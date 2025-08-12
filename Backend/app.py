@@ -20,6 +20,29 @@ def internal_error(error):
 def handle_exception(e):
     return jsonify({"error": f"שגיאה: {str(e)}"}), 500
 
+@app.route("/api/health", methods=["GET"])
+def health_check():
+    """בדיקת בריאות השרת"""
+    try:
+        # בדיקה חיבור לבסיס הנתונים
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+        conn.close()
+        
+        return jsonify({
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "database": "connected"
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "unhealthy",
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e)
+        }), 500
+
 # נתיב יחסי לקובץ DB
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade.db")
@@ -40,17 +63,88 @@ print(f"Files in UI directory: {os.listdir(UI_DIR)}")
 
 def get_db_connection():
     try:
-        conn = sqlite3.connect(DB_PATH, timeout=20.0)  # timeout ארוך יותר
+        # הגדרות SQLite משופרות ליציבות
+        conn = sqlite3.connect(
+            DB_PATH, 
+            timeout=30.0,  # timeout ארוך יותר
+            check_same_thread=False  # מאפשר שימוש מרובה threads
+        )
         conn.row_factory = sqlite3.Row
-        # הגדרת WAL mode לביצועים טובים יותר
+        
+        # הגדרות WAL mode לביצועים טובים יותר
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA synchronous=NORMAL")
         conn.execute("PRAGMA cache_size=10000")
         conn.execute("PRAGMA temp_store=MEMORY")
+        conn.execute("PRAGMA foreign_keys=ON")
+        
         return conn
     except Exception as e:
         print(f"שגיאה בחיבור לבסיס הנתונים: {e}")
         raise
+
+def update_ticker_active_status(ticker_id):
+    """
+    מעדכן את שדה active_trades של טיקר בהתאם למצב התכנונים והטריידים
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # בדיקה אם יש תכנונים פעילים
+        cursor.execute("""
+            SELECT COUNT(*) as count 
+            FROM trade_plans 
+            WHERE ticker_id = ? AND (canceled_at IS NULL OR canceled_at = '')
+        """, (ticker_id,))
+        active_plans = cursor.fetchone()['count']
+        
+        # בדיקה אם יש טריידים פעילים
+        cursor.execute("""
+            SELECT COUNT(*) as count 
+            FROM trades 
+            WHERE ticker_id = ? AND status IN ('open', 'pending', 'פתוח', 'ממתין')
+        """, (ticker_id,))
+        active_trades = cursor.fetchone()['count']
+        
+        # עדכון שדה active_trades
+        is_active = (active_plans > 0 or active_trades > 0)
+        cursor.execute("""
+            UPDATE tickers 
+            SET active_trades = ? 
+            WHERE id = ?
+        """, (is_active, ticker_id))
+        
+        conn.commit()
+        print(f"DEBUG: עדכון active_trades לטיקר {ticker_id}: {is_active} (תכנונים: {active_plans}, טריידים: {active_trades})")
+        
+    except Exception as e:
+        print(f"ERROR: שגיאה בעדכון active_trades לטיקר {ticker_id}: {str(e)}")
+        conn.rollback()
+    finally:
+        conn.close()
+
+def update_all_tickers_active_status():
+    """
+    מעדכן את שדה active_trades של כל הטיקרים
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # קבלת כל הטיקרים
+        cursor.execute("SELECT id FROM tickers")
+        tickers = cursor.fetchall()
+        
+        for ticker in tickers:
+            update_ticker_active_status(ticker['id'])
+        
+        print(f"DEBUG: עדכון active_trades הושלם עבור {len(tickers)} טיקרים")
+        
+    except Exception as e:
+        print(f"ERROR: שגיאה בעדכון כל הטיקרים: {str(e)}")
+    finally:
+        conn.close()
 
 @app.route("/")
 def home():
@@ -193,6 +287,10 @@ def create_trade_plan():
         ))
         
         plan_id = cursor.lastrowid
+        
+        # עדכון שדה active_trades של הטיקר
+        update_ticker_active_status(data['ticker_id'])
+        
         conn.commit()
         
         # החזרת תכנון הטרייד החדש
@@ -259,6 +357,12 @@ def update_trade_plan(plan_id):
             params.append(plan_id)
             query = f"UPDATE trade_plans SET {', '.join(update_fields)} WHERE id = ?"
             cursor.execute(query, params)
+            
+            # עדכון שדה active_trades של הטיקר
+            cursor.execute("SELECT ticker_id FROM trade_plans WHERE id = ?", (plan_id,))
+            ticker_id = cursor.fetchone()['ticker_id']
+            update_ticker_active_status(ticker_id)
+            
             conn.commit()
         
         # החזרת תכנון הטרייד המעודכן
@@ -279,12 +383,19 @@ def delete_trade_plan(plan_id):
     
     try:
         # בדיקה אם תכנון הטרייד קיים
-        cursor.execute("SELECT * FROM trade_plans WHERE id = ?", (plan_id,))
-        if not cursor.fetchone():
+        cursor.execute("SELECT ticker_id FROM trade_plans WHERE id = ?", (plan_id,))
+        plan = cursor.fetchone()
+        if not plan:
             return jsonify({"status": "error", "message": "תכנון טרייד לא נמצא"}), 404
+        
+        ticker_id = plan['ticker_id']
         
         # מחיקת תכנון הטרייד
         cursor.execute("DELETE FROM trade_plans WHERE id = ?", (plan_id,))
+        
+        # עדכון שדה active_trades של הטיקר
+        update_ticker_active_status(ticker_id)
+        
         conn.commit()
         
         conn.close()
@@ -310,7 +421,7 @@ def get_trades():
         t.total_pl,
         t.notes,
         tick.symbol as ticker,
-        tick.symbol as ticker_name,
+        tick.symbol as ticker_symbol,
         a.name as account_name
     FROM trades t
     JOIN tickers tick ON t.ticker_id = tick.id
@@ -352,6 +463,9 @@ def create_trade():
         ))
         
         trade_id = cursor.lastrowid
+        
+        # עדכון שדה active_trades של הטיקר
+        update_ticker_active_status(data['ticker_id'])
         
         conn.commit()
         
@@ -417,6 +531,12 @@ def update_trade(trade_id):
             params.append(trade_id)
             query = f"UPDATE trades SET {', '.join(update_fields)} WHERE id = ?"
             cursor.execute(query, params)
+            
+            # עדכון שדה active_trades של הטיקר
+            cursor.execute("SELECT ticker_id FROM trades WHERE id = ?", (trade_id,))
+            ticker_id = cursor.fetchone()['ticker_id']
+            update_ticker_active_status(ticker_id)
+            
             conn.commit()
         
         # החזרת הטרייד המעודכן
@@ -438,12 +558,19 @@ def delete_trade(trade_id):
     
     try:
         # בדיקה אם הטרייד קיים
-        cursor.execute("SELECT * FROM trades WHERE id = ?", (trade_id,))
-        if not cursor.fetchone():
+        cursor.execute("SELECT ticker_id FROM trades WHERE id = ?", (trade_id,))
+        trade = cursor.fetchone()
+        if not trade:
             return jsonify({"status": "error", "message": "טרייד לא נמצא"}), 404
+        
+        ticker_id = trade['ticker_id']
         
         # מחיקת הטרייד
         cursor.execute("DELETE FROM trades WHERE id = ?", (trade_id,))
+        
+        # עדכון שדה active_trades של הטיקר
+        update_ticker_active_status(ticker_id)
+        
         conn.commit()
         
         conn.close()
@@ -720,12 +847,8 @@ def get_accounts():
         if account['total_deposits'] > 0:
             profit_percentage = round((account['total_profit_loss'] / account['total_deposits']) * 100, 1)
         
-        # יצירת יתרת מזומן (דמו)
-        cash_balance = {}
-        if account['currency'] == 'USD':
-            cash_balance = {'USD': account['total_deposits'] * 0.15}  # 15% מזומן
-        else:
-            cash_balance = {'ILS': account['total_deposits'] * 0.15}  # 15% מזומן
+        # יתרת מזומן אמיתית מהטבלה
+        cash_balance = account.get('cash_balance', 0)
         
         accounts.append({
             'id': account['id'],
@@ -810,7 +933,7 @@ def create_account():
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (
             data['name'],
-            data.get('status', 'active'),
+            data.get('status', 'פתוח'),
             data['currency'],
             data.get('cash_balance', 0),
             data.get('total_value', 0),
@@ -896,31 +1019,55 @@ def update_account(account_id):
         conn.close()
         return jsonify({"status": "error", "message": str(e)}), 400
 
-# API למחיקת חשבון
+# API לביטול חשבון (עדכון סטטוס ל"מבוטל")
 @app.route("/api/accounts/<int:account_id>", methods=["DELETE"])
-def delete_account(account_id):
+def cancel_account(account_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
         # בדיקה אם החשבון קיים
         cursor.execute("SELECT * FROM accounts WHERE id = ?", (account_id,))
-        if not cursor.fetchone():
+        account = cursor.fetchone()
+        if not account:
             return jsonify({"status": "error", "message": "חשבון לא נמצא"}), 404
         
-        # בדיקה אם יש טריידים קשורים
-        cursor.execute("SELECT COUNT(*) as count FROM trades WHERE account_id = ?", (account_id,))
-        trades_count = cursor.fetchone()['count']
+        # בדיקה אם יש טריידים פתוחים
+        cursor.execute("""
+            SELECT t.id, t.opened_at, tk.symbol as ticker_symbol
+            FROM trades t
+            JOIN tickers tk ON t.ticker_id = tk.id
+            WHERE t.account_id = ? AND t.status IN ('open', 'pending', 'פתוח', 'ממתין')
+        """, (account_id,))
+        open_trades = cursor.fetchall()
         
-        if trades_count > 0:
-            return jsonify({"status": "error", "message": "לא ניתן למחוק חשבון עם טריידים קשורים"}), 400
+        print(f"DEBUG: בדיקת טריידים לחשבון {account_id}, נמצאו: {len(open_trades)} טריידים פתוחים")
         
-        # מחיקת החשבון
-        cursor.execute("DELETE FROM accounts WHERE id = ?", (account_id,))
+        if open_trades:
+            # החזרת פרטי הטריידים הפתוחים
+            trades_info = []
+            for trade in open_trades:
+                trades_info.append({
+                    'id': trade['id'],
+                    'ticker': trade['ticker_symbol'],
+                    'opened_at': trade['opened_at']
+                })
+            
+            response_data = {
+                "status": "error", 
+                "message": f"לא ניתן לבטל חשבון '{account['name']}' - יש טריידים פתוחים",
+                "error_type": "open_trades",
+                "trades": trades_info
+            }
+            print(f"DEBUG: מחזיר response: {response_data}")
+            return jsonify(response_data), 400
+        
+        # עדכון סטטוס החשבון ל"מבוטל"
+        cursor.execute("UPDATE accounts SET status = 'מבוטל' WHERE id = ?", (account_id,))
         conn.commit()
         
         conn.close()
-        return jsonify({"status": "success", "message": "חשבון נמחק בהצלחה"})
+        return jsonify({"status": "success", "message": f"חשבון '{account['name']}' בוטל בהצלחה"})
         
     except Exception as e:
         conn.close()
@@ -1102,15 +1249,24 @@ def create_ticker():
         if not data.get('symbol'):
             return jsonify({"status": "error", "message": "סימבול הוא שדה חובה"}), 400
         
+        if not data.get('type'):
+            return jsonify({"status": "error", "message": "סוג הוא שדה חובה"}), 400
+        
+        # בדיקת תקינות הסימבול - רק אותיות גדולות באנגלית, נקודות ומספרים
+        import re
+        symbol_pattern = re.compile(r'^[A-Z0-9.]+$')
+        if not symbol_pattern.match(data['symbol']):
+            return jsonify({"status": "error", "message": "סימבול יכול להכיל רק אותיות גדולות באנגלית, מספרים ונקודות"}), 400
+        
         # בדיקה אם הסימבול כבר קיים
         cursor.execute("SELECT * FROM tickers WHERE symbol = ?", (data['symbol'],))
         if cursor.fetchone():
-            return jsonify({"status": "error", "message": "סימבול זה כבר קיים"}), 400
+            return jsonify({"status": "error", "message": f"הטיקר '{data['symbol']}' כבר קיים במערכת"}), 400
         
         # הוספת הטיקר
         cursor.execute(
-            "INSERT INTO tickers (symbol, type, exchange) VALUES (?, ?, ?)",
-            (data['symbol'], data.get('type'), data.get('exchange'))
+            "INSERT INTO tickers (symbol, type, remarks) VALUES (?, ?, ?)",
+            (data['symbol'], data.get('type'), data.get('remarks'))
         )
         conn.commit()
         
@@ -1139,6 +1295,12 @@ def update_ticker(ticker_id):
         if not cursor.fetchone():
             return jsonify({"status": "error", "message": "טיקר לא נמצא"}), 404
         
+        # בדיקה אם הסימבול החדש כבר קיים בטיקר אחר
+        if 'symbol' in data:
+            cursor.execute("SELECT * FROM tickers WHERE symbol = ? AND id != ?", (data['symbol'], ticker_id))
+            if cursor.fetchone():
+                return jsonify({"status": "error", "message": f"הטיקר '{data['symbol']}' כבר קיים במערכת"}), 400
+        
         # עדכון הטיקר
         update_fields = []
         params = []
@@ -1151,9 +1313,9 @@ def update_ticker(ticker_id):
             update_fields.append("type = ?")
             params.append(data['type'])
         
-        if 'exchange' in data:
-            update_fields.append("exchange = ?")
-            params.append(data['exchange'])
+        if 'remarks' in data:
+            update_fields.append("remarks = ?")
+            params.append(data['remarks'])
         
         if update_fields:
             params.append(ticker_id)
@@ -1180,18 +1342,133 @@ def delete_ticker(ticker_id):
     try:
         # בדיקה אם הטיקר קיים
         cursor.execute("SELECT * FROM tickers WHERE id = ?", (ticker_id,))
-        if not cursor.fetchone():
+        ticker = cursor.fetchone()
+        if not ticker:
             return jsonify({"status": "error", "message": "טיקר לא נמצא"}), 404
         
-        # מחיקת הטיקר
+        # בדיקה אם יש תכנוני טריידים פעילים המקושרים לטיקר זה
+        cursor.execute("""
+            SELECT id, created_at, investment_type, planned_amount 
+            FROM trade_plans 
+            WHERE ticker_id = ? AND (canceled_at IS NULL OR canceled_at = '')
+        """, (ticker_id,))
+        linked_plans = cursor.fetchall()
+        
+        print(f"DEBUG: בדיקת תכנונים פעילים לטיקר {ticker_id}, נמצאו: {len(linked_plans)} תכנונים")
+        
+        # בדיקה אם יש טריידים פעילים המקושרים לטיקר זה
+        cursor.execute("""
+            SELECT id, status, opened_at, total_pl 
+            FROM trades 
+            WHERE ticker_id = ? AND status IN ('open', 'pending', 'פתוח', 'ממתין')
+        """, (ticker_id,))
+        linked_trades = cursor.fetchall()
+        
+        print(f"DEBUG: בדיקת טריידים פעילים לטיקר {ticker_id}, נמצאו: {len(linked_trades)} טריידים")
+        
+        # אם יש תכנונים פעילים או טריידים פעילים - מחזיר שגיאה
+        if linked_plans or linked_trades:
+            plans_info = []
+            trades_info = []
+            
+            if linked_plans:
+                for plan in linked_plans:
+                    plans_info.append({
+                        'id': plan['id'],
+                        'created_at': plan['created_at'],
+                        'investment_type': plan['investment_type'],
+                        'planned_amount': plan['planned_amount']
+                    })
+            
+            if linked_trades:
+                for trade in linked_trades:
+                    trades_info.append({
+                        'id': trade['id'],
+                        'status': trade['status'],
+                        'opened_at': trade['opened_at'],
+                        'total_pl': trade['total_pl']
+                    })
+            
+            # בניית הודעת שגיאה מתאימה
+            error_message = f"לא ניתן למחוק טיקר '{ticker['symbol']}' - יש "
+            if linked_plans and linked_trades:
+                error_message += f"תכנוני טריידים פעילים ({len(linked_plans)}) וטריידים פעילים ({len(linked_trades)}) המקושרים אליו"
+                error_type = "linked_plans_and_trades"
+            elif linked_plans:
+                error_message += f"תכנוני טריידים פעילים ({len(linked_plans)}) המקושרים אליו"
+                error_type = "linked_plans"
+            else:
+                error_message += f"טריידים פעילים ({len(linked_trades)}) המקושרים אליו"
+                error_type = "linked_trades"
+            
+            error_message += " (רק תכנונים וטריידים בסטטוס פתוח מונעים מחיקה)"
+            
+            print(f"DEBUG: מחזיר שגיאה - יש {len(plans_info)} תכנונים ו-{len(trades_info)} טריידים פעילים")
+            
+            response_data = {
+                "status": "error", 
+                "message": error_message,
+                "error_type": error_type
+            }
+            
+            if plans_info:
+                response_data["linked_plans"] = plans_info
+            if trades_info:
+                response_data["linked_trades"] = trades_info
+                
+            return jsonify(response_data), 400
+        
+
+        
+        # בדיקה אם יש התראות פעילות המקושרות לטיקר זה
+        cursor.execute("""
+            SELECT id, alert_type, condition, status, created_at 
+            FROM alerts 
+            WHERE ticker_id = ? AND status IN ('active', 'פעיל')
+        """, (ticker_id,))
+        linked_alerts = cursor.fetchall()
+        
+        print(f"DEBUG: בדיקת התראות פעילות לטיקר {ticker_id}, נמצאו: {len(linked_alerts)} התראות")
+        
+        if linked_alerts:
+            # יש התראות פעילות מקושרות - מחזיר שגיאה עם פרטי ההתראות
+            alerts_info = []
+            for alert in linked_alerts:
+                alerts_info.append({
+                    'id': alert['id'],
+                    'alert_type': alert['alert_type'],
+                    'condition': alert['condition'],
+                    'status': alert['status'],
+                    'created_at': alert['created_at']
+                })
+            
+            print(f"DEBUG: מחזיר שגיאה - יש {len(alerts_info)} התראות פעילות מקושרות")
+            return jsonify({
+                "status": "error", 
+                "message": f"לא ניתן למחוק טיקר '{ticker['symbol']}' - יש התראות פעילות המקושרות אליו (רק התראות בסטטוס פעיל מונעות מחיקה)",
+                "error_type": "linked_alerts",
+                "linked_alerts": alerts_info
+            }), 400
+        
+        # אין קשרים - ניתן למחוק
+        print(f"DEBUG: אין קשרים - מוחק טיקר {ticker_id}")
         cursor.execute("DELETE FROM tickers WHERE id = ?", (ticker_id,))
         conn.commit()
         
         conn.close()
-        return jsonify({"status": "success", "message": "טיקר נמחק בהצלחה"})
+        return jsonify({"status": "success", "message": f"טיקר '{ticker['symbol']}' נמחק בהצלחה"})
         
     except Exception as e:
         conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 400
+
+# API לעדכון שדה active_trades של כל הטיקרים
+@app.route("/api/tickers/update-active-status", methods=["POST"])
+def update_all_tickers_active():
+    try:
+        update_all_tickers_active_status()
+        return jsonify({"status": "success", "message": "עדכון שדה active_trades הושלם בהצלחה"})
+    except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
 # API לטרנזקציות

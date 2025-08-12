@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SimpleTrade - כל בסיס הנתונים</title>
+  <title>בסיס הנתונים - TikTrack</title>
   <link href="https://fonts.googleapis.com/css2?family=Alef&display=swap" rel="stylesheet" />
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -479,6 +479,31 @@
       background-color: rgba(0, 0, 0, 0.5) !important;
     }
     
+    /* סגנונות למודל אזהרה כללי */
+    #warningModal .modal-header {
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    #warningModal .modal-content {
+      border-radius: 8px;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    #warningModal .table {
+      margin-bottom: 0;
+    }
+    
+    #warningModal .table th {
+      background-color: #f8f9fa;
+      border-color: #dee2e6;
+      font-weight: 600;
+    }
+    
+    #warningModal .table td {
+      border-color: #dee2e6;
+      vertical-align: middle;
+    }
+    
     #addAccountModal .modal-content {
       background-color: white !important;
       border: 1px solid #dee2e6 !important;
@@ -747,9 +772,8 @@
               <div class="col-md-6 mb-3">
                 <label for="accountStatus" class="form-label">סטטוס</label>
                 <select class="form-select" id="accountStatus">
-                  <option value="active">פעיל</option>
-                  <option value="inactive">לא פעיל</option>
-                  <option value="suspended">מושעה</option>
+                  <option value="פתוח">פתוח</option>
+                  <option value="סגור">סגור</option>
                 </select>
               </div>
             </div>
@@ -820,9 +844,8 @@
               <div class="col-md-6 mb-3">
                 <label for="editAccountStatus" class="form-label">סטטוס</label>
                 <select class="form-select" id="editAccountStatus">
-                  <option value="active">פעיל</option>
-                  <option value="inactive">לא פעיל</option>
-                  <option value="suspended">מושעה</option>
+                  <option value="פתוח">פתוח</option>
+                  <option value="סגור">סגור</option>
                 </select>
               </div>
             </div>
@@ -854,12 +877,16 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteAccountFromModal()" title="מחק חשבון">🗑️</button>
+          <button type="button" class="delete-account-btn me-auto" onclick="deleteAccountFromModal()" title="בטל חשבון">🚫</button>
           <button type="button" class="edit-btn" onclick="updateAccountFromModal()" title="עדכן חשבון">💾</button>
         </div>
       </div>
     </div>
   </div>
+
+
+
+
 
   <!-- מודל הוספת טיקר -->
   <div class="modal fade" id="addTickerModal" tabindex="-1" aria-labelledby="addTickerModalLabel" aria-hidden="true">
@@ -873,7 +900,11 @@
           <form id="addTickerForm">
             <div class="mb-3">
               <label for="tickerSymbol" class="form-label">סימבול *</label>
-              <input type="text" class="form-control" id="tickerSymbol" required placeholder="למשל: AAPL">
+              <input type="text" class="form-control" id="tickerSymbol" required placeholder="למשל: AAPL" 
+                     oninput="validateSymbolInput(this)" 
+                     onkeypress="return validateSymbolKeypress(event)"
+                     maxlength="20">
+              <div class="form-text">רק אותיות גדולות באנגלית, מספרים ונקודות מותרים</div>
             </div>
             <div class="mb-3">
               <label for="tickerType" class="form-label">סוג</label>
@@ -887,8 +918,8 @@
               </select>
             </div>
             <div class="mb-3">
-              <label for="tickerExchange" class="form-label">בורסה</label>
-              <input type="text" class="form-control" id="tickerExchange" placeholder="למשל: NASDAQ">
+              <label for="tickerRemarks" class="form-label">הערות</label>
+              <textarea class="form-control" id="tickerRemarks" rows="3" placeholder="הערות על הטיקר..."></textarea>
             </div>
           </form>
         </div>
@@ -912,7 +943,11 @@
             <input type="hidden" id="editTickerId">
             <div class="mb-3">
               <label for="editTickerSymbol" class="form-label">סימבול *</label>
-              <input type="text" class="form-control" id="editTickerSymbol" required>
+              <input type="text" class="form-control" id="editTickerSymbol" required
+                     oninput="validateSymbolInput(this)" 
+                     onkeypress="return validateSymbolKeypress(event)"
+                     maxlength="20">
+              <div class="form-text">רק אותיות גדולות באנגלית, מספרים ונקודות מותרים</div>
             </div>
             <div class="mb-3">
               <label for="editTickerType" class="form-label">סוג</label>
@@ -926,8 +961,8 @@
               </select>
             </div>
             <div class="mb-3">
-              <label for="editTickerExchange" class="form-label">בורסה</label>
-              <input type="text" class="form-control" id="editTickerExchange">
+              <label for="editTickerRemarks" class="form-label">הערות</label>
+              <textarea class="form-control" id="editTickerRemarks" rows="3"></textarea>
             </div>
           </form>
         </div>
@@ -1342,6 +1377,26 @@
     </div>
   </div>
 
+  <!-- מודל אזהרה כללי -->
+  <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" id="warningModalContent">
+        <div class="modal-header" id="warningModalHeader">
+          <h5 class="modal-title" id="warningModalLabel">
+            <i class="fas fa-exclamation-triangle"></i> <span id="warningModalTitle">אזהרה</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="warningModalBody"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">הבנתי</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- מודל עריכת הערה -->
   <div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -1445,7 +1500,7 @@
         if (tableName === 'accounts') {
           columns = ['id', 'name', 'currency', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'];
         } else if (tableName === 'tickers') {
-          columns = ['id', 'symbol', 'type', 'exchange'];
+          columns = ['id', 'symbol', 'type', 'active_trades', 'remarks'];
         } else if (tableName === 'trades') {
           columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'opened_at', 'closed_at', 'total_pl', 'notes'];
         } else if (tableName === 'executions') {
@@ -1466,7 +1521,18 @@
         
         columns.forEach(column => {
           const th = document.createElement('th');
-          th.textContent = getColumnDisplayName(column);
+          const displayName = getColumnDisplayName(column);
+          
+          // יצירת כותרת עם חלק באנגלית לא בבולד
+          if (displayName.includes('(') && displayName.includes(')')) {
+            const hebrewPart = displayName.split('(')[0].trim();
+            const englishPart = displayName.split('(')[1].replace(')', '').trim();
+            
+            th.innerHTML = `${hebrewPart} <span style="font-weight: normal; color: #666;">(${englishPart})</span>`;
+          } else {
+            th.textContent = displayName;
+          }
+          
           th.style.cursor = 'pointer';
           th.title = 'לחץ למיון';
           
@@ -1498,7 +1564,7 @@
         if (tableName === 'accounts') {
           columns = ['id', 'name', 'currency', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'];
         } else if (tableName === 'tickers') {
-          columns = ['id', 'symbol', 'type', 'exchange'];
+          columns = ['id', 'symbol', 'type', 'active_trades', 'remarks'];
         } else if (tableName === 'trades') {
           columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'opened_at', 'closed_at', 'total_pl', 'notes'];
         } else if (tableName === 'executions') {
@@ -1532,6 +1598,11 @@
           } else if (typeof value === 'boolean') {
             td.textContent = value ? 'כן' : 'לא';
             td.style.color = value ? 'var(--apple-green)' : 'var(--apple-red)';
+            td.style.fontWeight = '500';
+          } else if (key === 'active_trades') {
+            td.textContent = value ? 'פעיל' : 'לא פעיל';
+            td.style.color = value ? 'var(--apple-green)' : 'var(--apple-red)';
+            td.style.fontWeight = '500';
           } else if (key === 'status') {
             // המרת סטטוסים לעברית
             let statusText = value;
@@ -1539,20 +1610,32 @@
             
             switch (value) {
               case 'open':
+              case 'פתוח':
                 statusText = 'פתוח';
                 statusColor = 'var(--apple-blue)';
                 break;
               case 'closed':
+              case 'סגור':
                 statusText = 'סגור';
                 statusColor = 'var(--apple-green)';
                 break;
               case 'cancelled':
+              case 'מבוטל':
                 statusText = 'מבוטל';
                 statusColor = 'var(--apple-red)';
                 break;
               case 'pending':
+              case 'ממתין':
                 statusText = 'ממתין';
                 statusColor = 'var(--apple-orange)';
+                break;
+              case 'active':
+                statusText = 'פעיל';
+                statusColor = 'var(--apple-blue)';
+                break;
+              case 'inactive':
+                statusText = 'לא פעיל';
+                statusColor = 'var(--apple-gray)';
                 break;
             }
             
@@ -1603,8 +1686,15 @@
         deleteBtn.addEventListener('click', () => {
           const displayName = getTableDisplayName(tableName);
           const itemName = getItemDisplayName(tableName, row);
-          if (confirm(`האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?`)) {
-            deleteItem(tableName, row.id, itemName);
+          
+          if (tableName === 'accounts') {
+            if (confirm(`⚠️ אזהרה: האם אתה בטוח שברצונך לבטל את ${displayName} "${itemName}"?\n\nהחשבון יקבל סטטוס "מבוטל" ולא יימחק מהמערכת.\nפעולה זו אינה הפיכה.`)) {
+              deleteItem(tableName, row.id, itemName);
+            }
+          } else {
+            if (confirm(`האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?`)) {
+              deleteItem(tableName, row.id, itemName);
+            }
           }
         });
         
@@ -1622,7 +1712,7 @@
       return table;
     }
     
-    // פונקציה למחיקת חשבון
+    // פונקציה לביטול חשבון
     async function deleteAccount(accountId, accountName) {
       try {
         const response = await fetch(`/api/accounts/${accountId}`, {
@@ -1632,18 +1722,71 @@
           }
         });
         
+        const data = await response.json();
+        
         if (response.ok) {
-          alert(`החשבון "${accountName}" נמחק בהצלחה!`);
+          // הצגת הודעת הצלחה
+          showSuccessMessage(`החשבון "${accountName}" בוטל בהצלחה!`);
           // רענון הטבלה
           loadTable('accounts');
         } else {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'שגיאה במחיקת החשבון');
+          if (data.error_type === 'open_trades') {
+            showOpenTradesWarning(data.message, data.trades);
+          } else {
+            throw new Error(data.message || 'שגיאה בביטול החשבון');
+          }
         }
       } catch (error) {
-        console.error('שגיאה במחיקת חשבון:', error);
-        alert(`שגיאה במחיקת החשבון: ${error.message}`);
+        console.error('שגיאה בביטול חשבון:', error);
+        // הצגת הודעת שגיאה
+        showErrorMessage(`שגיאה בביטול החשבון: ${error.message}`);
       }
+    }
+
+
+
+    // פונקציה להצגת הודעת הצלחה
+    function showSuccessMessage(message) {
+      // יצירת אלמנט הודעה
+      const notification = document.createElement('div');
+      notification.className = 'alert alert-success alert-dismissible fade show position-fixed';
+      notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+      notification.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // הסרה אוטומטית אחרי 3 שניות
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 3000);
+    }
+
+    // פונקציה להצגת הודעת שגיאה
+    function showErrorMessage(message) {
+      // יצירת אלמנט הודעה
+      const notification = document.createElement('div');
+      notification.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+      notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+      notification.innerHTML = `
+        <i class="fas fa-exclamation-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // הסרה אוטומטית אחרי 5 שניות
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 5000);
     }
     
     // פונקציות לניהול מודלים
@@ -1680,7 +1823,7 @@
       document.getElementById('editAccountId').value = account.id;
       document.getElementById('editAccountName').value = account.name;
       document.getElementById('editAccountCurrency').value = account.currency;
-      document.getElementById('editAccountStatus').value = account.status || 'active';
+      document.getElementById('editAccountStatus').value = account.status || 'פתוח';
       document.getElementById('editAccountCashBalance').value = account.cash_balance || '';
       document.getElementById('editAccountTotalValue').value = account.total_value || '';
       document.getElementById('editAccountTotalPl').value = account.total_pl || '';
@@ -1714,14 +1857,14 @@
     async function createAccount() {
       const name = document.getElementById('accountName').value.trim();
       const currency = document.getElementById('accountCurrency').value;
-      const status = document.getElementById('accountStatus').value;
+      const status = document.getElementById('accountStatus').value || 'פתוח';
       const cashBalance = parseFloat(document.getElementById('accountCashBalance').value) || 0;
       const totalValue = parseFloat(document.getElementById('accountTotalValue').value) || 0;
       const totalPl = parseFloat(document.getElementById('accountTotalPl').value) || 0;
       const notes = document.getElementById('accountNotes').value.trim();
       
       if (!name || !currency) {
-        alert('שם החשבון ומטבע הם שדות חובה');
+        showErrorMessage('שם החשבון ומטבע הם שדות חובה');
         return;
       }
       
@@ -1745,7 +1888,7 @@
         const data = await response.json();
         
         if (response.ok) {
-          alert('החשבון נוסף בהצלחה!');
+          showSuccessMessage('החשבון נוסף בהצלחה!');
           // סגירת המודל
           const modal = bootstrap.Modal.getInstance(document.getElementById('addAccountModal'));
           modal.hide();
@@ -1756,7 +1899,7 @@
         }
       } catch (error) {
         console.error('שגיאה בהוספת חשבון:', error);
-        alert(`שגיאה בהוספת החשבון: ${error.message}`);
+        showErrorMessage(`שגיאה בהוספת החשבון: ${error.message}`);
       }
     }
     
@@ -1764,14 +1907,14 @@
       const accountId = document.getElementById('editAccountId').value;
       const name = document.getElementById('editAccountName').value.trim();
       const currency = document.getElementById('editAccountCurrency').value;
-      const status = document.getElementById('editAccountStatus').value;
+      const status = document.getElementById('editAccountStatus').value || 'פתוח';
       const cashBalance = parseFloat(document.getElementById('editAccountCashBalance').value) || 0;
       const totalValue = parseFloat(document.getElementById('editAccountTotalValue').value) || 0;
       const totalPl = parseFloat(document.getElementById('editAccountTotalPl').value) || 0;
       const notes = document.getElementById('editAccountNotes').value.trim();
       
       if (!name || !currency) {
-        alert('שם החשבון ומטבע הם שדות חובה');
+        showErrorMessage('שם החשבון ומטבע הם שדות חובה');
         return;
       }
       
@@ -1795,7 +1938,7 @@
         const data = await response.json();
         
         if (response.ok) {
-          alert('החשבון עודכן בהצלחה!');
+          showSuccessMessage('החשבון עודכן בהצלחה!');
           // סגירת המודל
           const modal = bootstrap.Modal.getInstance(document.getElementById('editAccountModal'));
           modal.hide();
@@ -1806,7 +1949,7 @@
         }
       } catch (error) {
         console.error('שגיאה בעדכון חשבון:', error);
-        alert(`שגיאה בעדכון החשבון: ${error.message}`);
+        showErrorMessage(`שגיאה בעדכון החשבון: ${error.message}`);
       }
     }
     
@@ -1814,7 +1957,7 @@
       const accountId = document.getElementById('editAccountId').value;
       const accountName = document.getElementById('editAccountName').value;
       
-      if (confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
+      if (confirm(`⚠️ אזהרה: האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?\n\nהחשבון יקבל סטטוס "מבוטל" ולא יימחק מהמערכת.\nפעולה זו אינה הפיכה.`)) {
         deleteAccount(accountId, accountName);
         // סגירת המודל
         const modal = bootstrap.Modal.getInstance(document.getElementById('editAccountModal'));
@@ -1927,110 +2070,73 @@
       currentHeader.textContent += newOrder === 'asc' ? ' ↑' : ' ↓';
     }
     
-    // פונקציה להמרת שמות עמודות לעברית
+    // פונקציה להמרת שמות עמודות לעברית עם שם באנגלית
     function getColumnDisplayName(columnName) {
       const columnNames = {
-        'id': 'מזהה',
-        'name': 'שם',
-        'symbol': 'סימבול',
-        'type': 'סוג',
-        'account_id': 'מזהה חשבון',
-        'account_name': 'שם חשבון',
-        'ticker_id': 'מזהה טיקר',
-        'ticker_symbol': 'סימבול טיקר',
-        'action': 'פעולה',
-        'order_type': 'סוג פקודה',
-        'expiry_type': 'סוג תפוגה',
-        'price': 'מחיר',
-        'quantity': 'כמות',
-        'trade_id': 'מזהה טרייד',
-        'trade_status': 'סטטוס טרייד',
-        'trade_opened_at': 'תאריך פתיחת טרייד',
-        'flow_type': 'סוג תזרים',
-        'currency': 'מטבע',
-        'date': 'תאריך',
-        'snapshot_date': 'תאריך צילום',
-        'portfolio_value': 'שווי תיק',
-        'total_invested': 'סה"כ מושקע',
-        'total_return': 'סה"כ תשואה',
-        'investment_type': 'סוג השקעה',
-        'investment_category': 'קטגוריית השקעה',
-        'category_display': 'קטגוריה',
-        'planned_amount': 'סכום מתוכנן',
-        'entry_conditions': 'תנאי כניסה',
-        'stop_price': 'מחיר סטופ',
-        'target_price': 'מחיר יעד',
-        'reasons': 'סיבות',
-        'created_at': 'תאריך יצירה',
-        'canceled_at': 'תאריך ביטול',
-        'cancel_reason': 'סיבת ביטול',
-        'opened_at': 'תאריך פתיחה',
-        'closed_at': 'תאריך סגירה',
-        'status': 'סטטוס',
-        'notes': 'הערות',
-        'total_pl': 'רווח/הפסד כולל',
-        'cash_balance': 'יתרת מזומן',
-        'total_value': 'שווי כולל',
-        'quantity': 'כמות',
-        'price': 'מחיר',
-        'execution_date': 'תאריך ביצוע',
-        'request_date': 'תאריך בקשה',
-        'amount': 'סכום',
-        'flow_type': 'סוג תזרים',
-        'description': 'תיאור',
-        'alert_type': 'סוג התראה',
-        'condition': 'תנאי',
-        'triggered_at': 'תאריך הפעלה',
-        'is_active': 'פעיל',
-        'snapshot_date': 'תאריך צילום',
-        'portfolio_value': 'שווי תיק',
-        'total_invested': 'סה"כ מושקע',
-        'total_return': 'סה"כ תשואה',
-        'content': 'תוכן',
-        'created_by': 'נוצר על ידי',
-        'updated_at': 'תאריך עדכון',
-        'symbol': 'סימבול',
-        'type': 'סוג',
-        'exchange': 'בורסה',
-        'account_id': 'מזהה חשבון',
-        'ticker_id': 'מזהה טיקר',
-        'trade_plan_id': 'מזהה תכנון',
-        'action': 'פעולה',
-        'date': 'תאריך',
-        'quantity': 'כמות',
-        'price': 'מחיר',
-        'fee': 'עמלה',
-        'source': 'מקור',
-        'alert_type': 'סוג התראה',
-        'condition': 'תנאי',
-        'triggered_at': 'תאריך הפעלה',
-        'flow_type': 'סוג תזרים',
-        'amount': 'סכום',
-        'description': 'תיאור',
-        'total_value': 'שווי כולל',
-        'open_pl': 'רווח/הפסד פתוח',
-        'closed_pl': 'רווח/הפסד סגור',
-        'mtm_value': 'שווי שוק',
-        'investment_type': 'סוג השקעה',
-        'planned_amount': 'סכום מתוכנן',
-        'entry_conditions': 'תנאי כניסה',
-        'stop_price': 'מחיר סטופ',
-        'target_price': 'מחיר יעד',
-        'reasons': 'סיבות',
-        'canceled_at': 'תאריך ביטול',
-        'cancel_reason': 'סיבת ביטול',
-        'opened_at': 'תאריך פתיחה',
-        'closed_at': 'תאריך סגירה',
-        'trade_id': 'מזהה טרייד',
-        'ticker_symbol': 'סימבול טיקר',
-        'order_type': 'סוג פקודה',
-        'expiry_type': 'סוג תפוגה',
-        'content': 'תוכן',
-        'attachment': 'קובץ מצורף',
-        'created_by': 'נוצר על ידי'
+        'id': 'מזהה (ID)',
+        'name': 'שם (Name)',
+        'symbol': 'סימבול (Symbol)',
+        'type': 'סוג (Type)',
+        'account_id': 'מזהה חשבון (Account ID)',
+        'account_name': 'שם חשבון (Account Name)',
+        'ticker_id': 'מזהה טיקר (Ticker ID)',
+        'ticker_symbol': 'סימבול טיקר (Ticker Symbol)',
+        'action': 'פעולה (Action)',
+        'order_type': 'סוג פקודה (Order Type)',
+        'expiry_type': 'סוג תפוגה (Expiry Type)',
+        'price': 'מחיר (Price)',
+        'quantity': 'כמות (Quantity)',
+        'trade_id': 'מזהה טרייד (Trade ID)',
+        'trade_status': 'סטטוס טרייד (Trade Status)',
+        'trade_opened_at': 'תאריך פתיחת טרייד (Trade Opened At)',
+        'flow_type': 'סוג תזרים (Flow Type)',
+        'currency': 'מטבע (Currency)',
+        'date': 'תאריך (Date)',
+        'snapshot_date': 'תאריך צילום (Snapshot Date)',
+        'portfolio_value': 'שווי תיק (Portfolio Value)',
+        'total_invested': 'סה"כ מושקע (Total Invested)',
+        'total_return': 'סה"כ תשואה (Total Return)',
+        'investment_type': 'סוג השקעה (Investment Type)',
+        'investment_category': 'קטגוריית השקעה (Investment Category)',
+        'category_display': 'קטגוריה (Category)',
+        'planned_amount': 'סכום מתוכנן (Planned Amount)',
+        'entry_conditions': 'תנאי כניסה (Entry Conditions)',
+        'stop_price': 'מחיר סטופ (Stop Price)',
+        'target_price': 'מחיר יעד (Target Price)',
+        'reasons': 'סיבות (Reasons)',
+        'created_at': 'תאריך יצירה (Created At)',
+        'canceled_at': 'תאריך ביטול (Canceled At)',
+        'cancel_reason': 'סיבת ביטול (Cancel Reason)',
+        'opened_at': 'תאריך פתיחה (Opened At)',
+        'closed_at': 'תאריך סגירה (Closed At)',
+        'status': 'סטטוס (Status)',
+        'notes': 'הערות (Notes)',
+        'total_pl': 'רווח/הפסד כולל (Total P/L)',
+        'cash_balance': 'יתרת מזומן (Cash Balance)',
+        'total_value': 'שווי כולל (Total Value)',
+        'execution_date': 'תאריך ביצוע (Execution Date)',
+        'request_date': 'תאריך בקשה (Request Date)',
+        'amount': 'סכום (Amount)',
+        'description': 'תיאור (Description)',
+        'alert_type': 'סוג התראה (Alert Type)',
+        'condition': 'תנאי (Condition)',
+        'triggered_at': 'תאריך הפעלה (Triggered At)',
+        'is_active': 'פעיל (Is Active)',
+        'content': 'תוכן (Content)',
+        'created_by': 'נוצר על ידי (Created By)',
+        'updated_at': 'תאריך עדכון (Updated At)',
+        'active_trades': 'טריידים פעילים (Active Trades)',
+        'remarks': 'הערות (Remarks)',
+        'trade_plan_id': 'מזהה תכנון (Trade Plan ID)',
+        'fee': 'עמלה (Fee)',
+        'source': 'מקור (Source)',
+        'open_pl': 'רווח/הפסד פתוח (Open P/L)',
+        'closed_pl': 'רווח/הפסד סגור (Closed P/L)',
+        'mtm_value': 'שווי שוק (MTM Value)',
+        'attachment': 'קובץ מצורף (Attachment)'
       };
       
-      return columnNames[columnName] || columnName;
+      return columnNames[columnName] || `${columnName} (${columnName})`;
     }
     
     // טעינת כל הטבלאות בעת טעינת הדף
@@ -2307,11 +2413,36 @@
       }, 100);
     }
     
+    // פונקציות ולידציה לשדה סימבול
+    function validateSymbolInput(input) {
+      // המר לאותיות גדולות
+      let value = input.value.toUpperCase();
+      
+      // הסר תווים לא מותרים (רק אותיות גדולות באנגלית, מספרים ונקודות)
+      value = value.replace(/[^A-Z0-9.]/g, '');
+      
+      // עדכן את הערך בשדה
+      input.value = value;
+    }
+    
+    function validateSymbolKeypress(event) {
+      const char = String.fromCharCode(event.which);
+      const allowedChars = /[A-Za-z0-9.]/;
+      
+      // אם זה לא תו מותר, בטל את האירוע
+      if (!allowedChars.test(char)) {
+        event.preventDefault();
+        return false;
+      }
+      
+      return true;
+    }
+    
     function showEditTickerModal(ticker) {
       document.getElementById('editTickerId').value = ticker.id;
       document.getElementById('editTickerSymbol').value = ticker.symbol;
       document.getElementById('editTickerType').value = ticker.type || '';
-      document.getElementById('editTickerExchange').value = ticker.exchange || '';
+      document.getElementById('editTickerRemarks').value = ticker.remarks || '';
       
       const modalElement = document.getElementById('editTickerModal');
       const modal = new bootstrap.Modal(modalElement);
@@ -2339,10 +2470,17 @@
     async function createTicker() {
       const symbol = document.getElementById('tickerSymbol').value.trim();
       const type = document.getElementById('tickerType').value;
-      const exchange = document.getElementById('tickerExchange').value.trim();
+      const remarks = document.getElementById('tickerRemarks').value.trim();
       
       if (!symbol) {
         alert('סימבול הוא שדה חובה');
+        return;
+      }
+      
+      // ולידציה נוספת של הסימבול
+      const symbolPattern = /^[A-Z0-9.]+$/;
+      if (!symbolPattern.test(symbol)) {
+        alert('סימבול יכול להכיל רק אותיות גדולות באנגלית, מספרים ונקודות');
         return;
       }
       
@@ -2355,7 +2493,7 @@
           body: JSON.stringify({
             symbol: symbol,
             type: type,
-            exchange: exchange
+            remarks: remarks
           })
         });
         
@@ -2379,10 +2517,17 @@
       const id = document.getElementById('editTickerId').value;
       const symbol = document.getElementById('editTickerSymbol').value.trim();
       const type = document.getElementById('editTickerType').value;
-      const exchange = document.getElementById('editTickerExchange').value.trim();
+      const remarks = document.getElementById('editTickerRemarks').value.trim();
       
       if (!symbol) {
         alert('סימבול הוא שדה חובה');
+        return;
+      }
+      
+      // ולידציה נוספת של הסימבול
+      const symbolPattern = /^[A-Z0-9.]+$/;
+      if (!symbolPattern.test(symbol)) {
+        alert('סימבול יכול להכיל רק אותיות גדולות באנגלית, מספרים ונקודות');
         return;
       }
       
@@ -2395,7 +2540,7 @@
           body: JSON.stringify({
             symbol: symbol,
             type: type,
-            exchange: exchange
+            remarks: remarks
           })
         });
         
@@ -2428,20 +2573,234 @@
             }
           });
           
+          const data = await response.json();
+          
           if (response.ok) {
             alert(`הטיקר "${symbol}" נמחק בהצלחה!`);
             const modal = bootstrap.Modal.getInstance(document.getElementById('editTickerModal'));
             modal.hide();
             loadTable('tickers');
           } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'שגיאה במחיקת הטיקר');
+            // בדיקה אם יש קשרים מונעים מחיקה
+            if (data.error_type && (data.error_type === 'linked_plans' || data.error_type === 'linked_trades' || data.error_type === 'linked_alerts' || data.error_type === 'has_links')) {
+              showWarningModal('danger', 'לא ניתן למחוק טיקר', data.message, data);
+            } else {
+              throw new Error(data.message || 'שגיאה במחיקת הטיקר');
+            }
           }
         } catch (error) {
           console.error('שגיאה במחיקת טיקר:', error);
           alert(`שגיאה במחיקת טיקר: ${error.message}`);
         }
       }
+    }
+    
+    // פונקציה כללית להצגת אזהרות
+    function showWarningModal(type, title, message, data = null) {
+      const modal = document.getElementById('warningModal');
+      const modalContent = document.getElementById('warningModalContent');
+      const modalHeader = document.getElementById('warningModalHeader');
+      const modalTitle = document.getElementById('warningModalTitle');
+      const modalBody = document.getElementById('warningModalBody');
+      
+      // הגדרת צבעים לפי סוג האזהרה
+      let headerClass = '';
+      let borderClass = '';
+      
+      switch (type) {
+        case 'danger':
+          headerClass = 'bg-danger text-white';
+          borderClass = 'border-danger';
+          break;
+        case 'warning':
+          headerClass = 'bg-warning text-dark';
+          borderClass = 'border-warning';
+          break;
+        case 'info':
+          headerClass = 'bg-info text-white';
+          borderClass = 'border-info';
+          break;
+        default:
+          headerClass = 'bg-secondary text-white';
+          borderClass = 'border-secondary';
+      }
+      
+      // עדכון המודל
+      modalHeader.className = `modal-header ${headerClass}`;
+      modalContent.className = `modal-content ${borderClass}`;
+      modalTitle.textContent = title;
+      
+      // בניית תוכן המודל
+      let bodyContent = `<div class="alert alert-${type === 'danger' ? 'danger' : type === 'warning' ? 'warning' : 'info'}" role="alert">
+        <h6 class="alert-heading">${title}</h6>
+        <p>${message}</p>
+      </div>`;
+      
+      // הוספת טבלה אם יש נתונים
+      if (data && data.trades && data.trades.length > 0) {
+        bodyContent += `
+          <div class="card mt-3">
+            <div class="card-header bg-light">
+              <h6 class="mb-0">טריידים פתוחים בחשבון:</h6>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                  <thead>
+                    <tr>
+                      <th>מזהה טרייד</th>
+                      <th>טיקר</th>
+                      <th>תאריך פתיחה</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${data.trades.map(trade => `
+                      <tr>
+                        <td>#${trade.id}</td>
+                        <td>${trade.ticker || 'לא ידוע'}</td>
+                        <td>${formatDate(trade.opened_at)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <p class="text-muted small">
+              <strong>הסבר:</strong> כדי לבטל חשבון, יש לסגור תחילה את כל הטריידים הפתוחים בו.
+            </p>
+          </div>
+        `;
+      }
+      
+      // הוספת פרטי תכנוני טריידים מקושרים
+      if (data && data.linked_plans && data.linked_plans.length > 0) {
+        bodyContent += `
+          <div class="mt-3">
+            <h6 class="text-${type === 'danger' ? 'danger' : 'warning'}">תכנוני טריידים פעילים מקושרים:</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered">
+                <thead class="table-${type === 'danger' ? 'danger' : 'warning'}">
+                  <tr>
+                    <th>מזהה</th>
+                    <th>תאריך יצירה</th>
+                    <th>סוג השקעה</th>
+                    <th>סכום מתוכנן</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${data.linked_plans.map(plan => `
+                    <tr>
+                      <td>#${plan.id}</td>
+                      <td>${formatDate(plan.created_at)}</td>
+                      <td>${plan.investment_type}</td>
+                      <td>${plan.planned_amount ? plan.planned_amount.toLocaleString() : '-'}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      
+      // הוספת פרטי טריידים פעילים מקושרים
+      if (data && data.linked_trades && data.linked_trades.length > 0) {
+        bodyContent += `
+          <div class="mt-3">
+            <h6 class="text-${type === 'danger' ? 'danger' : 'warning'}">טריידים פעילים מקושרים:</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered">
+                <thead class="table-${type === 'danger' ? 'danger' : 'warning'}">
+                  <tr>
+                    <th>מזהה</th>
+                    <th>סטטוס</th>
+                    <th>תאריך פתיחה</th>
+                    <th>רווח/הפסד</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${data.linked_trades.map(trade => `
+                    <tr>
+                      <td>#${trade.id}</td>
+                      <td>${trade.status}</td>
+                      <td>${trade.opened_at ? formatDate(trade.opened_at) : '-'}</td>
+                      <td>${trade.total_pl ? trade.total_pl.toLocaleString() : '-'}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      
+      // הוספת פרטי התראות מקושרות
+      if (data && data.linked_alerts && data.linked_alerts.length > 0) {
+        bodyContent += `
+          <div class="mt-3">
+            <h6 class="text-${type === 'danger' ? 'danger' : 'warning'}">התראות פעילות מקושרות:</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered">
+                <thead class="table-${type === 'danger' ? 'danger' : 'warning'}">
+                  <tr>
+                    <th>מזהה</th>
+                    <th>סוג התראה</th>
+                    <th>תנאי</th>
+                    <th>תאריך יצירה</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${data.linked_alerts.map(alert => `
+                    <tr>
+                      <td>#${alert.id}</td>
+                      <td>${alert.alert_type}</td>
+                      <td>${alert.condition}</td>
+                      <td>${formatDate(alert.created_at)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      
+      // הצגת סיכום כל הקשרים
+      if (data && data.error_type === 'has_links') {
+        bodyContent += `
+          <div class="mt-3">
+            <h6 class="text-${type === 'danger' ? 'danger' : 'warning'}">סיכום קשרים במערכת:</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered">
+                <thead class="table-${type === 'danger' ? 'danger' : 'warning'}">
+                  <tr>
+                    <th colspan="4" class="text-center">
+                      <strong>סה"כ קשרים במערכת:</strong><br>
+                      תכנוני טריידים: ${data.total_plans || 0}<br>
+                      טריידים: ${data.total_trades || 0}<br>
+                      התראות: ${data.total_alerts || 0}
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      
+      modalBody.innerHTML = bodyContent;
+      
+      // הצגת המודל
+      const bootstrapModal = new bootstrap.Modal(modal);
+      bootstrapModal.show();
+    }
+    
+    // פונקציה עזר לעיצוב תאריכים
+    function formatDate(dateString) {
+      if (!dateString) return '-';
+      return new Date(dateString).toLocaleDateString('he-IL');
     }
     
     async function deleteItem(tableName, itemId, itemName) {
@@ -2483,17 +2842,33 @@
           }
         });
         
+        const data = await response.json();
+        console.log('DEBUG: Server response for deleteItem:', data);
+        
         if (response.ok) {
-          alert(`${getTableDisplayName(tableName)} "${itemName}" נמחק בהצלחה!`);
+          // הצגת הודעת הצלחה
+          const successMessage = tableName === 'accounts' 
+            ? `${getTableDisplayName(tableName)} "${itemName}" בוטל בהצלחה!`
+            : `${getTableDisplayName(tableName)} "${itemName}" נמחק בהצלחה!`;
+          showSuccessMessage(successMessage);
           // רענון הטבלה
           loadTable(tableName);
         } else {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `שגיאה במחיקת ${getTableDisplayName(tableName)}`);
+          // טיפול מיוחד בטיקרים עם קשרים
+          if (tableName === 'tickers' && data.error_type && (data.error_type === 'linked_plans' || data.error_type === 'linked_trades' || data.error_type === 'linked_alerts' || data.error_type === 'has_links')) {
+            showWarningModal('danger', 'לא ניתן למחוק טיקר', data.message, data);
+          } 
+          // טיפול מיוחד בחשבונות עם טריידים פתוחים
+          else if (tableName === 'accounts' && data.error_type === 'open_trades') {
+            showWarningModal('danger', 'לא ניתן לבטל חשבון', data.message, data);
+          } else {
+            throw new Error(data.message || `שגיאה במחיקת ${getTableDisplayName(tableName)}`);
+          }
         }
       } catch (error) {
         console.error(`שגיאה במחיקת ${getTableDisplayName(tableName)}:`, error);
-        alert(`שגיאה במחיקת ${getTableDisplayName(tableName)}: ${error.message}`);
+        // הצגת הודעת שגיאה
+        showErrorMessage(`שגיאה במחיקת ${getTableDisplayName(tableName)}: ${error.message}`);
       }
     }
     

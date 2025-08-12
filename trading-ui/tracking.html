@@ -250,6 +250,13 @@
       color: white;
       cursor: not-allowed;
     }
+    
+    .no-alerts {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 2rem;
+    }
 
     /* עיצוב סיכום מידע */
     .info-summary {
@@ -846,59 +853,45 @@
         </div>
 
         <!-- תצוגת סיכום -->
-        <div class="info-summary">
-          <div>סה"כ טריידים פעילים: <strong>8</strong></div>
-          <div>ערך תיק כולל: <strong>₪153,150</strong></div>
-          <div>רווח כולל: <strong style="color: green">+₪8,690</strong></div>
-          <div>אחוז רווח: <strong style="color: green">+6.0%</strong></div>
+        <div class="info-summary" id="summaryStats">
+          <div>סה"כ טריידים פעילים: <strong id="activeTradesCount">טוען...</strong></div>
+          <div>ערך תיק כולל: <strong id="totalPortfolioValue">טוען...</strong></div>
+          <div>רווח כולל: <strong id="totalProfitLoss">טוען...</strong></div>
+          <div>אחוז רווח: <strong id="profitPercentage">טוען...</strong></div>
         </div>
 
         <!-- אזהרות -->
         <div class="alert-section">
           <h3>התראות <button class="btn btn-primary" onclick="openAlertModal()" style="margin-right: 1rem; font-size: 0.8rem;">הוסף התראה</button></h3>
-          <div class="alert-row">
+          <div class="alert-row" id="alertsContainer">
+            <!-- התראות יוכנסו כאן דינמית -->
             <div class="alert-card">
-              <strong onclick="openTradeDetails('AAPL')">AAPL</strong><br />
-              מחיר חצה את 180$<br />
-              <span class="price">נוכחי: $184.32 (+1.2%)</span>
-              <button class="btn btn-secondary" onclick="markAlertAsRead(this, 'AAPL')">סמן כנקרא</button>
-            </div>
-            <div class="alert-card">
-              <strong onclick="openTradeDetails('TSLA')">TSLA</strong><br />
-              מחיר ירד מתחת ל-700$<br />
-              <span class="price">נוכחי: $688.90 (-2.1%)</span>
-              <button class="btn btn-secondary" onclick="markAlertAsRead(this, 'TSLA')">סמן כנקרא</button>
-            </div>
-            <div class="alert-card">
-              <strong onclick="openTradeDetails('MSFT')">MSFT</strong><br />
-              תזכורת לכניסה ביום שלישי<br />
-              <span class="price">נוכחי: $342.00 (+2.4%)</span>
-              <button class="btn btn-secondary" onclick="markAlertAsRead(this, 'MSFT')">סמן כנקרא</button>
+              <div class="no-alerts">אין התראות פעילות</div>
             </div>
           </div>
         </div>
 
         <!-- סטטיסטיקות -->
-        <div class="stats-grid">
+        <div class="stats-grid" id="statsGrid">
           <div class="stat-card">
             <h3>רווח יומי</h3>
-            <div class="value">+₪1,240</div>
-            <div class="change positive">+1.2%</div>
+            <div class="value" id="dailyProfit">טוען...</div>
+            <div class="change" id="dailyProfitChange">טוען...</div>
           </div>
           <div class="stat-card">
             <h3>רווח שבועי</h3>
-            <div class="value">+₪3,450</div>
-            <div class="change positive">+2.8%</div>
+            <div class="value" id="weeklyProfit">טוען...</div>
+            <div class="change" id="weeklyProfitChange">טוען...</div>
           </div>
           <div class="stat-card">
             <h3>רווח חודשי</h3>
-            <div class="value">+₪8,240</div>
-            <div class="change positive">+7.0%</div>
+            <div class="value" id="monthlyProfit">טוען...</div>
+            <div class="change" id="monthlyProfitChange">טוען...</div>
           </div>
           <div class="stat-card">
             <h3>טריידים רווחיים</h3>
-            <div class="value">4/6</div>
-            <div class="change positive">66.7%</div>
+            <div class="value" id="profitableTrades">טוען...</div>
+            <div class="change" id="profitableTradesChange">טוען...</div>
           </div>
         </div>
 
@@ -2003,11 +1996,129 @@
       return null;
     }
 
+    // פונקציות לטעינת נתונים אמיתיים
+    async function loadSummaryStats() {
+      try {
+        const response = await fetch('/api/accounts/stats');
+        const stats = await response.json();
+        
+        // עדכון סטטיסטיקות סיכום
+        document.getElementById('activeTradesCount').textContent = stats.active_accounts || 0;
+        document.getElementById('totalPortfolioValue').textContent = formatCurrency(stats.total_value || 0);
+        
+        const profitLoss = stats.total_profit_loss || 0;
+        const profitElement = document.getElementById('totalProfitLoss');
+        profitElement.textContent = formatCurrency(profitLoss);
+        profitElement.style.color = profitLoss >= 0 ? 'green' : 'red';
+        
+        const percentageElement = document.getElementById('profitPercentage');
+        percentageElement.textContent = `${stats.profit_percentage || 0}%`;
+        percentageElement.style.color = profitLoss >= 0 ? 'green' : 'red';
+        
+      } catch (error) {
+        console.error('Error loading summary stats:', error);
+      }
+    }
+    
+    async function loadAlerts() {
+      try {
+        const response = await fetch('/api/alerts');
+        const alerts = await response.json();
+        
+        const alertsContainer = document.getElementById('alertsContainer');
+        
+        if (alerts.length === 0) {
+          alertsContainer.innerHTML = `
+            <div class="alert-card">
+              <div class="no-alerts">אין התראות פעילות</div>
+            </div>
+          `;
+          return;
+        }
+        
+        const activeAlerts = alerts.filter(alert => alert.status === 'active');
+        
+        if (activeAlerts.length === 0) {
+          alertsContainer.innerHTML = `
+            <div class="alert-card">
+              <div class="no-alerts">אין התראות פעילות</div>
+            </div>
+          `;
+          return;
+        }
+        
+        alertsContainer.innerHTML = activeAlerts.map(alert => `
+          <div class="alert-card">
+            <strong onclick="openTradeDetails('${alert.ticker_symbol || 'Unknown'}')">${alert.ticker_symbol || 'Unknown'}</strong><br />
+            ${alert.condition || 'התראה'}<br />
+            <span class="price">סטטוס: ${alert.status}</span>
+            <button class="btn btn-secondary" onclick="markAlertAsRead(this, '${alert.ticker_symbol || 'Unknown'}')">סמן כנקרא</button>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading alerts:', error);
+      }
+    }
+    
+    async function loadDetailedStats() {
+      try {
+        const response = await fetch('/api/stats');
+        const stats = await response.json();
+        
+        // עדכון סטטיסטיקות מפורטות
+        document.getElementById('dailyProfit').textContent = formatCurrency(stats.daily_profit || 0);
+        document.getElementById('weeklyProfit').textContent = formatCurrency(stats.weekly_profit || 0);
+        document.getElementById('monthlyProfit').textContent = formatCurrency(stats.monthly_profit || 0);
+        document.getElementById('profitableTrades').textContent = `${stats.profitable_trades || 0}/${stats.total_trades || 0}`;
+        
+        // עדכון צבעים
+        const dailyChange = document.getElementById('dailyProfitChange');
+        const weeklyChange = document.getElementById('weeklyProfitChange');
+        const monthlyChange = document.getElementById('monthlyProfitChange');
+        const tradesChange = document.getElementById('profitableTradesChange');
+        
+        const dailyProfit = stats.daily_profit || 0;
+        const weeklyProfit = stats.weekly_profit || 0;
+        const monthlyProfit = stats.monthly_profit || 0;
+        const profitableRate = stats.total_trades > 0 ? (stats.profitable_trades / stats.total_trades) * 100 : 0;
+        
+        dailyChange.textContent = `${dailyProfit >= 0 ? '+' : ''}${((dailyProfit / (stats.total_value || 1)) * 100).toFixed(1)}%`;
+        dailyChange.className = `change ${dailyProfit >= 0 ? 'positive' : 'negative'}`;
+        
+        weeklyChange.textContent = `${weeklyProfit >= 0 ? '+' : ''}${((weeklyProfit / (stats.total_value || 1)) * 100).toFixed(1)}%`;
+        weeklyChange.className = `change ${weeklyProfit >= 0 ? 'positive' : 'negative'}`;
+        
+        monthlyChange.textContent = `${monthlyProfit >= 0 ? '+' : ''}${((monthlyProfit / (stats.total_value || 1)) * 100).toFixed(1)}%`;
+        monthlyChange.className = `change ${monthlyProfit >= 0 ? 'positive' : 'negative'}`;
+        
+        tradesChange.textContent = `${profitableRate.toFixed(1)}%`;
+        tradesChange.className = `change ${profitableRate >= 50 ? 'positive' : 'negative'}`;
+        
+      } catch (error) {
+        console.error('Error loading detailed stats:', error);
+      }
+    }
+    
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('he-IL', {
+        style: 'currency',
+        currency: 'ILS',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+    
     // אתחול הדף
     document.addEventListener('DOMContentLoaded', () => {
       console.log('DOM loaded - setting up header listener');
       // הגדרת האזנה לכותרת
       setupHeaderListener();
+      
+      // טעינת נתונים אמיתיים
+      loadSummaryStats();
+      loadAlerts();
+      loadDetailedStats();
       
       // עדכון הקומפוננט הכותרת עם הפילטר השמור (אם יש)
       const savedFilter = loadSavedFilters();

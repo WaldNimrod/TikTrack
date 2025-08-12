@@ -43,17 +43,32 @@ pip3 install flask flask-cors
 
 ### הפעלת השרת
 
+#### אופציה 1: הפעלה עם מנטור אוטומטי (מומלץ!)
 ```bash
-cd Backend
-python3 app.py
+./start_server.sh
 ```
 
-השרת יפעל על `http://localhost:5000`
+#### אופציה 2: הפעלה רגילה
+```bash
+cd Backend
+python3 run_waitress.py
+```
+
+#### עצירת השרת
+```bash
+./stop_server.sh
+```
+
+השרת יפעל על `http://127.0.0.1:5002`
 
 ### בדיקת השרת
 
 ```bash
-curl http://localhost:5000/api/stats
+# בדיקת בריאות השרת
+curl http://127.0.0.1:5002/api/health
+
+# בדיקת סטטיסטיקות
+curl http://127.0.0.1:5002/api/stats
 ```
 
 אם השרת פועל כראוי, תקבל תשובה כמו:

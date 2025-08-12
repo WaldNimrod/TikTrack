@@ -1571,6 +1571,11 @@ class AppHeader extends HTMLElement {
       toggle.classList.remove('active');
       console.log('Filter menu closed');
     } else {
+      // סגירת פילטרים אחרים לפני פתיחת זה
+      if (typeof window.closeOtherFilters === 'function') {
+        window.closeOtherFilters('status');
+      }
+      
       // פתיחת התפריט
       menu.classList.add('show');
       toggle.classList.add('active');
@@ -1611,6 +1616,11 @@ class AppHeader extends HTMLElement {
       toggle.classList.remove('active');
       console.log('Type filter menu closed');
     } else {
+      // סגירת פילטרים אחרים לפני פתיחת זה
+      if (typeof window.closeOtherFilters === 'function') {
+        window.closeOtherFilters('type');
+      }
+      
       // פתיחת התפריט
       menu.classList.add('show');
       toggle.classList.add('active');
@@ -1651,6 +1661,11 @@ class AppHeader extends HTMLElement {
       toggle.classList.remove('active');
       console.log('Account filter menu closed');
     } else {
+      // סגירת פילטרים אחרים לפני פתיחת זה
+      if (typeof window.closeOtherFilters === 'function') {
+        window.closeOtherFilters('account');
+      }
+      
       // פתיחת התפריט
       menu.classList.add('show');
       toggle.classList.add('active');
@@ -1691,6 +1706,11 @@ class AppHeader extends HTMLElement {
       toggle.classList.remove('active');
       console.log('Date range filter menu closed');
     } else {
+      // סגירת פילטרים אחרים לפני פתיחת זה
+      if (typeof window.closeOtherFilters === 'function') {
+        window.closeOtherFilters('dateRange');
+      }
+      
       // פתיחת התפריט
       menu.classList.add('show');
       toggle.classList.add('active');
@@ -2102,6 +2122,11 @@ class AppHeader extends HTMLElement {
       this.toggleSearchClearButton();
     }
     
+    // עדכון שדה החיפוש בדף הטבלה
+    if (typeof window.updateSearchFieldFromComponent === 'function') {
+      window.updateSearchFieldFromComponent('');
+    }
+    
     // ניקוי הפילטר השמור ב-localStorage
     try {
       localStorage.removeItem('planningFilterSearch');
@@ -2138,6 +2163,11 @@ class AppHeader extends HTMLElement {
       console.log('Search term saved to localStorage:', searchTerm);
     } catch (error) {
       console.error('Error saving search term to localStorage:', error);
+    }
+    
+    // עדכון שדה החיפוש בדף הטבלה
+    if (typeof window.updateSearchFieldFromComponent === 'function') {
+      window.updateSearchFieldFromComponent(searchTerm);
     }
     
     // עדכון הגריד עם החיפוש
@@ -2198,6 +2228,9 @@ class AppHeader extends HTMLElement {
         }
       });
       this.updateDateRangeFilterText();
+      
+      // סגירת התפריט של פילטר התאריך
+      this.closeDateRangeFilter();
     }
     
     // ניקוי שדה החיפוש
@@ -2219,7 +2252,14 @@ class AppHeader extends HTMLElement {
       console.error('Error clearing filters from localStorage:', error);
     }
     
-    this.updateGridFilter();
+    // קריאה לפונקציה הגלובלית לרענון מלא
+    if (typeof window.resetAllFiltersAndReloadData === 'function') {
+      console.log('Calling global resetAllFiltersAndReloadData');
+      window.resetAllFiltersAndReloadData();
+    } else {
+      console.log('Global reset function not available, using updateGridFilter');
+      this.updateGridFilter();
+    }
   }
 
   updateGridFilter() {
@@ -2252,9 +2292,28 @@ class AppHeader extends HTMLElement {
         .map(item => item.getAttribute('data-account'));
     }
     
+    // קבלת טווח התאריכים הנבחר
+    const dateRangeMenu = this.shadowRoot.getElementById('dateRangeFilterMenu');
+    let selectedDateRange = null;
+    if (dateRangeMenu) {
+      const selectedDateRangeItem = dateRangeMenu.querySelector('.date-range-filter-item.selected');
+      if (selectedDateRangeItem) {
+        selectedDateRange = selectedDateRangeItem.querySelector('.option-text').textContent;
+      }
+    }
+    
+    // קבלת החיפוש הנוכחי
+    const searchInput = this.shadowRoot.getElementById('searchFilterInput');
+    let searchTerm = null;
+    if (searchInput) {
+      searchTerm = searchInput.value.trim();
+    }
+    
     console.log('Selected statuses from component:', selectedStatuses);
     console.log('Selected types from component:', selectedTypes);
     console.log('Selected accounts from component:', selectedAccounts);
+    console.log('Selected date range from component:', selectedDateRange);
+    console.log('Search term from component:', searchTerm);
     
     // עדכון הצ'קבוקסים מהקומפוננט החדש
     if (typeof window.updateTestCheckboxesFromComponent === 'function') {
@@ -2267,14 +2326,14 @@ class AppHeader extends HTMLElement {
     // עדכון הגריד דרך הפונקציה הגלובלית
     if (typeof window.updateGridFromComponent === 'function') {
       console.log('Calling updateGridFromComponent');
-      window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts);
+      window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
     } else {
       console.log('updateGridFromComponent function not found');
       // נסיון נוסף אחרי זמן קצר
       setTimeout(() => {
         if (typeof window.updateGridFromComponent === 'function') {
           console.log('Retrying updateGridFromComponent');
-          window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts);
+          window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
         }
       }, 100);
     }

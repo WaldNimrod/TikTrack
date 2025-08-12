@@ -26,24 +26,7 @@
           <h1>בדיקת גריד מסוג טבלה</h1>
         </div>
 
-        <!-- אלמנטי בדיקה ספציפיים לדף זה -->
-        <div class="filter-test-section">
-          <h3>בדיקת פילטר סטטוס</h3>
-          <div class="checkbox-group">
-            <label>
-              <input type="checkbox" id="status-open" checked>
-              <span>פתוח</span>
-            </label>
-            <label>
-              <input type="checkbox" id="status-closed">
-              <span>סגור</span>
-            </label>
-            <label>
-              <input type="checkbox" id="status-cancelled">
-              <span>מבוטל</span>
-            </label>
-          </div>
-        </div>
+
 
         <div class="info-summary">
           <div>סה"כ רשומות: <strong id="totalRecords">0</strong></div>
@@ -69,18 +52,9 @@
               💰 טריידים
             </div>
             <div class="table-count" id="tradesCount">סה"כ רשומות: טוען...</div>
-            <div class="button-container">
-              <input type="date" id="startDate" style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onchange="filterByDate()" placeholder="מתאריך">
-              <input type="date" id="endDate" style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onchange="filterByDate()" placeholder="עד תאריך">
-              <button onclick="clearDateFilter()" style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px; background: #f8f9fa; cursor: pointer;" title="נקה תאריכים">🗑️</button>
-              <input type="text" id="tradesSearch" placeholder="חיפוש בטריידים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="searchTrades()">
-              <button onclick="clearSearchFilter()" style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px; background: #f8f9fa; cursor: pointer;" title="נקה חיפוש">🗑️</button>
-            </div>
+
             
-            <!-- הצגת החיפוש הנוכחי -->
-            <div id="currentSearchDisplay" style="margin-top: 10px; padding: 8px 12px; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; font-size: 14px; display: none;">
-              <strong>חיפוש נוכחי:</strong> <span id="currentSearchText"></span>
-            </div>
+
               <button class="refresh-btn" onclick="resetAllFiltersAndReloadData()" title="רענן טבלה">
                 <span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן
               </button>
@@ -517,14 +491,13 @@
       console.log('Filters:', { selectedStatuses, selectedTypes, selectedAccounts });
       console.log('Total trades data:', tradesData.length);
       
-      // קבלת ערך החיפוש הנוכחי
-      const searchTerm = document.getElementById('tradesSearch').value.toLowerCase();
+      // קבלת ערך החיפוש הנוכחי מהמשתנה הגלובלי
+      const searchTerm = window.selectedSearchTermForFilter ? window.selectedSearchTermForFilter.toLowerCase() : '';
       console.log('Search term:', searchTerm);
       
-      // קבלת ערכי התאריך הנוכחיים
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
-      console.log('Date range:', { startDate, endDate });
+      // קבלת ערכי התאריך הנוכחיים מהמשתנה הגלובלי
+      const selectedDateRange = window.selectedDateRangeForFilter;
+      console.log('Selected date range:', selectedDateRange);
       
       filteredData = tradesData.filter(row => {
         // פילטר סטטוס
@@ -591,38 +564,55 @@
         }
         
         // פילטר תאריך
-        if (startDate || endDate) {
+        if (selectedDateRange && selectedDateRange !== 'הכול') {
           if (!row.originalDate) {
             console.log('Row has no original date:', row);
             return false; // אם אין תאריך מקורי, לא להציג
           }
           
           const rowDate = row.originalDate;
-          console.log('Checking date filter for row:', row.ticker, 'date:', rowDate, 'against range:', { startDate, endDate });
+          const today = new Date();
+          let startDate = new Date();
+          let endDate = new Date();
           
-          if (startDate && endDate) {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            // הגדרת זמן לסוף היום עבור endDate
-            end.setHours(23, 59, 59, 999);
-            if (!(rowDate >= start && rowDate <= end)) {
-              console.log('Date filter rejected:', row.ticker, 'date:', rowDate, 'not in range:', start, 'to', end);
-              return false;
-            }
-          } else if (startDate) {
-            const start = new Date(startDate);
-            if (!(rowDate >= start)) {
-              console.log('Start date filter rejected:', row.ticker, 'date:', rowDate, 'before:', start);
-              return false;
-            }
-          } else if (endDate) {
-            const end = new Date(endDate);
-            // הגדרת זמן לסוף היום עבור endDate
-            end.setHours(23, 59, 59, 999);
-            if (!(rowDate <= end)) {
-              console.log('End date filter rejected:', row.ticker, 'date:', rowDate, 'after:', end);
-              return false;
-            }
+          // חישוב טווח התאריכים לפי הבחירה
+          switch (selectedDateRange) {
+            case 'שבוע':
+              startDate.setDate(today.getDate() - 7);
+              break;
+            case 'MTD':
+              startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+              break;
+            case '30 יום':
+              startDate.setDate(today.getDate() - 30);
+              break;
+            case '60 יום':
+              startDate.setDate(today.getDate() - 60);
+              break;
+            case '90 יום':
+              startDate.setDate(today.getDate() - 90);
+              break;
+            case 'שנה':
+              startDate.setFullYear(today.getFullYear() - 1);
+              break;
+            case 'YTD':
+              startDate = new Date(today.getFullYear(), 0, 1);
+              break;
+            case 'שנה קודמת':
+              startDate = new Date(today.getFullYear() - 1, 0, 1);
+              endDate = new Date(today.getFullYear() - 1, 11, 31);
+              break;
+            default:
+              console.log('Unknown date range:', selectedDateRange);
+              return true; // אם לא מוכר, להציג הכל
+          }
+          
+          // הגדרת זמן לסוף היום עבור endDate
+          endDate.setHours(23, 59, 59, 999);
+          
+          if (!(rowDate >= startDate && rowDate <= endDate)) {
+            console.log('Date filter rejected:', row.ticker, 'date:', rowDate, 'not in range:', startDate, 'to', endDate);
+            return false;
           }
         }
         
@@ -637,106 +627,15 @@
       updatePagination();
     }
 
-    // פונקציה לפילטור לפי תאריך
-    function filterByDate() {
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
-      
-      console.log('=== filterByDate called ===');
-      console.log('Date range:', { startDate, endDate });
-      
-      // קבלת הפילטרים הנוכחיים מקומפוננטת התפריט
-      const selectedStatuses = window.selectedStatusesForFilter || [];
-      const selectedTypes = window.selectedTypesForFilter || [];
-      const selectedAccounts = window.selectedAccountsForFilter || [];
-      
-      console.log('Current filters:', { selectedStatuses, selectedTypes, selectedAccounts });
-      
-      // הפעלת הפילטרים דרך הפונקציה הראשית
-      filterData(selectedStatuses, selectedTypes, selectedAccounts);
-      
-      console.log('=== filterByDate completed ===');
-    }
 
-    // פונקציה לחיפוש חופשי
-    function searchTrades() {
-      const searchInput = document.getElementById('tradesSearch');
-      if (!searchInput) {
-        console.error('Search input not found');
-        return;
-      }
-      
-      const searchTerm = searchInput.value.toLowerCase();
-      
-      console.log('=== searchTrades called ===');
-      console.log('Search term:', searchTerm);
-      console.log('Search input value:', searchInput.value);
-      
-      // הצגת החיפוש הנוכחי
-      updateSearchDisplay(searchTerm);
-      
-      // קבלת הפילטרים הנוכחיים מקומפוננטת התפריט
-      const selectedStatuses = window.selectedStatusesForFilter || [];
-      const selectedTypes = window.selectedTypesForFilter || [];
-      const selectedAccounts = window.selectedAccountsForFilter || [];
-      
-      console.log('Current filters:', { selectedStatuses, selectedTypes, selectedAccounts });
-      
-      // הפעלת הפילטרים דרך הפונקציה הראשית
-      filterData(selectedStatuses, selectedTypes, selectedAccounts);
-      
-      console.log('=== searchTrades completed ===');
-    }
 
-    // פונקציה לעדכון הצגת החיפוש
-    function updateSearchDisplay(searchTerm) {
-      const searchDisplay = document.getElementById('currentSearchDisplay');
-      const searchText = document.getElementById('currentSearchText');
-      
-      if (!searchDisplay || !searchText) {
-        console.error('Search display elements not found');
-        return;
-      }
-      
-      if (searchTerm && searchTerm.trim() !== '') {
-        searchText.textContent = searchTerm;
-        searchDisplay.style.display = 'block';
-        console.log('Search display updated with:', searchTerm);
-      } else {
-        searchDisplay.style.display = 'none';
-        console.log('Search display hidden - no search term');
-      }
-    }
 
-    // פונקציה לניקוי פילטר החיפוש
-    function clearSearchFilter() {
-      document.getElementById('tradesSearch').value = '';
-      updateSearchDisplay(''); // הסתרת הצגת החיפוש
-      searchTrades();
-    }
 
-    // פונקציה לניקוי פילטר התאריך
-    function clearDateFilter() {
-      document.getElementById('startDate').value = '';
-      document.getElementById('endDate').value = '';
-      filterByDate();
-    }
+
 
     // פונקציה לסגירת כל הפילטרים הפתוחים
     function closeAllFilters() {
       console.log('=== closeAllFilters called ===');
-      
-      // ניקוי שדה החיפוש
-      const searchInput = document.getElementById('tradesSearch');
-      if (searchInput) {
-        searchInput.value = '';
-      }
-      
-      // ניקוי שדות התאריך
-      const startDateField = document.getElementById('startDate');
-      const endDateField = document.getElementById('endDate');
-      if (startDateField) startDateField.value = '';
-      if (endDateField) endDateField.value = '';
       
       // איפוס הפילטרים בקומפוננטת התפריט
       if (typeof window.resetComponentFilters === 'function') {
@@ -748,12 +647,14 @@
       window.selectedTypesForFilter = [];
       window.selectedAccountsForFilter = [];
       window.selectedDateRangeForFilter = null;
+      window.selectedSearchTermForFilter = null;
       
       // ניקוי localStorage
       localStorage.removeItem('planningFilterStatuses');
       localStorage.removeItem('planningFilterTypes');
       localStorage.removeItem('planningFilterAccounts');
       localStorage.removeItem('planningFilterDateRange');
+      localStorage.removeItem('planningFilterSearch');
       
       console.log('All filters cleared');
     }
@@ -951,19 +852,17 @@
       console.log('=== updateSearchFieldFromComponent called ===');
       console.log('Search term from component:', searchTerm);
       
-      const searchField = document.getElementById('tradesSearch');
-      if (!searchField) {
-        console.error('Search field not found');
-        return;
-      }
+      // עדכון המשתנה הגלובלי
+      window.selectedSearchTermForFilter = searchTerm;
       
-      // עדכון שדה החיפוש
-      searchField.value = searchTerm;
+      // הפעלת הפילטר ישירות
+      const selectedStatuses = window.selectedStatusesForFilter || [];
+      const selectedTypes = window.selectedTypesForFilter || [];
+      const selectedAccounts = window.selectedAccountsForFilter || [];
       
-      // הצגת החיפוש הנוכחי
-      updateSearchDisplay(searchTerm);
+      filterData(selectedStatuses, selectedTypes, selectedAccounts);
       
-      console.log('Search field updated with:', searchTerm);
+      console.log('Search filter applied with term:', searchTerm);
     }
 
     // פונקציה לעדכון שדות התאריך מקומפוננטת התפריט
@@ -971,72 +870,17 @@
       console.log('=== updateDateFieldsFromComponent called ===');
       console.log('Date range from component:', dateRange);
       
-      const startDateField = document.getElementById('startDate');
-      const endDateField = document.getElementById('endDate');
+      // עדכון המשתנה הגלובלי
+      window.selectedDateRangeForFilter = dateRange;
       
-      if (!startDateField || !endDateField) {
-        console.error('Date fields not found');
-        return;
-      }
+      // הפעלת הפילטר ישירות
+      const selectedStatuses = window.selectedStatusesForFilter || [];
+      const selectedTypes = window.selectedTypesForFilter || [];
+      const selectedAccounts = window.selectedAccountsForFilter || [];
       
-      // ניקוי השדות
-      startDateField.value = '';
-      endDateField.value = '';
+      filterData(selectedStatuses, selectedTypes, selectedAccounts);
       
-      if (!dateRange || dateRange === 'הכול') {
-        console.log('No date range selected, clearing fields');
-        // הפעלת הפילטר אחרי ניקוי השדות
-        filterByDate();
-        return;
-      }
-      
-      // חישוב התאריכים לפי הטווח הנבחר
-      const today = new Date();
-      let startDate = new Date();
-      let endDate = new Date();
-      
-      switch (dateRange) {
-        case 'שבוע':
-          startDate.setDate(today.getDate() - 7);
-          break;
-        case 'MTD':
-          startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-          break;
-        case '30 יום':
-          startDate.setDate(today.getDate() - 30);
-          break;
-        case '60 יום':
-          startDate.setDate(today.getDate() - 60);
-          break;
-        case '90 יום':
-          startDate.setDate(today.getDate() - 90);
-          break;
-        case 'שנה':
-          startDate.setFullYear(today.getFullYear() - 1);
-          break;
-        case 'YTD':
-          startDate = new Date(today.getFullYear(), 0, 1);
-          break;
-        case 'שנה קודמת':
-          startDate = new Date(today.getFullYear() - 1, 0, 1);
-          endDate = new Date(today.getFullYear() - 1, 11, 31);
-          break;
-        default:
-          console.log('Unknown date range:', dateRange);
-          return;
-      }
-      
-      // עדכון השדות
-      startDateField.value = startDate.toISOString().split('T')[0];
-      endDateField.value = endDate.toISOString().split('T')[0];
-      
-      console.log('Updated date fields:', {
-        startDate: startDateField.value,
-        endDate: endDateField.value
-      });
-      
-      // הפעלת הפילטר
-      filterByDate();
+      console.log('Date filter applied with range:', dateRange);
     }
 
     // טעינת נתונים בעת טעינת הדף

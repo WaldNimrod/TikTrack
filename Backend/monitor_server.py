@@ -78,7 +78,7 @@ class ServerMonitor:
                 # השרת רץ, בודק בריאות
                 if self.check_server_health():
                     print(f"✅ Server healthy at {datetime.now().strftime('%H:%M:%S')}")
-                    time.sleep(30)  # בדיקה כל 30 שניות
+                    time.sleep(15)  # בדיקה כל 15 שניות
                     continue
                 else:
                     print(f"⚠️  Server not responding at {datetime.now().strftime('%H:%M:%S')}")

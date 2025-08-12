@@ -2122,10 +2122,7 @@ class AppHeader extends HTMLElement {
       this.toggleSearchClearButton();
     }
     
-    // עדכון שדה החיפוש בדף הטבלה
-    if (typeof window.updateSearchFieldFromComponent === 'function') {
-      window.updateSearchFieldFromComponent('');
-    }
+    // עדכון שדה החיפוש בדף הטבלה - הוסר כדי למנוע לולאה אינסופית
     
     // ניקוי הפילטר השמור ב-localStorage
     try {
@@ -2165,10 +2162,7 @@ class AppHeader extends HTMLElement {
       console.error('Error saving search term to localStorage:', error);
     }
     
-    // עדכון שדה החיפוש בדף הטבלה
-    if (typeof window.updateSearchFieldFromComponent === 'function') {
-      window.updateSearchFieldFromComponent(searchTerm);
-    }
+    // עדכון שדה החיפוש בדף הטבלה - הוסר כדי למנוע לולאה אינסופית
     
     // עדכון הגריד עם החיפוש
     this.updateGridFilter();
@@ -2252,14 +2246,8 @@ class AppHeader extends HTMLElement {
       console.error('Error clearing filters from localStorage:', error);
     }
     
-    // קריאה לפונקציה הגלובלית לרענון מלא
-    if (typeof window.resetAllFiltersAndReloadData === 'function') {
-      console.log('Calling global resetAllFiltersAndReloadData');
-      window.resetAllFiltersAndReloadData();
-    } else {
-      console.log('Global reset function not available, using updateGridFilter');
-      this.updateGridFilter();
-    }
+    // עדכון הפילטרים
+    this.updateGridFilter();
   }
 
   updateGridFilter() {

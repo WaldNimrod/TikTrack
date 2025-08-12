@@ -701,18 +701,8 @@
         localStorage.setItem('planningFilterSearch', searchTerm);
       }
       
-      // עדכון שדה החיפוש אם יש חיפוש
-      if (searchTerm && typeof window.updateSearchFieldFromComponent === 'function') {
-        window.updateSearchFieldFromComponent(searchTerm);
-      }
-      
-      // עדכון שדות התאריך אם יש טווח תאריכים
-      if (selectedDateRange && typeof window.updateDateFieldsFromComponent === 'function') {
-        window.updateDateFieldsFromComponent(selectedDateRange);
-      } else {
-        // הפעלת הפילטרים על הטבלה
-        filterData(selectedStatuses, selectedTypes, selectedAccounts);
-      }
+      // הפעלת הפילטרים על הטבלה
+      filterData(selectedStatuses, selectedTypes, selectedAccounts);
       
       console.log('=== updateGridFromComponent completed in grid-table-test ===');
     }

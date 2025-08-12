@@ -54,12 +54,14 @@ def main():
             app, 
             host="127.0.0.1", 
             port=5002, 
-            threads=4,
-            connection_limit=1000,
-            cleanup_interval=30,
-            channel_timeout=120,
+            threads=8,  # הגדלת מספר threads
+            connection_limit=500,  # הקטנת connection limit
+            cleanup_interval=10,  # הקטנת cleanup interval
+            channel_timeout=60,  # הקטנת timeout
             log_socket_errors=True,
-            log_untrusted_proxy_headers=True
+            log_untrusted_proxy_headers=True,
+            max_request_body_size=1073741824,  # 1GB
+            buffer_size=16384  # הגדלת buffer
         )
     except KeyboardInterrupt:
         logger.info("Server stopped by user")

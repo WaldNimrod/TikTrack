@@ -825,6 +825,7 @@ class AppHeader extends HTMLElement {
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="/database">בסיס נתונים</a></li>
                   <li><a class="dropdown-item" href="/grid-test">גריד</a></li>
+                  <li><a class="dropdown-item" href="/grid-table-test">גריד טבלה</a></li>
                 </ul>
               </div>
             </nav>
@@ -1206,6 +1207,19 @@ class AppHeader extends HTMLElement {
         }
         
         this.updateStatusFilterText();
+        
+        // עדכון הפילטר בטבלה אחרי האתחול
+        setTimeout(() => {
+          // בדיקה שהפונקציות הגלובליות זמינות
+          if (typeof window.updateGridFromComponent === 'function') {
+            this.updateGridFilter();
+          } else {
+            // אם הפונקציה לא זמינה, נחכה קצת יותר
+            setTimeout(() => {
+              this.updateGridFilter();
+            }, 300);
+          }
+        }, 100);
       } else {
         console.log('Status menu not found in initializeFilter');
       }
@@ -1410,6 +1424,19 @@ class AppHeader extends HTMLElement {
       const accountFilterItems = this.shadowRoot.querySelectorAll('.account-filter-item');
       console.log('Found existing account filter items:', accountFilterItems.length);
       // לא מוסיפים event listeners כאן כי הפריטים נוצרים דינמית
+      
+      // עדכון הפילטר בטבלה אחרי אתחול כל הפילטרים
+      setTimeout(() => {
+        // בדיקה שהפונקציות הגלובליות זמינות
+        if (typeof window.updateGridFromComponent === 'function') {
+          this.updateGridFilter();
+        } else {
+          // אם הפונקציה לא זמינה, נחכה קצת יותר
+          setTimeout(() => {
+            this.updateGridFilter();
+          }, 500);
+        }
+      }, 200);
       
       // הוספת event listeners לפריטי פילטר טווח תאריכים
       const dateRangeFilterItems = this.shadowRoot.querySelectorAll('.date-range-filter-item');
@@ -2243,6 +2270,13 @@ class AppHeader extends HTMLElement {
       window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts);
     } else {
       console.log('updateGridFromComponent function not found');
+      // נסיון נוסף אחרי זמן קצר
+      setTimeout(() => {
+        if (typeof window.updateGridFromComponent === 'function') {
+          console.log('Retrying updateGridFromComponent');
+          window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts);
+        }
+      }, 100);
     }
     
     console.log('=== updateGridFilter completed ===');

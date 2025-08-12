@@ -359,7 +359,8 @@ const DEFAULT_DATA_CONFIG = {
     'open': 'פתוח',
     'closed': 'סגור',
     'pending': 'מבוטל',
-    'canceled': 'מבוטל'
+    'canceled': 'מבוטל',
+    'cancelled': 'מבוטל'
   },
   typeMapping: {
     'long': 'השקעה',

@@ -101,6 +101,14 @@ def grid_test():
 def grid_test_html():
     return send_from_directory(UI_DIR, "grid-test.html")
 
+@app.route("/grid-table-test")
+def grid_table_test():
+    return send_from_directory(UI_DIR, "grid-table-test.html")
+
+@app.route("/grid-table-test.html")
+def grid_table_test_html():
+    return send_from_directory(UI_DIR, "grid-table-test.html")
+
 @app.route("/research")
 def research():
     return send_from_directory(UI_DIR, "research.html")
@@ -119,6 +127,10 @@ def preferences():
 
 @app.route("/database")
 def database_page():
+    return send_from_directory(UI_DIR, "database.html")
+
+@app.route("/database.html")
+def database_html_page():
     return send_from_directory(UI_DIR, "database.html")
 
 # API עבור תכנוני טריידים
@@ -155,23 +167,14 @@ def get_trade_plans():
 
 @app.route("/api/tradeplans", methods=["POST"])
 def create_trade_plan():
-    data = request.json
+    data = request.get_json()
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        # בדיקה אם הטיקר קיים, אם לא - יצירתו
-        cursor.execute("SELECT id FROM tickers WHERE symbol = ?", (data['ticker'],))
-        ticker_result = cursor.fetchone()
-        
-        if ticker_result:
-            ticker_id = ticker_result['id']
-        else:
-            cursor.execute(
-                "INSERT INTO tickers (symbol, type) VALUES (?, ?)",
-                (data['ticker'], 'STOCK')
-            )
-            ticker_id = cursor.lastrowid
+        # בדיקת שדות חובה
+        if not data.get('account_id') or not data.get('ticker_id'):
+            return jsonify({"status": "error", "message": "חשבון וטיקר הם שדות חובה"}), 400
         
         # יצירת תכנון הטרייד
         cursor.execute("""
@@ -179,19 +182,25 @@ def create_trade_plan():
             (account_id, ticker_id, investment_type, planned_amount, entry_conditions, stop_price, target_price, reasons)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            1,  # account_id - נניח שיש חשבון ראשי
-            ticker_id,
-            data.get('investment_type', 'השקעה'),
+            data['account_id'],
+            data['ticker_id'],
+            data.get('investment_type', 'long'),
             data.get('planned_amount', 0),
             data.get('entry_conditions', ''),
-            data.get('stop_price', 0),
-            data.get('target_price', 0),
+            data.get('stop_price'),
+            data.get('target_price'),
             data.get('reasons', '')
         ))
         
+        plan_id = cursor.lastrowid
         conn.commit()
+        
+        # החזרת תכנון הטרייד החדש
+        cursor.execute("SELECT * FROM trade_plans WHERE id = ?", (plan_id,))
+        new_plan = dict(cursor.fetchone())
+        
         conn.close()
-        return jsonify({"status": "success", "id": cursor.lastrowid}), 201
+        return jsonify({"status": "success", "plan": new_plan}), 201
         
     except Exception as e:
         conn.rollback()
@@ -200,53 +209,88 @@ def create_trade_plan():
 
 @app.route("/api/tradeplans/<int:plan_id>", methods=["PUT"])
 def update_trade_plan(plan_id):
-    data = request.json
+    data = request.get_json()
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        cursor.execute("""
-            UPDATE trade_plans 
-            SET investment_type = ?, planned_amount = ?, entry_conditions = ?, 
-                stop_price = ?, target_price = ?, reasons = ?
-            WHERE id = ?
-        """, (
-            data.get('investment_type'),
-            data.get('planned_amount'),
-            data.get('entry_conditions'),
-            data.get('stop_price'),
-            data.get('target_price'),
-            data.get('reasons'),
-            plan_id
-        ))
+        # בדיקה אם תכנון הטרייד קיים
+        cursor.execute("SELECT * FROM trade_plans WHERE id = ?", (plan_id,))
+        if not cursor.fetchone():
+            return jsonify({"status": "error", "message": "תכנון טרייד לא נמצא"}), 404
         
-        conn.commit()
+        # עדכון תכנון הטרייד
+        update_fields = []
+        params = []
+        
+        if 'account_id' in data:
+            update_fields.append("account_id = ?")
+            params.append(data['account_id'])
+        
+        if 'ticker_id' in data:
+            update_fields.append("ticker_id = ?")
+            params.append(data['ticker_id'])
+        
+        if 'investment_type' in data:
+            update_fields.append("investment_type = ?")
+            params.append(data['investment_type'])
+        
+        if 'planned_amount' in data:
+            update_fields.append("planned_amount = ?")
+            params.append(data['planned_amount'])
+        
+        if 'entry_conditions' in data:
+            update_fields.append("entry_conditions = ?")
+            params.append(data['entry_conditions'])
+        
+        if 'stop_price' in data:
+            update_fields.append("stop_price = ?")
+            params.append(data['stop_price'])
+        
+        if 'target_price' in data:
+            update_fields.append("target_price = ?")
+            params.append(data['target_price'])
+        
+        if 'reasons' in data:
+            update_fields.append("reasons = ?")
+            params.append(data['reasons'])
+        
+        if update_fields:
+            params.append(plan_id)
+            query = f"UPDATE trade_plans SET {', '.join(update_fields)} WHERE id = ?"
+            cursor.execute(query, params)
+            conn.commit()
+        
+        # החזרת תכנון הטרייד המעודכן
+        cursor.execute("SELECT * FROM trade_plans WHERE id = ?", (plan_id,))
+        updated_plan = dict(cursor.fetchone())
+        
         conn.close()
-        return jsonify({"status": "success"})
+        return jsonify({"status": "success", "plan": updated_plan})
         
     except Exception as e:
-        conn.rollback()
         conn.close()
         return jsonify({"status": "error", "message": str(e)}), 400
 
 @app.route("/api/tradeplans/<int:plan_id>", methods=["DELETE"])
-def cancel_trade_plan(plan_id):
+def delete_trade_plan(plan_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        cursor.execute("""
-            UPDATE trade_plans 
-            SET canceled_at = ?, cancel_reason = ?
-            WHERE id = ?
-        """, (datetime.now().isoformat(), "בוטל על ידי המשתמש", plan_id))
+        # בדיקה אם תכנון הטרייד קיים
+        cursor.execute("SELECT * FROM trade_plans WHERE id = ?", (plan_id,))
+        if not cursor.fetchone():
+            return jsonify({"status": "error", "message": "תכנון טרייד לא נמצא"}), 404
         
+        # מחיקת תכנון הטרייד
+        cursor.execute("DELETE FROM trade_plans WHERE id = ?", (plan_id,))
         conn.commit()
+        
         conn.close()
-        return jsonify({"status": "success"})
+        return jsonify({"status": "success", "message": "תכנון טרייד נמחק בהצלחה"})
         
     except Exception as e:
-        conn.rollback()
         conn.close()
         return jsonify({"status": "error", "message": str(e)}), 400
 
@@ -281,63 +325,131 @@ def get_trades():
 
 @app.route("/api/trades", methods=["POST"])
 def create_trade():
-    data = request.json
+    data = request.get_json()
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        # בדיקה אם הטיקר קיים
-        cursor.execute("SELECT id FROM tickers WHERE symbol = ?", (data['ticker'],))
-        ticker_result = cursor.fetchone()
-        
-        if ticker_result:
-            ticker_id = ticker_result['id']
-        else:
-            cursor.execute(
-                "INSERT INTO tickers (symbol, name, type) VALUES (?, ?, ?)",
-                (data['ticker'], data['ticker'], 'STOCK')
-            )
-            ticker_id = cursor.lastrowid
+        # בדיקת שדות חובה
+        if not data.get('account_id') or not data.get('ticker_id'):
+            return jsonify({"status": "error", "message": "חשבון וטיקר הם שדות חובה"}), 400
         
         # יצירת הטרייד
         cursor.execute("""
             INSERT INTO trades 
-            (account_id, ticker_id, trade_plan_id, status, type, opened_at, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (account_id, ticker_id, trade_plan_id, status, type, opened_at, notes, cancelled_at, cancel_reason)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            1,  # account_id
-            ticker_id,
+            data['account_id'],
+            data['ticker_id'],
             data.get('trade_plan_id'),
-            data.get('status', 'פתוח'),
-            data.get('type', 'קנייה'),
+            data.get('status', 'open'),
+            data.get('type', 'buy'),
             datetime.now().isoformat(),
-            data.get('notes', '')
+            data.get('notes', ''),
+            data.get('cancelled_at'),
+            data.get('cancel_reason')
         ))
         
         trade_id = cursor.lastrowid
         
-        # הוספת ביצוע ראשון
-        if data.get('quantity') and data.get('price'):
-            cursor.execute("""
-                INSERT INTO executions 
-                (trade_id, action, date, quantity, price, fee, source)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (
-                trade_id,
-                data.get('type', 'קנייה'),
-                datetime.now().isoformat(),
-                data['quantity'],
-                data['price'],
-                data.get('fee', 0),
-                'manual'
-            ))
-        
         conn.commit()
+        
+        # החזרת הטרייד החדש
+        cursor.execute("SELECT * FROM trades WHERE id = ?", (trade_id,))
+        new_trade = dict(cursor.fetchone())
+        
         conn.close()
-        return jsonify({"status": "success", "id": trade_id}), 201
+        return jsonify({"status": "success", "trade": new_trade}), 201
         
     except Exception as e:
         conn.rollback()
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 400
+
+# API לעריכת טרייד
+@app.route("/api/trades/<int:trade_id>", methods=["PUT"])
+def update_trade(trade_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        data = request.get_json()
+        
+        # בדיקה אם הטרייד קיים
+        cursor.execute("SELECT * FROM trades WHERE id = ?", (trade_id,))
+        if not cursor.fetchone():
+            return jsonify({"status": "error", "message": "טרייד לא נמצא"}), 404
+        
+        # עדכון הטרייד
+        update_fields = []
+        params = []
+        
+        if 'account_id' in data:
+            update_fields.append("account_id = ?")
+            params.append(data['account_id'])
+        
+        if 'ticker_id' in data:
+            update_fields.append("ticker_id = ?")
+            params.append(data['ticker_id'])
+        
+        if 'type' in data:
+            update_fields.append("type = ?")
+            params.append(data['type'])
+        
+        if 'status' in data:
+            update_fields.append("status = ?")
+            params.append(data['status'])
+        
+        if 'notes' in data:
+            update_fields.append("notes = ?")
+            params.append(data['notes'])
+        
+        if 'cancelled_at' in data:
+            update_fields.append("cancelled_at = ?")
+            params.append(data['cancelled_at'])
+        
+        if 'cancel_reason' in data:
+            update_fields.append("cancel_reason = ?")
+            params.append(data['cancel_reason'])
+        
+        if update_fields:
+            params.append(trade_id)
+            query = f"UPDATE trades SET {', '.join(update_fields)} WHERE id = ?"
+            cursor.execute(query, params)
+            conn.commit()
+        
+        # החזרת הטרייד המעודכן
+        cursor.execute("SELECT * FROM trades WHERE id = ?", (trade_id,))
+        updated_trade = dict(cursor.fetchone())
+        
+        conn.close()
+        return jsonify({"status": "success", "trade": updated_trade})
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 400
+
+# API למחיקת טרייד
+@app.route("/api/trades/<int:trade_id>", methods=["DELETE"])
+def delete_trade(trade_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # בדיקה אם הטרייד קיים
+        cursor.execute("SELECT * FROM trades WHERE id = ?", (trade_id,))
+        if not cursor.fetchone():
+            return jsonify({"status": "error", "message": "טרייד לא נמצא"}), 404
+        
+        # מחיקת הטרייד
+        cursor.execute("DELETE FROM trades WHERE id = ?", (trade_id,))
+        conn.commit()
+        
+        conn.close()
+        return jsonify({"status": "success", "message": "טרייד נמחק בהצלחה"})
+        
+    except Exception as e:
         conn.close()
         return jsonify({"status": "error", "message": str(e)}), 400
 
@@ -869,36 +981,19 @@ def create_alert():
         data = request.get_json()
         
         # בדיקת נתונים נדרשים
-        required_fields = ['title', 'type']
-        for field in required_fields:
-            if field not in data or not data[field]:
-                return jsonify({"status": "error", "message": f"שדה {field} הוא חובה"}), 400
-        
-        # חילוץ טיקר מהכותרת (אם יש)
-        ticker = data.get('ticker', 'AAPL')  # ברירת מחדל
-        if ' - ' in data['title']:
-            ticker = data['title'].split(' - ')[0]
-        
-        # בדיקה אם הטיקר קיים, אם לא - יצירתו
-        cursor.execute("SELECT id FROM tickers WHERE symbol = ?", (ticker,))
-        ticker_result = cursor.fetchone()
-        
-        if ticker_result:
-            ticker_id = ticker_result['id']
-        else:
-            cursor.execute("INSERT INTO tickers (symbol, type) VALUES (?, ?)", (ticker, 'STOCK'))
-            ticker_id = cursor.lastrowid
+        if not data.get('condition'):
+            return jsonify({"status": "error", "message": "תנאי הוא שדה חובה"}), 400
         
         # הכנסת התראה חדשה
         cursor.execute("""
             INSERT INTO alerts (account_id, ticker_id, alert_type, condition, status, created_at)
             VALUES (?, ?, ?, ?, ?, ?)
         """, (
-            1,  # account_id ברירת מחדל
-            ticker_id,
-            data['type'],
-            data.get('description', ''),
-            data.get('status', 'פעיל'),
+            data.get('account_id'),
+            data.get('ticker_id'),
+            data.get('alert_type', 'price'),
+            data['condition'],
+            data.get('status', 'active'),
             datetime.now().isoformat()
         ))
         
@@ -906,23 +1001,8 @@ def create_alert():
         conn.commit()
         
         # החזרת ההתראה החדשה
-        cursor.execute("""
-            SELECT 
-                a.id,
-                a.alert_type as type,
-                a.condition as description,
-                a.status,
-                a.created_at,
-                t.symbol as ticker
-            FROM alerts a
-            LEFT JOIN tickers t ON a.ticker_id = t.id
-            WHERE a.id = ?
-        """, (alert_id,))
-        
+        cursor.execute("SELECT * FROM alerts WHERE id = ?", (alert_id,))
         new_alert = dict(cursor.fetchone())
-        new_alert['title'] = f"{new_alert['ticker']} - {new_alert['type']}"
-        new_alert['priority'] = 'בינונית'
-        new_alert['updated_at'] = new_alert['created_at']
         
         conn.close()
         return jsonify({"status": "success", "alert": new_alert}), 201
@@ -949,31 +1029,28 @@ def update_alert(alert_id):
         update_fields = []
         params = []
         
-        if 'title' in data:
-            update_fields.append("title = ?")
-            params.append(data['title'])
+        if 'account_id' in data:
+            update_fields.append("account_id = ?")
+            params.append(data['account_id'])
         
-        if 'type' in data:
-            update_fields.append("type = ?")
-            params.append(data['type'])
+        if 'ticker_id' in data:
+            update_fields.append("ticker_id = ?")
+            params.append(data['ticker_id'])
+        
+        if 'alert_type' in data:
+            update_fields.append("alert_type = ?")
+            params.append(data['alert_type'])
+        
+        if 'condition' in data:
+            update_fields.append("condition = ?")
+            params.append(data['condition'])
         
         if 'status' in data:
             update_fields.append("status = ?")
             params.append(data['status'])
         
-        if 'priority' in data:
-            update_fields.append("priority = ?")
-            params.append(data['priority'])
-        
-        if 'description' in data:
-            update_fields.append("description = ?")
-            params.append(data['description'])
-        
         if update_fields:
-            update_fields.append("updated_at = ?")
-            params.append(datetime.now().isoformat())
             params.append(alert_id)
-            
             query = f"UPDATE alerts SET {', '.join(update_fields)} WHERE id = ?"
             cursor.execute(query, params)
             conn.commit()

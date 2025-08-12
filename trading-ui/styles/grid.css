@@ -172,7 +172,6 @@
 
 /* עיצוב פילטרים של AG Grid */
 .ag-theme-quartz .ag-floating-filter-body input {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
   font-size: 0.85rem;
   padding: 0.3rem 0.5rem;
   border: 1px solid var(--apple-border);
@@ -181,7 +180,6 @@
 }
 
 .ag-theme-quartz .ag-floating-filter-body select {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
   font-size: 0.85rem;
   padding: 0.3rem 0.5rem;
   border: 1px solid var(--apple-border);

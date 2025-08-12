@@ -59,7 +59,6 @@
 
 /* סגנון בסיסי */
 body { 
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   background-color: var(--apple-bg-secondary);
   color: var(--apple-text-primary);
   margin: 0;
@@ -67,6 +66,7 @@ body {
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', sans-serif;
 }
 
 /* תפריט ראשי בסגנון אפל */
@@ -101,7 +101,6 @@ body {
 }
 
 .logo-text {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
   font-size: 18px;
   font-weight: 600;
   color: var(--apple-text-primary);
@@ -155,54 +154,7 @@ body {
   font-weight: 500;
 }
 
-/* כפתורים בסגנון אפל */
-.btn {
-  padding: var(--apple-spacing-sm) var(--apple-spacing-md);
-  border: none;
-  border-radius: var(--apple-radius-medium);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--apple-spacing-xs);
-  min-height: 36px;
-}
-
-.btn-primary {
-  background-color: var(--apple-blue);
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: var(--apple-blue-dark);
-  transform: translateY(-1px);
-  box-shadow: var(--apple-shadow-medium);
-}
-
-.btn-secondary {
-  background-color: var(--apple-gray-2);
-  color: var(--apple-text-primary);
-}
-
-.btn-secondary:hover {
-  background-color: var(--apple-gray-3);
-  transform: translateY(-1px);
-}
-
-.btn-success {
-  background-color: var(--apple-green);
-  color: white;
-}
-
-.btn-danger {
-  background-color: var(--apple-red);
-  color: white;
-}
+/* כפתורים בסגנון אפל - משתמשים בסגנונות הגלובליים */
 
 /* כרטיסים בסגנון אפל */
 .card {
@@ -234,7 +186,6 @@ body {
   padding: var(--apple-spacing-sm) var(--apple-spacing-md);
   border: 1px solid var(--apple-border);
   border-radius: var(--apple-radius-medium);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
   font-size: 15px;
   background-color: var(--apple-bg-primary);
   color: var(--apple-text-primary);
@@ -284,7 +235,7 @@ body {
   --ag-row-hover-color: var(--apple-gray-1);
   --ag-selected-row-background-color: rgba(0, 122, 255, 0.1);
   --ag-border-color: var(--apple-border-light);
-  --ag-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+  --ag-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', sans-serif;
   --ag-font-size: 14px;
   --ag-header-height: 48px;
   --ag-row-height: 48px;

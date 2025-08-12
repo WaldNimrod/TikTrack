@@ -1,10 +1,189 @@
+/* טעינת פונט Noto Sans Hebrew מגוגל */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* הגדרות גורפות לכל האתר */
+/* כל הכפתורים יהיו בצבע הלוגו עם טקסט לבן */
+button, .btn {
+  background-color: #29a6a8 !important;
+  color: white !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+}
+
+button:hover, .btn:hover {
+  background-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* כל הקישורים יהיו בצבע הלוגו */
+a, strong[onclick] {
+  color: #29a6a8 !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+a:hover, strong[onclick]:hover {
+  color: #1f8a8c !important;
+  text-decoration: none !important;
+}
+
+/* כפתורי סגירה לחלונות קופצים - רקע לבן עם מסגרת ירוקה */
+.btn-close, 
+button[data-bs-dismiss="modal"],
+button[onclick*="close"],
+button[onclick*="Close"],
+.modal .btn-close,
+.modal-header .btn-close,
+.modal-footer .btn-close {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+  border-radius: 4px !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-close:hover, 
+button[data-bs-dismiss="modal"]:hover,
+button[onclick*="close"]:hover,
+button[onclick*="Close"]:hover,
+.modal .btn-close:hover,
+.modal-header .btn-close:hover,
+.modal-footer .btn-close:hover {
+  background-color: #f8f9fa !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתורי סגירה עם איקון X */
+.btn-close[aria-label="Close"],
+button[aria-label="Close"] {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+  border-radius: 50% !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  padding: 0 !important;
+}
+
+.btn-close[aria-label="Close"]:hover,
+button[aria-label="Close"]:hover {
+  background-color: #f8f9fa !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3) !important;
+}
+
+/* כפתור מודגש בצבע כתום - לשימוש בכל המערכת */
+.btn-emphasized,
+.btn-primary-emphasized,
+button.btn-emphasized,
+button.btn-primary-emphasized {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 2px solid #ff9c05 !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+}
+
+/* כפתור משני - רקע לבן עם מסגרת ירוקה - לשימוש כללי */
+.btn-secondary-custom,
+button.btn-secondary-custom {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+  border-radius: 4px !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-secondary-custom:hover,
+button.btn-secondary-custom:hover {
+  background-color: #f8f9fa !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.2) !important;
+}
+  text-transform: none !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 4px rgba(255, 156, 5, 0.2) !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 38px !important;
+}
+
+.btn-emphasized:hover,
+.btn-primary-emphasized:hover,
+button.btn-emphasized:hover,
+button.btn-primary-emphasized:hover {
+  background-color: #fff5e6 !important;
+  border-color: #e68a00 !important;
+  color: #e68a00 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 156, 5, 0.3) !important;
+}
+
+.btn-emphasized:active,
+.btn-primary-emphasized:active,
+button.btn-emphasized:active,
+button.btn-primary-emphasized:active {
+  background-color: #ffe6cc !important;
+  border-color: #d47a00 !important;
+  color: #d47a00 !important;
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 6px rgba(255, 156, 5, 0.4) !important;
+}
+
+.btn-emphasized:focus,
+.btn-primary-emphasized:focus,
+button.btn-emphasized:focus,
+button.btn-primary-emphasized:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(255, 156, 5, 0.3) !important;
+}
+
+/* כפתור מודגש קטן */
+.btn-emphasized.btn-sm,
+.btn-primary-emphasized.btn-sm {
+  padding: 0.25rem 0.75rem !important;
+  font-size: 0.8rem !important;
+  min-height: 32px !important;
+}
+
+/* כפתור מודגש גדול */
+.btn-emphasized.btn-lg,
+.btn-primary-emphasized.btn-lg {
+  padding: 0.75rem 1.5rem !important;
+  font-size: 1rem !important;
+  min-height: 48px !important;
+}
+
 /* עיצוב כללי */
 html, body {
   margin: 0;
   padding: 0;
   background-color: white;
   color: #222;
-  font-family: 'Alef', sans-serif;
+  font-family: Georgia, 'Times New Roman', serif;
   direction: rtl;
 }
 
@@ -21,7 +200,6 @@ input, textarea, select {
 
 /* הגדרות RTL לגריד */
 .ag-theme-quartz .ag-floating-filter-body input {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
   font-size: 0.85rem;
   padding: 0.3rem 0.5rem;
   border: 1px solid #ddd;
@@ -31,7 +209,6 @@ input, textarea, select {
 }
 
 .ag-theme-quartz .ag-floating-filter-body select {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
   font-size: 0.85rem;
   padding: 0.3rem 0.5rem;
   border: 1px solid #ddd;
@@ -81,7 +258,7 @@ body {
   transition: padding-top 0.3s ease;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+  font-family: Georgia, 'Times New Roman', serif;
   background-color: #f5f5f7;
 }
 
@@ -91,12 +268,15 @@ body.filter-collapsed {
 
 .background-wrapper {
   min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 0 2rem 2rem 2rem;
   transition: padding-top 0.3s ease;
   padding-top: 120px !important; /* מרווח לכותרת + פילטר + מרווח קטן */
   padding-right: 32px;
   position: relative;
   z-index: 1;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
 .background-wrapper.filter-collapsed {
@@ -162,12 +342,13 @@ h1 {
 .alert-card {
   flex: 1 1 100%;
   max-width: 100%;
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 0.75rem;
+  background: var(--apple-card-bg);
+  border: 1px solid var(--apple-border-light);
+  border-radius: var(--apple-radius-medium);
+  padding: 1rem;
   position: relative;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: var(--apple-shadow-light);
+  transition: all 0.2s ease;
 }
 @media (min-width: 600px) {
   .alert-card {
@@ -176,30 +357,65 @@ h1 {
   }
 }
 .alert-card strong {
-  color: #29a6a8;
   cursor: pointer;
-  text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.2s ease;
 }
 .alert-card .price {
   font-size: 0.9rem;
+  color: var(--apple-text-secondary);
+  margin: 0.5rem 0;
 }
 .alert-card button {
   position: absolute;
-  bottom: 0.5rem;
-  left: 0.5rem;
+  bottom: 0.75rem;
+  left: 0.75rem;
   font-size: 0.8rem;
-  padding: 0.3rem 0.6rem;
+  padding: 0.4rem 0.8rem;
+  background-color: var(--apple-blue);
+  color: white;
+  border: none;
+  border-radius: var(--apple-radius-small);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.alert-card button:hover {
+  background-color: var(--apple-blue-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--apple-shadow-medium);
 }
 
 .alert-card.read {
   opacity: 0.6;
   background-color: var(--apple-gray-1);
+  border-color: var(--apple-gray-3);
 }
 
 .alert-card.read button {
   background-color: var(--apple-gray-5);
-  color: white;
+  color: var(--apple-text-secondary);
   cursor: not-allowed;
+}
+
+.alert-card.read button:hover {
+  background-color: var(--apple-gray-5);
+  transform: none;
+  box-shadow: none;
+}
+
+/* סגנונות ספציפיים לכפתורי Bootstrap בהתראות */
+.alert-card .btn {
+  font-family: inherit;
+  font-weight: 500;
+  border-radius: var(--apple-radius-small);
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
 }
 
 /* עיצוב סטטיסטיקות */
@@ -229,6 +445,397 @@ h1 {
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--apple-text-primary);
+}
+
+/* סגנונות לכפתורי Bootstrap */
+.btn {
+  font-family: inherit;
+  font-weight: 500;
+  border-radius: var(--apple-radius-small);
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background-color: var(--apple-blue);
+  border-color: var(--apple-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--apple-blue-dark);
+  border-color: var(--apple-blue-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--apple-shadow-medium);
+}
+
+.btn-secondary {
+  background-color: var(--apple-gray-5);
+  border-color: var(--apple-gray-5);
+  color: var(--apple-text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--apple-gray-6);
+  border-color: var(--apple-gray-6);
+  transform: translateY(-1px);
+  box-shadow: var(--apple-shadow-medium);
+}
+
+.btn-success {
+  background-color: var(--apple-green);
+  border-color: var(--apple-green);
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: var(--apple-green-dark);
+  border-color: var(--apple-green-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--apple-shadow-medium);
+}
+
+.btn-danger {
+  background-color: var(--apple-red);
+  border-color: var(--apple-red);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: var(--apple-red-dark);
+  border-color: var(--apple-red-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--apple-shadow-medium);
+}
+
+/* סגנונות לטבלאות - הועברו מ-grid-table.css */
+.table-section {
+  background: var(--apple-bg-elevated);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+  margin-bottom: 2rem;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--apple-border-light);
+  position: relative;
+}
+
+.table-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-count {
+  background: #29a6a8;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+  min-width: 80px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* כפתור פילטר התראות */
+.filter-toggle-btn {
+  background: white !important;
+  border: none !important;
+  color: var(--apple-orange) !important;
+  border-radius: 50%;
+  padding: 0.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-toggle-btn:hover {
+  background: white !important;
+  color: var(--apple-orange) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.filter-toggle-btn.active {
+  background: white !important;
+  color: var(--apple-orange) !important;
+}
+
+.filter-icon {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+  color: var(--apple-orange) !important;
+}
+
+.filter-toggle-btn.active .filter-icon {
+  transform: rotate(180deg);
+}
+
+/* אנימציה לסגירת אזור ההתראות */
+#alertsSection {
+  transition: height 0.3s ease;
+  overflow: hidden;
+}
+
+#alertsSection.collapsed {
+  height: 116px;
+}
+
+#alertsSection.collapsed #alertsContainer {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#alertsContainer {
+  transition: opacity 0.3s ease;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.75rem;
+  text-align: right;
+  border-bottom: 1px solid var(--apple-border-light);
+}
+
+.data-table th {
+  background: var(--apple-bg-secondary) !important;
+  font-weight: 600 !important;
+  color: var(--apple-text-primary) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.data-table th:hover {
+  background: var(--apple-bg-hover) !important;
+}
+
+.data-table td {
+  padding: 12px 8px !important;
+  text-align: right !important;
+  border-bottom: 1px solid var(--apple-border-light) !important;
+  vertical-align: middle !important;
+}
+
+.data-table tr:hover {
+  background: var(--apple-bg-hover) !important;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--apple-text-secondary);
+}
+
+.error {
+  background: var(--apple-red-light);
+  color: var(--apple-red);
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.empty-table {
+  text-align: center;
+  padding: 2rem;
+  color: var(--apple-text-secondary);
+  font-style: italic;
+}
+
+/* סגנונות לכפתורים */
+.add-btn {
+  background: transparent !important;
+  color: #000000 !important;
+  border: 2px solid #29a6a8 !important;
+  box-shadow: none !important;
+  padding: 6px 13px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+/* כפתורים קטנים */
+.btn-sm {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+}
+
+.add-btn:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+}
+
+.refresh-btn {
+  background: transparent !important;
+  color: #000000 !important;
+  border: 2px solid #29a6a8 !important;
+  box-shadow: none !important;
+  padding: 6px 13px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.refresh-btn:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+}
+
+.delete-account-btn {
+  background: white !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  box-shadow: 0 1px 3px rgba(41, 166, 168, 0.2) !important;
+  padding: 6px !important;
+  width: 25px !important;
+  height: 25px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.delete-account-btn:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(41, 166, 168, 0.3) !important;
+}
+
+/* סגנונות אחידים לכפתורי פעולות בטבלאות */
+.edit-btn {
+  background: white !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  box-shadow: 0 1px 3px rgba(41, 166, 168, 0.2) !important;
+  padding: 6px !important;
+  width: 25px !important;
+  height: 25px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  margin: 0 2px !important;
+}
+
+.edit-btn:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(41, 166, 168, 0.3) !important;
+}
+
+/* סגנונות מיוחדים לכפתור מחיקה - כתום של הלוגו */
+.delete-account-btn {
+  background: white !important;
+  color: #ff9c05 !important;
+  border: 1px solid #ff9c05 !important;
+  box-shadow: 0 1px 3px rgba(255, 156, 5, 0.2) !important;
+  padding: 6px !important;
+  width: 25px !important;
+  height: 25px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  margin: 0 2px !important;
+}
+
+.delete-account-btn:hover {
+  background: rgba(255, 156, 5, 0.1) !important;
+  border-color: #e68a00 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(255, 156, 5, 0.3) !important;
+}
+
+/* סגנונות מיוחדים לכפתורי עריכה עם action-btn class */
+.edit-btn.action-btn {
+  /* שומר על הסגנונות הבסיסיים של edit-btn */
+  background: white !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  box-shadow: 0 1px 3px rgba(41, 166, 168, 0.2) !important;
+  padding: 6px !important;
+  width: 25px !important;
+  height: 25px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  margin: 0 2px !important;
+}
+
+.edit-btn.action-btn:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(41, 166, 168, 0.3) !important;
 }
 
 .stat-card .change {
@@ -293,11 +900,18 @@ h1 {
 
 /* עיצוב לגריד */
 .ag-theme-alpine {
-  font-family: 'Alef', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', sans-serif;
   font-size: 0.95rem;
 }
 
 /* סגנונות ייחודיים לדפים */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', sans-serif;
+  background-color: #f5f5f7;
+}
+
 .background-wrapper {
   padding-top: 120px !important;
   padding-right: 32px;
@@ -310,7 +924,7 @@ h1 {
   padding-top: 30px !important;
 }
 
-.main-content {
+.main-content, .database-page, .grid-table-pages {
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
@@ -318,30 +932,66 @@ h1 {
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   border: 1px solid #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', sans-serif;
 }
 
 .page-header {
-  background: var(--apple-card-bg);
+  background: transparent;
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  border: none;
+  box-shadow: none;
 }
 
 .page-title {
   font-size: 28px;
-  font-weight: 600;
-  color: var(--apple-text);
+  font-weight: 400;
+  color: var(--apple-text-primary);
   margin: 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .page-subtitle {
-  font-size: 16px;
-  color: var(--apple-secondary);
-  margin-top: 8px;
+  display: none;
+}
+
+/* צבע כתום לסטטוס ממתין */
+:root {
+  --apple-orange: #ff9500;
+}
+
+/* סגנונות למספרים */
+.number-cell {
+  text-align: left !important;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+  font-size: 13px !important;
+}
+
+/* סגנונות למזהה */
+.id-cell {
+  font-weight: 600 !important;
+  color: var(--apple-blue) !important;
+  font-size: 12px !important;
+}
+
+.json-cell {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.json-cell:hover {
+  white-space: normal;
+  word-break: break-all;
+  max-width: none;
+  position: relative;
+  z-index: 100;
+  background: var(--apple-bg-elevated);
+  border-radius: 4px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 /* סגנונות לסטטיסטיקות */
@@ -482,7 +1132,7 @@ h1 {
   padding: 0.75rem 1.5rem;
   border-radius: var(--apple-radius-medium);
   border: none;
-  font-family: 'Alef', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', sans-serif;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;

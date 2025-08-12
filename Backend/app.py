@@ -305,6 +305,49 @@ def create_trade_plan():
         conn.close()
         return jsonify({"status": "error", "message": str(e)}), 400
 
+@app.route("/api/trade_plans/<int:plan_id>", methods=["GET"])
+def get_trade_plan(plan_id):
+    """קבלת תכנון טרייד בודד לפי מזהה"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        query = """
+        SELECT 
+            tp.id,
+            tp.investment_type,
+            tp.planned_amount,
+            tp.entry_conditions,
+            tp.stop_price,
+            tp.target_price,
+            tp.reasons,
+            tp.created_at,
+            tp.canceled_at,
+            tp.cancel_reason,
+            t.symbol as ticker,
+            t.symbol as ticker_name,
+            a.name as account_name
+        FROM trade_plans tp
+        JOIN tickers t ON tp.ticker_id = t.id
+        JOIN accounts a ON tp.account_id = a.id
+        WHERE tp.id = ?
+        """
+        
+        cursor.execute(query, (plan_id,))
+        row = cursor.fetchone()
+        
+        if not row:
+            conn.close()
+            return jsonify({"status": "error", "message": "תכנון לא נמצא"}), 404
+        
+        trade_plan = dict(row)
+        conn.close()
+        return jsonify(trade_plan)
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route("/api/tradeplans/<int:plan_id>", methods=["PUT"])
 def update_trade_plan(plan_id):
     data = request.get_json()
@@ -416,10 +459,12 @@ def get_trades():
         t.id,
         t.status,
         t.type,
-        t.opened_at,
+        t.opened_at as created_at,
         t.closed_at,
+        t.cancelled_at,
         t.total_pl,
         t.notes,
+        t.trade_plan_id,
         tick.symbol as ticker,
         tick.symbol as ticker_symbol,
         a.name as account_name

@@ -1101,11 +1101,13 @@ class AppHeader extends HTMLElement {
   setupGlobalEventListeners() {
     // סגירת דרופדאונים בלחיצה מחוץ להם
     document.addEventListener('click', (e) => {
+      // בדיקה אם הלחיצה היא מחוץ לקומפוננט
       if (!this.shadowRoot.contains(e.target)) {
         this.closeDropdown();
         this.closeStatusFilter();
         this.closeTypeFilter();
         this.closeAccountFilter();
+        this.closeDateRangeFilter();
       }
     });
     
@@ -1116,6 +1118,7 @@ class AppHeader extends HTMLElement {
         this.closeStatusFilter();
         this.closeTypeFilter();
         this.closeAccountFilter();
+        this.closeDateRangeFilter();
       }
     });
     
@@ -1130,6 +1133,9 @@ class AppHeader extends HTMLElement {
     window.addEventListener('beforeunload', () => {
       this.closeDropdown();
       this.closeStatusFilter();
+      this.closeTypeFilter();
+      this.closeAccountFilter();
+      this.closeDateRangeFilter();
     });
   }
 
@@ -1572,9 +1578,7 @@ class AppHeader extends HTMLElement {
       console.log('Filter menu closed');
     } else {
       // סגירת פילטרים אחרים לפני פתיחת זה
-      if (typeof window.closeOtherFilters === 'function') {
-        window.closeOtherFilters('status');
-      }
+      this.closeOtherFilters('status');
       
       // פתיחת התפריט
       menu.classList.add('show');
@@ -1617,9 +1621,7 @@ class AppHeader extends HTMLElement {
       console.log('Type filter menu closed');
     } else {
       // סגירת פילטרים אחרים לפני פתיחת זה
-      if (typeof window.closeOtherFilters === 'function') {
-        window.closeOtherFilters('type');
-      }
+      this.closeOtherFilters('type');
       
       // פתיחת התפריט
       menu.classList.add('show');
@@ -1662,9 +1664,7 @@ class AppHeader extends HTMLElement {
       console.log('Account filter menu closed');
     } else {
       // סגירת פילטרים אחרים לפני פתיחת זה
-      if (typeof window.closeOtherFilters === 'function') {
-        window.closeOtherFilters('account');
-      }
+      this.closeOtherFilters('account');
       
       // פתיחת התפריט
       menu.classList.add('show');
@@ -1707,9 +1707,7 @@ class AppHeader extends HTMLElement {
       console.log('Date range filter menu closed');
     } else {
       // סגירת פילטרים אחרים לפני פתיחת זה
-      if (typeof window.closeOtherFilters === 'function') {
-        window.closeOtherFilters('dateRange');
-      }
+      this.closeOtherFilters('dateRange');
       
       // פתיחת התפריט
       menu.classList.add('show');
@@ -1727,6 +1725,22 @@ class AppHeader extends HTMLElement {
     if (menu && toggle) {
       menu.classList.remove('show');
       toggle.classList.remove('active');
+    }
+  }
+
+  closeOtherFilters(excludeFilter) {
+    // סגירת כל הפילטרים חוץ מהפילטר שצוין
+    if (excludeFilter !== 'status') {
+      this.closeStatusFilter();
+    }
+    if (excludeFilter !== 'type') {
+      this.closeTypeFilter();
+    }
+    if (excludeFilter !== 'account') {
+      this.closeAccountFilter();
+    }
+    if (excludeFilter !== 'dateRange') {
+      this.closeDateRangeFilter();
     }
   }
 
@@ -2481,4 +2495,20 @@ window.testComponentFilter = function() {
     console.log('Header component not found');
   }
   console.log('=== Component test completed ===');
+};
+
+// פונקציה גלובלית לסגירת פילטרים אחרים
+window.closeOtherFilters = function(excludeFilter) {
+  const header = document.querySelector('app-header');
+  if (header && typeof header.closeOtherFilters === 'function') {
+    header.closeOtherFilters(excludeFilter);
+  }
+};
+
+// פונקציה גלובלית לסגירת כל הפילטרים
+window.closeAllFilters = function() {
+  const header = document.querySelector('app-header');
+  if (header && typeof header.closeAllDropdowns === 'function') {
+    header.closeAllDropdowns();
+  }
 };

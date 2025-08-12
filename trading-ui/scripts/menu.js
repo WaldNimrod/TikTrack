@@ -501,6 +501,15 @@ document.addEventListener('click', (e) => {
       }
     });
   }
+  
+  // סגירת פילטרים בלחיצה מחוץ להם
+  if (typeof window.closeAllFilters === 'function') {
+    // בדיקה אם הלחיצה היא מחוץ לפילטרים
+    const header = document.querySelector('app-header');
+    if (header && !header.shadowRoot.contains(e.target)) {
+      window.closeAllFilters();
+    }
+  }
 });
 
 // מניעת סגירת הדרופדאון של הפילטר בלחיצה על פריטים בתוכו
@@ -540,6 +549,15 @@ document.addEventListener('keydown', (e) => {
   const statusFilterMenu = document.getElementById('statusFilterMenu');
   if (statusFilterMenu && statusFilterMenu.classList.contains('show') && e.key === ' ') {
     e.stopPropagation();
+  }
+});
+
+// סגירת פילטרים בלחיצה על מקש Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (typeof window.closeAllFilters === 'function') {
+      window.closeAllFilters();
+    }
   }
 });
 

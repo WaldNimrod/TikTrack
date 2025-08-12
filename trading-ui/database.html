@@ -4,580 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>בסיס הנתונים - TikTrack</title>
-  <link href="https://fonts.googleapis.com/css2?family=Alef&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="styles/apple-theme.css" />
-  <link rel="stylesheet" href="styles/menu.css?v=6" />
-  <link rel="stylesheet" href="styles/styles.css?v=6" />
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
-      background-color: #f5f5f7;
-    }
-
-    /* התאמת המרווחים לכותרת החדשה */
-    .background-wrapper {
-      padding-top: 120px !important; /* מרווח לכותרת + פילטר + מרווח קטן */
-      padding-right: 32px;
-      transition: padding-top 0.3s ease;
-      position: relative;
-      z-index: 1;
-    }
-
-    .background-wrapper.filter-collapsed {
-      padding-top: 30px !important; /* מרווח לכותרת בלבד + מרווח קטן */
-    }
-
-    .database-page {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-      font-family: 'Alef', sans-serif;
-      background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-      border: 1px solid #e8e8e8;
-    }
-    
-    .page-header {
-      background: var(--apple-bg-elevated);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .page-title {
-      font-size: 28px;
-      font-weight: 600;
-      color: var(--apple-text-primary);
-      margin: 0;
-    }
-    
-    .page-subtitle {
-      font-size: 16px;
-      color: var(--apple-text-secondary);
-      margin-top: 8px;
-    }
-    
-    .table-section {
-      background: var(--apple-bg-elevated);
-      padding: 2rem;
-      border-radius: 12px;
-      border: 1px solid var(--apple-border-light);
-      box-shadow: var(--apple-shadow-light);
-      margin-bottom: 2rem;
-    }
-    
-    .table-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--apple-border-light);
-    }
-    
-    .table-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--apple-text-primary);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .table-count {
-      background: #29a6a8;
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-    
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .data-table th,
-    .data-table td {
-      padding: 0.75rem;
-      text-align: right;
-      border-bottom: 1px solid var(--apple-border-light);
-    }
-    
-    .data-table th {
-      background: var(--apple-bg-secondary);
-      font-weight: 600;
-      color: var(--apple-text-primary);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    
-    .data-table tr:hover {
-      background: var(--apple-bg-hover);
-    }
-    
-    .data-table tr:last-child td {
-      border-bottom: none;
-    }
-    
-    .loading {
-      text-align: center;
-      padding: 2rem;
-      color: var(--apple-text-secondary);
-    }
-    
-    .error {
-      background: var(--apple-red-light);
-      color: var(--apple-red);
-      padding: 1rem;
-      border-radius: 8px;
-      margin: 1rem 0;
-    }
-    
-    .empty-table {
-      text-align: center;
-      padding: 2rem;
-      color: var(--apple-text-secondary);
-      font-style: italic;
-    }
-    
-    .refresh-btn {
-      background: transparent !important;
-      color: #000000 !important;
-      border: 2px solid #29a6a8 !important;
-      box-shadow: none !important;
-      padding: 6px 13px !important;
-      border-radius: 6px !important;
-      font-size: 11px !important;
-      font-weight: 500 !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 5px !important;
-      cursor: pointer !important;
-      transition: all 0.2s ease !important;
-    }
-    
-    .refresh-btn:hover {
-      background: rgba(41, 166, 168, 0.1) !important;
-      border-color: #1f8a8c !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
-    }
-    
-    .json-cell {
-      max-width: 300px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
-    .json-cell:hover {
-      white-space: normal;
-      word-break: break-all;
-      max-width: none;
-      position: relative;
-      z-index: 100;
-      background: var(--apple-bg-elevated);
-      border-radius: 4px;
-      padding: 0.5rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    
-    /* סגנונות לכפתור מחיקת חשבון */
-    .delete-account-btn {
-      background: #dc3545 !important;
-      color: white !important;
-      border: none !important;
-      padding: 6px 12px !important;
-      border-radius: 6px !important;
-      cursor: pointer !important;
-      font-size: 12px !important;
-      font-weight: 500 !important;
-      transition: all 0.2s ease !important;
-      box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2) !important;
-    }
-    
-    .delete-account-btn:hover {
-      background: #c82333 !important;
-      transform: translateY(-1px) !important;
-      box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3) !important;
-    }
-    
-    .delete-account-btn:active {
-      transform: translateY(0) !important;
-      box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2) !important;
-    }
-    
-    /* סגנונות לכפתורי פעולות */
-    .action-btn {
-      padding: 8px 16px !important;
-      border: none !important;
-      border-radius: 8px !important;
-      cursor: pointer !important;
-      font-size: 14px !important;
-      font-weight: 500 !important;
-      transition: all 0.2s ease !important;
-      margin: 0 4px !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 6px !important;
-      text-decoration: none !important;
-    }
-    
-    .edit-btn {
-      background: white !important;
-      color: #29a6a8 !important;
-      border: 1px solid #29a6a8 !important;
-      box-shadow: 0 1px 3px rgba(41, 166, 168, 0.2) !important;
-      padding: 6px !important;
-      width: 25px !important;
-      height: 25px !important;
-      border-radius: 6px !important;
-      font-size: 11px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-    }
-    
-    .edit-btn:hover {
-      background: rgba(41, 166, 168, 0.1) !important;
-      border-color: #1f8a8c !important;
-      transform: translateY(-1px) !important;
-      box-shadow: 0 2px 6px rgba(41, 166, 168, 0.3) !important;
-    }
-    
-    .add-btn {
-      background: transparent !important;
-      color: #000000 !important;
-      border: 2px solid #29a6a8 !important;
-      box-shadow: none !important;
-      padding: 6px 13px !important;
-      border-radius: 6px !important;
-      font-size: 11px !important;
-      font-weight: 500 !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 5px !important;
-    }
-    
-    .add-btn:hover {
-      background: rgba(41, 166, 168, 0.1) !important;
-      border-color: #1f8a8c !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
-    }
-    
-    .add-btn:hover {
-      background: #1f8a8c !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 4px 12px rgba(41, 166, 168, 0.4) !important;
-    }
-    
-    .delete-account-btn {
-      background: white !important;
-      color: #29a6a8 !important;
-      border: 1px solid #29a6a8 !important;
-      box-shadow: 0 1px 3px rgba(41, 166, 168, 0.2) !important;
-      padding: 6px !important;
-      width: 25px !important;
-      height: 25px !important;
-      border-radius: 6px !important;
-      cursor: pointer !important;
-      font-size: 11px !important;
-      font-weight: 500 !important;
-      transition: all 0.2s ease !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-    }
-    
-    .delete-account-btn:hover {
-      background: rgba(41, 166, 168, 0.1) !important;
-      border-color: #1f8a8c !important;
-      transform: translateY(-1px) !important;
-      box-shadow: 0 2px 6px rgba(41, 166, 168, 0.3) !important;
-    }
-    
-    /* סגנונות למודלים */
-    .modal {
-      z-index: 9999 !important;
-    }
-    
-    .modal-backdrop {
-      z-index: 9998 !important;
-    }
-    
-    .modal-content {
-      border-radius: 12px !important;
-      border: none !important;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
-      z-index: 10000 !important;
-    }
-    
-    .modal-header {
-      background: var(--apple-bg-elevated) !important;
-      border-bottom: 1px solid var(--apple-border-light) !important;
-      border-radius: 12px 12px 0 0 !important;
-      position: relative !important;
-      z-index: 10001 !important;
-      display: flex !important;
-      justify-content: space-between !important;
-      align-items: center !important;
-      padding: 16px 24px !important;
-    }
-    
-    .modal-header .btn-close {
-      order: 1 !important;
-      margin-left: auto !important;
-      margin-right: 0 !important;
-      padding: 8px !important;
-      border-radius: 6px !important;
-      transition: all 0.2s ease !important;
-    }
-    
-    .modal-header .btn-close:hover {
-      background-color: rgba(0, 0, 0, 0.1) !important;
-      transform: scale(1.1) !important;
-    }
-    
-    .modal-header .modal-title {
-      flex: 1 !important;
-      text-align: center !important;
-      margin: 0 !important;
-    }
-    
-    .modal-title {
-      color: var(--apple-text-primary) !important;
-      font-weight: 600 !important;
-    }
-    
-    .modal-body {
-      padding: 24px !important;
-    }
-    
-    .form-label {
-      color: var(--apple-text-primary) !important;
-      font-weight: 500 !important;
-      margin-bottom: 8px !important;
-    }
-    
-    .form-control, .form-select {
-      border: 1px solid var(--apple-border-light) !important;
-      border-radius: 8px !important;
-      padding: 12px !important;
-      background: var(--apple-bg-elevated) !important;
-      color: var(--apple-text-primary) !important;
-    }
-    
-    .form-control:focus, .form-select:focus {
-      border-color: #29a6a8 !important;
-      box-shadow: 0 0 0 0.2rem rgba(41, 166, 168, 0.25) !important;
-    }
-    
-    .btn-primary {
-      background: #29a6a8 !important;
-      border-color: #29a6a8 !important;
-      color: white !important;
-      padding: 8px 16px !important;
-      border-radius: 8px !important;
-      font-size: 14px !important;
-      font-weight: 500 !important;
-      transition: all 0.2s ease !important;
-      box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3) !important;
-    }
-    
-    .btn-primary:hover {
-      background: #1f8a8c !important;
-      border-color: #1f8a8c !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 4px 12px rgba(41, 166, 168, 0.4) !important;
-    }
-    
-    .btn-success {
-      background: #28a745 !important;
-      border-color: #28a745 !important;
-    }
-    
-    .btn-success:hover {
-      background: #218838 !important;
-      border-color: #218838 !important;
-    }
-    
-    /* צבע כתום לסטטוס ממתין */
-    :root {
-      --apple-orange: #ff9500;
-    }
-    
-    /* סגנונות נוספים לכפתורי המודל */
-    .modal-footer {
-      position: relative !important;
-      z-index: 10001 !important;
-    }
-    
-    .modal-footer .btn {
-      position: relative !important;
-      z-index: 10002 !important;
-    }
-    
-    /* וידוא שהמודלים מוצגים מעל הכל */
-    .modal-dialog {
-      z-index: 10000 !important;
-    }
-    
-    .modal.show {
-      display: block !important;
-      z-index: 9999 !important;
-    }
-    
-    .modal.show .modal-dialog {
-      z-index: 10000 !important;
-    }
-    
-    /* תיקון למודל עריכת חשבון */
-    #editAccountModal {
-      background-color: rgba(0, 0, 0, 0.5) !important;
-    }
-    
-    #editAccountModal .modal-content {
-      background-color: white !important;
-      border: 1px solid #dee2e6 !important;
-      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    
-    #editAccountModal .modal-header {
-      background-color: #f8f9fa !important;
-      border-bottom: 1px solid #dee2e6 !important;
-    }
-    
-    #editAccountModal .modal-body {
-      background-color: white !important;
-      padding: 1rem !important;
-    }
-    
-    #editAccountModal .modal-footer {
-      background-color: #f8f9fa !important;
-      border-top: 1px solid #dee2e6 !important;
-    }
-    
-    /* תיקון למודל הוספת חשבון */
-    #addAccountModal {
-      background-color: rgba(0, 0, 0, 0.5) !important;
-    }
-    
-    /* סגנונות למודל אזהרה כללי */
-    #warningModal .modal-header {
-      border-bottom: 1px solid #dee2e6;
-    }
-    
-    #warningModal .modal-content {
-      border-radius: 8px;
-      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
-    
-    #warningModal .table {
-      margin-bottom: 0;
-    }
-    
-    #warningModal .table th {
-      background-color: #f8f9fa;
-      border-color: #dee2e6;
-      font-weight: 600;
-    }
-    
-    #warningModal .table td {
-      border-color: #dee2e6;
-      vertical-align: middle;
-    }
-    
-    #addAccountModal .modal-content {
-      background-color: white !important;
-      border: 1px solid #dee2e6 !important;
-      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    
-    #addAccountModal .modal-header {
-      background-color: #f8f9fa !important;
-      border-bottom: 1px solid #dee2e6 !important;
-    }
-    
-    #addAccountModal .modal-body {
-      background-color: white !important;
-      padding: 1rem !important;
-    }
-    
-    #addAccountModal .modal-footer {
-      background-color: #f8f9fa !important;
-      border-top: 1px solid #dee2e6 !important;
-    }
-    
-    /* סגנונות נוספים לטבלה */
-    .data-table th {
-      background: var(--apple-bg-secondary) !important;
-      font-weight: 600 !important;
-      color: var(--apple-text-primary) !important;
-      position: sticky !important;
-      top: 0 !important;
-      z-index: 10 !important;
-      transition: background-color 0.2s ease !important;
-    }
-    
-    .data-table th:hover {
-      background: var(--apple-bg-hover) !important;
-    }
-    
-    .data-table td {
-      padding: 12px 8px !important;
-      text-align: right !important;
-      border-bottom: 1px solid var(--apple-border-light) !important;
-      vertical-align: middle !important;
-    }
-    
-    .data-table tr:hover {
-      background: var(--apple-bg-hover) !important;
-    }
-    
-    /* סגנונות למספרים */
-    .number-cell {
-      text-align: left !important;
-      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
-      font-size: 13px !important;
-    }
-    
-    /* סגנונות למזהה */
-    .id-cell {
-      font-weight: 600 !important;
-      color: var(--apple-blue) !important;
-      font-size: 12px !important;
-    }
-  </style>
+  <link rel="stylesheet" href="styles/apple-theme.css?v=10" />
+  <link rel="stylesheet" href="styles/menu.css?v=9" />
+  <link rel="stylesheet" href="styles/styles.css?v=16" />
+  <link rel="stylesheet" href="styles/grid-table.css?v=7" />
 </head>
 <body>
   <!-- Web Component של הכותרת -->
   <app-header></app-header>
 
   <div class="background-wrapper">
-    <div class="database-page">
-      <div class="page-header">
-        <h1 class="page-title">🗄️ כל בסיס הנתונים</h1>
-        <p class="page-subtitle">תצוגה מלאה של כל הטבלאות והנתונים במערכת</p>
-      </div>
+    <div class="page-header">
+      <h1 class="page-title">🗄️ כל בסיס הנתונים</h1>
+      <p class="page-subtitle">תצוגה מלאה של כל הטבלאות והנתונים במערכת</p>
+    </div>
       
       <!-- חשבונות -->
       <div class="table-section">
@@ -1017,6 +460,16 @@
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
+                <label for="tradeInvestmentType" class="form-label">סוג השקעה</label>
+                <select class="form-select" id="tradeInvestmentType">
+                  <option value="swing">סווינג</option>
+                  <option value="investment">השקעה</option>
+                  <option value="passive">פאסיבי</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
                 <label for="tradeCancelledAt" class="form-label">תאריך ביטול</label>
                 <input type="datetime-local" class="form-control" id="tradeCancelledAt">
                 <small class="form-text text-muted">למלא רק אם הסטטוס הוא "מבוטל"</small>
@@ -1083,6 +536,16 @@
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
+                <label for="editTradeInvestmentType" class="form-label">סוג השקעה</label>
+                <select class="form-select" id="editTradeInvestmentType">
+                  <option value="swing">סווינג</option>
+                  <option value="investment">השקעה</option>
+                  <option value="passive">פאסיבי</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
                 <label for="editTradeCancelledAt" class="form-label">תאריך ביטול</label>
                 <input type="datetime-local" class="form-control" id="editTradeCancelledAt">
                 <small class="form-text text-muted">למלא רק אם הסטטוס הוא "מבוטל"</small>
@@ -1134,9 +597,9 @@
               <div class="col-md-6 mb-3">
                 <label for="tradePlanInvestmentType" class="form-label">סוג השקעה</label>
                 <select class="form-select" id="tradePlanInvestmentType">
-                  <option value="long">ארוך טווח</option>
-                  <option value="short">קצר טווח</option>
                   <option value="swing">סווינג</option>
+                  <option value="investment">השקעה</option>
+                  <option value="passive">פאסיבי</option>
                 </select>
               </div>
               <div class="col-md-6 mb-3">
@@ -1196,9 +659,9 @@
               <div class="col-md-6 mb-3">
                 <label for="editTradePlanInvestmentType" class="form-label">סוג השקעה</label>
                 <select class="form-select" id="editTradePlanInvestmentType">
-                  <option value="long">ארוך טווח</option>
-                  <option value="short">קצר טווח</option>
                   <option value="swing">סווינג</option>
+                  <option value="investment">השקעה</option>
+                  <option value="passive">פאסיבי</option>
                 </select>
               </div>
               <div class="col-md-6 mb-3">
@@ -1502,7 +965,7 @@
         } else if (tableName === 'tickers') {
           columns = ['id', 'symbol', 'type', 'active_trades', 'remarks'];
         } else if (tableName === 'trades') {
-          columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'opened_at', 'closed_at', 'total_pl', 'notes'];
+          columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'investment_type', 'created_at', 'closed_at', 'cancelled_at', 'total_pl', 'notes'];
         } else if (tableName === 'executions') {
           columns = ['id', 'trade_id', 'action', 'date', 'quantity', 'price', 'fee', 'source'];
         } else if (tableName === 'alerts') {
@@ -1566,7 +1029,7 @@
         } else if (tableName === 'tickers') {
           columns = ['id', 'symbol', 'type', 'active_trades', 'remarks'];
         } else if (tableName === 'trades') {
-          columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'opened_at', 'closed_at', 'total_pl', 'notes'];
+          columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'investment_type', 'opened_at', 'closed_at', 'total_pl', 'notes'];
         } else if (tableName === 'executions') {
           columns = ['id', 'trade_id', 'action', 'date', 'quantity', 'price', 'fee', 'source'];
         } else if (tableName === 'alerts') {
@@ -1642,6 +1105,29 @@
             td.textContent = statusText;
             td.style.color = statusColor;
             td.style.fontWeight = '500';
+          } else if (key === 'investment_type') {
+            // המרת סוגי השקעה לעברית
+            let investmentTypeText = value;
+            let investmentTypeColor = 'var(--apple-text-primary)';
+            
+            switch (value) {
+              case 'swing':
+                investmentTypeText = 'סווינג';
+                investmentTypeColor = 'var(--apple-blue)';
+                break;
+              case 'investment':
+                investmentTypeText = 'השקעה';
+                investmentTypeColor = 'var(--apple-green)';
+                break;
+              case 'passive':
+                investmentTypeText = 'פאסיבי';
+                investmentTypeColor = 'var(--apple-orange)';
+                break;
+            }
+            
+            td.textContent = investmentTypeText;
+            td.style.color = investmentTypeColor;
+            td.style.fontWeight = '500';
           } else if (typeof value === 'number') {
             // סגנון מיוחד למזהה
             if (key === 'id') {
@@ -1679,9 +1165,15 @@
         });
         
         const deleteBtn = document.createElement('button');
-        deleteBtn.innerHTML = '🗑️';
+        // בחירת האייקון הנכון לפי סוג הטבלה
+        if (tableName === 'accounts') {
+          deleteBtn.innerHTML = '🚫';
+          deleteBtn.title = `בטל ${getTableDisplayName(tableName)}`;
+        } else {
+          deleteBtn.innerHTML = '✕';
+          deleteBtn.title = `מחק ${getTableDisplayName(tableName)}`;
+        }
         deleteBtn.className = 'delete-account-btn';
-        deleteBtn.title = `מחק ${getTableDisplayName(tableName)}`;
         
         deleteBtn.addEventListener('click', () => {
           const displayName = getTableDisplayName(tableName);
@@ -2106,6 +1598,7 @@
         'reasons': 'סיבות (Reasons)',
         'created_at': 'תאריך יצירה (Created At)',
         'canceled_at': 'תאריך ביטול (Canceled At)',
+        'cancelled_at': 'תאריך ביטול (Cancelled At)',
         'cancel_reason': 'סיבת ביטול (Cancel Reason)',
         'opened_at': 'תאריך פתיחה (Opened At)',
         'closed_at': 'תאריך סגירה (Closed At)',
@@ -2888,6 +2381,7 @@
       document.getElementById('editTradeTickerId').value = trade.ticker_id || '';
       document.getElementById('editTradeType').value = trade.type || 'buy';
       document.getElementById('editTradeStatus').value = trade.status || 'open';
+      document.getElementById('editTradeInvestmentType').value = trade.investment_type || 'swing';
       document.getElementById('editTradeNotes').value = trade.notes || '';
       
       // טיפול בשדות ביטול
@@ -2905,6 +2399,7 @@
       const tickerId = document.getElementById('tradeTickerId').value;
       const type = document.getElementById('tradeType').value;
       const status = document.getElementById('tradeStatus').value;
+      const investmentType = document.getElementById('tradeInvestmentType').value || 'swing';
       const notes = document.getElementById('tradeNotes').value.trim();
       const cancelledAt = document.getElementById('tradeCancelledAt').value;
       const cancelReason = document.getElementById('tradeCancelReason').value.trim();
@@ -2920,6 +2415,7 @@
         ticker_id: tickerId,
         type: type,
         status: status,
+        investment_type: investmentType,
         notes: notes
       };
       
@@ -2964,6 +2460,7 @@
       const tickerId = document.getElementById('editTradeTickerId').value;
       const type = document.getElementById('editTradeType').value;
       const status = document.getElementById('editTradeStatus').value;
+      const investmentType = document.getElementById('editTradeInvestmentType').value || 'swing';
       const notes = document.getElementById('editTradeNotes').value.trim();
       const cancelledAt = document.getElementById('editTradeCancelledAt').value;
       const cancelReason = document.getElementById('editTradeCancelReason').value.trim();
@@ -2979,6 +2476,7 @@
         ticker_id: tickerId,
         type: type,
         status: status,
+        investment_type: investmentType,
         notes: notes
       };
       
@@ -3059,7 +2557,7 @@
       document.getElementById('editTradePlanId').value = tradePlan.id;
       document.getElementById('editTradePlanAccountId').value = tradePlan.account_id || '';
       document.getElementById('editTradePlanTickerId').value = tradePlan.ticker_id || '';
-      document.getElementById('editTradePlanInvestmentType').value = tradePlan.investment_type || 'long';
+      document.getElementById('editTradePlanInvestmentType').value = tradePlan.investment_type || 'swing';
       document.getElementById('editTradePlanAmount').value = tradePlan.planned_amount || '';
       document.getElementById('editTradePlanStopPrice').value = tradePlan.stop_price || '';
       document.getElementById('editTradePlanTargetPrice').value = tradePlan.target_price || '';
@@ -3073,7 +2571,7 @@
     async function createTradePlan() {
       const accountId = document.getElementById('tradePlanAccountId').value;
       const tickerId = document.getElementById('tradePlanTickerId').value;
-      const investmentType = document.getElementById('tradePlanInvestmentType').value;
+      const investmentType = document.getElementById('tradePlanInvestmentType').value || 'swing';
       const plannedAmount = parseFloat(document.getElementById('tradePlanAmount').value) || 0;
       const stopPrice = parseFloat(document.getElementById('tradePlanStopPrice').value) || null;
       const targetPrice = parseFloat(document.getElementById('tradePlanTargetPrice').value) || null;
@@ -3121,7 +2619,7 @@
       const tradePlanId = document.getElementById('editTradePlanId').value;
       const accountId = document.getElementById('editTradePlanAccountId').value;
       const tickerId = document.getElementById('editTradePlanTickerId').value;
-      const investmentType = document.getElementById('editTradePlanInvestmentType').value;
+      const investmentType = document.getElementById('editTradePlanInvestmentType').value || 'swing';
       const plannedAmount = parseFloat(document.getElementById('editTradePlanAmount').value) || 0;
       const stopPrice = parseFloat(document.getElementById('editTradePlanStopPrice').value) || null;
       const targetPrice = parseFloat(document.getElementById('editTradePlanTargetPrice').value) || null;

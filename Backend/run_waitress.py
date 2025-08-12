@@ -60,8 +60,7 @@ def main():
             channel_timeout=60,  # הקטנת timeout
             log_socket_errors=True,
             log_untrusted_proxy_headers=True,
-            max_request_body_size=1073741824,  # 1GB
-            buffer_size=16384  # הגדלת buffer
+            max_request_body_size=1073741824  # 1GB
         )
     except KeyboardInterrupt:
         logger.info("Server stopped by user")

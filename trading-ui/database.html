@@ -2855,7 +2855,7 @@
           loadTable(tableName);
         } else {
           // טיפול מיוחד בטיקרים עם קשרים
-          if (tableName === 'tickers' && data.error_type && (data.error_type === 'linked_plans' || data.error_type === 'linked_trades' || data.error_type === 'linked_alerts' || data.error_type === 'has_links')) {
+          if (tableName === 'tickers' && data.error_type && (data.error_type === 'linked_plans' || data.error_type === 'linked_trades' || data.error_type === 'linked_plans_and_trades' || data.error_type === 'linked_alerts' || data.error_type === 'has_links')) {
             showWarningModal('danger', 'לא ניתן למחוק טיקר', data.message, data);
           } 
           // טיפול מיוחד בחשבונות עם טריידים פתוחים

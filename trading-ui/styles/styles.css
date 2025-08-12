@@ -296,6 +296,90 @@ h1 {
   font-family: 'Alef', sans-serif;
   font-size: 0.95rem;
 }
+
+/* סגנונות ייחודיים לדפים */
+.background-wrapper {
+  padding-top: 120px !important;
+  padding-right: 32px;
+  transition: padding-top 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.background-wrapper.filter-collapsed {
+  padding-top: 30px !important;
+}
+
+.main-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e8e8e8;
+}
+
+.page-header {
+  background: var(--apple-card-bg);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--apple-text);
+  margin: 0;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: var(--apple-secondary);
+  margin-top: 8px;
+}
+
+/* סגנונות לסטטיסטיקות */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--apple-card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.stat-title {
+  color: var(--apple-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--apple-text);
+}
+
+.stat-value.positive {
+  color: #28a745;
+}
+
+.stat-value.negative {
+  color: #dc3545;
+}
 .ag-grid-reversed .ag-cell {
   display: flex;
   align-items: center;

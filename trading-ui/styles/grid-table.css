@@ -418,6 +418,53 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
   color: #721c24;
 }
 
+/* סגנונות ייחודיים לטבלאות */
+.table-section {
+  background: var(--apple-card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn, .refresh-btn {
+  background: var(--apple-bg-secondary);
+  border: 1px solid var(--apple-border-light);
+  color: var(--apple-text);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.action-btn:hover, .refresh-btn:hover {
+  background: var(--apple-border-light);
+  transform: translateY(-1px);
+}
+
+.add-btn {
+  background: var(--apple-primary);
+  border: 1px solid var(--apple-primary);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.add-btn:hover {
+  background: var(--apple-primary-dark);
+  transform: translateY(-1px);
+}
+
 /* סגנונות לתצוגה מותאמת */
 @media (max-width: 768px) {
   .background-wrapper {

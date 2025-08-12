@@ -1,0 +1,599 @@
+/* Using system fonts instead of external fonts to avoid loading errors */
+
+/* עיצוב התפריט בסגנון Apple */
+.main-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* וידוא שהתפריט הראשי מעל הכל */
+.main-header {
+  z-index: 10000 !important;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* וידוא שהתפריט הראשי מעל כל התוכן */
+.main-header {
+  position: relative !important;
+  z-index: 99999 !important;
+}
+
+.header-container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 44px;
+  direction: ltr; /* התפריט צריך להיות LTR */
+  border-bottom: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+}
+
+.header-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.logo-section {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  direction: ltr; /* הלוגו צריך להיות LTR */
+}
+
+.logo-text {
+  margin-bottom: 10px;
+}
+
+.logo-icon {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 16px 0;
+}
+
+.home-icon {
+  color: #09384d;
+  font-size: 48px;
+  font-weight: 500;
+}
+
+/* הסתרת החץ של Bootstrap */
+.dropdown-toggle::after {
+  display: none !important;
+}
+
+.logo-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1d1d1f;
+  letter-spacing: -0.01em;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 0;
+  align-items: center;
+  direction: ltr; /* התפריט צריך להיות LTR */
+  z-index: 10000 !important;
+  position: relative;
+}
+
+/* היפוך סדר הכפתורים באמצעות order */
+.nav-item:nth-child(1) { order: 5; } /* בית */
+.nav-item:nth-child(2) { order: 4; } /* תכנון */
+.nav-item:nth-child(3) { order: 3; } /* מעקב */
+.nav-item:nth-child(4) { order: 2; } /* תחקיר */
+.nav-item:nth-child(5) { order: 1; } /* הגדרות */
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  text-decoration: none;
+  color: #1d1d1f;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 400;
+  position: relative;
+  margin: 0 0.125rem;
+}
+
+.nav-item:hover {
+  background: rgba(41, 166, 168, 0.1);
+  color: #29a6a8;
+}
+
+.nav-item.active {
+  background: rgba(41, 166, 168, 0.15);
+  color: #29a6a8;
+}
+
+.nav-icon {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.nav-text {
+  font-weight: 400;
+  color: inherit;
+  letter-spacing: -0.01em;
+}
+
+.dropdown-arrow {
+  font-size: 0.6rem;
+  margin-right: 0.125rem;
+  transition: transform 0.2s ease;
+  opacity: 0.6;
+  font-weight: 300;
+}
+
+/* Bootstrap Dropdown עיצוב בסגנון Apple */
+.dropdown {
+  position: relative;
+  z-index: 10000 !important;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.dropdown-toggle[aria-expanded="true"] .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  min-width: 180px;
+  margin-top: 8px;
+  z-index: 1001;
+  padding: 0.5rem 0;
+  list-style: none;
+  margin: 0;
+  animation: dropdownFadeIn 0.2s ease-out;
+  /* וידוא שהתפריט נסגר */
+  display: none;
+  direction: ltr; /* הדרופדאון צריך להיות LTR */
+}
+
+/* סגנונות לתפריט הנפתח */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  min-width: 200px;
+  padding: 0.5rem 0;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+/* וידוא שהתפריט הנפתח מופיע מעל הכל */
+.dropdown-menu.show {
+  display: block !important;
+  z-index: 99999 !important;
+  position: absolute !important;
+}
+
+.nav-menu .dropdown {
+  position: relative !important;
+  z-index: 99999 !important;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #1d1d1f;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  font-size: 0.875rem;
+  font-weight: 400;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: right;
+  letter-spacing: -0.01em;
+  position: relative;
+  font-family: inherit;
+  cursor: pointer;
+  direction: ltr; /* פריטי הדרופדאון צריכים להיות LTR */
+}
+
+.dropdown-item {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: rgba(41, 166, 168, 0.1);
+  color: #29a6a8;
+  transform: translateX(-2px);
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #29a6a8;
+}
+
+.dropdown-item:active {
+  background: rgba(41, 166, 168, 0.1);
+  color: #29a6a8;
+  transform: translateX(-1px);
+}
+
+.dropdown-item:first-child {
+  border-radius: 12px 12px 0 0;
+}
+
+.dropdown-item:last-child {
+  border-radius: 0 0 12px 12px;
+}
+
+.dropdown-arrow {
+  margin-right: 0.5rem;
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-toggle[aria-expanded="true"] .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* אפקט נוסף לתפריט הנפתח */
+.dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 20px;
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: none;
+  border-right: none;
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+/* תמיכה במכשירים ניידים */
+@media (max-width: 768px) {
+  .header-container {
+    padding: 0 1rem;
+    height: 44px;
+  }
+  
+  .nav-menu {
+    gap: 0;
+  }
+  
+  .nav-item {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.8125rem;
+    margin: 0 0.0625rem;
+  }
+  
+  .dropdown-menu {
+    position: fixed;
+    top: 44px;
+    right: 1rem;
+    left: 1rem;
+    min-width: auto;
+    max-width: 280px;
+    margin: 0 auto;
+    border-radius: 12px;
+  }
+  
+  .logo-text {
+    font-size: 0.9375rem;
+  }
+}
+
+/* אנימציות נוספות */
+.nav-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(41, 166, 168, 0.1);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border-radius: 6px;
+}
+
+.nav-item:hover::before {
+  opacity: 1;
+}
+
+.nav-item.active::before {
+  opacity: 1;
+  background: rgba(41, 166, 168, 0.15);
+}
+
+/* תיקון לבעיית התפריט הנפתח */
+.dropdown-menu.show {
+  display: block !important;
+}
+
+.dropdown-menu:not(.show) {
+  display: none !important;
+}
+
+/* עיצוב הפילטר המורכב */
+.status-filter-section {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  min-height: 30px !important;
+  display: block !important;
+}
+
+.filter-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  overflow: hidden;
+  max-height: 200px;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.filter-content-wrapper {
+  padding: 0.5rem 0;
+}
+
+.filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-filter-container {
+  position: relative;
+}
+
+.status-filter-dropdown {
+  position: relative;
+}
+
+.status-filter-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  min-width: 150px;
+  transition: all 0.2s ease;
+}
+
+.status-filter-toggle:hover {
+  border-color: #29a6a8;
+}
+
+.status-filter-toggle.active {
+  border-color: #29a6a8;
+  box-shadow: 0 0 0 0.2rem rgba(41, 166, 168, 0.25);
+}
+
+.status-filter-menu {
+  position: static;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  display: none;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+  animation: dropdownFadeIn 0.2s ease-out;
+  margin-top: 0.5rem;
+  width: fit-content;
+  min-width: 150px;
+}
+
+.status-filter-menu.show {
+  display: block;
+}
+
+.status-filter-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.status-filter-item:last-child {
+  border-bottom: none;
+}
+
+.status-filter-item:hover {
+  background-color: #f8f9fa;
+  color: #29a6a8;
+}
+
+.status-filter-item.selected {
+  background-color: #e3f2fd;
+  color: #29a6a8;
+}
+
+.status-filter-item.selected .check-mark {
+  display: inline;
+}
+
+.check-mark {
+  display: none;
+  color: #29a6a8;
+  font-weight: bold;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-btn {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.filter-btn:hover {
+  background: #f8f9fa;
+  border-color: #29a6a8;
+}
+
+.filter-btn-primary {
+  background: #29a6a8;
+  color: white;
+  border-color: #29a6a8;
+}
+
+.filter-btn-primary:hover {
+  background: #238a8c;
+}
+
+.filter-btn-secondary {
+  background: white;
+  color: #666;
+}
+
+.filter-collapse-arrow {
+  position: absolute;
+  bottom: -20px;
+  left: calc(50% - 550px);
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: 1px solid #ff9c05;
+  border-radius: 4px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.filter-collapse-arrow:hover {
+  background: rgba(255, 156, 5, 0.1);
+  border-color: #e68a00;
+}
+
+.collapse-arrow {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid #ff9c05;
+  transform: rotate(180deg);
+  transition: transform 0.2s ease;
+}
+
+.status-filter-section.collapsed .collapse-arrow {
+  transform: rotate(0deg);
+}
+
+.status-filter-section.collapsed .filter-container {
+  max-height: 0;
+  padding: 0 2rem;
+  overflow: hidden;
+}
+
+.status-filter-section.collapsed {
+  background: transparent !important;
+  border-bottom: none !important;
+  min-height: 20px !important;
+  height: 20px !important;
+  overflow: visible;
+}
+
+.status-filter-section.collapsed .filter-collapse-arrow {
+  display: flex !important;
+  position: absolute;
+  bottom: -10px;
+  left: calc(50% - 550px);
+  z-index: 1001;
+}

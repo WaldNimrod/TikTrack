@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>העדפות - SimpleTrade</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles/apple-theme.css" />
+  <link rel="stylesheet" href="styles/menu.css?v=6" />
+  <link rel="stylesheet" href="styles/styles.css?v=6" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+      background-color: #f5f5f7;
+    }
+
+    /* התאמת המרווחים לכותרת החדשה */
+    .background-wrapper {
+      padding-top: 120px !important; /* מרווח לכותרת + פילטר + מרווח קטן */
+      padding-right: 32px;
+      transition: padding-top 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .background-wrapper.filter-collapsed {
+      padding-top: 30px !important; /* מרווח לכותרת בלבד + מרווח קטן */
+    }
+
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e8e8e8;
+    }
+    
+    .page-header {
+      background: var(--apple-card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--apple-text);
+      margin: 0;
+    }
+    
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--apple-secondary);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Web Component של הכותרת -->
+  <app-header></app-header>
+
+  <!-- Menu will be loaded here -->
+  <div id="menu-container"></div>
+  
+  <div class="background-wrapper">
+    <div class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">העדפות</h1>
+        <p class="page-subtitle">הגדרות מערכת והעדפות אישיות</p>
+      </div>
+      
+      <!-- Content will be added here -->
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="card" style="background: var(--apple-card-bg); border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+              <div class="card-body">
+                <h5 class="card-title">תוכן עמוד העדפות</h5>
+                <p class="card-text">כאן יוצג תוכן עמוד העדפות...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Scripts -->
+  <script src="scripts/app-header.js"></script>
+  
+  <script>
+    // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
+    function updateBackgroundPadding(isCollapsed) {
+      const backgroundWrapper = document.querySelector('.background-wrapper');
+      const body = document.body;
+      
+      if (backgroundWrapper) {
+        if (isCollapsed) {
+          backgroundWrapper.classList.add('filter-collapsed');
+        } else {
+          backgroundWrapper.classList.remove('filter-collapsed');
+        }
+      }
+      
+      if (body) {
+        if (isCollapsed) {
+          body.classList.add('filter-collapsed');
+        } else {
+          body.classList.remove('filter-collapsed');
+        }
+      }
+    }
+
+    // האזנה לשינויים בקומפוננט הכותרת
+    function setupHeaderListener() {
+      const header = document.querySelector('app-header');
+      if (header) {
+        // האזנה לשינויים בפילטר
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
+              if (filterSection) {
+                const isCollapsed = filterSection.classList.contains('collapsed');
+                updateBackgroundPadding(isCollapsed);
+              }
+            }
+          });
+        });
+
+        // התחלת ההאזנה
+        setTimeout(() => {
+          const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
+          if (filterSection) {
+            observer.observe(filterSection, { attributes: true });
+          }
+        }, 1000);
+      }
+    }
+
+    // אתחול הדף
+    document.addEventListener('DOMContentLoaded', () => {
+      // הגדרת האזנה לכותרת
+      setupHeaderListener();
+    });
+  </script>
+</body>
+</html>

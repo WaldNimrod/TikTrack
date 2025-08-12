@@ -1,0 +1,501 @@
+<DOCTYPE html> 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>בדיקת גריד - מערכת ניהול השקעות</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- AG-Grid CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/apple-theme.css" />
+  <link rel="stylesheet" href="styles/menu.css?v=6" />
+  <link rel="stylesheet" href="styles/styles.css?v=6" />
+  <link rel="stylesheet" href="styles/grid.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+  <!-- Web Component של הכותרת -->
+  <app-header></app-header>
+
+  <div class="background-wrapper">
+    <div class="container">
+      <div class="content-wrapper">
+        <div class="top-bar">
+          <h1>בדיקת גריד - טריידים</h1>
+          
+
+        </div>
+
+        <!-- אלמנטי בדיקה ספציפיים לדף זה -->
+        <div class="filter-test-section">
+          <h3>בדיקת פילטר סטטוס</h3>
+          <div class="checkbox-group">
+            <label>
+              <input type="checkbox" id="status-open" checked>
+              <span>פתוח</span>
+            </label>
+            <label>
+              <input type="checkbox" id="status-closed">
+              <span>סגור</span>
+            </label>
+            <label>
+              <input type="checkbox" id="status-cancelled">
+              <span>מבוטל</span>
+            </label>
+          </div>
+        </div>
+
+
+
+
+
+
+
+        <div class="info-summary">
+          <div>סה"כ רשומות: <strong>0</strong></div>
+          <div>סה"כ סכום: <strong>$0</strong></div>
+          <div>סכום ממוצע: <strong>$0</strong></div>
+        </div>
+
+        <div class="status-indicator">
+          <div class="status-item">
+            <div class="status-dot success"></div>
+            <span>גריד מוכן</span>
+          </div>
+          <div class="status-item">
+            <div class="status-dot warning"></div>
+            <span>טוען נתונים...</span>
+          </div>
+        </div>
+
+        <div id="agGridFloating" class="ag-theme-quartz grid-container" style="height: 500px; width: 100%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Web Component Header -->
+  <script src="scripts/app-header.js"></script>
+  
+  <!-- Grid System Scripts -->
+  <script src="scripts/grid-core.js"></script>
+  <script src="scripts/grid-filters.js"></script>
+  <script src="scripts/grid-data.js"></script>
+  <script src="scripts/grid-init.js"></script>
+  
+  <script>
+    // הגדרת עמודות הגריד הספציפיות לדף זה
+    window.getPageColumnDefs = () => [
+      { 
+        headerName: "המרה", 
+        field: "action", 
+        width: 60,
+        minWidth: 50,
+        maxWidth: 80,
+        cellRenderer: params => `<span style="cursor: pointer; font-size: 1.2rem;">${params.value}</span>`
+      },
+      { 
+        headerName: "סטטוס", 
+        field: "status", 
+        width: 80,
+        minWidth: 70,
+        maxWidth: 100, 
+        cellClass: params => `badge-status ${params.value}`,
+        filter: true,
+        filterParams: {
+          filterOptions: ['equals', 'notEqual'],
+          defaultOption: 'equals'
+        }
+      },
+      { 
+        headerName: "נוכחי", 
+        field: "current", 
+        width: 120,
+        minWidth: 100,
+        maxWidth: 150, 
+        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+      },
+      { 
+        headerName: "סטופ", 
+        field: "stop", 
+        width: 120,
+        minWidth: 100,
+        maxWidth: 150, 
+        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+      },
+      { 
+        headerName: "יעד", 
+        field: "target", 
+        width: 120,
+        minWidth: 100,
+        maxWidth: 150, 
+        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+      },
+      { 
+        headerName: "סכום/כמות", 
+        field: "amount", 
+        width: 140,
+        minWidth: 120,
+        maxWidth: 180,
+        flex: 1
+      },
+      { 
+        headerName: "סוג", 
+        field: "type", 
+        width: 80,
+        minWidth: 70,
+        maxWidth: 100, 
+        cellClass: params => `badge-type ${params.value}`
+      },
+      { 
+        headerName: "תאריך", 
+        field: "date", 
+        width: 100,
+        minWidth: 90,
+        maxWidth: 120
+      },
+      {
+        headerName: "נכס",
+        field: "ticker",
+        width: 100,
+        minWidth: 80,
+        maxWidth: 120,
+        cellRenderer: params => {
+          return `<a href="#" onclick="openPlanDetails('${params.value}'); return false;" style="color: #0077cc; text-decoration: underline;">${params.value}</a>`;
+        }
+      },
+      { 
+        headerName: "חשבון", 
+        field: "account", 
+        width: 120,
+        minWidth: 100,
+        maxWidth: 150,
+        filter: true,
+        filterParams: {
+          filterOptions: ['equals', 'notEqual'],
+          defaultOption: 'equals'
+        },
+        cellRenderer: params => {
+          const value = params.value || 'N/A';
+          return `<span style="font-weight: 500; color: #29a6a8;">${value}</span>`;
+        }
+      }
+    ];
+
+    // הגדרות הגריד הספציפיות לדף זה
+    const getPageGridOptions = (rowData = []) => ({
+      columnDefs: getPageColumnDefs(),
+      rowData: rowData,
+      theme: 'legacy',
+      defaultColDef: {
+        sortable: true,
+        filter: false,
+        resizable: true,
+        wrapText: true,
+        autoHeight: true,
+        cellStyle: { 
+          textAlign: 'center', 
+          direction: 'rtl', 
+          padding: '4px', 
+          fontSize: '0.85rem', 
+          lineHeight: '1.4' 
+        },
+        headerClass: 'ag-header-center',
+        floatingFilter: false,
+        suppressSizeToFit: false
+      },
+      isExternalFilterPresent: isExternalFilterPresent,
+      doesExternalFilterPass: doesExternalFilterPass,
+      onGridReady: onGridReady
+    });
+
+    // אתחול הגריד עם טריידים במקום תכנונים
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM Content Loaded - Initializing grid test page');
+      
+      // המתנה קצרה לוודא שהגריד נטען
+      setTimeout(() => {
+        // ניסיון לטעון טריידים מהשרת
+        loadDataByType('trades').then(data => {
+          console.log('Trades loaded for grid test:', data);
+          updateGridWithData(data);
+        }).catch(error => {
+          console.error('Error loading trades for grid test:', error);
+          // במקרה של שגיאה, נשתמש בנתוני דוגמה
+          console.log('Using fallback data with account column');
+          const fallbackData = [
+            { ticker: "AAPL", date: "2025-08-01", type: "סווינג", amount: "$25,000 (#100)", target: "$210 (12.3%)", stop: "$180 (-6.7%)", current: "$184.32 (+1.2%)", status: "פתוח", action: "⬅️", account: "חשבון ראשי" },
+            { ticker: "TSLA", date: "2025-07-30", type: "השקעה", amount: "$20,000 (#100)", target: "$780 (10.1%)", stop: "$690 (-4.8%)", current: "$688.90 (-2.1%)", status: "סגור", action: "⬅️", account: "חשבון משני" },
+            { ticker: "NVDA", date: "2025-07-28", type: "השקעה", amount: "$15,000 (#75)", target: "$540 (8.2%)", stop: "$480 (-4.5%)", current: "$503.20 (+0.5%)", status: "פתוח", action: "⬅️", account: "חשבון ראשי" },
+            { ticker: "AMZN", date: "2025-07-27", type: "פאסיבי", amount: "$10,000 (#50)", target: "$140 (6.3%)", stop: "$126 (-3.1%)", current: "$129.00 (-1.0%)", status: "מבוטל", action: "⬅️", account: "חשבון משני" },
+            { ticker: "GOOG", date: "2025-07-26", type: "השקעה", amount: "$20,000 (#60)", target: "$148 (9.0%)", stop: "$130 (-3.4%)", current: "$141.00 (+1.6%)", status: "פתוח", action: "⬅️", account: "חשבון ראשי" }
+          ];
+          updateGridWithData(fallbackData);
+        });
+      }, 500);
+    });
+    
+    // פונקציה לעדכון הגריד עם נתונים
+    function updateGridWithData(data) {
+      console.log('Updating grid with data:', data);
+      
+      // בדיקה אם יש שדה חשבון בנתונים
+      if (data && data.length > 0) {
+        const firstItem = data[0];
+        console.log('First trade item:', firstItem);
+        console.log('Account field exists:', 'account' in firstItem);
+        if ('account' in firstItem) {
+          console.log('Account value:', firstItem.account);
+        }
+      }
+      
+      // רענון הגריד עם הנתונים החדשים
+      if (window.gridApi && data) {
+        // עדכון העמודות והנתונים
+        window.gridApi.setGridOption('columnDefs', getPageColumnDefs());
+        window.gridApi.setGridOption('rowData', data);
+        window.gridApi.sizeColumnsToFit();
+        console.log('Grid refreshed with data and account column');
+      } else {
+        console.log('Grid API not available yet, retrying...');
+        // ניסיון נוסף אחרי המתנה
+        setTimeout(() => {
+          if (window.gridApi && data) {
+            window.gridApi.setGridOption('columnDefs', getPageColumnDefs());
+            window.gridApi.setGridOption('rowData', data);
+            window.gridApi.sizeColumnsToFit();
+            console.log('Grid refreshed on second attempt');
+          }
+        }, 1000);
+      }
+    }
+
+        // אתחול מערכת הגריד המודולרית
+    // האתחול מתבצע אוטומטית על ידי grid-init.js
+    console.log('Grid test page loaded, waiting for automatic initialization...');
+    
+
+
+    // פונקציה לטעינת הפילטרים השמורים
+    function loadSavedFilters() {
+      try {
+        const savedStatusFilter = localStorage.getItem('planningFilterStatuses');
+        const savedTypeFilter = localStorage.getItem('planningFilterTypes');
+        const savedAccountFilter = localStorage.getItem('planningFilterAccounts');
+        const savedDateRangeFilter = localStorage.getItem('planningFilterDateRanges');
+        const savedSearchFilter = localStorage.getItem('planningFilterSearch');
+        
+        let filters = {};
+        
+        if (savedStatusFilter) {
+          filters.statuses = JSON.parse(savedStatusFilter);
+          console.log('Loaded saved status filter:', filters.statuses);
+        }
+        if (savedTypeFilter) {
+          filters.types = JSON.parse(savedTypeFilter);
+          console.log('Loaded saved type filter:', filters.types);
+        }
+        if (savedAccountFilter) {
+          filters.accounts = JSON.parse(savedAccountFilter);
+          console.log('Loaded saved account filter:', filters.accounts);
+        }
+        if (savedDateRangeFilter) {
+          filters.dateRanges = JSON.parse(savedDateRangeFilter);
+          console.log('Loaded saved date range filter:', filters.dateRanges);
+        }
+        if (savedSearchFilter) {
+          filters.search = savedSearchFilter;
+          console.log('Loaded saved search filter:', filters.search);
+        }
+        
+        return filters;
+      } catch (error) {
+        console.error('Error loading saved filters:', error);
+      }
+              return null;
+      }
+
+      // פונקציות גלובליות לקומפוננט הכותרת
+      window.updateGridFromComponent = function(selectedStatuses, selectedTypes = null, selectedAccounts = null) {
+        console.log('=== updateGridFromComponent called in grid-test ===');
+        console.log('Selected statuses:', selectedStatuses);
+        console.log('Selected types:', selectedTypes);
+        console.log('Selected accounts:', selectedAccounts);
+        
+        // שמירת הערכים הנבחרים לשימוש מאוחר יותר
+        window.selectedStatusesForFilter = selectedStatuses;
+        window.selectedTypesForFilter = selectedTypes;
+        window.selectedAccountsForFilter = selectedAccounts;
+        
+        // שמירת הפילטרים ב-localStorage לזכירה במעבר בין דפים
+        localStorage.setItem('planningFilterStatuses', JSON.stringify(selectedStatuses));
+        if (selectedTypes) {
+          localStorage.setItem('planningFilterTypes', JSON.stringify(selectedTypes));
+        }
+        if (selectedAccounts) {
+          localStorage.setItem('planningFilterAccounts', JSON.stringify(selectedAccounts));
+        }
+        
+        // אם הגריד זמין, הפעל את הפילטרים מיד
+        if (window.gridApi) {
+          // הפעלת פילטר הסטטוסים, הסוגים והחשבונות
+          applyStatusFilterToGrid(selectedStatuses, selectedTypes, selectedAccounts);
+        } else {
+          console.log('Grid API not available yet, filters will be applied when grid is ready');
+        }
+        
+        console.log('=== updateGridFromComponent completed in grid-test ===');
+      }
+
+      window.updateTestCheckboxesFromComponent = function(selectedValues) {
+        console.log('=== updateTestCheckboxesFromComponent called in grid-test ===');
+        console.log('Selected values:', selectedValues);
+        
+        // עדכון הצ'קבוקסים בדף
+        const checkboxes = {
+          'status-open': 'פתוח',
+          'status-closed': 'סגור', 
+          'status-cancelled': 'מבוטל'
+        };
+        
+        Object.keys(checkboxes).forEach(checkboxId => {
+          const checkbox = document.getElementById(checkboxId);
+          if (checkbox) {
+            const status = checkboxes[checkboxId];
+            checkbox.checked = selectedValues.includes(status);
+          }
+        });
+        
+        console.log('Test checkboxes updated');
+      };
+
+      // פונקציה להחלת פילטר סטטוס, סוג וחשבונות
+      function applyStatusFilterToGrid(selectedStatuses, selectedTypes = null, selectedAccounts = null) {
+        if (!window.gridApi) {
+          console.log('Grid API not available yet');
+          return;
+        }
+
+        console.log('=== applyStatusFilterToGrid called in grid-test ===');
+        console.log('Selected statuses:', selectedStatuses);
+        console.log('Selected types:', selectedTypes);
+        console.log('Selected accounts:', selectedAccounts);
+        console.log('Window rowData length:', window.rowData ? window.rowData.length : 'undefined');
+
+        try {
+          let filteredData = window.rowData || [];
+          console.log('Initial data length:', filteredData.length);
+          
+          // סינון לפי סטטוס
+          if (selectedStatuses && selectedStatuses.length > 0 && selectedStatuses.length < 3) {
+            console.log('Applying status filter for:', selectedStatuses);
+            filteredData = filteredData.filter(row => selectedStatuses.includes(row.status));
+            console.log('Status filter applied, showing', filteredData.length, 'rows');
+          } else {
+            console.log('No status filter applied');
+          }
+          
+          // סינון לפי סוג
+          if (selectedTypes && selectedTypes.length > 0 && selectedTypes.length < 4) {
+            console.log('Applying type filter for:', selectedTypes);
+            filteredData = filteredData.filter(row => selectedTypes.includes(row.type));
+            console.log('Type filter applied, showing', filteredData.length, 'rows');
+          } else {
+            console.log('No type filter applied');
+          }
+          
+          // סינון לפי חשבון
+          if (selectedAccounts && selectedAccounts.length > 0) {
+            console.log('Applying account filter for:', selectedAccounts);
+            filteredData = filteredData.filter(row => selectedAccounts.includes(row.account));
+            console.log('Account filter applied, showing', filteredData.length, 'rows');
+          } else {
+            console.log('No account filter applied');
+          }
+          
+          window.gridApi.setGridOption('rowData', filteredData);
+          console.log('Final filtered data:', filteredData.length, 'rows');
+          console.log('=== applyStatusFilterToGrid completed in grid-test ===');
+          
+        } catch (error) {
+          console.error('Error updating grid data:', error);
+        }
+      }
+
+      // פונקציה להחלת פילטר תאריכים
+      function applyDateRangeFilterToGrid(selectedDateRange) {
+        if (!window.gridApi) {
+          console.log('Grid API not available yet');
+          return;
+        }
+
+        console.log('Applying date range filter to grid:', selectedDateRange);
+
+        try {
+          if (!selectedDateRange || selectedDateRange === 'הכול') {
+            // אם לא נבחר טווח תאריכים או נבחר "הכול" - הצג הכל
+            console.log('Showing all dates');
+            window.gridApi.setGridOption('rowData', window.rowData);
+          } else {
+            // חישוב טווח התאריכים
+            const now = new Date();
+            let startDate = new Date();
+            
+            switch (selectedDateRange) {
+              case 'שבוע':
+                startDate.setDate(now.getDate() - 7);
+                break;
+              case 'MTD':
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                break;
+              case '30 יום':
+                startDate.setDate(now.getDate() - 30);
+                break;
+              case '60 יום':
+                startDate.setDate(now.getDate() - 60);
+                break;
+              case '90 יום':
+                startDate.setDate(now.getDate() - 90);
+                break;
+              case 'שנה':
+                startDate.setFullYear(now.getFullYear() - 1);
+                break;
+              case 'YTD':
+                startDate = new Date(now.getFullYear(), 0, 1);
+                break;
+              case 'שנה קודמת':
+                startDate = new Date(now.getFullYear() - 1, 0, 1);
+                const endDate = new Date(now.getFullYear() - 1, 11, 31);
+                break;
+              default:
+                console.log('Unknown date range:', selectedDateRange);
+                window.gridApi.setGridOption('rowData', window.rowData);
+                return;
+            }
+            
+            // סינון הנתונים לפי טווח התאריכים
+            const filteredData = window.rowData.filter(row => {
+              // בדיקה אם יש שדה תאריך (date או created_at או opened_at)
+              const dateField = row.date || row.created_at || row.opened_at;
+              if (!dateField) return false;
+              const rowDate = new Date(dateField);
+              return rowDate >= startDate && rowDate <= now;
+            });
+            
+            console.log('Date range filter applied:', selectedDateRange, 'Showing', filteredData.length, 'rows');
+            window.gridApi.setGridOption('rowData', filteredData);
+          }
+          
+        } catch (error) {
+          console.error('Error updating grid data with date filter:', error);
+        }
+      }
+
+  </script>
+</body>
+</html>

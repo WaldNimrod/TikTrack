@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>תכנון טריידים - מערכת ניהול השקעות</title>
+  <!-- Using system fonts instead of Google Fonts to avoid loading errors -->
+  <!-- AG-Grid CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/apple-theme.css" />
+  <link rel="stylesheet" href="styles/menu.css?v=6" />
+  <link rel="stylesheet" href="styles/styles.css?v=6" />
+  <link rel="stylesheet" href="styles/grid.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* סגנונות מיוחדים לדף זה */
+    
+    /* אין סגנונות מיוחדים נדרשים כרגע - כל הסגנונות הועברו לקבצים המתאימים */
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- קבצים מודולריים של הגריד -->
+  <script src="scripts/app-header.js"></script>
+  <script src="scripts/grid-core.js"></script>
+  <script src="scripts/grid-filters.js"></script>
+  <script src="scripts/grid-data.js"></script>
+  <script src="scripts/grid-init.js"></script>
+
+</head>
+<body>
+  <!-- Web Component של הכותרת -->
+  <app-header></app-header>
+
+  <div class="background-wrapper">
+    <div class="container">
+      <div class="content-wrapper">
+        <div class="top-bar">
+          <h1>תכנון טריידים</h1>
+        </div>
+
+      <!-- תצוגת סיכום -->
+      <div class="info-summary">
+        <div>סה"כ תכנונים פעילים: <strong>4</strong></div>
+        <div>סכום השקעה כולל: <strong>₪78,000</strong></div>
+        <div>השקעה ממוצעת: <strong>₪19,500</strong></div>
+        <div>רווח כולל: <strong style="color: green">+₪3,240</strong></div>
+      </div>
+
+      <!-- אזהרות -->
+      <div class="alert-section">
+        <h3>התראות</h3>
+        <div class="alert-row">
+          <div class="alert-card">
+            <strong onclick="openPlanDetails('AAPL')">AAPL</strong><br />
+            מחיר חצה את 180$<br />
+            <span class="price">נוכחי: $184.32 (+1.2%)</span>
+            <button class="btn btn-secondary" onclick="markAlertAsRead(this, 'AAPL')">סמן כנקרא</button>
+          </div>
+          <div class="alert-card">
+            <strong onclick="openPlanDetails('TSLA')">TSLA</strong><br />
+            מחיר ירד מתחת ל-700$<br />
+            <span class="price">נוכחי: $688.90 (-2.1%)</span>
+            <button class="btn btn-secondary" onclick="markAlertAsRead(this, 'TSLA')">סמן כנקרא</button>
+          </div>
+          <div class="alert-card">
+            <strong onclick="openPlanDetails('MSFT')">MSFT</strong><br />
+            תזכורת לכניסה ביום שלישי<br />
+            <span class="price">נוכחי: $342.00 (+2.4%)</span>
+            <button class="btn btn-secondary" onclick="markAlertAsRead(this, 'MSFT')">סמן כנקרא</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- טופס תכנון (מוסתר בהתחלה) -->
+      <div class="plan-form" id="planForm" style="display: none;">
+        <h3>טופס תכנון טרייד</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>נכס (סימבול)</label>
+            <input type="text" id="ticker" placeholder="למשל: AAPL, TSLA" />
+          </div>
+          <div class="form-group">
+            <label>סוג השקעה</label>
+            <select id="type">
+              <option value="סווינג">סווינג</option>
+              <option value="השקעה">השקעה</option>
+              <option value="פאסיבי">פאסיבי</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>סטטוס</label>
+            <select id="status">
+              <option value="פתוח">פתוח</option>
+              <option value="סגור">סגור</option>
+              <option value="מבוטל">מבוטל</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>סכום השקעה</label>
+            <input type="number" id="amount" placeholder="למשל: 25000" />
+          </div>
+          <div class="form-group">
+            <label>מחיר יעד</label>
+            <input type="number" id="target" placeholder="מחיר יעד" />
+          </div>
+          <div class="form-group">
+            <label>מחיר סטופ</label>
+            <input type="number" id="stop" placeholder="מחיר סטופ" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>תאריך יעד</label>
+            <input type="date" id="targetDate" />
+          </div>
+          <div class="form-group">
+            <label>הערות</label>
+            <textarea id="notes" rows="2" placeholder="הערות נוספות..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="closePlanForm()">ביטול</button>
+          <button class="btn btn-success" onclick="savePlan()">שמור תכנון</button>
+        </div>
+      </div>
+
+      <!-- כפתור הוספה -->
+      <div class="filters">
+        <div style="display: flex; justify-content: flex-end;">
+          <button class="btn btn-secondary" onclick="openPlanDetails()" style="padding: 0.4rem 0.8rem; font-size: 0.9rem; background-color: #29a6a8; color: white; border: none; border-radius: 6px;">הוסף תכנון חדש</button>
+        </div>
+      </div>
+
+      <!-- הגריד כעת בתוך ה-content-wrapper הראשי -->
+      <div class="grid-container" id="gridContainer">
+        <h3>טבלת תכנונים</h3>
+        
+        <div id="agGridFloating" class="ag-theme-quartz grid-container"></div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- מרווח בתחתית הדף -->
+  <div style="height: 3rem;"></div>
+
+  <!-- מודל פרטי תכנון -->
+  <div id="planModal" class="modal">
+    <button class="modal-close" onclick="closePlanDetails()">✕</button>
+    <div class="modal-content" id="planDetailsContent">
+      <!-- תוכן המודל יוכנס כאן -->
+    </div>
+  </div>
+
+  <!-- חלון אישור מותאם אישית -->
+  <div id="customConfirmModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 400px; text-align: center; padding: 2rem;">
+      <div style="font-size: 4rem; color: #FF3B30; margin-bottom: 1rem;">⚠️</div>
+      <h3 id="customConfirmMessage" style="color: #FF3B30; margin-bottom: 2rem;"></h3>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <button class="btn btn-danger" onclick="confirmCustomAction()" style="padding: 0.5rem 1rem;">מחק</button>
+        <button class="btn btn-secondary" onclick="cancelCustomAction()" style="padding: 0.5rem 1rem;">ביטול</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    console.log('Script loaded');
+    
+    let gridApi;
+    let externalFilterPresent = false;
+    let selectedStatuses = [];
+    let selectedTypes = [];
+    let rowData = [
+      { ticker: "AAPL", date: "2025-08-01", type: "סווינג", amount: "$25,000 (#100)", target: "$210 (12.3%)", stop: "$180 (-6.7%)", current: "$184.32 (+1.2%)", status: "פתוח", action: "⬅️" },
+      { ticker: "TSLA", date: "2025-07-30", type: "השקעה", amount: "$20,000 (#100)", target: "$780 (10.1%)", stop: "$690 (-4.8%)", current: "$688.90 (-2.1%)", status: "סגור", action: "⬅️" },
+      { ticker: "NVDA", date: "2025-07-28", type: "השקעה", amount: "$15,000 (#75)", target: "$540 (8.2%)", stop: "$480 (-4.5%)", current: "$503.20 (+0.5%)", status: "פתוח", action: "⬅️" },
+      { ticker: "AMZN", date: "2025-07-27", type: "פאסיבי", amount: "$10,000 (#50)", target: "$140 (6.3%)", stop: "$126 (-3.1%)", current: "$129.00 (-1.0%)", status: "מבוטל", action: "⬅️" },
+      { ticker: "GOOG", date: "2025-07-26", type: "השקעה", amount: "$20,000 (#60)", target: "$148 (9.0%)", stop: "$130 (-3.4%)", current: "$141.00 (+1.6%)", status: "פתוח", action: "⬅️" },
+      { ticker: "MSFT", date: "2025-07-25", type: "סווינג", amount: "$18,000 (#90)", target: "$355 (11.2%)", stop: "$320 (-4.2%)", current: "$342.00 (+2.4%)", status: "סגור", action: "⬅️" }
+    ];
+
+    window.openPlanDetails = function(ticker = null) {
+      if (ticker) {
+        // פתיחת פרטי תכנון קיים
+        const modal = document.getElementById("planModal");
+        const content = document.getElementById("planDetailsContent");
+        const plan = rowData.find(p => p.ticker === ticker);
+        const profitLoss = calculateProfitLoss(plan);
+        const isPositive = profitLoss >= 0;
+        
+        content.innerHTML = `
+          <h2>פרטי תכנון - ${ticker}</h2>
+          <div style="background: #e3f2fd; padding: 1rem; border-radius: 6px; margin: 1rem 0; text-align: center; border: 1px solid #2196f3;">
+            <strong>מחיר נוכחי:</strong> ${plan.current}
+          </div>
+          <div class="plan-details-grid">
+            <div class="plan-details-section">
+              <h4>פרטי התכנון</h4>
+              <p><strong>תאריך יצירה:</strong> 
+                <input type="date" id="editDate" value="${plan.date}" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem;" />
+              </p>
+              <p><strong>סוג השקעה:</strong> 
+                <select id="quickType" onchange="updateQuickType('${ticker}', this.value)" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem;">
+                  <option value="סווינג" ${plan.type === 'סווינג' ? 'selected' : ''}>סווינג</option>
+                  <option value="השקעה" ${plan.type === 'השקעה' ? 'selected' : ''}>השקעה</option>
+                  <option value="פאסיבי" ${plan.type === 'פאסיבי' ? 'selected' : ''}>פאסיבי</option>
+                </select>
+              </p>
+              <p><strong>סכום השקעה:</strong> 
+                <input type="number" id="editAmountSum" value="${plan.amount.match(/[\d,]+/)[0].replace(',', '')}" placeholder="סכום" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 80px;" />
+                <input type="number" id="editAmountShares" value="${plan.amount.match(/#(\d+)/)[1]}" placeholder="מניות" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 80px;" />
+              </p>
+              <p><strong>סטטוס:</strong> 
+                <select id="quickStatus" onchange="updateQuickStatus('${ticker}', this.value)" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem;">
+                  <option value="פתוח" ${plan.status === 'פתוח' ? 'selected' : ''}>פתוח</option>
+                  <option value="סגור" ${plan.status === 'סגור' ? 'selected' : ''}>סגור</option>
+                  <option value="מבוטל" ${plan.status === 'מבוטל' ? 'selected' : ''}>מבוטל</option>
+                </select>
+                <span class="badge-status ${plan.status}" id="statusBadge">${plan.status}</span>
+              </p>
+            </div>
+            <div class="plan-details-section">
+              <h4>מחירים ורווח/הפסד</h4>
+              <p><strong>מחיר יעד:</strong> 
+                <input type="number" id="editTargetPrice" value="${plan.target.match(/[\d.]+/)[0]}" placeholder="מחיר" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 80px;" />
+                <input type="number" id="editTargetPercent" value="${plan.target.match(/\(([^)]+)\)/)[1].replace('%', '')}" placeholder="%" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 60px;" />
+              </p>
+              <p><strong>מחיר סטופ:</strong> 
+                <input type="number" id="editStopPrice" value="${plan.stop.match(/[\d.]+/)[0]}" placeholder="מחיר" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 80px;" />
+                <input type="number" id="editStopPercent" value="${plan.stop.match(/\(([^)]+)\)/)[1].replace('%', '')}" placeholder="%" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 60px;" />
+              </p>
+              <div style="margin-top: 1rem;">
+                <div class="profit-loss positive" style="margin-bottom: 0.5rem;">
+                  <strong>רווח ביעד:</strong> +₪${calculateTargetProfit(plan).toLocaleString()}
+                </div>
+                <div class="profit-loss negative">
+                  <strong>הפסד בסטופ:</strong> -₪${calculateStopLoss(plan).toLocaleString()}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 2rem; position: relative;">
+            <button class="btn btn-danger" onclick="deletePlan('${ticker}')" style="position: absolute; top: 0; left: 0; padding: 0.3rem 0.6rem; font-size: 0.75rem;">מחק תכנון</button>
+          </div>
+        `;
+        
+        modal.style.display = "block";
+        // קביעת גובה דינמי למודל
+        setTimeout(() => {
+          adjustModalHeight();
+        }, 10);
+      } else {
+        // הוספת תכנון חדש - טופס ריק עם תאריך נוכחי
+        const modal = document.getElementById("planModal");
+        const content = document.getElementById("planDetailsContent");
+        const today = new Date().toISOString().split('T')[0];
+        
+        content.innerHTML = `
+          <h2>הוספת תכנון חדש</h2>
+          <div class="plan-details-grid">
+            <div class="plan-details-section">
+              <h4>פרטי התכנון</h4>
+              <p><strong>נכס (סימבול):</strong> 
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <select id="newTicker" style="flex: 1; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem;" onchange="onTickerChange()">
+                    <option value="">בחר נכס...</option>
+                    <option value="AAPL">AAPL - Apple</option>
+                    <option value="TSLA">TSLA - Tesla</option>
+                    <option value="NVDA">NVDA - NVIDIA</option>
+                    <option value="AMZN">AMZN - Amazon</option>
+                    <option value="GOOG">GOOG - Google</option>
+                    <option value="MSFT">MSFT - Microsoft</option>
+                    <option value="META">META - Meta</option>
+                    <option value="NFLX">NFLX - Netflix</option>
+                    <option value="custom">+ הוסף נכס חדש</option>
+                  </select>
+                  <input type="text" id="customTicker" placeholder="סימבול חדש (אותיות גדולות באנגלית בלבד)" style="display: none; flex: 1; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; text-transform: uppercase; maxlength: 10;" oninput="validateTickerInput(this)" onkeypress="return validateTickerKeypress(event)" />
+                </div>
+              </p>
+              <p><strong>תאריך יצירה:</strong> 
+                <input type="date" id="newDate" value="${today}" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem;" />
+              </p>
+              <p><strong>סוג השקעה:</strong> 
+                <select id="newType" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem;">
+                  <option value="סווינג">סווינג</option>
+                  <option value="השקעה">השקעה</option>
+                  <option value="פאסיבי">פאסיבי</option>
+                </select>
+              </p>
+              <p><strong>סכום השקעה:</strong> 
+                <input type="number" id="newAmountSum" placeholder="סכום" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 80px;" />
+                <input type="number" id="newAmountShares" placeholder="מניות" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 80px;" />
+              </p>
+              <p><strong>סטטוס:</strong> 
+                <select id="newStatus" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem;">
+                  <option value="פתוח">פתוח</option>
+                  <option value="סגור">סגור</option>
+                  <option value="מבוטל">מבוטל</option>
+                </select>
+              </p>
+            </div>
+            <div class="plan-details-section">
+              <h4>מחירים</h4>
+              <p><strong>מחיר יעד:</strong> 
+                <input type="number" id="newTargetPrice" placeholder="מחיר" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 80px;" />
+                <input type="number" id="newTargetPercent" placeholder="%" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 60px;" />
+              </p>
+              <p><strong>מחיר סטופ:</strong> 
+                <input type="number" id="newStopPrice" placeholder="מחיר" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 80px;" />
+                <input type="number" id="newStopPercent" placeholder="%" style="margin-right: 0.5rem; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #ced4da; font-size: 0.85rem; width: 60px;" />
+              </p>
+              <p><strong>הערות:</strong></p>
+              <textarea id="newNotes" rows="3" placeholder="הערות נוספות..." style="width: 100%; padding: 0.5rem; border: 1px solid #ced4da; border-radius: 4px; font-family: 'Alef', sans-serif; resize: vertical;"></textarea>
+            </div>
+          </div>
+          <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+            <button class="btn btn-success" onclick="saveNewPlan().catch(console.error)">שמור תכנון</button>
+          </div>
+        `;
+        
+        modal.style.display = "block";
+        // קביעת גובה דינמי למודל
+        setTimeout(() => {
+          adjustModalHeight();
+        }, 10);
+      }
+    }
+
+    // פונקציה לקביעת גובה דינמי למודל
+    function adjustModalHeight() {
+      const modal = document.getElementById("planModal");
+      const content = document.getElementById("planDetailsContent");
+      
+      if (modal && content) {
+        // קבלת גובה התוכן
+        const contentHeight = content.scrollHeight;
+        const windowHeight = window.innerHeight;
+        
+        // חישוב גובה מקסימלי (90% מגובה החלון)
+        const maxHeight = windowHeight * 0.9;
+        
+        // קביעת גובה המודל
+        if (contentHeight > maxHeight) {
+          modal.style.height = maxHeight + 'px';
+          modal.style.overflowY = 'auto';
+        } else {
+          modal.style.height = 'auto';
+          modal.style.overflowY = 'visible';
+        }
+      }
+    }
+
+    // משתנים גלובליים לחלון האישור המותאם אישית
+    let customConfirmCallback = null;
+
+    // פונקציה להצגת חלון אישור מותאם אישית
+    function showCustomConfirmDialog(message, callback) {
+      const modal = document.getElementById("customConfirmModal");
+      const messageElement = document.getElementById("customConfirmMessage");
+      
+      messageElement.textContent = message;
+      customConfirmCallback = callback;
+      modal.style.display = "block";
+    }
+
+    // פונקציה לאישור הפעולה
+    function confirmCustomAction() {
+      const modal = document.getElementById("customConfirmModal");
+      modal.style.display = "none";
+      
+      if (customConfirmCallback) {
+        customConfirmCallback();
+        customConfirmCallback = null;
+      }
+    }
+
+    // פונקציה לביטול הפעולה
+    function cancelCustomAction() {
+      const modal = document.getElementById("customConfirmModal");
+      modal.style.display = "none";
+      customConfirmCallback = null;
+    }
+
+    // מחירי מניות לדוגמה (בפועל זה יהיה מ-API)
+    const stockPrices = {
+      'AAPL': 184.32,
+      'TSLA': 688.90,
+      'NVDA': 503.20,
+      'AMZN': 129.00,
+      'GOOG': 141.00,
+      'MSFT': 342.00,
+      'META': 275.50,
+      'NFLX': 485.75
+    };
+
+    // פונקציות validation לסימבול
+    function validateTickerInput(input) {
+      // הסרת כל התווים שאינם אותיות באנגלית
+      input.value = input.value.replace(/[^A-Za-z]/g, '').toUpperCase();
+    }
+
+    function validateTickerKeypress(event) {
+      // אפשר רק אותיות באנגלית
+      const charCode = event.which || event.keyCode;
+      if (charCode >= 65 && charCode <= 90) { // A-Z
+        return true;
+      }
+      if (charCode >= 97 && charCode <= 122) { // a-z
+        return true;
+      }
+      if (charCode === 8 || charCode === 46) { // Backspace, Delete
+        return true;
+      }
+      return false;
+    }
+
+    function onTickerChange() {
+      const tickerSelect = document.getElementById("newTicker");
+      const customTicker = document.getElementById("customTicker");
+      
+      if (tickerSelect.value === "custom") {
+        customTicker.style.display = "block";
+        customTicker.focus();
+      } else if (tickerSelect.value) {
+        customTicker.style.display = "none";
+        customTicker.value = "";
+        // עדכון מחיר נוכחי לחישובים
+        window.currentStockPrice = stockPrices[tickerSelect.value] || 100;
+      } else {
+        customTicker.style.display = "none";
+        customTicker.value = "";
+      }
+    }
+
+    window.saveNewPlan = async function() {
+      const tickerSelect = document.getElementById("newTicker");
+      const customTicker = document.getElementById("customTicker");
+      const type = document.getElementById("newType").value;
+      const status = document.getElementById("newStatus").value;
+      const amountSum = document.getElementById("newAmountSum").value;
+      const amountShares = document.getElementById("newAmountShares").value;
+      const targetPrice = document.getElementById("newTargetPrice").value;
+      const targetPercent = document.getElementById("newTargetPercent").value;
+      const stopPrice = document.getElementById("newStopPrice").value;
+      const stopPercent = document.getElementById("newStopPercent").value;
+      const date = document.getElementById("newDate").value;
+      const notes = document.getElementById("newNotes").value;
+
+      // קביעת הסימבול
+      let ticker;
+      if (tickerSelect.value === "custom") {
+        ticker = customTicker.value.toUpperCase();
+      } else {
+        ticker = tickerSelect.value;
+      }
+
+      if (!ticker || !amountSum || !amountShares || !targetPrice || !stopPrice) {
+        alert("נא למלא את כל השדות הנדרשים");
+        return;
+      }
+
+      // בדיקת תקינות הסימבול
+      if (!/^[A-Z]{1,10}$/.test(ticker)) {
+        alert("הסימבול חייב להכיל אותיות באנגלית בלבד (1-10 תווים)");
+        return;
+      }
+
+      // הכנת נתונים לשליחה לשרת
+      const planData = {
+        ticker: ticker,
+        investment_type: type,
+        planned_amount: parseInt(amountSum),
+        entry_conditions: notes,
+        stop_price: parseFloat(stopPrice),
+        target_price: parseFloat(targetPrice),
+        reasons: notes
+      };
+
+      // שליחה לשרת
+      console.log('שולח נתונים לשרת:', planData);
+      
+      try {
+        const response = await fetch('/api/tradeplans', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(planData)
+        });
+        
+        console.log('תגובה מהשרת:', response.status, response.statusText);
+        const result = await response.json();
+        console.log('תוצאה מהשרת:', result);
+        
+        if (result.status === 'success') {
+          console.log('התכנון נשמר בהצלחה בשרת!');
+          
+          // טעינת נתונים חדשים מהשרת
+          try {
+            await loadPlansFromServer();
+            console.log('הנתונים נטענו מחדש מהשרת!');
+          } catch (error) {
+            console.error('שגיאה בטעינת נתונים מהשרת:', error);
+            
+            // אם יש שגיאה בטעינה מהשרת, נוסיף את התכנון החדש מקומית
+            const newPlan = {
+              ticker: ticker,
+              date: date,
+              type: type,
+              status: status,
+              amount: `$${parseInt(amountSum).toLocaleString()} (#${amountShares})`,
+              target: `$${targetPrice} (${targetPercent}%)`,
+              stop: `$${stopPrice} (${stopPercent}%)`,
+              current: `$${window.currentStockPrice || 100}.00 (0.0%)`,
+              action: "⬅️",
+              notes: notes
+            };
+
+            console.log('מוסיף תכנון חדש לגריד מקומית:', newPlan);
+            rowData.unshift(newPlan);
+            
+            // עדכון הגריד
+            if (gridApi.setRowData) {
+              gridApi.setRowData(rowData);
+            } else if (gridApi.setGridOption) {
+              gridApi.setGridOption('rowData', rowData);
+            } else {
+              console.warn('setRowData function not available');
+            }
+          }
+          
+          // סגירת המודל
+          try {
+            closePlanDetails();
+            console.log('המודל נסגר בהצלחה!');
+          } catch (error) {
+            console.error('שגיאה בסגירת המודל:', error);
+          }
+          
+          // הצגת הודעת הצלחה
+          try {
+            showNotification("התכנון נשמר בהצלחה!");
+            console.log('הודעת הצלחה הוצגה!');
+          } catch (error) {
+            console.error('שגיאה בהצגת הודעת הצלחה:', error);
+            alert("התכנון נשמר בהצלחה!");
+          }
+          
+          // עדכון הסטטיסטיקות
+          try {
+            updatePlanningSummaryStats();
+            console.log('הסטטיסטיקות עודכנו בהצלחה!');
+          } catch (error) {
+            console.error('שגיאה בעדכון סטטיסטיקות:', error);
+          }
+          
+          console.log('כל הפעולות הושלמו בהצלחה!');
+        } else {
+          console.error('שגיאה מהשרת:', result);
+          showNotification("שגיאה בשמירת התכנון: " + (result.message || "שגיאה לא ידועה"), "error");
+        }
+      } catch (error) {
+        console.error('שגיאה ברשת:', error);
+        showNotification("שגיאה בשמירת התכנון", "error");
+      }
+    }
+
+    function calculateProfitLoss(plan) {
+      // חישוב פשוט של רווח/הפסד (בפועל זה יהיה מ-API)
+      const currentPrice = parseFloat(plan.current.match(/[\d.]+/)[0]);
+      const targetPrice = parseFloat(plan.target.match(/[\d.]+/)[0]);
+      const amount = parseInt(plan.amount.match(/[\d,]+/)[0].replace(',', ''));
+      
+      return Math.round((currentPrice - targetPrice) * (amount / targetPrice));
+    }
+
+    function calculateTargetProfit(plan) {
+      // חישוב רווח ביעד
+      const currentPrice = parseFloat(plan.current.match(/[\d.]+/)[0]);
+      const targetPrice = parseFloat(plan.target.match(/[\d.]+/)[0]);
+      const shares = parseInt(plan.amount.match(/#(\d+)/)[1]);
+      
+      return Math.round((targetPrice - currentPrice) * shares);
+    }
+
+    function calculateStopLoss(plan) {
+      // חישוב הפסד בסטופ
+      const currentPrice = parseFloat(plan.current.match(/[\d.]+/)[0]);
+      const stopPrice = parseFloat(plan.stop.match(/[\d.]+/)[0]);
+      const shares = parseInt(plan.amount.match(/#(\d+)/)[1]);
+      
+      return Math.round((currentPrice - stopPrice) * shares);
+    }
+
+    window.closePlanDetails = function() {
+      document.getElementById("planModal").style.display = "none";
+    }
+
+    // פונקציה להצגת הודעות
+    window.showNotification = function(message, type = 'success') {
+      try {
+        const notification = document.createElement('div');
+        const bgColor = type === 'error' ? '#f8d7da' : '#d4edda';
+        const textColor = type === 'error' ? '#721c24' : '#155724';
+        const borderColor = type === 'error' ? '#f5c6cb' : '#c3e6cb';
+        
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 9999;
+          min-width: 300px;
+          padding: 15px 20px;
+          background-color: ${bgColor};
+          color: ${textColor};
+          border: 1px solid ${borderColor};
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          font-size: 14px;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          animation: slideIn 0.3s ease-out;
+        `;
+        
+        notification.innerHTML = `
+          <span>${message}</span>
+          <button onclick="this.parentElement.remove()" style="
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 10px;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          ">×</button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // הסרה אוטומטית אחרי 5 שניות
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => {
+              if (notification.parentNode) {
+                notification.remove();
+              }
+            }, 300);
+          }
+        }, 5000);
+        
+        console.log('הודעת הצלחה נוצרה:', message);
+      } catch (error) {
+        console.error('שגיאה ביצירת הודעה:', error);
+        alert(message);
+      }
+    }
+    
+    // הוספת CSS לאנימציות
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // סגירת המודל בלחיצה מחוץ לו
+    window.onclick = function(event) {
+      const modal = document.getElementById("planModal");
+      if (event.target === modal) {
+        closePlanDetails();
+      }
+    }
+
+    // סגירת המודל עם מקש Escape
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closePlanDetails();
+      }
+    });
+
+
+
+
+
+    window.updateSummaryStats = function(data = null) {
+      updatePlanningSummaryStats(data);
+    }
+
+
+
+
+
+    // פונקציה לטעינת תכנונים מהשרת
+    window.loadPlansFromServer = async function() {
+      try {
+        console.log('טוען תכנונים מהשרת...');
+        const response = await fetch('/api/tradeplans');
+        
+        if (!response.ok) {
+          console.log('לא ניתן לטעון מהשרת, משתמש בנתונים מקומיים');
+          return;
+        }
+        
+        const plans = await response.json();
+        console.log('קיבלתי מהשרת:', plans.length, 'תכנונים');
+        
+        // המרת הנתונים לפורמט של הגריד
+        const formattedPlans = plans.map(plan => ({
+          id: plan.id,
+          ticker: plan.ticker,
+          date: plan.created_at ? plan.created_at.split(' ')[0] : new Date().toISOString().split('T')[0],
+          type: plan.investment_type || 'השקעה',
+          status: plan.canceled_at ? 'מבוטל' : 'פתוח',
+          amount: `$${plan.planned_amount ? plan.planned_amount.toLocaleString() : '0'} (#100)`,
+          target: `$${plan.target_price || 0} (10%)`,
+          stop: `$${plan.stop_price || 0} (-5%)`,
+          current: `$${window.currentStockPrice || 100}.00 (0.0%)`,
+          action: "⬅️",
+          notes: plan.reasons || plan.entry_conditions || ''
+        }));
+        
+        // עדכון הגריד רק אם הוא זמין
+        if (gridApi && gridApi.setRowData) {
+          rowData = formattedPlans;
+          gridApi.setRowData(rowData);
+          console.log('הגריד עודכן עם', formattedPlans.length, 'שורות');
+          updatePlanningSummaryStats();
+        }
+        
+        return formattedPlans;
+      } catch (error) {
+        console.error('שגיאה בטעינת תכנונים:', error);
+      }
+    }
+
+
+
+
+
+
+
+
+
+    window.deletePlan = async function(ticker) {
+      if (confirm(`האם אתה בטוח שברצונך למחוק את התכנון עבור ${ticker}?`)) {
+        // הצגת חלון אישור מותאם אישית
+        showCustomConfirmDialog("אתה בטוח? לא ניתן לשחזר!", async () => {
+          try {
+            // מציאת התכנון לפי ticker
+            const plan = rowData.find(p => p.ticker === ticker);
+            if (!plan || !plan.id) {
+              showNotification("לא נמצא תכנון למחיקה", "error");
+              return;
+            }
+            
+            // מחיקה מהשרת
+            const response = await fetch(`/api/tradeplans/${plan.id}`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            if (response.ok) {
+              // מחיקה מהגריד המקומי
+              const planIndex = rowData.findIndex(p => p.ticker === ticker);
+              if (planIndex !== -1) {
+                rowData.splice(planIndex, 1);
+                if (gridApi.setRowData) {
+                  gridApi.setRowData(rowData);
+                } else if (gridApi.setGridOption) {
+                  gridApi.setGridOption('rowData', rowData);
+                }
+              }
+              
+              // סגירת המודל
+              closePlanDetails();
+              showNotification("התכנון נמחק בהצלחה!");
+            } else {
+              showNotification("שגיאה במחיקת התכנון מהשרת", "error");
+            }
+          } catch (error) {
+            console.error('שגיאה במחיקת התכנון:', error);
+            showNotification("שגיאה במחיקת התכנון", "error");
+          }
+        });
+      }
+    }
+
+    function saveAndClosePlan(ticker) {
+      const planIndex = rowData.findIndex(p => p.ticker === ticker);
+      if (planIndex === -1) return;
+
+      // קריאת הערכים המעודכנים
+      const newDate = document.getElementById("editDate").value;
+      const newType = document.getElementById("quickType").value;
+      const newStatus = document.getElementById("quickStatus").value;
+      const newAmountSum = document.getElementById("editAmountSum").value;
+      const newAmountShares = document.getElementById("editAmountShares").value;
+      const newTargetPrice = document.getElementById("editTargetPrice").value;
+      const newTargetPercent = document.getElementById("editTargetPercent").value;
+      const newStopPrice = document.getElementById("editStopPrice").value;
+      const newStopPercent = document.getElementById("editStopPercent").value;
+
+      // עדכון הנתונים
+      rowData[planIndex] = {
+        ...rowData[planIndex],
+        date: newDate,
+        type: newType,
+        status: newStatus,
+        amount: `$${parseInt(newAmountSum).toLocaleString()} (#${newAmountShares})`,
+        target: `$${newTargetPrice} (${newTargetPercent}%)`,
+        stop: `$${newStopPrice} (${newStopPercent}%)`
+      };
+
+      // עדכון הטבלה
+      gridApi.setRowData(rowData);
+      
+      // סגירת המודל
+      closePlanDetails();
+      showNotification("התכנון נשמר בהצלחה!");
+    }
+
+    // פונקציה לעדכון אוטומטי של רווח/הפסד
+    function updateProfitLoss() {
+      const targetInput = document.getElementById("editTarget");
+      const stopInput = document.getElementById("editStop");
+      
+      if (targetInput && stopInput) {
+        targetInput.addEventListener('input', function() {
+          // כאן אפשר להוסיף לוגיקה לעדכון רווח/הפסד בזמן אמת
+        });
+        
+        stopInput.addEventListener('input', function() {
+          // כאן אפשר להוסיף לוגיקה לעדכון רווח/הפסד בזמן אמת
+        });
+      }
+    }
+
+    function updateQuickStatus(ticker, newStatus) {
+      const planIndex = rowData.findIndex(p => p.ticker === ticker);
+      if (planIndex !== -1) {
+        // עדכון הנתונים
+        rowData[planIndex].status = newStatus;
+        
+        // עדכון הטבלה
+        if (gridApi.setRowData) {
+          gridApi.setRowData(rowData);
+        } else if (gridApi.setGridOption) {
+          gridApi.setGridOption('rowData', rowData);
+        }
+        
+        // עדכון התצוגה במודל
+        const statusBadge = document.getElementById("statusBadge");
+        if (statusBadge) {
+          statusBadge.textContent = newStatus;
+          statusBadge.className = `badge-status ${newStatus}`;
+        }
+        
+        // הודעה קצרה על העדכון
+        showQuickNotification(`הסטטוס של ${ticker} עודכן ל: ${newStatus}`);
+      }
+    }
+
+    function updateQuickType(ticker, newType) {
+      const planIndex = rowData.findIndex(p => p.ticker === ticker);
+      if (planIndex !== -1) {
+        // עדכון הנתונים
+        rowData[planIndex].type = newType;
+        
+        // עדכון הטבלה
+        if (gridApi.setRowData) {
+          gridApi.setRowData(rowData);
+        } else if (gridApi.setGridOption) {
+          gridApi.setGridOption('rowData', rowData);
+        }
+        
+        // הודעה קצרה על העדכון
+        showQuickNotification(`סוג ההשקעה של ${ticker} עודכן ל: ${newType}`);
+      }
+    }
+
+    function showQuickNotification(message) {
+      // יצירת הודעה זמנית
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 4px;
+        z-index: 10000;
+        font-family: 'Alef', sans-serif;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        animation: slideIn 0.3s ease-out;
+      `;
+      notification.textContent = message;
+      
+      // הוספת אנימציה
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(100%); opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      document.body.appendChild(notification);
+      
+      // הסרה אוטומטית אחרי 3 שניות
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    // פונקציה לטיפול בניווט
+    function handleNavigation(page) {
+      // כאן אפשר להוסיף לוגיקה לניווט בין דפים
+      console.log(`ניווט ל: ${page}`);
+      // לדוגמה: window.location.href = `${page}.html`;
+    }
+
+
+
+    // פונקציות פילטר מולטיסלקט
+    window.toggleDropdown = function(type) {
+      const dropdown = document.getElementById(type + 'Dropdown');
+      const toggle = dropdown.previousElementSibling;
+      
+      // סגירת כל הדרופדאונים האחרים
+      document.querySelectorAll('.multiselect-menu').forEach(menu => {
+        if (menu !== dropdown) {
+          menu.classList.remove('show');
+          menu.previousElementSibling.classList.remove('active');
+        }
+      });
+      
+      // פתיחה/סגירה של הדרופדאון הנוכחי
+      dropdown.classList.toggle('show');
+      toggle.classList.toggle('active');
+      
+      // עדכון הטקסט הנבחר
+      updateSelectedText(type);
+    }
+
+    window.selectOption = function(type, value) {
+      const dropdown = document.getElementById(type + 'Dropdown');
+      const item = Array.from(dropdown.querySelectorAll('.multiselect-item'))
+        .find(item => item.querySelector('.option-text').textContent === value);
+      
+      if (item) {
+        item.classList.toggle('selected');
+        updateSelectedText(type);
+        applyFilters();
+      }
+    }
+
+    window.updateSelectedText = function(type) {
+      const dropdown = document.getElementById(type + 'Dropdown');
+      const toggle = dropdown.previousElementSibling;
+      const selectedText = toggle.querySelector('.selected-text');
+      const selectedItems = dropdown.querySelectorAll('.multiselect-item.selected');
+      
+      const selectedValues = Array.from(selectedItems)
+        .map(item => item.querySelector('.option-text').textContent);
+      
+      if (selectedValues.length === 0) {
+        selectedText.textContent = type === 'status' ? 'כל הסטטוסים' : 'כל הסוגים';
+      } else if (selectedValues.length === dropdown.querySelectorAll('.multiselect-item').length) {
+        selectedText.textContent = type === 'status' ? 'כל הסטטוסים' : 'כל הסוגים';
+      } else {
+        selectedText.textContent = selectedValues.join(', ');
+      }
+    }
+
+    window.updateSorting = function(sortBy) {
+      if (gridApi) {
+        if (sortBy === '') {
+          gridApi.setSortModel(null);
+        } else {
+          const sortOrder = sortBy === 'date' ? 'desc' : 'asc';
+          gridApi.setSortModel([
+            { colId: sortBy, sort: sortOrder }
+          ]);
+        }
+      }
+    }
+
+    window.applyFilters = function() {
+      if (!gridApi) return;
+      
+      const statusItems = document.querySelectorAll('#statusDropdown .multiselect-item.selected');
+      const typeItems = document.querySelectorAll('#typeDropdown .multiselect-item.selected');
+      
+      const selectedStatuses = Array.from(statusItems)
+        .map(item => item.querySelector('.option-text').textContent);
+      
+      const selectedTypes = Array.from(typeItems)
+        .map(item => item.querySelector('.option-text').textContent);
+      
+      // יצירת פילטר מורכב
+      const filterModel = {};
+      
+      if (selectedStatuses.length > 0 && selectedStatuses.length < document.querySelectorAll('#statusDropdown .multiselect-item').length) {
+        filterModel.status = {
+          type: 'in',
+          filter: selectedStatuses
+        };
+      }
+      
+      if (selectedTypes.length > 0 && selectedTypes.length < document.querySelectorAll('#typeDropdown .multiselect-item').length) {
+        filterModel.type = {
+          type: 'in',
+          filter: selectedTypes
+        };
+      }
+      
+      if (Object.keys(filterModel).length > 0) {
+        gridApi.setFilterModel(filterModel);
+      } else {
+        gridApi.setFilterModel(null);
+      }
+    }
+
+    window.clearAllFilters = function() {
+      // בחירת כל האפשרויות
+      document.querySelectorAll('.multiselect-item').forEach(item => {
+        item.classList.add('selected');
+      });
+      
+      // איפוס המיון
+      document.querySelector('.sort-select').value = '';
+      
+      // עדכון הטקסטים
+      updateSelectedText('status');
+      updateSelectedText('type');
+      
+      // ניקוי הפילטרים בגריד
+      if (gridApi) {
+        gridApi.setFilterModel(null);
+        gridApi.setSortModel(null);
+      }
+    }
+
+    // הוספת event listeners לכפתורי הניווט
+    document.addEventListener('DOMContentLoaded', () => {
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          // הסרת active מכל הפריטים
+          navItems.forEach(nav => nav.classList.remove('active'));
+          // הוספת active לפריט הנוכחי
+          item.classList.add('active');
+        });
+      });
+      
+      // הוספת event listener לתפריט הנפתח
+      const dropdownToggle = document.querySelector('.dropdown-toggle');
+      if (dropdownToggle) {
+        dropdownToggle.addEventListener('click', (e) => {
+          e.preventDefault();
+          const dropdownMenu = document.querySelector('.dropdown-menu');
+          if (dropdownMenu) {
+            dropdownMenu.classList.toggle('show');
+            dropdownToggle.setAttribute('aria-expanded', 
+              dropdownMenu.classList.contains('show') ? 'true' : 'false');
+          }
+        });
+      }
+      
+      // סגירת התפריט כשלוחצים מחוץ לו
+      document.addEventListener('click', (e) => {
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        if (dropdownToggle && dropdownMenu && 
+            !dropdownToggle.contains(e.target) && 
+            !dropdownMenu.contains(e.target)) {
+          dropdownMenu.classList.remove('show');
+          dropdownToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+      
+      // סגירת דרופדאונים בלחיצה מחוץ להם
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.multiselect-dropdown')) {
+          document.querySelectorAll('.multiselect-menu').forEach(menu => {
+            menu.classList.remove('show');
+            menu.previousElementSibling.classList.remove('active');
+          });
+        }
+      });
+    });
+
+    // פונקציה לחישוב סטטיסטיקות התכנונים - מותאמת לעמוד התכנונים
+    function updatePlanningSummaryStats(data = null) {
+      try {
+        console.log('=== updatePlanningSummaryStats called ===');
+        
+        // אם לא הועברו נתונים, השתמש בנתונים המוצגים בגריד
+        if (!data && window.gridApi) {
+          const displayedRows = [];
+          window.gridApi.forEachNodeAfterFilter(node => {
+            displayedRows.push(node.data);
+          });
+          data = displayedRows;
+        } else if (!data) {
+          data = rowData;
+        }
+        
+        console.log('Planning data for statistics:', data);
+        
+        if (data.length === 0) {
+          console.log('No planning data to calculate statistics');
+          updatePlanningStatsDisplay({
+            total: 0,
+            totalAmount: 0,
+            avgAmount: 0,
+            totalProfit: 0
+          });
+          return;
+        }
+        
+        const totalPlans = data.length;
+        let totalAmount = 0;
+        let totalProfit = 0;
+        
+        data.forEach(plan => {
+          try {
+            // חילוץ סכום ההשקעה
+            if (plan.amount && typeof plan.amount === 'string') {
+              const amountMatch = plan.amount.match(/[\d,]+/);
+              if (amountMatch) {
+                totalAmount += parseInt(amountMatch[0].replace(',', ''));
+              }
+            } else if (plan.planned_amount) {
+              totalAmount += parseInt(plan.planned_amount);
+            }
+            
+            // חישוב רווח (אם יש נתונים מספיקים)
+            if (plan.current && plan.target && plan.amount) {
+              try {
+                const currentPrice = parseFloat(plan.current.match(/[\d.]+/)[0]);
+                const targetPrice = parseFloat(plan.target.match(/[\d.]+/)[0]);
+                const sharesMatch = plan.amount.match(/#(\d+)/);
+                if (sharesMatch) {
+                  const shares = parseInt(sharesMatch[1]);
+                  totalProfit += Math.round((targetPrice - currentPrice) * shares);
+                }
+              } catch (e) {
+                console.log('שגיאה בחישוב רווח לתכנון:', plan.ticker, e);
+              }
+            }
+          } catch (e) {
+            console.log('שגיאה בעיבוד תכנון:', plan, e);
+          }
+        });
+        
+        const avgAmount = totalPlans > 0 ? Math.round(totalAmount / totalPlans) : 0;
+
+        console.log('Planning statistics calculated:', {
+          total: totalPlans,
+          totalAmount: totalAmount,
+          avgAmount: avgAmount,
+          totalProfit: totalProfit
+        });
+
+        // עדכון תצוגת הסטטיסטיקות
+        updatePlanningStatsDisplay({
+          total: totalPlans,
+          totalAmount: totalAmount,
+          avgAmount: avgAmount,
+          totalProfit: totalProfit
+        });
+      } catch (error) {
+        console.error('Error calculating planning summary stats:', error);
+      }
+    }
+
+    // פונקציה לעדכון תצוגת הסטטיסטיקות
+    function updatePlanningStatsDisplay(stats) {
+      try {
+        console.log('=== updatePlanningStatsDisplay called ===');
+        console.log('Planning stats to display:', stats);
+        
+        // עדכון התצוגה
+        const summaryDiv = document.querySelector('.info-summary');
+        if (summaryDiv) {
+          summaryDiv.innerHTML = `
+            <div>סה"כ תכנונים פעילים: <strong>${stats.total}</strong></div>
+            <div>סכום השקעה כולל: <strong>₪${stats.totalAmount.toLocaleString()}</strong></div>
+            <div>השקעה ממוצעת: <strong>₪${stats.avgAmount.toLocaleString()}</strong></div>
+            <div>רווח כולל: <strong style="color: ${stats.totalProfit >= 0 ? 'green' : 'red'}">${stats.totalProfit >= 0 ? '+' : ''}₪${stats.totalProfit.toLocaleString()}</strong></div>
+          `;
+          console.log('Updated planning info-summary with:', stats);
+        } else {
+          console.warn('Planning info-summary element not found');
+        }
+      } catch (error) {
+        console.error('Error updating planning stats display:', error);
+      }
+    }
+
+    // פונקציה לתאימות לאחור
+    function updateSummaryStats(data = null) {
+      updatePlanningSummaryStats(data);
+    }
+
+    // פונקציה לבדיקה אם שורה עוברת את הפילטר
+    function doesExternalFilterPass(node) {
+      const data = node.data;
+      
+      // בדיקת סטטוס
+      if (selectedStatuses.length > 0 && !selectedStatuses.includes(data.status)) {
+        return false;
+      }
+      
+      // בדיקת סוג
+      if (selectedTypes.length > 0 && !selectedTypes.includes(data.type)) {
+        return false;
+      }
+      
+      return true;
+    }
+
+    function isExternalFilterPresent() {
+      return externalFilterPresent;
+    }
+
+    function filterPlans() {
+      console.log('=== פונקציית filterPlans נקראת ===');
+      
+      // בדיקה שהגריד זמין
+      if (!gridApi) {
+        console.log('גריד לא זמין עדיין');
+        return;
+      }
+      
+      console.log('פונקציית filterPlans - הגריד זמין, לא צריך לעשות כלום כי הפילטר מטופל על ידי הקומפוננט');
+    }
+
+    // פונקציה לטעינת תכנונים מהשרת
+    async function loadPlansFromServer() {
+      try {
+        console.log('טוען תכנונים מהשרת...');
+        const response = await fetch('/api/tradeplans');
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const plans = await response.json();
+        console.log('קיבלתי מהשרת:', plans);
+        console.log('מספר תכנונים:', plans.length);
+        
+        // המרת הנתונים לפורמט של הגריד
+        const formattedPlans = plans.map(plan => ({
+          id: plan.id, // שמירת ה-ID למחיקה
+          ticker: plan.ticker,
+          date: plan.created_at ? plan.created_at.split(' ')[0] : new Date().toISOString().split('T')[0],
+          type: plan.investment_type || 'השקעה',
+          status: plan.canceled_at ? 'מבוטל' : 'פתוח',
+          amount: `$${plan.planned_amount ? plan.planned_amount.toLocaleString() : '0'} (#100)`,
+          target: `$${plan.target_price || 0} (10%)`,
+          stop: `$${plan.stop_price || 0} (-5%)`,
+          current: `$${window.currentStockPrice || 100}.00 (0.0%)`,
+          action: "⬅️",
+          notes: plan.reasons || plan.entry_conditions || ''
+        }));
+        
+        console.log('הנתונים הומרו:', formattedPlans);
+        
+        // עדכון הגריד
+        console.log('מעדכן את rowData:', formattedPlans);
+        rowData = formattedPlans;
+        console.log('rowData עודכן, gridApi קיים:', !!gridApi);
+        
+        if (gridApi) {
+          console.log('מעדכן את הגריד...');
+          
+          // עדכון הנתונים בגריד
+          if (gridApi.setRowData) {
+            gridApi.setRowData(rowData);
+          } else if (gridApi.setGridOption) {
+            gridApi.setGridOption('rowData', rowData);
+          } else {
+            console.error('לא ניתן לעדכן את הגריד - API לא זמין');
+          }
+          
+          console.log('הגריד עודכן עם הנתונים החדשים');
+          
+          // עדכון גובה הגריד
+          const rowCount = gridApi.getDisplayedRowCount ? gridApi.getDisplayedRowCount() : rowData.length;
+          const gridDiv = document.querySelector("#agGridFloating");
+          if (gridDiv) {
+            gridDiv.style.height = Math.max(350, rowCount * 48 + 50) + 'px';
+            console.log('גובה הגריד עודכן ל:', gridDiv.style.height);
+          }
+        } else {
+          console.error('gridApi לא זמין!');
+        }
+        
+        // עדכון הסטטיסטיקות
+        updatePlanningSummaryStats();
+        
+        return formattedPlans;
+      } catch (error) {
+        console.error('שגיאה בטעינת תכנונים מהשרת:', error);
+        console.log('משתמש בנתונים מקומיים...');
+        
+        // אם יש שגיאה, נשתמש בנתונים המקומיים
+        if (gridApi && rowData) {
+          gridApi.setRowData(rowData);
+          updatePlanningSummaryStats();
+        }
+        
+        return rowData;
+      }
+    }
+
+    function markAlertAsRead(button, ticker) {
+      const alertCard = button.closest('.alert-card');
+      if (alertCard) {
+        alertCard.classList.add('read');
+        button.textContent = 'נקרא';
+        button.disabled = true;
+        // הורדתי את ההודעה שקופצת
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, initializing grid...');
+      
+      // המתנה קצרה לוודא שהכל נטען
+      setTimeout(() => {
+        const gridDiv = document.querySelector("#agGridFloating");
+        console.log('Grid div found:', gridDiv);
+        
+        if (!gridDiv) {
+          console.error('Grid div not found!');
+          return;
+        }
+      
+      // בדיקה אם agGrid זמין
+      if (typeof agGrid === 'undefined') {
+        console.error('agGrid is not loaded!');
+        return;
+      }
+      console.log('agGrid is available:', agGrid);
+      
+      // טעינת פילטרים שמורים לפני יצירת הגריד
+      const savedFilters = loadSavedFilters();
+      if (savedFilters && savedFilters.statuses) {
+        console.log('Found saved filters, will apply after grid creation:', savedFilters);
+        window.pendingFilter = savedFilters.statuses; // רק פילטר הסטטוס משפיע על הגריד
+        
+        // הפילטרים נטענים אוטומטית בקומפוננט הכותרת
+        console.log('Filters will be loaded automatically by header component');
+      }
+      // הגדרת עמודות ייחודיות לעמוד התכנונים
+      const planningColumnDefs = [
+        { 
+          headerName: "המרה", 
+          field: "action", 
+          width: 60,
+          minWidth: 50,
+          maxWidth: 80,
+          cellRenderer: params => `<span style="cursor: pointer; font-size: 1.2rem;">${params.value}</span>`
+        },
+        { 
+          headerName: "סטטוס", 
+          field: "status", 
+          width: 80,
+          minWidth: 70,
+          maxWidth: 100, 
+          cellClass: params => `badge-status ${params.value}`
+        },
+        { 
+          headerName: "נוכחי", 
+          field: "current", 
+          width: 120,
+          minWidth: 100,
+          maxWidth: 150, 
+          cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+        },
+        { 
+          headerName: "סטופ", 
+          field: "stop", 
+          width: 120,
+          minWidth: 100,
+          maxWidth: 150, 
+          cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+        },
+        { 
+          headerName: "יעד", 
+          field: "target", 
+          width: 120,
+          minWidth: 100,
+          maxWidth: 150, 
+          cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+        },
+        { 
+          headerName: "סכום/כמות", 
+          field: "amount", 
+          width: 140,
+          minWidth: 120,
+          maxWidth: 180,
+          flex: 1
+        },
+        { 
+          headerName: "סוג", 
+          field: "type", 
+          width: 80,
+          minWidth: 70,
+          maxWidth: 100, 
+          cellClass: params => `badge-type ${params.value}`
+        },
+        { 
+          headerName: "תאריך", 
+          field: "date", 
+          width: 100,
+          minWidth: 90,
+          maxWidth: 120
+        },
+        {
+          headerName: "נכס",
+          field: "ticker",
+          width: 100,
+          minWidth: 80,
+          maxWidth: 120,
+          cellRenderer: params => {
+            return `<a href="#" onclick="openPlanDetails('${params.value}'); return false;" style="color: #0077cc; text-decoration: underline;">${params.value}</a>`;
+          }
+        }
+      ];
+
+      // שימוש במערכת המודולרית עם הגדרות ייחודיות
+      const gridOptions = createGridOptions({
+        columnDefs: planningColumnDefs,
+        rowData: rowData,
+        containerId: 'agGridFloating'
+      });
+
+                onGridReady: async params => {
+          gridApi = params.api;
+          console.log('Grid API available:', !!gridApi);
+          
+          // התאמת הגריד לרוחב המסך
+          params.api.sizeColumnsToFit();
+          
+          // עדכון הגריד בעת שינוי גודל החלון
+          window.addEventListener('resize', () => {
+            setTimeout(() => {
+              params.api.sizeColumnsToFit();
+            }, 100);
+          });
+          
+          // טעינת נתונים מהשרת
+          try {
+            console.log('טוען נתונים ראשוניים מהשרת...');
+            await loadPlansFromServer();
+            console.log('הנתונים הראשוניים נטענו בהצלחה');
+          } catch (error) {
+            console.error('שגיאה בטעינת נתונים ראשוניים:', error);
+            // אם יש שגיאה, נשתמש בנתונים המקומיים
+            const rowCount = params.api.getDisplayedRowCount();
+            gridDiv.style.height = Math.max(350, rowCount * 48 + 50) + 'px';
+            console.log('Grid initialized with local data:', rowCount, 'rows');
+          }
+          
+          // עדכון הסטטיסטיקות הראשוניות
+          updatePlanningSummaryStats();
+          
+          // בדיקה אם יש פילטר ממתין או טעינת פילטר שמור
+          if (window.pendingFilter) {
+            console.log('Applying pending filter:', window.pendingFilter);
+            applyStatusFilterToGrid(window.pendingFilter);
+            
+            // ניקוי הפילטר הממתין
+            delete window.pendingFilter;
+          } else {
+            // אם אין פילטר שמור, נשתמש בברירת המחדל של הקומפוננט (פתוח בלבד)
+            console.log('No saved filter, applying default filter: פתוח');
+            applyStatusFilterToGrid(['פתוח']);
+          }
+          
+          // אתחול הפילטרים לברירת מחדל
+          console.log('אתחול פילטרים לברירת מחדל...');
+          setTimeout(() => {
+            filterPlans();
+          }, 1000);
+          
+          // הוספת event listeners לפילטרים
+          console.log('Adding event listeners to filters...');
+          const allCheckboxes = document.querySelectorAll(".filter-buttons input[type='checkbox']");
+          allCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+              console.log('Checkbox changed:', cb.checked);
+              filterPlans();
+            });
+          });
+        }
+      };
+      
+      console.log('Creating grid...');
+      console.log('Grid div:', gridDiv);
+      console.log('Grid options:', gridOptions);
+      console.log('agGrid object:', agGrid);
+      console.log('agGrid.createGrid function:', typeof agGrid.createGrid);
+      
+      try {
+        agGrid.createGrid(gridDiv, gridOptions);
+        console.log('Grid creation completed');
+        
+        // בדיקה שהגריד נוצר בהצלחה
+        setTimeout(() => {
+          if (gridDiv.children.length > 0) {
+            console.log('Grid rendered successfully');
+            console.log('Grid children count:', gridDiv.children.length);
+            console.log('Grid is visible:', gridDiv.offsetHeight > 0);
+          } else {
+            console.error('Grid failed to render');
+          }
+        }, 500);
+        
+
+        
+      } catch (error) {
+        console.error('Error creating grid:', error);
+      }
+      
+      }, 100); // סגירת setTimeout
+    });
+
+    // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
+    function updateBackgroundPadding(isCollapsed) {
+      const backgroundWrapper = document.querySelector('.background-wrapper');
+      const body = document.body;
+      
+      if (backgroundWrapper) {
+        if (isCollapsed) {
+          backgroundWrapper.classList.add('filter-collapsed');
+        } else {
+          backgroundWrapper.classList.remove('filter-collapsed');
+        }
+      }
+      
+      if (body) {
+        if (isCollapsed) {
+          body.classList.add('filter-collapsed');
+        } else {
+          body.classList.remove('filter-collapsed');
+        }
+      }
+    }
+
+    // האזנה לשינויים בקומפוננט הכותרת
+    function setupHeaderListener() {
+      const header = document.querySelector('app-header');
+      if (header) {
+        // האזנה לשינויים בפילטר
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
+              if (filterSection) {
+                const isCollapsed = filterSection.classList.contains('collapsed');
+                updateBackgroundPadding(isCollapsed);
+              }
+            }
+          });
+        });
+
+        // התחלת ההאזנה
+        setTimeout(() => {
+          const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
+          if (filterSection) {
+            observer.observe(filterSection, { attributes: true });
+          }
+          
+          // עדכון נוסף של הקומפוננט עם הפילטר השמור אחרי שהקומפוננט מוכן
+          const savedFilter = loadSavedFilters();
+          if (savedFilter) {
+            console.log('Header ready - updating with saved filter:', savedFilter);
+          }
+        }, 1000);
+      }
+    }
+
+    // אתחול הדף
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded - setting up header listener');
+      // הגדרת האזנה לכותרת
+      setupHeaderListener();
+      
+      // עדכון הקומפוננט הכותרת עם הפילטר השמור (אם יש)
+      const savedFilter = loadSavedFilters();
+      if (savedFilter) {
+        console.log('DOM loaded - updating header with saved filter:', savedFilter);
+      }
+    });
+
+    // פונקציה מותאמת אישית להחלת פילטר סטטוס
+    function applyStatusFilterToGrid(selectedStatuses) {
+      if (!gridApi) {
+        console.log('Grid API not available yet');
+        return;
+      }
+
+      console.log('Applying status filter to grid:', selectedStatuses);
+
+      try {
+        if (selectedStatuses.length === 0 || selectedStatuses.length === 3) {
+          // אם לא נבחרו סטטוסים או נבחרו כולם - הצג הכל
+          console.log('Showing all statuses');
+          gridApi.setGridOption('rowData', rowData);
+        } else {
+          // סינון הנתונים לפי הסטטוסים הנבחרים
+          const filteredData = rowData.filter(row => selectedStatuses.includes(row.status));
+          console.log('Filter applied for statuses:', selectedStatuses, 'Showing', filteredData.length, 'rows');
+          gridApi.setGridOption('rowData', filteredData);
+        }
+        
+        // עדכון הסטטיסטיקות
+        updatePlanningSummaryStats();
+        
+      } catch (error) {
+        console.error('Error updating grid data:', error);
+        console.log('Grid API methods available:', Object.keys(gridApi));
+      }
+    }
+
+    // הפיכת הפונקציה לזמינה גלובלית
+    window.applyStatusFilterToGrid = applyStatusFilterToGrid;
+
+    // פונקציה להחלת פילטר תאריכים
+    function applyDateRangeFilterToGrid(selectedDateRange) {
+      if (!gridApi) {
+        console.log('Grid API not available yet');
+        return;
+      }
+
+      console.log('Applying date range filter to grid:', selectedDateRange);
+
+      try {
+        if (!selectedDateRange || selectedDateRange === 'הכול') {
+          // אם לא נבחר טווח תאריכים או נבחר "הכול" - הצג הכל
+          console.log('Showing all dates');
+          gridApi.setGridOption('rowData', rowData);
+        } else {
+          // חישוב טווח התאריכים
+          const now = new Date();
+          let startDate = new Date();
+          
+          switch (selectedDateRange) {
+            case 'שבוע':
+              startDate.setDate(now.getDate() - 7);
+              break;
+            case 'MTD':
+              startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+              break;
+            case '30 יום':
+              startDate.setDate(now.getDate() - 30);
+              break;
+            case '60 יום':
+              startDate.setDate(now.getDate() - 60);
+              break;
+            case '90 יום':
+              startDate.setDate(now.getDate() - 90);
+              break;
+            case 'שנה':
+              startDate.setFullYear(now.getFullYear() - 1);
+              break;
+            case 'YTD':
+              startDate = new Date(now.getFullYear(), 0, 1);
+              break;
+            case 'שנה קודמת':
+              startDate = new Date(now.getFullYear() - 1, 0, 1);
+              const endDate = new Date(now.getFullYear() - 1, 11, 31);
+              break;
+            default:
+              console.log('Unknown date range:', selectedDateRange);
+              gridApi.setGridOption('rowData', rowData);
+              return;
+          }
+          
+          // סינון הנתונים לפי טווח התאריכים
+          const filteredData = rowData.filter(row => {
+            if (!row.created_at) return false;
+            const rowDate = new Date(row.created_at);
+            return rowDate >= startDate && rowDate <= now;
+          });
+          
+          console.log('Date range filter applied:', selectedDateRange, 'Showing', filteredData.length, 'rows');
+          gridApi.setGridOption('rowData', filteredData);
+        }
+        
+        // עדכון הסטטיסטיקות
+        updatePlanningSummaryStats();
+        
+      } catch (error) {
+        console.error('Error updating grid data with date filter:', error);
+      }
+    }
+
+    // הפיכת הפונקציה לזמינה גלובלית
+    window.applyDateRangeFilterToGrid = applyDateRangeFilterToGrid;
+
+    // פונקציות גלובליות לקומפוננט הכותרת
+    window.updateGridFromComponent = function(selectedStatuses, selectedAccounts, selectedDateRange) {
+      console.log('=== updateGridFromComponent called ===');
+      console.log('Selected statuses:', selectedStatuses);
+      console.log('Selected accounts:', selectedAccounts);
+      console.log('Selected date range:', selectedDateRange);
+      
+      // שמירת הערכים הנבחרים לשימוש מאוחר יותר
+      window.selectedStatusesForFilter = selectedStatuses;
+      window.selectedDateRangeForFilter = selectedDateRange;
+      
+      // שמירת הפילטרים ב-localStorage לזכירה במעבר בין דפים
+      localStorage.setItem('planningFilterStatuses', JSON.stringify(selectedStatuses));
+      if (selectedDateRange) {
+        localStorage.setItem('planningFilterDateRanges', JSON.stringify([selectedDateRange]));
+      }
+      
+      // אם הגריד זמין, הפעל את הפילטרים מיד
+      if (gridApi) {
+        // הפעלת פילטר הסטטוסים
+        applyStatusFilterToGrid(selectedStatuses);
+        
+        // הפעלת פילטר התאריכים
+        if (selectedDateRange) {
+          applyDateRangeFilterToGrid(selectedDateRange);
+        }
+      } else {
+        console.log('Grid API not available yet, filters will be applied when grid is ready');
+      }
+      
+      console.log('=== updateGridFromComponent completed ===');
+    }
+
+    window.updateTestCheckboxesFromComponent = function(selectedValues) {
+      console.log('=== updateTestCheckboxesFromComponent called ===');
+      console.log('Selected values:', selectedValues);
+      // פונקציה זו נדרשת על ידי הקומפוננט אבל לא רלוונטית לעמוד זה
+      console.log('Test checkboxes update not needed for planning page');
+    };
+
+    // פונקציה לבדיקה ידנית של הפילטר
+    window.testFilterManually = function() {
+      console.log('=== Testing filter manually ===');
+      const testValues = ['פתוח', 'סגור'];
+      console.log('Testing with values:', testValues);
+      window.updateTestCheckboxesFromComponent(testValues);
+      window.updateGridFromComponent(testValues);
+      console.log('=== Manual test completed ===');
+    }
+
+    // פונקציה לבדיקת Grid API
+    window.testGridAPI = function() {
+      console.log('=== Testing Grid API ===');
+      console.log('Grid API object:', gridApi);
+      console.log('Grid API methods:', Object.keys(gridApi));
+      if (gridApi && gridApi.setGridOption) {
+        console.log('setGridOption is available');
+        try {
+          gridApi.setGridOption('rowData', rowData.slice(0, 2));
+          console.log('Successfully updated grid with 2 rows');
+        } catch (error) {
+          console.error('Error updating grid:', error);
+        }
+      } else {
+        console.log('setGridOption is not available');
+      }
+      console.log('=== Grid API test completed ===');
+    }
+
+    // פונקציה לטעינת הפילטרים השמורים
+    function loadSavedFilters() {
+      try {
+        const savedStatusFilter = localStorage.getItem('planningFilterStatuses');
+        const savedTypeFilter = localStorage.getItem('planningFilterTypes');
+        const savedAccountFilter = localStorage.getItem('planningFilterAccounts');
+        const savedDateRangeFilter = localStorage.getItem('planningFilterDateRanges');
+      const savedSearchFilter = localStorage.getItem('planningFilterSearch');
+        
+        let filters = {};
+        
+        if (savedStatusFilter) {
+          filters.statuses = JSON.parse(savedStatusFilter);
+          console.log('Loaded saved status filter:', filters.statuses);
+          window.selectedStatusesForFilter = filters.statuses;
+        }
+        if (savedTypeFilter) {
+          filters.types = JSON.parse(savedTypeFilter);
+          console.log('Loaded saved type filter:', filters.types);
+        }
+        if (savedAccountFilter) {
+          filters.accounts = JSON.parse(savedAccountFilter);
+          console.log('Loaded saved account filter:', filters.accounts);
+        }
+        if (savedDateRangeFilter) {
+          filters.dateRanges = JSON.parse(savedDateRangeFilter);
+          console.log('Loaded saved date range filter:', filters.dateRanges);
+        }
+        if (savedSearchFilter) {
+          filters.search = savedSearchFilter;
+          console.log('Loaded saved search filter:', filters.search);
+        }
+        
+        return filters;
+      } catch (error) {
+        console.error('Error loading saved filters:', error);
+      }
+      return null;
+    }
+
+
+
+  </script>
+  
+  <!-- Scripts -->
+  <script src="scripts/app-header.js"></script>
+</body>
+</html>

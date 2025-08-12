@@ -1,0 +1,578 @@
+/* עיצוב כללי */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  color: #222;
+  font-family: 'Alef', sans-serif;
+  direction: rtl;
+}
+
+/* הגדרות RTL גלובליות */
+* {
+  direction: rtl;
+}
+
+/* הגדרות RTL ספציפיות לאלמנטים */
+input, textarea, select {
+  direction: rtl;
+  text-align: right;
+}
+
+/* הגדרות RTL לגריד */
+.ag-theme-quartz .ag-floating-filter-body input {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  direction: rtl;
+  text-align: right;
+}
+
+.ag-theme-quartz .ag-floating-filter-body select {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  direction: rtl;
+  text-align: right;
+}
+
+.ag-theme-quartz .ag-header-cell {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+  direction: rtl;
+}
+
+.ag-theme-quartz .ag-floating-filter {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  direction: rtl;
+}
+
+/* הגדרות RTL לטקסטים */
+h1, h2, h3, h4, h5, h6 {
+  direction: rtl;
+}
+
+label, span, p, div {
+  direction: rtl;
+}
+
+/* הגדרות RTL לכפתורים */
+button {
+  direction: rtl;
+}
+
+/* הגדרות RTL לתפריטים */
+.dropdown-menu {
+  direction: rtl;
+}
+
+.dropdown-item {
+  direction: rtl;
+  text-align: right;
+}
+/* מרווחים לכותרת עם Web Component */
+body {
+  padding-top: 120px;
+  transition: padding-top 0.3s ease;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+  background-color: #f5f5f7;
+}
+
+body.filter-collapsed {
+  padding-top: 30px;
+}
+
+.background-wrapper {
+  min-height: 100vh;
+  padding: 0 2rem 2rem 2rem;
+  transition: padding-top 0.3s ease;
+  padding-top: 120px !important; /* מרווח לכותרת + פילטר + מרווח קטן */
+  padding-right: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.background-wrapper.filter-collapsed {
+  padding-top: 30px !important; /* מרווח לכותרת בלבד + מרווח קטן */
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 1rem;
+}
+
+/* מגבלת רוחב מקסימלית לתוכן */
+.content-wrapper {
+  max-width: 1390px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* עיצוב הכותרת */
+.top-bar {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.button-primary {
+  background-color: #29a6a8;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.info-summary {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #eef2f7;
+  border-radius: 6px;
+  display: flex;
+  gap: 2rem;
+  justify-content: space-around;
+  font-size: 1rem;
+}
+.alert-section {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+.alert-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.alert-card {
+  flex: 1 1 100%;
+  max-width: 100%;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.75rem;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+@media (min-width: 600px) {
+  .alert-card {
+    flex: 1 1 30%;
+    max-width: 30%;
+  }
+}
+.alert-card strong {
+  color: #29a6a8;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.alert-card .price {
+  font-size: 0.9rem;
+}
+.alert-card button {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+}
+
+.alert-card.read {
+  opacity: 0.6;
+  background-color: var(--apple-gray-1);
+}
+
+.alert-card.read button {
+  background-color: var(--apple-gray-5);
+  color: white;
+  cursor: not-allowed;
+}
+
+/* עיצוב סטטיסטיקות */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.stat-card {
+  background-color: var(--apple-bg-elevated);
+  padding: 1.5rem;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+  text-align: center;
+}
+
+.stat-card h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--apple-text-secondary);
+  font-size: 0.9rem;
+}
+
+.stat-card .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--apple-text-primary);
+}
+
+.stat-card .change {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.stat-card .change.positive {
+  color: var(--apple-green);
+}
+
+.stat-card .change.negative {
+  color: var(--apple-red);
+}
+.filters {
+  margin-bottom: 1rem;
+}
+.filters-options {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.filters-options::before {
+  content: "סטטוס:";
+  margin-left: 0.5rem;
+  font-weight: bold;
+}
+.filters-options label {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+.status-open {
+  background-color: #28a745;
+  color: white;
+}
+.status-closed {
+  background-color: #29a6a8;
+  color: white;
+}
+.status-cancelled {
+  background-color: #dc3545;
+  color: white;
+}
+.badge-status {
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  color: white;
+}
+.badge-status.פתוח { background-color: #28a745; }
+.badge-status.סגור { background-color: #29a6a8; }
+.badge-status.מבוטל { background-color: #dc3545; }
+.badge-type {
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  background-color: #f3e5f5;
+  color: #222;
+}
+.badge-type.סווינג { background-color: #e8f5e9; }
+.badge-type.השקעה { background-color: #fff8e1; }
+.badge-type.פאסיבי { background-color: #ede7f6; }
+
+/* עיצוב לגריד */
+.ag-theme-alpine {
+  font-family: 'Alef', sans-serif;
+  font-size: 0.95rem;
+}
+.ag-grid-reversed .ag-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: auto !important;
+  min-height: 40px;
+  line-height: 1.6 !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  font-size: 0.95rem !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+.ag-grid-reversed .ag-row:nth-child(even) .ag-cell {
+  background-color: #fafafa;
+}
+.ag-grid-reversed .ag-row-hover .ag-cell {
+  background-color: #f0f0f0 !important;
+}
+#agGrid {
+  border: none !important;
+  min-height: 350px;
+}
+.bg-open { background-color: #28a745 !important; color: white !important; }
+.bg-closed { background-color: #29a6a8 !important; color: white !important; }
+.bg-cancelled { background-color: #dc3545 !important; color: white !important; }
+.bg-swing { background-color: #e8f5e9 !important; }
+.bg-invest { background-color: #fff8e1 !important; }
+.bg-passive { background-color: #ede7f6 !important; }
+.positive { color: green !important; font-weight: bold; }
+.negative { color: red !important; font-weight: bold; }
+
+.modal {
+  position: fixed;
+  top: 5%;
+  right: 5%;
+  width: 90%;
+  height: 90%;
+  background: rgba(255,255,255,0.97);
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  z-index: 999;
+  display: none;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+.modal-content {
+  padding: 1rem;
+}
+.modal-close {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* עיצוב תוכן המודל */
+.trade-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.trade-details-section {
+  background-color: var(--apple-bg-secondary);
+  padding: 1.5rem;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+}
+
+.trade-details-section h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--apple-text-primary);
+  border-bottom: 2px solid var(--apple-blue);
+  padding-bottom: 0.5rem;
+}
+
+.trade-details-section p {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trade-details-section strong {
+  min-width: 120px;
+  color: var(--apple-text-primary);
+}
+
+/* עיצוב כפתורים במודל */
+.modal-content .btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--apple-radius-medium);
+  border: none;
+  font-family: 'Alef', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0 0.5rem;
+}
+
+.modal-content .btn-primary {
+  background-color: var(--apple-blue);
+  color: white;
+}
+
+.modal-content .btn-primary:hover {
+  background-color: var(--apple-blue-dark);
+}
+
+.modal-content .btn-secondary {
+  background-color: var(--apple-gray-3);
+  color: var(--apple-text-primary);
+}
+
+.modal-content .btn-secondary:hover {
+  background-color: var(--apple-gray-4);
+}
+
+.modal-content .btn-success {
+  background-color: var(--apple-green);
+  color: white;
+}
+
+.modal-content .btn-success:hover {
+  background-color: var(--apple-green-dark);
+}
+
+.modal-content .btn-danger {
+  background-color: var(--apple-red);
+  color: white;
+}
+
+.modal-content .btn-danger:hover {
+  background-color: var(--apple-red-dark);
+}
+
+/* עיצוב כרטיסי תכנונים */
+.plan-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.plan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--apple-blue);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.plan-card:hover::before {
+  opacity: 1;
+}
+
+.plan-card.selected {
+  background-color: var(--apple-blue) !important;
+  color: white;
+  border-color: var(--apple-blue) !important;
+}
+
+.plan-card.selected::before {
+  opacity: 1;
+}
+
+/* סגנונות לטופס תכנון חדש */
+#newPlanForm {
+  background: var(--apple-bg-secondary);
+  padding: 1.5rem;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+  margin-top: 1rem;
+}
+
+#newPlanForm h3 {
+  margin-top: 0;
+  color: var(--apple-text-primary);
+  border-bottom: 2px solid var(--apple-blue);
+  padding-bottom: 0.5rem;
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 768px) {
+  .content-wrapper {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .trade-details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .modal-content {
+    width: 95%;
+    margin: 10% auto;
+    padding: 1rem;
+  }
+}
+
+/* התאמה למסכים בינוניים */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .content-wrapper {
+    max-width: 100%;
+    padding: 0 2rem;
+  }
+}
+
+/* התאמה למסכים קטנים - סגנונות גלובליים */
+@media (max-width: 768px) {
+  .content-wrapper {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .plan-details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .modal-content {
+    width: 95%;
+    margin: 10% auto;
+    padding: 1rem;
+  }
+}
+
+/* התאמה למסכים בינוניים - סגנונות גלובליים */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .content-wrapper {
+    max-width: 100%;
+    padding: 0 2rem;
+  }
+}
+
+/* עיצוב אינדיקטור סטטוס - סגנונות גלובליים */
+.status-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0;
+  gap: 1rem;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot.success {
+  background-color: #4caf50;
+}
+
+.status-dot.error {
+  background-color: #f44336;
+}
+
+.status-dot.warning {
+  background-color: #ff9800;
+}

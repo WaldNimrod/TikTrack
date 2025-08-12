@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimpleTrade - כל בסיס הנתונים</title>
+  <link href="https://fonts.googleapis.com/css2?family=Alef&display=swap" rel="stylesheet" />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles/apple-theme.css" />
+  <link rel="stylesheet" href="styles/menu.css?v=6" />
+  <link rel="stylesheet" href="styles/styles.css?v=6" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+      background-color: #f5f5f7;
+    }
+
+    /* התאמת המרווחים לכותרת החדשה */
+    .background-wrapper {
+      padding-top: 120px !important; /* מרווח לכותרת + פילטר + מרווח קטן */
+      padding-right: 32px;
+      transition: padding-top 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .background-wrapper.filter-collapsed {
+      padding-top: 30px !important; /* מרווח לכותרת בלבד + מרווח קטן */
+    }
+
+    .database-page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      font-family: 'Alef', sans-serif;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e8e8e8;
+    }
+    
+    .page-header {
+      background: var(--apple-bg-elevated);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--apple-text-primary);
+      margin: 0;
+    }
+    
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--apple-text-secondary);
+      margin-top: 8px;
+    }
+    
+    .table-section {
+      background: var(--apple-bg-elevated);
+      padding: 2rem;
+      border-radius: 12px;
+      border: 1px solid var(--apple-border-light);
+      box-shadow: var(--apple-shadow-light);
+      margin-bottom: 2rem;
+    }
+    
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--apple-border-light);
+    }
+    
+    .table-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--apple-text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .table-count {
+      background: #29a6a8;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .data-table th,
+    .data-table td {
+      padding: 0.75rem;
+      text-align: right;
+      border-bottom: 1px solid var(--apple-border-light);
+    }
+    
+    .data-table th {
+      background: var(--apple-bg-secondary);
+      font-weight: 600;
+      color: var(--apple-text-primary);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .data-table tr:hover {
+      background: var(--apple-bg-hover);
+    }
+    
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--apple-text-secondary);
+    }
+    
+    .error {
+      background: var(--apple-red-light);
+      color: var(--apple-red);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    
+    .empty-table {
+      text-align: center;
+      padding: 2rem;
+      color: var(--apple-text-secondary);
+      font-style: italic;
+    }
+    
+    .refresh-btn {
+      background: transparent !important;
+      color: #000000 !important;
+      border: 2px solid #29a6a8 !important;
+      box-shadow: none !important;
+      padding: 6px 13px !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      font-weight: 500 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    }
+    
+    .refresh-btn:hover {
+      background: rgba(41, 166, 168, 0.1) !important;
+      border-color: #1f8a8c !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+    }
+    
+    .json-cell {
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .json-cell:hover {
+      white-space: normal;
+      word-break: break-all;
+      max-width: none;
+      position: relative;
+      z-index: 100;
+      background: var(--apple-bg-elevated);
+      border-radius: 4px;
+      padding: 0.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* סגנונות לכפתור מחיקת חשבון */
+    .delete-account-btn {
+      background: #dc3545 !important;
+      color: white !important;
+      border: none !important;
+      padding: 6px 12px !important;
+      border-radius: 6px !important;
+      cursor: pointer !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+      transition: all 0.2s ease !important;
+      box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2) !important;
+    }
+    
+    .delete-account-btn:hover {
+      background: #c82333 !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3) !important;
+    }
+    
+    .delete-account-btn:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2) !important;
+    }
+    
+    /* סגנונות לכפתורי פעולות */
+    .action-btn {
+      padding: 8px 16px !important;
+      border: none !important;
+      border-radius: 8px !important;
+      cursor: pointer !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      transition: all 0.2s ease !important;
+      margin: 0 4px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      text-decoration: none !important;
+    }
+    
+    .edit-btn {
+      background: white !important;
+      color: #29a6a8 !important;
+      border: 1px solid #29a6a8 !important;
+      box-shadow: 0 1px 3px rgba(41, 166, 168, 0.2) !important;
+      padding: 6px !important;
+      width: 25px !important;
+      height: 25px !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    
+    .edit-btn:hover {
+      background: rgba(41, 166, 168, 0.1) !important;
+      border-color: #1f8a8c !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 2px 6px rgba(41, 166, 168, 0.3) !important;
+    }
+    
+    .add-btn {
+      background: transparent !important;
+      color: #000000 !important;
+      border: 2px solid #29a6a8 !important;
+      box-shadow: none !important;
+      padding: 6px 13px !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      font-weight: 500 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+    }
+    
+    .add-btn:hover {
+      background: rgba(41, 166, 168, 0.1) !important;
+      border-color: #1f8a8c !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+    }
+    
+    .add-btn:hover {
+      background: #1f8a8c !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 12px rgba(41, 166, 168, 0.4) !important;
+    }
+    
+    .delete-account-btn {
+      background: white !important;
+      color: #29a6a8 !important;
+      border: 1px solid #29a6a8 !important;
+      box-shadow: 0 1px 3px rgba(41, 166, 168, 0.2) !important;
+      padding: 6px !important;
+      width: 25px !important;
+      height: 25px !important;
+      border-radius: 6px !important;
+      cursor: pointer !important;
+      font-size: 11px !important;
+      font-weight: 500 !important;
+      transition: all 0.2s ease !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    
+    .delete-account-btn:hover {
+      background: rgba(41, 166, 168, 0.1) !important;
+      border-color: #1f8a8c !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 2px 6px rgba(41, 166, 168, 0.3) !important;
+    }
+    
+    /* סגנונות למודלים */
+    .modal {
+      z-index: 9999 !important;
+    }
+    
+    .modal-backdrop {
+      z-index: 9998 !important;
+    }
+    
+    .modal-content {
+      border-radius: 12px !important;
+      border: none !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+      z-index: 10000 !important;
+    }
+    
+    .modal-header {
+      background: var(--apple-bg-elevated) !important;
+      border-bottom: 1px solid var(--apple-border-light) !important;
+      border-radius: 12px 12px 0 0 !important;
+      position: relative !important;
+      z-index: 10001 !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 16px 24px !important;
+    }
+    
+    .modal-header .btn-close {
+      order: 1 !important;
+      margin-left: auto !important;
+      margin-right: 0 !important;
+      padding: 8px !important;
+      border-radius: 6px !important;
+      transition: all 0.2s ease !important;
+    }
+    
+    .modal-header .btn-close:hover {
+      background-color: rgba(0, 0, 0, 0.1) !important;
+      transform: scale(1.1) !important;
+    }
+    
+    .modal-header .modal-title {
+      flex: 1 !important;
+      text-align: center !important;
+      margin: 0 !important;
+    }
+    
+    .modal-title {
+      color: var(--apple-text-primary) !important;
+      font-weight: 600 !important;
+    }
+    
+    .modal-body {
+      padding: 24px !important;
+    }
+    
+    .form-label {
+      color: var(--apple-text-primary) !important;
+      font-weight: 500 !important;
+      margin-bottom: 8px !important;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid var(--apple-border-light) !important;
+      border-radius: 8px !important;
+      padding: 12px !important;
+      background: var(--apple-bg-elevated) !important;
+      color: var(--apple-text-primary) !important;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: #29a6a8 !important;
+      box-shadow: 0 0 0 0.2rem rgba(41, 166, 168, 0.25) !important;
+    }
+    
+    .btn-primary {
+      background: #29a6a8 !important;
+      border-color: #29a6a8 !important;
+      color: white !important;
+      padding: 8px 16px !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      transition: all 0.2s ease !important;
+      box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3) !important;
+    }
+    
+    .btn-primary:hover {
+      background: #1f8a8c !important;
+      border-color: #1f8a8c !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 12px rgba(41, 166, 168, 0.4) !important;
+    }
+    
+    .btn-success {
+      background: #28a745 !important;
+      border-color: #28a745 !important;
+    }
+    
+    .btn-success:hover {
+      background: #218838 !important;
+      border-color: #218838 !important;
+    }
+    
+    /* סגנונות נוספים לכפתורי המודל */
+    .modal-footer {
+      position: relative !important;
+      z-index: 10001 !important;
+    }
+    
+    .modal-footer .btn {
+      position: relative !important;
+      z-index: 10002 !important;
+    }
+    
+    /* וידוא שהמודלים מוצגים מעל הכל */
+    .modal-dialog {
+      z-index: 10000 !important;
+    }
+    
+    .modal.show {
+      display: block !important;
+      z-index: 9999 !important;
+    }
+    
+    .modal.show .modal-dialog {
+      z-index: 10000 !important;
+    }
+    
+    /* תיקון למודל עריכת חשבון */
+    #editAccountModal {
+      background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+    
+    #editAccountModal .modal-content {
+      background-color: white !important;
+      border: 1px solid #dee2e6 !important;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    
+    #editAccountModal .modal-header {
+      background-color: #f8f9fa !important;
+      border-bottom: 1px solid #dee2e6 !important;
+    }
+    
+    #editAccountModal .modal-body {
+      background-color: white !important;
+      padding: 1rem !important;
+    }
+    
+    #editAccountModal .modal-footer {
+      background-color: #f8f9fa !important;
+      border-top: 1px solid #dee2e6 !important;
+    }
+    
+    /* תיקון למודל הוספת חשבון */
+    #addAccountModal {
+      background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+    
+    #addAccountModal .modal-content {
+      background-color: white !important;
+      border: 1px solid #dee2e6 !important;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    
+    #addAccountModal .modal-header {
+      background-color: #f8f9fa !important;
+      border-bottom: 1px solid #dee2e6 !important;
+    }
+    
+    #addAccountModal .modal-body {
+      background-color: white !important;
+      padding: 1rem !important;
+    }
+    
+    #addAccountModal .modal-footer {
+      background-color: #f8f9fa !important;
+      border-top: 1px solid #dee2e6 !important;
+    }
+    
+    /* סגנונות נוספים לטבלה */
+    .data-table th {
+      background: var(--apple-bg-secondary) !important;
+      font-weight: 600 !important;
+      color: var(--apple-text-primary) !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 10 !important;
+      transition: background-color 0.2s ease !important;
+    }
+    
+    .data-table th:hover {
+      background: var(--apple-bg-hover) !important;
+    }
+    
+    .data-table td {
+      padding: 12px 8px !important;
+      text-align: right !important;
+      border-bottom: 1px solid var(--apple-border-light) !important;
+      vertical-align: middle !important;
+    }
+    
+    .data-table tr:hover {
+      background: var(--apple-bg-hover) !important;
+    }
+    
+    /* סגנונות למספרים */
+    .number-cell {
+      text-align: left !important;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+      font-size: 13px !important;
+    }
+    
+    /* סגנונות למזהה */
+    .id-cell {
+      font-weight: 600 !important;
+      color: var(--apple-blue) !important;
+      font-size: 12px !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Web Component של הכותרת -->
+  <app-header></app-header>
+
+  <div class="background-wrapper">
+    <div class="database-page">
+      <div class="page-header">
+        <h1 class="page-title">🗄️ כל בסיס הנתונים</h1>
+        <p class="page-subtitle">תצוגה מלאה של כל הטבלאות והנתונים במערכת</p>
+      </div>
+      
+      <!-- חשבונות -->
+      <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            🏦 חשבונות
+          </div>
+          <div class="table-count" id="accountsCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="accountsSearch" placeholder="חיפוש בחשבונות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterAccountsTable()">
+            <button class="add-btn action-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTable('accounts')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div id="accountsTable" class="loading">טוען חשבונות...</div>
+      </div>
+      
+      <!-- טיקרים -->
+      <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            📈 טיקרים
+          </div>
+          <div class="table-count" id="tickersCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="tickersSearch" placeholder="חיפוש בטיקרים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('tickers')">
+            <button class="add-btn action-btn" onclick="showAddModal('tickers')" title="הוסף טיקר חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTable('tickers')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div id="tickersTable" class="loading">טוען טיקרים...</div>
+      </div>
+      
+      <!-- תכנוני טריידים -->
+      <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            📋 תכנוני טריידים
+          </div>
+          <div class="table-count" id="tradePlansCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="tradePlansSearch" placeholder="חיפוש בתכנוני טריידים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('trade_plans')">
+            <button class="add-btn action-btn" onclick="showAddModal('trade_plans')" title="הוסף תכנון טרייד חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTable('trade_plans')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div id="tradePlansTable" class="loading">טוען תכנוני טריידים...</div>
+      </div>
+      
+      <!-- טריידים -->
+      <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            💰 טריידים
+          </div>
+          <div class="table-count" id="tradesCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="tradesSearch" placeholder="חיפוש בטריידים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('trades')">
+            <button class="add-btn action-btn" onclick="showAddModal('trades')" title="הוסף טרייד חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTable('trades')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div id="tradesTable" class="loading">טוען טריידים...</div>
+      </div>
+      
+      <!-- טרנזקציות -->
+      <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            ⚡ טרנזקציות
+          </div>
+          <div class="table-count" id="executionsCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="executionsSearch" placeholder="חיפוש בטרנזקציות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('executions')">
+            <button class="add-btn action-btn" onclick="showAddModal('executions')" title="הוסף טרנזקציה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTable('executions')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div id="executionsTable" class="loading">טוען טרנזקציות...</div>
+      </div>
+      
+      <!-- פקודות -->
+      <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            🔄 פקודות
+          </div>
+          <div class="table-count" id="openExecutionsCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="openExecutionsSearch" placeholder="חיפוש בפקודות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('open_execution_requests')">
+            <button class="add-btn action-btn" onclick="showAddModal('open_execution_requests')" title="הוסף פקודה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTable('open_execution_requests')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div id="openExecutionsTable" class="loading">טוען פקודות...</div>
+      </div>
+      
+      <!-- תזרים מזומנים -->
+      <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            💸 תזרים מזומנים
+          </div>
+          <div class="table-count" id="cashFlowsCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="cashFlowsSearch" placeholder="חיפוש בתזרים מזומנים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('cash_flows')">
+            <button class="add-btn action-btn" onclick="showAddModal('cash_flows')" title="הוסף תזרים מזומנים חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTable('cash_flows')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div id="cashFlowsTable" class="loading">טוען תזרים מזומנים...</div>
+      </div>
+      
+      <!-- התראות -->
+      <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            🔔 התראות
+          </div>
+          <div class="table-count" id="alertsCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="alertsSearch" placeholder="חיפוש בהתראות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('alerts')">
+            <button class="add-btn action-btn" onclick="showAddModal('alerts')" title="הוסף התראה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTable('alerts')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div id="alertsTable" class="loading">טוען התראות...</div>
+      </div>
+      
+      <!-- תמונת זמן -->
+      <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            📸 תמונת זמן
+          </div>
+          <div class="table-count" id="performanceSnapshotsCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="performanceSnapshotsSearch" placeholder="חיפוש בתמונות זמן..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('performance_snapshots')">
+            <button class="add-btn action-btn" onclick="showAddModal('performance_snapshots')" title="הוסף תמונת זמן חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTable('performance_snapshots')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div id="performanceSnapshotsTable" class="loading">טוען תמונת זמן...</div>
+      </div>
+      
+      <!-- הערות -->
+      <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            📝 הערות
+          </div>
+          <div class="table-count" id="notesCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="notesSearch" placeholder="חיפוש בהערות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('notes')">
+            <button class="add-btn action-btn" onclick="showAddModal('notes')" title="הוסף הערה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTable('notes')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div id="notesTable" class="loading">טוען הערות...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודל הוספת חשבון -->
+  <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addAccountModalLabel">הוסף חשבון חדש</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addAccountForm">
+            <!-- שדות בסיסיים -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="accountName" class="form-label">שם החשבון *</label>
+                <input type="text" class="form-control" id="accountName" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="accountCurrency" class="form-label">מטבע *</label>
+                <select class="form-select" id="accountCurrency" required>
+                  <option value="">בחר מטבע</option>
+                  <option value="ILS">שקל ישראלי (ILS)</option>
+                  <option value="USD">דולר אמריקאי (USD)</option>
+                  <option value="EUR">אירו (EUR)</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="accountStatus" class="form-label">סטטוס</label>
+                <select class="form-select" id="accountStatus">
+                  <option value="active">פעיל</option>
+                  <option value="inactive">לא פעיל</option>
+                  <option value="suspended">מושעה</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- שדות פיננסיים -->
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="accountCashBalance" class="form-label">יתרת מזומן</label>
+                <input type="number" class="form-control" id="accountCashBalance" step="0.01" placeholder="0.00">
+                <small class="form-text text-muted">יתרת המזומן בחשבון</small>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="accountTotalValue" class="form-label">שווי כולל</label>
+                <input type="number" class="form-control" id="accountTotalValue" step="0.01" placeholder="0.00">
+                <small class="form-text text-muted">השווי הכולל של החשבון</small>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="accountTotalPl" class="form-label">רווח/הפסד כולל</label>
+                <input type="number" class="form-control" id="accountTotalPl" step="0.01" placeholder="0.00">
+                <small class="form-text text-muted">הרווח או ההפסד הכולל</small>
+              </div>
+            </div>
+            
+            <!-- הערות -->
+            <div class="mb-3">
+              <label for="accountNotes" class="form-label">הערות</label>
+              <textarea class="form-control" id="accountNotes" rows="4" placeholder="הערות על החשבון..."></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="add-btn" onclick="createAccount()"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף חשבון</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודל עריכת חשבון -->
+  <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editAccountModalLabel">ערוך חשבון</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editAccountForm">
+            <input type="hidden" id="editAccountId">
+            
+            <!-- שדות בסיסיים -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="editAccountName" class="form-label">שם החשבון *</label>
+                <input type="text" class="form-control" id="editAccountName" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="editAccountCurrency" class="form-label">מטבע *</label>
+                <select class="form-select" id="editAccountCurrency" required>
+                  <option value="">בחר מטבע</option>
+                  <option value="ILS">שקל ישראלי (ILS)</option>
+                  <option value="USD">דולר אמריקאי (USD)</option>
+                  <option value="EUR">אירו (EUR)</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="editAccountStatus" class="form-label">סטטוס</label>
+                <select class="form-select" id="editAccountStatus">
+                  <option value="active">פעיל</option>
+                  <option value="inactive">לא פעיל</option>
+                  <option value="suspended">מושעה</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- שדות פיננסיים -->
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="editAccountCashBalance" class="form-label">יתרת מזומן</label>
+                <input type="number" class="form-control" id="editAccountCashBalance" step="0.01" placeholder="0.00">
+                <small class="form-text text-muted">יתרת המזומן בחשבון</small>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="editAccountTotalValue" class="form-label">שווי כולל</label>
+                <input type="number" class="form-control" id="editAccountTotalValue" step="0.01" placeholder="0.00">
+                <small class="form-text text-muted">השווי הכולל של החשבון</small>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="editAccountTotalPl" class="form-label">רווח/הפסד כולל</label>
+                <input type="number" class="form-control" id="editAccountTotalPl" step="0.01" placeholder="0.00">
+                <small class="form-text text-muted">הרווח או ההפסד הכולל</small>
+              </div>
+            </div>
+            
+            <!-- הערות -->
+            <div class="mb-3">
+              <label for="editAccountNotes" class="form-label">הערות</label>
+              <textarea class="form-control" id="editAccountNotes" rows="4" placeholder="הערות על החשבון..."></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="delete-account-btn me-auto" onclick="deleteAccountFromModal()" title="מחק חשבון">🗑️</button>
+          <button type="button" class="edit-btn" onclick="updateAccountFromModal()" title="עדכן חשבון">✏️</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודל הוספת טיקר -->
+  <div class="modal fade" id="addTickerModal" tabindex="-1" aria-labelledby="addTickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addTickerModalLabel">הוסף טיקר חדש</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addTickerForm">
+            <div class="mb-3">
+              <label for="tickerSymbol" class="form-label">סימבול *</label>
+              <input type="text" class="form-control" id="tickerSymbol" required placeholder="למשל: AAPL">
+            </div>
+            <div class="mb-3">
+              <label for="tickerType" class="form-label">סוג</label>
+              <select class="form-select" id="tickerType">
+                <option value="">בחר סוג</option>
+                <option value="stock">מניה</option>
+                <option value="etf">ETF</option>
+                <option value="bond">אג"ח</option>
+                <option value="crypto">קריפטו</option>
+                <option value="forex">מט"ח</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="tickerExchange" class="form-label">בורסה</label>
+              <input type="text" class="form-control" id="tickerExchange" placeholder="למשל: NASDAQ">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="add-btn" onclick="createTicker()"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף טיקר</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודל עריכת טיקר -->
+  <div class="modal fade" id="editTickerModal" tabindex="-1" aria-labelledby="editTickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editTickerModalLabel">ערוך טיקר</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editTickerForm">
+            <input type="hidden" id="editTickerId">
+            <div class="mb-3">
+              <label for="editTickerSymbol" class="form-label">סימבול *</label>
+              <input type="text" class="form-control" id="editTickerSymbol" required>
+            </div>
+            <div class="mb-3">
+              <label for="editTickerType" class="form-label">סוג</label>
+              <select class="form-select" id="editTickerType">
+                <option value="">בחר סוג</option>
+                <option value="stock">מניה</option>
+                <option value="etf">ETF</option>
+                <option value="bond">אג"ח</option>
+                <option value="crypto">קריפטו</option>
+                <option value="forex">מט"ח</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editTickerExchange" class="form-label">בורסה</label>
+              <input type="text" class="form-control" id="editTickerExchange">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="delete-account-btn me-auto" onclick="deleteTickerFromModal()" title="מחק טיקר">🗑️</button>
+          <button type="button" class="edit-btn" onclick="updateTickerFromModal()" title="עדכן טיקר">✏️</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // פונקציה לטעינת טבלה
+    async function loadTable(tableName) {
+      console.log(`טוען טבלה: ${tableName}`);
+      
+      // מיפוי שמות טבלאות ל-ID של אלמנטים
+      const tableIdMap = {
+        'open_execution_requests': 'openExecutions',
+        'cash_flows': 'cashFlows',
+        'performance_snapshots': 'performanceSnapshots'
+      };
+      
+      const elementSuffix = tableIdMap[tableName] || tableName;
+      const tableElement = document.getElementById(elementSuffix + 'Table');
+      const countElement = document.getElementById(elementSuffix + 'Count');
+      
+      try {
+        tableElement.innerHTML = '<div class="loading">טוען...</div>';
+        
+        const response = await fetch(`/api/database/${tableName}`);
+        const data = await response.json();
+        
+        console.log(`נתונים עבור ${tableName}:`, data);
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        
+        // עדכון מספר הרשומות
+        countElement.textContent = `${data.length} רשומות`;
+        
+        if (data.length === 0) {
+          tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
+          return;
+        }
+        
+        // יצירת הטבלה
+        const table = createDataTable(data, tableName);
+        tableElement.innerHTML = '';
+        tableElement.appendChild(table);
+        
+      } catch (error) {
+        console.error(`שגיאה בטעינת טבלה ${tableName}:`, error);
+        tableElement.innerHTML = `<div class="error">שגיאה בטעינת הנתונים: ${error.message}</div>`;
+        countElement.textContent = 'שגיאה';
+      }
+    }
+    
+    // פונקציה ליצירת טבלת נתונים
+    function createDataTable(data, tableName) {
+      const table = document.createElement('table');
+      table.className = 'data-table';
+      
+      // יצירת כותרות
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      
+      if (data.length > 0) {
+        let columns = Object.keys(data[0]);
+        
+        // סדר מותאם לכל הטבלאות
+        if (tableName === 'accounts') {
+          columns = ['id', 'name', 'currency', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'];
+        } else if (tableName === 'tickers') {
+          columns = ['id', 'symbol', 'type', 'exchange'];
+        } else if (tableName === 'trades') {
+          columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'opened_at', 'closed_at', 'total_pl', 'notes'];
+        } else if (tableName === 'executions') {
+          columns = ['id', 'trade_id', 'action', 'date', 'quantity', 'price', 'fee', 'source'];
+        } else if (tableName === 'alerts') {
+          columns = ['id', 'account_id', 'ticker_id', 'alert_type', 'condition', 'status', 'created_at', 'triggered_at'];
+        } else if (tableName === 'cash_flows') {
+          columns = ['id', 'account_id', 'date', 'flow_type', 'amount', 'currency', 'description'];
+        } else if (tableName === 'performance_snapshots') {
+          columns = ['id', 'account_id', 'date', 'total_value', 'open_pl', 'closed_pl', 'mtm_value', 'investment_type'];
+        } else if (tableName === 'notes') {
+          columns = ['id', 'account_id', 'trade_id', 'trade_plan_id', 'content', 'created_at', 'attachment'];
+        } else if (tableName === 'trade_plans') {
+          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason'];
+        } else if (tableName === 'open_execution_requests') {
+          columns = ['id', 'trade_id', 'ticker_symbol', 'action', 'order_type', 'status', 'expiry_type', 'price', 'quantity', 'created_at'];
+        }
+        
+        columns.forEach(column => {
+          const th = document.createElement('th');
+          th.textContent = getColumnDisplayName(column);
+          th.style.cursor = 'pointer';
+          th.title = 'לחץ למיון';
+          
+          // הוספת אירוע מיון
+          th.addEventListener('click', () => {
+            sortTable(tableName, column);
+          });
+          
+          headerRow.appendChild(th);
+        });
+        
+        // הוספת עמודת פעולות לכל הטבלאות
+        const actionsTh = document.createElement('th');
+        actionsTh.textContent = 'פעולות';
+        actionsTh.style.textAlign = 'center';
+        headerRow.appendChild(actionsTh);
+      }
+      
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+      
+      // יצירת שורות נתונים
+      const tbody = document.createElement('tbody');
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        
+        // שימוש באותו סדר עמודות כמו בכותרות
+        let columns = Object.keys(row);
+        if (tableName === 'accounts') {
+          columns = ['id', 'name', 'currency', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'];
+        } else if (tableName === 'tickers') {
+          columns = ['id', 'symbol', 'type', 'exchange'];
+        } else if (tableName === 'trades') {
+          columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'opened_at', 'closed_at', 'total_pl', 'notes'];
+        } else if (tableName === 'executions') {
+          columns = ['id', 'trade_id', 'action', 'date', 'quantity', 'price', 'fee', 'source'];
+        } else if (tableName === 'alerts') {
+          columns = ['id', 'account_id', 'ticker_id', 'alert_type', 'condition', 'status', 'created_at', 'triggered_at'];
+        } else if (tableName === 'cash_flows') {
+          columns = ['id', 'account_id', 'date', 'flow_type', 'amount', 'currency', 'description'];
+        } else if (tableName === 'performance_snapshots') {
+          columns = ['id', 'account_id', 'date', 'total_value', 'open_pl', 'closed_pl', 'mtm_value', 'investment_type'];
+        } else if (tableName === 'notes') {
+          columns = ['id', 'account_id', 'trade_id', 'trade_plan_id', 'content', 'created_at', 'attachment'];
+        } else if (tableName === 'trade_plans') {
+          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason'];
+        } else if (tableName === 'open_execution_requests') {
+          columns = ['id', 'trade_id', 'ticker_symbol', 'action', 'order_type', 'status', 'expiry_type', 'price', 'quantity', 'created_at'];
+        }
+        
+        columns.forEach(key => {
+          const value = row[key];
+          const td = document.createElement('td');
+          
+          if (value === null || value === undefined) {
+            td.textContent = '-';
+            td.style.color = 'var(--apple-text-secondary)';
+            td.style.fontStyle = 'italic';
+          } else if (typeof value === 'object') {
+            td.className = 'json-cell';
+            td.textContent = JSON.stringify(value);
+            td.title = 'לחץ להרחבה';
+          } else if (typeof value === 'boolean') {
+            td.textContent = value ? 'כן' : 'לא';
+            td.style.color = value ? 'var(--apple-green)' : 'var(--apple-red)';
+          } else if (typeof value === 'number') {
+            // סגנון מיוחד למזהה
+            if (key === 'id') {
+              td.className = 'id-cell';
+              td.textContent = `#${value}`;
+            } else {
+              td.className = 'number-cell';
+              if (value.toString().includes('.')) {
+                td.textContent = value.toFixed(2);
+              } else {
+                td.textContent = value.toLocaleString();
+              }
+            }
+          } else if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
+            // תאריך
+            td.textContent = new Date(value).toLocaleDateString('he-IL');
+          } else {
+            td.textContent = value;
+          }
+          
+          tr.appendChild(td);
+        });
+        
+        // הוספת כפתורי פעולות לכל הטבלאות
+        const actionsTd = document.createElement('td');
+        actionsTd.style.textAlign = 'center';
+        
+        const editBtn = document.createElement('button');
+        editBtn.innerHTML = '✏️';
+        editBtn.className = 'edit-btn action-btn';
+        editBtn.title = `ערוך ${getTableDisplayName(tableName)}`;
+        
+        editBtn.addEventListener('click', () => {
+          showEditModal(tableName, row);
+        });
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '🗑️';
+        deleteBtn.className = 'delete-account-btn';
+        deleteBtn.title = `מחק ${getTableDisplayName(tableName)}`;
+        
+        deleteBtn.addEventListener('click', () => {
+          const displayName = getTableDisplayName(tableName);
+          const itemName = getItemDisplayName(tableName, row);
+          if (confirm(`האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?`)) {
+            deleteItem(tableName, row.id, itemName);
+          }
+        });
+        
+        actionsTd.appendChild(editBtn);
+        actionsTd.appendChild(deleteBtn);
+        actionsTd.style.display = 'flex';
+        actionsTd.style.gap = '4px';
+        actionsTd.style.justifyContent = 'center';
+        tr.appendChild(actionsTd);
+        
+        tbody.appendChild(tr);
+      });
+      
+      table.appendChild(tbody);
+      return table;
+    }
+    
+    // פונקציה למחיקת חשבון
+    async function deleteAccount(accountId, accountName) {
+      try {
+        const response = await fetch(`/api/accounts/${accountId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          alert(`החשבון "${accountName}" נמחק בהצלחה!`);
+          // רענון הטבלה
+          loadTable('accounts');
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'שגיאה במחיקת החשבון');
+        }
+      } catch (error) {
+        console.error('שגיאה במחיקת חשבון:', error);
+        alert(`שגיאה במחיקת החשבון: ${error.message}`);
+      }
+    }
+    
+    // פונקציות לניהול מודלים
+    function showAddAccountModal() {
+      // ניקוי הטופס
+      document.getElementById('addAccountForm').reset();
+      // הצגת המודל
+      const modalElement = document.getElementById('addAccountModal');
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+      
+      // וידוא שהמודל מוצג כראוי
+      setTimeout(() => {
+        modalElement.style.zIndex = '9999';
+        modalElement.style.display = 'block';
+        modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        
+        const modalContent = modalElement.querySelector('.modal-content');
+        if (modalContent) {
+          modalContent.style.backgroundColor = 'white';
+          modalContent.style.opacity = '1';
+          modalContent.style.visibility = 'visible';
+        }
+        
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+          backdrop.style.zIndex = '9998';
+        }
+      }, 100);
+    }
+    
+    function showEditAccountModal(account) {
+      // מילוי הטופס עם נתוני החשבון
+      document.getElementById('editAccountId').value = account.id;
+      document.getElementById('editAccountName').value = account.name;
+      document.getElementById('editAccountCurrency').value = account.currency;
+      document.getElementById('editAccountStatus').value = account.status || 'active';
+      document.getElementById('editAccountCashBalance').value = account.cash_balance || '';
+      document.getElementById('editAccountTotalValue').value = account.total_value || '';
+      document.getElementById('editAccountTotalPl').value = account.total_pl || '';
+      document.getElementById('editAccountNotes').value = account.notes || '';
+      
+      // הצגת המודל
+      const modalElement = document.getElementById('editAccountModal');
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+      
+      // וידוא שהמודל מוצג כראוי
+      setTimeout(() => {
+        modalElement.style.zIndex = '9999';
+        modalElement.style.display = 'block';
+        modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        
+        const modalContent = modalElement.querySelector('.modal-content');
+        if (modalContent) {
+          modalContent.style.backgroundColor = 'white';
+          modalContent.style.opacity = '1';
+          modalContent.style.visibility = 'visible';
+        }
+        
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+          backdrop.style.zIndex = '9998';
+        }
+      }, 100);
+    }
+    
+    async function createAccount() {
+      const name = document.getElementById('accountName').value.trim();
+      const currency = document.getElementById('accountCurrency').value;
+      const status = document.getElementById('accountStatus').value;
+      const cashBalance = parseFloat(document.getElementById('accountCashBalance').value) || 0;
+      const totalValue = parseFloat(document.getElementById('accountTotalValue').value) || 0;
+      const totalPl = parseFloat(document.getElementById('accountTotalPl').value) || 0;
+      const notes = document.getElementById('accountNotes').value.trim();
+      
+      if (!name || !currency) {
+        alert('שם החשבון ומטבע הם שדות חובה');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/accounts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: name,
+            currency: currency,
+            status: status,
+            cash_balance: cashBalance,
+            total_value: totalValue,
+            total_pl: totalPl,
+            notes: notes
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('החשבון נוסף בהצלחה!');
+          // סגירת המודל
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addAccountModal'));
+          modal.hide();
+          // רענון הטבלה
+          loadTable('accounts');
+        } else {
+          throw new Error(data.message || 'שגיאה בהוספת החשבון');
+        }
+      } catch (error) {
+        console.error('שגיאה בהוספת חשבון:', error);
+        alert(`שגיאה בהוספת החשבון: ${error.message}`);
+      }
+    }
+    
+    async function updateAccountFromModal() {
+      const accountId = document.getElementById('editAccountId').value;
+      const name = document.getElementById('editAccountName').value.trim();
+      const currency = document.getElementById('editAccountCurrency').value;
+      const status = document.getElementById('editAccountStatus').value;
+      const cashBalance = parseFloat(document.getElementById('editAccountCashBalance').value) || 0;
+      const totalValue = parseFloat(document.getElementById('editAccountTotalValue').value) || 0;
+      const totalPl = parseFloat(document.getElementById('editAccountTotalPl').value) || 0;
+      const notes = document.getElementById('editAccountNotes').value.trim();
+      
+      if (!name || !currency) {
+        alert('שם החשבון ומטבע הם שדות חובה');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/accounts/${accountId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: name,
+            currency: currency,
+            status: status,
+            cash_balance: cashBalance,
+            total_value: totalValue,
+            total_pl: totalPl,
+            notes: notes
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('החשבון עודכן בהצלחה!');
+          // סגירת המודל
+          const modal = bootstrap.Modal.getInstance(document.getElementById('editAccountModal'));
+          modal.hide();
+          // רענון הטבלה
+          loadTable('accounts');
+        } else {
+          throw new Error(data.message || 'שגיאה בעדכון החשבון');
+        }
+      } catch (error) {
+        console.error('שגיאה בעדכון חשבון:', error);
+        alert(`שגיאה בעדכון החשבון: ${error.message}`);
+      }
+    }
+    
+    function deleteAccountFromModal() {
+      const accountId = document.getElementById('editAccountId').value;
+      const accountName = document.getElementById('editAccountName').value;
+      
+      if (confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
+        deleteAccount(accountId, accountName);
+        // סגירת המודל
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editAccountModal'));
+        modal.hide();
+      }
+    }
+    
+    // פונקציה כללית לסינון כל הטבלאות
+    function filterTable(tableName) {
+      const searchInputId = tableName + 'Search';
+      const searchTerm = document.getElementById(searchInputId)?.value.toLowerCase() || '';
+      const table = document.getElementById(tableName + 'Table');
+      
+      if (!table) return;
+      
+      const rows = table.querySelectorAll('tbody tr');
+      let visibleCount = 0;
+      
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        let shouldShow = false;
+        
+        // בדיקה אם אחד מהתאים מכיל את מונח החיפוש
+        cells.forEach(cell => {
+          if (cell.textContent.toLowerCase().includes(searchTerm)) {
+            shouldShow = true;
+          }
+        });
+        
+        if (shouldShow) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      
+      // עדכון מספר הרשומות המוצגות
+      const countElement = document.getElementById(tableName + 'Count');
+      if (countElement) {
+        const totalCount = rows.length;
+        if (searchTerm) {
+          countElement.textContent = `${visibleCount} מתוך ${totalCount} רשומות`;
+        } else {
+          countElement.textContent = `${totalCount} רשומות`;
+        }
+      }
+    }
+    
+    // פונקציה לסינון טבלת החשבונות (לשמירה על תאימות)
+    function filterAccountsTable() {
+      filterTable('accounts');
+    }
+    
+    // פונקציה למיון טבלה
+    function sortTable(tableName, column) {
+      const table = document.getElementById(tableName + 'Table');
+      if (!table) return;
+      
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      
+      // קביעת כיוון המיון
+      const currentOrder = table.getAttribute('data-sort-order') || 'asc';
+      const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+      table.setAttribute('data-sort-order', newOrder);
+      
+      // מציאת אינדקס העמודה
+      const headers = table.querySelectorAll('thead th');
+      let columnIndex = -1;
+      for (let i = 0; i < headers.length; i++) {
+        if (headers[i].textContent === getColumnDisplayName(column)) {
+          columnIndex = i;
+          break;
+        }
+      }
+      
+      if (columnIndex === -1) return;
+      
+      // מיון השורות
+      rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex].textContent.trim();
+        const bValue = b.cells[columnIndex].textContent.trim();
+        
+        // בדיקה אם הערכים הם מספרים
+        const aNum = parseFloat(aValue.replace(/[^\d.-]/g, ''));
+        const bNum = parseFloat(bValue.replace(/[^\d.-]/g, ''));
+        
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+          return newOrder === 'asc' ? aNum - bNum : bNum - aNum;
+        }
+        
+        // מיון טקסטואלי
+        if (newOrder === 'asc') {
+          return aValue.localeCompare(bValue, 'he');
+        } else {
+          return bValue.localeCompare(aValue, 'he');
+        }
+      });
+      
+      // עדכון הטבלה
+      rows.forEach(row => tbody.appendChild(row));
+      
+      // עדכון הכותרות
+      headers.forEach(header => {
+        header.textContent = header.textContent.replace(' ↑', '').replace(' ↓', '');
+      });
+      
+      const currentHeader = headers[columnIndex];
+      currentHeader.textContent += newOrder === 'asc' ? ' ↑' : ' ↓';
+    }
+    
+    // פונקציה להמרת שמות עמודות לעברית
+    function getColumnDisplayName(columnName) {
+      const columnNames = {
+        'id': 'מזהה',
+        'name': 'שם',
+        'symbol': 'סימבול',
+        'type': 'סוג',
+        'account_id': 'מזהה חשבון',
+        'account_name': 'שם חשבון',
+        'ticker_id': 'מזהה טיקר',
+        'ticker_symbol': 'סימבול טיקר',
+        'action': 'פעולה',
+        'order_type': 'סוג פקודה',
+        'expiry_type': 'סוג תפוגה',
+        'price': 'מחיר',
+        'quantity': 'כמות',
+        'trade_id': 'מזהה טרייד',
+        'trade_status': 'סטטוס טרייד',
+        'trade_opened_at': 'תאריך פתיחת טרייד',
+        'flow_type': 'סוג תזרים',
+        'currency': 'מטבע',
+        'date': 'תאריך',
+        'snapshot_date': 'תאריך צילום',
+        'portfolio_value': 'שווי תיק',
+        'total_invested': 'סה"כ מושקע',
+        'total_return': 'סה"כ תשואה',
+        'investment_type': 'סוג השקעה',
+        'investment_category': 'קטגוריית השקעה',
+        'category_display': 'קטגוריה',
+        'planned_amount': 'סכום מתוכנן',
+        'entry_conditions': 'תנאי כניסה',
+        'stop_price': 'מחיר סטופ',
+        'target_price': 'מחיר יעד',
+        'reasons': 'סיבות',
+        'created_at': 'תאריך יצירה',
+        'canceled_at': 'תאריך ביטול',
+        'cancel_reason': 'סיבת ביטול',
+        'opened_at': 'תאריך פתיחה',
+        'closed_at': 'תאריך סגירה',
+        'status': 'סטטוס',
+        'notes': 'הערות',
+        'total_pl': 'רווח/הפסד כולל',
+        'cash_balance': 'יתרת מזומן',
+        'total_value': 'שווי כולל',
+        'quantity': 'כמות',
+        'price': 'מחיר',
+        'execution_date': 'תאריך ביצוע',
+        'request_date': 'תאריך בקשה',
+        'amount': 'סכום',
+        'flow_type': 'סוג תזרים',
+        'description': 'תיאור',
+        'alert_type': 'סוג התראה',
+        'condition': 'תנאי',
+        'triggered_at': 'תאריך הפעלה',
+        'is_active': 'פעיל',
+        'snapshot_date': 'תאריך צילום',
+        'portfolio_value': 'שווי תיק',
+        'total_invested': 'סה"כ מושקע',
+        'total_return': 'סה"כ תשואה',
+        'content': 'תוכן',
+        'created_by': 'נוצר על ידי',
+        'updated_at': 'תאריך עדכון',
+        'symbol': 'סימבול',
+        'type': 'סוג',
+        'exchange': 'בורסה',
+        'account_id': 'מזהה חשבון',
+        'ticker_id': 'מזהה טיקר',
+        'trade_plan_id': 'מזהה תכנון',
+        'action': 'פעולה',
+        'date': 'תאריך',
+        'quantity': 'כמות',
+        'price': 'מחיר',
+        'fee': 'עמלה',
+        'source': 'מקור',
+        'alert_type': 'סוג התראה',
+        'condition': 'תנאי',
+        'triggered_at': 'תאריך הפעלה',
+        'flow_type': 'סוג תזרים',
+        'amount': 'סכום',
+        'description': 'תיאור',
+        'total_value': 'שווי כולל',
+        'open_pl': 'רווח/הפסד פתוח',
+        'closed_pl': 'רווח/הפסד סגור',
+        'mtm_value': 'שווי שוק',
+        'investment_type': 'סוג השקעה',
+        'planned_amount': 'סכום מתוכנן',
+        'entry_conditions': 'תנאי כניסה',
+        'stop_price': 'מחיר סטופ',
+        'target_price': 'מחיר יעד',
+        'reasons': 'סיבות',
+        'canceled_at': 'תאריך ביטול',
+        'cancel_reason': 'סיבת ביטול',
+        'opened_at': 'תאריך פתיחה',
+        'closed_at': 'תאריך סגירה',
+        'trade_id': 'מזהה טרייד',
+        'ticker_symbol': 'סימבול טיקר',
+        'order_type': 'סוג פקודה',
+        'expiry_type': 'סוג תפוגה',
+        'content': 'תוכן',
+        'attachment': 'קובץ מצורף',
+        'created_by': 'נוצר על ידי'
+      };
+      
+      return columnNames[columnName] || columnName;
+    }
+    
+    // טעינת כל הטבלאות בעת טעינת הדף
+    window.addEventListener('load', () => {
+      console.log('הדף נטען, מתחיל לטעון טבלאות...');
+      
+      // טעינה מיידית של תכנוני טריידים
+      console.log('טוען תכנוני טריידים...');
+      loadTable('trade_plans');
+      
+      // טעינה מיידית של פקודות ותזרים מזומנים
+      console.log('טוען פקודות...');
+      loadTable('open_execution_requests');
+      
+      console.log('טוען תזרים מזומנים...');
+      loadTable('cash_flows');
+      
+      const tables = [
+        'accounts',
+        'tickers', 
+        'trades',
+        'executions',
+        'alerts',
+        'performance_snapshots',
+        'notes'
+      ];
+      
+      tables.forEach(table => {
+        console.log(`מתחיל לטעון: ${table}`);
+        loadTable(table);
+      });
+    });
+    
+    // בדיקה נוספת
+    console.log('הסקריפט נטען');
+    
+    // בדיקה מיידית
+    setTimeout(() => {
+      console.log('בדיקה מיידית - טוען trade_plans');
+      fetch('/api/database/trade_plans')
+        .then(response => response.json())
+        .then(data => {
+          console.log('נתונים שהתקבלו:', data);
+          const tableElement = document.getElementById('tradePlansTable');
+          const countElement = document.getElementById('tradePlansCount');
+          if (tableElement && countElement) {
+            countElement.textContent = `${data.length} רשומות`;
+            if (data.length > 0) {
+              const table = createDataTable(data, 'trade_plans');
+              tableElement.innerHTML = '';
+              tableElement.appendChild(table);
+            } else {
+              tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
+            }
+          }
+        })
+        .catch(error => {
+          console.error('שגיאה:', error);
+        });
+      
+      // בדיקה מיידית לפקודות
+      console.log('בדיקה מיידית - טוען open_execution_requests');
+      fetch('/api/database/open_execution_requests')
+        .then(response => response.json())
+        .then(data => {
+          console.log('נתוני פקודות:', data);
+          const tableElement = document.getElementById('openExecutionsTable');
+          const countElement = document.getElementById('openExecutionsCount');
+          if (tableElement && countElement) {
+            countElement.textContent = `${data.length} רשומות`;
+            if (data.length > 0) {
+              const table = createDataTable(data, 'open_execution_requests');
+              tableElement.innerHTML = '';
+              tableElement.appendChild(table);
+            } else {
+              tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
+            }
+          }
+        })
+        .catch(error => {
+          console.error('שגיאה בפקודות:', error);
+        });
+      
+      // בדיקה מיידית לתזרים מזומנים
+      console.log('בדיקה מיידית - טוען cash_flows');
+      fetch('/api/database/cash_flows')
+        .then(response => response.json())
+        .then(data => {
+          console.log('נתוני תזרים מזומנים:', data);
+          const tableElement = document.getElementById('cashFlowsTable');
+          const countElement = document.getElementById('cashFlowsCount');
+          if (tableElement && countElement) {
+            countElement.textContent = `${data.length} רשומות`;
+            if (data.length > 0) {
+              const table = createDataTable(data, 'cash_flows');
+              tableElement.innerHTML = '';
+              tableElement.appendChild(table);
+            } else {
+              tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
+            }
+          }
+        })
+        .catch(error => {
+          console.error('שגיאה בתזרים מזומנים:', error);
+        });
+    }, 2000);
+    
+    // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
+    function updateBackgroundPadding(isCollapsed) {
+      const backgroundWrapper = document.querySelector('.background-wrapper');
+      const body = document.body;
+      
+      if (backgroundWrapper) {
+        if (isCollapsed) {
+          backgroundWrapper.classList.add('filter-collapsed');
+        } else {
+          backgroundWrapper.classList.remove('filter-collapsed');
+        }
+      }
+      
+      if (body) {
+        if (isCollapsed) {
+          body.classList.add('filter-collapsed');
+        } else {
+          body.classList.remove('filter-collapsed');
+        }
+      }
+    }
+
+    // האזנה לשינויים בקומפוננט הכותרת
+    function setupHeaderListener() {
+      const header = document.querySelector('app-header');
+      if (header) {
+        // האזנה לשינויים בפילטר
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
+              if (filterSection) {
+                const isCollapsed = filterSection.classList.contains('collapsed');
+                updateBackgroundPadding(isCollapsed);
+              }
+            }
+          });
+        });
+
+        // התחלת ההאזנה
+        setTimeout(() => {
+          const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
+          if (filterSection) {
+            observer.observe(filterSection, { attributes: true });
+          }
+        }, 1000);
+      }
+    }
+
+    // פונקציות עזר לניהול כל הטבלאות
+    function getTableDisplayName(tableName) {
+      const tableNames = {
+        'accounts': 'חשבון',
+        'tickers': 'טיקר',
+        'trades': 'טרייד',
+        'executions': 'ביצוע',
+        'alerts': 'התראה',
+        'cash_flows': 'תזרים מזומנים',
+        'performance_snapshots': 'צילום ביצועים',
+        'notes': 'הערה',
+        'trade_plans': 'תכנון טרייד',
+        'open_execution_requests': 'בקשת ביצוע'
+      };
+      return tableNames[tableName] || 'רשומה';
+    }
+    
+    function getItemDisplayName(tableName, row) {
+      switch (tableName) {
+        case 'accounts':
+          return row.name || `חשבון ${row.id}`;
+        case 'tickers':
+          return row.symbol || `טיקר ${row.id}`;
+        case 'trades':
+          return `טרייד ${row.id}`;
+        case 'executions':
+          return `ביצוע ${row.id}`;
+        case 'alerts':
+          return `התראה ${row.id}`;
+        case 'cash_flows':
+          return `תזרים ${row.id}`;
+        case 'performance_snapshots':
+          return `צילום ${row.id}`;
+        case 'notes':
+          return row.content ? row.content.substring(0, 30) + '...' : `הערה ${row.id}`;
+        case 'trade_plans':
+          return `תכנון ${row.id}`;
+        case 'open_execution_requests':
+          return `בקשה ${row.id}`;
+        default:
+          return `רשומה ${row.id}`;
+      }
+    }
+    
+    function showEditModal(tableName, row) {
+      // כרגע נשתמש במודל החשבון הקיים, בהמשך נוסיף מודלים לכל הטבלאות
+      if (tableName === 'accounts') {
+        showEditAccountModal(row);
+      } else if (tableName === 'tickers') {
+        showEditTickerModal(row);
+      } else {
+        alert(`עריכת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
+      }
+    }
+    
+    function showAddModal(tableName) {
+      // כרגע נשתמש במודל החשבון הקיים, בהמשך נוסיף מודלים לכל הטבלאות
+      if (tableName === 'accounts') {
+        showAddAccountModal();
+      } else if (tableName === 'tickers') {
+        showAddTickerModal();
+      } else {
+        alert(`הוספת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
+      }
+    }
+    
+    // פונקציות לטיקרים
+    function showAddTickerModal() {
+      document.getElementById('addTickerForm').reset();
+      const modalElement = document.getElementById('addTickerModal');
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+      
+      setTimeout(() => {
+        modalElement.style.zIndex = '9999';
+        modalElement.style.display = 'block';
+        modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        
+        const modalContent = modalElement.querySelector('.modal-content');
+        if (modalContent) {
+          modalContent.style.backgroundColor = 'white';
+          modalContent.style.opacity = '1';
+          modalContent.style.visibility = 'visible';
+        }
+        
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+          backdrop.style.zIndex = '9998';
+        }
+      }, 100);
+    }
+    
+    function showEditTickerModal(ticker) {
+      document.getElementById('editTickerId').value = ticker.id;
+      document.getElementById('editTickerSymbol').value = ticker.symbol;
+      document.getElementById('editTickerType').value = ticker.type || '';
+      document.getElementById('editTickerExchange').value = ticker.exchange || '';
+      
+      const modalElement = document.getElementById('editTickerModal');
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+      
+      setTimeout(() => {
+        modalElement.style.zIndex = '9999';
+        modalElement.style.display = 'block';
+        modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        
+        const modalContent = modalElement.querySelector('.modal-content');
+        if (modalContent) {
+          modalContent.style.backgroundColor = 'white';
+          modalContent.style.opacity = '1';
+          modalContent.style.visibility = 'visible';
+        }
+        
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+          backdrop.style.zIndex = '9998';
+        }
+      }, 100);
+    }
+    
+    async function createTicker() {
+      const symbol = document.getElementById('tickerSymbol').value.trim();
+      const type = document.getElementById('tickerType').value;
+      const exchange = document.getElementById('tickerExchange').value.trim();
+      
+      if (!symbol) {
+        alert('סימבול הוא שדה חובה');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/tickers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            symbol: symbol,
+            type: type,
+            exchange: exchange
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('הטיקר נוסף בהצלחה!');
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addTickerModal'));
+          modal.hide();
+          loadTable('tickers');
+        } else {
+          throw new Error(data.message || 'שגיאה בהוספת הטיקר');
+        }
+      } catch (error) {
+        console.error('שגיאה בהוספת טיקר:', error);
+        alert(`שגיאה בהוספת טיקר: ${error.message}`);
+      }
+    }
+    
+    async function updateTickerFromModal() {
+      const id = document.getElementById('editTickerId').value;
+      const symbol = document.getElementById('editTickerSymbol').value.trim();
+      const type = document.getElementById('editTickerType').value;
+      const exchange = document.getElementById('editTickerExchange').value.trim();
+      
+      if (!symbol) {
+        alert('סימבול הוא שדה חובה');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/tickers/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            symbol: symbol,
+            type: type,
+            exchange: exchange
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('הטיקר עודכן בהצלחה!');
+          const modal = bootstrap.Modal.getInstance(document.getElementById('editTickerModal'));
+          modal.hide();
+          loadTable('tickers');
+        } else {
+          throw new Error(data.message || 'שגיאה בעדכון הטיקר');
+        }
+      } catch (error) {
+        console.error('שגיאה בעדכון טיקר:', error);
+        alert(`שגיאה בעדכון טיקר: ${error.message}`);
+      }
+    }
+    
+    async function deleteTickerFromModal() {
+      const id = document.getElementById('editTickerId').value;
+      const symbol = document.getElementById('editTickerSymbol').value;
+      
+      if (confirm(`האם אתה בטוח שברצונך למחוק את הטיקר "${symbol}"?`)) {
+        try {
+          const response = await fetch(`/api/tickers/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            alert(`הטיקר "${symbol}" נמחק בהצלחה!`);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editTickerModal'));
+            modal.hide();
+            loadTable('tickers');
+          } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'שגיאה במחיקת הטיקר');
+          }
+        } catch (error) {
+          console.error('שגיאה במחיקת טיקר:', error);
+          alert(`שגיאה במחיקת טיקר: ${error.message}`);
+        }
+      }
+    }
+    
+    async function deleteItem(tableName, itemId, itemName) {
+      try {
+        let endpoint = '';
+        switch (tableName) {
+          case 'accounts':
+            endpoint = `/api/accounts/${itemId}`;
+            break;
+          case 'tickers':
+            endpoint = `/api/tickers/${itemId}`;
+            break;
+          case 'trades':
+            endpoint = `/api/trades/${itemId}`;
+            break;
+          case 'executions':
+            endpoint = `/api/executions/${itemId}`;
+            break;
+          case 'alerts':
+            endpoint = `/api/alerts/${itemId}`;
+            break;
+          case 'cash_flows':
+            endpoint = `/api/cash_flows/${itemId}`;
+            break;
+          case 'notes':
+            endpoint = `/api/notes/${itemId}`;
+            break;
+          case 'trade_plans':
+            endpoint = `/api/tradeplans/${itemId}`;
+            break;
+          default:
+            throw new Error(`מחיקת ${getTableDisplayName(tableName)} לא נתמכת עדיין`);
+        }
+        
+        const response = await fetch(endpoint, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          alert(`${getTableDisplayName(tableName)} "${itemName}" נמחק בהצלחה!`);
+          // רענון הטבלה
+          loadTable(tableName);
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `שגיאה במחיקת ${getTableDisplayName(tableName)}`);
+        }
+      } catch (error) {
+        console.error(`שגיאה במחיקת ${getTableDisplayName(tableName)}:`, error);
+        alert(`שגיאה במחיקת ${getTableDisplayName(tableName)}: ${error.message}`);
+      }
+    }
+    
+    // אתחול הדף
+    document.addEventListener('DOMContentLoaded', () => {
+      // הגדרת האזנה לכותרת
+      setupHeaderListener();
+    });
+  </script>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Scripts -->
+  <script src="scripts/app-header.js"></script>
+</body>
+</html>

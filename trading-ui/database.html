@@ -361,6 +361,14 @@
               </select>
             </div>
             <div class="mb-3">
+              <label for="tickerCurrency" class="form-label">מטבע</label>
+              <select class="form-select" id="tickerCurrency">
+                <option value="USD">דולר אמריקאי (USD)</option>
+                <option value="ILS">שקל ישראלי (ILS)</option>
+                <option value="EUR">אירו (EUR)</option>
+              </select>
+            </div>
+            <div class="mb-3">
               <label for="tickerRemarks" class="form-label">הערות</label>
               <textarea class="form-control" id="tickerRemarks" rows="3" placeholder="הערות על הטיקר..."></textarea>
             </div>
@@ -401,6 +409,14 @@
                 <option value="bond">אג"ח</option>
                 <option value="crypto">קריפטו</option>
                 <option value="forex">מט"ח</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editTickerCurrency" class="form-label">מטבע</label>
+              <select class="form-select" id="editTickerCurrency">
+                <option value="USD">דולר אמריקאי (USD)</option>
+                <option value="ILS">שקל ישראלי (ILS)</option>
+                <option value="EUR">אירו (EUR)</option>
               </select>
             </div>
             <div class="mb-3">
@@ -963,7 +979,7 @@
         if (tableName === 'accounts') {
           columns = ['id', 'name', 'currency', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'];
         } else if (tableName === 'tickers') {
-          columns = ['id', 'symbol', 'type', 'active_trades', 'remarks'];
+          columns = ['id', 'symbol', 'name', 'type', 'remarks', 'currency', 'active_trades'];
         } else if (tableName === 'trades') {
           columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'investment_type', 'created_at', 'closed_at', 'cancelled_at', 'total_pl', 'notes'];
         } else if (tableName === 'executions') {
@@ -1027,7 +1043,7 @@
         if (tableName === 'accounts') {
           columns = ['id', 'name', 'currency', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'];
         } else if (tableName === 'tickers') {
-          columns = ['id', 'symbol', 'type', 'active_trades', 'remarks'];
+          columns = ['id', 'symbol', 'name', 'type', 'remarks', 'currency', 'active_trades'];
         } else if (tableName === 'trades') {
           columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'investment_type', 'opened_at', 'closed_at', 'total_pl', 'notes'];
         } else if (tableName === 'executions') {
@@ -1058,13 +1074,17 @@
             td.className = 'json-cell';
             td.textContent = JSON.stringify(value);
             td.title = 'לחץ להרחבה';
-          } else if (typeof value === 'boolean') {
-            td.textContent = value ? 'כן' : 'לא';
-            td.style.color = value ? 'var(--apple-green)' : 'var(--apple-red)';
+          } else if (typeof value === 'boolean' || (typeof value === 'number' && (value === 0 || value === 1))) {
+            // טיפול ב-boolean וגם במספרים 0/1
+            const boolValue = value === true || value === 1;
+            td.textContent = boolValue ? 'כן' : 'לא';
+            td.style.color = boolValue ? 'var(--apple-green)' : 'var(--apple-red)';
             td.style.fontWeight = '500';
           } else if (key === 'active_trades') {
-            td.textContent = value ? 'פעיל' : 'לא פעיל';
-            td.style.color = value ? 'var(--apple-green)' : 'var(--apple-red)';
+            // המרת מספר ל-boolean
+            const isActive = value === 1 || value === true;
+            td.textContent = isActive ? 'פעיל' : 'לא פעיל';
+            td.style.color = isActive ? 'var(--apple-green)' : 'var(--apple-red)';
             td.style.fontWeight = '500';
           } else if (key === 'status') {
             // המרת סטטוסים לעברית
@@ -1127,6 +1147,29 @@
             
             td.textContent = investmentTypeText;
             td.style.color = investmentTypeColor;
+            td.style.fontWeight = '500';
+          } else if (key === 'currency') {
+            // הצגת מטבע עם אייקון
+            let currencyText = value;
+            let currencyColor = 'var(--apple-text-primary)';
+            
+            switch (value) {
+              case 'USD':
+                currencyText = '💵 USD';
+                currencyColor = 'var(--apple-green)';
+                break;
+              case 'ILS':
+                currencyText = '₪ ILS';
+                currencyColor = 'var(--apple-blue)';
+                break;
+              case 'EUR':
+                currencyText = '€ EUR';
+                currencyColor = 'var(--apple-orange)';
+                break;
+            }
+            
+            td.textContent = currencyText;
+            td.style.color = currencyColor;
             td.style.fontWeight = '500';
           } else if (typeof value === 'number') {
             // סגנון מיוחד למזהה
@@ -1935,6 +1978,7 @@
       document.getElementById('editTickerId').value = ticker.id;
       document.getElementById('editTickerSymbol').value = ticker.symbol;
       document.getElementById('editTickerType').value = ticker.type || '';
+      document.getElementById('editTickerCurrency').value = ticker.currency || 'USD';
       document.getElementById('editTickerRemarks').value = ticker.remarks || '';
       
       const modalElement = document.getElementById('editTickerModal');
@@ -1963,6 +2007,7 @@
     async function createTicker() {
       const symbol = document.getElementById('tickerSymbol').value.trim();
       const type = document.getElementById('tickerType').value;
+      const currency = document.getElementById('tickerCurrency').value;
       const remarks = document.getElementById('tickerRemarks').value.trim();
       
       if (!symbol) {
@@ -1986,6 +2031,7 @@
           body: JSON.stringify({
             symbol: symbol,
             type: type,
+            currency: currency,
             remarks: remarks
           })
         });
@@ -2010,6 +2056,7 @@
       const id = document.getElementById('editTickerId').value;
       const symbol = document.getElementById('editTickerSymbol').value.trim();
       const type = document.getElementById('editTickerType').value;
+      const currency = document.getElementById('editTickerCurrency').value;
       const remarks = document.getElementById('editTickerRemarks').value.trim();
       
       if (!symbol) {
@@ -2033,6 +2080,7 @@
           body: JSON.stringify({
             symbol: symbol,
             type: type,
+            currency: currency,
             remarks: remarks
           })
         });

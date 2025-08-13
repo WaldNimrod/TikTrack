@@ -610,6 +610,37 @@ h1 {
   transition: opacity 0.3s ease;
 }
 
+/* אנימציה לסגירת החלק העליון */
+#topSection {
+  transition: height 0.3s ease;
+  overflow: hidden;
+}
+
+#topSection.collapsed {
+  height: 120px;
+}
+
+#topSection.collapsed #statsGrid {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#statsGrid {
+  transition: opacity 0.3s ease;
+}
+
+/* מיקום כפתור החלק העליון */
+#topSection .page-header {
+  position: relative;
+}
+
+#topSection .filter-toggle-btn {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;

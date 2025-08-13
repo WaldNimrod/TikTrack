@@ -45,7 +45,7 @@ def health_check():
 
 # נתיב יחסי לקובץ DB
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade.db")
+DB_PATH = os.path.join(BASE_DIR, "simpleTrade.db")
 
 # נתיב לקבצי ה-UI
 UI_DIR = "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui"
@@ -737,9 +737,38 @@ def get_stats():
         conn.close()
         return jsonify({"status": "error", "message": str(e)}), 400
 
-# API endpoints לכל הטבלאות
-@app.route("/api/database/<table_name>")
-def get_table_data(table_name):
+
+# API חדש לטבלאות בסיס הנתונים - בדיקה
+@app.route("/api/test_tickers")
+def test_tickers():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        query = """
+        SELECT 
+            id,
+            symbol,
+            type,
+            remarks,
+            currency,
+            active_trades
+        FROM tickers
+        ORDER BY symbol
+        """
+        
+        cursor.execute(query)
+        rows = [dict(row) for row in cursor.fetchall()]
+        
+        conn.close()
+        return jsonify(rows)
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/database_v2/<table_name>")
+def get_table_data_v2(table_name):
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -755,7 +784,19 @@ def get_table_data(table_name):
             return jsonify({"error": "טבלה לא מורשית"}), 400
         
         # שאילתות מיוחדות לטבלאות עם קשרים
-        if table_name == 'trade_plans':
+        if table_name == 'tickers':
+            query = """
+            SELECT 
+                id,
+                symbol,
+                type,
+                remarks,
+                currency,
+                active_trades
+            FROM tickers
+            ORDER BY symbol
+            """
+        elif table_name == 'trade_plans':
             query = """
             SELECT 
                 tp.*,
@@ -775,7 +816,7 @@ def get_table_data(table_name):
             FROM trades tr
             LEFT JOIN tickers t ON tr.ticker_id = t.id
             LEFT JOIN accounts a ON tr.account_id = a.id
-            ORDER BY tr.opened_at DESC
+            ORDER BY tr.created_at DESC
             """
         elif table_name == 'executions':
             query = """
@@ -803,7 +844,7 @@ def get_table_data(table_name):
             SELECT 
                 oer.*,
                 tr.status as trade_status,
-                tr.opened_at as trade_opened_at
+                tr.created_at as trade_created_at
             FROM open_execution_requests oer
             LEFT JOIN trades tr ON oer.trade_id = tr.id
             ORDER BY oer.created_at DESC
@@ -1282,6 +1323,96 @@ def delete_alert(alert_id):
         return jsonify({"status": "error", "message": str(e)}), 400
 
 # API לטיקרים
+@app.route("/api/tickers/<int:ticker_id>", methods=["GET"])
+def get_ticker(ticker_id):
+    """קבלת טיקר בודד לפי מזהה"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT * FROM tickers WHERE id = ?", (ticker_id,))
+        ticker = cursor.fetchone()
+        
+        if not ticker:
+            conn.close()
+            return jsonify({"status": "error", "message": "טיקר לא נמצא"}), 404
+        
+        ticker_dict = dict(ticker)
+        conn.close()
+        return jsonify(ticker_dict)
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/tickers/<int:ticker_id>/info", methods=["GET"])
+def get_ticker_info(ticker_id):
+    """קבלת מידע על טיקר לפי מזהה - סימבול ומטבע"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT id, symbol, currency FROM tickers WHERE id = ?", (ticker_id,))
+        ticker = cursor.fetchone()
+        
+        if not ticker:
+            conn.close()
+            return jsonify({"status": "error", "message": "טיקר לא נמצא"}), 404
+        
+        ticker_info = {
+            "id": ticker['id'],
+            "symbol": ticker['symbol'],
+            "currency": ticker['currency']
+        }
+        conn.close()
+        return jsonify(ticker_info)
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/tickers/symbol/<symbol>", methods=["GET"])
+def get_ticker_by_symbol(symbol):
+    """קבלת מידע על טיקר לפי סימבול - סימבול ומטבע"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT id, symbol, currency FROM tickers WHERE symbol = ?", (symbol,))
+        ticker = cursor.fetchone()
+        
+        if not ticker:
+            conn.close()
+            return jsonify({"status": "error", "message": "טיקר לא נמצא"}), 404
+        
+        ticker_info = {
+            "id": ticker['id'],
+            "symbol": ticker['symbol'],
+            "currency": ticker['currency']
+        }
+        conn.close()
+        return jsonify(ticker_info)
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/tickers", methods=["GET"])
+def get_tickers():
+    """קבלת כל הטיקרים"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT * FROM tickers ORDER BY symbol")
+        tickers = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(tickers)
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route("/api/tickers", methods=["POST"])
 def create_ticker():
     conn = get_db_connection()
@@ -1310,8 +1441,8 @@ def create_ticker():
         
         # הוספת הטיקר
         cursor.execute(
-            "INSERT INTO tickers (symbol, type, remarks) VALUES (?, ?, ?)",
-            (data['symbol'], data.get('type'), data.get('remarks'))
+            "INSERT INTO tickers (symbol, type, currency, remarks) VALUES (?, ?, ?, ?)",
+            (data['symbol'], data.get('type'), data.get('currency', 'USD'), data.get('remarks'))
         )
         conn.commit()
         
@@ -1357,6 +1488,10 @@ def update_ticker(ticker_id):
         if 'type' in data:
             update_fields.append("type = ?")
             params.append(data['type'])
+        
+        if 'currency' in data:
+            update_fields.append("currency = ?")
+            params.append(data['currency'])
         
         if 'remarks' in data:
             update_fields.append("remarks = ?")

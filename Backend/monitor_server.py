@@ -33,7 +33,7 @@ class ServerMonitor:
     def check_server_health(self):
         """בודק אם השרת עובד"""
         try:
-            response = requests.get("http://127.0.0.1:5002/api/health", timeout=5)
+            response = requests.get("http://127.0.0.1:8080/api/health", timeout=5)
             return response.status_code == 200
         except:
             return False
@@ -68,7 +68,7 @@ class ServerMonitor:
     def monitor(self):
         """הלולאה הראשית של המנטור"""
         print("🔍 TikTrack Server Monitor Started")
-        print("📍 Monitoring server at http://127.0.0.1:5002")
+        print("📍 Monitoring server at http://127.0.0.1:8080")
         print("🔄 Auto-restart enabled")
         print("-" * 50)
         

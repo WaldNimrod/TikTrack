@@ -1,0 +1,46 @@
+{
+    "python.defaultInterpreterPath": "./.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.extraPaths": ["./Backend"],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "cursorpyright.analysis.extraPaths": [
+        "./Backend"
+    ],
+    "git.autofetch": false,
+    "search.followSymlinks": false,
+    "typescript.tsserver.maxTsServerMemory": 4096,
+    "editor.codeActionsOnSave": { 
+        "source.organizeImports": false, 
+        "source.fixAll.eslint": false 
+    },
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.git/**": true,
+        "**/dist/**": true,
+        "**/build/**": true,
+        "**/.venv/**": true,
+        "**/__pycache__/**": true
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/node_modules": true,
+        "**/.venv": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/.venv": true,
+        "**/__pycache__": true
+    },
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false,
+    "python.analysis.typeCheckingMode": "basic",
+    "files.autoSave": "off"
+}

@@ -56,7 +56,7 @@ def main():
         sys.exit(1)
     
     print("✅ כל הבדיקות עברו בהצלחה")
-    print("🌐 השרת זמין בכתובת: http://127.0.0.1:5002")
+    print("🌐 השרת זמין בכתובת: http://127.0.0.1:8080")
     print("⏹️  לחץ Ctrl+C לסגירה")
     
     try:
@@ -64,7 +64,7 @@ def main():
         app.run(
             debug=False,
             host='127.0.0.1',
-            port=5002,
+            port=8080,
             threaded=True,
             use_reloader=False
         )

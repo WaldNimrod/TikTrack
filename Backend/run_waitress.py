@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 def main():
     print("🚀 Starting TikTrack with Waitress Server...")
-    print("📍 Server will run on: http://127.0.0.1:5002")
+    print("📍 Server will run on: http://127.0.0.1:8080")
     print("⚡ Waitress is more stable than Flask development server")
     print("📝 Detailed logs will be saved to server_detailed.log")
     print("🛑 Press Ctrl+C to stop the server")
@@ -53,7 +53,7 @@ def main():
         serve(
             app, 
             host="127.0.0.1", 
-            port=5002, 
+            port=8080, 
             threads=8,  # הגדלת מספר threads
             connection_limit=500,  # הקטנת connection limit
             cleanup_interval=10,  # הקטנת cleanup interval

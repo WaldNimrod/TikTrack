@@ -45,7 +45,7 @@ def health_check():
 
 # נתיב יחסי לקובץ DB
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "simpleTrade.db")
+DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade.db")
 
 # נתיב לקבצי ה-UI
 UI_DIR = "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui"
@@ -720,7 +720,7 @@ def get_stats():
         total_pl_result = cursor.fetchone()
         total_pl = total_pl_result['total_pl'] or 0
         
-        cursor.execute("SELECT COUNT(*) as total_alerts FROM alerts WHERE status = 'פעיל'")
+        cursor.execute("SELECT COUNT(*) as total_alerts FROM alerts WHERE status = 'active'")
         active_alerts = cursor.fetchone()['total_alerts']
         
         stats = {
@@ -816,18 +816,23 @@ def get_table_data_v2(table_name):
             FROM trades tr
             LEFT JOIN tickers t ON tr.ticker_id = t.id
             LEFT JOIN accounts a ON tr.account_id = a.id
-            ORDER BY tr.created_at DESC
+            ORDER BY tr.opened_at DESC
             """
         elif table_name == 'executions':
             query = """
             SELECT 
                 e.*,
-                t.symbol as ticker_symbol
+                tr.status as trade_status,
+                tr.type as trade_type,
+                t.symbol as ticker_symbol,
+                a.name as account_name
             FROM executions e
             LEFT JOIN trades tr ON e.trade_id = tr.id
             LEFT JOIN tickers t ON tr.ticker_id = t.id
+            LEFT JOIN accounts a ON tr.account_id = a.id
             ORDER BY e.date DESC
             """
+
         elif table_name == 'alerts':
             query = """
             SELECT 
@@ -1652,120 +1657,7 @@ def update_all_tickers_active():
         return jsonify({"status": "error", "message": str(e)}), 400
 
 # API לטרנזקציות
-@app.route("/api/executions", methods=["POST"])
-def create_execution():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        data = request.get_json()
-        
-        # בדיקת שדות חובה
-        if not data.get('trade_id') or not data.get('action') or not data.get('quantity') or not data.get('price'):
-            return jsonify({"status": "error", "message": "מזהה טרייד, פעולה, כמות ומחיר הם שדות חובה"}), 400
-        
-        # הוספת הטרנזקציה
-        cursor.execute(
-            "INSERT INTO executions (trade_id, action, date, quantity, price, fee, source) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (data['trade_id'], data['action'], data.get('date'), data['quantity'], data['price'], data.get('fee'), data.get('source'))
-        )
-        conn.commit()
-        
-        # החזרת הטרנזקציה החדשה
-        new_execution_id = cursor.lastrowid
-        cursor.execute("SELECT * FROM executions WHERE id = ?", (new_execution_id,))
-        new_execution = dict(cursor.fetchone())
-        
-        conn.close()
-        return jsonify({"status": "success", "execution": new_execution}), 201
-        
-    except Exception as e:
-        conn.close()
-        return jsonify({"status": "error", "message": str(e)}), 400
 
-@app.route("/api/executions/<int:execution_id>", methods=["PUT"])
-def update_execution(execution_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        data = request.get_json()
-        
-        # בדיקה אם הטרנזקציה קיימת
-        cursor.execute("SELECT * FROM executions WHERE id = ?", (execution_id,))
-        if not cursor.fetchone():
-            return jsonify({"status": "error", "message": "טרנזקציה לא נמצאה"}), 404
-        
-        # עדכון הטרנזקציה
-        update_fields = []
-        params = []
-        
-        if 'trade_id' in data:
-            update_fields.append("trade_id = ?")
-            params.append(data['trade_id'])
-        
-        if 'action' in data:
-            update_fields.append("action = ?")
-            params.append(data['action'])
-        
-        if 'date' in data:
-            update_fields.append("date = ?")
-            params.append(data['date'])
-        
-        if 'quantity' in data:
-            update_fields.append("quantity = ?")
-            params.append(data['quantity'])
-        
-        if 'price' in data:
-            update_fields.append("price = ?")
-            params.append(data['price'])
-        
-        if 'fee' in data:
-            update_fields.append("fee = ?")
-            params.append(data['fee'])
-        
-        if 'source' in data:
-            update_fields.append("source = ?")
-            params.append(data['source'])
-        
-        if update_fields:
-            params.append(execution_id)
-            query = f"UPDATE executions SET {', '.join(update_fields)} WHERE id = ?"
-            cursor.execute(query, params)
-            conn.commit()
-        
-        # החזרת הטרנזקציה המעודכנת
-        cursor.execute("SELECT * FROM executions WHERE id = ?", (execution_id,))
-        updated_execution = dict(cursor.fetchone())
-        
-        conn.close()
-        return jsonify({"status": "success", "execution": updated_execution})
-        
-    except Exception as e:
-        conn.close()
-        return jsonify({"status": "error", "message": str(e)}), 400
-
-@app.route("/api/executions/<int:execution_id>", methods=["DELETE"])
-def delete_execution(execution_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        # בדיקה אם הטרנזקציה קיימת
-        cursor.execute("SELECT * FROM executions WHERE id = ?", (execution_id,))
-        if not cursor.fetchone():
-            return jsonify({"status": "error", "message": "טרנזקציה לא נמצאה"}), 404
-        
-        # מחיקת הטרנזקציה
-        cursor.execute("DELETE FROM executions WHERE id = ?", (execution_id,))
-        conn.commit()
-        
-        conn.close()
-        return jsonify({"status": "success", "message": "טרנזקציה נמחקה בהצלחה"})
-        
-    except Exception as e:
-        conn.close()
-        return jsonify({"status": "error", "message": str(e)}), 400
 
 # API לתזרים מזומנים
 @app.route("/api/cash_flows", methods=["POST"])
@@ -1987,12 +1879,142 @@ def delete_note(note_id):
         conn.close()
         return jsonify({"status": "error", "message": str(e)}), 400
 
+# ===== API ENDPOINTS FOR EXECUTIONS =====
+
+@app.route("/api/executions", methods=["POST"])
+def create_execution():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        data = request.get_json()
+        
+        # בדיקת שדות חובה
+        required_fields = ['trade_id', 'action', 'date', 'quantity', 'price']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"status": "error", "message": f"שדה {field} הוא חובה"}), 400
+        
+        # הכנסת הביצוע החדש
+        query = """
+        INSERT INTO executions (trade_id, action, date, quantity, price, fee, source)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """
+        
+        cursor.execute(query, (
+            data['trade_id'],
+            data['action'],
+            data['date'],
+            data['quantity'],
+            data['price'],
+            data.get('fee', 0),
+            data.get('source', 'manual')
+        ))
+        
+        conn.commit()
+        
+        # החזרת הביצוע החדש
+        new_execution_id = cursor.lastrowid
+        cursor.execute("SELECT * FROM executions WHERE id = ?", (new_execution_id,))
+        new_execution = dict(cursor.fetchone())
+        
+        conn.close()
+        return jsonify({"status": "success", "execution": new_execution}), 201
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 400
+
+@app.route("/api/executions/<int:execution_id>", methods=["PUT"])
+def update_execution(execution_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        data = request.get_json()
+        
+        # בדיקה אם הביצוע קיים
+        cursor.execute("SELECT * FROM executions WHERE id = ?", (execution_id,))
+        if not cursor.fetchone():
+            return jsonify({"status": "error", "message": "ביצוע לא נמצא"}), 404
+        
+        # עדכון הביצוע
+        update_fields = []
+        params = []
+        
+        if 'trade_id' in data:
+            update_fields.append("trade_id = ?")
+            params.append(data['trade_id'])
+        
+        if 'action' in data:
+            update_fields.append("action = ?")
+            params.append(data['action'])
+        
+        if 'date' in data:
+            update_fields.append("date = ?")
+            params.append(data['date'])
+        
+        if 'quantity' in data:
+            update_fields.append("quantity = ?")
+            params.append(data['quantity'])
+        
+        if 'price' in data:
+            update_fields.append("price = ?")
+            params.append(data['price'])
+        
+        if 'fee' in data:
+            update_fields.append("fee = ?")
+            params.append(data['fee'])
+        
+        if 'source' in data:
+            update_fields.append("source = ?")
+            params.append(data['source'])
+        
+        if update_fields:
+            params.append(execution_id)
+            query = f"UPDATE executions SET {', '.join(update_fields)} WHERE id = ?"
+            cursor.execute(query, params)
+            conn.commit()
+        
+        # החזרת הביצוע המעודכן
+        cursor.execute("SELECT * FROM executions WHERE id = ?", (execution_id,))
+        updated_execution = dict(cursor.fetchone())
+        
+        conn.close()
+        return jsonify({"status": "success", "execution": updated_execution})
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 400
+
+@app.route("/api/executions/<int:execution_id>", methods=["DELETE"])
+def delete_execution(execution_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # בדיקה אם הביצוע קיים
+        cursor.execute("SELECT * FROM executions WHERE id = ?", (execution_id,))
+        if not cursor.fetchone():
+            return jsonify({"status": "error", "message": "ביצוע לא נמצא"}), 404
+        
+        # מחיקת הביצוע
+        cursor.execute("DELETE FROM executions WHERE id = ?", (execution_id,))
+        conn.commit()
+        
+        conn.close()
+        return jsonify({"status": "success", "message": "ביצוע נמחק בהצלחה"})
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 400
+
 if __name__ == "__main__":
     # הגדרות יציבות לשרת
     app.run(
         debug=False,  # כיבוי debug mode למניעת רילוד אוטומטי
         host='127.0.0.1',  # הגדרת host ספציפי
-        port=5002,
+        port=8080,
         threaded=True,  # תמיכה ב-multiple threads
         use_reloader=False  # כיבוי reloader למניעת רילוד אוטומטי
     )

@@ -59,16 +59,28 @@ python3 run_waitress.py
 ./stop_server.sh
 ```
 
-השרת יפעל על `http://127.0.0.1:5002`
+#### הפעלה אוטומטית אחרי אתחול המחשב
+```bash
+# הגדרת הפעלה אוטומטית
+./setup_autostart.sh
+
+# ביטול הפעלה אוטומטית
+./disable_autostart.sh
+
+# בדיקת סטטוס הפעלה אוטומטית
+./check_autostart.sh
+```
+
+השרת יפעל על `http://127.0.0.1:8080`
 
 ### בדיקת השרת
 
 ```bash
 # בדיקת בריאות השרת
-curl http://127.0.0.1:5002/api/health
+curl http://127.0.0.1:8080/api/health
 
 # בדיקת סטטיסטיקות
-curl http://127.0.0.1:5002/api/stats
+curl http://127.0.0.1:8080/api/stats
 ```
 
 אם השרת פועל כראוי, תקבל תשובה כמו:

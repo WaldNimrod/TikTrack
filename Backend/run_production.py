@@ -14,7 +14,7 @@ def main():
     # הגדרות Gunicorn
     gunicorn_config = [
         "gunicorn",
-        "--bind", "127.0.0.1:5002",
+        "--bind", "127.0.0.1:8080",
         "--workers", "2",  # מספר workers
         "--timeout", "30",  # timeout ארוך
         "--keep-alive", "5",  # keep-alive

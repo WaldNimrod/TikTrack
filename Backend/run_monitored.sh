@@ -3,7 +3,7 @@
 # מפעיל את השרת עם מנטור אוטומטי
 
 echo "🚀 Starting TikTrack with Auto-Monitoring..."
-echo "📍 Server will run on: http://127.0.0.1:5002"
+echo "📍 Server will run on: http://127.0.0.1:8080"
 echo "🔍 Auto-restart enabled if server crashes"
 echo "⚡ Using caffeinate to prevent sleep"
 echo "🛑 Press Ctrl+C to stop the server"

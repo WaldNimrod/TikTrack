@@ -1,23 +1,3 @@
-"""
-TikTrack Backend Server - Flask API
-===================================
-
-⚠️  שרת יציב - אין לשנות!
-==========================
-- פורט: 5002
-- קובץ: app.py
-- סטטוס: יציב ופעיל
-- תאריך עדכון אחרון: 2025-08-15
-
-שינויים אחרונים:
-- הוספת טבלאות חדשות לבסיס הנתונים
-- שיפור יציבות חיבור SQLite
-- הוספת endpoints לטבלאות חדשות
-- שיפור טיפול בשגיאות
-
-⚠️  חשוב: אין לעבור לשרת app_new.py!
-"""
-
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import sqlite3
@@ -416,18 +396,6 @@ def update_trade_plan(plan_id):
             update_fields.append("reasons = ?")
             params.append(data['reasons'])
         
-        if 'status' in data:
-            update_fields.append("status = ?")
-            params.append(data['status'])
-            
-            # אם הסטטוס הוא 'delete', נקבע גם canceled_at
-            if data['status'] == 'delete':
-                update_fields.append("canceled_at = ?")
-                params.append(datetime.now().isoformat())
-            elif data['status'] == 'open' and 'canceled_at' in update_fields:
-                # אם הסטטוס חזר ל'open', נמחק את canceled_at
-                update_fields.append("canceled_at = NULL")
-        
         if update_fields:
             params.append(plan_id)
             query = f"UPDATE trade_plans SET {', '.join(update_fields)} WHERE id = ?"
@@ -439,47 +407,6 @@ def update_trade_plan(plan_id):
             update_ticker_active_status(ticker_id)
             
             conn.commit()
-        
-        # החזרת תכנון הטרייד המעודכן
-        cursor.execute("SELECT * FROM trade_plans WHERE id = ?", (plan_id,))
-        updated_plan = dict(cursor.fetchone())
-        
-        conn.close()
-        return jsonify({"status": "success", "plan": updated_plan})
-        
-    except Exception as e:
-        conn.close()
-        return jsonify({"status": "error", "message": str(e)}), 400
-
-@app.route("/api/tradeplans/<int:plan_id>/status", methods=["PUT"])
-def update_trade_plan_status(plan_id):
-    """עדכון סטטוס תכנון טרייד"""
-    data = request.get_json()
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        # בדיקה אם תכנון הטרייד קיים
-        cursor.execute("SELECT * FROM trade_plans WHERE id = ?", (plan_id,))
-        if not cursor.fetchone():
-            return jsonify({"status": "error", "message": "תכנון טרייד לא נמצא"}), 404
-        
-        new_status = data.get('status')
-        if new_status not in ['open', 'close', 'cancelled']:
-            return jsonify({"status": "error", "message": "סטטוס לא חוקי. ערכים מותרים: open, close, cancelled"}), 400
-        
-        # עדכון הסטטוס
-        if new_status == 'cancelled':
-            cursor.execute("UPDATE trade_plans SET status = ?, canceled_at = ? WHERE id = ?", 
-                         (new_status, datetime.now().isoformat(), plan_id))
-        elif new_status == 'open':
-            cursor.execute("UPDATE trade_plans SET status = ?, canceled_at = NULL WHERE id = ?", 
-                         (new_status, plan_id))
-        else:  # close
-            cursor.execute("UPDATE trade_plans SET status = ? WHERE id = ?", 
-                         (new_status, plan_id))
-        
-        conn.commit()
         
         # החזרת תכנון הטרייד המעודכן
         cursor.execute("SELECT * FROM trade_plans WHERE id = ?", (plan_id,))
@@ -872,19 +799,7 @@ def get_table_data_v2(table_name):
         elif table_name == 'trade_plans':
             query = """
             SELECT 
-                tp.id,
-                tp.account_id,
-                tp.ticker_id,
-                tp.investment_type,
-                tp.planned_amount,
-                tp.entry_conditions,
-                tp.stop_price,
-                tp.target_price,
-                tp.reasons,
-                tp.created_at,
-                tp.canceled_at,
-                tp.cancel_reason,
-                tp.status,
+                tp.*,
                 t.symbol as ticker_symbol,
                 a.name as account_name
             FROM trade_plans tp
@@ -964,7 +879,6 @@ def get_table_data_v2(table_name):
             LEFT JOIN tickers t ON tr.ticker_id = t.id
             ORDER BY n.created_at DESC
             """
-
         else:
             # שאילתה רגילה לטבלאות אחרות
             query = f"SELECT * FROM {table_name}"
@@ -1255,12 +1169,13 @@ def get_alerts():
         cursor.execute("""
             SELECT 
                 a.id,
-                a.alert_type as type,
-                a.condition as description,
-                a.status,
-                a.created_at,
+                a.type,
+                a.condition,
+                a.message,
+                a.is_active,
                 a.triggered_at,
-                t.symbol as ticker,
+                a.created_at,
+                t.symbol as ticker_symbol,
                 acc.name as account_name
             FROM alerts a
             LEFT JOIN tickers t ON a.ticker_id = t.id
@@ -1273,12 +1188,9 @@ def get_alerts():
         
         for row in rows:
             alert = dict(row)
-            # יצירת כותרת מהטיקר והסוג
-            ticker_symbol = alert.get('ticker', 'UNKNOWN')
-            alert['title'] = f"{ticker_symbol} - {alert['type']}"
-            # הוספת עדיפות ברירת מחדל
+            # הוספת שדות נוספים
+            alert['status'] = 'פעיל' if alert.get('is_active') else 'לא פעיל'
             alert['priority'] = 'בינונית'
-            # הוספת שדה updated_at
             alert['updated_at'] = alert['created_at']
             
             alerts.append(alert)
@@ -1305,14 +1217,15 @@ def create_alert():
         
         # הכנסת התראה חדשה
         cursor.execute("""
-            INSERT INTO alerts (account_id, ticker_id, alert_type, condition, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO alerts (account_id, ticker_id, type, condition, message, is_active, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (
             data.get('account_id'),
             data.get('ticker_id'),
-            data.get('alert_type', 'price'),
+            data.get('type', 'price'),
             data['condition'],
-            data.get('status', 'active'),
+            data.get('message', ''),
+            True,
             datetime.now().isoformat()
         ))
         
@@ -1356,9 +1269,9 @@ def update_alert(alert_id):
             update_fields.append("ticker_id = ?")
             params.append(data['ticker_id'])
         
-        if 'alert_type' in data:
-            update_fields.append("alert_type = ?")
-            params.append(data['alert_type'])
+        if 'type' in data:
+            update_fields.append("type = ?")
+            params.append(data['type'])
         
         if 'condition' in data:
             update_fields.append("condition = ?")
@@ -1688,9 +1601,9 @@ def delete_ticker(ticker_id):
         
         # בדיקה אם יש התראות פעילות המקושרות לטיקר זה
         cursor.execute("""
-            SELECT id, alert_type, condition, status, created_at 
+            SELECT id, type, condition, is_active, created_at 
             FROM alerts 
-            WHERE ticker_id = ? AND status IN ('active', 'פעיל')
+            WHERE ticker_id = ? AND is_active = 1
         """, (ticker_id,))
         linked_alerts = cursor.fetchall()
         
@@ -1700,13 +1613,13 @@ def delete_ticker(ticker_id):
             # יש התראות פעילות מקושרות - מחזיר שגיאה עם פרטי ההתראות
             alerts_info = []
             for alert in linked_alerts:
-                alerts_info.append({
-                    'id': alert['id'],
-                    'alert_type': alert['alert_type'],
-                    'condition': alert['condition'],
-                    'status': alert['status'],
-                    'created_at': alert['created_at']
-                })
+                            alerts_info.append({
+                'id': alert['id'],
+                'type': alert['type'],
+                'condition': alert['condition'],
+                'is_active': alert['is_active'],
+                'created_at': alert['created_at']
+            })
             
             print(f"DEBUG: מחזיר שגיאה - יש {len(alerts_info)} התראות פעילות מקושרות")
             return jsonify({

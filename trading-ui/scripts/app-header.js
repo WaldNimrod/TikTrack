@@ -1,3 +1,23 @@
+/*
+TikTrack App Header Web Component
+=================================
+
+⚠️  רכיב כותרת מרכזי - יציב ופעיל
+==================================
+- קובץ: app-header.js
+- סטטוס: יציב ופעיל
+- תאריך עדכון אחרון: 2025-08-15
+
+שינויים אחרונים:
+- הוספת פילטרים מתקדמים (חשבונות, תאריכים, סטטוס, סוג)
+- שיפור עיצוב תפריט ראשי
+- הוספת אנימציות hover
+- שיפור חוויית משתמש
+
+⚠️  חשוב: רכיב זה משמש בכל הדפים!
+==================================
+*/
+
 // Web Component עבור כותרת האתר
 class AppHeader extends HTMLElement {
   constructor() {
@@ -43,7 +63,7 @@ class AppHeader extends HTMLElement {
         .header-container {
           max-width: 1400px;
           margin: 0 auto;
-          padding: 0 15px;
+          padding: 5px 15px;
         }
 
         .header-wrapper {
@@ -81,8 +101,10 @@ class AppHeader extends HTMLElement {
         }
 
         .nav-item.active {
-          background-color: #29a6a8;
-          color: white;
+          background-color: transparent;
+          color: #29a6a8;
+          border: 2px solid #29a6a8;
+          box-shadow: 0 2px 8px rgba(41, 166, 168, 0.2);
         }
 
         .nav-icon {
@@ -309,6 +331,98 @@ class AppHeader extends HTMLElement {
           background-color: #f0f8f8;
         }
 
+        /* Status Filter Menu */
+        .status-filter-menu {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          background: white;
+          border: 1px solid #e8e8e8;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          min-width: 150px;
+          z-index: 1001;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-10px);
+          transition: all 0.2s ease;
+          margin-top: 5px;
+        }
+
+        .status-filter-menu.show {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+        }
+
+        .status-filter-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 16px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+        }
+
+        .status-filter-item:hover {
+          background-color: #f8f9fa;
+        }
+
+        .status-filter-item.selected {
+          background-color: #e8f5e8;
+          color: #2e7d32;
+          border-left: 3px solid #29a6a8;
+        }
+
+        /* Type Filter Menu */
+        .type-filter-menu {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          background: white;
+          border: 1px solid #e8e8e8;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          min-width: 150px;
+          z-index: 1001;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-10px);
+          transition: all 0.2s ease;
+          margin-top: 5px;
+        }
+
+        .type-filter-menu.show {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+        }
+
+        .type-filter-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 16px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+        }
+
+        .type-filter-item:hover {
+          background-color: #f8f9fa;
+        }
+
+        .type-filter-item.selected {
+          background-color: #e8f5e8;
+          color: #2e7d32;
+          border-left: 3px solid #29a6a8;
+        }
+
+        .type-filter-item.selected .check-mark {
+          opacity: 1;
+        }
+
         /* Account Filter Styles */
         .account-filter-container {
           position: relative;
@@ -339,6 +453,54 @@ class AppHeader extends HTMLElement {
         .account-filter-toggle.active {
           border-color: #29a6a8;
           background-color: #f0f8f8;
+        }
+
+        /* Account Filter Menu */
+        .account-filter-menu {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          background: white;
+          border: 1px solid #e8e8e8;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          min-width: 150px;
+          z-index: 1001;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-10px);
+          transition: all 0.2s ease;
+          margin-top: 5px;
+        }
+
+        .account-filter-menu.show {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+        }
+
+        .account-filter-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 16px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+        }
+
+        .account-filter-item:hover {
+          background-color: #f8f9fa;
+        }
+
+        .account-filter-item.selected {
+          background-color: #e8f5e8;
+          color: #2e7d32;
+          border-left: 3px solid #29a6a8;
+        }
+
+        .account-filter-item.selected .check-mark {
+          opacity: 1;
         }
 
         .selected-status-text {

@@ -13,17 +13,30 @@
 ## מבנה הפרויקט
 
 ```
-SimpleTradeApp/
+TikTrackApp/
 ├── Backend/
-│   ├── app.py              # Flask API
-│   └── db/
-│       └── simpleTrade.db  # בסיס נתונים SQLite
-└── trading-ui/
-    └── mockups/
-        ├── planning.html   # עמוד תכנון טריידים
-        ├── tracking.html   # עמוד מעקב טריידים
-        ├── main.js         # JavaScript ראשי
-        └── apple-theme.css # עיצוב Apple
+│   ├── app.py                    # Flask API (שרת יציב על פורט 5002)
+│   ├── app_new.py                # שרת חדש (לא בשימוש כרגע)
+│   ├── db/
+│   │   └── simpleTrade.db        # בסיס נתונים SQLite (עודכן)
+│   ├── models/                   # מודלים SQLAlchemy
+│   ├── routes/                   # נתיבי API
+│   ├── services/                 # שירותי עסקים
+│   └── utils/                    # כלי עזר
+├── trading-ui/
+│   ├── index.html               # דף הבית
+│   ├── planning.html            # עמוד תכנון טריידים
+│   ├── database.html            # עמוד בסיס נתונים
+│   ├── tracking.html            # עמוד מעקב טריידים
+│   ├── accounts.html            # עמוד חשבונות
+│   ├── alerts.html              # עמוד התראות
+│   ├── research.html            # עמוד מחקר
+│   ├── preferences.html         # עמוד העדפות
+│   ├── styles/                  # קבצי CSS
+│   └── scripts/                 # קבצי JavaScript
+├── start_server.sh              # הפעלת שרת עם מוניטורינג
+├── stop_server.sh               # עצירת שרת
+└── documentation/               # דוקומנטציה מפורטת
 ```
 
 ## התקנה והפעלה
@@ -43,15 +56,18 @@ pip3 install flask flask-cors
 
 ### הפעלת השרת
 
-#### אופציה 1: הפעלה עם מנטור אוטומטי (מומלץ!)
+#### ⚠️ חשוב: שרת יציב על פורט 5002
+המערכת פועלת על שרת יציב (`app.py`) על פורט 5002. **אין לשנות זאת!**
+
+#### הפעלה מומלצת (עם מוניטורינג)
 ```bash
 ./start_server.sh
 ```
 
-#### אופציה 2: הפעלה רגילה
+#### הפעלה ישירה
 ```bash
 cd Backend
-python3 run_waitress.py
+python3 app.py
 ```
 
 #### עצירת השרת
@@ -59,7 +75,16 @@ python3 run_waitress.py
 ./stop_server.sh
 ```
 
-השרת יפעל על `http://127.0.0.1:5002`
+#### בדיקת זמינות שרת
+```bash
+# בדיקה מהירה
+python3 Backend/quick_server_check.py
+
+# בדיקה מפורטת  
+python3 Backend/server_health_check.py
+```
+
+**השרת פועל על:** `http://127.0.0.1:5002`
 
 ### בדיקת השרת
 
@@ -83,8 +108,19 @@ curl http://127.0.0.1:5002/api/stats
 
 ### פתיחת הממשק
 
-1. פתח את הקובץ `trading-ui/mockups/planning.html` בדפדפן
-2. או פתח את הקובץ `trading-ui/mockups/tracking.html` בדפדפן
+**חשוב:** פתח את הכתובות בלי `.html` בסוף!
+
+#### דפים עיקריים:
+- **דף הבית:** `http://127.0.0.1:5002/`
+- **תכנון טריידים:** `http://127.0.0.1:5002/planning`
+- **בסיס נתונים:** `http://127.0.0.1:5002/database`
+- **מעקב טריידים:** `http://127.0.0.1:5002/tracking`
+- **חשבונות:** `http://127.0.0.1:5002/accounts`
+- **התראות:** `http://127.0.0.1:5002/alerts`
+
+#### דפים נוספים:
+- **מחקר:** `http://127.0.0.1:5002/research`
+- **העדפות:** `http://127.0.0.1:5002/preferences`
 
 ## API Endpoints
 
@@ -134,21 +170,48 @@ curl http://127.0.0.1:5002/api/stats
 
 המערכת משתמשת ב-SQLite עם הטבלאות הבאות:
 
+### טבלאות פעילות (עם נתונים):
 - `accounts` - חשבונות משתמשים
-- `tickers` - מניות ונכסים
+- `tickers` - מניות ונכסים  
 - `trade_plans` - תכנוני טריידים
 - `trades` - טריידים פעילים וסגורים
 - `executions` - ביצועי טריידים
 - `alerts` - התראות
+- `cash_flows` - תזרים מזומנים
+- `open_execution_requests` - פקודות ביצוע
 - `performance_snapshots` - תמונת זמן
+- `notes` - הערות
+
+### טבלאות עתידיות (ללא נתונים כרגע):
+- `users` - משתמשים (תצוגה בלבד)
+- `user_roles` - תפקידי משתמשים (תצוגה בלבד)
+
+**קובץ בסיס נתונים:** `Backend/db/simpleTrade.db`
+
+## שינויים אחרונים (2025-08-15)
+
+### ✅ שיפורים שבוצעו:
+- **שרת יציב:** המעבר לשרת `app.py` על פורט 5002
+- **בסיס נתונים מורחב:** הוספת טבלאות חדשות עם נתונים
+- **ממשק אחיד:** עיצוב אחיד לכל הדפים
+- **כפתורי פעולות:** עריכה ומחיקה בכל הטבלאות
+- **Web Components:** תפריט ראשי ופילטרים מרוכזים
+- **סגנונות מרוכזים:** `grid-table.css` לכל הטבלאות
+
+### 🎯 תכונות עיקריות:
+- **דף בסיס נתונים:** תצוגת כל הטבלאות עם כפתורי פעולות
+- **דף תכנון:** טבלת תכנוני טריידים מלאה
+- **מערכת פילטרים:** פילטרים מתקדמים בכל הדפים
+- **עיצוב Apple:** ממשק מודרני ונגיש
 
 ## פיתוח
 
 ### הוספת תכונות חדשות
 
 1. הוסף endpoints חדשים ב-`Backend/app.py`
-2. עדכן את ה-JavaScript ב-`trading-ui/mockups/main.js`
-3. הוסף עיצובים ב-`trading-ui/mockups/apple-theme.css`
+2. עדכן את ה-JavaScript בקבצי הדפים הרלוונטיים
+3. הוסף עיצובים ב-`trading-ui/styles/grid-table.css`
+4. השתמש ב-Web Components לרכיבים משותפים
 
 ### בדיקת המערכת
 

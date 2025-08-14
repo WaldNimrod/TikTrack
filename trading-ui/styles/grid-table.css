@@ -1,3 +1,23 @@
+/*
+TikTrack Grid Table Styles
+==========================
+
+⚠️  סגנונות טבלאות - מרכזי לכל המערכת
+======================================
+- קובץ: grid-table.css
+- סטטוס: יציב ופעיל
+- תאריך עדכון אחרון: 2025-08-15
+
+שינויים אחרונים:
+- הוספת סגנונות לכפתורי פעולות (עריכה/מחיקה)
+- שיפור עיצוב טבלאות
+- הוספת אנימציות hover
+- עיצוב אחיד לכל הטבלאות במערכת
+
+⚠️  חשוב: קובץ זה משמש בכל הדפים!
+==================================
+*/
+
 /* סגנונות לדף גריד טבלה */
 
 /* סגנונות כללים */
@@ -452,6 +472,65 @@
   background: #f8f9fa;
 }
 
+/* סגנונות לכפתורי פעולות בטבלה */
+.action-buttons {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.edit-btn {
+  background: white;
+  color: #29a6a8;
+  border: 1px solid #29a6a8;
+  box-shadow: 0 1px 3px rgba(41, 166, 168, 0.2);
+  padding: 6px;
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 2px;
+}
+
+.edit-btn:hover {
+  background: rgba(41, 166, 168, 0.1);
+  border-color: #1f8a8c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(41, 166, 168, 0.3);
+}
+
+.delete-btn {
+  background: white;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  box-shadow: 0 1px 3px rgba(220, 53, 69, 0.2);
+  padding: 6px;
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 2px;
+}
+
+.delete-btn:hover {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
 /* סגנונות למצב טעינה */
 .loading {
   padding: 2rem;
@@ -635,15 +714,7 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
   color: #721c24;
 }
 
-/* סגנונות ייחודיים לטבלאות */
-.table-section {
-  background: var(--apple-bg-elevated);
-  padding: 2rem;
-  border-radius: 12px;
-  border: 1px solid var(--apple-border-light);
-  box-shadow: var(--apple-shadow-light);
-  margin-bottom: 2rem;
-}
+
 
 /* סגנונות ייחודיים לטבלאות */
 .table th {
@@ -717,32 +788,7 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
   color: #FF3B30;
 }
 
-.table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--apple-border-light);
-}
 
-.table-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--apple-text-primary);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.table-count {
-  background: #29a6a8;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
 
 .data-table {
   width: 100%;
@@ -830,46 +876,7 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
   transform: translateY(-1px);
 }
 
-.add-btn {
-  background: transparent !important;
-  color: #000000 !important;
-  border: 2px solid #29a6a8 !important;
-  box-shadow: none !important;
-  padding: 6px 13px !important;
-  border-radius: 6px !important;
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 5px !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-}
 
-.add-btn:hover {
-  background: rgba(41, 166, 168, 0.1) !important;
-  border-color: #1f8a8c !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
-}
-
-.refresh-btn {
-  padding: 0.5rem 1rem;
-  background: #ff9c05;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.refresh-btn:hover {
-  background: #e68a00;
-}
 
 /* סגנונות ייחודיים לטבלאות */
 .table th {
@@ -1068,6 +1075,416 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
     grid-template-columns: 1fr;
   }
 }
+
+/* סגנונות לטבלאות וסקשנים */
+.content-section {
+  background: var(--apple-bg-elevated);
+  padding: 20px 2rem 10px 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+/* כפתור סגירה/פתיחה */
+.table-header .toggle-btn {
+  background: var(--apple-bg-secondary) !important;
+  border: 1px solid var(--apple-border-light) !important;
+  color: var(--apple-text-secondary) !important;
+  padding: 0;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-family: inherit;
+  box-sizing: border-box;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.table-header .toggle-btn:hover {
+  background: var(--apple-bg-hover) !important;
+  border-color: var(--apple-border) !important;
+  color: var(--apple-text-primary) !important;
+  transform: translateY(-1px);
+}
+
+.table-header .toggle-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.25);
+}
+
+.table-header .toggle-btn:active {
+  transform: translateY(0);
+}
+
+.content-section.collapsed .table-header .toggle-btn {
+  transform: rotate(180deg);
+}
+
+/* סגנונות מיוחדים לסקשן הראשי */
+.content-section.top-section {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 1rem;
+}
+
+.content-section.top-section .table-header {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.content-section.top-section .table-title {
+  margin-left: 0;
+}
+
+.content-section.top-section .table-title h1 {
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--apple-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.content-section.top-section .page-subtitle {
+  font-size: 1.1rem;
+  color: var(--apple-text-secondary);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* פס אפור לכותרת (חוץ מהסקשן הראשי) */
+.content-section:not(.top-section) .table-header {
+  background: var(--apple-bg-secondary);
+  border-bottom: 1px solid var(--apple-border-light);
+  padding: 1rem 1.5rem;
+  border-radius: 8px 8px 0 0;
+}
+
+/* וידוא סגנונות כפתור */
+.table-header .toggle-btn,
+.table-header .toggle-btn:hover,
+.table-header .toggle-btn:focus,
+.table-header .toggle-btn:active {
+  background: var(--apple-bg-secondary) !important;
+  border: 1px solid var(--apple-border-light) !important;
+  color: var(--apple-text-secondary) !important;
+}
+
+/* הסתרת תוכן סקשן */
+.content-section.collapsed .content-section-body {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  overflow: hidden !important;
+}
+
+/* מצב פתוח - מציג את התוכן */
+.content-section .content-section-body {
+  max-height: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  overflow: visible !important;
+  transition: all 0.3s ease;
+}
+
+/* כותרת טבלה */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--apple-bg-secondary);
+  border-bottom: 1px solid var(--apple-border-light);
+  border-radius: 8px 8px 0 0;
+  position: relative;
+}
+
+/* מיכל כפתורים */
+.table-header .header-button-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+}
+
+/* כותרת */
+.table-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+/* ספירה */
+.table-count {
+  background: #29a6a8 !important;
+  color: white !important;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+  min-width: 80px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* שם באנגלית */
+.table-name-en {
+  font-weight: normal;
+  color: var(--apple-text-secondary);
+  font-size: 0.85rem;
+  margin-right: 0.5rem;
+}
+
+/* כפתורי מחיקה */
+.delete-account-btn {
+  color: var(--logo-orange) !important;
+  background: transparent !important;
+  border: none !important;
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.delete-account-btn:hover {
+  background: rgba(255, 156, 5, 0.1) !important;
+  transform: scale(1.1) !important;
+}
+
+/* כפתורי הוספה */
+.add-btn {
+  background: transparent !important;
+  color: #000000 !important;
+  border: 2px solid #29a6a8 !important;
+  box-shadow: none !important;
+  padding: 6px 13px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.add-btn:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתורי רענון */
+.refresh-btn {
+  background: transparent !important;
+  color: #000000 !important;
+  border: 2px solid #29a6a8 !important;
+  box-shadow: none !important;
+  padding: 6px 13px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.refresh-btn:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתורי סגירה לחלונות קופצים */
+.btn-close, 
+button[data-bs-dismiss="modal"],
+button[onclick*="close"],
+button[onclick*="Close"],
+.modal .btn-close,
+.modal-header .btn-close,
+.modal-footer .btn-close {
+  background-color: white !important;
+  color: var(--logo-orange) !important;
+  border: 2px solid var(--logo-orange) !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  cursor: pointer !important;
+  position: relative !important;
+}
+
+/* הוספת החץ הכתום של הלוגו */
+.btn-close::before, 
+button[data-bs-dismiss="modal"]::before,
+button[onclick*="close"]::before,
+button[onclick*="Close"]::before,
+.modal .btn-close::before,
+.modal-header .btn-close::before,
+.modal-footer .btn-close::before {
+  content: "←" !important;
+  color: var(--logo-orange) !important;
+  font-size: 1.4rem !important;
+  font-weight: bold !important;
+  line-height: 1 !important;
+}
+
+.btn-close:hover, 
+button[data-bs-dismiss="modal"]:hover,
+button[onclick*="close"]:hover,
+button[onclick*="Close"]:hover,
+.modal .btn-close:hover,
+.modal-header .btn-close:hover,
+.modal-footer .btn-close:hover {
+  background-color: white !important;
+  color: var(--logo-orange) !important;
+  border-color: var(--logo-orange) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* הוספת החץ הכתום של הלוגו ב-hover */
+.btn-close:hover::before, 
+button[data-bs-dismiss="modal"]:hover::before,
+button[onclick*="close"]:hover::before,
+button[onclick*="Close"]:hover::before,
+.modal .btn-close:hover::before,
+.modal-header .btn-close:hover::before,
+.modal-footer .btn-close:hover::before {
+  color: var(--logo-orange) !important;
+}
+
+/* כפתורי סגירה עם איקון X */
+.btn-close[aria-label="Close"],
+button[aria-label="Close"] {
+  background-color: white !important;
+  color: var(--logo-orange) !important;
+  border: 2px solid var(--logo-orange) !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  padding: 0 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+}
+
+/* הוספת החץ הכתום של הלוגו לכפתורים עם aria-label */
+.btn-close[aria-label="Close"]::before,
+button[aria-label="Close"]::before {
+  content: "←" !important;
+  color: var(--logo-orange) !important;
+  font-size: 1.4rem !important;
+  font-weight: bold !important;
+  line-height: 1 !important;
+}
+
+.btn-close[aria-label="Close"]:hover,
+button[aria-label="Close"]:hover {
+  background-color: white !important;
+  color: var(--logo-orange) !important;
+  border-color: var(--logo-orange) !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* הוספת החץ הכתום של הלוגו ב-hover לכפתורים עם aria-label */
+.btn-close[aria-label="Close"]:hover::before,
+button[aria-label="Close"]:hover::before {
+  color: var(--logo-orange) !important;
+}
+
+/* כפתור מודגש בצבע כתום */
+.btn-emphasized,
+.btn-primary-emphasized,
+button.btn-emphasized,
+button.btn-primary-emphasized {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 2px solid #ff9c05 !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+}
+
+/* כפתור משני - רקע לבן עם מסגרת ירוקה */
+.btn-secondary-custom,
+button.btn-secondary-custom {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+  border-radius: 4px !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-secondary-custom:hover,
+button.btn-secondary-custom:hover {
+  background-color: #f8f9fa !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתור סגירה למודלים */
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--apple-text-secondary);
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background-color: var(--apple-bg-hover);
+  color: var(--apple-text-primary);
+}
+
+
 
 /* סגנונות ייחודיים לעמוד המעקב */
 .badge-status {

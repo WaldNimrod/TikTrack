@@ -1,3 +1,23 @@
+<!--
+TikTrack Database Page
+======================
+
+⚠️  דף בסיס נתונים - יציב ופעיל
+================================
+- קובץ: database.html
+- סטטוס: יציב ופעיל
+- תאריך עדכון אחרון: 2025-08-15
+
+שינויים אחרונים:
+- הוספת כפתורי פעולות (עריכה/מחיקה) לכל הטבלאות
+- שיפור עיצוב עם grid-table.css
+- הוספת טבלאות חדשות (cash_flows, open_execution_requests)
+- שיפור חוויית משתמש עם Web Components
+
+⚠️  חשוב: אין לשנות את מבנה הטבלאות!
+=====================================
+-->
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -7,179 +27,237 @@
       <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="styles/apple-theme.css?v=10" />
-  <link rel="stylesheet" href="styles/menu.css?v=9" />
+  <link rel="stylesheet" href="styles/apple-theme.css?v=11" />
   <link rel="stylesheet" href="styles/styles.css?v=16" />
   <link rel="stylesheet" href="styles/grid-table.css?v=7" />
+  <!-- קבצים מודולריים -->
+  <script src="scripts/app-header.js"></script>
+  <script src="scripts/content-section-toggle.js"></script>
 </head>
 <body>
   <!-- Web Component של הכותרת -->
   <app-header></app-header>
 
   <div class="background-wrapper">
-    <div class="page-header">
+      <div class="page-header">
       <h1 class="page-title">🗄️ כל בסיס הנתונים</h1>
       <p class="page-subtitle">תצוגה מלאה של כל הטבלאות והנתונים במערכת</p>
-    </div>
+          </div>
       
       <!-- חשבונות -->
-      <div class="table-section">
+      <div class="content-section" id="accountsSection">
         <div class="table-header">
           <div class="table-title">
-            🏦 חשבונות
+            🏦 חשבונות <span class="table-name-en">(accounts)</span>
           </div>
           <div class="table-count" id="accountsCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="accountsSearch" placeholder="חיפוש בחשבונות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterAccountsTable()">
-            <button class="add-btn action-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+          <div class="header-button-container">
+            <input type="text" id="accountsSearch" placeholder="חיפוש בחשבונות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('accounts')">
+            <button class="add-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
             <button class="refresh-btn" onclick="loadTable('accounts')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
           </div>
         </div>
-        <div id="accountsTable" class="loading">טוען חשבונות...</div>
+        <div class="content-section-body">
+          <div id="accountsTable" class="loading">טוען חשבונות...</div>
+        </div>
       </div>
-      
+
       <!-- טיקרים -->
-      <div class="table-section">
+      <div class="content-section" id="tickersSection">
         <div class="table-header">
           <div class="table-title">
-            📈 טיקרים
+            📈 טיקרים <span class="table-name-en">(tickers)</span>
           </div>
           <div class="table-count" id="tickersCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="header-button-container">
             <input type="text" id="tickersSearch" placeholder="חיפוש בטיקרים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('tickers')">
-            <button class="add-btn action-btn" onclick="showAddModal('tickers')" title="הוסף טיקר חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="add-btn" onclick="showAddModal('tickers')" title="הוסף טיקר חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
             <button class="refresh-btn" onclick="loadTable('tickers')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
           </div>
         </div>
-        <div id="tickersTable" class="loading">טוען טיקרים...</div>
+        <div class="content-section-body">
+          <div id="tickersTable" class="loading">טוען טיקרים...</div>
+        </div>
       </div>
       
       <!-- תכנוני טריידים -->
-      <div class="table-section">
+      <div class="content-section" id="tradePlansSection">
         <div class="table-header">
           <div class="table-title">
-            📋 תכנוני טריידים
+            📋 תכנוני טריידים <span class="table-name-en">(trade_plans)</span>
           </div>
           <div class="table-count" id="tradePlansCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="header-button-container">
             <input type="text" id="tradePlansSearch" placeholder="חיפוש בתכנוני טריידים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('trade_plans')">
-            <button class="add-btn action-btn" onclick="showAddModal('trade_plans')" title="הוסף תכנון טרייד חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="add-btn" onclick="showAddModal('trade_plans')" title="הוסף תכנון טרייד חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
             <button class="refresh-btn" onclick="loadTable('trade_plans')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
           </div>
         </div>
-        <div id="tradePlansTable" class="loading">טוען תכנוני טריידים...</div>
+        <div class="content-section-body">
+          <div id="tradePlansTable" class="loading">טוען תכנוני טריידים...</div>
+        </div>
       </div>
-      
+
       <!-- טריידים -->
-      <div class="table-section">
+      <div class="content-section" id="tradesSection" style="display: none;">
         <div class="table-header">
           <div class="table-title">
-            💰 טריידים
+            💰 טריידים <span class="table-name-en">(trades)</span>
           </div>
           <div class="table-count" id="tradesCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="header-button-container">
             <input type="text" id="tradesSearch" placeholder="חיפוש בטריידים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('trades')">
-            <button class="add-btn action-btn" onclick="showAddModal('trades')" title="הוסף טרייד חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="add-btn" onclick="showAddModal('trades')" title="הוסף טרייד חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
             <button class="refresh-btn" onclick="loadTable('trades')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
           </div>
+          </div>
+        <div class="content-section-body">
+          <div id="tradesTable" class="loading">טוען טריידים...</div>
         </div>
-        <div id="tradesTable" class="loading">טוען טריידים...</div>
       </div>
       
       <!-- טרנזקציות -->
-      <div class="table-section">
+      <div class="content-section" id="executionsSection">
         <div class="table-header">
           <div class="table-title">
-            ⚡ טרנזקציות
+            ⚡ טרנזקציות <span class="table-name-en">(executions)</span>
           </div>
           <div class="table-count" id="executionsCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="header-button-container">
             <input type="text" id="executionsSearch" placeholder="חיפוש בטרנזקציות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('executions')">
-            <button class="add-btn action-btn" onclick="showAddModal('executions')" title="הוסף טרנזקציה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="add-btn" onclick="showAddModal('executions')" title="הוסף טרנזקציה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
             <button class="refresh-btn" onclick="loadTable('executions')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
           </div>
         </div>
-        <div id="executionsTable" class="loading">טוען טרנזקציות...</div>
+        <div class="content-section-body">
+          <div id="executionsTable" class="loading">טוען טרנזקציות...</div>
+        </div>
       </div>
-      
+
       <!-- פקודות -->
-      <div class="table-section">
+      <div class="content-section" id="openExecutionsSection">
         <div class="table-header">
           <div class="table-title">
-            🔄 פקודות
+            🔄 פקודות <span class="table-name-en">(open_execution_requests)</span>
           </div>
           <div class="table-count" id="openExecutionsCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="header-button-container">
             <input type="text" id="openExecutionsSearch" placeholder="חיפוש בפקודות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('open_execution_requests')">
-            <button class="add-btn action-btn" onclick="showAddModal('open_execution_requests')" title="הוסף פקודה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="add-btn" onclick="showAddModal('open_execution_requests')" title="הוסף פקודה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
             <button class="refresh-btn" onclick="loadTable('open_execution_requests')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
           </div>
+          </div>
+        <div class="content-section-body">
+          <div id="openExecutionsTable" class="loading">טוען פקודות...</div>
         </div>
-        <div id="openExecutionsTable" class="loading">טוען פקודות...</div>
       </div>
       
       <!-- תזרים מזומנים -->
-      <div class="table-section">
+      <div class="content-section" id="cashFlowsSection">
         <div class="table-header">
           <div class="table-title">
-            💸 תזרים מזומנים
+            💸 תזרים מזומנים <span class="table-name-en">(cash_flows)</span>
           </div>
           <div class="table-count" id="cashFlowsCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="header-button-container">
             <input type="text" id="cashFlowsSearch" placeholder="חיפוש בתזרים מזומנים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('cash_flows')">
-            <button class="add-btn action-btn" onclick="showAddModal('cash_flows')" title="הוסף תזרים מזומנים חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="add-btn" onclick="showAddModal('cash_flows')" title="הוסף תזרים מזומנים חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
             <button class="refresh-btn" onclick="loadTable('cash_flows')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
           </div>
         </div>
-        <div id="cashFlowsTable" class="loading">טוען תזרים מזומנים...</div>
+        <div class="content-section-body">
+          <div id="cashFlowsTable" class="loading">טוען תזרים מזומנים...</div>
+        </div>
       </div>
-      
+
       <!-- התראות -->
-      <div class="table-section">
+      <div class="content-section" id="alertsSection">
         <div class="table-header">
           <div class="table-title">
-            🔔 התראות
+            🔔 התראות <span class="table-name-en">(alerts)</span>
           </div>
           <div class="table-count" id="alertsCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="header-button-container">
             <input type="text" id="alertsSearch" placeholder="חיפוש בהתראות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('alerts')">
-            <button class="add-btn action-btn" onclick="showAddModal('alerts')" title="הוסף התראה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="add-btn" onclick="showAddModal('alerts')" title="הוסף התראה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
             <button class="refresh-btn" onclick="loadTable('alerts')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
           </div>
+          </div>
+        <div class="content-section-body">
+          <div id="alertsTable" class="loading">טוען התראות...</div>
         </div>
-        <div id="alertsTable" class="loading">טוען התראות...</div>
       </div>
       
       <!-- תמונת זמן -->
-      <div class="table-section">
+      <div class="content-section" id="performanceSnapshotsSection">
         <div class="table-header">
           <div class="table-title">
-            📸 תמונת זמן
+            📸 תמונת זמן <span class="table-name-en">(performance_snapshots)</span>
           </div>
           <div class="table-count" id="performanceSnapshotsCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="header-button-container">
             <input type="text" id="performanceSnapshotsSearch" placeholder="חיפוש בתמונות זמן..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('performance_snapshots')">
-            <button class="add-btn action-btn" onclick="showAddModal('performance_snapshots')" title="הוסף תמונת זמן חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="add-btn" onclick="showAddModal('performance_snapshots')" title="הוסף תמונת זמן חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
             <button class="refresh-btn" onclick="loadTable('performance_snapshots')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
           </div>
         </div>
-        <div id="performanceSnapshotsTable" class="loading">טוען תמונת זמן...</div>
+        <div class="content-section-body">
+          <div id="performanceSnapshotsTable" class="loading">טוען תמונת זמן...</div>
+        </div>
       </div>
-      
+
       <!-- הערות -->
-      <div class="table-section">
+      <div class="content-section" id="notesSection">
         <div class="table-header">
           <div class="table-title">
-            📝 הערות
+            📝 הערות <span class="table-name-en">(notes)</span>
           </div>
           <div class="table-count" id="notesCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="header-button-container">
             <input type="text" id="notesSearch" placeholder="חיפוש בהערות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('notes')">
-            <button class="add-btn action-btn" onclick="showAddModal('notes')" title="הוסף הערה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="add-btn" onclick="showAddModal('notes')" title="הוסף הערה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
             <button class="refresh-btn" onclick="loadTable('notes')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
           </div>
+          </div>
+        <div class="content-section-body">
+          <div id="notesTable" class="loading">טוען הערות...</div>
         </div>
-        <div id="notesTable" class="loading">טוען הערות...</div>
+      </div>
+
+      <!-- טבלת משתמשים -->
+      <div class="content-section" id="usersSection">
+        <div class="table-header">
+          <div class="table-title">
+            👥 משתמשים <span class="table-name-en">(users)</span>
+          </div>
+          <div class="table-count" id="usersCount">טוען...</div>
+          <div class="header-button-container">
+            <input type="text" id="usersSearch" placeholder="חיפוש במשתמשים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('users')">
+            <button class="add-btn" onclick="alert('פונקציונליות תהיה זמינה בהמשך')" title="הוסף משתמש חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="alert('פונקציונליות תהיה זמינה בהמשך')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+        </div>
+        <div class="content-section-body">
+          <div id="usersTable" class="empty-table">טבלת משתמשים תהיה זמינה בהמשך</div>
+        </div>
+      </div>
+
+      <!-- טבלת תפקידי משתמשים -->
+      <div class="content-section" id="userRolesSection">
+        <div class="table-header">
+          <div class="table-title">
+            🔐 תפקידי משתמשים <span class="table-name-en">(user_roles)</span>
+          </div>
+          <div class="table-count" id="userRolesCount">טוען...</div>
+          <div class="header-button-container">
+            <input type="text" id="userRolesSearch" placeholder="חיפוש בתפקידים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('user_roles')">
+            <button class="add-btn" onclick="alert('פונקציונליות תהיה זמינה בהמשך')" title="הוסף תפקיד חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="alert('פונקציונליות תהיה זמינה בהמשך')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          </div>
+          </div>
+        <div class="content-section-body">
+          <div id="userRolesTable" class="empty-table">טבלת תפקידי משתמשים תהיה זמינה בהמשך</div>
+        </div>
       </div>
     </div>
   </div>
@@ -208,9 +286,9 @@
                   <option value="USD">דולר אמריקאי (USD)</option>
                   <option value="EUR">אירו (EUR)</option>
                 </select>
-              </div>
-            </div>
-            
+        </div>
+      </div>
+
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="accountStatus" class="form-label">סטטוס</label>
@@ -218,7 +296,7 @@
                   <option value="פתוח">פתוח</option>
                   <option value="סגור">סגור</option>
                 </select>
-              </div>
+          </div>
             </div>
             
             <!-- שדות פיננסיים -->
@@ -227,17 +305,17 @@
                 <label for="accountCashBalance" class="form-label">יתרת מזומן</label>
                 <input type="number" class="form-control" id="accountCashBalance" step="0.01" placeholder="0.00">
                 <small class="form-text text-muted">יתרת המזומן בחשבון</small>
-              </div>
+          </div>
               <div class="col-md-4 mb-3">
                 <label for="accountTotalValue" class="form-label">שווי כולל</label>
                 <input type="number" class="form-control" id="accountTotalValue" step="0.01" placeholder="0.00">
                 <small class="form-text text-muted">השווי הכולל של החשבון</small>
-              </div>
+        </div>
               <div class="col-md-4 mb-3">
                 <label for="accountTotalPl" class="form-label">רווח/הפסד כולל</label>
                 <input type="number" class="form-control" id="accountTotalPl" step="0.01" placeholder="0.00">
                 <small class="form-text text-muted">הרווח או ההפסד הכולל</small>
-              </div>
+        </div>
             </div>
             
             <!-- הערות -->
@@ -251,8 +329,8 @@
           <button type="button" class="add-btn" onclick="createAccount()"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף חשבון</button>
         </div>
       </div>
-    </div>
-  </div>
+        </div>
+      </div>
 
   <!-- מודל עריכת חשבון -->
   <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
@@ -261,7 +339,7 @@
         <div class="modal-header">
           <h5 class="modal-title" id="editAccountModalLabel">ערוך חשבון</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
+          </div>
         <div class="modal-body">
           <form id="editAccountForm">
             <input type="hidden" id="editAccountId">
@@ -271,7 +349,7 @@
               <div class="col-md-6 mb-3">
                 <label for="editAccountName" class="form-label">שם החשבון *</label>
                 <input type="text" class="form-control" id="editAccountName" required>
-              </div>
+            </div>
               <div class="col-md-6 mb-3">
                 <label for="editAccountCurrency" class="form-label">מטבע *</label>
                 <select class="form-select" id="editAccountCurrency" required>
@@ -280,8 +358,8 @@
                   <option value="USD">דולר אמריקאי (USD)</option>
                   <option value="EUR">אירו (EUR)</option>
                 </select>
-              </div>
-            </div>
+          </div>
+        </div>
             
             <div class="row">
               <div class="col-md-6 mb-3">
@@ -290,7 +368,7 @@
                   <option value="פתוח">פתוח</option>
                   <option value="סגור">סגור</option>
                 </select>
-              </div>
+        </div>
             </div>
             
             <!-- שדות פיננסיים -->
@@ -309,22 +387,22 @@
                 <label for="editAccountTotalPl" class="form-label">רווח/הפסד כולל</label>
                 <input type="number" class="form-control" id="editAccountTotalPl" step="0.01" placeholder="0.00">
                 <small class="form-text text-muted">הרווח או ההפסד הכולל</small>
-              </div>
-            </div>
-            
+        </div>
+      </div>
+
             <!-- הערות -->
             <div class="mb-3">
               <label for="editAccountNotes" class="form-label">הערות</label>
               <textarea class="form-control" id="editAccountNotes" rows="4" placeholder="הערות על החשבון..."></textarea>
-            </div>
+          </div>
           </form>
-        </div>
+            </div>
         <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteAccountFromModal()" title="בטל חשבון">🚫</button>
+          <button type="button" class="delete-account-btn me-auto" onclick="deleteAccountFromModal()" title="בטל חשבון">✕</button>
           <button type="button" class="edit-btn" onclick="updateAccountFromModal()" title="עדכן חשבון">💾</button>
+          </div>
         </div>
-      </div>
-    </div>
+        </div>
   </div>
 
 
@@ -378,8 +456,8 @@
           <button type="button" class="add-btn" onclick="createTicker()"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף טיקר</button>
         </div>
       </div>
-    </div>
-  </div>
+        </div>
+      </div>
 
   <!-- מודל עריכת טיקר -->
   <div class="modal fade" id="editTickerModal" tabindex="-1" aria-labelledby="editTickerModalLabel" aria-hidden="true">
@@ -388,7 +466,7 @@
         <div class="modal-header">
           <h5 class="modal-title" id="editTickerModalLabel">ערוך טיקר</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
+          </div>
         <div class="modal-body">
           <form id="editTickerForm">
             <input type="hidden" id="editTickerId">
@@ -410,7 +488,7 @@
                 <option value="crypto">קריפטו</option>
                 <option value="forex">מט"ח</option>
               </select>
-            </div>
+          </div>
             <div class="mb-3">
               <label for="editTickerCurrency" class="form-label">מטבע</label>
               <select class="form-select" id="editTickerCurrency">
@@ -418,15 +496,15 @@
                 <option value="ILS">שקל ישראלי (ILS)</option>
                 <option value="EUR">אירו (EUR)</option>
               </select>
-            </div>
+        </div>
             <div class="mb-3">
               <label for="editTickerRemarks" class="form-label">הערות</label>
               <textarea class="form-control" id="editTickerRemarks" rows="3"></textarea>
-            </div>
+        </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteTickerFromModal()" title="מחק טיקר">🗑️</button>
+          <button type="button" class="delete-account-btn me-auto" onclick="deleteTickerFromModal()" title="מחק טיקר">✕</button>
           <button type="button" class="edit-btn" onclick="updateTickerFromModal()" title="עדכן טיקר">💾</button>
         </div>
       </div>
@@ -578,7 +656,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteTradeFromModal()" title="מחק טרייד">🗑️</button>
+          <button type="button" class="delete-account-btn me-auto" onclick="deleteTradeFromModal()" title="מחק טרייד">✕</button>
           <button type="button" class="edit-btn" onclick="updateTradeFromModal()" title="עדכן טרייד">💾</button>
         </div>
       </div>
@@ -702,7 +780,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteTradePlanFromModal()" title="מחק תכנון">🗑️</button>
+          <button type="button" class="delete-account-btn me-auto" onclick="deleteTradePlanFromModal()" title="מחק תכנון">✕</button>
           <button type="button" class="edit-btn" onclick="updateTradePlanFromModal()" title="עדכן תכנון">💾</button>
         </div>
       </div>
@@ -812,7 +890,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteAlertFromModal()" title="מחק התראה">🗑️</button>
+          <button type="button" class="delete-account-btn me-auto" onclick="deleteAlertFromModal()" title="מחק התראה">✕</button>
           <button type="button" class="edit-btn" onclick="updateAlertFromModal()" title="עדכן התראה">💾</button>
         </div>
       </div>
@@ -908,36 +986,76 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteNoteFromModal()" title="מחק הערה">🗑️</button>
+          <button type="button" class="delete-account-btn me-auto" onclick="deleteNoteFromModal()" title="מחק הערה">✕</button>
           <button type="button" class="edit-btn" onclick="updateNoteFromModal()" title="עדכן הערה">💾</button>
         </div>
       </div>
     </div>
   </div>
-
+  
   <script>
     // פונקציה לטעינת טבלה
     async function loadTable(tableName) {
       console.log(`טוען טבלה: ${tableName}`);
+      console.log(`URL: /api/database_v2/${tableName}`);
       
       // מיפוי שמות טבלאות ל-ID של אלמנטים
       const tableIdMap = {
         'open_execution_requests': 'openExecutions',
         'cash_flows': 'cashFlows',
-        'performance_snapshots': 'performanceSnapshots'
+        'performance_snapshots': 'performanceSnapshots',
+        'trade_plans': 'tradePlans'
       };
       
       const elementSuffix = tableIdMap[tableName] || tableName;
-      const tableElement = document.getElementById(elementSuffix + 'Table');
-      const countElement = document.getElementById(elementSuffix + 'Count');
+      console.log(`elementSuffix עבור ${tableName}: ${elementSuffix}`);
+      
+      // חיפוש האלמנטים במבנה החדש
+      let tableElement = document.getElementById(elementSuffix + 'Table');
+      let countElement = document.getElementById(elementSuffix + 'Count');
+      
+      console.log(`מחפש אלמנטים: ${elementSuffix}Table, ${elementSuffix}Count`);
+      console.log(`tableElement:`, tableElement);
+      console.log(`countElement:`, countElement);
+      
+      if (!tableElement || !countElement) {
+        console.warn(`אלמנטים לא נמצאו עבור טבלה: ${tableName}`);
+        console.warn(`elementSuffix: ${elementSuffix}`);
+        console.warn(`tableIdMap:`, tableIdMap);
+        
+        // חיפוש אלטרנטיבי - אולי האלמנטים נמצאים בתוך content-section-body
+        const sectionElement = document.getElementById(elementSuffix + 'Section');
+        if (sectionElement) {
+          const bodyElement = sectionElement.querySelector('.content-section-body');
+          if (bodyElement) {
+            const altTableElement = bodyElement.querySelector(`#${elementSuffix}Table`);
+            const altCountElement = sectionElement.querySelector(`#${elementSuffix}Count`);
+            console.log(`נמצאו אלמנטים אלטרנטיביים:`, altTableElement, altCountElement);
+            if (altTableElement && altCountElement) {
+              // עדכון האלמנטים שנמצאו
+              tableElement = altTableElement;
+              countElement = altCountElement;
+            } else {
+              return;
+            }
+          } else {
+            return;
+          }
+        } else {
+          return;
+        }
+      }
       
       try {
         tableElement.innerHTML = '<div class="loading">טוען...</div>';
         
-        const response = await fetch(`/api/database/${tableName}`);
+        console.log(`שולח בקשת fetch ל: /api/database_v2/${tableName}`);
+        const response = await fetch(`/api/database_v2/${tableName}`);
+        console.log(`תגובה מהשרת:`, response.status, response.statusText);
         const data = await response.json();
         
         console.log(`נתונים עבור ${tableName}:`, data);
+        console.log(`מספר רשומות:`, data.length);
         
         if (data.error) {
           throw new Error(data.error);
@@ -952,12 +1070,16 @@
         }
         
         // יצירת הטבלה
+        console.log(`יוצר טבלה עבור ${tableName}`);
         const table = createDataTable(data, tableName);
+        console.log(`טבלה נוצרה:`, table);
         tableElement.innerHTML = '';
         tableElement.appendChild(table);
+        console.log(`טבלה נוספה לדף`);
         
       } catch (error) {
         console.error(`שגיאה בטעינת טבלה ${tableName}:`, error);
+        console.error(`פירוט השגיאה:`, error.stack);
         tableElement.innerHTML = `<div class="error">שגיאה בטעינת הנתונים: ${error.message}</div>`;
         countElement.textContent = 'שגיאה';
       }
@@ -993,7 +1115,7 @@
         } else if (tableName === 'notes') {
           columns = ['id', 'account_id', 'trade_id', 'trade_plan_id', 'content', 'created_at', 'attachment'];
         } else if (tableName === 'trade_plans') {
-          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason'];
+          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason', 'status'];
         } else if (tableName === 'open_execution_requests') {
           columns = ['id', 'trade_id', 'ticker_symbol', 'action', 'order_type', 'status', 'expiry_type', 'price', 'quantity', 'created_at'];
         }
@@ -1049,22 +1171,32 @@
         } else if (tableName === 'executions') {
           columns = ['id', 'trade_id', 'action', 'date', 'quantity', 'price', 'fee', 'source'];
         } else if (tableName === 'alerts') {
-          columns = ['id', 'account_id', 'ticker_id', 'alert_type', 'condition', 'status', 'created_at', 'triggered_at'];
+          columns = ['id', 'account_id', 'ticker_id', 'type', 'condition', 'message', 'is_active', 'created_at', 'triggered_at'];
         } else if (tableName === 'cash_flows') {
           columns = ['id', 'account_id', 'date', 'flow_type', 'amount', 'currency', 'description'];
         } else if (tableName === 'performance_snapshots') {
           columns = ['id', 'account_id', 'date', 'total_value', 'open_pl', 'closed_pl', 'mtm_value', 'investment_type'];
         } else if (tableName === 'notes') {
           columns = ['id', 'account_id', 'trade_id', 'trade_plan_id', 'content', 'created_at', 'attachment'];
+        } else if (tableName === 'users') {
+          columns = ['id', 'username', 'email', 'is_active', 'last_login', 'created_at'];
+        } else if (tableName === 'user_roles') {
+          columns = ['id', 'user_id', 'role_id', 'created_at', 'assigned_at'];
         } else if (tableName === 'trade_plans') {
-          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason'];
+          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason', 'status'];
         } else if (tableName === 'open_execution_requests') {
           columns = ['id', 'trade_id', 'ticker_symbol', 'action', 'order_type', 'status', 'expiry_type', 'price', 'quantity', 'created_at'];
         }
         
         columns.forEach(key => {
-          const value = row[key];
+          let value = row[key];
           const td = document.createElement('td');
+          
+          // טיפול מיוחד בשדה סטטוס של תכנוני טריידים
+          if (tableName === 'trade_plans' && key === 'status') {
+            // שימוש בשדה הסטטוס האמיתי מהבסיס נתונים
+            // open, close, delete
+          }
           
           if (value === null || value === undefined) {
             td.textContent = '-';
@@ -1097,6 +1229,7 @@
                 statusText = 'פתוח';
                 statusColor = 'var(--apple-blue)';
                 break;
+              case 'close':
               case 'closed':
               case 'סגור':
                 statusText = 'סגור';
@@ -1210,7 +1343,7 @@
         const deleteBtn = document.createElement('button');
         // בחירת האייקון הנכון לפי סוג הטבלה
         if (tableName === 'accounts') {
-          deleteBtn.innerHTML = '🚫';
+          deleteBtn.innerHTML = '✕';
           deleteBtn.title = `בטל ${getTableDisplayName(tableName)}`;
         } else {
           deleteBtn.innerHTML = '✕';
@@ -1542,10 +1675,7 @@
       }
     }
     
-    // פונקציה לסינון טבלת החשבונות (לשמירה על תאימות)
-    function filterAccountsTable() {
-      filterTable('accounts');
-    }
+
     
     // פונקציה למיון טבלה
     function sortTable(tableName, column) {
@@ -1647,6 +1777,8 @@
         'closed_at': 'תאריך סגירה (Closed At)',
         'status': 'סטטוס (Status)',
         'notes': 'הערות (Notes)',
+    'users': 'משתמשים (Users)',
+    'user_roles': 'תפקידי משתמשים (User Roles)',
         'total_pl': 'רווח/הפסד כולל (Total P/L)',
         'cash_balance': 'יתרת מזומן (Cash Balance)',
         'total_value': 'שווי כולל (Total Value)',
@@ -1679,106 +1811,33 @@
     window.addEventListener('load', () => {
       console.log('הדף נטען, מתחיל לטעון טבלאות...');
       
-      // טעינה מיידית של תכנוני טריידים
-      console.log('טוען תכנוני טריידים...');
-      loadTable('trade_plans');
-      
-      // טעינה מיידית של פקודות ותזרים מזומנים
-      console.log('טוען פקודות...');
-      loadTable('open_execution_requests');
-      
-      console.log('טוען תזרים מזומנים...');
-      loadTable('cash_flows');
-      
-      const tables = [
+      // רק הטבלאות הקיימות במסד הנתונים
+      const availableTables = [
         'accounts',
         'tickers', 
-        'trades',
-        'executions',
-        'alerts',
         'performance_snapshots',
-        'notes'
+        'notes',
+        'executions',
+        'open_execution_requests',
+        'cash_flows',
+        'alerts'
       ];
       
-      tables.forEach(table => {
+      availableTables.forEach(table => {
         console.log(`מתחיל לטעון: ${table}`);
         loadTable(table);
       });
+      
+      // טעינת trade_plans בנפרד (יכול להיות ריק)
+      console.log('טוען תכנוני טריידים...');
+      setTimeout(() => {
+        console.log('מנסה לטעון trade_plans...');
+        loadTable('trade_plans');
+      }, 1000);
     });
     
     // בדיקה נוספת
     console.log('הסקריפט נטען');
-    
-    // בדיקה מיידית
-    setTimeout(() => {
-      console.log('בדיקה מיידית - טוען trade_plans');
-      fetch('/api/database/trade_plans')
-        .then(response => response.json())
-        .then(data => {
-          console.log('נתונים שהתקבלו:', data);
-          const tableElement = document.getElementById('tradePlansTable');
-          const countElement = document.getElementById('tradePlansCount');
-          if (tableElement && countElement) {
-            countElement.textContent = `${data.length} רשומות`;
-            if (data.length > 0) {
-              const table = createDataTable(data, 'trade_plans');
-              tableElement.innerHTML = '';
-              tableElement.appendChild(table);
-            } else {
-              tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
-            }
-          }
-        })
-        .catch(error => {
-          console.error('שגיאה:', error);
-        });
-      
-      // בדיקה מיידית לפקודות
-      console.log('בדיקה מיידית - טוען open_execution_requests');
-      fetch('/api/database/open_execution_requests')
-        .then(response => response.json())
-        .then(data => {
-          console.log('נתוני פקודות:', data);
-          const tableElement = document.getElementById('openExecutionsTable');
-          const countElement = document.getElementById('openExecutionsCount');
-          if (tableElement && countElement) {
-            countElement.textContent = `${data.length} רשומות`;
-            if (data.length > 0) {
-              const table = createDataTable(data, 'open_execution_requests');
-              tableElement.innerHTML = '';
-              tableElement.appendChild(table);
-            } else {
-              tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
-            }
-          }
-        })
-        .catch(error => {
-          console.error('שגיאה בפקודות:', error);
-        });
-      
-      // בדיקה מיידית לתזרים מזומנים
-      console.log('בדיקה מיידית - טוען cash_flows');
-      fetch('/api/database/cash_flows')
-        .then(response => response.json())
-        .then(data => {
-          console.log('נתוני תזרים מזומנים:', data);
-          const tableElement = document.getElementById('cashFlowsTable');
-          const countElement = document.getElementById('cashFlowsCount');
-          if (tableElement && countElement) {
-            countElement.textContent = `${data.length} רשומות`;
-            if (data.length > 0) {
-              const table = createDataTable(data, 'cash_flows');
-              tableElement.innerHTML = '';
-              tableElement.appendChild(table);
-            } else {
-              tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
-            }
-          }
-        })
-        .catch(error => {
-          console.error('שגיאה בתזרים מזומנים:', error);
-        });
-    }, 2000);
     
     // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
     function updateBackgroundPadding(isCollapsed) {
@@ -1893,6 +1952,12 @@
         case 'notes':
           showEditNoteModal(row);
           break;
+        case 'users':
+          alert(`עריכת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
+          break;
+        case 'user_roles':
+          alert(`עריכת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
+          break;
         default:
           alert(`עריכת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
       }
@@ -1917,6 +1982,12 @@
           break;
         case 'notes':
           showAddNoteModal();
+          break;
+        case 'users':
+          alert(`הוספת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
+          break;
+        case 'user_roles':
+          alert(`הוספת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
           break;
         default:
           alert(`הוספת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
@@ -2043,10 +2114,10 @@
           const modal = bootstrap.Modal.getInstance(document.getElementById('addTickerModal'));
           modal.hide();
           loadTable('tickers');
-        } else {
+            } else {
           throw new Error(data.message || 'שגיאה בהוספת הטיקר');
-        }
-      } catch (error) {
+            }
+        } catch (error) {
         console.error('שגיאה בהוספת טיקר:', error);
         alert(`שגיאה בהוספת טיקר: ${error.message}`);
       }
@@ -2129,7 +2200,7 @@
               throw new Error(data.message || 'שגיאה במחיקת הטיקר');
             }
           }
-        } catch (error) {
+      } catch (error) {
           console.error('שגיאה במחיקת טיקר:', error);
           alert(`שגיאה במחיקת טיקר: ${error.message}`);
         }
@@ -2192,7 +2263,7 @@
                       <th>מזהה טרייד</th>
                       <th>טיקר</th>
                       <th>תאריך פתיחה</th>
-                    </tr>
+          </tr>
                   </thead>
                   <tbody>
                     ${data.trades.map(trade => `
@@ -2323,7 +2394,7 @@
                       טריידים: ${data.total_trades || 0}<br>
                       התראות: ${data.total_alerts || 0}
                     </th>
-                  </tr>
+          </tr>
                 </thead>
               </table>
             </div>
@@ -2369,6 +2440,12 @@
           case 'notes':
             endpoint = `/api/notes/${itemId}`;
             break;
+          case 'users':
+            alert(`מחיקת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
+            return;
+          case 'user_roles':
+            alert(`מחיקת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
+            return;
           case 'trade_plans':
             endpoint = `/api/tradeplans/${itemId}`;
             break;
@@ -2584,7 +2661,7 @@
             const errorData = await response.json();
             throw new Error(errorData.message || 'שגיאה במחיקת הטרייד');
           }
-        } catch (error) {
+      } catch (error) {
           console.error('שגיאה במחיקת טרייד:', error);
           alert(`שגיאה במחיקת טרייד: ${error.message}`);
         }
@@ -2702,7 +2779,7 @@
           const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
           modal.hide();
           loadTable('trade_plans');
-        } else {
+          } else {
           throw new Error(data.message || 'שגיאה בעדכון תכנון הטרייד');
         }
       } catch (error) {
@@ -2728,7 +2805,7 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
             modal.hide();
             loadTable('trade_plans');
-          } else {
+            } else {
             const errorData = await response.json();
             throw new Error(errorData.message || 'שגיאה במחיקת תכנון הטרייד');
           }
@@ -2771,8 +2848,8 @@
       
       if (!condition) {
         alert('תנאי הוא שדה חובה');
-        return;
-      }
+                return;
+            }
       
       try {
         const response = await fetch('/api/alerts', {
@@ -2856,11 +2933,11 @@
         try {
           const response = await fetch(`/api/alerts/${alertId}`, {
             method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-          
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
           if (response.ok) {
             alert('ההתראה נמחקה בהצלחה!');
             const modal = bootstrap.Modal.getInstance(document.getElementById('editAlertModal'));
@@ -2910,28 +2987,28 @@
       
       try {
         const response = await fetch('/api/notes', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
             account_id: accountId,
             trade_id: tradeId,
             content: content
-          })
-        });
-        
-        const data = await response.json();
+                })
+            });
+            
+                const data = await response.json();
         
         if (response.ok) {
           alert('ההערה נוספה בהצלחה!');
           const modal = bootstrap.Modal.getInstance(document.getElementById('addNoteModal'));
           modal.hide();
           loadTable('notes');
-        } else {
+            } else {
           throw new Error(data.message || 'שגיאה בהוספת ההערה');
-        }
-      } catch (error) {
+            }
+        } catch (error) {
         console.error('שגיאה בהוספת הערה:', error);
         alert(`שגיאה בהוספת הערה: ${error.message}`);
       }
@@ -2994,7 +3071,7 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
             modal.hide();
             loadTable('notes');
-          } else {
+      } else {
             const errorData = await response.json();
             throw new Error(errorData.message || 'שגיאה במחיקת ההערה');
           }
@@ -3122,7 +3199,7 @@
           if (header && typeof header.updateGridFilter === 'function') {
             header.updateGridFilter();
           }
-        } else {
+      } else {
           console.log('Global functions not ready yet, retrying...');
           setTimeout(checkAndUpdateFilter, 200);
         }
@@ -3132,7 +3209,7 @@
       setTimeout(checkAndUpdateFilter, 500);
     });
   </script>
-  
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   

@@ -86,7 +86,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0;
+  padding: 5px 0;
 }
 
 .logo-section {
@@ -107,52 +107,7 @@ body {
   letter-spacing: -0.01em;
 }
 
-.nav-menu {
-  display: flex;
-  gap: var(--apple-spacing-sm);
-  align-items: center;
-}
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: var(--apple-spacing-xs);
-  padding: var(--apple-spacing-sm) var(--apple-spacing-md);
-  border-radius: var(--apple-radius-medium);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  text-decoration: none;
-  color: var(--apple-text-secondary);
-  font-size: 15px;
-  font-weight: 500;
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-item:hover {
-  background-color: rgba(41, 166, 168, 0.1);
-  color: var(--logo-orange);
-  transform: translateY(-1px);
-}
-
-.nav-item.active {
-  background-color: var(--apple-blue);
-  color: white;
-  box-shadow: var(--apple-shadow-light);
-}
-
-.nav-item.active:hover {
-  background-color: var(--apple-blue-dark);
-}
-
-.nav-icon {
-  font-size: 18px;
-}
-
-.nav-text {
-  font-size: 15px;
-  font-weight: 500;
-}
 
 /* כפתורים בסגנון אפל - משתמשים בסגנונות הגלובליים */
 

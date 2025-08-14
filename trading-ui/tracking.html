@@ -15,6 +15,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="scripts/grid-core.js"></script>
 
 </head>
 <body>
@@ -27,7 +28,7 @@
       <div class="page-header">
         <h1 class="page-title">מעקב טריידים</h1>
         <p class="page-subtitle">ניהול ועקיבה אחר טריידים פעילים</p>
-        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר חלק עליון">
+        <button class="filter-toggle-btn top-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר חלק עליון">
           <span class="filter-icon">▲</span>
         </button>
       </div>
@@ -301,113 +302,7 @@
   let totalPages = 1;
   let alertsFilterVisible = false;
 
-  // פונקציה להצגת/הסתרת אזור ההתראות
-  function toggleAlertsSection() {
-    const alertsSection = document.getElementById('alertsSection');
-    const filterBtn = document.querySelector('.filter-toggle-btn');
-    const isCollapsed = alertsSection.classList.contains('collapsed');
-    
-    if (isCollapsed) {
-      // פתיחת אזור ההתראות
-      alertsSection.classList.remove('collapsed');
-      filterBtn.classList.remove('active');
-      localStorage.setItem('alertsSectionCollapsed', 'false');
-      console.log('פתיחת אזור התראות');
-    } else {
-      // סגירת אזור ההתראות
-      alertsSection.classList.add('collapsed');
-      filterBtn.classList.add('active');
-      localStorage.setItem('alertsSectionCollapsed', 'true');
-      console.log('סגירת אזור התראות');
-    }
-  }
 
-  // פונקציה להצגת/הסתרת החלק העליון
-  function toggleTopSection() {
-    const topSection = document.getElementById('topSection');
-    const filterBtn = topSection.querySelector('.filter-toggle-btn');
-    const isCollapsed = topSection.classList.contains('collapsed');
-    
-    if (isCollapsed) {
-      // פתיחת החלק העליון
-      topSection.classList.remove('collapsed');
-      filterBtn.classList.remove('active');
-      localStorage.setItem('topSectionCollapsed', 'false');
-      console.log('פתיחת חלק עליון');
-    } else {
-      // סגירת החלק העליון
-      topSection.classList.add('collapsed');
-      filterBtn.classList.add('active');
-      localStorage.setItem('topSectionCollapsed', 'true');
-      console.log('סגירת חלק עליון');
-    }
-  }
-
-  // פונקציה לשחזור מצב אזור ההתראות
-  function restoreAlertsSectionState() {
-    const alertsSection = document.getElementById('alertsSection');
-    const filterBtn = document.querySelector('.filter-toggle-btn');
-    const isCollapsed = localStorage.getItem('alertsSectionCollapsed') === 'true';
-    
-    if (isCollapsed) {
-      alertsSection.classList.add('collapsed');
-      filterBtn.classList.add('active');
-      console.log('שחזור מצב: אזור התראות מקופל');
-    } else {
-      alertsSection.classList.remove('collapsed');
-      filterBtn.classList.remove('active');
-      console.log('שחזור מצב: אזור התראות פתוח');
-    }
-  }
-
-  // פונקציה לשחזור מצב החלק העליון
-  function restoreTopSectionState() {
-    const topSection = document.getElementById('topSection');
-    const filterBtn = topSection.querySelector('.filter-toggle-btn');
-    const isCollapsed = localStorage.getItem('topSectionCollapsed') === 'true';
-    
-    if (isCollapsed) {
-      topSection.classList.add('collapsed');
-      filterBtn.classList.add('active');
-      console.log('שחזור מצב: חלק עליון מקופל');
-    } else {
-      topSection.classList.remove('collapsed');
-      filterBtn.classList.remove('active');
-      console.log('שחזור מצב: חלק עליון פתוח');
-    }
-  }
-
-  // פונקציה גלובלית לאיפוס כל הפילטרים ורענון הטבלה
-  async function resetAllFiltersAndReloadData() {
-    console.log('=== resetAllFiltersAndReloadData called ===');
-    
-    // איפוס כל הפילטרים דרך הקומפוננטה
-    const header = document.querySelector('app-header');
-    if (header && typeof header.clearAllFilters === 'function') {
-      console.log('Calling clearAllFilters from component');
-      header.clearAllFilters();
-    } else {
-      console.log('Component clearAllFilters not available, using fallback');
-      closeAllFilters();
-    }
-    
-    // איפוס המשתנים הגלובליים
-    window.selectedStatusesForFilter = [];
-    window.selectedTypesForFilter = [];
-    window.selectedAccountsForFilter = [];
-    window.selectedDateRangeForFilter = null;
-    window.selectedSearchTermForFilter = null;
-    
-    // ניקוי localStorage
-    localStorage.removeItem('trackingFilterStatuses');
-    localStorage.removeItem('trackingFilterTypes');
-    localStorage.removeItem('trackingFilterAccounts');
-    localStorage.removeItem('trackingFilterDateRange');
-    localStorage.removeItem('trackingFilterSearch');
-    
-    // טעינת נתונים מחדש
-    await loadTradesDataDirect();
-  }
 
   // פונקציה לטעינת נתוני טריידים (עם איפוס)
   async function loadTradesData() {
@@ -1766,31 +1661,7 @@
     console.log('Other filters closed');
   }
 
-  // פונקציה לאיפוס כל הפילטרים
-  function closeAllFilters() {
-    console.log('=== closeAllFilters called ===');
-    
-    // איפוס הפילטרים בקומפוננטת התפריט
-    if (typeof window.resetComponentFilters === 'function') {
-      window.resetComponentFilters();
-    }
-    
-    // איפוס המשתנים הגלובליים
-    window.selectedStatusesForFilter = [];
-    window.selectedTypesForFilter = [];
-    window.selectedAccountsForFilter = [];
-    window.selectedDateRangeForFilter = null;
-    window.selectedSearchTermForFilter = null;
-    
-    // ניקוי localStorage
-    localStorage.removeItem('trackingFilterStatuses');
-    localStorage.removeItem('trackingFilterTypes');
-    localStorage.removeItem('trackingFilterAccounts');
-    localStorage.removeItem('trackingFilterDateRange');
-    localStorage.removeItem('trackingFilterSearch');
-    
-    console.log('All filters cleared');
-  }
+
 
   // פונקציות גלובליות לעדכון שדות מהקומפוננטה
   window.updateSearchFieldFromComponent = function(searchTerm) {
@@ -2268,20 +2139,7 @@
     });
   }
 
-  function markAlertAsRead(button, ticker) {
-    const alertCard = button.closest('.alert-card');
-    alertCard.classList.add('read');
-    button.textContent = 'נקרא';
-    button.disabled = true;
-    console.log(`התראה עבור ${ticker} סומנה כנקראה`);
-    
-    // כאן תהיה לוגיקת עדכון בשרת
-    // fetch('/api/alerts/mark-read', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ ticker: ticker })
-    // });
-  }
+
 
   function closeTradeDetails() {
     document.getElementById("tradeModal").style.display = "none";
@@ -2530,26 +2388,7 @@
     closeTradeDetails();
   }
 
-  // פונקציות לאישור מותאם אישית
-  let customActionCallback = null;
 
-  function confirmCustomAction() {
-    if (customActionCallback) {
-      customActionCallback();
-    }
-    document.getElementById("customConfirmModal").style.display = "none";
-  }
-
-  function cancelCustomAction() {
-    customActionCallback = null;
-    document.getElementById("customConfirmModal").style.display = "none";
-  }
-
-  function showCustomConfirm(message, callback) {
-    customActionCallback = callback;
-    document.getElementById("customConfirmMessage").textContent = message;
-    document.getElementById("customConfirmModal").style.display = "block";
-  }
 
   // סגירת המודל בלחיצה מחוץ לו
   window.onclick = function(event) {

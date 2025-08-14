@@ -85,32 +85,4 @@ VALUES (1, 10, 'long', 3000.00, 'תמיכה טכנית', 70.00, 90.00, 'תנוע
 INSERT INTO trades (account_id, ticker_id, trade_plan_id, status, type, opened_at, cancelled_at, cancel_reason, notes) 
 VALUES (1, 10, (SELECT id FROM trade_plans WHERE created_at = '2025-01-04 09:00:00'), 'cancelled', 'buy', '2025-01-04 10:30:00', '2025-01-04 15:45:00', 'שינוי בסיסי בתנאי השוק', 'בוטל עקב שינוי בסיסי בתנאי השוק');
 
--- הוספת ביצועים לטריידים הסגורים
 
--- ביצועים לטרייד 4
-INSERT INTO executions (trade_id, action, date, quantity, price, fee, source) 
-VALUES ((SELECT id FROM trades WHERE opened_at = '2024-12-20 12:30:00'), 'buy', '2024-12-20 12:30:00', 50, 120.00, 15.00, 'manual');
-
-INSERT INTO executions (trade_id, action, date, quantity, price, fee, source) 
-VALUES ((SELECT id FROM trades WHERE opened_at = '2024-12-20 12:30:00'), 'sell', '2024-12-28 14:15:00', 50, 156.00, 15.00, 'manual');
-
--- ביצועים לטרייד 5
-INSERT INTO executions (trade_id, action, date, quantity, price, fee, source) 
-VALUES ((SELECT id FROM trades WHERE opened_at = '2024-12-15 15:20:00'), 'sell', '2024-12-15 15:20:00', 25, 95.00, 12.50, 'manual');
-
-INSERT INTO executions (trade_id, action, date, quantity, price, fee, source) 
-VALUES ((SELECT id FROM trades WHERE opened_at = '2024-12-15 15:20:00'), 'buy', '2024-12-22 10:30:00', 25, 96.80, 12.50, 'manual');
-
--- ביצועים לטרייד 7
-INSERT INTO executions (trade_id, action, date, quantity, price, fee, source) 
-VALUES ((SELECT id FROM trades WHERE opened_at = '2025-01-02 10:20:00'), 'buy', '2025-01-02 10:20:00', 35, 180.00, 17.50, 'manual');
-
-INSERT INTO executions (trade_id, action, date, quantity, price, fee, source) 
-VALUES ((SELECT id FROM trades WHERE opened_at = '2025-01-02 10:20:00'), 'sell', '2025-01-05 16:30:00', 35, 240.00, 17.50, 'manual');
-
--- ביצועים לטרייד 9
-INSERT INTO executions (trade_id, action, date, quantity, price, fee, source) 
-VALUES ((SELECT id FROM trades WHERE opened_at = '2025-01-03 11:45:00'), 'buy', '2025-01-03 11:45:00', 40, 90.00, 20.00, 'manual');
-
-INSERT INTO executions (trade_id, action, date, quantity, price, fee, source) 
-VALUES ((SELECT id FROM trades WHERE opened_at = '2025-01-03 11:45:00'), 'sell', '2025-01-07 13:20:00', 40, 127.50, 20.00, 'manual');

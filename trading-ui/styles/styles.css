@@ -121,6 +121,15 @@ button.btn-secondary-custom:hover {
   transform: translateY(-1px) !important;
   box-shadow: 0 2px 4px rgba(41, 166, 168, 0.2) !important;
 }
+
+/* כפתור מודגש */
+.btn-emphasized,
+.btn-primary-emphasized,
+button.btn-emphasized,
+button.btn-primary-emphasized {
+  background-color: #fff5e6 !important;
+  color: #ff9c05 !important;
+  border: 2px solid #ff9c05 !important;
   text-transform: none !important;
   transition: all 0.3s ease !important;
   box-shadow: 0 2px 4px rgba(255, 156, 5, 0.2) !important;
@@ -634,13 +643,28 @@ h1 {
   position: relative;
 }
 
-#topSection .filter-toggle-btn {
+#topSection .top-toggle-btn {
   position: absolute;
-  left: 24px;
+  left: 74px;
   top: 50%;
   transform: translateY(-50%);
+  transition: none !important;
 }
 
+#topSection .top-toggle-btn:hover {
+  transform: translateY(-50%) !important;
+}
+
+#topSection .top-toggle-btn.active .filter-icon {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+#topSection .top-toggle-btn .filter-icon {
+  transition: transform 0.3s ease;
+}
+
+/* סגנונות משותפים לטבלאות */
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -687,18 +711,11 @@ h1 {
   border-bottom: none;
 }
 
+/* סגנונות משותפים למצבי טעינה וריק */
 .loading {
   text-align: center;
   padding: 2rem;
   color: var(--apple-text-secondary);
-}
-
-.error {
-  background: var(--apple-red-light);
-  color: var(--apple-red);
-  padding: 1rem;
-  border-radius: 8px;
-  margin: 1rem 0;
 }
 
 .empty-table {
@@ -706,6 +723,189 @@ h1 {
   padding: 2rem;
   color: var(--apple-text-secondary);
   font-style: italic;
+}
+
+/* סגנונות משותפים לתגי סטטוס */
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+  min-width: 60px;
+}
+
+.status-badge.status-פתוח,
+.status-badge.status-פעיל {
+  background-color: #e8f5e8;
+  color: #2d5a2d;
+}
+
+.status-badge.status-סגור {
+  background-color: #ffe6e6;
+  color: #8b0000;
+}
+
+.status-badge.status-מבוטל {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* סגנונות משותפים לכרטיסי התראות */
+.alert-card {
+  background: white;
+  border: 1px solid var(--apple-border-light);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.alert-card:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+}
+
+.alert-card.read {
+  opacity: 0.6;
+  background-color: var(--apple-bg-secondary);
+}
+
+.alert-card .price {
+  color: var(--apple-text-secondary);
+  font-size: 0.9rem;
+}
+
+/* סגנונות משותפים למודלים */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 5% auto;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--apple-text-secondary);
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background-color: var(--apple-bg-hover);
+  color: var(--apple-text-primary);
+}
+
+/* סגנונות משותפים לטופסי פרטים */
+.trade-details-grid,
+.plan-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin: 1rem 0;
+}
+
+.trade-details-section,
+.plan-details-section {
+  background: var(--apple-bg-secondary);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--apple-border-light);
+}
+
+.trade-details-section h4,
+.plan-details-section h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--apple-text-primary);
+  font-weight: 600;
+}
+
+/* סגנונות משותפים לכפתורים */
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.btn-primary {
+  background-color: var(--apple-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--apple-gray-2);
+  color: var(--apple-text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--apple-gray-3);
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
 }
 
 /* סגנונות לכפתורים */
@@ -1093,123 +1293,41 @@ body {
 .positive { color: green !important; font-weight: bold; }
 .negative { color: red !important; font-weight: bold; }
 
-.modal {
-  position: fixed;
-  top: 5%;
-  right: 5%;
-  width: 90%;
-  height: 90%;
-  background: rgba(255,255,255,0.97);
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  z-index: 999;
-  display: none;
-  overflow-y: auto;
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
-}
-.modal-content {
+/* סגנונות נוספים למצבי טעינה וריק */
+.error {
+  background: var(--apple-red-light);
+  color: var(--apple-red);
   padding: 1rem;
-}
-.modal-close {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: #e74c3c;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px;
+  margin: 1rem 0;
 }
 
-/* עיצוב תוכן המודל */
-.trade-details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-top: 1rem;
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
 }
 
-.trade-details-section {
-  background-color: var(--apple-bg-secondary);
-  padding: 1.5rem;
-  border-radius: var(--apple-radius-medium);
-  border: 1px solid var(--apple-border-light);
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.trade-details-section h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: var(--apple-text-primary);
-  border-bottom: 2px solid var(--apple-blue);
-  padding-bottom: 0.5rem;
-}
-
-.trade-details-section p {
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.trade-details-section strong {
-  min-width: 120px;
-  color: var(--apple-text-primary);
-}
-
-/* עיצוב כפתורים במודל */
-.modal-content .btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--apple-radius-medium);
-  border: none;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', sans-serif;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin: 0 0.5rem;
-}
-
-.modal-content .btn-primary {
-  background-color: var(--apple-blue);
-  color: white;
-}
-
-.modal-content .btn-primary:hover {
-  background-color: var(--apple-blue-dark);
-}
-
-.modal-content .btn-secondary {
-  background-color: var(--apple-gray-3);
-  color: var(--apple-text-primary);
-}
-
-.modal-content .btn-secondary:hover {
-  background-color: var(--apple-gray-4);
-}
-
-.modal-content .btn-success {
-  background-color: var(--apple-green);
-  color: white;
-}
-
-.modal-content .btn-success:hover {
-  background-color: var(--apple-green-dark);
-}
-
-.modal-content .btn-danger {
-  background-color: var(--apple-red);
-  color: white;
-}
-
-.modal-content .btn-danger:hover {
-  background-color: var(--apple-red-dark);
-}
-
-/* עיצוב כרטיסי תכנונים */
+/* סגנונות לכרטיסי תכנונים */
 .plan-card {
   position: relative;
   overflow: hidden;
+  background: white;
+  border: 1px solid var(--apple-border-light);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .plan-card::before {
@@ -1226,6 +1344,11 @@ body {
 
 .plan-card:hover::before {
   opacity: 1;
+}
+
+.plan-card:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transform: translateY(-1px);
 }
 
 .plan-card.selected {
@@ -1261,33 +1384,7 @@ body {
     padding: 0 1rem;
   }
   
-  .trade-details-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .modal-content {
-    width: 95%;
-    margin: 10% auto;
-    padding: 1rem;
-  }
-}
-
-/* התאמה למסכים בינוניים */
-@media (min-width: 769px) and (max-width: 1200px) {
-  .content-wrapper {
-    max-width: 100%;
-    padding: 0 2rem;
-  }
-}
-
-/* התאמה למסכים קטנים - סגנונות גלובליים */
-@media (max-width: 768px) {
-  .content-wrapper {
-    max-width: 100%;
-    padding: 0 1rem;
-  }
-  
+  .trade-details-grid,
   .plan-details-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -1298,17 +1395,25 @@ body {
     margin: 10% auto;
     padding: 1rem;
   }
+  
+  .stats-cards {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
-/* התאמה למסכים בינוניים - סגנונות גלובליים */
+/* התאמה למסכים בינוניים */
 @media (min-width: 769px) and (max-width: 1200px) {
   .content-wrapper {
     max-width: 100%;
     padding: 0 2rem;
   }
+  
+  .stats-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
-/* עיצוב אינדיקטור סטטוס - סגנונות גלובליים */
+/* עיצוב אינדיקטור סטטוס */
 .status-indicator {
   display: flex;
   justify-content: center;
@@ -1340,4 +1445,78 @@ body {
 
 .status-dot.warning {
   background-color: #ff9800;
+}
+
+/* סגנונות שדות חיפוש */
+.search-filter-container {
+  position: relative;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-filter-input {
+  width: 200px;
+  padding: 8px 35px 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+  font-size: 0.9rem;
+  background: white;
+  transition: all 0.2s ease;
+  direction: rtl;
+}
+
+.search-filter-input:focus {
+  outline: none;
+  border-color: #29a6a8;
+  box-shadow: 0 0 0 2px rgba(41, 166, 168, 0.1);
+}
+
+.search-filter-input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.search-clear-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.search-clear-btn.show {
+  display: flex;
+}
+
+.search-clear-icon {
+  font-size: 16px;
+  color: #666;
+  font-weight: bold;
+}
+
+.search-clear-btn:hover .search-clear-icon {
+  color: #333;
+}
+
+/* סגנון לאיקונים בכפתורים */
+.btn-icon {
+  color: #29a6a8;
+  font-size: 0.7em;
 }

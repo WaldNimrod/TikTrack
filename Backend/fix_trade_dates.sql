@@ -38,19 +38,7 @@ SET closed_at = datetime(opened_at, '+2 hours')
 WHERE closed_at IS NOT NULL 
 AND closed_at < opened_at;
 
--- עדכון טרנזקציות עם תאריכים לפני תאריך פתיחת הטרייד
-UPDATE executions 
-SET date = (
-    SELECT datetime(t.opened_at, '+5 minutes')
-    FROM trades t 
-    WHERE t.id = executions.trade_id
-)
-WHERE EXISTS (
-    SELECT 1 
-    FROM trades t 
-    WHERE t.id = executions.trade_id 
-    AND executions.date < t.opened_at
-);
+
 
 -- בדיקה סופית - הצגת התוצאות
 SELECT 
@@ -73,12 +61,5 @@ SELECT
     COUNT(*) as count
 FROM trades t
 JOIN trade_plans tp ON t.trade_plan_id = tp.id
-WHERE t.opened_at >= tp.created_at
-UNION ALL
-SELECT 
-    'טרנזקציות שתוקנו' as description,
-    COUNT(*) as count
-FROM executions e
-JOIN trades t ON e.trade_id = t.id
-WHERE e.date >= t.opened_at;
+WHERE t.opened_at >= tp.created_at;
 

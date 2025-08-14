@@ -274,7 +274,7 @@ function updateHeaderComponentWithFilter(selectedStatuses, selectedAccounts = nu
 }
 
 // פונקציה לעדכון הצ'קבוקסים מהקומפוננט החדש
-function updateTestCheckboxesFromComponent(selectedStatuses) {
+window.updateTestCheckboxesFromComponent = function(selectedStatuses) {
   console.log('=== updateTestCheckboxesFromComponent called ===');
   console.log('Selected statuses:', selectedStatuses);
   

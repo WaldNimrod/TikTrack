@@ -342,7 +342,7 @@ let currentDataConfig = null;
 
 // הגדרות ברירת מחדל לנתונים
 const DEFAULT_DATA_CONFIG = {
-  apiEndpoint: '/api/tradeplans',
+  apiEndpoint: '/api/v1/tradeplans/',
   dataMapping: {
     ticker: 'ticker',
     date: 'created_at',
@@ -615,7 +615,7 @@ async function loadAccountsList() {
   try {
     console.log('Loading accounts list from server...');
     
-    const response = await fetch('/api/accounts');
+    const response = await fetch('/api/v1/accounts/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -643,7 +643,7 @@ async function loadDataByType(dataType, customConfig = {}) {
   
   const dataTypes = {
     'tradeplans': {
-      apiEndpoint: '/api/tradeplans',
+      apiEndpoint: '/api/v1/tradeplans/',
       dataMapping: {
         ticker: 'ticker',
         date: 'created_at',
@@ -658,7 +658,7 @@ async function loadDataByType(dataType, customConfig = {}) {
       }
     },
     'trades': {
-      apiEndpoint: '/api/trades',
+      apiEndpoint: '/api/v1/trades/',
       dataMapping: {
         ticker: 'ticker',
         date: 'opened_at',
@@ -673,7 +673,7 @@ async function loadDataByType(dataType, customConfig = {}) {
       }
     },
     'alerts': {
-      apiEndpoint: '/api/alerts',
+      apiEndpoint: '/api/v1/alerts/',
       dataMapping: {
         ticker: 'ticker',
         date: 'created_at',
@@ -717,7 +717,7 @@ function getCurrentDataSourceInfo() {
 // פונקציה לבדיקת זמינות השרת
 async function checkServerAvailability() {
   try {
-    const response = await fetch('/api/tradeplans');
+    const response = await fetch('/api/v1/tradeplans/');
     return response.ok;
   } catch (error) {
     console.error('Server not available:', error);

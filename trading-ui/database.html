@@ -3,3140 +3,1539 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>בסיס הנתונים - TikTrack</title>
-      <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="styles/apple-theme.css?v=10" />
+  <title>בסיס נתונים - TikTrack</title>
+  <!-- AG-Grid CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/apple-theme.css?v=9" />
   <link rel="stylesheet" href="styles/menu.css?v=9" />
-  <link rel="stylesheet" href="styles/styles.css?v=16" />
+  <link rel="stylesheet" href="styles/styles.css?v=10" />
+  <link rel="stylesheet" href="styles/grid.css?v=11" />
   <link rel="stylesheet" href="styles/grid-table.css?v=7" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- קבצים מודולריים של הגריד -->
+  <script src="scripts/auth.js"></script>
+  <script src="scripts/app-header.js"></script>
+  <script src="scripts/grid-core.js"></script>
+  <script src="scripts/grid-filters.js"></script>
+  <script src="scripts/grid-data.js"></script>
+  <script src="scripts/grid-init.js"></script>
+
+  <style>
+    /* סגנונות ייחודיים לדף בסיס נתונים שלא קיימים בקבצים הכלליים */
+    .database-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e8e8e8;
+    }
+
+    .filter-icon {
+      font-size: 1.2rem;
+      transition: transform 0.2s ease;
+    }
+
+    .table-section.collapsed .filter-icon {
+      transform: rotate(180deg);
+    }
+
+    .table-container {
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .table-section.collapsed .table-container {
+      max-height: 0;
+      opacity: 0;
+    }
+  </style>
 </head>
 <body>
   <!-- Web Component של הכותרת -->
   <app-header></app-header>
 
   <div class="background-wrapper">
-    <div class="page-header">
-      <h1 class="page-title">🗄️ כל בסיס הנתונים</h1>
-      <p class="page-subtitle">תצוגה מלאה של כל הטבלאות והנתונים במערכת</p>
+    <!-- חלק עליון עם כותרת -->
+    <div class="top-section" id="topSection">
+      <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h1 class="page-title">בסיס נתונים</h1>
+            <p class="page-subtitle">ניהול ועקיבה אחר כל הנתונים במערכת</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" onclick="refreshAllTables()">
+              🔄 רענן הכל
+            </button>
+            <button class="btn btn-success" onclick="exportDatabase()">
+              📤 ייצא נתונים
+            </button>
+          </div>
+        </div>
+      </div>
+
+
     </div>
-      
-      <!-- חשבונות -->
-      <div class="table-section">
+
+    <div class="database-container">
+
+      <!-- טבלת תוכניות טרייד -->
+      <div class="table-section" id="tradePlansSection">
         <div class="table-header">
           <div class="table-title">
-            🏦 חשבונות
-          </div>
-          <div class="table-count" id="accountsCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="accountsSearch" placeholder="חיפוש בחשבונות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterAccountsTable()">
-            <button class="add-btn action-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTable('accounts')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
-          </div>
-        </div>
-        <div id="accountsTable" class="loading">טוען חשבונות...</div>
-      </div>
-      
-      <!-- טיקרים -->
-      <div class="table-section">
-        <div class="table-header">
-          <div class="table-title">
-            📈 טיקרים
-          </div>
-          <div class="table-count" id="tickersCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="tickersSearch" placeholder="חיפוש בטיקרים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('tickers')">
-            <button class="add-btn action-btn" onclick="showAddModal('tickers')" title="הוסף טיקר חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTable('tickers')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
-          </div>
-        </div>
-        <div id="tickersTable" class="loading">טוען טיקרים...</div>
-      </div>
-      
-      <!-- תכנוני טריידים -->
-      <div class="table-section">
-        <div class="table-header">
-          <div class="table-title">
-            📋 תכנוני טריידים
+            📋 תוכניות טרייד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plans</span>
           </div>
           <div class="table-count" id="tradePlansCount">טוען...</div>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="tradePlansSearch" placeholder="חיפוש בתכנוני טריידים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('trade_plans')">
-            <button class="add-btn action-btn" onclick="showAddModal('trade_plans')" title="הוסף תכנון טרייד חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTable('trade_plans')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש תוכניות..."
+                onkeyup="filterTable('tradePlansTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddTradePlanModal()" title="הוסף תוכנית חדשה"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTradePlans()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleTradePlansSection()" title="הצג/הסתר טבלת תוכניות טרייד">
+              <span class="filter-icon">▲</span>
+            </button>
           </div>
         </div>
-        <div id="tradePlansTable" class="loading">טוען תכנוני טריידים...</div>
+        <div class="table-responsive" id="tradePlansContainer">
+          <table class="table" id="tradePlansTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
+                <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker ID</span></th>
+                <th>סוג השקעה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Investment Type</span></th>
+                <th>סכום מתוכנן<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Planned Amount</span></th>
+                <th>תנאי כניסה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Entry Conditions</span></th>
+                <th>מחיר עצירה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Stop Price</span></th>
+                <th>מחיר יעד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Target Price</span></th>
+                <th>סיבות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Reasons</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
+                <th>בוטל ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Canceled At</span></th>
+                <th>סיבת ביטול<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cancel Reason</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="13" class="loading">טוען תוכניות טרייד...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
       </div>
-      
-      <!-- טריידים -->
-      <div class="table-section">
+
+      <!-- טבלת טריידים -->
+      <div class="table-section" id="tradesSection">
         <div class="table-header">
           <div class="table-title">
-            💰 טריידים
+            📈 טריידים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trades</span>
           </div>
           <div class="table-count" id="tradesCount">טוען...</div>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="tradesSearch" placeholder="חיפוש בטריידים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('trades')">
-            <button class="add-btn action-btn" onclick="showAddModal('trades')" title="הוסף טרייד חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTable('trades')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש טריידים..."
+                onkeyup="filterTable('tradesTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTrades()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleTradesSection()" title="הצג/הסתר טבלת טריידים">
+              <span class="filter-icon">▲</span>
+            </button>
           </div>
         </div>
-        <div id="tradesTable" class="loading">טוען טריידים...</div>
+        <div class="table-responsive" id="tradesContainer">
+          <table class="table" id="tradesTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
+                <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker ID</span></th>
+                <th>תוכנית<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plan ID</span></th>
+                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
+                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
+                <th>נפתח ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Opened At</span></th>
+                <th>נסגר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Closed At</span></th>
+                <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P/L</span></th>
+                <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="11" class="loading">טוען טריידים...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
       </div>
-      
-      <!-- טרנזקציות -->
-      <div class="table-section">
+
+      <!-- טבלת חשבונות -->
+      <div class="table-section" id="accountsSection">
         <div class="table-header">
           <div class="table-title">
-            ⚡ טרנזקציות
+            💰 חשבונות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Accounts</span>
+          </div>
+          <div class="table-count" id="accountsCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש חשבונות..."
+                onkeyup="filterTable('accountsTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadAccounts()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleAccountsSection()" title="הצג/הסתר טבלת חשבונות">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive" id="accountsContainer">
+          <table class="table" id="accountsTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name</span></th>
+                <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency</span></th>
+                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
+                <th>יתרה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cash Balance</span></th>
+                <th>שווי כולל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total Value</span></th>
+                <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P&L</span></th>
+                <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="9" class="loading">טוען חשבונות...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
+      </div>
+
+      <!-- טבלת טיקרים -->
+      <div class="table-section" id="tickersSection">
+        <div class="table-header">
+          <div class="table-title">
+            📊 טיקרים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Tickers</span>
+          </div>
+          <div class="table-count" id="tickersCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש טיקרים..."
+                onkeyup="filterTable('tickersTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddTickerModal()" title="הוסף טיקר חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadTickers()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleTickersSection()" title="הצג/הסתר טבלת טיקרים">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive" id="tickersContainer">
+          <table class="table" id="tickersTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>סמל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Symbol</span></th>
+                <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name</span></th>
+                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
+                <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency</span></th>
+                <th>טריידים פעילים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Active Trades</span></th>
+                <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Remarks</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="8" class="loading">טוען טיקרים...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
+      </div>
+
+      <!-- טבלת ביצועים -->
+      <div class="table-section" id="executionsSection">
+        <div class="table-header">
+          <div class="table-title">
+            ⚡ ביצועים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Executions</span>
           </div>
           <div class="table-count" id="executionsCount">טוען...</div>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="executionsSearch" placeholder="חיפוש בטרנזקציות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('executions')">
-            <button class="add-btn action-btn" onclick="showAddModal('executions')" title="הוסף טרנזקציה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTable('executions')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש ביצועים..."
+                onkeyup="filterTable('executionsTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddExecutionModal()" title="הוסף ביצוע חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadExecutions()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleExecutionsSection()" title="הצג/הסתר טבלת ביצועים">
+              <span class="filter-icon">▲</span>
+            </button>
           </div>
         </div>
-        <div id="executionsTable" class="loading">טוען טרנזקציות...</div>
-      </div>
-      
-      <!-- פקודות -->
-      <div class="table-section">
-        <div class="table-header">
-          <div class="table-title">
-            🔄 פקודות
-          </div>
-          <div class="table-count" id="openExecutionsCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="openExecutionsSearch" placeholder="חיפוש בפקודות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('open_execution_requests')">
-            <button class="add-btn action-btn" onclick="showAddModal('open_execution_requests')" title="הוסף פקודה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTable('open_execution_requests')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
-          </div>
+        <div class="table-responsive" id="executionsContainer">
+          <table class="table" id="executionsTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>טרייד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade ID</span></th>
+                <th>פעולה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Action</span></th>
+                <th>תאריך<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Date</span></th>
+                <th>כמות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Quantity</span></th>
+                <th>מחיר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Price</span></th>
+                <th>עמלה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Fee</span></th>
+                <th>מקור<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Source</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="9" class="loading">טוען ביצועים...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div id="openExecutionsTable" class="loading">טוען פקודות...</div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
       </div>
-      
-      <!-- תזרים מזומנים -->
-      <div class="table-section">
+
+      <!-- טבלת תזרימי מזומנים -->
+      <div class="table-section" id="cashFlowsSection">
         <div class="table-header">
           <div class="table-title">
-            💸 תזרים מזומנים
+            💸 תזרימי מזומנים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cash Flows</span>
           </div>
           <div class="table-count" id="cashFlowsCount">טוען...</div>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="cashFlowsSearch" placeholder="חיפוש בתזרים מזומנים..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('cash_flows')">
-            <button class="add-btn action-btn" onclick="showAddModal('cash_flows')" title="הוסף תזרים מזומנים חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTable('cash_flows')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש תזרימי מזומנים..."
+                onkeyup="filterTable('cashFlowsTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadCashFlows()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleCashFlowsSection()" title="הצג/הסתר טבלת תזרימי מזומנים">
+              <span class="filter-icon">▲</span>
+            </button>
           </div>
         </div>
-        <div id="cashFlowsTable" class="loading">טוען תזרים מזומנים...</div>
+        <div class="table-responsive" id="cashFlowsContainer">
+          <table class="table" id="cashFlowsTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
+                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
+                <th>סכום<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Amount</span></th>
+                <th>תאריך<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Date</span></th>
+                <th>תיאור<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Description</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="8" class="loading">טוען תזרימי מזומנים...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
       </div>
-      
-      <!-- התראות -->
-      <div class="table-section">
+
+      <!-- טבלת התראות -->
+      <div class="table-section" id="alertsSection">
         <div class="table-header">
           <div class="table-title">
-            🔔 התראות
+            🔔 התראות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Alerts</span>
           </div>
           <div class="table-count" id="alertsCount">טוען...</div>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="alertsSearch" placeholder="חיפוש בהתראות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('alerts')">
-            <button class="add-btn action-btn" onclick="showAddModal('alerts')" title="הוסף התראה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTable('alerts')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש התראות..."
+                onkeyup="filterTable('alertsTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadAlerts()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleAlertsSection()" title="הצג/הסתר טבלת התראות">
+              <span class="filter-icon">▲</span>
+            </button>
           </div>
         </div>
-        <div id="alertsTable" class="loading">טוען התראות...</div>
-      </div>
-      
-      <!-- תמונת זמן -->
-      <div class="table-section">
-        <div class="table-header">
-          <div class="table-title">
-            📸 תמונת זמן
-          </div>
-          <div class="table-count" id="performanceSnapshotsCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="performanceSnapshotsSearch" placeholder="חיפוש בתמונות זמן..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('performance_snapshots')">
-            <button class="add-btn action-btn" onclick="showAddModal('performance_snapshots')" title="הוסף תמונת זמן חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTable('performance_snapshots')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
-          </div>
+        <div class="table-responsive" id="alertsContainer">
+          <table class="table" id="alertsTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
+                <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker ID</span></th>
+                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
+                <th>תנאי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Condition</span></th>
+                <th>הודעה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Message</span></th>
+                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
+                <th>הופעל ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Triggered At</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="9" class="loading">טוען התראות...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div id="performanceSnapshotsTable" class="loading">טוען תמונת זמן...</div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
       </div>
-      
-      <!-- הערות -->
-      <div class="table-section">
+
+      <!-- טבלת הערות -->
+      <div class="table-section" id="notesSection">
         <div class="table-header">
           <div class="table-title">
-            📝 הערות
+            📝 הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span>
           </div>
           <div class="table-count" id="notesCount">טוען...</div>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="notesSearch" placeholder="חיפוש בהערות..." style="padding: 6px 12px; border: 1px solid var(--apple-border-light); border-radius: 6px; font-size: 14px;" onkeyup="filterTable('notes')">
-            <button class="add-btn action-btn" onclick="showAddModal('notes')" title="הוסף הערה חדשה"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTable('notes')" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש הערות..."
+                onkeyup="filterTable('notesTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddNoteModal()" title="הוסף הערה חדשה"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadNotes()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleNotesSection()" title="הצג/הסתר טבלת הערות">
+              <span class="filter-icon">▲</span>
+            </button>
           </div>
         </div>
-        <div id="notesTable" class="loading">טוען הערות...</div>
+        <div class="table-responsive" id="notesContainer">
+          <table class="table" id="notesTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
+                <th>טרייד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade ID</span></th>
+                <th>תוכנית טרייד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plan ID</span></th>
+                <th>תוכן<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Content</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
+                <th>קובץ מצורף<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Attachment</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="8" class="loading">טוען הערות...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
       </div>
+
+      <!-- טבלת משתמשים -->
+      <div class="table-section" id="usersSection">
+        <div class="table-header">
+          <div class="table-title">
+            👥 משתמשים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Users</span>
+          </div>
+          <div class="table-count" id="usersCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש משתמשים..."
+                onkeyup="filterTable('usersTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddUserModal()" title="הוסף משתמש חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadUsers()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleUsersSection()" title="הצג/הסתר טבלת משתמשים">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive" id="usersContainer">
+          <table class="table" id="usersTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>שם משתמש<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Username</span></th>
+                <th>אימייל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Email</span></th>
+                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
+                <th>תפקידים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Roles</span></th>
+                <th>התחברות אחרונה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Last Login</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="8" class="loading">טוען משתמשים...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
+      </div>
+
+      <!-- טבלת תפקידי משתמשים -->
+      <div class="table-section" id="userRolesSection">
+        <div class="table-header">
+          <div class="table-title">
+            👤 תפקידי משתמשים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">User Roles</span>
+          </div>
+          <div class="table-count" id="userRolesCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש תפקידי משתמשים..."
+                onkeyup="filterTable('userRolesTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddUserRoleModal()" title="הוסף תפקיד משתמש חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadUserRoles()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleUserRolesSection()" title="הצג/הסתר טבלת תפקידי משתמשים">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive" id="userRolesContainer">
+          <table class="table" id="userRolesTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>מזהה משתמש<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">User ID</span></th>
+                <th>שם משתמש<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Username</span></th>
+                <th>מזהה תפקיד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Role ID</span></th>
+                <th>שם תפקיד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Role Name</span></th>
+                <th>הוקצה ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Assigned At</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="8" class="loading">טוען תפקידי משתמשים...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
+      </div>
+
+
+
+
     </div>
   </div>
 
-  <!-- מודל הוספת חשבון -->
-  <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addAccountModalLabel">הוסף חשבון חדש</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="addAccountForm">
-            <!-- שדות בסיסיים -->
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="accountName" class="form-label">שם החשבון *</label>
-                <input type="text" class="form-control" id="accountName" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="accountCurrency" class="form-label">מטבע *</label>
-                <select class="form-select" id="accountCurrency" required>
-                  <option value="">בחר מטבע</option>
-                  <option value="ILS">שקל ישראלי (ILS)</option>
-                  <option value="USD">דולר אמריקאי (USD)</option>
-                  <option value="EUR">אירו (EUR)</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="accountStatus" class="form-label">סטטוס</label>
-                <select class="form-select" id="accountStatus">
-                  <option value="פתוח">פתוח</option>
-                  <option value="סגור">סגור</option>
-                </select>
-              </div>
-            </div>
-            
-            <!-- שדות פיננסיים -->
-            <div class="row">
-              <div class="col-md-4 mb-3">
-                <label for="accountCashBalance" class="form-label">יתרת מזומן</label>
-                <input type="number" class="form-control" id="accountCashBalance" step="0.01" placeholder="0.00">
-                <small class="form-text text-muted">יתרת המזומן בחשבון</small>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label for="accountTotalValue" class="form-label">שווי כולל</label>
-                <input type="number" class="form-control" id="accountTotalValue" step="0.01" placeholder="0.00">
-                <small class="form-text text-muted">השווי הכולל של החשבון</small>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label for="accountTotalPl" class="form-label">רווח/הפסד כולל</label>
-                <input type="number" class="form-control" id="accountTotalPl" step="0.01" placeholder="0.00">
-                <small class="form-text text-muted">הרווח או ההפסד הכולל</small>
-              </div>
-            </div>
-            
-            <!-- הערות -->
-            <div class="mb-3">
-              <label for="accountNotes" class="form-label">הערות</label>
-              <textarea class="form-control" id="accountNotes" rows="4" placeholder="הערות על החשבון..."></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="add-btn" onclick="createAccount()"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף חשבון</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל עריכת חשבון -->
-  <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editAccountModalLabel">ערוך חשבון</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editAccountForm">
-            <input type="hidden" id="editAccountId">
-            
-            <!-- שדות בסיסיים -->
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editAccountName" class="form-label">שם החשבון *</label>
-                <input type="text" class="form-control" id="editAccountName" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editAccountCurrency" class="form-label">מטבע *</label>
-                <select class="form-select" id="editAccountCurrency" required>
-                  <option value="">בחר מטבע</option>
-                  <option value="ILS">שקל ישראלי (ILS)</option>
-                  <option value="USD">דולר אמריקאי (USD)</option>
-                  <option value="EUR">אירו (EUR)</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editAccountStatus" class="form-label">סטטוס</label>
-                <select class="form-select" id="editAccountStatus">
-                  <option value="פתוח">פתוח</option>
-                  <option value="סגור">סגור</option>
-                </select>
-              </div>
-            </div>
-            
-            <!-- שדות פיננסיים -->
-            <div class="row">
-              <div class="col-md-4 mb-3">
-                <label for="editAccountCashBalance" class="form-label">יתרת מזומן</label>
-                <input type="number" class="form-control" id="editAccountCashBalance" step="0.01" placeholder="0.00">
-                <small class="form-text text-muted">יתרת המזומן בחשבון</small>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label for="editAccountTotalValue" class="form-label">שווי כולל</label>
-                <input type="number" class="form-control" id="editAccountTotalValue" step="0.01" placeholder="0.00">
-                <small class="form-text text-muted">השווי הכולל של החשבון</small>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label for="editAccountTotalPl" class="form-label">רווח/הפסד כולל</label>
-                <input type="number" class="form-control" id="editAccountTotalPl" step="0.01" placeholder="0.00">
-                <small class="form-text text-muted">הרווח או ההפסד הכולל</small>
-              </div>
-            </div>
-            
-            <!-- הערות -->
-            <div class="mb-3">
-              <label for="editAccountNotes" class="form-label">הערות</label>
-              <textarea class="form-control" id="editAccountNotes" rows="4" placeholder="הערות על החשבון..."></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteAccountFromModal()" title="בטל חשבון">🚫</button>
-          <button type="button" class="edit-btn" onclick="updateAccountFromModal()" title="עדכן חשבון">💾</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-
-
-  <!-- מודל הוספת טיקר -->
-  <div class="modal fade" id="addTickerModal" tabindex="-1" aria-labelledby="addTickerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addTickerModalLabel">הוסף טיקר חדש</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="addTickerForm">
-            <div class="mb-3">
-              <label for="tickerSymbol" class="form-label">סימבול *</label>
-              <input type="text" class="form-control" id="tickerSymbol" required placeholder="למשל: AAPL" 
-                     oninput="validateSymbolInput(this)" 
-                     onkeypress="return validateSymbolKeypress(event)"
-                     maxlength="20">
-              <div class="form-text">רק אותיות גדולות באנגלית, מספרים ונקודות מותרים</div>
-            </div>
-            <div class="mb-3">
-              <label for="tickerType" class="form-label">סוג</label>
-              <select class="form-select" id="tickerType">
-                <option value="">בחר סוג</option>
-                <option value="stock">מניה</option>
-                <option value="etf">ETF</option>
-                <option value="bond">אג"ח</option>
-                <option value="crypto">קריפטו</option>
-                <option value="forex">מט"ח</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="tickerCurrency" class="form-label">מטבע</label>
-              <select class="form-select" id="tickerCurrency">
-                <option value="USD">דולר אמריקאי (USD)</option>
-                <option value="ILS">שקל ישראלי (ILS)</option>
-                <option value="EUR">אירו (EUR)</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="tickerRemarks" class="form-label">הערות</label>
-              <textarea class="form-control" id="tickerRemarks" rows="3" placeholder="הערות על הטיקר..."></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="add-btn" onclick="createTicker()"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף טיקר</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל עריכת טיקר -->
-  <div class="modal fade" id="editTickerModal" tabindex="-1" aria-labelledby="editTickerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editTickerModalLabel">ערוך טיקר</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editTickerForm">
-            <input type="hidden" id="editTickerId">
-            <div class="mb-3">
-              <label for="editTickerSymbol" class="form-label">סימבול *</label>
-              <input type="text" class="form-control" id="editTickerSymbol" required
-                     oninput="validateSymbolInput(this)" 
-                     onkeypress="return validateSymbolKeypress(event)"
-                     maxlength="20">
-              <div class="form-text">רק אותיות גדולות באנגלית, מספרים ונקודות מותרים</div>
-            </div>
-            <div class="mb-3">
-              <label for="editTickerType" class="form-label">סוג</label>
-              <select class="form-select" id="editTickerType">
-                <option value="">בחר סוג</option>
-                <option value="stock">מניה</option>
-                <option value="etf">ETF</option>
-                <option value="bond">אג"ח</option>
-                <option value="crypto">קריפטו</option>
-                <option value="forex">מט"ח</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="editTickerCurrency" class="form-label">מטבע</label>
-              <select class="form-select" id="editTickerCurrency">
-                <option value="USD">דולר אמריקאי (USD)</option>
-                <option value="ILS">שקל ישראלי (ILS)</option>
-                <option value="EUR">אירו (EUR)</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="editTickerRemarks" class="form-label">הערות</label>
-              <textarea class="form-control" id="editTickerRemarks" rows="3"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteTickerFromModal()" title="מחק טיקר">🗑️</button>
-          <button type="button" class="edit-btn" onclick="updateTickerFromModal()" title="עדכן טיקר">💾</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל הוספת טרייד -->
-  <div class="modal fade" id="addTradeModal" tabindex="-1" aria-labelledby="addTradeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addTradeModalLabel">הוסף טרייד חדש</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="addTradeForm">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="tradeAccountId" class="form-label">חשבון *</label>
-                <select class="form-select" id="tradeAccountId" required>
-                  <option value="">בחר חשבון</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="tradeTickerId" class="form-label">טיקר *</label>
-                <select class="form-select" id="tradeTickerId" required>
-                  <option value="">בחר טיקר</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="tradeType" class="form-label">סוג טרייד</label>
-                <select class="form-select" id="tradeType">
-                  <option value="buy">קנייה</option>
-                  <option value="sell">מכירה</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="tradeStatus" class="form-label">סטטוס</label>
-                <select class="form-select" id="tradeStatus">
-                  <option value="open">פתוח</option>
-                  <option value="closed">סגור</option>
-                  <option value="cancelled">מבוטל</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="tradeInvestmentType" class="form-label">סוג השקעה</label>
-                <select class="form-select" id="tradeInvestmentType">
-                  <option value="swing">סווינג</option>
-                  <option value="investment">השקעה</option>
-                  <option value="passive">פאסיבי</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="tradeCancelledAt" class="form-label">תאריך ביטול</label>
-                <input type="datetime-local" class="form-control" id="tradeCancelledAt">
-                <small class="form-text text-muted">למלא רק אם הסטטוס הוא "מבוטל"</small>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="tradeCancelReason" class="form-label">סיבת ביטול</label>
-                <input type="text" class="form-control" id="tradeCancelReason" placeholder="סיבת הביטול...">
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="tradeNotes" class="form-label">הערות</label>
-              <textarea class="form-control" id="tradeNotes" rows="3"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="add-btn" onclick="createTrade()"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף טרייד</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל עריכת טרייד -->
-  <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editTradeModalLabel">ערוך טרייד</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editTradeForm">
-            <input type="hidden" id="editTradeId">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editTradeAccountId" class="form-label">חשבון *</label>
-                <select class="form-select" id="editTradeAccountId" required>
-                  <option value="">בחר חשבון</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editTradeTickerId" class="form-label">טיקר *</label>
-                <select class="form-select" id="editTradeTickerId" required>
-                  <option value="">בחר טיקר</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editTradeType" class="form-label">סוג טרייד</label>
-                <select class="form-select" id="editTradeType">
-                  <option value="buy">קנייה</option>
-                  <option value="sell">מכירה</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editTradeStatus" class="form-label">סטטוס</label>
-                <select class="form-select" id="editTradeStatus">
-                  <option value="open">פתוח</option>
-                  <option value="closed">סגור</option>
-                  <option value="cancelled">מבוטל</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editTradeInvestmentType" class="form-label">סוג השקעה</label>
-                <select class="form-select" id="editTradeInvestmentType">
-                  <option value="swing">סווינג</option>
-                  <option value="investment">השקעה</option>
-                  <option value="passive">פאסיבי</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editTradeCancelledAt" class="form-label">תאריך ביטול</label>
-                <input type="datetime-local" class="form-control" id="editTradeCancelledAt">
-                <small class="form-text text-muted">למלא רק אם הסטטוס הוא "מבוטל"</small>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editTradeCancelReason" class="form-label">סיבת ביטול</label>
-                <input type="text" class="form-control" id="editTradeCancelReason" placeholder="סיבת הביטול...">
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="editTradeNotes" class="form-label">הערות</label>
-              <textarea class="form-control" id="editTradeNotes" rows="3"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteTradeFromModal()" title="מחק טרייד">🗑️</button>
-          <button type="button" class="edit-btn" onclick="updateTradeFromModal()" title="עדכן טרייד">💾</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל הוספת תכנון טרייד -->
-  <div class="modal fade" id="addTradePlanModal" tabindex="-1" aria-labelledby="addTradePlanModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addTradePlanModalLabel">הוסף תכנון טרייד חדש</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="addTradePlanForm">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="tradePlanAccountId" class="form-label">חשבון *</label>
-                <select class="form-select" id="tradePlanAccountId" required>
-                  <option value="">בחר חשבון</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="tradePlanTickerId" class="form-label">טיקר *</label>
-                <select class="form-select" id="tradePlanTickerId" required>
-                  <option value="">בחר טיקר</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="tradePlanInvestmentType" class="form-label">סוג השקעה</label>
-                <select class="form-select" id="tradePlanInvestmentType">
-                  <option value="swing">סווינג</option>
-                  <option value="investment">השקעה</option>
-                  <option value="passive">פאסיבי</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="tradePlanAmount" class="form-label">סכום מתוכנן</label>
-                <input type="number" class="form-control" id="tradePlanAmount" step="0.01">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="tradePlanStopPrice" class="form-label">מחיר סטופ</label>
-                <input type="number" class="form-control" id="tradePlanStopPrice" step="0.01">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="tradePlanTargetPrice" class="form-label">מחיר יעד</label>
-                <input type="number" class="form-control" id="tradePlanTargetPrice" step="0.01">
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="tradePlanReasons" class="form-label">סיבות</label>
-              <textarea class="form-control" id="tradePlanReasons" rows="3"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="add-btn" onclick="createTradePlan()"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף תכנון</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל עריכת תכנון טרייד -->
-  <div class="modal fade" id="editTradePlanModal" tabindex="-1" aria-labelledby="editTradePlanModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editTradePlanModalLabel">ערוך תכנון טרייד</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editTradePlanForm">
-            <input type="hidden" id="editTradePlanId">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editTradePlanAccountId" class="form-label">חשבון *</label>
-                <select class="form-select" id="editTradePlanAccountId" required>
-                  <option value="">בחר חשבון</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editTradePlanTickerId" class="form-label">טיקר *</label>
-                <select class="form-select" id="editTradePlanTickerId" required>
-                  <option value="">בחר טיקר</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editTradePlanInvestmentType" class="form-label">סוג השקעה</label>
-                <select class="form-select" id="editTradePlanInvestmentType">
-                  <option value="swing">סווינג</option>
-                  <option value="investment">השקעה</option>
-                  <option value="passive">פאסיבי</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editTradePlanAmount" class="form-label">סכום מתוכנן</label>
-                <input type="number" class="form-control" id="editTradePlanAmount" step="0.01">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editTradePlanStopPrice" class="form-label">מחיר סטופ</label>
-                <input type="number" class="form-control" id="editTradePlanStopPrice" step="0.01">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editTradePlanTargetPrice" class="form-label">מחיר יעד</label>
-                <input type="number" class="form-control" id="editTradePlanTargetPrice" step="0.01">
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="editTradePlanReasons" class="form-label">סיבות</label>
-              <textarea class="form-control" id="editTradePlanReasons" rows="3"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteTradePlanFromModal()" title="מחק תכנון">🗑️</button>
-          <button type="button" class="edit-btn" onclick="updateTradePlanFromModal()" title="עדכן תכנון">💾</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל הוספת התראה -->
-  <div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addAlertModalLabel">הוסף התראה חדשה</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="addAlertForm">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="alertAccountId" class="form-label">חשבון</label>
-                <select class="form-select" id="alertAccountId">
-                  <option value="">בחר חשבון</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="alertTickerId" class="form-label">טיקר</label>
-                <select class="form-select" id="alertTickerId">
-                  <option value="">בחר טיקר</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="alertType" class="form-label">סוג התראה</label>
-                <select class="form-select" id="alertType">
-                  <option value="price">מחיר</option>
-                  <option value="volume">נפח</option>
-                  <option value="technical">טכני</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="alertStatus" class="form-label">סטטוס</label>
-                <select class="form-select" id="alertStatus">
-                  <option value="active">פעיל</option>
-                  <option value="inactive">לא פעיל</option>
-                </select>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="alertCondition" class="form-label">תנאי</label>
-              <textarea class="form-control" id="alertCondition" rows="3" placeholder="תיאור התנאי להתראה..."></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="add-btn" onclick="createAlert()"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף התראה</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל עריכת התראה -->
-  <div class="modal fade" id="editAlertModal" tabindex="-1" aria-labelledby="editAlertModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editAlertModalLabel">ערוך התראה</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editAlertForm">
-            <input type="hidden" id="editAlertId">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editAlertAccountId" class="form-label">חשבון</label>
-                <select class="form-select" id="editAlertAccountId">
-                  <option value="">בחר חשבון</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editAlertTickerId" class="form-label">טיקר</label>
-                <select class="form-select" id="editAlertTickerId">
-                  <option value="">בחר טיקר</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editAlertType" class="form-label">סוג התראה</label>
-                <select class="form-select" id="editAlertType">
-                  <option value="price">מחיר</option>
-                  <option value="volume">נפח</option>
-                  <option value="technical">טכני</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editAlertStatus" class="form-label">סטטוס</label>
-                <select class="form-select" id="editAlertStatus">
-                  <option value="active">פעיל</option>
-                  <option value="inactive">לא פעיל</option>
-                </select>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="editAlertCondition" class="form-label">תנאי</label>
-              <textarea class="form-control" id="editAlertCondition" rows="3"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteAlertFromModal()" title="מחק התראה">🗑️</button>
-          <button type="button" class="edit-btn" onclick="updateAlertFromModal()" title="עדכן התראה">💾</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל הוספת הערה -->
-  <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addNoteModalLabel">הוסף הערה חדשה</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="addNoteForm">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="noteAccountId" class="form-label">חשבון</label>
-                <select class="form-select" id="noteAccountId">
-                  <option value="">בחר חשבון</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="noteTradeId" class="form-label">טרייד</label>
-                <select class="form-select" id="noteTradeId">
-                  <option value="">בחר טרייד</option>
-                </select>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="noteContent" class="form-label">תוכן *</label>
-              <textarea class="form-control" id="noteContent" rows="4" required placeholder="תוכן ההערה..."></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="add-btn" onclick="createNote()"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף הערה</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל אזהרה כללי -->
-  <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content" id="warningModalContent">
-        <div class="modal-header" id="warningModalHeader">
-          <h5 class="modal-title" id="warningModalLabel">
-            <i class="fas fa-exclamation-triangle"></i> <span id="warningModalTitle">אזהרה</span>
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="warningModalBody"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">הבנתי</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל עריכת הערה -->
-  <div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editNoteModalLabel">ערוך הערה</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editNoteForm">
-            <input type="hidden" id="editNoteId">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editNoteAccountId" class="form-label">חשבון</label>
-                <select class="form-select" id="editNoteAccountId">
-                  <option value="">בחר חשבון</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editNoteTradeId" class="form-label">טרייד</label>
-                <select class="form-select" id="editNoteTradeId">
-                  <option value="">בחר טרייד</option>
-                </select>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="editNoteContent" class="form-label">תוכן *</label>
-              <textarea class="form-control" id="editNoteContent" rows="4" required></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="delete-account-btn me-auto" onclick="deleteNoteFromModal()" title="מחק הערה">🗑️</button>
-          <button type="button" class="edit-btn" onclick="updateNoteFromModal()" title="עדכן הערה">💾</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Authentication System -->
+  
   <script>
-    // פונקציה לטעינת טבלה
-    async function loadTable(tableName) {
-      console.log(`טוען טבלה: ${tableName}`);
-      
-      // מיפוי שמות טבלאות ל-ID של אלמנטים
-      const tableIdMap = {
-        'open_execution_requests': 'openExecutions',
-        'cash_flows': 'cashFlows',
-        'performance_snapshots': 'performanceSnapshots'
-      };
-      
-      const elementSuffix = tableIdMap[tableName] || tableName;
-      const tableElement = document.getElementById(elementSuffix + 'Table');
-      const countElement = document.getElementById(elementSuffix + 'Count');
-      
-      try {
-        tableElement.innerHTML = '<div class="loading">טוען...</div>';
-        
-        const response = await fetch(`/api/database/${tableName}`);
-        const data = await response.json();
-        
-        console.log(`נתונים עבור ${tableName}:`, data);
-        
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        
-        // עדכון מספר הרשומות
-        countElement.textContent = `${data.length} רשומות`;
-        
-        if (data.length === 0) {
-          tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
-          return;
-        }
-        
-        // יצירת הטבלה
-        const table = createDataTable(data, tableName);
-        tableElement.innerHTML = '';
-        tableElement.appendChild(table);
-        
-      } catch (error) {
-        console.error(`שגיאה בטעינת טבלה ${tableName}:`, error);
-        tableElement.innerHTML = `<div class="error">שגיאה בטעינת הנתונים: ${error.message}</div>`;
-        countElement.textContent = 'שגיאה';
-      }
-    }
-    
-    // פונקציה ליצירת טבלת נתונים
-    function createDataTable(data, tableName) {
-      const table = document.createElement('table');
-      table.className = 'data-table';
-      
-      // יצירת כותרות
-      const thead = document.createElement('thead');
-      const headerRow = document.createElement('tr');
-      
-      if (data.length > 0) {
-        let columns = Object.keys(data[0]);
-        
-        // סדר מותאם לכל הטבלאות
-        if (tableName === 'accounts') {
-          columns = ['id', 'name', 'currency', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'];
-        } else if (tableName === 'tickers') {
-          columns = ['id', 'symbol', 'name', 'type', 'remarks', 'currency', 'active_trades'];
-        } else if (tableName === 'trades') {
-          columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'investment_type', 'created_at', 'closed_at', 'cancelled_at', 'total_pl', 'notes'];
-        } else if (tableName === 'executions') {
-          columns = ['id', 'trade_id', 'action', 'date', 'quantity', 'price', 'fee', 'source'];
-        } else if (tableName === 'alerts') {
-          columns = ['id', 'account_id', 'ticker_id', 'alert_type', 'condition', 'status', 'created_at', 'triggered_at'];
-        } else if (tableName === 'cash_flows') {
-          columns = ['id', 'account_id', 'date', 'flow_type', 'amount', 'currency', 'description'];
-        } else if (tableName === 'performance_snapshots') {
-          columns = ['id', 'account_id', 'date', 'total_value', 'open_pl', 'closed_pl', 'mtm_value', 'investment_type'];
-        } else if (tableName === 'notes') {
-          columns = ['id', 'account_id', 'trade_id', 'trade_plan_id', 'content', 'created_at', 'attachment'];
-        } else if (tableName === 'trade_plans') {
-          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason'];
-        } else if (tableName === 'open_execution_requests') {
-          columns = ['id', 'trade_id', 'ticker_symbol', 'action', 'order_type', 'status', 'expiry_type', 'price', 'quantity', 'created_at'];
-        }
-        
-        columns.forEach(column => {
-          const th = document.createElement('th');
-          const displayName = getColumnDisplayName(column);
-          
-          // יצירת כותרת עם חלק באנגלית לא בבולד
-          if (displayName.includes('(') && displayName.includes(')')) {
-            const hebrewPart = displayName.split('(')[0].trim();
-            const englishPart = displayName.split('(')[1].replace(')', '').trim();
-            
-            th.innerHTML = `${hebrewPart} <span style="font-weight: normal; color: #666;">(${englishPart})</span>`;
-          } else {
-            th.textContent = displayName;
-          }
-          
-          th.style.cursor = 'pointer';
-          th.title = 'לחץ למיון';
-          
-          // הוספת אירוע מיון
-          th.addEventListener('click', () => {
-            sortTable(tableName, column);
-          });
-          
-          headerRow.appendChild(th);
-        });
-        
-        // הוספת עמודת פעולות לכל הטבלאות
-        const actionsTh = document.createElement('th');
-        actionsTh.textContent = 'פעולות';
-        actionsTh.style.textAlign = 'center';
-        headerRow.appendChild(actionsTh);
-      }
-      
-      thead.appendChild(headerRow);
-      table.appendChild(thead);
-      
-      // יצירת שורות נתונים
-      const tbody = document.createElement('tbody');
-      data.forEach(row => {
-        const tr = document.createElement('tr');
-        
-        // שימוש באותו סדר עמודות כמו בכותרות
-        let columns = Object.keys(row);
-        if (tableName === 'accounts') {
-          columns = ['id', 'name', 'currency', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'];
-        } else if (tableName === 'tickers') {
-          columns = ['id', 'symbol', 'name', 'type', 'remarks', 'currency', 'active_trades'];
-        } else if (tableName === 'trades') {
-          columns = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'type', 'investment_type', 'opened_at', 'closed_at', 'total_pl', 'notes'];
-        } else if (tableName === 'executions') {
-          columns = ['id', 'trade_id', 'action', 'date', 'quantity', 'price', 'fee', 'source'];
-        } else if (tableName === 'alerts') {
-          columns = ['id', 'account_id', 'ticker_id', 'alert_type', 'condition', 'status', 'created_at', 'triggered_at'];
-        } else if (tableName === 'cash_flows') {
-          columns = ['id', 'account_id', 'date', 'flow_type', 'amount', 'currency', 'description'];
-        } else if (tableName === 'performance_snapshots') {
-          columns = ['id', 'account_id', 'date', 'total_value', 'open_pl', 'closed_pl', 'mtm_value', 'investment_type'];
-        } else if (tableName === 'notes') {
-          columns = ['id', 'account_id', 'trade_id', 'trade_plan_id', 'content', 'created_at', 'attachment'];
-        } else if (tableName === 'trade_plans') {
-          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason'];
-        } else if (tableName === 'open_execution_requests') {
-          columns = ['id', 'trade_id', 'ticker_symbol', 'action', 'order_type', 'status', 'expiry_type', 'price', 'quantity', 'created_at'];
-        }
-        
-        columns.forEach(key => {
-          const value = row[key];
-          const td = document.createElement('td');
-          
-          if (value === null || value === undefined) {
-            td.textContent = '-';
-            td.style.color = 'var(--apple-text-secondary)';
-            td.style.fontStyle = 'italic';
-          } else if (typeof value === 'object') {
-            td.className = 'json-cell';
-            td.textContent = JSON.stringify(value);
-            td.title = 'לחץ להרחבה';
-          } else if (typeof value === 'boolean' || (typeof value === 'number' && (value === 0 || value === 1))) {
-            // טיפול ב-boolean וגם במספרים 0/1
-            const boolValue = value === true || value === 1;
-            td.textContent = boolValue ? 'כן' : 'לא';
-            td.style.color = boolValue ? 'var(--apple-green)' : 'var(--apple-red)';
-            td.style.fontWeight = '500';
-          } else if (key === 'active_trades') {
-            // המרת מספר ל-boolean
-            const isActive = value === 1 || value === true;
-            td.textContent = isActive ? 'פעיל' : 'לא פעיל';
-            td.style.color = isActive ? 'var(--apple-green)' : 'var(--apple-red)';
-            td.style.fontWeight = '500';
-          } else if (key === 'status') {
-            // המרת סטטוסים לעברית
-            let statusText = value;
-            let statusColor = 'var(--apple-text-primary)';
-            
-            switch (value) {
-              case 'open':
-              case 'פתוח':
-                statusText = 'פתוח';
-                statusColor = 'var(--apple-blue)';
-                break;
-              case 'closed':
-              case 'סגור':
-                statusText = 'סגור';
-                statusColor = 'var(--apple-green)';
-                break;
-              case 'cancelled':
-              case 'מבוטל':
-                statusText = 'מבוטל';
-                statusColor = 'var(--apple-red)';
-                break;
-              case 'pending':
-              case 'ממתין':
-                statusText = 'ממתין';
-                statusColor = 'var(--apple-orange)';
-                break;
-              case 'active':
-                statusText = 'פעיל';
-                statusColor = 'var(--apple-blue)';
-                break;
-              case 'inactive':
-                statusText = 'לא פעיל';
-                statusColor = 'var(--apple-gray)';
-                break;
-            }
-            
-            td.textContent = statusText;
-            td.style.color = statusColor;
-            td.style.fontWeight = '500';
-          } else if (key === 'investment_type') {
-            // המרת סוגי השקעה לעברית
-            let investmentTypeText = value;
-            let investmentTypeColor = 'var(--apple-text-primary)';
-            
-            switch (value) {
-              case 'swing':
-                investmentTypeText = 'סווינג';
-                investmentTypeColor = 'var(--apple-blue)';
-                break;
-              case 'investment':
-                investmentTypeText = 'השקעה';
-                investmentTypeColor = 'var(--apple-green)';
-                break;
-              case 'passive':
-                investmentTypeText = 'פאסיבי';
-                investmentTypeColor = 'var(--apple-orange)';
-                break;
-            }
-            
-            td.textContent = investmentTypeText;
-            td.style.color = investmentTypeColor;
-            td.style.fontWeight = '500';
-          } else if (key === 'currency') {
-            // הצגת מטבע עם אייקון
-            let currencyText = value;
-            let currencyColor = 'var(--apple-text-primary)';
-            
-            switch (value) {
-              case 'USD':
-                currencyText = '💵 USD';
-                currencyColor = 'var(--apple-green)';
-                break;
-              case 'ILS':
-                currencyText = '₪ ILS';
-                currencyColor = 'var(--apple-blue)';
-                break;
-              case 'EUR':
-                currencyText = '€ EUR';
-                currencyColor = 'var(--apple-orange)';
-                break;
-            }
-            
-            td.textContent = currencyText;
-            td.style.color = currencyColor;
-            td.style.fontWeight = '500';
-          } else if (typeof value === 'number') {
-            // סגנון מיוחד למזהה
-            if (key === 'id') {
-              td.className = 'id-cell';
-              td.textContent = `#${value}`;
-            } else {
-              td.className = 'number-cell';
-              if (value.toString().includes('.')) {
-                td.textContent = value.toFixed(2);
-              } else {
-                td.textContent = value.toLocaleString();
-              }
-            }
-          } else if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
-            // תאריך
-            td.textContent = new Date(value).toLocaleDateString('he-IL');
-          } else {
-            td.textContent = value;
-          }
-          
-          tr.appendChild(td);
-        });
-        
-        // הוספת כפתורי פעולות לכל הטבלאות
-        const actionsTd = document.createElement('td');
-        actionsTd.style.textAlign = 'center';
-        
-        const editBtn = document.createElement('button');
-        editBtn.innerHTML = '✏️';
-        editBtn.className = 'edit-btn action-btn';
-        editBtn.title = `ערוך ${getTableDisplayName(tableName)}`;
-        
-        editBtn.addEventListener('click', () => {
-          showEditModal(tableName, row);
-        });
-        
-        const deleteBtn = document.createElement('button');
-        // בחירת האייקון הנכון לפי סוג הטבלה
-        if (tableName === 'accounts') {
-          deleteBtn.innerHTML = '🚫';
-          deleteBtn.title = `בטל ${getTableDisplayName(tableName)}`;
-        } else {
-          deleteBtn.innerHTML = '✕';
-          deleteBtn.title = `מחק ${getTableDisplayName(tableName)}`;
-        }
-        deleteBtn.className = 'delete-account-btn';
-        
-        deleteBtn.addEventListener('click', () => {
-          const displayName = getTableDisplayName(tableName);
-          const itemName = getItemDisplayName(tableName, row);
-          
-          if (tableName === 'accounts') {
-            if (confirm(`⚠️ אזהרה: האם אתה בטוח שברצונך לבטל את ${displayName} "${itemName}"?\n\nהחשבון יקבל סטטוס "מבוטל" ולא יימחק מהמערכת.\nפעולה זו אינה הפיכה.`)) {
-              deleteItem(tableName, row.id, itemName);
-            }
-          } else {
-            if (confirm(`האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?`)) {
-              deleteItem(tableName, row.id, itemName);
-            }
-          }
-        });
-        
-        actionsTd.appendChild(editBtn);
-        actionsTd.appendChild(deleteBtn);
-        actionsTd.style.display = 'flex';
-        actionsTd.style.gap = '4px';
-        actionsTd.style.justifyContent = 'center';
-        tr.appendChild(actionsTd);
-        
-        tbody.appendChild(tr);
-      });
-      
-      table.appendChild(tbody);
-      return table;
-    }
-    
-    // פונקציה לביטול חשבון
-    async function deleteAccount(accountId, accountName) {
-      try {
-        const response = await fetch(`/api/accounts/${accountId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          // הצגת הודעת הצלחה
-          showSuccessMessage(`החשבון "${accountName}" בוטל בהצלחה!`);
-          // רענון הטבלה
-          loadTable('accounts');
-        } else {
-          if (data.error_type === 'open_trades') {
-            showOpenTradesWarning(data.message, data.trades);
-          } else {
-            throw new Error(data.message || 'שגיאה בביטול החשבון');
-          }
-        }
-      } catch (error) {
-        console.error('שגיאה בביטול חשבון:', error);
-        // הצגת הודעת שגיאה
-        showErrorMessage(`שגיאה בביטול החשבון: ${error.message}`);
-      }
-    }
-
-
-
-    // פונקציה להצגת הודעת הצלחה
-    function showSuccessMessage(message) {
-      // יצירת אלמנט הודעה
-      const notification = document.createElement('div');
-      notification.className = 'alert alert-success alert-dismissible fade show position-fixed';
-      notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-      notification.innerHTML = `
-        <i class="fas fa-check-circle me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      `;
-      
-      document.body.appendChild(notification);
-      
-      // הסרה אוטומטית אחרי 3 שניות
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.remove();
-        }
-      }, 3000);
-    }
-
-    // פונקציה להצגת הודעת שגיאה
-    function showErrorMessage(message) {
-      // יצירת אלמנט הודעה
-      const notification = document.createElement('div');
-      notification.className = 'alert alert-danger alert-dismissible fade show position-fixed';
-      notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-      notification.innerHTML = `
-        <i class="fas fa-exclamation-circle me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      `;
-      
-      document.body.appendChild(notification);
-      
-      // הסרה אוטומטית אחרי 5 שניות
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.remove();
-        }
-      }, 5000);
-    }
-    
-    // פונקציות לניהול מודלים
-    function showAddAccountModal() {
-      // ניקוי הטופס
-      document.getElementById('addAccountForm').reset();
-      // הצגת המודל
-      const modalElement = document.getElementById('addAccountModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-      
-      // וידוא שהמודל מוצג כראוי
-      setTimeout(() => {
-        modalElement.style.zIndex = '9999';
-        modalElement.style.display = 'block';
-        modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-        
-        const modalContent = modalElement.querySelector('.modal-content');
-        if (modalContent) {
-          modalContent.style.backgroundColor = 'white';
-          modalContent.style.opacity = '1';
-          modalContent.style.visibility = 'visible';
-        }
-        
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-          backdrop.style.zIndex = '9998';
-        }
-      }, 100);
-    }
-    
-    function showEditAccountModal(account) {
-      // מילוי הטופס עם נתוני החשבון
-      document.getElementById('editAccountId').value = account.id;
-      document.getElementById('editAccountName').value = account.name;
-      document.getElementById('editAccountCurrency').value = account.currency;
-      document.getElementById('editAccountStatus').value = account.status || 'פתוח';
-      document.getElementById('editAccountCashBalance').value = account.cash_balance || '';
-      document.getElementById('editAccountTotalValue').value = account.total_value || '';
-      document.getElementById('editAccountTotalPl').value = account.total_pl || '';
-      document.getElementById('editAccountNotes').value = account.notes || '';
-      
-      // הצגת המודל
-      const modalElement = document.getElementById('editAccountModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-      
-      // וידוא שהמודל מוצג כראוי
-      setTimeout(() => {
-        modalElement.style.zIndex = '9999';
-        modalElement.style.display = 'block';
-        modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-        
-        const modalContent = modalElement.querySelector('.modal-content');
-        if (modalContent) {
-          modalContent.style.backgroundColor = 'white';
-          modalContent.style.opacity = '1';
-          modalContent.style.visibility = 'visible';
-        }
-        
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-          backdrop.style.zIndex = '9998';
-        }
-      }, 100);
-    }
-    
-    async function createAccount() {
-      const name = document.getElementById('accountName').value.trim();
-      const currency = document.getElementById('accountCurrency').value;
-      const status = document.getElementById('accountStatus').value || 'פתוח';
-      const cashBalance = parseFloat(document.getElementById('accountCashBalance').value) || 0;
-      const totalValue = parseFloat(document.getElementById('accountTotalValue').value) || 0;
-      const totalPl = parseFloat(document.getElementById('accountTotalPl').value) || 0;
-      const notes = document.getElementById('accountNotes').value.trim();
-      
-      if (!name || !currency) {
-        showErrorMessage('שם החשבון ומטבע הם שדות חובה');
-        return;
-      }
-      
-      try {
-        const response = await fetch('/api/accounts', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: name,
-            currency: currency,
-            status: status,
-            cash_balance: cashBalance,
-            total_value: totalValue,
-            total_pl: totalPl,
-            notes: notes
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          showSuccessMessage('החשבון נוסף בהצלחה!');
-          // סגירת המודל
-          const modal = bootstrap.Modal.getInstance(document.getElementById('addAccountModal'));
-          modal.hide();
-          // רענון הטבלה
-          loadTable('accounts');
-        } else {
-          throw new Error(data.message || 'שגיאה בהוספת החשבון');
-        }
-      } catch (error) {
-        console.error('שגיאה בהוספת חשבון:', error);
-        showErrorMessage(`שגיאה בהוספת החשבון: ${error.message}`);
-      }
-    }
-    
-    async function updateAccountFromModal() {
-      const accountId = document.getElementById('editAccountId').value;
-      const name = document.getElementById('editAccountName').value.trim();
-      const currency = document.getElementById('editAccountCurrency').value;
-      const status = document.getElementById('editAccountStatus').value || 'פתוח';
-      const cashBalance = parseFloat(document.getElementById('editAccountCashBalance').value) || 0;
-      const totalValue = parseFloat(document.getElementById('editAccountTotalValue').value) || 0;
-      const totalPl = parseFloat(document.getElementById('editAccountTotalPl').value) || 0;
-      const notes = document.getElementById('editAccountNotes').value.trim();
-      
-      if (!name || !currency) {
-        showErrorMessage('שם החשבון ומטבע הם שדות חובה');
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/api/accounts/${accountId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: name,
-            currency: currency,
-            status: status,
-            cash_balance: cashBalance,
-            total_value: totalValue,
-            total_pl: totalPl,
-            notes: notes
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          showSuccessMessage('החשבון עודכן בהצלחה!');
-          // סגירת המודל
-          const modal = bootstrap.Modal.getInstance(document.getElementById('editAccountModal'));
-          modal.hide();
-          // רענון הטבלה
-          loadTable('accounts');
-        } else {
-          throw new Error(data.message || 'שגיאה בעדכון החשבון');
-        }
-      } catch (error) {
-        console.error('שגיאה בעדכון חשבון:', error);
-        showErrorMessage(`שגיאה בעדכון החשבון: ${error.message}`);
-      }
-    }
-    
-    function deleteAccountFromModal() {
-      const accountId = document.getElementById('editAccountId').value;
-      const accountName = document.getElementById('editAccountName').value;
-      
-      if (confirm(`⚠️ אזהרה: האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?\n\nהחשבון יקבל סטטוס "מבוטל" ולא יימחק מהמערכת.\nפעולה זו אינה הפיכה.`)) {
-        deleteAccount(accountId, accountName);
-        // סגירת המודל
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editAccountModal'));
-        modal.hide();
-      }
-    }
-    
-    // פונקציה כללית לסינון כל הטבלאות
-    function filterTable(tableName) {
-      const searchInputId = tableName + 'Search';
-      const searchTerm = document.getElementById(searchInputId)?.value.toLowerCase() || '';
-      const table = document.getElementById(tableName + 'Table');
-      
+    // פונקציה לחיפוש בטבלאות
+    function filterTable(tableId, searchTerm) {
+      const table = document.getElementById(tableId);
       if (!table) return;
       
-      const rows = table.querySelectorAll('tbody tr');
-      let visibleCount = 0;
+      const tbody = table.querySelector('tbody');
+      if (!tbody) return;
+      
+      const rows = tbody.querySelectorAll('tr');
+      const term = searchTerm.toLowerCase().trim();
       
       rows.forEach(row => {
         const cells = row.querySelectorAll('td');
-        let shouldShow = false;
+        let found = false;
         
-        // בדיקה אם אחד מהתאים מכיל את מונח החיפוש
         cells.forEach(cell => {
-          if (cell.textContent.toLowerCase().includes(searchTerm)) {
-            shouldShow = true;
+          const text = cell.textContent.toLowerCase();
+          if (text.includes(term)) {
+            found = true;
           }
         });
         
-        if (shouldShow) {
+        if (found || term === '') {
           row.style.display = '';
-          visibleCount++;
         } else {
           row.style.display = 'none';
         }
       });
       
-      // עדכון מספר הרשומות המוצגות
-      const countElement = document.getElementById(tableName + 'Count');
-      if (countElement) {
-        const totalCount = rows.length;
-        if (searchTerm) {
-          countElement.textContent = `${visibleCount} מתוך ${totalCount} רשומות`;
-        } else {
-          countElement.textContent = `${totalCount} רשומות`;
-        }
-      }
+      // עדכון ספירה
+      updateTableCount(tableId);
     }
     
-    // פונקציה לסינון טבלת החשבונות (לשמירה על תאימות)
-    function filterAccountsTable() {
-      filterTable('accounts');
-    }
-    
-    // פונקציה למיון טבלה
-    function sortTable(tableName, column) {
-      const table = document.getElementById(tableName + 'Table');
+    // פונקציה לעדכון ספירת שורות בטבלה
+    function updateTableCount(tableId) {
+      const table = document.getElementById(tableId);
       if (!table) return;
       
       const tbody = table.querySelector('tbody');
-      const rows = Array.from(tbody.querySelectorAll('tr'));
+      if (!tbody) return;
       
-      // קביעת כיוון המיון
-      const currentOrder = table.getAttribute('data-sort-order') || 'asc';
-      const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-      table.setAttribute('data-sort-order', newOrder);
+      const visibleRows = Array.from(tbody.querySelectorAll('tr')).filter(row => 
+        row.style.display !== 'none'
+      ).length;
       
-      // מציאת אינדקס העמודה
-      const headers = table.querySelectorAll('thead th');
-      let columnIndex = -1;
-      for (let i = 0; i < headers.length; i++) {
-        if (headers[i].textContent === getColumnDisplayName(column)) {
-          columnIndex = i;
-          break;
-        }
+      // עדכון הספירה בהתאם לטבלה
+      const countElement = getCountElementForTable(tableId);
+      if (countElement) {
+        const tableName = getTableNameForTable(tableId);
+        countElement.textContent = `${visibleRows} ${tableName}`;
       }
-      
-      if (columnIndex === -1) return;
-      
-      // מיון השורות
-      rows.sort((a, b) => {
-        const aValue = a.cells[columnIndex].textContent.trim();
-        const bValue = b.cells[columnIndex].textContent.trim();
-        
-        // בדיקה אם הערכים הם מספרים
-        const aNum = parseFloat(aValue.replace(/[^\d.-]/g, ''));
-        const bNum = parseFloat(bValue.replace(/[^\d.-]/g, ''));
-        
-        if (!isNaN(aNum) && !isNaN(bNum)) {
-          return newOrder === 'asc' ? aNum - bNum : bNum - aNum;
-        }
-        
-        // מיון טקסטואלי
-        if (newOrder === 'asc') {
-          return aValue.localeCompare(bValue, 'he');
-        } else {
-          return bValue.localeCompare(aValue, 'he');
-        }
-      });
-      
-      // עדכון הטבלה
-      rows.forEach(row => tbody.appendChild(row));
-      
-      // עדכון הכותרות
-      headers.forEach(header => {
-        header.textContent = header.textContent.replace(' ↑', '').replace(' ↓', '');
-      });
-      
-      const currentHeader = headers[columnIndex];
-      currentHeader.textContent += newOrder === 'asc' ? ' ↑' : ' ↓';
     }
     
-    // פונקציה להמרת שמות עמודות לעברית עם שם באנגלית
-    function getColumnDisplayName(columnName) {
-      const columnNames = {
-        'id': 'מזהה (ID)',
-        'name': 'שם (Name)',
-        'symbol': 'סימבול (Symbol)',
-        'type': 'סוג (Type)',
-        'account_id': 'מזהה חשבון (Account ID)',
-        'account_name': 'שם חשבון (Account Name)',
-        'ticker_id': 'מזהה טיקר (Ticker ID)',
-        'ticker_symbol': 'סימבול טיקר (Ticker Symbol)',
-        'action': 'פעולה (Action)',
-        'order_type': 'סוג פקודה (Order Type)',
-        'expiry_type': 'סוג תפוגה (Expiry Type)',
-        'price': 'מחיר (Price)',
-        'quantity': 'כמות (Quantity)',
-        'trade_id': 'מזהה טרייד (Trade ID)',
-        'trade_status': 'סטטוס טרייד (Trade Status)',
-        'trade_opened_at': 'תאריך פתיחת טרייד (Trade Opened At)',
-        'flow_type': 'סוג תזרים (Flow Type)',
-        'currency': 'מטבע (Currency)',
-        'date': 'תאריך (Date)',
-        'snapshot_date': 'תאריך צילום (Snapshot Date)',
-        'portfolio_value': 'שווי תיק (Portfolio Value)',
-        'total_invested': 'סה"כ מושקע (Total Invested)',
-        'total_return': 'סה"כ תשואה (Total Return)',
-        'investment_type': 'סוג השקעה (Investment Type)',
-        'investment_category': 'קטגוריית השקעה (Investment Category)',
-        'category_display': 'קטגוריה (Category)',
-        'planned_amount': 'סכום מתוכנן (Planned Amount)',
-        'entry_conditions': 'תנאי כניסה (Entry Conditions)',
-        'stop_price': 'מחיר סטופ (Stop Price)',
-        'target_price': 'מחיר יעד (Target Price)',
-        'reasons': 'סיבות (Reasons)',
-        'created_at': 'תאריך יצירה (Created At)',
-        'canceled_at': 'תאריך ביטול (Canceled At)',
-        'cancelled_at': 'תאריך ביטול (Cancelled At)',
-        'cancel_reason': 'סיבת ביטול (Cancel Reason)',
-        'opened_at': 'תאריך פתיחה (Opened At)',
-        'closed_at': 'תאריך סגירה (Closed At)',
-        'status': 'סטטוס (Status)',
-        'notes': 'הערות (Notes)',
-        'total_pl': 'רווח/הפסד כולל (Total P/L)',
-        'cash_balance': 'יתרת מזומן (Cash Balance)',
-        'total_value': 'שווי כולל (Total Value)',
-        'execution_date': 'תאריך ביצוע (Execution Date)',
-        'request_date': 'תאריך בקשה (Request Date)',
-        'amount': 'סכום (Amount)',
-        'description': 'תיאור (Description)',
-        'alert_type': 'סוג התראה (Alert Type)',
-        'condition': 'תנאי (Condition)',
-        'triggered_at': 'תאריך הפעלה (Triggered At)',
-        'is_active': 'פעיל (Is Active)',
-        'content': 'תוכן (Content)',
-        'created_by': 'נוצר על ידי (Created By)',
-        'updated_at': 'תאריך עדכון (Updated At)',
-        'active_trades': 'טריידים פעילים (Active Trades)',
-        'remarks': 'הערות (Remarks)',
-        'trade_plan_id': 'מזהה תכנון (Trade Plan ID)',
-        'fee': 'עמלה (Fee)',
-        'source': 'מקור (Source)',
-        'open_pl': 'רווח/הפסד פתוח (Open P/L)',
-        'closed_pl': 'רווח/הפסד סגור (Closed P/L)',
-        'mtm_value': 'שווי שוק (MTM Value)',
-        'attachment': 'קובץ מצורף (Attachment)'
+    // פונקציה לקבלת אלמנט הספירה המתאים
+    function getCountElementForTable(tableId) {
+      const countMap = {
+        'usersTable': 'usersCount',
+        'accountsTable': 'accountsCount',
+        'tickersTable': 'tickersCount',
+        'tradesTable': 'tradesCount',
+        'tradePlansTable': 'tradePlansCount',
+        'alertsTable': 'alertsCount',
+        'cashFlowsTable': 'cashFlowsCount',
+        'notesTable': 'notesCount',
+        'executionsTable': 'executionsCount'
       };
       
-      return columnNames[columnName] || `${columnName} (${columnName})`;
+      const countId = countMap[tableId];
+      return countId ? document.getElementById(countId) : null;
     }
     
-    // טעינת כל הטבלאות בעת טעינת הדף
-    window.addEventListener('load', () => {
-      console.log('הדף נטען, מתחיל לטעון טבלאות...');
-      
-      // טעינה מיידית של תכנוני טריידים
-      console.log('טוען תכנוני טריידים...');
-      loadTable('trade_plans');
-      
-      // טעינה מיידית של פקודות ותזרים מזומנים
-      console.log('טוען פקודות...');
-      loadTable('open_execution_requests');
-      
-      console.log('טוען תזרים מזומנים...');
-      loadTable('cash_flows');
-      
-      const tables = [
-        'accounts',
-        'tickers', 
-        'trades',
-        'executions',
-        'alerts',
-        'performance_snapshots',
-        'notes'
-      ];
-      
-      tables.forEach(table => {
-        console.log(`מתחיל לטעון: ${table}`);
-        loadTable(table);
-      });
-    });
-    
-    // בדיקה נוספת
-    console.log('הסקריפט נטען');
-    
-    // בדיקה מיידית
-    setTimeout(() => {
-      console.log('בדיקה מיידית - טוען trade_plans');
-      fetch('/api/database/trade_plans')
-        .then(response => response.json())
-        .then(data => {
-          console.log('נתונים שהתקבלו:', data);
-          const tableElement = document.getElementById('tradePlansTable');
-          const countElement = document.getElementById('tradePlansCount');
-          if (tableElement && countElement) {
-            countElement.textContent = `${data.length} רשומות`;
-            if (data.length > 0) {
-              const table = createDataTable(data, 'trade_plans');
-              tableElement.innerHTML = '';
-              tableElement.appendChild(table);
-            } else {
-              tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
-            }
-          }
-        })
-        .catch(error => {
-          console.error('שגיאה:', error);
-        });
-      
-      // בדיקה מיידית לפקודות
-      console.log('בדיקה מיידית - טוען open_execution_requests');
-      fetch('/api/database/open_execution_requests')
-        .then(response => response.json())
-        .then(data => {
-          console.log('נתוני פקודות:', data);
-          const tableElement = document.getElementById('openExecutionsTable');
-          const countElement = document.getElementById('openExecutionsCount');
-          if (tableElement && countElement) {
-            countElement.textContent = `${data.length} רשומות`;
-            if (data.length > 0) {
-              const table = createDataTable(data, 'open_execution_requests');
-              tableElement.innerHTML = '';
-              tableElement.appendChild(table);
-            } else {
-              tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
-            }
-          }
-        })
-        .catch(error => {
-          console.error('שגיאה בפקודות:', error);
-        });
-      
-      // בדיקה מיידית לתזרים מזומנים
-      console.log('בדיקה מיידית - טוען cash_flows');
-      fetch('/api/database/cash_flows')
-        .then(response => response.json())
-        .then(data => {
-          console.log('נתוני תזרים מזומנים:', data);
-          const tableElement = document.getElementById('cashFlowsTable');
-          const countElement = document.getElementById('cashFlowsCount');
-          if (tableElement && countElement) {
-            countElement.textContent = `${data.length} רשומות`;
-            if (data.length > 0) {
-              const table = createDataTable(data, 'cash_flows');
-              tableElement.innerHTML = '';
-              tableElement.appendChild(table);
-            } else {
-              tableElement.innerHTML = '<div class="empty-table">אין רשומות בטבלה זו</div>';
-            }
-          }
-        })
-        .catch(error => {
-          console.error('שגיאה בתזרים מזומנים:', error);
-        });
-    }, 2000);
-    
-    // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
-    function updateBackgroundPadding(isCollapsed) {
-      const backgroundWrapper = document.querySelector('.background-wrapper');
-      const body = document.body;
-      
-      if (backgroundWrapper) {
-        if (isCollapsed) {
-          backgroundWrapper.classList.add('filter-collapsed');
-        } else {
-          backgroundWrapper.classList.remove('filter-collapsed');
-        }
-      }
-      
-      if (body) {
-        if (isCollapsed) {
-          body.classList.add('filter-collapsed');
-        } else {
-          body.classList.remove('filter-collapsed');
-        }
-      }
-    }
-
-    // האזנה לשינויים בקומפוננט הכותרת
-    function setupHeaderListener() {
-      const header = document.querySelector('app-header');
-      if (header) {
-        // האזנה לשינויים בפילטר
-        const observer = new MutationObserver((mutations) => {
-          mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-              const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
-              if (filterSection) {
-                const isCollapsed = filterSection.classList.contains('collapsed');
-                updateBackgroundPadding(isCollapsed);
-              }
-            }
-          });
-        });
-
-        // התחלת ההאזנה
-        setTimeout(() => {
-          const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
-          if (filterSection) {
-            observer.observe(filterSection, { attributes: true });
-          }
-        }, 1000);
-      }
-    }
-
-    // פונקציות עזר לניהול כל הטבלאות
-    function getTableDisplayName(tableName) {
-      const tableNames = {
-        'accounts': 'חשבון',
-        'tickers': 'טיקר',
-        'trades': 'טרייד',
-        'executions': 'ביצוע',
-        'alerts': 'התראה',
-        'cash_flows': 'תזרים מזומנים',
-        'performance_snapshots': 'צילום ביצועים',
-        'notes': 'הערה',
-        'trade_plans': 'תכנון טרייד',
-        'open_execution_requests': 'בקשת ביצוע'
+    // פונקציה לקבלת שם הטבלה
+    function getTableNameForTable(tableId) {
+      const nameMap = {
+        'usersTable': 'משתמשים',
+        'accountsTable': 'חשבונות',
+        'tickersTable': 'טיקרים',
+        'tradesTable': 'טריידים',
+        'tradePlansTable': 'תוכניות טרייד',
+        'alertsTable': 'התראות',
+        'cashFlowsTable': 'תזרימי מזומנים',
+        'notesTable': 'הערות',
+        'executionsTable': 'ביצועים'
       };
-      return tableNames[tableName] || 'רשומה';
+      
+      return nameMap[tableId] || '';
     }
-    
-    function getItemDisplayName(tableName, row) {
-      switch (tableName) {
-        case 'accounts':
-          return row.name || `חשבון ${row.id}`;
-        case 'tickers':
-          return row.symbol || `טיקר ${row.id}`;
-        case 'trades':
-          return `טרייד ${row.id}`;
-        case 'executions':
-          return `ביצוע ${row.id}`;
-        case 'alerts':
-          return `התראה ${row.id}`;
-        case 'cash_flows':
-          return `תזרים ${row.id}`;
-        case 'performance_snapshots':
-          return `צילום ${row.id}`;
-        case 'notes':
-          return row.content ? row.content.substring(0, 30) + '...' : `הערה ${row.id}`;
-        case 'trade_plans':
-          return `תכנון ${row.id}`;
-        case 'open_execution_requests':
-          return `בקשה ${row.id}`;
-        default:
-          return `רשומה ${row.id}`;
-      }
+
+    // פונקציה לטעינת נתוני הדשבורד
+    function loadDashboardData() {
+      refreshAllTables();
     }
-    
-    function showEditModal(tableName, row) {
-      switch (tableName) {
-        case 'accounts':
-          showEditAccountModal(row);
-          break;
-        case 'tickers':
-          showEditTickerModal(row);
-          break;
-        case 'trades':
-          showEditTradeModal(row);
-          break;
-        case 'trade_plans':
-          showEditTradePlanModal(row);
-          break;
-        case 'alerts':
-          showEditAlertModal(row);
-          break;
-        case 'notes':
-          showEditNoteModal(row);
-          break;
-        default:
-          alert(`עריכת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
-      }
+
+    // פונקציה להתנתקות
+    function onLogout() {
+      window.location.href = '/';
     }
-    
-    function showAddModal(tableName) {
-      switch (tableName) {
-        case 'accounts':
-          showAddAccountModal();
-          break;
-        case 'tickers':
-          showAddTickerModal();
-          break;
-        case 'trades':
-          showAddTradeModal();
-          break;
-        case 'trade_plans':
-          showAddTradePlanModal();
-          break;
-        case 'alerts':
-          showAddAlertModal();
-          break;
-        case 'notes':
-          showAddNoteModal();
-          break;
-        default:
-          alert(`הוספת ${getTableDisplayName(tableName)} תתמוך בקרוב`);
-      }
-    }
-    
-    // פונקציות לטיקרים
-    function showAddTickerModal() {
-      document.getElementById('addTickerForm').reset();
-      const modalElement = document.getElementById('addTickerModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-      
-      setTimeout(() => {
-        modalElement.style.zIndex = '9999';
-        modalElement.style.display = 'block';
-        modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-        
-        const modalContent = modalElement.querySelector('.modal-content');
-        if (modalContent) {
-          modalContent.style.backgroundColor = 'white';
-          modalContent.style.opacity = '1';
-          modalContent.style.visibility = 'visible';
-        }
-        
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-          backdrop.style.zIndex = '9998';
-        }
-      }, 100);
-    }
-    
-    // פונקציות ולידציה לשדה סימבול
-    function validateSymbolInput(input) {
-      // המר לאותיות גדולות
-      let value = input.value.toUpperCase();
-      
-      // הסר תווים לא מותרים (רק אותיות גדולות באנגלית, מספרים ונקודות)
-      value = value.replace(/[^A-Z0-9.]/g, '');
-      
-      // עדכן את הערך בשדה
-      input.value = value;
-    }
-    
-    function validateSymbolKeypress(event) {
-      const char = String.fromCharCode(event.which);
-      const allowedChars = /[A-Za-z0-9.]/;
-      
-      // אם זה לא תו מותר, בטל את האירוע
-      if (!allowedChars.test(char)) {
-        event.preventDefault();
-        return false;
-      }
-      
-      return true;
-    }
-    
-    function showEditTickerModal(ticker) {
-      document.getElementById('editTickerId').value = ticker.id;
-      document.getElementById('editTickerSymbol').value = ticker.symbol;
-      document.getElementById('editTickerType').value = ticker.type || '';
-      document.getElementById('editTickerCurrency').value = ticker.currency || 'USD';
-      document.getElementById('editTickerRemarks').value = ticker.remarks || '';
-      
-      const modalElement = document.getElementById('editTickerModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-      
-      setTimeout(() => {
-        modalElement.style.zIndex = '9999';
-        modalElement.style.display = 'block';
-        modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-        
-        const modalContent = modalElement.querySelector('.modal-content');
-        if (modalContent) {
-          modalContent.style.backgroundColor = 'white';
-          modalContent.style.opacity = '1';
-          modalContent.style.visibility = 'visible';
-        }
-        
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-          backdrop.style.zIndex = '9998';
-        }
-      }, 100);
-    }
-    
-    async function createTicker() {
-      const symbol = document.getElementById('tickerSymbol').value.trim();
-      const type = document.getElementById('tickerType').value;
-      const currency = document.getElementById('tickerCurrency').value;
-      const remarks = document.getElementById('tickerRemarks').value.trim();
-      
-      if (!symbol) {
-        alert('סימבול הוא שדה חובה');
-        return;
-      }
-      
-      // ולידציה נוספת של הסימבול
-      const symbolPattern = /^[A-Z0-9.]+$/;
-      if (!symbolPattern.test(symbol)) {
-        alert('סימבול יכול להכיל רק אותיות גדולות באנגלית, מספרים ונקודות');
-        return;
-      }
-      
-      try {
-        const response = await fetch('/api/tickers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            symbol: symbol,
-            type: type,
-            currency: currency,
-            remarks: remarks
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          alert('הטיקר נוסף בהצלחה!');
-          const modal = bootstrap.Modal.getInstance(document.getElementById('addTickerModal'));
-          modal.hide();
-          loadTable('tickers');
-        } else {
-          throw new Error(data.message || 'שגיאה בהוספת הטיקר');
-        }
-      } catch (error) {
-        console.error('שגיאה בהוספת טיקר:', error);
-        alert(`שגיאה בהוספת טיקר: ${error.message}`);
-      }
-    }
-    
-    async function updateTickerFromModal() {
-      const id = document.getElementById('editTickerId').value;
-      const symbol = document.getElementById('editTickerSymbol').value.trim();
-      const type = document.getElementById('editTickerType').value;
-      const currency = document.getElementById('editTickerCurrency').value;
-      const remarks = document.getElementById('editTickerRemarks').value.trim();
-      
-      if (!symbol) {
-        alert('סימבול הוא שדה חובה');
-        return;
-      }
-      
-      // ולידציה נוספת של הסימבול
-      const symbolPattern = /^[A-Z0-9.]+$/;
-      if (!symbolPattern.test(symbol)) {
-        alert('סימבול יכול להכיל רק אותיות גדולות באנגלית, מספרים ונקודות');
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/api/tickers/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            symbol: symbol,
-            type: type,
-            currency: currency,
-            remarks: remarks
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          alert('הטיקר עודכן בהצלחה!');
-          const modal = bootstrap.Modal.getInstance(document.getElementById('editTickerModal'));
-          modal.hide();
-          loadTable('tickers');
-        } else {
-          throw new Error(data.message || 'שגיאה בעדכון הטיקר');
-        }
-      } catch (error) {
-        console.error('שגיאה בעדכון טיקר:', error);
-        alert(`שגיאה בעדכון טיקר: ${error.message}`);
-      }
-    }
-    
-    async function deleteTickerFromModal() {
-      const id = document.getElementById('editTickerId').value;
-      const symbol = document.getElementById('editTickerSymbol').value;
-      
-      if (confirm(`האם אתה בטוח שברצונך למחוק את הטיקר "${symbol}"?`)) {
-        try {
-          const response = await fetch(`/api/tickers/${id}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          const data = await response.json();
-          
-          if (response.ok) {
-            alert(`הטיקר "${symbol}" נמחק בהצלחה!`);
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editTickerModal'));
-            modal.hide();
-            loadTable('tickers');
-          } else {
-            // בדיקה אם יש קשרים מונעים מחיקה
-            if (data.error_type && (data.error_type === 'linked_plans' || data.error_type === 'linked_trades' || data.error_type === 'linked_alerts' || data.error_type === 'has_links')) {
-              showWarningModal('danger', 'לא ניתן למחוק טיקר', data.message, data);
-            } else {
-              throw new Error(data.message || 'שגיאה במחיקת הטיקר');
-            }
-          }
-        } catch (error) {
-          console.error('שגיאה במחיקת טיקר:', error);
-          alert(`שגיאה במחיקת טיקר: ${error.message}`);
-        }
-      }
-    }
-    
-    // פונקציה כללית להצגת אזהרות
-    function showWarningModal(type, title, message, data = null) {
-      const modal = document.getElementById('warningModal');
-      const modalContent = document.getElementById('warningModalContent');
-      const modalHeader = document.getElementById('warningModalHeader');
-      const modalTitle = document.getElementById('warningModalTitle');
-      const modalBody = document.getElementById('warningModalBody');
-      
-      // הגדרת צבעים לפי סוג האזהרה
-      let headerClass = '';
-      let borderClass = '';
-      
-      switch (type) {
-        case 'danger':
-          headerClass = 'bg-danger text-white';
-          borderClass = 'border-danger';
-          break;
-        case 'warning':
-          headerClass = 'bg-warning text-dark';
-          borderClass = 'border-warning';
-          break;
-        case 'info':
-          headerClass = 'bg-info text-white';
-          borderClass = 'border-info';
-          break;
-        default:
-          headerClass = 'bg-secondary text-white';
-          borderClass = 'border-secondary';
-      }
-      
-      // עדכון המודל
-      modalHeader.className = `modal-header ${headerClass}`;
-      modalContent.className = `modal-content ${borderClass}`;
-      modalTitle.textContent = title;
-      
-      // בניית תוכן המודל
-      let bodyContent = `<div class="alert alert-${type === 'danger' ? 'danger' : type === 'warning' ? 'warning' : 'info'}" role="alert">
-        <h6 class="alert-heading">${title}</h6>
-        <p>${message}</p>
-      </div>`;
-      
-      // הוספת טבלה אם יש נתונים
-      if (data && data.trades && data.trades.length > 0) {
-        bodyContent += `
-          <div class="card mt-3">
-            <div class="card-header bg-light">
-              <h6 class="mb-0">טריידים פתוחים בחשבון:</h6>
-            </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-sm table-striped">
-                  <thead>
-                    <tr>
-                      <th>מזהה טרייד</th>
-                      <th>טיקר</th>
-                      <th>תאריך פתיחה</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${data.trades.map(trade => `
-                      <tr>
-                        <td>#${trade.id}</td>
-                        <td>${trade.ticker || 'לא ידוע'}</td>
-                        <td>${formatDate(trade.opened_at)}</td>
-                      </tr>
-                    `).join('')}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="mt-3">
-            <p class="text-muted small">
-              <strong>הסבר:</strong> כדי לבטל חשבון, יש לסגור תחילה את כל הטריידים הפתוחים בו.
-            </p>
-          </div>
-        `;
-      }
-      
-      // הוספת פרטי תכנוני טריידים מקושרים
-      if (data && data.linked_plans && data.linked_plans.length > 0) {
-        bodyContent += `
-          <div class="mt-3">
-            <h6 class="text-${type === 'danger' ? 'danger' : 'warning'}">תכנוני טריידים פעילים מקושרים:</h6>
-            <div class="table-responsive">
-              <table class="table table-sm table-bordered">
-                <thead class="table-${type === 'danger' ? 'danger' : 'warning'}">
-                  <tr>
-                    <th>מזהה</th>
-                    <th>תאריך יצירה</th>
-                    <th>סוג השקעה</th>
-                    <th>סכום מתוכנן</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${data.linked_plans.map(plan => `
-                    <tr>
-                      <td>#${plan.id}</td>
-                      <td>${formatDate(plan.created_at)}</td>
-                      <td>${plan.investment_type}</td>
-                      <td>${plan.planned_amount ? plan.planned_amount.toLocaleString() : '-'}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-      }
-      
-      // הוספת פרטי טריידים פעילים מקושרים
-      if (data && data.linked_trades && data.linked_trades.length > 0) {
-        bodyContent += `
-          <div class="mt-3">
-            <h6 class="text-${type === 'danger' ? 'danger' : 'warning'}">טריידים פעילים מקושרים:</h6>
-            <div class="table-responsive">
-              <table class="table table-sm table-bordered">
-                <thead class="table-${type === 'danger' ? 'danger' : 'warning'}">
-                  <tr>
-                    <th>מזהה</th>
-                    <th>סטטוס</th>
-                    <th>תאריך פתיחה</th>
-                    <th>רווח/הפסד</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${data.linked_trades.map(trade => `
-                    <tr>
-                      <td>#${trade.id}</td>
-                      <td>${trade.status}</td>
-                      <td>${trade.opened_at ? formatDate(trade.opened_at) : '-'}</td>
-                      <td>${trade.total_pl ? trade.total_pl.toLocaleString() : '-'}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-      }
-      
-      // הוספת פרטי התראות מקושרות
-      if (data && data.linked_alerts && data.linked_alerts.length > 0) {
-        bodyContent += `
-          <div class="mt-3">
-            <h6 class="text-${type === 'danger' ? 'danger' : 'warning'}">התראות פעילות מקושרות:</h6>
-            <div class="table-responsive">
-              <table class="table table-sm table-bordered">
-                <thead class="table-${type === 'danger' ? 'danger' : 'warning'}">
-                  <tr>
-                    <th>מזהה</th>
-                    <th>סוג התראה</th>
-                    <th>תנאי</th>
-                    <th>תאריך יצירה</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${data.linked_alerts.map(alert => `
-                    <tr>
-                      <td>#${alert.id}</td>
-                      <td>${alert.alert_type}</td>
-                      <td>${alert.condition}</td>
-                      <td>${formatDate(alert.created_at)}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-      }
-      
-      // הצגת סיכום כל הקשרים
-      if (data && data.error_type === 'has_links') {
-        bodyContent += `
-          <div class="mt-3">
-            <h6 class="text-${type === 'danger' ? 'danger' : 'warning'}">סיכום קשרים במערכת:</h6>
-            <div class="table-responsive">
-              <table class="table table-sm table-bordered">
-                <thead class="table-${type === 'danger' ? 'danger' : 'warning'}">
-                  <tr>
-                    <th colspan="4" class="text-center">
-                      <strong>סה"כ קשרים במערכת:</strong><br>
-                      תכנוני טריידים: ${data.total_plans || 0}<br>
-                      טריידים: ${data.total_trades || 0}<br>
-                      התראות: ${data.total_alerts || 0}
-                    </th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-          </div>
-        `;
-      }
-      
-      modalBody.innerHTML = bodyContent;
-      
-      // הצגת המודל
-      const bootstrapModal = new bootstrap.Modal(modal);
-      bootstrapModal.show();
-    }
-    
-    // פונקציה עזר לעיצוב תאריכים
+
+    // Helper functions
     function formatDate(dateString) {
       if (!dateString) return '-';
-      return new Date(dateString).toLocaleDateString('he-IL');
+      const date = new Date(dateString);
+      return date.toLocaleDateString('he-IL');
     }
-    
-    async function deleteItem(tableName, itemId, itemName) {
-      try {
-        let endpoint = '';
-        switch (tableName) {
-          case 'accounts':
-            endpoint = `/api/accounts/${itemId}`;
-            break;
-          case 'tickers':
-            endpoint = `/api/tickers/${itemId}`;
-            break;
-          case 'trades':
-            endpoint = `/api/trades/${itemId}`;
-            break;
-          case 'executions':
-            endpoint = `/api/executions/${itemId}`;
-            break;
-          case 'alerts':
-            endpoint = `/api/alerts/${itemId}`;
-            break;
-          case 'cash_flows':
-            endpoint = `/api/cash_flows/${itemId}`;
-            break;
-          case 'notes':
-            endpoint = `/api/notes/${itemId}`;
-            break;
-          case 'trade_plans':
-            endpoint = `/api/tradeplans/${itemId}`;
-            break;
-          default:
-            throw new Error(`מחיקת ${getTableDisplayName(tableName)} לא נתמכת עדיין`);
-        }
-        
-        const response = await fetch(endpoint, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        const data = await response.json();
-        console.log('DEBUG: Server response for deleteItem:', data);
-        
-        if (response.ok) {
-          // הצגת הודעת הצלחה
-          const successMessage = tableName === 'accounts' 
-            ? `${getTableDisplayName(tableName)} "${itemName}" בוטל בהצלחה!`
-            : `${getTableDisplayName(tableName)} "${itemName}" נמחק בהצלחה!`;
-          showSuccessMessage(successMessage);
-          // רענון הטבלה
-          loadTable(tableName);
-        } else {
-          // טיפול מיוחד בטיקרים עם קשרים
-          if (tableName === 'tickers' && data.error_type && (data.error_type === 'linked_plans' || data.error_type === 'linked_trades' || data.error_type === 'linked_plans_and_trades' || data.error_type === 'linked_alerts' || data.error_type === 'has_links')) {
-            showWarningModal('danger', 'לא ניתן למחוק טיקר', data.message, data);
-          } 
-          // טיפול מיוחד בחשבונות עם טריידים פתוחים
-          else if (tableName === 'accounts' && data.error_type === 'open_trades') {
-            showWarningModal('danger', 'לא ניתן לבטל חשבון', data.message, data);
-          } else {
-            throw new Error(data.message || `שגיאה במחיקת ${getTableDisplayName(tableName)}`);
-          }
-        }
-      } catch (error) {
-        console.error(`שגיאה במחיקת ${getTableDisplayName(tableName)}:`, error);
-        // הצגת הודעת שגיאה
-        showErrorMessage(`שגיאה במחיקת ${getTableDisplayName(tableName)}: ${error.message}`);
-      }
+
+    function formatDateTime(dateString) {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      return date.toLocaleString('he-IL');
     }
-    
-    // פונקציות לניהול מודלים - טריידים
-    function showAddTradeModal() {
-      loadAccountsAndTickers();
-      document.getElementById('addTradeForm').reset();
-      const modalElement = document.getElementById('addTradeModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
+
+    function formatCurrency(amount) {
+      if (amount === null || amount === undefined) return '-';
+      return new Intl.NumberFormat('he-IL', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
     }
-    
-    function showEditTradeModal(trade) {
-      loadAccountsAndTickers();
-      document.getElementById('editTradeId').value = trade.id;
-      document.getElementById('editTradeAccountId').value = trade.account_id || '';
-      document.getElementById('editTradeTickerId').value = trade.ticker_id || '';
-      document.getElementById('editTradeType').value = trade.type || 'buy';
-      document.getElementById('editTradeStatus').value = trade.status || 'open';
-      document.getElementById('editTradeInvestmentType').value = trade.investment_type || 'swing';
-      document.getElementById('editTradeNotes').value = trade.notes || '';
-      
-      // טיפול בשדות ביטול
-      const cancelledAt = trade.cancelled_at ? new Date(trade.cancelled_at).toISOString().slice(0, 16) : '';
-      document.getElementById('editTradeCancelledAt').value = cancelledAt;
-      document.getElementById('editTradeCancelReason').value = trade.cancel_reason || '';
-      
-      const modalElement = document.getElementById('editTradeModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-    
-    async function createTrade() {
-      const accountId = document.getElementById('tradeAccountId').value;
-      const tickerId = document.getElementById('tradeTickerId').value;
-      const type = document.getElementById('tradeType').value;
-      const status = document.getElementById('tradeStatus').value;
-      const investmentType = document.getElementById('tradeInvestmentType').value || 'swing';
-      const notes = document.getElementById('tradeNotes').value.trim();
-      const cancelledAt = document.getElementById('tradeCancelledAt').value;
-      const cancelReason = document.getElementById('tradeCancelReason').value.trim();
-      
-      if (!accountId || !tickerId) {
-        alert('חשבון וטיקר הם שדות חובה');
-        return;
-      }
-      
-      // הכנת נתוני הביטול
-      const tradeData = {
-        account_id: accountId,
-        ticker_id: tickerId,
-        type: type,
-        status: status,
-        investment_type: investmentType,
-        notes: notes
+
+    function getStatusBadge(status) {
+      const statusMap = {
+        'active': '<span class="badge bg-success">פעיל</span>',
+        'inactive': '<span class="badge bg-secondary">לא פעיל</span>',
+        'open': '<span class="badge bg-primary">פתוח</span>',
+        'closed': '<span class="badge bg-success">סגור</span>',
+        'pending': '<span class="badge bg-warning">ממתין</span>',
+        'cancelled': '<span class="badge bg-danger">בוטל</span>',
+        'buy': '<span class="badge bg-success">קנייה</span>',
+        'sell': '<span class="badge bg-danger">מכירה</span>'
       };
-      
-      // הוספת נתוני ביטול אם הסטטוס הוא "מבוטל"
-      if (status === 'cancelled') {
-        if (cancelledAt) {
-          tradeData.cancelled_at = cancelledAt;
-        }
-        if (cancelReason) {
-          tradeData.cancel_reason = cancelReason;
-        }
-      }
-      
-      try {
-        const response = await fetch('/api/trades', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(tradeData)
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          alert('הטרייד נוסף בהצלחה!');
-          const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
-          modal.hide();
-          loadTable('trades');
-        } else {
-          throw new Error(data.message || 'שגיאה בהוספת הטרייד');
-        }
-      } catch (error) {
-        console.error('שגיאה בהוספת טרייד:', error);
-        alert(`שגיאה בהוספת טרייד: ${error.message}`);
-      }
+      return statusMap[status] || `<span class="badge bg-secondary">${status}</span>`;
     }
-    
-    async function updateTradeFromModal() {
-      const tradeId = document.getElementById('editTradeId').value;
-      const accountId = document.getElementById('editTradeAccountId').value;
-      const tickerId = document.getElementById('editTradeTickerId').value;
-      const type = document.getElementById('editTradeType').value;
-      const status = document.getElementById('editTradeStatus').value;
-      const investmentType = document.getElementById('editTradeInvestmentType').value || 'swing';
-      const notes = document.getElementById('editTradeNotes').value.trim();
-      const cancelledAt = document.getElementById('editTradeCancelledAt').value;
-      const cancelReason = document.getElementById('editTradeCancelReason').value.trim();
+
+            // API call function
+        async function apiCall(endpoint, options = {}) {
+          const baseUrl = 'http://127.0.0.1:8080';
+      const url = `${baseUrl}${endpoint}`;
       
-      if (!accountId || !tickerId) {
-        alert('חשבון וטיקר הם שדות חובה');
-        return;
+      // שימוש ב-token מ-TikTrackAuth אם זמין
+      let token = null;
+      if (typeof TikTrackAuth !== 'undefined') {
+        token = TikTrackAuth.getAuthToken();
       }
       
-      // הכנת נתוני הביטול
-      const updateData = {
-        account_id: accountId,
-        ticker_id: tickerId,
-        type: type,
-        status: status,
-        investment_type: investmentType,
-        notes: notes
+      // fallback ל-localStorage
+      if (!token) {
+        token = localStorage.getItem('authToken');
+      }
+      
+      const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers
       };
-      
-      // הוספת נתוני ביטול אם הסטטוס הוא "מבוטל"
-      if (status === 'cancelled') {
-        if (cancelledAt) {
-          updateData.cancelled_at = cancelledAt;
-        }
-        if (cancelReason) {
-          updateData.cancel_reason = cancelReason;
-        }
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        console.log('🔑 שולח בקשה עם token:', token.substring(0, 20) + '...');
+      } else {
+        console.log('⚠️ אין token זמין');
       }
-      
-      try {
-        const response = await fetch(`/api/trades/${tradeId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(updateData)
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          alert('הטרייד עודכן בהצלחה!');
-          const modal = bootstrap.Modal.getInstance(document.getElementById('editTradeModal'));
-          modal.hide();
-          loadTable('trades');
-        } else {
-          throw new Error(data.message || 'שגיאה בעדכון הטרייד');
-        }
-      } catch (error) {
-        console.error('שגיאה בעדכון טרייד:', error);
-        alert(`שגיאה בעדכון טרייד: ${error.message}`);
-      }
-    }
-    
-    async function deleteTradeFromModal() {
-      const tradeId = document.getElementById('editTradeId').value;
-      
-      if (confirm('האם אתה בטוח שברצונך למחוק את הטרייד?')) {
-        try {
-          const response = await fetch(`/api/trades/${tradeId}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (response.ok) {
-            alert('הטרייד נמחק בהצלחה!');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editTradeModal'));
-            modal.hide();
-            loadTable('trades');
-          } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'שגיאה במחיקת הטרייד');
-          }
-        } catch (error) {
-          console.error('שגיאה במחיקת טרייד:', error);
-          alert(`שגיאה במחיקת טרייד: ${error.message}`);
-        }
-      }
-    }
-    
-    // פונקציות לניהול מודלים - תכנוני טריידים
-    function showAddTradePlanModal() {
-      loadAccountsAndTickers();
-      document.getElementById('addTradePlanForm').reset();
-      const modalElement = document.getElementById('addTradePlanModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-    
-    function showEditTradePlanModal(tradePlan) {
-      loadAccountsAndTickers();
-      document.getElementById('editTradePlanId').value = tradePlan.id;
-      document.getElementById('editTradePlanAccountId').value = tradePlan.account_id || '';
-      document.getElementById('editTradePlanTickerId').value = tradePlan.ticker_id || '';
-      document.getElementById('editTradePlanInvestmentType').value = tradePlan.investment_type || 'swing';
-      document.getElementById('editTradePlanAmount').value = tradePlan.planned_amount || '';
-      document.getElementById('editTradePlanStopPrice').value = tradePlan.stop_price || '';
-      document.getElementById('editTradePlanTargetPrice').value = tradePlan.target_price || '';
-      document.getElementById('editTradePlanReasons').value = tradePlan.reasons || '';
-      
-      const modalElement = document.getElementById('editTradePlanModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-    
-    async function createTradePlan() {
-      const accountId = document.getElementById('tradePlanAccountId').value;
-      const tickerId = document.getElementById('tradePlanTickerId').value;
-      const investmentType = document.getElementById('tradePlanInvestmentType').value || 'swing';
-      const plannedAmount = parseFloat(document.getElementById('tradePlanAmount').value) || 0;
-      const stopPrice = parseFloat(document.getElementById('tradePlanStopPrice').value) || null;
-      const targetPrice = parseFloat(document.getElementById('tradePlanTargetPrice').value) || null;
-      const reasons = document.getElementById('tradePlanReasons').value.trim();
-      
-      if (!accountId || !tickerId) {
-        alert('חשבון וטיקר הם שדות חובה');
-        return;
-      }
-      
-      try {
-        const response = await fetch('/api/tradeplans', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            account_id: accountId,
-            ticker_id: tickerId,
-            investment_type: investmentType,
-            planned_amount: plannedAmount,
-            stop_price: stopPrice,
-            target_price: targetPrice,
-            reasons: reasons
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          alert('תכנון הטרייד נוסף בהצלחה!');
-          const modal = bootstrap.Modal.getInstance(document.getElementById('addTradePlanModal'));
-          modal.hide();
-          loadTable('trade_plans');
-        } else {
-          throw new Error(data.message || 'שגיאה בהוספת תכנון הטרייד');
-        }
-      } catch (error) {
-        console.error('שגיאה בהוספת תכנון טרייד:', error);
-        alert(`שגיאה בהוספת תכנון טרייד: ${error.message}`);
-      }
-    }
-    
-    async function updateTradePlanFromModal() {
-      const tradePlanId = document.getElementById('editTradePlanId').value;
-      const accountId = document.getElementById('editTradePlanAccountId').value;
-      const tickerId = document.getElementById('editTradePlanTickerId').value;
-      const investmentType = document.getElementById('editTradePlanInvestmentType').value || 'swing';
-      const plannedAmount = parseFloat(document.getElementById('editTradePlanAmount').value) || 0;
-      const stopPrice = parseFloat(document.getElementById('editTradePlanStopPrice').value) || null;
-      const targetPrice = parseFloat(document.getElementById('editTradePlanTargetPrice').value) || null;
-      const reasons = document.getElementById('editTradePlanReasons').value.trim();
-      
-      if (!accountId || !tickerId) {
-        alert('חשבון וטיקר הם שדות חובה');
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/api/tradeplans/${tradePlanId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            account_id: accountId,
-            ticker_id: tickerId,
-            investment_type: investmentType,
-            planned_amount: plannedAmount,
-            stop_price: stopPrice,
-            target_price: targetPrice,
-            reasons: reasons
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          alert('תכנון הטרייד עודכן בהצלחה!');
-          const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
-          modal.hide();
-          loadTable('trade_plans');
-        } else {
-          throw new Error(data.message || 'שגיאה בעדכון תכנון הטרייד');
-        }
-      } catch (error) {
-        console.error('שגיאה בעדכון תכנון טרייד:', error);
-        alert(`שגיאה בעדכון תכנון טרייד: ${error.message}`);
-      }
-    }
-    
-    async function deleteTradePlanFromModal() {
-      const tradePlanId = document.getElementById('editTradePlanId').value;
-      
-      if (confirm('האם אתה בטוח שברצונך למחוק את תכנון הטרייד?')) {
-        try {
-          const response = await fetch(`/api/tradeplans/${tradePlanId}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (response.ok) {
-            alert('תכנון הטרייד נמחק בהצלחה!');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
-            modal.hide();
-            loadTable('trade_plans');
-          } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'שגיאה במחיקת תכנון הטרייד');
-          }
-        } catch (error) {
-          console.error('שגיאה במחיקת תכנון טרייד:', error);
-          alert(`שגיאה במחיקת תכנון טרייד: ${error.message}`);
-        }
-      }
-    }
-    
-    // פונקציות לניהול מודלים - התראות
-    function showAddAlertModal() {
-      loadAccountsAndTickers();
-      document.getElementById('addAlertForm').reset();
-      const modalElement = document.getElementById('addAlertModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-    
-    function showEditAlertModal(alert) {
-      loadAccountsAndTickers();
-      document.getElementById('editAlertId').value = alert.id;
-      document.getElementById('editAlertAccountId').value = alert.account_id || '';
-      document.getElementById('editAlertTickerId').value = alert.ticker_id || '';
-      document.getElementById('editAlertType').value = alert.alert_type || 'price';
-      document.getElementById('editAlertStatus').value = alert.status || 'active';
-      document.getElementById('editAlertCondition').value = alert.condition || '';
-      
-      const modalElement = document.getElementById('editAlertModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-    
-    async function createAlert() {
-      const accountId = document.getElementById('alertAccountId').value || null;
-      const tickerId = document.getElementById('alertTickerId').value || null;
-      const alertType = document.getElementById('alertType').value;
-      const status = document.getElementById('alertStatus').value;
-      const condition = document.getElementById('alertCondition').value.trim();
-      
-      if (!condition) {
-        alert('תנאי הוא שדה חובה');
-        return;
-      }
-      
-      try {
-        const response = await fetch('/api/alerts', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            account_id: accountId,
-            ticker_id: tickerId,
-            alert_type: alertType,
-            status: status,
-            condition: condition
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          alert('ההתראה נוספה בהצלחה!');
-          const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
-          modal.hide();
-          loadTable('alerts');
-        } else {
-          throw new Error(data.message || 'שגיאה בהוספת ההתראה');
-        }
-      } catch (error) {
-        console.error('שגיאה בהוספת התראה:', error);
-        alert(`שגיאה בהוספת התראה: ${error.message}`);
-      }
-    }
-    
-    async function updateAlertFromModal() {
-      const alertId = document.getElementById('editAlertId').value;
-      const accountId = document.getElementById('editAlertAccountId').value || null;
-      const tickerId = document.getElementById('editAlertTickerId').value || null;
-      const alertType = document.getElementById('editAlertType').value;
-      const status = document.getElementById('editAlertStatus').value;
-      const condition = document.getElementById('editAlertCondition').value.trim();
-      
-      if (!condition) {
-        alert('תנאי הוא שדה חובה');
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/api/alerts/${alertId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            account_id: accountId,
-            ticker_id: tickerId,
-            alert_type: alertType,
-            status: status,
-            condition: condition
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          alert('ההתראה עודכנה בהצלחה!');
-          const modal = bootstrap.Modal.getInstance(document.getElementById('editAlertModal'));
-          modal.hide();
-          loadTable('alerts');
-        } else {
-          throw new Error(data.message || 'שגיאה בעדכון ההתראה');
-        }
-      } catch (error) {
-        console.error('שגיאה בעדכון התראה:', error);
-        alert(`שגיאה בעדכון התראה: ${error.message}`);
-      }
-    }
-    
-    async function deleteAlertFromModal() {
-      const alertId = document.getElementById('editAlertId').value;
-      
-      if (confirm('האם אתה בטוח שברצונך למחוק את ההתראה?')) {
-        try {
-          const response = await fetch(`/api/alerts/${alertId}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (response.ok) {
-            alert('ההתראה נמחקה בהצלחה!');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editAlertModal'));
-            modal.hide();
-            loadTable('alerts');
-          } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'שגיאה במחיקת ההתראה');
-          }
-        } catch (error) {
-          console.error('שגיאה במחיקת התראה:', error);
-          alert(`שגיאה במחיקת התראה: ${error.message}`);
-        }
-      }
-    }
-    
-    // פונקציות לניהול מודלים - הערות
-    function showAddNoteModal() {
-      loadAccountsAndTrades();
-      document.getElementById('addNoteForm').reset();
-      const modalElement = document.getElementById('addNoteModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-    
-    function showEditNoteModal(note) {
-      loadAccountsAndTrades();
-      document.getElementById('editNoteId').value = note.id;
-      document.getElementById('editNoteAccountId').value = note.account_id || '';
-      document.getElementById('editNoteTradeId').value = note.trade_id || '';
-      document.getElementById('editNoteContent').value = note.content || '';
-      
-      const modalElement = document.getElementById('editNoteModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-    
-    async function createNote() {
-      const accountId = document.getElementById('noteAccountId').value || null;
-      const tradeId = document.getElementById('noteTradeId').value || null;
-      const content = document.getElementById('noteContent').value.trim();
-      
-      if (!content) {
-        alert('תוכן הוא שדה חובה');
-        return;
-      }
-      
-      try {
-        const response = await fetch('/api/notes', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            account_id: accountId,
-            trade_id: tradeId,
-            content: content
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          alert('ההערה נוספה בהצלחה!');
-          const modal = bootstrap.Modal.getInstance(document.getElementById('addNoteModal'));
-          modal.hide();
-          loadTable('notes');
-        } else {
-          throw new Error(data.message || 'שגיאה בהוספת ההערה');
-        }
-      } catch (error) {
-        console.error('שגיאה בהוספת הערה:', error);
-        alert(`שגיאה בהוספת הערה: ${error.message}`);
-      }
-    }
-    
-    async function updateNoteFromModal() {
-      const noteId = document.getElementById('editNoteId').value;
-      const accountId = document.getElementById('editNoteAccountId').value || null;
-      const tradeId = document.getElementById('editNoteTradeId').value || null;
-      const content = document.getElementById('editNoteContent').value.trim();
-      
-      if (!content) {
-        alert('תוכן הוא שדה חובה');
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/api/notes/${noteId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            account_id: accountId,
-            trade_id: tradeId,
-            content: content
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          alert('ההערה עודכנה בהצלחה!');
-          const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
-          modal.hide();
-          loadTable('notes');
-        } else {
-          throw new Error(data.message || 'שגיאה בעדכון ההערה');
-        }
-      } catch (error) {
-        console.error('שגיאה בעדכון הערה:', error);
-        alert(`שגיאה בעדכון הערה: ${error.message}`);
-      }
-    }
-    
-    async function deleteNoteFromModal() {
-      const noteId = document.getElementById('editNoteId').value;
-      
-      if (confirm('האם אתה בטוח שברצונך למחוק את ההערה?')) {
-        try {
-          const response = await fetch(`/api/notes/${noteId}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (response.ok) {
-            alert('ההערה נמחקה בהצלחה!');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
-            modal.hide();
-            loadTable('notes');
-          } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'שגיאה במחיקת ההערה');
-          }
-        } catch (error) {
-          console.error('שגיאה במחיקת הערה:', error);
-          alert(`שגיאה במחיקת הערה: ${error.message}`);
-        }
-      }
-    }
-    
-    // פונקציות עזר לטעינת נתונים למודלים
-    async function loadAccountsAndTickers() {
-      try {
-        // טעינת חשבונות
-        const accountsResponse = await fetch('/api/accounts');
-        const accounts = await accountsResponse.json();
-        
-        // טעינת טיקרים
-        const tickersResponse = await fetch('/api/database/tickers');
-        const tickers = await tickersResponse.json();
-        
-        // מילוי רשימות החשבונות
-        const accountSelects = [
-          'tradeAccountId', 'editTradeAccountId',
-          'tradePlanAccountId', 'editTradePlanAccountId',
-          'alertAccountId', 'editAlertAccountId',
-          'noteAccountId', 'editNoteAccountId'
-        ];
-        
-        accountSelects.forEach(selectId => {
-          const select = document.getElementById(selectId);
-          if (select) {
-            select.innerHTML = '<option value="">בחר חשבון</option>';
-            accounts.forEach(account => {
-              const option = document.createElement('option');
-              option.value = account.id;
-              option.textContent = account.name;
-              select.appendChild(option);
-            });
-          }
-        });
-        
-        // מילוי רשימות הטיקרים
-        const tickerSelects = [
-          'tradeTickerId', 'editTradeTickerId',
-          'tradePlanTickerId', 'editTradePlanTickerId',
-          'alertTickerId', 'editAlertTickerId'
-        ];
-        
-        tickerSelects.forEach(selectId => {
-          const select = document.getElementById(selectId);
-          if (select) {
-            select.innerHTML = '<option value="">בחר טיקר</option>';
-            tickers.forEach(ticker => {
-              const option = document.createElement('option');
-              option.value = ticker.id;
-              option.textContent = ticker.symbol;
-              select.appendChild(option);
-            });
-          }
-        });
-        
-      } catch (error) {
-        console.error('שגיאה בטעינת נתונים למודלים:', error);
-      }
-    }
-    
-    async function loadAccountsAndTrades() {
-      try {
-        // טעינת חשבונות
-        const accountsResponse = await fetch('/api/accounts');
-        const accounts = await accountsResponse.json();
-        
-        // טעינת טריידים
-        const tradesResponse = await fetch('/api/database/trades');
-        const trades = await tradesResponse.json();
-        
-        // מילוי רשימות החשבונות
-        const accountSelects = ['noteAccountId', 'editNoteAccountId'];
-        
-        accountSelects.forEach(selectId => {
-          const select = document.getElementById(selectId);
-          if (select) {
-            select.innerHTML = '<option value="">בחר חשבון</option>';
-            accounts.forEach(account => {
-              const option = document.createElement('option');
-              option.value = account.id;
-              option.textContent = account.name;
-              select.appendChild(option);
-            });
-          }
-        });
-        
-        // מילוי רשימות הטריידים
-        const tradeSelects = ['noteTradeId', 'editNoteTradeId'];
-        
-        tradeSelects.forEach(selectId => {
-          const select = document.getElementById(selectId);
-          if (select) {
-            select.innerHTML = '<option value="">בחר טרייד</option>';
-            trades.forEach(trade => {
-              const option = document.createElement('option');
-              option.value = trade.id;
-              option.textContent = `טרייד ${trade.id}`;
-              select.appendChild(option);
-            });
-          }
-        });
-        
-      } catch (error) {
-        console.error('שגיאה בטעינת נתונים למודלים:', error);
-      }
-    }
-    
-    // אתחול הדף
-    document.addEventListener('DOMContentLoaded', () => {
-      // הגדרת האזנה לכותרת
-      setupHeaderListener();
-      
-      // בדיקה שהפונקציות הגלובליות זמינות ועדכון הפילטר
-      const checkAndUpdateFilter = () => {
-        if (typeof window.updateGridFromComponent === 'function') {
-          console.log('Global functions are ready, updating filter');
-          const header = document.querySelector('app-header');
-          if (header && typeof header.updateGridFilter === 'function') {
-            header.updateGridFilter();
-          }
-        } else {
-          console.log('Global functions not ready yet, retrying...');
-          setTimeout(checkAndUpdateFilter, 200);
-        }
+
+      const finalOptions = { 
+        ...options,
+        headers
       };
+
+      try {
+        console.log('📡 שולח בקשה ל:', url);
+        const response = await fetch(url, finalOptions);
+        const data = await response.json();
+        
+        if (!response.ok) {
+          console.error('❌ שגיאה בתגובה:', response.status, data);
+          
+          // אם זה 401 (Invalid token), ננסה לרענן
+          if (response.status === 401) {
+            console.log('🔄 Token לא תקין, מנסה לרענן...');
+            const newToken = await refreshToken();
+            if (newToken) {
+              console.log('✅ Token רוענן, מנסה שוב...');
+              // נסה שוב עם ה-token החדש
+              finalOptions.headers['Authorization'] = `Bearer ${newToken}`;
+              const retryResponse = await fetch(url, finalOptions);
+              const retryData = await retryResponse.json();
+              
+              if (retryResponse.ok) {
+                console.log('✅ תגובה מוצלחת אחרי רענון:', retryData);
+                return retryData;
+              } else {
+                throw new Error(retryData.error?.message || retryData.message || `HTTP ${retryResponse.status}`);
+              }
+            } else {
+              throw new Error('Token refresh failed');
+            }
+          }
+          
+          throw new Error(data.error?.message || data.message || `HTTP ${response.status}`);
+        }
+        
+        console.log('✅ תגובה מוצלחת:', data);
+        return data;
+      } catch (error) {
+        console.error(`❌ שגיאת API (${endpoint}):`, error);
+        throw error;
+      }
+    }
+
+    // Data loading functions
+    async function loadUserRoles() {
+        try {
+            const response = await apiCall('/api/v1/user_roles/');
+            const tbody = document.querySelector('#userRolesTable tbody');
+            
+            if (response.status === 'success' && response.data) {
+                const userRoles = response.data;
+                document.getElementById('userRolesCount').textContent = `${userRoles.length} רשומות`;
+                
+                tbody.innerHTML = userRoles.map(userRole => `
+                    <tr>
+                        <td>${userRole.id}</td>
+                        <td>${userRole.user_id}</td>
+                        <td>${userRole.user_username}</td>
+                        <td>${userRole.role_id}</td>
+                        <td>${userRole.role_name}</td>
+                        <td>${userRole.assigned_at || 'לא מוגדר'}</td>
+                        <td>${userRole.created_at || 'לא מוגדר'}</td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="editUserRole(${userRole.id})" title="ערוך">
+                                <span class="btn-icon">✏️</span>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteUserRole(${userRole.id})" title="מחק">
+                                <span class="btn-icon">🗑️</span>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="8" class="error">שגיאה בטעינת תפקידי משתמשים</td></tr>';
+                document.getElementById('userRolesCount').textContent = 'שגיאה';
+            }
+        } catch (error) {
+            console.error('Error loading user roles:', error);
+            const tbody = document.querySelector('#userRolesTable tbody');
+            tbody.innerHTML = '<tr><td colspan="8" class="error">שגיאה בטעינת תפקידי משתמשים</td></tr>';
+            document.getElementById('userRolesCount').textContent = 'שגיאה';
+        }
+    }
+
+    async function loadUsers() {
+      try {
+        console.log('🔄 טוען משתמשים...');
+        const response = await apiCall('/api/v1/auth/users');
+        const users = response.data;
+        
+        const tbody = document.querySelector('#usersTable tbody');
+        tbody.innerHTML = users.map(user => `
+          <tr>
+            <td>${user.id}</td>
+            <td>${user.username || '-'}</td>
+            <td>${user.email || '-'}</td>
+            <td>${user.is_active ? 'כן' : 'לא'}</td>
+            <td>${user.roles ? user.roles.join(', ') : '-'}</td>
+            <td>${formatDateTime(user.last_login)}</td>
+            <td>${formatDateTime(user.created_at)}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="editUser(${user.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">מחק</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('usersCount').textContent = `${users.length} משתמשים`;
+        
+      } catch (error) {
+        console.error('❌ שגיאה בטעינת משתמשים:', error);
+        document.querySelector('#usersTable tbody').innerHTML = `<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת משתמשים: ${error.message}</td></tr>`;
+        document.getElementById('usersCount').textContent = 'שגיאה';
+      }
+    }
+
+    async function loadAccounts() {
+      try {
+        console.log('🔄 טוען חשבונות...');
+        const response = await apiCall('/api/v1/accounts/');
+        const accounts = response.data;
+        
+        const tbody = document.querySelector('#accountsTable tbody');
+        tbody.innerHTML = accounts.map(account => `
+          <tr>
+            <td>${account.id}</td>
+            <td>${account.name || '-'}</td>
+            <td>${account.currency || '-'}</td>
+            <td>${account.status || '-'}</td>
+            <td>${formatCurrency(account.cash_balance)}</td>
+            <td>${formatCurrency(account.total_value)}</td>
+            <td>${formatCurrency(account.total_pl)}</td>
+            <td>${account.notes || '-'}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="editAccount(${account.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})">מחק</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('accountsCount').textContent = `${accounts.length} חשבונות`;
+        
+      } catch (error) {
+        console.error('❌ שגיאה בטעינת חשבונות:', error);
+        document.querySelector('#accountsTable tbody').innerHTML = `<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת חשבונות: ${error.message}</td></tr>`;
+        document.getElementById('accountsCount').textContent = 'שגיאה';
+      }
+    }
+
+    async function loadTickers() {
+      try {
+        console.log('🔄 טוען טיקרים...');
+        const response = await apiCall('/api/v1/tickers/');
+        const tickers = response.data;
+        
+        const tbody = document.querySelector('#tickersTable tbody');
+        tbody.innerHTML = tickers.map(ticker => `
+          <tr>
+            <td>${ticker.id}</td>
+            <td>${ticker.symbol || '-'}</td>
+            <td>${ticker.name || '-'}</td>
+            <td>${ticker.type || '-'}</td>
+            <td>${ticker.currency || '-'}</td>
+            <td>${ticker.active_trades ? 'כן' : 'לא'}</td>
+            <td>${ticker.remarks || '-'}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="editTicker(${ticker.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})">מחק</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('tickersCount').textContent = `${tickers.length} טיקרים`;
+        
+      } catch (error) {
+        console.error('Error loading tickers:', error);
+        document.querySelector('#tickersTable tbody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+      }
+    }
+
+    async function loadTrades() {
+      try {
+        console.log('🔄 טוען טריידים...');
+        const response = await apiCall('/api/v1/trades/');
+        const trades = response.data;
+        
+        const tbody = document.querySelector('#tradesTable tbody');
+        tbody.innerHTML = trades.map(trade => `
+          <tr>
+            <td>${trade.id}</td>
+            <td>${trade.account_id || '-'}</td>
+            <td>${trade.ticker_id || '-'}</td>
+            <td>${trade.trade_plan_id || '-'}</td>
+            <td>${trade.status || '-'}</td>
+            <td>${trade.type || '-'}</td>
+            <td>${formatDateTime(trade.opened_at)}</td>
+            <td>${formatDateTime(trade.closed_at)}</td>
+            <td>${formatCurrency(trade.total_pl)}</td>
+            <td>${trade.notes || '-'}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="editTrade(${trade.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteTrade(${trade.id})">מחק</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('tradesCount').textContent = `${trades.length} טריידים`;
+        
+      } catch (error) {
+        console.error('Error loading trades:', error);
+        document.querySelector('#tradesTable tbody').innerHTML = '<tr><td colspan="11" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+      }
+    }
+
+    async function loadTradePlans() {
+      try {
+        console.log('🔄 טוען תוכניות טרייד...');
+        const response = await apiCall('/api/v1/tradeplans/');
+        const plans = response.data;
+        
+        const tbody = document.querySelector('#tradePlansTable tbody');
+        tbody.innerHTML = plans.map(plan => `
+          <tr>
+            <td>${plan.id}</td>
+            <td>${plan.account_id || '-'}</td>
+            <td>${plan.ticker_id || '-'}</td>
+            <td>${plan.investment_type || '-'}</td>
+            <td>${formatCurrency(plan.planned_amount)}</td>
+            <td>${plan.entry_conditions || '-'}</td>
+            <td>${formatCurrency(plan.stop_price)}</td>
+            <td>${formatCurrency(plan.target_price)}</td>
+            <td>${plan.reasons || '-'}</td>
+            <td>${formatDateTime(plan.created_at)}</td>
+            <td>${formatDateTime(plan.canceled_at)}</td>
+            <td>${plan.cancel_reason || '-'}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="editTradePlan(${plan.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteTradePlan(${plan.id})">מחק</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('tradePlansCount').textContent = `${plans.length} תוכניות טרייד`;
+        
+      } catch (error) {
+        console.error('Error loading trade plans:', error);
+        document.querySelector('#tradePlansTable tbody').innerHTML = '<tr><td colspan="13" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+      }
+    }
+
+    async function loadAlerts() {
+      try {
+        console.log('🔄 טוען התראות...');
+        const response = await apiCall('/api/v1/alerts/');
+        const alerts = response.data;
+        
+        const tbody = document.querySelector('#alertsTable tbody');
+        tbody.innerHTML = alerts.map(alert => `
+          <tr>
+            <td>${alert.id}</td>
+            <td>${alert.account_id || '-'}</td>
+            <td>${alert.ticker_id || '-'}</td>
+            <td>${alert.type}</td>
+            <td>${alert.condition}</td>
+            <td>${alert.message || '-'}</td>
+            <td>${alert.is_active ? 'כן' : 'לא'}</td>
+            <td>${formatDateTime(alert.triggered_at)}</td>
+            <td>${formatDateTime(alert.created_at)}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="editAlert(${alert.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})">מחק</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('alertsCount').textContent = `${alerts.length} התראות`;
+        
+      } catch (error) {
+        console.error('Error loading alerts:', error);
+        document.querySelector('#alertsTable tbody').innerHTML = '<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+      }
+    }
+
+    async function loadCashFlows() {
+      try {
+        console.log('🔄 טוען תזרימי מזומנים...');
+        const response = await apiCall('/api/v1/cash_flows/');
+        const cashFlows = response.data;
+        
+        const tbody = document.querySelector('#cashFlowsTable tbody');
+        tbody.innerHTML = cashFlows.map(cf => `
+          <tr>
+            <td>${cf.id}</td>
+            <td>${cf.account_id}</td>
+            <td>${cf.type}</td>
+            <td>${formatCurrency(cf.amount)}</td>
+            <td>${formatDate(cf.date)}</td>
+            <td>${cf.description || '-'}</td>
+            <td>${formatDateTime(cf.created_at)}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="editCashFlow(${cf.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cf.id})">מחק</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('cashFlowsCount').textContent = `${cashFlows.length} תזרימי מזומנים`;
+        
+      } catch (error) {
+        console.error('Error loading cash flows:', error);
+        document.querySelector('#cashFlowsTable tbody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+      }
+    }
+
+    async function loadNotes() {
+      try {
+        console.log('🔄 טוען הערות...');
+        const response = await apiCall('/api/v1/notes/');
+        const notes = response.data;
+        
+        const tbody = document.querySelector('#notesTable tbody');
+        tbody.innerHTML = notes.map(note => `
+          <tr>
+            <td>${note.id}</td>
+            <td>${note.account_id || '-'}</td>
+            <td>${note.trade_id || '-'}</td>
+            <td>${note.trade_plan_id || '-'}</td>
+            <td>${note.content ? (note.content.substring(0, 50) + (note.content.length > 50 ? '...' : '')) : '-'}</td>
+            <td>${formatDateTime(note.created_at)}</td>
+            <td>${note.attachment || '-'}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="editNote(${note.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id})">מחק</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('notesCount').textContent = `${notes.length} הערות`;
+        
+      } catch (error) {
+        console.error('Error loading notes:', error);
+        document.querySelector('#notesTable tbody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+      }
+    }
+
+    async function loadExecutions() {
+      try {
+        console.log('🔄 טוען ביצועים...');
+        const response = await apiCall('/api/v1/executions/');
+        const executions = response.data;
+        
+        const tbody = document.querySelector('#executionsTable tbody');
+        tbody.innerHTML = executions.map(execution => `
+          <tr>
+            <td>${execution.id}</td>
+            <td>${execution.trade_id || '-'}</td>
+            <td>${execution.action || '-'}</td>
+            <td>${formatDateTime(execution.date)}</td>
+            <td>${execution.quantity || '-'}</td>
+            <td>${formatCurrency(execution.price)}</td>
+            <td>${formatCurrency(execution.fee)}</td>
+            <td>${execution.source || '-'}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="editExecution(${execution.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})">מחק</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('executionsCount').textContent = `${executions.length} ביצועים`;
+        
+      } catch (error) {
+        console.error('Error loading executions:', error);
+        document.querySelector('#executionsTable tbody').innerHTML = '<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+      }
+    }
+
+    // Action functions
+    function refreshAllTables() {
+      loadUsers();
+      loadAccounts();
+      loadTickers();
+      loadTrades();
+      loadTradePlans();
+      loadAlerts();
+      loadCashFlows();
+      loadNotes();
+      loadExecutions();
+      loadUserRoles();
+    }
+
+    function exportDatabase() {
+      // TODO: Implement database export functionality
+      alert('פונקציית ייצוא תתווסף בקרוב');
+    }
+
+    // Edit functions (placeholders)
+    function editUserRole(userRoleId) {
+        alert(`עריכת תפקיד משתמש ${userRoleId} - לא מומש עדיין`);
+    }
+
+    function deleteUserRole(userRoleId) {
+        if (confirm('האם אתה בטוח שברצונך למחוק תפקיד משתמש זה?')) {
+            alert(`מחיקת תפקיד משתמש ${userRoleId} - לא מומש עדיין`);
+        }
+    }
+
+    function editUser(id) { alert(`עריכת משתמש ${id}`); }
+    function deleteUser(id) { alert(`מחיקת משתמש ${id}`); }
+    function editAccount(id) { alert(`עריכת חשבון ${id}`); }
+    function deleteAccount(id) { alert(`מחיקת חשבון ${id}`); }
+    function editTicker(id) { alert(`עריכת טיקר ${id}`); }
+    function deleteTicker(id) { alert(`מחיקת טיקר ${id}`); }
+    function editTrade(id) { alert(`עריכת טרייד ${id}`); }
+    function deleteTrade(id) { alert(`מחיקת טרייד ${id}`); }
+    function editTradePlan(id) { alert(`עריכת תוכנית טרייד ${id}`); }
+    function deleteTradePlan(id) { alert(`מחיקת תוכנית טרייד ${id}`); }
+    function editAlert(id) { alert(`עריכת התראה ${id}`); }
+    function deleteAlert(id) { alert(`מחיקת התראה ${id}`); }
+    function editCashFlow(id) { alert(`עריכת תזרים מזומנים ${id}`); }
+    function deleteCashFlow(id) { alert(`מחיקת תזרים מזומנים ${id}`); }
+    function editNote(id) { alert(`עריכת הערה ${id}`); }
+    function deleteNote(id) { alert(`מחיקת הערה ${id}`); }
+    function editExecution(id) { alert(`עריכת ביצוע ${id}`); }
+    function deleteExecution(id) { alert(`מחיקת ביצוע ${id}`); }
+
+    // פונקציה לטעינת מצב הטבלאות השמור
+    function loadTableStates() {
+      const sections = [
+        'usersSection',
+        'accountsSection', 
+        'tickersSection',
+        'tradesSection',
+        'tradePlansSection',
+        'alertsSection',
+        'cashFlowsSection',
+        'notesSection',
+        'executionsSection',
+        'userRolesSection'
+      ];
       
-      // התחלת הבדיקה אחרי זמן קצר
-      setTimeout(checkAndUpdateFilter, 500);
+      sections.forEach(section => {
+        const container = document.getElementById(section.replace('Section', 'Container'));
+        const footer = document.querySelector(`#${section} .table-footer`);
+        const icon = document.querySelector(`#${section} .filter-icon`);
+        
+        if (container && footer && icon) {
+          const isOpen = localStorage.getItem(section.replace('Section', 'SectionOpen'));
+          
+          if (isOpen === 'false') {
+            container.style.display = 'none';
+            footer.style.display = 'none';
+            icon.textContent = '▼';
+          } else {
+            container.style.display = 'block';
+            footer.style.display = 'block';
+            icon.textContent = '▲';
+          }
+        }
+        
+        // טיפול מיוחד לטבלת User Roles
+        if (section === 'userRolesSection') {
+          const container = document.getElementById('userRolesContainer');
+          const footer = document.querySelector('#userRolesSection .table-footer');
+          const icon = document.querySelector('#userRolesSection .filter-icon');
+          
+          if (container && footer && icon) {
+            const isCollapsed = localStorage.getItem('userRolesSectionCollapsed');
+            
+            if (isCollapsed === 'true') {
+              container.style.display = 'none';
+              footer.style.display = 'none';
+              icon.textContent = '▼';
+            } else {
+              container.style.display = 'block';
+              footer.style.display = 'block';
+              icon.textContent = '▲';
+            }
+          }
+        }
+      });
+    }
+
+    // Initial data load
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('טוען נתונים עם אימות');
+      loadTableStates(); // טוען את המצב השמור של הטבלאות
+      await checkAuthentication();
     });
+
+    // פונקציית אימות
+    async function checkAuthentication() {
+        console.log('🔍 בדיקת אימות בדף בסיס נתונים...');
+        
+        // בדיקה אם יש token תקין
+        let token = localStorage.getItem('authToken');
+        if (!token) {
+            console.log('❌ אין token - מנסה להתחבר אוטומטית...');
+            token = await refreshToken();
+            if (!token) {
+                console.log('❌ לא הצלחתי להתחבר - מעביר לדף התחברות');
+                window.location.href = '/index.html';
+                return;
+            }
+        }
+        
+        // בדיקה אם ה-token עדיין תקף
+        console.log('🔑 בדיקת תקינות token...');
+        const isValid = await testToken(token);
+        if (isValid) {
+            console.log('✅ Token תקין - טוען נתונים');
+            refreshAllTables();
+        } else {
+            console.log('❌ Token לא תקין - מנסה לרענן...');
+            const newToken = await refreshToken();
+            if (newToken) {
+                console.log('✅ Token רוענן - טוען נתונים');
+                refreshAllTables();
+            } else {
+                console.log('❌ לא הצלחתי לרענן token - מעביר לדף התחברות');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
+                window.location.href = '/index.html';
+            }
+        }
+    }
+
+    // פונקציה לבדיקת תקינות token
+    async function testToken(token) {
+        try {
+            const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            return response.ok;
+        } catch (error) {
+            console.error('שגיאה בבדיקת token:', error);
+            return false;
+        }
+    }
+
+    // פונקציה לרענון token
+    async function refreshToken() {
+        try {
+            console.log('🔄 מנסה לרענן token...');
+            const response = await fetch('http://127.0.0.1:8080/api/v1/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: 'admin',
+                    password: 'admin123'
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const newToken = data.data.access_token;
+                localStorage.setItem('authToken', newToken);
+                localStorage.setItem('currentUser', JSON.stringify(data.data.user));
+                console.log('✅ Token רוענן בהצלחה');
+                return newToken;
+            } else {
+                console.log('❌ לא הצלחתי לרענן token');
+                return null;
+            }
+        } catch (error) {
+            console.error('שגיאה ברענון token:', error);
+            return null;
+        }
+    }
+
+    // פונקציה לרענון כל הטבלאות
+    function refreshAllTables() {
+        loadUsers();
+        loadAccounts();
+        loadTickers();
+        loadTrades();
+        loadTradePlans();
+        loadAlerts();
+        loadCashFlows();
+        loadNotes();
+        loadExecutions();
+        loadUserRoles();
+    }
+
+    // פונקציות לפתיחה/סגירה של סקציות
+    function toggleUserRolesSection() {
+        const container = document.getElementById('userRolesContainer');
+        const footer = document.querySelector('#userRolesSection .table-footer');
+        const icon = document.querySelector('#userRolesSection .filter-icon');
+        
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+            footer.style.display = 'block';
+            icon.textContent = '▲';
+            localStorage.setItem('userRolesSectionCollapsed', 'false');
+        } else {
+            container.style.display = 'none';
+            footer.style.display = 'none';
+            icon.textContent = '▼';
+            localStorage.setItem('userRolesSectionCollapsed', 'true');
+        }
+    }
+
+    function toggleUsersSection() {
+      const container = document.getElementById('usersContainer');
+      const footer = document.querySelector('#usersSection .table-footer');
+      const icon = document.querySelector('#usersSection .filter-icon');
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        footer.style.display = 'block';
+        icon.textContent = '▲';
+        localStorage.setItem('usersSectionOpen', 'true');
+      } else {
+        container.style.display = 'none';
+        footer.style.display = 'none';
+        icon.textContent = '▼';
+        localStorage.setItem('usersSectionOpen', 'false');
+      }
+    }
+
+    function toggleAccountsSection() {
+      const container = document.getElementById('accountsContainer');
+      const footer = document.querySelector('#accountsSection .table-footer');
+      const icon = document.querySelector('#accountsSection .filter-icon');
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        footer.style.display = 'block';
+        icon.textContent = '▲';
+        localStorage.setItem('accountsSectionOpen', 'true');
+      } else {
+        container.style.display = 'none';
+        footer.style.display = 'none';
+        icon.textContent = '▼';
+        localStorage.setItem('accountsSectionOpen', 'false');
+      }
+    }
+
+    function toggleTickersSection() {
+      const container = document.getElementById('tickersContainer');
+      const footer = document.querySelector('#tickersSection .table-footer');
+      const icon = document.querySelector('#tickersSection .filter-icon');
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        footer.style.display = 'block';
+        icon.textContent = '▲';
+        localStorage.setItem('tickersSectionOpen', 'true');
+      } else {
+        container.style.display = 'none';
+        footer.style.display = 'none';
+        icon.textContent = '▼';
+        localStorage.setItem('tickersSectionOpen', 'false');
+      }
+    }
+
+    function toggleTradesSection() {
+      const container = document.getElementById('tradesContainer');
+      const footer = document.querySelector('#tradesSection .table-footer');
+      const icon = document.querySelector('#tradesSection .filter-icon');
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        footer.style.display = 'block';
+        icon.textContent = '▲';
+        localStorage.setItem('tradesSectionOpen', 'true');
+      } else {
+        container.style.display = 'none';
+        footer.style.display = 'none';
+        icon.textContent = '▼';
+        localStorage.setItem('tradesSectionOpen', 'false');
+      }
+    }
+
+    function toggleTradePlansSection() {
+      const container = document.getElementById('tradePlansContainer');
+      const footer = document.querySelector('#tradePlansSection .table-footer');
+      const icon = document.querySelector('#tradePlansSection .filter-icon');
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        footer.style.display = 'block';
+        icon.textContent = '▲';
+        localStorage.setItem('tradePlansSectionOpen', 'true');
+      } else {
+        container.style.display = 'none';
+        footer.style.display = 'none';
+        icon.textContent = '▼';
+        localStorage.setItem('tradePlansSectionOpen', 'false');
+      }
+    }
+
+    function toggleAlertsSection() {
+      const container = document.getElementById('alertsContainer');
+      const footer = document.querySelector('#alertsSection .table-footer');
+      const icon = document.querySelector('#alertsSection .filter-icon');
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        footer.style.display = 'block';
+        icon.textContent = '▲';
+        localStorage.setItem('alertsSectionOpen', 'true');
+      } else {
+        container.style.display = 'none';
+        footer.style.display = 'none';
+        icon.textContent = '▼';
+        localStorage.setItem('alertsSectionOpen', 'false');
+      }
+    }
+
+    function toggleCashFlowsSection() {
+      const container = document.getElementById('cashFlowsContainer');
+      const footer = document.querySelector('#cashFlowsSection .table-footer');
+      const icon = document.querySelector('#cashFlowsSection .filter-icon');
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        footer.style.display = 'block';
+        icon.textContent = '▲';
+        localStorage.setItem('cashFlowsSectionOpen', 'true');
+      } else {
+        container.style.display = 'none';
+        footer.style.display = 'none';
+        icon.textContent = '▼';
+        localStorage.setItem('cashFlowsSectionOpen', 'false');
+      }
+    }
+
+    function toggleNotesSection() {
+      const container = document.getElementById('notesContainer');
+      const footer = document.querySelector('#notesSection .table-footer');
+      const icon = document.querySelector('#notesSection .filter-icon');
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        footer.style.display = 'block';
+        icon.textContent = '▲';
+        localStorage.setItem('notesSectionOpen', 'true');
+      } else {
+        container.style.display = 'none';
+        footer.style.display = 'none';
+        icon.textContent = '▼';
+        localStorage.setItem('notesSectionOpen', 'false');
+      }
+    }
+
+    function toggleExecutionsSection() {
+      const container = document.getElementById('executionsContainer');
+      const footer = document.querySelector('#executionsSection .table-footer');
+      const icon = document.querySelector('#executionsSection .filter-icon');
+      
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        footer.style.display = 'block';
+        icon.textContent = '▲';
+        localStorage.setItem('executionsSectionOpen', 'true');
+      } else {
+        container.style.display = 'none';
+        footer.style.display = 'none';
+        icon.textContent = '▼';
+        localStorage.setItem('executionsSectionOpen', 'false');
+      }
+    }
   </script>
-  
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- Scripts -->
-  <script src="scripts/app-header.js"></script>
+</body>
+</html>
+
 </body>
 </html>

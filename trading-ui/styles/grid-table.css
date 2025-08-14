@@ -830,46 +830,7 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
   transform: translateY(-1px);
 }
 
-.add-btn {
-  background: transparent !important;
-  color: #000000 !important;
-  border: 2px solid #29a6a8 !important;
-  box-shadow: none !important;
-  padding: 6px 13px !important;
-  border-radius: 6px !important;
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 5px !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-}
 
-.add-btn:hover {
-  background: rgba(41, 166, 168, 0.1) !important;
-  border-color: #1f8a8c !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
-}
-
-.refresh-btn {
-  padding: 0.5rem 1rem;
-  background: #ff9c05;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.refresh-btn:hover {
-  background: #e68a00;
-}
 
 /* סגנונות ייחודיים לטבלאות */
 .table th {

@@ -41,6 +41,165 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
       border: 1px solid #e8e8e8;
     }
+
+    /* Login Interface Styles */
+    .login-container {
+      max-width: 400px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e8e8e8;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1rem;
+      background: linear-gradient(135deg, var(--apple-blue), #29a6a8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+    }
+
+    .login-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--apple-text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+      color: var(--apple-text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: var(--apple-text-primary);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--apple-border-light);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s;
+      background: var(--apple-bg-secondary);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--apple-blue);
+      box-shadow: 0 0 0 0.2rem rgba(0, 122, 255, 0.25);
+      background: white;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--apple-blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 1rem;
+    }
+
+    .btn-login:hover {
+      background: #0056b3;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    }
+
+    .btn-login:disabled {
+      background: var(--apple-text-secondary);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .remember-me input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--apple-blue);
+    }
+
+    .remember-me label {
+      font-size: 0.9rem;
+      color: var(--apple-text-secondary);
+      cursor: pointer;
+    }
+
+    .login-error {
+      background: var(--apple-red-light);
+      color: var(--apple-red);
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .login-success {
+      background: var(--apple-green-light);
+      color: var(--apple-green);
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .demo-credentials {
+      background: var(--apple-bg-secondary);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      border: 1px solid var(--apple-border-light);
+    }
+
+    .demo-credentials h6 {
+      margin-bottom: 0.5rem;
+      color: var(--apple-text-primary);
+      font-size: 0.9rem;
+    }
+
+    .demo-credentials p {
+      margin-bottom: 0.25rem;
+      font-size: 0.8rem;
+      color: var(--apple-text-secondary);
+    }
+
+    .demo-credentials strong {
+      color: var(--apple-text-primary);
+    }
     
     .dashboard-grid {
       display: grid;
@@ -299,7 +458,50 @@
   <!-- Web Component של הכותרת -->
   <app-header></app-header>
 
-  <div class="background-wrapper">
+  <!-- Login Interface -->
+  <div class="background-wrapper" id="loginSection" style="display: block;">
+    <div class="login-container">
+      <div class="login-header">
+        <div class="login-logo">📊</div>
+        <h1 class="login-title">ברוכים הבאים ל-TikTrack</h1>
+        <p class="login-subtitle">מערכת ניהול השקעות מתקדמת</p>
+      </div>
+      
+      <div class="login-error" id="loginError"></div>
+      <div class="login-success" id="loginSuccess"></div>
+      
+      <form id="loginForm" onsubmit="return false;">
+        <div class="form-group">
+          <label class="form-label" for="username">שם משתמש</label>
+          <input type="text" id="username" class="form-control" placeholder="הכנס שם משתמש" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="password">סיסמה</label>
+          <input type="password" id="password" class="form-control" placeholder="הכנס סיסמה" required>
+        </div>
+        
+        <div class="remember-me">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">זכור אותי לתקופת הפיתוח</label>
+        </div>
+        
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span id="loginBtnText">התחבר</span>
+          <span id="loginBtnSpinner" style="display: none;">⏳ מתחבר...</span>
+        </button>
+      </form>
+      
+      <div class="demo-credentials">
+        <h6>🔑 פרטי התחברות לבדיקה:</h6>
+        <p><strong>מנהל:</strong> username=admin, password=admin123</p>
+        <p><strong>משתמש:</strong> username=test, password=test123</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Content (Hidden initially) -->
+  <div class="background-wrapper" id="dashboardSection" style="display: none;">
     <div class="dashboard">
       <!-- סטטיסטיקות מרכזיות -->
       <div class="stats-grid" id="statsGrid">
@@ -398,7 +600,26 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Authentication System -->
+  <script src="scripts/auth.js"></script>
+  
   <script>
+    // פונקציה לטעינת נתוני הדשבורד
+    function loadDashboardData() {
+      displayStats();
+      displayAlerts();
+      displaySummary(mockData.accounts, 'accounts');
+      displayDailyChanges();
+      createPerformanceChart();
+      createTradesChart();
+    }
+
+    // פונקציה להתנתקות
+    function onLogout() {
+      showLogin();
+    }
+
     // נתוני דמה
     const mockData = {
       stats: {
@@ -503,7 +724,7 @@
       `).join('');
     }
 
-            // יצירת גרף טרנזקציות
+    // יצירת גרף טרנזקציות
     function createPerformanceChart() {
       const ctx = document.getElementById('performanceChart').getContext('2d');
       const labels = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט'];
@@ -623,49 +844,12 @@
       }
     }
 
-
-
     function viewAllAlerts() {
       // ניווט למסך ההתראות
       window.location.href = '/alerts';
     }
 
-    // טעינת נתונים בעת טעינת הדף
-    document.addEventListener('DOMContentLoaded', () => {
-      displayStats();
-      displayAlerts();
-      displaySummary(mockData.accounts, 'accounts');
-      displayDailyChanges();
-      createPerformanceChart();
-      createTradesChart();
-      
-      // הגדרת האזנה לכותרת
-      setupHeaderListener();
-    });
-
-    // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
-    function updateBackgroundPadding(isCollapsed) {
-      const backgroundWrapper = document.querySelector('.background-wrapper');
-      const body = document.body;
-      
-      if (backgroundWrapper) {
-        if (isCollapsed) {
-          backgroundWrapper.classList.add('filter-collapsed');
-        } else {
-          backgroundWrapper.classList.remove('filter-collapsed');
-        }
-      }
-      
-      if (body) {
-        if (isCollapsed) {
-          body.classList.add('filter-collapsed');
-        } else {
-          body.classList.remove('filter-collapsed');
-        }
-      }
-    }
-
-    // האזנה לשינויים בקומפוננט הכותרת
+    // הגדרת האזנה לכותרת
     function setupHeaderListener() {
       const header = document.querySelector('app-header');
       if (header) {
@@ -691,6 +875,157 @@
         }, 1000);
       }
     }
+
+    // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
+    function updateBackgroundPadding(isCollapsed) {
+      const backgroundWrapper = document.querySelector('.background-wrapper');
+      const body = document.body;
+      
+      if (backgroundWrapper) {
+        if (isCollapsed) {
+          backgroundWrapper.classList.add('filter-collapsed');
+        } else {
+          backgroundWrapper.classList.remove('filter-collapsed');
+        }
+      }
+      
+      if (body) {
+        if (isCollapsed) {
+          body.classList.add('filter-collapsed');
+        } else {
+          body.classList.remove('filter-collapsed');
+        }
+      }
+    }
+
+    // פונקציה להגדרת טופס התחברות
+    function setupLoginForm(formId) {
+      const form = document.getElementById(formId);
+      if (!form) {
+        console.error('Login form not found:', formId);
+        return;
+      }
+      
+      // הסרת event listeners קיימים
+      const newForm = form.cloneNode(true);
+      form.parentNode.replaceChild(newForm, form);
+      
+      // הוספת event listener חדש
+      newForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        
+        if (!username || !password) {
+          showError('אנא מלא את כל השדות');
+          return;
+        }
+        
+        try {
+          // הצגת מצב טעינה
+          const loginBtn = document.getElementById('loginBtn');
+          const loginBtnText = document.getElementById('loginBtnText');
+          const loginBtnSpinner = document.getElementById('loginBtnSpinner');
+          
+          loginBtn.disabled = true;
+          loginBtnText.style.display = 'none';
+          loginBtnSpinner.style.display = 'inline';
+          
+          // ניסיון התחברות
+          const result = await login(username, password, rememberMe);
+          
+          if (result && result.data && result.data.access_token) {
+            // שמירת ה-token
+            localStorage.setItem('authToken', result.data.access_token);
+            localStorage.setItem('currentUser', JSON.stringify(result.data.user));
+            
+            showSuccess('התחברות הצליחה!');
+            // הצגת הדשבורד
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            loadDashboardData();
+          } else {
+            showError('שם משתמש או סיסמה שגויים');
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          showError('שגיאה בהתחברות. אנא נסה שוב.');
+        } finally {
+          // החזרת מצב הכפתור
+          const loginBtn = document.getElementById('loginBtn');
+          const loginBtnText = document.getElementById('loginBtnText');
+          const loginBtnSpinner = document.getElementById('loginBtnSpinner');
+          
+          loginBtn.disabled = false;
+          loginBtnText.style.display = 'inline';
+          loginBtnSpinner.style.display = 'none';
+        }
+      });
+      
+      console.log('✅ Login form setup completed');
+    }
+    
+    // פונקציה להצגת שגיאה
+    function showError(message) {
+      const errorDiv = document.getElementById('loginError');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      
+      // הסתרת שגיאה אחרי 5 שניות
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+    
+    // פונקציה להצגת הצלחה
+    function showSuccess(message) {
+      const successDiv = document.getElementById('loginSuccess');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      
+      // הסתרת הודעה אחרי 3 שניות
+      setTimeout(() => {
+        successDiv.style.display = 'none';
+      }, 3000);
+    }
+    
+    // בדיקת התחברות בעת טעינת הדף
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🔍 DOM loaded, starting authentication check...');
+      
+      // בדיקה מה מציג הדף בהתחלה
+      const loginSection = document.getElementById('loginSection');
+      const dashboardSection = document.getElementById('dashboardSection');
+      const loginForm = document.getElementById('loginForm');
+      
+      console.log('📋 Initial state:');
+      console.log('  - loginSection display:', loginSection?.style.display);
+      console.log('  - dashboardSection display:', dashboardSection?.style.display);
+      console.log('  - loginForm found:', !!loginForm);
+      
+      // הגדרת האזנה לכותרת
+      setupHeaderListener();
+      
+      // בדיקת התחברות באמצעות המערכת הגלובלית
+      checkAuthentication(
+        // onAuthenticated - אם מחובר
+        () => {
+          console.log('✅ משתמש מחובר, מציג דשבורד');
+          document.getElementById('loginSection').style.display = 'none';
+          document.getElementById('dashboardSection').style.display = 'block';
+          loadDashboardData();
+        },
+        // onNotAuthenticated - אם לא מחובר
+        () => {
+          console.log('❌ משתמש לא מחובר, מציג מסך התחברות');
+          // הגדרת הטופס באופן ידני
+          console.log('🔧 Setting up login form manually...');
+          setupLoginForm('loginForm');
+        }
+      );
+    });
   </script>
   
   <!-- Scripts -->

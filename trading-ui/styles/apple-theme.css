@@ -86,7 +86,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0;
+  padding: 5px 0;
 }
 
 .logo-section {
@@ -136,13 +136,13 @@ body {
 }
 
 .nav-item.active {
-  background-color: var(--apple-blue);
-  color: white;
-  box-shadow: var(--apple-shadow-light);
+  background-color: transparent;
+  color: var(--logo-orange);
+  box-shadow: 0 2px 8px rgba(255, 156, 5, 0.3);
 }
 
 .nav-item.active:hover {
-  background-color: var(--apple-blue-dark);
+  background-color: transparent;
 }
 
 .nav-icon {

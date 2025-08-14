@@ -35,7 +35,7 @@ def test_api_endpoint():
     print("\n=== בדיקת ה-API endpoint ===")
     
     try:
-        response = requests.get('http://localhost:5002/api/database/tickers')
+        response = requests.get('http://localhost:8080/api/database/tickers')
         print(f"Status Code: {response.status_code}")
         
         if response.status_code == 200:

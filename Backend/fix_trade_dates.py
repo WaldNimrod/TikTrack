@@ -95,30 +95,12 @@ def fix_trade_dates():
     closed_updated = cursor.rowcount
     print(f"✅ עודכנו {closed_updated} תאריכי סגירה")
     
-    # עדכון טרנזקציות עם תאריכים לפני תאריך פתיחת הטרייד
-    update_executions_query = """
-    UPDATE executions 
-    SET date = (
-        SELECT datetime(t.opened_at, '+5 minutes')
-        FROM trades t 
-        WHERE t.id = executions.trade_id
-    )
-    WHERE EXISTS (
-        SELECT 1 
-        FROM trades t 
-        WHERE t.id = executions.trade_id 
-        AND executions.date < t.opened_at
-    )
-    """
-    
-    cursor.execute(update_executions_query)
-    executions_updated = cursor.rowcount
-    print(f"✅ עודכנו {executions_updated} טרנזקציות")
+
     
     conn.commit()
     conn.close()
     
-    return trades_updated, closed_updated, executions_updated
+    return trades_updated, closed_updated, 0
 
 def verify_fixes():
     """אימות שהתיקונים הצליחו"""
@@ -162,36 +144,7 @@ def verify_fixes():
     print(f"   ✅ תקינים: {fixed_count}")
     print(f"   ❌ בעייתיים: {still_problematic}")
     
-    # בדיקת טרנזקציות
-    executions_query = """
-    SELECT 
-        e.id as execution_id,
-        e.date as execution_date,
-        t.opened_at as trade_opened_at,
-        CASE 
-            WHEN e.date >= t.opened_at THEN 'תקין'
-            ELSE 'בעייתי'
-        END as status
-    FROM executions e
-    JOIN trades t ON e.trade_id = t.id
-    ORDER BY e.id
-    """
-    
-    cursor.execute(executions_query)
-    executions = cursor.fetchall()
-    
-    exec_fixed = 0
-    exec_problematic = 0
-    
-    for row in executions:
-        if row['status'] == 'תקין':
-            exec_fixed += 1
-        else:
-            exec_problematic += 1
-            print(f"❌ טרנזקציה {row['execution_id']}: תאריך {row['execution_date']} לפני פתיחת טרייד {row['trade_opened_at']}")
-    
-    print(f"   📈 טרנזקציות תקינות: {exec_fixed}")
-    print(f"   📉 טרנזקציות בעייתיות: {exec_problematic}")
+
     
     conn.close()
     
@@ -210,12 +163,12 @@ def main():
         return
     
     # תיקון התאריכים
-    trades_updated, closed_updated, executions_updated = fix_trade_dates()
+    trades_updated, closed_updated, _ = fix_trade_dates()
     
     print(f"\n📈 סיכום התיקונים:")
     print(f"   🔧 טריידים שתוקנו: {trades_updated}")
     print(f"   🔧 תאריכי סגירה שתוקנו: {closed_updated}")
-    print(f"   🔧 טרנזקציות שתוקנו: {executions_updated}")
+
     
     # אימות התיקונים
     success = verify_fixes()

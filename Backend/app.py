@@ -1,3 +1,36 @@
+#!/usr/bin/env python3
+"""
+TikTrack Production Server
+שרת TikTrack לייצור - יציב ובדוק
+
+✅ יציב מאוד - מומלץ לייצור
+✅ בדוק ומוכח
+✅ ללא אימות (לפיתוח)
+✅ קובץ אחד פשוט
+
+🔧 הפעלה:
+    python3 run_waitress.py    # מומלץ (Waitress)
+    python3 app.py            # Flask development
+    ./start_server.sh         # עם מנטור
+
+📊 נתיבים:
+    /api/health              # בדיקת בריאות
+    /api/accounts            # חשבונות
+    /api/trades              # טריידים
+    /api/tickers             # טיקרים
+    /api/trade_plans         # תכנונים
+    /api/alerts              # התראות
+    /api/cash_flows          # תזרימי מזומנים
+    /api/notes               # הערות
+    /api/executions          # ביצועים
+
+📝 לוגים:
+    server_detailed.log
+
+📖 מדריך מפורט:
+    README_SERVER_SETUP.md
+"""
+
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import sqlite3

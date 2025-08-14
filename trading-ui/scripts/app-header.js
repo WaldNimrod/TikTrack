@@ -43,7 +43,7 @@ class AppHeader extends HTMLElement {
         .header-container {
           max-width: 1400px;
           margin: 0 auto;
-          padding: 0 15px;
+          padding: 5px 15px;
         }
 
         .header-wrapper {
@@ -81,8 +81,9 @@ class AppHeader extends HTMLElement {
         }
 
         .nav-item.active {
-          background-color: #29a6a8;
-          color: white;
+          background-color: transparent;
+          color: #29a6a8;
+          box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3);
         }
 
         .nav-icon {
@@ -2347,7 +2348,27 @@ class AppHeader extends HTMLElement {
     try {
       console.log('Loading accounts from server...');
       
-      const response = await fetch('/api/accounts');
+      // קבלת token מ-localStorage
+      const token = localStorage.getItem('authToken');
+      
+      // אם אין token, לא ננסה לטעון מהשרת
+      if (!token) {
+        console.log('No token found, using fallback accounts');
+        const fallbackAccounts = ['חשבון ראשי', 'חשבון משני'];
+        this.updateAccountFilterMenu(fallbackAccounts);
+        return;
+      }
+      
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      
+      const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
+        method: 'GET',
+        headers: headers
+      });
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -2356,7 +2377,7 @@ class AppHeader extends HTMLElement {
       console.log('Accounts loaded from server:', accounts);
       
       // יצירת רשימת שמות החשבונות
-      const accountNames = accounts.map(account => account.name);
+      const accountNames = accounts.data ? accounts.data.map(account => account.name) : [];
       console.log('Account names:', accountNames);
       
       // עדכון תפריט החשבונות

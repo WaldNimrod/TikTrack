@@ -355,3 +355,238 @@ window.openPlanDetails = openPlanDetails;
 window.updateGridStatus = updateGridStatus;
 window.setPageColumnDefs = setPageColumnDefs;
 window.addColumnToDefaultDefs = addColumnToDefaultDefs;
+
+// פונקציה לפורמט כסף
+function formatCurrency(amount) {
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return '$0.00';
+  }
+  
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(amount);
+}
+
+// פונקציה לפורמט אחוזים
+function formatPercentage(value, decimals = 2) {
+  if (value === null || value === undefined || isNaN(value)) {
+    return '0.00%';
+  }
+  
+  return `${value >= 0 ? '+' : ''}${value.toFixed(decimals)}%`;
+}
+
+// פונקציות גלובליות לסגירה/פתיחה
+function toggleAlertsSection() {
+  const alertsSection = document.getElementById('alertsSection');
+  const filterBtn = document.querySelector('.filter-toggle-btn');
+  const isCollapsed = alertsSection.classList.contains('collapsed');
+  
+  if (isCollapsed) {
+    // פתיחת אזור ההתראות
+    alertsSection.classList.remove('collapsed');
+    filterBtn.classList.remove('active');
+    localStorage.setItem('alertsSectionCollapsed', 'false');
+    console.log('פתיחת אזור התראות');
+  } else {
+    // סגירת אזור ההתראות
+    alertsSection.classList.add('collapsed');
+    filterBtn.classList.add('active');
+    localStorage.setItem('alertsSectionCollapsed', 'true');
+    console.log('סגירת אזור התראות');
+  }
+}
+
+function toggleTopSection() {
+  const topSection = document.getElementById('topSection');
+  const filterBtn = topSection.querySelector('.top-toggle-btn');
+  const isCollapsed = topSection.classList.contains('collapsed');
+  
+  if (isCollapsed) {
+    // פתיחת החלק העליון
+    topSection.classList.remove('collapsed');
+    filterBtn.classList.remove('active');
+    localStorage.setItem('topSectionCollapsed', 'false');
+    console.log('פתיחת חלק עליון');
+  } else {
+    // סגירת החלק העליון
+    topSection.classList.add('collapsed');
+    filterBtn.classList.add('active');
+    localStorage.setItem('topSectionCollapsed', 'true');
+    console.log('סגירת חלק עליון');
+  }
+}
+
+function restoreAlertsSectionState() {
+  const alertsSection = document.getElementById('alertsSection');
+  const filterBtn = document.querySelector('.filter-toggle-btn');
+  const isCollapsed = localStorage.getItem('alertsSectionCollapsed') === 'true';
+  
+  if (isCollapsed) {
+    alertsSection.classList.add('collapsed');
+    filterBtn.classList.add('active');
+    console.log('שחזור מצב: אזור התראות מקופל');
+  } else {
+    alertsSection.classList.remove('collapsed');
+    filterBtn.classList.remove('active');
+    console.log('שחזור מצב: אזור התראות פתוח');
+  }
+}
+
+function restoreTopSectionState() {
+  const topSection = document.getElementById('topSection');
+  const filterBtn = topSection.querySelector('.top-toggle-btn');
+  const isCollapsed = localStorage.getItem('topSectionCollapsed') === 'true';
+  
+  if (isCollapsed) {
+    topSection.classList.add('collapsed');
+    filterBtn.classList.add('active');
+    console.log('שחזור מצב: חלק עליון מקופל');
+  } else {
+    topSection.classList.remove('collapsed');
+    filterBtn.classList.remove('active');
+    console.log('שחזור מצב: חלק עליון פתוח');
+  }
+}
+
+// פונקציה לטעינת התראות
+function loadAlerts() {
+  const alertsContainer = document.getElementById('alertsContainer');
+  if (!alertsContainer) return;
+  
+  // קביעת סוג הדף לפי URL
+  const isPlanningPage = window.location.pathname.includes('planning');
+  const openDetailsFunction = isPlanningPage ? 'openPlanDetails' : 'openTradeDetails';
+  
+  // נתוני דמה להתראות
+  const alerts = [
+    { ticker: 'AAPL', message: 'מחיר חצה את 180$', price: '$184.32 (+1.2%)' },
+    { ticker: 'TSLA', message: 'מחיר ירד מתחת ל-700$', price: '$688.90 (-2.1%)' },
+    { ticker: 'MSFT', message: 'תזכורת לכניסה ביום שלישי', price: '$342.00 (+2.4%)' }
+  ];
+  
+  const alertsHtml = alerts.map(alert => `
+    <div class="alert-card">
+      <strong onclick="${openDetailsFunction}('${alert.ticker}')">${alert.ticker}</strong><br />
+      ${alert.message}<br />
+      <span class="price">נוכחי: ${alert.price}</span>
+      <button class="btn btn-secondary" onclick="markAlertAsRead(this, '${alert.ticker}')">סמן כנקרא</button>
+    </div>
+  `).join('');
+  
+  alertsContainer.innerHTML = alertsHtml;
+  
+  // עדכון מונה ההתראות
+  const alertsCount = document.getElementById('alertsCount');
+  if (alertsCount) {
+    alertsCount.textContent = alerts.length;
+  }
+}
+
+// פונקציה לסמן התראה כנקראה
+function markAlertAsRead(button, ticker) {
+  const alertCard = button.closest('.alert-card');
+  if (alertCard) {
+    alertCard.classList.add('read');
+    button.textContent = 'נקרא';
+    button.disabled = true;
+    console.log(`התראה עבור ${ticker} סומנה כנקראה`);
+  }
+}
+
+// פונקציה לאיפוס פילטרים ורענון נתונים
+async function resetAllFiltersAndReloadData() {
+  console.log('=== resetAllFiltersAndReloadData called ===');
+  
+  // קביעת סוג הדף לפי URL
+  const isPlanningPage = window.location.pathname.includes('planning');
+  const isDatabasePage = window.location.pathname.includes('database');
+  
+  // איפוס הפילטרים בקומפוננטת התפריט
+  const header = document.querySelector('app-header');
+  if (header && typeof header.clearAllFilters === 'function') {
+    console.log('Calling clearAllFilters from component');
+    header.clearAllFilters();
+  }
+  
+  // איפוס המשתנים הגלובליים
+  window.selectedStatusesForFilter = [];
+  window.selectedTypesForFilter = [];
+  window.selectedAccountsForFilter = [];
+  window.selectedDateRangeForFilter = null;
+  window.selectedSearchTermForFilter = null;
+  
+  // ניקוי localStorage
+  const filterPrefix = isPlanningPage ? 'planningFilter' : isDatabasePage ? 'databaseFilter' : 'trackingFilter';
+  localStorage.removeItem(`${filterPrefix}Statuses`);
+  localStorage.removeItem(`${filterPrefix}Types`);
+  localStorage.removeItem(`${filterPrefix}Accounts`);
+  localStorage.removeItem(`${filterPrefix}DateRange`);
+  localStorage.removeItem(`${filterPrefix}Search`);
+  
+  // רענון נתונים לפי סוג הדף
+  if (isPlanningPage && typeof loadPlansData === 'function') {
+    await loadPlansData();
+  } else if (isDatabasePage && typeof loadDatabaseStats === 'function') {
+    await loadDatabaseStats();
+  } else if (typeof loadTradesDataDirect === 'function') {
+    await loadTradesDataDirect();
+  }
+  
+  console.log('=== resetAllFiltersAndReloadData completed ===');
+}
+
+// פונקציה לסגירת כל הפילטרים
+function closeAllFilters() {
+  console.log('=== closeAllFilters called ===');
+  
+  // קביעת סוג הדף לפי URL
+  const isPlanningPage = window.location.pathname.includes('planning');
+  const isDatabasePage = window.location.pathname.includes('database');
+  
+  // איפוס הפילטרים בקומפוננטת התפריט
+  if (typeof window.resetComponentFilters === 'function') {
+    window.resetComponentFilters();
+  }
+  
+  // איפוס המשתנים הגלובליים
+  window.selectedStatusesForFilter = [];
+  window.selectedTypesForFilter = [];
+  window.selectedAccountsForFilter = [];
+  window.selectedDateRangeForFilter = null;
+  window.selectedSearchTermForFilter = null;
+  
+  // ניקוי localStorage
+  const filterPrefix = isPlanningPage ? 'planningFilter' : isDatabasePage ? 'databaseFilter' : 'trackingFilter';
+  localStorage.removeItem(`${filterPrefix}Statuses`);
+  localStorage.removeItem(`${filterPrefix}Types`);
+  localStorage.removeItem(`${filterPrefix}Accounts`);
+  localStorage.removeItem(`${filterPrefix}DateRange`);
+  localStorage.removeItem(`${filterPrefix}Search`);
+  
+  console.log('All filters cleared');
+}
+
+// פונקציות לאישור מותאם אישית
+let customActionCallback = null;
+
+function confirmCustomAction() {
+  if (customActionCallback) {
+    customActionCallback();
+  }
+  document.getElementById("customConfirmModal").style.display = "none";
+}
+
+function cancelCustomAction() {
+  customActionCallback = null;
+  document.getElementById("customConfirmModal").style.display = "none";
+}
+
+function showCustomConfirm(message, callback) {
+  customActionCallback = callback;
+  document.getElementById("customConfirmMessage").textContent = message;
+  document.getElementById("customConfirmModal").style.display = "block";
+}

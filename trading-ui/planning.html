@@ -4,14 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>תכנון טריידים - מערכת ניהול השקעות</title>
-  <!-- Using system fonts instead of Google Fonts to avoid loading errors -->
   <!-- AG-Grid CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/apple-theme.css" />
-  <link rel="stylesheet" href="styles/menu.css?v=6" />
+  <link rel="stylesheet" href="styles/apple-theme.css?v=9" />
+  <link rel="stylesheet" href="styles/menu.css?v=9" />
   <link rel="stylesheet" href="styles/styles.css?v=10" />
-  <link rel="stylesheet" href="styles/grid.css" />
+  <link rel="stylesheet" href="styles/grid.css?v=11" />
+  <link rel="stylesheet" href="styles/grid-table.css?v=7" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     /* סגנונות מיוחדים לדף זה */
@@ -34,44 +33,62 @@
   <app-header></app-header>
 
   <div class="background-wrapper">
-    <div class="container">
-      <div class="content-wrapper">
-        <div class="top-bar">
-          <h1>תכנון טריידים</h1>
-        </div>
-
-      <!-- תצוגת סיכום -->
-      <div class="info-summary">
-        <div>סה"כ תכנונים פעילים: <strong>4</strong></div>
-        <div>סכום השקעה כולל: <strong>₪78,000</strong></div>
-        <div>השקעה ממוצעת: <strong>₪19,500</strong></div>
-        <div>רווח כולל: <strong style="color: green">+₪3,240</strong></div>
+    <!-- חלק עליון עם כפתור סגירה/פתיחה -->
+    <div class="top-section" id="topSection">
+      <div class="page-header">
+        <h1 class="page-title">תכנון טריידים</h1>
+        <p class="page-subtitle">ניהול ועקיבה אחר תכנוני השקעות</p>
+        <button class="filter-toggle-btn top-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר חלק עליון">
+          <span class="filter-icon">▲</span>
+        </button>
       </div>
 
-      <!-- אזהרות -->
-      <div class="alert-section">
-        <h3>התראות</h3>
-        <div class="alert-row">
-          <div class="alert-card">
-            <strong onclick="openPlanDetails('AAPL')">AAPL</strong><br />
-            מחיר חצה את 180$<br />
-            <span class="price">נוכחי: $184.32 (+1.2%)</span>
-            <button class="btn btn-secondary" onclick="markAlertAsRead(this, 'AAPL')">סמן כנקרא</button>
-          </div>
-          <div class="alert-card">
-            <strong onclick="openPlanDetails('TSLA')">TSLA</strong><br />
-            מחיר ירד מתחת ל-700$<br />
-            <span class="price">נוכחי: $688.90 (-2.1%)</span>
-            <button class="btn btn-secondary" onclick="markAlertAsRead(this, 'TSLA')">סמן כנקרא</button>
-          </div>
-          <div class="alert-card">
-            <strong onclick="openPlanDetails('MSFT')">MSFT</strong><br />
-            תזכורת לכניסה ביום שלישי<br />
-            <span class="price">נוכחי: $342.00 (+2.4%)</span>
-            <button class="btn btn-secondary" onclick="markAlertAsRead(this, 'MSFT')">סמן כנקרא</button>
-          </div>
+      <!-- סטטיסטיקות -->
+      <div class="stats-cards" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-title">תכנונים פעילים</div>
+          <div class="stat-value" id="activePlans">טוען...</div>
+          <div class="change" id="activePlansChange">טוען...</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">סכום השקעה</div>
+          <div class="stat-value" id="totalInvestment">טוען...</div>
+          <div class="change" id="totalInvestmentChange">טוען...</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">השקעה ממוצעת</div>
+          <div class="stat-value" id="avgInvestment">טוען...</div>
+          <div class="change" id="avgInvestmentChange">טוען...</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">רווח כולל</div>
+          <div class="stat-value" id="totalProfit">טוען...</div>
+          <div class="change" id="totalProfitChange">טוען...</div>
         </div>
       </div>
+    </div>
+
+    <!-- התראות -->
+    <div class="table-section" id="alertsSection">
+      <div class="table-header">
+        <div class="table-title">
+          🔔 התראות
+        </div>
+        <div class="table-count" id="alertsCount">טוען...</div>
+        <button class="filter-toggle-btn" onclick="toggleAlertsSection()" title="הצג/הסתר אזור התראות">
+          <span class="filter-icon">▲</span>
+        </button>
+      </div>
+      <div id="alertsContainer" class="loading">טוען התראות...</div>
+    </div>
+
+    <!-- תצוגת סיכום -->
+    <div class="info-summary" id="summaryStats">
+      <div>סה"כ תכנונים פעילים: <strong id="activePlansCount">טוען...</strong></div>
+      <div>סכום השקעה כולל: <strong id="totalInvestmentValue">טוען...</strong></div>
+      <div>השקעה ממוצעת: <strong id="avgInvestmentValue">טוען...</strong></div>
+      <div>רווח כולל: <strong id="totalProfitValue">טוען...</strong></div>
+    </div>
 
       <!-- טופס תכנון (מוסתר בהתחלה) -->
       <div class="plan-form" id="planForm" style="display: none;">
@@ -128,21 +145,20 @@
         </div>
       </div>
 
-      <!-- כפתור הוספה -->
-      <div class="filters">
-        <div style="display: flex; justify-content: flex-end;">
-          <button class="btn btn-secondary" onclick="openPlanDetails()" style="padding: 0.4rem 0.8rem; font-size: 0.9rem; background-color: #29a6a8; color: white; border: none; border-radius: 6px;">הוסף תכנון חדש</button>
+    <!-- טבלת תכנונים -->
+    <div class="table-section">
+        <div class="table-header">
+          <div class="table-title">
+            📋 תכנונים
+          </div>
+        <div class="table-count" id="plansCount">טוען...</div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="add-btn action-btn" onclick="openPlanDetails()" title="הוסף תכנון חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+          <button class="refresh-btn" onclick="resetAllFiltersAndReloadData()" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
         </div>
-      </div>
-
-      <!-- הגריד כעת בתוך ה-content-wrapper הראשי -->
-      <div class="grid-container" id="gridContainer">
-        <h3>טבלת תכנונים</h3>
-        
-        <div id="agGridFloating" class="ag-theme-quartz grid-container"></div>
-      </div>
-      </div>
-    </div>
+        </div>
+        <div id="plansTable" class="loading">טוען תכנונים...</div>
+          </div>
   </div>
 
   <!-- מרווח בתחתית הדף -->
@@ -175,6 +191,205 @@
     let externalFilterPresent = false;
     let selectedStatuses = [];
     let selectedTypes = [];
+    let plansData = [
+      { ticker: "AAPL", date: "2025-08-01", type: "סווינג", amount: "$25,000 (#100)", target: "$210 (12.3%)", stop: "$180 (-6.7%)", current: "$184.32 (+1.2%)", status: "פתוח", action: "⬅️" },
+      { ticker: "TSLA", date: "2025-07-30", type: "השקעה", amount: "$20,000 (#100)", target: "$780 (10.1%)", stop: "$690 (-4.8%)", current: "$688.90 (-2.1%)", status: "סגור", action: "⬅️" },
+      { ticker: "NVDA", date: "2025-07-28", type: "השקעה", amount: "$15,000 (#75)", target: "$540 (8.2%)", stop: "$480 (-4.5%)", current: "$503.20 (+0.5%)", status: "פתוח", action: "⬅️" },
+      { ticker: "AMZN", date: "2025-07-27", type: "פאסיבי", amount: "$10,000 (#50)", target: "$140 (6.3%)", stop: "$126 (-3.1%)", current: "$129.00 (-1.0%)", status: "מבוטל", action: "⬅️" },
+      { ticker: "GOOG", date: "2025-07-26", type: "השקעה", amount: "$20,000 (#60)", target: "$148 (9.0%)", stop: "$130 (-3.4%)", current: "$141.00 (+1.6%)", status: "פתוח", action: "⬅️" },
+      { ticker: "MSFT", date: "2025-07-25", type: "סווינג", amount: "$18,000 (#90)", target: "$355 (11.2%)", stop: "$320 (-4.2%)", current: "$342.00 (+2.4%)", status: "סגור", action: "⬅️" }
+    ];
+    let filteredData = [...plansData];
+
+    // פונקציה לטעינת נתוני תכנונים
+    async function loadPlansData() {
+      console.log('=== loadPlansData called ===');
+      
+      try {
+        const response = await fetch('/api/trade_plans');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Plans data loaded:', data);
+        
+        // עדכון הנתונים
+        plansData = data.map(plan => ({
+          ticker: plan.ticker || plan.ticker_name,
+          date: plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : '-',
+          type: plan.investment_type || 'לא ידוע',
+          amount: plan.planned_amount ? `$${plan.planned_amount.toLocaleString()}` : '-',
+          target: plan.target_price ? `$${plan.target_price.toFixed(2)}` : '-',
+          stop: plan.stop_price ? `$${plan.stop_price.toFixed(2)}` : '-',
+          current: '$0.00 (0.0%)', // יועדכן בהמשך
+          status: plan.status || 'פתוח',
+          action: "⬅️"
+        }));
+        
+        filteredData = [...plansData];
+        updateTable();
+        updateSummary();
+        updateStats();
+        
+      } catch (error) {
+        console.error('Error loading plans data:', error);
+        // שימוש בנתוני דמה במקרה של שגיאה
+        filteredData = [...plansData];
+        updateTable();
+        updateSummary();
+        updateStats();
+      }
+    }
+
+    // פונקציה לעדכון הטבלה
+    function updateTable() {
+      const tableContainer = document.getElementById('plansTable');
+      if (!tableContainer) return;
+      
+      if (filteredData.length === 0) {
+        tableContainer.innerHTML = '<div class="empty-table">אין תכנונים להצגה</div>';
+        return;
+      }
+      
+      const table = `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>נכס</th>
+              <th>תאריך</th>
+              <th>סוג</th>
+              <th>סכום</th>
+              <th>יעד</th>
+              <th>סטופ</th>
+              <th>נוכחי</th>
+              <th>סטטוס</th>
+              <th>פעולות</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filteredData.map(plan => `
+              <tr>
+                <td><strong>${plan.ticker}</strong></td>
+                <td>${plan.date}</td>
+                <td>${plan.type}</td>
+                <td>${plan.amount}</td>
+                <td>${plan.target}</td>
+                <td>${plan.stop}</td>
+                <td>${plan.current}</td>
+                <td><span class="status-badge status-${plan.status.toLowerCase()}">${plan.status}</span></td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick="openPlanDetails('${plan.ticker}')" title="פרטים">👁️</button>
+                  <button class="btn btn-sm btn-secondary" onclick="editPlan('${plan.ticker}')" title="ערוך">✏️</button>
+                  <button class="btn btn-sm btn-danger" onclick="deletePlan('${plan.ticker}')" title="מחק">🗑️</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+      
+      tableContainer.innerHTML = table;
+    }
+
+    // פונקציה לעדכון הסיכום
+    function updateSummary() {
+      const activePlansCount = document.getElementById('activePlansCount');
+      const totalInvestmentValue = document.getElementById('totalInvestmentValue');
+      const avgInvestmentValue = document.getElementById('avgInvestmentValue');
+      const totalProfitValue = document.getElementById('totalProfitValue');
+      
+      if (activePlansCount) {
+        const activeCount = filteredData.filter(plan => plan.status === 'פתוח').length;
+        activePlansCount.textContent = activeCount;
+      }
+      
+      if (totalInvestmentValue) {
+        const totalInvestment = filteredData.reduce((sum, plan) => {
+          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
+          return sum + amount;
+        }, 0);
+        totalInvestmentValue.textContent = `$${totalInvestment.toLocaleString()}`;
+      }
+      
+      if (avgInvestmentValue) {
+        const totalInvestment = filteredData.reduce((sum, plan) => {
+          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
+          return sum + amount;
+        }, 0);
+        const avgInvestment = filteredData.length > 0 ? totalInvestment / filteredData.length : 0;
+        avgInvestmentValue.textContent = `$${avgInvestment.toLocaleString()}`;
+      }
+      
+      if (totalProfitValue) {
+        // חישוב רווח דמיוני לצורך הדוגמה
+        const totalProfit = filteredData.reduce((sum, plan) => {
+          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
+          return sum + (amount * 0.05); // 5% רווח דמיוני
+        }, 0);
+        totalProfitValue.textContent = `$${totalProfit.toLocaleString()}`;
+      }
+    }
+
+    // פונקציה לעדכון הסטטיסטיקות
+    function updateStats() {
+      const activePlans = document.getElementById('activePlans');
+      const totalInvestment = document.getElementById('totalInvestment');
+      const avgInvestment = document.getElementById('avgInvestment');
+      const totalProfit = document.getElementById('totalProfit');
+      
+      if (activePlans) {
+        const activeCount = filteredData.filter(plan => plan.status === 'פתוח').length;
+        activePlans.textContent = activeCount;
+      }
+      
+      if (totalInvestment) {
+        const total = filteredData.reduce((sum, plan) => {
+          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
+          return sum + amount;
+        }, 0);
+        totalInvestment.textContent = `$${total.toLocaleString()}`;
+      }
+      
+      if (avgInvestment) {
+        const total = filteredData.reduce((sum, plan) => {
+          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
+          return sum + amount;
+        }, 0);
+        const avg = filteredData.length > 0 ? total / filteredData.length : 0;
+        avgInvestment.textContent = `$${avg.toLocaleString()}`;
+      }
+      
+      if (totalProfit) {
+        const profit = filteredData.reduce((sum, plan) => {
+          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
+          return sum + (amount * 0.05); // 5% רווח דמיוני
+        }, 0);
+        totalProfit.textContent = `$${profit.toLocaleString()}`;
+      }
+    }
+
+
+
+    // אתחול הדף
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded - loading plans data');
+      
+      // שחזור מצב אזור ההתראות
+      restoreAlertsSectionState();
+      
+      // שחזור מצב החלק העליון
+      restoreTopSectionState();
+      
+      // טעינת נתוני תכנונים
+      loadPlansData();
+      
+      // טעינת התראות
+      loadAlerts();
+    });
+
+
+
     let rowData = [
       { ticker: "AAPL", date: "2025-08-01", type: "סווינג", amount: "$25,000 (#100)", target: "$210 (12.3%)", stop: "$180 (-6.7%)", current: "$184.32 (+1.2%)", status: "פתוח", action: "⬅️" },
       { ticker: "TSLA", date: "2025-07-30", type: "השקעה", amount: "$20,000 (#100)", target: "$780 (10.1%)", stop: "$690 (-4.8%)", current: "$688.90 (-2.1%)", status: "סגור", action: "⬅️" },
@@ -189,9 +404,11 @@
         // פתיחת פרטי תכנון קיים
         const modal = document.getElementById("planModal");
         const content = document.getElementById("planDetailsContent");
-        const plan = rowData.find(p => p.ticker === ticker);
-        const profitLoss = calculateProfitLoss(plan);
-        const isPositive = profitLoss >= 0;
+        const plan = filteredData.find(p => p.ticker === ticker);
+        if (!plan) {
+          console.error('Plan not found:', ticker);
+          return;
+        }
         
         content.innerHTML = `
           <h2>פרטי תכנון - ${ticker}</h2>
@@ -1364,18 +1581,34 @@
       }
     }
 
-    function markAlertAsRead(button, ticker) {
-      const alertCard = button.closest('.alert-card');
-      if (alertCard) {
-        alertCard.classList.add('read');
-        button.textContent = 'נקרא';
-        button.disabled = true;
-        // הורדתי את ההודעה שקופצת
+    function editPlan(ticker) {
+      console.log('Editing plan:', ticker);
+      openPlanDetails(ticker);
+    }
+
+    function deletePlan(ticker) {
+      console.log('Deleting plan:', ticker);
+      if (confirm(`האם אתה בטוח שברצונך למחוק את התכנון ${ticker}?`)) {
+        // כאן תהיה לוגיקת מחיקה
+        console.log(`Plan ${ticker} deleted`);
+        loadPlansData(); // רענון הנתונים
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM loaded, initializing grid...');
+      console.log('DOM loaded, initializing planning page...');
+      
+      // שחזור מצב אזור ההתראות
+      restoreAlertsSectionState();
+      
+      // שחזור מצב החלק העליון
+      restoreTopSectionState();
+      
+      // טעינת נתוני תכנונים
+      loadPlansData();
+      
+      // טעינת התראות
+      loadAlerts();
       
       // המתנה קצרה לוודא שהכל נטען
       setTimeout(() => {

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Auth</title>
+</head>
+<body>
+    <h1>Test Authentication</h1>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testLogin() {
+            try {
+                const response = await fetch('http://127.0.0.1:8080/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Login response:', data);
+                
+                if (data.status === 'success') {
+                    localStorage.setItem('authToken', data.data.access_token);
+                    document.getElementById('result').innerHTML = 'Login successful! Token saved.';
+                } else {
+                    document.getElementById('result').innerHTML = 'Login failed: ' + JSON.stringify(data);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('result').innerHTML = 'Login error: ' + error.message;
+            }
+        }
+
+        async function testAPI() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    document.getElementById('result').innerHTML = 'No token found. Please login first.';
+                    return;
+                }
+
+                const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                console.log('API response:', data);
+                
+                if (response.ok) {
+                    document.getElementById('result').innerHTML = 'API call successful! Found ' + data.data.length + ' accounts.';
+                } else {
+                    document.getElementById('result').innerHTML = 'API call failed: ' + JSON.stringify(data);
+                }
+            } catch (error) {
+                console.error('API error:', error);
+                document.getElementById('result').innerHTML = 'API error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

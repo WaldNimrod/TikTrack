@@ -1,4 +1,21 @@
 {
+    // ========================================
+    // TikTrack Cursor Performance Optimizations
+    // ========================================
+    // 
+    // 📋 מטרה: שיפור ביצועי Cursor בפרויקט TikTrack
+    // 📅 תאריך: 2024
+    // 🔧 שיפורים:
+    //   - כיבוי git autofetch
+    //   - הפחתת עומס חיפוש
+    //   - הגבלת מעקב קבצים
+    //   - כיבוי פעולות אוטומטיות
+    //   - הגדרות Python מותאמות
+    //
+    // 💡 שימוש: הגדרות אלו משפרות משמעותית את הביצועים
+    //    במיוחד בשעות העומס ובפרויקטים גדולים
+    // ========================================
+
     "python.defaultInterpreterPath": "./.venv/bin/python",
     "python.terminal.activateEnvironment": true,
     "python.analysis.extraPaths": ["./Backend"],
@@ -11,9 +28,9 @@
     "git.autofetch": false,
     "search.followSymlinks": false,
     "typescript.tsserver.maxTsServerMemory": 4096,
-    "editor.codeActionsOnSave": { 
-        "source.organizeImports": false, 
-        "source.fixAll.eslint": false 
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "never",
+        "source.fixAll.eslint": "never"
     },
     "files.watcherExclude": {
         "**/node_modules/**": true,

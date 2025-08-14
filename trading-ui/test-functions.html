@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>בדיקת פונקציות גלובליות</title>
+  <link rel="stylesheet" href="styles/styles.css?v=10" />
+  <script src="scripts/grid-core.js"></script>
+</head>
+<body>
+  <div style="padding: 2rem;">
+    <h1>בדיקת פונקציות גלובליות</h1>
+    
+    <div style="margin: 2rem 0;">
+      <h3>בדיקת פונקציות סגירה/פתיחה:</h3>
+      <button onclick="testToggleFunctions()">בדוק פונקציות סגירה/פתיחה</button>
+      <div id="toggleTestResult" style="margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 8px;"></div>
+    </div>
+    
+    <div style="margin: 2rem 0;">
+      <h3>בדיקת פונקציות פורמט:</h3>
+      <button onclick="testFormatFunctions()">בדוק פונקציות פורמט</button>
+      <div id="formatTestResult" style="margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 8px;"></div>
+    </div>
+    
+    <div style="margin: 2rem 0;">
+      <h3>בדיקת פונקציות אישור:</h3>
+      <button onclick="testConfirmFunctions()">בדוק פונקציות אישור</button>
+      <div id="confirmTestResult" style="margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 8px;"></div>
+    </div>
+  </div>
+
+  <!-- חלון אישור מותאם אישית -->
+  <div id="customConfirmModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 400px; text-align: center; padding: 2rem;">
+      <div style="font-size: 4rem; color: #FF3B30; margin-bottom: 1rem;">⚠️</div>
+      <h3 id="customConfirmMessage" style="color: #FF3B30; margin-bottom: 2rem;"></h3>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <button class="btn btn-danger" onclick="confirmCustomAction()" style="padding: 0.5rem 1rem;">אישור</button>
+        <button class="btn btn-secondary" onclick="cancelCustomAction()" style="padding: 0.5rem 1rem;">ביטול</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function testToggleFunctions() {
+      const result = document.getElementById('toggleTestResult');
+      let tests = [];
+      
+      // בדיקת קיום הפונקציות
+      tests.push(`toggleAlertsSection: ${typeof toggleAlertsSection === 'function' ? '✅' : '❌'}`);
+      tests.push(`toggleTopSection: ${typeof toggleTopSection === 'function' ? '✅' : '❌'}`);
+      tests.push(`restoreAlertsSectionState: ${typeof restoreAlertsSectionState === 'function' ? '✅' : '❌'}`);
+      tests.push(`restoreTopSectionState: ${typeof restoreTopSectionState === 'function' ? '✅' : '❌'}`);
+      tests.push(`loadAlerts: ${typeof loadAlerts === 'function' ? '✅' : '❌'}`);
+      tests.push(`markAlertAsRead: ${typeof markAlertAsRead === 'function' ? '✅' : '❌'}`);
+      tests.push(`resetAllFiltersAndReloadData: ${typeof resetAllFiltersAndReloadData === 'function' ? '✅' : '❌'}`);
+      tests.push(`closeAllFilters: ${typeof closeAllFilters === 'function' ? '✅' : '❌'}`);
+      
+      result.innerHTML = tests.join('<br>');
+    }
+    
+    function testFormatFunctions() {
+      const result = document.getElementById('formatTestResult');
+      let tests = [];
+      
+      // בדיקת קיום הפונקציות
+      tests.push(`formatCurrency: ${typeof formatCurrency === 'function' ? '✅' : '❌'}`);
+      tests.push(`formatPercentage: ${typeof formatPercentage === 'function' ? '✅' : '❌'}`);
+      
+      // בדיקת הפונקציות
+      if (typeof formatCurrency === 'function') {
+        tests.push(`formatCurrency(1234.56): ${formatCurrency(1234.56)}`);
+        tests.push(`formatCurrency(0): ${formatCurrency(0)}`);
+        tests.push(`formatCurrency(null): ${formatCurrency(null)}`);
+      }
+      
+      if (typeof formatPercentage === 'function') {
+        tests.push(`formatPercentage(5.25): ${formatPercentage(5.25)}`);
+        tests.push(`formatPercentage(-2.1): ${formatPercentage(-2.1)}`);
+        tests.push(`formatPercentage(0): ${formatPercentage(0)}`);
+      }
+      
+      result.innerHTML = tests.join('<br>');
+    }
+    
+    function testConfirmFunctions() {
+      const result = document.getElementById('confirmTestResult');
+      let tests = [];
+      
+      // בדיקת קיום הפונקציות
+      tests.push(`showCustomConfirm: ${typeof showCustomConfirm === 'function' ? '✅' : '❌'}`);
+      tests.push(`confirmCustomAction: ${typeof confirmCustomAction === 'function' ? '✅' : '❌'}`);
+      tests.push(`cancelCustomAction: ${typeof cancelCustomAction === 'function' ? '✅' : '❌'}`);
+      
+      // בדיקת הפונקציה
+      if (typeof showCustomConfirm === 'function') {
+        tests.push('לחיצה על הכפתור תציג חלון אישור לבדיקה');
+        showCustomConfirm('זהו חלון בדיקה - האם הכל עובד?', () => {
+          alert('הפונקציה עובדת!');
+        });
+      }
+      
+      result.innerHTML = tests.join('<br>');
+    }
+  </script>
+</body>
+</html>

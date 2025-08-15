@@ -789,6 +789,7 @@ def get_table_data_v2(table_name):
             SELECT 
                 id,
                 symbol,
+                name,
                 type,
                 remarks,
                 currency,
@@ -849,7 +850,7 @@ def get_table_data_v2(table_name):
             SELECT 
                 oer.*,
                 tr.status as trade_status,
-                tr.created_at as trade_created_at
+                tr.opened_at as trade_created_at
             FROM open_execution_requests oer
             LEFT JOIN trades tr ON oer.trade_id = tr.id
             ORDER BY oer.created_at DESC

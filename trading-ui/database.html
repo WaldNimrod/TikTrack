@@ -934,7 +934,7 @@
       try {
         tableElement.innerHTML = '<div class="loading">טוען...</div>';
         
-        const response = await fetch(`/api/database/${tableName}`);
+        const response = await fetch(`/api/database_v2/${tableName}`);
         const data = await response.json();
         
         console.log(`נתונים עבור ${tableName}:`, data);
@@ -993,7 +993,7 @@
         } else if (tableName === 'notes') {
           columns = ['id', 'account_id', 'trade_id', 'trade_plan_id', 'content', 'created_at', 'attachment'];
         } else if (tableName === 'trade_plans') {
-          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason'];
+          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason', 'status'];
         } else if (tableName === 'open_execution_requests') {
           columns = ['id', 'trade_id', 'ticker_symbol', 'action', 'order_type', 'status', 'expiry_type', 'price', 'quantity', 'created_at'];
         }
@@ -1057,7 +1057,7 @@
         } else if (tableName === 'notes') {
           columns = ['id', 'account_id', 'trade_id', 'trade_plan_id', 'content', 'created_at', 'attachment'];
         } else if (tableName === 'trade_plans') {
-          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason'];
+          columns = ['id', 'account_id', 'ticker_id', 'investment_type', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'created_at', 'canceled_at', 'cancel_reason', 'status'];
         } else if (tableName === 'open_execution_requests') {
           columns = ['id', 'trade_id', 'ticker_symbol', 'action', 'order_type', 'status', 'expiry_type', 'price', 'quantity', 'created_at'];
         }
@@ -1712,7 +1712,7 @@
     // בדיקה מיידית
     setTimeout(() => {
       console.log('בדיקה מיידית - טוען trade_plans');
-      fetch('/api/database/trade_plans')
+              fetch('/api/database_v2/trade_plans')
         .then(response => response.json())
         .then(data => {
           console.log('נתונים שהתקבלו:', data);
@@ -1735,7 +1735,7 @@
       
       // בדיקה מיידית לפקודות
       console.log('בדיקה מיידית - טוען open_execution_requests');
-      fetch('/api/database/open_execution_requests')
+              fetch('/api/database_v2/open_execution_requests')
         .then(response => response.json())
         .then(data => {
           console.log('נתוני פקודות:', data);
@@ -1758,7 +1758,7 @@
       
       // בדיקה מיידית לתזרים מזומנים
       console.log('בדיקה מיידית - טוען cash_flows');
-      fetch('/api/database/cash_flows')
+              fetch('/api/database_v2/cash_flows')
         .then(response => response.json())
         .then(data => {
           console.log('נתוני תזרים מזומנים:', data);
@@ -3013,7 +3013,7 @@
         const accounts = await accountsResponse.json();
         
         // טעינת טיקרים
-        const tickersResponse = await fetch('/api/database/tickers');
+        const tickersResponse = await fetch('/api/database_v2/tickers');
         const tickers = await tickersResponse.json();
         
         // מילוי רשימות החשבונות
@@ -3069,7 +3069,7 @@
         const accounts = await accountsResponse.json();
         
         // טעינת טריידים
-        const tradesResponse = await fetch('/api/database/trades');
+        const tradesResponse = await fetch('/api/database_v2/trades');
         const trades = await tradesResponse.json();
         
         // מילוי רשימות החשבונות

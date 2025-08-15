@@ -1,31 +1,108 @@
-# מערכת הגריד המודולרית - TikTrack
+# מערכת הטבלאות המודולרית - TikTrack
 
 ## סקירה כללית
 
-מערכת הגריד המודולרית מאפשרת שימוש אחיד בגריד בכל הדפים במערכת. המערכת מבטיחה שיהיה רק גריד אחד פעיל בכל רגע נתון ומשתמשת בקובץ הכללי. המערכת מחולקת לקבצים נפרדים לפי תפקידים:
+מערכת הטבלאות המודולרית מאפשרת שימוש אחיד בטבלאות בכל הדפים במערכת. המערכת כוללת תבנית טבלה כללית שניתן לשיכפול בקלות ומבטיחה עיצוב אחיד בכל האתר. המערכת מחולקת לקבצים נפרדים לפי תפקידים:
 
 ### קבצי המערכת
 
-1. **`grid-core.js`** - לוגיקת הגריד הבסיסית
-2. **`grid-filters.js`** - מערכת הפילטרים
-3. **`grid-data.js`** - ניהול נתונים
-4. **`grid-init.js`** - אתחול המערכת
-5. **`grid.css`** - סגנונות הגריד
+1. **`grid-table.js`** - לוגיקת הטבלאות הבסיסית (סידור, סגירה/פתיחה)
+2. **`grid-table.css`** - סגנונות הטבלאות
+3. **`table-template.html`** - תבנית טבלה לשיכפול
+4. **`designs.html`** - דוגמה לשימוש בתבנית
 
 ## איך להשתמש במערכת
+
+### תבנית טבלה לשיכפול
+
+המערכת כוללת תבנית טבלה כללית שניתן לשיכפול בקלות:
+
+1. **העתקת התבנית** - השתמש בקובץ `table-template.html` כבסיס
+2. **התאמת הכותרת** - שנה את הכותרת והעמודות לפי הצורך
+3. **הוספת פונקציות** - הוסף את הפונקציות JavaScript הנדרשות
+4. **קישור קבצים** - וודא שקבצי CSS ו-JavaScript מקושרים
+
+#### דוגמה לשימוש:
+```html
+<!-- אזור טבלה -->
+<div class="content-section">
+  <!-- כותרת הטבלה -->
+  <div class="table-header">
+    <div class="table-title">📋 כותרת הטבלה</div>
+    <div class="table-count">0 פריטים</div>
+    <div class="table-actions">
+      <button class="refresh-btn" onclick="addNewItem()">
+        <span class="action-icon">➕</span> הוסף
+      </button>
+      <button class="refresh-btn" onclick="refreshTable()">
+        <span class="action-icon">🔄</span> רענן
+      </button>
+      <div class="action-separator"></div>
+      <button class="filter-toggle-btn" onclick="toggleTableSection()">
+        <span class="filter-icon">▲</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- תוכן הטבלה -->
+  <div class="content-section">
+    <div class="table-responsive">
+      <table class="table">
+        <!-- תוכן הטבלה -->
+      </table>
+    </div>
+  </div>
+</div>
+```
+
+### קלאסים זמינים
+
+#### כותרת הטבלה:
+- `.table-header` - כותרת הטבלה
+- `.table-title` - כותרת ראשית
+- `.table-count` - מונה פריטים
+- `.table-actions` - אזור כפתורי פעולה
+
+#### כפתורים:
+- `.refresh-btn` - כפתורי רענון והוספה
+- `.filter-toggle-btn` - כפתור סגירה/פתיחה
+- `.action-icon` - אייקונים בכפתורים
+- `.action-separator` - מפריד בין כפתורים
+
+#### טבלה:
+- `.sortable-header` - כותרות עם סידור
+- `.header-subtitle` - כותרות משנה
+- `.actions-header` - כותרת עמודת פעולות
+- `.actions-cell` - תא פעולות
+- `.ticker-link` - קישורים בטבלה
+
+#### סטטוס:
+- `.status-badge` - תגי סטטוס
+- `.status-open` - סטטוס פתוח
+- `.status-canceled` - סטטוס מבוטל
+- `.status-closed` - סטטוס סגור
+
+### יתרונות המערכת החדשה
+
+1. **מודולריות** - כל הטבלאות משתמשות באותם קלאסים
+2. **עקביות** - עיצוב אחיד בכל האתר
+3. **תחזוקה קלה** - שינוי אחד ב-CSS משפיע על הכל
+4. **שיכפול מהיר** - העתקה והתאמה בלבד
+5. **נקיות** - ללא ID-ים או סגנונות פנימיים
+6. **ביצועים** - טעינה מהירה ללא ספריות חיצוניות
 
 ### אלמנטים אוניברסליים vs אלמנטים ספציפיים
 
 **אלמנטים אוניברסליים** (נוצרים אוטומטית):
-- הגריד עצמו (`#agGridFloating`)
-- פונקציונליות בסיסית
-- פילטרים אוטומטיים
+- סגנונות הטבלה
+- פונקציונליות סידור
+- כפתורי פעולה
+- אנימציות
 
 **אלמנטים ספציפיים** (צריכים להיות בדף):
-- `filter-test-section` - אזור בדיקת פילטרים
-- `stats-container` - תצוגת סטטיסטיקות
-- `status-indicator` - אינדיקטור סטטוס
-- כפתורי בדיקה
+- תוכן הטבלה
+- פונקציות JavaScript מותאמות
+- נתונים ספציפיים
 
 ### מניעת כפילות
 
@@ -37,23 +114,32 @@
 ### 1. הוספת קבצי הסקריפט לדף
 
 ```html
-<!-- Grid System Scripts -->
-<script src="scripts/grid-core.js"></script>
-<script src="scripts/grid-filters.js"></script>
-<script src="scripts/grid-data.js"></script>
-<script src="scripts/grid-init.js"></script>
+<!-- Table System Scripts -->
+<script src="scripts/grid-table.js"></script>
 ```
 
 ### 2. הוספת קובץ הסגנונות
 
 ```html
-<link rel="stylesheet" href="styles/grid.css" />
+<link rel="stylesheet" href="styles/grid-table.css" />
 ```
 
-### 3. יצירת אלמנט גריד
+### 3. שימוש בתבנית הטבלה
 
 ```html
-<div id="agGridFloating" class="ag-theme-quartz grid-container" style="height: 500px; width: 100%;"></div>
+<!-- העתק את התבנית מ-table-template.html -->
+<div class="content-section">
+  <div class="table-header">
+    <!-- כותרת הטבלה -->
+  </div>
+  <div class="content-section">
+    <div class="table-responsive">
+      <table class="table">
+        <!-- תוכן הטבלה -->
+      </table>
+    </div>
+  </div>
+</div>
 ```
 
 ### 4. אתחול המערכת
@@ -89,14 +175,27 @@ initializeGridWithFilters('#agGridFloating', {
 
 ## פונקציות עיקריות
 
-### ניהול גריד
+### ניהול טבלאות
 
-- `createGrid(containerId, rowData, customOptions)` - יצירת גריד חדש
-- `updateGridData(newData)` - עדכון נתוני הגריד
-- `refreshGrid()` - רענון הגריד
-- `clearGrid()` - ניקוי הגריד
+- `initializeTableSorting(tableId)` - אתחול סידור לטבלה
+- `sortTable(table, columnIndex, sortDirection)` - סידור טבלה
+- `updateSortIcons(table, sortedColumn, sortDirection)` - עדכון אייקוני סידור
 
-### ניהול פילטרים
+### ניהול סקשנים
+
+- `togglePlansSection()` - סגירה/פתיחה של אזור תכנונים
+- `toggleAlertsSection()` - סגירה/פתיחה של אזור התראות
+- `toggleTopSection()` - סגירה/פתיחה של החלק העליון
+- `restoreAllSectionStates()` - שחזור כל מצבי הסקשנים
+
+### פונקציות מותאמות אישית
+
+יש ליצור פונקציות מותאמות לכל טבלה:
+- `addNewItem()` - הוספת פריט חדש
+- `refreshTable()` - רענון הטבלה
+- `openItemDetails(id)` - פתיחת פרטי פריט
+- `editItem(id)` - עריכת פריט
+- `deleteItem(id)` - מחיקת פריט
 
 - `applyStatusFilterToGrid(selectedStatuses)` - החלת פילטר סטטוס
 - `updateGridFromComponent(selectedStatuses)` - עדכון גריד מקומפוננטה
@@ -131,7 +230,7 @@ initializeGridWithFilters('#agGridFloating', {
 <body>
   <div id="agGridFloating" class="ag-theme-quartz grid-container"></div>
   
-  <script src="scripts/grid-core.js"></script>
+  <script src="scripts/grid-table.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/grid-data.js"></script>
   <script src="scripts/grid-init.js"></script>
@@ -157,7 +256,7 @@ initializeGridWithFilters('#agGridFloating', {
 <body>
   <div id="agGridFloating" class="ag-theme-quartz grid-container"></div>
   
-  <script src="scripts/grid-core.js"></script>
+  <script src="scripts/grid-table.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/grid-data.js"></script>
   <script src="scripts/grid-init.js"></script>
@@ -209,7 +308,7 @@ initializeGridWithFilters('#agGridFloating', {
 
   <div id="agGridFloating" class="ag-theme-quartz grid-container"></div>
   
-  <script src="scripts/grid-core.js"></script>
+  <script src="scripts/grid-table.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/grid-data.js"></script>
   <script src="scripts/grid-init.js"></script>

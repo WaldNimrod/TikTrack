@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from models.note import Note
-from utils.auth import require_auth
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,7 +9,6 @@ logger = logging.getLogger(__name__)
 notes_bp = Blueprint('notes', __name__, url_prefix='/api/v1/notes')
 
 @notes_bp.route('/', methods=['GET'])
-# @require_auth  # זמנית ללא אימות לבדיקה
 def get_notes():
     """קבלת כל ההערות"""
     try:
@@ -33,7 +31,6 @@ def get_notes():
         db.close()
 
 @notes_bp.route('/<int:note_id>', methods=['GET'])
-@require_auth
 def get_note(note_id: int):
     """קבלת הערה לפי מזהה"""
     try:
@@ -62,7 +59,6 @@ def get_note(note_id: int):
         db.close()
 
 @notes_bp.route('/', methods=['POST'])
-@require_auth
 def create_note():
     """יצירת הערה חדשה"""
     try:
@@ -89,7 +85,6 @@ def create_note():
         db.close()
 
 @notes_bp.route('/<int:note_id>', methods=['PUT'])
-@require_auth
 def update_note(note_id: int):
     """עדכון הערה"""
     try:
@@ -124,7 +119,6 @@ def update_note(note_id: int):
         db.close()
 
 @notes_bp.route('/<int:note_id>', methods=['DELETE'])
-@require_auth
 def delete_note(note_id: int):
     """מחיקת הערה"""
     try:

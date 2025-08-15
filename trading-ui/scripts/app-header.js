@@ -825,6 +825,7 @@ class AppHeader extends HTMLElement {
                   <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="/database">בסיס נתונים</a></li>
+                  <li><a class="dropdown-item" href="/designs">עיצובים</a></li>
                   <li><a class="dropdown-item" href="/grid-test">גריד</a></li>
                   <li><a class="dropdown-item" href="/grid-table-test">גריד טבלה</a></li>
                 </ul>
@@ -2364,7 +2365,7 @@ class AppHeader extends HTMLElement {
         'Authorization': `Bearer ${token}`
       };
       
-      const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
+              const response = await fetch('http://127.0.0.1:8080/api/accounts', {
         method: 'GET',
         headers: headers
       });

@@ -10,49 +10,13 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from sqlalchemy.orm import Session
 from config.database import SessionLocal, init_db
 from models import (
-    User, Role, UserRole, Ticker, Account, Trade, TradePlan, 
+    Ticker, Account, Trade, TradePlan, 
     Alert, CashFlow, Note, Execution
 )
-from services.auth_service import AuthService
 from datetime import datetime, timedelta
 import random
 
-def create_roles(db: Session):
-    """יצירת תפקידים"""
-    roles_data = [
-        {"name": "admin", "description": "מנהל מערכת", "permissions": '["read", "write", "delete", "admin"]'},
-        {"name": "trader", "description": "סוחר", "permissions": '["read", "write"]'},
-        {"name": "viewer", "description": "צופה", "permissions": '["read"]'}
-    ]
-    
-    for role_data in roles_data:
-        existing = db.query(Role).filter(Role.name == role_data["name"]).first()
-        if not existing:
-            role = Role(**role_data)
-            db.add(role)
-    
-    db.commit()
-    print("✅ Roles created")
-
-def create_users(db: Session):
-    """יצירת משתמשים"""
-    # יצירת משתמש מנהל
-    admin_user = db.query(User).filter(User.username == "admin").first()
-    if not admin_user:
-        admin_user = AuthService.create_user(db, "admin", "admin@tiktrack.com", "admin123", ["admin"])
-        print(f"✅ Admin user created: {admin_user.username}")
-    
-    # יצירת משתמש סוחר
-    trader_user = db.query(User).filter(User.username == "trader").first()
-    if not trader_user:
-        trader_user = AuthService.create_user(db, "trader", "trader@tiktrack.com", "trader123", ["trader"])
-        print(f"✅ Trader user created: {trader_user.username}")
-    
-    # יצירת משתמש צופה
-    viewer_user = db.query(User).filter(User.username == "viewer").first()
-    if not viewer_user:
-        viewer_user = AuthService.create_user(db, "viewer", "viewer@tiktrack.com", "viewer123", ["viewer"])
-        print(f"✅ Viewer user created: {viewer_user.username}")
+# Authentication system removed for simplicity
 
 def create_tickers(db: Session):
     """יצירת טיקרים"""
@@ -386,8 +350,6 @@ def main():
     
     try:
         # יצירת נתונים בסדר הנכון
-        create_roles(db)
-        create_users(db)
         create_tickers(db)
         create_accounts(db)
         create_trade_plans(db)

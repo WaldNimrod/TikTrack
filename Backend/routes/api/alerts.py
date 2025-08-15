@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from models.alert import Alert
-from utils.auth import require_auth
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,7 +9,6 @@ logger = logging.getLogger(__name__)
 alerts_bp = Blueprint('alerts', __name__, url_prefix='/api/v1/alerts')
 
 @alerts_bp.route('/', methods=['GET'])
-@require_auth
 def get_alerts():
     """קבלת כל ההתראות"""
     try:
@@ -33,7 +31,6 @@ def get_alerts():
         db.close()
 
 @alerts_bp.route('/<int:alert_id>', methods=['GET'])
-@require_auth
 def get_alert(alert_id: int):
     """קבלת התראה לפי מזהה"""
     try:
@@ -62,7 +59,6 @@ def get_alert(alert_id: int):
         db.close()
 
 @alerts_bp.route('/', methods=['POST'])
-@require_auth
 def create_alert():
     """יצירת התראה חדשה"""
     try:
@@ -89,7 +85,6 @@ def create_alert():
         db.close()
 
 @alerts_bp.route('/<int:alert_id>', methods=['PUT'])
-@require_auth
 def update_alert(alert_id: int):
     """עדכון התראה"""
     try:
@@ -124,7 +119,6 @@ def update_alert(alert_id: int):
         db.close()
 
 @alerts_bp.route('/<int:alert_id>', methods=['DELETE'])
-@require_auth
 def delete_alert(alert_id: int):
     """מחיקת התראה"""
     try:

@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.account_service import AccountService
-from utils.auth import require_auth
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,7 +9,6 @@ logger = logging.getLogger(__name__)
 accounts_bp = Blueprint('accounts', __name__, url_prefix='/api/v1/accounts')
 
 @accounts_bp.route('/', methods=['GET'])
-@require_auth
 def get_accounts():
     """קבלת כל החשבונות"""
     try:
@@ -33,7 +31,6 @@ def get_accounts():
         db.close()
 
 @accounts_bp.route('/<int:account_id>', methods=['GET'])
-@require_auth
 def get_account(account_id: int):
     """קבלת חשבון לפי מזהה"""
     try:
@@ -62,7 +59,6 @@ def get_account(account_id: int):
         db.close()
 
 @accounts_bp.route('/', methods=['POST'])
-@require_auth
 def create_account():
     """יצירת חשבון חדש"""
     try:
@@ -86,7 +82,6 @@ def create_account():
         db.close()
 
 @accounts_bp.route('/<int:account_id>', methods=['PUT'])
-@require_auth
 def update_account(account_id: int):
     """עדכון חשבון"""
     try:
@@ -116,7 +111,6 @@ def update_account(account_id: int):
         db.close()
 
 @accounts_bp.route('/<int:account_id>', methods=['DELETE'])
-@require_auth
 def delete_account(account_id: int):
     """מחיקת חשבון"""
     try:
@@ -144,7 +138,6 @@ def delete_account(account_id: int):
         db.close()
 
 @accounts_bp.route('/<int:account_id>/stats', methods=['GET'])
-@require_auth
 def get_account_stats(account_id: int):
     """קבלת סטטיסטיקות חשבון"""
     try:

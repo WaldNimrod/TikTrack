@@ -590,3 +590,341 @@ function showCustomConfirm(message, callback) {
   document.getElementById("customConfirmMessage").textContent = message;
   document.getElementById("customConfirmModal").style.display = "block";
 }
+
+// ===== פונקציות לסגירה ופתיחה של סקשנים =====
+
+// פונקציה לסגירה/פתיחה של אזור התכנונים
+window.togglePlansSection = function() {
+  const plansSection = document.getElementById('plansSection');
+  const toggleBtn = document.querySelector('button[onclick="togglePlansSection()"]');
+  const icon = toggleBtn.querySelector('.filter-icon');
+  
+  if (plansSection.classList.contains('collapsed')) {
+    plansSection.classList.remove('collapsed');
+    icon.textContent = '▲';
+    toggleBtn.title = 'הצג/הסתר אזור תכנונים';
+    localStorage.setItem('plansSectionCollapsed', 'false');
+  } else {
+    plansSection.classList.add('collapsed');
+    icon.textContent = '▼';
+    toggleBtn.title = 'הצג/הסתר אזור תכנונים';
+    localStorage.setItem('plansSectionCollapsed', 'true');
+  }
+}
+
+// פונקציה לשחזור מצב אזור התכנונים
+function restorePlansSectionState() {
+  const plansSection = document.getElementById('plansSection');
+  const toggleBtn = document.querySelector('button[onclick="togglePlansSection()"]');
+  const icon = toggleBtn.querySelector('.filter-icon');
+  
+  const isCollapsed = localStorage.getItem('plansSectionCollapsed') === 'true';
+  
+  if (isCollapsed) {
+    plansSection.classList.add('collapsed');
+    icon.textContent = '▼';
+    toggleBtn.title = 'הצג/הסתר אזור תכנונים';
+  } else {
+    plansSection.classList.remove('collapsed');
+    icon.textContent = '▲';
+    toggleBtn.title = 'הצג/הסתר אזור תכנונים';
+  }
+}
+
+// פונקציה לסגירה/פתיחה של אזור ההתראות
+window.toggleAlertsSection = function() {
+  const alertsSection = document.getElementById('alertsSection');
+  const toggleBtn = document.querySelector('button[onclick="toggleAlertsSection()"]');
+  const icon = toggleBtn.querySelector('.filter-icon');
+  
+  if (alertsSection.classList.contains('collapsed')) {
+    alertsSection.classList.remove('collapsed');
+    icon.textContent = '▲';
+    toggleBtn.title = 'הצג/הסתר אזור התראות';
+    localStorage.setItem('alertsSectionCollapsed', 'false');
+  } else {
+    alertsSection.classList.add('collapsed');
+    icon.textContent = '▼';
+    toggleBtn.title = 'הצג/הסתר אזור התראות';
+    localStorage.setItem('alertsSectionCollapsed', 'true');
+  }
+}
+
+// פונקציה לשחזור מצב אזור ההתראות
+function restoreAlertsSectionState() {
+  const alertsSection = document.getElementById('alertsSection');
+  const toggleBtn = document.querySelector('button[onclick="toggleAlertsSection()"]');
+  const icon = toggleBtn.querySelector('.filter-icon');
+  
+  const isCollapsed = localStorage.getItem('alertsSectionCollapsed') === 'true';
+  
+  if (isCollapsed) {
+    alertsSection.classList.add('collapsed');
+    icon.textContent = '▼';
+    toggleBtn.title = 'הצג/הסתר אזור התראות';
+  } else {
+    alertsSection.classList.remove('collapsed');
+    icon.textContent = '▲';
+    toggleBtn.title = 'הצג/הסתר אזור התראות';
+  }
+}
+
+// פונקציה לסגירה/פתיחה של החלק העליון
+window.toggleTopSection = function() {
+  const topSection = document.getElementById('topSection');
+  const toggleBtn = document.querySelector('button[onclick="toggleTopSection()"]');
+  const icon = toggleBtn.querySelector('.filter-icon');
+  
+  if (topSection.classList.contains('collapsed')) {
+    topSection.classList.remove('collapsed');
+    icon.textContent = '▲';
+    toggleBtn.title = 'הצג/הסתר חלק עליון';
+    localStorage.setItem('topSectionCollapsed', 'false');
+  } else {
+    topSection.classList.add('collapsed');
+    icon.textContent = '▼';
+    toggleBtn.title = 'הצג/הסתר חלק עליון';
+    localStorage.setItem('topSectionCollapsed', 'true');
+  }
+}
+
+// פונקציה לשחזור מצב החלק העליון
+function restoreTopSectionState() {
+  const topSection = document.getElementById('topSection');
+  const toggleBtn = document.querySelector('button[onclick="toggleTopSection()"]');
+  const icon = toggleBtn.querySelector('.filter-icon');
+  
+  const isCollapsed = localStorage.getItem('topSectionCollapsed') === 'true';
+  
+  if (isCollapsed) {
+    topSection.classList.add('collapsed');
+    icon.textContent = '▼';
+    toggleBtn.title = 'הצג/הסתר חלק עליון';
+  } else {
+    topSection.classList.remove('collapsed');
+    icon.textContent = '▲';
+    toggleBtn.title = 'הצג/הסתר חלק עליון';
+  }
+}
+
+// פונקציה לשחזור כל מצבי הסקשנים
+function restoreAllSectionStates() {
+  restorePlansSectionState();
+  restoreAlertsSectionState();
+  restoreTopSectionState();
+  restoreDesignsSectionState();
+}
+
+// פונקציה לסגירה/פתיחה של אזור העיצובים
+window.toggleDesignsSection = function() {
+  const designsSection = document.getElementById('designsSection');
+  const toggleBtn = document.querySelector('button[onclick="toggleDesignsSection()"]');
+  const icon = toggleBtn.querySelector('.filter-icon');
+  
+  if (designsSection.classList.contains('collapsed')) {
+    designsSection.classList.remove('collapsed');
+    icon.textContent = '▲';
+    toggleBtn.title = 'הצג/הסתר אזור עיצובים';
+    localStorage.setItem('designsSectionCollapsed', 'false');
+  } else {
+    designsSection.classList.add('collapsed');
+    icon.textContent = '▼';
+    toggleBtn.title = 'הצג/הסתר אזור עיצובים';
+    localStorage.setItem('designsSectionCollapsed', 'true');
+  }
+}
+
+// פונקציה לשחזור מצב אזור העיצובים
+function restoreDesignsSectionState() {
+  const designsSection = document.getElementById('designsSection');
+  const toggleBtn = document.querySelector('button[onclick="toggleDesignsSection()"]');
+  const icon = toggleBtn.querySelector('.filter-icon');
+  
+  if (!designsSection || !toggleBtn || !icon) return;
+  
+  const isCollapsed = localStorage.getItem('designsSectionCollapsed') === 'true';
+  
+  if (isCollapsed) {
+    designsSection.classList.add('collapsed');
+    icon.textContent = '▼';
+    toggleBtn.title = 'הצג/הסתר אזור עיצובים';
+  } else {
+    designsSection.classList.remove('collapsed');
+    icon.textContent = '▲';
+    toggleBtn.title = 'הצג/הסתר אזור עיצובים';
+  }
+}
+
+// ===== פונקציונליות סידור לטבלאות =====
+
+// משתנים גלובליים לסידור
+let currentSortColumn = null;
+let currentSortDirection = 'asc'; // 'asc' או 'desc'
+
+// פונקציה להוספת פונקציונליות סידור לטבלה
+function initializeTableSorting(tableId) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  
+  const headers = table.querySelectorAll('thead th');
+  
+  headers.forEach((header, index) => {
+    // דלג על עמודת הפעולות
+    if (header.textContent.includes('פעולות') || header.textContent.includes('Actions')) {
+      return;
+    }
+    
+    // בדוק אם כבר יש אייקון סידור
+    if (header.querySelector('.sort-icon')) {
+      return; // כבר מאותחל
+    }
+    
+    // הוסף סגנון cursor pointer
+    header.style.cursor = 'pointer';
+    header.classList.add('sortable-header');
+    
+    // הוסף אייקון סידור
+    const sortIcon = document.createElement('span');
+    sortIcon.className = 'sort-icon';
+    sortIcon.innerHTML = '↕';
+    header.insertBefore(sortIcon, header.firstChild);
+    
+    // הוסף event listener
+    header.addEventListener('click', () => {
+      sortTable(tableId, index);
+    });
+  });
+}
+
+// פונקציה לסידור הטבלה
+function sortTable(tableId, columnIndex) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  
+  const tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  
+  // בדוק אם זה אותו עמודה - שנה כיוון
+  if (currentSortColumn === columnIndex) {
+    currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSortColumn = columnIndex;
+    currentSortDirection = 'asc';
+  }
+  
+  // עדכן אייקונים
+  updateSortIcons(tableId, columnIndex);
+  
+  // מיין את השורות
+  rows.sort((a, b) => {
+    const aValue = getCellValue(a, columnIndex);
+    const bValue = getCellValue(b, columnIndex);
+    
+    let comparison = 0;
+    
+    // טיפול בסוגים שונים של נתונים
+    if (isNumeric(aValue) && isNumeric(bValue)) {
+      comparison = parseFloat(aValue) - parseFloat(bValue);
+    } else if (isDate(aValue) && isDate(bValue)) {
+      comparison = new Date(aValue) - new Date(bValue);
+    } else {
+      comparison = String(aValue).localeCompare(String(bValue), 'he');
+    }
+    
+    return currentSortDirection === 'asc' ? comparison : -comparison;
+  });
+  
+  // הסר את השורות הישנות והוסף את הממוינות
+  rows.forEach(row => tbody.appendChild(row));
+}
+
+// פונקציה לקבלת ערך תא
+function getCellValue(row, columnIndex) {
+  const cell = row.cells[columnIndex];
+  if (!cell) return '';
+  
+  // הסר תגיות HTML וקבל רק טקסט
+  let value = cell.textContent || cell.innerText || '';
+  
+  // הסר רווחים מיותרים
+  value = value.trim();
+  
+  // טיפול בערכים מיוחדים
+  if (value.includes('$')) {
+    // הסר סימן דולר ופסיקים
+    value = value.replace(/[$,]/g, '');
+  }
+  
+  if (value.includes('%')) {
+    // הסר סימן אחוז
+    value = value.replace(/%/g, '');
+  }
+  
+  return value;
+}
+
+// פונקציה לבדיקה אם ערך הוא מספרי
+function isNumeric(value) {
+  return !isNaN(value) && !isNaN(parseFloat(value));
+}
+
+// פונקציה לבדיקה אם ערך הוא תאריך
+function isDate(value) {
+  const date = new Date(value);
+  return date instanceof Date && !isNaN(date);
+}
+
+// פונקציה לעדכון אייקוני הסידור
+function updateSortIcons(tableId, activeColumnIndex) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  
+  const headers = table.querySelectorAll('thead th');
+  
+  headers.forEach((header, index) => {
+    const sortIcon = header.querySelector('.sort-icon');
+    if (!sortIcon) return;
+    
+    // הסר קלאס sorted מכל הכותרות
+    header.classList.remove('sorted');
+    
+    if (index === activeColumnIndex) {
+      // עמודה פעילה
+      header.classList.add('sorted');
+      sortIcon.innerHTML = currentSortDirection === 'asc' ? '↑' : '↓';
+    } else {
+      // עמודה לא פעילה
+      sortIcon.innerHTML = '↕';
+    }
+  });
+}
+
+// פונקציה לאתחול סידור לכל הטבלאות בדף
+function initializeAllTableSorting() {
+  // אתחול לטבלת תכנונים
+  initializeTableSorting('plansTable');
+  
+  // אתחול לטבלת עיצובים
+  initializeTableSorting('designsTable');
+  
+  // אתחול לטבלאות אחרות לפי הצורך
+  const tables = ['accountsTable', 'tickersTable', 'tradesTable', 'tradePlansTable', 'alertsTable', 'cashFlowsTable', 'notesTable', 'executionsTable'];
+  tables.forEach(tableId => {
+    if (document.getElementById(tableId)) {
+      initializeTableSorting(tableId);
+    }
+  });
+}
+
+// קריאה לשחזור מצבי הסקשנים בטעינת הדף
+document.addEventListener('DOMContentLoaded', function() {
+  // המתנה קצרה כדי לוודא שכל האלמנטים נטענו
+  setTimeout(() => {
+    if (typeof restoreAllSectionStates === 'function') {
+      restoreAllSectionStates();
+    }
+    
+    // אתחול סידור לטבלאות
+    initializeAllTableSorting();
+  }, 100);
+});

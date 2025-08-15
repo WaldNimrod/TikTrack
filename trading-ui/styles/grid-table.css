@@ -636,13 +636,541 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
 }
 
 /* סגנונות ייחודיים לטבלאות */
-.table-section {
+.content-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  margin-bottom: 2rem;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* סגנונות חדשים לסקשנים */
+.section-container {
   background: var(--apple-bg-elevated);
   padding: 2rem;
   border-radius: 12px;
   border: 1px solid var(--apple-border-light);
   box-shadow: var(--apple-shadow-light);
   margin-bottom: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--apple-border-light);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-count {
+  background: #29a6a8;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.section-body {
+  background: var(--apple-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.section-body .table {
+  margin: 0;
+  background: var(--apple-bg);
+}
+
+
+
+/* סגנונות כפתורים לטבלאות */
+.btn-sm {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+}
+
+.btn-primary {
+  background-color: #007bff !important;
+  color: white !important;
+  border: 1px solid #007bff !important;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-secondary {
+  background-color: white !important;
+  color: #28a745 !important;
+  border: 1px solid #28a745 !important;
+}
+
+.btn-secondary:hover {
+  background-color: #f8fff9 !important;
+  border-color: #28a745 !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-danger {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 1px solid #ff9c05 !important;
+  font-weight: bold !important;
+  font-size: 12px !important;
+}
+
+.btn-danger:hover {
+  background-color: #fff8f0 !important;
+  border-color: #ff9c05 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* סגנון לאיקונים בכפתורים */
+.btn-icon {
+  color: #29a6a8 !important;
+  font-size: 0.7em !important;
+}
+
+/* כפתורי רענון */
+.refresh-btn {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+  font-size: 0.9em !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.refresh-btn:hover {
+  background-color: #f0f9f9 !important;
+  border-color: #29a6a8 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* כפתור סגירה/פתיחה */
+.filter-toggle-btn {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 6px !important;
+  padding: 6px 8px !important;
+  font-size: 0.9em !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.filter-toggle-btn:hover {
+  background-color: #f0f9f9 !important;
+  border-color: #29a6a8 !important;
+  transform: translateY(-1px) !important;
+}
+
+.filter-icon {
+  font-size: 0.8em !important;
+  transition: transform 0.2s ease !important;
+}
+
+/* סגנונות לטבלאות - הועברו מ-styles.css */
+.content-section {
+  background: var(--apple-bg-elevated);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+  margin-bottom: 2rem;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--apple-border-light);
+  position: relative;
+}
+
+.table-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-count {
+  background: #29a6a8;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+  min-width: 80px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* כפתור פילטר התראות */
+.filter-toggle-btn {
+  background: white !important;
+  border: none !important;
+  color: var(--apple-orange) !important;
+  border-radius: 50%;
+  padding: 0.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-toggle-btn:hover {
+  background: white !important;
+  color: var(--apple-orange) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.filter-toggle-btn.active {
+  background: white !important;
+  color: var(--apple-orange) !important;
+}
+
+.filter-icon {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+  color: var(--apple-orange) !important;
+}
+
+.filter-toggle-btn.active .filter-icon {
+  transform: rotate(180deg);
+}
+
+/* אנימציה לסגירת אזור ההתראות */
+#alertsSection {
+  transition: height 0.3s ease;
+  overflow: hidden;
+}
+
+#alertsSection.collapsed {
+  height: 116px;
+}
+
+/* אנימציה לסגירת אזור התכנונים */
+#plansSection {
+  transition: height 0.3s ease;
+  overflow: hidden;
+}
+
+#plansSection.collapsed {
+  height: 120px;
+}
+
+#plansSection.collapsed .content-section {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* אנימציה לסגירת אזור העיצובים */
+#designsSection {
+  transition: height 0.3s ease;
+  overflow: hidden;
+}
+
+#designsSection.collapsed {
+  height: 120px;
+}
+
+#designsSection.collapsed .content-section {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* ===== תבנית טבלה כללית ===== */
+
+/* אזור פעולות הכותרת */
+.table-actions {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+/* אייקון פעולה */
+.action-icon {
+  color: #29a6a8 !important;
+  font-size: 0.7em !important;
+}
+
+/* מפריד בין כפתורים */
+.action-separator {
+  width: 12px !important;
+}
+
+/* כותרת פעולות */
+.actions-header {
+  cursor: default !important;
+  user-select: none !important;
+  background-color: var(--apple-bg-secondary) !important;
+  border-bottom: 1px solid var(--apple-border-light) !important;
+  color: var(--apple-text-primary) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  padding: 12px 16px !important;
+  vertical-align: middle !important;
+}
+
+/* תא פעולות */
+.actions-cell {
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+/* קישור טיקר */
+.ticker-link {
+  color: inherit !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+.ticker-link:hover {
+  color: #29a6a8 !important;
+  text-decoration: underline !important;
+}
+
+/* כותרת משנה */
+.header-subtitle {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
+  color: #666 !important;
+}
+
+/* סטטוס badges */
+.status-badge {
+  display: inline-block !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  font-size: 0.8em !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.status-open {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+  border: 1px solid #c3e6cb !important;
+}
+
+.status-canceled {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+  border: 1px solid #f5c6cb !important;
+}
+
+.status-closed {
+  background-color: #d1ecf1 !important;
+  color: #0c5460 !important;
+  border: 1px solid #bee5eb !important;
+}
+
+/* כפתורי פעולה */
+.btn-sm {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.2rem !important;
+  margin: 0 2px !important;
+}
+
+.btn-secondary {
+  background-color: white !important;
+  color: #28a745 !important;
+  border: 1px solid #28a745 !important;
+}
+
+.btn-secondary:hover {
+  background-color: #f8fff9 !important;
+  border-color: #28a745 !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-danger {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 1px solid #ff9c05 !important;
+  font-weight: bold !important;
+  font-size: 12px !important;
+}
+
+.btn-danger:hover {
+  background-color: #fff8f0 !important;
+  border-color: #ff9c05 !important;
+  transform: translateY(-1px) !important;
+}
+
+#alertsSection.collapsed #alertsContainer {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#alertsContainer {
+  transition: opacity 0.3s ease;
+}
+
+/* אנימציה לסגירת החלק העליון */
+#topSection {
+  transition: height 0.3s ease;
+  overflow: hidden;
+}
+
+#topSection.collapsed {
+  height: 120px;
+}
+
+#topSection.collapsed #statsGrid {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#statsGrid {
+  transition: opacity 0.3s ease;
+}
+
+/* מיקום כפתור החלק העליון */
+#topSection .page-header {
+  position: relative;
+}
+
+#topSection .top-toggle-btn {
+  position: absolute;
+  left: 74px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: none !important;
+}
+
+#topSection .top-toggle-btn:hover {
+  transform: translateY(-50%) !important;
+}
+
+#topSection .top-toggle-btn.active .filter-icon {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+#topSection .top-toggle-btn .filter-icon {
+  transition: transform 0.3s ease;
+}
+
+/* סגנונות משותפים לטבלאות */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.data-table th {
+  background: var(--apple-bg-secondary) !important;
+  font-weight: 600 !important;
+  color: var(--apple-text-primary) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.data-table th:hover {
+  background: var(--apple-bg-hover) !important;
+}
+
+.data-table td {
+  padding: 12px 8px !important;
+  text-align: right !important;
+  border-bottom: 1px solid var(--apple-border-light) !important;
+  vertical-align: middle !important;
+}
+
+.data-table tr:hover {
+  background: var(--apple-bg-hover) !important;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* סגנונות משותפים למצבי טעינה וריק */
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--apple-text-secondary);
+}
+
+.empty-table {
+  text-align: center;
+  padding: 2rem;
+  color: var(--apple-text-secondary);
+  font-style: italic;
+}
+
+/* סגנונות משותפים לתגי סטטוס */
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+  min-width: 60px;
+}
+
+.status-badge.status-פתוח,
+.status-badge.status-פעיל {
+  background-color: #e8f5e8;
+  color: #2d5a2d;
+}
+
+.status-badge.status-סגור {
+  background-color: #ffe6e6;
+  color: #8b0000;
+}
+
+.status-badge.status-מבוטל {
+  background-color: #fff3cd;
+  color: #856404;
 }
 
 /* סגנונות ייחודיים לטבלאות */
@@ -923,6 +1451,101 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
 
 .modal-footer {
   border-top: 1px solid var(--apple-border);
+}
+
+/* קישורים בטבלאות */
+.table a {
+  color: inherit !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+.table a:hover {
+  color: #29a6a8 !important;
+  text-decoration: underline !important;
+}
+
+/* סגנונות לכותרות מיון */
+.sortable-header {
+  cursor: pointer !important;
+  user-select: none !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  background-color: rgba(40, 167, 69, 0.05) !important;
+  border-radius: 4px !important;
+  padding: 8px 12px !important;
+}
+
+.sortable-header:hover {
+  background-color: rgba(40, 167, 69, 0.15) !important;
+}
+
+.sort-icon {
+  display: none !important;
+  margin-left: 5px !important;
+  font-size: 0.7em !important;
+  transition: all 0.2s ease !important;
+  color: #28a745 !important;
+}
+
+.sortable-header:hover .sort-icon {
+  display: inline-block !important;
+}
+
+.sortable-header.sorted .sort-icon {
+  display: inline-block !important;
+}
+
+/* הגדרות בסיסיות לטבלאות - דרוס הגדרות Bootstrap */
+.table {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  background: white !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+.table th {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  padding: 12px 16px !important;
+  vertical-align: middle !important;
+  border-bottom: 1px solid var(--apple-border-light) !important;
+  background: var(--apple-bg-secondary) !important;
+  color: var(--apple-text-primary) !important;
+}
+
+.table td {
+  font-size: 14px !important;
+  padding: 12px 16px !important;
+  vertical-align: middle !important;
+  border-bottom: 1px solid var(--apple-border-light) !important;
+}
+
+.table tbody tr:hover {
+  background: var(--apple-bg-hover) !important;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* סגנון מיוחד לטבלה בתוך content-section */
+.content-section .table {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.content-section .table th {
+  background: var(--apple-bg-secondary) !important;
+  border-bottom: 1px solid var(--apple-border-light) !important;
+}
+
+.content-section .table td {
+  border-bottom: 1px solid var(--apple-border-light) !important;
 }
 
 .form-control, .form-select {

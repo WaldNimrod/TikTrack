@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_service import TradeService
-from utils.auth import require_auth
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,7 +9,6 @@ logger = logging.getLogger(__name__)
 trades_bp = Blueprint('trades', __name__, url_prefix='/api/v1/trades')
 
 @trades_bp.route('/', methods=['GET'])
-@require_auth
 def get_trades():
     """קבלת כל הטריידים"""
     try:
@@ -33,7 +31,6 @@ def get_trades():
         db.close()
 
 @trades_bp.route('/<int:trade_id>', methods=['GET'])
-@require_auth
 def get_trade(trade_id: int):
     """קבלת טרייד לפי מזהה"""
     try:
@@ -62,7 +59,6 @@ def get_trade(trade_id: int):
         db.close()
 
 @trades_bp.route('/account/<int:account_id>', methods=['GET'])
-@require_auth
 def get_trades_by_account(account_id: int):
     """קבלת טריידים לפי חשבון"""
     try:
@@ -85,7 +81,6 @@ def get_trades_by_account(account_id: int):
         db.close()
 
 @trades_bp.route('/', methods=['POST'])
-@require_auth
 def create_trade():
     """יצירת טרייד חדש"""
     try:
@@ -109,7 +104,6 @@ def create_trade():
         db.close()
 
 @trades_bp.route('/<int:trade_id>', methods=['PUT'])
-@require_auth
 def update_trade(trade_id: int):
     """עדכון טרייד"""
     try:
@@ -139,7 +133,6 @@ def update_trade(trade_id: int):
         db.close()
 
 @trades_bp.route('/<int:trade_id>/close', methods=['POST'])
-@require_auth
 def close_trade(trade_id: int):
     """סגירת טרייד"""
     try:
@@ -169,7 +162,6 @@ def close_trade(trade_id: int):
         db.close()
 
 @trades_bp.route('/<int:trade_id>/cancel', methods=['POST'])
-@require_auth
 def cancel_trade(trade_id: int):
     """ביטול טרייד"""
     try:
@@ -200,7 +192,6 @@ def cancel_trade(trade_id: int):
         db.close()
 
 @trades_bp.route('/summary', methods=['GET'])
-@require_auth
 def get_trade_summary():
     """קבלת סיכום טריידים"""
     try:

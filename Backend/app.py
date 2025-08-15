@@ -260,6 +260,14 @@ def database_page():
 def database_html_page():
     return send_from_directory(UI_DIR, "database.html")
 
+@app.route("/designs")
+def designs_page():
+    return send_from_directory(UI_DIR, "designs.html")
+
+@app.route("/designs.html")
+def designs_html_page():
+    return send_from_directory(UI_DIR, "designs.html")
+
 # API עבור תכנוני טריידים
 @app.route("/api/tradeplans")
 def get_trade_plans():

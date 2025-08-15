@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_plan_service import TradePlanService
-from utils.auth import require_auth
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,7 +9,6 @@ logger = logging.getLogger(__name__)
 trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/v1/tradeplans')
 
 @trade_plans_bp.route('/', methods=['GET'])
-@require_auth
 def get_trade_plans():
     """קבלת כל תוכניות הטרייד"""
     try:
@@ -33,7 +31,6 @@ def get_trade_plans():
         db.close()
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['GET'])
-@require_auth
 def get_trade_plan(plan_id: int):
     """קבלת תוכנית טרייד לפי מזהה"""
     try:
@@ -62,7 +59,6 @@ def get_trade_plan(plan_id: int):
         db.close()
 
 @trade_plans_bp.route('/account/<int:account_id>', methods=['GET'])
-@require_auth
 def get_trade_plans_by_account(account_id: int):
     """קבלת תוכניות טרייד לפי חשבון"""
     try:
@@ -85,7 +81,6 @@ def get_trade_plans_by_account(account_id: int):
         db.close()
 
 @trade_plans_bp.route('/', methods=['POST'])
-@require_auth
 def create_trade_plan():
     """יצירת תוכנית טרייד חדשה"""
     try:
@@ -109,7 +104,6 @@ def create_trade_plan():
         db.close()
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['PUT'])
-@require_auth
 def update_trade_plan(plan_id: int):
     """עדכון תוכנית טרייד"""
     try:
@@ -139,7 +133,6 @@ def update_trade_plan(plan_id: int):
         db.close()
 
 @trade_plans_bp.route('/<int:plan_id>/cancel', methods=['POST'])
-@require_auth
 def cancel_trade_plan(plan_id: int):
     """ביטול תוכנית טרייד"""
     try:
@@ -170,7 +163,6 @@ def cancel_trade_plan(plan_id: int):
         db.close()
 
 @trade_plans_bp.route('/<int:plan_id>/activate', methods=['POST'])
-@require_auth
 def activate_trade_plan(plan_id: int):
     """הפעלת תוכנית טרייד"""
     try:
@@ -199,7 +191,6 @@ def activate_trade_plan(plan_id: int):
         db.close()
 
 @trade_plans_bp.route('/summary', methods=['GET'])
-@require_auth
 def get_trade_plan_summary():
     """קבלת סיכום תוכניות טרייד"""
     try:

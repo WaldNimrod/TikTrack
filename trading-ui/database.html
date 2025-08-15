@@ -18,7 +18,7 @@
   <!-- קבצים מודולריים של הגריד -->
   <script src="scripts/auth.js"></script>
   <script src="scripts/app-header.js"></script>
-  <script src="scripts/grid-core.js"></script>
+  <script src="scripts/grid-table.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/grid-data.js"></script>
   <script src="scripts/grid-init.js"></script>
@@ -40,7 +40,7 @@
       transition: transform 0.2s ease;
     }
 
-    .table-section.collapsed .filter-icon {
+    .content-section.collapsed .filter-icon {
       transform: rotate(180deg);
     }
 
@@ -49,7 +49,7 @@
       overflow: hidden;
     }
 
-    .table-section.collapsed .table-container {
+    .content-section.collapsed .table-container {
       max-height: 0;
       opacity: 0;
     }
@@ -85,7 +85,7 @@
     <div class="database-container">
 
       <!-- טבלת תוכניות טרייד -->
-      <div class="table-section" id="tradePlansSection">
+      <div class="content-section" id="tradePlansSection">
         <div class="table-header">
           <div class="table-title">
             📋 תוכניות טרייד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plans</span>
@@ -139,7 +139,7 @@
       </div>
 
       <!-- טבלת טריידים -->
-      <div class="table-section" id="tradesSection">
+      <div class="content-section" id="tradesSection">
         <div class="table-header">
           <div class="table-title">
             📈 טריידים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trades</span>
@@ -191,7 +191,7 @@
       </div>
 
       <!-- טבלת חשבונות -->
-      <div class="table-section" id="accountsSection">
+      <div class="content-section" id="accountsSection">
         <div class="table-header">
           <div class="table-title">
             💰 חשבונות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Accounts</span>
@@ -241,7 +241,7 @@
       </div>
 
       <!-- טבלת טיקרים -->
-      <div class="table-section" id="tickersSection">
+      <div class="content-section" id="tickersSection">
         <div class="table-header">
           <div class="table-title">
             📊 טיקרים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Tickers</span>
@@ -290,7 +290,7 @@
       </div>
 
       <!-- טבלת ביצועים -->
-      <div class="table-section" id="executionsSection">
+      <div class="content-section" id="executionsSection">
         <div class="table-header">
           <div class="table-title">
             ⚡ ביצועים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Executions</span>
@@ -340,7 +340,7 @@
       </div>
 
       <!-- טבלת תזרימי מזומנים -->
-      <div class="table-section" id="cashFlowsSection">
+      <div class="content-section" id="cashFlowsSection">
         <div class="table-header">
           <div class="table-title">
             💸 תזרימי מזומנים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cash Flows</span>
@@ -389,7 +389,7 @@
       </div>
 
       <!-- טבלת התראות -->
-      <div class="table-section" id="alertsSection">
+      <div class="content-section" id="alertsSection">
         <div class="table-header">
           <div class="table-title">
             🔔 התראות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Alerts</span>
@@ -439,7 +439,7 @@
       </div>
 
       <!-- טבלת הערות -->
-      <div class="table-section" id="notesSection">
+      <div class="content-section" id="notesSection">
         <div class="table-header">
           <div class="table-title">
             📝 הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span>
@@ -487,57 +487,10 @@
         </div>
       </div>
 
-      <!-- טבלת משתמשים -->
-      <div class="table-section" id="usersSection">
-        <div class="table-header">
-          <div class="table-title">
-            👥 משתמשים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Users</span>
-          </div>
-          <div class="table-count" id="usersCount">טוען...</div>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <div class="search-input-wrapper">
-              <input 
-                type="text" 
-                class="search-filter-input" 
-                placeholder="חיפוש משתמשים..."
-                onkeyup="filterTable('usersTable', this.value)"
-              >
-            </div>
-            <button class="add-btn action-btn" onclick="showAddUserModal()" title="הוסף משתמש חדש"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadUsers()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
-            <button class="filter-toggle-btn" onclick="toggleUsersSection()" title="הצג/הסתר טבלת משתמשים">
-              <span class="filter-icon">▲</span>
-            </button>
-          </div>
-        </div>
-        <div class="table-responsive" id="usersContainer">
-          <table class="table" id="usersTable">
-            <thead>
-              <tr>
-                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                <th>שם משתמש<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Username</span></th>
-                <th>אימייל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Email</span></th>
-                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
-                <th>תפקידים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Roles</span></th>
-                <th>התחברות אחרונה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Last Login</span></th>
-                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
-                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="8" class="loading">טוען משתמשים...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="table-footer">
-          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
-        </div>
-      </div>
+      
 
       <!-- טבלת תפקידי משתמשים -->
-      <div class="table-section" id="userRolesSection">
+      <div class="content-section" id="userRolesSection">
         <div class="table-header">
           <div class="table-title">
             👤 תפקידי משתמשים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">User Roles</span>
@@ -735,28 +688,10 @@
           const baseUrl = 'http://127.0.0.1:8080';
       const url = `${baseUrl}${endpoint}`;
       
-      // שימוש ב-token מ-TikTrackAuth אם זמין
-      let token = null;
-      if (typeof TikTrackAuth !== 'undefined') {
-        token = TikTrackAuth.getAuthToken();
-      }
-      
-      // fallback ל-localStorage
-      if (!token) {
-        token = localStorage.getItem('authToken');
-      }
-      
       const headers = {
         'Content-Type': 'application/json',
         ...options.headers
       };
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-        console.log('🔑 שולח בקשה עם token:', token.substring(0, 20) + '...');
-      } else {
-        console.log('⚠️ אין token זמין');
-      }
 
       const finalOptions = { 
         ...options,
@@ -881,8 +816,8 @@
     async function loadAccounts() {
       try {
         console.log('🔄 טוען חשבונות...');
-        const response = await apiCall('/api/v1/accounts/');
-        const accounts = response.data;
+        const response = await apiCall('/api/accounts');
+        const accounts = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#accountsTable tbody');
         tbody.innerHTML = accounts.map(account => `
@@ -915,8 +850,8 @@
     async function loadTickers() {
       try {
         console.log('🔄 טוען טיקרים...');
-        const response = await apiCall('/api/v1/tickers/');
-        const tickers = response.data;
+        const response = await apiCall('/api/tickers');
+        const tickers = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#tickersTable tbody');
         tbody.innerHTML = tickers.map(ticker => `
@@ -947,8 +882,8 @@
     async function loadTrades() {
       try {
         console.log('🔄 טוען טריידים...');
-        const response = await apiCall('/api/v1/trades/');
-        const trades = response.data;
+        const response = await apiCall('/api/trades');
+        const trades = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#tradesTable tbody');
         tbody.innerHTML = trades.map(trade => `
@@ -982,8 +917,8 @@
     async function loadTradePlans() {
       try {
         console.log('🔄 טוען תוכניות טרייד...');
-        const response = await apiCall('/api/v1/tradeplans/');
-        const plans = response.data;
+        const response = await apiCall('/api/tradeplans');
+        const plans = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#tradePlansTable tbody');
         tbody.innerHTML = plans.map(plan => `
@@ -1019,8 +954,8 @@
     async function loadAlerts() {
       try {
         console.log('🔄 טוען התראות...');
-        const response = await apiCall('/api/v1/alerts/');
-        const alerts = response.data;
+        const response = await apiCall('/api/database_v2/alerts');
+        const alerts = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#alertsTable tbody');
         tbody.innerHTML = alerts.map(alert => `
@@ -1053,8 +988,8 @@
     async function loadCashFlows() {
       try {
         console.log('🔄 טוען תזרימי מזומנים...');
-        const response = await apiCall('/api/v1/cash_flows/');
-        const cashFlows = response.data;
+        const response = await apiCall('/api/database_v2/cash_flows');
+        const cashFlows = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#cashFlowsTable tbody');
         tbody.innerHTML = cashFlows.map(cf => `
@@ -1085,8 +1020,8 @@
     async function loadNotes() {
       try {
         console.log('🔄 טוען הערות...');
-        const response = await apiCall('/api/v1/notes/');
-        const notes = response.data;
+        const response = await apiCall('/api/database_v2/notes');
+        const notes = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#notesTable tbody');
         tbody.innerHTML = notes.map(note => `
@@ -1117,8 +1052,8 @@
     async function loadExecutions() {
       try {
         console.log('🔄 טוען ביצועים...');
-        const response = await apiCall('/api/v1/executions/');
-        const executions = response.data;
+        const response = await apiCall('/api/database_v2/executions');
+        const executions = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#executionsTable tbody');
         tbody.innerHTML = executions.map(execution => `
@@ -1253,104 +1188,20 @@
       });
     }
 
-    // Initial data load
+    // Initial data load - ללא אימות
     document.addEventListener('DOMContentLoaded', async () => {
-      console.log('טוען נתונים עם אימות');
+      console.log('טוען נתונים ללא אימות');
       loadTableStates(); // טוען את המצב השמור של הטבלאות
-      await checkAuthentication();
+      refreshAllTables(); // טוען נתונים ישירות
     });
 
-    // פונקציית אימות
-    async function checkAuthentication() {
-        console.log('🔍 בדיקת אימות בדף בסיס נתונים...');
-        
-        // בדיקה אם יש token תקין
-        let token = localStorage.getItem('authToken');
-        if (!token) {
-            console.log('❌ אין token - מנסה להתחבר אוטומטית...');
-            token = await refreshToken();
-            if (!token) {
-                console.log('❌ לא הצלחתי להתחבר - מעביר לדף התחברות');
-                window.location.href = '/index.html';
-                return;
-            }
-        }
-        
-        // בדיקה אם ה-token עדיין תקף
-        console.log('🔑 בדיקת תקינות token...');
-        const isValid = await testToken(token);
-        if (isValid) {
-            console.log('✅ Token תקין - טוען נתונים');
-            refreshAllTables();
-        } else {
-            console.log('❌ Token לא תקין - מנסה לרענן...');
-            const newToken = await refreshToken();
-            if (newToken) {
-                console.log('✅ Token רוענן - טוען נתונים');
-                refreshAllTables();
-            } else {
-                console.log('❌ לא הצלחתי לרענן token - מעביר לדף התחברות');
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('currentUser');
-                window.location.href = '/index.html';
-            }
-        }
-    }
+    // Authentication system removed for simplicity
 
-    // פונקציה לבדיקת תקינות token
-    async function testToken(token) {
-        try {
-            const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            return response.ok;
-        } catch (error) {
-            console.error('שגיאה בבדיקת token:', error);
-            return false;
-        }
-    }
 
-    // פונקציה לרענון token
-    async function refreshToken() {
-        try {
-            console.log('🔄 מנסה לרענן token...');
-            const response = await fetch('http://127.0.0.1:8080/api/v1/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: 'admin',
-                    password: 'admin123'
-                })
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                const newToken = data.data.access_token;
-                localStorage.setItem('authToken', newToken);
-                localStorage.setItem('currentUser', JSON.stringify(data.data.user));
-                console.log('✅ Token רוענן בהצלחה');
-                return newToken;
-            } else {
-                console.log('❌ לא הצלחתי לרענן token');
-                return null;
-            }
-        } catch (error) {
-            console.error('שגיאה ברענון token:', error);
-            return null;
-        }
-    }
 
-    // פונקציה לרענון כל הטבלאות
-    function refreshAllTables() {
-        loadUsers();
-        loadAccounts();
+         // פונקציה לרענון כל הטבלאות
+     function refreshAllTables() {
+         loadAccounts();
         loadTickers();
         loadTrades();
         loadTradePlans();

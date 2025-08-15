@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from models.cash_flow import CashFlow
-from utils.auth import require_auth
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,7 +9,6 @@ logger = logging.getLogger(__name__)
 cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/v1/cash_flows')
 
 @cash_flows_bp.route('/', methods=['GET'])
-@require_auth
 def get_cash_flows():
     """קבלת כל תזרימי המזומנים"""
     try:
@@ -33,7 +31,6 @@ def get_cash_flows():
         db.close()
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['GET'])
-@require_auth
 def get_cash_flow(cash_flow_id: int):
     """קבלת תזרים מזומנים לפי מזהה"""
     try:
@@ -62,7 +59,6 @@ def get_cash_flow(cash_flow_id: int):
         db.close()
 
 @cash_flows_bp.route('/', methods=['POST'])
-@require_auth
 def create_cash_flow():
     """יצירת תזרים מזומנים חדש"""
     try:
@@ -89,7 +85,6 @@ def create_cash_flow():
         db.close()
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['PUT'])
-@require_auth
 def update_cash_flow(cash_flow_id: int):
     """עדכון תזרים מזומנים"""
     try:
@@ -124,7 +119,6 @@ def update_cash_flow(cash_flow_id: int):
         db.close()
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['DELETE'])
-@require_auth
 def delete_cash_flow(cash_flow_id: int):
     """מחיקת תזרים מזומנים"""
     try:

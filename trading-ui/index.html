@@ -615,10 +615,7 @@
       createTradesChart();
     }
 
-    // פונקציה להתנתקות
-    function onLogout() {
-      showLogin();
-    }
+    // Authentication system removed for simplicity
 
     // נתוני דמה
     const mockData = {
@@ -991,40 +988,18 @@
       }, 3000);
     }
     
-    // בדיקת התחברות בעת טעינת הדף
+    // טעינת הדף - ללא בדיקת התחברות
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('🔍 DOM loaded, starting authentication check...');
-      
-      // בדיקה מה מציג הדף בהתחלה
-      const loginSection = document.getElementById('loginSection');
-      const dashboardSection = document.getElementById('dashboardSection');
-      const loginForm = document.getElementById('loginForm');
-      
-      console.log('📋 Initial state:');
-      console.log('  - loginSection display:', loginSection?.style.display);
-      console.log('  - dashboardSection display:', dashboardSection?.style.display);
-      console.log('  - loginForm found:', !!loginForm);
+      console.log('🔍 DOM loaded, showing dashboard directly...');
       
       // הגדרת האזנה לכותרת
       setupHeaderListener();
       
-      // בדיקת התחברות באמצעות המערכת הגלובלית
-      checkAuthentication(
-        // onAuthenticated - אם מחובר
-        () => {
-          console.log('✅ משתמש מחובר, מציג דשבורד');
-          document.getElementById('loginSection').style.display = 'none';
-          document.getElementById('dashboardSection').style.display = 'block';
-          loadDashboardData();
-        },
-        // onNotAuthenticated - אם לא מחובר
-        () => {
-          console.log('❌ משתמש לא מחובר, מציג מסך התחברות');
-          // הגדרת הטופס באופן ידני
-          console.log('🔧 Setting up login form manually...');
-          setupLoginForm('loginForm');
-        }
-      );
+      // הצגת הדשבורד ישירות ללא התחברות
+      console.log('✅ מציג דשבורד ישירות');
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('dashboardSection').style.display = 'block';
+      loadDashboardData();
     });
   </script>
   

@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.ticker_service import TickerService
-from utils.auth import require_auth
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,7 +9,6 @@ logger = logging.getLogger(__name__)
 tickers_bp = Blueprint('tickers', __name__, url_prefix='/api/v1/tickers')
 
 @tickers_bp.route('/', methods=['GET'])
-@require_auth
 def get_tickers():
     """קבלת כל הטיקרים"""
     try:
@@ -33,7 +31,6 @@ def get_tickers():
         db.close()
 
 @tickers_bp.route('/<int:ticker_id>', methods=['GET'])
-@require_auth
 def get_ticker(ticker_id: int):
     """קבלת טיקר לפי מזהה"""
     try:
@@ -62,7 +59,6 @@ def get_ticker(ticker_id: int):
         db.close()
 
 @tickers_bp.route('/', methods=['POST'])
-@require_auth
 def create_ticker():
     """יצירת טיקר חדש"""
     try:
@@ -86,7 +82,6 @@ def create_ticker():
         db.close()
 
 @tickers_bp.route('/<int:ticker_id>', methods=['PUT'])
-@require_auth
 def update_ticker(ticker_id: int):
     """עדכון טיקר"""
     try:
@@ -116,7 +111,6 @@ def update_ticker(ticker_id: int):
         db.close()
 
 @tickers_bp.route('/<int:ticker_id>', methods=['DELETE'])
-@require_auth
 def delete_ticker(ticker_id: int):
     """מחיקת טיקר"""
     try:

@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>תכנון טריידים - מערכת ניהול השקעות</title>
-  <!-- AG-Grid CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css" rel="stylesheet" />
+
   <link rel="stylesheet" href="styles/apple-theme.css?v=9" />
   <link rel="stylesheet" href="styles/menu.css?v=9" />
   <link rel="stylesheet" href="styles/styles.css?v=10" />
@@ -17,12 +16,12 @@
     
     /* אין סגנונות מיוחדים נדרשים כרגע - כל הסגנונות הועברו לקבצים המתאימים */
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
   <!-- קבצים מודולריים של הגריד -->
   <script src="scripts/app-header.js"></script>
-  <script src="scripts/grid-core.js"></script>
+  <script src="scripts/grid-table.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/grid-data.js"></script>
   <script src="scripts/grid-init.js"></script>
@@ -69,7 +68,7 @@
     </div>
 
     <!-- התראות -->
-    <div class="table-section" id="alertsSection">
+    <div class="content-section" id="alertsSection">
       <div class="table-header">
         <div class="table-title">
           🔔 התראות
@@ -90,76 +89,103 @@
       <div>רווח כולל: <strong id="totalProfitValue">טוען...</strong></div>
     </div>
 
-      <!-- טופס תכנון (מוסתר בהתחלה) -->
-      <div class="plan-form" id="planForm" style="display: none;">
-        <h3>טופס תכנון טרייד</h3>
-        <div class="form-row">
-          <div class="form-group">
-            <label>נכס (סימבול)</label>
-            <input type="text" id="ticker" placeholder="למשל: AAPL, TSLA" />
-          </div>
-          <div class="form-group">
-            <label>סוג השקעה</label>
-            <select id="type">
-              <option value="סווינג">סווינג</option>
-              <option value="השקעה">השקעה</option>
-              <option value="פאסיבי">פאסיבי</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>סטטוס</label>
-            <select id="status">
-              <option value="פתוח">פתוח</option>
-              <option value="סגור">סגור</option>
-              <option value="מבוטל">מבוטל</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>סכום השקעה</label>
-            <input type="number" id="amount" placeholder="למשל: 25000" />
-          </div>
-          <div class="form-group">
-            <label>מחיר יעד</label>
-            <input type="number" id="target" placeholder="מחיר יעד" />
-          </div>
-          <div class="form-group">
-            <label>מחיר סטופ</label>
-            <input type="number" id="stop" placeholder="מחיר סטופ" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>תאריך יעד</label>
-            <input type="date" id="targetDate" />
-          </div>
-          <div class="form-group">
-            <label>הערות</label>
-            <textarea id="notes" rows="2" placeholder="הערות נוספות..."></textarea>
-          </div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-secondary" onclick="closePlanForm()">ביטול</button>
-          <button class="btn btn-success" onclick="savePlan()">שמור תכנון</button>
-        </div>
-      </div>
-
-    <!-- טבלת תכנונים -->
-    <div class="table-section">
+          <!-- אזור תכנונים -->
+      <div class="content-section" id="plansSection">
+        <!-- כותרת תכנונים -->
         <div class="table-header">
           <div class="table-title">
             📋 תכנונים
           </div>
         <div class="table-count" id="plansCount">טוען...</div>
         <div style="display: flex; gap: 8px; align-items: center;">
-          <button class="add-btn action-btn" onclick="openPlanDetails()" title="הוסף תכנון חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
+          <button class="refresh-btn" onclick="openPlanDetails()" title="הוסף תכנון חדש"><span style="color: #29a6a8; font-size: 0.7em;">➕</span> הוסף</button>
           <button class="refresh-btn" onclick="resetAllFiltersAndReloadData()" title="רענן טבלה"><span style="color: #29a6a8; font-size: 0.7em;">🔄</span> רענן</button>
+          <div style="width: 12px;"></div>
+          <button class="filter-toggle-btn" onclick="togglePlansSection()" title="הצג/הסתר אזור תכנונים"><span class="filter-icon">▲</span></button>
         </div>
         </div>
-        <div id="plansTable" class="loading">טוען תכנונים...</div>
-          </div>
-  </div>
+        
+        <!-- טבלת תכנונים -->
+        <div class="content-section">
+          <div class="table-responsive" id="plansContainer">
+            <table class="table" id="plansTable">
+              <thead>
+                <tr>
+                  <th>נכס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker</span></th>
+                  <th>תאריך<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Date</span></th>
+                  <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
+                  <th>סכום<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Amount</span></th>
+                  <th>יעד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Target</span></th>
+                  <th>סטופ<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Stop</span></th>
+                  <th>נוכחי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Current</span></th>
+                  <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
+                  <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="9" class="loading">טוען תכנונים...</td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- טופס תכנון (מוסתר בהתחלה) -->
+    <div class="plan-form" id="planForm" style="display: none;">
+      <h3>טופס תכנון טרייד</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>נכס (סימבול)</label>
+          <input type="text" id="ticker" placeholder="למשל: AAPL, TSLA" />
+        </div>
+        <div class="form-group">
+          <label>סוג השקעה</label>
+          <select id="type">
+            <option value="סווינג">סווינג</option>
+            <option value="השקעה">השקעה</option>
+            <option value="פאסיבי">פאסיבי</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>סטטוס</label>
+          <select id="status">
+            <option value="פתוח">פתוח</option>
+            <option value="סגור">סגור</option>
+            <option value="מבוטל">מבוטל</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>סכום השקעה</label>
+          <input type="number" id="amount" placeholder="למשל: 25000" />
+        </div>
+        <div class="form-group">
+          <label>מחיר יעד</label>
+          <input type="number" id="target" placeholder="מחיר יעד" />
+        </div>
+        <div class="form-group">
+          <label>מחיר סטופ</label>
+          <input type="number" id="stop" placeholder="מחיר סטופ" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>תאריך יעד</label>
+          <input type="date" id="targetDate" />
+        </div>
+        <div class="form-group">
+          <label>הערות</label>
+          <textarea id="notes" rows="2" placeholder="הערות נוספות..."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closePlanForm()">ביטול</button>
+        <button class="btn btn-success" onclick="savePlan()">שמור תכנון</button>
+      </div>
+    </div>
 
   <!-- מרווח בתחתית הדף -->
   <div style="height: 3rem;"></div>
@@ -187,7 +213,7 @@
   <script>
     console.log('Script loaded');
     
-    let gridApi;
+
     let externalFilterPresent = false;
     let selectedStatuses = [];
     let selectedTypes = [];
@@ -201,96 +227,9 @@
     ];
     let filteredData = [...plansData];
 
-    // פונקציה לטעינת נתוני תכנונים
-    async function loadPlansData() {
-      console.log('=== loadPlansData called ===');
-      
-      try {
-        const response = await fetch('/api/trade_plans');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('Plans data loaded:', data);
-        
-        // עדכון הנתונים
-        plansData = data.map(plan => ({
-          ticker: plan.ticker || plan.ticker_name,
-          date: plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : '-',
-          type: plan.investment_type || 'לא ידוע',
-          amount: plan.planned_amount ? `$${plan.planned_amount.toLocaleString()}` : '-',
-          target: plan.target_price ? `$${plan.target_price.toFixed(2)}` : '-',
-          stop: plan.stop_price ? `$${plan.stop_price.toFixed(2)}` : '-',
-          current: '$0.00 (0.0%)', // יועדכן בהמשך
-          status: plan.status || 'פתוח',
-          action: "⬅️"
-        }));
-        
-        filteredData = [...plansData];
-        updateTable();
-        updateSummary();
-        updateStats();
-        
-      } catch (error) {
-        console.error('Error loading plans data:', error);
-        // שימוש בנתוני דמה במקרה של שגיאה
-        filteredData = [...plansData];
-        updateTable();
-        updateSummary();
-        updateStats();
-      }
-    }
+    // פונקציה לטעינת נתוני תכנונים - הוסרה בגלל כפילות
 
-    // פונקציה לעדכון הטבלה
-    function updateTable() {
-      const tableContainer = document.getElementById('plansTable');
-      if (!tableContainer) return;
-      
-      if (filteredData.length === 0) {
-        tableContainer.innerHTML = '<div class="empty-table">אין תכנונים להצגה</div>';
-        return;
-      }
-      
-      const table = `
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>נכס</th>
-              <th>תאריך</th>
-              <th>סוג</th>
-              <th>סכום</th>
-              <th>יעד</th>
-              <th>סטופ</th>
-              <th>נוכחי</th>
-              <th>סטטוס</th>
-              <th>פעולות</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${filteredData.map(plan => `
-              <tr>
-                <td><strong>${plan.ticker}</strong></td>
-                <td>${plan.date}</td>
-                <td>${plan.type}</td>
-                <td>${plan.amount}</td>
-                <td>${plan.target}</td>
-                <td>${plan.stop}</td>
-                <td>${plan.current}</td>
-                <td><span class="status-badge status-${plan.status.toLowerCase()}">${plan.status}</span></td>
-                <td>
-                  <button class="btn btn-sm btn-primary" onclick="openPlanDetails('${plan.ticker}')" title="פרטים">👁️</button>
-                  <button class="btn btn-sm btn-secondary" onclick="editPlan('${plan.ticker}')" title="ערוך">✏️</button>
-                  <button class="btn btn-sm btn-danger" onclick="deletePlan('${plan.ticker}')" title="מחק">🗑️</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-      
-      tableContainer.innerHTML = table;
-    }
+
 
     // פונקציה לעדכון הסיכום
     function updateSummary() {
@@ -299,36 +238,41 @@
       const avgInvestmentValue = document.getElementById('avgInvestmentValue');
       const totalProfitValue = document.getElementById('totalProfitValue');
       
-      if (activePlansCount) {
-        const activeCount = filteredData.filter(plan => plan.status === 'פתוח').length;
-        activePlansCount.textContent = activeCount;
-      }
-      
-      if (totalInvestmentValue) {
-        const totalInvestment = filteredData.reduce((sum, plan) => {
-          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
-          return sum + amount;
-        }, 0);
-        totalInvestmentValue.textContent = `$${totalInvestment.toLocaleString()}`;
-      }
-      
-      if (avgInvestmentValue) {
-        const totalInvestment = filteredData.reduce((sum, plan) => {
-          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
-          return sum + amount;
-        }, 0);
-        const avgInvestment = filteredData.length > 0 ? totalInvestment / filteredData.length : 0;
-        avgInvestmentValue.textContent = `$${avgInvestment.toLocaleString()}`;
-      }
-      
-      if (totalProfitValue) {
-        // חישוב רווח דמיוני לצורך הדוגמה
-        const totalProfit = filteredData.reduce((sum, plan) => {
-          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
-          return sum + (amount * 0.05); // 5% רווח דמיוני
-        }, 0);
-        totalProfitValue.textContent = `$${totalProfit.toLocaleString()}`;
-      }
+      // נטען את הנתונים מהשרת
+      fetch('http://127.0.0.1:8080/api/tradeplans')
+        .then(response => response.json())
+        .then(plans => {
+          if (activePlansCount) {
+            const activeCount = plans.filter(plan => !plan.canceled_at).length;
+            activePlansCount.textContent = activeCount;
+          }
+          
+          if (totalInvestmentValue) {
+            const totalInvestment = plans.reduce((sum, plan) => {
+              return sum + (plan.planned_amount || 0);
+            }, 0);
+            totalInvestmentValue.textContent = `$${totalInvestment.toLocaleString()}`;
+          }
+          
+          if (avgInvestmentValue) {
+            const totalInvestment = plans.reduce((sum, plan) => {
+              return sum + (plan.planned_amount || 0);
+            }, 0);
+            const avgInvestment = plans.length > 0 ? totalInvestment / plans.length : 0;
+            avgInvestmentValue.textContent = `$${avgInvestment.toLocaleString()}`;
+          }
+          
+          if (totalProfitValue) {
+            // חישוב רווח דמיוני לצורך הדוגמה
+            const totalProfit = plans.reduce((sum, plan) => {
+              return sum + ((plan.planned_amount || 0) * 0.05); // 5% רווח דמיוני
+            }, 0);
+            totalProfitValue.textContent = `$${totalProfit.toLocaleString()}`;
+          }
+        })
+        .catch(error => {
+          console.error('Error updating summary:', error);
+        });
     }
 
     // פונקציה לעדכון הסטטיסטיקות
@@ -338,55 +282,45 @@
       const avgInvestment = document.getElementById('avgInvestment');
       const totalProfit = document.getElementById('totalProfit');
       
-      if (activePlans) {
-        const activeCount = filteredData.filter(plan => plan.status === 'פתוח').length;
-        activePlans.textContent = activeCount;
-      }
-      
-      if (totalInvestment) {
-        const total = filteredData.reduce((sum, plan) => {
-          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
-          return sum + amount;
-        }, 0);
-        totalInvestment.textContent = `$${total.toLocaleString()}`;
-      }
-      
-      if (avgInvestment) {
-        const total = filteredData.reduce((sum, plan) => {
-          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
-          return sum + amount;
-        }, 0);
-        const avg = filteredData.length > 0 ? total / filteredData.length : 0;
-        avgInvestment.textContent = `$${avg.toLocaleString()}`;
-      }
-      
-      if (totalProfit) {
-        const profit = filteredData.reduce((sum, plan) => {
-          const amount = parseFloat(plan.amount.replace(/[$,]/g, '') || '0');
-          return sum + (amount * 0.05); // 5% רווח דמיוני
-        }, 0);
-        totalProfit.textContent = `$${profit.toLocaleString()}`;
-      }
+      // נטען את הנתונים מהשרת
+      fetch('http://127.0.0.1:8080/api/tradeplans')
+        .then(response => response.json())
+        .then(plans => {
+          if (activePlans) {
+            const activeCount = plans.filter(plan => !plan.canceled_at).length;
+            activePlans.textContent = activeCount;
+          }
+          
+          if (totalInvestment) {
+            const total = plans.reduce((sum, plan) => {
+              return sum + (plan.planned_amount || 0);
+            }, 0);
+            totalInvestment.textContent = `$${total.toLocaleString()}`;
+          }
+          
+          if (avgInvestment) {
+            const total = plans.reduce((sum, plan) => {
+              return sum + (plan.planned_amount || 0);
+            }, 0);
+            const avg = plans.length > 0 ? total / plans.length : 0;
+            avgInvestment.textContent = `$${avg.toLocaleString()}`;
+          }
+          
+          if (totalProfit) {
+            const profit = plans.reduce((sum, plan) => {
+              return sum + ((plan.planned_amount || 0) * 0.05); // 5% רווח דמיוני
+            }, 0);
+            totalProfit.textContent = `$${profit.toLocaleString()}`;
+          }
+        })
+        .catch(error => {
+          console.error('Error updating stats:', error);
+        });
     }
 
 
 
-    // אתחול הדף
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM loaded - loading plans data');
-      
-      // שחזור מצב אזור ההתראות
-      restoreAlertsSectionState();
-      
-      // שחזור מצב החלק העליון
-      restoreTopSectionState();
-      
-      // טעינת נתוני תכנונים
-      loadPlansData();
-      
-      // טעינת התראות
-      loadAlerts();
-    });
+    // אתחול הדף - הוסר בגלל כפילות
 
 
 
@@ -702,7 +636,7 @@
       console.log('שולח נתונים לשרת:', planData);
       
       try {
-        const response = await fetch('/api/tradeplans', {
+        const response = await fetch('http://127.0.0.1:8080/api/tradeplans', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -741,14 +675,8 @@
             console.log('מוסיף תכנון חדש לגריד מקומית:', newPlan);
             rowData.unshift(newPlan);
             
-            // עדכון הגריד
-            if (gridApi.setRowData) {
-              gridApi.setRowData(rowData);
-            } else if (gridApi.setGridOption) {
-              gridApi.setGridOption('rowData', rowData);
-            } else {
-              console.warn('setRowData function not available');
-            }
+            // עדכון הטבלה
+            loadPlansData();
           }
           
           // סגירת המודל
@@ -944,7 +872,7 @@
     window.loadPlansFromServer = async function() {
       try {
         console.log('טוען תכנונים מהשרת...');
-        const response = await fetch('/api/tradeplans');
+        const response = await fetch('http://127.0.0.1:8080/api/tradeplans');
         
         if (!response.ok) {
           console.log('לא ניתן לטעון מהשרת, משתמש בנתונים מקומיים');
@@ -969,13 +897,8 @@
           notes: plan.reasons || plan.entry_conditions || ''
         }));
         
-        // עדכון הגריד רק אם הוא זמין
-        if (gridApi && gridApi.setRowData) {
-          rowData = formattedPlans;
-          gridApi.setRowData(rowData);
-          console.log('הגריד עודכן עם', formattedPlans.length, 'שורות');
-          updatePlanningSummaryStats();
-        }
+        // עדכון הטבלה
+        loadPlansData();
         
         return formattedPlans;
       } catch (error) {
@@ -1004,7 +927,7 @@
             }
             
             // מחיקה מהשרת
-            const response = await fetch(`/api/tradeplans/${plan.id}`, {
+            const response = await fetch(`http://127.0.0.1:8080/api/tradeplans/${plan.id}`, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json'
@@ -1016,11 +939,7 @@
               const planIndex = rowData.findIndex(p => p.ticker === ticker);
               if (planIndex !== -1) {
                 rowData.splice(planIndex, 1);
-                if (gridApi.setRowData) {
-                  gridApi.setRowData(rowData);
-                } else if (gridApi.setGridOption) {
-                  gridApi.setGridOption('rowData', rowData);
-                }
+                loadPlansData();
               }
               
               // סגירת המודל
@@ -1064,7 +983,7 @@
       };
 
       // עדכון הטבלה
-      gridApi.setRowData(rowData);
+      loadPlansData();
       
       // סגירת המודל
       closePlanDetails();
@@ -1094,11 +1013,7 @@
         rowData[planIndex].status = newStatus;
         
         // עדכון הטבלה
-        if (gridApi.setRowData) {
-          gridApi.setRowData(rowData);
-        } else if (gridApi.setGridOption) {
-          gridApi.setGridOption('rowData', rowData);
-        }
+        loadPlansData();
         
         // עדכון התצוגה במודל
         const statusBadge = document.getElementById("statusBadge");
@@ -1119,11 +1034,7 @@
         rowData[planIndex].type = newType;
         
         // עדכון הטבלה
-        if (gridApi.setRowData) {
-          gridApi.setRowData(rowData);
-        } else if (gridApi.setGridOption) {
-          gridApi.setGridOption('rowData', rowData);
-        }
+        loadPlansData();
         
         // הודעה קצרה על העדכון
         showQuickNotification(`סוג ההשקעה של ${ticker} עודכן ל: ${newType}`);
@@ -1235,54 +1146,9 @@
       }
     }
 
-    window.updateSorting = function(sortBy) {
-      if (gridApi) {
-        if (sortBy === '') {
-          gridApi.setSortModel(null);
-        } else {
-          const sortOrder = sortBy === 'date' ? 'desc' : 'asc';
-          gridApi.setSortModel([
-            { colId: sortBy, sort: sortOrder }
-          ]);
-        }
-      }
-    }
 
-    window.applyFilters = function() {
-      if (!gridApi) return;
-      
-      const statusItems = document.querySelectorAll('#statusDropdown .multiselect-item.selected');
-      const typeItems = document.querySelectorAll('#typeDropdown .multiselect-item.selected');
-      
-      const selectedStatuses = Array.from(statusItems)
-        .map(item => item.querySelector('.option-text').textContent);
-      
-      const selectedTypes = Array.from(typeItems)
-        .map(item => item.querySelector('.option-text').textContent);
-      
-      // יצירת פילטר מורכב
-      const filterModel = {};
-      
-      if (selectedStatuses.length > 0 && selectedStatuses.length < document.querySelectorAll('#statusDropdown .multiselect-item').length) {
-        filterModel.status = {
-          type: 'in',
-          filter: selectedStatuses
-        };
-      }
-      
-      if (selectedTypes.length > 0 && selectedTypes.length < document.querySelectorAll('#typeDropdown .multiselect-item').length) {
-        filterModel.type = {
-          type: 'in',
-          filter: selectedTypes
-        };
-      }
-      
-      if (Object.keys(filterModel).length > 0) {
-        gridApi.setFilterModel(filterModel);
-      } else {
-        gridApi.setFilterModel(null);
-      }
-    }
+
+
 
     window.clearAllFilters = function() {
       // בחירת כל האפשרויות
@@ -1297,11 +1163,8 @@
       updateSelectedText('status');
       updateSelectedText('type');
       
-      // ניקוי הפילטרים בגריד
-      if (gridApi) {
-        gridApi.setFilterModel(null);
-        gridApi.setSortModel(null);
-      }
+      // רענון הטבלה
+      loadPlansData();
     }
 
     // הוספת event listeners לכפתורי הניווט
@@ -1358,14 +1221,8 @@
       try {
         console.log('=== updatePlanningSummaryStats called ===');
         
-        // אם לא הועברו נתונים, השתמש בנתונים המוצגים בגריד
-        if (!data && window.gridApi) {
-          const displayedRows = [];
-          window.gridApi.forEachNodeAfterFilter(node => {
-            displayedRows.push(node.data);
-          });
-          data = displayedRows;
-        } else if (!data) {
+        // אם לא הועברו נתונים, השתמש בנתונים המקומיים
+        if (!data) {
           data = rowData;
         }
         
@@ -1488,23 +1345,13 @@
       return externalFilterPresent;
     }
 
-    function filterPlans() {
-      console.log('=== פונקציית filterPlans נקראת ===');
-      
-      // בדיקה שהגריד זמין
-      if (!gridApi) {
-        console.log('גריד לא זמין עדיין');
-        return;
-      }
-      
-      console.log('פונקציית filterPlans - הגריד זמין, לא צריך לעשות כלום כי הפילטר מטופל על ידי הקומפוננט');
-    }
+
 
     // פונקציה לטעינת תכנונים מהשרת
     async function loadPlansFromServer() {
       try {
         console.log('טוען תכנונים מהשרת...');
-        const response = await fetch('/api/tradeplans');
+        const response = await fetch('http://127.0.0.1:8080/api/tradeplans');
         console.log('Response status:', response.status);
         console.log('Response ok:', response.ok);
         
@@ -1533,35 +1380,9 @@
         
         console.log('הנתונים הומרו:', formattedPlans);
         
-        // עדכון הגריד
+        // עדכון הנתונים
         console.log('מעדכן את rowData:', formattedPlans);
         rowData = formattedPlans;
-        console.log('rowData עודכן, gridApi קיים:', !!gridApi);
-        
-        if (gridApi) {
-          console.log('מעדכן את הגריד...');
-          
-          // עדכון הנתונים בגריד
-          if (gridApi.setRowData) {
-            gridApi.setRowData(rowData);
-          } else if (gridApi.setGridOption) {
-            gridApi.setGridOption('rowData', rowData);
-          } else {
-            console.error('לא ניתן לעדכן את הגריד - API לא זמין');
-          }
-          
-          console.log('הגריד עודכן עם הנתונים החדשים');
-          
-          // עדכון גובה הגריד
-          const rowCount = gridApi.getDisplayedRowCount ? gridApi.getDisplayedRowCount() : rowData.length;
-          const gridDiv = document.querySelector("#agGridFloating");
-          if (gridDiv) {
-            gridDiv.style.height = Math.max(350, rowCount * 48 + 50) + 'px';
-            console.log('גובה הגריד עודכן ל:', gridDiv.style.height);
-          }
-        } else {
-          console.error('gridApi לא זמין!');
-        }
         
         // עדכון הסטטיסטיקות
         updatePlanningSummaryStats();
@@ -1572,10 +1393,7 @@
         console.log('משתמש בנתונים מקומיים...');
         
         // אם יש שגיאה, נשתמש בנתונים המקומיים
-        if (gridApi && rowData) {
-          gridApi.setRowData(rowData);
-          updatePlanningSummaryStats();
-        }
+        updatePlanningSummaryStats();
         
         return rowData;
       }
@@ -1610,206 +1428,7 @@
       // טעינת התראות
       loadAlerts();
       
-      // המתנה קצרה לוודא שהכל נטען
-      setTimeout(() => {
-        const gridDiv = document.querySelector("#agGridFloating");
-        console.log('Grid div found:', gridDiv);
-        
-        if (!gridDiv) {
-          console.error('Grid div not found!');
-          return;
-        }
-      
-      // בדיקה אם agGrid זמין
-      if (typeof agGrid === 'undefined') {
-        console.error('agGrid is not loaded!');
-        return;
-      }
-      console.log('agGrid is available:', agGrid);
-      
-      // טעינת פילטרים שמורים לפני יצירת הגריד
-      const savedFilters = loadSavedFilters();
-      if (savedFilters && savedFilters.statuses) {
-        console.log('Found saved filters, will apply after grid creation:', savedFilters);
-        window.pendingFilter = savedFilters.statuses; // רק פילטר הסטטוס משפיע על הגריד
-        
-        // הפילטרים נטענים אוטומטית בקומפוננט הכותרת
-        console.log('Filters will be loaded automatically by header component');
-      }
-      // הגדרת עמודות ייחודיות לעמוד התכנונים
-      const planningColumnDefs = [
-        { 
-          headerName: "המרה", 
-          field: "action", 
-          width: 60,
-          minWidth: 50,
-          maxWidth: 80,
-          cellRenderer: params => `<span style="cursor: pointer; font-size: 1.2rem;">${params.value}</span>`
-        },
-        { 
-          headerName: "סטטוס", 
-          field: "status", 
-          width: 80,
-          minWidth: 70,
-          maxWidth: 100, 
-          cellClass: params => `badge-status ${params.value}`
-        },
-        { 
-          headerName: "נוכחי", 
-          field: "current", 
-          width: 120,
-          minWidth: 100,
-          maxWidth: 150, 
-          cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
-        },
-        { 
-          headerName: "סטופ", 
-          field: "stop", 
-          width: 120,
-          minWidth: 100,
-          maxWidth: 150, 
-          cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
-        },
-        { 
-          headerName: "יעד", 
-          field: "target", 
-          width: 120,
-          minWidth: 100,
-          maxWidth: 150, 
-          cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
-        },
-        { 
-          headerName: "סכום/כמות", 
-          field: "amount", 
-          width: 140,
-          minWidth: 120,
-          maxWidth: 180,
-          flex: 1
-        },
-        { 
-          headerName: "סוג", 
-          field: "type", 
-          width: 80,
-          minWidth: 70,
-          maxWidth: 100, 
-          cellClass: params => `badge-type ${params.value}`
-        },
-        { 
-          headerName: "תאריך", 
-          field: "date", 
-          width: 100,
-          minWidth: 90,
-          maxWidth: 120
-        },
-        {
-          headerName: "נכס",
-          field: "ticker",
-          width: 100,
-          minWidth: 80,
-          maxWidth: 120,
-          cellRenderer: params => {
-            return `<a href="#" onclick="openPlanDetails('${params.value}'); return false;" style="color: #0077cc; text-decoration: underline;">${params.value}</a>`;
-          }
-        }
-      ];
 
-      // שימוש במערכת המודולרית עם הגדרות ייחודיות
-      const gridOptions = createGridOptions({
-        columnDefs: planningColumnDefs,
-        rowData: rowData,
-        containerId: 'agGridFloating'
-      });
-
-                onGridReady: async params => {
-          gridApi = params.api;
-          console.log('Grid API available:', !!gridApi);
-          
-          // התאמת הגריד לרוחב המסך
-          params.api.sizeColumnsToFit();
-          
-          // עדכון הגריד בעת שינוי גודל החלון
-          window.addEventListener('resize', () => {
-            setTimeout(() => {
-              params.api.sizeColumnsToFit();
-            }, 100);
-          });
-          
-          // טעינת נתונים מהשרת
-          try {
-            console.log('טוען נתונים ראשוניים מהשרת...');
-            await loadPlansFromServer();
-            console.log('הנתונים הראשוניים נטענו בהצלחה');
-          } catch (error) {
-            console.error('שגיאה בטעינת נתונים ראשוניים:', error);
-            // אם יש שגיאה, נשתמש בנתונים המקומיים
-            const rowCount = params.api.getDisplayedRowCount();
-            gridDiv.style.height = Math.max(350, rowCount * 48 + 50) + 'px';
-            console.log('Grid initialized with local data:', rowCount, 'rows');
-          }
-          
-          // עדכון הסטטיסטיקות הראשוניות
-          updatePlanningSummaryStats();
-          
-          // בדיקה אם יש פילטר ממתין או טעינת פילטר שמור
-          if (window.pendingFilter) {
-            console.log('Applying pending filter:', window.pendingFilter);
-            applyStatusFilterToGrid(window.pendingFilter);
-            
-            // ניקוי הפילטר הממתין
-            delete window.pendingFilter;
-          } else {
-            // אם אין פילטר שמור, נשתמש בברירת המחדל של הקומפוננט (פתוח בלבד)
-            console.log('No saved filter, applying default filter: פתוח');
-            applyStatusFilterToGrid(['פתוח']);
-          }
-          
-          // אתחול הפילטרים לברירת מחדל
-          console.log('אתחול פילטרים לברירת מחדל...');
-          setTimeout(() => {
-            filterPlans();
-          }, 1000);
-          
-          // הוספת event listeners לפילטרים
-          console.log('Adding event listeners to filters...');
-          const allCheckboxes = document.querySelectorAll(".filter-buttons input[type='checkbox']");
-          allCheckboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-              console.log('Checkbox changed:', cb.checked);
-              filterPlans();
-            });
-          });
-        }
-      };
-      
-      console.log('Creating grid...');
-      console.log('Grid div:', gridDiv);
-      console.log('Grid options:', gridOptions);
-      console.log('agGrid object:', agGrid);
-      console.log('agGrid.createGrid function:', typeof agGrid.createGrid);
-      
-      try {
-        agGrid.createGrid(gridDiv, gridOptions);
-        console.log('Grid creation completed');
-        
-        // בדיקה שהגריד נוצר בהצלחה
-        setTimeout(() => {
-          if (gridDiv.children.length > 0) {
-            console.log('Grid rendered successfully');
-            console.log('Grid children count:', gridDiv.children.length);
-            console.log('Grid is visible:', gridDiv.offsetHeight > 0);
-          } else {
-            console.error('Grid failed to render');
-          }
-        }, 500);
-        
-
-        
-      } catch (error) {
-        console.error('Error creating grid:', error);
-      }
-      
-      }, 100); // סגירת setTimeout
-    });
 
     // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
     function updateBackgroundPadding(isCollapsed) {
@@ -1868,66 +1487,377 @@
 
     // אתחול הדף
     document.addEventListener('DOMContentLoaded', () => {
+      console.log('=== DOMContentLoaded event fired ===');
       console.log('DOM loaded - setting up header listener');
-      // הגדרת האזנה לכותרת
-      setupHeaderListener();
       
-      // עדכון הקומפוננט הכותרת עם הפילטר השמור (אם יש)
-      const savedFilter = loadSavedFilters();
-      if (savedFilter) {
-        console.log('DOM loaded - updating header with saved filter:', savedFilter);
+      try {
+        // הגדרת האזנה לכותרת
+        setupHeaderListener();
+        console.log('Header listener setup completed');
+        
+        // שחזור מצב אזור התכנונים
+        restorePlansSectionState();
+        
+        // עדכון הקומפוננט הכותרת עם הפילטר השמור (אם יש)
+        const savedFilter = loadSavedFilters();
+        if (savedFilter) {
+          console.log('DOM loaded - updating header with saved filter:', savedFilter);
+          // עדכון הקומפוננט הכותרת עם הפילטרים השמורים
+          updateHeaderWithSavedFilters(savedFilter);
+        }
+        
+        // טעינת נתוני תכנונים - נדחה לסוף
+        console.log('DOM loaded - about to call loadPlansData');
+        setTimeout(() => {
+          if (window.loadPlansData) {
+            window.loadPlansData();
+            console.log('DOM loaded - loadPlansData called');
+          } else {
+            console.error('loadPlansData function not found');
+          }
+        }, 100);
+      } catch (error) {
+        console.error('Error in DOMContentLoaded:', error);
       }
     });
 
-    // פונקציה מותאמת אישית להחלת פילטר סטטוס
-    function applyStatusFilterToGrid(selectedStatuses) {
-      if (!gridApi) {
-        console.log('Grid API not available yet');
-        return;
+
+
+
+
+    // הפיכת הפונקציה לזמינה גלובלית - הוסרה כי הפונקציה לא קיימת
+
+    // פונקציות גלובליות לקומפוננט הכותרת
+    window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
+      console.log('🔍 === PLANNING PAGE updateGridFromComponent called ===');
+      console.log('🔍 This is the PLANNING PAGE function, not grid-filters.js!');
+      console.log('🔍 Selected statuses:', selectedStatuses);
+      console.log('🔍 Selected types:', selectedTypes);
+      console.log('🔍 Selected accounts:', selectedAccounts);
+      console.log('🔍 Selected date range:', selectedDateRange);
+      console.log('🔍 Search term:', searchTerm);
+      
+      // בדיקה: האם הפונקציה נקראת בכלל?
+      console.log('🔍 Function is being called!');
+      
+      // שמירת הערכים הנבחרים לשימוש מאוחר יותר
+      window.selectedStatusesForFilter = selectedStatuses;
+      window.selectedDateRangeForFilter = selectedDateRange;
+      
+      console.log('🔍 Saved to window.selectedStatusesForFilter:', window.selectedStatusesForFilter);
+      console.log('🔍 Saved to window.selectedDateRangeForFilter:', window.selectedDateRangeForFilter);
+      
+      // שמירת הפילטרים ב-localStorage לזכירה במעבר בין דפים
+      localStorage.setItem('planningFilterStatuses', JSON.stringify(selectedStatuses));
+      if (selectedDateRange) {
+        localStorage.setItem('planningFilterDateRanges', JSON.stringify([selectedDateRange]));
       }
+      
+      console.log('🔍 Saved to localStorage:', {
+        statuses: localStorage.getItem('planningFilterStatuses'),
+        dateRanges: localStorage.getItem('planningFilterDateRanges')
+      });
+      
+      // עדכון הטבלה עם הפילטרים החדשים
+      console.log('🔍 About to call loadPlansData...');
+      loadPlansData();
+      
+      console.log('🔍 === PLANNING PAGE updateGridFromComponent completed ===');
+    }
 
-      console.log('Applying status filter to grid:', selectedStatuses);
+    window.updateTestCheckboxesFromComponent = function(selectedValues) {
+      console.log('=== updateTestCheckboxesFromComponent called ===');
+      console.log('Selected values:', selectedValues);
+      // פונקציה זו נדרשת על ידי הקומפוננט אבל לא רלוונטית לעמוד זה
+      console.log('Test checkboxes update not needed for planning page');
+    };
 
-      try {
-        if (selectedStatuses.length === 0 || selectedStatuses.length === 3) {
-          // אם לא נבחרו סטטוסים או נבחרו כולם - הצג הכל
-          console.log('Showing all statuses');
-          gridApi.setGridOption('rowData', rowData);
-        } else {
-          // סינון הנתונים לפי הסטטוסים הנבחרים
-          const filteredData = rowData.filter(row => selectedStatuses.includes(row.status));
-          console.log('Filter applied for statuses:', selectedStatuses, 'Showing', filteredData.length, 'rows');
-          gridApi.setGridOption('rowData', filteredData);
-        }
-        
-        // עדכון הסטטיסטיקות
-        updatePlanningSummaryStats();
-        
-      } catch (error) {
-        console.error('Error updating grid data:', error);
-        console.log('Grid API methods available:', Object.keys(gridApi));
+
+
+    // פונקציה לסגירה/פתיחה של אזור התכנונים
+    window.togglePlansSection = function() {
+      const plansSection = document.getElementById('plansSection');
+      const toggleBtn = document.querySelector('button[onclick="togglePlansSection()"]');
+      const icon = toggleBtn.querySelector('.filter-icon');
+      
+      if (plansSection.classList.contains('collapsed')) {
+        plansSection.classList.remove('collapsed');
+        icon.textContent = '▲';
+        toggleBtn.title = 'הצג/הסתר אזור תכנונים';
+        localStorage.setItem('plansSectionCollapsed', 'false');
+      } else {
+        plansSection.classList.add('collapsed');
+        icon.textContent = '▼';
+        toggleBtn.title = 'הצג/הסתר אזור תכנונים';
+        localStorage.setItem('plansSectionCollapsed', 'true');
       }
     }
 
-    // הפיכת הפונקציה לזמינה גלובלית
-    window.applyStatusFilterToGrid = applyStatusFilterToGrid;
-
-    // פונקציה להחלת פילטר תאריכים
-    function applyDateRangeFilterToGrid(selectedDateRange) {
-      if (!gridApi) {
-        console.log('Grid API not available yet');
-        return;
+    // פונקציה לשחזור מצב אזור התכנונים
+    function restorePlansSectionState() {
+      const plansSection = document.getElementById('plansSection');
+      const toggleBtn = document.querySelector('button[onclick="togglePlansSection()"]');
+      const icon = toggleBtn.querySelector('.filter-icon');
+      
+      const isCollapsed = localStorage.getItem('plansSectionCollapsed') === 'true';
+      
+      if (isCollapsed) {
+        plansSection.classList.add('collapsed');
+        icon.textContent = '▼';
+        toggleBtn.title = 'הצג/הסתר אזור תכנונים';
+      } else {
+        plansSection.classList.remove('collapsed');
+        icon.textContent = '▲';
+        toggleBtn.title = 'הצג/הסתר אזור תכנונים';
       }
+    }
 
-      console.log('Applying date range filter to grid:', selectedDateRange);
-
+    // פונקציה לטעינת הפילטרים השמורים
+    function loadSavedFilters() {
       try {
-        if (!selectedDateRange || selectedDateRange === 'הכול') {
-          // אם לא נבחר טווח תאריכים או נבחר "הכול" - הצג הכל
-          console.log('Showing all dates');
-          gridApi.setGridOption('rowData', rowData);
+        const savedStatusFilter = localStorage.getItem('planningFilterStatuses');
+        const savedTypeFilter = localStorage.getItem('planningFilterTypes');
+        const savedAccountFilter = localStorage.getItem('planningFilterAccounts');
+        const savedDateRangeFilter = localStorage.getItem('planningFilterDateRanges');
+        const savedSearchFilter = localStorage.getItem('planningFilterSearch');
+        
+        let filters = {};
+        
+        if (savedStatusFilter) {
+          filters.statuses = JSON.parse(savedStatusFilter);
+          console.log('Loaded saved status filter:', filters.statuses);
+          window.selectedStatusesForFilter = filters.statuses;
+        }
+        if (savedTypeFilter) {
+          filters.types = JSON.parse(savedTypeFilter);
+          console.log('Loaded saved type filter:', filters.types);
+        }
+        if (savedAccountFilter) {
+          filters.accounts = JSON.parse(savedAccountFilter);
+          console.log('Loaded saved account filter:', filters.accounts);
+        }
+        if (savedDateRangeFilter) {
+          filters.dateRanges = JSON.parse(savedDateRangeFilter);
+          console.log('Loaded saved date range filter:', filters.dateRanges);
+          // עדכון המשתנה הגלובלי לטווח תאריכים
+          if (filters.dateRanges && filters.dateRanges.length > 0) {
+            window.selectedDateRangeForFilter = filters.dateRanges[0];
+          }
+        }
+        if (savedSearchFilter) {
+          filters.search = savedSearchFilter;
+          console.log('Loaded saved search filter:', filters.search);
+        }
+        
+        return filters;
+      } catch (error) {
+        console.error('Error loading saved filters:', error);
+      }
+      return null;
+    }
+
+    // פונקציה לעדכון הקומפוננט הכותרת עם הפילטרים השמורים
+    function updateHeaderWithSavedFilters(filters) {
+      try {
+        const header = document.querySelector('app-header');
+        if (!header || !header.shadowRoot) {
+          console.log('Header component not ready yet');
+          return;
+        }
+        
+        console.log('Updating header with saved filters:', filters);
+        
+        // עדכון פילטר סטטוס
+        if (filters.statuses && filters.statuses.length > 0) {
+          const statusMenu = header.shadowRoot.getElementById('statusFilterMenu');
+          if (statusMenu) {
+            const statusItems = statusMenu.querySelectorAll('.status-filter-item');
+            statusItems.forEach(item => {
+              const statusText = item.querySelector('.option-text').textContent;
+              const checkMark = item.querySelector('.check-mark');
+              if (filters.statuses.includes(statusText)) {
+                checkMark.style.display = 'inline';
+                item.classList.add('selected');
+              } else {
+                checkMark.style.display = 'none';
+                item.classList.remove('selected');
+              }
+            });
+          }
+        }
+        
+        // עדכון פילטר טווח תאריכים
+        if (filters.dateRanges && filters.dateRanges.length > 0) {
+          const dateRangeMenu = header.shadowRoot.getElementById('dateRangeFilterMenu');
+          if (dateRangeMenu) {
+            const dateRangeItems = dateRangeMenu.querySelectorAll('.date-range-filter-item');
+            dateRangeItems.forEach(item => {
+              const dateRangeText = item.querySelector('.option-text').textContent;
+              const checkMark = item.querySelector('.check-mark');
+              if (filters.dateRanges.includes(dateRangeText)) {
+                checkMark.style.display = 'inline';
+                item.classList.add('selected');
+              } else {
+                checkMark.style.display = 'none';
+                item.classList.remove('selected');
+              }
+            });
+          }
+        }
+        
+        console.log('Header updated with saved filters');
+      } catch (error) {
+        console.error('Error updating header with saved filters:', error);
+      }
+    }
+
+  </script>
+  
+  <!-- Scripts -->
+  <!-- app-header.js נטען כבר בתחילת הקובץ -->
+  
+  <!-- קריאה לטעינת נתונים אחרי שכל הסקריפטים נטענו -->
+  <script>
+    // פונקציה לעדכון הסיכום
+    function updateSummary() {
+      const activePlansCount = document.getElementById('activePlansCount');
+      const totalInvestmentValue = document.getElementById('totalInvestmentValue');
+      const avgInvestmentValue = document.getElementById('avgInvestmentValue');
+      const totalProfitValue = document.getElementById('totalProfitValue');
+      
+      // נטען את הנתונים מהשרת
+      fetch('http://127.0.0.1:8080/api/tradeplans')
+        .then(response => response.json())
+        .then(plans => {
+          if (activePlansCount) {
+            const activeCount = plans.filter(plan => !plan.canceled_at).length;
+            activePlansCount.textContent = activeCount;
+          }
+          
+          if (totalInvestmentValue) {
+            const totalInvestment = plans.reduce((sum, plan) => {
+              return sum + (plan.planned_amount || 0);
+            }, 0);
+            totalInvestmentValue.textContent = `$${totalInvestment.toLocaleString()}`;
+          }
+          
+          if (avgInvestmentValue) {
+            const totalInvestment = plans.reduce((sum, plan) => {
+              return sum + (plan.planned_amount || 0);
+            }, 0);
+            const avgInvestment = plans.length > 0 ? totalInvestment / plans.length : 0;
+            avgInvestmentValue.textContent = `$${avgInvestment.toLocaleString()}`;
+          }
+          
+          if (totalProfitValue) {
+            // חישוב רווח דמיוני לצורך הדוגמה
+            const totalProfit = plans.reduce((sum, plan) => {
+              return sum + ((plan.planned_amount || 0) * 0.05); // 5% רווח דמיוני
+            }, 0);
+            totalProfitValue.textContent = `$${totalProfit.toLocaleString()}`;
+          }
+        })
+        .catch(error => {
+          console.error('Error updating summary:', error);
+        });
+    }
+
+    // פונקציה לעדכון הסטטיסטיקות
+    function updateStats() {
+      const activePlans = document.getElementById('activePlans');
+      const totalInvestment = document.getElementById('totalInvestment');
+      const avgInvestment = document.getElementById('avgInvestment');
+      const totalProfit = document.getElementById('totalProfit');
+      
+      // נטען את הנתונים מהשרת
+      fetch('http://127.0.0.1:8080/api/tradeplans')
+        .then(response => response.json())
+        .then(plans => {
+          if (activePlans) {
+            const activeCount = plans.filter(plan => !plan.canceled_at).length;
+            activePlans.textContent = activeCount;
+          }
+          
+          if (totalInvestment) {
+            const total = plans.reduce((sum, plan) => {
+              return sum + (plan.planned_amount || 0);
+            }, 0);
+            totalInvestment.textContent = `$${total.toLocaleString()}`;
+          }
+          
+          if (avgInvestment) {
+            const total = plans.reduce((sum, plan) => {
+              return sum + (plan.planned_amount || 0);
+            }, 0);
+            const avg = plans.length > 0 ? total / plans.length : 0;
+            avgInvestment.textContent = `$${avg.toLocaleString()}`;
+          }
+          
+          if (totalProfit) {
+            const profit = plans.reduce((sum, plan) => {
+              return sum + ((plan.planned_amount || 0) * 0.05); // 5% רווח דמיוני
+            }, 0);
+            totalProfit.textContent = `$${profit.toLocaleString()}`;
+          }
+        })
+        .catch(error => {
+          console.error('Error updating stats:', error);
+        });
+    }
+
+    // הגדרת הפונקציה מחדש כאן
+    window.loadPlansData = async function() {
+      console.log('🔍 === loadPlansData function called ===');
+      try {
+        console.log('🔄 טוען תכנונים...');
+        console.log('Fetching from: http://127.0.0.1:8080/api/tradeplans');
+        const response = await fetch('http://127.0.0.1:8080/api/tradeplans');
+        
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        let plans = await response.json();
+        console.log('🔍 Plans data loaded:', plans);
+        console.log('🔍 Number of plans before filtering:', plans.length);
+        
+        // בדיקות מפורטות של הפילטרים
+        console.log('🔍 === FILTER DEBUGGING ===');
+        console.log('🔍 window.selectedStatusesForFilter:', window.selectedStatusesForFilter);
+        console.log('🔍 window.selectedDateRangeForFilter:', window.selectedDateRangeForFilter);
+        console.log('🔍 localStorage planningFilterStatuses:', localStorage.getItem('planningFilterStatuses'));
+        console.log('🔍 localStorage planningFilterDateRanges:', localStorage.getItem('planningFilterDateRanges'));
+        
+        // החלת פילטרים על הנתונים
+        const selectedStatuses = window.selectedStatusesForFilter || [];
+        const selectedDateRange = window.selectedDateRangeForFilter || null;
+        
+        console.log('🔍 Applying filters - Statuses:', selectedStatuses, 'Date Range:', selectedDateRange);
+        console.log('🔍 Window selectedStatusesForFilter:', window.selectedStatusesForFilter);
+        console.log('🔍 Window selectedDateRangeForFilter:', window.selectedDateRangeForFilter);
+        
+        // סינון לפי סטטוס
+        if (selectedStatuses && selectedStatuses.length > 0 && selectedStatuses.length < 3) {
+          console.log('🔍 Filtering by status:', selectedStatuses);
+          console.log('🔍 Plans before status filter:', plans.length);
+          
+          plans = plans.filter(plan => {
+            const planStatus = plan.canceled_at ? 'מבוטל' : 'פתוח';
+            const isIncluded = selectedStatuses.includes(planStatus);
+            console.log(`🔍 Plan ${plan.ticker_symbol || plan.ticker}: status=${planStatus}, included=${isIncluded}`);
+            return isIncluded;
+          });
+          console.log('🔍 After status filter:', plans.length, 'plans');
         } else {
-          // חישוב טווח התאריכים
+          console.log('🔍 No status filter applied - selectedStatuses:', selectedStatuses);
+        }
+        
+        // סינון לפי טווח תאריכים
+        if (selectedDateRange && selectedDateRange !== 'הכול') {
+          console.log('Filtering by date range:', selectedDateRange);
           const now = new Date();
           let startDate = new Date();
           
@@ -1957,44 +1887,92 @@
               startDate = new Date(now.getFullYear() - 1, 0, 1);
               const endDate = new Date(now.getFullYear() - 1, 11, 31);
               break;
-            default:
-              console.log('Unknown date range:', selectedDateRange);
-              gridApi.setGridOption('rowData', rowData);
-              return;
           }
           
-          // סינון הנתונים לפי טווח התאריכים
-          const filteredData = rowData.filter(row => {
-            if (!row.created_at) return false;
-            const rowDate = new Date(row.created_at);
-            return rowDate >= startDate && rowDate <= now;
+          plans = plans.filter(plan => {
+            const planDate = new Date(plan.created_at);
+            return planDate >= startDate && planDate <= now;
           });
-          
-          console.log('Date range filter applied:', selectedDateRange, 'Showing', filteredData.length, 'rows');
-          gridApi.setGridOption('rowData', filteredData);
+          console.log('After date range filter:', plans.length, 'plans');
         }
         
-        // עדכון הסטטיסטיקות
-        updatePlanningSummaryStats();
+        console.log('Final filtered plans:', plans.length);
+        
+        const tbody = document.querySelector('#plansTable tbody');
+        console.log('Found tbody element:', tbody);
+        console.log('About to populate table with', plans.length, 'plans');
+        tbody.innerHTML = plans.map(plan => `
+          <tr>
+            <td><strong><a href="#" onclick="openPlanDetails('${plan.id}')" style="color: inherit; text-decoration: none;">${plan.ticker_symbol || plan.ticker || '-'}</a></strong></td>
+            <td>${plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : '-'}</td>
+            <td>${plan.investment_type || '-'}</td>
+            <td>${plan.planned_amount ? `$${plan.planned_amount.toLocaleString()}` : '-'}</td>
+            <td>${plan.target_price ? `$${plan.target_price.toFixed(2)}` : '-'}</td>
+            <td>${plan.stop_price ? `$${plan.stop_price.toFixed(2)}` : '-'}</td>
+            <td>$0.00 (0.0%)</td>
+            <td><span class="status-badge status-${plan.canceled_at ? 'canceled' : 'open'}">${plan.canceled_at ? 'מבוטל' : 'פתוח'}</span></td>
+            <td>
+              <button class="btn btn-sm btn-secondary" onclick="editPlan('${plan.id}')" title="ערוך"><span class="btn-icon">✏️</span></button>
+              <button class="btn btn-sm btn-danger" onclick="deletePlan('${plan.id}')" title="מחק">X</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('plansCount').textContent = `${plans.length} תכנונים`;
+        
+        console.log('Table populated successfully');
+        
+        // עדכון הסיכום והסטטיסטיקות
+        updateSummary();
+        updateStats();
+        
+        // אתחול סידור לטבלה
+        if (typeof initializeTableSorting === 'function') {
+          initializeTableSorting('plansTable');
+        }
         
       } catch (error) {
-        console.error('Error updating grid data with date filter:', error);
+        console.error('Error loading plans data:', error);
+        document.querySelector('#plansTable tbody').innerHTML = '<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
       }
-    }
+    };
+    
+    // קריאה לטעינת נתונים אחרי שכל הסקריפטים נטענו
+    setTimeout(() => {
+      console.log('=== Final loadPlansData call ===');
+      if (window.loadPlansData) {
+        window.loadPlansData();
+      } else {
+        console.error('loadPlansData function not available');
+      }
+    }, 500);
+  </script>
 
-    // הפיכת הפונקציה לזמינה גלובלית
-    window.applyDateRangeFilterToGrid = applyDateRangeFilterToGrid;
-
-    // פונקציות גלובליות לקומפוננט הכותרת
-    window.updateGridFromComponent = function(selectedStatuses, selectedAccounts, selectedDateRange) {
-      console.log('=== updateGridFromComponent called ===');
-      console.log('Selected statuses:', selectedStatuses);
-      console.log('Selected accounts:', selectedAccounts);
-      console.log('Selected date range:', selectedDateRange);
+  <script>
+    // בדיקות בתחילת הדף
+    console.log('🔍 === PLANNING PAGE LOADED ===');
+    console.log('🔍 Checking if functions are available...');
+    
+    // הגדרת הפונקציה שלנו לפני כל דבר אחר
+    window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
+      console.log('🔍 === PLANNING PAGE updateGridFromComponent called ===');
+      console.log('🔍 This is the PLANNING PAGE function, not grid-filters.js!');
+      console.log('🔍 Selected statuses:', selectedStatuses);
+      console.log('🔍 Selected types:', selectedTypes);
+      console.log('🔍 Selected accounts:', selectedAccounts);
+      console.log('🔍 Selected date range:', selectedDateRange);
+      console.log('🔍 Search term:', searchTerm);
+      
+      // בדיקה: האם הפונקציה נקראת בכלל?
+      console.log('🔍 Function is being called!');
       
       // שמירת הערכים הנבחרים לשימוש מאוחר יותר
       window.selectedStatusesForFilter = selectedStatuses;
       window.selectedDateRangeForFilter = selectedDateRange;
+      
+      console.log('🔍 Saved to window.selectedStatusesForFilter:', window.selectedStatusesForFilter);
+      console.log('🔍 Saved to window.selectedDateRangeForFilter:', window.selectedDateRangeForFilter);
       
       // שמירת הפילטרים ב-localStorage לזכירה במעבר בין דפים
       localStorage.setItem('planningFilterStatuses', JSON.stringify(selectedStatuses));
@@ -2002,103 +1980,25 @@
         localStorage.setItem('planningFilterDateRanges', JSON.stringify([selectedDateRange]));
       }
       
-      // אם הגריד זמין, הפעל את הפילטרים מיד
-      if (gridApi) {
-        // הפעלת פילטר הסטטוסים
-        applyStatusFilterToGrid(selectedStatuses);
-        
-        // הפעלת פילטר התאריכים
-        if (selectedDateRange) {
-          applyDateRangeFilterToGrid(selectedDateRange);
-        }
-      } else {
-        console.log('Grid API not available yet, filters will be applied when grid is ready');
-      }
+      console.log('🔍 Saved to localStorage:', {
+        statuses: localStorage.getItem('planningFilterStatuses'),
+        dateRanges: localStorage.getItem('planningFilterDateRanges')
+      });
       
-      console.log('=== updateGridFromComponent completed ===');
-    }
-
-    window.updateTestCheckboxesFromComponent = function(selectedValues) {
-      console.log('=== updateTestCheckboxesFromComponent called ===');
-      console.log('Selected values:', selectedValues);
-      // פונקציה זו נדרשת על ידי הקומפוננט אבל לא רלוונטית לעמוד זה
-      console.log('Test checkboxes update not needed for planning page');
+      // עדכון הטבלה עם הפילטרים החדשים
+      console.log('🔍 About to call loadPlansData...');
+      loadPlansData();
+      
+      console.log('🔍 === PLANNING PAGE updateGridFromComponent completed ===');
     };
-
-    // פונקציה לבדיקה ידנית של הפילטר
-    window.testFilterManually = function() {
-      console.log('=== Testing filter manually ===');
-      const testValues = ['פתוח', 'סגור'];
-      console.log('Testing with values:', testValues);
-      window.updateTestCheckboxesFromComponent(testValues);
-      window.updateGridFromComponent(testValues);
-      console.log('=== Manual test completed ===');
-    }
-
-    // פונקציה לבדיקת Grid API
-    window.testGridAPI = function() {
-      console.log('=== Testing Grid API ===');
-      console.log('Grid API object:', gridApi);
-      console.log('Grid API methods:', Object.keys(gridApi));
-      if (gridApi && gridApi.setGridOption) {
-        console.log('setGridOption is available');
-        try {
-          gridApi.setGridOption('rowData', rowData.slice(0, 2));
-          console.log('Successfully updated grid with 2 rows');
-        } catch (error) {
-          console.error('Error updating grid:', error);
-        }
-      } else {
-        console.log('setGridOption is not available');
-      }
-      console.log('=== Grid API test completed ===');
-    }
-
-    // פונקציה לטעינת הפילטרים השמורים
-    function loadSavedFilters() {
-      try {
-        const savedStatusFilter = localStorage.getItem('planningFilterStatuses');
-        const savedTypeFilter = localStorage.getItem('planningFilterTypes');
-        const savedAccountFilter = localStorage.getItem('planningFilterAccounts');
-        const savedDateRangeFilter = localStorage.getItem('planningFilterDateRanges');
-      const savedSearchFilter = localStorage.getItem('planningFilterSearch');
-        
-        let filters = {};
-        
-        if (savedStatusFilter) {
-          filters.statuses = JSON.parse(savedStatusFilter);
-          console.log('Loaded saved status filter:', filters.statuses);
-          window.selectedStatusesForFilter = filters.statuses;
-        }
-        if (savedTypeFilter) {
-          filters.types = JSON.parse(savedTypeFilter);
-          console.log('Loaded saved type filter:', filters.types);
-        }
-        if (savedAccountFilter) {
-          filters.accounts = JSON.parse(savedAccountFilter);
-          console.log('Loaded saved account filter:', filters.accounts);
-        }
-        if (savedDateRangeFilter) {
-          filters.dateRanges = JSON.parse(savedDateRangeFilter);
-          console.log('Loaded saved date range filter:', filters.dateRanges);
-        }
-        if (savedSearchFilter) {
-          filters.search = savedSearchFilter;
-          console.log('Loaded saved search filter:', filters.search);
-        }
-        
-        return filters;
-      } catch (error) {
-        console.error('Error loading saved filters:', error);
-      }
-      return null;
-    }
-
-
-
+    
+    // בדיקה אם הפונקציות קיימות
+    setTimeout(() => {
+      console.log('🔍 window.updateGridFromComponent exists:', typeof window.updateGridFromComponent);
+      console.log('🔍 window.loadPlansData exists:', typeof window.loadPlansData);
+      console.log('🔍 window.selectedStatusesForFilter:', window.selectedStatusesForFilter);
+      console.log('🔍 window.selectedDateRangeForFilter:', window.selectedDateRangeForFilter);
+    }, 1000);
   </script>
-  
-  <!-- Scripts -->
-  <script src="scripts/app-header.js"></script>
 </body>
 </html>

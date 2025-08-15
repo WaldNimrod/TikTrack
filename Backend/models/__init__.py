@@ -7,9 +7,6 @@ from .alert import Alert
 from .cash_flow import CashFlow
 from .note import Note
 from .execution import Execution
-from .user import User
-from .role import Role
-from .user_role import UserRole
 
 __all__ = [
     'BaseModel',
@@ -20,8 +17,5 @@ __all__ = [
     'Alert',
     'CashFlow',
     'Note',
-    'Execution',
-    'User',
-    'Role',
-    'UserRole'
+    'Execution'
 ]

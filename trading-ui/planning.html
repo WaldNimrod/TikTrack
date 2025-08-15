@@ -1542,20 +1542,36 @@
       
       // שמירת הערכים הנבחרים לשימוש מאוחר יותר
       window.selectedStatusesForFilter = selectedStatuses;
+      window.selectedTypesForFilter = selectedTypes;
+      window.selectedAccountsForFilter = selectedAccounts;
       window.selectedDateRangeForFilter = selectedDateRange;
+      window.searchTermForFilter = searchTerm;
       
-      console.log('🔍 Saved to window.selectedStatusesForFilter:', window.selectedStatusesForFilter);
-      console.log('🔍 Saved to window.selectedDateRangeForFilter:', window.selectedDateRangeForFilter);
+      console.log('🔍 Saved to window variables:', {
+        statuses: window.selectedStatusesForFilter,
+        types: window.selectedTypesForFilter,
+        accounts: window.selectedAccountsForFilter,
+        dateRange: window.selectedDateRangeForFilter,
+        search: window.searchTermForFilter
+      });
       
       // שמירת הפילטרים ב-localStorage לזכירה במעבר בין דפים
       localStorage.setItem('planningFilterStatuses', JSON.stringify(selectedStatuses));
+      localStorage.setItem('planningFilterTypes', JSON.stringify(selectedTypes));
+      localStorage.setItem('planningFilterAccounts', JSON.stringify(selectedAccounts));
       if (selectedDateRange) {
         localStorage.setItem('planningFilterDateRanges', JSON.stringify([selectedDateRange]));
+      }
+      if (searchTerm) {
+        localStorage.setItem('planningFilterSearch', searchTerm);
       }
       
       console.log('🔍 Saved to localStorage:', {
         statuses: localStorage.getItem('planningFilterStatuses'),
-        dateRanges: localStorage.getItem('planningFilterDateRanges')
+        types: localStorage.getItem('planningFilterTypes'),
+        accounts: localStorage.getItem('planningFilterAccounts'),
+        dateRanges: localStorage.getItem('planningFilterDateRanges'),
+        search: localStorage.getItem('planningFilterSearch')
       });
       
       // עדכון הטבלה עם הפילטרים החדשים
@@ -1563,7 +1579,7 @@
       loadPlansData();
       
       console.log('🔍 === PLANNING PAGE updateGridFromComponent completed ===');
-    }
+    };
 
     window.updateTestCheckboxesFromComponent = function(selectedValues) {
       console.log('=== updateTestCheckboxesFromComponent called ===');
@@ -1827,17 +1843,24 @@
         // בדיקות מפורטות של הפילטרים
         console.log('🔍 === FILTER DEBUGGING ===');
         console.log('🔍 window.selectedStatusesForFilter:', window.selectedStatusesForFilter);
+        console.log('🔍 window.selectedTypesForFilter:', window.selectedTypesForFilter);
+        console.log('🔍 window.selectedAccountsForFilter:', window.selectedAccountsForFilter);
         console.log('🔍 window.selectedDateRangeForFilter:', window.selectedDateRangeForFilter);
+        console.log('🔍 window.searchTermForFilter:', window.searchTermForFilter);
         console.log('🔍 localStorage planningFilterStatuses:', localStorage.getItem('planningFilterStatuses'));
+        console.log('🔍 localStorage planningFilterTypes:', localStorage.getItem('planningFilterTypes'));
+        console.log('🔍 localStorage planningFilterAccounts:', localStorage.getItem('planningFilterAccounts'));
         console.log('🔍 localStorage planningFilterDateRanges:', localStorage.getItem('planningFilterDateRanges'));
+        console.log('🔍 localStorage planningFilterSearch:', localStorage.getItem('planningFilterSearch'));
         
         // החלת פילטרים על הנתונים
         const selectedStatuses = window.selectedStatusesForFilter || [];
+        const selectedTypes = window.selectedTypesForFilter || [];
+        const selectedAccounts = window.selectedAccountsForFilter || [];
         const selectedDateRange = window.selectedDateRangeForFilter || null;
+        const searchTerm = window.searchTermForFilter || '';
         
-        console.log('🔍 Applying filters - Statuses:', selectedStatuses, 'Date Range:', selectedDateRange);
-        console.log('🔍 Window selectedStatusesForFilter:', window.selectedStatusesForFilter);
-        console.log('🔍 Window selectedDateRangeForFilter:', window.selectedDateRangeForFilter);
+        console.log('🔍 Applying filters - Statuses:', selectedStatuses, 'Types:', selectedTypes, 'Accounts:', selectedAccounts, 'Date Range:', selectedDateRange, 'Search:', searchTerm);
         
         // סינון לפי סטטוס
         if (selectedStatuses && selectedStatuses.length > 0 && selectedStatuses.length < 3) {
@@ -1855,9 +1878,61 @@
           console.log('🔍 No status filter applied - selectedStatuses:', selectedStatuses);
         }
         
+        // סינון לפי סוג השקעה
+        if (selectedTypes && selectedTypes.length > 0 && selectedTypes.length < 3) {
+          console.log('🔍 Filtering by type:', selectedTypes);
+          console.log('🔍 Plans before type filter:', plans.length);
+          
+          plans = plans.filter(plan => {
+            const planType = plan.investment_type || 'סווינג';
+            const isIncluded = selectedTypes.includes(planType);
+            console.log(`🔍 Plan ${plan.ticker_symbol || plan.ticker}: type=${planType}, included=${isIncluded}`);
+            return isIncluded;
+          });
+          console.log('🔍 After type filter:', plans.length, 'plans');
+        } else {
+          console.log('🔍 No type filter applied - selectedTypes:', selectedTypes);
+        }
+        
+        // סינון לפי חשבון
+        if (selectedAccounts && selectedAccounts.length > 0) {
+          console.log('🔍 Filtering by account:', selectedAccounts);
+          console.log('🔍 Plans before account filter:', plans.length);
+          
+          plans = plans.filter(plan => {
+            const planAccount = plan.account_name || plan.account || 'חשבון ראשי';
+            const isIncluded = selectedAccounts.includes(planAccount);
+            console.log(`🔍 Plan ${plan.ticker_symbol || plan.ticker}: account=${planAccount}, included=${isIncluded}`);
+            return isIncluded;
+          });
+          console.log('🔍 After account filter:', plans.length, 'plans');
+        } else {
+          console.log('🔍 No account filter applied - selectedAccounts:', selectedAccounts);
+        }
+        
+        // סינון לפי חיפוש
+        if (searchTerm && searchTerm.trim() !== '') {
+          console.log('🔍 Filtering by search term:', searchTerm);
+          console.log('🔍 Plans before search filter:', plans.length);
+          
+          const searchLower = searchTerm.toLowerCase();
+          plans = plans.filter(plan => {
+            const ticker = (plan.ticker_symbol || plan.ticker || '').toLowerCase();
+            const notes = (plan.notes || '').toLowerCase();
+            const isIncluded = ticker.includes(searchLower) || notes.includes(searchLower);
+            console.log(`🔍 Plan ${plan.ticker_symbol || plan.ticker}: search match=${isIncluded}`);
+            return isIncluded;
+          });
+          console.log('🔍 After search filter:', plans.length, 'plans');
+        } else {
+          console.log('🔍 No search filter applied - searchTerm:', searchTerm);
+        }
+        
         // סינון לפי טווח תאריכים
         if (selectedDateRange && selectedDateRange !== 'הכול') {
-          console.log('Filtering by date range:', selectedDateRange);
+          console.log('🔍 Filtering by date range:', selectedDateRange);
+          console.log('🔍 Plans before date range filter:', plans.length);
+          
           const now = new Date();
           let startDate = new Date();
           
@@ -1891,12 +1966,16 @@
           
           plans = plans.filter(plan => {
             const planDate = new Date(plan.created_at);
-            return planDate >= startDate && planDate <= now;
+            const isIncluded = planDate >= startDate && planDate <= now;
+            console.log(`🔍 Plan ${plan.ticker_symbol || plan.ticker}: date=${planDate}, included=${isIncluded}`);
+            return isIncluded;
           });
-          console.log('After date range filter:', plans.length, 'plans');
+          console.log('🔍 After date range filter:', plans.length, 'plans');
+        } else {
+          console.log('🔍 No date range filter applied - selectedDateRange:', selectedDateRange);
         }
         
-        console.log('Final filtered plans:', plans.length);
+        console.log('🔍 Final filtered plans:', plans.length);
         
         const tbody = document.querySelector('#plansTable tbody');
         console.log('Found tbody element:', tbody);
@@ -1969,20 +2048,36 @@
       
       // שמירת הערכים הנבחרים לשימוש מאוחר יותר
       window.selectedStatusesForFilter = selectedStatuses;
+      window.selectedTypesForFilter = selectedTypes;
+      window.selectedAccountsForFilter = selectedAccounts;
       window.selectedDateRangeForFilter = selectedDateRange;
+      window.searchTermForFilter = searchTerm;
       
-      console.log('🔍 Saved to window.selectedStatusesForFilter:', window.selectedStatusesForFilter);
-      console.log('🔍 Saved to window.selectedDateRangeForFilter:', window.selectedDateRangeForFilter);
+      console.log('🔍 Saved to window variables:', {
+        statuses: window.selectedStatusesForFilter,
+        types: window.selectedTypesForFilter,
+        accounts: window.selectedAccountsForFilter,
+        dateRange: window.selectedDateRangeForFilter,
+        search: window.searchTermForFilter
+      });
       
       // שמירת הפילטרים ב-localStorage לזכירה במעבר בין דפים
       localStorage.setItem('planningFilterStatuses', JSON.stringify(selectedStatuses));
+      localStorage.setItem('planningFilterTypes', JSON.stringify(selectedTypes));
+      localStorage.setItem('planningFilterAccounts', JSON.stringify(selectedAccounts));
       if (selectedDateRange) {
         localStorage.setItem('planningFilterDateRanges', JSON.stringify([selectedDateRange]));
+      }
+      if (searchTerm) {
+        localStorage.setItem('planningFilterSearch', searchTerm);
       }
       
       console.log('🔍 Saved to localStorage:', {
         statuses: localStorage.getItem('planningFilterStatuses'),
-        dateRanges: localStorage.getItem('planningFilterDateRanges')
+        types: localStorage.getItem('planningFilterTypes'),
+        accounts: localStorage.getItem('planningFilterAccounts'),
+        dateRanges: localStorage.getItem('planningFilterDateRanges'),
+        search: localStorage.getItem('planningFilterSearch')
       });
       
       // עדכון הטבלה עם הפילטרים החדשים

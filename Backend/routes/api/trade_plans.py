@@ -6,7 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/v1/tradeplans')
+trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/v1/trade_plans')
 
 @trade_plans_bp.route('/', methods=['GET'])
 def get_trade_plans():

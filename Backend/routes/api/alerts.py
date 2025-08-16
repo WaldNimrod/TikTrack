@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
-from models.alert import Alert
+from services.alert_service import AlertService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,7 +13,7 @@ def get_alerts():
     """קבלת כל ההתראות"""
     try:
         db: Session = next(get_db())
-        alerts = db.query(Alert).all()
+        alerts = AlertService.get_all(db)
         return jsonify({
             "status": "success",
             "data": [alert.to_dict() for alert in alerts],
@@ -35,7 +35,7 @@ def get_alert(alert_id: int):
     """קבלת התראה לפי מזהה"""
     try:
         db: Session = next(get_db())
-        alert = db.query(Alert).filter(Alert.id == alert_id).first()
+        alert = AlertService.get_by_id(db, alert_id)
         if alert:
             return jsonify({
                 "status": "success",
@@ -64,10 +64,7 @@ def create_alert():
     try:
         data = request.get_json()
         db: Session = next(get_db())
-        alert = Alert(**data)
-        db.add(alert)
-        db.commit()
-        db.refresh(alert)
+        alert = AlertService.create(db, data)
         return jsonify({
             "status": "success",
             "data": alert.to_dict(),
@@ -90,22 +87,18 @@ def update_alert(alert_id: int):
     try:
         data = request.get_json()
         db: Session = next(get_db())
-        alert = db.query(Alert).filter(Alert.id == alert_id).first()
-        if alert:
-            for key, value in data.items():
-                if hasattr(alert, key):
-                    setattr(alert, key, value)
-            db.commit()
-            db.refresh(alert)
-            return jsonify({
-                "status": "success",
-                "data": alert.to_dict(),
-                "message": "Alert updated successfully",
-                "version": "v1"
-            })
+        alert = AlertService.update(db, alert_id, data)
+        return jsonify({
+            "status": "success",
+            "data": alert.to_dict(),
+            "message": "Alert updated successfully",
+            "version": "v1"
+        })
+    except ValueError as e:
+        logger.error(f"Alert not found {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Alert not found"},
+            "error": {"message": str(e)},
             "version": "v1"
         }), 404
     except Exception as e:
@@ -123,18 +116,17 @@ def delete_alert(alert_id: int):
     """מחיקת התראה"""
     try:
         db: Session = next(get_db())
-        alert = db.query(Alert).filter(Alert.id == alert_id).first()
-        if alert:
-            db.delete(alert)
-            db.commit()
-            return jsonify({
-                "status": "success",
-                "message": "Alert deleted successfully",
-                "version": "v1"
-            })
+        AlertService.delete(db, alert_id)
+        return jsonify({
+            "status": "success",
+            "message": "Alert deleted successfully",
+            "version": "v1"
+        })
+    except ValueError as e:
+        logger.error(f"Alert not found {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Alert not found"},
+            "error": {"message": str(e)},
             "version": "v1"
         }), 404
     except Exception as e:
@@ -142,6 +134,108 @@ def delete_alert(alert_id: int):
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()
+
+@alerts_bp.route('/<int:alert_id>/trigger', methods=['POST'])
+def mark_as_triggered(alert_id: int):
+    """סימון התראה כמופעלת (new)"""
+    try:
+        db: Session = next(get_db())
+        alert = AlertService.mark_as_triggered(db, alert_id)
+        return jsonify({
+            "status": "success",
+            "data": alert.to_dict(),
+            "message": "Alert marked as triggered successfully",
+            "version": "v1"
+        })
+    except ValueError as e:
+        logger.error(f"Alert not found {alert_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 404
+    except Exception as e:
+        logger.error(f"Error marking alert {alert_id} as triggered: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 400
+    finally:
+        db.close()
+
+@alerts_bp.route('/<int:alert_id>/read', methods=['POST'])
+def mark_as_read(alert_id: int):
+    """סימון התראה כנקראה (true)"""
+    try:
+        db: Session = next(get_db())
+        alert = AlertService.mark_as_read(db, alert_id)
+        return jsonify({
+            "status": "success",
+            "data": alert.to_dict(),
+            "message": "Alert marked as read successfully",
+            "version": "v1"
+        })
+    except ValueError as e:
+        logger.error(f"Alert not found {alert_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 404
+    except Exception as e:
+        logger.error(f"Error marking alert {alert_id} as read: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 400
+    finally:
+        db.close()
+
+@alerts_bp.route('/unread', methods=['GET'])
+def get_unread_alerts():
+    """קבלת התראות שלא נקראו (new)"""
+    try:
+        db: Session = next(get_db())
+        alerts = AlertService.get_unread_alerts(db)
+        return jsonify({
+            "status": "success",
+            "data": [alert.to_dict() for alert in alerts],
+            "message": "Unread alerts retrieved successfully",
+            "version": "v1"
+        })
+    except Exception as e:
+        logger.error(f"Error getting unread alerts: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to retrieve unread alerts"},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()
+
+@alerts_bp.route('/active', methods=['GET'])
+def get_active_alerts():
+    """קבלת התראות פעילות (is_triggered = false)"""
+    try:
+        db: Session = next(get_db())
+        alerts = AlertService.get_active_alerts(db)
+        return jsonify({
+            "status": "success",
+            "data": [alert.to_dict() for alert in alerts],
+            "message": "Active alerts retrieved successfully",
+            "version": "v1"
+        })
+    except Exception as e:
+        logger.error(f"Error getting active alerts: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to retrieve active alerts"},
             "version": "v1"
         }), 500
     finally:

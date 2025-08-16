@@ -423,6 +423,65 @@ async function updateTickerFromModal() {
 }
 
 /**
+ * עדכון טבלת טיקרים בדף database.html
+ * הפונקציה מעדכנת את הטבלה עם נתוני הטיקרים
+ * 
+ * @param {Array} tickers - מערך של טיקרים
+ * 
+ * @example
+ * updateTickersTable(tickers);
+ */
+function updateTickersTable(tickers) {
+    console.log('🔄 מעדכן טבלת טיקרים עם', tickers.length, 'טיקרים');
+    
+    const tbody = document.querySelector('#tickersTable tbody');
+    if (!tbody) {
+        console.error('❌ לא נמצא tbody לטבלת טיקרים');
+        return;
+    }
+    
+    tbody.innerHTML = tickers.map(ticker => `
+        <tr>
+            <td>${ticker.id}</td>
+            <td>${ticker.symbol || '-'}</td>
+            <td>${ticker.name || '-'}</td>
+            <td>${ticker.sector || '-'}</td>
+            <td>${ticker.industry || '-'}</td>
+            <td>${ticker.currency || '-'}</td>
+            <td>${window.convertTickerStatusToHebrew(ticker.status)}</td>
+            <td>${ticker.notes || '-'}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="showEditTickerModal(${JSON.stringify(ticker).replace(/"/g, '&quot;')})">ערוך</button>
+                <button class="btn btn-sm btn-warning" onclick="cancelTicker(${ticker.id}, '${ticker.name || ticker.symbol}')">ביטול</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id}, '${ticker.name || ticker.symbol}')">מחק</button>
+            </td>
+        </tr>
+    `).join('');
+    
+    // עדכון ספירת רשומות
+    const countElement = document.getElementById('tickersCount');
+    if (countElement) {
+        countElement.textContent = `${tickers.length} טיקרים`;
+    }
+    
+    // הצגת הטבלה אם היא מוסתרת
+    const section = document.getElementById('tickersSection');
+    const container = document.getElementById('tickersContainer');
+    const footer = document.querySelector('#tickersSection .table-footer');
+    const icon = document.querySelector('#tickersSection .filter-icon');
+    
+    if (section && section.classList.contains('collapsed')) {
+        section.classList.remove('collapsed');
+        if (container) container.style.display = 'block';
+        if (footer) footer.style.display = 'block';
+        if (icon) icon.textContent = '▲';
+        localStorage.setItem('tickersSectionOpen', 'true');
+    }
+    
+    console.log('✅ טבלת טיקרים עודכנה בהצלחה');
+}
+
+/**
  * רענון טבלת טיקרים
  * הפונקציה מרעננת את טבלת הטיקרים עם נתונים עדכניים
  * 
@@ -493,6 +552,7 @@ window.showAddTickerModal = showAddTickerModal;
 window.showEditTickerModal = showEditTickerModal;
 window.saveTicker = saveTicker;
 window.updateTickerFromModal = updateTickerFromModal;
+window.updateTickersTable = updateTickersTable;
 window.refreshTickersTable = refreshTickersTable;
 window.showNotification = showNotification;
 

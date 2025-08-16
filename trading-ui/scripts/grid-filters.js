@@ -1,151 +1,11 @@
 // ===== GRID FILTERS SYSTEM =====
 // קובץ ייעודי למערכת הפילטרים - משותף לכל הדפים
 
-// פונקציה להחלת פילטר סטטוס, סוג וחשבונות על הגריד
-function applyStatusFilterToGrid(selectedStatuses, selectedTypes = null, selectedAccounts = null) {
-  if (!window.gridApi) {
-    console.log('Grid API not available yet');
-    return;
-  }
 
-  console.log('=== applyStatusFilterToGrid called ===');
-  console.log('Selected statuses:', selectedStatuses);
-  console.log('Selected types:', selectedTypes);
-  console.log('Selected accounts:', selectedAccounts);
-  console.log('Window rowData length:', window.rowData ? window.rowData.length : 'undefined');
 
-  try {
-    let filteredData = window.rowData || [];
-    console.log('Initial data length:', filteredData.length);
-    
-    // סינון לפי סטטוס
-    if (selectedStatuses && selectedStatuses.length > 0 && selectedStatuses.length < 3) {
-      console.log('Applying status filter for:', selectedStatuses);
-      filteredData = filteredData.filter(row => selectedStatuses.includes(row.status));
-      console.log('Status filter applied, showing', filteredData.length, 'rows');
-    } else {
-      console.log('No status filter applied');
-    }
-    
-    // סינון לפי סוג
-    if (selectedTypes && selectedTypes.length > 0 && selectedTypes.length < 4) {
-      console.log('Applying type filter for:', selectedTypes);
-      filteredData = filteredData.filter(row => selectedTypes.includes(row.type));
-      console.log('Type filter applied, showing', filteredData.length, 'rows');
-    } else {
-      console.log('No type filter applied');
-    }
-    
-    // סינון לפי חשבון
-    if (selectedAccounts && selectedAccounts.length > 0) {
-      console.log('Applying account filter for:', selectedAccounts);
-      filteredData = filteredData.filter(row => selectedAccounts.includes(row.account));
-      console.log('Account filter applied, showing', filteredData.length, 'rows');
-    } else {
-      console.log('No account filter applied');
-    }
-    
-    window.gridApi.setGridOption('rowData', filteredData);
-    console.log('Final filtered data:', filteredData.length, 'rows');
-    console.log('=== applyStatusFilterToGrid completed ===');
-    
-  } catch (error) {
-    console.error('Error updating grid data:', error);
-    console.log('Grid API methods available:', Object.keys(window.gridApi));
-  }
-}
 
-// פונקציה לעדכון הגריד מהקומפוננטה
-function updateGridFromComponent(selectedStatuses, selectedTypes = null, selectedAccounts = null) {
-  console.log('=== updateGridFromComponent called ===');
-  console.log('Selected statuses:', selectedStatuses);
-  console.log('Selected types:', selectedTypes);
-  console.log('Selected accounts:', selectedAccounts);
-  applyStatusFilterToGrid(selectedStatuses, selectedTypes, selectedAccounts);
-  console.log('=== updateGridFromComponent completed ===');
-}
 
-// פונקציה להחלת כל הפילטרים ביחד
-function applyAllFiltersToGrid(selectedStatuses, selectedAccounts = null, selectedDateRange = null) {
-  if (!window.gridApi) {
-    console.log('Grid API not available yet');
-    return;
-  }
 
-  console.log('Applying all filters to grid:', { selectedStatuses, selectedAccounts, selectedDateRange });
-
-  try {
-    let currentData = window.rowData || [];
-    
-    // סינון לפי סטטוס
-    if (selectedStatuses && selectedStatuses.length > 0 && selectedStatuses.length < 3) {
-      currentData = currentData.filter(row => selectedStatuses.includes(row.status));
-      console.log('Status filter applied, showing', currentData.length, 'rows');
-    }
-    
-    // סינון לפי חשבון
-    if (selectedAccounts && selectedAccounts.length > 0) {
-      currentData = currentData.filter(row => selectedAccounts.includes(row.account));
-      console.log('Account filter applied, showing', currentData.length, 'rows');
-    }
-    
-    // סינון לפי טווח תאריכים
-    if (selectedDateRange && selectedDateRange !== 'הכול') {
-      const now = new Date();
-      let startDate = new Date();
-      
-      switch (selectedDateRange) {
-        case 'שבוע':
-          startDate.setDate(now.getDate() - 7);
-          break;
-        case 'MTD':
-          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-          break;
-        case '30 יום':
-          startDate.setDate(now.getDate() - 30);
-          break;
-        case '60 יום':
-          startDate.setDate(now.getDate() - 60);
-          break;
-        case '90 יום':
-          startDate.setDate(now.getDate() - 90);
-          break;
-        case 'שנה':
-          startDate.setFullYear(now.getFullYear() - 1);
-          break;
-        case 'YTD':
-          startDate = new Date(now.getFullYear(), 0, 1);
-          break;
-        case 'שנה קודמת':
-          startDate = new Date(now.getFullYear() - 1, 0, 1);
-          const endDate = new Date(now.getFullYear() - 1, 11, 31);
-          break;
-        default:
-          console.log('Unknown date range:', selectedDateRange);
-          break;
-      }
-      
-      currentData = currentData.filter(row => {
-        const dateField = row.date || row.created_at || row.opened_at;
-        if (!dateField) return false;
-        const rowDate = new Date(dateField);
-        return rowDate >= startDate && rowDate <= now;
-      });
-      console.log('Date range filter applied:', selectedDateRange, 'showing', currentData.length, 'rows');
-    }
-    
-    window.gridApi.setGridOption('rowData', currentData);
-    
-    // עדכון סטטיסטיקות בהתאם לנתונים המוצגים (תמיד בסוף התהליך)
-    setTimeout(() => {
-      updateSummaryStats(); // לא מעבירים נתונים - הפונקציה תקבל את הנתונים המוצגים מהגריד
-    }, 100);
-    
-  } catch (error) {
-    console.error('Error updating grid data:', error);
-    console.log('Grid API methods available:', Object.keys(window.gridApi));
-  }
-}
 
 // פונקציה להחלת פילטר תאריכים על הגריד
 function applyDateRangeFilterToGrid(selectedDateRange) {
@@ -503,10 +363,6 @@ function initializeFilterSystem() {
 }
 
 // הפיכת הפונקציות לזמינות גלובלית
-window.applyStatusFilterToGrid = applyStatusFilterToGrid;
-window.applyDateRangeFilterToGrid = applyDateRangeFilterToGrid;
-window.applyAllFiltersToGrid = applyAllFiltersToGrid;
-window.updateGridFromComponent = updateGridFromComponent;
 window.loadSavedFilters = loadSavedFilters;
 window.loadSavedStatusFilter = loadSavedStatusFilter;
 window.updateHeaderComponentWithFilter = updateHeaderComponentWithFilter;
@@ -517,7 +373,6 @@ window.applyTestFilter = applyTestFilter;
 window.updateBackgroundPadding = updateBackgroundPadding;
 window.setupHeaderListener = setupHeaderListener;
 window.testFilterManually = testFilterManually;
-window.testGridAPI = testGridAPI;
 window.testComponentFilter = testComponentFilter;
 window.applyStatusFilter = applyStatusFilter;
 window.clearStatusFilter = clearStatusFilter;
@@ -540,7 +395,7 @@ function loadSavedFiltersForPage(pageName) {
     statuses: savedStatuses,
     types: savedTypes,
     accounts: savedAccounts,
-    dateRanges: savedDateRanges,
+    dateRange: savedDateRange,
     search: savedSearch
   });
   
@@ -763,13 +618,7 @@ function filterDataByFilters(data, pageName) {
     filteredData = filteredData.filter(item => {
       let itemStatus;
       if (pageName === 'designs') {
-        if (item.status === 'canceled') {
-          itemStatus = 'מבוטל';
-        } else if (item.status === 'closed') {
-          itemStatus = 'סגור';
-        } else {
-          itemStatus = 'פתוח';
-        }
+        itemStatus = item.status === 'canceled' ? 'מבוטל' : 'פתוח';
       } else if (pageName === 'planning') {
         itemStatus = item.canceled_at ? 'מבוטל' : 'פתוח';
       } else {

@@ -13,6 +13,7 @@ class Alert(BaseModel):
     message = Column(String(500), nullable=True)
     is_active = Column(Boolean, default=True, nullable=True)
     triggered_at = Column(DateTime, nullable=True)
+    is_triggered = Column(String(20), default='false', nullable=True)  # false, new, true
     
     # יחסים
     account = relationship("Account", back_populates="alerts")

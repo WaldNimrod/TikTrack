@@ -28,7 +28,8 @@
   <script src="scripts/grid-init.js"></script>
   <script src="scripts/accounts.js"></script>
   <script src="scripts/tickers.js"></script>
-  <script src="scripts/alerts.js"></script>
+      <script src="scripts/alerts.js"></script>
+    <script src="scripts/notes.js"></script>
   <script src="scripts/executions.js"></script>
 
   <style>
@@ -431,13 +432,14 @@
                 <th>תנאי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Condition</span></th>
                 <th>הודעה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Message</span></th>
                 <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
+                <th>הופעל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Is Triggered</span></th>
                 <th>הופעל ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Triggered At</span></th>
                 <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="9" class="loading">טוען התראות...</td>
+                <td colspan="10" class="loading">טוען התראות...</td>
               </tr>
             </tbody>
           </table>
@@ -1123,6 +1125,18 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAlertIsTriggered" class="form-label">הופעל (Is Triggered)</label>
+                  <select class="form-control" id="editAlertIsTriggered" required>
+                    <option value="false">לא הופעל</option>
+                    <option value="new">חדש</option>
+                    <option value="true">נקרא</option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -1184,6 +1198,18 @@
                     <option value="פתוח">פתוח</option>
                     <option value="סגור">סגור</option>
                     <option value="מבוטל">מבוטל</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="alertIsTriggered" class="form-label">הופעל (Is Triggered)</label>
+                  <select class="form-control" id="alertIsTriggered" required>
+                    <option value="false">לא הופעל</option>
+                    <option value="new">חדש</option>
+                    <option value="true">נקרא</option>
                   </select>
                 </div>
               </div>
@@ -1470,95 +1496,7 @@
   <!-- Authentication System -->
   
   <script>
-    // פונקציה לחיפוש בטבלאות
-    function filterTable(tableId, searchTerm) {
-      const table = document.getElementById(tableId);
-      if (!table) return;
-      
-      const tbody = table.querySelector('tbody');
-      if (!tbody) return;
-      
-      const rows = tbody.querySelectorAll('tr');
-      const term = searchTerm.toLowerCase().trim();
-      
-      rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        let found = false;
-        
-        cells.forEach(cell => {
-          const text = cell.textContent.toLowerCase();
-          if (text.includes(term)) {
-            found = true;
-          }
-        });
-        
-        if (found || term === '') {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
-      
-      // עדכון ספירה
-      updateTableCount(tableId);
-    }
-    
-    // פונקציה לעדכון ספירת שורות בטבלה
-    function updateTableCount(tableId) {
-      const table = document.getElementById(tableId);
-      if (!table) return;
-      
-      const tbody = table.querySelector('tbody');
-      if (!tbody) return;
-      
-      const visibleRows = Array.from(tbody.querySelectorAll('tr')).filter(row => 
-        row.style.display !== 'none'
-      ).length;
-      
-      // עדכון הספירה בהתאם לטבלה
-      const countElement = getCountElementForTable(tableId);
-      if (countElement) {
-        const tableName = getTableNameForTable(tableId);
-        countElement.textContent = `${visibleRows} ${tableName}`;
-      }
-    }
-    
-    // פונקציה לקבלת אלמנט הספירה המתאים
-    function getCountElementForTable(tableId) {
-      const countMap = {
-        'usersTable': 'usersCount',
-        'accountsTable': 'accountsCount',
-        'tickersTable': 'tickersCount',
-        'tradesTable': 'tradesCount',
-        'tradePlansTable': 'tradePlansCount',
-        'alertsTable': 'alertsCount',
-        'cashFlowsTable': 'cashFlowsCount',
-        'notesTable': 'notesCount',
-        'executionsTable': 'executionsCount',
-        'userRolesTable': 'userRolesCount'
-      };
-      
-      const countId = countMap[tableId];
-      return countId ? document.getElementById(countId) : null;
-    }
-    
-    // פונקציה לקבלת שם הטבלה
-    function getTableNameForTable(tableId) {
-      const nameMap = {
-        'usersTable': 'משתמשים',
-        'accountsTable': 'חשבונות',
-        'tickersTable': 'טיקרים',
-        'tradesTable': 'טריידים',
-        'tradePlansTable': 'תוכניות טרייד',
-        'alertsTable': 'התראות',
-        'cashFlowsTable': 'תזרימי מזומנים',
-        'notesTable': 'הערות',
-        'executionsTable': 'ביצועים',
-        'userRolesTable': 'תפקידי משתמשים'
-      };
-      
-      return nameMap[tableId] || '';
-    }
+
 
     // פונקציה לטעינת נתוני הדשבורד
     function loadDashboardData() {
@@ -1604,82 +1542,42 @@
     // Data loading functions
     async function loadUserRoles() {
         try {
-            const response = await apiCall('/api/v1/user_roles/');
-            const tbody = document.querySelector('#userRolesTable tbody');
-            
-            if (response.status === 'success' && response.data) {
-                const userRoles = response.data;
-                document.getElementById('userRolesCount').textContent = `${userRoles.length} רשומות`;
-                
-                tbody.innerHTML = userRoles.map(userRole => `
-                    <tr>
-                        <td>${userRole.id}</td>
-                        <td>${userRole.user_id}</td>
-                        <td>${userRole.user_username}</td>
-                        <td>${userRole.role_id}</td>
-                        <td>${userRole.role_name}</td>
-                        <td>${userRole.assigned_at || 'לא מוגדר'}</td>
-                        <td>${userRole.created_at || 'לא מוגדר'}</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary" onclick="editRecord('user_roles', ${userRole.id})">ערוך</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteRecord('user_roles', ${userRole.id})">מחק</button>
-                        </td>
-                    </tr>
-                `).join('');
-            } else {
-                tbody.innerHTML = '<tr><td colspan="8" class="error">שגיאה בטעינת תפקידי משתמשים</td></tr>';
-                document.getElementById('userRolesCount').textContent = 'שגיאה';
+            // הסתרת הטבלה כי אין endpoint
+            const container = document.getElementById('userRolesContainer');
+            if (container) {
+                container.style.display = 'none';
+            }
+            const section = document.getElementById('userRolesSection');
+            if (section) {
+                section.style.display = 'none';
             }
         } catch (error) {
-            console.error('Error loading user roles:', error);
-            const tbody = document.querySelector('#userRolesTable tbody');
-            tbody.innerHTML = '<tr><td colspan="8" class="error">שגיאה בטעינת תפקידי משתמשים</td></tr>';
-            document.getElementById('userRolesCount').textContent = 'שגיאה';
+            console.error('Error hiding user roles section:', error);
         }
     }
 
     async function loadUsers() {
       try {
-        console.log('🔄 טוען משתמשים...');
-        const response = await apiCall('/api/v1/users/');
-        const users = response.data;
-        
-        const tbody = document.querySelector('#usersTable tbody');
-        tbody.innerHTML = users.map(user => `
-          <tr>
-            <td>${user.id}</td>
-            <td>${user.username || '-'}</td>
-            <td>${user.email || '-'}</td>
-            <td>${user.is_active ? 'כן' : 'לא'}</td>
-            <td>${user.roles ? user.roles.join(', ') : '-'}</td>
-            <td>${formatDateTime(user.last_login)}</td>
-            <td>${formatDateTime(user.created_at)}</td>
-            <td>
-              <button class="btn btn-sm btn-primary" onclick="editRecord('users', ${user.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteRecord('users', ${user.id})">מחק</button>
-            </td>
-          </tr>
-        `).join('');
-        
-        // עדכון ספירת רשומות
-        document.getElementById('usersCount').textContent = `${users.length} משתמשים`;
-        
+        // הסתרת הטבלה כי אין endpoint
+        const container = document.getElementById('usersContainer');
+        if (container) {
+            container.style.display = 'none';
+        }
+        const section = document.getElementById('usersSection');
+        if (section) {
+            section.style.display = 'none';
+        }
       } catch (error) {
-        console.error('❌ שגיאה בטעינת משתמשים:', error);
-        document.querySelector('#usersTable tbody').innerHTML = `<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת משתמשים: ${error.message}</td></tr>`;
-        document.getElementById('usersCount').textContent = 'שגיאה';
+        console.error('Error hiding users section:', error);
       }
     }
 
     async function loadAccounts() {
       try {
         console.log('🔄 טוען חשבונות...');
-        console.log('🔍 בדיקת זמינות apiCall:', typeof apiCall);
-        console.log('🔍 בדיקת זמינות loadAccountsData:', typeof loadAccountsData);
         
-        const accounts = await loadAccountsData();
-        console.log('📊 חשבונות שהתקבלו:', accounts);
-        updateAccountsTable(accounts);
+        const accounts = await window.loadAccountsData();
+        window.updateAccountsTable(accounts);
         
       } catch (error) {
         console.error('❌ שגיאה בטעינת חשבונות:', error);
@@ -1688,42 +1586,122 @@
       }
     }
 
-    function updateAccountsTable(accounts) {
-      const tbody = document.querySelector('#accountsTable tbody');
-      tbody.innerHTML = accounts.map(account => `
-        <tr>
-          <td>${account.id}</td>
-          <td>${account.name || '-'}</td>
-          <td>${account.currency || '-'}</td>
-          <td>${convertAccountStatusToHebrew(account.status)}</td>
-          <td>${formatCurrency(account.cash_balance)}</td>
-          <td>${formatCurrency(account.total_value)}</td>
-          <td>${formatCurrency(account.total_pl)}</td>
-          <td>${account.notes || '-'}</td>
-          <td>
-            <button class="btn btn-sm btn-primary" onclick="showEditAccountModal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך חשבון">ערוך</button>
-            <button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id}, '${account.name}')" title="בטל חשבון">ביטול</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק חשבון">מחק</button>
-          </td>
-        </tr>
-      `).join('');
-      
-      // עדכון ספירת רשומות
-      document.getElementById('accountsCount').textContent = `${accounts.length} חשבונות`;
-    }
+
 
     function updateAccountsStats(stats) {
       // עדכון סטטיסטיקות אם יש
       console.log('📊 סטטיסטיקות חשבונות:', stats);
     }
 
+    // פונקציות הצגת מודלים להוספה - משתמשות בפונקציות הכלליות
+    function showAddAccountModal() {
+      // TODO: Implement add account modal
+      alert('פונקציית הוספת חשבון תתווסף בקרוב');
+    }
+
+    function showAddTickerModal() {
+      const modal = new bootstrap.Modal(document.getElementById('addTickerModal'));
+      modal.show();
+    }
+
+    function showAddTradeModal() {
+      // TODO: Implement add trade modal
+      alert('פונקציית הוספת טרייד תתווסף בקרוב');
+    }
+
+    function showAddTradePlanModal() {
+      // TODO: Implement add trade plan modal
+      alert('פונקציית הוספת תוכנית טרייד תתווסף בקרוב');
+    }
+
+    function showAddAlertModal() {
+      const modal = new bootstrap.Modal(document.getElementById('addAlertModal'));
+      modal.show();
+    }
+
+    function showAddCashFlowModal() {
+      // TODO: Implement add cash flow modal
+      alert('פונקציית הוספת תזרים מזומנים תתווסף בקרוב');
+    }
+
+    function showAddNoteModal() {
+      window.showAddNoteModal();
+    }
+
+    function showAddExecutionModal() {
+      const modal = new bootstrap.Modal(document.getElementById('addExecutionModal'));
+      modal.show();
+    }
+
+    function showAddUserModal() {
+      // TODO: Implement add user modal
+      alert('פונקציית הוספת משתמש תתווסף בקרוב');
+    }
+
+    function showAddUserRoleModal() {
+      // TODO: Implement add user role modal
+      alert('פונקציית הוספת תפקיד משתמש תתווסף בקרוב');
+    }
+
+    // פונקציות הצגת מודלים לעריכה - משתמשות בפונקציות הכלליות
+    function showEditAccountModal(account) {
+      // TODO: Implement edit account modal
+      alert('פונקציית עריכת חשבון תתווסף בקרוב');
+    }
+
+    function showEditTradeModal(trade) {
+      // TODO: Implement edit trade modal
+      alert('פונקציית עריכת טרייד תתווסף בקרוב');
+    }
+
+    function showEditTradePlanModal(plan) {
+      // TODO: Implement edit trade plan modal
+      alert('פונקציית עריכת תוכנית טרייד תתווסף בקרוב');
+    }
+
+    function showEditCashFlowsModal(cashFlow) {
+      // TODO: Implement edit cash flow modal
+      alert('פונקציית עריכת תזרים מזומנים תתווסף בקרוב');
+    }
+
+    function showEditNotesModal(note) {
+      window.showEditNoteModal(note);
+    }
+
+    function showEditUsersModal(user) {
+      // TODO: Implement edit user modal
+      alert('פונקציית עריכת משתמש תתווסף בקרוב');
+    }
+
+    function showEditUserRolesModal(userRole) {
+      // TODO: Implement edit user role modal
+      alert('פונקציית עריכת תפקיד משתמש תתווסף בקרוב');
+    }
+
+    // פונקציות ביטול ומחיקה - משתמשות בפונקציות הכלליות
+    async function cancelAccount(accountId, accountName) {
+      // TODO: Implement cancel account
+      alert('פונקציית ביטול חשבון תתווסף בקרוב');
+    }
+
+    async function deleteAccount(accountId, accountName) {
+      // TODO: Implement delete account
+      alert('פונקציית מחיקת חשבון תתווסף בקרוב');
+    }
+
+    async function cancelNote(noteId, noteTitle) {
+      await window.cancelNote(noteId, noteTitle);
+    }
+
+    async function deleteNote(noteId, noteTitle) {
+      await window.deleteNote(noteId, noteTitle);
+    }
+
     async function loadTickers() {
       try {
         console.log('🔄 טוען טיקרים...');
-        const response = await apiCall('/api/v1/tickers/');
-        const tickers = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
-        
-        updateTickersTable(tickers);
+        const tickers = await window.loadTickersData();
+        window.updateTickersTable(tickers);
         
       } catch (error) {
         console.error('Error loading tickers:', error);
@@ -1731,45 +1709,17 @@
       }
     }
 
-    function updateTickersTable(tickers) {
-      const tbody = document.querySelector('#tickersTable tbody');
-      tbody.innerHTML = tickers.map(ticker => `
-        <tr>
-          <td>${ticker.id}</td>
-          <td>${ticker.symbol || '-'}</td>
-          <td>${ticker.name || '-'}</td>
-          <td>${ticker.sector || '-'}</td>
-          <td>${ticker.industry || '-'}</td>
-          <td>${ticker.currency || '-'}</td>
-          <td>${convertTickerStatusToHebrew(ticker.status)}</td>
-          <td>${ticker.notes || '-'}</td>
-          <td>
-            <button class="btn btn-sm btn-primary" onclick="showEditTickerModal(${JSON.stringify(ticker).replace(/"/g, '&quot;')})">ערוך</button>
-            <button class="btn btn-sm btn-warning" onclick="cancelTicker(${ticker.id}, '${ticker.name || ticker.symbol}')">ביטול</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id}, '${ticker.name || ticker.symbol}')">מחק</button>
-          </td>
-        </tr>
-      `).join('');
-      
-      // עדכון ספירת רשומות
-      document.getElementById('tickersCount').textContent = `${tickers.length} טיקרים`;
-    }
+
 
     function updateTickersStats(stats) {
       // עדכון סטטיסטיקות אם יש
       console.log('📊 סטטיסטיקות טיקרים:', stats);
     }
 
-    function showNotification(message, type = 'info') {
-      // הצגה פשוטה של הודעות
-      console.log(`${type.toUpperCase()}: ${message}`);
-      alert(message);
-    }
-
     async function showOpenTradesWarning(accountName, openTrades, action = 'cancel') {
       try {
         // קבלת כל הטיקרים
-        const tickersResponse = await apiCall('/api/v1/tickers/');
+        const tickersResponse = await window.apiCall('/api/v1/tickers/');
         const tickers = tickersResponse.data || tickersResponse || [];
         
         // יצירת מפה של ticker_id -> symbol
@@ -1781,7 +1731,7 @@
         // יצירת תוכן הטבלה
         const tableRows = openTrades.map(trade => {
           const symbol = tickerMap[trade.ticker_id] || trade.ticker_id;
-          const openDate = formatDateTime(trade.opened_at);
+          const openDate = window.formatDateTime(trade.opened_at);
           return `
             <tr>
               <td>${symbol}</td>
@@ -1830,7 +1780,7 @@
     async function loadTrades() {
       try {
         console.log('🔄 טוען טריידים...');
-        const response = await apiCall('/api/v1/trades/');
+        const response = await window.apiCall('/api/v1/trades/');
         const trades = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
         
         const tbody = document.querySelector('#tradesTable tbody');
@@ -1842,9 +1792,9 @@
             <td>${trade.trade_plan_id || '-'}</td>
             <td>${trade.status || '-'}</td>
             <td>${trade.type || '-'}</td>
-            <td>${formatDateTime(trade.opened_at)}</td>
-            <td>${formatDateTime(trade.closed_at)}</td>
-            <td>${formatCurrency(trade.total_pl)}</td>
+            <td>${window.formatDateTime(trade.opened_at)}</td>
+            <td>${window.formatDateTime(trade.closed_at)}</td>
+            <td>${window.formatCurrency(trade.total_pl)}</td>
             <td>${trade.notes || '-'}</td>
             <td>
               <button class="btn btn-sm btn-primary" onclick="editRecord('trades', ${trade.id})">ערוך</button>
@@ -1865,23 +1815,30 @@
     async function loadTradePlans() {
       try {
         console.log('🔄 טוען תוכניות טרייד...');
-        const response = await apiCall('/api/v1/trade_plans/');
-        const plans = response; // השרת מחזיר מערך ישירות
+        const response = await window.apiCall('/api/v1/tradeplans/');
+        console.log('📊 תגובה מה-API:', response);
+        const plans = response.data || response; // השרת מחזיר מערך ישירות
+        console.log('📊 תוכניות טרייד:', plans);
         
         const tbody = document.querySelector('#tradePlansTable tbody');
+        if (!tbody) {
+          console.error('❌ לא נמצא tbody לטבלת תוכניות טרייד');
+          return;
+        }
+        
         tbody.innerHTML = plans.map(plan => `
           <tr>
             <td>${plan.id}</td>
             <td>${plan.account_id || '-'}</td>
             <td>${plan.ticker_id || '-'}</td>
             <td>${plan.investment_type || '-'}</td>
-            <td>${formatCurrency(plan.planned_amount)}</td>
+            <td>${window.formatCurrency(plan.planned_amount)}</td>
             <td>${plan.entry_conditions || '-'}</td>
-            <td>${formatCurrency(plan.stop_price)}</td>
-            <td>${formatCurrency(plan.target_price)}</td>
+            <td>${window.formatCurrency(plan.stop_price)}</td>
+            <td>${window.formatCurrency(plan.target_price)}</td>
             <td>${plan.reasons || '-'}</td>
-            <td>${formatDateTime(plan.created_at)}</td>
-            <td>${formatDateTime(plan.canceled_at)}</td>
+            <td>${window.formatDateTime(plan.created_at)}</td>
+            <td>${window.formatDateTime(plan.canceled_at)}</td>
             <td>${plan.cancel_reason || '-'}</td>
             <td>
               <button class="btn btn-sm btn-primary" onclick="editRecord('trade_plans', ${plan.id})">ערוך</button>
@@ -1891,25 +1848,45 @@
         `).join('');
         
         // עדכון ספירת רשומות
-        document.getElementById('tradePlansCount').textContent = `${plans.length} תוכניות טרייד`;
+        const countElement = document.getElementById('tradePlansCount');
+        if (countElement) {
+          countElement.textContent = `${plans.length} תוכניות טרייד`;
+        }
+        
+        console.log('✅ תוכניות טרייד נטענו בהצלחה');
+        
+        // הצגת הטבלה אם היא מוסתרת
+        const section = document.getElementById('tradePlansSection');
+        const container = document.getElementById('tradePlansContainer');
+        const footer = document.querySelector('#tradePlansSection .table-footer');
+        const icon = document.querySelector('#tradePlansSection .filter-icon');
+        
+        if (section && section.classList.contains('collapsed')) {
+          section.classList.remove('collapsed');
+          if (container) container.style.display = 'block';
+          if (footer) footer.style.display = 'block';
+          if (icon) icon.textContent = '▲';
+          localStorage.setItem('tradePlansSectionOpen', 'true');
+        }
         
       } catch (error) {
-        console.error('Error loading trade plans:', error);
-        document.querySelector('#tradePlansTable tbody').innerHTML = '<tr><td colspan="13" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        console.error('❌ שגיאה בטעינת תוכניות טרייד:', error);
+        const tbody = document.querySelector('#tradePlansTable tbody');
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="13" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        }
       }
     }
 
     async function loadAlerts() {
       try {
         console.log('🔄 טוען התראות...');
-        const response = await apiCall('/api/v1/alerts/');
-        const alerts = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
-        
-        updateAlertsTable(alerts);
+        const alerts = await window.loadAlertsData();
+        window.updateAlertsTable(alerts);
         
       } catch (error) {
-        console.error('Error loading alerts:', error);
-        document.querySelector('#alertsTable tbody').innerHTML = '<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        console.error('❌ שגיאה בטעינת התראות:', error);
+        document.querySelector('#alertsTable tbody').innerHTML = '<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
       }
     }
 
@@ -1923,12 +1900,15 @@
           <td>${alert.type || '-'}</td>
           <td>${alert.condition || '-'}</td>
           <td>${alert.message || '-'}</td>
-          <td>${convertAlertStatusToHebrew(alert.status)}</td>
-          <td>${formatDateTime(alert.triggered_at)}</td>
+          <td>${window.convertAlertStatusToHebrew(alert.status)}</td>
+          <td>${window.convertIsTriggeredToHebrew(alert.is_triggered)}</td>
+          <td>${window.formatDateTime(alert.triggered_at)}</td>
           <td>
             <button class="btn btn-sm btn-primary" onclick="showEditAlertModal(${JSON.stringify(alert).replace(/"/g, '&quot;')})">ערוך</button>
             <button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id}, '${alert.type}')">ביטול</button>
             <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id}, '${alert.type}')">מחק</button>
+            <button class="btn btn-sm btn-info" onclick="markAlertAsTriggered(${alert.id})" title="סמן כמופעלת">🔔</button>
+            <button class="btn btn-sm btn-success" onclick="markAlertAsRead(${alert.id})" title="סמן כנקראה">📖</button>
           </td>
         </tr>
       `).join('');
@@ -1937,38 +1917,40 @@
       document.getElementById('alertsCount').textContent = `${alerts.length} התראות`;
     }
 
-    function convertAlertStatusToHebrew(status) {
-      if (status === 'active' || status === 'פעיל' || status === 'open') {
-        return 'פתוח';
-      } else if (status === 'inactive' || status === 'לא פעיל' || status === 'closed') {
-        return 'סגור';
-      } else if (status === 'cancelled' || status === 'בוטל') {
-        return 'מבוטל';
-      }
-      return status || 'פתוח';
-    }
+
+
+
 
     function updateAlertsStats(stats) {
       // עדכון סטטיסטיקות אם יש
       console.log('📊 סטטיסטיקות התראות:', stats);
     }
 
+
+
     async function loadCashFlows() {
       try {
         console.log('🔄 טוען תזרימי מזומנים...');
-        const response = await apiCall('/api/v1/cash_flows/');
-        const cashFlows = response; // השרת מחזיר מערך ישירות
+        const response = await window.apiCall('/api/v1/cash_flows/');
+        console.log('📊 תגובה מה-API:', response);
+        const cashFlows = response.data || response; // השרת מחזיר מערך ישירות
+        console.log('📊 תזרימי מזומנים:', cashFlows);
         
         const tbody = document.querySelector('#cashFlowsTable tbody');
+        if (!tbody) {
+          console.error('❌ לא נמצא tbody לטבלת תזרימי מזומנים');
+          return;
+        }
+        
         tbody.innerHTML = cashFlows.map(cf => `
           <tr>
             <td>${cf.id}</td>
             <td>${cf.account_id}</td>
             <td>${cf.type}</td>
-            <td>${formatCurrency(cf.amount)}</td>
-            <td>${formatDate(cf.date)}</td>
+            <td>${window.formatCurrency(cf.amount)}</td>
+            <td>${window.formatDate(cf.date)}</td>
             <td>${cf.description || '-'}</td>
-            <td>${formatDateTime(cf.created_at)}</td>
+            <td>${window.formatDateTime(cf.created_at)}</td>
             <td>
               <button class="btn btn-sm btn-primary" onclick="editRecord('cash_flows', ${cf.id})">ערוך</button>
               <button class="btn btn-sm btn-danger" onclick="deleteRecord('cash_flows', ${cf.id})">מחק</button>
@@ -1977,43 +1959,48 @@
         `).join('');
         
         // עדכון ספירת רשומות
-        document.getElementById('cashFlowsCount').textContent = `${cashFlows.length} תזרימי מזומנים`;
+        const countElement = document.getElementById('cashFlowsCount');
+        if (countElement) {
+          countElement.textContent = `${cashFlows.length} תזרימי מזומנים`;
+        }
+        
+        console.log('✅ תזרימי מזומנים נטענו בהצלחה');
+        
+        // הצגת הטבלה אם היא מוסתרת
+        const section = document.getElementById('cashFlowsSection');
+        const container = document.getElementById('cashFlowsContainer');
+        const footer = document.querySelector('#cashFlowsSection .table-footer');
+        const icon = document.querySelector('#cashFlowsSection .filter-icon');
+        
+        if (section && section.classList.contains('collapsed')) {
+          section.classList.remove('collapsed');
+          if (container) container.style.display = 'block';
+          if (footer) footer.style.display = 'block';
+          if (icon) icon.textContent = '▲';
+          localStorage.setItem('cashFlowsSectionOpen', 'true');
+        }
         
       } catch (error) {
-        console.error('Error loading cash flows:', error);
-        document.querySelector('#cashFlowsTable tbody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        console.error('❌ שגיאה בטעינת תזרימי מזומנים:', error);
+        const tbody = document.querySelector('#cashFlowsTable tbody');
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        }
       }
     }
 
     async function loadNotes() {
       try {
         console.log('🔄 טוען הערות...');
-        const response = await apiCall('/api/v1/notes/');
-        const notes = response; // השרת מחזיר מערך ישירות
-        
-        const tbody = document.querySelector('#notesTable tbody');
-        tbody.innerHTML = notes.map(note => `
-          <tr>
-            <td>${note.id}</td>
-            <td>${note.account_id || '-'}</td>
-            <td>${note.trade_id || '-'}</td>
-            <td>${note.trade_plan_id || '-'}</td>
-            <td>${note.content ? (note.content.substring(0, 50) + (note.content.length > 50 ? '...' : '')) : '-'}</td>
-            <td>${formatDateTime(note.created_at)}</td>
-            <td>${note.attachment || '-'}</td>
-            <td>
-              <button class="btn btn-sm btn-primary" onclick="editRecord('notes', ${note.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteRecord('notes', ${note.id})">מחק</button>
-            </td>
-          </tr>
-        `).join('');
-        
-        // עדכון ספירת רשומות
-        document.getElementById('notesCount').textContent = `${notes.length} הערות`;
+        const notes = await window.loadNotesData();
+        window.updateNotesTable(notes);
         
       } catch (error) {
-        console.error('Error loading notes:', error);
-        document.querySelector('#notesTable tbody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        console.error('❌ שגיאה בטעינת הערות:', error);
+        const tbody = document.querySelector('#notesTable tbody');
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        }
       }
     }
 
@@ -2022,6 +2009,20 @@
         console.log('🔄 טוען ביצועים...');
         const executions = await loadExecutionsData();
         updateExecutionsTable(executions);
+        
+        // הצגת הטבלה אם היא מוסתרת
+        const section = document.getElementById('executionsSection');
+        const container = document.getElementById('executionsContainer');
+        const footer = document.querySelector('#executionsSection .table-footer');
+        const icon = document.querySelector('#executionsSection .filter-icon');
+        
+        if (section && section.classList.contains('collapsed')) {
+          section.classList.remove('collapsed');
+          if (container) container.style.display = 'block';
+          if (footer) footer.style.display = 'block';
+          if (icon) icon.textContent = '▲';
+          localStorage.setItem('executionsSectionOpen', 'true');
+        }
         
       } catch (error) {
         console.error('❌ שגיאה בטעינת ביצועים:', error);
@@ -2035,11 +2036,11 @@
         <tr>
           <td>${execution.id}</td>
           <td>${execution.trade_id || '-'}</td>
-          <td>${convertExecutionActionToHebrew(execution.action)}</td>
-          <td>${formatDateTime(execution.date)}</td>
+          <td>${window.convertExecutionActionToHebrew(execution.action)}</td>
+          <td>${window.formatDateTime(execution.date)}</td>
           <td>${execution.quantity || '-'}</td>
-          <td>${formatCurrency(execution.price)}</td>
-          <td>${formatCurrency(execution.fee)}</td>
+          <td>${window.formatCurrency(execution.price)}</td>
+          <td>${window.formatCurrency(execution.fee)}</td>
           <td>${execution.source || '-'}</td>
           <td>
             <button class="btn btn-sm btn-primary" onclick="showEditExecutionModal(${JSON.stringify(execution).replace(/"/g, '&quot;')})" title="ערוך ביצוע">ערוך</button>
@@ -2099,18 +2100,21 @@
       ];
       
       sections.forEach(section => {
+        const sectionElement = document.getElementById(section);
         const container = document.getElementById(section.replace('Section', 'Container'));
         const footer = document.querySelector(`#${section} .table-footer`);
         const icon = document.querySelector(`#${section} .filter-icon`);
         
-        if (container && footer && icon) {
+        if (sectionElement && container && footer && icon) {
           const isOpen = localStorage.getItem(section.replace('Section', 'SectionOpen'));
           
           if (isOpen === 'false') {
+            sectionElement.classList.add('collapsed');
             container.style.display = 'none';
             footer.style.display = 'none';
             icon.textContent = '▼';
           } else {
+            sectionElement.classList.remove('collapsed');
             container.style.display = 'block';
             footer.style.display = 'block';
             icon.textContent = '▲';
@@ -2267,15 +2271,21 @@
     }
 
     function toggleAlertsSection() {
+      const section = document.getElementById('alertsSection');
       const container = document.getElementById('alertsContainer');
       const footer = document.querySelector('#alertsSection .table-footer');
       const icon = document.querySelector('#alertsSection .filter-icon');
-      if (container.style.display === 'none') {
+      
+      if (section.classList.contains('collapsed')) {
+        // פתיחת הסקשן
+        section.classList.remove('collapsed');
         container.style.display = 'block';
         footer.style.display = 'block';
         icon.textContent = '▲';
         localStorage.setItem('alertsSectionOpen', 'true');
       } else {
+        // סגירת הסקשן
+        section.classList.add('collapsed');
         container.style.display = 'none';
         footer.style.display = 'none';
         icon.textContent = '▼';
@@ -2284,15 +2294,21 @@
     }
 
     function toggleCashFlowsSection() {
+      const section = document.getElementById('cashFlowsSection');
       const container = document.getElementById('cashFlowsContainer');
       const footer = document.querySelector('#cashFlowsSection .table-footer');
       const icon = document.querySelector('#cashFlowsSection .filter-icon');
-      if (container.style.display === 'none') {
+      
+      if (section.classList.contains('collapsed')) {
+        // פתיחת הסקשן
+        section.classList.remove('collapsed');
         container.style.display = 'block';
         footer.style.display = 'block';
         icon.textContent = '▲';
         localStorage.setItem('cashFlowsSectionOpen', 'true');
       } else {
+        // סגירת הסקשן
+        section.classList.add('collapsed');
         container.style.display = 'none';
         footer.style.display = 'none';
         icon.textContent = '▼';
@@ -2301,15 +2317,21 @@
     }
 
     function toggleNotesSection() {
+      const section = document.getElementById('notesSection');
       const container = document.getElementById('notesContainer');
       const footer = document.querySelector('#notesSection .table-footer');
       const icon = document.querySelector('#notesSection .filter-icon');
-      if (container.style.display === 'none') {
+      
+      if (section.classList.contains('collapsed')) {
+        // פתיחת הסקשן
+        section.classList.remove('collapsed');
         container.style.display = 'block';
         footer.style.display = 'block';
         icon.textContent = '▲';
         localStorage.setItem('notesSectionOpen', 'true');
       } else {
+        // סגירת הסקשן
+        section.classList.add('collapsed');
         container.style.display = 'none';
         footer.style.display = 'none';
         icon.textContent = '▼';
@@ -2318,16 +2340,21 @@
     }
 
     function toggleExecutionsSection() {
+      const section = document.getElementById('executionsSection');
       const container = document.getElementById('executionsContainer');
       const footer = document.querySelector('#executionsSection .table-footer');
       const icon = document.querySelector('#executionsSection .filter-icon');
       
-      if (container.style.display === 'none') {
+      if (section.classList.contains('collapsed')) {
+        // פתיחת הסקשן
+        section.classList.remove('collapsed');
         container.style.display = 'block';
         footer.style.display = 'block';
         icon.textContent = '▲';
         localStorage.setItem('executionsSectionOpen', 'true');
       } else {
+        // סגירת הסקשן
+        section.classList.add('collapsed');
         container.style.display = 'none';
         footer.style.display = 'none';
         icon.textContent = '▼';

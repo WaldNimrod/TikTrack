@@ -152,28 +152,7 @@ function updateStatsDisplay(stats) {
   console.log('Stats display updated:', stats);
 }
 
-// פונקציה לסימון התראה כנקראה
-function markAlertAsRead(button, ticker) {
-  try {
-    console.log('Marking alert as read for:', ticker);
-    
-    // הסתרת הכפתור
-    if (button) {
-      button.style.display = 'none';
-    }
-    
-    // כאן תהיה קריאה לשרת לעדכון סטטוס ההתראה
-    // await fetch('/api/alerts/mark-read', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ ticker })
-    // });
-    
-    console.log('Alert marked as read successfully');
-  } catch (error) {
-    console.error('Error marking alert as read:', error);
-  }
-}
+
 
 // פונקציה לטעינת נתונים עם פילטרים
 async function loadFilteredData(filters = {}) {
@@ -730,7 +709,7 @@ window.getDefaultRowData = getDefaultRowData;
 window.loadPlansFromServer = loadPlansFromServer;
 window.updateSummaryStats = updateSummaryStats;
 window.updateStatsDisplay = updateStatsDisplay;
-window.markAlertAsRead = markAlertAsRead;
+
 window.loadFilteredData = loadFilteredData;
 window.createSampleData = createSampleData;
 window.saveDataToLocalStorage = saveDataToLocalStorage;

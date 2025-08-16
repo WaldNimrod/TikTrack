@@ -1,6 +1,8 @@
 // ===== ALERTS MANAGEMENT =====
 // קובץ ייעודי לניהול התראות - משותף לכל הדפים
 
+console.log('🚀 alerts.js file loaded successfully!');
+
 /**
  * טעינת התראות מהשרת
  * הפונקציה טוענת את כל ההתראות ומחזירה אותן
@@ -83,6 +85,27 @@ function convertAlertStatusToHebrew(status) {
 }
 
 /**
+ * המרת סטטוס is_triggered לעברית
+ * הפונקציה ממירה ערכים מהשרת לערכים לתצוגה בעברית
+ * 
+ * @param {string} isTriggered - סטטוס is_triggered
+ * @returns {string} סטטוס בעברית
+ * 
+ * @example
+ * const triggeredDisplay = convertIsTriggeredToHebrew('new'); // returns 'חדש'
+ */
+function convertIsTriggeredToHebrew(isTriggered) {
+    if (isTriggered === 'false') {
+        return 'לא הופעל';
+    } else if (isTriggered === 'new') {
+        return 'חדש';
+    } else if (isTriggered === 'true') {
+        return 'נקרא';
+    }
+    return isTriggered || 'לא הופעל';
+}
+
+/**
  * מילוי נתונים במודל עריכת התראה
  * הפונקציה ממלאת את כל השדות במודל העריכה עם נתוני ההתראה
  * 
@@ -102,6 +125,7 @@ function fillAlertEditModal(alert) {
     document.getElementById('editAlertCondition').value = alert.condition || '';
     document.getElementById('editAlertMessage').value = alert.message || '';
     document.getElementById('editAlertStatus').value = convertAlertStatusToHebrew(alert.status);
+    document.getElementById('editAlertIsTriggered').value = alert.is_triggered || 'false';
 }
 
 /**
@@ -120,7 +144,8 @@ function collectAlertEditData() {
         type: document.getElementById('editAlertType').value.trim(),
         condition: document.getElementById('editAlertCondition').value.trim(),
         message: document.getElementById('editAlertMessage').value.trim(),
-        status: convertAlertStatus(document.getElementById('editAlertStatus').value)
+        status: convertAlertStatus(document.getElementById('editAlertStatus').value),
+        is_triggered: document.getElementById('editAlertIsTriggered').value
     };
     
     console.log('📝 נתונים שנאספו ממודל עריכת התראה:', alertData);
@@ -143,7 +168,8 @@ function collectAlertAddData() {
         type: document.getElementById('alertType').value.trim(),
         condition: document.getElementById('alertCondition').value.trim(),
         message: document.getElementById('alertMessage').value.trim(),
-        status: convertAlertStatus(document.getElementById('alertStatus').value)
+        status: convertAlertStatus(document.getElementById('alertStatus').value),
+        is_triggered: document.getElementById('alertIsTriggered').value || 'false'
     };
     
     console.log('📝 נתונים שנאספו ממודל הוספת התראה:', alertData);
@@ -237,7 +263,7 @@ async function deleteAlert(alertId, alertType) {
         console.log('✅ התראה נמחקה בהצלחה:', response);
         showNotification(`התראה "${alertType}" נמחקה בהצלחה!`, 'success');
         return response;
-    } catch (error) {
+  } catch (error) {
         console.error('❌ שגיאה במחיקת התראה:', error);
         showNotification('שגיאה במחיקת התראה: ' + (error.message || 'שגיאה לא ידועה'), 'error');
         throw error;
@@ -276,6 +302,60 @@ async function cancelAlert(alertId, alertType) {
     } catch (error) {
         console.error('❌ שגיאה בביטול התראה:', error);
         showNotification('שגיאה בביטול התראה: ' + (error.message || 'שגיאה לא ידועה'), 'error');
+        throw error;
+    }
+}
+
+/**
+ * סימון התראה כמופעלת (new)
+ * הפונקציה שולחת בקשה לשרת לסימון התראה כמופעלת
+ * 
+ * @param {number} alertId - מזהה ההתראה
+ * @returns {Promise<Object>} תשובה מהשרת
+ * 
+ * @example
+ * const result = await markAlertAsTriggered(1);
+ */
+async function markAlertAsTriggered(alertId) {
+    try {
+        console.log(`🔔 מסמן התראה ${alertId} כמופעלת`);
+        const response = await apiCall(`/api/v1/alerts/${alertId}/trigger`, {
+            method: 'POST'
+        });
+        
+        console.log('✅ התראה סומנה כמופעלת:', response);
+        showNotification('התראה סומנה כמופעלת!', 'success');
+        return response;
+    } catch (error) {
+        console.error('❌ שגיאה בסימון התראה כמופעלת:', error);
+        showNotification('שגיאה בסימון התראה כמופעלת: ' + (error.message || 'שגיאה לא ידועה'), 'error');
+        throw error;
+    }
+}
+
+/**
+ * סימון התראה כנקראה (true)
+ * הפונקציה שולחת בקשה לשרת לסימון התראה כנקראה
+ * 
+ * @param {number} alertId - מזהה ההתראה
+ * @returns {Promise<Object>} תשובה מהשרת
+ * 
+ * @example
+ * const result = await markAlertAsRead(1);
+ */
+async function markAlertAsRead(alertId) {
+    try {
+        console.log(`📖 מסמן התראה ${alertId} כנקראה`);
+        const response = await apiCall(`/api/v1/alerts/${alertId}/read`, {
+            method: 'POST'
+        });
+        
+        console.log('✅ התראה סומנה כנקראה:', response);
+        showNotification('התראה סומנה כנקראה!', 'success');
+        return response;
+    } catch (error) {
+        console.error('❌ שגיאה בסימון התראה כנקראה:', error);
+        showNotification('שגיאה בסימון התראה כנקראה: ' + (error.message || 'שגיאה לא ידועה'), 'error');
         throw error;
     }
 }
@@ -397,6 +477,68 @@ async function updateAlertFromModal() {
 }
 
 /**
+ * עדכון טבלת התראות בדף database.html
+ * הפונקציה מעדכנת את הטבלה עם נתוני ההתראות
+ * 
+ * @param {Array} alerts - מערך של התראות
+ * 
+ * @example
+ * updateAlertsTable(alerts);
+ */
+function updateAlertsTable(alerts) {
+    console.log('🔄 מעדכן טבלת התראות עם', alerts.length, 'התראות');
+    
+    const tbody = document.querySelector('#alertsTable tbody');
+    if (!tbody) {
+        console.error('❌ לא נמצא tbody לטבלת התראות');
+        return;
+    }
+    
+    tbody.innerHTML = alerts.map(alert => `
+        <tr>
+            <td>${alert.id}</td>
+            <td>${alert.account_id || '-'}</td>
+            <td>${alert.ticker_id || '-'}</td>
+            <td>${alert.type || '-'}</td>
+            <td>${alert.condition || '-'}</td>
+            <td>${alert.message || '-'}</td>
+            <td>${convertAlertStatusToHebrew(alert.status)}</td>
+            <td>${convertIsTriggeredToHebrew(alert.is_triggered)}</td>
+            <td>${alert.triggered_at ? window.formatDateTime(alert.triggered_at) : '-'}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="showEditAlertModal(${JSON.stringify(alert).replace(/"/g, '&quot;')})">ערוך</button>
+                <button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id}, '${alert.type}')">ביטול</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id}, '${alert.type}')">מחק</button>
+                <button class="btn btn-sm btn-info" onclick="markAlertAsTriggered(${alert.id})" title="סמן כמופעלת">🔔</button>
+                <button class="btn btn-sm btn-success" onclick="markAlertAsRead(${alert.id})" title="סמן כנקראה">📖</button>
+            </td>
+        </tr>
+    `).join('');
+    
+    // עדכון ספירת רשומות
+    const countElement = document.getElementById('alertsCount');
+    if (countElement) {
+        countElement.textContent = `${alerts.length} התראות`;
+    }
+    
+    // הצגת הטבלה אם היא מוסתרת
+    const section = document.getElementById('alertsSection');
+    const container = document.getElementById('alertsContainer');
+    const footer = document.querySelector('#alertsSection .table-footer');
+    const icon = document.querySelector('#alertsSection .filter-icon');
+    
+    if (section && section.classList.contains('collapsed')) {
+        section.classList.remove('collapsed');
+        if (container) container.style.display = 'block';
+        if (footer) footer.style.display = 'block';
+        if (icon) icon.textContent = '▲';
+        localStorage.setItem('alertsSectionOpen', 'true');
+    }
+    
+    console.log('✅ טבלת התראות עודכנה בהצלחה');
+}
+
+/**
  * רענון טבלת התראות
  * הפונקציה מרעננת את טבלת ההתראות עם נתונים עדכניים
  * 
@@ -454,6 +596,7 @@ window.loadAlertsData = loadAlertsData;
 window.calculateAlertsStats = calculateAlertsStats;
 window.convertAlertStatus = convertAlertStatus;
 window.convertAlertStatusToHebrew = convertAlertStatusToHebrew;
+window.convertIsTriggeredToHebrew = convertIsTriggeredToHebrew;
 window.fillAlertEditModal = fillAlertEditModal;
 window.collectAlertEditData = collectAlertEditData;
 window.collectAlertAddData = collectAlertAddData;
@@ -461,13 +604,415 @@ window.createAlert = createAlert;
 window.updateAlert = updateAlert;
 window.deleteAlert = deleteAlert;
 window.cancelAlert = cancelAlert;
+window.markAlertAsTriggered = markAlertAsTriggered;
+window.markAlertAsRead = markAlertAsRead;
 
 // פונקציות UI
 window.showAddAlertModal = showAddAlertModal;
 window.showEditAlertModal = showEditAlertModal;
 window.saveAlert = saveAlert;
 window.updateAlertFromModal = updateAlertFromModal;
+window.updateAlertsTable = updateAlertsTable;
 window.refreshAlertsTable = refreshAlertsTable;
 window.showNotification = showNotification;
 
 console.log('✅ קובץ alerts.js נטען בהצלחה - פונקציות זמינות גלובלית');
+
+// ===== מערכת כרטיסיות התראות =====
+// פונקציות ייעודיות לכרטיסיות ההתראות בדף designs.html
+
+// משתנים גלובליים לכרטיסיות
+let alertsCardsData = [];
+let newAlertsCount = 0;
+
+// פונקציה לטעינת התראות לכרטיסיות
+async function loadAlertsForCards() {
+  console.log('🔄 === Loading alerts for cards ===');
+  console.log('🔄 Function called from:', new Error().stack);
+  
+  try {
+    const token = localStorage.getItem('authToken');
+    console.log('🔄 Token found:', !!token);
+    
+    if (!token) {
+      console.log('🔄 No auth token found, using sample alerts');
+      loadSampleAlertsForCards();
+      return;
+    }
+    
+    console.log('🔄 Fetching alerts from server...');
+    const response = await fetch('http://127.0.0.1:8080/api/v1/alerts', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log('🔄 Response status:', response.status);
+    
+    if (response.ok) {
+      const alerts = await response.json();
+      console.log('🔄 Raw response from server:', alerts);
+      
+      // בדיקה אם התגובה היא מערך או אובייקט עם data
+      alertsCardsData = Array.isArray(alerts) ? alerts : (alerts.data || []);
+      console.log('🔄 Alerts loaded from server:', alertsCardsData.length, 'alerts');
+      console.log('🔄 Sample alert data:', alertsCardsData[0]);
+      
+      if (alertsCardsData.length === 0) {
+        console.log('🔄 No alerts found in server response, using sample data');
+        loadSampleAlertsForCards();
+      } else {
+        filterAndDisplayNewAlerts();
+      }
+    } else {
+      console.log('🔄 Error loading alerts from server, status:', response.status);
+      loadSampleAlertsForCards();
+    }
+    
+  } catch (error) {
+    console.log('🔄 Error loading alerts from server:', error);
+    loadSampleAlertsForCards();
+  }
+}
+
+// פונקציה לטעינת התראות דוגמה לכרטיסיות
+function loadSampleAlertsForCards() {
+  console.log('🔄 Loading sample alerts for cards');
+  
+  // יצירת התראות דוגמה עם מצבים שונים - רק 6 חדשות
+  alertsCardsData = [
+    {
+      id: 1,
+      title: 'התראה על מחיר נכס',
+      message: 'מחיר AAPL הגיע ליעד המחיר שהוגדר',
+      ticker: 'AAPL',
+      current_price: 185.50,
+      target_price: 185.00,
+      created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // לפני 30 דקות
+      is_triggered: 'new',
+      alert_type: 'price_target'
+    },
+    {
+      id: 2,
+      title: 'התראה על נפח מסחר',
+      message: 'נפח המסחר ב-TSLA עלה ב-50% מהממוצע היומי',
+      ticker: 'TSLA',
+      volume: 15000000,
+      avg_volume: 10000000,
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // לפני שעתיים
+      is_triggered: 'new',
+      alert_type: 'volume_spike'
+    },
+    {
+      id: 3,
+      title: 'התראה על תנועת מחיר',
+      message: 'MSFT עלה ב-3% במהלך השעה האחרונה',
+      ticker: 'MSFT',
+      price_change: 3.2,
+      created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // לפני 45 דקות
+      is_triggered: 'new',
+      alert_type: 'price_movement'
+    },
+    {
+      id: 4,
+      title: 'התראה על תמיכה/התנגדות',
+      message: 'GOOGL מתקרב לקו התמיכה הקריטי',
+      ticker: 'GOOGL',
+      support_level: 140.00,
+      current_price: 141.50,
+      created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // לפני 15 דקות
+      is_triggered: 'new',
+      alert_type: 'support_resistance'
+    },
+    {
+      id: 5,
+      title: 'התראה על רווח',
+      message: 'NVDA הגיע ליעד הרווח שהוגדר',
+      ticker: 'NVDA',
+      profit_target: 5.0,
+      current_profit: 5.2,
+      created_at: new Date(Date.now() - 1000 * 60 * 10).toISOString(), // לפני 10 דקות
+      is_triggered: 'new',
+      alert_type: 'profit_target'
+    },
+    {
+      id: 6,
+      title: 'התראה על הפסד',
+      message: 'AMZN הגיע לסטופ לוס שהוגדר',
+      ticker: 'AMZN',
+      stop_loss: 150.00,
+      current_price: 149.80,
+      created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(), // לפני 5 דקות
+      is_triggered: 'new',
+      alert_type: 'stop_loss'
+    }
+  ];
+  
+  filterAndDisplayNewAlerts();
+}
+
+// פונקציה לסינון והצגת התראות חדשות בלבד
+function filterAndDisplayNewAlerts() {
+  console.log('🔄 Filtering new alerts...');
+  console.log('🔄 Total alerts in data:', alertsCardsData.length);
+  
+  if (alertsCardsData.length === 0) {
+    console.log('🔄 No alerts data available');
+    newAlertsCount = 0;
+    updateAlertsCount();
+    renderAlertsCards([]);
+    return;
+  }
+  
+  // לוג של כל ההתראות עם הסטטוס שלהן
+  alertsCardsData.forEach((alert, index) => {
+    console.log(`🔄 Alert ${index + 1}: ID=${alert.id}, is_triggered="${alert.is_triggered}"`);
+  });
+  
+  const newAlerts = alertsCardsData.filter(alert => alert.is_triggered === 'new');
+  newAlertsCount = newAlerts.length;
+  
+  console.log('🔄 Found', newAlertsCount, 'new alerts');
+  console.log('🔄 New alerts:', newAlerts);
+  
+  updateAlertsCount();
+  renderAlertsCards(newAlerts);
+}
+
+// פונקציה לעדכון מונה ההתראות
+function updateAlertsCount() {
+  const countElement = document.getElementById('newAlertsCount');
+  if (countElement) {
+    countElement.textContent = `${newAlertsCount} התראות`;
+  }
+}
+
+// פונקציה לרנדור כרטיסיות ההתראות
+function renderAlertsCards(alerts) {
+  console.log('🔄 Rendering alerts cards...');
+  
+  const cardsContainer = document.getElementById('alertsCards');
+  if (!cardsContainer) {
+    console.log('🔄 Alerts cards container not found');
+    return;
+  }
+  
+  if (alerts.length === 0) {
+    cardsContainer.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+        <div style="font-size: 3rem; margin-bottom: 20px;">🔕</div>
+        <h4>אין התראות חדשות</h4>
+        <p>כל ההתראות נקראו או שאין התראות פעילות כרגע</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const cardsHTML = alerts.map(alert => createAlertCardHTML(alert)).join('');
+  cardsContainer.innerHTML = cardsHTML;
+  
+  console.log('🔄 Rendered', alerts.length, 'alert cards');
+}
+
+// פונקציה ליצירת HTML של כרטיסיית התראה
+function createAlertCardHTML(alert) {
+  const timeAgo = getTimeAgo(alert.created_at);
+  const alertIcon = getAlertIcon(alert.alert_type);
+  
+  return `
+    <div class="alert-card" data-alert-id="${alert.id}">
+      <div class="alert-card-header">
+        <h4 class="alert-card-title">${alertIcon} ${alert.title}</h4>
+        <span class="alert-card-time">${timeAgo}</span>
+      </div>
+      
+      <div class="alert-card-content">
+        <p class="alert-card-message">${alert.message}</p>
+        
+        <div class="alert-card-details">
+          <span class="alert-detail-item">📈 ${alert.ticker}</span>
+          ${getAlertDetails(alert)}
+        </div>
+      </div>
+      
+      <div class="alert-card-actions">
+        <button class="btn-mark-read" onclick="markAlertAsRead(${alert.id})" data-alert-id="${alert.id}">
+          ✓ קראתי
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// פונקציה לקבלת אייקון לפי סוג ההתראה
+function getAlertIcon(alertType) {
+  const icons = {
+    'price_target': '🎯',
+    'volume_spike': '📊',
+    'price_movement': '📈',
+    'support_resistance': '⚖️',
+    'profit_target': '💰',
+    'stop_loss': '⚠️'
+  };
+  
+  return icons[alertType] || '🔔';
+}
+
+// פונקציה לקבלת פרטי התראה
+function getAlertDetails(alert) {
+  let details = '';
+  
+  switch (alert.alert_type) {
+    case 'price_target':
+      details = `
+        <span class="alert-detail-item">יעד: $${alert.target_price}</span>
+        <span class="alert-detail-item">נוכחי: $${alert.current_price}</span>
+      `;
+      break;
+    case 'volume_spike':
+      details = `
+        <span class="alert-detail-item">נפח: ${formatNumber(alert.volume)}</span>
+        <span class="alert-detail-item">ממוצע: ${formatNumber(alert.avg_volume)}</span>
+      `;
+      break;
+    case 'price_movement':
+      details = `
+        <span class="alert-detail-item">שינוי: ${alert.price_change}%</span>
+      `;
+      break;
+    case 'support_resistance':
+      details = `
+        <span class="alert-detail-item">תמיכה: $${alert.support_level}</span>
+        <span class="alert-detail-item">נוכחי: $${alert.current_price}</span>
+      `;
+      break;
+    case 'profit_target':
+      details = `
+        <span class="alert-detail-item">יעד: ${alert.profit_target}%</span>
+        <span class="alert-detail-item">נוכחי: ${alert.current_profit}%</span>
+      `;
+      break;
+    case 'stop_loss':
+      details = `
+        <span class="alert-detail-item">סטופ: $${alert.stop_loss}</span>
+        <span class="alert-detail-item">נוכחי: $${alert.current_price}</span>
+      `;
+      break;
+  }
+  
+  return details;
+}
+
+// פונקציה לסמן התראה כנקראה
+async function markAlertAsRead(alertId) {
+  console.log('🔄 Marking alert as read:', alertId);
+  
+  const button = document.querySelector(`button[data-alert-id="${alertId}"]`);
+  if (button) {
+    button.disabled = true;
+    button.textContent = '✓ נקרא';
+  }
+  
+  try {
+    const token = localStorage.getItem('authToken');
+    
+    if (token) {
+      // עדכון בשרת - שימוש ב-endpoint ייעודי לסימון כנקרא
+      const response = await fetch(`http://127.0.0.1:8080/api/v1/alerts/${alertId}/read`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        console.log('🔄 Alert marked as read on server');
+      } else {
+        console.log('🔄 Error updating alert on server');
+      }
+    }
+    
+    // עדכון מקומי
+    const alertIndex = alertsCardsData.findIndex(alert => alert.id === alertId);
+    if (alertIndex !== -1) {
+      alertsCardsData[alertIndex].is_triggered = true;
+    }
+    
+    // הסתרת הכרטיסיה
+    const card = document.querySelector(`[data-alert-id="${alertId}"]`);
+    if (card) {
+      card.style.opacity = '0.5';
+      card.style.transform = 'scale(0.98)';
+      
+      setTimeout(() => {
+        card.remove();
+        newAlertsCount--;
+        updateAlertsCount();
+        
+        // אם אין יותר התראות, הצג הודעה
+        if (newAlertsCount === 0) {
+          renderAlertsCards([]);
+        }
+      }, 300);
+    }
+    
+  } catch (error) {
+    console.log('🔄 Error marking alert as read:', error);
+    
+    // החזרת הכפתור למצב רגיל במקרה של שגיאה
+    if (button) {
+      button.disabled = false;
+      button.textContent = '✓ קראתי';
+    }
+  }
+}
+
+// פונקציה לחישוב זמן שעבר
+function getTimeAgo(dateString) {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  
+  if (diffMins < 1) return 'עכשיו';
+  if (diffMins < 60) return `לפני ${diffMins} דקות`;
+  if (diffHours < 24) return `לפני ${diffHours} שעות`;
+  if (diffDays < 7) return `לפני ${diffDays} ימים`;
+  
+  return date.toLocaleDateString('he-IL');
+}
+
+// פונקציה לעיצוב מספרים
+function formatNumber(num) {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K';
+  }
+  return num.toString();
+}
+
+// פונקציה לרענון ההתראות
+function refreshAlerts() {
+  console.log('🔄 Refreshing alerts...');
+  loadAlertsForCards();
+}
+
+// ייצוא הפונקציות החדשות לשימוש גלובלי
+window.loadAlertsForCards = loadAlertsForCards;
+window.markAlertAsRead = markAlertAsRead;
+window.refreshAlerts = refreshAlerts;
+
+console.log('✅ פונקציות כרטיסיות התראות נוספו לקובץ alerts.js');
+
+// בדיקה שהפונקציות זמינות
+console.log('🔄 Testing function availability:');
+console.log('🔄 loadAlertsForCards available:', typeof loadAlertsForCards);
+console.log('🔄 markAlertAsRead available:', typeof markAlertAsRead);
+console.log('🔄 refreshAlerts available:', typeof refreshAlerts);

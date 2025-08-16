@@ -10,7 +10,18 @@ class AppHeader extends HTMLElement {
     this.render();
     this.setupEventListeners();
     this.initializeFilter();
-    this.loadAccountsFromServer();
+    
+    // טעינת חשבונות רק בדפים שצריכים אותם
+    const currentPage = window.location.pathname;
+    const pagesNeedingAccounts = ['/planning.html', '/tracking.html', '/database.html'];
+    
+    if (pagesNeedingAccounts.some(page => currentPage.includes(page))) {
+      if (typeof window.loadAccountsFromServer === 'function') {
+        window.loadAccountsFromServer();
+      }
+    } else {
+      console.log('🔄 Skipping accounts loading - not needed on this page');
+    }
     
     // אתחול Bootstrap Dropdown אם זמין
     this.initializeBootstrapDropdown();
@@ -1510,23 +1521,9 @@ class AppHeader extends HTMLElement {
         console.log('Collapse arrow not found');
       }
       
-      // עדכון הגריד בזמן האתחול - רק אם הגריד מוכן
+      // עדכון פילטרים
       setTimeout(() => {
-        if (window.gridApi) {
-          console.log('Grid API is ready, calling updateGridFilter during initialization');
-          this.updateGridFilter();
-        } else {
-          console.log('Grid API not ready yet, will try again later');
-          // ניסיון נוסף אחרי זמן נוסף
-          setTimeout(() => {
-            if (window.gridApi) {
-              console.log('Grid API is now ready, calling updateGridFilter');
-              this.updateGridFilter();
-            } else {
-              console.log('Grid API still not ready');
-            }
-          }, 1000);
-        }
+        this.updateGridFilter();
       }, 500);
     }, 100);
   }
@@ -2371,129 +2368,7 @@ class AppHeader extends HTMLElement {
     console.log('=== updateGridFilter completed ===');
   }
 
-  async loadAccountsFromServer() {
-    try {
-      console.log('🔍 Loading accounts from server...');
-      
-      // קבלת token מ-localStorage
-      const token = localStorage.getItem('authToken');
-      console.log('🔍 Token found:', !!token);
-      
-      // אם אין token, נשתמש ברשימת דוגמה
-      if (!token) {
-        console.log('🔍 No token found, using fallback accounts');
-        const fallbackAccounts = ['חשבון ראשי', 'חשבון משני', 'חשבון השקעות', 'חשבון מסחר'];
-        this.updateAccountFilterMenu(fallbackAccounts);
-        return;
-      }
-      
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      };
-      
-      console.log('🔍 Fetching accounts from server...');
-      const response = await fetch('http://127.0.0.1:8080/api/accounts', {
-        method: 'GET',
-        headers: headers
-      });
-      
-      console.log('🔍 Response status:', response.status);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const accounts = await response.json();
-      console.log('🔍 Accounts loaded from server:', accounts);
-      
-      // יצירת רשימת שמות החשבונות
-      const accountNames = accounts.data ? accounts.data.map(account => account.name) : [];
-      console.log('🔍 Account names:', accountNames);
-      
-      // אם אין חשבונות מהשרת, נשתמש ברשימת דוגמה
-      if (accountNames.length === 0) {
-        console.log('🔍 No accounts from server, using fallback');
-        const fallbackAccounts = ['חשבון ראשי', 'חשבון משני', 'חשבון השקעות', 'חשבון מסחר'];
-        this.updateAccountFilterMenu(fallbackAccounts);
-        return;
-      }
-      
-      // עדכון תפריט החשבונות
-      this.updateAccountFilterMenu(accountNames);
-      
-    } catch (error) {
-      console.error('🔍 Error loading accounts from server:', error);
-      // במקרה של שגיאה, נשתמש ברשימת דוגמה
-      const fallbackAccounts = ['חשבון ראשי', 'חשבון משני', 'חשבון השקעות', 'חשבון מסחר'];
-      this.updateAccountFilterMenu(fallbackAccounts);
-    }
-  }
 
-  updateAccountFilterMenu(accountNames) {
-    console.log('🔍 updateAccountFilterMenu called with:', accountNames);
-    
-    const accountMenu = this.shadowRoot.getElementById('accountFilterMenu');
-    if (!accountMenu) {
-      console.log('🔍 Account menu not found');
-      return;
-    }
-    
-    console.log('🔍 Account menu found, clearing existing content');
-    
-    // ניקוי התפריט הקיים
-    accountMenu.innerHTML = '';
-    
-    console.log('🔍 Adding account items...');
-    
-    // הוספת החשבונות החדשים
-    accountNames.forEach((accountName, index) => {
-      const accountItem = document.createElement('div');
-      accountItem.className = 'account-filter-item';
-      accountItem.setAttribute('data-account', accountName);
-      // הגבלת אורך שם החשבון ל-10 תווים
-      const displayName = accountName.length > 10 ? accountName.substring(0, 10) + '...' : accountName;
-      
-      accountItem.innerHTML = `
-        <span class="option-text" title="${accountName}">${displayName}</span>
-        <span class="check-mark">✓</span>
-      `;
-      
-      accountMenu.appendChild(accountItem);
-      console.log(`🔍 Added account item ${index + 1}:`, accountName);
-    });
-    
-    console.log('🔍 Total account items added:', accountMenu.children.length);
-    
-    // הוספת event listener לתפריט כולו (event delegation) - רק אם עוד לא נוסף
-    if (!accountMenu.hasAttribute('data-event-listener-added')) {
-      accountMenu.addEventListener('click', (e) => {
-        const accountItem = e.target.closest('.account-filter-item');
-        if (accountItem) {
-          e.preventDefault();
-          e.stopPropagation();
-          const accountName = accountItem.getAttribute('data-account');
-          console.log('🔍 Account filter item clicked:', accountName);
-          this.selectAccountOption(accountName);
-        }
-      });
-      accountMenu.setAttribute('data-event-listener-added', 'true');
-      console.log('🔍 Event delegation listener added to account menu');
-    }
-    
-    // אתחול הפילטר עם ברירת מחדל (כל החשבונות מסומנים)
-    const accountItems = accountMenu.querySelectorAll('.account-filter-item');
-    accountItems.forEach(item => {
-      item.classList.add('selected');
-    });
-    
-    console.log('🔍 All account items marked as selected');
-    
-    // עדכון טקסט הפילטר
-    this.updateAccountFilterText();
-    
-    console.log('🔍 Account filter menu updated successfully');
-  }
 
   toggleFilterSection() {
     const filterSection = this.shadowRoot.getElementById('statusFilterSection');

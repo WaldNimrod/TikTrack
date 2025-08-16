@@ -2,7 +2,6 @@
 // קובץ ייעודי ללוגיקת הגריד הבסיסית - משותף לכל הדפים
 
 // משתנים גלובליים
-window.gridApi = null;
 let externalFilterPresent = false;
 
 // פונקציית API כללית
@@ -235,93 +234,7 @@ function createGrid(containerId, rowData = [], customOptions = {}) {
   }
 }
 
-// פונקציה לאתחול הגריד
-function onGridReady(params) {
-  // בדיקה אם הגריד כבר מאותחל
-  if (window.gridApi) {
-    console.log('Grid already initialized, skipping onGridReady');
-    return;
-  }
-  
-  gridApi = params.api;
-  window.gridApi = params.api;
-  console.log('Grid API available:', !!gridApi);
-  
-  // התאמת הגריד לרוחב המסך
-  params.api.sizeColumnsToFit();
-  
-  // עדכון הגריד בעת שינוי גודל החלון
-  window.addEventListener('resize', () => {
-    setTimeout(() => {
-      params.api.sizeColumnsToFit();
-    }, 100);
-  });
-  
-  // עדכון סטטוס
-  updateGridStatus();
-  
-  // טעינת טריידים מהשרת אם זה דף בדיקת הגריד
-  if (window.location.pathname.includes('grid-test')) {
-    console.log('Grid test page detected, loading trades...');
-    if (typeof loadDataByType === 'function') {
-      loadDataByType('trades').then(data => {
-        console.log('Trades loaded for grid test:', data);
-        // עדכון הגריד עם הנתונים החדשים
-        if (window.gridApi && data) {
-          window.gridApi.setGridOption('rowData', data);
-          console.log('Grid updated with trades data');
-        }
-      }).catch(error => {
-        console.error('Error loading trades for grid test:', error);
-      });
-    }
-  }
-  
-  // בדיקה אם יש פילטר ממתין
-  if (window.pendingFilter) {
-    console.log('Applying pending filter:', window.pendingFilter);
-          if (typeof applyStatusFilterToGrid === 'function') {
-        applyStatusFilterToGrid(window.pendingFilter, window.pendingAccountFilter);
-      } else {
-        console.log('applyStatusFilterToGrid not available yet, will apply later');
-      }
-    delete window.pendingFilter;
-  } else {
-          // ברירת מחדל - פתוח בלבד
-      console.log('No saved filter, applying default filter: פתוח');
-      if (typeof applyStatusFilterToGrid === 'function') {
-        applyStatusFilterToGrid(['פתוח'], null);
-      } else {
-        console.log('applyStatusFilterToGrid not available yet, will apply later');
-      }
-  }
-  
-  // עדכון סטטיסטיקות בהתאם לנתונים המוצגים
-  setTimeout(() => {
-    if (window.updateSummaryStats) {
-      updateSummaryStats();
-    }
-    
-    // בדיקה אם הפילטר זמין עכשיו
-    if (typeof applyStatusFilterToGrid === 'function') {
-      console.log('applyStatusFilterToGrid is now available, applying default filter');
-      applyStatusFilterToGrid(['פתוח'], null);
-    } else {
-      console.log('applyStatusFilterToGrid still not available, will try again later');
-      // נסיון נוסף אחרי זמן נוסף
-      setTimeout(() => {
-              if (typeof applyStatusFilterToGrid === 'function') {
-        console.log('applyStatusFilterToGrid is now available on second try, applying default filter');
-        applyStatusFilterToGrid(['פתוח'], null);
-      } else {
-        console.log('applyStatusFilterToGrid still not available on second try');
-      }
-      }, 500);
-    }
-  }, 200);
-  
-  console.log('Grid initialized successfully');
-}
+
 
 // פונקציה לעדכון סטטוס הגריד
 function updateGridStatus() {
@@ -519,16 +432,7 @@ function loadAlerts() {
   }
 }
 
-// פונקציה לסמן התראה כנקראה
-function markAlertAsRead(button, ticker) {
-  const alertCard = button.closest('.alert-card');
-  if (alertCard) {
-    alertCard.classList.add('read');
-    button.textContent = 'נקרא';
-    button.disabled = true;
-    console.log(`התראה עבור ${ticker} סומנה כנקראה`);
-  }
-}
+
 
 // פונקציה לאיפוס פילטרים ורענון נתונים
 async function resetAllFiltersAndReloadData() {
@@ -630,7 +534,17 @@ function showCustomConfirm(message, callback) {
 window.togglePlansSection = function() {
   const plansSection = document.getElementById('plansSection');
   const toggleBtn = document.querySelector('button[onclick="togglePlansSection()"]');
+  
+  if (!plansSection || !toggleBtn) {
+    console.log('🔄 Plans section elements not found');
+    return;
+  }
+  
   const icon = toggleBtn.querySelector('.filter-icon');
+  if (!icon) {
+    console.log('🔄 Plans section icon not found');
+    return;
+  }
   
   if (plansSection.classList.contains('collapsed')) {
     plansSection.classList.remove('collapsed');
@@ -649,7 +563,18 @@ window.togglePlansSection = function() {
 function restorePlansSectionState() {
   const plansSection = document.getElementById('plansSection');
   const toggleBtn = document.querySelector('button[onclick="togglePlansSection()"]');
+  
+  // בדיקה אם אנחנו בדף planning
+  if (!plansSection || !toggleBtn) {
+    console.log('🔄 Plans section elements not found - not on planning page');
+    return;
+  }
+  
   const icon = toggleBtn.querySelector('.filter-icon');
+  if (!icon) {
+    console.log('🔄 Plans section icon not found');
+    return;
+  }
   
   const isCollapsed = localStorage.getItem('plansSectionCollapsed') === 'true';
   
@@ -668,7 +593,17 @@ function restorePlansSectionState() {
 window.toggleAlertsSection = function() {
   const alertsSection = document.getElementById('alertsSection');
   const toggleBtn = document.querySelector('button[onclick="toggleAlertsSection()"]');
+  
+  if (!alertsSection || !toggleBtn) {
+    console.log('🔄 Alerts section elements not found');
+    return;
+  }
+  
   const icon = toggleBtn.querySelector('.filter-icon');
+  if (!icon) {
+    console.log('🔄 Alerts section icon not found');
+    return;
+  }
   
   if (alertsSection.classList.contains('collapsed')) {
     alertsSection.classList.remove('collapsed');
@@ -687,7 +622,18 @@ window.toggleAlertsSection = function() {
 function restoreAlertsSectionState() {
   const alertsSection = document.getElementById('alertsSection');
   const toggleBtn = document.querySelector('button[onclick="toggleAlertsSection()"]');
+  
+  // בדיקה אם האלמנטים קיימים
+  if (!alertsSection || !toggleBtn) {
+    console.log('🔄 Alerts section elements not found');
+    return;
+  }
+  
   const icon = toggleBtn.querySelector('.filter-icon');
+  if (!icon) {
+    console.log('🔄 Alerts section icon not found');
+    return;
+  }
   
   const isCollapsed = localStorage.getItem('alertsSectionCollapsed') === 'true';
   
@@ -706,7 +652,17 @@ function restoreAlertsSectionState() {
 window.toggleTopSection = function() {
   const topSection = document.getElementById('topSection');
   const toggleBtn = document.querySelector('button[onclick="toggleTopSection()"]');
+  
+  if (!topSection || !toggleBtn) {
+    console.log('🔄 Top section elements not found');
+    return;
+  }
+  
   const icon = toggleBtn.querySelector('.filter-icon');
+  if (!icon) {
+    console.log('🔄 Top section icon not found');
+    return;
+  }
   
   if (topSection.classList.contains('collapsed')) {
     topSection.classList.remove('collapsed');
@@ -725,7 +681,18 @@ window.toggleTopSection = function() {
 function restoreTopSectionState() {
   const topSection = document.getElementById('topSection');
   const toggleBtn = document.querySelector('button[onclick="toggleTopSection()"]');
+  
+  // בדיקה אם האלמנטים קיימים
+  if (!topSection || !toggleBtn) {
+    console.log('🔄 Top section elements not found');
+    return;
+  }
+  
   const icon = toggleBtn.querySelector('.filter-icon');
+  if (!icon) {
+    console.log('🔄 Top section icon not found');
+    return;
+  }
   
   const isCollapsed = localStorage.getItem('topSectionCollapsed') === 'true';
   
@@ -771,9 +738,18 @@ window.toggleDesignsSection = function() {
 function restoreDesignsSectionState() {
   const designsSection = document.getElementById('designsSection');
   const toggleBtn = document.querySelector('button[onclick="toggleDesignsSection()"]');
-  const icon = toggleBtn.querySelector('.filter-icon');
   
-  if (!designsSection || !toggleBtn || !icon) return;
+  // בדיקה אם אנחנו בדף designs
+  if (!designsSection || !toggleBtn) {
+    console.log('🔄 Designs section elements not found - not on designs page');
+    return;
+  }
+  
+  const icon = toggleBtn.querySelector('.filter-icon');
+  if (!icon) {
+    console.log('🔄 Designs section icon not found');
+    return;
+  }
   
   const isCollapsed = localStorage.getItem('designsSectionCollapsed') === 'true';
   
@@ -1768,5 +1744,188 @@ function extractAmount(amountString) {
   
   return isNaN(amount) ? 0 : amount;
 }
+
+// ===== פונקציות כללית נוספות =====
+
+/**
+ * המרת סטטוס חשבון לעברית
+ */
+function convertAccountStatusToHebrew(status) {
+  if (status === 'active' || status === 'פעיל' || status === 'open') {
+    return 'פתוח';
+  } else if (status === 'inactive' || status === 'לא פעיל' || status === 'closed') {
+    return 'סגור';
+  } else if (status === 'cancelled' || status === 'בוטל') {
+    return 'מבוטל';
+  }
+  return status || 'פתוח';
+}
+
+/**
+ * המרת סטטוס טיקר לעברית
+ */
+function convertTickerStatusToHebrew(status) {
+  if (status === 'active' || status === 'פעיל' || status === 'open') {
+    return 'פתוח';
+  } else if (status === 'inactive' || status === 'לא פעיל' || status === 'closed') {
+    return 'סגור';
+  } else if (status === 'cancelled' || status === 'בוטל') {
+    return 'מבוטל';
+  }
+  return status || 'פתוח';
+}
+
+/**
+ * המרת סטטוס הערה לעברית
+ */
+function convertNoteStatusToHebrew(status) {
+  if (status === 'active' || status === 'פעיל' || status === 'open') {
+    return 'פעיל';
+  } else if (status === 'inactive' || status === 'לא פעיל' || status === 'closed') {
+    return 'לא פעיל';
+  } else if (status === 'cancelled' || status === 'בוטל') {
+    return 'מבוטל';
+  }
+  return status || 'פעיל';
+}
+
+/**
+ * עיצוב מטבע
+ */
+function formatCurrency(amount) {
+  if (amount === null || amount === undefined) return '-';
+  return new Intl.NumberFormat('he-IL', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(amount);
+}
+
+/**
+ * עיצוב תאריך
+ */
+function formatDate(dateString) {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('he-IL');
+}
+
+/**
+ * עיצוב תאריך ושעה
+ */
+function formatDateTime(dateString) {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  return date.toLocaleString('he-IL');
+}
+
+/**
+ * פונקציה לחיפוש בטבלאות
+ */
+function filterTable(tableId, searchTerm) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return;
+  
+  const rows = tbody.querySelectorAll('tr');
+  const term = searchTerm.toLowerCase().trim();
+  
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    let found = false;
+    
+    cells.forEach(cell => {
+      const text = cell.textContent.toLowerCase();
+      if (text.includes(term)) {
+        found = true;
+      }
+    });
+    
+    if (found || term === '') {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+  
+  // עדכון ספירה
+  updateTableCount(tableId);
+}
+
+/**
+ * עדכון ספירת שורות בטבלה
+ */
+function updateTableCount(tableId) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return;
+  
+  const visibleRows = Array.from(tbody.querySelectorAll('tr')).filter(row => 
+    row.style.display !== 'none'
+  ).length;
+  
+  // עדכון הספירה בהתאם לטבלה
+  const countElement = getCountElementForTable(tableId);
+  if (countElement) {
+    const tableName = getTableNameForTable(tableId);
+    countElement.textContent = `${visibleRows} ${tableName}`;
+  }
+}
+
+/**
+ * קבלת אלמנט הספירה המתאים
+ */
+function getCountElementForTable(tableId) {
+  const countMap = {
+    'usersTable': 'usersCount',
+    'accountsTable': 'accountsCount',
+    'tickersTable': 'tickersCount',
+    'tradesTable': 'tradesCount',
+    'tradePlansTable': 'tradePlansCount',
+    'alertsTable': 'alertsCount',
+    'cashFlowsTable': 'cashFlowsCount',
+    'notesTable': 'notesCount',
+    'executionsTable': 'executionsCount',
+    'userRolesTable': 'userRolesCount'
+  };
+  
+  const countId = countMap[tableId];
+  return countId ? document.getElementById(countId) : null;
+}
+
+/**
+ * קבלת שם הטבלה
+ */
+function getTableNameForTable(tableId) {
+  const nameMap = {
+    'usersTable': 'משתמשים',
+    'accountsTable': 'חשבונות',
+    'tickersTable': 'טיקרים',
+    'tradesTable': 'טריידים',
+    'tradePlansTable': 'תוכניות טרייד',
+    'alertsTable': 'התראות',
+    'cashFlowsTable': 'תזרימי מזומנים',
+    'notesTable': 'הערות',
+    'executionsTable': 'ביצועים',
+    'userRolesTable': 'תפקידי משתמשים'
+  };
+  
+  return nameMap[tableId] || '';
+}
+
+// הוספת הפונקציות החדשות לגלובל
+window.convertAccountStatusToHebrew = convertAccountStatusToHebrew;
+window.convertTickerStatusToHebrew = convertTickerStatusToHebrew;
+window.convertNoteStatusToHebrew = convertNoteStatusToHebrew;
+window.formatCurrency = formatCurrency;
+window.formatDate = formatDate;
+window.formatDateTime = formatDateTime;
+window.filterTable = filterTable;
+window.updateTableCount = updateTableCount;
+window.getCountElementForTable = getCountElementForTable;
+window.getTableNameForTable = getTableNameForTable;
 
 

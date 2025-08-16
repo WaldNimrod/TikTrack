@@ -1,185 +1,105 @@
-# בעיות ידועות - TikTrack
+# Known Issues
 
-## סקירה כללית
+## Identified and Fixed Issues
 
-מסמך זה מתעד בעיות ידועות במערכת, כולל בעיות שזוהו וטופלו, בעיות שזוהו וטרם נפתרו, ובעיות שזוהו וטופלו חלקית.
+### 1. Duplicate Code Between Pages
+- **Issue**: Account management functions were duplicated between `accounts.html` and `database.html`
+- **Fix**: Refactored common functionality into shared external files (`accounts.js`, `tickers.js`, `alerts.js`, `executions.js`)
+- **Status**: ✅ Fixed
 
-## בעיות שזוהו וטופלו ✅
+### 2. Open Trade Checks Not Working
+- **Issue**: Warning modal for account/ticker cancellation was showing all open trades instead of only those associated with the specific account/ticker
+- **Fix**: Updated backend filtering in `trade_service.py` and frontend logic in `accounts.js` and `tickers.js`
+- **Status**: ✅ Fixed
 
-### 1. קוד כפול במערכת ניהול חשבונות
-**תיאור**: היה קוד כפול בין דף החשבונות לדף בסיס נתונים
-**מיקום**: `trading-ui/accounts.html`, `trading-ui/database.html`
-**פתרון**: ריכוז כל הפונקציות בקובץ `trading-ui/scripts/accounts.js`
-**סטטוס**: ✅ נפתר
-**תאריך**: 2025-08-16
+### 3. Ticker Symbol Display in Warning Modal
+- **Issue**: Warning modal was showing `ticker_id` instead of ticker `symbol`
+- **Fix**: Modified `showOpenTradesWarning` to fetch tickers and create a mapping from ID to symbol
+- **Status**: ✅ Fixed
 
-### 2. בדיקת טריידים פתוחים לפני ביטול/מחיקת חשבון
-**תיאור**: לא הייתה בדיקה אם יש טריידים פתוחים לפני ביטול או מחיקת חשבון
-**מיקום**: פונקציות `cancelAccount` ו-`deleteAccount`
-**פתרון**: הוספת בדיקה אוטומטית עם הצגת אזהרה
-**סטטוס**: ✅ נפתר
-**תאריך**: 2025-08-16
+### 4. Inconsistent Status Values
+- **Issue**: Status values were inconsistent across the system (English vs Hebrew, different terms)
+- **Fix**: Standardized all status values to Hebrew: 'פתוח', 'סגור', 'מבוטל'
+- **Status**: ✅ Fixed
 
-### 3. הצגת מזהים מספריים במקום סימבולי טיקרים
-**תיאור**: בטבלת הטריידים הפתוחים הוצגו מזהים מספריים במקום סימבולי טיקרים
-**מיקום**: פונקציה `showOpenTradesWarning`
-**פתרון**: הוספת קריאה ל-API לקבלת סימבולי טיקרים
-**סטטוס**: ✅ נפתר
-**תאריך**: 2025-08-16
+### 5. apiCall Function Availability
+- **Issue**: `apiCall` function was not available in `accounts.html` due to missing `grid-table.js` import
+- **Fix**: Added `<script src="scripts/grid-table.js"></script>` to `accounts.html`
+- **Status**: ✅ Fixed
 
-### 4. סטטוסים לא עקביים במערכת
-**תיאור**: המערכת השתמשה בסטטוסים שונים באנגלית ובעברית
-**מיקום**: כל המערכת
-**פתרון**: הגדרת סטטוסים עקביים בעברית: 'פתוח', 'סגור', 'מבוטל'
-**סטטוס**: ✅ נפתר
-**תאריך**: 2025-08-16
+### 6. URL Encoding Issues
+- **Issue**: Hebrew characters in URL parameters were not properly encoded
+- **Fix**: Used `encodeURIComponent()` for Hebrew status values in API calls
+- **Status**: ✅ Fixed
 
-### 5. פונקציה `apiCall` לא זמינה בדף החשבונות
-**תיאור**: הפונקציה `apiCall` לא הייתה זמינה בדף החשבונות
-**מיקום**: `trading-ui/accounts.html`
-**פתרון**: הוספת `<script src="scripts/grid-table.js"></script>`
-**סטטוס**: ✅ נפתר
-**תאריך**: 2025-08-16
+### 7. Server Monitoring Awareness
+- **Issue**: Code changes were not being picked up due to server monitoring setup
+- **Fix**: Understood that server is managed by `monitor_server.py` and `run_waitress.py`
+- **Status**: ✅ Fixed
 
-## בעיות שזוהו וטרם נפתרו ⚠️
+## Identified but Unresolved Issues
 
-### 1. פונקציה `get_by_account_and_status` לא עובדת נכון
-**תיאור**: הפונקציה מחזירה את כל הטריידים הפתוחים במערכת במקום רק את הטריידים של החשבון הספציפי
-**מיקום**: `Backend/services/trade_service.py`
-**תסמינים**: 
-- חלון האזהרה מציג טריידים של כל החשבונות
-- בדיקת טריידים פתוחים לא מדויקת
-**השפעה**: 
-- משתמשים רואים טריידים לא רלוונטיים
-- בדיקת טריידים פתוחים לא מדויקת
-**סטטוס**: ⚠️ זוהה, ממתין לתיקון
-**תאריך זיהוי**: 2025-08-16
-**עדיפות**: גבוהה
+### 1. get_by_account_and_status Returning All Trades
+- **Issue**: The `get_by_account_and_status` function in `trade_service.py` appears to return all trades instead of filtering by account and status
+- **Investigation**: Added extensive logging to track parameter reception and filtering logic
+- **Status**: 🔍 Under Investigation
 
-**פירוט טכני**:
-```python
-@staticmethod
-def get_by_account_and_status(db: Session, account_id: int, status: str) -> List[Trade]:
-    """קבלת טריידים לפי חשבון וסטטוס"""
-    return db.query(Trade).filter(
-        Trade.account_id == account_id,
-        Trade.status == status
-    ).all()
-```
+## Partially Fixed Issues
 
-**בדיקות שנעשו**:
-- הוספת לוגים לפונקציה
-- בדיקת הפרמטרים שמתקבלים
-- בדיקת התוצאות שמחזירה הפונקציה
+### 1. URL Encoding
+- **Issue**: Hebrew characters in URL parameters causing "Bad Request" errors
+- **Partial Fix**: Used `encodeURIComponent()` in client-side calls
+- **Remaining**: May need additional backend handling for Hebrew parameters
+- **Status**: 🔄 Partially Fixed
 
-**הצעה לתיקון**:
-1. בדיקת הלוגים בשרת
-2. בדיקת הפרמטרים שמתקבלים
-3. בדיקת התוצאות שמחזירה הפונקציה
-4. תיקון הלוגיקה אם נדרש
+## Current Active Issues
 
-## בעיות שזוהו וטופלו חלקית 🔄
+### 1. Accounts Table Not Displaying on database.html
+- **Issue**: The accounts table on `database.html` is not displaying data, showing only the header, while `accounts.html` works correctly
+- **Symptoms**: 
+  - Header shows correct count (e.g., "8 חשבונות")
+  - Table body is empty or not rendered
+  - No JavaScript errors in console
+- **Investigation**: 
+  - Both pages should use the same shared external code (`accounts.js`)
+  - `database.html` calls `window.loadAccountsData()` from `accounts.js`
+  - `accounts.html` has a local wrapper function that calls `window.loadAccountsData()`
+- **Root Cause**: The `accounts.js` file appears to be outdated and doesn't contain the expected functions (`loadAccountsData`, `convertAccountStatusToHebrew`, etc.)
+- **Status**: 🔍 Under Investigation
 
-### 1. URL Encoding לתווים עבריים
-**תיאור**: תווים עבריים לא מקודדים נכון ב-URL
-**מיקום**: `trading-ui/scripts/accounts.js`
-**תסמינים**: 
-- שגיאות "Bad Request" בקריאות ל-API
-- תווים עבריים לא מועברים נכון
-**פתרון חלקי**: שימוש ב-`encodeURIComponent()`
-**סטטוס**: 🔄 תוקן חלקית
-**תאריך**: 2025-08-16
+### 2. Alerts Table Not Displaying on database.html
+- **Issue**: The alerts table on `database.html` is not displaying data, showing only the header, despite the correct count being displayed
+- **Symptoms**: 
+  - Header shows correct count (e.g., "8 התראות")
+  - Table body is empty or not rendered
+  - Occurs after implementing the `is_triggered` field for alerts
+- **Investigation**: 
+  - All alert-related JavaScript functions are centralized in `alerts.js`
+  - `database.html` is configured to use them
+  - Issue appears to be client-side rendering problem
+- **Status**: 🔍 Under Investigation
 
-**קוד תיקון**:
-```javascript
-// לפני התיקון
-const tradesResponse = await apiCall(`/api/v1/trades/?account_id=${accountId}&status=פתוח`);
+## Potential Future Issues
 
-// אחרי התיקון
-const tradesResponse = await apiCall(`/api/v1/trades/?account_id=${accountId}&status=${encodeURIComponent('פתוח')}`);
-```
+### 1. Performance Concerns
+- **Risk**: Client-side calculation of statistics may become slow with large datasets
+- **Mitigation**: Consider server-side aggregation for large datasets
 
-**נדרש**:
-- בדיקה שהתיקון עובד בכל המקרים
-- בדיקה עם תווים עבריים נוספים
-- בדיקה עם פרמטרים נוספים
+### 2. Browser Compatibility
+- **Risk**: RTL layout and Hebrew text may have compatibility issues with older browsers
+- **Mitigation**: Test across different browsers and versions
 
-## בעיות פוטנציאליות 🔍
+### 3. Security Considerations
+- **Risk**: Client-side data manipulation could be bypassed
+- **Mitigation**: Implement server-side validation for all operations
 
-### 1. ביצועים עם כמות גדולה של נתונים
-**תיאור**: המערכת לא נבדקה עם כמות גדולה של נתונים
-**השפעה פוטנציאלית**: 
-- טעינה איטית של דפים
-- זיכרון גבוה
-- תגובה איטית של הממשק
-**סטטוס**: 🔍 לא נבדק
-**עדיפות**: נמוכה
+### 4. Code Maintenance
+- **Risk**: Shared JavaScript files may become difficult to maintain as they grow
+- **Mitigation**: Consider modular architecture or TypeScript for better type safety
 
-### 2. תאימות דפדפנים
-**תיאור**: המערכת לא נבדקה בכל הדפדפנים
-**השפעה פוטנציאלית**: 
-- בעיות תצוגה בדפדפנים מסוימים
-- פונקציונליות לא עובדת
-**סטטוס**: 🔍 לא נבדק
-**עדיפות**: נמוכה
+## Notes
 
-### 3. אבטחה
-**תיאור**: המערכת לא נבדקה מבחינת אבטחה
-**השפעה פוטנציאלית**: 
-- פגיעויות אבטחה
-- גישה לא מורשית לנתונים
-**סטטוס**: 🔍 לא נבדק
-**עדיפות**: בינונית
-
-## תהליך דיווח בעיות
-
-### איך לדווח על בעיה חדשה
-1. **תיאור מפורט**: תאר את הבעיה בצורה מפורטת
-2. **שלבי שחזור**: תאר את השלבים לשחזור הבעיה
-3. **תסמינים**: תאר את התסמינים של הבעיה
-4. **השפעה**: תאר את ההשפעה על המשתמש
-5. **מיקום**: ציין את המיקום המדויק של הבעיה
-6. **עדיפות**: ציין את רמת העדיפות
-
-### תבנית דיווח
-```markdown
-### שם הבעיה
-**תיאור**: תיאור מפורט של הבעיה
-**מיקום**: מיקום הבעיה בקוד
-**תסמינים**: תסמיני הבעיה
-**השפעה**: השפעה על המשתמש
-**שלבי שחזור**: שלבים לשחזור הבעיה
-**סטטוס**: זוהה/בטיפול/נפתר
-**תאריך**: תאריך זיהוי הבעיה
-**עדיפות**: גבוהה/בינונית/נמוכה
-```
-
-## מעקב אחר בעיות
-
-### כלי מעקב
-- מסמך זה מתעד את כל הבעיות הידועות
-- כל בעיה מקבלת מזהה ייחודי
-- כל בעיה מתעדכנת עם סטטוס עדכני
-
-### עדכון סטטוס
-- ✅ נפתר - הבעיה נפתרה לחלוטין
-- 🔄 בטיפול - הבעיה בטיפול
-- ⚠️ זוהה - הבעיה זוהתה וטרם טופלה
-- 🔍 לא נבדק - הבעיה לא נבדקה
-
-### תאריכי עדכון
-- כל בעיה מתעדכנת עם תאריך עדכון אחרון
-- בעיות נפתרות מסומנות עם תאריך פתרון
-- בעיות חדשות מסומנות עם תאריך זיהוי
-
-## סיכום
-
-נכון ל-2025-08-16:
-- **בעיות נפתרות**: 5
-- **בעיות בטיפול**: 1
-- **בעיות זוהו**: 1
-- **בעיות לא נבדקות**: 3
-
-**סה"כ בעיות ידועות**: 10
-
-המערכת יציבה ברובה, עם בעיה אחת עיקרית שדורשת תיקון (פונקציה `get_by_account_and_status`).
+- The system uses a modular architecture with shared JavaScript files for common functionality
+- All status values are standardized to Hebrew terms across the entire system
+- The server is managed by monitoring scripts (`monitor_server.py` and `run_waitress.py`)
+- Browser caching can cause issues with seeing updated code - may need cache clearing

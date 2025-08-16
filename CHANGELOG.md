@@ -155,3 +155,171 @@
 - [KNOWN_ISSUES.md](./KNOWN_ISSUES.md) - בעיות ידועות
 - [trading-ui/scripts/README_ACCOUNTS_SYSTEM.md](./trading-ui/scripts/README_ACCOUNTS_SYSTEM.md) - תיעוד מערכת חשבונות
 - [Backend/README_SERVER.md](./Backend/README_SERVER.md) - תיעוד שרת
+
+## [2025-01-16] - Debugging Session
+
+### 🔍 Investigation
+- **Accounts Table Issue**: Investigated why accounts table on `database.html` is not displaying data while `accounts.html` works correctly
+- **Root Cause Analysis**: Discovered that `accounts.js` file appears to be outdated and doesn't contain expected functions (`loadAccountsData`, `convertAccountStatusToHebrew`, etc.)
+- **Code Comparison**: Compared how both pages call account-related functions and identified differences in implementation
+
+### 🔧 Attempted Fixes
+- **Function Call Update**: Updated `loadAccounts()` in `database.html` to call `window.loadAccountsData()` instead of `loadAccountsData()`
+- **Documentation Update**: Updated `KNOWN_ISSUES.md` to document the current active issues
+
+### 📝 Current Status
+- **Active Issues**: 
+  - Accounts table not displaying on `database.html` (investigation ongoing)
+  - Alerts table not displaying on `database.html` (investigation ongoing)
+- **Next Steps**: Need to recreate/update the `accounts.js` file with proper functions or fix the existing implementation
+
+### 🚨 Session Notes
+- **Loop Issue**: Assistant got stuck in a loop during debugging
+- **User Request**: User requested to update documentation and start fresh chat
+- **Documentation**: Updated `KNOWN_ISSUES.md` with current active issues
+
+---
+
+## [2025-01-16] - Alert System Enhancement
+
+### ✨ New Features
+- **is_triggered Field**: Added new field to Alert model with options: 'false' (default), 'New' (triggered but not read), 'true' (read)
+- **Automatic Status Update**: When alert is marked as read (true), main status automatically updates to 'סגור' (closed)
+- **New API Endpoints**: Added endpoints for marking alerts as triggered and read
+
+### 🔧 Backend Changes
+- **Alert Model**: Added `is_triggered = Column(String(20), default='false', nullable=True)` to Alert model
+- **Alert Service**: Created comprehensive `AlertService` with business logic for `is_triggered` transitions
+- **API Routes**: Added new routes for alert management (`/trigger`, `/read`, `/unread`, `/active`)
+- **Migration**: Created `add_is_triggered_to_alerts.py` migration script
+
+### 🎨 Frontend Changes
+- **Alert Table**: Added new column for `is_triggered` status with Hebrew display
+- **Action Buttons**: Added buttons to mark alerts as triggered (🔔) and read (📖)
+- **Modal Updates**: Updated add/edit modals to include `is_triggered` field
+- **Status Conversion**: Added `convertIsTriggeredToHebrew` function
+
+### 📊 Database
+- **Migration**: Successfully ran migration to add `is_triggered` column to alerts table
+- **Default Values**: Set existing alerts to 'false' by default
+
+### 🐛 Issues Encountered
+- **Server Restart**: Had to restart server to pick up new code changes
+- **Table Display**: Alerts table disappeared from `database.html` after implementation
+- **Temporary Revert**: Temporarily reverted changes to debug interface issue
+- **User Request**: User requested to keep all logic in external `alerts.js` file
+
+---
+
+## [2025-01-16] - CRUD Implementation for All Tables
+
+### ✨ New Features
+- **Executions CRUD**: Implemented full CRUD operations for executions table on `database.html`
+- **Tickers CRUD**: Implemented full CRUD operations for tickers table on `database.html`
+- **Alerts CRUD**: Implemented full CRUD operations for alerts table on `database.html`
+
+### 🔧 Backend Changes
+- **API Endpoints**: All CRUD endpoints working for accounts, tickers, alerts, and executions
+- **Service Layer**: Comprehensive service classes for all entities
+- **Data Validation**: Proper validation and error handling
+
+### 🎨 Frontend Changes
+- **Shared JavaScript Files**: Created modular JS files for each entity type
+  - `accounts.js` - Account management functions
+  - `tickers.js` - Ticker management functions  
+  - `alerts.js` - Alert management functions
+  - `executions.js` - Execution management functions
+- **Modal System**: Consistent modal design across all tables
+- **Action Buttons**: Edit, Cancel, Delete buttons for each table row
+- **Add Functionality**: Add new record buttons and modals for all tables
+
+### 📊 Database
+- **Status Standardization**: All status fields now use Hebrew values ('פתוח', 'סגור', 'מבוטל')
+- **Migration Scripts**: Created and ran migration scripts to update existing data
+
+### 🐛 Issues Fixed
+- **Duplicate Functions**: Removed duplicate JavaScript functions between pages
+- **API Call Issues**: Fixed `apiCall` function availability across pages
+- **Modal Not Found**: Fixed modal ID mapping issues
+- **Status Conversion**: Standardized status display and conversion functions
+
+---
+
+## [2025-01-16] - Account Management System Refactor
+
+### ✨ Major Refactoring
+- **Code Centralization**: Moved all account-related JavaScript functions to shared `accounts.js` file
+- **Consistent Architecture**: Both `accounts.html` and `database.html` now use the same shared code
+- **Modular Design**: Separated concerns into dedicated files for better maintainability
+
+### 🔧 Backend Changes
+- **API Versioning**: Updated all endpoints to use `/api/v1/` prefix
+- **Service Layer**: Enhanced account service with comprehensive CRUD operations
+- **Data Models**: Updated account model with new fields (`total_value`, `total_pl`)
+
+### 🎨 Frontend Changes
+- **Shared Functions**: All account management functions now in `accounts.js`
+- **Consistent UI**: Standardized modal design and button layout across pages
+- **RTL Support**: Improved right-to-left layout for Hebrew interface
+- **Status Management**: Consistent Hebrew status values throughout the system
+
+### 🛡️ New Features
+- **Open Trade Checks**: Added warning modal when canceling/deleting accounts with open trades
+- **Ticker Symbol Display**: Enhanced warning modal to show ticker symbols instead of IDs
+- **Error Handling**: Improved error handling and user feedback
+
+### 📊 Database
+- **Status Migration**: Updated all status values to Hebrew terms
+- **Schema Updates**: Added new columns and updated existing data
+
+### 🐛 Issues Resolved
+- **Duplicate Code**: Eliminated code duplication between pages
+- **API Compatibility**: Fixed API endpoint mismatches
+- **Modal Alignment**: Fixed RTL modal header alignment
+- **Cache Issues**: Resolved browser caching problems
+
+---
+
+## [2025-01-15] - Initial Account Editing Implementation
+
+### ✨ New Features
+- **Account Editing**: Implemented full CRUD operations for accounts through database interface
+- **Modal System**: Created comprehensive modal system for account management
+- **Status Management**: Added Hebrew status options with proper conversion
+
+### 🔧 Backend Changes
+- **API Routes**: Created new versioned API endpoints (`/api/v1/accounts/`)
+- **Service Layer**: Implemented account service with business logic
+- **Data Models**: Enhanced account model with additional fields
+
+### 🎨 Frontend Changes
+- **UI Improvements**: Enhanced account table with action buttons
+- **Modal Design**: Created responsive modals for add/edit operations
+- **Form Validation**: Added client-side validation for account forms
+
+### 🐛 Issues Encountered
+- **API Migration**: Had to update from old `/api/accounts/` to new `/api/v1/accounts/` endpoints
+- **Data Model Changes**: Adjusted to new account model structure
+- **Cache Problems**: Faced browser caching issues requiring server restarts
+
+---
+
+## Quality Metrics
+
+### Before Changes
+- **Code Duplication**: High (duplicate functions across pages)
+- **Maintainability**: Low (scattered functionality)
+- **Consistency**: Poor (inconsistent status values)
+- **Error Handling**: Basic
+
+### After Changes  
+- **Code Duplication**: Minimal (shared external files)
+- **Maintainability**: High (modular architecture)
+- **Consistency**: Excellent (standardized Hebrew statuses)
+- **Error Handling**: Comprehensive
+
+### Future Plans
+- **Performance Optimization**: Server-side aggregation for large datasets
+- **Type Safety**: Consider TypeScript migration
+- **Testing**: Implement comprehensive test suite
+- **Documentation**: Expand technical documentation

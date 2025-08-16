@@ -348,12 +348,14 @@ function showEditNoteModal(note) {
         return;
     }
     
-    // מילוי הנתונים
-    fillNoteEditModal(note);
-    
-    // הצגת המודל
+    // הצגת המודל קודם
     const modal = new bootstrap.Modal(document.getElementById('editNoteModal'));
     modal.show();
+    
+    // מילוי הנתונים אחרי שהמודל נפתח
+    setTimeout(() => {
+        fillNoteEditModal(note);
+    }, 100);
 }
 
 /**

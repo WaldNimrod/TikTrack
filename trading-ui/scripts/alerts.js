@@ -852,7 +852,6 @@ function createAlertCardHTML(alert) {
       
       <div class="alert-card-footer">
         <div class="alert-ticker-info">
-          <span class="alert-detail-item">📈 ${tickerSymbol || 'N/A'}</span>
           <span class="alert-detail-item">$${getCurrentPrice(tickerSymbol)}</span>
           <span class="alert-detail-item ${getDailyChangeClass(tickerSymbol)}">${getDailyChange(tickerSymbol)}%</span>
         </div>

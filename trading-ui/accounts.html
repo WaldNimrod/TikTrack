@@ -609,7 +609,7 @@
       tableElement.innerHTML = '<div class="loading">טוען חשבונות...</div>';
       
       try {
-        const response = await fetch('/api/database/accounts');
+        const response = await fetch('/api/database_v2/accounts');
         const accounts = await response.json();
         
         if (accounts.length === 0) {

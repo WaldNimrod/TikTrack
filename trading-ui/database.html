@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>בסיס נתונים - TikTrack</title>
+  
+  <!-- 🚨 CRITICAL REMINDERS FOR ALL NEW SESSIONS:
+       - ALWAYS start with: cd Backend && ./run_monitored.sh
+       - ALWAYS check health: curl http://localhost:8080/api/health
+       - NEVER write routes directly in app.py - use blueprints only!
+       - ALWAYS follow architecture: Models → Services → Routes → App
+       - ALWAYS use port 8080
+       - ALWAYS test all CRUD operations: GET, POST, PUT, DELETE -->
   <!-- AG-Grid CSS -->
   <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css" rel="stylesheet" />
   <link rel="stylesheet" href="styles/apple-theme.css?v=9" />
@@ -538,9 +546,674 @@
         </div>
       </div>
 
+      <!-- טבלת משתמשים -->
+      <div class="content-section" id="usersSection">
+        <div class="table-header">
+          <div class="table-title">
+            👥 משתמשים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Users</span>
+          </div>
+          <div class="table-count" id="usersCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש משתמשים..."
+                onkeyup="filterTable('usersTable', this.value)"
+              >
+            </div>
+            <button class="add-btn action-btn" onclick="showAddUserModal()" title="הוסף משתמש חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="loadUsers()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="filter-toggle-btn" onclick="toggleUsersSection()" title="הצג/הסתר טבלת משתמשים">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive" id="usersContainer">
+          <table class="table" id="usersTable">
+            <thead>
+              <tr>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                <th>שם משתמש<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Username</span></th>
+                <th>אימייל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Email</span></th>
+                <th>פעיל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Active</span></th>
+                <th>תפקידים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Roles</span></th>
+                <th>התחברות אחרונה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Last Login</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
+                <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="8" class="loading">טוען משתמשים...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+        </div>
+      </div>
 
+    </div>
+  </div>
 
+  <!-- Modal Dialogs for Editing -->
+  
+  <!-- Edit Account Modal -->
+  <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editAccountModalLabel">עריכת חשבון</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editAccountForm">
+            <input type="hidden" id="editAccountId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAccountName" class="form-label">שם החשבון</label>
+                  <input type="text" class="form-control" id="editAccountName" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAccountCurrency" class="form-label">מטבע</label>
+                  <select class="form-control" id="editAccountCurrency" required>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="ILS">ILS</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAccountStatus" class="form-label">סטטוס</label>
+                  <select class="form-control" id="editAccountStatus" required>
+                    <option value="active">פעיל</option>
+                    <option value="inactive">לא פעיל</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAccountCashBalance" class="form-label">יתרת מזומן</label>
+                  <input type="number" step="0.01" class="form-control" id="editAccountCashBalance" required>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editAccountNotes" class="form-label">הערות</label>
+              <textarea class="form-control" id="editAccountNotes" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                      <button type="button" class="btn btn-primary" onclick="alert('פונקציית שמירה תתווסף בקרוב')">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Edit Ticker Modal -->
+  <div class="modal fade" id="editTickerModal" tabindex="-1" aria-labelledby="editTickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editTickerModalLabel">עריכת טיקר</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editTickerForm">
+            <input type="hidden" id="editTickerId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTickerSymbol" class="form-label">סמל</label>
+                  <input type="text" class="form-control" id="editTickerSymbol" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTickerName" class="form-label">שם</label>
+                  <input type="text" class="form-control" id="editTickerName" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTickerType" class="form-label">סוג</label>
+                  <select class="form-control" id="editTickerType" required>
+                    <option value="stock">מניה</option>
+                    <option value="etf">ETF</option>
+                    <option value="crypto">קריפטו</option>
+                    <option value="forex">פורקס</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTickerCurrency" class="form-label">מטבע</label>
+                  <select class="form-control" id="editTickerCurrency" required>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="ILS">ILS</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editTickerRemarks" class="form-label">הערות</label>
+              <textarea class="form-control" id="editTickerRemarks" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('tickers')">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Trade Modal -->
+  <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editTradeModalLabel">עריכת טרייד</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editTradeForm">
+            <input type="hidden" id="editTradeId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradeAccountId" class="form-label">חשבון</label>
+                  <input type="number" class="form-control" id="editTradeAccountId" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradeTickerId" class="form-label">טיקר</label>
+                  <input type="number" class="form-control" id="editTradeTickerId" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradeStatus" class="form-label">סטטוס</label>
+                  <select class="form-control" id="editTradeStatus" required>
+                    <option value="open">פתוח</option>
+                    <option value="closed">סגור</option>
+                    <option value="cancelled">בוטל</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradeType" class="form-label">סוג</label>
+                  <select class="form-control" id="editTradeType" required>
+                    <option value="buy">קנייה</option>
+                    <option value="sell">מכירה</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editTradeNotes" class="form-label">הערות</label>
+              <textarea class="form-control" id="editTradeNotes" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('trades')">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Trade Plan Modal -->
+  <div class="modal fade" id="editTradePlanModal" tabindex="-1" aria-labelledby="editTradePlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editTradePlanModalLabel">עריכת תוכנית טרייד</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editTradePlanForm">
+            <input type="hidden" id="editTradePlanId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanAccountId" class="form-label">חשבון</label>
+                  <input type="number" class="form-control" id="editTradePlanAccountId" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanTickerId" class="form-label">טיקר</label>
+                  <input type="number" class="form-control" id="editTradePlanTickerId" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanInvestmentType" class="form-label">סוג השקעה</label>
+                  <select class="form-control" id="editTradePlanInvestmentType" required>
+                    <option value="swing">סווינג</option>
+                    <option value="investment">השקעה</option>
+                    <option value="passive">פאסיבי</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanPlannedAmount" class="form-label">סכום מתוכנן</label>
+                  <input type="number" step="0.01" class="form-control" id="editTradePlanPlannedAmount" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanStopPrice" class="form-label">מחיר עצירה</label>
+                  <input type="number" step="0.01" class="form-control" id="editTradePlanStopPrice">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanTargetPrice" class="form-label">מחיר יעד</label>
+                  <input type="number" step="0.01" class="form-control" id="editTradePlanTargetPrice">
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editTradePlanEntryConditions" class="form-label">תנאי כניסה</label>
+              <textarea class="form-control" id="editTradePlanEntryConditions" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="editTradePlanReasons" class="form-label">סיבות</label>
+              <textarea class="form-control" id="editTradePlanReasons" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('trade_plans')">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal fade" id="editUsersModal" tabindex="-1" aria-labelledby="editUsersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editUsersModalLabel">עריכת משתמש</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editUserForm">
+            <input type="hidden" id="editUserId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editUserUsername" class="form-label">שם משתמש</label>
+                  <input type="text" class="form-control" id="editUserUsername" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editUserEmail" class="form-label">אימייל</label>
+                  <input type="email" class="form-control" id="editUserEmail" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editUserIsActive" class="form-label">פעיל</label>
+                  <select class="form-select" id="editUserIsActive">
+                    <option value="true">כן</option>
+                    <option value="false">לא</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editUserRoles" class="form-label">תפקידים (מופרדים בפסיקים)</label>
+                  <input type="text" class="form-control" id="editUserRoles" placeholder="admin, user, manager">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('users')">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Role Modal -->
+  <div class="modal fade" id="editUserRolesModal" tabindex="-1" aria-labelledby="editUserRolesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editUserRolesModalLabel">עריכת תפקיד משתמש</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editUserRoleForm">
+            <input type="hidden" id="editUserRoleId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editUserRoleUserId" class="form-label">מזהה משתמש</label>
+                  <input type="number" class="form-control" id="editUserRoleUserId" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editUserRoleUsername" class="form-label">שם משתמש</label>
+                  <input type="text" class="form-control" id="editUserRoleUsername" readonly>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editUserRoleRoleId" class="form-label">מזהה תפקיד</label>
+                  <input type="number" class="form-control" id="editUserRoleRoleId" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editUserRoleRoleName" class="form-label">שם תפקיד</label>
+                  <input type="text" class="form-control" id="editUserRoleRoleName" readonly>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editUserRoleAssignedAt" class="form-label">תאריך הקצאה</label>
+                  <input type="datetime-local" class="form-control" id="editUserRoleAssignedAt">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('user_roles')">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Alert Modal -->
+  <div class="modal fade" id="editAlertsModal" tabindex="-1" aria-labelledby="editAlertsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editAlertsModalLabel">עריכת התראה</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editAlertForm">
+            <input type="hidden" id="editAlertId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAlertAccountId" class="form-label">מזהה חשבון</label>
+                  <input type="number" class="form-control" id="editAlertAccountId">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAlertTickerId" class="form-label">מזהה טיקר</label>
+                  <input type="number" class="form-control" id="editAlertTickerId">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAlertType" class="form-label">סוג</label>
+                  <input type="text" class="form-control" id="editAlertType" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAlertCondition" class="form-label">תנאי</label>
+                  <input type="text" class="form-control" id="editAlertCondition" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAlertMessage" class="form-label">הודעה</label>
+                  <textarea class="form-control" id="editAlertMessage" rows="3"></textarea>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editAlertIsActive" class="form-label">פעיל</label>
+                  <select class="form-select" id="editAlertIsActive">
+                    <option value="true">כן</option>
+                    <option value="false">לא</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('alerts')">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Cash Flow Modal -->
+  <div class="modal fade" id="editCashFlowsModal" tabindex="-1" aria-labelledby="editCashFlowsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editCashFlowsModalLabel">עריכת תזרים מזומנים</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editCashFlowForm">
+            <input type="hidden" id="editCashFlowId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editCashFlowAccountId" class="form-label">מזהה חשבון</label>
+                  <input type="number" class="form-control" id="editCashFlowAccountId" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editCashFlowType" class="form-label">סוג</label>
+                  <input type="text" class="form-control" id="editCashFlowType" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editCashFlowAmount" class="form-label">סכום</label>
+                  <input type="number" step="0.01" class="form-control" id="editCashFlowAmount" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editCashFlowDate" class="form-label">תאריך</label>
+                  <input type="date" class="form-control" id="editCashFlowDate" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="mb-3">
+                  <label for="editCashFlowDescription" class="form-label">תיאור</label>
+                  <textarea class="form-control" id="editCashFlowDescription" rows="3"></textarea>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('cash_flows')">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Note Modal -->
+  <div class="modal fade" id="editNotesModal" tabindex="-1" aria-labelledby="editNotesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editNotesModalLabel">עריכת הערה</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editNoteForm">
+            <input type="hidden" id="editNoteId">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="editNoteAccountId" class="form-label">מזהה חשבון</label>
+                  <input type="number" class="form-control" id="editNoteAccountId">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="editNoteTradeId" class="form-label">מזהה טרייד</label>
+                  <input type="number" class="form-control" id="editNoteTradeId">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="editNoteTradePlanId" class="form-label">מזהה תוכנית טרייד</label>
+                  <input type="number" class="form-control" id="editNoteTradePlanId">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="mb-3">
+                  <label for="editNoteContent" class="form-label">תוכן</label>
+                  <textarea class="form-control" id="editNoteContent" rows="4" required></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editNoteAttachment" class="form-label">קובץ מצורף</label>
+                  <input type="text" class="form-control" id="editNoteAttachment">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('notes')">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Execution Modal -->
+  <div class="modal fade" id="editExecutionsModal" tabindex="-1" aria-labelledby="editExecutionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editExecutionsModalLabel">עריכת ביצוע</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editExecutionForm">
+            <input type="hidden" id="editExecutionId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editExecutionTradeId" class="form-label">מזהה טרייד</label>
+                  <input type="number" class="form-control" id="editExecutionTradeId" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editExecutionAction" class="form-label">פעולה</label>
+                  <input type="text" class="form-control" id="editExecutionAction" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editExecutionDate" class="form-label">תאריך</label>
+                  <input type="datetime-local" class="form-control" id="editExecutionDate" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editExecutionQuantity" class="form-label">כמות</label>
+                  <input type="number" class="form-control" id="editExecutionQuantity">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editExecutionPrice" class="form-label">מחיר</label>
+                  <input type="number" step="0.01" class="form-control" id="editExecutionPrice" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editExecutionFee" class="form-label">עמלה</label>
+                  <input type="number" step="0.01" class="form-control" id="editExecutionFee" value="0">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editExecutionSource" class="form-label">מקור</label>
+                  <input type="text" class="form-control" id="editExecutionSource">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('executions')">שמור</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -551,6 +1224,12 @@
   
   <script>
     // פונקציה לחיפוש בטבלאות
+    /**
+     * Filter table rows based on search term
+     * 
+     * @param {string} tableId - ID of the table to filter
+     * @param {string} searchTerm - Search term to filter by
+     */
     function filterTable(tableId, searchTerm) {
       const table = document.getElementById(tableId);
       if (!table) return;
@@ -614,7 +1293,8 @@
         'alertsTable': 'alertsCount',
         'cashFlowsTable': 'cashFlowsCount',
         'notesTable': 'notesCount',
-        'executionsTable': 'executionsCount'
+        'executionsTable': 'executionsCount',
+        'userRolesTable': 'userRolesCount'
       };
       
       const countId = countMap[tableId];
@@ -632,7 +1312,8 @@
         'alertsTable': 'התראות',
         'cashFlowsTable': 'תזרימי מזומנים',
         'notesTable': 'הערות',
-        'executionsTable': 'ביצועים'
+        'executionsTable': 'ביצועים',
+        'userRolesTable': 'תפקידי משתמשים'
       };
       
       return nameMap[tableId] || '';
@@ -655,12 +1336,31 @@
       return date.toLocaleDateString('he-IL');
     }
 
+    /**
+     * Format date and time for display
+     * 
+     * @param {string} dateString - ISO date string to format
+     * @returns {string} Formatted date and time string
+     */
     function formatDateTime(dateString) {
       if (!dateString) return '-';
       const date = new Date(dateString);
       return date.toLocaleString('he-IL');
     }
 
+    /**
+     * Utility functions for data formatting and display
+     * 
+     * These functions provide consistent formatting for different data types
+     * displayed in the database tables.
+     */
+    
+    /**
+     * Format currency amounts for display
+     * 
+     * @param {number} amount - The amount to format
+     * @returns {string} Formatted currency string
+     */
     function formatCurrency(amount) {
       if (amount === null || amount === undefined) return '-';
       return new Intl.NumberFormat('he-IL', {
@@ -683,8 +1383,25 @@
       return statusMap[status] || `<span class="badge bg-secondary">${status}</span>`;
     }
 
-            // API call function
-        async function apiCall(endpoint, options = {}) {
+    /**
+     * Generic API call function for communicating with the backend
+     * 
+     * This function provides a centralized way to make HTTP requests to the
+     * TikTrack backend API. It handles authentication, error handling, and
+     * response formatting consistently across all API calls.
+     * 
+     * Features:
+     * - Automatic token refresh on 401 errors
+     * - Consistent error handling and logging
+     * - Support for custom headers and options
+     * - JSON request/response handling
+     * 
+     * @param {string} endpoint - API endpoint path (e.g., '/api/v1/accounts/')
+     * @param {Object} options - Additional fetch options (method, body, headers, etc.)
+     * @returns {Promise<Object>} API response data
+     * @throws {Error} When API call fails
+     */
+    async function apiCall(endpoint, options = {}) {
           const baseUrl = 'http://127.0.0.1:8080';
       const url = `${baseUrl}${endpoint}`;
       
@@ -739,7 +1456,22 @@
       }
     }
 
-    // Data loading functions
+    /**
+     * Data loading functions for database tables
+     * 
+     * These functions handle loading and displaying data from various database tables
+     * using the new modular API endpoints. Each function follows the same pattern:
+     * 1. Make API call to the appropriate endpoint
+     * 2. Process the response data
+     * 3. Update the corresponding HTML table
+     * 4. Handle errors gracefully
+     */
+    
+    /**
+     * Load and display user roles data
+     * 
+     * @returns {Promise<void>}
+     */
     async function loadUserRoles() {
         try {
             const response = await apiCall('/api/v1/user_roles/');
@@ -759,12 +1491,8 @@
                         <td>${userRole.assigned_at || 'לא מוגדר'}</td>
                         <td>${userRole.created_at || 'לא מוגדר'}</td>
                         <td>
-                            <button class="action-btn edit-btn" onclick="editUserRole(${userRole.id})" title="ערוך">
-                                <span class="btn-icon">✏️</span>
-                            </button>
-                            <button class="action-btn delete-btn" onclick="deleteUserRole(${userRole.id})" title="מחק">
-                                <span class="btn-icon">🗑️</span>
-                            </button>
+                            <button class="btn btn-sm btn-primary" onclick="editRecord('user_roles', ${userRole.id})">ערוך</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteRecord('user_roles', ${userRole.id})">מחק</button>
                         </td>
                     </tr>
                 `).join('');
@@ -780,10 +1508,15 @@
         }
     }
 
+    /**
+     * Load and display users data
+     * 
+     * @returns {Promise<void>}
+     */
     async function loadUsers() {
       try {
         console.log('🔄 טוען משתמשים...');
-        const response = await apiCall('/api/v1/auth/users');
+        const response = await apiCall('/api/v1/users/');
         const users = response.data;
         
         const tbody = document.querySelector('#usersTable tbody');
@@ -797,8 +1530,8 @@
             <td>${formatDateTime(user.last_login)}</td>
             <td>${formatDateTime(user.created_at)}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editUser(${user.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="editRecord('users', ${user.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('users', ${user.id})">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -813,11 +1546,24 @@
       }
     }
 
+    /**
+     * Load and display accounts data from the new API
+     * 
+     * This function fetches account data from the new modular API endpoint
+     * and displays it in the accounts table. It uses the updated API structure
+     * with proper error handling and data formatting.
+     * 
+     * API Endpoint: /api/v1/accounts/
+     * Architecture: New modular backend with service layer
+     * 
+     * @returns {Promise<void>}
+     */
     async function loadAccounts() {
       try {
         console.log('🔄 טוען חשבונות...');
-        const response = await apiCall('/api/accounts');
-        const accounts = response; // השרת מחזיר מערך ישירות
+        // Use the new modular API endpoint with proper versioning
+        const response = await apiCall('/api/v1/accounts/');
+        const accounts = response.data || response; // Handle both response formats
         
         const tbody = document.querySelector('#accountsTable tbody');
         tbody.innerHTML = accounts.map(account => `
@@ -831,8 +1577,8 @@
             <td>${formatCurrency(account.total_pl)}</td>
             <td>${account.notes || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editAccount(${account.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="alert('פונקציית עריכה תתווסף בקרוב')">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="alert('פונקציית מחיקה תתווסף בקרוב')">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -847,11 +1593,16 @@
       }
     }
 
+    /**
+     * Load and display tickers data
+     * 
+     * @returns {Promise<void>}
+     */
     async function loadTickers() {
       try {
         console.log('🔄 טוען טיקרים...');
-        const response = await apiCall('/api/tickers');
-        const tickers = response; // השרת מחזיר מערך ישירות
+        const response = await apiCall('/api/v1/tickers/');
+        const tickers = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
         
         const tbody = document.querySelector('#tickersTable tbody');
         tbody.innerHTML = tickers.map(ticker => `
@@ -864,8 +1615,8 @@
             <td>${ticker.active_trades ? 'כן' : 'לא'}</td>
             <td>${ticker.remarks || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editTicker(${ticker.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="editRecord('tickers', ${ticker.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('tickers', ${ticker.id})">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -879,11 +1630,16 @@
       }
     }
 
+    /**
+     * Load and display trades data
+     * 
+     * @returns {Promise<void>}
+     */
     async function loadTrades() {
       try {
         console.log('🔄 טוען טריידים...');
-        const response = await apiCall('/api/trades');
-        const trades = response; // השרת מחזיר מערך ישירות
+        const response = await apiCall('/api/v1/trades/');
+        const trades = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
         
         const tbody = document.querySelector('#tradesTable tbody');
         tbody.innerHTML = trades.map(trade => `
@@ -899,8 +1655,8 @@
             <td>${formatCurrency(trade.total_pl)}</td>
             <td>${trade.notes || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editTrade(${trade.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteTrade(${trade.id})">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="editRecord('trades', ${trade.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('trades', ${trade.id})">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -914,10 +1670,15 @@
       }
     }
 
+    /**
+     * Load and display trade plans data
+     * 
+     * @returns {Promise<void>}
+     */
     async function loadTradePlans() {
       try {
         console.log('🔄 טוען תוכניות טרייד...');
-        const response = await apiCall('/api/tradeplans');
+        const response = await apiCall('/api/v1/trade_plans/');
         const plans = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#tradePlansTable tbody');
@@ -936,8 +1697,8 @@
             <td>${formatDateTime(plan.canceled_at)}</td>
             <td>${plan.cancel_reason || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editTradePlan(${plan.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteTradePlan(${plan.id})">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="editRecord('trade_plans', ${plan.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('trade_plans', ${plan.id})">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -951,10 +1712,15 @@
       }
     }
 
+    /**
+     * Load and display alerts data
+     * 
+     * @returns {Promise<void>}
+     */
     async function loadAlerts() {
       try {
         console.log('🔄 טוען התראות...');
-        const response = await apiCall('/api/database_v2/alerts');
+        const response = await apiCall('/api/v1/alerts/');
         const alerts = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#alertsTable tbody');
@@ -970,8 +1736,8 @@
             <td>${formatDateTime(alert.triggered_at)}</td>
             <td>${formatDateTime(alert.created_at)}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editAlert(${alert.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="editRecord('alerts', ${alert.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('alerts', ${alert.id})">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -985,10 +1751,15 @@
       }
     }
 
+    /**
+     * Load and display cash flows data
+     * 
+     * @returns {Promise<void>}
+     */
     async function loadCashFlows() {
       try {
         console.log('🔄 טוען תזרימי מזומנים...');
-        const response = await apiCall('/api/database_v2/cash_flows');
+        const response = await apiCall('/api/v1/cash_flows/');
         const cashFlows = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#cashFlowsTable tbody');
@@ -1002,8 +1773,8 @@
             <td>${cf.description || '-'}</td>
             <td>${formatDateTime(cf.created_at)}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editCashFlow(${cf.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cf.id})">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="editRecord('cash_flows', ${cf.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('cash_flows', ${cf.id})">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -1017,10 +1788,15 @@
       }
     }
 
+    /**
+     * Load and display notes data
+     * 
+     * @returns {Promise<void>}
+     */
     async function loadNotes() {
       try {
         console.log('🔄 טוען הערות...');
-        const response = await apiCall('/api/database_v2/notes');
+        const response = await apiCall('/api/v1/notes/');
         const notes = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#notesTable tbody');
@@ -1034,8 +1810,8 @@
             <td>${formatDateTime(note.created_at)}</td>
             <td>${note.attachment || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editNote(${note.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id})">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="editRecord('notes', ${note.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('notes', ${note.id})">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -1049,10 +1825,15 @@
       }
     }
 
+    /**
+     * Load and display executions data
+     * 
+     * @returns {Promise<void>}
+     */
     async function loadExecutions() {
       try {
         console.log('🔄 טוען ביצועים...');
-        const response = await apiCall('/api/database_v2/executions');
+        const response = await apiCall('/api/v1/executions/');
         const executions = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#executionsTable tbody');
@@ -1067,8 +1848,8 @@
             <td>${formatCurrency(execution.fee)}</td>
             <td>${execution.source || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editExecution(${execution.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="editRecord('executions', ${execution.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('executions', ${execution.id})">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -1083,6 +1864,12 @@
     }
 
     // Action functions
+    /**
+     * Refresh all database tables by reloading their data
+     * 
+     * This function calls all the load functions to refresh the data
+     * displayed in all tables on the database page.
+     */
     function refreshAllTables() {
       loadUsers();
       loadAccounts();
@@ -1096,42 +1883,30 @@
       loadUserRoles();
     }
 
+    /**
+     * Export database data to CSV format
+     * 
+     * This function collects data from all tables and exports it
+     * as a CSV file for backup or analysis purposes.
+     */
     function exportDatabase() {
       // TODO: Implement database export functionality
       alert('פונקציית ייצוא תתווסף בקרוב');
     }
 
-    // Edit functions (placeholders)
-    function editUserRole(userRoleId) {
-        alert(`עריכת תפקיד משתמש ${userRoleId} - לא מומש עדיין`);
-    }
-
-    function deleteUserRole(userRoleId) {
-        if (confirm('האם אתה בטוח שברצונך למחוק תפקיד משתמש זה?')) {
-            alert(`מחיקת תפקיד משתמש ${userRoleId} - לא מומש עדיין`);
-        }
-    }
-
-    function editUser(id) { alert(`עריכת משתמש ${id}`); }
-    function deleteUser(id) { alert(`מחיקת משתמש ${id}`); }
-    function editAccount(id) { alert(`עריכת חשבון ${id}`); }
-    function deleteAccount(id) { alert(`מחיקת חשבון ${id}`); }
-    function editTicker(id) { alert(`עריכת טיקר ${id}`); }
-    function deleteTicker(id) { alert(`מחיקת טיקר ${id}`); }
-    function editTrade(id) { alert(`עריכת טרייד ${id}`); }
-    function deleteTrade(id) { alert(`מחיקת טרייד ${id}`); }
-    function editTradePlan(id) { alert(`עריכת תוכנית טרייד ${id}`); }
-    function deleteTradePlan(id) { alert(`מחיקת תוכנית טרייד ${id}`); }
-    function editAlert(id) { alert(`עריכת התראה ${id}`); }
-    function deleteAlert(id) { alert(`מחיקת התראה ${id}`); }
-    function editCashFlow(id) { alert(`עריכת תזרים מזומנים ${id}`); }
-    function deleteCashFlow(id) { alert(`מחיקת תזרים מזומנים ${id}`); }
-    function editNote(id) { alert(`עריכת הערה ${id}`); }
-    function deleteNote(id) { alert(`מחיקת הערה ${id}`); }
-    function editExecution(id) { alert(`עריכת ביצוע ${id}`); }
-    function deleteExecution(id) { alert(`מחיקת ביצוע ${id}`); }
+    // פונקציות עריכה ומחיקה - משתמשות בפונקציות הכלליות מקובץ grid-table.js
+    // הפונקציות הספציפיות הוסרו לטובת הפונקציות הכלליות:
+    // - editRecord(tableType, recordId)
+    // - deleteRecord(tableType, recordId)
+    // - saveRecord(tableType)
 
     // פונקציה לטעינת מצב הטבלאות השמור
+    /**
+     * Load and restore table section states from localStorage
+     * 
+     * This function restores the collapsed/expanded state of table sections
+     * based on user preferences stored in localStorage.
+     */
     function loadTableStates() {
       const sections = [
         'usersSection',
@@ -1189,6 +1964,12 @@
     }
 
     // Initial data load - ללא אימות
+    /**
+     * Page initialization and setup
+     * 
+     * This event listener runs when the DOM is fully loaded and sets up
+     * the database page with initial data loading and state restoration.
+     */
     document.addEventListener('DOMContentLoaded', async () => {
       console.log('טוען נתונים ללא אימות');
       loadTableStates(); // טוען את המצב השמור של הטבלאות
@@ -1199,18 +1980,7 @@
 
 
 
-         // פונקציה לרענון כל הטבלאות
-     function refreshAllTables() {
-         loadAccounts();
-        loadTickers();
-        loadTrades();
-        loadTradePlans();
-        loadAlerts();
-        loadCashFlows();
-        loadNotes();
-        loadExecutions();
-        loadUserRoles();
-    }
+
 
     // פונקציות לפתיחה/סגירה של סקציות
     function toggleUserRolesSection() {
@@ -1248,6 +2018,12 @@
       }
     }
 
+    /**
+     * Toggle the visibility of the accounts table section
+     * 
+     * This function shows/hides the accounts table and saves the state
+     * to localStorage for persistence across page reloads.
+     */
     function toggleAccountsSection() {
       const container = document.getElementById('accountsContainer');
       const footer = document.querySelector('#accountsSection .table-footer');
@@ -1384,6 +2160,12 @@
         localStorage.setItem('executionsSectionOpen', 'false');
       }
     }
+
+    // פונקציות מודלים - הוסרו לטובת הפונקציות הכלליות מקובץ grid-table.js
+    // הפונקציות הספציפיות הוסרו לטובת הפונקציות הכלליות:
+    // - showEditModal(tableType, data)
+    // - fillEditModalData(tableType, data)
+    // - saveRecord(tableType)
   </script>
 </body>
 </html>

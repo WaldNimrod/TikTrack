@@ -1647,10 +1647,12 @@
         if (savedTypeFilter) {
           filters.types = JSON.parse(savedTypeFilter);
           console.log('Loaded saved type filter:', filters.types);
+          window.selectedTypesForFilter = filters.types;
         }
         if (savedAccountFilter) {
           filters.accounts = JSON.parse(savedAccountFilter);
           console.log('Loaded saved account filter:', filters.accounts);
+          window.selectedAccountsForFilter = filters.accounts;
         }
         if (savedDateRangeFilter) {
           filters.dateRanges = JSON.parse(savedDateRangeFilter);
@@ -1663,7 +1665,16 @@
         if (savedSearchFilter) {
           filters.search = savedSearchFilter;
           console.log('Loaded saved search filter:', filters.search);
+          window.searchTermForFilter = filters.search;
         }
+        
+        console.log('🔍 All saved filters loaded:', {
+          statuses: window.selectedStatusesForFilter,
+          types: window.selectedTypesForFilter,
+          accounts: window.selectedAccountsForFilter,
+          dateRange: window.selectedDateRangeForFilter,
+          search: window.searchTermForFilter
+        });
         
         return filters;
       } catch (error) {

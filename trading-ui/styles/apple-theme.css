@@ -156,8 +156,8 @@ body {
 
 /* כפתורים בסגנון אפל - משתמשים בסגנונות הגלובליים */
 
-/* כרטיסים בסגנון אפל */
-.card {
+/* כרטיסים בסגנון אפל - לא כולל כרטיסי עיצובים */
+.card:not(.design-card) {
   background: var(--apple-bg-elevated);
   border-radius: var(--apple-radius-large);
   border: 1px solid var(--apple-border-light);
@@ -266,56 +266,9 @@ body {
   box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
 }
 
-/* תגיות סטטוס בסגנון אפל */
-.badge-status {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 500;
-  text-align: center;
-  color: white;
-  min-width: 60px;
-}
+/* הגדרות .badge-status הועברו ל-styles.css */
 
-.badge-status.פתוח {
-  background-color: #28a745;
-}
-
-.badge-status.סגור {
-  background-color: #29a6a8;
-}
-
-.badge-status.מבוטל {
-  background-color: #dc3545;
-}
-
-/* תגיות סוג השקעה בסגנון אפל */
-.badge-type {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 500;
-  text-align: center;
-  color: #333;
-  min-width: 60px;
-}
-
-.badge-type.סווינג {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-
-.badge-type.השקעה {
-  background-color: #fff8e1;
-  color: #f57c00;
-}
-
-.badge-type.פאסיבי {
-  background-color: #ede7f6;
-  color: #512da8;
-}
+/* הגדרות .badge-type הועברו ל-styles.css */
 
 /* סגנונות לטבלת נתונים רגילה */
 .data-table {

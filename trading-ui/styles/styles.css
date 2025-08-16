@@ -98,6 +98,264 @@ button.btn-primary-emphasized {
   padding: 0.5rem 1rem !important;
   font-size: 0.875rem !important;
   font-weight: 600 !important;
+
+/* ===== סגנונות לכרטיסיות ===== */
+
+/* מיכל הכרטיסיות */
+.cards-container {
+  display: flex !important;
+  gap: 1.5rem !important;
+  flex-wrap: wrap !important;
+  padding: 1.5rem 0 !important;
+  background: transparent !important;
+}
+
+/* כרטיסיה בודדת - עיצוב מודרני ונקי */
+.design-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+  border: 2px solid #e9ecef !important;
+  border-radius: 16px !important;
+  padding: 1.5rem !important;
+  min-width: 320px !important;
+  flex: 1 !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  margin-bottom: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.design-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 4px !important;
+  background: linear-gradient(90deg, #29a6a8 0%, #ff9c05 100%) !important;
+  opacity: 0 !important;
+  transition: opacity 0.3s ease !important;
+}
+
+.design-card:hover {
+  box-shadow: 0 16px 48px rgba(0,0,0,0.12) !important;
+  transform: translateY(-4px) !important;
+  border-color: #29a6a8 !important;
+}
+
+.design-card:hover::before {
+  opacity: 1 !important;
+}
+
+/* כותרת הכרטיסיה - עיצוב מודרני */
+.design-card .card-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 2px solid #f1f3f4 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 0 1rem 0 !important;
+}
+
+.design-card .card-title {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  color: #1a1a1a !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  letter-spacing: -0.025em !important;
+}
+
+/* סטטוס הכרטיסיה - עיצוב מודרני */
+.design-card .card-status {
+  padding: 0.5rem 1rem !important;
+  border-radius: 20px !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+.design-card .card-status.status-open {
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3) !important;
+}
+
+.design-card .card-status.status-closed {
+  background: linear-gradient(135deg, #f44336 0%, #ef5350 100%) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3) !important;
+}
+
+.design-card .card-status.status-canceled {
+  background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3) !important;
+}
+
+/* תוכן הכרטיסיה - עיצוב מודרני */
+.design-card .card-content {
+  margin-bottom: 1.5rem !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.design-card .card-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0.75rem 0 !important;
+  border-bottom: 1px solid #f8f9fa !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.design-card .card-row:hover {
+  background-color: #f8f9fa !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 0.5rem !important;
+  margin: 0 -0.5rem !important;
+}
+
+.design-card .card-row:last-child {
+  border-bottom: none !important;
+}
+
+.design-card .card-row .label {
+  font-weight: 500 !important;
+  color: #6c757d !important;
+  font-size: 0.95rem !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+}
+
+.design-card .card-row .value {
+  font-weight: 700 !important;
+  color: #1a1a1a !important;
+  font-size: 0.95rem !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+}
+
+/* כפתורי פעולה בכרטיסיה - עיצוב מודרני */
+.design-card .card-actions {
+  display: flex !important;
+  gap: 0.75rem !important;
+  justify-content: flex-end !important;
+  padding-top: 1rem !important;
+  border-top: 2px solid #f1f3f4 !important;
+}
+
+/* סגנונות ל-top-section */
+.top-section {
+  background: transparent;
+  margin: 10px 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.top-section .section-header {
+  margin-bottom: 1rem;
+  background: transparent;
+}
+
+.top-section .content-section {
+  padding: 0;
+}
+
+/* מצב סגור ל-content-section */
+.content-section.collapsed {
+  padding: 20px 0 !important;
+}
+
+/* מצב סגור ל-section-body */
+.section-body.collapsed {
+  padding: 20px 0 !important;
+}
+
+/* כפתורים בתוך כרטיסיות - עיצוב מודרני */
+.design-card .card-actions .btn {
+  padding: 0.5rem 1rem !important;
+  font-size: 0.85rem !important;
+  border-radius: 12px !important;
+  border: 2px solid !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  min-width: 80px !important;
+  height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 600 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+.design-card .card-actions .btn-secondary {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+  color: #29a6a8 !important;
+  border-color: #29a6a8 !important;
+}
+
+.design-card .card-actions .btn-secondary:hover {
+  background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
+  color: white !important;
+  border-color: #29a6a8 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 16px rgba(41, 166, 168, 0.3) !important;
+}
+
+.design-card .card-actions .btn-danger {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+  color: #ff9c05 !important;
+  border-color: #ff9c05 !important;
+}
+
+.design-card .card-actions .btn-danger:hover {
+  background: linear-gradient(135deg, #ff9c05 0%, #e68a00 100%) !important;
+  color: white !important;
+  border-color: #ff9c05 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 16px rgba(255, 156, 5, 0.3) !important;
+}
+/* התאמה למסכים קטנים */
+@media (max-width: 768px) {
+  .cards-container {
+    flex-direction: column !important;
+    gap: 1rem !important;
+    padding: 1rem 0 !important;
+  }
+  
+  .design-card {
+    min-width: auto !important;
+    padding: 1.25rem !important;
+    border-radius: 12px !important;
+  }
+  
+  .design-card .card-title {
+    font-size: 1.1rem !important;
+  }
+  
+  .design-card .card-status {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .design-card .card-actions .btn {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.8rem !important;
+    min-width: 70px !important;
+    height: 36px !important;
+  }
 }
 
 /* כפתור משני - רקע לבן עם מסגרת ירוקה - לשימוש כללי */
@@ -519,31 +777,7 @@ h1 {
 
 /* סגנונות לטבלאות - הועברו ל-grid-table.css */
 
-/* סגנונות משותפים לכרטיסי התראות */
-.alert-card {
-  background: white;
-  border: 1px solid var(--apple-border-light);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: all 0.2s ease;
-}
-
-.alert-card:hover {
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  transform: translateY(-1px);
-}
-
-.alert-card.read {
-  opacity: 0.6;
-  background-color: var(--apple-bg-secondary);
-}
-
-.alert-card .price {
-  color: var(--apple-text-secondary);
-  font-size: 0.9rem;
-}
+/* סגנונות משותפים לכרטיסי התראות - הועברו להגדרות הראשונות */
 
 /* סגנונות משותפים למודלים */
 .modal {
@@ -697,6 +931,60 @@ h1 {
   padding: 0.25rem 0.5rem !important;
   font-size: 0.75rem !important;
   border-radius: 0.25rem !important;
+}
+
+/* כפתורים בטבלאות - סגנון אחיד לכל הדפים */
+.btn-sm.btn-secondary {
+  background-color: white !important;
+  color: #28a745 !important;
+  border: 1px solid #28a745 !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-secondary:hover {
+  background-color: #28a745 !important;
+  color: white !important;
+  border-color: #28a745 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+}
+
+.btn-sm.btn-danger {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 1px solid #ff9c05 !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-danger:hover {
+  background-color: #ff9c05 !important;
+  color: white !important;
+  border-color: #ff9c05 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(255, 156, 5, 0.3) !important;
+}
+
+.btn-sm.btn-primary {
+  background-color: #007bff !important;
+  color: white !important;
+  border: 1px solid #007bff !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-primary:hover {
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
 }
 
 .add-btn:hover {
@@ -866,17 +1154,18 @@ h1 {
   border-radius: 4px;
   font-size: 0.9rem;
 }
+/* הגדרות סטטוסים כלליות - לא לכרטיסי עיצובים */
 .status-open {
-  background-color: #28a745;
-  color: white;
+  background-color: #28a745 !important;
+  color: white !important;
 }
 .status-closed {
-  background-color: #29a6a8;
-  color: white;
+  background-color: #29a6a8 !important;
+  color: white !important;
 }
 .status-cancelled {
-  background-color: #dc3545;
-  color: white;
+  background-color: #dc3545 !important;
+  color: white !important;
 }
 .badge-status {
   padding: 0.3rem 0.5rem;
@@ -1000,13 +1289,7 @@ body {
   margin-bottom: 24px;
 }
 
-.stat-card {
-  background: var(--apple-card-bg);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
+/* הגדרות .stat-card הועברו להגדרות הראשונות */
 
 .stat-title {
   color: var(--apple-secondary);
@@ -1214,7 +1497,7 @@ body {
   background-color: #ff9800;
 }
 
-/* סגנונות שדות חיפוש */
+/* סגנות שדות חיפוש */
 .search-filter-container {
   position: relative;
 }
@@ -1282,8 +1565,14 @@ body {
   color: #333;
 }
 
-/* סגנון לאיקונים בכפתורים */
+/* איקונים בתוך כפתורים */
 .btn-icon {
-  color: #29a6a8;
-  font-size: 0.7em;
+  font-size: 0.7rem !important;
+  margin-right: 0.25rem !important;
+}
+
+/* מרווח בין כפתורים בטבלה */
+td .btn + .btn {
+  margin-right: 0.25rem !important;
+}
 }

@@ -1,0 +1,126 @@
+<!-- ===== תבנית טבלה כללית לשיכפול ===== -->
+
+<!-- אזור טבלה -->
+<div class="content-section">
+  <!-- כותרת הטבלה -->
+  <div class="table-header">
+    <div class="table-title">
+      📋 כותרת הטבלה
+    </div>
+    <div class="table-count">0 פריטים</div>
+    <div class="table-actions">
+      <button class="refresh-btn" onclick="addNewItem()" title="הוסף פריט חדש">
+        <span class="action-icon">➕</span> הוסף
+      </button>
+      <button class="refresh-btn" onclick="refreshTable()" title="רענן טבלה">
+        <span class="action-icon">🔄</span> רענן
+      </button>
+      <div class="action-separator"></div>
+      <button class="filter-toggle-btn" onclick="toggleTableSection()" title="הצג/הסתר אזור טבלה">
+        <span class="filter-icon">▲</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- תוכן הטבלה -->
+  <div class="content-section">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="sortable-header">
+              <span class="sort-icon">↕</span>עמודה 1
+              <br><span class="header-subtitle">Column 1</span>
+            </th>
+            <th class="sortable-header">
+              <span class="sort-icon">↕</span>עמודה 2
+              <br><span class="header-subtitle">Column 2</span>
+            </th>
+            <th class="sortable-header">
+              <span class="sort-icon">↕</span>עמודה 3
+              <br><span class="header-subtitle">Column 3</span>
+            </th>
+            <th class="actions-header">
+              פעולות
+              <br><span class="header-subtitle">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong><a href="#" onclick="openItemDetails('1')" class="ticker-link">ערך 1</a></strong></td>
+            <td>ערך 2</td>
+            <td><span class="status-badge status-open">סטטוס</span></td>
+            <td class="actions-cell">
+              <button class="btn btn-sm btn-secondary" onclick="editItem('1')" title="ערוך">
+                <span class="btn-icon">✏️</span>
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteItem('1')" title="מחק">X</button>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong><a href="#" onclick="openItemDetails('2')" class="ticker-link">ערך 1</a></strong></td>
+            <td>ערך 2</td>
+            <td><span class="status-badge status-canceled">סטטוס</span></td>
+            <td class="actions-cell">
+              <button class="btn btn-sm btn-secondary" onclick="editItem('2')" title="ערוך">
+                <span class="btn-icon">✏️</span>
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteItem('2')" title="מחק">X</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== פונקציות JavaScript בסיסיות ===== -->
+<script>
+// פונקציות בסיסיות לשימוש בתבנית
+function addNewItem() {
+  console.log('הוספת פריט חדש');
+  // כאן יוכנס קוד להוספת פריט חדש
+}
+
+function refreshTable() {
+  console.log('רענון טבלה');
+  // כאן יוכנס קוד לרענון הטבלה
+}
+
+function toggleTableSection() {
+  console.log('הצג/הסתר אזור טבלה');
+  // כאן יוכנס קוד לסגירה/פתיחה של האזור
+}
+
+function openItemDetails(id) {
+  console.log('פתיחת פרטי פריט:', id);
+  // כאן יוכנס קוד לפתיחת פרטי פריט
+}
+
+function editItem(id) {
+  console.log('עריכת פריט:', id);
+  // כאן יוכנס קוד לעריכת פריט
+}
+
+function deleteItem(id) {
+  console.log('מחיקת פריט:', id);
+  // כאן יוכנס קוד למחיקת פריט
+}
+</script>
+
+<!-- ===== הוראות שימוש ===== -->
+<!--
+1. העתק את התבנית לקובץ HTML חדש
+2. שנה את הכותרת והעמודות לפי הצורך
+3. הוסף את הפונקציות JavaScript הנדרשות
+4. הוסף את הקבצים הבאים ל-<head>:
+   - styles/grid-table.css
+   - scripts/grid-table.js
+5. התבנית כוללת:
+   - כותרת עם כפתורי פעולה
+   - טבלה עם סידור
+   - כפתורי עריכה ומחיקה
+   - סגנונות מוכנים לשימוש
+-->

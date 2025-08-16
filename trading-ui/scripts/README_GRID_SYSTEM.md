@@ -377,6 +377,154 @@ document.addEventListener('gridReady', (event) => {
 2. בדוק את ה-network tab בדפדפן
 3. בדוק שהפונקציה `loadPlansFromServer` מוגדרת
 
+## מערכת עריכה ומחיקה כללית
+
+### סקירה כללית
+
+המערכת כוללת מערכת כללית לעריכה ומחיקה של רשומות מכל הטבלאות במערכת. במקום ליצור פונקציות ספציפיות לכל טבלה, המערכת משתמשת בפונקציות כלליות שמקבלות את סוג הטבלה כפרמטר.
+
+### פונקציות עיקריות
+
+#### `editRecord(tableType, recordId)`
+פונקציה כללית לעריכת רשומה מכל טבלה במערכת.
+
+**פרמטרים:**
+- `tableType` (string) - סוג הטבלה (למשל: 'accounts', 'tickers', 'trades')
+- `recordId` (number) - מזהה הרשומה לעריכה
+
+**דוגמה:**
+```javascript
+// עריכת חשבון עם מזהה 123
+editRecord('accounts', 123);
+
+// עריכת טיקר עם מזהה 456
+editRecord('tickers', 456);
+```
+
+#### `deleteRecord(tableType, recordId)`
+פונקציה כללית למחיקת רשומה מכל טבלה במערכת.
+
+**פרמטרים:**
+- `tableType` (string) - סוג הטבלה
+- `recordId` (number) - מזהה הרשומה למחיקה
+
+**דוגמה:**
+```javascript
+// מחיקת חשבון עם מזהה 123
+deleteRecord('accounts', 123);
+
+// מחיקת טיקר עם מזהה 456
+deleteRecord('tickers', 456);
+```
+
+#### `saveRecord(tableType)`
+פונקציה כללית לשמירת נתונים ממודל עריכה.
+
+**פרמטרים:**
+- `tableType` (string) - סוג הטבלה
+
+**דוגמה:**
+```javascript
+// שמירת נתוני חשבון
+saveRecord('accounts');
+
+// שמירת נתוני טיקר
+saveRecord('tickers');
+```
+
+### שימוש בטבלאות
+
+#### הוספת כפתורי עריכה ומחיקה
+
+```html
+<!-- כפתור עריכה -->
+<button class="btn btn-sm btn-primary" onclick="editRecord('accounts', ${account.id})">ערוך</button>
+
+<!-- כפתור מחיקה -->
+<button class="btn btn-sm btn-danger" onclick="deleteRecord('accounts', ${account.id})">מחק</button>
+```
+
+#### הוספת מודל עריכה
+
+```html
+<!-- מודל עריכת חשבון -->
+<div class="modal fade" id="editAccountsModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">עריכת חשבון</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <input type="hidden" id="editAccountsId">
+          <!-- שדות נוספים... -->
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+        <button type="button" class="btn btn-primary" onclick="saveRecord('accounts')">שמור</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+### טבלאות נתמכות
+
+המערכת תומכת בטבלאות הבאות:
+- `accounts` - חשבונות
+- `tickers` - טיקרים
+- `trades` - טריידים
+- `trade_plans` - תוכניות טרייד
+- `alerts` - התראות
+- `cash_flows` - תזרימי מזומנים
+- `notes` - הערות
+- `executions` - ביצועים
+
+### הרחבת המערכת
+
+#### הוספת טבלה חדשה
+
+1. **הוספת פונקציית מילוי נתונים:**
+```javascript
+function fillNewTableModalData(data) {
+    document.getElementById('editNewTableId').value = data.id;
+    // מילוי שדות נוספים...
+}
+```
+
+2. **הוספת מקרה ב-switch:**
+```javascript
+case 'new_table':
+    fillNewTableModalData(data);
+    break;
+```
+
+3. **הוספת מקרה ב-collectModalData:**
+```javascript
+case 'new_table':
+    return {
+        field1: document.getElementById('editNewTableField1').value,
+        // שדות נוספים...
+    };
+```
+
+4. **הוספת שם תצוגה:**
+```javascript
+const displayNames = {
+    // שמות קיימים...
+    'new_table': 'שם חדש'
+};
+```
+
+### יתרונות המערכת
+
+- **קוד נקי** - פחות כפילות קוד
+- **תחזוקה קלה** - שינוי אחד משפיע על כל הטבלאות
+- **עקביות** - אותו התנהגות בכל הטבלאות
+- **הרחבה קלה** - הוספת טבלה חדשה דורשת מינימום קוד
+
 ## עדכונים עתידיים
 
 - תמיכה בפילטרים מתקדמים יותר
@@ -384,6 +532,7 @@ document.addEventListener('gridReady', (event) => {
 - תמיכה בגרידים מרובים באותו דף
 - שיפור הביצועים
 - תמיכה במובייל מתקדמת
+- הרחבת מערכת העריכה והמחיקה לטבלאות נוספות
 
 ## תמיכה טכנית
 

@@ -54,63 +54,9 @@
   text-align: center;
 }
 
-/* עיצוב סטטוסים */
-.badge-status {
-  padding: 0.2rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-align: center;
-  display: inline-block;
-  min-width: 60px;
-}
+/* הגדרות .badge-status הועברו ל-styles.css */
 
-.badge-status.פתוח {
-  background-color: #e8f5e8;
-  color: #2e7d32;
-  border: 1px solid #4caf50;
-}
-
-.badge-status.סגור {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid #f44336;
-}
-
-.badge-status.מבוטל {
-  background-color: #fff3e0;
-  color: #ef6c00;
-  border: 1px solid #ff9800;
-}
-
-/* עיצוב סוגים */
-.badge-type {
-  padding: 0.2rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-align: center;
-  display: inline-block;
-  min-width: 60px;
-}
-
-.badge-type.סווינג {
-  background-color: #e3f2fd;
-  color: #1565c0;
-  border: 1px solid #2196f3;
-}
-
-.badge-type.השקעה {
-  background-color: #f3e5f5;
-  color: #7b1fa2;
-  border: 1px solid #9c27b0;
-}
-
-.badge-type.פאסיבי {
-  background-color: #e8f5e8;
-  color: #2e7d32;
-  border: 1px solid #4caf50;
-}
+/* הגדרות .badge-type הועברו ל-styles.css */
 
 /* עיצוב מספרים חיוביים ושליליים */
 .positive {
@@ -227,54 +173,9 @@
   align-items: center !important;
 }
 
-/* עיצוב badges */
-.badge-status {
-  padding: 0.3rem 0.5rem;
-  border-radius: var(--apple-radius-small);
-  font-size: 0.8rem;
-  font-weight: 500;
-  border: 1px solid;
-}
+/* הגדרות .badge-status נוספות הועברו ל-styles.css */
 
-.badge-status.פתוח { 
-  background-color: #e8f5e8; 
-  color: #2d5a2d; 
-  border-color: #c8e6c9;
-}
-.badge-status.סגור { 
-  background-color: #e3f2fd; 
-  color: #1e3a5f; 
-  border-color: #bbdefb;
-}
-.badge-status.מבוטל { 
-  background-color: #ffebee; 
-  color: #5d2e2e; 
-  border-color: #ffcdd2;
-}
-
-.badge-type {
-  padding: 0.3rem 0.5rem;
-  border-radius: var(--apple-radius-small);
-  font-size: 0.8rem;
-  font-weight: 500;
-  border: 1px solid;
-}
-
-.badge-type.סווינג { 
-  background-color: #f3e5f5; 
-  color: #4a2c5a; 
-  border-color: #e1bee7;
-}
-.badge-type.השקעה { 
-  background-color: #fff3e0; 
-  color: #5d4a2e; 
-  border-color: #ffcc80;
-}
-.badge-type.פאסיבי {
-  background-color: #e0f2f1;
-  color: #2c5a5a;
-  border-color: #b2dfdb;
-}
+/* הגדרות .badge-type נוספות הועברו ל-styles.css */
 
 /* עיצוב קטגוריות חדשות */
 .badge-category {
@@ -320,60 +221,7 @@
   padding-left: 50px; /* רווח של 50 פיקסלים מהקצה השמאלי */
 }
 
-.status-open {
-  background-color: #e8f5e8;
-  color: #2d5a2d;
-  border: 1px solid #c8e6c9;
-}
-
-.status-closed {
-  background-color: #e3f2fd;
-  color: #1e3a5f;
-  border: 1px solid #bbdefb;
-}
-
-.status-cancelled {
-  background-color: #ffebee;
-  color: #5d2e2e;
-  border: 1px solid #ffcdd2;
-}
-
-.type-swing {
-  background-color: #f3e5f5;
-  color: #4a2c5a;
-  border: 1px solid #e1bee7;
-}
-
-.type-invest {
-  background-color: #fff3e0;
-  color: #5d4a2e;
-  border: 1px solid #ffcc80;
-}
-
-.type-passive {
-  background-color: #e0f2f1;
-  color: #2c5a5a;
-  border: 1px solid #b2dfdb;
-}
-
-/* אפקט hover לפילטרים */
-.status-open:hover {
-  background-color: #d4edda;
-  border-color: #a8d5b3;
-}
-
-.status-closed:hover {
-  background-color: #cce7f3;
-  border-color: #90caf9;
-}
-
-.status-cancelled:hover {
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
-}
-
-.type-swing:hover {
-  background-color: #e1bee7;
+/* הגדרות סטטוסים הועברו ל-styles.css */
   border-color: #ce93d8;
 }
 

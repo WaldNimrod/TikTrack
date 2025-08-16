@@ -103,13 +103,11 @@ function fillNoteEditModal(note) {
     
     // מילוי שדות הטופס
     document.getElementById('editNoteId').value = note.id;
-    document.getElementById('editNoteTitle').value = note.title || '';
     document.getElementById('editNoteContent').value = note.content || '';
-    document.getElementById('editNoteCategory').value = note.category || '';
-    document.getElementById('editNoteStatus').value = convertNoteStatusToHebrew(note.status);
-    document.getElementById('editNoteIsImportant').checked = note.is_important || false;
     document.getElementById('editNoteAccountId').value = note.account_id || '';
-    document.getElementById('editNoteTickerId').value = note.ticker_id || '';
+    document.getElementById('editNoteTradeId').value = note.trade_id || '';
+    document.getElementById('editNoteTradePlanId').value = note.trade_plan_id || '';
+    document.getElementById('editNoteAttachment').value = note.attachment || '';
 }
 
 /**
@@ -123,13 +121,11 @@ function fillNoteEditModal(note) {
  */
 function collectNoteEditData() {
     const noteData = {
-        title: document.getElementById('editNoteTitle').value.trim(),
         content: document.getElementById('editNoteContent').value.trim(),
-        category: document.getElementById('editNoteCategory').value.trim(),
-        status: convertNoteStatus(document.getElementById('editNoteStatus').value),
-        is_important: document.getElementById('editNoteIsImportant').checked,
         account_id: document.getElementById('editNoteAccountId').value ? parseInt(document.getElementById('editNoteAccountId').value) : null,
-        ticker_id: document.getElementById('editNoteTickerId').value ? parseInt(document.getElementById('editNoteTickerId').value) : null
+        trade_id: document.getElementById('editNoteTradeId').value ? parseInt(document.getElementById('editNoteTradeId').value) : null,
+        trade_plan_id: document.getElementById('editNoteTradePlanId').value ? parseInt(document.getElementById('editNoteTradePlanId').value) : null,
+        attachment: document.getElementById('editNoteAttachment').value.trim()
     };
     
     console.log('📝 נתונים שנאספו ממודל עריכת הערה:', noteData);
@@ -147,13 +143,11 @@ function collectNoteEditData() {
  */
 function collectNoteAddData() {
     const noteData = {
-        title: document.getElementById('noteTitle').value.trim(),
         content: document.getElementById('noteContent').value.trim(),
-        category: document.getElementById('noteCategory').value.trim(),
-        status: convertNoteStatus(document.getElementById('noteStatus').value),
-        is_important: document.getElementById('noteIsImportant').checked,
         account_id: document.getElementById('noteAccountId').value ? parseInt(document.getElementById('noteAccountId').value) : null,
-        ticker_id: document.getElementById('noteTickerId').value ? parseInt(document.getElementById('noteTickerId').value) : null
+        trade_id: document.getElementById('noteTradeId').value ? parseInt(document.getElementById('noteTradeId').value) : null,
+        trade_plan_id: document.getElementById('noteTradePlanId').value ? parseInt(document.getElementById('noteTradePlanId').value) : null,
+        attachment: document.getElementById('noteAttachment').value.trim()
     };
     
     console.log('📝 נתונים שנאספו ממודל הוספת הערה:', noteData);
@@ -301,13 +295,11 @@ function showAddNoteModal() {
     console.log('📝 מציג מודל הוספת הערה');
     
     // ניקוי הטופס
-    document.getElementById('noteTitle').value = '';
     document.getElementById('noteContent').value = '';
-    document.getElementById('noteCategory').value = '';
-    document.getElementById('noteStatus').value = 'פעיל';
-    document.getElementById('noteIsImportant').checked = false;
     document.getElementById('noteAccountId').value = '';
-    document.getElementById('noteTickerId').value = '';
+    document.getElementById('noteTradeId').value = '';
+    document.getElementById('noteTradePlanId').value = '';
+    document.getElementById('noteAttachment').value = '';
     
     // הצגת המודל
     const modal = new bootstrap.Modal(document.getElementById('addNoteModal'));
@@ -346,11 +338,6 @@ async function saveNote() {
         const noteData = collectNoteAddData();
         
         // בדיקות תקינות
-        if (!noteData.title) {
-            showNotification('כותרת ההערה היא שדה חובה', 'error');
-            return;
-        }
-        
         if (!noteData.content) {
             showNotification('תוכן ההערה הוא שדה חובה', 'error');
             return;
@@ -383,11 +370,6 @@ async function updateNoteFromModal() {
         const noteData = collectNoteEditData();
         
         // בדיקות תקינות
-        if (!noteData.title) {
-            showNotification('כותרת ההערה היא שדה חובה', 'error');
-            return;
-        }
-        
         if (!noteData.content) {
             showNotification('תוכן ההערה הוא שדה חובה', 'error');
             return;
@@ -428,18 +410,16 @@ function updateNotesTable(notes) {
     tbody.innerHTML = notes.map(note => `
         <tr>
             <td>${note.id}</td>
-            <td>${note.title || '-'}</td>
-            <td>${note.content ? (note.content.length > 50 ? note.content.substring(0, 50) + '...' : note.content) : '-'}</td>
-            <td>${note.category || '-'}</td>
-            <td>${window.convertNoteStatusToHebrew(note.status)}</td>
-            <td>${note.is_important ? 'כן' : 'לא'}</td>
             <td>${note.account_id || '-'}</td>
-            <td>${note.ticker_id || '-'}</td>
+            <td>${note.trade_id || '-'}</td>
+            <td>${note.trade_plan_id || '-'}</td>
+            <td>${note.content ? (note.content.length > 50 ? note.content.substring(0, 50) + '...' : note.content) : '-'}</td>
             <td>${window.formatDateTime(note.created_at)}</td>
+            <td>${note.attachment || '-'}</td>
             <td>
                 <button class="btn btn-sm btn-primary" onclick="showEditNoteModal(${JSON.stringify(note).replace(/"/g, '&quot;')})">ערוך</button>
-                <button class="btn btn-sm btn-warning" onclick="cancelNote(${note.id}, '${note.title || 'הערה'}')">ביטול</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id}, '${note.title || 'הערה'}')">מחק</button>
+                <button class="btn btn-sm btn-warning" onclick="cancelNote(${note.id}, 'הערה ${note.id}')">ביטול</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id}, 'הערה ${note.id}')">מחק</button>
             </td>
         </tr>
     `).join('');

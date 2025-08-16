@@ -2436,6 +2436,125 @@
     // הוספת המודל לדף
     document.body.insertAdjacentHTML('beforeend', warningModalHTML);
 
+    // Add Note Modal
+    const addNoteModalHTML = `
+      <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h5 class="modal-title" id="addNoteModalLabel">הוסף הערה חדשה</h5>
+            </div>
+            <div class="modal-body">
+              <form id="addNoteForm">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="noteContent" class="form-label">תוכן (Content)</label>
+                      <textarea class="form-control" id="noteContent" rows="4" required></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="noteAccountId" class="form-label">מזהה חשבון (Account ID)</label>
+                      <input type="number" class="form-control" id="noteAccountId">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="noteTradeId" class="form-label">מזהה טרייד (Trade ID)</label>
+                      <input type="number" class="form-control" id="noteTradeId">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="noteTradePlanId" class="form-label">מזהה תוכנית טרייד (Trade Plan ID)</label>
+                      <input type="number" class="form-control" id="noteTradePlanId">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="noteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
+                      <input type="text" class="form-control" id="noteAttachment">
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" onclick="saveNote()">שמור</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Edit Note Modal
+    const editNoteModalHTML = `
+      <div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h5 class="modal-title" id="editNoteModalLabel">עריכת הערה</h5>
+            </div>
+            <div class="modal-body">
+              <form id="editNoteForm">
+                <input type="hidden" id="editNoteId">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="editNoteContent" class="form-label">תוכן (Content)</label>
+                      <textarea class="form-control" id="editNoteContent" rows="4" required></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="editNoteAccountId" class="form-label">מזהה חשבון (Account ID)</label>
+                      <input type="number" class="form-control" id="editNoteAccountId">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="editNoteTradeId" class="form-label">מזהה טרייד (Trade ID)</label>
+                      <input type="number" class="form-control" id="editNoteTradeId">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="editNoteTradePlanId" class="form-label">מזהה תוכנית טרייד (Trade Plan ID)</label>
+                      <input type="number" class="form-control" id="editNoteTradePlanId">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="editNoteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
+                      <input type="text" class="form-control" id="editNoteAttachment">
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" onclick="updateNoteFromModal()">שמור</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // הוספת המודלים לדף
+    document.body.insertAdjacentHTML('beforeend', addNoteModalHTML);
+    document.body.insertAdjacentHTML('beforeend', editNoteModalHTML);
+
   </script>
 </body>
 </html>

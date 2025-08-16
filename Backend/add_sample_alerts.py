@@ -9,7 +9,7 @@ import random
 from pathlib import Path
 
 # נתיב לבסיס הנתונים
-DB_PATH = Path(__file__).parent / "db" / "simpleTrade.db"
+DB_PATH = Path(__file__).parent / "tiktrack.db"
 
 def create_alerts_table():
     """יצירת טבלת התראות אם לא קיימת"""

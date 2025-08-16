@@ -13,7 +13,7 @@
 async function loadNotesData() {
     try {
         console.log('🔄 טוען הערות...');
-        const response = await apiCall('/api/v1/notes/');
+        const response = await window.apiCall('/api/v1/notes/');
         const notes = response.data || response;
         console.log(`✅ נטענו ${notes.length} הערות`);
         return notes;
@@ -168,7 +168,7 @@ async function createNote(noteData) {
     try {
         console.log('🚀 יוצר הערה חדשה:', noteData);
         
-        const response = await apiCall('/api/v1/notes/', {
+        const response = await window.apiCall('/api/v1/notes/', {
             method: 'POST',
             body: JSON.stringify(noteData)
         });
@@ -198,7 +198,7 @@ async function updateNote(noteId) {
         const noteData = collectNoteEditData();
         console.log(`🔄 מעדכן הערה ${noteId}:`, noteData);
         
-        const response = await apiCall(`/api/v1/notes/${noteId}`, {
+        const response = await window.apiCall(`/api/v1/notes/${noteId}`, {
             method: 'PUT',
             body: JSON.stringify(noteData)
         });
@@ -234,7 +234,7 @@ async function deleteNote(noteId, noteTitle) {
         }
         
         console.log(`🗑️ מוחק הערה ${noteId}: ${noteTitle}`);
-        const response = await apiCall(`/api/v1/notes/${noteId}`, {
+        const response = await window.apiCall(`/api/v1/notes/${noteId}`, {
             method: 'DELETE'
         });
         
@@ -269,7 +269,7 @@ async function cancelNote(noteId, noteTitle) {
         }
         
         console.log(`🚫 מבטל הערה ${noteId}: ${noteTitle}`);
-        const response = await apiCall(`/api/v1/notes/${noteId}`, {
+        const response = await window.apiCall(`/api/v1/notes/${noteId}`, {
             method: 'PUT',
             body: JSON.stringify({ status: 'מבוטל' })
         });

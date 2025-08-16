@@ -1743,6 +1743,9 @@ td .btn + .btn {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 200px;
 }
 
 .alert-card:hover {
@@ -1785,13 +1788,16 @@ td .btn + .btn {
 }
 
 .alert-card-content {
-  margin-bottom: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .alert-card-message {
   color: #555;
   line-height: 1.5;
   margin-bottom: 10px;
+  flex: 1;
 }
 
 .alert-card-details {

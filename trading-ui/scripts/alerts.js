@@ -819,31 +819,114 @@ function renderAlertsCards(alerts) {
 // פונקציה ליצירת HTML של כרטיסיית התראה
 function createAlertCardHTML(alert) {
   const timeAgo = getTimeAgo(alert.created_at);
-  const alertIcon = getAlertIcon(alert.alert_type);
+  const alertIcon = getAlertIcon(alert.type || alert.alert_type);
+  
+  // יצירת כותרת עם סימבול
+  let title = '';
+  let tickerSymbol = '';
+  
+  if (alert.title) {
+    // נתוני דמה - יש title ו-ticker
+    title = alert.title;
+    tickerSymbol = alert.ticker || '';
+  } else {
+    // נתונים מהשרת - יש type ו-condition
+    title = alert.condition || 'התראה';
+    tickerSymbol = extractTickerFromCondition(alert.condition) || '';
+  }
   
   return `
     <div class="alert-card" data-alert-id="${alert.id}">
       <div class="alert-card-header">
-        <h4 class="alert-card-title">${alertIcon} ${alert.title}</h4>
+        <h4 class="alert-card-title">${alertIcon} ${tickerSymbol || 'התראה'}</h4>
         <span class="alert-card-time">${timeAgo}</span>
       </div>
       
       <div class="alert-card-content">
-        <p class="alert-card-message">${alert.message}</p>
+        <p class="alert-card-message">${alert.message || alert.condition || ''}</p>
         
         <div class="alert-card-details">
-          <span class="alert-detail-item">📈 ${alert.ticker}</span>
           ${getAlertDetails(alert)}
         </div>
       </div>
       
-      <div class="alert-card-actions">
+      <div class="alert-card-footer">
+        <div class="alert-ticker-info">
+          <span class="alert-detail-item">📈 ${tickerSymbol || 'N/A'}</span>
+          <span class="alert-detail-item">$${getCurrentPrice(tickerSymbol)}</span>
+          <span class="alert-detail-item ${getDailyChangeClass(tickerSymbol)}">${getDailyChange(tickerSymbol)}%</span>
+        </div>
         <button class="btn-mark-read" onclick="markAlertAsRead(${alert.id})" data-alert-id="${alert.id}">
           ✓ קראתי
         </button>
       </div>
     </div>
   `;
+}
+
+// פונקציה לחילוץ סימבול מהתנאי
+function extractTickerFromCondition(condition) {
+  if (!condition) return '';
+  
+  // חיפוש סימבולים נפוצים בתנאי
+  const tickerPatterns = [
+    /\b(AAPL|TSLA|MSFT|GOOGL|NVDA|AMZN|META|NFLX|SPY|QQQ|IWM)\b/gi,
+    /\b([A-Z]{2,5})\b/g
+  ];
+  
+  for (const pattern of tickerPatterns) {
+    const match = condition.match(pattern);
+    if (match) {
+      return match[0].toUpperCase();
+    }
+  }
+  
+  return '';
+}
+
+// פונקציות לנתוני דמה של מחירים
+function getCurrentPrice(ticker) {
+  const prices = {
+    'AAPL': '185.50',
+    'TSLA': '245.30',
+    'MSFT': '415.80',
+    'GOOGL': '141.20',
+    'NVDA': '875.40',
+    'AMZN': '149.80',
+    'META': '485.60',
+    'NFLX': '625.90',
+    'SPY': '485.20',
+    'QQQ': '425.80',
+    'IWM': '195.40'
+  };
+  return prices[ticker] || '0.00';
+}
+
+function getDailyChange(ticker) {
+  const changes = {
+    'AAPL': '+2.3',
+    'TSLA': '-1.8',
+    'MSFT': '+0.9',
+    'GOOGL': '+1.2',
+    'NVDA': '+3.5',
+    'AMZN': '-0.7',
+    'META': '+1.8',
+    'NFLX': '+2.1',
+    'SPY': '+0.5',
+    'QQQ': '+0.8',
+    'IWM': '-0.3'
+  };
+  return changes[ticker] || '0.0';
+}
+
+function getDailyChangeClass(ticker) {
+  const change = getDailyChange(ticker);
+  if (change.startsWith('+')) {
+    return 'positive-change';
+  } else if (change.startsWith('-')) {
+    return 'negative-change';
+  }
+  return '';
 }
 
 // פונקציה לקבלת אייקון לפי סוג ההתראה

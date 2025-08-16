@@ -348,14 +348,19 @@ function showEditNoteModal(note) {
         return;
     }
     
-    // הצגת המודל קודם
-    const modal = new bootstrap.Modal(document.getElementById('editNoteModal'));
-    modal.show();
+    // הצגת המודל
+    const modalElement = document.getElementById('editNoteModal');
+    const modal = new bootstrap.Modal(modalElement);
     
-    // מילוי הנתונים אחרי שהמודל נפתח
-    setTimeout(() => {
+    // מילוי הנתונים כשהמודל נפתח לחלוטין
+    modalElement.addEventListener('shown.bs.modal', function fillModalData() {
+        console.log('🎯 המודל נפתח, ממלא נתונים...');
         fillNoteEditModal(note);
-    }, 100);
+        // הסרת האירוע כדי שלא יופעל שוב
+        modalElement.removeEventListener('shown.bs.modal', fillModalData);
+    });
+    
+    modal.show();
 }
 
 /**

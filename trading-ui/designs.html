@@ -45,7 +45,7 @@
       <!-- כותרת עיצובים -->
       <div class="section-header">
         <div class="table-title">
-          🎨 עיצובים - top-Section
+          📋 תכנונים - top-Section
         </div>
         <div class="table-actions">
           <button class="refresh-btn" onclick="openDesignDetails()" title="הוסף עיצוב חדש">
@@ -77,14 +77,15 @@
         
         <!-- סיכום נתונים -->
         <div class="info-summary" id="summaryStats">
-          <div>סה"כ עיצובים: <strong id="totalDesigns">0</strong></div>
+          <div>סה"כ תכנונים: <strong id="totalDesigns">0</strong></div>
           <div>סה"כ השקעה: <strong id="totalInvestment">$0</strong></div>
           <div>השקעה ממוצעת: <strong id="avgInvestment">$0</strong></div>
           <div>רווח כולל: <strong id="totalProfit">$0</strong></div>
         </div>
       </div>
+    </div> <!-- סוף top-section -->
         
-        <!-- תוכן ראשי -->
+    <!-- תוכן ראשי -->
     <div class="main-content">
 
       <!-- אזור עיצובים - content-section -->
@@ -94,7 +95,7 @@
           <div class="table-title">
             📋 תכנונים - content-section
           </div>
-          <div class="table-count">9 עיצובים</div>
+          <div class="table-count">9 תכנונים</div>
           <div class="table-actions">
             <button class="refresh-btn" onclick="openDesignDetails()" title="הוסף עיצוב חדש">
               <span class="action-icon">➕</span> הוסף
@@ -328,6 +329,55 @@
         </div>
       </div>
     </div>
+    
+    <!-- האלמנט השני - טבלת חשבונות -->
+    <div class="content-section">
+        <!-- כותרת חשבונות -->
+        <div class="section-header">
+          <div class="table-title">
+            💰 חשבונות - content-section
+          </div>
+          <div class="table-count">טוען...</div>
+          <div class="table-actions">
+            <button class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש">
+              <span class="action-icon">➕</span> הוסף
+            </button>
+            <button class="refresh-btn" onclick="loadAccounts()" title="רענן טבלה">
+              <span class="action-icon">🔄</span> רענן
+            </button>
+            <div class="action-separator"></div>
+            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור חשבונות">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- טבלת חשבונות -->
+        <div class="section-body" style="display: block;">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
+                  <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name</span></th>
+                  <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency</span></th>
+                  <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
+                  <th>יתרה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cash Balance</span></th>
+                  <th>שווי כולל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total Value</span></th>
+                  <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P&L</span></th>
+                  <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
+                  <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="9" class="loading">טוען חשבונות...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div> <!-- סוף page-body -->
 
   <!-- מרווח בתחתית הדף -->
@@ -335,6 +385,9 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- קבצים מודולריים -->
+  <script src="scripts/accounts.js"></script>
   
   <script>
     // פונקציות מותאמות לעמוד עיצובים

@@ -1,22 +1,12 @@
 #!/usr/bin/env python3
 """
-TikTrack Production Server - Main Application Entry Point
-שרת TikTrack לייצור - נקודת הכניסה הראשית של האפליקציה
-
-This is the main Flask application that serves as the entry point for the TikTrack
-trading system. It implements the new modular architecture with proper separation
-of concerns using Flask Blueprints.
-
-Architecture Overview:
-- Presentation Layer: Flask routes and error handlers
-- Business Logic: Delegated to service classes via blueprints
-- Data Access: SQLAlchemy ORM models
-- Database: SQLite with connection pooling
+TikTrack Production Server
+שרת TikTrack לייצור - יציב ובדוק
 
 ✅ יציב מאוד - מומלץ לייצור
 ✅ בדוק ומוכח
-✅ ארכיטקטורה מודולרית חדשה
-✅ הפרדת אחריות נכונה
+✅ ללא אימות (לפיתוח)
+✅ קובץ אחד פשוט
 
 🔧 הפעלה:
     python3 run_waitress.py    # מומלץ (Waitress)
@@ -25,32 +15,20 @@ Architecture Overview:
 
 📊 נתיבים:
     /api/health              # בדיקת בריאות
-    /api/v1/accounts/        # חשבונות (API חדש)
-    /api/v1/trades/          # טריידים (API חדש)
-    /api/v1/tickers/         # טיקרים (API חדש)
-    /api/v1/trade_plans/     # תכנונים (API חדש)
-    /api/v1/alerts/          # התראות (API חדש)
-    /api/v1/cash_flows/      # תזרימי מזומנים (API חדש)
-    /api/v1/notes/           # הערות (API חדש)
-    /api/v1/executions/      # ביצועים (API חדש)
+    /api/accounts            # חשבונות
+    /api/trades              # טריידים
+    /api/tickers             # טיקרים
+    /api/trade_plans         # תכנונים
+    /api/alerts              # התראות
+    /api/cash_flows          # תזרימי מזומנים
+    /api/notes               # הערות
+    /api/executions          # ביצועים
 
 📝 לוגים:
     server_detailed.log
 
 📖 מדריך מפורט:
     README_SERVER_SETUP.md
-
-Author: TikTrack Development Team
-Version: 2.0 (New Architecture)
-Last Updated: 2025-01-16
-
-🚨 CRITICAL REMINDERS FOR ALL NEW SESSIONS:
-- ALWAYS start with: cd Backend && ./run_monitored.sh
-- ALWAYS check health: curl http://localhost:8080/api/health
-- NEVER write routes directly in app.py - use blueprints only!
-- ALWAYS follow architecture: Models → Services → Routes → App
-- ALWAYS use port 8080
-- ALWAYS test all CRUD operations: GET, POST, PUT, DELETE
 """
 
 from flask import Flask, jsonify, request, send_from_directory
@@ -59,8 +37,7 @@ import sqlite3
 import os
 from datetime import datetime
 
-# Import Flask Blueprints for modular API structure
-# Each blueprint represents a separate module with its own routes
+# Import blueprints
 from routes.api.accounts import accounts_bp
 from routes.api.tickers import tickers_bp
 from routes.api.trades import trades_bp
@@ -70,73 +47,37 @@ from routes.api.cash_flows import cash_flows_bp
 from routes.api.notes import notes_bp
 from routes.api.executions import executions_bp
 
-# Initialize Flask application
 app = Flask(__name__)
-
-# Enable CORS for frontend integration
 CORS(app)
 
-# Register all API blueprints with the main application
-# This creates the modular structure where each entity has its own API module
-app.register_blueprint(accounts_bp)      # /api/v1/accounts/
-app.register_blueprint(tickers_bp)       # /api/v1/tickers/
-app.register_blueprint(trades_bp)        # /api/v1/trades/
-app.register_blueprint(trade_plans_bp)   # /api/v1/trade_plans/
-app.register_blueprint(alerts_bp)        # /api/v1/alerts/
-app.register_blueprint(cash_flows_bp)    # /api/v1/cash_flows/
-app.register_blueprint(notes_bp)         # /api/v1/notes/
-app.register_blueprint(executions_bp)    # /api/v1/executions/
+# Register blueprints
+app.register_blueprint(accounts_bp)
+app.register_blueprint(tickers_bp)
+app.register_blueprint(trades_bp)
+app.register_blueprint(trade_plans_bp)
+app.register_blueprint(alerts_bp)
+app.register_blueprint(cash_flows_bp)
+app.register_blueprint(notes_bp)
+app.register_blueprint(executions_bp)
 
-# Global error handlers for consistent error responses
+# הגדרת טיפול בשגיאות
 @app.errorhandler(404)
 def not_found(error):
-    """
-    Handle 404 Not Found errors
-    
-    Returns:
-        JSON response with Hebrew error message
-    """
     return jsonify({"error": "הדף לא נמצא"}), 404
 
 @app.errorhandler(500)
 def internal_error(error):
-    """
-    Handle 500 Internal Server errors
-    
-    Returns:
-        JSON response with Hebrew error message
-    """
     return jsonify({"error": "שגיאה פנימית בשרת"}), 500
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    """
-    Handle all unhandled exceptions
-    
-    Args:
-        e: The exception that was raised
-        
-    Returns:
-        JSON response with error details
-    """
     return jsonify({"error": f"שגיאה: {str(e)}"}), 500
 
 @app.route("/api/health", methods=["GET"])
 def health_check():
-    """
-    בדיקת בריאות השרת - Health Check Endpoint
-    
-    This endpoint is used to verify that the server is running properly
-    and can connect to the database. It's commonly used by monitoring
-    systems and load balancers.
-    
-    Returns:
-        JSON response with server health status
-        Success: 200 with health information
-        Error: 500 with error details
-    """
+    """בדיקת בריאות השרת"""
     try:
-        # Test database connection
+        # בדיקה חיבור לבסיס הנתונים
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT 1")
@@ -146,19 +87,16 @@ def health_check():
         return jsonify({
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
-            "database": "connected",
-            "version": "2.0",
-            "architecture": "modular"
+            "database": "connected"
         }), 200
     except Exception as e:
         return jsonify({
             "status": "unhealthy",
             "timestamp": datetime.now().isoformat(),
-            "error": str(e),
-            "version": "2.0"
+            "error": str(e)
         }), 500
 
-# Database configuration and utility functions
+# נתיב יחסי לקובץ DB
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade.db")
 

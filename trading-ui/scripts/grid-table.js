@@ -1,69 +1,11 @@
-/**
- * Grid Table Core Functions Module
- * מודול פונקציות ליבת הגריד - משותף לכל הדפים
- * 
- * This module provides the core grid functionality for the TikTrack application.
- * It handles grid initialization, column definitions, filtering, and user interactions.
- * 
- * Features:
- * - AG-Grid integration and configuration
- * - Column definitions and formatting
- * - Filtering and sorting capabilities
- * - User interaction handlers
- * - Data export functionality
- * - Responsive design support
- * 
- * Dependencies:
- * - AG-Grid Community Edition
- * - grid-data.js for data management
- * - grid-filters.js for advanced filtering
- * 
- * Author: TikTrack Development Team
- * Version: 2.0
- * Last Updated: 2025-01-16
- * 
- * 🚨 CRITICAL REMINDERS:
- * - ALWAYS start with: cd Backend && ./run_monitored.sh
- * - ALWAYS check health: curl http://localhost:8080/api/health
- * - NEVER write routes directly in app.py - use blueprints only!
- * - ALWAYS follow architecture: Models → Services → Routes → App
- * - ALWAYS use port 8080
- * - ALWAYS test all CRUD operations: GET, POST, PUT, DELETE
- */
-
 // ===== GRID CORE FUNCTIONS =====
 // קובץ ייעודי ללוגיקת הגריד הבסיסית - משותף לכל הדפים
 
-/**
- * Global variables for grid state management
- * 
- * These variables maintain the current state of the grid across
- * different pages and user interactions.
- */
-window.gridApi = null;        // AG-Grid API instance
-let externalFilterPresent = false;  // Flag for external filter state
+// משתנים גלובליים
+window.gridApi = null;
+let externalFilterPresent = false;
 
-/**
- * Get default column definitions for the trading grid
- * 
- * This function returns the standard column configuration for the
- * trading data grid. Each column includes formatting, filtering,
- * and interaction capabilities.
- * 
- * Column structure:
- * - Action: Quick action buttons
- * - Status: Current trade status with color coding
- * - Current: Current price with change indicators
- * - Stop: Stop loss level
- * - Target: Profit target level
- * - Amount: Investment amount and share count
- * - Type: Trading strategy type
- * - Date: Trade date
- * - Ticker: Asset symbol with clickable link
- * - Account: Trading account name
- * 
- * @returns {Array} Array of column definition objects
- */
+// הגדרת עמודות הגריד הסטנדרטיות
 const getDefaultColumnDefs = () => [
   { 
     headerName: "המרה", 
@@ -161,16 +103,7 @@ const getDefaultColumnDefs = () => [
   }
 ];
 
-/**
- * Get default grid options for the trading grid
- * 
- * This function returns the standard grid configuration for the
- * trading data grid. It includes column definitions, theme, default
- * column properties, and external filter handling.
- * 
- * @param {Array} rowData - Initial data for the grid
- * @returns {Object} Grid options object
- */
+// הגדרות הגריד הסטנדרטיות
 const getDefaultGridOptions = (rowData = []) => ({
   columnDefs: getDefaultColumnDefs(),
   rowData: rowData,
@@ -197,43 +130,18 @@ const getDefaultGridOptions = (rowData = []) => ({
   onGridReady: onGridReady
 });
 
-/**
- * Check if external filter is present
- * 
- * This function returns true if an external filter is currently applied
- * to the grid.
- * 
- * @returns {boolean} True if external filter is present
- */
+// פונקציות לפילטר חיצוני
 function isExternalFilterPresent() {
   return externalFilterPresent;
 }
 
-/**
- * Check if external filter passes for a given node
- * 
- * This function checks if a given node passes the external filter criteria.
- * 
- * @param {Object} node - The node to check
- * @returns {boolean} True if the node passes the filter
- */
 function doesExternalFilterPass(node) {
-  // The external filter is handled by applyStatusFilterToGrid
-  // This function remains unchanged from the previous code block
+  // הפילטר מטופל על ידי applyStatusFilterToGrid
+  // פונקציה זו נשארת לתאימות עם AG-Grid
   return true;
 }
 
-/**
- * Create a grid instance
- * 
- * This function creates an AG-Grid instance in the specified container.
- * It uses the grid options provided to configure the grid.
- * 
- * @param {string} containerId - ID of the container element
- * @param {Array} rowData - Initial data for the grid
- * @param {Object} customOptions - Custom grid options
- * @returns {Object} Grid options object
- */
+// פונקציה ליצירת גריד
 function createGrid(containerId, rowData = [], customOptions = {}) {
   console.log('Creating grid in container:', containerId);
   
@@ -243,22 +151,22 @@ function createGrid(containerId, rowData = [], customOptions = {}) {
     return null;
   }
   
-  // Check if grid already exists in the container
+  // בדיקה אם כבר יש גריד באותו container
   if (gridDiv.children.length > 0 && gridDiv.querySelector('.ag-root')) {
     console.log('Grid already exists in container, skipping creation');
     return null;
   }
   
-  // Check if agGrid is loaded
+  // בדיקה אם agGrid זמין
   if (typeof agGrid === 'undefined') {
     console.error('agGrid is not loaded!');
     return null;
   }
   
-  // Check if custom column definitions are provided
+  // בדיקה אם יש הגדרות עמודות מותאמות אישית בדף
   let gridOptions;
   if (window.getPageColumnDefs) {
-    // Use page-specific column definitions
+    // שימוש בהגדרות העמודות של הדף
     console.log('Using page-specific column definitions');
     const pageColumnDefs = window.getPageColumnDefs();
     console.log('Page column definitions:', pageColumnDefs);
@@ -268,14 +176,14 @@ function createGrid(containerId, rowData = [], customOptions = {}) {
       ...customOptions
     };
   } else if (window.getPageGridOptions) {
-    // Use page-specific grid options
+    // שימוש בהגדרות העמודות של הדף
     console.log('Using page-specific grid options');
     gridOptions = {
       ...window.getPageGridOptions(rowData),
       ...customOptions
     };
   } else {
-    // Use default grid options
+    // שימוש בהגדרות ברירת המחדל
     console.log('Using default grid options');
     gridOptions = {
       ...getDefaultGridOptions(rowData),
@@ -294,17 +202,9 @@ function createGrid(containerId, rowData = [], customOptions = {}) {
   }
 }
 
-/**
- * Initialize grid on ready
- * 
- * This function is called when the grid is ready to be initialized.
- * It sets up the grid API, handles size adjustments, updates status,
- * loads data, and applies filters.
- * 
- * @param {Object} params - Grid API parameters
- */
+// פונקציה לאתחול הגריד
 function onGridReady(params) {
-  // Check if grid is already initialized
+  // בדיקה אם הגריד כבר מאותחל
   if (window.gridApi) {
     console.log('Grid already initialized, skipping onGridReady');
     return;
@@ -314,26 +214,26 @@ function onGridReady(params) {
   window.gridApi = params.api;
   console.log('Grid API available:', !!gridApi);
   
-  // Adjust grid size to fit the screen
+  // התאמת הגריד לרוחב המסך
   params.api.sizeColumnsToFit();
   
-  // Update grid on window resize
+  // עדכון הגריד בעת שינוי גודל החלון
   window.addEventListener('resize', () => {
     setTimeout(() => {
       params.api.sizeColumnsToFit();
     }, 100);
   });
   
-  // Update status
+  // עדכון סטטוס
   updateGridStatus();
   
-  // Load trades from server if this is a grid test page
+  // טעינת טריידים מהשרת אם זה דף בדיקת הגריד
   if (window.location.pathname.includes('grid-test')) {
     console.log('Grid test page detected, loading trades...');
     if (typeof loadDataByType === 'function') {
       loadDataByType('trades').then(data => {
         console.log('Trades loaded for grid test:', data);
-        // Update grid with new data
+        // עדכון הגריד עם הנתונים החדשים
         if (window.gridApi && data) {
           window.gridApi.setGridOption('rowData', data);
           console.log('Grid updated with trades data');
@@ -344,7 +244,7 @@ function onGridReady(params) {
     }
   }
   
-  // Check if there's a pending filter
+  // בדיקה אם יש פילטר ממתין
   if (window.pendingFilter) {
     console.log('Applying pending filter:', window.pendingFilter);
           if (typeof applyStatusFilterToGrid === 'function') {
@@ -354,7 +254,7 @@ function onGridReady(params) {
       }
     delete window.pendingFilter;
   } else {
-          // Default: open only
+          // ברירת מחדל - פתוח בלבד
       console.log('No saved filter, applying default filter: פתוח');
       if (typeof applyStatusFilterToGrid === 'function') {
         applyStatusFilterToGrid(['פתוח'], null);
@@ -363,19 +263,19 @@ function onGridReady(params) {
       }
   }
   
-  // Update summary statistics based on displayed data
+  // עדכון סטטיסטיקות בהתאם לנתונים המוצגים
   setTimeout(() => {
     if (window.updateSummaryStats) {
       updateSummaryStats();
     }
     
-    // Check if applyStatusFilterToGrid is available now
+    // בדיקה אם הפילטר זמין עכשיו
     if (typeof applyStatusFilterToGrid === 'function') {
       console.log('applyStatusFilterToGrid is now available, applying default filter');
       applyStatusFilterToGrid(['פתוח'], null);
     } else {
       console.log('applyStatusFilterToGrid still not available, will try again later');
-      // Try again after a delay
+      // נסיון נוסף אחרי זמן נוסף
       setTimeout(() => {
               if (typeof applyStatusFilterToGrid === 'function') {
         console.log('applyStatusFilterToGrid is now available on second try, applying default filter');
@@ -390,11 +290,7 @@ function onGridReady(params) {
   console.log('Grid initialized successfully');
 }
 
-/**
- * Update grid status
- * 
- * This function updates the status indicators for the grid.
- */
+// פונקציה לעדכון סטטוס הגריד
 function updateGridStatus() {
   const statusItems = document.querySelectorAll('.status-item');
   if (statusItems.length >= 2) {
@@ -403,40 +299,24 @@ function updateGridStatus() {
   }
 }
 
-/**
- * Open plan details
- * 
- * This function opens a dialog to view plan details for a given ticker.
- * 
- * @param {string} ticker - Ticker symbol of the plan
- */
+// פונקציה לפתיחת פרטי תכנון
 function openPlanDetails(ticker) {
   alert(`פתיחת פרטי תכנון עבור ${ticker}`);
 }
 
-/**
- * Update grid data
- * 
- * This function updates the grid data with new data.
- * 
- * @param {Array} newData - New data to be set in the grid
- */
+// פונקציה לעדכון נתוני הגריד
 function updateGridData(newData) {
   if (gridApi) {
     gridApi.setGridOption('rowData', newData);
     console.log('Grid data updated with', newData.length, 'rows');
     
-    // We don't update summary statistics here - the filter will handle that
+    // לא מעדכנים סטטיסטיקות כאן - הפילטר יעדכן אותן
   } else {
     console.warn('Grid API not available');
   }
 }
 
-/**
- * Refresh grid
- * 
- * This function refreshes the grid by refreshing cells and adjusting column sizes.
- */
+// פונקציה לרענון הגריד
 function refreshGrid() {
   if (gridApi) {
     gridApi.refreshCells();
@@ -445,11 +325,7 @@ function refreshGrid() {
   }
 }
 
-/**
- * Clear grid
- * 
- * This function clears the grid data.
- */
+// פונקציה לניקוי הגריד
 function clearGrid() {
   if (gridApi) {
     gridApi.setGridOption('rowData', []);
@@ -457,36 +333,20 @@ function clearGrid() {
   }
 }
 
-/**
- * Set page-specific column definitions
- * 
- * This function sets custom column definitions for the grid.
- * 
- * @param {Array} columnDefs - Array of column definition objects
- */
+// פונקציה עזר להגדרת עמודות מותאמות אישית
 function setPageColumnDefs(columnDefs) {
   window.getPageColumnDefs = () => columnDefs;
   console.log('Page column definitions set:', columnDefs);
 }
 
-/**
- * Add a new column to default definitions
- * 
- * This function adds a new column to the default column definitions.
- * 
- * @param {Object} newColumn - New column definition object
- */
+// פונקציה עזר להוספת עמודה לעמודות ברירת המחדל
 function addColumnToDefaultDefs(newColumn) {
   const defaultDefs = getDefaultColumnDefs();
   defaultDefs.push(newColumn);
   console.log('Column added to default definitions:', newColumn);
 }
 
-/**
- * Global functions for grid operations
- * 
- * These functions are made available globally for use in other parts of the application
- */
+// הפיכת הפונקציות לזמינות גלובלית
 window.createGrid = createGrid;
 window.updateGridData = updateGridData;
 window.refreshGrid = refreshGrid;
@@ -496,14 +356,7 @@ window.updateGridStatus = updateGridStatus;
 window.setPageColumnDefs = setPageColumnDefs;
 window.addColumnToDefaultDefs = addColumnToDefaultDefs;
 
-/**
- * Format currency
- * 
- * This function formats a given amount as a currency string.
- * 
- * @param {number} amount - Amount to be formatted
- * @returns {string} Formatted currency string
- */
+// פונקציה לפורמט כסף
 function formatCurrency(amount) {
   if (amount === null || amount === undefined || isNaN(amount)) {
     return '$0.00';
@@ -517,15 +370,7 @@ function formatCurrency(amount) {
   }).format(amount);
 }
 
-/**
- * Format percentage
- * 
- * This function formats a given value as a percentage string.
- * 
- * @param {number} value - Value to be formatted
- * @param {number} decimals - Number of decimal places
- * @returns {string} Formatted percentage string
- */
+// פונקציה לפורמט אחוזים
 function formatPercentage(value, decimals = 2) {
   if (value === null || value === undefined || isNaN(value)) {
     return '0.00%';
@@ -534,24 +379,20 @@ function formatPercentage(value, decimals = 2) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(decimals)}%`;
 }
 
-/**
- * Toggle alerts section
- * 
- * This function toggles the visibility of the alerts section.
- */
+// פונקציות גלובליות לסגירה/פתיחה
 function toggleAlertsSection() {
   const alertsSection = document.getElementById('alertsSection');
   const filterBtn = document.querySelector('.filter-toggle-btn');
   const isCollapsed = alertsSection.classList.contains('collapsed');
   
   if (isCollapsed) {
-    // Open alerts section
+    // פתיחת אזור ההתראות
     alertsSection.classList.remove('collapsed');
     filterBtn.classList.remove('active');
     localStorage.setItem('alertsSectionCollapsed', 'false');
     console.log('פתיחת אזור התראות');
   } else {
-    // Close alerts section
+    // סגירת אזור ההתראות
     alertsSection.classList.add('collapsed');
     filterBtn.classList.add('active');
     localStorage.setItem('alertsSectionCollapsed', 'true');
@@ -565,13 +406,13 @@ function toggleTopSection() {
   const isCollapsed = topSection.classList.contains('collapsed');
   
   if (isCollapsed) {
-    // Open top section
+    // פתיחת החלק העליון
     topSection.classList.remove('collapsed');
     filterBtn.classList.remove('active');
     localStorage.setItem('topSectionCollapsed', 'false');
     console.log('פתיחת חלק עליון');
   } else {
-    // Close top section
+    // סגירת החלק העליון
     topSection.classList.add('collapsed');
     filterBtn.classList.add('active');
     localStorage.setItem('topSectionCollapsed', 'true');
@@ -597,7 +438,7 @@ function restoreAlertsSectionState() {
 
 function restoreTopSectionState() {
   const topSection = document.getElementById('topSection');
-  const filterBtn = document.querySelector('.top-toggle-btn');
+  const filterBtn = topSection.querySelector('.top-toggle-btn');
   const isCollapsed = localStorage.getItem('topSectionCollapsed') === 'true';
   
   if (isCollapsed) {
@@ -611,20 +452,16 @@ function restoreTopSectionState() {
   }
 }
 
-/**
- * Load alerts
- * 
- * This function loads sample alerts into the alerts section.
- */
+// פונקציה לטעינת התראות
 function loadAlerts() {
   const alertsContainer = document.getElementById('alertsContainer');
   if (!alertsContainer) return;
   
-  // Determine page type based on URL
+  // קביעת סוג הדף לפי URL
   const isPlanningPage = window.location.pathname.includes('planning');
   const openDetailsFunction = isPlanningPage ? 'openPlanDetails' : 'openTradeDetails';
   
-  // Sample alerts data
+  // נתוני דמה להתראות
   const alerts = [
     { ticker: 'AAPL', message: 'מחיר חצה את 180$', price: '$184.32 (+1.2%)' },
     { ticker: 'TSLA', message: 'מחיר ירד מתחת ל-700$', price: '$688.90 (-2.1%)' },
@@ -642,21 +479,14 @@ function loadAlerts() {
   
   alertsContainer.innerHTML = alertsHtml;
   
-  // Update alerts count
+  // עדכון מונה ההתראות
   const alertsCount = document.getElementById('alertsCount');
   if (alertsCount) {
     alertsCount.textContent = alerts.length;
   }
 }
 
-/**
- * Mark alert as read
- * 
- * This function marks an alert as read when the user clicks on it.
- * 
- * @param {Object} button - The button element that was clicked
- * @param {string} ticker - Ticker symbol of the alert
- */
+// פונקציה לסמן התראה כנקראה
 function markAlertAsRead(button, ticker) {
   const alertCard = button.closest('.alert-card');
   if (alertCard) {
@@ -667,33 +497,29 @@ function markAlertAsRead(button, ticker) {
   }
 }
 
-/**
- * Reset all filters and reload data
- * 
- * This function resets all filters and reloads data based on the current page type.
- */
+// פונקציה לאיפוס פילטרים ורענון נתונים
 async function resetAllFiltersAndReloadData() {
   console.log('=== resetAllFiltersAndReloadData called ===');
   
-  // Determine page type based on URL
+  // קביעת סוג הדף לפי URL
   const isPlanningPage = window.location.pathname.includes('planning');
   const isDatabasePage = window.location.pathname.includes('database');
   
-  // Clear filters in the header component
+  // איפוס הפילטרים בקומפוננטת התפריט
   const header = document.querySelector('app-header');
   if (header && typeof header.clearAllFilters === 'function') {
     console.log('Calling clearAllFilters from component');
     header.clearAllFilters();
   }
   
-  // Reset global variables
+  // איפוס המשתנים הגלובליים
   window.selectedStatusesForFilter = [];
   window.selectedTypesForFilter = [];
   window.selectedAccountsForFilter = [];
   window.selectedDateRangeForFilter = null;
   window.selectedSearchTermForFilter = null;
   
-  // Clear local storage
+  // ניקוי localStorage
   const filterPrefix = isPlanningPage ? 'planningFilter' : isDatabasePage ? 'databaseFilter' : 'trackingFilter';
   localStorage.removeItem(`${filterPrefix}Statuses`);
   localStorage.removeItem(`${filterPrefix}Types`);
@@ -701,7 +527,7 @@ async function resetAllFiltersAndReloadData() {
   localStorage.removeItem(`${filterPrefix}DateRange`);
   localStorage.removeItem(`${filterPrefix}Search`);
   
-  // Reload data based on page type
+  // רענון נתונים לפי סוג הדף
   if (isPlanningPage && typeof loadPlansData === 'function') {
     await loadPlansData();
   } else if (isDatabasePage && typeof loadDatabaseStats === 'function') {
@@ -713,31 +539,27 @@ async function resetAllFiltersAndReloadData() {
   console.log('=== resetAllFiltersAndReloadData completed ===');
 }
 
-/**
- * Close all filters
- * 
- * This function closes all filters in the header component.
- */
+// פונקציה לסגירת כל הפילטרים
 function closeAllFilters() {
   console.log('=== closeAllFilters called ===');
   
-  // Determine page type based on URL
+  // קביעת סוג הדף לפי URL
   const isPlanningPage = window.location.pathname.includes('planning');
   const isDatabasePage = window.location.pathname.includes('database');
   
-  // Clear filters in the header component
+  // איפוס הפילטרים בקומפוננטת התפריט
   if (typeof window.resetComponentFilters === 'function') {
     window.resetComponentFilters();
   }
   
-  // Reset global variables
+  // איפוס המשתנים הגלובליים
   window.selectedStatusesForFilter = [];
   window.selectedTypesForFilter = [];
   window.selectedAccountsForFilter = [];
   window.selectedDateRangeForFilter = null;
   window.selectedSearchTermForFilter = null;
   
-  // Clear local storage
+  // ניקוי localStorage
   const filterPrefix = isPlanningPage ? 'planningFilter' : isDatabasePage ? 'databaseFilter' : 'trackingFilter';
   localStorage.removeItem(`${filterPrefix}Statuses`);
   localStorage.removeItem(`${filterPrefix}Types`);
@@ -748,11 +570,7 @@ function closeAllFilters() {
   console.log('All filters cleared');
 }
 
-/**
- * Custom action confirmation
- * 
- * This function handles confirmation for custom actions.
- */
+// פונקציות לאישור מותאם אישית
 let customActionCallback = null;
 
 function confirmCustomAction() {
@@ -773,17 +591,9 @@ function showCustomConfirm(message, callback) {
   document.getElementById("customConfirmModal").style.display = "block";
 }
 
-/**
- * Section toggling functions
- * 
- * These functions toggle the visibility of different sections.
- */
+// ===== פונקציות לסגירה ופתיחה של סקשנים =====
 
-/**
- * Toggle plans section
- * 
- * This function toggles the visibility of the plans section.
- */
+// פונקציה לסגירה/פתיחה של אזור התכנונים
 window.togglePlansSection = function() {
   const plansSection = document.getElementById('plansSection');
   const toggleBtn = document.querySelector('button[onclick="togglePlansSection()"]');
@@ -802,11 +612,7 @@ window.togglePlansSection = function() {
   }
 }
 
-/**
- * Restore plans section state
- * 
- * This function restores the state of the plans section.
- */
+// פונקציה לשחזור מצב אזור התכנונים
 function restorePlansSectionState() {
   const plansSection = document.getElementById('plansSection');
   const toggleBtn = document.querySelector('button[onclick="togglePlansSection()"]');
@@ -825,11 +631,7 @@ function restorePlansSectionState() {
   }
 }
 
-/**
- * Toggle alerts section
- * 
- * This function toggles the visibility of the alerts section.
- */
+// פונקציה לסגירה/פתיחה של אזור ההתראות
 window.toggleAlertsSection = function() {
   const alertsSection = document.getElementById('alertsSection');
   const toggleBtn = document.querySelector('button[onclick="toggleAlertsSection()"]');
@@ -848,11 +650,7 @@ window.toggleAlertsSection = function() {
   }
 }
 
-/**
- * Restore alerts section state
- * 
- * This function restores the state of the alerts section.
- */
+// פונקציה לשחזור מצב אזור ההתראות
 function restoreAlertsSectionState() {
   const alertsSection = document.getElementById('alertsSection');
   const toggleBtn = document.querySelector('button[onclick="toggleAlertsSection()"]');
@@ -871,11 +669,7 @@ function restoreAlertsSectionState() {
   }
 }
 
-/**
- * Toggle top section
- * 
- * This function toggles the visibility of the top section.
- */
+// פונקציה לסגירה/פתיחה של החלק העליון
 window.toggleTopSection = function() {
   const topSection = document.getElementById('topSection');
   const toggleBtn = document.querySelector('button[onclick="toggleTopSection()"]');
@@ -894,11 +688,7 @@ window.toggleTopSection = function() {
   }
 }
 
-/**
- * Restore top section state
- * 
- * This function restores the state of the top section.
- */
+// פונקציה לשחזור מצב החלק העליון
 function restoreTopSectionState() {
   const topSection = document.getElementById('topSection');
   const toggleBtn = document.querySelector('button[onclick="toggleTopSection()"]');
@@ -917,11 +707,7 @@ function restoreTopSectionState() {
   }
 }
 
-/**
- * Restore all section states
- * 
- * This function restores the state of all sections.
- */
+// פונקציה לשחזור כל מצבי הסקשנים
 function restoreAllSectionStates() {
   restorePlansSectionState();
   restoreAlertsSectionState();
@@ -929,11 +715,7 @@ function restoreAllSectionStates() {
   restoreDesignsSectionState();
 }
 
-/**
- * Toggle designs section
- * 
- * This function toggles the visibility of the designs section.
- */
+// פונקציה לסגירה/פתיחה של אזור העיצובים
 window.toggleDesignsSection = function() {
   const designsSection = document.getElementById('designsSection');
   const toggleBtn = document.querySelector('button[onclick="toggleDesignsSection()"]');
@@ -952,11 +734,7 @@ window.toggleDesignsSection = function() {
   }
 }
 
-/**
- * Restore designs section state
- * 
- * This function restores the state of the designs section.
- */
+// פונקציה לשחזור מצב אזור העיצובים
 function restoreDesignsSectionState() {
   const designsSection = document.getElementById('designsSection');
   const toggleBtn = document.querySelector('button[onclick="toggleDesignsSection()"]');
@@ -977,28 +755,13 @@ function restoreDesignsSectionState() {
   }
 }
 
-/**
- * Table sorting functions
- * 
- * These functions handle sorting for tables.
- */
+// ===== פונקציונליות סידור לטבלאות =====
 
-/**
- * Global variables for sorting
- * 
- * These variables maintain the current sorting state across
- * different tables and columns.
- */
+// משתנים גלובליים לסידור
 let currentSortColumn = null;
-let currentSortDirection = 'asc'; // 'asc' or 'desc'
+let currentSortDirection = 'asc'; // 'asc' או 'desc'
 
-/**
- * Initialize table sorting for a given table
- * 
- * This function sets up sorting functionality for a specific table.
- * 
- * @param {string} tableId - ID of the table
- */
+// פונקציה להוספת פונקציונליות סידור לטבלה
 function initializeTableSorting(tableId) {
   const table = document.getElementById(tableId);
   if (!table) return;
@@ -1006,41 +769,34 @@ function initializeTableSorting(tableId) {
   const headers = table.querySelectorAll('thead th');
   
   headers.forEach((header, index) => {
-    // Skip action column
+    // דלג על עמודת הפעולות
     if (header.textContent.includes('פעולות') || header.textContent.includes('Actions')) {
       return;
     }
     
-    // Check if sorting icon already exists
+    // בדוק אם כבר יש אייקון סידור
     if (header.querySelector('.sort-icon')) {
-      return; // Already initialized
+      return; // כבר מאותחל
     }
     
-    // Add cursor pointer style
+    // הוסף סגנון cursor pointer
     header.style.cursor = 'pointer';
     header.classList.add('sortable-header');
     
-    // Add sorting icon
+    // הוסף אייקון סידור
     const sortIcon = document.createElement('span');
     sortIcon.className = 'sort-icon';
     sortIcon.innerHTML = '↕';
     header.insertBefore(sortIcon, header.firstChild);
     
-    // Add event listener
+    // הוסף event listener
     header.addEventListener('click', () => {
       sortTable(tableId, index);
     });
   });
 }
 
-/**
- * Sort table
- * 
- * This function sorts the rows of a table based on the clicked column.
- * 
- * @param {string} tableId - ID of the table
- * @param {number} columnIndex - Index of the clicked column
- */
+// פונקציה לסידור הטבלה
 function sortTable(tableId, columnIndex) {
   const table = document.getElementById(tableId);
   if (!table) return;
@@ -1048,7 +804,7 @@ function sortTable(tableId, columnIndex) {
   const tbody = table.querySelector('tbody');
   const rows = Array.from(tbody.querySelectorAll('tr'));
   
-  // Check if it's the same column - toggle direction
+  // בדוק אם זה אותו עמודה - שנה כיוון
   if (currentSortColumn === columnIndex) {
     currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
   } else {
@@ -1056,17 +812,17 @@ function sortTable(tableId, columnIndex) {
     currentSortDirection = 'asc';
   }
   
-  // Update sort icons
+  // עדכן אייקונים
   updateSortIcons(tableId, columnIndex);
   
-  // Sort rows
+  // מיין את השורות
   rows.sort((a, b) => {
     const aValue = getCellValue(a, columnIndex);
     const bValue = getCellValue(b, columnIndex);
     
     let comparison = 0;
     
-    // Handle different data types
+    // טיפול בסוגים שונים של נתונים
     if (isNumeric(aValue) && isNumeric(bValue)) {
       comparison = parseFloat(aValue) - parseFloat(bValue);
     } else if (isDate(aValue) && isDate(bValue)) {
@@ -1078,76 +834,47 @@ function sortTable(tableId, columnIndex) {
     return currentSortDirection === 'asc' ? comparison : -comparison;
   });
   
-  // Remove old rows and append new ones
+  // הסר את השורות הישנות והוסף את הממוינות
   rows.forEach(row => tbody.appendChild(row));
 }
 
-/**
- * Get cell value
- * 
- * This function retrieves the value of a cell in a given row and column.
- * 
- * @param {Object} row - The row object
- * @param {number} columnIndex - Index of the column
- * @returns {string} Value of the cell
- */
+// פונקציה לקבלת ערך תא
 function getCellValue(row, columnIndex) {
   const cell = row.cells[columnIndex];
   if (!cell) return '';
   
-  // Strip HTML tags and get text content
+  // הסר תגיות HTML וקבל רק טקסט
   let value = cell.textContent || cell.innerText || '';
   
-  // Remove extra spaces
+  // הסר רווחים מיותרים
   value = value.trim();
   
-  // Handle special values
+  // טיפול בערכים מיוחדים
   if (value.includes('$')) {
-    // Remove dollar sign and commas
+    // הסר סימן דולר ופסיקים
     value = value.replace(/[$,]/g, '');
   }
   
   if (value.includes('%')) {
-    // Remove percentage sign
+    // הסר סימן אחוז
     value = value.replace(/%/g, '');
   }
   
   return value;
 }
 
-/**
- * Check if value is numeric
- * 
- * This function checks if a given value is numeric.
- * 
- * @param {string} value - Value to check
- * @returns {boolean} True if value is numeric
- */
+// פונקציה לבדיקה אם ערך הוא מספרי
 function isNumeric(value) {
   return !isNaN(value) && !isNaN(parseFloat(value));
 }
 
-/**
- * Check if value is a date
- * 
- * This function checks if a given value is a valid date.
- * 
- * @param {string} value - Value to check
- * @returns {boolean} True if value is a date
- */
+// פונקציה לבדיקה אם ערך הוא תאריך
 function isDate(value) {
   const date = new Date(value);
   return date instanceof Date && !isNaN(date);
 }
 
-/**
- * Update sort icons
- * 
- * This function updates the sort icons for the active column.
- * 
- * @param {string} tableId - ID of the table
- * @param {number} activeColumnIndex - Index of the active column
- */
+// פונקציה לעדכון אייקוני הסידור
 function updateSortIcons(tableId, activeColumnIndex) {
   const table = document.getElementById(tableId);
   if (!table) return;
@@ -1158,33 +885,29 @@ function updateSortIcons(tableId, activeColumnIndex) {
     const sortIcon = header.querySelector('.sort-icon');
     if (!sortIcon) return;
     
-    // Remove 'sorted' class from all headers
+    // הסר קלאס sorted מכל הכותרות
     header.classList.remove('sorted');
     
     if (index === activeColumnIndex) {
-      // Active column
+      // עמודה פעילה
       header.classList.add('sorted');
       sortIcon.innerHTML = currentSortDirection === 'asc' ? '↑' : '↓';
     } else {
-      // Inactive column
+      // עמודה לא פעילה
       sortIcon.innerHTML = '↕';
     }
   });
 }
 
-/**
- * Initialize sorting for all tables on the page
- * 
- * This function sets up sorting for all tables on the page.
- */
+// פונקציה לאתחול סידור לכל הטבלאות בדף
 function initializeAllTableSorting() {
-  // Initialize plans table
+  // אתחול לטבלת תכנונים
   initializeTableSorting('plansTable');
   
-  // Initialize designs table
+  // אתחול לטבלת עיצובים
   initializeTableSorting('designsTable');
   
-  // Initialize other tables as needed
+  // אתחול לטבלאות אחרות לפי הצורך
   const tables = ['accountsTable', 'tickersTable', 'tradesTable', 'tradePlansTable', 'alertsTable', 'cashFlowsTable', 'notesTable', 'executionsTable'];
   tables.forEach(tableId => {
     if (document.getElementById(tableId)) {
@@ -1193,29 +916,103 @@ function initializeAllTableSorting() {
   });
 }
 
-/**
- * CRUD functions
- * 
- * These functions handle create, read, update, and delete operations for records.
- */
+// ===== CRUD FUNCTIONS =====
+// מערכת כללית לעריכה ומחיקה - משותפת לכל הטבלאות במערכת
+// המערכת מאפשרת עריכה ומחיקה של רשומות מכל טבלה באמצעות פונקציות כלליות
+// במקום ליצור פונקציות ספציפיות לכל טבלה, המערכת משתמשת בפונקציות כלליות
+// שמקבלות את סוג הטבלה כפרמטר ומטפלות בכל הלוגיקה הנדרשת
 
 /**
- * Show edit modal
+ * פונקציה כללית לעריכת רשומה מכל טבלה במערכת
+ * הפונקציה טוענת את הנתונים מהשרת ומציגה מודל עריכה מתאים
  * 
- * This function shows an edit modal for a given table type and data.
- * 
- * @param {string} tableType - Type of table (e.g., 'accounts', 'tickers', 'trades')
- * @param {Object} data - Data for editing
+ * @param {string} tableType - סוג הטבלה (למשל: 'accounts', 'tickers', 'trades')
+ * @param {number} recordId - מזהה הרשומה לעריכה
  * 
  * @example
- * // Show edit modal for accounts
+ * // עריכת חשבון עם מזהה 123
+ * editRecord('accounts', 123);
+ * 
+ * // עריכת טיקר עם מזהה 456
+ * editRecord('tickers', 456);
+ */
+async function editRecord(tableType, recordId) {
+    try {
+        // קריאה לשרת לקבלת נתוני הרשומה
+        const response = await apiCall(`/api/v1/${tableType}/${recordId}`);
+        
+        if (response.status === 'success') {
+            // הצגת מודל עריכה עם הנתונים שנטענו
+            showEditModal(tableType, response.data);
+        } else {
+            // הצגת הודעת שגיאה אם הטעינה נכשלה
+            alert(`שגיאה בטעינת נתוני ${getTableDisplayName(tableType)}`);
+        }
+    } catch (error) {
+        // לוג שגיאה לקונסול והודעת שגיאה למשתמש
+        console.error(`Error loading ${tableType}:`, error);
+        alert(`שגיאה בטעינת נתוני ${getTableDisplayName(tableType)}`);
+    }
+}
+
+/**
+ * פונקציה כללית למחיקת רשומה מכל טבלה במערכת
+ * הפונקציה מציגה אישור מחיקה ואז מוחקת את הרשומה מהשרת
+ * 
+ * @param {string} tableType - סוג הטבלה (למשל: 'accounts', 'tickers', 'trades')
+ * @param {number} recordId - מזהה הרשומה למחיקה
+ * 
+ * @example
+ * // מחיקת חשבון עם מזהה 123
+ * deleteRecord('accounts', 123);
+ * 
+ * // מחיקת טיקר עם מזהה 456
+ * deleteRecord('tickers', 456);
+ */
+async function deleteRecord(tableType, recordId) {
+    // קבלת שם התצוגה של הטבלה להודעות למשתמש
+    const displayName = getTableDisplayName(tableType);
+    
+    // הצגת אישור מחיקה למשתמש
+    if (confirm(`האם אתה בטוח שברצונך למחוק ${displayName} זה?`)) {
+        try {
+            // קריאה לשרת למחיקת הרשומה
+            const response = await apiCall(`/api/v1/${tableType}/${recordId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.status === 'success') {
+                // הצגת הודעת הצלחה ורענון הטבלה
+                alert(`${displayName} נמחק בהצלחה`);
+                refreshTable(tableType);
+            } else {
+                // הצגת הודעת שגיאה אם המחיקה נכשלה
+                alert(`שגיאה במחיקת ${displayName}`);
+            }
+        } catch (error) {
+            // לוג שגיאה לקונסול והודעת שגיאה למשתמש
+            console.error(`Error deleting ${tableType}:`, error);
+            alert(`שגיאה במחיקת ${displayName}`);
+        }
+    }
+}
+
+/**
+ * פונקציה להצגת מודל עריכה מתאים לסוג הטבלה
+ * הפונקציה מוצאת את המודל המתאים, ממלאת אותו בנתונים ומציגה אותו
+ * 
+ * @param {string} tableType - סוג הטבלה (למשל: 'accounts', 'tickers', 'trades')
+ * @param {Object} data - נתוני הרשומה לעריכה
+ * 
+ * @example
+ * // הצגת מודל עריכת חשבון
  * showEditModal('accounts', accountData);
  */
 function showEditModal(tableType, data) {
-    // Create a unique ID for the modal based on table type
+    // יצירת מזהה המודל לפי סוג הטבלה
     let modalId;
     
-    // Map specific table types to their respective modals
+    // מיפוי מיוחד לטבלאות עם שמות מודלים שונים
     const modalIdMap = {
         'user_roles': 'editUserRolesModal',
         'cash_flows': 'editCashFlowsModal',
@@ -1231,42 +1028,41 @@ function showEditModal(tableType, data) {
     
     const modal = document.getElementById(modalId);
     
-    // Check if the modal exists in the page
+    // בדיקה שהמודל קיים בדף
     if (!modal) {
         console.error(`Modal ${modalId} not found`);
         alert('מודל עריכה לא נמצא');
         return;
     }
     
-    // Populate the modal with data
+    // מילוי הנתונים במודל באמצעות הפונקציה המתאימה
     fillEditModalData(tableType, data);
     
-    // Show the modal using Bootstrap
+    // הצגת המודל באמצעות Bootstrap
     const bootstrapModal = new bootstrap.Modal(modal);
     bootstrapModal.show();
 }
 
 /**
- * Fill edit modal data
+ * פונקציה למילוי נתונים במודל עריכה לפי סוג הטבלה
+ * הפונקציה קוראת לפונקציה הספציפית המתאימה לכל סוג טבלה
  * 
- * This function populates the edit modal with data based on the table type.
- * 
- * @param {string} tableType - Type of table (e.g., 'accounts', 'tickers', 'trades')
- * @param {Object} data - Data for editing
+ * @param {string} tableType - סוג הטבלה (למשל: 'accounts', 'tickers', 'trades')
+ * @param {Object} data - נתוני הרשומה לעריכה
  * 
  * @example
- * // Populate edit modal data for accounts
+ * // מילוי נתונים במודל עריכת חשבון
  * fillEditModalData('accounts', accountData);
  */
 function fillEditModalData(tableType, data) {
-    // Create a unique ID for the modal based on table type
+    // יצירת מזהה המודל לפי סוג הטבלה
     const modalId = `edit${capitalizeFirstLetter(tableType)}Modal`;
     const modal = document.getElementById(modalId);
     
-    // Check if the modal exists in the page
+    // בדיקה שהמודל קיים בדף
     if (!modal) return;
     
-    // Populate fields based on table type
+    // מילוי שדות לפי סוג הטבלה - כל טבלה מקבלת פונקציה ספציפית
     switch (tableType) {
         case 'accounts':
             fillAccountModalData(data);
@@ -1313,26 +1109,24 @@ function fillEditModalData(tableType, data) {
 }
 
 /**
- * Specific data population functions
- * 
- * These functions populate the fields of the edit modal based on the table type.
+ * פונקציות מילוי נתונים ספציפיות לכל טבלה
+ * כל פונקציה ממלאת את השדות המתאימים במודל העריכה של הטבלה הספציפית
  */
 
 /**
- * Populate account data
+ * מילוי נתונים במודל עריכת חשבון
+ * ממלא את כל השדות הרלוונטיים לחשבון במודל העריכה
  * 
- * This function populates the account fields in the edit modal.
- * 
- * @param {Object} data - Account data for editing
- * @param {number} data.id - Account ID
- * @param {string} data.name - Account name
- * @param {string} data.currency - Account currency
- * @param {string} data.status - Account status
- * @param {number} data.cash_balance - Account cash balance
- * @param {string} data.notes - Account notes
+ * @param {Object} data - נתוני החשבון לעריכה
+ * @param {number} data.id - מזהה החשבון
+ * @param {string} data.name - שם החשבון
+ * @param {string} data.currency - מטבע החשבון
+ * @param {string} data.status - סטטוס החשבון
+ * @param {number} data.cash_balance - יתרת מזומן
+ * @param {string} data.notes - הערות
  */
 function fillAccountModalData(data) {
-    // Populate fields with data or default values
+    // מילוי שדות המודל עם הנתונים או ערכי ברירת מחדל
     document.getElementById('editAccountId').value = data.id;
     document.getElementById('editAccountName').value = data.name || '';
     document.getElementById('editAccountCurrency').value = data.currency || 'USD';
@@ -1342,20 +1136,19 @@ function fillAccountModalData(data) {
 }
 
 /**
- * Populate ticker data
+ * מילוי נתונים במודל עריכת טיקר
+ * ממלא את כל השדות הרלוונטיים לטיקר במודל העריכה
  * 
- * This function populates the ticker fields in the edit modal.
- * 
- * @param {Object} data - Ticker data for editing
- * @param {number} data.id - Ticker ID
- * @param {string} data.symbol - Ticker symbol
- * @param {string} data.name - Ticker name
- * @param {string} data.type - Ticker type
- * @param {string} data.currency - Ticker currency
- * @param {string} data.remarks - Ticker remarks
+ * @param {Object} data - נתוני הטיקר לעריכה
+ * @param {number} data.id - מזהה הטיקר
+ * @param {string} data.symbol - סמל הטיקר
+ * @param {string} data.name - שם הטיקר
+ * @param {string} data.type - סוג הטיקר (stock, etf, crypto, forex)
+ * @param {string} data.currency - מטבע הטיקר
+ * @param {string} data.remarks - הערות
  */
 function fillTickerModalData(data) {
-    // Populate fields with data or default values
+    // מילוי שדות המודל עם הנתונים או ערכי ברירת מחדל
     document.getElementById('editTickerId').value = data.id;
     document.getElementById('editTickerSymbol').value = data.symbol || '';
     document.getElementById('editTickerName').value = data.name || '';
@@ -1365,20 +1158,19 @@ function fillTickerModalData(data) {
 }
 
 /**
- * Populate trade data
+ * מילוי נתונים במודל עריכת טרייד
+ * ממלא את כל השדות הרלוונטיים לטרייד במודל העריכה
  * 
- * This function populates the trade fields in the edit modal.
- * 
- * @param {Object} data - Trade data for editing
- * @param {number} data.id - Trade ID
- * @param {number} data.account_id - Account ID
- * @param {number} data.ticker_id - Ticker ID
- * @param {string} data.status - Trade status
- * @param {string} data.type - Trade type
- * @param {string} data.notes - Trade notes
+ * @param {Object} data - נתוני הטרייד לעריכה
+ * @param {number} data.id - מזהה הטרייד
+ * @param {number} data.account_id - מזהה החשבון
+ * @param {number} data.ticker_id - מזהה הטיקר
+ * @param {string} data.status - סטטוס הטרייד (open, closed, cancelled)
+ * @param {string} data.type - סוג הטרייד (buy, sell)
+ * @param {string} data.notes - הערות
  */
 function fillTradeModalData(data) {
-    // Populate fields with data or default values
+    // מילוי שדות המודל עם הנתונים או ערכי ברירת מחדל
     document.getElementById('editTradeId').value = data.id;
     document.getElementById('editTradeAccountId').value = data.account_id || '';
     document.getElementById('editTradeTickerId').value = data.ticker_id || '';
@@ -1388,23 +1180,22 @@ function fillTradeModalData(data) {
 }
 
 /**
- * Populate trade plan data
+ * מילוי נתונים במודל עריכת תוכנית טרייד
+ * ממלא את כל השדות הרלוונטיים לתוכנית טרייד במודל העריכה
  * 
- * This function populates the trade plan fields in the edit modal.
- * 
- * @param {Object} data - Trade plan data for editing
- * @param {number} data.id - Trade plan ID
- * @param {number} data.account_id - Account ID
- * @param {number} data.ticker_id - Ticker ID
- * @param {string} data.investment_type - Investment type
- * @param {number} data.planned_amount - Planned amount
- * @param {number} data.stop_price - Stop price
- * @param {number} data.target_price - Target price
- * @param {string} data.entry_conditions - Entry conditions
- * @param {string} data.reasons - Reasons
+ * @param {Object} data - נתוני תוכנית הטרייד לעריכה
+ * @param {number} data.id - מזהה תוכנית הטרייד
+ * @param {number} data.account_id - מזהה החשבון
+ * @param {number} data.ticker_id - מזהה הטיקר
+ * @param {string} data.investment_type - סוג השקעה (swing, investment, passive)
+ * @param {number} data.planned_amount - סכום מתוכנן
+ * @param {number} data.stop_price - מחיר עצירה
+ * @param {number} data.target_price - מחיר יעד
+ * @param {string} data.entry_conditions - תנאי כניסה
+ * @param {string} data.reasons - סיבות
  */
 function fillTradePlanModalData(data) {
-    // Populate fields with data or default values
+    // מילוי שדות המודל עם הנתונים או ערכי ברירת מחדל
     document.getElementById('editTradePlanId').value = data.id;
     document.getElementById('editTradePlanAccountId').value = data.account_id || '';
     document.getElementById('editTradePlanTickerId').value = data.ticker_id || '';
@@ -1456,18 +1247,17 @@ function fillExecutionModalData(data) {
 }
 
 /**
- * Populate alert data
+ * מילוי נתונים במודל עריכת התראה
+ * ממלא את כל השדות הרלוונטיים להתראה במודל העריכה
  * 
- * This function populates the alert fields in the edit modal.
- * 
- * @param {Object} data - Alert data for editing
- * @param {number} data.id - Alert ID
- * @param {number} data.account_id - Account ID
- * @param {number} data.ticker_id - Ticker ID
- * @param {string} data.type - Alert type
- * @param {string} data.condition - Alert condition
- * @param {string} data.message - Alert message
- * @param {boolean} data.is_active - Is the alert active
+ * @param {Object} data - נתוני ההתראה לעריכה
+ * @param {number} data.id - מזהה ההתראה
+ * @param {number} data.account_id - מזהה החשבון
+ * @param {number} data.ticker_id - מזהה הטיקר
+ * @param {string} data.type - סוג ההתראה
+ * @param {string} data.condition - תנאי ההתראה
+ * @param {string} data.message - הודעת ההתראה
+ * @param {boolean} data.is_active - האם ההתראה פעילה
  */
 function fillAlertModalData(data) {
     document.getElementById('editAlertId').value = data.id;
@@ -1480,17 +1270,16 @@ function fillAlertModalData(data) {
 }
 
 /**
- * Populate cash flow data
+ * מילוי נתונים במודל עריכת תזרים מזומנים
+ * ממלא את כל השדות הרלוונטיים לתזרים מזומנים במודל העריכה
  * 
- * This function populates the cash flow fields in the edit modal.
- * 
- * @param {Object} data - Cash flow data for editing
- * @param {number} data.id - Cash flow ID
- * @param {number} data.account_id - Account ID
- * @param {string} data.type - Cash flow type
- * @param {number} data.amount - Cash flow amount
- * @param {string} data.date - Cash flow date
- * @param {string} data.description - Cash flow description
+ * @param {Object} data - נתוני תזרים המזומנים לעריכה
+ * @param {number} data.id - מזהה תזרים המזומנים
+ * @param {number} data.account_id - מזהה החשבון
+ * @param {string} data.type - סוג התזרים
+ * @param {number} data.amount - סכום התזרים
+ * @param {string} data.date - תאריך התזרים
+ * @param {string} data.description - תיאור התזרים
  */
 function fillCashFlowModalData(data) {
     document.getElementById('editCashFlowId').value = data.id;
@@ -1502,17 +1291,16 @@ function fillCashFlowModalData(data) {
 }
 
 /**
- * Populate note data
+ * מילוי נתונים במודל עריכת הערה
+ * ממלא את כל השדות הרלוונטיים להערה במודל העריכה
  * 
- * This function populates the note fields in the edit modal.
- * 
- * @param {Object} data - Note data for editing
- * @param {number} data.id - Note ID
- * @param {number} data.account_id - Account ID
- * @param {number} data.trade_id - Trade ID
- * @param {number} data.trade_plan_id - Trade plan ID
- * @param {string} data.content - Note content
- * @param {string} data.attachment - Note attachment
+ * @param {Object} data - נתוני ההערה לעריכה
+ * @param {number} data.id - מזהה ההערה
+ * @param {number} data.account_id - מזהה החשבון
+ * @param {number} data.trade_id - מזהה הטרייד
+ * @param {number} data.trade_plan_id - מזהה תוכנית הטרייד
+ * @param {string} data.content - תוכן ההערה
+ * @param {string} data.attachment - קובץ מצורף
  */
 function fillNoteModalData(data) {
     document.getElementById('editNoteId').value = data.id;
@@ -1524,16 +1312,15 @@ function fillNoteModalData(data) {
 }
 
 /**
- * Populate user data
+ * מילוי נתונים במודל עריכת משתמש
+ * ממלא את כל השדות הרלוונטיים למשתמש במודל העריכה
  * 
- * This function populates the user fields in the edit modal.
- * 
- * @param {Object} data - User data for editing
- * @param {number} data.id - User ID
- * @param {string} data.username - Username
- * @param {string} data.email - Email
- * @param {boolean} data.is_active - Is the user active
- * @param {Array} data.roles - User roles
+ * @param {Object} data - נתוני המשתמש לעריכה
+ * @param {number} data.id - מזהה המשתמש
+ * @param {string} data.username - שם משתמש
+ * @param {string} data.email - כתובת אימייל
+ * @param {boolean} data.is_active - האם המשתמש פעיל
+ * @param {Array} data.roles - תפקידי המשתמש
  */
 function fillUserModalData(data) {
     document.getElementById('editUserId').value = data.id;
@@ -1544,17 +1331,16 @@ function fillUserModalData(data) {
 }
 
 /**
- * Populate user role data
+ * מילוי נתונים במודל עריכת תפקיד משתמש
+ * ממלא את כל השדות הרלוונטיים לתפקיד משתמש במודל העריכה
  * 
- * This function populates the user role fields in the edit modal.
- * 
- * @param {Object} data - User role data for editing
- * @param {number} data.id - User role ID
- * @param {number} data.user_id - User ID
- * @param {string} data.user_username - Username
- * @param {number} data.role_id - Role ID
- * @param {string} data.role_name - Role name
- * @param {string} data.assigned_at - Assignment date
+ * @param {Object} data - נתוני תפקיד המשתמש לעריכה
+ * @param {number} data.id - מזהה תפקיד המשתמש
+ * @param {number} data.user_id - מזהה המשתמש
+ * @param {string} data.user_username - שם המשתמש
+ * @param {number} data.role_id - מזהה התפקיד
+ * @param {string} data.role_name - שם התפקיד
+ * @param {string} data.assigned_at - תאריך הקצאה
  */
 function fillUserRoleModalData(data) {
     document.getElementById('editUserRoleId').value = data.id;
@@ -1566,23 +1352,89 @@ function fillUserRoleModalData(data) {
 }
 
 /**
- * Collect modal data
+ * פונקציה כללית לשמירת נתונים ממודל עריכה
+ * הפונקציה אוספת את הנתונים מהמודל, שולחת אותם לשרת ומרעננת את הטבלה
  * 
- * This function collects data from the edit modal and returns it as an object.
- * 
- * @param {string} tableType - Type of table (e.g., 'accounts', 'tickers', 'trades')
- * @returns {Object} Object containing collected data
+ * @param {string} tableType - סוג הטבלה (למשל: 'accounts', 'tickers', 'trades')
  * 
  * @example
- * // Collect data for accounts
+ * // שמירת נתוני חשבון
+ * saveRecord('accounts');
+ * 
+ * // שמירת נתוני טיקר
+ * saveRecord('tickers');
+ */
+async function saveRecord(tableType) {
+    // קבלת מזהה הרשומה מהמודל
+    let recordId;
+    let modalId;
+    
+    // מיפוי מיוחד לטבלאות עם שמות שדות ומודלים שונים
+    const recordIdMap = {
+        'user_roles': 'editUserRoleId',
+        'cash_flows': 'editCashFlowId',
+        'trade_plans': 'editTradePlanId',
+        'users': 'editUserId'
+    };
+    
+    const modalIdMap = {
+        'user_roles': 'editUserRolesModal',
+        'cash_flows': 'editCashFlowsModal',
+        'trade_plans': 'editTradePlanModal',
+        'users': 'editUsersModal'
+    };
+    
+    if (recordIdMap[tableType]) {
+        recordId = document.getElementById(recordIdMap[tableType]).value;
+        modalId = modalIdMap[tableType];
+    } else {
+        recordId = document.getElementById(`edit${capitalizeFirstLetter(tableType)}Id`).value;
+        modalId = `edit${capitalizeFirstLetter(tableType)}Modal`;
+    }
+    
+    // איסוף הנתונים מהמודל באמצעות הפונקציה המתאימה
+    const recordData = collectModalData(tableType);
+    
+    try {
+        // שליחת הנתונים לשרת לעדכון
+        const response = await apiCall(`/api/v1/${tableType}/${recordId}`, {
+            method: 'PUT',
+            body: JSON.stringify(recordData)
+        });
+        
+        if (response.status === 'success') {
+            // הצגת הודעת הצלחה, סגירת המודל ורענון הטבלה
+            alert(`${getTableDisplayName(tableType)} נשמר בהצלחה`);
+            bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+            refreshTable(tableType);
+        } else {
+            // הצגת הודעת שגיאה אם השמירה נכשלה
+            alert(`שגיאה בשמירת ${getTableDisplayName(tableType)}`);
+        }
+    } catch (error) {
+        // לוג שגיאה לקונסול והודעת שגיאה למשתמש
+        console.error(`Error saving ${tableType}:`, error);
+        alert(`שגיאה בשמירת ${getTableDisplayName(tableType)}`);
+    }
+}
+
+/**
+ * פונקציה לאיסוף נתונים ממודל עריכה לפי סוג הטבלה
+ * הפונקציה אוספת את הנתונים מהשדות המתאימים במודל ומחזירה אובייקט עם הנתונים
+ * 
+ * @param {string} tableType - סוג הטבלה (למשל: 'accounts', 'tickers', 'trades')
+ * @returns {Object} אובייקט עם הנתונים שנאספו מהמודל
+ * 
+ * @example
+ * // איסוף נתוני חשבון
  * const accountData = collectModalData('accounts');
  * // returns { name: "...", currency: "...", status: "...", ... }
  */
 function collectModalData(tableType) {
-    // Collect data based on table type
+    // איסוף נתונים לפי סוג הטבלה - כל טבלה מקבלת טיפול ספציפי
     switch (tableType) {
         case 'accounts':
-            // Collect account data
+            // איסוף נתוני חשבון
             return {
                 name: document.getElementById('editAccountName').value,
                 currency: document.getElementById('editAccountCurrency').value,
@@ -1591,7 +1443,7 @@ function collectModalData(tableType) {
                 notes: document.getElementById('editAccountNotes').value
             };
         case 'tickers':
-            // Collect ticker data
+            // איסוף נתוני טיקר
             return {
                 symbol: document.getElementById('editTickerSymbol').value,
                 name: document.getElementById('editTickerName').value,
@@ -1600,7 +1452,7 @@ function collectModalData(tableType) {
                 remarks: document.getElementById('editTickerRemarks').value
             };
         case 'trades':
-            // Collect trade data
+            // איסוף נתוני טרייד
             return {
                 account_id: parseInt(document.getElementById('editTradeAccountId').value),
                 ticker_id: parseInt(document.getElementById('editTradeTickerId').value),
@@ -1609,7 +1461,7 @@ function collectModalData(tableType) {
                 notes: document.getElementById('editTradeNotes').value
             };
         case 'trade_plans':
-            // Collect trade plan data
+            // איסוף נתוני תוכנית טרייד
             return {
                 account_id: parseInt(document.getElementById('editTradePlanAccountId').value),
                 ticker_id: parseInt(document.getElementById('editTradePlanTickerId').value),
@@ -1621,7 +1473,7 @@ function collectModalData(tableType) {
                 reasons: document.getElementById('editTradePlanReasons').value
             };
         case 'alerts':
-            // Collect alert data
+            // איסוף נתוני התראה
             return {
                 account_id: parseInt(document.getElementById('editAlertAccountId').value) || null,
                 ticker_id: parseInt(document.getElementById('editAlertTickerId').value) || null,
@@ -1631,7 +1483,7 @@ function collectModalData(tableType) {
                 is_active: document.getElementById('editAlertIsActive').value === 'true'
             };
         case 'cash_flows':
-            // Collect cash flow data
+            // איסוף נתוני תזרים מזומנים
             return {
                 account_id: parseInt(document.getElementById('editCashFlowAccountId').value),
                 type: document.getElementById('editCashFlowType').value,
@@ -1640,7 +1492,7 @@ function collectModalData(tableType) {
                 description: document.getElementById('editCashFlowDescription').value
             };
         case 'notes':
-            // Collect note data
+            // איסוף נתוני הערה
             return {
                 account_id: parseInt(document.getElementById('editNoteAccountId').value) || null,
                 trade_id: parseInt(document.getElementById('editNoteTradeId').value) || null,
@@ -1649,7 +1501,7 @@ function collectModalData(tableType) {
                 attachment: document.getElementById('editNoteAttachment').value
             };
         case 'executions':
-            // Collect execution data
+            // איסוף נתוני ביצוע
             return {
                 trade_id: parseInt(document.getElementById('editExecutionTradeId').value),
                 action: document.getElementById('editExecutionAction').value,
@@ -1660,7 +1512,7 @@ function collectModalData(tableType) {
                 source: document.getElementById('editExecutionSource').value
             };
         case 'users':
-            // Collect user data
+            // איסוף נתוני משתמש
             return {
                 username: document.getElementById('editUserUsername').value,
                 email: document.getElementById('editUserEmail').value,
@@ -1668,38 +1520,37 @@ function collectModalData(tableType) {
                 roles: document.getElementById('editUserRoles').value.split(',').map(role => role.trim()).filter(role => role)
             };
         case 'user_roles':
-            // Collect user role data
+            // איסוף נתוני תפקיד משתמש
             return {
                 user_id: parseInt(document.getElementById('editUserRoleUserId').value),
                 role_id: parseInt(document.getElementById('editUserRoleRoleId').value),
                 assigned_at: document.getElementById('editUserRoleAssignedAt').value
             };
         default:
-            // Return empty object if table type is not recognized
+            // החזרת אובייקט ריק אם סוג הטבלה לא מוכר
             return {};
     }
 }
 
 /**
- * Refresh table
+ * פונקציה לרענון טבלה לאחר עריכה או מחיקה
+ * הפונקציה מוצאת את פונקציית הטעינה המתאימה וקוראת לה
  * 
- * This function reloads data for a given table type.
- * 
- * @param {string} tableType - Type of table (e.g., 'accounts', 'tickers', 'trades')
+ * @param {string} tableType - סוג הטבלה (למשל: 'accounts', 'tickers', 'trades')
  * 
  * @example
- * // Refresh accounts table
+ * // רענון טבלת חשבונות
  * refreshTable('accounts');
  * 
- * // Refresh tickers table
+ * // רענון טבלת טיקרים
  * refreshTable('tickers');
  */
 function refreshTable(tableType) {
-    // Create a function name based on table type
-    // For example: 'accounts' -> 'loadAccounts', 'trade_plans' -> 'loadTradePlans'
+    // יצירת שם פונקציית הטעינה לפי סוג הטבלה
+    // לדוגמה: 'accounts' -> 'loadAccounts', 'trade_plans' -> 'loadTradePlans'
     let loadFunction;
     
-    // Map specific table types to their respective load functions
+    // מיפוי מיוחד לטבלאות עם שמות שונים
     const loadFunctionMap = {
         'user_roles': 'loadUserRoles',
         'cash_flows': 'loadCashFlows',
@@ -1713,7 +1564,7 @@ function refreshTable(tableType) {
         loadFunction = `load${capitalizeFirstLetter(tableType.replace('_', ''))}`;
     }
     
-    // Check if the function exists and call it
+    // בדיקה שהפונקציה קיימת וקריאה אליה
     if (typeof window[loadFunction] === 'function') {
         window[loadFunction]();
     } else {
@@ -1722,18 +1573,16 @@ function refreshTable(tableType) {
 }
 
 /**
- * Helper functions for CRUD operations
- * 
- * These functions provide basic services for CRUD operations.
+ * פונקציות עזר למערכת העריכה והמחיקה
+ * פונקציות אלו מספקות שירותים בסיסיים למערכת
  */
 
 /**
- * Capitalize first letter of a string
+ * הפיכת האות הראשונה של מחרוזת לאות גדולה
+ * משמש ליצירת שמות מודלים ופונקציות
  * 
- * This function capitalizes the first letter of a given string.
- * 
- * @param {string} string - The string to capitalize
- * @returns {string} The string with capitalized first letter
+ * @param {string} string - המחרוזת להפיכה
+ * @returns {string} המחרוזת עם אות ראשונה גדולה
  * 
  * @example
  * capitalizeFirstLetter('accounts') // returns 'Accounts'
@@ -1744,12 +1593,11 @@ function capitalizeFirstLetter(string) {
 }
 
 /**
- * Get table display name in Hebrew
+ * קבלת שם התצוגה של טבלה בעברית
+ * מחזיר את השם בעברית של הטבלה להודעות למשתמש
  * 
- * This function returns the Hebrew name of a table based on its English name.
- * 
- * @param {string} tableType - Table type in English
- * @returns {string} Table name in Hebrew
+ * @param {string} tableType - סוג הטבלה באנגלית
+ * @returns {string} שם הטבלה בעברית
  * 
  * @example
  * getTableDisplayName('accounts') // returns 'חשבון'
@@ -1757,7 +1605,7 @@ function capitalizeFirstLetter(string) {
  * getTableDisplayName('unknown') // returns 'unknown'
  */
 function getTableDisplayName(tableType) {
-    // Map table names in English to their Hebrew equivalents
+    // מיפוי שמות הטבלאות באנגלית לשמות בעברית
     const displayNames = {
         'accounts': 'חשבון',
         'tickers': 'טיקר',
@@ -1771,28 +1619,29 @@ function getTableDisplayName(tableType) {
         'user_roles': 'תפקיד משתמש'
     };
     
-    // Return Hebrew name or original name if not found
+    // החזרת השם בעברית או את השם המקורי אם לא נמצא
     return displayNames[tableType] || tableType;
 }
 
 /**
- * Global functions for CRUD operations
+ * הפיכת הפונקציות לזמינות גלובלית
+ * הפונקציות הללו זמינות לשימוש בכל הדפים במערכת
  * 
- * These functions are made available globally for use in other parts of the application
+ * @global
  */
 window.editRecord = editRecord;
 window.deleteRecord = deleteRecord;
 window.saveRecord = saveRecord;
 
-// Call to restore section states on page load
+// קריאה לשחזור מצבי הסקשנים בטעינת הדף
 document.addEventListener('DOMContentLoaded', function() {
-  // Short delay to ensure all elements are loaded
+  // המתנה קצרה כדי לוודא שכל האלמנטים נטענו
   setTimeout(() => {
     if (typeof restoreAllSectionStates === 'function') {
       restoreAllSectionStates();
     }
     
-    // Initialize table sorting
+    // אתחול סידור לטבלאות
     initializeAllTableSorting();
   }, 100);
 });

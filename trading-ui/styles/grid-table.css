@@ -975,34 +975,9 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
   color: #666 !important;
 }
 
-/* סטטוס badges */
-.status-badge {
-  display: inline-block !important;
-  padding: 4px 8px !important;
-  border-radius: 12px !important;
-  font-size: 0.8em !important;
-  font-weight: 500 !important;
-  text-align: center !important;
-  white-space: nowrap !important;
-}
+/* הגדרות .status-badge הועברו ל-styles.css */
 
-.status-open {
-  background-color: #d4edda !important;
-  color: #155724 !important;
-  border: 1px solid #c3e6cb !important;
-}
-
-.status-canceled {
-  background-color: #f8d7da !important;
-  color: #721c24 !important;
-  border: 1px solid #f5c6cb !important;
-}
-
-.status-closed {
-  background-color: #d1ecf1 !important;
-  color: #0c5460 !important;
-  border: 1px solid #bee5eb !important;
-}
+/* הגדרות סטטוסים הועברו ל-styles.css */
 
 /* כפתורי פעולה */
 .btn-sm {
@@ -1146,33 +1121,9 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
   font-style: italic;
 }
 
-/* סגנונות משותפים לתגי סטטוס */
-.status-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-align: center;
-  display: inline-block;
-  min-width: 60px;
-}
+/* הגדרות .status-badge הועברו ל-styles.css */
 
-.status-badge.status-פתוח,
-.status-badge.status-פעיל {
-  background-color: #e8f5e8;
-  color: #2d5a2d;
-}
-
-.status-badge.status-סגור,
-.status-badge.status-closed {
-  background-color: #d1ecf1 !important;
-  color: #0c5460 !important;
-}
-
-.status-badge.status-מבוטל {
-  background-color: #fff3cd;
-  color: #856404;
-}
+/* הגדרות .status-badge ספציפיות הועברו ל-styles.css */
 
 /* סגנונות ייחודיים לטבלאות */
 .table th {
@@ -1198,23 +1149,6 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
 .negative {
   color: #dc3545;
   font-weight: 500;
-}
-
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-active {
-  background: #d4edda;
-  color: #155724;
-}
-
-.status-inactive {
-  background: #f8d7da;
-  color: #721c24;
 }
 
 .currency-badge {
@@ -1393,30 +1327,8 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
   font-weight: 500;
 }
 
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
+/* הגדרות .status-badge הועברו ל-styles.css */
 
-.status-active {
-  background: #d4edda;
-  color: #155724;
-}
-
-.status-inactive {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.currency-badge {
-  background: var(--apple-bg-secondary);
-  color: var(--apple-text);
-  padding: 2px 6px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
 }
 
 .cash-balance {

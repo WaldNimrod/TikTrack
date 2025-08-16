@@ -1,42 +1,7 @@
-/**
- * Grid Data Management Module
- * מודול ניהול נתונים לגריד - משותף לכל הדפים
- * 
- * This module provides centralized data management functionality for all grid components
- * in the TikTrack application. It handles data loading, processing, and statistics
- * calculation for various trading-related data.
- * 
- * Features:
- * - Default data generation for development/testing
- * - Server data loading with fallback to mock data
- * - Data processing and formatting utilities
- * - Statistics calculation and display
- * - Error handling and logging
- * 
- * Author: TikTrack Development Team
- * Version: 2.0
- * Last Updated: 2025-01-16
- * 
- * 🚨 CRITICAL REMINDERS:
- * - ALWAYS start with: cd Backend && ./run_monitored.sh
- * - ALWAYS check health: curl http://localhost:8080/api/health
- * - NEVER write routes directly in app.py - use blueprints only!
- * - ALWAYS follow architecture: Models → Services → Routes → App
- * - ALWAYS use port 8080
- * - ALWAYS test all CRUD operations: GET, POST, PUT, DELETE
- */
-
 // ===== GRID DATA MANAGEMENT =====
 // קובץ ייעודי לניהול נתונים - משותף לכל הדפים
 
-/**
- * Generate default row data for development and testing
- * 
- * This function provides sample data that mimics the structure of real trading data.
- * Used when server data is unavailable or for development purposes.
- * 
- * @returns {Array} Array of sample trading records
- */
+// נתוני דוגמה סטנדרטיים
 const getDefaultRowData = () => [
   { ticker: "AAPL", date: "2025-08-01", type: "סווינג", amount: "$25,000 (#100)", target: "$210 (12.3%)", stop: "$180 (-6.7%)", current: "$184.32 (+1.2%)", status: "פתוח", action: "⬅️", account: "חשבון ראשי" },
   { ticker: "TSLA", date: "2025-07-30", type: "השקעה", amount: "$20,000 (#100)", target: "$780 (10.1%)", stop: "$690 (-4.8%)", current: "$688.90 (-2.1%)", status: "סגור", action: "⬅️", account: "חשבון משני" },
@@ -46,23 +11,13 @@ const getDefaultRowData = () => [
   { ticker: "MSFT", date: "2025-07-25", type: "סווינג", amount: "$18,000 (#90)", target: "$355 (11.2%)", stop: "$320 (-4.2%)", current: "$342.00 (+2.4%)", status: "סגור", action: "⬅️", account: "חשבון משני" }
 ];
 
-/**
- * Load trading plans data from the server
- * 
- * This function attempts to load real data from the TikTrack backend API.
- * If the server is unavailable or returns an error, it falls back to
- * default mock data for development purposes.
- * 
- * TODO: Update to use new API endpoints (/api/v1/trade_plans/)
- * 
- * @returns {Promise<Array>} Promise that resolves to array of trading plans
- */
+// פונקציה לטעינת נתונים מהשרת
 async function loadPlansFromServer() {
   try {
     console.log('Loading plans from server...');
     
-    // TODO: Update to use new modular API
-    // const response = await fetch('/api/v1/trade_plans/');
+    // כאן תהיה קריאה לשרת האמיתי
+    // const response = await fetch('/api/plans');
     // const data = await response.json();
     
     // כרגע נחזיר נתוני דוגמה
@@ -77,21 +32,7 @@ async function loadPlansFromServer() {
   }
 }
 
-/**
- * Extract numeric amount from formatted amount string
- * 
- * This utility function parses amount strings that contain currency symbols,
- * commas, and additional information (like share counts) to extract the
- * pure numeric value.
- * 
- * Examples:
- * - "$25,000 (#100)" -> 25000
- * - "$1,500" -> 1500
- * - "1500" -> 1500
- * 
- * @param {string} amountString - Formatted amount string to parse
- * @returns {number} Extracted numeric amount, 0 if parsing fails
- */
+// פונקציה לחילוץ סכום מהשדה amount
 function extractAmount(amountString) {
   if (!amountString) return 0;
   
@@ -111,21 +52,7 @@ function extractAmount(amountString) {
   return 0;
 }
 
-/**
- * Update summary statistics display
- * 
- * This function calculates and displays various statistics based on the
- * current data in the grid. It can work with provided data, grid data,
- * or fallback to window.rowData.
- * 
- * Statistics calculated:
- * - Total number of records
- * - Total amount invested
- * - Average amount per record
- * - Status distribution
- * 
- * @param {Array} data - Optional data array to calculate stats from
- */
+// פונקציה לעדכון סטטיסטיקות
 function updateSummaryStats(data = null) {
   console.log('=== updateSummaryStats called ===');
   console.log('Input data:', data);
@@ -194,14 +121,7 @@ function updateSummaryStats(data = null) {
   });
 }
 
-/**
- * Update the statistics display elements
- * 
- * This function formats and updates the HTML elements that display
- * the total records, total amount, and average amount.
- * 
- * @param {Object} stats - Object containing statistics to display
- */
+// פונקציה לעדכון תצוגת הסטטיסטיקות
 function updateStatsDisplay(stats) {
   console.log('=== updateStatsDisplay called ===');
   console.log('Stats to display:', stats);
@@ -232,16 +152,7 @@ function updateStatsDisplay(stats) {
   console.log('Stats display updated:', stats);
 }
 
-/**
- * Mark an alert as read
- * 
- * This function simulates marking an alert as read by hiding the button.
- * In a real application, it would communicate with a backend API to update
- * the alert status.
- * 
- * @param {HTMLElement} button - The button element to hide
- * @param {string} ticker - The ticker symbol of the alert
- */
+// פונקציה לסימון התראה כנקראה
 function markAlertAsRead(button, ticker) {
   try {
     console.log('Marking alert as read for:', ticker);
@@ -264,15 +175,7 @@ function markAlertAsRead(button, ticker) {
   }
 }
 
-/**
- * Load data from the server with filters applied
- * 
- * This function fetches all data from the server and then applies
- * the provided filters to return the filtered data.
- * 
- * @param {Object} filters - Object containing filter criteria
- * @returns {Promise<Array>} Promise that resolves to filtered data
- */
+// פונקציה לטעינת נתונים עם פילטרים
 async function loadFilteredData(filters = {}) {
   try {
     console.log('Loading filtered data with filters:', filters);
@@ -304,15 +207,7 @@ async function loadFilteredData(filters = {}) {
   }
 }
 
-/**
- * Create sample data for development and testing
- * 
- * This function generates a specified number of random sample trading plans.
- * It includes various types, statuses, and dates.
- * 
- * @param {number} count - Number of sample data items to generate
- * @returns {Array} Array of sample trading plan objects
- */
+// פונקציה ליצירת נתוני דוגמה מותאמים אישית
 function createSampleData(count = 10) {
   const tickers = ['AAPL', 'TSLA', 'NVDA', 'AMZN', 'GOOG', 'MSFT', 'META', 'NFLX', 'AMD', 'INTC'];
   const types = ['סווינג', 'השקעה', 'פאסיבי'];
@@ -353,14 +248,7 @@ function createSampleData(count = 10) {
   return sampleData;
 }
 
-/**
- * Save data to localStorage
- * 
- * This function stores the provided data array in localStorage under a specified key.
- * 
- * @param {Array} data - Data array to save
- * @param {string} key - Key under which to save the data (default: 'gridData')
- */
+// פונקציה לשמירת נתונים ב-localStorage
 function saveDataToLocalStorage(data, key = 'gridData') {
   try {
     localStorage.setItem(key, JSON.stringify(data));
@@ -370,15 +258,7 @@ function saveDataToLocalStorage(data, key = 'gridData') {
   }
 }
 
-/**
- * Load data from localStorage
- * 
- * This function retrieves data from localStorage that was previously saved
- * under a specified key.
- * 
- * @param {string} key - Key under which the data was saved (default: 'gridData')
- * @returns {Array|null} Loaded data array, or null if no data found
- */
+// פונקציה לטעינת נתונים מ-localStorage
 function loadDataFromLocalStorage(key = 'gridData') {
   try {
     const data = localStorage.getItem(key);
@@ -393,14 +273,7 @@ function loadDataFromLocalStorage(key = 'gridData') {
   return null;
 }
 
-/**
- * Clear data from localStorage
- * 
- * This function removes data from localStorage that was previously saved
- * under a specified key.
- * 
- * @param {string} key - Key under which the data was saved (default: 'gridData')
- */
+// פונקציה לניקוי נתונים מ-localStorage
 function clearDataFromLocalStorage(key = 'gridData') {
   try {
     localStorage.removeItem(key);
@@ -410,15 +283,7 @@ function clearDataFromLocalStorage(key = 'gridData') {
   }
 }
 
-/**
- * Initialize data for the application
- * 
- * This function checks if there is existing data in localStorage.
- * If not, it loads data from the server. It then sets the data
- * as global variables for grid updates.
- * 
- * @returns {Promise<Array>} The initialized data array
- */
+// פונקציה לאתחול נתונים
 async function initializeData() {
   console.log('Initializing data...');
   
@@ -443,14 +308,7 @@ async function initializeData() {
   return data;
 }
 
-/**
- * Refresh data from the server
- * 
- * This function fetches the latest data from the server and updates
- * the global data variable. It also saves the new data to localStorage.
- * 
- * @returns {Promise<Array>} The refreshed data array
- */
+// פונקציה לרענון נתונים
 async function refreshData() {
   console.log('Refreshing data...');
   
@@ -514,16 +372,7 @@ const DEFAULT_DATA_CONFIG = {
   }
 };
 
-/**
- * Load data from the database (backend)
- * 
- * This function fetches data from a specified API endpoint and processes it
- * into a format suitable for the grid. It handles configuration merging
- * and error handling.
- * 
- * @param {Object} config - Optional custom configuration for the data source
- * @returns {Promise<Array>} Promise that resolves to processed data
- */
+// פונקציה לטעינת נתונים מבסיס הנתונים
 async function loadDataFromDatabase(config = {}) {
   try {
     console.log('Loading data from database with config:', config);
@@ -577,16 +426,7 @@ async function loadDataFromDatabase(config = {}) {
   }
 }
 
-/**
- * Process raw data from the database into a format suitable for the grid
- * 
- * This function maps raw database fields to grid-friendly fields and
- * formats them appropriately.
- * 
- * @param {Array} rawData - Array of raw data objects from the database
- * @param {Object} config - Configuration object for data mapping
- * @returns {Array} Array of processed data objects for the grid
- */
+// פונקציה להמרת נתונים לפורמט הגריד
 function processDataForGrid(rawData, config) {
   console.log('=== processDataForGrid called ===');
   console.log('Raw data:', rawData);
@@ -637,15 +477,7 @@ function processDataForGrid(rawData, config) {
   return processedData;
 }
 
-/**
- * Format a date string into a YYYY-MM-DD format
- * 
- * This function attempts to parse a date string and return it in a consistent
- * YYYY-MM-DD format.
- * 
- * @param {string} dateString - Date string to format
- * @returns {string} Formatted date string
- */
+// פונקציה לעיצוב תאריך
 function formatDate(dateString) {
   try {
     const date = new Date(dateString);
@@ -655,15 +487,7 @@ function formatDate(dateString) {
   }
 }
 
-/**
- * Format an amount string into a currency string
- * 
- * This function takes a number or a string and formats it as a currency
- * string (e.g., "$1,234.56").
- * 
- * @param {number|string} amount - Amount to format
- * @returns {string} Formatted currency string
- */
+// פונקציה לעיצוב סכום
 function formatAmount(amount) {
   if (typeof amount === 'number') {
     return `$${amount.toLocaleString()}`;
@@ -671,15 +495,7 @@ function formatAmount(amount) {
   return amount;
 }
 
-/**
- * Format a price string into a currency string
- * 
- * This function takes a number or a string and formats it as a currency
- * string (e.g., "$123.45").
- * 
- * @param {number|string} price - Price to format
- * @returns {string} Formatted price string
- */
+// פונקציה לעיצוב מחיר
 function formatPrice(price) {
   if (typeof price === 'number') {
     return `$${price.toFixed(2)}`;
@@ -687,16 +503,7 @@ function formatPrice(price) {
   return price;
 }
 
-/**
- * Load filtered data from the database with specific filters applied
- * 
- * This function fetches all data from the database and then applies
- * the provided filters to return the filtered data.
- * 
- * @param {Object} filters - Object containing filter criteria
- * @param {Object} config - Optional custom configuration for the data source
- * @returns {Promise<Array>} Promise that resolves to filtered data
- */
+// פונקציה לטעינת נתונים עם פילטרים מבסיס הנתונים
 async function loadFilteredDataFromDatabase(filters = {}, config = {}) {
   try {
     console.log('Loading filtered data from database:', filters);
@@ -729,17 +536,7 @@ async function loadFilteredDataFromDatabase(filters = {}, config = {}) {
   }
 }
 
-/**
- * Initialize the grid with data from the database
- * 
- * This function sets up the grid on a specified container and
- * configures it with data from the database. It also initializes
- * the filter system and applies default filters.
- * 
- * @param {string} containerId - ID of the HTML element to contain the grid
- * @param {Object} config - Optional custom configuration for the grid
- * @returns {boolean} True if grid initialization was successful, false otherwise
- */
+// פונקציה לאתחול גריד עם נתונים מבסיס הנתונים
 async function initializeGridWithDatabaseData(containerId = '#agGridFloating', config = {}) {
   console.log('=== Initializing Grid with Database Data ===');
   
@@ -788,15 +585,7 @@ async function initializeGridWithDatabaseData(containerId = '#agGridFloating', c
   }
 }
 
-/**
- * Refresh data from the database
- * 
- * This function fetches the latest data from the database and updates
- * the grid if it exists. It also updates the statistics.
- * 
- * @param {Object} config - Optional custom configuration for the data source
- * @returns {Promise<Array>} The refreshed data array
- */
+// פונקציה לרענון נתונים מבסיס הנתונים
 async function refreshDatabaseData(config = {}) {
   console.log('Refreshing database data...');
   
@@ -821,14 +610,7 @@ async function refreshDatabaseData(config = {}) {
   }
 }
 
-/**
- * Load a list of accounts from the server
- * 
- * This function fetches a list of account names from the backend API.
- * It's used to populate dropdowns for account filtering.
- * 
- * @returns {Promise<Array<string>>} Promise that resolves to an array of account names
- */
+// פונקציה לטעינת רשימת חשבונות
 async function loadAccountsList() {
   try {
     console.log('Loading accounts list from server...');
@@ -853,16 +635,7 @@ async function loadAccountsList() {
   }
 }
 
-/**
- * Load data based on a specific data type (tradeplans, trades, alerts)
- * 
- * This function fetches data from a specific API endpoint and processes it
- * into a format suitable for the grid. It handles configuration merging.
- * 
- * @param {string} dataType - Type of data to load ('tradeplans', 'trades', 'alerts')
- * @param {Object} customConfig - Optional custom configuration for the data source
- * @returns {Promise<Array>} Promise that resolves to processed data
- */
+// פונקציה לקבלת נתונים לפי סוג
 async function loadDataByType(dataType, customConfig = {}) {
   console.log('=== loadDataByType called ===');
   console.log('Data type:', dataType);
@@ -904,7 +677,7 @@ async function loadDataByType(dataType, customConfig = {}) {
       dataMapping: {
         ticker: 'ticker',
         date: 'created_at',
-        type: 'type',
+        type: 'alert_type',
         amount: 'condition',
         target: 'target_price',
         stop: 'stop_price',
@@ -932,14 +705,7 @@ async function loadDataByType(dataType, customConfig = {}) {
   return result;
 }
 
-/**
- * Get information about the current data source
- * 
- * This function returns an object containing the current data source,
- * its configuration, and the number of items in it.
- * 
- * @returns {Object} Object containing data source info
- */
+// פונקציה לקבלת מידע על מקור הנתונים הנוכחי
 function getCurrentDataSourceInfo() {
   return {
     dataSource: currentDataSource,
@@ -948,14 +714,7 @@ function getCurrentDataSourceInfo() {
   };
 }
 
-/**
- * Check if the server is available
- * 
- * This function attempts to connect to a specific API endpoint to check
- * if the backend server is running and accessible.
- * 
- * @returns {Promise<boolean>} Promise that resolves to true if server is available, false otherwise
- */
+// פונקציה לבדיקת זמינות השרת
 async function checkServerAvailability() {
   try {
     const response = await fetch('http://127.0.0.1:8080/api/tradeplans');

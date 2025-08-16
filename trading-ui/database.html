@@ -4,14 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>בסיס נתונים - TikTrack</title>
-  
-  <!-- 🚨 CRITICAL REMINDERS FOR ALL NEW SESSIONS:
-       - ALWAYS start with: cd Backend && ./run_monitored.sh
-       - ALWAYS check health: curl http://localhost:8080/api/health
-       - NEVER write routes directly in app.py - use blueprints only!
-       - ALWAYS follow architecture: Models → Services → Routes → App
-       - ALWAYS use port 8080
-       - ALWAYS test all CRUD operations: GET, POST, PUT, DELETE -->
   <!-- AG-Grid CSS -->
   <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css" rel="stylesheet" />
   <link rel="stylesheet" href="styles/apple-theme.css?v=9" />
@@ -654,7 +646,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                      <button type="button" class="btn btn-primary" onclick="alert('פונקציית שמירה תתווסף בקרוב')">שמור</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('accounts')">שמור</button>
         </div>
       </div>
     </div>
@@ -1224,12 +1216,6 @@
   
   <script>
     // פונקציה לחיפוש בטבלאות
-    /**
-     * Filter table rows based on search term
-     * 
-     * @param {string} tableId - ID of the table to filter
-     * @param {string} searchTerm - Search term to filter by
-     */
     function filterTable(tableId, searchTerm) {
       const table = document.getElementById(tableId);
       if (!table) return;
@@ -1336,31 +1322,12 @@
       return date.toLocaleDateString('he-IL');
     }
 
-    /**
-     * Format date and time for display
-     * 
-     * @param {string} dateString - ISO date string to format
-     * @returns {string} Formatted date and time string
-     */
     function formatDateTime(dateString) {
       if (!dateString) return '-';
       const date = new Date(dateString);
       return date.toLocaleString('he-IL');
     }
 
-    /**
-     * Utility functions for data formatting and display
-     * 
-     * These functions provide consistent formatting for different data types
-     * displayed in the database tables.
-     */
-    
-    /**
-     * Format currency amounts for display
-     * 
-     * @param {number} amount - The amount to format
-     * @returns {string} Formatted currency string
-     */
     function formatCurrency(amount) {
       if (amount === null || amount === undefined) return '-';
       return new Intl.NumberFormat('he-IL', {
@@ -1383,25 +1350,8 @@
       return statusMap[status] || `<span class="badge bg-secondary">${status}</span>`;
     }
 
-    /**
-     * Generic API call function for communicating with the backend
-     * 
-     * This function provides a centralized way to make HTTP requests to the
-     * TikTrack backend API. It handles authentication, error handling, and
-     * response formatting consistently across all API calls.
-     * 
-     * Features:
-     * - Automatic token refresh on 401 errors
-     * - Consistent error handling and logging
-     * - Support for custom headers and options
-     * - JSON request/response handling
-     * 
-     * @param {string} endpoint - API endpoint path (e.g., '/api/v1/accounts/')
-     * @param {Object} options - Additional fetch options (method, body, headers, etc.)
-     * @returns {Promise<Object>} API response data
-     * @throws {Error} When API call fails
-     */
-    async function apiCall(endpoint, options = {}) {
+            // API call function
+        async function apiCall(endpoint, options = {}) {
           const baseUrl = 'http://127.0.0.1:8080';
       const url = `${baseUrl}${endpoint}`;
       
@@ -1456,25 +1406,10 @@
       }
     }
 
-    /**
-     * Data loading functions for database tables
-     * 
-     * These functions handle loading and displaying data from various database tables
-     * using the new modular API endpoints. Each function follows the same pattern:
-     * 1. Make API call to the appropriate endpoint
-     * 2. Process the response data
-     * 3. Update the corresponding HTML table
-     * 4. Handle errors gracefully
-     */
-    
-    /**
-     * Load and display user roles data
-     * 
-     * @returns {Promise<void>}
-     */
+    // Data loading functions
     async function loadUserRoles() {
         try {
-            const response = await apiCall('/api/v1/user_roles/');
+            const response = await apiCall('/api/user_roles');
             const tbody = document.querySelector('#userRolesTable tbody');
             
             if (response.status === 'success' && response.data) {
@@ -1508,15 +1443,10 @@
         }
     }
 
-    /**
-     * Load and display users data
-     * 
-     * @returns {Promise<void>}
-     */
     async function loadUsers() {
       try {
         console.log('🔄 טוען משתמשים...');
-        const response = await apiCall('/api/v1/users/');
+        const response = await apiCall('/api/users');
         const users = response.data;
         
         const tbody = document.querySelector('#usersTable tbody');
@@ -1546,24 +1476,11 @@
       }
     }
 
-    /**
-     * Load and display accounts data from the new API
-     * 
-     * This function fetches account data from the new modular API endpoint
-     * and displays it in the accounts table. It uses the updated API structure
-     * with proper error handling and data formatting.
-     * 
-     * API Endpoint: /api/v1/accounts/
-     * Architecture: New modular backend with service layer
-     * 
-     * @returns {Promise<void>}
-     */
     async function loadAccounts() {
       try {
         console.log('🔄 טוען חשבונות...');
-        // Use the new modular API endpoint with proper versioning
-        const response = await apiCall('/api/v1/accounts/');
-        const accounts = response.data || response; // Handle both response formats
+        const response = await apiCall('/api/accounts');
+        const accounts = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
         
         const tbody = document.querySelector('#accountsTable tbody');
         tbody.innerHTML = accounts.map(account => `
@@ -1577,8 +1494,8 @@
             <td>${formatCurrency(account.total_pl)}</td>
             <td>${account.notes || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="alert('פונקציית עריכה תתווסף בקרוב')">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="alert('פונקציית מחיקה תתווסף בקרוב')">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="editRecord('accounts', ${account.id})">ערוך</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('accounts', ${account.id})">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -1593,15 +1510,10 @@
       }
     }
 
-    /**
-     * Load and display tickers data
-     * 
-     * @returns {Promise<void>}
-     */
     async function loadTickers() {
       try {
         console.log('🔄 טוען טיקרים...');
-        const response = await apiCall('/api/v1/tickers/');
+        const response = await apiCall('/api/tickers');
         const tickers = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
         
         const tbody = document.querySelector('#tickersTable tbody');
@@ -1630,15 +1542,10 @@
       }
     }
 
-    /**
-     * Load and display trades data
-     * 
-     * @returns {Promise<void>}
-     */
     async function loadTrades() {
       try {
         console.log('🔄 טוען טריידים...');
-        const response = await apiCall('/api/v1/trades/');
+        const response = await apiCall('/api/trades');
         const trades = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
         
         const tbody = document.querySelector('#tradesTable tbody');
@@ -1670,15 +1577,10 @@
       }
     }
 
-    /**
-     * Load and display trade plans data
-     * 
-     * @returns {Promise<void>}
-     */
     async function loadTradePlans() {
       try {
         console.log('🔄 טוען תוכניות טרייד...');
-        const response = await apiCall('/api/v1/trade_plans/');
+        const response = await apiCall('/api/tradeplans');
         const plans = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#tradePlansTable tbody');
@@ -1712,15 +1614,10 @@
       }
     }
 
-    /**
-     * Load and display alerts data
-     * 
-     * @returns {Promise<void>}
-     */
     async function loadAlerts() {
       try {
         console.log('🔄 טוען התראות...');
-        const response = await apiCall('/api/v1/alerts/');
+        const response = await apiCall('/api/alerts');
         const alerts = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#alertsTable tbody');
@@ -1751,15 +1648,10 @@
       }
     }
 
-    /**
-     * Load and display cash flows data
-     * 
-     * @returns {Promise<void>}
-     */
     async function loadCashFlows() {
       try {
         console.log('🔄 טוען תזרימי מזומנים...');
-        const response = await apiCall('/api/v1/cash_flows/');
+        const response = await apiCall('/api/cash_flows');
         const cashFlows = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#cashFlowsTable tbody');
@@ -1788,15 +1680,10 @@
       }
     }
 
-    /**
-     * Load and display notes data
-     * 
-     * @returns {Promise<void>}
-     */
     async function loadNotes() {
       try {
         console.log('🔄 טוען הערות...');
-        const response = await apiCall('/api/v1/notes/');
+        const response = await apiCall('/api/notes');
         const notes = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#notesTable tbody');
@@ -1825,15 +1712,10 @@
       }
     }
 
-    /**
-     * Load and display executions data
-     * 
-     * @returns {Promise<void>}
-     */
     async function loadExecutions() {
       try {
         console.log('🔄 טוען ביצועים...');
-        const response = await apiCall('/api/v1/executions/');
+        const response = await apiCall('/api/executions');
         const executions = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#executionsTable tbody');
@@ -1864,12 +1746,6 @@
     }
 
     // Action functions
-    /**
-     * Refresh all database tables by reloading their data
-     * 
-     * This function calls all the load functions to refresh the data
-     * displayed in all tables on the database page.
-     */
     function refreshAllTables() {
       loadUsers();
       loadAccounts();
@@ -1883,12 +1759,6 @@
       loadUserRoles();
     }
 
-    /**
-     * Export database data to CSV format
-     * 
-     * This function collects data from all tables and exports it
-     * as a CSV file for backup or analysis purposes.
-     */
     function exportDatabase() {
       // TODO: Implement database export functionality
       alert('פונקציית ייצוא תתווסף בקרוב');
@@ -1901,12 +1771,6 @@
     // - saveRecord(tableType)
 
     // פונקציה לטעינת מצב הטבלאות השמור
-    /**
-     * Load and restore table section states from localStorage
-     * 
-     * This function restores the collapsed/expanded state of table sections
-     * based on user preferences stored in localStorage.
-     */
     function loadTableStates() {
       const sections = [
         'usersSection',
@@ -1964,12 +1828,6 @@
     }
 
     // Initial data load - ללא אימות
-    /**
-     * Page initialization and setup
-     * 
-     * This event listener runs when the DOM is fully loaded and sets up
-     * the database page with initial data loading and state restoration.
-     */
     document.addEventListener('DOMContentLoaded', async () => {
       console.log('טוען נתונים ללא אימות');
       loadTableStates(); // טוען את המצב השמור של הטבלאות
@@ -2018,12 +1876,6 @@
       }
     }
 
-    /**
-     * Toggle the visibility of the accounts table section
-     * 
-     * This function shows/hides the accounts table and saves the state
-     * to localStorage for persistence across page reloads.
-     */
     function toggleAccountsSection() {
       const container = document.getElementById('accountsContainer');
       const footer = document.querySelector('#accountsSection .table-footer');

@@ -3,26 +3,31 @@ from sqlalchemy.sql import func
 from config.database import Base
 
 class BaseModel(Base):
-    """מודל בסיס עם שדות משותפים"""
+    """
+    Base model with common fields for all entities
+    
+    This model provides common fields that are shared across all entities:
+    - id: Primary key
+    - created_at: Timestamp when the record was created
+    
+    Author: TikTrack Development Team
+    Version: 1.0
+    Last Updated: 2025-08-16
+    """
     __abstract__ = True
     
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, server_default=func.now())
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     
     def to_dict(self):
         """המרה למילון"""
         result = {}
         for c in self.__table__.columns:
-            try:
-                value = getattr(self, c.name)
-                if hasattr(value, 'strftime'):  # אם זה תאריך
-                    result[c.name] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
-                else:
-                    result[c.name] = value
-            except AttributeError:
-                # Skip fields that don't exist in the database
-                continue
+            value = getattr(self, c.name)
+            if hasattr(value, 'strftime'):  # אם זה תאריך
+                result[c.name] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
+            else:
+                result[c.name] = value
         return result
     
     def __repr__(self):

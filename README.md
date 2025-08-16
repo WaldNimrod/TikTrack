@@ -1,31 +1,6 @@
-# מערכת ניהול טריידים - TikTrack
+# מערכת ניהול טריידים - SimpleTrade
 
 מערכת לניהול תכנוני טריידים ומעקב אחר טריידים פעילים.
-
-## 🎯 זיכרון קבוע - נקודות קריטיות לכל צט חדש
-
-**⚠️ חשוב מאוד - קרא לפני התחלת עבודה:**
-
-### ⚡ תהליך העבודה הנכון - תמיד להתחיל כאן:
-1. **הפעלת השרת**: `cd Backend && ./run_monitored.sh`
-2. **בדיקת בריאות**: `curl http://localhost:8080/api/health`
-3. **בנייה לפי ארכיטקטורה**: Models → Services → Routes → App
-4. **בדיקת כל API**: GET, POST, PUT, DELETE
-5. **הפרדה נכונה**: לא לכתוב routes ב-app.py - רק blueprints!
-
-### 🔒 זיכרון קבוע - זה עובד מושלם:
-- ✅ **הארכיטקטורה החדשה עובדת מושלם**
-- ✅ **השרת יציב עם המנטור האוטומטי**
-- ✅ **כל CRUD operations עובדים**
-- ✅ **הפורט הוא 8080 בלבד**
-- ✅ **תמיד להשתמש ב-./run_monitored.sh**
-
-### 📚 קבצי תיעוד חשובים:
-- `CRITICAL_REMINDERS.md` - **קרא קודם!** - נקודות קריטיות לכל צט חדש
-- `Backend/README_SERVER_STABILITY.md` - מדריך יציבות השרת
-- `documentation/backend_architecture_new.html` - ארכיטקטורה מפורטת
-
----
 
 ## תכונות עיקריות
 
@@ -68,20 +43,15 @@ pip3 install flask flask-cors
 
 ### הפעלת השרת
 
-#### אופציה 1: הפעלה עם מנטור אוטומטי (מומלץ ביותר!)
+#### אופציה 1: הפעלה עם מנטור אוטומטי (מומלץ!)
 ```bash
-cd Backend && ./run_monitored.sh
+./start_server.sh
 ```
 
 #### אופציה 2: הפעלה רגילה
 ```bash
 cd Backend
 python3 run_waitress.py
-```
-
-#### אופציה 3: הפעלה עם מנטור (ישן)
-```bash
-./start_server.sh
 ```
 
 #### עצירת השרת
@@ -107,13 +77,10 @@ python3 run_waitress.py
 
 ```bash
 # בדיקת בריאות השרת
-curl http://localhost:8080/api/health
+curl http://127.0.0.1:8080/api/health
 
-# בדיקת API חדש
-curl http://localhost:8080/api/v1/accounts/
-
-# בדיקת CRUD מלא
-curl -X POST http://localhost:8080/api/v1/accounts/ -H "Content-Type: application/json" -d '{"name":"חשבון בדיקה","currency":"USD","status":"active"}'
+# בדיקת סטטיסטיקות
+curl http://127.0.0.1:8080/api/stats
 ```
 
 אם השרת פועל כראוי, תקבל תשובה כמו:

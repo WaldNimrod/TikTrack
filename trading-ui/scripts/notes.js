@@ -101,13 +101,36 @@ function convertNoteStatusToHebrew(status) {
 function fillNoteEditModal(note) {
     console.log(`🔧 מילוי מודל עריכת הערה עם נתונים:`, note);
     
+    // בדיקה שהאלמנטים קיימים
+    const editNoteId = document.getElementById('editNoteId');
+    const editNoteContent = document.getElementById('editNoteContent');
+    const editNoteAccountId = document.getElementById('editNoteAccountId');
+    const editNoteTradeId = document.getElementById('editNoteTradeId');
+    const editNoteTradePlanId = document.getElementById('editNoteTradePlanId');
+    const editNoteAttachment = document.getElementById('editNoteAttachment');
+    
+    if (!editNoteId || !editNoteContent || !editNoteAccountId || !editNoteTradeId || !editNoteTradePlanId || !editNoteAttachment) {
+        console.error('❌ לא נמצאו כל האלמנטים הנדרשים למודל עריכת הערה');
+        console.log('אלמנטים שנבדקו:', {
+            editNoteId: !!editNoteId,
+            editNoteContent: !!editNoteContent,
+            editNoteAccountId: !!editNoteAccountId,
+            editNoteTradeId: !!editNoteTradeId,
+            editNoteTradePlanId: !!editNoteTradePlanId,
+            editNoteAttachment: !!editNoteAttachment
+        });
+        return;
+    }
+    
     // מילוי שדות הטופס
-    document.getElementById('editNoteId').value = note.id;
-    document.getElementById('editNoteContent').value = note.content || '';
-    document.getElementById('editNoteAccountId').value = note.account_id || '';
-    document.getElementById('editNoteTradeId').value = note.trade_id || '';
-    document.getElementById('editNoteTradePlanId').value = note.trade_plan_id || '';
-    document.getElementById('editNoteAttachment').value = note.attachment || '';
+    editNoteId.value = note.id;
+    editNoteContent.value = note.content || '';
+    editNoteAccountId.value = note.account_id || '';
+    editNoteTradeId.value = note.trade_id || '';
+    editNoteTradePlanId.value = note.trade_plan_id || '';
+    editNoteAttachment.value = note.attachment || '';
+    
+    console.log('✅ מודל עריכת הערה מולא בהצלחה');
 }
 
 /**
@@ -317,6 +340,13 @@ function showAddNoteModal() {
  */
 function showEditNoteModal(note) {
     console.log('✏️ מציג מודל עריכת הערה:', note);
+    
+    // בדיקה שהנתונים קיימים
+    if (!note || !note.id) {
+        console.error('❌ נתונים לא תקינים למודל עריכת הערה:', note);
+        showNotification('שגיאה בטעינת נתוני ההערה', 'error');
+        return;
+    }
     
     // מילוי הנתונים
     fillNoteEditModal(note);

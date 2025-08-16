@@ -1816,10 +1816,26 @@ td .btn + .btn {
   border: 1px solid #e9ecef;
 }
 
-.alert-card-actions {
+.alert-card-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 10px;
+  margin-top: auto;
+}
+
+.alert-ticker-info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.positive-change {
+  color: #28a745 !important;
+}
+
+.negative-change {
+  color: #dc3545 !important;
 }
 
 .btn-mark-read {

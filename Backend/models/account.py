@@ -19,9 +19,9 @@ Last Updated: 2025-08-16
 from sqlalchemy import Column, String, Float, Integer, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from config.database import Base
+from models.base import BaseModel
 
-class Account(Base):
+class Account(BaseModel):
     """
     Account model representing a trading account in the system.
     
@@ -31,15 +31,15 @@ class Account(Base):
     
     __tablename__ = "accounts"
     
-    # Database columns - exactly as defined in the documentation
+    # Database columns - matching actual database schema
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    currency = Column(String, default='USD')
-    status = Column(String, default='active')
+    name = Column(String(100), nullable=False)
+    currency = Column(String(3), default='USD')
+    status = Column(String(20), default='active')
     cash_balance = Column(Float, default=0)
     total_value = Column(Float, default=0)
     total_pl = Column(Float, default=0)
-    notes = Column(String)
+    notes = Column(String(500))
     created_at = Column(DateTime, server_default=func.now())
     
     # Relationships with other entities

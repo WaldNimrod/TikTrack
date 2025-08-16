@@ -37,6 +37,10 @@ import sqlite3
 import os
 from datetime import datetime
 
+# Import new architecture components
+from config.database import init_db
+from config.logging import setup_logging
+
 # Import blueprints
 from routes.api.accounts import accounts_bp
 from routes.api.tickers import tickers_bp
@@ -49,6 +53,11 @@ from routes.api.executions import executions_bp
 
 app = Flask(__name__)
 CORS(app)
+
+# Initialize new architecture
+logger = setup_logging()
+app.logger = logger
+init_db()
 
 # Register blueprints
 app.register_blueprint(accounts_bp)
@@ -98,7 +107,7 @@ def health_check():
 
 # נתיב יחסי לקובץ DB
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade.db")
+DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
 
 # נתיב לקבצי ה-UI
 UI_DIR = "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui"

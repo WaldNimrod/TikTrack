@@ -36,8 +36,8 @@ from config.database import init_db
 from config.logging import setup_logging
 from routes import (
     tickers_bp, accounts_bp, trades_bp, trade_plans_bp, 
-    auth_bp, alerts_bp, cash_flows_bp, notes_bp, 
-    executions_bp, user_roles_bp, pages_bp
+    alerts_bp, cash_flows_bp, notes_bp, 
+    executions_bp, pages_bp
 )
 import logging
 import time
@@ -56,7 +56,6 @@ def create_app():
     init_db()
     
     # רישום blueprints
-    app.register_blueprint(auth_bp)
     app.register_blueprint(tickers_bp)
     app.register_blueprint(accounts_bp)
     app.register_blueprint(trades_bp)
@@ -65,7 +64,6 @@ def create_app():
     app.register_blueprint(cash_flows_bp)
     app.register_blueprint(notes_bp)
     app.register_blueprint(executions_bp)
-    app.register_blueprint(user_roles_bp)
     app.register_blueprint(pages_bp)
     
     # Swagger UI Blueprint

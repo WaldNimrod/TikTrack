@@ -123,23 +123,33 @@ function fillNoteEditModal(note) {
         return;
     }
     
-    // מילוי שדות הטופס
-    editNoteId.value = note.id;
-    editNoteContent.value = note.content || '';
-    editNoteAccountId.value = note.account_id || '';
-    editNoteTradeId.value = note.trade_id || '';
-    editNoteTradePlanId.value = note.trade_plan_id || '';
-    editNoteAttachment.value = note.attachment || '';
-    
-    console.log('✅ מודל עריכת הערה מולא בהצלחה');
-    console.log('📝 ערכים שהוכנסו:', {
-        id: editNoteId.value,
-        content: editNoteContent.value,
-        account_id: editNoteAccountId.value,
-        trade_id: editNoteTradeId.value,
-        trade_plan_id: editNoteTradePlanId.value,
-        attachment: editNoteAttachment.value
-    });
+    // מילוי שדות הטופס עם השהייה קצרה
+    setTimeout(() => {
+        editNoteId.value = note.id;
+        editNoteContent.value = note.content || '';
+        editNoteAccountId.value = note.account_id || '';
+        editNoteTradeId.value = note.trade_id || '';
+        editNoteTradePlanId.value = note.trade_plan_id || '';
+        editNoteAttachment.value = note.attachment || '';
+        
+        // כפייה של עדכון ה-DOM
+        editNoteId.dispatchEvent(new Event('input', { bubbles: true }));
+        editNoteContent.dispatchEvent(new Event('input', { bubbles: true }));
+        editNoteAccountId.dispatchEvent(new Event('input', { bubbles: true }));
+        editNoteTradeId.dispatchEvent(new Event('input', { bubbles: true }));
+        editNoteTradePlanId.dispatchEvent(new Event('input', { bubbles: true }));
+        editNoteAttachment.dispatchEvent(new Event('input', { bubbles: true }));
+        
+        console.log('✅ מודל עריכת הערה מולא בהצלחה');
+        console.log('📝 ערכים שהוכנסו:', {
+            id: editNoteId.value,
+            content: editNoteContent.value,
+            account_id: editNoteAccountId.value,
+            trade_id: editNoteTradeId.value,
+            trade_plan_id: editNoteTradePlanId.value,
+            attachment: editNoteAttachment.value
+        });
+    }, 50);
 }
 
 /**

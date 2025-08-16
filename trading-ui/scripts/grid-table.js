@@ -5,6 +5,39 @@
 window.gridApi = null;
 let externalFilterPresent = false;
 
+// פונקציית API כללית
+async function apiCall(endpoint, options = {}) {
+    const baseUrl = 'http://127.0.0.1:8080';
+    const url = `${baseUrl}${endpoint}`;
+    
+    const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers
+    };
+
+    const finalOptions = { 
+        ...options,
+        headers
+    };
+
+    try {
+        console.log('📡 שולח בקשה ל:', url);
+        const response = await fetch(url, finalOptions);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            console.error('❌ שגיאה בתגובה:', response.status, data);
+            throw new Error(data.error?.message || data.message || `HTTP ${response.status}`);
+        }
+        
+        console.log('✅ תגובה מוצלחת:', data);
+        return data;
+    } catch (error) {
+        console.error(`❌ שגיאת API (${endpoint}):`, error);
+        throw error;
+    }
+}
+
 // הגדרת עמודות הגריד הסטנדרטיות
 const getDefaultColumnDefs = () => [
   { 
@@ -937,20 +970,25 @@ function initializeAllTableSorting() {
  * editRecord('tickers', 456);
  */
 async function editRecord(tableType, recordId) {
+    console.log(`🔧 editRecord called: tableType=${tableType}, recordId=${recordId}`);
     try {
         // קריאה לשרת לקבלת נתוני הרשומה
+        console.log(`📡 Calling API: /api/v1/${tableType}/${recordId}`);
         const response = await apiCall(`/api/v1/${tableType}/${recordId}`);
+        console.log(`📡 API Response:`, response);
         
         if (response.status === 'success') {
+            console.log(`✅ API call successful, showing modal for ${tableType}`);
             // הצגת מודל עריכה עם הנתונים שנטענו
             showEditModal(tableType, response.data);
         } else {
+            console.error(`❌ API call failed: ${response.error || 'Unknown error'}`);
             // הצגת הודעת שגיאה אם הטעינה נכשלה
             alert(`שגיאה בטעינת נתוני ${getTableDisplayName(tableType)}`);
         }
     } catch (error) {
         // לוג שגיאה לקונסול והודעת שגיאה למשתמש
-        console.error(`Error loading ${tableType}:`, error);
+        console.error(`❌ Error in editRecord for ${tableType}:`, error);
         alert(`שגיאה בטעינת נתוני ${getTableDisplayName(tableType)}`);
     }
 }
@@ -974,7 +1012,7 @@ async function deleteRecord(tableType, recordId) {
     const displayName = getTableDisplayName(tableType);
     
     // הצגת אישור מחיקה למשתמש
-    if (confirm(`האם אתה בטוח שברצונך למחוק ${displayName} זה?`)) {
+    if (confirm(`⚠️ אזהרה: האם אתה בטוח שברצונך למחוק ${displayName} זה?\n\nפעולה זו אינה הפיכה והרשומה תימחק לחלוטין מהמערכת.`)) {
         try {
             // קריאה לשרת למחיקת הרשומה
             const response = await apiCall(`/api/v1/${tableType}/${recordId}`, {
@@ -983,7 +1021,7 @@ async function deleteRecord(tableType, recordId) {
             
             if (response.status === 'success') {
                 // הצגת הודעת הצלחה ורענון הטבלה
-                alert(`${displayName} נמחק בהצלחה`);
+                alert(`${displayName} נמחק בהצלחה!`);
                 refreshTable(tableType);
             } else {
                 // הצגת הודעת שגיאה אם המחיקה נכשלה
@@ -1009,11 +1047,78 @@ async function deleteRecord(tableType, recordId) {
  * showEditModal('accounts', accountData);
  */
 function showEditModal(tableType, data) {
+    console.log(`🔧 showEditModal called: tableType=${tableType}, data=`, data);
+    
     // יצירת מזהה המודל לפי סוג הטבלה
     let modalId;
     
     // מיפוי מיוחד לטבלאות עם שמות מודלים שונים
     const modalIdMap = {
+        'accounts': 'editAccountModal',
+        'user_roles': 'editUserRolesModal',
+        'cash_flows': 'editCashFlowsModal',
+        'trade_plans': 'editTradePlanModal',
+        'users': 'editUsersModal'
+    };
+    
+    if (modalIdMap[tableType]) {
+        modalId = modalIdMap[tableType];
+    } else {
+        modalId = `edit${capitalizeFirstLetter(tableType)}Modal`;
+    }
+    
+    console.log(`🔧 Looking for modal with ID: ${modalId}`);
+    const modal = document.getElementById(modalId);
+    
+    // בדיקה שהמודל קיים בדף
+    if (!modal) {
+        console.error(`❌ Modal ${modalId} not found`);
+        alert('מודל עריכה לא נמצא');
+        return;
+    }
+    
+    console.log(`✅ Modal ${modalId} found, proceeding with data fill`);
+    
+    // מילוי הנתונים במודל באמצעות הפונקציה המתאימה
+    fillEditModalData(tableType, data);
+    
+    // הצגת המודל באמצעות Bootstrap
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+    } else {
+        // גיבוי אם Bootstrap לא זמין
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // הוספת backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        document.body.appendChild(backdrop);
+    }
+}
+
+/**
+ * פונקציה למילוי נתונים במודל עריכה לפי סוג הטבלה
+ * הפונקציה קוראת לפונקציה הספציפית המתאימה לכל סוג טבלה
+ * 
+ * @param {string} tableType - סוג הטבלה (למשל: 'accounts', 'tickers', 'trades')
+ * @param {Object} data - נתוני הרשומה לעריכה
+ * 
+ * @example
+ * // מילוי נתונים במודל עריכת חשבון
+ * fillEditModalData('accounts', accountData);
+ */
+function fillEditModalData(tableType, data) {
+    console.log(`🔧 fillEditModalData called: tableType=${tableType}, data=`, data);
+    
+    // יצירת מזהה המודל לפי סוג הטבלה
+    let modalId;
+    
+    // מיפוי מיוחד לטבלאות עם שמות מודלים שונים
+    const modalIdMap = {
+        'accounts': 'editAccountModal',
         'user_roles': 'editUserRolesModal',
         'cash_flows': 'editCashFlowsModal',
         'trade_plans': 'editTradePlanModal',
@@ -1030,41 +1135,16 @@ function showEditModal(tableType, data) {
     
     // בדיקה שהמודל קיים בדף
     if (!modal) {
-        console.error(`Modal ${modalId} not found`);
-        alert('מודל עריכה לא נמצא');
+        console.error(`❌ Modal ${modalId} not found in fillEditModalData`);
         return;
     }
     
-    // מילוי הנתונים במודל באמצעות הפונקציה המתאימה
-    fillEditModalData(tableType, data);
-    
-    // הצגת המודל באמצעות Bootstrap
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
-}
-
-/**
- * פונקציה למילוי נתונים במודל עריכה לפי סוג הטבלה
- * הפונקציה קוראת לפונקציה הספציפית המתאימה לכל סוג טבלה
- * 
- * @param {string} tableType - סוג הטבלה (למשל: 'accounts', 'tickers', 'trades')
- * @param {Object} data - נתוני הרשומה לעריכה
- * 
- * @example
- * // מילוי נתונים במודל עריכת חשבון
- * fillEditModalData('accounts', accountData);
- */
-function fillEditModalData(tableType, data) {
-    // יצירת מזהה המודל לפי סוג הטבלה
-    const modalId = `edit${capitalizeFirstLetter(tableType)}Modal`;
-    const modal = document.getElementById(modalId);
-    
-    // בדיקה שהמודל קיים בדף
-    if (!modal) return;
+    console.log(`✅ Modal ${modalId} found, filling data for ${tableType}`);
     
     // מילוי שדות לפי סוג הטבלה - כל טבלה מקבלת פונקציה ספציפית
     switch (tableType) {
         case 'accounts':
+            console.log(`🔧 Calling fillAccountModalData for accounts`);
             fillAccountModalData(data);
             break;
         case 'tickers':
@@ -1126,13 +1206,12 @@ function fillEditModalData(tableType, data) {
  * @param {string} data.notes - הערות
  */
 function fillAccountModalData(data) {
-    // מילוי שדות המודל עם הנתונים או ערכי ברירת מחדל
-    document.getElementById('editAccountId').value = data.id;
-    document.getElementById('editAccountName').value = data.name || '';
-    document.getElementById('editAccountCurrency').value = data.currency || 'USD';
-    document.getElementById('editAccountStatus').value = data.status || 'active';
-    document.getElementById('editAccountCashBalance').value = data.cash_balance || 0;
-    document.getElementById('editAccountNotes').value = data.notes || '';
+    // שימוש בפונקציה המאוחדת מהקובץ החדש
+    if (typeof fillAccountEditModal === 'function') {
+        fillAccountEditModal(data);
+    } else {
+        console.error('❌ fillAccountEditModal function not found');
+    }
 }
 
 /**
@@ -1371,6 +1450,7 @@ async function saveRecord(tableType) {
     
     // מיפוי מיוחד לטבלאות עם שמות שדות ומודלים שונים
     const recordIdMap = {
+        'accounts': 'editAccountId',
         'user_roles': 'editUserRoleId',
         'cash_flows': 'editCashFlowId',
         'trade_plans': 'editTradePlanId',
@@ -1378,6 +1458,7 @@ async function saveRecord(tableType) {
     };
     
     const modalIdMap = {
+        'accounts': 'editAccountModal',
         'user_roles': 'editUserRolesModal',
         'cash_flows': 'editCashFlowsModal',
         'trade_plans': 'editTradePlanModal',
@@ -1405,7 +1486,24 @@ async function saveRecord(tableType) {
         if (response.status === 'success') {
             // הצגת הודעת הצלחה, סגירת המודל ורענון הטבלה
             alert(`${getTableDisplayName(tableType)} נשמר בהצלחה`);
-            bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+            
+            // סגירת המודל
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+            } else {
+                // גיבוי אם Bootstrap לא זמין
+                const modal = document.getElementById(modalId);
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                document.body.classList.remove('modal-open');
+                
+                // הסרת backdrop
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+            }
+            
             refreshTable(tableType);
         } else {
             // הצגת הודעת שגיאה אם השמירה נכשלה
@@ -1434,14 +1532,13 @@ function collectModalData(tableType) {
     // איסוף נתונים לפי סוג הטבלה - כל טבלה מקבלת טיפול ספציפי
     switch (tableType) {
         case 'accounts':
-            // איסוף נתוני חשבון
-            return {
-                name: document.getElementById('editAccountName').value,
-                currency: document.getElementById('editAccountCurrency').value,
-                status: document.getElementById('editAccountStatus').value,
-                cash_balance: parseFloat(document.getElementById('editAccountCashBalance').value),
-                notes: document.getElementById('editAccountNotes').value
-            };
+            // שימוש בפונקציה המאוחדת מהקובץ החדש
+            if (typeof collectAccountEditData === 'function') {
+                return collectAccountEditData();
+            } else {
+                console.error('❌ collectAccountEditData function not found');
+                return {};
+            }
         case 'tickers':
             // איסוף נתוני טיקר
             return {
@@ -1592,6 +1689,8 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+
+
 /**
  * קבלת שם התצוגה של טבלה בעברית
  * מחזיר את השם בעברית של הטבלה להודעות למשתמש
@@ -1632,6 +1731,14 @@ function getTableDisplayName(tableType) {
 window.editRecord = editRecord;
 window.deleteRecord = deleteRecord;
 window.saveRecord = saveRecord;
+window.showEditModal = showEditModal;
+window.fillEditModalData = fillEditModalData;
+window.refreshTable = refreshTable;
+window.getTableDisplayName = getTableDisplayName;
+window.capitalizeFirstLetter = capitalizeFirstLetter;
+window.collectModalData = collectModalData;
+window.fillAccountModalData = fillAccountModalData;
+window.apiCall = apiCall;
 
 // קריאה לשחזור מצבי הסקשנים בטעינת הדף
 document.addEventListener('DOMContentLoaded', function() {

@@ -10,10 +10,26 @@ trades_bp = Blueprint('trades', __name__, url_prefix='/api/v1/trades')
 
 @trades_bp.route('/', methods=['GET'])
 def get_trades():
-    """קבלת כל הטריידים"""
+    """קבלת כל הטריידים עם אפשרות לסינון"""
     try:
         db: Session = next(get_db())
-        trades = TradeService.get_all(db)
+        
+        # קבלת פרמטרים של סינון
+        account_id = request.args.get('account_id', type=int)
+        status = request.args.get('status')
+        
+        # אם יש פרמטרים של סינון, משתמש בפונקציה מתאימה
+        if account_id and status:
+            logger.info(f"Filtering trades by account_id={account_id} and status={status}")
+            trades = TradeService.get_by_account_and_status(db, account_id, status)
+            logger.info(f"Found {len(trades)} trades for account {account_id} with status {status}")
+        elif account_id:
+            trades = TradeService.get_by_account(db, account_id)
+        elif status:
+            trades = TradeService.get_by_status(db, status)
+        else:
+            trades = TradeService.get_all(db)
+        
         return jsonify({
             "status": "success",
             "data": [trade.to_dict() for trade in trades],

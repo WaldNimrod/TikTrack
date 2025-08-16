@@ -461,8 +461,10 @@
   <!-- Web Component של הכותרת -->
   <app-header></app-header>
 
-  <!-- Login Interface -->
-  <div class="background-wrapper" id="loginSection" style="display: block;">
+  <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+  <div class="page-body">
+    <!-- Login Interface -->
+    <div class="background-wrapper" id="loginSection" style="display: block;">
     <div class="login-container">
       <div class="login-header">
         <div class="login-logo">📊</div>
@@ -1005,6 +1007,7 @@
       loadDashboardData();
     });
   </script>
+    </div> <!-- סוף page-body -->
   
   <!-- Scripts -->
   <script src="scripts/app-header.js"></script>

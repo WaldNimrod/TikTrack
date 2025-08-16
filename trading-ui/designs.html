@@ -20,12 +20,16 @@
   <!-- Grid Table CSS - טבלאות וגרידים -->
   <link rel="stylesheet" href="styles/grid-table.css">
   
+  <!-- Typography CSS - טיפוגרפיה ופונטים -->
+  <link rel="stylesheet" href="styles/typography.css">
+  
 
   
   <!-- קבצים מודולריים של הגריד -->
   <script src="scripts/app-header.js"></script>
   <script src="scripts/grid-table.js"></script>
   <script src="scripts/grid-filters.js"></script>
+  <script src="scripts/alerts.js"></script>
 </head>
 <body>
   <!-- רקע כללי -->
@@ -34,8 +38,10 @@
     <!-- כותרת האפליקציה -->
     <app-header></app-header>
     
-    <!-- אזור עיצובים - top-Section -->
-    <div class="top-section">
+    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <div class="page-body">
+      <!-- אזור עיצובים - top-Section -->
+      <div class="top-section">
       <!-- כותרת עיצובים -->
       <div class="section-header">
         <div class="table-title">
@@ -52,119 +58,10 @@
         </div>
       </div>
       
-      <!-- כרטיסיות עיצובים -->
+            <!-- התראות עיצובים -->
       <div class="section-body">
-        <div class="cards-container">
-          <!-- כרטיסיה ראשונה -->
-          <div class="design-card">
-            <div class="card-header">
-              <h3 class="card-title">📈 עיצוב מוביל</h3>
-              <span class="card-status status-open">פתוח</span>
-            </div>
-            <div class="card-content">
-              <div class="card-row">
-                <span class="label">נכס:</span>
-                <span class="value">AAPL</span>
-              </div>
-              <div class="card-row">
-                <span class="label">סוג:</span>
-                <span class="value">Long</span>
-              </div>
-              <div class="card-row">
-                <span class="label">סכום:</span>
-                <span class="value">$15,000</span>
-              </div>
-              <div class="card-row">
-                <span class="label">יעד:</span>
-                <span class="value">$200.00</span>
-              </div>
-              <div class="card-row">
-                <span class="label">סטופ:</span>
-                <span class="value">$145.00</span>
-              </div>
-            </div>
-            <div class="card-actions">
-              <button class="btn btn-sm btn-secondary" onclick="editDesign('4')" title="ערוך">
-                <span class="btn-icon">✏️</span>
-              </button>
-              <button class="btn btn-sm btn-danger" onclick="deleteDesign('4')" title="מחק">X</button>
-            </div>
-          </div>
-
-          <!-- כרטיסיה שנייה -->
-          <div class="design-card">
-            <div class="card-header">
-              <h3 class="card-title">📊 עיצוב מתקדם</h3>
-              <span class="card-status status-open">פתוח</span>
-            </div>
-            <div class="card-content">
-              <div class="card-row">
-                <span class="label">נכס:</span>
-                <span class="value">GOOGL</span>
-              </div>
-              <div class="card-row">
-                <span class="label">סוג:</span>
-                <span class="value">Short</span>
-              </div>
-              <div class="card-row">
-                <span class="label">סכום:</span>
-                <span class="value">$12,000</span>
-              </div>
-              <div class="card-row">
-                <span class="label">יעד:</span>
-                <span class="value">$2,500.00</span>
-              </div>
-              <div class="card-row">
-                <span class="label">סטופ:</span>
-                <span class="value">$2,950.00</span>
-              </div>
-            </div>
-            <div class="card-actions">
-              <button class="btn btn-sm btn-secondary" onclick="editDesign('5')" title="ערוך">
-                <span class="btn-icon">✏️</span>
-              </button>
-              <button class="btn btn-sm btn-danger" onclick="deleteDesign('5')" title="מחק">X</button>
-            </div>
-          </div>
-
-          <!-- כרטיסיה שלישית -->
-          <div class="design-card">
-            <div class="card-header">
-              <h3 class="card-title">🎯 עיצוב ממוקד</h3>
-              <span class="card-status status-open">פתוח</span>
-            </div>
-            <div class="card-content">
-              <div class="card-row">
-                <span class="label">נכס:</span>
-                <span class="value">SPY</span>
-              </div>
-              <div class="card-row">
-                <span class="label">סוג:</span>
-                <span class="value">Long</span>
-              </div>
-              <div class="card-row">
-                <span class="label">סכום:</span>
-                <span class="value">$5,000</span>
-              </div>
-              <div class="card-row">
-                <span class="label">יעד:</span>
-                <span class="value">$450.00</span>
-              </div>
-              <div class="card-row">
-                <span class="label">סטופ:</span>
-                <span class="value">$380.00</span>
-              </div>
-            </div>
-            <div class="card-actions">
-              <button class="btn btn-sm btn-secondary" onclick="editDesign('3')" title="ערוך">
-                <span class="btn-icon">✏️</span>
-              </button>
-              <button class="btn btn-sm btn-danger" onclick="deleteDesign('3')" title="מחק">X</button>
-            </div>
-          </div>
-        </div>
+        <div id="alertsContainer" class="loading">טוען התראות...</div>
       </div>
-    </div>
     
     <!-- תוכן ראשי -->
     <div class="main-content">
@@ -410,6 +307,7 @@
         </div>
       </div>
     </div>
+    </div> <!-- סוף page-body -->
 
   <!-- מרווח בתחתית הדף -->
   <div style="height: 3rem;"></div>
@@ -1040,6 +938,12 @@
       
       // שחזור מצב הסגירה
       restoreDesignsSectionState();
+      
+      // טעינת התראות
+      if (typeof loadAlerts === 'function') {
+        loadAlerts();
+        console.log('🔄 === ALERTS LOADED ===');
+      }
       
       // הגדרת כותרות למיון מיד
       console.log('🔄 === SETUP SORTABLE HEADERS IMMEDIATE ===');

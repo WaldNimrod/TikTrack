@@ -26,6 +26,7 @@
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/grid-data.js"></script>
   <script src="scripts/grid-init.js"></script>
+  <script src="scripts/accounts.js"></script>
 
   <style>
     /* סגנונות ייחודיים לדף בסיס נתונים שלא קיימים בקבצים הכלליים */
@@ -598,59 +599,73 @@
   
   <!-- Edit Account Modal -->
   <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="editAccountModalLabel">עריכת חשבון</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title" id="editAccountModalLabel">עריכת חשבון</h5>
         </div>
         <div class="modal-body">
           <form id="editAccountForm">
             <input type="hidden" id="editAccountId">
+            
+            <!-- שדות בסיסיים -->
             <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="editAccountName" class="form-label">שם החשבון</label>
-                  <input type="text" class="form-control" id="editAccountName" required>
-                </div>
+              <div class="col-md-6 mb-3">
+                <label for="editAccountName" class="form-label">שם החשבון *</label>
+                <input type="text" class="form-control" id="editAccountName" required>
               </div>
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="editAccountCurrency" class="form-label">מטבע</label>
-                  <select class="form-control" id="editAccountCurrency" required>
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="ILS">ILS</option>
-                  </select>
-                </div>
+              <div class="col-md-6 mb-3">
+                <label for="editAccountCurrency" class="form-label">מטבע *</label>
+                <select class="form-select" id="editAccountCurrency" required>
+                  <option value="">בחר מטבע</option>
+                  <option value="ILS">שקל ישראלי (ILS)</option>
+                  <option value="USD">דולר אמריקאי (USD)</option>
+                  <option value="EUR">אירו (EUR)</option>
+                </select>
               </div>
             </div>
+            
             <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="editAccountStatus" class="form-label">סטטוס</label>
-                  <select class="form-control" id="editAccountStatus" required>
-                    <option value="active">פעיל</option>
-                    <option value="inactive">לא פעיל</option>
-                  </select>
-                </div>
+              <div class="col-md-6 mb-3">
+                <label for="editAccountStatus" class="form-label">סטטוס</label>
+                <select class="form-select" id="editAccountStatus">
+                  <option value="פתוח">פתוח</option>
+                  <option value="סגור">סגור</option>
+                  <option value="מבוטל">מבוטל</option>
+                </select>
               </div>
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="editAccountCashBalance" class="form-label">יתרת מזומן</label>
-                  <input type="number" step="0.01" class="form-control" id="editAccountCashBalance" required>
-                </div>
+              <div class="col-md-6 mb-3">
+                <label for="editAccountCashBalance" class="form-label">יתרת מזומן</label>
+                <input type="number" class="form-control" id="editAccountCashBalance" step="0.01" placeholder="0.00">
+                <small class="form-text text-muted">יתרת המזומן בחשבון</small>
               </div>
             </div>
+            
+            <!-- שדות פיננסיים -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="editAccountTotalValue" class="form-label">שווי כולל</label>
+                <input type="number" class="form-control" id="editAccountTotalValue" step="0.01" placeholder="0.00">
+                <small class="form-text text-muted">השווי הכולל של החשבון</small>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="editAccountTotalPl" class="form-label">רווח/הפסד כולל</label>
+                <input type="number" class="form-control" id="editAccountTotalPl" step="0.01" placeholder="0.00">
+                <small class="form-text text-muted">הרווח או ההפסד הכולל</small>
+              </div>
+            </div>
+            
+            <!-- הערות -->
             <div class="mb-3">
               <label for="editAccountNotes" class="form-label">הערות</label>
-              <textarea class="form-control" id="editAccountNotes" rows="3"></textarea>
+              <textarea class="form-control" id="editAccountNotes" rows="4" placeholder="הערות על החשבון..."></textarea>
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveRecord('accounts')">שמור</button>
+          <button type="button" class="btn btn-primary" onclick="saveRecord('accounts')">שמור שינויים</button>
         </div>
       </div>
     </div>
@@ -1413,7 +1428,7 @@
     // Data loading functions
     async function loadUserRoles() {
         try {
-            const response = await apiCall('/api/user_roles');
+            const response = await apiCall('/api/v1/user_roles/');
             const tbody = document.querySelector('#userRolesTable tbody');
             
             if (response.status === 'success' && response.data) {
@@ -1450,7 +1465,7 @@
     async function loadUsers() {
       try {
         console.log('🔄 טוען משתמשים...');
-        const response = await apiCall('/api/users');
+        const response = await apiCall('/api/v1/users/');
         const users = response.data;
         
         const tbody = document.querySelector('#usersTable tbody');
@@ -1498,8 +1513,9 @@
             <td>${formatCurrency(account.total_pl)}</td>
             <td>${account.notes || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editRecord('accounts', ${account.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteRecord('accounts', ${account.id})">מחק</button>
+              <button class="btn btn-sm btn-primary" onclick="editRecord('accounts', ${account.id})" title="ערוך חשבון">ערוך</button>
+              <button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id}, '${account.name}')" title="בטל חשבון">ביטול</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק חשבון">מחק</button>
             </td>
           </tr>
         `).join('');
@@ -1517,7 +1533,7 @@
     async function loadTickers() {
       try {
         console.log('🔄 טוען טיקרים...');
-        const response = await apiCall('/api/tickers');
+        const response = await apiCall('/api/v1/tickers/');
         const tickers = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
         
         const tbody = document.querySelector('#tickersTable tbody');
@@ -1549,7 +1565,7 @@
     async function loadTrades() {
       try {
         console.log('🔄 טוען טריידים...');
-        const response = await apiCall('/api/trades');
+        const response = await apiCall('/api/v1/trades/');
         const trades = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
         
         const tbody = document.querySelector('#tradesTable tbody');
@@ -1584,7 +1600,7 @@
     async function loadTradePlans() {
       try {
         console.log('🔄 טוען תוכניות טרייד...');
-        const response = await apiCall('/api/tradeplans');
+        const response = await apiCall('/api/v1/trade_plans/');
         const plans = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#tradePlansTable tbody');
@@ -1621,7 +1637,7 @@
     async function loadAlerts() {
       try {
         console.log('🔄 טוען התראות...');
-        const response = await apiCall('/api/alerts');
+        const response = await apiCall('/api/v1/alerts/');
         const alerts = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#alertsTable tbody');
@@ -1655,7 +1671,7 @@
     async function loadCashFlows() {
       try {
         console.log('🔄 טוען תזרימי מזומנים...');
-        const response = await apiCall('/api/cash_flows');
+        const response = await apiCall('/api/v1/cash_flows/');
         const cashFlows = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#cashFlowsTable tbody');
@@ -1687,7 +1703,7 @@
     async function loadNotes() {
       try {
         console.log('🔄 טוען הערות...');
-        const response = await apiCall('/api/notes');
+        const response = await apiCall('/api/v1/notes/');
         const notes = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#notesTable tbody');
@@ -1719,7 +1735,7 @@
     async function loadExecutions() {
       try {
         console.log('🔄 טוען ביצועים...');
-        const response = await apiCall('/api/executions');
+        const response = await apiCall('/api/v1/executions/');
         const executions = response; // השרת מחזיר מערך ישירות
         
         const tbody = document.querySelector('#executionsTable tbody');
@@ -1834,6 +1850,15 @@
     // Initial data load - ללא אימות
     document.addEventListener('DOMContentLoaded', async () => {
       console.log('טוען נתונים ללא אימות');
+      
+      // בדיקה שהפונקציות נטענו
+      console.log('בדיקת פונקציות:', {
+        editRecord: typeof window.editRecord,
+        deleteRecord: typeof window.deleteRecord,
+        saveRecord: typeof window.saveRecord,
+        apiCall: typeof window.apiCall
+      });
+      
       loadTableStates(); // טוען את המצב השמור של הטבלאות
       refreshAllTables(); // טוען נתונים ישירות
     });
@@ -2022,9 +2047,43 @@
     // - showEditModal(tableType, data)
     // - fillEditModalData(tableType, data)
     // - saveRecord(tableType)
-  </script>
-</body>
-</html>
 
+    // הגדרת פונקציות גלובליות לעריכה ומחיקה
+    // הפונקציות מוגדרות בקובץ grid-table.js
+    // אם הן לא קיימות, נגדיר fallback
+    if (!window.editRecord) {
+      window.editRecord = function(tableType, recordId) {
+        console.log(`🔧 editRecord fallback: עריכת ${tableType} עם מזהה ${recordId}`);
+        alert('פונקציית העריכה לא זמינה');
+      };
+    } else {
+      console.log('✅ editRecord function found and available');
+    }
+
+    if (!window.deleteRecord) {
+      window.deleteRecord = function(tableType, recordId) {
+        console.log(`מחיקת ${tableType} עם מזהה ${recordId}`);
+        alert('פונקציית המחיקה לא זמינה');
+      };
+    }
+
+    if (!window.saveRecord) {
+      window.saveRecord = function(tableType) {
+        console.log(`שמירת ${tableType}`);
+        alert('פונקציית השמירה לא זמינה');
+      };
+    }
+
+    // הגדרת פונקציית API כ-global
+    window.apiCall = apiCall;
+
+    // בדיקה שהפונקציות נטענו
+    console.log('בדיקת פונקציות בסוף:', {
+      editRecord: typeof window.editRecord,
+      deleteRecord: typeof window.deleteRecord,
+      saveRecord: typeof window.saveRecord,
+      apiCall: typeof window.apiCall
+    });
+  </script>
 </body>
 </html>

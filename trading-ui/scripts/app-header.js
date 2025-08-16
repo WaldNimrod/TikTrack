@@ -2498,6 +2498,7 @@ class AppHeader extends HTMLElement {
   toggleFilterSection() {
     const filterSection = this.shadowRoot.getElementById('statusFilterSection');
     const backgroundWrapper = document.querySelector('.background-wrapper');
+    const pageBody = document.querySelector('.page-body');
     const body = document.body;
     
     if (!filterSection) return;
@@ -2510,6 +2511,9 @@ class AppHeader extends HTMLElement {
       if (backgroundWrapper) {
         backgroundWrapper.classList.remove('filter-collapsed');
       }
+      if (pageBody) {
+        pageBody.classList.remove('filter-collapsed');
+      }
       if (body) {
         body.classList.remove('filter-collapsed');
       }
@@ -2521,6 +2525,9 @@ class AppHeader extends HTMLElement {
       // עדכון המרווח - מרווח קטן יותר
       if (backgroundWrapper) {
         backgroundWrapper.classList.add('filter-collapsed');
+      }
+      if (pageBody) {
+        pageBody.classList.add('filter-collapsed');
       }
       if (body) {
         body.classList.add('filter-collapsed');

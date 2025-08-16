@@ -30,7 +30,42 @@ class TradeService:
     @staticmethod
     def get_open_trades(db: Session) -> List[Trade]:
         """קבלת טריידים פתוחים"""
-        return db.query(Trade).filter(Trade.status == 'open').all()
+        return db.query(Trade).filter(Trade.status == 'פתוח').all()
+    
+    @staticmethod
+    def get_by_status(db: Session, status: str) -> List[Trade]:
+        """קבלת טריידים לפי סטטוס"""
+        return db.query(Trade).filter(Trade.status == status).all()
+    
+    @staticmethod
+    def get_by_account_and_status(db: Session, account_id: int, status: str) -> List[Trade]:
+        """קבלת טריידים לפי חשבון וסטטוס"""
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info(f"Getting trades for account_id={account_id} and status={status}")
+        
+        # בדיקה שכל הטריידים במערכת
+        all_trades = db.query(Trade).all()
+        logger.info(f"Total trades in system: {len(all_trades)}")
+        
+        # בדיקה של הטריידים לפי חשבון
+        account_trades = db.query(Trade).filter(Trade.account_id == account_id).all()
+        logger.info(f"Trades for account {account_id}: {len(account_trades)}")
+        
+        # בדיקה של הטריידים לפי סטטוס
+        status_trades = db.query(Trade).filter(Trade.status == status).all()
+        logger.info(f"Trades with status {status}: {len(status_trades)}")
+        
+        # הסינון המשולב
+        filtered_trades = db.query(Trade).filter(
+            Trade.account_id == account_id,
+            Trade.status == status
+        ).all()
+        
+        logger.info(f"Filtered trades for account {account_id} with status {status}: {len(filtered_trades)}")
+        
+        return filtered_trades
     
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> Trade:
@@ -71,8 +106,8 @@ class TradeService:
     def close_trade(db: Session, trade_id: int, close_data: Dict[str, Any]) -> Optional[Trade]:
         """סגירת טרייד"""
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
-        if trade and trade.status == 'open':
-            trade.status = 'closed'
+        if trade and trade.status == 'פתוח':
+            trade.status = 'סגור'
             trade.closed_at = datetime.utcnow()
             trade.total_pl = close_data.get('total_pl', trade.total_pl)
             db.commit()
@@ -85,8 +120,8 @@ class TradeService:
     def cancel_trade(db: Session, trade_id: int, cancel_reason: str) -> Optional[Trade]:
         """ביטול טרייד"""
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
-        if trade and trade.status == 'open':
-            trade.status = 'cancelled'
+        if trade and trade.status == 'פתוח':
+            trade.status = 'מבוטל'
             trade.cancelled_at = datetime.utcnow()
             trade.cancel_reason = cancel_reason
             db.commit()

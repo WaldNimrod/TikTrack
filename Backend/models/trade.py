@@ -8,7 +8,7 @@ class Trade(BaseModel):
     account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
     trade_plan_id = Column(Integer, ForeignKey('trade_plans.id'), nullable=True)
-    status = Column(String(20), default='open', nullable=True)
+    status = Column(String(20), default='פתוח', nullable=True)
     type = Column(String(20), default='buy', nullable=True)
     opened_at = Column(DateTime, nullable=True)
     closed_at = Column(DateTime, nullable=True)

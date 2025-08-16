@@ -8,6 +8,7 @@ class Alert(BaseModel):
     account_id = Column(Integer, ForeignKey('accounts.id'), nullable=True)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
     type = Column(String(50), nullable=False)
+    status = Column(String(20), default='פתוח', nullable=True)
     condition = Column(String(500), nullable=False)
     message = Column(String(500), nullable=True)
     is_active = Column(Boolean, default=True, nullable=True)

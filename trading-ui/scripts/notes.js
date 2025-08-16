@@ -109,16 +109,17 @@ function fillNoteEditModal(note) {
     const editNoteTradePlanId = document.getElementById('editNoteTradePlanId');
     const editNoteAttachment = document.getElementById('editNoteAttachment');
     
+    console.log('🔍 בדיקת אלמנטים:', {
+        editNoteId: editNoteId ? 'נמצא' : 'לא נמצא',
+        editNoteContent: editNoteContent ? 'נמצא' : 'לא נמצא',
+        editNoteAccountId: editNoteAccountId ? 'נמצא' : 'לא נמצא',
+        editNoteTradeId: editNoteTradeId ? 'נמצא' : 'לא נמצא',
+        editNoteTradePlanId: editNoteTradePlanId ? 'נמצא' : 'לא נמצא',
+        editNoteAttachment: editNoteAttachment ? 'נמצא' : 'לא נמצא'
+    });
+    
     if (!editNoteId || !editNoteContent || !editNoteAccountId || !editNoteTradeId || !editNoteTradePlanId || !editNoteAttachment) {
         console.error('❌ לא נמצאו כל האלמנטים הנדרשים למודל עריכת הערה');
-        console.log('אלמנטים שנבדקו:', {
-            editNoteId: !!editNoteId,
-            editNoteContent: !!editNoteContent,
-            editNoteAccountId: !!editNoteAccountId,
-            editNoteTradeId: !!editNoteTradeId,
-            editNoteTradePlanId: !!editNoteTradePlanId,
-            editNoteAttachment: !!editNoteAttachment
-        });
         return;
     }
     
@@ -131,6 +132,14 @@ function fillNoteEditModal(note) {
     editNoteAttachment.value = note.attachment || '';
     
     console.log('✅ מודל עריכת הערה מולא בהצלחה');
+    console.log('📝 ערכים שהוכנסו:', {
+        id: editNoteId.value,
+        content: editNoteContent.value,
+        account_id: editNoteAccountId.value,
+        trade_id: editNoteTradeId.value,
+        trade_plan_id: editNoteTradePlanId.value,
+        attachment: editNoteAttachment.value
+    });
 }
 
 /**

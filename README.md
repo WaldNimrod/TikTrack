@@ -13,17 +13,35 @@
 ## מבנה הפרויקט
 
 ```
-SimpleTradeApp/
+TikTrackApp/
 ├── Backend/
-│   ├── app.py              # Flask API
+│   ├── app.py                    # Flask API (עם ארכיטקטורה חדשה)
+│   ├── app_new.py                # שרת חדש (בפיתוח)
+│   ├── models/                   # מודלים SQLAlchemy
+│   │   ├── account.py           # מודל חשבונות
+│   │   ├── trade.py             # מודל טריידים
+│   │   └── ...
+│   ├── services/                 # שכבת לוגיקה עסקית
+│   │   ├── account_service.py   # שירות חשבונות
+│   │   └── ...
+│   ├── routes/                   # נתיבי API
+│   │   └── api/
+│   │       ├── accounts.py      # API חשבונות
+│   │       └── ...
+│   ├── config/                   # הגדרות
+│   │   ├── database.py          # הגדרות בסיס נתונים
+│   │   └── settings.py          # הגדרות כלליות
 │   └── db/
-│       └── simpleTrade.db  # בסיס נתונים SQLite
-└── trading-ui/
-    └── mockups/
-        ├── planning.html   # עמוד תכנון טריידים
-        ├── tracking.html   # עמוד מעקב טריידים
-        ├── main.js         # JavaScript ראשי
-        └── apple-theme.css # עיצוב Apple
+│       └── simpleTrade_new.db   # בסיס נתונים SQLite (חדש)
+├── trading-ui/                   # ממשק משתמש
+│   ├── index.html               # דף ראשי
+│   ├── accounts.html            # עמוד חשבונות
+│   ├── planning.html            # עמוד תכנון טריידים
+│   ├── tracking.html            # עמוד מעקב טריידים
+│   ├── styles/                  # קבצי CSS
+│   └── scripts/                 # קבצי JavaScript
+└── backups/                     # גיבויים
+    └── old_database_20250816_180456/  # בסיס נתונים ישן
 ```
 
 ## התקנה והפעלה
@@ -33,12 +51,14 @@ SimpleTradeApp/
 - Python 3.7+
 - Flask
 - Flask-CORS
+- SQLAlchemy
+- Waitress (לייצור)
 
 ### התקנת תלויות
 
 ```bash
 cd Backend
-pip3 install flask flask-cors
+pip3 install -r requirements.txt
 ```
 
 ### הפעלת השרת
@@ -79,6 +99,9 @@ python3 run_waitress.py
 # בדיקת בריאות השרת
 curl http://127.0.0.1:8080/api/health
 
+# בדיקת חשבונות (API חדש)
+curl http://127.0.0.1:8080/api/v1/accounts/
+
 # בדיקת סטטיסטיקות
 curl http://127.0.0.1:8080/api/stats
 ```
@@ -86,17 +109,55 @@ curl http://127.0.0.1:8080/api/stats
 אם השרת פועל כראוי, תקבל תשובה כמו:
 ```json
 {
-  "active_alerts": 2,
-  "active_plans": 3,
-  "open_trades": 1,
-  "total_pl": 0
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "חשבון ראשי",
+      "currency": "USD",
+      "status": "active",
+      "cash_balance": 10000.0,
+      "total_value": 10500.0,
+      "total_pl": 500.0
+    }
+  ],
+  "message": "Accounts retrieved successfully",
+  "version": "v1"
 }
 ```
 
 ### פתיחת הממשק
 
-1. פתח את הקובץ `trading-ui/mockups/planning.html` בדפדפן
-2. או פתח את הקובץ `trading-ui/mockups/tracking.html` בדפדפן
+1. פתח את הקובץ `trading-ui/index.html` בדפדפן
+2. או פתח את הקובץ `trading-ui/accounts.html` לדף חשבונות
+3. או פתח את הקובץ `trading-ui/planning.html` לעמוד תכנון טריידים
+
+## ארכיטקטורה חדשה
+
+המערכת עברה לארכיטקטורה מודולרית חדשה עם:
+
+- **מודלים SQLAlchemy**: ניהול בסיס נתונים מובנה
+- **שכבת שירותים**: לוגיקה עסקית נפרדת
+- **API מובנה**: נתיבים RESTful עם גרסה
+- **ניהול שגיאות**: טיפול בשגיאות מתקדם
+- **תיעוד API**: Swagger UI מובנה
+
+### מבנה API חדש
+
+```
+/api/v1/accounts/     # חשבונות
+/api/v1/trades/       # טריידים  
+/api/v1/tickers/      # טיקרים
+/api/v1/trade_plans/  # תכנוני טריידים
+/api/v1/alerts/       # התראות
+/api/v1/cash_flows/   # תזרימי מזומנים
+/api/v1/notes/        # הערות
+/api/v1/executions/   # ביצועים
+```
+
+### תיעוד API
+
+פתח את `http://127.0.0.1:8080/api/docs` לצפייה בתיעוד API המלא.
 
 ## API Endpoints
 

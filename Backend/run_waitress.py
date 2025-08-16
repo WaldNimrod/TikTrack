@@ -35,9 +35,9 @@ def main():
     
     try:
         # בדיקת תיקיות וקבצים
-        if not os.path.exists("db/simpleTrade.db"):
+        if not os.path.exists("db/simpleTrade_new.db"):
             logger.error("Database file not found!")
-            print("❌ Database file not found at db/simpleTrade.db")
+            print("❌ Database file not found at db/simpleTrade_new.db")
             sys.exit(1)
         
         if not os.path.exists("../trading-ui"):

@@ -214,15 +214,6 @@ body {
   border: 1px solid var(--apple-border-light);
 }
 
-/* התראות בסגנון אפל */
-.alert-card {
-  background: var(--apple-bg-elevated);
-  border: 1px solid var(--apple-border-light);
-  border-radius: var(--apple-radius-medium);
-  box-shadow: var(--apple-shadow-light);
-  transition: all 0.2s ease;
-}
-
 .alert-card:hover {
   box-shadow: var(--apple-shadow-medium);
   transform: translateY(-1px);

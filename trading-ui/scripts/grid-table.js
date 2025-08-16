@@ -1752,3 +1752,21 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeAllTableSorting();
   }, 100);
 });
+
+/**
+ * ===== מערכת סטטיסטיקות סיכום =====
+ * פונקציות לעדכון אלמנט info-summary בכל הדפים
+ */
+
+// פונקציה לחילוץ סכום מרשומה
+function extractAmount(amountString) {
+  if (!amountString) return 0;
+  
+  // הסרת סימני דולר ופסיקים
+  const cleanAmount = amountString.toString().replace(/[$,]/g, '');
+  const amount = parseFloat(cleanAmount);
+  
+  return isNaN(amount) ? 0 : amount;
+}
+
+

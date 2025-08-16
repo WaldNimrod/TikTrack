@@ -204,17 +204,25 @@ body {
 /* סגנונות למידע סיכום */
 .info-summary {
   display: flex;
-  gap: 2rem;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1.5rem;
-  padding: 1rem;
+  padding: 1.5rem;
   background: var(--apple-bg-secondary);
   border-radius: var(--apple-radius-medium);
   border: 1px solid var(--apple-border-light);
+  width: 100%;
 }
 
 .info-summary div {
   font-size: 14px;
   color: var(--apple-text-secondary);
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .info-summary strong {

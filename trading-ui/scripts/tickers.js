@@ -451,9 +451,9 @@ function updateTickersTable(tickers) {
             <td>${window.convertTickerStatusToHebrew(ticker.status)}</td>
             <td>${ticker.notes || '-'}</td>
             <td>
-                <button class="btn btn-sm btn-primary" onclick="showEditTickerModal(${JSON.stringify(ticker).replace(/"/g, '&quot;')})">ערוך</button>
-                <button class="btn btn-sm btn-warning" onclick="cancelTicker(${ticker.id}, '${ticker.name || ticker.symbol}')">ביטול</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id}, '${ticker.name || ticker.symbol}')">מחק</button>
+                <button class="btn btn-sm btn-secondary" onclick="showEditTickerModal(${JSON.stringify(ticker).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
+                <button class="btn btn-sm btn-secondary" onclick="cancelTicker(${ticker.id}, '${ticker.name || ticker.symbol}')" title="ביטול">❌</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id}, '${ticker.name || ticker.symbol}')" title="מחק">🗑️</button>
             </td>
         </tr>
     `).join('');

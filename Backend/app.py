@@ -50,6 +50,7 @@ from routes.api.alerts import alerts_bp
 from routes.api.cash_flows import cash_flows_bp
 from routes.api.notes import notes_bp
 from routes.api.executions import executions_bp
+from routes.pages import pages_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -68,6 +69,7 @@ app.register_blueprint(alerts_bp)
 app.register_blueprint(cash_flows_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
+app.register_blueprint(pages_bp)
 
 # הגדרת טיפול בשגיאות
 @app.errorhandler(404)
@@ -431,7 +433,7 @@ def get_trades():
         t.id,
         t.status,
         t.type,
-        t.opened_at as created_at,
+        t.opened_at,
         t.closed_at,
         t.cancelled_at,
         t.total_pl,

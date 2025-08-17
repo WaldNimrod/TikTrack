@@ -31,6 +31,7 @@
       <script src="scripts/alerts.js"></script>
     <script src="scripts/notes.js"></script>
   <script src="scripts/executions.js"></script>
+  <script src="scripts/trades.js"></script>
 
   <style>
     /* סגנונות ייחודיים לדף בסיס נתונים שלא קיימים בקבצים הכלליים */
@@ -92,6 +93,154 @@
     </div>
 
     <div class="database-container">
+
+      <!-- מודלים - מוגדרים בתחילת הדף כדי להיות זמינים מיד -->
+      <!-- Warning Modal -->
+      <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h5 class="modal-title" id="warningModalTitle">אזהרה</h5>
+            </div>
+            <div class="modal-body" id="warningModalBody">
+              <!-- תוכן האזהרה יוכנס כאן -->
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Note Modal -->
+      <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h5 class="modal-title" id="addNoteModalLabel">הוסף הערה חדשה</h5>
+            </div>
+            <div class="modal-body">
+              <form id="addNoteForm">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="noteContent" class="form-label">תוכן (Content)</label>
+                      <textarea class="form-control" id="noteContent" rows="4" required></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="noteAccountId" class="form-label">חשבון</label>
+                      <select class="form-control" id="noteAccountId">
+                        <option value="">בחר חשבון...</option>
+                      </select>
+                      <small class="form-text text-muted">מזהה חשבון (Account ID)</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="noteTradeId" class="form-label">טרייד</label>
+                      <select class="form-control" id="noteTradeId">
+                        <option value="">בחר טרייד...</option>
+                      </select>
+                      <small class="form-text text-muted">מזהה טרייד (Trade ID)</small>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="noteTradePlanId" class="form-label">תוכנית טרייד</label>
+                      <select class="form-control" id="noteTradePlanId">
+                        <option value="">בחר תוכנית טרייד...</option>
+                      </select>
+                      <small class="form-text text-muted">מזהה תוכנית טרייד (Trade Plan ID)</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="noteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
+                      <input type="text" class="form-control" id="noteAttachment">
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+                    <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="saveNote()" title="שמור">💾</button>
+        </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Note Modal -->
+      <div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h5 class="modal-title" id="editNoteModalLabel">עריכת הערה</h5>
+            </div>
+            <div class="modal-body">
+              <form id="editNoteForm">
+                <input type="hidden" id="editNoteId">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="editNoteContent" class="form-label">תוכן (Content)</label>
+                      <textarea class="form-control" id="editNoteContent" rows="4" required></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="editNoteAccountId" class="form-label">חשבון</label>
+                      <select class="form-control" id="editNoteAccountId">
+                        <option value="">בחר חשבון...</option>
+                      </select>
+                      <small class="form-text text-muted">מזהה חשבון (Account ID)</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="editNoteTradeId" class="form-label">טרייד</label>
+                      <select class="form-control" id="editNoteTradeId">
+                        <option value="">בחר טרייד...</option>
+                      </select>
+                      <small class="form-text text-muted">מזהה טרייד (Trade ID)</small>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="editNoteTradePlanId" class="form-label">תוכנית טרייד</label>
+                      <select class="form-control" id="editNoteTradePlanId">
+                        <option value="">בחר תוכנית טרייד...</option>
+                      </select>
+                      <small class="form-text text-muted">מזהה תוכנית טרייד (Trade Plan ID)</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="editNoteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
+                      <input type="text" class="form-control" id="editNoteAttachment">
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+                    <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="updateNoteFromModal()" title="שמור">💾</button>
+        </div>
+          </div>
+        </div>
+      </div>
 
       <!-- טבלת תוכניות טרייד -->
       <div class="content-section" id="tradePlansSection">
@@ -163,8 +312,12 @@
                 onkeyup="filterTable('tradesTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTrades()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
+            <button class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
+              <span class="action-icon">➕</span> הוסף
+            </button>
+            <button class="refresh-btn" onclick="loadTrades()" title="רענן טבלה">
+              <span class="action-icon">🔄</span> רענן
+            </button>
             <button class="filter-toggle-btn" onclick="toggleTradesSection()" title="הצג/הסתר טבלת טריידים">
               <span class="filter-icon">▲</span>
             </button>
@@ -619,8 +772,8 @@
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="editAccountName" class="form-label">שם החשבון *</label>
-                <input type="text" class="form-control" id="editAccountName" required>
-              </div>
+                  <input type="text" class="form-control" id="editAccountName" required>
+                </div>
               <div class="col-md-6 mb-3">
                 <label for="editAccountCurrency" class="form-label">מטבע *</label>
                 <select class="form-select" id="editAccountCurrency" required>
@@ -628,25 +781,25 @@
                   <option value="ILS">שקל ישראלי (ILS)</option>
                   <option value="USD">דולר אמריקאי (USD)</option>
                   <option value="EUR">אירו (EUR)</option>
-                </select>
+                  </select>
+                </div>
               </div>
-            </div>
             
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label for="editAccountStatus" class="form-label">סטטוס</label>
+                  <label for="editAccountStatus" class="form-label">סטטוס</label>
                 <select class="form-select" id="editAccountStatus">
                   <option value="פתוח">פתוח</option>
                   <option value="סגור">סגור</option>
                   <option value="מבוטל">מבוטל</option>
-                </select>
-              </div>
+                  </select>
+                </div>
               <div class="col-md-6 mb-3">
-                <label for="editAccountCashBalance" class="form-label">יתרת מזומן</label>
+                  <label for="editAccountCashBalance" class="form-label">יתרת מזומן</label>
                 <input type="number" class="form-control" id="editAccountCashBalance" step="0.01" placeholder="0.00">
                 <small class="form-text text-muted">יתרת המזומן בחשבון</small>
+                </div>
               </div>
-            </div>
             
             <!-- שדות פיננסיים -->
             <div class="row">
@@ -654,7 +807,7 @@
                 <label for="editAccountTotalValue" class="form-label">שווי כולל</label>
                 <input type="number" class="form-control" id="editAccountTotalValue" step="0.01" placeholder="0.00">
                 <small class="form-text text-muted">השווי הכולל של החשבון</small>
-              </div>
+            </div>
               <div class="col-md-6 mb-3">
                 <label for="editAccountTotalPl" class="form-label">רווח/הפסד כולל</label>
                 <input type="number" class="form-control" id="editAccountTotalPl" step="0.01" placeholder="0.00">
@@ -671,7 +824,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveRecord('accounts')">שמור שינויים</button>
+                      <button type="button" class="btn btn-secondary" onclick="saveRecord('accounts')" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -745,7 +898,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="updateTickerFromModal()">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="updateTickerFromModal()" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -818,7 +971,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="saveTicker()">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="saveTicker()" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -878,7 +1031,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveRecord('trades')">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="saveRecord('trades')" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -953,7 +1106,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveRecord('trade_plans')">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="saveRecord('trade_plans')" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -1005,7 +1158,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveRecord('users')">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="saveRecord('users')" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -1062,7 +1215,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveRecord('user_roles')">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="saveRecord('user_roles')" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -1140,7 +1293,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="updateAlertFromModal()">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="updateAlertFromModal()" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -1217,7 +1370,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="saveAlert()">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="saveAlert()" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -1274,7 +1427,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveRecord('cash_flows')">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="saveRecord('cash_flows')" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -1331,7 +1484,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveRecord('notes')">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="saveRecord('notes')" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -1408,7 +1561,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="updateExecutionFromModal()">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="updateExecutionFromModal()" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -1484,7 +1637,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="saveExecution()">שמור</button>
+                      <button type="button" class="btn btn-secondary" onclick="saveExecution()" title="שמור">💾</button>
         </div>
       </div>
     </div>
@@ -1604,10 +1757,7 @@
       modal.show();
     }
 
-    function showAddTradeModal() {
-      // TODO: Implement add trade modal
-      alert('פונקציית הוספת טרייד תתווסף בקרוב');
-    }
+    // showAddTradeModal מוגדרת בקובץ trades.js
 
     function showAddTradePlanModal() {
       // TODO: Implement add trade plan modal
@@ -1731,13 +1881,13 @@
         // יצירת תוכן הטבלה
         const tableRows = openTrades.map(trade => {
           const symbol = tickerMap[trade.ticker_id] || trade.ticker_id;
-          const openDate = window.formatDateTime(trade.opened_at);
+          const openDate = window.formatDateTime(trade.created_at);
           return `
             <tr>
               <td>${symbol}</td>
               <td>${openDate}</td>
               <td>${trade.id}</td>
-            </tr>
+          </tr>
           `;
         }).join('');
         
@@ -1787,18 +1937,19 @@
         tbody.innerHTML = trades.map(trade => `
           <tr>
             <td>${trade.id}</td>
-            <td>${trade.account_id || '-'}</td>
-            <td>${trade.ticker_id || '-'}</td>
-            <td>${trade.trade_plan_id || '-'}</td>
+            <td>${trade.account_name || `חשבון ${trade.account_id}` || '-'}</td>
+            <td>${trade.ticker_symbol || `טיקר ${trade.ticker_id}` || '-'}</td>
+            <td>${trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-'}</td>
             <td>${trade.status || '-'}</td>
             <td>${trade.type || '-'}</td>
-            <td>${window.formatDateTime(trade.opened_at)}</td>
+            <td>${window.formatDateTime(trade.created_at)}</td>
             <td>${window.formatDateTime(trade.closed_at)}</td>
             <td>${window.formatCurrency(trade.total_pl)}</td>
             <td>${trade.notes || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editRecord('trades', ${trade.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteRecord('trades', ${trade.id})">מחק</button>
+              <button class="btn btn-sm btn-secondary" onclick="editTradeRecord('${trade.id}')" title="ערוך">✏️</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelTradeRecord('${trade.id}')" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteTradeRecord('${trade.id}')" title="מחק">🗑️</button>
             </td>
           </tr>
         `).join('');
@@ -1815,7 +1966,7 @@
     async function loadTradePlans() {
       try {
         console.log('🔄 טוען תוכניות טרייד...');
-        const response = await window.apiCall('/api/v1/tradeplans/');
+        const response = await window.apiCall('/api/v1/trade_plans/');
         console.log('📊 תגובה מה-API:', response);
         const plans = response.data || response; // השרת מחזיר מערך ישירות
         console.log('📊 תוכניות טרייד:', plans);
@@ -1841,8 +1992,9 @@
             <td>${window.formatDateTime(plan.canceled_at)}</td>
             <td>${plan.cancel_reason || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editRecord('trade_plans', ${plan.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteRecord('trade_plans', ${plan.id})">מחק</button>
+              <button class="btn btn-sm btn-secondary" onclick="editRecord('trade_plans', ${plan.id})" title="ערוך">✏️</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('trade_plans', ${plan.id})" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('trade_plans', ${plan.id})" title="מחק">🗑️</button>
             </td>
           </tr>
         `).join('');
@@ -1891,30 +2043,30 @@
     }
 
     function updateAlertsTable(alerts) {
-      const tbody = document.querySelector('#alertsTable tbody');
-      tbody.innerHTML = alerts.map(alert => `
-        <tr>
-          <td>${alert.id}</td>
-          <td>${alert.account_id || '-'}</td>
-          <td>${alert.ticker_id || '-'}</td>
+        const tbody = document.querySelector('#alertsTable tbody');
+        tbody.innerHTML = alerts.map(alert => `
+          <tr>
+            <td>${alert.id}</td>
+            <td>${alert.account_id || '-'}</td>
+            <td>${alert.ticker_id || '-'}</td>
           <td>${alert.type || '-'}</td>
           <td>${alert.condition || '-'}</td>
-          <td>${alert.message || '-'}</td>
+            <td>${alert.message || '-'}</td>
           <td>${window.convertAlertStatusToHebrew(alert.status)}</td>
           <td>${window.convertIsTriggeredToHebrew(alert.is_triggered)}</td>
           <td>${window.formatDateTime(alert.triggered_at)}</td>
           <td>
-            <button class="btn btn-sm btn-primary" onclick="showEditAlertModal(${JSON.stringify(alert).replace(/"/g, '&quot;')})">ערוך</button>
-            <button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id}, '${alert.type}')">ביטול</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id}, '${alert.type}')">מחק</button>
+            <button class="btn btn-sm btn-secondary" onclick="showEditAlertModal(${JSON.stringify(alert).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
+                          <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id}, '${alert.type}')" title="ביטול">❌</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id}, '${alert.type}')" title="מחק">🗑️</button>
             <button class="btn btn-sm btn-info" onclick="markAlertAsTriggered(${alert.id})" title="סמן כמופעלת">🔔</button>
             <button class="btn btn-sm btn-success" onclick="markAlertAsRead(${alert.id})" title="סמן כנקראה">📖</button>
-          </td>
-        </tr>
-      `).join('');
-      
-      // עדכון ספירת רשומות
-      document.getElementById('alertsCount').textContent = `${alerts.length} התראות`;
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('alertsCount').textContent = `${alerts.length} התראות`;
     }
 
 
@@ -1952,8 +2104,8 @@
             <td>${cf.description || '-'}</td>
             <td>${window.formatDateTime(cf.created_at)}</td>
             <td>
-              <button class="btn btn-sm btn-primary" onclick="editRecord('cash_flows', ${cf.id})">ערוך</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteRecord('cash_flows', ${cf.id})">מחק</button>
+              <button class="btn btn-sm btn-secondary" onclick="editRecord('cash_flows', ${cf.id})" title="ערוך">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('cash_flows', ${cf.id})" title="מחק">🗑️</button>
             </td>
           </tr>
         `).join('');
@@ -1993,7 +2145,7 @@
       try {
         console.log('🔄 טוען הערות...');
         const notes = await window.loadNotesData();
-        window.updateNotesTable(notes);
+        window.updateNotesTableDatabase(notes);
         
       } catch (error) {
         console.error('❌ שגיאה בטעינת הערות:', error);
@@ -2031,27 +2183,27 @@
     }
 
     function updateExecutionsTable(executions) {
-      const tbody = document.querySelector('#executionsTable tbody');
-      tbody.innerHTML = executions.map(execution => `
-        <tr>
-          <td>${execution.id}</td>
-          <td>${execution.trade_id || '-'}</td>
+        const tbody = document.querySelector('#executionsTable tbody');
+        tbody.innerHTML = executions.map(execution => `
+          <tr>
+            <td>${execution.id}</td>
+            <td>${execution.trade_id || '-'}</td>
           <td>${window.convertExecutionActionToHebrew(execution.action)}</td>
           <td>${window.formatDateTime(execution.date)}</td>
-          <td>${execution.quantity || '-'}</td>
+            <td>${execution.quantity || '-'}</td>
           <td>${window.formatCurrency(execution.price)}</td>
           <td>${window.formatCurrency(execution.fee)}</td>
-          <td>${execution.source || '-'}</td>
-          <td>
-            <button class="btn btn-sm btn-primary" onclick="showEditExecutionModal(${JSON.stringify(execution).replace(/"/g, '&quot;')})" title="ערוך ביצוע">ערוך</button>
-            <button class="btn btn-sm btn-warning" onclick="cancelExecution(${execution.id}, '${execution.action}')" title="בטל ביצוע">ביטול</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id}, '${execution.action}')" title="מחק ביצוע">מחק</button>
-          </td>
-        </tr>
-      `).join('');
-      
-      // עדכון ספירת רשומות
-      document.getElementById('executionsCount').textContent = `${executions.length} ביצועים`;
+            <td>${execution.source || '-'}</td>
+            <td>
+            <button class="btn btn-sm btn-secondary" onclick="showEditExecutionModal(${JSON.stringify(execution).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
+            <button class="btn btn-sm btn-secondary" onclick="cancelExecution(${execution.id}, '${execution.action}')" title="ביטול">❌</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id}, '${execution.action}')" title="מחק">🗑️</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        // עדכון ספירת רשומות
+        document.getElementById('executionsCount').textContent = `${executions.length} ביצועים`;
     }
 
     function updateExecutionsStats(stats) {
@@ -2370,20 +2522,26 @@
 
     // הגדרת פונקציות גלובליות לעריכה ומחיקה
     // הפונקציות מוגדרות בקובץ grid-table.js
-    // אם הן לא קיימות, נגדיר fallback
-    if (!window.editRecord) {
-      window.editRecord = function(tableType, recordId) {
-        console.log(`🔧 editRecord fallback: עריכת ${tableType} עם מזהה ${recordId}`);
-        alert('פונקציית העריכה לא זמינה');
-      };
-    } else {
-      console.log('✅ editRecord function found and available');
-    }
+    console.log('✅ editRecord function available:', typeof window.editRecord);
+    console.log('✅ deleteRecord function available:', typeof window.deleteRecord);
 
-    if (!window.deleteRecord) {
-      window.deleteRecord = function(tableType, recordId) {
-        console.log(`מחיקת ${tableType} עם מזהה ${recordId}`);
-        alert('פונקציית המחיקה לא זמינה');
+    if (!window.cancelRecord) {
+      window.cancelRecord = function(tableType, recordId) {
+        console.log(`ביטול ${tableType} עם מזהה ${recordId}`);
+        
+        if (tableType === 'trades') {
+          // ביטול טרייד - שינוי סטטוס לבוטל
+          if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
+            cancelTrade(recordId);
+          }
+        } else if (tableType === 'trade_plans') {
+          // ביטול תוכנית טרייד - שינוי סטטוס לבוטל
+          if (confirm('האם אתה בטוח שברצונך לבטל תוכנית טרייד זו?')) {
+            cancelTradePlan(recordId);
+          }
+        } else {
+          alert('ביטול לא נתמך עבור סוג זה של רשומה');
+        }
       };
     }
 
@@ -2394,8 +2552,57 @@
       };
     }
 
-    // הגדרת פונקציית API כ-global
+    // פונקציות ביטול
+    async function cancelTrade(tradeId) {
+      try {
+        console.log(`ביטול טרייד ${tradeId}`);
+        
+        // קריאה ל-API לביטול הטרייד
+        const response = await window.apiCall(`/api/v1/trades/${tradeId}/cancel`, 'PUT');
+        
+        if (response.success) {
+          console.log('✅ טרייד בוטל בהצלחה');
+          // רענון הטבלה
+          loadTrades();
+          alert('טרייד בוטל בהצלחה');
+        } else {
+          console.error('❌ שגיאה בביטול טרייד:', response);
+          alert('שגיאה בביטול טרייד');
+        }
+      } catch (error) {
+        console.error('❌ שגיאה בביטול טרייד:', error);
+        alert('שגיאה בביטול טרייד');
+      }
+    }
+
+    async function cancelTradePlan(planId) {
+      try {
+        console.log(`ביטול תוכנית טרייד ${planId}`);
+        
+        // קריאה ל-API לביטול תוכנית הטרייד
+        const response = await window.apiCall(`/api/v1/trade_plans/${planId}/cancel`, 'PUT');
+        
+        if (response.success) {
+          console.log('✅ תוכנית טרייד בוטלה בהצלחה');
+          // רענון הטבלה
+          loadTradePlans();
+          alert('תוכנית טרייד בוטלה בהצלחה');
+        } else {
+          console.error('❌ שגיאה בביטול תוכנית טרייד:', response);
+          alert('שגיאה בביטול תוכנית טרייד');
+        }
+      } catch (error) {
+        console.error('❌ שגיאה בביטול תוכנית טרייד:', error);
+        alert('שגיאה בביטול תוכנית טרייד');
+      }
+    }
+
+    // הגדרת פונקציות גלובליות
     window.apiCall = apiCall;
+    window.cancelTrade = cancelTrade;
+    window.cancelTradePlan = cancelTradePlan;
+    window.loadTrades = loadTrades;
+    window.loadTradePlans = loadTradePlans;
     
     // בדיקה שהפונקציות זמינות
     console.log('🔍 בדיקת זמינות פונקציות בסוף:', {
@@ -2409,153 +2616,184 @@
     console.log('בדיקת פונקציות בסוף:', {
       editRecord: typeof window.editRecord,
       deleteRecord: typeof window.deleteRecord,
+      cancelRecord: typeof window.cancelRecord,
       saveRecord: typeof window.saveRecord,
-      apiCall: typeof window.apiCall
+      apiCall: typeof window.apiCall,
+      cancelTrade: typeof window.cancelTrade,
+      cancelTradePlan: typeof window.cancelTradePlan
     });
 
-    // Warning Modal
-    const warningModalHTML = `
-      <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              <h5 class="modal-title" id="warningModalTitle">אזהרה</h5>
-            </div>
-            <div class="modal-body" id="warningModalBody">
-              <!-- תוכן האזהרה יוכנס כאן -->
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // הוספת המודל לדף
-    document.body.insertAdjacentHTML('beforeend', warningModalHTML);
-
-    // Add Note Modal
-    const addNoteModalHTML = `
-      <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              <h5 class="modal-title" id="addNoteModalLabel">הוסף הערה חדשה</h5>
-            </div>
-            <div class="modal-body">
-              <form id="addNoteForm">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="noteContent" class="form-label">תוכן (Content)</label>
-                      <textarea class="form-control" id="noteContent" rows="4" required></textarea>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="noteAccountId" class="form-label">מזהה חשבון (Account ID)</label>
-                      <input type="number" class="form-control" id="noteAccountId">
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="noteTradeId" class="form-label">מזהה טרייד (Trade ID)</label>
-                      <input type="number" class="form-control" id="noteTradeId">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="noteTradePlanId" class="form-label">מזהה תוכנית טרייד (Trade Plan ID)</label>
-                      <input type="number" class="form-control" id="noteTradePlanId">
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="noteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
-                      <input type="text" class="form-control" id="noteAttachment">
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" onclick="saveNote()">שמור</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Edit Note Modal
-    const editNoteModalHTML = `
-      <div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              <h5 class="modal-title" id="editNoteModalLabel">עריכת הערה</h5>
-            </div>
-            <div class="modal-body">
-              <form id="editNoteForm">
-                <input type="hidden" id="editNoteId">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="editNoteContent" class="form-label">תוכן (Content)</label>
-                      <textarea class="form-control" id="editNoteContent" rows="4" required></textarea>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="editNoteAccountId" class="form-label">מזהה חשבון (Account ID)</label>
-                      <input type="number" class="form-control" id="editNoteAccountId">
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="editNoteTradeId" class="form-label">מזהה טרייד (Trade ID)</label>
-                      <input type="number" class="form-control" id="editNoteTradeId">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="editNoteTradePlanId" class="form-label">מזהה תוכנית טרייד (Trade Plan ID)</label>
-                      <input type="number" class="form-control" id="editNoteTradePlanId">
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="editNoteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
-                      <input type="text" class="form-control" id="editNoteAttachment">
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" onclick="updateNoteFromModal()">שמור</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // הוספת המודלים לדף
-    document.body.insertAdjacentHTML('beforeend', addNoteModalHTML);
-    document.body.insertAdjacentHTML('beforeend', editNoteModalHTML);
+    // המודלים מוגדרים כעת בתחילת הדף - אין צורך ליצור אותם דינמית
 
   </script>
+
+  <!-- מודל עריכת טרייד -->
+  <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editTradeModalLabel">עריכת טרייד</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editTradeForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradeId" class="form-label">מזהה</label>
+                  <div class="form-control-plaintext" id="editTradeIdDisplay"></div>
+                  <input type="hidden" id="editTradeId">
+                </div>
+                <div class="mb-3">
+                  <label for="editTradeAccountId" class="form-label">חשבון</label>
+                  <select class="form-select" id="editTradeAccountId" required>
+                    <option value="">בחר חשבון</option>
+                    <option value="1">חשבון 1</option>
+                    <option value="2">חשבון 2</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="editTradeTickerId" class="form-label">טיקר</label>
+                  <select class="form-select" id="editTradeTickerId" required>
+                    <option value="">בחר טיקר</option>
+                    <option value="1">AAPL</option>
+                    <option value="2">GOOGL</option>
+                    <option value="3">TSLA</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="editTradeTradePlanId" class="form-label">תוכנית טרייד</label>
+                  <select class="form-select" id="editTradeTradePlanId">
+                    <option value="">ללא תוכנית</option>
+                    <option value="1">תוכנית 1</option>
+                    <option value="2">תוכנית 2</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradeStatus" class="form-label">סטטוס</label>
+                  <select class="form-select" id="editTradeStatus" required>
+                    <option value="open">פתוח</option>
+                    <option value="closed">סגור</option>
+                    <option value="cancelled">מבוטל</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="editTradeType" class="form-label">סוג</label>
+                  <select class="form-select" id="editTradeType" required>
+                    <option value="swing">סווינג</option>
+                    <option value="investment">השקעה</option>
+                    <option value="passive">פאסיבי</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="editTradeOpenedAt" class="form-label">תאריך פתיחה</label>
+                  <input type="datetime-local" class="form-control" id="editTradeOpenedAt">
+                </div>
+                <div class="mb-3">
+                  <label for="editTradeClosedAt" class="form-label">תאריך סגירה</label>
+                  <input type="datetime-local" class="form-control" id="editTradeClosedAt">
+                </div>
+                <div class="mb-3">
+                  <label for="editTradeTotalPl" class="form-label">רווח/הפסד</label>
+                  <input type="number" step="0.01" class="form-control" id="editTradeTotalPl">
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editTradeNotes" class="form-label">הערות</label>
+              <textarea class="form-control" id="editTradeNotes" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveTradeRecord()">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודל הוספת טרייד -->
+  <div class="modal fade" id="addTradeModal" tabindex="-1" aria-labelledby="addTradeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addTradeModalLabel">הוספת טרייד חדש</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addTradeForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradeAccountId" class="form-label">חשבון</label>
+                  <select class="form-select" id="addTradeAccountId" required>
+                    <option value="">בחר חשבון</option>
+                    <option value="1">חשבון 1</option>
+                    <option value="2">חשבון 2</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="addTradeTickerId" class="form-label">טיקר</label>
+                  <select class="form-select" id="addTradeTickerId" required>
+                    <option value="">בחר טיקר</option>
+                    <option value="1">AAPL</option>
+                    <option value="2">GOOGL</option>
+                    <option value="2">TSLA</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="addTradeTradePlanId" class="form-label">תוכנית טרייד</label>
+                  <select class="form-select" id="addTradeTradePlanId">
+                    <option value="">ללא תוכנית</option>
+                    <option value="1">תוכנית 1</option>
+                    <option value="2">תוכנית 2</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradeStatus" class="form-label">סטטוס</label>
+                  <select class="form-select" id="addTradeStatus" required>
+                    <option value="open">פתוח</option>
+                    <option value="closed">סגור</option>
+                    <option value="cancelled">מבוטל</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="addTradeType" class="form-label">סוג</label>
+                  <select class="form-select" id="addTradeType" required>
+                    <option value="swing">סווינג</option>
+                    <option value="investment">השקעה</option>
+                    <option value="passive">פאסיבי</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="addTradeOpenedAt" class="form-label">תאריך פתיחה</label>
+                  <input type="datetime-local" class="form-control" id="addTradeOpenedAt">
+                </div>
+                <div class="mb-3">
+                  <label for="addTradeClosedAt" class="form-label">תאריך סגירה</label>
+                  <input type="datetime-local" class="form-control" id="addTradeClosedAt">
+                </div>
+
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="addTradeNotes" class="form-label">הערות</label>
+              <textarea class="form-control" id="addTradeNotes" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveNewTradeRecord()">הוסף</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
 

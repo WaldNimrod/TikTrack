@@ -1,3 +1,18 @@
+/* ===== סגנונות טבלאות וגרידים ===== */
+/*
+ * קובץ זה מכיל את כל הסגנונות הקשורים לטבלאות נתונים וגרידים
+ * כולל data tables, sortable headers, status badges ו-modals
+ * 
+ * תכולת הקובץ:
+ * - data tables: טבלאות נתונים עם מיון ופילטרים
+ * - sortable headers: כותרות למיון עם אייקונים
+ * - status badges: תגיות סטטוס צבעוניות
+ * - modals: חלונות קופצים לעריכה והוספה
+ * - responsive design: התאמה למסכים שונים
+ * 
+ * היררכיה: נטען רביעי, סגנונות ייעודיים לטבלאות
+ */
+
 /* סגנונות לדף גריד טבלה */
 
 
@@ -326,21 +341,98 @@
 }
 
 .status-badge.status-open {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(67, 160, 71, 0.15) 100%) !important;
+  color: #2e7d32 !important;
+  border: 1px solid rgba(76, 175, 80, 0.3) !important;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15) !important;
+}
+
+.status-badge.status-closed {
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(30, 136, 229, 0.15) 100%) !important;
+  color: #1565c0 !important;
+  border: 1px solid rgba(33, 150, 243, 0.3) !important;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15) !important;
+}
+
+.status-badge.status-canceled {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 143, 0, 0.15) 100%) !important;
+  color: #ef6c00 !important;
+  border: 1px solid rgba(255, 152, 0, 0.3) !important;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15) !important;
+}
+
+.status-badge.status-cancelled {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 143, 0, 0.15) 100%) !important;
+  color: #ef6c00 !important;
+  border: 1px solid rgba(255, 152, 0, 0.3) !important;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15) !important;
+}
+
+/* תגיות חשיבות */
+.priority-badge {
+  padding: 0.5rem 1rem !important;
+  border-radius: 20px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  display: inline-block !important;
+}
+
+.priority-badge::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent) !important;
+  transition: left 0.5s ease !important;
+}
+
+.priority-badge:hover::before {
+  left: 100% !important;
+}
+
+.priority-badge.priority-high {
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(229, 57, 53, 0.2) 100%) !important;
+  color: #d32f2f !important;
+  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.1) !important;
+}
+
+.priority-badge.priority-medium {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) !important;
+  color: #f57c00 !important;
+  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) !important;
+}
+
+.priority-badge.priority-low {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) !important;
+  color: #388e3c !important;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) !important;
+}
+
+/* תגיות סטטוס נוספות להערות */
+.status-badge.status-active {
   background: linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(66, 165, 245, 0.2) 100%) !important;
   color: #1976d2 !important;
   box-shadow: 0 2px 6px rgba(100, 181, 246, 0.1) !important;
 }
 
-.status-badge.status-closed {
-  background: linear-gradient(135deg, rgba(149, 117, 205, 0.2) 0%, rgba(126, 87, 194, 0.2) 100%) !important;
-  color: #512da8 !important;
-  box-shadow: 0 2px 6px rgba(149, 117, 205, 0.1) !important;
+.status-badge.status-completed {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) !important;
+  color: #388e3c !important;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) !important;
 }
 
-.status-badge.status-canceled {
-  background: linear-gradient(135deg, rgba(255, 183, 77, 0.2) 0%, rgba(255, 167, 38, 0.2) 100%) !important;
-  color: #f57c00 !important;
-  box-shadow: 0 2px 6px rgba(255, 183, 77, 0.1) !important;
+.status-badge.status-archived {
+  background: linear-gradient(135deg, rgba(158, 158, 158, 0.2) 0%, rgba(117, 117, 117, 0.2) 100%) !important;
+  color: #616161 !important;
+  box-shadow: 0 2px 6px rgba(158, 158, 158, 0.1) !important;
 }
 
 /* תאי פעולות - משתמשים בסגנונות הגלובליים של הטבלה */
@@ -659,6 +751,8 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
   transition: height 0.3s ease;
   overflow: hidden;
 }
+
+.content-section {
   transition: opacity 0.3s ease;
 }
 
@@ -707,9 +801,7 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
   color: #FF3B30;
 }
 
-
-
-
+.badge-category.טכנולוגיה {
   background-color: #e8f5e8; 
   color: #2e7d32; 
   border-color: #c8e6c9;
@@ -807,9 +899,13 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
 
 /* .status-dot - הועבר ל-styles.css */
 
+.stats-container {
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .stats-item {
   display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

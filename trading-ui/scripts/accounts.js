@@ -1,4 +1,20 @@
 /* ===== מערכת ניהול חשבונות ===== */
+/*
+ * קובץ זה מכיל את כל הפונקציות הקשורות לניהול חשבונות
+ * כולל טעינת נתונים, עדכון טבלאות, מודלים ופעולות CRUD
+ * 
+ * תכולת הקובץ:
+ * - loadAccountsFromServer: טעינת חשבונות מהשרת
+ * - updateAccountsTable: עדכון טבלת חשבונות
+ * - showAddAccountModal: הצגת מודל הוספת חשבון
+ * - createAccount: יצירת חשבון חדש
+ * - updateAccountFromModal: עדכון חשבון קיים
+ * - deleteAccount: מחיקת חשבון
+ * 
+ * שימוש: נטען בדפים שצריכים ניהול חשבונות
+ * תלויות: Bootstrap (למודלים), fetch API
+ */
+
 // קובץ ייעודי לניהול חשבונות - נטען רק בדפים שצריכים חשבונות
 
 // משתנים גלובליים לחשבונות
@@ -42,7 +58,7 @@ async function loadAccountsFromServer() {
       loadDefaultAccounts();
     }
     
-  } catch (error) {
+    } catch (error) {
     console.log('🔄 Error loading accounts from server:', error);
     loadDefaultAccounts();
   }
@@ -157,10 +173,10 @@ async function loadAccountsData() {
     const accounts = response.data || response;
     console.log('📊 חשבונות שהתקבלו:', accounts);
     return accounts;
-  } catch (error) {
+    } catch (error) {
     console.error('❌ שגיאה בטעינת נתוני חשבונות:', error);
-    throw error;
-  }
+        throw error;
+    }
 }
 
 /**
@@ -192,9 +208,9 @@ function updateAccountsTable(accounts) {
       <td>${window.formatCurrency(account.total_pl)}</td>
       <td>${account.notes || '-'}</td>
       <td>
-        <button class="btn btn-sm btn-primary" onclick="showEditAccountModal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך חשבון">ערוך</button>
-        <button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id}, '${account.name}')" title="בטל חשבון">ביטול</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק חשבון">מחק</button>
+        <button class="btn btn-sm btn-secondary" onclick="showEditAccountModal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
+        <button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">❌</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק">🗑️</button>
       </td>
     </tr>
   `).join('');
@@ -222,6 +238,82 @@ function updateAccountsTable(accounts) {
   console.log('✅ טבלת חשבונות עודכנה בהצלחה');
 }
 
+/**
+ * פונקציה לטעינת חשבונות - מתאימה לעבוד עם designs.html
+ * הפונקציה טוענת נתונים ומעדכנת את הטבלה
+ */
+async function loadAccounts() {
+  try {
+    console.log('🔄 טוען חשבונות...');
+    
+    const accounts = await window.loadAccountsData();
+    updateAccountsTableInDesigns(accounts);
+    
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת חשבונות:', error);
+    const tbody = document.querySelector('.content-section:nth-child(2) tbody');
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת חשבונות: ${error.message}</td></tr>`;
+    }
+    
+    const countElement = document.querySelector('.content-section:nth-child(2) .table-count');
+    if (countElement) {
+      countElement.textContent = 'שגיאה';
+    }
+    }
+}
+
+/**
+ * עדכון טבלת חשבונות בדף designs.html
+ * הפונקציה מעדכנת את הטבלה השנייה (חשבונות) בדף designs.html
+ * 
+ * @param {Array} accounts - מערך של חשבונות
+ */
+function updateAccountsTableInDesigns(accounts) {
+  console.log('🔄 מעדכן טבלת חשבונות ב-designs.html עם', accounts.length, 'חשבונות');
+  
+  // מציאת הטבלה השנייה (חשבונות) בדף designs.html
+  const contentSections = document.querySelectorAll('.content-section');
+  const accountsSection = contentSections[1]; // הטבלה השנייה
+  
+  if (!accountsSection) {
+    console.error('❌ לא נמצאה טבלת חשבונות בדף designs.html');
+    return;
+  }
+  
+  const tbody = accountsSection.querySelector('tbody');
+  if (!tbody) {
+    console.error('❌ לא נמצא tbody לטבלת חשבונות');
+    return;
+  }
+  
+  tbody.innerHTML = accounts.map(account => `
+    <tr>
+      <td>${account.id}</td>
+      <td>${account.name || '-'}</td>
+      <td>${account.currency || '-'}</td>
+      <td>${window.convertAccountStatusToHebrew ? window.convertAccountStatusToHebrew(account.status) : (account.status || '-')}</td>
+      <td>${window.formatCurrency ? window.formatCurrency(account.cash_balance) : (account.cash_balance || '-')}</td>
+      <td>${window.formatCurrency ? window.formatCurrency(account.total_value) : (account.total_value || '-')}</td>
+      <td>${window.formatCurrency ? window.formatCurrency(account.total_pl) : (account.total_pl || '-')}</td>
+      <td>${account.notes || '-'}</td>
+      <td>
+        <button class="btn btn-sm btn-secondary" onclick="showEditAccountModal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
+        <button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">❌</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+  
+  // עדכון ספירת רשומות
+  const countElement = accountsSection.querySelector('.table-count');
+  if (countElement) {
+    countElement.textContent = `${accounts.length} חשבונות`;
+  }
+  
+  console.log('✅ טבלת חשבונות ב-designs.html עודכנה בהצלחה');
+}
+
 // ייצוא הפונקציות לשימוש גלובלי
 window.loadAccountsFromServer = loadAccountsFromServer;
 window.loadDefaultAccounts = loadDefaultAccounts;
@@ -231,5 +323,312 @@ window.getAccounts = getAccounts;
 window.isAccountsLoaded = isAccountsLoaded;
 window.loadAccountsData = loadAccountsData;
 window.updateAccountsTable = updateAccountsTable;
+window.loadAccounts = loadAccounts;
+window.updateAccountsTableInDesigns = updateAccountsTableInDesigns;
 
 console.log('✅ קובץ accounts.js נטען בהצלחה - פונקציות זמינות גלובלית');
+
+// ===== פונקציות נוספות לניהול חשבונות =====
+
+/**
+ * הצגת מודל הוספת חשבון
+ */
+function showAddAccountModal() {
+  console.log('🔄 הצגת מודל הוספת חשבון');
+    
+  // בדיקה אם יש מודל קיים בדף
+  const modalElement = document.getElementById('addAccountModal');
+  if (modalElement) {
+    // איפוס הטופס
+    const form = document.getElementById('addAccountForm');
+    if (form) {
+        form.reset();
+    }
+    
+    // הצגת המודל
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  } else {
+    // אם אין מודל, הצגת הודעה זמנית
+    alert('פונקציית הוספת חשבון תתווסף בקרוב');
+  }
+}
+
+/**
+ * הצגת מודל עריכת חשבון
+ * @param {Object} account - אובייקט החשבון לעריכה
+ */
+function showEditAccountModal(account) {
+  console.log('🔄 הצגת מודל עריכת חשבון:', account);
+    
+  // בדיקה אם יש מודל קיים בדף
+  const modalElement = document.getElementById('editAccountModal');
+  if (modalElement) {
+    // מילוי השדות
+    document.getElementById('editAccountId').value = account.id;
+    document.getElementById('editAccountName').value = account.name;
+    document.getElementById('editAccountCurrency').value = account.currency;
+    
+    // תיקון סטטוס - המרה מ-active/active ל-פתוח/סגור
+    let statusValue = 'פתוח';
+    if (account.status === 'active' || account.status === 'פעיל') {
+      statusValue = 'פתוח';
+    } else if (account.status === 'inactive' || account.status === 'לא פעיל' || account.status === 'סגור') {
+      statusValue = 'סגור';
+    } else {
+      statusValue = account.status || 'פתוח';
+    }
+    document.getElementById('editAccountStatus').value = statusValue;
+    
+    document.getElementById('editAccountCashBalance').value = account.cash_balance || '';
+    document.getElementById('editAccountTotalValue').value = account.total_value || '';
+    document.getElementById('editAccountTotalPl').value = account.total_pl || '';
+    document.getElementById('editAccountNotes').value = account.notes || '';
+    
+    // הצגת המודל
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  } else {
+    // אם אין מודל, הצגת הודעה זמנית
+    alert('פונקציית עריכת חשבון תתווסף בקרוב');
+  }
+}
+
+/**
+ * יצירת חשבון חדש
+ */
+async function createAccount() {
+  console.log('🔄 יצירת חשבון חדש');
+  
+  const name = document.getElementById('accountName').value.trim();
+  const currency = document.getElementById('accountCurrency').value;
+  
+  // המרת סטטוס מ-פתוח/סגור ל-active/inactive
+  const statusDisplay = document.getElementById('accountStatus').value || 'פתוח';
+  let status = 'active';
+  if (statusDisplay === 'סגור') {
+    status = 'inactive';
+  }
+  
+  const cashBalance = parseFloat(document.getElementById('accountCashBalance').value) || 0;
+  const totalValue = parseFloat(document.getElementById('accountTotalValue').value) || 0;
+  const totalPl = parseFloat(document.getElementById('accountTotalPl').value) || 0;
+  const notes = document.getElementById('accountNotes').value.trim();
+  
+  if (!name || !currency) {
+    showErrorMessage('שם החשבון ומטבע הם שדות חובה');
+        return;
+    }
+    
+  try {
+    const response = await fetch('/api/v1/accounts/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name,
+        currency: currency,
+        status: status,
+        cash_balance: cashBalance,
+        total_value: totalValue,
+        total_pl: totalPl,
+        notes: notes
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showSuccessMessage('חשבון נוצר בהצלחה!');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addAccountModal'));
+            modal.hide();
+            
+      // רענון הטבלה
+      if (typeof loadAccounts === 'function') {
+        loadAccounts();
+      }
+    } else {
+      showErrorMessage(data.message || 'שגיאה ביצירת חשבון');
+        }
+    } catch (error) {
+    console.error('שגיאה ביצירת חשבון:', error);
+    showErrorMessage('שגיאה ביצירת חשבון');
+    }
+}
+
+/**
+ * עדכון חשבון קיים
+ */
+async function updateAccountFromModal() {
+  console.log('🔄 עדכון חשבון');
+  
+  const id = document.getElementById('editAccountId').value;
+  const name = document.getElementById('editAccountName').value.trim();
+  const currency = document.getElementById('editAccountCurrency').value;
+  
+  // המרת סטטוס מ-פתוח/סגור ל-active/inactive
+  const statusDisplay = document.getElementById('editAccountStatus').value || 'פתוח';
+  let status = 'active';
+  if (statusDisplay === 'סגור') {
+    status = 'inactive';
+  }
+  
+  const cashBalance = parseFloat(document.getElementById('editAccountCashBalance').value) || 0;
+  const totalValue = parseFloat(document.getElementById('editAccountTotalValue').value) || 0;
+  const totalPl = parseFloat(document.getElementById('editAccountTotalPl').value) || 0;
+  const notes = document.getElementById('editAccountNotes').value.trim();
+  
+  if (!name || !currency) {
+    showErrorMessage('שם החשבון ומטבע הם שדות חובה');
+        return;
+    }
+    
+  try {
+    const response = await fetch(`/api/v1/accounts/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name,
+        currency: currency,
+        status: status,
+        cash_balance: cashBalance,
+        total_value: totalValue,
+        total_pl: totalPl,
+        notes: notes
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showSuccessMessage('חשבון עודכן בהצלחה!');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editAccountModal'));
+            modal.hide();
+            
+      // רענון הטבלה
+      if (typeof loadAccounts === 'function') {
+        loadAccounts();
+      }
+    } else {
+      showErrorMessage(data.message || 'שגיאה בעדכון חשבון');
+        }
+    } catch (error) {
+    console.error('שגיאה בעדכון חשבון:', error);
+    showErrorMessage('שגיאה בעדכון חשבון');
+    }
+}
+
+/**
+ * ביטול חשבון
+ * @param {number} accountId - מזהה החשבון
+ * @param {string} accountName - שם החשבון
+ */
+async function cancelAccount(accountId, accountName) {
+  console.log('🔄 ביטול חשבון:', accountId, accountName);
+  
+  if (!confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/api/v1/accounts/${accountId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        status: 'inactive'
+      })
+    });
+    
+    if (response.ok) {
+      showSuccessMessage('חשבון בוטל בהצלחה!');
+      
+      // רענון הטבלה
+      if (typeof loadAccounts === 'function') {
+        loadAccounts();
+      }
+    } else {
+      showErrorMessage('שגיאה בביטול חשבון');
+        }
+    } catch (error) {
+    console.error('שגיאה בביטול חשבון:', error);
+    showErrorMessage('שגיאה בביטול חשבון');
+    }
+}
+
+/**
+ * מחיקת חשבון
+ * @param {number} accountId - מזהה החשבון
+ * @param {string} accountName - שם החשבון
+ */
+async function deleteAccount(accountId, accountName) {
+  console.log('🔄 מחיקת חשבון:', accountId, accountName);
+  
+  if (!confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"? פעולה זו אינה הפיכה.`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/api/v1/accounts/${accountId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      showSuccessMessage('חשבון נמחק בהצלחה!');
+      
+      // רענון הטבלה
+      if (typeof loadAccounts === 'function') {
+        loadAccounts();
+      }
+    } else {
+      const data = await response.json();
+      showErrorMessage(data.message || 'שגיאה במחיקת חשבון');
+    }
+  } catch (error) {
+    console.error('שגיאה במחיקת חשבון:', error);
+    showErrorMessage('שגיאה במחיקת חשבון');
+  }
+}
+
+/**
+ * הצגת הודעת הצלחה
+ * @param {string} message - הודעת ההצלחה
+ */
+function showSuccessMessage(message) {
+  console.log('✅ הצלחה:', message);
+  if (typeof window.showNotification === 'function') {
+    window.showNotification(message, 'success');
+  } else {
+    alert(message);
+  }
+}
+
+/**
+ * הצגת הודעת שגיאה
+ * @param {string} message - הודעת השגיאה
+ */
+function showErrorMessage(message) {
+  console.log('❌ שגיאה:', message);
+  if (typeof window.showNotification === 'function') {
+    window.showNotification(message, 'error');
+  } else {
+    alert(message);
+  }
+}
+
+// ייצוא הפונקציות הנוספות
+window.showAddAccountModal = showAddAccountModal;
+window.showEditAccountModal = showEditAccountModal;
+window.createAccount = createAccount;
+window.updateAccountFromModal = updateAccountFromModal;
+window.cancelAccount = cancelAccount;
+window.deleteAccount = deleteAccount;
+window.showSuccessMessage = showSuccessMessage;
+window.showErrorMessage = showErrorMessage;

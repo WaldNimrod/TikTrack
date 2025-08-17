@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
 from .base import BaseModel
 
 class Note(BaseModel):
@@ -11,10 +10,27 @@ class Note(BaseModel):
     content = Column(String(1000), nullable=False)
     attachment = Column(String(500), nullable=True)  # path to file
     
-    # יחסים
-    account = relationship("Account", back_populates="notes_rel")
-    trade = relationship("Trade", back_populates="notes_rel")
-    trade_plan = relationship("TradePlan", back_populates="notes")
-    
     def __repr__(self):
-        return f"<Note(id={self.id}, content='{self.content[:50]}...')>"
+        related_type = 'account' if self.account_id else 'trade' if self.trade_id else 'trade_plan' if self.trade_plan_id else 'none'
+        related_id = self.account_id or self.trade_id or self.trade_plan_id
+        return f"<Note(id={self.id}, related_type='{related_type}', related_id={related_id}, content='{self.content[:50]}...')>"
+    
+    def to_dict(self):
+        """המרה למילון עם תאימות לאחור"""
+        result = super().to_dict()
+        
+        # קביעת related_type ו-related_id לפי השדות הקיימים
+        if self.account_id:
+            result['related_type'] = 'account'
+            result['related_id'] = self.account_id
+        elif self.trade_id:
+            result['related_type'] = 'trade'
+            result['related_id'] = self.trade_id
+        elif self.trade_plan_id:
+            result['related_type'] = 'trade_plan'
+            result['related_id'] = self.trade_plan_id
+        else:
+            result['related_type'] = None
+            result['related_id'] = None
+        
+        return result

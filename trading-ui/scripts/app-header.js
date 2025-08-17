@@ -832,6 +832,7 @@ class AppHeader extends HTMLElement {
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="/accounts">ניהול חשבונות</a></li>
+                  <li><a class="dropdown-item" href="/notes">הערות</a></li>
                   <li><a class="dropdown-item" href="/alerts">ניהול התראות</a></li>
                   <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
                   <li><hr class="dropdown-divider"></li>
@@ -1031,8 +1032,9 @@ class AppHeader extends HTMLElement {
       this.shadowRoot.querySelector('[data-page="tracking"]')?.classList.add('active');
     } else if (currentPath === '/research') {
       this.shadowRoot.querySelector('[data-page="research"]')?.classList.add('active');
-    } else if (currentPath.includes('/accounts') || currentPath.includes('/alerts') || 
-               currentPath.includes('/database') || currentPath.includes('/preferences')) {
+    } else if (currentPath.includes('/accounts') || currentPath.includes('/notes') || 
+               currentPath.includes('/alerts') || currentPath.includes('/database') || 
+               currentPath.includes('/preferences')) {
       this.shadowRoot.querySelector('[data-page="settings"]')?.classList.add('active');
     }
   }

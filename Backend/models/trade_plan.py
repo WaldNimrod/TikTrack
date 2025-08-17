@@ -21,7 +21,7 @@ class TradePlan(BaseModel):
     account = relationship("Account", back_populates="trade_plans")
     ticker = relationship("Ticker")
     trades = relationship("Trade", back_populates="trade_plan")
-    notes = relationship("Note", back_populates="trade_plan")
+    # Notes relationship removed - notes now use related_type and related_id
     
     def __repr__(self):
         return f"<TradePlan(id={self.id}, type='{self.investment_type}')>"

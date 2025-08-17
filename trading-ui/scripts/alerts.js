@@ -1,3 +1,22 @@
+/* ===== מערכת התראות ===== */
+/*
+ * קובץ זה מכיל את כל הפונקציות הקשורות להתראות
+ * כולל טעינת התראות, הצגת כרטיסיות וניהול סטטוס
+ * 
+ * תכולת הקובץ:
+ * - loadAlertsForCards: טעינת התראות לכרטיסיות
+ * - createAlertCardHTML: יצירת HTML לכרטיסיית התראה
+ * - markAlertAsRead: סימון התראה כנקראה
+ * - refreshAlerts: רענון התראות
+ * 
+ * שימוש: נטען בדפים שצריכים הצגת התראות
+ * תלויות: fetch API, DOM manipulation
+ */
+
+// משתנים גלובליים להתראות
+window.alertsData = [];
+window.alertsLoaded = false;
+
 // ===== ALERTS MANAGEMENT =====
 // קובץ ייעודי לניהול התראות - משותף לכל הדפים
 
@@ -506,9 +525,9 @@ function updateAlertsTable(alerts) {
             <td>${convertIsTriggeredToHebrew(alert.is_triggered)}</td>
             <td>${alert.triggered_at ? window.formatDateTime(alert.triggered_at) : '-'}</td>
             <td>
-                <button class="btn btn-sm btn-primary" onclick="showEditAlertModal(${JSON.stringify(alert).replace(/"/g, '&quot;')})">ערוך</button>
-                <button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id}, '${alert.type}')">ביטול</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id}, '${alert.type}')">מחק</button>
+                            <button class="btn btn-sm btn-secondary" onclick="showEditAlertModal(${JSON.stringify(alert).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
+            <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id}, '${alert.type}')" title="ביטול">❌</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id}, '${alert.type}')" title="מחק">🗑️</button>
                 <button class="btn btn-sm btn-info" onclick="markAlertAsTriggered(${alert.id})" title="סמן כמופעלת">🔔</button>
                 <button class="btn btn-sm btn-success" onclick="markAlertAsRead(${alert.id})" title="סמן כנקראה">📖</button>
             </td>
@@ -681,8 +700,8 @@ async function loadAlertsForCards() {
 function loadSampleAlertsForCards() {
   console.log('🔄 Loading sample alerts for cards');
   
-  // יצירת התראות דוגמה עם מצבים שונים - רק 6 חדשות
-  alertsCardsData = [
+  // יצירת התראות דוגמה עם מצבים שונים - רק 2 חדשות כמו בקוד הידני
+  const alertsCardsData = [
     {
       id: 1,
       title: 'התראה על מחיר נכס',
@@ -704,53 +723,25 @@ function loadSampleAlertsForCards() {
       created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // לפני שעתיים
       is_triggered: 'new',
       alert_type: 'volume_spike'
-    },
-    {
-      id: 3,
-      title: 'התראה על תנועת מחיר',
-      message: 'MSFT עלה ב-3% במהלך השעה האחרונה',
-      ticker: 'MSFT',
-      price_change: 3.2,
-      created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // לפני 45 דקות
-      is_triggered: 'new',
-      alert_type: 'price_movement'
-    },
-    {
-      id: 4,
-      title: 'התראה על תמיכה/התנגדות',
-      message: 'GOOGL מתקרב לקו התמיכה הקריטי',
-      ticker: 'GOOGL',
-      support_level: 140.00,
-      current_price: 141.50,
-      created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // לפני 15 דקות
-      is_triggered: 'new',
-      alert_type: 'support_resistance'
-    },
-    {
-      id: 5,
-      title: 'התראה על רווח',
-      message: 'NVDA הגיע ליעד הרווח שהוגדר',
-      ticker: 'NVDA',
-      profit_target: 5.0,
-      current_profit: 5.2,
-      created_at: new Date(Date.now() - 1000 * 60 * 10).toISOString(), // לפני 10 דקות
-      is_triggered: 'new',
-      alert_type: 'profit_target'
-    },
-    {
-      id: 6,
-      title: 'התראה על הפסד',
-      message: 'AMZN הגיע לסטופ לוס שהוגדר',
-      ticker: 'AMZN',
-      stop_loss: 150.00,
-      current_price: 149.80,
-      created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(), // לפני 5 דקות
-      is_triggered: 'new',
-      alert_type: 'stop_loss'
     }
   ];
   
-  filterAndDisplayNewAlerts();
+  console.log('🔄 Sample alerts data created:', alertsCardsData);
+  
+  // עדכון מונה ההתראות
+  newAlertsCount = alertsCardsData.length;
+  updateAlertsCount();
+  
+  // הצגת הכרטיסיות עם העיצוב המלא
+  const cardsContainer = document.getElementById('alertsCards');
+  if (cardsContainer) {
+    console.log('🔄 Found alertsCards container, rendering sample alerts...');
+    const cardsHTML = alertsCardsData.map(alert => createAlertCardHTML(alert)).join('');
+    cardsContainer.innerHTML = cardsHTML;
+    console.log('🔄 Sample cards rendered successfully!');
+  } else {
+    console.log('🔄 alertsCards container NOT found!');
+  }
 }
 
 // פונקציה לסינון והצגת התראות חדשות בלבד
@@ -843,18 +834,17 @@ function createAlertCardHTML(alert) {
       </div>
       
       <div class="alert-card-content">
+        <p class="alert-card-message"><strong>${title}</strong></p>
         <p class="alert-card-message">${alert.message || alert.condition || ''}</p>
         
         <div class="alert-card-details">
           ${getAlertDetails(alert)}
-        </div>
-      </div>
-      
-      <div class="alert-card-footer">
-        <div class="alert-ticker-info">
           <span class="alert-detail-item">$${getCurrentPrice(tickerSymbol)}</span>
           <span class="alert-detail-item ${getDailyChangeClass(tickerSymbol)}">${getDailyChange(tickerSymbol)}%</span>
         </div>
+      </div>
+      
+      <div class="alert-card-footer" style="display: flex; justify-content: flex-end;">
         <button class="btn-mark-read" onclick="markAlertAsRead(${alert.id})" data-alert-id="${alert.id}">
           ✓ קראתי
         </button>
@@ -1088,6 +1078,7 @@ function refreshAlerts() {
 
 // ייצוא הפונקציות החדשות לשימוש גלובלי
 window.loadAlertsForCards = loadAlertsForCards;
+window.loadSampleAlertsForCards = loadSampleAlertsForCards;
 window.markAlertAsRead = markAlertAsRead;
 window.refreshAlerts = refreshAlerts;
 
@@ -1096,5 +1087,6 @@ console.log('✅ פונקציות כרטיסיות התראות נוספו לק�
 // בדיקה שהפונקציות זמינות
 console.log('🔄 Testing function availability:');
 console.log('🔄 loadAlertsForCards available:', typeof loadAlertsForCards);
+console.log('🔄 loadSampleAlertsForCards available:', typeof loadSampleAlertsForCards);
 console.log('🔄 markAlertAsRead available:', typeof markAlertAsRead);
 console.log('🔄 refreshAlerts available:', typeof refreshAlerts);

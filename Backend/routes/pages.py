@@ -34,6 +34,11 @@ def alerts():
     """דף התראות"""
     return send_from_directory(UI_DIR, "alerts.html")
 
+@pages_bp.route('/notes')
+def notes():
+    """דף הערות"""
+    return send_from_directory(UI_DIR, "notes.html")
+
 @pages_bp.route('/research')
 def research():
     """דף מחקר"""

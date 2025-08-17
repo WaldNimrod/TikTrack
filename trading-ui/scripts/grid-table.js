@@ -9,10 +9,18 @@ async function apiCall(endpoint, options = {}) {
     const baseUrl = 'http://127.0.0.1:8080';
     const url = `${baseUrl}${endpoint}`;
     
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers
-    };
+    // הגדרת headers
+    let headers = {};
+    
+    // אם יש FormData, לא שולח Content-Type
+    if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+    }
+    
+    // הוספת headers נוספים אם יש
+    if (options.headers) {
+        headers = { ...headers, ...options.headers };
+    }
 
     const finalOptions = { 
         ...options,
@@ -21,6 +29,8 @@ async function apiCall(endpoint, options = {}) {
 
     try {
         console.log('📡 שולח בקשה ל:', url);
+        console.log('📋 סוג body:', options.body instanceof FormData ? 'FormData' : 'JSON');
+        
         const response = await fetch(url, finalOptions);
         const data = await response.json();
         

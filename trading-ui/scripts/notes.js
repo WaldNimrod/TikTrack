@@ -101,55 +101,13 @@ function convertNoteStatusToHebrew(status) {
 function fillNoteEditModal(note) {
     console.log(`🔧 מילוי מודל עריכת הערה עם נתונים:`, note);
     
-    // בדיקה שהאלמנטים קיימים
-    const editNoteId = document.getElementById('editNoteId');
-    const editNoteContent = document.getElementById('editNoteContent');
-    const editNoteAccountId = document.getElementById('editNoteAccountId');
-    const editNoteTradeId = document.getElementById('editNoteTradeId');
-    const editNoteTradePlanId = document.getElementById('editNoteTradePlanId');
-    const editNoteAttachment = document.getElementById('editNoteAttachment');
-    
-    console.log('🔍 בדיקת אלמנטים:', {
-        editNoteId: editNoteId ? 'נמצא' : 'לא נמצא',
-        editNoteContent: editNoteContent ? 'נמצא' : 'לא נמצא',
-        editNoteAccountId: editNoteAccountId ? 'נמצא' : 'לא נמצא',
-        editNoteTradeId: editNoteTradeId ? 'נמצא' : 'לא נמצא',
-        editNoteTradePlanId: editNoteTradePlanId ? 'נמצא' : 'לא נמצא',
-        editNoteAttachment: editNoteAttachment ? 'נמצא' : 'לא נמצא'
-    });
-    
-    if (!editNoteId || !editNoteContent || !editNoteAccountId || !editNoteTradeId || !editNoteTradePlanId || !editNoteAttachment) {
-        console.error('❌ לא נמצאו כל האלמנטים הנדרשים למודל עריכת הערה');
-        return;
-    }
-    
-    // מילוי שדות הטופס עם השהייה קצרה
-    setTimeout(() => {
-        editNoteId.value = note.id;
-        editNoteContent.value = note.content || '';
-        editNoteAccountId.value = note.account_id || '';
-        editNoteTradeId.value = note.trade_id || '';
-        editNoteTradePlanId.value = note.trade_plan_id || '';
-        editNoteAttachment.value = note.attachment || '';
-        
-        // כפייה של עדכון ה-DOM
-        editNoteId.dispatchEvent(new Event('input', { bubbles: true }));
-        editNoteContent.dispatchEvent(new Event('input', { bubbles: true }));
-        editNoteAccountId.dispatchEvent(new Event('input', { bubbles: true }));
-        editNoteTradeId.dispatchEvent(new Event('input', { bubbles: true }));
-        editNoteTradePlanId.dispatchEvent(new Event('input', { bubbles: true }));
-        editNoteAttachment.dispatchEvent(new Event('input', { bubbles: true }));
-        
-        console.log('✅ מודל עריכת הערה מולא בהצלחה');
-        console.log('📝 ערכים שהוכנסו:', {
-            id: editNoteId.value,
-            content: editNoteContent.value,
-            account_id: editNoteAccountId.value,
-            trade_id: editNoteTradeId.value,
-            trade_plan_id: editNoteTradePlanId.value,
-            attachment: editNoteAttachment.value
-        });
-    }, 50);
+    // מילוי שדות הטופס
+    document.getElementById('editNoteId').value = note.id;
+    document.getElementById('editNoteContent').value = note.content || '';
+    document.getElementById('editNoteAccountId').value = note.account_id || '';
+    document.getElementById('editNoteTradeId').value = note.trade_id || '';
+    document.getElementById('editNoteTradePlanId').value = note.trade_plan_id || '';
+    document.getElementById('editNoteAttachment').value = note.attachment || '';
 }
 
 /**
@@ -360,25 +318,11 @@ function showAddNoteModal() {
 function showEditNoteModal(note) {
     console.log('✏️ מציג מודל עריכת הערה:', note);
     
-    // בדיקה שהנתונים קיימים
-    if (!note || !note.id) {
-        console.error('❌ נתונים לא תקינים למודל עריכת הערה:', note);
-        showNotification('שגיאה בטעינת נתוני ההערה', 'error');
-        return;
-    }
+    // מילוי הנתונים
+    fillNoteEditModal(note);
     
     // הצגת המודל
-    const modalElement = document.getElementById('editNoteModal');
-    const modal = new bootstrap.Modal(modalElement);
-    
-    // מילוי הנתונים כשהמודל נפתח לחלוטין
-    modalElement.addEventListener('shown.bs.modal', function fillModalData() {
-        console.log('🎯 המודל נפתח, ממלא נתונים...');
-        fillNoteEditModal(note);
-        // הסרת האירוע כדי שלא יופעל שוב
-        modalElement.removeEventListener('shown.bs.modal', fillModalData);
-    });
-    
+    const modal = new bootstrap.Modal(document.getElementById('editNoteModal'));
     modal.show();
 }
 

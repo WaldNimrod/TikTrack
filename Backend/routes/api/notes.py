@@ -196,17 +196,17 @@ def create_note():
             attachment_filename = data.get('attachment')
         
         # קביעת הקשר לפי עדיפות: trade_plan > trade > account
-        related_type = None
+        related_type_id = None
         related_id = None
         
         if trade_plan_id:
-            related_type = 'trade_plan'
+            related_type_id = 3  # trade_plan
             related_id = trade_plan_id
         elif trade_id:
-            related_type = 'trade'
+            related_type_id = 2  # trade
             related_id = trade_id
         elif account_id:
-            related_type = 'account'
+            related_type_id = 1  # account
             related_id = account_id
         else:
             return jsonify({
@@ -219,7 +219,7 @@ def create_note():
         note_data = {
             'content': content,
             'attachment': attachment_filename,
-            'related_type': related_type,
+            'related_type_id': related_type_id,
             'related_id': related_id
         }
         
@@ -310,19 +310,19 @@ def update_note(note_id: int):
                 logger.info(f"📋 JSON data - content: {content[:50]}..., trade_plan_id: {trade_plan_id}, trade_id: {trade_id}, account_id: {account_id}, attachment: {attachment_filename}")
             
             # קביעת הקשר לפי עדיפות: trade_plan > trade > account
-            related_type = None
+            related_type_id = None
             related_id = None
             
             logger.info(f"🔍 Determining relation - trade_plan_id: {trade_plan_id}, trade_id: {trade_id}, account_id: {account_id}")
             
             if trade_plan_id:
-                related_type = 'trade_plan'
+                related_type_id = 3  # trade_plan
                 related_id = trade_plan_id
             elif trade_id:
-                related_type = 'trade'
+                related_type_id = 2  # trade
                 related_id = trade_id
             elif account_id:
-                related_type = 'account'
+                related_type_id = 1  # account
                 related_id = account_id
             else:
                 logger.error("❌ No relation found")
@@ -332,7 +332,7 @@ def update_note(note_id: int):
                     "version": "v1"
                 }), 400
             
-            logger.info(f"✅ Relation determined: {related_type} -> {related_id}")
+            logger.info(f"✅ Relation determined: related_type_id={related_type_id} -> {related_id}")
             
             # עדכון השדות
             logger.info(f"📝 Updating note fields - content: {content[:50]}..., attachment: {attachment_filename}")
@@ -344,7 +344,7 @@ def update_note(note_id: int):
                     delete_uploaded_file(note.attachment)
                 note.attachment = attachment_filename
                 logger.info(f"📎 New attachment set: {attachment_filename}")
-            note.related_type = related_type
+            note.related_type_id = related_type_id
             note.related_id = related_id
             
             logger.info("💾 Committing to database...")

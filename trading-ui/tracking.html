@@ -19,12 +19,19 @@
       - top-section: כרטיסיות התראות וסיכום נתונים
       - content-section: טבלת מעקב טריידים
     
-    שינויים אחרונים:
-    - העתקת תוכן מדף עיצובים לדף מעקב טריידים
-    - הסרת טבלת חשבונות (לא נדרשת בדף מעקב)
-    - שיפור עיצוב כרטיסיות התראות
-    - תיקון כפתורי סגירה עצמאיים
-    - החלפת טבלת עיצובים בטבלת טריידים
+    עדכון: אוגוסט 2025
+    שינויים עיקריים:
+    - פיצול פונקציות טריידים לקובץ trades.js נפרד
+    - עדכון מבנה בסיס נתונים (הסרת opened_at, החלפת ב-created_at)
+    - הגבלת סוגי טריידים לשלושה: swing, invest, pasive
+    - שיפור מבנה טופסי עריכה והוספה
+    - עיצוב כפתורי שמירה עם צבע הלוגו ורקע לבן
+    - צמצום רווחים בטופסים (mb-3 -> mb-2)
+    - הוספת איקונים לכפתורי שמירה (💾)
+    
+    תלות: trades.js - פונקציות ייעודיות לטריידים
+    תלות: grid-table.js - פונקציות כלליות לטבלאות
+    תלות: alerts.js - פונקציות התראות
   -->
   
   <!-- Bootstrap CSS -->
@@ -151,7 +158,7 @@
                   <th>תוכנית<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plan ID</span></th>
                   <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
                   <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
-                  <th>נפתח ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Opened At</span></th>
+                  <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
                   <th>נסגר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Closed At</span></th>
                   <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P/L</span></th>
                   <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
@@ -625,10 +632,10 @@
             case 'swing':
               typeDisplay = 'סווינג';
               break;
-            case 'investment':
+            case 'invest':
               typeDisplay = 'השקעה';
               break;
-            case 'passive':
+            case 'pasive':
               typeDisplay = 'פאסיבי';
               break;
             default:
@@ -686,10 +693,10 @@
           case 'swing':
             typeDisplay = 'סווינג';
             break;
-          case 'investment':
+          case 'invest':
             typeDisplay = 'השקעה';
             break;
-          case 'passive':
+          case 'pasive':
             typeDisplay = 'פאסיבי';
             break;
           default:
@@ -1255,40 +1262,78 @@
         </div>
         <div class="modal-body">
           <form id="editTradeForm">
+            <!-- שורה ראשונה: תוכנית + טיקר + מחיר -->
             <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="editTradeId" class="form-label">מזהה</label>
-                  <div class="form-control-plaintext" id="editTradeIdDisplay"></div>
-                  <input type="hidden" id="editTradeId">
-                </div>
-                <div class="mb-3">
-                  <label for="editTradeAccountId" class="form-label">חשבון</label>
-                  <select class="form-select" id="editTradeAccountId" required>
-                    <option value="">בחר חשבון</option>
-                    <option value="1">חשבון 1</option>
-                    <option value="2">חשבון 2</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="editTradeTickerId" class="form-label">טיקר</label>
-                  <select class="form-select" id="editTradeTickerId" required>
-                    <option value="">בחר טיקר</option>
-                    <option value="1">AAPL</option>
-                    <option value="2">GOOGL</option>
-                    <option value="3">TSLA</option>
-                  </select>
-                </div>
-                <div class="mb-3">
+              <div class="col-md-4">
+                <div class="mb-2">
                   <label for="editTradeTradePlanId" class="form-label">תוכנית טרייד</label>
                   <select class="form-select" id="editTradeTradePlanId">
                     <option value="">ללא תוכנית</option>
-                    <option value="1">תוכנית 1</option>
-                    <option value="2">תוכנית 2</option>
                   </select>
                 </div>
               </div>
+              <div class="col-md-4">
+                <div class="mb-2">
+                  <label class="form-label">טיקר</label>
+                  <div class="form-control-plaintext" id="editTradeTickerDisplay"></div>
+                  <input type="hidden" id="editTradeTickerId">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-2">
+                  <label class="form-label">מחיר נוכחי</label>
+                  <div class="form-control-plaintext" id="editTradeCurrentPrice">$150.25</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- שורה שנייה: שינוי יומי + סוג + חשבון -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-2">
+                  <label class="form-label">שינוי יומי</label>
+                  <div class="form-control-plaintext text-success" id="editTradeDailyChange">+2.5%</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-2">
+                  <label for="editTradeType" class="form-label">סוג</label>
+                  <select class="form-select" id="editTradeType" required>
+                    <option value="swing">סווינג</option>
+                    <option value="invest">השקעה</option>
+                    <option value="pasive">פאסיבי</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-2">
+                  <label for="editTradeAccountId" class="form-label">חשבון</label>
+                  <select class="form-select" id="editTradeAccountId" required>
+                    <option value="">בחר חשבון</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <!-- שורה שלישית: תאריך יצירה + תאריך סגירה -->
+            <div class="row">
               <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradeOpenedAt" class="form-label">תאריך יצירה</label>
+                  <input type="datetime-local" class="form-control" id="editTradeOpenedAt">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradeClosedAt" class="form-label">תאריך סגירה</label>
+                  <input type="datetime-local" class="form-control" id="editTradeClosedAt">
+                </div>
+              </div>
+            </div>
+            
+            <!-- שורה רביעית: סטטוס -->
+            <div class="row">
+              <div class="col-md-12">
                 <div class="mb-3">
                   <label for="editTradeStatus" class="form-label">סטטוס</label>
                   <select class="form-select" id="editTradeStatus" required>
@@ -1297,37 +1342,33 @@
                     <option value="cancelled">מבוטל</option>
                   </select>
                 </div>
+              </div>
+            </div>
+            
+            <!-- שורה חמישית: הערות -->
+            <div class="row">
+              <div class="col-md-12">
                 <div class="mb-3">
-                  <label for="editTradeType" class="form-label">סוג</label>
-                  <select class="form-select" id="editTradeType" required>
-                    <option value="swing">סווינג</option>
-                    <option value="investment">השקעה</option>
-                    <option value="passive">פאסיבי</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="editTradeOpenedAt" class="form-label">תאריך פתיחה</label>
-                  <input type="datetime-local" class="form-control" id="editTradeOpenedAt">
-                </div>
-                <div class="mb-3">
-                  <label for="editTradeClosedAt" class="form-label">תאריך סגירה</label>
-                  <input type="datetime-local" class="form-control" id="editTradeClosedAt">
-                </div>
-                <div class="mb-3">
-                  <label for="editTradeTotalPl" class="form-label">רווח/הפסד</label>
-                  <input type="number" step="0.01" class="form-control" id="editTradeTotalPl">
+                  <label for="editTradeNotes" class="form-label">הערות</label>
+                  <textarea class="form-control" id="editTradeNotes" rows="3"></textarea>
                 </div>
               </div>
             </div>
-            <div class="mb-3">
-              <label for="editTradeNotes" class="form-label">הערות</label>
-              <textarea class="form-control" id="editTradeNotes" rows="3"></textarea>
+            
+            <!-- שדות נסתרים -->
+            <input type="hidden" id="editTradeId">
+            <div class="form-control-plaintext" id="editTradeIdDisplay" style="display: none;"></div>
+            <div class="mb-3" style="display: none;">
+              <label for="editTradeTotalPl" class="form-label">רווח/הפסד</label>
+              <input type="number" step="0.01" class="form-control" id="editTradeTotalPl">
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveTradeRecord()">שמור</button>
+          <button type="button" class="btn btn-success" onclick="saveTradeRecord()">
+            <span class="btn-icon">💾</span> שמור
+          </button>
         </div>
       </div>
     </div>
@@ -1343,71 +1384,101 @@
         </div>
         <div class="modal-body">
           <form id="addTradeForm">
+            <!-- שורה ראשונה: תוכנית + טיקר + מחיר -->
             <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="addTradeAccountId" class="form-label">חשבון</label>
-                  <select class="form-select" id="addTradeAccountId" required>
-                    <option value="">בחר חשבון</option>
-                    <option value="1">חשבון 1</option>
-                    <option value="2">חשבון 2</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="addTradeTickerId" class="form-label">טיקר</label>
-                  <select class="form-select" id="addTradeTickerId" required>
-                    <option value="">בחר טיקר</option>
-                    <option value="1">AAPL</option>
-                    <option value="2">GOOGL</option>
-                    <option value="3">TSLA</option>
-                  </select>
-                </div>
-                <div class="mb-3">
+              <div class="col-md-4">
+                <div class="mb-2">
                   <label for="addTradeTradePlanId" class="form-label">תוכנית טרייד</label>
                   <select class="form-select" id="addTradeTradePlanId">
                     <option value="">ללא תוכנית</option>
-                    <option value="1">תוכנית 1</option>
-                    <option value="2">תוכנית 2</option>
                   </select>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="editTradeStatus" class="form-label">סטטוס</label>
-                  <select class="form-select" id="addTradeStatus" required>
-                    <option value="open">פתוח</option>
-                    <option value="closed">סגור</option>
-                    <option value="cancelled">מבוטל</option>
-                  </select>
+              <div class="col-md-4">
+                <div class="mb-2">
+                  <label class="form-label">טיקר</label>
+                  <div class="form-control-plaintext" id="addTradeTickerDisplay">לא נבחר</div>
+                  <input type="hidden" id="addTradeTickerId">
                 </div>
-                <div class="mb-3">
+              </div>
+              <div class="col-md-4">
+                <div class="mb-2">
+                  <label class="form-label">מחיר נוכחי</label>
+                  <div class="form-control-plaintext" id="addTradeCurrentPrice">-</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- שורה שנייה: שינוי יומי + סוג + חשבון -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-2">
+                  <label class="form-label">שינוי יומי</label>
+                  <div class="form-control-plaintext" id="addTradeDailyChange">-</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-2">
                   <label for="addTradeType" class="form-label">סוג</label>
                   <select class="form-select" id="addTradeType" required>
                     <option value="swing">סווינג</option>
-                    <option value="investment">השקעה</option>
-                    <option value="passive">פאסיבי</option>
+                    <option value="invest">השקעה</option>
+                    <option value="pasive">פאסיבי</option>
                   </select>
                 </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-2">
+                  <label for="addTradeAccountId" class="form-label">חשבון</label>
+                  <select class="form-select" id="addTradeAccountId" required>
+                    <option value="">בחר חשבון</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <!-- שורה שלישית: תאריך יצירה + תאריך סגירה -->
+            <div class="row">
+              <div class="col-md-6">
                 <div class="mb-3">
-                  <label for="addTradeOpenedAt" class="form-label">תאריך פתיחה</label>
+                  <label for="addTradeOpenedAt" class="form-label">תאריך יצירה</label>
                   <input type="datetime-local" class="form-control" id="addTradeOpenedAt">
                 </div>
+              </div>
+              <div class="col-md-6">
                 <div class="mb-3">
                   <label for="addTradeClosedAt" class="form-label">תאריך סגירה</label>
                   <input type="datetime-local" class="form-control" id="addTradeClosedAt">
                 </div>
-
               </div>
             </div>
-            <div class="mb-3">
-              <label for="addTradeNotes" class="form-label">הערות</label>
-              <textarea class="form-control" id="addTradeNotes" rows="3"></textarea>
+            
+            <!-- שורה רביעית: הערות -->
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <label for="addTradeNotes" class="form-label">הערות</label>
+                  <textarea class="form-control" id="addTradeNotes" rows="3"></textarea>
+                </div>
+              </div>
+            </div>
+            
+            <!-- שדות נסתרים -->
+            <div class="mb-3" style="display: none;">
+              <label for="addTradeStatus" class="form-label">סטטוס</label>
+              <select class="form-select" id="addTradeStatus" required>
+                <option value="open">פתוח</option>
+                <option value="closed">סגור</option>
+                <option value="cancelled">מבוטל</option>
+              </select>
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveNewTradeRecord()">הוסף</button>
+          <button type="button" class="btn btn-success" onclick="saveNewTradeRecord()">
+            <span class="btn-icon">💾</span> שמור
+          </button>
         </div>
       </div>
     </div>

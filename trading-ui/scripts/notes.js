@@ -228,8 +228,10 @@ async function populateTradePlansSelect(selectId, selectedValue = '') {
             select.appendChild(firstOption);
         }
         
-        // הוספת תוכניות הטרייד
-        tradePlans.forEach(plan => {
+        // הוספת תוכניות הטרייד - רק בסטטוס פתוח
+        const openTradePlans = tradePlans.filter(plan => plan.status === 'open' || plan.status === 'פתוח');
+        
+        openTradePlans.forEach(plan => {
             const option = document.createElement('option');
             option.value = plan.id;
             
@@ -252,7 +254,7 @@ async function populateTradePlansSelect(selectId, selectedValue = '') {
             select.appendChild(option);
         });
         
-        console.log(`✅ מילאתי ${tradePlans.length} תוכניות טרייד ב-${selectId}`);
+        console.log(`✅ מילאתי ${openTradePlans.length} תוכניות טרייד בסטטוס פתוח ב-${selectId}`);
     } catch (error) {
         console.error('❌ שגיאה במילוי רשימת תוכניות טרייד:', error);
     }
@@ -910,6 +912,62 @@ async function updateNotesTable(notes) {
     console.log('🔄 מעדכן טבלת הערות עם', notes.length, 'הערות');
     console.log('📝 הערות:', notes);
     
+    // פונקציות לקבצים (מוגדרות מקומית)
+    function getFileIcon(filename) {
+        if (!filename) return '📄';
+        
+        const extension = filename.toLowerCase().split('.').pop();
+        
+        switch (extension) {
+            case 'pdf':
+                return '📄';
+            case 'doc':
+            case 'docx':
+                return '📝';
+            case 'xls':
+            case 'xlsx':
+                return '📊';
+            case 'ppt':
+            case 'pptx':
+                return '📈';
+            case 'txt':
+                return '📄';
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+            case 'bmp':
+            case 'svg':
+                return '🖼️';
+            case 'mp4':
+            case 'avi':
+            case 'mov':
+            case 'wmv':
+                return '🎥';
+            case 'mp3':
+            case 'wav':
+            case 'flac':
+                return '🎵';
+            case 'zip':
+            case 'rar':
+            case '7z':
+                return '📦';
+            default:
+                return '📎';
+        }
+    }
+    
+    function createFileLink(filename, fileUrl) {
+        if (!filename) return '-';
+        
+        const icon = getFileIcon(filename);
+        const displayName = filename.length > 20 ? filename.substring(0, 20) + '...' : filename;
+        
+        return `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="${filename}">
+            ${icon} ${displayName}
+        </a>`;
+    }
+    
     // חיפוש הטבלה - בדף הערות היא נמצאת ב-.main-content table tbody
     let tbody = document.querySelector('#notesTable tbody');
     if (!tbody) {
@@ -1000,7 +1058,7 @@ async function updateNotesTable(notes) {
           <td>${relatedDisplay}</td>
           <td>${note.content ? (note.content.length > 50 ? note.content.substring(0, 50) + '...' : note.content) : '-'}</td>
           <td>${window.formatDateTime ? window.formatDateTime(note.created_at) : note.created_at}</td>
-          <td>${note.attachment ? `<a href="/api/v1/notes/files/${note.attachment}" target="_blank" class="btn btn-sm btn-outline-primary">📎 צפה בקובץ</a>` : '-'}</td>
+          <td>${createFileLink(note.attachment, `/api/v1/notes/files/${note.attachment}`)}</td>
           <td>
             <button class="btn btn-sm btn-secondary" onclick="showEditNoteModal(${JSON.stringify(note).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
             <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id}, 'הערה ${note.id}')" title="מחק">🗑️</button>
@@ -1043,6 +1101,62 @@ async function updateNotesTable(notes) {
 function updateNotesTableDatabase(notes) {
     console.log('🔄 מעדכן טבלת הערות בדף בסיס נתונים עם', notes.length, 'הערות');
     
+    // פונקציות לקבצים (מוגדרות מקומית)
+    function getFileIcon(filename) {
+        if (!filename) return '📄';
+        
+        const extension = filename.toLowerCase().split('.').pop();
+        
+        switch (extension) {
+            case 'pdf':
+                return '📄';
+            case 'doc':
+            case 'docx':
+                return '📝';
+            case 'xls':
+            case 'xlsx':
+                return '📊';
+            case 'ppt':
+            case 'pptx':
+                return '📈';
+            case 'txt':
+                return '📄';
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+            case 'bmp':
+            case 'svg':
+                return '🖼️';
+            case 'mp4':
+            case 'avi':
+            case 'mov':
+            case 'wmv':
+                return '🎥';
+            case 'mp3':
+            case 'wav':
+            case 'flac':
+                return '🎵';
+            case 'zip':
+            case 'rar':
+            case '7z':
+                return '📦';
+            default:
+                return '📎';
+        }
+    }
+    
+    function createFileLink(filename, fileUrl) {
+        if (!filename) return '-';
+        
+        const icon = getFileIcon(filename);
+        const displayName = filename.length > 20 ? filename.substring(0, 20) + '...' : filename;
+        
+        return `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="${filename}">
+            ${icon} ${displayName}
+        </a>`;
+    }
+    
     const tbody = document.querySelector('#notesTable tbody');
     if (!tbody) {
         console.error('❌ לא נמצא tbody לטבלת הערות');
@@ -1071,7 +1185,7 @@ function updateNotesTableDatabase(notes) {
           <td>${tradePlanId}</td>
           <td>${note.content ? (note.content.length > 50 ? note.content.substring(0, 50) + '...' : note.content) : '-'}</td>
           <td>${window.formatDateTime ? window.formatDateTime(note.created_at) : note.created_at}</td>
-          <td>${note.attachment ? `<a href="/api/v1/notes/files/${note.attachment}" target="_blank" class="btn btn-sm btn-outline-primary">📎 צפה בקובץ</a>` : '-'}</td>
+          <td>${createFileLink(note.attachment, `/api/v1/notes/files/${note.attachment}`)}</td>
           <td>
             <button class="btn btn-sm btn-secondary" onclick="showEditNoteModal(${JSON.stringify(note).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
             <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id}, 'הערה ${note.id}')" title="מחק">🗑️</button>
@@ -1153,6 +1267,82 @@ function showNotification(message, type = 'info') {
     alert(message);
 }
 
+/**
+ * קביעת אייקון לפי סוג קובץ
+ * הפונקציה מחזירה אייקון מתאים לפי סיומת הקובץ
+ * 
+ * @param {string} filename - שם הקובץ
+ * @returns {string} אייקון מתאים
+ * 
+ * @example
+ * const icon = getFileIcon('document.pdf'); // returns '📄'
+ */
+function getFileIcon(filename) {
+    if (!filename) return '📄';
+    
+    const extension = filename.toLowerCase().split('.').pop();
+    
+    switch (extension) {
+        case 'pdf':
+            return '📄';
+        case 'doc':
+        case 'docx':
+            return '📝';
+        case 'xls':
+        case 'xlsx':
+            return '📊';
+        case 'ppt':
+        case 'pptx':
+            return '📈';
+        case 'txt':
+            return '📄';
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+        case 'gif':
+        case 'bmp':
+        case 'svg':
+            return '🖼️';
+        case 'mp4':
+        case 'avi':
+        case 'mov':
+        case 'wmv':
+            return '🎥';
+        case 'mp3':
+        case 'wav':
+        case 'flac':
+            return '🎵';
+        case 'zip':
+        case 'rar':
+        case '7z':
+            return '📦';
+        default:
+            return '📎';
+    }
+}
+
+/**
+ * יצירת קישור לקובץ עם אייקון
+ * הפונקציה יוצרת קישור לקובץ עם אייקון מתאים
+ * 
+ * @param {string} filename - שם הקובץ
+ * @param {string} fileUrl - כתובת הקובץ
+ * @returns {string} HTML של הקישור
+ * 
+ * @example
+ * const link = createFileLink('document.pdf', '/api/v1/notes/files/document.pdf');
+ */
+function createFileLink(filename, fileUrl) {
+    if (!filename) return '-';
+    
+    const icon = getFileIcon(filename);
+    const displayName = filename.length > 20 ? filename.substring(0, 20) + '...' : filename;
+    
+    return `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="${filename}">
+        ${icon} ${displayName}
+    </a>`;
+}
+
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
 
 // פונקציות עיקריות
@@ -1187,5 +1377,9 @@ window.updateNotesTable = updateNotesTable;
 window.updateNotesTableDatabase = updateNotesTableDatabase;
 window.refreshNotesTable = refreshNotesTable;
 window.showNotification = showNotification;
+
+// פונקציות קבצים
+window.getFileIcon = getFileIcon;
+window.createFileLink = createFileLink;
 
 console.log('✅ קובץ notes.js נטען בהצלחה - פונקציות זמינות גלובלית');

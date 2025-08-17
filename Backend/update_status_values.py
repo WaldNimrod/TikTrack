@@ -2,15 +2,28 @@
 """
 Update Status Values Script
 
-This script updates all status values in the database to use the new Hebrew values:
-- 'active' -> 'פתוח'
-- 'inactive' -> 'סגור'
-- 'open' -> 'פתוח'
-- 'closed' -> 'סגור'
-- 'cancelled' -> 'מבוטל'
+עדכון: אוגוסט 2025
+מטרה: עדכון ערכי סטטוס בבסיס הנתונים לעברית ותיקון איות
+
+שינויים:
+- תיקון איות: 'canceled' -> 'cancelled'
+- עדכון ערכים לעברית:
+  - 'active' -> 'פתוח'
+  - 'inactive' -> 'סגור'
+  - 'open' -> 'פתוח'
+  - 'closed' -> 'סגור'
+  - 'cancelled' -> 'מבוטל'
+
+טבלאות מעודכנות:
+- accounts: סטטוס חשבונות
+- trades: סטטוס טריידים
+- trade_plans: סטטוס תוכניות טרייד
+- alerts: סטטוס התראות
+
+תוצאה: עקביות בשמות סטטוסים בכל המערכת
 
 Author: TikTrack Development Team
-Version: 1.0
+Version: 2.0 - אוגוסט 2025
 """
 
 import sys

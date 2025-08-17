@@ -10,7 +10,7 @@ class Trade(BaseModel):
     trade_plan_id = Column(Integer, ForeignKey('trade_plans.id'), nullable=True)
     status = Column(String(20), default='פתוח', nullable=True)
     type = Column(String(20), default='buy', nullable=True)
-    opened_at = Column(DateTime, nullable=True)
+    # opened_at field removed - using created_at from BaseModel instead
     closed_at = Column(DateTime, nullable=True)
     cancelled_at = Column(DateTime, nullable=True)
     cancel_reason = Column(String(500), nullable=True)

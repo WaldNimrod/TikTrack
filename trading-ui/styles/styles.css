@@ -90,6 +90,34 @@ button[onclick*="Close"]:hover,
   box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
 }
 
+/* כפתורי שמירה - ירוקים עם רקע לבן ומסגרת */
+/* עדכון: אוגוסט 2025 - עיצוב כפתורי שמירה עם צבע הלוגו */
+/* מיועד לכפתורי שמירה בטופסי טריידים */
+.btn-success[onclick*="save"],
+.btn-success[onclick*="Save"],
+button[onclick*="saveTradeRecord"],
+button[onclick*="saveNewTradeRecord"] {
+  background-color: white !important;
+  color: #29a6a8 !important; /* צבע הלוגו של האפליקציה */
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem 0.6rem !important; /* גודל קטן יותר כמו כפתור ביטול */
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-success[onclick*="save"]:hover,
+.btn-success[onclick*="Save"]:hover,
+button[onclick*="saveTradeRecord"]:hover,
+button[onclick*="saveNewTradeRecord"]:hover {
+  background-color: #29a6a8 !important; /* רקע ירוק של הלוגו */
+  color: white !important;
+  border-color: #29a6a8 !important;
+  transform: translateY(-1px) !important; /* אפקט הרמה */
+  box-shadow: 0 4px 8px rgba(41, 166, 168, 0.3) !important; /* צל ירוק */
+}
+
 /* כפתורי סגירה עם איקון X */
 .btn-close[aria-label="Close"],
 button[aria-label="Close"] {

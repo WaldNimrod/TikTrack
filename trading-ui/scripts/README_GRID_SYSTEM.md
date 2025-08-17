@@ -10,6 +10,7 @@
 2. **`grid-table.css`** - סגנונות הטבלאות
 3. **`table-template.html`** - תבנית טבלה לשיכפול
 4. **`designs.html`** - דוגמה לשימוש בתבנית
+5. **`trades.js`** - פונקציות ייעודיות לטריידים (חדש - אוגוסט 2025)
 
 ## איך להשתמש במערכת
 
@@ -98,6 +99,52 @@
 - פונקציונליות סידור
 - כפתורי פעולה
 - אנימציות
+
+## קובץ trades.js - פונקציות ייעודיות לטריידים
+
+### סקירה כללית
+הקובץ `trades.js` מכיל את כל הפונקציות הקשורות לניהול טריידים במערכת. הקובץ נוצר כדי לפצל את הקוד ולשפר את התחזוקה.
+
+### פונקציות עיקריות
+
+#### ניהול טריידים
+- `loadTrades()` - טעינת רשימת טריידים מהשרת
+- `editTradeRecord(id)` - פתיחת טופס עריכת טרייד
+- `saveTradeRecord()` - שמירת שינויים בטרייד
+- `cancelTradeRecord(id)` - ביטול טרייד
+- `deleteTradeRecord(id)` - מחיקת טרייד
+
+#### ניהול טופסים
+- `showAddTradeModal()` - פתיחת טופס הוספת טרייד
+- `saveNewTradeRecord()` - שמירת טרייד חדש
+- `populateTradeForm(trade)` - מילוי טופס עם נתוני טרייד
+- `clearTradeForm()` - ניקוי טופס
+
+#### עזר
+- `formatTradeData(trade)` - עיצוב נתוני טרייד לתצוגה
+- `validateTradeForm()` - אימות טופס טרייד
+- `showTradeNotification(message, type)` - הצגת הודעות
+
+### מבנה הנתונים
+```javascript
+const tradeData = {
+  id: 1,
+  trade_plan_id: 5,
+  ticker_id: 10,
+  account_id: 3,
+  type: 'swing', // swing, invest, pasive
+  status: 'open', // open, closed, cancelled
+  created_at: '2025-08-18T10:00:00',
+  closed_at: null,
+  notes: 'הערות על הטרייד'
+};
+```
+
+### שילוב עם המערכת הכללית
+- הקובץ משתמש בפונקציות הכלליות מ-`grid-table.js`
+- עובד עם מערכת הפילטרים הכללית
+- משתמש בעיצוב הכללי של הטבלאות
+- תומך במערכת ההודעות הכללית
 
 **אלמנטים ספציפיים** (צריכים להיות בדף):
 - תוכן הטבלה

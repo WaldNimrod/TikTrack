@@ -1,5 +1,16 @@
 // ===== TRADES MANAGEMENT SYSTEM =====
 // קובץ ייעודי לניהול טריידים - פונקציות עריכה, ביטול ומחיקה
+// 
+// עדכון: אוגוסט 2025
+// שינויים עיקריים:
+// - פיצול פונקציות טריידים מקובץ database.html
+// - עדכון מבנה בסיס נתונים (הסרת opened_at, החלפת ב-created_at)
+// - הגבלת סוגי טריידים לשלושה: swing, invest, pasive
+// - תיקון ערכי סטטוס (canceled -> cancelled)
+// - שיפור מבנה טופסי עריכה והוספה
+//
+// תלות: נדרש apiCall function מ-grid-table.js
+// תלות: נדרש showNotification function מ-grid-table.js
 
 /**
  * פונקציה לעריכת טרייד
@@ -213,11 +224,11 @@ async function fillEditTradeModalData(tradeData) {
     if (tradeData.type) {
         const typeMapping = {
             'swing': 'swing',
-            'investment': 'investment',
-            'passive': 'passive',
+            'invest': 'invest',
+            'pasive': 'pasive',
             'סווינג': 'swing',
-            'השקעה': 'investment',
-            'פאסיבי': 'passive'
+            'השקעה': 'invest',
+            'פאסיבי': 'pasive'
         };
         fields['editTradeType'] = typeMapping[tradeData.type] || 'swing';
         console.log(`🔧 המרת סוג: "${tradeData.type}" → "${fields['editTradeType']}"`);
@@ -240,6 +251,38 @@ async function fillEditTradeModalData(tradeData) {
     if (idDisplay) {
         idDisplay.textContent = fields['editTradeId'];
         console.log(`✅ מילא מזהה: ${fields['editTradeId']}`);
+    }
+    
+    // מילוי טיקר כטקסט (לייבל)
+    const tickerDisplay = document.getElementById('editTradeTickerDisplay');
+    if (tickerDisplay) {
+        // נסה לקבל את שם הטיקר מהנתונים
+        const tickerSymbol = tradeData.ticker_symbol || tradeData.ticker_name || 'לא ידוע';
+        tickerDisplay.textContent = tickerSymbol;
+        console.log(`✅ מילא טיקר: ${tickerSymbol}`);
+    } else {
+        console.warn('⚠️ שדה editTradeTickerDisplay לא נמצא');
+    }
+    
+    // מילוי מחיר נוכחי ושינוי יומי (נתוני דמה)
+    const currentPrice = document.getElementById('editTradeCurrentPrice');
+    if (currentPrice) {
+        const price = (Math.random() * 200 + 50).toFixed(2);
+        currentPrice.textContent = `$${price}`;
+        console.log(`✅ מילא מחיר נוכחי: $${price}`);
+    } else {
+        console.warn('⚠️ שדה editTradeCurrentPrice לא נמצא');
+    }
+    
+    const dailyChange = document.getElementById('editTradeDailyChange');
+    if (dailyChange) {
+        const change = (Math.random() * 10 - 5).toFixed(1);
+        const isPositive = change >= 0;
+        dailyChange.textContent = `${isPositive ? '+' : ''}${change}%`;
+        dailyChange.className = `form-control-plaintext ${isPositive ? 'text-success' : 'text-danger'}`;
+        console.log(`✅ מילא שינוי יומי: ${isPositive ? '+' : ''}${change}%`);
+    } else {
+        console.warn('⚠️ שדה editTradeDailyChange לא נמצא');
     }
     
     // מילוי כל השדות
@@ -308,7 +351,7 @@ async function saveTradeRecord() {
         }
         
         // וולידציה של סוג הטרייד
-        const validTypes = ['swing', 'investment', 'passive'];
+        const validTypes = ['swing', 'invest', 'pasive'];
         if (!validTypes.includes(type)) {
             alert('שגיאה: סוג טרייד לא תקין. יש לבחור: סווינג, השקעה, או פאסיבי');
             return;
@@ -443,6 +486,28 @@ function clearAddTradeModal() {
             }
         }
     });
+    
+    // ניקוי שדות הטיקר
+    const tickerDisplay = document.getElementById('addTradeTickerDisplay');
+    if (tickerDisplay) {
+        tickerDisplay.textContent = 'לא נבחר';
+    }
+    
+    const tickerIdInput = document.getElementById('addTradeTickerId');
+    if (tickerIdInput) {
+        tickerIdInput.value = '';
+    }
+    
+    const currentPrice = document.getElementById('addTradeCurrentPrice');
+    if (currentPrice) {
+        currentPrice.textContent = '-';
+    }
+    
+    const dailyChange = document.getElementById('addTradeDailyChange');
+    if (dailyChange) {
+        dailyChange.textContent = '-';
+        dailyChange.className = 'form-control-plaintext';
+    }
 }
 
 /**
@@ -480,7 +545,7 @@ async function saveNewTradeRecord() {
         }
         
         // וולידציה של סוג הטרייד
-        const validTypes = ['swing', 'investment', 'passive'];
+        const validTypes = ['swing', 'invest', 'pasive'];
         if (!validTypes.includes(type)) {
             alert('שגיאה: סוג טרייד לא תקין. יש לבחור: סווינג, השקעה, או פאסיבי');
             return;
@@ -548,6 +613,13 @@ window.saveTradeRecord = saveTradeRecord;
 window.showAddTradeModal = showAddTradeModal;
 window.clearAddTradeModal = clearAddTradeModal;
 window.saveNewTradeRecord = saveNewTradeRecord;
+window.updateTickerFromTradePlan = updateTickerFromTradePlan;
+window.loadAccountsForModal = loadAccountsForModal;
+window.loadTickersForModal = loadTickersForModal;
+window.loadTradePlansForModal = loadTradePlansForModal;
+window.loadAccountsForAddModal = loadAccountsForAddModal;
+window.loadTickersForAddModal = loadTickersForAddModal;
+window.loadTradePlansForAddModal = loadTradePlansForAddModal;
 
 /**
  * פונקציה לטעינת חשבונות למודל
@@ -639,31 +711,44 @@ async function loadTradePlansForModal() {
         // קריאה ל-API לקבלת תוכניות טרייד
         const response = await window.apiCall('/api/v1/trade_plans/');
         
+        console.log('📡 תגובת API לתוכניות:', response);
+        
         if (response.status === 'success' && response.data) {
             const tradePlans = response.data;
             console.log('📊 תוכניות טרייד שהתקבלו:', tradePlans);
+            console.log('📊 מספר תוכניות:', tradePlans.length);
             
             // מילוי שדה תוכנית הטרייד במודל
             const tradePlanSelect = document.getElementById('editTradeTradePlanId');
+            console.log('🔍 שדה תוכנית טרייד:', tradePlanSelect);
+            
             if (tradePlanSelect) {
+                console.log('🔍 מספר אפשרויות קיימות:', tradePlanSelect.options.length);
+                
                 // ניקוי האפשרויות הקיימות (למעט הראשונה)
                 while (tradePlanSelect.options.length > 1) {
                     tradePlanSelect.remove(1);
                 }
                 
+                console.log('🧹 ניקוי הושלם, מספר אפשרויות:', tradePlanSelect.options.length);
+                
                 // הוספת התוכניות
-                tradePlans.forEach(plan => {
+                tradePlans.forEach((plan, index) => {
                     const option = document.createElement('option');
                     option.value = plan.id;
                     const createdDate = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : '';
                     option.textContent = `תוכנית ${plan.id} - ${createdDate}`;
                     tradePlanSelect.appendChild(option);
+                    console.log(`✅ הוספת תוכנית ${index + 1}: ${option.textContent}`);
                 });
                 
                 console.log(`✅ מילא ${tradePlans.length} תוכניות טרייד במודל`);
+                console.log('🔍 מספר אפשרויות סופי:', tradePlanSelect.options.length);
+            } else {
+                console.error('❌ שדה editTradeTradePlanId לא נמצא!');
             }
         } else {
-            console.warn('⚠️ לא הצלחתי לטעון תוכניות טרייד, משתמש בערכים ברירת מחדל');
+            console.warn('⚠️ לא הצלחתי לטעון תוכניות טרייד:', response);
         }
     } catch (error) {
         console.error('❌ שגיאה בטעינת תוכניות טרייד:', error);
@@ -760,35 +845,142 @@ async function loadTradePlansForAddModal() {
         // קריאה ל-API לקבלת תוכניות טרייד
         const response = await window.apiCall('/api/v1/trade_plans/');
         
+        console.log('📡 תגובת API לתוכניות (הוספה):', response);
+        
         if (response.status === 'success' && response.data) {
             const tradePlans = response.data;
-            console.log('📊 תוכניות טרייד שהתקבלו:', tradePlans);
+            console.log('📊 תוכניות טרייד שהתקבלו (הוספה):', tradePlans);
+            console.log('📊 מספר תוכניות (הוספה):', tradePlans.length);
             
             // מילוי שדה תוכנית הטרייד במודל הוספה
             const tradePlanSelect = document.getElementById('addTradeTradePlanId');
+            console.log('🔍 שדה תוכנית טרייד (הוספה):', tradePlanSelect);
+            
             if (tradePlanSelect) {
+                console.log('🔍 מספר אפשרויות קיימות (הוספה):', tradePlanSelect.options.length);
+                
                 // ניקוי האפשרויות הקיימות (למעט הראשונה)
                 while (tradePlanSelect.options.length > 1) {
                     tradePlanSelect.remove(1);
                 }
                 
+                console.log('🧹 ניקוי הושלם (הוספה), מספר אפשרויות:', tradePlanSelect.options.length);
+                
                 // הוספת התוכניות
-                tradePlans.forEach(plan => {
+                tradePlans.forEach((plan, index) => {
                     const option = document.createElement('option');
                     option.value = plan.id;
                     const createdDate = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : '';
                     option.textContent = `תוכנית ${plan.id} - ${createdDate}`;
                     tradePlanSelect.appendChild(option);
+                    console.log(`✅ הוספת תוכנית ${index + 1} (הוספה): ${option.textContent}`);
                 });
                 
                 console.log(`✅ מילא ${tradePlans.length} תוכניות טרייד במודל הוספה`);
+                console.log('🔍 מספר אפשרויות סופי (הוספה):', tradePlanSelect.options.length);
+            } else {
+                console.error('❌ שדה addTradeTradePlanId לא נמצא!');
             }
         } else {
-            console.warn('⚠️ לא הצלחתי לטעון תוכניות טרייד, משתמש בערכים ברירת מחדל');
+            console.warn('⚠️ לא הצלחתי לטעון תוכניות טרייד (הוספה):', response);
         }
     } catch (error) {
-        console.error('❌ שגיאה בטעינת תוכניות טרייד:', error);
+        console.error('❌ שגיאה בטעינת תוכניות טרייד (הוספה):', error);
     }
 }
 
+/**
+ * פונקציה לעדכון טיקר בהתאם לתוכנית שנבחרה
+ */
+function updateTickerFromTradePlan(tradePlanId, isEditModal = true) {
+    console.log(`🔧 עדכון טיקר לפי תוכנית ${tradePlanId} (עריכה: ${isEditModal})`);
+    
+    const tickerDisplay = document.getElementById(isEditModal ? 'editTradeTickerDisplay' : 'addTradeTickerDisplay');
+    const tickerIdInput = document.getElementById(isEditModal ? 'editTradeTickerId' : 'addTradeTickerId');
+    const currentPrice = document.getElementById(isEditModal ? 'editTradeCurrentPrice' : 'addTradeCurrentPrice');
+    const dailyChange = document.getElementById(isEditModal ? 'editTradeDailyChange' : 'addTradeDailyChange');
+    
+    if (!tradePlanId) {
+        // אם לא נבחרה תוכנית, נקה את השדות
+        if (tickerDisplay) tickerDisplay.textContent = isEditModal ? '' : 'לא נבחר';
+        if (tickerIdInput) tickerIdInput.value = '';
+        if (currentPrice) currentPrice.textContent = isEditModal ? '$150.25' : '-';
+        if (dailyChange) {
+            dailyChange.textContent = isEditModal ? '+2.5%' : '-';
+            dailyChange.className = 'form-control-plaintext text-success';
+        }
+        return;
+    }
+    
+    // כאן נצטרך לקרוא ל-API לקבלת פרטי התוכנית
+    // כרגע נשתמש בנתוני דמה
+    fetch(`/api/v1/trade_plans/${tradePlanId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success' && data.data) {
+                const plan = data.data;
+                console.log('📊 פרטי תוכנית:', plan);
+                
+                // עדכון הטיקר
+                if (tickerDisplay) {
+                    tickerDisplay.textContent = plan.ticker_symbol || plan.ticker_name || 'לא ידוע';
+                }
+                if (tickerIdInput) {
+                    tickerIdInput.value = plan.ticker_id || '';
+                }
+                
+                // נתוני דמה למחיר ושינוי יומי
+                if (currentPrice) {
+                    const price = (Math.random() * 200 + 50).toFixed(2);
+                    currentPrice.textContent = `$${price}`;
+                }
+                if (dailyChange) {
+                    const change = (Math.random() * 10 - 5).toFixed(1);
+                    const isPositive = change >= 0;
+                    dailyChange.textContent = `${isPositive ? '+' : ''}${change}%`;
+                    dailyChange.className = `form-control-plaintext ${isPositive ? 'text-success' : 'text-danger'}`;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('❌ שגיאה בקבלת פרטי תוכנית:', error);
+            // במקרה של שגיאה, נשתמש בנתוני דמה
+            if (tickerDisplay) tickerDisplay.textContent = 'AAPL';
+            if (tickerIdInput) tickerIdInput.value = '1';
+            if (currentPrice) currentPrice.textContent = '$150.25';
+            if (dailyChange) {
+                dailyChange.textContent = '+2.5%';
+                dailyChange.className = 'form-control-plaintext text-success';
+            }
+        });
+}
+
+/**
+ * הוספת event listeners לטופסי עריכה והוספה
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listener לבחירת תוכנית בטופס עריכה
+    const editTradePlanSelect = document.getElementById('editTradeTradePlanId');
+    if (editTradePlanSelect) {
+        editTradePlanSelect.addEventListener('change', function() {
+            updateTickerFromTradePlan(this.value, true);
+        });
+    }
+    
+    // Event listener לבחירת תוכנית בטופס הוספה
+    const addTradePlanSelect = document.getElementById('addTradeTradePlanId');
+    if (addTradePlanSelect) {
+        addTradePlanSelect.addEventListener('change', function() {
+            updateTickerFromTradePlan(this.value, false);
+        });
+    }
+});
+
 console.log('✅ קובץ trades.js נטען בהצלחה - פונקציות טריידים זמינות');
+
+// בדיקת זמינות פונקציות
+console.log('🔍 בדיקת זמינות פונקציות:');
+console.log('🔍 loadTradePlansForModal:', typeof window.loadTradePlansForModal);
+console.log('🔍 loadTradePlansForAddModal:', typeof window.loadTradePlansForAddModal);
+console.log('🔍 showAddTradeModal:', typeof window.showAddTradeModal);
+console.log('🔍 showEditTradeModal:', typeof window.showEditTradeModal);

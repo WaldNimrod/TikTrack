@@ -5,6 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>הערות - Tik.track</title>
   
+  <!--
+    ========================================
+    דף הערות - Tik.track
+    ========================================
+    
+    תכונות עיקריות:
+    - הצגת הערות בטבלה עם מיון וסינון
+    - הוספת, עריכת ומחיקת הערות
+    - חיפוש חופשי בכל השדות כולל סימבולים
+    - סינון לפי תאריכים
+    - שמירת מצב פילטרים בין ביקורים
+    - עורך טקסט מתקדם עם תמיכה בעיצוב
+    
+    פונקציות עיקריות:
+    - loadNotesData() - טעינת נתונים מהשרת
+    - updateNotesTable() - עדכון הטבלה
+    - sortTable() - מיון לפי עמודות
+    - filterNotesData() - סינון נתונים
+    - updateGridFromComponent() - עדכון מהווב קומפוננט
+    
+    מחבר: Tik.track Development Team
+    תאריך עדכון אחרון: 2025
+    ========================================
+  -->
+  
   <style>
     /* עיצוב עורך הטקסט */
     .text-editor-toolbar {
@@ -177,9 +202,6 @@
               <button class="refresh-btn" onclick="openNoteDetails()" title="הוסף הערה חדשה">
                 <span class="action-icon">➕</span> הוסף
               </button>
-                          <button class="refresh-btn" onclick="loadNotes()" title="רענן טבלה">
-              <span class="action-icon">🔄</span> רענן
-            </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור הערות">
                 <span class="filter-icon">▲</span>
@@ -193,12 +215,40 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                    <th>אובייקט מקושר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Related Object</span></th>
-                    <th>תוכן<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Content</span></th>
-                    <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
-                    <th>קובץ מצורף<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Attachment</span></th>
-                    <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(0)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>מזהה
+                        <br><span class="header-subtitle">ID</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(1)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>אובייקט מקושר
+                        <br><span class="header-subtitle">Related Object</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(2)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>תוכן
+                        <br><span class="header-subtitle">Content</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(3)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>נוצר ב
+                        <br><span class="header-subtitle">Created At</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(4)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>קובץ מצורף
+                        <br><span class="header-subtitle">Attachment</span>
+                      </button>
+                    </th>
+                    <th class="actions-header">
+                      פעולות
+                      <br><span class="header-subtitle">Actions</span>
+                    </th>
                   </tr>
                 </thead>
                                   <tbody>
@@ -683,7 +733,11 @@
     let notesCurrentSortColumn = null;
     let notesCurrentSortDirection = 'asc';
     
-    // פונקציה למיון הטבלה
+    /**
+     * פונקציה למיון הטבלה לפי עמודה
+     * תומך במיון לפי: מזהה, אובייקט מקושר, תוכן, תאריך יצירה, קובץ מצורף
+     * @param {number} columnIndex - אינדקס העמודה למיון (0-4)
+     */
     function sortTable(columnIndex) {
       console.log('🔄 === SORT TABLE FUNCTION CALLED ===');
       console.log('🔄 Column clicked:', columnIndex);
@@ -692,11 +746,11 @@
       
       // קבלת הנתונים הנוכחיים
       let notes = [...notesData];
-      console.log('🔄 Original data:', notes.map(n => `${n.title}: ${n.date}`));
+      console.log('🔄 Original data:', notes.map(n => `ID ${n.id}: ${n.content?.substring(0, 20)}...`));
       
       // החלת פילטרים קיימים
       notes = window.filterDataByFilters(notes, 'notes');
-      console.log('🔄 After filtering:', notes.map(n => `${n.title}: ${n.date}`));
+      console.log('🔄 After filtering:', notes.map(n => `ID ${n.id}: ${n.content?.substring(0, 20)}...`));
       
       // עדכון המשתנים הגלובליים
       if (notesCurrentSortColumn === columnIndex) {
@@ -713,33 +767,25 @@
         let aValue, bValue;
         
         switch (columnIndex) {
-          case 0: // תאריך
-            aValue = parseDateForSort(a.date);
-            bValue = parseDateForSort(b.date);
+          case 0: // מזהה (ID)
+            aValue = parseInt(a.id);
+            bValue = parseInt(b.id);
             break;
-          case 1: // כותרת
-            aValue = a.title.toLowerCase();
-            bValue = b.title.toLowerCase();
+          case 1: // אובייקט מקושר
+            aValue = (a.related_type || '').toLowerCase();
+            bValue = (b.related_type || '').toLowerCase();
             break;
-          case 2: // סוג
-            aValue = a.type.toLowerCase();
-            bValue = b.type.toLowerCase();
+          case 2: // תוכן
+            aValue = (a.content || '').toLowerCase();
+            bValue = (b.content || '').toLowerCase();
             break;
-          case 3: // נכס
-            aValue = (a.ticker || '').toLowerCase();
-            bValue = (b.ticker || '').toLowerCase();
+          case 3: // נוצר ב
+            aValue = parseDateForSort(a.created_at);
+            bValue = parseDateForSort(b.created_at);
             break;
-          case 4: // חשבון
-            aValue = (a.account_name || '').toLowerCase();
-            bValue = (b.account_name || '').toLowerCase();
-            break;
-          case 5: // חשיבות
-            aValue = getPriorityForSort(a.priority);
-            bValue = getPriorityForSort(b.priority);
-            break;
-          case 6: // סטטוס
-            aValue = getStatusForSort(a.status);
-            bValue = getStatusForSort(b.status);
+          case 4: // קובץ מצורף
+            aValue = (a.attachment || '').toLowerCase();
+            bValue = (b.attachment || '').toLowerCase();
             break;
           default:
             return 0;
@@ -762,10 +808,14 @@
         }
       });
       
-      console.log('🔄 Sorted data:', notes.map(n => `${n.title}: ${n.date}`));
+      console.log('🔄 Sorted data:', notes.map(n => `ID ${n.id}: ${n.content?.substring(0, 20)}...`));
       
       // עדכון הטבלה
-      updateNotesTable(notes);
+      if (typeof window.updateNotesTable === 'function') {
+        window.updateNotesTable(notes);
+      } else {
+        console.error('❌ updateNotesTable function not found');
+      }
       
       // עדכון אייקונים
       updateSortIcons(columnIndex);
@@ -777,7 +827,12 @@
       console.log('🔄 === SORT TABLE FUNCTION COMPLETED ===');
     }
     
-    // פונקציה להמרת תאריך למיון
+    /**
+     * פונקציה להמרת תאריך למיון
+     * ממירה תאריך בפורמט dd.mm.yyyy למילישניות לצורך מיון
+     * @param {string} dateStr - תאריך בפורמט dd.mm.yyyy
+     * @returns {number} זמן במילישניות או 0 אם הפורמט לא תקין
+     */
     function parseDateForSort(dateStr) {
       const parts = dateStr.split('.');
       if (parts.length === 3) {
@@ -789,7 +844,12 @@
       return 0;
     }
     
-    // פונקציה לקבלת ערך חשיבות למיון
+    /**
+     * פונקציה לקבלת ערך חשיבות למיון
+     * ממירה ערכי חשיבות למספרים לצורך מיון
+     * @param {string} priority - ערך החשיבות
+     * @returns {number} ערך מספרי למיון
+     */
     function getPriorityForSort(priority) {
       switch (priority) {
         case 'high': return 3;
@@ -799,7 +859,12 @@
       }
     }
     
-    // פונקציה לקבלת ערך סטטוס למיון
+    /**
+     * פונקציה לקבלת ערך סטטוס למיון
+     * ממירה ערכי סטטוס למספרים לצורך מיון
+     * @param {string} status - ערך הסטטוס
+     * @returns {number} ערך מספרי למיון
+     */
     function getStatusForSort(status) {
       switch (status) {
         case 'active': return 1;
@@ -809,7 +874,11 @@
       }
     }
     
-    // פונקציה לעדכון אייקוני המיון
+    /**
+     * פונקציה לעדכון אייקוני המיון בטבלה
+     * מעדכנת את האייקונים (↕, ↑, ↓) בעמודות הניתנות למיון
+     * @param {number} activeColumnIndex - אינדקס העמודה הפעילה למיון
+     */
     function updateSortIcons(activeColumnIndex) {
       console.log('🔄 Updating sort icons for column:', activeColumnIndex);
       const buttons = document.querySelectorAll('.sortable-header-btn');
@@ -869,7 +938,11 @@
       }
     ];
 
-    // פונקציה לטעינת נתוני הערות מהשרת
+    /**
+     * פונקציה לטעינת נתוני הערות מהשרת
+     * טוענת את כל ההערות ומעדכנת את המשתנה הגלובלי notesData
+     * @returns {Promise<Array>} מערך של הערות
+     */
     async function loadNotesData() {
       try {
         console.log('🔄 טוען הערות מהשרת...');
@@ -877,7 +950,10 @@
         const notes = response.data || response;
         console.log(`✅ נטענו ${notes.length} הערות`);
         
-        // עדכון הטבלה
+        // עדכון המשתנה הגלובלי לצורך מיון וסינון
+        notesData = notes;
+        
+        // עדכון הטבלה עם הנתונים החדשים
         updateNotesTable(notes);
         
         return notes;
@@ -889,7 +965,12 @@
       }
     }
 
-    // פונקציה לעדכון הטבלה
+    /**
+     * פונקציה לעדכון הטבלה עם נתוני הערות
+     * טוענת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים) לצורך הצגת שמות מלאים
+     * ומעדכנת את הטבלה עם הנתונים המלאים
+     * @param {Array} notes - מערך של הערות לעדכון
+     */
     async function updateNotesTable(notes) {
       console.log('🚀 === התחלת updateNotesTable בדף הערות ===');
       console.log('🔄 מעדכן טבלת הערות עם', notes.length, 'הערות');
@@ -920,6 +1001,13 @@
         trades = tradesResponse.data || tradesResponse;
         tradePlans = tradePlansResponse.data || tradePlansResponse;
         tickers = tickersResponse.data || tickersResponse;
+        
+        // שמירת הנתונים כמשתנים גלובליים לצורך החיפוש והסינון
+        // נתונים אלה נדרשים לפונקציות החיפוש כדי למצוא סימבולים ושמות מלאים
+        window.accountsData = accounts;
+        window.tradesData = trades;
+        window.tradePlansData = tradePlans;
+        window.tickersData = tickers;
         
         console.log('📊 נתונים שנטענו:');
         console.log('חשבונות:', accounts);
@@ -1264,6 +1352,277 @@
     window.loadNotesData = loadNotesData;
     window.updateTableStats = updateTableStats;
     
+    // פונקציות לקבצים
+    function getFileIcon(filename) {
+        if (!filename) return '📄';
+        
+        const extension = filename.toLowerCase().split('.').pop();
+        
+        switch (extension) {
+            case 'pdf':
+                return '📄';
+            case 'doc':
+            case 'docx':
+                return '📝';
+            case 'xls':
+            case 'xlsx':
+                return '📊';
+            case 'ppt':
+            case 'pptx':
+                return '📈';
+            case 'txt':
+                return '📄';
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+            case 'bmp':
+            case 'svg':
+                return '🖼️';
+            case 'mp4':
+            case 'avi':
+            case 'mov':
+            case 'wmv':
+                return '🎥';
+            case 'mp3':
+            case 'wav':
+            case 'flac':
+                return '🎵';
+            case 'zip':
+            case 'rar':
+            case '7z':
+                return '📦';
+            default:
+                return '📎';
+        }
+    }
+    
+    function createFileLink(filename, fileUrl) {
+        if (!filename) return '-';
+        
+        const icon = getFileIcon(filename);
+        const displayName = filename.length > 20 ? filename.substring(0, 20) + '...' : filename;
+        
+        return `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="${filename}">
+            ${icon} ${displayName}
+        </a>`;
+    }
+    
+    // הגדרת הפונקציות כגלובליות
+    window.getFileIcon = getFileIcon;
+    window.createFileLink = createFileLink;
+    
+    /**
+     * פונקציה להגדרת כותרות למיון
+     * מוסיפה event listeners לכפתורי המיון בטבלה ומגדירה אייקונים
+     */
+    function setupSortableHeaders() {
+      console.log('🔄 Setting up sortable headers...');
+      
+      // בדיקה אם יש כותרות למיון
+      const headers = document.querySelectorAll('.sortable-header-btn');
+      console.log('🔄 Found sortable headers:', headers.length);
+      
+      if (headers.length === 0) {
+        console.error('🔄 No sortable headers found!');
+        console.log('🔄 All elements with sortable-header-btn class:', document.querySelectorAll('.sortable-header-btn').length);
+        return;
+      }
+      
+      // הוספת event listeners לכל הכפתורים
+      headers.forEach((button, index) => {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          console.log(`🔄 Sortable header ${index} clicked`);
+          sortTable(index);
+        });
+        
+        // הוספת אייקון מיון
+        const sortIcon = button.querySelector('.sort-icon');
+        if (!sortIcon) {
+          const icon = document.createElement('span');
+          icon.className = 'sort-icon';
+          icon.textContent = '↕';
+          icon.style.marginLeft = '5px';
+          button.insertBefore(icon, button.firstChild);
+        }
+      });
+      
+      console.log('🔄 Sortable headers setup completed');
+    }
+    
+    // הגדרת הפונקציה כגלובלית
+    window.setupSortableHeaders = setupSortableHeaders;
+    
+    /**
+     * פונקציה לעדכון הגריד מהקומפוננט
+     * מקבלת פילטרים מהווב קומפוננט app-header ומעדכנת את הטבלה
+     * @param {Array} selectedStatuses - סטטוסים נבחרים
+     * @param {Array} selectedTypes - סוגים נבחרים
+     * @param {Array} selectedAccounts - חשבונות נבחרים
+     * @param {string} selectedDateRange - טווח תאריכים נבחר
+     * @param {string} searchTerm - מונח חיפוש
+     */
+    window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
+      console.log('🔄 === updateGridFromComponent called for notes ===');
+      console.log('🔄 Selected statuses:', selectedStatuses);
+      console.log('🔄 Selected types:', selectedTypes);
+      console.log('🔄 Selected accounts:', selectedAccounts);
+      console.log('🔄 Selected date range:', selectedDateRange);
+      console.log('🔄 Search term:', searchTerm);
+      
+      // שמירת הפילטרים ב-localStorage
+      localStorage.setItem('notesFilterStatuses', JSON.stringify(selectedStatuses));
+      localStorage.setItem('notesFilterTypes', JSON.stringify(selectedTypes));
+      localStorage.setItem('notesFilterAccounts', JSON.stringify(selectedAccounts));
+      localStorage.setItem('notesFilterDateRanges', JSON.stringify([selectedDateRange]));
+      localStorage.setItem('notesFilterSearch', searchTerm);
+      
+      // שמירת הפילטרים במשתנים הגלובליים
+      window.selectedStatusesForFilter = selectedStatuses;
+      window.selectedTypesForFilter = selectedTypes;
+      window.selectedAccountsForFilter = selectedAccounts;
+      window.selectedDateRangeForFilter = selectedDateRange;
+      window.searchTermForFilter = searchTerm;
+      
+      // החלת הפילטרים על הנתונים
+      filterNotesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
+      
+      console.log('🔄 === updateGridFromComponent completed for notes ===');
+    };
+    
+    /**
+     * פונקציה מותאמת לפילטור נתוני הערות
+     * מסננת את ההערות לפי הפילטרים הנבחרים ומעדכנת את הטבלה
+     * @param {Array} selectedStatuses - סטטוסים נבחרים (לא רלוונטי להערות)
+     * @param {Array} selectedTypes - סוגים נבחרים (לא רלוונטי להערות)
+     * @param {Array} selectedAccounts - חשבונות נבחרים (לא רלוונטי להערות)
+     * @param {string} selectedDateRange - טווח תאריכים נבחר
+     * @param {string} searchTerm - מונח חיפוש חופשי
+     */
+    function filterNotesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
+      console.log('🔄 === FILTER NOTES DATA ===');
+      console.log('🔄 Selected statuses:', selectedStatuses);
+      console.log('🔄 Selected types:', selectedTypes);
+      console.log('🔄 Selected accounts:', selectedAccounts);
+      console.log('🔄 Date range:', selectedDateRange);
+      console.log('🔄 Search term:', searchTerm);
+      
+      if (!notesData || notesData.length === 0) {
+        console.log('🔄 No notes data available for filtering');
+        return;
+      }
+      
+      let filteredNotes = [...notesData];
+      
+      // פילטר לפי תאריכים
+      if (selectedDateRange && selectedDateRange !== 'הכול') {
+        console.log('🔄 Filtering by date range:', selectedDateRange);
+        const now = new Date();
+        let startDate = new Date();
+        
+        switch (selectedDateRange) {
+          case 'שבוע':
+            startDate.setDate(now.getDate() - 7);
+            break;
+          case 'MTD':
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            break;
+          case '30 יום':
+            startDate.setDate(now.getDate() - 30);
+            break;
+          case '60 יום':
+            startDate.setDate(now.getDate() - 60);
+            break;
+          case '90 יום':
+            startDate.setDate(now.getDate() - 90);
+            break;
+          case 'שנה':
+            startDate.setFullYear(now.getFullYear() - 1);
+            break;
+          case 'YTD':
+            startDate = new Date(now.getFullYear(), 0, 1);
+            break;
+          case 'שנה קודמת':
+            startDate = new Date(now.getFullYear() - 1, 0, 1);
+            const endDate = new Date(now.getFullYear() - 1, 11, 31);
+            break;
+        }
+        
+        filteredNotes = filteredNotes.filter(note => {
+          const noteDate = new Date(note.created_at);
+          let isIncluded;
+          if (selectedDateRange === 'שנה קודמת') {
+            isIncluded = noteDate >= startDate && noteDate <= endDate;
+          } else {
+            isIncluded = noteDate >= startDate && noteDate <= now;
+          }
+          console.log(`🔄 Note ${note.id}: date=${noteDate}, included=${isIncluded}`);
+          return isIncluded;
+        });
+        console.log('🔄 After date range filter:', filteredNotes.length, 'notes');
+      }
+      
+      // פילטר לפי חיפוש חופשי - חיפוש בכל השדות כולל סימבולים ושמות
+      if (searchTerm && searchTerm.trim() !== '') {
+        console.log('🔄 Filtering by search term:', searchTerm);
+        const searchLower = searchTerm.toLowerCase();
+        filteredNotes = filteredNotes.filter(note => {
+          // חיפוש בשדות בסיסיים
+          const idMatch = (note.id || '').toString().toLowerCase().includes(searchLower);
+          const contentMatch = (note.content || '').toLowerCase().includes(searchLower);
+          const relatedTypeMatch = (note.related_type || '').toLowerCase().includes(searchLower);
+          const relatedIdMatch = (note.related_id || '').toString().toLowerCase().includes(searchLower);
+          const attachmentMatch = (note.attachment || '').toLowerCase().includes(searchLower);
+          const createdAtMatch = (note.created_at || '').toLowerCase().includes(searchLower);
+          
+          // חיפוש בשדות נוספים אם קיימים
+          const accountIdMatch = (note.account_id || '').toString().toLowerCase().includes(searchLower);
+          const tradeIdMatch = (note.trade_id || '').toString().toLowerCase().includes(searchLower);
+          const tradePlanIdMatch = (note.trade_plan_id || '').toString().toLowerCase().includes(searchLower);
+          
+          // חיפוש בשדה "אובייקט מקושר" - שם הסימבול או שם החשבון
+          let relatedObjectMatch = false;
+          if (note.related_type === 'trade' || note.related_type === 'trade_plan') {
+            // נחפש את הסימבול של הטיקר (AAPL, TSLA, וכו')
+            const tickerId = note.related_type === 'trade' ? 
+              (window.tradesData ? window.tradesData.find(t => t.id == note.related_id)?.ticker_id : null) :
+              (window.tradePlansData ? window.tradePlansData.find(p => p.id == note.related_id)?.ticker_id : null);
+            
+            if (tickerId && window.tickersData) {
+              const ticker = window.tickersData.find(tick => tick.id == tickerId);
+              if (ticker && ticker.symbol) {
+                relatedObjectMatch = ticker.symbol.toLowerCase().includes(searchLower);
+              }
+            }
+          } else if (note.related_type === 'account') {
+            // נחפש את שם החשבון
+            if (window.accountsData) {
+              const account = window.accountsData.find(acc => acc.id == note.related_id);
+              if (account && account.name) {
+                relatedObjectMatch = account.name.toLowerCase().includes(searchLower);
+              }
+            }
+          }
+          
+          const isIncluded = idMatch || contentMatch || relatedTypeMatch || relatedIdMatch || 
+                            attachmentMatch || createdAtMatch || accountIdMatch || tradeIdMatch || 
+                            tradePlanIdMatch || relatedObjectMatch;
+          
+          console.log(`🔄 Note ${note.id}: id match=${idMatch}, content match=${contentMatch}, related_type match=${relatedTypeMatch}, related_id match=${relatedIdMatch}, attachment match=${attachmentMatch}, created_at match=${createdAtMatch}, related_object match=${relatedObjectMatch}, included=${isIncluded}`);
+          return isIncluded;
+        });
+        console.log('🔄 After search filter:', filteredNotes.length, 'notes');
+      }
+      
+      // עדכון הטבלה
+      if (typeof window.updateNotesTable === 'function') {
+        window.updateNotesTable(filteredNotes);
+      } else {
+        console.error('❌ updateNotesTable function not found');
+      }
+    }
+    
     // פונקציה לטעינת הערות (כמו בדף database.html)
     async function loadNotes() {
       try {
@@ -1289,6 +1648,43 @@
     // הגדרת הפונקציה כגלובלית
     window.loadNotes = loadNotes;
     
+    /**
+     * פונקציה לאיפוס כל הפילטרים למצב ברירת המחדל
+     * מאפסת את כל הפילטרים ב-localStorage ובמשתנים הגלובליים
+     * @param {string} pageName - שם הדף (notes, designs, tracking)
+     */
+    window.resetAllFiltersForPage = function(pageName) {
+      console.log(`🔄 === Resetting all filters for ${pageName} ===`);
+      
+      if (pageName === 'notes') {
+        // איפוס הפילטרים למצב ברירת המחדל
+        const defaultStatuses = ['פתוח']; // רק "פתוח" מסומן
+        const defaultTypes = []; // כל הסוגים מסומנים (אין פילטר)
+        const defaultAccounts = []; // כל החשבונות מסומנים (אין פילטר)
+        const defaultDateRange = 'הכול'; // "הכול" מסומן
+        const defaultSearch = ''; // חיפוש ריק
+        
+        // שמירת הפילטרים ב-localStorage
+        localStorage.setItem('notesFilterStatuses', JSON.stringify(defaultStatuses));
+        localStorage.setItem('notesFilterTypes', JSON.stringify(defaultTypes));
+        localStorage.setItem('notesFilterAccounts', JSON.stringify(defaultAccounts));
+        localStorage.setItem('notesFilterDateRanges', JSON.stringify([defaultDateRange]));
+        localStorage.setItem('notesFilterSearch', defaultSearch);
+        
+        // עדכון המשתנים הגלובליים
+        window.selectedStatusesForFilter = defaultStatuses;
+        window.selectedTypesForFilter = defaultTypes;
+        window.selectedAccountsForFilter = defaultAccounts;
+        window.selectedDateRangeForFilter = defaultDateRange;
+        window.searchTermForFilter = defaultSearch;
+        
+        // רענון הנתונים עם הפילטרים החדשים
+        filterNotesData(defaultStatuses, defaultTypes, defaultAccounts, defaultDateRange, defaultSearch);
+        
+        console.log(`🔄 === Reset completed for ${pageName} ===`);
+      }
+    };
+    
     // פונקציה לרענון התראות
     function refreshAlerts() {
       if (typeof loadAlertsForCards === 'function') {
@@ -1299,6 +1695,23 @@
     
     // הגדרת הפונקציה כגלובלית
     window.refreshAlerts = refreshAlerts;
+    
+    /**
+     * פונקציה לאיפוס פילטרים ורענון נתונים
+     * מאפסת את כל הפילטרים למצב ברירת המחדל וטוענת נתונים חדשים מהשרת
+     */
+    function resetAllFiltersAndReloadData() {
+      console.log('🔄 === Resetting filters and reloading data ===');
+      
+      // איפוס הפילטרים למצב ברירת המחדל
+      window.resetAllFiltersForPage('notes');
+      
+      // רענון הנתונים מהשרת
+      loadNotes();
+    }
+    
+    // הגדרת הפונקציה כגלובלית
+    window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
     
     // אתחול הדף
     document.addEventListener('DOMContentLoaded', function() {
@@ -1337,10 +1750,16 @@
         loadAlertsForCards();
       }
       
+      // הגדרת כותרות למיון אחרי טעינת נתונים
+      setTimeout(() => {
+        console.log('🔄 === SETUP SORTABLE HEADERS AFTER DATA LOAD ===');
+        setupSortableHeaders();
+      }, 1000);
+      
       // הגדרת כותרות למיון
       setTimeout(() => {
         console.log('🔄 === SETUP SORTABLE HEADERS ===');
-        // כאן יוכנס קוד להגדרת כותרות למיון
+        setupSortableHeaders();
       }, 500);
       
       // בדיקת פילטרים שמורים אחרי 1 שנייה

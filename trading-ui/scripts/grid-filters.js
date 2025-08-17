@@ -1,5 +1,32 @@
-// ===== GRID FILTERS SYSTEM =====
-// קובץ ייעודי למערכת הפילטרים - משותף לכל הדפים
+/**
+ * ========================================
+ * מערכת הפילטרים - Grid Filters System
+ * ========================================
+ * 
+ * קובץ ייעודי למערכת הפילטרים המשותפת לכל הדפים
+ * 
+ * תכונות עיקריות:
+ * - פילטר תאריכים (שבוע, MTD, 30 יום, וכו')
+ * - פילטר חיפוש חופשי (כולל סימבולים ושמות)
+ * - פילטר סטטוס (פתוח, סגור, וכו')
+ * - פילטר סוג (long, short, וכו')
+ * - פילטר חשבון
+ * - שמירת מצב פילטרים ב-localStorage
+ * 
+ * דפים נתמכים:
+ * - notes - הערות (פילטרים רלוונטיים: תאריכים, חיפוש)
+ * - designs - עיצובים (כל הפילטרים)
+ * - tracking - מעקב (כל הפילטרים)
+ * 
+ * פונקציות עיקריות:
+ * - filterDataByFilters() - פילטור נתונים לפי כל הפילטרים
+ * - applyDateRangeFilterToGrid() - פילטר תאריכים
+ * - loadSavedFilters() - טעינת פילטרים שמורים
+ * 
+ * מחבר: Tik.track Development Team
+ * תאריך עדכון אחרון: 2025
+ * ========================================
+ */
 
 
 
@@ -594,7 +621,15 @@ window.updateGridFromComponentGlobal = updateGridFromComponentGlobal;
 window.resetAllFiltersForPage = resetAllFiltersForPage;
 window.initializePageFilters = initializePageFilters;
 
-// פונקציה כללית לסינון נתונים לפי פילטרים
+/**
+ * פונקציה כללית לסינון נתונים לפי פילטרים
+ * מסננת נתונים לפי סטטוס, סוג, חשבון, תאריכים וחיפוש חופשי
+ * תומכת בדפים שונים עם פילטרים מותאמים לכל דף
+ * 
+ * @param {Array} data - מערך הנתונים לסינון
+ * @param {string} pageName - שם הדף (notes, designs, tracking, planning)
+ * @returns {Array} מערך הנתונים המסוננים
+ */
 function filterDataByFilters(data, pageName) {
   console.log(`🔍 === Filtering data for ${pageName} ===`);
   console.log('🔍 Initial data length:', data.length);
@@ -615,45 +650,55 @@ function filterDataByFilters(data, pageName) {
     console.log('🔍 Filtering by status:', selectedStatuses);
     console.log('🔍 Data before status filter:', filteredData.length);
     
-    filteredData = filteredData.filter(item => {
-      let itemStatus;
-      if (pageName === 'designs') {
-        itemStatus = item.status === 'canceled' ? 'מבוטל' : 'פתוח';
-      } else if (pageName === 'planning') {
-        itemStatus = item.canceled_at ? 'מבוטל' : 'פתוח';
-      } else {
-        itemStatus = item.status || 'פתוח';
-      }
-      
-      const isIncluded = selectedStatuses.includes(itemStatus);
-      console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: status=${itemStatus}, included=${isIncluded}`);
-      return isIncluded;
-    });
-    console.log('🔍 After status filter:', filteredData.length, 'items');
+    // עבור דף ההערות - לא מסננים לפי סטטוס, תמיד מציגים הכל
+    if (pageName === 'notes') {
+      console.log('🔍 Notes page - status filter not applied (showing all)');
+    } else {
+      filteredData = filteredData.filter(item => {
+        let itemStatus;
+        if (pageName === 'designs') {
+          itemStatus = item.status === 'canceled' ? 'מבוטל' : 'פתוח';
+        } else if (pageName === 'planning') {
+          itemStatus = item.canceled_at ? 'מבוטל' : 'פתוח';
+        } else {
+          itemStatus = item.status || 'פתוח';
+        }
+        
+        const isIncluded = selectedStatuses.includes(itemStatus);
+        console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: status=${itemStatus}, included=${isIncluded}`);
+        return isIncluded;
+      });
+      console.log('🔍 After status filter:', filteredData.length, 'items');
+    }
   } else {
     console.log('🔍 No status filter applied - selectedStatuses:', selectedStatuses);
   }
   
-  // סינון לפי סוג השקעה
+  // סינון לפי סוג השקעה/קשר
   if (selectedTypes && selectedTypes.length > 0 && selectedTypes.length < 3) {
     console.log('🔍 Filtering by type:', selectedTypes);
     console.log('🔍 Data before type filter:', filteredData.length);
     
-    filteredData = filteredData.filter(item => {
-      let itemType;
-      if (pageName === 'designs') {
-        itemType = item.type || 'long';
-      } else if (pageName === 'planning') {
-        itemType = item.investment_type || 'long';
-      } else {
-        itemType = item.type || 'long';
-      }
-      
-      const isIncluded = selectedTypes.includes(itemType);
-      console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: type=${itemType}, included=${isIncluded}`);
-      return isIncluded;
-    });
-    console.log('🔍 After type filter:', filteredData.length, 'items');
+    // עבור דף ההערות - לא מסננים לפי סוג, תמיד מציגים הכל
+    if (pageName === 'notes') {
+      console.log('🔍 Notes page - type filter not applied (showing all)');
+    } else {
+      filteredData = filteredData.filter(item => {
+        let itemType;
+        if (pageName === 'designs') {
+          itemType = item.type || 'long';
+        } else if (pageName === 'planning') {
+          itemType = item.investment_type || 'long';
+        } else {
+          itemType = item.type || 'long';
+        }
+        
+        const isIncluded = selectedTypes.includes(itemType);
+        console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: type=${itemType}, included=${isIncluded}`);
+        return isIncluded;
+      });
+      console.log('🔍 After type filter:', filteredData.length, 'items');
+    }
   } else {
     console.log('🔍 No type filter applied - selectedTypes:', selectedTypes);
   }
@@ -669,12 +714,24 @@ function filterDataByFilters(data, pageName) {
         itemAccount = item.account || 'חשבון ראשי';
       } else if (pageName === 'planning') {
         itemAccount = item.account_name || item.account || 'חשבון ראשי';
+      } else if (pageName === 'notes') {
+        // פילטר לפי חשבון עבור הערות - נבדוק אם ההערה קשורה לחשבון
+        if (item.related_type === 'account') {
+          // נצטרך לטעון את שם החשבון מהשרת
+          itemAccount = `חשבון ${item.related_id}`;
+        } else {
+          itemAccount = 'לא קשור לחשבון';
+        }
       } else {
         itemAccount = item.account || 'חשבון ראשי';
       }
       
       const isIncluded = selectedAccounts.includes(itemAccount);
-      console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: account=${itemAccount}, included=${isIncluded}`);
+      if (pageName === 'notes') {
+        console.log(`🔍 Note ${item.id}: account=${itemAccount}, included=${isIncluded}`);
+      } else {
+        console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: account=${itemAccount}, included=${isIncluded}`);
+      }
       return isIncluded;
     });
     console.log('🔍 After account filter:', filteredData.length, 'items');
@@ -689,11 +746,59 @@ function filterDataByFilters(data, pageName) {
     
     filteredData = filteredData.filter(item => {
       const searchLower = searchTerm.toLowerCase();
-      const tickerMatch = (item.ticker || item.ticker_symbol || '').toLowerCase().includes(searchLower);
-      const notesMatch = (item.notes || '').toLowerCase().includes(searchLower);
-      const isIncluded = tickerMatch || notesMatch;
-      console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: search match=${isIncluded}`);
-      return isIncluded;
+      
+      if (pageName === 'notes') {
+        // פילטר חיפוש עבור הערות - חיפוש בכל השדות כולל סימבולים ושמות
+        const idMatch = (item.id || '').toString().toLowerCase().includes(searchLower);
+        const contentMatch = (item.content || '').toLowerCase().includes(searchLower);
+        const relatedTypeMatch = (item.related_type || '').toLowerCase().includes(searchLower);
+        const relatedIdMatch = (item.related_id || '').toString().toLowerCase().includes(searchLower);
+        const attachmentMatch = (item.attachment || '').toLowerCase().includes(searchLower);
+        const createdAtMatch = (item.created_at || '').toLowerCase().includes(searchLower);
+        
+        // חיפוש בשדות נוספים אם קיימים
+        const accountIdMatch = (item.account_id || '').toString().toLowerCase().includes(searchLower);
+        const tradeIdMatch = (item.trade_id || '').toString().toLowerCase().includes(searchLower);
+        const tradePlanIdMatch = (item.trade_plan_id || '').toString().toLowerCase().includes(searchLower);
+        
+        // חיפוש בשדה "אובייקט מקושר" - שם הסימבול או שם החשבון
+        let relatedObjectMatch = false;
+        if (item.related_type === 'trade' || item.related_type === 'trade_plan') {
+          // נחפש את הסימבול של הטיקר (AAPL, TSLA, וכו')
+          const tickerId = item.related_type === 'trade' ? 
+            (window.tradesData ? window.tradesData.find(t => t.id == item.related_id)?.ticker_id : null) :
+            (window.tradePlansData ? window.tradePlansData.find(p => p.id == item.related_id)?.ticker_id : null);
+          
+          if (tickerId && window.tickersData) {
+            const ticker = window.tickersData.find(tick => tick.id == tickerId);
+            if (ticker && ticker.symbol) {
+              relatedObjectMatch = ticker.symbol.toLowerCase().includes(searchLower);
+            }
+          }
+        } else if (item.related_type === 'account') {
+          // נחפש את שם החשבון
+          if (window.accountsData) {
+            const account = window.accountsData.find(acc => acc.id == item.related_id);
+            if (account && account.name) {
+              relatedObjectMatch = account.name.toLowerCase().includes(searchLower);
+            }
+          }
+        }
+        
+        const isIncluded = idMatch || contentMatch || relatedTypeMatch || relatedIdMatch || 
+                          attachmentMatch || createdAtMatch || accountIdMatch || tradeIdMatch || 
+                          tradePlanIdMatch || relatedObjectMatch;
+        
+        console.log(`🔍 Note ${item.id}: id match=${idMatch}, content match=${contentMatch}, related_type match=${relatedTypeMatch}, related_id match=${relatedIdMatch}, attachment match=${attachmentMatch}, created_at match=${createdAtMatch}, related_object match=${relatedObjectMatch}, included=${isIncluded}`);
+        return isIncluded;
+      } else {
+        // פילטר חיפוש עבור דפים אחרים
+        const tickerMatch = (item.ticker || item.ticker_symbol || '').toLowerCase().includes(searchLower);
+        const notesMatch = (item.notes || '').toLowerCase().includes(searchLower);
+        const isIncluded = tickerMatch || notesMatch;
+        console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: search match=${isIncluded}`);
+        return isIncluded;
+      }
     });
     console.log('🔍 After search filter:', filteredData.length, 'items');
   } else {
@@ -750,6 +855,9 @@ function filterDataByFilters(data, pageName) {
           itemDate = new Date(item.date);
         }
       } else if (pageName === 'planning') {
+        itemDate = new Date(item.created_at);
+      } else if (pageName === 'notes') {
+        // פילטר תאריכים עבור הערות
         itemDate = new Date(item.created_at);
       } else {
         itemDate = new Date(item.date || item.created_at);

@@ -6,6 +6,7 @@ from .trade import Trade
 from .alert import Alert
 from .cash_flow import CashFlow
 from .note import Note
+from .note_relation_type import NoteRelationType
 from .execution import Execution
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     'Alert',
     'CashFlow',
     'Note',
+    'NoteRelationType',
     'Execution'
 ]

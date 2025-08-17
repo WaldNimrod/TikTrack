@@ -1,3 +1,27 @@
+/**
+ * ========================================
+ * Web Component - AppHeader
+ * ========================================
+ * 
+ * קומפוננט כותרת האתר עם מערכת פילטרים גלובלית
+ * 
+ * תכונות עיקריות:
+ * - ניווט בין דפים
+ * - מערכת פילטרים גלובלית (סטטוס, סוג, חשבון, תאריכים, חיפוש)
+ * - שמירת מצב פילטרים ב-localStorage
+ * - תמיכה בדפים שונים עם פילטרים מותאמים
+ * - כפתור רענון לאיפוס פילטרים
+ * 
+ * דפים נתמכים:
+ * - notes - הערות (פילטרים רלוונטיים: תאריכים, חיפוש)
+ * - designs - עיצובים (כל הפילטרים)
+ * - tracking - מעקב (כל הפילטרים)
+ * 
+ * מחבר: Tik.track Development Team
+ * תאריך עדכון אחרון: 2025
+ * ========================================
+ */
+
 // Web Component עבור כותרת האתר
 class AppHeader extends HTMLElement {
   constructor() {
@@ -1154,8 +1178,27 @@ class AppHeader extends HTMLElement {
     });
   }
 
+  /**
+   * אתחול מערכת הפילטרים
+   * טוענת פילטרים שמורים מ-localStorage או מגדירה ברירות מחדל
+   * תומכת בדפים שונים עם פילטרים מותאמים לכל דף
+   */
   initializeFilter() {
     console.log('initializeFilter called');
+    
+    // קביעת שם הדף הנוכחי
+    const currentPath = window.location.pathname;
+    let pageName = 'planning'; // ברירת מחדל
+    
+    if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
+      pageName = 'designs';
+    } else if (currentPath.includes('/tracking')) {
+      pageName = 'tracking';
+    } else if (currentPath.includes('/notes')) {
+      pageName = 'notes';
+    }
+    
+    console.log('Current page for filters:', pageName);
     
     // בדיקה אם יש פילטרים שמורים ב-localStorage
     let savedStatusFilter = null;
@@ -1165,11 +1208,11 @@ class AppHeader extends HTMLElement {
     let savedSearchFilter = null;
     
     try {
-      const savedStatusData = localStorage.getItem('planningFilterStatuses');
-      const savedTypeData = localStorage.getItem('planningFilterTypes');
-      const savedAccountData = localStorage.getItem('planningFilterAccounts');
-      const savedDateRangeData = localStorage.getItem('planningFilterDateRanges');
-      const savedSearchData = localStorage.getItem('planningFilterSearch');
+      const savedStatusData = localStorage.getItem(`${pageName}FilterStatuses`);
+      const savedTypeData = localStorage.getItem(`${pageName}FilterTypes`);
+      const savedAccountData = localStorage.getItem(`${pageName}FilterAccounts`);
+      const savedDateRangeData = localStorage.getItem(`${pageName}FilterDateRanges`);
+      const savedSearchData = localStorage.getItem(`${pageName}FilterSearch`);
       
       if (savedStatusData) {
         savedStatusFilter = JSON.parse(savedStatusData);
@@ -1218,13 +1261,20 @@ class AppHeader extends HTMLElement {
           // ברירת מחדל - רק "פתוח" מסומן
           items.forEach(item => {
             const text = item.querySelector('.option-text').textContent;
-            if (text === 'פתוח') {
+            if (pageName === 'notes') {
+              // עבור דף ההערות - רק "פתוח" מסומן (ברירת מחדל)
+              if (text === 'פתוח') {
+                item.classList.add('selected');
+              } else {
+                item.classList.remove('selected');
+              }
+            } else if (text === 'פתוח') {
               item.classList.add('selected');
             } else {
               item.classList.remove('selected');
             }
           });
-          console.log('Status filter initialized with default (only "פתוח" selected)');
+          console.log(`Status filter initialized with default for ${pageName}`);
         }
         
         this.updateStatusFilterText();
@@ -1267,7 +1317,7 @@ class AppHeader extends HTMLElement {
           typeItems.forEach(item => {
             item.classList.add('selected');
           });
-          console.log('Type filter initialized with default (all items selected)');
+          console.log(`Type filter initialized with default for ${pageName} (all items selected)`);
         }
         
         this.updateTypeFilterText();
@@ -1297,7 +1347,7 @@ class AppHeader extends HTMLElement {
           accountItems.forEach(item => {
             item.classList.add('selected');
           });
-          console.log('Account filter initialized with default (all items selected)');
+          console.log(`Account filter initialized with default for ${pageName} (all items selected)`);
         }
         
         this.updateAccountFilterText();
@@ -1333,7 +1383,7 @@ class AppHeader extends HTMLElement {
               item.classList.remove('selected');
             }
           });
-          console.log('Date range filter initialized with default (only "הכול" selected)');
+          console.log(`Date range filter initialized with default for ${pageName} (only "הכול" selected)`);
         }
         
         this.updateDateRangeFilterText();
@@ -1346,10 +1396,10 @@ class AppHeader extends HTMLElement {
       if (searchInput) {
         if (savedSearchFilter && savedSearchFilter.trim() !== '') {
           searchInput.value = savedSearchFilter;
-          console.log('Search input initialized with saved filter:', savedSearchFilter);
+          console.log(`Search input initialized with saved filter for ${pageName}:`, savedSearchFilter);
         } else {
           searchInput.value = '';
-          console.log('Search input initialized with empty value');
+          console.log(`Search input initialized with empty value for ${pageName}`);
         }
         
         this.toggleSearchClearButton();
@@ -2216,6 +2266,11 @@ class AppHeader extends HTMLElement {
 
 
 
+  /**
+   * איפוס כל הפילטרים למצב ברירת המחדל
+   * מאפסת את כל הפילטרים ב-localStorage ובממשק המשתמש
+   * תומכת בדפים שונים עם פילטרים מותאמים לכל דף
+   */
   clearAllFilters() {
     console.log('clearAllFilters called from component');
     
@@ -2277,12 +2332,25 @@ class AppHeader extends HTMLElement {
     
     // ניקוי הפילטרים השמורים ב-localStorage
     try {
-      localStorage.removeItem('globalFilterStatuses');
-      localStorage.removeItem('globalFilterTypes');
-      localStorage.removeItem('globalFilterAccounts');
-      localStorage.removeItem('globalFilterDateRanges');
-      localStorage.removeItem('globalFilterSearch');
-      console.log('All saved filters cleared from localStorage');
+      // קביעת שם הדף הנוכחי
+      const currentPath = window.location.pathname;
+      let pageName = 'planning'; // ברירת מחדל
+      
+      if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
+        pageName = 'designs';
+      } else if (currentPath.includes('/tracking')) {
+        pageName = 'tracking';
+      } else if (currentPath.includes('/notes')) {
+        pageName = 'notes';
+      }
+      
+      // מחיקת הפילטרים לפי שם הדף
+      localStorage.removeItem(`${pageName}FilterStatuses`);
+      localStorage.removeItem(`${pageName}FilterTypes`);
+      localStorage.removeItem(`${pageName}FilterAccounts`);
+      localStorage.removeItem(`${pageName}FilterDateRanges`);
+      localStorage.removeItem(`${pageName}FilterSearch`);
+      console.log(`All saved filters cleared from localStorage for ${pageName}`);
     } catch (error) {
       console.error('Error clearing filters from localStorage:', error);
     }
@@ -2291,6 +2359,11 @@ class AppHeader extends HTMLElement {
     this.updateGridFilter();
   }
 
+  /**
+   * עדכון הפילטרים בגריד
+   * אוספת את כל הפילטרים הנבחרים ומעבירה אותם לפונקציה הגלובלית
+   * תומכת בדפים שונים עם פילטרים מותאמים לכל דף
+   */
   updateGridFilter() {
     console.log('=== updateGridFilter called ===');
     
@@ -2351,6 +2424,20 @@ class AppHeader extends HTMLElement {
     } else {
       console.log('updateTestCheckboxesFromComponent function not found');
     }
+    
+    // קביעת שם הדף הנוכחי
+    const currentPath = window.location.pathname;
+    let pageName = 'planning'; // ברירת מחדל
+    
+    if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
+      pageName = 'designs';
+    } else if (currentPath.includes('/tracking')) {
+      pageName = 'tracking';
+    } else if (currentPath.includes('/notes')) {
+      pageName = 'notes';
+    }
+    
+    console.log('Current page for grid filter:', pageName);
     
     // עדכון הגריד דרך הפונקציה הגלובלית
     if (typeof window.updateGridFromComponent === 'function') {

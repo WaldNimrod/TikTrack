@@ -433,7 +433,7 @@ def get_trades():
         t.id,
         t.status,
         t.type,
-        t.opened_at,
+        t.created_at,
         t.closed_at,
         t.cancelled_at,
         t.total_pl,
@@ -445,7 +445,7 @@ def get_trades():
     FROM trades t
     JOIN tickers tick ON t.ticker_id = tick.id
     JOIN accounts a ON t.account_id = a.id
-    ORDER BY t.opened_at DESC
+    ORDER BY t.created_at DESC
     """
     
     cursor.execute(query)
@@ -467,7 +467,7 @@ def create_trade():
         # יצירת הטרייד
         cursor.execute("""
             INSERT INTO trades 
-            (account_id, ticker_id, trade_plan_id, status, type, opened_at, notes, cancelled_at, cancel_reason)
+            (account_id, ticker_id, trade_plan_id, status, type, created_at, notes, cancelled_at, cancel_reason)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             data['account_id'],
@@ -513,7 +513,7 @@ def get_closed_trades():
         t.id,
         t.status,
         t.type,
-        t.opened_at,
+        t.created_at,
         t.closed_at,
         t.total_pl,
         t.notes,
@@ -693,7 +693,7 @@ def get_table_data_v2(table_name):
             FROM trades tr
             LEFT JOIN tickers t ON tr.ticker_id = t.id
             LEFT JOIN accounts a ON tr.account_id = a.id
-            ORDER BY tr.opened_at DESC
+            ORDER BY tr.created_at DESC
             """
         elif table_name == 'executions':
             query = """
@@ -791,7 +791,7 @@ def get_table_data_v2(table_name):
 
 
         cursor.execute("""
-            SELECT id, status, opened_at, ticker_id 
+            SELECT id, status, created_at, ticker_id 
             FROM trades 
             WHERE account_id = ? AND status IN ('open', 'pending', 'פתוח', 'ממתין')
         """, (account_id,))
@@ -803,7 +803,7 @@ def get_table_data_v2(table_name):
                 trades_info.append({
                     'id': trade['id'],
                     'status': trade['status'],
-                    'opened_at': trade['opened_at']
+                    'created_at': trade['created_at']
                 })
             
             return jsonify({
@@ -1341,7 +1341,7 @@ def delete_account(account_id):
         
         # בדיקה שאין טריידים פעילים בחשבון
         cursor.execute("""
-            SELECT id, status, opened_at, ticker_id 
+            SELECT id, status, created_at, ticker_id 
             FROM trades 
             WHERE account_id = ? AND status IN ('open', 'pending', 'פתוח', 'ממתין')
         """, (account_id,))
@@ -1353,7 +1353,7 @@ def delete_account(account_id):
                 trades_info.append({
                     'id': trade['id'],
                     'status': trade['status'],
-                    'opened_at': trade['opened_at']
+                    'created_at': trade['created_at']
                 })
             
             return jsonify({

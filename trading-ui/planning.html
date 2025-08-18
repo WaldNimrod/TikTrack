@@ -54,6 +54,7 @@
   <script src="scripts/grid-table.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/alerts.js"></script>
+  <script src="scripts/active-alerts-component.js"></script>
 </head>
 <body>
   <!-- רקע כללי -->
@@ -82,22 +83,9 @@
         </div>
       </div>
 
-                        <!-- כרטיסיות התראות -->
+                        <!-- כרטיסיות התראות פעילות -->
       <div class="section-body">
-        <div class="alerts-cards-container">
-          <div class="alerts-header">
-                          <h3>🔔 התראות</h3>
-            <div class="alerts-header-actions">
-              <div class="alerts-count" id="newAlertsCount">0 התראות</div>
-              <button class="refresh-btn" onclick="refreshAlerts()" title="רענן התראות">
-                <span class="action-icon">🔄</span>
-              </button>
-        </div>
-        </div>
-          <div class="alerts-cards" id="alertsCards">
-            <!-- כרטיסיות ההתראות יוכנסו כאן דינמית -->
-        </div>
-        </div>
+        <active-alerts></active-alerts>
         
         <!-- סיכום נתונים -->
         <div class="info-summary" id="summaryStats">
@@ -1239,96 +1227,7 @@
       console.log('🔄 window.refreshAlerts:', typeof window.refreshAlerts);
       console.log('🔄 window.loadSampleAlertsForCards:', typeof window.loadSampleAlertsForCards);
       
-      // בדיקה אם הקובץ alerts.js נטען
-      console.log('🔄 === ALERTS.JS LOADING CHECK ===');
-      const scripts = document.querySelectorAll('script[src*="alerts.js"]');
-      console.log('🔄 Found alerts.js scripts:', scripts.length);
-      scripts.forEach((script, index) => {
-        console.log(`🔄 Script ${index + 1}:`, script.src);
-      });
-      
-      // בדיקה של ה-container
-      console.log('🔄 === CONTAINER CHECK ===');
-      const alertsCardsContainer = document.getElementById('alertsCards');
-      const newAlertsCountElement = document.getElementById('newAlertsCount');
-      console.log('🔄 alertsCards container:', alertsCardsContainer);
-      console.log('🔄 newAlertsCount element:', newAlertsCountElement);
-      
-      if (alertsCardsContainer) {
-        console.log('🔄 Container HTML:', alertsCardsContainer.innerHTML);
-      }
-      
-      if (typeof loadAlertsForCards === 'function') {
-        console.log('🔄 loadAlertsForCards function found, calling it...');
-        loadAlertsForCards();
-        console.log('🔄 === ALERTS CARDS LOADED ===');
-        } else {
-        console.log('🔄 loadAlertsForCards function NOT found!');
-        console.log('🔄 Trying to load sample alerts directly...');
-        if (typeof loadSampleAlertsForCards === 'function') {
-          loadSampleAlertsForCards();
-        } else {
-          console.log('🔄 loadSampleAlertsForCards also not found!');
-          console.log('🔄 Loading sample alerts manually...');
-          
-          // טעינה ידנית של התראות דוגמה
-          const alertsCardsData = [
-            {
-              id: 1,
-              title: 'התראה על מחיר נכס',
-              message: 'מחיר AAPL הגיע ליעד המחיר שהוגדר',
-              ticker: 'AAPL',
-              current_price: 185.50,
-              target_price: 185.00,
-              created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-              is_triggered: 'new',
-              alert_type: 'price_target'
-            },
-            {
-              id: 2,
-              title: 'התראה על נפח מסחר',
-              message: 'נפח המסחר ב-TSLA עלה ב-50% מהממוצע היומי',
-              ticker: 'TSLA',
-              volume: 15000000,
-              avg_volume: 10000000,
-              created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-              is_triggered: 'new',
-              alert_type: 'volume_spike'
-            }
-          ];
-          
-          console.log('🔄 Manual alerts data created:', alertsCardsData);
-          
-          // הצגת הכרטיסיות ידנית
-          const cardsContainer = document.getElementById('alertsCards');
-          if (cardsContainer) {
-            console.log('🔄 Found alertsCards container, rendering manually...');
-            const cardsHTML = alertsCardsData.map(alert => `
-              <div class="alert-card" data-alert-id="${alert.id}">
-                <div class="alert-card-header">
-                  <h4 class="alert-card-title">🔔 ${alert.title}</h4>
-                  <span class="alert-card-time">לפני 30 דקות</span>
-                </div>
-                <div class="alert-card-content">
-                  <p class="alert-card-message">${alert.message}</p>
-                  <div class="alert-card-details">
-                    <span class="alert-detail-item">📈 ${alert.ticker}</span>
-                  </div>
-                </div>
-                <div class="alert-card-actions">
-                  <button class="btn-mark-read" onclick="alert('קראתי!')" data-alert-id="${alert.id}">
-                    ✓ קראתי
-                  </button>
-                </div>
-              </div>
-        `).join('');
-            cardsContainer.innerHTML = cardsHTML;
-            console.log('🔄 Manual cards rendered successfully!');
-          } else {
-            console.log('🔄 alertsCards container NOT found!');
-          }
-        }
-      }
+
       
       // הגדרת כותרות למיון מיד
       console.log('🔄 === SETUP SORTABLE HEADERS IMMEDIATE ===');
@@ -1365,6 +1264,8 @@
         }
     }, 1000);
     });
+    
+
   </script>
 </body>
 </html>

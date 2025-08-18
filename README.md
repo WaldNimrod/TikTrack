@@ -37,6 +37,19 @@ TikTrackApp/
 │   ├── config/                   # הגדרות
 │   │   ├── database.py          # הגדרות בסיס נתונים
 │   │   └── settings.py          # הגדרות כלליות
+│   ├── testing_suite/            # מערכת בדיקות מקיפה
+│   │   ├── unit_tests/          # בדיקות יחידה
+│   │   ├── integration_tests/   # בדיקות אינטגרציה
+│   │   ├── e2e_tests/           # בדיקות end-to-end
+│   │   ├── performance_tests/   # בדיקות ביצועים
+│   │   ├── load_tests/          # בדיקות עומס
+│   │   ├── security_tests/      # בדיקות אבטחה
+│   │   ├── documentation/       # תיעוד בדיקות
+│   │   ├── logs/               # לוגים
+│   │   ├── reports/            # דוחות
+│   │   ├── configs/            # הגדרות בדיקות
+│   │   ├── Makefile            # פקודות להרצה
+│   │   └── README.md           # תיעוד מפורט
 │   └── db/
 │       └── simpleTrade_new.db   # בסיס נתונים SQLite (חדש)
 ├── trading-ui/                   # ממשק משתמש
@@ -74,6 +87,8 @@ documentation/
 - **שינויים בבסיס נתונים**: `documentation/database/DATABASE_CHANGES_AUGUST_2025.md`
 - **מערכת ההתראות**: `Backend/ALERT_SYSTEM_DOCUMENTATION.md`
 - **מערכת אישור כפול**: `documentation/frontend/DOUBLE_CONFIRMATION_SYSTEM.md`
+- **מערכת בדיקות**: `Backend/testing_suite/README.md`
+- **סיכום בדיקות**: `Backend/README_TESTING.md`
 
 ### 🚀 **אינדקס מהיר:**
 - **גישה מהירה לכל התיעוד**: `documentation/QUICK_INDEX.md`
@@ -95,6 +110,7 @@ documentation/
 - **הסרת שדה is_active**: פישוט מבנה טבלת ההתראות
 - **מערכת שיוך גמישה**: שיוך התראות והערות לישויות שונות באמצעות `related_type_id` ו-`related_id`
 - **מערכת אישור כפול**: חלון אזהרה שני למחיקת חשבונות עם בדיקת אובייקטים מקושרים
+- **מערכת בדיקות מקיפה**: ארגון כל הבדיקות בתיקייה ייעודית עם מבנה מקצועי
 
 ### תיקוני באגים
 - **תיקון רשימת תוכניות**: פתרון בעיית טעינת תוכניות טרייד בטופסים
@@ -443,6 +459,27 @@ CREATE TABLE alerts (
 2. פתח את העמודים בדפדפן
 3. בדוק שהנתונים נטענים מהשרת
 4. בדוק יצירה ועריכה של נתונים
+
+### הרצת בדיקות
+
+```bash
+# הרצת כל הבדיקות
+cd Backend/testing_suite && make test
+
+# הרצת בדיקות יחידה
+make test-unit
+
+# הרצת בדיקות אינטגרציה
+make test-integration
+
+# הרצת בדיקות E2E
+make test-e2e
+
+# הרצה עם דוח כיסוי
+make coverage
+```
+
+**סטטוס בדיקות**: 23 בדיקות עוברות, 2 דילוגו
 
 ## בעיות ידועות
 

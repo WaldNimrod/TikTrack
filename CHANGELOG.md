@@ -2,6 +2,46 @@
 
 כל השינויים המשמעותיים בפרויקט מתועדים בקובץ זה.
 
+## [2025-08-19] - מערכת בדיקות מקיפה
+
+### ✅ הוספו
+- **מערכת בדיקות מאורגנת** - תיקייה ייעודית `testing_suite/` עם מבנה מקצועי
+- **בדיקות Unit** - 5 בדיקות למודלים (Ticker, Account, Trade, Alert)
+- **בדיקות Integration** - 10 בדיקות ל-API endpoints
+- **בדיקות E2E** - 9 בדיקות לזרימות עבודה מלאות
+- **Makefile** - פקודות נוחות להרצת בדיקות
+- **תיעוד בדיקות** - README מפורט ומדריכי הגדרה
+- **קבצי הגדרות** - pytest.ini, test_config.py, requirements.txt
+- **דוחות כיסוי** - HTML reports עם ניתוח מפורט
+
+### 🔧 שונה
+- **ארגון קבצים** - העברת כל קבצי הבדיקות לתיקייה ייעודית
+- **מבנה תיקיות** - חלוקה ל-unit_tests, integration_tests, e2e_tests
+- **הגדרות pytest** - עדכון conftest.py לעבודה מהמיקום החדש
+- **תיעוד ראשי** - עדכון README.md עם מידע על מערכת הבדיקות
+
+### 🐛 תוקן
+- **Import errors** - תיקון נתיבים למודלים
+- **Database fixtures** - תיקון הגדרות בסיס נתונים לבדיקות
+- **Test structure** - התאמת בדיקות למבנה המודלים האמיתי
+
+### 📁 קבצים חדשים
+- `Backend/testing_suite/` - תיקיית מערכת הבדיקות המלאה
+- `Backend/testing_suite/README.md` - תיעוד מפורט
+- `Backend/testing_suite/Makefile` - פקודות להרצה
+- `Backend/testing_suite/requirements.txt` - תלויות בדיקות
+- `Backend/testing_suite/configs/test_config.py` - הגדרות מתקדמות
+- `Backend/README_TESTING.md` - סיכום בדיקות
+- `Backend/testing_suite/documentation/TESTING_SUITE_SETUP.md` - מדריך הגדרה
+
+### 📁 קבצים שעודכנו
+- `README.md` - הוספת מידע על מערכת הבדיקות
+- `CHANGELOG.md` - קובץ זה
+
+### 🔄 מיגרציות בסיס נתונים
+- **בסיס נתונים שוחזר** - עם המבנה העדכני
+- **כל הבדיקות עובדות** - 23 בדיקות עוברות, 2 דילוגו
+
 ## [2025-08-18] - שיפורי ממשק ופיצול קוד
 
 ### ✅ הוספו

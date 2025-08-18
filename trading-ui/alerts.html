@@ -543,23 +543,8 @@
   
   <div class="background-wrapper">
     <div class="main-content">
-    <!-- קומפוננטת התראות פעילות -->
-    <div class="active-alerts-section">
-      <div class="alerts-cards-container">
-        <div class="alerts-header">
-          <h3>🔔 התראות פעילות</h3>
-          <div class="alerts-header-actions">
-            <div class="alerts-count" id="newAlertsCount">0 התראות</div>
-            <button class="refresh-btn" onclick="refreshActiveAlerts()" title="רענן התראות">
-              <span class="action-icon">🔄</span>
-            </button>
-          </div>
-        </div>
-        <div class="alerts-cards" id="activeAlertsCards">
-          <!-- כרטיסיות ההתראות הפעילות יוכנסו כאן דינמית -->
-        </div>
-      </div>
-    </div>
+      <!-- קומפוננטת התראות פעילות -->
+      <active-alerts></active-alerts>
 
     <div class="page-header">
       <div>
@@ -1019,160 +1004,15 @@
       gridApi.setRowData(dataToShow);
     }
 
-    // פונקציות לטעינת התראות פעילות
-    async function loadActiveAlerts() {
-      console.log('🔄 === טוען התראות פעילות ===');
-      
-      try {
-        const response = await fetch('/api/v1/alerts/unread');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const apiData = await response.json();
-        
-        console.log('📡 נתונים מה-API:', apiData);
-        
-        if (apiData.status === 'success' && apiData.data) {
-          const activeAlerts = apiData.data;
-          console.log('📊 נמצאו', activeAlerts.length, 'התראות פעילות');
-          
-          // עדכון מונה ההתראות
-          const countElement = document.getElementById('newAlertsCount');
-          if (countElement) {
-            countElement.textContent = `${activeAlerts.length} התראות`;
-          }
-          
-          // הצגת הכרטיסיות
-          renderActiveAlertsCards(activeAlerts);
-        } else {
-          console.warn('⚠️ לא התקבלו התראות פעילות');
-          renderActiveAlertsCards([]);
-        }
-        
-      } catch (error) {
-        console.error('❌ שגיאה בטעינת התראות פעילות:', error);
-        renderActiveAlertsCards([]);
-      }
-    }
+
     
-    function renderActiveAlertsCards(alerts) {
-      const cardsContainer = document.getElementById('activeAlertsCards');
-      if (!cardsContainer) {
-        console.error('❌ לא נמצא container לכרטיסיות התראות פעילות');
-        return;
-      }
-      
-      if (alerts.length === 0) {
-        cardsContainer.innerHTML = `
-          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
-            <div style="font-size: 3rem; margin-bottom: 20px;">🔕</div>
-            <h4>אין התראות פעילות</h4>
-            <p>כל ההתראות נקראו או שאין התראות חדשות כרגע</p>
-          </div>
-        `;
-        return;
-      }
-      
-      const cardsHTML = alerts.map(alert => createActiveAlertCardHTML(alert)).join('');
-      cardsContainer.innerHTML = cardsHTML;
-      
-      console.log('✅ הוצגו', alerts.length, 'כרטיסיות התראות פעילות');
-    }
+
     
-    function createActiveAlertCardHTML(alert) {
-      const timeAgo = getTimeAgo(alert.created_at);
-      const alertIcon = getAlertIcon(alert.type);
-      const tickerSymbol = extractTickerFromCondition(alert.condition) || '';
-      
-      return `
-        <div class="alert-card" data-alert-id="${alert.id}">
-          <div class="alert-card-header">
-            <h4 class="alert-card-title">${alertIcon} ${tickerSymbol || 'התראה'}</h4>
-            <span class="alert-card-time">${timeAgo}</span>
-          </div>
-          
-          <div class="alert-card-content">
-            <p class="alert-card-message"><strong>${alert.message || alert.condition}</strong></p>
-            <p class="alert-card-message">${alert.condition || ''}</p>
-            
-            <div class="alert-card-details">
-              <span class="alert-detail-item">סוג: ${getAlertTypeDisplay(alert.type)}</span>
-              <span class="alert-detail-item">ישות: ${getEntityTypeDisplay(alert.related_type)}</span>
-              ${tickerSymbol ? `<span class="alert-detail-item">$${getCurrentPrice(tickerSymbol)}</span>` : ''}
-              ${tickerSymbol ? `<span class="alert-detail-item ${getDailyChangeClass(tickerSymbol)}">${getDailyChange(tickerSymbol)}%</span>` : ''}
-            </div>
-          </div>
-          
-          <div class="alert-card-footer">
-            <button class="btn-mark-read" onclick="markActiveAlertAsRead(${alert.id})" data-alert-id="${alert.id}">
-              ✓ קראתי
-            </button>
-          </div>
-        </div>
-      `;
-    }
+
     
-    async function markActiveAlertAsRead(alertId) {
-      console.log('🔄 מסמן התראה כנקראה:', alertId);
-      
-      const button = document.querySelector(`button[data-alert-id="${alertId}"]`);
-      if (button) {
-        button.disabled = true;
-        button.textContent = '✓ נקרא';
-      }
-      
-      try {
-        const response = await fetch(`/api/v1/alerts/${alertId}/mark-read`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          console.log('✅ התראה סומנה כנקראה בהצלחה');
-          
-          // הסתרת הכרטיסיה
-          const card = document.querySelector(`[data-alert-id="${alertId}"]`);
-          if (card) {
-            card.style.opacity = '0.5';
-            card.style.transform = 'scale(0.98)';
-            
-            setTimeout(() => {
-              card.remove();
-              
-              // עדכון מונה
-              const countElement = document.getElementById('newAlertsCount');
-              if (countElement) {
-                const currentCount = parseInt(countElement.textContent) - 1;
-                countElement.textContent = `${currentCount} התראות`;
-                
-                // אם אין יותר התראות, הצג הודעה
-                if (currentCount === 0) {
-                  renderActiveAlertsCards([]);
-                }
-              }
-            }, 300);
-          }
-        } else {
-          throw new Error('שגיאה בסימון התראה כנקראה');
-        }
-        
-      } catch (error) {
-        console.error('❌ שגיאה בסימון התראה כנקראה:', error);
-        
-        // החזרת הכפתור למצב רגיל
-        if (button) {
-          button.disabled = false;
-          button.textContent = '✓ קראתי';
-        }
-      }
-    }
+
     
-    function refreshActiveAlerts() {
-      console.log('🔄 מרענן התראות פעילות...');
-      loadActiveAlerts();
-    }
+
     
     // פונקציות עזר
     function getTimeAgo(dateString) {
@@ -1668,8 +1508,7 @@
       const gridDiv = document.getElementById('alertsGrid');
               gridApi = agGrid.createGrid(gridDiv, gridOptions, { theme: 'quartz' });
       
-      // טעינת התראות פעילות
-      loadActiveAlerts();
+
       
       // טעינת נתוני הגריד
       loadAlertsData();
@@ -1736,5 +1575,6 @@
   <!-- Scripts -->
   <script src="scripts/app-header.js"></script>
   <script src="scripts/menu.js"></script>
+  <script src="scripts/active-alerts-component.js"></script>
 </body>
 </html>

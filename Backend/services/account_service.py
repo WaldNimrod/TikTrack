@@ -101,6 +101,78 @@ class AccountService:
         # עדכון החשבון
         account.total_pl = total_pl
         db.commit()
+        logger.info(f"Updated account values for: {account.name}")
+        return True
+    
+    @staticmethod
+    def get_open_trades(db: Session, account_id: int) -> List[Dict[str, Any]]:
+        """קבלת טריידים פתוחים של חשבון"""
+        from models.trade import Trade
+        from models.ticker import Ticker
+        
+        # בדיקה שהחשבון קיים
+        account = db.query(Account).filter(Account.id == account_id).first()
+        if not account:
+            return []
+        
+        # קבלת טריידים פתוחים עם פרטי טיקר
+        open_trades = db.query(Trade).filter(
+            Trade.account_id == account_id,
+            Trade.status == 'open'
+        ).all()
+        
+        # המרה לרשימת מילונים עם פרטי טיקר
+        trades_data = []
+        for trade in open_trades:
+            ticker = db.query(Ticker).filter(Ticker.id == trade.ticker_id).first()
+            trade_dict = {
+                'id': trade.id,
+                'ticker_id': trade.ticker_id,
+                'ticker_symbol': ticker.symbol if ticker else None,
+                'type': trade.type,
+                'status': trade.status,
+                'total_pl': trade.total_pl,
+                'notes': trade.notes,
+                'created_at': trade.created_at.isoformat() if trade.created_at else None,
+                'opened_at': trade.created_at.isoformat() if trade.created_at else None
+            }
+            trades_data.append(trade_dict)
+        
+        return trades_data
+        
+        # עדכון החשבון
+        account.total_pl = total_pl
+        db.commit()
         
         logger.info(f"Updated account values for account {account_id}")
         return True
+    
+    @staticmethod
+    def get_open_trades(db: Session, account_id: int) -> List[Dict[str, Any]]:
+        """קבלת טריידים פתוחים של חשבון"""
+        from models.trade import Trade
+        from models.ticker import Ticker
+        
+        # קבלת טריידים פתוחים עם פרטי הטיקר
+        trades = db.query(Trade, Ticker).join(
+            Ticker, Trade.ticker_id == Ticker.id
+        ).filter(
+            Trade.account_id == account_id,
+            Trade.status == 'open'
+        ).all()
+        
+        # המרה למילון
+        open_trades = []
+        for trade, ticker in trades:
+            open_trades.append({
+                'id': trade.id,
+                'ticker_id': trade.ticker_id,
+                'ticker_symbol': ticker.symbol,
+                'type': trade.type,
+                'created_at': trade.created_at,
+                'total_pl': trade.total_pl,
+                'notes': trade.notes
+            })
+        
+        logger.info(f"Found {len(open_trades)} open trades for account {account_id}")
+        return open_trades

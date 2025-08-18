@@ -126,7 +126,7 @@ def create_trades(db: Session):
             "trade_plan_id": plans[0].id if plans else None,
             "status": "open",
             "type": "buy",
-            "opened_at": datetime.now() - timedelta(days=5),
+            # "opened_at": datetime.now() - timedelta(days=5),  # removed - using created_at instead
             "total_pl": 2500,
             "notes": "קנייה של Apple"
         },
@@ -135,7 +135,7 @@ def create_trades(db: Session):
             "ticker_id": tickers[1].id,  # GOOGL
             "status": "closed",
             "type": "buy",
-            "opened_at": datetime.now() - timedelta(days=30),
+            "created_at": datetime.now() - timedelta(days=30),
             "closed_at": datetime.now() - timedelta(days=5),
             "total_pl": 1500,
             "notes": "טרייד מוצלח ב-Google"
@@ -145,7 +145,7 @@ def create_trades(db: Session):
             "ticker_id": tickers[8].id,  # SPY
             "status": "open",
             "type": "buy",
-            "opened_at": datetime.now() - timedelta(days=10),
+            "created_at": datetime.now() - timedelta(days=10),
             "total_pl": 800,
             "notes": "השקעה ב-ETF"
         }
@@ -247,6 +247,23 @@ def create_cash_flows(db: Session):
     db.commit()
     print("✅ Cash flows created")
 
+def create_note_relation_types(db: Session):
+    """יצירת סוגי שיוך להערות"""
+    from models.note_relation_type import NoteRelationType
+    
+    relation_types = [
+        {"note_relation_type": "account"},
+        {"note_relation_type": "trade"},
+        {"note_relation_type": "trade_plan"}
+    ]
+    
+    for rel_type_data in relation_types:
+        rel_type = NoteRelationType(**rel_type_data)
+        db.add(rel_type)
+    
+    db.commit()
+    print("✅ Note relation types created")
+
 def create_notes(db: Session):
     """יצירת הערות"""
     accounts = db.query(Account).all()
@@ -257,21 +274,28 @@ def create_notes(db: Session):
         print("⚠️ No accounts found for notes")
         return
     
+    # קבלת סוגי השיוך
+    from models.note_relation_type import NoteRelationType
+    account_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "account").first()
+    trade_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "trade").first()
+    trade_plan_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "trade_plan").first()
+    
     notes_data = [
         {
-            "account_id": accounts[0].id,
-            "trade_id": trades[0].id if trades else None,
+            "related_type_id": account_type.id,
+            "related_id": accounts[0].id,
             "content": "Apple נראית כמו השקעה טובה לטווח ארוך. החברה ממשיכה לחדש ולשמור על דומיננטיות בשוק",
             "attachment": None
         },
         {
-            "account_id": accounts[1].id,
-            "trade_plan_id": plans[0].id if plans else None,
+            "related_type_id": trade_plan_type.id,
+            "related_id": plans[0].id if plans else accounts[1].id,
             "content": "Google עם AI חזק ועתיד מבטיח. כדאי לעקוב אחרי התפתחויות ב-Gemini",
             "attachment": None
         },
         {
-            "account_id": accounts[2].id,
+            "related_type_id": account_type.id,
+            "related_id": accounts[2].id,
             "content": "השקעה ב-ETF היא דרך טובה לפיזור סיכונים. כדאי לשקול הוספת ETF נוספים",
             "attachment": None
         }
@@ -356,6 +380,7 @@ def main():
         create_trades(db)
         create_alerts(db)
         create_cash_flows(db)
+        create_note_relation_types(db)
         create_notes(db)
         create_executions(db)
         

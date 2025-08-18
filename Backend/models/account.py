@@ -35,7 +35,7 @@ class Account(BaseModel):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False)
     currency = Column(String(3), default='USD')
-    status = Column(String(20), default='פתוח')
+    status = Column(String(20), default='open')
     cash_balance = Column(Float, default=0)
     total_value = Column(Float, default=0)
     total_pl = Column(Float, default=0)
@@ -82,7 +82,7 @@ class Account(BaseModel):
     
     def is_active(self):
         """Check if the account is active."""
-        return self.status == 'פתוח'
+        return self.status == 'open'
     
     def get_balance_info(self):
         """Get formatted balance information for display."""

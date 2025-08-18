@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request, send_from_directory
-from sqlalchemy.orm import Session
 from config.database import get_db
 from models.note import Note
 import logging
@@ -71,7 +70,7 @@ def delete_uploaded_file(filename):
 def cleanup_orphaned_files():
     """ניקוי קבצים יתומים (קבצים שלא מקושרים להערות)"""
     try:
-        db: Session = next(get_db())
+        db = next(get_db())
         
         # קבלת כל שמות הקבצים המקושרים להערות
         notes = db.query(Note).filter(Note.attachment.isnot(None)).all()
@@ -105,7 +104,7 @@ def cleanup_orphaned_files():
 def get_notes():
     """קבלת כל ההערות"""
     try:
-        db: Session = next(get_db())
+        db = next(get_db())
         notes = db.query(Note).all()
         return jsonify({
             "status": "success",
@@ -127,7 +126,7 @@ def get_notes():
 def get_note(note_id: int):
     """קבלת הערה לפי מזהה"""
     try:
-        db: Session = next(get_db())
+        db = next(get_db())
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
             return jsonify({
@@ -156,7 +155,7 @@ def create_note():
     """יצירת הערה חדשה"""
     db = None
     try:
-        db: Session = next(get_db())
+        db = next(get_db())
         
         # בדיקה אם יש קובץ או JSON
         if request.files:
@@ -259,7 +258,7 @@ def update_note(note_id: int):
         logger.info(f"📋 Request form: {dict(request.form) if request.form else 'No form data'}")
         logger.info(f"📋 Request JSON: {request.get_json() if request.is_json else 'Not JSON'}")
         
-        db: Session = next(get_db())
+        db = next(get_db())
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
             logger.info(f"✅ Found note: {note.id}")
@@ -387,7 +386,7 @@ def update_note(note_id: int):
 def delete_note(note_id: int):
     """מחיקת הערה"""
     try:
-        db: Session = next(get_db())
+        db = next(get_db())
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
             # מחיקת הקובץ המצורף אם קיים

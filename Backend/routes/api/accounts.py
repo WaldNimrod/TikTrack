@@ -110,11 +110,46 @@ def update_account(account_id: int):
     finally:
         db.close()
 
+@accounts_bp.route('/<int:account_id>/open-trades', methods=['GET'])
+def get_account_open_trades(account_id: int):
+    """קבלת טריידים פתוחים של חשבון"""
+    try:
+        db: Session = next(get_db())
+        open_trades = AccountService.get_open_trades(db, account_id)
+        return jsonify({
+            "status": "success",
+            "data": open_trades,
+            "message": "Open trades retrieved successfully",
+            "version": "v1"
+        })
+    except Exception as e:
+        logger.error(f"Error getting open trades for account {account_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to retrieve open trades"},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()
+
 @accounts_bp.route('/<int:account_id>', methods=['DELETE'])
 def delete_account(account_id: int):
     """מחיקת חשבון"""
     try:
         db: Session = next(get_db())
+        
+        # בדיקה אם יש טריידים פתוחים
+        open_trades = AccountService.get_open_trades(db, account_id)
+        if open_trades:
+            return jsonify({
+                "status": "error",
+                "error": {
+                    "message": "Cannot delete account with open trades",
+                    "open_trades": open_trades
+                },
+                "version": "v1"
+            }), 400
+        
         success = AccountService.delete(db, account_id)
         if success:
             return jsonify({

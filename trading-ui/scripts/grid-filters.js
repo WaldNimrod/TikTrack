@@ -671,7 +671,14 @@ function filterDataByFilters(data, pageName) {
       filteredData = filteredData.filter(item => {
         let itemStatus;
         if (pageName === 'designs') {
-          itemStatus = item.status === 'canceled' ? 'מבוטל' : 'פתוח';
+          // המרה נכונה של סטטוסים עבור דף designs
+          if (item.status === 'canceled') {
+            itemStatus = 'מבוטל';
+          } else if (item.status === 'closed') {
+            itemStatus = 'סגור';
+          } else {
+            itemStatus = 'פתוח';
+          }
         } else if (pageName === 'planning') {
           itemStatus = item.canceled_at ? 'מבוטל' : 'פתוח';
         } else if (pageName === 'accounts') {
@@ -705,9 +712,29 @@ function filterDataByFilters(data, pageName) {
       filteredData = filteredData.filter(item => {
         let itemType;
         if (pageName === 'designs') {
-          itemType = item.type || 'long';
+          // המרה לעברית עבור פילטר
+          const typeMap = {
+            'swing': 'סווינג',
+            'investment': 'השקעה',
+            'passive': 'פאסיבי'
+          };
+          itemType = typeMap[item.type] || item.type || 'השקעה';
         } else if (pageName === 'planning') {
-          itemType = item.investment_type || 'long';
+          // המרה לעברית עבור פילטר
+          const typeMap = {
+            'swing': 'סווינג',
+            'investment': 'השקעה',
+            'passive': 'פאסיבי'
+          };
+          itemType = typeMap[item.investment_type] || item.investment_type || 'השקעה';
+        } else if (pageName === 'trades') {
+          // המרה לעברית עבור פילטר טריידים
+          const typeMap = {
+            'swing': 'סווינג',
+            'investment': 'השקעה',
+            'passive': 'פאסיבי'
+          };
+          itemType = typeMap[item.type] || item.type || 'השקעה';
         } else {
           itemType = item.type || 'long';
         }
@@ -727,33 +754,36 @@ function filterDataByFilters(data, pageName) {
     console.log('🔍 Filtering by account:', selectedAccounts);
     console.log('🔍 Data before account filter:', filteredData.length);
     
-    filteredData = filteredData.filter(item => {
-      let itemAccount;
-      if (pageName === 'designs') {
-        itemAccount = item.account || 'חשבון ראשי';
-      } else if (pageName === 'planning') {
-        itemAccount = item.account_name || item.account || 'חשבון ראשי';
-      } else if (pageName === 'notes') {
-        // פילטר לפי חשבון עבור הערות - נבדוק אם ההערה קשורה לחשבון
-        if (item.related_type === 'account') {
-          // נצטרך לטעון את שם החשבון מהשרת
-          itemAccount = `חשבון ${item.related_id}`;
+    // עבור דף התכנון - לא מסננים לפי חשבון כי אין שדה חשבון
+    if (pageName === 'designs') {
+      console.log('🔍 Designs page - account filter not applied (no account field)');
+    } else {
+      filteredData = filteredData.filter(item => {
+        let itemAccount;
+        if (pageName === 'planning') {
+          itemAccount = item.account_name || item.account || 'חשבון ראשי';
+        } else if (pageName === 'notes') {
+          // פילטר לפי חשבון עבור הערות - נבדוק אם ההערה קשורה לחשבון
+          if (item.related_type === 'account') {
+            // נצטרך לטעון את שם החשבון מהשרת
+            itemAccount = `חשבון ${item.related_id}`;
+          } else {
+            itemAccount = 'לא קשור לחשבון';
+          }
         } else {
-          itemAccount = 'לא קשור לחשבון';
+          itemAccount = item.account || 'חשבון ראשי';
         }
-      } else {
-        itemAccount = item.account || 'חשבון ראשי';
-      }
-      
-      const isIncluded = selectedAccounts.includes(itemAccount);
-      if (pageName === 'notes') {
-        console.log(`🔍 Note ${item.id}: account=${itemAccount}, included=${isIncluded}`);
-      } else {
-        console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: account=${itemAccount}, included=${isIncluded}`);
-      }
-      return isIncluded;
-    });
-    console.log('🔍 After account filter:', filteredData.length, 'items');
+        
+        const isIncluded = selectedAccounts.includes(itemAccount);
+        if (pageName === 'notes') {
+          console.log(`🔍 Note ${item.id}: account=${itemAccount}, included=${isIncluded}`);
+        } else {
+          console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: account=${itemAccount}, included=${isIncluded}`);
+        }
+        return isIncluded;
+      });
+      console.log('🔍 After account filter:', filteredData.length, 'items');
+    }
   } else {
     console.log('🔍 No account filter applied - selectedAccounts:', selectedAccounts);
   }

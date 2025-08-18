@@ -89,7 +89,7 @@ function updateAccountFilterMenu(accounts) {
   
   const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
   if (!accountMenu) {
-    console.log('🔄 Account menu found, clearing existing content');
+    console.log('🔄 Account menu not found');
     return;
   }
   
@@ -99,11 +99,11 @@ function updateAccountFilterMenu(accounts) {
   console.log('🔄 Adding account items...');
   accounts.forEach((account, index) => {
     const accountItem = document.createElement('div');
-    accountItem.className = 'filter-item';
+    accountItem.className = 'account-filter-item';
     accountItem.dataset.value = account.name;
     accountItem.innerHTML = `
-      <input type="checkbox" id="account-${account.id}" value="${account.name}" checked>
-      <label for="account-${account.id}">${account.name}</label>
+      <span class="option-text">${account.name}</span>
+      <span class="check-mark">●</span>
     `;
     accountMenu.appendChild(accountItem);
     console.log(`🔄 Added account item ${index + 1}: ${account.name}`);
@@ -111,21 +111,18 @@ function updateAccountFilterMenu(accounts) {
   
   console.log('🔄 Total account items added:', accounts.length);
   
-  // הוספת event delegation
-  accountMenu.addEventListener('change', (e) => {
-    if (e.target.type === 'checkbox') {
-      const selectedAccounts = Array.from(accountMenu.querySelectorAll('input[type="checkbox"]:checked'))
-        .map(cb => cb.value);
-      console.log('🔄 Account selection changed:', selectedAccounts);
-      updateAccountFilterText(selectedAccounts);
-    }
+  // הוספת event listeners לפריטי החשבונות
+  const accountItems = accountMenu.querySelectorAll('.account-filter-item');
+  accountItems.forEach((item, index) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const accountName = item.querySelector('.option-text').textContent;
+      console.log('🔄 Account filter item clicked:', accountName);
+      // כאן נוכל להוסיף לוגיקה לבחירת חשבון ספציפי
+    });
   });
-  console.log('🔄 Event delegation listener added to account menu');
-  
-  // סימון כל החשבונות כברירת מחדל
-  const checkboxes = accountMenu.querySelectorAll('input[type="checkbox"]');
-  checkboxes.forEach(cb => cb.checked = true);
-  console.log('🔄 All account items marked as selected');
+  console.log('🔄 Event listeners added to account items');
   
   updateAccountFilterText(accounts.map(a => a.name));
   console.log('🔄 Account filter menu updated successfully');
@@ -139,7 +136,7 @@ function updateAccountFilterText(selectedAccounts) {
   const appHeader = document.querySelector('app-header');
   if (!appHeader) return;
   
-  const accountToggle = appHeader.shadowRoot.querySelector('.account-filter-toggle');
+  const accountToggle = appHeader.shadowRoot.querySelector('.account-filter-toggle .selected-account-text');
   if (!accountToggle) return;
   
   let displayText = 'כל החשבונות';
@@ -632,3 +629,5 @@ window.cancelAccount = cancelAccount;
 window.deleteAccount = deleteAccount;
 window.showSuccessMessage = showSuccessMessage;
 window.showErrorMessage = showErrorMessage;
+window.updateAccountFilterMenu = updateAccountFilterMenu;
+window.updateAccountFilterText = updateAccountFilterText;

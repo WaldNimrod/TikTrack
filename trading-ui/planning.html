@@ -54,7 +54,6 @@
   <script src="scripts/grid-table.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/alerts.js"></script>
-  <script src="scripts/active-alerts-component.js"></script>
 </head>
 <body>
   <!-- רקע כללי -->
@@ -65,12 +64,12 @@
 
     <!-- גוף הדף - כל התוכן אחרי הכותרת -->
     <div class="page-body">
-      <!-- אזור עיצובים - top-Section -->
+      <!-- אזור תכנונים - top-Section -->
       <div class="top-section">
-      <!-- כותרת עיצובים -->
+      <!-- כותרת תכנונים -->
       <div class="section-header">
         <div class="table-title">
-          📋 תכנונים - top-Section
+          📋 תכנונים
         </div>
         <div class="table-actions">
           <button class="refresh-btn" onclick="openDesignDetails()" title="הוסף עיצוב חדש">
@@ -83,9 +82,22 @@
         </div>
       </div>
 
-                        <!-- כרטיסיות התראות פעילות -->
+                        <!-- כרטיסיות התראות -->
       <div class="section-body">
-        <active-alerts></active-alerts>
+        <div class="alerts-cards-container">
+          <div class="alerts-header">
+                          <h3>🔔 התראות</h3>
+            <div class="alerts-header-actions">
+              <div class="alerts-count" id="newAlertsCount">0 התראות</div>
+              <button class="refresh-btn" onclick="refreshAlerts()" title="רענן התראות">
+                <span class="action-icon">🔄</span>
+              </button>
+        </div>
+        </div>
+          <div class="alerts-cards" id="alertsCards">
+            <!-- כרטיסיות ההתראות יוכנסו כאן דינמית -->
+        </div>
+        </div>
         
         <!-- סיכום נתונים -->
         <div class="info-summary" id="summaryStats">
@@ -100,23 +112,20 @@
     <!-- תוכן ראשי -->
     <div class="main-content">
 
-      <!-- אזור עיצובים - content-section -->
+      <!-- אזור תכנונים - content-section -->
       <div class="content-section">
-        <!-- כותרת עיצובים -->
+        <!-- כותרת תכנונים -->
         <div class="section-header">
         <div class="table-title">
-            📋 תכנונים - content-section
+            📋 התכנונים שלי
         </div>
-          <div class="table-count">9 תכנונים</div>
+          <div class="table-count">תכנונים</div>
           <div class="table-actions">
-            <button class="refresh-btn" onclick="openDesignDetails()" title="הוסף עיצוב חדש">
+            <button class="refresh-btn" onclick="openDesignDetails()" title="הוסף תכנון חדש">
               <span class="action-icon">➕</span> הוסף
             </button>
-            <button class="refresh-btn" onclick="resetAllFiltersAndReloadData()" title="רענן טבלה">
-              <span class="action-icon">🔄</span> רענן
-            </button>
             <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור עיצובים">
+            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תכנונים">
           <span class="filter-icon">▲</span>
         </button>
       </div>
@@ -650,7 +659,7 @@
     
     // ===== פונקציות פילטרים =====
     
-    // נתוני עיצובים לדוגמה
+    // נתוני תכנונים לדוגמה
     let designsData = [
       {
         id: '8',
@@ -678,7 +687,7 @@
         id: '7',
         ticker: 'TSLA',
         date: '5.1.2025',
-        type: 'short',
+        type: 'passive',
         amount: 10000,
         target: 750,
         stop: 800,
@@ -689,7 +698,7 @@
         id: '6',
         ticker: 'MSFT',
         date: '20.12.2024',
-        type: 'long',
+        type: 'investment',
         amount: 8000,
         target: 380,
         stop: 300,
@@ -700,7 +709,7 @@
         id: '5',
         ticker: 'GOOGL',
         date: '15.11.2024',
-        type: 'short',
+        type: 'swing',
         amount: 12000,
         target: 2500,
         stop: 2950,
@@ -711,7 +720,7 @@
         id: '4',
         ticker: 'AAPL',
         date: '1.10.2024',
-        type: 'long',
+        type: 'investment',
         amount: 15000,
         target: 200,
         stop: 145,
@@ -722,7 +731,7 @@
         id: '1',
         ticker: 'AAPL',
         date: '15.8.2024',
-        type: 'long',
+        type: 'swing',
         amount: 10000,
         target: 180,
         stop: 140,
@@ -733,7 +742,7 @@
         id: '2',
         ticker: 'GOOGL',
         date: '1.7.2024',
-        type: 'long',
+        type: 'passive',
         amount: 8000,
         target: 150,
         stop: 110,
@@ -744,16 +753,147 @@
         id: '3',
         ticker: 'SPY',
         date: '15.6.2024',
-        type: 'long',
+        type: 'investment',
         amount: 5000,
         target: 450,
         stop: 380,
         current: 0,
         status: 'open'
+      },
+      {
+        id: '10',
+        ticker: 'NVDA',
+        date: '15.5.2024',
+        type: 'swing',
+        amount: 18000,
+        target: 850,
+        stop: 750,
+        current: 0,
+        status: 'open'
+      },
+      {
+        id: '11',
+        ticker: 'META',
+        date: '1.4.2024',
+        type: 'investment',
+        amount: 22000,
+        target: 380,
+        stop: 320,
+        current: 0,
+        status: 'open'
+      },
+      {
+        id: '12',
+        ticker: 'NFLX',
+        date: '15.3.2024',
+        type: 'passive',
+        amount: 12000,
+        target: 580,
+        stop: 520,
+        current: 0,
+        status: 'open'
+      },
+      {
+        id: '13',
+        ticker: 'AMD',
+        date: '1.2.2024',
+        type: 'swing',
+        amount: 15000,
+        target: 120,
+        stop: 100,
+        current: 0,
+        status: 'open'
+      },
+      {
+        id: '14',
+        ticker: 'INTC',
+        date: '15.1.2024',
+        type: 'investment',
+        amount: 9000,
+        target: 45,
+        stop: 40,
+        current: 0,
+        status: 'open'
+      },
+      {
+        id: '15',
+        ticker: 'ORCL',
+        date: '1.12.2023',
+        type: 'passive',
+        amount: 11000,
+        target: 125,
+        stop: 115,
+        current: 0,
+        status: 'open'
+      },
+      {
+        id: '16',
+        ticker: 'CRM',
+        date: '15.11.2023',
+        type: 'swing',
+        amount: 16000,
+        target: 280,
+        stop: 250,
+        current: 0,
+        status: 'open'
+      },
+      {
+        id: '17',
+        ticker: 'ADBE',
+        date: '1.10.2023',
+        type: 'investment',
+        amount: 14000,
+        target: 520,
+        stop: 480,
+        current: 0,
+        status: 'open'
+      },
+      {
+        id: '18',
+        ticker: 'AMZN',
+        date: '15.9.2023',
+        type: 'passive',
+        amount: 20000,
+        target: 3200,
+        stop: 3000,
+        current: 0,
+        status: 'open'
+      },
+      {
+        id: '19',
+        ticker: 'IWM',
+        date: '1.8.2023',
+        type: 'swing',
+        amount: 13000,
+        target: 185,
+        stop: 170,
+        current: 0,
+        status: 'open'
+      },
+      {
+        id: '20',
+        ticker: 'QQQ',
+        date: '15.7.2023',
+        type: 'investment',
+        amount: 17000,
+        target: 380,
+        stop: 350,
+        current: 0,
+        status: 'open'
       }
     ];
 
-    // פונקציה לטעינת נתוני עיצובים עם פילטרים
+    // פונקציה לתרגום סוג לעברית
+    function getTypeDisplay(type) {
+      const typeMap = {
+        'swing': 'סווינג',
+        'investment': 'השקעה',
+        'passive': 'פאסיבי'
+      };
+      return typeMap[type] || type;
+    }
+
+    // פונקציה לטעינת נתוני תכנונים עם פילטרים
     async function loadDesignsData() {
       try {
         let designs = [...designsData];
@@ -766,7 +906,7 @@
           
           } catch (error) {
         console.error('Error loading designs data:', error);
-        document.querySelector('#designsTable tbody').innerHTML = '<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+                 document.querySelector('.main-content table tbody').innerHTML = '<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
       }
     }
 
@@ -782,7 +922,7 @@
         <tr>
           <td><strong><a href="#" onclick="openDesignDetails('${design.id}')" class="ticker-link">${design.ticker}</a></strong></td>
           <td>${design.date}</td>
-          <td>${design.type}</td>
+          <td>${getTypeDisplay(design.type)}</td>
           <td>$${design.amount.toLocaleString()}</td>
           <td>$${design.target.toFixed(2)}</td>
           <td>$${design.stop.toFixed(2)}</td>
@@ -802,7 +942,7 @@
       // עדכון ספירת רשומות
       const countElement = document.querySelector('.main-content .table-count');
       if (countElement) {
-        countElement.textContent = `${designs.length} עיצובים`;
+        countElement.textContent = `${designs.length} תכנונים`;
       }
       
       // עדכון סטטיסטיקות הטבלה
@@ -1227,7 +1367,96 @@
       console.log('🔄 window.refreshAlerts:', typeof window.refreshAlerts);
       console.log('🔄 window.loadSampleAlertsForCards:', typeof window.loadSampleAlertsForCards);
       
-
+      // בדיקה אם הקובץ alerts.js נטען
+      console.log('🔄 === ALERTS.JS LOADING CHECK ===');
+      const scripts = document.querySelectorAll('script[src*="alerts.js"]');
+      console.log('🔄 Found alerts.js scripts:', scripts.length);
+      scripts.forEach((script, index) => {
+        console.log(`🔄 Script ${index + 1}:`, script.src);
+      });
+      
+      // בדיקה של ה-container
+      console.log('🔄 === CONTAINER CHECK ===');
+      const alertsCardsContainer = document.getElementById('alertsCards');
+      const newAlertsCountElement = document.getElementById('newAlertsCount');
+      console.log('🔄 alertsCards container:', alertsCardsContainer);
+      console.log('🔄 newAlertsCount element:', newAlertsCountElement);
+      
+      if (alertsCardsContainer) {
+        console.log('🔄 Container HTML:', alertsCardsContainer.innerHTML);
+      }
+      
+      if (typeof loadAlertsForCards === 'function') {
+        console.log('🔄 loadAlertsForCards function found, calling it...');
+        loadAlertsForCards();
+        console.log('🔄 === ALERTS CARDS LOADED ===');
+        } else {
+        console.log('🔄 loadAlertsForCards function NOT found!');
+        console.log('🔄 Trying to load sample alerts directly...');
+        if (typeof loadSampleAlertsForCards === 'function') {
+          loadSampleAlertsForCards();
+        } else {
+          console.log('🔄 loadSampleAlertsForCards also not found!');
+          console.log('🔄 Loading sample alerts manually...');
+          
+          // טעינה ידנית של התראות דוגמה
+          const alertsCardsData = [
+            {
+              id: 1,
+              title: 'התראה על מחיר נכס',
+              message: 'מחיר AAPL הגיע ליעד המחיר שהוגדר',
+              ticker: 'AAPL',
+              current_price: 185.50,
+              target_price: 185.00,
+              created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+              is_triggered: 'new',
+              alert_type: 'price_target'
+            },
+            {
+              id: 2,
+              title: 'התראה על נפח מסחר',
+              message: 'נפח המסחר ב-TSLA עלה ב-50% מהממוצע היומי',
+              ticker: 'TSLA',
+              volume: 15000000,
+              avg_volume: 10000000,
+              created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+              is_triggered: 'new',
+              alert_type: 'volume_spike'
+            }
+          ];
+          
+          console.log('🔄 Manual alerts data created:', alertsCardsData);
+          
+          // הצגת הכרטיסיות ידנית
+          const cardsContainer = document.getElementById('alertsCards');
+          if (cardsContainer) {
+            console.log('🔄 Found alertsCards container, rendering manually...');
+            const cardsHTML = alertsCardsData.map(alert => `
+              <div class="alert-card" data-alert-id="${alert.id}">
+                <div class="alert-card-header">
+                  <h4 class="alert-card-title">🔔 ${alert.title}</h4>
+                  <span class="alert-card-time">לפני 30 דקות</span>
+                </div>
+                <div class="alert-card-content">
+                  <p class="alert-card-message">${alert.message}</p>
+                  <div class="alert-card-details">
+                    <span class="alert-detail-item">📈 ${alert.ticker}</span>
+                  </div>
+                </div>
+                <div class="alert-card-actions">
+                  <button class="btn-mark-read" onclick="alert('קראתי!')" data-alert-id="${alert.id}">
+                    ✓ קראתי
+                  </button>
+                </div>
+              </div>
+        `).join('');
+            cardsContainer.innerHTML = cardsHTML;
+            console.log('🔄 Manual cards rendered successfully!');
+          } else {
+            console.log('🔄 alertsCards container NOT found!');
+          }
+        }
+      }
       
       // הגדרת כותרות למיון מיד
       console.log('🔄 === SETUP SORTABLE HEADERS IMMEDIATE ===');
@@ -1254,18 +1483,8 @@
         
         // עדכון סטטיסטיקות הטבלה
         updateTableStats();
-        
-        // טעינת חשבונות לטבלה השנייה
-        if (typeof loadAccounts === 'function') {
-          console.log('🔄 טוען חשבונות לטבלה השנייה...');
-          loadAccounts();
-        } else {
-          console.log('❌ פונקציית loadAccounts לא נמצאה');
-        }
     }, 1000);
     });
-    
-
   </script>
 </body>
 </html>

@@ -43,6 +43,12 @@ class AppHeader extends HTMLElement {
     if (pagesNeedingAccounts.some(page => currentPage.includes(page))) {
       if (typeof window.loadAccountsFromServer === 'function') {
         window.loadAccountsFromServer();
+        // עדכון התפריט אחרי טעינת החשבונות
+        setTimeout(() => {
+          if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
+            window.updateAccountFilterMenu(window.accountsData);
+          }
+        }, 500);
       }
     } else {
       console.log('🔄 Skipping accounts loading - not needed on this page');
@@ -353,6 +359,7 @@ class AppHeader extends HTMLElement {
 
         .account-filter-dropdown {
           position: relative;
+          z-index: 10000;
         }
 
         .account-filter-toggle {
@@ -543,7 +550,7 @@ class AppHeader extends HTMLElement {
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           min-width: 150px;
-          z-index: 1002;
+          z-index: 100000;
           opacity: 0;
           visibility: hidden;
           transform: translateY(-10px);
@@ -1500,20 +1507,36 @@ class AppHeader extends HTMLElement {
       // הוספת event listeners לפריטי פילטר החשבונות (רק אם יש פריטים קיימים)
       const accountFilterItems = this.shadowRoot.querySelectorAll('.account-filter-item');
       console.log('Found existing account filter items:', accountFilterItems.length);
-      // לא מוסיפים event listeners כאן כי הפריטים נוצרים דינמית
+      accountFilterItems.forEach((item, index) => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const accountName = item.querySelector('.option-text').textContent;
+          console.log('Account filter item clicked:', accountName);
+          this.selectAccountOption(accountName);
+        });
+      });
+      console.log('Account filter items event listeners added');
       
-      // עדכון הפילטר בטבלה אחרי אתחול כל הפילטרים
-      setTimeout(() => {
-        // בדיקה שהפונקציות הגלובליות זמינות
-        if (typeof window.updateGridFromComponent === 'function') {
-          this.updateGridFilter();
-        } else {
-          // אם הפונקציה לא זמינה, נחכה קצת יותר
-          setTimeout(() => {
+              // עדכון הפילטר בטבלה אחרי אתחול כל הפילטרים
+        setTimeout(() => {
+          // בדיקה שהפונקציות הגלובליות זמינות
+          if (typeof window.updateGridFromComponent === 'function') {
             this.updateGridFilter();
-          }, 500);
-        }
-      }, 200);
+          } else {
+            // אם הפונקציה לא זמינה, נחכה קצת יותר
+            setTimeout(() => {
+              this.updateGridFilter();
+            }, 500);
+          }
+        }, 200);
+        
+        // עדכון תפריט החשבונות
+        setTimeout(() => {
+          if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
+            window.updateAccountFilterMenu(window.accountsData);
+          }
+        }, 1000);
       
       // הוספת event listeners לפריטי פילטר טווח תאריכים
       const dateRangeFilterItems = this.shadowRoot.querySelectorAll('.date-range-filter-item');

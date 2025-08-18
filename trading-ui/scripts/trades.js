@@ -224,11 +224,13 @@ async function fillEditTradeModalData(tradeData) {
     if (tradeData.type) {
         const typeMapping = {
             'swing': 'swing',
-            'invest': 'invest',
-            'pasive': 'pasive',
+            'investment': 'investment',
+            'passive': 'passive',
+            'invest': 'investment',  // תאימות לאחור
+            'pasive': 'passive',     // תאימות לאחור
             'סווינג': 'swing',
-            'השקעה': 'invest',
-            'פאסיבי': 'pasive'
+            'השקעה': 'investment',
+            'פאסיבי': 'passive'
         };
         fields['editTradeType'] = typeMapping[tradeData.type] || 'swing';
         console.log(`🔧 המרת סוג: "${tradeData.type}" → "${fields['editTradeType']}"`);
@@ -351,7 +353,7 @@ async function saveTradeRecord() {
         }
         
         // וולידציה של סוג הטרייד
-        const validTypes = ['swing', 'invest', 'pasive'];
+        const validTypes = ['swing', 'investment', 'passive'];
         if (!validTypes.includes(type)) {
             alert('שגיאה: סוג טרייד לא תקין. יש לבחור: סווינג, השקעה, או פאסיבי');
             return;
@@ -545,7 +547,7 @@ async function saveNewTradeRecord() {
         }
         
         // וולידציה של סוג הטרייד
-        const validTypes = ['swing', 'invest', 'pasive'];
+        const validTypes = ['swing', 'investment', 'passive'];
         if (!validTypes.includes(type)) {
             alert('שגיאה: סוג טרייד לא תקין. יש לבחור: סווינג, השקעה, או פאסיבי');
             return;

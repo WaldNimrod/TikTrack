@@ -479,6 +479,16 @@
     
     // ===== פונקציות פילטרים =====
     
+    // פונקציה לתרגום סוג לעברית
+    function getTypeDisplay(type) {
+      const typeMap = {
+        'swing': 'סווינג',
+        'investment': 'השקעה',
+        'passive': 'פאסיבי'
+      };
+      return typeMap[type] || type;
+    }
+    
     // נתוני טריידים לדוגמה
     let tradesData = [
       {
@@ -688,20 +698,7 @@
         const statusDisplay = trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח';
         
         // המרת סוגים מאנגלית לעברית
-        let typeDisplay;
-        switch(trade.type) {
-          case 'swing':
-            typeDisplay = 'סווינג';
-            break;
-          case 'invest':
-            typeDisplay = 'השקעה';
-            break;
-          case 'pasive':
-            typeDisplay = 'פאסיבי';
-            break;
-          default:
-            typeDisplay = trade.type || '';
-        }
+        const typeDisplay = getTypeDisplay(trade.type);
         
         return `
         <tr>

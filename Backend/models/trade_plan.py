@@ -7,7 +7,7 @@ class TradePlan(BaseModel):
     
     account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
-    investment_type = Column(String(20), default='long', nullable=True)
+    investment_type = Column(String(20), default='swing', nullable=True)
     status = Column(String(20), default='open', nullable=True)
     planned_amount = Column(Float, default=0, nullable=True)
     entry_conditions = Column(String(500), nullable=True)

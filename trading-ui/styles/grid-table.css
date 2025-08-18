@@ -670,15 +670,17 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus {
 
 /* כותרת העמוד - עיצוב מודרני */
 .table-title {
-  font-size: 1.8rem !important;
-  font-weight: 600 !important;
+  font-size: 1.4rem !important;
+  font-weight: 500 !important;
   color: #495057 !important;
   font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
   letter-spacing: -0.01em !important;
-  line-height: 1.3 !important;
+  line-height: 1.2 !important;
   margin: 0 !important;
   position: relative !important;
 }
+
+
 
 /* ביטול הקו התחתון של הכותרת */
 

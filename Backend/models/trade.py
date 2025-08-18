@@ -9,7 +9,7 @@ class Trade(BaseModel):
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
     trade_plan_id = Column(Integer, ForeignKey('trade_plans.id'), nullable=True)
     status = Column(String(20), default='open', nullable=True)
-    type = Column(String(20), default='buy', nullable=True)
+    type = Column(String(20), default='swing', nullable=True)
     # opened_at field removed - using created_at from BaseModel instead
     closed_at = Column(DateTime, nullable=True)
     cancelled_at = Column(DateTime, nullable=True)

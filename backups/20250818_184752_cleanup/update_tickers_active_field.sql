@@ -14,7 +14,7 @@ UPDATE tickers SET active_trades = (
         ) OR EXISTS (
             SELECT 1 FROM trades 
             WHERE trades.ticker_id = tickers.id 
-            AND trades.status IN ('open', 'pending', 'פתוח', 'ממתין')
+            AND trades.status = 'open'
         ) THEN TRUE
         ELSE FALSE
     END

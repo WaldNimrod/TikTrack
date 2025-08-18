@@ -2,6 +2,20 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from .base import BaseModel
 
 class Note(BaseModel):
+    """
+    מודל הערות עם מערכת שיוך גמישה
+    
+    מערכת השיוך מאפשרת לקשר הערות לישויות שונות במערכת:
+    - account (id=1): הערה משויכת לחשבון
+    - trade (id=2): הערה משויכת לטרייד  
+    - trade_plan (id=3): הערה משויכת לתכנון טרייד
+    - ticker (id=4): הערה משויכת לטיקר
+    
+    יתרונות המערכת:
+    - גמישות: אפשרות לשייך הערות לכל סוג של ישות
+    - הרחבה קלה: הוספת סוגי ישות חדשים ללא שינוי מבנה הטבלה
+    - עקביות: שימוש באותה מערכת שיוך כמו התראות
+    """
     __tablename__ = "notes"
     
     content = Column(String(1000), nullable=False)

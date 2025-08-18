@@ -49,27 +49,27 @@ class TickerService:
         return False
     
     @staticmethod
-    def update_active_status(db: Session, ticker_id: int) -> bool:
-        """עדכון סטטוס פעילות של טיקר"""
+    def update_open_status(db: Session, ticker_id: int) -> bool:
+        """עדכון סטטוס פתיחה של טיקר"""
         from models.trade import Trade
         from models.trade_plan import TradePlan
         
-        # בדיקה אם יש תכנונים פעילים
-        active_plans = db.query(TradePlan).filter(
+        # בדיקה אם יש תכנונים פתוחים
+        open_plans = db.query(TradePlan).filter(
             TradePlan.ticker_id == ticker_id,
-            TradePlan.canceled_at.is_(None)
+            TradePlan.status == 'open'
         ).count()
         
-        # בדיקה אם יש טריידים פעילים
-        active_trades = db.query(Trade).filter(
+        # בדיקה אם יש טריידים פתוחים
+        open_trades = db.query(Trade).filter(
             Trade.ticker_id == ticker_id,
-            Trade.status.in_(['open', 'pending'])
+            Trade.status == 'open'
         ).count()
         
         # עדכון סטטוס
         ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
         if ticker:
-            ticker.active_trades = (active_plans > 0 or active_trades > 0)
+            ticker.active_trades = (open_plans > 0 or open_trades > 0)
             db.commit()
             return True
         return False

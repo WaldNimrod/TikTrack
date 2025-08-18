@@ -2047,8 +2047,8 @@
         tbody.innerHTML = alerts.map(alert => `
           <tr>
             <td>${alert.id}</td>
-            <td>${alert.account_id || '-'}</td>
-            <td>${alert.ticker_id || '-'}</td>
+            <td>${alert.related_type || '-'}</td>
+            <td>${alert.related_id || '-'}</td>
           <td>${alert.type || '-'}</td>
           <td>${alert.condition || '-'}</td>
             <td>${alert.message || '-'}</td>

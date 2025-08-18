@@ -177,7 +177,7 @@ def activate_trade_plan(plan_id: int):
             })
         return jsonify({
             "status": "error",
-            "error": {"message": "Trade plan not found or already active"},
+            "error": {"message": "Trade plan not found or already open"},
             "version": "v1"
         }), 404
     except Exception as e:

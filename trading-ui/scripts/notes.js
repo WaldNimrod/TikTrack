@@ -293,7 +293,7 @@ async function loadNotesData() {
  * const stats = calculateNotesStats(notes);
  */
 function calculateNotesStats(notes) {
-    const activeNotes = notes.filter(note => note.status === 'פעיל').length;
+            const openNotes = notes.filter(note => note.status === 'open').length;
     const totalNotes = notes.length;
     const importantNotes = notes.filter(note => note.is_important).length;
     const recentNotes = notes.filter(note => {
@@ -303,7 +303,7 @@ function calculateNotesStats(notes) {
     }).length;
     
     return {
-        active_notes: activeNotes,
+        open_notes: openNotes,
         total_notes: totalNotes,
         important_notes: importantNotes,
         recent_notes: recentNotes
@@ -318,13 +318,13 @@ function calculateNotesStats(notes) {
  * @returns {string} סטטוס באנגלית
  * 
  * @example
- * const status = convertNoteStatus('פעיל'); // returns 'active'
+ * const status = convertNoteStatus('פתוח'); // returns 'open'
  */
 function convertNoteStatus(statusDisplay) {
-    if (statusDisplay === 'פעיל') return 'active';
-    if (statusDisplay === 'לא פעיל') return 'inactive';
+    if (statusDisplay === 'פתוח') return 'open';
+    if (statusDisplay === 'סגור') return 'closed';
     if (statusDisplay === 'מבוטל') return 'cancelled';
-    return statusDisplay || 'active';
+    return statusDisplay || 'open';
 }
 
 /**
@@ -335,13 +335,13 @@ function convertNoteStatus(statusDisplay) {
  * @returns {string} סטטוס בעברית
  * 
  * @example
- * const statusDisplay = convertNoteStatusToHebrew('active'); // returns 'פעיל'
+ * const statusDisplay = convertNoteStatusToHebrew('open'); // returns 'פתוח'
  */
 function convertNoteStatusToHebrew(status) {
-    if (status === 'active' || status === 'פעיל') {
-        return 'פעיל';
-    } else if (status === 'inactive' || status === 'לא פעיל') {
-        return 'לא פעיל';
+    if (status === 'open' || status === 'פתוח') {
+        return 'פתוח';
+    } else if (status === 'closed' || status === 'סגור') {
+        return 'סגור';
     } else if (status === 'cancelled' || status === 'מבוטל') {
         return 'מבוטל';
     }
@@ -609,7 +609,7 @@ function convertNoteDataForServer(noteData) {
     
     // הגדרת השדה המתאים לפי סוג הקשר
     if (noteData.related_type === 'account' && noteData.related_id) {
-        serverData.account_id = noteData.related_id;
+        serverData.related_id = noteData.related_id;
     } else if (noteData.related_type === 'trade' && noteData.related_id) {
         serverData.trade_id = noteData.related_id;
     } else if (noteData.related_type === 'trade_plan' && noteData.related_id) {

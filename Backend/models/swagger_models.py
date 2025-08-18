@@ -73,7 +73,7 @@ def create_swagger_models(api):
         'id': fields.Integer(example=1),
         'name': fields.String(required=True, example='Main Account'),
         'currency': fields.String(example='USD'),
-        'status': fields.String(example='active'),
+        'status': fields.String(example='open'),
         'cash_balance': fields.Float(example=10000.0),
         'total_value': fields.Float(example=15000.0),
         'total_pl': fields.Float(example=5000.0),
@@ -84,7 +84,7 @@ def create_swagger_models(api):
     account_create = api.model('AccountCreate', {
         'name': fields.String(required=True, example='Main Account'),
         'currency': fields.String(example='USD'),
-        'status': fields.String(example='active'),
+        'status': fields.String(example='open'),
         'cash_balance': fields.Float(example=10000.0),
         'notes': fields.String(example='Primary trading account')
     })

@@ -28,9 +28,9 @@ class TradePlanService:
         return db.query(TradePlan).filter(TradePlan.ticker_id == ticker_id).all()
     
     @staticmethod
-    def get_active_plans(db: Session) -> List[TradePlan]:
-        """קבלת תוכניות טרייד פעילות"""
-        return db.query(TradePlan).filter(TradePlan.canceled_at.is_(None)).all()
+    def get_open_plans(db: Session) -> List[TradePlan]:
+        """קבלת תוכניות טרייד פתוחות"""
+        return db.query(TradePlan).filter(TradePlan.status == 'open').all()
     
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> TradePlan:
@@ -103,16 +103,18 @@ class TradePlanService:
         plans = query.all()
         
         total_plans = len(plans)
-        active_plans = len([p for p in plans if p.canceled_at is None])
-        canceled_plans = len([p for p in plans if p.canceled_at is not None])
+        open_plans = len([p for p in plans if p.status == 'open'])
+        closed_plans = len([p for p in plans if p.status == 'closed'])
+        cancelled_plans = len([p for p in plans if p.status == 'cancelled'])
         
         # חישוב סכומים
         total_planned_amount = sum(p.planned_amount for p in plans if p.planned_amount)
         
         return {
             'total_plans': total_plans,
-            'active_plans': active_plans,
-            'canceled_plans': canceled_plans,
+            'open_plans': open_plans,
+            'closed_plans': closed_plans,
+            'cancelled_plans': cancelled_plans,
             'total_planned_amount': total_planned_amount
         }
     
@@ -121,7 +123,7 @@ class TradePlanService:
         """קבלת תוכניות לפי סוג השקעה"""
         return db.query(TradePlan).filter(
             TradePlan.investment_type == investment_type,
-            TradePlan.canceled_at.is_(None)
+            TradePlan.status == 'open'
         ).all()
     
     @staticmethod
@@ -138,7 +140,7 @@ class TradePlanService:
         if 'investment_type' in conditions:
             query = query.filter(TradePlan.investment_type == conditions['investment_type'])
         
-        if conditions.get('active_only', True):
-            query = query.filter(TradePlan.canceled_at.is_(None))
+        if conditions.get('open_only', True):
+            query = query.filter(TradePlan.status == 'open')
         
         return query.all()

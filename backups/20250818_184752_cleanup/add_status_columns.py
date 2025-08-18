@@ -28,7 +28,7 @@ def add_status_columns():
             # הוספת שדה status לטבלת trade_plans
             print("📝 מוסיף שדה status לטבלת trade_plans...")
             try:
-                conn.execute(text("ALTER TABLE trade_plans ADD COLUMN status VARCHAR(20) DEFAULT 'פתוח'"))
+                conn.execute(text("ALTER TABLE trade_plans ADD COLUMN status VARCHAR(20) DEFAULT 'open'"))
                 print("✅ שדה status נוסף לטבלת trade_plans")
             except Exception as e:
                 print(f"⚠️ שדה status כבר קיים בטבלת trade_plans: {e}")
@@ -36,7 +36,7 @@ def add_status_columns():
             # הוספת שדה status לטבלת alerts
             print("📝 מוסיף שדה status לטבלת alerts...")
             try:
-                conn.execute(text("ALTER TABLE alerts ADD COLUMN status VARCHAR(20) DEFAULT 'פתוח'"))
+                conn.execute(text("ALTER TABLE alerts ADD COLUMN status VARCHAR(20) DEFAULT 'open'"))
                 print("✅ שדה status נוסף לטבלת alerts")
             except Exception as e:
                 print(f"⚠️ שדה status כבר קיים בטבלת alerts: {e}")

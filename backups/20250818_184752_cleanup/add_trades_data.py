@@ -84,7 +84,7 @@ def add_trades():
     
     try:
         # קבלת חשבונות, טיקרים ותכנונים קיימים
-        cursor.execute("SELECT id, name FROM accounts WHERE status = 'active' LIMIT 2")
+        cursor.execute("SELECT id, name FROM accounts WHERE status = 'open' LIMIT 2")
         accounts = cursor.fetchall()
         
         cursor.execute("SELECT id, symbol FROM tickers ORDER BY id LIMIT 4")
@@ -235,7 +235,7 @@ def add_trades():
             cursor.execute("""
                 SELECT COUNT(*) as count 
                 FROM trades 
-                WHERE ticker_id = ? AND status IN ('open', 'pending', 'פתוח', 'ממתין')
+                WHERE ticker_id = ? AND status = 'open'
             """, (ticker_id,))
             active_trades = cursor.fetchone()['count']
             

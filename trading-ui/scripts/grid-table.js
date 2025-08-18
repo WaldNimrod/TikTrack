@@ -1274,12 +1274,12 @@ function fillTradePlanModalData(data) {
 
 function fillAlertModalData(data) {
     document.getElementById('editAlertId').value = data.id;
-    document.getElementById('editAlertAccountId').value = data.account_id || '';
-    document.getElementById('editAlertTickerId').value = data.ticker_id || '';
+    document.getElementById('editAlertRelatedTypeId').value = data.related_type_id || '';
+    document.getElementById('editAlertRelatedId').value = data.related_id || '';
     document.getElementById('editAlertType').value = data.type || '';
     document.getElementById('editAlertCondition').value = data.condition || '';
     document.getElementById('editAlertMessage').value = data.message || '';
-    document.getElementById('editAlertStatus').checked = data.is_active || false;
+    document.getElementById('editAlertStatus').value = data.status || 'open';
 }
 
 function fillCashFlowModalData(data) {
@@ -1317,21 +1317,21 @@ function fillExecutionModalData(data) {
  * 
  * @param {Object} data - נתוני ההתראה לעריכה
  * @param {number} data.id - מזהה ההתראה
- * @param {number} data.account_id - מזהה החשבון
- * @param {number} data.ticker_id - מזהה הטיקר
+ * @param {number} data.related_type_id - מזהה סוג הישות המשויכת
+ * @param {number} data.related_id - מזהה הישות הספציפית
  * @param {string} data.type - סוג ההתראה
  * @param {string} data.condition - תנאי ההתראה
  * @param {string} data.message - הודעת ההתראה
- * @param {boolean} data.is_active - האם ההתראה פעילה
+ * @param {string} data.status - סטטוס ההתראה
  */
 function fillAlertModalData(data) {
     document.getElementById('editAlertId').value = data.id;
-    document.getElementById('editAlertAccountId').value = data.account_id || '';
-    document.getElementById('editAlertTickerId').value = data.ticker_id || '';
+    document.getElementById('editAlertRelatedTypeId').value = data.related_type_id || '';
+    document.getElementById('editAlertRelatedId').value = data.related_id || '';
     document.getElementById('editAlertType').value = data.type || '';
     document.getElementById('editAlertCondition').value = data.condition || '';
     document.getElementById('editAlertMessage').value = data.message || '';
-    document.getElementById('editAlertIsActive').value = data.is_active ? 'true' : 'false';
+    document.getElementById('editAlertStatus').value = data.status || 'open';
 }
 
 /**
@@ -1558,12 +1558,12 @@ function collectModalData(tableType) {
         case 'alerts':
             // איסוף נתוני התראה
             return {
-                account_id: parseInt(document.getElementById('editAlertAccountId').value) || null,
-                ticker_id: parseInt(document.getElementById('editAlertTickerId').value) || null,
+                related_type_id: parseInt(document.getElementById('editAlertRelatedTypeId').value) || null,
+                related_id: parseInt(document.getElementById('editAlertRelatedId').value) || null,
                 type: document.getElementById('editAlertType').value,
                 condition: document.getElementById('editAlertCondition').value,
                 message: document.getElementById('editAlertMessage').value,
-                is_active: document.getElementById('editAlertIsActive').value === 'true'
+                status: document.getElementById('editAlertStatus').value
             };
         case 'cash_flows':
             // איסוף נתוני תזרים מזומנים

@@ -30,7 +30,7 @@ class TradeService:
     @staticmethod
     def get_open_trades(db: Session) -> List[Trade]:
         """קבלת טריידים פתוחים"""
-        return db.query(Trade).filter(Trade.status == 'פתוח').all()
+        return db.query(Trade).filter(Trade.status == 'open').all()
     
     @staticmethod
     def get_by_status(db: Session, status: str) -> List[Trade]:
@@ -106,8 +106,8 @@ class TradeService:
     def close_trade(db: Session, trade_id: int, close_data: Dict[str, Any]) -> Optional[Trade]:
         """סגירת טרייד"""
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
-        if trade and trade.status == 'פתוח':
-            trade.status = 'סגור'
+        if trade and trade.status == 'open':
+            trade.status = 'closed'
             trade.closed_at = datetime.utcnow()
             trade.total_pl = close_data.get('total_pl', trade.total_pl)
             db.commit()
@@ -120,8 +120,8 @@ class TradeService:
     def cancel_trade(db: Session, trade_id: int, cancel_reason: str) -> Optional[Trade]:
         """ביטול טרייד"""
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
-        if trade and trade.status == 'פתוח':
-            trade.status = 'מבוטל'
+        if trade and trade.status == 'open':
+            trade.status = 'cancelled'
             trade.cancelled_at = datetime.utcnow()
             trade.cancel_reason = cancel_reason
             db.commit()

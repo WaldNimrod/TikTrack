@@ -20,7 +20,7 @@ window.alertsLoaded = false;
 // ===== ALERTS MANAGEMENT =====
 // קובץ ייעודי לניהול התראות - משותף לכל הדפים
 
-console.log('🚀 alerts.js file loaded successfully!');
+
 
 /**
  * טעינת התראות מהשרת
@@ -33,10 +33,8 @@ console.log('🚀 alerts.js file loaded successfully!');
  */
 async function loadAlertsData() {
     try {
-        console.log('🔄 טוען התראות...');
         const response = await apiCall('/api/v1/alerts/');
         const alerts = response.data || response;
-        console.log(`✅ נטענו ${alerts.length} התראות`);
         return alerts;
     } catch (error) {
         console.error('❌ שגיאה בטעינת התראות:', error);
@@ -134,12 +132,12 @@ function convertIsTriggeredToHebrew(isTriggered) {
  * fillAlertEditModal(alertData);
  */
 function fillAlertEditModal(alert) {
-    console.log(`🔧 מילוי מודל עריכת התראה עם נתונים:`, alert);
+    
     
     // מילוי שדות הטופס
     document.getElementById('editAlertId').value = alert.id;
-    document.getElementById('editAlertAccountId').value = alert.account_id || '';
-    document.getElementById('editAlertTickerId').value = alert.ticker_id || '';
+            document.getElementById('editAlertRelatedTypeId').value = alert.related_type_id || '';
+        document.getElementById('editAlertRelatedId').value = alert.related_id || '';
     document.getElementById('editAlertType').value = alert.type || '';
     document.getElementById('editAlertCondition').value = alert.condition || '';
     document.getElementById('editAlertMessage').value = alert.message || '';
@@ -158,8 +156,8 @@ function fillAlertEditModal(alert) {
  */
 function collectAlertEditData() {
     const alertData = {
-        account_id: document.getElementById('editAlertAccountId').value ? parseInt(document.getElementById('editAlertAccountId').value) : null,
-        ticker_id: document.getElementById('editAlertTickerId').value ? parseInt(document.getElementById('editAlertTickerId').value) : null,
+        related_type_id: document.getElementById('editAlertRelatedTypeId').value ? parseInt(document.getElementById('editAlertRelatedTypeId').value) : null,
+        related_id: document.getElementById('editAlertRelatedId').value ? parseInt(document.getElementById('editAlertRelatedId').value) : null,
         type: document.getElementById('editAlertType').value.trim(),
         condition: document.getElementById('editAlertCondition').value.trim(),
         message: document.getElementById('editAlertMessage').value.trim(),
@@ -167,7 +165,7 @@ function collectAlertEditData() {
         is_triggered: document.getElementById('editAlertIsTriggered').value
     };
     
-    console.log('📝 נתונים שנאספו ממודל עריכת התראה:', alertData);
+
     return alertData;
 }
 
@@ -182,8 +180,8 @@ function collectAlertEditData() {
  */
 function collectAlertAddData() {
     const alertData = {
-        account_id: document.getElementById('alertAccountId').value ? parseInt(document.getElementById('alertAccountId').value) : null,
-        ticker_id: document.getElementById('alertTickerId').value ? parseInt(document.getElementById('alertTickerId').value) : null,
+        related_type_id: document.getElementById('alertRelatedTypeId').value ? parseInt(document.getElementById('alertRelatedTypeId').value) : null,
+        related_id: document.getElementById('alertRelatedId').value ? parseInt(document.getElementById('alertRelatedId').value) : null,
         type: document.getElementById('alertType').value.trim(),
         condition: document.getElementById('alertCondition').value.trim(),
         message: document.getElementById('alertMessage').value.trim(),
@@ -191,7 +189,7 @@ function collectAlertAddData() {
         is_triggered: document.getElementById('alertIsTriggered').value || 'false'
     };
     
-    console.log('📝 נתונים שנאספו ממודל הוספת התראה:', alertData);
+
     return alertData;
 }
 
@@ -207,14 +205,10 @@ function collectAlertAddData() {
  */
 async function createAlert(alertData) {
     try {
-        console.log('🚀 יוצר התראה חדשה:', alertData);
-        
         const response = await apiCall('/api/v1/alerts/', {
             method: 'POST',
             body: JSON.stringify(alertData)
         });
-        
-        console.log('✅ התראה נוצרה בהצלחה:', response);
         showNotification('התראה נוצרה בהצלחה!', 'success');
         return response;
     } catch (error) {
@@ -237,14 +231,10 @@ async function createAlert(alertData) {
 async function updateAlert(alertId) {
     try {
         const alertData = collectAlertEditData();
-        console.log(`🔄 מעדכן התראה ${alertId}:`, alertData);
-        
         const response = await apiCall(`/api/v1/alerts/${alertId}`, {
             method: 'PUT',
             body: JSON.stringify(alertData)
         });
-        
-        console.log('✅ התראה עודכנה בהצלחה:', response);
         showNotification('התראה עודכנה בהצלחה!', 'success');
         return response;
     } catch (error) {
@@ -270,16 +260,16 @@ async function deleteAlert(alertId, alertType) {
         // אישור מחיקה
         const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ההתראה "${alertType}"?\n\nפעולה זו לא ניתנת לביטול.`);
         if (!confirmed) {
-            console.log('❌ מחיקת התראה בוטלה על ידי המשתמש');
+    
             return null;
         }
         
-        console.log(`🗑️ מוחק התראה ${alertId}: ${alertType}`);
+
         const response = await apiCall(`/api/v1/alerts/${alertId}`, {
             method: 'DELETE'
         });
         
-        console.log('✅ התראה נמחקה בהצלחה:', response);
+
         showNotification(`התראה "${alertType}" נמחקה בהצלחה!`, 'success');
         return response;
   } catch (error) {
@@ -305,17 +295,14 @@ async function cancelAlert(alertId, alertType) {
         // אישור ביטול
         const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ההתראה "${alertType}"?\n\nהסטטוס ישתנה ל"מבוטל".`);
         if (!confirmed) {
-            console.log('❌ ביטול התראה בוטל על ידי המשתמש');
             return null;
         }
-        
-        console.log(`🚫 מבטל התראה ${alertId}: ${alertType}`);
         const response = await apiCall(`/api/v1/alerts/${alertId}`, {
             method: 'PUT',
             body: JSON.stringify({ status: 'מבוטל' })
         });
         
-        console.log('✅ התראה בוטלה בהצלחה:', response);
+
         showNotification(`התראה "${alertType}" בוטלה בהצלחה!`, 'success');
         return response;
     } catch (error) {
@@ -337,12 +324,9 @@ async function cancelAlert(alertId, alertType) {
  */
 async function markAlertAsTriggered(alertId) {
     try {
-        console.log(`🔔 מסמן התראה ${alertId} כמופעלת`);
         const response = await apiCall(`/api/v1/alerts/${alertId}/trigger`, {
             method: 'POST'
         });
-        
-        console.log('✅ התראה סומנה כמופעלת:', response);
         showNotification('התראה סומנה כמופעלת!', 'success');
         return response;
     } catch (error) {
@@ -364,12 +348,9 @@ async function markAlertAsTriggered(alertId) {
  */
 async function markAlertAsRead(alertId) {
     try {
-        console.log(`📖 מסמן התראה ${alertId} כנקראה`);
         const response = await apiCall(`/api/v1/alerts/${alertId}/read`, {
             method: 'POST'
         });
-        
-        console.log('✅ התראה סומנה כנקראה:', response);
         showNotification('התראה סומנה כנקראה!', 'success');
         return response;
     } catch (error) {
@@ -387,7 +368,7 @@ async function markAlertAsRead(alertId) {
  * showAddAlertModal();
  */
 function showAddAlertModal() {
-    console.log('📝 מציג מודל הוספת התראה');
+    
     
     // ניקוי הטופס
     document.getElementById('alertAccountId').value = '';
@@ -412,7 +393,7 @@ function showAddAlertModal() {
  * showEditAlertModal(alertData);
  */
 function showEditAlertModal(alert) {
-    console.log('✏️ מציג מודל עריכת התראה:', alert);
+    
     
     // מילוי הנתונים
     fillAlertEditModal(alert);
@@ -505,7 +486,7 @@ async function updateAlertFromModal() {
  * updateAlertsTable(alerts);
  */
 function updateAlertsTable(alerts) {
-    console.log('🔄 מעדכן טבלת התראות עם', alerts.length, 'התראות');
+    
     
     const tbody = document.querySelector('#alertsTable tbody');
     if (!tbody) {
@@ -516,8 +497,8 @@ function updateAlertsTable(alerts) {
     tbody.innerHTML = alerts.map(alert => `
         <tr>
             <td>${alert.id}</td>
-            <td>${alert.account_id || '-'}</td>
-            <td>${alert.ticker_id || '-'}</td>
+                            <td>${alert.related_type || '-'}</td>
+                <td>${alert.related_id || '-'}</td>
             <td>${alert.type || '-'}</td>
             <td>${alert.condition || '-'}</td>
             <td>${alert.message || '-'}</td>
@@ -554,7 +535,7 @@ function updateAlertsTable(alerts) {
         localStorage.setItem('alertsSectionOpen', 'true');
     }
     
-    console.log('✅ טבלת התראות עודכנה בהצלחה');
+    
 }
 
 /**
@@ -566,7 +547,7 @@ function updateAlertsTable(alerts) {
  */
 async function refreshAlertsTable() {
     try {
-        console.log('🔄 מרענן טבלת התראות...');
+
         const alerts = await loadAlertsData();
         
         // עדכון הטבלה (תלוי בדף)
@@ -580,7 +561,7 @@ async function refreshAlertsTable() {
             updateAlertsStats(stats);
         }
         
-        console.log('✅ טבלת התראות רועננה בהצלחה');
+
     } catch (error) {
         console.error('❌ שגיאה ברענון טבלת התראות:', error);
     }
@@ -604,7 +585,6 @@ function showNotification(message, type = 'info') {
     }
     
     // הצגה פשוטה
-    console.log(`${type.toUpperCase()}: ${message}`);
     alert(message);
 }
 
@@ -635,7 +615,7 @@ window.updateAlertsTable = updateAlertsTable;
 window.refreshAlertsTable = refreshAlertsTable;
 window.showNotification = showNotification;
 
-console.log('✅ קובץ alerts.js נטען בהצלחה - פונקציות זמינות גלובלית');
+
 
 // ===== מערכת כרטיסיות התראות =====
 // פונקציות ייעודיות לכרטיסיות ההתראות בדף designs.html
@@ -646,20 +626,13 @@ let newAlertsCount = 0;
 
 // פונקציה לטעינת התראות לכרטיסיות
 async function loadAlertsForCards() {
-  console.log('🔄 === Loading alerts for cards ===');
-  console.log('🔄 Function called from:', new Error().stack);
-  
   try {
     const token = localStorage.getItem('authToken');
-    console.log('🔄 Token found:', !!token);
     
     if (!token) {
-      console.log('🔄 No auth token found, using sample alerts');
       loadSampleAlertsForCards();
       return;
     }
-    
-    console.log('🔄 Fetching alerts from server...');
     const response = await fetch('http://127.0.0.1:8080/api/v1/alerts', {
       method: 'GET',
       headers: {
@@ -668,37 +641,28 @@ async function loadAlertsForCards() {
       }
     });
     
-    console.log('🔄 Response status:', response.status);
-    
     if (response.ok) {
       const alerts = await response.json();
-      console.log('🔄 Raw response from server:', alerts);
       
       // בדיקה אם התגובה היא מערך או אובייקט עם data
       alertsCardsData = Array.isArray(alerts) ? alerts : (alerts.data || []);
-      console.log('🔄 Alerts loaded from server:', alertsCardsData.length, 'alerts');
-      console.log('🔄 Sample alert data:', alertsCardsData[0]);
       
       if (alertsCardsData.length === 0) {
-        console.log('🔄 No alerts found in server response, using sample data');
         loadSampleAlertsForCards();
       } else {
         filterAndDisplayNewAlerts();
       }
     } else {
-      console.log('🔄 Error loading alerts from server, status:', response.status);
       loadSampleAlertsForCards();
     }
     
   } catch (error) {
-    console.log('🔄 Error loading alerts from server:', error);
     loadSampleAlertsForCards();
   }
 }
 
 // פונקציה לטעינת התראות דוגמה לכרטיסיות
 function loadSampleAlertsForCards() {
-  console.log('🔄 Loading sample alerts for cards');
   
   // יצירת התראות דוגמה עם מצבים שונים - רק 2 חדשות כמו בקוד הידני
   const alertsCardsData = [
@@ -726,8 +690,6 @@ function loadSampleAlertsForCards() {
     }
   ];
   
-  console.log('🔄 Sample alerts data created:', alertsCardsData);
-  
   // עדכון מונה ההתראות
   newAlertsCount = alertsCardsData.length;
   updateAlertsCount();
@@ -735,38 +697,22 @@ function loadSampleAlertsForCards() {
   // הצגת הכרטיסיות עם העיצוב המלא
   const cardsContainer = document.getElementById('alertsCards');
   if (cardsContainer) {
-    console.log('🔄 Found alertsCards container, rendering sample alerts...');
     const cardsHTML = alertsCardsData.map(alert => createAlertCardHTML(alert)).join('');
     cardsContainer.innerHTML = cardsHTML;
-    console.log('🔄 Sample cards rendered successfully!');
-  } else {
-    console.log('🔄 alertsCards container NOT found!');
   }
 }
 
 // פונקציה לסינון והצגת התראות חדשות בלבד
 function filterAndDisplayNewAlerts() {
-  console.log('🔄 Filtering new alerts...');
-  console.log('🔄 Total alerts in data:', alertsCardsData.length);
-  
   if (alertsCardsData.length === 0) {
-    console.log('🔄 No alerts data available');
     newAlertsCount = 0;
     updateAlertsCount();
     renderAlertsCards([]);
     return;
   }
   
-  // לוג של כל ההתראות עם הסטטוס שלהן
-  alertsCardsData.forEach((alert, index) => {
-    console.log(`🔄 Alert ${index + 1}: ID=${alert.id}, is_triggered="${alert.is_triggered}"`);
-  });
-  
   const newAlerts = alertsCardsData.filter(alert => alert.is_triggered === 'new');
   newAlertsCount = newAlerts.length;
-  
-  console.log('🔄 Found', newAlertsCount, 'new alerts');
-  console.log('🔄 New alerts:', newAlerts);
   
   updateAlertsCount();
   renderAlertsCards(newAlerts);
@@ -782,11 +728,8 @@ function updateAlertsCount() {
 
 // פונקציה לרנדור כרטיסיות ההתראות
 function renderAlertsCards(alerts) {
-  console.log('🔄 Rendering alerts cards...');
-  
   const cardsContainer = document.getElementById('alertsCards');
   if (!cardsContainer) {
-    console.log('🔄 Alerts cards container not found');
     return;
   }
   
@@ -804,7 +747,7 @@ function renderAlertsCards(alerts) {
   const cardsHTML = alerts.map(alert => createAlertCardHTML(alert)).join('');
   cardsContainer.innerHTML = cardsHTML;
   
-  console.log('🔄 Rendered', alerts.length, 'alert cards');
+
 }
 
 // פונקציה ליצירת HTML של כרטיסיית התראה
@@ -979,7 +922,7 @@ function getAlertDetails(alert) {
 
 // פונקציה לסמן התראה כנקראה
 async function markAlertAsRead(alertId) {
-  console.log('🔄 Marking alert as read:', alertId);
+  
   
   const button = document.querySelector(`button[data-alert-id="${alertId}"]`);
   if (button) {
@@ -1000,11 +943,7 @@ async function markAlertAsRead(alertId) {
         }
       });
       
-      if (response.ok) {
-        console.log('🔄 Alert marked as read on server');
-      } else {
-        console.log('🔄 Error updating alert on server');
-      }
+
     }
     
     // עדכון מקומי
@@ -1032,7 +971,6 @@ async function markAlertAsRead(alertId) {
     }
     
   } catch (error) {
-    console.log('🔄 Error marking alert as read:', error);
     
     // החזרת הכפתור למצב רגיל במקרה של שגיאה
     if (button) {
@@ -1072,7 +1010,6 @@ function formatNumber(num) {
 
 // פונקציה לרענון ההתראות
 function refreshAlerts() {
-  console.log('🔄 Refreshing alerts...');
   loadAlertsForCards();
 }
 
@@ -1082,11 +1019,4 @@ window.loadSampleAlertsForCards = loadSampleAlertsForCards;
 window.markAlertAsRead = markAlertAsRead;
 window.refreshAlerts = refreshAlerts;
 
-console.log('✅ פונקציות כרטיסיות התראות נוספו לקובץ alerts.js');
 
-// בדיקה שהפונקציות זמינות
-console.log('🔄 Testing function availability:');
-console.log('🔄 loadAlertsForCards available:', typeof loadAlertsForCards);
-console.log('🔄 loadSampleAlertsForCards available:', typeof loadSampleAlertsForCards);
-console.log('🔄 markAlertAsRead available:', typeof markAlertAsRead);
-console.log('🔄 refreshAlerts available:', typeof refreshAlerts);

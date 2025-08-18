@@ -35,6 +35,42 @@
       padding-top: 30px !important; /* מרווח לכותרת בלבד + מרווח קטן */
     }
     
+    /* עיצוב קומפוננטת התראות פעילות */
+    .active-alerts-section {
+      margin-bottom: 2rem;
+    }
+    
+    .active-alerts-section .alerts-cards-container {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border: 1px solid #dee2e6;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .active-alerts-section .alerts-header h3 {
+      color: #495057;
+      font-weight: 700;
+    }
+    
+    .active-alerts-section .alerts-count {
+      background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%);
+      font-weight: 600;
+    }
+    
+    .active-alerts-section .refresh-btn {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 8px 12px;
+      transition: all 0.2s ease;
+    }
+    
+    .active-alerts-section .refresh-btn:hover {
+      background: #f8f9fa;
+      border-color: #29a6a8;
+      transform: translateY(-1px);
+    }
+    
     .container {
       padding-top: 1rem;
     }
@@ -507,6 +543,24 @@
   
   <div class="background-wrapper">
     <div class="main-content">
+    <!-- קומפוננטת התראות פעילות -->
+    <div class="active-alerts-section">
+      <div class="alerts-cards-container">
+        <div class="alerts-header">
+          <h3>🔔 התראות פעילות</h3>
+          <div class="alerts-header-actions">
+            <div class="alerts-count" id="newAlertsCount">0 התראות</div>
+            <button class="refresh-btn" onclick="refreshActiveAlerts()" title="רענן התראות">
+              <span class="action-icon">🔄</span>
+            </button>
+          </div>
+        </div>
+        <div class="alerts-cards" id="activeAlertsCards">
+          <!-- כרטיסיות ההתראות הפעילות יוכנסו כאן דינמית -->
+        </div>
+      </div>
+    </div>
+
     <div class="page-header">
       <div>
         <h1 class="page-title">ניהול התראות</h1>
@@ -573,16 +627,32 @@
                 <input type="text" class="form-control" id="alertTitle" required>
               </div>
               <div class="col-md-6 mb-3">
-                <label for="alertType" class="form-label">סוג שיוך *</label>
-                <select class="form-select" id="alertType" required>
-                  <option value="">בחר סוג</option>
-                  <option value="תכנון">תכנון</option>
-                  <option value="טרייד פתוח">טרייד פתוח</option>
-                  <option value="טרייד סגור">טרייד סגור</option>
-                  <option value="טיקר">טיקר</option>
-                  <option value="אחר">אחר</option>
+                <label for="alertRelatedType" class="form-label">סוג ישות *</label>
+                <select class="form-select" id="alertRelatedType" required onchange="loadRelatedEntities()">
+                  <option value="">בחר סוג ישות</option>
+                  <option value="account">חשבון</option>
+                  <option value="trade">טרייד</option>
+                  <option value="trade_plan">תכנון טרייד</option>
+                  <option value="ticker">טיקר</option>
                 </select>
               </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="alertRelatedId" class="form-label">ישות ספציפית *</label>
+                <select class="form-select" id="alertRelatedId" required>
+                  <option value="">בחר ישות</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="alertType" class="form-label">סוג התראה *</label>
+                <select class="form-select" id="alertType" required>
+                  <option value="">בחר סוג</option>
+                  <option value="price_alert">התראה על מחיר</option>
+                  <option value="stop_loss">סטופ לוס</option>
+                  <option value="volume_alert">התראה על נפח</option>
+                  <option value="custom_alert">התראה מותאמת</option>
+                </select>
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
@@ -633,16 +703,32 @@
                 <input type="text" class="form-control" id="editAlertTitle" required>
               </div>
               <div class="col-md-6 mb-3">
-                <label for="editAlertType" class="form-label">סוג שיוך *</label>
-                <select class="form-select" id="editAlertType" required>
-                  <option value="">בחר סוג</option>
-                  <option value="תכנון">תכנון</option>
-                  <option value="טרייד פתוח">טרייד פתוח</option>
-                  <option value="טרייד סגור">טרייד סגור</option>
-                  <option value="טיקר">טיקר</option>
-                  <option value="אחר">אחר</option>
+                <label for="editAlertRelatedType" class="form-label">סוג ישות *</label>
+                <select class="form-select" id="editAlertRelatedType" required onchange="loadEditRelatedEntities()">
+                  <option value="">בחר סוג ישות</option>
+                  <option value="account">חשבון</option>
+                  <option value="trade">טרייד</option>
+                  <option value="trade_plan">תכנון טרייד</option>
+                  <option value="ticker">טיקר</option>
                 </select>
               </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="editAlertRelatedId" class="form-label">ישות ספציפית *</label>
+                <select class="form-select" id="editAlertRelatedId" required>
+                  <option value="">בחר ישות</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="editAlertType" class="form-label">סוג התראה *</label>
+                <select class="form-select" id="editAlertType" required>
+                  <option value="">בחר סוג</option>
+                  <option value="price_alert">התראה על מחיר</option>
+                  <option value="stop_loss">סטופ לוס</option>
+                  <option value="volume_alert">התראה על נפח</option>
+                  <option value="custom_alert">התראה מותאמת</option>
+                </select>
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
@@ -685,48 +771,49 @@
     let gridApi;
     let allAlerts = [];
     let filteredAlerts = [];
+    let entitiesCache = {}; // מטמון לישויות
 
     // נתוני דמה להתראות
     const demoAlerts = [
       {
         id: 1,
-        title: "AAPL הגיע ליעד מחיר",
-        type: "תכנון",
-        status: "פעיל",
-        priority: "גבוהה",
-        description: "Apple הגיע ליעד המחיר של $210",
-        created_at: "2024-01-15",
-        updated_at: "2024-01-15"
+        related_type: "ticker",
+        related_id: 1,
+        type: "price_alert",
+        status: "open",
+        condition: "מחיר > 210$",
+        message: "AAPL הגיע ליעד מחיר",
+        created_at: "2024-01-15"
       },
       {
         id: 2,
-        title: "TSLA מתחת לסטופ",
-        type: "טרייד פתוח",
-        status: "פעיל",
-        priority: "גבוהה",
-        description: "Tesla ירד מתחת למחיר הסטופ של $690",
-        created_at: "2024-01-14",
-        updated_at: "2024-01-14"
+        related_type: "trade",
+        related_id: 1,
+        type: "stop_loss",
+        status: "open",
+        condition: "מחיר < 690$",
+        message: "TSLA מתחת לסטופ",
+        created_at: "2024-01-14"
       },
       {
         id: 3,
-        title: "NVDA רווח 10%",
-        type: "טרייד סגור",
-        status: "לא פעיל",
-        priority: "בינונית",
-        description: "NVIDIA הגיע לרווח של 10%",
-        created_at: "2024-01-13",
-        updated_at: "2024-01-13"
+        related_type: "trade_plan",
+        related_id: 1,
+        type: "price_alert",
+        status: "closed",
+        condition: "רווח 10%",
+        message: "NVDA רווח 10%",
+        created_at: "2024-01-13"
       },
       {
         id: 4,
-        title: "GOOGL התראה כללית",
-        type: "טיקר",
-        status: "ממתין",
-        priority: "נמוכה",
-        description: "התראה כללית על Google",
-        created_at: "2024-01-12",
-        updated_at: "2024-01-12"
+        related_type: "ticker",
+        related_id: 2,
+        type: "volume_alert",
+        status: "open",
+        condition: "נפח > 1M",
+        message: "GOOGL התראה כללית",
+        created_at: "2024-01-12"
       },
       {
         id: 5,
@@ -757,8 +844,26 @@
         filter: true
       },
       { 
+        field: 'related_type', 
+        headerName: 'סוג ישות', 
+        width: 120,
+        sortable: true,
+        filter: true,
+        cellRenderer: params => {
+          const typeClass = getTypeClass(params.value);
+          return `<span class="type-badge ${typeClass}">${params.value}</span>`;
+        }
+      },
+      { 
+        field: 'related_id', 
+        headerName: 'מזהה ישות', 
+        width: 100,
+        sortable: true,
+        filter: true
+      },
+      { 
         field: 'type', 
-        headerName: 'סוג שיוך', 
+        headerName: 'סוג התראה', 
         width: 120,
         sortable: true,
         filter: true,
@@ -779,16 +884,16 @@
         }
       },
       { 
-        field: 'priority', 
-        headerName: 'עדיפות', 
-        width: 100,
+        field: 'condition', 
+        headerName: 'תנאי', 
+        width: 200,
         sortable: true,
         filter: true
       },
       { 
-        field: 'description', 
-        headerName: 'תיאור', 
-        width: 250,
+        field: 'message', 
+        headerName: 'הודעה', 
+        width: 200,
         sortable: true,
         filter: true
       },
@@ -914,6 +1019,383 @@
       gridApi.setRowData(dataToShow);
     }
 
+    // פונקציות לטעינת התראות פעילות
+    async function loadActiveAlerts() {
+      console.log('🔄 === טוען התראות פעילות ===');
+      
+      try {
+        const response = await fetch('/api/v1/alerts/unread');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const apiData = await response.json();
+        
+        console.log('📡 נתונים מה-API:', apiData);
+        
+        if (apiData.status === 'success' && apiData.data) {
+          const activeAlerts = apiData.data;
+          console.log('📊 נמצאו', activeAlerts.length, 'התראות פעילות');
+          
+          // עדכון מונה ההתראות
+          const countElement = document.getElementById('newAlertsCount');
+          if (countElement) {
+            countElement.textContent = `${activeAlerts.length} התראות`;
+          }
+          
+          // הצגת הכרטיסיות
+          renderActiveAlertsCards(activeAlerts);
+        } else {
+          console.warn('⚠️ לא התקבלו התראות פעילות');
+          renderActiveAlertsCards([]);
+        }
+        
+      } catch (error) {
+        console.error('❌ שגיאה בטעינת התראות פעילות:', error);
+        renderActiveAlertsCards([]);
+      }
+    }
+    
+    function renderActiveAlertsCards(alerts) {
+      const cardsContainer = document.getElementById('activeAlertsCards');
+      if (!cardsContainer) {
+        console.error('❌ לא נמצא container לכרטיסיות התראות פעילות');
+        return;
+      }
+      
+      if (alerts.length === 0) {
+        cardsContainer.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+            <div style="font-size: 3rem; margin-bottom: 20px;">🔕</div>
+            <h4>אין התראות פעילות</h4>
+            <p>כל ההתראות נקראו או שאין התראות חדשות כרגע</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const cardsHTML = alerts.map(alert => createActiveAlertCardHTML(alert)).join('');
+      cardsContainer.innerHTML = cardsHTML;
+      
+      console.log('✅ הוצגו', alerts.length, 'כרטיסיות התראות פעילות');
+    }
+    
+    function createActiveAlertCardHTML(alert) {
+      const timeAgo = getTimeAgo(alert.created_at);
+      const alertIcon = getAlertIcon(alert.type);
+      const tickerSymbol = extractTickerFromCondition(alert.condition) || '';
+      
+      return `
+        <div class="alert-card" data-alert-id="${alert.id}">
+          <div class="alert-card-header">
+            <h4 class="alert-card-title">${alertIcon} ${tickerSymbol || 'התראה'}</h4>
+            <span class="alert-card-time">${timeAgo}</span>
+          </div>
+          
+          <div class="alert-card-content">
+            <p class="alert-card-message"><strong>${alert.message || alert.condition}</strong></p>
+            <p class="alert-card-message">${alert.condition || ''}</p>
+            
+            <div class="alert-card-details">
+              <span class="alert-detail-item">סוג: ${getAlertTypeDisplay(alert.type)}</span>
+              <span class="alert-detail-item">ישות: ${getEntityTypeDisplay(alert.related_type)}</span>
+              ${tickerSymbol ? `<span class="alert-detail-item">$${getCurrentPrice(tickerSymbol)}</span>` : ''}
+              ${tickerSymbol ? `<span class="alert-detail-item ${getDailyChangeClass(tickerSymbol)}">${getDailyChange(tickerSymbol)}%</span>` : ''}
+            </div>
+          </div>
+          
+          <div class="alert-card-footer">
+            <button class="btn-mark-read" onclick="markActiveAlertAsRead(${alert.id})" data-alert-id="${alert.id}">
+              ✓ קראתי
+            </button>
+          </div>
+        </div>
+      `;
+    }
+    
+    async function markActiveAlertAsRead(alertId) {
+      console.log('🔄 מסמן התראה כנקראה:', alertId);
+      
+      const button = document.querySelector(`button[data-alert-id="${alertId}"]`);
+      if (button) {
+        button.disabled = true;
+        button.textContent = '✓ נקרא';
+      }
+      
+      try {
+        const response = await fetch(`/api/v1/alerts/${alertId}/mark-read`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          console.log('✅ התראה סומנה כנקראה בהצלחה');
+          
+          // הסתרת הכרטיסיה
+          const card = document.querySelector(`[data-alert-id="${alertId}"]`);
+          if (card) {
+            card.style.opacity = '0.5';
+            card.style.transform = 'scale(0.98)';
+            
+            setTimeout(() => {
+              card.remove();
+              
+              // עדכון מונה
+              const countElement = document.getElementById('newAlertsCount');
+              if (countElement) {
+                const currentCount = parseInt(countElement.textContent) - 1;
+                countElement.textContent = `${currentCount} התראות`;
+                
+                // אם אין יותר התראות, הצג הודעה
+                if (currentCount === 0) {
+                  renderActiveAlertsCards([]);
+                }
+              }
+            }, 300);
+          }
+        } else {
+          throw new Error('שגיאה בסימון התראה כנקראה');
+        }
+        
+      } catch (error) {
+        console.error('❌ שגיאה בסימון התראה כנקראה:', error);
+        
+        // החזרת הכפתור למצב רגיל
+        if (button) {
+          button.disabled = false;
+          button.textContent = '✓ קראתי';
+        }
+      }
+    }
+    
+    function refreshActiveAlerts() {
+      console.log('🔄 מרענן התראות פעילות...');
+      loadActiveAlerts();
+    }
+    
+    // פונקציות עזר
+    function getTimeAgo(dateString) {
+      const now = new Date();
+      const date = new Date(dateString);
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / (1000 * 60));
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      
+      if (diffMins < 1) return 'עכשיו';
+      if (diffMins < 60) return `לפני ${diffMins} דקות`;
+      if (diffHours < 24) return `לפני ${diffHours} שעות`;
+      if (diffDays < 7) return `לפני ${diffDays} ימים`;
+      
+      return date.toLocaleDateString('he-IL');
+    }
+    
+    function getAlertIcon(alertType) {
+      const icons = {
+        'price_alert': '🎯',
+        'stop_loss': '⚠️',
+        'volume_alert': '📊',
+        'custom_alert': '🔔'
+      };
+      return icons[alertType] || '🔔';
+    }
+    
+    function getAlertTypeDisplay(alertType) {
+      const types = {
+        'price_alert': 'התראה על מחיר',
+        'stop_loss': 'סטופ לוס',
+        'volume_alert': 'התראה על נפח',
+        'custom_alert': 'התראה מותאמת'
+      };
+      return types[alertType] || alertType;
+    }
+    
+    function getEntityTypeDisplay(entityType) {
+      const types = {
+        'account': 'חשבון',
+        'trade': 'טרייד',
+        'trade_plan': 'תכנון טרייד',
+        'ticker': 'טיקר'
+      };
+      return types[entityType] || entityType;
+    }
+    
+    function extractTickerFromCondition(condition) {
+      if (!condition) return '';
+      
+      const tickerPatterns = [
+        /\b(AAPL|TSLA|MSFT|GOOGL|NVDA|AMZN|META|NFLX|SPY|QQQ|IWM)\b/gi,
+        /\b([A-Z]{2,5})\b/g
+      ];
+      
+      for (const pattern of tickerPatterns) {
+        const match = condition.match(pattern);
+        if (match) {
+          return match[0].toUpperCase();
+        }
+      }
+      
+      return '';
+    }
+    
+    function getCurrentPrice(ticker) {
+      const prices = {
+        'AAPL': '185.50',
+        'TSLA': '245.30',
+        'MSFT': '415.80',
+        'GOOGL': '141.20',
+        'NVDA': '875.40',
+        'AMZN': '149.80',
+        'META': '485.60',
+        'NFLX': '625.90',
+        'SPY': '485.20',
+        'QQQ': '425.80',
+        'IWM': '195.40'
+      };
+      return prices[ticker] || '0.00';
+    }
+    
+    function getDailyChange(ticker) {
+      const changes = {
+        'AAPL': '+2.3',
+        'TSLA': '-1.8',
+        'MSFT': '+0.9',
+        'GOOGL': '+1.2',
+        'NVDA': '+3.5',
+        'AMZN': '-0.7',
+        'META': '+1.8',
+        'NFLX': '+2.1',
+        'SPY': '+0.5',
+        'QQQ': '+0.8',
+        'IWM': '-0.3'
+      };
+      return changes[ticker] || '0.0';
+    }
+    
+    function getDailyChangeClass(ticker) {
+      const change = getDailyChange(ticker);
+      if (change.startsWith('+')) {
+        return 'positive-change';
+      } else if (change.startsWith('-')) {
+        return 'negative-change';
+      }
+      return '';
+    }
+
+    // פונקציות לטעינת ישויות
+    async function loadRelatedEntities() {
+      const relatedType = document.getElementById('alertRelatedType').value;
+      const relatedIdSelect = document.getElementById('alertRelatedId');
+      
+      if (!relatedType) {
+        relatedIdSelect.innerHTML = '<option value="">בחר ישות</option>';
+        return;
+      }
+      
+      // בדיקה במטמון
+      if (entitiesCache[relatedType]) {
+        populateRelatedEntities(relatedIdSelect, entitiesCache[relatedType]);
+        return;
+      }
+      
+      try {
+        let entities = [];
+        
+        switch (relatedType) {
+          case 'account':
+            const accountsResponse = await fetch('/api/accounts');
+            const accountsData = await accountsResponse.json();
+            entities = accountsData.map(acc => ({ id: acc.id, name: acc.name }));
+            break;
+          case 'trade':
+            const tradesResponse = await fetch('/api/trades');
+            const tradesData = await tradesResponse.json();
+            entities = tradesData.map(trade => ({ id: trade.id, name: `${trade.ticker} - ${trade.status}` }));
+            break;
+          case 'trade_plan':
+            const plansResponse = await fetch('/api/trade_plans');
+            const plansData = await plansResponse.json();
+            entities = plansData.map(plan => ({ id: plan.id, name: `${plan.ticker} - ${plan.investment_type}` }));
+            break;
+          case 'ticker':
+            const tickersResponse = await fetch('/api/tickers');
+            const tickersData = await tickersResponse.json();
+            entities = tickersData.map(ticker => ({ id: ticker.id, name: ticker.symbol }));
+            break;
+        }
+        
+        // שמירה במטמון
+        entitiesCache[relatedType] = entities;
+        populateRelatedEntities(relatedIdSelect, entities);
+        
+      } catch (error) {
+        console.error('שגיאה בטעינת ישויות:', error);
+        relatedIdSelect.innerHTML = '<option value="">שגיאה בטעינה</option>';
+      }
+    }
+    
+    function populateRelatedEntities(select, entities) {
+      select.innerHTML = '<option value="">בחר ישות</option>';
+      entities.forEach(entity => {
+        const option = document.createElement('option');
+        option.value = entity.id;
+        option.textContent = entity.name;
+        select.appendChild(option);
+      });
+    }
+    
+    async function loadEditRelatedEntities() {
+      const relatedType = document.getElementById('editAlertRelatedType').value;
+      const relatedIdSelect = document.getElementById('editAlertRelatedId');
+      
+      if (!relatedType) {
+        relatedIdSelect.innerHTML = '<option value="">בחר ישות</option>';
+        return;
+      }
+      
+      // בדיקה במטמון
+      if (entitiesCache[relatedType]) {
+        populateRelatedEntities(relatedIdSelect, entitiesCache[relatedType]);
+        return;
+      }
+      
+      try {
+        let entities = [];
+        
+        switch (relatedType) {
+          case 'account':
+            const accountsResponse = await fetch('/api/accounts');
+            const accountsData = await accountsResponse.json();
+            entities = accountsData.map(acc => ({ id: acc.id, name: acc.name }));
+            break;
+          case 'trade':
+            const tradesResponse = await fetch('/api/trades');
+            const tradesData = await tradesResponse.json();
+            entities = tradesData.map(trade => ({ id: trade.id, name: `${trade.ticker} - ${trade.status}` }));
+            break;
+          case 'trade_plan':
+            const plansResponse = await fetch('/api/trade_plans');
+            const plansData = await plansResponse.json();
+            entities = plansData.map(plan => ({ id: plan.id, name: `${plan.ticker} - ${plan.investment_type}` }));
+            break;
+          case 'ticker':
+            const tickersResponse = await fetch('/api/tickers');
+            const tickersData = await tickersResponse.json();
+            entities = tickersData.map(ticker => ({ id: ticker.id, name: ticker.symbol }));
+            break;
+        }
+        
+        // שמירה במטמון
+        entitiesCache[relatedType] = entities;
+        populateRelatedEntities(relatedIdSelect, entities);
+        
+      } catch (error) {
+        console.error('שגיאה בטעינת ישויות:', error);
+        relatedIdSelect.innerHTML = '<option value="">שגיאה בטעינה</option>';
+      }
+    }
+
     // פונקציות CRUD
     function showAddAlertModal() {
       document.getElementById('addAlertForm').reset();
@@ -921,15 +1403,21 @@
       modal.show();
     }
 
-    function editAlert(alertId) {
+    async function editAlert(alertId) {
       const alert = allAlerts.find(a => a.id === alertId);
       if (alert) {
         document.getElementById('editAlertId').value = alert.id;
-        document.getElementById('editAlertTitle').value = alert.title;
+        document.getElementById('editAlertRelatedType').value = alert.related_type || '';
         document.getElementById('editAlertType').value = alert.type;
         document.getElementById('editAlertStatus').value = alert.status;
-        document.getElementById('editAlertPriority').value = alert.priority;
-        document.getElementById('editAlertDescription').value = alert.description || '';
+        document.getElementById('editAlertDescription').value = alert.condition || '';
+        document.getElementById('editAlertTitle').value = alert.message || '';
+        
+        // טעינת ישויות לעריכה
+        if (alert.related_type) {
+          await loadEditRelatedEntities();
+          document.getElementById('editAlertRelatedId').value = alert.related_id || '';
+        }
         
         const modal = new bootstrap.Modal(document.getElementById('editAlertModal'));
         modal.show();
@@ -944,15 +1432,16 @@
       }
 
       const alertData = {
-        title: document.getElementById('alertTitle').value,
+        related_type: document.getElementById('alertRelatedType').value,
+        related_id: parseInt(document.getElementById('alertRelatedId').value),
         type: document.getElementById('alertType').value,
-        status: document.getElementById('alertStatus').value,
-        priority: document.getElementById('alertPriority').value,
-        description: document.getElementById('alertDescription').value
+        condition: document.getElementById('alertDescription').value,
+        message: document.getElementById('alertTitle').value,
+        status: 'open'
       };
 
       try {
-        const response = await fetch('/api/alerts', {
+        const response = await fetch('/api/v1/alerts/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -998,15 +1487,16 @@
 
       const alertId = document.getElementById('editAlertId').value;
       const alertData = {
-        title: document.getElementById('editAlertTitle').value,
+        related_type: document.getElementById('editAlertRelatedType').value,
+        related_id: parseInt(document.getElementById('editAlertRelatedId').value),
         type: document.getElementById('editAlertType').value,
-        status: document.getElementById('editAlertStatus').value,
-        priority: document.getElementById('editAlertPriority').value,
-        description: document.getElementById('editAlertDescription').value
+        condition: document.getElementById('editAlertDescription').value,
+        message: document.getElementById('editAlertTitle').value,
+        status: document.getElementById('editAlertStatus').value
       };
 
       try {
-        const response = await fetch(`/api/alerts/${alertId}`, {
+        const response = await fetch(`/api/v1/alerts/${alertId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -1053,7 +1543,7 @@
       }
 
       try {
-        const response = await fetch(`/api/alerts/${alertId}`, {
+        const response = await fetch(`/api/v1/alerts/${alertId}`, {
           method: 'DELETE'
         });
 
@@ -1113,12 +1603,42 @@
     // טעינת נתונים
     async function loadAlertsData() {
       try {
-        const response = await fetch('/api/alerts');
-        const alerts = await response.json();
-        allAlerts = alerts;
+        console.log('🔄 === LOAD ALERTS DATA ===');
+        
+        // קריאה מה-API
+        const response = await fetch('/api/v1/alerts/');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const apiData = await response.json();
+        
+        console.log('📡 נתונים מה-API:', apiData);
+        
+        // עדכון הנתונים המקומיים
+        if (apiData.status === 'success' && apiData.data) {
+          allAlerts = apiData.data.map(alert => ({
+            id: alert.id,
+            related_type: alert.related_type,
+            related_id: alert.related_id,
+            type: alert.type,
+            status: alert.status,
+            condition: alert.condition,
+            message: alert.message,
+            created_at: alert.created_at
+          }));
+        } else {
+          console.warn('⚠️ לא התקבלו נתונים מה-API, משתמש בנתוני דמו');
+          allAlerts = demoAlerts;
+        }
+        
+        console.log('📊 נתונים מעודכנים:', allAlerts);
+        
+        // עדכון הגריד
         updateGrid();
+        
       } catch (error) {
-        console.error('שגיאה בטעינת נתונים:', error);
+        console.error('❌ שגיאה בטעינת נתונים:', error);
+        console.warn('⚠️ משתמש בנתוני דמו');
         allAlerts = demoAlerts;
         updateGrid();
       }
@@ -1148,6 +1668,10 @@
       const gridDiv = document.getElementById('alertsGrid');
               gridApi = agGrid.createGrid(gridDiv, gridOptions, { theme: 'quartz' });
       
+      // טעינת התראות פעילות
+      loadActiveAlerts();
+      
+      // טעינת נתוני הגריד
       loadAlertsData();
       
       // הגדרת האזנה לכותרת

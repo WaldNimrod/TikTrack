@@ -337,7 +337,7 @@ const DEFAULT_DATA_CONFIG = {
   statusMapping: {
     'open': 'פתוח',
     'closed': 'סגור',
-    'pending': 'מבוטל',
+            'cancelled': 'מבוטל',
     'canceled': 'מבוטל',
     'cancelled': 'מבוטל'
   },

@@ -60,7 +60,7 @@ class TestAccountModel:
         account = Account(
             name='Test Account',
             currency='USD',
-            status='active',
+            status='open',
             cash_balance=10000.0,
             notes='Test account'
         )
@@ -70,7 +70,7 @@ class TestAccountModel:
         assert account.id is not None
         assert account.name == 'Test Account'
         assert account.currency == 'USD'
-        assert account.status == 'active'
+        assert account.status == 'open'
         assert account.cash_balance == 10000.0
         assert account.total_value == 0.0
         assert account.total_pl == 0.0

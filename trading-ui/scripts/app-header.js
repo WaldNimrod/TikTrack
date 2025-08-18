@@ -16,6 +16,7 @@
  * - notes - הערות (פילטרים רלוונטיים: תאריכים, חיפוש)
  * - designs - עיצובים (כל הפילטרים)
  * - tracking - מעקב (כל הפילטרים)
+ * - accounts - חשבונות (פילטרים רלוונטיים: סטטוס, חיפוש, תאריכים)
  * 
  * מחבר: Tik.track Development Team
  * תאריך עדכון אחרון: 2025
@@ -857,7 +858,7 @@ class AppHeader extends HTMLElement {
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="/accounts">ניהול חשבונות</a></li>
                   <li><a class="dropdown-item" href="/notes">הערות</a></li>
-                  <li><a class="dropdown-item" href="/alerts">ניהול התראות</a></li>
+                  <li><a class="dropdown-item" href="/alerts">התראות</a></li>
                   <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="/database">בסיס נתונים</a></li>
@@ -1196,6 +1197,8 @@ class AppHeader extends HTMLElement {
       pageName = 'tracking';
     } else if (currentPath.includes('/notes')) {
       pageName = 'notes';
+    } else if (currentPath.includes('/accounts')) {
+      pageName = 'accounts';
     }
     
     console.log('Current page for filters:', pageName);
@@ -1258,10 +1261,13 @@ class AppHeader extends HTMLElement {
           });
           console.log('Status filter initialized with saved filter:', savedStatusFilter);
         } else {
-          // ברירת מחדל - רק "פתוח" מסומן
+          // ברירת מחדל לפי דף
           items.forEach(item => {
             const text = item.querySelector('.option-text').textContent;
-            if (pageName === 'notes') {
+            if (pageName === 'accounts') {
+              // בדף החשבונות - לבחור את כל הסטטוסים כברירת מחדל
+              item.classList.add('selected');
+            } else if (pageName === 'notes') {
               // עבור דף ההערות - רק "פתוח" מסומן (ברירת מחדל)
               if (text === 'פתוח') {
                 item.classList.add('selected');
@@ -2435,6 +2441,8 @@ class AppHeader extends HTMLElement {
       pageName = 'tracking';
     } else if (currentPath.includes('/notes')) {
       pageName = 'notes';
+    } else if (currentPath.includes('/accounts')) {
+      pageName = 'accounts';
     }
     
     console.log('Current page for grid filter:', pageName);

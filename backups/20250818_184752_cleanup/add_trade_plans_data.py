@@ -81,7 +81,7 @@ def add_trade_plans():
     
     try:
         # קבלת חשבונות וטיקרים קיימים
-        cursor.execute("SELECT id, name FROM accounts WHERE status = 'active' LIMIT 2")
+        cursor.execute("SELECT id, name FROM accounts WHERE status = 'open' LIMIT 2")
         accounts = cursor.fetchall()
         
         cursor.execute("SELECT id, symbol FROM tickers ORDER BY id LIMIT 4")

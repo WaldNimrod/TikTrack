@@ -17,6 +17,7 @@
  * - notes - הערות (פילטרים רלוונטיים: תאריכים, חיפוש)
  * - designs - עיצובים (כל הפילטרים)
  * - tracking - מעקב (כל הפילטרים)
+ * - accounts - חשבונות (פילטרים רלוונטיים: סטטוס, חיפוש, תאריכים)
  * 
  * פונקציות עיקריות:
  * - filterDataByFilters() - פילטור נתונים לפי כל הפילטרים
@@ -426,11 +427,19 @@ function loadSavedFiltersForPage(pageName) {
     search: savedSearch
   });
   
-  // הגדרת ברירת מחדל - רק רשומות פתוחות
+  // הגדרת ברירת מחדל
   if (!savedStatuses) {
-    window.selectedStatusesForFilter = ['פתוח'];
-    localStorage.setItem('globalFilterStatuses', JSON.stringify(['פתוח']));
-    console.log(`🔍 Set default filter for ${pageName}: only open items`);
+    if (pageName === 'accounts') {
+      // בדף החשבונות - להציג את כל הסטטוסים כברירת מחדל
+      window.selectedStatusesForFilter = ['פתוח', 'סגור', 'מבוטל'];
+      localStorage.setItem('globalFilterStatuses', JSON.stringify(['פתוח', 'סגור', 'מבוטל']));
+      console.log(`🔍 Set default filter for ${pageName}: all statuses`);
+    } else {
+      // דפים אחרים - רק פתוח כברירת מחדל
+      window.selectedStatusesForFilter = ['פתוח'];
+      localStorage.setItem('globalFilterStatuses', JSON.stringify(['פתוח']));
+      console.log(`🔍 Set default filter for ${pageName}: only open items`);
+    }
   } else {
     window.selectedStatusesForFilter = JSON.parse(savedStatuses);
   }
@@ -552,7 +561,11 @@ function resetAllFiltersForPage(pageName) {
   console.log(`🔍 Resetting all filters for ${pageName}`);
   
   // איפוס פילטרים
-  window.selectedStatusesForFilter = ['פתוח']; // ברירת מחדל
+  if (pageName === 'accounts') {
+    window.selectedStatusesForFilter = ['פתוח', 'סגור', 'מבוטל'];
+  } else {
+    window.selectedStatusesForFilter = ['פתוח']; // ברירת מחדל
+  }
   window.selectedTypesForFilter = [];
   window.selectedAccountsForFilter = [];
   window.selectedDateRangeForFilter = null;
@@ -573,8 +586,9 @@ function resetAllFiltersForPage(pageName) {
   localStorage.removeItem(`${pageName}FilterSearch`);
   
   // שמירת ברירת מחדל (גלובלית וספציפית לדף)
-  localStorage.setItem('globalFilterStatuses', JSON.stringify(['פתוח']));
-  localStorage.setItem(`${pageName}FilterStatuses`, JSON.stringify(['פתוח']));
+  const defaultStatuses = pageName === 'accounts' ? ['פתוח', 'סגור', 'מבוטל'] : ['פתוח'];
+  localStorage.setItem('globalFilterStatuses', JSON.stringify(defaultStatuses));
+  localStorage.setItem(`${pageName}FilterStatuses`, JSON.stringify(defaultStatuses));
   
   // עדכון header
   updateHeaderWithSavedFilters(pageName);
@@ -660,6 +674,11 @@ function filterDataByFilters(data, pageName) {
           itemStatus = item.status === 'canceled' ? 'מבוטל' : 'פתוח';
         } else if (pageName === 'planning') {
           itemStatus = item.canceled_at ? 'מבוטל' : 'פתוח';
+        } else if (pageName === 'accounts') {
+          // עבור דף החשבונות - המרה מאנגלית לעברית
+          itemStatus = item.status === 'closed' ? 'סגור' : 
+                      item.status === 'cancelled' ? 'מבוטל' : 
+                      item.status === 'open' ? 'פתוח' : 'פתוח';
         } else {
           itemStatus = item.status || 'פתוח';
         }

@@ -147,9 +147,9 @@ def get_db_connection():
         print(f"שגיאה בחיבור לבסיס הנתונים: {e}")
         raise
 
-def update_ticker_active_status(ticker_id):
+def update_ticker_open_status(ticker_id):
     """
-    מעדכן את שדה active_trades של טיקר בהתאם למצב התכנונים והטריידים
+    מעדכן את שדה active_trades של טיקר בהתאם למצב התכנונים והטריידים הפתוחים
     """
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -159,20 +159,20 @@ def update_ticker_active_status(ticker_id):
         cursor.execute("""
             SELECT COUNT(*) as count 
             FROM trade_plans 
-            WHERE ticker_id = ? AND (canceled_at IS NULL OR canceled_at = '')
+            WHERE ticker_id = ? AND status = 'open'
         """, (ticker_id,))
-        active_plans = cursor.fetchone()['count']
+        open_plans = cursor.fetchone()['count']
         
         # בדיקה אם יש טריידים פעילים
         cursor.execute("""
             SELECT COUNT(*) as count 
             FROM trades 
-            WHERE ticker_id = ? AND status IN ('open', 'pending', 'פתוח', 'ממתין')
+            WHERE ticker_id = ? AND status = 'open'
         """, (ticker_id,))
-        active_trades = cursor.fetchone()['count']
+        open_trades = cursor.fetchone()['count']
         
         # עדכון שדה active_trades
-        is_active = (active_plans > 0 or active_trades > 0)
+        is_active = (open_plans > 0 or open_trades > 0)
         cursor.execute("""
             UPDATE tickers 
             SET active_trades = ? 
@@ -180,7 +180,7 @@ def update_ticker_active_status(ticker_id):
         """, (is_active, ticker_id))
         
         conn.commit()
-        print(f"DEBUG: עדכון active_trades לטיקר {ticker_id}: {is_active} (תכנונים: {active_plans}, טריידים: {active_trades})")
+        print(f"DEBUG: עדכון active_trades לטיקר {ticker_id}: {is_active} (תכנונים: {open_plans}, טריידים: {open_trades})")
         
     except Exception as e:
         print(f"ERROR: שגיאה בעדכון active_trades לטיקר {ticker_id}: {str(e)}")
@@ -188,7 +188,7 @@ def update_ticker_active_status(ticker_id):
     finally:
         conn.close()
 
-def update_all_tickers_active_status():
+def update_all_tickers_open_status():
     """
     מעדכן את שדה active_trades של כל הטיקרים
     """
@@ -201,7 +201,7 @@ def update_all_tickers_active_status():
         tickers = cursor.fetchall()
         
         for ticker in tickers:
-            update_ticker_active_status(ticker['id'])
+            update_ticker_open_status(ticker['id'])
         
         print(f"DEBUG: עדכון active_trades הושלם עבור {len(tickers)} טיקרים")
         
@@ -526,7 +526,7 @@ def get_closed_trades():
     JOIN tickers tick ON t.ticker_id = tick.id
     JOIN accounts a ON t.account_id = a.id
     LEFT JOIN trade_plans tp ON t.trade_plan_id = tp.id
-    WHERE t.status = 'סגור' OR t.closed_at IS NOT NULL
+            WHERE t.status = 'closed' OR t.closed_at IS NOT NULL
     ORDER BY t.closed_at DESC
     """
     
@@ -551,7 +551,7 @@ def get_research_stats():
                 COUNT(CASE WHEN total_pl > 0 THEN 1 END) as successful_trades,
                 COUNT(CASE WHEN total_pl < 0 THEN 1 END) as losing_trades
             FROM trades 
-            WHERE status = 'סגור' OR closed_at IS NOT NULL
+            WHERE status = 'closed' OR closed_at IS NOT NULL
         """)
         
         stats = cursor.fetchone()
@@ -587,24 +587,24 @@ def get_stats():
     
     try:
         # סטטיסטיקות כללית
-        cursor.execute("SELECT COUNT(*) as total_plans FROM trade_plans WHERE canceled_at IS NULL")
-        active_plans = cursor.fetchone()['total_plans']
+        cursor.execute("SELECT COUNT(*) as total_plans FROM trade_plans WHERE status = 'open'")
+        open_plans = cursor.fetchone()['total_plans']
         
-        cursor.execute("SELECT COUNT(*) as total_trades FROM trades WHERE status = 'פתוח'")
+        cursor.execute("SELECT COUNT(*) as total_trades FROM trades WHERE status = 'open'")
         open_trades = cursor.fetchone()['total_trades']
         
-        cursor.execute("SELECT SUM(total_pl) as total_pl FROM trades WHERE status = 'סגור'")
+        cursor.execute("SELECT SUM(total_pl) as total_pl FROM trades WHERE status = 'closed'")
         total_pl_result = cursor.fetchone()
         total_pl = total_pl_result['total_pl'] or 0
         
-        cursor.execute("SELECT COUNT(*) as total_alerts FROM alerts WHERE status = 'active'")
-        active_alerts = cursor.fetchone()['total_alerts']
+        cursor.execute("SELECT COUNT(*) as total_alerts FROM alerts WHERE status = 'open'")
+        open_alerts = cursor.fetchone()['total_alerts']
         
         stats = {
-            "active_plans": active_plans,
+            "open_plans": open_plans,
             "open_trades": open_trades,
             "total_pl": total_pl,
-            "active_alerts": active_alerts
+            "open_alerts": open_alerts
         }
         
         conn.close()
@@ -793,7 +793,7 @@ def get_table_data_v2(table_name):
         cursor.execute("""
             SELECT id, status, created_at, ticker_id 
             FROM trades 
-            WHERE account_id = ? AND status IN ('open', 'pending', 'פתוח', 'ממתין')
+            WHERE account_id = ? AND status = 'open'
         """, (account_id,))
         linked_trades = cursor.fetchall()
         
@@ -969,9 +969,9 @@ def create_ticker():
         
         # בדיקה אם יש התראות פעילות המקושרות לטיקר זה
         cursor.execute("""
-            SELECT id, type, condition, is_active, created_at 
+            SELECT id, type, condition, status, is_triggered, created_at
             FROM alerts 
-            WHERE ticker_id = ? AND is_active = 1
+            WHERE related_type_id = 4 AND related_id = ? AND status = 'open'
         """, (ticker_id,))
         linked_alerts = cursor.fetchall()
         
@@ -985,7 +985,8 @@ def create_ticker():
                     'id': alert['id'],
                     'type': alert['type'],
                     'condition': alert['condition'],
-                    'is_active': alert['is_active'],
+                    'status': alert['status'],
+                    'is_triggered': alert['is_triggered'],
                     'created_at': alert['created_at']
                 })
             
@@ -1106,8 +1107,8 @@ def create_note():
         
         # הוספת ההערה
         cursor.execute(
-            "INSERT INTO notes (account_id, trade_id, trade_plan_id, content, attachment) VALUES (?, ?, ?, ?, ?)",
-            (data.get('account_id'), data.get('trade_id'), data.get('trade_plan_id'), data['content'], data.get('attachment'))
+            "INSERT INTO notes (related_type_id, related_id, content, attachment) VALUES (?, ?, ?, ?)",
+            (data.get('related_type_id'), data.get('related_id'), data['content'], data.get('attachment'))
         )
         conn.commit()
         
@@ -1199,7 +1200,7 @@ def get_users():
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT id, username, email, is_active, last_login, created_at FROM users ORDER BY created_at DESC")
+        cursor.execute("SELECT id, username, email, last_login, created_at FROM users ORDER BY created_at DESC")
         users = []
         for row in cursor.fetchall():
             users.append(dict(row))
@@ -1217,7 +1218,7 @@ def get_user(user_id):
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT id, username, email, is_active, last_login, created_at FROM users WHERE id = ?", (user_id,))
+        cursor.execute("SELECT id, username, email, last_login, created_at FROM users WHERE id = ?", (user_id,))
         user = cursor.fetchone()
         
         if not user:
@@ -1254,7 +1255,7 @@ def create_account():
         """, (
             data['name'],
             data['currency'],
-            data.get('status', 'active'),
+            data.get('status', 'open'),
             data.get('cash_balance', 0),
             data.get('total_value', 0),
             data.get('total_pl', 0),
@@ -1343,7 +1344,7 @@ def delete_account(account_id):
         cursor.execute("""
             SELECT id, status, created_at, ticker_id 
             FROM trades 
-            WHERE account_id = ? AND status IN ('open', 'pending', 'פתוח', 'ממתין')
+            WHERE account_id = ? AND status = 'open'
         """, (account_id,))
         linked_trades = cursor.fetchall()
         

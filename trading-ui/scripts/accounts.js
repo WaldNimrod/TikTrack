@@ -369,12 +369,12 @@ function showEditAccountModal(account) {
     document.getElementById('editAccountName').value = account.name;
     document.getElementById('editAccountCurrency').value = account.currency;
     
-    // תיקון סטטוס - המרה מ-active/active ל-פתוח/סגור
+    // תיקון סטטוס - המרה מ-active/inactive ל-open/closed
     let statusValue = 'פתוח';
-    if (account.status === 'active' || account.status === 'פעיל') {
-      statusValue = 'פתוח';
-    } else if (account.status === 'inactive' || account.status === 'לא פעיל' || account.status === 'סגור') {
-      statusValue = 'סגור';
+        if (account.status === 'open' || account.status === 'פתוח') {
+        statusValue = 'פתוח';
+    } else if (account.status === 'closed' || account.status === 'סגור') {
+        statusValue = 'סגור';
     } else {
       statusValue = account.status || 'פתוח';
     }
@@ -403,12 +403,12 @@ async function createAccount() {
   const name = document.getElementById('accountName').value.trim();
   const currency = document.getElementById('accountCurrency').value;
   
-  // המרת סטטוס מ-פתוח/סגור ל-active/inactive
-  const statusDisplay = document.getElementById('accountStatus').value || 'פתוח';
-  let status = 'active';
-  if (statusDisplay === 'סגור') {
-    status = 'inactive';
-  }
+  // המרת סטטוס מ-פתוח/סגור ל-open/closed
+const statusDisplay = document.getElementById('accountStatus').value || 'פתוח';
+let status = 'open';
+if (statusDisplay === 'סגור') {
+  status = 'closed';
+}
   
   const cashBalance = parseFloat(document.getElementById('accountCashBalance').value) || 0;
   const totalValue = parseFloat(document.getElementById('accountTotalValue').value) || 0;
@@ -467,12 +467,12 @@ async function updateAccountFromModal() {
   const name = document.getElementById('editAccountName').value.trim();
   const currency = document.getElementById('editAccountCurrency').value;
   
-  // המרת סטטוס מ-פתוח/סגור ל-active/inactive
-  const statusDisplay = document.getElementById('editAccountStatus').value || 'פתוח';
-  let status = 'active';
-  if (statusDisplay === 'סגור') {
-    status = 'inactive';
-  }
+  // המרת סטטוס מ-פתוח/סגור ל-open/closed
+const statusDisplay = document.getElementById('editAccountStatus').value || 'פתוח';
+let status = 'open';
+if (statusDisplay === 'סגור') {
+  status = 'closed';
+}
   
   const cashBalance = parseFloat(document.getElementById('editAccountCashBalance').value) || 0;
   const totalValue = parseFloat(document.getElementById('editAccountTotalValue').value) || 0;
@@ -540,7 +540,7 @@ async function cancelAccount(accountId, accountName) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        status: 'inactive'
+        status: 'closed'
       })
     });
     

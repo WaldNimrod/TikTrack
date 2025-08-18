@@ -45,10 +45,10 @@ def create_tickers(db: Session):
 def create_accounts(db: Session):
     """יצירת חשבונות"""
     accounts_data = [
-        {"name": "חשבון ראשי", "currency": "USD", "status": "active", "cash_balance": 50000, "total_value": 75000, "total_pl": 25000, "notes": "החשבון הראשי שלי"},
-        {"name": "חשבון טכנולוגיה", "currency": "USD", "status": "active", "cash_balance": 25000, "total_value": 35000, "total_pl": 10000, "notes": "מתמקד במניות טכנולוגיה"},
-        {"name": "חשבון ETF", "currency": "USD", "status": "active", "cash_balance": 15000, "total_value": 18000, "total_pl": 3000, "notes": "השקעות ב-ETF"},
-        {"name": "חשבון ניסיוני", "currency": "USD", "status": "inactive", "cash_balance": 5000, "total_value": 5000, "total_pl": 0, "notes": "חשבון לניסויים"}
+        {"name": "חשבון ראשי", "currency": "USD", "status": "open", "cash_balance": 50000, "total_value": 75000, "total_pl": 25000, "notes": "החשבון הראשי שלי"},
+        {"name": "חשבון טכנולוגיה", "currency": "USD", "status": "open", "cash_balance": 25000, "total_value": 35000, "total_pl": 10000, "notes": "מתמקד במניות טכנולוגיה"},
+        {"name": "חשבון ETF", "currency": "USD", "status": "closed", "cash_balance": 15000, "total_value": 18000, "total_pl": 3000, "notes": "השקעות ב-ETF"},
+        {"name": "חשבון ניסיוני", "currency": "USD", "status": "cancelled", "cash_balance": 5000, "total_value": 5000, "total_pl": 0, "notes": "חשבון לניסויים"}
     ]
     
     for account_data in accounts_data:
@@ -62,7 +62,7 @@ def create_accounts(db: Session):
 
 def create_trade_plans(db: Session):
     """יצירת תוכניות טרייד"""
-    accounts = db.query(Account).filter(Account.status == "active").all()
+    accounts = db.query(Account).filter(Account.status == "open").all()
     tickers = db.query(Ticker).all()
     
     if not accounts or not tickers:
@@ -91,7 +91,7 @@ def create_trade_plans(db: Session):
             "reasons": "דומיננטיות בחיפוש ופרסום"
         },
         {
-            "account_id": accounts[2].id,
+            "account_id": accounts[1].id if len(accounts) > 1 else accounts[0].id,
             "ticker_id": tickers[8].id,  # SPY
             "investment_type": "long",
             "planned_amount": 5000,
@@ -111,7 +111,7 @@ def create_trade_plans(db: Session):
 
 def create_trades(db: Session):
     """יצירת טריידים"""
-    accounts = db.query(Account).filter(Account.status == "active").all()
+    accounts = db.query(Account).filter(Account.status == "open").all()
     tickers = db.query(Ticker).all()
     plans = db.query(TradePlan).all()
     
@@ -131,7 +131,7 @@ def create_trades(db: Session):
             "notes": "קנייה של Apple"
         },
         {
-            "account_id": accounts[1].id,
+            "account_id": accounts[1].id if len(accounts) > 1 else accounts[0].id,
             "ticker_id": tickers[1].id,  # GOOGL
             "status": "closed",
             "type": "buy",
@@ -141,7 +141,7 @@ def create_trades(db: Session):
             "notes": "טרייד מוצלח ב-Google"
         },
         {
-            "account_id": accounts[2].id,
+            "account_id": accounts[0].id,
             "ticker_id": tickers[8].id,  # SPY
             "status": "open",
             "type": "buy",
@@ -160,7 +160,7 @@ def create_trades(db: Session):
 
 def create_alerts(db: Session):
     """יצירת התראות"""
-    accounts = db.query(Account).filter(Account.status == "active").all()
+    accounts = db.query(Account).filter(Account.status == "open").all()
     tickers = db.query(Ticker).all()
     
     if not accounts or not tickers:
@@ -168,29 +168,79 @@ def create_alerts(db: Session):
         return
     
     alerts_data = [
+        # התראות לחשבונות
         {
-            "account_id": accounts[0].id,
-            "ticker_id": tickers[0].id,  # AAPL
+            "related_type_id": 1,  # account
+            "related_id": accounts[0].id,
             "type": "price_alert",
             "condition": "מחיר > 160$",
             "message": "Apple הגיע ליעד המחיר",
-            "is_active": True
+            "status": "open",
+            "is_triggered": "false"
         },
         {
-            "account_id": accounts[1].id,
-            "ticker_id": tickers[1].id,  # GOOGL
+            "related_type_id": 1,  # account
+            "related_id": accounts[1].id,
             "type": "stop_loss",
             "condition": "מחיר < 110$",
             "message": "Google הגיע לעצירת הפסד",
-            "is_active": True
+            "status": "open",
+            "is_triggered": "false"
+        },
+        # התראות לטיקרים
+        {
+            "related_type_id": 4,  # ticker
+            "related_id": tickers[0].id,  # AAPL
+            "type": "price_alert",
+            "condition": "מחיר > 170$",
+            "message": "Apple הגיע ליעד מחיר חדש",
+            "status": "closed",
+            "is_triggered": "new"
         },
         {
-            "account_id": accounts[2].id,
-            "ticker_id": tickers[8].id,  # SPY
+            "related_type_id": 4,  # ticker
+            "related_id": tickers[1].id,  # GOOGL
+            "type": "volume_alert",
+            "condition": "נפח > 50M",
+            "message": "נפח מסחר גבוה ב-Google",
+            "status": "closed",
+            "is_triggered": "new"
+        },
+        {
+            "related_type_id": 4,  # ticker
+            "related_id": tickers[2].id,  # MSFT
+            "type": "price_alert",
+            "condition": "מחיר > 400$",
+            "message": "Microsoft הגיע ליעד מחיר",
+            "status": "closed",
+            "is_triggered": "new"
+        },
+        {
+            "related_type_id": 4,  # ticker
+            "related_id": tickers[3].id,  # TSLA
+            "type": "stop_loss",
+            "condition": "מחיר < 200$",
+            "message": "Tesla הגיע לעצירת הפסד",
+            "status": "closed",
+            "is_triggered": "new"
+        },
+        {
+            "related_type_id": 4,  # ticker
+            "related_id": tickers[4].id,  # NVDA
+            "type": "price_alert",
+            "condition": "מחיר > 500$",
+            "message": "NVIDIA הגיע ליעד מחיר",
+            "status": "closed",
+            "is_triggered": "new"
+        },
+        {
+            "related_type_id": 1,  # account
+            "related_id": accounts[0].id,
             "type": "volume_alert",
             "condition": "נפח > 100M",
             "message": "נפח מסחר גבוה ב-SPY",
-            "is_active": False
+            "status": "closed",
+            "is_triggered": "new"
         }
     ]
     
@@ -203,7 +253,7 @@ def create_alerts(db: Session):
 
 def create_cash_flows(db: Session):
     """יצירת תזרימי מזומנים"""
-    accounts = db.query(Account).filter(Account.status == "active").all()
+    accounts = db.query(Account).filter(Account.status == "open").all()
     
     if not accounts:
         print("⚠️ No accounts found for cash flows")
@@ -232,7 +282,7 @@ def create_cash_flows(db: Session):
             "description": "הפקדה לחשבון טכנולוגיה"
         },
         {
-            "account_id": accounts[2].id,
+            "account_id": accounts[0].id,
             "type": "withdrawal",
             "amount": -2000,
             "date": datetime.now() - timedelta(days=20),
@@ -254,7 +304,8 @@ def create_note_relation_types(db: Session):
     relation_types = [
         {"note_relation_type": "account"},
         {"note_relation_type": "trade"},
-        {"note_relation_type": "trade_plan"}
+        {"note_relation_type": "trade_plan"},
+        {"note_relation_type": "ticker"}
     ]
     
     for rel_type_data in relation_types:
@@ -269,6 +320,7 @@ def create_notes(db: Session):
     accounts = db.query(Account).all()
     trades = db.query(Trade).all()
     plans = db.query(TradePlan).all()
+    tickers = db.query(Ticker).all()
     
     if not accounts:
         print("⚠️ No accounts found for notes")
@@ -279,6 +331,7 @@ def create_notes(db: Session):
     account_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "account").first()
     trade_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "trade").first()
     trade_plan_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "trade_plan").first()
+    ticker_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "ticker").first()
     
     notes_data = [
         {
@@ -297,6 +350,18 @@ def create_notes(db: Session):
             "related_type_id": account_type.id,
             "related_id": accounts[2].id,
             "content": "השקעה ב-ETF היא דרך טובה לפיזור סיכונים. כדאי לשקול הוספת ETF נוספים",
+            "attachment": None
+        },
+        {
+            "related_type_id": ticker_type.id,
+            "related_id": tickers[0].id,  # AAPL
+            "content": "Apple עם iPhone 15 Pro Max מציגה ביצועים מעולים. החברה ממשיכה לחדש בתחום ה-AI",
+            "attachment": None
+        },
+        {
+            "related_type_id": ticker_type.id,
+            "related_id": tickers[1].id,  # GOOGL
+            "content": "Google עם Gemini מתקדם מאוד. החברה מחזקת את הדומיננטיות בחיפוש ו-AI",
             "attachment": None
         }
     ]

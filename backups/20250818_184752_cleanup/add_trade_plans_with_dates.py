@@ -19,7 +19,7 @@ def add_trade_plans_with_dates():
     
     try:
         # קבלת חשבונות וטיקרים קיימים
-        accounts = db.query(Account).filter(Account.status == "active").all()
+        accounts = db.query(Account).filter(Account.status == "open").all()
         tickers = db.query(Ticker).all()
         
         if not accounts or not tickers:

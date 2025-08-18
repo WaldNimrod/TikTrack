@@ -867,7 +867,7 @@
      */
     function getStatusForSort(status) {
       switch (status) {
-        case 'active': return 1;
+        case 'open': return 1;
         case 'completed': return 2;
         case 'archived': return 3;
         default: return 0;
@@ -1576,7 +1576,7 @@
           const attachmentMatch = (note.attachment || '').toLowerCase().includes(searchLower);
           const createdAtMatch = (note.created_at || '').toLowerCase().includes(searchLower);
           
-          // חיפוש בשדות נוספים אם קיימים
+          // חיפוש בשדות נוספים אם קיימים (לתאימות לאחור)
           const accountIdMatch = (note.account_id || '').toString().toLowerCase().includes(searchLower);
           const tradeIdMatch = (note.trade_id || '').toString().toLowerCase().includes(searchLower);
           const tradePlanIdMatch = (note.trade_plan_id || '').toString().toLowerCase().includes(searchLower);
@@ -1584,7 +1584,7 @@
           // חיפוש בשדה "אובייקט מקושר" - שם הסימבול או שם החשבון
           let relatedObjectMatch = false;
           if (note.related_type === 'trade' || note.related_type === 'trade_plan') {
-            // נחפש את הסימבול של הטיקר (AAPL, TSLA, וכו')
+            // נחפש את הסימבול של הטיקר (AAPL, TSLA, וכו') - לתאימות לאחור
             const tickerId = note.related_type === 'trade' ? 
               (window.tradesData ? window.tradesData.find(t => t.id == note.related_id)?.ticker_id : null) :
               (window.tradePlansData ? window.tradePlansData.find(p => p.id == note.related_id)?.ticker_id : null);

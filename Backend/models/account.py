@@ -49,8 +49,8 @@ class Account(BaseModel):
     # Each account can have multiple trade plans
     trade_plans = relationship("TradePlan", back_populates="account", cascade="all, delete-orphan")
     
-    # Each account can have multiple alerts
-    alerts = relationship("Alert", back_populates="account", cascade="all, delete-orphan")
+    # Each account can have multiple alerts (through related_type_id and related_id)
+    # alerts = relationship("Alert", back_populates="account", cascade="all, delete-orphan")
     
     # Each account can have multiple cash flows
     cash_flows = relationship("CashFlow", back_populates="account", cascade="all, delete-orphan")
@@ -81,7 +81,14 @@ class Account(BaseModel):
         }
     
     def is_active(self):
-        """Check if the account is active."""
+        """
+        Check if the account is active.
+        
+        Note: All status values are now in English:
+        - 'open': Account is active and operational
+        - 'closed': Account is closed but can be reopened
+        - 'cancelled': Account is permanently cancelled
+        """
         return self.status == 'open'
     
     def get_balance_info(self):

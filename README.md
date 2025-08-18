@@ -56,6 +56,28 @@ TikTrackApp/
     └── old_database_20250816_180456/  # בסיס נתונים ישן
 ```
 
+## 📚 תיעוד מפורט
+
+### 📁 **מבנה התיעוד החדש:**
+```
+documentation/
+├── frontend/          # תיעוד ממשק משתמש
+├── backend/           # תיעוד Backend
+├── database/          # תיעוד בסיס נתונים
+├── deployment/        # תיעוד פריסה ויציבות
+├── development/       # תיעוד פיתוח
+└── api/              # תיעוד API
+```
+
+### 🔗 **קבצים חשובים במיוחד:**
+- **יציבות השרת**: `documentation/deployment/README_SERVER_STABILITY.md`
+- **שינויים בבסיס נתונים**: `documentation/database/DATABASE_CHANGES_AUGUST_2025.md`
+- **מערכת ההתראות**: `Backend/ALERT_SYSTEM_DOCUMENTATION.md`
+- **מערכת אישור כפול**: `documentation/frontend/DOUBLE_CONFIRMATION_SYSTEM.md`
+
+### 🚀 **אינדקס מהיר:**
+- **גישה מהירה לכל התיעוד**: `documentation/QUICK_INDEX.md`
+
 ## עדכונים אחרונים (אוגוסט 2025)
 
 ### שיפורי ממשק משתמש
@@ -68,11 +90,19 @@ TikTrackApp/
 - **עדכון מבנה בסיס נתונים**: הסרת שדה `opened_at` והחלפתו ב-`created_at`
 - **תיקון סוגי טריידים**: הגבלה לשלושה סוגים בלבד (`swing`, `invest`, `pasive`)
 - **שיפור טופסי עריכה**: סידור מחדש של שדות הטופס לנוחות המשתמש
+- **ארגון תיעוד**: מבנה תיעוד מסודר עם קבצים חשובים מודגשים
+- **מערכת התראות מתקדמת**: מחזור חיים מלא עם סטטוסים ומצבי הפעלה
+- **הסרת שדה is_active**: פישוט מבנה טבלת ההתראות
+- **מערכת שיוך גמישה**: שיוך התראות והערות לישויות שונות באמצעות `related_type_id` ו-`related_id`
+- **מערכת אישור כפול**: חלון אזהרה שני למחיקת חשבונות עם בדיקת אובייקטים מקושרים
 
 ### תיקוני באגים
 - **תיקון רשימת תוכניות**: פתרון בעיית טעינת תוכניות טרייד בטופסים
 - **תיקון שמירת נתונים**: פתרון בעיות שמירה בעריכת טריידים
 - **תיקון תצוגת נתונים**: הצגת שמות חשבונות וטיקרים במקום מזהה
+- **תיקון סטטוסים**: עדכון כל הסטטוסים לאנגלית בבסיס הנתונים
+- **תיקון פילטרים**: תיקון פילטרים גלובליים לעמוד חשבונות
+- **ניקוי קבצי גיבוי**: הסרת שאריות סטטוסים בעברית מקבצי גיבוי
 
 ## התקנה והפעלה
 
@@ -138,6 +168,9 @@ curl http://127.0.0.1:8080/api/v1/notes/
 # בדיקת תכנונים (API חדש)
 curl http://127.0.0.1:8080/api/v1/trade_plans/
 
+# בדיקת התראות (API חדש)
+curl http://127.0.0.1:8080/api/v1/alerts/
+
 # בדיקת סטטיסטיקות
 curl http://127.0.0.1:8080/api/stats
 ```
@@ -168,6 +201,7 @@ curl http://127.0.0.1:8080/api/stats
 2. או פתח את הקובץ `trading-ui/database.html` לדף בסיס נתונים (מרכזי)
 3. או פתח את הקובץ `trading-ui/accounts.html` לדף חשבונות
 4. או פתח את הקובץ `trading-ui/planning.html` לעמוד תכנון טריידים
+5. או פתח את הקובץ `trading-ui/alerts.html` לדף התראות
 
 ## ארכיטקטורה חדשה
 
@@ -211,6 +245,29 @@ curl http://127.0.0.1:8080/api/stats
 - **מבנה ישן**: `account_id`, `trade_id`, `trade_plan_id` (3 שדות נפרדים)
 - **מבנה חדש**: `related_type`, `related_id` (2 שדות בלבד)
 - **עדיפות**: `trade_plan` > `trade` > `account`
+
+## תכונות חדשות - מערכת ההתראות
+
+### מחזור חיים מתקדם
+מערכת ההתראות כוללת מחזור חיים מתקדם עם שלבים ברורים:
+
+- **יצירה**: התראה חדשה במצב `open` עם `is_triggered = 'false'`
+- **הפעלה**: עם התממשות התנאי, סטטוס הופך ל-`closed` ו-`is_triggered = 'new'`
+- **קריאה**: המשתמש מסמן "קראתי", `is_triggered = 'true'`
+- **ניהול**: החזרה למצב פעיל או ביטול ההתראה
+
+### סטטוסים ומצבי הפעלה
+- **Status**: `open` (פעיל), `closed` (הופעל), `cancelled` (בוטל)
+- **Is_triggered**: `false` (לא הופעל), `new` (הופעל חדש), `true` (נקרא)
+
+### סוגי התראות
+- **price_alert**: התראה על מחיר
+- **stop_loss**: התראה על עצירת הפסד  
+- **volume_alert**: התראה על נפח מסחר
+- **custom_alert**: התראה מותאמת אישית
+
+### תיעוד מפורט
+לפרטים מלאים על מערכת ההתראות, ראה: `Backend/ALERT_SYSTEM_DOCUMENTATION.md`
 
 ### תאימות לאחור
 המערכת שומרת על תאימות לאחור:
@@ -262,6 +319,11 @@ curl http://127.0.0.1:8080/api/stats
 ### התראות
 - `GET /api/v1/alerts/` - קבלת כל ההתראות
 - `POST /api/v1/alerts/` - יצירת התראה חדשה
+- `PUT /api/v1/alerts/<id>` - עדכון התראה
+- `DELETE /api/v1/alerts/<id>` - מחיקת התראה
+- `PATCH /api/v1/alerts/<id>/mark-read` - סימון כנקראה
+- `PATCH /api/v1/alerts/<id>/reactivate` - החזרה למצב פעיל
+- `PATCH /api/v1/alerts/<id>/cancel` - ביטול התראה
 
 ### הערות
 - `GET /api/v1/notes/` - קבלת כל ההערות
@@ -314,7 +376,7 @@ curl http://127.0.0.1:8080/api/stats
 - `trade_plans` - תכנוני טריידים
 - `trades` - טריידים פעילים וסגורים
 - `executions` - ביצועי טריידים
-- `alerts` - התראות
+- `alerts` - התראות (מבנה חדש: ללא is_active, עם מחזור חיים מתקדם)
 - `notes` - הערות (מבנה חדש: related_type, related_id)
 - `performance_snapshots` - תמונת זמן
 
@@ -331,12 +393,29 @@ CREATE TABLE notes (
 );
 ```
 
+### מבנה טבלת ההתראות החדש
+
+```sql
+CREATE TABLE alerts (
+    id INTEGER PRIMARY KEY,
+    account_id INTEGER,
+    ticker_id INTEGER,
+    type VARCHAR(50) NOT NULL,           -- 'price_alert', 'stop_loss', 'volume_alert'
+    status VARCHAR(20) DEFAULT 'open',   -- 'open', 'closed', 'cancelled'
+    condition VARCHAR(500) NOT NULL,     -- התנאי להפעלת ההתראה
+    message VARCHAR(500),                -- הודעה למשתמש
+    triggered_at DATETIME,               -- תאריך הפעלת ההתראה
+    is_triggered VARCHAR(20) DEFAULT 'false',  -- 'false', 'new', 'true'
+    created_at DATETIME DEFAULT (CURRENT_TIMESTAMP)
+);
+```
+
 ## ארכיטקטורת הפרונטנד
 
 ### מבנה קבצים
 - **`database.html`**: דף מרכזי לניהול כל הנתונים
 - **`accounts.js`**: פונקציות ייעודיות לחשבונות
-- **`alerts.js`**: פונקציות ייעודיות להתראות
+- **`alerts.js`**: פונקציות ייעודיות להתראות (מערכת מתקדמת)
 - **`notes.js`**: פונקציות ייעודיות להערות
 - **`grid-table.js`**: פונקציות כלליות לכל הטבלאות
 
@@ -355,6 +434,8 @@ CREATE TABLE notes (
 3. הוסף שירות ב-`Backend/services/`
 4. הוסף קובץ JS ייעודי ב-`trading-ui/scripts/`
 5. עדכן את `database.html` לקריאה לפונקציות החדשות
+6. הוסף תיעוד מפורט ב-`Backend/` או `documentation/`
+7. עדכן את `README.md` עם התיעוד החדש
 
 ### בדיקת המערכת
 
@@ -373,6 +454,8 @@ CREATE TABLE notes (
 - **מבנה הערות**: עודכן למבנה חדש ✅
 - **API endpoints**: תוקנו עם underscore ✅
 - **ארכיטקטורת פרונטנד**: מודולרית ✅
+- **מערכת התראות**: עודכנה למבנה חדש ללא is_active ✅
+- **תיעוד מערכת**: נוסף תיעוד מפורט למערכת ההתראות ✅
 
 ### בעיות שזוהו וטרם נפתרו ⚠️
 - **פונקציה `get_by_account_and_status`**: מחזירה את כל הטריידים הפתוחים במערכת במקום רק את הטריידים של החשבון הספציפי

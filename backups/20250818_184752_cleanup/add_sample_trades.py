@@ -19,7 +19,7 @@ def get_existing_data():
     cursor = conn.cursor()
     
     # קבלת חשבונות
-    cursor.execute('SELECT id, name, currency FROM accounts WHERE status = "פתוח"')
+            cursor.execute('SELECT id, name, currency FROM accounts WHERE status = "open"')
     accounts = cursor.fetchall()
     
     # קבלת טיקרים

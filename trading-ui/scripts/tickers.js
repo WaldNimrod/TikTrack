@@ -34,13 +34,13 @@ async function loadTickersData() {
  * const stats = calculateTickersStats(tickers);
  */
 function calculateTickersStats(tickers) {
-    const activeTickers = tickers.filter(ticker => ticker.status === 'פתוח').length;
+    const openTickers = tickers.filter(ticker => ticker.status === 'פתוח').length;
     const totalTickers = tickers.length;
     const usdTickers = tickers.filter(ticker => ticker.currency === 'USD').length;
     const ilsTickers = tickers.filter(ticker => ticker.currency === 'ILS').length;
     
     return {
-        active_tickers: activeTickers,
+        open_tickers: openTickers,
         total_tickers: totalTickers,
         usd_tickers: usdTickers,
         ils_tickers: ilsTickers
@@ -55,7 +55,7 @@ function calculateTickersStats(tickers) {
  * @returns {string} סטטוס באנגלית
  * 
  * @example
- * const status = convertTickerStatus('פתוח'); // returns 'active'
+ * const status = convertTickerStatus('פתוח'); // returns 'open'
  */
 function convertTickerStatus(statusDisplay) {
     return statusDisplay || 'פתוח';
@@ -69,12 +69,12 @@ function convertTickerStatus(statusDisplay) {
  * @returns {string} סטטוס בעברית
  * 
  * @example
- * const statusDisplay = convertTickerStatusToHebrew('active'); // returns 'פתוח'
+ * const statusDisplay = convertTickerStatusToHebrew('open'); // returns 'פתוח'
  */
 function convertTickerStatusToHebrew(status) {
-    if (status === 'active' || status === 'פעיל' || status === 'open') {
+    if (status === 'open' || status === 'פתוח') {
         return 'פתוח';
-    } else if (status === 'inactive' || status === 'לא פעיל' || status === 'closed') {
+    } else if (status === 'closed' || status === 'סגור') {
         return 'סגור';
     } else if (status === 'cancelled' || status === 'בוטל') {
         return 'מבוטל';

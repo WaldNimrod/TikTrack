@@ -12,6 +12,7 @@
     1. כרטיסיות התראות - בחלק העליון
     2. טבלת חשבונות - הסקשן הראשי
     3. מערכת פילטרים ומיון מתקדמת
+    4. מערכת אישור כפול למחיקת חשבונות
     
     מבנה הדף:
     - app-header: כותרת האפליקציה עם ניווט
@@ -19,12 +20,19 @@
       - top-section: כרטיסיות התראות וסיכום נתונים
       - content-section: טבלת חשבונות
     
+    מערכת אישור כפול:
+    - חלון ראשון: אישור סטנדרטי
+    - חלון שני: בדיקת אובייקטים מקושרים (טריידים, התראות, תזרימי מזומן, הערות)
+    - תצוגה מפורטת של אובייקטים מקושרים עם אפשרות הרחבה
+    
     שינויים אחרונים:
     - העתקת מבנה מדף העיצובים
     - הסרת טבלת התכנונים
     - התמקדות בחשבונות בלבד
     - שיפור עיצוב כרטיסיות התראות
     - ריכוז פונקציות חשבונות ב-accounts.js
+    - הוספת מערכת אישור כפול למחיקת חשבונות
+    - אינטגרציה עם מערכת הפילטרים הגלובלית
   -->
   
   <!-- Bootstrap CSS -->
@@ -161,6 +169,13 @@
       color: #495057;
     }
     
+    .linked-item:hover {
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      padding: 4px;
+      transition: background-color 0.2s;
+    }
+    
     .actions-cell .btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -291,7 +306,7 @@
           <!-- סיכום נתונים -->
           <div class="info-summary" id="summaryStats">
             <div>סה"כ חשבונות: <strong id="totalAccounts">0</strong></div>
-            <div>חשבונות פעילים: <strong id="activeAccounts">0</strong></div>
+            <div>חשבונות פתוחים: <strong id="activeAccounts">0</strong></div>
             <div>שווי כולל: <strong id="totalValue">₪0</strong></div>
             <div>רווח כולל: <strong id="totalProfit">₪0</strong></div>
           </div>
@@ -468,8 +483,8 @@
     // פונקציה לקבלת ערך סטטוס חשבון למיון
     function getAccountStatusForSort(status) {
       switch (status) {
-        case 'active': return 1;
-        case 'inactive': return 2;
+        case 'open': return 1;
+        case 'closed': return 2;
         case 'cancelled': return 3;
         default: return 0;
       }
@@ -611,12 +626,12 @@
         console.error('Table body not found');
         return;
       }
-      
-      if (accounts.length === 0) {
+        
+        if (accounts.length === 0) {
         tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">אין חשבונות להצגה</td></tr>';
-        return;
-      }
-      
+          return;
+        }
+        
       const tableHTML = accounts.map(account => {
         const currencySymbol = account.currency === 'USD' ? '$' : account.currency === 'ILS' ? '₪' : account.currency === 'EUR' ? '€' : account.currency;
         const profitPercentage = account.cash_balance > 0 ? ((account.total_pl / account.cash_balance) * 100).toFixed(2) : '0.00';
@@ -664,20 +679,20 @@
       }
       
       const totalAccounts = accountsData.length;
-      const activeAccounts = accountsData.filter(acc => acc.status === 'open').length;
+              const openAccounts = accountsData.filter(acc => acc.status === 'open').length;
       const totalValue = accountsData.reduce((sum, acc) => sum + (acc.total_value || 0), 0);
       const totalProfit = accountsData.reduce((sum, acc) => sum + (acc.total_pl || 0), 0);
       
       console.log('🔄 Calculated stats:', {
         totalAccounts,
-        activeAccounts,
+        openAccounts,
         totalValue,
         totalProfit
       });
       
       // עדכון התצוגה
       document.getElementById('totalAccounts').textContent = totalAccounts;
-      document.getElementById('activeAccounts').textContent = activeAccounts;
+              document.getElementById('activeAccounts').textContent = openAccounts;
       document.getElementById('totalValue').textContent = `₪${totalValue.toLocaleString('he-IL')}`;
       document.getElementById('totalProfit').textContent = `₪${totalProfit.toLocaleString('he-IL')}`;
       
@@ -994,6 +1009,34 @@
       }
     }
     
+    // עדכון טבלת חשבונות מתוך קומפוננטת הכותרת (פילטר עליון)
+    function updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
+      try {
+        console.log('🔄 updateGridFromComponent (accounts) called with:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm });
+        // שמירת הערכים הגלובליים לשימוש במערכת הפילטרים
+        window.selectedStatusesForFilter = selectedStatuses || [];
+        window.selectedTypesForFilter = selectedTypes || [];
+        window.selectedAccountsForFilter = selectedAccounts || [];
+        window.selectedDateRangeForFilter = selectedDateRange || null;
+        window.searchTermForFilter = searchTerm || '';
+
+        // החלת פילטרים על רשימת החשבונות
+        let accounts = Array.isArray(accountsData) ? [...accountsData] : [];
+        if (typeof window.filterDataByFilters === 'function') {
+          accounts = window.filterDataByFilters(accounts, 'accounts');
+        }
+
+        // רענון הטבלה והמונה
+        updateAccountsTable(accounts);
+        const countElement = document.querySelector('.main-content .table-count');
+        if (countElement) {
+          countElement.textContent = `${accounts.length} חשבונות`;
+        }
+      } catch (err) {
+        console.error('❌ Error updating accounts from header filter:', err);
+      }
+    }
+
     // הגדרת הפונקציות כגלובליות
     window.loadAccountsData = loadAccountsData;
     window.loadAccounts = loadAccounts;
@@ -1006,6 +1049,7 @@
     window.showAddAccountModal = showAddAccountModal;
     window.showEditAccountModal = showEditAccountModal;
     window.deleteAccount = deleteAccount;
+    window.updateGridFromComponent = updateGridFromComponent;
     
     // פונקציה לרענון התראות
     function refreshAlerts() {
@@ -1216,19 +1260,19 @@
       
       modal.innerHTML = `
         <div class="modal-dialog modal-lg">
-          <div class="modal-content">
+      <div class="modal-content">
             <div class="modal-header bg-warning text-dark">
               <h5 class="modal-title" id="warningModalLabel">${title}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
               ${body}
-            </div>
+              </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">הבנתי</button>
+              </div>
             </div>
-          </div>
-        </div>
+              </div>
       `;
       
       return modal;
@@ -1248,19 +1292,19 @@
           <div class="alert alert-danger">
             <h6>⚠️ אתה עומד למחוק את החשבון "${accountName}"</h6>
             <p><strong>פעולה זו אינה הפיכה!</strong></p>
-          </div>
+              </div>
           ${linkedItems.hasLinkedItems ? `
           <div class="alert alert-warning">
             <h6>🔗 נמצאו אלמנטים מקושרים לחשבון זה:</h6>
             <div class="linked-items-summary">
               ${linkedItems.summary}
+              </div>
             </div>
-          </div>
           ` : `
           <div class="alert alert-success">
             <h6>✅ אין אלמנטים מקושרים לחשבון זה</h6>
             <p>החשבון מוכן למחיקה</p>
-          </div>
+              </div>
           `}
           <div class="alert alert-info">
             <h6>📋 לפני המחיקה, אנא וודא:</h6>
@@ -1269,10 +1313,10 @@
               <li>✅ אין פעולות ממתינות</li>
               <li>✅ החשבון לא בשימוש פעיל</li>
             </ul>
-          </div>
+              </div>
           <div class="alert alert-info">
             <strong>💡 טיפ:</strong> אם יש לך ספק, מומלץ לסגור את החשבון במקום למחוק אותו
-          </div>
+            </div>
         `;
         
         // יצירת המודל
@@ -1289,20 +1333,20 @@
               <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="secondConfirmationModalLabel">${modalTitle}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
+            </div>
               <div class="modal-body">
                 ${modalBody}
-              </div>
-              <div class="modal-footer">
+        </div>
+        <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                   <span>❌ ביטול</span>
                 </button>
                 <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount(${accountId}, '${accountName}')">
                   <span>🗑️ כן, מחק את החשבון</span>
                 </button>
-              </div>
-            </div>
-          </div>
+        </div>
+      </div>
+    </div>
         `;
         
         document.body.appendChild(modal);
@@ -1322,7 +1366,22 @@
       }
     }
     
-    // פונקציה לבדיקת אלמנטים מקושרים לחשבון
+    /**
+     * בדיקת אלמנטים מקושרים לחשבון
+     * 
+     * פונקציה זו בודקת את כל האלמנטים המקושרים לחשבון:
+     * - טריידים (פתוחים, סגורים, מבוטלים)
+     * - התראות (פתוחות, סגורות, מבוטלות) 
+     * - תזרימי מזומנים
+     * - הערות
+     * 
+     * המערכת משתמשת במערכת השיוך הגמישה החדשה:
+     * - התראות והערות משתמשות ב-related_type_id ו-related_id
+     * - טריידים ותזרימי מזומנים משתמשים ב-account_id ישיר
+     * 
+     * @param {number} accountId - מזהה החשבון
+     * @returns {Object} אובייקט עם פרטי האלמנטים המקושרים
+     */
     async function checkLinkedItems(accountId) {
       try {
         console.log('🔄 בודק אלמנטים מקושרים לחשבון:', accountId);
@@ -1353,7 +1412,9 @@
           if (alertsResponse.ok) {
             const alertsData = await alertsResponse.json();
             if (alertsData.data) {
-              const accountAlerts = alertsData.data.filter(alert => alert.account_id == accountId);
+              const accountAlerts = alertsData.data.filter(alert => 
+                alert.related_type === 'account' && alert.related_id == accountId
+              );
               if (accountAlerts.length > 0) {
                 linkedItems.details.alerts = accountAlerts;
                 linkedItems.hasLinkedItems = true;
@@ -1407,12 +1468,15 @@
           if (linkedItems.details.trades) {
             const openTrades = linkedItems.details.trades.filter(t => t.status === 'open');
             const closedTrades = linkedItems.details.trades.filter(t => t.status === 'closed');
-            summaryParts.push(`📊 <strong>${linkedItems.details.trades.length} טריידים</strong> (${openTrades.length} פתוחים, ${closedTrades.length} סגורים)`);
+            const cancelledTrades = linkedItems.details.trades.filter(t => t.status === 'cancelled');
+            summaryParts.push(`📊 <strong>${linkedItems.details.trades.length} טריידים</strong> (${openTrades.length} פתוחים, ${closedTrades.length} סגורים, ${cancelledTrades.length} מבוטלים)`);
           }
           
           if (linkedItems.details.alerts) {
-            const activeAlerts = linkedItems.details.alerts.filter(a => a.status === 'פתוח' || a.status === 'open');
-            summaryParts.push(`🔔 <strong>${linkedItems.details.alerts.length} התראות</strong> (${activeAlerts.length} פעילות)`);
+            const openAlerts = linkedItems.details.alerts.filter(a => a.status === 'open');
+            const closedAlerts = linkedItems.details.alerts.filter(a => a.status === 'closed');
+            const cancelledAlerts = linkedItems.details.alerts.filter(a => a.status === 'cancelled');
+            summaryParts.push(`🔔 <strong>${linkedItems.details.alerts.length} התראות</strong> (${openAlerts.length} פתוחות, ${closedAlerts.length} סגורות, ${cancelledAlerts.length} מבוטלות)`);
           }
           
           if (linkedItems.details.cashFlows) {
@@ -1425,17 +1489,24 @@
           
           linkedItems.summary = `
             <div class="linked-items-list">
-              ${summaryParts.map(item => `<div class="linked-item">${item}</div>`).join('')}
+              ${summaryParts.map(item => `<div class="linked-item" style="cursor: pointer;" onclick="toggleLinkedItemsDetails('${item.split(' ')[1]}')">${item}</div>`).join('')}
             </div>
             <div class="mt-2">
               <small class="text-muted">
                 💡 <strong>המלצה:</strong> יש לטפל באלמנטים אלו לפני מחיקת החשבון
               </small>
             </div>
+            <div id="linkedItemsDetails" class="mt-3" style="display: none;">
+              <!-- פרטי האלמנטים יוצגו כאן -->
+            </div>
           `;
         }
         
         console.log('✅ בדיקת אלמנטים מקושרים הושלמה:', linkedItems);
+        
+        // שמירת האלמנטים המקושרים ב-global לצורך הצגת פרטים
+        window.currentLinkedItems = linkedItems;
+        
         return linkedItems;
         
       } catch (error) {
@@ -1446,6 +1517,151 @@
           details: {}
         };
       }
+    }
+    
+    // פונקציה להצגת/הסתרת פרטי אלמנטים מקושרים
+    function toggleLinkedItemsDetails(itemType) {
+      const detailsDiv = document.getElementById('linkedItemsDetails');
+      if (!detailsDiv) return;
+      
+      if (detailsDiv.style.display === 'none') {
+        // הצגת פרטים
+        let detailsContent = '';
+        
+        switch(itemType) {
+          case 'טריידים':
+            if (window.currentLinkedItems && window.currentLinkedItems.details.trades) {
+              detailsContent = createTradesTable(window.currentLinkedItems.details.trades);
+            }
+            break;
+          case 'התראות':
+            if (window.currentLinkedItems && window.currentLinkedItems.details.alerts) {
+              detailsContent = createAlertsTable(window.currentLinkedItems.details.alerts);
+            }
+            break;
+          case 'תזרימי':
+            if (window.currentLinkedItems && window.currentLinkedItems.details.cashFlows) {
+              detailsContent = createCashFlowsTable(window.currentLinkedItems.details.cashFlows);
+            }
+            break;
+          case 'הערות':
+            if (window.currentLinkedItems && window.currentLinkedItems.details.notes) {
+              detailsContent = createNotesTable(window.currentLinkedItems.details.notes);
+            }
+            break;
+        }
+        
+        detailsDiv.innerHTML = detailsContent;
+        detailsDiv.style.display = 'block';
+      } else {
+        // הסתרת פרטים
+        detailsDiv.style.display = 'none';
+      }
+    }
+    
+    // פונקציות עזר ליצירת טבלאות
+    function createTradesTable(trades) {
+      const rows = trades.map(trade => `
+        <tr>
+          <td>${trade.ticker_symbol || `טיקר ${trade.ticker_id}`}</td>
+          <td>${trade.status === 'open' ? 'פתוח' : trade.status === 'closed' ? 'סגור' : trade.status}</td>
+          <td>${new Date(trade.created_at).toLocaleDateString('he-IL')}</td>
+          <td>${trade.total_pl ? trade.total_pl.toLocaleString() : '0'}</td>
+        </tr>
+      `).join('');
+      
+      return `
+        <div class="table-responsive">
+          <table class="table table-sm table-striped">
+            <thead class="table-light">
+              <tr>
+                <th>טיקר</th>
+                <th>סטטוס</th>
+                <th>תאריך יצירה</th>
+                <th>רווח/הפסד</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+    
+    function createAlertsTable(alerts) {
+      const rows = alerts.map(alert => `
+        <tr>
+          <td>${alert.related_type === 'ticker' ? `טיקר ${alert.related_id}` : alert.related_type === 'account' ? `חשבון ${alert.related_id}` : `${alert.related_type} ${alert.related_id}`}</td>
+          <td>${alert.type}</td>
+          <td>${alert.status === 'open' ? 'פתוח' : alert.status === 'closed' ? 'סגור' : alert.status}</td>
+          <td>${alert.message}</td>
+        </tr>
+      `).join('');
+      
+      return `
+        <div class="table-responsive">
+          <table class="table table-sm table-striped">
+            <thead class="table-light">
+              <tr>
+                <th>טיקר</th>
+                <th>סוג</th>
+                <th>סטטוס</th>
+                <th>הודעה</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+    
+    function createCashFlowsTable(cashFlows) {
+      const rows = cashFlows.map(cf => `
+        <tr>
+          <td>${cf.type}</td>
+          <td>${cf.amount}</td>
+          <td>${new Date(cf.date).toLocaleDateString('he-IL')}</td>
+          <td>${cf.description || '-'}</td>
+        </tr>
+      `).join('');
+      
+      return `
+        <div class="table-responsive">
+          <table class="table table-sm table-striped">
+            <thead class="table-light">
+              <tr>
+                <th>סוג</th>
+                <th>סכום</th>
+                <th>תאריך</th>
+                <th>תיאור</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+    
+    function createNotesTable(notes) {
+      const rows = notes.map(note => `
+        <tr>
+          <td>${note.content.substring(0, 50)}${note.content.length > 50 ? '...' : ''}</td>
+          <td>${new Date(note.created_at).toLocaleDateString('he-IL')}</td>
+        </tr>
+      `).join('');
+      
+      return `
+        <div class="table-responsive">
+          <table class="table table-sm table-striped">
+            <thead class="table-light">
+              <tr>
+                <th>תוכן</th>
+                <th>תאריך יצירה</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
     }
     
     // פונקציה לאישור סופי של מחיקת חשבון
@@ -1484,6 +1700,7 @@
     window.showSecondConfirmationModal = showSecondConfirmationModal;
     window.confirmDeleteAccount = confirmDeleteAccount;
     window.checkLinkedItems = checkLinkedItems;
+    window.toggleLinkedItemsDetails = toggleLinkedItemsDetails;
     
     // אתחול הדף
     document.addEventListener('DOMContentLoaded', function() {

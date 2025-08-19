@@ -30,7 +30,7 @@
     - הוספת איקונים לכפתורי שמירה (💾)
     
     תלות: trades.js - פונקציות ייעודיות לטריידים
-    תלות: grid-table.js - פונקציות כלליות לטבלאות
+    תלות: main.js - פונקציות כלליות לטבלאות
     תלות: alerts.js - פונקציות התראות
   -->
   
@@ -56,12 +56,12 @@
   
   <!-- קבצים מודולריים של הגריד -->
   <script src="scripts/app-header.js"></script>
-  <script src="scripts/grid-table.js"></script>
+      <script src="scripts/main.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
   <script src="scripts/accounts.js"></script>
-  <script src="scripts/trades.js"></script>
+      <script src="scripts/tracking.js"></script>
 </head>
 <body>
   <!-- רקע כללי -->
@@ -187,7 +187,11 @@
     
     function loadTrades() {
       console.log('טעינת טריידים');
-      loadTradesData();
+      if (typeof window.loadTradesData === 'function') {
+        window.loadTradesData();
+      } else {
+        console.error('loadTradesData function not found');
+      }
     }
     
     function editTrade(id) {
@@ -205,7 +209,11 @@
         tradesData[tradeIndex].status = 'canceled';
         
         // רענון הטבלה
-        loadTradesData();
+        if (typeof window.loadTradesData === 'function') {
+          window.loadTradesData();
+        } else {
+          console.error('loadTradesData function not found');
+        }
         
         // הצגת הודעה
         showNotification(`טרייד ${id} בוטל בהצלחה`, 'success');
@@ -220,8 +228,12 @@
       // הסרת הטרייד מהמערך
       tradesData = tradesData.filter(trade => trade.id !== id);
       
-      // רענון הטבלה
-      loadTradesData();
+              // רענון הטבלה
+        if (typeof window.loadTradesData === 'function') {
+          window.loadTradesData();
+        } else {
+          console.error('loadTradesData function not found');
+        }
       
       // הצגת הודעה
       showNotification(`טרייד ${id} נמחק בהצלחה`, 'success');
@@ -458,7 +470,11 @@
       updateSortIcons(-1);
       
       // רענון הנתונים
-      loadTradesData();
+      if (typeof window.loadTradesData === 'function') {
+        window.loadTradesData();
+      } else {
+        console.error('loadTradesData function not found');
+      }
       
       showNotification('מיון אופס', 'success');
     }
@@ -484,78 +500,7 @@
     // נתוני טריידים - יטענו מה-API
     let tradesData = [];
 
-    // פונקציה לטעינת נתוני טריידים עם פילטרים
-    async function loadTradesData() {
-      try {
-        console.log('🔄 === LOAD TRADES DATA ===');
-        
-        // קריאה מה-API
-        const response = await fetch('/api/v1/trades/');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        let apiData = await response.json();
-        
-        // בדיקה שהנתונים בפורמט הנכון
-        if (apiData && apiData.data && Array.isArray(apiData.data)) {
-          apiData = apiData.data;
-        }
-        
-        console.log('📡 נתונים מה-API:', apiData);
-        console.log('📡 סוג הנתונים:', typeof apiData);
-        console.log('📡 האם זה מערך:', Array.isArray(apiData));
-        console.log('📡 אורך הנתונים:', apiData ? apiData.length : 'null');
-        
-        // עדכון הנתונים המקומיים
-        tradesData = apiData.map(trade => ({
-          id: trade.id,
-          account_id: trade.account_id,
-          account_name: trade.account_name,
-          ticker_id: trade.ticker_id,
-          ticker_symbol: trade.ticker_symbol,
-          trade_plan_id: trade.trade_plan_id,
-          status: trade.status,
-          type: trade.type,
-          opened_at: trade.created_at, // תאריך יצירת הטרייד
-          closed_at: trade.closed_at,
-          total_pl: trade.total_pl,
-          notes: trade.notes
-        }));
-        
-        console.log('📊 נתונים מעודכנים:', tradesData);
-        console.log('📊 אורך tradesData:', tradesData.length);
-        console.log('📊 דוגמה לטרייד ראשון:', tradesData[0]);
-        
-        // קבלת פילטרים שמורים
-        const selectedStatuses = window.selectedStatusesForFilter || [];
-        const selectedTypes = window.selectedTypesForFilter || [];
-        const selectedAccounts = window.selectedAccountsForFilter || [];
-        const selectedDateRange = window.selectedDateRangeForFilter || null;
-        const searchTerm = window.searchTermForFilter || '';
-        
-        // ניקוי פילטר חיפוש שגוי
-        if (searchTerm === 'ס') {
-          window.searchTermForFilter = '';
-        }
-        
-        console.log('🔄 פילטרים שמורים:', {
-          selectedStatuses,
-          selectedTypes,
-          selectedAccounts,
-          selectedDateRange,
-          searchTerm
-        });
-        
-        console.log('🔄 Saved filters:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm });
-        
-        // שימוש בפונקציה המותאמת לפילטור
-        filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
-        
-      } catch (error) {
-        console.error('Error loading trades data:', error);
-        document.querySelector('#tradesTable tbody').innerHTML = '<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
-      }
-    }
+    // פונקציה לטעינת נתוני טריידים - מוגדרת בקובץ trades.js
     
     // פונקציה מותאמת לפילטור נתוני טריידים
     function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
@@ -793,7 +738,11 @@
     
     // פונקציה לרענון נתונים בלבד (לא מאפסת פילטרים)
     function refreshDataOnly() {
-      loadTradesData();
+      if (typeof window.loadTradesData === 'function') {
+        window.loadTradesData();
+      } else {
+        console.error('loadTradesData function not found');
+      }
     }
     
     // פונקציה לאיפוס מיון
@@ -806,7 +755,11 @@
       updateSortIcons(-1);
       
       // רענון הנתונים
-      loadDesignsData();
+      if (typeof window.loadTradesData === 'function') {
+        window.loadTradesData();
+      } else {
+        console.error('loadTradesData function not found');
+      }
       
       showNotification('מיון אופס', 'success');
     }
@@ -1069,7 +1022,11 @@
       restoreDesignsSectionState();
       
       // טעינת נתוני טריידים
-      loadTradesData();
+      if (typeof window.loadTradesData === 'function') {
+        window.loadTradesData();
+      } else {
+        console.error('loadTradesData function not found');
+      }
       
       // טעינת התראות
       if (typeof loadAlerts === 'function') {

@@ -10,17 +10,23 @@ class TradePlanService:
     @staticmethod
     def get_all(db: Session) -> List[TradePlan]:
         """קבלת כל תוכניות הטרייד"""
-        return db.query(TradePlan).options(
-            db.joinedload(TradePlan.ticker),
-            db.joinedload(TradePlan.account)
+        logger.info("Loading trade plans with joinedload for ticker and account")
+        plans = db.query(TradePlan).options(
+            joinedload(TradePlan.ticker),
+            joinedload(TradePlan.account)
         ).all()
+        logger.info(f"Loaded {len(plans)} trade plans")
+        if plans:
+            logger.info(f"First plan ticker: {plans[0].ticker}")
+            logger.info(f"First plan account: {plans[0].account}")
+        return plans
     
     @staticmethod
     def get_by_id(db: Session, plan_id: int) -> Optional[TradePlan]:
         """קבלת תוכנית טרייד לפי מזהה"""
         return db.query(TradePlan).options(
-            db.joinedload(TradePlan.ticker),
-            db.joinedload(TradePlan.account)
+            joinedload(TradePlan.ticker),
+            joinedload(TradePlan.account)
         ).filter(TradePlan.id == plan_id).first()
     
     @staticmethod

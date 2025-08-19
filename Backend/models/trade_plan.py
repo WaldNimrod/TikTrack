@@ -26,6 +26,9 @@ class TradePlan(BaseModel):
     
     def to_dict(self):
         """המרה למילון עם יחסים"""
+        import logging
+        logger = logging.getLogger(__name__)
+        
         result = {}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
@@ -41,22 +44,32 @@ class TradePlan(BaseModel):
         # הוספת יחסים
         try:
             if hasattr(self, 'ticker') and self.ticker:
+                logger.info(f"Trade plan {self.id}: Using loaded ticker relationship")
                 result['ticker'] = {
                     'id': self.ticker.id,
                     'symbol': self.ticker.symbol,
                     'name': self.ticker.name
                 }
+            else:
+                logger.info(f"Trade plan {self.id}: Ticker relationship not loaded, using ticker_id")
+                result['ticker'] = {'id': self.ticker_id, 'symbol': f'Ticker_{self.ticker_id}', 'name': f'Ticker {self.ticker_id}'}
         except Exception as e:
+            logger.error(f"Trade plan {self.id}: Error with ticker relationship: {str(e)}")
             # אם יש בעיה עם היחס ticker, נשתמש ב-ticker_id
             result['ticker'] = {'id': self.ticker_id, 'symbol': f'Ticker_{self.ticker_id}', 'name': f'Ticker {self.ticker_id}'}
         
         try:
             if hasattr(self, 'account') and self.account:
+                logger.info(f"Trade plan {self.id}: Using loaded account relationship")
                 result['account'] = {
                     'id': self.account.id,
                     'name': self.account.name
                 }
+            else:
+                logger.info(f"Trade plan {self.id}: Account relationship not loaded, using account_id")
+                result['account'] = {'id': self.account_id, 'name': f'Account_{self.account_id}'}
         except Exception as e:
+            logger.error(f"Trade plan {self.id}: Error with account relationship: {str(e)}")
             # אם יש בעיה עם היחס account, נשתמש ב-account_id
             result['account'] = {'id': self.account_id, 'name': f'Account_{self.account_id}'}
         

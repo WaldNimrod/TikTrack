@@ -44,18 +44,22 @@ class AppHeader extends HTMLElement {
       console.log('🔄 Page needs accounts, loading...');
       // ודא שקובץ accounts.js נטען לפני ניסיון שימוש בפונקציות שלו
       const ensureAccountsReady = () => {
-        if (typeof window.loadAccountsFromServer === 'function' && typeof window.updateAccountFilterMenu === 'function') {
-          console.log('🔄 Accounts functions available, loading accounts...');
-          window.loadAccountsFromServer().then(() => {
-            if (window.accountsData) {
-              console.log('🔄 Accounts loaded, updating menu...');
-              window.updateAccountFilterMenu(window.accountsData);
+        if (typeof window.loadAllAccountsFromServer === 'function' && typeof window.updateAccountFilterMenu === 'function') {
+          console.log('🔄 Accounts functions available, loading all accounts...');
+          window.loadAllAccountsFromServer().then((allAccounts) => {
+            if (allAccounts && allAccounts.length > 0) {
+              console.log('🔄 All accounts loaded, updating menu...');
+              window.updateAccountFilterMenu(allAccounts);
             }
           }).catch((error) => {
-            console.log('🔄 Error loading accounts:', error);
-            // fallback לנתוני דיפולט
-            if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
-              window.updateAccountFilterMenu(window.accountsData);
+            console.log('🔄 Error loading all accounts:', error);
+            // fallback לפונקציה הישנה
+            if (typeof window.loadAccountsFromServer === 'function') {
+              window.loadAccountsFromServer().then(() => {
+                if (window.accountsData) {
+                  window.updateAccountFilterMenu(window.accountsData);
+                }
+              });
             }
           });
         } else {
@@ -399,7 +403,7 @@ class AppHeader extends HTMLElement {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
           font-size: 0.9rem;
           transition: all 0.2s ease;
-          min-width: 120px;
+          min-width: 140px;
           white-space: nowrap;
           overflow: hidden;
         }
@@ -1046,7 +1050,7 @@ class AppHeader extends HTMLElement {
                   <div class="date-range-filter-container">
                     <div class="date-range-filter-dropdown">
                       <button class="date-range-filter-toggle" id="dateRangeFilterToggle">
-                        <span class="selected-date-range-text">הכול</span>
+                        <span class="selected-date-range-text">כל זמן</span>
                         <span class="dropdown-arrow">▼</span>
                       </button>
                       
@@ -1085,7 +1089,7 @@ class AppHeader extends HTMLElement {
                           <span class="check-mark">●</span>
                         </div>
                         <div class="date-range-filter-item">
-                          <span class="option-text">הכול</span>
+                          <span class="option-text">כל זמן</span>
                           <span class="check-mark">●</span>
                         </div>
                       </div>
@@ -1477,16 +1481,16 @@ class AppHeader extends HTMLElement {
           });
           console.log('Date range filter initialized with saved filter:', firstSavedRange);
         } else {
-          // ברירת מחדל - רק "הכול" מסומן
+          // ברירת מחדל - רק "כל זמן" מסומן
           dateRangeItems.forEach(item => {
             const text = item.querySelector('.option-text').textContent;
-            if (text === 'הכול') {
+            if (text === 'כל זמן') {
               item.classList.add('selected');
             } else {
               item.classList.remove('selected');
             }
           });
-          console.log(`Date range filter initialized with default for ${pageName} (only "הכול" selected)`);
+          console.log(`Date range filter initialized with default for ${pageName} (only "כל זמן" selected)`);
         }
         
         this.updateDateRangeFilterText();
@@ -1624,7 +1628,20 @@ class AppHeader extends HTMLElement {
         // עדכון תפריט החשבונות
         setTimeout(() => {
           console.log('🔄 Attempting to update account filter menu...');
-          if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
+          if (typeof window.loadAllAccountsFromServer === 'function') {
+            console.log('🔄 Loading all accounts from server for filter update');
+            window.loadAllAccountsFromServer().then((allAccounts) => {
+              if (allAccounts && allAccounts.length > 0) {
+                window.updateAccountFilterMenu(allAccounts);
+              }
+            }).catch((error) => {
+              console.log('🔄 Error loading all accounts for filter update:', error);
+              // fallback לנתונים קיימים
+              if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
+                window.updateAccountFilterMenu(window.accountsData);
+              }
+            });
+          } else if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
             console.log('🔄 Updating account filter menu with existing data');
             window.updateAccountFilterMenu(window.accountsData);
           } else if (typeof window.refreshAccountFilterMenu === 'function') {
@@ -2211,7 +2228,7 @@ class AppHeader extends HTMLElement {
     console.log('🔍 Number of selected items:', selectedItems.length);
     
     if (selectedValues.length === 0) {
-      selectedText.textContent = 'הכול';
+      selectedText.textContent = 'כל זמן';
     } else if (selectedValues.length === 1) {
       selectedText.textContent = selectedValues[0];
     } else {
@@ -2304,12 +2321,12 @@ class AppHeader extends HTMLElement {
   clearDateRangeFilter() {
     console.log('clearDateRangeFilter called from component');
     
-    // ניקוי פילטר טווח תאריכים - רק "הכול" מסומן
+    // ניקוי פילטר טווח תאריכים - רק "כל זמן" מסומן
     const dateRangeMenu = this.shadowRoot.getElementById('dateRangeFilterMenu');
     if (dateRangeMenu) {
       dateRangeMenu.querySelectorAll('.date-range-filter-item').forEach(item => {
         const text = item.querySelector('.option-text').textContent;
-        if (text === 'הכול') {
+        if (text === 'כל זמן') {
           item.classList.add('selected');
         } else {
           item.classList.remove('selected');
@@ -2339,12 +2356,25 @@ class AppHeader extends HTMLElement {
       this.toggleSearchClearButton();
     }
     
-    // עדכון שדה החיפוש בדף הטבלה - הוסר כדי למנוע לולאה אינסופית
+    // קביעת שם הדף הנוכחי
+    const currentPath = window.location.pathname;
+    let pageName = 'planning'; // ברירת מחדל
     
-    // ניקוי הפילטר השמור ב-localStorage
+    if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
+      pageName = 'designs';
+    } else if (currentPath.includes('/tracking')) {
+      pageName = 'tracking';
+    } else if (currentPath.includes('/notes')) {
+      pageName = 'notes';
+    } else if (currentPath.includes('/accounts')) {
+      pageName = 'accounts';
+    }
+    
+    // ניקוי הפילטר השמור ב-localStorage עם שם ספציפי לדף
     try {
-      localStorage.removeItem('planningFilterSearch');
-      console.log('Search filter cleared from localStorage');
+      localStorage.removeItem(`${pageName}FilterSearch`);
+      localStorage.removeItem('globalFilterSearch');
+      console.log('Search filter cleared from localStorage for page:', pageName);
     } catch (error) {
       console.error('Error clearing search filter from localStorage:', error);
     }
@@ -2371,15 +2401,36 @@ class AppHeader extends HTMLElement {
     
     this.toggleSearchClearButton();
     
-    // שמירת החיפוש ב-localStorage
+    // קביעת שם הדף הנוכחי
+    const currentPath = window.location.pathname;
+    let pageName = 'planning'; // ברירת מחדל
+    
+    if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
+      pageName = 'designs';
+    } else if (currentPath.includes('/tracking')) {
+      pageName = 'tracking';
+    } else if (currentPath.includes('/notes')) {
+      pageName = 'notes';
+    } else if (currentPath.includes('/accounts')) {
+      pageName = 'accounts';
+    }
+    
+    // שמירת החיפוש ב-localStorage עם שם ספציפי לדף
     try {
-      localStorage.setItem('planningFilterSearch', searchTerm);
-      console.log('Search term saved to localStorage:', searchTerm);
+      if (searchTerm.trim() === '') {
+        // אם השדה ריק, נמחק את הפילטר
+        localStorage.removeItem(`${pageName}FilterSearch`);
+        localStorage.removeItem('globalFilterSearch');
+        console.log('Search term cleared from localStorage');
+      } else {
+        // אם יש תוכן, נשמור אותו
+        localStorage.setItem(`${pageName}FilterSearch`, searchTerm);
+        localStorage.setItem('globalFilterSearch', searchTerm);
+        console.log('Search term saved to localStorage:', searchTerm);
+      }
     } catch (error) {
       console.error('Error saving search term to localStorage:', error);
     }
-    
-    // עדכון שדה החיפוש בדף הטבלה - הוסר כדי למנוע לולאה אינסופית
     
     // עדכון הגריד עם החיפוש
     this.updateGridFilter();
@@ -2400,15 +2451,42 @@ class AppHeader extends HTMLElement {
   clearAllFilters() {
     console.log('clearAllFilters called from component');
     
-    // ניקוי פילטר הסטטוס - רק "פתוח" מסומן
+    // קביעת שם הדף הנוכחי
+    const currentPath = window.location.pathname;
+    let pageName = 'planning'; // ברירת מחדל
+    
+    if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
+      pageName = 'designs';
+    } else if (currentPath.includes('/tracking')) {
+      pageName = 'tracking';
+    } else if (currentPath.includes('/notes')) {
+      pageName = 'notes';
+    } else if (currentPath.includes('/accounts')) {
+      pageName = 'accounts';
+    }
+    
+    // ניקוי פילטר הסטטוס - מותאם לדף
     const statusMenu = this.shadowRoot.getElementById('statusFilterMenu');
     if (statusMenu) {
       statusMenu.querySelectorAll('.status-filter-item').forEach(item => {
         const text = item.querySelector('.option-text').textContent;
-        if (text === 'פתוח') {
+        if (pageName === 'accounts') {
+          // בדף החשבונות - לבחור את כל הסטטוסים כברירת מחדל
           item.classList.add('selected');
+        } else if (pageName === 'notes') {
+          // עבור דף ההערות - רק "פתוח" מסומן (ברירת מחדל)
+          if (text === 'פתוח') {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
         } else {
-          item.classList.remove('selected');
+          // דפים אחרים - רק "פתוח" מסומן
+          if (text === 'פתוח') {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
         }
       });
       this.updateStatusFilterText();
@@ -2432,12 +2510,12 @@ class AppHeader extends HTMLElement {
       this.updateAccountFilterText();
     }
     
-    // ניקוי פילטר טווח תאריכים - רק "הכול" מסומן
+    // ניקוי פילטר טווח תאריכים - רק "כל זמן" מסומן
     const dateRangeMenu = this.shadowRoot.getElementById('dateRangeFilterMenu');
     if (dateRangeMenu) {
       dateRangeMenu.querySelectorAll('.date-range-filter-item').forEach(item => {
         const text = item.querySelector('.option-text').textContent;
-        if (text === 'הכול') {
+        if (text === 'כל זמן') {
           item.classList.add('selected');
         } else {
           item.classList.remove('selected');
@@ -2458,18 +2536,6 @@ class AppHeader extends HTMLElement {
     
     // ניקוי הפילטרים השמורים ב-localStorage
     try {
-      // קביעת שם הדף הנוכחי
-      const currentPath = window.location.pathname;
-      let pageName = 'planning'; // ברירת מחדל
-      
-      if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
-        pageName = 'designs';
-      } else if (currentPath.includes('/tracking')) {
-        pageName = 'tracking';
-      } else if (currentPath.includes('/notes')) {
-        pageName = 'notes';
-      }
-      
       // מחיקת הפילטרים לפי שם הדף
       localStorage.removeItem(`${pageName}FilterStatuses`);
       localStorage.removeItem(`${pageName}FilterTypes`);
@@ -2760,7 +2826,7 @@ class AppHeader extends HTMLElement {
         if (dateRangeToggle) {
           const selectedText = dateRangeToggle.querySelector('.selected-date-range-text');
           if (selectedText) {
-            selectedText.textContent = filters.dateRange || 'הכול';
+            selectedText.textContent = filters.dateRange || 'כל זמן';
           }
         }
       }
@@ -2771,6 +2837,7 @@ class AppHeader extends HTMLElement {
       const searchInput = this.shadowRoot.getElementById('searchFilterInput');
       if (searchInput) {
         searchInput.value = filters.search || '';
+        this.toggleSearchClearButton();
       }
     }
 

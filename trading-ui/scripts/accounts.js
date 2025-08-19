@@ -82,6 +82,44 @@ async function loadAccountsFromServer() {
   }
 }
 
+// פונקציה לטעינת כל החשבונות מהשרת (לפילטר)
+async function loadAllAccountsFromServer() {
+  console.log('🔄 === Loading all accounts from server ===');
+  
+  try {
+    const token = localStorage.getItem('authToken');
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
+      method: 'GET',
+      headers: headers
+    });
+    
+    if (response.ok) {
+      const responseData = await response.json();
+      const allAccounts = responseData.data || responseData;
+      console.log('🔄 All accounts loaded for filter:', allAccounts.length, 'accounts');
+      
+      // עדכון הפילטר עם כל החשבונות
+      updateAccountFilterMenu(allAccounts);
+      return allAccounts;
+    } else {
+      console.log('🔄 Error loading all accounts from server, status:', response.status);
+      return [];
+    }
+    
+    } catch (error) {
+    console.log('🔄 Error loading all accounts from server:', error);
+    return [];
+  }
+}
+
 // פונקציה לטעינת חשבונות ברירת מחדל
 function loadDefaultAccounts() {
   console.log('🔄 Loading default accounts');
@@ -121,7 +159,7 @@ function updateAccountFilterMenu(accounts) {
     accountItem.setAttribute('data-account', account.name); // הוספת data-account attribute
     accountItem.innerHTML = `
       <span class="option-text">${account.name}</span>
-      <span class="check-mark">●</span>
+      <span class="check-mark">✓</span>
     `;
     accountMenu.appendChild(accountItem);
     console.log(`🔄 Added account item ${index + 1}: ${account.name}`);
@@ -167,7 +205,11 @@ function updateAccountFilterText(selectedAccounts) {
     displayText = 'לא נבחרו חשבונות';
   } else if (selectedAccounts.length === 1) {
     displayText = selectedAccounts[0];
+  } else if (selectedAccounts.length === window.accountsData?.length) {
+    displayText = 'כל החשבונות';
   } else if (selectedAccounts.length < 4) {
+    displayText = `${selectedAccounts.length} חשבונות`;
+  } else {
     displayText = `${selectedAccounts.length} חשבונות`;
   }
   
@@ -336,6 +378,7 @@ function updateAccountsTableInDesigns(accounts) {
 
 // ייצוא הפונקציות לשימוש גלובלי
 window.loadAccountsFromServer = loadAccountsFromServer;
+window.loadAllAccountsFromServer = loadAllAccountsFromServer;
 window.loadDefaultAccounts = loadDefaultAccounts;
 window.updateAccountFilterMenu = updateAccountFilterMenu;
 window.updateAccountFilterText = updateAccountFilterText;
@@ -741,3 +784,12 @@ window.showSuccessMessage = showSuccessMessage;
 window.showErrorMessage = showErrorMessage;
 window.updateAccountFilterMenu = updateAccountFilterMenu;
 window.updateAccountFilterText = updateAccountFilterText;
+
+// הגדרת הפונקציה updateGridFromComponent לדף החשבונות
+window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+  console.log('🔄 === UPDATE GRID FROM COMPONENT (accounts) ===');
+  console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
+
+  // קריאה לפונקציה הגלובלית
+  window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'accounts');
+};

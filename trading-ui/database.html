@@ -22,10 +22,8 @@
   <!-- קבצים מודולריים של הגריד -->
   <script src="scripts/auth.js"></script>
   <script src="scripts/app-header.js"></script>
-  <script src="scripts/grid-table.js"></script>
+  <script src="scripts/main.js"></script>
   <script src="scripts/grid-filters.js"></script>
-  <script src="scripts/grid-data.js"></script>
-  <script src="scripts/grid-init.js"></script>
   <script src="scripts/accounts.js"></script>
   <script src="scripts/tickers.js"></script>
       <script src="scripts/alerts.js"></script>
@@ -35,16 +33,6 @@
 
   <style>
     /* סגנונות ייחודיים לדף בסיס נתונים שלא קיימים בקבצים הכלליים */
-    .database-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-      background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-      border: 1px solid #e8e8e8;
-    }
-
     .filter-icon {
       font-size: 1.2rem;
       transition: transform 0.2s ease;
@@ -63,6 +51,25 @@
       max-height: 0;
       opacity: 0;
     }
+
+    /* CSS לסגירת content-section */
+    .content-section {
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .content-section.collapsed .section-body {
+      max-height: 0;
+      opacity: 0;
+      padding: 0;
+      margin: 0;
+    }
+
+    .content-section.collapsed .table-responsive {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
@@ -70,29 +77,30 @@
   <app-header></app-header>
 
   <div class="background-wrapper">
-    <!-- חלק עליון עם כותרת -->
-    <div class="top-section" id="topSection">
-      <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h1 class="page-title">בסיס נתונים</h1>
-            <p class="page-subtitle">ניהול ועקיבה אחר כל הנתונים במערכת</p>
+    
+    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <div class="page-body">
+            <!-- אזור כותרת - top-Section -->
+      <div class="top-section">
+        <!-- כותרת בסיס נתונים -->
+        <div class="section-header">
+          <div class="table-title">
+            📊 בסיס נתונים
           </div>
-          <div class="d-flex gap-2">
-            <button class="btn btn-primary" onclick="refreshAllTables()">
-              🔄 רענן הכל
+          <div class="table-actions">
+            <button class="refresh-btn" onclick="exportDatabase()" title="ייצא נתונים">
+              <span class="action-icon">📤</span> ייצא נתונים
             </button>
-            <button class="btn btn-success" onclick="exportDatabase()">
-              📤 ייצא נתונים
+            <div class="action-separator"></div>
+            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="סגור/פתח את כל הסקשנים" style="font-size: 1.2em; padding: 8px 12px;">
+              <span class="filter-icon">▲</span>
             </button>
           </div>
         </div>
-      </div>
-
-
-    </div>
-
-    <div class="database-container">
+      </div> <!-- סוף top-section -->
+        
+      <!-- תוכן ראשי -->
+      <div class="main-content">
 
       <!-- מודלים - מוגדרים בתחילת הדף כדי להיות זמינים מיד -->
       <!-- Warning Modal -->
@@ -259,7 +267,6 @@
               >
             </div>
             <button class="add-btn action-btn" onclick="showAddTradePlanModal()" title="הוסף תוכנית חדשה"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTradePlans()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
             <button class="filter-toggle-btn" onclick="toggleTradePlansSection()" title="הצג/הסתר טבלת תוכניות טרייד">
               <span class="filter-icon">▲</span>
             </button>
@@ -313,12 +320,7 @@
                 onkeyup="filterTable('tradesTable', this.value)"
               >
             </div>
-            <button class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
-              <span class="action-icon">➕</span> הוסף
-            </button>
-            <button class="refresh-btn" onclick="loadTrades()" title="רענן טבלה">
-              <span class="action-icon">🔄</span> רענן
-            </button>
+            <button class="add-btn action-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש"><span class="btn-icon">➕</span> הוסף</button>
             <button class="filter-toggle-btn" onclick="toggleTradesSection()" title="הצג/הסתר טבלת טריידים">
               <span class="filter-icon">▲</span>
             </button>
@@ -371,7 +373,6 @@
               >
             </div>
             <button class="add-btn action-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadAccounts()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
             <button class="filter-toggle-btn" onclick="toggleAccountsSection()" title="הצג/הסתר טבלת חשבונות">
               <span class="filter-icon">▲</span>
             </button>
@@ -421,7 +422,6 @@
               >
             </div>
             <button class="add-btn action-btn" onclick="showAddTickerModal()" title="הוסף טיקר חדש"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadTickers()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
             <button class="filter-toggle-btn" onclick="toggleTickersSection()" title="הצג/הסתר טבלת טיקרים">
               <span class="filter-icon">▲</span>
             </button>
@@ -471,7 +471,6 @@
               >
             </div>
             <button class="add-btn action-btn" onclick="showAddExecutionModal()" title="הוסף ביצוע חדש"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadExecutions()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
             <button class="filter-toggle-btn" onclick="toggleExecutionsSection()" title="הצג/הסתר טבלת ביצועים">
               <span class="filter-icon">▲</span>
             </button>
@@ -521,7 +520,6 @@
               >
             </div>
             <button class="add-btn action-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים חדש"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadCashFlows()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
             <button class="filter-toggle-btn" onclick="toggleCashFlowsSection()" title="הצג/הסתר טבלת תזרימי מזומנים">
               <span class="filter-icon">▲</span>
             </button>
@@ -570,7 +568,6 @@
               >
             </div>
             <button class="add-btn action-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadAlerts()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
             <button class="filter-toggle-btn" onclick="toggleAlertsSection()" title="הצג/הסתר טבלת התראות">
               <span class="filter-icon">▲</span>
             </button>
@@ -621,7 +618,6 @@
               >
             </div>
             <button class="add-btn action-btn" onclick="showAddNoteModal()" title="הוסף הערה חדשה"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadNotes()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
             <button class="filter-toggle-btn" onclick="toggleNotesSection()" title="הצג/הסתר טבלת הערות">
               <span class="filter-icon">▲</span>
             </button>
@@ -672,7 +668,6 @@
               >
             </div>
             <button class="add-btn action-btn" onclick="showAddUserRoleModal()" title="הוסף תפקיד משתמש חדש"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadUserRoles()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
             <button class="filter-toggle-btn" onclick="toggleUserRolesSection()" title="הצג/הסתר טבלת תפקידי משתמשים">
               <span class="filter-icon">▲</span>
             </button>
@@ -721,7 +716,6 @@
               >
             </div>
             <button class="add-btn action-btn" onclick="showAddUserModal()" title="הוסף משתמש חדש"><span class="btn-icon">➕</span> הוסף</button>
-            <button class="refresh-btn" onclick="loadUsers()" title="רענן טבלה"><span class="btn-icon">🔄</span> רענן</button>
             <button class="filter-toggle-btn" onclick="toggleUsersSection()" title="הצג/הסתר טבלת משתמשים">
               <span class="filter-icon">▲</span>
             </button>
@@ -2243,7 +2237,7 @@
       alert('פונקציית ייצוא תתווסף בקרוב');
     }
 
-    // פונקציות עריכה ומחיקה - משתמשות בפונקציות הכלליות מקובץ grid-table.js
+    // פונקציות עריכה ומחיקה - משתמשות בפונקציות הכלליות מקובץ main.js
     // הפונקציות הספציפיות הוסרו לטובת הפונקציות הכלליות:
     // - editRecord(tableType, recordId)
     // - deleteRecord(tableType, recordId)
@@ -2331,210 +2325,47 @@
 
 
 
-    // פונקציות לפתיחה/סגירה של סקציות
-    function toggleUserRolesSection() {
-        const container = document.getElementById('userRolesContainer');
-        const footer = document.querySelector('#userRolesSection .table-footer');
-        const icon = document.querySelector('#userRolesSection .filter-icon');
-        
-        if (container.style.display === 'none') {
-            container.style.display = 'block';
-            footer.style.display = 'block';
-            icon.textContent = '▲';
-            localStorage.setItem('userRolesSectionCollapsed', 'false');
-        } else {
-            container.style.display = 'none';
-            footer.style.display = 'none';
-            icon.textContent = '▼';
-            localStorage.setItem('userRolesSectionCollapsed', 'true');
-        }
-    }
-
-    function toggleUsersSection() {
-      const container = document.getElementById('usersContainer');
-      const footer = document.querySelector('#usersSection .table-footer');
-      const icon = document.querySelector('#usersSection .filter-icon');
-      if (container.style.display === 'none') {
-        container.style.display = 'block';
-        footer.style.display = 'block';
-        icon.textContent = '▲';
-        localStorage.setItem('usersSectionOpen', 'true');
-      } else {
-        container.style.display = 'none';
-        footer.style.display = 'none';
-        icon.textContent = '▼';
-        localStorage.setItem('usersSectionOpen', 'false');
+    // פונקציה כללית לפתיחה/סגירה של סקשנים
+    function toggleSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      const icon = document.querySelector(`#${sectionId} .filter-icon`);
+      
+      if (!section || !icon) {
+        console.error(`❌ לא נמצא סקשן או אייקון עבור: ${sectionId}`);
+        return;
       }
-    }
-
-    function toggleAccountsSection() {
-      const container = document.getElementById('accountsContainer');
-      const footer = document.querySelector('#accountsSection .table-footer');
-      const icon = document.querySelector('#accountsSection .filter-icon');
-      if (container.style.display === 'none') {
-        container.style.display = 'block';
-        footer.style.display = 'block';
-        icon.textContent = '▲';
-        localStorage.setItem('accountsSectionOpen', 'true');
-      } else {
-        container.style.display = 'none';
-        footer.style.display = 'none';
-        icon.textContent = '▼';
-        localStorage.setItem('accountsSectionOpen', 'false');
-      }
-    }
-
-    function toggleTickersSection() {
-      const container = document.getElementById('tickersContainer');
-      const footer = document.querySelector('#tickersSection .table-footer');
-      const icon = document.querySelector('#tickersSection .filter-icon');
-      if (container.style.display === 'none') {
-        container.style.display = 'block';
-        footer.style.display = 'block';
-        icon.textContent = '▲';
-        localStorage.setItem('tickersSectionOpen', 'true');
-      } else {
-        container.style.display = 'none';
-        footer.style.display = 'none';
-        icon.textContent = '▼';
-        localStorage.setItem('tickersSectionOpen', 'false');
-      }
-    }
-
-    function toggleTradesSection() {
-      const container = document.getElementById('tradesContainer');
-      const footer = document.querySelector('#tradesSection .table-footer');
-      const icon = document.querySelector('#tradesSection .filter-icon');
-      if (container.style.display === 'none') {
-        container.style.display = 'block';
-        footer.style.display = 'block';
-        icon.textContent = '▲';
-        localStorage.setItem('tradesSectionOpen', 'true');
-      } else {
-        container.style.display = 'none';
-        footer.style.display = 'none';
-        icon.textContent = '▼';
-        localStorage.setItem('tradesSectionOpen', 'false');
-      }
-    }
-
-    function toggleTradePlansSection() {
-      const container = document.getElementById('tradePlansContainer');
-      const footer = document.querySelector('#tradePlansSection .table-footer');
-      const icon = document.querySelector('#tradePlansSection .filter-icon');
-      if (container.style.display === 'none') {
-        container.style.display = 'block';
-        footer.style.display = 'block';
-        icon.textContent = '▲';
-        localStorage.setItem('tradePlansSectionOpen', 'true');
-      } else {
-        container.style.display = 'none';
-        footer.style.display = 'none';
-        icon.textContent = '▼';
-        localStorage.setItem('tradePlansSectionOpen', 'false');
-      }
-    }
-
-    function toggleAlertsSection() {
-      const section = document.getElementById('alertsSection');
-      const container = document.getElementById('alertsContainer');
-      const footer = document.querySelector('#alertsSection .table-footer');
-      const icon = document.querySelector('#alertsSection .filter-icon');
       
       if (section.classList.contains('collapsed')) {
-        // פתיחת הסקשן
         section.classList.remove('collapsed');
-        container.style.display = 'block';
-        footer.style.display = 'block';
         icon.textContent = '▲';
-        localStorage.setItem('alertsSectionOpen', 'true');
+        localStorage.setItem(`${sectionId}Collapsed`, 'false');
       } else {
-        // סגירת הסקשן
         section.classList.add('collapsed');
-        container.style.display = 'none';
-        footer.style.display = 'none';
         icon.textContent = '▼';
-        localStorage.setItem('alertsSectionOpen', 'false');
+        localStorage.setItem(`${sectionId}Collapsed`, 'true');
       }
     }
 
-    function toggleCashFlowsSection() {
-      const section = document.getElementById('cashFlowsSection');
-      const container = document.getElementById('cashFlowsContainer');
-      const footer = document.querySelector('#cashFlowsSection .table-footer');
-      const icon = document.querySelector('#cashFlowsSection .filter-icon');
-      
-      if (section.classList.contains('collapsed')) {
-        // פתיחת הסקשן
-        section.classList.remove('collapsed');
-        container.style.display = 'block';
-        footer.style.display = 'block';
-        icon.textContent = '▲';
-        localStorage.setItem('cashFlowsSectionOpen', 'true');
-      } else {
-        // סגירת הסקשן
-        section.classList.add('collapsed');
-        container.style.display = 'none';
-        footer.style.display = 'none';
-        icon.textContent = '▼';
-        localStorage.setItem('cashFlowsSectionOpen', 'false');
-      }
-    }
+    // פונקציות ספציפיות שמשתמשות בפונקציה הכללית
+    function toggleUserRolesSection() { toggleSection('userRolesSection'); }
+    function toggleUsersSection() { toggleSection('usersSection'); }
+    function toggleAccountsSection() { toggleSection('accountsSection'); }
+    function toggleTickersSection() { toggleSection('tickersSection'); }
+    function toggleTradesSection() { toggleSection('tradesSection'); }
+    function toggleTradePlansSection() { toggleSection('tradePlansSection'); }
+    function toggleAlertsSection() { toggleSection('alertsSection'); }
+    function toggleCashFlowsSection() { toggleSection('cashFlowsSection'); }
+    function toggleNotesSection() { toggleSection('notesSection'); }
+    function toggleExecutionsSection() { toggleSection('executionsSection'); }
 
-    function toggleNotesSection() {
-      const section = document.getElementById('notesSection');
-      const container = document.getElementById('notesContainer');
-      const footer = document.querySelector('#notesSection .table-footer');
-      const icon = document.querySelector('#notesSection .filter-icon');
-      
-      if (section.classList.contains('collapsed')) {
-        // פתיחת הסקשן
-        section.classList.remove('collapsed');
-        container.style.display = 'block';
-        footer.style.display = 'block';
-        icon.textContent = '▲';
-        localStorage.setItem('notesSectionOpen', 'true');
-      } else {
-        // סגירת הסקשן
-        section.classList.add('collapsed');
-        container.style.display = 'none';
-        footer.style.display = 'none';
-        icon.textContent = '▼';
-        localStorage.setItem('notesSectionOpen', 'false');
-      }
-    }
-
-    function toggleExecutionsSection() {
-      const section = document.getElementById('executionsSection');
-      const container = document.getElementById('executionsContainer');
-      const footer = document.querySelector('#executionsSection .table-footer');
-      const icon = document.querySelector('#executionsSection .filter-icon');
-      
-      if (section.classList.contains('collapsed')) {
-        // פתיחת הסקשן
-        section.classList.remove('collapsed');
-        container.style.display = 'block';
-        footer.style.display = 'block';
-        icon.textContent = '▲';
-        localStorage.setItem('executionsSectionOpen', 'true');
-      } else {
-        // סגירת הסקשן
-        section.classList.add('collapsed');
-        container.style.display = 'none';
-        footer.style.display = 'none';
-        icon.textContent = '▼';
-        localStorage.setItem('executionsSectionOpen', 'false');
-      }
-    }
-
-    // פונקציות מודלים - הוסרו לטובת הפונקציות הכלליות מקובץ grid-table.js
+    // פונקציות מודלים - הוסרו לטובת הפונקציות הכלליות מקובץ main.js
     // הפונקציות הספציפיות הוסרו לטובת הפונקציות הכלליות:
     // - showEditModal(tableType, data)
     // - fillEditModalData(tableType, data)
     // - saveRecord(tableType)
 
     // הגדרת פונקציות גלובליות לעריכה ומחיקה
-    // הפונקציות מוגדרות בקובץ grid-table.js
+    // הפונקציות מוגדרות בקובץ main.js
     console.log('✅ editRecord function available:', typeof window.editRecord);
     console.log('✅ deleteRecord function available:', typeof window.deleteRecord);
 
@@ -2637,6 +2468,8 @@
     });
 
     // המודלים מוגדרים כעת בתחילת הדף - אין צורך ליצור אותם דינמית
+
+    // הפונקציה toggleAllSections מוגדרת בקובץ main.js
 
   </script>
 
@@ -2876,9 +2709,9 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
           <button type="button" class="btn btn-primary" onclick="saveNewTradeRecord()">הוסף</button>
         </div>
-      </div>
-    </div>
-  </div>
+      </div> <!-- סוף main-content -->
+    </div> <!-- סוף page-body -->
+  </div> <!-- סוף background-wrapper -->
 </body>
 </html>
 

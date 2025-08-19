@@ -13,14 +13,20 @@ help:
 	@echo "  test-performance - Run performance tests only"
 	@echo "  test-load     - Run load tests only"
 	@echo "  test-security - Run security tests only"
+	@echo "  test-safe     - Run tests with database protection"
+	@echo "  test-with-backup - Run tests with database backup"
 	@echo "  coverage      - Run tests with coverage report"
 	@echo "  clean         - Clean test artifacts"
 	@echo "  install       - Install test dependencies"
+	@echo "  validate      - Validate test environment"
+	@echo ""
+	@echo "  test-file FILE=path - Test specific file"
+	@echo "  test-function FILE=path FUNCTION=name - Test specific function"
 	@echo ""
 
 # Install test dependencies
 install:
-	pip3 install pytest pytest-cov pytest-html pytest-xdist
+	pip3 install -r requirements.txt
 
 # Run all tests
 test:
@@ -107,3 +113,38 @@ quick: test-fast
 
 # Full test suite (all tests with coverage)
 full: coverage test-html summary
+
+# Safe test execution (with database protection)
+test-safe:
+	python3 -m pytest -v --tb=short --strict-markers --disable-warnings
+
+# Test specific test file
+test-file:
+	@if [ -z "$(FILE)" ]; then \
+		echo "Usage: make test-file FILE=path/to/test_file.py"; \
+		exit 1; \
+	fi
+	python3 -m pytest $(FILE) -v
+
+# Test specific test function
+test-function:
+	@if [ -z "$(FILE)" ] || [ -z "$(FUNCTION)" ]; then \
+		echo "Usage: make test-function FILE=path/to/test_file.py FUNCTION=test_function_name"; \
+		exit 1; \
+	fi
+	python3 -m pytest $(FILE)::$(FUNCTION) -v
+
+# Run tests with database backup
+test-with-backup:
+	@echo "Creating database backup..."
+	@cp ../db/simpleTrade_new.db ../db/simpleTrade_new_backup_$(shell date +%Y%m%d_%H%M%S).db
+	python3 -m pytest -v
+	@echo "Tests completed. Backup available in ../db/"
+
+# Validate test environment
+validate:
+	@echo "Validating test environment..."
+	@python3 -c "import pytest; print('✓ pytest available')"
+	@python3 -c "import psutil; print('✓ psutil available')"
+	@python3 -c "import sqlite3; print('✓ sqlite3 available')"
+	@echo "✓ Test environment validated"

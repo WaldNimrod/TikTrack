@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,14 +8,14 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Apple Theme CSS - בסיס כללי -->
   <link rel="stylesheet" href="styles/apple-theme.css" />
   <!-- Main Styles - סגנונות הפרויקט -->
   <link rel="stylesheet" href="styles/styles.css?v=10" />
   <!-- Menu CSS - תפריט -->
   <link rel="stylesheet" href="styles/menu.css?v=6" />
+  <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
       margin: 0;
@@ -24,7 +25,8 @@
 
     /* התאמת המרווחים לכותרת החדשה */
     .background-wrapper {
-      padding-top: 120px !important; /* מרווח לכותרת + פילטר + מרווח קטן */
+      padding-top: 120px !important;
+      /* מרווח לכותרת + פילטר + מרווח קטן */
       padding-right: 32px;
       transition: padding-top 0.3s ease;
       position: relative;
@@ -32,31 +34,32 @@
     }
 
     .background-wrapper.filter-collapsed {
-      padding-top: 30px !important; /* מרווח לכותרת בלבד + מרווח קטן */
+      padding-top: 30px !important;
+      /* מרווח לכותרת בלבד + מרווח קטן */
     }
-    
+
     /* עיצוב קומפוננטת התראות פעילות */
     .active-alerts-section {
       margin-bottom: 2rem;
     }
-    
+
     .active-alerts-section .alerts-cards-container {
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
       border: 1px solid #dee2e6;
       border-radius: 16px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
-    
+
     .active-alerts-section .alerts-header h3 {
       color: #495057;
       font-weight: 700;
     }
-    
+
     .active-alerts-section .alerts-count {
       background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%);
       font-weight: 600;
     }
-    
+
     .active-alerts-section .refresh-btn {
       background: #fff;
       border: 1px solid #dee2e6;
@@ -64,19 +67,19 @@
       padding: 8px 12px;
       transition: all 0.2s ease;
     }
-    
+
     .active-alerts-section .refresh-btn:hover {
       background: #f8f9fa;
       border-color: #29a6a8;
       transform: translateY(-1px);
     }
-    
+
     .container {
       padding-top: 1rem;
     }
 
 
-    
+
     .main-content {
       max-width: 1400px;
       margin: 0 auto;
@@ -86,7 +89,7 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
       border: 1px solid #e8e8e8;
     }
-    
+
     .page-header {
       background: var(--apple-bg-elevated);
       border-radius: var(--apple-radius-large);
@@ -98,7 +101,7 @@
       align-items: center;
       border: 1px solid var(--apple-border-light);
     }
-    
+
     .page-title {
       font-size: 28px;
       font-weight: 600;
@@ -106,14 +109,14 @@
       margin: 0;
       letter-spacing: -0.01em;
     }
-    
+
     .page-subtitle {
       font-size: 16px;
       color: var(--apple-text-secondary);
       margin-top: var(--apple-spacing-sm);
       font-weight: 400;
     }
-    
+
     .button-primary {
       background-color: var(--apple-blue);
       color: white;
@@ -126,13 +129,13 @@
       transition: all 0.2s ease;
       letter-spacing: -0.01em;
     }
-    
+
     .button-primary:hover {
       background-color: var(--apple-blue-dark);
       transform: translateY(-1px);
       box-shadow: var(--apple-shadow-medium);
     }
-    
+
     .filters-section {
       background: var(--apple-bg-elevated);
       border-radius: var(--apple-radius-large);
@@ -141,29 +144,30 @@
       margin-bottom: var(--apple-spacing-xl);
       border: 1px solid var(--apple-border-light);
     }
-    
+
     .filters-row {
       display: flex;
       gap: var(--apple-spacing-lg);
       align-items: flex-end;
       flex-wrap: wrap;
     }
-    
+
     .filter-group {
       display: flex;
       flex-direction: column;
       gap: var(--apple-spacing-sm);
       min-width: 150px;
     }
-    
+
     .filter-label {
       font-size: 14px;
       font-weight: 500;
       color: var(--apple-text-secondary);
       letter-spacing: -0.01em;
     }
-    
-    .form-control, .form-select {
+
+    .form-control,
+    .form-select {
       background: var(--apple-bg-primary);
       border: 1px solid var(--apple-border);
       color: var(--apple-text-primary);
@@ -173,15 +177,16 @@
       transition: all 0.2s ease;
       font-family: inherit;
     }
-    
-    .form-control:focus, .form-select:focus {
+
+    .form-control:focus,
+    .form-select:focus {
       background: var(--apple-bg-primary);
       border-color: var(--apple-blue);
       color: var(--apple-text-primary);
       box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
       outline: none;
     }
-    
+
     .btn-outline-secondary {
       border: 1px solid var(--apple-border);
       color: var(--apple-text-secondary);
@@ -192,13 +197,13 @@
       font-weight: 500;
       transition: all 0.2s ease;
     }
-    
+
     .btn-outline-secondary:hover {
       background: var(--apple-gray-1);
       border-color: var(--apple-gray-3);
       color: var(--apple-text-primary);
     }
-    
+
     .grid-container {
       background: var(--apple-bg-elevated);
       border-radius: var(--apple-radius-large);
@@ -206,7 +211,7 @@
       box-shadow: var(--apple-shadow-light);
       border: 1px solid var(--apple-border-light);
     }
-    
+
     .grid-title {
       font-size: 20px;
       font-weight: 600;
@@ -214,7 +219,7 @@
       margin-bottom: var(--apple-spacing-lg);
       letter-spacing: -0.01em;
     }
-    
+
     .ag-theme-quartz {
       --ag-font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --ag-font-size: 14px;
@@ -268,7 +273,7 @@
       --ag-checkbox-focus-indeterminate-box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
       --ag-checkbox-focus-unchecked-box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
     }
-    
+
     .status-badge {
       padding: 6px 12px;
       border-radius: 20px;
@@ -279,25 +284,25 @@
       text-align: center;
       min-width: 60px;
     }
-    
+
     .status-active {
       background: rgba(52, 199, 89, 0.1);
       color: var(--apple-green);
       border: 1px solid rgba(52, 199, 89, 0.2);
     }
-    
+
     .status-inactive {
       background: rgba(255, 59, 48, 0.1);
       color: var(--apple-red);
       border: 1px solid rgba(255, 59, 48, 0.2);
     }
-    
+
     .status-pending {
       background: rgba(255, 149, 0, 0.1);
       color: var(--apple-orange);
       border: 1px solid rgba(255, 149, 0, 0.2);
     }
-    
+
     .type-badge {
       padding: 6px 12px;
       border-radius: 16px;
@@ -308,43 +313,43 @@
       text-align: center;
       min-width: 80px;
     }
-    
+
     .type-planning {
       background: rgba(175, 82, 222, 0.1);
       color: var(--apple-purple);
       border: 1px solid rgba(175, 82, 222, 0.2);
     }
-    
+
     .type-trade-open {
       background: rgba(52, 199, 89, 0.1);
       color: var(--apple-green);
       border: 1px solid rgba(52, 199, 89, 0.2);
     }
-    
+
     .type-trade-closed {
       background: rgba(255, 59, 48, 0.1);
       color: var(--apple-red);
       border: 1px solid rgba(255, 59, 48, 0.2);
     }
-    
+
     .type-ticker {
       background: rgba(0, 122, 255, 0.1);
       color: var(--apple-blue);
       border: 1px solid rgba(0, 122, 255, 0.2);
     }
-    
+
     .type-other {
       background: rgba(142, 142, 147, 0.1);
       color: var(--apple-gray-6);
       border: 1px solid rgba(142, 142, 147, 0.2);
     }
-    
+
     .action-buttons {
       display: flex;
       gap: var(--apple-spacing-sm);
       justify-content: center;
     }
-    
+
     .btn-sm {
       padding: 8px 12px;
       font-size: 12px;
@@ -355,44 +360,44 @@
       transition: all 0.2s ease;
       font-weight: 500;
     }
-    
+
     .btn-sm:hover {
       background: var(--apple-gray-1);
       border-color: var(--apple-gray-3);
       color: var(--apple-text-primary);
       transform: translateY(-1px);
     }
-    
+
     .btn-outline-primary {
       border-color: var(--apple-blue);
       color: var(--apple-blue);
     }
-    
+
     .btn-outline-primary:hover {
       background: var(--apple-blue);
       color: white;
     }
-    
+
     .btn-outline-success {
       border-color: var(--apple-green);
       color: var(--apple-green);
     }
-    
+
     .btn-outline-success:hover {
       background: var(--apple-green);
       color: white;
     }
-    
+
     .btn-outline-danger {
       border-color: var(--apple-red);
       color: var(--apple-red);
     }
-    
+
     .btn-outline-danger:hover {
       background: var(--apple-red);
       color: white;
     }
-    
+
     .modal-content {
       background: var(--apple-bg-elevated);
       color: var(--apple-text-primary);
@@ -400,28 +405,28 @@
       border-radius: var(--apple-radius-large);
       box-shadow: var(--apple-shadow-heavy);
     }
-    
+
     .modal-header {
       border-bottom: 1px solid var(--apple-border-light);
       padding: var(--apple-spacing-xl);
     }
-    
+
     .modal-body {
       padding: var(--apple-spacing-xl);
     }
-    
+
     .modal-footer {
       border-top: 1px solid var(--apple-border-light);
       padding: var(--apple-spacing-xl);
     }
-    
+
     .modal-title {
       font-size: 20px;
       font-weight: 600;
       color: var(--apple-text-primary);
       letter-spacing: -0.01em;
     }
-    
+
     .form-label {
       color: var(--apple-text-primary);
       font-weight: 500;
@@ -429,7 +434,7 @@
       margin-bottom: var(--apple-spacing-sm);
       letter-spacing: -0.01em;
     }
-    
+
     .btn-close {
       background: none;
       border: none;
@@ -445,12 +450,12 @@
       border-radius: 50%;
       transition: all 0.2s ease;
     }
-    
+
     .btn-close:hover {
       background: var(--apple-gray-1);
       color: var(--apple-text-primary);
     }
-    
+
     .btn {
       padding: 12px 24px;
       border-radius: var(--apple-radius-medium);
@@ -460,7 +465,7 @@
       letter-spacing: -0.01em;
       border: 1px solid transparent;
     }
-    
+
     .btn-primary {
       background: #29a6a8 !important;
       border-color: #29a6a8 !important;
@@ -472,61 +477,61 @@
       transition: all 0.2s ease !important;
       box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3) !important;
     }
-    
+
     .btn-primary:hover {
       background: #1f8a8c !important;
       border-color: #1f8a8c !important;
       transform: translateY(-2px) !important;
       box-shadow: 0 4px 12px rgba(41, 166, 168, 0.4) !important;
     }
-    
+
     .btn-secondary {
       background: var(--apple-gray-1);
       color: var(--apple-text-secondary);
       border-color: var(--apple-border);
     }
-    
+
     .btn-secondary:hover {
       background: var(--apple-gray-2);
       color: var(--apple-text-primary);
       border-color: var(--apple-gray-3);
     }
-    
+
     .btn-danger {
       background: var(--apple-red);
       color: white;
       border-color: var(--apple-red);
     }
-    
+
     .btn-danger:hover {
       background: #d70015;
       border-color: #d70015;
       transform: translateY(-1px);
       box-shadow: var(--apple-shadow-medium);
     }
-    
+
     /* תמיכה במכשירים ניידים */
     @media (max-width: 768px) {
       .main-content {
         padding: var(--apple-spacing-md);
         margin-top: 44px;
       }
-      
+
       .page-header {
         flex-direction: column;
         gap: var(--apple-spacing-lg);
         align-items: flex-start;
       }
-      
+
       .filters-row {
         flex-direction: column;
         gap: var(--apple-spacing-md);
       }
-      
+
       .filter-group {
         min-width: 100%;
       }
-      
+
       .action-buttons {
         flex-direction: column;
         gap: var(--apple-spacing-xs);
@@ -534,68 +539,70 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Web Component של הכותרת -->
   <app-header></app-header>
 
   <!-- Menu will be loaded here -->
   <div id="menu-container"></div>
-  
+
   <div class="background-wrapper">
     <div class="main-content">
       <!-- קומפוננטת התראות פעילות -->
       <active-alerts></active-alerts>
 
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">ניהול התראות</h1>
-        <p class="page-subtitle">ניהול התראות מחיר וסטטוס</p>
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">ניהול התראות</h1>
+          <p class="page-subtitle">ניהול התראות מחיר וסטטוס</p>
+        </div>
+        <button class="button-primary add-plan-btn" onclick="showAddAlertModal()">הוסף התראה חדשה</button>
       </div>
-      <button class="button-primary add-plan-btn" onclick="showAddAlertModal()">הוסף התראה חדשה</button>
-    </div>
-    
-    <!-- סינון וחיפוש -->
-    <div class="filters-section">
-      <div class="filters-row">
-        <div class="filter-group">
-          <label class="filter-label">סטטוס</label>
-          <select class="form-select" id="statusFilter" onchange="filterAlerts()">
-            <option value="">כל הסטטוסים</option>
-            <option value="פעיל">פעיל</option>
-            <option value="לא פעיל">לא פעיל</option>
-            <option value="ממתין">ממתין</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">סוג שיוך</label>
-          <select class="form-select" id="typeFilter" onchange="filterAlerts()">
-            <option value="">כל הסוגים</option>
-            <option value="תכנון">תכנון</option>
-            <option value="טרייד פתוח">טרייד פתוח</option>
-            <option value="טרייד סגור">טרייד סגור</option>
-            <option value="טיקר">טיקר</option>
-            <option value="אחר">אחר</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">חיפוש מהיר</label>
-          <input type="text" class="form-control" id="searchInput" placeholder="חיפוש בהתראות..." onkeyup="filterAlerts()">
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">&nbsp;</label>
-          <button class="btn btn-outline-secondary" onclick="clearFilters()">נקה סינון</button>
+
+      <!-- סינון וחיפוש -->
+      <div class="filters-section">
+        <div class="filters-row">
+          <div class="filter-group">
+            <label class="filter-label">סטטוס</label>
+            <select class="form-select" id="statusFilter" onchange="filterAlerts()">
+              <option value="">כל הסטטוסים</option>
+              <option value="פעיל">פעיל</option>
+              <option value="לא פעיל">לא פעיל</option>
+              <option value="ממתין">ממתין</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">סוג שיוך</label>
+            <select class="form-select" id="typeFilter" onchange="filterAlerts()">
+              <option value="">כל הסוגים</option>
+              <option value="תכנון">תכנון</option>
+              <option value="טרייד פתוח">טרייד פתוח</option>
+              <option value="טרייד סגור">טרייד סגור</option>
+              <option value="טיקר">טיקר</option>
+              <option value="אחר">אחר</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">חיפוש מהיר</label>
+            <input type="text" class="form-control" id="searchInput" placeholder="חיפוש בהתראות..."
+              onkeyup="filterAlerts()">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">&nbsp;</label>
+            <button class="btn btn-outline-secondary" onclick="clearFilters()">נקה סינון</button>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <!-- גריד התראות -->
-    <div class="grid-container">
-      <h3 class="grid-title">טבלת התראות</h3>
-      <div id="alertsGrid" class="ag-theme-quartz" style="height: 600px; width: 100%;"></div>
+
+      <!-- גריד התראות -->
+      <div class="grid-container">
+        <h3 class="grid-title">טבלת התראות</h3>
+        <div id="alertsGrid" class="ag-theme-quartz" style="height: 600px; width: 100%;"></div>
+      </div>
     </div>
   </div>
-  </div>
-  
+
   <!-- מודל הוספת התראה -->
   <div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -638,29 +645,29 @@
                   <option value="volume_alert">התראה על נפח</option>
                   <option value="custom_alert">התראה מותאמת</option>
                 </select>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="alertStatus" class="form-label">סטטוס</label>
-                <select class="form-select" id="alertStatus">
-                  <option value="פעיל">פעיל</option>
-                  <option value="לא פעיל">לא פעיל</option>
-                  <option value="ממתין">ממתין</option>
-                </select>
               </div>
-              <div class="col-md-6 mb-3">
-                <label for="alertPriority" class="form-label">עדיפות</label>
-                <select class="form-select" id="alertPriority">
-                  <option value="נמוכה">נמוכה</option>
-                  <option value="בינונית">בינונית</option>
-                  <option value="גבוהה">גבוהה</option>
-                </select>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="alertStatus" class="form-label">סטטוס</label>
+                  <select class="form-select" id="alertStatus">
+                    <option value="פעיל">פעיל</option>
+                    <option value="לא פעיל">לא פעיל</option>
+                    <option value="ממתין">ממתין</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="alertPriority" class="form-label">עדיפות</label>
+                  <select class="form-select" id="alertPriority">
+                    <option value="נמוכה">נמוכה</option>
+                    <option value="בינונית">בינונית</option>
+                    <option value="גבוהה">גבוהה</option>
+                  </select>
+                </div>
               </div>
-            </div>
-            <div class="mb-3">
-              <label for="alertDescription" class="form-label">תיאור</label>
-              <textarea class="form-control" id="alertDescription" rows="3" placeholder="תיאור ההתראה..."></textarea>
-            </div>
+              <div class="mb-3">
+                <label for="alertDescription" class="form-label">תיאור</label>
+                <textarea class="form-control" id="alertDescription" rows="3" placeholder="תיאור ההתראה..."></textarea>
+              </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -714,29 +721,30 @@
                   <option value="volume_alert">התראה על נפח</option>
                   <option value="custom_alert">התראה מותאמת</option>
                 </select>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editAlertStatus" class="form-label">סטטוס</label>
-                <select class="form-select" id="editAlertStatus">
-                  <option value="פעיל">פעיל</option>
-                  <option value="לא פעיל">לא פעיל</option>
-                  <option value="ממתין">ממתין</option>
-                </select>
               </div>
-              <div class="col-md-6 mb-3">
-                <label for="editAlertPriority" class="form-label">עדיפות</label>
-                <select class="form-select" id="editAlertPriority">
-                  <option value="נמוכה">נמוכה</option>
-                  <option value="בינונית">בינונית</option>
-                  <option value="גבוהה">גבוהה</option>
-                </select>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="editAlertStatus" class="form-label">סטטוס</label>
+                  <select class="form-select" id="editAlertStatus">
+                    <option value="פעיל">פעיל</option>
+                    <option value="לא פעיל">לא פעיל</option>
+                    <option value="ממתין">ממתין</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="editAlertPriority" class="form-label">עדיפות</label>
+                  <select class="form-select" id="editAlertPriority">
+                    <option value="נמוכה">נמוכה</option>
+                    <option value="בינונית">בינונית</option>
+                    <option value="גבוהה">גבוהה</option>
+                  </select>
+                </div>
               </div>
-            </div>
-            <div class="mb-3">
-              <label for="editAlertDescription" class="form-label">תיאור</label>
-              <textarea class="form-control" id="editAlertDescription" rows="3" placeholder="תיאור ההתראה..."></textarea>
-            </div>
+              <div class="mb-3">
+                <label for="editAlertDescription" class="form-label">תיאור</label>
+                <textarea class="form-control" id="editAlertDescription" rows="3"
+                  placeholder="תיאור ההתראה..."></textarea>
+              </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -747,7 +755,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
@@ -814,23 +822,23 @@
 
     // הגדרת עמודות הגריד
     const columnDefs = [
-      { 
-        field: 'id', 
-        headerName: 'מזהה', 
+      {
+        field: 'id',
+        headerName: 'מזהה',
         width: 80,
         sortable: true,
         filter: true
       },
-      { 
-        field: 'title', 
-        headerName: 'כותרת', 
+      {
+        field: 'title',
+        headerName: 'כותרת',
         width: 200,
         sortable: true,
         filter: true
       },
-      { 
-        field: 'related_type', 
-        headerName: 'סוג ישות', 
+      {
+        field: 'related_type',
+        headerName: 'סוג ישות',
         width: 120,
         sortable: true,
         filter: true,
@@ -839,16 +847,16 @@
           return `<span class="type-badge ${typeClass}">${params.value}</span>`;
         }
       },
-      { 
-        field: 'related_id', 
-        headerName: 'מזהה ישות', 
+      {
+        field: 'related_id',
+        headerName: 'מזהה ישות',
         width: 100,
         sortable: true,
         filter: true
       },
-      { 
-        field: 'type', 
-        headerName: 'סוג התראה', 
+      {
+        field: 'type',
+        headerName: 'סוג התראה',
         width: 120,
         sortable: true,
         filter: true,
@@ -857,9 +865,9 @@
           return `<span class="type-badge ${typeClass}">${params.value}</span>`;
         }
       },
-      { 
-        field: 'status', 
-        headerName: 'סטטוס', 
+      {
+        field: 'status',
+        headerName: 'סטטוס',
         width: 100,
         sortable: true,
         filter: true,
@@ -868,23 +876,23 @@
           return `<span class="status-badge ${statusClass}">${params.value}</span>`;
         }
       },
-      { 
-        field: 'condition', 
-        headerName: 'תנאי', 
+      {
+        field: 'condition',
+        headerName: 'תנאי',
         width: 200,
         sortable: true,
         filter: true
       },
-      { 
-        field: 'message', 
-        headerName: 'הודעה', 
+      {
+        field: 'message',
+        headerName: 'הודעה',
         width: 200,
         sortable: true,
         filter: true
       },
-      { 
-        field: 'created_at', 
-        headerName: 'תאריך יצירה', 
+      {
+        field: 'created_at',
+        headerName: 'תאריך יצירה',
         width: 120,
         sortable: true,
         filter: true
@@ -952,7 +960,7 @@
 
     // פונקציות עזר
     function getStatusClass(status) {
-      switch(status) {
+      switch (status) {
         case 'פעיל': return 'status-active';
         case 'לא פעיל': return 'status-inactive';
         case 'ממתין': return 'status-pending';
@@ -961,7 +969,7 @@
     }
 
     function getTypeClass(type) {
-      switch(type) {
+      switch (type) {
         case 'תכנון': return 'type-planning';
         case 'טרייד פתוח': return 'type-trade-open';
         case 'טרייד סגור': return 'type-trade-closed';
@@ -976,18 +984,18 @@
       const statusFilter = document.getElementById('statusFilter').value;
       const typeFilter = document.getElementById('typeFilter').value;
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      
+
       filteredAlerts = allAlerts.filter(alert => {
         const matchesStatus = !statusFilter || alert.status === statusFilter;
         const matchesType = !typeFilter || alert.type === typeFilter;
-        const matchesSearch = !searchTerm || 
+        const matchesSearch = !searchTerm ||
           alert.title.toLowerCase().includes(searchTerm) ||
           alert.description.toLowerCase().includes(searchTerm) ||
           alert.id.toString().includes(searchTerm);
-        
+
         return matchesStatus && matchesType && matchesSearch;
       });
-      
+
       updateGrid();
     }
 
@@ -1005,15 +1013,15 @@
     }
 
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
     // פונקציות עזר
     function getTimeAgo(dateString) {
       const now = new Date();
@@ -1022,15 +1030,15 @@
       const diffMins = Math.floor(diffMs / (1000 * 60));
       const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      
+
       if (diffMins < 1) return 'עכשיו';
       if (diffMins < 60) return `לפני ${diffMins} דקות`;
       if (diffHours < 24) return `לפני ${diffHours} שעות`;
       if (diffDays < 7) return `לפני ${diffDays} ימים`;
-      
+
       return date.toLocaleDateString('he-IL');
     }
-    
+
     function getAlertIcon(alertType) {
       const icons = {
         'price_alert': '🎯',
@@ -1040,7 +1048,7 @@
       };
       return icons[alertType] || '🔔';
     }
-    
+
     function getAlertTypeDisplay(alertType) {
       const types = {
         'price_alert': 'התראה על מחיר',
@@ -1050,7 +1058,7 @@
       };
       return types[alertType] || alertType;
     }
-    
+
     function getEntityTypeDisplay(entityType) {
       const types = {
         'account': 'חשבון',
@@ -1060,25 +1068,25 @@
       };
       return types[entityType] || entityType;
     }
-    
+
     function extractTickerFromCondition(condition) {
       if (!condition) return '';
-      
+
       const tickerPatterns = [
         /\b(AAPL|TSLA|MSFT|GOOGL|NVDA|AMZN|META|NFLX|SPY|QQQ|IWM)\b/gi,
         /\b([A-Z]{2,5})\b/g
       ];
-      
+
       for (const pattern of tickerPatterns) {
         const match = condition.match(pattern);
         if (match) {
           return match[0].toUpperCase();
         }
       }
-      
+
       return '';
     }
-    
+
     function getCurrentPrice(ticker) {
       const prices = {
         'AAPL': '185.50',
@@ -1095,7 +1103,7 @@
       };
       return prices[ticker] || '0.00';
     }
-    
+
     function getDailyChange(ticker) {
       const changes = {
         'AAPL': '+2.3',
@@ -1112,7 +1120,7 @@
       };
       return changes[ticker] || '0.0';
     }
-    
+
     function getDailyChangeClass(ticker) {
       const change = getDailyChange(ticker);
       if (change.startsWith('+')) {
@@ -1127,21 +1135,21 @@
     async function loadRelatedEntities() {
       const relatedType = document.getElementById('alertRelatedType').value;
       const relatedIdSelect = document.getElementById('alertRelatedId');
-      
+
       if (!relatedType) {
         relatedIdSelect.innerHTML = '<option value="">בחר ישות</option>';
         return;
       }
-      
+
       // בדיקה במטמון
       if (entitiesCache[relatedType]) {
         populateRelatedEntities(relatedIdSelect, entitiesCache[relatedType]);
         return;
       }
-      
+
       try {
         let entities = [];
-        
+
         switch (relatedType) {
           case 'account':
             const accountsResponse = await fetch('/api/accounts');
@@ -1164,17 +1172,17 @@
             entities = tickersData.map(ticker => ({ id: ticker.id, name: ticker.symbol }));
             break;
         }
-        
+
         // שמירה במטמון
         entitiesCache[relatedType] = entities;
         populateRelatedEntities(relatedIdSelect, entities);
-        
+
       } catch (error) {
         console.error('שגיאה בטעינת ישויות:', error);
         relatedIdSelect.innerHTML = '<option value="">שגיאה בטעינה</option>';
       }
     }
-    
+
     function populateRelatedEntities(select, entities) {
       select.innerHTML = '<option value="">בחר ישות</option>';
       entities.forEach(entity => {
@@ -1184,25 +1192,25 @@
         select.appendChild(option);
       });
     }
-    
+
     async function loadEditRelatedEntities() {
       const relatedType = document.getElementById('editAlertRelatedType').value;
       const relatedIdSelect = document.getElementById('editAlertRelatedId');
-      
+
       if (!relatedType) {
         relatedIdSelect.innerHTML = '<option value="">בחר ישות</option>';
         return;
       }
-      
+
       // בדיקה במטמון
       if (entitiesCache[relatedType]) {
         populateRelatedEntities(relatedIdSelect, entitiesCache[relatedType]);
         return;
       }
-      
+
       try {
         let entities = [];
-        
+
         switch (relatedType) {
           case 'account':
             const accountsResponse = await fetch('/api/accounts');
@@ -1225,11 +1233,11 @@
             entities = tickersData.map(ticker => ({ id: ticker.id, name: ticker.symbol }));
             break;
         }
-        
+
         // שמירה במטמון
         entitiesCache[relatedType] = entities;
         populateRelatedEntities(relatedIdSelect, entities);
-        
+
       } catch (error) {
         console.error('שגיאה בטעינת ישויות:', error);
         relatedIdSelect.innerHTML = '<option value="">שגיאה בטעינה</option>';
@@ -1252,13 +1260,13 @@
         document.getElementById('editAlertStatus').value = alert.status;
         document.getElementById('editAlertDescription').value = alert.condition || '';
         document.getElementById('editAlertTitle').value = alert.message || '';
-        
+
         // טעינת ישויות לעריכה
         if (alert.related_type) {
           await loadEditRelatedEntities();
           document.getElementById('editAlertRelatedId').value = alert.related_id || '';
         }
-        
+
         const modal = new bootstrap.Modal(document.getElementById('editAlertModal'));
         modal.show();
       }
@@ -1290,11 +1298,11 @@
         });
 
         const result = await response.json();
-        
+
         if (result.status === 'success') {
           const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
           modal.hide();
-          
+
           await loadAlertsData();
           showNotification('התראה נוספה בהצלחה!', 'success');
         } else {
@@ -1311,7 +1319,7 @@
         };
         allAlerts.unshift(newAlert);
         updateGrid();
-        
+
         const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
         modal.hide();
         showNotification('התראה נוספה בהצלחה!', 'success');
@@ -1345,11 +1353,11 @@
         });
 
         const result = await response.json();
-        
+
         if (result.status === 'success') {
           const modal = bootstrap.Modal.getInstance(document.getElementById('editAlertModal'));
           modal.hide();
-          
+
           await loadAlertsData();
           showNotification('התראה עודכנה בהצלחה!', 'success');
         } else {
@@ -1366,7 +1374,7 @@
             updated_at: new Date().toISOString().split('T')[0]
           };
           updateGrid();
-          
+
           const modal = bootstrap.Modal.getInstance(document.getElementById('editAlertModal'));
           modal.hide();
           showNotification('התראה עודכנה בהצלחה!', 'success');
@@ -1377,7 +1385,7 @@
     async function deleteAlert(alertId) {
       const alert = allAlerts.find(a => a.id === alertId);
       if (!alert) return;
-      
+
       if (!confirm(`האם אתה בטוח שברצונך למחוק את ההתראה "${alert.title}"?`)) {
         return;
       }
@@ -1388,7 +1396,7 @@
         });
 
         const result = await response.json();
-        
+
         if (result.status === 'success') {
           await loadAlertsData();
           showNotification('התראה נמחקה בהצלחה!', 'success');
@@ -1409,7 +1417,7 @@
       if (!alert) return;
 
       const newStatus = alert.status === 'פעיל' ? 'לא פעיל' : 'פעיל';
-      
+
       try {
         const response = await fetch(`/api/alerts/${alertId}`, {
           method: 'PUT',
@@ -1420,7 +1428,7 @@
         });
 
         const result = await response.json();
-        
+
         if (result.status === 'success') {
           await loadAlertsData();
           showNotification(`סטטוס ההתראה שונה ל-${newStatus}`, 'success');
@@ -1444,16 +1452,16 @@
     async function loadAlertsData() {
       try {
         console.log('🔄 === LOAD ALERTS DATA ===');
-        
+
         // קריאה מה-API
         const response = await fetch('/api/v1/alerts/');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const apiData = await response.json();
-        
+
         console.log('📡 נתונים מה-API:', apiData);
-        
+
         // עדכון הנתונים המקומיים
         if (apiData.status === 'success' && apiData.data) {
           allAlerts = apiData.data.map(alert => ({
@@ -1470,12 +1478,12 @@
           console.warn('⚠️ לא התקבלו נתונים מה-API, משתמש בנתוני דמו');
           allAlerts = demoAlerts;
         }
-        
+
         console.log('📊 נתונים מעודכנים:', allAlerts);
-        
+
         // עדכון הגריד
         updateGrid();
-        
+
       } catch (error) {
         console.error('❌ שגיאה בטעינת נתונים:', error);
         console.warn('⚠️ משתמש בנתוני דמו');
@@ -1493,9 +1501,9 @@
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       `;
-      
+
       document.body.appendChild(notification);
-      
+
       setTimeout(() => {
         if (notification.parentNode) {
           notification.remove();
@@ -1509,18 +1517,18 @@
       if (typeof window.loadSectionStates === 'function') {
         window.loadSectionStates();
       }
-      
-      const gridDiv = document.getElementById('alertsGrid');
-              gridApi = agGrid.createGrid(gridDiv, gridOptions, { theme: 'quartz' });
-      
 
-      
+      const gridDiv = document.getElementById('alertsGrid');
+      gridApi = agGrid.createGrid(gridDiv, gridOptions, { theme: 'quartz' });
+
+
+
       // טעינת נתוני הגריד
       loadAlertsData();
-      
+
       // הגדרת האזנה לכותרת
       setupHeaderListener();
-      
+
       // טעינת התפריט
       if (typeof loadMenu === 'function') {
         loadMenu();
@@ -1531,7 +1539,7 @@
     function updateBackgroundPadding(isCollapsed) {
       const backgroundWrapper = document.querySelector('.background-wrapper');
       const body = document.body;
-      
+
       if (backgroundWrapper) {
         if (isCollapsed) {
           backgroundWrapper.classList.add('filter-collapsed');
@@ -1539,7 +1547,7 @@
           backgroundWrapper.classList.remove('filter-collapsed');
         }
       }
-      
+
       if (body) {
         if (isCollapsed) {
           body.classList.add('filter-collapsed');
@@ -1576,7 +1584,7 @@
       }
     }
   </script>
-  
+
   <!-- Scripts -->
   <script src="scripts/app-header.js"></script>
   <script src="scripts/menu.js"></script>
@@ -1585,4 +1593,5 @@
   <script src="scripts/accounts.js"></script>
   <script src="scripts/alerts.js"></script>
 </body>
+
 </html>

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>הערות - Tik.track</title>
-  
+
   <!--
     ========================================
     דף הערות - Tik.track
@@ -29,121 +30,253 @@
     תאריך עדכון אחרון: 2025
     ========================================
   -->
-  
+
   <style>
     /* עיצוב עורך הטקסט */
     .text-editor-toolbar {
-      background-color: #f8f9fa;
-      border: 1px solid #ced4da;
-      border-bottom: none;
-      border-radius: 0.375rem 0.375rem 0 0;
-      padding: 8px;
       display: flex;
       gap: 5px;
-      align-items: center;
+      margin-bottom: 10px;
       flex-wrap: wrap;
     }
-    
+
     .text-editor-toolbar button {
       min-width: 32px;
       height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border: 1px solid #ced4da;
+      background-color: white;
+      border-radius: 4px;
+      cursor: pointer;
       font-size: 12px;
     }
-    
+
     .toolbar-separator {
       color: #6c757d;
       margin: 0 5px;
       font-weight: bold;
     }
-    
+
     .text-editor-content {
       font-family: inherit;
       line-height: 1.5;
     }
-    
+
     .text-editor-content:focus {
       outline: none;
       border-color: #86b7fe;
       box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
     }
-    
+
     .text-editor-content h3 {
       font-size: 1.25rem;
       font-weight: bold;
       margin: 10px 0 5px 0;
     }
-    
+
     .text-editor-content h4 {
       font-size: 1.1rem;
       font-weight: bold;
       margin: 8px 0 4px 0;
     }
-    
-    .text-editor-content ul, .text-editor-content ol {
+
+    .text-editor-content ul,
+    .text-editor-content ol {
       margin: 5px 0;
       padding-left: 20px;
     }
-    
+
     .text-editor-content li {
       margin: 2px 0;
     }
-    
+
     /* פתרון קבוע לרדיו באטונים בעברית */
     .radio-group-item {
       text-align: right;
       margin-bottom: 10px;
     }
-    
+
     .radio-group-item input[type="radio"] {
       margin-left: 10px;
       margin-right: 0;
     }
-    
+
     .radio-group-item label {
       margin: 0;
       cursor: pointer;
     }
+
+    /* עיצוב שדה האובייקט המקושר */
+    .related-object-cell {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      text-align: right;
+      min-height: 40px;
+      box-sizing: border-box;
+      direction: rtl;
+    }
+
+    .related-account {
+      background-color: #e3f2fd;
+      color: #1565c0;
+      border: 1px solid #bbdefb;
+    }
+
+    .related-trade {
+      background-color: #e8f5e8;
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
+    }
+
+    .related-plan {
+      background-color: #fff3e0;
+      color: #ef6c00;
+      border: 1px solid #ffcc02;
+    }
+
+    .related-ticker {
+      background-color: #fce4ec;
+      color: #c2185b;
+      border: 1px solid #f8bbd9;
+    }
+
+    .related-other {
+      background-color: #f5f5f5;
+      color: #616161;
+      border: 1px solid #e0e0e0;
+    }
+
+    /* הוספת hover effects */
+    .related-account:hover {
+      background-color: #bbdefb;
+      color: #0d47a1;
+    }
+
+    .related-trade:hover {
+      background-color: #c8e6c9;
+      color: #1b5e20;
+    }
+
+    .related-plan:hover {
+      background-color: #ffcc02;
+      color: #e65100;
+    }
+
+    .related-ticker:hover {
+      background-color: #f8bbd9;
+      color: #880e4f;
+    }
+
+    .related-other:hover {
+      background-color: #e0e0e0;
+      color: #424242;
+    }
   </style>
-  
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
+
   <!-- Apple Theme CSS - בסיס כללי -->
   <link rel="stylesheet" href="styles/apple-theme.css">
-  
+
   <!-- Main Styles - סגנונות הפרויקט -->
   <link rel="stylesheet" href="styles/styles.css">
-  
+
   <!-- Menu CSS - תפריט -->
   <link rel="stylesheet" href="styles/menu.css">
-  
+
   <!-- Grid Table CSS - טבלאות וגרידים -->
   <link rel="stylesheet" href="styles/grid-table.css">
-  
+
   <!-- Typography CSS - טיפוגרפיה ופונטים -->
   <link rel="stylesheet" href="styles/typography.css">
-  
+
+  <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <!-- קבצים מודולריים של הגריד -->
   <script src="scripts/app-header.js"></script>
-      <script src="scripts/main.js"></script>
+  <script src="scripts/main.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/alerts.js"></script>
+  <script src="scripts/active-alerts-component.js"></script>
+  <script src="scripts/accounts.js"></script>
   <script src="scripts/notes.js"></script>
+
+  <!-- פונקציות פתיחה וסגירה של סקשנים - מוגדרות מיד -->
+  <script>
+    function toggleTopSection() {
+      const section = document.querySelector('.top-section .section-body');
+      const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+      if (section) {
+        const isCollapsed = section.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          section.classList.remove('collapsed');
+          section.style.display = 'block';
+        } else {
+          section.classList.add('collapsed');
+          section.style.display = 'none';
+        }
+
+        // עדכון האייקון
+        if (icon) {
+          icon.textContent = isCollapsed ? '▲' : '▼';
+        }
+
+        // שמירת המצב ב-localStorage
+        localStorage.setItem('notesTopSectionCollapsed', !isCollapsed);
+      }
+    }
+
+    function toggleMainSection() {
+      const section = document.querySelector('.content-section .section-body');
+      const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+      if (section) {
+        const isCollapsed = section.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          section.classList.remove('collapsed');
+          section.style.display = 'block';
+        } else {
+          section.classList.add('collapsed');
+          section.style.display = 'none';
+        }
+
+        // עדכון האייקון
+        if (icon) {
+          icon.textContent = isCollapsed ? '▲' : '▼';
+        }
+
+        // שמירת המצב ב-localStorage
+        localStorage.setItem('notesMainSectionCollapsed', !isCollapsed);
+      }
+    }
+
+    // הוספת הפונקציות לגלובל מיד
+    window.toggleTopSection = toggleTopSection;
+    window.toggleMainSection = toggleMainSection;
+  </script>
 </head>
+
 <body>
   <!-- רקע כללי -->
   <div class="background-wrapper">
-    
+
     <!-- כותרת האפליקציה -->
     <app-header></app-header>
-    
+
     <!-- גוף הדף - כל התוכן אחרי הכותרת -->
     <div class="page-body">
       <!-- אזור הערות - top-Section -->
-      <div class="top-section">
+      <div class="top-section" id="notesTopSection">
         <!-- כותרת הערות -->
         <div class="section-header">
           <div class="table-title">
@@ -154,29 +287,19 @@
               <span class="action-icon">➕</span> הוסף
             </button>
             <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור הערות">
+            <button class="filter-toggle-btn"
+              onclick="if (typeof window.toggleTopSection === 'function') { window.toggleTopSection(); } else { console.error('toggleTopSection function not found'); }"
+              title="הצג/הסתר אזור הערות">
               <span class="filter-icon">▲</span>
             </button>
           </div>
         </div>
-        
+
         <!-- כרטיסיות התראות -->
         <div class="section-body">
-          <div class="alerts-cards-container">
-            <div class="alerts-header">
-              <h3>🔔 התראות</h3>
-              <div class="alerts-header-actions">
-                <div class="alerts-count" id="newAlertsCount">0 התראות</div>
-                <button class="refresh-btn" onclick="refreshAlerts()" title="רענן התראות">
-                  <span class="action-icon">🔄</span>
-                </button>
-              </div>
-            </div>
-            <div class="alerts-cards" id="alertsCards">
-              <!-- כרטיסיות ההתראות יוכנסו כאן דינמית -->
-            </div>
-          </div>
-          
+          <!-- ווב קומפוננט של התראות פעילות -->
+          <active-alerts></active-alerts>
+
           <!-- סיכום נתונים -->
           <div class="info-summary" id="summaryStats">
             <div>סה"כ הערות: <strong id="totalNotes">0</strong></div>
@@ -186,12 +309,12 @@
           </div>
         </div>
       </div> <!-- סוף top-section -->
-        
+
       <!-- תוכן ראשי -->
       <div class="main-content">
 
         <!-- אזור הערות - content-section -->
-        <div class="content-section">
+        <div class="content-section" id="notesMainSection">
           <!-- כותרת הערות -->
           <div class="section-header">
             <div class="table-title">
@@ -203,12 +326,14 @@
                 <span class="action-icon">➕</span> הוסף
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור הערות">
+              <button class="filter-toggle-btn"
+                onclick="if (typeof window.toggleMainSection === 'function') { window.toggleMainSection(); } else { console.error('toggleMainSection function not found'); }"
+                title="הצג/הסתר אזור הערות">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
           </div>
-          
+
           <!-- טבלת הערות -->
           <div class="section-body">
             <div class="table-responsive" id="notesContainer">
@@ -216,31 +341,29 @@
                 <thead>
                   <tr>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(0)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>מזהה
-                        <br><span class="header-subtitle">ID</span>
-                      </button>
-                    </th>
-                    <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(1)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(0)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         <span class="sort-icon">↕</span>אובייקט מקושר
                         <br><span class="header-subtitle">Related Object</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(2)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(1)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         <span class="sort-icon">↕</span>תוכן
                         <br><span class="header-subtitle">Content</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(3)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(2)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         <span class="sort-icon">↕</span>נוצר ב
                         <br><span class="header-subtitle">Created At</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(4)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(3)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         <span class="sort-icon">↕</span>קובץ מצורף
                         <br><span class="header-subtitle">Attachment</span>
                       </button>
@@ -251,11 +374,11 @@
                     </th>
                   </tr>
                 </thead>
-                                  <tbody>
-                    <tr>
-                      <td colspan="6" class="loading">טוען הערות...</td>
-                    </tr>
-                  </tbody>
+                <tbody>
+                  <tr>
+                    <td colspan="5" class="loading">טוען הערות...</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -263,1168 +386,1340 @@
       </div>
     </div> <!-- סוף page-body -->
 
-  <!-- מרווח בתחתית הדף -->
-  <div style="height: 3rem;"></div>
+    <!-- מרווח בתחתית הדף -->
+    <div style="height: 3rem;"></div>
 
-  <!-- Add Note Modal -->
-  <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          <h5 class="modal-title" id="addNoteModalLabel">הוספת הערה</h5>
-        </div>
-        <div class="modal-body">
-          <form id="addNoteForm">
-            <div class="row">
-              <div class="col-md-12">
-                <div class="mb-3">
-                  <label class="form-label">הערה עבור:</label>
-                  <div class="radio-group-item">
-                    <input type="radio" name="noteRelationType" id="noteRelationTradePlan" value="trade_plan" required checked>
-                    <label for="noteRelationTradePlan">תוכנית טרייד</label>
-                    <select class="form-control mt-2" id="noteTradePlanId" style="display: none; margin-top: 10px; width: 100%;">
-                      <option value="">בחר תוכנית טרייד...</option>
-                    </select>
-                  </div>
-                  <div class="radio-group-item">
-                    <input type="radio" name="noteRelationType" id="noteRelationTrade" value="trade" required>
-                    <label for="noteRelationTrade">טרייד</label>
-                    <select class="form-control mt-2" id="noteTradeId" style="display: none; margin-top: 10px; width: 100%;">
-                      <option value="">בחר טרייד...</option>
-                    </select>
-                  </div>
-                  <div class="radio-group-item">
-                    <input type="radio" name="noteRelationType" id="noteRelationAccount" value="account" required>
-                    <label for="noteRelationAccount">חשבון</label>
-                    <select class="form-control mt-2" id="noteAccountId" style="display: none; margin-top: 10px; width: 100%;">
-                      <option value="">בחר חשבון...</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12">
-                <div class="mb-3">
-                  <label for="noteContent" class="form-label">תוכן (Content)</label>
-                  <div class="text-editor-toolbar">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')" title="מודגש">
-                      <strong>B</strong>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')" title="נטוי">
-                      <em>I</em>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')" title="קו תחתון">
-                      <u>U</u>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('strikethrough')" title="קו חוצה">
-                      <s>S</s>
-                    </button>
-                    <span class="toolbar-separator">|</span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h3')" title="כותרת">
-                      H3
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h4')" title="כותרת משנה">
-                      H4
-                    </button>
-                    <span class="toolbar-separator">|</span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ul')" title="רשימה לא ממוספרת">
-                      • List
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ol')" title="רשימה ממוספרת">
-                      1. List
-                    </button>
-                    <span class="toolbar-separator">|</span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('link')" title="קישור">
-                      🔗
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('color')" title="צבע טקסט">
-                      🎨
-                    </button>
-                  </div>
-                  <div class="text-editor-content" id="noteContentEditor" contenteditable="true" style="border: 1px solid #ced4da; border-radius: 0.375rem; padding: 0.375rem 0.75rem; min-height: 120px; background-color: white; overflow-y: auto;"></div>
-                  <textarea class="form-control" id="noteContent" rows="4" required style="display: none;"></textarea>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="noteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
-                  <input type="file" class="form-control" id="noteAttachment" accept=".jpg,.jpeg,.png,.gif,.pdf" max="524288">
-                  <small class="form-text text-muted">מותר: תמונות (JPG, PNG, GIF) ו-PDF. גודל מקסימלי: 512KB</small>
-                  <div id="noteAttachmentPreview" class="mt-2" style="display: none;">
-                    <img id="noteAttachmentImage" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
-                    <div id="noteAttachmentInfo" class="mt-1"></div>
+    <!-- Add Note Modal -->
+    <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 class="modal-title" id="addNoteModalLabel">הוספת הערה</h5>
+          </div>
+          <div class="modal-body">
+            <form id="addNoteForm">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label class="form-label">הערה עבור:</label>
+                    <div class="radio-group-item">
+                      <input type="radio" name="noteRelationType" id="noteRelationTradePlan" value="trade_plan" required
+                        checked>
+                      <label for="noteRelationTradePlan">תוכנית טרייד</label>
+                      <select class="form-control mt-2" id="noteTradePlanId"
+                        style="display: none; margin-top: 10px; width: 100%;">
+                        <option value="">בחר תוכנית טרייד...</option>
+                      </select>
+                    </div>
+                    <div class="radio-group-item">
+                      <input type="radio" name="noteRelationType" id="noteRelationTrade" value="trade" required>
+                      <label for="noteRelationTrade">טרייד</label>
+                      <select class="form-control mt-2" id="noteTradeId"
+                        style="display: none; margin-top: 10px; width: 100%;">
+                        <option value="">בחר טרייד...</option>
+                      </select>
+                    </div>
+                    <div class="radio-group-item">
+                      <input type="radio" name="noteRelationType" id="noteRelationAccount" value="account" required>
+                      <label for="noteRelationAccount">חשבון</label>
+                      <select class="form-control mt-2" id="noteAccountId"
+                        style="display: none; margin-top: 10px; width: 100%;">
+                        <option value="">בחר חשבון...</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" onclick="saveNote()" title="שמור">💾</button>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="noteContent" class="form-label">תוכן (Content)</label>
+                    <div class="text-editor-toolbar">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')"
+                        title="מודגש">
+                        <strong>B</strong>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')"
+                        title="נטוי">
+                        <em>I</em>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')"
+                        title="קו תחתון">
+                        <u>U</u>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary"
+                        onclick="formatText('strikethrough')" title="קו חוצה">
+                        <s>S</s>
+                      </button>
+                      <span class="toolbar-separator">|</span>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h3')"
+                        title="כותרת">
+                        H3
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h4')"
+                        title="כותרת משנה">
+                        H4
+                      </button>
+                      <span class="toolbar-separator">|</span>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ul')"
+                        title="רשימה לא ממוספרת">
+                        • List
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ol')"
+                        title="רשימה ממוספרת">
+                        1. List
+                      </button>
+                      <span class="toolbar-separator">|</span>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('link')"
+                        title="קישור">
+                        🔗
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('color')"
+                        title="צבע טקסט">
+                        🎨
+                      </button>
+                    </div>
+                    <div class="text-editor-content" id="noteContentEditor" contenteditable="true"
+                      style="border: 1px solid #ced4da; border-radius: 0.375rem; padding: 0.375rem 0.75rem; min-height: 120px; background-color: white; overflow-y: auto;">
+                    </div>
+                    <textarea class="form-control" id="noteContent" rows="4" required style="display: none;"></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="noteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
+                    <input type="file" class="form-control" id="noteAttachment" accept=".jpg,.jpeg,.png,.gif,.pdf"
+                      max="524288">
+                    <small class="form-text text-muted">מותר: תמונות (JPG, PNG, GIF) ו-PDF. גודל מקסימלי: 512KB</small>
+                    <div id="noteAttachmentPreview" class="mt-2" style="display: none;">
+                      <img id="noteAttachmentImage" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                      <div id="noteAttachmentInfo" class="mt-1"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="saveNote()" title="שמור">💾</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Edit Note Modal -->
-  <div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          <h5 class="modal-title" id="editNoteModalLabel">עריכת הערה</h5>
-        </div>
-        <div class="modal-body">
-          <form id="editNoteForm">
-            <input type="hidden" id="editNoteId">
-            <div class="row">
-              <div class="col-md-12">
-                <div class="mb-3">
-                  <label class="form-label">הערה עבור:</label>
-                  <div class="radio-group-item">
-                    <input type="radio" name="editNoteRelationType" id="editNoteRelationTradePlan" value="trade_plan" required>
-                    <label for="editNoteRelationTradePlan">תוכנית טרייד</label>
-                    <select class="form-control mt-2" id="editNoteTradePlanId" style="display: none; margin-top: 10px; width: 100%;">
-                      <option value="">בחר תוכנית טרייד...</option>
-                    </select>
-                  </div>
-                  <div class="radio-group-item">
-                    <input type="radio" name="editNoteRelationType" id="editNoteRelationTrade" value="trade" required>
-                    <label for="editNoteRelationTrade">טרייד</label>
-                    <select class="form-control mt-2" id="editNoteTradeId" style="display: none; margin-top: 10px; width: 100%;">
-                      <option value="">בחר טרייד...</option>
-                    </select>
-                  </div>
-                  <div class="radio-group-item">
-                    <input type="radio" name="editNoteRelationType" id="editNoteRelationAccount" value="account" required>
-                    <label for="editNoteRelationAccount">חשבון</label>
-                    <select class="form-control mt-2" id="editNoteAccountId" style="display: none; margin-top: 10px; width: 100%;">
-                      <option value="">בחר חשבון...</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12">
-                <div class="mb-3">
-                  <label for="editNoteContent" class="form-label">תוכן (Content)</label>
-                  <div class="text-editor-toolbar">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')" title="מודגש">
-                      <strong>B</strong>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')" title="נטוי">
-                      <em>I</em>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')" title="קו תחתון">
-                      <u>U</u>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('strikethrough')" title="קו חוצה">
-                      <s>S</s>
-                    </button>
-                    <span class="toolbar-separator">|</span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h3')" title="כותרת">
-                      H3
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h4')" title="כותרת משנה">
-                      H4
-                    </button>
-                    <span class="toolbar-separator">|</span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ul')" title="רשימה לא ממוספרת">
-                      • List
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ol')" title="רשימה ממוספרת">
-                      1. List
-                    </button>
-                    <span class="toolbar-separator">|</span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('link')" title="קישור">
-                      🔗
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('color')" title="צבע טקסט">
-                      🎨
-                    </button>
-                  </div>
-                  <div class="text-editor-content" id="editNoteContentEditor" contenteditable="true" style="border: 1px solid #ced4da; border-radius: 0.375rem; padding: 0.375rem 0.75rem; min-height: 120px; background-color: white; overflow-y: auto;"></div>
-                  <textarea class="form-control" id="editNoteContent" rows="4" required style="display: none;"></textarea>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="editNoteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
-                  <input type="file" class="form-control" id="editNoteAttachment" accept=".jpg,.jpeg,.png,.gif,.pdf" max="524288">
-                  <small class="form-text text-muted">מותר: תמונות (JPG, PNG, GIF) ו-PDF. גודל מקסימלי: 512KB</small>
-                  <div id="editNoteAttachmentPreview" class="mt-2" style="display: none;">
-                    <img id="editNoteAttachmentImage" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
-                    <div id="editNoteAttachmentInfo" class="mt-1"></div>
+    <!-- Edit Note Modal -->
+    <div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 class="modal-title" id="editNoteModalLabel">עריכת הערה</h5>
+          </div>
+          <div class="modal-body">
+            <form id="editNoteForm">
+              <input type="hidden" id="editNoteId">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label class="form-label">הערה עבור:</label>
+                    <div class="radio-group-item">
+                      <input type="radio" name="editNoteRelationType" id="editNoteRelationTradePlan" value="trade_plan"
+                        required>
+                      <label for="editNoteRelationTradePlan">תוכנית טרייד</label>
+                      <select class="form-control mt-2" id="editNoteTradePlanId"
+                        style="display: none; margin-top: 10px; width: 100%;">
+                        <option value="">בחר תוכנית טרייד...</option>
+                      </select>
+                    </div>
+                    <div class="radio-group-item">
+                      <input type="radio" name="editNoteRelationType" id="editNoteRelationTrade" value="trade" required>
+                      <label for="editNoteRelationTrade">טרייד</label>
+                      <select class="form-control mt-2" id="editNoteTradeId"
+                        style="display: none; margin-top: 10px; width: 100%;">
+                        <option value="">בחר טרייד...</option>
+                      </select>
+                    </div>
+                    <div class="radio-group-item">
+                      <input type="radio" name="editNoteRelationType" id="editNoteRelationAccount" value="account"
+                        required>
+                      <label for="editNoteRelationAccount">חשבון</label>
+                      <select class="form-control mt-2" id="editNoteAccountId"
+                        style="display: none; margin-top: 10px; width: 100%;">
+                        <option value="">בחר חשבון...</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" onclick="updateNoteFromModal()" title="שמור">💾</button>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="editNoteContent" class="form-label">תוכן (Content)</label>
+                    <div class="text-editor-toolbar">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')"
+                        title="מודגש">
+                        <strong>B</strong>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')"
+                        title="נטוי">
+                        <em>I</em>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')"
+                        title="קו תחתון">
+                        <u>U</u>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary"
+                        onclick="formatText('strikethrough')" title="קו חוצה">
+                        <s>S</s>
+                      </button>
+                      <span class="toolbar-separator">|</span>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h3')"
+                        title="כותרת">
+                        H3
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h4')"
+                        title="כותרת משנה">
+                        H4
+                      </button>
+                      <span class="toolbar-separator">|</span>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ul')"
+                        title="רשימה לא ממוספרת">
+                        • List
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ol')"
+                        title="רשימה ממוספרת">
+                        1. List
+                      </button>
+                      <span class="toolbar-separator">|</span>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('link')"
+                        title="קישור">
+                        🔗
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('color')"
+                        title="צבע טקסט">
+                        🎨
+                      </button>
+                    </div>
+                    <div class="text-editor-content" id="editNoteContentEditor" contenteditable="true"
+                      style="border: 1px solid #ced4da; border-radius: 0.375rem; padding: 0.375rem 0.75rem; min-height: 120px; background-color: white; overflow-y: auto;">
+                    </div>
+                    <textarea class="form-control" id="editNoteContent" rows="4" required
+                      style="display: none;"></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editNoteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
+                    <input type="file" class="form-control" id="editNoteAttachment" accept=".jpg,.jpeg,.png,.gif,.pdf"
+                      max="524288">
+                    <small class="form-text text-muted">מותר: תמונות (JPG, PNG, GIF) ו-PDF. גודל מקסימלי: 512KB</small>
+                    <div id="editNoteAttachmentPreview" class="mt-2" style="display: none;">
+                      <img id="editNoteAttachmentImage" class="img-thumbnail"
+                        style="max-width: 200px; max-height: 200px;">
+                      <div id="editNoteAttachmentInfo" class="mt-1"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="updateNoteFromModal()" title="שמור">💾</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <script>
-    // פונקציות לעיצוב טקסט
-    function formatText(command) {
-      // מציאת העורך הפעיל
-      let editor = null;
-      
-      // בדיקה איזה עורך פעיל כרגע
-      const addEditor = document.getElementById('noteContentEditor');
-      const editEditor = document.getElementById('editNoteContentEditor');
-      
-      if (addEditor && addEditor === document.activeElement) {
-        editor = addEditor;
-      } else if (editEditor && editEditor === document.activeElement) {
-        editor = editEditor;
-      } else {
-        // אם אף עורך לא פעיל, ננסה למצוא עורך פתוח
-        if (addEditor && addEditor.offsetParent !== null) {
-          editor = addEditor;
-        } else if (editEditor && editEditor.offsetParent !== null) {
-          editor = editEditor;
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // פונקציות פתיחה וסגירה של סקשנים - מוגדרות מיד
+      function toggleTopSection() {
+        const section = document.querySelector('.top-section .section-body');
+        const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+        if (section) {
+          const isCollapsed = section.classList.contains('collapsed');
+
+          if (isCollapsed) {
+            section.classList.remove('collapsed');
+            section.style.display = 'block';
+          } else {
+            section.classList.add('collapsed');
+            section.style.display = 'none';
+          }
+
+          // עדכון האייקון
+          if (icon) {
+            icon.textContent = isCollapsed ? '▲' : '▼';
+          }
+
+          // שמירת המצב ב-localStorage
+          localStorage.setItem('notesTopSectionCollapsed', !isCollapsed);
         }
       }
-      
-      if (!editor) {
-        console.warn('לא נמצא עורך טקסט פעיל');
-        return;
-      }
-      
-      editor.focus();
-      
-      switch (command) {
-        case 'bold':
-          document.execCommand('bold', false, null);
-          break;
-        case 'italic':
-          document.execCommand('italic', false, null);
-          break;
-        case 'underline':
-          document.execCommand('underline', false, null);
-          break;
-        case 'strikethrough':
-          document.execCommand('strikethrough', false, null);
-          break;
-        case 'h3':
-          document.execCommand('formatBlock', false, '<h3>');
-          break;
-        case 'h4':
-          document.execCommand('formatBlock', false, '<h4>');
-          break;
-        case 'ul':
-          document.execCommand('insertUnorderedList', false, null);
-          break;
-        case 'ol':
-          document.execCommand('insertOrderedList', false, null);
-          break;
-        case 'link':
-          const url = prompt('הכנס URL לקישור:');
-          if (url) {
-            document.execCommand('createLink', false, url);
+
+      function toggleMainSection() {
+        const section = document.querySelector('.content-section .section-body');
+        const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+        if (section) {
+          const isCollapsed = section.classList.contains('collapsed');
+
+          if (isCollapsed) {
+            section.classList.remove('collapsed');
+            section.style.display = 'block';
+          } else {
+            section.classList.add('collapsed');
+            section.style.display = 'none';
           }
-          break;
-        case 'color':
-          const color = prompt('הכנס צבע (למשל: red, #ff0000):');
-          if (color) {
-            document.execCommand('foreColor', false, color);
+
+          // עדכון האייקון
+          if (icon) {
+            icon.textContent = isCollapsed ? '▲' : '▼';
           }
-          break;
+
+          // שמירת המצב ב-localStorage
+          localStorage.setItem('notesMainSectionCollapsed', !isCollapsed);
+        }
       }
-      
-      // עדכון השדה הנסתר
-      syncEditorContent();
-    }
-    
-    // פונקציה להעתקת תוכן מהעורך לשדה הנסתר
-    function syncEditorContent() {
-      const addEditor = document.getElementById('noteContentEditor');
-      const editEditor = document.getElementById('editNoteContentEditor');
-      const addTextarea = document.getElementById('noteContent');
-      const editTextarea = document.getElementById('editNoteContent');
-      
-      if (addEditor && addTextarea) {
-        addTextarea.value = addEditor.innerHTML;
-        console.log('🔄 עדכון תוכן הוספה:', addEditor.innerHTML);
+
+      // פונקציה לשחזור מצב הסגירה
+      function restoreNotesSectionState() {
+        // שחזור מצב top section
+        const topSection = document.querySelector('.top-section .section-body');
+        const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+        const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
+
+        if (topSection && topToggleBtn && topIcon) {
+          const isCollapsed = localStorage.getItem('notesTopSectionCollapsed') === 'true';
+
+          if (isCollapsed) {
+            topSection.classList.add('collapsed');
+            topSection.style.display = 'none';
+            topIcon.textContent = '▼';
+          } else {
+            topSection.classList.remove('collapsed');
+            topSection.style.display = 'block';
+            topIcon.textContent = '▲';
+          }
+        }
+
+        // שחזור מצב main section
+        const mainSection = document.querySelector('.content-section .section-body');
+        const mainToggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+        const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
+
+        if (mainSection && mainToggleBtn && mainIcon) {
+          const isCollapsed = localStorage.getItem('notesMainSectionCollapsed') === 'true';
+
+          if (isCollapsed) {
+            mainSection.classList.add('collapsed');
+            mainSection.style.display = 'none';
+            mainIcon.textContent = '▼';
+          } else {
+            mainSection.classList.remove('collapsed');
+            mainSection.style.display = 'block';
+            mainIcon.textContent = '▲';
+          }
+        }
       }
-      
-      if (editEditor && editTextarea) {
-        editTextarea.value = editEditor.innerHTML;
-        console.log('🔄 עדכון תוכן עריכה:', editEditor.innerHTML);
+
+      // פונקציות לעיצוב טקסט
+      function formatText(command) {
+        // מציאת העורך הפעיל
+        let editor = null;
+
+        // בדיקה איזה עורך פעיל כרגע
+        const addEditor = document.getElementById('noteContentEditor');
+        const editEditor = document.getElementById('editNoteContentEditor');
+
+        if (addEditor && addEditor === document.activeElement) {
+          editor = addEditor;
+        } else if (editEditor && editEditor === document.activeElement) {
+          editor = editEditor;
+        } else {
+          // אם אף עורך לא פעיל, ננסה למצוא עורך פתוח
+          if (addEditor && addEditor.offsetParent !== null) {
+            editor = addEditor;
+          } else if (editEditor && editEditor.offsetParent !== null) {
+            editor = editEditor;
+          }
+        }
+
+        if (!editor) {
+          console.warn('לא נמצא עורך טקסט פעיל');
+          return;
+        }
+
+        editor.focus();
+
+        switch (command) {
+          case 'bold':
+            document.execCommand('bold', false, null);
+            break;
+          case 'italic':
+            document.execCommand('italic', false, null);
+            break;
+          case 'underline':
+            document.execCommand('underline', false, null);
+            break;
+          case 'strikethrough':
+            document.execCommand('strikethrough', false, null);
+            break;
+          case 'h3':
+            document.execCommand('formatBlock', false, '<h3>');
+            break;
+          case 'h4':
+            document.execCommand('formatBlock', false, '<h4>');
+            break;
+          case 'ul':
+            document.execCommand('insertUnorderedList', false, null);
+            break;
+          case 'ol':
+            document.execCommand('insertOrderedList', false, null);
+            break;
+          case 'link':
+            const url = prompt('הכנס URL לקישור:');
+            if (url) {
+              document.execCommand('createLink', false, url);
+            }
+            break;
+          case 'color':
+            const color = prompt('הכנס צבע (למשל: red, #ff0000):');
+            if (color) {
+              document.execCommand('foreColor', false, color);
+            }
+            break;
+        }
+
+        // עדכון השדה הנסתר
+        syncEditorContent();
       }
-    }
-    
-    // פונקציה לטיפול בקבצים מצורפים
-    function setupFileHandlers() {
-      // הוספת הערה
-      const addFileInput = document.getElementById('noteAttachment');
-      if (addFileInput) {
-        addFileInput.addEventListener('change', function(e) {
-          handleFileSelect(e, 'noteAttachment');
-        });
+
+      // פונקציה להעתקת תוכן מהעורך לשדה הנסתר
+      function syncEditorContent() {
+        const addEditor = document.getElementById('noteContentEditor');
+        const editEditor = document.getElementById('editNoteContentEditor');
+        const addTextarea = document.getElementById('noteContent');
+        const editTextarea = document.getElementById('editNoteContent');
+
+        if (addEditor && addTextarea) {
+          addTextarea.value = addEditor.innerHTML;
+          console.log('🔄 עדכון תוכן הוספה:', addEditor.innerHTML);
+        }
+
+        if (editEditor && editTextarea) {
+          editTextarea.value = editEditor.innerHTML;
+          console.log('🔄 עדכון תוכן עריכה:', editEditor.innerHTML);
+        }
       }
-      
-      // עריכת הערה
-      const editFileInput = document.getElementById('editNoteAttachment');
-      if (editFileInput) {
-        editFileInput.addEventListener('change', function(e) {
-          handleFileSelect(e, 'editNoteAttachment');
-        });
+
+      // פונקציה לטיפול בקבצים מצורפים
+      function setupFileHandlers() {
+        // הוספת הערה
+        const addFileInput = document.getElementById('noteAttachment');
+        if (addFileInput) {
+          addFileInput.addEventListener('change', function (e) {
+            handleFileSelect(e, 'noteAttachment');
+          });
+        }
+
+        // עריכת הערה
+        const editFileInput = document.getElementById('editNoteAttachment');
+        if (editFileInput) {
+          editFileInput.addEventListener('change', function (e) {
+            handleFileSelect(e, 'editNoteAttachment');
+          });
+        }
       }
-    }
-    
-    // פונקציה לטיפול בבחירת קובץ
-    function handleFileSelect(event, inputId) {
-      const file = event.target.files[0];
-      const previewId = inputId + 'Preview';
-      const imageId = inputId + 'Image';
-      const infoId = inputId + 'Info';
-      
-      if (!file) {
-        document.getElementById(previewId).style.display = 'none';
-        return;
-      }
-      
-      // בדיקת סוג הקובץ
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
-      if (!allowedTypes.includes(file.type)) {
-        alert('סוג קובץ לא נתמך. מותר רק: JPG, PNG, GIF, PDF');
-        event.target.value = '';
-        document.getElementById(previewId).style.display = 'none';
-        return;
-      }
-      
-      // בדיקת גודל הקובץ (512KB)
-      const maxSize = 524288; // 512KB in bytes
-      if (file.size > maxSize) {
-        alert('הקובץ גדול מדי. גודל מקסימלי: 512KB');
-        event.target.value = '';
-        document.getElementById(previewId).style.display = 'none';
-        return;
-      }
-      
-      // הצגת מידע על הקובץ
-      const infoDiv = document.getElementById(infoId);
-      const fileSizeKB = (file.size / 1024).toFixed(1);
-      infoDiv.innerHTML = `
+
+      // פונקציה לטיפול בבחירת קובץ
+      function handleFileSelect(event, inputId) {
+        const file = event.target.files[0];
+        const previewId = inputId + 'Preview';
+        const imageId = inputId + 'Image';
+        const infoId = inputId + 'Info';
+
+        if (!file) {
+          document.getElementById(previewId).style.display = 'none';
+          return;
+        }
+
+        // בדיקת סוג הקובץ
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+          alert('סוג קובץ לא נתמך. מותר רק: JPG, PNG, GIF, PDF');
+          event.target.value = '';
+          document.getElementById(previewId).style.display = 'none';
+          return;
+        }
+
+        // בדיקת גודל הקובץ (512KB)
+        const maxSize = 524288; // 512KB in bytes
+        if (file.size > maxSize) {
+          alert('הקובץ גדול מדי. גודל מקסימלי: 512KB');
+          event.target.value = '';
+          document.getElementById(previewId).style.display = 'none';
+          return;
+        }
+
+        // הצגת מידע על הקובץ
+        const infoDiv = document.getElementById(infoId);
+        const fileSizeKB = (file.size / 1024).toFixed(1);
+        infoDiv.innerHTML = `
         <strong>שם הקובץ:</strong> ${file.name}<br>
         <strong>גודל:</strong> ${fileSizeKB}KB<br>
         <strong>סוג:</strong> ${file.type}
       `;
-      
-      // הצגת תמונה מקדימה אם זה קובץ תמונה
-      const previewDiv = document.getElementById(previewId);
-      const imageElement = document.getElementById(imageId);
-      
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          imageElement.src = e.target.result;
-          imageElement.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      } else {
-        imageElement.style.display = 'none';
-      }
-      
-      previewDiv.style.display = 'block';
-      console.log('📎 קובץ נבחר:', file.name, 'גודל:', fileSizeKB + 'KB');
-    }
-    
-    // פונקציות לטיפול ברדיו באטונים
-    function setupRadioButtons() {
-      // הוספת הערה
-      document.querySelectorAll('input[name="noteRelationType"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-          const accountSelect = document.getElementById('noteAccountId');
-          const tradeSelect = document.getElementById('noteTradeId');
-          const tradePlanSelect = document.getElementById('noteTradePlanId');
-          
-          // הסתרת כל הסלקטים
-          accountSelect.style.display = 'none';
-          tradeSelect.style.display = 'none';
-          tradePlanSelect.style.display = 'none';
-          
-          // הצגת הסלקט הרלוונטי
-          if (this.value === 'account') {
-            accountSelect.style.display = 'block';
-          } else if (this.value === 'trade') {
-            tradeSelect.style.display = 'block';
-          } else if (this.value === 'trade_plan') {
-            tradePlanSelect.style.display = 'block';
-          }
-        });
-      });
-      
-      // הצגת סלקט תוכנית טרייד כברירת מחדל
-      const tradePlanSelect = document.getElementById('noteTradePlanId');
-      if (tradePlanSelect) {
-        tradePlanSelect.style.display = 'block';
-      }
-      
-      // עריכת הערה
-      document.querySelectorAll('input[name="editNoteRelationType"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-          const accountSelect = document.getElementById('editNoteAccountId');
-          const tradeSelect = document.getElementById('editNoteTradeId');
-          const tradePlanSelect = document.getElementById('editNoteTradePlanId');
-          
-          // הסתרת כל הסלקטים
-          accountSelect.style.display = 'none';
-          tradeSelect.style.display = 'none';
-          tradePlanSelect.style.display = 'none';
-          
-          // הצגת הסלקט הרלוונטי
-          if (this.value === 'account') {
-            accountSelect.style.display = 'block';
-          } else if (this.value === 'trade') {
-            tradeSelect.style.display = 'block';
-          } else if (this.value === 'trade_plan') {
-            tradePlanSelect.style.display = 'block';
-          }
-        });
-      });
-    }
-    
-    // פונקציות מותאמות לעמוד הערות
-    function openNoteDetails(id) {
-      console.log('פתיחת פרטי הערה:', id);
-      // פתיחת מודל הוספת הערה
-      if (typeof showAddNoteModal === 'function') {
-        showAddNoteModal();
-      } else {
-        console.error('showAddNoteModal function not found');
-      }
-    }
-    
-    function editNote(id) {
-      console.log('עריכת הערה:', id);
-      // כאן יוכנס קוד לעריכת הערה
-    }
-    
-    // הפונקציה deleteNote מוגדרת בקובץ notes.js
-    // window.deleteNote = deleteNote; // הוסר כי הפונקציה כבר מיוצאת בקובץ notes.js
-    
-    // הגדרת הפונקציות כגלובליות
-    window.openNoteDetails = openNoteDetails;
-    window.editNote = editNote;
-    window.formatText = formatText;
-    window.syncEditorContent = syncEditorContent;
-    // window.deleteNote = deleteNote; // הפונקציה כבר מיוצאת בקובץ notes.js
-    
-    // ===== מערכת מיון =====
-    
-    // משתנים גלובליים למיון
-    let notesCurrentSortColumn = null;
-    let notesCurrentSortDirection = 'asc';
-    
-    /**
-     * פונקציה למיון הטבלה לפי עמודה
-     * תומך במיון לפי: מזהה, אובייקט מקושר, תוכן, תאריך יצירה, קובץ מצורף
-     * @param {number} columnIndex - אינדקס העמודה למיון (0-4)
-     */
-    function sortTable(columnIndex) {
-      console.log('🔄 === SORT TABLE FUNCTION CALLED ===');
-      console.log('🔄 Column clicked:', columnIndex);
-      console.log('🔄 Current sort column:', notesCurrentSortColumn);
-      console.log('🔄 Current sort direction:', notesCurrentSortDirection);
-      
-      // קבלת הנתונים הנוכחיים
-      let notes = [...notesData];
-      console.log('🔄 Original data:', notes.map(n => `ID ${n.id}: ${n.content?.substring(0, 20)}...`));
-      
-      // החלת פילטרים קיימים
-      notes = window.filterDataByFilters(notes, 'notes');
-      console.log('🔄 After filtering:', notes.map(n => `ID ${n.id}: ${n.content?.substring(0, 20)}...`));
-      
-      // עדכון המשתנים הגלובליים
-      if (notesCurrentSortColumn === columnIndex) {
-        notesCurrentSortDirection = notesCurrentSortDirection === 'asc' ? 'desc' : 'asc';
-        console.log('🔄 Same column clicked, direction changed to:', notesCurrentSortDirection);
-      } else {
-        notesCurrentSortColumn = columnIndex;
-        notesCurrentSortDirection = 'asc';
-        console.log('🔄 New column clicked, set to column:', columnIndex, 'direction: asc');
-      }
-      
-      // מיון הנתונים
-      notes.sort((a, b) => {
-        let aValue, bValue;
-        
-        switch (columnIndex) {
-          case 0: // מזהה (ID)
-            aValue = parseInt(a.id);
-            bValue = parseInt(b.id);
-            break;
-          case 1: // אובייקט מקושר
-            aValue = (a.related_type || '').toLowerCase();
-            bValue = (b.related_type || '').toLowerCase();
-            break;
-          case 2: // תוכן
-            aValue = (a.content || '').toLowerCase();
-            bValue = (b.content || '').toLowerCase();
-            break;
-          case 3: // נוצר ב
-            aValue = parseDateForSort(a.created_at);
-            bValue = parseDateForSort(b.created_at);
-            break;
-          case 4: // קובץ מצורף
-            aValue = (a.attachment || '').toLowerCase();
-            bValue = (b.attachment || '').toLowerCase();
-            break;
-          default:
-            return 0;
-        }
-        
-        console.log(`🔄 Comparing: ${aValue} vs ${bValue}`);
-        
-        // השוואה
-        if (aValue < bValue) {
-          const result = notesCurrentSortDirection === 'asc' ? -1 : 1;
-          console.log(`🔄 ${aValue} < ${bValue}, returning ${result}`);
-          return result;
-        } else if (aValue > bValue) {
-          const result = notesCurrentSortDirection === 'asc' ? 1 : -1;
-          console.log(`🔄 ${aValue} > ${bValue}, returning ${result}`);
-          return result;
+
+        // הצגת תמונה מקדימה אם זה קובץ תמונה
+        const previewDiv = document.getElementById(previewId);
+        const imageElement = document.getElementById(imageId);
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imageElement.src = e.target.result;
+            imageElement.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
         } else {
-          console.log(`🔄 ${aValue} = ${bValue}, returning 0`);
-          return 0;
+          imageElement.style.display = 'none';
         }
-      });
-      
-      console.log('🔄 Sorted data:', notes.map(n => `ID ${n.id}: ${n.content?.substring(0, 20)}...`));
-      
-      // עדכון הטבלה
-      if (typeof window.updateNotesTable === 'function') {
-        window.updateNotesTable(notes);
-      } else {
-        console.error('❌ updateNotesTable function not found');
-      }
-      
-      // עדכון אייקונים
-      updateSortIcons(columnIndex);
-      
-      // שמירת מצב המיון ב-localStorage
-      localStorage.setItem('notesSortColumn', columnIndex.toString());
-      localStorage.setItem('notesSortDirection', notesCurrentSortDirection);
-      
-      console.log('🔄 === SORT TABLE FUNCTION COMPLETED ===');
-    }
-    
-    /**
-     * פונקציה להמרת תאריך למיון
-     * ממירה תאריך בפורמט dd.mm.yyyy למילישניות לצורך מיון
-     * @param {string} dateStr - תאריך בפורמט dd.mm.yyyy
-     * @returns {number} זמן במילישניות או 0 אם הפורמט לא תקין
-     */
-    function parseDateForSort(dateStr) {
-      const parts = dateStr.split('.');
-      if (parts.length === 3) {
-        const day = parseInt(parts[0]);
-        const month = parseInt(parts[1]) - 1;
-        const year = parseInt(parts[2]);
-        return new Date(year, month, day).getTime();
-      }
-      return 0;
-    }
-    
-    /**
-     * פונקציה לקבלת ערך חשיבות למיון
-     * ממירה ערכי חשיבות למספרים לצורך מיון
-     * @param {string} priority - ערך החשיבות
-     * @returns {number} ערך מספרי למיון
-     */
-    function getPriorityForSort(priority) {
-      switch (priority) {
-        case 'high': return 3;
-        case 'medium': return 2;
-        case 'low': return 1;
-        default: return 0;
-      }
-    }
-    
-    /**
-     * פונקציה לקבלת ערך סטטוס למיון
-     * ממירה ערכי סטטוס למספרים לצורך מיון
-     * @param {string} status - ערך הסטטוס
-     * @returns {number} ערך מספרי למיון
-     */
-    function getStatusForSort(status) {
-      switch (status) {
-        case 'open': return 1;
-        case 'completed': return 2;
-        case 'archived': return 3;
-        default: return 0;
-      }
-    }
-    
-    /**
-     * פונקציה לעדכון אייקוני המיון בטבלה
-     * מעדכנת את האייקונים (↕, ↑, ↓) בעמודות הניתנות למיון
-     * @param {number} activeColumnIndex - אינדקס העמודה הפעילה למיון
-     */
-    function updateSortIcons(activeColumnIndex) {
-      console.log('🔄 Updating sort icons for column:', activeColumnIndex);
-      const buttons = document.querySelectorAll('.sortable-header-btn');
-      console.log('🔄 Found sortable header buttons:', buttons.length);
-      
-      buttons.forEach((button, index) => {
-        const sortIcon = button.querySelector('.sort-icon');
-        if (sortIcon) {
-          if (index === activeColumnIndex) {
-            const iconText = notesCurrentSortDirection === 'asc' ? '↑' : '↓';
-            sortIcon.textContent = iconText;
-            sortIcon.style.color = '#ff9c05';
-            sortIcon.style.fontWeight = 'bold';
-            console.log(`🔄 Updated button ${index} icon to: ${iconText}`);
-          } else {
-            sortIcon.textContent = '↕';
-            sortIcon.style.color = '#666';
-            sortIcon.style.fontWeight = 'normal';
-          }
-        }
-      });
-    }
-    
-    // ===== פונקציות פילטרים =====
-    
-    // נתוני הערות לדוגמה
-    let notesData = [
-      {
-        id: '1',
-        date: '15.1.2025',
-        title: 'ניתוח טכני AAPL',
-        type: 'analysis',
-        ticker: 'AAPL',
-        account_name: 'חשבון ראשי',
-        priority: 'high',
-        status: 'active'
-      },
-      {
-        id: '2',
-        date: '10.1.2025',
-        title: 'תזכורת לבדיקת רווחים',
-        type: 'reminder',
-        ticker: 'TSLA',
-        account_name: 'חשבון משני',
-        priority: 'medium',
-        status: 'active'
-      },
-      {
-        id: '3',
-        date: '5.1.2025',
-        title: 'הערות על אסטרטגיה',
-        type: 'strategy',
-        ticker: null,
-        account_name: null,
-        priority: 'low',
-        status: 'completed'
-      }
-    ];
 
-    /**
-     * פונקציה לטעינת נתוני הערות מהשרת
-     * טוענת את כל ההערות ומעדכנת את המשתנה הגלובלי notesData
-     * @returns {Promise<Array>} מערך של הערות
-     */
-    async function loadNotesData() {
-      try {
-        console.log('🔄 טוען הערות מהשרת...');
-        const response = await window.apiCall('/api/v1/notes/');
-        const notes = response.data || response;
-        console.log(`✅ נטענו ${notes.length} הערות`);
-        
-        // עדכון המשתנה הגלובלי לצורך מיון וסינון
-        notesData = notes;
-        
-        // החלת פילטרים על הנתונים
-        let filteredNotes = [...notesData];
-        if (typeof window.filterDataByFilters === 'function') {
-          console.log('🔄 מחיל פילטרים על נתוני ההערות...');
-          filteredNotes = window.filterDataByFilters(notesData, 'notes');
-          console.log('🔄 לאחר החלת פילטרים:', filteredNotes.length, 'הערות');
-        }
-        
-        // עדכון הטבלה עם הנתונים המסוננים
-        updateNotesTable(filteredNotes);
-        
-        return notes;
-        
-      } catch (error) {
-        console.error('Error loading notes data:', error);
-        document.querySelector('.main-content table tbody').innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
-        throw error;
+        previewDiv.style.display = 'block';
+        console.log('📎 קובץ נבחר:', file.name, 'גודל:', fileSizeKB + 'KB');
       }
-    }
 
-    /**
-     * פונקציה לעדכון הטבלה עם נתוני הערות
-     * טוענת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים) לצורך הצגת שמות מלאים
-     * ומעדכנת את הטבלה עם הנתונים המלאים
-     * @param {Array} notes - מערך של הערות לעדכון
-     */
-    async function updateNotesTable(notes) {
-      console.log('🚀 === התחלת updateNotesTable בדף הערות ===');
-      console.log('🔄 מעדכן טבלת הערות עם', notes.length, 'הערות');
-      
-      const tbody = document.querySelector('.main-content table tbody');
-      if (!tbody) {
-        console.error('❌ לא נמצא tbody לטבלת הערות');
-        return;
-      }
-      
-      // טעינת נתונים נוספים לצורך הצגת שמות מלאים
-      let accounts = [];
-      let trades = [];
-      let tradePlans = [];
-      let tickers = [];
-      
-      try {
-        // טעינת נתונים במקביל
-        console.log('🔄 טוען נתונים נוספים...');
-        const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-          window.apiCall('/api/v1/accounts/'),
-          window.apiCall('/api/v1/trades/'),
-          window.apiCall('/api/v1/trade_plans/'),
-          window.apiCall('/api/v1/tickers/')
-        ]);
-        
-        accounts = accountsResponse.data || accountsResponse;
-        trades = tradesResponse.data || tradesResponse;
-        tradePlans = tradePlansResponse.data || tradePlansResponse;
-        tickers = tickersResponse.data || tickersResponse;
-        
-        // שמירת הנתונים כמשתנים גלובליים לצורך החיפוש והסינון
-        // נתונים אלה נדרשים לפונקציות החיפוש כדי למצוא סימבולים ושמות מלאים
-        window.accountsData = accounts;
-        window.tradesData = trades;
-        window.tradePlansData = tradePlans;
-        window.tickersData = tickers;
-        
-        console.log('📊 נתונים שנטענו:');
-        console.log('חשבונות:', accounts);
-        console.log('טריידים:', trades);
-        console.log('תוכניות:', tradePlans);
-        console.log('טיקרים:', tickers);
-        console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
-      } catch (error) {
-        console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
-      }
-      
-      tbody.innerHTML = notes.map(note => {
-        // קביעת הקשר לתצוגה עם שמות מלאים
-        let relatedDisplay = '-';
-        
-        console.log(`🔍 מעבד הערה ${note.id}:`, note);
-        console.log(`📊 נתונים זמינים: ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
-        
-        let relatedClass = '';
-        
-        if (note.related_type === 'account') {
-          console.log(`🔍 מחפש חשבון עם ID: ${note.related_id}`);
-          const account = accounts.find(acc => acc.id == note.related_id);
-          console.log(`📋 חשבון שנמצא:`, account);
-          relatedDisplay = account ? `חשבון - ${account.name}` : `חשבון ${note.related_id}`;
-          relatedClass = 'related-account';
-          console.log(`✅ תצוגה סופית: ${relatedDisplay}`);
-        } else if (note.related_type === 'trade') {
-          console.log(`🔍 מחפש טרייד עם ID: ${note.related_id}`);
-          const trade = trades.find(t => t.id == note.related_id);
-          console.log(`📈 טרייד שנמצא:`, trade);
-          if (trade) {
-            console.log(`🔍 מחפש טיקר עם ID: ${trade.ticker_id}`);
-            const ticker = tickers.find(tick => tick.id == trade.ticker_id);
-            console.log(`🎯 טיקר שנמצא:`, ticker);
-            const tickerSymbol = ticker ? ticker.symbol : trade.ticker_id;
-            relatedDisplay = `טרייד - ${tickerSymbol}`;
-          } else {
-            relatedDisplay = `טרייד ${note.related_id}`;
-          }
-          relatedClass = 'related-trade';
-          console.log(`✅ תצוגה סופית: ${relatedDisplay}`);
-        } else if (note.related_type === 'trade_plan') {
-          console.log(`🔍 מחפש תוכנית עם ID: ${note.related_id}`);
-          const plan = tradePlans.find(p => p.id == note.related_id);
-          console.log(`📋 תוכנית שנמצאה:`, plan);
-          if (plan) {
-            console.log(`🔍 מחפש טיקר עם ID: ${plan.ticker_id}`);
-            const ticker = tickers.find(tick => tick.id == plan.ticker_id);
-            console.log(`🎯 טיקר שנמצא:`, ticker);
-            const tickerSymbol = ticker ? ticker.symbol : plan.ticker_id;
-            relatedDisplay = `תוכנית - ${tickerSymbol}`;
-          } else {
-            relatedDisplay = `תוכנית ${note.related_id}`;
-          }
-          relatedClass = 'related-plan';
-          console.log(`✅ תצוגה סופית: ${relatedDisplay}`);
+      // פונקציות לטיפול ברדיו באטונים
+      function setupRadioButtons() {
+        // הוספת הערה
+        document.querySelectorAll('input[name="noteRelationType"]').forEach(radio => {
+          radio.addEventListener('change', function () {
+            const accountSelect = document.getElementById('noteAccountId');
+            const tradeSelect = document.getElementById('noteTradeId');
+            const tradePlanSelect = document.getElementById('noteTradePlanId');
+
+            // הסתרת כל הסלקטים
+            accountSelect.style.display = 'none';
+            tradeSelect.style.display = 'none';
+            tradePlanSelect.style.display = 'none';
+
+            // הצגת הסלקט הרלוונטי
+            if (this.value === 'account') {
+              accountSelect.style.display = 'block';
+            } else if (this.value === 'trade') {
+              tradeSelect.style.display = 'block';
+            } else if (this.value === 'trade_plan') {
+              tradePlanSelect.style.display = 'block';
+            }
+          });
+        });
+
+        // הצגת סלקט תוכנית טרייד כברירת מחדל
+        const tradePlanSelect = document.getElementById('noteTradePlanId');
+        if (tradePlanSelect) {
+          tradePlanSelect.style.display = 'block';
         }
-        
-        return `
+
+        // עריכת הערה
+        document.querySelectorAll('input[name="editNoteRelationType"]').forEach(radio => {
+          radio.addEventListener('change', function () {
+            const accountSelect = document.getElementById('editNoteAccountId');
+            const tradeSelect = document.getElementById('editNoteTradeId');
+            const tradePlanSelect = document.getElementById('editNoteTradePlanId');
+
+            // הסתרת כל הסלקטים
+            accountSelect.style.display = 'none';
+            tradeSelect.style.display = 'none';
+            tradePlanSelect.style.display = 'none';
+
+            // הצגת הסלקט הרלוונטי
+            if (this.value === 'account') {
+              accountSelect.style.display = 'block';
+            } else if (this.value === 'trade') {
+              tradeSelect.style.display = 'block';
+            } else if (this.value === 'trade_plan') {
+              tradePlanSelect.style.display = 'block';
+            }
+          });
+        });
+      }
+
+      // פונקציות מותאמות לעמוד הערות
+      function openNoteDetails(id) {
+        console.log('פתיחת פרטי הערה:', id);
+        // פתיחת מודל הוספת הערה
+        if (typeof showAddNoteModal === 'function') {
+          showAddNoteModal();
+        } else {
+          console.error('showAddNoteModal function not found');
+        }
+      }
+
+      /**
+       * פונקציה לעריכת הערה
+       */
+      function editNote(noteId) {
+        console.log('עריכת הערה:', noteId);
+        // כאן יוכנס קוד לעריכת הערה
+        alert('פונקציית עריכה תתווסף בקרוב');
+      }
+
+      /**
+       * פונקציה למחיקת הערה
+       */
+      function deleteNote(noteId) {
+        console.log('מחיקת הערה:', noteId);
+        if (confirm('האם אתה בטוח שברצונך למחוק הערה זו?')) {
+          // כאן יוכנס קוד למחיקת הערה
+          alert('פונקציית מחיקה תתווסף בקרוב');
+        }
+      }
+
+      // הגדרת הפונקציות כגלובליות
+      window.openNoteDetails = openNoteDetails;
+      window.editNote = editNote;
+      window.formatText = formatText;
+      window.syncEditorContent = syncEditorContent;
+
+
+
+      // ===== מערכת מיון =====
+
+      // משתנים גלובליים למיון
+      let notesCurrentSortColumn = null;
+      let notesCurrentSortDirection = 'asc';
+
+      /**
+       * פונקציה למיון הטבלה לפי עמודה
+       * תומך במיון לפי: מזהה, אובייקט מקושר, תוכן, תאריך יצירה, קובץ מצורף
+       * @param {number} columnIndex - אינדקס העמודה למיון (0-4)
+       */
+      function sortTable(columnIndex) {
+        console.log('🔄 === SORT TABLE FUNCTION CALLED ===');
+        console.log('🔄 Column clicked:', columnIndex);
+        console.log('🔄 Current sort column:', notesCurrentSortColumn);
+        console.log('🔄 Current sort direction:', notesCurrentSortDirection);
+
+        // קבלת הנתונים הנוכחיים
+        let notes = [...notesData];
+        console.log('🔄 Original data:', notes.map(n => `ID ${n.id}: ${n.content?.substring(0, 20)}...`));
+
+        // החלת פילטרים קיימים
+        notes = window.filterDataByFilters(notes, 'notes');
+        console.log('🔄 After filtering:', notes.map(n => `ID ${n.id}: ${n.content?.substring(0, 20)}...`));
+
+        // עדכון המשתנים הגלובליים
+        if (notesCurrentSortColumn === columnIndex) {
+          notesCurrentSortDirection = notesCurrentSortDirection === 'asc' ? 'desc' : 'asc';
+          console.log('🔄 Same column clicked, direction changed to:', notesCurrentSortDirection);
+        } else {
+          notesCurrentSortColumn = columnIndex;
+          notesCurrentSortDirection = 'asc';
+          console.log('🔄 New column clicked, set to column:', columnIndex, 'direction: asc');
+        }
+
+        // מיון הנתונים
+        notes.sort((a, b) => {
+          let aValue, bValue;
+
+          switch (columnIndex) {
+            case 0: // מזהה (ID)
+              aValue = parseInt(a.id);
+              bValue = parseInt(b.id);
+              break;
+            case 1: // אובייקט מקושר
+              aValue = (a.related_type || '').toLowerCase();
+              bValue = (b.related_type || '').toLowerCase();
+              break;
+            case 2: // תוכן
+              aValue = (a.content || '').toLowerCase();
+              bValue = (b.content || '').toLowerCase();
+              break;
+            case 3: // נוצר ב
+              aValue = parseDateForSort(a.created_at);
+              bValue = parseDateForSort(b.created_at);
+              break;
+            case 4: // קובץ מצורף
+              aValue = (a.attachment || '').toLowerCase();
+              bValue = (b.attachment || '').toLowerCase();
+              break;
+            default:
+              return 0;
+          }
+
+          console.log(`🔄 Comparing: ${aValue} vs ${bValue}`);
+
+          // השוואה
+          if (aValue < bValue) {
+            const result = notesCurrentSortDirection === 'asc' ? -1 : 1;
+            console.log(`🔄 ${aValue} < ${bValue}, returning ${result}`);
+            return result;
+          } else if (aValue > bValue) {
+            const result = notesCurrentSortDirection === 'asc' ? 1 : -1;
+            console.log(`🔄 ${aValue} > ${bValue}, returning ${result}`);
+            return result;
+          } else {
+            console.log(`🔄 ${aValue} = ${bValue}, returning 0`);
+            return 0;
+          }
+        });
+
+        console.log('🔄 Sorted data:', notes.map(n => `ID ${n.id}: ${n.content?.substring(0, 20)}...`));
+
+        // עדכון הטבלה
+        if (typeof window.updateNotesTable === 'function') {
+          window.updateNotesTable(notes);
+        } else {
+          console.error('❌ updateNotesTable function not found');
+        }
+
+        // עדכון אייקונים
+        updateSortIcons(columnIndex);
+
+        // שמירת מצב המיון ב-localStorage
+        localStorage.setItem('notesSortColumn', columnIndex.toString());
+        localStorage.setItem('notesSortDirection', notesCurrentSortDirection);
+
+        console.log('🔄 === SORT TABLE FUNCTION COMPLETED ===');
+      }
+
+      /**
+       * פונקציה להמרת תאריך למיון
+       * ממירה תאריך בפורמט dd.mm.yyyy למילישניות לצורך מיון
+       * @param {string} dateStr - תאריך בפורמט dd.mm.yyyy
+       * @returns {number} זמן במילישניות או 0 אם הפורמט לא תקין
+       */
+      function parseDateForSort(dateStr) {
+        const parts = dateStr.split('.');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0]);
+          const month = parseInt(parts[1]) - 1;
+          const year = parseInt(parts[2]);
+          return new Date(year, month, day).getTime();
+        }
+        return 0;
+      }
+
+      /**
+       * פונקציה לקבלת ערך חשיבות למיון
+       * ממירה ערכי חשיבות למספרים לצורך מיון
+       * @param {string} priority - ערך החשיבות
+       * @returns {number} ערך מספרי למיון
+       */
+      function getPriorityForSort(priority) {
+        switch (priority) {
+          case 'high': return 3;
+          case 'medium': return 2;
+          case 'low': return 1;
+          default: return 0;
+        }
+      }
+
+      /**
+       * פונקציה לקבלת ערך סטטוס למיון
+       * ממירה ערכי סטטוס למספרים לצורך מיון
+       * @param {string} status - ערך הסטטוס
+       * @returns {number} ערך מספרי למיון
+       */
+      function getStatusForSort(status) {
+        switch (status) {
+          case 'open': return 1;
+          case 'completed': return 2;
+          case 'archived': return 3;
+          default: return 0;
+        }
+      }
+
+      /**
+       * פונקציה לעדכון אייקוני המיון בטבלה
+       * מעדכנת את האייקונים (↕, ↑, ↓) בעמודות הניתנות למיון
+       * @param {number} activeColumnIndex - אינדקס העמודה הפעילה למיון
+       */
+      function updateSortIcons(activeColumnIndex) {
+        console.log('🔄 Updating sort icons for column:', activeColumnIndex);
+        const buttons = document.querySelectorAll('.sortable-header-btn');
+        console.log('🔄 Found sortable header buttons:', buttons.length);
+
+        buttons.forEach((button, index) => {
+          const sortIcon = button.querySelector('.sort-icon');
+          if (sortIcon) {
+            if (index === activeColumnIndex) {
+              const iconText = notesCurrentSortDirection === 'asc' ? '↑' : '↓';
+              sortIcon.textContent = iconText;
+              sortIcon.style.color = '#ff9c05';
+              sortIcon.style.fontWeight = 'bold';
+              console.log(`🔄 Updated button ${index} icon to: ${iconText}`);
+            } else {
+              sortIcon.textContent = '↕';
+              sortIcon.style.color = '#666';
+              sortIcon.style.fontWeight = 'normal';
+            }
+          }
+        });
+      }
+
+      // ===== פונקציות פילטרים =====
+
+      // נתוני הערות - משתנה גלובלי
+      let notesData = [];
+
+      /**
+       * פונקציה לטעינת נתוני הערות מהשרת
+       * טוענת את כל ההערות ומעדכנת את המשתנה הגלובלי notesData
+       * @returns {Promise<Array>} מערך של הערות
+       */
+      async function loadNotesData() {
+        try {
+          console.log('🔄 טוען הערות מהשרת...');
+          const response = await window.apiCall('/api/notes');
+          const notes = response.data || response;
+          console.log(`✅ נטענו ${notes.length} הערות`);
+
+          // עדכון המשתנה הגלובלי לצורך מיון וסינון
+          notesData = notes;
+
+          // החלת פילטרים על הנתונים
+          let filteredNotes = [...notesData];
+          if (typeof window.filterDataByFilters === 'function') {
+            console.log('🔄 מחיל פילטרים על נתוני ההערות...');
+            filteredNotes = window.filterDataByFilters(notesData, 'notes');
+            console.log('🔄 לאחר החלת פילטרים:', filteredNotes.length, 'הערות');
+          }
+
+          // עדכון הטבלה עם הנתונים המסוננים
+          updateNotesTable(filteredNotes);
+
+          return notes;
+
+        } catch (error) {
+          console.error('Error loading notes data:', error);
+          document.querySelector('.main-content table tbody').innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+          throw error;
+        }
+      }
+
+      /**
+       * פונקציה לעדכון הטבלה עם נתוני הערות
+       * טוענת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים) לצורך הצגת שמות מלאים
+       * ומעדכנת את הטבלה עם הנתונים המלאים
+       * @param {Array} notes - מערך של הערות לעדכון
+       */
+      async function updateNotesTable(notes) {
+        console.log('🚀 === התחלת updateNotesTable בדף הערות ===');
+        console.log('🔄 מעדכן טבלת הערות עם', notes.length, 'הערות');
+
+        const tbody = document.querySelector('.main-content table tbody');
+        if (!tbody) {
+          console.error('❌ לא נמצא tbody לטבלת הערות');
+          return;
+        }
+
+        tbody.innerHTML = notes.map(note => {
+          // קביעת הקשר לתצוגה עם שמות מלאים
+          let relatedDisplay = note.related_type_name || '-';
+
+          console.log(`🔍 מעבד הערה ${note.id}:`, note);
+
+          let relatedClass = '';
+
+          // קביעת CSS class לפי סוג הקשר
+          if (note.related_type_id == 1) { // account
+            relatedClass = 'related-account';
+          } else if (note.related_type_id == 2) { // trade
+            relatedClass = 'related-trade';
+          } else if (note.related_type_id == 3) { // trade_plan
+            relatedClass = 'related-plan';
+          } else if (note.related_type_id == 4) { // ticker
+            relatedClass = 'related-ticker';
+          }
+
+          // קביעת אייקון הקובץ
+          const fileIcon = getFileIcon(note.attachment);
+          const fileLink = createFileLink(note.attachment);
+
+          // תאריך יצירה
+          const createdAt = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+
+          return `
         <tr>
-          <td>${note.id}</td>
-          <td class="${relatedClass}">${relatedDisplay}</td>
+          <td><strong>#${note.id}</strong></td>
+          <td><span class="${relatedClass}">${relatedDisplay}</span></td>
           <td>${note.content ? (note.content.length > 50 ? note.content.substring(0, 50) + '...' : note.content) : '-'}</td>
-          <td>${window.formatDateTime ? window.formatDateTime(note.created_at) : note.created_at}</td>
-          <td>${note.attachment || '-'}</td>
-          <td>
-            <button class="btn btn-sm btn-secondary" onclick="showEditNoteModal(${JSON.stringify(note).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id}, 'הערה ${note.id}')" title="מחק">🗑️</button>
+          <td>${createdAt}</td>
+          <td>${fileLink}</td>
+          <td class="actions-cell">
+            <button class="btn btn-sm btn-secondary" onclick="editNote('${note.id}')" title="ערוך">
+              <span class="btn-icon">✏️</span>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteNote('${note.id}')" title="מחק">✕</button>
           </td>
         </tr>
-      `}).join('');
-      
-      // עדכון ספירת רשומות
-      const countElement = document.querySelector('.main-content .table-count');
-      if (countElement) {
-        countElement.textContent = `${notes.length} הערות`;
-      }
-      
-      // עדכון סטטיסטיקות הטבלה
-      updateTableStats();
-      
-      console.log('✅ טבלת הערות עודכנה בהצלחה');
-    }
-    
-    // הגדרת הפונקציה כגלובלית
-    window.updateNotesTable = updateNotesTable;
-    window.loadNotesData = loadNotesData;
-    
-    // הגדרת הפונקציה הגלובלית לעדכון מהפילטרים
-    window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
-      console.log('🔄 === updateGridFromComponent called for notes ===');
-      console.log('🔄 Selected statuses:', selectedStatuses);
-      console.log('🔄 Selected types:', selectedTypes);
-      console.log('🔄 Selected accounts:', selectedAccounts);
-      console.log('🔄 Selected date range:', selectedDateRange);
-      console.log('🔄 Search term:', searchTerm);
-      
-      // קריאה לפונקציה הגלובלית
-      if (typeof window.updateGridFromComponentGlobal === 'function') {
-        window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, 'notes');
-      } else {
-        console.log('🔄 Global updateGridFromComponentGlobal function not available, using local filtering');
-        
-        // שמירת הפילטרים ב-localStorage
-        localStorage.setItem('notesFilterStatuses', JSON.stringify(selectedStatuses));
-        localStorage.setItem('notesFilterTypes', JSON.stringify(selectedTypes));
-        localStorage.setItem('notesFilterAccounts', JSON.stringify(selectedAccounts));
-        localStorage.setItem('notesFilterDateRanges', JSON.stringify([selectedDateRange]));
-        localStorage.setItem('notesFilterSearch', searchTerm);
-        
-        // שמירת הפילטרים במשתנים הגלובליים
-        window.selectedStatusesForFilter = selectedStatuses;
-        window.selectedTypesForFilter = selectedTypes;
-        window.selectedAccountsForFilter = selectedAccounts;
-        window.selectedDateRangeForFilter = selectedDateRange;
-        window.searchTermForFilter = searchTerm;
-        
-        // החלת הפילטרים על הנתונים
-        filterNotesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
-      }
-      
-      console.log('🔄 === updateGridFromComponent completed for notes ===');
-    };
-    
-    /**
-     * פונקציה מותאמת לפילטור נתוני הערות
-     * מסננת את ההערות לפי הפילטרים הנבחרים ומעדכנת את הטבלה
-     * @param {Array} selectedStatuses - סטטוסים נבחרים (לא רלוונטי להערות)
-     * @param {Array} selectedTypes - סוגים נבחרים (לא רלוונטי להערות)
-     * @param {Array} selectedAccounts - חשבונות נבחרים (לא רלוונטי להערות)
-     * @param {string} selectedDateRange - טווח תאריכים נבחר
-     * @param {string} searchTerm - מונח חיפוש חופשי
-     */
-    function filterNotesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
-      console.log('🔄 === FILTER NOTES DATA ===');
-      console.log('🔄 Selected statuses:', selectedStatuses);
-      console.log('🔄 Selected types:', selectedTypes);
-      console.log('🔄 Selected accounts:', selectedAccounts);
-      console.log('🔄 Date range:', selectedDateRange);
-      console.log('🔄 Search term:', searchTerm);
-      
-      if (!notesData || notesData.length === 0) {
-        console.log('🔄 No notes data available for filtering');
-        return;
-      }
-      
-      let filteredNotes = [...notesData];
-      
-      // פילטר לפי תאריכים
-      if (selectedDateRange && selectedDateRange !== 'הכול') {
-        console.log('🔄 Filtering by date range:', selectedDateRange);
-        const now = new Date();
-        let startDate = new Date();
-        
-        switch (selectedDateRange) {
-          case 'שבוע':
-            startDate.setDate(now.getDate() - 7);
-            break;
-          case 'MTD':
-            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-            break;
-          case '30 יום':
-            startDate.setDate(now.getDate() - 30);
-            break;
-          case '60 יום':
-            startDate.setDate(now.getDate() - 60);
-            break;
-          case '90 יום':
-            startDate.setDate(now.getDate() - 90);
-            break;
-          case 'שנה':
-            startDate.setFullYear(now.getFullYear() - 1);
-            break;
-          case 'YTD':
-            startDate = new Date(now.getFullYear(), 0, 1);
-            break;
-          case 'שנה קודמת':
-            startDate = new Date(now.getFullYear() - 1, 0, 1);
-            const endDate = new Date(now.getFullYear() - 1, 11, 31);
-            break;
+      `;
+        }).join('');
+
+        // עדכון ספירת רשומות
+        const countElement = document.querySelector('.main-content .table-count');
+        if (countElement) {
+          countElement.textContent = `${notes.length} הערות`;
         }
-        
-        filteredNotes = filteredNotes.filter(note => {
-          const noteDate = new Date(note.created_at);
-          let isIncluded;
-          if (selectedDateRange === 'שנה קודמת') {
-            isIncluded = noteDate >= startDate && noteDate <= endDate;
-          } else {
-            isIncluded = noteDate >= startDate && noteDate <= now;
-          }
-          console.log(`🔄 Note ${note.id}: date=${noteDate}, included=${isIncluded}`);
-          return isIncluded;
-        });
-        console.log('🔄 After date range filter:', filteredNotes.length, 'notes');
-      }
-      
-      // פילטר לפי חיפוש חופשי - חיפוש בכל השדות כולל סימבולים ושמות
-      if (searchTerm && searchTerm.trim() !== '') {
-        console.log('🔄 Filtering by search term:', searchTerm);
-        const searchLower = searchTerm.toLowerCase();
-        filteredNotes = filteredNotes.filter(note => {
-          // חיפוש בשדות בסיסיים
-          const idMatch = (note.id || '').toString().toLowerCase().includes(searchLower);
-          const contentMatch = (note.content || '').toLowerCase().includes(searchLower);
-          const relatedTypeMatch = (note.related_type || '').toLowerCase().includes(searchLower);
-          const relatedIdMatch = (note.related_id || '').toString().toLowerCase().includes(searchLower);
-          const attachmentMatch = (note.attachment || '').toLowerCase().includes(searchLower);
-          const createdAtMatch = (note.created_at || '').toLowerCase().includes(searchLower);
-          
-          // חיפוש בשדות נוספים אם קיימים (לתאימות לאחור)
-          const accountIdMatch = (note.account_id || '').toString().toLowerCase().includes(searchLower);
-          const tradeIdMatch = (note.trade_id || '').toString().toLowerCase().includes(searchLower);
-          const tradePlanIdMatch = (note.trade_plan_id || '').toString().toLowerCase().includes(searchLower);
-          
-          // חיפוש בשדה "אובייקט מקושר" - שם הסימבול או שם החשבון
-          let relatedObjectMatch = false;
-          if (note.related_type === 'trade' || note.related_type === 'trade_plan') {
-            // נחפש את הסימבול של הטיקר (AAPL, TSLA, וכו') - לתאימות לאחור
-            const tickerId = note.related_type === 'trade' ? 
-              (window.tradesData ? window.tradesData.find(t => t.id == note.related_id)?.ticker_id : null) :
-              (window.tradePlansData ? window.tradePlansData.find(p => p.id == note.related_id)?.ticker_id : null);
-            
-            if (tickerId && window.tickersData) {
-              const ticker = window.tickersData.find(tick => tick.id == tickerId);
-              if (ticker && ticker.symbol) {
-                relatedObjectMatch = ticker.symbol.toLowerCase().includes(searchLower);
-              }
-            }
-          } else if (note.related_type === 'account') {
-            // נחפש את שם החשבון
-            if (window.accountsData) {
-              const account = window.accountsData.find(acc => acc.id == note.related_id);
-              if (account && account.name) {
-                relatedObjectMatch = account.name.toLowerCase().includes(searchLower);
-              }
-            }
-          }
-          
-          const isIncluded = idMatch || contentMatch || relatedTypeMatch || relatedIdMatch || 
-                            attachmentMatch || createdAtMatch || accountIdMatch || tradeIdMatch || 
-                            tradePlanIdMatch || relatedObjectMatch;
-          
-          console.log(`🔄 Note ${note.id}: id match=${idMatch}, content match=${contentMatch}, related_type match=${relatedTypeMatch}, related_id match=${relatedIdMatch}, attachment match=${attachmentMatch}, created_at match=${createdAtMatch}, related_object match=${relatedObjectMatch}, included=${isIncluded}`);
-          return isIncluded;
-        });
-        console.log('🔄 After search filter:', filteredNotes.length, 'notes');
-      }
-      
-      // עדכון הטבלה
-      if (typeof window.updateNotesTable === 'function') {
-        window.updateNotesTable(filteredNotes);
-      } else {
-        console.error('❌ updateNotesTable function not found');
-      }
-    }
-    
-    // פונקציה לטעינת הערות (כמו בדף database.html)
-    async function loadNotes() {
-      try {
-        console.log('🔄 טוען הערות...');
-        const notes = await loadNotesData();
-        
-        // עדכון הטבלה עם הנתונים
-        if (typeof updateNotesTable === 'function') {
-          await updateNotesTable(notes);
-        } else {
-          console.error('❌ פונקציית updateNotesTable לא נמצאה');
-        }
-        
-      } catch (error) {
-        console.error('❌ שגיאה בטעינת הערות:', error);
-        const tbody = document.querySelector('.main-content table tbody');
-        if (tbody) {
-          tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
-        }
-      }
-    }
-    
-    // הגדרת הפונקציה כגלובלית
-    window.loadNotes = loadNotes;
-    
-    /**
-     * פונקציה לאיפוס כל הפילטרים למצב ברירת המחדל
-     * מאפסת את כל הפילטרים ב-localStorage ובמשתנים הגלובליים
-     * @param {string} pageName - שם הדף (notes, designs, tracking)
-     */
-    window.resetAllFiltersForPage = function(pageName) {
-      console.log(`🔄 === Resetting all filters for ${pageName} ===`);
-      
-      if (pageName === 'notes') {
-        // איפוס הפילטרים למצב ברירת המחדל
-        const defaultStatuses = ['פתוח']; // רק "פתוח" מסומן
-        const defaultTypes = []; // כל הסוגים מסומנים (אין פילטר)
-        const defaultAccounts = []; // כל החשבונות מסומנים (אין פילטר)
-        const defaultDateRange = 'הכול'; // "הכול" מסומן
-        const defaultSearch = ''; // חיפוש ריק
-        
-        // שמירת הפילטרים ב-localStorage
-        localStorage.setItem('notesFilterStatuses', JSON.stringify(defaultStatuses));
-        localStorage.setItem('notesFilterTypes', JSON.stringify(defaultTypes));
-        localStorage.setItem('notesFilterAccounts', JSON.stringify(defaultAccounts));
-        localStorage.setItem('notesFilterDateRanges', JSON.stringify([defaultDateRange]));
-        localStorage.setItem('notesFilterSearch', defaultSearch);
-        
-        // עדכון המשתנים הגלובליים
-        window.selectedStatusesForFilter = defaultStatuses;
-        window.selectedTypesForFilter = defaultTypes;
-        window.selectedAccountsForFilter = defaultAccounts;
-        window.selectedDateRangeForFilter = defaultDateRange;
-        window.searchTermForFilter = defaultSearch;
-        
-        // רענון הנתונים עם הפילטרים החדשים
-        filterNotesData(defaultStatuses, defaultTypes, defaultAccounts, defaultDateRange, defaultSearch);
-        
-        console.log(`🔄 === Reset completed for ${pageName} ===`);
-      }
-    };
-    
-    // פונקציה לרענון התראות
-    function refreshAlerts() {
-      if (typeof loadAlertsForCards === 'function') {
-        loadAlertsForCards();
-        showNotification('התראות רועננו', 'success');
-      }
-    }
-    
-    // הגדרת הפונקציה כגלובלית
-    window.refreshAlerts = refreshAlerts;
-    
-    /**
-     * פונקציה לאיפוס פילטרים ורענון נתונים
-     * מאפסת את כל הפילטרים למצב ברירת המחדל וטוענת נתונים חדשים מהשרת
-     */
-    function resetAllFiltersAndReloadData() {
-      console.log('🔄 === Resetting filters and reloading data ===');
-      
-      // איפוס הפילטרים למצב ברירת המחדל
-      window.resetAllFiltersForPage('notes');
-      
-      // רענון הנתונים מהשרת
-      loadNotes();
-    }
-    
-    // הגדרת הפונקציה כגלובלית
-    window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
-    
-    // אתחול הדף
-    document.addEventListener('DOMContentLoaded', function() {
-      // טעינת מצב הסקשנים לפי הדף הנוכחי
-      if (typeof window.loadSectionStates === 'function') {
-        window.loadSectionStates();
-      }
-      
-      console.log('🔄 === DOM CONTENT LOADED ===');
-      window.initializePageFilters('notes');
-      
-      // הגדרת רדיו באטונים
-      setupRadioButtons();
-      
-      // הגדרת טיפול בקבצים
-      setupFileHandlers();
-      
-      // הגדרת event listeners לעורך הטקסט
-      const addEditor = document.getElementById('noteContentEditor');
-      const editEditor = document.getElementById('editNoteContentEditor');
-      
-      if (addEditor) {
-        addEditor.addEventListener('input', syncEditorContent);
-        addEditor.addEventListener('blur', syncEditorContent);
-      }
-      
-      if (editEditor) {
-        editEditor.addEventListener('input', syncEditorContent);
-        editEditor.addEventListener('blur', syncEditorContent);
-      }
-      
-      // שחזור מצב הסגירה
-      restoreNotesSectionState();
-      
-      // טעינת נתונים
-      loadNotes();
-      
-      // טעינת התראות
-      if (typeof loadAlertsForCards === 'function') {
-        console.log('🔄 טוען התראות...');
-        loadAlertsForCards();
-      }
-      
-      // הגדרת כותרות למיון אחרי טעינת נתונים
-      setTimeout(() => {
-        console.log('🔄 === SETUP SORTABLE HEADERS AFTER DATA LOAD ===');
-        setupSortableHeaders();
-      }, 1000);
-      
-      // הגדרת כותרות למיון
-      setTimeout(() => {
-        console.log('🔄 === SETUP SORTABLE HEADERS ===');
-        setupSortableHeaders();
-      }, 500);
-      
-      // בדיקת פילטרים שמורים אחרי 1 שנייה
-      setTimeout(() => {
-        window.debugSavedFilters('notes');
-        
+
         // עדכון סטטיסטיקות הטבלה
         updateTableStats();
-      }, 1000);
-    });
-  </script>
+
+        console.log('✅ טבלת הערות עודכנה בהצלחה');
+      }
+
+      /**
+       * פונקציה לקבלת אייקון קובץ
+       */
+      function getFileIcon(filename) {
+        if (!filename) return '';
+
+        const extension = filename.split('.').pop().toLowerCase();
+        const iconMap = {
+          'pdf': '📄',
+          'doc': '📝',
+          'docx': '📝',
+          'xls': '📊',
+          'xlsx': '📊',
+          'txt': '📄',
+          'jpg': '🖼️',
+          'jpeg': '🖼️',
+          'png': '🖼️',
+          'gif': '🖼️'
+        };
+
+        return iconMap[extension] || '📎';
+      }
+
+      /**
+       * פונקציה ליצירת קישור לקובץ
+       */
+      function createFileLink(filename) {
+        if (!filename) return '-';
+
+        const icon = getFileIcon(filename);
+        return `<a href="/uploads/notes/${filename}" target="_blank" class="file-link">${icon} ${filename}</a>`;
+      }
+
+      // הגדרת הפונקציה כגלובלית
+      window.updateNotesTable = updateNotesTable;
+      window.loadNotesData = loadNotesData;
+
+      // הגדרת הפונקציה הגלובלית לעדכון מהפילטרים
+      window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
+        console.log('🔄 === updateGridFromComponent called for notes ===');
+        console.log('🔄 Selected statuses:', selectedStatuses);
+        console.log('🔄 Selected types:', selectedTypes);
+        console.log('🔄 Selected accounts:', selectedAccounts);
+        console.log('🔄 Selected date range:', selectedDateRange);
+        console.log('🔄 Search term:', searchTerm);
+
+        // קריאה לפונקציה הגלובלית
+        if (typeof window.updateGridFromComponentGlobal === 'function') {
+          window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, 'notes');
+        } else {
+          console.log('🔄 Global updateGridFromComponentGlobal function not available, using local filtering');
+
+          // שמירת הפילטרים ב-localStorage
+          localStorage.setItem('notesFilterStatuses', JSON.stringify(selectedStatuses));
+          localStorage.setItem('notesFilterTypes', JSON.stringify(selectedTypes));
+          localStorage.setItem('notesFilterAccounts', JSON.stringify(selectedAccounts));
+          localStorage.setItem('notesFilterDateRanges', JSON.stringify([selectedDateRange]));
+          localStorage.setItem('notesFilterSearch', searchTerm);
+
+          // שמירת הפילטרים במשתנים הגלובליים
+          window.selectedStatusesForFilter = selectedStatuses;
+          window.selectedTypesForFilter = selectedTypes;
+          window.selectedAccountsForFilter = selectedAccounts;
+          window.selectedDateRangeForFilter = selectedDateRange;
+          window.searchTermForFilter = searchTerm;
+
+          // החלת הפילטרים על הנתונים
+          filterNotesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
+        }
+
+        console.log('🔄 === updateGridFromComponent completed for notes ===');
+      };
+
+      /**
+       * פונקציה מותאמת לפילטור נתוני הערות
+       * מסננת את ההערות לפי הפילטרים הנבחרים ומעדכנת את הטבלה
+       * @param {Array} selectedStatuses - סטטוסים נבחרים (לא רלוונטי להערות)
+       * @param {Array} selectedTypes - סוגים נבחרים (לא רלוונטי להערות)
+       * @param {Array} selectedAccounts - חשבונות נבחרים (לא רלוונטי להערות)
+       * @param {string} selectedDateRange - טווח תאריכים נבחר
+       * @param {string} searchTerm - מונח חיפוש חופשי
+       */
+      function filterNotesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
+        console.log('🔄 === FILTER NOTES DATA ===');
+        console.log('🔄 Selected statuses:', selectedStatuses);
+        console.log('🔄 Selected types:', selectedTypes);
+        console.log('🔄 Selected accounts:', selectedAccounts);
+        console.log('🔄 Date range:', selectedDateRange);
+        console.log('🔄 Search term:', searchTerm);
+
+        if (!notesData || notesData.length === 0) {
+          console.log('🔄 No notes data available for filtering');
+          return;
+        }
+
+        let filteredNotes = [...notesData];
+
+        // פילטר לפי תאריכים
+        if (selectedDateRange && selectedDateRange !== 'הכול') {
+          console.log('🔄 Filtering by date range:', selectedDateRange);
+          const now = new Date();
+          let startDate = new Date();
+
+          switch (selectedDateRange) {
+            case 'שבוע':
+              startDate.setDate(now.getDate() - 7);
+              break;
+            case 'MTD':
+              startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+              break;
+            case '30 יום':
+              startDate.setDate(now.getDate() - 30);
+              break;
+            case '60 יום':
+              startDate.setDate(now.getDate() - 60);
+              break;
+            case '90 יום':
+              startDate.setDate(now.getDate() - 90);
+              break;
+            case 'שנה':
+              startDate.setFullYear(now.getFullYear() - 1);
+              break;
+            case 'YTD':
+              startDate = new Date(now.getFullYear(), 0, 1);
+              break;
+            case 'שנה קודמת':
+              startDate = new Date(now.getFullYear() - 1, 0, 1);
+              const endDate = new Date(now.getFullYear() - 1, 11, 31);
+              break;
+          }
+
+          filteredNotes = filteredNotes.filter(note => {
+            const noteDate = new Date(note.created_at);
+            let isIncluded;
+            if (selectedDateRange === 'שנה קודמת') {
+              isIncluded = noteDate >= startDate && noteDate <= endDate;
+            } else {
+              isIncluded = noteDate >= startDate && noteDate <= now;
+            }
+            console.log(`🔄 Note ${note.id}: date=${noteDate}, included=${isIncluded}`);
+            return isIncluded;
+          });
+          console.log('🔄 After date range filter:', filteredNotes.length, 'notes');
+        }
+
+        // פילטר לפי חיפוש חופשי - חיפוש בכל השדות כולל סימבולים ושמות
+        if (searchTerm && searchTerm.trim() !== '') {
+          console.log('🔄 Filtering by search term:', searchTerm);
+          const searchLower = searchTerm.toLowerCase();
+          filteredNotes = filteredNotes.filter(note => {
+            // חיפוש בשדות בסיסיים
+            const idMatch = (note.id || '').toString().toLowerCase().includes(searchLower);
+            const contentMatch = (note.content || '').toLowerCase().includes(searchLower);
+            const relatedTypeMatch = (note.related_type || '').toLowerCase().includes(searchLower);
+            const relatedIdMatch = (note.related_id || '').toString().toLowerCase().includes(searchLower);
+            const attachmentMatch = (note.attachment || '').toLowerCase().includes(searchLower);
+            const createdAtMatch = (note.created_at || '').toLowerCase().includes(searchLower);
+
+            // חיפוש בשדות נוספים אם קיימים (לתאימות לאחור)
+            const accountIdMatch = (note.account_id || '').toString().toLowerCase().includes(searchLower);
+            const tradeIdMatch = (note.trade_id || '').toString().toLowerCase().includes(searchLower);
+            const tradePlanIdMatch = (note.trade_plan_id || '').toString().toLowerCase().includes(searchLower);
+
+            // חיפוש בשדה "אובייקט מקושר" - שם הסימבול או שם החשבון
+            let relatedObjectMatch = false;
+            if (note.related_type === 'trade' || note.related_type === 'trade_plan') {
+              // נחפש את הסימבול של הטיקר (AAPL, TSLA, וכו') - לתאימות לאחור
+              const tickerId = note.related_type === 'trade' ?
+                (window.tradesData ? window.tradesData.find(t => t.id == note.related_id)?.ticker_id : null) :
+                (window.tradePlansData ? window.tradePlansData.find(p => p.id == note.related_id)?.ticker_id : null);
+
+              if (tickerId && window.tickersData) {
+                const ticker = window.tickersData.find(tick => tick.id == tickerId);
+                if (ticker && ticker.symbol) {
+                  relatedObjectMatch = ticker.symbol.toLowerCase().includes(searchLower);
+                }
+              }
+            } else if (note.related_type === 'account') {
+              // נחפש את שם החשבון
+              if (window.accountsData) {
+                const account = window.accountsData.find(acc => acc.id == note.related_id);
+                if (account && account.name) {
+                  relatedObjectMatch = account.name.toLowerCase().includes(searchLower);
+                }
+              }
+            }
+
+            const isIncluded = idMatch || contentMatch || relatedTypeMatch || relatedIdMatch ||
+              attachmentMatch || createdAtMatch || accountIdMatch || tradeIdMatch ||
+              tradePlanIdMatch || relatedObjectMatch;
+
+            console.log(`🔄 Note ${note.id}: id match=${idMatch}, content match=${contentMatch}, related_type match=${relatedTypeMatch}, related_id match=${relatedIdMatch}, attachment match=${attachmentMatch}, created_at match=${createdAtMatch}, related_object match=${relatedObjectMatch}, included=${isIncluded}`);
+            return isIncluded;
+          });
+          console.log('🔄 After search filter:', filteredNotes.length, 'notes');
+        }
+
+        // עדכון הטבלה
+        if (typeof window.updateNotesTable === 'function') {
+          window.updateNotesTable(filteredNotes);
+        } else {
+          console.error('❌ updateNotesTable function not found');
+        }
+      }
+
+      // פונקציה לטעינת הערות (כמו בדף database.html)
+      async function loadNotes() {
+        try {
+          console.log('🔄 טוען הערות...');
+          const notes = await loadNotesData();
+
+          // עדכון הטבלה עם הנתונים
+          if (typeof updateNotesTable === 'function') {
+            await updateNotesTable(notes);
+          } else {
+            console.error('❌ פונקציית updateNotesTable לא נמצאה');
+          }
+
+        } catch (error) {
+          console.error('❌ שגיאה בטעינת הערות:', error);
+          const tbody = document.querySelector('.main-content table tbody');
+          if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+          }
+        }
+      }
+
+      // הגדרת הפונקציה כגלובלית
+      window.loadNotes = loadNotes;
+
+      /**
+       * פונקציה לאיפוס כל הפילטרים למצב ברירת המחדל
+       * מאפסת את כל הפילטרים ב-localStorage ובמשתנים הגלובליים
+       * @param {string} pageName - שם הדף (notes, designs, tracking)
+       */
+      window.resetAllFiltersForPage = function (pageName) {
+        console.log(`🔄 === Resetting all filters for ${pageName} ===`);
+
+        if (pageName === 'notes') {
+          // איפוס הפילטרים למצב ברירת המחדל
+          const defaultStatuses = ['פתוח']; // רק "פתוח" מסומן
+          const defaultTypes = []; // כל הסוגים מסומנים (אין פילטר)
+          const defaultAccounts = []; // כל החשבונות מסומנים (אין פילטר)
+          const defaultDateRange = 'הכול'; // "הכול" מסומן
+          const defaultSearch = ''; // חיפוש ריק
+
+          // שמירת הפילטרים ב-localStorage
+          localStorage.setItem('notesFilterStatuses', JSON.stringify(defaultStatuses));
+          localStorage.setItem('notesFilterTypes', JSON.stringify(defaultTypes));
+          localStorage.setItem('notesFilterAccounts', JSON.stringify(defaultAccounts));
+          localStorage.setItem('notesFilterDateRanges', JSON.stringify([defaultDateRange]));
+          localStorage.setItem('notesFilterSearch', defaultSearch);
+
+          // עדכון המשתנים הגלובליים
+          window.selectedStatusesForFilter = defaultStatuses;
+          window.selectedTypesForFilter = defaultTypes;
+          window.selectedAccountsForFilter = defaultAccounts;
+          window.selectedDateRangeForFilter = defaultDateRange;
+          window.searchTermForFilter = defaultSearch;
+
+          // רענון הנתונים עם הפילטרים החדשים
+          filterNotesData(defaultStatuses, defaultTypes, defaultAccounts, defaultDateRange, defaultSearch);
+
+          console.log(`🔄 === Reset completed for ${pageName} ===`);
+        }
+      };
+
+      // פונקציה לרענון התראות
+      function refreshAlerts() {
+        if (typeof loadAlertsForCards === 'function') {
+          loadAlertsForCards();
+          showNotification('התראות רועננו', 'success');
+        }
+      }
+
+      // הגדרת הפונקציה כגלובלית
+      window.refreshAlerts = refreshAlerts;
+
+      /**
+       * פונקציה לאיפוס פילטרים ורענון נתונים
+       * מאפסת את כל הפילטרים למצב ברירת המחדל וטוענת נתונים חדשים מהשרת
+       */
+      function resetAllFiltersAndReloadData() {
+        console.log('🔄 === Resetting filters and reloading data ===');
+
+        // איפוס הפילטרים למצב ברירת המחדל
+        window.resetAllFiltersForPage('notes');
+
+        // רענון הנתונים מהשרת
+        loadNotes();
+      }
+
+      // הגדרת הפונקציה כגלובלית
+      window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
+
+      /**
+       * פונקציה לעדכון סטטיסטיקות הטבלה
+       */
+      function updateTableStats() {
+        console.log('🔄 עדכון סטטיסטיקות הטבלה');
+
+        // עדכון ספירת רשומות
+        const totalNotes = notesData.length;
+        const todayNotes = notesData.filter(note => {
+          const noteDate = new Date(note.created_at);
+          const today = new Date();
+          return noteDate.toDateString() === today.toDateString();
+        }).length;
+
+        const weekNotes = notesData.filter(note => {
+          const noteDate = new Date(note.created_at);
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return noteDate >= weekAgo;
+        }).length;
+
+        const importantNotes = notesData.filter(note =>
+          note.content && note.content.toLowerCase().includes('חשוב')
+        ).length;
+
+        // עדכון אלמנטים
+        const totalElement = document.getElementById('totalNotes');
+        const todayElement = document.getElementById('todayNotes');
+        const weekElement = document.getElementById('weekNotes');
+        const importantElement = document.getElementById('importantNotes');
+
+        if (totalElement) totalElement.textContent = totalNotes;
+        if (todayElement) todayElement.textContent = todayNotes;
+        if (weekElement) weekElement.textContent = weekNotes;
+        if (importantElement) importantElement.textContent = importantNotes;
+
+        console.log(`📊 סטטיסטיקות: סה"כ ${totalNotes}, היום ${todayNotes}, השבוע ${weekNotes}, חשובות ${importantNotes}`);
+      }
+
+      // פונקציה לשחזור מצב הסגירה
+      function restoreNotesSectionState() {
+        // שחזור מצב top section
+        const topSection = document.querySelector('.top-section .section-body');
+        const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+        const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
+
+        if (topSection && topToggleBtn && topIcon) {
+          const isCollapsed = localStorage.getItem('notesTopSectionCollapsed') === 'true';
+
+          if (isCollapsed) {
+            topSection.classList.add('collapsed');
+            topSection.style.display = 'none';
+            topIcon.textContent = '▼';
+          } else {
+            topSection.classList.remove('collapsed');
+            topSection.style.display = 'block';
+            topIcon.textContent = '▲';
+          }
+        }
+
+        // שחזור מצב main section
+        const mainSection = document.querySelector('.content-section .section-body');
+        const mainToggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+        const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
+
+        if (mainSection && mainToggleBtn && mainIcon) {
+          const isCollapsed = localStorage.getItem('notesMainSectionCollapsed') === 'true';
+
+          if (isCollapsed) {
+            mainSection.classList.add('collapsed');
+            mainSection.style.display = 'none';
+            mainIcon.textContent = '▼';
+          } else {
+            mainSection.classList.remove('collapsed');
+            mainSection.style.display = 'block';
+            mainIcon.textContent = '▲';
+          }
+        }
+      }
+
+      // אתחול הדף
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('🔄 === DOM CONTENT LOADED ===');
+
+        // שחזור מצב הסקשנים
+        restoreNotesSectionState();
+
+        window.initializePageFilters('notes');
+
+        // הגדרת רדיו באטונים
+        setupRadioButtons();
+
+        // הגדרת טיפול בקבצים
+        setupFileHandlers();
+
+        // הגדרת event listeners לעורך הטקסט
+        const addEditor = document.getElementById('noteContentEditor');
+        const editEditor = document.getElementById('editNoteContentEditor');
+
+        if (addEditor) {
+          addEditor.addEventListener('input', syncEditorContent);
+          addEditor.addEventListener('blur', syncEditorContent);
+        }
+
+        if (editEditor) {
+          editEditor.addEventListener('input', syncEditorContent);
+          editEditor.addEventListener('blur', syncEditorContent);
+        }
+
+        // שחזור מצב הסגירה
+        restoreNotesSectionState();
+
+        // טעינת נתונים
+        loadNotes();
+
+        // טעינת התראות
+        if (typeof loadAlertsForCards === 'function') {
+          console.log('🔄 טוען התראות...');
+          loadAlertsForCards();
+        }
+
+        // הגדרת כותרות למיון אחרי טעינת נתונים
+        setTimeout(() => {
+          console.log('🔄 === SETUP SORTABLE HEADERS AFTER DATA LOAD ===');
+          setupSortableHeaders();
+        }, 1000);
+
+        // הגדרת כותרות למיון
+        setTimeout(() => {
+          console.log('🔄 === SETUP SORTABLE HEADERS ===');
+          setupSortableHeaders();
+        }, 500);
+
+        // בדיקת פילטרים שמורים אחרי 1 שנייה
+        setTimeout(() => {
+          window.debugSavedFilters('notes');
+
+          // עדכון סטטיסטיקות הטבלה
+          updateTableStats();
+        }, 1000);
+      });
+    </script>
+
+
+
 </body>
+
 </html>

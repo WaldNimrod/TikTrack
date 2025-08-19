@@ -227,6 +227,7 @@ function updateTradesTable(trades) {
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editTradeRecord('${trade.id}')" title="ערוך">✏️</button>
         <button class="btn btn-sm btn-secondary" onclick="cancelTradeRecord('${trade.id}')" title="ביטול">❌</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteTradeRecord('${trade.id}')" title="מחק">🗑️</button>
       </td>
     </tr>
   `;
@@ -274,6 +275,14 @@ function editTradeRecord(tradeId) {
 function cancelTradeRecord(tradeId) {
   console.log('ביטול טרייד:', tradeId);
   // כאן יוכנס קוד לביטול טרייד
+}
+
+function deleteTradeRecord(tradeId) {
+  console.log('מחיקת טרייד:', tradeId);
+  if (confirm('האם אתה בטוח שברצונך למחוק את הטרייד?')) {
+    // כאן יוכנס קוד למחיקת טרייד
+    console.log('טרייד נמחק:', tradeId);
+  }
 }
 
 // הגדרת הפונקציה updateGridFromComponent לדף המעקב

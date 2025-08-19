@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename
 from typing import Optional, Dict, Any, List
 from werkzeug.datastructures import FileStorage
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 logger = logging.getLogger(__name__)
 
@@ -111,9 +112,9 @@ def get_notes():
         db = next(get_db())
         logger.info("✅ Database connection established")
         
-        # שימוש ב-SQL ישיר במקום SQLAlchemy
+        # שימוש ב-SQL ישיר עם text() מ-SQLAlchemy
         try:
-            result = db.execute("SELECT * FROM notes ORDER BY created_at DESC")
+            result = db.execute(text("SELECT * FROM notes ORDER BY created_at DESC"))
             notes_data = result.fetchall()
             logger.info(f"✅ Successfully retrieved {len(notes_data)} notes using direct SQL")
             

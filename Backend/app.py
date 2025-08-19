@@ -52,6 +52,7 @@ from routes.api.cash_flows import cash_flows_bp
 from routes.api.notes import notes_bp
 from routes.api.executions import executions_bp
 from routes.api.preferences import preferences_bp
+from routes.api.tests import tests_bp
 from routes.pages import pages_bp
 
 app = Flask(__name__)
@@ -72,6 +73,7 @@ app.register_blueprint(cash_flows_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
 app.register_blueprint(preferences_bp)
+app.register_blueprint(tests_bp)
 app.register_blueprint(pages_bp)
 
 # הגדרת טיפול בשגיאות

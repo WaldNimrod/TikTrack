@@ -24,7 +24,7 @@ async function loadDesignsData() {
     
     // טעינת נתונים מהשרת
     const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-    const response = await fetch(`${base}/api/database_v2/trade_plans`);
+    const response = await fetch(`${base}/api/v1/trade_plans/`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

@@ -223,14 +223,8 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="alertTitle" class="form-label">כותרת התראה *</label>
-                    <input type="text" class="form-control" id="alertTitle" required>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="mb-3">
                     <label for="alertType" class="form-label">סוג התראה *</label>
-                    <select class="form-select" id="alertType" required>
+                    <select class="form-select" id="alertType" required onchange="onAlertTypeChange(this)">
                       <option value="">בחר סוג התראה...</option>
                       <option value="price_alert">התראה על מחיר</option>
                       <option value="stop_loss">סטופ לוס</option>
@@ -239,8 +233,6 @@
                     </select>
                   </div>
                 </div>
-              </div>
-              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="alertCondition" class="form-label">תנאי התראה *</label>
@@ -248,6 +240,8 @@
                       placeholder="למשל: מחיר > 100$">
                   </div>
                 </div>
+              </div>
+              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="alertMessage" class="form-label">הודעת התראה</label>
@@ -260,7 +254,9 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-            <button type="button" class="btn btn-secondary" onclick="saveAlert()" title="שמור">💾</button>
+            <button type="button" class="btn btn-success" onclick="saveAlert()"
+              style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">שמור
+              התראה</button>
           </div>
         </div>
       </div>
@@ -316,14 +312,8 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="editAlertTitle" class="form-label">כותרת התראה *</label>
-                    <input type="text" class="form-control" id="editAlertTitle" required>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="mb-3">
                     <label for="editAlertType" class="form-label">סוג התראה *</label>
-                    <select class="form-select" id="editAlertType" required>
+                    <select class="form-select" id="editAlertType" required onchange="onAlertTypeChange(this)">
                       <option value="">בחר סוג התראה...</option>
                       <option value="price_alert">התראה על מחיר</option>
                       <option value="stop_loss">סטופ לוס</option>
@@ -332,8 +322,6 @@
                     </select>
                   </div>
                 </div>
-              </div>
-              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editAlertCondition" class="form-label">תנאי התראה *</label>
@@ -341,6 +329,8 @@
                       placeholder="למשל: מחיר > 100$">
                   </div>
                 </div>
+              </div>
+              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editAlertMessage" class="form-label">הודעת התראה</label>
@@ -353,7 +343,9 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-            <button type="button" class="btn btn-secondary" onclick="updateAlert()" title="שמור">💾</button>
+            <button type="button" class="btn btn-success" onclick="updateAlert()"
+              style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן
+              התראה</button>
           </div>
         </div>
       </div>

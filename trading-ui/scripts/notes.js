@@ -840,7 +840,7 @@ async function saveNote() {
       relatedId = document.getElementById('noteRelatedObjectSelect').value;
       break;
   }
-  
+
   console.log('🔗 relatedTypeId:', relatedTypeId, 'relatedId:', relatedId);
 
   if (!content || content.trim() === '' || content === '<br>' || !relatedId) {

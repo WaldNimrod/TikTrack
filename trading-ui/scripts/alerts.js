@@ -500,46 +500,77 @@ function closeModal(modalId) {
 }
 
 /**
+ * בדיקת סוג התראה בזמן אמת
+ */
+function onAlertTypeChange(selectElement) {
+  const selectedType = selectElement.value;
+  if (selectedType && !checkAlertType(selectedType)) {
+    // החזרת הבחירה הקודמת
+    selectElement.value = '';
+  }
+}
+
+/**
+ * בדיקת סוג התראה והצגת התראה לסוגים לא נתמכים
+ */
+function checkAlertType(alertType) {
+  const unsupportedTypes = ['volume_alert', 'custom_alert'];
+
+  if (unsupportedTypes.includes(alertType)) {
+    alert('סוג התראה זה ייפתח בהמשך. כרגע נתמכים רק התראות על מחיר וסטופ לוס.');
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * שמירת התראה חדשה
  */
 async function saveAlert() {
+  const form = document.getElementById('addAlertForm');
+  if (!form) {
+    console.error('Form element not found');
+    return;
+  }
+
+  // בדיקת סוג ההתראה
+  const alertType = document.getElementById('alertType').value;
+  if (!checkAlertType(alertType)) {
+    return; // עצירת השמירה אם הסוג לא נתמך
+  }
+
+  // בדיקת תקינות הטופס
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  // בדיקת שדות חובה
+  const formData = new FormData(form);
+  const relatedType = formData.get('alertRelationType');
+  const relatedId = document.getElementById('alertRelatedObjectSelect').value;
+  const condition = document.getElementById('alertCondition').value;
+
+  if (!relatedType || !relatedId || !condition) {
+    alert('יש למלא את כל השדות החובה');
+    return;
+  }
+
+  // המשך הקוד הקיים...
+  const alertData = {
+    related_type_id: parseInt(formData.get('alertRelationType')),
+    related_id: parseInt(document.getElementById('alertRelatedObjectSelect').value),
+    type: alertType,
+    condition: document.getElementById('alertCondition').value,
+    message: document.getElementById('alertMessage').value || null,
+    status: 'open',
+    is_triggered: 'false'
+  };
+
+  console.log('שולח התראה חדשה:', alertData);
+
   try {
-    const form = document.getElementById('addAlertForm');
-    if (!form) {
-      console.error('Add alert form not found');
-      return;
-    }
-
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-
-    const alertTitle = document.getElementById('alertTitle');
-    const alertType = document.getElementById('alertType');
-    const alertCondition = document.getElementById('alertCondition');
-    const alertMessage = document.getElementById('alertMessage');
-    const relationTypeRadio = document.querySelector('input[name="alertRelationType"]:checked');
-    const relatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
-
-    if (!alertTitle || !alertType || !alertCondition || !relationTypeRadio || !relatedObjectSelect) {
-      console.error('Required form elements not found');
-      return;
-    }
-
-    const alertData = {
-      title: alertTitle.value,
-      type: alertType.value,
-      related_type_id: parseInt(relationTypeRadio.value),
-      related_id: parseInt(relatedObjectSelect.value),
-      condition: alertCondition.value,
-      message: alertMessage.value,
-      status: 'open',
-      is_triggered: false
-    };
-
-    console.log('שולח התראה חדשה:', alertData);
-
     const response = await fetch('/api/v1/alerts/', {
       method: 'POST',
       headers: {
@@ -584,13 +615,11 @@ function editAlert(alertId) {
 
   // מילוי הטופס
   const editAlertId = document.getElementById('editAlertId');
-  const editAlertTitle = document.getElementById('editAlertTitle');
   const editAlertType = document.getElementById('editAlertType');
   const editAlertCondition = document.getElementById('editAlertCondition');
   const editAlertMessage = document.getElementById('editAlertMessage');
 
   if (editAlertId) editAlertId.value = alert.id;
-  if (editAlertTitle) editAlertTitle.value = alert.title || '';
   if (editAlertType) editAlertType.value = alert.type || '';
   if (editAlertCondition) editAlertCondition.value = alert.condition || '';
   if (editAlertMessage) editAlertMessage.value = alert.message || '';
@@ -650,46 +679,35 @@ function editAlert(alertId) {
 }
 
 /**
- * עדכון התראה
+ * עדכון התראה קיימת
  */
 async function updateAlert() {
+  const form = document.getElementById('editAlertForm');
+  if (!form) {
+    console.error('Form element not found');
+    return;
+  }
+
+  // בדיקת סוג ההתראה
+  const alertType = document.getElementById('editAlertType').value;
+  if (!checkAlertType(alertType)) {
+    return; // עצירת העדכון אם הסוג לא נתמך
+  }
+
+  // המשך הקוד הקיים...
+  const alertId = document.getElementById('editAlertId').value;
+  const alertData = {
+    related_type_id: parseInt(document.querySelector('input[name="editAlertRelationType"]:checked').value),
+    related_id: parseInt(document.getElementById('editAlertRelatedObjectSelect').value),
+    type: alertType,
+    condition: document.getElementById('editAlertCondition').value,
+    message: document.getElementById('editAlertMessage').value || null
+  };
+
+  console.log('מעדכן התראה:', alertId, alertData);
+
   try {
-    const form = document.getElementById('editAlertForm');
-    if (!form) {
-      console.error('Edit alert form not found');
-      return;
-    }
-
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-
-    const editAlertId = document.getElementById('editAlertId');
-    const editAlertTitle = document.getElementById('editAlertTitle');
-    const editAlertType = document.getElementById('editAlertType');
-    const editAlertCondition = document.getElementById('editAlertCondition');
-    const editAlertMessage = document.getElementById('editAlertMessage');
-    const relationTypeRadio = document.querySelector('input[name="editAlertRelationType"]:checked');
-    const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
-
-    if (!editAlertId || !editAlertTitle || !editAlertType || !editAlertCondition || !relationTypeRadio || !relatedObjectSelect) {
-      console.error('Required edit form elements not found');
-      return;
-    }
-
-    const alertData = {
-      title: editAlertTitle.value,
-      type: editAlertType.value,
-      related_type_id: parseInt(relationTypeRadio.value),
-      related_id: parseInt(relatedObjectSelect.value),
-      condition: editAlertCondition.value,
-      message: editAlertMessage.value
-    };
-
-    console.log('מעדכן התראה:', editAlertId.value, alertData);
-
-    const response = await fetch(`/api/v1/alerts/${editAlertId.value}`, {
+    const response = await fetch(`/api/v1/alerts/${alertId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -860,12 +878,13 @@ document.addEventListener('DOMContentLoaded', function () {
 // הוספת הפונקציות לגלובל
 window.loadAlertsData = loadAlertsData;
 window.updateAlertsTable = updateAlertsTable;
-
 window.showAddAlertModal = showAddAlertModal;
 window.editAlert = editAlert;
 window.deleteAlert = deleteAlert;
 window.saveAlert = saveAlert;
 window.updateAlert = updateAlert;
 window.sortTable = sortTable;
+window.checkAlertType = checkAlertType;
+window.onAlertTypeChange = onAlertTypeChange;
 
 

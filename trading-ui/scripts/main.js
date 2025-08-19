@@ -13,63 +13,63 @@ let externalFilterPresent = false;
 
 // פונקציית API כללית
 async function apiCall(endpoint, options = {}) {
-    const baseUrl = 'http://127.0.0.1:8080';
-    const url = `${baseUrl}${endpoint}`;
-    
-    // הגדרת headers
-    let headers = {};
-    
-    // אם יש FormData, לא שולח Content-Type
-    if (!(options.body instanceof FormData)) {
-        headers['Content-Type'] = 'application/json';
-    }
-    
-    // הוספת headers נוספים אם יש
-    if (options.headers) {
-        headers = { ...headers, ...options.headers };
+  const baseUrl = 'http://127.0.0.1:8080';
+  const url = `${baseUrl}${endpoint}`;
+
+  // הגדרת headers
+  let headers = {};
+
+  // אם יש FormData, לא שולח Content-Type
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  // הוספת headers נוספים אם יש
+  if (options.headers) {
+    headers = { ...headers, ...options.headers };
+  }
+
+  const finalOptions = {
+    ...options,
+    headers
+  };
+
+  try {
+    console.log('📡 שולח בקשה ל:', url);
+    console.log('📋 סוג body:', options.body instanceof FormData ? 'FormData' : 'JSON');
+
+    const response = await fetch(url, finalOptions);
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('❌ שגיאה בתגובה:', response.status, data);
+      throw new Error(data.error?.message || data.message || `HTTP ${response.status}`);
     }
 
-    const finalOptions = { 
-        ...options,
-        headers
-    };
-
-    try {
-        console.log('📡 שולח בקשה ל:', url);
-        console.log('📋 סוג body:', options.body instanceof FormData ? 'FormData' : 'JSON');
-        
-        const response = await fetch(url, finalOptions);
-        const data = await response.json();
-        
-        if (!response.ok) {
-            console.error('❌ שגיאה בתגובה:', response.status, data);
-            throw new Error(data.error?.message || data.message || `HTTP ${response.status}`);
-        }
-        
-        console.log('✅ תגובה מוצלחת:', data);
-        return data;
-    } catch (error) {
-        console.error(`❌ שגיאת API (${endpoint}):`, error);
-        throw error;
-    }
+    console.log('✅ תגובה מוצלחת:', data);
+    return data;
+  } catch (error) {
+    console.error(`❌ שגיאת API (${endpoint}):`, error);
+    throw error;
+  }
 }
 
 // הגדרת עמודות הגריד הסטנדרטיות
 const getDefaultColumnDefs = () => [
-  { 
-    headerName: "המרה", 
-    field: "action", 
+  {
+    headerName: "המרה",
+    field: "action",
     width: 60,
     minWidth: 50,
     maxWidth: 80,
     cellRenderer: params => `<span style="cursor: pointer; font-size: 1.2rem;">${params.value}</span>`
   },
-  { 
-    headerName: "סטטוס", 
-    field: "status", 
+  {
+    headerName: "סטטוס",
+    field: "status",
     width: 80,
     minWidth: 70,
-    maxWidth: 100, 
+    maxWidth: 100,
     cellClass: params => `badge-status ${params.value}`,
     filter: true,
     filterParams: {
@@ -77,40 +77,40 @@ const getDefaultColumnDefs = () => [
       defaultOption: 'equals'
     }
   },
-  { 
-    headerName: "נוכחי", 
-    field: "current", 
+  {
+    headerName: "נוכחי",
+    field: "current",
     width: 120,
     minWidth: 100,
-    maxWidth: 150, 
-    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+    maxWidth: 150,
+    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
   },
-  { 
-    headerName: "סטופ", 
-    field: "stop", 
+  {
+    headerName: "סטופ",
+    field: "stop",
     width: 120,
     minWidth: 100,
-    maxWidth: 150, 
-    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+    maxWidth: 150,
+    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
   },
-  { 
-    headerName: "יעד", 
-    field: "target", 
+  {
+    headerName: "יעד",
+    field: "target",
     width: 120,
     minWidth: 100,
-    maxWidth: 150, 
-    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+    maxWidth: 150,
+    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
   },
-  { 
-    headerName: "סכום/כמות", 
-    field: "amount", 
+  {
+    headerName: "סכום/כמות",
+    field: "amount",
     width: 140,
     minWidth: 120,
     maxWidth: 160
   },
-  { 
-    headerName: "סוג", 
-    field: "type", 
+  {
+    headerName: "סוג",
+    field: "type",
     width: 100,
     minWidth: 80,
     maxWidth: 120,
@@ -120,9 +120,9 @@ const getDefaultColumnDefs = () => [
       defaultOption: 'equals'
     }
   },
-  { 
-    headerName: "תאריך", 
-    field: "date", 
+  {
+    headerName: "תאריך",
+    field: "date",
     width: 120,
     minWidth: 100,
     maxWidth: 140,
@@ -132,9 +132,9 @@ const getDefaultColumnDefs = () => [
       defaultOption: 'equals'
     }
   },
-  { 
-    headerName: "טיקר", 
-    field: "ticker", 
+  {
+    headerName: "טיקר",
+    field: "ticker",
     width: 100,
     minWidth: 80,
     maxWidth: 120,
@@ -149,28 +149,28 @@ const getDefaultColumnDefs = () => [
 // ===== GRID DATA MANAGEMENT =====
 // קובץ ייעודי לניהול נתונים - משותף לכל הדפים
 
-// נתוני דוגמה סטנדרטיים
+// נתוני דוגמה סטנדרטיים - ללא חשבונות ספציפיים
 const getDefaultRowData = () => [
-  { ticker: "AAPL", date: "2025-08-01", type: "סווינג", amount: "$25,000 (#100)", target: "$210 (12.3%)", stop: "$180 (-6.7%)", current: "$184.32 (+1.2%)", status: "פתוח", action: "⬅️", account: "חשבון ראשי" },
-  { ticker: "TSLA", date: "2025-07-30", type: "השקעה", amount: "$20,000 (#100)", target: "$780 (10.1%)", stop: "$690 (-4.8%)", current: "$688.90 (-2.1%)", status: "סגור", action: "⬅️", account: "חשבון משני" },
-  { ticker: "NVDA", date: "2025-07-28", type: "השקעה", amount: "$15,000 (#75)", target: "$540 (8.2%)", stop: "$480 (-4.5%)", current: "$503.20 (+0.5%)", status: "פתוח", action: "⬅️", account: "חשבון ראשי" },
-  { ticker: "AMZN", date: "2025-07-27", type: "פאסיבי", amount: "$10,000 (#50)", target: "$140 (6.3%)", stop: "$126 (-3.1%)", current: "$129.00 (-1.0%)", status: "מבוטל", action: "⬅️", account: "חשבון משני" },
-  { ticker: "GOOG", date: "2025-07-26", type: "השקעה", amount: "$20,000 (#60)", target: "$148 (9.0%)", stop: "$130 (-3.4%)", current: "$141.00 (+1.6%)", status: "פתוח", action: "⬅️", account: "חשבון ראשי" },
-  { ticker: "MSFT", date: "2025-07-25", type: "סווינג", amount: "$18,000 (#90)", target: "$355 (11.2%)", stop: "$320 (-4.2%)", current: "$342.00 (+2.4%)", status: "סגור", action: "⬅️", account: "חשבון משני" }
+  { ticker: "AAPL", date: "2025-08-01", type: "סווינג", amount: "$25,000 (#100)", target: "$210 (12.3%)", stop: "$180 (-6.7%)", current: "$184.32 (+1.2%)", status: "פתוח", action: "⬅️", account: "" },
+  { ticker: "TSLA", date: "2025-07-30", type: "השקעה", amount: "$20,000 (#100)", target: "$780 (10.1%)", stop: "$690 (-4.8%)", current: "$688.90 (-2.1%)", status: "סגור", action: "⬅️", account: "" },
+  { ticker: "NVDA", date: "2025-07-28", type: "השקעה", amount: "$15,000 (#75)", target: "$540 (8.2%)", stop: "$480 (-4.5%)", current: "$503.20 (+0.5%)", status: "פתוח", action: "⬅️", account: "" },
+  { ticker: "AMZN", date: "2025-07-27", type: "פאסיבי", amount: "$10,000 (#50)", target: "$140 (6.3%)", stop: "$126 (-3.1%)", current: "$129.00 (-1.0%)", status: "מבוטל", action: "⬅️", account: "" },
+  { ticker: "GOOG", date: "2025-07-26", type: "השקעה", amount: "$20,000 (#60)", target: "$148 (9.0%)", stop: "$130 (-3.4%)", current: "$141.00 (+1.6%)", status: "פתוח", action: "⬅️", account: "" },
+  { ticker: "MSFT", date: "2025-07-25", type: "סווינג", amount: "$18,000 (#90)", target: "$355 (11.2%)", stop: "$320 (-4.2%)", current: "$342.00 (+2.4%)", status: "סגור", action: "⬅️", account: "" }
 ];
 
 // פונקציה לטעינת נתונים מהשרת
 async function loadPlansFromServer() {
   try {
     console.log('Loading plans from server...');
-    
+
     // כאן תהיה קריאה לשרת האמיתי
     // const response = await fetch('/api/plans');
     // const data = await response.json();
-    
+
     // כרגע נחזיר נתוני דוגמה
     const data = getDefaultRowData();
-    
+
     console.log('Plans loaded from server:', data.length, 'items');
     return data;
   } catch (error) {
@@ -183,20 +183,20 @@ async function loadPlansFromServer() {
 // פונקציה לחילוץ סכום מהשדה amount
 function extractAmount(amountString) {
   if (!amountString) return 0;
-  
+
   // מחפש מספר אחרי הסימן $ ולפני הסימן (
   const match = amountString.match(/\$([0-9,]+)/);
   if (match) {
     // מסיר פסיקים וממיר למספר
     return parseFloat(match[1].replace(/,/g, ''));
   }
-  
+
   // אם לא מצאנו $, נחפש מספר רגיל
   const numberMatch = amountString.match(/[\d,]+/);
   if (numberMatch) {
     return parseInt(numberMatch[0].replace(/,/g, ''));
   }
-  
+
   return 0;
 }
 
@@ -206,9 +206,9 @@ function updateSummaryStats(data = null) {
   console.log('Input data:', data);
   console.log('window.rowData:', window.rowData);
   console.log('window.gridApi exists:', !!window.gridApi);
-  
+
   let statsData;
-  
+
   // אם לא הועברו נתונים, השתמש בנתונים המוצגים בגריד (כמו בדף התכנונים)
   if (!data && window.gridApi) {
     const displayedRows = [];
@@ -224,10 +224,10 @@ function updateSummaryStats(data = null) {
     statsData = data;
     console.log('Using provided data:', statsData);
   }
-  
+
   console.log('Stats data to process:', statsData);
   console.log('Stats data length:', statsData.length);
-  
+
   if (statsData.length === 0) {
     console.log('No data to calculate statistics');
     // עדכון תצוגה עם אפסים
@@ -238,11 +238,11 @@ function updateSummaryStats(data = null) {
     });
     return;
   }
-  
+
   // חישוב סטטיסטיקות כלליות
   const totalRecords = statsData.length;
   let totalAmount = 0;
-  
+
   // חישוב סכום כולל
   statsData.forEach(record => {
     try {
@@ -251,16 +251,16 @@ function updateSummaryStats(data = null) {
       console.log('שגיאה בחישוב סכום לרשומה:', record, e);
     }
   });
-  
+
   // חישוב סכום ממוצע
   const averageAmount = totalRecords > 0 ? Math.round(totalAmount / totalRecords) : 0;
-  
+
   console.log('Summary statistics calculated:', {
     totalRecords: totalRecords,
     totalAmount: totalAmount,
     averageAmount: averageAmount
   });
-  
+
   // עדכון תצוגת הסטטיסטיקות
   updateStatsDisplay({
     totalRecords: totalRecords,
@@ -273,17 +273,17 @@ function updateSummaryStats(data = null) {
 function updateStatsDisplay(stats) {
   console.log('=== updateStatsDisplay called ===');
   console.log('Stats to display:', stats);
-  
+
   // פונקציה לעיצוב מספרים עם פסיקים
   const formatNumber = (num) => {
     return num.toLocaleString('he-IL');
   };
-  
+
   // פונקציה לעיצוב סכומים בדולרים
   const formatCurrency = (num) => {
     return `$${num.toLocaleString('he-IL')}`;
   };
-  
+
   // עדכון התצוגה עם המידע החדש
   const summaryDiv = document.querySelector('.info-summary');
   if (summaryDiv) {
@@ -296,7 +296,7 @@ function updateStatsDisplay(stats) {
   } else {
     console.warn('info-summary element not found');
   }
-  
+
   console.log('Stats display updated:', stats);
 }
 
@@ -309,16 +309,16 @@ function updateStatsDisplay(stats) {
 function toggleSection(sectionId) {
   const section = document.getElementById(sectionId);
   const icon = document.querySelector(`#${sectionId} .filter-icon`);
-  
+
   if (!section || !icon) {
     console.error(`❌ לא נמצא סקשן או אייקון עבור: ${sectionId}`);
     return;
   }
-  
+
   // קביעת שם הדף לפי ה-URL הנוכחי
   const currentPath = window.location.pathname;
   let pageName = 'default';
-  
+
   if (currentPath.includes('/database')) {
     pageName = 'database';
   } else if (currentPath.includes('/accounts')) {
@@ -338,10 +338,10 @@ function toggleSection(sectionId) {
   } else if (currentPath.includes('/alerts')) {
     pageName = 'alerts';
   }
-  
+
   // הוספת שם הדף למפתח כדי שכל דף ישמור את הסטטוס שלו בנפרד
   const storageKey = `${pageName}_${sectionId}Collapsed`;
-  
+
   if (section.classList.contains('collapsed')) {
     section.classList.remove('collapsed');
     icon.textContent = '▲';
@@ -360,11 +360,11 @@ function toggleAllSections() {
   const sections = document.querySelectorAll('.content-section');
   const isAnyOpen = Array.from(sections).some(section => !section.classList.contains('collapsed'));
   const pageName = 'database';
-  
+
   sections.forEach(section => {
     const sectionId = section.id;
     const storageKey = `${pageName}_${sectionId}Collapsed`;
-    
+
     if (isAnyOpen) {
       section.classList.add('collapsed');
       const icon = section.querySelector('.filter-icon');
@@ -377,7 +377,7 @@ function toggleAllSections() {
       localStorage.setItem(storageKey, 'false');
     }
   });
-  
+
   // עדכון האייקון בכפתור הראשי
   const mainButton = document.querySelector('button[onclick="toggleAllSections()"]');
   if (mainButton) {
@@ -515,31 +515,31 @@ function formatDateTime(dateString) {
 function filterTable(tableId, searchTerm) {
   const table = document.getElementById(tableId);
   if (!table) return;
-  
+
   const tbody = table.querySelector('tbody');
   if (!tbody) return;
-  
+
   const rows = tbody.querySelectorAll('tr');
   const term = searchTerm.toLowerCase();
-  
+
   rows.forEach(row => {
     const cells = row.querySelectorAll('td');
     let found = false;
-    
+
     cells.forEach(cell => {
       const text = cell.textContent.toLowerCase();
       if (text.includes(term)) {
         found = true;
       }
     });
-    
+
     if (found || term === '') {
       row.style.display = '';
     } else {
       row.style.display = 'none';
     }
   });
-  
+
   // עדכון ספירה
   updateTableCount(tableId);
 }
@@ -550,14 +550,14 @@ function filterTable(tableId, searchTerm) {
 function updateTableCount(tableId) {
   const table = document.getElementById(tableId);
   if (!table) return;
-  
+
   const tbody = table.querySelector('tbody');
   if (!tbody) return;
-  
-  const visibleRows = Array.from(tbody.querySelectorAll('tr')).filter(row => 
+
+  const visibleRows = Array.from(tbody.querySelectorAll('tr')).filter(row =>
     row.style.display !== 'none'
   ).length;
-  
+
   // עדכון הספירה בהתאם לטבלה
   const countElement = getCountElementForTable(tableId);
   if (countElement) {
@@ -582,7 +582,7 @@ function getCountElementForTable(tableId) {
     'executionsTable': 'executionsCount',
     'userRolesTable': 'userRolesCount'
   };
-  
+
   const countId = countMap[tableId];
   return countId ? document.getElementById(countId) : null;
 }
@@ -603,7 +603,7 @@ function getTableNameForTable(tableId) {
     'executionsTable': 'ביצועים',
     'userRolesTable': 'תפקידי משתמשים'
   };
-  
+
   return nameMap[tableId] || '';
 }
 
@@ -648,28 +648,28 @@ const DEFAULT_DATA_CONFIG = {
 async function loadDataFromDatabase(config = {}) {
   try {
     console.log('Loading data from database with config:', config);
-    
+
     // מיזוג הגדרות מותאמות אישית עם ברירת המחדל
     const dataConfig = { ...DEFAULT_DATA_CONFIG, ...config };
     currentDataConfig = dataConfig;
-    
+
     // קריאה לשרת
     const response = await fetch(dataConfig.apiEndpoint);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const rawData = await response.json();
     console.log('Raw data from server:', rawData);
-    
+
     // המרת הנתונים לפורמט הנדרש לגריד
     const processedData = processDataForGrid(rawData, dataConfig);
     console.log('Processed data for grid:', processedData);
-    
+
     // שמירת הנתונים הגלובליים
     window.rowData = processedData;
     currentDataSource = processedData;
-    
+
     // עדכון הגריד אם הוא קיים
     if (window.gridApi) {
       updateGridData(processedData);
@@ -678,22 +678,22 @@ async function loadDataFromDatabase(config = {}) {
       // אם הגריד לא קיים, עדכן רק את הסטטיסטיקות
       updateSummaryStats(processedData);
     }
-    
+
     console.log('Data loaded successfully:', processedData.length, 'items');
     return processedData;
-    
+
   } catch (error) {
     console.error('Error loading data from database:', error);
-    
+
     // במקרה של שגיאה, נחזיר נתוני דוגמה
     const fallbackData = getDefaultRowData();
     window.rowData = fallbackData;
     currentDataSource = fallbackData;
-    
+
     if (window.gridApi) {
       updateGridData(fallbackData);
     }
-    
+
     return fallbackData;
   }
 }
@@ -703,31 +703,31 @@ function processDataForGrid(rawData, config) {
   console.log('=== processDataForGrid called ===');
   console.log('Raw data:', rawData);
   console.log('Config:', config);
-  
+
   const mapping = config.dataMapping;
   const statusMapping = config.statusMapping;
   const typeMapping = config.typeMapping;
-  
+
   const processedData = rawData.map(item => {
     // המרת תאריך
     const date = item[mapping.date] ? formatDate(item[mapping.date]) : 'N/A';
-    
+
     // המרת סטטוס
     const rawStatus = item[mapping.status] || 'open';
     const status = statusMapping[rawStatus] || rawStatus;
-    
+
     // המרת סוג
     const rawType = item[mapping.type] || 'long';
     const type = typeMapping[rawType] || rawType;
-    
+
     // המרת סכום
     const amount = item[mapping.amount] ? formatAmount(item[mapping.amount]) : 'N/A';
-    
+
     // המרת מחירים
     const target = item[mapping.target] ? formatPrice(item[mapping.target]) : 'N/A';
     const stop = item[mapping.stop] ? formatPrice(item[mapping.stop]) : 'N/A';
     const current = item[mapping.current] ? formatPrice(item[mapping.current]) : 'N/A';
-    
+
     const processedItem = {
       ticker: item[mapping.ticker] || 'N/A',
       date: date,
@@ -740,11 +740,11 @@ function processDataForGrid(rawData, config) {
       action: '⬅️',
       account: item[mapping.account] || 'N/A'
     };
-    
+
     console.log('Processed item:', processedItem);
     return processedItem;
   });
-  
+
   console.log('Final processed data:', processedData);
   return processedData;
 }
@@ -770,7 +770,7 @@ async function loadDataByType(dataType, customConfig = {}) {
   console.log('=== loadDataByType called ===');
   console.log('Data type:', dataType);
   console.log('Custom config:', customConfig);
-  
+
   const dataTypes = {
     'tradeplans': {
       apiEndpoint: 'http://127.0.0.1:8080/api/tradeplans',
@@ -818,20 +818,20 @@ async function loadDataByType(dataType, customConfig = {}) {
       }
     }
   };
-  
+
   const config = dataTypes[dataType];
   if (!config) {
     console.error('Unknown data type:', dataType);
     return null;
   }
-  
+
   // מיזוג עם הגדרות מותאמות אישית
   const finalConfig = { ...config, ...customConfig };
   console.log('Final config:', finalConfig);
-  
+
   const result = await loadDataFromDatabase(finalConfig);
   console.log('loadDataByType result:', result);
-  
+
   return result;
 }
 
@@ -862,25 +862,25 @@ async function checkServerAvailability() {
  */
 async function initializeGridSystem(containerId = '#agGridFloating', customOptions = {}) {
   console.log('=== Initializing Grid System ===');
-  
+
   try {
     // 1. אתחול נתונים
     console.log('1. Initializing data...');
     const data = await initializeData();
-    
+
     // 2. יצירת הגריד
     console.log('2. Creating grid...');
     const gridOptions = createGrid(containerId, data, customOptions);
-    
+
     if (!gridOptions) {
       console.error('Failed to create grid');
       return false;
     }
-    
+
     // 3. אתחול מערכת הפילטרים
     console.log('3. Initializing filter system...');
     initializeFilterSystem();
-    
+
     // 4. טעינת פילטרים שמורים
     console.log('4. Loading saved filters...');
     const savedFilters = loadSavedFilters();
@@ -888,14 +888,14 @@ async function initializeGridSystem(containerId = '#agGridFloating', customOptio
       console.log('Found saved filters, will apply after grid creation:', savedFilters);
       window.pendingFilter = savedFilters.statuses;
     }
-    
+
     // 5. עדכון סטטיסטיקות
     console.log('5. Updating statistics...');
     updateSummaryStats(data);
-    
+
     console.log('=== Grid System Initialized Successfully ===');
     return true;
-    
+
   } catch (error) {
     console.error('Error initializing grid system:', error);
     return false;
@@ -907,15 +907,15 @@ async function initializeGridSystem(containerId = '#agGridFloating', customOptio
  */
 function initializeBasicGrid(containerId = '#agGridFloating') {
   console.log('=== Initializing Basic Grid ===');
-  
+
   try {
     // שימוש בנתוני דוגמה
     const data = getDefaultRowData();
     window.rowData = data;
-    
+
     // יצירת גריד בסיסי
     const gridOptions = createGrid(containerId, data);
-    
+
     if (gridOptions) {
       console.log('Basic grid initialized successfully');
       return true;
@@ -923,7 +923,7 @@ function initializeBasicGrid(containerId = '#agGridFloating') {
       console.error('Failed to initialize basic grid');
       return false;
     }
-    
+
   } catch (error) {
     console.error('Error initializing basic grid:', error);
     return false;
@@ -935,28 +935,28 @@ function initializeBasicGrid(containerId = '#agGridFloating') {
  */
 function initializeGridWithFilters(containerId = '#agGridFloating', filters = {}) {
   console.log('=== Initializing Grid with Custom Filters ===');
-  
+
   try {
     // טעינת נתונים עם פילטרים
     const data = getDefaultRowData();
     window.rowData = data;
-    
+
     // יצירת הגריד
     const gridOptions = createGrid(containerId, data);
-    
+
     if (gridOptions) {
       // החלת פילטרים מותאמים אישית
       if (filters.statuses) {
         applyStatusFilterToGrid(filters.statuses, filters.accounts);
       }
-      
+
       console.log('Grid with custom filters initialized successfully');
       return true;
     } else {
       console.error('Failed to initialize grid with filters');
       return false;
     }
-    
+
   } catch (error) {
     console.error('Error initializing grid with filters:', error);
     return false;
@@ -968,7 +968,7 @@ function initializeGridWithFilters(containerId = '#agGridFloating', filters = {}
  */
 function checkSystemAvailability() {
   console.log('=== Checking System Availability ===');
-  
+
   const checks = {
     agGrid: typeof agGrid !== 'undefined',
     gridApi: !!window.gridApi,
@@ -976,12 +976,12 @@ function checkSystemAvailability() {
     filterSystem: typeof applyStatusFilterToGrid === 'function',
     dataSystem: typeof getDefaultRowData === 'function'
   };
-  
+
   console.log('System availability:', checks);
-  
+
   const allAvailable = Object.values(checks).every(check => check);
   console.log('All systems available:', allAvailable);
-  
+
   return allAvailable;
 }
 
@@ -990,22 +990,22 @@ function checkSystemAvailability() {
  */
 async function refreshGridSystem() {
   console.log('=== Refreshing Grid System ===');
-  
+
   try {
     // רענון נתונים
     const newData = await refreshData();
-    
+
     // רענון הגריד
     if (window.gridApi) {
       refreshGrid();
     }
-    
+
     // רענון סטטיסטיקות
     updateSummaryStats(newData);
-    
+
     console.log('Grid system refreshed successfully');
     return true;
-    
+
   } catch (error) {
     console.error('Error refreshing grid system:', error);
     return false;
@@ -1017,20 +1017,20 @@ async function refreshGridSystem() {
  */
 function clearGridSystem() {
   console.log('=== Clearing Grid System ===');
-  
+
   try {
     // ניקוי הגריד
     clearGrid();
-    
+
     // ניקוי נתונים
     clearDataFromLocalStorage();
-    
+
     // ניקוי פילטרים
     clearTestFilter();
-    
+
     console.log('Grid system cleared successfully');
     return true;
-    
+
   } catch (error) {
     console.error('Error clearing grid system:', error);
     return false;
@@ -1084,10 +1084,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function openPlanDetails(ticker = null) {
   const modal = document.getElementById("planModal");
   const content = document.getElementById("planDetailsContent");
-  
+
   // קבלת תאריך נוכחי
   const today = new Date().toISOString().split('T')[0];
-  
+
   if (ticker) {
     // עריכת תכנון קיים
     content.innerHTML = `<h2>עריכת תכנון - ${ticker}</h2>
@@ -1171,7 +1171,7 @@ function openPlanDetails(ticker = null) {
         </div>
       </form>`;
   }
-  
+
   modal.style.display = "block";
 }
 
@@ -1204,7 +1204,7 @@ function saveRecord(tableType) {
 // פונקציה לביטול רשומה
 function cancelRecord(tableType, recordId) {
   console.log(`ביטול ${tableType} עם מזהה ${recordId}`);
-  
+
   if (tableType === 'trades') {
     // ביטול טרייד - שינוי סטטוס לבוטל
     if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
@@ -1237,7 +1237,7 @@ function showNotification(message, type = 'success') {
     const bgColor = type === 'error' ? '#f8d7da' : type === 'warning' ? '#fff3cd' : '#d4edda';
     const textColor = type === 'error' ? '#721c24' : type === 'warning' ? '#856404' : '#155724';
     const borderColor = type === 'error' ? '#f5c6cb' : type === 'warning' ? '#ffeaa7' : '#c3e6cb';
-    
+
     notification.style.cssText = `
       position: fixed;
       top: 20px;
@@ -1254,15 +1254,15 @@ function showNotification(message, type = 'success') {
       transition: opacity 0.3s ease;
       opacity: 0;
     `;
-    
+
     notification.textContent = message;
     document.body.appendChild(notification);
-    
+
     // הצגת ההודעה
     setTimeout(() => {
       notification.style.opacity = '1';
     }, 100);
-    
+
     // הסתרת ההודעה אחרי 3 שניות
     setTimeout(() => {
       notification.style.opacity = '0';
@@ -1272,7 +1272,7 @@ function showNotification(message, type = 'success') {
         }
       }, 300);
     }, 3000);
-    
+
   } catch (error) {
     console.error('Error showing notification:', error);
   }
@@ -1328,7 +1328,7 @@ window.clearGridSystem = clearGridSystem;
 function loadSectionStates() {
   const currentPath = window.location.pathname;
   let pageName = 'default';
-  
+
   if (currentPath.includes('/database')) {
     pageName = 'database';
   } else if (currentPath.includes('/accounts')) {
@@ -1348,16 +1348,16 @@ function loadSectionStates() {
   } else if (currentPath.includes('/alerts')) {
     pageName = 'alerts';
   }
-  
+
   const sections = document.querySelectorAll('.content-section');
   sections.forEach(section => {
     const sectionId = section.id;
     const icon = section.querySelector('.filter-icon');
-    
+
     if (icon) {
       const storageKey = `${pageName}_${sectionId}Collapsed`;
       const isCollapsed = localStorage.getItem(storageKey) === 'true';
-      
+
       if (isCollapsed) {
         section.classList.add('collapsed');
         icon.textContent = '▼';

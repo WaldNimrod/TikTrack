@@ -137,15 +137,12 @@ async function loadAllAccountsFromServer() {
 
 // פונקציה לטעינת חשבונות ברירת מחדל
 function loadDefaultAccounts() {
-  console.log('🔄 Loading default accounts');
-  window.accountsData = [
-    { id: 1, name: 'חשבון ראשי', type: 'main', status: 'open' },
-    { id: 2, name: 'חשבון משני', type: 'secondary', status: 'open' },
-    { id: 3, name: 'חשבון השקעות', type: 'investment', status: 'open' },
-    { id: 4, name: 'חשבון מסחר', type: 'trading', status: 'open' }
-  ];
+  console.log('🔄 Loading default accounts - no dummy data');
+  window.accountsData = [];
   window.accountsLoaded = true;
-  updateAccountFilterMenu(window.accountsData);
+  if (typeof window.updateAccountFilterMenu === 'function') {
+    window.updateAccountFilterMenu(window.accountsData);
+  }
 }
 
 // הפונקציות הכלליות לפילטר חשבונות הועברו ל-grid-filters.js

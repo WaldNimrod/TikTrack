@@ -3071,3 +3071,57 @@ button[onclick*="showAddAccountModalLocal"]:hover {
     min-height: 35px;
   }
 }
+
+/* מודל התראות - כותרת עם רקע ירוק */
+#addAlertModal .modal-header,
+#editAlertModal .modal-header {
+  background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
+  color: white !important;
+  border-bottom: none !important;
+  padding: 1.5rem 2rem !important;
+}
+
+#addAlertModal .modal-title,
+#editAlertModal .modal-title {
+  font-size: 1.4rem !important;
+  font-weight: 600 !important;
+  color: white !important;
+  margin: 0 !important;
+}
+
+#addAlertModal .btn-close,
+#editAlertModal .btn-close {
+  background-color: white !important;
+  background-image: none !important;
+  color: #ff6b35 !important;
+  border: 2px solid #ff6b35 !important;
+  border-radius: 6px !important;
+  padding: 0.25rem !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+}
+
+#addAlertModal .btn-close:hover,
+#editAlertModal .btn-close:hover {
+  background-color: #fff8f5 !important;
+  color: #e55a2b !important;
+  border-color: #e55a2b !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
+}
+
+#addAlertModal .btn-close::before,
+#editAlertModal .btn-close::before {
+  content: '✕' !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+}
+
+/* מודל אזהרה על רשומות מקושרות */

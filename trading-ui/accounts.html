@@ -268,12 +268,12 @@
     
     <!-- גוף הדף - כל התוכן אחרי הכותרת -->
     <div class="page-body">
-      <!-- אזור התראות - top-Section -->
-      <div class="top-section">
-        <!-- כותרת התראות -->
-        <div class="section-header">
-          <div class="table-title">
-            📋 התראות - top-Section
+              <!-- אזור חשבונות - top-Section -->
+        <div class="top-section">
+          <!-- כותרת חשבונות -->
+          <div class="section-header">
+            <div class="table-title">
+              📋 חשבונות
               </div>
           <div class="table-actions">
             <button class="refresh-btn" onclick="refreshAlerts()" title="רענן התראות">
@@ -315,12 +315,12 @@
         
       <!-- תוכן ראשי -->
       <div class="main-content">
-        <!-- אזור חשבונות - content-section -->
+        <!-- אזור החשבונות שלי - content-section -->
         <div class="content-section">
-          <!-- כותרת חשבונות -->
+          <!-- כותרת החשבונות שלי -->
           <div class="section-header">
             <div class="table-title">
-              💰 חשבונות - content-section
+              💰 החשבונות שלי
             </div>
             <div class="table-count">טוען...</div>
             <div class="table-actions">
@@ -339,8 +339,8 @@
           
           <!-- טבלת חשבונות -->
           <div class="section-body">
-                      <div class="table-responsive">
-              <table class="table">
+                      <div class="table-responsive" id="accountsContainer">
+              <table class="table" id="accountsTable" data-table-type="accounts">
                           <thead>
                             <tr>
                                                               <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
@@ -1725,6 +1725,11 @@
     document.addEventListener('DOMContentLoaded', function() {
       console.log('🔄 === DOM CONTENT LOADED - ACCOUNTS PAGE ===');
       
+      // טעינת מצב הסקשנים לפי הדף הנוכחי
+      if (typeof window.loadSectionStates === 'function') {
+        window.loadSectionStates();
+      }
+      
       // שחזור מצב הסגירה
       restoreSectionState();
       
@@ -1744,7 +1749,7 @@
       setupSortableHeaders();
       
       // טעינת נתוני חשבונות
-      loadAccountsData();
+      loadAccountsDataForAccountsPage();
       
       // הגדרת כותרות למיון אחרי טעינת הנתונים
       setTimeout(() => {

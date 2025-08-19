@@ -67,6 +67,9 @@
 
     <!-- גוף הדף - כל התוכן אחרי הכותרת -->
     <div class="page-body">
+      
+                  
+      
       <!-- אזור תכנונים - top-Section -->
       <div class="top-section">
       <!-- כותרת תכנונים -->
@@ -982,6 +985,11 @@
     document.addEventListener('DOMContentLoaded', function() {
       console.log('🔄 === DOM CONTENT LOADED ===');
       
+      // טעינת מצב הסקשנים לפי הדף הנוכחי
+      if (typeof window.loadSectionStates === 'function') {
+        window.loadSectionStates();
+      }
+      
       // אתחול פילטרים לדף התכנון
       if (typeof window.initializePageFilters === 'function') {
         window.initializePageFilters('planning');
@@ -1050,6 +1058,9 @@
     
 
     });
+    
+    
+    
   </script>
 </body>
 </html>

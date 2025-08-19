@@ -1505,6 +1505,11 @@
 
     // אתחול הגריד
     document.addEventListener('DOMContentLoaded', () => {
+      // טעינת מצב הסקשנים לפי הדף הנוכחי
+      if (typeof window.loadSectionStates === 'function') {
+        window.loadSectionStates();
+      }
+      
       const gridDiv = document.getElementById('alertsGrid');
               gridApi = agGrid.createGrid(gridDiv, gridOptions, { theme: 'quartz' });
       

@@ -24,7 +24,7 @@ let alertsData = [];
  * פונקציה לטעינת נתוני התראות מהשרת
  */
 async function loadAlertsData() {
-  try {
+    try {
     console.log('🔄 טוען התראות מהשרת...');
     
     // קריאה מה-API
@@ -77,10 +77,10 @@ async function loadAlertsData() {
     // שימוש בפונקציה המותאמת לפילטור
     filterAlertsData(selectedStatuses, selectedTypes, selectedDateRange, searchTerm);
     
-  } catch (error) {
+    } catch (error) {
     console.error('Error loading alerts data:', error);
     document.querySelector('#alertsTable tbody').innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
-  }
+    }
 }
 
 /**
@@ -226,7 +226,7 @@ function getTypeDisplay(type) {
  * פונקציה לסימון התראה כנקראה
  */
 async function markAlertAsRead(alertId) {
-  try {
+    try {
     console.log('🔄 מסמן התראה כנקראה:', alertId);
     
     const response = await fetch(`/api/v1/alerts/${alertId}/mark-read`, {
@@ -251,12 +251,12 @@ async function markAlertAsRead(alertId) {
       window.showNotification('ההתראה סומנה כנקראה', 'success');
     }
     
-  } catch (error) {
+    } catch (error) {
     console.error('❌ שגיאה בסימון התראה כנקראה:', error);
     if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בסימון התראה כנקראה', 'error');
     }
-  }
+    }
 }
 
 /**
@@ -268,7 +268,7 @@ async function deleteAlert(alertId) {
     
     // אישור מחיקה
     if (!confirm('האם אתה בטוח שברצונך למחוק התראה זו?')) {
-      return;
+        return;
     }
     
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
@@ -289,13 +289,13 @@ async function deleteAlert(alertId) {
     if (typeof window.showNotification === 'function') {
       window.showNotification('ההתראה נמחקה בהצלחה', 'success');
     }
-    
-  } catch (error) {
+
+    } catch (error) {
     console.error('❌ שגיאה במחיקת התראה:', error);
     if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה במחיקת התראה', 'error');
     }
-  }
+    }
 }
 
 /**

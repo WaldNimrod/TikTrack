@@ -308,7 +308,11 @@ def get_trade_plans():
     query = """
     SELECT 
         tp.id,
+        tp.account_id,
+        tp.ticker_id,
         tp.investment_type,
+        tp.side,
+        tp.status,
         tp.planned_amount,
         tp.entry_conditions,
         tp.stop_price,
@@ -317,8 +321,8 @@ def get_trade_plans():
         tp.created_at,
         tp.canceled_at,
         tp.cancel_reason,
-        t.symbol as ticker,
-        t.symbol as ticker_name,
+        t.symbol as ticker_symbol,
+        t.name as ticker_name,
         a.name as account_name
     FROM trade_plans tp
     JOIN tickers t ON tp.ticker_id = t.id
@@ -431,16 +435,20 @@ def get_trades():
     query = """
     SELECT 
         t.id,
+        t.account_id,
+        t.ticker_id,
+        t.trade_plan_id,
         t.status,
         t.type,
+        t.side,
         t.created_at,
         t.closed_at,
         t.cancelled_at,
+        t.cancel_reason,
         t.total_pl,
         t.notes,
-        t.trade_plan_id,
-        tick.symbol as ticker,
         tick.symbol as ticker_symbol,
+        tick.name as ticker_name,
         a.name as account_name
     FROM trades t
     JOIN tickers tick ON t.ticker_id = tick.id
@@ -1029,7 +1037,22 @@ def get_cash_flows():
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT * FROM cash_flows ORDER BY date DESC")
+        query = """
+        SELECT 
+            cf.id,
+            cf.account_id,
+            cf.type,
+            cf.amount,
+            cf.date,
+            cf.description,
+            cf.created_at,
+            a.name as account_name
+        FROM cash_flows cf
+        JOIN accounts a ON cf.account_id = a.id
+        ORDER BY cf.date DESC, cf.created_at DESC
+        """
+        
+        cursor.execute(query)
         cash_flows = []
         for row in cursor.fetchall():
             cash_flows.append(dict(row))
@@ -1081,7 +1104,26 @@ def get_notes():
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT * FROM notes ORDER BY created_at DESC")
+        query = """
+        SELECT 
+            n.id,
+            n.content,
+            n.attachment,
+            n.related_type_id,
+            n.related_id,
+            n.created_at,
+            CASE 
+                WHEN n.related_type_id = 1 THEN 'חשבון'
+                WHEN n.related_type_id = 2 THEN 'טרייד'
+                WHEN n.related_type_id = 3 THEN 'תוכנית טרייד'
+                WHEN n.related_type_id = 4 THEN 'טיקר'
+                ELSE 'לא ידוע'
+            END as related_type_name
+        FROM notes n
+        ORDER BY n.created_at DESC
+        """
+        
+        cursor.execute(query)
         notes = []
         for row in cursor.fetchall():
             notes.append(dict(row))
@@ -1134,7 +1176,28 @@ def get_executions():
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT * FROM executions ORDER BY date DESC")
+        query = """
+        SELECT 
+            e.id,
+            e.trade_id,
+            e.action,
+            e.date,
+            e.quantity,
+            e.price,
+            e.fee,
+            e.source,
+            e.created_at,
+            t.status as trade_status,
+            tick.symbol as ticker_symbol,
+            a.name as account_name
+        FROM executions e
+        JOIN trades t ON e.trade_id = t.id
+        JOIN tickers tick ON t.ticker_id = tick.id
+        JOIN accounts a ON t.account_id = a.id
+        ORDER BY e.date DESC, e.created_at DESC
+        """
+        
+        cursor.execute(query)
         executions = []
         for row in cursor.fetchall():
             executions.append(dict(row))

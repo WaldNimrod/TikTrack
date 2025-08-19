@@ -215,7 +215,7 @@ function updateTradesTable(trades) {
     return `
     <tr>
       <td><strong>${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</strong></td>
-      <td><strong><a href="#" onclick="viewTickerDetails('${trade.ticker_id}')" class="ticker-link">${trade.ticker_symbol || trade.ticker_id || 'טיקר לא ידוע'}</a></strong></td>
+      <td><strong><a href="#" onclick="viewTickerDetails('${trade.ticker_id}')" class="ticker-link">${trade.ticker_symbol || 'טיקר לא ידוע'}</a></strong></td>
       <td>${trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-'}</td>
       <td><span class="status-badge status-${trade.status || 'open'}">${statusDisplay}</span></td>
       <td>${typeDisplay}</td>

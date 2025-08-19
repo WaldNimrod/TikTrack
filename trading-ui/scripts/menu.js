@@ -68,7 +68,7 @@ function createBasicMenu() {
               <span class="dropdown-arrow">▼</span>
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="/accounts">ניהול חשבונות</a></li>
+              <li><a class="dropdown-item" href="/accounts">חשבונות</a></li>
               <li><a class="dropdown-item" href="/notes">הערות</a></li>
               <li><a class="dropdown-item" href="/alerts">ניהול התראות</a></li>
               <li><a class="dropdown-item" href="/preferences">העדפות</a></li>

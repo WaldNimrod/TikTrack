@@ -246,6 +246,8 @@ class AppHeader extends HTMLElement {
           overflow: hidden;
           text-overflow: ellipsis;
         }
+        
+
 
         .dropdown-item:hover {
           background-color: #f8f9fa;
@@ -957,7 +959,7 @@ class AppHeader extends HTMLElement {
                   <span class="dropdown-arrow">▼</span>
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="/accounts">ניהול חשבונות</a></li>
+                  <li><a class="dropdown-item" href="/accounts">חשבונות</a></li>
                   <li><a class="dropdown-item" href="/notes">הערות</a></li>
                   <li><a class="dropdown-item" href="/alerts">התראות</a></li>
                   <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
@@ -974,6 +976,8 @@ class AppHeader extends HTMLElement {
               <img src="images/tiktrack_logo_256px.png" alt="TikTrack Logo" class="logo-icon">
               <span class="logo-text">פשוט לנהל תיק</span>
             </div>
+            
+
           </div>
         </div>
         
@@ -1056,6 +1060,10 @@ class AppHeader extends HTMLElement {
                       
                       <!-- התפריט הנפתח לפילטר טווח תאריכים -->
                       <div class="date-range-filter-menu" id="dateRangeFilterMenu">
+                        <div class="date-range-filter-item">
+                          <span class="option-text">השבוע</span>
+                          <span class="check-mark">●</span>
+                        </div>
                         <div class="date-range-filter-item">
                           <span class="option-text">שבוע</span>
                           <span class="check-mark">●</span>
@@ -2076,6 +2084,8 @@ class AppHeader extends HTMLElement {
       // עדכון אוטומטי של הגריד
       this.updateGridFilter();
       
+
+      
       console.log('🔍 Date range option updated and grid filter applied');
     } else {
       console.log('🔍 Item not found for date range:', dateRange);
@@ -2083,6 +2093,8 @@ class AppHeader extends HTMLElement {
         .map(item => item.querySelector('.option-text').textContent));
     }
   }
+  
+
 
   updateStatusFilterText() {
     console.log('updateStatusFilterText called');
@@ -2734,7 +2746,7 @@ class AppHeader extends HTMLElement {
           const selectedText = statusToggle.querySelector('.selected-status-text');
           if (selectedText) {
             if (filters.statuses.length === 0) {
-              selectedText.textContent = 'הכול';
+              selectedText.textContent = 'כל הסטטוסים';
             } else if (filters.statuses.length === 1) {
               selectedText.textContent = filters.statuses[0];
             } else {
@@ -2765,7 +2777,7 @@ class AppHeader extends HTMLElement {
           const selectedText = typeToggle.querySelector('.selected-type-text');
           if (selectedText) {
             if (filters.types.length === 0) {
-              selectedText.textContent = 'הכול';
+              selectedText.textContent = 'כל הסוגים';
             } else if (filters.types.length === 1) {
               selectedText.textContent = filters.types[0];
             } else {
@@ -2796,7 +2808,7 @@ class AppHeader extends HTMLElement {
           const selectedText = accountToggle.querySelector('.selected-account-text');
           if (selectedText) {
             if (filters.accounts.length === 0) {
-              selectedText.textContent = 'הכול';
+              selectedText.textContent = 'כל החשבונות';
             } else if (filters.accounts.length === 1) {
               selectedText.textContent = filters.accounts[0];
             } else {

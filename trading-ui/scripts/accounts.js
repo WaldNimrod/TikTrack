@@ -3,6 +3,9 @@
  * קובץ זה מכיל את כל הפונקציות הקשורות לניהול חשבונות
  * כולל טעינת נתונים, עדכון טבלאות, מודלים ופעולות CRUD
  * 
+ * הערה חשובה: פונקציות פילטר כלליות (updateAccountFilterMenu, updateAccountFilterText)
+ * הועברו לקובץ grid-filters.js כדי להיות משותפות לכל הדפים
+ * 
  * תכולת הקובץ:
  * - loadAccountsFromServer: טעינת חשבונות מהשרת
  * - updateAccountsTable: עדכון טבלת חשבונות
@@ -10,9 +13,10 @@
  * - createAccount: יצירת חשבון חדש
  * - updateAccountFromModal: עדכון חשבון קיים
  * - deleteAccount: מחיקת חשבון
+ * - getAccounts, isAccountsLoaded: פונקציות עזר ספציפיות לחשבונות
  * 
  * שימוש: נטען בדפים שצריכים ניהול חשבונות
- * תלויות: Bootstrap (למודלים), fetch API
+ * תלויות: Bootstrap (למודלים), fetch API, grid-filters.js (לפונקציות פילטר)
  */
 
 // קובץ ייעודי לניהול חשבונות - נטען רק בדפים שצריכים חשבונות
@@ -106,6 +110,9 @@ async function loadAllAccountsFromServer() {
       const allAccounts = responseData.data || responseData;
       console.log('🔄 All accounts loaded for filter:', allAccounts.length, 'accounts');
       
+      // שמירת כל החשבונות במשתנה גלובלי
+      window.allAccountsData = allAccounts;
+      
       // עדכון הפילטר עם כל החשבונות
       updateAccountFilterMenu(allAccounts);
       return allAccounts;
@@ -133,89 +140,7 @@ function loadDefaultAccounts() {
   updateAccountFilterMenu(window.accountsData);
 }
 
-// פונקציה לעדכון תפריט הפילטר של החשבונות
-function updateAccountFilterMenu(accounts) {
-  console.log('🔄 updateAccountFilterMenu called with:', accounts);
-  
-  const appHeader = document.querySelector('app-header');
-  if (!appHeader) {
-    console.log('🔄 App header not found');
-    return;
-  }
-  
-  const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
-  if (!accountMenu) {
-    console.log('🔄 Account menu not found');
-    return;
-  }
-  
-  console.log('🔄 Account menu found, clearing existing content');
-  accountMenu.innerHTML = '';
-  
-  console.log('🔄 Adding account items...');
-  accounts.forEach((account, index) => {
-    const accountItem = document.createElement('div');
-    accountItem.className = 'account-filter-item';
-    accountItem.setAttribute('data-account', account.name); // הוספת data-account attribute
-    accountItem.innerHTML = `
-      <span class="option-text">${account.name}</span>
-      <span class="check-mark">✓</span>
-    `;
-    accountMenu.appendChild(accountItem);
-    console.log(`🔄 Added account item ${index + 1}: ${account.name}`);
-  });
-  
-  console.log('🔄 Total account items added:', accounts.length);
-  
-  // הוספת event listeners לפריטי החשבונות
-  const accountItems = accountMenu.querySelectorAll('.account-filter-item');
-  accountItems.forEach((item, index) => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const accountName = item.getAttribute('data-account'); // שימוש ב-data-account
-      console.log('🔄 Account filter item clicked:', accountName);
-      
-      // קריאה לפונקציה של הקומפוננט
-      const appHeader = document.querySelector('app-header');
-      if (appHeader && typeof appHeader.selectAccountOption === 'function') {
-        appHeader.selectAccountOption(accountName);
-      }
-    });
-  });
-  console.log('🔄 Event listeners added to account items');
-  
-  updateAccountFilterText(accounts.map(a => a.name));
-  console.log('🔄 Account filter menu updated successfully');
-}
-
-// פונקציה לעדכון טקסט הפילטר של החשבונות
-function updateAccountFilterText(selectedAccounts) {
-  console.log('🔄 updateAccountFilterText called');
-  console.log('🔄 Selected account values for text update:', selectedAccounts);
-  
-  const appHeader = document.querySelector('app-header');
-  if (!appHeader) return;
-  
-  const accountToggle = appHeader.shadowRoot.querySelector('.account-filter-toggle .selected-account-text');
-  if (!accountToggle) return;
-  
-  let displayText = 'כל החשבונות';
-  if (selectedAccounts.length === 0) {
-    displayText = 'לא נבחרו חשבונות';
-  } else if (selectedAccounts.length === 1) {
-    displayText = selectedAccounts[0];
-  } else if (selectedAccounts.length === window.accountsData?.length) {
-    displayText = 'כל החשבונות';
-  } else if (selectedAccounts.length < 4) {
-    displayText = `${selectedAccounts.length} חשבונות`;
-  } else {
-    displayText = `${selectedAccounts.length} חשבונות`;
-  }
-  
-  accountToggle.textContent = displayText;
-  console.log('🔄 Updated account filter text to:', displayText);
-}
+// הפונקציות הכלליות לפילטר חשבונות הועברו ל-grid-filters.js
 
 // פונקציה לקבלת חשבונות נטענים
 function getAccounts() {
@@ -380,7 +305,7 @@ function updateAccountsTableInDesigns(accounts) {
 window.loadAccountsFromServer = loadAccountsFromServer;
 window.loadAllAccountsFromServer = loadAllAccountsFromServer;
 window.loadDefaultAccounts = loadDefaultAccounts;
-window.updateAccountFilterMenu = updateAccountFilterMenu;
+// updateAccountFilterMenu moved to grid-filters.js
 window.updateAccountFilterText = updateAccountFilterText;
 window.getAccounts = getAccounts;
 window.isAccountsLoaded = isAccountsLoaded;
@@ -407,7 +332,7 @@ window.checkAccountsStatus = function() {
   console.log('🔄 accountsData:', window.accountsData);
   console.log('🔄 accountsLoaded:', window.accountsLoaded);
   console.log('🔄 loadAccountsFromServer function:', typeof window.loadAccountsFromServer);
-  console.log('🔄 updateAccountFilterMenu function:', typeof window.updateAccountFilterMenu);
+  console.log('🔄 updateAccountFilterMenu function moved to grid-filters.js');
   
   const appHeader = document.querySelector('app-header');
   if (appHeader) {
@@ -782,7 +707,7 @@ window.cancelAccount = cancelAccount;
 window.deleteAccount = deleteAccount;
 window.showSuccessMessage = showSuccessMessage;
 window.showErrorMessage = showErrorMessage;
-window.updateAccountFilterMenu = updateAccountFilterMenu;
+// updateAccountFilterMenu moved to grid-filters.js
 window.updateAccountFilterText = updateAccountFilterText;
 
 // הגדרת הפונקציה updateGridFromComponent לדף החשבונות
@@ -793,3 +718,52 @@ window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selec
   // קריאה לפונקציה הגלובלית
   window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'accounts');
 };
+
+/**
+ * פונקציה לטעינת נתוני חשבונות ועדכון הטבלה בדף החשבונות
+ * פונקציה זו מיועדת לדף החשבונות (accounts.html)
+ */
+async function loadAccountsDataForAccountsPage() {
+  try {
+    console.log('🔄 === LOADING ACCOUNTS DATA FOR ACCOUNTS PAGE ===');
+    
+    // טעינת נתונים מהשרת
+    const accounts = await loadAccountsData();
+    console.log('🔄 Accounts loaded:', accounts.length, 'accounts');
+    
+    // שמירת הנתונים במשתנה גלובלי
+    window.accountsData = accounts;
+    window.allAccountsData = accounts;
+    
+    // החלת פילטרים על הנתונים
+    let filteredAccounts = [...accounts];
+    if (typeof window.filterDataByFilters === 'function') {
+      console.log('🔄 Applying filters to accounts data...');
+      filteredAccounts = window.filterDataByFilters(accounts, 'accounts');
+      console.log('🔄 After filtering:', filteredAccounts.length, 'accounts');
+    }
+    
+    // עדכון הטבלה עם הנתונים המסוננים
+    updateAccountsTable(filteredAccounts);
+    
+    console.log('✅ Accounts page data loaded and table updated successfully');
+    
+  } catch (error) {
+    console.error('❌ Error loading accounts data for accounts page:', error);
+    
+    // הצגת הודעת שגיאה בטבלה
+    const tbody = document.querySelector('#accountsTable tbody');
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים: ${error.message}</td></tr>`;
+    }
+    
+    // עדכון ספירת רשומות
+    const countElement = document.getElementById('accountsCount');
+    if (countElement) {
+      countElement.textContent = 'שגיאה';
+    }
+  }
+}
+
+// ייצוא הפונקציה החדשה
+window.loadAccountsDataForAccountsPage = loadAccountsDataForAccountsPage;

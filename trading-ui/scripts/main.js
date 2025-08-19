@@ -315,14 +315,41 @@ function toggleSection(sectionId) {
     return;
   }
   
+  // קביעת שם הדף לפי ה-URL הנוכחי
+  const currentPath = window.location.pathname;
+  let pageName = 'default';
+  
+  if (currentPath.includes('/database')) {
+    pageName = 'database';
+  } else if (currentPath.includes('/accounts')) {
+    pageName = 'accounts';
+  } else if (currentPath.includes('/tickers')) {
+    pageName = 'tickers';
+  } else if (currentPath.includes('/trades')) {
+    pageName = 'trades';
+  } else if (currentPath.includes('/planning')) {
+    pageName = 'planning';
+  } else if (currentPath.includes('/tracking')) {
+    pageName = 'tracking';
+  } else if (currentPath.includes('/designs')) {
+    pageName = 'designs';
+  } else if (currentPath.includes('/notes')) {
+    pageName = 'notes';
+  } else if (currentPath.includes('/alerts')) {
+    pageName = 'alerts';
+  }
+  
+  // הוספת שם הדף למפתח כדי שכל דף ישמור את הסטטוס שלו בנפרד
+  const storageKey = `${pageName}_${sectionId}Collapsed`;
+  
   if (section.classList.contains('collapsed')) {
     section.classList.remove('collapsed');
     icon.textContent = '▲';
-    localStorage.setItem(`${sectionId}Collapsed`, 'false');
+    localStorage.setItem(storageKey, 'false');
   } else {
     section.classList.add('collapsed');
     icon.textContent = '▼';
-    localStorage.setItem(`${sectionId}Collapsed`, 'true');
+    localStorage.setItem(storageKey, 'true');
   }
 }
 
@@ -392,6 +419,52 @@ function convertNoteStatusToHebrew(status) {
     'deleted': 'נמחק'
   };
   return statusMap[status] || status;
+}
+
+/**
+ * המרת סטטוס התראה לעברית
+ */
+function convertAlertStatusToHebrew(status) {
+  const statusMap = {
+    'active': 'פעיל',
+    'inactive': 'לא פעיל',
+    'triggered': 'הופעל',
+    'cancelled': 'מבוטל'
+  };
+  return statusMap[status] || status;
+}
+
+/**
+ * המרת מצב הפעלה לעברית
+ */
+function convertIsTriggeredToHebrew(isTriggered) {
+  return isTriggered ? 'כן' : 'לא';
+}
+
+/**
+ * הצגת מודל עריכת התראה
+ */
+function showEditAlertModal(alert) {
+  console.log('עריכת התראה:', alert);
+  alert('פונקציית עריכת התראה תתווסף בקרוב');
+}
+
+/**
+ * ביטול התראה
+ */
+function cancelAlert(alertId, alertType) {
+  console.log(`ביטול התראה ${alertId} מסוג ${alertType}`);
+  if (confirm('האם אתה בטוח שברצונך לבטל התראה זו?')) {
+    alert('פונקציית ביטול התראה תתווסף בקרוב');
+  }
+}
+
+/**
+ * סימון התראה כמופעלת
+ */
+function markAlertAsTriggered(alertId) {
+  console.log(`סימון התראה ${alertId} כמופעלת`);
+  alert('פונקציית סימון התראה כמופעלת תתווסף בקרוב');
 }
 
 /**
@@ -1100,12 +1173,43 @@ function closePlanDetails() {
   document.getElementById("planModal").style.display = "none";
 }
 
+// ===== פונקציות עריכה ומחיקה =====
+
+// פונקציה לעריכת רשומה
+function editRecord(tableType, recordId) {
+  console.log(`עריכת ${tableType} עם מזהה ${recordId}`);
+  alert(`פונקציית עריכה עבור ${tableType} עם מזהה ${recordId} תתווסף בקרוב`);
+}
+
+// פונקציה למחיקת רשומה
+function deleteRecord(tableType, recordId) {
+  console.log(`מחיקת ${tableType} עם מזהה ${recordId}`);
+  if (confirm('האם אתה בטוח שברצונך למחוק רשומה זו?')) {
+    alert(`פונקציית מחיקה עבור ${tableType} עם מזהה ${recordId} תתווסף בקרוב`);
+  }
+}
+
+// פונקציה לשמירת רשומה
+function saveRecord(tableType) {
+  console.log(`שמירת ${tableType}`);
+  alert(`פונקציית שמירה עבור ${tableType} תתווסף בקרוב`);
+}
+
 // ===== הוספת הפונקציות החדשות לגלובל =====
 
 // הוספת הפונקציות החדשות לגלובל
+window.apiCall = apiCall;
+window.editRecord = editRecord;
+window.deleteRecord = deleteRecord;
+window.saveRecord = saveRecord;
 window.convertAccountStatusToHebrew = convertAccountStatusToHebrew;
 window.convertTickerStatusToHebrew = convertTickerStatusToHebrew;
 window.convertNoteStatusToHebrew = convertNoteStatusToHebrew;
+window.convertAlertStatusToHebrew = convertAlertStatusToHebrew;
+window.convertIsTriggeredToHebrew = convertIsTriggeredToHebrew;
+window.showEditAlertModal = showEditAlertModal;
+window.cancelAlert = cancelAlert;
+window.markAlertAsTriggered = markAlertAsTriggered;
 window.formatCurrency = formatCurrency;
 window.formatDate = formatDate;
 window.formatDateTime = formatDateTime;
@@ -1134,3 +1238,56 @@ window.initializeGridWithFilters = initializeGridWithFilters;
 window.checkSystemAvailability = checkSystemAvailability;
 window.refreshGridSystem = refreshGridSystem;
 window.clearGridSystem = clearGridSystem;
+
+// פונקציה לטעינת מצב הסקשנים לפי הדף הנוכחי
+function loadSectionStates() {
+  const currentPath = window.location.pathname;
+  let pageName = 'default';
+  
+  if (currentPath.includes('/database')) {
+    pageName = 'database';
+  } else if (currentPath.includes('/accounts')) {
+    pageName = 'accounts';
+  } else if (currentPath.includes('/tickers')) {
+    pageName = 'tickers';
+  } else if (currentPath.includes('/trades')) {
+    pageName = 'trades';
+  } else if (currentPath.includes('/planning')) {
+    pageName = 'planning';
+  } else if (currentPath.includes('/tracking')) {
+    pageName = 'tracking';
+  } else if (currentPath.includes('/designs')) {
+    pageName = 'designs';
+  } else if (currentPath.includes('/notes')) {
+    pageName = 'notes';
+  } else if (currentPath.includes('/alerts')) {
+    pageName = 'alerts';
+  }
+  
+  const sections = document.querySelectorAll('.content-section');
+  sections.forEach(section => {
+    const sectionId = section.id;
+    const container = document.getElementById(sectionId.replace('Section', 'Container'));
+    const footer = section.querySelector('.table-footer');
+    const icon = section.querySelector('.filter-icon');
+    
+    if (container && footer && icon) {
+      const storageKey = `${pageName}_${sectionId}Collapsed`;
+      const isCollapsed = localStorage.getItem(storageKey) === 'true';
+      
+      if (isCollapsed) {
+        section.classList.add('collapsed');
+        container.style.display = 'none';
+        footer.style.display = 'none';
+        icon.textContent = '▼';
+      } else {
+        section.classList.remove('collapsed');
+        container.style.display = 'block';
+        footer.style.display = 'block';
+        icon.textContent = '▲';
+      }
+    }
+  });
+}
+
+window.loadSectionStates = loadSectionStates;

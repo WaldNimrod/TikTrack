@@ -266,7 +266,9 @@
                 onkeyup="filterTable('tradePlansTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddTradePlanModal()" title="הוסף תוכנית חדשה"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="showAddTradePlanModal()" title="הוסף תוכנית חדשה">
+              <span class="action-icon">➕</span> הוסף
+            </button>
             <button class="filter-toggle-btn" onclick="toggleTradePlansSection()" title="הצג/הסתר טבלת תוכניות טרייד">
               <span class="filter-icon">▲</span>
             </button>
@@ -276,25 +278,29 @@
           <table class="table" id="tradePlansTable">
             <thead>
               <tr>
-                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
-                <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker ID</span></th>
-                <th>סוג השקעה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Investment Type</span></th>
-                <th>צד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Side</span></th>
-                <th>סכום מתוכנן<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Planned Amount</span></th>
-                <th>תנאי כניסה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Entry Conditions</span></th>
-                <th>מחיר עצירה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Stop Price</span></th>
-                <th>מחיר יעד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Target Price</span></th>
-                <th>סיבות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Reasons</span></th>
-                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
-                <th>בוטל ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Canceled At</span></th>
-                <th>סיבת ביטול<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cancel Reason</span></th>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID (Integer)</span></th>
+                <th>מזהה חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID (Integer)</span></th>
+                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account Name (String)</span></th>
+                <th>מזהה טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker ID (Integer)</span></th>
+                <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker Symbol (String)</span></th>
+                <th>שם טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker Name (String)</span></th>
+                <th>סוג השקעה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Investment Type (String)</span></th>
+                <th>צד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Side (String)</span></th>
+                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status (String)</span></th>
+                <th>סכום מתוכנן<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Planned Amount (Float)</span></th>
+                <th>תנאי כניסה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Entry Conditions (String)</span></th>
+                <th>מחיר עצירה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Stop Price (Float)</span></th>
+                <th>מחיר יעד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Target Price (Float)</span></th>
+                <th>סיבות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Reasons (String)</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At (DateTime)</span></th>
+                <th>בוטל ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Canceled At (DateTime)</span></th>
+                <th>סיבת ביטול<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cancel Reason (String)</span></th>
                 <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="14" class="loading">טוען תוכניות טרייד...</td>
+                <td colspan="18" class="loading">טוען תוכניות טרייד...</td>
               </tr>
             </tbody>
           </table>
@@ -320,7 +326,9 @@
                 onkeyup="filterTable('tradesTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
+              <span class="action-icon">➕</span> הוסף
+            </button>
             <button class="filter-toggle-btn" onclick="toggleTradesSection()" title="הצג/הסתר טבלת טריידים">
               <span class="filter-icon">▲</span>
             </button>
@@ -330,23 +338,28 @@
           <table class="table" id="tradesTable">
             <thead>
               <tr>
-                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
-                <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker ID</span></th>
-                <th>תוכנית<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plan ID</span></th>
-                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
-                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
-                <th>צד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Side</span></th>
-                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
-                <th>נסגר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Closed At</span></th>
-                <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P/L</span></th>
-                <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID (Integer)</span></th>
+                <th>מזהה חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID (Integer)</span></th>
+                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account Name (String)</span></th>
+                <th>מזהה טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker ID (Integer)</span></th>
+                <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker Symbol (String)</span></th>
+                <th>שם טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker Name (String)</span></th>
+                <th>מזהה תוכנית<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plan ID (Integer)</span></th>
+                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status (String)</span></th>
+                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type (String)</span></th>
+                <th>צד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Side (String)</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At (DateTime)</span></th>
+                <th>נסגר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Closed At (DateTime)</span></th>
+                <th>בוטל ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cancelled At (DateTime)</span></th>
+                <th>סיבת ביטול<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cancel Reason (String)</span></th>
+                <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P/L (Float)</span></th>
+                <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes (String)</span></th>
                 <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="12" class="loading">טוען טריידים...</td>
+                <td colspan="17" class="loading">טוען טריידים...</td>
               </tr>
             </tbody>
           </table>
@@ -372,7 +385,9 @@
                 onkeyup="filterTable('accountsTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש">
+              <span class="action-icon">➕</span> הוסף
+            </button>
             <button class="filter-toggle-btn" onclick="toggleAccountsSection()" title="הצג/הסתר טבלת חשבונות">
               <span class="filter-icon">▲</span>
             </button>
@@ -382,20 +397,21 @@
           <table class="table" id="accountsTable">
             <thead>
               <tr>
-                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name</span></th>
-                <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency</span></th>
-                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
-                <th>יתרה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cash Balance</span></th>
-                <th>שווי כולל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total Value</span></th>
-                <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P&L</span></th>
-                <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID (Integer)</span></th>
+                <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name (String)</span></th>
+                <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency (String)</span></th>
+                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status (String)</span></th>
+                <th>יתרה במזומן<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cash Balance (Float)</span></th>
+                <th>שווי כולל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total Value (Float)</span></th>
+                <th>רווח/הפסד כולל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P&L (Float)</span></th>
+                <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes (String)</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At (DateTime)</span></th>
                 <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="9" class="loading">טוען חשבונות...</td>
+                <td colspan="10" class="loading">טוען חשבונות...</td>
               </tr>
             </tbody>
           </table>
@@ -421,7 +437,9 @@
                 onkeyup="filterTable('tickersTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddTickerModal()" title="הוסף טיקר חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="showAddTickerModal()" title="הוסף טיקר חדש">
+              <span class="action-icon">➕</span> הוסף
+            </button>
             <button class="filter-toggle-btn" onclick="toggleTickersSection()" title="הצג/הסתר טבלת טיקרים">
               <span class="filter-icon">▲</span>
             </button>
@@ -431,20 +449,21 @@
           <table class="table" id="tickersTable">
             <thead>
               <tr>
-                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                <th>סמל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Symbol</span></th>
-                <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name</span></th>
-                <th>סקטור<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Sector</span></th>
-                <th>תעשייה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Industry</span></th>
-                <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency</span></th>
-                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
-                <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID (Integer)</span></th>
+                <th>סמל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Symbol (String)</span></th>
+                <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name (String)</span></th>
+                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type (String)</span></th>
+                <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Remarks (String)</span></th>
+                <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency (String)</span></th>
+                <th>טריידים פעילים<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Active Trades (Boolean)</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At (DateTime)</span></th>
+                <th>עודכן ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Updated At (DateTime)</span></th>
                 <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="9" class="loading">טוען טיקרים...</td>
+                <td colspan="10" class="loading">טוען טיקרים...</td>
               </tr>
             </tbody>
           </table>
@@ -470,7 +489,9 @@
                 onkeyup="filterTable('executionsTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddExecutionModal()" title="הוסף ביצוע חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="showAddExecutionModal()" title="הוסף ביצוע חדש">
+              <span class="action-icon">➕</span> הוסף
+            </button>
             <button class="filter-toggle-btn" onclick="toggleExecutionsSection()" title="הצג/הסתר טבלת ביצועים">
               <span class="filter-icon">▲</span>
             </button>
@@ -480,20 +501,24 @@
           <table class="table" id="executionsTable">
             <thead>
               <tr>
-                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                <th>טרייד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade ID</span></th>
-                <th>פעולה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Action</span></th>
-                <th>תאריך<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Date</span></th>
-                <th>כמות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Quantity</span></th>
-                <th>מחיר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Price</span></th>
-                <th>עמלה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Fee</span></th>
-                <th>מקור<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Source</span></th>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID (Integer)</span></th>
+                <th>מזהה טרייד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade ID (Integer)</span></th>
+                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account Name (String)</span></th>
+                <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker Symbol (String)</span></th>
+                <th>סטטוס טרייד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Status (String)</span></th>
+                <th>פעולה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Action (String)</span></th>
+                <th>תאריך<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Date (DateTime)</span></th>
+                <th>כמות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Quantity (Float)</span></th>
+                <th>מחיר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Price (Float)</span></th>
+                <th>עמלה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Fee (Float)</span></th>
+                <th>מקור<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Source (String)</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At (DateTime)</span></th>
                 <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="9" class="loading">טוען ביצועים...</td>
+                <td colspan="13" class="loading">טוען ביצועים...</td>
               </tr>
             </tbody>
           </table>
@@ -519,7 +544,9 @@
                 onkeyup="filterTable('cashFlowsTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים חדש">
+              <span class="action-icon">➕</span> הוסף
+            </button>
             <button class="filter-toggle-btn" onclick="toggleCashFlowsSection()" title="הצג/הסתר טבלת תזרימי מזומנים">
               <span class="filter-icon">▲</span>
             </button>
@@ -529,19 +556,20 @@
           <table class="table" id="cashFlowsTable">
             <thead>
               <tr>
-                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
-                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
-                <th>סכום<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Amount</span></th>
-                <th>תאריך<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Date</span></th>
-                <th>תיאור<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Description</span></th>
-                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID (Integer)</span></th>
+                <th>מזהה חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID (Integer)</span></th>
+                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account Name (String)</span></th>
+                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type (String)</span></th>
+                <th>סכום<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Amount (Float)</span></th>
+                <th>תאריך<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Date (Date)</span></th>
+                <th>תיאור<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Description (String)</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At (DateTime)</span></th>
                 <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="8" class="loading">טוען תזרימי מזומנים...</td>
+                <td colspan="9" class="loading">טוען תזרימי מזומנים...</td>
               </tr>
             </tbody>
           </table>
@@ -567,7 +595,9 @@
                 onkeyup="filterTable('alertsTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
+              <span class="action-icon">➕</span> הוסף
+            </button>
             <button class="filter-toggle-btn" onclick="toggleAlertsSection()" title="הצג/הסתר טבלת התראות">
               <span class="filter-icon">▲</span>
             </button>
@@ -577,21 +607,22 @@
           <table class="table" id="alertsTable">
             <thead>
               <tr>
-                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
-                <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker ID</span></th>
-                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
-                <th>תנאי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Condition</span></th>
-                <th>הודעה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Message</span></th>
-                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
-                <th>הופעל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Is Triggered</span></th>
-                <th>הופעל ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Triggered At</span></th>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID (Integer)</span></th>
+                <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type (String)</span></th>
+                <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status (String)</span></th>
+                <th>תנאי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Condition (String)</span></th>
+                <th>הודעה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Message (String)</span></th>
+                <th>הופעל ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Triggered At (DateTime)</span></th>
+                <th>הופעל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Is Triggered (String)</span></th>
+                <th>סוג קשר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Related Type ID (Integer)</span></th>
+                <th>מזהה קשר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Related ID (Integer)</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At (DateTime)</span></th>
                 <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="10" class="loading">טוען התראות...</td>
+                <td colspan="11" class="loading">טוען התראות...</td>
               </tr>
             </tbody>
           </table>
@@ -617,7 +648,9 @@
                 onkeyup="filterTable('notesTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddNoteModal()" title="הוסף הערה חדשה"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="showAddNoteModal()" title="הוסף הערה חדשה">
+              <span class="action-icon">➕</span> הוסף
+            </button>
             <button class="filter-toggle-btn" onclick="toggleNotesSection()" title="הצג/הסתר טבלת הערות">
               <span class="filter-icon">▲</span>
             </button>
@@ -627,13 +660,13 @@
           <table class="table" id="notesTable">
             <thead>
               <tr>
-                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
-                <th>טרייד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade ID</span></th>
-                <th>תוכנית טרייד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plan ID</span></th>
-                <th>תוכן<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Content</span></th>
-                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
-                <th>קובץ מצורף<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Attachment</span></th>
+                <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID (Integer)</span></th>
+                <th>תוכן<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Content (String)</span></th>
+                <th>קובץ מצורף<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Attachment (String)</span></th>
+                <th>סוג קשר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Related Type ID (Integer)</span></th>
+                <th>שם סוג קשר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Related Type Name (String)</span></th>
+                <th>מזהה קשר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Related ID (Integer)</span></th>
+                <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At (DateTime)</span></th>
                 <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
               </tr>
             </thead>
@@ -667,7 +700,9 @@
                 onkeyup="filterTable('userRolesTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddUserRoleModal()" title="הוסף תפקיד משתמש חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="showAddUserRoleModal()" title="הוסף תפקיד משתמש חדש">
+              <span class="action-icon">➕</span> הוסף
+            </button>
             <button class="filter-toggle-btn" onclick="toggleUserRolesSection()" title="הצג/הסתר טבלת תפקידי משתמשים">
               <span class="filter-icon">▲</span>
             </button>
@@ -715,7 +750,9 @@
                 onkeyup="filterTable('usersTable', this.value)"
               >
             </div>
-            <button class="add-btn action-btn" onclick="showAddUserModal()" title="הוסף משתמש חדש"><span class="btn-icon">➕</span> הוסף</button>
+            <button class="refresh-btn" onclick="showAddUserModal()" title="הוסף משתמש חדש">
+              <span class="action-icon">➕</span> הוסף
+            </button>
             <button class="filter-toggle-btn" onclick="toggleUsersSection()" title="הצג/הסתר טבלת משתמשים">
               <span class="filter-icon">▲</span>
             </button>
@@ -1734,12 +1771,38 @@
       try {
         console.log('🔄 טוען חשבונות...');
         
-        const accounts = await window.loadAccountsData();
-        window.updateAccountsTable(accounts);
+        const response = await window.apiCall('/api/v1/accounts/');
+        const accounts = response.data || response;
+        
+        const tbody = document.querySelector('#accountsTable tbody');
+        if (!tbody) {
+          console.error('❌ לא נמצא tbody לטבלת חשבונות');
+          return;
+        }
+        
+        tbody.innerHTML = accounts.map(account => `
+          <tr>
+            <td>${account.id}</td>
+            <td>${account.name || '-'}</td>
+            <td>${account.currency || '-'}</td>
+            <td>${account.status || '-'}</td>
+            <td>${window.formatCurrency(account.cash_balance)}</td>
+            <td>${window.formatCurrency(account.total_value)}</td>
+            <td>${window.formatCurrency(account.total_pl)}</td>
+            <td>${account.notes || '-'}</td>
+            <td>${window.formatDateTime(account.created_at)}</td>
+            <td>
+              <button class="btn btn-sm btn-secondary" onclick="editRecord('accounts', ${account.id})" title="ערוך">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('accounts', ${account.id})" title="מחק">🗑️</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        document.getElementById('accountsCount').textContent = `${accounts.length} חשבונות`;
         
       } catch (error) {
         console.error('❌ שגיאה בטעינת חשבונות:', error);
-        document.querySelector('#accountsTable tbody').innerHTML = `<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת חשבונות: ${error.message}</td></tr>`;
+        document.querySelector('#accountsTable tbody').innerHTML = `<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת חשבונות: ${error.message}</td></tr>`;
         document.getElementById('accountsCount').textContent = 'שגיאה';
       }
     }
@@ -1855,12 +1918,39 @@
     async function loadTickers() {
       try {
         console.log('🔄 טוען טיקרים...');
-        const tickers = await window.loadTickersData();
-        window.updateTickersTable(tickers);
+        
+        const response = await window.apiCall('/api/tickers');
+        const tickers = response.data || response;
+        
+        const tbody = document.querySelector('#tickersTable tbody');
+        if (!tbody) {
+          console.error('❌ לא נמצא tbody לטבלת טיקרים');
+          return;
+        }
+        
+        tbody.innerHTML = tickers.map(ticker => `
+          <tr>
+            <td>${ticker.id}</td>
+            <td>${ticker.symbol || '-'}</td>
+            <td>${ticker.name || '-'}</td>
+            <td>${ticker.type || '-'}</td>
+            <td>${ticker.remarks || '-'}</td>
+            <td>${ticker.currency || '-'}</td>
+            <td>${ticker.active_trades ? 'כן' : 'לא'}</td>
+            <td>${window.formatDateTime(ticker.created_at)}</td>
+            <td>${window.formatDateTime(ticker.updated_at)}</td>
+            <td>
+              <button class="btn btn-sm btn-secondary" onclick="editRecord('tickers', ${ticker.id})" title="ערוך">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('tickers', ${ticker.id})" title="מחק">🗑️</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        document.getElementById('tickersCount').textContent = `${tickers.length} טיקרים`;
         
       } catch (error) {
         console.error('Error loading tickers:', error);
-        document.querySelector('#tickersTable tbody').innerHTML = '<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        document.querySelector('#tickersTable tbody').innerHTML = '<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
       }
     }
 
@@ -1935,27 +2025,32 @@
     async function loadTrades() {
       try {
         console.log('🔄 טוען טריידים...');
-        const response = await window.apiCall('/api/v1/trades/');
+        const response = await window.apiCall('/api/trades');
         const trades = response.data || response; // השרת מחזיר מערך ישירות או בתוך data
         
         const tbody = document.querySelector('#tradesTable tbody');
         tbody.innerHTML = trades.map(trade => `
           <tr>
             <td>${trade.id}</td>
-            <td>${trade.account_name || `חשבון ${trade.account_id}` || '-'}</td>
-            <td>${trade.ticker_symbol || `טיקר ${trade.ticker_id}` || '-'}</td>
-            <td>${trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-'}</td>
+            <td>${trade.account_id || '-'}</td>
+            <td>${trade.account_name || '-'}</td>
+            <td>${trade.ticker_id || '-'}</td>
+            <td>${trade.ticker_symbol || '-'}</td>
+            <td>${trade.ticker_name || '-'}</td>
+            <td>${trade.trade_plan_id || '-'}</td>
             <td>${trade.status || '-'}</td>
             <td>${trade.type || '-'}</td>
             <td>${trade.side || 'Long'}</td>
             <td>${window.formatDateTime(trade.created_at)}</td>
             <td>${window.formatDateTime(trade.closed_at)}</td>
+            <td>${window.formatDateTime(trade.cancelled_at)}</td>
+            <td>${trade.cancel_reason || '-'}</td>
             <td>${window.formatCurrency(trade.total_pl)}</td>
             <td>${trade.notes || '-'}</td>
             <td>
-              <button class="btn btn-sm btn-secondary" onclick="editTradeRecord('${trade.id}')" title="ערוך">✏️</button>
-              <button class="btn btn-sm btn-secondary" onclick="cancelTradeRecord('${trade.id}')" title="ביטול">❌</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteTradeRecord('${trade.id}')" title="מחק">🗑️</button>
+              <button class="btn btn-sm btn-secondary" onclick="editRecord('trades', ${trade.id})" title="ערוך">✏️</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('trades', ${trade.id})" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('trades', ${trade.id})" title="מחק">🗑️</button>
             </td>
           </tr>
         `).join('');
@@ -1965,17 +2060,15 @@
         
       } catch (error) {
         console.error('Error loading trades:', error);
-        document.querySelector('#tradesTable tbody').innerHTML = '<tr><td colspan="12" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        document.querySelector('#tradesTable tbody').innerHTML = '<tr><td colspan="17" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
       }
     }
 
     async function loadTradePlans() {
       try {
         console.log('🔄 טוען תוכניות טרייד...');
-        const response = await window.apiCall('/api/v1/trade_plans/');
-        console.log('📊 תגובה מה-API:', response);
-        const plans = response.data || response; // השרת מחזיר מערך ישירות
-        console.log('📊 תוכניות טרייד:', plans);
+        const response = await window.apiCall('/api/tradeplans');
+        const plans = response.data || response;
         
         const tbody = document.querySelector('#tradePlansTable tbody');
         if (!tbody) {
@@ -1987,9 +2080,13 @@
           <tr>
             <td>${plan.id}</td>
             <td>${plan.account_id || '-'}</td>
+            <td>${plan.account_name || '-'}</td>
             <td>${plan.ticker_id || '-'}</td>
+            <td>${plan.ticker_symbol || '-'}</td>
+            <td>${plan.ticker_name || '-'}</td>
             <td>${plan.investment_type || '-'}</td>
             <td>${plan.side || 'Long'}</td>
+            <td>${plan.status || 'open'}</td>
             <td>${window.formatCurrency(plan.planned_amount)}</td>
             <td>${plan.entry_conditions || '-'}</td>
             <td>${window.formatCurrency(plan.stop_price)}</td>
@@ -2014,25 +2111,11 @@
         
         console.log('✅ תוכניות טרייד נטענו בהצלחה');
         
-        // הצגת הטבלה אם היא מוסתרת
-        const section = document.getElementById('tradePlansSection');
-        const container = document.getElementById('tradePlansContainer');
-        const footer = document.querySelector('#tradePlansSection .table-footer');
-        const icon = document.querySelector('#tradePlansSection .filter-icon');
-        
-        if (section && section.classList.contains('collapsed')) {
-          section.classList.remove('collapsed');
-          if (container) container.style.display = 'block';
-          if (footer) footer.style.display = 'block';
-          if (icon) icon.textContent = '▲';
-          localStorage.setItem('tradePlansSectionOpen', 'true');
-        }
-        
       } catch (error) {
         console.error('❌ שגיאה בטעינת תוכניות טרייד:', error);
         const tbody = document.querySelector('#tradePlansTable tbody');
         if (tbody) {
-          tbody.innerHTML = '<tr><td colspan="14" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="18" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
         }
       }
     }
@@ -2040,12 +2123,41 @@
     async function loadAlerts() {
       try {
         console.log('🔄 טוען התראות...');
-        const alerts = await window.loadAlertsData();
-        window.updateAlertsTable(alerts);
+        
+        const response = await window.apiCall('/api/v1/alerts/');
+        const alerts = response.data || response;
+        
+        const tbody = document.querySelector('#alertsTable tbody');
+        if (!tbody) {
+          console.error('❌ לא נמצא tbody לטבלת התראות');
+          return;
+        }
+        
+        tbody.innerHTML = alerts.map(alert => `
+          <tr>
+            <td>${alert.id}</td>
+            <td>${alert.type || '-'}</td>
+            <td>${alert.status || '-'}</td>
+            <td>${alert.condition || '-'}</td>
+            <td>${alert.message || '-'}</td>
+            <td>${window.formatDateTime(alert.triggered_at)}</td>
+            <td>${alert.is_triggered || '-'}</td>
+            <td>${alert.related_type_id || '-'}</td>
+            <td>${alert.related_id || '-'}</td>
+            <td>${window.formatDateTime(alert.created_at)}</td>
+            <td>
+              <button class="btn btn-sm btn-secondary" onclick="editRecord('alerts', ${alert.id})" title="ערוך">✏️</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('alerts', ${alert.id})" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('alerts', ${alert.id})" title="מחק">🗑️</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        document.getElementById('alertsCount').textContent = `${alerts.length} התראות`;
         
       } catch (error) {
         console.error('❌ שגיאה בטעינת התראות:', error);
-        document.querySelector('#alertsTable tbody').innerHTML = '<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        document.querySelector('#alertsTable tbody').innerHTML = '<tr><td colspan="11" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
       }
     }
 
@@ -2090,7 +2202,7 @@
     async function loadCashFlows() {
       try {
         console.log('🔄 טוען תזרימי מזומנים...');
-        const response = await window.apiCall('/api/v1/cash_flows/');
+        const response = await window.apiCall('/api/cash_flows');
         console.log('📊 תגובה מה-API:', response);
         const cashFlows = response.data || response; // השרת מחזיר מערך ישירות
         console.log('📊 תזרימי מזומנים:', cashFlows);
@@ -2104,8 +2216,9 @@
         tbody.innerHTML = cashFlows.map(cf => `
           <tr>
             <td>${cf.id}</td>
-            <td>${cf.account_id}</td>
-            <td>${cf.type}</td>
+            <td>${cf.account_id || '-'}</td>
+            <td>${cf.account_name || '-'}</td>
+            <td>${cf.type || '-'}</td>
             <td>${window.formatCurrency(cf.amount)}</td>
             <td>${window.formatDate(cf.date)}</td>
             <td>${cf.description || '-'}</td>
@@ -2143,7 +2256,7 @@
         console.error('❌ שגיאה בטעינת תזרימי מזומנים:', error);
         const tbody = document.querySelector('#cashFlowsTable tbody');
         if (tbody) {
-          tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
         }
       }
     }
@@ -2151,8 +2264,33 @@
     async function loadNotes() {
       try {
         console.log('🔄 טוען הערות...');
-        const notes = await window.loadNotesData();
-        window.updateNotesTableDatabase(notes);
+        
+        const response = await window.apiCall('/api/notes');
+        const notes = response.data || response;
+        
+        const tbody = document.querySelector('#notesTable tbody');
+        if (!tbody) {
+          console.error('❌ לא נמצא tbody לטבלת הערות');
+          return;
+        }
+        
+        tbody.innerHTML = notes.map(note => `
+          <tr>
+            <td>${note.id}</td>
+            <td>${note.content || '-'}</td>
+            <td>${note.attachment || '-'}</td>
+            <td>${note.related_type_id || '-'}</td>
+            <td>${note.related_type_name || '-'}</td>
+            <td>${note.related_id || '-'}</td>
+            <td>${window.formatDateTime(note.created_at)}</td>
+            <td>
+              <button class="btn btn-sm btn-secondary" onclick="editRecord('notes', ${note.id})" title="ערוך">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('notes', ${note.id})" title="מחק">🗑️</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        document.getElementById('notesCount').textContent = `${notes.length} הערות`;
         
       } catch (error) {
         console.error('❌ שגיאה בטעינת הערות:', error);
@@ -2166,8 +2304,39 @@
     async function loadExecutions() {
       try {
         console.log('🔄 טוען ביצועים...');
-        const executions = await loadExecutionsData();
-        updateExecutionsTable(executions);
+        
+        const response = await window.apiCall('/api/executions');
+        const executions = response.data || response;
+        
+        const tbody = document.querySelector('#executionsTable tbody');
+        if (!tbody) {
+          console.error('❌ לא נמצא tbody לטבלת ביצועים');
+          return;
+        }
+        
+        tbody.innerHTML = executions.map(execution => `
+          <tr>
+            <td>${execution.id}</td>
+            <td>${execution.trade_id || '-'}</td>
+            <td>${execution.account_name || '-'}</td>
+            <td>${execution.ticker_symbol || '-'}</td>
+            <td>${execution.trade_status || '-'}</td>
+            <td>${execution.action || '-'}</td>
+            <td>${window.formatDateTime(execution.date)}</td>
+            <td>${execution.quantity || '-'}</td>
+            <td>${window.formatCurrency(execution.price)}</td>
+            <td>${window.formatCurrency(execution.fee)}</td>
+            <td>${execution.source || '-'}</td>
+            <td>${window.formatDateTime(execution.created_at)}</td>
+            <td>
+              <button class="btn btn-sm btn-secondary" onclick="editRecord('executions', ${execution.id})" title="ערוך">✏️</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('executions', ${execution.id})" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRecord('executions', ${execution.id})" title="מחק">🗑️</button>
+            </td>
+          </tr>
+        `).join('');
+        
+        document.getElementById('executionsCount').textContent = `${executions.length} ביצועים`;
         
         // הצגת הטבלה אם היא מוסתרת
         const section = document.getElementById('executionsSection');
@@ -2185,7 +2354,7 @@
         
       } catch (error) {
         console.error('❌ שגיאה בטעינת ביצועים:', error);
-        document.querySelector('#executionsTable tbody').innerHTML = '<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        document.querySelector('#executionsTable tbody').innerHTML = '<tr><td colspan="13" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
       }
     }
 
@@ -2245,6 +2414,9 @@
 
     // פונקציה לטעינת מצב הטבלאות השמור
     function loadTableStates() {
+      console.log('🔄 טוען מצב טבלאות...');
+      
+      const pageName = 'database';
       const sections = [
         'usersSection',
         'accountsSection', 
@@ -2265,57 +2437,70 @@
         const icon = document.querySelector(`#${section} .filter-icon`);
         
         if (sectionElement && container && footer && icon) {
-          const isOpen = localStorage.getItem(section.replace('Section', 'SectionOpen'));
+          // בדיקה אם הסקשן נשמר כסגור עבור דף זה
+          const storageKey = `${pageName}_${section}Collapsed`;
+          const isCollapsed = localStorage.getItem(storageKey) === 'true';
           
-          if (isOpen === 'false') {
+          if (isCollapsed) {
             sectionElement.classList.add('collapsed');
             container.style.display = 'none';
             footer.style.display = 'none';
             icon.textContent = '▼';
+            console.log(`📁 ${section}: נטען כסגור`);
           } else {
             sectionElement.classList.remove('collapsed');
             container.style.display = 'block';
             footer.style.display = 'block';
             icon.textContent = '▲';
+            console.log(`📂 ${section}: נטען כפתוח`);
           }
-        }
-        
-        // טיפול מיוחד לטבלת User Roles
-        if (section === 'userRolesSection') {
-          const container = document.getElementById('userRolesContainer');
-          const footer = document.querySelector('#userRolesSection .table-footer');
-          const icon = document.querySelector('#userRolesSection .filter-icon');
-          
-          if (container && footer && icon) {
-            const isCollapsed = localStorage.getItem('userRolesSectionCollapsed');
-            
-            if (isCollapsed === 'true') {
-              container.style.display = 'none';
-              footer.style.display = 'none';
-              icon.textContent = '▼';
-            } else {
-              container.style.display = 'block';
-              footer.style.display = 'block';
-              icon.textContent = '▲';
-            }
-          }
+        } else {
+          console.warn(`⚠️ ${section}: אלמנטים חסרים`);
         }
       });
+      
+      console.log('✅ מצב טבלאות נטען בהצלחה');
     }
+
+    // פונקציה לעדכון גריד מהפילטרים הגלובליים
+    window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
+      console.log('🔄 updateGridFromComponent (database) called with:', { 
+        selectedStatuses, 
+        selectedTypes, 
+        selectedAccounts, 
+        selectedDateRange, 
+        searchTerm 
+      });
+      
+      // בדיקה אם הפונקציה הגלובלית זמינה
+      if (typeof window.updateGridFromComponentGlobal === 'function') {
+        window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, 'database');
+      } else {
+        console.log('🔄 Global updateGridFromComponentGlobal function not available, using local filtering');
+        // כאן אפשר להוסיף פילטור מקומי אם צריך
+      }
+    };
 
     // Initial data load - ללא אימות
     document.addEventListener('DOMContentLoaded', async () => {
       console.log('טוען נתונים ללא אימות');
       
-      // בדיקה שהפונקציות נטענו
-      console.log('בדיקת פונקציות:', {
-        editRecord: typeof window.editRecord,
-        deleteRecord: typeof window.deleteRecord,
-        saveRecord: typeof window.saveRecord,
-        apiCall: typeof window.apiCall
+      // ניקוי localStorage ישן שעלול לגרום לבעיות (רק מפתחים גלובליים ישנים)
+      const oldKeys = Object.keys(localStorage).filter(key => 
+        (key.includes('SectionOpen') || key.includes('SectionCollapsed')) && 
+        !key.includes('database_') // לא לנקות מפתחים של דף זה
+      );
+      oldKeys.forEach(key => {
+        console.log(`🗑️ מסיר מפתח ישן: ${key}`);
+        localStorage.removeItem(key);
       });
       
-      loadTableStates(); // טוען את המצב השמור של הטבלאות
+      // טעינת מצב הסקשנים לפי הדף הנוכחי
+      if (typeof window.loadSectionStates === 'function') {
+        window.loadSectionStates();
+      } else {
+        loadTableStates(); // fallback לפונקציה המקומית
+      }
       refreshAllTables(); // טוען נתונים ישירות
     });
 
@@ -2335,14 +2520,18 @@
         return;
       }
       
+      // הוספת שם הדף למפתח כדי שכל דף ישמור את הסטטוס שלו בנפרד
+      const pageName = 'database';
+      const storageKey = `${pageName}_${sectionId}Collapsed`;
+      
       if (section.classList.contains('collapsed')) {
         section.classList.remove('collapsed');
         icon.textContent = '▲';
-        localStorage.setItem(`${sectionId}Collapsed`, 'false');
+        localStorage.setItem(storageKey, 'false');
       } else {
         section.classList.add('collapsed');
         icon.textContent = '▼';
-        localStorage.setItem(`${sectionId}Collapsed`, 'true');
+        localStorage.setItem(storageKey, 'true');
       }
     }
 

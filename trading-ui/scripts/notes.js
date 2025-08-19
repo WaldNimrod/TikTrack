@@ -23,11 +23,11 @@ let notesData = [];
  * פונקציה לטעינת נתוני הערות מהשרת
  */
 async function loadNotesData() {
-  try {
+    try {
     console.log('🔄 טוען הערות מהשרת...');
-    const response = await window.apiCall('/api/v1/notes/');
-    const notes = response.data || response;
-    console.log(`✅ נטענו ${notes.length} הערות`);
+        const response = await window.apiCall('/api/v1/notes/');
+        const notes = response.data || response;
+        console.log(`✅ נטענו ${notes.length} הערות`);
     
     // עדכון המשתנה הגלובלי לצורך מיון וסינון
     notesData = notes;
@@ -45,11 +45,11 @@ async function loadNotesData() {
     
     return notes;
     
-  } catch (error) {
+    } catch (error) {
     console.error('Error loading notes data:', error);
     document.querySelector('.main-content table tbody').innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
-    throw error;
-  }
+        throw error;
+    }
 }
 
 /**
@@ -60,34 +60,34 @@ async function loadNotesData() {
  */
 async function updateNotesTable(notes) {
   console.log('🚀 === התחלת updateNotesTable בדף ההערות ===');
-  console.log('🔄 מעדכן טבלת הערות עם', notes.length, 'הערות');
+    console.log('🔄 מעדכן טבלת הערות עם', notes.length, 'הערות');
   
   const tbody = document.querySelector('.main-content table tbody');
-  if (!tbody) {
-    console.error('❌ לא נמצא tbody לטבלת הערות');
-    return;
-  }
-  
-  // טעינת נתונים נוספים לצורך הצגת שמות מלאים
-  let accounts = [];
-  let trades = [];
-  let tradePlans = [];
-  let tickers = [];
-  
-  try {
-    // טעינת נתונים במקביל
-    console.log('🔄 טוען נתונים נוספים...');
-    const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      window.apiCall('/api/v1/accounts/'),
-      window.apiCall('/api/v1/trades/'),
-      window.apiCall('/api/v1/trade_plans/'),
-      window.apiCall('/api/v1/tickers/')
-    ]);
+    if (!tbody) {
+        console.error('❌ לא נמצא tbody לטבלת הערות');
+        return;
+    }
     
-    accounts = accountsResponse.data || accountsResponse;
-    trades = tradesResponse.data || tradesResponse;
-    tradePlans = tradePlansResponse.data || tradePlansResponse;
-    tickers = tickersResponse.data || tickersResponse;
+    // טעינת נתונים נוספים לצורך הצגת שמות מלאים
+    let accounts = [];
+    let trades = [];
+    let tradePlans = [];
+    let tickers = [];
+    
+    try {
+        // טעינת נתונים במקביל
+        console.log('🔄 טוען נתונים נוספים...');
+        const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
+            window.apiCall('/api/v1/accounts/'),
+            window.apiCall('/api/v1/trades/'),
+            window.apiCall('/api/v1/trade_plans/'),
+            window.apiCall('/api/v1/tickers/')
+        ]);
+        
+        accounts = accountsResponse.data || accountsResponse;
+        trades = tradesResponse.data || tradesResponse;
+        tradePlans = tradePlansResponse.data || tradePlansResponse;
+        tickers = tickersResponse.data || tickersResponse;
     
     // שמירת הנתונים כמשתנים גלובליים לצורך החיפוש והסינון
     // נתונים אלה נדרשים לפונקציות החיפוש כדי למצוא סימבולים ושמות מלאים
@@ -95,55 +95,55 @@ async function updateNotesTable(notes) {
     window.tradesData = trades;
     window.tradePlansData = tradePlans;
     window.tickersData = tickers;
+        
+        console.log('📊 נתונים שנטענו:');
+        console.log('חשבונות:', accounts);
+        console.log('טריידים:', trades);
+        console.log('תוכניות:', tradePlans);
+        console.log('טיקרים:', tickers);
+        console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
+    } catch (error) {
+        console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
+    }
     
-    console.log('📊 נתונים שנטענו:');
-    console.log('חשבונות:', accounts);
-    console.log('טריידים:', trades);
-    console.log('תוכניות:', tradePlans);
-    console.log('טיקרים:', tickers);
-    console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
-  } catch (error) {
-    console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
-  }
-  
-  tbody.innerHTML = notes.map(note => {
-    // קביעת הקשר לתצוגה עם שמות מלאים
-    let relatedDisplay = '-';
-    
-    console.log(`🔍 מעבד הערה ${note.id}:`, note);
-    console.log(`📊 נתונים זמינים: ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
+    tbody.innerHTML = notes.map(note => {
+        // קביעת הקשר לתצוגה עם שמות מלאים
+        let relatedDisplay = '-';
+        
+        console.log(`🔍 מעבד הערה ${note.id}:`, note);
+        console.log(`📊 נתונים זמינים: ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
     
     let relatedClass = '';
-    
-    if (note.related_type === 'account') {
-      console.log(`🔍 מחפש חשבון עם ID: ${note.related_id}`);
-      const account = accounts.find(acc => acc.id == note.related_id);
-      console.log(`📋 חשבון שנמצא:`, account);
-      relatedDisplay = account ? `חשבון - ${account.name}` : `חשבון ${note.related_id}`;
+        
+        if (note.related_type === 'account') {
+            console.log(`🔍 מחפש חשבון עם ID: ${note.related_id}`);
+            const account = accounts.find(acc => acc.id == note.related_id);
+            console.log(`📋 חשבון שנמצא:`, account);
+            relatedDisplay = account ? `חשבון - ${account.name}` : `חשבון ${note.related_id}`;
       relatedClass = 'related-account';
-    } else if (note.related_type === 'trade') {
-      console.log(`🔍 מחפש טרייד עם ID: ${note.related_id}`);
-      const trade = trades.find(t => t.id == note.related_id);
+        } else if (note.related_type === 'trade') {
+            console.log(`🔍 מחפש טרייד עם ID: ${note.related_id}`);
+            const trade = trades.find(t => t.id == note.related_id);
       console.log(`📋 טרייד שנמצא:`, trade);
-      if (trade) {
-        const ticker = tickers.find(tick => tick.id == trade.ticker_id);
+            if (trade) {
+                const ticker = tickers.find(tick => tick.id == trade.ticker_id);
         const tickerSymbol = ticker ? ticker.symbol : 'לא ידוע';
-        relatedDisplay = `טרייד - ${tickerSymbol}`;
-      } else {
-        relatedDisplay = `טרייד ${note.related_id}`;
-      }
+                relatedDisplay = `טרייד - ${tickerSymbol}`;
+            } else {
+                relatedDisplay = `טרייד ${note.related_id}`;
+            }
       relatedClass = 'related-trade';
-    } else if (note.related_type === 'trade_plan') {
-      console.log(`🔍 מחפש תוכנית עם ID: ${note.related_id}`);
-      const plan = tradePlans.find(p => p.id == note.related_id);
-      console.log(`📋 תוכנית שנמצאה:`, plan);
-      if (plan) {
-        const ticker = tickers.find(tick => tick.id == plan.ticker_id);
+        } else if (note.related_type === 'trade_plan') {
+            console.log(`🔍 מחפש תוכנית עם ID: ${note.related_id}`);
+            const plan = tradePlans.find(p => p.id == note.related_id);
+            console.log(`📋 תוכנית שנמצאה:`, plan);
+            if (plan) {
+                const ticker = tickers.find(tick => tick.id == plan.ticker_id);
         const tickerSymbol = ticker ? ticker.symbol : 'לא ידוע';
-        relatedDisplay = `תוכנית - ${tickerSymbol}`;
-      } else {
-        relatedDisplay = `תוכנית ${note.related_id}`;
-      }
+                relatedDisplay = `תוכנית - ${tickerSymbol}`;
+            } else {
+                relatedDisplay = `תוכנית ${note.related_id}`;
+            }
       relatedClass = 'related-plan';
     } else {
       relatedDisplay = note.related_type || '-';
@@ -156,9 +156,9 @@ async function updateNotesTable(notes) {
     
     // תאריך יצירה
     const createdAt = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-    
-    return `
-      <tr>
+        
+        return `
+        <tr>
         <td><strong>#${note.id}</strong></td>
         <td>${note.content || '-'}</td>
         <td><span class="${relatedClass}">${relatedDisplay}</span></td>
@@ -169,17 +169,17 @@ async function updateNotesTable(notes) {
             <span class="btn-icon">✏️</span>
           </button>
           <button class="btn btn-sm btn-danger" onclick="deleteNote('${note.id}')" title="מחק">✕</button>
-        </td>
-      </tr>
+          </td>
+        </tr>
     `;
   }).join('');
-  
-  // עדכון ספירת רשומות
+    
+    // עדכון ספירת רשומות
   const countElement = document.querySelector('.main-content .table-count');
-  if (countElement) {
-    countElement.textContent = `${notes.length} הערות`;
-  }
-  
+    if (countElement) {
+        countElement.textContent = `${notes.length} הערות`;
+    }
+    
   // עדכון סטטיסטיקות הטבלה
   window.updateTableStats('notes');
   
@@ -213,9 +213,9 @@ function getFileIcon(filename) {
  * פונקציה ליצירת קישור לקובץ
  */
 function createFileLink(filename) {
-  if (!filename) return '-';
-  
-  const icon = getFileIcon(filename);
+    if (!filename) return '-';
+    
+    const icon = getFileIcon(filename);
   return `<a href="/uploads/notes/${filename}" target="_blank" class="file-link">${icon} ${filename}</a>`;
 }
 

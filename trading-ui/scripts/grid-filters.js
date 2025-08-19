@@ -24,6 +24,26 @@
  */
 
 /**
+ * פונקציה לקבלת סוג הטבלה לפי מזהה הדף
+ * @param {string} pageName - שם הדף
+ * @returns {string} - סוג הטבלה
+ */
+function getTableType(pageName) {
+  // מיפוי דפים לסוגי טבלאות
+  const tableTypeMap = {
+    'designs': 'designs',
+    'planning': 'designs',
+    'tracking': 'trades',
+    'trades': 'trades',
+    'accounts': 'accounts',
+    'notes': 'notes',
+    'alerts': 'alerts'
+  };
+  
+  return tableTypeMap[pageName] || pageName;
+}
+
+/**
  * פונקציה לפילטור נתונים לפי כל הפילטרים
  * פונקציה גלובלית שמשותפת לכל הדפים
  */
@@ -108,13 +128,13 @@ function filterDataByFilters(data, pageName) {
         switch(item.type || item.investment_type) {
           case 'swing':
             typeDisplay = 'סווינג';
-            break;
+          break;
           case 'investment':
             typeDisplay = 'השקעה';
-            break;
+          break;
           case 'passive':
             typeDisplay = 'פאסיבי';
-            break;
+          break;
           default:
             typeDisplay = item.type || item.investment_type;
         }
@@ -123,20 +143,20 @@ function filterDataByFilters(data, pageName) {
         switch(item.type) {
           case 'swing':
             typeDisplay = 'סווינג';
-            break;
+          break;
           case 'investment':
             typeDisplay = 'השקעה';
-            break;
+          break;
           case 'passive':
             typeDisplay = 'פאסיבי';
-            break;
+          break;
           case 'buy':
             typeDisplay = 'קנייה';
-            break;
+          break;
           case 'sell':
             typeDisplay = 'מכירה';
-            break;
-          default:
+          break;
+        default:
             typeDisplay = item.type;
         }
       } else {
@@ -150,8 +170,9 @@ function filterDataByFilters(data, pageName) {
     console.log('🔄 After type filter:', filteredData.length, 'items');
   }
   
-  // פילטר לפי חשבון
-  if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('all')) {
+  // פילטר לפי חשבון (לא חל על תכנונים)
+  const tableType = getTableType(pageName);
+  if (tableType !== 'designs' && selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('all')) {
     console.log('🔄 Filtering by account:', selectedAccounts);
     filteredData = filteredData.filter(item => {
       let accountMatch = false;
@@ -172,15 +193,17 @@ function filterDataByFilters(data, pageName) {
       return accountMatch;
     });
     console.log('🔄 After account filter:', filteredData.length, 'items');
+  } else if (tableType === 'designs') {
+    console.log('🔄 Skipping account filter for designs table - plans are not linked to accounts');
   }
   
   // פילטר לפי תאריכים
-  if (selectedDateRange && selectedDateRange !== 'הכול') {
+  if (selectedDateRange && selectedDateRange !== 'כל זמן') {
     console.log('🔄 Filtering by date range:', selectedDateRange);
     filteredData = filteredData.filter(item => {
       let itemDate;
       
-      if (pageName === 'planning') {
+      if (pageName === 'planning' || pageName === 'designs') {
         itemDate = new Date(item.created_at);
       } else if (pageName === 'tracking') {
         itemDate = new Date(item.created_at);
@@ -243,6 +266,17 @@ function filterDataByFilters(data, pageName) {
   }
   
   console.log(`🔄 Final filtered data: ${filteredData.length} items`);
+  
+  // עדכון חלון בדיקת פילטר תאריכים אם קיים
+  if (typeof window.updateDateDebugInfo === 'function') {
+    setTimeout(() => window.updateDateDebugInfo(), 100);
+  }
+  
+  // עדכון נוסף אחרי זמן קצר יותר
+  if (typeof window.updateDateDebugInfo === 'function') {
+    setTimeout(() => window.updateDateDebugInfo(), 500);
+  }
+  
   return filteredData;
 }
 
@@ -263,20 +297,54 @@ function getDateRange(dateRange) {
       endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59, 59);
       break;
     case 'השבוע':
+      // השבוע - מיום ראשון האחרון ועד היום כולל
       const dayOfWeek = now.getDay();
-      const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      const daysToSubtract = dayOfWeek === 0 ? 0 : dayOfWeek; // 0 = ראשון, 1 = שני, וכו'
       startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysToSubtract);
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      break;
+    case 'שבוע':
+      // שבוע - מלפני 7 ימים ועד היום
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
       break;
     case 'החודש':
       startDate = new Date(now.getFullYear(), now.getMonth(), 1);
       endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
       break;
+    case 'MTD':
+      // MTD - מתחילת החודש הקלנדרי ועד היום
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      break;
+    case '30 יום':
+      // 30 יום - מלפני 30 יום ועד היום
+      startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      break;
+    case '60 יום':
+      // 60 יום - מלפני 60 יום ועד היום
+      startDate = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      break;
+    case '90 יום':
+      // 90 יום - מלפני 90 יום ועד היום
+      startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      break;
+    case 'שנה':
     case 'השנה':
+      // שנה - מלפני 365 ימים ועד היום
+      startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      break;
+    case 'YTD':
+      // YTD - מתחילת השנה הקלנדרית ועד היום
       startDate = new Date(now.getFullYear(), 0, 1);
       endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
       break;
     case 'שנה קודמת':
+      // שנה קודמת - מתחילת השנה הקלנדרית הקודמת ועד סופה
       startDate = new Date(now.getFullYear() - 1, 0, 1);
       endDate = new Date(now.getFullYear() - 1, 11, 31, 23, 59, 59);
       break;
@@ -284,6 +352,8 @@ function getDateRange(dateRange) {
       startDate = new Date(0);
       endDate = new Date();
   }
+  
+
   
   return { startDate, endDate };
 }
@@ -302,18 +372,12 @@ function updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selected
   window.selectedDateRangeForFilter = selectedDateRange || null;
   window.searchTermForFilter = searchTerm || '';
   
-  // שמירה ב-localStorage
+  // שמירה ב-localStorage (גלובלי לכל הדפים)
   try {
-    localStorage.setItem(`${pageName}FilterStatuses`, JSON.stringify(selectedStatuses || []));
-    localStorage.setItem(`${pageName}FilterTypes`, JSON.stringify(selectedTypes || []));
-    localStorage.setItem(`${pageName}FilterAccounts`, JSON.stringify(selectedAccounts || []));
-    localStorage.setItem(`${pageName}FilterDateRange`, selectedDateRange || 'הכול');
-    
-    if (searchTerm && searchTerm.trim() !== '') {
-      localStorage.setItem(`${pageName}FilterSearch`, searchTerm);
-    } else {
-      localStorage.removeItem(`${pageName}FilterSearch`);
-    }
+    localStorage.setItem('globalFilterStatuses', JSON.stringify(selectedStatuses || []));
+    localStorage.setItem('globalFilterTypes', JSON.stringify(selectedTypes || []));
+    localStorage.setItem('globalFilterAccounts', JSON.stringify(selectedAccounts || []));
+    localStorage.setItem('globalFilterDateRange', selectedDateRange || 'כל זמן');
     
     if (searchTerm && searchTerm.trim() !== '') {
       localStorage.setItem('globalFilterSearch', searchTerm);
@@ -321,9 +385,9 @@ function updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selected
       localStorage.removeItem('globalFilterSearch');
     }
     
-    console.log('🔄 Filters saved to localStorage');
+    console.log('🔄 Global filters saved to localStorage');
   } catch (error) {
-    console.error('❌ Error saving filters to localStorage:', error);
+    console.error('❌ Error saving global filters to localStorage:', error);
   }
   
   // קריאה לפונקציה הספציפית לדף
@@ -357,12 +421,12 @@ function loadSavedFiltersForPage(pageName) {
   console.log(`🔄 === LOAD SAVED FILTERS FOR PAGE (${pageName}) ===`);
   
   try {
-    // טעינת פילטרים מ-localStorage
-    const savedStatuses = JSON.parse(localStorage.getItem(`${pageName}FilterStatuses`) || '[]');
-    const savedTypes = JSON.parse(localStorage.getItem(`${pageName}FilterTypes`) || '[]');
-    const savedAccounts = JSON.parse(localStorage.getItem(`${pageName}FilterAccounts`) || '[]');
-    const savedDateRange = localStorage.getItem(`${pageName}FilterDateRange`) || 'הכול';
-    const savedSearch = localStorage.getItem(`${pageName}FilterSearch`) || '';
+    // טעינת פילטרים גלובליים מ-localStorage
+    const savedStatuses = JSON.parse(localStorage.getItem('globalFilterStatuses') || '[]');
+    const savedTypes = JSON.parse(localStorage.getItem('globalFilterTypes') || '[]');
+    const savedAccounts = JSON.parse(localStorage.getItem('globalFilterAccounts') || '[]');
+    const savedDateRange = localStorage.getItem('globalFilterDateRange') || 'כל זמן';
+    const savedSearch = localStorage.getItem('globalFilterSearch') || '';
     
     console.log('🔄 Saved filters:', { savedStatuses, savedTypes, savedAccounts, savedDateRange, savedSearch });
     
@@ -378,7 +442,7 @@ function loadSavedFiltersForPage(pageName) {
     window.selectedStatusesForFilter = savedStatuses.length > 0 ? savedStatuses : defaultStatuses;
     window.selectedTypesForFilter = savedTypes.length > 0 ? savedTypes : [];
     window.selectedAccountsForFilter = savedAccounts.length > 0 ? savedAccounts : [];
-    window.selectedDateRangeForFilter = savedDateRange;
+      window.selectedDateRangeForFilter = savedDateRange;
     window.searchTermForFilter = savedSearch;
     
     console.log('🔄 Updated global filter variables:', {
@@ -395,34 +459,29 @@ function loadSavedFiltersForPage(pageName) {
 }
 
 /**
- * פונקציה לאיפוס כל הפילטרים לדף
+ * פונקציה לאיפוס כל הפילטרים הגלובליים
  */
 function resetAllFiltersForPage(pageName) {
-  console.log(`🔄 === RESET ALL FILTERS FOR PAGE (${pageName}) ===`);
+  console.log(`🔄 === RESET ALL GLOBAL FILTERS ===`);
   
   // איפוס המשתנים הגלובליים
-  if (pageName === 'accounts') {
-    window.selectedStatusesForFilter = ['פתוח', 'סגור', 'מבוטל'];
-  } else {
-    window.selectedStatusesForFilter = ['פתוח'];
-  }
+  window.selectedStatusesForFilter = [];
   window.selectedTypesForFilter = [];
   window.selectedAccountsForFilter = [];
-  window.selectedDateRangeForFilter = 'הכול';
+  window.selectedDateRangeForFilter = 'כל זמן';
   window.searchTermForFilter = '';
   
-  // מחיקה מ-localStorage
+  // מחיקה מ-localStorage (גלובלי)
   try {
-    localStorage.removeItem(`${pageName}FilterStatuses`);
-    localStorage.removeItem(`${pageName}FilterTypes`);
-    localStorage.removeItem(`${pageName}FilterAccounts`);
-    localStorage.removeItem(`${pageName}FilterDateRange`);
-    localStorage.removeItem(`${pageName}FilterSearch`);
+    localStorage.removeItem('globalFilterStatuses');
+    localStorage.removeItem('globalFilterTypes');
+    localStorage.removeItem('globalFilterAccounts');
+    localStorage.removeItem('globalFilterDateRange');
     localStorage.removeItem('globalFilterSearch');
     
-    console.log('🔄 Filters removed from localStorage');
+    console.log('🔄 Global filters removed from localStorage');
   } catch (error) {
-    console.error('❌ Error removing filters from localStorage:', error);
+    console.error('❌ Error removing global filters from localStorage:', error);
   }
   
   // קריאה לפונקציה הספציפית לדף
@@ -474,10 +533,10 @@ function initializePageFilters(pageName) {
     pageLoadFunction = window[`load${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`];
   }
   
-  if (pageLoadFunction && typeof pageLoadFunction === 'function') {
+    if (pageLoadFunction && typeof pageLoadFunction === 'function') {
     console.log(`🔄 Calling page-specific load function: ${pageLoadFunction.name}`);
-    pageLoadFunction();
-  } else {
+      pageLoadFunction();
+    } else {
     console.log(`🔍 Page-specific load function not found for ${pageName}`);
   }
 }
@@ -522,11 +581,111 @@ function updateTableStats(pageName) {
   // כרגע היא רק לוג לצורך מעקב
 }
 
+/**
+ * ========================================
+ * פונקציות פילטר חשבונות כלליות
+ * ========================================
+ */
+
+/**
+ * פונקציה לעדכון תפריט הפילטר של החשבונות
+ * פונקציה כללית שמשותפת לכל הדפים
+ */
+function updateAccountFilterMenu(accounts) {
+  console.log('🔄 updateAccountFilterMenu called with:', accounts);
+  
+  const appHeader = document.querySelector('app-header');
+  if (!appHeader) {
+    console.log('🔄 App header not found');
+    return;
+  }
+  
+  const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
+  if (!accountMenu) {
+    console.log('🔄 Account menu not found');
+    return;
+  }
+  
+  console.log('🔄 Account menu found, clearing existing content');
+  accountMenu.innerHTML = '';
+  
+  console.log('🔄 Adding account items...');
+  accounts.forEach((account, index) => {
+    const accountItem = document.createElement('div');
+    accountItem.className = 'account-filter-item';
+    accountItem.setAttribute('data-account', account.name); // הוספת data-account attribute
+    accountItem.innerHTML = `
+      <span class="option-text">${account.name}</span>
+      <span class="check-mark">✓</span>
+    `;
+    accountMenu.appendChild(accountItem);
+    console.log(`🔄 Added account item ${index + 1}: ${account.name}`);
+  });
+  
+  console.log('🔄 Total account items added:', accounts.length);
+  
+  // הוספת event listeners לפריטי החשבונות
+  const accountItems = accountMenu.querySelectorAll('.account-filter-item');
+  accountItems.forEach((item, index) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const accountName = item.getAttribute('data-account'); // שימוש ב-data-account
+      console.log('🔄 Account filter item clicked:', accountName);
+      
+      // קריאה לפונקציה של הקומפוננט
+      const appHeader = document.querySelector('app-header');
+      if (appHeader && typeof appHeader.selectAccountOption === 'function') {
+        appHeader.selectAccountOption(accountName);
+      }
+    });
+  });
+  console.log('🔄 Event listeners added to account items');
+  
+  updateAccountFilterText(accounts.map(a => a.name));
+  console.log('🔄 Account filter menu updated successfully');
+}
+
+/**
+ * פונקציה לעדכון טקסט הפילטר של החשבונות
+ * פונקציה כללית שמשותפת לכל הדפים
+ */
+function updateAccountFilterText(selectedAccounts) {
+  console.log('🔄 updateAccountFilterText called');
+  console.log('🔄 Selected account values for text update:', selectedAccounts);
+  
+  const appHeader = document.querySelector('app-header');
+  if (!appHeader) return;
+  
+  const accountToggle = appHeader.shadowRoot.querySelector('.account-filter-toggle .selected-account-text');
+  if (!accountToggle) return;
+  
+  let displayText = 'כל החשבונות';
+  if (selectedAccounts.length === 0) {
+    displayText = 'לא נבחרו חשבונות';
+  } else if (selectedAccounts.length === 1) {
+    displayText = selectedAccounts[0];
+  } else if (selectedAccounts.length === window.accountsData?.length || selectedAccounts.length === window.allAccountsData?.length) {
+    displayText = 'כל החשבונות';
+  } else if (selectedAccounts.length < 4) {
+    displayText = `${selectedAccounts.length} חשבונות`;
+  } else {
+    displayText = `${selectedAccounts.length} חשבונות`;
+  }
+  
+  accountToggle.textContent = displayText;
+  console.log('🔄 Updated account filter text to:', displayText);
+}
+
 // הוספת הפונקציות לגלובל
 window.filterDataByFilters = filterDataByFilters;
+window.getTableType = getTableType;
+window.getDateRange = getDateRange;
 window.updateGridFromComponentGlobal = updateGridFromComponentGlobal;
 window.loadSavedFiltersForPage = loadSavedFiltersForPage;
 window.resetAllFiltersForPage = resetAllFiltersForPage;
 window.initializePageFilters = initializePageFilters;
 window.showNotification = showNotification;
 window.updateTableStats = updateTableStats;
+window.updateAccountFilterMenu = updateAccountFilterMenu;
+window.updateAccountFilterText = updateAccountFilterText;

@@ -24,7 +24,7 @@ async function loadDesignsData() {
     
     // טעינת נתונים מהשרת
     const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-    const response = await fetch(`${base}/api/v1/trade_plans/`);
+    const response = await fetch(`${base}/api/database_v2/trade_plans`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -54,8 +54,8 @@ async function loadDesignsData() {
       console.log('🔄 מעבד תכנון:', plan);
       return {
         id: plan.id,
-        ticker: plan.ticker?.symbol || plan.ticker_id || 'N/A',
-        date: plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'N/A',
+        ticker: plan.ticker_symbol || 'N/A',
+        created_at: plan.created_at, // שמירת התאריך המקורי לפילטרים ולהצגה
         type: plan.investment_type || 'swing',
         side: plan.side || 'Long',
         amount: plan.planned_amount || 0,
@@ -73,7 +73,10 @@ async function loadDesignsData() {
     
     if (designs.length === 0) {
       console.log('🔄 אין תכנונים להצגה');
-      document.querySelector('.main-content table tbody').innerHTML = '<tr><td colspan="10" class="text-center text-muted">אין תכנונים להצגה</td></tr>';
+      const tbody = document.querySelector('#designsTable tbody');
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">אין תכנונים להצגה</td></tr>';
+      }
       return;
     }
     
@@ -94,35 +97,58 @@ async function loadDesignsData() {
     console.log('🔄 טעינת תכנונים הושלמה בהצלחה');
       
   } catch (error) {
-    console.error('Error loading designs data:', error);
-    console.error('Error details:', error.message);
-    console.error('Error stack:', error.stack);
+    console.error('❌ Error loading designs data:', error);
+    console.error('❌ Error details:', error.message);
+    console.error('❌ Error stack:', error.stack);
     
-    // בדיקה אם זו שגיאה של פילטר תאריכים
-    const savedDateRange = localStorage.getItem('designsFilterDateRange');
-    if (savedDateRange && savedDateRange !== 'הכול') {
-      document.querySelector('.main-content table tbody').innerHTML = `<tr><td colspan="10" class="text-center text-info">אין נתונים לפילטר "${savedDateRange}"</td></tr>`;
-    } else {
-      document.querySelector('.main-content table tbody').innerHTML = '<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+    // הצגת הודעת שגיאה מפורטת יותר
+    const tbody = document.querySelector('#designsTable tbody');
+    if (tbody) {
+      // בדיקה אם זו שגיאה של פילטר תאריכים
+      const savedDateRange = localStorage.getItem('designsFilterDateRange');
+      if (savedDateRange && savedDateRange !== 'כל זמן') {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-info">
+          <i class="fas fa-info-circle"></i> אין נתונים לפילטר "${savedDateRange}"
+          <br><small>נסה לשנות את הפילטר או לרענן את הדף</small>
+        </td></tr>`;
+      } else {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger">
+          <i class="fas fa-exclamation-triangle"></i> שגיאה בטעינת נתונים
+          <br><small>פרטי השגיאה: ${error.message}</small>
+          <br><button class="btn btn-sm btn-outline-primary mt-2" onclick="if (typeof window.loadDesignsData === 'function') { window.loadDesignsData(); } else { location.reload(); }">נסה שוב</button>
+        </td></tr>`;
+      }
+    }
+    
+    // עדכון ספירת רשומות
+    const countElement = document.querySelector('.content-section .table-count');
+    if (countElement) {
+      countElement.textContent = 'שגיאה';
     }
   }
 }
 
 // פונקציה לעדכון הטבלה
 function updateDesignsTable(designs) {
-  const tbody = document.querySelector('.content-section table tbody');
+  const tbody = document.querySelector('#designsTable tbody');
   if (!tbody) {
-    console.error('Table body not found');
+    console.error('Table body not found for designs table');
     return;
   }
   
   // בדיקה אם אין נתונים
   if (!designs || designs.length === 0) {
     const savedDateRange = localStorage.getItem('designsFilterDateRange');
-    if (savedDateRange && savedDateRange !== 'הכול') {
-      tbody.innerHTML = `<tr><td colspan="10" class="text-center text-info">אין נתונים לפילטר "${savedDateRange}"</td></tr>`;
+    if (savedDateRange && savedDateRange !== 'כל זמן') {
+      tbody.innerHTML = `<tr><td colspan="10" class="text-center text-info">
+        <i class="fas fa-info-circle"></i> אין נתונים לפילטר "${savedDateRange}"
+        <br><small>נסה לשנות את הפילטר או לרענן את הדף</small>
+      </td></tr>`;
     } else {
-      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">אין נתונים להצגה</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted">
+        <i class="fas fa-inbox"></i> אין תכנונים להצגה
+        <br><small>אין תכנונים במערכת או שכל התכנונים מסוננים החוצה</small>
+      </td></tr>`;
     }
     
     // עדכון ספירת רשומות
@@ -137,13 +163,18 @@ function updateDesignsTable(designs) {
     } else {
       console.error('updateTableStats function not found');
     }
+    
+    // עדכון שדות תצוגת טווח תאריכים
+    if (typeof window.updateDateDebugInfo === 'function') {
+      setTimeout(() => window.updateDateDebugInfo(), 100);
+    }
     return;
   }
   
   const tableHTML = designs.map(design => `
     <tr>
       <td><strong><a href="#" onclick="if (typeof window.openDesignDetails === 'function') { window.openDesignDetails('${design.id}'); } else { console.error('openDesignDetails function not found'); }" class="ticker-link">${design.ticker}</a></strong></td>
-      <td>${design.date}</td>
+      <td>${design.created_at ? new Date(design.created_at).toLocaleDateString('he-IL') : 'N/A'}</td>
       <td><span class="type-${design.type}">${typeof window.getTypeDisplay === 'function' ? window.getTypeDisplay(design.type) : design.type}</span></td>
       <td><span class="${(design.side || 'Long').toLowerCase() === 'long' ? 'side-long' : 'side-short'}">${design.side || 'Long'}</span></td>
       <td>$${design.amount.toLocaleString()}</td>
@@ -173,6 +204,11 @@ function updateDesignsTable(designs) {
     window.updateTableStats('planning');
   } else {
     console.error('updateTableStats function not found');
+  }
+  
+  // עדכון שדות תצוגת טווח תאריכים
+  if (typeof window.updateDateDebugInfo === 'function') {
+    setTimeout(() => window.updateDateDebugInfo(), 100);
   }
 }
 
@@ -215,8 +251,8 @@ function sortTable(columnIndex) {
         bValue = b.ticker.toLowerCase();
         break;
       case 1: // תאריך
-        aValue = parseDateForSort(a.date);
-        bValue = parseDateForSort(b.date);
+        aValue = parseDateForSort(a.created_at);
+        bValue = parseDateForSort(b.created_at);
         break;
       case 2: // סוג
         aValue = a.type.toLowerCase();
@@ -284,6 +320,14 @@ function sortTable(columnIndex) {
 
 // פונקציה להמרת תאריך למיון
 function parseDateForSort(dateStr) {
+  if (!dateStr) return 0;
+  
+  // אם זה תאריך בפורמט YYYY-MM-DD HH:MM:SS
+  if (dateStr.includes('-')) {
+    return new Date(dateStr).getTime();
+  }
+  
+  // אם זה תאריך בפורמט DD.MM.YYYY
   const parts = dateStr.split('.');
   if (parts.length === 3) {
     const day = parseInt(parts[0]);
@@ -291,6 +335,7 @@ function parseDateForSort(dateStr) {
     const year = parseInt(parts[2]);
     return new Date(year, month, day).getTime();
   }
+  
   return 0;
 }
 
@@ -623,7 +668,7 @@ window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selec
   
   // קריאה לפונקציה הגלובלית
   if (typeof window.updateGridFromComponentGlobal === 'function') {
-    window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'planning');
+    window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'designs');
   } else {
     console.error('updateGridFromComponentGlobal function not found');
   }

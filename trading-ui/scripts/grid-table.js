@@ -1265,6 +1265,7 @@ function fillTradePlanModalData(data) {
     document.getElementById('editTradePlanAccountId').value = data.account_id || '';
     document.getElementById('editTradePlanTickerId').value = data.ticker_id || '';
     document.getElementById('editTradePlanInvestmentType').value = data.investment_type || 'swing';
+    document.getElementById('editTradePlanSide').value = data.side || 'Long';
     document.getElementById('editTradePlanPlannedAmount').value = data.planned_amount || 0;
     document.getElementById('editTradePlanStopPrice').value = data.stop_price || '';
     document.getElementById('editTradePlanTargetPrice').value = data.target_price || '';
@@ -1541,6 +1542,7 @@ function collectModalData(tableType) {
                 ticker_id: parseInt(document.getElementById('editTradeTickerId').value),
                 status: document.getElementById('editTradeStatus').value,
                 type: document.getElementById('editTradeType').value,
+                side: document.getElementById('editTradeSide').value,
                 notes: document.getElementById('editTradeNotes').value
             };
         case 'trade_plans':
@@ -1549,6 +1551,7 @@ function collectModalData(tableType) {
                 account_id: parseInt(document.getElementById('editTradePlanAccountId').value),
                 ticker_id: parseInt(document.getElementById('editTradePlanTickerId').value),
                 investment_type: document.getElementById('editTradePlanInvestmentType').value,
+                side: document.getElementById('editTradePlanSide').value,
                 planned_amount: parseFloat(document.getElementById('editTradePlanPlannedAmount').value),
                 stop_price: parseFloat(document.getElementById('editTradePlanStopPrice').value) || null,
                 target_price: parseFloat(document.getElementById('editTradePlanTargetPrice').value) || null,

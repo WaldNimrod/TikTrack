@@ -12,6 +12,7 @@
  * - פילטר סוג (long, short, וכו')
  * - פילטר חשבון
  * - שמירת מצב פילטרים ב-localStorage
+ * - פונקציות משותפות: showNotification, setupSortableHeaders, updateTableStats
  * 
  * דפים נתמכים:
  * - notes - הערות (פילטרים רלוונטיים: תאריכים, חיפוש)
@@ -23,6 +24,9 @@
  * - filterDataByFilters() - פילטור נתונים לפי כל הפילטרים
  * - applyDateRangeFilterToGrid() - פילטר תאריכים
  * - loadSavedFilters() - טעינת פילטרים שמורים
+ * - showNotification() - הצגת הודעות
+ * - setupSortableHeaders() - הגדרת כותרות למיון
+ * - updateTableStats() - עדכון סטטיסטיקות טבלה
  * 
  * מחבר: Tik.track Development Team
  * תאריך עדכון אחרון: 2025
@@ -81,6 +85,15 @@ function applyDateRangeFilterToGrid(selectedDateRange) {
         case 'שנה קודמת':
           startDate = new Date(now.getFullYear() - 1, 0, 1);
           const endDate = new Date(now.getFullYear() - 1, 11, 31);
+          // שימוש ב-endDate במקום now לפילטר
+          currentData = currentData.filter(row => {
+            const dateField = row.date || row.created_at || row.opened_at;
+            if (!dateField) return false;
+            const rowDate = new Date(dateField);
+            return rowDate >= startDate && rowDate <= endDate;
+          });
+          console.log('Date range filter applied:', selectedDateRange, 'showing', currentData.length, 'rows');
+          return; // יציאה מוקדמת כי הפילטר כבר הוחל
           break;
         default:
           console.log('Unknown date range:', selectedDateRange);
@@ -861,6 +874,10 @@ function filterDataByFilters(data, pageName) {
     
     const now = new Date();
     let startDate = new Date();
+    let endDate = null;
+    
+    console.log('🔍 Current date (now):', now);
+    console.log('🔍 Initial startDate:', startDate);
     
     switch (selectedDateRange) {
       case 'שבוע':
@@ -886,9 +903,12 @@ function filterDataByFilters(data, pageName) {
         break;
       case 'שנה קודמת':
         startDate = new Date(now.getFullYear() - 1, 0, 1);
-        const endDate = new Date(now.getFullYear() - 1, 11, 31);
+        endDate = new Date(now.getFullYear() - 1, 11, 31);
+        console.log('🔍 שנה קודמת - startDate:', startDate, 'endDate:', endDate);
         break;
     }
+    
+    console.log('🔍 After switch - startDate:', startDate, 'endDate:', endDate);
     
     filteredData = filteredData.filter(item => {
       let itemDate;
@@ -915,14 +935,21 @@ function filterDataByFilters(data, pageName) {
       let isIncluded;
       if (selectedDateRange === 'שנה קודמת') {
         isIncluded = itemDate >= startDate && itemDate <= endDate;
+        console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: date=${itemDate}, startDate=${startDate}, endDate=${endDate}, included=${isIncluded}`);
       } else {
         isIncluded = itemDate >= startDate && itemDate <= now;
+        console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: date=${itemDate}, startDate=${startDate}, now=${now}, included=${isIncluded}`);
       }
       
-      console.log(`🔍 Item ${item.ticker || item.ticker_symbol}: date=${itemDate}, included=${isIncluded}`);
       return isIncluded;
     });
     console.log('🔍 After date range filter:', filteredData.length, 'items');
+    
+    // הודעה למשתמש אם אין נתונים לפילטר תאריכים
+    if (filteredData.length === 0 && selectedDateRange && selectedDateRange !== 'הכול') {
+      console.log('🔍 No data found for date range:', selectedDateRange);
+      // אפשר להוסיף כאן הודעה למשתמש
+    }
   } else {
     console.log('🔍 No date range filter applied - selectedDateRange:', selectedDateRange);
   }
@@ -960,6 +987,331 @@ function debugSavedFilters(pageName) {
   });
 }
 
+// פונקציה לטיפול במקרה שאין נתונים לפילטר
+function handleNoDataForFilter(pageName, selectedDateRange) {
+  console.log(`🔍 No data found for ${pageName} with date range: ${selectedDateRange}`);
+  
+  // שמירת הפילטר הנוכחי
+  if (selectedDateRange) {
+    localStorage.setItem(`${pageName}FilterDateRange`, selectedDateRange);
+  }
+  
+  // החזרת מערך ריק עם הודעה
+  return [];
+}
+
 // הוספת הפונקציות החדשות לגלובל
 window.filterDataByFilters = filterDataByFilters;
 window.debugSavedFilters = debugSavedFilters;
+window.handleNoDataForFilter = handleNoDataForFilter;
+
+// ========================================
+// פונקציות משותפות לכל הדפים
+// ========================================
+
+/**
+ * פונקציה להצגת הודעות
+ * @param {string} message - הודעה להצגה
+ * @param {string} type - סוג ההודעה (success, error, info)
+ */
+function showNotification(message, type = 'success') {
+  try {
+    const notification = document.createElement('div');
+    const bgColor = type === 'error' ? '#f8d7da' : type === 'info' ? '#d1ecf1' : '#d4edda';
+    const textColor = type === 'error' ? '#721c24' : type === 'info' ? '#0c5460' : '#155724';
+    const borderColor = type === 'error' ? '#f5c6cb' : type === 'info' ? '#bee5eb' : '#c3e6cb';
+    
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      padding: 12px 20px;
+      border-radius: 8px;
+      background-color: ${bgColor};
+      color: ${textColor};
+      border: 1px solid ${borderColor};
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: opacity 0.3s ease;
+      opacity: 0;
+    `;
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // הצגת ההודעה
+    setTimeout(() => {
+      notification.style.opacity = '1';
+    }, 100);
+    
+    // הסתרת ההודעה אחרי 3 שניות
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 300);
+    }, 3000);
+    
+  } catch (error) {
+    console.error('Error showing notification:', error);
+  }
+}
+
+/**
+ * פונקציה להגדרת כותרות למיון
+ * @param {string} tableSelector - סלקטור לטבלה (ברירת מחדל: '.content-section table')
+ */
+function setupSortableHeaders(tableSelector = '.content-section table') {
+  console.log('🔄 Setting up sortable headers...');
+  
+  // בדיקה אם הטבלה קיימת
+  const table = document.querySelector(tableSelector);
+  console.log('🔄 Table found:', !!table);
+  
+  const headers = document.querySelectorAll('.sortable-header');
+  console.log('🔄 Found sortable headers:', headers.length);
+  
+  if (headers.length === 0) {
+    console.error('🔄 No sortable headers found!');
+    console.log('🔄 All th elements:', document.querySelectorAll('th').length);
+    console.log('🔄 All elements with sortable-header class:', document.querySelectorAll('.sortable-header').length);
+    return;
+  }
+  
+  headers.forEach((header, index) => {
+    console.log(`🔄 Setting up header ${index}:`, header.textContent.trim());
+    header.style.cursor = 'pointer';
+    
+    // הסרת אירועים קיימים
+    if (header._sortClickHandler) {
+      header.removeEventListener('click', header._sortClickHandler);
+    }
+    
+    // יצירת handler חדש
+    header._sortClickHandler = () => {
+      console.log(`🔄 Header ${index} clicked!`);
+      if (typeof window.sortTable === 'function') {
+        window.sortTable(index);
+      }
+    };
+    
+    // הוספת אירוע לחיצה
+    header.addEventListener('click', header._sortClickHandler);
+    
+    // הוספת אפקט hover
+    header.addEventListener('mouseenter', () => {
+      header.style.backgroundColor = '#f8f9fa';
+    });
+    
+    header.addEventListener('mouseleave', () => {
+      header.style.backgroundColor = '';
+    });
+  });
+  
+  console.log('🔄 Sortable headers setup completed');
+}
+
+/**
+ * פונקציה לעדכון סטטיסטיקות טבלה
+ * @param {string} pageName - שם הדף (designs, trades, notes, accounts)
+ * @param {string} tableSelector - סלקטור לטבלה
+ */
+function updateTableStats(pageName, tableSelector = null) {
+  console.log(`🔄 === updateTableStats called for ${pageName} ===`);
+  
+  // בחירת סלקטור ברירת מחדל לפי הדף
+  if (!tableSelector) {
+    switch (pageName) {
+      case 'designs':
+      case 'planning':
+        tableSelector = '#designsTable tbody';
+        break;
+      case 'trades':
+      case 'tracking':
+        tableSelector = '#tradesTable tbody';
+        break;
+      case 'notes':
+        tableSelector = '#notesTable tbody';
+        break;
+      case 'accounts':
+        tableSelector = '#accountsTable tbody';
+        break;
+      default:
+        tableSelector = '.content-section table tbody';
+    }
+  }
+  
+  // בדיקה אם הטבלה קיימת
+  const table = document.querySelector(tableSelector);
+  console.log(`🔄 Looking for table with selector: ${tableSelector}`);
+  console.log('🔄 Table found:', !!table);
+  
+  if (!table) {
+    console.log('🔄 Table not found, trying alternative selector...');
+    const altTable = document.querySelector('.content-section table tbody');
+    console.log('🔄 Alternative table found:', !!altTable);
+    
+    if (!altTable) {
+      console.log('🔄 No table found at all');
+      return;
+    }
+    
+    // השתמש בטבלה החלופית
+    const rows = altTable.querySelectorAll('tr');
+    console.log('🔄 Found rows with alternative selector:', rows.length);
+    
+    if (rows.length === 0) {
+      console.log('🔄 No rows found in table');
+      return;
+    }
+    
+    // עדכון סטטיסטיקות לפי הדף
+    updateStatsForPage(pageName, rows);
+    return;
+  }
+  
+  const rows = table.querySelectorAll('tr');
+  console.log('🔄 Found rows:', rows.length);
+  
+  if (rows.length === 0) {
+    console.log('🔄 No rows found in table');
+    return;
+  }
+  
+  // עדכון סטטיסטיקות לפי הדף
+  updateStatsForPage(pageName, rows);
+}
+
+/**
+ * פונקציה לעדכון סטטיסטיקות לפי דף ספציפי
+ * @param {string} pageName - שם הדף
+ * @param {NodeList} rows - שורות הטבלה
+ */
+function updateStatsForPage(pageName, rows) {
+  console.log(`🔄 Updating stats for ${pageName} with ${rows.length} rows`);
+  
+  switch (pageName) {
+    case 'designs':
+    case 'planning':
+      updateDesignsStats(rows);
+      break;
+    case 'trades':
+    case 'tracking':
+      updateTradesStats(rows);
+      break;
+    case 'notes':
+      updateNotesStats(rows);
+      break;
+    case 'accounts':
+      updateAccountsStats(rows);
+      break;
+    default:
+      console.log('🔄 Unknown page for stats update:', pageName);
+  }
+}
+
+/**
+ * עדכון סטטיסטיקות לתכנונים
+ */
+function updateDesignsStats(rows) {
+  let totalDesigns = rows.length;
+  let totalInvestment = 0;
+  let totalProfit = 0;
+  
+  rows.forEach((row, index) => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length >= 9) {
+      // סכום השקעה (עמודה 5)
+      const amountText = cells[4].textContent.trim();
+      const amount = parseFloat(amountText.replace(/[^\d.-]/g, '')) || 0;
+      totalInvestment += amount;
+      
+      // רווח (עמודה 8 - נוכחי)
+      const currentText = cells[7].textContent.trim();
+      const profitMatch = currentText.match(/\(([^)]+)\)/);
+      if (profitMatch) {
+        const profit = parseFloat(profitMatch[1].replace(/[^\d.-]/g, '')) || 0;
+        totalProfit += profit;
+      }
+    }
+  });
+  
+  const avgInvestment = totalDesigns > 0 ? totalInvestment / totalDesigns : 0;
+  
+  // עדכון התצוגה
+  const totalDesignsEl = document.getElementById('totalDesigns');
+  const totalInvestmentEl = document.getElementById('totalInvestment');
+  const avgInvestmentEl = document.getElementById('avgInvestment');
+  const totalProfitEl = document.getElementById('totalProfit');
+  
+  if (totalDesignsEl) totalDesignsEl.textContent = totalDesigns;
+  if (totalInvestmentEl) totalInvestmentEl.textContent = `$${totalInvestment.toLocaleString('he-IL')}`;
+  if (avgInvestmentEl) avgInvestmentEl.textContent = `$${Math.round(avgInvestment).toLocaleString('he-IL')}`;
+  if (totalProfitEl) totalProfitEl.textContent = `$${totalProfit.toLocaleString('he-IL')}`;
+}
+
+/**
+ * עדכון סטטיסטיקות לטריידים
+ */
+function updateTradesStats(rows) {
+  let totalTrades = rows.length;
+  let openTrades = 0;
+  let closedTrades = 0;
+  let totalPL = 0;
+  
+  rows.forEach((row) => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length >= 9) {
+      // סטטוס (עמודה 4)
+      const statusText = cells[3].textContent.trim();
+      if (statusText.includes('פתוח')) {
+        openTrades++;
+      } else if (statusText.includes('סגור')) {
+        closedTrades++;
+      }
+      
+      // רווח/הפסד (עמודה 9)
+      const plText = cells[8].textContent.trim();
+      const pl = parseFloat(plText.replace(/[^\d.-]/g, '')) || 0;
+      totalPL += pl;
+    }
+  });
+  
+  // עדכון התצוגה
+  const totalTradesEl = document.getElementById('totalTrades');
+  const openTradesEl = document.getElementById('openTrades');
+  const closedTradesEl = document.getElementById('closedTrades');
+  const totalPLEl = document.getElementById('totalPL');
+  
+  if (totalTradesEl) totalTradesEl.textContent = totalTrades;
+  if (openTradesEl) openTradesEl.textContent = openTrades;
+  if (closedTradesEl) closedTradesEl.textContent = closedTrades;
+  if (totalPLEl) totalPLEl.textContent = `$${totalPL.toLocaleString('he-IL')}`;
+}
+
+/**
+ * עדכון סטטיסטיקות להערות
+ */
+function updateNotesStats(rows) {
+  const totalNotes = rows.length;
+  const totalNotesEl = document.getElementById('totalNotes');
+  if (totalNotesEl) totalNotesEl.textContent = totalNotes;
+}
+
+/**
+ * עדכון סטטיסטיקות לחשבונות
+ */
+function updateAccountsStats(rows) {
+  const totalAccounts = rows.length;
+  const totalAccountsEl = document.getElementById('totalAccounts');
+  if (totalAccountsEl) totalAccountsEl.textContent = totalAccounts;
+}
+
+// הוספת הפונקציות המשותפות לגלובל
+window.showNotification = showNotification;
+window.setupSortableHeaders = setupSortableHeaders;
+window.updateTableStats = updateTableStats;

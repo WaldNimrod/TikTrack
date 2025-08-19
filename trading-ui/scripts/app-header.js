@@ -36,20 +36,35 @@ class AppHeader extends HTMLElement {
     this.setupEventListeners();
     this.initializeFilter();
     
-    // טעינת חשבונות רק בדפים שצריכים אותם
+    // טעינת חשבונות בכל הדפים שצריכים פילטר חשבונות
     const currentPage = window.location.pathname;
-    const pagesNeedingAccounts = ['/planning.html', '/tracking.html', '/database.html'];
+    const pagesNeedingAccounts = ['/planning.html', '/tracking.html', '/database.html', '/planning', '/tracking', '/database'];
     
     if (pagesNeedingAccounts.some(page => currentPage.includes(page))) {
-      if (typeof window.loadAccountsFromServer === 'function') {
-        window.loadAccountsFromServer();
-        // עדכון התפריט אחרי טעינת החשבונות
-        setTimeout(() => {
-          if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
-            window.updateAccountFilterMenu(window.accountsData);
-          }
-        }, 500);
-      }
+      console.log('🔄 Page needs accounts, loading...');
+      // ודא שקובץ accounts.js נטען לפני ניסיון שימוש בפונקציות שלו
+      const ensureAccountsReady = () => {
+        if (typeof window.loadAccountsFromServer === 'function' && typeof window.updateAccountFilterMenu === 'function') {
+          console.log('🔄 Accounts functions available, loading accounts...');
+          window.loadAccountsFromServer().then(() => {
+            if (window.accountsData) {
+              console.log('🔄 Accounts loaded, updating menu...');
+              window.updateAccountFilterMenu(window.accountsData);
+            }
+          }).catch((error) => {
+            console.log('🔄 Error loading accounts:', error);
+            // fallback לנתוני דיפולט
+            if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
+              window.updateAccountFilterMenu(window.accountsData);
+            }
+          });
+        } else {
+          console.log('🔄 Accounts functions not available yet, retrying...');
+          // נסה שוב מעט מאוחר יותר
+          setTimeout(ensureAccountsReady, 200);
+        }
+      };
+      ensureAccountsReady();
     } else {
       console.log('🔄 Skipping accounts loading - not needed on this page');
     }
@@ -194,7 +209,8 @@ class AppHeader extends HTMLElement {
           border: 1px solid #e8e8e8;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          min-width: 180px;
+          min-width: 200px;
+          width: auto;
           z-index: 1001;
           opacity: 0;
           visibility: hidden;
@@ -221,6 +237,10 @@ class AppHeader extends HTMLElement {
           color: #333;
           transition: background-color 0.2s ease;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+          white-space: nowrap;
+          min-width: 180px;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .dropdown-item:hover {
@@ -309,6 +329,9 @@ class AppHeader extends HTMLElement {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
           font-size: 0.9rem;
           transition: all 0.2s ease;
+          min-width: 120px;
+          white-space: nowrap;
+          overflow: hidden;
         }
 
         .status-filter-toggle:hover {
@@ -341,6 +364,9 @@ class AppHeader extends HTMLElement {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
           font-size: 0.9rem;
           transition: all 0.2s ease;
+          min-width: 120px;
+          white-space: nowrap;
+          overflow: hidden;
         }
 
         .type-filter-toggle:hover {
@@ -359,7 +385,6 @@ class AppHeader extends HTMLElement {
 
         .account-filter-dropdown {
           position: relative;
-          z-index: 10000;
         }
 
         .account-filter-toggle {
@@ -374,6 +399,9 @@ class AppHeader extends HTMLElement {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
           font-size: 0.9rem;
           transition: all 0.2s ease;
+          min-width: 120px;
+          white-space: nowrap;
+          overflow: hidden;
         }
 
         .account-filter-toggle:hover {
@@ -385,8 +413,14 @@ class AppHeader extends HTMLElement {
           background-color: #f0f8f8;
         }
 
-        .selected-status-text {
+        .selected-status-text,
+        .selected-type-text,
+        .selected-account-text,
+        .selected-date-range-text {
           font-weight: 500;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .filter-actions {
@@ -463,7 +497,8 @@ class AppHeader extends HTMLElement {
           border: 1px solid #e8e8e8;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          min-width: 150px;
+          min-width: 180px;
+          width: auto;
           z-index: 1001;
           opacity: 0;
           visibility: hidden;
@@ -486,6 +521,9 @@ class AppHeader extends HTMLElement {
           cursor: pointer;
           transition: background-color 0.2s ease;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+          white-space: nowrap;
+          min-width: 180px;
+          overflow: hidden;
         }
 
         .status-filter-item:hover {
@@ -506,7 +544,8 @@ class AppHeader extends HTMLElement {
           border: 1px solid #e8e8e8;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          min-width: 150px;
+          min-width: 180px;
+          width: auto;
           z-index: 1001;
           opacity: 0;
           visibility: hidden;
@@ -529,6 +568,9 @@ class AppHeader extends HTMLElement {
           cursor: pointer;
           transition: background-color 0.2s ease;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+          white-space: nowrap;
+          min-width: 180px;
+          overflow: hidden;
         }
 
         .type-filter-item:hover {
@@ -549,8 +591,9 @@ class AppHeader extends HTMLElement {
           border: 1px solid #e8e8e8;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          min-width: 150px;
-          z-index: 100000;
+          min-width: 180px;
+          width: auto;
+          z-index: 1000; /* aligned with other filter menus, below main dropdown (99999) */
           opacity: 0;
           visibility: hidden;
           transform: translateY(-10px);
@@ -572,6 +615,9 @@ class AppHeader extends HTMLElement {
           cursor: pointer;
           transition: background-color 0.2s ease;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+          white-space: nowrap;
+          min-width: 180px;
+          overflow: hidden;
         }
 
         .account-filter-item:hover {
@@ -604,6 +650,9 @@ class AppHeader extends HTMLElement {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
           font-size: 0.9rem;
           transition: all 0.2s ease;
+          min-width: 120px;
+          white-space: nowrap;
+          overflow: hidden;
         }
 
         .date-range-filter-toggle:hover {
@@ -624,7 +673,8 @@ class AppHeader extends HTMLElement {
           border: 1px solid #e8e8e8;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          min-width: 150px;
+          min-width: 180px;
+          width: auto;
           z-index: 1003;
           opacity: 0;
           visibility: hidden;
@@ -647,6 +697,9 @@ class AppHeader extends HTMLElement {
           cursor: pointer;
           transition: background-color 0.2s ease;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+          white-space: nowrap;
+          min-width: 180px;
+          overflow: hidden;
         }
 
         .date-range-filter-item:hover {
@@ -661,6 +714,11 @@ class AppHeader extends HTMLElement {
 
         .option-text {
           font-weight: 500;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          flex: 1;
+          min-width: 0;
         }
 
         .check-mark {
@@ -668,6 +726,8 @@ class AppHeader extends HTMLElement {
           font-weight: bold;
           opacity: 0;
           transition: opacity 0.2s ease;
+          flex-shrink: 0;
+          margin-right: 8px;
         }
 
         .status-filter-item.selected .check-mark {
@@ -834,6 +894,36 @@ class AppHeader extends HTMLElement {
 
         .status-filter-item {
           direction: rtl;
+        }
+
+        .type-filter-item {
+          direction: rtl;
+        }
+
+        .account-filter-item {
+          direction: rtl;
+        }
+
+        .date-range-filter-item {
+          direction: rtl;
+        }
+
+        .dropdown-item {
+          direction: rtl;
+        }
+
+        /* תמיכה נוספת בטקסטים ארוכים */
+        .nav-text {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 120px;
+        }
+
+        .logo-text {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       </style>
 
@@ -1533,8 +1623,15 @@ class AppHeader extends HTMLElement {
         
         // עדכון תפריט החשבונות
         setTimeout(() => {
+          console.log('🔄 Attempting to update account filter menu...');
           if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
+            console.log('🔄 Updating account filter menu with existing data');
             window.updateAccountFilterMenu(window.accountsData);
+          } else if (typeof window.refreshAccountFilterMenu === 'function') {
+            console.log('🔄 Using manual refresh function');
+            window.refreshAccountFilterMenu();
+          } else {
+            console.log('🔄 No account functions available');
           }
         }, 1000);
       
@@ -2473,14 +2570,23 @@ class AppHeader extends HTMLElement {
     // עדכון הגריד דרך הפונקציה הגלובלית
     if (typeof window.updateGridFromComponent === 'function') {
       console.log('Calling updateGridFromComponent');
-      window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
+      // נעביר pageName דרך הפונקציה הגלובלית הראשית כדי למנוע חוסר תאימות פרמטרים
+      if (typeof window.updateGridFromComponentGlobal === 'function') {
+        window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName);
+      } else {
+        window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedDateRange, searchTerm);
+      }
     } else {
       console.log('updateGridFromComponent function not found');
       // נסיון נוסף אחרי זמן קצר
       setTimeout(() => {
         if (typeof window.updateGridFromComponent === 'function') {
           console.log('Retrying updateGridFromComponent');
-          window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
+          if (typeof window.updateGridFromComponentGlobal === 'function') {
+            window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName);
+          } else {
+            window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedDateRange, searchTerm);
+          }
         }
       }, 100);
     }
@@ -2528,6 +2634,147 @@ class AppHeader extends HTMLElement {
         body.classList.add('filter-collapsed');
       }
     }
+  }
+
+  /**
+   * עדכון הפילטרים מהערכים השמורים
+   * @param {Object} filters - אובייקט עם הפילטרים השמורים
+   */
+  updateFiltersFromSaved(filters) {
+    console.log('=== updateFiltersFromSaved called ===', filters);
+    
+    if (!filters) {
+      console.log('No filters provided');
+      return;
+    }
+
+    // עדכון פילטר סטטוס
+    if (filters.statuses && Array.isArray(filters.statuses)) {
+      const statusMenu = this.shadowRoot.getElementById('statusFilterMenu');
+      if (statusMenu) {
+        const statusItems = statusMenu.querySelectorAll('.status-filter-item');
+        statusItems.forEach(item => {
+          const text = item.querySelector('.option-text').textContent;
+          if (filters.statuses.includes(text)) {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
+        });
+        
+        // עדכון טקסט הפילטר
+        const statusToggle = this.shadowRoot.getElementById('statusFilterToggle');
+        if (statusToggle) {
+          const selectedText = statusToggle.querySelector('.selected-status-text');
+          if (selectedText) {
+            if (filters.statuses.length === 0) {
+              selectedText.textContent = 'הכול';
+            } else if (filters.statuses.length === 1) {
+              selectedText.textContent = filters.statuses[0];
+            } else {
+              selectedText.textContent = `${filters.statuses.length} נבחרו`;
+            }
+          }
+        }
+      }
+    }
+
+    // עדכון פילטר סוג
+    if (filters.types && Array.isArray(filters.types)) {
+      const typeMenu = this.shadowRoot.getElementById('typeFilterMenu');
+      if (typeMenu) {
+        const typeItems = typeMenu.querySelectorAll('.type-filter-item');
+        typeItems.forEach(item => {
+          const text = item.querySelector('.option-text').textContent;
+          if (filters.types.includes(text)) {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
+        });
+        
+        // עדכון טקסט הפילטר
+        const typeToggle = this.shadowRoot.getElementById('typeFilterToggle');
+        if (typeToggle) {
+          const selectedText = typeToggle.querySelector('.selected-type-text');
+          if (selectedText) {
+            if (filters.types.length === 0) {
+              selectedText.textContent = 'הכול';
+            } else if (filters.types.length === 1) {
+              selectedText.textContent = filters.types[0];
+            } else {
+              selectedText.textContent = `${filters.types.length} נבחרו`;
+            }
+          }
+        }
+      }
+    }
+
+    // עדכון פילטר חשבון
+    if (filters.accounts && Array.isArray(filters.accounts)) {
+      const accountMenu = this.shadowRoot.getElementById('accountFilterMenu');
+      if (accountMenu) {
+        const accountItems = accountMenu.querySelectorAll('.account-filter-item');
+        accountItems.forEach(item => {
+          const accountId = item.getAttribute('data-account');
+          if (filters.accounts.includes(accountId)) {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
+        });
+        
+        // עדכון טקסט הפילטר
+        const accountToggle = this.shadowRoot.getElementById('accountFilterToggle');
+        if (accountToggle) {
+          const selectedText = accountToggle.querySelector('.selected-account-text');
+          if (selectedText) {
+            if (filters.accounts.length === 0) {
+              selectedText.textContent = 'הכול';
+            } else if (filters.accounts.length === 1) {
+              selectedText.textContent = filters.accounts[0];
+            } else {
+              selectedText.textContent = `${filters.accounts.length} נבחרו`;
+            }
+          }
+        }
+      }
+    }
+
+    // עדכון פילטר תאריכים
+    if (filters.dateRange) {
+      const dateRangeMenu = this.shadowRoot.getElementById('dateRangeFilterMenu');
+      if (dateRangeMenu) {
+        const dateRangeItems = dateRangeMenu.querySelectorAll('.date-range-filter-item');
+        dateRangeItems.forEach(item => {
+          const text = item.querySelector('.option-text').textContent;
+          if (text === filters.dateRange) {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
+        });
+        
+        // עדכון טקסט הפילטר
+        const dateRangeToggle = this.shadowRoot.getElementById('dateRangeFilterToggle');
+        if (dateRangeToggle) {
+          const selectedText = dateRangeToggle.querySelector('.selected-date-range-text');
+          if (selectedText) {
+            selectedText.textContent = filters.dateRange || 'הכול';
+          }
+        }
+      }
+    }
+
+    // עדכון פילטר חיפוש
+    if (filters.search !== undefined) {
+      const searchInput = this.shadowRoot.getElementById('searchFilterInput');
+      if (searchInput) {
+        searchInput.value = filters.search || '';
+      }
+    }
+
+    console.log('=== updateFiltersFromSaved completed ===');
   }
 }
 
@@ -2585,3 +2832,5 @@ window.closeAllFilters = function() {
     header.closeAllDropdowns();
   }
 };
+
+

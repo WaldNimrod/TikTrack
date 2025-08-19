@@ -273,6 +273,7 @@
                 <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account ID</span></th>
                 <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker ID</span></th>
                 <th>סוג השקעה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Investment Type</span></th>
+                <th>צד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Side</span></th>
                 <th>סכום מתוכנן<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Planned Amount</span></th>
                 <th>תנאי כניסה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Entry Conditions</span></th>
                 <th>מחיר עצירה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Stop Price</span></th>
@@ -286,7 +287,7 @@
             </thead>
             <tbody>
               <tr>
-                <td colspan="13" class="loading">טוען תוכניות טרייד...</td>
+                <td colspan="14" class="loading">טוען תוכניות טרייד...</td>
               </tr>
             </tbody>
           </table>
@@ -333,6 +334,7 @@
                 <th>תוכנית<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plan ID</span></th>
                 <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
                 <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
+                <th>צד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Side</span></th>
                 <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
                 <th>נסגר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Closed At</span></th>
                 <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P/L</span></th>
@@ -342,7 +344,7 @@
             </thead>
             <tbody>
               <tr>
-                <td colspan="11" class="loading">טוען טריידים...</td>
+                <td colspan="12" class="loading">טוען טריידים...</td>
               </tr>
             </tbody>
           </table>
@@ -1063,7 +1065,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="mb-3">
                   <label for="editTradePlanInvestmentType" class="form-label">סוג השקעה</label>
                   <select class="form-control" id="editTradePlanInvestmentType" required>
@@ -1073,7 +1075,16 @@
                   </select>
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="editTradePlanSide" class="form-label">צד</label>
+                  <select class="form-control" id="editTradePlanSide" required>
+                    <option value="Long">Long</option>
+                    <option value="Short">Short</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
                 <div class="mb-3">
                   <label for="editTradePlanPlannedAmount" class="form-label">סכום מתוכנן</label>
                   <input type="number" step="0.01" class="form-control" id="editTradePlanPlannedAmount" required>
@@ -1942,6 +1953,7 @@
             <td>${trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-'}</td>
             <td>${trade.status || '-'}</td>
             <td>${trade.type || '-'}</td>
+            <td>${trade.side || 'Long'}</td>
             <td>${window.formatDateTime(trade.created_at)}</td>
             <td>${window.formatDateTime(trade.closed_at)}</td>
             <td>${window.formatCurrency(trade.total_pl)}</td>
@@ -1959,7 +1971,7 @@
         
       } catch (error) {
         console.error('Error loading trades:', error);
-        document.querySelector('#tradesTable tbody').innerHTML = '<tr><td colspan="11" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        document.querySelector('#tradesTable tbody').innerHTML = '<tr><td colspan="12" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
       }
     }
 
@@ -1983,6 +1995,7 @@
             <td>${plan.account_id || '-'}</td>
             <td>${plan.ticker_id || '-'}</td>
             <td>${plan.investment_type || '-'}</td>
+            <td>${plan.side || 'Long'}</td>
             <td>${window.formatCurrency(plan.planned_amount)}</td>
             <td>${plan.entry_conditions || '-'}</td>
             <td>${window.formatCurrency(plan.stop_price)}</td>
@@ -2025,7 +2038,7 @@
         console.error('❌ שגיאה בטעינת תוכניות טרייד:', error);
         const tbody = document.querySelector('#tradePlansTable tbody');
         if (tbody) {
-          tbody.innerHTML = '<tr><td colspan="13" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="14" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
         }
       }
     }

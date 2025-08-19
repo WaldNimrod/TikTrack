@@ -953,8 +953,16 @@
         // עדכון המשתנה הגלובלי לצורך מיון וסינון
         notesData = notes;
         
-        // עדכון הטבלה עם הנתונים החדשים
-        updateNotesTable(notes);
+        // החלת פילטרים על הנתונים
+        let filteredNotes = [...notesData];
+        if (typeof window.filterDataByFilters === 'function') {
+          console.log('🔄 מחיל פילטרים על נתוני ההערות...');
+          filteredNotes = window.filterDataByFilters(notesData, 'notes');
+          console.log('🔄 לאחר החלת פילטרים:', filteredNotes.length, 'הערות');
+        }
+        
+        // עדכון הטבלה עם הנתונים המסוננים
+        updateNotesTable(filteredNotes);
         
         return notes;
         
@@ -1095,374 +1103,9 @@
     
     // הגדרת הפונקציה כגלובלית
     window.updateNotesTable = updateNotesTable;
-
-    // הגדרת הפונקציה הגלובלית לעדכון מהפילטרים
-    window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
-      const globalUpdateFunction = window.updateGridFromComponentGlobal;
-      if (globalUpdateFunction) {
-        globalUpdateFunction(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, 'notes');
-      } else {
-        console.error('Global updateGridFromComponent function not found');
-      }
-    };
-    
-    // פונקציה להצגת הודעות
-    function showNotification(message, type = 'success') {
-      try {
-        const notification = document.createElement('div');
-        const bgColor = type === 'error' ? '#f8d7da' : '#d4edda';
-        const textColor = type === 'error' ? '#721c24' : '#155724';
-        const borderColor = type === 'error' ? '#f5c6cb' : '#c3e6cb';
-        
-        notification.style.cssText = `
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          z-index: 9999;
-          padding: 12px 20px;
-          border-radius: 8px;
-          background-color: ${bgColor};
-          color: ${textColor};
-          border: 1px solid ${borderColor};
-          font-size: 14px;
-          font-weight: 500;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-          transition: opacity 0.3s ease;
-          opacity: 0;
-        `;
-        
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        // הצגת ההודעה
-        setTimeout(() => {
-          notification.style.opacity = '1';
-        }, 100);
-        
-        // הסתרת ההודעה אחרי 3 שניות
-        setTimeout(() => {
-          notification.style.opacity = '0';
-          setTimeout(() => {
-            if (notification.parentNode) {
-              notification.parentNode.removeChild(notification);
-            }
-          }, 300);
-        }, 3000);
-        
-      } catch (error) {
-        console.error('Error showing notification:', error);
-      }
-    }
-
-    // פונקציות נוספות
-    function resetAllFiltersAndReloadData() {
-      window.resetAllFiltersForPage('notes');
-      showNotification('כל הפילטרים אופסו', 'success');
-    }
-    
-    // פונקציה לרענון נתונים בלבד (לא מאפסת פילטרים)
-    function refreshDataOnly() {
-      loadNotesData();
-    }
-    
-    // פונקציה לאיפוס מיון
-    function resetSort() {
-      // מחיקת מצב מיון מ-localStorage
-      localStorage.removeItem('notesSortColumn');
-      localStorage.removeItem('notesSortDirection');
-      
-      // איפוס אייקונים
-      updateSortIcons(-1);
-      
-      // רענון הנתונים
-      loadNotesData();
-      
-      showNotification('מיון אופס', 'success');
-    }
-    
-    // הגדרת הפונקציה כגלובלית
-    window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
-
-    function toggleTopSection() {
-      const section = document.querySelector('.top-section .section-body');
-      const toggleBtn = document.querySelector('.top-section button[onclick="toggleTopSection()"]');
-      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-      
-      if (section) {
-        const isCollapsed = section.classList.contains('collapsed');
-        
-        if (isCollapsed) {
-          section.classList.remove('collapsed');
-          section.style.display = 'block';
-        } else {
-          section.classList.add('collapsed');
-          section.style.display = 'none';
-        }
-        
-        // עדכון האייקון
-        if (icon) {
-          icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-        
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('notesTopSectionCollapsed', !isCollapsed);
-      }
-    }
-    
-    function toggleMainSection() {
-      const section = document.querySelector('.main-content .section-body');
-      const toggleBtn = document.querySelector('.main-content button[onclick="toggleMainSection()"]');
-      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-      
-      if (section) {
-        const isCollapsed = section.classList.contains('collapsed');
-        
-        if (isCollapsed) {
-          section.classList.remove('collapsed');
-          section.style.display = 'block';
-        } else {
-          section.classList.add('collapsed');
-          section.style.display = 'none';
-        }
-        
-        // עדכון האייקון
-        if (icon) {
-          icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-        
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('notesMainSectionCollapsed', !isCollapsed);
-      }
-    }
-    
-    // הגדרת הפונקציות כגלובליות
-    window.toggleTopSection = toggleTopSection;
-    window.toggleMainSection = toggleMainSection;
-    
-    // פונקציה לשחזור מצב הסגירה
-    function restoreNotesSectionState() {
-      // שחזור מצב top section
-      const topSection = document.querySelector('.top-section .section-body');
-      const topToggleBtn = document.querySelector('.top-section button[onclick="toggleTopSection()"]');
-      const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
-      
-      if (topSection && topToggleBtn && topIcon) {
-        const isCollapsed = localStorage.getItem('notesTopSectionCollapsed') === 'true';
-        
-        if (isCollapsed) {
-          topSection.classList.add('collapsed');
-          topSection.style.display = 'none';
-          topIcon.textContent = '▼';
-        } else {
-          topSection.classList.remove('collapsed');
-          topSection.style.display = 'block';
-          topIcon.textContent = '▲';
-        }
-      }
-      
-      // שחזור מצב main section
-      const mainSection = document.querySelector('.main-content .section-body');
-      const mainToggleBtn = document.querySelector('.main-content button[onclick="toggleMainSection()"]');
-      const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
-      
-      if (mainSection && mainToggleBtn && mainIcon) {
-        const isCollapsed = localStorage.getItem('notesMainSectionCollapsed') === 'true';
-        
-        if (isCollapsed) {
-          mainSection.classList.add('collapsed');
-          mainSection.style.display = 'none';
-          mainIcon.textContent = '▼';
-        } else {
-          mainSection.classList.remove('collapsed');
-          mainSection.style.display = 'block';
-          mainIcon.textContent = '▲';
-        }
-      }
-    }
-
-    // פונקציה לעדכון סטטיסטיקות הטבלה
-    function updateTableStats() {
-      console.log('🔄 === updateTableStats called ===');
-      
-      const table = document.querySelector('.main-content table tbody');
-      if (!table) {
-        console.log('🔄 No table found');
-        return;
-      }
-      
-      const rows = table.querySelectorAll('tr');
-      console.log('🔄 Found rows:', rows.length);
-      
-      let totalNotes = rows.length;
-      let todayNotes = 0;
-      let weekNotes = 0;
-      let importantNotes = 0;
-      
-      const today = new Date();
-      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-      
-      rows.forEach((row, index) => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length >= 6) {
-          // בדיקת תאריך (עמודה 4 - נוצר ב)
-          const dateText = cells[3].textContent.trim();
-          if (dateText && dateText !== '-') {
-            try {
-              const noteDateObj = new Date(dateText);
-              
-              // בדיקה אם היום
-              if (noteDateObj.toDateString() === today.toDateString()) {
-                todayNotes++;
-              }
-              
-              // בדיקה אם השבוע
-              if (noteDateObj >= weekAgo) {
-                weekNotes++;
-              }
-            } catch (e) {
-              console.log('🔄 Error parsing date:', dateText, e);
-            }
-          }
-          
-          // בדיקת חשיבות (עמודה 3 - תוכן)
-          const contentText = cells[2].textContent.trim();
-          if (contentText.includes('חשוב') || contentText.includes('דחוף')) {
-            importantNotes++;
-          }
-        }
-      });
-      
-      console.log('🔄 Calculated stats:', {
-        totalNotes,
-        todayNotes,
-        weekNotes,
-        importantNotes
-      });
-      
-      // עדכון התצוגה
-      document.getElementById('totalNotes').textContent = totalNotes;
-      document.getElementById('todayNotes').textContent = todayNotes;
-      document.getElementById('weekNotes').textContent = weekNotes;
-      document.getElementById('importantNotes').textContent = importantNotes;
-      
-      console.log('🔄 Stats updated in DOM');
-    }
-    
-    // הגדרת הפונקציה כגלובלית
     window.loadNotesData = loadNotesData;
-    window.updateTableStats = updateTableStats;
     
-    // פונקציות לקבצים
-    function getFileIcon(filename) {
-        if (!filename) return '📄';
-        
-        const extension = filename.toLowerCase().split('.').pop();
-        
-        switch (extension) {
-            case 'pdf':
-                return '📄';
-            case 'doc':
-            case 'docx':
-                return '📝';
-            case 'xls':
-            case 'xlsx':
-                return '📊';
-            case 'ppt':
-            case 'pptx':
-                return '📈';
-            case 'txt':
-                return '📄';
-            case 'jpg':
-            case 'jpeg':
-            case 'png':
-            case 'gif':
-            case 'bmp':
-            case 'svg':
-                return '🖼️';
-            case 'mp4':
-            case 'avi':
-            case 'mov':
-            case 'wmv':
-                return '🎥';
-            case 'mp3':
-            case 'wav':
-            case 'flac':
-                return '🎵';
-            case 'zip':
-            case 'rar':
-            case '7z':
-                return '📦';
-            default:
-                return '📎';
-        }
-    }
-    
-    function createFileLink(filename, fileUrl) {
-        if (!filename) return '-';
-        
-        const icon = getFileIcon(filename);
-        const displayName = filename.length > 20 ? filename.substring(0, 20) + '...' : filename;
-        
-        return `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="${filename}">
-            ${icon} ${displayName}
-        </a>`;
-    }
-    
-    // הגדרת הפונקציות כגלובליות
-    window.getFileIcon = getFileIcon;
-    window.createFileLink = createFileLink;
-    
-    /**
-     * פונקציה להגדרת כותרות למיון
-     * מוסיפה event listeners לכפתורי המיון בטבלה ומגדירה אייקונים
-     */
-    function setupSortableHeaders() {
-      console.log('🔄 Setting up sortable headers...');
-      
-      // בדיקה אם יש כותרות למיון
-      const headers = document.querySelectorAll('.sortable-header-btn');
-      console.log('🔄 Found sortable headers:', headers.length);
-      
-      if (headers.length === 0) {
-        console.error('🔄 No sortable headers found!');
-        console.log('🔄 All elements with sortable-header-btn class:', document.querySelectorAll('.sortable-header-btn').length);
-        return;
-      }
-      
-      // הוספת event listeners לכל הכפתורים
-      headers.forEach((button, index) => {
-        button.addEventListener('click', (e) => {
-          e.preventDefault();
-          console.log(`🔄 Sortable header ${index} clicked`);
-          sortTable(index);
-        });
-        
-        // הוספת אייקון מיון
-        const sortIcon = button.querySelector('.sort-icon');
-        if (!sortIcon) {
-          const icon = document.createElement('span');
-          icon.className = 'sort-icon';
-          icon.textContent = '↕';
-          icon.style.marginLeft = '5px';
-          button.insertBefore(icon, button.firstChild);
-        }
-      });
-      
-      console.log('🔄 Sortable headers setup completed');
-    }
-    
-    // הגדרת הפונקציה כגלובלית
-    window.setupSortableHeaders = setupSortableHeaders;
-    
-    /**
-     * פונקציה לעדכון הגריד מהקומפוננט
-     * מקבלת פילטרים מהווב קומפוננט app-header ומעדכנת את הטבלה
-     * @param {Array} selectedStatuses - סטטוסים נבחרים
-     * @param {Array} selectedTypes - סוגים נבחרים
-     * @param {Array} selectedAccounts - חשבונות נבחרים
-     * @param {string} selectedDateRange - טווח תאריכים נבחר
-     * @param {string} searchTerm - מונח חיפוש
-     */
+    // הגדרת הפונקציה הגלובלית לעדכון מהפילטרים
     window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
       console.log('🔄 === updateGridFromComponent called for notes ===');
       console.log('🔄 Selected statuses:', selectedStatuses);
@@ -1471,22 +1114,29 @@
       console.log('🔄 Selected date range:', selectedDateRange);
       console.log('🔄 Search term:', searchTerm);
       
-      // שמירת הפילטרים ב-localStorage
-      localStorage.setItem('notesFilterStatuses', JSON.stringify(selectedStatuses));
-      localStorage.setItem('notesFilterTypes', JSON.stringify(selectedTypes));
-      localStorage.setItem('notesFilterAccounts', JSON.stringify(selectedAccounts));
-      localStorage.setItem('notesFilterDateRanges', JSON.stringify([selectedDateRange]));
-      localStorage.setItem('notesFilterSearch', searchTerm);
-      
-      // שמירת הפילטרים במשתנים הגלובליים
-      window.selectedStatusesForFilter = selectedStatuses;
-      window.selectedTypesForFilter = selectedTypes;
-      window.selectedAccountsForFilter = selectedAccounts;
-      window.selectedDateRangeForFilter = selectedDateRange;
-      window.searchTermForFilter = searchTerm;
-      
-      // החלת הפילטרים על הנתונים
-      filterNotesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
+      // קריאה לפונקציה הגלובלית
+      if (typeof window.updateGridFromComponentGlobal === 'function') {
+        window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, 'notes');
+      } else {
+        console.log('🔄 Global updateGridFromComponentGlobal function not available, using local filtering');
+        
+        // שמירת הפילטרים ב-localStorage
+        localStorage.setItem('notesFilterStatuses', JSON.stringify(selectedStatuses));
+        localStorage.setItem('notesFilterTypes', JSON.stringify(selectedTypes));
+        localStorage.setItem('notesFilterAccounts', JSON.stringify(selectedAccounts));
+        localStorage.setItem('notesFilterDateRanges', JSON.stringify([selectedDateRange]));
+        localStorage.setItem('notesFilterSearch', searchTerm);
+        
+        // שמירת הפילטרים במשתנים הגלובליים
+        window.selectedStatusesForFilter = selectedStatuses;
+        window.selectedTypesForFilter = selectedTypes;
+        window.selectedAccountsForFilter = selectedAccounts;
+        window.selectedDateRangeForFilter = selectedDateRange;
+        window.searchTermForFilter = searchTerm;
+        
+        // החלת הפילטרים על הנתונים
+        filterNotesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
+      }
       
       console.log('🔄 === updateGridFromComponent completed for notes ===');
     };

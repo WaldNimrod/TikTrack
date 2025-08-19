@@ -604,11 +604,19 @@
         
         console.log('🔄 נתוני חשבונות נטענו:', accountsData.length, 'חשבונות');
         
-        // עדכון הטבלה
-        updateAccountsTable(accountsData);
+        // החלת פילטרים על הנתונים
+        let filteredAccounts = [...accountsData];
+        if (typeof window.filterDataByFilters === 'function') {
+          console.log('🔄 מחיל פילטרים על נתוני החשבונות...');
+          filteredAccounts = window.filterDataByFilters(accountsData, 'accounts');
+          console.log('🔄 לאחר החלת פילטרים:', filteredAccounts.length, 'חשבונות');
+        }
         
-        // עדכון סטטיסטיקות
-        updateAccountsStats();
+        // עדכון הטבלה עם הנתונים המסוננים
+        updateAccountsTable(filteredAccounts);
+        
+        // עדכון סטטיסטיקות עם הנתונים המסוננים
+        updateAccountsStats(filteredAccounts);
         
       } catch (error) {
         console.error('❌ שגיאה בטעינת נתוני חשבונות:', error);
@@ -670,18 +678,21 @@
     }
     
     // פונקציה לעדכון סטטיסטיקות החשבונות
-    function updateAccountsStats() {
+    function updateAccountsStats(filteredAccounts = null) {
       console.log('🔄 === updateAccountsStats called ===');
       
-      if (!accountsData || accountsData.length === 0) {
+      // שימוש בנתונים המסוננים אם הועברו, אחרת בנתונים המקוריים
+      const accountsToUse = filteredAccounts || accountsData;
+      
+      if (!accountsToUse || accountsToUse.length === 0) {
         console.log('🔄 No accounts data available');
         return;
       }
       
-      const totalAccounts = accountsData.length;
-              const openAccounts = accountsData.filter(acc => acc.status === 'open').length;
-      const totalValue = accountsData.reduce((sum, acc) => sum + (acc.total_value || 0), 0);
-      const totalProfit = accountsData.reduce((sum, acc) => sum + (acc.total_pl || 0), 0);
+      const totalAccounts = accountsToUse.length;
+      const openAccounts = accountsToUse.filter(acc => acc.status === 'open').length;
+      const totalValue = accountsToUse.reduce((sum, acc) => sum + (acc.total_value || 0), 0);
+      const totalProfit = accountsToUse.reduce((sum, acc) => sum + (acc.total_pl || 0), 0);
       
       console.log('🔄 Calculated stats:', {
         totalAccounts,
@@ -692,7 +703,7 @@
       
       // עדכון התצוגה
       document.getElementById('totalAccounts').textContent = totalAccounts;
-              document.getElementById('activeAccounts').textContent = openAccounts;
+      document.getElementById('activeAccounts').textContent = openAccounts;
       document.getElementById('totalValue').textContent = `₪${totalValue.toLocaleString('he-IL')}`;
       document.getElementById('totalProfit').textContent = `₪${totalProfit.toLocaleString('he-IL')}`;
       
@@ -1013,24 +1024,32 @@
     function updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
       try {
         console.log('🔄 updateGridFromComponent (accounts) called with:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm });
-        // שמירת הערכים הגלובליים לשימוש במערכת הפילטרים
-        window.selectedStatusesForFilter = selectedStatuses || [];
-        window.selectedTypesForFilter = selectedTypes || [];
-        window.selectedAccountsForFilter = selectedAccounts || [];
-        window.selectedDateRangeForFilter = selectedDateRange || null;
-        window.searchTermForFilter = searchTerm || '';
+        
+        // קריאה לפונקציה הגלובלית
+        if (typeof window.updateGridFromComponentGlobal === 'function') {
+          window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, 'accounts');
+        } else {
+          console.log('🔄 Global updateGridFromComponentGlobal function not available, using local filtering');
+          
+          // שמירת הערכים הגלובליים לשימוש במערכת הפילטרים
+          window.selectedStatusesForFilter = selectedStatuses || [];
+          window.selectedTypesForFilter = selectedTypes || [];
+          window.selectedAccountsForFilter = selectedAccounts || [];
+          window.selectedDateRangeForFilter = selectedDateRange || null;
+          window.searchTermForFilter = searchTerm || '';
 
-        // החלת פילטרים על רשימת החשבונות
-        let accounts = Array.isArray(accountsData) ? [...accountsData] : [];
-        if (typeof window.filterDataByFilters === 'function') {
-          accounts = window.filterDataByFilters(accounts, 'accounts');
-        }
+          // החלת פילטרים על רשימת החשבונות
+          let accounts = Array.isArray(accountsData) ? [...accountsData] : [];
+          if (typeof window.filterDataByFilters === 'function') {
+            accounts = window.filterDataByFilters(accounts, 'accounts');
+          }
 
-        // רענון הטבלה והמונה
-        updateAccountsTable(accounts);
-        const countElement = document.querySelector('.main-content .table-count');
-        if (countElement) {
-          countElement.textContent = `${accounts.length} חשבונות`;
+          // רענון הטבלה והמונה
+          updateAccountsTable(accounts);
+          const countElement = document.querySelector('.main-content .table-count');
+          if (countElement) {
+            countElement.textContent = `${accounts.length} חשבונות`;
+          }
         }
       } catch (err) {
         console.error('❌ Error updating accounts from header filter:', err);
@@ -1708,6 +1727,12 @@
       
       // שחזור מצב הסגירה
       restoreSectionState();
+      
+      // אתחול פילטרים שמורים
+      if (typeof window.initializePageFilters === 'function') {
+        window.initializePageFilters('accounts');
+        console.log('🔄 === FILTERS INITIALIZED ===');
+      }
       
       // טעינת התראות
       if (typeof loadAlertsForCards === 'function') {

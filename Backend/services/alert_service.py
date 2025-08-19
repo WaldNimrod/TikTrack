@@ -31,6 +31,17 @@ class AlertService:
             raise
     
     @staticmethod
+    def get_unread_alerts(db: Session):
+        """קבלת התראות שלא נקראו (is_triggered = 'new')"""
+        try:
+            alerts = db.query(Alert).filter(Alert.is_triggered == 'new').all()
+            logger.info(f"נטענו {len(alerts)} התראות שלא נקראו")
+            return alerts
+        except Exception as e:
+            logger.error(f"שגיאה בטעינת התראות שלא נקראו: {e}")
+            raise
+    
+    @staticmethod
     def create(db: Session, alert_data: dict):
         """יצירת התראה חדשה"""
         try:

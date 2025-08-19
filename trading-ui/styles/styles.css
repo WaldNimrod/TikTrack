@@ -21,7 +21,7 @@
 .page-body {
   background: transparent !important;
   margin: 0 auto !important;
-  padding: 120px 0 0 0 !important; /* מרווח לכותרת + פילטר + מרווח קטן */
+  padding: 120px 10px 0 10px !important; /* מרווח לכותרת + פילטר + מרווח קטן + רווח פנימי מימין ומשמאל */
   width: 100% !important;
   max-width: 1400px !important;
   position: relative !important;

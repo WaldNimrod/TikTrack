@@ -54,6 +54,8 @@
   <script src="scripts/grid-table.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/alerts.js"></script>
+  <script src="scripts/active-alerts-component.js"></script>
+  <script src="scripts/accounts.js"></script>
 </head>
 <body>
   <!-- רקע כללי -->
@@ -72,7 +74,7 @@
           📋 תכנונים
         </div>
         <div class="table-actions">
-          <button class="refresh-btn" onclick="openDesignDetails()" title="הוסף עיצוב חדש">
+          <button class="refresh-btn" onclick="openAddTradePlanModal()" title="הוסף תכנון חדש">
             <span class="action-icon">➕</span> הוסף
           </button>
           <div class="action-separator"></div>
@@ -84,20 +86,8 @@
 
                         <!-- כרטיסיות התראות -->
       <div class="section-body">
-        <div class="alerts-cards-container">
-          <div class="alerts-header">
-                          <h3>🔔 התראות</h3>
-            <div class="alerts-header-actions">
-              <div class="alerts-count" id="newAlertsCount">0 התראות</div>
-              <button class="refresh-btn" onclick="refreshAlerts()" title="רענן התראות">
-                <span class="action-icon">🔄</span>
-              </button>
-        </div>
-        </div>
-          <div class="alerts-cards" id="alertsCards">
-            <!-- כרטיסיות ההתראות יוכנסו כאן דינמית -->
-        </div>
-        </div>
+        <!-- ווב קומפוננט של התראות פעילות -->
+        <active-alerts></active-alerts>
         
         <!-- סיכום נתונים -->
         <div class="info-summary" id="summaryStats">
@@ -111,291 +101,108 @@
         
     <!-- תוכן ראשי -->
     <div class="main-content">
-
-      <!-- אזור תכנונים - content-section -->
+      <!-- אזור התכנונים שלי - content-section -->
       <div class="content-section">
-        <!-- כותרת תכנונים -->
-        <div class="section-header">
-        <div class="table-title">
-            📋 התכנונים שלי
-        </div>
-          <div class="table-count">תכנונים</div>
-          <div class="table-actions">
-            <button class="refresh-btn" onclick="openDesignDetails()" title="הוסף תכנון חדש">
-              <span class="action-icon">➕</span> הוסף
-            </button>
-            <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תכנונים">
-          <span class="filter-icon">▲</span>
-        </button>
-      </div>
-    </div>
-
-        <!-- טבלת עיצובים -->
-        <div class="section-body">
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>
-                    <button class="btn btn-link sortable-header-btn" onclick="sortTable(0)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                      <span class="sort-icon">↕</span>נכס
-                      <br><span class="header-subtitle">Ticker</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button class="btn btn-link sortable-header-btn" onclick="sortTable(1)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                      <span class="sort-icon">↕</span>תאריך
-                      <br><span class="header-subtitle">Date</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button class="btn btn-link sortable-header-btn" onclick="sortTable(2)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                      <span class="sort-icon">↕</span>סוג
-                      <br><span class="header-subtitle">Type</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button class="btn btn-link sortable-header-btn" onclick="sortTable(3)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                      <span class="sort-icon">↕</span>סכום
-                      <br><span class="header-subtitle">Amount</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button class="btn btn-link sortable-header-btn" onclick="sortTable(4)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                      <span class="sort-icon">↕</span>יעד
-                      <br><span class="header-subtitle">Target</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button class="btn btn-link sortable-header-btn" onclick="sortTable(5)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                      <span class="sort-icon">↕</span>סטופ
-                      <br><span class="header-subtitle">Stop</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button class="btn btn-link sortable-header-btn" onclick="sortTable(6)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                      <span class="sort-icon">↕</span>נוכחי
-                      <br><span class="header-subtitle">Current</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button class="btn btn-link sortable-header-btn" onclick="sortTable(7)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                      <span class="sort-icon">↕</span>סטטוס
-                      <br><span class="header-subtitle">Status</span>
-                    </button>
-                  </th>
-                  <th class="actions-header">
-                    פעולות
-                    <br><span class="header-subtitle">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong><a href="#" onclick="openDesignDetails('8')" class="ticker-link">AAPL</a></strong></td>
-                  <td>15.1.2025</td>
-                  <td>investment</td>
-                  <td>$25,000</td>
-                  <td>$200.00</td>
-                  <td>$170.00</td>
-                  <td>$0.00 (0.0%)</td>
-                  <td><span class="status-badge status-closed">סגור</span></td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" onclick="editDesign('8')" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteDesign('8')" title="מחק">X</button>
-                  </td>
-                </tr>
-                
-                <tr>
-                  <td><strong><a href="#" onclick="openDesignDetails('9')" class="ticker-link">TSLA</a></strong></td>
-                  <td>10.1.2025</td>
-                  <td>swing</td>
-                  <td>$30,000</td>
-                  <td>$250.00</td>
-                  <td>$200.00</td>
-                  <td>$0.00 (0.0%)</td>
-                  <td><span class="status-badge status-closed">סגור</span></td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" onclick="editDesign('9')" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteDesign('9')" title="מחק">X</button>
-                  </td>
-                </tr>
-                
-                <tr>
-                  <td><strong><a href="#" onclick="openDesignDetails('7')" class="ticker-link">TSLA</a></strong></td>
-                  <td>15.8.2025</td>
-                  <td>short</td>
-                  <td>$10,000</td>
-                  <td>$750.00</td>
-                  <td>$900.00</td>
-                  <td>$0.00 (0.0%)</td>
-                  <td><span class="status-badge status-canceled">מבוטל</span></td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" onclick="editDesign('7')" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteDesign('7')" title="מחק">X</button>
-                  </td>
-                </tr>
-                
-                <tr>
-                  <td><strong><a href="#" onclick="openDesignDetails('6')" class="ticker-link">MSFT</a></strong></td>
-                  <td>15.8.2025</td>
-                  <td>long</td>
-                  <td>$8,000</td>
-                  <td>$380.00</td>
-                  <td>$300.00</td>
-                  <td>$0.00 (0.0%)</td>
-                  <td><span class="status-badge status-canceled">מבוטל</span></td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" onclick="editDesign('6')" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteDesign('6')" title="מחק">X</button>
-                  </td>
-                </tr>
-                
-                <tr>
-                  <td><strong><a href="#" onclick="openDesignDetails('5')" class="ticker-link">GOOGL</a></strong></td>
-                  <td>15.8.2025</td>
-                  <td>short</td>
-                  <td>$12,000</td>
-                  <td>$2500.00</td>
-                  <td>$2950.00</td>
-                  <td>$0.00 (0.0%)</td>
-                  <td><span class="status-badge status-open">פתוח</span></td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" onclick="editDesign('5')" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteDesign('5')" title="מחק">X</button>
-                  </td>
-                </tr>
-                
-                <tr>
-                  <td><strong><a href="#" onclick="openDesignDetails('4')" class="ticker-link">AAPL</a></strong></td>
-                  <td>15.8.2025</td>
-                  <td>long</td>
-                  <td>$15,000</td>
-                  <td>$200.00</td>
-                  <td>$145.00</td>
-                  <td>$0.00 (0.0%)</td>
-                  <td><span class="status-badge status-open">פתוח</span></td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" onclick="editDesign('4')" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteDesign('4')" title="מחק">X</button>
-                  </td>
-                </tr>
-                
-                <tr>
-                  <td><strong><a href="#" onclick="openDesignDetails('1')" class="ticker-link">AAPL</a></strong></td>
-                  <td>15.8.2025</td>
-                  <td>long</td>
-                  <td>$10,000</td>
-                  <td>$180.00</td>
-                  <td>$140.00</td>
-                  <td>$0.00 (0.0%)</td>
-                  <td><span class="status-badge status-open">פתוח</span></td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" onclick="editDesign('1')" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteDesign('1')" title="מחק">X</button>
-                  </td>
-                </tr>
-                
-                <tr>
-                  <td><strong><a href="#" onclick="openDesignDetails('2')" class="ticker-link">GOOGL</a></strong></td>
-                  <td>15.8.2025</td>
-                  <td>long</td>
-                  <td>$8,000</td>
-                  <td>$150.00</td>
-                  <td>$110.00</td>
-                  <td>$0.00 (0.0%)</td>
-                  <td><span class="status-badge status-open">פתוח</span></td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" onclick="editDesign('2')" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteDesign('2')" title="מחק">X</button>
-                  </td>
-                </tr>
-                
-                <tr>
-                  <td><strong><a href="#" onclick="openDesignDetails('3')" class="ticker-link">SPY</a></strong></td>
-                  <td>15.8.2025</td>
-                  <td>long</td>
-                  <td>$5,000</td>
-                  <td>$450.00</td>
-                  <td>$380.00</td>
-                  <td>$0.00 (0.0%)</td>
-                  <td><span class="status-badge status-open">פתוח</span></td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" onclick="editDesign('3')" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteDesign('3')" title="מחק">X</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- האלמנט השני - טבלת חשבונות -->
-    <div class="content-section">
-        <!-- כותרת חשבונות -->
+        <!-- כותרת התכנונים שלי -->
         <div class="section-header">
           <div class="table-title">
-            💰 חשבונות - content-section
+            📋 התכנונים שלי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plans</span>
           </div>
-          <div class="table-count">טוען...</div>
-          <div class="table-actions">
-            <button class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש">
+          <div class="table-count" id="designsCount">טוען...</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="search-filter-input" 
+                placeholder="חיפוש תכנונים..."
+                onkeyup="filterDesignsData([], [], [], null, this.value)"
+              >
+            </div>
+            <button class="refresh-btn" onclick="showAddTradePlanModal()" title="הוסף תכנון חדש">
               <span class="action-icon">➕</span> הוסף
             </button>
-            <button class="refresh-btn" onclick="loadAccounts()" title="רענן טבלה">
-              <span class="action-icon">🔄</span> רענן
-            </button>
-            <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleAccountsSection()" title="הצג/הסתר אזור חשבונות">
+            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התכנונים שלי">
               <span class="filter-icon">▲</span>
             </button>
-        </div>
+          </div>
         </div>
         
-        <!-- טבלת חשבונות -->
-        <div class="section-body" style="display: block;">
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                  <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name</span></th>
-                  <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency</span></th>
-                  <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
-                  <th>יתרה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cash Balance</span></th>
-                  <th>שווי כולל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total Value</span></th>
-                  <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P&L</span></th>
-                  <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
-                  <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td colspan="9" class="loading">טוען חשבונות...</td>
-                </tr>
-              </tbody>
-            </table>
+        <!-- טבלת תכנונים -->
+        <div class="section-body">
+          <div class="table-responsive" id="designsContainer">
+            <table class="table" id="designsTable">
+          <thead>
+            <tr>
+              <th>
+                <button class="btn btn-link sortable-header" onclick="sortTable(0)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                  <span class="sort-icon">↕</span>נכס
+                  <br><span class="header-subtitle">Ticker</span>
+                </button>
+              </th>
+              <th>
+                <button class="btn btn-link sortable-header" onclick="sortTable(1)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                  <span class="sort-icon">↕</span>תאריך
+                  <br><span class="header-subtitle">Date</span>
+                </button>
+              </th>
+              <th>
+                <button class="btn btn-link sortable-header" onclick="sortTable(2)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                  <span class="sort-icon">↕</span>סוג
+                  <br><span class="header-subtitle">Type</span>
+                </button>
+              </th>
+              <th>
+                <button class="btn btn-link sortable-header" onclick="sortTable(3)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                  <span class="sort-icon">↕</span>צד
+                  <br><span class="header-subtitle">Side</span>
+                </button>
+              </th>
+              <th>
+                <button class="btn btn-link sortable-header" onclick="sortTable(4)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                  <span class="sort-icon">↕</span>סכום
+                  <br><span class="header-subtitle">Amount</span>
+                </button>
+              </th>
+              <th>
+                <button class="btn btn-link sortable-header" onclick="sortTable(5)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                  <span class="sort-icon">↕</span>יעד
+                  <br><span class="header-subtitle">Target</span>
+                </button>
+              </th>
+              <th>
+                <button class="btn btn-link sortable-header" onclick="sortTable(6)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                  <span class="sort-icon">↕</span>סטופ
+                  <br><span class="header-subtitle">Stop</span>
+                </button>
+              </th>
+              <th>
+                <button class="btn btn-link sortable-header" onclick="sortTable(7)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                  <span class="sort-icon">↕</span>נוכחי
+                  <br><span class="header-subtitle">Current</span>
+                </button>
+              </th>
+              <th>
+                <button class="btn btn-link sortable-header" onclick="sortTable(8)" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                  <span class="sort-icon">↕</span>סטטוס
+                  <br><span class="header-subtitle">Status</span>
+                </button>
+              </th>
+              <th class="actions-header">
+                פעולות
+                <br><span class="header-subtitle">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="10" class="loading">טוען תכנונים...</td>
+            </tr>
+          </tbody>
+        </table>
+          </div>
+        </div>
+        <div class="table-footer">
+          <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
         </div>
       </div>
     </div>
@@ -404,17 +211,146 @@
   <!-- מרווח בתחתית הדף -->
   <div style="height: 3rem;"></div>
 
+  <!-- Add Trade Plan Modal -->
+  <div class="modal fade" id="addTradePlanModal" tabindex="-1" aria-labelledby="addTradePlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addTradePlanModalLabel">הוסף תכנון חדש</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addTradePlanForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanTickerId" class="form-label">טיקר</label>
+                  <select class="form-control" id="addTradePlanTickerId" required>
+                    <option value="">בחר טיקר</option>
+                    <option value="1">AAPL</option>
+                    <option value="2">GOOGL</option>
+                    <option value="3">TSLA</option>
+                    <option value="4">MSFT</option>
+                    <option value="5">SPY</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanDate" class="form-label">תאריך</label>
+                  <input type="date" class="form-control" id="addTradePlanDate" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="addTradePlanInvestmentType" class="form-label">סוג השקעה</label>
+                  <select class="form-control" id="addTradePlanInvestmentType" required>
+                    <option value="swing">סווינג</option>
+                    <option value="investment">השקעה</option>
+                    <option value="passive">פאסיבי</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="addTradePlanSide" class="form-label">צד</label>
+                  <select class="form-control" id="addTradePlanSide" required>
+                    <option value="Long">Long</option>
+                    <option value="Short">Short</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="addTradePlanPlannedAmount" class="form-label">סכום מתוכנן</label>
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanPlannedAmount" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanStopPrice" class="form-label">מחיר עצירה</label>
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanStopPrice">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanTargetPrice" class="form-label">מחיר יעד</label>
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanTargetPrice">
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="addTradePlanEntryConditions" class="form-label">תנאי כניסה</label>
+              <textarea class="form-control" id="addTradePlanEntryConditions" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="addTradePlanReasons" class="form-label">סיבות</label>
+              <textarea class="form-control" id="addTradePlanReasons" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-primary" onclick="saveNewTradePlan()">שמור</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- קבצים מודולריים -->
-  <script src="scripts/accounts.js"></script>
 
   <script>
     // פונקציות מותאמות לעמוד עיצובים
     function openDesignDetails(id) {
       console.log('פתיחת פרטי עיצוב:', id);
       // כאן יוכנס קוד לפתיחת מודל פרטי עיצוב
+    }
+    
+    // פונקציה לפתיחת מודל הוספת תכנון חדש
+    function openAddTradePlanModal() {
+      const modal = new bootstrap.Modal(document.getElementById('addTradePlanModal'));
+      // קבע ברירת מחדל של היום לשדה התאריך
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const todayStr = `${yyyy}-${mm}-${dd}`;
+      const dateInput = document.getElementById('addTradePlanDate');
+      if (dateInput) dateInput.value = todayStr;
+      modal.show();
+    }
+    
+    // פונקציה לשמירת תכנון חדש
+    function saveNewTradePlan() {
+      const formData = {
+        ticker_id: document.getElementById('addTradePlanTickerId').value,
+        investment_type: document.getElementById('addTradePlanInvestmentType').value,
+        side: document.getElementById('addTradePlanSide').value,
+        planned_amount: parseFloat(document.getElementById('addTradePlanPlannedAmount').value),
+        stop_price: parseFloat(document.getElementById('addTradePlanStopPrice').value) || null,
+        target_price: parseFloat(document.getElementById('addTradePlanTargetPrice').value) || null,
+        entry_conditions: document.getElementById('addTradePlanEntryConditions').value,
+        reasons: document.getElementById('addTradePlanReasons').value,
+        created_at: document.getElementById('addTradePlanDate').value
+      };
+      
+      console.log('שמירת תכנון חדש:', formData);
+      
+      // כאן יוכנס קוד לשמירה לשרת
+      // לעת עתה נציג הודעה
+      window.showNotification('תכנון חדש נשמר בהצלחה!', 'success');
+      
+      // סגירת המודל
+      const modal = bootstrap.Modal.getInstance(document.getElementById('addTradePlanModal'));
+      modal.hide();
+      
+      // רענון הטבלה
+      loadDesignsData();
     }
     
     function editDesign(id) {
@@ -429,6 +365,8 @@
     
     // הגדרת הפונקציות כגלובליות
     window.openDesignDetails = openDesignDetails;
+    window.openAddTradePlanModal = openAddTradePlanModal;
+    window.saveNewTradePlan = saveNewTradePlan;
     window.editDesign = editDesign;
     window.deleteDesign = deleteDesign;
     
@@ -480,23 +418,27 @@
             aValue = a.type.toLowerCase();
             bValue = b.type.toLowerCase();
             break;
-          case 3: // סכום
+          case 3: // צד
+            aValue = (a.side || 'Long').toLowerCase();
+            bValue = (b.side || 'Long').toLowerCase();
+            break;
+          case 4: // סכום
             aValue = parseFloat(a.amount);
             bValue = parseFloat(b.amount);
             break;
-          case 4: // יעד
+          case 5: // יעד
             aValue = parseFloat(a.target);
             bValue = parseFloat(b.target);
             break;
-          case 5: // סטופ
+          case 6: // סטופ
             aValue = parseFloat(a.stop);
             bValue = parseFloat(b.stop);
             break;
-          case 6: // נוכחי
+          case 7: // נוכחי
             aValue = parseFloat(a.current);
             bValue = parseFloat(b.current);
             break;
-          case 7: // סטטוס
+          case 8: // סטטוס
             aValue = getStatusForSort(a.status);
             bValue = getStatusForSort(b.status);
             break;
@@ -582,54 +524,7 @@
       });
     }
     
-    // הוספת אירועי לחיצה לכותרות
-    function setupSortableHeaders() {
-      console.log('🔄 Setting up sortable headers...');
-      
-      // בדיקה אם הטבלה קיימת
-      const table = document.querySelector('.main-content table');
-      console.log('🔄 Table found:', !!table);
-      
-      const headers = document.querySelectorAll('.sortable-header');
-      console.log('🔄 Found sortable headers:', headers.length);
-      
-      if (headers.length === 0) {
-        console.error('🔄 No sortable headers found!');
-        console.log('🔄 All th elements:', document.querySelectorAll('th').length);
-        console.log('🔄 All elements with sortable-header class:', document.querySelectorAll('.sortable-header').length);
-        return;
-      }
-      
-      headers.forEach((header, index) => {
-        console.log(`🔄 Setting up header ${index}:`, header.textContent.trim());
-        header.style.cursor = 'pointer';
-        
-        // הסרת אירועים קיימים
-        if (header._sortClickHandler) {
-          header.removeEventListener('click', header._sortClickHandler);
-        }
-        
-        // יצירת handler חדש
-        header._sortClickHandler = () => {
-          console.log(`🔄 Header ${index} clicked!`);
-          sortTable(index);
-        };
-        
-        // הוספת אירוע לחיצה
-        header.addEventListener('click', header._sortClickHandler);
-        
-        // הוספת אפקט hover
-        header.addEventListener('mouseenter', () => {
-          header.style.backgroundColor = '#f8f9fa';
-        });
-        
-        header.addEventListener('mouseleave', () => {
-          header.style.backgroundColor = '';
-        });
-      });
-      
-      console.log('🔄 Sortable headers setup completed');
-    }
+
     
 
     
@@ -653,235 +548,12 @@
     }
     
     // הגדרת הפונקציות כגלובליות
-    window.resetSort = resetSort;
     window.sortTable = sortTable;
-    window.setupSortableHeaders = setupSortableHeaders;
     
     // ===== פונקציות פילטרים =====
     
-    // נתוני תכנונים לדוגמה
-    let designsData = [
-      {
-        id: '8',
-        ticker: 'AAPL',
-        date: '15.1.2025',
-        type: 'investment',
-        amount: 25000,
-        target: 200,
-        stop: 170,
-        current: 0,
-        status: 'closed'
-      },
-      {
-        id: '9',
-        ticker: 'TSLA',
-        date: '10.1.2025',
-        type: 'swing',
-        amount: 30000,
-        target: 250,
-        stop: 200,
-        current: 0,
-        status: 'closed'
-      },
-      {
-        id: '7',
-        ticker: 'TSLA',
-        date: '5.1.2025',
-        type: 'passive',
-        amount: 10000,
-        target: 750,
-        stop: 800,
-        current: 0,
-        status: 'canceled'
-      },
-      {
-        id: '6',
-        ticker: 'MSFT',
-        date: '20.12.2024',
-        type: 'investment',
-        amount: 8000,
-        target: 380,
-        stop: 300,
-        current: 0,
-        status: 'canceled'
-      },
-      {
-        id: '5',
-        ticker: 'GOOGL',
-        date: '15.11.2024',
-        type: 'swing',
-        amount: 12000,
-        target: 2500,
-        stop: 2950,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '4',
-        ticker: 'AAPL',
-        date: '1.10.2024',
-        type: 'investment',
-        amount: 15000,
-        target: 200,
-        stop: 145,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '1',
-        ticker: 'AAPL',
-        date: '15.8.2024',
-        type: 'swing',
-        amount: 10000,
-        target: 180,
-        stop: 140,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '2',
-        ticker: 'GOOGL',
-        date: '1.7.2024',
-        type: 'passive',
-        amount: 8000,
-        target: 150,
-        stop: 110,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '3',
-        ticker: 'SPY',
-        date: '15.6.2024',
-        type: 'investment',
-        amount: 5000,
-        target: 450,
-        stop: 380,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '10',
-        ticker: 'NVDA',
-        date: '15.5.2024',
-        type: 'swing',
-        amount: 18000,
-        target: 850,
-        stop: 750,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '11',
-        ticker: 'META',
-        date: '1.4.2024',
-        type: 'investment',
-        amount: 22000,
-        target: 380,
-        stop: 320,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '12',
-        ticker: 'NFLX',
-        date: '15.3.2024',
-        type: 'passive',
-        amount: 12000,
-        target: 580,
-        stop: 520,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '13',
-        ticker: 'AMD',
-        date: '1.2.2024',
-        type: 'swing',
-        amount: 15000,
-        target: 120,
-        stop: 100,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '14',
-        ticker: 'INTC',
-        date: '15.1.2024',
-        type: 'investment',
-        amount: 9000,
-        target: 45,
-        stop: 40,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '15',
-        ticker: 'ORCL',
-        date: '1.12.2023',
-        type: 'passive',
-        amount: 11000,
-        target: 125,
-        stop: 115,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '16',
-        ticker: 'CRM',
-        date: '15.11.2023',
-        type: 'swing',
-        amount: 16000,
-        target: 280,
-        stop: 250,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '17',
-        ticker: 'ADBE',
-        date: '1.10.2023',
-        type: 'investment',
-        amount: 14000,
-        target: 520,
-        stop: 480,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '18',
-        ticker: 'AMZN',
-        date: '15.9.2023',
-        type: 'passive',
-        amount: 20000,
-        target: 3200,
-        stop: 3000,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '19',
-        ticker: 'IWM',
-        date: '1.8.2023',
-        type: 'swing',
-        amount: 13000,
-        target: 185,
-        stop: 170,
-        current: 0,
-        status: 'open'
-      },
-      {
-        id: '20',
-        ticker: 'QQQ',
-        date: '15.7.2023',
-        type: 'investment',
-        amount: 17000,
-        target: 380,
-        stop: 350,
-        current: 0,
-        status: 'open'
-      }
-    ];
+    // מערך ריק לנתוני תכנונים - יטען מהשרת
+    let designsData = [];
 
     // פונקציה לתרגום סוג לעברית
     function getTypeDisplay(type) {
@@ -896,25 +568,111 @@
     // פונקציה לטעינת נתוני תכנונים עם פילטרים
     async function loadDesignsData() {
       try {
-        let designs = [...designsData];
+        console.log('🔄 טוען נתוני תכנונים מהשרת...');
+        
+        // טעינת נתונים מהשרת
+        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+        const response = await fetch(`${base}/api/v1/trade_plans/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('🔄 נתונים שהתקבלו מהשרת:', data);
+        console.log('🔄 סוג הנתונים:', typeof data);
+        console.log('🔄 האם מערך:', Array.isArray(data));
+        if (data && typeof data === 'object') {
+          console.log('🔄 מפתחות האובייקט:', Object.keys(data));
+        }
+        
+        // בדיקה שהנתונים הם מערך
+        let plansData = data;
+        if (!Array.isArray(plansData)) {
+          console.error('🔄 הנתונים שהתקבלו אינם מערך:', typeof plansData);
+          if (plansData && plansData.data && Array.isArray(plansData.data)) {
+            console.log('🔄 נמצא מערך בתוך data.data');
+            plansData = plansData.data;
+          } else {
+            throw new Error('הנתונים שהתקבלו מהשרת אינם בפורמט הנכון');
+          }
+        }
+        
+        // המרת הנתונים לפורמט הנדרש
+        let designs = plansData.map(plan => {
+          console.log('🔄 מעבד תכנון:', plan);
+          return {
+            id: plan.id,
+            ticker: plan.ticker?.symbol || plan.ticker_id || 'N/A',
+            date: plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'N/A',
+            type: plan.investment_type || 'swing',
+            side: plan.side || 'Long',
+            amount: plan.planned_amount || 0,
+            target: plan.target_price || 0,
+            stop: plan.stop_price || 0,
+            current: 0, // יטען בנפרד אם נדרש
+            status: plan.status || 'open'
+          };
+        });
+        
+        // עדכון המערך הגלובלי
+        designsData = designs;
+        
+        console.log('🔄 מספר תכנונים שנטענו:', designs.length);
+        
+        if (designs.length === 0) {
+          console.log('🔄 אין תכנונים להצגה');
+          document.querySelector('.main-content table tbody').innerHTML = '<tr><td colspan="10" class="text-center text-muted">אין תכנונים להצגה</td></tr>';
+          return;
+        }
         
         // שימוש בפונקציה הגלובלית לסינון
         designs = window.filterDataByFilters(designs, 'designs');
             
-            // עדכון הטבלה
+        // עדכון הטבלה
         updateDesignsTable(designs);
+        
+        console.log('🔄 טעינת תכנונים הושלמה בהצלחה');
           
-          } catch (error) {
+      } catch (error) {
         console.error('Error loading designs data:', error);
-                 document.querySelector('.main-content table tbody').innerHTML = '<tr><td colspan="9" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
+        
+        // בדיקה אם זו שגיאה של פילטר תאריכים
+        const savedDateRange = localStorage.getItem('designsFilterDateRange');
+        if (savedDateRange && savedDateRange !== 'הכול') {
+          document.querySelector('.main-content table tbody').innerHTML = `<tr><td colspan="10" class="text-center text-info">אין נתונים לפילטר "${savedDateRange}"</td></tr>`;
+        } else {
+          document.querySelector('.main-content table tbody').innerHTML = '<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        }
       }
     }
 
     // פונקציה לעדכון הטבלה
     function updateDesignsTable(designs) {
-      const tbody = document.querySelector('.main-content table tbody');
+      const tbody = document.querySelector('.content-section table tbody');
       if (!tbody) {
         console.error('Table body not found');
+        return;
+      }
+      
+      // בדיקה אם אין נתונים
+      if (!designs || designs.length === 0) {
+        const savedDateRange = localStorage.getItem('designsFilterDateRange');
+        if (savedDateRange && savedDateRange !== 'הכול') {
+          tbody.innerHTML = `<tr><td colspan="10" class="text-center text-info">אין נתונים לפילטר "${savedDateRange}"</td></tr>`;
+        } else {
+          tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">אין נתונים להצגה</td></tr>';
+        }
+        
+        // עדכון ספירת רשומות
+        const countElement = document.querySelector('.content-section .table-count');
+        if (countElement) {
+          countElement.textContent = '0 תכנונים';
+        }
+        
+        // עדכון סטטיסטיקות הטבלה
+        window.updateTableStats('planning');
         return;
       }
       
@@ -922,7 +680,8 @@
         <tr>
           <td><strong><a href="#" onclick="openDesignDetails('${design.id}')" class="ticker-link">${design.ticker}</a></strong></td>
           <td>${design.date}</td>
-          <td>${getTypeDisplay(design.type)}</td>
+          <td><span class="type-${design.type}">${getTypeDisplay(design.type)}</span></td>
+          <td><span class="${(design.side || 'Long').toLowerCase() === 'long' ? 'side-long' : 'side-short'}">${design.side || 'Long'}</span></td>
           <td>$${design.amount.toLocaleString()}</td>
           <td>$${design.target.toFixed(2)}</td>
           <td>$${design.stop.toFixed(2)}</td>
@@ -940,80 +699,40 @@
       tbody.innerHTML = tableHTML;
       
       // עדכון ספירת רשומות
-      const countElement = document.querySelector('.main-content .table-count');
+      const countElement = document.querySelector('.content-section .table-count');
       if (countElement) {
         countElement.textContent = `${designs.length} תכנונים`;
       }
       
-      // עדכון סטטיסטיקות הטבלה
-      updateTableStats();
+              // עדכון סטטיסטיקות הטבלה
+        window.updateTableStats('planning');
     }
     
-    // הגדרת הפונקציה כגלובלית
+    // הגדרת הפונקציות כגלובליות
     window.updateDesignsTable = updateDesignsTable;
+    window.loadDesignsData = loadDesignsData;
 
     // הגדרת הפונקציה הגלובלית לעדכון מהפילטרים
-    window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
-      const globalUpdateFunction = window.updateGridFromComponentGlobal;
-      if (globalUpdateFunction) {
-        globalUpdateFunction(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, 'designs');
-      } else {
-        console.error('Global updateGridFromComponent function not found');
+    window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+      console.log('🔄 updateGridFromComponent called with:', {
+        selectedStatuses,
+        selectedTypes,
+        selectedDateRange,
+        searchTerm
+      });
+      
+      // קריאה לפונקציה הגלובלית
+      if (typeof window.updateGridFromComponentGlobal === 'function') {
+        window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'designs');
       }
     };
 
-    // פונקציה להצגת הודעות
-    function showNotification(message, type = 'success') {
-      try {
-        const notification = document.createElement('div');
-        const bgColor = type === 'error' ? '#f8d7da' : '#d4edda';
-        const textColor = type === 'error' ? '#721c24' : '#155724';
-        const borderColor = type === 'error' ? '#f5c6cb' : '#c3e6cb';
-        
-        notification.style.cssText = `
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          z-index: 9999;
-          padding: 12px 20px;
-          border-radius: 8px;
-          background-color: ${bgColor};
-          color: ${textColor};
-          border: 1px solid ${borderColor};
-          font-size: 14px;
-          font-weight: 500;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-          transition: opacity 0.3s ease;
-          opacity: 0;
-        `;
-        
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        // הצגת ההודעה
-        setTimeout(() => {
-          notification.style.opacity = '1';
-        }, 100);
-        
-        // הסתרת ההודעה אחרי 3 שניות
-        setTimeout(() => {
-          notification.style.opacity = '0';
-            setTimeout(() => {
-              if (notification.parentNode) {
-              notification.parentNode.removeChild(notification);
-              }
-            }, 300);
-        }, 3000);
-        
-      } catch (error) {
-        console.error('Error showing notification:', error);
-      }
-    }
+
 
     // פונקציות נוספות
     function resetAllFiltersAndReloadData() {
       window.resetAllFiltersForPage('designs');
-      showNotification('כל הפילטרים אופסו', 'success');
+      window.showNotification('כל הפילטרים אופסו', 'success');
     }
     
     // פונקציה לרענון נתונים בלבד (לא מאפסת פילטרים)
@@ -1021,20 +740,7 @@
       loadDesignsData();
     }
     
-    // פונקציה לאיפוס מיון
-    function resetSort() {
-      // מחיקת מצב מיון מ-localStorage
-      localStorage.removeItem('designsSortColumn');
-      localStorage.removeItem('designsSortDirection');
-      
-      // איפוס אייקונים
-      updateSortIcons(-1);
-      
-      // רענון הנתונים
-      loadDesignsData();
-      
-      showNotification('מיון אופס', 'success');
-    }
+
     
     // הגדרת הפונקציה כגלובלית
     window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
@@ -1085,8 +791,8 @@
     }
     
     function toggleMainSection() {
-      const section = document.querySelector('.main-content .section-body');
-      const toggleBtn = document.querySelector('.main-content button[onclick="toggleMainSection()"]');
+      const section = document.querySelector('.content-section .section-body');
+      const toggleBtn = document.querySelector('.content-section button[onclick="toggleMainSection()"]');
       const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
       
       if (section) {
@@ -1110,44 +816,12 @@
       }
     }
     
-    function toggleAccountsSection() {
-      // מציאת הסקשן השני (חשבונות) - הטבלה השנייה
-      const contentSections = document.querySelectorAll('.content-section');
-      const accountsSection = contentSections[1]; // הסקשן השני
-      
-      if (!accountsSection) {
-        console.error('❌ לא נמצא סקשן חשבונות');
-          return;
-        }
-        
-      const sectionBody = accountsSection.querySelector('.section-body');
-      const toggleBtn = accountsSection.querySelector('button[onclick="toggleAccountsSection()"]');
-      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-      
-      if (sectionBody) {
-        const isCollapsed = sectionBody.style.display === 'none';
-        
-        if (isCollapsed) {
-          sectionBody.style.display = 'block';
-        } else {
-          sectionBody.style.display = 'none';
-        }
-        
-        // עדכון האייקון
-        if (icon) {
-          icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-        
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('accountsSectionCollapsed', !isCollapsed);
-      }
-    }
+
     
     // הגדרת הפונקציות כגלובליות
     window.toggleDesignsSectionLocal = toggleDesignsSectionLocal;
     window.toggleTopSection = toggleTopSection;
     window.toggleMainSection = toggleMainSection;
-    window.toggleAccountsSection = toggleAccountsSection;
     
     // פונקציה לשחזור מצב הסגירה
     function restoreDesignsSectionState() {
@@ -1171,8 +845,8 @@
       }
       
       // שחזור מצב main section
-      const mainSection = document.querySelector('.main-content .section-body');
-      const mainToggleBtn = document.querySelector('.main-content button[onclick="toggleMainSection()"]');
+      const mainSection = document.querySelector('.content-section .section-body');
+      const mainToggleBtn = document.querySelector('.content-section button[onclick="toggleMainSection()"]');
       const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
       
       if (mainSection && mainToggleBtn && mainIcon) {
@@ -1188,290 +862,85 @@
           mainIcon.textContent = '▲';
         }
       }
-      
-      // שחזור מצב accounts section
-      const contentSections = document.querySelectorAll('.content-section');
-      const accountsSection = contentSections[1]; // הסקשן השני
-      
-      if (accountsSection) {
-        const sectionBody = accountsSection.querySelector('.section-body');
-        const toggleBtn = accountsSection.querySelector('button[onclick="toggleAccountsSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-        
-        if (sectionBody && toggleBtn && icon) {
-          const isCollapsed = localStorage.getItem('accountsSectionCollapsed') === 'true';
-          
-          if (isCollapsed) {
-            sectionBody.style.display = 'none';
-            icon.textContent = '▼';
-          } else {
-            sectionBody.style.display = 'block';
-            icon.textContent = '▲';
-          }
-        }
-      }
     }
 
-    // פונקציה לעדכון סטטיסטיקות הטבלה
-    function updateTableStats() {
-      console.log('🔄 === updateTableStats called ===');
-      
-      // בדיקה אם הטבלה קיימת
-      const table = document.querySelector('#designsTable tbody');
-      console.log('🔄 Looking for table with selector: #designsTable tbody');
-      console.log('🔄 Table found:', !!table);
-      
-      if (!table) {
-        console.log('🔄 Table not found, trying alternative selector...');
-        const altTable = document.querySelector('.main-content table tbody');
-        console.log('🔄 Alternative table found:', !!altTable);
-        
-        if (!altTable) {
-          console.log('🔄 No table found at all');
-          return;
-        }
-        
-        // השתמש בטבלה החלופית
-        const rows = altTable.querySelectorAll('tr');
-        console.log('🔄 Found rows with alternative selector:', rows.length);
-        
-        if (rows.length === 0) {
-          console.log('🔄 No rows found in table');
-          return;
-        }
-        
-        // הצג את התוכן של השורה הראשונה לדיבוג
-        const firstRow = rows[0];
-        const firstRowCells = firstRow.querySelectorAll('td');
-        console.log('🔄 First row cells count:', firstRowCells.length);
-        console.log('🔄 First row content:', firstRow.textContent);
-        
-        let totalDesigns = rows.length;
-        let totalInvestment = 0;
-        let totalProfit = 0;
-        
-        rows.forEach((row, index) => {
-          const cells = row.querySelectorAll('td');
-          console.log(`🔄 Row ${index + 1} has ${cells.length} cells`);
-          
-          if (cells.length >= 8) {
-            // סכום השקעה (עמודה 4)
-            const amountText = cells[3].textContent.trim();
-            console.log(`🔄 Row ${index + 1} amount text: "${amountText}"`);
-            const amount = parseFloat(amountText.replace(/[^\d.-]/g, '')) || 0;
-            console.log(`🔄 Row ${index + 1} parsed amount: ${amount}`);
-            totalInvestment += amount;
-            
-            // רווח (עמודה 7 - נוכחי)
-            const currentText = cells[6].textContent.trim();
-            console.log(`🔄 Row ${index + 1} current text: "${currentText}"`);
-            const profitMatch = currentText.match(/\(([^)]+)\)/);
-            if (profitMatch) {
-              const profit = parseFloat(profitMatch[1].replace(/[^\d.-]/g, '')) || 0;
-              console.log(`🔄 Row ${index + 1} parsed profit: ${profit}`);
-              totalProfit += profit;
-            }
-          }
-        });
-        
-        const avgInvestment = totalDesigns > 0 ? totalInvestment / totalDesigns : 0;
-        
-        console.log('🔄 Calculated stats:', {
-          totalDesigns,
-          totalInvestment,
-          avgInvestment,
-          totalProfit
-        });
-        
-        // עדכון התצוגה
-        document.getElementById('totalDesigns').textContent = totalDesigns;
-        document.getElementById('totalInvestment').textContent = `$${totalInvestment.toLocaleString('he-IL')}`;
-        document.getElementById('avgInvestment').textContent = `$${Math.round(avgInvestment).toLocaleString('he-IL')}`;
-        document.getElementById('totalProfit').textContent = `$${totalProfit.toLocaleString('he-IL')}`;
-        
-        console.log('🔄 Stats updated in DOM');
-        return;
-      }
-      
-      const rows = table.querySelectorAll('tr');
-      console.log('🔄 Found rows:', rows.length);
-      
-      let totalDesigns = rows.length;
-      let totalInvestment = 0;
-      let totalProfit = 0;
-      
-      rows.forEach((row, index) => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length >= 8) {
-          // סכום השקעה (עמודה 4)
-          const amountText = cells[3].textContent.trim();
-          const amount = parseFloat(amountText.replace(/[^\d.-]/g, '')) || 0;
-          totalInvestment += amount;
-          
-          // רווח (עמודה 7 - נוכחי)
-          const currentText = cells[6].textContent.trim();
-          const profitMatch = currentText.match(/\(([^)]+)\)/);
-          if (profitMatch) {
-            const profit = parseFloat(profitMatch[1].replace(/[^\d.-]/g, '')) || 0;
-            totalProfit += profit;
-          }
-        }
-      });
-      
-      const avgInvestment = totalDesigns > 0 ? totalInvestment / totalDesigns : 0;
-      
-      console.log('🔄 Calculated stats:', {
-        totalDesigns,
-        totalInvestment,
-        avgInvestment,
-        totalProfit
-      });
-      
-      // עדכון התצוגה
-      document.getElementById('totalDesigns').textContent = totalDesigns;
-      document.getElementById('totalInvestment').textContent = `$${totalInvestment.toLocaleString('he-IL')}`;
-      document.getElementById('avgInvestment').textContent = `$${Math.round(avgInvestment).toLocaleString('he-IL')}`;
-      document.getElementById('totalProfit').textContent = `$${totalProfit.toLocaleString('he-IL')}`;
-      
-      console.log('🔄 Stats updated in DOM');
+
+    
+
+    
+    // פונקציות מותאמות לעמוד תכנונים
+    function loadDesigns() {
+      console.log('טעינת תכנונים');
+      loadDesignsData();
     }
     
-    // הגדרת הפונקציה כגלובלית
-    window.loadDesignsData = loadDesignsData;
-    window.updateTableStats = updateTableStats;
+    function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
+      console.log('פילטור תכנונים:', { statuses, types, accounts, dateRange, searchTerm });
+      // קריאה לפונקציה הגלובלית עם pageName
+      if (typeof window.updateGridFromComponentGlobal === 'function') {
+        window.updateGridFromComponentGlobal(statuses, types, accounts, dateRange, searchTerm, 'designs');
+      }
+    }
+    
+
+    
+    function showAddTradePlanModal() {
+      console.log('הצגת מודל הוספת תכנון');
+      const modal = new bootstrap.Modal(document.getElementById('addTradePlanModal'));
+      // קבע ברירת מחדל של היום לשדה התאריך
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const todayStr = `${yyyy}-${mm}-${dd}`;
+      const dateInput = document.getElementById('addTradePlanDate');
+      if (dateInput) dateInput.value = todayStr;
+      modal.show();
+    }
+    
+    function openDesignDetails(id) {
+      console.log('פתיחת פרטי תכנון:', id);
+      // כאן יוכנס קוד לפתיחת פרטי תכנון
+    }
+    
+    function editDesign(id) {
+      console.log('עריכת תכנון:', id);
+      // כאן יוכנס קוד לעריכת תכנון
+    }
+    
+    function deleteDesign(id) {
+      console.log('מחיקת תכנון:', id);
+      // כאן יוכנס קוד למחיקת תכנון
+    }
     
     // אתחול הדף
     document.addEventListener('DOMContentLoaded', function() {
       console.log('🔄 === DOM CONTENT LOADED ===');
-      window.initializePageFilters('designs');
       
       // שחזור מצב הסגירה
       restoreDesignsSectionState();
       
-      // טעינת התראות
-      if (typeof loadAlerts === 'function') {
-        loadAlerts();
-        console.log('🔄 === ALERTS LOADED ===');
-      }
+      // טעינת נתוני תכנונים
+      loadDesignsData();
       
-      // טעינת כרטיסיות התראות
-      console.log('🔄 === TRYING TO LOAD ALERTS CARDS ===');
-      console.log('🔄 Checking if alerts.js loaded...');
-      console.log('🔄 typeof loadAlerts:', typeof loadAlerts);
-      console.log('🔄 typeof loadAlertsForCards:', typeof loadAlertsForCards);
+      // טעינת התראות - נטען אוטומטית על ידי ווב קומפוננט
+      console.log('🔄 === ALERTS WILL BE LOADED BY WEB COMPONENT ===');
       
-      // בדיקה מפורטת של כל הפונקציות
-      console.log('🔄 === DETAILED FUNCTION CHECK ===');
-      console.log('🔄 window.loadAlertsForCards:', typeof window.loadAlertsForCards);
-      console.log('🔄 window.markAlertAsRead:', typeof window.markAlertAsRead);
-      console.log('🔄 window.refreshAlerts:', typeof window.refreshAlerts);
-      console.log('🔄 window.loadSampleAlertsForCards:', typeof window.loadSampleAlertsForCards);
-      
-      // בדיקה אם הקובץ alerts.js נטען
-      console.log('🔄 === ALERTS.JS LOADING CHECK ===');
-      const scripts = document.querySelectorAll('script[src*="alerts.js"]');
-      console.log('🔄 Found alerts.js scripts:', scripts.length);
-      scripts.forEach((script, index) => {
-        console.log(`🔄 Script ${index + 1}:`, script.src);
-      });
-      
-      // בדיקה של ה-container
-      console.log('🔄 === CONTAINER CHECK ===');
-      const alertsCardsContainer = document.getElementById('alertsCards');
-      const newAlertsCountElement = document.getElementById('newAlertsCount');
-      console.log('🔄 alertsCards container:', alertsCardsContainer);
-      console.log('🔄 newAlertsCount element:', newAlertsCountElement);
-      
-      if (alertsCardsContainer) {
-        console.log('🔄 Container HTML:', alertsCardsContainer.innerHTML);
-      }
-      
-      if (typeof loadAlertsForCards === 'function') {
-        console.log('🔄 loadAlertsForCards function found, calling it...');
-        loadAlertsForCards();
-        console.log('🔄 === ALERTS CARDS LOADED ===');
-        } else {
-        console.log('🔄 loadAlertsForCards function NOT found!');
-        console.log('🔄 Trying to load sample alerts directly...');
-        if (typeof loadSampleAlertsForCards === 'function') {
-          loadSampleAlertsForCards();
-        } else {
-          console.log('🔄 loadSampleAlertsForCards also not found!');
-          console.log('🔄 Loading sample alerts manually...');
-          
-          // טעינה ידנית של התראות דוגמה
-          const alertsCardsData = [
-            {
-              id: 1,
-              title: 'התראה על מחיר נכס',
-              message: 'מחיר AAPL הגיע ליעד המחיר שהוגדר',
-              ticker: 'AAPL',
-              current_price: 185.50,
-              target_price: 185.00,
-              created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-              is_triggered: 'new',
-              alert_type: 'price_target'
-            },
-            {
-              id: 2,
-              title: 'התראה על נפח מסחר',
-              message: 'נפח המסחר ב-TSLA עלה ב-50% מהממוצע היומי',
-              ticker: 'TSLA',
-              volume: 15000000,
-              avg_volume: 10000000,
-              created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-              is_triggered: 'new',
-              alert_type: 'volume_spike'
-            }
-          ];
-          
-          console.log('🔄 Manual alerts data created:', alertsCardsData);
-          
-          // הצגת הכרטיסיות ידנית
-          const cardsContainer = document.getElementById('alertsCards');
-          if (cardsContainer) {
-            console.log('🔄 Found alertsCards container, rendering manually...');
-            const cardsHTML = alertsCardsData.map(alert => `
-              <div class="alert-card" data-alert-id="${alert.id}">
-                <div class="alert-card-header">
-                  <h4 class="alert-card-title">🔔 ${alert.title}</h4>
-                  <span class="alert-card-time">לפני 30 דקות</span>
-                </div>
-                <div class="alert-card-content">
-                  <p class="alert-card-message">${alert.message}</p>
-                  <div class="alert-card-details">
-                    <span class="alert-detail-item">📈 ${alert.ticker}</span>
-                  </div>
-                </div>
-                <div class="alert-card-actions">
-                  <button class="btn-mark-read" onclick="alert('קראתי!')" data-alert-id="${alert.id}">
-                    ✓ קראתי
-                  </button>
-                </div>
-              </div>
-        `).join('');
-            cardsContainer.innerHTML = cardsHTML;
-            console.log('🔄 Manual cards rendered successfully!');
-          } else {
-            console.log('🔄 alertsCards container NOT found!');
-          }
-        }
-      }
+      // ווב קומפוננט של התראות פעילות נטען אוטומטית
+      console.log('🔄 === ActiveAlerts Web Component will load automatically ===');
       
       // הגדרת כותרות למיון מיד
       console.log('🔄 === SETUP SORTABLE HEADERS IMMEDIATE ===');
-      setupSortableHeaders();
+      window.setupSortableHeaders();
       
       // הגדרת כותרות למיון אחרי טעינת הדף
     setTimeout(() => {
         console.log('🔄 === SETUP SORTABLE HEADERS TIMEOUT ===');
-        setupSortableHeaders();
+        window.setupSortableHeaders();
     }, 500);
       
       // בדיקת פילטרים שמורים אחרי 1 שנייה
       setTimeout(() => {
-        window.debugSavedFilters('designs');
-        
         // בדיקת פילטרים שמורים (ללא הצגת הודעה)
         const savedStatuses = localStorage.getItem('designsFilterStatuses');
         const savedDateRange = localStorage.getItem('designsFilterDateRange');
@@ -1479,11 +948,13 @@
         
                 // הגדרת כותרות למיון אחרי טעינת הפילטרים
         console.log('🔄 === SETUP SORTABLE HEADERS AFTER FILTERS ===');
-        setupSortableHeaders();
+        window.setupSortableHeaders();
         
         // עדכון סטטיסטיקות הטבלה
-        updateTableStats();
+        window.updateTableStats('planning');
     }, 1000);
+    
+
     });
   </script>
 </body>

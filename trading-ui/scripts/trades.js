@@ -200,6 +200,7 @@ async function fillEditTradeModalData(tradeData) {
         'editTradeTradePlanId': tradeData.trade_plan_id || '',
         'editTradeStatus': tradeData.status || 'open',
         'editTradeType': tradeData.type || 'swing',
+        'editTradeSide': tradeData.side || 'Long',
         'editTradeOpenedAt': tradeData.created_at ? new Date(tradeData.created_at).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
         'editTradeClosedAt': tradeData.closed_at ? new Date(tradeData.closed_at).toISOString().slice(0, 16) : '',
         'editTradeTotalPl': tradeData.total_pl || 0,
@@ -365,6 +366,7 @@ async function saveTradeRecord() {
             trade_plan_id: document.getElementById('editTradeTradePlanId').value || null,
             status: status,
             type: type,
+            side: document.getElementById('editTradeSide').value || 'Long',
             created_at: document.getElementById('editTradeOpenedAt').value || null,
             closed_at: document.getElementById('editTradeClosedAt').value || null,
             total_pl: parseFloat(document.getElementById('editTradeTotalPl').value) || 0,
@@ -524,6 +526,7 @@ async function saveNewTradeRecord() {
         const tickerId = document.getElementById('addTradeTickerId').value;
         const status = document.getElementById('addTradeStatus').value;
         const type = document.getElementById('addTradeType').value;
+        const side = document.getElementById('addTradeSide').value;
         
         // וולידציה בסיסית
         if (!accountId) {
@@ -559,6 +562,7 @@ async function saveNewTradeRecord() {
             trade_plan_id: document.getElementById('addTradeTradePlanId').value || null,
             status: status,
             type: type,
+            side: side,
             created_at: document.getElementById('addTradeOpenedAt').value || null,
             closed_at: document.getElementById('addTradeClosedAt').value || null,
             total_pl: 0, // רווח/הפסד מתחיל ב-0 בטרייד חדש - לא נדרש מהמשתמש

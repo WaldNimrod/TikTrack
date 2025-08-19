@@ -31,30 +31,48 @@ async function loadAccountsFromServer() {
     console.log('🔄 Token found:', !!token);
     
     if (!token) {
-      console.log('🔄 No auth token found, using default accounts');
-      loadDefaultAccounts();
-      return;
+      console.log('🔄 No auth token found, trying without token...');
+      // נסיון לטעון ללא token
     }
     
     console.log('🔄 Fetching accounts from server...');
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
     const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+      headers: headers
     });
     
     console.log('🔄 Response status:', response.status);
     
     if (response.ok) {
-      const accounts = await response.json();
-      window.accountsData = accounts;
+      const responseData = await response.json();
+      console.log('🔄 Raw response from server:', responseData);
+      
+      // טיפול במבנה התשובה - יכול להיות ישירות מערך או בתוך data
+      const allAccounts = responseData.data || responseData;
+      console.log('🔄 All accounts from server:', allAccounts);
+      
+      // סינון רק חשבונות בסטטוס open
+      const openAccounts = allAccounts.filter(account => account.status === 'open');
+      window.accountsData = openAccounts;
       window.accountsLoaded = true;
-      console.log('🔄 Accounts loaded from server:', accounts.length, 'accounts');
-      updateAccountFilterMenu(accounts);
+      console.log('🔄 All accounts loaded from server:', allAccounts.length, 'accounts');
+      console.log('🔄 Open accounts filtered:', openAccounts.length, 'accounts');
+      console.log('🔄 Open accounts details:', openAccounts);
+      
+      // קריאה לעדכון התפריט
+      updateAccountFilterMenu(openAccounts);
     } else {
-      console.log('🔄 Error loading accounts from server');
+      console.log('🔄 Error loading accounts from server, status:', response.status);
+      const errorText = await response.text();
+      console.log('🔄 Error response:', errorText);
       loadDefaultAccounts();
     }
     
@@ -68,10 +86,10 @@ async function loadAccountsFromServer() {
 function loadDefaultAccounts() {
   console.log('🔄 Loading default accounts');
   window.accountsData = [
-    { id: 1, name: 'חשבון ראשי', type: 'main' },
-    { id: 2, name: 'חשבון משני', type: 'secondary' },
-    { id: 3, name: 'חשבון השקעות', type: 'investment' },
-    { id: 4, name: 'חשבון מסחר', type: 'trading' }
+    { id: 1, name: 'חשבון ראשי', type: 'main', status: 'open' },
+    { id: 2, name: 'חשבון משני', type: 'secondary', status: 'open' },
+    { id: 3, name: 'חשבון השקעות', type: 'investment', status: 'open' },
+    { id: 4, name: 'חשבון מסחר', type: 'trading', status: 'open' }
   ];
   window.accountsLoaded = true;
   updateAccountFilterMenu(window.accountsData);
@@ -100,7 +118,7 @@ function updateAccountFilterMenu(accounts) {
   accounts.forEach((account, index) => {
     const accountItem = document.createElement('div');
     accountItem.className = 'account-filter-item';
-    accountItem.dataset.value = account.name;
+    accountItem.setAttribute('data-account', account.name); // הוספת data-account attribute
     accountItem.innerHTML = `
       <span class="option-text">${account.name}</span>
       <span class="check-mark">●</span>
@@ -117,9 +135,14 @@ function updateAccountFilterMenu(accounts) {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const accountName = item.querySelector('.option-text').textContent;
+      const accountName = item.getAttribute('data-account'); // שימוש ב-data-account
       console.log('🔄 Account filter item clicked:', accountName);
-      // כאן נוכל להוסיף לוגיקה לבחירת חשבון ספציפי
+      
+      // קריאה לפונקציה של הקומפוננט
+      const appHeader = document.querySelector('app-header');
+      if (appHeader && typeof appHeader.selectAccountOption === 'function') {
+        appHeader.selectAccountOption(accountName);
+      }
     });
   });
   console.log('🔄 Event listeners added to account items');
@@ -322,6 +345,93 @@ window.loadAccountsData = loadAccountsData;
 window.updateAccountsTable = updateAccountsTable;
 window.loadAccounts = loadAccounts;
 window.updateAccountsTableInDesigns = updateAccountsTableInDesigns;
+
+// פונקציה גלובלית לעדכון ידני של תפריט החשבונות
+window.refreshAccountFilterMenu = function() {
+  console.log('🔄 Manual refresh of account filter menu called');
+  if (window.accountsData && window.accountsData.length > 0) {
+    console.log('🔄 Using existing accounts data:', window.accountsData);
+    updateAccountFilterMenu(window.accountsData);
+  } else {
+    console.log('🔄 No accounts data, loading from server...');
+    loadAccountsFromServer();
+  }
+};
+
+// פונקציה לבדיקת מצב החשבונות
+window.checkAccountsStatus = function() {
+  console.log('🔄 === ACCOUNTS STATUS CHECK ===');
+  console.log('🔄 accountsData:', window.accountsData);
+  console.log('🔄 accountsLoaded:', window.accountsLoaded);
+  console.log('🔄 loadAccountsFromServer function:', typeof window.loadAccountsFromServer);
+  console.log('🔄 updateAccountFilterMenu function:', typeof window.updateAccountFilterMenu);
+  
+  const appHeader = document.querySelector('app-header');
+  if (appHeader) {
+    const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
+    if (accountMenu) {
+      const items = accountMenu.querySelectorAll('.account-filter-item');
+      console.log('🔄 Account menu items count:', items.length);
+      items.forEach((item, index) => {
+        const accountName = item.getAttribute('data-account');
+        console.log(`🔄 Item ${index + 1}: ${accountName}`);
+      });
+    } else {
+      console.log('🔄 Account menu not found in shadow DOM');
+    }
+  } else {
+    console.log('🔄 App header not found');
+  }
+  console.log('🔄 === END ACCOUNTS STATUS CHECK ===');
+};
+
+// פונקציה גלובלית לבדיקה מהירה
+window.debugAccountsFilter = function() {
+  console.log('🔄 === DEBUG ACCOUNTS FILTER ===');
+  
+  // בדיקת מצב החשבונות
+  window.checkAccountsStatus();
+  
+  // בדיקה מהירה של השרת
+  fetch('http://127.0.0.1:8080/api/v1/accounts/')
+    .then(response => {
+      console.log('🔄 Server response status:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('🔄 Server data:', data);
+      const accounts = data.data || data;
+      const openAccounts = accounts.filter(acc => acc.status === 'open');
+      console.log('🔄 Open accounts from server:', openAccounts);
+    })
+    .catch(error => {
+      console.log('🔄 Server error:', error);
+    });
+  
+  // ניסיון לטעון חשבונות
+  if (typeof window.loadAccountsFromServer === 'function') {
+    console.log('🔄 Attempting to load accounts...');
+    window.loadAccountsFromServer().then(() => {
+      console.log('🔄 Accounts loaded successfully');
+      window.checkAccountsStatus();
+    }).catch((error) => {
+      console.log('🔄 Error loading accounts:', error);
+    });
+  }
+  
+  // ניסיון לעדכן תפריט
+  setTimeout(() => {
+    if (typeof window.refreshAccountFilterMenu === 'function') {
+      console.log('🔄 Attempting to refresh menu...');
+      window.refreshAccountFilterMenu();
+      setTimeout(() => {
+        window.checkAccountsStatus();
+      }, 500);
+    }
+  }, 1000);
+  
+  console.log('🔄 === END DEBUG ACCOUNTS FILTER ===');
+};
 
 console.log('✅ קובץ accounts.js נטען בהצלחה - פונקציות זמינות גלובלית');
 

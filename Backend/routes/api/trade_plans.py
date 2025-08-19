@@ -13,10 +13,37 @@ def get_trade_plans():
     """קבלת כל תוכניות הטרייד"""
     try:
         db: Session = next(get_db())
+        logger.info("Fetching all trade plans from database")
         plans = TradePlanService.get_all(db)
+        logger.info(f"Retrieved {len(plans)} trade plans")
+        
+        # המרה למילונים
+        plans_data = []
+        for plan in plans:
+            try:
+                plan_dict = plan.to_dict()
+                plans_data.append(plan_dict)
+                logger.debug(f"Converted plan {plan.id} to dict: {plan_dict}")
+            except Exception as e:
+                logger.error(f"Error converting plan {plan.id} to dict: {str(e)}")
+                # ננסה המרה בסיסית
+                basic_dict = {
+                    'id': plan.id,
+                    'ticker_id': plan.ticker_id,
+                    'account_id': plan.account_id,
+                    'investment_type': plan.investment_type,
+                    'side': plan.side,
+                    'status': plan.status,
+                    'planned_amount': plan.planned_amount,
+                    'target_price': plan.target_price,
+                    'stop_price': plan.stop_price,
+                    'created_at': plan.created_at.strftime('%Y-%m-%d %H:%M:%S') if plan.created_at else None
+                }
+                plans_data.append(basic_dict)
+        
         return jsonify({
             "status": "success",
-            "data": [plan.to_dict() for plan in plans],
+            "data": plans_data,
             "message": "Trade plans retrieved successfully",
             "version": "v1"
         })

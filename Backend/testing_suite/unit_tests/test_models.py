@@ -127,7 +127,8 @@ class TestModels:
         trade = Trade(
             ticker_id=ticker.id,
             account_id=account.id,
-            type='buy',
+            type='swing',
+            side='Long',
             notes='Test trade'
         )
         
@@ -138,7 +139,8 @@ class TestModels:
         assert trade.id is not None
         assert trade.ticker_id == ticker.id
         assert trade.account_id == account.id
-        assert trade.type == 'buy'
+        assert trade.type == 'swing'
+        assert trade.side == 'Long'
         assert trade.status == 'open'  # default value
     
     def test_alert_creation(self, db_session):
@@ -175,3 +177,209 @@ class TestModels:
         assert alert.type == 'price_alert'
         assert alert.condition == 'price > 200.0'
         assert alert.status == 'open'  # default value
+
+    def test_trade_plan_creation(self, db_session):
+        """Test creating a trade plan"""
+        from models.trade_plan import TradePlan
+        from models.ticker import Ticker
+        from models.account import Account
+        
+        # Create required dependencies
+        ticker = Ticker(
+            symbol='TEST_PLAN_' + str(int(time.time())),
+            type='stock',
+            currency='USD',
+            remarks='Test ticker for trade plan'
+        )
+        
+        account = Account(
+            name='Test Account for Plan',
+            currency='USD',
+            notes='Test account for trade plan tests'
+        )
+        
+        db_session.add(ticker)
+        db_session.add(account)
+        db_session.commit()
+        
+        # Create a test trade plan
+        trade_plan = TradePlan(
+            ticker_id=ticker.id,
+            account_id=account.id,
+            investment_type='swing',
+            side='Long',
+            planned_amount=10000.0,
+            entry_conditions='Price above $100',
+            reasons='Strong technical indicators'
+        )
+        
+        db_session.add(trade_plan)
+        db_session.commit()
+        
+        # Verify the trade plan was created
+        assert trade_plan.id is not None
+        assert trade_plan.ticker_id == ticker.id
+        assert trade_plan.account_id == account.id
+        assert trade_plan.investment_type == 'swing'
+        assert trade_plan.side == 'Long'
+        assert trade_plan.planned_amount == 10000.0
+        assert trade_plan.status == 'open'  # default value
+
+    def test_trade_side_values(self, db_session):
+        """Test trade side field with different values"""
+        from models.trade import Trade
+        from models.ticker import Ticker
+        from models.account import Account
+        
+        # Create required dependencies
+        ticker = Ticker(
+            symbol='TEST_SIDE_' + str(int(time.time())),
+            type='stock',
+            currency='USD',
+            remarks='Test ticker for side tests'
+        )
+        
+        account = Account(
+            name='Test Account for Side',
+            currency='USD',
+            notes='Test account for side tests'
+        )
+        
+        db_session.add(ticker)
+        db_session.add(account)
+        db_session.commit()
+        
+        # Test Long side
+        long_trade = Trade(
+            ticker_id=ticker.id,
+            account_id=account.id,
+            type='swing',
+            side='Long',
+            notes='Long trade test'
+        )
+        
+        # Test Short side
+        short_trade = Trade(
+            ticker_id=ticker.id,
+            account_id=account.id,
+            type='investment',
+            side='Short',
+            notes='Short trade test'
+        )
+        
+        db_session.add(long_trade)
+        db_session.add(short_trade)
+        db_session.commit()
+        
+        # Verify both sides work
+        assert long_trade.side == 'Long'
+        assert short_trade.side == 'Short'
+        assert long_trade.type == 'swing'
+        assert short_trade.type == 'investment'
+
+    def test_trade_plan_side_values(self, db_session):
+        """Test trade plan side field with different values"""
+        from models.trade_plan import TradePlan
+        from models.ticker import Ticker
+        from models.account import Account
+        
+        # Create required dependencies
+        ticker = Ticker(
+            symbol='TEST_PLAN_SIDE_' + str(int(time.time())),
+            type='stock',
+            currency='USD',
+            remarks='Test ticker for plan side tests'
+        )
+        
+        account = Account(
+            name='Test Account for Plan Side',
+            currency='USD',
+            notes='Test account for plan side tests'
+        )
+        
+        db_session.add(ticker)
+        db_session.add(account)
+        db_session.commit()
+        
+        # Test Long side
+        long_plan = TradePlan(
+            ticker_id=ticker.id,
+            account_id=account.id,
+            investment_type='swing',
+            side='Long',
+            planned_amount=5000.0,
+            entry_conditions='Price above $50',
+            reasons='Bullish pattern'
+        )
+        
+        # Test Short side
+        short_plan = TradePlan(
+            ticker_id=ticker.id,
+            account_id=account.id,
+            investment_type='investment',
+            side='Short',
+            planned_amount=3000.0,
+            entry_conditions='Price below $30',
+            reasons='Bearish pattern'
+        )
+        
+        db_session.add(long_plan)
+        db_session.add(short_plan)
+        db_session.commit()
+        
+        # Verify both sides work
+        assert long_plan.side == 'Long'
+        assert short_plan.side == 'Short'
+        assert long_plan.investment_type == 'swing'
+        assert short_plan.investment_type == 'investment'
+
+    def test_side_default_values(self, db_session):
+        """Test that side field defaults to 'Long' when not specified"""
+        from models.trade import Trade
+        from models.trade_plan import TradePlan
+        from models.ticker import Ticker
+        from models.account import Account
+        
+        # Create required dependencies
+        ticker = Ticker(
+            symbol='TEST_DEFAULT_' + str(int(time.time())),
+            type='stock',
+            currency='USD',
+            remarks='Test ticker for default tests'
+        )
+        
+        account = Account(
+            name='Test Account for Default',
+            currency='USD',
+            notes='Test account for default tests'
+        )
+        
+        db_session.add(ticker)
+        db_session.add(account)
+        db_session.commit()
+        
+        # Test trade without specifying side
+        trade = Trade(
+            ticker_id=ticker.id,
+            account_id=account.id,
+            type='passive',
+            notes='Trade without side'
+        )
+        
+        # Test trade plan without specifying side
+        plan = TradePlan(
+            ticker_id=ticker.id,
+            account_id=account.id,
+            investment_type='passive',
+            planned_amount=2000.0,
+            entry_conditions='Price stable',
+            reasons='Conservative approach'
+        )
+        
+        db_session.add(trade)
+        db_session.add(plan)
+        db_session.commit()
+        
+        # Verify default values
+        assert trade.side == 'Long'  # default from model
+        assert plan.side == 'Long'   # default from model

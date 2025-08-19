@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from models.trade import Trade
 from typing import List, Optional, Dict, Any
 import logging
@@ -10,12 +10,31 @@ class TradeService:
     @staticmethod
     def get_all(db: Session) -> List[Trade]:
         """קבלת כל הטריידים"""
-        return db.query(Trade).all()
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info("Loading trades with joinedload for account and ticker")
+        
+        trades = db.query(Trade).options(
+            joinedload(Trade.account),
+            joinedload(Trade.ticker)
+        ).all()
+        
+        logger.info(f"Loaded {len(trades)} trades")
+        if trades:
+            first_trade = trades[0]
+            logger.info(f"First trade account: {hasattr(first_trade, 'account') and first_trade.account}")
+            logger.info(f"First trade ticker: {hasattr(first_trade, 'ticker') and first_trade.ticker}")
+        
+        return trades
     
     @staticmethod
     def get_by_id(db: Session, trade_id: int) -> Optional[Trade]:
         """קבלת טרייד לפי מזהה"""
-        return db.query(Trade).filter(Trade.id == trade_id).first()
+        return db.query(Trade).options(
+            joinedload(Trade.account),
+            joinedload(Trade.ticker)
+        ).filter(Trade.id == trade_id).first()
     
     @staticmethod
     def get_by_account(db: Session, account_id: int) -> List[Trade]:
@@ -70,7 +89,31 @@ class TradeService:
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> Trade:
         """יצירת טרייד חדש"""
+        
+        # אם יש trade_plan_id, נקצה את הסוג מהתוכנית כברירת מחדל
+        if 'trade_plan_id' in data and data['trade_plan_id']:
+            from models.trade_plan import TradePlan
+            trade_plan = db.query(TradePlan).filter(TradePlan.id == data['trade_plan_id']).first()
+            if trade_plan:
+                # הקצאת סוג מהתוכנית אם לא הוגדר
+                if 'type' not in data or not data['type']:
+                    data['type'] = trade_plan.investment_type
+                    logger.info(f"Assigned type '{trade_plan.investment_type}' from trade plan {trade_plan.id}")
+                
+                # הקצאת צד מהתוכנית אם לא הוגדר
+                if 'side' not in data or not data['side']:
+                    data['side'] = trade_plan.side
+                    logger.info(f"Assigned side '{trade_plan.side}' from trade plan {trade_plan.id}")
+        
         trade = Trade(**data)
+        
+        # בדיקת תקינות לפני שמירה
+        validation_errors = trade.validate_before_save(db)
+        if validation_errors:
+            error_message = "; ".join(validation_errors)
+            logger.error(f"Validation errors for trade: {error_message}")
+            raise ValueError(f"שגיאות תקינות בטרייד: {error_message}")
+        
         db.add(trade)
         db.commit()
         db.refresh(trade)
@@ -85,6 +128,14 @@ class TradeService:
             for key, value in data.items():
                 if hasattr(trade, key):
                     setattr(trade, key, value)
+            
+            # בדיקת תקינות לפני שמירה
+            validation_errors = trade.validate_before_save(db)
+            if validation_errors:
+                error_message = "; ".join(validation_errors)
+                logger.error(f"Validation errors for trade {trade_id}: {error_message}")
+                raise ValueError(f"שגיאות תקינות בטרייד: {error_message}")
+            
             db.commit()
             db.refresh(trade)
             logger.info(f"Updated trade: {trade.id}")

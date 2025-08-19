@@ -30,6 +30,8 @@ def get_alerts():
     finally:
         db.close()
 
+ 
+
 @alerts_bp.route('/<int:alert_id>', methods=['GET'])
 def get_alert(alert_id: int):
     """קבלת התראה לפי מזהה"""

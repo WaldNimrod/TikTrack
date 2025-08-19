@@ -85,6 +85,7 @@ documentation/
 ### 🔗 **קבצים חשובים במיוחד:**
 - **יציבות השרת**: `documentation/deployment/README_SERVER_STABILITY.md`
 - **שינויים בבסיס נתונים**: `documentation/database/DATABASE_CHANGES_AUGUST_2025.md`
+- **כללי קישור טריידים-תוכניות**: `TRADE_PLAN_LINKING_RULES.md`
 - **מערכת ההתראות**: `Backend/ALERT_SYSTEM_DOCUMENTATION.md`
 - **מערכת אישור כפול**: `documentation/frontend/DOUBLE_CONFIRMATION_SYSTEM.md`
 - **מערכת בדיקות**: `Backend/testing_suite/README.md`
@@ -111,6 +112,7 @@ documentation/
 - **מערכת שיוך גמישה**: שיוך התראות והערות לישויות שונות באמצעות `related_type_id` ו-`related_id`
 - **מערכת אישור כפול**: חלון אזהרה שני למחיקת חשבונות עם בדיקת אובייקטים מקושרים
 - **מערכת בדיקות מקיפה**: ארגון כל הבדיקות בתיקייה ייעודית עם מבנה מקצועי
+- **כללי קישור טריידים-תוכניות**: הגדרת כללים ברורים לקישור בין טריידים לתוכניות עם validation אוטומטי
 
 ### תיקוני באגים
 - **תיקון רשימת תוכניות**: פתרון בעיית טעינת תוכניות טרייד בטופסים

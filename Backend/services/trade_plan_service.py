@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from models.trade_plan import TradePlan
 from typing import List, Optional, Dict, Any
 import logging
@@ -10,12 +10,18 @@ class TradePlanService:
     @staticmethod
     def get_all(db: Session) -> List[TradePlan]:
         """קבלת כל תוכניות הטרייד"""
-        return db.query(TradePlan).all()
+        return db.query(TradePlan).options(
+            db.joinedload(TradePlan.ticker),
+            db.joinedload(TradePlan.account)
+        ).all()
     
     @staticmethod
     def get_by_id(db: Session, plan_id: int) -> Optional[TradePlan]:
         """קבלת תוכנית טרייד לפי מזהה"""
-        return db.query(TradePlan).filter(TradePlan.id == plan_id).first()
+        return db.query(TradePlan).options(
+            db.joinedload(TradePlan.ticker),
+            db.joinedload(TradePlan.account)
+        ).filter(TradePlan.id == plan_id).first()
     
     @staticmethod
     def get_by_account(db: Session, account_id: int) -> List[TradePlan]:

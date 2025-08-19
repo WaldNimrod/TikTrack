@@ -59,6 +59,8 @@
   <script src="scripts/grid-table.js"></script>
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/alerts.js"></script>
+  <script src="scripts/active-alerts-component.js"></script>
+  <script src="scripts/accounts.js"></script>
   <script src="scripts/trades.js"></script>
 </head>
 <body>
@@ -78,7 +80,7 @@
                       📋 מעקב טריידים
         </div>
         <div class="table-actions">
-                        <button class="refresh-btn" onclick="openTradeDetails()" title="הוסף טרייד חדש">
+                        <button class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
             <span class="action-icon">➕</span> הוסף
           </button>
           <div class="action-separator"></div>
@@ -90,20 +92,8 @@
       
                         <!-- כרטיסיות התראות -->
       <div class="section-body">
-        <div class="alerts-cards-container">
-          <div class="alerts-header">
-                          <h3>🔔 התראות</h3>
-            <div class="alerts-header-actions">
-              <div class="alerts-count" id="newAlertsCount">0 התראות</div>
-              <button class="refresh-btn" onclick="refreshAlerts()" title="רענן התראות">
-                <span class="action-icon">🔄</span>
-              </button>
-            </div>
-          </div>
-          <div class="alerts-cards" id="alertsCards">
-            <!-- כרטיסיות ההתראות יוכנסו כאן דינמית -->
-          </div>
-        </div>
+        <!-- ווב קומפוננט של התראות פעילות -->
+        <active-alerts></active-alerts>
         
         <!-- סיכום נתונים -->
         <div class="info-summary" id="summaryStats">
@@ -132,7 +122,7 @@
                 type="text" 
                 class="search-filter-input" 
                 placeholder="חיפוש טריידים..."
-                onkeyup="filterTable('tradesTable', this.value)"
+                onkeyup="filterTradesData([], [], [], null, this.value)"
               >
             </div>
             <button class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
@@ -158,6 +148,7 @@
                   <th>תוכנית<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plan ID</span></th>
                   <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
                   <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
+                  <th>צד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Side</span></th>
                   <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span></th>
                   <th>נסגר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Closed At</span></th>
                   <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P/L</span></th>
@@ -167,7 +158,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td colspan="10" class="loading">טוען טריידים...</td>
+                  <td colspan="11" class="loading">טוען טריידים...</td>
                 </tr>
               </tbody>
             </table>
@@ -255,15 +246,15 @@
     // ===== מערכת מיון - נבנה מחדש =====
     
     // משתנים גלובליים למיון
-    let designsCurrentSortColumn = null;
-    let designsCurrentSortDirection = 'asc';
+    let tradesCurrentSortColumn = null;
+    let tradesCurrentSortDirection = 'asc';
     
     // פונקציה למיון הטבלה - נבנה מחדש
     function sortTable(columnIndex) {
       console.log('🔄 === SORT TABLE FUNCTION CALLED ===');
       console.log('🔄 Column clicked:', columnIndex);
-      console.log('🔄 Current sort column:', designsCurrentSortColumn);
-      console.log('🔄 Current sort direction:', designsCurrentSortDirection);
+      console.log('🔄 Current sort column:', tradesCurrentSortColumn);
+      console.log('🔄 Current sort direction:', tradesCurrentSortDirection);
       
       // קבלת הנתונים הנוכחיים
         let trades = [...tradesData];
@@ -274,17 +265,17 @@
         console.log('🔄 After filtering:', trades.map(t => `${t.ticker_id}: ${t.total_pl}`));
       
       // עדכון המשתנים הגלובליים
-      if (designsCurrentSortColumn === columnIndex) {
-        designsCurrentSortDirection = designsCurrentSortDirection === 'asc' ? 'desc' : 'asc';
-        console.log('🔄 Same column clicked, direction changed to:', designsCurrentSortDirection);
+      if (tradesCurrentSortColumn === columnIndex) {
+        tradesCurrentSortDirection = tradesCurrentSortDirection === 'asc' ? 'desc' : 'asc';
+        console.log('🔄 Same column clicked, direction changed to:', tradesCurrentSortDirection);
       } else {
-        designsCurrentSortColumn = columnIndex;
-        designsCurrentSortDirection = 'asc';
+        tradesCurrentSortColumn = columnIndex;
+        tradesCurrentSortDirection = 'asc';
         console.log('🔄 New column clicked, set to column:', columnIndex, 'direction: asc');
       }
       
       // מיון הנתונים
-      designs.sort((a, b) => {
+      trades.sort((a, b) => {
         let aValue, bValue;
         
         switch (columnIndex) {
@@ -456,12 +447,12 @@
     // פונקציה לאיפוס מיון
     function resetSort() {
       console.log('🧪 === RESET SORT ===');
-      designsCurrentSortColumn = null;
-      designsCurrentSortDirection = 'asc';
+      tradesCurrentSortColumn = null;
+      tradesCurrentSortDirection = 'asc';
       
       // מחיקת מצב מיון מ-localStorage
-      localStorage.removeItem('designsSortColumn');
-      localStorage.removeItem('designsSortDirection');
+      localStorage.removeItem('tradesSortColumn');
+      localStorage.removeItem('tradesSortDirection');
       
       // איפוס אייקונים
       updateSortIcons(-1);
@@ -484,84 +475,14 @@
       const typeMap = {
         'swing': 'סווינג',
         'investment': 'השקעה',
-        'passive': 'פאסיבי'
+        'passive': 'פאסיבי',
+        'buy': 'קנייה' // ערך זמני שצריך לתקן בבסיס הנתונים
       };
       return typeMap[type] || type;
     }
     
-    // נתוני טריידים לדוגמה
-    let tradesData = [
-      {
-        id: '1',
-        account_id: 'ACC001',
-        account_name: 'חשבון ראשי',
-        ticker_id: 'AAPL',
-        ticker_symbol: 'AAPL',
-        trade_plan_id: 'TP001',
-        status: 'open',
-        type: 'investment',
-        opened_at: '2024-08-15T10:30:00Z',
-        closed_at: null,
-        total_pl: 1250.50,
-        notes: 'פוזיציה ארוכת טווח'
-      },
-      {
-        id: '2',
-        account_id: 'ACC002',
-        account_name: 'חשבון משני',
-        ticker_id: 'TSLA',
-        ticker_symbol: 'TSLA',
-        trade_plan_id: 'TP002',
-        status: 'closed',
-        type: 'swing',
-        opened_at: '2024-07-01T14:15:00Z',
-        closed_at: '2024-07-15T16:45:00Z',
-        total_pl: -850.25,
-        notes: 'פוזיציה קצרה - הפסד'
-      },
-      {
-        id: '3',
-        account_id: 'ACC001',
-        account_name: 'חשבון ראשי',
-        ticker_id: 'GOOGL',
-        ticker_symbol: 'GOOGL',
-        trade_plan_id: 'TP003',
-        status: 'open',
-        type: 'investment',
-        opened_at: '2024-09-10T09:00:00Z',
-        closed_at: null,
-        total_pl: 2100.75,
-        notes: 'השקעה ארוכת טווח'
-      },
-      {
-        id: '4',
-        account_id: 'ACC003',
-        account_name: 'חשבון נסיוני',
-        ticker_id: 'MSFT',
-        ticker_symbol: 'MSFT',
-        trade_plan_id: 'TP004',
-        status: 'canceled',
-        type: 'passive',
-        opened_at: '2024-06-20T11:20:00Z',
-        closed_at: null,
-        total_pl: 0,
-        notes: 'בוטל - תנאי שוק'
-      },
-      {
-        id: '5',
-        account_id: 'ACC002',
-        account_name: 'חשבון משני',
-        ticker_id: 'NVDA',
-        ticker_symbol: 'NVDA',
-        trade_plan_id: 'TP005',
-        status: 'open',
-        type: 'swing',
-        opened_at: '2024-10-05T13:45:00Z',
-        closed_at: null,
-        total_pl: 3200.00,
-        notes: 'פוזיציה טכנולוגית'
-      }
-    ];
+    // נתוני טריידים - יטענו מה-API
+    let tradesData = [];
 
     // פונקציה לטעינת נתוני טריידים עם פילטרים
     async function loadTradesData() {
@@ -569,13 +490,21 @@
         console.log('🔄 === LOAD TRADES DATA ===');
         
         // קריאה מה-API
-        const response = await fetch('/api/trades');
+        const response = await fetch('/api/v1/trades/');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const apiData = await response.json();
+        let apiData = await response.json();
+        
+        // בדיקה שהנתונים בפורמט הנכון
+        if (apiData && apiData.data && Array.isArray(apiData.data)) {
+          apiData = apiData.data;
+        }
         
         console.log('📡 נתונים מה-API:', apiData);
+        console.log('📡 סוג הנתונים:', typeof apiData);
+        console.log('📡 האם זה מערך:', Array.isArray(apiData));
+        console.log('📡 אורך הנתונים:', apiData ? apiData.length : 'null');
         
         // עדכון הנתונים המקומיים
         tradesData = apiData.map(trade => ({
@@ -583,7 +512,7 @@
           account_id: trade.account_id,
           account_name: trade.account_name,
           ticker_id: trade.ticker_id,
-          ticker_symbol: trade.ticker,
+          ticker_symbol: trade.ticker_symbol,
           trade_plan_id: trade.trade_plan_id,
           status: trade.status,
           type: trade.type,
@@ -594,6 +523,8 @@
         }));
         
         console.log('📊 נתונים מעודכנים:', tradesData);
+        console.log('📊 אורך tradesData:', tradesData.length);
+        console.log('📊 דוגמה לטרייד ראשון:', tradesData[0]);
         
         // קבלת פילטרים שמורים
         const selectedStatuses = window.selectedStatusesForFilter || [];
@@ -601,6 +532,19 @@
         const selectedAccounts = window.selectedAccountsForFilter || [];
         const selectedDateRange = window.selectedDateRangeForFilter || null;
         const searchTerm = window.searchTermForFilter || '';
+        
+        // ניקוי פילטר חיפוש שגוי
+        if (searchTerm === 'ס') {
+          window.searchTermForFilter = '';
+        }
+        
+        console.log('🔄 פילטרים שמורים:', {
+          selectedStatuses,
+          selectedTypes,
+          selectedAccounts,
+          selectedDateRange,
+          searchTerm
+        });
         
         console.log('🔄 Saved filters:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm });
         
@@ -622,12 +566,16 @@
       console.log('🔄 Date range:', selectedDateRange);
       console.log('🔄 Search term:', searchTerm);
       
+      console.log('🔄 Original tradesData length:', tradesData.length);
+      console.log('🔄 Original tradesData:', tradesData);
       let filteredTrades = [...tradesData];
       
       // פילטר לפי סטטוס
       if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
+        console.log('🔄 Filtering by status:', selectedStatuses);
         filteredTrades = filteredTrades.filter(trade => {
           const statusDisplay = trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח';
+          console.log(`🔄 Trade ${trade.id}: status=${trade.status}, display=${statusDisplay}, selected=${selectedStatuses}, match=${selectedStatuses.includes(statusDisplay)}`);
           return selectedStatuses.includes(statusDisplay);
         });
         console.log('🔄 After status filter:', filteredTrades.length, 'trades');
@@ -635,6 +583,7 @@
       
       // פילטר לפי סוג
       if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
+        console.log('🔄 Filtering by type:', selectedTypes);
         filteredTrades = filteredTrades.filter(trade => {
           // המרת סוגים מאנגלית לעברית
           let typeDisplay;
@@ -642,11 +591,14 @@
             case 'swing':
               typeDisplay = 'סווינג';
               break;
-            case 'invest':
+            case 'investment':
               typeDisplay = 'השקעה';
               break;
-            case 'pasive':
+            case 'passive':
               typeDisplay = 'פאסיבי';
+              break;
+            case 'buy':
+              typeDisplay = 'קנייה';
               break;
             default:
               typeDisplay = trade.type;
@@ -669,25 +621,32 @@
       }
       
       // פילטר לפי חיפוש
-      if (searchTerm && searchTerm.trim() !== '') {
+      if (searchTerm && searchTerm.trim() !== '' && searchTerm !== 'ס') {
         const searchLower = searchTerm.toLowerCase();
         filteredTrades = filteredTrades.filter(trade => {
           return (
             (trade.account_name && trade.account_name.toLowerCase().includes(searchLower)) ||
             (trade.ticker_symbol && trade.ticker_symbol.toLowerCase().includes(searchLower)) ||
             (trade.notes && trade.notes.toLowerCase().includes(searchLower)) ||
-            (trade.trade_plan_id && trade.trade_plan_id.toLowerCase().includes(searchLower))
+            (trade.trade_plan_id && trade.trade_plan_id.toString().includes(searchLower))
           );
         });
         console.log('🔄 After search filter:', filteredTrades.length, 'trades');
       }
       
       // עדכון הטבלה
+      console.log('🔄 === UPDATING TABLE ===');
+      console.log('🔄 Filtered trades count:', filteredTrades.length);
+      console.log('🔄 First filtered trade:', filteredTrades[0]);
       updateTradesTable(filteredTrades);
     }
 
     // פונקציה לעדכון הטבלה
     function updateTradesTable(trades) {
+      console.log('🔄 === UPDATE TRADES TABLE ===');
+      console.log('🔄 Trades to display:', trades.length);
+      console.log('🔄 First trade:', trades[0]);
+      
       const tbody = document.querySelector('.main-content table tbody');
       if (!tbody) {
         console.error('Table body not found');
@@ -707,7 +666,8 @@
           <td>${trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-'}</td>
           <td><span class="status-badge status-${trade.status || 'open'}">${statusDisplay}</span></td>
           <td>${typeDisplay}</td>
-          <td>${trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
+          <td>${trade.side || 'Long'}</td>
+          <td>${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
           <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : ''}</td>
           <td class="${trade.total_pl >= 0 ? 'text-success' : 'text-danger'}">${trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00'}</td>
           <td>${trade.notes || ''}</td>
@@ -770,7 +730,10 @@
       
       if (pageType === 'trades') {
         // עבור טריידים, נשתמש בפונקציה המותאמת
+        console.log('🔄 Calling filterTradesData for trades page');
         filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
+      } else {
+        console.log('🔄 Page type is not trades, skipping filterTradesData');
       }
     };
     
@@ -1115,108 +1078,7 @@
       }
       
       // טעינת כרטיסיות התראות
-      console.log('🔄 === TRYING TO LOAD ALERTS CARDS ===');
-      console.log('🔄 Checking if alerts.js loaded...');
-      console.log('🔄 typeof loadAlerts:', typeof loadAlerts);
-      console.log('🔄 typeof loadAlertsForCards:', typeof loadAlertsForCards);
-      
-      // בדיקה מפורטת של כל הפונקציות
-      console.log('🔄 === DETAILED FUNCTION CHECK ===');
-      console.log('🔄 window.loadAlertsForCards:', typeof window.loadAlertsForCards);
-      console.log('🔄 window.markAlertAsRead:', typeof window.markAlertAsRead);
-      console.log('🔄 window.refreshAlerts:', typeof window.refreshAlerts);
-      console.log('🔄 window.loadSampleAlertsForCards:', typeof window.loadSampleAlertsForCards);
-      
-      // בדיקה אם הקובץ alerts.js נטען
-      console.log('🔄 === ALERTS.JS LOADING CHECK ===');
-      const scripts = document.querySelectorAll('script[src*="alerts.js"]');
-      console.log('🔄 Found alerts.js scripts:', scripts.length);
-      scripts.forEach((script, index) => {
-        console.log(`🔄 Script ${index + 1}:`, script.src);
-      });
-      
-      // בדיקה של ה-container
-      console.log('🔄 === CONTAINER CHECK ===');
-      const alertsCardsContainer = document.getElementById('alertsCards');
-      const newAlertsCountElement = document.getElementById('newAlertsCount');
-      console.log('🔄 alertsCards container:', alertsCardsContainer);
-      console.log('🔄 newAlertsCount element:', newAlertsCountElement);
-      
-      if (alertsCardsContainer) {
-        console.log('🔄 Container HTML:', alertsCardsContainer.innerHTML);
-      }
-      
-      if (typeof loadAlertsForCards === 'function') {
-        console.log('🔄 loadAlertsForCards function found, calling it...');
-        loadAlertsForCards();
-        console.log('🔄 === ALERTS CARDS LOADED ===');
-      } else {
-        console.log('🔄 loadAlertsForCards function NOT found!');
-        console.log('🔄 Trying to load sample alerts directly...');
-        if (typeof loadSampleAlertsForCards === 'function') {
-          loadSampleAlertsForCards();
-        } else {
-          console.log('🔄 loadSampleAlertsForCards also not found!');
-          console.log('🔄 Loading sample alerts manually...');
-          
-          // טעינה ידנית של התראות דוגמה
-          const alertsCardsData = [
-            {
-              id: 1,
-              title: 'התראה על מחיר נכס',
-              message: 'מחיר AAPL הגיע ליעד המחיר שהוגדר',
-              ticker: 'AAPL',
-              current_price: 185.50,
-              target_price: 185.00,
-              created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-              is_triggered: 'new',
-              alert_type: 'price_target'
-            },
-            {
-              id: 2,
-              title: 'התראה על נפח מסחר',
-              message: 'נפח המסחר ב-TSLA עלה ב-50% מהממוצע היומי',
-              ticker: 'TSLA',
-              volume: 15000000,
-              avg_volume: 10000000,
-              created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-              is_triggered: 'new',
-              alert_type: 'volume_spike'
-            }
-          ];
-          
-          console.log('🔄 Manual alerts data created:', alertsCardsData);
-          
-          // הצגת הכרטיסיות ידנית
-          const cardsContainer = document.getElementById('alertsCards');
-          if (cardsContainer) {
-            console.log('🔄 Found alertsCards container, rendering manually...');
-            const cardsHTML = alertsCardsData.map(alert => `
-              <div class="alert-card" data-alert-id="${alert.id}">
-                <div class="alert-card-header">
-                  <h4 class="alert-card-title">🔔 ${alert.title}</h4>
-                  <span class="alert-card-time">לפני 30 דקות</span>
-                </div>
-                <div class="alert-card-content">
-                  <p class="alert-card-message">${alert.message}</p>
-                  <div class="alert-card-details">
-                    <span class="alert-detail-item">📈 ${alert.ticker}</span>
-                  </div>
-                </div>
-                <div class="alert-card-actions">
-                  <button class="btn-mark-read" onclick="alert('קראתי!')" data-alert-id="${alert.id}">
-                    ✓ קראתי
-                  </button>
-                </div>
-              </div>
-            `).join('');
-            cardsContainer.innerHTML = cardsHTML;
-            console.log('🔄 Manual cards rendered successfully!');
-          } else {
-            console.log('🔄 alertsCards container NOT found!');
-          }
-        }
-      }
+      console.log('🔄 === ActiveAlerts Web Component will load automatically ===');
       
       // הגדרת כותרות למיון מיד
       console.log('🔄 === SETUP SORTABLE HEADERS IMMEDIATE ===');
@@ -1230,12 +1092,12 @@
       
       // בדיקת פילטרים שמורים אחרי 1 שנייה
       setTimeout(() => {
-        window.debugSavedFilters('designs');
+        window.debugSavedFilters('trades');
         
         // בדיקת פילטרים שמורים (ללא הצגת הודעה)
-        const savedStatuses = localStorage.getItem('designsFilterStatuses');
-        const savedDateRange = localStorage.getItem('designsFilterDateRange');
-        const savedSearch = localStorage.getItem('designsFilterSearch');
+        const savedStatuses = localStorage.getItem('tradesFilterStatuses');
+        const savedDateRange = localStorage.getItem('tradesFilterDateRange');
+        const savedSearch = localStorage.getItem('tradesFilterSearch');
         
                 // הגדרת כותרות למיון אחרי טעינת הפילטרים
         console.log('🔄 === SETUP SORTABLE HEADERS AFTER FILTERS ===');
@@ -1292,17 +1154,26 @@
                   <div class="form-control-plaintext text-success" id="editTradeDailyChange">+2.5%</div>
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <div class="mb-2">
                   <label for="editTradeType" class="form-label">סוג</label>
                   <select class="form-select" id="editTradeType" required>
                     <option value="swing">סווינג</option>
-                    <option value="invest">השקעה</option>
-                    <option value="pasive">פאסיבי</option>
+                    <option value="investment">השקעה</option>
+                    <option value="passive">פאסיבי</option>
                   </select>
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
+                <div class="mb-2">
+                  <label for="editTradeSide" class="form-label">צד</label>
+                  <select class="form-select" id="editTradeSide" required>
+                    <option value="Long">Long</option>
+                    <option value="Short">Short</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
                 <div class="mb-2">
                   <label for="editTradeAccountId" class="form-label">חשבון</label>
                   <select class="form-select" id="editTradeAccountId" required>
@@ -1406,25 +1277,34 @@
               </div>
             </div>
             
-            <!-- שורה שנייה: שינוי יומי + סוג + חשבון -->
+            <!-- שורה שנייה: שינוי יומי + סוג + צד + חשבון -->
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <div class="mb-2">
                   <label class="form-label">שינוי יומי</label>
                   <div class="form-control-plaintext" id="addTradeDailyChange">-</div>
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <div class="mb-2">
                   <label for="addTradeType" class="form-label">סוג</label>
                   <select class="form-select" id="addTradeType" required>
                     <option value="swing">סווינג</option>
-                    <option value="invest">השקעה</option>
-                    <option value="pasive">פאסיבי</option>
+                    <option value="investment">השקעה</option>
+                    <option value="passive">פאסיבי</option>
                   </select>
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
+                <div class="mb-2">
+                  <label for="addTradeSide" class="form-label">צד</label>
+                  <select class="form-select" id="addTradeSide" required>
+                    <option value="Long">Long</option>
+                    <option value="Short">Short</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3">
                 <div class="mb-2">
                   <label for="addTradeAccountId" class="form-label">חשבון</label>
                   <select class="form-select" id="addTradeAccountId" required>
@@ -1480,5 +1360,61 @@
       </div>
     </div>
   </div>
+  
+  <script>
+    // פונקציה לבדיקת מצב החשבונות
+    function testAccountsFilter() {
+      console.log('🔄 === TESTING ACCOUNTS FILTER ===');
+      
+      // בדיקה מהירה של מצב החשבונות
+      if (typeof window.checkAccountsStatus === 'function') {
+        window.checkAccountsStatus();
+      } else {
+        console.log('🔄 checkAccountsStatus function not available');
+      }
+      
+      // ניסיון לטעון חשבונות
+      if (typeof window.loadAccountsFromServer === 'function') {
+        console.log('🔄 Loading accounts from server...');
+        window.loadAccountsFromServer();
+      } else {
+        console.log('🔄 loadAccountsFromServer function not available');
+      }
+      
+      // ניסיון לעדכן תפריט
+      setTimeout(() => {
+        if (typeof window.refreshAccountFilterMenu === 'function') {
+          console.log('🔄 Refreshing account filter menu...');
+          window.refreshAccountFilterMenu();
+        } else {
+          console.log('🔄 refreshAccountFilterMenu function not available');
+        }
+      }, 1000);
+      
+      console.log('🔄 === END TESTING ACCOUNTS FILTER ===');
+    }
+    
+    // הפעלת הבדיקה אחרי טעינת הדף
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(testAccountsFilter, 2000);
+    });
+    
+    // פונקציה גלובלית לבדיקה מהירה
+    window.testAccountsFilterQuick = function() {
+      console.log('🔄 === QUICK ACCOUNTS FILTER TEST ===');
+      
+      // בדיקה מהירה
+      if (typeof window.debugAccountsFilter === 'function') {
+        window.debugAccountsFilter();
+      } else {
+        console.log('🔄 debugAccountsFilter function not available');
+        testAccountsFilter();
+      }
+      
+      console.log('🔄 === END QUICK TEST ===');
+    };
+    
+
+  </script>
 </body>
 </html>

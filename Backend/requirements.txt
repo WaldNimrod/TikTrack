@@ -1,13 +1,27 @@
+# TikTrack Server Dependencies - תלויות השרת
+# ==============================================
+# ⚠️  חשוב: זהו קובץ תלויות השרת בלבד!
+# 
+# אין קשר למערכת הבדיקות!
+# 
+# 🎯 מטרה: תלויות Python הנדרשות להפעלת שרת TikTrack
+# 📍 מיקום: Backend/requirements.txt
+# 🔗 מערכת הבדיקות: Backend/testing_suite/requirements.txt
+# 
+# ==============================================
+
+# Core server dependencies
 Flask==2.3.3
 Flask-CORS==4.0.0
 Werkzeug==2.3.7
 SQLAlchemy==2.0.23
-# גרסאות יציבות לשרת יציב
+
+# Production server dependencies
 gunicorn==21.2.0
 waitress==2.1.2
 requests==2.31.0
 
-# Testing dependencies
+# Testing dependencies (for API endpoints)
 pytest==7.4.3
 pytest-cov==4.1.0
 pytest-html==4.1.1

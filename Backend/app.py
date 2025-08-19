@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 """
-TikTrack Production Server
-שרת TikTrack לייצור - יציב ובדוק
+TikTrack Production Server - קובץ ראשי של השרת
+================================================
+
+⚠️  חשוב: זהו קובץ השרת הראשי בלבד!
+
+אין קשר למערכת הבדיקות!
+
+🎯 מטרה: הפעלת שרת TikTrack עם כל ה-API endpoints
+📍 מיקום: Backend/app.py
+🔗 מערכת הבדיקות: Backend/testing_suite/
 
 ✅ יציב מאוד - מומלץ לייצור
 ✅ בדוק ומוכח
@@ -9,9 +17,11 @@ TikTrack Production Server
 ✅ קובץ אחד פשוט
 
 🔧 הפעלה:
-    python3 run_waitress.py    # מומלץ (Waitress)
-    python3 app.py            # Flask development
-    ./start_server.sh         # עם מנטור
+    python3 run_stable.py        # מומלץ (יציב)
+    python3 dev_server.py        # פיתוח עם auto-reload
+    python3 run_waitress_fixed.py # פרודקשן (Waitress)
+    python3 app.py               # Flask development
+    ./start_server.sh            # עם מנטור
 
 📊 נתיבים:
     /api/health              # בדיקת בריאות
@@ -23,12 +33,16 @@ TikTrack Production Server
     /api/cash_flows          # תזרימי מזומנים
     /api/notes               # הערות
     /api/executions          # ביצועים
+    /api/v1/tests/run        # הרצת בדיקות (מערכת הבדיקות)
 
 📝 לוגים:
     server_detailed.log
 
-📖 מדריך מפורט:
-    README_SERVER_SETUP.md
+📖 מדריכים:
+    Backend/SERVER_CONFIGURATIONS.md    # קונפיגורציות שרת
+    Backend/testing_suite/README.md     # מערכת הבדיקות
+
+================================================
 """
 
 from flask import Flask, jsonify, request, send_from_directory
@@ -37,6 +51,7 @@ import sqlite3
 import os
 from datetime import datetime
 from typing import Dict, Any, Optional, List
+import sys # Added for sys.exit
 
 # Import new architecture components
 from config.database import init_db
@@ -1497,11 +1512,31 @@ def get_user_role(user_role_id: int) -> Any:
 
 
 if __name__ == "__main__":
-    # הגדרות יציבות לשרת
-    app.run(
-        debug=False,  # כיבוי debug mode למניעת רילוד אוטומטי
-        host='127.0.0.1',  # הגדרת host ספציפי
-        port=8080,
-        threaded=True,  # תמיכה ב-multiple threads
-        use_reloader=False  # כיבוי reloader למניעת רילוד אוטומטי
-    )
+    # ⚠️ **חשוב: הקובץ הזה לא מיועד להפעלה ישירה!**
+    # 
+    # 🎯 **הקונפיגורציה היחידה בשימוש:**
+    # - **קובץ שרת:** `dev_server.py`
+    # - **סקריפט הפעלה:** `./start_dev.sh`
+    # - **תכונות:** Auto-reload, monitoring, health checks, restart אוטומטי
+    #
+    # 🚀 **הפעלה:**
+    # ```bash
+    # # הפעלה מהירה (מומלץ)
+    # ./start_dev.sh
+    #
+    # # או הפעלה ישירה
+    # python3 dev_server.py
+    # ```
+    #
+    # 📁 **ארכיון קונפיגורציות ישנות:**
+    # - **מיקום:** `backups/20250819_server_configurations/`
+    # - **תאריך:** 19 באוגוסט 2025
+    # - **סטטוס:** ארכיון - לא בשימוש
+    #
+    # ❌ **אין להפעיל את הקובץ הזה ישירות!**
+    # ✅ **השתמש ב-`dev_server.py` או `./start_dev.sh`**
+    
+    print("❌ הקובץ הזה לא מיועד להפעלה ישירה!")
+    print("🎯 השתמש ב-`dev_server.py` או `./start_dev.sh`")
+    print("📁 ארכיון קונפיגורציות ישנות: `backups/20250819_server_configurations/`")
+    sys.exit(1)

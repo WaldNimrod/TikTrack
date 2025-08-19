@@ -1709,14 +1709,14 @@ button.btn-primary-emphasized {
   margin: 0 0.3rem !important;
 }
 
-/* כפתור הצג/הסתר - עיצוב מודרני */
+/* כפתור הצג/הסתר - עיצוב אחיד לכל האתר */
 .filter-toggle-btn {
   background: #ffffff !important;
-  color: #ff6b35 !important;
-  border: 1px solid #ff6b35 !important;
-  padding: 0.25rem 0.4rem !important;
-  border-radius: 6px !important;
-  font-size: 0.6rem !important;
+  color: #ff9c05 !important;
+  border: 2px solid #ff9c05 !important;
+  padding: 6px 8px !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
   font-weight: 500 !important;
   font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
   cursor: pointer !important;
@@ -1725,17 +1725,17 @@ button.btn-primary-emphasized {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  min-width: 24px !important;
-  height: 24px !important;
+  min-width: 28px !important;
+  height: 28px !important;
   margin: 2px !important;
 }
 
 .filter-toggle-btn:hover {
-  background: #ffffff !important;
+  background: rgba(255, 156, 5, 0.1) !important;
   color: #e55a2b !important;
   border-color: #e55a2b !important;
-  transform: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 156, 5, 0.2) !important;
 }
 
 .filter-toggle-btn .filter-icon {
@@ -1788,25 +1788,124 @@ button.btn-primary-emphasized {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* ===== סגנונות לכפתורי רענן והוסף ===== */
+/* ===== סגנונות אחידים לכפתורי רענן והוסף ===== */
 
+/* כפתורי הוסף - סגנון אחיד לכל האתר */
+.refresh-btn[onclick*="showAdd"],
+.refresh-btn[onclick*="openNoteDetails"],
+.refresh-btn[onclick*="openDesignDetails"],
+.refresh-btn[onclick*="showAddTradePlanModal"],
+.refresh-btn[onclick*="showAddTradeModal"],
+.refresh-btn[onclick*="showAddAccountModal"],
+.refresh-btn[onclick*="showAddTickerModal"],
+.refresh-btn[onclick*="showAddExecutionModal"],
+.refresh-btn[onclick*="showAddCashFlowModal"],
+.refresh-btn[onclick*="showAddAlertModal"],
+.refresh-btn[onclick*="showAddNoteModal"],
+.refresh-btn[onclick*="showAddUserRoleModal"],
+.refresh-btn[onclick*="showAddUserModal"],
+button[onclick*="showAdd"],
+button[onclick*="openNoteDetails"],
+button[onclick*="openDesignDetails"] {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 6px 13px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  letter-spacing: -0.01em !important;
+}
+
+.refresh-btn[onclick*="showAdd"]:hover,
+.refresh-btn[onclick*="openNoteDetails"]:hover,
+.refresh-btn[onclick*="openDesignDetails"]:hover,
+.refresh-btn[onclick*="showAddTradePlanModal"]:hover,
+.refresh-btn[onclick*="showAddTradeModal"]:hover,
+.refresh-btn[onclick*="showAddAccountModal"]:hover,
+.refresh-btn[onclick*="showAddTickerModal"]:hover,
+.refresh-btn[onclick*="showAddExecutionModal"]:hover,
+.refresh-btn[onclick*="showAddCashFlowModal"]:hover,
+.refresh-btn[onclick*="showAddAlertModal"]:hover,
+.refresh-btn[onclick*="showAddNoteModal"]:hover,
+.refresh-btn[onclick*="showAddUserRoleModal"]:hover,
+.refresh-btn[onclick*="showAddUserModal"]:hover,
+button[onclick*="showAdd"]:hover,
+button[onclick*="openNoteDetails"]:hover,
+button[onclick*="openDesignDetails"]:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתורי רענן - סגנון אחיד לכל האתר */
+.refresh-btn[onclick*="refresh"],
+.refresh-btn[onclick*="resetAllFiltersAndReloadData"],
+.refresh-btn[onclick*="loadTrades"],
+.refresh-btn[onclick*="loadAccounts"],
+.refresh-btn[onclick*="resetTestPreferences"] {
+  background: #ffffff !important;
+  color: #ff9c05 !important;
+  border: 2px solid #ff9c05 !important;
+  border-radius: 8px !important;
+  padding: 6px 13px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+}
+
+.refresh-btn[onclick*="refresh"]:hover,
+.refresh-btn[onclick*="resetAllFiltersAndReloadData"]:hover,
+.refresh-btn[onclick*="loadTrades"]:hover,
+.refresh-btn[onclick*="loadAccounts"]:hover,
+.refresh-btn[onclick*="resetTestPreferences"]:hover {
+  background: rgba(255, 156, 5, 0.1) !important;
+  color: #e55a2b !important;
+  border-color: #e55a2b !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 156, 5, 0.2) !important;
+}
+
+/* כפתורי הוסף - סגנון אחיד לכל האתר */
 .btn-add {
   background: #ffffff !important;
   color: #29a6a8 !important;
-  border: 1px solid #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
   border-radius: 8px !important;
-  padding: 0.3rem 0.6rem !important;
-  font-size: 0.7rem !important;
+  padding: 6px 13px !important;
+  font-size: 11px !important;
   font-weight: 500 !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
   transition: all 0.2s ease !important;
   box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  letter-spacing: -0.01em !important;
 }
 
 .btn-add:hover {
-  background: #ffffff !important;
+  background: rgba(41, 166, 168, 0.1) !important;
   color: #1f8a8c !important;
   border-color: #1f8a8c !important;
-  transform: none !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
@@ -1870,6 +1969,59 @@ button.btn-primary-emphasized {
   align-items: center !important;
   justify-content: center !important;
   margin: 0 0.2rem !important;
+}
+
+/* הגדרות ספציפיות לכפתורים בטבלאות */
+.actions-cell .btn-sm.btn-secondary {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 0.2rem !important;
+}
+
+.actions-cell .btn-sm.btn-secondary:hover {
+  background: #ffffff !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.actions-cell .btn-sm.btn-danger {
+  background: #ffffff !important;
+  color: #dc3545 !important;
+  border: 1px solid #dc3545 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 0.2rem !important;
+}
+
+.actions-cell .btn-sm.btn-danger:hover {
+  background: #ffffff !important;
+  color: #c82333 !important;
+  border-color: #c82333 !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* ===== סגנונות לכרטיסיות התראות ===== */
@@ -2298,6 +2450,12 @@ button[title="שמור"] span,
   font-size: 0.9em !important;
 }
 
+.related-ticker::before {
+  content: '🎯' !important;
+  margin-left: 4px !important;
+  font-size: 0.9em !important;
+}
+
 /* אפקט hover לכל האובייקטים המקושרים */
 .related-account:hover,
 .related-trade:hover,
@@ -2410,6 +2568,58 @@ button[title="שמור"] span,
 }
 
 #accountModal .btn-close::before {
+  content: '✕' !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+}
+
+/* מודל הערות - כותרת עם רקע ירוק */
+#addNoteModal .modal-header,
+#editNoteModal .modal-header {
+  background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
+  color: white !important;
+  border-bottom: none !important;
+  padding: 1.5rem 2rem !important;
+}
+
+#addNoteModal .modal-title,
+#editNoteModal .modal-title {
+  font-size: 1.4rem !important;
+  font-weight: 600 !important;
+  color: white !important;
+  margin: 0 !important;
+}
+
+#addNoteModal .btn-close,
+#editNoteModal .btn-close {
+  background-color: white !important;
+  background-image: none !important;
+  color: #ff6b35 !important;
+  border: 2px solid #ff6b35 !important;
+  border-radius: 6px !important;
+  padding: 0.25rem !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+}
+
+#addNoteModal .btn-close:hover,
+#editNoteModal .btn-close:hover {
+  background-color: #fff8f5 !important;
+  color: #e55a2b !important;
+  border-color: #e55a2b !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
+}
+
+#addNoteModal .btn-close::before,
+#editNoteModal .btn-close::before {
   content: '✕' !important;
   font-size: 0.9rem !important;
   font-weight: 500 !important;

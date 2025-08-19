@@ -1,4 +1,14 @@
 # Testing Dependencies for TikTrack
+# ======================================
+# ⚠️  חשוב: זהו קובץ תלויות מערכת הבדיקות בלבד!
+# 
+# אין קשר לקונפיגורציות השרת או סביבת הפיתוח!
+# 
+# 🎯 מטרה: תלויות Python הנדרשות להרצת בדיקות TikTrack
+# 📍 מיקום: Backend/testing_suite/requirements.txt
+# 🔗 קונפיגורציות שרת: Backend/requirements.txt
+# 
+# ======================================
 
 # Core testing framework
 pytest>=7.0.0

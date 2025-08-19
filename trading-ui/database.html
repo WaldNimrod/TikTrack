@@ -2112,7 +2112,7 @@
             <td>${trade.notes || '-'}</td>
             <td>
               <button class="btn btn-sm btn-secondary" onclick="editRecord('trades', ${trade.id})" title="ערוך">✏️</button>
-              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('trades', ${trade.id})" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('trades', ${trade.id})" title="ביטול">X</button>
               <button class="btn btn-sm btn-danger" onclick="deleteRecord('trades', ${trade.id})" title="מחק">🗑️</button>
             </td>
           </tr>
@@ -2160,7 +2160,7 @@
             <td>${plan.cancel_reason || '-'}</td>
             <td>
               <button class="btn btn-sm btn-secondary" onclick="editRecord('trade_plans', ${plan.id})" title="ערוך">✏️</button>
-              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('trade_plans', ${plan.id})" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('trade_plans', ${plan.id})" title="ביטול">X</button>
               <button class="btn btn-sm btn-danger" onclick="deleteRecord('trade_plans', ${plan.id})" title="מחק">🗑️</button>
             </td>
           </tr>
@@ -2210,7 +2210,7 @@
             <td>${window.formatDateTime(alert.created_at)}</td>
             <td>
               <button class="btn btn-sm btn-secondary" onclick="editRecord('alerts', ${alert.id})" title="ערוך">✏️</button>
-              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('alerts', ${alert.id})" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('alerts', ${alert.id})" title="ביטול">X</button>
               <button class="btn btn-sm btn-danger" onclick="deleteRecord('alerts', ${alert.id})" title="מחק">🗑️</button>
             </td>
           </tr>
@@ -2239,7 +2239,7 @@
           <td>${window.formatDateTime(alert.triggered_at)}</td>
           <td>
             <button class="btn btn-sm btn-secondary" onclick="showEditAlertModal(${JSON.stringify(alert).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
-                          <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id}, '${alert.type}')" title="ביטול">❌</button>
+                          <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id}, '${alert.type}')" title="ביטול">X</button>
             <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id}, '${alert.type}')" title="מחק">🗑️</button>
             <button class="btn btn-sm btn-info" onclick="markAlertAsTriggered(${alert.id})" title="סמן כמופעלת">🔔</button>
             <button class="btn btn-sm btn-success" onclick="markAlertAsRead(${alert.id})" title="סמן כנקראה">📖</button>
@@ -2393,7 +2393,7 @@
             <td>${window.formatDateTime(execution.created_at)}</td>
             <td>
               <button class="btn btn-sm btn-secondary" onclick="editRecord('executions', ${execution.id})" title="ערוך">✏️</button>
-              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('executions', ${execution.id})" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelRecord('executions', ${execution.id})" title="ביטול">X</button>
               <button class="btn btn-sm btn-danger" onclick="deleteRecord('executions', ${execution.id})" title="מחק">🗑️</button>
             </td>
           </tr>
@@ -2435,7 +2435,7 @@
             <td>${execution.source || '-'}</td>
             <td>
             <button class="btn btn-sm btn-secondary" onclick="showEditExecutionModal(${JSON.stringify(execution).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
-            <button class="btn btn-sm btn-secondary" onclick="cancelExecution(${execution.id}, '${execution.action}')" title="ביטול">❌</button>
+            <button class="btn btn-sm btn-secondary" onclick="cancelExecution(${execution.id}, '${execution.action}')" title="ביטול">X</button>
             <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id}, '${execution.action}')" title="מחק">🗑️</button>
             </td>
           </tr>
@@ -2558,6 +2558,13 @@
         } else {
           loadTableStates(); // fallback לפונקציה המקומית
         }
+
+        // אתחול פילטרים שמורים
+        if (typeof window.initializePageFilters === 'function') {
+          window.initializePageFilters('database');
+          console.log('🔄 === FILTERS INITIALIZED ===');
+        }
+
         refreshAllTables(); // טוען נתונים ישירות
       });
 

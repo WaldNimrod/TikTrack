@@ -26,24 +26,24 @@ let tradesData = [];
 async function loadTradesData() {
   try {
     console.log('🔄 === LOAD TRADES DATA ===');
-    
+
     // קריאה מה-API
     const response = await fetch('/api/v1/trades/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     let apiData = await response.json();
-    
+
     // בדיקה שהנתונים בפורמט הנכון
     if (apiData && apiData.data && Array.isArray(apiData.data)) {
       apiData = apiData.data;
     }
-    
+
     console.log('📡 נתונים מה-API:', apiData);
     console.log('📡 סוג הנתונים:', typeof apiData);
     console.log('📡 האם זה מערך:', Array.isArray(apiData));
     console.log('📡 אורך הנתונים:', apiData ? apiData.length : 'null');
-    
+
     // עדכון הנתונים המקומיים
     tradesData = apiData.map(trade => ({
       id: trade.id,
@@ -59,23 +59,23 @@ async function loadTradesData() {
       total_pl: trade.total_pl,
       notes: trade.notes
     }));
-    
+
     console.log('📊 נתונים מעודכנים:', tradesData);
     console.log('📊 אורך tradesData:', tradesData.length);
     console.log('📊 דוגמה לטרייד ראשון:', tradesData[0]);
-    
+
     // קבלת פילטרים שמורים
     const selectedStatuses = window.selectedStatusesForFilter || [];
     const selectedTypes = window.selectedTypesForFilter || [];
     const selectedAccounts = window.selectedAccountsForFilter || [];
     const selectedDateRange = window.selectedDateRangeForFilter || null;
     const searchTerm = window.searchTermForFilter || '';
-    
+
     // ניקוי פילטר חיפוש שגוי
     if (searchTerm === 'ס') {
       window.searchTermForFilter = '';
     }
-    
+
     console.log('🔄 פילטרים שמורים:', {
       selectedStatuses,
       selectedTypes,
@@ -83,23 +83,23 @@ async function loadTradesData() {
       selectedDateRange,
       searchTerm
     });
-    
+
     console.log('🔄 Saved filters:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm });
-    
+
     // שימוש בפונקציה הגלובלית לפילטור
     if (typeof window.filterDataByFilters === 'function') {
       tradesData = window.filterDataByFilters(tradesData, 'tracking');
     } else {
       console.error('filterDataByFilters function not found');
     }
-        
+
     // עדכון הטבלה
     if (typeof window.updateTradesTable === 'function') {
       window.updateTradesTable(tradesData);
     } else {
       console.error('updateTradesTable function not found');
     }
-    
+
   } catch (error) {
     console.error('Error loading trades data:', error);
     document.querySelector('#tradesTable tbody').innerHTML = '<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
@@ -116,11 +116,11 @@ function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, sel
   console.log('🔄 Selected accounts:', selectedAccounts);
   console.log('🔄 Date range:', selectedDateRange);
   console.log('🔄 Search term:', searchTerm);
-  
+
   console.log('🔄 Original tradesData length:', tradesData.length);
   console.log('🔄 Original tradesData:', tradesData);
   let filteredTrades = [...tradesData];
-  
+
   // פילטר לפי סטטוס
   if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
     console.log('🔄 Filtering by status:', selectedStatuses);
@@ -131,14 +131,14 @@ function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, sel
     });
     console.log('🔄 After status filter:', filteredTrades.length, 'trades');
   }
-  
+
   // פילטר לפי סוג
   if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
     console.log('🔄 Filtering by type:', selectedTypes);
     filteredTrades = filteredTrades.filter(trade => {
       // המרת סוגים מאנגלית לעברית
       let typeDisplay;
-      switch(trade.type) {
+      switch (trade.type) {
         case 'swing':
           typeDisplay = 'סווינג';
           break;
@@ -154,7 +154,7 @@ function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, sel
         default:
           typeDisplay = trade.type;
       }
-      
+
       // בדיקה אם הסוג הנבחר מתאים
       const isMatch = selectedTypes.includes(typeDisplay);
       console.log(`🔄 Trade ${trade.id}: type=${trade.type}, display=${typeDisplay}, selected=${selectedTypes}, match=${isMatch}`);
@@ -162,7 +162,7 @@ function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, sel
     });
     console.log('🔄 After type filter:', filteredTrades.length, 'trades');
   }
-  
+
   // פילטר לפי חשבון
   if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('all')) {
     filteredTrades = filteredTrades.filter(trade => {
@@ -170,7 +170,7 @@ function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, sel
     });
     console.log('🔄 After account filter:', filteredTrades.length, 'trades');
   }
-  
+
   // פילטר לפי חיפוש
   if (searchTerm && searchTerm.trim() !== '' && searchTerm !== 'ס') {
     const searchLower = searchTerm.toLowerCase();
@@ -184,7 +184,7 @@ function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, sel
     });
     console.log('🔄 After search filter:', filteredTrades.length, 'trades');
   }
-  
+
   // עדכון הטבלה
   console.log('🔄 === UPDATING TABLE ===');
   console.log('🔄 Filtered trades count:', filteredTrades.length);
@@ -199,19 +199,19 @@ function updateTradesTable(trades) {
   console.log('🔄 === UPDATE TRADES TABLE ===');
   console.log('🔄 Trades to display:', trades.length);
   console.log('🔄 First trade:', trades[0]);
-  
+
   const tbody = document.querySelector('.main-content table tbody');
   if (!tbody) {
     console.error('Table body not found');
     return;
   }
-  
+
   const tableHTML = trades.map(trade => {
     const statusDisplay = trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח';
-    
+
     // המרת סוגים מאנגלית לעברית
     const typeDisplay = getTypeDisplay(trade.type);
-    
+
     return `
     <tr>
       <td><strong>${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</strong></td>
@@ -226,21 +226,21 @@ function updateTradesTable(trades) {
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editTradeRecord('${trade.id}')" title="ערוך">✏️</button>
-        <button class="btn btn-sm btn-secondary" onclick="cancelTradeRecord('${trade.id}')" title="ביטול">❌</button>
+        <button class="btn btn-sm btn-secondary" onclick="cancelTradeRecord('${trade.id}')" title="ביטול">X</button>
         <button class="btn btn-sm btn-danger" onclick="deleteTradeRecord('${trade.id}')" title="מחק">🗑️</button>
       </td>
     </tr>
   `;
   }).join('');
-  
+
   tbody.innerHTML = tableHTML;
-  
+
   // עדכון ספירת רשומות
   const countElement = document.querySelector('.main-content .table-count');
   if (countElement) {
     countElement.textContent = `${trades.length} טריידים`;
   }
-  
+
   // עדכון סטטיסטיקות הטבלה
   window.updateTableStats('tracking');
 }
@@ -286,10 +286,10 @@ function deleteTradeRecord(tradeId) {
 }
 
 // הגדרת הפונקציה updateGridFromComponent לדף המעקב
-window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
   console.log('🔄 === UPDATE GRID FROM COMPONENT (tracking) ===');
   console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
-  
+
   // קריאה לפונקציה הגלובלית
   window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'tracking');
 };

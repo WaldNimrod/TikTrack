@@ -1,4 +1,14 @@
 # TikTrack Testing Suite Makefile
+# ======================================
+# ⚠️  חשוב: זהו Makefile למערכת הבדיקות בלבד!
+# 
+# אין קשר לקונפיגורציות השרת או סביבת הפיתוח!
+# 
+# 🎯 מטרה: הרצת בדיקות אוטומטיות של TikTrack
+# 📍 מיקום: Backend/testing_suite/
+# 🔗 קונפיגורציות שרת: Backend/SERVER_CONFIGURATIONS.md
+# 
+# ======================================
 
 .PHONY: help test test-unit test-integration test-e2e test-all coverage clean
 

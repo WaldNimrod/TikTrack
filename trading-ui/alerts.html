@@ -9,1589 +9,419 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <!-- Apple Theme CSS - בסיס כללי -->
-  <link rel="stylesheet" href="styles/apple-theme.css" />
+  <link rel="stylesheet" href="styles/apple-theme.css">
+
   <!-- Main Styles - סגנונות הפרויקט -->
-  <link rel="stylesheet" href="styles/styles.css?v=10" />
+  <link rel="stylesheet" href="styles/styles.css">
+
   <!-- Menu CSS - תפריט -->
-  <link rel="stylesheet" href="styles/menu.css?v=6" />
+  <link rel="stylesheet" href="styles/menu.css">
+
+  <!-- Grid Table CSS - טבלאות וגרידים -->
+  <link rel="stylesheet" href="styles/grid-table.css">
+
+  <!-- Typography CSS - טיפוגרפיה ופונטים -->
+  <link rel="stylesheet" href="styles/typography.css">
   <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #f5f5f7;
-    }
 
-    /* התאמת המרווחים לכותרת החדשה */
-    .background-wrapper {
-      padding-top: 120px !important;
-      /* מרווח לכותרת + פילטר + מרווח קטן */
-      padding-right: 32px;
-      transition: padding-top 0.3s ease;
-      position: relative;
-      z-index: 1;
-    }
-
-    .background-wrapper.filter-collapsed {
-      padding-top: 30px !important;
-      /* מרווח לכותרת בלבד + מרווח קטן */
-    }
-
-    /* עיצוב קומפוננטת התראות פעילות */
-    .active-alerts-section {
-      margin-bottom: 2rem;
-    }
-
-    .active-alerts-section .alerts-cards-container {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      border: 1px solid #dee2e6;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .active-alerts-section .alerts-header h3 {
-      color: #495057;
-      font-weight: 700;
-    }
-
-    .active-alerts-section .alerts-count {
-      background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%);
-      font-weight: 600;
-    }
-
-    .active-alerts-section .refresh-btn {
-      background: #fff;
-      border: 1px solid #dee2e6;
-      border-radius: 8px;
-      padding: 8px 12px;
-      transition: all 0.2s ease;
-    }
-
-    .active-alerts-section .refresh-btn:hover {
-      background: #f8f9fa;
-      border-color: #29a6a8;
-      transform: translateY(-1px);
-    }
-
-    .container {
-      padding-top: 1rem;
-    }
-
-
-
-    .main-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-      background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-      border: 1px solid #e8e8e8;
-    }
-
-    .page-header {
-      background: var(--apple-bg-elevated);
-      border-radius: var(--apple-radius-large);
-      padding: var(--apple-spacing-xl);
-      margin-bottom: var(--apple-spacing-xl);
-      box-shadow: var(--apple-shadow-light);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid var(--apple-border-light);
-    }
-
-    .page-title {
-      font-size: 28px;
-      font-weight: 600;
-      color: var(--apple-text-primary);
-      margin: 0;
-      letter-spacing: -0.01em;
-    }
-
-    .page-subtitle {
-      font-size: 16px;
-      color: var(--apple-text-secondary);
-      margin-top: var(--apple-spacing-sm);
-      font-weight: 400;
-    }
-
-    .button-primary {
-      background-color: var(--apple-blue);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: var(--apple-radius-medium);
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      letter-spacing: -0.01em;
-    }
-
-    .button-primary:hover {
-      background-color: var(--apple-blue-dark);
-      transform: translateY(-1px);
-      box-shadow: var(--apple-shadow-medium);
-    }
-
-    .filters-section {
-      background: var(--apple-bg-elevated);
-      border-radius: var(--apple-radius-large);
-      padding: var(--apple-spacing-xl);
-      box-shadow: var(--apple-shadow-light);
-      margin-bottom: var(--apple-spacing-xl);
-      border: 1px solid var(--apple-border-light);
-    }
-
-    .filters-row {
-      display: flex;
-      gap: var(--apple-spacing-lg);
-      align-items: flex-end;
-      flex-wrap: wrap;
-    }
-
-    .filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: var(--apple-spacing-sm);
-      min-width: 150px;
-    }
-
-    .filter-label {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--apple-text-secondary);
-      letter-spacing: -0.01em;
-    }
-
-    .form-control,
-    .form-select {
-      background: var(--apple-bg-primary);
-      border: 1px solid var(--apple-border);
-      color: var(--apple-text-primary);
-      border-radius: var(--apple-radius-medium);
-      padding: 12px 16px;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      font-family: inherit;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-      background: var(--apple-bg-primary);
-      border-color: var(--apple-blue);
-      color: var(--apple-text-primary);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-      outline: none;
-    }
-
-    .btn-outline-secondary {
-      border: 1px solid var(--apple-border);
-      color: var(--apple-text-secondary);
-      background: var(--apple-bg-primary);
-      padding: 12px 20px;
-      border-radius: var(--apple-radius-medium);
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .btn-outline-secondary:hover {
-      background: var(--apple-gray-1);
-      border-color: var(--apple-gray-3);
-      color: var(--apple-text-primary);
-    }
-
-    .grid-container {
-      background: var(--apple-bg-elevated);
-      border-radius: var(--apple-radius-large);
-      padding: var(--apple-spacing-xl);
-      box-shadow: var(--apple-shadow-light);
-      border: 1px solid var(--apple-border-light);
-    }
-
-    .grid-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--apple-text-primary);
-      margin-bottom: var(--apple-spacing-lg);
-      letter-spacing: -0.01em;
-    }
-
-    .ag-theme-quartz {
-      --ag-font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --ag-font-size: 14px;
-      --ag-grid-size: 8px;
-      --ag-list-item-height: 48px;
-      --ag-header-height: 56px;
-      --ag-header-foreground-color: var(--apple-text-secondary);
-      --ag-header-background-color: var(--apple-bg-primary);
-      --ag-odd-row-background-color: var(--apple-bg-primary);
-      --ag-row-border-color: var(--apple-border-light);
-      --ag-row-hover-color: var(--apple-gray-1);
-      --ag-selected-row-background-color: rgba(0, 122, 255, 0.08);
-      --ag-cell-horizontal-border: solid var(--apple-border-light);
-      --ag-borders: solid 1px var(--apple-border-light);
-      --ag-border-color: var(--apple-border-light);
-      --ag-cell-horizontal-padding: 16px;
-      --ag-cell-vertical-padding: 12px;
-      --ag-header-column-separator-color: var(--apple-border-light);
-      --ag-row-border-style: solid;
-      --ag-row-border-width: 1px;
-      --ag-row-border-color: var(--apple-border-light);
-      --ag-range-selection-border-color: var(--apple-blue);
-      --ag-range-selection-border-style: solid;
-      --ag-range-selection-border-width: 2px;
-      --ag-range-selection-background-color: rgba(0, 122, 255, 0.1);
-      --ag-range-selection-highlight-color: rgba(0, 122, 255, 0.1);
-      --ag-input-border-color: var(--apple-border);
-      --ag-input-focus-border-color: var(--apple-blue);
-      --ag-input-focus-box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-      --ag-checkbox-background-color: var(--apple-bg-primary);
-      --ag-checkbox-border-color: var(--apple-border);
-      --ag-checkbox-checked-color: var(--apple-blue);
-      --ag-checkbox-unchecked-color: var(--apple-bg-primary);
-      --ag-checkbox-indeterminate-color: var(--apple-blue);
-      --ag-checkbox-checked-background-color: var(--apple-blue);
-      --ag-checkbox-unchecked-background-color: var(--apple-bg-primary);
-      --ag-checkbox-indeterminate-background-color: var(--apple-blue);
-      --ag-checkbox-focus-border-color: var(--apple-blue);
-      --ag-checkbox-focus-box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-      --ag-checkbox-focus-background-color: var(--apple-bg-primary);
-      --ag-checkbox-focus-checked-background-color: var(--apple-blue);
-      --ag-checkbox-focus-indeterminate-background-color: var(--apple-blue);
-      --ag-checkbox-focus-unchecked-background-color: var(--apple-bg-primary);
-      --ag-checkbox-focus-checked-color: white;
-      --ag-checkbox-focus-indeterminate-color: white;
-      --ag-checkbox-focus-unchecked-color: var(--apple-text-primary);
-      --ag-checkbox-focus-checked-border-color: var(--apple-blue);
-      --ag-checkbox-focus-indeterminate-border-color: var(--apple-blue);
-      --ag-checkbox-focus-unchecked-border-color: var(--apple-blue);
-      --ag-checkbox-focus-checked-box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-      --ag-checkbox-focus-indeterminate-box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-      --ag-checkbox-focus-unchecked-box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-    }
-
-    .status-badge {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: -0.01em;
-      display: inline-block;
-      text-align: center;
-      min-width: 60px;
-    }
-
-    .status-active {
-      background: rgba(52, 199, 89, 0.1);
-      color: var(--apple-green);
-      border: 1px solid rgba(52, 199, 89, 0.2);
-    }
-
-    .status-inactive {
-      background: rgba(255, 59, 48, 0.1);
-      color: var(--apple-red);
-      border: 1px solid rgba(255, 59, 48, 0.2);
-    }
-
-    .status-pending {
-      background: rgba(255, 149, 0, 0.1);
-      color: var(--apple-orange);
-      border: 1px solid rgba(255, 149, 0, 0.2);
-    }
-
-    .type-badge {
-      padding: 6px 12px;
-      border-radius: 16px;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: -0.01em;
-      display: inline-block;
-      text-align: center;
-      min-width: 80px;
-    }
-
-    .type-planning {
-      background: rgba(175, 82, 222, 0.1);
-      color: var(--apple-purple);
-      border: 1px solid rgba(175, 82, 222, 0.2);
-    }
-
-    .type-trade-open {
-      background: rgba(52, 199, 89, 0.1);
-      color: var(--apple-green);
-      border: 1px solid rgba(52, 199, 89, 0.2);
-    }
-
-    .type-trade-closed {
-      background: rgba(255, 59, 48, 0.1);
-      color: var(--apple-red);
-      border: 1px solid rgba(255, 59, 48, 0.2);
-    }
-
-    .type-ticker {
-      background: rgba(0, 122, 255, 0.1);
-      color: var(--apple-blue);
-      border: 1px solid rgba(0, 122, 255, 0.2);
-    }
-
-    .type-other {
-      background: rgba(142, 142, 147, 0.1);
-      color: var(--apple-gray-6);
-      border: 1px solid rgba(142, 142, 147, 0.2);
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: var(--apple-spacing-sm);
-      justify-content: center;
-    }
-
-    .btn-sm {
-      padding: 8px 12px;
-      font-size: 12px;
-      border-radius: var(--apple-radius-medium);
-      border: 1px solid var(--apple-border);
-      background: var(--apple-bg-primary);
-      color: var(--apple-text-secondary);
-      transition: all 0.2s ease;
-      font-weight: 500;
-    }
-
-    .btn-sm:hover {
-      background: var(--apple-gray-1);
-      border-color: var(--apple-gray-3);
-      color: var(--apple-text-primary);
-      transform: translateY(-1px);
-    }
-
-    .btn-outline-primary {
-      border-color: var(--apple-blue);
-      color: var(--apple-blue);
-    }
-
-    .btn-outline-primary:hover {
-      background: var(--apple-blue);
-      color: white;
-    }
-
-    .btn-outline-success {
-      border-color: var(--apple-green);
-      color: var(--apple-green);
-    }
-
-    .btn-outline-success:hover {
-      background: var(--apple-green);
-      color: white;
-    }
-
-    .btn-outline-danger {
-      border-color: var(--apple-red);
-      color: var(--apple-red);
-    }
-
-    .btn-outline-danger:hover {
-      background: var(--apple-red);
-      color: white;
-    }
-
-    .modal-content {
-      background: var(--apple-bg-elevated);
-      color: var(--apple-text-primary);
-      border: 1px solid var(--apple-border-light);
-      border-radius: var(--apple-radius-large);
-      box-shadow: var(--apple-shadow-heavy);
-    }
-
-    .modal-header {
-      border-bottom: 1px solid var(--apple-border-light);
-      padding: var(--apple-spacing-xl);
-    }
-
-    .modal-body {
-      padding: var(--apple-spacing-xl);
-    }
-
-    .modal-footer {
-      border-top: 1px solid var(--apple-border-light);
-      padding: var(--apple-spacing-xl);
-    }
-
-    .modal-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--apple-text-primary);
-      letter-spacing: -0.01em;
-    }
-
-    .form-label {
-      color: var(--apple-text-primary);
-      font-weight: 500;
-      font-size: 14px;
-      margin-bottom: var(--apple-spacing-sm);
-      letter-spacing: -0.01em;
-    }
-
-    .btn-close {
-      background: none;
-      border: none;
-      font-size: 18px;
-      color: var(--apple-text-secondary);
-      cursor: pointer;
-      padding: 0;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      transition: all 0.2s ease;
-    }
-
-    .btn-close:hover {
-      background: var(--apple-gray-1);
-      color: var(--apple-text-primary);
-    }
-
-    .btn {
-      padding: 12px 24px;
-      border-radius: var(--apple-radius-medium);
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      letter-spacing: -0.01em;
-      border: 1px solid transparent;
-    }
-
-    .btn-primary {
-      background: #29a6a8 !important;
-      border-color: #29a6a8 !important;
-      color: white !important;
-      padding: 8px 16px !important;
-      border-radius: 8px !important;
-      font-size: 14px !important;
-      font-weight: 500 !important;
-      transition: all 0.2s ease !important;
-      box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3) !important;
-    }
-
-    .btn-primary:hover {
-      background: #1f8a8c !important;
-      border-color: #1f8a8c !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 4px 12px rgba(41, 166, 168, 0.4) !important;
-    }
-
-    .btn-secondary {
-      background: var(--apple-gray-1);
-      color: var(--apple-text-secondary);
-      border-color: var(--apple-border);
-    }
-
-    .btn-secondary:hover {
-      background: var(--apple-gray-2);
-      color: var(--apple-text-primary);
-      border-color: var(--apple-gray-3);
-    }
-
-    .btn-danger {
-      background: var(--apple-red);
-      color: white;
-      border-color: var(--apple-red);
-    }
-
-    .btn-danger:hover {
-      background: #d70015;
-      border-color: #d70015;
-      transform: translateY(-1px);
-      box-shadow: var(--apple-shadow-medium);
-    }
-
-    /* תמיכה במכשירים ניידים */
-    @media (max-width: 768px) {
-      .main-content {
-        padding: var(--apple-spacing-md);
-        margin-top: 44px;
-      }
-
-      .page-header {
-        flex-direction: column;
-        gap: var(--apple-spacing-lg);
-        align-items: flex-start;
-      }
-
-      .filters-row {
-        flex-direction: column;
-        gap: var(--apple-spacing-md);
-      }
-
-      .filter-group {
-        min-width: 100%;
-      }
-
-      .action-buttons {
-        flex-direction: column;
-        gap: var(--apple-spacing-xs);
-      }
-    }
-  </style>
+  <!-- קבצים מודולריים של הגריד -->
+  <script src="scripts/app-header.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/grid-filters.js"></script>
+  <script src="scripts/alerts.js"></script>
+  <script src="scripts/active-alerts-component.js"></script>
+  <script src="scripts/accounts.js"></script>
 </head>
 
 <body>
-  <!-- Web Component של הכותרת -->
-  <app-header></app-header>
-
-  <!-- Menu will be loaded here -->
-  <div id="menu-container"></div>
-
+  <!-- רקע כללי -->
   <div class="background-wrapper">
-    <div class="main-content">
-      <!-- קומפוננטת התראות פעילות -->
-      <active-alerts></active-alerts>
 
-      <div class="page-header">
-        <div>
-          <h1 class="page-title">ניהול התראות</h1>
-          <p class="page-subtitle">ניהול התראות מחיר וסטטוס</p>
-        </div>
-        <button class="button-primary add-plan-btn" onclick="showAddAlertModal()">הוסף התראה חדשה</button>
-      </div>
+    <!-- כותרת האפליקציה -->
+    <app-header></app-header>
 
-      <!-- סינון וחיפוש -->
-      <div class="filters-section">
-        <div class="filters-row">
-          <div class="filter-group">
-            <label class="filter-label">סטטוס</label>
-            <select class="form-select" id="statusFilter" onchange="filterAlerts()">
-              <option value="">כל הסטטוסים</option>
-              <option value="פעיל">פעיל</option>
-              <option value="לא פעיל">לא פעיל</option>
-              <option value="ממתין">ממתין</option>
-            </select>
+    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <div class="page-body">
+      <!-- אזור התראות - top-Section -->
+      <div class="top-section" id="alertsTopSection">
+        <!-- כותרת התראות -->
+        <div class="section-header">
+          <div class="table-title">
+            🔔 התראות
           </div>
-          <div class="filter-group">
-            <label class="filter-label">סוג שיוך</label>
-            <select class="form-select" id="typeFilter" onchange="filterAlerts()">
-              <option value="">כל הסוגים</option>
-              <option value="תכנון">תכנון</option>
-              <option value="טרייד פתוח">טרייד פתוח</option>
-              <option value="טרייד סגור">טרייד סגור</option>
-              <option value="טיקר">טיקר</option>
-              <option value="אחר">אחר</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="filter-label">חיפוש מהיר</label>
-            <input type="text" class="form-control" id="searchInput" placeholder="חיפוש בהתראות..."
-              onkeyup="filterAlerts()">
-          </div>
-          <div class="filter-group">
-            <label class="filter-label">&nbsp;</label>
-            <button class="btn btn-outline-secondary" onclick="clearFilters()">נקה סינון</button>
+          <div class="table-actions">
+            <button class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
+              <span class="action-icon">➕</span> הוסף
+            </button>
+            <div class="action-separator"></div>
+            <button class="filter-toggle-btn"
+              onclick="if (typeof window.toggleTopSection === 'function') { window.toggleTopSection(); } else { console.error('toggleTopSection function not found'); }"
+              title="הצג/הסתר אזור התראות">
+              <span class="filter-icon">▲</span>
+            </button>
           </div>
         </div>
-      </div>
 
-      <!-- גריד התראות -->
-      <div class="grid-container">
-        <h3 class="grid-title">טבלת התראות</h3>
-        <div id="alertsGrid" class="ag-theme-quartz" style="height: 600px; width: 100%;"></div>
-      </div>
-    </div>
-  </div>
+        <!-- כרטיסיות התראות -->
+        <div class="section-body">
+          <!-- ווב קומפוננט של התראות פעילות -->
+          <active-alerts></active-alerts>
 
-  <!-- מודל הוספת התראה -->
-  <div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addAlertModalLabel">הוסף התראה חדשה</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
+          <!-- סיכום נתונים -->
+          <div class="info-summary" id="summaryStats">
+            <div>סה"כ התראות: <strong id="totalAlerts">0</strong></div>
+            <div>התראות פעילות: <strong id="activeAlerts">0</strong></div>
+            <div>התראות היום: <strong id="todayAlerts">0</strong></div>
+            <div>התראות השבוע: <strong id="weekAlerts">0</strong></div>
+          </div>
         </div>
-        <div class="modal-body">
-          <form id="addAlertForm">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="alertTitle" class="form-label">כותרת ההתראה *</label>
-                <input type="text" class="form-control" id="alertTitle" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="alertRelatedType" class="form-label">סוג ישות *</label>
-                <select class="form-select" id="alertRelatedType" required onchange="loadRelatedEntities()">
-                  <option value="">בחר סוג ישות</option>
-                  <option value="account">חשבון</option>
-                  <option value="trade">טרייד</option>
-                  <option value="trade_plan">תכנון טרייד</option>
-                  <option value="ticker">טיקר</option>
-                </select>
-              </div>
+      </div> <!-- סוף top-section -->
+
+      <!-- תוכן ראשי -->
+      <div class="main-content">
+
+        <!-- אזור התראות - content-section -->
+        <div class="content-section" id="alertsMainSection">
+          <!-- כותרת התראות -->
+          <div class="section-header">
+            <div class="table-title">
+              🔔 ההתראות שלי
             </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="alertRelatedId" class="form-label">ישות ספציפית *</label>
-                <select class="form-select" id="alertRelatedId" required>
-                  <option value="">בחר ישות</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="alertType" class="form-label">סוג התראה *</label>
-                <select class="form-select" id="alertType" required>
-                  <option value="">בחר סוג</option>
-                  <option value="price_alert">התראה על מחיר</option>
-                  <option value="stop_loss">סטופ לוס</option>
-                  <option value="volume_alert">התראה על נפח</option>
-                  <option value="custom_alert">התראה מותאמת</option>
-                </select>
+            <div class="table-count">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn"
+                onclick="if (typeof window.toggleMainSection === 'function') { window.toggleMainSection(); } else { console.error('toggleMainSection function not found'); }"
+                title="הצג/הסתר אזור התראות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- טבלת התראות -->
+          <div class="section-body">
+            <div class="table-responsive" id="alertsContainer">
+              <table class="table" id="alertsTable" data-table-type="alerts">
+                <thead>
+                  <tr>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(0)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>סימבול
+                        <br><span class="header-subtitle">Symbol</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(1)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>אובייקט משיוך
+                        <br><span class="header-subtitle">Related Object</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(2)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>סוג התראה
+                        <br><span class="header-subtitle">Alert Type</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(3)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>סטטוס
+                        <br><span class="header-subtitle">Status</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(4)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>תנאי
+                        <br><span class="header-subtitle">Condition</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(5)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>הודעה
+                        <br><span class="header-subtitle">Message</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(6)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>נוצר ב
+                        <br><span class="header-subtitle">Created At</span>
+                      </button>
+                    </th>
+                    <th class="actions-header">
+                      פעולות
+                      <br><span class="header-subtitle">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="8" class="loading">טוען התראות...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- סוף page-body -->
+
+    <!-- מרווח בתחתית הדף -->
+    <div style="height: 3rem;"></div>
+
+    <!-- Add Alert Modal -->
+    <div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addAlertModalLabel">הוספת התראה</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="addAlertForm">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label class="form-label">התראה עבור:</label>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="radio-group-item">
+                          <input type="radio" name="alertRelationType" id="alertRelationTradePlan" value="3" required>
+                          <label for="alertRelationTradePlan">תוכנית טרייד</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="alertRelationType" id="alertRelationTrade" value="2" required>
+                          <label for="alertRelationTrade">טרייד</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="alertRelationType" id="alertRelationAccount" value="1" required>
+                          <label for="alertRelationAccount">חשבון</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="alertRelationType" id="alertRelationTicker" value="4" required>
+                          <label for="alertRelationTicker">טיקר</label>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <select class="form-select" id="alertRelatedObjectSelect" style="width: 100%;">
+                          <option value="">בחר אובייקט לשיוך...</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="alertStatus" class="form-label">סטטוס</label>
-                  <select class="form-select" id="alertStatus">
-                    <option value="פעיל">פעיל</option>
-                    <option value="לא פעיל">לא פעיל</option>
-                    <option value="ממתין">ממתין</option>
-                  </select>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="alertTitle" class="form-label">כותרת התראה *</label>
+                    <input type="text" class="form-control" id="alertTitle" required>
+                  </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label for="alertPriority" class="form-label">עדיפות</label>
-                  <select class="form-select" id="alertPriority">
-                    <option value="נמוכה">נמוכה</option>
-                    <option value="בינונית">בינונית</option>
-                    <option value="גבוהה">גבוהה</option>
-                  </select>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="alertType" class="form-label">סוג התראה *</label>
+                    <select class="form-select" id="alertType" required>
+                      <option value="">בחר סוג התראה...</option>
+                      <option value="price_alert">התראה על מחיר</option>
+                      <option value="stop_loss">סטופ לוס</option>
+                      <option value="volume_alert">התראה על נפח</option>
+                      <option value="custom_alert">התראה מותאמת</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
-              <div class="mb-3">
-                <label for="alertDescription" class="form-label">תיאור</label>
-                <textarea class="form-control" id="alertDescription" rows="3" placeholder="תיאור ההתראה..."></textarea>
-              </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveAlert()">שמור התראה</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מודל עריכת התראה -->
-  <div class="modal fade" id="editAlertModal" tabindex="-1" aria-labelledby="editAlertModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editAlertModalLabel">ערוך התראה</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
-        </div>
-        <div class="modal-body">
-          <form id="editAlertForm">
-            <input type="hidden" id="editAlertId">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editAlertTitle" class="form-label">כותרת ההתראה *</label>
-                <input type="text" class="form-control" id="editAlertTitle" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editAlertRelatedType" class="form-label">סוג ישות *</label>
-                <select class="form-select" id="editAlertRelatedType" required onchange="loadEditRelatedEntities()">
-                  <option value="">בחר סוג ישות</option>
-                  <option value="account">חשבון</option>
-                  <option value="trade">טרייד</option>
-                  <option value="trade_plan">תכנון טרייד</option>
-                  <option value="ticker">טיקר</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="editAlertRelatedId" class="form-label">ישות ספציפית *</label>
-                <select class="form-select" id="editAlertRelatedId" required>
-                  <option value="">בחר ישות</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="editAlertType" class="form-label">סוג התראה *</label>
-                <select class="form-select" id="editAlertType" required>
-                  <option value="">בחר סוג</option>
-                  <option value="price_alert">התראה על מחיר</option>
-                  <option value="stop_loss">סטופ לוס</option>
-                  <option value="volume_alert">התראה על נפח</option>
-                  <option value="custom_alert">התראה מותאמת</option>
-                </select>
               </div>
               <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="editAlertStatus" class="form-label">סטטוס</label>
-                  <select class="form-select" id="editAlertStatus">
-                    <option value="פעיל">פעיל</option>
-                    <option value="לא פעיל">לא פעיל</option>
-                    <option value="ממתין">ממתין</option>
-                  </select>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="alertCondition" class="form-label">תנאי התראה *</label>
+                    <input type="text" class="form-control" id="alertCondition" required
+                      placeholder="למשל: מחיר > 100$">
+                  </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label for="editAlertPriority" class="form-label">עדיפות</label>
-                  <select class="form-select" id="editAlertPriority">
-                    <option value="נמוכה">נמוכה</option>
-                    <option value="בינונית">בינונית</option>
-                    <option value="גבוהה">גבוהה</option>
-                  </select>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="alertMessage" class="form-label">הודעת התראה</label>
+                    <input type="text" class="form-control" id="alertMessage"
+                      placeholder="הודעה שתוצג בעת הפעלת ההתראה">
+                  </div>
                 </div>
               </div>
-              <div class="mb-3">
-                <label for="editAlertDescription" class="form-label">תיאור</label>
-                <textarea class="form-control" id="editAlertDescription" rows="3"
-                  placeholder="תיאור ההתראה..."></textarea>
-              </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger me-auto" onclick="deleteAlert()">מחק התראה</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="updateAlert()">עדכן התראה</button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+            <button type="button" class="btn btn-secondary" onclick="saveAlert()" title="שמור">💾</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
-
-  <script>
-    let gridApi;
-    let allAlerts = [];
-    let filteredAlerts = [];
-    let entitiesCache = {}; // מטמון לישויות
-
-    // נתוני דמה להתראות
-    const demoAlerts = [
-      {
-        id: 1,
-        related_type: "ticker",
-        related_id: 1,
-        type: "price_alert",
-        status: "open",
-        condition: "מחיר > 210$",
-        message: "AAPL הגיע ליעד מחיר",
-        created_at: "2024-01-15"
-      },
-      {
-        id: 2,
-        related_type: "trade",
-        related_id: 1,
-        type: "stop_loss",
-        status: "open",
-        condition: "מחיר < 690$",
-        message: "TSLA מתחת לסטופ",
-        created_at: "2024-01-14"
-      },
-      {
-        id: 3,
-        related_type: "trade_plan",
-        related_id: 1,
-        type: "price_alert",
-        status: "closed",
-        condition: "רווח 10%",
-        message: "NVDA רווח 10%",
-        created_at: "2024-01-13"
-      },
-      {
-        id: 4,
-        related_type: "ticker",
-        related_id: 2,
-        type: "volume_alert",
-        status: "open",
-        condition: "נפח > 1M",
-        message: "GOOGL התראה כללית",
-        created_at: "2024-01-12"
-      },
-      {
-        id: 5,
-        title: "התראה מערכת",
-        type: "אחר",
-        status: "פעיל",
-        priority: "בינונית",
-        description: "התראה מערכת כללית",
-        created_at: "2024-01-11",
-        updated_at: "2024-01-11"
-      }
-    ];
-
-    // הגדרת עמודות הגריד
-    const columnDefs = [
-      {
-        field: 'id',
-        headerName: 'מזהה',
-        width: 80,
-        sortable: true,
-        filter: true
-      },
-      {
-        field: 'title',
-        headerName: 'כותרת',
-        width: 200,
-        sortable: true,
-        filter: true
-      },
-      {
-        field: 'related_type',
-        headerName: 'סוג ישות',
-        width: 120,
-        sortable: true,
-        filter: true,
-        cellRenderer: params => {
-          const typeClass = getTypeClass(params.value);
-          return `<span class="type-badge ${typeClass}">${params.value}</span>`;
-        }
-      },
-      {
-        field: 'related_id',
-        headerName: 'מזהה ישות',
-        width: 100,
-        sortable: true,
-        filter: true
-      },
-      {
-        field: 'type',
-        headerName: 'סוג התראה',
-        width: 120,
-        sortable: true,
-        filter: true,
-        cellRenderer: params => {
-          const typeClass = getTypeClass(params.value);
-          return `<span class="type-badge ${typeClass}">${params.value}</span>`;
-        }
-      },
-      {
-        field: 'status',
-        headerName: 'סטטוס',
-        width: 100,
-        sortable: true,
-        filter: true,
-        cellRenderer: params => {
-          const statusClass = getStatusClass(params.value);
-          return `<span class="status-badge ${statusClass}">${params.value}</span>`;
-        }
-      },
-      {
-        field: 'condition',
-        headerName: 'תנאי',
-        width: 200,
-        sortable: true,
-        filter: true
-      },
-      {
-        field: 'message',
-        headerName: 'הודעה',
-        width: 200,
-        sortable: true,
-        filter: true
-      },
-      {
-        field: 'created_at',
-        headerName: 'תאריך יצירה',
-        width: 120,
-        sortable: true,
-        filter: true
-      },
-      {
-        headerName: 'פעולות',
-        width: 150,
-        cellRenderer: params => {
-          return `
-            <div class="action-buttons">
-              <button class="btn btn-outline-primary btn-sm" onclick="editAlert(${params.data.id})" title="ערוך">
-                ✏️
-              </button>
-              <button class="btn btn-outline-success btn-sm" onclick="toggleStatus(${params.data.id})" title="שנה סטטוס">
-                🔄
-              </button>
-              <button class="btn btn-outline-danger btn-sm" onclick="deleteAlert(${params.data.id})" title="מחק">
-                🗑️
-              </button>
-            </div>
-          `;
-        }
-      }
-    ];
-
-    // הגדרת אפשרויות הגריד
-    const gridOptions = {
-      columnDefs: columnDefs,
-      rowData: demoAlerts,
-      pagination: true,
-      paginationPageSize: 10,
-      domLayout: 'autoHeight',
-      defaultColDef: {
-        resizable: true,
-        sortable: true,
-        filter: true
-      },
-      localeText: {
-        page: 'עמוד',
-        of: 'מתוך',
-        to: 'עד',
-        next: 'הבא',
-        last: 'אחרון',
-        first: 'ראשון',
-        previous: 'קודם',
-        loadingOoo: 'טוען...',
-        noRowsToShow: 'אין נתונים להצגה',
-        filterOoo: 'סינון...',
-        equals: 'שווה ל',
-        notEqual: 'לא שווה ל',
-        blank: 'ריק',
-        notBlank: 'לא ריק',
-        empty: 'בחר אחד',
-        contains: 'מכיל',
-        notContains: 'לא מכיל',
-        startsWith: 'מתחיל ב',
-        endsWith: 'מסתיים ב',
-        inRange: 'בטווח',
-        lessThan: 'פחות מ',
-        greaterThan: 'יותר מ',
-        lessThanOrEqual: 'פחות או שווה ל',
-        greaterThanOrEqual: 'יותר או שווה ל'
-      }
-    };
-
-    // פונקציות עזר
-    function getStatusClass(status) {
-      switch (status) {
-        case 'פעיל': return 'status-active';
-        case 'לא פעיל': return 'status-inactive';
-        case 'ממתין': return 'status-pending';
-        default: return 'status-inactive';
-      }
-    }
-
-    function getTypeClass(type) {
-      switch (type) {
-        case 'תכנון': return 'type-planning';
-        case 'טרייד פתוח': return 'type-trade-open';
-        case 'טרייד סגור': return 'type-trade-closed';
-        case 'טיקר': return 'type-ticker';
-        case 'אחר': return 'type-other';
-        default: return 'type-other';
-      }
-    }
-
-    // פונקציות סינון
-    function filterAlerts() {
-      const statusFilter = document.getElementById('statusFilter').value;
-      const typeFilter = document.getElementById('typeFilter').value;
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-
-      filteredAlerts = allAlerts.filter(alert => {
-        const matchesStatus = !statusFilter || alert.status === statusFilter;
-        const matchesType = !typeFilter || alert.type === typeFilter;
-        const matchesSearch = !searchTerm ||
-          alert.title.toLowerCase().includes(searchTerm) ||
-          alert.description.toLowerCase().includes(searchTerm) ||
-          alert.id.toString().includes(searchTerm);
-
-        return matchesStatus && matchesType && matchesSearch;
-      });
-
-      updateGrid();
-    }
-
-    function clearFilters() {
-      document.getElementById('statusFilter').value = '';
-      document.getElementById('typeFilter').value = '';
-      document.getElementById('searchInput').value = '';
-      filteredAlerts = [];
-      updateGrid();
-    }
-
-    function updateGrid() {
-      const dataToShow = filteredAlerts.length > 0 ? filteredAlerts : allAlerts;
-      gridApi.setRowData(dataToShow);
-    }
-
-
-
-
-
-
-
-
-
-
-
-    // פונקציות עזר
-    function getTimeAgo(dateString) {
-      const now = new Date();
-      const date = new Date(dateString);
-      const diffMs = now - date;
-      const diffMins = Math.floor(diffMs / (1000 * 60));
-      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-      if (diffMins < 1) return 'עכשיו';
-      if (diffMins < 60) return `לפני ${diffMins} דקות`;
-      if (diffHours < 24) return `לפני ${diffHours} שעות`;
-      if (diffDays < 7) return `לפני ${diffDays} ימים`;
-
-      return date.toLocaleDateString('he-IL');
-    }
-
-    function getAlertIcon(alertType) {
-      const icons = {
-        'price_alert': '🎯',
-        'stop_loss': '⚠️',
-        'volume_alert': '📊',
-        'custom_alert': '🔔'
-      };
-      return icons[alertType] || '🔔';
-    }
-
-    function getAlertTypeDisplay(alertType) {
-      const types = {
-        'price_alert': 'התראה על מחיר',
-        'stop_loss': 'סטופ לוס',
-        'volume_alert': 'התראה על נפח',
-        'custom_alert': 'התראה מותאמת'
-      };
-      return types[alertType] || alertType;
-    }
-
-    function getEntityTypeDisplay(entityType) {
-      const types = {
-        'account': 'חשבון',
-        'trade': 'טרייד',
-        'trade_plan': 'תכנון טרייד',
-        'ticker': 'טיקר'
-      };
-      return types[entityType] || entityType;
-    }
-
-    function extractTickerFromCondition(condition) {
-      if (!condition) return '';
-
-      const tickerPatterns = [
-        /\b(AAPL|TSLA|MSFT|GOOGL|NVDA|AMZN|META|NFLX|SPY|QQQ|IWM)\b/gi,
-        /\b([A-Z]{2,5})\b/g
-      ];
-
-      for (const pattern of tickerPatterns) {
-        const match = condition.match(pattern);
-        if (match) {
-          return match[0].toUpperCase();
-        }
-      }
-
-      return '';
-    }
-
-    function getCurrentPrice(ticker) {
-      const prices = {
-        'AAPL': '185.50',
-        'TSLA': '245.30',
-        'MSFT': '415.80',
-        'GOOGL': '141.20',
-        'NVDA': '875.40',
-        'AMZN': '149.80',
-        'META': '485.60',
-        'NFLX': '625.90',
-        'SPY': '485.20',
-        'QQQ': '425.80',
-        'IWM': '195.40'
-      };
-      return prices[ticker] || '0.00';
-    }
-
-    function getDailyChange(ticker) {
-      const changes = {
-        'AAPL': '+2.3',
-        'TSLA': '-1.8',
-        'MSFT': '+0.9',
-        'GOOGL': '+1.2',
-        'NVDA': '+3.5',
-        'AMZN': '-0.7',
-        'META': '+1.8',
-        'NFLX': '+2.1',
-        'SPY': '+0.5',
-        'QQQ': '+0.8',
-        'IWM': '-0.3'
-      };
-      return changes[ticker] || '0.0';
-    }
-
-    function getDailyChangeClass(ticker) {
-      const change = getDailyChange(ticker);
-      if (change.startsWith('+')) {
-        return 'positive-change';
-      } else if (change.startsWith('-')) {
-        return 'negative-change';
-      }
-      return '';
-    }
-
-    // פונקציות לטעינת ישויות
-    async function loadRelatedEntities() {
-      const relatedType = document.getElementById('alertRelatedType').value;
-      const relatedIdSelect = document.getElementById('alertRelatedId');
-
-      if (!relatedType) {
-        relatedIdSelect.innerHTML = '<option value="">בחר ישות</option>';
-        return;
-      }
-
-      // בדיקה במטמון
-      if (entitiesCache[relatedType]) {
-        populateRelatedEntities(relatedIdSelect, entitiesCache[relatedType]);
-        return;
-      }
-
-      try {
-        let entities = [];
-
-        switch (relatedType) {
-          case 'account':
-            const accountsResponse = await fetch('/api/accounts');
-            const accountsData = await accountsResponse.json();
-            entities = accountsData.map(acc => ({ id: acc.id, name: acc.name }));
-            break;
-          case 'trade':
-            const tradesResponse = await fetch('/api/trades');
-            const tradesData = await tradesResponse.json();
-            entities = tradesData.map(trade => ({ id: trade.id, name: `${trade.ticker} - ${trade.status}` }));
-            break;
-          case 'trade_plan':
-            const plansResponse = await fetch('/api/trade_plans');
-            const plansData = await plansResponse.json();
-            entities = plansData.map(plan => ({ id: plan.id, name: `${plan.ticker} - ${plan.investment_type}` }));
-            break;
-          case 'ticker':
-            const tickersResponse = await fetch('/api/tickers');
-            const tickersData = await tickersResponse.json();
-            entities = tickersData.map(ticker => ({ id: ticker.id, name: ticker.symbol }));
-            break;
-        }
-
-        // שמירה במטמון
-        entitiesCache[relatedType] = entities;
-        populateRelatedEntities(relatedIdSelect, entities);
-
-      } catch (error) {
-        console.error('שגיאה בטעינת ישויות:', error);
-        relatedIdSelect.innerHTML = '<option value="">שגיאה בטעינה</option>';
-      }
-    }
-
-    function populateRelatedEntities(select, entities) {
-      select.innerHTML = '<option value="">בחר ישות</option>';
-      entities.forEach(entity => {
-        const option = document.createElement('option');
-        option.value = entity.id;
-        option.textContent = entity.name;
-        select.appendChild(option);
-      });
-    }
-
-    async function loadEditRelatedEntities() {
-      const relatedType = document.getElementById('editAlertRelatedType').value;
-      const relatedIdSelect = document.getElementById('editAlertRelatedId');
-
-      if (!relatedType) {
-        relatedIdSelect.innerHTML = '<option value="">בחר ישות</option>';
-        return;
-      }
-
-      // בדיקה במטמון
-      if (entitiesCache[relatedType]) {
-        populateRelatedEntities(relatedIdSelect, entitiesCache[relatedType]);
-        return;
-      }
-
-      try {
-        let entities = [];
-
-        switch (relatedType) {
-          case 'account':
-            const accountsResponse = await fetch('/api/accounts');
-            const accountsData = await accountsResponse.json();
-            entities = accountsData.map(acc => ({ id: acc.id, name: acc.name }));
-            break;
-          case 'trade':
-            const tradesResponse = await fetch('/api/trades');
-            const tradesData = await tradesResponse.json();
-            entities = tradesData.map(trade => ({ id: trade.id, name: `${trade.ticker} - ${trade.status}` }));
-            break;
-          case 'trade_plan':
-            const plansResponse = await fetch('/api/trade_plans');
-            const plansData = await plansResponse.json();
-            entities = plansData.map(plan => ({ id: plan.id, name: `${plan.ticker} - ${plan.investment_type}` }));
-            break;
-          case 'ticker':
-            const tickersResponse = await fetch('/api/tickers');
-            const tickersData = await tickersResponse.json();
-            entities = tickersData.map(ticker => ({ id: ticker.id, name: ticker.symbol }));
-            break;
-        }
-
-        // שמירה במטמון
-        entitiesCache[relatedType] = entities;
-        populateRelatedEntities(relatedIdSelect, entities);
-
-      } catch (error) {
-        console.error('שגיאה בטעינת ישויות:', error);
-        relatedIdSelect.innerHTML = '<option value="">שגיאה בטעינה</option>';
-      }
-    }
-
-    // פונקציות CRUD
-    function showAddAlertModal() {
-      document.getElementById('addAlertForm').reset();
-      const modal = new bootstrap.Modal(document.getElementById('addAlertModal'));
-      modal.show();
-    }
-
-    async function editAlert(alertId) {
-      const alert = allAlerts.find(a => a.id === alertId);
-      if (alert) {
-        document.getElementById('editAlertId').value = alert.id;
-        document.getElementById('editAlertRelatedType').value = alert.related_type || '';
-        document.getElementById('editAlertType').value = alert.type;
-        document.getElementById('editAlertStatus').value = alert.status;
-        document.getElementById('editAlertDescription').value = alert.condition || '';
-        document.getElementById('editAlertTitle').value = alert.message || '';
-
-        // טעינת ישויות לעריכה
-        if (alert.related_type) {
-          await loadEditRelatedEntities();
-          document.getElementById('editAlertRelatedId').value = alert.related_id || '';
-        }
-
-        const modal = new bootstrap.Modal(document.getElementById('editAlertModal'));
-        modal.show();
-      }
-    }
-
-    async function saveAlert() {
-      const form = document.getElementById('addAlertForm');
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-
-      const alertData = {
-        related_type: document.getElementById('alertRelatedType').value,
-        related_id: parseInt(document.getElementById('alertRelatedId').value),
-        type: document.getElementById('alertType').value,
-        condition: document.getElementById('alertDescription').value,
-        message: document.getElementById('alertTitle').value,
-        status: 'open'
-      };
-
-      try {
-        const response = await fetch('/api/v1/alerts/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(alertData)
-        });
-
-        const result = await response.json();
-
-        if (result.status === 'success') {
-          const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
-          modal.hide();
-
-          await loadAlertsData();
-          showNotification('התראה נוספה בהצלחה!', 'success');
-        } else {
-          showNotification(result.message || 'שגיאה בהוספת ההתראה', 'error');
-        }
-      } catch (error) {
-        console.error('שגיאה:', error);
-        // אם אין חיבור לשרת, נוסיף לדמו
-        const newAlert = {
-          id: allAlerts.length + 1,
-          ...alertData,
-          created_at: new Date().toISOString().split('T')[0],
-          updated_at: new Date().toISOString().split('T')[0]
-        };
-        allAlerts.unshift(newAlert);
-        updateGrid();
-
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
-        modal.hide();
-        showNotification('התראה נוספה בהצלחה!', 'success');
-      }
-    }
-
-    async function updateAlert() {
-      const form = document.getElementById('editAlertForm');
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-
-      const alertId = document.getElementById('editAlertId').value;
-      const alertData = {
-        related_type: document.getElementById('editAlertRelatedType').value,
-        related_id: parseInt(document.getElementById('editAlertRelatedId').value),
-        type: document.getElementById('editAlertType').value,
-        condition: document.getElementById('editAlertDescription').value,
-        message: document.getElementById('editAlertTitle').value,
-        status: document.getElementById('editAlertStatus').value
-      };
-
-      try {
-        const response = await fetch(`/api/v1/alerts/${alertId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(alertData)
-        });
-
-        const result = await response.json();
-
-        if (result.status === 'success') {
-          const modal = bootstrap.Modal.getInstance(document.getElementById('editAlertModal'));
-          modal.hide();
-
-          await loadAlertsData();
-          showNotification('התראה עודכנה בהצלחה!', 'success');
-        } else {
-          showNotification(result.message || 'שגיאה בעדכון ההתראה', 'error');
-        }
-      } catch (error) {
-        console.error('שגיאה:', error);
-        // אם אין חיבור לשרת, נעדכן בדמו
-        const alertIndex = allAlerts.findIndex(a => a.id == alertId);
-        if (alertIndex !== -1) {
-          allAlerts[alertIndex] = {
-            ...allAlerts[alertIndex],
-            ...alertData,
-            updated_at: new Date().toISOString().split('T')[0]
-          };
-          updateGrid();
-
-          const modal = bootstrap.Modal.getInstance(document.getElementById('editAlertModal'));
-          modal.hide();
-          showNotification('התראה עודכנה בהצלחה!', 'success');
-        }
-      }
-    }
-
-    async function deleteAlert(alertId) {
-      const alert = allAlerts.find(a => a.id === alertId);
-      if (!alert) return;
-
-      if (!confirm(`האם אתה בטוח שברצונך למחוק את ההתראה "${alert.title}"?`)) {
-        return;
-      }
-
-      try {
-        const response = await fetch(`/api/v1/alerts/${alertId}`, {
-          method: 'DELETE'
-        });
-
-        const result = await response.json();
-
-        if (result.status === 'success') {
-          await loadAlertsData();
-          showNotification('התראה נמחקה בהצלחה!', 'success');
-        } else {
-          showNotification(result.message || 'שגיאה במחיקת ההתראה', 'error');
-        }
-      } catch (error) {
-        console.error('שגיאה:', error);
-        // אם אין חיבור לשרת, נמחק מדמו
-        allAlerts = allAlerts.filter(a => a.id !== alertId);
-        updateGrid();
-        showNotification('התראה נמחקה בהצלחה!', 'success');
-      }
-    }
-
-    async function toggleStatus(alertId) {
-      const alert = allAlerts.find(a => a.id === alertId);
-      if (!alert) return;
-
-      const newStatus = alert.status === 'פעיל' ? 'לא פעיל' : 'פעיל';
-
-      try {
-        const response = await fetch(`/api/alerts/${alertId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ status: newStatus })
-        });
-
-        const result = await response.json();
-
-        if (result.status === 'success') {
-          await loadAlertsData();
-          showNotification(`סטטוס ההתראה שונה ל-${newStatus}`, 'success');
-        } else {
-          showNotification(result.message || 'שגיאה בשינוי הסטטוס', 'error');
-        }
-      } catch (error) {
-        console.error('שגיאה:', error);
-        // אם אין חיבור לשרת, נעדכן בדמו
-        const alertIndex = allAlerts.findIndex(a => a.id === alertId);
-        if (alertIndex !== -1) {
-          allAlerts[alertIndex].status = newStatus;
-          allAlerts[alertIndex].updated_at = new Date().toISOString().split('T')[0];
-          updateGrid();
-          showNotification(`סטטוס ההתראה שונה ל-${newStatus}`, 'success');
-        }
-      }
-    }
-
-    // טעינת נתונים
-    async function loadAlertsData() {
-      try {
-        console.log('🔄 === LOAD ALERTS DATA ===');
-
-        // קריאה מה-API
-        const response = await fetch('/api/v1/alerts/');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const apiData = await response.json();
-
-        console.log('📡 נתונים מה-API:', apiData);
-
-        // עדכון הנתונים המקומיים
-        if (apiData.status === 'success' && apiData.data) {
-          allAlerts = apiData.data.map(alert => ({
-            id: alert.id,
-            related_type: alert.related_type,
-            related_id: alert.related_id,
-            type: alert.type,
-            status: alert.status,
-            condition: alert.condition,
-            message: alert.message,
-            created_at: alert.created_at
-          }));
-        } else {
-          console.warn('⚠️ לא התקבלו נתונים מה-API, משתמש בנתוני דמו');
-          allAlerts = demoAlerts;
-        }
-
-        console.log('📊 נתונים מעודכנים:', allAlerts);
-
-        // עדכון הגריד
-        updateGrid();
-
-      } catch (error) {
-        console.error('❌ שגיאה בטעינת נתונים:', error);
-        console.warn('⚠️ משתמש בנתוני דמו');
-        allAlerts = demoAlerts;
-        updateGrid();
-      }
-    }
-
-    // הצגת הודעות
-    function showNotification(message, type = 'info') {
-      const notification = document.createElement('div');
-      notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} alert-dismissible fade show position-fixed`;
-      notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; border-radius: var(--apple-radius-medium); box-shadow: var(--apple-shadow-medium);';
-      notification.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      `;
-
-      document.body.appendChild(notification);
-
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.remove();
-        }
-      }, 5000);
-    }
-
-    // אתחול הגריד
-    document.addEventListener('DOMContentLoaded', () => {
-      // טעינת מצב הסקשנים לפי הדף הנוכחי
-      if (typeof window.loadSectionStates === 'function') {
-        window.loadSectionStates();
-      }
-
-      const gridDiv = document.getElementById('alertsGrid');
-      gridApi = agGrid.createGrid(gridDiv, gridOptions, { theme: 'quartz' });
-
-
-
-      // טעינת נתוני הגריד
-      loadAlertsData();
-
-      // הגדרת האזנה לכותרת
-      setupHeaderListener();
-
-      // טעינת התפריט
-      if (typeof loadMenu === 'function') {
-        loadMenu();
-      }
-    });
-
-    // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
-    function updateBackgroundPadding(isCollapsed) {
-      const backgroundWrapper = document.querySelector('.background-wrapper');
-      const body = document.body;
-
-      if (backgroundWrapper) {
-        if (isCollapsed) {
-          backgroundWrapper.classList.add('filter-collapsed');
-        } else {
-          backgroundWrapper.classList.remove('filter-collapsed');
-        }
-      }
-
-      if (body) {
-        if (isCollapsed) {
-          body.classList.add('filter-collapsed');
-        } else {
-          body.classList.remove('filter-collapsed');
-        }
-      }
-    }
-
-    // האזנה לשינויים בקומפוננט הכותרת
-    function setupHeaderListener() {
-      const header = document.querySelector('app-header');
-      if (header) {
-        // האזנה לשינויים בפילטר
-        const observer = new MutationObserver((mutations) => {
-          mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-              const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
-              if (filterSection) {
-                const isCollapsed = filterSection.classList.contains('collapsed');
-                updateBackgroundPadding(isCollapsed);
-              }
-            }
-          });
-        });
-
-        // התחלת ההאזנה
-        setTimeout(() => {
-          const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
-          if (filterSection) {
-            observer.observe(filterSection, { attributes: true });
+    <!-- Edit Alert Modal -->
+    <div class="modal fade" id="editAlertModal" tabindex="-1" aria-labelledby="editAlertModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editAlertModalLabel">עריכת התראה</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="editAlertForm">
+              <input type="hidden" id="editAlertId">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label class="form-label">התראה עבור:</label>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="radio-group-item">
+                          <input type="radio" name="editAlertRelationType" id="editAlertRelationTradePlan" value="3"
+                            required>
+                          <label for="editAlertRelationTradePlan">תוכנית טרייד</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="editAlertRelationType" id="editAlertRelationTrade" value="2"
+                            required>
+                          <label for="editAlertRelationTrade">טרייד</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="editAlertRelationType" id="editAlertRelationAccount" value="1"
+                            required>
+                          <label for="editAlertRelationAccount">חשבון</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="editAlertRelationType" id="editAlertRelationTicker" value="4"
+                            required>
+                          <label for="editAlertRelationTicker">טיקר</label>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <select class="form-select" id="editAlertRelatedObjectSelect" style="width: 100%;">
+                          <option value="">בחר אובייקט לשיוך...</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editAlertTitle" class="form-label">כותרת התראה *</label>
+                    <input type="text" class="form-control" id="editAlertTitle" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editAlertType" class="form-label">סוג התראה *</label>
+                    <select class="form-select" id="editAlertType" required>
+                      <option value="">בחר סוג התראה...</option>
+                      <option value="price_alert">התראה על מחיר</option>
+                      <option value="stop_loss">סטופ לוס</option>
+                      <option value="volume_alert">התראה על נפח</option>
+                      <option value="custom_alert">התראה מותאמת</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editAlertCondition" class="form-label">תנאי התראה *</label>
+                    <input type="text" class="form-control" id="editAlertCondition" required
+                      placeholder="למשל: מחיר > 100$">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editAlertMessage" class="form-label">הודעת התראה</label>
+                    <input type="text" class="form-control" id="editAlertMessage"
+                      placeholder="הודעה שתוצג בעת הפעלת ההתראה">
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+            <button type="button" class="btn btn-secondary" onclick="updateAlert()" title="שמור">💾</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- פונקציות פתיחה וסגירה של סקשנים - מוגדרות מיד -->
+    <script>
+      function toggleTopSection() {
+        const section = document.querySelector('.top-section .section-body');
+        const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+        if (section) {
+          const isCollapsed = section.classList.contains('collapsed');
+
+          if (isCollapsed) {
+            section.classList.remove('collapsed');
+            section.style.display = 'block';
+          } else {
+            section.classList.add('collapsed');
+            section.style.display = 'none';
           }
-        }, 1000);
-      }
-    }
-  </script>
 
-  <!-- Scripts -->
-  <script src="scripts/app-header.js"></script>
-  <script src="scripts/menu.js"></script>
-  <script src="scripts/active-alerts-component.js"></script>
-  <script src="scripts/grid-filters.js"></script>
-  <script src="scripts/accounts.js"></script>
-  <script src="scripts/alerts.js"></script>
+          // עדכון האייקון
+          if (icon) {
+            icon.textContent = isCollapsed ? '▲' : '▼';
+          }
+
+          // שמירת המצב ב-localStorage
+          localStorage.setItem('alertsTopSectionCollapsed', !isCollapsed);
+        }
+      }
+
+      function toggleMainSection() {
+        const section = document.querySelector('.content-section .section-body');
+        const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+        if (section) {
+          const isCollapsed = section.classList.contains('collapsed');
+
+          if (isCollapsed) {
+            section.classList.remove('collapsed');
+            section.style.display = 'block';
+          } else {
+            section.classList.add('collapsed');
+            section.style.display = 'none';
+          }
+
+          // עדכון האייקון
+          if (icon) {
+            icon.textContent = isCollapsed ? '▲' : '▼';
+          }
+
+          // שמירת המצב ב-localStorage
+          localStorage.setItem('alertsMainSectionCollapsed', !isCollapsed);
+        }
+      }
+
+      // הוספת הפונקציות לגלובל מיד
+      window.toggleTopSection = toggleTopSection;
+      window.toggleMainSection = toggleMainSection;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
 </body>
 
 </html>

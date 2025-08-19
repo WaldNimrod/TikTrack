@@ -38,7 +38,7 @@ function calculateTickersStats(tickers) {
     const totalTickers = tickers.length;
     const usdTickers = tickers.filter(ticker => ticker.currency === 'USD').length;
     const ilsTickers = tickers.filter(ticker => ticker.currency === 'ILS').length;
-    
+
     return {
         open_tickers: openTickers,
         total_tickers: totalTickers,
@@ -93,7 +93,7 @@ function convertTickerStatusToHebrew(status) {
  */
 function fillTickerEditModal(ticker) {
     console.log(`🔧 מילוי מודל עריכת טיקר עם נתונים:`, ticker);
-    
+
     // מילוי שדות הטופס
     document.getElementById('editTickerId').value = ticker.id;
     document.getElementById('editTickerSymbol').value = ticker.symbol || '';
@@ -124,7 +124,7 @@ function collectTickerEditData() {
         industry: document.getElementById('editTickerIndustry').value.trim(),
         notes: document.getElementById('editTickerNotes').value.trim()
     };
-    
+
     console.log('📝 נתונים שנאספו ממודל עריכת טיקר:', tickerData);
     return tickerData;
 }
@@ -148,7 +148,7 @@ function collectTickerAddData() {
         industry: document.getElementById('tickerIndustry').value.trim(),
         notes: document.getElementById('tickerNotes').value.trim()
     };
-    
+
     console.log('📝 נתונים שנאספו ממודל הוספת טיקר:', tickerData);
     return tickerData;
 }
@@ -166,12 +166,12 @@ function collectTickerAddData() {
 async function createTicker(tickerData) {
     try {
         console.log('🚀 יוצר טיקר חדש:', tickerData);
-        
+
         const response = await apiCall('/api/v1/tickers/', {
             method: 'POST',
             body: JSON.stringify(tickerData)
         });
-        
+
         console.log('✅ טיקר נוצר בהצלחה:', response);
         showNotification('טיקר נוצר בהצלחה!', 'success');
         return response;
@@ -196,12 +196,12 @@ async function updateTicker(tickerId) {
     try {
         const tickerData = collectTickerEditData();
         console.log(`🔄 מעדכן טיקר ${tickerId}:`, tickerData);
-        
+
         const response = await apiCall(`/api/v1/tickers/${tickerId}`, {
             method: 'PUT',
             body: JSON.stringify(tickerData)
         });
-        
+
         console.log('✅ טיקר עודכן בהצלחה:', response);
         showNotification('טיקר עודכן בהצלחה!', 'success');
         return response;
@@ -229,25 +229,25 @@ async function deleteTicker(tickerId, tickerName) {
         console.log(`🔍 בודק טריידים פתוחים לטיקר ${tickerId}...`);
         const tradesResponse = await apiCall(`/api/v1/trades/?ticker_id=${tickerId}&status=${encodeURIComponent('פתוח')}`);
         const openTrades = tradesResponse.data || tradesResponse || [];
-        
+
         if (openTrades.length > 0) {
             console.log(`⚠️ נמצאו ${openTrades.length} טריידים פתוחים לטיקר ${tickerName}`);
             await showOpenTradesWarning(tickerName, openTrades, 'delete');
             return null; // מניעת המחיקה
         }
-        
+
         // אישור מחיקה
         const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את הטיקר "${tickerName}"?\n\nפעולה זו לא ניתנת לביטול.`);
         if (!confirmed) {
             console.log('❌ מחיקת טיקר בוטלה על ידי המשתמש');
             return null;
         }
-        
+
         console.log(`🗑️ מוחק טיקר ${tickerId}: ${tickerName}`);
         const response = await apiCall(`/api/v1/tickers/${tickerId}`, {
             method: 'DELETE'
         });
-        
+
         console.log('✅ טיקר נמחק בהצלחה:', response);
         showNotification(`טיקר "${tickerName}" נמחק בהצלחה!`, 'success');
         return response;
@@ -275,26 +275,26 @@ async function cancelTicker(tickerId, tickerName) {
         console.log(`🔍 בודק טריידים פתוחים לטיקר ${tickerId}...`);
         const tradesResponse = await apiCall(`/api/v1/trades/?ticker_id=${tickerId}&status=${encodeURIComponent('פתוח')}`);
         const openTrades = tradesResponse.data || tradesResponse || [];
-        
+
         if (openTrades.length > 0) {
             console.log(`⚠️ נמצאו ${openTrades.length} טריידים פתוחים לטיקר ${tickerName}`);
             await showOpenTradesWarning(tickerName, openTrades, 'cancel');
             return null; // מניעת הביטול
         }
-        
+
         // אישור ביטול
         const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את הטיקר "${tickerName}"?\n\nהסטטוס ישתנה ל"מבוטל".`);
         if (!confirmed) {
             console.log('❌ ביטול טיקר בוטל על ידי המשתמש');
             return null;
         }
-        
+
         console.log(`🚫 מבטל טיקר ${tickerId}: ${tickerName}`);
         const response = await apiCall(`/api/v1/tickers/${tickerId}`, {
             method: 'PUT',
             body: JSON.stringify({ status: 'מבוטל' })
         });
-        
+
         console.log('✅ טיקר בוטל בהצלחה:', response);
         showNotification(`טיקר "${tickerName}" בוטל בהצלחה!`, 'success');
         return response;
@@ -314,7 +314,7 @@ async function cancelTicker(tickerId, tickerName) {
  */
 function showAddTickerModal() {
     console.log('📝 מציג מודל הוספת טיקר');
-    
+
     // ניקוי הטופס
     document.getElementById('tickerSymbol').value = '';
     document.getElementById('tickerName').value = '';
@@ -323,7 +323,7 @@ function showAddTickerModal() {
     document.getElementById('tickerSector').value = '';
     document.getElementById('tickerIndustry').value = '';
     document.getElementById('tickerNotes').value = '';
-    
+
     // הצגת המודל
     const modal = new bootstrap.Modal(document.getElementById('addTickerModal'));
     modal.show();
@@ -340,10 +340,10 @@ function showAddTickerModal() {
  */
 function showEditTickerModal(ticker) {
     console.log('✏️ מציג מודל עריכת טיקר:', ticker);
-    
+
     // מילוי הנתונים
     fillTickerEditModal(ticker);
-    
+
     // הצגת המודל
     const modal = new bootstrap.Modal(document.getElementById('editTickerModal'));
     modal.show();
@@ -359,27 +359,27 @@ function showEditTickerModal(ticker) {
 async function saveTicker() {
     try {
         const tickerData = collectTickerAddData();
-        
+
         // בדיקות תקינות
         if (!tickerData.symbol) {
             showNotification('שם הסימבול הוא שדה חובה', 'error');
             return;
         }
-        
+
         if (!tickerData.name) {
             showNotification('שם הטיקר הוא שדה חובה', 'error');
             return;
         }
-        
+
         await createTicker(tickerData);
-        
+
         // סגירת המודל
         const modal = bootstrap.Modal.getInstance(document.getElementById('addTickerModal'));
         modal.hide();
-        
+
         // רענון הטבלה
         await refreshTickersTable();
-        
+
     } catch (error) {
         console.error('❌ שגיאה בשמירת טיקר:', error);
     }
@@ -396,27 +396,27 @@ async function updateTickerFromModal() {
     try {
         const tickerId = document.getElementById('editTickerId').value;
         const tickerData = collectTickerEditData();
-        
+
         // בדיקות תקינות
         if (!tickerData.symbol) {
             showNotification('שם הסימבול הוא שדה חובה', 'error');
             return;
         }
-        
+
         if (!tickerData.name) {
             showNotification('שם הטיקר הוא שדה חובה', 'error');
             return;
         }
-        
+
         await updateTicker(tickerId);
-        
+
         // סגירת המודל
         const modal = bootstrap.Modal.getInstance(document.getElementById('editTickerModal'));
         modal.hide();
-        
+
         // רענון הטבלה
         await refreshTickersTable();
-        
+
     } catch (error) {
         console.error('❌ שגיאה בעדכון טיקר:', error);
     }
@@ -433,13 +433,13 @@ async function updateTickerFromModal() {
  */
 function updateTickersTable(tickers) {
     console.log('🔄 מעדכן טבלת טיקרים עם', tickers.length, 'טיקרים');
-    
+
     const tbody = document.querySelector('#tickersTable tbody');
     if (!tbody) {
         console.error('❌ לא נמצא tbody לטבלת טיקרים');
         return;
     }
-    
+
     tbody.innerHTML = tickers.map(ticker => `
         <tr>
             <td>${ticker.id}</td>
@@ -452,24 +452,24 @@ function updateTickersTable(tickers) {
             <td>${ticker.notes || '-'}</td>
             <td>
                 <button class="btn btn-sm btn-secondary" onclick="showEditTickerModal(${JSON.stringify(ticker).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
-                <button class="btn btn-sm btn-secondary" onclick="cancelTicker(${ticker.id}, '${ticker.name || ticker.symbol}')" title="ביטול">❌</button>
+                <button class="btn btn-sm btn-secondary" onclick="cancelTicker(${ticker.id}, '${ticker.name || ticker.symbol}')" title="ביטול">X</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id}, '${ticker.name || ticker.symbol}')" title="מחק">🗑️</button>
             </td>
         </tr>
     `).join('');
-    
+
     // עדכון ספירת רשומות
     const countElement = document.getElementById('tickersCount');
     if (countElement) {
         countElement.textContent = `${tickers.length} טיקרים`;
     }
-    
+
     // הצגת הטבלה אם היא מוסתרת
     const section = document.getElementById('tickersSection');
     const container = document.getElementById('tickersContainer');
     const footer = document.querySelector('#tickersSection .table-footer');
     const icon = document.querySelector('#tickersSection .filter-icon');
-    
+
     if (section && section.classList.contains('collapsed')) {
         section.classList.remove('collapsed');
         if (container) container.style.display = 'block';
@@ -477,7 +477,7 @@ function updateTickersTable(tickers) {
         if (icon) icon.textContent = '▲';
         localStorage.setItem('tickersSectionOpen', 'true');
     }
-    
+
     console.log('✅ טבלת טיקרים עודכנה בהצלחה');
 }
 
@@ -492,18 +492,18 @@ async function refreshTickersTable() {
     try {
         console.log('🔄 מרענן טבלת טיקרים...');
         const tickers = await loadTickersData();
-        
+
         // עדכון הטבלה (תלוי בדף)
         if (typeof updateTickersTable === 'function') {
             updateTickersTable(tickers);
         }
-        
+
         // עדכון סטטיסטיקות (תלוי בדף)
         if (typeof updateTickersStats === 'function') {
             const stats = calculateTickersStats(tickers);
             updateTickersStats(stats);
         }
-        
+
         console.log('✅ טבלת טיקרים רועננה בהצלחה');
     } catch (error) {
         console.error('❌ שגיאה ברענון טבלת טיקרים:', error);
@@ -526,7 +526,7 @@ function showNotification(message, type = 'info') {
         window.showNotification(message, type);
         return;
     }
-    
+
     // הצגה פשוטה
     console.log(`${type.toUpperCase()}: ${message}`);
     alert(message);

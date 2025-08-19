@@ -20,7 +20,7 @@ class ActiveAlertsComponent extends HTMLElement {
     this.innerHTML = `
       <div class="alerts-cards-container">
         <div class="alerts-header">
-          <h3>🔔 התראות פעילות</h3>
+          <h3 id="alertsTitle">🔔 התראות פעילות</h3>
           <div class="alerts-header-actions">
             <div class="alerts-count" id="newAlertsCount">0 התראות</div>
           </div>
@@ -58,8 +58,38 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   updateCount() {
-    const el = this.querySelector('#newAlertsCount');
-    if (el) el.textContent = `${this.alerts.length} התראות`;
+    const countEl = this.querySelector('#newAlertsCount');
+    const titleEl = this.querySelector('#alertsTitle');
+    const cardsContainer = this.querySelector('#alertsCards');
+
+    if (countEl) {
+      countEl.textContent = `${this.alerts.length} התראות`;
+      // עדכון שקיפות של מונה ההתראות
+      if (this.alerts.length === 0) {
+        countEl.style.opacity = '0.5';
+      } else {
+        countEl.style.opacity = '1';
+      }
+    }
+
+    if (titleEl) {
+      if (this.alerts.length === 0) {
+        titleEl.textContent = '🔕 אין התראות חדשות';
+        titleEl.style.opacity = '0.5';
+      } else {
+        titleEl.textContent = '🔔 התראות פעילות';
+        titleEl.style.opacity = '1';
+      }
+    }
+
+    // הסתרת/הצגת מיכל הכרטיסיות
+    if (cardsContainer) {
+      if (this.alerts.length === 0) {
+        cardsContainer.style.display = 'none';
+      } else {
+        cardsContainer.style.display = 'grid';
+      }
+    }
   }
 
   renderAlerts() {
@@ -67,18 +97,17 @@ class ActiveAlertsComponent extends HTMLElement {
     if (!container) return;
 
     if (!this.alerts.length) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">🔕</div>
-          <h4>אין התראות פעילות</h4>
-          <p>כל ההתראות נקראו או שאין התראות חדשות כרגע</p>
-        </div>
-      `;
+      // הסתרת המיכל כשאין התראות
+      container.style.display = 'none';
+      this.updateCount(); // עדכון הכותרת למצב ריק
       return;
     }
 
+    // הצגת המיכל כשיש התראות
+    container.style.display = 'grid';
     container.innerHTML = this.alerts.map(a => this.createAlertCardHTML(a)).join('');
     this.setupCardEventListeners();
+    this.updateCount(); // עדכון הכותרת למצב עם התראות
   }
 
   createAlertCardHTML(alert) {
@@ -188,8 +217,8 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   getCurrentPrice(sym) {
-    const p = { 
-      AAPL: '185.50', GOOGL: '2750.00', MSFT: '420.75', TSLA: '250.25', 
+    const p = {
+      AAPL: '185.50', GOOGL: '2750.00', MSFT: '420.75', TSLA: '250.25',
       NVDA: '850.00', SPY: '450.30', QQQ: '380.45', IWM: '185.20',
       AMZN: '3200.00', META: '380.50', NFLX: '580.25', AMD: '120.75',
       INTC: '45.80', ORCL: '125.40', CRM: '280.90', ADBE: '520.60'
@@ -198,8 +227,8 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   getDailyChange(sym) {
-    const c = { 
-      AAPL: '+2.5', GOOGL: '-1.2', MSFT: '+3.1', TSLA: '-0.8', 
+    const c = {
+      AAPL: '+2.5', GOOGL: '-1.2', MSFT: '+3.1', TSLA: '-0.8',
       NVDA: '+5.2', SPY: '+1.8', QQQ: '+2.3', IWM: '-0.5',
       AMZN: '+1.7', META: '-2.1', NFLX: '+4.3', AMD: '+6.8',
       INTC: '-1.5', ORCL: '+0.9', CRM: '+2.4', ADBE: '-0.7'

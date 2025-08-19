@@ -9,13 +9,13 @@ Development Server with Auto-Reload and Stability Features
   - Monitoring ו-health checks
   - Restart אוטומטי במקרה של קריסה
   - לוגים מפורטים
-🛡️ יציבות: משתמש ב-Waitress המתוקן בתור subprocess
+🛡️ יציבות: משתמש ב-Waitress המתוקן ישירות
 📊 ביצועים: מתאים לפיתוח עם עומס נמוך-בינוני
 
 ארכיטקטורה:
 - DevServer: מנהל את התהליך הראשי
 - CodeChangeHandler: צופה בשינויים בקבצים
-- subprocess: מפעיל את run_waitress_fixed.py
+- Waitress: שרת WSGI יציב ישירות
 - watchdog: ספרייה לצפייה בשינויים
 
 מתאים ל:
@@ -23,6 +23,11 @@ Development Server with Auto-Reload and Stability Features
 ✅ ניסויים ובדיקות
 ✅ סביבות עם auto-reload
 ❌ לא מתאים לפרודקשן (יותר מדי משאבים)
+
+שינויים אחרונים (גרסה 2.6):
+- ✅ הסרת תלות ב-run_waitress_fixed.py (הועבר לארכיון)
+- ✅ שימוש ב-Waitress ישירות
+- ✅ קונפיגורציה אחידה - רק dev_server.py ו-start_dev.sh
 """
 
 import os
@@ -119,7 +124,7 @@ class DevServer:
         
     def start_server(self):
         """
-        הפעלת השרת עם Waitress המתוקן בתור subprocess
+        הפעלת השרת עם Waitress ישירות (ללא תלות ב-run_waitress_fixed.py)
         """
         print("🚀 מפעיל שרת פיתוח עם Waitress...")
         logger.info("Starting development server with Waitress")
@@ -140,10 +145,10 @@ class DevServer:
                 print("❌ UI directory not found at ../trading-ui")
                 return False
             
-            # הפעלת השרת עם subprocess - משתמש ב-run_waitress_fixed.py
+            # הפעלת השרת עם subprocess - משתמש ב-app.py ישירות
             # זה מאפשר לנו לנהל את התהליך ולעצור אותו בעת הצורך
             self.process = subprocess.Popen([
-                sys.executable, 'run_waitress_fixed.py'
+                sys.executable, 'app.py'
             ], cwd=os.path.dirname(os.path.abspath(__file__)))
             
             print("✅ כל הקבצים והתיקיות הנדרשים נמצאו")
@@ -226,6 +231,7 @@ class DevServer:
             print("🔄 Auto-restart enabled")
             print("⚡ Using Waitress for stability")
             print("📝 Detailed logs in server_detailed.log")
+            print("🎯 קונפיגורציה אחידה - רק dev_server.py ו-start_dev.sh")
             print("-" * 50)
             
             # הפעלת השרת והצופה

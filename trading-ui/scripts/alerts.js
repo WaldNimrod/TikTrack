@@ -4,392 +4,868 @@
  * ========================================
  * 
  * קובץ ייעודי לדף ההתראות (alerts.html)
- * מכיל את כל הפונקציות הספציפיות לדף זה
- * 
- * פונקציות עיקריות:
- * - loadAlertsData() - טעינת נתוני התראות
- * - updateAlertsTable() - עדכון טבלת ההתראות
- * - markAlertAsRead() - סימון התראה כנקראה
- * - פונקציות מיון וסטטיסטיקות
  * 
  * מחבר: Tik.track Development Team
  * תאריך עדכון אחרון: 2025
  * ========================================
  */
 
-// משתנים גלובליים לדף ההתראות
+// משתנים גלובליים
 let alertsData = [];
 
+// נתוני דמה
+const demoAlerts = [
+  {
+    id: 1,
+    title: "התראה על מחיר AAPL",
+    type: "price_alert",
+    status: "open",
+    related_type_id: 4, // ticker
+    related_id: 1,
+    condition: "מחיר > 210$",
+    message: "AAPL הגיע ליעד מחיר",
+    created_at: "2024-01-15",
+    is_triggered: false
+  },
+  {
+    id: 2,
+    title: "סטופ לוס TSLA",
+    type: "stop_loss",
+    status: "open",
+    related_type_id: 2, // trade
+    related_id: 1,
+    condition: "מחיר < 690$",
+    message: "TSLA מתחת לסטופ",
+    created_at: "2024-01-14",
+    is_triggered: true
+  }
+];
+
 /**
- * פונקציה לטעינת נתוני התראות מהשרת
+ * טעינת נתוני התראות
  */
 async function loadAlertsData() {
-    try {
+  try {
     console.log('🔄 טוען התראות מהשרת...');
-    
-    // קריאה מה-API
     const response = await fetch('/api/v1/alerts/');
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    let apiData = await response.json();
-    
-    // בדיקה שהנתונים בפורמט הנכון
-    if (apiData && apiData.data && Array.isArray(apiData.data)) {
-      apiData = apiData.data;
-    }
-    
-    console.log('📡 נתונים מה-API:', apiData);
-    console.log('📡 סוג הנתונים:', typeof apiData);
-    console.log('📡 האם זה מערך:', Array.isArray(apiData));
-    console.log('📡 אורך הנתונים:', apiData ? apiData.length : 'null');
-    
-    // עדכון הנתונים המקומיים
-    alertsData = apiData.map(alert => ({
+
+    const data = await response.json();
+    const alerts = data.data || data;
+    console.log(`✅ נטענו ${alerts.length} התראות`);
+
+    // עדכון המשתנה הגלובלי
+    alertsData = alerts.map(alert => ({
       id: alert.id,
       title: alert.title,
-      message: alert.message,
       type: alert.type,
       status: alert.status,
+      related_type_id: alert.related_type_id,
+      related_id: alert.related_id,
+      condition: alert.condition,
+      message: alert.message,
       created_at: alert.created_at,
-      read_at: alert.read_at,
-      related_type: alert.related_type,
-      related_id: alert.related_id
+      is_triggered: alert.is_triggered
     }));
-    
-    console.log('📊 נתונים מעודכנים:', alertsData);
-    console.log('📊 אורך alertsData:', alertsData.length);
-    console.log('📊 דוגמה להתראה ראשונה:', alertsData[0]);
-    
-    // קבלת פילטרים שמורים
-    const selectedStatuses = window.selectedStatusesForFilter || [];
-    const selectedTypes = window.selectedTypesForFilter || [];
-    const selectedDateRange = window.selectedDateRangeForFilter || null;
-    const searchTerm = window.searchTermForFilter || '';
-    
-    console.log('🔄 פילטרים שמורים:', {
-      selectedStatuses,
-      selectedTypes,
-      selectedDateRange,
-      searchTerm
-    });
-    
-    // שימוש בפונקציה המותאמת לפילטור
-    filterAlertsData(selectedStatuses, selectedTypes, selectedDateRange, searchTerm);
-    
-    } catch (error) {
+
+    // עדכון הטבלה
+    updateAlertsTable(alertsData);
+
+    return alertsData;
+
+  } catch (error) {
     console.error('Error loading alerts data:', error);
-    document.querySelector('#alertsTable tbody').innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
-    }
+    console.log('⚠️ משתמש בנתוני דמו');
+
+    // שימוש בנתוני דמו
+    alertsData = demoAlerts;
+    updateAlertsTable(alertsData);
+
+    return alertsData;
+  }
 }
 
 /**
- * פונקציה לפילטור נתוני התראות
- */
-function filterAlertsData(selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-  console.log('🔄 === FILTER ALERTS DATA ===');
-  console.log('🔄 Selected statuses:', selectedStatuses);
-  console.log('🔄 Selected types:', selectedTypes);
-  console.log('🔄 Date range:', selectedDateRange);
-  console.log('🔄 Search term:', searchTerm);
-  
-  console.log('🔄 Original alertsData length:', alertsData.length);
-  console.log('🔄 Original alertsData:', alertsData);
-  let filteredAlerts = [...alertsData];
-  
-  // פילטר לפי סטטוס
-  if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
-    console.log('🔄 Filtering by status:', selectedStatuses);
-    filteredAlerts = filteredAlerts.filter(alert => {
-      const statusDisplay = alert.status === 'read' ? 'נקראה' : 'לא נקראה';
-      console.log(`🔄 Alert ${alert.id}: status=${alert.status}, display=${statusDisplay}, selected=${selectedStatuses}, match=${selectedStatuses.includes(statusDisplay)}`);
-      return selectedStatuses.includes(statusDisplay);
-    });
-    console.log('🔄 After status filter:', filteredAlerts.length, 'alerts');
-  }
-  
-  // פילטר לפי סוג
-  if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
-    console.log('🔄 Filtering by type:', selectedTypes);
-    filteredAlerts = filteredAlerts.filter(alert => {
-      // המרת סוגים מאנגלית לעברית
-      let typeDisplay;
-      switch(alert.type) {
-        case 'info':
-          typeDisplay = 'מידע';
-          break;
-        case 'warning':
-          typeDisplay = 'אזהרה';
-          break;
-        case 'error':
-          typeDisplay = 'שגיאה';
-          break;
-        case 'success':
-          typeDisplay = 'הצלחה';
-          break;
-        default:
-          typeDisplay = alert.type;
-      }
-      
-      // בדיקה אם הסוג הנבחר מתאים
-      const isMatch = selectedTypes.includes(typeDisplay);
-      console.log(`🔄 Alert ${alert.id}: type=${alert.type}, display=${typeDisplay}, selected=${selectedTypes}, match=${isMatch}`);
-      return isMatch;
-    });
-    console.log('🔄 After type filter:', filteredAlerts.length, 'alerts');
-  }
-  
-  // פילטר לפי חיפוש
-  if (searchTerm && searchTerm.trim() !== '') {
-    const searchLower = searchTerm.toLowerCase();
-    filteredAlerts = filteredAlerts.filter(alert => {
-      return (
-        (alert.title && alert.title.toLowerCase().includes(searchLower)) ||
-        (alert.message && alert.message.toLowerCase().includes(searchLower)) ||
-        (alert.type && alert.type.toLowerCase().includes(searchLower))
-      );
-    });
-    console.log('🔄 After search filter:', filteredAlerts.length, 'alerts');
-  }
-  
-  // עדכון הטבלה
-  console.log('🔄 === UPDATING TABLE ===');
-  console.log('🔄 Filtered alerts count:', filteredAlerts.length);
-  console.log('🔄 First filtered alert:', filteredAlerts[0]);
-  updateAlertsTable(filteredAlerts);
-}
-
-/**
- * פונקציה לעדכון טבלת ההתראות
+ * עדכון טבלת התראות
  */
 function updateAlertsTable(alerts) {
   console.log('🔄 === UPDATE ALERTS TABLE ===');
   console.log('🔄 Alerts to display:', alerts.length);
-  console.log('🔄 First alert:', alerts[0]);
-  
-  const tbody = document.querySelector('.main-content table tbody');
+
+  const tbody = document.querySelector('#alertsTable tbody');
   if (!tbody) {
     console.error('Table body not found');
     return;
   }
-  
-  const tableHTML = alerts.map(alert => {
-    const statusDisplay = alert.status === 'read' ? 'נקראה' : 'לא נקראה';
-    const typeDisplay = getTypeDisplay(alert.type);
-    const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-    
-    return `
-    <tr class="${alert.status === 'unread' ? 'unread-alert' : ''}">
-      <td><strong>#${alert.id}</strong></td>
-      <td><span class="alert-type-${alert.type}">${typeDisplay}</span></td>
-      <td><strong>${alert.title || '-'}</strong></td>
-      <td>${alert.message || '-'}</td>
-      <td><span class="status-badge status-${alert.status}">${statusDisplay}</span></td>
-      <td>${createdAt}</td>
-      <td class="actions-cell">
-        ${alert.status === 'unread' ? 
-          `<button class="btn btn-sm btn-success" onclick="markAlertAsRead('${alert.id}')" title="סמן כנקראה">✓</button>` : 
-          ''
-        }
-        <button class="btn btn-sm btn-danger" onclick="deleteAlert('${alert.id}')" title="מחק">✕</button>
-      </td>
-    </tr>
-  `;
-  }).join('');
-  
-  tbody.innerHTML = tableHTML;
-  
-  // עדכון ספירת רשומות
-  const countElement = document.querySelector('.main-content .table-count');
-  if (countElement) {
-    countElement.textContent = `${alerts.length} התראות`;
-  }
-  
-  // עדכון סטטיסטיקות הטבלה
-  window.updateTableStats('alerts');
-}
 
-/**
- * פונקציה לתרגום סוג לעברית
- */
-function getTypeDisplay(type) {
-  const typeMap = {
-    'info': 'מידע',
-    'warning': 'אזהרה',
-    'error': 'שגיאה',
-    'success': 'הצלחה'
-  };
-  return typeMap[type] || type;
-}
+  // טעינת נתונים נוספים לצורך הצגת סימבולים
+  let accounts = [];
+  let trades = [];
+  let tradePlans = [];
+  let tickers = [];
 
-/**
- * פונקציה לסימון התראה כנקראה
- */
-async function markAlertAsRead(alertId) {
+  // פונקציה לטעינת נתונים נוספים
+  const loadAdditionalData = async () => {
     try {
-    console.log('🔄 מסמן התראה כנקראה:', alertId);
-    
-    const response = await fetch(`/api/v1/alerts/${alertId}/mark-read`, {
+      console.log('🔄 טוען נתונים נוספים...');
+      const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
+        fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/trades').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/tickers').then(r => r.json()).catch(() => ({ data: [] }))
+      ]);
+
+      accounts = accountsResponse.data || accountsResponse || [];
+      trades = tradesResponse.data || tradesResponse || [];
+      tradePlans = tradePlansResponse.data || tradePlansResponse || [];
+      tickers = tickersResponse.data || tickersResponse || [];
+
+      console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
+    } catch (error) {
+      console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
+      // המשך עם מערכים ריקים
+      accounts = [];
+      trades = [];
+      tradePlans = [];
+      tickers = [];
+    }
+  };
+
+  // טעינת נתונים ועדכון הטבלה
+  loadAdditionalData().then(() => {
+    const tableHTML = alerts.map(alert => {
+      const statusClass = getStatusClass(alert.status);
+      const typeClass = getTypeClass(alert.type);
+      // קביעת האובייקט המקושר
+      let relatedDisplay = '';
+      let relatedIcon = '';
+      let relatedClass = '';
+
+      switch (alert.related_type_id) {
+        case 1: // חשבון
+          const account = accounts.find(a => a.id === alert.related_id);
+          relatedDisplay = account ? account.name : `חשבון ${alert.related_id}`;
+          relatedIcon = '🏦';
+          relatedClass = 'related-account';
+          break;
+        case 2: // טרייד
+          const trade = trades.find(t => t.id === alert.related_id);
+          relatedDisplay = trade ? trade.symbol : `טרייד ${alert.related_id}`;
+          relatedIcon = '📈';
+          relatedClass = 'related-trade';
+          break;
+        case 3: // תוכנית
+          const plan = tradePlans.find(p => p.id === alert.related_id);
+          relatedDisplay = plan ? plan.symbol : `תוכנית ${alert.related_id}`;
+          relatedIcon = '📋';
+          relatedClass = 'related-plan';
+          break;
+        case 4: // טיקר
+          const ticker = tickers.find(t => t.id === alert.related_id);
+          relatedDisplay = ticker ? ticker.symbol : `טיקר ${alert.related_id}`;
+          relatedIcon = '📊';
+          relatedClass = 'related-ticker';
+          break;
+        default:
+          relatedDisplay = `אובייקט ${alert.related_id}`;
+          relatedIcon = '❓';
+          relatedClass = 'related-other';
+      }
+
+      // קביעת הסימבול לטור הראשון
+      let symbolDisplay = '';
+      if (alert.related_type_id == 1) { // חשבון - ריק
+        symbolDisplay = '';
+      } else if (alert.related_type_id == 2) { // טרייד
+        const trade = trades.find(t => t.id == alert.related_id);
+        if (trade && trade.ticker_id) {
+          const ticker = tickers.find(tick => tick.id == trade.ticker_id);
+          symbolDisplay = ticker ? ticker.symbol : trade.ticker_id;
+        } else {
+          symbolDisplay = `${alert.related_id}`;
+        }
+      } else if (alert.related_type_id == 3) { // תוכנית
+        const plan = tradePlans.find(p => p.id == alert.related_id);
+        if (plan && plan.ticker_id) {
+          const ticker = tickers.find(tick => tick.id == plan.ticker_id);
+          symbolDisplay = ticker ? ticker.symbol : plan.ticker_id;
+        } else {
+          symbolDisplay = `${alert.related_id}`;
+        }
+      } else if (alert.related_type_id == 4) { // טיקר
+        const ticker = tickers.find(tick => tick.id == alert.related_id);
+        symbolDisplay = ticker ? ticker.symbol : alert.related_id;
+      } else {
+        symbolDisplay = `אובייקט ${alert.related_id}`;
+      }
+
+      // הוספת הסוג לפני האובייקט
+      const typeLabels = {
+        1: 'חשבון: ',
+        2: 'טרייד: ',
+        3: 'תוכנית: ',
+        4: 'טיקר: '
+      };
+
+      const typeLabel = typeLabels[alert.related_type_id] || 'אובייקט: ';
+      relatedDisplay = typeLabel + relatedDisplay;
+
+      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+
+      // המרת סטטוס לעברית להצגה
+      let statusDisplay;
+      switch (alert.status) {
+        case 'open': statusDisplay = 'פתוח'; break;
+        case 'closed': statusDisplay = 'סגור'; break;
+        case 'cancelled': statusDisplay = 'מבוטל'; break;
+        default: statusDisplay = alert.status;
+      }
+
+      // המרת מצב לעברית להצגה
+      let stateDisplay;
+      switch (alert.is_triggered) {
+        case 'new': stateDisplay = 'לא נקרא'; break;
+        case true: stateDisplay = 'נקרא'; break;
+        case false: stateDisplay = 'מאזין'; break;
+        default: stateDisplay = 'לא מוגדר';
+      }
+
+      return `
+        <tr>
+          <td><strong>${symbolDisplay}</strong></td>
+          <td style="padding: 0;">
+            <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right;">
+              ${relatedDisplay}
+            </div>
+          </td>
+          <td><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+          <td><span class="state-badge">${stateDisplay}</span></td>
+          <td><span class="type-badge ${typeClass}">${alert.type}</span></td>
+          <td>${alert.condition || '-'}</td>
+          <td>${alert.message || '-'}</td>
+          <td>${createdAt}</td>
+          <td class="actions-cell">
+            <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">
+              ✏️
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.innerHTML = tableHTML;
+
+    // עדכון ספירת רשומות
+    const countElement = document.querySelector('.table-count');
+    if (countElement) {
+      countElement.textContent = `${alerts.length} התראות`;
+    }
+
+    // עדכון סטטיסטיקות
+    updateSummaryStats();
+  });
+}
+
+/**
+ * עדכון סטטיסטיקות סיכום
+ */
+function updateSummaryStats() {
+  const totalAlerts = alertsData.length;
+  const openAlerts = alertsData.filter(alert => alert.status === 'open').length;
+  const todayAlerts = alertsData.filter(alert => {
+    const today = new Date().toDateString();
+    const alertDate = new Date(alert.created_at).toDateString();
+    return alertDate === today;
+  }).length;
+  const weekAlerts = alertsData.filter(alert => {
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return new Date(alert.created_at) >= weekAgo;
+  }).length;
+
+  document.getElementById('totalAlerts').textContent = totalAlerts;
+  document.getElementById('activeAlerts').textContent = openAlerts;
+  document.getElementById('todayAlerts').textContent = todayAlerts;
+  document.getElementById('weekAlerts').textContent = weekAlerts;
+}
+
+
+
+/**
+ * הצגת מודל הוספת התראה
+ */
+function showAddAlertModal() {
+  // טעינת נתונים למודל
+  loadModalData();
+
+  // ניקוי הטופס
+  const form = document.getElementById('addAlertForm');
+  if (form) {
+    form.reset();
+  }
+
+  // הצגת המודל
+  const modalElement = document.getElementById('addAlertModal');
+  if (modalElement) {
+    // הגדרת z-index גבוה מאוד
+    modalElement.style.zIndex = '99999';
+
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      const modal = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      modal.show();
+
+      // וידוא שהמודל מופיע מעל הכל
+      setTimeout(() => {
+        modalElement.style.zIndex = '99999';
+        const dialog = modalElement.querySelector('.modal-dialog');
+        if (dialog) {
+          dialog.style.zIndex = '100000';
+        }
+        const content = modalElement.querySelector('.modal-content');
+        if (content) {
+          content.style.zIndex = '100001';
+        }
+      }, 100);
+    } else {
+      // אם Bootstrap לא זמין, נציג את המודל באופן ידני
+      modalElement.style.display = 'block';
+      modalElement.classList.add('show');
+      modalElement.style.zIndex = '99999';
+      document.body.classList.add('modal-open');
+
+      // הוספת backdrop
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      backdrop.id = 'modalBackdrop';
+      backdrop.style.zIndex = '99998';
+      document.body.appendChild(backdrop);
+    }
+  } else {
+    console.error('Modal element not found');
+  }
+}
+
+/**
+ * טעינת נתונים למודלים
+ */
+async function loadModalData() {
+  try {
+    console.log('🔄 טוען נתונים למודל...');
+
+    // טעינת נתונים במקביל
+    const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
+      fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/trades').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/tickers').then(r => r.json()).catch(() => ({ data: [] }))
+    ]);
+
+    const accounts = accountsResponse.data || accountsResponse || [];
+    const trades = tradesResponse.data || tradesResponse || [];
+    const tradePlans = tradePlansResponse.data || tradePlansResponse || [];
+    const tickers = tickersResponse.data || tickersResponse || [];
+
+    console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
+
+    // עדכון רדיו באטונים
+    updateRadioButtons(accounts, trades, tradePlans, tickers);
+  } catch (error) {
+    console.error('שגיאה בטעינת נתונים למודל:', error);
+    // המשך עם מערכים ריקים
+    updateRadioButtons([], [], [], []);
+  }
+}
+
+/**
+ * עדכון רדיו באטונים
+ */
+function updateRadioButtons(accounts, trades, tradePlans, tickers) {
+  // עדכון רדיו באטון לחשבונות
+  const accountRadio = document.getElementById('alertRelationAccount');
+  const editAccountRadio = document.getElementById('editAlertRelationAccount');
+
+  if (accountRadio) {
+    accountRadio.addEventListener('change', () => {
+      populateSelect('alertRelatedObjectSelect', accounts, 'name');
+    });
+  }
+
+  if (editAccountRadio) {
+    editAccountRadio.addEventListener('change', () => {
+      populateSelect('editAlertRelatedObjectSelect', accounts, 'name');
+    });
+  }
+
+  // עדכון רדיו באטון לטריידים
+  const tradeRadio = document.getElementById('alertRelationTrade');
+  const editTradeRadio = document.getElementById('editAlertRelationTrade');
+
+  if (tradeRadio) {
+    tradeRadio.addEventListener('change', () => {
+      populateSelect('alertRelatedObjectSelect', trades, 'id', 'טרייד');
+    });
+  }
+
+  if (editTradeRadio) {
+    editTradeRadio.addEventListener('change', () => {
+      populateSelect('editAlertRelatedObjectSelect', trades, 'id', 'טרייד');
+    });
+  }
+
+  // עדכון רדיו באטון לתכנונים
+  const planRadio = document.getElementById('alertRelationTradePlan');
+  const editPlanRadio = document.getElementById('editAlertRelationTradePlan');
+
+  if (planRadio) {
+    planRadio.addEventListener('change', () => {
+      populateSelect('alertRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+    });
+  }
+
+  if (editPlanRadio) {
+    editPlanRadio.addEventListener('change', () => {
+      populateSelect('editAlertRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+    });
+  }
+
+  // עדכון רדיו באטון לטיקרים
+  const tickerRadio = document.getElementById('alertRelationTicker');
+  const editTickerRadio = document.getElementById('editAlertRelationTicker');
+
+  if (tickerRadio) {
+    tickerRadio.addEventListener('change', () => {
+      populateSelect('alertRelatedObjectSelect', tickers, 'symbol');
+    });
+  }
+
+  if (editTickerRadio) {
+    editTickerRadio.addEventListener('change', () => {
+      populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol');
+    });
+  }
+}
+
+/**
+ * מילוי select עם נתונים
+ */
+function populateSelect(selectId, data, field, prefix = '') {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+
+  select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+  data.forEach(item => {
+    const option = document.createElement('option');
+    option.value = item.id;
+    option.textContent = prefix ? `${prefix} ${item[field]}` : item[field];
+    select.appendChild(option);
+  });
+}
+
+/**
+ * סגירת מודל
+ */
+function closeModal(modalId) {
+  const modalElement = document.getElementById(modalId);
+  if (modalElement) {
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
+    } else {
+      // אם Bootstrap לא זמין, נסגור את המודל באופן ידני
+      modalElement.style.display = 'none';
+      modalElement.classList.remove('show');
+      document.body.classList.remove('modal-open');
+
+      // הסרת backdrop
+      const backdrop = document.getElementById('modalBackdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
+    }
+  }
+}
+
+/**
+ * שמירת התראה חדשה
+ */
+async function saveAlert() {
+  try {
+    const form = document.getElementById('addAlertForm');
+    if (!form) {
+      console.error('Add alert form not found');
+      return;
+    }
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const alertTitle = document.getElementById('alertTitle');
+    const alertType = document.getElementById('alertType');
+    const alertCondition = document.getElementById('alertCondition');
+    const alertMessage = document.getElementById('alertMessage');
+    const relationTypeRadio = document.querySelector('input[name="alertRelationType"]:checked');
+    const relatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
+
+    if (!alertTitle || !alertType || !alertCondition || !relationTypeRadio || !relatedObjectSelect) {
+      console.error('Required form elements not found');
+      return;
+    }
+
+    const alertData = {
+      title: alertTitle.value,
+      type: alertType.value,
+      related_type_id: parseInt(relationTypeRadio.value),
+      related_id: parseInt(relatedObjectSelect.value),
+      condition: alertCondition.value,
+      message: alertMessage.value,
+      status: 'open',
+      is_triggered: false
+    };
+
+    console.log('שולח התראה חדשה:', alertData);
+
+    const response = await fetch('/api/v1/alerts/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(alertData)
+    });
+
+    if (response.ok) {
+      const newAlert = await response.json();
+      console.log('התראה נשמרה בהצלחה:', newAlert);
+
+      // סגירת המודל
+      closeModal('addAlertModal');
+
+      // רענון הנתונים
+      loadAlertsData();
+
+      // הצגת הודעה
+      alert('התראה נשמרה בהצלחה!');
+    } else {
+      throw new Error(`שגיאה בשמירת התראה: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('שגיאה בשמירת התראה:', error);
+    alert('שגיאה בשמירת התראה: ' + error.message);
+  }
+}
+
+/**
+ * עריכת התראה
+ */
+function editAlert(alertId) {
+  const alert = alertsData.find(a => a.id === alertId);
+  if (!alert) {
+    alert('התראה לא נמצאה');
+    return;
+  }
+
+  // טעינת נתונים למודל
+  loadModalData();
+
+  // מילוי הטופס
+  const editAlertId = document.getElementById('editAlertId');
+  const editAlertTitle = document.getElementById('editAlertTitle');
+  const editAlertType = document.getElementById('editAlertType');
+  const editAlertCondition = document.getElementById('editAlertCondition');
+  const editAlertMessage = document.getElementById('editAlertMessage');
+
+  if (editAlertId) editAlertId.value = alert.id;
+  if (editAlertTitle) editAlertTitle.value = alert.title || '';
+  if (editAlertType) editAlertType.value = alert.type || '';
+  if (editAlertCondition) editAlertCondition.value = alert.condition || '';
+  if (editAlertMessage) editAlertMessage.value = alert.message || '';
+
+  // בחירת סוג הקשר
+  const relationType = alert.related_type_id;
+  const radioButton = document.querySelector(`input[name="editAlertRelationType"][value="${relationType}"]`);
+  if (radioButton) {
+    radioButton.checked = true;
+    // הפעלת אירוע change לטעינת האובייקטים
+    radioButton.dispatchEvent(new Event('change'));
+  }
+
+  // הצגת המודל
+  const modalElement = document.getElementById('editAlertModal');
+  if (modalElement) {
+    // הגדרת z-index גבוה מאוד
+    modalElement.style.zIndex = '99999';
+
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      const modal = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      modal.show();
+
+      // וידוא שהמודל מופיע מעל הכל
+      setTimeout(() => {
+        modalElement.style.zIndex = '99999';
+        const dialog = modalElement.querySelector('.modal-dialog');
+        if (dialog) {
+          dialog.style.zIndex = '100000';
+        }
+        const content = modalElement.querySelector('.modal-content');
+        if (content) {
+          content.style.zIndex = '100001';
+        }
+      }, 100);
+    } else {
+      // אם Bootstrap לא זמין, נציג את המודל באופן ידני
+      modalElement.style.display = 'block';
+      modalElement.classList.add('show');
+      modalElement.style.zIndex = '99999';
+      document.body.classList.add('modal-open');
+
+      // הוספת backdrop
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      backdrop.id = 'modalBackdrop';
+      backdrop.style.zIndex = '99998';
+      document.body.appendChild(backdrop);
+    }
+  } else {
+    console.error('Edit modal element not found');
+  }
+}
+
+/**
+ * עדכון התראה
+ */
+async function updateAlert() {
+  try {
+    const form = document.getElementById('editAlertForm');
+    if (!form) {
+      console.error('Edit alert form not found');
+      return;
+    }
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const editAlertId = document.getElementById('editAlertId');
+    const editAlertTitle = document.getElementById('editAlertTitle');
+    const editAlertType = document.getElementById('editAlertType');
+    const editAlertCondition = document.getElementById('editAlertCondition');
+    const editAlertMessage = document.getElementById('editAlertMessage');
+    const relationTypeRadio = document.querySelector('input[name="editAlertRelationType"]:checked');
+    const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
+
+    if (!editAlertId || !editAlertTitle || !editAlertType || !editAlertCondition || !relationTypeRadio || !relatedObjectSelect) {
+      console.error('Required edit form elements not found');
+      return;
+    }
+
+    const alertData = {
+      title: editAlertTitle.value,
+      type: editAlertType.value,
+      related_type_id: parseInt(relationTypeRadio.value),
+      related_id: parseInt(relatedObjectSelect.value),
+      condition: editAlertCondition.value,
+      message: editAlertMessage.value
+    };
+
+    console.log('מעדכן התראה:', editAlertId.value, alertData);
+
+    const response = await fetch(`/api/v1/alerts/${editAlertId.value}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(alertData)
     });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+
+    if (response.ok) {
+      const updatedAlert = await response.json();
+      console.log('התראה עודכנה בהצלחה:', updatedAlert);
+
+      // סגירת המודל
+      closeModal('editAlertModal');
+
+      // רענון הנתונים
+      loadAlertsData();
+
+      // הצגת הודעה
+      alert('התראה עודכנה בהצלחה!');
+    } else {
+      throw new Error(`שגיאה בעדכון התראה: ${response.status}`);
     }
-    
-    const result = await response.json();
-    console.log('✅ התראה סומנה כנקראה:', result);
-    
-    // רענון הנתונים
-    loadAlertsData();
-    
-    // הצגת הודעת הצלחה
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('ההתראה סומנה כנקראה', 'success');
-    }
-    
-    } catch (error) {
-    console.error('❌ שגיאה בסימון התראה כנקראה:', error);
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בסימון התראה כנקראה', 'error');
-    }
-    }
+  } catch (error) {
+    console.error('שגיאה בעדכון התראה:', error);
+    alert('שגיאה בעדכון התראה: ' + error.message);
+  }
 }
 
 /**
- * פונקציה למחיקת התראה
+ * מחיקת התראה
  */
 async function deleteAlert(alertId) {
+  if (!confirm('האם אתה בטוח שברצונך למחוק התראה זו?')) {
+    return;
+  }
+
   try {
-    console.log('🗑️ מוחק התראה:', alertId);
-    
-    // אישור מחיקה
-    if (!confirm('האם אתה בטוח שברצונך למחוק התראה זו?')) {
-        return;
-    }
-    
+    console.log('מוחק התראה:', alertId);
+
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
       method: 'DELETE'
     });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    console.log('✅ התראה נמחקה:', result);
-    
-    // רענון הנתונים
-    loadAlertsData();
-    
-    // הצגת הודעת הצלחה
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('ההתראה נמחקה בהצלחה', 'success');
-    }
 
-    } catch (error) {
-    console.error('❌ שגיאה במחיקת התראה:', error);
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה במחיקת התראה', 'error');
-    }
-    }
-}
+    if (response.ok) {
+      console.log('התראה נמחקה בהצלחה');
 
-/**
- * פונקציה לסימון כל ההתראות כנקראו
- */
-async function markAllAlertsAsRead() {
-  try {
-    console.log('🔄 מסמן את כל ההתראות כנקראו');
-    
-    const response = await fetch('/api/v1/alerts/mark-all-read', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // רענון הנתונים
+      loadAlertsData();
+
+      // הצגת הודעה
+      alert('התראה נמחקה בהצלחה!');
+    } else {
+      throw new Error(`שגיאה במחיקת התראה: ${response.status}`);
     }
-    
-    const result = await response.json();
-    console.log('✅ כל ההתראות סומנו כנקראו:', result);
-    
-    // רענון הנתונים
-    loadAlertsData();
-    
-    // הצגת הודעת הצלחה
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('כל ההתראות סומנו כנקראו', 'success');
-    }
-    
   } catch (error) {
-    console.error('❌ שגיאה בסימון כל ההתראות כנקראו:', error);
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בסימון כל ההתראות כנקראו', 'error');
-    }
+    console.error('שגיאה במחיקת התראה:', error);
+    alert('שגיאה במחיקת התראה: ' + error.message);
   }
 }
 
 /**
- * פונקציה למחיקת כל ההתראות
+ * מיון טבלה
  */
-async function deleteAllAlerts() {
-  try {
-    console.log('🗑️ מוחק את כל ההתראות');
-    
-    // אישור מחיקה
-    if (!confirm('האם אתה בטוח שברצונך למחוק את כל ההתראות? פעולה זו אינה הפיכה.')) {
-      return;
+function sortTable(columnIndex) {
+  // פונקציה זו תתווסף בהמשך
+  console.log(`מיון לפי עמודה ${columnIndex}`);
+}
+
+/**
+ * קבלת מחלקת סטטוס
+ */
+function getStatusClass(status) {
+  switch (status) {
+    case 'open': return 'status-open';
+    case 'closed': return 'status-closed';
+    case 'cancelled': return 'status-cancelled';
+    default: return 'status-inactive';
+  }
+}
+
+/**
+ * קבלת מחלקת סוג
+ */
+function getTypeClass(type) {
+  switch (type) {
+    case 'price_alert': return 'type-ticker';
+    case 'stop_loss': return 'type-trade-open';
+    case 'volume_alert': return 'type-other';
+    case 'custom_alert': return 'type-other';
+    default: return 'type-other';
+  }
+}
+
+/**
+ * קבלת מחלקת סוג של אובייקט מקושר
+ */
+function getRelatedClass(relatedType) {
+  switch (relatedType) {
+    case 4: return 'related-ticker'; // ticker
+    case 2: return 'related-trade'; // trade
+    case 3: return 'related-plan'; // trade_plan
+    case 1: return 'related-account'; // account
+    default: return 'related-other';
+  }
+}
+
+
+
+/**
+ * שחזור מצב הסקשנים
+ */
+function restoreAlertsSectionState() {
+  // שחזור מצב top section
+  const topSection = document.querySelector('.top-section .section-body');
+  const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+  const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
+
+  if (topSection && topToggleBtn && topIcon) {
+    const isCollapsed = localStorage.getItem('alertsTopSectionCollapsed') === 'true';
+
+    if (isCollapsed) {
+      topSection.classList.add('collapsed');
+      topSection.style.display = 'none';
+      topIcon.textContent = '▼';
+    } else {
+      topSection.classList.remove('collapsed');
+      topSection.style.display = 'block';
+      topIcon.textContent = '▲';
     }
-    
-    const response = await fetch('/api/v1/alerts/', {
-      method: 'DELETE'
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    console.log('✅ כל ההתראות נמחקו:', result);
-    
-    // רענון הנתונים
-    loadAlertsData();
-    
-    // הצגת הודעת הצלחה
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('כל ההתראות נמחקו בהצלחה', 'success');
-    }
-    
-  } catch (error) {
-    console.error('❌ שגיאה במחיקת כל ההתראות:', error);
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה במחיקת כל ההתראות', 'error');
+  }
+
+  // שחזור מצב main section
+  const mainSection = document.querySelector('.content-section .section-body');
+  const mainToggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+  const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
+
+  if (mainSection && mainToggleBtn && mainIcon) {
+    const isCollapsed = localStorage.getItem('alertsMainSectionCollapsed') === 'true';
+
+    if (isCollapsed) {
+      mainSection.classList.add('collapsed');
+      mainSection.style.display = 'none';
+      mainIcon.textContent = '▼';
+    } else {
+      mainSection.classList.remove('collapsed');
+      mainSection.style.display = 'block';
+      mainIcon.textContent = '▲';
     }
   }
 }
+
+// אתחול הדף
+document.addEventListener('DOMContentLoaded', function () {
+  console.log('🔄 === DOM CONTENT LOADED (ALERTS) ===');
+
+  // שחזור מצב הסקשנים
+  restoreAlertsSectionState();
+
+  // אתחול פילטרים
+  if (typeof window.initializePageFilters === 'function') {
+    window.initializePageFilters('alerts');
+  }
+
+  // טעינת נתונים
+  loadAlertsData();
+});
 
 // הוספת הפונקציות לגלובל
 window.loadAlertsData = loadAlertsData;
 window.updateAlertsTable = updateAlertsTable;
-window.filterAlertsData = filterAlertsData;
-window.markAlertAsRead = markAlertAsRead;
+
+window.showAddAlertModal = showAddAlertModal;
+window.editAlert = editAlert;
 window.deleteAlert = deleteAlert;
-window.markAllAlertsAsRead = markAllAlertsAsRead;
-window.deleteAllAlerts = deleteAllAlerts;
-
-// הגדרת הפונקציה updateGridFromComponent לדף ההתראות
-window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-  console.log('🔄 === UPDATE GRID FROM COMPONENT (alerts) ===');
-  console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
-
-  // קריאה לפונקציה הגלובלית
-  window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'alerts');
-};
+window.saveAlert = saveAlert;
+window.updateAlert = updateAlert;
+window.sortTable = sortTable;
 
 

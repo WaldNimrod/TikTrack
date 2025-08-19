@@ -1320,34 +1320,34 @@ class AppHeader extends HTMLElement {
     let savedSearchFilter = null;
 
     try {
-      const savedStatusData = localStorage.getItem(`${pageName}FilterStatuses`);
-      const savedTypeData = localStorage.getItem(`${pageName}FilterTypes`);
-      const savedAccountData = localStorage.getItem(`${pageName}FilterAccounts`);
-      const savedDateRangeData = localStorage.getItem(`${pageName}FilterDateRanges`);
-      const savedSearchData = localStorage.getItem(`${pageName}FilterSearch`);
+      const savedStatusData = localStorage.getItem('globalFilterStatuses');
+      const savedTypeData = localStorage.getItem('globalFilterTypes');
+      const savedAccountData = localStorage.getItem('globalFilterAccounts');
+      const savedDateRangeData = localStorage.getItem('globalFilterDateRange');
+      const savedSearchData = localStorage.getItem('globalFilterSearch');
 
       if (savedStatusData) {
         savedStatusFilter = JSON.parse(savedStatusData);
-        console.log('Found saved status filter in initializeFilter:', savedStatusFilter);
+        console.log('Found saved global status filter in initializeFilter:', savedStatusFilter);
       }
       if (savedTypeData) {
         savedTypeFilter = JSON.parse(savedTypeData);
-        console.log('Found saved type filter in initializeFilter:', savedTypeFilter);
+        console.log('Found saved global type filter in initializeFilter:', savedTypeFilter);
       }
       if (savedAccountData) {
         savedAccountFilter = JSON.parse(savedAccountData);
-        console.log('Found saved account filter in initializeFilter:', savedAccountFilter);
+        console.log('Found saved global account filter in initializeFilter:', savedAccountFilter);
       }
       if (savedDateRangeData) {
-        savedDateRangeFilter = JSON.parse(savedDateRangeData);
-        console.log('Found saved date range filter in initializeFilter:', savedDateRangeFilter);
+        savedDateRangeFilter = savedDateRangeData;
+        console.log('Found saved global date range filter in initializeFilter:', savedDateRangeFilter);
       }
       if (savedSearchData) {
         savedSearchFilter = savedSearchData;
-        console.log('Found saved search filter in initializeFilter:', savedSearchFilter);
+        console.log('Found saved global search filter in initializeFilter:', savedSearchFilter);
       }
     } catch (error) {
-      console.error('Error loading saved filters in initializeFilter:', error);
+      console.error('Error loading saved global filters in initializeFilter:', error);
     }
 
     // אתחול הפילטר - אם יש פילטר שמור, השתמש בו, אחרת ברירת מחדל

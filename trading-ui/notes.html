@@ -56,6 +56,34 @@
       font-weight: bold;
     }
 
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .color-palette {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.25rem;
+      padding: 0.5rem;
+      min-width: 200px;
+    }
+
+    .color-option {
+      width: 30px;
+      height: 30px;
+      border: 2px solid #ced4da;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .color-option:hover {
+      border-color: #495057;
+      transform: scale(1.1);
+    }
+
     .text-editor-content {
       font-family: inherit;
       line-height: 1.5;
@@ -176,6 +204,39 @@
     .related-other:hover {
       background-color: #e0e0e0;
       color: #424242;
+    }
+
+    /* עיצוב קישורי קבצים */
+    .file-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+      text-decoration: none;
+      color: #495057;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-link:hover {
+      background-color: #e9ecef;
+      border-color: #adb5bd;
+      color: #0a58ca;
+      text-decoration: none;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-link:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
   </style>
 
@@ -343,22 +404,22 @@
                     <th>
                       <button class="btn btn-link sortable-header-btn" onclick="sortTable(0)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>אובייקט מקושר
-                        <br><span class="header-subtitle">Related Object</span>
+                        <span class="sort-icon">↕</span>סימבול
+                        <br><span class="header-subtitle">Symbol</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header-btn" onclick="sortTable(1)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>תוכן
-                        <br><span class="header-subtitle">Content</span>
+                        <span class="sort-icon">↕</span>אובייקט מקושר
+                        <br><span class="header-subtitle">Related Object</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header-btn" onclick="sortTable(2)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>נוצר ב
-                        <br><span class="header-subtitle">Created At</span>
+                        <span class="sort-icon">↕</span>תוכן
+                        <br><span class="header-subtitle">Content</span>
                       </button>
                     </th>
                     <th>
@@ -366,6 +427,13 @@
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         <span class="sort-icon">↕</span>קובץ מצורף
                         <br><span class="header-subtitle">Attachment</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(4)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>נוצר ב
+                        <br><span class="header-subtitle">Created At</span>
                       </button>
                     </th>
                     <th class="actions-header">
@@ -376,7 +444,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="5" class="loading">טוען הערות...</td>
+                    <td colspan="6" class="loading">טוען הערות...</td>
                   </tr>
                 </tbody>
               </table>
@@ -394,8 +462,8 @@
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             <h5 class="modal-title" id="addNoteModalLabel">הוספת הערה</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form id="addNoteForm">
@@ -403,30 +471,31 @@
                 <div class="col-md-12">
                   <div class="mb-3">
                     <label class="form-label">הערה עבור:</label>
-                    <div class="radio-group-item">
-                      <input type="radio" name="noteRelationType" id="noteRelationTradePlan" value="trade_plan" required
-                        checked>
-                      <label for="noteRelationTradePlan">תוכנית טרייד</label>
-                      <select class="form-control mt-2" id="noteTradePlanId"
-                        style="display: none; margin-top: 10px; width: 100%;">
-                        <option value="">בחר תוכנית טרייד...</option>
-                      </select>
-                    </div>
-                    <div class="radio-group-item">
-                      <input type="radio" name="noteRelationType" id="noteRelationTrade" value="trade" required>
-                      <label for="noteRelationTrade">טרייד</label>
-                      <select class="form-control mt-2" id="noteTradeId"
-                        style="display: none; margin-top: 10px; width: 100%;">
-                        <option value="">בחר טרייד...</option>
-                      </select>
-                    </div>
-                    <div class="radio-group-item">
-                      <input type="radio" name="noteRelationType" id="noteRelationAccount" value="account" required>
-                      <label for="noteRelationAccount">חשבון</label>
-                      <select class="form-control mt-2" id="noteAccountId"
-                        style="display: none; margin-top: 10px; width: 100%;">
-                        <option value="">בחר חשבון...</option>
-                      </select>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="radio-group-item">
+                          <input type="radio" name="noteRelationType" id="noteRelationTradePlan" value="trade_plan"
+                            required>
+                          <label for="noteRelationTradePlan">תוכנית טרייד</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="noteRelationType" id="noteRelationTrade" value="trade" required>
+                          <label for="noteRelationTrade">טרייד</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="noteRelationType" id="noteRelationAccount" value="account" required>
+                          <label for="noteRelationAccount">חשבון</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="noteRelationType" id="noteRelationTicker" value="ticker" required>
+                          <label for="noteRelationTicker">טיקר</label>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <select class="form-select" id="noteRelatedObjectSelect" style="width: 100%;">
+                          <option value="">בחר אובייקט לשיוך...</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -434,51 +503,135 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="mb-3">
-                    <label for="noteContent" class="form-label">תוכן (Content)</label>
+                    <label for="noteContent" class="form-label">תוכן הערה *</label>
                     <div class="text-editor-toolbar">
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')"
-                        title="מודגש">
-                        <strong>B</strong>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')"
-                        title="נטוי">
-                        <em>I</em>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')"
-                        title="קו תחתון">
-                        <u>U</u>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary"
-                        onclick="formatText('strikethrough')" title="קו חוצה">
-                        <s>S</s>
-                      </button>
+                      <!-- עיצוב בסיסי -->
+                      <div class="toolbar-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')"
+                          title="מודגש">
+                          <strong>B</strong>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')"
+                          title="נטוי">
+                          <em>I</em>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')"
+                          title="קו תחתון">
+                          <u>U</u>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="formatText('strikethrough')" title="קו חוצה">
+                          <s>S</s>
+                        </button>
+                      </div>
+
                       <span class="toolbar-separator">|</span>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h3')"
-                        title="כותרת">
-                        H3
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h4')"
-                        title="כותרת משנה">
-                        H4
-                      </button>
+
+                      <!-- כותרות -->
+                      <div class="toolbar-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h3')"
+                          title="כותרת">
+                          H3
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h4')"
+                          title="כותרת משנה">
+                          H4
+                        </button>
+                      </div>
+
                       <span class="toolbar-separator">|</span>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ul')"
-                        title="רשימה לא ממוספרת">
-                        • List
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ol')"
-                        title="רשימה ממוספרת">
-                        1. List
-                      </button>
+
+                      <!-- רשימות -->
+                      <div class="toolbar-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ul')"
+                          title="רשימה לא ממוספרת">
+                          • List
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ol')"
+                          title="רשימה ממוספרת">
+                          1. List
+                        </button>
+                      </div>
+
                       <span class="toolbar-separator">|</span>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('link')"
-                        title="קישור">
-                        🔗
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('color')"
-                        title="צבע טקסט">
-                        🎨
-                      </button>
+
+                      <!-- יישור טקסט -->
+                      <div class="toolbar-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('alignLeft')"
+                          title="יישור שמאל">
+                          ⬅️
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="formatText('alignCenter')" title="יישור מרכז">
+                          ↔️
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="formatText('alignRight')" title="יישור ימין">
+                          ➡️
+                        </button>
+                      </div>
+
+                      <span class="toolbar-separator">|</span>
+
+                      <!-- כיוון טקסט -->
+                      <div class="toolbar-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="formatText('directionLtr')" title="כיוון משמאל לימין">
+                          LTR
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="formatText('directionRtl')" title="כיוון מימין לשמאל">
+                          RTL
+                        </button>
+                      </div>
+
+                      <span class="toolbar-separator">|</span>
+
+                      <!-- צבעים -->
+                      <div class="toolbar-group">
+                        <div class="dropdown">
+                          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" title="צבע טקסט">
+                            🎨
+                          </button>
+                          <ul class="dropdown-menu color-palette">
+                            <li><button type="button" class="color-option" data-color="#000000"
+                                style="background-color: #000000;" onclick="setTextColor('#000000')"
+                                title="שחור"></button></li>
+                            <li><button type="button" class="color-option" data-color="#FF0000"
+                                style="background-color: #FF0000;" onclick="setTextColor('#FF0000')"
+                                title="אדום"></button></li>
+                            <li><button type="button" class="color-option" data-color="#00FF00"
+                                style="background-color: #00FF00;" onclick="setTextColor('#00FF00')"
+                                title="ירוק"></button></li>
+                            <li><button type="button" class="color-option" data-color="#0000FF"
+                                style="background-color: #0000FF;" onclick="setTextColor('#0000FF')"
+                                title="כחול"></button></li>
+                            <li><button type="button" class="color-option" data-color="#FFFF00"
+                                style="background-color: #FFFF00;" onclick="setTextColor('#FFFF00')"
+                                title="צהוב"></button></li>
+                            <li><button type="button" class="color-option" data-color="#FF00FF"
+                                style="background-color: #FF00FF;" onclick="setTextColor('#FF00FF')"
+                                title="מגנטה"></button></li>
+                            <li><button type="button" class="color-option" data-color="#00FFFF"
+                                style="background-color: #00FFFF;" onclick="setTextColor('#00FFFF')"
+                                title="ציאן"></button></li>
+                            <li><button type="button" class="color-option" data-color="#FFA500"
+                                style="background-color: #FFA500;" onclick="setTextColor('#FFA500')"
+                                title="כתום"></button></li>
+                            <li><button type="button" class="color-option" data-color="#800080"
+                                style="background-color: #800080;" onclick="setTextColor('#800080')"
+                                title="סגול"></button></li>
+                            <li><button type="button" class="color-option" data-color="#808080"
+                                style="background-color: #808080;" onclick="setTextColor('#808080')"
+                                title="אפור"></button></li>
+                          </ul>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('link')"
+                          title="קישור">
+                          🔗
+                        </button>
+                      </div>
                     </div>
                     <div class="text-editor-content" id="noteContentEditor" contenteditable="true"
                       style="border: 1px solid #ced4da; border-radius: 0.375rem; padding: 0.375rem 0.75rem; min-height: 120px; background-color: white; overflow-y: auto;">
@@ -490,7 +643,7 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="noteAttachment" class="form-label">קובץ מצורף (Attachment)</label>
+                    <label for="noteAttachment" class="form-label">קובץ מצורף</label>
                     <input type="file" class="form-control" id="noteAttachment" accept=".jpg,.jpeg,.png,.gif,.pdf"
                       max="524288">
                     <small class="form-text text-muted">מותר: תמונות (JPG, PNG, GIF) ו-PDF. גודל מקסימלי: 512KB</small>
@@ -504,7 +657,10 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="saveNote()" title="שמור">💾</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+            <button type="button" class="btn btn-success" onclick="saveNote()"
+              style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">שמור
+              הערה</button>
           </div>
         </div>
       </div>
@@ -515,8 +671,8 @@
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             <h5 class="modal-title" id="editNoteModalLabel">עריכת הערה</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form id="editNoteForm">
@@ -551,57 +707,150 @@
                         <option value="">בחר חשבון...</option>
                       </select>
                     </div>
+                    <div class="radio-group-item">
+                      <input type="radio" name="editNoteRelationType" id="editNoteRelationTicker" value="ticker"
+                        required>
+                      <label for="editNoteRelationTicker">טיקר</label>
+                      <select class="form-control mt-2" id="editNoteTickerId"
+                        style="display: none; margin-top: 10px; width: 100%;">
+                        <option value="">בחר טיקר...</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-12">
                   <div class="mb-3">
-                    <label for="editNoteContent" class="form-label">תוכן (Content)</label>
+                    <label for="editNoteContent" class="form-label">תוכן הערה</label>
                     <div class="text-editor-toolbar">
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')"
-                        title="מודגש">
-                        <strong>B</strong>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')"
-                        title="נטוי">
-                        <em>I</em>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')"
-                        title="קו תחתון">
-                        <u>U</u>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary"
-                        onclick="formatText('strikethrough')" title="קו חוצה">
-                        <s>S</s>
-                      </button>
+                      <!-- עיצוב בסיסי -->
+                      <div class="toolbar-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')"
+                          title="מודגש">
+                          <strong>B</strong>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')"
+                          title="נטוי">
+                          <em>I</em>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')"
+                          title="קו תחתון">
+                          <u>U</u>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="formatText('strikethrough')" title="קו חוצה">
+                          <s>S</s>
+                        </button>
+                      </div>
+
                       <span class="toolbar-separator">|</span>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h3')"
-                        title="כותרת">
-                        H3
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h4')"
-                        title="כותרת משנה">
-                        H4
-                      </button>
+
+                      <!-- כותרות -->
+                      <div class="toolbar-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h3')"
+                          title="כותרת">
+                          H3
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('h4')"
+                          title="כותרת משנה">
+                          H4
+                        </button>
+                      </div>
+
                       <span class="toolbar-separator">|</span>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ul')"
-                        title="רשימה לא ממוספרת">
-                        • List
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ol')"
-                        title="רשימה ממוספרת">
-                        1. List
-                      </button>
+
+                      <!-- רשימות -->
+                      <div class="toolbar-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ul')"
+                          title="רשימה לא ממוספרת">
+                          • List
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('ol')"
+                          title="רשימה ממוספרת">
+                          1. List
+                        </button>
+                      </div>
+
                       <span class="toolbar-separator">|</span>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('link')"
-                        title="קישור">
-                        🔗
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('color')"
-                        title="צבע טקסט">
-                        🎨
-                      </button>
+
+                      <!-- יישור טקסט -->
+                      <div class="toolbar-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('alignLeft')"
+                          title="יישור שמאל">
+                          ⬅️
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="formatText('alignCenter')" title="יישור מרכז">
+                          ↔️
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="formatText('alignRight')" title="יישור ימין">
+                          ➡️
+                        </button>
+                      </div>
+
+                      <span class="toolbar-separator">|</span>
+
+                      <!-- כיוון טקסט -->
+                      <div class="toolbar-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="formatText('directionLtr')" title="כיוון משמאל לימין">
+                          LTR
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="formatText('directionRtl')" title="כיוון מימין לשמאל">
+                          RTL
+                        </button>
+                      </div>
+
+                      <span class="toolbar-separator">|</span>
+
+                      <!-- צבעים -->
+                      <div class="toolbar-group">
+                        <div class="dropdown">
+                          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" title="צבע טקסט">
+                            🎨
+                          </button>
+                          <ul class="dropdown-menu color-palette">
+                            <li><button type="button" class="color-option" data-color="#000000"
+                                style="background-color: #000000;" onclick="setTextColor('#000000')"
+                                title="שחור"></button></li>
+                            <li><button type="button" class="color-option" data-color="#FF0000"
+                                style="background-color: #FF0000;" onclick="setTextColor('#FF0000')"
+                                title="אדום"></button></li>
+                            <li><button type="button" class="color-option" data-color="#00FF00"
+                                style="background-color: #00FF00;" onclick="setTextColor('#00FF00')"
+                                title="ירוק"></button></li>
+                            <li><button type="button" class="color-option" data-color="#0000FF"
+                                style="background-color: #0000FF;" onclick="setTextColor('#0000FF')"
+                                title="כחול"></button></li>
+                            <li><button type="button" class="color-option" data-color="#FFFF00"
+                                style="background-color: #FFFF00;" onclick="setTextColor('#FFFF00')"
+                                title="צהוב"></button></li>
+                            <li><button type="button" class="color-option" data-color="#FF00FF"
+                                style="background-color: #FF00FF;" onclick="setTextColor('#FF00FF')"
+                                title="מגנטה"></button></li>
+                            <li><button type="button" class="color-option" data-color="#00FFFF"
+                                style="background-color: #00FFFF;" onclick="setTextColor('#00FFFF')"
+                                title="ציאן"></button></li>
+                            <li><button type="button" class="color-option" data-color="#FFA500"
+                                style="background-color: #FFA500;" onclick="setTextColor('#FFA500')"
+                                title="כתום"></button></li>
+                            <li><button type="button" class="color-option" data-color="#800080"
+                                style="background-color: #800080;" onclick="setTextColor('#800080')"
+                                title="סגול"></button></li>
+                            <li><button type="button" class="color-option" data-color="#808080"
+                                style="background-color: #808080;" onclick="setTextColor('#808080')"
+                                title="אפור"></button></li>
+                          </ul>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('link')"
+                          title="קישור">
+                          🔗
+                        </button>
+                      </div>
                     </div>
                     <div class="text-editor-content" id="editNoteContentEditor" contenteditable="true"
                       style="border: 1px solid #ced4da; border-radius: 0.375rem; padding: 0.375rem 0.75rem; min-height: 120px; background-color: white; overflow-y: auto;">
@@ -733,95 +982,7 @@
         }
       }
 
-      // פונקציות לעיצוב טקסט
-      function formatText(command) {
-        // מציאת העורך הפעיל
-        let editor = null;
 
-        // בדיקה איזה עורך פעיל כרגע
-        const addEditor = document.getElementById('noteContentEditor');
-        const editEditor = document.getElementById('editNoteContentEditor');
-
-        if (addEditor && addEditor === document.activeElement) {
-          editor = addEditor;
-        } else if (editEditor && editEditor === document.activeElement) {
-          editor = editEditor;
-        } else {
-          // אם אף עורך לא פעיל, ננסה למצוא עורך פתוח
-          if (addEditor && addEditor.offsetParent !== null) {
-            editor = addEditor;
-          } else if (editEditor && editEditor.offsetParent !== null) {
-            editor = editEditor;
-          }
-        }
-
-        if (!editor) {
-          console.warn('לא נמצא עורך טקסט פעיל');
-          return;
-        }
-
-        editor.focus();
-
-        switch (command) {
-          case 'bold':
-            document.execCommand('bold', false, null);
-            break;
-          case 'italic':
-            document.execCommand('italic', false, null);
-            break;
-          case 'underline':
-            document.execCommand('underline', false, null);
-            break;
-          case 'strikethrough':
-            document.execCommand('strikethrough', false, null);
-            break;
-          case 'h3':
-            document.execCommand('formatBlock', false, '<h3>');
-            break;
-          case 'h4':
-            document.execCommand('formatBlock', false, '<h4>');
-            break;
-          case 'ul':
-            document.execCommand('insertUnorderedList', false, null);
-            break;
-          case 'ol':
-            document.execCommand('insertOrderedList', false, null);
-            break;
-          case 'link':
-            const url = prompt('הכנס URL לקישור:');
-            if (url) {
-              document.execCommand('createLink', false, url);
-            }
-            break;
-          case 'color':
-            const color = prompt('הכנס צבע (למשל: red, #ff0000):');
-            if (color) {
-              document.execCommand('foreColor', false, color);
-            }
-            break;
-        }
-
-        // עדכון השדה הנסתר
-        syncEditorContent();
-      }
-
-      // פונקציה להעתקת תוכן מהעורך לשדה הנסתר
-      function syncEditorContent() {
-        const addEditor = document.getElementById('noteContentEditor');
-        const editEditor = document.getElementById('editNoteContentEditor');
-        const addTextarea = document.getElementById('noteContent');
-        const editTextarea = document.getElementById('editNoteContent');
-
-        if (addEditor && addTextarea) {
-          addTextarea.value = addEditor.innerHTML;
-          console.log('🔄 עדכון תוכן הוספה:', addEditor.innerHTML);
-        }
-
-        if (editEditor && editTextarea) {
-          editTextarea.value = editEditor.innerHTML;
-          console.log('🔄 עדכון תוכן עריכה:', editEditor.innerHTML);
-        }
-      }
 
       // פונקציה לטיפול בקבצים מצורפים
       function setupFileHandlers() {
@@ -955,40 +1116,7 @@
         });
       }
 
-      // פונקציות מותאמות לעמוד הערות
-      function openNoteDetails(id) {
-        console.log('פתיחת פרטי הערה:', id);
-        // פתיחת מודל הוספת הערה
-        if (typeof showAddNoteModal === 'function') {
-          showAddNoteModal();
-        } else {
-          console.error('showAddNoteModal function not found');
-        }
-      }
-
-      /**
-       * פונקציה לעריכת הערה
-       */
-      function editNote(noteId) {
-        console.log('עריכת הערה:', noteId);
-        // כאן יוכנס קוד לעריכת הערה
-        alert('פונקציית עריכה תתווסף בקרוב');
-      }
-
-      /**
-       * פונקציה למחיקת הערה
-       */
-      function deleteNote(noteId) {
-        console.log('מחיקת הערה:', noteId);
-        if (confirm('האם אתה בטוח שברצונך למחוק הערה זו?')) {
-          // כאן יוכנס קוד למחיקת הערה
-          alert('פונקציית מחיקה תתווסף בקרוב');
-        }
-      }
-
       // הגדרת הפונקציות כגלובליות
-      window.openNoteDetails = openNoteDetails;
-      window.editNote = editNote;
       window.formatText = formatText;
       window.syncEditorContent = syncEditorContent;
 
@@ -1262,7 +1390,7 @@
             <button class="btn btn-sm btn-secondary" onclick="editNote('${note.id}')" title="ערוך">
               <span class="btn-icon">✏️</span>
             </button>
-            <button class="btn btn-sm btn-danger" onclick="deleteNote('${note.id}')" title="מחק">✕</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteNote('${note.id}')" title="מחק">X</button>
           </td>
         </tr>
       `;
@@ -1489,15 +1617,12 @@
       async function loadNotes() {
         try {
           console.log('🔄 טוען הערות...');
-          const notes = await loadNotesData();
-
-          // עדכון הטבלה עם הנתונים
-          if (typeof updateNotesTable === 'function') {
-            await updateNotesTable(notes);
+          if (typeof window.loadNotesData === 'function') {
+            const notes = await window.loadNotesData();
+            console.log('✅ הערות נטענו בהצלחה:', notes.length);
           } else {
-            console.error('❌ פונקציית updateNotesTable לא נמצאה');
+            console.error('❌ פונקציית loadNotesData לא נמצאה');
           }
-
         } catch (error) {
           console.error('❌ שגיאה בטעינת הערות:', error);
           const tbody = document.querySelector('.main-content table tbody');
@@ -1688,7 +1813,13 @@
         restoreNotesSectionState();
 
         // טעינת נתונים
-        loadNotes();
+        if (typeof window.loadNotesData === 'function') {
+          console.log('🔄 קריאה ישירה ל-loadNotesData...');
+          window.loadNotesData();
+        } else {
+          console.log('🔄 קריאה ל-loadNotes...');
+          loadNotes();
+        }
 
         // טעינת התראות
         if (typeof loadAlertsForCards === 'function') {

@@ -324,39 +324,8 @@
 
       // ===== פונקציות חשבונות =====
 
-      // נתוני חשבונות לדוגמה
-      let accountsData = [
-        {
-          id: 1,
-          name: 'חשבון ראשי',
-          currency: 'ILS',
-          status: 'open',
-          cash_balance: 50000,
-          total_value: 55000,
-          total_pl: 5000,
-          notes: 'חשבון ראשי למסחר'
-        },
-        {
-          id: 2,
-          name: 'חשבון השקעות',
-          currency: 'USD',
-          status: 'open',
-          cash_balance: 25000,
-          total_value: 27000,
-          total_pl: 2000,
-          notes: 'חשבון השקעות ארוכות טווח'
-        },
-        {
-          id: 3,
-          name: 'חשבון מסחר',
-          currency: 'EUR',
-          status: 'closed',
-          cash_balance: 10000,
-          total_value: 9500,
-          total_pl: -500,
-          notes: 'חשבון מסחר יומי'
-        }
-      ];
+      // נתוני חשבונות - יטענו מהשרת
+      let accountsData = [];
 
       // פונקציה לטעינת נתוני חשבונות
       async function loadAccountsData() {
@@ -440,7 +409,7 @@
                               <button class="btn btn-sm btn-secondary" onclick="showEditAccountModalLocal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך">
                 <span class="btn-icon">✏️</span>
               </button>
-              <button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">X</button>
               <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק">🗑️</button>
             </td>
           </tr>

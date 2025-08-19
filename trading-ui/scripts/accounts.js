@@ -72,7 +72,11 @@ async function loadAccountsFromServer() {
       console.log('🔄 Open accounts details:', openAccounts);
 
       // קריאה לעדכון התפריט
-      updateAccountFilterMenu(openAccounts);
+      if (typeof window.updateAccountFilterMenu === 'function') {
+        window.updateAccountFilterMenu(openAccounts);
+      } else {
+        console.log('🔄 updateAccountFilterMenu not available yet');
+      }
     } else {
       console.log('🔄 Error loading accounts from server, status:', response.status);
       const errorText = await response.text();
@@ -113,8 +117,12 @@ async function loadAllAccountsFromServer() {
       // שמירת כל החשבונות במשתנה גלובלי
       window.allAccountsData = allAccounts;
 
-      // עדכון הפילטר עם כל החשבונות
-      updateAccountFilterMenu(allAccounts);
+      // עדכון הפילטר עם כל החשבונות (אם הפונקציה קיימת)
+      if (typeof window.updateAccountFilterMenu === 'function') {
+        window.updateAccountFilterMenu(allAccounts);
+      } else {
+        console.log('🔄 updateAccountFilterMenu not available yet');
+      }
       return allAccounts;
     } else {
       console.log('🔄 Error loading all accounts from server, status:', response.status);
@@ -223,7 +231,7 @@ function updateAccountsTable(accounts) {
       <td>${account.notes || '-'}</td>
       <td>
         <button class="btn btn-sm btn-secondary" onclick="showEditAccountModalLocal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
-        <button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">❌</button>
+        <button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">X</button>
         <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק">🗑️</button>
       </td>
     </tr>
@@ -318,7 +326,7 @@ function updateAccountsTableInDesigns(accounts) {
       <td>${account.notes || '-'}</td>
       <td>
         <button class="btn btn-sm btn-secondary" onclick="showEditAccountModal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
-        <button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">❌</button>
+        <button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">X</button>
         <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק">🗑️</button>
       </td>
     </tr>
@@ -351,7 +359,11 @@ window.refreshAccountFilterMenu = function () {
   console.log('🔄 Manual refresh of account filter menu called');
   if (window.accountsData && window.accountsData.length > 0) {
     console.log('🔄 Using existing accounts data:', window.accountsData);
-    updateAccountFilterMenu(window.accountsData);
+    if (typeof window.updateAccountFilterMenu === 'function') {
+      window.updateAccountFilterMenu(window.accountsData);
+    } else {
+      console.log('🔄 updateAccountFilterMenu not available yet');
+    }
   } else {
     console.log('🔄 No accounts data, loading from server...');
     loadAccountsFromServer();

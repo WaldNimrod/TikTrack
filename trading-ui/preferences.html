@@ -9,20 +9,37 @@
   <!-- 
     ===== דף העדפות - TikTrack =====
     
+    ⚠️  חשוב: זהו דף העדפות המשתמש בלבד!
+    
+    אין קשר לקונפיגורציות השרת או מערכת הבדיקות!
+    
+    🎯 מטרה: ממשק משתמש להגדרת העדפות אישיות
+    📍 מיקום: trading-ui/preferences.html
+    🔗 קונפיגורציות שרת: Backend/SERVER_CONFIGURATIONS.md
+    🔗 מערכת הבדיקות: Backend/testing_suite/
+    
     דף זה מכיל:
     1. הגדרות מערכת - הסקשן הראשון
-    2. הגדרות אישיות - הסקשן השני
-    3. הגדרות אבטחה - הסקשן השלישי
-    4. הגדרות תצוגה - הסקשן הרביעי
+    2. מערכת בדיקות - הסקשן השני (ממשק להרצת בדיקות)
+    3. הגדרות אישיות - הסקשן השלישי
+    4. הגדרות אבטחה - הסקשן הרביעי
+    5. הגדרות תצוגה - הסקשן החמישי
     
     מבנה הדף:
     - app-header: כותרת האפליקציה עם ניווט
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: סיכום הגדרות
       - content-section (1): הגדרות מערכת
-      - content-section (2): הגדרות אישיות
-      - content-section (3): הגדרות אבטחה
-      - content-section (4): הגדרות תצוגה
+      - content-section (2): מערכת בדיקות (ממשק משתמש)
+      - content-section (3): הגדרות אישיות
+      - content-section (4): הגדרות אבטחה
+      - content-section (5): הגדרות תצוגה
+    
+    🚫 מה לא נמצא כאן:
+    - ❌ קונפיגורציות שרת
+    - ❌ הגדרות סביבת פיתוח
+    - ❌ סקריפטי הפעלת שרת
+    - ❌ קבצי בדיקות עצמם
   -->
 
   <!-- Apple Theme CSS - בסיס כללי -->
@@ -614,16 +631,239 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6c757d;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+    }
+
+    .close-btn:hover {
+      background-color: #f8f9fa;
+      color: #495057;
+    }
+
+    .test-details {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+    }
+
+    .test-details h6 {
+      margin: 0 0 10px 0;
+      color: #495057;
+      font-weight: 600;
+    }
+
+    .test-details pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    /* כפתורי קטגוריה */
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .category-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .category-toggle-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .category-toggle-btn:active {
+      transform: translateY(0);
+    }
+
+    .category-toggle-btn .toggle-text {
+      font-weight: 600;
+    }
+
+    .category-toggle-btn i {
+      font-size: 0.8em;
+      transition: transform 0.3s ease;
+    }
+
+    .category-toggle-btn.active i {
+      transform: rotate(180deg);
+    }
+
+    /* מצב כבוי */
+    .category-toggle-btn.off {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+    }
+
+    .category-toggle-btn.off:hover {
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+    }
+
+    /* מצב מופעל */
+    .category-toggle-btn.on {
+      background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+      box-shadow: 0 2px 8px rgba(81, 207, 102, 0.3);
+    }
+
+    .category-toggle-btn.on:hover {
+      box-shadow: 0 4px 12px rgba(81, 207, 102, 0.4);
+    }
+
+    /* כפתורי פעולה בסוף חלק ניהול בדיקות */
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: var(--apple-card-bg);
+      border-radius: 12px;
+      border: 1px solid #e8e8e8;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 180px;
+      justify-content: center;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .action-btn:active {
+      transform: translateY(0);
+    }
+
+    .action-btn .action-icon {
+      font-size: 1.1em;
+    }
+
+    .action-btn .action-text {
+      font-weight: 600;
+    }
+
+    /* כפתור שמירה */
+    .action-btn.save-btn {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    }
+
+    .action-btn.save-btn:hover {
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+    }
+
+    /* כפתור הרצה */
+    .action-btn.run-btn {
+      background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    }
+
+    .action-btn.run-btn:hover {
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    }
+
+    .action-btn.run-btn:disabled {
+      background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+    }
+
+    .action-btn.run-btn:disabled:hover {
+      transform: none;
+      box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+    }
+
+    /* כפתור איפוס */
+    .action-btn.reset-btn {
+      background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+      color: #212529;
+      box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+    }
+
+    .action-btn.reset-btn:hover {
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+    }
+
+    /* כפתור סגירה באזור תוצאות */
+    .test-results-header .btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      background: #f8f9fa;
+      color: #6c757d;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .test-results-header .btn:hover {
+      background: #e9ecef;
+      border-color: #adb5bd;
+      color: #495057;
     }
   </style>
 
   <!-- קבצים מודולריים של הגריד -->
-  <script src="scripts/app-header.js"></script>
-  <script src="scripts/main.js"></script>
-  <script src="scripts/grid-filters.js"></script>
-  <script src="scripts/preferences.js"></script>
+  <script src="scripts/app-header.js" onerror="console.error('Failed to load app-header.js')"></script>
+  <script src="scripts/main.js" onerror="console.error('Failed to load main.js')"></script>
+  <script src="scripts/grid-filters.js" onerror="console.error('Failed to load grid-filters.js')"></script>
+  <script src="scripts/preferences.js" onerror="console.error('Failed to load preferences.js')"></script>
 </head>
 
 <body>
@@ -724,6 +964,9 @@
               </button>
               <button class="refresh-btn" onclick="saveTestPreferences()" title="שמור העדפות בדיקות">
                 <span class="action-icon">💾</span> שמור
+              </button>
+              <button class="refresh-btn" onclick="resetTestPreferences()" title="רענן לברירות מחדל">
+                <span class="action-icon">🔄</span> רענן
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleTestingSection()" title="הצג/הסתר אזור ניהול בדיקות">
@@ -829,7 +1072,14 @@
 
             <!-- בדיקות יחידה -->
             <div class="test-category">
-              <h3><i class="fas fa-microchip"></i> בדיקות יחידה (Unit Tests)</h3>
+              <div class="category-header">
+                <h3><i class="fas fa-microchip"></i> בדיקות יחידה (Unit Tests)</h3>
+                <button class="category-toggle-btn" onclick="toggleAllTestsInCategory('unit_tests')"
+                  title="הפעל/כבה את כל בדיקות היחידה">
+                  <span class="toggle-text">כבה הכל</span>
+                  <i class="fas fa-power-off"></i>
+                </button>
+              </div>
               <div class="category-description">
                 בדיקות יחידה בודקות פונקציות בודדות ומודלים בנפרד. הן מהירות ופשוטות לביצוע.
               </div>
@@ -917,7 +1167,14 @@
 
             <!-- בדיקות אינטגרציה -->
             <div class="test-category">
-              <h3><i class="fas fa-plug"></i> בדיקות אינטגרציה</h3>
+              <div class="category-header">
+                <h3><i class="fas fa-plug"></i> בדיקות אינטגרציה</h3>
+                <button class="category-toggle-btn" onclick="toggleAllTestsInCategory('integration_tests')"
+                  title="הפעל/כבה את כל בדיקות האינטגרציה">
+                  <span class="toggle-text">כבה הכל</span>
+                  <i class="fas fa-power-off"></i>
+                </button>
+              </div>
               <div class="category-description">
                 בדיקות אינטגרציה בודקות את האינטראקציה בין רכיבים שונים במערכת.
               </div>
@@ -958,7 +1215,14 @@
 
             <!-- בדיקות End-to-End -->
             <div class="test-category">
-              <h3><i class="fas fa-route"></i> בדיקות End-to-End</h3>
+              <div class="category-header">
+                <h3><i class="fas fa-route"></i> בדיקות End-to-End</h3>
+                <button class="category-toggle-btn" onclick="toggleAllTestsInCategory('e2e_tests')"
+                  title="הפעל/כבה את כל בדיקות ה-E2E">
+                  <span class="toggle-text">כבה הכל</span>
+                  <i class="fas fa-power-off"></i>
+                </button>
+              </div>
               <div class="category-description">
                 בדיקות E2E בודקות את המערכת כולה מההתחלה עד הסוף, כולל ממשק המשתמש.
               </div>
@@ -999,7 +1263,14 @@
 
             <!-- בדיקות ביצועים -->
             <div class="test-category">
-              <h3><i class="fas fa-tachometer-alt"></i> בדיקות ביצועים</h3>
+              <div class="category-header">
+                <h3><i class="fas fa-tachometer-alt"></i> בדיקות ביצועים</h3>
+                <button class="category-toggle-btn" onclick="toggleAllTestsInCategory('performance_tests')"
+                  title="הפעל/כבה את כל בדיקות הביצועים">
+                  <span class="toggle-text">כבה הכל</span>
+                  <i class="fas fa-power-off"></i>
+                </button>
+              </div>
               <div class="category-description">
                 בדיקות ביצועים בודקות את מהירות התגובה וניצול המשאבים של המערכת.
               </div>
@@ -1030,7 +1301,14 @@
 
             <!-- בדיקות אבטחה -->
             <div class="test-category">
-              <h3><i class="fas fa-shield-alt"></i> בדיקות אבטחה</h3>
+              <div class="category-header">
+                <h3><i class="fas fa-shield-alt"></i> בדיקות אבטחה</h3>
+                <button class="category-toggle-btn" onclick="toggleAllTestsInCategory('security_tests')"
+                  title="הפעל/כבה את כל בדיקות האבטחה">
+                  <span class="toggle-text">כבה הכל</span>
+                  <i class="fas fa-power-off"></i>
+                </button>
+              </div>
               <div class="category-description">
                 בדיקות אבטחה בודקות את ההגנה של המערכת מפני התקפות ופגיעויות.
               </div>
@@ -1061,14 +1339,18 @@
 
             <!-- כפתורי פעולה -->
             <div class="action-buttons">
-              <button class="btn btn-primary" onclick="saveTestPreferences()">
-                <i class="fas fa-save"></i> שמירת העדפות
+              <button class="action-btn save-btn" onclick="saveTestPreferences()" title="שמור העדפות בדיקות">
+                <span class="action-icon">💾</span>
+                <span class="action-text">שמירת העדפות</span>
               </button>
-              <button class="btn btn-success" onclick="runSelectedTests()" id="runTestsBtn">
-                <i class="fas fa-play"></i> הרצת בדיקות נבחרות
+              <button class="action-btn run-btn" onclick="runSelectedTests()" id="runTestsBtn"
+                title="הרץ בדיקות נבחרות">
+                <span class="action-icon">▶️</span>
+                <span class="action-text">הרצת בדיקות נבחרות</span>
               </button>
-              <button class="btn btn-warning" onclick="resetTestPreferences()">
-                <i class="fas fa-undo"></i> איפוס לברירות מחדל
+              <button class="action-btn reset-btn" onclick="resetTestPreferences()" title="איפוס לברירות מחדל">
+                <span class="action-icon">🔄</span>
+                <span class="action-text">איפוס לברירות מחדל</span>
               </button>
             </div>
 
@@ -2005,6 +2287,7 @@
           localStorage.removeItem('testSettings');
           loadTestPreferences();
           updateTestSummary();
+          updateCategoryButtonStates(); // עדכון מצב כפתורי הקטגוריות
           showNotification('העדפות בדיקות אופסו לברירות מחדל', 'info');
         }
       }
@@ -2050,75 +2333,248 @@
        * Execute the selected tests
        */
       function executeTests(testList) {
-        showNotification('מתחיל הרצת בדיקות...', 'info');
+        const runBtn = document.getElementById('runTestsBtn');
+        const originalText = runBtn.innerHTML;
 
-        // Create test configuration
-        const testConfig = {
-          tests: testList,
-          settings: testSettings,
-          preferences: testPreferences
-        };
+        try {
+          // שינוי כפתור למצב טעינה
+          runBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מריץ בדיקות...';
+          runBtn.disabled = true;
 
-        // Send to backend for execution
-        fetch('/api/v1/tests/run', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(testConfig)
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (data.status === 'success') {
-              showNotification(`הבדיקות הושלמו! ${data.passed} עברו, ${data.failed} נכשלו`, 'success');
-              // Optionally show detailed results
-              if (data.results) {
-                showTestResults(data.results);
+          // הצגת אזור תוצאות
+          showTestResults();
+
+          // Create test configuration
+          const testConfig = {
+            tests: testList,
+            settings: {
+              database: {
+                use_temp_database: true,
+                backup_before_tests: true,
+                cleanup_after_tests: true
+              },
+              execution: {
+                parallel_tests: false,
+                stop_on_failure: false,
+                verbose_output: true
               }
-            } else {
-              showNotification(`שגיאה בהרצת הבדיקות: ${data.message}`, 'error');
             }
+          };
+
+          // Send to backend for execution
+          fetch('/api/v1/tests/run', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(testConfig)
           })
-          .catch(error => {
-            console.error('Error running tests:', error);
-            showNotification('שגיאה בהרצת הבדיקות', 'error');
-          });
+            .then(response => response.json())
+            .then(data => {
+              displayTestResults(data);
+            })
+            .catch(error => {
+              console.error('Error running tests:', error);
+              displayTestError(error);
+            })
+            .finally(() => {
+              // החזרת כפתור למצב רגיל
+              runBtn.innerHTML = originalText;
+              runBtn.disabled = false;
+            });
+        } catch (error) {
+          console.error('שגיאה בהרצת בדיקות:', error);
+          displayTestError(error);
+          // החזרת כפתור למצב רגיל
+          runBtn.innerHTML = originalText;
+          runBtn.disabled = false;
+        }
       }
 
       /**
-       * Show test results in a modal
+       * Show test results area
        */
-      function showTestResults(results) {
-        // Create modal for test results
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.innerHTML = `
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>תוצאות בדיקות</h3>
-            <span class="close">&times;</span>
+      function showTestResults() {
+        const resultsArea = document.getElementById('testResultsArea');
+        const resultsContent = document.getElementById('testResultsContent');
+
+        resultsArea.style.display = 'block';
+        resultsContent.innerHTML = `
+          <div class="test-summary">
+            <h5>מרץ בדיקות...</h5>
+            <div class="loading-spinner"></div>
+            <p>אנא המתן בזמן שהבדיקות רצות...</p>
           </div>
-          <div class="modal-body">
-            <div class="test-results">
-              ${results.map(result => `
-                <div class="test-result ${result.status}">
-                  <span class="test-name">${result.name}</span>
-                  <span class="test-status">${result.status === 'passed' ? '✅' : '❌'}</span>
-                  <span class="test-duration">${result.duration}ms</span>
+        `;
+
+        // גלילה לאזור התוצאות
+        resultsArea.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      /**
+       * Display test results in the results area
+       */
+      function displayTestResults(result) {
+        const resultsContent = document.getElementById('testResultsContent');
+
+        if (result.status === 'success') {
+          const passed = result.passed || 0;
+          const failed = result.failed || 0;
+          const total = result.total || 0;
+          const executionTime = result.execution_time || 0;
+
+          let resultsHtml = `
+            <div class="test-summary">
+              <h5>תוצאות בדיקות</h5>
+              <div class="test-summary-stats">
+                <div class="test-stat">
+                  <div class="test-stat-number" style="color: #28a745;">${passed}</div>
+                  <div class="test-stat-label">עברו</div>
                 </div>
-              `).join('')}
+                <div class="test-stat">
+                  <div class="test-stat-number" style="color: #dc3545;">${failed}</div>
+                  <div class="test-stat-label">נכשלו</div>
+                </div>
+                <div class="test-stat">
+                  <div class="test-stat-number" style="color: #007bff;">${total}</div>
+                  <div class="test-stat-label">סה"כ</div>
+                </div>
+                <div class="test-stat">
+                  <div class="test-stat-number" style="color: #6c757d;">${executionTime.toFixed(2)}s</div>
+                  <div class="test-stat-label">זמן הרצה</div>
+                </div>
+              </div>
             </div>
+          `;
+
+          // הצגת תוצאות מפורטות אם יש
+          if (result.results && result.results.stdout) {
+            resultsHtml += `
+              <div class="test-details">
+                <h6>פרטי הרצה:</h6>
+                <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 0.9em; overflow-x: auto;">${result.results.stdout}</pre>
+              </div>
+            `;
+          }
+
+          resultsContent.innerHTML = resultsHtml;
+
+        } else {
+          displayTestError(new Error(result.message || 'שגיאה לא ידועה'));
+        }
+      }
+
+      /**
+       * Display test error in the results area
+       */
+      function displayTestError(error) {
+        const resultsContent = document.getElementById('testResultsContent');
+
+        resultsContent.innerHTML = `
+          <div class="test-summary" style="background: #f8d7da; border: 1px solid #f5c6cb;">
+            <h5 style="color: #721c24;">שגיאה בהרצת בדיקות</h5>
+            <p style="color: #721c24;">${error.message}</p>
+            <p style="font-size: 0.9em; color: #6c757d;">
+              אנא בדוק שהשרת פועל ונסה שוב.
+            </p>
           </div>
-        </div>
-      `;
+        `;
+      }
 
-        document.body.appendChild(modal);
+      /**
+       * Hide test results area
+       */
+      function hideTestResults() {
+        const resultsArea = document.getElementById('testResultsArea');
+        resultsArea.style.display = 'none';
+      }
 
-        // Close modal functionality
-        modal.querySelector('.close').onclick = () => modal.remove();
-        modal.onclick = (e) => {
-          if (e.target === modal) modal.remove();
+      /**
+       * Toggle all tests in a specific category
+       * @param {string} category - The test category (e.g., 'unit_tests', 'integration_tests')
+       */
+      function toggleAllTestsInCategory(category) {
+        const checkboxes = document.querySelectorAll(`input[data-test^="${category}."]`);
+        const button = event.target.closest('.category-toggle-btn');
+        const toggleText = button.querySelector('.toggle-text');
+
+        if (checkboxes.length === 0) {
+          console.warn(`No tests found for category: ${category}`);
+          return;
+        }
+
+        // בדיקה אם כל הבדיקות מופעלות
+        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+        // החלפת מצב כל הבדיקות
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = !allChecked;
+        });
+
+        // עדכון כפתור
+        if (allChecked) {
+          // כיבוי כל הבדיקות
+          button.classList.remove('on');
+          button.classList.add('off');
+          toggleText.textContent = 'הפעל הכל';
+          button.querySelector('i').className = 'fas fa-power-off';
+          showNotification(`כובו כל בדיקות ה-${getCategoryDisplayName(category)}`, 'info');
+        } else {
+          // הפעלת כל הבדיקות
+          button.classList.remove('off');
+          button.classList.add('on');
+          toggleText.textContent = 'כבה הכל';
+          button.querySelector('i').className = 'fas fa-power-off';
+          showNotification(`הופעלו כל בדיקות ה-${getCategoryDisplayName(category)}`, 'success');
+        }
+
+        // עדכון העדפות וסיכום
+        updateTestPreferencesFromUI();
+        updateTestSummary();
+      }
+
+      /**
+       * Get display name for test category
+       * @param {string} category - The test category
+       * @returns {string} Display name
+       */
+      function getCategoryDisplayName(category) {
+        const categoryNames = {
+          'unit_tests': 'יחידה',
+          'integration_tests': 'אינטגרציה',
+          'e2e_tests': 'End-to-End',
+          'performance_tests': 'ביצועים',
+          'security_tests': 'אבטחה',
+          'load_tests': 'עומס'
         };
+        return categoryNames[category] || category;
+      }
+
+      /**
+       * Update category button states based on current test selections
+       */
+      function updateCategoryButtonStates() {
+        const categories = ['unit_tests', 'integration_tests', 'e2e_tests', 'performance_tests', 'security_tests', 'load_tests'];
+
+        categories.forEach(category => {
+          const checkboxes = document.querySelectorAll(`input[data-test^="${category}."]`);
+          const button = document.querySelector(`button[onclick="toggleAllTestsInCategory('${category}')"]`);
+
+          if (button && checkboxes.length > 0) {
+            const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+            const toggleText = button.querySelector('.toggle-text');
+
+            if (allChecked) {
+              button.classList.remove('off');
+              button.classList.add('on');
+              toggleText.textContent = 'כבה הכל';
+            } else {
+              button.classList.remove('on');
+              button.classList.add('off');
+              toggleText.textContent = 'הפעל הכל';
+            }
+          }
+        });
       }
 
       /**
@@ -2155,35 +2611,75 @@
       window.resetTestPreferences = resetTestPreferences;
       window.runSelectedTests = runSelectedTests;
       window.toggleTestingSection = toggleTestingSection;
+      window.toggleAllTestsInCategory = toggleAllTestsInCategory;
+      window.updateCategoryButtonStates = updateCategoryButtonStates;
+
+      /**
+       * Initialize preferences page
+       */
+      function initializePreferences() {
+        console.log('🔄 === INITIALIZING PREFERENCES PAGE ===');
+
+        try {
+          // שחזור מצב הסגירה
+          restorePreferencesSectionState();
+
+          // טעינת העדפות לממשק
+          loadPreferencesToUI();
+
+          // טעינת העדפות בדיקות
+          loadTestPreferences();
+          updateTestSummary();
+
+          // Setup event listeners for test checkboxes
+          document.querySelectorAll('[data-test]').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+              updateTestPreferencesFromUI();
+              updateTestSummary();
+              updateCategoryButtonStates(); // עדכון מצב כפתורי הקטגוריות
+            });
+          });
+
+          // Setup event listeners for test settings
+          document.querySelectorAll('#useTempDatabase, #backupBeforeTests, #cleanupAfterTests, #parallelTests, #stopOnFailure, #verboseOutput').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+              updateTestSettingsFromUI();
+            });
+          });
+
+          // עדכון מצב כפתורי הקטגוריות
+          updateCategoryButtonStates();
+
+          console.log('✅ Preferences page initialized successfully');
+        } catch (error) {
+          console.error('❌ Error initializing preferences page:', error);
+          throw error;
+        }
+      }
 
       // אתחול הדף
       document.addEventListener('DOMContentLoaded', function () {
         console.log('🔄 === DOM CONTENT LOADED - PREFERENCES ===');
 
-        // שחזור מצב הסגירה
-        restorePreferencesSectionState();
-
-        // טעינת העדפות לממשק
-        loadPreferencesToUI();
-
-        // טעינת העדפות בדיקות
-        loadTestPreferences();
-        updateTestSummary();
-
-        // Setup event listeners for test checkboxes
-        document.querySelectorAll('[data-test]').forEach(checkbox => {
-          checkbox.addEventListener('change', function () {
-            updateTestPreferencesFromUI();
-            updateTestSummary();
-          });
-        });
-
-        // Setup event listeners for test settings
-        document.querySelectorAll('#useTempDatabase, #backupBeforeTests, #cleanupAfterTests, #parallelTests, #stopOnFailure, #verboseOutput').forEach(checkbox => {
-          checkbox.addEventListener('change', function () {
-            updateTestSettingsFromUI();
-          });
-        });
+        try {
+          initializePreferences();
+        } catch (error) {
+          console.error('❌ Failed to initialize preferences page:', error);
+          // Show error to user
+          const body = document.body;
+          if (body) {
+            body.innerHTML = `
+              <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
+                <h2>שגיאה בטעינת הדף</h2>
+                <p>אירעה שגיאה בטעינת דף ההעדפות. אנא רענן את הדף או פנה למנהל המערכת.</p>
+                <p style="color: #666; font-size: 0.9em;">שגיאה: ${error.message}</p>
+                <button onclick="location.reload()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                  רענן דף
+                </button>
+              </div>
+            `;
+          }
+        }
       });
 
       // פונקציה לטעינת סיכום העדפות - הוסרה

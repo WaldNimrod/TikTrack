@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Boolean
 from sqlalchemy.orm import relationship
 from .base import BaseModel
+from typing import Dict, Any, Optional
 
 class Ticker(BaseModel):
     __tablename__ = "tickers"
@@ -16,5 +17,5 @@ class Ticker(BaseModel):
     trades = relationship("Trade")
     trade_plans = relationship("TradePlan")
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Ticker(symbol='{self.symbol}', name='{self.name}')>"

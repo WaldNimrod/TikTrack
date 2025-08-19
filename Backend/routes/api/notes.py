@@ -6,6 +6,9 @@ import os
 import uuid
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from typing import Optional, Dict, Any, List
+from werkzeug.datastructures import FileStorage
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -16,12 +19,12 @@ UPLOAD_FOLDER = 'uploads/notes'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}
 MAX_FILE_SIZE = 524288  # 512KB
 
-def allowed_file(filename):
+def allowed_file(filename: str) -> bool:
     """בדיקה אם סיומת הקובץ מותרת"""
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def save_uploaded_file(file):
+def save_uploaded_file(file: FileStorage) -> Optional[str]:
     """שמירת קובץ שהועלה עם שם ייחודי"""
     logger.info(f"📎 save_uploaded_file called with file: {file.filename if file else 'None'}")
     
@@ -50,7 +53,7 @@ def save_uploaded_file(file):
         logger.warning(f"❌ File not allowed or missing: {file.filename if file else 'None'}")
         return None
 
-def delete_uploaded_file(filename):
+def delete_uploaded_file(filename: str) -> bool:
     """מחיקת קובץ שהועלה"""
     if filename:
         try:
@@ -67,7 +70,7 @@ def delete_uploaded_file(filename):
             return False
     return False
 
-def cleanup_orphaned_files():
+def cleanup_orphaned_files() -> int:
     """ניקוי קבצים יתומים (קבצים שלא מקושרים להערות)"""
     try:
         db = next(get_db())
@@ -104,23 +107,86 @@ def cleanup_orphaned_files():
 def get_notes():
     """קבלת כל ההערות"""
     try:
+        logger.info("🔄 Starting get_notes function")
         db = next(get_db())
-        notes = db.query(Note).all()
+        logger.info("✅ Database connection established")
+        
+        # שימוש ב-SQL ישיר במקום SQLAlchemy
+        try:
+            result = db.execute("SELECT * FROM notes ORDER BY created_at DESC")
+            notes_data = result.fetchall()
+            logger.info(f"✅ Successfully retrieved {len(notes_data)} notes using direct SQL")
+            
+            # המרה למילונים
+            notes_list = []
+            for row in notes_data:
+                # קביעת related_type לפי related_type_id
+                related_type = None
+                if row[3] == 1:  # related_type_id
+                    related_type = 'account'
+                elif row[3] == 2:
+                    related_type = 'trade'
+                elif row[3] == 3:
+                    related_type = 'trade_plan'
+                elif row[3] == 4:
+                    related_type = 'ticker'
+                
+                note_dict = {
+                    'id': row[0],
+                    'content': row[1],
+                    'attachment': row[2],
+                    'related_type_id': row[3],
+                    'related_id': row[4],
+                    'created_at': row[5],
+                    'related_type': related_type
+                }
+                
+                # הוספת שדות לתאימות לאחור
+                if row[3] == 1:  # account
+                    note_dict['account_id'] = row[4]
+                    note_dict['trade_id'] = None
+                    note_dict['trade_plan_id'] = None
+                elif row[3] == 2:  # trade
+                    note_dict['account_id'] = None
+                    note_dict['trade_id'] = row[4]
+                    note_dict['trade_plan_id'] = None
+                elif row[3] == 3:  # trade_plan
+                    note_dict['account_id'] = None
+                    note_dict['trade_id'] = None
+                    note_dict['trade_plan_id'] = row[4]
+                else:
+                    note_dict['account_id'] = None
+                    note_dict['trade_id'] = None
+                    note_dict['trade_plan_id'] = None
+                
+                notes_list.append(note_dict)
+            
+        except Exception as sql_error:
+            logger.error(f"❌ Error with direct SQL: {str(sql_error)}")
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Database error: {str(sql_error)}"},
+                "version": "v1"
+            }), 500
+            
         return jsonify({
             "status": "success",
-            "data": [note.to_dict() for note in notes],
+            "data": notes_list,
             "message": "Notes retrieved successfully",
             "version": "v1"
         })
     except Exception as e:
-        logger.error(f"Error getting notes: {str(e)}")
+        logger.error(f"❌ Error getting notes: {str(e)}")
+        import traceback
+        logger.error(f"❌ Full traceback: {traceback.format_exc()}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve notes"},
+            "error": {"message": f"Failed to retrieve notes: {str(e)}"},
             "version": "v1"
         }), 500
     finally:
-        db.close()
+        if 'db' in locals():
+            db.close()
 
 @notes_bp.route('/<int:note_id>', methods=['GET'])
 def get_note(note_id: int):
@@ -436,7 +502,7 @@ def cleanup_files():
         }), 500
 
 @notes_bp.route('/files/<filename>', methods=['GET', 'DELETE'])
-def handle_file(filename):
+def handle_file(filename: str):
     """טיפול בקבצים - הצגה ומחיקה"""
     if request.method == 'GET':
         """הצגת קובץ שהועלה"""

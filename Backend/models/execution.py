@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import BaseModel
+from typing import Dict, Any, Optional
 
 class Execution(BaseModel):
     __tablename__ = "executions"
@@ -16,5 +17,5 @@ class Execution(BaseModel):
     # יחסים
     trade = relationship("Trade", back_populates="executions")
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Execution(id={self.id}, action='{self.action}', quantity={self.quantity})>"

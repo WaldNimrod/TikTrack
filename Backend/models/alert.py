@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import BaseModel
+from typing import Dict, Any, Optional
 
 class Alert(BaseModel):
     __tablename__ = "alerts"
@@ -14,5 +15,5 @@ class Alert(BaseModel):
     related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False)
     related_id = Column(Integer, nullable=False)
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Alert(id={self.id}, type='{self.type}', active={self.is_active})>"

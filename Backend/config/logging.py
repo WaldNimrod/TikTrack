@@ -3,8 +3,9 @@ import logging.handlers
 import os
 from pathlib import Path
 from datetime import datetime
+from typing import Optional
 
-def setup_logging():
+def setup_logging() -> logging.Logger:
     """הגדרת מערכת הלוגים"""
     
     # יצירת תיקיית לוגים
@@ -65,11 +66,11 @@ def generate_correlation_id() -> str:
 class CorrelationFilter(logging.Filter):
     """פילטר להוספת correlation ID לכל לוג"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.correlation_id = None
+        self.correlation_id: Optional[str] = None
     
-    def filter(self, record):
+    def filter(self, record: logging.LogRecord) -> bool:
         if self.correlation_id:
             record.correlation_id = self.correlation_id
         return True

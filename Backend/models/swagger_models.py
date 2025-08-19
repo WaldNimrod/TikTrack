@@ -1,9 +1,10 @@
 """
 Swagger Data Models for API Documentation
 """
-from flask_restx import fields
+from flask_restx import fields, Api
+from typing import Dict, Any
 
-def create_swagger_models(api):
+def create_swagger_models(api: Api) -> Dict[str, Any]:
     """Create Swagger data models for API documentation"""
     
     # Common response models

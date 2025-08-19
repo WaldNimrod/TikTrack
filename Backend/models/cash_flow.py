@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import BaseModel
+from typing import Dict, Any, Optional
 
 class CashFlow(BaseModel):
     __tablename__ = "cash_flows"
@@ -14,6 +15,6 @@ class CashFlow(BaseModel):
     # יחסים
     account = relationship("Account", back_populates="cash_flows")
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<CashFlow(id={self.id}, type='{self.type}', amount={self.amount})>"
 

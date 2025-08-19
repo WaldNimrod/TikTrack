@@ -53,211 +53,13 @@
   <!-- Typography CSS - טיפוגרפיה ופונטים -->
   <link rel="stylesheet" href="styles/typography.css">
   
-  <style>
-    /* סגנונות למודל חשבון */
-    .modal-content {
-      border-radius: 12px;
-      border: none;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-    
-    .modal-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 12px 12px 0 0;
-      border-bottom: none;
-    }
-    
-    .modal-title {
-      font-weight: 600;
-      font-size: 1.25rem;
-    }
-    
-    .btn-close {
-      filter: invert(1);
-    }
-    
-    .form-label {
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 0.5rem;
-    }
-    
-    .form-control, .form-select {
-      border-radius: 8px;
-      border: 2px solid #e9ecef;
-      transition: all 0.3s ease;
-    }
-    
-    .form-control:focus, .form-select:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .modal-footer {
-      border-top: 1px solid #e9ecef;
-      padding: 1rem 1.5rem;
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border: none;
-      border-radius: 8px;
-      padding: 0.5rem 1.5rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-secondary {
-      background: #6c757d;
-      border: none;
-      border-radius: 8px;
-      padding: 0.5rem 1.5rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-secondary:hover {
-      background: #5a6268;
-      transform: translateY(-2px);
-    }
-    
-    /* אנימציה למודל */
-    .modal.fade .modal-dialog {
-      transition: transform 0.3s ease-out;
-      transform: translate(0, -50px);
-    }
-    
-    .modal.show .modal-dialog {
-      transform: none;
-    }
-    
-    /* סגנונות לכפתורי פעולות */
-    .actions-cell {
-      white-space: nowrap;
-      text-align: center;
-    }
-    
-    .actions-cell .btn {
-      margin: 0 2px;
-    }
-    
-    /* סגנונות לאלמנטים מקושרים */
-    .linked-items-list {
-      margin-top: 0.5rem;
-    }
-    
-    .linked-item {
-      background: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-radius: 6px;
-      padding: 0.5rem 0.75rem;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-    }
-    
-    .linked-item:last-child {
-      margin-bottom: 0;
-    }
-    
-    .linked-item strong {
-      color: #495057;
-    }
-    
-    .linked-item:hover {
-      background-color: #f8f9fa;
-      border-radius: 4px;
-      padding: 4px;
-      transition: background-color 0.2s;
-    }
-    
-    .actions-cell .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    
-    .btn-danger {
-      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-    
-    .btn-danger:hover {
-      background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%);
-      color: white;
-    }
-    
-    .btn-secondary {
-      background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-    
-    .btn-secondary:hover {
-      background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
-      color: white;
-    }
-    
-    /* סגנונות לסטטוס */
-    .status-badge {
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-align: center;
-      display: inline-block;
-      min-width: 60px;
-    }
-    
-    .status-open {
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-      color: white;
-    }
-    
-    .status-closed {
-      background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-      color: white;
-    }
-    
-    .status-cancelled {
-      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-      color: white;
-    }
-    
-    /* סגנונות למטבע */
-    .currency-badge {
-      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-      color: white;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    
-    /* סגנונות לרווח/הפסד */
-    .positive {
-      color: #28a745;
-      font-weight: 600;
-    }
-    
-    .negative {
-      color: #dc3545;
-      font-weight: 600;
-    }
+
   </style>
   
   <!-- קבצים מודולריים של הגריד -->
   <script src="scripts/app-header.js"></script>
       <script src="scripts/main.js"></script>
   <script src="scripts/grid-filters.js"></script>
-  <script src="scripts/alerts.js"></script>
 </head>
 <body>
   <!-- רקע כללי -->
@@ -276,34 +78,14 @@
               📋 חשבונות
               </div>
           <div class="table-actions">
-            <button class="refresh-btn" onclick="refreshAlerts()" title="רענן התראות">
-              <span class="action-icon">🔄</span> רענן
-            </button>
-            <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור התראות">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור סיכום">
               <span class="filter-icon">▲</span>
             </button>
-                </div>
+          </div>
                     </div>
         
-        <!-- כרטיסיות התראות -->
+        <!-- סיכום נתונים -->
         <div class="section-body">
-          <div class="alerts-cards-container">
-            <div class="alerts-header">
-              <h3>🔔 התראות</h3>
-              <div class="alerts-header-actions">
-                <div class="alerts-count" id="newAlertsCount">0 התראות</div>
-                <button class="refresh-btn" onclick="refreshAlerts()" title="רענן התראות">
-                  <span class="action-icon">🔄</span>
-                </button>
-              </div>
-            </div>
-            <div class="alerts-cards" id="alertsCards">
-              <!-- כרטיסיות ההתראות יוכנסו כאן דינמית -->
-            </div>
-          </div>
-          
-          <!-- סיכום נתונים -->
           <div class="info-summary" id="summaryStats">
             <div>סה"כ חשבונות: <strong id="totalAccounts">0</strong></div>
             <div>חשבונות פתוחים: <strong id="activeAccounts">0</strong></div>
@@ -324,12 +106,10 @@
             </div>
             <div class="table-count">טוען...</div>
             <div class="table-actions">
-              <button class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש">
+              <button class="refresh-btn" onclick="showAddAccountModalLocal()" title="הוסף חשבון חדש">
                 <span class="action-icon">➕</span> הוסף
               </button>
-              <button class="refresh-btn" onclick="loadAccounts()" title="רענן טבלה">
-                <span class="action-icon">🔄</span> רענן
-              </button>
+
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור חשבונות">
                 <span class="filter-icon">▲</span>
@@ -341,24 +121,23 @@
           <div class="section-body">
                       <div class="table-responsive" id="accountsContainer">
               <table class="table" id="accountsTable" data-table-type="accounts">
-                          <thead>
-                            <tr>
-                                                              <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                     <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name</span></th>
-                     <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency</span></th>
-                     <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
-                     <th>יתרה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cash Balance</span></th>
-                     <th>שווי כולל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total Value</span></th>
-                     <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P&L</span></th>
-                     <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
-                     <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+                                                      <thead>
+                              <tr>
+                       <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name</span></th>
+                       <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency</span></th>
+                       <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
+                       <th>יתרה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cash Balance</span></th>
+                       <th>שווי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total Value</span></th>
+                       <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P&L</span></th>
+                       <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
+                       <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
                             </tr>
                           </thead>
-                          <tbody>
-                              <tr>
-                    <td colspan="9" class="loading">טוען חשבונות...</td>
-                              </tr>
-                          </tbody>
+                                                      <tbody>
+                                <tr>
+                     <td colspan="8" class="loading">טוען חשבונות...</td>
+                                </tr>
+                            </tbody>
                         </table>
                       </div>
                     </div>
@@ -412,35 +191,31 @@
         let aValue, bValue;
         
         switch (columnIndex) {
-          case 0: // מזהה (ID)
-            aValue = parseInt(a.id);
-            bValue = parseInt(b.id);
-            break;
-          case 1: // שם
+          case 0: // שם
             aValue = a.name.toLowerCase();
             bValue = b.name.toLowerCase();
             break;
-          case 2: // מטבע
+          case 1: // מטבע
             aValue = a.currency.toLowerCase();
             bValue = b.currency.toLowerCase();
             break;
-          case 3: // סטטוס
+          case 2: // סטטוס
             aValue = getAccountStatusForSort(a.status);
             bValue = getAccountStatusForSort(b.status);
             break;
-          case 4: // יתרת מזומן
+          case 3: // יתרת מזומן
             aValue = parseFloat(a.cash_balance) || 0;
             bValue = parseFloat(b.cash_balance) || 0;
             break;
-          case 5: // שווי כולל
+          case 4: // שווי
             aValue = parseFloat(a.total_value) || 0;
             bValue = parseFloat(b.total_value) || 0;
             break;
-          case 6: // רווח/הפסד
+          case 5: // רווח/הפסד
             aValue = parseFloat(a.total_pl) || 0;
             bValue = parseFloat(b.total_pl) || 0;
             break;
-          case 7: // הערות
+          case 6: // הערות
             aValue = (a.notes || '').toLowerCase();
             bValue = (b.notes || '').toLowerCase();
             break;
@@ -584,7 +359,7 @@
       try {
         console.log('🔄 טוען נתוני חשבונות...');
         
-        // בדיקה אם יש פונקציה מ-accounts.js
+        // קריאה לפונקציה מ-accounts.js
         if (typeof window.loadAccountsDataFromAPI === 'function') {
           console.log('🔄 קורא נתונים מ-API...');
           const accounts = await window.loadAccountsDataFromAPI();
@@ -593,11 +368,11 @@
           if (Array.isArray(accounts)) {
             accountsData = accounts;
             console.log('🔄 נתונים נטענו בהצלחה:', accounts.length, 'חשבונות');
-            } else {
+          } else {
             console.error('❌ הנתונים שהתקבלו אינם מערך:', typeof accounts);
             throw new Error('הנתונים שהתקבלו אינם מערך');
           }
-          } else {
+        } else {
           console.log('🔄 משתמש בנתוני דוגמה');
           // משתמש בנתוני הדוגמה שכבר מוגדרים
         }
@@ -635,10 +410,10 @@
         return;
       }
         
-        if (accounts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">אין חשבונות להצגה</td></tr>';
-          return;
-        }
+                  if (accounts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">אין חשבונות להצגה</td></tr>';
+            return;
+          }
         
       const tableHTML = accounts.map(account => {
         const currencySymbol = account.currency === 'USD' ? '$' : account.currency === 'ILS' ? '₪' : account.currency === 'EUR' ? '€' : account.currency;
@@ -650,19 +425,19 @@
         
         return `
           <tr>
-            <td><strong>#${account.id}</strong></td>
-            <td><strong><a href="#" onclick="showEditAccountModal(${JSON.stringify(account).replace(/"/g, '&quot;')})" class="account-link">${account.name}</a></strong></td>
-            <td><span class="currency-badge">${account.currency}</span></td>
+            <td><strong><a href="#" onclick="showEditAccountModalLocal(${JSON.stringify(account).replace(/"/g, '&quot;')})" class="account-link">${account.name}</a></strong></td>
+            <td>${account.currency === 'USD' ? '$' : account.currency === 'ILS' ? '₪' : account.currency === 'EUR' ? '€' : account.currency === 'GBP' ? '£' : account.currency}</td>
             <td><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
             <td>${currencySymbol}${(account.cash_balance || 0).toLocaleString()}</td>
             <td>${currencySymbol}${(account.total_value || 0).toLocaleString()}</td>
             <td class="${(account.total_pl || 0) >= 0 ? 'positive' : 'negative'}">${currencySymbol}${(account.total_pl || 0) >= 0 ? '+' : ''}${(account.total_pl || 0).toLocaleString()} (${profitPercentage >= 0 ? '+' : ''}${profitPercentage}%)</td>
             <td>${account.notes || '-'}</td>
             <td class="actions-cell">
-              <button class="btn btn-sm btn-secondary" onclick="showEditAccountModal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך">
+                              <button class="btn btn-sm btn-secondary" onclick="showEditAccountModalLocal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך">
                 <span class="btn-icon">✏️</span>
               </button>
-              <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק">✕</button>
+              <button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">❌</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק">🗑️</button>
             </td>
           </tr>
         `;
@@ -854,42 +629,183 @@
     
     // פונקציה לטעינת חשבונות (alias ל-loadAccountsData)
     async function loadAccounts() {
-      return await loadAccountsData();
+      // קריאה לפונקציה מ-accounts.js
+      if (typeof window.loadAccountsDataForAccountsPage === 'function') {
+        return await window.loadAccountsDataForAccountsPage();
+      } else {
+        return await loadAccountsData();
+      }
     }
     
     // פונקציות למודלים
-    function showAddAccountModal() {
+    function showAddAccountModalLocal() {
       console.log('🔄 הצגת מודל הוספת חשבון');
       
-      // יצירת המודל
-      const modal = createAccountModal('add');
+      // קריאה לפונקציה מ-accounts.js
+      if (typeof window.showAddAccountModal === 'function') {
+        window.showAddAccountModal();
+      } else {
+        // יצירת המודל
+        const modal = createAccountModalLocal('add');
+        document.body.appendChild(modal);
+        
+        // הוספת ולידציה בזמן אמת
+        setTimeout(() => {
+          const nameInput = modal.querySelector('#accountName');
+          const currencySelect = modal.querySelector('#accountCurrency');
+          const cashBalanceInput = modal.querySelector('#accountCashBalance');
+          
+          // בדיקת שם החשבון
+          if (nameInput) {
+            nameInput.addEventListener('input', function() {
+              const value = this.value.trim();
+              const errorElement = modal.querySelector('#nameError');
+              
+              if (value.length > 18) {
+                this.classList.add('is-invalid');
+                errorElement.textContent = 'שם החשבון לא יכול לעלות על 18 תווים';
+              } else if (value === '') {
+                this.classList.add('is-invalid');
+                errorElement.textContent = 'שם החשבון הוא שדה חובה';
+              } else {
+                this.classList.remove('is-invalid');
+                errorElement.textContent = '';
+              }
+            });
+          }
+          
+          // בדיקת מטבע
+          if (currencySelect) {
+            currencySelect.addEventListener('change', function() {
+              const errorElement = modal.querySelector('#currencyError');
+              
+              if (!this.value) {
+                this.classList.add('is-invalid');
+                errorElement.textContent = 'יש לבחור מטבע';
+              } else {
+                this.classList.remove('is-invalid');
+                errorElement.textContent = '';
+              }
+            });
+          }
+          
+          // בדיקת יתרת מזומן
+          if (cashBalanceInput) {
+            cashBalanceInput.addEventListener('input', function() {
+              const value = parseFloat(this.value);
+              const errorElement = modal.querySelector('#cashBalanceError');
+              
+              if (this.value !== '' && (isNaN(value) || value < 0)) {
+                this.classList.add('is-invalid');
+                errorElement.textContent = 'יתרת מזומן חייבת להיות מספר חיובי';
+              } else {
+                this.classList.remove('is-invalid');
+                errorElement.textContent = '';
+              }
+            });
+          }
+        }, 100);
+        
+        // הצגת המודל
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+      }
+    }
+    
+    function showEditAccountModalLocal(account) {
+      console.log('🔄 הצגת מודל עריכת חשבון (local):', account);
+      
+      // יצירת המודל עם נתונים קיימים
+      const modal = createAccountModalLocal('edit', account);
       document.body.appendChild(modal);
+      
+      // הוספת ולידציה בזמן אמת
+      setTimeout(() => {
+        const nameInput = modal.querySelector('#accountName');
+        const currencySelect = modal.querySelector('#accountCurrency');
+        const cashBalanceInput = modal.querySelector('#accountCashBalance');
+        
+        // בדיקת שם החשבון
+        if (nameInput) {
+          nameInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            const errorElement = modal.querySelector('#nameError');
+            
+            if (value.length > 18) {
+              this.classList.add('is-invalid');
+              errorElement.textContent = 'שם החשבון לא יכול לעלות על 18 תווים';
+            } else if (value === '') {
+              this.classList.add('is-invalid');
+              errorElement.textContent = 'שם החשבון הוא שדה חובה';
+            } else {
+              this.classList.remove('is-invalid');
+              errorElement.textContent = '';
+            }
+          });
+        }
+        
+        // בדיקת מטבע
+        if (currencySelect) {
+          currencySelect.addEventListener('change', function() {
+            const errorElement = modal.querySelector('#currencyError');
+            
+            if (!this.value) {
+              this.classList.add('is-invalid');
+              errorElement.textContent = 'יש לבחור מטבע';
+            } else {
+              this.classList.remove('is-invalid');
+              errorElement.textContent = '';
+            }
+          });
+        }
+        
+        // בדיקת יתרת מזומן
+        if (cashBalanceInput) {
+          cashBalanceInput.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            const errorElement = modal.querySelector('#cashBalanceError');
+            
+            if (this.value !== '' && (isNaN(value) || value < 0)) {
+              this.classList.add('is-invalid');
+              errorElement.textContent = 'יתרת מזומן חייבת להיות מספר חיובי';
+            } else {
+              this.classList.remove('is-invalid');
+              errorElement.textContent = '';
+            }
+          });
+        }
+      }, 100);
       
       // הצגת המודל
       const bootstrapModal = new bootstrap.Modal(modal);
       bootstrapModal.show();
     }
     
-    function showEditAccountModal(account) {
-      console.log('🔄 הצגת מודל עריכת חשבון:', account);
+    function cancelAccount(accountId, accountName) {
+      console.log('🔄 ביטול חשבון (local):', accountId, accountName);
       
-      // יצירת המודל עם נתונים קיימים
-      const modal = createAccountModal('edit', account);
-      document.body.appendChild(modal);
-      
-      // הצגת המודל
-      const bootstrapModal = new bootstrap.Modal(modal);
-      bootstrapModal.show();
+      // קריאה לפונקציה מ-accounts.js
+      if (typeof window.cancelAccount === 'function') {
+        window.cancelAccount(accountId, accountName);
+      } else {
+        console.error('❌ cancelAccount לא נמצאה');
+        alert('פונקציית ביטול חשבון לא זמינה');
+      }
     }
     
     function deleteAccount(accountId, accountName) {
-      console.log('🔄 מחיקת חשבון:', accountId, accountName);
-      // הצגת חלון אישור שני במקום confirm רגיל
-      showSecondConfirmationModal(accountId, accountName);
+      console.log('🔄 מחיקת חשבון (local):', accountId, accountName);
+      // קריאה לפונקציה מ-accounts.js
+      if (typeof window.deleteAccount === 'function') {
+        window.deleteAccount(accountId, accountName);
+      } else {
+        console.error('❌ deleteAccount לא נמצאה');
+        alert('פונקציית מחיקת חשבון לא זמינה');
+      }
     }
     
     // פונקציה ליצירת מודל חשבון
-    function createAccountModal(mode, account = null) {
+    function createAccountModalLocal(mode, account = null) {
       const isEdit = mode === 'edit';
       const title = isEdit ? 'עריכת חשבון' : 'הוספת חשבון חדש';
       const buttonText = isEdit ? 'שמור שינויים' : 'הוסף חשבון';
@@ -915,7 +831,8 @@
                     <div class="mb-3">
                 <label for="accountName" class="form-label">שם החשבון *</label>
                       <input type="text" class="form-control" id="accountName" name="name" required 
-                             value="${account ? account.name : ''}" placeholder="הכנס שם חשבון">
+                             value="${account ? account.name : ''}" placeholder="הכנס שם חשבון" maxlength="18">
+                      <div class="invalid-feedback" id="nameError"></div>
               </div>
                   </div>
                   <div class="col-md-6">
@@ -928,6 +845,7 @@
                         <option value="EUR" ${account && account.currency === 'EUR' ? 'selected' : ''}>אירו (EUR)</option>
                         <option value="GBP" ${account && account.currency === 'GBP' ? 'selected' : ''}>פאונד (GBP)</option>
                 </select>
+                      <div class="invalid-feedback" id="currencyError"></div>
                     </div>
               </div>
             </div>
@@ -939,7 +857,6 @@
                       <select class="form-select" id="accountStatus" name="status">
                         <option value="open" ${account && account.status === 'open' ? 'selected' : ''}>פתוח</option>
                         <option value="closed" ${account && account.status === 'closed' ? 'selected' : ''}>סגור</option>
-                        <option value="cancelled" ${account && account.status === 'cancelled' ? 'selected' : ''}>מבוטל</option>
                 </select>
               </div>
             </div>
@@ -947,7 +864,8 @@
                     <div class="mb-3">
                 <label for="accountCashBalance" class="form-label">יתרת מזומן</label>
                       <input type="number" class="form-control" id="accountCashBalance" name="cash_balance" 
-                             value="${account ? account.cash_balance || 0 : 0}" placeholder="0" step="0.01">
+                             value="${account ? account.cash_balance || 0 : 0}" placeholder="0" step="0.01" min="0">
+                      <div class="invalid-feedback" id="cashBalanceError"></div>
               </div>
               </div>
             </div>
@@ -961,7 +879,7 @@
         </div>
         <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-              <button type="button" class="btn btn-primary" onclick="saveAccount('${mode}', ${account ? account.id : 'null'})">
+              <button type="button" class="btn btn-primary" onclick="saveAccountLocal('${mode}', ${account ? account.id : 'null'})">
                 ${buttonText}
               </button>
         </div>
@@ -972,8 +890,130 @@
       return modal;
     }
     
+    // פונקציה לוולידציה של נתוני חשבון
+    function validateAccountDataLocal(accountData) {
+      // בדיקת שם החשבון
+      if (!accountData.name || accountData.name.trim() === '') {
+        return { isValid: false, message: 'שם החשבון הוא שדה חובה' };
+      }
+      if (accountData.name.length > 18) {
+        return { isValid: false, message: 'שם החשבון לא יכול לעלות על 18 תווים' };
+      }
+      
+      // בדיקת מטבע
+      if (!accountData.currency || accountData.currency === '') {
+        return { isValid: false, message: 'יש לבחור מטבע' };
+      }
+      
+      // בדיקת יתרת מזומן
+      const cashBalance = accountData.cash_balance;
+      if (cashBalance !== null && cashBalance !== undefined && cashBalance !== '') {
+        if (isNaN(cashBalance) || cashBalance < 0) {
+          return { isValid: false, message: 'יתרת מזומן חייבת להיות מספר חיובי' };
+        }
+      }
+      
+      return { isValid: true, message: '' };
+    }
+    
+    // פונקציה להצגת שגיאות ולידציה
+    function showFormErrorLocal(message) {
+      if (typeof window.showNotification === 'function') {
+        window.showNotification(message, 'error');
+      } else {
+        alert(message);
+      }
+    }
+    
+    // פונקציה לבדיקת רשומות מקושרות
+    async function checkLinkedItemsLocal(accountId) {
+      try {
+        console.log('🔄 בודק רשומות מקושרות לחשבון:', accountId);
+        
+        const linkedItems = {
+          trades: [],
+          alerts: [],
+          cash_flows: [],
+          notes: []
+        };
+        
+        // בדיקת טריידים מקושרים
+        try {
+          const tradesResponse = await fetch(`/api/v1/trades/?account_id=${accountId}`);
+          if (tradesResponse.ok) {
+            const tradesData = await tradesResponse.json();
+            linkedItems.trades = tradesData.data || [];
+          }
+        } catch (error) {
+          console.warn('⚠️ לא ניתן לבדוק טריידים מקושרים:', error);
+        }
+        
+        // בדיקת התראות מקושרות
+        try {
+          const alertsResponse = await fetch(`/api/v1/alerts/?account_id=${accountId}`);
+          if (alertsResponse.ok) {
+            const alertsData = await alertsResponse.json();
+            linkedItems.alerts = alertsData.data || [];
+          }
+        } catch (error) {
+          console.warn('⚠️ לא ניתן לבדוק התראות מקושרות:', error);
+        }
+        
+        // בדיקת תזרים מזומן מקושר
+        try {
+          const cashFlowsResponse = await fetch(`/api/v1/cash_flows/?account_id=${accountId}`);
+          if (cashFlowsResponse.ok) {
+            const cashFlowsData = await cashFlowsResponse.json();
+            linkedItems.cash_flows = cashFlowsData.data || [];
+          }
+        } catch (error) {
+          console.warn('⚠️ לא ניתן לבדוק תזרים מזומן מקושר:', error);
+        }
+        
+        // בדיקת הערות מקושרות
+        try {
+          const notesResponse = await fetch(`/api/v1/notes/?account_id=${accountId}`);
+          if (notesResponse.ok) {
+            const notesData = await notesResponse.json();
+            linkedItems.notes = notesData.data || [];
+          }
+        } catch (error) {
+          console.warn('⚠️ לא ניתן לבדוק הערות מקושרות:', error);
+        }
+        
+        console.log('🔄 רשומות מקושרות שנמצאו:', linkedItems);
+        return linkedItems;
+        
+      } catch (error) {
+        console.error('❌ שגיאה בבדיקת רשומות מקושרות:', error);
+        return { trades: [], alerts: [], cash_flows: [], notes: [] };
+      }
+    }
+    
+    // פונקציה להצגת אזהרה על רשומות מקושרות
+    function showLinkedItemsWarningLocal(linkedItems, accountName) {
+      let message = `לא ניתן לסגור את החשבון "${accountName}" מכיוון שיש רשומות מקושרות:\n\n`;
+      
+      if (linkedItems.trades.length > 0) {
+        message += `• טריידים: ${linkedItems.trades.length} רשומות\n`;
+      }
+      if (linkedItems.alerts.length > 0) {
+        message += `• התראות: ${linkedItems.alerts.length} רשומות\n`;
+      }
+      if (linkedItems.cash_flows.length > 0) {
+        message += `• תזרים מזומן: ${linkedItems.cash_flows.length} רשומות\n`;
+      }
+      if (linkedItems.notes.length > 0) {
+        message += `• הערות: ${linkedItems.notes.length} רשומות\n`;
+      }
+      
+      message += '\nיש למחוק או להעביר את הרשומות המקושרות לפני סגירת החשבון.';
+      
+      alert(message);
+    }
+    
     // פונקציה לשמירת חשבון
-    async function saveAccount(mode, accountId = null) {
+    async function saveAccountLocal(mode, accountId = null) {
       try {
         console.log('🔄 שמירת חשבון:', mode, accountId);
         
@@ -991,12 +1031,35 @@
         
         console.log('🔄 נתוני חשבון:', accountData);
         
+        // בדיקת ולידציה ראשונית
+        const validation = validateAccountDataLocal(accountData);
+        if (!validation.isValid) {
+          showFormErrorLocal(validation.message);
+          return;
+        }
+        
+        // בדיקת רשומות מקושרות אם הסטטוס משתנה לסגור
+        if (mode === 'edit' && accountId && accountData.status === 'closed') {
+          console.log('🔄 בודק רשומות מקושרות לפני סגירת חשבון...');
+          const linkedItems = await checkLinkedItemsLocal(accountId);
+          
+          const hasLinkedItems = linkedItems.trades.length > 0 || 
+                                linkedItems.alerts.length > 0 || 
+                                linkedItems.cash_flows.length > 0 || 
+                                linkedItems.notes.length > 0;
+          
+          if (hasLinkedItems) {
+            showLinkedItemsWarningLocal(linkedItems, accountData.name);
+            return;
+          }
+        }
+        
         // קריאה ל-API
         let result;
         if (mode === 'add') {
-          result = await addAccountToAPI(accountData);
+          result = await window.addAccountToAPI(accountData);
         } else {
-          result = await updateAccountInAPI(accountId, accountData);
+          result = await window.updateAccountInAPI(accountId, accountData);
         }
         
         // סגירת המודל
@@ -1008,15 +1071,25 @@
         modal.remove();
         
         // רענון הנתונים
-        await loadAccountsData();
+        if (typeof window.loadAccounts === 'function') {
+          await window.loadAccounts();
+        }
         
         // הצגת הודעה
         const message = mode === 'add' ? 'חשבון נוסף בהצלחה' : 'חשבון עודכן בהצלחה';
-        showNotification(message, 'success');
+        if (typeof window.showNotification === 'function') {
+          window.showNotification(message, 'success');
+        } else {
+          alert(message);
+        }
         
       } catch (error) {
         console.error('❌ שגיאה בשמירת חשבון:', error);
-        showNotification('שגיאה בשמירת החשבון', 'error');
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('שגיאה בשמירת החשבון', 'error');
+        } else {
+          alert('שגיאה בשמירת החשבון');
+        }
       }
     }
     
@@ -1066,15 +1139,12 @@
     window.toggleMainSection = toggleMainSection;
     window.loadAccountsDataFromAPI = loadAccountsDataFromAPI;
     window.showAddAccountModal = showAddAccountModal;
-    window.showEditAccountModal = showEditAccountModal;
+    window.showEditAccountModal = showEditAccountModalLocal;
+    window.cancelAccount = cancelAccount;
     window.deleteAccount = deleteAccount;
     window.updateGridFromComponent = updateGridFromComponent;
     
-    // פונקציה לרענון התראות
-    function refreshAlerts() {
-      console.log('🔄 רענון התראות');
-      showNotification('התראות עודכנו', 'success');
-    }
+
     
     // פונקציה לטעינת נתונים מ-API
     async function loadAccountsDataFromAPI() {
@@ -1186,7 +1256,9 @@
         console.log('🔄 חשבון נמחק בהצלחה');
         
         // רענון הנתונים
-        await loadAccountsData();
+        if (typeof window.loadAccounts === 'function') {
+          await window.loadAccounts();
+        }
         
         // הצגת הודעה
         showNotification(`החשבון "${accountName}" נמחק בהצלחה`, 'success');
@@ -1707,7 +1779,7 @@
       }
     }
     
-    window.refreshAlerts = refreshAlerts;
+
     window.loadAccountsDataFromAPI = loadAccountsDataFromAPI;
     window.addAccountToAPI = addAccountToAPI;
     window.updateAccountInAPI = updateAccountInAPI;
@@ -1739,11 +1811,7 @@
         console.log('🔄 === FILTERS INITIALIZED ===');
       }
       
-      // טעינת התראות
-      if (typeof loadAlertsForCards === 'function') {
-        loadAlertsForCards();
-        console.log('🔄 === ALERTS LOADED ===');
-      }
+
       
       // הגדרת כותרות למיון
       setupSortableHeaders();

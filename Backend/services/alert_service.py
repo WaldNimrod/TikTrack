@@ -3,6 +3,7 @@ from models.alert import Alert
 from models.note_relation_type import NoteRelationType
 from datetime import datetime
 import logging
+from typing import List, Optional, Dict, Any
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +11,7 @@ class AlertService:
     """שירות לניהול התראות"""
     
     @staticmethod
-    def get_all(db: Session):
+    def get_all(db: Session) -> List[Alert]:
         """קבלת כל ההתראות"""
         try:
             alerts = db.query(Alert).all()
@@ -21,7 +22,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def get_by_id(db: Session, alert_id: int):
+    def get_by_id(db: Session, alert_id: int) -> Optional[Alert]:
         """קבלת התראה לפי מזהה"""
         try:
             alert = db.query(Alert).filter(Alert.id == alert_id).first()
@@ -31,7 +32,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def get_unread_alerts(db: Session):
+    def get_unread_alerts(db: Session) -> List[Alert]:
         """קבלת התראות שלא נקראו (is_triggered = 'new')"""
         try:
             alerts = db.query(Alert).filter(Alert.is_triggered == 'new').all()
@@ -42,7 +43,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def create(db: Session, alert_data: dict):
+    def create(db: Session, alert_data: Dict[str, Any]) -> Alert:
         """יצירת התראה חדשה"""
         try:
             # הגדרת ברירת מחדל ל-is_triggered
@@ -68,7 +69,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def update(db: Session, alert_id: int, alert_data: dict):
+    def update(db: Session, alert_id: int, alert_data: Dict[str, Any]) -> Alert:
         """עדכון התראה קיימת"""
         try:
             alert = db.query(Alert).filter(Alert.id == alert_id).first()
@@ -110,7 +111,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def delete(db: Session, alert_id: int):
+    def delete(db: Session, alert_id: int) -> bool:
         """מחיקת התראה"""
         try:
             alert = db.query(Alert).filter(Alert.id == alert_id).first()
@@ -128,7 +129,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def mark_as_triggered(db: Session, alert_id: int):
+    def mark_as_triggered(db: Session, alert_id: int) -> Alert:
         """הפעלת התראה (שינוי ל-new)"""
         try:
             alert = db.query(Alert).filter(Alert.id == alert_id).first()
@@ -150,7 +151,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def mark_as_read(db: Session, alert_id: int):
+    def mark_as_read(db: Session, alert_id: int) -> Alert:
         """סימון התראה כנקראה (true)"""
         try:
             alert = db.query(Alert).filter(Alert.id == alert_id).first()
@@ -171,7 +172,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def get_unread_alerts(db: Session):
+    def get_unread_alerts(db: Session) -> List[Alert]:
         """קבלת התראות שלא נקראו (new)"""
         try:
             alerts = db.query(Alert).filter(Alert.is_triggered == 'new').all()
@@ -182,7 +183,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def get_unread_alerts_with_symbols(db: Session):
+    def get_unread_alerts_with_symbols(db: Session) -> List[Dict[str, Any]]:
         """קבלת התראות שלא נקראו עם סימבולי טיקרים"""
         try:
             from models.ticker import Ticker
@@ -191,7 +192,7 @@ class AlertService:
             alerts = db.query(Alert).filter(Alert.is_triggered == 'new').all()
             
             # יצירת רשימה של dictionaries
-            alerts_with_symbols = []
+            alerts_with_symbols: List[Dict[str, Any]] = []
             for alert in alerts:
                 alert_dict = alert.to_dict()
                 
@@ -216,7 +217,7 @@ class AlertService:
 
     
     @staticmethod
-    def get_alerts_by_entity(db: Session, entity_type: str, entity_id: int):
+    def get_alerts_by_entity(db: Session, entity_type: str, entity_id: int) -> List[Alert]:
         """קבלת התראות לפי סוג ישות ומזהה"""
         try:
             related_type_id = AlertService._get_relation_type_id(db, entity_type)
@@ -232,7 +233,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def reactivate(db: Session, alert_id: int):
+    def reactivate(db: Session, alert_id: int) -> Alert:
         """החזרת התראה למצב פעיל"""
         try:
             alert = db.query(Alert).filter(Alert.id == alert_id).first()
@@ -254,7 +255,7 @@ class AlertService:
             raise
     
     @staticmethod
-    def cancel(db: Session, alert_id: int):
+    def cancel(db: Session, alert_id: int) -> Alert:
         """ביטול התראה"""
         try:
             alert = db.query(Alert).filter(Alert.id == alert_id).first()

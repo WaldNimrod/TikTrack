@@ -58,6 +58,9 @@ function filterDataByFilters(data, pageName) {
   
   let filteredData = [...data];
   
+  // קבלת סוג הטבלה
+  const tableType = getTableType(pageName);
+  
   // קבלת פילטרים שמורים
   const selectedStatuses = window.selectedStatusesForFilter || [];
   const selectedTypes = window.selectedTypesForFilter || [];
@@ -74,7 +77,7 @@ function filterDataByFilters(data, pageName) {
   });
   
   // פילטר לפי סטטוס (לא חל על הערות)
-  if (pageName !== 'notes' && selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
+  if (tableType !== 'notes' && selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
     console.log('🔄 Filtering by status:', selectedStatuses);
     filteredData = filteredData.filter(item => {
       let itemStatus;
@@ -117,8 +120,8 @@ function filterDataByFilters(data, pageName) {
     console.log('🔄 After status filter:', filteredData.length, 'items');
   }
   
-  // פילטר לפי סוג (לא חל על הערות)
-  if (pageName !== 'notes' && selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
+  // פילטר לפי סוג (לא חל על הערות וחשבונות)
+  if (tableType !== 'notes' && tableType !== 'accounts' && selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
     console.log('🔄 Filtering by type:', selectedTypes);
     filteredData = filteredData.filter(item => {
       let typeDisplay;
@@ -168,11 +171,12 @@ function filterDataByFilters(data, pageName) {
       return isMatch;
     });
     console.log('🔄 After type filter:', filteredData.length, 'items');
+  } else if (tableType === 'accounts') {
+    console.log('🔄 Skipping type filter for accounts - accounts do not have type field');
   }
   
-  // פילטר לפי חשבון (לא חל על תכנונים)
-  const tableType = getTableType(pageName);
-  if (tableType !== 'designs' && selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('all')) {
+  // פילטר לפי חשבון (לא חל על תכנונים וחשבונות)
+  if (tableType !== 'designs' && tableType !== 'accounts' && selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('all')) {
     console.log('🔄 Filtering by account:', selectedAccounts);
     filteredData = filteredData.filter(item => {
       let accountMatch = false;
@@ -195,10 +199,12 @@ function filterDataByFilters(data, pageName) {
     console.log('🔄 After account filter:', filteredData.length, 'items');
   } else if (tableType === 'designs') {
     console.log('🔄 Skipping account filter for designs table - plans are not linked to accounts');
+  } else if (tableType === 'accounts') {
+    console.log('🔄 Skipping account filter for accounts table - showing all accounts regardless of filter');
   }
   
-  // פילטר לפי תאריכים
-  if (selectedDateRange && selectedDateRange !== 'כל זמן') {
+  // פילטר לפי תאריכים (לא חל על חשבונות)
+  if (tableType !== 'accounts' && selectedDateRange && selectedDateRange !== 'כל זמן') {
     console.log('🔄 Filtering by date range:', selectedDateRange);
     filteredData = filteredData.filter(item => {
       let itemDate;
@@ -220,6 +226,8 @@ function filterDataByFilters(data, pageName) {
       return isInRange;
     });
     console.log('🔄 After date filter:', filteredData.length, 'items');
+  } else if (tableType === 'accounts') {
+    console.log('🔄 Skipping date filter for accounts - showing all accounts regardless of date range');
   }
   
   // פילטר לפי חיפוש
@@ -251,7 +259,7 @@ function filterDataByFilters(data, pageName) {
         searchFields = [
           item.name,
           item.currency,
-          item.description
+          item.notes
         ];
       }
       
@@ -473,12 +481,12 @@ function resetAllFiltersForPage(pageName) {
   
   // מחיקה מ-localStorage (גלובלי)
   try {
-    localStorage.removeItem('globalFilterStatuses');
-    localStorage.removeItem('globalFilterTypes');
-    localStorage.removeItem('globalFilterAccounts');
+  localStorage.removeItem('globalFilterStatuses');
+  localStorage.removeItem('globalFilterTypes');
+  localStorage.removeItem('globalFilterAccounts');
     localStorage.removeItem('globalFilterDateRange');
-    localStorage.removeItem('globalFilterSearch');
-    
+  localStorage.removeItem('globalFilterSearch');
+  
     console.log('🔄 Global filters removed from localStorage');
   } catch (error) {
     console.error('❌ Error removing global filters from localStorage:', error);

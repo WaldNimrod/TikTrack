@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Che
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 from .base import BaseModel
+from typing import Dict, Any, Optional, List, Tuple
+from datetime import datetime
 
 class Trade(BaseModel):
     __tablename__ = "trades"
@@ -26,12 +28,12 @@ class Trade(BaseModel):
     executions = relationship("Execution", back_populates="trade")
     # Notes relationship removed - notes now use related_type and related_id
     
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """המרה למילון עם יחסים"""
         import logging
         logger = logging.getLogger(__name__)
         
-        result = {}
+        result: Dict[str, Any] = {}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
             if hasattr(value, 'strftime'):
@@ -64,10 +66,10 @@ class Trade(BaseModel):
         
         return result
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Trade(id={self.id}, status='{self.status}', type='{self.type}')>"
     
-    def validate_trade_plan_link(self, trade_plan):
+    def validate_trade_plan_link(self, trade_plan: 'TradePlan') -> Tuple[bool, str]:
         """
         בדיקת תקינות הקישור לתוכנית
         
@@ -97,11 +99,11 @@ class Trade(BaseModel):
         
         return True, "תקין"
     
-    def validate_before_save(self, db_session):
+    def validate_before_save(self, db_session) -> List[str]:
         """
         בדיקת תקינות לפני שמירה
         """
-        errors = []
+        errors: List[str] = []
         
         # בדיקת קישור לתוכנית
         if self.trade_plan_id:

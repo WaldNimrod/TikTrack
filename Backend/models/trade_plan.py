@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import BaseModel
+from typing import Dict, Any, Optional
 
 class TradePlan(BaseModel):
     __tablename__ = "trade_plans"
@@ -24,12 +25,12 @@ class TradePlan(BaseModel):
     trades = relationship("Trade", back_populates="trade_plan")
     # Notes relationship removed - notes now use related_type and related_id
     
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """המרה למילון עם יחסים"""
         import logging
         logger = logging.getLogger(__name__)
         
-        result = {}
+        result: Dict[str, Any] = {}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
             if hasattr(value, 'strftime'):  # אם זה תאריך
@@ -75,5 +76,5 @@ class TradePlan(BaseModel):
         
         return result
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<TradePlan(id={self.id}, type='{self.investment_type}')>"

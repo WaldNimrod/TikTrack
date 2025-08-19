@@ -70,6 +70,21 @@
       opacity: 0;
       overflow: hidden;
     }
+
+    /* סגנונות נוספים לסגירת סקשנים */
+    .content-section.collapsed .table-container {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+
+    .content-section.collapsed .table {
+      display: none;
+    }
+
+    .content-section.collapsed .table-footer {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -2067,7 +2082,7 @@
     async function loadTradePlans() {
       try {
         console.log('🔄 טוען תוכניות טרייד...');
-        const response = await window.apiCall('/api/tradeplans');
+        const response = await window.apiCall('/api/v1/trade_plans/');
         const plans = response.data || response;
         
         const tbody = document.querySelector('#tradePlansTable tbody');
@@ -2080,20 +2095,20 @@
           <tr>
             <td>${plan.id}</td>
             <td>${plan.account_id || '-'}</td>
-            <td>${plan.account_name || '-'}</td>
+            <td>${plan.account?.name || '-'}</td>
             <td>${plan.ticker_id || '-'}</td>
-            <td>${plan.ticker_symbol || '-'}</td>
-            <td>${plan.ticker_name || '-'}</td>
+            <td>${plan.ticker?.symbol || '-'}</td>
+            <td>${plan.ticker?.name || '-'}</td>
             <td>${plan.investment_type || '-'}</td>
             <td>${plan.side || 'Long'}</td>
             <td>${plan.status || 'open'}</td>
-            <td>${window.formatCurrency(plan.planned_amount)}</td>
+            <td>${window.formatCurrency ? window.formatCurrency(plan.planned_amount) : plan.planned_amount || '-'}</td>
             <td>${plan.entry_conditions || '-'}</td>
-            <td>${window.formatCurrency(plan.stop_price)}</td>
-            <td>${window.formatCurrency(plan.target_price)}</td>
+            <td>${window.formatCurrency ? window.formatCurrency(plan.stop_price) : plan.stop_price || '-'}</td>
+            <td>${window.formatCurrency ? window.formatCurrency(plan.target_price) : plan.target_price || '-'}</td>
             <td>${plan.reasons || '-'}</td>
-            <td>${window.formatDateTime(plan.created_at)}</td>
-            <td>${window.formatDateTime(plan.canceled_at)}</td>
+            <td>${window.formatDateTime ? window.formatDateTime(plan.created_at) : plan.created_at || '-'}</td>
+            <td>${window.formatDateTime ? window.formatDateTime(plan.canceled_at) : plan.canceled_at || '-'}</td>
             <td>${plan.cancel_reason || '-'}</td>
             <td>
               <button class="btn btn-sm btn-secondary" onclick="editRecord('trade_plans', ${plan.id})" title="ערוך">✏️</button>
@@ -2432,25 +2447,19 @@
       
       sections.forEach(section => {
         const sectionElement = document.getElementById(section);
-        const container = document.getElementById(section.replace('Section', 'Container'));
-        const footer = document.querySelector(`#${section} .table-footer`);
         const icon = document.querySelector(`#${section} .filter-icon`);
         
-        if (sectionElement && container && footer && icon) {
+        if (sectionElement && icon) {
           // בדיקה אם הסקשן נשמר כסגור עבור דף זה
           const storageKey = `${pageName}_${section}Collapsed`;
           const isCollapsed = localStorage.getItem(storageKey) === 'true';
           
           if (isCollapsed) {
             sectionElement.classList.add('collapsed');
-            container.style.display = 'none';
-            footer.style.display = 'none';
             icon.textContent = '▼';
             console.log(`📁 ${section}: נטען כסגור`);
           } else {
             sectionElement.classList.remove('collapsed');
-            container.style.display = 'block';
-            footer.style.display = 'block';
             icon.textContent = '▲';
             console.log(`📂 ${section}: נטען כפתוח`);
           }
@@ -2628,6 +2637,30 @@
         console.error('❌ שגיאה בביטול תוכנית טרייד:', error);
         alert('שגיאה בביטול תוכנית טרייד');
       }
+    }
+
+    // פונקציות עזר לפורמט
+    if (!window.formatCurrency) {
+      window.formatCurrency = function(amount) {
+        if (amount === null || amount === undefined) return '-';
+        return new Intl.NumberFormat('he-IL', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2
+        }).format(amount);
+      };
+    }
+
+    if (!window.formatDateTime) {
+      window.formatDateTime = function(dateTime) {
+        if (!dateTime) return '-';
+        try {
+          const date = new Date(dateTime);
+          return date.toLocaleString('he-IL');
+        } catch (error) {
+          return dateTime;
+        }
+      };
     }
 
     // הגדרת פונקציות גלובליות

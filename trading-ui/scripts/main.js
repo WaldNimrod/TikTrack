@@ -359,16 +359,22 @@ function toggleSection(sectionId) {
 function toggleAllSections() {
   const sections = document.querySelectorAll('.content-section');
   const isAnyOpen = Array.from(sections).some(section => !section.classList.contains('collapsed'));
+  const pageName = 'database';
   
   sections.forEach(section => {
+    const sectionId = section.id;
+    const storageKey = `${pageName}_${sectionId}Collapsed`;
+    
     if (isAnyOpen) {
       section.classList.add('collapsed');
       const icon = section.querySelector('.filter-icon');
       if (icon) icon.textContent = '▼';
+      localStorage.setItem(storageKey, 'true');
     } else {
       section.classList.remove('collapsed');
       const icon = section.querySelector('.filter-icon');
       if (icon) icon.textContent = '▲';
+      localStorage.setItem(storageKey, 'false');
     }
   });
   
@@ -1195,6 +1201,83 @@ function saveRecord(tableType) {
   alert(`פונקציית שמירה עבור ${tableType} תתווסף בקרוב`);
 }
 
+// פונקציה לביטול רשומה
+function cancelRecord(tableType, recordId) {
+  console.log(`ביטול ${tableType} עם מזהה ${recordId}`);
+  
+  if (tableType === 'trades') {
+    // ביטול טרייד - שינוי סטטוס לבוטל
+    if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
+      // קריאה לפונקציה הספציפית לדף
+      if (typeof window.cancelTrade === 'function') {
+        window.cancelTrade(recordId);
+      } else {
+        alert('פונקציית ביטול טרייד לא זמינה');
+      }
+    }
+  } else if (tableType === 'trade_plans') {
+    // ביטול תוכנית טרייד - שינוי סטטוס לבוטל
+    if (confirm('האם אתה בטוח שברצונך לבטל תוכנית טרייד זו?')) {
+      // קריאה לפונקציה הספציפית לדף
+      if (typeof window.cancelTradePlan === 'function') {
+        window.cancelTradePlan(recordId);
+      } else {
+        alert('פונקציית ביטול תוכנית טרייד לא זמינה');
+      }
+    }
+  } else {
+    alert('ביטול לא נתמך עבור סוג זה של רשומה');
+  }
+}
+
+// פונקציה להצגת הודעות
+function showNotification(message, type = 'success') {
+  try {
+    const notification = document.createElement('div');
+    const bgColor = type === 'error' ? '#f8d7da' : type === 'warning' ? '#fff3cd' : '#d4edda';
+    const textColor = type === 'error' ? '#721c24' : type === 'warning' ? '#856404' : '#155724';
+    const borderColor = type === 'error' ? '#f5c6cb' : type === 'warning' ? '#ffeaa7' : '#c3e6cb';
+    
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      padding: 12px 20px;
+      border-radius: 8px;
+      background-color: ${bgColor};
+      color: ${textColor};
+      border: 1px solid ${borderColor};
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: opacity 0.3s ease;
+      opacity: 0;
+    `;
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // הצגת ההודעה
+    setTimeout(() => {
+      notification.style.opacity = '1';
+    }, 100);
+    
+    // הסתרת ההודעה אחרי 3 שניות
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 300);
+    }, 3000);
+    
+  } catch (error) {
+    console.error('Error showing notification:', error);
+  }
+}
+
 // ===== הוספת הפונקציות החדשות לגלובל =====
 
 // הוספת הפונקציות החדשות לגלובל
@@ -1202,6 +1285,7 @@ window.apiCall = apiCall;
 window.editRecord = editRecord;
 window.deleteRecord = deleteRecord;
 window.saveRecord = saveRecord;
+window.cancelRecord = cancelRecord;
 window.convertAccountStatusToHebrew = convertAccountStatusToHebrew;
 window.convertTickerStatusToHebrew = convertTickerStatusToHebrew;
 window.convertNoteStatusToHebrew = convertNoteStatusToHebrew;
@@ -1219,6 +1303,7 @@ window.getCountElementForTable = getCountElementForTable;
 window.getTableNameForTable = getTableNameForTable;
 window.toggleSection = toggleSection;
 window.toggleAllSections = toggleAllSections;
+window.showNotification = showNotification;
 
 // פונקציות נתונים
 window.getDefaultRowData = getDefaultRowData;
@@ -1267,23 +1352,17 @@ function loadSectionStates() {
   const sections = document.querySelectorAll('.content-section');
   sections.forEach(section => {
     const sectionId = section.id;
-    const container = document.getElementById(sectionId.replace('Section', 'Container'));
-    const footer = section.querySelector('.table-footer');
     const icon = section.querySelector('.filter-icon');
     
-    if (container && footer && icon) {
+    if (icon) {
       const storageKey = `${pageName}_${sectionId}Collapsed`;
       const isCollapsed = localStorage.getItem(storageKey) === 'true';
       
       if (isCollapsed) {
         section.classList.add('collapsed');
-        container.style.display = 'none';
-        footer.style.display = 'none';
         icon.textContent = '▼';
       } else {
         section.classList.remove('collapsed');
-        container.style.display = 'block';
-        footer.style.display = 'block';
         icon.textContent = '▲';
       }
     }

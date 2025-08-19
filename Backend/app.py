@@ -36,6 +36,7 @@ from flask_cors import CORS
 import sqlite3
 import os
 from datetime import datetime
+from typing import Dict, Any, Optional, List
 
 # Import new architecture components
 from config.database import init_db
@@ -50,6 +51,7 @@ from routes.api.alerts import alerts_bp
 from routes.api.cash_flows import cash_flows_bp
 from routes.api.notes import notes_bp
 from routes.api.executions import executions_bp
+from routes.api.preferences import preferences_bp
 from routes.pages import pages_bp
 
 app = Flask(__name__)
@@ -69,23 +71,24 @@ app.register_blueprint(alerts_bp)
 app.register_blueprint(cash_flows_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
+app.register_blueprint(preferences_bp)
 app.register_blueprint(pages_bp)
 
 # הגדרת טיפול בשגיאות
 @app.errorhandler(404)
-def not_found(error):
+def not_found(error) -> Any:
     return jsonify({"error": "הדף לא נמצא"}), 404
 
 @app.errorhandler(500)
-def internal_error(error):
+def internal_error(error) -> Any:
     return jsonify({"error": "שגיאה פנימית בשרת"}), 500
 
 @app.errorhandler(Exception)
-def handle_exception(e):
+def handle_exception(e: Exception) -> Any:
     return jsonify({"error": f"שגיאה: {str(e)}"}), 500
 
 @app.route("/api/health", methods=["GET"])
-def health_check():
+def health_check() -> Any:
     """בדיקת בריאות השרת"""
     try:
         # בדיקה חיבור לבסיס הנתונים
@@ -125,7 +128,7 @@ if not os.path.exists(UI_DIR):
 print(f"UI Directory: {UI_DIR}")
 print(f"Files in UI directory: {os.listdir(UI_DIR)}")
 
-def get_db_connection():
+def get_db_connection() -> sqlite3.Connection:
     try:
         # הגדרות SQLite משופרות ליציבות
         conn = sqlite3.connect(
@@ -147,7 +150,7 @@ def get_db_connection():
         print(f"שגיאה בחיבור לבסיס הנתונים: {e}")
         raise
 
-def update_ticker_open_status(ticker_id):
+def update_ticker_open_status(ticker_id: int) -> None:
     """
     מעדכן את שדה active_trades של טיקר בהתאם למצב התכנונים והטריידים הפתוחים
     """
@@ -188,7 +191,7 @@ def update_ticker_open_status(ticker_id):
     finally:
         conn.close()
 
-def update_all_tickers_open_status():
+def update_all_tickers_open_status() -> None:
     """
     מעדכן את שדה active_trades של כל הטיקרים
     """
@@ -211,97 +214,97 @@ def update_all_tickers_open_status():
         conn.close()
 
 @app.route("/")
-def home():
+def home() -> Any:
     return send_from_directory(UI_DIR, "index.html")
 
 @app.route("/index.html")
-def index_page():
+def index_page() -> Any:
     return send_from_directory(UI_DIR, "index.html")
 
 # Routes לקבצי ה-UI
 @app.route("/planning")
-def planning_page():
+def planning_page() -> Any:
     return send_from_directory(UI_DIR, "planning.html")
 
 @app.route("/tracking")
-def tracking_page():
+def tracking_page() -> Any:
     return send_from_directory(UI_DIR, "tracking.html")
 
 @app.route("/static/<path:filename>")
-def static_files(filename):
+def static_files(filename: str) -> Any:
     return send_from_directory(UI_DIR, filename)
 
 @app.route("/styles/<path:filename>")
-def styles_files(filename):
+def styles_files(filename: str) -> Any:
     return send_from_directory(os.path.join(UI_DIR, "styles"), filename)
 
 @app.route("/scripts/<path:filename>")
-def scripts_files(filename):
+def scripts_files(filename: str) -> Any:
     return send_from_directory(os.path.join(UI_DIR, "scripts"), filename)
 
 @app.route("/images/<path:filename>")
-def images_files(filename):
+def images_files(filename: str) -> Any:
     return send_from_directory(os.path.join(UI_DIR, "images"), filename)
 
 @app.route("/menu.html")
-def menu_file():
+def menu_file() -> Any:
     return send_from_directory(UI_DIR, "menu.html")
 
 @app.route("/test-menu")
-def test_menu():
+def test_menu() -> Any:
     return send_from_directory(UI_DIR, "test-menu.html")
 
 @app.route("/grid-test")
-def grid_test():
+def grid_test() -> Any:
     return send_from_directory(UI_DIR, "grid-test.html")
 
 @app.route("/grid-test.html")
-def grid_test_html():
+def grid_test_html() -> Any:
     return send_from_directory(UI_DIR, "grid-test.html")
 
 @app.route("/grid-table-test")
-def grid_table_test():
+def grid_table_test() -> Any:
     return send_from_directory(UI_DIR, "grid-table-test.html")
 
 @app.route("/grid-table-test.html")
-def grid_table_test_html():
+def grid_table_test_html() -> Any:
     return send_from_directory(UI_DIR, "grid-table-test.html")
 
 @app.route("/research")
-def research():
+def research() -> Any:
     return send_from_directory(UI_DIR, "research.html")
 
 @app.route("/accounts")
-def accounts():
+def accounts() -> Any:
     return send_from_directory(UI_DIR, "accounts.html")
 
 @app.route("/alerts")
-def alerts():
+def alerts() -> Any:
     return send_from_directory(UI_DIR, "alerts.html")
 
 @app.route("/preferences")
-def preferences():
+def preferences() -> Any:
     return send_from_directory(UI_DIR, "preferences.html")
 
 @app.route("/database")
-def database_page():
+def database_page() -> Any:
     return send_from_directory(UI_DIR, "database.html")
 
 @app.route("/database.html")
-def database_html_page():
+def database_html_page() -> Any:
     return send_from_directory(UI_DIR, "database.html")
 
 @app.route("/designs")
-def designs_page():
+def designs_page() -> Any:
     return send_from_directory(UI_DIR, "designs.html")
 
 @app.route("/designs.html")
-def designs_html_page():
+def designs_html_page() -> Any:
     return send_from_directory(UI_DIR, "designs.html")
 
 # API עבור תכנוני טריידים
 @app.route("/api/tradeplans")
-def get_trade_plans():
+def get_trade_plans() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -336,7 +339,7 @@ def get_trade_plans():
     return jsonify(rows)
 
 @app.route("/api/tradeplans", methods=["POST"])
-def create_trade_plan():
+def create_trade_plan() -> Any:
     data = request.get_json()
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -382,7 +385,7 @@ def create_trade_plan():
         return jsonify({"status": "error", "message": str(e)}), 400
 
 @app.route("/api/trade_plans/<int:plan_id>", methods=["GET"])
-def get_trade_plan(plan_id):
+def get_trade_plan(plan_id: int) -> Any:
     """קבלת תכנון טרייד בודד לפי מזהה"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -428,7 +431,7 @@ def get_trade_plan(plan_id):
 
 # API עבור טריידים
 @app.route("/api/trades")
-def get_trades():
+def get_trades() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -462,7 +465,7 @@ def get_trades():
     return jsonify(rows)
 
 @app.route("/api/trades", methods=["POST"])
-def create_trade():
+def create_trade() -> Any:
     data = request.get_json()
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -512,7 +515,7 @@ def create_trade():
 
 # API עבור תחקיר - טריידים סגורים
 @app.route("/api/research/closed-trades")
-def get_closed_trades():
+def get_closed_trades() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -545,7 +548,7 @@ def get_closed_trades():
 
 # API עבור סטטיסטיקות תחקיר
 @app.route("/api/research/stats")
-def get_research_stats():
+def get_research_stats() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -589,7 +592,7 @@ def get_research_stats():
 
 # API עבור סטטיסטיקות
 @app.route("/api/stats")
-def get_stats():
+def get_stats() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -625,7 +628,7 @@ def get_stats():
 
 # API חדש לטבלאות בסיס הנתונים - בדיקה
 @app.route("/api/test_tickers")
-def test_tickers():
+def test_tickers() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -653,7 +656,7 @@ def test_tickers():
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/database_v2/<table_name>")
-def get_table_data_v2(table_name):
+def get_table_data_v2(table_name: str) -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -835,7 +838,7 @@ def get_table_data_v2(table_name):
 
 # API לטיקרים
 @app.route("/api/tickers/<int:ticker_id>", methods=["GET"])
-def get_ticker(ticker_id):
+def get_ticker(ticker_id: int) -> Any:
     """קבלת טיקר בודד לפי מזהה"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -857,7 +860,7 @@ def get_ticker(ticker_id):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/tickers/<int:ticker_id>/info", methods=["GET"])
-def get_ticker_info(ticker_id):
+def get_ticker_info(ticker_id: int) -> Any:
     """קבלת מידע על טיקר לפי מזהה - סימבול ומטבע"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -883,7 +886,7 @@ def get_ticker_info(ticker_id):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/tickers/symbol/<symbol>", methods=["GET"])
-def get_ticker_by_symbol(symbol):
+def get_ticker_by_symbol(symbol: str) -> Any:
     """קבלת מידע על טיקר לפי סימבול - סימבול ומטבע"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -909,7 +912,7 @@ def get_ticker_by_symbol(symbol):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/tickers", methods=["GET"])
-def get_tickers():
+def get_tickers() -> Any:
     """קבלת כל הטיקרים"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -925,7 +928,7 @@ def get_tickers():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/tickers", methods=["POST"])
-def create_ticker():
+def create_ticker() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -1020,7 +1023,7 @@ def create_ticker():
 
 # API לעדכון שדה active_trades של כל הטיקרים
 @app.route("/api/tickers/update-active-status", methods=["POST"])
-def update_all_tickers_active():
+def update_all_tickers_active() -> Any:
     try:
         update_all_tickers_active_status()
         return jsonify({"status": "success", "message": "עדכון שדה active_trades הושלם בהצלחה"})
@@ -1032,7 +1035,7 @@ def update_all_tickers_active():
 
 # API לתזרים מזומנים
 @app.route("/api/cash_flows", methods=["GET"])
-def get_cash_flows():
+def get_cash_flows() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -1065,7 +1068,7 @@ def get_cash_flows():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/cash_flows", methods=["POST"])
-def create_cash_flow():
+def create_cash_flow() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -1099,7 +1102,7 @@ def create_cash_flow():
 
 # API להערות
 @app.route("/api/notes", methods=["GET"])
-def get_notes():
+def get_notes() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -1136,7 +1139,7 @@ def get_notes():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/notes", methods=["POST"])
-def create_note():
+def create_note() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -1171,7 +1174,7 @@ def create_note():
 # ===== API ENDPOINTS FOR EXECUTIONS =====
 
 @app.route("/api/executions", methods=["GET"])
-def get_executions():
+def get_executions() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -1210,7 +1213,7 @@ def get_executions():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/executions", methods=["POST"])
-def create_execution():
+def create_execution() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -1258,7 +1261,7 @@ def create_execution():
 # ===== API ENDPOINTS FOR USERS =====
 
 @app.route("/api/users", methods=["GET"])
-def get_users():
+def get_users() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -1276,7 +1279,7 @@ def get_users():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/users/<int:user_id>", methods=["GET"])
-def get_user(user_id):
+def get_user(user_id: int) -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -1299,7 +1302,7 @@ def get_user(user_id):
 # ===== API ENDPOINTS FOR ACCOUNTS =====
 
 @app.route("/api/accounts", methods=["POST"])
-def create_account():
+def create_account() -> Any:
     """יצירת חשבון חדש"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -1340,7 +1343,7 @@ def create_account():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/accounts/<int:account_id>", methods=["PUT"])
-def update_account(account_id):
+def update_account(account_id: int) -> Any:
     """עדכון חשבון"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -1387,7 +1390,7 @@ def update_account(account_id):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/accounts/<int:account_id>", methods=["DELETE"])
-def delete_account(account_id):
+def delete_account(account_id: int) -> Any:
     """מחיקת חשבון"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -1441,7 +1444,7 @@ def delete_account(account_id):
 # ===== API ENDPOINTS FOR USER ROLES =====
 
 @app.route("/api/user_roles", methods=["GET"])
-def get_user_roles():
+def get_user_roles() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -1465,7 +1468,7 @@ def get_user_roles():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/user_roles/<int:user_role_id>", methods=["GET"])
-def get_user_role(user_role_id):
+def get_user_role(user_role_id: int) -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     

@@ -20,6 +20,7 @@ from sqlalchemy import Column, String, Float, Integer, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from models.base import BaseModel
+from typing import Dict, Any, Optional
 
 class Account(BaseModel):
     """
@@ -57,11 +58,11 @@ class Account(BaseModel):
     
     # Notes relationship removed - notes now use related_type and related_id
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         """String representation of the Account object."""
         return f"<Account(name='{self.name}', currency='{self.currency}', status='{self.status}')>"
     
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """
         Convert Account object to dictionary for JSON serialization.
         
@@ -80,7 +81,7 @@ class Account(BaseModel):
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
     
-    def is_active(self):
+    def is_active(self) -> bool:
         """
         Check if the account is active.
         
@@ -91,7 +92,7 @@ class Account(BaseModel):
         """
         return self.status == 'open'
     
-    def get_balance_info(self):
+    def get_balance_info(self) -> Dict[str, str]:
         """Get formatted balance information for display."""
         return {
             'cash_balance': f"{self.cash_balance:,.2f} {self.currency}" if self.cash_balance else "0.00",

@@ -1,160 +1,954 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>העדפות - TikTrack</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>העדפות - Tik.track</title>
+  
+  <!-- 
+    ===== דף העדפות - TikTrack =====
+    
+    דף זה מכיל:
+    1. הגדרות מערכת - הסקשן הראשון
+    2. הגדרות אישיות - הסקשן השני
+    3. הגדרות אבטחה - הסקשן השלישי
+    4. הגדרות תצוגה - הסקשן הרביעי
+    
+    מבנה הדף:
+    - app-header: כותרת האפליקציה עם ניווט
+    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+      - top-section: סיכום הגדרות
+      - content-section (1): הגדרות מערכת
+      - content-section (2): הגדרות אישיות
+      - content-section (3): הגדרות אבטחה
+      - content-section (4): הגדרות תצוגה
+  -->
+  
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
   <!-- Apple Theme CSS - בסיס כללי -->
-  <link rel="stylesheet" href="styles/apple-theme.css" />
+  <link rel="stylesheet" href="styles/apple-theme.css">
+  
   <!-- Main Styles - סגנונות הפרויקט -->
-  <link rel="stylesheet" href="styles/styles.css?v=10" />
+  <link rel="stylesheet" href="styles/styles.css">
+  
   <!-- Menu CSS - תפריט -->
-  <link rel="stylesheet" href="styles/menu.css?v=6" />
+  <link rel="stylesheet" href="styles/menu.css">
+  
+  <!-- Grid Table CSS - טבלאות וגרידים -->
+  <link rel="stylesheet" href="styles/grid-table.css">
+  
+  <!-- Typography CSS - טיפוגרפיה ופונטים -->
+  <link rel="stylesheet" href="styles/typography.css">
+  
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #f5f5f7;
-    }
-
-    /* התאמת המרווחים לכותרת החדשה */
-    .background-wrapper {
-      padding-top: 120px !important; /* מרווח לכותרת + פילטר + מרווח קטן */
-      padding-right: 32px;
-      transition: padding-top 0.3s ease;
-      position: relative;
-      z-index: 1;
-    }
-
-    .background-wrapper.filter-collapsed {
-      padding-top: 30px !important; /* מרווח לכותרת בלבד + מרווח קטן */
-    }
-
-    .main-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem;
-      background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-      border: 1px solid #e8e8e8;
+    /* ===== סגנונות לממשק העדפות ===== */
+    
+    /**
+     * מיכל ראשי לכל ההעדפות
+     * מספק מרווחים ואת המבנה הבסיסי
+     */
+    .preferences-container {
+      padding: 1rem 0;
     }
     
-    .page-header {
+    /**
+     * פריט העדפה בודד
+     * מכיל את התיאור ואת אלמנט הבקרה
+     * כולל אפקטי hover ואנימציות
+     */
+    .preference-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
       background: var(--apple-card-bg);
       border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e8e8e8;
+      transition: all 0.3s ease;
     }
     
-    .page-title {
-      font-size: 28px;
+    /**
+     * אפקט hover לפריט העדפה
+     * מעלה את הפריט ומציג צל
+     */
+    .preference-item:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    /**
+     * תווית ההעדפה - הצד השמאלי
+     * מכיל את האייקון והטקסט
+     */
+    .preference-label {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+    }
+    
+    /**
+     * אייקון ההעדפה
+     * עיגול צבעוני עם אייקון אמוג'י
+     */
+    .preference-icon {
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--apple-accent);
+      color: white;
+      border-radius: 8px;
+    }
+    
+    /**
+     * כותרת ההעדפה
+     * טקסט גדול ומודגש
+     */
+    .preference-text h4 {
+      margin: 0;
+      font-size: 1.1rem;
       font-weight: 600;
       color: var(--apple-text);
-      margin: 0;
     }
     
-    .page-subtitle {
-      font-size: 16px;
+    /**
+     * תיאור ההעדפה
+     * טקסט קטן יותר בצבע משני
+     */
+    .preference-text p {
+      margin: 0.25rem 0 0 0;
+      font-size: 0.9rem;
       color: var(--apple-secondary);
-      margin-top: 8px;
+    }
+    
+    /**
+     * מיכל אלמנט הבקרה - הצד הימני
+     * מספק רוחב מינימלי לאלמנטי הבקרה
+     */
+    .preference-control {
+      min-width: 200px;
+    }
+    
+    /**
+     * אלמנט בחירה (select)
+     * עיצוב מותאם לסגנון Apple
+     */
+    .preference-control .form-select {
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.9rem;
+      background: white;
+      transition: border-color 0.3s ease;
+    }
+    
+    /**
+     * מצב focus לאלמנט הבחירה
+     * מציג מסגרת בצבע האקצנט של הפרויקט
+     */
+    .preference-control .form-select:focus {
+      border-color: var(--apple-accent);
+      box-shadow: 0 0 0 3px rgba(255, 156, 5, 0.1);
+      outline: none;
+    }
+    
+    /**
+     * אפשרויות בחירה
+     * מרווחים נוחים לאפשרויות
+     */
+    .preference-control .form-select option {
+      padding: 0.5rem;
+    }
+    
+    /**
+     * מצב טעינה לפריט העדפה
+     * מקטין שקיפות ומבטל אינטראקציה
+     */
+    .preference-item.loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    
+    /**
+     * ספינר טעינה
+     * מופיע בצד ימין של אלמנט הבקרה במצב טעינה
+     */
+    .preference-item.loading .preference-control::after {
+      content: "⏳";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      animation: spin 1s linear infinite;
+    }
+    
+    /**
+     * אנימציית סיבוב לספינר
+     * מסובב את הספינר 360 מעלות
+     */
+    @keyframes spin {
+      0% { transform: translateY(-50%) rotate(0deg); }
+      100% { transform: translateY(-50%) rotate(360deg); }
     }
   </style>
+  
+  <!-- קבצים מודולריים של הגריד -->
+  <script src="scripts/app-header.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/grid-filters.js"></script>
+  <script src="scripts/preferences.js"></script>
 </head>
 <body>
-  <!-- Web Component של הכותרת -->
-  <app-header></app-header>
-
-  <!-- Menu will be loaded here -->
-  <div id="menu-container"></div>
-  
+  <!-- רקע כללי -->
   <div class="background-wrapper">
-    <div class="main-content">
-      <div class="page-header">
-        <h1 class="page-title">העדפות</h1>
-        <p class="page-subtitle">הגדרות מערכת והעדפות אישיות</p>
-      </div>
-      
-      <!-- Content will be added here -->
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <div class="card" style="background: var(--apple-card-bg); border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-              <div class="card-body">
-                <h5 class="card-title">תוכן עמוד העדפות</h5>
-                <p class="card-text">כאן יוצג תוכן עמוד העדפות...</p>
+    
+    <!-- כותרת האפליקציה -->
+    <app-header></app-header>
+    
+    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <div class="page-body">
+      <!-- אזור סיכום - top-Section -->
+      <div class="top-section">
+        <!-- כותרת סיכום -->
+        <div class="section-header">
+          <div class="table-title">
+            ⚙️ העדפות והגדרות
+          </div>
+          <div class="table-actions">
+            <button class="refresh-btn" onclick="saveAllPreferences()" title="שמור כל ההגדרות">
+              <span class="action-icon">💾</span> שמור הכל
+            </button>
+            <div class="action-separator"></div>
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור סיכום">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- סיכום הגדרות -->
+        <div class="section-body">
+          <div class="preferences-summary">
+            <!-- סיכום ההגדרות יוכנס כאן דינמית -->
+          </div>
+        </div>
+      </div> <!-- סוף top-section -->
+        
+      <!-- תוכן ראשי -->
+      <div class="main-content">
+
+        <!-- אזור הגדרות מערכת - content-section -->
+        <div class="content-section">
+          <!-- כותרת הגדרות מערכת -->
+          <div class="section-header">
+                      <div class="table-title">
+            🔧 הגדרות מערכת
+          </div>
+            <div class="table-count">הגדרות מערכת</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="resetSystemPreferences()" title="אפס הגדרות מערכת">
+                <span class="action-icon">🔄</span> אפס
+              </button>
+              <button class="refresh-btn" onclick="saveSystemPreferences()" title="שמור הגדרות מערכת">
+                <span class="action-icon">💾</span> שמור
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleSystemSection()" title="הצג/הסתר אזור הגדרות מערכת">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- תוכן הגדרות מערכת -->
+          <div class="section-body">
+            <div class="preferences-container">
+              <!-- הגדרת מטבע ראשי -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">💰</span>
+                  <div class="preference-text">
+                    <h4>מטבע ראשי</h4>
+                    <p>המטבע הראשי שיוצג במערכת</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <select id="primaryCurrencySelect" class="form-select" onchange="updatePrimaryCurrency(this.value)">
+                    <option value="USD">USD - דולר אמריקאי</option>
+                    <option value="ILS">ILS - שקל ישראלי</option>
+                    <option value="EUR">EUR - יורו</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        
+        <!-- אזור הגדרות אישיות - content-section -->
+        <div class="content-section">
+          <!-- כותרת הגדרות אישיות -->
+          <div class="section-header">
+                      <div class="table-title">
+            👤 הגדרות אישיות
+          </div>
+            <div class="table-count">הגדרות אישיות</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="resetPersonalPreferences()" title="אפס הגדרות אישיות">
+                <span class="action-icon">🔄</span> אפס
+              </button>
+              <button class="refresh-btn" onclick="savePersonalPreferences()" title="שמור הגדרות אישיות">
+                <span class="action-icon">💾</span> שמור
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="togglePersonalSection()" title="הצג/הסתר אזור הגדרות אישיות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- תוכן הגדרות אישיות -->
+          <div class="section-body">
+            <!-- תוכן יוכנס כאן -->
+          </div>
+        </div>
+        
+        <!-- אזור הגדרות אבטחה - content-section -->
+        <div class="content-section">
+          <!-- כותרת הגדרות אבטחה -->
+          <div class="section-header">
+                      <div class="table-title">
+            🔒 הגדרות אבטחה
+          </div>
+            <div class="table-count">הגדרות אבטחה</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="resetSecurityPreferences()" title="אפס הגדרות אבטחה">
+                <span class="action-icon">🔄</span> אפס
+              </button>
+              <button class="refresh-btn" onclick="saveSecurityPreferences()" title="שמור הגדרות אבטחה">
+                <span class="action-icon">💾</span> שמור
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleSecuritySection()" title="הצג/הסתר אזור הגדרות אבטחה">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- תוכן הגדרות אבטחה -->
+          <div class="section-body">
+            <!-- תוכן יוכנס כאן -->
+          </div>
+        </div>
+        
+        <!-- אזור הגדרות תצוגה - content-section -->
+        <div class="content-section">
+          <!-- כותרת הגדרות תצוגה -->
+          <div class="section-header">
+                      <div class="table-title">
+            🎨 הגדרות תצוגה
+          </div>
+            <div class="table-count">הגדרות תצוגה</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="resetDisplayPreferences()" title="אפס הגדרות תצוגה">
+                <span class="action-icon">🔄</span> אפס
+              </button>
+              <button class="refresh-btn" onclick="saveDisplayPreferences()" title="שמור הגדרות תצוגה">
+                <span class="action-icon">💾</span> שמור
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleDisplaySection()" title="הצג/הסתר אזור הגדרות תצוגה">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- תוכן הגדרות תצוגה -->
+          <div class="section-body">
+            <!-- תוכן יוכנס כאן -->
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-  
+    </div> <!-- סוף page-body -->
+
+  <!-- מרווח בתחתית הדף -->
+  <div style="height: 3rem;"></div>
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
-  <!-- Scripts -->
-  <script src="scripts/app-header.js"></script>
-  
   <script>
-    // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
-    function updateBackgroundPadding(isCollapsed) {
-      const backgroundWrapper = document.querySelector('.background-wrapper');
-      const body = document.body;
+    /**
+     * מעדכן את המטבע הראשי במערכת
+     * 
+     * פונקציה זו נקראת כאשר המשתמש משנה את בחירת המטבע הראשי
+     * היא שומרת את ההגדרה החדשה לשרת ומציגה משוב למשתמש
+     * 
+     * @param {string} value - ערך המטבע החדש (USD, ILS, EUR)
+     * @returns {Promise<void>}
+     * 
+     * @example
+     * // עדכון מטבע ראשי ל-ILS
+     * updatePrimaryCurrency('ILS');
+     */
+    async function updatePrimaryCurrency(value) {
+      console.log('🔄 עדכון מטבע ראשי:', value);
       
-      if (backgroundWrapper) {
-        if (isCollapsed) {
-          backgroundWrapper.classList.add('filter-collapsed');
-        } else {
-          backgroundWrapper.classList.remove('filter-collapsed');
-        }
-      }
+      // מציאת אלמנטי הממשק
+      const selectElement = document.getElementById('primaryCurrencySelect');
+      const preferenceItem = selectElement.closest('.preference-item');
       
-      if (body) {
-        if (isCollapsed) {
-          body.classList.add('filter-collapsed');
+      // הוספת מצב טעינה לממשק
+      preferenceItem.classList.add('loading');
+      
+      try {
+        // שמירת ההגדרה החדשה לשרת
+        const success = await savePreference('primaryCurrency', value);
+        
+        if (success) {
+          // עדכון התצוגה עם הערך החדש
+          selectElement.value = value;
+          showNotification(`מטבע ראשי עודכן ל-${value}`, 'success');
+          console.log('✅ מטבע ראשי עודכן בהצלחה');
         } else {
-          body.classList.remove('filter-collapsed');
+          // אם השמירה נכשלה, החזרת הערך הקודם
+          const currentValue = await getCurrentPreference('primaryCurrency');
+          selectElement.value = currentValue;
+          showNotification('שגיאה בעדכון מטבע ראשי', 'error');
         }
+      } catch (error) {
+        console.error('❌ שגיאה בעדכון מטבע ראשי:', error);
+        showNotification('שגיאה בעדכון מטבע ראשי', 'error');
+      } finally {
+        // הסרת מצב הטעינה מהממשק
+        preferenceItem.classList.remove('loading');
       }
     }
-
-    // האזנה לשינויים בקומפוננט הכותרת
-    function setupHeaderListener() {
-      const header = document.querySelector('app-header');
-      if (header) {
-        // האזנה לשינויים בפילטר
-        const observer = new MutationObserver((mutations) => {
-          mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-              const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
-              if (filterSection) {
-                const isCollapsed = filterSection.classList.contains('collapsed');
-                updateBackgroundPadding(isCollapsed);
-              }
-            }
-          });
-        });
-
-        // התחלת ההאזנה
-        setTimeout(() => {
-          const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
-          if (filterSection) {
-            observer.observe(filterSection, { attributes: true });
+    
+    /**
+     * טוען את ההעדפות מהשרת ומעדכן את ממשק המשתמש
+     * 
+     * פונקציה זו נקראת בעת טעינת הדף ומעדכנת את כל אלמנטי הממשק
+     * עם הערכים הנוכחיים של ההעדפות מהשרת
+     * 
+     * @returns {Promise<void>}
+     * 
+     * @example
+     * // טעינת העדפות לממשק
+     * await loadPreferencesToUI();
+     */
+    async function loadPreferencesToUI() {
+      try {
+        console.log('🔄 טוען העדפות לממשק...');
+        
+        // טעינת העדפות מהשרת
+        const response = await fetch('/api/preferences');
+        if (response.ok) {
+          const preferences = await response.json();
+          
+          // עדכון ממשק המשתמש עם הערכים הנוכחיים
+          const currencySelect = document.getElementById('primaryCurrencySelect');
+          if (currencySelect) {
+            // שימוש בהגדרת המשתמש או ברירת המחדל
+            const currentCurrency = preferences.user.primaryCurrency || preferences.defaults.primaryCurrency;
+            currencySelect.value = currentCurrency;
+            console.log('✅ מטבע ראשי נטען:', currentCurrency);
           }
-        }, 1000);
+          
+          console.log('✅ העדפות נטענו לממשק בהצלחה');
+        } else {
+          console.error('❌ שגיאה בטעינת העדפות מהשרת:', response.status);
+        }
+      } catch (error) {
+        console.error('❌ שגיאה בטעינת העדפות לממשק:', error);
+      }
+    }
+    
+    /**
+     * שומר את כל ההעדפות לשרת
+     * 
+     * פונקציה זו שומרת את כל ההעדפות הנוכחיות לשרת
+     * נקראת בעת לחיצה על כפתור "שמור הכל"
+     * 
+     * @returns {Promise<void>}
+     * 
+     * @example
+     * // שמירת כל ההעדפות
+     * await saveAllPreferences();
+     */
+    async function saveAllPreferences() {
+      console.log('🔄 שומר את כל ההעדפות...');
+      // כאן יוכנס קוד לשמירת כל ההעדפות
+    }
+    
+    /**
+     * שומר הגדרה ספציפית לשרת
+     * 
+     * פונקציה זו שולחת בקשה לשרת לשמירת הגדרה ספציפית
+     * ומחזירה true אם השמירה הצליחה, false אם נכשלה
+     * 
+     * @param {string} key - מפתח ההגדרה (למשל: 'primaryCurrency')
+     * @param {any} value - ערך ההגדרה החדש
+     * @returns {Promise<boolean>} - true אם השמירה הצליחה, false אם נכשלה
+     * 
+     * @example
+     * // שמירת מטבע ראשי
+     * const success = await savePreference('primaryCurrency', 'ILS');
+     * if (success) {
+     *   console.log('המטבע נשמר בהצלחה');
+     * }
+     */
+    async function savePreference(key, value) {
+      try {
+        console.log(`🔄 שומר הגדרה: ${key} = ${value}`);
+        
+        // שליחת בקשה לשרת
+        const response = await fetch(`/api/preferences/${key}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ value: value })
+        });
+        
+        if (response.ok) {
+          console.log(`✅ הגדרה ${key} נשמרה בהצלחה`);
+          return true;
+        } else {
+          console.error(`❌ שגיאה בשמירת הגדרה ${key}:`, response.status);
+          return false;
+        }
+      } catch (error) {
+        console.error(`❌ שגיאה בשמירת הגדרה ${key}:`, error);
+        return false;
+      }
+    }
+    
+    /**
+     * מקבל את הערך הנוכחי של הגדרה מהשרת
+     * 
+     * פונקציה זו שולחת בקשה לשרת לקבלת הערך הנוכחי של הגדרה ספציפית
+     * 
+     * @param {string} key - מפתח ההגדרה
+     * @returns {Promise<any>} - ערך ההגדרה הנוכחי
+     * 
+     * @example
+     * // קבלת מטבע ראשי נוכחי
+     * const currency = await getCurrentPreference('primaryCurrency');
+     * console.log('מטבע נוכחי:', currency);
+     */
+    async function getCurrentPreference(key) {
+      try {
+        const response = await fetch('/api/preferences');
+        if (response.ok) {
+          const preferences = await response.json();
+          return preferences.user[key] || preferences.defaults[key];
+        }
+        return null;
+      } catch (error) {
+        console.error(`❌ שגיאה בקבלת הגדרה ${key}:`, error);
+        return null;
       }
     }
 
+    /**
+     * מציג הודעת התראה למשתמש
+     * 
+     * פונקציה זו יוצרת הודעת התראה זמנית בפינה הימנית העליונה של המסך
+     * ההודעה נעלמת אוטומטית אחרי 3 שניות
+     * 
+     * @param {string} message - טקסט ההודעה להצגה
+     * @param {string} type - סוג ההודעה: 'success' (ירוק) או 'error' (אדום)
+     * 
+     * @example
+     * // הצגת הודעת הצלחה
+     * showNotification('הגדרות נשמרו בהצלחה', 'success');
+     * 
+     * // הצגת הודעת שגיאה
+     * showNotification('שגיאה בשמירת הגדרות', 'error');
+     */
+    function showNotification(message, type = 'success') {
+      try {
+        // יצירת אלמנט ההודעה
+        const notification = document.createElement('div');
+        
+        // הגדרת צבעים לפי סוג ההודעה
+        const bgColor = type === 'error' ? '#f8d7da' : '#d4edda';
+        const textColor = type === 'error' ? '#721c24' : '#155724';
+        const borderColor = type === 'error' ? '#f5c6cb' : '#c3e6cb';
+        
+        // הגדרת סגנונות ההודעה
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 9999;
+          padding: 12px 20px;
+          border-radius: 8px;
+          background-color: ${bgColor};
+          color: ${textColor};
+          border: 1px solid ${borderColor};
+          font-size: 14px;
+          font-weight: 500;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          transition: opacity 0.3s ease;
+          opacity: 0;
+        `;
+        
+        // הוספת הטקסט להודעה
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // הצגת ההודעה עם אנימציה
+        setTimeout(() => {
+          notification.style.opacity = '1';
+        }, 100);
+        
+        // הסתרת ההודעה אחרי 3 שניות
+        setTimeout(() => {
+          notification.style.opacity = '0';
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 300);
+        }, 3000);
+        
+      } catch (error) {
+        console.error('❌ שגיאה בהצגת הודעה:', error);
+      }
+    }
+    
+    function resetSystemPreferences() {
+      console.log('איפוס הגדרות מערכת');
+      // כאן יוכנס קוד לאיפוס הגדרות מערכת
+    }
+    
+    function saveSystemPreferences() {
+      console.log('שמירת הגדרות מערכת');
+      // כאן יוכנס קוד לשמירת הגדרות מערכת
+    }
+    
+    function resetPersonalPreferences() {
+      console.log('איפוס הגדרות אישיות');
+      // כאן יוכנס קוד לאיפוס הגדרות אישיות
+    }
+    
+    function savePersonalPreferences() {
+      console.log('שמירת הגדרות אישיות');
+      // כאן יוכנס קוד לשמירת הגדרות אישיות
+    }
+    
+    function resetSecurityPreferences() {
+      console.log('איפוס הגדרות אבטחה');
+      // כאן יוכנס קוד לאיפוס הגדרות אבטחה
+    }
+    
+    function saveSecurityPreferences() {
+      console.log('שמירת הגדרות אבטחה');
+      // כאן יוכנס קוד לשמירת הגדרות אבטחה
+    }
+    
+    function resetDisplayPreferences() {
+      console.log('איפוס הגדרות תצוגה');
+      // כאן יוכנס קוד לאיפוס הגדרות תצוגה
+    }
+    
+    function saveDisplayPreferences() {
+      console.log('שמירת הגדרות תצוגה');
+      // כאן יוכנס קוד לשמירת הגדרות תצוגה
+    }
+    
+    // פונקציות הצגה/הסתרה של סקשנים
+    function toggleTopSection() {
+      const section = document.querySelector('.top-section .section-body');
+      const toggleBtn = document.querySelector('.top-section button[onclick="toggleTopSection()"]');
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+      
+      if (section) {
+        const isCollapsed = section.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          section.classList.remove('collapsed');
+          section.style.display = 'block';
+        } else {
+          section.classList.add('collapsed');
+          section.style.display = 'none';
+        }
+        
+        // עדכון האייקון
+        if (icon) {
+          icon.textContent = isCollapsed ? '▲' : '▼';
+        }
+        
+        // שמירת המצב ב-localStorage
+        localStorage.setItem('preferencesTopSectionCollapsed', !isCollapsed);
+      }
+    }
+    
+    function toggleSystemSection() {
+      const section = document.querySelector('.main-content .content-section:nth-child(1) .section-body');
+      const toggleBtn = document.querySelector('.main-content .content-section:nth-child(1) button[onclick="toggleSystemSection()"]');
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+      
+      if (section) {
+        const isCollapsed = section.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          section.classList.remove('collapsed');
+          section.style.display = 'block';
+        } else {
+          section.classList.add('collapsed');
+          section.style.display = 'none';
+        }
+        
+        // עדכון האייקון
+        if (icon) {
+          icon.textContent = isCollapsed ? '▲' : '▼';
+        }
+        
+        // שמירת המצב ב-localStorage
+        localStorage.setItem('preferencesSystemSectionCollapsed', !isCollapsed);
+      }
+    }
+    
+    function togglePersonalSection() {
+      const section = document.querySelector('.main-content .content-section:nth-child(2) .section-body');
+      const toggleBtn = document.querySelector('.main-content .content-section:nth-child(2) button[onclick="togglePersonalSection()"]');
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+      
+      if (section) {
+        const isCollapsed = section.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          section.classList.remove('collapsed');
+          section.style.display = 'block';
+        } else {
+          section.classList.add('collapsed');
+          section.style.display = 'none';
+        }
+        
+        // עדכון האייקון
+        if (icon) {
+          icon.textContent = isCollapsed ? '▲' : '▼';
+        }
+        
+        // שמירת המצב ב-localStorage
+        localStorage.setItem('preferencesPersonalSectionCollapsed', !isCollapsed);
+      }
+    }
+    
+    function toggleSecuritySection() {
+      const section = document.querySelector('.main-content .content-section:nth-child(3) .section-body');
+      const toggleBtn = document.querySelector('.main-content .content-section:nth-child(3) button[onclick="toggleSecuritySection()"]');
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+      
+      if (section) {
+        const isCollapsed = section.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          section.classList.remove('collapsed');
+          section.style.display = 'block';
+        } else {
+          section.classList.add('collapsed');
+          section.style.display = 'none';
+        }
+        
+        // עדכון האייקון
+        if (icon) {
+          icon.textContent = isCollapsed ? '▲' : '▼';
+        }
+        
+        // שמירת המצב ב-localStorage
+        localStorage.setItem('preferencesSecuritySectionCollapsed', !isCollapsed);
+      }
+    }
+    
+    function toggleDisplaySection() {
+      const section = document.querySelector('.main-content .content-section:nth-child(4) .section-body');
+      const toggleBtn = document.querySelector('.main-content .content-section:nth-child(4) button[onclick="toggleDisplaySection()"]');
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+      
+      if (section) {
+        const isCollapsed = section.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          section.classList.remove('collapsed');
+          section.style.display = 'block';
+        } else {
+          section.classList.add('collapsed');
+          section.style.display = 'none';
+        }
+        
+        // עדכון האייקון
+        if (icon) {
+          icon.textContent = isCollapsed ? '▲' : '▼';
+        }
+        
+        // שמירת המצב ב-localStorage
+        localStorage.setItem('preferencesDisplaySectionCollapsed', !isCollapsed);
+      }
+    }
+    
+    // פונקציה לשחזור מצב הסגירה
+    function restorePreferencesSectionState() {
+      // שחזור מצב top section
+      const topSection = document.querySelector('.top-section .section-body');
+      const topToggleBtn = document.querySelector('.top-section button[onclick="toggleTopSection()"]');
+      const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
+      
+      if (topSection && topToggleBtn && topIcon) {
+        const isCollapsed = localStorage.getItem('preferencesTopSectionCollapsed') === 'true';
+        
+        if (isCollapsed) {
+          topSection.classList.add('collapsed');
+          topSection.style.display = 'none';
+          topIcon.textContent = '▼';
+        } else {
+          topSection.classList.remove('collapsed');
+          topSection.style.display = 'block';
+          topIcon.textContent = '▲';
+        }
+      }
+      
+      // שחזור מצב system section
+      const systemSection = document.querySelector('.main-content .content-section:nth-child(1) .section-body');
+      const systemToggleBtn = document.querySelector('.main-content .content-section:nth-child(1) button[onclick="toggleSystemSection()"]');
+      const systemIcon = systemToggleBtn ? systemToggleBtn.querySelector('.filter-icon') : null;
+      
+      if (systemSection && systemToggleBtn && systemIcon) {
+        const isCollapsed = localStorage.getItem('preferencesSystemSectionCollapsed') === 'true';
+        
+        if (isCollapsed) {
+          systemSection.classList.add('collapsed');
+          systemSection.style.display = 'none';
+          systemIcon.textContent = '▼';
+        } else {
+          systemSection.classList.remove('collapsed');
+          systemSection.style.display = 'block';
+          systemIcon.textContent = '▲';
+        }
+      }
+      
+      // שחזור מצב personal section
+      const personalSection = document.querySelector('.main-content .content-section:nth-child(2) .section-body');
+      const personalToggleBtn = document.querySelector('.main-content .content-section:nth-child(2) button[onclick="togglePersonalSection()"]');
+      const personalIcon = personalToggleBtn ? personalToggleBtn.querySelector('.filter-icon') : null;
+      
+      if (personalSection && personalToggleBtn && personalIcon) {
+        const isCollapsed = localStorage.getItem('preferencesPersonalSectionCollapsed') === 'true';
+        
+        if (isCollapsed) {
+          personalSection.classList.add('collapsed');
+          personalSection.style.display = 'none';
+          personalIcon.textContent = '▼';
+        } else {
+          personalSection.classList.remove('collapsed');
+          personalSection.style.display = 'block';
+          personalIcon.textContent = '▲';
+        }
+      }
+      
+      // שחזור מצב security section
+      const securitySection = document.querySelector('.main-content .content-section:nth-child(3) .section-body');
+      const securityToggleBtn = document.querySelector('.main-content .content-section:nth-child(3) button[onclick="toggleSecuritySection()"]');
+      const securityIcon = securityToggleBtn ? securityToggleBtn.querySelector('.filter-icon') : null;
+      
+      if (securitySection && securityToggleBtn && securityIcon) {
+        const isCollapsed = localStorage.getItem('preferencesSecuritySectionCollapsed') === 'true';
+        
+        if (isCollapsed) {
+          securitySection.classList.add('collapsed');
+          securitySection.style.display = 'none';
+          securityIcon.textContent = '▼';
+        } else {
+          securitySection.classList.remove('collapsed');
+          securitySection.style.display = 'block';
+          securityIcon.textContent = '▲';
+        }
+      }
+      
+      // שחזור מצב display section
+      const displaySection = document.querySelector('.main-content .content-section:nth-child(4) .section-body');
+      const displayToggleBtn = document.querySelector('.main-content .content-section:nth-child(4) button[onclick="toggleDisplaySection()"]');
+      const displayIcon = displayToggleBtn ? displayToggleBtn.querySelector('.filter-icon') : null;
+      
+      if (displaySection && displayToggleBtn && displayIcon) {
+        const isCollapsed = localStorage.getItem('preferencesDisplaySectionCollapsed') === 'true';
+        
+        if (isCollapsed) {
+          displaySection.classList.add('collapsed');
+          displaySection.style.display = 'none';
+          displayIcon.textContent = '▼';
+        } else {
+          displaySection.classList.remove('collapsed');
+          displaySection.style.display = 'block';
+          displayIcon.textContent = '▲';
+        }
+      }
+    }
+    
+    // הגדרת הפונקציות כגלובליות
+    window.saveAllPreferences = saveAllPreferences;
+    window.savePreference = savePreference;
+    window.getCurrentPreference = getCurrentPreference;
+    window.showNotification = showNotification;
+    window.updatePrimaryCurrency = updatePrimaryCurrency;
+    window.loadPreferencesToUI = loadPreferencesToUI;
+    window.resetSystemPreferences = resetSystemPreferences;
+    window.saveSystemPreferences = saveSystemPreferences;
+    window.resetPersonalPreferences = resetPersonalPreferences;
+    window.savePersonalPreferences = savePersonalPreferences;
+    window.resetSecurityPreferences = resetSecurityPreferences;
+    window.saveSecurityPreferences = saveSecurityPreferences;
+    window.resetDisplayPreferences = resetDisplayPreferences;
+    window.saveDisplayPreferences = saveDisplayPreferences;
+    window.toggleTopSection = toggleTopSection;
+    window.toggleSystemSection = toggleSystemSection;
+    window.togglePersonalSection = togglePersonalSection;
+    window.toggleSecuritySection = toggleSecuritySection;
+    window.toggleDisplaySection = toggleDisplaySection;
+    
     // אתחול הדף
-    document.addEventListener('DOMContentLoaded', () => {
-      // הגדרת האזנה לכותרת
-      setupHeaderListener();
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🔄 === DOM CONTENT LOADED - PREFERENCES ===');
+      
+      // שחזור מצב הסגירה
+      restorePreferencesSectionState();
+      
+      // טעינת העדפות לממשק
+      loadPreferencesToUI();
     });
+    
+    // פונקציה לטעינת סיכום העדפות - הוסרה
+    // function loadPreferencesSummary() {
+    //   const summaryContainer = document.getElementById('preferencesSummary');
+    //   if (summaryContainer) {
+    //     summaryContainer.innerHTML = `
+    //       <div class="preferences-summary-content">
+    //         <div class="summary-item">
+    //           <span class="summary-icon">🔧</span>
+    //           <span class="summary-text">הגדרות מערכת: <strong>פעילות</strong></span>
+    //         </div>
+    //         <div class="summary-item">
+    //           <span class="summary-icon">👤</span>
+    //           <span class="summary-text">הגדרות אישיות: <strong>נטענו</strong></span>
+    //         </div>
+    //         <div class="summary-item">
+    //           <span class="summary-icon">🔒</span>
+    //           <span class="summary-text">הגדרות אבטחה: <strong>מוגדרות</strong></span>
+    //         </div>
+    //         <div class="summary-item">
+    //           <span class="summary-icon">🎨</span>
+    //           <span class="summary-text">הגדרות תצוגה: <strong>מותאמות</strong></span>
+    //         </div>
+    //       </div>
+    //     `;
+    //   }
+    // }
   </script>
 </body>
 </html>

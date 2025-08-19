@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from .base import BaseModel
+from typing import Dict, Any, Optional
 
 class Note(BaseModel):
     """
@@ -23,13 +24,13 @@ class Note(BaseModel):
     related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False)
     related_id = Column(Integer, nullable=False)
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         related_type = 'account' if self.related_type_id == 1 else 'trade' if self.related_type_id == 2 else 'trade_plan' if self.related_type_id == 3 else 'none'
         return f"<Note(id={self.id}, related_type='{related_type}', related_id={self.related_id}, content='{self.content[:50]}...')>"
     
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """המרה למילון עם תאימות לאחור"""
-        result = super().to_dict()
+        result: Dict[str, Any] = super().to_dict()
         
         # קביעת related_type לפי related_type_id
         if self.related_type_id == 1:

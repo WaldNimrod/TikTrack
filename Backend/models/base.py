@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, DateTime
 from sqlalchemy.sql import func
 from config.database import Base
+from typing import Dict, Any, Optional
+from datetime import datetime
 
 class BaseModel(Base):
     """
@@ -19,9 +21,9 @@ class BaseModel(Base):
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, server_default=func.now())
     
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """המרה למילון"""
-        result = {}
+        result: Dict[str, Any] = {}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
             if hasattr(value, 'strftime'):  # אם זה תאריך
@@ -30,5 +32,5 @@ class BaseModel(Base):
                 result[c.name] = value
         return result
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.__class__.__name__}(id={self.id})>"

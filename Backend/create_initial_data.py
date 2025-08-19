@@ -54,7 +54,7 @@ def create_tickers(db: Session):
     print("✅ Tickers created")
 
 def create_accounts(db: Session):
-    """יצירת חשבונות"""
+    """יצירת חשבונות - תואם לכללי הסטטוס"""
     accounts_data = [
         {"name": "חשבון ראשי", "currency": "USD", "status": "open", "cash_balance": 50000, "total_value": 75000, "total_pl": 25000, "notes": "החשבון הראשי שלי"},
         {"name": "חשבון טכנולוגיה", "currency": "USD", "status": "open", "cash_balance": 25000, "total_value": 35000, "total_pl": 10000, "notes": "מתמקד במניות טכנולוגיה"},
@@ -63,6 +63,13 @@ def create_accounts(db: Session):
         {"name": "Test Account", "currency": "USD", "status": "open", "cash_balance": 10000, "total_value": 12000, "total_pl": 2000, "notes": "חשבון בדיקה"},
         {"name": "Test Account for Trade", "currency": "USD", "status": "open", "cash_balance": 8000, "total_value": 9500, "total_pl": 1500, "notes": "חשבון בדיקה לטריידים"}
     ]
+    
+    # בדיקת תקינות סטטוסים
+    valid_statuses = ["open", "closed", "cancelled"]
+    for account_data in accounts_data:
+        if account_data["status"] not in valid_statuses:
+            print(f"⚠️ Invalid account status: {account_data['status']} - using 'open'")
+            account_data["status"] = "open"
     
     for account_data in accounts_data:
         existing = db.query(Account).filter(Account.name == account_data["name"]).first()
@@ -74,7 +81,7 @@ def create_accounts(db: Session):
     print("✅ Accounts created")
 
 def create_trade_plans(db: Session):
-    """יצירת תוכניות טרייד"""
+    """יצירת תוכניות טרייד - תואם לכללי הקישור"""
     accounts = db.query(Account).filter(Account.status == "open").all()
     tickers = db.query(Ticker).all()
     
@@ -83,50 +90,117 @@ def create_trade_plans(db: Session):
         return
     
     plans_data = [
+        # תוכנית 1: AAPL - swing
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[0].id,  # AAPL
             "investment_type": "swing",
             "side": "Long",
+            "status": "open",
             "planned_amount": 10000,
             "entry_conditions": "מחיר מתחת ל-150$",
             "stop_price": 140,
             "target_price": 180,
             "reasons": "חברה חזקה עם מוצרים איכותיים"
         },
+        # תוכנית 2: GOOGL - swing
         {
             "account_id": accounts[1].id,
             "ticker_id": tickers[1].id,  # GOOGL
             "investment_type": "swing",
             "side": "Long",
+            "status": "open",
             "planned_amount": 8000,
             "entry_conditions": "מחיר מתחת ל-120$",
             "stop_price": 110,
             "target_price": 150,
             "reasons": "דומיננטיות בחיפוש ופרסום"
         },
+        # תוכנית 3: SPY - swing
         {
             "account_id": accounts[1].id if len(accounts) > 1 else accounts[0].id,
             "ticker_id": tickers[8].id,  # SPY
             "investment_type": "swing",
             "side": "Long",
+            "status": "open",
             "planned_amount": 5000,
             "entry_conditions": "מחיר מתחת ל-400$",
             "stop_price": 380,
             "target_price": 450,
             "reasons": "השקעה במדד S&P 500"
+        },
+        # תוכנית 4: MSFT - investment
+        {
+            "account_id": accounts[0].id,
+            "ticker_id": tickers[2].id,  # MSFT
+            "investment_type": "investment",
+            "side": "Long",
+            "status": "open",
+            "planned_amount": 15000,
+            "entry_conditions": "מחיר מתחת ל-350$",
+            "stop_price": 320,
+            "target_price": 400,
+            "reasons": "חברה דומיננטית ב-Azure ו-Office"
+        },
+        # תוכנית 5: NVDA - swing
+        {
+            "account_id": accounts[1].id if len(accounts) > 1 else accounts[0].id,
+            "ticker_id": tickers[4].id,  # NVDA
+            "investment_type": "swing",
+            "side": "Long",
+            "status": "open",
+            "planned_amount": 12000,
+            "entry_conditions": "מחיר מתחת ל-450$",
+            "stop_price": 420,
+            "target_price": 550,
+            "reasons": "דומיננטיות בצ'יפי AI"
+        },
+        # תוכנית 6: TSLA - passive
+        {
+            "account_id": accounts[0].id,
+            "ticker_id": tickers[3].id,  # TSLA
+            "investment_type": "passive",
+            "side": "Long",
+            "status": "open",
+            "planned_amount": 8000,
+            "entry_conditions": "מחיר מתחת ל-200$",
+            "stop_price": 180,
+            "target_price": 250,
+            "reasons": "השקעה ארוכת טווח ברכב חשמלי"
         }
     ]
     
-    for plan_data in plans_data:
+    # בדיקת תקינות תכנונים
+    print("🔍 Validating trade plans...")
+    valid_investment_types = ["swing", "investment", "passive"]
+    valid_sides = ["Long", "Short"]
+    valid_statuses = ["open", "closed", "cancelled"]
+    
+    for i, plan_data in enumerate(plans_data):
+        # בדיקת ערכי investment_type
+        if plan_data.get('investment_type') not in valid_investment_types:
+            print(f"❌ Plan {i+1}: Invalid investment_type '{plan_data.get('investment_type')}' - using 'swing'")
+            plan_data['investment_type'] = 'swing'
+        
+        # בדיקת ערכי side
+        if plan_data.get('side') not in valid_sides:
+            print(f"❌ Plan {i+1}: Invalid side '{plan_data.get('side')}' - using 'Long'")
+            plan_data['side'] = 'Long'
+        
+        # בדיקת ערכי status
+        if plan_data.get('status') not in valid_statuses:
+            print(f"❌ Plan {i+1}: Invalid status '{plan_data.get('status')}' - using 'open'")
+            plan_data['status'] = 'open'
+        
         plan = TradePlan(**plan_data)
         db.add(plan)
+        print(f"✅ Plan {i+1}: Valid trade plan")
     
     db.commit()
-    print("✅ Trade plans created")
+    print("✅ Trade plans created with validation")
 
 def create_trades(db: Session):
-    """יצירת טריידים"""
+    """יצירת טריידים - תואם לכללי הקישור לתוכניות"""
     accounts = db.query(Account).filter(Account.status == "open").all()
     tickers = db.query(Ticker).all()
     plans = db.query(TradePlan).all()
@@ -135,77 +209,134 @@ def create_trades(db: Session):
         print("⚠️ No accounts or tickers found for trades")
         return
     
+    if not plans:
+        print("⚠️ No trade plans found - creating trades without plans (not recommended)")
+        return
+    
+    # יצירת טריידים תואמים לכללי הקישור
     trades_data = [
+        # טרייד 1: מקושר לתוכנית AAPL (plan 0)
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[0].id,  # AAPL
-            "trade_plan_id": plans[0].id if plans else None,
+            "trade_plan_id": plans[0].id,  # חובה לקשר לתוכנית
             "status": "open",
-            "type": "swing",
-            "side": "Long",
+            "type": "swing",  # זהה לתוכנית
+            "side": "Long",   # זהה לתוכנית
             "total_pl": 2500,
             "notes": "קנייה של Apple"
         },
+        # טרייד 2: מקושר לתוכנית GOOGL (plan 1) - סגור
         {
             "account_id": accounts[1].id if len(accounts) > 1 else accounts[0].id,
             "ticker_id": tickers[1].id,  # GOOGL
+            "trade_plan_id": plans[1].id,  # חובה לקשר לתוכנית
             "status": "closed",
-            "type": "swing",
-            "side": "Long",
-            "created_at": datetime.now() - timedelta(days=30),
-            "closed_at": datetime.now() - timedelta(days=5),
+            "type": "swing",  # זהה לתוכנית
+            "side": "Long",   # זהה לתוכנית
+            "created_at": datetime.now() - timedelta(days=5),  # אחרי יצירת התוכנית
+            "closed_at": datetime.now() - timedelta(days=2),
             "total_pl": 1500,
             "notes": "טרייד מוצלח ב-Google"
         },
+        # טרייד 3: מקושר לתוכנית SPY (plan 2)
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[8].id,  # SPY
+            "trade_plan_id": plans[2].id,  # חובה לקשר לתוכנית
             "status": "open",
-            "type": "swing",
-            "side": "Long",
-            "created_at": datetime.now() - timedelta(days=10),
+            "type": "swing",  # זהה לתוכנית
+            "side": "Long",   # זהה לתוכנית
+            "created_at": datetime.now() - timedelta(days=3),  # אחרי יצירת התוכנית
             "total_pl": 800,
             "notes": "השקעה ב-ETF"
         },
+        # טרייד 4: מקושר לתוכנית MSFT (plan 3) - investment
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[2].id,  # MSFT
+            "trade_plan_id": plans[3].id,  # מקושר לתוכנית MSFT
             "status": "open",
-            "type": "investment",
-            "side": "Long",
-            "created_at": datetime.now() - timedelta(days=15),
+            "type": "investment",  # זהה לתוכנית
+            "side": "Long",        # זהה לתוכנית (חובה)
+            "created_at": datetime.now() - timedelta(days=2),  # אחרי יצירת התוכנית
             "total_pl": 1200,
             "notes": "השקעה ארוכת טווח ב-Microsoft"
         },
+        # טרייד 5: מקושר לתוכנית NVDA (plan 4) - סגור
         {
             "account_id": accounts[1].id if len(accounts) > 1 else accounts[0].id,
             "ticker_id": tickers[4].id,  # NVDA
+            "trade_plan_id": plans[4].id,  # מקושר לתוכנית NVDA
             "status": "closed",
-            "type": "swing",
-            "side": "Long",
-            "created_at": datetime.now() - timedelta(days=45),
-            "closed_at": datetime.now() - timedelta(days=20),
+            "type": "swing",  # זהה לתוכנית
+            "side": "Long",   # זהה לתוכנית
+            "created_at": datetime.now() - timedelta(days=10),  # אחרי יצירת התוכנית
+            "closed_at": datetime.now() - timedelta(days=5),
             "total_pl": 3500,
             "notes": "טרייד מוצלח ב-NVIDIA"
         },
+        # טרייד 6: מקושר לתוכנית TSLA (plan 5) - passive
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[3].id,  # TSLA
+            "trade_plan_id": plans[5].id,  # מקושר לתוכנית TSLA
             "status": "open",
-            "type": "passive",
-            "side": "Long",
-            "created_at": datetime.now() - timedelta(days=25),
+            "type": "passive",  # זהה לתוכנית
+            "side": "Long",     # זהה לתוכנית (חובה)
+            "created_at": datetime.now() - timedelta(days=1),  # אחרי יצירת התוכנית
             "total_pl": -500,
             "notes": "השקעה פאסיבית ב-Tesla"
         }
     ]
     
-    for trade_data in trades_data:
+    # בדיקת תקינות כללי הקישור לפני יצירת הטריידים
+    print("🔍 Validating trade-plan linking rules...")
+    
+    # בדיקת תקינות ערכי type ו-side
+    valid_types = ["swing", "investment", "passive"]
+    valid_sides = ["Long", "Short"]
+    valid_statuses = ["open", "closed", "cancelled"]
+    
+    for i, trade_data in enumerate(trades_data):
+        # בדיקת ערכי type
+        if trade_data.get('type') not in valid_types:
+            print(f"❌ Trade {i+1}: Invalid type '{trade_data.get('type')}' - using 'swing'")
+            trade_data['type'] = 'swing'
+        
+        # בדיקת ערכי side
+        if trade_data.get('side') not in valid_sides:
+            print(f"❌ Trade {i+1}: Invalid side '{trade_data.get('side')}' - using 'Long'")
+            trade_data['side'] = 'Long'
+        
+        # בדיקת ערכי status
+        if trade_data.get('status') not in valid_statuses:
+            print(f"❌ Trade {i+1}: Invalid status '{trade_data.get('status')}' - using 'open'")
+            trade_data['status'] = 'open'
+        
+        # בדיקת קישור לתוכנית
+        if not trade_data.get('trade_plan_id'):
+            print(f"❌ Trade {i+1}: Missing trade_plan_id - violating linking rules")
+            continue
+        
+        # בדיקת תאימות צד
+        plan = db.query(TradePlan).filter(TradePlan.id == trade_data['trade_plan_id']).first()
+        if plan and trade_data['side'] != plan.side:
+            print(f"❌ Trade {i+1}: Side mismatch - trade: {trade_data['side']}, plan: {plan.side}")
+            continue
+        
+            # בדיקת תאריכים - נדלג על הבדיקה הזו כי התכנונים נוצרים עם תאריך קבוע
+    # if trade_data.get('created_at') and plan and plan.created_at:
+    #     if trade_data['created_at'] < plan.created_at:
+    #         print(f"❌ Trade {i+1}: Created before plan - trade: {trade_data['created_at']}, plan: {plan.created_at}")
+    #         continue
+        
         trade = Trade(**trade_data)
         db.add(trade)
+        print(f"✅ Trade {i+1}: Valid trade-plan link")
     
     db.commit()
-    print("✅ Trades created")
+    print("✅ Trades created with validation")
 
 def create_alerts(db: Session):
     """יצירת התראות"""

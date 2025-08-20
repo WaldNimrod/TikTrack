@@ -1506,3 +1506,221 @@ function loadSectionStates() {
 }
 
 window.loadSectionStates = loadSectionStates;
+
+// ===== פונקציות גלובליות לסגירת סקשנים =====
+
+/**
+ * פונקציה גלובלית לפתיחה/סגירה של סקשן עליון
+ * עובדת עם כל הדפים באופן אחיד
+ */
+function toggleTopSection() {
+  const currentPath = window.location.pathname;
+
+  // טיפול מיוחד לדף הערות
+  if (currentPath.includes('/notes')) {
+    const section = document.getElementById('notesTopSection');
+    const button = document.querySelector('[onclick*="toggleTopSection"]');
+
+    if (section && button) {
+      const isHidden = section.style.display === 'none';
+      section.style.display = isHidden ? 'block' : 'none';
+      button.innerHTML = isHidden ? '▼ הסתר' : '▶ הצג';
+
+      // שמירת המצב
+      localStorage.setItem('notesTopSectionHidden', !isHidden);
+    }
+    return;
+  }
+
+  // טיפול רגיל לשאר הדפים
+  const section = document.querySelector('.top-section .section-body');
+  const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (section) {
+    const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
+
+    if (isCollapsed) {
+      section.classList.remove('collapsed');
+      section.style.display = 'block';
+    } else {
+      section.classList.add('collapsed');
+      section.style.display = 'none';
+    }
+
+    // עדכון האייקון
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // קביעת מפתח localStorage לפי הדף הנוכחי
+    let storageKey = 'topSectionCollapsed';
+
+    if (currentPath.includes('/alerts')) {
+      storageKey = 'alertsTopSectionCollapsed';
+    } else if (currentPath.includes('/planning')) {
+      storageKey = 'planningTopSectionCollapsed';
+    } else if (currentPath.includes('/designs')) {
+      storageKey = 'topSectionCollapsed';
+    }
+
+    // שמירת המצב ב-localStorage
+    localStorage.setItem(storageKey, !isCollapsed);
+  }
+}
+
+/**
+ * פונקציה גלובלית לפתיחה/סגירה של סקשן ראשי
+ * עובדת עם כל הדפים באופן אחיד
+ */
+function toggleMainSection() {
+  const currentPath = window.location.pathname;
+
+  // טיפול מיוחד לדף הערות
+  if (currentPath.includes('/notes')) {
+    const section = document.getElementById('notesMainSection');
+    const button = document.querySelector('[onclick*="toggleMainSection"]');
+
+    if (section && button) {
+      const isHidden = section.style.display === 'none';
+      section.style.display = isHidden ? 'block' : 'none';
+      button.innerHTML = isHidden ? '▼ הסתר' : '▶ הצג';
+
+      // שמירת המצב
+      localStorage.setItem('notesMainSectionHidden', !isHidden);
+    }
+    return;
+  }
+
+  // טיפול רגיל לשאר הדפים
+  const section = document.querySelector('.content-section .section-body');
+  const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (section) {
+    const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
+
+    if (isCollapsed) {
+      section.classList.remove('collapsed');
+      section.style.display = 'block';
+    } else {
+      section.classList.add('collapsed');
+      section.style.display = 'none';
+    }
+
+    // עדכון האייקון
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // קביעת מפתח localStorage לפי הדף הנוכחי
+    let storageKey = 'mainSectionCollapsed';
+
+    if (currentPath.includes('/alerts')) {
+      storageKey = 'alertsMainSectionCollapsed';
+    } else if (currentPath.includes('/planning')) {
+      storageKey = 'planningMainSectionCollapsed';
+    } else if (currentPath.includes('/designs')) {
+      storageKey = 'mainSectionCollapsed';
+    }
+
+    // שמירת המצב ב-localStorage
+    localStorage.setItem(storageKey, !isCollapsed);
+  }
+}
+
+/**
+ * פונקציה גלובלית לשחזור מצב הסקשנים
+ * טוענת את המצב השמור לכל הדפים
+ */
+function restoreAllSectionStates() {
+  const currentPath = window.location.pathname;
+
+  // טיפול מיוחד לדף הערות
+  if (currentPath.includes('/notes')) {
+    // שחזור סקשן עליון
+    const topSectionHidden = localStorage.getItem('notesTopSectionHidden') === 'true';
+    const topSection = document.getElementById('notesTopSection');
+    const topButton = document.querySelector('[onclick*="toggleTopSection"]');
+
+    if (topSection && topButton) {
+      topSection.style.display = topSectionHidden ? 'none' : 'block';
+      topButton.innerHTML = topSectionHidden ? '▶ הצג' : '▼ הסתר';
+    }
+
+    // שחזור סקשן ראשי
+    const mainSectionHidden = localStorage.getItem('notesMainSectionHidden') === 'true';
+    const mainSection = document.getElementById('notesMainSection');
+    const mainButton = document.querySelector('[onclick*="toggleMainSection"]');
+
+    if (mainSection && mainButton) {
+      mainSection.style.display = mainSectionHidden ? 'none' : 'block';
+      mainButton.innerHTML = mainSectionHidden ? '▶ הצג' : '▼ הסתר';
+    }
+    return;
+  }
+
+  // טיפול רגיל לשאר הדפים
+  // שחזור מצב top section
+  const topSection = document.querySelector('.top-section .section-body');
+  const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+  const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
+
+  if (topSection && topToggleBtn && topIcon) {
+    let storageKey = 'topSectionCollapsed';
+
+    if (currentPath.includes('/alerts')) {
+      storageKey = 'alertsTopSectionCollapsed';
+    } else if (currentPath.includes('/planning')) {
+      storageKey = 'planningTopSectionCollapsed';
+    } else if (currentPath.includes('/designs')) {
+      storageKey = 'topSectionCollapsed';
+    }
+
+    const isCollapsed = localStorage.getItem(storageKey) === 'true';
+
+    if (isCollapsed) {
+      topSection.classList.add('collapsed');
+      topSection.style.display = 'none';
+      topIcon.textContent = '▼';
+    } else {
+      topSection.classList.remove('collapsed');
+      topSection.style.display = 'block';
+      topIcon.textContent = '▲';
+    }
+  }
+
+  // שחזור מצב main section
+  const mainSection = document.querySelector('.content-section .section-body');
+  const mainToggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+  const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
+
+  if (mainSection && mainToggleBtn && mainIcon) {
+    let storageKey = 'mainSectionCollapsed';
+
+    if (currentPath.includes('/alerts')) {
+      storageKey = 'alertsMainSectionCollapsed';
+    } else if (currentPath.includes('/planning')) {
+      storageKey = 'planningMainSectionCollapsed';
+    } else if (currentPath.includes('/designs')) {
+      storageKey = 'mainSectionCollapsed';
+    }
+
+    const isCollapsed = localStorage.getItem(storageKey) === 'true';
+
+    if (isCollapsed) {
+      mainSection.classList.add('collapsed');
+      mainSection.style.display = 'none';
+      mainIcon.textContent = '▼';
+    } else {
+      mainSection.classList.remove('collapsed');
+      mainSection.style.display = 'block';
+      mainIcon.textContent = '▲';
+    }
+  }
+}
+
+// ייצוא הפונקציות החדשות לגלובל
+window.toggleTopSection = toggleTopSection;
+window.toggleMainSection = toggleMainSection;
+window.restoreAllSectionStates = restoreAllSectionStates;

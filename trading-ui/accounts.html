@@ -98,7 +98,9 @@
             📋 חשבונות
           </div>
           <div class="table-actions">
-            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור סיכום">
+            <button class="filter-toggle-btn"
+              onclick="if (typeof window.toggleTopSection === 'function') { window.toggleTopSection(); } else { console.error('toggleTopSection function not found'); }"
+              title="הצג/הסתר אזור סיכום">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -131,7 +133,9 @@
               </button>
 
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור חשבונות">
+              <button class="filter-toggle-btn"
+                onclick="if (typeof window.toggleMainSection === 'function') { window.toggleMainSection(); } else { console.error('toggleMainSection function not found'); }"
+                title="הצג/הסתר אזור חשבונות">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -528,97 +532,16 @@
         }
       }
 
-      // פונקציות toggle
-      function toggleTopSection() {
-        const section = document.querySelector('.top-section .section-body');
-        const toggleBtn = document.querySelector('.top-section button[onclick="toggleTopSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (section) {
-          const isCollapsed = section.classList.contains('collapsed');
-
-          if (isCollapsed) {
-            section.classList.remove('collapsed');
-            section.style.display = 'block';
-          } else {
-            section.classList.add('collapsed');
-            section.style.display = 'none';
-          }
-
-          // עדכון האייקון
-          if (icon) {
-            icon.textContent = isCollapsed ? '▲' : '▼';
-          }
-
-          // שמירת המצב ב-localStorage
-          localStorage.setItem('topSectionCollapsed', !isCollapsed);
-        }
-      }
-
-      function toggleMainSection() {
-        const section = document.querySelector('.main-content .section-body');
-        const toggleBtn = document.querySelector('.main-content button[onclick="toggleMainSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (section) {
-          const isCollapsed = section.classList.contains('collapsed');
-
-          if (isCollapsed) {
-            section.classList.remove('collapsed');
-            section.style.display = 'block';
-          } else {
-            section.classList.add('collapsed');
-            section.style.display = 'none';
-          }
-
-          // עדכון האייקון
-          if (icon) {
-            icon.textContent = isCollapsed ? '▲' : '▼';
-          }
-
-          // שמירת המצב ב-localStorage
-          localStorage.setItem('mainSectionCollapsed', !isCollapsed);
-        }
-      }
+      // הפונקציות toggleTopSection ו-toggleMainSection הועברו לקובץ main.js
+      // כדי להיות זמינות לכל הדפים באופן אחיד
 
       // פונקציה לשחזור מצב הסגירה
       function restoreSectionState() {
-        // שחזור מצב top section
-        const topSection = document.querySelector('.top-section .section-body');
-        const topToggleBtn = document.querySelector('.top-section button[onclick="toggleTopSection()"]');
-        const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
-
-        if (topSection && topToggleBtn && topIcon) {
-          const isCollapsed = localStorage.getItem('topSectionCollapsed') === 'true';
-
-          if (isCollapsed) {
-            topSection.classList.add('collapsed');
-            topSection.style.display = 'none';
-            topIcon.textContent = '▼';
-          } else {
-            topSection.classList.remove('collapsed');
-            topSection.style.display = 'block';
-            topIcon.textContent = '▲';
-          }
-        }
-
-        // שחזור מצב main section
-        const mainSection = document.querySelector('.main-content .section-body');
-        const mainToggleBtn = document.querySelector('.main-content button[onclick="toggleMainSection()"]');
-        const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
-
-        if (mainSection && mainToggleBtn && mainIcon) {
-          const isCollapsed = localStorage.getItem('mainSectionCollapsed') === 'true';
-
-          if (isCollapsed) {
-            mainSection.classList.add('collapsed');
-            mainSection.style.display = 'none';
-            mainIcon.textContent = '▼';
-          } else {
-            mainSection.classList.remove('collapsed');
-            mainSection.style.display = 'block';
-            mainIcon.textContent = '▲';
-          }
+        // שימוש בפונקציה הגלובלית החדשה
+        if (typeof window.restoreAllSectionStates === 'function') {
+          window.restoreAllSectionStates();
+        } else {
+          console.error('restoreAllSectionStates function not found in main.js');
         }
       }
 
@@ -1130,8 +1053,7 @@
       window.updateAccountsTable = updateAccountsTable;
       window.updateAccountsStats = updateAccountsStats;
       window.showNotification = showNotification;
-      window.toggleTopSection = toggleTopSection;
-      window.toggleMainSection = toggleMainSection;
+      // הפונקציות toggleTopSection ו-toggleMainSection מיוצאות כעת מ-main.js
       window.loadAccountsDataFromAPI = loadAccountsDataFromAPI;
       window.showAddAccountModal = showAddAccountModal;
       window.showEditAccountModal = showEditAccountModalLocal;
@@ -1830,6 +1752,32 @@
           setupSortableHeaders();
         }, 1000);
       });
+
+      // Global Scripts - סקריפטים כלליים
+      // הוספת הסקריפטים הנדרשים
+      const script1 = document.createElement('script');
+      script1.src = 'scripts/app-header.js';
+      document.head.appendChild(script1);
+
+      const script2 = document.createElement('script');
+      script2.src = 'scripts/main.js';
+      document.head.appendChild(script2);
+
+      const script3 = document.createElement('script');
+      script3.src = 'scripts/grid-filters.js';
+      document.head.appendChild(script3);
+
+      const script4 = document.createElement('script');
+      script4.src = 'scripts/alerts.js';
+      document.head.appendChild(script4);
+
+      const script5 = document.createElement('script');
+      script5.src = 'scripts/active-alerts-component.js';
+      document.head.appendChild(script5);
+
+      const script6 = document.createElement('script');
+      script6.src = 'scripts/accounts.js';
+      document.head.appendChild(script6);
     </script>
 </body>
 

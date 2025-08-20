@@ -43,6 +43,9 @@ class AppHeader extends HTMLElement {
     if (pagesNeedingAccounts.some(page => currentPage.includes(page))) {
       console.log('🔄 Page needs accounts, loading...');
       // ודא שקובץ accounts.js נטען לפני ניסיון שימוש בפונקציות שלו
+      let retryCount = 0;
+      const maxRetries = 10; // מקסימום 10 נסיונות (2 שניות)
+      
       const ensureAccountsReady = () => {
         if (typeof window.loadAllAccountsFromServer === 'function' && typeof window.updateAccountFilterMenu === 'function') {
           console.log('🔄 Accounts functions available, loading all accounts...');
@@ -63,9 +66,13 @@ class AppHeader extends HTMLElement {
             }
           });
         } else {
-          console.log('🔄 Accounts functions not available yet, retrying...');
-          // נסה שוב מעט מאוחר יותר
-          setTimeout(ensureAccountsReady, 200);
+          retryCount++;
+          if (retryCount < maxRetries) {
+            console.log(`🔄 Accounts functions not available yet, retrying... (${retryCount}/${maxRetries})`);
+            setTimeout(ensureAccountsReady, 200);
+          } else {
+            console.log('🔄 Max retries reached, skipping accounts loading');
+          }
         }
       };
       ensureAccountsReady();
@@ -1294,10 +1301,7 @@ class AppHeader extends HTMLElement {
    * תומכת בדפים שונים עם פילטרים מותאמים לכל דף
    */
   initializeFilter() {
-    console.log('🔴 FILTER DISABLED - initializeFilter called but disabled');
-
-    // 🔴 הפילטר מושבת באופן זמני
-    return;
+    console.log('🟢 FILTER ENABLED - initializeFilter called');
 
     // קביעת שם הדף הנוכחי
     const currentPath = window.location.pathname;
@@ -2592,10 +2596,7 @@ class AppHeader extends HTMLElement {
    * תומכת בדפים שונים עם פילטרים מותאמים לכל דף
    */
   updateGridFilter() {
-    console.log('🔴 FILTER DISABLED - updateGridFilter called but disabled');
-
-    // 🔴 הפילטר מושבת באופן זמני
-    return;
+    console.log('🟢 FILTER ENABLED - updateGridFilter called');
 
     console.log('=== updateGridFilter called ===');
 

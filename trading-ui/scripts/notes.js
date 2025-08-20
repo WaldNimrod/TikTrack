@@ -1424,39 +1424,8 @@ function setTextColor(color) {
  * פונקציה זו פותחת או סוגרת את הסקשן העליון של הדף
  * שומרת את המצב ב-localStorage לצורך שמירת העדפות המשתמש
  */
-function toggleTopSection() {
-  const section = document.getElementById('notesTopSection');
-  const button = document.querySelector('[onclick="toggleTopSection()"]');
-
-  if (section && button) {
-    const isHidden = section.style.display === 'none';
-    section.style.display = isHidden ? 'block' : 'none';
-    button.innerHTML = isHidden ? '▼ הסתר' : '▶ הצג';
-
-    // שמירת המצב
-    localStorage.setItem('notesTopSectionHidden', !isHidden);
-  }
-}
-
-/**
- * פתיחה/סגירה של סקשן ראשי
- * 
- * פונקציה זו פותחת או סוגרת את הסקשן הראשי של הדף
- * שומרת את המצב ב-localStorage לצורך שמירת העדפות המשתמש
- */
-function toggleMainSection() {
-  const section = document.getElementById('notesMainSection');
-  const button = document.querySelector('[onclick="toggleMainSection()"]');
-
-  if (section && button) {
-    const isHidden = section.style.display === 'none';
-    section.style.display = isHidden ? 'block' : 'none';
-    button.innerHTML = isHidden ? '▼ הסתר' : '▶ הצג';
-
-    // שמירת המצב
-    localStorage.setItem('notesMainSectionHidden', !isHidden);
-  }
-}
+// הפונקציות toggleTopSection ו-toggleMainSection הועברו לקובץ main.js
+// כדי להיות זמינות לכל הדפים באופן אחיד
 
 /**
  * שחזור מצב הסקשנים
@@ -1465,24 +1434,11 @@ function toggleMainSection() {
  * נקראת בטעינת הדף כדי לשמור על העדפות המשתמש
  */
 function restoreNotesSectionState() {
-  // שחזור סקשן עליון
-  const topSectionHidden = localStorage.getItem('notesTopSectionHidden') === 'true';
-  const topSection = document.getElementById('notesTopSection');
-  const topButton = document.querySelector('[onclick="toggleTopSection()"]');
-
-  if (topSection && topButton) {
-    topSection.style.display = topSectionHidden ? 'none' : 'block';
-    topButton.innerHTML = topSectionHidden ? '▶ הצג' : '▼ הסתר';
-  }
-
-  // שחזור סקשן ראשי
-  const mainSectionHidden = localStorage.getItem('notesMainSectionHidden') === 'true';
-  const mainSection = document.getElementById('notesMainSection');
-  const mainButton = document.querySelector('[onclick="toggleMainSection()"]');
-
-  if (mainSection && mainButton) {
-    mainSection.style.display = mainSectionHidden ? 'none' : 'block';
-    mainButton.innerHTML = mainSectionHidden ? '▶ הצג' : '▼ הסתר';
+  // שימוש בפונקציה הגלובלית החדשה
+  if (typeof window.restoreAllSectionStates === 'function') {
+    window.restoreAllSectionStates();
+  } else {
+    console.error('restoreAllSectionStates function not found in main.js');
   }
 }
 
@@ -1557,8 +1513,7 @@ window.syncEditorContent = syncEditorContent;
 window.setTextColor = setTextColor;
 
 // הגדרת פונקציות גלובליות לניהול סקשנים
-window.toggleTopSection = toggleTopSection;
-window.toggleMainSection = toggleMainSection;
+// הפונקציות toggleTopSection ו-toggleMainSection מיוצאות כעת מ-main.js
 window.restoreNotesSectionState = restoreNotesSectionState;
 
 // הגדרת פונקציות גלובליות למודלים

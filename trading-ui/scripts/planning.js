@@ -498,11 +498,29 @@ function togglePlanningSection() {
  * פונקציה לשחזור מצב הסקשן
  */
 function restorePlanningSectionState() {
-    const section = document.getElementById('designsSection');
-    if (section) {
-        const isCollapsed = localStorage.getItem('planningSectionCollapsed') === 'true';
-        section.style.display = isCollapsed ? 'none' : 'block';
+    // שימוש בפונקציה הגלובלית החדשה
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    } else {
+        console.error('restoreAllSectionStates function not found in main.js');
     }
+}
+
+/**
+ * פונקציה להצגת מודל הוספת תכנון
+ */
+function showAddTradePlanModal() {
+    console.log('הצגת מודל הוספת תכנון');
+    const modal = new bootstrap.Modal(document.getElementById('addTradePlanModal'));
+    // קבע ברירת מחדל של היום לשדה התאריך
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    const dateInput = document.getElementById('addTradePlanDate');
+    if (dateInput) dateInput.value = todayStr;
+    modal.show();
 }
 
 // ===== ייצוא הפונקציות לגלובל =====
@@ -521,6 +539,7 @@ window.cancelTradePlan = cancelTradePlan;
 // פונקציות מודל
 window.openAddTradePlanModal = openAddTradePlanModal;
 window.saveNewTradePlan = saveNewTradePlan;
+window.showAddTradePlanModal = showAddTradePlanModal;
 
 // פונקציות מיון
 window.sortPlanningTable = sortPlanningTable;
@@ -536,6 +555,10 @@ window.refreshDataOnly = refreshDataOnly;
 window.togglePlanningSection = togglePlanningSection;
 window.restorePlanningSectionState = restorePlanningSectionState;
 
+// פונקציות תצוגה
+window.getTypeDisplay = getTypeDisplay;
+window.getStatusDisplay = getStatusDisplay;
+
 // Aliases לשמירה על תאימות
 window.loadDesignsData = loadPlanningData;
 window.updateDesignsTable = updatePlanningTable;
@@ -543,5 +566,51 @@ window.sortTable = sortPlanningTable;
 window.filterDesignsData = filterPlanningData;
 window.toggleDesignsSectionLocal = togglePlanningSection;
 window.restoreDesignsSectionState = restorePlanningSectionState;
+
+/**
+ * פונקציה להגדרת כותרות ניתנות למיון
+ */
+function setupSortableHeaders() {
+  console.log('🔄 === SETUP SORTABLE HEADERS ===');
+  
+  const headers = document.querySelectorAll('th[data-sort]');
+  headers.forEach(header => {
+    header.style.cursor = 'pointer';
+    header.addEventListener('click', () => {
+      const sortKey = header.getAttribute('data-sort');
+      if (sortKey && typeof window.sortPlanningTable === 'function') {
+        window.sortPlanningTable(sortKey);
+      }
+    });
+  });
+  
+  console.log(`🔄 Setup ${headers.length} sortable headers`);
+}
+
+/**
+ * פונקציה לעדכון סטטיסטיקות הטבלה
+ */
+function updateTableStats() {
+  console.log('🔄 === UPDATE TABLE STATS ===');
+  
+  const tbody = document.querySelector('#planningTableBody');
+  if (!tbody) {
+    console.log('🔄 Planning table body not found');
+    return;
+  }
+  
+  const rows = tbody.querySelectorAll('tr');
+  const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+  
+  console.log(`🔄 Table stats: ${visibleRows.length} visible rows out of ${rows.length} total`);
+  
+  // ניתן להוסיף כאן עדכון של אלמנטים בדף שמציגים סטטיסטיקות
+}
+
+// פונקציות נוספות
+window.sortTable = sortPlanningTable;
+window.filterDesignsData = filterPlanningData;
+window.setupSortableHeaders = setupSortableHeaders;
+window.updateTableStats = updateTableStats;
 
 console.log('✅ קובץ planning.js נטען בהצלחה - פונקציות זמינות גלובלית');

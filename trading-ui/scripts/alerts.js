@@ -1140,42 +1140,11 @@ function getRelatedClass(relatedType) {
  * משתמשת ב-localStorage לשמירת המצב
  */
 function restoreAlertsSectionState() {
-  // שחזור מצב top section
-  const topSection = document.querySelector('.top-section .section-body');
-  const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
-  const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
-
-  if (topSection && topToggleBtn && topIcon) {
-    const isCollapsed = localStorage.getItem('alertsTopSectionCollapsed') === 'true';
-
-    if (isCollapsed) {
-      topSection.classList.add('collapsed');
-      topSection.style.display = 'none';
-      topIcon.textContent = '▼';
-    } else {
-      topSection.classList.remove('collapsed');
-      topSection.style.display = 'block';
-      topIcon.textContent = '▲';
-    }
-  }
-
-  // שחזור מצב main section
-  const mainSection = document.querySelector('.content-section .section-body');
-  const mainToggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
-  const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
-
-  if (mainSection && mainToggleBtn && mainIcon) {
-    const isCollapsed = localStorage.getItem('alertsMainSectionCollapsed') === 'true';
-
-    if (isCollapsed) {
-      mainSection.classList.add('collapsed');
-      mainSection.style.display = 'none';
-      mainIcon.textContent = '▼';
-    } else {
-      mainSection.classList.remove('collapsed');
-      mainSection.style.display = 'block';
-      mainIcon.textContent = '▲';
-    }
+  // שימוש בפונקציה הגלובלית החדשה
+  if (typeof window.restoreAllSectionStates === 'function') {
+    window.restoreAllSectionStates();
+  } else {
+    console.error('restoreAllSectionStates function not found in main.js');
   }
 }
 

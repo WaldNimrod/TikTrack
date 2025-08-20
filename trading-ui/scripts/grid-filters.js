@@ -672,6 +672,56 @@ function updateTableStats(pageName) {
 }
 
 /**
+ * פונקציה לעדכון תפריט פילטר החשבונות
+ */
+function updateAccountFilterMenu(accounts) {
+  console.log('🔄 === UPDATE ACCOUNT FILTER MENU ===');
+  console.log('🔄 Accounts received:', accounts);
+
+  // חיפוש התפריט בתוך האפ-הדר (Shadow DOM)
+  const appHeader = document.querySelector('app-header');
+  if (!appHeader || !appHeader.shadowRoot) {
+    console.log('🔄 App header or shadow root not found, skipping account menu update');
+    return;
+  }
+
+  const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
+  if (!accountMenu) {
+    console.log('🔄 Account filter menu not found in app header shadow root');
+    return;
+  }
+
+  // ניקוי התפריט הקיים
+  accountMenu.innerHTML = '';
+
+  // הוספת אופציית "כל החשבונות"
+  const allAccountsItem = document.createElement('div');
+  allAccountsItem.className = 'account-filter-item selected';
+  allAccountsItem.setAttribute('data-account', 'all');
+  allAccountsItem.innerHTML = `
+    <span class="option-text">כל החשבונות</span>
+    <span class="check-mark">✓</span>
+  `;
+  accountMenu.appendChild(allAccountsItem);
+
+  // הוספת החשבונות מהשרת
+  if (accounts && accounts.length > 0) {
+    accounts.forEach(account => {
+      const accountItem = document.createElement('div');
+      accountItem.className = 'account-filter-item';
+      accountItem.setAttribute('data-account', account.id || account.name);
+      accountItem.innerHTML = `
+        <span class="option-text">${account.name || account.account_name || 'Unknown'}</span>
+        <span class="check-mark">✓</span>
+      `;
+      accountMenu.appendChild(accountItem);
+    });
+  }
+
+  console.log(`🔄 Account filter menu updated with ${accounts ? accounts.length : 0} accounts`);
+}
+
+/**
  * ========================================
  * פונקציות פילטר חשבונות כלליות
  * ========================================
@@ -689,6 +739,7 @@ window.resetAllFiltersForPage = resetAllFiltersForPage;
 window.initializePageFilters = initializePageFilters;
 window.showNotification = showNotification;
 window.updateTableStats = updateTableStats;
+window.updateAccountFilterMenu = updateAccountFilterMenu;
 
 
 // בדיקה שהפונקציות הוגדרו נכון

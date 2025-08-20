@@ -21,14 +21,14 @@ function getTypeDisplay(type) {
 async function loadDesignsData() {
   try {
     console.log('🔄 טוען נתוני תכנונים מהשרת...');
-    
+
     // טעינת נתונים מהשרת
     const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
     const response = await fetch(`${base}/api/v1/trade_plans/`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     console.log('🔄 נתונים שהתקבלו מהשרת:', data);
     console.log('🔄 סוג הנתונים:', typeof data);
@@ -36,7 +36,7 @@ async function loadDesignsData() {
     if (data && typeof data === 'object') {
       console.log('🔄 מפתחות האובייקט:', Object.keys(data));
     }
-    
+
     // בדיקה שהנתונים הם מערך
     let plansData = data;
     if (!Array.isArray(plansData)) {
@@ -48,7 +48,7 @@ async function loadDesignsData() {
         throw new Error('הנתונים שהתקבלו מהשרת אינם בפורמט הנכון');
       }
     }
-    
+
     // המרת הנתונים לפורמט הנדרש
     let designs = plansData.map(plan => {
       console.log('🔄 מעבד תכנון:', plan);
@@ -65,12 +65,12 @@ async function loadDesignsData() {
         status: plan.status || 'open'
       };
     });
-    
+
     // עדכון המערך הגלובלי
     designsData = designs;
-    
+
     console.log('🔄 מספר תכנונים שנטענו:', designs.length);
-    
+
     if (designs.length === 0) {
       console.log('🔄 אין תכנונים להצגה');
       const tbody = document.querySelector('#designsTable tbody');
@@ -79,28 +79,28 @@ async function loadDesignsData() {
       }
       return;
     }
-    
+
     // שימוש בפונקציה הגלובלית לסינון
     if (typeof window.filterDataByFilters === 'function') {
       designs = window.filterDataByFilters(designs, 'planning');
     } else {
       console.error('filterDataByFilters function not found');
     }
-        
+
     // עדכון הטבלה
     if (typeof window.updateDesignsTable === 'function') {
       window.updateDesignsTable(designs);
     } else {
       console.error('updateDesignsTable function not found');
     }
-    
+
     console.log('🔄 טעינת תכנונים הושלמה בהצלחה');
-      
+
   } catch (error) {
     console.error('❌ Error loading designs data:', error);
     console.error('❌ Error details:', error.message);
     console.error('❌ Error stack:', error.stack);
-    
+
     // הצגת הודעת שגיאה מפורטת יותר
     const tbody = document.querySelector('#designsTable tbody');
     if (tbody) {
@@ -119,7 +119,7 @@ async function loadDesignsData() {
         </td></tr>`;
       }
     }
-    
+
     // עדכון ספירת רשומות
     const countElement = document.querySelector('.content-section .table-count');
     if (countElement) {
@@ -135,7 +135,7 @@ function updateDesignsTable(designs) {
     console.error('Table body not found for designs table');
     return;
   }
-  
+
   // בדיקה אם אין נתונים
   if (!designs || designs.length === 0) {
     const savedDateRange = localStorage.getItem('designsFilterDateRange');
@@ -150,27 +150,27 @@ function updateDesignsTable(designs) {
         <br><small>אין תכנונים במערכת או שכל התכנונים מסוננים החוצה</small>
       </td></tr>`;
     }
-    
+
     // עדכון ספירת רשומות
     const countElement = document.querySelector('.content-section .table-count');
     if (countElement) {
       countElement.textContent = '0 תכנונים';
     }
-    
+
     // עדכון סטטיסטיקות הטבלה
     if (typeof window.updateTableStats === 'function') {
       window.updateTableStats('planning');
     } else {
       console.error('updateTableStats function not found');
     }
-    
+
     // עדכון שדות תצוגת טווח תאריכים
     if (typeof window.updateDateDebugInfo === 'function') {
       setTimeout(() => window.updateDateDebugInfo(), 100);
     }
     return;
   }
-  
+
   const tableHTML = designs.map(design => `
     <tr>
       <td><strong><a href="#" onclick="if (typeof window.openDesignDetails === 'function') { window.openDesignDetails('${design.id}'); } else { console.error('openDesignDetails function not found'); }" class="ticker-link">${design.ticker}</a></strong></td>
@@ -190,22 +190,22 @@ function updateDesignsTable(designs) {
       </td>
     </tr>
   `).join('');
-  
+
   tbody.innerHTML = tableHTML;
-  
+
   // עדכון ספירת רשומות
   const countElement = document.querySelector('.content-section .table-count');
   if (countElement) {
     countElement.textContent = `${designs.length} תכנונים`;
   }
-  
+
   // עדכון סטטיסטיקות הטבלה
   if (typeof window.updateTableStats === 'function') {
     window.updateTableStats('planning');
   } else {
     console.error('updateTableStats function not found');
   }
-  
+
   // עדכון שדות תצוגת טווח תאריכים
   if (typeof window.updateDateDebugInfo === 'function') {
     setTimeout(() => window.updateDateDebugInfo(), 100);
@@ -218,11 +218,11 @@ function sortTable(columnIndex) {
   console.log('🔄 Column clicked:', columnIndex);
   console.log('🔄 Current sort column:', designsCurrentSortColumn);
   console.log('🔄 Current sort direction:', designsCurrentSortDirection);
-  
+
   // קבלת הנתונים הנוכחיים
   let designs = [...designsData];
   console.log('🔄 Original data:', designs.map(d => `${d.ticker}: ${d.amount}`));
-  
+
   // החלת פילטרים קיימים
   if (typeof window.filterDataByFilters === 'function') {
     designs = window.filterDataByFilters(designs, 'planning');
@@ -230,7 +230,7 @@ function sortTable(columnIndex) {
     console.error('filterDataByFilters function not found');
   }
   console.log('🔄 After filtering:', designs.map(d => `${d.ticker}: ${d.amount}`));
-  
+
   // עדכון המשתנים הגלובליים
   if (designsCurrentSortColumn === columnIndex) {
     designsCurrentSortDirection = designsCurrentSortDirection === 'asc' ? 'desc' : 'asc';
@@ -240,11 +240,11 @@ function sortTable(columnIndex) {
     designsCurrentSortDirection = 'asc';
     console.log('🔄 New column clicked, set to column:', columnIndex, 'direction: asc');
   }
-  
+
   // מיון הנתונים
   designs.sort((a, b) => {
     let aValue, bValue;
-    
+
     switch (columnIndex) {
       case 0: // נכס (Ticker)
         aValue = a.ticker.toLowerCase();
@@ -285,7 +285,7 @@ function sortTable(columnIndex) {
       default:
         return 0;
     }
-    
+
     if (aValue < bValue) {
       return designsCurrentSortDirection === 'asc' ? -1 : 1;
     } else if (aValue > bValue) {
@@ -294,39 +294,39 @@ function sortTable(columnIndex) {
       return 0;
     }
   });
-  
+
   console.log('🔄 Sorted data:', designs.map(d => `${d.ticker}: ${d.amount}`));
-  
+
   // עדכון הטבלה
   if (typeof window.updateDesignsTable === 'function') {
     window.updateDesignsTable(designs);
   } else {
     console.error('updateDesignsTable function not found');
   }
-  
+
   // עדכון אייקונים
   if (typeof window.updateSortIcons === 'function') {
     window.updateSortIcons(columnIndex);
   } else {
     console.error('updateSortIcons function not found');
   }
-  
+
   // שמירת מצב המיון ב-localStorage
   localStorage.setItem('designsSortColumn', columnIndex.toString());
   localStorage.setItem('designsSortDirection', designsCurrentSortDirection);
-  
+
   console.log('🔄 === SORT TABLE FUNCTION COMPLETED ===');
 }
 
 // פונקציה להמרת תאריך למיון
 function parseDateForSort(dateStr) {
   if (!dateStr) return 0;
-  
+
   // אם זה תאריך בפורמט YYYY-MM-DD HH:MM:SS
   if (dateStr.includes('-')) {
     return new Date(dateStr).getTime();
   }
-  
+
   // אם זה תאריך בפורמט DD.MM.YYYY
   const parts = dateStr.split('.');
   if (parts.length === 3) {
@@ -335,7 +335,7 @@ function parseDateForSort(dateStr) {
     const year = parseInt(parts[2]);
     return new Date(year, month, day).getTime();
   }
-  
+
   return 0;
 }
 
@@ -354,7 +354,7 @@ function updateSortIcons(activeColumnIndex) {
   console.log('🔄 Updating sort icons for column:', activeColumnIndex);
   const buttons = document.querySelectorAll('.sortable-header-btn');
   console.log('🔄 Found sortable header buttons:', buttons.length);
-  
+
   buttons.forEach((button, index) => {
     const sortIcon = button.querySelector('.sort-icon');
     if (sortIcon) {
@@ -378,25 +378,25 @@ function resetSort() {
   console.log('🧪 === RESET SORT ===');
   designsCurrentSortColumn = null;
   designsCurrentSortDirection = 'asc';
-  
+
   // מחיקת מצב מיון מ-localStorage
   localStorage.removeItem('designsSortColumn');
   localStorage.removeItem('designsSortDirection');
-  
+
   // איפוס אייקונים
   if (typeof window.updateSortIcons === 'function') {
     window.updateSortIcons(-1);
   } else {
     console.error('updateSortIcons function not found');
   }
-  
+
   // רענון הנתונים
   if (typeof window.loadDesignsData === 'function') {
     window.loadDesignsData();
   } else {
     console.error('loadDesignsData function not found');
   }
-  
+
   if (typeof window.showNotification === 'function') {
     window.showNotification('מיון אופס', 'success');
   } else {
@@ -451,109 +451,31 @@ function toggleDesignsSectionLocal() {
   const section = document.querySelector('.section-body');
   const toggleBtn = document.querySelector('button[onclick="toggleDesignsSectionLocal()"]');
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-  
+
   if (section) {
     const isHidden = section.style.display === 'none';
     section.style.display = isHidden ? 'block' : 'none';
-    
+
     // עדכון האייקון
     if (icon) {
       icon.textContent = isHidden ? '▲' : '▼';
     }
-    
+
     // שמירת המצב ב-localStorage
     localStorage.setItem('designsSectionCollapsed', !isHidden);
   }
 }
 
-function toggleTopSection() {
-  const section = document.querySelector('.top-section .section-body');
-  const toggleBtn = document.querySelector('.top-section button[onclick="toggleTopSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-  
-  if (section) {
-    const isCollapsed = section.classList.contains('collapsed');
-    
-    if (isCollapsed) {
-      section.classList.remove('collapsed');
-      section.style.display = 'block';
-    } else {
-      section.classList.add('collapsed');
-      section.style.display = 'none';
-    }
-    
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-    
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('topSectionCollapsed', !isCollapsed);
-  }
-}
-
-function toggleMainSection() {
-  const section = document.querySelector('.content-section .section-body');
-  const toggleBtn = document.querySelector('.content-section button[onclick="toggleMainSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-  
-  if (section) {
-    const isCollapsed = section.classList.contains('collapsed');
-    
-    if (isCollapsed) {
-      section.classList.remove('collapsed');
-      section.style.display = 'block';
-    } else {
-      section.classList.add('collapsed');
-      section.style.display = 'none';
-    }
-    
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-    
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('mainSectionCollapsed', !isCollapsed);
-  }
-}
+// הפונקציות toggleTopSection ו-toggleMainSection הועברו לקובץ main.js
+// כדי להיות זמינות לכל הדפים באופן אחיד
 
 // פונקציה לשחזור מצב הסגירה
 function restoreDesignsSectionState() {
-  // שחזור מצב top section
-  const topSection = document.querySelector('.top-section .section-body');
-  const topToggleBtn = document.querySelector('.top-section button[onclick="toggleTopSection()"]');
-  const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
-  
-  if (topSection && topToggleBtn && topIcon) {
-    const topCollapsed = localStorage.getItem('topSectionCollapsed') === 'true';
-    if (topCollapsed) {
-      topSection.classList.add('collapsed');
-      topSection.style.display = 'none';
-      topIcon.textContent = '▼';
-    } else {
-      topSection.classList.remove('collapsed');
-      topSection.style.display = 'block';
-      topIcon.textContent = '▲';
-    }
-  }
-  
-  // שחזור מצב main section
-  const mainSection = document.querySelector('.content-section .section-body');
-  const mainToggleBtn = document.querySelector('.content-section button[onclick="toggleMainSection()"]');
-  const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
-  
-  if (mainSection && mainToggleBtn && mainIcon) {
-    const mainCollapsed = localStorage.getItem('mainSectionCollapsed') === 'true';
-    if (mainCollapsed) {
-      mainSection.classList.add('collapsed');
-      mainSection.style.display = 'none';
-      mainIcon.textContent = '▼';
-    } else {
-      mainSection.classList.remove('collapsed');
-      mainSection.style.display = 'block';
-      mainIcon.textContent = '▲';
-    }
+  // שימוש בפונקציה הגלובלית החדשה
+  if (typeof window.restoreAllSectionStates === 'function') {
+    window.restoreAllSectionStates();
+  } else {
+    console.error('restoreAllSectionStates function not found in main.js');
   }
 }
 
@@ -590,18 +512,18 @@ function deleteDesign(id) {
 // פונקציה לביטול תכנון טרייד
 async function cancelTradePlan(recordId) {
   console.log('ביטול תכנון טרייד:', recordId);
-  
+
   try {
     // קריאה ל-API לביטול התכנון
     const response = await window.apiCall(`/api/v1/trade_plans/${recordId}/cancel`, 'POST');
-    
+
     if (response.status === 'success') {
       if (typeof window.showNotification === 'function') {
         window.showNotification('תכנון הטרייד בוטל בהצלחה', 'success');
       } else {
         alert('תכנון הטרייד בוטל בהצלחה');
       }
-      
+
       // רענון הטבלה
       if (typeof window.loadDesignsData === 'function') {
         window.loadDesignsData();
@@ -627,7 +549,7 @@ function openAddTradePlanModal() {
 
 function saveNewTradePlan() {
   console.log('שמירת תכנון חדש');
-  
+
   // קבלת הנתונים מהטופס
   const ticker = document.getElementById('addTradePlanTicker').value;
   const type = document.getElementById('addTradePlanType').value;
@@ -636,7 +558,7 @@ function saveNewTradePlan() {
   const target = parseFloat(document.getElementById('addTradePlanTarget').value);
   const stop = parseFloat(document.getElementById('addTradePlanStop').value);
   const date = document.getElementById('addTradePlanDate').value;
-  
+
   // בדיקת תקינות
   if (!ticker || !type || !side || !amount || !target || !stop || !date) {
     if (typeof window.showNotification === 'function') {
@@ -646,7 +568,7 @@ function saveNewTradePlan() {
     }
     return;
   }
-  
+
   // כאן יוכנס קוד לשמירה לשרת
   // לעת עתה נציג הודעה
   if (typeof window.showNotification === 'function') {
@@ -654,11 +576,11 @@ function saveNewTradePlan() {
   } else {
     console.error('showNotification function not found');
   }
-  
+
   // סגירת המודל
   const modal = bootstrap.Modal.getInstance(document.getElementById('addTradePlanModal'));
   modal.hide();
-  
+
   // רענון הטבלה
   if (typeof window.loadDesignsData === 'function') {
     window.loadDesignsData();
@@ -685,20 +607,19 @@ window.filterDesignsData = filterDesignsData;
 window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
 window.refreshDataOnly = refreshDataOnly;
 window.toggleDesignsSectionLocal = toggleDesignsSectionLocal;
-window.toggleTopSection = toggleTopSection;
-window.toggleMainSection = toggleMainSection;
+// הפונקציות toggleTopSection ו-toggleMainSection מיוצאות כעת מ-main.js
 window.restoreDesignsSectionState = restoreDesignsSectionState;
 window.showAddTradePlanModal = showAddTradePlanModal;
 
 // הגדרת הפונקציה הגלובלית לעדכון מהפילטרים
-window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
   console.log('🔄 updateGridFromComponent called with:', {
     selectedStatuses,
     selectedTypes,
     selectedDateRange,
     searchTerm
   });
-  
+
   // קריאה לפונקציה הגלובלית
   if (typeof window.updateGridFromComponentGlobal === 'function') {
     window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'designs');

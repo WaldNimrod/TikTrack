@@ -40,6 +40,11 @@ def notes() -> Any:
     """דף הערות"""
     return send_from_directory(UI_DIR, "notes.html")
 
+@pages_bp.route('/tickers')
+def tickers() -> Any:
+    """דף טיקרים"""
+    return send_from_directory(UI_DIR, "tickers-test.html")
+
 @pages_bp.route('/research')
 def research() -> Any:
     """דף מחקר"""

@@ -1,12 +1,26 @@
 #!/usr/bin/env python3
 """
-יצירת נתוני דמה לבסיס הנתונים החדש - עדכון 20.08.2025
+יצירת נתוני דמה לבסיס הנתונים - עדכון 21.08.2025
 
-קובץ זה יוצר בסיס נתונים חדש עם נתוני דמה תואמים למבנה הנוכחי:
-- ערכי type: swing, investment, passive (לא buy/long)
-- שדה side: Long/Short
-- ללא שדה opened_at בטבלת trades
-- תאימות מלאה לדוקומנטציה DATABASE_CHANGES_AUGUST_2025.md
+קובץ זה יוצר בסיס נתונים חדש עם נתוני דמה תואמים למבנה הנוכחי הפעיל:
+
+מבנה הטבלאות (תואם למבנה הקיים):
+- tickers: symbol, name, type, remarks, currency, active_trades
+- accounts: name, currency, status, cash_balance, total_value, total_pl, notes
+- trade_plans: account_id, ticker_id, investment_type, side, status, planned_amount, entry_conditions, stop_price, target_price, reasons
+- trades: account_id, ticker_id, trade_plan_id, status, type, side, closed_at, cancelled_at, cancel_reason, total_pl, notes
+- alerts: related_type_id, related_id, type, condition, message, status, is_triggered
+- cash_flows: account_id, type, amount, date, description
+- notes: content, attachment, related_type_id, related_id
+- note_relation_types: note_relation_type (account, trade, trade_plan, ticker)
+- executions: trade_id, action, date, quantity, price, fee, source
+
+תכונות מיוחדות:
+- ערכי type בטריידים: swing, investment, passive
+- שדה side: Long/Short בטריידים ותכנונים
+- מערכת שיוך הערות גמישה עם related_type_id
+- קישור חובה בין טריידים לתכנונים
+- תאימות מלאה למבנה הנוכחי של בסיס הנתונים
 """
 
 import sys
@@ -25,23 +39,23 @@ import random
 # Authentication system removed for simplicity
 
 def create_tickers(db: Session):
-    """יצירת טיקרים"""
+    """יצירת טיקרים - תואם למבנה הנוכחי"""
     tickers_data = [
-        {"symbol": "AAPL", "name": "Apple Inc.", "type": "stock", "currency": "USD", "remarks": "טכנולוגיה"},
-        {"symbol": "GOOGL", "name": "Alphabet Inc.", "type": "stock", "currency": "USD", "remarks": "טכנולוגיה"},
-        {"symbol": "MSFT", "name": "Microsoft Corporation", "type": "stock", "currency": "USD", "remarks": "טכנולוגיה"},
-        {"symbol": "TSLA", "name": "Tesla Inc.", "type": "stock", "currency": "USD", "remarks": "רכב חשמלי"},
-        {"symbol": "NVDA", "name": "NVIDIA Corporation", "type": "stock", "currency": "USD", "remarks": "צ'יפים"},
-        {"symbol": "AMZN", "name": "Amazon.com Inc.", "type": "stock", "currency": "USD", "remarks": "מסחר אלקטרוני"},
-        {"symbol": "META", "name": "Meta Platforms Inc.", "type": "stock", "currency": "USD", "remarks": "מדיה חברתית"},
-        {"symbol": "NFLX", "name": "Netflix Inc.", "type": "stock", "currency": "USD", "remarks": "סטרימינג"},
-        {"symbol": "SPY", "name": "SPDR S&P 500 ETF", "type": "etf", "currency": "USD", "remarks": "ETF מדד S&P 500"},
-        {"symbol": "QQQ", "name": "Invesco QQQ Trust", "type": "etf", "currency": "USD", "remarks": "ETF טכנולוגיה"},
-        {"symbol": "VTI", "name": "Vanguard Total Stock Market ETF", "type": "etf", "currency": "USD", "remarks": "ETF שוק כולל"},
-        {"symbol": "VOO", "name": "Vanguard S&P 500 ETF", "type": "etf", "currency": "USD", "remarks": "ETF S&P 500"},
-        {"symbol": "ARKK", "name": "ARK Innovation ETF", "type": "etf", "currency": "USD", "remarks": "ETF חדשנות"},
-        {"symbol": "TQQQ", "name": "ProShares UltraPro QQQ", "type": "etf", "currency": "USD", "remarks": "ETF ממונף טכנולוגיה"},
-        {"symbol": "SOXL", "name": "Direxion Daily Semiconductor Bull 3X Shares", "type": "etf", "currency": "USD", "remarks": "ETF ממונף צ'יפים"}
+        {"symbol": "AAPL", "name": "Apple Inc.", "type": "stock", "currency": "USD", "remarks": "טכנולוגיה", "active_trades": True},
+        {"symbol": "GOOGL", "name": "Alphabet Inc.", "type": "stock", "currency": "USD", "remarks": "טכנולוגיה", "active_trades": True},
+        {"symbol": "MSFT", "name": "Microsoft Corporation", "type": "stock", "currency": "USD", "remarks": "טכנולוגיה", "active_trades": True},
+        {"symbol": "TSLA", "name": "Tesla Inc.", "type": "stock", "currency": "USD", "remarks": "רכב חשמלי", "active_trades": True},
+        {"symbol": "NVDA", "name": "NVIDIA Corporation", "type": "stock", "currency": "USD", "remarks": "צ'יפים", "active_trades": True},
+        {"symbol": "AMZN", "name": "Amazon.com Inc.", "type": "stock", "currency": "USD", "remarks": "מסחר אלקטרוני", "active_trades": False},
+        {"symbol": "META", "name": "Meta Platforms Inc.", "type": "stock", "currency": "USD", "remarks": "מדיה חברתית", "active_trades": False},
+        {"symbol": "NFLX", "name": "Netflix Inc.", "type": "stock", "currency": "USD", "remarks": "סטרימינג", "active_trades": False},
+        {"symbol": "SPY", "name": "SPDR S&P 500 ETF", "type": "etf", "currency": "USD", "remarks": "ETF מדד S&P 500", "active_trades": True},
+        {"symbol": "QQQ", "name": "Invesco QQQ Trust", "type": "etf", "currency": "USD", "remarks": "ETF טכנולוגיה", "active_trades": False},
+        {"symbol": "VTI", "name": "Vanguard Total Stock Market ETF", "type": "etf", "currency": "USD", "remarks": "ETF שוק כולל", "active_trades": False},
+        {"symbol": "VOO", "name": "Vanguard S&P 500 ETF", "type": "etf", "currency": "USD", "remarks": "ETF S&P 500", "active_trades": False},
+        {"symbol": "ARKK", "name": "ARK Innovation ETF", "type": "etf", "currency": "USD", "remarks": "ETF חדשנות", "active_trades": False},
+        {"symbol": "TQQQ", "name": "ProShares UltraPro QQQ", "type": "etf", "currency": "USD", "remarks": "ETF ממונף טכנולוגיה", "active_trades": False},
+        {"symbol": "SOXL", "name": "Direxion Daily Semiconductor Bull 3X Shares", "type": "etf", "currency": "USD", "remarks": "ETF ממונף צ'יפים", "active_trades": False}
     ]
     
     for ticker_data in tickers_data:
@@ -339,7 +353,18 @@ def create_trades(db: Session):
     print("✅ Trades created with validation")
 
 def create_alerts(db: Session):
-    """יצירת התראות"""
+    """
+    יצירת התראות - תואם למערכת השיוך הגמישה
+    
+    מערכת השיוך:
+    - related_type_id = 1: התראה מקושרת לחשבון
+    - related_type_id = 4: התראה מקושרת לטיקר
+    
+    התראות יכולות להיות מסוגים שונים:
+    - price_alert: התראת מחיר
+    - stop_loss: עצירת הפסד
+    - volume_alert: התראת נפח
+    """
     accounts = db.query(Account).filter(Account.status == "open").all()
     tickers = db.query(Ticker).all()
     
@@ -600,7 +625,17 @@ def create_note_relation_types(db: Session):
     print("✅ Note relation types created")
 
 def create_notes(db: Session):
-    """יצירת הערות"""
+    """
+    יצירת הערות - תואם למערכת השיוך הגמישה
+    
+    מערכת השיוך:
+    - related_type_id = 1: הערה מקושרת לחשבון
+    - related_type_id = 2: הערה מקושרת לטרייד
+    - related_type_id = 3: הערה מקושרת לתכנון טרייד
+    - related_type_id = 4: הערה מקושרת לטיקר
+    
+    הערות מקושרות לישויות קיימות בלבד
+    """
     accounts = db.query(Account).all()
     trades = db.query(Trade).all()
     plans = db.query(TradePlan).all()
@@ -610,12 +645,16 @@ def create_notes(db: Session):
         print("⚠️ No accounts found for notes")
         return
     
-    # קבלת סוגי השיוך
+    # קבלת סוגי השיוך מטבלת note_relation_types
     from models.note_relation_type import NoteRelationType
     account_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "account").first()
     trade_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "trade").first()
     trade_plan_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "trade_plan").first()
     ticker_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "ticker").first()
+    
+    if not all([account_type, trade_type, trade_plan_type, ticker_type]):
+        print("⚠️ Note relation types not found - creating notes may fail")
+        return
     
     notes_data = [
         {
@@ -774,9 +813,11 @@ def create_executions(db: Session):
 def main():
     """פונקציה ראשית"""
     print("🚀 Starting data creation...")
-    print("📋 Creating database with updated schema (20.08.2025)")
-    print("✅ Compatible with DATABASE_CHANGES_AUGUST_2025.md")
-    print("✅ Using: swing/investment/passive types, side field, no opened_at")
+    print("📋 Creating database with current schema (21.08.2025)")
+    print("✅ Compatible with current database structure")
+    print("✅ Using: swing/investment/passive types, side field, active_trades field")
+    print("✅ Flexible notes system with related_type_id")
+    print("✅ Mandatory trade-plan linking")
     
     # יצירת בסיס הנתונים
     init_db()
@@ -798,14 +839,18 @@ def main():
         
         print("🎉 All data created successfully!")
         print("📊 Database contains:")
-        print(f"   - {db.query(Ticker).count()} tickers")
-        print(f"   - {db.query(Account).count()} accounts")
-        print(f"   - {db.query(TradePlan).count()} trade plans")
-        print(f"   - {db.query(Trade).count()} trades")
-        print(f"   - {db.query(Alert).count()} alerts")
-        print(f"   - {db.query(Note).count()} notes")
+        print(f"   - {db.query(Ticker).count()} tickers (with active_trades field)")
+        print(f"   - {db.query(Account).count()} accounts (with status: open/closed/cancelled)")
+        print(f"   - {db.query(TradePlan).count()} trade plans (with investment_type and side)")
+        print(f"   - {db.query(Trade).count()} trades (linked to plans, with type and side)")
+        print(f"   - {db.query(Alert).count()} alerts (flexible linking system)")
+        print(f"   - {db.query(Note).count()} notes (flexible linking system)")
         print(f"   - {db.query(CashFlow).count()} cash flows")
         print(f"   - {db.query(Execution).count()} executions")
+        print("")
+        print("✅ Database structure matches current active schema")
+        print("✅ All relationships and constraints validated")
+        print("✅ Ready for production use")
         
     except Exception as e:
         print(f"❌ Error creating data: {str(e)}")

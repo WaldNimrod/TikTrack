@@ -946,6 +946,42 @@
                   </select>
                 </div>
               </div>
+
+              <!-- הגדרת סטופ ברירת מחדל -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">🛑</span>
+                  <div class="preference-text">
+                    <h4>סטופ ברירת מחדל</h4>
+                    <p>אחוז הסטופ לוס ברירת המחדל לטריידים חדשים</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <div class="input-group">
+                    <input type="number" id="defaultStopLossInput" class="form-control" min="0" max="100" step="0.1"
+                      onchange="updateDefaultStopLoss(this.value)" placeholder="5">
+                    <span class="input-group-text">%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- הגדרת מחיר יעד ברירת מחדל -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">🎯</span>
+                  <div class="preference-text">
+                    <h4>מחיר יעד ברירת מחדל</h4>
+                    <p>אחוז מחיר היעד ברירת המחדל לטריידים חדשים</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <div class="input-group">
+                    <input type="number" id="defaultTargetPriceInput" class="form-control" min="0" max="100" step="0.1"
+                      onchange="updateDefaultTargetPrice(this.value)" placeholder="10">
+                    <span class="input-group-text">%</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1510,6 +1546,114 @@
       }
 
       /**
+       * מעדכן את הסטופ לוס ברירת המחדל במערכת
+       * 
+       * פונקציה זו נקראת כאשר המשתמש משנה את אחוז הסטופ לוס ברירת המחדל
+       * היא שומרת את ההגדרה החדשה לשרת ומציגה משוב למשתמש
+       * 
+       * @param {number} value - אחוז הסטופ לוס החדש (0-100)
+       * @returns {Promise<void>}
+       * 
+       * @example
+       * // עדכון סטופ לוס ברירת מחדל ל-15%
+       * updateDefaultStopLoss(15);
+       */
+      async function updateDefaultStopLoss(value) {
+        console.log('🔄 עדכון סטופ לוס ברירת מחדל:', value);
+
+        // וידוא שהערך תקין
+        const numValue = parseFloat(value);
+        if (isNaN(numValue) || numValue < 0 || numValue > 100) {
+          showNotification('אחוז הסטופ לוס חייב להיות בין 0 ל-100', 'error');
+          return;
+        }
+
+        // מציאת אלמנטי הממשק
+        const inputElement = document.getElementById('defaultStopLossInput');
+        const preferenceItem = inputElement.closest('.preference-item');
+
+        // הוספת מצב טעינה לממשק
+        preferenceItem.classList.add('loading');
+
+        try {
+          // שמירת ההגדרה החדשה לשרת
+          const success = await savePreference('defaultStopLoss', numValue);
+
+          if (success) {
+            // עדכון התצוגה עם הערך החדש
+            inputElement.value = numValue;
+            showNotification(`סטופ לוס ברירת מחדל עודכן ל-${numValue}%`, 'success');
+            console.log('✅ סטופ לוס ברירת מחדל עודכן בהצלחה');
+          } else {
+            // אם השמירה נכשלה, החזרת הערך הקודם
+            const currentValue = await getCurrentPreference('defaultStopLoss');
+            inputElement.value = currentValue;
+            showNotification('שגיאה בעדכון סטופ לוס ברירת מחדל', 'error');
+          }
+        } catch (error) {
+          console.error('❌ שגיאה בעדכון סטופ לוס ברירת מחדל:', error);
+          showNotification('שגיאה בעדכון סטופ לוס ברירת מחדל', 'error');
+        } finally {
+          // הסרת מצב הטעינה מהממשק
+          preferenceItem.classList.remove('loading');
+        }
+      }
+
+      /**
+       * מעדכן את מחיר היעד ברירת המחדל במערכת
+       * 
+       * פונקציה זו נקראת כאשר המשתמש משנה את אחוז מחיר היעד ברירת המחדל
+       * היא שומרת את ההגדרה החדשה לשרת ומציגה משוב למשתמש
+       * 
+       * @param {number} value - אחוז מחיר היעד החדש (0-100)
+       * @returns {Promise<void>}
+       * 
+       * @example
+       * // עדכון מחיר יעד ברירת מחדל ל-20%
+       * updateDefaultTargetPrice(20);
+       */
+      async function updateDefaultTargetPrice(value) {
+        console.log('🔄 עדכון מחיר יעד ברירת מחדל:', value);
+
+        // וידוא שהערך תקין
+        const numValue = parseFloat(value);
+        if (isNaN(numValue) || numValue < 0 || numValue > 100) {
+          showNotification('אחוז מחיר היעד חייב להיות בין 0 ל-100', 'error');
+          return;
+        }
+
+        // מציאת אלמנטי הממשק
+        const inputElement = document.getElementById('defaultTargetPriceInput');
+        const preferenceItem = inputElement.closest('.preference-item');
+
+        // הוספת מצב טעינה לממשק
+        preferenceItem.classList.add('loading');
+
+        try {
+          // שמירת ההגדרה החדשה לשרת
+          const success = await savePreference('defaultTargetPrice', numValue);
+
+          if (success) {
+            // עדכון התצוגה עם הערך החדש
+            inputElement.value = numValue;
+            showNotification(`מחיר יעד ברירת מחדל עודכן ל-${numValue}%`, 'success');
+            console.log('✅ מחיר יעד ברירת מחדל עודכן בהצלחה');
+          } else {
+            // אם השמירה נכשלה, החזרת הערך הקודם
+            const currentValue = await getCurrentPreference('defaultTargetPrice');
+            inputElement.value = currentValue;
+            showNotification('שגיאה בעדכון מחיר יעד ברירת מחדל', 'error');
+          }
+        } catch (error) {
+          console.error('❌ שגיאה בעדכון מחיר יעד ברירת מחדל:', error);
+          showNotification('שגיאה בעדכון מחיר יעד ברירת מחדל', 'error');
+        } finally {
+          // הסרת מצב הטעינה מהממשק
+          preferenceItem.classList.remove('loading');
+        }
+      }
+
+      /**
        * טוען את ההעדפות מהשרת ומעדכן את ממשק המשתמש
        * 
        * פונקציה זו נקראת בעת טעינת הדף ומעדכנת את כל אלמנטי הממשק
@@ -1537,6 +1681,22 @@
               const currentCurrency = preferences.user.primaryCurrency || preferences.defaults.primaryCurrency;
               currencySelect.value = currentCurrency;
               console.log('✅ מטבע ראשי נטען:', currentCurrency);
+            }
+
+            // עדכון סטופ לוס ברירת מחדל
+            const stopLossInput = document.getElementById('defaultStopLossInput');
+            if (stopLossInput) {
+              const currentStopLoss = preferences.user.defaultStopLoss || preferences.defaults.defaultStopLoss;
+              stopLossInput.value = currentStopLoss;
+              console.log('✅ סטופ לוס ברירת מחדל נטען:', currentStopLoss);
+            }
+
+            // עדכון מחיר יעד ברירת מחדל
+            const targetPriceInput = document.getElementById('defaultTargetPriceInput');
+            if (targetPriceInput) {
+              const currentTargetPrice = preferences.user.defaultTargetPrice || preferences.defaults.defaultTargetPrice;
+              targetPriceInput.value = currentTargetPrice;
+              console.log('✅ מחיר יעד ברירת מחדל נטען:', currentTargetPrice);
             }
 
             console.log('✅ העדפות נטענו לממשק בהצלחה');
@@ -1997,6 +2157,8 @@
       window.getCurrentPreference = getCurrentPreference;
       window.showNotification = showNotification;
       window.updatePrimaryCurrency = updatePrimaryCurrency;
+      window.updateDefaultStopLoss = updateDefaultStopLoss;
+      window.updateDefaultTargetPrice = updateDefaultTargetPrice;
       window.loadPreferencesToUI = loadPreferencesToUI;
       window.resetSystemPreferences = resetSystemPreferences;
       window.saveSystemPreferences = saveSystemPreferences;
@@ -2006,7 +2168,7 @@
       window.saveSecurityPreferences = saveSecurityPreferences;
       window.resetDisplayPreferences = resetDisplayPreferences;
       window.saveDisplayPreferences = saveDisplayPreferences;
-      window.toggleTopSection = toggleTopSection;
+      // הפונקציה toggleTopSection היא פונקציה מקומית לדף ההעדפות
       window.toggleSystemSection = toggleSystemSection;
       window.togglePersonalSection = togglePersonalSection;
       window.toggleSecuritySection = toggleSecuritySection;

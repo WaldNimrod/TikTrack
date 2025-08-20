@@ -2634,93 +2634,7 @@ button[title="שמור"] span,
 }
 
 /* ===== סגנונות למודול הוספת חשבון ===== */
-
-/* טיפוגרפיה למודול החשבונות */
-#accountModal {
-  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
-}
-
-#accountModal .modal-title {
-  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.02em !important;
-}
-
-#accountForm .form-label {
-  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.01em !important;
-}
-
-#accountForm .form-control,
-#accountForm .form-select {
-  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
-  font-weight: 400 !important;
-}
-
-#accountModal .btn-primary,
-#accountModal .btn-secondary {
-  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.01em !important;
-}
-
-/* מודל החשבון - עיצוב כללי */
-#accountModal .modal-content {
-  border-radius: 12px !important;
-  border: none !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
-  overflow: hidden !important;
-}
-
-/* כותרת המודל - רקע ירוק עם טקסט לבן */
-#accountModal .modal-header {
-  background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
-  color: white !important;
-  border-bottom: none !important;
-  padding: 1.5rem 2rem !important;
-}
-
-#accountModal .modal-title {
-  font-size: 1.4rem !important;
-  font-weight: 600 !important;
-  color: white !important;
-  margin: 0 !important;
-}
-
-/* כפתור סגירה - רקע לבן עם מסגרת ואיקון כתומים */
-#accountModal .btn-close {
-  background-color: white !important;
-  background-image: none !important;
-  background: white !important;
-  color: #ff6b35 !important;
-  border: 2px solid #ff6b35 !important;
-  border-radius: 6px !important;
-  padding: 0.25rem !important;
-  font-size: 0.8rem !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-  width: 30px !important;
-  height: 30px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  opacity: 1 !important;
-}
-
-#accountModal .btn-close:hover {
-  background-color: #fff8f5 !important;
-  color: #e55a2b !important;
-  border-color: #e55a2b !important;
-  transform: scale(1.05) !important;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
-}
-
-#accountModal .btn-close::before {
-  content: '✕' !important;
-  font-size: 0.9rem !important;
-  font-weight: 500 !important;
-}
+/* הגדרות ספציפיות למודל החשבון - עיצוב גלובלי מוחל אוטומטית */
 
 /* ========================================
  * הגדרות גלובליות לכל המודלים
@@ -2734,79 +2648,94 @@ button[title="שמור"] span,
  * - כפיית הצגה עם display: block
  * - הגדרות z-index לכל הרכיבים (dialog, content)
  * - תמיכה בכל סוגי המודלים באתר
+ * - הגדרות חזקות יותר עם !important לכל הרכיבים
  */
 
+/* הגדרות בסיסיות למודלים */
 .modal {
   z-index: 99999 !important;
+  position: fixed !important;
 }
 
 .modal.show {
   display: block !important;
+  z-index: 99999 !important;
 }
 
 .modal.show .modal-dialog {
   display: block !important;
+  z-index: 100000 !important;
 }
 
 .modal-dialog {
   z-index: 100000 !important;
+  position: relative !important;
 }
 
 .modal-content {
   z-index: 100001 !important;
+  position: relative !important;
 }
 
-/* מודל הערות - כותרת עם רקע ירוק */
-#addNoteModal .modal-header,
-#editNoteModal .modal-header {
-  background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
-  color: white !important;
-  border-bottom: none !important;
-  padding: 1.5rem 2rem !important;
+/* הגדרות נוספות לוודא שהמודלים עובדים */
+.modal-backdrop {
+  z-index: 99998 !important;
 }
 
-#addNoteModal .modal-title,
-#editNoteModal .modal-title {
-  font-size: 1.4rem !important;
-  font-weight: 600 !important;
-  color: white !important;
-  margin: 0 !important;
+.modal-header,
+.modal-body,
+.modal-footer {
+  z-index: 100002 !important;
+  position: relative !important;
 }
 
-#addNoteModal .btn-close,
-#editNoteModal .btn-close {
-  background-color: white !important;
-  background-image: none !important;
-  color: #ff6b35 !important;
-  border: 2px solid #ff6b35 !important;
-  border-radius: 6px !important;
-  padding: 0.25rem !important;
-  font-size: 0.8rem !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-  width: 30px !important;
-  height: 30px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  opacity: 1 !important;
+/* הגדרות ספציפיות למודלים שונים */
+#addTradePlanModal,
+#editTradePlanModal,
+#addAlertModal,
+#editAlertModal,
+#addNoteModal,
+#editNoteModal,
+#addTickerModal,
+#editTickerModal,
+#addTradeModal,
+#editTradeModal,
+#addAccountModal,
+#editAccountModal {
+  z-index: 99999 !important;
 }
 
-#addNoteModal .btn-close:hover,
-#editNoteModal .btn-close:hover {
-  background-color: #fff8f5 !important;
-  color: #e55a2b !important;
-  border-color: #e55a2b !important;
-  transform: scale(1.05) !important;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
+#addTradePlanModal .modal-dialog,
+#editTradePlanModal .modal-dialog,
+#addAlertModal .modal-dialog,
+#editAlertModal .modal-dialog,
+#addNoteModal .modal-dialog,
+#editNoteModal .modal-dialog,
+#addTickerModal .modal-dialog,
+#editTickerModal .modal-dialog,
+#addTradeModal .modal-dialog,
+#editTradeModal .modal-dialog,
+#addAccountModal .modal-dialog,
+#editAccountModal .modal-dialog {
+  z-index: 100000 !important;
 }
 
-#addNoteModal .btn-close::before,
-#editNoteModal .btn-close::before {
-  content: '✕' !important;
-  font-size: 0.9rem !important;
-  font-weight: 500 !important;
+#addTradePlanModal .modal-content,
+#editTradePlanModal .modal-content,
+#addAlertModal .modal-content,
+#editAlertModal .modal-content,
+#addNoteModal .modal-content,
+#editNoteModal .modal-content,
+#addTickerModal .modal-content,
+#editTickerModal .modal-content,
+#addTradeModal .modal-content,
+#editTradeModal .modal-content,
+#addAccountModal .modal-content,
+#editAccountModal .modal-content {
+  z-index: 100001 !important;
 }
+
+/* הגדרות ישנות הוסרו - עובר לעיצוב גלובלי אחיד */
 
 /* מודל אזהרה על רשומות מקושרות */
 #linkedItemsWarningModal .modal-header {
@@ -2943,45 +2872,7 @@ button[title="שמור"] span,
   font-weight: bold !important;
 }
 
-/* כפתור סגירה במודל חשבון - סלקטור חזק יותר */
-#accountModal .modal-header .btn-close,
-#accountModal button[data-bs-dismiss="modal"],
-#accountModal button[aria-label="Close"] {
-  background-color: white !important;
-  background-image: none !important;
-  background: white !important;
-  color: #ff6b35 !important;
-  border: 2px solid #ff6b35 !important;
-  border-radius: 6px !important;
-  padding: 0.25rem !important;
-  font-size: 0.8rem !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-  width: 30px !important;
-  height: 30px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  opacity: 1 !important;
-}
-
-#accountModal .modal-header .btn-close:hover,
-#accountModal button[data-bs-dismiss="modal"]:hover,
-#accountModal button[aria-label="Close"]:hover {
-  background-color: #fff8f5 !important;
-  background-image: none !important;
-  color: #e55a2b !important;
-  border-color: #e55a2b !important;
-  transform: scale(1.05) !important;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
-  opacity: 1 !important;
-}
-
-/* גוף המודל */
-#accountModal .modal-body {
-  padding: 2rem !important;
-  background-color: #fafafa !important;
-}
+/* הגדרות ספציפיות למודל החשבון - עיצוב גלובלי מוחל אוטומטית */
 
 /* טופס החשבון */
 #accountForm {
@@ -3039,88 +2930,7 @@ button[title="שמור"] span,
   margin-top: 0.25rem !important;
 }
 
-/* כפתור הוסף חשבון - רקע לבן עם מסגרת ירוקה */
-#accountModal .btn-primary {
-  background-color: white !important;
-  color: #29a6a8 !important;
-  border: 2px solid #29a6a8 !important;
-  border-radius: 6px !important;
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.8rem !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-}
-
-#accountModal .btn-primary:hover {
-  background-color: white !important;
-  color: #1f8a8c !important;
-  border-color: #1f8a8c !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 20px rgba(41, 166, 168, 0.2) !important;
-}
-
-/* כפתור ביטול */
-#accountModal .btn-secondary {
-  background-color: white !important;
-  color: #ff6b35 !important;
-  border: 2px solid #ff6b35 !important;
-  border-radius: 6px !important;
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.8rem !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-}
-
-#accountModal .btn-secondary:hover {
-  background-color: #fff8f5 !important;
-  color: #e55a2b !important;
-  border-color: #e55a2b !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.2) !important;
-}
-
-/* אזור הכפתורים */
-#accountModal .modal-footer {
-  background-color: #f8f9fa !important;
-  border-top: 1px solid #e9ecef !important;
-  padding: 1.5rem 2rem !important;
-  display: flex !important;
-  justify-content: flex-end !important;
-  gap: 1rem !important;
-}
-
-/* אנימציה למודל */
-#accountModal.fade .modal-dialog {
-  transform: scale(0.8) !important;
-  transition: transform 0.3s ease-out !important;
-}
-
-#accountModal.show .modal-dialog {
-  transform: scale(1) !important;
-}
-
-/* רספונסיביות */
-@media (max-width: 768px) {
-  #accountModal .modal-dialog {
-    margin: 1rem !important;
-  }
-
-  #accountModal .modal-header,
-  #accountModal .modal-body,
-  #accountModal .modal-footer {
-    padding: 1rem !important;
-  }
-
-  #accountForm {
-    padding: 1rem !important;
-  }
-
-  #accountModal .btn-primary,
-  #accountModal .btn-secondary {
-    padding: 0.2rem 0.4rem !important;
-    font-size: 0.75rem !important;
-  }
-}
+/* הגדרות ספציפיות למודל החשבון - עיצוב גלובלי מוחל אוטומטית */
 
 /* ===== כפתור הוספת חשבון בדף החשבונות ===== */
 
@@ -3255,25 +3065,57 @@ button[onclick*="showAddAccountModalLocal"]:hover {
   }
 }
 
-/* מודל התראות - כותרת עם רקע ירוק */
-#addAlertModal .modal-header,
-#editAlertModal .modal-header {
+/* ========================================
+ * עיצוב אחיד לכל המודלים באתר
+ * ========================================
+ * 
+ * הגדרות אלו מבטיחות עיצוב אחיד לכל המודלים
+ * בהתבסס על עיצוב מודל ההתראות
+ * 
+ * תכונות:
+ * - כותרות צבעוניות עם gradient
+ * - כפתורי סגירה מעוצבים
+ * - כפתורי פעולה אחידים
+ * - גוף מודל מעוצב
+ */
+
+/* הגדרות כלליות לכל המודלים */
+.modal-header {
   background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
   color: white !important;
   border-bottom: none !important;
   padding: 1.5rem 2rem !important;
+  border-radius: 12px 12px 0 0 !important;
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: space-between !important;
 }
 
-#addAlertModal .modal-title,
-#editAlertModal .modal-title {
+.modal-title {
   font-size: 1.4rem !important;
   font-weight: 600 !important;
   color: white !important;
   margin: 0 !important;
+  order: 2 !important;
+  text-align: right !important;
 }
 
-#addAlertModal .btn-close,
-#editAlertModal .btn-close {
+.modal-body {
+  padding: 2rem !important;
+  background-color: #fafafa !important;
+  border-radius: 0 !important;
+}
+
+.modal-footer {
+  padding: 1.5rem 2rem !important;
+  background-color: #f8f9fa !important;
+  border-top: 1px solid #e9ecef !important;
+  border-radius: 0 0 12px 12px !important;
+}
+
+/* כפתור סגירה מעוצב לכל המודלים */
+.modal .btn-close {
   background-color: white !important;
   background-image: none !important;
   color: #ff6b35 !important;
@@ -3289,10 +3131,12 @@ button[onclick*="showAddAccountModalLocal"]:hover {
   align-items: center !important;
   justify-content: center !important;
   opacity: 1 !important;
+  order: 1 !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
 }
 
-#addAlertModal .btn-close:hover,
-#editAlertModal .btn-close:hover {
+.modal .btn-close:hover {
   background-color: #fff8f5 !important;
   color: #e55a2b !important;
   border-color: #e55a2b !important;
@@ -3300,11 +3144,236 @@ button[onclick*="showAddAccountModalLocal"]:hover {
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
 }
 
-#addAlertModal .btn-close::before,
-#editAlertModal .btn-close::before {
+.modal .btn-close::before {
   content: '✕' !important;
   font-size: 0.9rem !important;
   font-weight: 500 !important;
 }
+
+/* כפתורי פעולה אחידים */
+.modal-footer .btn {
+  padding: 0.75rem 1.5rem !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  margin-left: 0.5rem !important;
+}
+
+/* כפתור ביטול - טקסט ומסגרת כתומה על רקע לבן */
+.modal-footer .btn-secondary {
+  background-color: white !important;
+  border: 2px solid #ff6b35 !important;
+  color: #ff6b35 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-footer .btn-secondary:hover {
+  background-color: #fff8f5 !important;
+  border-color: #e55a2b !important;
+  color: #e55a2b !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
+}
+
+/* כפתור שמירה ראשי - טקסט ומסגרת ירוקה על רקע לבן (צבע הלוגו) */
+.modal-footer .btn-primary {
+  background-color: white !important;
+  border: 2px solid #29a6a8 !important;
+  color: #29a6a8 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: #f0fafa !important;
+  border-color: #1f8a8c !important;
+  color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתור הצלחה - טקסט ומסגרת ירוקה על רקע לבן */
+.modal-footer .btn-success {
+  background-color: white !important;
+  border: 2px solid #28a745 !important;
+  color: #28a745 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-footer .btn-success:hover {
+  background-color: #f8fff9 !important;
+  border-color: #1e7e34 !important;
+  color: #1e7e34 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2) !important;
+}
+
+/* כפתור מחיקה */
+.modal-footer .btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+  border: 2px solid #dc3545 !important;
+  color: white !important;
+}
+
+.modal-footer .btn-danger:hover {
+  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%) !important;
+  border-color: #c82333 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* עיצוב שדות הטופס */
+.modal-body .form-label {
+  font-weight: 600 !important;
+  color: #495057 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.modal-body .form-control,
+.modal-body .form-select {
+  border: 2px solid #e9ecef !important;
+  border-radius: 8px !important;
+  padding: 0.75rem !important;
+  font-size: 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-body .form-control:focus,
+.modal-body .form-select:focus {
+  border-color: #29a6a8 !important;
+  box-shadow: 0 0 0 0.2rem rgba(41, 166, 168, 0.25) !important;
+  background-color: white !important;
+}
+
+/* עיצוב שדות עם שגיאות */
+.modal-body .form-control.is-invalid,
+.modal-body .form-select.is-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+  background-color: #fff5f5 !important;
+}
+
+.modal-body .form-control.is-invalid:focus,
+.modal-body .form-select.is-invalid:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+  background-color: #fff5f5 !important;
+}
+
+/* עיצוב הודעות שגיאה */
+.modal-body .invalid-feedback {
+  display: none !important;
+  color: #dc3545 !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  margin-top: 0.25rem !important;
+  padding: 0.25rem 0.5rem !important;
+  background-color: #fff5f5 !important;
+  border: 1px solid #ffebee !important;
+  border-radius: 4px !important;
+}
+
+/* עיצוב כוכבית שדות חובה */
+.modal-body .form-label .text-danger {
+  color: #dc3545 !important;
+  font-weight: bold !important;
+  margin-right: 0.25rem !important;
+}
+
+/* עיצוב רדיו כפתורים */
+.modal-body .radio-group-item {
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 0.5rem !important;
+  padding: 0.5rem !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-body .radio-group-item:hover {
+  background-color: #f8f9fa !important;
+}
+
+.modal-body .radio-group-item input[type="radio"] {
+  margin-left: 0.5rem !important;
+  accent-color: #29a6a8 !important;
+}
+
+.modal-body .radio-group-item label {
+  margin: 0 !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+}
+
+/* עיצוב מיוחד למודלים ספציפיים */
+
+/* מודל תכנונים - כותרת כחולה */
+#addTradePlanModal .modal-header,
+#editTradePlanModal .modal-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+}
+
+/* מודל הערות - כותרת ירוקה */
+#addNoteModal .modal-header,
+#editNoteModal .modal-header {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
+}
+
+/* מודל טיקרים - כותרת סגולה */
+#addTickerModal .modal-header,
+#editTickerModal .modal-header {
+  background: linear-gradient(135deg, #6f42c1 0%, #5a2d91 100%) !important;
+}
+
+/* מודל טריידים - כותרת כתומה */
+#addTradeModal .modal-header,
+#editTradeModal .modal-header {
+  background: linear-gradient(135deg, #fd7e14 0%, #e55a2b 100%) !important;
+}
+
+/* מודל חשבונות - כותרת ירוקה כהה */
+#addAccountModal .modal-header,
+#editAccountModal .modal-header {
+  background: linear-gradient(135deg, #20c997 0%, #1a9f7a 100%) !important;
+}
+
+/* הגדרות נוספות לגמישות */
+.modal-content {
+  border-radius: 12px !important;
+  border: none !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+}
+
+.modal-dialog {
+  margin: 2rem auto !important;
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 1rem !important;
+  }
+
+  .modal-header {
+    padding: 1rem 1.5rem !important;
+  }
+
+  .modal-body {
+    padding: 1.5rem !important;
+  }
+
+  .modal-footer {
+    padding: 1rem 1.5rem !important;
+  }
+
+  .modal-title {
+    font-size: 1.2rem !important;
+  }
+}
+
+/* הגדרות ישנות למודל התראות הוסרו - עובר לעיצוב גלובלי אחיד */
 
 /* מודל אזהרה על רשומות מקושרות */

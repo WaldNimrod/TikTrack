@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>תחקיר טריידים סגורים - TikTrack</title>
+  <!-- Apple Theme CSS - בסיס כללי -->
+  <link rel="stylesheet" href="styles/apple-theme.css" />
+  <!-- Main Styles - סגנונות הפרויקט -->
+  <link rel="stylesheet" href="styles/styles.css?v=10" />
+  <!-- Menu CSS - תפריט -->
+  <link rel="stylesheet" href="styles/menu.css?v=6" />
+  <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f7;
+    }
+
+    /* התאמת המרווחים לכותרת החדשה */
+    .background-wrapper {
+      padding-top: 120px !important;
+      /* מרווח לכותרת + פילטר + מרווח קטן */
+      padding-right: 32px;
+      transition: padding-top 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .background-wrapper.filter-collapsed {
+      padding-top: 30px !important;
+      /* מרווח לכותרת בלבד + מרווח קטן */
+    }
+
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e8e8e8;
+    }
+
+    .page-header {
+      background: var(--apple-card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--apple-text);
+      margin: 0;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--apple-secondary);
+      margin-top: 8px;
+    }
+
+    .export-btn {
+      background: var(--apple-primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .export-btn:hover {
+      background: var(--apple-primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--apple-card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .stat-title {
+      color: var(--apple-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--apple-text);
+    }
+
+    .stat-value.positive {
+      color: #34C759;
+    }
+
+    .stat-value.negative {
+      color: #FF3B30;
+    }
+
+    .filter-section {
+      background: var(--apple-card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-label {
+      font-weight: 500;
+      color: var(--apple-text);
+      margin-right: 12px;
+    }
+
+    .filter-select {
+      background: var(--apple-bg);
+      border: 1px solid var(--apple-border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--apple-text);
+      font-size: 14px;
+    }
+
+    .trades-table {
+      background: var(--apple-card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 24px;
+    }
+
+    .table {
+      margin: 0;
+      color: var(--apple-text);
+    }
+
+    .table th {
+      background: var(--apple-bg);
+      border: none;
+      padding: 16px 12px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--apple-secondary);
+    }
+
+    .table td {
+      border: none;
+      border-bottom: 1px solid var(--apple-border);
+      padding: 16px 12px;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+      background: var(--apple-bg);
+    }
+
+    .trade-link {
+      color: var(--apple-primary);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .trade-link:hover {
+      text-decoration: underline;
+    }
+
+    .charts-section {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 1200px) {
+      .charts-section {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .chart-card {
+      background: var(--apple-card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--apple-text);
+      margin-bottom: 16px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Web Component של הכותרת -->
+  <app-header></app-header>
+
+  <!-- Menu will be loaded here -->
+  <div id="menu-container"></div>
+
+  <div class="background-wrapper">
+    <div class="main-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">תחקיר טריידים סגורים</h1>
+          <p class="page-subtitle">ניתוח ביצועי טריידים סגורים ומחקר השקעות</p>
+        </div>
+        <button class="export-btn" onclick="exportReport()">
+          📊 ייצוא דוח
+        </button>
+      </div>
+
+      <!-- סטטיסטיקות -->
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-title">סה"כ טריידים סגורים</div>
+          <div class="stat-value" id="totalTrades">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">רווח כולל</div>
+          <div class="stat-value positive" id="totalProfit">₪0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">אחוז הצלחה</div>
+          <div class="stat-value" id="successRate">0%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">ממוצע טרייד</div>
+          <div class="stat-value" id="avgTrade">₪0</div>
+        </div>
+      </div>
+
+      <!-- פילטרים -->
+      <div class="filter-section">
+        <label class="filter-label">סוג השקעה:</label>
+        <select class="filter-select" id="investmentType" onchange="onFilterChange()">
+          <option value="all">הכל</option>
+          <option value="סווינג">סווינג</option>
+          <option value="השקעה">השקעה</option>
+          <option value="פנסיה">פנסיה</option>
+        </select>
+      </div>
+
+      <!-- טבלת טריידים -->
+      <div class="trades-table">
+        <table class="table" id="tradesTable">
+          <thead>
+            <tr>
+              <th>מזהה טרייד</th>
+              <th>נכס</th>
+              <th>תאריכים (ימים)</th>
+              <th>סוג השקעה</th>
+              <th>עלות ממוצעת</th>
+              <th>רווח/הפסד</th>
+              <th>סטטוס</th>
+              <th>הערות</th>
+            </tr>
+          </thead>
+          <tbody id="tradesTableBody">
+            <!-- נתונים יוכנסו כאן -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- גרפים -->
+      <div class="charts-section">
+        <div class="chart-card">
+          <h3 class="chart-title">ביצועי טריידים (רווח/הפסד, גובה השקעה, משך)</h3>
+          <div class="chart-container">
+            <canvas id="tradesBar"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3 class="chart-title">חלוקת השקעה לפי סוג ואחוזי הצלחה</h3>
+          <div class="chart-container">
+            <canvas id="typeMix"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    let tradesBarChart, typeMixChart;
+    let allTrades = [];
+
+    // טעינת נתונים מהשרת
+    async function loadResearchData() {
+      try {
+        // טעינת סטטיסטיקות
+        const statsResponse = await fetch('/api/research/stats');
+        const stats = await statsResponse.json();
+
+        // טעינת טריידים סגורים
+        const tradesResponse = await fetch('/api/research/closed-trades');
+        const trades = await tradesResponse.json();
+
+        allTrades = trades;
+
+        updateStats(stats);
+        updateTable();
+        rebuildCharts();
+      } catch (error) {
+        console.error('שגיאה בטעינת נתונים:', error);
+        // טעינת נתוני דמה אם אין חיבור לשרת
+        loadDemoData();
+      }
+    }
+
+    // נתוני דמה
+    function loadDemoData() {
+      allTrades = [
+        {
+          id: 101,
+          ticker: 'AAPL',
+          type: 'סווינג',
+          opened_at: '2025-05-01',
+          closed_at: '2025-05-20',
+          total_pl: 1200,
+          notes: 'כניסה לאחר דוח רווחים',
+          planned_amount: 15000,
+          investment_type: 'סווינג'
+        },
+        {
+          id: 102,
+          ticker: 'TSLA',
+          type: 'השקעה',
+          opened_at: '2025-04-10',
+          closed_at: '2025-04-30',
+          total_pl: -800,
+          notes: 'יציאה עקב שבירת סטופ',
+          planned_amount: 20000,
+          investment_type: 'השקעה'
+        },
+        {
+          id: 103,
+          ticker: 'NVDA',
+          type: 'השקעה',
+          opened_at: '2025-03-01',
+          closed_at: '2025-03-18',
+          total_pl: 900,
+          notes: 'ריבאונד טכני מעל MA20',
+          planned_amount: 12000,
+          investment_type: 'השקעה'
+        }
+      ];
+
+      const demoStats = {
+        total_trades: 3,
+        total_profit: 1300,
+        avg_profit: 433,
+        success_rate: 67,
+        successful_trades: 2,
+        losing_trades: 1
+      };
+
+      updateStats(demoStats);
+      updateTable();
+      rebuildCharts();
+    }
+
+    // עדכון סטטיסטיקות
+    function updateStats(stats) {
+      document.getElementById('totalTrades').textContent = stats.total_trades;
+      document.getElementById('totalProfit').textContent = `${stats.total_profit >= 0 ? '+' : ''}₪${stats.total_profit.toLocaleString()}`;
+      document.getElementById('totalProfit').className = `stat-value ${stats.total_profit >= 0 ? 'positive' : 'negative'}`;
+      document.getElementById('successRate').textContent = `${stats.success_rate}%`;
+      document.getElementById('avgTrade').textContent = `₪${stats.avg_profit.toLocaleString()}`;
+    }
+
+    // עדכון טבלה
+    function updateTable() {
+      const tbody = document.getElementById('tradesTableBody');
+      tbody.innerHTML = '';
+
+      allTrades.forEach(trade => {
+        const row = document.createElement('tr');
+        const duration = calculateDuration(trade.opened_at, trade.closed_at);
+        const profitLoss = trade.total_pl || 0;
+        const plannedAmount = trade.planned_amount || 0;
+        const profitPercent = plannedAmount > 0 ? Math.round((profitLoss / plannedAmount) * 100) : 0;
+        const investmentType = trade.investment_type || trade.type || 'N/A';
+
+        row.innerHTML = `
+          <td>${trade.id}</td>
+          <td><a class="trade-link" onclick="showTradeDetails(${trade.id})">${trade.ticker || 'N/A'}</a></td>
+          <td>${formatDate(trade.opened_at)} → ${formatDate(trade.closed_at)} (${duration}d)</td>
+          <td>${investmentType}</td>
+          <td>₪${plannedAmount.toLocaleString()}</td>
+          <td class="${profitLoss >= 0 ? 'positive' : 'negative'}">₪${profitLoss >= 0 ? '+' : ''}${profitLoss.toLocaleString()} (${profitPercent >= 0 ? '+' : ''}${profitPercent}%)</td>
+          <td>הושלם</td>
+          <td>${trade.notes || ''}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // חישוב משך טרייד
+    function calculateDuration(startDate, endDate) {
+      if (!startDate || !endDate) return 0;
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const diffTime = Math.abs(end - start);
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    // עיצוב תאריך
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    }
+
+    // שינוי פילטר
+    function onFilterChange() {
+      const type = document.getElementById('investmentType').value;
+      const rows = document.querySelectorAll('#tradesTableBody tr');
+
+      rows.forEach(row => {
+        const cellType = row.cells[3].textContent.trim();
+        row.style.display = (type === 'all' || cellType === type) ? '' : 'none';
+      });
+
+      rebuildCharts();
+    }
+
+
+
+    // בניית גרף ביצועי טריידים
+    function buildTradesBarChart(data) {
+      const ctx = document.getElementById('tradesBar').getContext('2d');
+      const labels = data.map(d => `${d.ticker || 'N/A'} #${d.id}`);
+      const plData = data.map(d => d.total_pl || 0);
+      const investData = data.map(d => d.planned_amount || 0);
+      const durationData = data.map(d => calculateDuration(d.opened_at, d.closed_at));
+
+      if (tradesBarChart) tradesBarChart.destroy();
+
+      tradesBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'רווח/הפסד',
+              data: plData,
+              backgroundColor: plData.map(v => v >= 0 ? 'rgba(52, 199, 89, 0.8)' : 'rgba(255, 59, 48, 0.8)'),
+              borderColor: plData.map(v => v >= 0 ? '#34C759' : '#FF3B30'),
+              borderWidth: 1
+            },
+            {
+              label: 'גובה השקעה',
+              data: investData,
+              backgroundColor: 'rgba(0, 122, 255, 0.8)',
+              borderColor: '#007AFF',
+              borderWidth: 1
+            },
+            {
+              label: 'משך (ימים)',
+              data: durationData,
+              backgroundColor: 'rgba(255, 149, 0, 0.8)',
+              borderColor: '#FF9500',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-text')
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-border')
+              },
+              ticks: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-secondary')
+              }
+            },
+            x: {
+              grid: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-border')
+              },
+              ticks: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-secondary')
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // בניית גרף חלוקה לפי סוג
+    function buildTypeMixChart(data) {
+      const ctx = document.getElementById('typeMix').getContext('2d');
+      const byType = {};
+
+      data.forEach(d => {
+        const type = d.investment_type || d.type || 'אחר';
+        if (!byType[type]) byType[type] = { invested: 0, success: 0, count: 0 };
+        byType[type].invested += d.planned_amount || 0;
+        byType[type].success += (d.total_pl || 0) > 0 ? 1 : 0;
+        byType[type].count += 1;
+      });
+
+      const labels = Object.keys(byType);
+      const invested = labels.map(t => byType[t].invested);
+      const successRate = labels.map(t => byType[t].count ? Math.round((byType[t].success / byType[t].count) * 100) : 0);
+
+      if (typeMixChart) typeMixChart.destroy();
+
+      typeMixChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'סה"כ השקעה',
+              data: invested,
+              backgroundColor: 'rgba(0, 122, 255, 0.8)',
+              borderColor: '#007AFF',
+              borderWidth: 1,
+              yAxisID: 'y'
+            },
+            {
+              label: 'אחוזי הצלחה',
+              data: successRate,
+              type: 'line',
+              borderColor: '#34C759',
+              backgroundColor: 'rgba(52, 199, 89, 0.2)',
+              borderWidth: 3,
+              fill: true,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-text')
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: '₪ / $',
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-secondary')
+              },
+              grid: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-border')
+              },
+              ticks: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-secondary')
+              }
+            },
+            y1: {
+              beginAtZero: true,
+              position: 'right',
+              suggestedMax: 100,
+              title: {
+                display: true,
+                text: '% הצלחה',
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-secondary')
+              },
+              grid: {
+                drawOnChartArea: false
+              },
+              ticks: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-secondary')
+              }
+            },
+            x: {
+              grid: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-border')
+              },
+              ticks: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--apple-secondary')
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // בניית גרפים מחדש
+    function rebuildCharts() {
+      const type = document.getElementById('investmentType').value;
+      const data = allTrades;
+      buildTradesBarChart(data);
+      buildTypeMixChart(data);
+    }
+
+    // הצגת פרטי טרייד
+    function showTradeDetails(tradeId) {
+      const trade = allTrades.find(t => t.id === tradeId);
+      if (trade) {
+        alert(`פרטי טרייד: ${trade.ticker}\nרווח/הפסד: ₪${trade.total_pl || 0}\nהערות: ${trade.notes || 'אין'}`);
+      }
+    }
+
+    // ייצוא דוח
+    function exportReport() {
+      const type = document.getElementById('investmentType').value;
+      const data = allTrades;
+
+      let csv = 'מזהה טרייד,נכס,תאריך פתיחה,תאריך סגירה,סוג השקעה,עלות,רווח/הפסד,הערות\n';
+
+      data.forEach(trade => {
+        csv += `${trade.id},${trade.ticker || 'N/A'},${trade.opened_at || 'N/A'},${trade.closed_at || 'N/A'},${trade.type || 'N/A'},${trade.planned_amount || 0},${trade.total_pl || 0},"${trade.notes || ''}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `research_report_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // טעינת נתונים בעת טעינת הדף
+    document.addEventListener('DOMContentLoaded', () => {
+      loadResearchData();
+
+      // הגדרת האזנה לכותרת
+      setupHeaderListener();
+    });
+
+    // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
+    function updateBackgroundPadding(isCollapsed) {
+      const backgroundWrapper = document.querySelector('.background-wrapper');
+      const body = document.body;
+
+      if (backgroundWrapper) {
+        if (isCollapsed) {
+          backgroundWrapper.classList.add('filter-collapsed');
+        } else {
+          backgroundWrapper.classList.remove('filter-collapsed');
+        }
+      }
+
+      if (body) {
+        if (isCollapsed) {
+          body.classList.add('filter-collapsed');
+        } else {
+          body.classList.remove('filter-collapsed');
+        }
+      }
+    }
+
+    // האזנה לשינויים בקומפוננט הכותרת
+    function setupHeaderListener() {
+      const header = document.querySelector('app-header');
+      if (header) {
+        // האזנה לשינויים בפילטר
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
+              if (filterSection) {
+                const isCollapsed = filterSection.classList.contains('collapsed');
+                updateBackgroundPadding(isCollapsed);
+              }
+            }
+          });
+        });
+
+        // התחלת ההאזנה
+        setTimeout(() => {
+          const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
+          if (filterSection) {
+            observer.observe(filterSection, { attributes: true });
+          }
+        }, 1000);
+      }
+    }
+  </script>
+
+  <!-- Scripts -->
+  <script src="scripts/app-header.js"></script>
+</body>
+
+</html>

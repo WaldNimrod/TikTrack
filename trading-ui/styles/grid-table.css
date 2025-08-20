@@ -379,6 +379,34 @@ body.modal-open {
   transform: translateY(-1px) !important;
 }
 
+/* ===== עיצובי סידור טבלאות ===== */
+
+/**
+ * עיצובי אייקוני סידור
+ * 
+ * מערכת עיצוב אחידה לאייקוני הסידור בכל הטבלאות באתר.
+ * 
+ * תכונות:
+ * - אייקונים דינמיים (↕, ↑, ↓)
+ * - אנימציות מעבר חלקות
+ * - צבעים שונים למצבים שונים
+ * - תמיכה ב-sortable-header ו-sortable-header-btn
+ * 
+ * שימוש:
+ * 1. הוסף class="sortable-header" לכפתורי הכותרות
+ * 2. הוסף <span class="sort-icon">↕</span> בתוך הכפתור
+ * 3. האייקון יתעדכן אוטומטית לפי מצב הסידור
+ * 
+ * מצבי אייקון:
+ * - ↕ = לא פעיל (אפור)
+ * - ↑ = סידור עולה (כתום)
+ * - ↓ = סידור יורד (כתום)
+ * 
+ * @author TikTrack Development Team
+ * @version 2.0
+ * @since 2025-08-21
+ */
+
 .sortable-header-btn .sort-icon {
   font-size: 0.7rem !important;
   margin-left: 0.3rem !important;
@@ -389,6 +417,23 @@ body.modal-open {
 
 .sortable-header-btn:hover .sort-icon {
   opacity: 1 !important;
+}
+
+.sortable-header .sort-icon {
+  font-size: 0.7rem !important;
+  margin-left: 0.3rem !important;
+  opacity: 0.7 !important;
+  transition: opacity 0.3s ease !important;
+  display: inline !important;
+}
+
+.sortable-header:hover .sort-icon {
+  opacity: 1 !important;
+}
+
+.sortable-header.active-sort .sort-icon {
+  opacity: 1 !important;
+  color: #ff9c05 !important;
 }
 
 /* כותרות משנה */

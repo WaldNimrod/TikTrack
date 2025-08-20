@@ -150,53 +150,53 @@ let externalFilterPresent = false;
 // ייצוא הפונקציות הגלובליות מיד בתחילת הקובץ כדי לוודא שהן זמינות
 
 // פונקציה לאתחול הגדרות תצוגה בדף הערות
-window.resetNotesDisplaySettings = function() {
+window.resetNotesDisplaySettings = function () {
   console.log('🔄 === אתחול הגדרות תצוגה בדף הערות ===');
-  
+
   // מחיקת הגדרות שמורות
   localStorage.removeItem('notesTopSectionHidden');
   localStorage.removeItem('notesMainSectionHidden');
-  
+
   // איפוס תצוגת הסקשנים
   const topSection = document.getElementById('notesTopSection');
   const mainSection = document.getElementById('notesMainSection');
-  
+
   if (topSection) {
     topSection.style.display = 'block';
     console.log('✅ אופס top section');
   }
-  
+
   if (mainSection) {
     mainSection.style.display = 'block';
     console.log('✅ אופס main section');
   }
-  
+
   // איפוס אייקונים
   const topIcon = document.querySelector('.top-section .filter-icon');
   const mainIcon = document.querySelector('.content-section .filter-icon');
-  
+
   if (topIcon) {
     topIcon.textContent = '▲';
     console.log('✅ אופס top icon');
   }
-  
+
   if (mainIcon) {
     mainIcon.textContent = '▲';
     console.log('✅ אופס main icon');
   }
-  
+
   console.log('✅ אתחול הגדרות תצוגה הושלם');
 };
 
 // פונקציה לאיפוס אוטומטי של הגדרות תצוגה בדף הערות
-window.autoResetNotesDisplay = function() {
+window.autoResetNotesDisplay = function () {
   if (window.location.pathname.includes('/notes')) {
     console.log('🔄 === איפוס אוטומטי של הגדרות תצוגה בדף הערות ===');
-    
+
     // בדיקה אם יש הגדרות שמורות שגויות
     const topHidden = localStorage.getItem('notesTopSectionHidden');
     const mainHidden = localStorage.getItem('notesMainSectionHidden');
-    
+
     if (topHidden === 'true' || mainHidden === 'true') {
       console.log('⚠️ נמצאו הגדרות שגויות - מאתחל...');
       window.resetNotesDisplaySettings();
@@ -1966,8 +1966,364 @@ if (typeof window.autoResetNotesDisplay === 'function') {
 }
 
 // אתחול אוטומטי כשהדף נטען
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   if (typeof window.autoResetNotesDisplay === 'function') {
     window.autoResetNotesDisplay();
   }
 });
+
+// ===== פונקציות סידור טבלאות גלובליות =====
+/**
+ * מערכת סידור טבלאות גלובלית
+ * 
+ * מערכת זו מספקת פונקציונליות סידור אחידה לכל הטבלאות באתר.
+ * 
+ * תכונות:
+ * - סידור לפי כל סוגי הנתונים (טקסט, מספרים, תאריכים, סטטוסים)
+ * - שמירת מצב הסידור ב-localStorage
+ * - אייקונים דינמיים המציגים כיוון הסידור
+ * - תמיכה במבני נתונים שונים (אובייקטים, מחרוזות)
+ * 
+ * שימוש:
+ * 1. הוסף class="sortable-header" לכפתורי הכותרות
+ * 2. הוסף <span class="sort-icon">↕</span> בתוך הכפתור
+ * 3. קרא ל-sortTableData עם הפרמטרים הנכונים
+ * 
+ * דוגמה:
+ * <button class="sortable-header" onclick="sortTable(0)">
+ *   <span class="sort-icon">↕</span>כותרת
+ * </button>
+ * 
+ * @author TikTrack Development Team
+ * @version 2.0
+ * @since 2025-08-21
+ */
+
+// משתנים גלובליים לסידור
+window.currentSortColumn = -1;
+window.currentSortDirection = 'asc';
+
+/**
+ * פונקציה גלובלית לסידור טבלאות
+ * 
+ * פונקציה זו מבצעת סידור של נתונים לפי עמודה מסוימת ומעדכנת את הטבלה.
+ * הפונקציה תומכת בסידור עולה ויורד, שומרת את המצב ב-localStorage,
+ * ומעדכנת את אייקוני הסידור.
+ * 
+ * @param {number} columnIndex - אינדקס העמודה לסידור (0-8)
+ * @param {Array} data - מערך הנתונים לסידור
+ * @param {string} pageName - שם הדף לשמירת מצב (למשל: 'planning', 'alerts')
+ * @param {Function} updateTableFunction - פונקציה לעדכון הטבלה עם הנתונים המסודרים
+ * @returns {Array} הנתונים המסודרים
+ * 
+ * @example
+ * // סידור טבלת תכנונים לפי עמודת נכס
+ * const sortedData = sortTableData(0, designsData, 'planning', updateDesignsTable);
+ * 
+ * @throws {Error} אם הפונקציה updateTableFunction לא קיימת
+ * 
+ * @since 2.0
+ */
+function sortTableData(columnIndex, data, pageName, updateTableFunction) {
+  console.log(`🔄 === SORT TABLE (${pageName}) ===`);
+  console.log('🔄 Column clicked:', columnIndex);
+
+  // קבלת הנתונים הנוכחיים
+  let sortedData = [...data];
+
+  // עדכון כיוון הסידור
+  if (window.currentSortColumn === columnIndex) {
+    window.currentSortDirection = window.currentSortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    window.currentSortColumn = columnIndex;
+    window.currentSortDirection = 'asc';
+  }
+
+  // מיון הנתונים
+  sortedData.sort((a, b) => {
+    let aValue, bValue;
+
+    switch (columnIndex) {
+      case 0: // נכס (Ticker)
+        aValue = getTickerValue(a).toLowerCase();
+        bValue = getTickerValue(b).toLowerCase();
+        break;
+      case 1: // תאריך
+        aValue = new Date(getDateValue(a)).getTime();
+        bValue = new Date(getDateValue(b)).getTime();
+        break;
+      case 2: // סוג
+        aValue = getTypeValue(a).toLowerCase();
+        bValue = getTypeValue(b).toLowerCase();
+        break;
+      case 3: // צד
+        aValue = (getSideValue(a) || 'Long').toLowerCase();
+        bValue = (getSideValue(b) || 'Long').toLowerCase();
+        break;
+      case 4: // סכום
+        aValue = parseFloat(getAmountValue(a)) || 0;
+        bValue = parseFloat(getAmountValue(b)) || 0;
+        break;
+      case 5: // יעד
+        aValue = parseFloat(getTargetValue(a)) || 0;
+        bValue = parseFloat(getTargetValue(b)) || 0;
+        break;
+      case 6: // סטופ
+        aValue = parseFloat(getStopValue(a)) || 0;
+        bValue = parseFloat(getStopValue(b)) || 0;
+        break;
+      case 7: // נוכחי
+        aValue = parseFloat(getCurrentValue(a)) || 0;
+        bValue = parseFloat(getCurrentValue(b)) || 0;
+        break;
+      case 8: // סטטוס
+        aValue = getStatusForSort(getStatusValue(a));
+        bValue = getStatusForSort(getStatusValue(b));
+        break;
+      default:
+        return 0;
+    }
+
+    // השוואה
+    if (aValue < bValue) {
+      return window.currentSortDirection === 'asc' ? -1 : 1;
+    } else if (aValue > bValue) {
+      return window.currentSortDirection === 'asc' ? 1 : -1;
+    } else {
+      return 0;
+    }
+  });
+
+  // עדכון הטבלה
+  if (typeof updateTableFunction === 'function') {
+    updateTableFunction(sortedData);
+  }
+
+  // עדכון אייקונים
+  updateSortIcons(columnIndex, pageName);
+
+  // שמירת מצב המיון ב-localStorage
+  localStorage.setItem(`${pageName}SortColumn`, columnIndex.toString());
+  localStorage.setItem(`${pageName}SortDirection`, window.currentSortDirection);
+
+  return sortedData;
+}
+
+/**
+ * פונקציות עזר לחילוץ ערכים מנתונים
+ */
+
+/**
+ * חילוץ ערך ticker מפריט נתונים
+ * 
+ * @param {Object} item - פריט הנתונים
+ * @returns {string} ערך ה-ticker (symbol או name)
+ * 
+ * @example
+ * getTickerValue({ticker: {symbol: 'AAPL', name: 'Apple Inc.'}}) // 'AAPL'
+ * getTickerValue({ticker: 'AAPL'}) // 'AAPL'
+ */
+function getTickerValue(item) {
+  if (item.ticker && typeof item.ticker === 'object') {
+    return item.ticker.symbol || item.ticker.name || '';
+  }
+  return item.ticker || item.ticker_symbol || '';
+}
+
+/**
+ * חילוץ ערך תאריך מפריט נתונים
+ * 
+ * @param {Object} item - פריט הנתונים
+ * @returns {string} ערך התאריך
+ * 
+ * @example
+ * getDateValue({created_at: '2025-08-21'}) // '2025-08-21'
+ * getDateValue({date: '2025-08-21'}) // '2025-08-21'
+ */
+function getDateValue(item) {
+  return item.created_at || item.date || '';
+}
+
+/**
+ * חילוץ ערך סוג מפריט נתונים
+ * 
+ * @param {Object} item - פריט הנתונים
+ * @returns {string} ערך הסוג
+ * 
+ * @example
+ * getTypeValue({investment_type: 'swing'}) // 'swing'
+ * getTypeValue({type: 'investment'}) // 'investment'
+ */
+function getTypeValue(item) {
+  return item.investment_type || item.type || '';
+}
+
+/**
+ * חילוץ ערך צד מפריט נתונים
+ * 
+ * @param {Object} item - פריט הנתונים
+ * @returns {string} ערך הצד (ברירת מחדל: 'Long')
+ * 
+ * @example
+ * getSideValue({side: 'Short'}) // 'Short'
+ * getSideValue({}) // 'Long'
+ */
+function getSideValue(item) {
+  return item.side || 'Long';
+}
+
+/**
+ * חילוץ ערך סכום מפריט נתונים
+ * 
+ * @param {Object} item - פריט הנתונים
+ * @returns {number} ערך הסכום (ברירת מחדל: 0)
+ * 
+ * @example
+ * getAmountValue({planned_amount: 1000}) // 1000
+ * getAmountValue({amount: 500}) // 500
+ */
+function getAmountValue(item) {
+  return item.planned_amount || item.amount || 0;
+}
+
+/**
+ * חילוץ ערך יעד מפריט נתונים
+ * 
+ * @param {Object} item - פריט הנתונים
+ * @returns {number} ערך היעד (ברירת מחדל: 0)
+ * 
+ * @example
+ * getTargetValue({target_price: 150}) // 150
+ * getTargetValue({target: 200}) // 200
+ */
+function getTargetValue(item) {
+  return item.target_price || item.target || 0;
+}
+
+/**
+ * חילוץ ערך סטופ מפריט נתונים
+ * 
+ * @param {Object} item - פריט הנתונים
+ * @returns {number} ערך הסטופ (ברירת מחדל: 0)
+ * 
+ * @example
+ * getStopValue({stop_price: 100}) // 100
+ * getStopValue({stop: 90}) // 90
+ */
+function getStopValue(item) {
+  return item.stop_price || item.stop || 0;
+}
+
+/**
+ * חילוץ ערך נוכחי מפריט נתונים
+ * 
+ * @param {Object} item - פריט הנתונים
+ * @returns {number} הערך הנוכחי (ברירת מחדל: 0)
+ * 
+ * @example
+ * getCurrentValue({current_price: 120}) // 120
+ * getCurrentValue({current: 110}) // 110
+ */
+function getCurrentValue(item) {
+  return item.current_price || item.current || 0;
+}
+
+/**
+ * חילוץ ערך סטטוס מפריט נתונים
+ * 
+ * @param {Object} item - פריט הנתונים
+ * @returns {string} ערך הסטטוס
+ * 
+ * @example
+ * getStatusValue({status: 'open'}) // 'open'
+ * getStatusValue({status: 'closed'}) // 'closed'
+ */
+function getStatusValue(item) {
+  return item.status || '';
+}
+
+/**
+ * פונקציה לקבלת ערך מספרי לסטטוס לסידור
+ * 
+ * ממירה סטטוסים טקסטואליים לערכים מספריים לצורך סידור עקבי.
+ * 
+ * @param {string} status - הסטטוס לסידור
+ * @returns {number} ערך מספרי לסידור (1=open, 2=closed, 3=cancelled, 0=אחר)
+ * 
+ * @example
+ * getStatusForSort('open') // 1
+ * getStatusForSort('closed') // 2
+ * getStatusForSort('cancelled') // 3
+ * getStatusForSort('unknown') // 0
+ */
+function getStatusForSort(status) {
+  switch (status) {
+    case 'open': return 1;
+    case 'closed': return 2;
+    case 'cancelled': return 3;
+    case 'canceled': return 3;
+    default: return 0;
+  }
+}
+
+/**
+ * פונקציה לעדכון אייקוני המיון
+ * 
+ * מעדכנת את אייקוני הסידור בטבלה לפי העמודה הפעילה וכיוון הסידור.
+ * 
+ * @param {number} activeColumnIndex - אינדקס העמודה הפעילה
+ * @param {string} pageName - שם הדף (לא בשימוש כרגע)
+ * 
+ * @example
+ * updateSortIcons(0, 'planning'); // מעדכן אייקון בעמודה הראשונה
+ */
+function updateSortIcons(activeColumnIndex, pageName) {
+  const buttons = document.querySelectorAll('.sortable-header');
+
+  buttons.forEach((button, index) => {
+    const sortIcon = button.querySelector('.sort-icon');
+    if (sortIcon) {
+      if (index === activeColumnIndex) {
+        const iconText = window.currentSortDirection === 'asc' ? '↑' : '↓';
+        sortIcon.textContent = iconText;
+        sortIcon.style.color = '#ff9c05';
+        button.classList.add('active-sort');
+      } else {
+        sortIcon.textContent = '↕';
+        sortIcon.style.color = '#999';
+        button.classList.remove('active-sort');
+      }
+    }
+  });
+}
+
+/**
+ * פונקציה לטעינת מצב המיון מ-localStorage
+ * 
+ * טוענת את מצב הסידור השמור ומעדכנת את האייקונים בהתאם.
+ * 
+ * @param {string} pageName - שם הדף לטעינת המצב
+ * 
+ * @example
+ * loadSortState('planning'); // טוען מצב סידור לדף תכנונים
+ */
+function loadSortState(pageName) {
+  const savedColumn = localStorage.getItem(`${pageName}SortColumn`);
+  const savedDirection = localStorage.getItem(`${pageName}SortDirection`);
+
+  if (savedColumn !== null) {
+    window.currentSortColumn = parseInt(savedColumn);
+    window.currentSortDirection = savedDirection || 'asc';
+
+    // עדכון אייקונים
+    updateSortIcons(window.currentSortColumn, pageName);
+  }
+}
+
+// ייצוא הפונקציות הגלובליות
+window.sortTableData = sortTableData;
+window.getStatusForSort = getStatusForSort;
+window.updateSortIcons = updateSortIcons;
+window.loadSortState = loadSortState;
+
+// ===== סיום הקובץ =====

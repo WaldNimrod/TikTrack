@@ -1402,7 +1402,43 @@ if (typeof window.toggleTopSection !== 'function') {
 
 if (typeof window.toggleMainSection !== 'function') {
   window.toggleMainSection = function () {
-    console.warn('toggleMainSection fallback called - main.js may not be loaded properly');
+    console.log('🔄 toggleMainSection fallback נקראה');
+    const contentSections = document.querySelectorAll('.content-section');
+    console.log('📋 מספר content-sections נמצא:', contentSections.length);
+    const alertsSection = contentSections[0]; // הסקשן הראשון - התראות
+
+    if (!alertsSection) {
+      console.error('❌ לא נמצא סקשן התראות');
+      return;
+    }
+    console.log('✅ סקשן התראות נמצא:', alertsSection);
+
+    const sectionBody = alertsSection.querySelector('.section-body');
+    const toggleBtn = alertsSection.querySelector('button[onclick="toggleMainSection()"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    console.log('🎯 sectionBody נמצא:', !!sectionBody);
+    console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
+    console.log('🎨 icon נמצא:', !!icon);
+
+    if (sectionBody) {
+      const isCollapsed = sectionBody.style.display === 'none';
+      console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
+
+      if (isCollapsed) {
+        sectionBody.style.display = 'block';
+      } else {
+        sectionBody.style.display = 'none';
+      }
+
+      // עדכון האייקון
+      if (icon) {
+        icon.textContent = isCollapsed ? '▲' : '▼';
+      }
+
+      // שמירת המצב ב-localStorage
+      localStorage.setItem('alertsSectionCollapsed', !isCollapsed);
+    }
   };
 }
 

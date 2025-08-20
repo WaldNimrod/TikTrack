@@ -15,13 +15,16 @@ function deleteDesign(id) {
 
 // פונקציות לפתיחה/סגירה של סקשנים
 function toggleDesignsSection() {
+  console.log('🔄 toggleDesignsSection נקראה');
   const contentSections = document.querySelectorAll('.content-section');
+  console.log('📋 מספר content-sections נמצא:', contentSections.length);
   const designsSection = contentSections[0]; // הסקשן הראשון - עיצובים
   
   if (!designsSection) {
     console.error('❌ לא נמצא סקשן עיצובים');
     return;
   }
+  console.log('✅ סקשן עיצובים נמצא:', designsSection);
 
   const sectionBody = designsSection.querySelector('.section-body');
   const toggleBtn = designsSection.querySelector('button[onclick="toggleDesignsSection()"]');
@@ -120,6 +123,23 @@ function restoreDesignsSectionState() {
 function resetAllFiltersAndReloadData() {
   console.log('איפוס פילטרים');
 }
+
+// הגדרת הפונקציה updateGridFromComponent לדף העיצובים
+window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+  console.log('🔄 updateGridFromComponent called for designs page with:', {
+    selectedStatuses,
+    selectedTypes,
+    selectedDateRange,
+    searchTerm
+  });
+
+  // קריאה לפונקציה הגלובלית אם זמינה
+  if (typeof window.updateGridFromComponentGlobal === 'function') {
+    window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'designs');
+  } else {
+    console.error('❌ updateGridFromComponentGlobal function not found');
+  }
+};
 
 // הגדרת הפונקציות כגלובליות
 window.openDesignDetails = openDesignDetails;

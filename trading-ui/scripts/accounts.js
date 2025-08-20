@@ -1468,12 +1468,55 @@ async function loadAccountsDataForAccountsPage() {
   }
 }
 
+// פונקציות לפתיחה/סגירה של סקשנים
+function toggleMainSection() {
+  console.log('🔄 toggleMainSection נקראה');
+  const contentSections = document.querySelectorAll('.content-section');
+  console.log('📋 מספר content-sections נמצא:', contentSections.length);
+  const accountsSection = contentSections[0]; // הסקשן הראשון - חשבונות
+  
+  if (!accountsSection) {
+    console.error('❌ לא נמצא סקשן חשבונות');
+    return;
+  }
+  console.log('✅ סקשן חשבונות נמצא:', accountsSection);
+
+  const sectionBody = accountsSection.querySelector('.section-body');
+  const toggleBtn = accountsSection.querySelector('button[onclick="toggleMainSection()"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+  
+  console.log('🎯 sectionBody נמצא:', !!sectionBody);
+  console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
+  console.log('🎨 icon נמצא:', !!icon);
+
+  if (sectionBody) {
+    const isCollapsed = sectionBody.style.display === 'none';
+    console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
+
+    if (isCollapsed) {
+      sectionBody.style.display = 'block';
+    } else {
+      sectionBody.style.display = 'none';
+    }
+
+    // עדכון האייקון
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // שמירת המצב ב-localStorage
+    localStorage.setItem('accountsSectionCollapsed', !isCollapsed);
+  }
+}
+
 // ייצוא הפונקציה החדשה
 window.loadAccountsDataForAccountsPage = loadAccountsDataForAccountsPage;
+window.toggleMainSection = toggleMainSection;
 
 // בדיקה סופית שהפונקציות מיוצאות
 console.log('🔄 === בדיקה סופית של ייצוא פונקציות ===');
 console.log('- showEditAccountModalById:', typeof window.showEditAccountModalById);
 console.log('- showEditAccountModal:', typeof window.showEditAccountModal);
 console.log('- showAddAccountModal:', typeof window.showAddAccountModal);
+console.log('- toggleMainSection:', typeof window.toggleMainSection);
 console.log('✅ === סיום בדיקת ייצוא ===');

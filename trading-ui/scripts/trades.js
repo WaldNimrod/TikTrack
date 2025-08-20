@@ -586,6 +586,49 @@ window.clearTradeValidationErrors = clearTradeValidationErrors; // ניקוי ש
 // פונקציות עזר:
 window.loadModalData = loadModalData;                      // טעינת נתונים למודל
 
+// פונקציות לפתיחה/סגירה של סקשנים
+function toggleMainSection() {
+  console.log('🔄 toggleMainSection נקראה');
+  const contentSections = document.querySelectorAll('.content-section');
+  console.log('📋 מספר content-sections נמצא:', contentSections.length);
+  const tradesSection = contentSections[0]; // הסקשן הראשון - טריידים
+  
+  if (!tradesSection) {
+    console.error('❌ לא נמצא סקשן טריידים');
+    return;
+  }
+  console.log('✅ סקשן טריידים נמצא:', tradesSection);
+
+  const sectionBody = tradesSection.querySelector('.section-body');
+  const toggleBtn = tradesSection.querySelector('button[onclick="toggleMainSection()"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+  
+  console.log('🎯 sectionBody נמצא:', !!sectionBody);
+  console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
+  console.log('🎨 icon נמצא:', !!icon);
+
+  if (sectionBody) {
+    const isCollapsed = sectionBody.style.display === 'none';
+    console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
+
+    if (isCollapsed) {
+      sectionBody.style.display = 'block';
+    } else {
+      sectionBody.style.display = 'none';
+    }
+
+    // עדכון האייקון
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // שמירת המצב ב-localStorage
+    localStorage.setItem('tradesSectionCollapsed', !isCollapsed);
+  }
+}
+
+window.toggleMainSection = toggleMainSection;
+
 // קריאה לטעינת נתונים כשהדף נטען
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function () {

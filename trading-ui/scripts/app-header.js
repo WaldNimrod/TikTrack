@@ -969,7 +969,7 @@ class AppHeader extends HTMLElement {
                   <li><a class="dropdown-item" href="/accounts">חשבונות</a></li>
                   <li><a class="dropdown-item" href="/notes">הערות</a></li>
                   <li><a class="dropdown-item" href="/alerts">התראות</a></li>
-                  <li><a class="dropdown-item" href="/tickers">תיקרים</a></li>
+                  <li><a class="dropdown-item" href="/tickers">טיקרים</a></li>
                   <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="/database">בסיס נתונים</a></li>
@@ -2578,7 +2578,7 @@ class AppHeader extends HTMLElement {
    * מאפסת את כל הפילטרים ב-localStorage ובממשק המשתמש
    * תומכת בדפים שונים עם פילטרים מותאמים לכל דף
    */
-  clearAllFilters() {
+  async clearAllFilters() {
     console.log('clearAllFilters called from component');
 
     // קביעת שם הדף הנוכחי
@@ -2595,23 +2595,43 @@ class AppHeader extends HTMLElement {
       pageName = 'accounts';
     }
 
-    // ניקוי פילטר הסטטוס - מותאם לדף
+    // טעינת ברירות המחדל מההעדפות
+    let filterDefaults = {
+      statusFilter: 'all',
+      typeFilter: 'all',
+      accountFilter: 'all',
+      dateRangeFilter: 'all',
+      searchFilter: ''
+    };
+
+    try {
+      const response = await fetch('/config/preferences.json');
+      if (response.ok) {
+        const preferences = await response.json();
+        filterDefaults = preferences.user?.filterDefaults || preferences.defaults?.filterDefaults || filterDefaults;
+        console.log('Loaded filter defaults from preferences:', filterDefaults);
+      }
+    } catch (error) {
+      console.error('Error loading preferences for filter defaults:', error);
+    }
+
+    // ניקוי פילטר הסטטוס - לפי ברירת המחדל
     const statusMenu = this.shadowRoot.getElementById('statusFilterMenu');
     if (statusMenu) {
       statusMenu.querySelectorAll('.status-filter-item').forEach(item => {
         const text = item.querySelector('.option-text').textContent;
-        if (pageName === 'accounts') {
-          // בדף החשבונות - לבחור את כל הסטטוסים כברירת מחדל
+        if (filterDefaults.statusFilter === 'all') {
+          // אם ברירת המחדל היא "כל הסטטוסים"
           item.classList.add('selected');
-        } else if (pageName === 'notes') {
-          // עבור דף ההערות - רק "פתוח" מסומן (ברירת מחדל)
+        } else if (filterDefaults.statusFilter === 'open') {
+          // אם ברירת המחדל היא רק "פתוח"
           if (text === 'פתוח') {
             item.classList.add('selected');
           } else {
             item.classList.remove('selected');
           }
         } else {
-          // דפים אחרים - רק "פתוח" מסומן
+          // ברירת מחדל - רק "פתוח"
           if (text === 'פתוח') {
             item.classList.add('selected');
           } else {
@@ -2622,33 +2642,54 @@ class AppHeader extends HTMLElement {
       this.updateStatusFilterText();
     }
 
-    // ניקוי פילטר הסוג - כל הסוגים מסומנים
+    // ניקוי פילטר הסוג - לפי ברירת המחדל
     const typeMenu = this.shadowRoot.getElementById('typeFilterMenu');
     if (typeMenu) {
       typeMenu.querySelectorAll('.type-filter-item').forEach(item => {
-        item.classList.add('selected');
+        if (filterDefaults.typeFilter === 'all') {
+          // אם ברירת המחדל היא "כל הסוגים"
+          item.classList.add('selected');
+        } else {
+          // ברירת מחדל - כל הסוגים
+          item.classList.add('selected');
+        }
       });
       this.updateTypeFilterText();
     }
 
-    // ניקוי פילטר החשבונות - כל החשבונות מסומנים
+    // ניקוי פילטר החשבונות - לפי ברירת המחדל
     const accountMenu = this.shadowRoot.getElementById('accountFilterMenu');
     if (accountMenu) {
       accountMenu.querySelectorAll('.account-filter-item').forEach(item => {
-        item.classList.add('selected');
+        if (filterDefaults.accountFilter === 'all') {
+          // אם ברירת המחדל היא "כל החשבונות"
+          item.classList.add('selected');
+        } else {
+          // ברירת מחדל - כל החשבונות
+          item.classList.add('selected');
+        }
       });
       this.updateAccountFilterText();
     }
 
-    // ניקוי פילטר טווח תאריכים - רק "כל זמן" מסומן
+    // ניקוי פילטר טווח תאריכים - לפי ברירת המחדל
     const dateRangeMenu = this.shadowRoot.getElementById('dateRangeFilterMenu');
     if (dateRangeMenu) {
       dateRangeMenu.querySelectorAll('.date-range-filter-item').forEach(item => {
         const text = item.querySelector('.option-text').textContent;
-        if (text === 'כל זמן') {
+        if (filterDefaults.dateRangeFilter === 'all' && text === 'כל זמן') {
+          // אם ברירת המחדל היא "כל זמן"
+          item.classList.add('selected');
+        } else if (filterDefaults.dateRangeFilter !== 'all' && text === filterDefaults.dateRangeFilter) {
+          // אם יש ברירת מחדל ספציפית
           item.classList.add('selected');
         } else {
-          item.classList.remove('selected');
+          // ברירת מחדל - "כל זמן"
+          if (text === 'כל זמן') {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
         }
       });
       this.updateDateRangeFilterText();
@@ -2657,24 +2698,44 @@ class AppHeader extends HTMLElement {
       this.closeDateRangeFilter();
     }
 
-    // ניקוי שדה החיפוש
+    // ניקוי שדה החיפוש - לפי ברירת המחדל
     const searchInput = this.shadowRoot.getElementById('searchFilterInput');
     if (searchInput) {
-      searchInput.value = '';
+      searchInput.value = filterDefaults.searchFilter || '';
       this.toggleSearchClearButton();
     }
 
-    // ניקוי הפילטרים השמורים ב-localStorage
+    // שמירת ברירות המחדל ב-localStorage
     try {
-      // מחיקת הפילטרים לפי שם הדף
+      // מחיקת הפילטרים הישנים
       localStorage.removeItem(`${pageName}FilterStatuses`);
       localStorage.removeItem(`${pageName}FilterTypes`);
       localStorage.removeItem(`${pageName}FilterAccounts`);
       localStorage.removeItem(`${pageName}FilterDateRanges`);
       localStorage.removeItem(`${pageName}FilterSearch`);
-      console.log(`All saved filters cleared from localStorage for ${pageName}`);
+
+      // שמירת ברירות המחדל
+      if (filterDefaults.statusFilter === 'all') {
+        localStorage.setItem(`${pageName}FilterStatuses`, JSON.stringify(['פתוח', 'סגור', 'מבוטל']));
+      } else if (filterDefaults.statusFilter === 'open') {
+        localStorage.setItem(`${pageName}FilterStatuses`, JSON.stringify(['פתוח']));
+      }
+
+      if (filterDefaults.typeFilter === 'all') {
+        localStorage.setItem(`${pageName}FilterTypes`, JSON.stringify(['סווינג', 'השקעה', 'פאסיבי']));
+      }
+
+      if (filterDefaults.dateRangeFilter === 'all') {
+        localStorage.setItem(`${pageName}FilterDateRanges`, JSON.stringify(['כל זמן']));
+      }
+
+      if (filterDefaults.searchFilter) {
+        localStorage.setItem(`${pageName}FilterSearch`, filterDefaults.searchFilter);
+      }
+
+      console.log(`Filter defaults saved to localStorage for ${pageName}:`, filterDefaults);
     } catch (error) {
-      console.error('Error clearing filters from localStorage:', error);
+      console.error('Error saving filter defaults to localStorage:', error);
     }
 
     // עדכון הפילטרים

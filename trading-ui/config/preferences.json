@@ -3,6 +3,7 @@
     "primaryCurrency": "USD",
     "defaultStopLoss": 10,
     "defaultTargetPrice": 10,
+    "timezone": "Asia/Jerusalem",
     "filterDefaults": {
       "statusFilter": "all",
       "typeFilter": "all", 
@@ -15,6 +16,7 @@
     "primaryCurrency": "USD",
     "defaultStopLoss": 10,
     "defaultTargetPrice": 10,
+    "timezone": "Asia/Jerusalem",
     "filterDefaults": {
       "statusFilter": "all",
       "typeFilter": "all",

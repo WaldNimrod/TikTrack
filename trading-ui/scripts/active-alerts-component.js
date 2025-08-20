@@ -9,12 +9,34 @@ class ActiveAlertsComponent extends HTMLElement {
     super();
     this.alerts = [];
     this.isLoading = false;
+    this._checkAttempts = 0;
+    this._functionsChecked = false;
+    this._checkTimeout = null;
   }
 
   connectedCallback() {
     this.render();
     this.checkGlobalFunctions();
     this.loadActiveAlerts();
+
+    // ניקוי הודעות קונסולה ישנות אחרי 10 שניות (רק אם יש הרבה הודעות)
+    setTimeout(() => {
+      // בדיקה אם יש הרבה הודעות בקונסולה
+      if (this._checkAttempts > 3) {
+        console.log('🧹 Clearing console messages to reduce clutter...');
+        if (console.clear) {
+          console.clear();
+        }
+      }
+    }, 10000);
+  }
+
+  disconnectedCallback() {
+    // ניקוי timeout אם הקומפוננטה מוסרת
+    if (this._checkTimeout) {
+      clearTimeout(this._checkTimeout);
+      this._checkTimeout = null;
+    }
   }
 
   render() {
@@ -41,19 +63,49 @@ class ActiveAlertsComponent extends HTMLElement {
    * בדיקת זמינות פונקציות גלובליות
    */
   checkGlobalFunctions() {
+    // בדיקה אם כבר בדקנו ופונקציות זמינות
+    if (this._functionsChecked) {
+      return;
+    }
+
     console.log('🔍 === CHECKING GLOBAL FUNCTIONS (ACTIVE ALERTS COMPONENT) ===');
     console.log('🔍 formatAlertCondition available:', typeof window.formatAlertCondition);
     console.log('🔍 parseAlertCondition available:', typeof window.parseAlertCondition);
 
-    if (!window.formatAlertCondition) {
-      console.warn('⚠️ formatAlertCondition not available globally - using local version');
-      // ניסיון לטעון שוב אחרי זמן קצר
-      setTimeout(() => this.checkGlobalFunctions(), 1000);
+    // בדיקה אם שתי הפונקציות זמינות
+    if (window.formatAlertCondition && window.parseAlertCondition) {
+      console.log('✅ All global functions are available');
+      this._functionsChecked = true;
+      // ניקוי timeout אם יש אחד פעיל
+      if (this._checkTimeout) {
+        clearTimeout(this._checkTimeout);
+        this._checkTimeout = null;
+      }
+      return;
     }
-    if (!window.parseAlertCondition) {
-      console.warn('⚠️ parseAlertCondition not available globally - using local version');
-      // ניסיון לטעון שוב אחרי זמן קצר
-      setTimeout(() => this.checkGlobalFunctions(), 1000);
+
+    // אם הפונקציות לא זמינות, ננסה שוב רק אם לא ניסינו יותר מדי פעמים
+    if (!this._checkAttempts) {
+      this._checkAttempts = 0;
+    }
+
+    if (this._checkAttempts < 5) { // מקסימום 5 ניסיונות
+      this._checkAttempts++;
+      console.warn(`⚠️ Global functions not available (attempt ${this._checkAttempts}/5) - retrying in 2 seconds`);
+      this._checkTimeout = setTimeout(() => {
+        // בדיקה אם הקומפוננטה עדיין מחוברת
+        if (this.isConnected) {
+          this.checkGlobalFunctions();
+        }
+      }, 2000);
+    } else {
+      console.warn('⚠️ Global functions not available after 5 attempts - using local versions');
+      this._functionsChecked = true;
+      // ניקוי timeout אם יש אחד פעיל
+      if (this._checkTimeout) {
+        clearTimeout(this._checkTimeout);
+        this._checkTimeout = null;
+      }
     }
   }
 
@@ -371,8 +423,18 @@ customElements.define('active-alerts', ActiveAlertsComponent);
 window.updateActiveAlertsComponent = function () {
   const components = document.querySelectorAll('active-alerts');
   components.forEach(component => {
-    if (component.checkGlobalFunctions) {
+    if (component.checkGlobalFunctions && !component._functionsChecked) {
       component.checkGlobalFunctions();
     }
   });
 };
+
+// האזנה לשינויים בפונקציות הגלובליות
+window.addEventListener('load', () => {
+  // בדיקה אם הפונקציות זמינות אחרי טעינת הדף
+  setTimeout(() => {
+    if (window.formatAlertCondition && window.parseAlertCondition) {
+      window.updateActiveAlertsComponent();
+    }
+  }, 1000);
+});

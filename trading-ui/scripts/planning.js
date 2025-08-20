@@ -126,19 +126,20 @@ async function loadDesignsData() {
 
         console.log(`✅ נטענו ${designs.length} תכנונים`);
 
-        // עדכון המשתנה הגלובלי
-        designsData = designs.map(design => ({
-            id: design.id,
-            ticker: design.ticker_symbol || design.ticker,
-            date: design.created_at || design.date,
-            type: design.investment_type || design.type,
-            side: design.side,
-            amount: design.planned_amount || design.amount,
-            target: design.target_price || design.target,
-            stop: design.stop_price || design.stop,
-            current: design.current_price || design.current,
-            status: design.status
-        }));
+        // עדכון המשתנה הגלובלי - שימוש בשדות המקוריים מהשרת
+        designsData = designs;
+
+        // לוג לדיבוג - בדיקת הנתונים הראשונים
+        if (designsData.length > 0) {
+            console.log('🔄 First design data structure:', {
+                id: designsData[0].id,
+                created_at: designsData[0].created_at,
+                investment_type: designsData[0].investment_type,
+                status: designsData[0].status,
+                ticker: designsData[0].ticker,
+                side: designsData[0].side
+            });
+        }
 
         // החלת פילטרים על הנתונים
         let filteredDesigns = [...designsData];
@@ -309,22 +310,65 @@ function updateDesignsTable(designs) {
             return '';
         }
 
-        const statusClass = getStatusClass(design.status);
-        const typeClass = getTypeClass(design.type);
+        // לוג לדיבוג
+        console.log('🔄 Processing design for table:', {
+            id: design.id,
+            ticker: design.ticker,
+            tickerSymbol: design.ticker?.symbol,
+            tickerName: design.ticker?.name,
+            investmentType: design.investment_type,
+            status: design.status,
+            side: design.side,
+            created_at: design.created_at
+        });
 
-        const date = design.date ? new Date(design.date).toLocaleDateString('he-IL') : 'לא מוגדר';
-        const typeDisplay = getTypeDisplay(design.type);
+        const statusClass = getStatusClass(design.status);
+        const typeClass = getTypeClass(design.investment_type);
+
+        // תיקון תאריך - המרה לפורמט עברי
+        let dateDisplay = 'לא מוגדר';
+        console.log('🔄 Processing date for design:', design.id, 'created_at:', design.created_at, 'type:', typeof design.created_at);
+
+        if (design.created_at) {
+            try {
+                const dateObj = new Date(design.created_at);
+                console.log('🔄 Date object created:', dateObj, 'isValid:', !isNaN(dateObj.getTime()));
+
+                if (!isNaN(dateObj.getTime())) {
+                    dateDisplay = dateObj.toLocaleDateString('he-IL');
+                    console.log('🔄 Date conversion successful:', {
+                        original: design.created_at,
+                        dateObj: dateObj,
+                        display: dateDisplay
+                    });
+                } else {
+                    console.error('Invalid date:', design.created_at);
+                }
+            } catch (error) {
+                console.error('Error parsing date:', design.created_at, error);
+            }
+        } else {
+            console.log('🔄 No created_at field for design:', design.id);
+        }
+
+        // תיקון סוג - וידוא שהפונקציה מקבלת ערך תקין
+        console.log('🔄 Processing type for design:', design.id, 'investment_type:', design.investment_type, 'type:', typeof design.investment_type);
+        const typeDisplay = design.investment_type ? getTypeDisplay(design.investment_type) : 'לא מוגדר';
+        console.log('🔄 Type display result:', typeDisplay);
         const sideDisplay = design.side === 'Long' ? 'Long' : 'Short';
-        const amountDisplay = formatCurrency(design.amount);
-        const targetDisplay = formatCurrency(design.target);
-        const stopDisplay = formatCurrency(design.stop);
-        const currentDisplay = formatCurrency(design.current);
+        const amountDisplay = formatCurrency(design.planned_amount);
+        const targetDisplay = formatCurrency(design.target_price);
+        const stopDisplay = formatCurrency(design.stop_price);
+        const currentDisplay = formatCurrency(design.current || 0);
         const statusDisplay = getStatusDisplay(design.status);
+
+        // הצגת ticker symbol או שם
+        const tickerDisplay = design.ticker ? (design.ticker.symbol || design.ticker.name || 'לא מוגדר') : 'לא מוגדר';
 
         return `
       <tr>
-        <td><span class="ticker-text">${design.ticker}</span></td>
-        <td><span class="date-text">${date}</span></td>
+        <td><span class="ticker-text">${tickerDisplay}</span></td>
+        <td><span class="date-text">${dateDisplay}</span></td>
         <td><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
         <td><span class="side-badge ${design.side.toLowerCase()}">${sideDisplay}</span></td>
         <td><span class="amount-text">${amountDisplay}</span></td>
@@ -471,15 +515,16 @@ async function saveNewTradePlan() {
     }
 
     const formData = {
-        ticker_id: document.getElementById('addTradePlanTickerId').value,
+        account_id: 1, // ברירת מחדל לחשבון ראשי
+        ticker_id: parseInt(document.getElementById('addTradePlanTickerId').value),
         investment_type: document.getElementById('addTradePlanInvestmentType').value,
         side: document.getElementById('addTradePlanSide').value,
-        planned_amount: parseFloat(document.getElementById('addTradePlanPlannedAmount').value),
+        planned_amount: parseFloat(document.getElementById('addTradePlanPlannedAmount').value) || 0,
         stop_price: parseFloat(document.getElementById('addTradePlanStopPrice').value) || null,
         target_price: parseFloat(document.getElementById('addTradePlanTargetPrice').value) || null,
-        entry_conditions: document.getElementById('addTradePlanEntryConditions').value,
-        reasons: document.getElementById('addTradePlanReasons').value,
-        created_at: document.getElementById('addTradePlanDate').value
+        entry_conditions: document.getElementById('addTradePlanEntryConditions').value || '',
+        reasons: document.getElementById('addTradePlanReasons').value || '',
+        status: 'open' // ברירת מחדל לסטטוס פתוח
     };
 
     console.log('שולח תכנון חדש:', formData);
@@ -492,6 +537,19 @@ async function saveNewTradePlan() {
             },
             body: JSON.stringify(formData)
         });
+
+        // לוג מפורט של התגובה
+        console.log('תגובת השרת:', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('תגובת שגיאה מהשרת:', errorText);
+            throw new Error(`שגיאה בשמירת תכנון: ${response.status} - ${errorText}`);
+        }
 
         if (response.ok) {
             const newDesign = await response.json();
@@ -592,11 +650,47 @@ function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
 }
 
 /**
- * מיון טבלה
+ * פונקציה לסידור הטבלה
+ * 
+ * פונקציה זו משתמשת במערכת הסידור הגלובלית מ-main.js
+ * כדי לסדר את טבלת התכנונים לפי העמודה הנבחרת.
+ * 
+ * הפונקציה:
+ * - משתמשת ב-sortTableData הגלובלית
+ * - מעדכנת את הנתונים המסוננים
+ * - שומרת את מצב הסידור ב-localStorage
+ * 
+ * @param {number} columnIndex - אינדקס העמודה לסידור (0-8)
+ * 
+ * @example
+ * sortTable(0); // סידור לפי עמודת נכס
+ * sortTable(1); // סידור לפי עמודת תאריך
+ * sortTable(8); // סידור לפי עמודת סטטוס
+ * 
+ * @requires window.sortTableData - פונקציה גלובלית מ-main.js
+ * @requires window.filteredDesignsData - נתונים מסוננים
+ * @requires designsData - נתונים מקוריים
+ * @requires updateDesignsTable - פונקציה לעדכון הטבלה
+ * 
+ * @since 2.0
  */
 function sortTable(columnIndex) {
-    console.log(`מיון לפי עמודה ${columnIndex}`);
-    // פונקציה זו תתווסף בהמשך
+    console.log(`🔄 מיון טבלת תכנונים לפי עמודה ${columnIndex}`);
+
+    // שימוש בפונקציה הגלובלית
+    if (typeof window.sortTableData === 'function') {
+        const sortedData = window.sortTableData(
+            columnIndex,
+            window.filteredDesignsData || designsData,
+            'planning',
+            updateDesignsTable
+        );
+
+        // עדכון הנתונים המסוננים
+        window.filteredDesignsData = sortedData;
+    } else {
+        console.error('❌ sortTableData function not found in main.js');
+    }
 }
 
 /**
@@ -1203,7 +1297,43 @@ if (typeof window.toggleTopSection !== 'function') {
 
 if (typeof window.toggleMainSection !== 'function') {
     window.toggleMainSection = function () {
-        console.warn('toggleMainSection fallback called - main.js may not be loaded properly');
+        console.log('🔄 toggleMainSection fallback נקראה');
+        const contentSections = document.querySelectorAll('.content-section');
+        console.log('📋 מספר content-sections נמצא:', contentSections.length);
+        const planningSection = contentSections[0]; // הסקשן הראשון - תכנונים
+
+        if (!planningSection) {
+            console.error('❌ לא נמצא סקשן תכנונים');
+            return;
+        }
+        console.log('✅ סקשן תכנונים נמצא:', planningSection);
+
+        const sectionBody = planningSection.querySelector('.section-body');
+        const toggleBtn = planningSection.querySelector('button[onclick="toggleMainSection()"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+        console.log('🎯 sectionBody נמצא:', !!sectionBody);
+        console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
+        console.log('🎨 icon נמצא:', !!icon);
+
+        if (sectionBody) {
+            const isCollapsed = sectionBody.style.display === 'none';
+            console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
+
+            if (isCollapsed) {
+                sectionBody.style.display = 'block';
+            } else {
+                sectionBody.style.display = 'none';
+            }
+
+            // עדכון האייקון
+            if (icon) {
+                icon.textContent = isCollapsed ? '▲' : '▼';
+            }
+
+            // שמירת המצב ב-localStorage
+            localStorage.setItem('planningSectionCollapsed', !isCollapsed);
+        }
     };
 }
 
@@ -1235,6 +1365,11 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(() => {
         updateFilterDebugPanel();
     }, 1000);
+
+    // טעינת מצב המיון
+    if (typeof window.loadSortState === 'function') {
+        window.loadSortState('planning');
+    }
 });
 
 // הפונקציה updateGridFromComponent כבר מוגדרת בתחילת הקובץ

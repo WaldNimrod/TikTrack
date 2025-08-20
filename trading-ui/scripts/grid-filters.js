@@ -830,3 +830,11 @@ if (typeof window.updateAccountFilterMenu === 'function') {
 } else {
   console.log('❌ updateAccountFilterMenu is NOT available');
 }
+
+// ניקוי הודעות קונסולה אחרי זמן קצר
+setTimeout(() => {
+  console.log('🧹 Clearing console messages to reduce clutter...');
+  if (console.clear) {
+    console.clear();
+  }
+}, 8000);

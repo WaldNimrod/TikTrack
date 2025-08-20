@@ -1520,3 +1520,11 @@ console.log('- showEditAccountModal:', typeof window.showEditAccountModal);
 console.log('- showAddAccountModal:', typeof window.showAddAccountModal);
 console.log('- toggleMainSection:', typeof window.toggleMainSection);
 console.log('✅ === סיום בדיקת ייצוא ===');
+
+// ניקוי הודעות קונסולה אחרי זמן קצר
+setTimeout(() => {
+  console.log('🧹 Clearing console messages to reduce clutter...');
+  if (console.clear) {
+    console.clear();
+  }
+}, 15000);

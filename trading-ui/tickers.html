@@ -516,6 +516,46 @@
       </div>
     </div>
 
+    <!-- Linked Items Modal -->
+    <div class="modal fade" id="linkedItemsModal" tabindex="-1" aria-labelledby="linkedItemsModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="linkedItemsModalLabel">לא ניתן למחוק טיקר עם פריטים מקושרים</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-warning">
+              <strong>⚠️ לא ניתן למחוק את הטיקר <span id="linkedTickerName"></span></strong>
+              <br>
+              הטיקר מקושר לפריטים הבאים במערכת. יש לטפל בהם תחילה:
+            </div>
+
+            <div id="linkedItemsContent">
+              <!-- תוכן הפריטים המקושרים יוצג כאן -->
+            </div>
+
+            <div class="alert alert-info mt-3">
+              <strong>💡 מה ניתן לעשות:</strong>
+              <ul class="mb-0">
+                <li>סגור או בטל את כל הטריידים הפתוחים</li>
+                <li>סגור או בטל את כל התכנונים הפתוחים</li>
+                <li>מחק את כל ההתראות הקשורות לטיקר</li>
+                <li>מחק את כל ההערות הקשורות לטיקר</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+            <button type="button" class="btn btn-primary" onclick="goToLinkedItems()">
+              עבור לניהול פריטים
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

@@ -70,7 +70,7 @@
         <!-- כותרת ראשית -->
         <div class="section-header">
           <div class="table-title">
-            📋 כותרת ראשית
+            📋 הערות
           </div>
           <div class="table-actions">
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור הערות">
@@ -101,7 +101,7 @@
           <!-- כותרת הערות -->
           <div class="section-header">
             <div class="table-title">
-              📋 כותרת הסקשן
+              📋 ההערות שלי
             </div>
             <div class="table-count">9 הערות</div>
             <div class="table-actions">
@@ -153,6 +153,150 @@
 
     <!-- מרווח בתחתית הדף -->
     <div class="bottom-spacer"></div>
+
+    <!-- מערכת התראות -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Add Note Modal -->
+    <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addNoteModalLabel">הוספת הערה</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="addNoteForm">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label class="form-label">הערה עבור:</label>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="radio-group-item">
+                          <input type="radio" name="noteRelationType" id="noteRelationTradePlan" value="3" required onchange="onNoteRelationTypeChange()">
+                          <label for="noteRelationTradePlan">תוכנית טרייד</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="noteRelationType" id="noteRelationTrade" value="2" required onchange="onNoteRelationTypeChange()">
+                          <label for="noteRelationTrade">טרייד</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="noteRelationType" id="noteRelationAccount" value="1" required onchange="onNoteRelationTypeChange()">
+                          <label for="noteRelationAccount">חשבון</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="noteRelationType" id="noteRelationTicker" value="4" required onchange="onNoteRelationTypeChange()">
+                          <label for="noteRelationTicker">טיקר</label>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <select class="form-select" id="noteRelatedObjectSelect" style="width: 100%;" required>
+                          <option value="">בחר אובייקט לשיוך...</option>
+                        </select>
+                        <div class="invalid-feedback" id="relatedObjectError"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="noteContent" class="form-label">תוכן הערה <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="noteContent" rows="4" required placeholder="הכנס את תוכן ההערה כאן..."></textarea>
+                    <div class="invalid-feedback" id="contentError"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="noteAttachment" class="form-label">קובץ מצורף</label>
+                    <input type="file" class="form-control" id="noteAttachment" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+            <button type="button" class="btn btn-primary" onclick="saveNote()">שמור הערה</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Note Modal -->
+    <div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editNoteModalLabel">עריכת הערה</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="editNoteForm">
+              <input type="hidden" id="editNoteId">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label class="form-label">הערה עבור:</label>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="radio-group-item">
+                          <input type="radio" name="editNoteRelationType" id="editNoteRelationTradePlan" value="3" required onchange="onNoteRelationTypeChange()">
+                          <label for="editNoteRelationTradePlan">תוכנית טרייד</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="editNoteRelationType" id="editNoteRelationTrade" value="2" required onchange="onNoteRelationTypeChange()">
+                          <label for="editNoteRelationTrade">טרייד</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="editNoteRelationType" id="editNoteRelationAccount" value="1" required onchange="onNoteRelationTypeChange()">
+                          <label for="editNoteRelationAccount">חשבון</label>
+                        </div>
+                        <div class="radio-group-item">
+                          <input type="radio" name="editNoteRelationType" id="editNoteRelationTicker" value="4" required onchange="onNoteRelationTypeChange()">
+                          <label for="editNoteRelationTicker">טיקר</label>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <select class="form-select" id="editNoteRelatedObjectSelect" style="width: 100%;" required>
+                          <option value="">בחר אובייקט לשיוך...</option>
+                        </select>
+                        <div class="invalid-feedback" id="editRelatedObjectError"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="editNoteContent" class="form-label">תוכן הערה <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="editNoteContent" rows="4" required placeholder="הכנס את תוכן ההערה כאן..."></textarea>
+                    <div class="invalid-feedback" id="editContentError"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editNoteAttachment" class="form-label">קובץ מצורף</label>
+                    <input type="file" class="form-control" id="editNoteAttachment" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+            <button type="button" class="btn btn-primary" onclick="updateNoteFromModal()">שמור הערה</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

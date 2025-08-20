@@ -396,6 +396,17 @@
     <!-- קבצים מודולריים -->
     <script src="scripts/accounts.js"></script>
     <script src="scripts/designs.js"></script>
+
+    <!-- ניקוי הודעות קונסולה -->
+    <script>
+      // ניקוי הודעות קונסולה אחרי זמן קצר
+      setTimeout(() => {
+        console.log('🧹 Clearing console messages to reduce clutter...');
+        if (console.clear) {
+          console.clear();
+        }
+      }, 25000);
+    </script>
 </body>
 
 </html>

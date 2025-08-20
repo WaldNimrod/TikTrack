@@ -1960,6 +1960,14 @@ console.log('✅ Global toggle functions loaded and ready:', {
   restoreAllSectionStates: typeof window.restoreAllSectionStates
 });
 
+// ניקוי הודעות קונסולה אחרי זמן קצר
+setTimeout(() => {
+  console.log('🧹 Clearing console messages to reduce clutter...');
+  if (console.clear) {
+    console.clear();
+  }
+}, 20000);
+
 // אתחול אוטומטי של הגדרות תצוגה בדף הערות
 if (typeof window.autoResetNotesDisplay === 'function') {
   window.autoResetNotesDisplay();

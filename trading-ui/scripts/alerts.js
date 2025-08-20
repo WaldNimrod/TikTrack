@@ -1486,4 +1486,12 @@ window.parseAlertCondition = parseAlertCondition;
 
 // פונקציות התראה מיובאות מ-main.js - אין צורך בייצוא כפול
 
+// ניקוי הודעות קונסולה אחרי זמן קצר
+setTimeout(() => {
+  console.log('🧹 Clearing console messages to reduce clutter...');
+  if (console.clear) {
+    console.clear();
+  }
+}, 18000);
+
 

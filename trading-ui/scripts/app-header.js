@@ -1679,6 +1679,13 @@ class AppHeader extends HTMLElement {
           window.refreshAccountFilterMenu();
         } else {
           console.log('🔄 No account functions available');
+          // ניסיון נוסף אחרי זמן קצר
+          setTimeout(() => {
+            if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
+              console.log('🔄 Retrying account filter menu update...');
+              window.updateAccountFilterMenu(window.accountsData);
+            }
+          }, 2000);
         }
       }, 1000);
 
@@ -1750,6 +1757,22 @@ class AppHeader extends HTMLElement {
       setTimeout(() => {
         this.updateGridFilter();
       }, 500);
+
+      // בדיקה נוספת אחרי טעינת הדף
+      setTimeout(() => {
+        if (typeof window.updateAccountFilterMenu === 'function' && window.accountsData) {
+          console.log('🔄 Late account filter menu update...');
+          window.updateAccountFilterMenu(window.accountsData);
+        }
+      }, 3000);
+
+      // ניקוי הודעות קונסולה אחרי זמן קצר
+      setTimeout(() => {
+        console.log('🧹 Clearing console messages to reduce clutter...');
+        if (console.clear) {
+          console.clear();
+        }
+      }, 10000);
     }, 100);
   }
 

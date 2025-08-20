@@ -1,8 +1,10 @@
 // ===== קובץ JavaScript לדף טיקרים =====
 
 // משתנים גלובליים
-let tickersData = [];
-window.tickersData = tickersData;
+if (!window.tickersData) {
+    window.tickersData = [];
+}
+let tickersData = window.tickersData;
 
 // פונקציות בסיסיות
 function openTickerDetails(id) {
@@ -308,7 +310,7 @@ async function saveTicker() {
 
         console.log('📤 שליחת נתונים:', tickerData);
 
-        const response = await fetch('/api/tickers', {
+        const response = await fetch('/api/v1/tickers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -374,7 +376,7 @@ async function updateTicker() {
 
         console.log('📤 שליחת נתונים לעדכון:', tickerData);
 
-        const response = await fetch(`/api/tickers/${id}`, {
+        const response = await fetch(`/api/v1/tickers/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -417,7 +419,7 @@ async function confirmDeleteTicker() {
     const id = document.getElementById('deleteTickerId').value;
 
     try {
-        const response = await fetch(`/api/tickers/${id}`, {
+        const response = await fetch(`/api/v1/tickers/${id}`, {
             method: 'DELETE'
         });
 
@@ -435,15 +437,389 @@ async function confirmDeleteTicker() {
             await loadTickersData();
 
         } else {
-            const error = await response.text();
-            console.error('❌ שגיאה במחיקת טיקר:', error);
-            showNotification('❌ שגיאה במחיקת טיקר: ' + error, 'error');
+            const errorResponse = await response.text();
+            console.error('❌ שגיאה במחיקת טיקר:', errorResponse);
+
+            try {
+                const errorData = JSON.parse(errorResponse);
+
+                // בדיקה אם השגיאה קשורה לפריטים מקושרים
+                if (errorData.error && errorData.error.message &&
+                    errorData.error.message.includes('linked items')) {
+
+                    // סגירת מודל המחיקה הרגיל
+                    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteTickerModal'));
+                    deleteModal.hide();
+
+                    // הצגת מודל הפריטים המקושרים
+                    await showLinkedItemsModal(id, errorData);
+                    return;
+                }
+
+                showNotification('❌ שגיאה במחיקת טיקר: ' + errorData.error.message, 'error');
+
+            } catch (parseError) {
+                showNotification('❌ שגיאה במחיקת טיקר: ' + errorResponse, 'error');
+            }
         }
 
     } catch (error) {
         console.error('❌ שגיאה במחיקת טיקר:', error);
         showNotification('❌ שגיאה במחיקת טיקר', 'error');
     }
+}
+
+// ========================================
+// פונקציות מודל פריטים מקושרים
+// ========================================
+
+/**
+ * הצגת מודל פריטים מקושרים
+ */
+async function showLinkedItemsModal(tickerId, errorData) {
+    console.log('🔄 הצגת מודל פריטים מקושרים לטיקר:', tickerId);
+
+    // מציאת הטיקר לפי ID
+    const ticker = tickersData.find(t => t.id == tickerId);
+    if (!ticker) {
+        showNotification('❌ טיקר לא נמצא', 'error');
+        return;
+    }
+
+    // עדכון שם הטיקר
+    document.getElementById('linkedTickerName').textContent = `${ticker.symbol} - ${ticker.name}`;
+
+    // טעינת פרטי הפריטים המקושרים
+    await loadLinkedItemsDetails(tickerId);
+
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'));
+    modal.show();
+}
+
+/**
+ * טעינת פרטי הפריטים המקושרים
+ */
+async function loadLinkedItemsDetails(tickerId) {
+    console.log('🔄 טעינת פרטי פריטים מקושרים לטיקר:', tickerId);
+
+    const contentDiv = document.getElementById('linkedItemsContent');
+    contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><br>טוען פרטים...</div>';
+
+    try {
+        // קריאה ל-API לקבלת פרטי הפריטים המקושרים
+        const response = await fetch(`/api/v1/tickers/${tickerId}/linked-items`);
+
+        if (response.ok) {
+            const data = await response.json();
+            displayLinkedItems(data.data);
+        } else {
+            // אם אין API ספציפי, ננסה לטעון מכל ה-APIs
+            await loadLinkedItemsFromMultipleSources(tickerId);
+        }
+
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת פריטים מקושרים:', error);
+        // אם יש שגיאה, ננסה לטעון מכל ה-APIs
+        await loadLinkedItemsFromMultipleSources(tickerId);
+    }
+}
+
+/**
+ * טעינת פריטים מקושרים ממקורות מרובים
+ */
+async function loadLinkedItemsFromMultipleSources(tickerId) {
+    console.log('🔄 טעינת פריטים מקושרים ממקורות מרובים');
+
+    const ticker = tickersData.find(t => t.id == tickerId);
+    if (!ticker) return;
+
+    const linkedItems = {
+        open_trades: [],
+        open_trade_plans: [],
+        alerts: [],
+        notes: []
+    };
+
+    try {
+        // טעינת טריידים
+        try {
+            const tradesResponse = await fetch('/api/v1/trades');
+            if (tradesResponse.ok) {
+                const tradesData = await tradesResponse.json();
+                const trades = tradesData.data || tradesData;
+                linkedItems.open_trades = trades.filter(trade =>
+                    trade.ticker_symbol === ticker.symbol &&
+                    (trade.status === 'open' || trade.status === 'pending')
+                );
+            }
+        } catch (e) { console.warn('לא ניתן לטעון טריידים:', e); }
+
+        // טעינת תכנונים
+        try {
+            const plansResponse = await fetch('/api/v1/trade_plans');
+            if (plansResponse.ok) {
+                const plansData = await plansResponse.json();
+                const plans = plansData.data || plansData;
+                linkedItems.trade_plans = plans.filter(plan =>
+                    plan.ticker_symbol === ticker.symbol &&
+                    (plan.status === 'open' || plan.status === 'pending')
+                );
+            }
+        } catch (e) { console.warn('לא ניתן לטעון תכנונים:', e); }
+
+        // טעינת התראות
+        try {
+            const alertsResponse = await fetch('/api/v1/alerts');
+            if (alertsResponse.ok) {
+                const alertsData = await alertsResponse.json();
+                const alerts = alertsData.data || alertsData;
+                linkedItems.alerts = alerts.filter(alert =>
+                    alert.related_type_id === 4 && alert.related_id == tickerId &&
+                    alert.status === 'active'
+                );
+            }
+        } catch (e) { console.warn('לא ניתן לטעון התראות:', e); }
+
+        // טעינת הערות
+        try {
+            const notesResponse = await fetch('/api/v1/notes');
+            if (notesResponse.ok) {
+                const notesData = await notesResponse.json();
+                const notes = notesData.data || notesData;
+                linkedItems.notes = notes.filter(note =>
+                    note.related_type_id === 4 && note.related_id == tickerId
+                );
+            }
+        } catch (e) { console.warn('לא ניתן לטעון הערות:', e); }
+
+        displayLinkedItems(linkedItems);
+
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת פריטים מקושרים:', error);
+        document.getElementById('linkedItemsContent').innerHTML =
+            '<div class="alert alert-danger">שגיאה בטעינת פרטי הפריטים המקושרים</div>';
+    }
+}
+
+/**
+ * הצגת הפריטים המקושרים
+ */
+function displayLinkedItems(linkedItems) {
+    console.log('🔄 הצגת פריטים מקושרים:', linkedItems);
+
+    const contentDiv = document.getElementById('linkedItemsContent');
+    let html = '';
+
+    // טריידים פתוחים
+    if (linkedItems.open_trades && linkedItems.open_trades.length > 0) {
+        html += `
+            <div class="card mb-3">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">🔄 טריידים פתוחים (${linkedItems.open_trades.length})</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>מזהה</th>
+                                    <th>חשבון</th>
+                                    <th>סוג</th>
+                                    <th>סטטוס</th>
+                                    <th>תאריך פתיחה</th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${linkedItems.open_trades.map(trade => `
+                                    <tr>
+                                        <td>${trade.id}</td>
+                                        <td>${trade.account_name || 'לא זמין'}</td>
+                                        <td>${trade.type}</td>
+                                        <td><span class="badge bg-warning">${trade.status}</span></td>
+                                        <td>${formatDate(trade.created_at)}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="goToTrade(${trade.id})">
+                                                עבור לטרייד
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // תכנונים פתוחים
+    if (linkedItems.open_trade_plans && linkedItems.open_trade_plans.length > 0) {
+        html += `
+            <div class="card mb-3">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">📋 תכנונים פתוחים (${linkedItems.open_trade_plans.length})</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>מזהה</th>
+                                    <th>סוג השקעה</th>
+                                    <th>סטטוס</th>
+                                    <th>תאריך יצירה</th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${linkedItems.open_trade_plans.map(plan => `
+                                    <tr>
+                                        <td>${plan.id}</td>
+                                        <td>${plan.investment_type}</td>
+                                        <td><span class="badge bg-info">${plan.status}</span></td>
+                                        <td>${formatDate(plan.created_at)}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="goToPlan(${plan.id})">
+                                                עבור לתכנון
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // התראות פעילות
+    if (linkedItems.alerts && linkedItems.alerts.length > 0) {
+        html += `
+            <div class="card mb-3">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0">🚨 התראות פעילות (${linkedItems.alerts.length})</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>מזהה</th>
+                                    <th>סוג התראה</th>
+                                    <th>תנאי</th>
+                                    <th>סטטוס</th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${linkedItems.alerts.map(alert => `
+                                    <tr>
+                                        <td>${alert.id}</td>
+                                        <td>${alert.alert_type}</td>
+                                        <td>${alert.condition || 'לא זמין'}</td>
+                                        <td><span class="badge bg-danger">${alert.status}</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="goToAlert(${alert.id})">
+                                                עבור להתראה
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // הערות
+    if (linkedItems.notes && linkedItems.notes.length > 0) {
+        html += `
+            <div class="card mb-3">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">📝 הערות (${linkedItems.notes.length})</h6>
+            </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>מזהה</th>
+                                    <th>תוכן</th>
+                                    <th>תאריך יצירה</th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${linkedItems.notes.map(note => `
+                                    <tr>
+                                        <td>${note.id}</td>
+                                        <td>${note.content ? note.content.substring(0, 50) + '...' : 'ללא תוכן'}</td>
+                                        <td>${formatDate(note.created_at)}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="goToNote(${note.id})">
+                                                עבור להערה
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+        </div>
+                </div>
+        </div>
+    `;
+    }
+
+    if (!html) {
+        html = '<div class="alert alert-success">✅ לא נמצאו פריטים מקושרים פתוחים. ניתן למחוק את הטיקר בבטחה.</div>';
+    }
+
+    contentDiv.innerHTML = html;
+}
+
+/**
+ * מעבר לניהול פריטים מקושרים
+ */
+function goToLinkedItems() {
+    // סגירת המודל
+    const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsModal'));
+    modal.hide();
+
+    // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
+    window.location.href = '/tracking'; // ברירת מחדל - דף מעקב
+}
+
+/**
+ * מעבר לטרייד ספציפי
+ */
+function goToTrade(tradeId) {
+    window.location.href = `/tracking#trade-${tradeId}`;
+}
+
+/**
+ * מעבר לתכנון ספציפי
+ */
+function goToPlan(planId) {
+    window.location.href = `/planning#plan-${planId}`;
+}
+
+/**
+ * מעבר להתראה ספציפית
+ */
+function goToAlert(alertId) {
+    window.location.href = `/alerts#alert-${alertId}`;
+}
+
+/**
+ * מעבר להערה ספציפית
+ */
+function goToNote(noteId) {
+    window.location.href = `/notes#note-${noteId}`;
 }
 
 // ========================================
@@ -481,7 +857,7 @@ async function loadTickersData() {
     try {
         console.log('🔄 טעינת נתוני טיקרים');
 
-        const response = await fetch('/api/tickers');
+        const response = await fetch('/api/v1/tickers');
         if (response.ok) {
             const data = await response.json();
             tickersData = data.data || data;
@@ -566,6 +942,14 @@ window.confirmDeleteTicker = confirmDeleteTicker;
 // פונקציות ולידציה
 window.validateTickerSymbol = validateTickerSymbol;
 window.validateTickerName = validateTickerName;
+
+// פונקציות מודל פריטים מקושרים
+window.showLinkedItemsModal = showLinkedItemsModal;
+window.goToLinkedItems = goToLinkedItems;
+window.goToTrade = goToTrade;
+window.goToPlan = goToPlan;
+window.goToAlert = goToAlert;
+window.goToNote = goToNote;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {

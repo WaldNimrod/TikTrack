@@ -253,11 +253,17 @@ def static_files(filename: str) -> Any:
 
 @app.route("/styles/<path:filename>")
 def styles_files(filename: str) -> Any:
-    return send_from_directory(os.path.join(UI_DIR, "styles"), filename)
+    response = send_from_directory(os.path.join(UI_DIR, "styles"), filename)
+    if filename.endswith('.css'):
+        response.headers['Content-Type'] = 'text/css; charset=utf-8'
+    return response
 
 @app.route("/scripts/<path:filename>")
 def scripts_files(filename: str) -> Any:
-    return send_from_directory(os.path.join(UI_DIR, "scripts"), filename)
+    response = send_from_directory(os.path.join(UI_DIR, "scripts"), filename)
+    if filename.endswith('.js'):
+        response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+    return response
 
 @app.route("/images/<path:filename>")
 def images_files(filename: str) -> Any:
@@ -475,87 +481,7 @@ def get_trade_plan(plan_id: int) -> Any:
 
 
 
-# API עבור טריידים
-@app.route("/api/trades")
-def get_trades() -> Any:
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    query = """
-    SELECT 
-        t.id,
-        t.account_id,
-        t.ticker_id,
-        t.trade_plan_id,
-        t.status,
-        t.type,
-        t.side,
-        t.created_at,
-        t.closed_at,
-        t.cancelled_at,
-        t.cancel_reason,
-        t.total_pl,
-        t.notes,
-        tick.symbol as ticker_symbol,
-        tick.name as ticker_name,
-        a.name as account_name
-    FROM trades t
-    JOIN tickers tick ON t.ticker_id = tick.id
-    JOIN accounts a ON t.account_id = a.id
-    ORDER BY t.created_at DESC
-    """
-    
-    cursor.execute(query)
-    rows = [dict(row) for row in cursor.fetchall()]
-    conn.close()
-    return jsonify(rows)
-
-@app.route("/api/trades", methods=["POST"])
-def create_trade() -> Any:
-    data = request.get_json()
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        # בדיקת שדות חובה
-        if not data.get('account_id') or not data.get('ticker_id'):
-            return jsonify({"status": "error", "message": "חשבון וטיקר הם שדות חובה"}), 400
-        
-        # יצירת הטרייד
-        cursor.execute("""
-            INSERT INTO trades 
-            (account_id, ticker_id, trade_plan_id, status, type, created_at, notes, cancelled_at, cancel_reason)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            data['account_id'],
-            data['ticker_id'],
-            data.get('trade_plan_id'),
-            data.get('status', 'open'),
-            data.get('type', 'buy'),
-            datetime.now().isoformat(),
-            data.get('notes', ''),
-            data.get('cancelled_at'),
-            data.get('cancel_reason')
-        ))
-        
-        trade_id = cursor.lastrowid
-        
-        # עדכון שדה active_trades של הטיקר
-        update_ticker_active_status(data['ticker_id'])
-        
-        conn.commit()
-        
-        # החזרת הטרייד החדש
-        cursor.execute("SELECT * FROM trades WHERE id = ?", (trade_id,))
-        new_trade = dict(cursor.fetchone())
-        
-        conn.close()
-        return jsonify({"status": "success", "trade": new_trade}), 201
-        
-    except Exception as e:
-        conn.rollback()
-        conn.close()
-        return jsonify({"status": "error", "message": str(e)}), 400
+# API עבור טריידים - עכשיו מוגדר ב-blueprint /api/v1/trades
 
 
 

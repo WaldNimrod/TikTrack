@@ -969,6 +969,7 @@ class AppHeader extends HTMLElement {
                   <li><a class="dropdown-item" href="/accounts">חשבונות</a></li>
                   <li><a class="dropdown-item" href="/notes">הערות</a></li>
                   <li><a class="dropdown-item" href="/alerts">התראות</a></li>
+                  <li><a class="dropdown-item" href="/tickers">תיקרים</a></li>
                   <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="/database">בסיס נתונים</a></li>
@@ -1319,8 +1320,10 @@ class AppHeader extends HTMLElement {
     const currentPath = window.location.pathname;
     let pageName = 'planning'; // ברירת מחדל
 
-    if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
+    if (currentPath.includes('/designs')) {
       pageName = 'designs';
+    } else if (currentPath.includes('/planning')) {
+      pageName = 'planning';
     } else if (currentPath.includes('/tracking')) {
       pageName = 'tracking';
     } else if (currentPath.includes('/notes')) {
@@ -2512,15 +2515,21 @@ class AppHeader extends HTMLElement {
   }
 
   handleSearchInput(event) {
-    console.log('🔴 FILTER DISABLED - handleSearchInput called but disabled');
-
-    // 🔴 הפילטר מושבת באופן זמני
-    return;
+    console.log('🟢 FILTER ENABLED - handleSearchInput called');
 
     const searchTerm = event.target.value;
     console.log('Search input changed:', searchTerm);
 
     this.toggleSearchClearButton();
+
+    // Debounce - המתנה קצרה לפני עדכון הפילטר
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.updateSearchFilter(searchTerm);
+    }, 300); // 300ms delay
+  }
+
+  updateSearchFilter(searchTerm) {
 
     // קביעת שם הדף הנוכחי
     const currentPath = window.location.pathname;
@@ -2744,8 +2753,10 @@ class AppHeader extends HTMLElement {
     const currentPath = window.location.pathname;
     let pageName = 'planning'; // ברירת מחדל
 
-    if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
+    if (currentPath.includes('/designs')) {
       pageName = 'designs';
+    } else if (currentPath.includes('/planning')) {
+      pageName = 'planning';
     } else if (currentPath.includes('/tracking')) {
       pageName = 'tracking';
     } else if (currentPath.includes('/notes')) {
@@ -2757,27 +2768,31 @@ class AppHeader extends HTMLElement {
     console.log('Current page for grid filter:', pageName);
 
     // עדכון הגריד דרך הפונקציה הגלובלית
-    if (typeof window.updateGridFromComponent === 'function') {
-      console.log('Calling updateGridFromComponent');
-      // נעביר pageName דרך הפונקציה הגלובלית הראשית כדי למנוע חוסר תאימות פרמטרים
-      if (typeof window.updateGridFromComponentGlobal === 'function') {
-        window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName);
-      } else {
-        window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedDateRange, searchTerm);
-      }
+    console.log('🔄 Available functions:', {
+      updateGridFromComponent: typeof window.updateGridFromComponent,
+      updateGridFromComponentGlobal: typeof window.updateGridFromComponentGlobal
+    });
+
+    if (typeof window.updateGridFromComponentGlobal === 'function') {
+      console.log('🔄 Calling updateGridFromComponentGlobal directly');
+      window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName);
+    } else if (typeof window.updateGridFromComponent === 'function') {
+      console.log('🔄 Calling updateGridFromComponent as fallback');
+      window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedDateRange, searchTerm);
     } else {
-      console.log('updateGridFromComponent function not found');
+      console.log('❌ No update function found, retrying...');
       // נסיון נוסף אחרי זמן קצר
       setTimeout(() => {
-        if (typeof window.updateGridFromComponent === 'function') {
-          console.log('Retrying updateGridFromComponent');
-          if (typeof window.updateGridFromComponentGlobal === 'function') {
-            window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName);
-          } else {
-            window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedDateRange, searchTerm);
-          }
+        if (typeof window.updateGridFromComponentGlobal === 'function') {
+          console.log('🔄 Retrying updateGridFromComponentGlobal');
+          window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName);
+        } else if (typeof window.updateGridFromComponent === 'function') {
+          console.log('🔄 Retrying updateGridFromComponent');
+          window.updateGridFromComponent(selectedStatuses, selectedTypes, selectedDateRange, searchTerm);
+        } else {
+          console.log('❌ Still no update function found');
         }
-      }, 100);
+      }, 500);
     }
 
     console.log('=== updateGridFilter completed ===');

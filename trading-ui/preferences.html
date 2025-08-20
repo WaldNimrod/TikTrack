@@ -947,6 +947,27 @@
                 </div>
               </div>
 
+              <!-- הגדרת אזור זמן -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">🌍</span>
+                  <div class="preference-text">
+                    <h4>אזור זמן</h4>
+                    <p>אזור הזמן שישמש לחישובי תאריכים במערכת</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <select id="timezoneSelect" class="form-select" onchange="updateTimezone(this.value)">
+                    <option value="Asia/Jerusalem">Asia/Jerusalem - ישראל</option>
+                    <option value="UTC">UTC - זמן אוניברסלי</option>
+                    <option value="America/New_York">America/New_York - ניו יורק</option>
+                    <option value="Europe/London">Europe/London - לונדון</option>
+                    <option value="Asia/Tokyo">Asia/Tokyo - טוקיו</option>
+                    <option value="Australia/Sydney">Australia/Sydney - סידני</option>
+                  </select>
+                </div>
+              </div>
+
               <!-- הגדרת סטופ ברירת מחדל -->
               <div class="preference-item">
                 <div class="preference-label">
@@ -1488,7 +1509,7 @@
             <div class="preferences-container">
               <!-- הגדרות ברירות מחדל לפילטרים -->
               <h5 style="margin-bottom: 1.5rem; color: #495057; font-weight: 600;">🔍 ברירות מחדל לפילטרים</h5>
-              
+
               <!-- פילטר סטטוס ברירת מחדל -->
               <div class="preference-item">
                 <div class="preference-label">
@@ -1499,7 +1520,8 @@
                   </div>
                 </div>
                 <div class="preference-control">
-                  <select id="defaultStatusFilterSelect" class="form-select" onchange="updateDefaultStatusFilter(this.value)">
+                  <select id="defaultStatusFilterSelect" class="form-select"
+                    onchange="updateDefaultStatusFilter(this.value)">
                     <option value="all">הכול</option>
                     <option value="open">פתוח</option>
                     <option value="closed">סגור</option>
@@ -1518,7 +1540,8 @@
                   </div>
                 </div>
                 <div class="preference-control">
-                  <select id="defaultTypeFilterSelect" class="form-select" onchange="updateDefaultTypeFilter(this.value)">
+                  <select id="defaultTypeFilterSelect" class="form-select"
+                    onchange="updateDefaultTypeFilter(this.value)">
                     <option value="all">הכול</option>
                     <option value="swing">סווינג</option>
                     <option value="investment">השקעה</option>
@@ -1537,7 +1560,8 @@
                   </div>
                 </div>
                 <div class="preference-control">
-                  <select id="defaultAccountFilterSelect" class="form-select" onchange="updateDefaultAccountFilter(this.value)">
+                  <select id="defaultAccountFilterSelect" class="form-select"
+                    onchange="updateDefaultAccountFilter(this.value)">
                     <option value="all">הכול</option>
                     <!-- החשבונות יטענו דינמית -->
                   </select>
@@ -1554,7 +1578,8 @@
                   </div>
                 </div>
                 <div class="preference-control">
-                  <select id="defaultDateRangeFilterSelect" class="form-select" onchange="updateDefaultDateRangeFilter(this.value)">
+                  <select id="defaultDateRangeFilterSelect" class="form-select"
+                    onchange="updateDefaultDateRangeFilter(this.value)">
                     <option value="all">כל זמן</option>
                     <option value="this_week">השבוע</option>
                     <option value="week">שבוע</option>
@@ -1579,7 +1604,8 @@
                   </div>
                 </div>
                 <div class="preference-control">
-                  <input type="text" id="defaultSearchFilterInput" class="form-control" onchange="updateDefaultSearchFilter(this.value)" placeholder="השאר ריק עבור חיפוש ריק">
+                  <input type="text" id="defaultSearchFilterInput" class="form-control"
+                    onchange="updateDefaultSearchFilter(this.value)" placeholder="השאר ריק עבור חיפוש ריק">
                 </div>
               </div>
 
@@ -1637,6 +1663,53 @@
         } catch (error) {
           console.error('❌ שגיאה בעדכון מטבע ראשי:', error);
           showNotification('שגיאה בעדכון מטבע ראשי', 'error');
+        } finally {
+          // הסרת מצב הטעינה מהממשק
+          preferenceItem.classList.remove('loading');
+        }
+      }
+
+      /**
+       * מעדכן את אזור הזמן במערכת
+       * 
+       * פונקציה זו נקראת כאשר המשתמש משנה את אזור הזמן
+       * היא שומרת את ההגדרה החדשה לשרת ומציגה משוב למשתמש
+       * 
+       * @param {string} value - אזור הזמן החדש (למשל: 'Asia/Jerusalem')
+       * @returns {Promise<void>}
+       * 
+       * @example
+       * // עדכון אזור זמן לישראל
+       * updateTimezone('Asia/Jerusalem');
+       */
+      async function updateTimezone(value) {
+        console.log('🔄 עדכון אזור זמן:', value);
+
+        // מציאת אלמנטי הממשק
+        const selectElement = document.getElementById('timezoneSelect');
+        const preferenceItem = selectElement.closest('.preference-item');
+
+        // הוספת מצב טעינה לממשק
+        preferenceItem.classList.add('loading');
+
+        try {
+          // שמירת ההגדרה החדשה לשרת
+          const success = await savePreference('timezone', value);
+
+          if (success) {
+            // עדכון התצוגה עם הערך החדש
+            selectElement.value = value;
+            showNotification(`אזור זמן עודכן ל-${value}`, 'success');
+            console.log('✅ אזור זמן עודכן בהצלחה');
+          } else {
+            // אם השמירה נכשלה, החזרת הערך הקודם
+            const currentValue = await getCurrentPreference('timezone');
+            selectElement.value = currentValue;
+            showNotification('שגיאה בעדכון אזור זמן', 'error');
+          }
+        } catch (error) {
+          console.error('❌ שגיאה בעדכון אזור זמן:', error);
+          showNotification('שגיאה בעדכון אזור זמן', 'error');
         } finally {
           // הסרת מצב הטעינה מהממשק
           preferenceItem.classList.remove('loading');
@@ -1779,6 +1852,15 @@
               const currentCurrency = preferences.user.primaryCurrency || preferences.defaults.primaryCurrency;
               currencySelect.value = currentCurrency;
               console.log('✅ מטבע ראשי נטען:', currentCurrency);
+            }
+
+            // עדכון אזור זמן
+            const timezoneSelect = document.getElementById('timezoneSelect');
+            if (timezoneSelect) {
+              // שימוש בהגדרת המשתמש או ברירת המחדל
+              const currentTimezone = preferences.user.timezone || preferences.defaults.timezone;
+              timezoneSelect.value = currentTimezone;
+              console.log('✅ אזור זמן נטען:', currentTimezone);
             }
 
             // עדכון סטופ לוס ברירת מחדל
@@ -2255,6 +2337,7 @@
       window.getCurrentPreference = getCurrentPreference;
       window.showNotification = showNotification;
       window.updatePrimaryCurrency = updatePrimaryCurrency;
+      window.updateTimezone = updateTimezone;
       window.updateDefaultStopLoss = updateDefaultStopLoss;
       window.updateDefaultTargetPrice = updateDefaultTargetPrice;
       window.updateDefaultStatusFilter = updateDefaultStatusFilter;

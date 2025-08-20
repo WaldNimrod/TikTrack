@@ -1,5 +1,5 @@
 /* ===== סגנונות טבלאות וגרידים ===== */
-/**
+/*
  * קובץ זה מכיל את כל הסגנונות הקשורים לטבלאות נתונים וגרידים
  * כולל data tables, sortable headers, status badges ו-modals
  * 
@@ -7,14 +7,10 @@
  * - data tables: טבלאות נתונים עם מיון ופילטרים
  * - sortable headers: כותרות למיון עם אייקונים
  * - status badges: תגיות סטטוס צבעוניות
- * - modals: חלונות קופצים לעריכה והוספה עם z-index גבוה
+ * - modals: חלונות קופצים לעריכה והוספה
  * - responsive design: התאמה למסכים שונים
- * - עיצוב תאריכים: פונט אחיד עם שאר השדות
  * 
  * היררכיה: נטען רביעי, סגנונות ייעודיים לטבלאות
- * 
- * מחבר: Tik.track Development Team
- * תאריך עדכון אחרון: 2025-08-20
  */
 
 /* סגנונות למודלים - חייב להיות בתחילת הקובץ */
@@ -209,7 +205,8 @@ body.modal-open {
 .date-text {
   font-weight: 500;
   color: var(--apple-text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 }
 
 .triggered-badge {

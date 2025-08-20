@@ -8,28 +8,20 @@
  * תכולת הקובץ:
  * - טעינת נתוני התראות מהשרת
  * - הצגת טבלת התראות עם מיון ופילטרים
- * - הוספת התראה חדשה עם תנאים בפורמט חדש
+ * - הוספת התראה חדשה
  * - עריכת התראה קיימת
  * - מחיקת התראה
  * - ניהול סטטוסים ומצבי הפעלה
- * - שימוש במערכת התראות גלובלית ובתוך מודול
- * - תרגום תנאי התראה לעברית להצגה
+ * - שימוש במערכת התראות גלובלית
  * 
  * מערכת התראות:
  * - כל הודעות המשתמש משתמשות במערכת ההתראות הגלובלית מ-main.js
  * - showSuccessNotification() - הודעות הצלחה
  * - showErrorNotification() - הודעות שגיאה
  * - showWarningNotification() - הודעות אזהרה
- * - showModalNotification() - הודעות בתוך מודול
- * 
- * מבנה תנאי התראה:
- * - פורמט חדש: "variable|operator|value"
- * - משתנים נתמכים: price, daily_change, moving_average, volume
- * - אופרטורים נתמכים: greater_than, less_than, crosses, increases_by, decreases_by
- * - הצגה בעברית: "מחיר > 150", "נפח מסחר עולה ב 5000000"
  * 
  * מחבר: Tik.track Development Team
- * תאריך עדכון אחרון: 2025-08-20
+ * תאריך עדכון אחרון: 2025
  * ========================================
  */
 
@@ -122,13 +114,7 @@ async function loadAlertsData() {
  * עדכון טבלת התראות
  * 
  * פונקציה זו מעדכנת את הטבלה עם הנתונים החדשים
- * כולל המרת ערכים לעברית, עיצוב תאים ותרגום תנאי התראה
- * 
- * תכונות:
- * - הצגת תנאי התראה בעברית קריאה
- * - הצגת תאריך נוצר בפורמט תאריך בלבד (ללא שעה)
- * - הצגת אובייקטים מקושרים עם איקונים ופרטים
- * - עיצוב תאים עם צבעים וסגנונות מותאמים
+ * כולל המרת ערכים לעברית ועיצוב תאים
  * 
  * @param {Array} alerts - מערך של התראות לעדכון
  */
@@ -272,10 +258,12 @@ function updateAlertsTable(alerts) {
       const typeLabel = typeLabels[alert.related_type_id] || '❓ ';
       relatedDisplay = typeLabel + relatedDisplay;
 
-      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL', {
+      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleString('he-IL', {
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit'
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
       }) : 'לא מוגדר';
 
       // המרת סטטוס לעברית להצגה
@@ -301,9 +289,6 @@ function updateAlertsTable(alerts) {
       // המרת מצב הפעלה לעברית להצגה
       // לפי הדוקומנטציה: false=לא הופעל, new=הופעל לא נקרא, true=נקרא/בוטל
       let triggeredDisplay;
-
-      // המרת תנאי התראה לעברית
-      const conditionDisplay = formatAlertCondition(alert.condition);
       let triggeredClass = '';
       if (alert.is_triggered === 'true' || alert.is_triggered === true) {
         triggeredDisplay = 'כן';
@@ -330,7 +315,7 @@ function updateAlertsTable(alerts) {
           <td><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
           <td><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
-          <td><span class="condition-text">${conditionDisplay}</span></td>
+          <td><span class="condition-text">${alert.condition || '-'}</span></td>
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
@@ -388,15 +373,6 @@ function updateSummaryStats() {
 
 /**
  * הצגת מודל הוספת התראה
- * 
- * פונקציה זו פותחת את מודל ההוספה ומכינה אותו לשימוש
- * 
- * תכונות:
- * - טעינת נתונים מקושרים (חשבונות, טריידים, תכנונים, טיקרים)
- * - ניקוי טופס ההוספה
- * - בדיקת ערכים נתמכים והצגת הודעות מתאימות
- * - הגדרת z-index גבוה למודל
- * - תמיכה ב-Bootstrap ו-fallback ידני
  */
 function showAddAlertModal() {
   // טעינת נתונים למודל
@@ -475,14 +451,6 @@ function showAddAlertModal() {
 
 /**
  * טעינת נתונים למודלים
- * 
- * פונקציה זו טוענת את כל הנתונים הנדרשים למודלי ההוספה והעריכה
- * 
- * תכונות:
- * - טעינת חשבונות, טריידים, תכנונים וטיקרים במקביל
- * - טיפול בשגיאות עם מערכים ריקים כגיבוי
- * - מילוי רשימות בחירה במודלים
- * - לוגים מפורטים לדיבוג
  */
 async function loadModalData() {
   try {
@@ -709,12 +677,6 @@ function checkAlertType(alertType, element = null) {
  * 
  * פונקציה זו בודקת אם המשתנה שנבחר נתמך
  * כרגע נתמך רק 'price' (מחיר)
- * משתנים אחרים (daily_change, moving_average, volume) עדיין בפיתוח
- * 
- * תכונות:
- * - הצגת הודעת אזהרה בתוך מודול אם זמין
- * - איפוס הערך למחיר אם לא נתמך
- * - לוגים מפורטים לדיבוג
  * 
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  * @returns {boolean} true אם נתמך, false אם לא
@@ -764,12 +726,6 @@ function checkAlertVariable(selectElement) {
  * 
  * פונקציה זו בודקת אם האופרטור שנבחר נתמך
  * כרגע נתמכים רק 'greater_than' ו-'less_than'
- * אופרטורים אחרים (crosses, increases_by, decreases_by) עדיין בפיתוח
- * 
- * תכונות:
- * - הצגת הודעת אזהרה בתוך מודול אם זמין
- * - איפוס הערך לגדול מ אם לא נתמך
- * - לוגים מפורטים לדיבוג
  * 
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  * @returns {boolean} true אם נתמך, false אם לא
@@ -820,14 +776,10 @@ function checkAlertOperator(selectElement) {
  * פונקציה זו בונה מחרוזת תנאי מהמשתנה, האופרטור והערך
  * המחרוזת נשמרת בפורמט: "variable|operator|value"
  * 
- * דוגמאות:
- * - buildAlertCondition('price', 'greater_than', '150') -> "price|greater_than|150"
- * - buildAlertCondition('volume', 'increases_by', '5000000') -> "volume|increases_by|5000000"
- * 
- * @param {string} variable - המשתנה (price, daily_change, moving_average, volume)
- * @param {string} operator - האופרטור (greater_than, less_than, crosses, increases_by, decreases_by)
- * @param {string} value - הערך (מספר כטקסט)
- * @returns {string} מחרוזת התנאי בפורמט "variable|operator|value"
+ * @param {string} variable - המשתנה (price, daily_change, etc.)
+ * @param {string} operator - האופרטור (greater_than, less_than, etc.)
+ * @param {string} value - הערך
+ * @returns {string} מחרוזת התנאי
  */
 function buildAlertCondition(variable, operator, value) {
   return `${variable}|${operator}|${value}`;
@@ -837,10 +789,6 @@ function buildAlertCondition(variable, operator, value) {
  * פירוק מחרוזת תנאי התראה
  * 
  * פונקציה זו מפרקת מחרוזת תנאי למשתנה, אופרטור וערך
- * 
- * דוגמאות:
- * - parseAlertCondition("price|greater_than|150") -> {variable: "price", operator: "greater_than", value: "150"}
- * - parseAlertCondition("volume|increases_by|5000000") -> {variable: "volume", operator: "increases_by", value: "5000000"}
  * 
  * @param {string} condition - מחרוזת התנאי בפורמט "variable|operator|value"
  * @returns {object} אובייקט עם variable, operator, value
@@ -859,77 +807,11 @@ function parseAlertCondition(condition) {
 }
 
 /**
- * המרת תנאי התראה לעברית להצגה
- * 
- * פונקציה זו ממירה תנאי התראה בפורמט "variable|operator|value" לפורמט קריא בעברית
- * 
- * דוגמאות:
- * - "price|greater_than|150" -> "מחיר > 150"
- * - "volume|increases_by|5000000" -> "נפח מסחר עולה ב 5000000"
- * - "moving_average|crosses|200" -> "ממוצע נע חוצה 200"
- * 
- * @param {string} condition - מחרוזת התנאי בפורמט "variable|operator|value"
- * @returns {string} תנאי בפורמט עברי קריא
- */
-function formatAlertCondition(condition) {
-  if (!condition) return '-';
-
-  const parsed = parseAlertCondition(condition);
-
-  // המרת משתנה לעברית
-  const variableLabels = {
-    'price': 'מחיר',
-    'daily_change': 'שינוי יומי',
-    'moving_average': 'ממוצע נע',
-    'volume': 'נפח מסחר'
-  };
-
-  // המרת אופרטור לעברית
-  const operatorLabels = {
-    'greater_than': '>',
-    'less_than': '<',
-    'crosses': 'חוצה',
-    'crosses_up': 'חוצה למעלה',
-    'crosses_down': 'חוצה למטה',
-    'increases_by': 'עולה ב',
-    'decreases_by': 'יורד ב',
-    'increases_by_percent': 'עולה ב%',
-    'decreases_by_percent': 'יורד ב%'
-  };
-
-  const variableDisplay = variableLabels[parsed.variable] || parsed.variable;
-  const operatorDisplay = operatorLabels[parsed.operator] || parsed.operator;
-
-  if (parsed.operator && parsed.value) {
-    return `${variableDisplay} ${operatorDisplay} ${parsed.value}`;
-  } else if (parsed.variable) {
-    return parsed.variable; // אם אין אופרטור או ערך, נציג רק את המשתנה
-  } else {
-    return condition; // אם לא הצלחנו לפרק, נציג את המקורי
-  }
-}
-
-/**
  * שמירת התראה חדשה
  * 
  * פונקציה זו אוספת נתונים מהטופס ושולחת אותם לשרת
- * כולל בדיקת תקינות, בניית תנאי התראה וטיפול בשגיאות
- * 
- * תכונות:
- * - בדיקת תקינות שדות חובה
- * - בדיקת משתנה ואופרטור נתמכים
- * - בניית מחרוזת תנאי בפורמט "variable|operator|value"
- * - שימוש במערכת ההתראות הגלובלית להודעות
- * - שליחה לשרת עם מבנה נתונים תקין
- * 
- * מבנה הנתונים הנשלח:
- * - related_type_id: סוג האובייקט המקושר
- * - related_id: מזהה האובייקט המקושר
- * - type: סוג ההתראה (price_alert, stop_loss)
- * - condition: תנאי בפורמט "variable|operator|value"
- * - message: הודעה (אופציונלי)
- * - status: סטטוס (open)
- * - is_triggered: האם הופעלה (false)
+ * כולל בדיקת תקינות וטיפול בשגיאות
+ * משתמשת במערכת ההתראות הגלובלית להודעות
  */
 async function saveAlert() {
   const form = document.getElementById('addAlertForm');
@@ -1034,15 +916,7 @@ async function saveAlert() {
  * עריכת התראה
  * 
  * פונקציה זו פותחת את מודל העריכה עם הנתונים של ההתראה הנבחרת
- * כולל טעינת נתונים מקושרים ופירוק תנאי התראה
- * 
- * תכונות:
- * - טעינת נתונים מקושרים (חשבונות, טריידים, תכנונים, טיקרים)
- * - פירוק תנאי התראה לפורמט "variable|operator|value"
- * - מילוי שדות הטופס עם הנתונים הקיימים
- * - בדיקת ערכים נתמכים והצגת הודעות מתאימות
- * - קביעת מצב התראה לפי סטטוס ומצב הפעלה
- * - בחירת אובייקט מקושר וסוג קשר
+ * כולל טעינת נתונים מקושרים (חשבונות, טריידים, תכנונים, טיקרים)
  * 
  * @param {number} alertId - מזהה ההתראה לעריכה
  */
@@ -1283,24 +1157,8 @@ function updateStatusAndTriggered() {
  * עדכון התראה קיימת
  * 
  * פונקציה זו מעדכנת התראה קיימת עם הנתונים החדשים מהטופס
- * כולל בדיקת תקינות, בניית תנאי התראה, אימות שילוב סטטוס/הפעלה, ושליחה לשרת
- * 
- * תכונות:
- * - בדיקת תקינות שדות חובה
- * - בדיקת משתנה ואופרטור נתמכים
- * - בניית מחרוזת תנאי בפורמט "variable|operator|value"
- * - אימות שילוב תקין בין סטטוס ומצב הפעלה
- * - שימוש במערכת ההתראות הגלובלית להודעות
- * - שליחה לשרת עם מבנה נתונים תקין
- * 
- * מבנה הנתונים הנשלח:
- * - related_type_id: סוג האובייקט המקושר
- * - related_id: מזהה האובייקט המקושר
- * - type: סוג ההתראה (price_alert, stop_loss)
- * - condition: תנאי בפורמט "variable|operator|value"
- * - message: הודעה (אופציונלי)
- * - status: סטטוס (open, closed, cancelled)
- * - is_triggered: האם הופעלה (true, false, new)
+ * כולל בדיקת תקינות, אימות שילוב סטטוס/הפעלה, ושליחה לשרת
+ * משתמשת במערכת ההתראות הגלובלית להודעות
  */
 async function updateAlert() {
   const form = document.getElementById('editAlertForm');
@@ -1571,35 +1429,24 @@ document.addEventListener('DOMContentLoaded', function () {
   loadAlertsData();
 });
 
-// ========================================
-// ייצוא פונקציות לגלובל
-// ========================================
-// 
-// פונקציות יסוד:
-window.loadAlertsData = loadAlertsData;                    // טעינת נתוני התראות
-window.updateAlertsTable = updateAlertsTable;              // עדכון טבלת התראות
-window.showAddAlertModal = showAddAlertModal;              // הצגת מודל הוספה
-window.editAlert = editAlert;                              // עריכת התראה
-window.deleteAlert = deleteAlert;                          // מחיקת התראה
-window.saveAlert = saveAlert;                              // שמירת התראה חדשה
-window.updateAlert = updateAlert;                          // עדכון התראה קיימת
-
-// פונקציות עזר:
-window.updateStatusAndTriggered = updateStatusAndTriggered; // עדכון סטטוס והפעלה
-window.getAlertState = getAlertState;                      // קבלת מצב התראה
-window.validateAlertStatusCombination = validateAlertStatusCombination; // אימות שילוב סטטוס
-window.sortTable = sortTable;                              // מיון טבלה
-
-// פונקציות בדיקה וולידציה:
-window.checkAlertType = checkAlertType;                    // בדיקת סוג התראה
-window.onAlertTypeChange = onAlertTypeChange;              // שינוי סוג התראה
-window.checkAlertVariable = checkAlertVariable;            // בדיקת משתנה התראה
-window.checkAlertOperator = checkAlertOperator;            // בדיקת אופרטור התראה
-
-// פונקציות תנאי התראה:
-window.buildAlertCondition = buildAlertCondition;          // בניית תנאי התראה
-window.parseAlertCondition = parseAlertCondition;          // פירוק תנאי התראה
-window.formatAlertCondition = formatAlertCondition;        // תרגום תנאי לעברית
+// הוספת הפונקציות לגלובל
+window.loadAlertsData = loadAlertsData;
+window.updateAlertsTable = updateAlertsTable;
+window.showAddAlertModal = showAddAlertModal;
+window.editAlert = editAlert;
+window.deleteAlert = deleteAlert;
+window.saveAlert = saveAlert;
+window.updateAlert = updateAlert;
+window.updateStatusAndTriggered = updateStatusAndTriggered;
+window.getAlertState = getAlertState;
+window.validateAlertStatusCombination = validateAlertStatusCombination;
+window.sortTable = sortTable;
+window.checkAlertType = checkAlertType;
+window.onAlertTypeChange = onAlertTypeChange;
+window.checkAlertVariable = checkAlertVariable;
+window.checkAlertOperator = checkAlertOperator;
+window.buildAlertCondition = buildAlertCondition;
+window.parseAlertCondition = parseAlertCondition;
 
 // פונקציות התראה מיובאות מ-main.js - אין צורך בייצוא כפול
 

@@ -13,6 +13,7 @@ class ActiveAlertsComponent extends HTMLElement {
 
   connectedCallback() {
     this.render();
+    this.checkGlobalFunctions();
     this.loadActiveAlerts();
   }
 
@@ -34,6 +35,26 @@ class ActiveAlertsComponent extends HTMLElement {
         </div>
       </div>
     `;
+  }
+
+  /**
+   * בדיקת זמינות פונקציות גלובליות
+   */
+  checkGlobalFunctions() {
+    console.log('🔍 === CHECKING GLOBAL FUNCTIONS (ACTIVE ALERTS COMPONENT) ===');
+    console.log('🔍 formatAlertCondition available:', typeof window.formatAlertCondition);
+    console.log('🔍 parseAlertCondition available:', typeof window.parseAlertCondition);
+
+    if (!window.formatAlertCondition) {
+      console.warn('⚠️ formatAlertCondition not available globally - using local version');
+      // ניסיון לטעון שוב אחרי זמן קצר
+      setTimeout(() => this.checkGlobalFunctions(), 1000);
+    }
+    if (!window.parseAlertCondition) {
+      console.warn('⚠️ parseAlertCondition not available globally - using local version');
+      // ניסיון לטעון שוב אחרי זמן קצר
+      setTimeout(() => this.checkGlobalFunctions(), 1000);
+    }
   }
 
   async loadActiveAlerts() {
@@ -118,6 +139,13 @@ class ActiveAlertsComponent extends HTMLElement {
     const dailyChange = this.getDailyChange(ticker);
     const changeClass = this.getDailyChangeClass(ticker);
 
+    // שימוש בפונקציה formatAlertCondition לתרגום התנאי
+    const formattedCondition = window.formatAlertCondition ? window.formatAlertCondition(alert.condition) : this.formatAlertCondition(alert.condition);
+
+    // טיפול בשדות undefined
+    const message = alert.message || '';
+    const relatedType = this.getRelatedTypeFromId(alert.related_type_id);
+
     return `
       <div class="alert-card" data-alert-id="${alert.id}">
         <div class="alert-card-header">
@@ -125,11 +153,11 @@ class ActiveAlertsComponent extends HTMLElement {
           <span class="alert-card-time">${timeAgo}</span>
         </div>
         <div class="alert-card-content">
-          <p class="alert-card-message"><strong>${alert.message || alert.condition || ''}</strong></p>
-          <p class="alert-card-message">${alert.condition || ''}</p>
+          ${message ? `<p class="alert-card-message"><strong>${message}</strong></p>` : ''}
+          <p class="alert-card-message">${formattedCondition}</p>
           <div class="alert-card-details">
             <span class="alert-detail-item">${this.getAlertTypeDisplay(alert.type)}</span>
-            <span class="alert-detail-item">${this.getEntityTypeDisplay(alert.related_type)}</span>
+            <span class="alert-detail-item">${this.getEntityTypeDisplay(relatedType)}</span>
             <span class="alert-detail-item">$${currentPrice}</span>
             <span class="alert-detail-item ${changeClass}">${dailyChange}%</span>
           </div>
@@ -205,6 +233,16 @@ class ActiveAlertsComponent extends HTMLElement {
     return m[t] || t;
   }
 
+  getRelatedTypeFromId(typeId) {
+    const typeMap = {
+      1: 'account',
+      2: 'trade',
+      3: 'trade_plan',
+      4: 'ticker'
+    };
+    return typeMap[typeId] || 'unknown';
+  }
+
   extractTickerFromCondition(c) {
     if (!c) return '';
     const m = c.match(/\b(AAPL|GOOGL|MSFT|TSLA|NVDA|SPY|QQQ|IWM|AMZN|META|NFLX|AMD|INTC|ORCL|CRM|ADBE)\b/i);
@@ -240,6 +278,101 @@ class ActiveAlertsComponent extends HTMLElement {
     const v = this.getDailyChange(sym);
     return typeof v === 'string' && v.startsWith('+') ? 'positive-change' : (typeof v === 'string' && v.startsWith('-') ? 'negative-change' : '');
   }
+
+  /**
+   * פונקציה לתרגום תנאי התראה לעברית
+   * משתמשת בפונקציה הגלובלית אם זמינה, אחרת משתמשת בגרסה מקומית
+   */
+  formatAlertCondition(condition) {
+    // בדיקה אם הפונקציה הגלובלית זמינה
+    if (window.formatAlertCondition) {
+      return window.formatAlertCondition(condition);
+    }
+
+    // גרסה מקומית כגיבוי
+    if (!condition) return '-';
+
+    const parsed = this.parseAlertCondition(condition);
+
+    // המרת משתנה לעברית
+    const variableLabels = {
+      'price': 'מחיר',
+      'daily_change': 'שינוי יומי',
+      'moving_average': 'ממוצע נע',
+      'volume': 'נפח מסחר'
+    };
+
+    // המרת אופרטור לעברית
+    const operatorLabels = {
+      'greater_than': '>',
+      'less_than': '<',
+      'crosses': 'חוצה',
+      'crosses_up': 'חוצה למעלה',
+      'crosses_down': 'חוצה למטה',
+      'increases_by': 'עולה ב',
+      'decreases_by': 'יורד ב',
+      'increases_by_percent': 'עולה ב%',
+      'decreases_by_percent': 'יורד ב%'
+    };
+
+    const variableDisplay = variableLabels[parsed.variable] || parsed.variable;
+    const operatorDisplay = operatorLabels[parsed.operator] || parsed.operator;
+
+    if (parsed.operator && parsed.value) {
+      return `${variableDisplay} ${operatorDisplay} ${parsed.value}`;
+    } else if (parsed.variable) {
+      return parsed.variable; // אם אין אופרטור או ערך, נציג רק את המשתנה
+    } else {
+      return condition; // אם לא הצלחנו לפרק, נציג את המקורי
+    }
+  }
+
+  /**
+   * פונקציה לפרסור תנאי התראה
+   * משתמשת בפונקציה הגלובלית אם זמינה, אחרת משתמשת בגרסה מקומית
+   */
+  parseAlertCondition(condition) {
+    // בדיקה אם הפונקציה הגלובלית זמינה
+    if (window.parseAlertCondition) {
+      return window.parseAlertCondition(condition);
+    }
+
+    // גרסה מקומית כגיבוי
+    if (!condition) return { variable: '', operator: '', value: '' };
+
+    const parts = condition.split('|');
+    if (parts.length >= 3) {
+      return {
+        variable: parts[0] || '',
+        operator: parts[1] || '',
+        value: parts[2] || ''
+      };
+    } else if (parts.length === 2) {
+      return {
+        variable: parts[0] || '',
+        operator: parts[1] || '',
+        value: ''
+      };
+    } else if (parts.length === 1) {
+      return {
+        variable: parts[0] || '',
+        operator: '',
+        value: ''
+      };
+    }
+
+    return { variable: '', operator: '', value: '' };
+  }
 }
 
 customElements.define('active-alerts', ActiveAlertsComponent);
+
+// פונקציה לעדכון הקומפוננטה כאשר הפונקציות הגלובליות נטענות
+window.updateActiveAlertsComponent = function () {
+  const components = document.querySelectorAll('active-alerts');
+  components.forEach(component => {
+    if (component.checkGlobalFunctions) {
+      component.checkGlobalFunctions();
+    }
+  });
+};

@@ -1,29 +1,4 @@
-/**
- * ========================================
- * MAIN.JS - קובץ כללי לכל האתר
- * ========================================
- * 
- * קובץ זה מכיל פונקציות גלובליות המשותפות לכל דפי האתר
- * 
- * תכולת הקובץ:
- * - מערכת התראות גלובלית (CSS + JavaScript)
- * - מערכת התראות למודולים
- * - ניהול מצב סקשנים (top-section, main-section)
- * - פונקציות עזר כלליות
- * - אתחול דפים
- * 
- * מערכת התראות:
- * - showNotification() - התראה כללית
- * - showSuccessNotification() - התראה להצלחה
- * - showErrorNotification() - התראה לשגיאה
- * - showWarningNotification() - התראה לאזהרה
- * - showInfoNotification() - התראה למידע
- * - showModalNotification() - התראה בתוך מודול
- * 
- * מחבר: Tik.track Development Team
- * תאריך עדכון אחרון: 2025-08-20
- * ========================================
- */
+// ===== MAIN.JS - קובץ כללי לכל האתר =====
 
 /**
  * מערכת התראות גלובלית - CSS
@@ -174,6 +149,61 @@ let externalFilterPresent = false;
 // ===== ייצוא מיידי של פונקציות גלובליות =====
 // ייצוא הפונקציות הגלובליות מיד בתחילת הקובץ כדי לוודא שהן זמינות
 
+// פונקציה לאתחול הגדרות תצוגה בדף הערות
+window.resetNotesDisplaySettings = function() {
+  console.log('🔄 === אתחול הגדרות תצוגה בדף הערות ===');
+  
+  // מחיקת הגדרות שמורות
+  localStorage.removeItem('notesTopSectionHidden');
+  localStorage.removeItem('notesMainSectionHidden');
+  
+  // איפוס תצוגת הסקשנים
+  const topSection = document.getElementById('notesTopSection');
+  const mainSection = document.getElementById('notesMainSection');
+  
+  if (topSection) {
+    topSection.style.display = 'block';
+    console.log('✅ אופס top section');
+  }
+  
+  if (mainSection) {
+    mainSection.style.display = 'block';
+    console.log('✅ אופס main section');
+  }
+  
+  // איפוס אייקונים
+  const topIcon = document.querySelector('.top-section .filter-icon');
+  const mainIcon = document.querySelector('.content-section .filter-icon');
+  
+  if (topIcon) {
+    topIcon.textContent = '▲';
+    console.log('✅ אופס top icon');
+  }
+  
+  if (mainIcon) {
+    mainIcon.textContent = '▲';
+    console.log('✅ אופס main icon');
+  }
+  
+  console.log('✅ אתחול הגדרות תצוגה הושלם');
+};
+
+// פונקציה לאיפוס אוטומטי של הגדרות תצוגה בדף הערות
+window.autoResetNotesDisplay = function() {
+  if (window.location.pathname.includes('/notes')) {
+    console.log('🔄 === איפוס אוטומטי של הגדרות תצוגה בדף הערות ===');
+    
+    // בדיקה אם יש הגדרות שמורות שגויות
+    const topHidden = localStorage.getItem('notesTopSectionHidden');
+    const mainHidden = localStorage.getItem('notesMainSectionHidden');
+    
+    if (topHidden === 'true' || mainHidden === 'true') {
+      console.log('⚠️ נמצאו הגדרות שגויות - מאתחל...');
+      window.resetNotesDisplaySettings();
+    }
+  }
+};
+
 // הגדרת הפונקציות הגלובליות ישירות
 window.toggleTopSection = function () {
   const currentPath = window.location.pathname;
@@ -181,12 +211,17 @@ window.toggleTopSection = function () {
   // טיפול מיוחד לדף הערות
   if (currentPath.includes('/notes')) {
     const section = document.getElementById('notesTopSection');
-    const button = document.querySelector('[onclick*="toggleTopSection"]');
+    const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-    if (section && button) {
+    if (section && toggleBtn) {
       const isHidden = section.style.display === 'none';
       section.style.display = isHidden ? 'block' : 'none';
-      button.innerHTML = isHidden ? '▼ הסתר' : '▶ הצג';
+
+      // עדכון האייקון בלבד
+      if (icon) {
+        icon.textContent = isHidden ? '▲' : '▼';
+      }
 
       // שמירת המצב
       localStorage.setItem('notesTopSectionHidden', !isHidden);
@@ -237,12 +272,17 @@ window.toggleMainSection = function () {
   // טיפול מיוחד לדף הערות
   if (currentPath.includes('/notes')) {
     const section = document.getElementById('notesMainSection');
-    const button = document.querySelector('[onclick*="toggleMainSection"]');
+    const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-    if (section && button) {
+    if (section && toggleBtn) {
       const isHidden = section.style.display === 'none';
       section.style.display = isHidden ? 'block' : 'none';
-      button.innerHTML = isHidden ? '▼ הסתר' : '▶ הצג';
+
+      // עדכון האייקון בלבד
+      if (icon) {
+        icon.textContent = isHidden ? '▲' : '▼';
+      }
 
       // שמירת המצב
       localStorage.setItem('notesMainSectionHidden', !isHidden);
@@ -396,18 +436,7 @@ window.restoreAllSectionStates = function () {
  */
 
 /**
- * הצגת התראה
- * 
- * פונקציה זו מציגה התראה למשתמש עם כותרת, תוכן וסוג
- * ההתראה מוצגת בפינה הימנית העליונה של המסך או בתוך מודול
- * 
- * תכונות:
- * - תמיכה בהתראות גלובליות ובתוך מודולים
- * - אנימציות כניסה ויציאה חלקות
- * - אייקונים מותאמים לסוג ההתראה
- * - הסרה אוטומטית או ידנית
- * - z-index גבוה למודולים
- * 
+ * פונקציה להצגת התראה
  * @param {string} title - כותרת ההתראה
  * @param {string} message - תוכן ההתראה
  * @param {string} type - סוג ההתראה (success, error, warning, info)
@@ -539,16 +568,6 @@ function showWarningNotification(title, message, duration = 5000) {
 
 /**
  * הצגת התראה בתוך מודול
- * 
- * פונקציה זו מציגה התראה בתוך מודול ספציפי
- * ההתראה מוצגת בפינה הימנית העליונה של המודול
- * 
- * תכונות:
- * - z-index גבוה מאוד למודולים
- * - מיקום מותאם בתוך המודול
- * - אנימציות חלקות
- * - אייקונים מותאמים לסוג ההתראה
- * 
  * @param {string} modalId - מזהה המודול
  * @param {string} title - כותרת ההתראה
  * @param {string} message - תוכן ההתראה
@@ -562,10 +581,6 @@ function showModalNotification(modalId, title, message, type = 'info', duration 
 
 /**
  * הצגת התראת הצלחה בתוך מודול
- * 
- * פונקציה זו מציגה התראת הצלחה בתוך מודול ספציפי
- * משך זמן הצגה קצר יותר (3000ms) להצלחות
- * 
  * @param {string} modalId - מזהה המודול
  * @param {string} title - כותרת ההתראה
  * @param {string} message - תוכן ההתראה
@@ -577,10 +592,6 @@ function showModalSuccessNotification(modalId, title, message, duration = 3000) 
 
 /**
  * הצגת התראת שגיאה בתוך מודול
- * 
- * פונקציה זו מציגה התראת שגיאה בתוך מודול ספציפי
- * משך זמן הצגה ארוך יותר (4000ms) לשגיאות
- * 
  * @param {string} modalId - מזהה המודול
  * @param {string} title - כותרת ההתראה
  * @param {string} message - תוכן ההתראה
@@ -592,10 +603,6 @@ function showModalErrorNotification(modalId, title, message, duration = 4000) {
 
 /**
  * הצגת התראת אזהרה בתוך מודול
- * 
- * פונקציה זו מציגה התראת אזהרה בתוך מודול ספציפי
- * משך זמן הצגה בינוני (3500ms) לאזהרות
- * 
  * @param {string} modalId - מזהה המודול
  * @param {string} title - כותרת ההתראה
  * @param {string} message - תוכן ההתראה
@@ -607,10 +614,6 @@ function showModalWarningNotification(modalId, title, message, duration = 3500) 
 
 /**
  * הצגת התראת מידע בתוך מודול
- * 
- * פונקציה זו מציגה התראת מידע בתוך מודול ספציפי
- * משך זמן הצגה קצר (3000ms) למידע
- * 
  * @param {string} modalId - מזהה המודול
  * @param {string} title - כותרת ההתראה
  * @param {string} message - תוכן ההתראה
@@ -635,13 +638,6 @@ function showInfoNotification(title, message, duration = 4000) {
  * 
  * פונקציה זו מספקת ממשק אחיד לכל קריאות ה-API לאתר
  * כולל טיפול אוטומטי ב-headers, שגיאות ולוגים
- * 
- * תכונות:
- * - טיפול אוטומטי ב-Content-Type
- * - תמיכה ב-FormData ו-JSON
- * - לוגים מפורטים לדיבוג
- * - טיפול בשגיאות רשת
- * - headers מותאמים אוטומטית
  * 
  * @param {string} endpoint - נקודת הקצה של ה-API (למשל: '/api/v1/alerts/')
  * @param {Object} options - אפשרויות הבקשה (method, body, headers, וכו')
@@ -1875,23 +1871,18 @@ window.getCountElementForTable = getCountElementForTable;
 window.getTableNameForTable = getTableNameForTable;
 window.toggleSection = toggleSection;
 window.toggleAllSections = toggleAllSections;
-// ========================================
-// ייצוא פונקציות התראות לגלובל
-// ========================================
-// 
-// פונקציות התראות גלובליות:
-window.showNotification = showNotification;                    // התראה כללית
-window.showSuccessNotification = showSuccessNotification;      // התראת הצלחה
-window.showErrorNotification = showErrorNotification;          // התראת שגיאה
-window.showWarningNotification = showWarningNotification;      // התראת אזהרה
-window.showInfoNotification = showInfoNotification;            // התראת מידע
+window.showNotification = showNotification;
+window.showSuccessNotification = showSuccessNotification;
+window.showErrorNotification = showErrorNotification;
+window.showWarningNotification = showWarningNotification;
+window.showInfoNotification = showInfoNotification;
 
-// פונקציות התראות בתוך מודול:
-window.showModalNotification = showModalNotification;          // התראה בתוך מודול
-window.showModalSuccessNotification = showModalSuccessNotification; // התראת הצלחה במודול
-window.showModalErrorNotification = showModalErrorNotification;     // התראת שגיאה במודול
-window.showModalWarningNotification = showModalWarningNotification; // התראת אזהרה במודול
-window.showModalInfoNotification = showModalInfoNotification;       // התראת מידע במודול
+// פונקציות התראות בתוך מודול
+window.showModalNotification = showModalNotification;
+window.showModalSuccessNotification = showModalSuccessNotification;
+window.showModalErrorNotification = showModalErrorNotification;
+window.showModalWarningNotification = showModalWarningNotification;
+window.showModalInfoNotification = showModalInfoNotification;
 
 // פונקציות נתונים
 window.getDefaultRowData = getDefaultRowData;
@@ -1967,4 +1958,16 @@ console.log('✅ Global toggle functions loaded and ready:', {
   toggleTopSection: typeof window.toggleTopSection,
   toggleMainSection: typeof window.toggleMainSection,
   restoreAllSectionStates: typeof window.restoreAllSectionStates
+});
+
+// אתחול אוטומטי של הגדרות תצוגה בדף הערות
+if (typeof window.autoResetNotesDisplay === 'function') {
+  window.autoResetNotesDisplay();
+}
+
+// אתחול אוטומטי כשהדף נטען
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof window.autoResetNotesDisplay === 'function') {
+    window.autoResetNotesDisplay();
+  }
 });

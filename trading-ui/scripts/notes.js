@@ -1160,8 +1160,8 @@ async function saveNote() {
     await loadNotesData();
 
     // הצגת הודעת הצלחה
-    if (typeof showSuccessNotification === 'function') {
-      showSuccessNotification('הערה נשמרה', 'ההערה נשמרה בהצלחה');
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('הערה נשמרה בהצלחה!', 'success');
     } else {
       alert('הערה נשמרה בהצלחה');
     }
@@ -1170,8 +1170,8 @@ async function saveNote() {
     console.error('❌ Error saving note:', error);
 
     // הצגת הודעת שגיאה
-    if (typeof showErrorNotification === 'function') {
-      showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת ההערה');
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בשמירת ההערה', 'error');
     } else {
       alert('שגיאה בשמירת ההערה');
     }
@@ -1521,6 +1521,7 @@ window.showAddNoteModal = showAddNoteModal;
 window.editNote = editNote;
 window.deleteNote = deleteNote;
 window.saveNote = saveNote;
+window.updateNoteFromModal = updateNoteFromModal;
 
 /**
  * ========================================
@@ -1530,29 +1531,9 @@ window.saveNote = saveNote;
  * פונקציה זו מתבצעת בטעינת הדף ומאתחלת את כל הפונקציונליות
  */
 
-// הגנה - וידוא שהפונקציות הגלובליות זמינות
-if (typeof window.toggleTopSection !== 'function') {
-  window.toggleTopSection = function () {
-    console.warn('toggleTopSection fallback called - main.js may not be loaded properly');
-  };
-}
-
-if (typeof window.toggleMainSection !== 'function') {
-  window.toggleMainSection = function () {
-    console.warn('toggleMainSection fallback called - main.js may not be loaded properly');
-  };
-}
-
 // אתחול הדף כשהדף נטען
 document.addEventListener('DOMContentLoaded', async function () {
   console.log('🚀 === אתחול דף הערות ===');
-
-  // בדיקת זמינות פונקציות גלובליות
-  console.log('🔍 Checking global functions:', {
-    toggleTopSection: typeof window.toggleTopSection,
-    toggleMainSection: typeof window.toggleMainSection,
-    restoreAllSectionStates: typeof window.restoreAllSectionStates
-  });
 
   try {
     // שחזור מצב הסקשנים

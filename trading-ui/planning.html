@@ -75,8 +75,8 @@
   <script src="scripts/grid-filters.js"></script>
   <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
-  <script src="scripts/accounts.js"></script>
   <script src="scripts/planning.js"></script>
+  <script src="scripts/accounts.js"></script>
 </head>
 
 <body>
@@ -122,6 +122,42 @@
             <div>סה"כ השקעה: <strong id="totalInvestment">$0</strong></div>
             <div>השקעה ממוצעת: <strong id="avgInvestment">$0</strong></div>
             <div>רווח כולל: <strong id="totalProfit">$0</strong></div>
+          </div>
+
+          <!-- חלון בדיקת פילטרים -->
+          <div class="filter-debug-panel"
+            style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin-top: 15px; font-family: monospace; font-size: 12px;">
+            <h6 style="margin: 0 0 10px 0; color: #495057;">🔍 בדיקת פילטרים</h6>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <strong>סטטוסים נבחרים:</strong>
+                <div id="debugSelectedStatuses" style="color: #007bff; margin-top: 2px;">לא נבחרו</div>
+              </div>
+              <div>
+                <strong>סוגים נבחרים:</strong>
+                <div id="debugSelectedTypes" style="color: #007bff; margin-top: 2px;">לא נבחרו</div>
+              </div>
+              <div>
+                <strong>טווח תאריכים:</strong>
+                <div id="debugSelectedDateRange" style="color: #007bff; margin-top: 2px;">לא נבחר</div>
+              </div>
+              <div>
+                <strong>תאריך התחלה:</strong>
+                <div id="debugStartDate" style="color: #007bff; margin-top: 2px;">לא נבחר</div>
+              </div>
+              <div>
+                <strong>תאריך סיום:</strong>
+                <div id="debugEndDate" style="color: #007bff; margin-top: 2px;">לא נבחר</div>
+              </div>
+              <div>
+                <strong>חיפוש:</strong>
+                <div id="debugSearchTerm" style="color: #007bff; margin-top: 2px;">ריק</div>
+              </div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #dee2e6;">
+              <strong>סטטוס פילטור:</strong>
+              <div id="debugFilterStatus" style="color: #28a745; margin-top: 2px;">לא פעיל</div>
+            </div>
           </div>
         </div>
       </div> <!-- סוף top-section -->

@@ -310,14 +310,77 @@ if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.include
   if (searchTerm && searchTerm.trim() !== '') {
     console.log('🔄 Filtering by search term:', searchTerm);
     const searchLower = searchTerm.toLowerCase();
+
+    // תרגום מונחי חיפוש דו-כיווני
+    const searchTranslations = {
+      // תרגום סטטוסים
+      'פתוח': 'open',
+      'סגור': 'closed',
+      'בוטל': 'cancelled',
+      'מבוטל': 'cancelled',
+      'open': 'open',
+      'closed': 'closed',
+      'cancelled': 'cancelled',
+
+      // תרגום סוגי השקעות
+      'סווינג': 'swing',
+      'השקעה': 'investment',
+      'פאסיבי': 'passive',
+      'swing': 'swing',
+      'investment': 'investment',
+      'passive': 'passive',
+
+      // תרגום צדדים
+      'לונג': 'long',
+      'שורט': 'short',
+      'long': 'long',
+      'short': 'short',
+
+      // תרגום מספרים
+      'אפס': '0',
+      'אחת': '1',
+      'שתיים': '2',
+      'שלוש': '3',
+      'ארבע': '4',
+      'חמש': '5',
+      'שש': '6',
+      'שבע': '7',
+      'שמונה': '8',
+      'תשע': '9',
+      'עשר': '10'
+    };
+
+    // יצירת מערך מונחי חיפוש כולל התרגום
+    const searchTerms = [searchLower];
+
+    // הוספת תרגום מדויק
+    if (searchTranslations[searchLower]) {
+      searchTerms.push(searchTranslations[searchLower]);
+    }
+
+    // הוספת חיפוש חלקי - אם המשתמש מחפש חלק ממילה
+    Object.keys(searchTranslations).forEach(hebrewTerm => {
+      if (hebrewTerm.includes(searchLower) && !searchTerms.includes(searchTranslations[hebrewTerm])) {
+        searchTerms.push(searchTranslations[hebrewTerm]);
+      }
+    });
+
     filteredData = filteredData.filter(item => {
       let searchFields = [];
 
       if (pageName === 'planning') {
         searchFields = [
-          item.ticker,
+          item.ticker?.symbol,
+          item.ticker?.name,
+          item.investment_type,
+          item.status,
+          item.side,
+          item.planned_amount,
           item.entry_conditions,
-          item.reasons
+          item.stop_price,
+          item.target_price,
+          item.reasons,
+          item.account?.name
         ];
       } else if (pageName === 'tracking') {
         searchFields = [
@@ -340,10 +403,10 @@ if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.include
       }
 
       const isMatch = searchFields.some(field =>
-        field && field.toString().toLowerCase().includes(searchLower)
+        field && searchTerms.some(term => field.toString().toLowerCase().includes(term))
       );
 
-      console.log(`🔄 Item ${item.id}: searchFields=${searchFields}, searchTerm=${searchTerm}, match=${isMatch}`);
+      console.log(`🔄 Item ${item.id}: searchFields=${searchFields}, searchTerms=${searchTerms}, originalSearch=${searchLower}, match=${isMatch}`);
       return isMatch;
     });
     console.log('🔄 After search filter:', filteredData.length, 'items');
@@ -755,7 +818,13 @@ console.log('🔄 Grid filters loaded. Available functions:', {
   updateAccountFilterMenu: typeof window.updateAccountFilterMenu
 });
 
-// בדיקה מיידית של הפונקציה
+// בדיקה מיידית של הפונקציות
+if (typeof window.updateGridFromComponentGlobal === 'function') {
+  console.log('✅ updateGridFromComponentGlobal is available');
+} else {
+  console.log('❌ updateGridFromComponentGlobal is NOT available');
+}
+
 if (typeof window.updateAccountFilterMenu === 'function') {
   console.log('✅ updateAccountFilterMenu is available');
 } else {

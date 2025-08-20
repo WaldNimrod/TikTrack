@@ -1381,13 +1381,20 @@ window.validateAccountData = validateAccountData;
 window.showFormError = showFormError;
 
 // הגדרת הפונקציה updateGridFromComponent לדף החשבונות
-window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-  console.log('🔄 === UPDATE GRID FROM COMPONENT (accounts) ===');
-  console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
+// וידוא שהפונקציה מוגדרת רק בדף החשבונות
+if (window.location.pathname.includes('/accounts')) {
+  window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+    console.log('🔄 === UPDATE GRID FROM COMPONENT (accounts) ===');
+    console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
 
-  // קריאה לפונקציה הגלובלית
-  window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'accounts');
-};
+    // קריאה לפונקציה הגלובלית
+    if (typeof window.updateGridFromComponentGlobal === 'function') {
+      window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'accounts');
+    } else {
+      console.error('❌ updateGridFromComponentGlobal is not available');
+    }
+  };
+}
 
 /**
  * פונקציה לטעינת נתוני חשבונות ועדכון הטבלה בדף החשבונות

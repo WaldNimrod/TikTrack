@@ -7,7 +7,6 @@
  * 
  * תכולת הקובץ:
  * - מערכת התראות: הודעות הצלחה, שגיאה, אזהרה ומידע
- * - מערכת התראות למודולים: z-index גבוה למודולים
  * - page-body: מבנה הדף הראשי
  * - כפתורים: סגנונות לכל סוגי הכפתורים
  * - קישורים: עיצוב קישורים ואזורים לחיצה
@@ -21,10 +20,6 @@
  * - showErrorNotification() - הודעות שגיאה (אדום)
  * - showWarningNotification() - הודעות אזהרה (כתום)
  * - showInfoNotification() - הודעות מידע (כחול)
- * - showModalNotification() - הודעות בתוך מודול
- * 
- * מחבר: Tik.track Development Team
- * תאריך עדכון אחרון: 2025-08-20
  */
 
 /* ===== מערכת התראות ===== */
@@ -32,7 +27,7 @@
  * מערכת התראות גלובלית לאתר
  * 
  * מערכת זו מספקת הודעות משתמש יפות ומודרניות במקום alert() הסטנדרטי
- * ההתראות מוצגות בפינה הימנית העליונה של המסך או בתוך מודולים
+ * ההתראות מוצגות בפינה הימנית העליונה של המסך ונעלמות אוטומטית
  * 
  * תכונות:
  * - 4 סוגי התראות: הצלחה (ירוק), שגיאה (אדום), אזהרה (כתום), מידע (כחול)
@@ -40,14 +35,12 @@
  * - עיצוב מודרני עם blur effect וצללים
  * - כפתור סגירה ידני
  * - תמיכה בעברית עם direction: rtl
- * - תמיכה בהתראות בתוך מודולים עם z-index גבוה
  * 
  * שימוש:
  * showSuccessNotification('כותרת', 'הודעה');
  * showErrorNotification('כותרת', 'הודעה');
  * showWarningNotification('כותרת', 'הודעה');
  * showInfoNotification('כותרת', 'הודעה');
- * showModalNotification('modalId', 'כותרת', 'הודעה');
  */
 
 /* Container להתראות - מיקום קבוע בפינה הימנית העליונה */
@@ -58,25 +51,6 @@
   z-index: 100000;
   max-width: 400px;
   pointer-events: none;
-}
-
-/* Container להתראות בתוך מודול */
-.notification-container.modal-notification {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 9999999;
-  max-width: 350px;
-  pointer-events: none;
-}
-
-/* התראות בתוך מודול - z-index גבוה יותר */
-.modal .notification-container.modal-notification {
-  z-index: 99999999 !important;
-}
-
-.modal .notification-container.modal-notification .notification {
-  z-index: 99999999 !important;
 }
 
 /* התראה בודדת - עיצוב בסיסי */
@@ -96,7 +70,6 @@
   align-items: center;
   gap: 12px;
   direction: rtl;
-  z-index: 9999999;
 }
 
 .notification.show {

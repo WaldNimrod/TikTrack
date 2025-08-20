@@ -15,14 +15,22 @@
  * - loadTradesData() - טעינת נתוני טריידים
  * - updateTradesTable() - עדכון טבלת הטריידים
  * - filterTradesData() - פילטור נתוני טריידים
+ * - showAddTradeModal() - הצגת מודל הוספת טרייד
+ * - saveNewTradeRecord() - שמירת טרייד חדש
  * - editTradeRecord() - עריכת טרייד
  * - cancelTradeRecord() - ביטול טרייד
  * - deleteTradeRecord() - מחיקת טרייד
- * - showAddTradeModal() - הצגת מודל הוספת טרייד
- * - showEditTradeModal() - הצגת מודל עריכת טרייד
+ * - validateTradeForm() - ולידציה של טופס
+ * 
+ * תכונות חדשות:
+ * - ולידציה מלאה של טופס הוספת טרייד
+ * - שמירה לשרת עם API
+ * - טעינת נתונים למודל (חשבונות, תוכניות)
+ * - הודעות שגיאה והצלחה
+ * - עיצוב אחיד עם שאר המודלים
  * 
  * מחבר: Tik.track Development Team
- * תאריך עדכון אחרון: 2025
+ * תאריך עדכון אחרון: 2025-08-20
  * ========================================
  */
 
@@ -31,19 +39,40 @@ let tradesData = [];
 window.tradesData = tradesData;
 
 /**
- * פונקציה לטעינת נתוני טריידים מהשרת
+ * טעינת נתוני טריידים מהשרת
+ * 
+ * פונקציה זו טוענת את כל הטריידים מהשרת ומעדכנת את הטבלה
+ * כולל טיפול בשגיאות ועדכון המשתנה הגלובלי
+ * 
+ * תכונות:
+ * - קריאה ל-API `/api/v1/trades/`
+ * - טיפול בפורמט נתונים שונה
+ * - עדכון משתנה גלובלי
+ * - עדכון ישיר של הטבלה
+ * - טיפול בשגיאות עם הודעה למשתמש
+ * 
+ * @returns {Promise<void>}
  */
 async function loadTradesData() {
   try {
     console.log('🔄 === LOAD TRADES DATA ===');
     console.log('🔄 Starting to load trades data...');
+    console.log('🔄 Current URL:', window.location.href);
+    console.log('🔄 API URL:', '/api/v1/trades/');
 
     // קריאה מה-API
+    console.log('🔄 Fetching from API...');
     const response = await fetch('/api/v1/trades/');
+    console.log('🔄 Response status:', response.status);
+    console.log('🔄 Response headers:', response.headers);
+
     if (!response.ok) {
+      console.error('❌ HTTP error:', response.status, response.statusText);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     let apiData = await response.json();
+    console.log('🔄 Raw API response:', apiData);
 
     // בדיקה שהנתונים בפורמט הנכון
     if (apiData && apiData.data && Array.isArray(apiData.data)) {
@@ -79,16 +108,30 @@ async function loadTradesData() {
     updateTradesTable(tradesData);
 
   } catch (error) {
-    console.error('Error loading trades data:', error);
+    console.error('❌ Error loading trades data:', error);
+    console.error('❌ Error details:', error.message);
+    console.error('❌ Error stack:', error.stack);
+
     const tbody = document.querySelector('#tradesTable tbody');
     if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="11" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" class="text-center text-danger">שגיאה בטעינת נתונים: ' + error.message + '</td></tr>';
+    } else {
+      console.error('❌ Table body not found for error display');
     }
   }
 }
 
 /**
- * פונקציה לפילטור נתוני טריידים - פונקציה פשוטה
+ * פילטור נתוני טריידים
+ * 
+ * פונקציה זו מסננת את נתוני הטריידים לפי הפרמטרים שהועברו
+ * כרגע מחזירה את כל הנתונים ללא פילטור (כמו בדף database)
+ * 
+ * @param {Array} selectedStatuses - מערך סטטוסים נבחרים
+ * @param {Array} selectedTypes - מערך סוגים נבחרים
+ * @param {Array} selectedAccounts - מערך חשבונות נבחרים
+ * @param {Object} selectedDateRange - טווח תאריכים נבחר
+ * @param {string} searchTerm - מונח חיפוש
  */
 function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
   console.log('🔄 === FILTER TRADES DATA (SIMPLE) ===');
@@ -212,11 +255,287 @@ function showEditTradeModal(trade) {
   alert(`עריכת טרייד ${trade.id} - ${trade.ticker_symbol} תתווסף בקרוב`);
 }
 
-// פונקציה להצגת מודל הוספת טרייד
+/**
+ * הצגת מודל הוספת טרייד
+ * 
+ * פונקציה זו פותחת את מודל ההוספה ומכינה אותו לשימוש
+ * 
+ * תכונות:
+ * - טעינת נתונים למודל (חשבונות, תוכניות טרייד)
+ * - ניקוי טופס ההוספה
+ * - הגדרת תאריך נוכחי אוטומטי
+ * - הצגת המודל עם Bootstrap
+ * 
+ * תלויות:
+ * - loadModalData() - טעינת נתונים למודל
+ * - Bootstrap Modal
+ */
 function showAddTradeModal() {
-  console.log('הצגת מודל הוספת טרייד');
-  // TODO: Implement add trade modal
-  alert('פונקציית הוספת טרייד תתווסף בקרוב');
+  console.log('🔄 === SHOW ADD TRADE MODAL ===');
+
+  // טעינת נתונים למודל
+  loadModalData();
+
+  // ניקוי הטופס
+  const form = document.getElementById('addTradeForm');
+  if (form) {
+    form.reset();
+  }
+
+  // הגדרת תאריך נוכחי
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const hh = String(today.getHours()).padStart(2, '0');
+  const min = String(today.getMinutes()).padStart(2, '0');
+  const todayStr = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+
+  const dateInput = document.getElementById('addTradeOpenedAt');
+  if (dateInput) dateInput.value = todayStr;
+
+  // הצגת המודל
+  const modalElement = document.getElementById('addTradeModal');
+  if (modalElement) {
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  } else {
+    console.error('Modal element not found');
+  }
+}
+
+/**
+ * ולידציה של טופס הוספת טרייד
+ * 
+ * פונקציה זו בודקת את תקינות הטופס לפני שליחה לשרת
+ * 
+ * תכונות:
+ * - בדיקת שדות חובה
+ * - הצגת הודעות שגיאה מתאימות
+ * - ניקוי שגיאות קודמות
+ * - החזרת תוצאה בוליאנית
+ * 
+ * שדות נבדקים:
+ * - סוג טרייד (type)
+ * - צד (side)
+ * - חשבון (account_id)
+ * 
+ * @returns {boolean} true אם הטופס תקין, false אם לא
+ */
+function validateTradeForm() {
+  console.log('🔄 === VALIDATE TRADE FORM ===');
+
+  const form = document.getElementById('addTradeForm');
+  if (!form) {
+    console.error('Form element not found');
+    return false;
+  }
+
+  // ניקוי שגיאות קודמות
+  clearTradeValidationErrors();
+
+  let isValid = true;
+
+  // בדיקת סוג טרייד
+  const typeElement = document.getElementById('addTradeType');
+  if (!typeElement.value) {
+    showTradeValidationError('typeError', 'יש לבחור סוג טרייד');
+    isValid = false;
+  }
+
+  // בדיקת צד
+  const sideElement = document.getElementById('addTradeSide');
+  if (!sideElement.value) {
+    showTradeValidationError('sideError', 'יש לבחור צד');
+    isValid = false;
+  }
+
+  // בדיקת חשבון
+  const accountElement = document.getElementById('addTradeAccountId');
+  if (!accountElement.value) {
+    showTradeValidationError('accountError', 'יש לבחור חשבון');
+    isValid = false;
+  }
+
+  if (!isValid) {
+    showErrorNotification('שדות חובה חסרים', 'יש למלא את כל השדות החובה');
+  }
+
+  return isValid;
+}
+
+/**
+ * הצגת שגיאת ולידציה
+ * 
+ * פונקציה זו מציגה הודעת שגיאה מתחת לשדה המתאים
+ * 
+ * @param {string} errorId - מזהה אלמנט השגיאה
+ * @param {string} message - הודעת השגיאה
+ */
+function showTradeValidationError(errorId, message) {
+  const errorElement = document.getElementById(errorId);
+  if (errorElement) {
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+  }
+}
+
+/**
+ * ניקוי שגיאות ולידציה
+ * 
+ * פונקציה זו מסתירה את כל הודעות השגיאה בטופס
+ */
+function clearTradeValidationErrors() {
+  const errorIds = ['typeError', 'sideError', 'accountError', 'tradePlanError'];
+  errorIds.forEach(id => {
+    const errorElement = document.getElementById(id);
+    if (errorElement) {
+      errorElement.style.display = 'none';
+    }
+  });
+}
+
+/**
+ * שמירת טרייד חדש
+ * 
+ * פונקציה זו שומרת טרייד חדש לשרת
+ * כולל ולידציה, איסוף נתונים וטיפול בשגיאות
+ * 
+ * תכונות:
+ * - ולידציה של טופס לפני שליחה
+ * - איסוף נתונים מכל שדות הטופס
+ * - שליחה לשרת עם API
+ * - טיפול בשגיאות והודעות למשתמש
+ * - סגירת המודל ורענון הטבלה
+ * 
+ * מבנה הנתונים הנשלח:
+ * - account_id: מזהה החשבון
+ * - ticker_id: מזהה הטיקר (אופציונלי)
+ * - trade_plan_id: מזהה תוכנית טרייד (אופציונלי)
+ * - type: סוג הטרייד (swing, investment, passive)
+ * - side: צד הטרייד (Long, Short)
+ * - status: סטטוס (open)
+ * - created_at: תאריך יצירה
+ * - closed_at: תאריך סגירה (אופציונלי)
+ * - notes: הערות (אופציונלי)
+ * 
+ * @returns {Promise<void>}
+ */
+async function saveNewTradeRecord() {
+  console.log('🔄 === SAVE NEW TRADE RECORD ===');
+
+  // בדיקת ולידציה
+  if (!validateTradeForm()) {
+    return;
+  }
+
+  // איסוף נתונים מהטופס
+  const formData = {
+    account_id: parseInt(document.getElementById('addTradeAccountId').value),
+    ticker_id: parseInt(document.getElementById('addTradeTickerId').value) || null,
+    trade_plan_id: parseInt(document.getElementById('addTradeTradePlanId').value) || null,
+    type: document.getElementById('addTradeType').value,
+    side: document.getElementById('addTradeSide').value,
+    status: 'open',
+    created_at: document.getElementById('addTradeOpenedAt').value,
+    closed_at: document.getElementById('addTradeClosedAt').value || null,
+    notes: document.getElementById('addTradeNotes').value || null
+  };
+
+  console.log('שולח טרייד חדש:', formData);
+
+  try {
+    const response = await fetch('/api/v1/trades/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    });
+
+    if (response.ok) {
+      const newTrade = await response.json();
+      console.log('טרייד נשמר בהצלחה:', newTrade);
+
+      showSuccessNotification('טרייד נשמר בהצלחה', 'הטרייד החדש נוסף למערכת');
+
+      // סגירת המודל
+      const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
+      modal.hide();
+
+      // רענון הטבלה
+      loadTradesData();
+
+    } else {
+      const errorData = await response.json();
+      console.error('שגיאה בשמירת טרייד:', errorData);
+      showErrorNotification('שגיאה בשמירת טרייד', errorData.message || 'שגיאה לא ידועה');
+    }
+
+  } catch (error) {
+    console.error('שגיאה בשמירת טרייד:', error);
+    showErrorNotification('שגיאה בשמירת טרייד', 'שגיאה בתקשורת עם השרת');
+  }
+}
+
+/**
+ * טעינת נתונים למודל
+ * 
+ * פונקציה זו טוענת את הנתונים הנדרשים למודל ההוספה
+ * 
+ * תכונות:
+ * - טעינת חשבונות מ-API
+ * - טעינת תוכניות טרייד מ-API
+ * - מילוי רשימות בחירה במודל
+ * - טיפול בשגיאות
+ * 
+ * נתונים נטענים:
+ * - חשבונות: שם וסוג מטבע
+ * - תוכניות טרייד: סמל טיקר וסוג השקעה
+ * 
+ * @returns {Promise<void>}
+ */
+async function loadModalData() {
+  try {
+    console.log('🔄 טוען נתונים למודל...');
+
+    // טעינת חשבונות
+    const accountsResponse = await fetch('/api/v1/accounts/');
+    const accounts = await accountsResponse.json();
+
+    // טעינת תוכניות טרייד
+    const tradePlansResponse = await fetch('/api/v1/trade_plans/');
+    const tradePlans = await tradePlansResponse.json();
+
+    // מילוי רשימת חשבונות
+    const accountSelect = document.getElementById('addTradeAccountId');
+    if (accountSelect) {
+      accountSelect.innerHTML = '<option value="">בחר חשבון</option>';
+      accounts.data.forEach(account => {
+        const option = document.createElement('option');
+        option.value = account.id;
+        option.textContent = `${account.name} (${account.currency})`;
+        accountSelect.appendChild(option);
+      });
+    }
+
+    // מילוי רשימת תוכניות טרייד
+    const tradePlanSelect = document.getElementById('addTradeTradePlanId');
+    if (tradePlanSelect) {
+      tradePlanSelect.innerHTML = '<option value="">ללא תוכנית</option>';
+      tradePlans.data.forEach(plan => {
+        const option = document.createElement('option');
+        option.value = plan.id;
+        option.textContent = `${plan.ticker_symbol} - ${plan.investment_type}`;
+        tradePlanSelect.appendChild(option);
+      });
+    }
+
+    console.log('✅ נתונים נטענו למודל');
+
+  } catch (error) {
+    console.error('שגיאה בטעינת נתונים למודל:', error);
+  }
 }
 
 // הגדרת הפונקציה updateGridFromComponent לדף המעקב
@@ -239,16 +558,33 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
   }
 };
 
-// הוספת הפונקציות לגלובל
-window.loadTradesData = loadTradesData;
-window.updateTradesTable = updateTradesTable;
-window.filterTradesData = filterTradesData;
-window.viewTickerDetails = viewTickerDetails;
-window.editTradeRecord = editTradeRecord;
-window.cancelTradeRecord = cancelTradeRecord;
-window.deleteTradeRecord = deleteTradeRecord;
-window.showAddTradeModal = showAddTradeModal;
-window.showEditTradeModal = showEditTradeModal;
+// ========================================
+// ייצוא פונקציות לגלובל
+// ========================================
+// 
+// פונקציות יסוד:
+window.loadTradesData = loadTradesData;                    // טעינת נתוני טריידים
+window.updateTradesTable = updateTradesTable;              // עדכון טבלת טריידים
+window.filterTradesData = filterTradesData;                // פילטור נתוני טריידים
+
+// פונקציות פעולות:
+window.viewTickerDetails = viewTickerDetails;              // צפייה בפרטי טיקר
+window.editTradeRecord = editTradeRecord;                  // עריכת טרייד
+window.cancelTradeRecord = cancelTradeRecord;              // ביטול טרייד
+window.deleteTradeRecord = deleteTradeRecord;              // מחיקת טרייד
+
+// פונקציות מודלים:
+window.showAddTradeModal = showAddTradeModal;              // הצגת מודל הוספה
+window.showEditTradeModal = showEditTradeModal;            // הצגת מודל עריכה
+window.saveNewTradeRecord = saveNewTradeRecord;            // שמירת טרייד חדש
+
+// פונקציות ולידציה:
+window.validateTradeForm = validateTradeForm;              // ולידציה של טופס
+window.showTradeValidationError = showTradeValidationError; // הצגת שגיאת ולידציה
+window.clearTradeValidationErrors = clearTradeValidationErrors; // ניקוי שגיאות ולידציה
+
+// פונקציות עזר:
+window.loadModalData = loadModalData;                      // טעינת נתונים למודל
 
 // קריאה לטעינת נתונים כשהדף נטען
 if (document.readyState === 'loading') {

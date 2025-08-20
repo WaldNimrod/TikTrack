@@ -28,6 +28,68 @@
 // משתנים גלובליים
 let designsData = [];
 
+// הפונקציה translateDateRangeToDates כבר מוגדרת בתחילת הקובץ
+
+// הגדרת הפונקציה updateGridFromComponent מיד בתחילת הקובץ
+console.log('🔄 Planning.js: Setting up updateGridFromComponent for planning page');
+// וידוא שהפונקציה מוגדרת רק בדף התכנונים
+if (window.location.pathname.includes('/planning')) {
+    window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+        console.log('🔄 updateGridFromComponent called for planning page with:', {
+            selectedStatuses,
+            selectedTypes,
+            selectedDateRange,
+            searchTerm
+        });
+
+        console.log('✅ This is the PLANNING page updateGridFromComponent function!');
+
+        // שמירת הפילטרים במשתנים גלובליים
+        window.selectedStatusesForFilter = selectedStatuses || [];
+        window.selectedTypesForFilter = selectedTypes || [];
+        window.selectedDateRangeForFilter = selectedDateRange || null;
+        window.searchTermForFilter = searchTerm || '';
+
+        // חילוץ תאריכי התחלה וסיום מטווח התאריכים
+        let startDate = 'לא נבחר';
+        let endDate = 'לא נבחר';
+
+        if (selectedDateRange && selectedDateRange !== 'כל זמן') {
+            console.log('🔄 Translating date range:', selectedDateRange);
+            // תרגום טווח התאריכים לתאריכים אמיתיים
+            const dateRange = translateDateRangeToDates(selectedDateRange);
+            startDate = dateRange.startDate;
+            endDate = dateRange.endDate;
+            console.log('🔄 Translation result:', { startDate, endDate });
+        }
+
+        window.selectedStartDateForFilter = startDate;
+        window.selectedEndDateForFilter = endDate;
+
+        console.log('🔄 Filters saved for planning page:', {
+            selectedStatusesForFilter: window.selectedStatusesForFilter,
+            selectedTypesForFilter: window.selectedTypesForFilter,
+            selectedDateRangeForFilter: window.selectedDateRangeForFilter,
+            selectedStartDateForFilter: window.selectedStartDateForFilter,
+            selectedEndDateForFilter: window.selectedEndDateForFilter,
+            searchTermForFilter: window.searchTermForFilter
+        });
+
+        // עדכון חלון הבדיקה
+        if (typeof updateFilterDebugPanel === 'function') {
+            updateFilterDebugPanel();
+        }
+
+        // קריאה ישירה לפונקציה המקומית
+        console.log('🔄 Calling loadDesignsData directly for planning page');
+        if (typeof window.loadDesignsData === 'function') {
+            window.loadDesignsData();
+        } else {
+            console.error('❌ loadDesignsData function not found');
+        }
+    };
+}
+
 /**
  * טעינת נתוני תכנונים מהשרת
  * 
@@ -80,10 +142,32 @@ async function loadDesignsData() {
 
         // החלת פילטרים על הנתונים
         let filteredDesigns = [...designsData];
-        if (typeof window.filterDataByFilters === 'function') {
+
+        // בדיקה אם יש פילטרים פעילים
+        const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
+            (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
+            (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
+            (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
+
+        console.log('🔄 Checking filters for planning page:', {
+            hasActiveFilters,
+            selectedStatusesForFilter: window.selectedStatusesForFilter,
+            selectedTypesForFilter: window.selectedTypesForFilter,
+            selectedDateRangeForFilter: window.selectedDateRangeForFilter,
+            searchTermForFilter: window.searchTermForFilter
+        });
+
+        if (hasActiveFilters) {
             console.log('🔄 Applying filters to designs data...');
-            filteredDesigns = window.filterDataByFilters(designsData, 'planning');
+            if (typeof window.filterDataByFilters === 'function') {
+                filteredDesigns = window.filterDataByFilters(designsData, 'planning');
+            } else {
+                // פונקציה מקומית לפילטור אם הפונקציה הגלובלית לא זמינה
+                filteredDesigns = filterDesignsLocally(designsData, window.selectedStatusesForFilter, window.selectedTypesForFilter, window.selectedDateRangeForFilter, window.searchTermForFilter);
+            }
             console.log('🔄 After filtering:', filteredDesigns.length, 'designs');
+        } else {
+            console.log('🔄 No active filters, showing all designs');
         }
 
         // שמירת הנתונים המסוננים לגלובלי
@@ -91,6 +175,9 @@ async function loadDesignsData() {
 
         // עדכון הטבלה עם הנתונים המסוננים
         updateDesignsTable(filteredDesigns);
+
+        // עדכון חלון הבדיקה
+        updateFilterDebugPanel();
 
         return designsData;
 
@@ -154,10 +241,55 @@ function updateDesignsTable(designs) {
 
     // בדיקה אם יש נתונים להצגה
     if (!designs || designs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted">
-            <i class="fas fa-info-circle"></i> אין תכנונים להצגה
-            <br><small>לא נמצאו תכנונים במערכת</small>
-        </td></tr>`;
+        // בדיקה אם זה בגלל פילטר או שאין נתונים בכלל
+        const hasOriginalData = designsData && designsData.length > 0;
+
+        // בדיקה אם יש פילטרים פעילים
+        const hasActiveFilters = (() => {
+            // בדיקת חיפוש
+            if (window.searchTermForFilter && window.searchTermForFilter.trim() !== '') {
+                return true;
+            }
+
+            // בדיקת סטטוסים (אם לא כל הסטטוסים מסומנים)
+            if (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) {
+                const allStatuses = ['open', 'closed', 'cancelled'];
+                const selectedStatuses = window.selectedStatusesForFilter.map(s => s.toLowerCase());
+                if (!allStatuses.every(status => selectedStatuses.includes(status))) {
+                    return true;
+                }
+            }
+
+            // בדיקת סוגים (אם לא כל הסוגים מסומנים)
+            if (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) {
+                const allTypes = ['swing', 'investment', 'passive'];
+                const selectedTypes = window.selectedTypesForFilter.map(t => t.toLowerCase());
+                if (!allTypes.every(type => selectedTypes.includes(type))) {
+                    return true;
+                }
+            }
+
+            // בדיקת טווח תאריכים
+            if (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') {
+                return true;
+            }
+
+            return false;
+        })();
+
+        if (hasOriginalData && hasActiveFilters) {
+            // יש נתונים אבל הפילטר לא מצא תוצאות
+            tbody.innerHTML = `<tr><td colspan="10" class="text-center text-info">
+                <i class="fas fa-search"></i> לא נמצאו תוצאות
+                <br><small>נסה לשנות את הפילטרים או מונח החיפוש</small>
+            </td></tr>`;
+        } else {
+            // אין נתונים בכלל
+            tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted">
+                <i class="fas fa-info-circle"></i> אין תכנונים להצגה
+                <br><small>לא נמצאו תכנונים במערכת</small>
+            </td></tr>`;
+        }
 
         // עדכון ספירת רשומות
         const countElement = document.querySelector('#designsCount');
@@ -536,6 +668,495 @@ function getStatusDisplay(status) {
 }
 
 /**
+ * טעינת העדפות המשתמש
+ */
+function loadUserPreferences() {
+    try {
+        const response = fetch('/config/preferences.json');
+        if (response.ok) {
+            const preferences = response.json();
+            return preferences.user || preferences.defaults;
+        }
+    } catch (error) {
+        console.error('❌ Error loading preferences:', error);
+    }
+    return null;
+}
+
+/**
+ * יצירת תאריך עם timezone נכון
+ */
+function createDateWithTimezone(year, month, day) {
+    const preferences = loadUserPreferences();
+    const timezone = preferences?.timezone || 'Asia/Jerusalem';
+
+    // יצירת תאריך עם timezone
+    const date = new Date(year, month, day);
+    const options = {
+        timeZone: timezone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    };
+
+    return date.toLocaleDateString('en-CA', options); // YYYY-MM-DD format
+}
+
+/**
+ * תרגום טווח תאריכים לתאריכים אמיתיים
+ */
+function translateDateRangeToDates(dateRange) {
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+
+    let startDate = 'לא נבחר';
+    let endDate = 'לא נבחר';
+
+    if (typeof dateRange === 'string') {
+        switch (dateRange) {
+            case 'היום':
+                startDate = todayStr;
+                endDate = todayStr;
+                break;
+
+            case 'אתמול':
+                const yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+                startDate = yesterday.toISOString().split('T')[0];
+                endDate = startDate;
+                break;
+
+            case 'שבוע אחרון':
+                const weekAgoLast = new Date(today);
+                weekAgoLast.setDate(today.getDate() - 7);
+                startDate = weekAgoLast.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case 'חודש אחרון':
+                const monthAgo = new Date(today);
+                monthAgo.setMonth(today.getMonth() - 1);
+                startDate = monthAgo.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case '3 חודשים אחרונים':
+                const threeMonthsAgo = new Date(today);
+                threeMonthsAgo.setMonth(today.getMonth() - 3);
+                startDate = threeMonthsAgo.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case '6 חודשים אחרונים':
+                const sixMonthsAgo = new Date(today);
+                sixMonthsAgo.setMonth(today.getMonth() - 6);
+                startDate = sixMonthsAgo.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case 'שנה אחרונה':
+                const yearAgo = new Date(today);
+                yearAgo.setFullYear(today.getFullYear() - 1);
+                startDate = yearAgo.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case 'השבוע':
+                const startOfWeek = new Date(today);
+                const dayOfWeek = today.getDay();
+                // בישראל השבוע מתחיל ביום ראשון (0)
+                startOfWeek.setDate(today.getDate() - dayOfWeek);
+                startDate = startOfWeek.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case 'שבוע':
+                const weekAgo7 = new Date(today);
+                weekAgo7.setDate(today.getDate() - 7);
+                startDate = weekAgo7.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case 'החודש':
+                const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                startDate = startOfMonth.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case 'MTD':
+                startDate = createDateWithTimezone(today.getFullYear(), today.getMonth(), 1);
+                endDate = todayStr;
+                console.log('🔄 MTD calculation:', {
+                    today: todayStr,
+                    month: today.getMonth(),
+                    year: today.getFullYear(),
+                    startDate: startDate
+                });
+                break;
+
+            case 'השנה':
+                const startOfYear = new Date(today.getFullYear(), 0, 1);
+                startDate = startOfYear.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case 'YTD':
+                startDate = createDateWithTimezone(today.getFullYear(), 0, 1);
+                endDate = todayStr;
+                console.log('🔄 YTD calculation:', {
+                    today: todayStr,
+                    year: today.getFullYear(),
+                    startDate: startDate
+                });
+                break;
+
+            case '30 יום':
+                const thirtyDaysAgo = new Date(today);
+                thirtyDaysAgo.setDate(today.getDate() - 30);
+                startDate = thirtyDaysAgo.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case '60 יום':
+                const sixtyDaysAgo = new Date(today);
+                sixtyDaysAgo.setDate(today.getDate() - 60);
+                startDate = sixtyDaysAgo.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case '90 יום':
+                const ninetyDaysAgo = new Date(today);
+                ninetyDaysAgo.setDate(today.getDate() - 90);
+                startDate = ninetyDaysAgo.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case 'שנה':
+                const oneYearAgo = new Date(today);
+                oneYearAgo.setFullYear(today.getFullYear() - 1);
+                startDate = oneYearAgo.toISOString().split('T')[0];
+                endDate = todayStr;
+                break;
+
+            case 'שנה קודמת':
+                startDate = createDateWithTimezone(today.getFullYear() - 1, 0, 1);
+                endDate = createDateWithTimezone(today.getFullYear() - 1, 11, 31);
+                console.log('🔄 שנה קודמת calculation:', {
+                    today: todayStr,
+                    lastYear: today.getFullYear() - 1,
+                    startDate: startDate,
+                    endDate: endDate
+                });
+                break;
+
+            default:
+                // ניסיון לחלץ תאריכים מטקסט
+                if (dateRange.includes(' - ')) {
+                    const dates = dateRange.split(' - ');
+                    startDate = dates[0] || 'לא נבחר';
+                    endDate = dates[1] || 'לא נבחר';
+                } else if (dateRange.includes(' עד ')) {
+                    const dates = dateRange.split(' עד ');
+                    startDate = dates[0] || 'לא נבחר';
+                    endDate = dates[1] || 'לא נבחר';
+                } else {
+                    startDate = dateRange;
+                    endDate = dateRange;
+                }
+                break;
+        }
+    } else if (dateRange && dateRange.startDate && dateRange.endDate) {
+        startDate = dateRange.startDate;
+        endDate = dateRange.endDate;
+    }
+
+    console.log('🔄 Date range translation:', {
+        original: dateRange,
+        startDate,
+        endDate,
+        today: todayStr,
+        dayOfWeek: today.getDay()
+    });
+    return { startDate, endDate };
+}
+
+/**
+ * עדכון חלון בדיקת פילטרים
+ */
+function updateFilterDebugPanel() {
+    const statusesElement = document.getElementById('debugSelectedStatuses');
+    const typesElement = document.getElementById('debugSelectedTypes');
+    const dateRangeElement = document.getElementById('debugSelectedDateRange');
+    const startDateElement = document.getElementById('debugStartDate');
+    const endDateElement = document.getElementById('debugEndDate');
+    const searchElement = document.getElementById('debugSearchTerm');
+    const statusElement = document.getElementById('debugFilterStatus');
+
+    if (statusesElement) {
+        const statuses = window.selectedStatusesForFilter || [];
+        statusesElement.textContent = statuses.length > 0 ? statuses.join(', ') : 'לא נבחרו';
+        statusesElement.style.color = statuses.length > 0 ? '#007bff' : '#6c757d';
+    }
+
+    if (typesElement) {
+        const types = window.selectedTypesForFilter || [];
+        typesElement.textContent = types.length > 0 ? types.join(', ') : 'לא נבחרו';
+        typesElement.style.color = types.length > 0 ? '#007bff' : '#6c757d';
+    }
+
+    if (dateRangeElement) {
+        const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
+        dateRangeElement.textContent = dateRange !== 'כל זמן' ? dateRange : 'לא נבחר';
+        dateRangeElement.style.color = dateRange !== 'כל זמן' ? '#007bff' : '#6c757d';
+    }
+
+    if (startDateElement) {
+        const startDate = window.selectedStartDateForFilter || 'לא נבחר';
+        startDateElement.textContent = startDate;
+        startDateElement.style.color = startDate !== 'לא נבחר' ? '#007bff' : '#6c757d';
+    }
+
+    if (endDateElement) {
+        const endDate = window.selectedEndDateForFilter || 'לא נבחר';
+        endDateElement.textContent = endDate;
+        endDateElement.style.color = endDate !== 'לא נבחר' ? '#007bff' : '#6c757d';
+    }
+
+    if (searchElement) {
+        const search = window.searchTermForFilter || '';
+        searchElement.textContent = search.trim() !== '' ? search : 'ריק';
+        searchElement.style.color = search.trim() !== '' ? '#007bff' : '#6c757d';
+    }
+
+    if (statusElement) {
+        const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
+            (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
+            (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
+            (window.selectedStartDateForFilter && window.selectedStartDateForFilter !== 'לא נבחר') ||
+            (window.selectedEndDateForFilter && window.selectedEndDateForFilter !== 'לא נבחר') ||
+            (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
+
+        statusElement.textContent = hasActiveFilters ? 'פעיל' : 'לא פעיל';
+        statusElement.style.color = hasActiveFilters ? '#28a745' : '#6c757d';
+    }
+
+    console.log('🔄 Filter debug panel updated');
+}
+
+/**
+ * פילטור מקומי של תכנונים
+ */
+function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+    console.log('🔄 === FILTER DESIGNS LOCALLY ===');
+    console.log('🔄 Original designs:', designs.length);
+    console.log('🔄 Filters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
+
+    let filteredDesigns = [...designs];
+
+    // חילוץ תאריכי התחלה וסיום
+    let startDate = null;
+    let endDate = null;
+
+    if (selectedDateRange && selectedDateRange !== 'כל זמן') {
+        console.log('🔄 Filter: Translating date range:', selectedDateRange);
+        const dateRange = translateDateRangeToDates(selectedDateRange);
+        startDate = dateRange.startDate;
+        endDate = dateRange.endDate;
+        console.log('🔄 Filter: Translation result:', { startDate, endDate });
+    }
+
+    console.log('🔄 Extracted dates:', { startDate, endDate });
+
+    // פילטר לפי סטטוס
+    if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
+        console.log('🔄 Filtering by status:', selectedStatuses);
+        filteredDesigns = filteredDesigns.filter(design => {
+            let itemStatus;
+            if (design.status === 'cancelled') {
+                itemStatus = 'מבוטל';
+            } else if (design.status === 'closed') {
+                itemStatus = 'סגור';
+            } else {
+                itemStatus = 'פתוח';
+            }
+            const isMatch = selectedStatuses.includes(itemStatus);
+            console.log(`🔄 Design ${design.id}: status=${design.status}, mapped=${itemStatus}, selected=${selectedStatuses}, match=${isMatch}`);
+            return isMatch;
+        });
+        console.log('🔄 After status filter:', filteredDesigns.length, 'designs');
+    }
+
+    // פילטר לפי סוג
+    if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
+        console.log('🔄 Filtering by type:', selectedTypes);
+        filteredDesigns = filteredDesigns.filter(design => {
+            let typeDisplay;
+            switch (design.type || design.investment_type) {
+                case 'swing':
+                    typeDisplay = 'סווינג';
+                    break;
+                case 'investment':
+                    typeDisplay = 'השקעה';
+                    break;
+                case 'passive':
+                    typeDisplay = 'פאסיבי';
+                    break;
+                default:
+                    typeDisplay = design.type || design.investment_type;
+            }
+            const isMatch = selectedTypes.includes(typeDisplay);
+            console.log(`🔄 Design ${design.id}: type=${design.type}, mapped=${typeDisplay}, selected=${selectedTypes}, match=${isMatch}`);
+            return isMatch;
+        });
+        console.log('🔄 After type filter:', filteredDesigns.length, 'designs');
+    }
+
+    // פילטר לפי תאריכים
+    if (startDate && endDate) {
+        console.log('🔄 Filtering by date range:', { startDate, endDate });
+        filteredDesigns = filteredDesigns.filter(design => {
+            if (!design.date) return false;
+
+            const designDate = new Date(design.date);
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            // הגדרת זמן לתחילת היום לתאריך התחלה ולסוף היום לתאריך סיום
+            start.setHours(0, 0, 0, 0);
+            end.setHours(23, 59, 59, 999);
+
+            const isInRange = designDate >= start && designDate <= end;
+            console.log(`🔄 Design ${design.id}: date=${design.date}, inRange=${isInRange}`);
+            return isInRange;
+        });
+        console.log('🔄 After date filter:', filteredDesigns.length, 'designs');
+    }
+
+    // פילטר לפי חיפוש
+    if (searchTerm && searchTerm.trim() !== '') {
+        console.log('🔄 Filtering by search term:', searchTerm);
+        const searchLower = searchTerm.toLowerCase();
+
+        // תרגום מונחי חיפוש דו-כיווני
+        const searchTranslations = {
+            // תרגום סטטוסים
+            'פתוח': 'open',
+            'סגור': 'closed',
+            'בוטל': 'cancelled',
+            'מבוטל': 'cancelled',
+            'open': 'open',
+            'closed': 'closed',
+            'cancelled': 'cancelled',
+
+            // תרגום סוגי השקעות
+            'סווינג': 'swing',
+            'השקעה': 'investment',
+            'פאסיבי': 'passive',
+            'swing': 'swing',
+            'investment': 'investment',
+            'passive': 'passive',
+
+            // תרגום צדדים
+            'לונג': 'long',
+            'שורט': 'short',
+            'long': 'long',
+            'short': 'short',
+
+            // תרגום מספרים
+            'אפס': '0',
+            'אחת': '1',
+            'שתיים': '2',
+            'שלוש': '3',
+            'ארבע': '4',
+            'חמש': '5',
+            'שש': '6',
+            'שבע': '7',
+            'שמונה': '8',
+            'תשע': '9',
+            'עשר': '10'
+        };
+
+        // יצירת מערך מונחי חיפוש כולל התרגום
+        const searchTerms = [searchLower];
+
+        // הוספת תרגום מדויק
+        if (searchTranslations[searchLower]) {
+            searchTerms.push(searchTranslations[searchLower]);
+        }
+
+        // הוספת חיפוש חלקי - אם המשתמש מחפש חלק ממילה
+        Object.keys(searchTranslations).forEach(hebrewTerm => {
+            if (hebrewTerm.includes(searchLower) && !searchTerms.includes(searchTranslations[hebrewTerm])) {
+                searchTerms.push(searchTranslations[hebrewTerm]);
+            }
+        });
+
+        filteredDesigns = filteredDesigns.filter(design => {
+            // חיפוש בכל השדות הרלוונטיים - לפי המבנה האמיתי מהשרת
+            const tickerMatch = design.ticker && searchTerms.some(term =>
+                (design.ticker.symbol && design.ticker.symbol.toLowerCase().includes(term)) ||
+                (design.ticker.name && design.ticker.name.toLowerCase().includes(term))
+            );
+
+            const typeMatch = design.investment_type && searchTerms.some(term =>
+                design.investment_type.toLowerCase().includes(term)
+            );
+
+            const sideMatch = design.side && searchTerms.some(term =>
+                design.side.toLowerCase().includes(term)
+            );
+
+            const statusMatch = design.status && searchTerms.some(term =>
+                design.status.toLowerCase().includes(term)
+            );
+
+            const amountMatch = design.planned_amount && searchTerms.some(term =>
+                design.planned_amount.toString().includes(term)
+            );
+
+            const targetMatch = design.target_price && searchTerms.some(term =>
+                design.target_price.toString().includes(term)
+            );
+
+            const stopMatch = design.stop_price && searchTerms.some(term =>
+                design.stop_price.toString().includes(term)
+            );
+
+            const entryMatch = design.entry_conditions && searchTerms.some(term =>
+                design.entry_conditions.toLowerCase().includes(term)
+            );
+
+            const reasonsMatch = design.reasons && searchTerms.some(term =>
+                design.reasons.toLowerCase().includes(term)
+            );
+
+            const accountMatch = design.account && design.account.name && searchTerms.some(term =>
+                design.account.name.toLowerCase().includes(term)
+            );
+
+            const isMatch = tickerMatch || typeMatch || sideMatch || statusMatch ||
+                amountMatch || targetMatch || stopMatch || entryMatch || reasonsMatch || accountMatch;
+
+            console.log(`🔄 Design ${design.id} search:`, {
+                ticker: design.ticker?.symbol,
+                type: design.investment_type,
+                side: design.side,
+                status: design.status,
+                searchTerms: searchTerms,
+                originalSearch: searchLower,
+                isMatch
+            });
+
+            return isMatch;
+        });
+        console.log('🔄 After search filter:', filteredDesigns.length, 'designs');
+    }
+
+    console.log('🔄 Final filtered designs:', filteredDesigns.length);
+    return filteredDesigns;
+}
+
+/**
  * עיצוב מטבע
  */
 function formatCurrency(amount) {
@@ -594,7 +1215,9 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('🔍 Checking global functions:', {
         toggleTopSection: typeof window.toggleTopSection,
         toggleMainSection: typeof window.toggleMainSection,
-        restoreAllSectionStates: typeof window.restoreAllSectionStates
+        restoreAllSectionStates: typeof window.restoreAllSectionStates,
+        filterDataByFilters: typeof window.filterDataByFilters,
+        updateGridFromComponentGlobal: typeof window.updateGridFromComponentGlobal
     });
 
     // שחזור מצב הסקשנים
@@ -607,28 +1230,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // טעינת נתונים
     loadDesignsData();
+
+    // עדכון חלון הבדיקה בטעינת הדף
+    setTimeout(() => {
+        updateFilterDebugPanel();
+    }, 1000);
 });
 
-// הגדרת הפונקציה updateGridFromComponent לדף התכנונים
-window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-    console.log('🔄 updateGridFromComponent called for planning page with:', {
-        selectedStatuses,
-        selectedTypes,
-        selectedDateRange,
-        searchTerm
-    });
-
-    // קריאה לפונקציה הגלובלית
-    if (typeof window.updateGridFromComponentGlobal === 'function') {
-        window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'planning');
-    } else {
-        console.error('updateGridFromComponentGlobal function not found');
-        // fallback - טעינת נתונים מחדש
-        if (typeof window.loadDesignsData === 'function') {
-            window.loadDesignsData();
-        }
-    }
-};
+// הפונקציה updateGridFromComponent כבר מוגדרת בתחילת הקובץ
 
 // הוספת הפונקציות לגלובל
 window.loadDesignsData = loadDesignsData;
@@ -639,3 +1248,28 @@ window.editDesign = editDesign;
 window.deleteDesign = deleteDesign;
 window.filterDesignsData = filterDesignsData;
 window.sortTable = sortTable;
+window.filterDesignsLocally = filterDesignsLocally;
+window.updateFilterDebugPanel = updateFilterDebugPanel;
+window.translateDateRangeToDates = translateDateRangeToDates;
+
+// בדיקה שהפונקציות זמינות
+console.log('🔄 Planning.js loaded. Available functions:', {
+    loadDesignsData: typeof window.loadDesignsData,
+    updateDesignsTable: typeof window.updateDesignsTable,
+    filterDataByFilters: typeof window.filterDataByFilters,
+    updateGridFromComponentGlobal: typeof window.updateGridFromComponentGlobal,
+    updateGridFromComponent: typeof window.updateGridFromComponent
+});
+
+// וידוא שהפונקציה שלנו מוגדרת
+if (window.location.pathname.includes('/planning')) {
+    console.log('✅ Planning page detected - updateGridFromComponent should be ours');
+    console.log('✅ Our updateGridFromComponent function:', typeof window.updateGridFromComponent);
+
+    // בדיקה שהפונקציה שלנו נקראת
+    if (typeof window.updateGridFromComponent === 'function') {
+        console.log('✅ Our updateGridFromComponent function is properly defined');
+    } else {
+        console.error('❌ Our updateGridFromComponent function is NOT defined');
+    }
+}

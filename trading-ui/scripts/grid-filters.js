@@ -477,6 +477,8 @@ function updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selected
   if (pageName === 'tracking') {
     pageLoadFunction = window.loadTradesData;
   } else if (pageName === 'planning') {
+    pageLoadFunction = window.loadDesignsData; // בדף התכנונים הפונקציה נקראת loadDesignsData
+  } else if (pageName === 'designs') {
     pageLoadFunction = window.loadDesignsData;
   } else if (pageName === 'notes') {
     pageLoadFunction = window.loadNotesData;
@@ -575,6 +577,8 @@ function resetAllFiltersForPage(pageName) {
   if (pageName === 'tracking') {
     pageLoadFunction = window.loadTradesData;
   } else if (pageName === 'planning') {
+    pageLoadFunction = window.loadPlanningData;
+  } else if (pageName === 'designs') {
     pageLoadFunction = window.loadDesignsData;
   } else if (pageName === 'notes') {
     pageLoadFunction = window.loadNotesData;
@@ -610,6 +614,8 @@ function initializePageFilters(pageName) {
   if (pageName === 'tracking') {
     pageLoadFunction = window.loadTradesData;
   } else if (pageName === 'planning') {
+    pageLoadFunction = window.loadPlanningData;
+  } else if (pageName === 'designs') {
     pageLoadFunction = window.loadDesignsData;
   } else if (pageName === 'notes') {
     pageLoadFunction = window.loadNotesData;
@@ -748,3 +754,10 @@ console.log('🔄 Grid filters loaded. Available functions:', {
   updateGridFromComponentGlobal: typeof window.updateGridFromComponentGlobal,
   updateAccountFilterMenu: typeof window.updateAccountFilterMenu
 });
+
+// בדיקה מיידית של הפונקציה
+if (typeof window.updateAccountFilterMenu === 'function') {
+  console.log('✅ updateAccountFilterMenu is available');
+} else {
+  console.log('❌ updateAccountFilterMenu is NOT available');
+}

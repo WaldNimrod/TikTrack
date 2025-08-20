@@ -48,8 +48,6 @@
   <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-
-
   <!-- קבצים מודולריים של הגריד -->
   <script src="scripts/app-header.js"></script>
   <script src="scripts/main.js"></script>
@@ -69,19 +67,13 @@
     <div class="page-body">
       <!-- אזור עיצובים - top-Section -->
       <div class="top-section">
-        <!-- כותרת עיצובים -->
+        <!-- כותרת ראשית -->
         <div class="section-header">
           <div class="table-title">
-            📋 עיצובים - top-Section
+            📋 כותרת ראשית
           </div>
           <div class="table-actions">
-            <button class="refresh-btn" onclick="openDesignDetails()" title="הוסף עיצוב חדש">
-              <span class="action-icon">➕</span> הוסף
-            </button>
-            <div class="action-separator"></div>
-            <button class="filter-toggle-btn"
-              onclick="if (typeof window.toggleTopSection === 'function') { window.toggleTopSection(); } else { console.error('toggleTopSection function not found'); }"
-              title="הצג/הסתר אזור עיצובים">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור עיצובים">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -122,7 +114,7 @@
           <!-- כותרת עיצובים -->
           <div class="section-header">
             <div class="table-title">
-              📋 תכנונים - content-section
+              📋 כותרת הסקשן
             </div>
             <div class="table-count">9 תכנונים</div>
             <div class="table-actions">
@@ -133,9 +125,7 @@
                 <span class="action-icon">🔄</span> רענן
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn"
-                onclick="if (typeof window.toggleMainSection === 'function') { window.toggleMainSection(); } else { console.error('toggleMainSection function not found'); }"
-                title="הצג/הסתר אזור עיצובים">
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור עיצובים">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -148,57 +138,49 @@
                 <thead>
                   <tr>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(0)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(0)">
                         <span class="sort-icon">↕</span>נכס
                         <br><span class="header-subtitle">Ticker</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(1)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(1)">
                         <span class="sort-icon">↕</span>תאריך
                         <br><span class="header-subtitle">Date</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(2)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(2)">
                         <span class="sort-icon">↕</span>סוג
                         <br><span class="header-subtitle">Type</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(3)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(3)">
                         <span class="sort-icon">↕</span>סכום
                         <br><span class="header-subtitle">Amount</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(4)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(4)">
                         <span class="sort-icon">↕</span>יעד
                         <br><span class="header-subtitle">Target</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(5)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(5)">
                         <span class="sort-icon">↕</span>סטופ
                         <br><span class="header-subtitle">Stop</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(6)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(6)">
                         <span class="sort-icon">↕</span>נוכחי
                         <br><span class="header-subtitle">Current</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(7)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                      <button class="btn btn-link sortable-header-btn" onclick="sortTable(7)">
                         <span class="sort-icon">↕</span>סטטוס
                         <br><span class="header-subtitle">Status</span>
                       </button>
@@ -374,9 +356,9 @@
         <!-- כותרת חשבונות -->
         <div class="section-header">
           <div class="table-title">
-            💰 חשבונות - content-section
+            💰 כותרת סקשן 2
           </div>
-          <div class="table-count">טוען...</div>
+          <div class="table-count">3 חשבונות</div>
           <div class="table-actions">
             <button class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש">
               <span class="action-icon">➕</span> הוסף
@@ -392,27 +374,70 @@
         </div>
 
         <!-- טבלת חשבונות -->
-        <div class="section-body" style="display: block;">
+        <div class="section-body">
           <div class="table-responsive">
             <table class="table">
               <thead>
                 <tr>
-                  <th>מזהה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID</span></th>
-                  <th>שם<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name</span></th>
-                  <th>מטבע<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Currency</span></th>
-                  <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
-                  <th>יתרה<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Cash Balance</span></th>
-                  <th>שווי כולל<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total Value</span>
-                  </th>
-                  <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P&L</span>
-                  </th>
-                  <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
-                  <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+                  <th>מזהה<br><span class="header-subtitle">ID</span></th>
+                  <th>שם<br><span class="header-subtitle">Name</span></th>
+                  <th>מטבע<br><span class="header-subtitle">Currency</span></th>
+                  <th>סטטוס<br><span class="header-subtitle">Status</span></th>
+                  <th>יתרה<br><span class="header-subtitle">Cash Balance</span></th>
+                  <th>שווי כולל<br><span class="header-subtitle">Total Value</span></th>
+                  <th>רווח/הפסד<br><span class="header-subtitle">Total P&L</span></th>
+                  <th>הערות<br><span class="header-subtitle">Notes</span></th>
+                  <th>פעולות<br><span class="header-subtitle">Actions</span></th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td colspan="9" class="loading">טוען חשבונות...</td>
+                  <td>1</td>
+                  <td>חשבון ראשי</td>
+                  <td>USD</td>
+                  <td><span class="status-badge status-active">פעיל</span></td>
+                  <td>$25,000</td>
+                  <td>$45,250</td>
+                  <td class="profit-positive">+$2,500 (5.8%)</td>
+                  <td>חשבון המסחר הראשי</td>
+                  <td class="actions-cell">
+                    <button class="btn btn-sm btn-secondary" title="ערוך">
+                      <span class="btn-icon">✏️</span>
+                    </button>
+                    <button class="btn btn-sm btn-danger" title="מחק">X</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>חשבון משני</td>
+                  <td>USD</td>
+                  <td><span class="status-badge status-active">פעיל</span></td>
+                  <td>$15,000</td>
+                  <td>$18,750</td>
+                  <td class="profit-positive">+$750 (4.2%)</td>
+                  <td>חשבון למסחר משני</td>
+                  <td class="actions-cell">
+                    <button class="btn btn-sm btn-secondary" title="ערוך">
+                      <span class="btn-icon">✏️</span>
+                    </button>
+                    <button class="btn btn-sm btn-danger" title="מחק">X</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>חשבון בדיקה</td>
+                  <td>USD</td>
+                  <td><span class="status-badge status-inactive">לא פעיל</span></td>
+                  <td>$5,000</td>
+                  <td>$5,000</td>
+                  <td>$0 (0.0%)</td>
+                  <td>חשבון לבדיקות</td>
+                  <td class="actions-cell">
+                    <button class="btn btn-sm btn-secondary" title="ערוך">
+                      <span class="btn-icon">✏️</span>
+                    </button>
+                    <button class="btn btn-sm btn-danger" title="מחק">X</button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -422,16 +447,17 @@
     </div> <!-- סוף page-body -->
 
     <!-- מרווח בתחתית הדף -->
-    <div style="height: 3rem;"></div>
+    <div class="bottom-spacer"></div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- קבצים מודולריים -->
     <script src="scripts/accounts.js"></script>
+    <script src="scripts/designs.js"></script>
+</body>
 
-    <script>
-      // פונקציות מותאמות לעמוד עיצובים
+</html>
       function openDesignDetails(id) {
         console.log('פתיחת פרטי עיצוב:', id);
         // כאן יוכנס קוד לפתיחת מודל פרטי עיצוב
@@ -908,21 +934,6 @@
       // פונקציה לרענון נתונים בלבד (לא מאפסת פילטרים)
       function refreshDataOnly() {
         loadDesignsData();
-      }
-
-      // פונקציה לאיפוס מיון
-      function resetSort() {
-        // מחיקת מצב מיון מ-localStorage
-        localStorage.removeItem('designsSortColumn');
-        localStorage.removeItem('designsSortDirection');
-
-        // איפוס אייקונים
-        updateSortIcons(-1);
-
-        // רענון הנתונים
-        loadDesignsData();
-
-        showNotification('מיון אופס', 'success');
       }
 
       // הגדרת הפונקציה כגלובלית

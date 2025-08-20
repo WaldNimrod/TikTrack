@@ -7,6 +7,7 @@
  * 
  * תכולת הקובץ:
  * - מערכת התראות: הודעות הצלחה, שגיאה, אזהרה ומידע
+ * - מערכת התראות למודולים: z-index גבוה למודולים
  * - page-body: מבנה הדף הראשי
  * - כפתורים: סגנונות לכל סוגי הכפתורים
  * - קישורים: עיצוב קישורים ואזורים לחיצה
@@ -20,6 +21,10 @@
  * - showErrorNotification() - הודעות שגיאה (אדום)
  * - showWarningNotification() - הודעות אזהרה (כתום)
  * - showInfoNotification() - הודעות מידע (כחול)
+ * - showModalNotification() - הודעות בתוך מודול
+ * 
+ * מחבר: Tik.track Development Team
+ * תאריך עדכון אחרון: 2025-08-20
  */
 
 /* ===== מערכת התראות ===== */
@@ -27,7 +32,7 @@
  * מערכת התראות גלובלית לאתר
  * 
  * מערכת זו מספקת הודעות משתמש יפות ומודרניות במקום alert() הסטנדרטי
- * ההתראות מוצגות בפינה הימנית העליונה של המסך ונעלמות אוטומטית
+ * ההתראות מוצגות בפינה הימנית העליונה של המסך או בתוך מודולים
  * 
  * תכונות:
  * - 4 סוגי התראות: הצלחה (ירוק), שגיאה (אדום), אזהרה (כתום), מידע (כחול)
@@ -35,12 +40,14 @@
  * - עיצוב מודרני עם blur effect וצללים
  * - כפתור סגירה ידני
  * - תמיכה בעברית עם direction: rtl
+ * - תמיכה בהתראות בתוך מודולים עם z-index גבוה
  * 
  * שימוש:
  * showSuccessNotification('כותרת', 'הודעה');
  * showErrorNotification('כותרת', 'הודעה');
  * showWarningNotification('כותרת', 'הודעה');
  * showInfoNotification('כותרת', 'הודעה');
+ * showModalNotification('modalId', 'כותרת', 'הודעה');
  */
 
 /* Container להתראות - מיקום קבוע בפינה הימנית העליונה */
@@ -51,6 +58,25 @@
   z-index: 100000;
   max-width: 400px;
   pointer-events: none;
+}
+
+/* Container להתראות בתוך מודול */
+.notification-container.modal-notification {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 9999999;
+  max-width: 350px;
+  pointer-events: none;
+}
+
+/* התראות בתוך מודול - z-index גבוה יותר */
+.modal .notification-container.modal-notification {
+  z-index: 99999999 !important;
+}
+
+.modal .notification-container.modal-notification .notification {
+  z-index: 99999999 !important;
 }
 
 /* התראה בודדת - עיצוב בסיסי */
@@ -70,6 +96,7 @@
   align-items: center;
   gap: 12px;
   direction: rtl;
+  z-index: 9999999;
 }
 
 .notification.show {
@@ -2003,8 +2030,8 @@ button[onclick*="openDesignDetails"]:hover {
 .refresh-btn[onclick*="loadAccounts"],
 .refresh-btn[onclick*="resetTestPreferences"] {
   background: #ffffff !important;
-  color: #ff9c05 !important;
-  border: 2px solid #ff9c05 !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
   border-radius: 8px !important;
   padding: 6px 13px !important;
   font-size: 11px !important;
@@ -2016,6 +2043,7 @@ button[onclick*="openDesignDetails"]:hover {
   align-items: center !important;
   gap: 5px !important;
   cursor: pointer !important;
+  letter-spacing: -0.01em !important;
 }
 
 .refresh-btn[onclick*="refresh"]:hover,
@@ -2023,11 +2051,11 @@ button[onclick*="openDesignDetails"]:hover {
 .refresh-btn[onclick*="loadTrades"]:hover,
 .refresh-btn[onclick*="loadAccounts"]:hover,
 .refresh-btn[onclick*="resetTestPreferences"]:hover {
-  background: rgba(255, 156, 5, 0.1) !important;
-  color: #e55a2b !important;
-  border-color: #e55a2b !important;
+  background: rgba(41, 166, 168, 0.1) !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(255, 156, 5, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
 }
 
 /* כפתורי הוסף - סגנון אחיד לכל האתר */

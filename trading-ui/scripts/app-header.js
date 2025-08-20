@@ -45,7 +45,7 @@ class AppHeader extends HTMLElement {
       // ודא שקובץ accounts.js נטען לפני ניסיון שימוש בפונקציות שלו
       let retryCount = 0;
       const maxRetries = 10; // מקסימום 10 נסיונות (2 שניות)
-      
+
       const ensureAccountsReady = () => {
         if (typeof window.loadAllAccountsFromServer === 'function' && typeof window.updateAccountFilterMenu === 'function') {
           console.log('🔄 Accounts functions available, loading all accounts...');
@@ -1003,15 +1003,15 @@ class AppHeader extends HTMLElement {
                       
                       <!-- התפריט הנפתח מתחת לכפתורים -->
                       <div class="status-filter-menu" id="statusFilterMenu">
-                        <div class="status-filter-item">
+                        <div class="status-filter-item" data-status="פתוח">
                           <span class="option-text">פתוח</span>
                           <span class="check-mark">✓</span>
                         </div>
-                        <div class="status-filter-item">
+                        <div class="status-filter-item" data-status="סגור">
                           <span class="option-text">סגור</span>
                           <span class="check-mark">✓</span>
                         </div>
-                        <div class="status-filter-item">
+                        <div class="status-filter-item" data-status="מבוטל">
                           <span class="option-text">מבוטל</span>
                           <span class="check-mark">✓</span>
                         </div>
@@ -1153,6 +1153,9 @@ class AppHeader extends HTMLElement {
     // הוספת event listeners לתפריט הנפתח
     this.addDropdownEventListeners();
 
+    // הוספת event listeners לפילטרים
+    this.addFilterEventListeners();
+
     // סגירת דרופדאונים בלחיצה מחוץ להם
     this.setupGlobalEventListeners();
   }
@@ -1205,6 +1208,15 @@ class AppHeader extends HTMLElement {
         });
       });
     }
+  }
+
+  addFilterEventListeners() {
+    console.log('🔄 Adding filter event listeners...');
+    console.log('🔄 Shadow root:', this.shadowRoot);
+
+    // הערה: Event listeners לפילטרים מוגדרים בפונקציה אחרת
+    // כדי למנוע כפילות, אנחנו לא מוסיפים אותם כאן
+    console.log('✅ Filter event listeners are set up in another function');
   }
 
   toggleSettingsDropdown(event) {
@@ -1766,11 +1778,12 @@ class AppHeader extends HTMLElement {
 
   // פונקציות הפילטר
   toggleStatusFilter() {
-    console.log('toggleStatusFilter called');
+    console.log('🔄 toggleStatusFilter called');
     const menu = this.shadowRoot.getElementById('statusFilterMenu');
     const toggle = this.shadowRoot.querySelector('.status-filter-toggle');
 
-    console.log('Menu:', menu, 'Toggle:', toggle);
+    console.log('🔄 Menu element:', menu);
+    console.log('🔄 Toggle element:', toggle);
 
     if (!menu || !toggle) {
       console.log('Missing elements');
@@ -1806,6 +1819,45 @@ class AppHeader extends HTMLElement {
       menu.classList.remove('show');
       toggle.classList.remove('active');
     }
+  }
+
+  selectStatusFilter(element) {
+    console.log('selectStatusFilter called', element);
+
+    const status = element.getAttribute('data-status');
+    console.log('Selected status:', status);
+
+    // עדכון המשתנה הגלובלי
+    if (!window.selectedStatusesForFilter) {
+      window.selectedStatusesForFilter = [];
+    }
+
+    // בדיקה אם הסטטוס כבר נבחר
+    const index = window.selectedStatusesForFilter.indexOf(status);
+    if (index > -1) {
+      // הסרת הבחירה
+      window.selectedStatusesForFilter.splice(index, 1);
+      element.classList.remove('selected');
+    } else {
+      // הוספת הבחירה
+      window.selectedStatusesForFilter.push(status);
+      element.classList.add('selected');
+    }
+
+    // עדכון הטקסט של הכפתור
+    this.updateStatusFilterText();
+
+    // שמירה ב-localStorage
+    try {
+      localStorage.setItem('globalFilterStatuses', JSON.stringify(window.selectedStatusesForFilter));
+    } catch (error) {
+      console.error('Error saving status filter to localStorage:', error);
+    }
+
+    // עדכון הטבלה
+    this.updateGridFilter();
+
+    console.log('Updated selectedStatusesForFilter:', window.selectedStatusesForFilter);
   }
 
   toggleTypeFilter() {
@@ -1900,6 +1952,45 @@ class AppHeader extends HTMLElement {
     }
   }
 
+  selectAccountFilter(element) {
+    console.log('selectAccountFilter called', element);
+
+    const accountId = element.getAttribute('data-account');
+    console.log('Selected account:', accountId);
+
+    // עדכון המשתנה הגלובלי
+    if (!window.selectedAccountsForFilter) {
+      window.selectedAccountsForFilter = [];
+    }
+
+    // בדיקה אם החשבון כבר נבחר
+    const index = window.selectedAccountsForFilter.indexOf(accountId);
+    if (index > -1) {
+      // הסרת הבחירה
+      window.selectedAccountsForFilter.splice(index, 1);
+      element.classList.remove('selected');
+    } else {
+      // הוספת הבחירה
+      window.selectedAccountsForFilter.push(accountId);
+      element.classList.add('selected');
+    }
+
+    // עדכון הטקסט של הכפתור
+    this.updateAccountFilterText();
+
+    // שמירה ב-localStorage
+    try {
+      localStorage.setItem('globalFilterAccounts', JSON.stringify(window.selectedAccountsForFilter));
+    } catch (error) {
+      console.error('Error saving account filter to localStorage:', error);
+    }
+
+    // עדכון הטבלה
+    this.updateGridFilter();
+
+    console.log('Updated selectedAccountsForFilter:', window.selectedAccountsForFilter);
+  }
+
   toggleDateRangeFilter() {
     console.log('🔍 toggleDateRangeFilter called');
     const menu = this.shadowRoot.getElementById('dateRangeFilterMenu');
@@ -1971,10 +2062,7 @@ class AppHeader extends HTMLElement {
   }
 
   selectStatusOption(status) {
-    console.log('🔴 FILTER DISABLED - selectStatusOption called but disabled');
-
-    // 🔴 הפילטר מושבת באופן זמני
-    return;
+    console.log('🟢 FILTER ENABLED - selectStatusOption called');
 
     console.log('selectStatusOption called with status:', status);
     const menu = this.shadowRoot.getElementById('statusFilterMenu');
@@ -2005,10 +2093,7 @@ class AppHeader extends HTMLElement {
   }
 
   selectTypeOption(type) {
-    console.log('🔴 FILTER DISABLED - selectTypeOption called but disabled');
-
-    // 🔴 הפילטר מושבת באופן זמני
-    return;
+    console.log('🟢 FILTER ENABLED - selectTypeOption called');
 
     console.log('selectTypeOption called with type:', type);
     const menu = this.shadowRoot.getElementById('typeFilterMenu');
@@ -2039,10 +2124,7 @@ class AppHeader extends HTMLElement {
   }
 
   selectAccountOption(account) {
-    console.log('🔴 FILTER DISABLED - selectAccountOption called but disabled');
-
-    // 🔴 הפילטר מושבת באופן זמני
-    return;
+    console.log('🟢 FILTER ENABLED - selectAccountOption called');
 
     console.log('selectAccountOption called with account:', account);
     const menu = this.shadowRoot.getElementById('accountFilterMenu');

@@ -1485,7 +1485,105 @@
 
           <!-- תוכן הגדרות תצוגה -->
           <div class="section-body">
-            <!-- תוכן יוכנס כאן -->
+            <div class="preferences-container">
+              <!-- הגדרות ברירות מחדל לפילטרים -->
+              <h5 style="margin-bottom: 1.5rem; color: #495057; font-weight: 600;">🔍 ברירות מחדל לפילטרים</h5>
+              
+              <!-- פילטר סטטוס ברירת מחדל -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">📊</span>
+                  <div class="preference-text">
+                    <h4>פילטר סטטוס ברירת מחדל</h4>
+                    <p>בחר איזה סטטוס יוצג כברירת מחדל בפילטרים</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <select id="defaultStatusFilterSelect" class="form-select" onchange="updateDefaultStatusFilter(this.value)">
+                    <option value="all">הכול</option>
+                    <option value="open">פתוח</option>
+                    <option value="closed">סגור</option>
+                    <option value="cancelled">מבוטל</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- פילטר סוג ברירת מחדל -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">🏷️</span>
+                  <div class="preference-text">
+                    <h4>פילטר סוג ברירת מחדל</h4>
+                    <p>בחר איזה סוג יוצג כברירת מחדל בפילטרים</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <select id="defaultTypeFilterSelect" class="form-select" onchange="updateDefaultTypeFilter(this.value)">
+                    <option value="all">הכול</option>
+                    <option value="swing">סווינג</option>
+                    <option value="investment">השקעה</option>
+                    <option value="passive">פאסיבי</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- פילטר חשבונות ברירת מחדל -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">🏦</span>
+                  <div class="preference-text">
+                    <h4>פילטר חשבונות ברירת מחדל</h4>
+                    <p>בחר איזה חשבון יוצג כברירת מחדל בפילטרים</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <select id="defaultAccountFilterSelect" class="form-select" onchange="updateDefaultAccountFilter(this.value)">
+                    <option value="all">הכול</option>
+                    <!-- החשבונות יטענו דינמית -->
+                  </select>
+                </div>
+              </div>
+
+              <!-- פילטר טווח תאריכים ברירת מחדל -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">📅</span>
+                  <div class="preference-text">
+                    <h4>פילטר טווח תאריכים ברירת מחדל</h4>
+                    <p>בחר איזה טווח תאריכים יוצג כברירת מחדל</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <select id="defaultDateRangeFilterSelect" class="form-select" onchange="updateDefaultDateRangeFilter(this.value)">
+                    <option value="all">כל זמן</option>
+                    <option value="this_week">השבוע</option>
+                    <option value="week">שבוע</option>
+                    <option value="mtd">MTD</option>
+                    <option value="30_days">30 יום</option>
+                    <option value="60_days">60 יום</option>
+                    <option value="90_days">90 יום</option>
+                    <option value="year">שנה</option>
+                    <option value="ytd">YTD</option>
+                    <option value="previous_year">שנה קודמת</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- פילטר חיפוש ברירת מחדל -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">🔎</span>
+                  <div class="preference-text">
+                    <h4>טקסט חיפוש ברירת מחדל</h4>
+                    <p>הגדר טקסט חיפוש שיופיע כברירת מחדל (אופציונלי)</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <input type="text" id="defaultSearchFilterInput" class="form-control" onchange="updateDefaultSearchFilter(this.value)" placeholder="השאר ריק עבור חיפוש ריק">
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
@@ -2159,6 +2257,11 @@
       window.updatePrimaryCurrency = updatePrimaryCurrency;
       window.updateDefaultStopLoss = updateDefaultStopLoss;
       window.updateDefaultTargetPrice = updateDefaultTargetPrice;
+      window.updateDefaultStatusFilter = updateDefaultStatusFilter;
+      window.updateDefaultTypeFilter = updateDefaultTypeFilter;
+      window.updateDefaultAccountFilter = updateDefaultAccountFilter;
+      window.updateDefaultDateRangeFilter = updateDefaultDateRangeFilter;
+      window.updateDefaultSearchFilter = updateDefaultSearchFilter;
       window.loadPreferencesToUI = loadPreferencesToUI;
       window.resetSystemPreferences = resetSystemPreferences;
       window.saveSystemPreferences = saveSystemPreferences;

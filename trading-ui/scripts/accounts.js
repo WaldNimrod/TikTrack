@@ -114,16 +114,26 @@ async function loadAllAccountsFromServer() {
       const allAccounts = responseData.data || responseData;
       console.log('🔄 All accounts loaded for filter:', allAccounts.length, 'accounts');
 
-      // שמירת כל החשבונות במשתנה גלובלי
-      window.allAccountsData = allAccounts;
+      // סינון רק חשבונות בסטטוס open
+      const openAccounts = allAccounts.filter(account => account.status === 'open');
+      console.log('🔄 Open accounts filtered:', openAccounts.length, 'accounts');
 
-      // עדכון הפילטר עם כל החשבונות (אם הפונקציה קיימת)
+      // שמירת החשבונות הפתוחים במשתנה גלובלי
+      window.allAccountsData = openAccounts;
+
+      // עדכון הפילטר עם החשבונות הפתוחים (אם הפונקציה קיימת)
       if (typeof window.updateAccountFilterMenu === 'function') {
-        window.updateAccountFilterMenu(allAccounts);
+        window.updateAccountFilterMenu(openAccounts);
       } else {
-        console.log('🔄 updateAccountFilterMenu not available yet');
+        console.log('🔄 updateAccountFilterMenu not available yet, trying direct update...');
+        // ניסיון לעדכן ישירות
+        if (typeof window.updateAccountFilterMenuDirectly === 'function') {
+          window.updateAccountFilterMenuDirectly(openAccounts);
+        } else {
+          console.log('🔄 updateAccountFilterMenuDirectly not available either');
+        }
       }
-      return allAccounts;
+      return openAccounts;
     } else {
       console.log('🔄 Error loading all accounts from server, status:', response.status);
       return [];
@@ -338,11 +348,54 @@ function updateAccountsTableInDesigns(accounts) {
   console.log('✅ טבלת חשבונות ב-designs.html עודכנה בהצלחה');
 }
 
+// פונקציה לעדכון טקסט פילטר החשבונות
+function updateAccountFilterText() {
+  console.log('🔄 updateAccountFilterText called');
+
+  const appHeader = document.querySelector('app-header');
+  if (!appHeader || !appHeader.shadowRoot) {
+    console.log('🔄 App header or shadow root not found in updateAccountFilterText');
+    return;
+  }
+
+  const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
+  if (!accountMenu) {
+    console.log('🔄 Account menu not found in updateAccountFilterText');
+    return;
+  }
+
+  const accountToggle = appHeader.shadowRoot.getElementById('accountFilterToggle');
+  if (!accountToggle) {
+    console.log('🔄 Account toggle not found in updateAccountFilterText');
+    return;
+  }
+
+  const selectedText = accountToggle.querySelector('.selected-account-text');
+  if (!selectedText) {
+    console.log('🔄 Selected account text element not found in updateAccountFilterText');
+    return;
+  }
+
+  // קבלת החשבונות הנבחרים
+  const selectedAccounts = window.selectedAccountsForFilter || [];
+  console.log('🔄 Selected account values for text update:', selectedAccounts);
+
+  if (selectedAccounts.length === 0) {
+    selectedText.textContent = 'כל החשבונות';
+  } else if (selectedAccounts.length === 1) {
+    selectedText.textContent = selectedAccounts[0];
+  } else {
+    selectedText.textContent = `${selectedAccounts.length} נבחרו`;
+  }
+
+  console.log('🔄 Updated account filter text to:', selectedText.textContent);
+}
+
 // ייצוא הפונקציות לשימוש גלובלי
 window.loadAccountsFromServer = loadAccountsFromServer;
 window.loadAllAccountsFromServer = loadAllAccountsFromServer;
 window.loadDefaultAccounts = loadDefaultAccounts;
-window.updateAccountFilterMenu = updateAccountFilterMenu;
+// הערה: updateAccountFilterMenu מיוצאת מ-grid-filters.js
 window.updateAccountFilterText = updateAccountFilterText;
 window.getAccounts = getAccounts;
 window.isAccountsLoaded = isAccountsLoaded;
@@ -394,6 +447,54 @@ window.checkAccountsStatus = function () {
   console.log('🔄 === END ACCOUNTS STATUS CHECK ===');
 };
 
+// פונקציה זמנית לעדכון תפריט החשבונות
+window.updateAccountFilterMenuDirectly = function (accounts) {
+  console.log('🔄 === UPDATE ACCOUNT FILTER MENU DIRECTLY ===');
+  console.log('🔄 Accounts received:', accounts);
+
+  // חיפוש התפריט בתוך האפ-הדר (Shadow DOM)
+  const appHeader = document.querySelector('app-header');
+  if (!appHeader || !appHeader.shadowRoot) {
+    console.log('🔄 App header or shadow root not found, skipping account menu update');
+    return;
+  }
+
+  const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
+  if (!accountMenu) {
+    console.log('🔄 Account filter menu not found in app header shadow root');
+    return;
+  }
+
+  // ניקוי התפריט הקיים
+  accountMenu.innerHTML = '';
+
+  // הוספת אופציית "כל החשבונות"
+  const allAccountsItem = document.createElement('div');
+  allAccountsItem.className = 'account-filter-item selected';
+  allAccountsItem.setAttribute('data-account', 'all');
+  allAccountsItem.innerHTML = `
+    <span class="option-text">כל החשבונות</span>
+    <span class="check-mark">✓</span>
+  `;
+  accountMenu.appendChild(allAccountsItem);
+
+  // הוספת החשבונות מהשרת
+  if (accounts && accounts.length > 0) {
+    accounts.forEach(account => {
+      const accountItem = document.createElement('div');
+      accountItem.className = 'account-filter-item';
+      accountItem.setAttribute('data-account', account.id || account.name);
+      accountItem.innerHTML = `
+        <span class="option-text">${account.name || account.account_name || 'Unknown'}</span>
+        <span class="check-mark">✓</span>
+      `;
+      accountMenu.appendChild(accountItem);
+    });
+  }
+
+  console.log(`🔄 Account filter menu updated with ${accounts ? accounts.length : 0} accounts`);
+};
+
 // פונקציה גלובלית לבדיקה מהירה
 window.debugAccountsFilter = function () {
   console.log('🔄 === DEBUG ACCOUNTS FILTER ===');
@@ -412,16 +513,24 @@ window.debugAccountsFilter = function () {
       const accounts = data.data || data;
       const openAccounts = accounts.filter(acc => acc.status === 'open');
       console.log('🔄 Open accounts from server:', openAccounts);
+
+      // ניסיון לעדכן תפריט ישירות
+      if (typeof window.updateAccountFilterMenu === 'function') {
+        console.log('🔄 Direct menu update with open accounts');
+        window.updateAccountFilterMenu(openAccounts);
+      } else {
+        console.log('🔄 updateAccountFilterMenu not available');
+      }
     })
     .catch(error => {
       console.log('🔄 Server error:', error);
     });
 
   // ניסיון לטעון חשבונות
-  if (typeof window.loadAccountsFromServer === 'function') {
-    console.log('🔄 Attempting to load accounts...');
-    window.loadAccountsFromServer().then(() => {
-      console.log('🔄 Accounts loaded successfully');
+  if (typeof window.loadAllAccountsFromServer === 'function') {
+    console.log('🔄 Attempting to load all accounts...');
+    window.loadAllAccountsFromServer().then((accounts) => {
+      console.log('🔄 All accounts loaded successfully:', accounts);
       window.checkAccountsStatus();
     }).catch((error) => {
       console.log('🔄 Error loading accounts:', error);

@@ -98,9 +98,7 @@
             📋 חשבונות
           </div>
           <div class="table-actions">
-            <button class="filter-toggle-btn"
-              onclick="if (typeof window.toggleTopSection === 'function') { window.toggleTopSection(); } else { console.error('toggleTopSection function not found'); }"
-              title="הצג/הסתר אזור סיכום">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור סיכום">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -133,9 +131,7 @@
               </button>
 
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn"
-                onclick="if (typeof window.toggleMainSection === 'function') { window.toggleMainSection(); } else { console.error('toggleMainSection function not found'); }"
-                title="הצג/הסתר אזור חשבונות">
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור חשבונות">
                 <span class="filter-icon">▲</span>
               </button>
             </div>

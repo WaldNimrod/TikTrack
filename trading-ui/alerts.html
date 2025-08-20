@@ -9,13 +9,22 @@
   
   תכונות:
   - טבלת התראות עם מיון ופילטרים
-  - הוספת התראה חדשה
+  - הוספת התראה חדשה עם תנאים בפורמט חדש
   - עריכת התראה קיימת
   - מחיקת התראה
-  - מערכת התראות גלובלית
+  - מערכת התראות גלובלית ובתוך מודול
+  - תרגום תנאי התראה לעברית להצגה
+  - הצגת תאריכים בפורמט תאריך בלבד
+  - כותרת טבלה: "מקושר ל:" במקום "אובייקט משיוך"
+  
+  מבנה תנאי התראה:
+  - פורמט חדש: "variable|operator|value"
+  - משתנים נתמכים: price, daily_change, moving_average, volume
+  - אופרטורים נתמכים: greater_than, less_than, crosses, increases_by, decreases_by
+  - הצגה בעברית: "מחיר > 150", "נפח מסחר עולה ב 5000000"
   
   מחבר: Tik.track Development Team
-  תאריך עדכון אחרון: 2025
+  תאריך עדכון אחרון: 2025-08-20
   ========================================
 -->
 <html lang="he" dir="rtl">
@@ -74,9 +83,7 @@
               <span class="action-icon">➕</span> הוסף
             </button>
             <div class="action-separator"></div>
-            <button class="filter-toggle-btn"
-              onclick="if (typeof window.toggleTopSection === 'function') { window.toggleTopSection(); } else { console.error('toggleTopSection function not found'); }"
-              title="הצג/הסתר אזור התראות">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור התראות">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -114,9 +121,7 @@
                 <span class="action-icon">➕</span> הוסף
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn"
-                onclick="if (typeof window.toggleMainSection === 'function') { window.toggleMainSection(); } else { console.error('toggleMainSection function not found'); }"
-                title="הצג/הסתר אזור התראות">
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התראות">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -138,7 +143,7 @@
                     <th>
                       <button class="btn btn-link sortable-header-btn" onclick="sortTable(1)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>אובייקט משיוך
+                        <span class="sort-icon">↕</span>מקושר ל:
                         <br><span class="header-subtitle">Related Object</span>
                       </button>
                     </th>
@@ -265,9 +270,34 @@
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="alertCondition" class="form-label">תנאי התראה *</label>
-                    <input type="text" class="form-control" id="alertCondition" required
-                      placeholder="למשל: מחיר > 100$">
+                    <label class="form-label">תנאי התראה *</label>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <select class="form-select" id="alertVariable" required onchange="checkAlertVariable(this)">
+                          <option value="price">מחיר</option>
+                          <option value="daily_change">שינוי יומי</option>
+                          <option value="moving_average">ממוצע נע</option>
+                          <option value="volume">נפח מסחר</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <select class="form-select" id="alertOperator" required onchange="checkAlertOperator(this)">
+                          <option value="greater_than">גדול מ</option>
+                          <option value="less_than">קטן מ</option>
+                          <option value="crosses">חוצה</option>
+                          <option value="crosses_up">חוצה למעלה</option>
+                          <option value="crosses_down">חוצה למטה</option>
+                          <option value="increases_by">עולה ב</option>
+                          <option value="decreases_by">יורד ב</option>
+                          <option value="increases_by_percent">עולה ב%</option>
+                          <option value="decreases_by_percent">יורד ב%</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <input type="number" class="form-control" id="alertValue" step="0.01" placeholder="ערך">
+                      </div>
+                    </div>
+                    <input type="hidden" id="alertCondition" required>
                   </div>
                 </div>
               </div>
@@ -356,9 +386,34 @@
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="editAlertCondition" class="form-label">תנאי התראה *</label>
-                    <input type="text" class="form-control" id="editAlertCondition" required
-                      placeholder="למשל: מחיר > 100$">
+                    <label class="form-label">תנאי התראה *</label>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <select class="form-select" id="editAlertVariable" required onchange="checkAlertVariable(this)">
+                          <option value="price">מחיר</option>
+                          <option value="daily_change">שינוי יומי</option>
+                          <option value="moving_average">ממוצע נע</option>
+                          <option value="volume">נפח מסחר</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <select class="form-select" id="editAlertOperator" required onchange="checkAlertOperator(this)">
+                          <option value="greater_than">גדול מ</option>
+                          <option value="less_than">קטן מ</option>
+                          <option value="crosses">חוצה</option>
+                          <option value="crosses_up">חוצה למעלה</option>
+                          <option value="crosses_down">חוצה למטה</option>
+                          <option value="increases_by">עולה ב</option>
+                          <option value="decreases_by">יורד ב</option>
+                          <option value="increases_by_percent">עולה ב%</option>
+                          <option value="decreases_by_percent">יורד ב%</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <input type="number" class="form-control" id="editAlertValue" step="0.01" placeholder="ערך">
+                      </div>
+                    </div>
+                    <input type="hidden" id="editAlertCondition" required>
                   </div>
                 </div>
               </div>

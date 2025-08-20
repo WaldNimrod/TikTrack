@@ -1530,9 +1530,29 @@ window.saveNote = saveNote;
  * פונקציה זו מתבצעת בטעינת הדף ומאתחלת את כל הפונקציונליות
  */
 
+// הגנה - וידוא שהפונקציות הגלובליות זמינות
+if (typeof window.toggleTopSection !== 'function') {
+  window.toggleTopSection = function () {
+    console.warn('toggleTopSection fallback called - main.js may not be loaded properly');
+  };
+}
+
+if (typeof window.toggleMainSection !== 'function') {
+  window.toggleMainSection = function () {
+    console.warn('toggleMainSection fallback called - main.js may not be loaded properly');
+  };
+}
+
 // אתחול הדף כשהדף נטען
 document.addEventListener('DOMContentLoaded', async function () {
   console.log('🚀 === אתחול דף הערות ===');
+
+  // בדיקת זמינות פונקציות גלובליות
+  console.log('🔍 Checking global functions:', {
+    toggleTopSection: typeof window.toggleTopSection,
+    toggleMainSection: typeof window.toggleMainSection,
+    restoreAllSectionStates: typeof window.restoreAllSectionStates
+  });
 
   try {
     // שחזור מצב הסקשנים

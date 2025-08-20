@@ -22,9 +22,10 @@
    * - צרוף קבצים (PDF, תמונות)
    * - שיוך לאובייקטים עם סינון לפי סטטוס
    * - עיצוב מותאם עם איקונים וצבעים לכל סוג אובייקט
+   * - כותרת טבלה: "מקושר ל:" במקום "אובייקט מקושר"
    * 
    * מחבר: Tik.track Development Team
-   * תאריך עדכון אחרון: 2025
+   * תאריך עדכון אחרון: 2025-08-20
    * ======================================== -->
 
   <!-- Bootstrap CSS -->
@@ -62,9 +63,7 @@
               <span class="action-icon">➕</span> הוסף
             </button>
             <div class="action-separator"></div>
-            <button class="filter-toggle-btn"
-              onclick="if (typeof window.toggleTopSection === 'function') { window.toggleTopSection(); } else { console.error('toggleTopSection function not found'); }"
-              title="הצג/הסתר אזור הערות">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור הערות">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -101,9 +100,7 @@
                 <span class="action-icon">➕</span> הוסף
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn"
-                onclick="if (typeof window.toggleMainSection === 'function') { window.toggleMainSection(); } else { console.error('toggleMainSection function not found'); }"
-                title="הצג/הסתר אזור הערות">
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור הערות">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -125,7 +122,7 @@
                     <th>
                       <button class="btn btn-link sortable-header-btn" onclick="sortTable(1)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>אובייקט מקושר
+                        <span class="sort-icon">↕</span>מקושר ל:
                         <br><span class="header-subtitle">Related Object</span>
                       </button>
                     </th>

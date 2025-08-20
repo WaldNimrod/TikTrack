@@ -1,4 +1,148 @@
-// ===== MAIN.JS - קובץ כללי לכל האתר =====
+/**
+ * ========================================
+ * MAIN.JS - קובץ כללי לכל האתר
+ * ========================================
+ * 
+ * קובץ זה מכיל פונקציות גלובליות המשותפות לכל דפי האתר
+ * 
+ * תכולת הקובץ:
+ * - מערכת התראות גלובלית (CSS + JavaScript)
+ * - מערכת התראות למודולים
+ * - ניהול מצב סקשנים (top-section, main-section)
+ * - פונקציות עזר כלליות
+ * - אתחול דפים
+ * 
+ * מערכת התראות:
+ * - showNotification() - התראה כללית
+ * - showSuccessNotification() - התראה להצלחה
+ * - showErrorNotification() - התראה לשגיאה
+ * - showWarningNotification() - התראה לאזהרה
+ * - showInfoNotification() - התראה למידע
+ * - showModalNotification() - התראה בתוך מודול
+ * 
+ * מחבר: Tik.track Development Team
+ * תאריך עדכון אחרון: 2025-08-20
+ * ========================================
+ */
+
+/**
+ * מערכת התראות גלובלית - CSS
+ */
+function addNotificationStyles() {
+  if (document.getElementById('notificationStyles')) {
+    return; // כבר קיים
+  }
+
+  const style = document.createElement('style');
+  style.id = 'notificationStyles';
+  style.textContent = `
+    .notification-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 99999;
+      max-width: 400px;
+    }
+
+    .notification-container.modal-notification {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 999999;
+      max-width: 350px;
+    }
+
+    .notification {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      margin-bottom: 10px;
+      padding: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border-left: 4px solid #007bff;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .notification.hide {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+
+    .notification.success {
+      border-left-color: #28a745;
+    }
+
+    .notification.error {
+      border-left-color: #dc3545;
+    }
+
+    .notification.warning {
+      border-left-color: #ffc107;
+    }
+
+    .notification.info {
+      border-left-color: #17a2b8;
+    }
+
+    .notification-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #333;
+    }
+
+    .notification-message {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: #999;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .notification-close:hover {
+      color: #333;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// הוספת CSS בטעינת הדף
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', addNotificationStyles);
+} else {
+  addNotificationStyles();
+}
+
 /**
  * קובץ JavaScript ראשי לאתר TikTrack
  * 
@@ -27,6 +171,209 @@
 // משתנים גלובליים
 let externalFilterPresent = false;
 
+// ===== ייצוא מיידי של פונקציות גלובליות =====
+// ייצוא הפונקציות הגלובליות מיד בתחילת הקובץ כדי לוודא שהן זמינות
+
+// הגדרת הפונקציות הגלובליות ישירות
+window.toggleTopSection = function () {
+  const currentPath = window.location.pathname;
+
+  // טיפול מיוחד לדף הערות
+  if (currentPath.includes('/notes')) {
+    const section = document.getElementById('notesTopSection');
+    const button = document.querySelector('[onclick*="toggleTopSection"]');
+
+    if (section && button) {
+      const isHidden = section.style.display === 'none';
+      section.style.display = isHidden ? 'block' : 'none';
+      button.innerHTML = isHidden ? '▼ הסתר' : '▶ הצג';
+
+      // שמירת המצב
+      localStorage.setItem('notesTopSectionHidden', !isHidden);
+    }
+    return;
+  }
+
+  // טיפול רגיל לשאר הדפים
+  const section = document.querySelector('.top-section .section-body');
+  const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (section) {
+    const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
+
+    if (isCollapsed) {
+      section.classList.remove('collapsed');
+      section.style.display = 'block';
+    } else {
+      section.classList.add('collapsed');
+      section.style.display = 'none';
+    }
+
+    // עדכון האייקון
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // קביעת מפתח localStorage לפי הדף הנוכחי
+    let storageKey = 'topSectionCollapsed';
+
+    if (currentPath.includes('/alerts')) {
+      storageKey = 'alertsTopSectionCollapsed';
+    } else if (currentPath.includes('/planning')) {
+      storageKey = 'planningTopSectionCollapsed';
+    } else if (currentPath.includes('/designs')) {
+      storageKey = 'topSectionCollapsed';
+    }
+
+    // שמירת המצב ב-localStorage
+    localStorage.setItem(storageKey, !isCollapsed);
+  }
+};
+
+window.toggleMainSection = function () {
+  const currentPath = window.location.pathname;
+
+  // טיפול מיוחד לדף הערות
+  if (currentPath.includes('/notes')) {
+    const section = document.getElementById('notesMainSection');
+    const button = document.querySelector('[onclick*="toggleMainSection"]');
+
+    if (section && button) {
+      const isHidden = section.style.display === 'none';
+      section.style.display = isHidden ? 'block' : 'none';
+      button.innerHTML = isHidden ? '▼ הסתר' : '▶ הצג';
+
+      // שמירת המצב
+      localStorage.setItem('notesMainSectionHidden', !isHidden);
+    }
+    return;
+  }
+
+  // טיפול רגיל לשאר הדפים
+  const section = document.querySelector('.content-section .section-body');
+  const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (section) {
+    const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
+
+    if (isCollapsed) {
+      section.classList.remove('collapsed');
+      section.style.display = 'block';
+    } else {
+      section.classList.add('collapsed');
+      section.style.display = 'none';
+    }
+
+    // עדכון האייקון
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // קביעת מפתח localStorage לפי הדף הנוכחי
+    let storageKey = 'mainSectionCollapsed';
+
+    if (currentPath.includes('/alerts')) {
+      storageKey = 'alertsMainSectionCollapsed';
+    } else if (currentPath.includes('/planning')) {
+      storageKey = 'planningMainSectionCollapsed';
+    } else if (currentPath.includes('/designs')) {
+      storageKey = 'mainSectionCollapsed';
+    }
+
+    // שמירת המצב ב-localStorage
+    localStorage.setItem(storageKey, !isCollapsed);
+  }
+};
+
+window.restoreAllSectionStates = function () {
+  const currentPath = window.location.pathname;
+
+  // טיפול מיוחד לדף הערות
+  if (currentPath.includes('/notes')) {
+    // שחזור סקשן עליון
+    const topSectionHidden = localStorage.getItem('notesTopSectionHidden') === 'true';
+    const topSection = document.getElementById('notesTopSection');
+    const topButton = document.querySelector('[onclick*="toggleTopSection"]');
+
+    if (topSection && topButton) {
+      topSection.style.display = topSectionHidden ? 'none' : 'block';
+      topButton.innerHTML = topSectionHidden ? '▶ הצג' : '▼ הסתר';
+    }
+
+    // שחזור סקשן ראשי
+    const mainSectionHidden = localStorage.getItem('notesMainSectionHidden') === 'true';
+    const mainSection = document.getElementById('notesMainSection');
+    const mainButton = document.querySelector('[onclick*="toggleMainSection"]');
+
+    if (mainSection && mainButton) {
+      mainSection.style.display = mainSectionHidden ? 'none' : 'block';
+      mainButton.innerHTML = mainSectionHidden ? '▶ הצג' : '▼ הסתר';
+    }
+    return;
+  }
+
+  // טיפול רגיל לשאר הדפים
+  // שחזור מצב top section
+  const topSection = document.querySelector('.top-section .section-body');
+  const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+  const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
+
+  if (topSection && topToggleBtn && topIcon) {
+    let storageKey = 'topSectionCollapsed';
+
+    if (currentPath.includes('/alerts')) {
+      storageKey = 'alertsTopSectionCollapsed';
+    } else if (currentPath.includes('/planning')) {
+      storageKey = 'planningTopSectionCollapsed';
+    } else if (currentPath.includes('/designs')) {
+      storageKey = 'topSectionCollapsed';
+    }
+
+    const isCollapsed = localStorage.getItem(storageKey) === 'true';
+
+    if (isCollapsed) {
+      topSection.classList.add('collapsed');
+      topSection.style.display = 'none';
+      topIcon.textContent = '▼';
+    } else {
+      topSection.classList.remove('collapsed');
+      topSection.style.display = 'block';
+      topIcon.textContent = '▲';
+    }
+  }
+
+  // שחזור מצב main section
+  const mainSection = document.querySelector('.content-section .section-body');
+  const mainToggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+  const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
+
+  if (mainSection && mainToggleBtn && mainIcon) {
+    let storageKey = 'mainSectionCollapsed';
+
+    if (currentPath.includes('/alerts')) {
+      storageKey = 'alertsMainSectionCollapsed';
+    } else if (currentPath.includes('/planning')) {
+      storageKey = 'planningMainSectionCollapsed';
+    } else if (currentPath.includes('/designs')) {
+      storageKey = 'mainSectionCollapsed';
+    }
+
+    const isCollapsed = localStorage.getItem(storageKey) === 'true';
+
+    if (isCollapsed) {
+      mainSection.classList.add('collapsed');
+      mainSection.style.display = 'none';
+      mainIcon.textContent = '▼';
+    } else {
+      mainSection.classList.remove('collapsed');
+      mainSection.style.display = 'block';
+      mainIcon.textContent = '▲';
+    }
+  }
+};
+
 // ===== מערכת התראות =====
 /**
  * מערכת התראות גלובלית לאתר
@@ -49,20 +396,58 @@ let externalFilterPresent = false;
  */
 
 /**
- * פונקציה להצגת התראה
+ * הצגת התראה
+ * 
+ * פונקציה זו מציגה התראה למשתמש עם כותרת, תוכן וסוג
+ * ההתראה מוצגת בפינה הימנית העליונה של המסך או בתוך מודול
+ * 
+ * תכונות:
+ * - תמיכה בהתראות גלובליות ובתוך מודולים
+ * - אנימציות כניסה ויציאה חלקות
+ * - אייקונים מותאמים לסוג ההתראה
+ * - הסרה אוטומטית או ידנית
+ * - z-index גבוה למודולים
+ * 
  * @param {string} title - כותרת ההתראה
  * @param {string} message - תוכן ההתראה
  * @param {string} type - סוג ההתראה (success, error, warning, info)
  * @param {number} duration - משך זמן בהצגה (במילישניות, ברירת מחדל: 4000)
+ * @param {string} containerId - מזהה של container ספציפי (אופציונלי)
+ * @param {boolean} isModal - האם ההתראה בתוך מודול (ברירת מחדל: false)
  */
-function showNotification(title, message, type = 'info', duration = 4000) {
+function showNotification(title, message, type = 'info', duration = 4000, containerId = null, isModal = false) {
   // יצירת container אם לא קיים
   let container = document.getElementById('notificationContainer');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'notificationContainer';
-    container.className = 'notification-container';
-    document.body.appendChild(container);
+
+  if (containerId) {
+    // אם יש container ספציפי, נשתמש בו
+    container = document.getElementById(containerId);
+    if (!container) {
+      container = document.createElement('div');
+      container.id = containerId;
+      container.className = isModal ? 'notification-container modal-notification' : 'notification-container';
+
+      // אם זה מודול, נוסיף את ה-container לתוך המודול
+      if (isModal) {
+        const modalId = containerId.replace('notificationContainer_', '');
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.appendChild(container);
+        } else {
+          document.body.appendChild(container);
+        }
+      } else {
+        document.body.appendChild(container);
+      }
+    }
+  } else {
+    // container גלובלי
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'notificationContainer';
+      container.className = 'notification-container';
+      document.body.appendChild(container);
+    }
   }
 
   const notification = document.createElement('div');
@@ -138,7 +523,101 @@ function showErrorNotification(title, message, duration = 6000) {
  * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 5000ms)
  */
 function showWarningNotification(title, message, duration = 5000) {
+  console.log('🔔 === SHOW WARNING NOTIFICATION ===');
+  console.log('🔔 Title:', title);
+  console.log('🔔 Message:', message);
+  console.log('🔔 Duration:', duration);
   showNotification(title, message, 'warning', duration);
+}
+
+/**
+ * פונקציות להתראות בתוך מודול
+ * 
+ * פונקציות אלו מאפשרות הצגת התראות בתוך מודול ספציפי
+ * עם מיקום מותאם וזמן הצגה קצר יותר
+ */
+
+/**
+ * הצגת התראה בתוך מודול
+ * 
+ * פונקציה זו מציגה התראה בתוך מודול ספציפי
+ * ההתראה מוצגת בפינה הימנית העליונה של המודול
+ * 
+ * תכונות:
+ * - z-index גבוה מאוד למודולים
+ * - מיקום מותאם בתוך המודול
+ * - אנימציות חלקות
+ * - אייקונים מותאמים לסוג ההתראה
+ * 
+ * @param {string} modalId - מזהה המודול
+ * @param {string} title - כותרת ההתראה
+ * @param {string} message - תוכן ההתראה
+ * @param {string} type - סוג ההתראה (success, error, warning, info)
+ * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 3000ms)
+ */
+function showModalNotification(modalId, title, message, type = 'info', duration = 3000) {
+  const containerId = `notificationContainer_${modalId}`;
+  showNotification(title, message, type, duration, containerId, true);
+}
+
+/**
+ * הצגת התראת הצלחה בתוך מודול
+ * 
+ * פונקציה זו מציגה התראת הצלחה בתוך מודול ספציפי
+ * משך זמן הצגה קצר יותר (3000ms) להצלחות
+ * 
+ * @param {string} modalId - מזהה המודול
+ * @param {string} title - כותרת ההתראה
+ * @param {string} message - תוכן ההתראה
+ * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 3000ms)
+ */
+function showModalSuccessNotification(modalId, title, message, duration = 3000) {
+  showModalNotification(modalId, title, message, 'success', duration);
+}
+
+/**
+ * הצגת התראת שגיאה בתוך מודול
+ * 
+ * פונקציה זו מציגה התראת שגיאה בתוך מודול ספציפי
+ * משך זמן הצגה ארוך יותר (4000ms) לשגיאות
+ * 
+ * @param {string} modalId - מזהה המודול
+ * @param {string} title - כותרת ההתראה
+ * @param {string} message - תוכן ההתראה
+ * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 4000ms)
+ */
+function showModalErrorNotification(modalId, title, message, duration = 4000) {
+  showModalNotification(modalId, title, message, 'error', duration);
+}
+
+/**
+ * הצגת התראת אזהרה בתוך מודול
+ * 
+ * פונקציה זו מציגה התראת אזהרה בתוך מודול ספציפי
+ * משך זמן הצגה בינוני (3500ms) לאזהרות
+ * 
+ * @param {string} modalId - מזהה המודול
+ * @param {string} title - כותרת ההתראה
+ * @param {string} message - תוכן ההתראה
+ * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 3500ms)
+ */
+function showModalWarningNotification(modalId, title, message, duration = 3500) {
+  showModalNotification(modalId, title, message, 'warning', duration);
+}
+
+/**
+ * הצגת התראת מידע בתוך מודול
+ * 
+ * פונקציה זו מציגה התראת מידע בתוך מודול ספציפי
+ * משך זמן הצגה קצר (3000ms) למידע
+ * 
+ * @param {string} modalId - מזהה המודול
+ * @param {string} title - כותרת ההתראה
+ * @param {string} message - תוכן ההתראה
+ * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 3000ms)
+ */
+function showModalInfoNotification(modalId, title, message, duration = 3000) {
+  showModalNotification(modalId, title, message, 'info', duration);
 }
 
 /**
@@ -156,6 +635,13 @@ function showInfoNotification(title, message, duration = 4000) {
  * 
  * פונקציה זו מספקת ממשק אחיד לכל קריאות ה-API לאתר
  * כולל טיפול אוטומטי ב-headers, שגיאות ולוגים
+ * 
+ * תכונות:
+ * - טיפול אוטומטי ב-Content-Type
+ * - תמיכה ב-FormData ו-JSON
+ * - לוגים מפורטים לדיבוג
+ * - טיפול בשגיאות רשת
+ * - headers מותאמים אוטומטית
  * 
  * @param {string} endpoint - נקודת הקצה של ה-API (למשל: '/api/v1/alerts/')
  * @param {Object} options - אפשרויות הבקשה (method, body, headers, וכו')
@@ -1362,53 +1848,7 @@ function cancelRecord(tableType, recordId) {
   }
 }
 
-// פונקציה להצגת הודעות
-function showNotification(message, type = 'success') {
-  try {
-    const notification = document.createElement('div');
-    const bgColor = type === 'error' ? '#f8d7da' : type === 'warning' ? '#fff3cd' : '#d4edda';
-    const textColor = type === 'error' ? '#721c24' : type === 'warning' ? '#856404' : '#155724';
-    const borderColor = type === 'error' ? '#f5c6cb' : type === 'warning' ? '#ffeaa7' : '#c3e6cb';
-
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      padding: 12px 20px;
-      border-radius: 8px;
-      background-color: ${bgColor};
-      color: ${textColor};
-      border: 1px solid ${borderColor};
-      font-size: 14px;
-      font-weight: 500;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: opacity 0.3s ease;
-      opacity: 0;
-    `;
-
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    // הצגת ההודעה
-    setTimeout(() => {
-      notification.style.opacity = '1';
-    }, 100);
-
-    // הסתרת ההודעה אחרי 3 שניות
-    setTimeout(() => {
-      notification.style.opacity = '0';
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      }, 300);
-    }, 3000);
-
-  } catch (error) {
-    console.error('Error showing notification:', error);
-  }
-}
+// פונקציה להצגת הודעות - הוסרה כפילות, משתמשים במערכת ההתראות המתקדמת למעלה
 
 // ===== הוספת הפונקציות החדשות לגלובל =====
 
@@ -1435,11 +1875,23 @@ window.getCountElementForTable = getCountElementForTable;
 window.getTableNameForTable = getTableNameForTable;
 window.toggleSection = toggleSection;
 window.toggleAllSections = toggleAllSections;
-window.showNotification = showNotification;
-window.showSuccessNotification = showSuccessNotification;
-window.showErrorNotification = showErrorNotification;
-window.showWarningNotification = showWarningNotification;
-window.showInfoNotification = showInfoNotification;
+// ========================================
+// ייצוא פונקציות התראות לגלובל
+// ========================================
+// 
+// פונקציות התראות גלובליות:
+window.showNotification = showNotification;                    // התראה כללית
+window.showSuccessNotification = showSuccessNotification;      // התראת הצלחה
+window.showErrorNotification = showErrorNotification;          // התראת שגיאה
+window.showWarningNotification = showWarningNotification;      // התראת אזהרה
+window.showInfoNotification = showInfoNotification;            // התראת מידע
+
+// פונקציות התראות בתוך מודול:
+window.showModalNotification = showModalNotification;          // התראה בתוך מודול
+window.showModalSuccessNotification = showModalSuccessNotification; // התראת הצלחה במודול
+window.showModalErrorNotification = showModalErrorNotification;     // התראת שגיאה במודול
+window.showModalWarningNotification = showModalWarningNotification; // התראת אזהרה במודול
+window.showModalInfoNotification = showModalInfoNotification;       // התראת מידע במודול
 
 // פונקציות נתונים
 window.getDefaultRowData = getDefaultRowData;
@@ -1508,219 +1960,11 @@ function loadSectionStates() {
 window.loadSectionStates = loadSectionStates;
 
 // ===== פונקציות גלובליות לסגירת סקשנים =====
+// הפונקציות מוגדרות בתחילת הקובץ כפונקציות גלובליות
 
-/**
- * פונקציה גלובלית לפתיחה/סגירה של סקשן עליון
- * עובדת עם כל הדפים באופן אחיד
- */
-function toggleTopSection() {
-  const currentPath = window.location.pathname;
-
-  // טיפול מיוחד לדף הערות
-  if (currentPath.includes('/notes')) {
-    const section = document.getElementById('notesTopSection');
-    const button = document.querySelector('[onclick*="toggleTopSection"]');
-
-    if (section && button) {
-      const isHidden = section.style.display === 'none';
-      section.style.display = isHidden ? 'block' : 'none';
-      button.innerHTML = isHidden ? '▼ הסתר' : '▶ הצג';
-
-      // שמירת המצב
-      localStorage.setItem('notesTopSectionHidden', !isHidden);
-    }
-    return;
-  }
-
-  // טיפול רגיל לשאר הדפים
-  const section = document.querySelector('.top-section .section-body');
-  const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (section) {
-    const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
-
-    if (isCollapsed) {
-      section.classList.remove('collapsed');
-      section.style.display = 'block';
-    } else {
-      section.classList.add('collapsed');
-      section.style.display = 'none';
-    }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // קביעת מפתח localStorage לפי הדף הנוכחי
-    let storageKey = 'topSectionCollapsed';
-
-    if (currentPath.includes('/alerts')) {
-      storageKey = 'alertsTopSectionCollapsed';
-    } else if (currentPath.includes('/planning')) {
-      storageKey = 'planningTopSectionCollapsed';
-    } else if (currentPath.includes('/designs')) {
-      storageKey = 'topSectionCollapsed';
-    }
-
-    // שמירת המצב ב-localStorage
-    localStorage.setItem(storageKey, !isCollapsed);
-  }
-}
-
-/**
- * פונקציה גלובלית לפתיחה/סגירה של סקשן ראשי
- * עובדת עם כל הדפים באופן אחיד
- */
-function toggleMainSection() {
-  const currentPath = window.location.pathname;
-
-  // טיפול מיוחד לדף הערות
-  if (currentPath.includes('/notes')) {
-    const section = document.getElementById('notesMainSection');
-    const button = document.querySelector('[onclick*="toggleMainSection"]');
-
-    if (section && button) {
-      const isHidden = section.style.display === 'none';
-      section.style.display = isHidden ? 'block' : 'none';
-      button.innerHTML = isHidden ? '▼ הסתר' : '▶ הצג';
-
-      // שמירת המצב
-      localStorage.setItem('notesMainSectionHidden', !isHidden);
-    }
-    return;
-  }
-
-  // טיפול רגיל לשאר הדפים
-  const section = document.querySelector('.content-section .section-body');
-  const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (section) {
-    const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
-
-    if (isCollapsed) {
-      section.classList.remove('collapsed');
-      section.style.display = 'block';
-    } else {
-      section.classList.add('collapsed');
-      section.style.display = 'none';
-    }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // קביעת מפתח localStorage לפי הדף הנוכחי
-    let storageKey = 'mainSectionCollapsed';
-
-    if (currentPath.includes('/alerts')) {
-      storageKey = 'alertsMainSectionCollapsed';
-    } else if (currentPath.includes('/planning')) {
-      storageKey = 'planningMainSectionCollapsed';
-    } else if (currentPath.includes('/designs')) {
-      storageKey = 'mainSectionCollapsed';
-    }
-
-    // שמירת המצב ב-localStorage
-    localStorage.setItem(storageKey, !isCollapsed);
-  }
-}
-
-/**
- * פונקציה גלובלית לשחזור מצב הסקשנים
- * טוענת את המצב השמור לכל הדפים
- */
-function restoreAllSectionStates() {
-  const currentPath = window.location.pathname;
-
-  // טיפול מיוחד לדף הערות
-  if (currentPath.includes('/notes')) {
-    // שחזור סקשן עליון
-    const topSectionHidden = localStorage.getItem('notesTopSectionHidden') === 'true';
-    const topSection = document.getElementById('notesTopSection');
-    const topButton = document.querySelector('[onclick*="toggleTopSection"]');
-
-    if (topSection && topButton) {
-      topSection.style.display = topSectionHidden ? 'none' : 'block';
-      topButton.innerHTML = topSectionHidden ? '▶ הצג' : '▼ הסתר';
-    }
-
-    // שחזור סקשן ראשי
-    const mainSectionHidden = localStorage.getItem('notesMainSectionHidden') === 'true';
-    const mainSection = document.getElementById('notesMainSection');
-    const mainButton = document.querySelector('[onclick*="toggleMainSection"]');
-
-    if (mainSection && mainButton) {
-      mainSection.style.display = mainSectionHidden ? 'none' : 'block';
-      mainButton.innerHTML = mainSectionHidden ? '▶ הצג' : '▼ הסתר';
-    }
-    return;
-  }
-
-  // טיפול רגיל לשאר הדפים
-  // שחזור מצב top section
-  const topSection = document.querySelector('.top-section .section-body');
-  const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
-  const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
-
-  if (topSection && topToggleBtn && topIcon) {
-    let storageKey = 'topSectionCollapsed';
-
-    if (currentPath.includes('/alerts')) {
-      storageKey = 'alertsTopSectionCollapsed';
-    } else if (currentPath.includes('/planning')) {
-      storageKey = 'planningTopSectionCollapsed';
-    } else if (currentPath.includes('/designs')) {
-      storageKey = 'topSectionCollapsed';
-    }
-
-    const isCollapsed = localStorage.getItem(storageKey) === 'true';
-
-    if (isCollapsed) {
-      topSection.classList.add('collapsed');
-      topSection.style.display = 'none';
-      topIcon.textContent = '▼';
-    } else {
-      topSection.classList.remove('collapsed');
-      topSection.style.display = 'block';
-      topIcon.textContent = '▲';
-    }
-  }
-
-  // שחזור מצב main section
-  const mainSection = document.querySelector('.content-section .section-body');
-  const mainToggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
-  const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
-
-  if (mainSection && mainToggleBtn && mainIcon) {
-    let storageKey = 'mainSectionCollapsed';
-
-    if (currentPath.includes('/alerts')) {
-      storageKey = 'alertsMainSectionCollapsed';
-    } else if (currentPath.includes('/planning')) {
-      storageKey = 'planningMainSectionCollapsed';
-    } else if (currentPath.includes('/designs')) {
-      storageKey = 'mainSectionCollapsed';
-    }
-
-    const isCollapsed = localStorage.getItem(storageKey) === 'true';
-
-    if (isCollapsed) {
-      mainSection.classList.add('collapsed');
-      mainSection.style.display = 'none';
-      mainIcon.textContent = '▼';
-    } else {
-      mainSection.classList.remove('collapsed');
-      mainSection.style.display = 'block';
-      mainIcon.textContent = '▲';
-    }
-  }
-}
-
-// ייצוא הפונקציות החדשות לגלובל
-window.toggleTopSection = toggleTopSection;
-window.toggleMainSection = toggleMainSection;
-window.restoreAllSectionStates = restoreAllSectionStates;
+// וידוא שהפונקציות זמינות מיד
+console.log('✅ Global toggle functions loaded and ready:', {
+  toggleTopSection: typeof window.toggleTopSection,
+  toggleMainSection: typeof window.toggleMainSection,
+  restoreAllSectionStates: typeof window.restoreAllSectionStates
+});

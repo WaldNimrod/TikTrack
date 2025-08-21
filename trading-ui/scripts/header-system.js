@@ -95,22 +95,23 @@ class HeaderSystem {
         gap: 1rem;
       }
 
-      .logo {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
+              .logo {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
 
-      .logo-icon {
-        font-size: 2rem;
-        color: var(--apple-accent);
-      }
+        .logo-image {
+          width: 32px;
+          height: 32px;
+          object-fit: contain;
+        }
 
-      .logo-text {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--apple-text-primary);
-      }
+        .logo-text {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--apple-text-primary);
+        }
 
       .page-title h1 {
         font-size: 1.25rem;
@@ -258,12 +259,13 @@ class HeaderSystem {
         border-top: 1px solid var(--apple-border-light);
       }
 
-      .filters-container {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-      }
+              .filters-container {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
 
       .filter-group {
         position: relative;

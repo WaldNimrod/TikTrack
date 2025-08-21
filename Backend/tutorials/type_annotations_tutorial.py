@@ -100,12 +100,12 @@ def show_examples() -> None:
             "title": "Model Methods",
             "code": '''
 def to_dict(self) -> Dict[str, Any]:
-    """המרה למילון"""
+    """Convert to dictionary"""
     result: Dict[str, Any] = {}
     return result
 
 def __repr__(self) -> str:
-    """ייצוג מחרוזת"""
+    """String representation"""
     return f"<{self.__class__.__name__}(id={self.id})>"
 '''
         },
@@ -114,17 +114,17 @@ def __repr__(self) -> str:
             "code": '''
 @staticmethod
 def get_all(db: Session) -> List[Model]:
-    """קבלת כל הרשומות"""
+    """Get all records"""
     return db.query(Model).all()
 
 @staticmethod
 def get_by_id(db: Session, item_id: int) -> Optional[Model]:
-    """קבלת רשומה לפי מזהה"""
+    """Get record by ID"""
     return db.query(Model).filter(Model.id == item_id).first()
 
 @staticmethod
 def create(db: Session, data: Dict[str, Any]) -> Model:
-    """יצירת רשומה חדשה"""
+    """Create new record"""
     item = Model(**data)
     db.add(item)
     db.commit()
@@ -136,7 +136,7 @@ def create(db: Session, data: Dict[str, Any]) -> Model:
             "title": "API Routes",
             "code": '''
 def get_items() -> Any:
-    """API endpoint לקבלת רשומות"""
+    """API endpoint for getting records"""
     try:
         db: Session = next(get_db())
         items = Service.get_all(db)
@@ -156,7 +156,7 @@ def get_items() -> Any:
             "title": "Validation Functions",
             "code": '''
 def validate_data(data: Dict[str, Any]) -> Tuple[bool, str]:
-    """בדיקת תקינות נתונים"""
+    """Validate data"""
     errors: List[str] = []
     
     if not data.get('required_field'):

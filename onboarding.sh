@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🎉 ברוכים הבאים לצוות TikTrack!"
+echo "🎉 Welcome to the TikTrack team!"
 echo "=================================="
 echo ""
 

@@ -1,11 +1,11 @@
 """
-שירות ניהול מטבעות - TikTrack
+Currency Management Service - TikTrack
 
-מודול זה מכיל את כל הלוגיקה העסקית לניהול מטבעות במערכת.
-כולל CRUD operations, ולידציה, ועדכון שערי חליפין.
+This module contains all business logic for managing currencies in the system.
+Includes CRUD operations, validation, and exchange rate updates.
 
 Classes:
-    CurrencyService: שירות ראשי לניהול מטבעות
+    CurrencyService: Main service for currency management
 
 Author: TikTrack Development Team
 Version: 1.0
@@ -27,26 +27,26 @@ logger = logging.getLogger(__name__)
 
 class CurrencyService:
     """
-    שירות לניהול מטבעות במערכת TikTrack
+    Service for managing currencies in the TikTrack system
     
-    שירות זה מספק את כל הפונקציונליות הנדרשת לניהול מטבעות:
-    - יצירה, קריאה, עדכון ומחיקה (CRUD)
-    - ולידציה של נתונים
-    - עדכון שערי חליפין
-    - בדיקת שימוש במטבעות
+    This service provides all required functionality for currency management:
+    - Create, Read, Update, Delete (CRUD)
+    - Data validation
+    - Exchange rate updates
+    - Currency usage checking
     
     Attributes:
-        MAX_SYMBOL_LENGTH (int): אורך מקסימלי לסמל מטבע
-        MAX_NAME_LENGTH (int): אורך מקסימלי לשם מטבע
-        MIN_USD_RATE (Decimal): שער דולר מינימלי
-        MAX_USD_RATE (Decimal): שער דולר מקסימלי
+        MAX_SYMBOL_LENGTH (int): Maximum length for currency symbol
+        MAX_NAME_LENGTH (int): Maximum length for currency name
+        MIN_USD_RATE (Decimal): Minimum USD rate
+        MAX_USD_RATE (Decimal): Maximum USD rate
         
     Example:
         >>> service = CurrencyService()
         >>> currencies = service.get_all(db_session)
         >>> new_currency = service.create(db_session, {
         ...     'symbol': 'EUR',
-        ...     'name': 'אירו',
+        ...     'name': 'Euro',
         ...     'usd_rate': Decimal('0.85')
         ... })
     """
@@ -60,88 +60,88 @@ class CurrencyService:
     @staticmethod
     def get_all(db: Session) -> List[Currency]:
         """
-        קבלת כל המטבעות מהמערכת
+        Get all currencies from the system
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
+            db (Session): Database connection
             
         Returns:
-            List[Currency]: רשימת כל המטבעות במערכת
+            List[Currency]: List of all currencies in the system
             
         Example:
             >>> currencies = CurrencyService.get_all(db_session)
-            >>> print(f"מספר מטבעות במערכת: {len(currencies)}")
+            >>> print(f"Number of currencies in system: {len(currencies)}")
         """
         return db.query(Currency).order_by(Currency.symbol).all()
     
     @staticmethod
     def get_by_id(db: Session, currency_id: int) -> Optional[Currency]:
         """
-        קבלת מטבע לפי מזהה
+        Get currency by ID
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
-            currency_id (int): מזהה המטבע
+            db (Session): Database connection
+            currency_id (int): Currency ID
             
         Returns:
-            Optional[Currency]: המטבע אם נמצא, None אחרת
+            Optional[Currency]: Currency if found, None otherwise
             
         Example:
             >>> currency = CurrencyService.get_by_id(db_session, 1)
             >>> if currency:
-            ...     print(f"נמצא מטבע: {currency.symbol}")
+            ...     print(f"Found currency: {currency.symbol}")
         """
         return db.query(Currency).filter(Currency.id == currency_id).first()
     
     @staticmethod
     def get_by_symbol(db: Session, symbol: str) -> Optional[Currency]:
         """
-        קבלת מטבע לפי סמל
+        Get currency by symbol
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
-            symbol (str): סמל המטבע
+            db (Session): Database connection
+            symbol (str): Currency symbol
             
         Returns:
-            Optional[Currency]: המטבע אם נמצא, None אחרת
+            Optional[Currency]: Currency if found, None otherwise
             
         Example:
             >>> currency = CurrencyService.get_by_symbol(db_session, 'USD')
             >>> if currency:
-            ...     print(f"שער דולר: {currency.usd_rate}")
+            ...     print(f"USD rate: {currency.usd_rate}")
         """
         return db.query(Currency).filter(Currency.symbol == symbol.upper()).first()
     
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> Currency:
         """
-        יצירת מטבע חדש
+        Create a new currency
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
-            data (Dict[str, Any]): נתוני המטבע החדש
+            db (Session): Database connection
+            data (Dict[str, Any]): New currency data
             
         Returns:
-            Currency: המטבע החדש שנוצר
+            Currency: The newly created currency
             
         Raises:
-            ValueError: אם הנתונים לא תקינים
+            ValueError: If data is invalid
             
         Example:
             >>> currency_data = {
             ...     'symbol': 'EUR',
-            ...     'name': 'אירו',
+            ...     'name': 'Euro',
             ...     'usd_rate': Decimal('0.85')
             ... }
             >>> new_currency = CurrencyService.create(db_session, currency_data)
         """
-        # ולידציה של הנתונים
+        # Data validation
         CurrencyService._validate_currency_data(data)
         
-        # המרת סמל לאותיות גדולות
+        # Convert symbol to uppercase
         data['symbol'] = data['symbol'].upper()
         
-        # יצירת המטבע
+        # Create currency
         currency = Currency(**data)
         db.add(currency)
         db.commit()
@@ -153,18 +153,18 @@ class CurrencyService:
     @staticmethod
     def update(db: Session, currency_id: int, data: Dict[str, Any]) -> Currency:
         """
-        עדכון מטבע קיים
+        Update existing currency
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
-            currency_id (int): מזהה המטבע לעדכון
-            data (Dict[str, Any]): נתונים לעדכון
+            db (Session): Database connection
+            currency_id (int): Currency ID to update
+            data (Dict[str, Any]): Data to update
             
         Returns:
-            Currency: המטבע המעודכן
+            Currency: Updated currency
             
         Raises:
-            ValueError: אם המטבע לא נמצא או הנתונים לא תקינים
+            ValueError: If currency not found or data is invalid
             
         Example:
             >>> update_data = {'usd_rate': Decimal('0.86')}
@@ -174,11 +174,11 @@ class CurrencyService:
         if not currency:
             raise ValueError(f"Currency with ID {currency_id} not found")
         
-        # ולידציה של הנתונים אם יש שדות חדשים
+        # Validate data if there are new fields
         if data:
             CurrencyService._validate_currency_data(data, is_update=True)
         
-        # עדכון השדות
+        # Update fields
         for key, value in data.items():
             if hasattr(currency, key):
                 if key == 'symbol':
@@ -195,18 +195,18 @@ class CurrencyService:
     @staticmethod
     def update_rate(db: Session, currency_id: int, usd_rate: Decimal) -> Currency:
         """
-        עדכון שער דולר בלבד
+        Update USD rate only
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
-            currency_id (int): מזהה המטבע
-            usd_rate (Decimal): שער דולר חדש
+            db (Session): Database connection
+            currency_id (int): Currency ID
+            usd_rate (Decimal): New USD rate
             
         Returns:
-            Currency: המטבע המעודכן
+            Currency: Updated currency
             
         Raises:
-            ValueError: אם המטבע לא נמצא או השער לא תקין
+            ValueError: If currency not found or rate is invalid
             
         Example:
             >>> new_rate = Decimal('0.87')
@@ -216,7 +216,7 @@ class CurrencyService:
         if not currency:
             raise ValueError(f"Currency with ID {currency_id} not found")
         
-        # ולידציה של השער
+        # Rate validation
         if not CurrencyService.MIN_USD_RATE <= usd_rate <= CurrencyService.MAX_USD_RATE:
             raise ValueError(f"USD rate must be between {CurrencyService.MIN_USD_RATE} and {CurrencyService.MAX_USD_RATE}")
         
@@ -230,17 +230,17 @@ class CurrencyService:
     @staticmethod
     def delete(db: Session, currency_id: int) -> bool:
         """
-        מחיקת מטבע
+        Delete currency
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
-            currency_id (int): מזהה המטבע למחיקה
+            db (Session): Database connection
+            currency_id (int): Currency ID to delete
             
         Returns:
-            bool: True אם המטבע נמחק בהצלחה
+            bool: True if currency deleted successfully
             
         Raises:
-            ValueError: אם המטבע לא נמצא או בשימוש
+            ValueError: If currency not found or in use
             
         Example:
             >>> success = CurrencyService.delete(db_session, 1)
@@ -251,7 +251,7 @@ class CurrencyService:
         if not currency:
             raise ValueError(f"Currency with ID {currency_id} not found")
         
-        # בדיקה שהמטבע לא בשימוש
+        # Check if currency is in use
         if CurrencyService.is_currency_in_use(db, currency_id):
             raise ValueError(f"Cannot delete currency {currency.symbol} - it is in use")
         
@@ -264,41 +264,41 @@ class CurrencyService:
     @staticmethod
     def is_currency_in_use(db: Session, currency_id: int) -> bool:
         """
-        בדיקה אם מטבע בשימוש במערכת
+        Check if currency is in use in the system
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
-            currency_id (int): מזהה המטבע
+            db (Session): Database connection
+            currency_id (int): Currency ID
             
         Returns:
-            bool: True אם המטבע בשימוש
+            bool: True if currency is in use
             
         Example:
             >>> in_use = CurrencyService.is_currency_in_use(db_session, 1)
             >>> if in_use:
             ...     print("Cannot delete - currency is in use")
         """
-        # בדיקה בטבלת טיקרים
+        # Check in tickers table
         ticker_count = db.query(Ticker).filter(Ticker.currency == currency_id).count()
         if ticker_count > 0:
             return True
         
-        # בדיקה בטבלת חשבונות
+        # Check in accounts table
         account_count = db.query(Account).filter(Account.currency == currency_id).count()
         if account_count > 0:
             return True
         
-        # בדיקה בטבלת עסקאות
+        # Check in trades table
         trade_count = db.query(Trade).filter(Trade.currency == currency_id).count()
         if trade_count > 0:
             return True
         
-        # בדיקה בטבלת תוכניות מסחר
+        # Check in trade plans table
         plan_count = db.query(TradePlan).filter(TradePlan.currency == currency_id).count()
         if plan_count > 0:
             return True
         
-        # בדיקה בטבלת תזרים מזומן
+        # Check in cash flows table
         cash_flow_count = db.query(CashFlow).filter(CashFlow.currency == currency_id).count()
         if cash_flow_count > 0:
             return True
@@ -308,23 +308,23 @@ class CurrencyService:
     @staticmethod
     def _validate_currency_data(data: Dict[str, Any], is_update: bool = False) -> None:
         """
-        ולידציה של נתוני מטבע
+        Validate currency data
         
         Args:
-            data (Dict[str, Any]): נתונים לוולידציה
-            is_update (bool): האם זו עדכון (לא כל השדות נדרשים)
+            data (Dict[str, Any]): Data to validate
+            is_update (bool): Whether this is an update (not all fields required)
             
         Raises:
-            ValueError: אם הנתונים לא תקינים
+            ValueError: If data is invalid
         """
         if not is_update:
-            # בדיקת שדות חובה
+            # Check required fields
             required_fields = ['symbol', 'name', 'usd_rate']
             for field in required_fields:
                 if field not in data or not data[field]:
                     raise ValueError(f"Missing required field: {field}")
         
-        # ולידציה של סמל
+        # Symbol validation
         if 'symbol' in data:
             symbol = data['symbol']
             if not isinstance(symbol, str):
@@ -334,7 +334,7 @@ class CurrencyService:
             if len(symbol) > CurrencyService.MAX_SYMBOL_LENGTH:
                 raise ValueError(f"Symbol too long (max {CurrencyService.MAX_SYMBOL_LENGTH} characters)")
         
-        # ולידציה של שם
+        # Name validation
         if 'name' in data:
             name = data['name']
             if not isinstance(name, str):
@@ -344,7 +344,7 @@ class CurrencyService:
             if len(name) > CurrencyService.MAX_NAME_LENGTH:
                 raise ValueError(f"Name too long (max {CurrencyService.MAX_NAME_LENGTH} characters)")
         
-        # ולידציה של שער דולר
+        # USD rate validation
         if 'usd_rate' in data:
             try:
                 usd_rate = Decimal(str(data['usd_rate']))
@@ -356,14 +356,14 @@ class CurrencyService:
     @staticmethod
     def get_currency_usage_summary(db: Session, currency_id: int) -> Dict[str, int]:
         """
-        קבלת סיכום שימוש במטבע
+        Get currency usage summary
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
-            currency_id (int): מזהה המטבע
+            db (Session): Database connection
+            currency_id (int): Currency ID
             
         Returns:
-            Dict[str, int]: סיכום השימוש במטבע
+            Dict[str, int]: Currency usage summary
             
         Example:
             >>> usage = CurrencyService.get_currency_usage_summary(db_session, 1)

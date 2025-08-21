@@ -1,52 +1,52 @@
-# בעיות נוכחיות במערכת TikTrack
+# Current Issues in TikTrack System
 
-## תאריך: 14/08/2025
+## Date: 14/08/2025
 
-### בעיות בדף בסיס נתונים (database.html)
+### Issues in Database Page (database.html)
 
-1. **שגיאות CORS** - הדף מנסה לגשת לפורט 5000 במקום 8080
-   - תוקן: שינוי URLs מ-`http://127.0.0.1:5000` ל-`http://127.0.0.1:8080`
-   - מיקום: `trading-ui/database.html` שורות 734, 1321
+1. **CORS Errors** - Page tries to access port 5000 instead of 8080
+   - Fixed: Changed URLs from `http://127.0.0.1:5000` to `http://127.0.0.1:8080`
+   - Location: `trading-ui/database.html` lines 734, 1321
 
-2. **טבלאות ריקות** - כל הטבלאות מציגות "אין נתונים"
-   - סיבה: שגיאות CORS מונעות טעינת נתונים מהשרת
-   - נתונים קיימים במסד הנתונים: 7 חשבונות, 14 טיקרים, 3 טריידים, 3 תוכניות
+2. **Empty Tables** - All tables show "No data"
+   - Cause: CORS errors prevent loading data from server
+   - Existing data in database: 7 accounts, 14 tickers, 3 trades, 3 plans
 
-3. **בעיות אימות** - כפתור התחבר לא מגיב ב-index.html
-   - תוקן: הוספת פונקציה `setupLoginForm` ופונקציות תצוגת הודעות
-   - מיקום: `trading-ui/index.html`
+3. **Authentication Issues** - Login button not responding in index.html
+   - Fixed: Added `setupLoginForm` function and message display functions
+   - Location: `trading-ui/index.html`
 
-### בעיות שרת
+### Server Issues
 
-1. **אי יציבות השרת החדש** - `app_new.py` נופל כל הזמן
-   - סיבה: בעיות עם SQLite database locking
-   - פתרון זמני: שימוש בשרת הישן `app.py` עם waitress
+1. **New Server Instability** - `app_new.py` crashes constantly
+   - Cause: Issues with SQLite database locking
+   - Temporary solution: Using old server `app.py` with waitress
 
-2. **בעיות מסד נתונים** - database locked errors
-   - קבצים זמניים: `.db-journal`, `.db-shm`, `.db-wal`
-   - פתרון: מחיקת קבצים זמניים ופעלת שרת מחדש
+2. **Database Issues** - database locked errors
+   - Temporary files: `.db-journal`, `.db-shm`, `.db-wal`
+   - Solution: Delete temporary files and restart server
 
-3. **בעיות אימות משתמשים** - login failed
-   - משתמשים קיימים: admin, test, trader, viewer
-   - סיסמאות לא ידועות (מוצפנות ב-bcrypt)
+3. **User Authentication Issues** - login failed
+   - Existing users: admin, test, trader, viewer
+   - Passwords unknown (encrypted with bcrypt)
 
-### קבצים שעברו שינויים
+### Modified Files
 
-1. `trading-ui/database.html` - תיקון URLs לפורט 8080
-2. `trading-ui/index.html` - הוספת פונקציות התחברות
-3. `trading-ui/scripts/auth.js` - תיקון URL התחברות
-4. `trading-ui/scripts/app-header.js` - תיקון טעינת חשבונות
+1. `trading-ui/database.html` - Fixed URLs to port 8080
+2. `trading-ui/index.html` - Added login functions
+3. `trading-ui/scripts/auth.js` - Fixed login URL
+4. `trading-ui/scripts/app-header.js` - Fixed account loading
 
-### מצב נוכחי
+### Current Status
 
-- ✅ דף בסיס נתונים נטען ללא שגיאות JavaScript
-- ✅ כפתור התחבר עובד ב-index.html
-- ❌ טבלאות ריקות עקב בעיות CORS/שרת
-- ❌ שרת לא יציב
+- ✅ Database page loads without JavaScript errors
+- ✅ Login button works in index.html
+- ❌ Empty tables due to CORS/server issues
+- ❌ Server unstable
 
-### המלצות לפתרון
+### Solution Recommendations
 
-1. חזרה לגרסה יציבה קודמת
-2. יצירת ענף חדש לניסוי גישות אחרות
-3. שימוש בשרת הישן עם waitress
-4. בדיקת הגדרות CORS בשרת
+1. Return to previous stable version
+2. Create new branch for testing other approaches
+3. Use old server with waitress
+4. Check CORS settings on server

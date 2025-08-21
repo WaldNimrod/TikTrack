@@ -2,56 +2,56 @@
 
 ## 🚀 Quick Start
 
-### התקנה מהירה
+### Quick Installation
 ```bash
-# התקנת סביבת פיתוח
+# Install development environment
 make setup
 
-# או ידנית
+# Or manually
 chmod +x setup_development.sh
 ./setup_development.sh
 ```
 
-### פקודות שימושיות
+### Useful Commands
 ```bash
-# בדיקת טיפוסים
+# Type checking
 make type-check
 
-# עיצוב קוד
+# Code formatting
 make format
 
-# בדיקת סגנון
+# Style checking
 make lint
 
-# כל הבדיקות
+# All checks
 make check-all
 
-# הרצת בדיקות
+# Run tests
 make test
 
-# ניקוי קבצי cache
+# Clean cache files
 make clean
 ```
 
-## 🎯 Type Annotations - חובה לכל פונקציה
+## 🎯 Type Annotations - Required for Every Function
 
-### 📋 **כללים בסיסיים**
+### 📋 **Basic Rules**
 
-1. **כל פונקציה חייבת אנוטציות טיפוסים**
-2. **השתמש בתבניות מ-`Backend/templates/function_templates.py`**
-3. **בדוק עם `mypy` לפני commit**
+1. **Every function must have type annotations**
+2. **Use templates from `Backend/templates/function_templates.py`**
+3. **Check with `mypy` before commit**
 
-### 🔧 **דוגמאות נכונות**
+### 🔧 **Correct Examples**
 
 #### **Models**
 ```python
 def to_dict(self) -> Dict[str, Any]:
-    """המרה למילון"""
+    """Convert to dictionary"""
     result: Dict[str, Any] = {}
     return result
 
 def __repr__(self) -> str:
-    """ייצוג מחרוזת"""
+    """String representation"""
     return f"<{self.__class__.__name__}(id={self.id})>"
 ```
 
@@ -59,17 +59,17 @@ def __repr__(self) -> str:
 ```python
 @staticmethod
 def get_all(db: Session) -> List[Model]:
-    """קבלת כל הרשומות"""
+    """Get all records"""
     return db.query(Model).all()
 
 @staticmethod
 def get_by_id(db: Session, item_id: int) -> Optional[Model]:
-    """קבלת רשומה לפי מזהה"""
+    """Get record by ID"""
     return db.query(Model).filter(Model.id == item_id).first()
 
 @staticmethod
 def create(db: Session, data: Dict[str, Any]) -> Model:
-    """יצירת רשומה חדשה"""
+    """Create new record"""
     item = Model(**data)
     db.add(item)
     db.commit()
@@ -80,7 +80,7 @@ def create(db: Session, data: Dict[str, Any]) -> Model:
 #### **API Routes**
 ```python
 def get_items() -> Any:
-    """API endpoint לקבלת רשומות"""
+    """API endpoint for getting records"""
     try:
         db: Session = next(get_db())
         items = Service.get_all(db)
@@ -96,27 +96,27 @@ def get_items() -> Any:
         db.close()
 ```
 
-### 🚨 **שגיאות נפוצות**
+### 🚨 **Common Errors**
 
-#### **שגיאה: Missing return type annotation**
+#### **Error: Missing return type annotation**
 ```python
-# ❌ שגוי
+# ❌ Wrong
 def get_user(user_id):
     return user
 
-# ✅ נכון
+# ✅ Correct
 def get_user(user_id: int) -> Optional[User]:
     return user
 ```
 
-#### **שגיאה: Missing type annotation for variable**
+#### **Error: Missing type annotation for variable**
 ```python
-# ❌ שגוי
+# ❌ Wrong
 def process_data(data):
     result = {}
     return result
 
-# ✅ נכון
+# ✅ Correct
 def process_data(data: Dict[str, Any]) -> Dict[str, Any]:
     result: Dict[str, Any] = {}
     return result
@@ -126,31 +126,31 @@ def process_data(data: Dict[str, Any]) -> Dict[str, Any]:
 
 ### **Pre-commit Hooks**
 ```bash
-# התקנה
+# Installation
 pre-commit install
 
-# הרצה ידנית
+# Manual run
 pre-commit run --all-files
 ```
 
 ### **Type Checking**
 ```bash
-# בדיקה בסיסית
+# Basic check
 mypy Backend/
 
-# בדיקה מפורטת
+# Detailed check
 mypy Backend/ --html-report reports/mypy
 ```
 
 ### **Code Formatting**
 ```bash
-# עיצוב עם black
+# Format with black
 black Backend/
 
-# סידור imports
+# Sort imports
 isort Backend/
 
-# בדיקת סגנון
+# Style check
 flake8 Backend/
 ```
 
@@ -174,15 +174,15 @@ TikTrackApp/
 ## 🔍 Quality Assurance
 
 ### **Automated Checks**
-- **Type Checking**: `mypy` - בדיקת טיפוסים
-- **Code Formatting**: `black` - עיצוב קוד
-- **Import Sorting**: `isort` - סידור imports
-- **Linting**: `flake8` - בדיקת סגנון
-- **Pre-commit**: בדיקות אוטומטיות לפני commit
+- **Type Checking**: `mypy` - Type checking
+- **Code Formatting**: `black` - Code formatting
+- **Import Sorting**: `isort` - Import sorting
+- **Linting**: `flake8` - Style checking
+- **Pre-commit**: Automatic checks before commit
 
 ### **Manual Checks**
 ```bash
-# לפני כל commit
+# Before every commit
 make check-all
 make test
 ```
@@ -201,24 +201,24 @@ make test
 
 ## 🚀 Workflow
 
-### **פיתוח פונקציה חדשה**
+### **Developing a New Function**
 
-1. **בחר תבנית מתאימה** מ-`templates/function_templates.py`
-2. **הוסף אנוטציות טיפוסים** לכל פרמטר ופונקציה
-3. **הוסף docstring** בעברית
-4. **בדוק עם mypy**: `make type-check`
-5. **עצב עם black**: `make format`
-6. **בדוק סגנון**: `make lint`
-7. **הרץ בדיקות**: `make test`
-8. **Commit עם pre-commit hooks**
+1. **Choose appropriate template** from `templates/function_templates.py`
+2. **Add type annotations** for every parameter and function
+3. **Add docstring** in Hebrew
+4. **Check with mypy**: `make type-check`
+5. **Format with black**: `make format`
+6. **Check style**: `make lint`
+7. **Run tests**: `make test`
+8. **Commit with pre-commit hooks**
 
 ### **Commit Process**
 ```bash
-# 1. בדיקות אוטומטיות
+# 1. Automatic checks
 git add .
 pre-commit run --all-files
 
-# 2. בדיקות ידניות
+# 2. Manual checks
 make check-all
 make test
 
@@ -232,41 +232,41 @@ git commit -m "feat: add new function with type annotations"
 
 #### **Mypy Errors**
 ```bash
-# בדוק שגיאות טיפוסים
+# Check type errors
 mypy Backend/ --show-error-codes
 
-# התעלם מ-imports חסרים (זמני)
+# Ignore missing imports (temporary)
 mypy Backend/ --ignore-missing-imports
 ```
 
 #### **Black Formatting Issues**
 ```bash
-# בדוק מה ישתנה
+# Check what will change
 black Backend/ --check --diff
 
-# עיצוב אוטומטי
+# Automatic formatting
 black Backend/
 ```
 
 #### **Import Issues**
 ```bash
-# סידור imports
+# Sort imports
 isort Backend/ --check-only --diff
 
-# סידור אוטומטי
+# Automatic sorting
 isort Backend/
 ```
 
 ## 📞 Support
 
 ### **Getting Help**
-1. בדוק את [Development Guidelines](./Backend/DEVELOPMENT_GUIDELINES.md)
-2. השתמש בתבניות מ-`templates/function_templates.py`
-3. הרץ `make check-all` לזיהוי בעיות
-4. פנה לצוות הפיתוח
+1. Check [Development Guidelines](./Backend/DEVELOPMENT_GUIDELINES.md)
+2. Use templates from `templates/function_templates.py`
+3. Run `make check-all` to identify issues
+4. Contact the development team
 
 ### **Reporting Issues**
-- תיאור מפורט של הבעיה
-- קוד שגורם לבעיה
-- הודעות שגיאה מלאות
-- סביבת הפיתוח (OS, Python version, etc.)
+- Detailed description of the problem
+- Code that causes the problem
+- Complete error messages
+- Development environment (OS, Python version, etc.)

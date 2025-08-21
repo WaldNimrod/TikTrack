@@ -1,165 +1,165 @@
-# כללי קישור טריידים-תוכניות - TikTrack
+# Trade-Plan Linking Rules - TikTrack
 
-## סקירה כללית
+## Overview
 
-מסמך זה מתאר את הכללים לקישור בין טריידים לתוכניות טרייד במערכת TikTrack.
+This document describes the rules for linking between trades and trade plans in the TikTrack system.
 
-## כללים עיקריים
+## Main Rules
 
-### 1. קישור חובה
-- **כל טרייד חייב להיות מקושר לתוכנית כלשהי**
-- **לא ניתן ליצור טרייד ללא קישור לתוכנית**
+### 1. Mandatory Linking
+- **Every trade must be linked to some plan**
+- **Cannot create a trade without linking to a plan**
 
-### 2. כללי סטטוס
-- **טרייד פתוח**: חייב להיות מקושר לתוכנית במצב `open` או `closed`
-- **טרייד סגור/מבוטל**: יכול להיות משוייך לתוכנית בכל סטטוס
+### 2. Status Rules
+- **Open trade**: Must be linked to a plan in `open` or `closed` status
+- **Closed/cancelled trade**: Can be assigned to a plan in any status
 
-### 3. כללי תאריכים
-- **תאריך יצירת הטרייד לא יכול להיות מוקדם לתאריך יצירת התוכנית**
-- **התוכנית חייבת להיות קיימת לפני יצירת הטרייד**
+### 3. Date Rules
+- **Trade creation date cannot be earlier than plan creation date**
+- **Plan must exist before creating the trade**
 
-### 4. כללי צד (Side)
-- **צד הטרייד חייב להיות זהה לצד התוכנית**
-- **ערכים אפשריים**: `Long`, `Short`
-- **ברירת מחדל**: `Long`
+### 4. Side Rules
+- **Trade side must be identical to plan side**
+- **Possible values**: `Long`, `Short`
+- **Default**: `Long`
 
-### 5. כללי סוג (Type)
-- **סוג הטרייד יכול להיות שונה מסוג התוכנית**
-- **ברירת מחדל**: טרייד חדש מקבל את הסוג מהתוכנית
-- **שינוי מאוחר**: המשתמש יכול לשנות את סוג הטרייד ללא צורך לשנות את התוכנית
+### 5. Type Rules
+- **Trade type can be different from plan type**
+- **Default**: New trade gets type from plan
+- **Late change**: User can change trade type without needing to change the plan
 
-## דוגמאות
+## Examples
 
-### דוגמה 1: טרייד תקין
+### Example 1: Valid Trade
 ```
-תוכנית:
+Plan:
 - ID: 1
 - Type: swing
 - Side: Long
 - Status: open
 
-טרייד:
+Trade:
 - Trade Plan ID: 1
-- Type: swing (נלקח מהתוכנית)
-- Side: Long (חייב להיות זהה)
+- Type: swing (taken from plan)
+- Side: Long (must be identical)
 - Status: open
 ```
 
-### דוגמה 2: שינוי סוג טרייד
+### Example 2: Changing Trade Type
 ```
-תוכנית:
+Plan:
 - ID: 2
 - Type: investment
 - Side: Long
 - Status: open
 
-טרייד:
+Trade:
 - Trade Plan ID: 2
-- Type: swing (שונה מהתוכנית - מותר)
-- Side: Long (זהה לתוכנית - חובה)
+- Type: swing (different from plan - allowed)
+- Side: Long (identical to plan - required)
 - Status: open
 ```
 
-### דוגמה 3: טרייד לא תקין
+### Example 3: Invalid Trade
 ```
-תוכנית:
+Plan:
 - ID: 3
 - Type: swing
 - Side: Long
 - Status: open
 
-טרייד:
+Trade:
 - Trade Plan ID: 3
 - Type: swing
-- Side: Short (שונה מהתוכנית - לא מותר!)
+- Side: Short (different from plan - not allowed!)
 - Status: open
 ```
 
-## מימוש טכני
+## Technical Implementation
 
-### מודל Trade
+### Trade Model
 ```python
 def validate_trade_plan_link(self, trade_plan):
-    # בדיקת צד - חייב להיות זהה
+    # Check side - must be identical
     if self.side != trade_plan.side:
-        return False, f"צד הטרייד ({self.side}) חייב להיות זהה לצד התוכנית ({trade_plan.side})"
+        return False, f"Trade side ({self.side}) must be identical to plan side ({trade_plan.side})"
     
-    # בדיקות נוספות...
-    return True, "תקין"
+    # Additional checks...
+    return True, "Valid"
 ```
 
-### שירות Trade
+### Trade Service
 ```python
 def create(db: Session, data: Dict[str, Any]) -> Trade:
-    # הקצאת סוג מהתוכנית אם לא הוגדר
+    # Assign type from plan if not defined
     if 'type' not in data or not data['type']:
         data['type'] = trade_plan.investment_type
     
-    # הקצאת צד מהתוכנית אם לא הוגדר
+    # Assign side from plan if not defined
     if 'side' not in data or not data['side']:
         data['side'] = trade_plan.side
     
-    # יצירת הטרייד...
+    # Create trade...
 ```
 
-### סקריפט תיקון נתונים
+### Data Fix Script
 ```python
 def find_best_plan_for_trade(trade: Dict, plans: List[Dict]) -> Optional[int]:
-    # סינון לפי צד - חייב להיות זהה
+    # Filter by side - must be identical
     side_matching = [p for p in valid_plans if p.get('side', 'Long') == trade.get('side', 'Long')]
     if side_matching:
         valid_plans = side_matching
     else:
-        return None  # אין תוכנית עם אותו צד
+        return None  # No plan with same side
 ```
 
-## בדיקות תקינות
+## Validation Tests
 
-### בדיקות אוטומטיות
-1. **בדיקת קישור**: כל טרייד מקושר לתוכנית
-2. **בדיקת סטטוס**: טריידים פתוחים עם תוכניות תקינות
-3. **בדיקת תאריכים**: אין טריידים שנוצרו לפני תוכניות
-4. **בדיקת צד**: צד הטרייד זהה לצד התוכנית
+### Automated Tests
+1. **Link check**: Every trade linked to a plan
+2. **Status check**: Open trades with valid plans
+3. **Date check**: No trades created before plans
+4. **Side check**: Trade side identical to plan side
 
-### סקריפט בדיקה
+### Test Script
 ```bash
 python3 fix_trade_plan_links.py
 ```
 
-## השפעה על המערכת
+## System Impact
 
-### יתרונות
-- **תקינות נתונים**: כל טרייד מקושר לתוכנית תקינה
-- **עקביות**: כללים ברורים לכל הקישורים
-- **גמישות**: אפשרות לשנות סוג טרייד ללא השפעה על התוכנית
-- **מניעת שגיאות**: validation אוטומטי לפני שמירה
+### Advantages
+- **Data integrity**: Every trade linked to a valid plan
+- **Consistency**: Clear rules for all links
+- **Flexibility**: Option to change trade type without affecting plan
+- **Error prevention**: Automatic validation before saving
 
-### הגבלות
-- **צד קבוע**: לא ניתן לשנות את הצד של טרייד ללא שינוי התוכנית
-- **תלות בתוכנית**: כל טרייד תלוי בתוכנית קיימת
-- **מורכבות**: יותר כללים לתחזוקה
+### Limitations
+- **Fixed side**: Cannot change trade side without changing plan
+- **Plan dependency**: Every trade depends on existing plan
+- **Complexity**: More rules to maintain
 
-## הוראות שימוש
+## Usage Instructions
 
-### יצירת טרייד חדש
-1. בחר תוכנית קיימת
-2. המערכת תקצה אוטומטית את הסוג והצד מהתוכנית
-3. ניתן לשנות את הסוג מאוחר יותר
+### Creating New Trade
+1. Select existing plan
+2. System will automatically assign type and side from plan
+3. Can change type later
 
-### עדכון טרייד
-1. שינוי סוג: מותר
-2. שינוי צד: לא מותר (חייב לשנות את התוכנית)
-3. שינוי קישור: המערכת תבדוק תקינות
+### Updating Trade
+1. Change type: allowed
+2. Change side: not allowed (must change plan)
+3. Change link: System will check validity
 
-### תיקון נתונים
-1. הרץ `fix_trade_plan_links.py`
-2. הסקריפט ימצא את התוכנית הטובה ביותר לכל טרייד
-3. יבדוק ויתקן את כל הכללים
+### Fixing Data
+1. Run `fix_trade_plan_links.py`
+2. Script will find best plan for each trade
+3. Will check and fix all rules
 
-## סיכום
+## Summary
 
-הכללים מבטיחים:
-- **תקינות**: כל טרייד מקושר לתוכנית תקינה
-- **עקביות**: צד זהה בין טרייד לתוכנית
-- **גמישות**: סוג יכול להיות שונה
-- **אמינות**: נתונים אמינים ומדויקים
+The rules ensure:
+- **Integrity**: Every trade linked to valid plan
+- **Consistency**: Identical side between trade and plan
+- **Flexibility**: Type can be different
+- **Reliability**: Reliable and accurate data

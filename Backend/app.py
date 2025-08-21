@@ -1,46 +1,46 @@
 #!/usr/bin/env python3
 """
-TikTrack Production Server - קובץ ראשי של השרת
+TikTrack Production Server - Main server file
 ================================================
 
-⚠️  חשוב: זהו קובץ השרת הראשי בלבד!
+⚠️  Important: This is the main server file only!
 
-אין קשר למערכת הבדיקות!
+No connection to testing system!
 
-🎯 מטרה: הפעלת שרת TikTrack עם כל ה-API endpoints
-📍 מיקום: Backend/app.py
-🔗 מערכת הבדיקות: Backend/testing_suite/
+🎯 Purpose: Run TikTrack server with all API endpoints
+📍 Location: Backend/app.py
+🔗 Testing system: Backend/testing_suite/
 
-✅ יציב מאוד - מומלץ לייצור
-✅ בדוק ומוכח
-✅ ללא אימות (לפיתוח)
-✅ קובץ אחד פשוט
+✅ Very stable - recommended for production
+✅ Tested and proven
+✅ No authentication (for development)
+✅ Simple single file
 
-🔧 הפעלה:
-    python3 run_stable.py        # מומלץ (יציב)
-    python3 dev_server.py        # פיתוח עם auto-reload
-    python3 run_waitress_fixed.py # פרודקשן (Waitress)
+🔧 Execution:
+    python3 run_stable.py        # Recommended (stable)
+    python3 dev_server.py        # Development with auto-reload
+    python3 run_waitress_fixed.py # Production (Waitress)
     python3 app.py               # Flask development
-    ./start_server.sh            # עם מנטור
+    ./start_server.sh            # With monitor
 
-📊 נתיבים:
-    /api/health              # בדיקת בריאות
-    /api/accounts            # חשבונות
-    /api/trades              # טריידים
-    /api/tickers             # טיקרים
-    /api/trade_plans         # תכנונים
-    /api/alerts              # התראות
-    /api/cash_flows          # תזרימי מזומנים
-    /api/notes               # הערות
-    /api/executions          # ביצועים
-    /api/v1/tests/run        # הרצת בדיקות (מערכת הבדיקות)
+📊 Routes:
+    /api/health              # Health check
+    /api/accounts            # Accounts
+    /api/trades              # Trades
+    /api/tickers             # Tickers
+    /api/trade_plans         # Plans
+    /api/alerts              # Alerts
+    /api/cash_flows          # Cash flows
+    /api/notes               # Notes
+    /api/executions          # Executions
+    /api/v1/tests/run        # Run tests (testing system)
 
-📝 לוגים:
+📝 Logs:
     server_detailed.log
 
-📖 מדריכים:
-    Backend/SERVER_CONFIGURATIONS.md    # קונפיגורציות שרת
-    Backend/testing_suite/README.md     # מערכת הבדיקות
+📖 Guides:
+    Backend/SERVER_CONFIGURATIONS.md    # Server configurations
+    Backend/testing_suite/README.md     # Testing system
 
 ================================================
 """
@@ -93,24 +93,24 @@ app.register_blueprint(tests_bp)
 app.register_blueprint(currencies_bp)
 app.register_blueprint(pages_bp)
 
-# הגדרת טיפול בשגיאות
+# Error handling setup
 @app.errorhandler(404)
 def not_found(error) -> Any:
-    return jsonify({"error": "הדף לא נמצא"}), 404
+    return jsonify({"error": "Page not found"}), 404
 
 @app.errorhandler(500)
 def internal_error(error) -> Any:
-    return jsonify({"error": "שגיאה פנימית בשרת"}), 500
+    return jsonify({"error": "Internal server error"}), 500
 
 @app.errorhandler(Exception)
 def handle_exception(e: Exception) -> Any:
-    return jsonify({"error": f"שגיאה: {str(e)}"}), 500
+    return jsonify({"error": f"Error: {str(e)}"}), 500
 
 @app.route("/api/health", methods=["GET"])
 def health_check() -> Any:
-    """בדיקת בריאות השרת"""
+    """Server health check"""
     try:
-        # בדיקה חיבור לבסיס הנתונים
+        # Check database connection
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT 1")
@@ -129,18 +129,18 @@ def health_check() -> Any:
             "error": str(e)
         }), 500
 
-# נתיב יחסי לקובץ DB
+# Relative path to DB file
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
 
-# נתיב לקבצי ה-UI
+# Path to UI files
 UI_DIR = "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui"
 
-# בדיקה אם קובץ DB קיים
+# Check if DB file exists
 if not os.path.exists(DB_PATH):
     raise FileNotFoundError(f"Database not found at: {DB_PATH}")
 
-# בדיקה אם תיקיית UI קיימת
+# Check if UI directory exists
 if not os.path.exists(UI_DIR):
     raise FileNotFoundError(f"UI directory not found at: {UI_DIR}")
 
@@ -149,15 +149,15 @@ print(f"Files in UI directory: {os.listdir(UI_DIR)}")
 
 def get_db_connection() -> sqlite3.Connection:
     try:
-        # הגדרות SQLite משופרות ליציבות
+        # Enhanced SQLite settings for stability
         conn = sqlite3.connect(
             DB_PATH, 
-            timeout=30.0,  # timeout ארוך יותר
-            check_same_thread=False  # מאפשר שימוש מרובה threads
+            timeout=30.0,  # Longer timeout
+            check_same_thread=False  # Allow multi-thread usage
         )
         conn.row_factory = sqlite3.Row
         
-        # הגדרות WAL mode לביצועים טובים יותר
+        # WAL mode settings for better performance
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA synchronous=NORMAL")
         conn.execute("PRAGMA cache_size=10000")
@@ -166,18 +166,18 @@ def get_db_connection() -> sqlite3.Connection:
         
         return conn
     except Exception as e:
-        print(f"שגיאה בחיבור לבסיס הנתונים: {e}")
+        print(f"Database connection error: {e}")
         raise
 
 def update_ticker_open_status(ticker_id: int) -> None:
     """
-    מעדכן את שדה active_trades של טיקר בהתאם למצב התכנונים והטריידים הפתוחים
+    Updates the active_trades field of a ticker according to open plans and trades status
     """
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        # בדיקה אם יש תכנונים פעילים
+        # Check if there are active plans
         cursor.execute("""
             SELECT COUNT(*) as count 
             FROM trade_plans 
@@ -185,7 +185,7 @@ def update_ticker_open_status(ticker_id: int) -> None:
         """, (ticker_id,))
         open_plans = cursor.fetchone()['count']
         
-        # בדיקה אם יש טריידים פעילים
+        # Check if there are active trades
         cursor.execute("""
             SELECT COUNT(*) as count 
             FROM trades 
@@ -193,7 +193,7 @@ def update_ticker_open_status(ticker_id: int) -> None:
         """, (ticker_id,))
         open_trades = cursor.fetchone()['count']
         
-        # עדכון שדה active_trades
+        # Update active_trades field
         is_active = (open_plans > 0 or open_trades > 0)
         cursor.execute("""
             UPDATE tickers 
@@ -202,33 +202,33 @@ def update_ticker_open_status(ticker_id: int) -> None:
         """, (is_active, ticker_id))
         
         conn.commit()
-        print(f"DEBUG: עדכון active_trades לטיקר {ticker_id}: {is_active} (תכנונים: {open_plans}, טריידים: {open_trades})")
+        print(f"DEBUG: active_trades update for ticker {ticker_id}: {is_active} (plans: {open_plans}, trades: {open_trades})")
         
     except Exception as e:
-        print(f"ERROR: שגיאה בעדכון active_trades לטיקר {ticker_id}: {str(e)}")
+        print(f"ERROR: active_trades update error for ticker {ticker_id}: {str(e)}")
         conn.rollback()
     finally:
         conn.close()
 
 def update_all_tickers_open_status() -> None:
     """
-    מעדכן את שדה active_trades של כל הטיקרים
+    Updates the active_trades field of all tickers
     """
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        # קבלת כל הטיקרים
+        # Get all tickers
         cursor.execute("SELECT id FROM tickers")
         tickers = cursor.fetchall()
         
         for ticker in tickers:
             update_ticker_open_status(ticker['id'])
         
-        print(f"DEBUG: עדכון active_trades הושלם עבור {len(tickers)} טיקרים")
+        print(f"DEBUG: active_trades update completed for {len(tickers)} tickers")
         
     except Exception as e:
-        print(f"ERROR: שגיאה בעדכון כל הטיקרים: {str(e)}")
+        print(f"ERROR: error updating all tickers: {str(e)}")
     finally:
         conn.close()
 
@@ -240,7 +240,7 @@ def home() -> Any:
 def index_page() -> Any:
     return send_from_directory(UI_DIR, "index.html")
 
-# Routes לקבצי ה-UI
+# Routes for UI files
 @app.route("/planning")
 def planning_page() -> Any:
     return send_from_directory(UI_DIR, "planning.html")
@@ -279,21 +279,7 @@ def menu_file() -> Any:
 def test_menu() -> Any:
     return send_from_directory(UI_DIR, "test-menu.html")
 
-@app.route("/grid-test")
-def grid_test() -> Any:
-    return send_from_directory(UI_DIR, "grid-test.html")
 
-@app.route("/grid-test.html")
-def grid_test_html() -> Any:
-    return send_from_directory(UI_DIR, "grid-test.html")
-
-@app.route("/grid-table-test")
-def grid_table_test() -> Any:
-    return send_from_directory(UI_DIR, "grid-table-test.html")
-
-@app.route("/grid-table-test.html")
-def grid_table_test_html() -> Any:
-    return send_from_directory(UI_DIR, "grid-table-test.html")
 
 @app.route("/research")
 def research() -> Any:
@@ -330,61 +316,61 @@ def designs_html_page() -> Any:
 @app.route("/notes")
 def notes_page() -> Any:
     """
-    דף הערות - נתיב ללא .html
+    Notes page - route without .html
     """
     return send_from_directory(UI_DIR, "notes.html")
 
 @app.route("/notes.html")
 def notes_html_page() -> Any:
     """
-    דף הערות - נתיב עם .html (גיבוי)
+    Notes page - route with .html (backup)
     """
     return send_from_directory(UI_DIR, "notes.html")
 
 @app.route("/cash_flows")
 def cash_flows_page() -> Any:
     """
-    דף תזרימי מזומנים - נתיב ללא .html
+    Cash flows page - route without .html
     """
     return send_from_directory(UI_DIR, "cash_flows.html")
 
 @app.route("/cash_flows.html")
 def cash_flows_html_page() -> Any:
     """
-    דף תזרימי מזומנים - נתיב עם .html (גיבוי)
+    Cash flows page - route with .html (backup)
     """
     return send_from_directory(UI_DIR, "cash_flows.html")
 
 @app.route("/currencies")
 def currencies_page() -> Any:
     """
-    דף מטבעות - נתיב ללא .html
+    Currencies page - route without .html
     """
     return send_from_directory(UI_DIR, "currencies.html")
 
 @app.route("/currencies.html")
 def currencies_html_page() -> Any:
     """
-    דף מטבעות - נתיב עם .html (גיבוי)
+    Currencies page - route with .html (backup)
     """
     return send_from_directory(UI_DIR, "currencies.html")
 
 @app.route("/notification-demo")
 def notification_demo_page() -> Any:
     """
-    דף דמו להודעות - נתיב ללא .html
-    מציג את ההבדל בין alert ו-notification
+    Notification demo page - route without .html
+    Shows the difference between alert and notification
     """
     return send_from_directory(UI_DIR, "notification-demo.html")
 
 @app.route("/notification-demo.html")
 def notification_demo_html_page() -> Any:
     """
-    דף דמו להודעות - נתיב עם .html (גיבוי)
+    Notification demo page - route with .html (backup)
     """
     return send_from_directory(UI_DIR, "notification-demo.html")
 
-# API עבור תכנוני טריידים
+# API for trade plans
 @app.route("/api/tradeplans")
 def get_trade_plans() -> Any:
     conn = get_db_connection()
@@ -427,11 +413,11 @@ def create_trade_plan() -> Any:
     cursor = conn.cursor()
     
     try:
-        # בדיקת שדות חובה
+        # Check required fields
         if not data.get('account_id') or not data.get('ticker_id'):
-            return jsonify({"status": "error", "message": "חשבון וטיקר הם שדות חובה"}), 400
+            return jsonify({"status": "error", "message": "Account and ticker are required fields"}), 400
         
-        # יצירת תכנון הטרייד
+        # Create trade plan
         cursor.execute("""
             INSERT INTO trade_plans 
             (account_id, ticker_id, investment_type, planned_amount, entry_conditions, stop_price, target_price, reasons)
@@ -449,12 +435,12 @@ def create_trade_plan() -> Any:
         
         plan_id = cursor.lastrowid
         
-        # עדכון שדה active_trades של הטיקר
+        # Update ticker's active_trades field
         update_ticker_active_status(data['ticker_id'])
         
         conn.commit()
         
-        # החזרת תכנון הטרייד החדש
+        # Return new trade plan
         cursor.execute("SELECT * FROM trade_plans WHERE id = ?", (plan_id,))
         new_plan = dict(cursor.fetchone())
         
@@ -468,7 +454,7 @@ def create_trade_plan() -> Any:
 
 @app.route("/api/trade_plans/<int:plan_id>", methods=["GET"])
 def get_trade_plan(plan_id: int) -> Any:
-    """קבלת תכנון טרייד בודד לפי מזהה"""
+    """Get individual trade plan by ID"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -499,7 +485,7 @@ def get_trade_plan(plan_id: int) -> Any:
         
         if not row:
             conn.close()
-            return jsonify({"status": "error", "message": "תכנון לא נמצא"}), 404
+            return jsonify({"status": "error", "message": "Plan not found"}), 404
         
         trade_plan = dict(row)
         conn.close()
@@ -511,11 +497,11 @@ def get_trade_plan(plan_id: int) -> Any:
 
 
 
-# API עבור טריידים - עכשיו מוגדר ב-blueprint /api/v1/trades
+# API for trades - now defined in blueprint /api/v1/trades
 
 
 
-# API עבור תחקיר - טריידים סגורים
+# API for research - closed trades
 @app.route("/api/research/closed-trades")
 def get_closed_trades() -> Any:
     conn = get_db_connection()
@@ -548,14 +534,14 @@ def get_closed_trades() -> Any:
     conn.close()
     return jsonify(rows)
 
-# API עבור סטטיסטיקות תחקיר
+# API for research statistics
 @app.route("/api/research/stats")
 def get_research_stats() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        # סטטיסטיקות לטריידים סגורים
+        # Statistics for closed trades
         cursor.execute("""
             SELECT 
                 COUNT(*) as total_trades,
@@ -569,7 +555,7 @@ def get_research_stats() -> Any:
         
         stats = cursor.fetchone()
         
-        # חישוב אחוז הצלחה
+        # Calculate success rate
         total_trades = stats['total_trades'] or 0
         successful_trades = stats['successful_trades'] or 0
         success_rate = round((successful_trades / total_trades) * 100) if total_trades > 0 else 0
@@ -592,14 +578,14 @@ def get_research_stats() -> Any:
 
 
 
-# API עבור סטטיסטיקות
+# API for statistics
 @app.route("/api/stats")
 def get_stats() -> Any:
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        # סטטיסטיקות כללית
+        # General statistics
         cursor.execute("SELECT COUNT(*) as total_plans FROM trade_plans WHERE status = 'open'")
         open_plans = cursor.fetchone()['total_plans']
         
@@ -628,7 +614,7 @@ def get_stats() -> Any:
         return jsonify({"status": "error", "message": str(e)}), 400
 
 
-# API חדש לטבלאות בסיס הנתונים - בדיקה
+# New API for database tables - testing
 @app.route("/api/test_tickers")
 def test_tickers() -> Any:
     conn = get_db_connection()
@@ -663,7 +649,7 @@ def get_table_data_v2(table_name: str) -> Any:
     cursor = conn.cursor()
     
     try:
-        # רשימת הטבלאות המותרות
+        # List of allowed tables
         allowed_tables = [
             'accounts', 'tickers', 'trade_plans', 'trades', 'executions',
             'open_execution_requests', 'cash_flows', 'alerts', 
@@ -671,9 +657,9 @@ def get_table_data_v2(table_name: str) -> Any:
         ]
         
         if table_name not in allowed_tables:
-            return jsonify({"error": "טבלה לא מורשית"}), 400
+            return jsonify({"error": "Table not allowed"}), 400
         
-        # שאילתות מיוחדות לטבלאות עם קשרים
+        # Special queries for tables with relationships
         if table_name == 'tickers':
             query = """
             SELECT 
@@ -775,7 +761,7 @@ def get_table_data_v2(table_name: str) -> Any:
             ORDER BY n.created_at DESC
             """
         else:
-            # שאילתה רגילה לטבלאות אחרות
+            # Regular query for other tables
             query = f"SELECT * FROM {table_name}"
         
         cursor.execute(query)
@@ -821,27 +807,27 @@ def get_table_data_v2(table_name: str) -> Any:
             
             return jsonify({
                 "status": "error", 
-                "message": f"לא ניתן למחוק חשבון '{account_name}' - יש טריידים פעילים",
+                "message": f"Cannot delete account '{account_name}' - there are active trades",
                 "error_type": "linked_trades",
                 "trades": trades_info
             }), 400
         
-        # מחיקת החשבון
+        # Delete account
         cursor.execute("DELETE FROM accounts WHERE id = ?", (account_id,))
         conn.commit()
         
         conn.close()
-        return jsonify({"status": "success", "message": f"חשבון '{account_name}' נמחק בהצלחה"})
+        return jsonify({"status": "success", "message": f"Account '{account_name}' deleted successfully"})
         
     except Exception as e:
         conn.close()
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-# API לטיקרים
+# API for tickers
 @app.route("/api/tickers/<int:ticker_id>", methods=["GET"])
 def get_ticker(ticker_id: int) -> Any:
-    """קבלת טיקר בודד לפי מזהה"""
+    """Get single ticker by ID"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -851,7 +837,7 @@ def get_ticker(ticker_id: int) -> Any:
         
         if not ticker:
             conn.close()
-            return jsonify({"status": "error", "message": "טיקר לא נמצא"}), 404
+            return jsonify({"status": "error", "message": "Ticker not found"}), 404
         
         ticker_dict = dict(ticker)
         conn.close()
@@ -863,7 +849,7 @@ def get_ticker(ticker_id: int) -> Any:
 
 @app.route("/api/tickers/<int:ticker_id>/info", methods=["GET"])
 def get_ticker_info(ticker_id: int) -> Any:
-    """קבלת מידע על טיקר לפי מזהה - סימבול ומטבע"""
+    """Get ticker information by ID - symbol and currency"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -873,7 +859,7 @@ def get_ticker_info(ticker_id: int) -> Any:
         
         if not ticker:
             conn.close()
-            return jsonify({"status": "error", "message": "טיקר לא נמצא"}), 404
+            return jsonify({"status": "error", "message": "Ticker not found"}), 404
         
         ticker_info = {
             "id": ticker['id'],
@@ -889,7 +875,7 @@ def get_ticker_info(ticker_id: int) -> Any:
 
 @app.route("/api/tickers/symbol/<symbol>", methods=["GET"])
 def get_ticker_by_symbol(symbol: str) -> Any:
-    """קבלת מידע על טיקר לפי סימבול - סימבול ומטבע"""
+    """Get ticker information by symbol - symbol and currency"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -899,7 +885,7 @@ def get_ticker_by_symbol(symbol: str) -> Any:
         
         if not ticker:
             conn.close()
-            return jsonify({"status": "error", "message": "טיקר לא נמצא"}), 404
+            return jsonify({"status": "error", "message": "Ticker not found"}), 404
         
         ticker_info = {
             "id": ticker['id'],
@@ -915,7 +901,7 @@ def get_ticker_by_symbol(symbol: str) -> Any:
 
 @app.route("/api/tickers", methods=["GET"])
 def get_tickers() -> Any:
-    """קבלת כל הטיקרים"""
+    """Get all tickers"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -937,32 +923,32 @@ def create_ticker() -> Any:
     try:
         data = request.get_json()
         
-        # בדיקת שדות חובה
+        # Check required fields
         if not data.get('symbol'):
-            return jsonify({"status": "error", "message": "סימבול הוא שדה חובה"}), 400
+            return jsonify({"status": "error", "message": "Symbol is a required field"}), 400
         
         if not data.get('type'):
-            return jsonify({"status": "error", "message": "סוג הוא שדה חובה"}), 400
+            return jsonify({"status": "error", "message": "Type is a required field"}), 400
         
-        # בדיקת תקינות הסימבול - רק אותיות גדולות באנגלית, נקודות ומספרים
+        # Validate symbol - only uppercase English letters, dots and numbers
         import re
         symbol_pattern = re.compile(r'^[A-Z0-9.]+$')
         if not symbol_pattern.match(data['symbol']):
-            return jsonify({"status": "error", "message": "סימבול יכול להכיל רק אותיות גדולות באנגלית, מספרים ונקודות"}), 400
+            return jsonify({"status": "error", "message": "Symbol can only contain uppercase English letters, numbers and dots"}), 400
         
-        # בדיקה אם הסימבול כבר קיים
+        # Check if symbol already exists
         cursor.execute("SELECT * FROM tickers WHERE symbol = ?", (data['symbol'],))
         if cursor.fetchone():
-            return jsonify({"status": "error", "message": f"הטיקר '{data['symbol']}' כבר קיים במערכת"}), 400
+            return jsonify({"status": "error", "message": f"Ticker '{data['symbol']}' already exists in the system"}), 400
         
-        # הוספת הטיקר
+        # Add ticker
         cursor.execute(
             "INSERT INTO tickers (symbol, type, currency, remarks) VALUES (?, ?, ?, ?)",
             (data['symbol'], data.get('type'), data.get('currency', 'USD'), data.get('remarks'))
         )
         conn.commit()
         
-        # החזרת הטיקר החדש
+        # Return the new ticker
         new_ticker_id = cursor.lastrowid
         cursor.execute("SELECT * FROM tickers WHERE id = ?", (new_ticker_id,))
         new_ticker = dict(cursor.fetchone())
@@ -980,7 +966,7 @@ def create_ticker() -> Any:
         
 
         
-        # בדיקה אם יש התראות פעילות המקושרות לטיקר זה
+        # Check if there are active alerts linked to this ticker
         cursor.execute("""
             SELECT id, type, condition, status, is_triggered, created_at
             FROM alerts 
@@ -988,10 +974,10 @@ def create_ticker() -> Any:
         """, (ticker_id,))
         linked_alerts = cursor.fetchall()
         
-        print(f"DEBUG: בדיקת התראות פעילות לטיקר {ticker_id}, נמצאו: {len(linked_alerts)} התראות")
+        print(f"DEBUG: Checking active alerts for ticker {ticker_id}, found: {len(linked_alerts)} alerts")
         
         if linked_alerts:
-            # יש התראות פעילות מקושרות - מחזיר שגיאה עם פרטי ההתראות
+            # There are active linked alerts - return an error with details
             alerts_info = []
             for alert in linked_alerts:
                 alerts_info.append({
@@ -1003,32 +989,32 @@ def create_ticker() -> Any:
                     'created_at': alert['created_at']
                 })
             
-            print(f"DEBUG: מחזיר שגיאה - יש {len(alerts_info)} התראות פעילות מקושרות")
+            print(f"DEBUG: Returning error - there are {len(alerts_info)} active linked alerts")
             return jsonify({
                 "status": "error", 
-                "message": f"לא ניתן למחוק טיקר '{ticker['symbol']}' - יש התראות פעילות המקושרות אליו (רק התראות בסטטוס פעיל מונעות מחיקה)",
+                "message": f"Cannot delete ticker '{ticker['symbol']}' - there are active alerts linked to it (only open alerts prevent deletion)",
                 "error_type": "linked_alerts",
                 "linked_alerts": alerts_info
             }), 400
         
-        # אין קשרים - ניתן למחוק
-        print(f"DEBUG: אין קשרים - מוחק טיקר {ticker_id}")
+        # No links - can delete
+        print(f"DEBUG: No links - deleting ticker {ticker_id}")
         cursor.execute("DELETE FROM tickers WHERE id = ?", (ticker_id,))
         conn.commit()
         
         conn.close()
-        return jsonify({"status": "success", "message": f"טיקר '{ticker['symbol']}' נמחק בהצלחה"})
+        return jsonify({"status": "success", "message": f"Ticker '{ticker['symbol']}' deleted successfully"})
         
     except Exception as e:
         conn.close()
         return jsonify({"status": "error", "message": str(e)}), 400
 
-# API לעדכון שדה active_trades של כל הטיקרים
+# API for updating active_trades field of all tickers
 @app.route("/api/tickers/update-active-status", methods=["POST"])
 def update_all_tickers_active() -> Any:
     try:
         update_all_tickers_active_status()
-        return jsonify({"status": "success", "message": "עדכון שדה active_trades הושלם בהצלחה"})
+        return jsonify({"status": "success", "message": "active_trades field update completed successfully"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
@@ -1077,18 +1063,18 @@ def create_cash_flow() -> Any:
     try:
         data = request.get_json()
         
-        # בדיקת שדות חובה
+        # Check required fields
         if not data.get('account_id') or not data.get('amount') or not data.get('flow_type'):
-            return jsonify({"status": "error", "message": "מזהה חשבון, סכום וסוג תזרים הם שדות חובה"}), 400
+            return jsonify({"status": "error", "message": "Account ID, amount and flow type are required fields"}), 400
         
-        # הוספת תזרים המזומנים
+        # Add cash flow
         cursor.execute(
             "INSERT INTO cash_flows (account_id, date, flow_type, amount, currency, description) VALUES (?, ?, ?, ?, ?, ?)",
             (data['account_id'], data.get('date'), data['flow_type'], data['amount'], data.get('currency'), data.get('description'))
         )
         conn.commit()
         
-        # החזרת תזרים המזומנים החדש
+        # Return the new cash flow
         new_cash_flow_id = cursor.lastrowid
         cursor.execute("SELECT * FROM cash_flows WHERE id = ?", (new_cash_flow_id,))
         new_cash_flow = dict(cursor.fetchone())
@@ -1118,11 +1104,11 @@ def get_notes() -> Any:
             n.related_id,
             n.created_at,
             CASE 
-                WHEN n.related_type_id = 1 THEN 'חשבון'
-                WHEN n.related_type_id = 2 THEN 'טרייד'
-                WHEN n.related_type_id = 3 THEN 'תוכנית טרייד'
-                WHEN n.related_type_id = 4 THEN 'טיקר'
-                ELSE 'לא ידוע'
+                WHEN n.related_type_id = 1 THEN 'Account'
+                WHEN n.related_type_id = 2 THEN 'Trade'
+                WHEN n.related_type_id = 3 THEN 'Trade Plan'
+                WHEN n.related_type_id = 4 THEN 'Ticker'
+                ELSE 'Unknown'
             END as related_type_name
         FROM notes n
         ORDER BY n.created_at DESC
@@ -1148,18 +1134,18 @@ def create_note() -> Any:
     try:
         data = request.get_json()
         
-        # בדיקת שדות חובה
+        # Check required fields
         if not data.get('content'):
-            return jsonify({"status": "error", "message": "תוכן הוא שדה חובה"}), 400
+            return jsonify({"status": "error", "message": "Content is a required field"}), 400
         
-        # הוספת ההערה
+        # Add the note
         cursor.execute(
             "INSERT INTO notes (related_type_id, related_id, content, attachment) VALUES (?, ?, ?, ?)",
             (data.get('related_type_id'), data.get('related_id'), data['content'], data.get('attachment'))
         )
         conn.commit()
         
-        # החזרת ההערה החדשה
+        # Return the new note
         new_note_id = cursor.lastrowid
         cursor.execute("SELECT * FROM notes WHERE id = ?", (new_note_id,))
         new_note = dict(cursor.fetchone())
@@ -1222,13 +1208,13 @@ def create_execution() -> Any:
     try:
         data = request.get_json()
         
-        # בדיקת שדות חובה
+        # Check required fields
         required_fields = ['trade_id', 'action', 'date', 'quantity', 'price']
         for field in required_fields:
             if field not in data:
-                return jsonify({"status": "error", "message": f"שדה {field} הוא חובה"}), 400
+                return jsonify({"status": "error", "message": f"Field {field} is required"}), 400
         
-        # הכנסת הביצוע החדש
+        # Add the new execution
         query = """
         INSERT INTO executions (trade_id, action, date, quantity, price, fee, source)
         VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -1246,7 +1232,7 @@ def create_execution() -> Any:
         
         conn.commit()
         
-        # החזרת הביצוע החדש
+        # Return the new execution
         new_execution_id = cursor.lastrowid
         cursor.execute("SELECT * FROM executions WHERE id = ?", (new_execution_id,))
         new_execution = dict(cursor.fetchone())
@@ -1290,7 +1276,7 @@ def get_user(user_id: int) -> Any:
         user = cursor.fetchone()
         
         if not user:
-            return jsonify({"status": "error", "message": "משתמש לא נמצא"}), 404
+            return jsonify({"status": "error", "message": "User not found"}), 404
         
         conn.close()
         return jsonify({"status": "success", "data": dict(user)})
@@ -1305,18 +1291,18 @@ def get_user(user_id: int) -> Any:
 
 @app.route("/api/accounts", methods=["POST"])
 def create_account() -> Any:
-    """יצירת חשבון חדש"""
+    """Create new account"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
         data = request.get_json()
         
-        # בדיקת שדות חובה
+        # Check required fields
         if not data.get('name') or not data.get('currency'):
-            return jsonify({"status": "error", "message": "שם החשבון ומטבע הם שדות חובה"}), 400
+            return jsonify({"status": "error", "message": "Account name and currency are required fields"}), 400
         
-        # יצירת החשבון
+        # Create account
         cursor.execute("""
             INSERT INTO accounts (name, currency, status, cash_balance, total_value, total_pl, notes)
             VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -1333,12 +1319,12 @@ def create_account() -> Any:
         account_id = cursor.lastrowid
         conn.commit()
         
-        # החזרת החשבון החדש
+        # Return the new account
         cursor.execute("SELECT * FROM accounts WHERE id = ?", (account_id,))
         new_account = dict(cursor.fetchone())
         
         conn.close()
-        return jsonify({"status": "success", "data": new_account, "message": "חשבון נוצר בהצלחה"}), 201
+        return jsonify({"status": "success", "data": new_account, "message": "Account created successfully"}), 201
         
     except Exception as e:
         conn.close()
@@ -1346,22 +1332,22 @@ def create_account() -> Any:
 
 @app.route("/api/accounts/<int:account_id>", methods=["PUT"])
 def update_account(account_id: int) -> Any:
-    """עדכון חשבון"""
+    """Update account"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
         data = request.get_json()
         
-        # בדיקה שהחשבון קיים
+        # Check if account exists
         cursor.execute("SELECT * FROM accounts WHERE id = ?", (account_id,))
         account = cursor.fetchone()
         
         if not account:
             conn.close()
-            return jsonify({"status": "error", "message": "חשבון לא נמצא"}), 404
+            return jsonify({"status": "error", "message": "Account not found"}), 404
         
-        # עדכון החשבון
+        # Update account
         cursor.execute("""
             UPDATE accounts 
             SET name = ?, currency = ?, status = ?, cash_balance = ?, 
@@ -1380,12 +1366,12 @@ def update_account(account_id: int) -> Any:
         
         conn.commit()
         
-        # החזרת החשבון המעודכן
+        # Return the updated account
         cursor.execute("SELECT * FROM accounts WHERE id = ?", (account_id,))
         updated_account = dict(cursor.fetchone())
         
         conn.close()
-        return jsonify({"status": "success", "data": updated_account, "message": "חשבון עודכן בהצלחה"})
+        return jsonify({"status": "success", "data": updated_account, "message": "Account updated successfully"}), 200
         
     except Exception as e:
         conn.close()
@@ -1393,22 +1379,22 @@ def update_account(account_id: int) -> Any:
 
 @app.route("/api/accounts/<int:account_id>", methods=["DELETE"])
 def delete_account(account_id: int) -> Any:
-    """מחיקת חשבון"""
+    """Delete account"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        # בדיקה שהחשבון קיים
+        # Check if account exists
         cursor.execute("SELECT name FROM accounts WHERE id = ?", (account_id,))
         account = cursor.fetchone()
         
         if not account:
             conn.close()
-            return jsonify({"status": "error", "message": "חשבון לא נמצא"}), 404
+            return jsonify({"status": "error", "message": "Account not found"}), 404
         
         account_name = account['name']
         
-        # בדיקה שאין טריידים פעילים בחשבון
+        # Check if there are active trades in the account
         cursor.execute("""
             SELECT id, status, created_at, ticker_id 
             FROM trades 
@@ -1427,17 +1413,17 @@ def delete_account(account_id: int) -> Any:
             
             return jsonify({
                 "status": "error", 
-                "message": f"לא ניתן למחוק חשבון '{account_name}' - יש טריידים פעילים",
+                "message": f"Cannot delete account '{account_name}' - there are active trades",
                 "error_type": "open_trades",
                 "trades": trades_info
             }), 400
         
-        # מחיקת החשבון
+        # Delete account
         cursor.execute("DELETE FROM accounts WHERE id = ?", (account_id,))
         conn.commit()
         
         conn.close()
-        return jsonify({"status": "success", "message": f"חשבון '{account_name}' נמחק בהצלחה"})
+        return jsonify({"status": "success", "message": f"Account '{account_name}' deleted successfully"}), 200
         
     except Exception as e:
         conn.close()
@@ -1485,7 +1471,7 @@ def get_user_role(user_role_id: int) -> Any:
         user_role = cursor.fetchone()
         
         if not user_role:
-            return jsonify({"status": "error", "message": "תפקיד משתמש לא נמצא"}), 404
+            return jsonify({"status": "error", "message": "User role not found"}), 404
         
         conn.close()
         return jsonify({"status": "success", "data": dict(user_role)})
@@ -1515,15 +1501,15 @@ if __name__ == "__main__":
     #
     # ✅ **הקונפיגורציה החדשה:** Flask development server פשוט ויציב
     
-    print("🚀 מפעיל Flask development server...")
-    print("📍 שרת פיתוח פועל על http://127.0.0.1:8080")
-    print("⚡ Debug mode מופעל")
-    print("📝 לוגים מפורטים מופעלים")
+    print("🚀 Starting Flask development server...")
+    print("📍 Server running on http://127.0.0.1:8080")
+    print("⚡ Debug mode enabled")
+    print("📝 Detailed logs enabled")
     print("-" * 50)
     
     app.run(
         host='127.0.0.1',
         port=8080,
         debug=True,
-        use_reloader=False  # כיבוי auto-reload למניעת בעיות
+        use_reloader=False  # Disable auto-reload to prevent issues
     )

@@ -1,44 +1,44 @@
-# 📊 טבלת סיכום - מה שבוצע היום
+# 📊 Summary Table - What Was Completed Today
 
-## ✅ השלמות מלאות
+## ✅ Complete Completions
 
-| פריט | סטטוס | פירוט |
+| Item | Status | Details |
 |------|--------|--------|
-| 🔧 **עדכון תזרימי מזומנים** | ✅ הושלם | 4 שדות חדשים + אינטגרציה מטבעות |
-| 💱 **CRUD מלא למטבעות** | ✅ הושלם | דף חדש + API + תפריט |
-| 📝 **עדכון דוקומנטציה** | ✅ הושלם | DATABASE_CHANGES + README + CRUD_STATUS |
-| 🔗 **אינטגרציה תפריט** | ✅ הושלם | קישור מטבעות אחרי בסיס נתונים |
+| 🔧 **Cash Flows Update** | ✅ Completed | 4 new fields + currency integration |
+| 💱 **Full CRUD for Currencies** | ✅ Completed | New page + API + menu |
+| 📝 **Documentation Update** | ✅ Completed | DATABASE_CHANGES + README + CRUD_STATUS |
+| 🔗 **Menu Integration** | ✅ Completed | Currency link after database |
 
-## 📋 פירוט מפורט
+## 📋 Detailed Breakdown
 
-### 1. תזרימי מזומנים - שדות חדשים
-- ✅ **מטבע הפעולה** (currency_id) - קישור לטבלת מטבעות
-- ✅ **שער דולר** (usd_rate) - שער המטבע ביום הפעולה  
-- ✅ **מקור המידע** (source) - ידני/ייבוא קובץ/ייבוא ישיר
-- ✅ **מזהה חיצוני** (external_id) - מזהה ברוקר
+### 1. Cash Flows - New Fields
+- ✅ **Operation Currency** (currency_id) - Link to currencies table
+- ✅ **USD Rate** (usd_rate) - Currency rate on operation day  
+- ✅ **Data Source** (source) - Manual/File import/Direct import
+- ✅ **External ID** (external_id) - Broker identifier
 
-### 2. CRUD מטבעות - דף חדש
-- ✅ **HTML**: currencies.html - דף מלא עם טבלה ומודלים
-- ✅ **JavaScript**: currencies.js - פונקציות CRUD מלאות
-- ✅ **API**: /currencies נתבים בשרת
-- ✅ **תפריט**: קישור אחרי 'בסיס נתונים'
+### 2. Currency CRUD - New Page
+- ✅ **HTML**: currencies.html - Full page with table and modals
+- ✅ **JavaScript**: currencies.js - Complete CRUD functions
+- ✅ **API**: /currencies routes on server
+- ✅ **Menu**: Link after 'Database'
 
-### 3. דוקומנטציה מעודכנת
-- ✅ **DATABASE_CHANGES_AUGUST_2025.md** - 2 סקשנים חדשים
-- ✅ **README.md** - עדכון עם מידע חדש
-- ✅ **CRUD_COMPLETION_STATUS.md** - טבלת סטטוס מפורטת
+### 3. Updated Documentation
+- ✅ **DATABASE_CHANGES_AUGUST_2025.md** - 2 new sections
+- ✅ **README.md** - Update with new information
+- ✅ **CRUD_COMPLETION_STATUS.md** - Detailed status table
 
-## 🎯 המשך העבודה
+## 🎯 Continuation of Work
 
-### הבא בתור:
-1. **חשבונות (Accounts)** - בדיקת מחיקה
-2. **טיקרים (Tickers)** - בדיקת מחיקה  
-3. **התראות (Alerts)** - מחיקה + ביטול
+### Next Up:
+1. **Accounts** - Delete verification
+2. **Tickers** - Delete verification  
+3. **Alerts** - Delete + Cancel
 
-### סטטיסטיקות:
-- **הושלמו**: 8/8 ישויות (100%) ✅
-- **בתהליך**: 0/8 ישויות (0%)  
-- **ממתינים**: 0/8 ישויות (0%)
+### Statistics:
+- **Completed**: 8/8 entities (100%) ✅
+- **In Progress**: 0/8 entities (0%)  
+- **Pending**: 0/8 entities (0%)
 
 ## 🎉 הושלם במלואו!
 
@@ -61,3 +61,4 @@
 3. **שיפור התראות** - הוספת כפתור ביטול פעיל
 4. **תיעוד מעודכן** - כל השינויים מתועדים
 5. **סידור קבצי שרת** - run_flask_simple.py → dev_server.py + גיבוי מסודר
+6. **יצירת דף תחקיר חדש** - שיכפול עמוד עיצובים עם תוכן דמה + תיקון פונקציות סגירה + הוספת app-header + טבלת טריידים מלאה + שינוי סדר: חשבונות לפני טריידים + החלפת חשבונות בסיכום מצב עכשווי ושינוי יומי + עדכון נתוני דוגמה לסוגי טריידים אמיתיים במערכת + תיקון app-header בדפי מטבעות ועיצובים + סידור סגנונות CSS - העברת סגנונות פילטרים ל-menu.css וסגנונות סקשנים ל-styles.css

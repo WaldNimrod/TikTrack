@@ -1,0 +1,11 @@
+{
+  "defaults": {
+    "primaryCurrency": "USD"
+  },
+  "user": {
+    "primaryCurrency": "USD",
+    "defaultTargetPrice": 30,
+    "timezone": "Asia/Jerusalem",
+    "testKey": "testValue"
+  }
+}

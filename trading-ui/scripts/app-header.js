@@ -977,8 +977,7 @@ class AppHeader extends HTMLElement {
                   <li><a class="dropdown-item" href="/database">בסיס נתונים</a></li>
                   <li><a class="dropdown-item" href="/currencies">מטבעות</a></li>
                   <li><a class="dropdown-item" href="/designs">עיצובים</a></li>
-                  <li><a class="dropdown-item" href="/grid-test">גריד</a></li>
-                  <li><a class="dropdown-item" href="/grid-table-test">גריד טבלה</a></li>
+                  
                 </ul>
               </div>
             </nav>

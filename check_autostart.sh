@@ -1,10 +1,10 @@
 #!/bin/bash
 # TikTrack Check Auto-Start Status
-# בדיקת סטטוס ההפעלה האוטומטית
+# Check auto-start status
 
 echo "🔍 Checking TikTrack Auto-Start Status..."
 
-# קבלת הנתיב המלא לפרויקט
+# Get the full project path
 PROJECT_PATH=$(pwd)
 LAUNCH_AGENT_FILE="$HOME/Library/LaunchAgents/com.tiktrack.server.plist"
 
@@ -12,11 +12,11 @@ echo "📁 Project path: $PROJECT_PATH"
 echo "📝 LaunchAgent file: $LAUNCH_AGENT_FILE"
 echo ""
 
-# בדיקה אם LaunchAgent קיים
+# Check if LaunchAgent exists
 if [ -f "$LAUNCH_AGENT_FILE" ]; then
     echo "✅ LaunchAgent file exists"
     
-    # בדיקת סטטוס LaunchAgent
+    # Check LaunchAgent status
     echo "🔄 Checking LaunchAgent status..."
     LAUNCH_AGENT_STATUS=$(launchctl list | grep com.tiktrack.server)
     
@@ -28,7 +28,7 @@ if [ -f "$LAUNCH_AGENT_FILE" ]; then
         echo "🔧 To load it, run: launchctl load $LAUNCH_AGENT_FILE"
     fi
     
-    # הצגת תוכן קובץ LaunchAgent
+    # Display LaunchAgent file contents
     echo ""
     echo "📄 LaunchAgent file contents:"
     echo "----------------------------------------"

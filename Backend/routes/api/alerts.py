@@ -10,7 +10,7 @@ alerts_bp = Blueprint('alerts', __name__, url_prefix='/api/v1/alerts')
 
 @alerts_bp.route('/', methods=['GET'])
 def get_alerts():
-    """קבלת כל ההתראות"""
+    """Get all alerts"""
     try:
         db: Session = next(get_db())
         alerts = AlertService.get_all(db)
@@ -34,7 +34,7 @@ def get_alerts():
 
 @alerts_bp.route('/<int:alert_id>', methods=['GET'])
 def get_alert(alert_id: int):
-    """קבלת התראה לפי מזהה"""
+    """Get alert by ID"""
     try:
         db: Session = next(get_db())
         alert = AlertService.get_by_id(db, alert_id)
@@ -62,7 +62,7 @@ def get_alert(alert_id: int):
 
 @alerts_bp.route('/', methods=['POST'])
 def create_alert():
-    """יצירת התראה חדשה"""
+    """Create new alert"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -85,7 +85,7 @@ def create_alert():
 
 @alerts_bp.route('/<int:alert_id>', methods=['PUT'])
 def update_alert(alert_id: int):
-    """עדכון התראה"""
+    """Update alert"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -115,7 +115,7 @@ def update_alert(alert_id: int):
 
 @alerts_bp.route('/<int:alert_id>', methods=['DELETE'])
 def delete_alert(alert_id: int):
-    """מחיקת התראה"""
+    """Delete alert"""
     try:
         db: Session = next(get_db())
         AlertService.delete(db, alert_id)
@@ -145,7 +145,7 @@ def delete_alert(alert_id: int):
 
 @alerts_bp.route('/<int:alert_id>/trigger', methods=['POST'])
 def mark_as_triggered(alert_id: int):
-    """הפעלת התראה (שינוי ל-new)"""
+    """Activate alert (change to new)"""
     try:
         db: Session = next(get_db())
         alert = AlertService.mark_as_triggered(db, alert_id)
@@ -174,7 +174,7 @@ def mark_as_triggered(alert_id: int):
 
 @alerts_bp.route('/unread', methods=['GET'])
 def get_unread_alerts():
-    """קבלת התראות שלא נקראו (new)"""
+    """Get unread alerts (new)"""
     try:
         db: Session = next(get_db())
         alerts = AlertService.get_unread_alerts_with_symbols(db)
@@ -198,7 +198,7 @@ def get_unread_alerts():
 
 @alerts_bp.route('/<int:alert_id>/mark-read', methods=['PATCH'])
 def mark_read(alert_id: int):
-    """סימון התראה כנקראה (true)"""
+    """Mark alert as read (true)"""
     try:
         db: Session = next(get_db())
         alert = AlertService.mark_as_read(db, alert_id)
@@ -227,7 +227,7 @@ def mark_read(alert_id: int):
 
 @alerts_bp.route('/<int:alert_id>/reactivate', methods=['PATCH'])
 def reactivate_alert(alert_id: int):
-    """החזרת התראה למצב פעיל"""
+    """Return alert to active state"""
     try:
         db: Session = next(get_db())
         alert = AlertService.reactivate(db, alert_id)
@@ -256,7 +256,7 @@ def reactivate_alert(alert_id: int):
 
 @alerts_bp.route('/<int:alert_id>/cancel', methods=['PATCH'])
 def cancel_alert(alert_id: int):
-    """ביטול התראה"""
+    """Cancel alert"""
     try:
         db: Session = next(get_db())
         alert = AlertService.cancel(db, alert_id)
@@ -283,10 +283,10 @@ def cancel_alert(alert_id: int):
     finally:
         db.close()
 
-# Endpoints חדשים לקבלת התראות לפי ישות
+# New endpoints for getting alerts by entity
 @alerts_bp.route('/entity/<entity_type>/<int:entity_id>', methods=['GET'])
 def get_alerts_by_entity(entity_type: str, entity_id: int):
-    """קבלת התראות לפי סוג ישות ומזהה"""
+    """Get alerts by entity type and ID"""
     try:
         db: Session = next(get_db())
         alerts = AlertService.get_alerts_by_entity(db, entity_type, entity_id)

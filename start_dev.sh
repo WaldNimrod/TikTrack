@@ -1,51 +1,51 @@
 #!/bin/bash
 
 # Development Server Startup Script
-# סקריפט להפעלת שרת פיתוח
+# Development Server Startup Script
 
-# 🎯 מטרה: הפעלת שרת פיתוח Flask פשוט ויציב
-# ⚡ תכונות: 
+# 🎯 Purpose: Start a simple and stable Flask development server
+# ⚡ Features: 
 #   - Flask development server
-#   - Debug mode מופעל
-#   - לוגים מפורטים
-#   - יציבות משופרת
-# 🛡️ יציבות: Flask development server ללא auto-reload
-# 📊 ביצועים: מתאים לפיתוח עם עומס נמוך-בינוני
+#   - Debug mode enabled
+#   - Detailed logs
+#   - Improved stability
+# 🛡️ Stability: Flask development server without auto-reload
+# 📊 Performance: Suitable for development with low-medium load
 #
-# מתאים ל:
-# ✅ פיתוח פעיל
-# ✅ ניסויים ובדיקות
-# ✅ סביבות יציבות
-# ❌ לא מתאים לפרודקשן
+# Suitable for:
+# ✅ Active development
+# ✅ Experiments and testing
+# ✅ Stable environments
+# ❌ Not suitable for production
 
-echo "🚀 מפעיל שרת פיתוח TikTrack..."
+echo "🚀 Starting TikTrack development server..."
 
-# בדיקה שהסביבה מוכנה
+# Check if environment is ready
 if [ ! -d "Backend" ]; then
-    echo "❌ תיקיית Backend לא נמצאה"
+    echo "❌ Backend directory not found"
     exit 1
 fi
 
-# כניסה לתיקיית Backend
+# Enter Backend directory
 cd Backend
 
-# הפעלת הסביבה הוירטואלית
+# Activate virtual environment
 source ../.venv/bin/activate
 
-# בדיקה אם יש תהליכים רצים על הפורט
-echo "🔍 בודק תהליכים קיימים..."
+# Check if there are processes running on the port
+echo "🔍 Checking existing processes..."
 if lsof -i :8080 >/dev/null 2>&1; then
-    echo "⚠️  יש תהליכים רצים על פורט 8080"
-    echo "🔄 עוצר תהליכים קיימים..."
+    echo "⚠️  There are processes running on port 8080"
+    echo "🔄 Stopping existing processes..."
     lsof -ti :8080 | xargs kill -9 2>/dev/null || true
     sleep 2
 fi
 
-# הפעלת שרת פיתוח Flask פשוט
-echo "🔄 מפעיל שרת פיתוח Flask..."
-echo "⚡ Flask development server - יציב ומהיר"
-echo "📝 לוגים מפורטים מופעלים"
+# Start Flask development server
+echo "🔄 Starting Flask development server..."
+echo "⚡ Flask development server - stable and fast"
+echo "📝 Detailed logs enabled"
 echo "-" * 50
 
-# הפעלה עם dev_server.py - הקונפיגורציה הסטנדרטית
+# Start with dev_server.py - standard configuration
 python3 dev_server.py

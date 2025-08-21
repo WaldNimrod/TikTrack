@@ -1,24 +1,24 @@
 #!/bin/bash
 # TikTrack Auto-Start Setup
-# הגדרת הפעלה אוטומטית של השרת אחרי אתחול המחשב
+# Setting up automatic server startup after computer restart
 
 echo "🚀 Setting up TikTrack Auto-Start..."
 echo "📍 This will make the server start automatically after computer restart"
 
-# קבלת הנתיב המלא לפרויקט
+# Get the full project path
 PROJECT_PATH=$(pwd)
 echo "📁 Project path: $PROJECT_PATH"
 
-# יצירת קובץ LaunchAgent
+# Create LaunchAgent file
 LAUNCH_AGENT_DIR="$HOME/Library/LaunchAgents"
 LAUNCH_AGENT_FILE="$LAUNCH_AGENT_DIR/com.tiktrack.server.plist"
 
 echo "📝 Creating LaunchAgent file..."
 
-# יצירת תיקיית LaunchAgents אם לא קיימת
+# Create LaunchAgents directory if it doesn't exist
 mkdir -p "$LAUNCH_AGENT_DIR"
 
-# יצירת קובץ LaunchAgent
+# Create LaunchAgent file
 cat > "$LAUNCH_AGENT_FILE" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -52,7 +52,7 @@ EOF
 
 echo "✅ LaunchAgent file created: $LAUNCH_AGENT_FILE"
 
-# טעינת LaunchAgent
+# Load LaunchAgent
 echo "🔄 Loading LaunchAgent..."
 launchctl load "$LAUNCH_AGENT_FILE"
 

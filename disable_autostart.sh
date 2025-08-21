@@ -1,17 +1,17 @@
 #!/bin/bash
 # TikTrack Disable Auto-Start
-# ביטול הפעלה אוטומטית של השרת
+# Disable automatic server startup
 
 echo "🛑 Disabling TikTrack Auto-Start..."
 
-# קבלת הנתיב המלא לפרויקט
+# Get the full project path
 PROJECT_PATH=$(pwd)
 LAUNCH_AGENT_FILE="$HOME/Library/LaunchAgents/com.tiktrack.server.plist"
 
 echo "📁 Project path: $PROJECT_PATH"
 echo "📝 LaunchAgent file: $LAUNCH_AGENT_FILE"
 
-# בדיקה אם LaunchAgent קיים
+# Check if LaunchAgent exists
 if [ -f "$LAUNCH_AGENT_FILE" ]; then
     echo "🔄 Unloading LaunchAgent..."
     launchctl unload "$LAUNCH_AGENT_FILE"

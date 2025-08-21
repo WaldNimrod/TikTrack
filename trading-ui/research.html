@@ -10,8 +10,8 @@
     ===== דף תחקיר - TikTrack =====
     
     דף זה מכיל:
-    1. טבלת תחקירים - הסקשן הראשון
-    2. טבלת חשבונות - הסקשן השני
+    1. טבלת חשבונות - הסקשן הראשון
+    2. טבלת טריידים - הסקשן השני
     3. כרטיסיות התראות - בחלק העליון
     4. מערכת פילטרים ומיון מתקדמת
     
@@ -19,8 +19,8 @@
     - app-header: כותרת האפליקציה עם ניווט
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות התראות וסיכום נתונים
-      - content-section (1): טבלת תחקירים
-      - content-section (2): טבלת חשבונות
+      - content-section (1): טבלת חשבונות
+      - content-section (2): טבלת טריידים
     
     שינויים אחרונים:
     - יצירת דף תחקיר חדש כשיכפול של עמוד העיצובים
@@ -29,6 +29,7 @@
     - שיפור עיצוב כרטיסיות התראות
     - תיקון כפתורי סגירה עצמאיים
     - ריכוז פונקציות חשבונות ב-accounts.js
+    - שינוי סדר: חשבונות לפני טריידים
   -->
 
   <!-- Apple Theme CSS - בסיס כללי -->
@@ -40,11 +41,14 @@
   <!-- Menu CSS - תפריט -->
   <link rel="stylesheet" href="styles/menu.css">
 
-  <!-- Grid Table CSS - טבלאות וגרידים -->
-  <link rel="stylesheet" href="styles/grid-table.css">
+  <!-- Table CSS - טבלאות -->
+  <link rel="stylesheet" href="styles/table.css">
 
   <!-- Typography CSS - טיפוגרפיה ופונטים -->
   <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- Research Summary CSS - סגנונות לסיכום -->
+  <link rel="stylesheet" href="styles/research-summary.css">
 
   <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -69,7 +73,7 @@
             🔍 תחקיר
           </div>
           <div class="table-actions">
-            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור תחקיר">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר את כל הסקשנים">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -81,10 +85,10 @@
 
           <!-- סיכום נתונים -->
           <div class="info-summary" id="summaryStats">
-            <div>סה"כ תחקירים: <strong id="totalResearch">0</strong></div>
-            <div>סה"כ השקעה: <strong id="totalInvestment">$0</strong></div>
-            <div>השקעה ממוצעת: <strong id="avgInvestment">$0</strong></div>
-            <div>רווח כולל: <strong id="totalProfit">$0</strong></div>
+            <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
+            <div>טריידים פתוחים: <strong id="openTrades">0</strong></div>
+            <div>טריידים סגורים: <strong id="closedTrades">0</strong></div>
+            <div>רווח/הפסד כולל: <strong id="totalPL">$0</strong></div>
           </div>
         </div>
       </div> <!-- סוף top-section -->
@@ -92,39 +96,281 @@
       <!-- תוכן ראשי -->
       <div class="main-content">
 
-        <!-- אזור תחקיר - content-section -->
+        <!-- האלמנט הראשון - סיכום מצב עכשווי ושינוי יומי -->
         <div class="content-section">
-          <!-- כותרת תחקיר -->
+          <!-- כותרת סיכום מצב -->
           <div class="section-header">
             <div class="table-title">
-              🔍 תחקירים
+              📊 סיכום מצב עכשווי ושינוי יומי
             </div>
-                          <div class="table-count">9 תחקירים</div>
+
             <div class="table-actions">
-                              <button class="refresh-btn" onclick="openResearchDetails()" title="הוסף תחקיר חדש">
-                  <span class="action-icon">➕</span> הוסף
-                </button>
+              <button class="refresh-btn" onclick="refreshSummaryData()" title="רענן נתונים">
+                <span class="action-icon">🔄</span> רענן
+              </button>
               <div class="action-separator"></div>
-                              <button class="filter-toggle-btn" onclick="toggleResearchSection()" title="הצג/הסתר אזור תחקיר">
+              <button class="filter-toggle-btn" onclick="toggleSummarySection()" title="הצג/הסתר אזור סיכום">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
           </div>
 
-          <!-- טבלת עיצובים -->
+          <!-- תוכן סיכום מצב -->
           <div class="section-body">
-            <div class="table-responsive" id="designsContainer">
-              <table class="table" id="designsTable" data-table-type="designs">
+            <!-- כרטיסיות סיכום מהיר -->
+            <div class="summary-cards">
+              <div class="summary-card">
+                <div class="card-icon">💰</div>
+                <div class="card-content">
+                  <div class="card-title">סה"כ נכסים</div>
+                  <div class="card-value">$125,450</div>
+                  <div class="card-change positive">+$2,350 (1.9%)</div>
+                </div>
+              </div>
+              <div class="summary-card">
+                <div class="card-icon">📈</div>
+                <div class="card-content">
+                  <div class="card-title">רווח/הפסד כולל</div>
+                  <div class="card-value">$15,250</div>
+                  <div class="card-change positive">+$1,200 (8.5%)</div>
+                </div>
+              </div>
+              <div class="summary-card">
+                <div class="card-icon">🎯</div>
+                <div class="card-content">
+                  <div class="card-title">Market to Market</div>
+                  <div class="card-value">$3,750</div>
+                  <div class="card-change positive">+$450 (13.6%)</div>
+                </div>
+              </div>
+              <div class="summary-card">
+                <div class="card-icon">⚡</div>
+                <div class="card-content">
+                  <div class="card-title">טריידים פעילים</div>
+                  <div class="card-value">8</div>
+                  <div class="card-change neutral">+2 מהיום</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- טבלת סיכום לפי סוג טרייד -->
+            <div class="table-responsive">
+              <table class="table summary-table">
                 <thead>
                   <tr>
-                    <th>נכס<br><span class="header-subtitle">Ticker</span></th>
-                    <th>תאריך<br><span class="header-subtitle">Date</span></th>
-                    <th>סוג<br><span class="header-subtitle">Type</span></th>
-                    <th>סכום<br><span class="header-subtitle">Amount</span></th>
-                    <th>יעד<br><span class="header-subtitle">Target</span></th>
-                    <th>סטופ<br><span class="header-subtitle">Stop</span></th>
-                    <th>נוכחי<br><span class="header-subtitle">Current</span></th>
-                    <th>סטטוס<br><span class="header-subtitle">Status</span></th>
+                    <th>סוג טרייד<br><span class="header-subtitle">Trade Type</span></th>
+                    <th>כמות<br><span class="header-subtitle">Count</span></th>
+                    <th>ערך כולל<br><span class="header-subtitle">Total Value</span></th>
+                    <th>רווח/הפסד<br><span class="header-subtitle">P&L</span></th>
+                    <th>אחוז מהתיק<br><span class="header-subtitle">Portfolio %</span></th>
+                    <th>ביצוע יומי<br><span class="header-subtitle">Daily Performance</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="trade-type-badge type-stock">מניות</span></td>
+                    <td>8</td>
+                    <td>$65,200</td>
+                    <td class="profit-positive">+$6,450</td>
+                    <td>52.0%</td>
+                    <td class="profit-positive">+$1,200 (1.9%)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="trade-type-badge type-etf">ETF</span></td>
+                    <td>5</td>
+                    <td>$35,300</td>
+                    <td class="profit-positive">+$2,800</td>
+                    <td>28.2%</td>
+                    <td class="profit-positive">+$450 (1.3%)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="trade-type-badge type-crypto">קריפטו</span></td>
+                    <td>3</td>
+                    <td>$15,500</td>
+                    <td class="profit-positive">+$3,200</td>
+                    <td>12.4%</td>
+                    <td class="profit-positive">+$800 (5.4%)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="trade-type-badge type-commodity">סחורות</span></td>
+                    <td>2</td>
+                    <td>$8,450</td>
+                    <td class="profit-negative">-$1,200</td>
+                    <td>6.7%</td>
+                    <td class="profit-negative">-$300 (-3.4%)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="trade-type-badge type-forex">פורקס</span></td>
+                    <td>1</td>
+                    <td>$1,250</td>
+                    <td class="profit-positive">+$150</td>
+                    <td>1.0%</td>
+                    <td class="profit-positive">+$50 (4.2%)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- טבלת שינוי יומי -->
+            <div class="daily-changes-section">
+              <h4 class="section-subtitle">📅 שינוי יומי - 3 ימים אחרונים</h4>
+              <div class="table-responsive">
+                <table class="table daily-table">
+                  <thead>
+                    <tr>
+                      <th>תאריך<br><span class="header-subtitle">Date</span></th>
+                      <th>סה"כ נכסים<br><span class="header-subtitle">Total Assets</span></th>
+                      <th>רווח/הפסד<br><span class="header-subtitle">P&L</span></th>
+                      <th>שינוי יומי<br><span class="header-subtitle">Daily Change</span></th>
+                      <th>מניות<br><span class="header-subtitle">Stocks</span></th>
+                      <th>ETF<br><span class="header-subtitle">ETF</span></th>
+                      <th>קריפטו<br><span class="header-subtitle">Crypto</span></th>
+                      <th>סחורות<br><span class="header-subtitle">Commodity</span></th>
+                      <th>פורקס<br><span class="header-subtitle">Forex</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>היום</td>
+                      <td>$125,450</td>
+                      <td class="profit-positive">+$1,200</td>
+                      <td class="profit-positive">+1.9%</td>
+                      <td class="profit-positive">+$1,200</td>
+                      <td class="profit-positive">+$450</td>
+                      <td class="profit-positive">+$800</td>
+                      <td class="profit-negative">-$300</td>
+                      <td class="profit-positive">+$50</td>
+                    </tr>
+                    <tr>
+                      <td>אתמול</td>
+                      <td>$123,100</td>
+                      <td class="profit-positive">+$2,100</td>
+                      <td class="profit-positive">+1.7%</td>
+                      <td class="profit-positive">+$1,500</td>
+                      <td class="profit-positive">+$600</td>
+                      <td class="profit-positive">+$200</td>
+                      <td class="profit-positive">+$100</td>
+                      <td class="profit-positive">+$50</td>
+                    </tr>
+                    <tr>
+                      <td>שלשום</td>
+                      <td>$121,000</td>
+                      <td class="profit-negative">-$800</td>
+                      <td class="profit-negative">-0.7%</td>
+                      <td class="profit-negative">-$500</td>
+                      <td class="profit-positive">+$200</td>
+                      <td class="profit-negative">-$400</td>
+                      <td class="profit-negative">-$100</td>
+                      <td class="profit-negative">-$50</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- האלמנט השני - טבלת טריידים -->
+        <div class="content-section">
+          <!-- כותרת טריידים -->
+          <div class="section-header">
+            <div class="table-title">
+              📈 הטריידים שלי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trades</span>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <div class="search-input-wrapper">
+                <input type="text" class="search-filter-input" placeholder="חיפוש טריידים..."
+                  onkeyup="filterTradesData([], [], [], null, this.value)">
+              </div>
+              <button class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <button class="refresh-btn" onclick="loadTrades()" title="רענן טבלה">
+                <span class="action-icon">🔄</span> רענן
+              </button>
+              <button class="filter-toggle-btn" onclick="toggleResearchSection()" title="הצג/הסתר אזור הטריידים שלי">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- טבלת טריידים -->
+          <div class="section-body">
+            <div class="table-responsive" id="tradesContainer">
+              <table class="table" id="tradesTable" data-table-type="trades">
+                <thead>
+                  <tr>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>חשבון
+                        <br><span class="header-subtitle">Account</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(1)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>טיקר
+                        <br><span class="header-subtitle">Ticker</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>תוכנית
+                        <br><span class="header-subtitle">Trade Plan ID</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>סטטוס
+                        <br><span class="header-subtitle">Status</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(4)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>סוג
+                        <br><span class="header-subtitle">Type</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>צד
+                        <br><span class="header-subtitle">Side</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(6)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>נוצר ב
+                        <br><span class="header-subtitle">Created At</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(7)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>נסגר ב
+                        <br><span class="header-subtitle">Closed At</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(8)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>רווח/הפסד
+                        <br><span class="header-subtitle">Total P/L</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(9)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>הערות
+                        <br><span class="header-subtitle">Notes</span>
+                      </button>
+                    </th>
                     <th class="actions-header">
                       פעולות
                       <br><span class="header-subtitle">Actions</span>
@@ -133,251 +379,11 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong><a href="#" onclick="openResearchDetails('8')" class="ticker-link">AAPL</a></strong></td>
-                    <td>15.1.2025</td>
-                    <td>investment</td>
-                    <td>$25,000</td>
-                    <td>$200.00</td>
-                    <td>$170.00</td>
-                    <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-closed">סגור</span></td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editResearch('8')" title="ערוך">
-                        <span class="btn-icon">✏️</span>
-                      </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteResearch('8')" title="מחק">X</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong><a href="#" onclick="openResearchDetails('9')" class="ticker-link">TSLA</a></strong></td>
-                    <td>10.1.2025</td>
-                    <td>swing</td>
-                    <td>$30,000</td>
-                    <td>$250.00</td>
-                    <td>$200.00</td>
-                    <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-closed">סגור</span></td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editResearch('9')" title="ערוך">
-                        <span class="btn-icon">✏️</span>
-                      </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteResearch('9')" title="מחק">X</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong><a href="#" onclick="openResearchDetails('7')" class="ticker-link">TSLA</a></strong></td>
-                    <td>15.8.2025</td>
-                    <td>short</td>
-                    <td>$10,000</td>
-                    <td>$750.00</td>
-                    <td>$900.00</td>
-                    <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-canceled">מבוטל</span></td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editResearch('7')" title="ערוך">
-                        <span class="btn-icon">✏️</span>
-                      </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteResearch('7')" title="מחק">X</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong><a href="#" onclick="openResearchDetails('6')" class="ticker-link">MSFT</a></strong></td>
-                    <td>15.8.2025</td>
-                    <td>long</td>
-                    <td>$8,000</td>
-                    <td>$380.00</td>
-                    <td>$300.00</td>
-                    <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-canceled">מבוטל</span></td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editResearch('6')" title="ערוך">
-                        <span class="btn-icon">✏️</span>
-                      </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteResearch('6')" title="מחק">X</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong><a href="#" onclick="openResearchDetails('5')" class="ticker-link">GOOGL</a></strong></td>
-                    <td>15.8.2025</td>
-                    <td>short</td>
-                    <td>$12,000</td>
-                    <td>$2500.00</td>
-                    <td>$2950.00</td>
-                    <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-open">פתוח</span></td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editResearch('5')" title="ערוך">
-                        <span class="btn-icon">✏️</span>
-                      </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteResearch('5')" title="מחק">X</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong><a href="#" onclick="openResearchDetails('4')" class="ticker-link">AAPL</a></strong></td>
-                    <td>15.8.2025</td>
-                    <td>long</td>
-                    <td>$15,000</td>
-                    <td>$200.00</td>
-                    <td>$145.00</td>
-                    <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-open">פתוח</span></td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editResearch('4')" title="ערוך">
-                        <span class="btn-icon">✏️</span>
-                      </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteResearch('4')" title="מחק">X</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong><a href="#" onclick="openResearchDetails('1')" class="ticker-link">AAPL</a></strong></td>
-                    <td>15.8.2025</td>
-                    <td>long</td>
-                    <td>$10,000</td>
-                    <td>$180.00</td>
-                    <td>$140.00</td>
-                    <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-open">פתוח</span></td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editResearch('1')" title="ערוך">
-                        <span class="btn-icon">✏️</span>
-                      </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteResearch('1')" title="מחק">X</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong><a href="#" onclick="openResearchDetails('2')" class="ticker-link">GOOGL</a></strong></td>
-                    <td>15.8.2025</td>
-                    <td>long</td>
-                    <td>$8,000</td>
-                    <td>$150.00</td>
-                    <td>$110.00</td>
-                    <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-open">פתוח</span></td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editResearch('2')" title="ערוך">
-                        <span class="btn-icon">✏️</span>
-                      </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteResearch('2')" title="מחק">X</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong><a href="#" onclick="openResearchDetails('3')" class="ticker-link">SPY</a></strong></td>
-                    <td>15.8.2025</td>
-                    <td>long</td>
-                    <td>$5,000</td>
-                    <td>$450.00</td>
-                    <td>$380.00</td>
-                    <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-open">פתוח</span></td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editResearch('3')" title="ערוך">
-                        <span class="btn-icon">✏️</span>
-                      </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteResearch('3')" title="מחק">X</button>
-                    </td>
+                    <td colspan="11" class="loading">טוען טריידים...</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- האלמנט השני - טבלת חשבונות -->
-      <div class="content-section">
-        <!-- כותרת חשבונות -->
-        <div class="section-header">
-          <div class="table-title">
-            💰 חשבונות
-          </div>
-          <div class="table-count">3 חשבונות</div>
-          <div class="table-actions">
-            <button class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש">
-              <span class="action-icon">➕</span> הוסף
-            </button>
-            <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleAccountsSection()" title="הצג/הסתר אזור חשבונות">
-              <span class="filter-icon">▲</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- טבלת חשבונות -->
-        <div class="section-body">
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>מזהה<br><span class="header-subtitle">ID</span></th>
-                  <th>שם<br><span class="header-subtitle">Name</span></th>
-                  <th>מטבע<br><span class="header-subtitle">Currency</span></th>
-                  <th>סטטוס<br><span class="header-subtitle">Status</span></th>
-                  <th>יתרה<br><span class="header-subtitle">Cash Balance</span></th>
-                  <th>שווי כולל<br><span class="header-subtitle">Total Value</span></th>
-                  <th>רווח/הפסד<br><span class="header-subtitle">Total P&L</span></th>
-                  <th>הערות<br><span class="header-subtitle">Notes</span></th>
-                  <th>פעולות<br><span class="header-subtitle">Actions</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>חשבון ראשי</td>
-                  <td>USD</td>
-                  <td><span class="status-badge status-active">פעיל</span></td>
-                  <td>$25,000</td>
-                  <td>$45,250</td>
-                  <td class="profit-positive">+$2,500 (5.8%)</td>
-                  <td>חשבון המסחר הראשי</td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" title="מחק">X</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>חשבון משני</td>
-                  <td>USD</td>
-                  <td><span class="status-badge status-active">פעיל</span></td>
-                  <td>$15,000</td>
-                  <td>$18,750</td>
-                  <td class="profit-positive">+$750 (4.2%)</td>
-                  <td>חשבון למסחר משני</td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" title="מחק">X</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>חשבון בדיקה</td>
-                  <td>USD</td>
-                  <td><span class="status-badge status-inactive">לא פעיל</span></td>
-                  <td>$5,000</td>
-                  <td>$5,000</td>
-                  <td>$0 (0.0%)</td>
-                  <td>חשבון לבדיקות</td>
-                  <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" title="ערוך">
-                      <span class="btn-icon">✏️</span>
-                    </button>
-                    <button class="btn btn-sm btn-danger" title="מחק">X</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
@@ -390,7 +396,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- קבצים מודולריים -->
+    <script src="scripts/app-header.js"></script>
     <script src="scripts/account-modal.js"></script>
+    <script src="scripts/trades.js"></script>
     <script src="scripts/research.js"></script>
 
     <!-- ניקוי הודעות קונסולה -->
@@ -402,6 +410,14 @@
           console.clear();
         }
       }, 25000);
+
+      // אתחול הדף
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('🔄 אתחול דף תחקיר...');
+        if (typeof initializeResearchPage === 'function') {
+          initializeResearchPage();
+        }
+      });
     </script>
 </body>
 

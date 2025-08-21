@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 """
 Server Health Check Utility - Enhanced Version
-בודק איזה שרת רץ ואיזה פורט הוא משתמש
-משתמש במערכת המוניטורינג הקיימת
+Checks which server is running and which port it uses
+Uses the existing monitoring system
 
-📋 מטרה:
-- לפתור בעיה של בדיקות curl שנתקעות בלופים
-- לספק בדיקה מפורטת של בריאות השרת
-- לזהות מערכת מוניטורינג ותהליכים
-- לתת המלצות אוטומטיות לפתרון בעיות
+📋 Purpose:
+- Solve the problem of curl tests getting stuck in loops
+- Provide detailed server health check
+- Identify monitoring system and processes
+- Give automatic recommendations for problem solving
 
-🚀 שימוש:
-- python3 server_health_check.py - בדיקה מפורטת
-- main() - פונקציה לשימוש בקוד
+🚀 Usage:
+- python3 server_health_check.py - detailed check
+- main() - function for use in code
 
-📝 היסטוריה:
-- נוצר ב-2024 לפתרון בעיות ביצועים ב-Cursor
-- מחליף בדיקות curl מורכבות שנתקעות
-- מותאם לפרויקט TikTrack (פורט 8080)
-- משתמש במערכת המוניטורינג הקיימת
+📝 History:
+- Created in 2024 to solve performance problems in Cursor
+- Replaces complex curl tests that get stuck
+- Adapted for TikTrack project (port 8080)
+- Uses the existing monitoring system
 
-🔧 תלות:
+🔧 Dependencies:
 - requests
 - socket
 - subprocess
@@ -29,11 +29,11 @@ Server Health Check Utility - Enhanced Version
 - os
 - typing
 
-📊 פלט:
-- מידע על תהליכי TikTrack
-- סטטוס מערכת מוניטורינג
-- זמן תגובה
-- המלצות לפתרון בעיות
+📊 Output:
+- Information about TikTrack processes
+- Monitoring system status
+- Response time
+- Recommendations for problem solving
 """
 
 import requests
@@ -46,15 +46,15 @@ from typing import Optional, Tuple
 
 def check_port_open(host: str, port: int, timeout: float = 1.0) -> bool:
     """
-    בודק אם פורט פתוח
+    Check if port is open
     
     Args:
-        host (str): כתובת השרת
-        port (int): מספר הפורט
-        timeout (float): זמן timeout בשניות
+        host (str): Server address
+        port (int): Port number
+        timeout (float): Timeout in seconds
     
     Returns:
-        bool: True אם הפורט פתוח, False אחרת
+        bool: True if port is open, False otherwise
     """
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -67,35 +67,35 @@ def check_port_open(host: str, port: int, timeout: float = 1.0) -> bool:
 
 def check_server_response(url: str, timeout: float = 2.0) -> Tuple[bool, Optional[str]]:
     """
-    בודק תגובה מהשרת
+    Check server response
     
     Args:
-        url (str): כתובת URL לבדיקה
-        timeout (float): זמן timeout בשניות
+        url (str): URL to check
+        timeout (float): Timeout in seconds
     
     Returns:
-        Tuple[bool, Optional[str]]: (הצלחה, תגובה או שגיאה)
+        Tuple[bool, Optional[str]]: (success, response or error)
     """
     try:
         response = requests.get(url, timeout=timeout)
         if response.status_code == 200:
-            return True, response.text[:100]  # 100 תווים ראשונים
+            return True, response.text[:100]  # First 100 characters
         return False, f"Status: {response.status_code}"
     except requests.exceptions.RequestException as e:
         return False, str(e)
 
 def find_running_server() -> Optional[Tuple[str, int]]:
     """
-    מוצא איזה שרת רץ ואיזה פורט - מותאם לפרויקט TikTrack
+    Find which server is running and which port - adapted for TikTrack project
     
     Returns:
-        Optional[Tuple[str, int]]: (host, port) או None אם לא נמצא
+        Optional[Tuple[str, int]]: (host, port) or None if not found
     
     Note:
-        - TikTrack תמיד רץ על פורט 8080
-        - בודק localhost ו-127.0.0.1
+        - TikTrack always runs on port 8080
+        - Checks localhost and 127.0.0.1
     """
-    # TikTrack תמיד רץ על פורט 8080
+    # TikTrack always runs on port 8080
     target_port = 8080
     hosts = ['localhost', '127.0.0.1']
     

@@ -1,103 +1,103 @@
-# 🎉 ברוכים הבאים לצוות TikTrack!
+# 🎉 Welcome to the TikTrack Team!
 
-## 🚀 התחלה מהירה (5 דקות)
+## 🚀 Quick Start (5 minutes)
 
-### 1. **התקנה אוטומטית**
+### 1. **Automatic Installation**
 ```bash
-# הרץ את הסקריפט האוטומטי
+# Run the automatic script
 make onboarding
 
-# או ידנית
+# Or manually
 chmod +x onboarding.sh
 ./onboarding.sh
 ```
 
-### 2. **הדרכה אינטראקטיבית**
+### 2. **Interactive Tutorial**
 ```bash
-# למידה על אנוטציות טיפוסים
+# Learn about type annotations
 make tutorial
 ```
 
-### 3. **בדיקת המערכת**
+### 3. **System Check**
 ```bash
-# בדיקה שכל הכלים עובדים
+# Check that all tools work
 make check-all
 ```
 
-## 📚 **מה חשוב לדעת**
+## 📚 **What's Important to Know**
 
-### 🎯 **חוק מספר 1: אנוטציות טיפוסים**
-כל פונקציה חדשה חייבת לכלול אנוטציות טיפוסים:
+### 🎯 **Rule #1: Type Annotations**
+Every new function must include type annotations:
 
 ```python
-# ❌ שגוי - לא יעבור
+# ❌ Wrong - won't pass
 def get_user(user_id):
     return user
 
-# ✅ נכון - יעבור
+# ✅ Correct - will pass
 def get_user(user_id: int) -> Optional[User]:
     return user
 ```
 
-### 🛠️ **כלים אוטומטיים**
-- **Pre-commit hooks** - מונעים commit ללא אנוטציות
-- **Mypy** - בודק טיפוסים אוטומטית
-- **VS Code** - מראה שגיאות בזמן כתיבה
+### 🛠️ **Automatic Tools**
+- **Pre-commit hooks** - Prevent commits without annotations
+- **Mypy** - Automatically checks types
+- **VS Code** - Shows errors while writing
 
-### 📝 **תבניות מוכנות**
-השתמש בתבניות מ-`Backend/templates/function_templates.py`:
+### 📝 **Ready Templates**
+Use templates from `Backend/templates/function_templates.py`:
 
 ```python
-# תבנית לפונקציית service
+# Template for service function
 @staticmethod
 def get_by_id(db: Session, item_id: int) -> Optional[Model]:
-    """קבלת רשומה לפי מזהה"""
+    """Get record by ID"""
     return db.query(Model).filter(Model.id == item_id).first()
 ```
 
-## 🔧 **פקודות שימושיות**
+## 🔧 **Useful Commands**
 
-### **פיתוח יומיומי**
+### **Daily Development**
 ```bash
-# בדיקת טיפוסים
+# Type checking
 make type-check
 
-# עיצוב קוד
+# Code formatting
 make format
 
-# בדיקת סגנון
+# Style checking
 make lint
 
-# כל הבדיקות
+# All checks
 make check-all
 
-# הרצת בדיקות
+# Run tests
 make test
 ```
 
-### **למידה ועזרה**
+### **Learning and Help**
 ```bash
-# הדרכה אינטראקטיבית
+# Interactive tutorial
 make tutorial
 
-# דוח מפורט על בעיות טיפוסים
+# Detailed report on type issues
 make type-check-report
 
-# עזרה מהירה
+# Quick help
 make help-new-developer
 ```
 
-## 📋 **Checklist לפונקציה חדשה**
+## 📋 **Checklist for New Function**
 
-- [ ] הוספת אנוטציות טיפוסים לכל הפרמטרים
-- [ ] הוספת אנוטציית החזרה (return type)
-- [ ] הוספת docstring בעברית
-- [ ] שימוש בתבנית מתאימה מ-templates
-- [ ] בדיקת טיפוסים עם `make type-check`
-- [ ] עיצוב קוד עם `make format`
-- [ ] סידור imports עם `make lint`
+- [ ] Add type annotations for all parameters
+- [ ] Add return type annotation
+- [ ] Add docstring in English
+- [ ] Use appropriate template from templates
+- [ ] Check types with `make type-check`
+- [ ] Format code with `make format`
+- [ ] Organize imports with `make lint`
 
-## 🚨 **שגיאות נפוצות ופתרונות**
+## 🚨 **Common Errors and Solutions**
 
 ### **שגיאה: Missing return type annotation**
 ```bash

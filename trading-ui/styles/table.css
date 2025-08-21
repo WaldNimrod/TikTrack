@@ -630,14 +630,7 @@ body.modal-open {
 
 
 
-.page-size-selector select {
-  padding: 6px 12px;
-  border: 1px solid var(--apple-border-light);
-  border-radius: 6px;
-  font-size: 14px;
-  background: var(--apple-background);
-  color: var(--apple-text);
-}
+
 
 
 /* .pagination-btn ו-.page-number - הועברו ל-apple-theme.css */
@@ -705,65 +698,7 @@ select:focus {
   color: #721c24;
 }
 
-/* סגנונות ייחודיים לטבלאות */
-.content-section {
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  border: 1px solid #e8e8e8;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  margin-bottom: 10px;
-  margin-left: auto;
-  margin-right: auto;
-}
 
-/* סגנונות חדשים לסקשנים */
-.section-container {
-  background: var(--apple-bg-elevated);
-  padding: 2rem;
-  border-radius: 12px;
-  border: 1px solid var(--apple-border-light);
-  box-shadow: var(--apple-shadow-light);
-  margin-bottom: 2rem;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--apple-border-light);
-}
-
-.section-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--apple-text-primary);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.section-count {
-  background: #29a6a8;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.section-body {
-  background: var(--apple-bg);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.section-body .table {
-  margin: 0;
-  background: var(--apple-bg);
-}
 
 
 
@@ -898,14 +833,7 @@ select:focus {
 
 /* תא פעולות */
 
-/* כותרת משנה */
-.header-subtitle {
-  font-weight: normal !important;
-  font-size: 0.8em !important;
-  color: #666 !important;
-  border-color: #28a745 !important;
-  transform: translateY(-1px) !important;
-}
+
 
 
 .btn-danger:hover {
@@ -919,36 +847,9 @@ select:focus {
   transition: opacity 0.2s ease;
 }
 
-#alertsContainer {
-  transition: opacity 0.3s ease;
-}
 
-/* אנימציה לסגירת החלק העליון */
-#topSection {
-  transition: height 0.3s ease;
-  overflow: hidden;
-}
 
-.content-section {
-  transition: opacity 0.3s ease;
-}
 
-/* מיקום כפתור החלק העליון */
-#topSection .page-header {
-  position: relative;
-}
-
-#topSection .top-toggle-btn {
-  position: absolute;
-  left: 74px;
-  top: 50%;
-  transform: translateY(-50%);
-  transition: none !important;
-}
-
-#topSection .top-toggle-btn:hover {
-  transform: translateY(-50%) !important;
-}
 
 .data-table th {
   background: var(--apple-bg-secondary) !important;
@@ -1004,39 +905,7 @@ select:focus {
 
 /* הגדרות סטטוסים הועברו ל-styles.css */
 
-/* סגנונות לפילטר מולטיסלקט */
-.filter-section {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-}
 
-.filter-row {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-}
-
-
-.filter-group label {
-  font-weight: 600;
-  color: #495057;
-  font-size: 0.9rem;
-}
-
-.multiselect-dropdown {
-  position: relative;
-  min-width: 150px;
-  font-size: 0.9rem;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.multiselect-item:last-child {
-  border-bottom: none;
-}
 
 /* התאמה למסכים קטנים */
 @media (max-width: 768px) {
@@ -1166,14 +1035,3 @@ select:focus {
 /* ===== סגנונות לסטטוס אינדיקטור - הועברו ל-styles.css ===== */
 
 /* .status-dot - הועבר ל-styles.css */
-
-.stats-container {
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.stats-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}

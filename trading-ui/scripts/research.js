@@ -13,18 +13,109 @@ function deleteResearch(id) {
   console.log('מחיקת תחקיר:', id);
 }
 
+// פונקציות לטריידים
+function loadTrades() {
+  console.log('טעינת טריידים');
+  if (typeof window.loadTradesData === 'function') {
+    window.loadTradesData();
+  } else {
+    console.error('loadTradesData function not found');
+  }
+}
+
+function showAddTradeModal() {
+  console.log('הצגת מודל הוספת טרייד');
+  if (typeof window.showAddTradeModal === 'function') {
+    window.showAddTradeModal();
+  } else {
+    console.error('showAddTradeModal function not found');
+  }
+}
+
+function filterTradesData(statuses, types, accounts, dateRange, searchTerm) {
+  console.log('פילטור טריידים:', { statuses, types, accounts, dateRange, searchTerm });
+  if (typeof window.filterTradesData === 'function') {
+    window.filterTradesData(statuses, types, accounts, dateRange, searchTerm);
+  } else {
+    console.error('filterTradesData function not found');
+  }
+}
+
 // פונקציות לפתיחה/סגירה של סקשנים
+function toggleTopSection() {
+  console.log('🔄 toggleTopSection נקראה - סגירה/פתיחה של כל הסקשנים');
+
+  // מציאת כל הסקשנים
+  const topSection = document.querySelector('.top-section');
+  const contentSections = document.querySelectorAll('.content-section');
+
+  if (!topSection) {
+    console.error('❌ לא נמצא top-section');
+    return;
+  }
+
+  // בדיקה אם כל הסקשנים סגורים
+  const topSectionBody = topSection.querySelector('.section-body');
+  const isTopCollapsed = topSectionBody.style.display === 'none';
+
+  // מצב הסקשנים האחרים
+  let allSectionsCollapsed = isTopCollapsed;
+
+  contentSections.forEach((section, index) => {
+    const sectionBody = section.querySelector('.section-body');
+    if (sectionBody && sectionBody.style.display !== 'none') {
+      allSectionsCollapsed = false;
+    }
+  });
+
+  // החלטה: אם כל הסקשנים סגורים - פתח הכל, אחרת - סגור הכל
+  const shouldOpen = allSectionsCollapsed;
+
+  // עדכון top-section
+  if (topSectionBody) {
+    topSectionBody.style.display = shouldOpen ? 'block' : 'none';
+  }
+
+  // עדכון content-sections
+  contentSections.forEach((section, index) => {
+    const sectionBody = section.querySelector('.section-body');
+    const toggleBtn = section.querySelector('button[onclick*="toggle"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    if (sectionBody) {
+      sectionBody.style.display = shouldOpen ? 'block' : 'none';
+
+      // עדכון האייקון
+      if (icon) {
+        icon.textContent = shouldOpen ? '▲' : '▼';
+      }
+    }
+  });
+
+  // עדכון האייקון של הכפתור הראשי
+  const mainToggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+  const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
+  if (mainIcon) {
+    mainIcon.textContent = shouldOpen ? '▲' : '▼';
+  }
+
+  // שמירת המצב ב-localStorage
+  localStorage.setItem('allSectionsCollapsed', !shouldOpen);
+
+  console.log(`✅ כל הסקשנים ${shouldOpen ? 'נפתחו' : 'נסגרו'}`);
+}
+
 function toggleResearchSection() {
   console.log('🔄 toggleResearchSection נקראה');
   const contentSections = document.querySelectorAll('.content-section');
   console.log('📋 מספר content-sections נמצא:', contentSections.length);
-  const researchSection = contentSections[0]; // הסקשן הראשון - תחקירים
+  const researchSection = contentSections[1]; // הסקשן השני - טריידים
 
   if (!researchSection) {
-    console.error('❌ לא נמצא סקשן תחקירים');
+    console.error('❌ לא נמצא סקשן טריידים');
     return;
   }
-  console.log('✅ סקשן תחקירים נמצא:', researchSection);
+  console.log('✅ סקשן טריידים נמצא:', researchSection);
 
   const sectionBody = researchSection.querySelector('.section-body');
   const toggleBtn = researchSection.querySelector('button[onclick="toggleResearchSection()"]');
@@ -82,11 +173,45 @@ function toggleAccountsSection() {
 }
 
 // פונקציה לשחזור מצב הסגירה
+function restoreTopSectionState() {
+  // שחזור מצב כל הסקשנים
+  const allSectionsCollapsed = localStorage.getItem('allSectionsCollapsed') === 'true';
+  const topSection = document.querySelector('.top-section');
+  const contentSections = document.querySelectorAll('.content-section');
+
+  if (topSection) {
+    const sectionBody = topSection.querySelector('.section-body');
+    const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    if (sectionBody && allSectionsCollapsed) {
+      sectionBody.style.display = 'none';
+      if (icon) {
+        icon.textContent = '▼';
+      }
+    }
+  }
+
+  // שחזור מצב content-sections
+  contentSections.forEach((section, index) => {
+    const sectionBody = section.querySelector('.section-body');
+    const toggleBtn = section.querySelector('button[onclick*="toggle"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    if (sectionBody && allSectionsCollapsed) {
+      sectionBody.style.display = 'none';
+      if (icon) {
+        icon.textContent = '▼';
+      }
+    }
+  });
+}
+
 function restoreResearchSectionState() {
-  // שחזור מצב סקשן התחקירים
+  // שחזור מצב סקשן הטריידים
   const researchCollapsed = localStorage.getItem('researchSectionCollapsed') === 'true';
   const contentSections = document.querySelectorAll('.content-section');
-  const researchSection = contentSections[0];
+  const researchSection = contentSections[1];
 
   if (researchSection) {
     const sectionBody = researchSection.querySelector('.section-body');
@@ -101,16 +226,16 @@ function restoreResearchSectionState() {
     }
   }
 
-  // שחזור מצב סקשן החשבונות
-  const accountsCollapsed = localStorage.getItem('accountsSectionCollapsed') === 'true';
-  const accountsSection = contentSections[1];
+  // שחזור מצב סקשן הסיכום
+  const summaryCollapsed = localStorage.getItem('summarySectionCollapsed') === 'true';
+  const summarySection = contentSections[0];
 
-  if (accountsSection) {
-    const sectionBody = accountsSection.querySelector('.section-body');
-    const toggleBtn = accountsSection.querySelector('button[onclick="toggleAccountsSection()"]');
+  if (summarySection) {
+    const sectionBody = summarySection.querySelector('.section-body');
+    const toggleBtn = summarySection.querySelector('button[onclick="toggleSummarySection()"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-    if (sectionBody && accountsCollapsed) {
+    if (sectionBody && summaryCollapsed) {
       sectionBody.style.display = 'none';
       if (icon) {
         icon.textContent = '▼';
@@ -122,6 +247,62 @@ function restoreResearchSectionState() {
 // פונקציות נוספות
 function resetAllFiltersAndReloadData() {
   console.log('איפוס פילטרים');
+}
+
+// פונקציה להפעלה בטעינת הדף
+function initializeResearchPage() {
+  console.log('🔄 אתחול דף תחקיר...');
+
+  // שחזור מצב הסגירה
+  restoreTopSectionState();
+  restoreResearchSectionState();
+  restoreAccountsSectionState();
+
+  console.log('✅ דף תחקיר אותחל בהצלחה');
+}
+
+/**
+ * סגירה/פתיחה של סקשן הסיכום
+ */
+function toggleSummarySection() {
+  console.log('🔄 toggleSummarySection נקראה');
+  const contentSections = document.querySelectorAll('.content-section');
+  const summarySection = contentSections[0]; // הסקשן הראשון - סיכום
+
+  if (!summarySection) {
+    console.error('❌ לא נמצא סקשן סיכום');
+    return;
+  }
+
+  const sectionBody = summarySection.querySelector('.section-body');
+  const toggleBtn = summarySection.querySelector('button[onclick="toggleSummarySection()"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (sectionBody) {
+    const isCollapsed = sectionBody.style.display === 'none';
+    sectionBody.style.display = isCollapsed ? 'block' : 'none';
+
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // שמירת המצב
+    localStorage.setItem('summarySectionCollapsed', !isCollapsed);
+
+    console.log(`✅ סקשן סיכום ${isCollapsed ? 'נפתח' : 'נסגר'}`);
+  }
+}
+
+/**
+ * רענון נתוני הסיכום
+ */
+function refreshSummaryData() {
+  console.log('🔄 רענון נתוני סיכום...');
+
+  // כאן אפשר להוסיף קריאה לשרת לקבלת נתונים מעודכנים
+  // loadSummaryData();
+
+  console.log('✅ נתוני סיכום רועננו');
 }
 
 // הגדרת הפונקציה updateGridFromComponent לדף התחקיר
@@ -152,10 +333,19 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
 window.openResearchDetails = openResearchDetails;
 window.editResearch = editResearch;
 window.deleteResearch = deleteResearch;
+window.loadTrades = loadTrades;
+window.showAddTradeModal = showAddTradeModal;
+window.filterTradesData = filterTradesData;
+window.toggleTopSection = toggleTopSection;
 window.toggleResearchSection = toggleResearchSection;
 window.toggleAccountsSection = toggleAccountsSection;
+window.restoreTopSectionState = restoreTopSectionState;
 window.restoreResearchSectionState = restoreResearchSectionState;
+window.restoreAccountsSectionState = restoreAccountsSectionState;
+window.initializeResearchPage = initializeResearchPage;
 window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
+window.toggleSummarySection = toggleSummarySection;
+window.refreshSummaryData = refreshSummaryData;
 
 // בדיקת זמינות פונקציות מיד אחרי הגדרתן
 console.log('🔍 === RESEARCH.JS FUNCTIONS CHECK ===');
@@ -168,6 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
   console.log('🔄 === DOM CONTENT LOADED ===');
 
   // שחזור מצב הסגירה
+  restoreTopSectionState();
   restoreResearchSectionState();
 
   // בדיקת זמינות פונקציות גלובליות

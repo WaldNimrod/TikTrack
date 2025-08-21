@@ -1,11 +1,11 @@
 """
-שירות ניהול טיקרים - TikTrack
+Ticker Management Service - TikTrack
 
-מודול זה מכיל את כל הלוגיקה העסקית לניהול טיקרים במערכת.
-כולל CRUD operations, ולידציה, בדיקת פריטים מקושרים ועוד.
+This module contains all business logic for managing tickers in the system.
+Includes CRUD operations, validation, checking linked items and more.
 
 Classes:
-    TickerService: שירות ראשי לניהול טיקרים
+    TickerService: Main service for ticker management
 
 Author: TikTrack Development Team
 Version: 1.0
@@ -22,20 +22,20 @@ from typing import List, Optional, Dict, Any, Union
 
 class TickerService:
     """
-    שירות לניהול טיקרים במערכת TikTrack
+    Service for managing tickers in TikTrack system
     
-    שירות זה מספק את כל הפונקציונליות הנדרשת לניהול טיקרים:
-    - יצירה, קריאה, עדכון ומחיקה (CRUD)
-    - ולידציה של נתונים
-    - בדיקת פריטים מקושרים
-    - ניהול סטטוס פעילות
+    This service provides all functionality required for ticker management:
+    - Create, read, update and delete (CRUD)
+    - Data validation
+    - Checking linked items
+    - Activity status management
     
     Attributes:
-        VALID_TICKER_TYPES (List[str]): סוגי טיקרים תקינים במערכת
-        MAX_SYMBOL_LENGTH (int): אורך מקסימלי לסימבול
-        MAX_NAME_LENGTH (int): אורך מקסימלי לשם
-        MAX_REMARKS_LENGTH (int): אורך מקסימלי להערות
-        CURRENCY_LENGTH (int): אורך קבוע למטבע
+        VALID_TICKER_TYPES (List[str]): Valid ticker types in system
+        MAX_SYMBOL_LENGTH (int): Maximum length for symbol
+        MAX_NAME_LENGTH (int): Maximum length for name
+        MAX_REMARKS_LENGTH (int): Maximum length for remarks
+        CURRENCY_LENGTH (int): Fixed length for currency
         
     Example:
         >>> service = TickerService()

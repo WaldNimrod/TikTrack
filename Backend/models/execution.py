@@ -14,18 +14,18 @@ class Execution(BaseModel):
     fee = Column(Float, default=0, nullable=True)
     source = Column(String(50), default='manual', nullable=True)  # manual, api, etc.
     
-    # יחסים
+    # Relationships
     trade = relationship("Trade", back_populates="executions")
     
     def __repr__(self) -> str:
         return f"<Execution(id={self.id}, action='{self.action}', quantity={self.quantity})>"
     
     def to_dict(self) -> Dict[str, Any]:
-        """המרה למילון"""
+        """Convert to dictionary"""
         result: Dict[str, Any] = {}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
-            if hasattr(value, 'strftime'):  # אם זה תאריך
+            if hasattr(value, 'strftime'):  # If it's a date
                 result[c.name] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
             else:
                 result[c.name] = value

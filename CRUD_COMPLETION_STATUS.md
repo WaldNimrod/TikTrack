@@ -1,119 +1,119 @@
-# סטטוס השלמת CRUD לישויות - TikTrack
+# CRUD Completion Status for Entities - TikTrack
 
-## סקירה כללית
-מסמך זה מציג את הסטטוס הנוכחי של השלמת פעולות CRUD (Create, Read, Update, Delete) לכל הישויות במערכת TikTrack.
+## Overview
+This document shows the current status of CRUD (Create, Read, Update, Delete) operations completion for all entities in the TikTrack system.
 
-## טבלת סטטוס מעודכנת
+## Updated Status Table
 
-| ישות | סטטוס | הוספה | עריכה | מחיקה | ביטול | הערות |
-|------|--------|--------|--------|--------|--------|-------|
-| **מטבעות (Currencies)** | ✅ **הושלם** | ✅ | ✅ | ✅ | ➖ | **חדש!** דף מלא עם API |
-| **תזרימי מזומנים (Cash Flows)** | ✅ **הושלם** | ✅ | ✅ | ✅ | ➖ | עודכן עם שדות חדשים |
-| **חשבונות (Accounts)** | 🔄 **בתהליך** | ✅ | ✅ | ⚠️ | ➖ | צריך בדיקה ושיפורים |
-| **טיקרים (Tickers)** | 🔄 **בתהליך** | ✅ | ✅ | ⚠️ | ➖ | צריך בדיקה ושיפורים |
-| **התראות (Alerts)** | ⏳ **ממתין** | ✅ | ✅ | ❌ | ❌ | צריך מחיקה וביטול |
-| **ביצועים (Executions)** | ⏳ **ממתין** | ✅ | ✅ | ❌ | ➖ | צריך מחיקה |
-| **עסקאות (Trades)** | ⏳ **ממתין** | ✅ | ✅ | ❌ | ❌ | צריך מחיקה וביטול |
-| **תוכניות עסקה (Trade Plans)** | ⏳ **ממתין** | ✅ | ✅ | ❌ | ❌ | צריך מחיקה וביטול |
+| Entity | Status | Add | Edit | Delete | Cancel | Notes |
+|--------|--------|-----|------|--------|--------|-------|
+| **Currencies** | ✅ **Completed** | ✅ | ✅ | ✅ | ➖ | **New!** Full page with API |
+| **Cash Flows** | ✅ **Completed** | ✅ | ✅ | ✅ | ➖ | Updated with new fields |
+| **Accounts** | 🔄 **In Progress** | ✅ | ✅ | ⚠️ | ➖ | Needs verification and improvements |
+| **Tickers** | 🔄 **In Progress** | ✅ | ✅ | ⚠️ | ➖ | Needs verification and improvements |
+| **Alerts** | ⏳ **Pending** | ✅ | ✅ | ❌ | ❌ | Needs delete and cancel |
+| **Executions** | ⏳ **Pending** | ✅ | ✅ | ❌ | ➖ | Needs delete |
+| **Trades** | ⏳ **Pending** | ✅ | ✅ | ❌ | ❌ | Needs delete and cancel |
+| **Trade Plans** | ⏳ **Pending** | ✅ | ✅ | ❌ | ❌ | Needs delete and cancel |
 
-### מקרא סמלים:
-- ✅ **מוכן ועובד**
-- ⚠️ **קיים אבל צריך בדיקה/שיפור**
-- ❌ **לא קיים - צריך יישום**
-- ⏳ **ממתין לעבודה**
-- 🔄 **בתהליך עבודה**
-- ➖ **לא רלוונטי לישות זו**
+### Symbol Legend:
+- ✅ **Ready and working**
+- ⚠️ **Exists but needs verification/improvement**
+- ❌ **Doesn't exist - needs implementation**
+- ⏳ **Waiting for work**
+- 🔄 **In progress**
+- ➖ **Not relevant for this entity**
 
-## פירוט השינויים שבוצעו
+## Detailed Changes Made
 
-### 1. מטבעות (Currencies) - ✅ הושלם
-**תאריך השלמה**: 21.08.2025
+### 1. Currencies - ✅ Completed
+**Completion Date**: 21.08.2025
 
-#### מה שבוצע:
-- ✅ יצירת דף HTML מלא (`currencies.html`)
-- ✅ יצירת JavaScript מלא (`currencies.js`)
-- ✅ הוספת נתבים בשרת (`/currencies`)
-- ✅ הוספת קישור בתפריט (אחרי "בסיס נתונים")
-- ✅ פונקציות CRUD מלאות
-- ✅ ולידציה של נתונים
-- ✅ סטטיסטיקות דינמיות
+#### What was done:
+- ✅ Created full HTML page (`currencies.html`)
+- ✅ Created full JavaScript (`currencies.js`)
+- ✅ Added server routes (`/currencies`)
+- ✅ Added menu link (after "Database")
+- ✅ Complete CRUD functions
+- ✅ Data validation
+- ✅ Dynamic statistics
 
-#### תכונות:
-- **הוספה**: מודל עם שדות סמל, שם ושער דולר
-- **עריכה**: מודל לעדכון פרטי מטבע קיים
-- **מחיקה**: אישור מחיקה עם אזהרה
-- **הצגה**: טבלה דינמית עם מיון וחיפוש
+#### Features:
+- **Add**: Modal with symbol, name and USD rate fields
+- **Edit**: Modal for updating existing currency details
+- **Delete**: Delete confirmation with warning
+- **Display**: Dynamic table with sorting and search
 
-### 2. תזרימי מזומנים (Cash Flows) - ✅ הושלם
-**תאריך השלמה**: 21.08.2025
+### 2. Cash Flows - ✅ Completed
+**Completion Date**: 21.08.2025
 
-#### מה שבוצע:
-- ✅ הוספת 4 שדות חדשים לטבלה
-- ✅ אינטגרציה עם מערכת מטבעות
-- ✅ עדכון API לתמוך בשדות החדשים
-- ✅ עדכון Frontend עם מודלים חדשים
-- ✅ הוספת קישור בתפריט
+#### What was done:
+- ✅ Added 4 new fields to table
+- ✅ Integration with currency system
+- ✅ Updated API to support new fields
+- ✅ Updated Frontend with new modals
+- ✅ Added menu link
 
-#### השדות החדשים:
-1. **מטבע הפעולה** (`currency_id`) - קישור לטבלת מטבעות
-2. **שער דולר** (`usd_rate`) - שער המטבע ביום הפעולה
-3. **מקור המידע** (`source`) - ידני/ייבוא מקובץ/ייבוא ישיר
-4. **מזהה חיצוני** (`external_id`) - מזהה הברוקר
+#### New Fields:
+1. **Operation Currency** (`currency_id`) - Link to currencies table
+2. **USD Rate** (`usd_rate`) - Currency rate on operation day
+3. **Data Source** (`source`) - Manual/File import/Direct import
+4. **External ID** (`external_id`) - Broker identifier
 
-## סדר העדיפויות הבא
+## Next Priorities
 
-### 1. חשבונות (Accounts) - בעדיפות גבוהה
-- **מה קיים**: הוספה, עריכה, הצגה
-- **מה חסר**: בדיקה יסודית של מחיקה
-- **אתגרים**: וידוא שלא נמחקים חשבונות עם נתונים מקושרים
+### 1. Accounts - High Priority
+- **What exists**: Add, edit, display
+- **What's missing**: Thorough verification of delete
+- **Challenges**: Ensure accounts with linked data aren't deleted
 
-### 2. טיקרים (Tickers) - בעדיפות גבוהה  
-- **מה קיים**: הוספה, עריכה, הצגה
-- **מה חסר**: בדיקה יסודית של מחיקה
-- **אתגרים**: וידוא שלא נמחקים טיקרים עם טריידים פעילים
+### 2. Tickers - High Priority  
+- **What exists**: Add, edit, display
+- **What's missing**: Thorough verification of delete
+- **Challenges**: Ensure tickers with active trades aren't deleted
 
-### 3. התראות (Alerts) - בעדיפות בינונית
-- **מה קיים**: הוספה, עריכה, הצגה
-- **מה חסר**: מחיקה וביטול
-- **תכונות מיוחדות**: צריך תמיכה בביטול (לא רק מחיקה)
+### 3. Alerts - Medium Priority
+- **What exists**: Add, edit, display
+- **What's missing**: Delete and cancel
+- **Special features**: Needs cancel support (not just delete)
 
-### 4. ביצועים (Executions) - בעדיפות בינונית
-- **מה קיים**: הוספה, עריכה, הצגה
-- **מה חסר**: מחיקה
-- **הערות**: ביצועים בדרך כלל לא מבוטלים
+### 4. Executions - Medium Priority
+- **What exists**: Add, edit, display
+- **What's missing**: Delete
+- **Notes**: Executions are usually not cancelled
 
-### 5. עסקאות (Trades) - בעדיפות בינונית
-- **מה קיים**: הוספה, עריכה, הצגה
-- **מה חסר**: מחיקה וביטול
-- **תכונות מיוחדות**: צריך תמיכה בביטול (שינוי סטטוס)
+### 5. Trades - Medium Priority
+- **What exists**: Add, edit, display
+- **What's missing**: Delete and cancel
+- **Special features**: Needs cancel support (status change)
 
-### 6. תוכניות עסקה (Trade Plans) - בעדיפות נמוכה
-- **מה קיים**: הוספה, עריכה, הצגה
-- **מה חסר**: מחיקה וביטול
-- **תכונות מיוחדות**: צריך תמיכה בביטול (שינוי סטטוס)
+### 6. Trade Plans - Low Priority
+- **What exists**: Add, edit, display
+- **What's missing**: Delete and cancel
+- **Special features**: Needs cancel support (status change)
 
-## סטטיסטיקות
+## Statistics
 
-### הושלמו: 2/8 ישויות (25%)
-- ✅ מטבעות
-- ✅ תזרימי מזומנים
+### Completed: 2/8 entities (25%)
+- ✅ Currencies
+- ✅ Cash Flows
 
-### בתהליך: 2/8 ישויות (25%)
-- 🔄 חשבונות
-- 🔄 טיקרים
+### In Progress: 2/8 entities (25%)
+- 🔄 Accounts
+- 🔄 Tickers
 
-### ממתינים: 4/8 ישויות (50%)
-- ⏳ התראות
-- ⏳ ביצועים
-- ⏳ עסקאות
-- ⏳ תוכניות עסקה
+### Pending: 4/8 entities (50%)
+- ⏳ Alerts
+- ⏳ Executions
+- ⏳ Trades
+- ⏳ Trade Plans
 
-## יעדים לשבוע הבא
-1. **השלמת חשבונות וטיקרים** - בדיקה ושיפור המחיקה
-2. **התחלת עבודה על התראות** - יישום מחיקה וביטול
-3. **תכנון ביצועים** - הגדרת דרישות למחיקה
+## Goals for Next Week
+1. **Complete Accounts and Tickers** - Verification and improvement of delete
+2. **Start work on Alerts** - Implementation of delete and cancel
+3. **Plan Executions** - Define requirements for delete
 
-## הערות טכניות
-- כל הישויות משתמשות במערכת מטבעות המרכזית החדשה
-- כל השינויים מגובים ותואמים לאחור
-- כל הממשקים עוקבים אחר התבנית הסטנדרטית של המערכת
+## Technical Notes
+- All entities use the new central currency system
+- All changes are backed up and backward compatible
+- All interfaces follow the system's standard template

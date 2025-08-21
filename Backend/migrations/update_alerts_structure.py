@@ -105,7 +105,7 @@ def update_alerts_structure():
             )
         """)
         
-        # העתקת נתונים לטבלה החדשה
+        # Copy data to new table
         cursor.execute("""
             INSERT INTO alerts_new 
             SELECT id, type, status, condition, message, triggered_at, is_triggered, 
@@ -113,40 +113,40 @@ def update_alerts_structure():
             FROM alerts
         """)
         
-        # מחיקת הטבלה הישנה
+        # Delete old table
         cursor.execute("DROP TABLE alerts")
         
-        # שינוי שם הטבלה החדשה
+        # Rename new table
         cursor.execute("ALTER TABLE alerts_new RENAME TO alerts")
         
-        print("   ✅ הוסרו השדות הישנים account_id ו-ticker_id")
+        print("   ✅ Removed old fields account_id and ticker_id")
         
-        # 5. יצירת אינדקסים
-        print("📝 יוצר אינדקסים...")
+        # 5. Create indexes
+        print("📝 Creating indexes...")
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_alerts_related_type_id ON alerts(related_type_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_alerts_related_id ON alerts(related_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_alerts_is_triggered ON alerts(is_triggered)")
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_alerts_status ON alerts(status)")
-        print("   ✅ נוצרו אינדקסים")
+        print("   ✅ Indexes created")
         
-        # 6. בדיקה סופית
+        # 6. Final check
         cursor.execute("PRAGMA table_info(alerts)")
         final_columns = [column[1] for column in cursor.fetchall()]
-        print(f"   📊 שדות סופיים בטבלת alerts: {final_columns}")
+        print(f"   📊 Final fields in alerts table: {final_columns}")
         
-        # בדיקת נתונים
+        # Data check
         cursor.execute("SELECT COUNT(*) FROM alerts")
         total_alerts = cursor.fetchone()[0]
-        print(f"   📊 סה\"כ התראות בטבלה: {total_alerts}")
+        print(f"   📊 Total alerts in table: {total_alerts}")
         
         conn.commit()
         conn.close()
         
-        print("✅ מיגרציה הושלמה בהצלחה!")
+        print("✅ Migration completed successfully!")
         return True
         
     except Exception as e:
-        print(f"❌ שגיאה במיגרציה: {e}")
+        print(f"❌ Error in migration: {e}")
         if 'conn' in locals():
             conn.rollback()
             conn.close()
@@ -155,7 +155,7 @@ def update_alerts_structure():
 if __name__ == "__main__":
     success = update_alerts_structure()
     if success:
-        print("🎉 מיגרציה הושלמה בהצלחה!")
+        print("🎉 Migration completed successfully!")
     else:
-        print("💥 מיגרציה נכשלה!")
+        print("💥 Migration failed!")
         exit(1)

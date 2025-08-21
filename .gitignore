@@ -63,9 +63,9 @@ Thumbs.db
 *.7z
 
 # Large files and backups
-גיבויי ביניים זמניים/*.zip
-גיבויי ביניים זמניים/*.tar.gz
-גיבויי ביניים זמניים/*.rar
+temporary_backups/*.zip
+temporary_backups/*.tar.gz
+temporary_backups/*.rar
 
 # Documentation (local only)
 documentation/

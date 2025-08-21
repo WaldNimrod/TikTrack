@@ -15,23 +15,23 @@ logger = logging.getLogger(__name__)
 
 notes_bp = Blueprint('notes', __name__, url_prefix='/api/v1/notes')
 
-# הגדרות לקבצים
+# File settings
 UPLOAD_FOLDER = 'uploads/notes'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}
 MAX_FILE_SIZE = 524288  # 512KB
 
 def allowed_file(filename: str) -> bool:
-    """בדיקה אם סיומת הקובץ מותרת"""
+    """Check if file extension is allowed"""
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def save_uploaded_file(file: FileStorage) -> Optional[str]:
-    """שמירת קובץ שהועלה עם שם ייחודי"""
+    """Save uploaded file with unique name"""
     logger.info(f"📎 save_uploaded_file called with file: {file.filename if file else 'None'}")
     
     if file and allowed_file(file.filename):
         logger.info(f"✅ File type allowed: {file.filename}")
-        # יצירת שם קובץ ייחודי עם תאריך
+        # Create unique filename with date
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         unique_id = str(uuid.uuid4())[:8]
         filename = secure_filename(file.filename)
@@ -42,7 +42,7 @@ def save_uploaded_file(file: FileStorage) -> Optional[str]:
         
         logger.info(f"📎 Saving file to: {file_path}")
         
-        # שמירת הקובץ
+        # Save file
         try:
             file.save(file_path)
             logger.info(f"✅ File saved successfully: {file_path}")

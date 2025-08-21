@@ -10,15 +10,15 @@ trades_bp = Blueprint('trades', __name__, url_prefix='/api/v1/trades')
 
 @trades_bp.route('/', methods=['GET'])
 def get_trades():
-    """קבלת כל הטריידים עם אפשרות לסינון"""
+    """Get all trades with filtering options"""
     try:
         db: Session = next(get_db())
         
-        # קבלת פרמטרים של סינון
+        # Get filtering parameters
         account_id = request.args.get('account_id', type=int)
         status = request.args.get('status')
         
-        # אם יש פרמטרים של סינון, משתמש בפונקציה מתאימה
+        # If there are filtering parameters, use appropriate function
         if account_id and status:
             logger.info(f"Filtering trades by account_id={account_id} and status={status}")
             trades = TradeService.get_by_account_and_status(db, account_id, status)
@@ -48,7 +48,7 @@ def get_trades():
 
 @trades_bp.route('/<int:trade_id>', methods=['GET'])
 def get_trade(trade_id: int):
-    """קבלת טרייד לפי מזהה"""
+    """Get trade by ID"""
     try:
         db: Session = next(get_db())
         trade = TradeService.get_by_id(db, trade_id)
@@ -76,7 +76,7 @@ def get_trade(trade_id: int):
 
 @trades_bp.route('/account/<int:account_id>', methods=['GET'])
 def get_trades_by_account(account_id: int):
-    """קבלת טריידים לפי חשבון"""
+    """Get trades by account"""
     try:
         db: Session = next(get_db())
         trades = TradeService.get_by_account(db, account_id)
@@ -98,7 +98,7 @@ def get_trades_by_account(account_id: int):
 
 @trades_bp.route('/', methods=['POST'])
 def create_trade():
-    """יצירת טרייד חדש"""
+    """Create a new trade"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -121,7 +121,7 @@ def create_trade():
 
 @trades_bp.route('/<int:trade_id>', methods=['PUT'])
 def update_trade(trade_id: int):
-    """עדכון טרייד"""
+    """Update trade"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -150,7 +150,7 @@ def update_trade(trade_id: int):
 
 @trades_bp.route('/<int:trade_id>/close', methods=['POST'])
 def close_trade(trade_id: int):
-    """סגירת טרייד"""
+    """Close trade"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -179,7 +179,7 @@ def close_trade(trade_id: int):
 
 @trades_bp.route('/<int:trade_id>/cancel', methods=['POST'])
 def cancel_trade(trade_id: int):
-    """ביטול טרייד"""
+    """Cancel trade"""
     try:
         data = request.get_json()
         cancel_reason = data.get('cancel_reason', 'Cancelled by user')
@@ -209,7 +209,7 @@ def cancel_trade(trade_id: int):
 
 @trades_bp.route('/summary', methods=['GET'])
 def get_trade_summary():
-    """קבלת סיכום טריידים"""
+    """Get trade summary"""
     try:
         account_id = request.args.get('account_id', type=int)
         db: Session = next(get_db())

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class TradeService:
     @staticmethod
     def get_all(db: Session) -> List[Trade]:
-        """קבלת כל הטריידים"""
+        """Get all trades"""
         import logging
         logger = logging.getLogger(__name__)
         
@@ -30,7 +30,7 @@ class TradeService:
     
     @staticmethod
     def get_by_id(db: Session, trade_id: int) -> Optional[Trade]:
-        """קבלת טרייד לפי מזהה"""
+        """Get trade by ID"""
         return db.query(Trade).options(
             joinedload(Trade.account),
             joinedload(Trade.ticker)
@@ -38,45 +38,45 @@ class TradeService:
     
     @staticmethod
     def get_by_account(db: Session, account_id: int) -> List[Trade]:
-        """קבלת טריידים לפי חשבון"""
+        """Get trades by account"""
         return db.query(Trade).filter(Trade.account_id == account_id).all()
     
     @staticmethod
     def get_by_ticker(db: Session, ticker_id: int) -> List[Trade]:
-        """קבלת טריידים לפי טיקר"""
+        """Get trades by ticker"""
         return db.query(Trade).filter(Trade.ticker_id == ticker_id).all()
     
     @staticmethod
     def get_open_trades(db: Session) -> List[Trade]:
-        """קבלת טריידים פתוחים"""
+        """Get open trades"""
         return db.query(Trade).filter(Trade.status == 'open').all()
     
     @staticmethod
     def get_by_status(db: Session, status: str) -> List[Trade]:
-        """קבלת טריידים לפי סטטוס"""
+        """Get trades by status"""
         return db.query(Trade).filter(Trade.status == status).all()
     
     @staticmethod
     def get_by_account_and_status(db: Session, account_id: int, status: str) -> List[Trade]:
-        """קבלת טריידים לפי חשבון וסטטוס"""
+        """Get trades by account and status"""
         import logging
         logger = logging.getLogger(__name__)
         
         logger.info(f"Getting trades for account_id={account_id} and status={status}")
         
-        # בדיקה שכל הטריידים במערכת
+        # Check all trades in system
         all_trades = db.query(Trade).all()
         logger.info(f"Total trades in system: {len(all_trades)}")
         
-        # בדיקה של הטריידים לפי חשבון
+        # Check trades by account
         account_trades = db.query(Trade).filter(Trade.account_id == account_id).all()
         logger.info(f"Trades for account {account_id}: {len(account_trades)}")
         
-        # בדיקה של הטריידים לפי סטטוס
+        # Check trades by status
         status_trades = db.query(Trade).filter(Trade.status == status).all()
         logger.info(f"Trades with status {status}: {len(status_trades)}")
         
-        # הסינון המשולב
+        # Combined filtering
         filtered_trades = db.query(Trade).filter(
             Trade.account_id == account_id,
             Trade.status == status
@@ -88,31 +88,31 @@ class TradeService:
     
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> Trade:
-        """יצירת טרייד חדש"""
+        """Create a new trade"""
         
-        # אם יש trade_plan_id, נקצה את הסוג מהתוכנית כברירת מחדל
+        # If there's trade_plan_id, assign the type from the plan as default
         if 'trade_plan_id' in data and data['trade_plan_id']:
             from models.trade_plan import TradePlan
             trade_plan = db.query(TradePlan).filter(TradePlan.id == data['trade_plan_id']).first()
             if trade_plan:
-                # הקצאת סוג מהתוכנית אם לא הוגדר
+                # Assign type from plan if not defined
                 if 'type' not in data or not data['type']:
                     data['type'] = trade_plan.investment_type
                     logger.info(f"Assigned type '{trade_plan.investment_type}' from trade plan {trade_plan.id}")
                 
-                # הקצאת צד מהתוכנית אם לא הוגדר
+                # Assign side from plan if not defined
                 if 'side' not in data or not data['side']:
                     data['side'] = trade_plan.side
                     logger.info(f"Assigned side '{trade_plan.side}' from trade plan {trade_plan.id}")
         
         trade = Trade(**data)
         
-        # בדיקת תקינות לפני שמירה
+        # Validation before saving
         validation_errors = trade.validate_before_save(db)
         if validation_errors:
             error_message = "; ".join(validation_errors)
             logger.error(f"Validation errors for trade: {error_message}")
-            raise ValueError(f"שגיאות תקינות בטרייד: {error_message}")
+            raise ValueError(f"Trade validation errors: {error_message}")
         
         db.add(trade)
         db.commit()
@@ -122,19 +122,19 @@ class TradeService:
     
     @staticmethod
     def update(db: Session, trade_id: int, data: Dict[str, Any]) -> Optional[Trade]:
-        """עדכון טרייד"""
+        """Update trade"""
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
         if trade:
             for key, value in data.items():
                 if hasattr(trade, key):
                     setattr(trade, key, value)
             
-            # בדיקת תקינות לפני שמירה
+            # Validation before saving
             validation_errors = trade.validate_before_save(db)
             if validation_errors:
                 error_message = "; ".join(validation_errors)
                 logger.error(f"Validation errors for trade {trade_id}: {error_message}")
-                raise ValueError(f"שגיאות תקינות בטרייד: {error_message}")
+                raise ValueError(f"Trade validation errors: {error_message}")
             
             db.commit()
             db.refresh(trade)
@@ -144,7 +144,7 @@ class TradeService:
     
     @staticmethod
     def delete(db: Session, trade_id: int) -> bool:
-        """מחיקת טרייד"""
+        """Delete trade"""
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
         if trade:
             db.delete(trade)
@@ -155,7 +155,7 @@ class TradeService:
     
     @staticmethod
     def close_trade(db: Session, trade_id: int, close_data: Dict[str, Any]) -> Optional[Trade]:
-        """סגירת טרייד"""
+        """Close trade"""
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
         if trade and trade.status == 'open':
             trade.status = 'closed'
@@ -169,7 +169,7 @@ class TradeService:
     
     @staticmethod
     def cancel_trade(db: Session, trade_id: int, cancel_reason: str) -> Optional[Trade]:
-        """ביטול טרייד"""
+        """Cancel trade"""
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
         if trade and trade.status == 'open':
             trade.status = 'cancelled'
@@ -183,7 +183,7 @@ class TradeService:
     
     @staticmethod
     def calculate_trade_pl(db: Session, trade_id: int) -> float:
-        """חישוב רווח/הפסד של טרייד"""
+        """Calculate trade profit/loss"""
         from models.execution import Execution
         
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
@@ -205,7 +205,7 @@ class TradeService:
     
     @staticmethod
     def update_trade_pl(db: Session, trade_id: int) -> bool:
-        """עדכון רווח/הפסד של טרייד"""
+        """Update trade profit/loss"""
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
         if trade:
             trade.total_pl = TradeService.calculate_trade_pl(db, trade_id)
@@ -216,7 +216,7 @@ class TradeService:
     
     @staticmethod
     def get_trade_summary(db: Session, account_id: Optional[int] = None) -> Dict[str, Any]:
-        """קבלת סיכום טריידים"""
+        """Get trade summary"""
         query = db.query(Trade)
         if account_id:
             query = query.filter(Trade.account_id == account_id)

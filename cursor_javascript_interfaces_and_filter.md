@@ -5,13 +5,13 @@ _Exported on 8/20/2025 at 18:51:01 GMT+3 from Cursor (1.4.5)_
 
 **User**
 
-קצת java script  של ממשקים. תקרא בבקשה את תעוד האתר בעיקר התעוד על הפילטר באובייקט בראש הדף וכפתורי הפיתחה והסגירה של הסקשנים. חשוב שתבין את נושא שמירת הסטטוסים ודרך העבודה השונה של הפילטר העליון בעמודים השונים
+Some JavaScript interfaces. Please read the website documentation, especially the documentation about the filter object at the top of the page and the expand/collapse buttons of the sections. It's important that you understand the topic of status saving and the different way the top filter works on different pages
 
 ---
 
 **Cursor**
 
-אני אקרא את התיעוד של האתר כדי להבין את הפילטר העליון וכפתורי הפיתוח והסגירה של הסקשנים. בואו נתחיל בבדיקת המבנה הכללי של הפרויקט.
+I'll read the website documentation to understand the top filter and expand/collapse buttons of the sections. Let's start by checking the general structure of the project.
 
 
 עכשיו אני אקרא את הקבצים הרלוונטיים כדי להבין את הפילטר העליון וכפתורי הפיתוח. בואו נתחיל עם `app-header.js` שהוא כנראה הקובץ הראשי שמטפל בפילטר העליון:

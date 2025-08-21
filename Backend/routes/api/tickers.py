@@ -1,16 +1,16 @@
 """
 API Routes for Ticker Management - TikTrack
 
-מודול זה מכיל את כל ה-API endpoints לניהול טיקרים במערכת.
-כולל CRUD operations, בדיקת פריטים מקושרים ועוד.
+This module contains all API endpoints for managing tickers in the system.
+Includes CRUD operations, linked items checking and more.
 
 Endpoints:
-    GET /api/v1/tickers/ - קבלת כל הטיקרים
-    GET /api/v1/tickers/<id> - קבלת טיקר לפי מזהה
-    POST /api/v1/tickers/ - יצירת טיקר חדש
-    PUT /api/v1/tickers/<id> - עדכון טיקר
-    DELETE /api/v1/tickers/<id> - מחיקת טיקר
-    GET /api/v1/tickers/<id>/linked-items - בדיקת פריטים מקושרים
+    GET /api/v1/tickers/ - Get all tickers
+    GET /api/v1/tickers/<id> - Get ticker by ID
+    POST /api/v1/tickers/ - Create new ticker
+    PUT /api/v1/tickers/<id> - Update ticker
+    DELETE /api/v1/tickers/<id> - Delete ticker
+    GET /api/v1/tickers/<id>/linked-items - Check linked items
 
 Author: TikTrack Development Team
 Version: 1.0
@@ -30,7 +30,7 @@ tickers_bp = Blueprint('tickers', __name__, url_prefix='/api/v1/tickers')
 
 @tickers_bp.route('/', methods=['GET'])
 def get_tickers():
-    """קבלת כל הטיקרים"""
+    """Get all tickers"""
     try:
         db: Session = next(get_db())
         tickers = TickerService.get_all(db)
@@ -52,7 +52,7 @@ def get_tickers():
 
 @tickers_bp.route('/<int:ticker_id>', methods=['GET'])
 def get_ticker(ticker_id: int):
-    """קבלת טיקר לפי מזהה"""
+    """Get ticker by ID"""
     try:
         db: Session = next(get_db())
         ticker = TickerService.get_by_id(db, ticker_id)
@@ -80,11 +80,11 @@ def get_ticker(ticker_id: int):
 
 @tickers_bp.route('/<int:ticker_id>/linked-items', methods=['GET'])
 def check_linked_items(ticker_id: int):
-    """בדיקת פריטים מקושרים לטיקר לפני מחיקה"""
+    """Check linked items to ticker before deletion"""
     try:
         db: Session = next(get_db())
         
-        # בדיקה שהטיקר קיים
+        # Check that ticker exists
         ticker = TickerService.get_by_id(db, ticker_id)
         if not ticker:
             return jsonify({
@@ -93,7 +93,7 @@ def check_linked_items(ticker_id: int):
                 "version": "v1"
             }), 404
         
-        # בדיקת פריטים מקושרים
+        # Check linked items
         linked_items = TickerService.check_linked_items(db, ticker_id)
         
         return jsonify({
@@ -114,7 +114,7 @@ def check_linked_items(ticker_id: int):
 
 @tickers_bp.route('/', methods=['POST'])
 def create_ticker():
-    """יצירת טיקר חדש"""
+    """Create new ticker"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -137,7 +137,7 @@ def create_ticker():
 
 @tickers_bp.route('/<int:ticker_id>', methods=['PUT'])
 def update_ticker(ticker_id: int):
-    """עדכון טיקר"""
+    """Update ticker"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -166,7 +166,7 @@ def update_ticker(ticker_id: int):
 
 @tickers_bp.route('/<int:ticker_id>', methods=['DELETE'])
 def delete_ticker(ticker_id: int):
-    """מחיקת טיקר"""
+    """Delete ticker"""
     try:
         db: Session = next(get_db())
         success = TickerService.delete(db, ticker_id)

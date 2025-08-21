@@ -14,6 +14,34 @@ function deleteDesign(id) {
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים
+function toggleTopSection() {
+  console.log('🔄 toggleTopSection נקראה');
+  const topSection = document.querySelector('.top-section');
+  
+  if (!topSection) {
+    console.error('❌ לא נמצא top-section');
+    return;
+  }
+  
+  const sectionBody = topSection.querySelector('.section-body');
+  const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+  
+  if (sectionBody) {
+    const isCollapsed = sectionBody.style.display === 'none';
+    sectionBody.style.display = isCollapsed ? 'block' : 'none';
+    
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+    
+    // שמירת המצב ב-localStorage
+    localStorage.setItem('topSectionCollapsed', !isCollapsed);
+    
+    console.log(`✅ top-section ${isCollapsed ? 'נפתח' : 'נסגר'}`);
+  }
+}
+
 function toggleDesignsSection() {
   console.log('🔄 toggleDesignsSection נקראה');
   const contentSections = document.querySelectorAll('.content-section');
@@ -82,6 +110,25 @@ function toggleAccountsSection() {
 }
 
 // פונקציה לשחזור מצב הסגירה
+function restoreTopSectionState() {
+  // שחזור מצב הסקשן העליון
+  const topCollapsed = localStorage.getItem('topSectionCollapsed') === 'true';
+  const topSection = document.querySelector('.top-section');
+  
+  if (topSection) {
+    const sectionBody = topSection.querySelector('.section-body');
+    const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+    
+    if (sectionBody && topCollapsed) {
+      sectionBody.style.display = 'none';
+      if (icon) {
+        icon.textContent = '▼';
+      }
+    }
+  }
+}
+
 function restoreDesignsSectionState() {
   // שחזור מצב סקשן העיצובים
   const designsCollapsed = localStorage.getItem('designsSectionCollapsed') === 'true';
@@ -148,13 +195,29 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
   }
 };
 
+// פונקציה לאתחול הדף
+function initializeDesignsPage() {
+  console.log('🔄 אתחול דף עיצובים...');
+  
+  // שחזור מצב הסגירה
+  restoreTopSectionState();
+  restoreDesignsSectionState();
+  restoreAccountsSectionState();
+  
+  console.log('✅ דף עיצובים אותחל בהצלחה');
+}
+
 // הגדרת הפונקציות כגלובליות
 window.openDesignDetails = openDesignDetails;
 window.editDesign = editDesign;
 window.deleteDesign = deleteDesign;
+window.toggleTopSection = toggleTopSection;
 window.toggleDesignsSection = toggleDesignsSection;
 window.toggleAccountsSection = toggleAccountsSection;
+window.restoreTopSectionState = restoreTopSectionState;
 window.restoreDesignsSectionState = restoreDesignsSectionState;
+window.restoreAccountsSectionState = restoreAccountsSectionState;
+window.initializeDesignsPage = initializeDesignsPage;
 window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
 
 // בדיקת זמינות פונקציות מיד אחרי הגדרתן
@@ -167,8 +230,10 @@ console.log('🔍 updateGridFromComponent available:', typeof window.updateGridF
 document.addEventListener('DOMContentLoaded', function () {
   console.log('🔄 === DOM CONTENT LOADED ===');
 
-  // שחזור מצב הסגירה
-  restoreDesignsSectionState();
+  // אתחול הדף
+  if (typeof initializeDesignsPage === 'function') {
+    initializeDesignsPage();
+  }
 
   // בדיקת זמינות פונקציות גלובליות
   setTimeout(() => {

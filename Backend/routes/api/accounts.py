@@ -10,7 +10,7 @@ accounts_bp = Blueprint('accounts', __name__, url_prefix='/api/v1/accounts')
 
 @accounts_bp.route('/', methods=['GET'])
 def get_accounts():
-    """קבלת כל החשבונות"""
+    """Get all accounts"""
     try:
         db: Session = next(get_db())
         accounts = AccountService.get_all(db)
@@ -32,7 +32,7 @@ def get_accounts():
 
 @accounts_bp.route('/<int:account_id>', methods=['GET'])
 def get_account(account_id: int):
-    """קבלת חשבון לפי מזהה"""
+    """Get account by ID"""
     try:
         db: Session = next(get_db())
         account = AccountService.get_by_id(db, account_id)
@@ -60,7 +60,7 @@ def get_account(account_id: int):
 
 @accounts_bp.route('/', methods=['POST'])
 def create_account():
-    """יצירת חשבון חדש"""
+    """Create new account"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -83,7 +83,7 @@ def create_account():
 
 @accounts_bp.route('/<int:account_id>', methods=['PUT'])
 def update_account(account_id: int):
-    """עדכון חשבון"""
+    """Update account"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -112,7 +112,7 @@ def update_account(account_id: int):
 
 @accounts_bp.route('/<int:account_id>/open-trades', methods=['GET'])
 def get_account_open_trades(account_id: int):
-    """קבלת טריידים פתוחים של חשבון"""
+    """Get account's open trades"""
     try:
         db: Session = next(get_db())
         open_trades = AccountService.get_open_trades(db, account_id)
@@ -134,11 +134,11 @@ def get_account_open_trades(account_id: int):
 
 @accounts_bp.route('/<int:account_id>', methods=['DELETE'])
 def delete_account(account_id: int):
-    """מחיקת חשבון"""
+    """Delete account"""
     try:
         db: Session = next(get_db())
         
-        # בדיקה אם יש טריידים פתוחים
+        # Check if there are open trades
         open_trades = AccountService.get_open_trades(db, account_id)
         if open_trades:
             return jsonify({
@@ -174,7 +174,7 @@ def delete_account(account_id: int):
 
 @accounts_bp.route('/<int:account_id>/stats', methods=['GET'])
 def get_account_stats(account_id: int):
-    """קבלת סטטיסטיקות חשבון"""
+    """Get account statistics"""
     try:
         db: Session = next(get_db())
         stats = AccountService.get_stats(db, account_id)

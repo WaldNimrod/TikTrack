@@ -1,182 +1,182 @@
-# 📊 סיכום פרויקט TikTrack
+# 📊 TikTrack Project Summary
 
-## 🎯 סקירה כללית
-TikTrack היא מערכת מעקב טריידים מתקדמת עם ממשק משתמש מודרני ושרת Backend יציב. המערכת מאפשרת ניהול מלא של טריידים, תכנונים, חשבונות והתראות.
+## 🎯 Overview
+TikTrack is an advanced trading tracking system with a modern user interface and stable Backend server. The system enables complete management of trades, plans, accounts and alerts.
 
-## 🏗️ ארכיטקטורה
+## 🏗️ Architecture
 
 ### 🖥️ Frontend
-- **טכנולוגיות:** HTML5, CSS3, JavaScript (ES6+)
-- **עיצוב:** Bootstrap 5 עם תמיכה מלאה ב-RTL
-- **קומפוננטות:** Web Components למודולריות
-- **פילטרים:** מערכת פילטרים מתקדמת עם שמירת מצב
+- **Technologies:** HTML5, CSS3, JavaScript (ES6+)
+- **Design:** Bootstrap 5 with full RTL support
+- **Components:** Web Components for modularity
+- **Filters:** Advanced filtering system with state preservation
 
 ### ⚙️ Backend
-- **טכנולוגיות:** Python 3, Flask, SQLAlchemy
-- **בסיס נתונים:** SQLite עם WAL mode
-- **שרת:** Waitress/Flask עם קונפיגורציות יציבות
-- **API:** RESTful API עם תיעוד Swagger
+- **Technologies:** Python 3, Flask, SQLAlchemy
+- **Database:** SQLite with WAL mode
+- **Server:** Waitress/Flask with stable configurations
+- **API:** RESTful API with Swagger documentation
 
-### 🗄️ בסיס נתונים
-- **מודלים:** חשבונות, טריידים, תכנונים, התראות, הערות, תיקרים
-- **קשרים:** מערכת שיוך גמישה עם טבלת עזר
-- **מיגרציות:** מערכת ניהול שינויים אוטומטית
+### 🗄️ Database
+- **Models:** Accounts, trades, plans, alerts, notes, tickers
+- **Relationships:** Flexible association system with helper table
+- **Migrations:** Automatic change management system
 
-## 🔔 תכונות עיקריות
+## 🔔 Main Features
 
-### 📈 ניהול טריידים
-- **הוספה/עריכה/מחיקה** של טריידים
-- **סוגי טריידים:** סווינג, השקעה, פאסיבי
-- **סטטוסים:** פתוח, סגור, מבוטל
-- **פילטרים מתקדמים** לפי תאריך, סוג, סטטוס
+### 📈 Trade Management
+- **Add/Edit/Delete** trades
+- **Trade Types:** Swing, Investment, Passive
+- **Statuses:** Open, Closed, Cancelled
+- **Advanced Filters** by date, type, status
 
-### 📋 תכנון טריידים
-- **תכנונים מפורטים** עם יעדי מחיר וסטופ
-- **קישור לחשבונות** ולתיקרים
-- **מעקב ביצועים** עם סטטיסטיקות
+### 📋 Trade Planning
+- **Detailed Plans** with price targets and stops
+- **Link to Accounts** and tickers
+- **Performance Tracking** with statistics
 
-### 💰 ניהול חשבונות
-- **חשבונות מרובים** עם מטבעות שונים
-- **מעקב יתרות** ושווי כולל
-- **סטטוסים:** פתוח, סגור, מבוטל
+### 💰 Account Management
+- **Multiple Accounts** with different currencies
+- **Balance Tracking** and total value
+- **Statuses:** Open, Closed, Cancelled
 
-### 🔔 מערכת התראות
-- **התראות חכמות** עם שיוך גמיש לישויות
-- **קומפוננטה לשימוש חוזר** להצגת התראות פעילות
-- **עיצוב כרטיסיות** עם פרטי מחיר ושינוי יומי
-- **סטטוסים:** פתוח, חדש, נקרא
+### 🔔 Alert System
+- **Smart Alerts** with flexible entity association
+- **Reusable Component** for displaying active alerts
+- **Card Design** with price details and daily change
+- **Statuses:** Open, New, Read
 
-### 📝 מערכת הערות
-- **הערות מקושרות** לכל ישות במערכת
-- **עורך טקסט עשיר** עם כפתורי עיצוב
-- **העלאת קבצים** עם ניהול מלא
+### 📝 Note System
+- **Linked Notes** to every entity in the system
+- **Rich Text Editor** with styling buttons
+- **File Upload** with complete management
 
-### 📊 דוחות וסטטיסטיקות
-- **סטטיסטיקות בזמן אמת** לכל הדפים
-- **פילטרים מתקדמים** עם שמירת מצב
-- **ייצוא נתונים** בפורמטים שונים
+### 📊 Reports and Statistics
+- **Real-time Statistics** for all pages
+- **Advanced Filters** with state preservation
+- **Data Export** in various formats
 
-## 🆕 תכונות חדשות (גרסה 2.1)
+## 🆕 New Features (Version 2.1)
 
-### 🔔 מערכת התראות משופרת
-- **שיוך גמיש:** התראות מקושרות לישויות שונות דרך מערכת `related_type_id` ו-`related_id`
-- **קומפוננטה חדשה:** `active-alerts-component.js` - קומפוננטה לשימוש חוזר
-- **אינטגרציה:** הקומפוננטה משולבת בדפים `planning.html` ו-`alerts.html`
-- **עיצוב:** תצוגת כרטיסיות עם פרטי מחיר ושינוי יומי
+### 🔔 Improved Alert System
+- **Flexible Association:** Alerts linked to different entities through `related_type_id` and `related_id` system
+- **New Component:** `active-alerts-component.js` - reusable component
+- **Integration:** Component integrated in `planning.html` and `alerts.html` pages
+- **Design:** Card view with price details and daily change
 
-### 🎛️ מערכת פילטרים משופרת
-- **תיקון z-index:** פילטר חשבונות לא מסתיר את התפריט הראשי
-- **טעינת חשבונות:** פילטר חשבונות טוען רק חשבונות בסטטוס `open`
-- **סינון מדויק:** פילטר סטטוס עובד נכון (פתוח/סגור/מבוטל)
-- **תרגום סוגים:** סוגי תכנונים מתורגמים לעברית
+### 🎛️ Improved Filter System
+- **z-index Fix:** Account filter doesn't hide the main menu
+- **Account Loading:** Account filter loads only accounts with `open` status
+- **Precise Filtering:** Status filter works correctly (open/closed/cancelled)
+- **Type Translation:** Plan types translated to Hebrew
 
-### 🖥️ שיפורי ממשק
-- **עיצוב דף תכנון:** כותרות מעודכנות, הסרת סקשן חשבונות מיותר
-- **תצוגת נתונים:** הוספת נתוני דמה למחירים ושינויים יומיים
-- **RTL:** תמיכה מלאה בעברית עם יישור נכון לכפתורים
+### 🖥️ Interface Improvements
+- **Planning Page Design:** Updated headers, removed unnecessary accounts section
+- **Data Display:** Added dummy data for prices and daily changes
+- **RTL:** Full Hebrew support with proper button alignment
 
-### ⚙️ שיפורי שרת
-- **קונפיגורציות יציבות:** `run_stable.py` ו-`run_waitress_fixed.py`
-- **תיעוד שרת:** `SERVER_CONFIGURATIONS.md` עם הסברים מפורטים
-- **אוטומציה:** סקריפטים `start_dev.sh` ו-`start_server.sh` מעודכנים
+### ⚙️ Server Improvements
+- **Stable Configurations:** `run_stable.py` and `run_waitress_fixed.py`
+- **Server Documentation:** `SERVER_CONFIGURATIONS.md` with detailed explanations
+- **Automation:** Updated scripts `start_dev.sh` and `start_server.sh`
 
-## 🚀 התחלה מהירה
+## 🚀 Quick Start
 
-### 1. **הפעלת השרת:**
+### 1. **Start Server:**
 ```bash
 ./start_dev.sh
 ```
 
-### 2. **גישה למערכת:**
+### 2. **Access System:**
 - **Frontend:** http://127.0.0.1:8080
 - **API:** http://127.0.0.1:8080/api/v1/
 
-### 3. **בדיקת יציבות:**
+### 3. **Check Stability:**
 ```bash
 python3 Backend/server_health_check.py
 ```
 
-## 📁 מבנה קבצים
+## 📁 File Structure
 
 ### 🖥️ Frontend (`trading-ui/`)
 ```
 trading-ui/
-├── *.html              # דפי המערכת
-├── scripts/            # קבצי JavaScript
-│   ├── app-header.js   # כותרת ראשית
-│   ├── grid-table.js   # מערכת טבלאות
-│   ├── grid-filters.js # מערכת פילטרים
-│   └── *.js           # קבצים ייעודיים
-├── styles/            # קבצי CSS
-└── images/            # תמונות ולוגו
+├── *.html              # System pages
+├── scripts/            # JavaScript files
+│   ├── app-header.js   # Main header
+│   ├── grid-table.js   # Table system
+│   ├── grid-filters.js # Filter system
+│   └── *.js           # Dedicated files
+├── styles/            # CSS files
+└── images/            # Images and logo
 ```
 
 ### ⚙️ Backend (`Backend/`)
 ```
 Backend/
-├── app.py             # אפליקציה ראשית
-├── models/            # מודלי בסיס נתונים
-├── routes/            # נקודות קצה API
-├── services/          # לוגיקה עסקית
-├── config/            # הגדרות
-├── migrations/        # מיגרציות בסיס נתונים
-└── scripts/           # סקריפטי עזר
+├── app.py             # Main application
+├── models/            # Database models
+├── routes/            # API endpoints
+├── services/          # Business logic
+├── config/            # Configuration
+├── migrations/        # Database migrations
+└── scripts/           # Helper scripts
 ```
 
-## 🔧 פיתוח
+## 🔧 Development
 
-### **תהליך פיתוח:**
-1. ראה `documentation/development/DEVELOPMENT_WORKFLOW.md`
-2. עקוב אחר `CHANGELOG.md`
-3. בדוק `KNOWN_ISSUES.md`
+### **Development Process:**
+1. See `documentation/development/DEVELOPMENT_WORKFLOW.md`
+2. Follow `CHANGELOG.md`
+3. Check `KNOWN_ISSUES.md`
 
-### **בסיס נתונים:**
-1. ראה `documentation/database/DATABASE_CHANGES_AUGUST_2025.md`
-2. השתמש ב-`Backend/migrations_manager.py`
+### **Database:**
+1. See `documentation/database/DATABASE_CHANGES_AUGUST_2025.md`
+2. Use `Backend/migrations_manager.py`
 
-### **מערכת התראות:**
-1. ראה `Backend/ALERT_SYSTEM_DOCUMENTATION.md`
-2. ראה `trading-ui/scripts/README_ACTIVE_ALERTS_COMPONENT.md`
+### **Alert System:**
+1. See `Backend/ALERT_SYSTEM_DOCUMENTATION.md`
+2. See `trading-ui/scripts/README_ACTIVE_ALERTS_COMPONENT.md`
 
-## 📊 סטטיסטיקות פרויקט
+## 📊 Project Statistics
 
-### 📁 קבצים
-- **Frontend:** 50+ קבצי HTML/CSS/JS
-- **Backend:** 30+ קבצי Python
-- **תיעוד:** 20+ קבצי תיעוד
-- **בסיס נתונים:** 8 טבלאות עם קשרים מורכבים
+### 📁 Files
+- **Frontend:** 50+ HTML/CSS/JS files
+- **Backend:** 30+ Python files
+- **Documentation:** 20+ documentation files
+- **Database:** 8 tables with complex relationships
 
-### 🔧 תכונות
-- **דפים:** 8 דפים ראשיים
-- **API endpoints:** 50+ נקודות קצה
-- **פילטרים:** מערכת פילטרים מתקדמת
-- **קומפוננטות:** 5 קומפוננטות לשימוש חוזר
+### 🔧 Features
+- **Pages:** 8 main pages
+- **API endpoints:** 50+ endpoints
+- **Filters:** Advanced filtering system
+- **Components:** 5 reusable components
 
-### 🎯 יעדים שהושגו
-- ✅ מערכת יציבה ומוכנה לייצור
-- ✅ ממשק משתמש מודרני וידידותי
-- ✅ מערכת התראות מתקדמת
-- ✅ פילטרים מתקדמים עם שמירת מצב
-- ✅ תמיכה מלאה בעברית ו-RTL
-- ✅ תיעוד מקיף ומפורט
+### 🎯 Achieved Goals
+- ✅ Stable system ready for production
+- ✅ Modern and user-friendly interface
+- ✅ Advanced alert system
+- ✅ Advanced filters with state preservation
+- ✅ Full Hebrew and RTL support
+- ✅ Comprehensive and detailed documentation
 
-## 🚀 עתיד הפרויקט
+## 🚀 Project Future
 
-### 📈 תכונות מתוכננות
-- **דוחות מתקדמים** עם גרפים ואינטראקציה
-- **אינטגרציה עם ברוקרים** לנתונים בזמן אמת
-- **אפליקציה ניידת** עם React Native
-- **מערכת הרשאות** מתקדמת
-- **גיבוי אוטומטי** לענן
+### 📈 Planned Features
+- **Advanced Reports** with graphs and interaction
+- **Broker Integration** for real-time data
+- **Mobile Application** with React Native
+- **Advanced Permission System**
+- **Automatic Cloud Backup**
 
-### 🔧 שיפורים טכניים
-- **מיקרו-שירותים** לארכיטקטורה מודולרית
-- **בסיס נתונים מבוזר** עם PostgreSQL
-- **מערכת קאש** עם Redis
-- **CI/CD pipeline** אוטומטי
+### 🔧 Technical Improvements
+- **Microservices** for modular architecture
+- **Distributed Database** with PostgreSQL
+- **Cache System** with Redis
+- **Automated CI/CD Pipeline**
 
 ---
 
-**עדכון אחרון:** אוגוסט 2025  
-**גרסה:** 2.1  
-**סטטוס:** יציב ומוכן לייצור עם מערכת התראות משופרת
+**Last Update:** August 2025  
+**Version:** 2.1  
+**Status:** Stable and ready for production with improved alert system

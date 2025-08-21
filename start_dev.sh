@@ -47,5 +47,5 @@ echo "⚡ Flask development server - יציב ומהיר"
 echo "📝 לוגים מפורטים מופעלים"
 echo "-" * 50
 
-# הפעלה עם run_flask_simple.py - הקונפיגורציה החדשה
-python3 run_flask_simple.py
+# הפעלה עם dev_server.py - הקונפיגורציה הסטנדרטית
+python3 dev_server.py

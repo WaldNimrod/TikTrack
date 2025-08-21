@@ -3,19 +3,19 @@ import requests
 import json
 
 def test_trade_plans_api():
-    """בדיקת trade_plans API"""
+    """Test trade_plans API"""
     try:
-        # בדיקת trade_plans
+        # Check trade_plans
         response = requests.get('http://localhost:8080/api/v1/trade_plans/')
         print(f"Trade Plans Status: {response.status_code}")
         print(f"Trade Plans Response: {response.text}")
         
-        # בדיקת trades
+        # Check trades
         response = requests.get('http://localhost:8080/api/v1/trades/')
         print(f"\nTrades Status: {response.status_code}")
         print(f"Trades Response: {response.text[:200]}...")
         
-        # בדיקת accounts
+        # Check accounts
         response = requests.get('http://localhost:8080/api/v1/accounts/')
         print(f"\nAccounts Status: {response.status_code}")
         print(f"Accounts Response: {response.text[:200]}...")

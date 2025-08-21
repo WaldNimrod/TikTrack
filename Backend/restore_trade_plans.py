@@ -15,19 +15,19 @@ def restore_trade_plans():
         return
     
     try:
-        # חיבור לבסיס הנתונים הנוכחי
+        # Connect to current database
         current_conn = sqlite3.connect(current_db)
         current_cursor = current_conn.cursor()
         
-        # מחיקת כל הנתונים הנוכחיים מטבלת התכנונים
+        # Delete all current data from trade_plans table
         current_cursor.execute("DELETE FROM trade_plans")
         print("✅ Cleared current trade_plans table")
         
-        # קריאת קובץ הגיבוי וחילוץ התכנונים
+        # Read backup file and extract trade plans
         with open(backup_file, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        # חילוץ הגדרת הטבלה והנתונים
+        # Extract table definition and data
         start_marker = "CREATE TABLE trade_plans ("
         end_marker = "CREATE TABLE alerts ("
         
@@ -40,7 +40,7 @@ def restore_trade_plans():
         
         trade_plans_section = content[start_idx:end_idx]
         
-        # חילוץ ה-INSERT statements
+        # Extract INSERT statements
         lines = trade_plans_section.split('\n')
         insert_statements = []
         
@@ -50,20 +50,20 @@ def restore_trade_plans():
         
         print(f"📊 Found {len(insert_statements)} trade plans in backup")
         
-        # הכנסת הנתונים לבסיס הנתונים הנוכחי
+        # Insert data into current database
         for insert_stmt in insert_statements:
             current_cursor.execute(insert_stmt)
         
-        # שמירת השינויים
+        # Save changes
         current_conn.commit()
         print("✅ Trade plans restored successfully!")
         
-        # בדיקה שהנתונים הוכנסו
+        # Verify data was inserted
         current_cursor.execute("SELECT COUNT(*) FROM trade_plans")
         count = current_cursor.fetchone()[0]
         print(f"📊 Current trade plans count: {count}")
         
-        # הצגת פרטי התכנונים
+        # Show trade plan details
         current_cursor.execute("""
             SELECT tp.id, tp.investment_type, tp.status, tp.planned_amount, 
                    a.name as account_name, t.symbol as ticker_symbol

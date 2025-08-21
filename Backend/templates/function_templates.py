@@ -14,7 +14,7 @@ def model_to_dict_template(self) -> Dict[str, Any]:
     result: Dict[str, Any] = {}
     for c in self.__table__.columns:
         value = getattr(self, c.name)
-        if hasattr(value, 'strftime'):  # אם זה תאריך
+        if hasattr(value, 'strftime'):  # If it's a date
             result[c.name] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
         else:
             result[c.name] = value

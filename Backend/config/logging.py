@@ -6,28 +6,28 @@ from datetime import datetime
 from typing import Optional
 
 def setup_logging() -> logging.Logger:
-    """הגדרת מערכת הלוגים"""
+    """Setup logging system"""
     
-    # יצירת תיקיית לוגים
+    # Create logs directory
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
     
-    # הגדרת פורמט הלוגים
+    # Set log format
     log_format = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     
-    # הגדרת הלוגר הראשי
+    # Set main logger
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     
-    # לוג לקונסול
+    # Console log
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(log_format)
     logger.addHandler(console_handler)
     
-    # לוג לקובץ
+    # File log
     file_handler = logging.handlers.RotatingFileHandler(
         log_dir / "app.log",
         maxBytes=10*1024*1024,  # 10MB
@@ -37,7 +37,7 @@ def setup_logging() -> logging.Logger:
     file_handler.setFormatter(log_format)
     logger.addHandler(file_handler)
     
-    # לוג שגיאות לקובץ נפרד
+    # Error log to separate file
     error_handler = logging.handlers.RotatingFileHandler(
         log_dir / "errors.log",
         maxBytes=10*1024*1024,  # 10MB
@@ -47,7 +47,7 @@ def setup_logging() -> logging.Logger:
     error_handler.setFormatter(log_format)
     logger.addHandler(error_handler)
     
-    # לוג SQL queries (רק ב-development)
+    # SQL queries log (only in development)
     if os.getenv('FLASK_ENV') == 'development':
         sql_logger = logging.getLogger('sqlalchemy.engine')
         sql_logger.setLevel(logging.INFO)
@@ -55,16 +55,16 @@ def setup_logging() -> logging.Logger:
     return logger
 
 def get_logger(name: str) -> logging.Logger:
-    """קבלת לוגר עם שם ספציפי"""
+    """Get logger with specific name"""
     return logging.getLogger(name)
 
-# יצירת correlation ID לכל request
+# Create correlation ID for each request
 def generate_correlation_id() -> str:
-    """יצירת מזהה קורלציה ייחודי"""
+    """Generate unique correlation identifier"""
     return f"req_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
 
 class CorrelationFilter(logging.Filter):
-    """פילטר להוספת correlation ID לכל לוג"""
+    """Filter to add correlation ID to each log"""
     
     def __init__(self) -> None:
         super().__init__()

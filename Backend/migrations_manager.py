@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
 Database Migrations Manager
-מנהל migrations לבסיס הנתונים
+Database migrations manager
 
-✅ ניהול שינויים בבסיס הנתונים
-✅ היסטוריה של שינויים
-✅ rollback לשינויים קודמים
-✅ בדיקת תקינות
+✅ Database change management
+✅ Change history
+✅ Rollback to previous changes
+✅ Integrity checking
 """
 
 import os
@@ -21,15 +21,15 @@ class MigrationManager:
         self.migrations_table = "schema_migrations"
         self.migrations_dir = "migrations"
         
-        # יצירת תיקיית migrations אם לא קיימת
+        # Create migrations directory if it doesn't exist
         if not os.path.exists(self.migrations_dir):
             os.makedirs(self.migrations_dir)
             
-        # יצירת טבלת migrations אם לא קיימת
+        # Create migrations table if it doesn't exist
         self._create_migrations_table()
         
     def _create_migrations_table(self):
-        """יצירת טבלת migrations"""
+        """Create migrations table"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
@@ -49,7 +49,7 @@ class MigrationManager:
         conn.close()
         
     def create_migration(self, name: str, sql_up: str, sql_down: str = None) -> str:
-        """יצירת migration חדש"""
+        """Create new migration"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         version = f"migration_{timestamp}"
         
@@ -61,18 +61,18 @@ class MigrationManager:
             "created_at": datetime.now().isoformat()
         }
         
-        # שמירת migration לקובץ
+        # Save migration to file
         filename = f"{self.migrations_dir}/{version}_{name}.json"
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(migration_data, f, indent=2, ensure_ascii=False)
             
-        print(f"✅ Migration נוצר: {filename}")
+        print(f"✅ Migration created: {filename}")
         return version
         
     def apply_migration(self, version: str) -> bool:
-        """החלת migration"""
+        """Apply migration"""
         try:
-            # קריאת migration מהקובץ
+            # Read migration from file
             migration_file = None
             for filename in os.listdir(self.migrations_dir):
                 if filename.startswith(version) and filename.endswith('.json'):
@@ -80,39 +80,39 @@ class MigrationManager:
                     break
                     
             if not migration_file:
-                print(f"❌ Migration לא נמצא: {version}")
+                print(f"❌ Migration not found: {version}")
                 return False
                 
             with open(migration_file, 'r', encoding='utf-8') as f:
                 migration = json.load(f)
                 
-            # בדיקה אם כבר הוחל
+            # Check if already applied
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
             cursor.execute(f"SELECT COUNT(*) FROM {self.migrations_table} WHERE version = ?", (version,))
             if cursor.fetchone()[0] > 0:
-                print(f"⚠️  Migration כבר הוחל: {version}")
+                print(f"⚠️  Migration already applied: {version}")
                 conn.close()
                 return True
                 
-            # החלת ה-SQL - ביצוע statements אחד אחד
-            print(f"🔄 מחיל migration: {migration['name']}")
+            # Apply SQL - execute statements one by one
+            print(f"🔄 Applying migration: {migration['name']}")
             sql_statements = migration['sql_up'].split(';')
             
             for statement in sql_statements:
                 statement = statement.strip()
-                if statement:  # רק אם יש תוכן
+                if statement:  # Only if there's content
                     try:
                         cursor.execute(statement)
-                        print(f"  ✅ ביצוע: {statement[:50]}...")
+                        print(f"  ✅ Executing: {statement[:50]}...")
                     except Exception as e:
-                        print(f"  ❌ שגיאה בביצוע: {statement[:50]}... - {str(e)}")
+                        print(f"  ❌ Error executing: {statement[:50]}... - {str(e)}")
                         conn.rollback()
                         conn.close()
                         return False
             
-            # רישום ב-migrations table
+            # Record in migrations table
             cursor.execute(f"""
                 INSERT INTO {self.migrations_table} (version, name, sql_up, sql_down)
                 VALUES (?, ?, ?, ?)
@@ -121,53 +121,53 @@ class MigrationManager:
             conn.commit()
             conn.close()
             
-            print(f"✅ Migration הוחל בהצלחה: {migration['name']}")
+            print(f"✅ Migration applied successfully: {migration['name']}")
             return True
             
         except Exception as e:
-            print(f"❌ שגיאה בהחלת migration: {str(e)}")
+            print(f"❌ Error applying migration: {str(e)}")
             return False
             
     def rollback_migration(self, version: str) -> bool:
-        """ביטול migration"""
+        """Rollback migration"""
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # בדיקה אם הוחל
+            # Check if applied
             cursor.execute(f"SELECT sql_down FROM {self.migrations_table} WHERE version = ?", (version,))
             result = cursor.fetchone()
             
             if not result:
-                print(f"❌ Migration לא נמצא: {version}")
+                print(f"❌ Migration not found: {version}")
                 conn.close()
                 return False
                 
             sql_down = result[0]
             if not sql_down:
-                print(f"⚠️  אין rollback SQL ל-migration: {version}")
+                print(f"⚠️  No rollback SQL for migration: {version}")
                 conn.close()
                 return False
                 
-            # ביצוע rollback
-            print(f"🔄 מבטל migration: {version}")
+            # Execute rollback
+            print(f"🔄 Rolling back migration: {version}")
             cursor.execute(sql_down)
             
-            # מחיקה מהטבלה
+            # Delete from table
             cursor.execute(f"DELETE FROM {self.migrations_table} WHERE version = ?", (version,))
             
             conn.commit()
             conn.close()
             
-            print(f"✅ Migration בוטל בהצלחה: {version}")
+            print(f"✅ Migration rolled back successfully: {version}")
             return True
             
         except Exception as e:
-            print(f"❌ שגיאה בביטול migration: {str(e)}")
+            print(f"❌ Error rolling back migration: {str(e)}")
             return False
             
     def get_applied_migrations(self) -> List[Dict[str, Any]]:
-        """קבלת רשימת migrations שהוחלו"""
+        """Get list of applied migrations"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
@@ -185,7 +185,7 @@ class MigrationManager:
         return migrations
         
     def get_pending_migrations(self) -> List[str]:
-        """קבלת רשימת migrations שממתינים"""
+        """Get list of pending migrations"""
         applied = {m["version"] for m in self.get_applied_migrations()}
         pending = []
         
@@ -198,61 +198,61 @@ class MigrationManager:
         return sorted(pending)
         
     def migrate_all(self) -> bool:
-        """החלת כל ה-migrations הממתינים"""
+        """Apply all pending migrations"""
         pending = self.get_pending_migrations()
         
         if not pending:
-            print("✅ אין migrations ממתינים")
+            print("✅ No pending migrations")
             return True
             
-        print(f"🔄 מחיל {len(pending)} migrations...")
+        print(f"🔄 Applying {len(pending)} migrations...")
         
         for version in pending:
             if not self.apply_migration(version):
-                print(f"❌ נכשל בהחלת migration: {version}")
+                print(f"❌ Failed to apply migration: {version}")
                 return False
                 
-        print("✅ כל ה-migrations הוחלו בהצלחה")
+        print("✅ All migrations applied successfully")
         return True
         
     def status(self):
-        """הצגת סטטוס migrations"""
+        """Display migrations status"""
         applied = self.get_applied_migrations()
         pending = self.get_pending_migrations()
         
-        print("📊 סטטוס Migrations:")
-        print(f"✅ הוחלו: {len(applied)}")
-        print(f"⏳ ממתינים: {len(pending)}")
+        print("📊 Migrations Status:")
+        print(f"✅ Applied: {len(applied)}")
+        print(f"⏳ Pending: {len(pending)}")
         
         if applied:
-            print("\n📋 Migrations שהוחלו:")
+            print("\n📋 Applied Migrations:")
             for migration in applied:
                 print(f"  • {migration['version']} - {migration['name']} ({migration['applied_at']})")
                 
         if pending:
-            print("\n⏳ Migrations ממתינים:")
+            print("\n⏳ Pending Migrations:")
             for version in pending:
                 print(f"  • {version}")
 
-# יצירת migration לבעיה הנוכחית
+# Create migration for current issue
 def create_notes_migration():
-    """יצירת migration לתיקון טבלת notes"""
+    """Create migration to fix notes table"""
     manager = MigrationManager()
     
     sql_up = """
-    -- יצירת טבלת note_relation_types
+    -- Create note_relation_types table
     CREATE TABLE IF NOT EXISTS note_relation_types (
         id INTEGER PRIMARY KEY,
         note_relation_type VARCHAR(20) NOT NULL UNIQUE
     );
     
-    -- הוספת סוגי הקשרים
+    -- Add relation types
     INSERT OR IGNORE INTO note_relation_types (id, note_relation_type) VALUES 
         (1, 'account'),
         (2, 'trade'),
         (3, 'trade_plan');
     
-    -- יצירת טבלה חדשה עם המבנה הנכון
+    -- Create new table with correct structure
     CREATE TABLE notes_new (
         id INTEGER NOT NULL PRIMARY KEY,
         content VARCHAR(1000) NOT NULL,
@@ -262,7 +262,7 @@ def create_notes_migration():
         related_id INTEGER
     );
     
-    -- העתקת נתונים מהטבלה הישנה
+    -- Copy data from old table
     INSERT INTO notes_new (id, content, attachment, created_at, related_type_id, related_id)
     SELECT 
         id,
@@ -277,15 +277,15 @@ def create_notes_migration():
         COALESCE(account_id, trade_id, trade_plan_id) as related_id
     FROM notes;
     
-    -- מחיקת הטבלה הישנה
+    -- Delete old table
     DROP TABLE notes;
     
-    -- שינוי שם הטבלה החדשה
+    -- Rename new table
     ALTER TABLE notes_new RENAME TO notes;
     """
     
     sql_down = """
-    -- יצירת טבלה עם המבנה הישן
+    -- Create table with old structure
     CREATE TABLE notes_old (
         id INTEGER NOT NULL PRIMARY KEY,
         content VARCHAR(1000) NOT NULL,
@@ -296,7 +296,7 @@ def create_notes_migration():
         trade_plan_id INTEGER
     );
     
-    -- העתקת נתונים בחזרה
+    -- Copy data back
     INSERT INTO notes_old (id, content, attachment, created_at, account_id, trade_id, trade_plan_id)
     SELECT 
         id,
@@ -308,13 +308,13 @@ def create_notes_migration():
         CASE WHEN related_type_id = 3 THEN related_id ELSE NULL END as trade_plan_id
     FROM notes;
     
-    -- מחיקת הטבלה החדשה
+    -- Delete new table
     DROP TABLE notes;
     
-    -- שינוי שם הטבלה הישנה
+    -- Rename old table
     ALTER TABLE notes_old RENAME TO notes;
     
-    -- מחיקת טבלת note_relation_types
+    -- Delete note_relation_types table
     DROP TABLE note_relation_types;
     """
     
@@ -324,7 +324,7 @@ def create_notes_migration():
         sql_down
     )
     
-    print(f"✅ Migration נוצר: {version}")
+    print(f"✅ Migration created: {version}")
     return version
 
 if __name__ == "__main__":
@@ -332,12 +332,12 @@ if __name__ == "__main__":
     
     if len(sys.argv) < 2:
         print("""
-שימוש:
-  python migrations_manager.py status          # הצגת סטטוס
-  python migrations_manager.py migrate         # החלת כל migrations
-  python migrations_manager.py create_notes    # יצירת migration לתיקון notes
-  python migrations_manager.py apply <version> # החלת migration ספציפי
-  python migrations_manager.py rollback <version> # ביטול migration
+Usage:
+  python migrations_manager.py status          # Show status
+  python migrations_manager.py migrate         # Apply all migrations
+  python migrations_manager.py create_notes    # Create migration to fix notes
+  python migrations_manager.py apply <version> # Apply specific migration
+  python migrations_manager.py rollback <version> # Rollback migration
         """)
         sys.exit(1)
         
@@ -355,5 +355,5 @@ if __name__ == "__main__":
     elif command == "rollback" and len(sys.argv) > 2:
         manager.rollback_migration(sys.argv[2])
     else:
-        print("❌ פקודה לא מוכרת")
+        print("❌ Unknown command")
         sys.exit(1)

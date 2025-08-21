@@ -8,12 +8,12 @@ from config.database import get_db
 from models.account import Account
 
 def test_accounts_service():
-    """בדיקת accounts service"""
+    """Test accounts service"""
     try:
         db: Session = next(get_db())
         print("✅ Database connection successful")
         
-        # בדיקת accounts
+        # Check accounts
         accounts = db.query(Account).all()
         print(f"✅ Found {len(accounts)} accounts")
         
@@ -21,7 +21,7 @@ def test_accounts_service():
             account = accounts[0]
             print(f"✅ First account: ID={account.id}, Name={account.name}, Status={account.status}")
             
-            # בדיקת to_dict
+            # Check to_dict
             account_dict = account.to_dict()
             print(f"✅ Account dict: {account_dict}")
         

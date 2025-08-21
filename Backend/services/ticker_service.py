@@ -52,7 +52,7 @@ class TickerService:
     MAX_SYMBOL_LENGTH: int = 10
     MAX_NAME_LENGTH: int = 100
     MAX_REMARKS_LENGTH: int = 500
-    CURRENCY_LENGTH: int = 3
+    # CURRENCY_LENGTH: int = 3  # הוסר - עכשיו משתמשים ב-currency_id
     @staticmethod
     def get_all(db: Session) -> List[Ticker]:
         """
@@ -158,10 +158,15 @@ class TickerService:
         if ticker_type and ticker_type not in TickerService.VALID_TICKER_TYPES:
             warnings.append(f"סוג לא מוכר: {ticker_type}. סוגים מוכרים: {', '.join(TickerService.VALID_TICKER_TYPES)}")
         
-        # בדיקת מטבע
-        currency = ticker_data.get('currency', '').strip().upper()
-        if currency and len(currency) != TickerService.CURRENCY_LENGTH:
-            errors.append(f"מטבע חייב להיות בדיוק {TickerService.CURRENCY_LENGTH} תווים")
+        # בדיקת מטבע - עכשיו בודקים currency_id
+        currency_id = ticker_data.get('currency_id')
+        if currency_id is not None:
+            try:
+                currency_id = int(currency_id)
+                if currency_id <= 0:
+                    errors.append("מזהה מטבע חייב להיות מספר חיובי")
+            except (ValueError, TypeError):
+                errors.append("מזהה מטבע חייב להיות מספר תקין")
         
         # בדיקת הערות
         remarks = ticker_data.get('remarks', '').strip()
@@ -209,8 +214,7 @@ class TickerService:
         ticker_data['symbol'] = symbol
         if 'name' in ticker_data:
             ticker_data['name'] = ticker_data['name'].strip()
-        if 'currency' in ticker_data:
-            ticker_data['currency'] = ticker_data['currency'].strip().upper()
+        # currency_id לא צריך נרמול - הוא כבר מספר
         
         ticker = Ticker(**ticker_data)
         db.add(ticker)
@@ -240,8 +244,7 @@ class TickerService:
         # נרמול הנתונים
         if 'name' in ticker_data:
             ticker_data['name'] = ticker_data['name'].strip()
-        if 'currency' in ticker_data:
-            ticker_data['currency'] = ticker_data['currency'].strip().upper()
+        # currency_id לא צריך נרמול - הוא כבר מספר
         
         # עדכון השדות
         for key, value in ticker_data.items():

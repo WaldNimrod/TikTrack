@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-סקריפט לתיקון קישורים בין טריידים לתוכניות
-מתקן את הנתונים הקיימים ומגדיר כללים למערכת
+Script to fix links between trades and plans
+Fixes existing data and defines rules for the system
 
-כללים:
-1. כל טרייד חייב להיות מקושר לתוכנית כלשהי
-2. טרייד פתוח חייב להיות מקושר לתוכנית במצב פתוח או סגור
-3. טרייד סגור או מבוטל יכול להיות משוייך לתוכנית בכל סטטוס
-4. תאריך יצירת הטרייד לא יכול להיות מוקדם לתאריך יצירת התוכנית
+Rules:
+1. Every trade must be linked to a plan
+2. Open trade must be linked to a plan in open or closed status
+3. Closed or cancelled trade can be assigned to a plan in any status
+4. Trade creation date cannot be earlier than plan creation date
 """
 
 import sqlite3
@@ -16,16 +16,16 @@ import os
 from datetime import datetime
 from typing import List, Dict, Optional
 
-# הוספת הנתיב לפרויקט
+# Add project path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'Backend'))
 
 def connect_to_db():
-    """חיבור לבסיס הנתונים"""
+    """Connect to database"""
     db_path = os.path.join(os.path.dirname(__file__), 'Backend', 'db', 'simpleTrade_new.db')
     return sqlite3.connect(db_path)
 
 def get_trades_without_plans(cursor) -> List[Dict]:
-    """קבלת טריידים ללא קישור לתוכנית"""
+    """Get trades without plan link"""
     cursor.execute("""
         SELECT id, status, type, created_at, ticker_id, account_id
         FROM trades 
@@ -36,7 +36,7 @@ def get_trades_without_plans(cursor) -> List[Dict]:
             for row in cursor.fetchall()]
 
 def get_available_plans(cursor) -> List[Dict]:
-    """קבלת תוכניות זמינות"""
+    """Get available plans"""
     cursor.execute("""
         SELECT id, status, investment_type, created_at, ticker_id, account_id
         FROM trade_plans 
@@ -47,37 +47,37 @@ def get_available_plans(cursor) -> List[Dict]:
 
 def find_best_plan_for_trade(trade: Dict, plans: List[Dict]) -> Optional[int]:
     """
-    מציאת התוכנית הטובה ביותר עבור טרייד
+    Find the best plan for a trade
     
-    כללים:
-    1. תוכנית עם אותו ticker_id
-    2. תוכנית עם אותו account_id (אם אפשר)
-    3. תוכנית שנוצרה לפני הטרייד
-    4. אם הטרייד פתוח - תוכנית פתוחה או סגורה
-    5. אם הטרייד סגור/מבוטל - כל תוכנית
-    6. אם אין תוכנית לאותו ticker - חיפוש תוכנית דומה
-    7. צד התוכנית חייב להיות זהה לצד הטרייד
+    Rules:
+    1. Plan with same ticker_id
+    2. Plan with same account_id (if possible)
+    3. Plan created before the trade
+    4. If trade is open - plan must be open or closed
+    5. If trade is closed/cancelled - any plan
+    6. If no plan for same ticker - search for similar plan
+    7. Plan side must match trade side
     """
     trade_created = datetime.fromisoformat(trade['created_at'].replace('Z', '+00:00'))
     
-    # סינון תוכניות לפי ticker_id
+    # Filter plans by ticker_id
     matching_plans = [p for p in plans if p['ticker_id'] == trade['ticker_id']]
     
     if not matching_plans:
-        # אם אין תוכנית לאותו ticker, נחפש תוכנית דומה
-        print(f"  ⚠️  אין תוכניות עבור ticker_id {trade['ticker_id']}, מחפש תוכנית דומה...")
+        # If no plan for same ticker, search for similar plan
+        print(f"  ⚠️  No plans for ticker_id {trade['ticker_id']}, searching for similar plan...")
         
-        # חיפוש תוכנית עם אותו account_id
+        # Search for plan with same account_id
         account_matching = [p for p in plans if p['account_id'] == trade['account_id']]
         if account_matching:
             matching_plans = account_matching
-            print(f"  📋 נמצאו {len(matching_plans)} תוכניות עם אותו account_id")
+            print(f"  📋 Found {len(matching_plans)} plans with same account_id")
         else:
-            # אם אין גם account_id מתאים, נשתמש בתוכנית הראשונה הזמינה
+            # If no matching account_id either, use first available plan
             matching_plans = plans
-            print(f"  📋 משתמש בכל התוכניות הזמינות ({len(matching_plans)})")
+            print(f"  📋 Using all available plans ({len(matching_plans)})")
     
-    # סינון לפי תאריך יצירה
+    # Filter by creation date
     valid_plans = []
     for plan in matching_plans:
         try:
@@ -85,33 +85,33 @@ def find_best_plan_for_trade(trade: Dict, plans: List[Dict]) -> Optional[int]:
             if plan_created <= trade_created:
                 valid_plans.append(plan)
         except ValueError:
-            print(f"  ⚠️  תאריך לא תקין בתוכנית {plan['id']}: {plan['created_at']}")
+            print(f"  ⚠️  Invalid date in plan {plan['id']}: {plan['created_at']}")
     
     if not valid_plans:
-        print(f"  ⚠️  אין תוכניות שנוצרו לפני הטרייד")
+        print(f"  ⚠️  No plans created before the trade")
         return None
     
-    # סינון לפי סטטוס (אם הטרייד פתוח)
+    # Filter by status (if trade is open)
     if trade['status'] == 'open':
         status_valid_plans = [p for p in valid_plans if p['status'] in ['open', 'closed']]
         if status_valid_plans:
             valid_plans = status_valid_plans
     
-    # סינון לפי צד - חייב להיות זהה
+    # Filter by side - must be identical
     side_matching = [p for p in valid_plans if p.get('side', 'Long') == trade.get('side', 'Long')]
     if side_matching:
         valid_plans = side_matching
-        print(f"  📋 נמצאו {len(valid_plans)} תוכניות עם אותו צד ({trade.get('side', 'Long')})")
+        print(f"  📋 Found {len(valid_plans)} plans with same side ({trade.get('side', 'Long')})")
     else:
-        print(f"  ⚠️  אין תוכניות עם אותו צד ({trade.get('side', 'Long')})")
+        print(f"  ⚠️  No plans with same side ({trade.get('side', 'Long')})")
         return None
     
-    # העדפת תוכנית עם אותו account_id
+    # Prefer plan with same account_id
     account_matching = [p for p in valid_plans if p['account_id'] == trade['account_id']]
     if account_matching:
         valid_plans = account_matching
     
-    # בחירת התוכנית הוותיקה ביותר
+    # Choose the oldest plan
     if valid_plans:
         best_plan = min(valid_plans, key=lambda p: p['created_at'])
         return best_plan['id']
@@ -119,8 +119,8 @@ def find_best_plan_for_trade(trade: Dict, plans: List[Dict]) -> Optional[int]:
     return None
 
 def update_trade_plan_link(cursor, trade_id: int, plan_id: int):
-    """עדכון קישור טרייד לתוכנית"""
-    # קבלת פרטי התוכנית
+    """Update trade plan link"""
+    # Get plan details
     cursor.execute("""
         SELECT investment_type, side 
         FROM trade_plans 
@@ -131,16 +131,16 @@ def update_trade_plan_link(cursor, trade_id: int, plan_id: int):
     if plan_data:
         investment_type, side = plan_data
         
-        # עדכון הטרייד עם פרטי התוכנית
+        # Update trade with plan details
         cursor.execute("""
             UPDATE trades 
             SET trade_plan_id = ?, type = ?, side = ?
             WHERE id = ?
         """, (plan_id, investment_type, side, trade_id))
         
-        print(f"    📝 עודכן: type={investment_type}, side={side}")
+        print(f"    📝 Updated: type={investment_type}, side={side}")
     else:
-        # אם לא נמצאה התוכנית, רק מעדכן את הקישור
+        # If plan not found, only update the link
         cursor.execute("""
             UPDATE trades 
             SET trade_plan_id = ? 
@@ -148,15 +148,15 @@ def update_trade_plan_link(cursor, trade_id: int, plan_id: int):
         """, (plan_id, trade_id))
 
 def validate_trade_plan_links(cursor):
-    """בדיקת תקינות הקישורים"""
-    print("\n=== בדיקת תקינות קישורים ===")
+    """Validate link integrity"""
+    print("\n=== Link Integrity Check ===")
     
-    # בדיקת טריידים ללא קישור
+    # Check trades without links
     cursor.execute("SELECT COUNT(*) FROM trades WHERE trade_plan_id IS NULL")
     unlinked_count = cursor.fetchone()[0]
-    print(f"טריידים ללא קישור: {unlinked_count}")
+    print(f"Trades without links: {unlinked_count}")
     
-    # בדיקת טריידים פתוחים עם תוכניות סגורות/מבוטלות
+    # Check open trades with closed/cancelled plans
     cursor.execute("""
         SELECT t.id, t.status, tp.status as plan_status
         FROM trades t
@@ -164,9 +164,9 @@ def validate_trade_plan_links(cursor):
         WHERE t.status = 'open' AND tp.status NOT IN ('open', 'closed')
     """)
     invalid_open_trades = cursor.fetchall()
-    print(f"טריידים פתוחים עם תוכניות לא תקינות: {len(invalid_open_trades)}")
+    print(f"Open trades with invalid plans: {len(invalid_open_trades)}")
     
-    # בדיקת תאריכי יצירה
+    # Check creation dates
     cursor.execute("""
         SELECT t.id, t.created_at, tp.created_at as plan_created
         FROM trades t
@@ -174,9 +174,9 @@ def validate_trade_plan_links(cursor):
         WHERE t.created_at < tp.created_at
     """)
     invalid_dates = cursor.fetchall()
-    print(f"טריידים שנוצרו לפני התוכנית: {len(invalid_dates)}")
+    print(f"Trades created before plan: {len(invalid_dates)}")
     
-    # בדיקת צד - חייב להיות זהה
+    # Check side - must be identical
     cursor.execute("""
         SELECT t.id, t.side, tp.side as plan_side
         FROM trades t
@@ -184,62 +184,62 @@ def validate_trade_plan_links(cursor):
         WHERE t.side != tp.side
     """)
     invalid_sides = cursor.fetchall()
-    print(f"טריידים עם צד שונה מהתוכנית: {len(invalid_sides)}")
+    print(f"Trades with different side than plan: {len(invalid_sides)}")
     
     return unlinked_count == 0 and len(invalid_open_trades) == 0 and len(invalid_dates) == 0 and len(invalid_sides) == 0
 
 def main():
-    """פונקציה ראשית"""
-    print("🔧 תיקון קישורים בין טריידים לתוכניות")
+    """Main function"""
+    print("🔧 Fixing links between trades and plans")
     print("=" * 50)
     
     try:
         conn = connect_to_db()
         cursor = conn.cursor()
         
-        # קבלת נתונים
+        # Get data
         trades_without_plans = get_trades_without_plans(cursor)
         available_plans = get_available_plans(cursor)
         
-        print(f"נמצאו {len(trades_without_plans)} טריידים ללא קישור")
-        print(f"נמצאו {len(available_plans)} תוכניות זמינות")
+        print(f"Found {len(trades_without_plans)} trades without links")
+        print(f"Found {len(available_plans)} available plans")
         
         if not trades_without_plans:
-            print("✅ כל הטריידים כבר מקושרים לתוכניות")
+            print("✅ All trades are already linked to plans")
             return
         
-        # תיקון קישורים
-        print("\n=== תיקון קישורים ===")
+        # Fix links
+        print("\n=== Fixing Links ===")
         fixed_count = 0
         
         for trade in trades_without_plans:
-            print(f"\nטרייד {trade['id']} ({trade['status']} - {trade['type']}):")
+            print(f"\nTrade {trade['id']} ({trade['status']} - {trade['type']}):")
             
             best_plan_id = find_best_plan_for_trade(trade, available_plans)
             
             if best_plan_id:
                 update_trade_plan_link(cursor, trade['id'], best_plan_id)
-                print(f"  ✅ מקושר לתוכנית {best_plan_id}")
+                print(f"  ✅ Linked to plan {best_plan_id}")
                 fixed_count += 1
             else:
-                print(f"  ❌ לא נמצאה תוכנית מתאימה")
+                print(f"  ❌ No suitable plan found")
         
-        # שמירת שינויים
+        # Save changes
         conn.commit()
-        print(f"\n✅ תוקנו {fixed_count} קישורים")
+        print(f"\n✅ Fixed {fixed_count} links")
         
-        # בדיקת תקינות
+        # Validate integrity
         is_valid = validate_trade_plan_links(cursor)
         
         if is_valid:
-            print("\n🎉 כל הקישורים תקינים!")
+            print("\n🎉 All links are valid!")
         else:
-            print("\n⚠️  יש עדיין בעיות בקישורים")
+            print("\n⚠️  There are still issues with links")
         
         conn.close()
         
     except Exception as e:
-        print(f"❌ שגיאה: {e}")
+        print(f"❌ Error: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

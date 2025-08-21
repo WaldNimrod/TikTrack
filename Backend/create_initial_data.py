@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-יצירת נתוני דמה לבסיס הנתונים - עדכון 21.08.2025
+Creating dummy data for database - Updated 21.08.2025
 
-קובץ זה יוצר בסיס נתונים חדש עם נתוני דמה תואמים למבנה הנוכחי הפעיל:
+This file creates a new database with dummy data compatible with the current active structure:
 
-מבנה הטבלאות (תואם למבנה הקיים):
+Table structure (compatible with current structure):
 - tickers: symbol, name, type, remarks, currency, active_trades
 - accounts: name, currency, status, cash_balance, total_value, total_pl, notes
 - trade_plans: account_id, ticker_id, investment_type, side, status, planned_amount, entry_conditions, stop_price, target_price, reasons
@@ -15,12 +15,12 @@
 - note_relation_types: note_relation_type (account, trade, trade_plan, ticker)
 - executions: trade_id, action, date, quantity, price, fee, source
 
-תכונות מיוחדות:
-- ערכי type בטריידים: swing, investment, passive
-- שדה side: Long/Short בטריידים ותכנונים
-- מערכת שיוך הערות גמישה עם related_type_id
-- קישור חובה בין טריידים לתכנונים
-- תאימות מלאה למבנה הנוכחי של בסיס הנתונים
+Special features:
+- Trade type values: swing, investment, passive
+- Side field: Long/Short in trades and plans
+- Flexible note linking system with related_type_id
+- Mandatory linking between trades and plans
+- Full compatibility with current database structure
 """
 
 import sys
@@ -39,23 +39,23 @@ import random
 # Authentication system removed for simplicity
 
 def create_tickers(db: Session):
-    """יצירת טיקרים - תואם למבנה הנוכחי"""
+    """Create tickers - compatible with current structure"""
     tickers_data = [
-        {"symbol": "AAPL", "name": "Apple Inc.", "type": "stock", "currency": "USD", "remarks": "טכנולוגיה", "active_trades": True},
-        {"symbol": "GOOGL", "name": "Alphabet Inc.", "type": "stock", "currency": "USD", "remarks": "טכנולוגיה", "active_trades": True},
-        {"symbol": "MSFT", "name": "Microsoft Corporation", "type": "stock", "currency": "USD", "remarks": "טכנולוגיה", "active_trades": True},
-        {"symbol": "TSLA", "name": "Tesla Inc.", "type": "stock", "currency": "USD", "remarks": "רכב חשמלי", "active_trades": True},
-        {"symbol": "NVDA", "name": "NVIDIA Corporation", "type": "stock", "currency": "USD", "remarks": "צ'יפים", "active_trades": True},
-        {"symbol": "AMZN", "name": "Amazon.com Inc.", "type": "stock", "currency": "USD", "remarks": "מסחר אלקטרוני", "active_trades": False},
-        {"symbol": "META", "name": "Meta Platforms Inc.", "type": "stock", "currency": "USD", "remarks": "מדיה חברתית", "active_trades": False},
-        {"symbol": "NFLX", "name": "Netflix Inc.", "type": "stock", "currency": "USD", "remarks": "סטרימינג", "active_trades": False},
-        {"symbol": "SPY", "name": "SPDR S&P 500 ETF", "type": "etf", "currency": "USD", "remarks": "ETF מדד S&P 500", "active_trades": True},
-        {"symbol": "QQQ", "name": "Invesco QQQ Trust", "type": "etf", "currency": "USD", "remarks": "ETF טכנולוגיה", "active_trades": False},
-        {"symbol": "VTI", "name": "Vanguard Total Stock Market ETF", "type": "etf", "currency": "USD", "remarks": "ETF שוק כולל", "active_trades": False},
-        {"symbol": "VOO", "name": "Vanguard S&P 500 ETF", "type": "etf", "currency": "USD", "remarks": "ETF S&P 500", "active_trades": False},
-        {"symbol": "ARKK", "name": "ARK Innovation ETF", "type": "etf", "currency": "USD", "remarks": "ETF חדשנות", "active_trades": False},
-        {"symbol": "TQQQ", "name": "ProShares UltraPro QQQ", "type": "etf", "currency": "USD", "remarks": "ETF ממונף טכנולוגיה", "active_trades": False},
-        {"symbol": "SOXL", "name": "Direxion Daily Semiconductor Bull 3X Shares", "type": "etf", "currency": "USD", "remarks": "ETF ממונף צ'יפים", "active_trades": False}
+        {"symbol": "AAPL", "name": "Apple Inc.", "type": "stock", "currency": "USD", "remarks": "Technology", "active_trades": True},
+        {"symbol": "GOOGL", "name": "Alphabet Inc.", "type": "stock", "currency": "USD", "remarks": "Technology", "active_trades": True},
+        {"symbol": "MSFT", "name": "Microsoft Corporation", "type": "stock", "currency": "USD", "remarks": "Technology", "active_trades": True},
+        {"symbol": "TSLA", "name": "Tesla Inc.", "type": "stock", "currency": "USD", "remarks": "Electric vehicles", "active_trades": True},
+        {"symbol": "NVDA", "name": "NVIDIA Corporation", "type": "stock", "currency": "USD", "remarks": "Chips", "active_trades": True},
+        {"symbol": "AMZN", "name": "Amazon.com Inc.", "type": "stock", "currency": "USD", "remarks": "E-commerce", "active_trades": False},
+        {"symbol": "META", "name": "Meta Platforms Inc.", "type": "stock", "currency": "USD", "remarks": "Social media", "active_trades": False},
+        {"symbol": "NFLX", "name": "Netflix Inc.", "type": "stock", "currency": "USD", "remarks": "Streaming", "active_trades": False},
+        {"symbol": "SPY", "name": "SPDR S&P 500 ETF", "type": "etf", "currency": "USD", "remarks": "S&P 500 ETF", "active_trades": True},
+        {"symbol": "QQQ", "name": "Invesco QQQ Trust", "type": "etf", "currency": "USD", "remarks": "Technology ETF", "active_trades": False},
+        {"symbol": "VTI", "name": "Vanguard Total Stock Market ETF", "type": "etf", "currency": "USD", "remarks": "Total market ETF", "active_trades": False},
+        {"symbol": "VOO", "name": "Vanguard S&P 500 ETF", "type": "etf", "currency": "USD", "remarks": "S&P 500 ETF", "active_trades": False},
+        {"symbol": "ARKK", "name": "ARK Innovation ETF", "type": "etf", "currency": "USD", "remarks": "Innovation ETF", "active_trades": False},
+        {"symbol": "TQQQ", "name": "ProShares UltraPro QQQ", "type": "etf", "currency": "USD", "remarks": "Leveraged technology ETF", "active_trades": False},
+        {"symbol": "SOXL", "name": "Direxion Daily Semiconductor Bull 3X Shares", "type": "etf", "currency": "USD", "remarks": "Leveraged semiconductor ETF", "active_trades": False}
     ]
     
     for ticker_data in tickers_data:
@@ -68,17 +68,17 @@ def create_tickers(db: Session):
     print("✅ Tickers created")
 
 def create_accounts(db: Session):
-    """יצירת חשבונות - תואם לכללי הסטטוס"""
+    """Create accounts - compatible with status rules"""
     accounts_data = [
-        {"name": "חשבון ראשי", "currency": "USD", "status": "open", "cash_balance": 50000, "total_value": 75000, "total_pl": 25000, "notes": "החשבון הראשי שלי"},
-        {"name": "חשבון טכנולוגיה", "currency": "USD", "status": "open", "cash_balance": 25000, "total_value": 35000, "total_pl": 10000, "notes": "מתמקד במניות טכנולוגיה"},
-        {"name": "חשבון ETF", "currency": "USD", "status": "closed", "cash_balance": 15000, "total_value": 18000, "total_pl": 3000, "notes": "השקעות ב-ETF"},
-        {"name": "חשבון ניסיוני", "currency": "USD", "status": "cancelled", "cash_balance": 5000, "total_value": 5000, "total_pl": 0, "notes": "חשבון לניסויים"},
-        {"name": "Test Account", "currency": "USD", "status": "open", "cash_balance": 10000, "total_value": 12000, "total_pl": 2000, "notes": "חשבון בדיקה"},
-        {"name": "Test Account for Trade", "currency": "USD", "status": "open", "cash_balance": 8000, "total_value": 9500, "total_pl": 1500, "notes": "חשבון בדיקה לטריידים"}
+        {"name": "Main Account", "currency": "USD", "status": "open", "cash_balance": 50000, "total_value": 75000, "total_pl": 25000, "notes": "My main account"},
+        {"name": "Technology Account", "currency": "USD", "status": "open", "cash_balance": 25000, "total_value": 35000, "total_pl": 10000, "notes": "Focused on technology stocks"},
+        {"name": "ETF Account", "currency": "USD", "status": "closed", "cash_balance": 15000, "total_value": 18000, "total_pl": 3000, "notes": "ETF investments"},
+        {"name": "Experimental Account", "currency": "USD", "status": "cancelled", "cash_balance": 5000, "total_value": 5000, "total_pl": 0, "notes": "Account for experiments"},
+        {"name": "Test Account", "currency": "USD", "status": "open", "cash_balance": 10000, "total_value": 12000, "total_pl": 2000, "notes": "Test account"},
+        {"name": "Test Account for Trade", "currency": "USD", "status": "open", "cash_balance": 8000, "total_value": 9500, "total_pl": 1500, "notes": "Test account for trades"}
     ]
     
-    # בדיקת תקינות סטטוסים
+    # Validate status values
     valid_statuses = ["open", "closed", "cancelled"]
     for account_data in accounts_data:
         if account_data["status"] not in valid_statuses:
@@ -95,7 +95,7 @@ def create_accounts(db: Session):
     print("✅ Accounts created")
 
 def create_trade_plans(db: Session):
-    """יצירת תוכניות טרייד - תואם לכללי הקישור"""
+    """Create trade plans - compatible with linking rules"""
     accounts = db.query(Account).filter(Account.status == "open").all()
     tickers = db.query(Ticker).all()
     
@@ -104,7 +104,7 @@ def create_trade_plans(db: Session):
         return
     
     plans_data = [
-        # תוכנית 1: AAPL - swing
+        # Plan 1: AAPL - swing
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[0].id,  # AAPL
@@ -112,12 +112,12 @@ def create_trade_plans(db: Session):
             "side": "Long",
             "status": "open",
             "planned_amount": 10000,
-            "entry_conditions": "מחיר מתחת ל-150$",
+            "entry_conditions": "Price below $150",
             "stop_price": 140,
             "target_price": 180,
-            "reasons": "חברה חזקה עם מוצרים איכותיים"
+            "reasons": "Strong company with quality products"
         },
-        # תוכנית 2: GOOGL - swing
+        # Plan 2: GOOGL - swing
         {
             "account_id": accounts[1].id,
             "ticker_id": tickers[1].id,  # GOOGL
@@ -125,12 +125,12 @@ def create_trade_plans(db: Session):
             "side": "Long",
             "status": "open",
             "planned_amount": 8000,
-            "entry_conditions": "מחיר מתחת ל-120$",
+            "entry_conditions": "Price below $120",
             "stop_price": 110,
             "target_price": 150,
-            "reasons": "דומיננטיות בחיפוש ופרסום"
+            "reasons": "Dominance in search and advertising"
         },
-        # תוכנית 3: SPY - swing
+        # Plan 3: SPY - swing
         {
             "account_id": accounts[1].id if len(accounts) > 1 else accounts[0].id,
             "ticker_id": tickers[8].id,  # SPY
@@ -138,12 +138,12 @@ def create_trade_plans(db: Session):
             "side": "Long",
             "status": "open",
             "planned_amount": 5000,
-            "entry_conditions": "מחיר מתחת ל-400$",
+            "entry_conditions": "Price below $400",
             "stop_price": 380,
             "target_price": 450,
-            "reasons": "השקעה במדד S&P 500"
+            "reasons": "Investment in S&P 500 index"
         },
-        # תוכנית 4: MSFT - investment
+        # Plan 4: MSFT - investment
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[2].id,  # MSFT
@@ -151,12 +151,12 @@ def create_trade_plans(db: Session):
             "side": "Long",
             "status": "open",
             "planned_amount": 15000,
-            "entry_conditions": "מחיר מתחת ל-350$",
+            "entry_conditions": "Price below $350",
             "stop_price": 320,
             "target_price": 400,
-            "reasons": "חברה דומיננטית ב-Azure ו-Office"
+            "reasons": "Dominant company in Azure and Office"
         },
-        # תוכנית 5: NVDA - swing
+        # Plan 5: NVDA - swing
         {
             "account_id": accounts[1].id if len(accounts) > 1 else accounts[0].id,
             "ticker_id": tickers[4].id,  # NVDA
@@ -164,12 +164,12 @@ def create_trade_plans(db: Session):
             "side": "Long",
             "status": "open",
             "planned_amount": 12000,
-            "entry_conditions": "מחיר מתחת ל-450$",
+            "entry_conditions": "Price below $450",
             "stop_price": 420,
             "target_price": 550,
-            "reasons": "דומיננטיות בצ'יפי AI"
+            "reasons": "Dominance in AI chips"
         },
-        # תוכנית 6: TSLA - passive
+        # Plan 6: TSLA - passive
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[3].id,  # TSLA
@@ -177,31 +177,31 @@ def create_trade_plans(db: Session):
             "side": "Long",
             "status": "open",
             "planned_amount": 8000,
-            "entry_conditions": "מחיר מתחת ל-200$",
+            "entry_conditions": "Price below $200",
             "stop_price": 180,
             "target_price": 250,
-            "reasons": "השקעה ארוכת טווח ברכב חשמלי"
+            "reasons": "Long-term investment in electric vehicles"
         }
     ]
     
-    # בדיקת תקינות תכנונים
+    # Validate plans
     print("🔍 Validating trade plans...")
     valid_investment_types = ["swing", "investment", "passive"]
     valid_sides = ["Long", "Short"]
     valid_statuses = ["open", "closed", "cancelled"]
     
     for i, plan_data in enumerate(plans_data):
-        # בדיקת ערכי investment_type
+        # Validate investment_type values
         if plan_data.get('investment_type') not in valid_investment_types:
             print(f"❌ Plan {i+1}: Invalid investment_type '{plan_data.get('investment_type')}' - using 'swing'")
             plan_data['investment_type'] = 'swing'
         
-        # בדיקת ערכי side
+        # Validate side values
         if plan_data.get('side') not in valid_sides:
             print(f"❌ Plan {i+1}: Invalid side '{plan_data.get('side')}' - using 'Long'")
             plan_data['side'] = 'Long'
         
-        # בדיקת ערכי status
+        # Validate status values
         if plan_data.get('status') not in valid_statuses:
             print(f"❌ Plan {i+1}: Invalid status '{plan_data.get('status')}' - using 'open'")
             plan_data['status'] = 'open'
@@ -214,7 +214,7 @@ def create_trade_plans(db: Session):
     print("✅ Trade plans created with validation")
 
 def create_trades(db: Session):
-    """יצירת טריידים - תואם לכללי הקישור לתוכניות"""
+    """Create trades - compatible with plan linking rules"""
     accounts = db.query(Account).filter(Account.status == "open").all()
     tickers = db.query(Ticker).all()
     plans = db.query(TradePlan).all()
@@ -227,119 +227,119 @@ def create_trades(db: Session):
         print("⚠️ No trade plans found - creating trades without plans (not recommended)")
         return
     
-    # יצירת טריידים תואמים לכללי הקישור
+    # Create trades compatible with linking rules
     trades_data = [
-        # טרייד 1: מקושר לתוכנית AAPL (plan 0)
+        # Trade 1: Linked to AAPL plan (plan 0)
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[0].id,  # AAPL
-            "trade_plan_id": plans[0].id,  # חובה לקשר לתוכנית
+            "trade_plan_id": plans[0].id,  # Must link to plan
             "status": "open",
-            "type": "swing",  # זהה לתוכנית
-            "side": "Long",   # זהה לתוכנית
+            "type": "swing",  # Same as plan
+            "side": "Long",   # Same as plan
             "total_pl": 2500,
-            "notes": "קנייה של Apple"
+            "notes": "Apple purchase"
         },
-        # טרייד 2: מקושר לתוכנית GOOGL (plan 1) - סגור
+        # Trade 2: Linked to GOOGL plan (plan 1) - closed
         {
             "account_id": accounts[1].id if len(accounts) > 1 else accounts[0].id,
             "ticker_id": tickers[1].id,  # GOOGL
-            "trade_plan_id": plans[1].id,  # חובה לקשר לתוכנית
+            "trade_plan_id": plans[1].id,  # Must link to plan
             "status": "closed",
-            "type": "swing",  # זהה לתוכנית
-            "side": "Long",   # זהה לתוכנית
-            "created_at": datetime.now() - timedelta(days=5),  # אחרי יצירת התוכנית
+            "type": "swing",  # Same as plan
+            "side": "Long",   # Same as plan
+            "created_at": datetime.now() - timedelta(days=5),  # After plan creation
             "closed_at": datetime.now() - timedelta(days=2),
             "total_pl": 1500,
-            "notes": "טרייד מוצלח ב-Google"
+            "notes": "Successful Google trade"
         },
-        # טרייד 3: מקושר לתוכנית SPY (plan 2)
+        # Trade 3: Linked to SPY plan (plan 2)
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[8].id,  # SPY
-            "trade_plan_id": plans[2].id,  # חובה לקשר לתוכנית
+            "trade_plan_id": plans[2].id,  # Must link to plan
             "status": "open",
-            "type": "swing",  # זהה לתוכנית
-            "side": "Long",   # זהה לתוכנית
-            "created_at": datetime.now() - timedelta(days=3),  # אחרי יצירת התוכנית
+            "type": "swing",  # Same as plan
+            "side": "Long",   # Same as plan
+            "created_at": datetime.now() - timedelta(days=3),  # After plan creation
             "total_pl": 800,
-            "notes": "השקעה ב-ETF"
+            "notes": "ETF investment"
         },
-        # טרייד 4: מקושר לתוכנית MSFT (plan 3) - investment
+        # Trade 4: Linked to MSFT plan (plan 3) - investment
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[2].id,  # MSFT
-            "trade_plan_id": plans[3].id,  # מקושר לתוכנית MSFT
+            "trade_plan_id": plans[3].id,  # Linked to MSFT plan
             "status": "open",
-            "type": "investment",  # זהה לתוכנית
-            "side": "Long",        # זהה לתוכנית (חובה)
-            "created_at": datetime.now() - timedelta(days=2),  # אחרי יצירת התוכנית
+            "type": "investment",  # Same as plan
+            "side": "Long",        # Same as plan (required)
+            "created_at": datetime.now() - timedelta(days=2),  # After plan creation
             "total_pl": 1200,
-            "notes": "השקעה ארוכת טווח ב-Microsoft"
+            "notes": "Long-term Microsoft investment"
         },
-        # טרייד 5: מקושר לתוכנית NVDA (plan 4) - סגור
+        # Trade 5: Linked to NVDA plan (plan 4) - closed
         {
             "account_id": accounts[1].id if len(accounts) > 1 else accounts[0].id,
             "ticker_id": tickers[4].id,  # NVDA
-            "trade_plan_id": plans[4].id,  # מקושר לתוכנית NVDA
+            "trade_plan_id": plans[4].id,  # Linked to NVDA plan
             "status": "closed",
-            "type": "swing",  # זהה לתוכנית
-            "side": "Long",   # זהה לתוכנית
-            "created_at": datetime.now() - timedelta(days=10),  # אחרי יצירת התוכנית
+            "type": "swing",  # Same as plan
+            "side": "Long",   # Same as plan
+            "created_at": datetime.now() - timedelta(days=10),  # After plan creation
             "closed_at": datetime.now() - timedelta(days=5),
             "total_pl": 3500,
-            "notes": "טרייד מוצלח ב-NVIDIA"
+            "notes": "Successful NVIDIA trade"
         },
-        # טרייד 6: מקושר לתוכנית TSLA (plan 5) - passive
+        # Trade 6: Linked to TSLA plan (plan 5) - passive
         {
             "account_id": accounts[0].id,
             "ticker_id": tickers[3].id,  # TSLA
-            "trade_plan_id": plans[5].id,  # מקושר לתוכנית TSLA
+            "trade_plan_id": plans[5].id,  # Linked to TSLA plan
             "status": "open",
-            "type": "passive",  # זהה לתוכנית
-            "side": "Long",     # זהה לתוכנית (חובה)
-            "created_at": datetime.now() - timedelta(days=1),  # אחרי יצירת התוכנית
+            "type": "passive",  # Same as plan
+            "side": "Long",     # Same as plan (required)
+            "created_at": datetime.now() - timedelta(days=1),  # After plan creation
             "total_pl": -500,
-            "notes": "השקעה פאסיבית ב-Tesla"
+            "notes": "Passive Tesla investment"
         }
     ]
     
-    # בדיקת תקינות כללי הקישור לפני יצירת הטריידים
+    # Validate trade-plan linking rules before creating trades
     print("🔍 Validating trade-plan linking rules...")
     
-    # בדיקת תקינות ערכי type ו-side
+    # Validate type and side values
     valid_types = ["swing", "investment", "passive"]
     valid_sides = ["Long", "Short"]
     valid_statuses = ["open", "closed", "cancelled"]
     
     for i, trade_data in enumerate(trades_data):
-        # בדיקת ערכי type
+        # Validate type values
         if trade_data.get('type') not in valid_types:
             print(f"❌ Trade {i+1}: Invalid type '{trade_data.get('type')}' - using 'swing'")
             trade_data['type'] = 'swing'
         
-        # בדיקת ערכי side
+        # Validate side values
         if trade_data.get('side') not in valid_sides:
             print(f"❌ Trade {i+1}: Invalid side '{trade_data.get('side')}' - using 'Long'")
             trade_data['side'] = 'Long'
         
-        # בדיקת ערכי status
+        # Validate status values
         if trade_data.get('status') not in valid_statuses:
             print(f"❌ Trade {i+1}: Invalid status '{trade_data.get('status')}' - using 'open'")
             trade_data['status'] = 'open'
         
-        # בדיקת קישור לתוכנית
+        # Validate plan link
         if not trade_data.get('trade_plan_id'):
             print(f"❌ Trade {i+1}: Missing trade_plan_id - violating linking rules")
             continue
         
-        # בדיקת תאימות צד
+        # Validate side compatibility
         plan = db.query(TradePlan).filter(TradePlan.id == trade_data['trade_plan_id']).first()
         if plan and trade_data['side'] != plan.side:
             print(f"❌ Trade {i+1}: Side mismatch - trade: {trade_data['side']}, plan: {plan.side}")
             continue
         
-            # בדיקת תאריכים - נדלג על הבדיקה הזו כי התכנונים נוצרים עם תאריך קבוע
+            # Validate dates - skip this check because plans are created with fixed date
     # if trade_data.get('created_at') and plan and plan.created_at:
     #     if trade_data['created_at'] < plan.created_at:
     #         print(f"❌ Trade {i+1}: Created before plan - trade: {trade_data['created_at']}, plan: {plan.created_at}")
@@ -354,16 +354,16 @@ def create_trades(db: Session):
 
 def create_alerts(db: Session):
     """
-    יצירת התראות - תואם למערכת השיוך הגמישה
+    Create alerts - compatible with flexible linking system
     
-    מערכת השיוך:
-    - related_type_id = 1: התראה מקושרת לחשבון
-    - related_type_id = 4: התראה מקושרת לטיקר
+    Linking system:
+    - related_type_id = 1: Alert linked to account
+    - related_type_id = 4: Alert linked to ticker
     
-    התראות יכולות להיות מסוגים שונים:
-    - price_alert: התראת מחיר
-    - stop_loss: עצירת הפסד
-    - volume_alert: התראת נפח
+    Alerts can be of different types:
+    - price_alert: Price alert
+    - stop_loss: Stop loss
+    - volume_alert: Volume alert
     """
     accounts = db.query(Account).filter(Account.status == "open").all()
     tickers = db.query(Ticker).all()
@@ -373,13 +373,13 @@ def create_alerts(db: Session):
         return
     
     alerts_data = [
-        # התראות לחשבונות
+        # Account alerts
         {
             "related_type_id": 1,  # account
             "related_id": accounts[0].id,
             "type": "price_alert",
-            "condition": "מחיר > 160$",
-            "message": "Apple הגיע ליעד המחיר",
+            "condition": "Price > $160",
+            "message": "Apple reached target price",
             "status": "open",
             "is_triggered": "false"
         },
@@ -387,18 +387,18 @@ def create_alerts(db: Session):
             "related_type_id": 1,  # account
             "related_id": accounts[1].id,
             "type": "stop_loss",
-            "condition": "מחיר < 110$",
-            "message": "Google הגיע לעצירת הפסד",
+            "condition": "Price < $110",
+            "message": "Google reached stop loss",
             "status": "open",
             "is_triggered": "false"
         },
-        # התראות לטיקרים
+        # Ticker alerts
         {
             "related_type_id": 4,  # ticker
             "related_id": tickers[0].id,  # AAPL
             "type": "price_alert",
-            "condition": "מחיר > 170$",
-            "message": "Apple הגיע ליעד מחיר חדש",
+            "condition": "Price > $170",
+            "message": "Apple reached new target price",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -406,8 +406,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[1].id,  # GOOGL
             "type": "volume_alert",
-            "condition": "נפח > 50M",
-            "message": "נפח מסחר גבוה ב-Google",
+            "condition": "Volume > 50M",
+            "message": "High trading volume in Google",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -415,8 +415,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[2].id,  # MSFT
             "type": "price_alert",
-            "condition": "מחיר > 400$",
-            "message": "Microsoft הגיע ליעד מחיר",
+            "condition": "Price > $400",
+            "message": "Microsoft reached target price",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -424,8 +424,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[3].id,  # TSLA
             "type": "stop_loss",
-            "condition": "מחיר < 200$",
-            "message": "Tesla הגיע לעצירת הפסד",
+            "condition": "Price < $200",
+            "message": "Tesla reached stop loss",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -433,8 +433,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[4].id,  # NVDA
             "type": "price_alert",
-            "condition": "מחיר > 500$",
-            "message": "NVIDIA הגיע ליעד מחיר",
+            "condition": "Price > $500",
+            "message": "NVIDIA reached target price",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -442,8 +442,8 @@ def create_alerts(db: Session):
             "related_type_id": 1,  # account
             "related_id": accounts[0].id,
             "type": "volume_alert",
-            "condition": "נפח > 100M",
-            "message": "נפח מסחר גבוה ב-SPY",
+            "condition": "Volume > 100M",
+            "message": "High trading volume in SPY",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -451,8 +451,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[5].id,  # AMZN
             "type": "price_alert",
-            "condition": "מחיר > 150$",
-            "message": "Amazon הגיע ליעד מחיר",
+            "condition": "Price > $150",
+            "message": "Amazon reached target price",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -460,8 +460,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[6].id,  # META
             "type": "price_alert",
-            "condition": "מחיר > 300$",
-            "message": "Meta הגיע ליעד מחיר",
+            "condition": "Price > $300",
+            "message": "Meta reached target price",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -469,8 +469,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[7].id,  # NFLX
             "type": "stop_loss",
-            "condition": "מחיר < 400$",
-            "message": "Netflix הגיע לעצירת הפסד",
+            "condition": "Price < $400",
+            "message": "Netflix reached stop loss",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -478,8 +478,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[9].id,  # QQQ
             "type": "price_alert",
-            "condition": "מחיר > 350$",
-            "message": "QQQ הגיע ליעד מחיר",
+            "condition": "Price > $350",
+            "message": "QQQ reached target price",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -487,8 +487,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[10].id,  # VTI
             "type": "price_alert",
-            "condition": "מחיר > 250$",
-            "message": "VTI הגיע ליעד מחיר",
+            "condition": "Price > $250",
+            "message": "VTI reached target price",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -496,8 +496,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[11].id,  # VOO
             "type": "price_alert",
-            "condition": "מחיר > 400$",
-            "message": "VOO הגיע ליעד מחיר",
+            "condition": "Price > $400",
+            "message": "VOO reached target price",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -505,8 +505,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[12].id,  # ARKK
             "type": "stop_loss",
-            "condition": "מחיר < 40$",
-            "message": "ARKK הגיע לעצירת הפסד",
+            "condition": "Price < $40",
+            "message": "ARKK reached stop loss",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -514,8 +514,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[13].id,  # TQQQ
             "type": "price_alert",
-            "condition": "מחיר > 50$",
-            "message": "TQQQ הגיע ליעד מחיר",
+            "condition": "Price > $50",
+            "message": "TQQQ reached target price",
             "status": "closed",
             "is_triggered": "new"
         },
@@ -523,8 +523,8 @@ def create_alerts(db: Session):
             "related_type_id": 4,  # ticker
             "related_id": tickers[14].id,  # SOXL
             "type": "stop_loss",
-            "condition": "מחיר < 15$",
-            "message": "SOXL הגיע לעצירת הפסד",
+            "condition": "Price < $15",
+            "message": "SOXL reached stop loss",
             "status": "closed",
             "is_triggered": "new"
         }
@@ -538,7 +538,7 @@ def create_alerts(db: Session):
     print("✅ Alerts created")
 
 def create_cash_flows(db: Session):
-    """יצירת תזרימי מזומנים"""
+    """Create cash flows"""
     accounts = db.query(Account).filter(Account.status == "open").all()
     
     if not accounts:
@@ -551,49 +551,49 @@ def create_cash_flows(db: Session):
             "type": "deposit",
             "amount": 50000,
             "date": datetime.now() - timedelta(days=60),
-            "description": "הפקדה ראשונית"
+            "description": "Initial deposit"
         },
         {
             "account_id": accounts[0].id,
             "type": "dividend",
             "amount": 500,
             "date": datetime.now() - timedelta(days=15),
-            "description": "דיבידנד מ-Apple"
+            "description": "Dividend from Apple"
         },
         {
             "account_id": accounts[1].id,
             "type": "deposit",
             "amount": 25000,
             "date": datetime.now() - timedelta(days=45),
-            "description": "הפקדה לחשבון טכנולוגיה"
+            "description": "Deposit to technology account"
         },
         {
             "account_id": accounts[0].id,
             "type": "withdrawal",
             "amount": -2000,
             "date": datetime.now() - timedelta(days=20),
-            "description": "משיכה לצרכים אישיים"
+            "description": "Personal withdrawal"
         },
         {
             "account_id": accounts[1].id,
             "type": "dividend",
             "amount": 300,
             "date": datetime.now() - timedelta(days=10),
-            "description": "דיבידנד מ-Microsoft"
+            "description": "Dividend from Microsoft"
         },
         {
             "account_id": accounts[0].id,
             "type": "dividend",
             "amount": 200,
             "date": datetime.now() - timedelta(days=5),
-            "description": "דיבידנד מ-NVIDIA"
+            "description": "Dividend from NVIDIA"
         },
         {
             "account_id": accounts[1].id,
             "type": "deposit",
             "amount": 10000,
             "date": datetime.now() - timedelta(days=30),
-            "description": "הפקדה נוספת לחשבון טכנולוגיה"
+            "description": "Additional deposit to technology account"
         }
     ]
     
@@ -605,7 +605,7 @@ def create_cash_flows(db: Session):
     print("✅ Cash flows created")
 
 def create_note_relation_types(db: Session):
-    """יצירת סוגי שיוך להערות"""
+    """Create note relation types"""
     from models.note_relation_type import NoteRelationType
     
     relation_types = [
@@ -626,15 +626,15 @@ def create_note_relation_types(db: Session):
 
 def create_notes(db: Session):
     """
-    יצירת הערות - תואם למערכת השיוך הגמישה
+    Create notes - compatible with flexible linking system
     
-    מערכת השיוך:
-    - related_type_id = 1: הערה מקושרת לחשבון
-    - related_type_id = 2: הערה מקושרת לטרייד
-    - related_type_id = 3: הערה מקושרת לתכנון טרייד
-    - related_type_id = 4: הערה מקושרת לטיקר
+    Linking system:
+    - related_type_id = 1: Note linked to account
+    - related_type_id = 2: Note linked to trade
+    - related_type_id = 3: Note linked to trade plan
+    - related_type_id = 4: Note linked to ticker
     
-    הערות מקושרות לישויות קיימות בלבד
+    Notes linked to existing entities only
     """
     accounts = db.query(Account).all()
     trades = db.query(Trade).all()
@@ -645,7 +645,7 @@ def create_notes(db: Session):
         print("⚠️ No accounts found for notes")
         return
     
-    # קבלת סוגי השיוך מטבלת note_relation_types
+    # Get relation types from note_relation_types table
     from models.note_relation_type import NoteRelationType
     account_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "account").first()
     trade_type = db.query(NoteRelationType).filter(NoteRelationType.note_relation_type == "trade").first()
@@ -660,55 +660,55 @@ def create_notes(db: Session):
         {
             "related_type_id": account_type.id,
             "related_id": accounts[0].id,
-            "content": "Apple נראית כמו השקעה טובה לטווח ארוך. החברה ממשיכה לחדש ולשמור על דומיננטיות בשוק",
+            "content": "Apple looks like a good long-term investment. The company continues to innovate and maintain market dominance",
             "attachment": None
         },
         {
             "related_type_id": trade_plan_type.id,
             "related_id": plans[0].id if plans else accounts[1].id,
-            "content": "Google עם AI חזק ועתיד מבטיח. כדאי לעקוב אחרי התפתחויות ב-Gemini",
+            "content": "Google with strong AI and promising future. Worth following developments in Gemini",
             "attachment": None
         },
         {
             "related_type_id": account_type.id,
             "related_id": accounts[2].id,
-            "content": "השקעה ב-ETF היא דרך טובה לפיזור סיכונים. כדאי לשקול הוספת ETF נוספים",
+            "content": "ETF investment is a good way to diversify risk. Consider adding more ETFs",
             "attachment": None
         },
         {
             "related_type_id": ticker_type.id,
             "related_id": tickers[0].id,  # AAPL
-            "content": "Apple עם iPhone 15 Pro Max מציגה ביצועים מעולים. החברה ממשיכה לחדש בתחום ה-AI",
+            "content": "Apple with iPhone 15 Pro Max shows excellent performance. Company continues to innovate in AI",
             "attachment": None
         },
         {
             "related_type_id": ticker_type.id,
             "related_id": tickers[1].id,  # GOOGL
-            "content": "Google עם Gemini מתקדם מאוד. החברה מחזקת את הדומיננטיות בחיפוש ו-AI",
+            "content": "Google with advanced Gemini. Company strengthens dominance in search and AI",
             "attachment": None
         },
         {
             "related_type_id": ticker_type.id,
             "related_id": tickers[2].id,  # MSFT
-            "content": "Microsoft עם Azure ו-Office 365 ממשיכים להיות דומיננטיים. החברה משקיעה רבות ב-AI",
+            "content": "Microsoft with Azure and Office 365 continues to be dominant. Company invests heavily in AI",
             "attachment": None
         },
         {
             "related_type_id": ticker_type.id,
             "related_id": tickers[3].id,  # TSLA
-            "content": "Tesla עם Model 3 ו-Model Y ממשיכים למכור טוב. החברה מתקדמת ב-FSD",
+            "content": "Tesla with Model 3 and Model Y continues to sell well. Company advances in FSD",
             "attachment": None
         },
         {
             "related_type_id": ticker_type.id,
             "related_id": tickers[4].id,  # NVDA
-            "content": "NVIDIA עם צ'יפי AI מתקדמים. החברה דומיננטית בתחום ה-GPU",
+            "content": "NVIDIA with advanced AI chips. Company dominant in GPU field",
             "attachment": None
         },
         {
             "related_type_id": ticker_type.id,
             "related_id": tickers[5].id,  # AMZN
-            "content": "Amazon עם AWS ו-e-commerce ממשיכים לגדול. החברה משקיעה ב-AI",
+            "content": "Amazon with AWS and e-commerce continues to grow. Company invests in AI",
             "attachment": None
         }
     ]
@@ -721,7 +721,7 @@ def create_notes(db: Session):
     print("✅ Notes created")
 
 def create_executions(db: Session):
-    """יצירת ביצועים"""
+    """Create executions"""
     trades = db.query(Trade).all()
     
     if not trades:
@@ -811,7 +811,7 @@ def create_executions(db: Session):
     print("✅ Executions created")
 
 def main():
-    """פונקציה ראשית"""
+    """Main function"""
     print("🚀 Starting data creation...")
     print("📋 Creating database with current schema (21.08.2025)")
     print("✅ Compatible with current database structure")
@@ -819,14 +819,14 @@ def main():
     print("✅ Flexible notes system with related_type_id")
     print("✅ Mandatory trade-plan linking")
     
-    # יצירת בסיס הנתונים
+    # Create database
     init_db()
     
-    # יצירת session
+    # Create session
     db = SessionLocal()
     
     try:
-        # יצירת נתונים בסדר הנכון
+        # Create data in correct order
         create_tickers(db)
         create_accounts(db)
         create_trade_plans(db)

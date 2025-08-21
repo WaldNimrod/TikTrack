@@ -9,14 +9,14 @@ from config.database import get_db
 import json
 
 def test_trade_plans_api():
-    """בדיקת trade_plans API endpoint"""
+    """Test trade_plans API endpoint"""
     try:
-        # יצירת Flask app
+        # Create Flask app
         app = Flask(__name__)
         app.register_blueprint(trade_plans_bp)
         
         with app.test_client() as client:
-            # בדיקת trade_plans endpoint
+            # Check trade_plans endpoint
             response = client.get('/api/v1/trade_plans/')
             print(f"✅ Trade Plans Status: {response.status_code}")
             print(f"✅ Trade Plans Response: {response.data.decode()}")

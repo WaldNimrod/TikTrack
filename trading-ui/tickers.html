@@ -370,11 +370,9 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addTickerCurrency" class="form-label">מטבע *</label>
-                    <select class="form-select" id="addTickerCurrency" required>
+                    <select class="form-select" id="addTickerCurrency" name="currency_id" required>
                       <option value="">בחר מטבע...</option>
-                      <option value="ILS">שקל ישראלי (ILS)</option>
-                      <option value="USD">דולר אמריקאי (USD)</option>
-                      <option value="EUR">אירו (EUR)</option>
+                      <!-- האפשרויות יטענו דינמית -->
                     </select>
                     <div class="invalid-feedback" id="addTickerCurrencyError"></div>
                   </div>
@@ -453,11 +451,9 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editTickerCurrency" class="form-label">מטבע *</label>
-                    <select class="form-select" id="editTickerCurrency" required>
+                    <select class="form-select" id="editTickerCurrency" name="currency_id" required>
                       <option value="">בחר מטבע...</option>
-                      <option value="ILS">שקל ישראלי (ILS)</option>
-                      <option value="USD">דולר אמריקאי (USD)</option>
-                      <option value="EUR">אירו (EUR)</option>
+                      <!-- האפשרויות יטענו דינמית -->
                     </select>
                     <div class="invalid-feedback" id="editTickerCurrencyError"></div>
                   </div>

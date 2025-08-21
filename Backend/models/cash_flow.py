@@ -16,7 +16,7 @@ class CashFlow(BaseModel):
     source = Column(String(20), nullable=True, default='manual')  # manual, file_import, direct_import
     external_id = Column(String(100), nullable=True, default='0')
     
-    # יחסים
+    # Relationships
     account = relationship("Account", back_populates="cash_flows")
     currency = relationship("Currency", back_populates="cash_flows")
     
@@ -24,11 +24,11 @@ class CashFlow(BaseModel):
         return f"<CashFlow(id={self.id}, type='{self.type}', amount={self.amount})>"
     
     def to_dict(self) -> Dict[str, Any]:
-        """המרה למילון"""
+        """Convert to dictionary"""
         result: Dict[str, Any] = {}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
-            if hasattr(value, 'strftime'):  # אם זה תאריך
+            if hasattr(value, 'strftime'):  # If it's a date
                 result[c.name] = value.strftime('%Y-%m-%d') if value else None
             else:
                 result[c.name] = value

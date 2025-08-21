@@ -31,7 +31,7 @@ def analyze_suggestions(text):
     if not text:
         return
     
-    print("📋 **ניתוח הצעות לשיפור הארכיטקטורה**")
+    print("📋 **Architecture Improvement Suggestions Analysis**")
     print("=" * 60)
     print()
     
@@ -53,7 +53,7 @@ def analyze_suggestions(text):
         suggestions.append(current_suggestion)
     
     # Create analysis table
-    print("| מס' | הצעה | המלצה | נימוק |")
+    print("| # | Suggestion | Recommendation | Reason |")
     print("|-----|------|-------|-------|")
     
     for i, suggestion in enumerate(suggestions, 1):
@@ -65,10 +65,10 @@ def analyze_suggestions(text):
         print(f"| {i} | {suggestion[:50]}... | {recommendation} | {reason} |")
     
     print()
-    print("**סיכום המלצות:**")
-    print("- 🟢 לממש עכשיו: הצעות קריטיות לשיפור")
-    print("- 🟡 לממש בשלב הבא: הצעות חשובות אך לא דחופות")
-    print("- 🔴 לא לממש: הצעות לא רלוונטיות או מורכבות מדי")
+    print("**Recommendation Summary:**")
+    print("- 🟢 Implement now: Critical improvement suggestions")
+    print("- 🟡 Implement next: Important but not urgent suggestions")
+    print("- 🔴 Don't implement: Irrelevant or overly complex suggestions")
 
 def analyze_single_suggestion(suggestion):
     """Analyze a single suggestion and return recommendation"""
@@ -82,22 +82,22 @@ def analyze_single_suggestion(suggestion):
     
     # Check for critical issues
     if any(keyword in suggestion_lower for keyword in critical_keywords):
-        return "🟢 לממש עכשיו", "בעיה קריטית לביצועים/אבטחה"
+        return "🟢 Implement now", "Critical performance/security issue"
     
     # Check for important improvements
     if any(keyword in suggestion_lower for keyword in important_keywords):
-        return "🟡 לממש בשלב הבא", "שיפור חשוב לאיכות הקוד"
+        return "🟡 Implement next", "Important code quality improvement"
     
     # Check for complex solutions
     if any(keyword in suggestion_lower for keyword in complex_keywords):
-        return "🔴 לא לממש", "מורכב מדי למערכת קטנה"
+        return "🔴 Don't implement", "Too complex for small system"
     
     # Check for nice-to-have features
     if any(keyword in suggestion_lower for keyword in nice_to_have):
-        return "🟡 לממש בשלב הבא", "שיפור UX אך לא קריטי"
+        return "🟡 Implement next", "UX improvement but not critical"
     
     # Default recommendation
-    return "🟡 לממש בשלב הבא", "שיפור כללי"
+    return "🟡 Implement next", "General improvement"
 
 if __name__ == "__main__":
     text = read_pdf_suggestions()

@@ -56,7 +56,13 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
         'name': fields.String(example='Apple Inc.'),
         'type': fields.String(example='stock'),
         'remarks': fields.String(example='Technology company'),
-        'currency': fields.String(example='USD'),
+        'currency_id': fields.Integer(example=1),
+        'currency': fields.Nested(api.model('Currency', {
+            'id': fields.Integer(example=1),
+            'symbol': fields.String(example='USD'),
+            'name': fields.String(example='US Dollar'),
+            'usd_rate': fields.Float(example=1.0)
+        })),
         'active_trades': fields.Boolean(example=False),
         'created_at': fields.String(example='2025-01-15T10:30:00Z')
     })
@@ -66,14 +72,35 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
         'name': fields.String(example='Apple Inc.'),
         'type': fields.String(example='stock'),
         'remarks': fields.String(example='Technology company'),
-        'currency': fields.String(example='USD')
+        'currency_id': fields.Integer(required=True, example=1)
+    })
+    
+    # Currency models
+    currency_model = api.model('Currency', {
+        'id': fields.Integer(example=1),
+        'symbol': fields.String(required=True, example='USD'),
+        'name': fields.String(required=True, example='US Dollar'),
+        'usd_rate': fields.Float(required=True, example=1.0),
+        'created_at': fields.String(example='2025-01-15T10:30:00Z')
+    })
+    
+    currency_create = api.model('CurrencyCreate', {
+        'symbol': fields.String(required=True, example='USD'),
+        'name': fields.String(required=True, example='US Dollar'),
+        'usd_rate': fields.Float(required=True, example=1.0)
     })
     
     # Account models
     account_model = api.model('Account', {
         'id': fields.Integer(example=1),
         'name': fields.String(required=True, example='Main Account'),
-        'currency': fields.String(example='USD'),
+        'currency_id': fields.Integer(example=1),
+        'currency': fields.Nested(api.model('Currency', {
+            'id': fields.Integer(example=1),
+            'symbol': fields.String(example='USD'),
+            'name': fields.String(example='US Dollar'),
+            'usd_rate': fields.Float(example=1.0)
+        })),
         'status': fields.String(example='open'),
         'cash_balance': fields.Float(example=10000.0),
         'total_value': fields.Float(example=15000.0),
@@ -84,7 +111,7 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
     
     account_create = api.model('AccountCreate', {
         'name': fields.String(required=True, example='Main Account'),
-        'currency': fields.String(example='USD'),
+        'currency_id': fields.Integer(required=True, example=1),
         'status': fields.String(example='open'),
         'cash_balance': fields.Float(example=10000.0),
         'notes': fields.String(example='Primary trading account')
@@ -119,6 +146,8 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
         'error_response': error_response,
         'login_request': login_request,
         'login_response': login_response,
+        'currency_model': currency_model,
+        'currency_create': currency_create,
         'ticker_model': ticker_model,
         'ticker_create': ticker_create,
         'account_model': account_model,

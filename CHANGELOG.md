@@ -1,5 +1,46 @@
 # Changelog - TikTrack
 
+## [2.4] - 2025-08-21
+
+### 🏦 **מערכת מטבעות מרכזית**
+- **טבלת מטבעות נפרדת:** יצירת טבלה מרכזית למטבעות עם נרמול נתונים
+- **API מלא למטבעות:** CRUD operations עם endpoints מלאים
+- **מיגרציה של נתונים:** עדכון טבלאות `accounts` ו-`tickers` לעבוד עם `currency_id`
+- **תמיכה במטבעות מרובים:** USD, EUR, ILS עם אפשרות להוספת מטבעות חדשים
+- **שערי מטבע דינמיים:** עדכון שערים במקום אחד
+
+### 🔧 **שינויים טכניים**
+- **מודל Currency חדש:** `Backend/models/currency.py` עם שדות symbol, name, usd_rate
+- **CurrencyService:** שירות חדש לניהול מטבעות עם ולידציה מלאה
+- **API Routes:** endpoints חדשים למטבעות ב-`Backend/routes/api/currencies.py`
+- **מיגרציה:** קבצי מיגרציה ליצירת טבלה ועדכון נתונים קיימים
+- **Frontend Updates:** עדכון דפי חשבונות וטיקרים לעבוד עם מערכת מטבעות חדשה
+
+### 📁 **קבצים חדשים**
+- `Backend/models/currency.py` - מודל מטבעות
+- `Backend/services/currency_service.py` - שירות מטבעות
+- `Backend/routes/api/currencies.py` - API מטבעות
+- `Backend/migrations/create_currencies_table.py` - יצירת טבלת מטבעות
+- `Backend/migrations/update_accounts_currency.py` - מיגרציה חשבונות
+- `Backend/migrations/update_tickers_currency.py` - מיגרציה טיקרים
+- `add_currencies.py` - הוספת מטבעות ראשוניים
+- `CURRENCY_MIGRATION_DOCUMENTATION.md` - תיעוד מפורט
+
+### 📝 **תיעוד**
+- **תיעוד מיגרציה:** `CURRENCY_MIGRATION_DOCUMENTATION.md` עם הוראות מפורטות
+- **עדכון Database Changes:** הוספת סעיף מיגרציה ל-`DATABASE_CHANGES_AUGUST_2025.md`
+- **עדכון README:** תיעוד המערכת החדשה ב-README הראשי
+- **API Documentation:** עדכון Swagger models למטבעות
+
+### 🎯 **יתרונות המערכת החדשה**
+- **נרמול נתונים:** מבנה נתונים תקין עם טבלה נפרדת למטבעות
+- **גמישות:** קל להוסיף מטבעות חדשים ולעדכן שערים
+- **עקביות:** כל הטבלאות משתמשות באותה מערכת מטבעות
+- **תחזוקה:** עדכון שער מטבע במקום אחד
+- **תאימות לאחור:** המערכת ממשיכה לעבוד עם נתונים קיימים
+
+---
+
 ## [2.3] - 2025-08-18
 
 ### 🏗️ **שינויים ארכיטקטוניים**

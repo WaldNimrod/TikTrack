@@ -322,6 +322,11 @@ function updateAlertsTable(alerts) {
             <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">
               ✏️
             </button>
+            ${alert.status === 'open' ? `
+            <button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id})" title="בטל">
+              ⏹️
+            </button>
+            ` : ''}
             <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">
               🗑️
             </button>

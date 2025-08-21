@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 """
-סקריפט להוספת שדות חדשים לטבלת cash_flows
+Script to add new fields to the cash_flows table
 """
 
 import sqlite3
 import os
 
-# נתיב לבסיס הנתונים
+# Database path
 DB_PATH = "Backend/db/simpleTrade_new.db"
 
 def update_cash_flows_table():
-    """הוספת שדות חדשים לטבלת cash_flows"""
+    """Add new fields to the cash_flows table"""
     
     if not os.path.exists(DB_PATH):
-        print(f"❌ בסיס הנתונים לא נמצא: {DB_PATH}")
+        print(f"❌ Database not found: {DB_PATH}")
         return
     
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
     try:
-        print("🔄 מוסיף שדות חדשים לטבלת cash_flows...")
+        print("🔄 Adding new fields to cash_flows table...")
         
-        # הוספת השדות החדשים
+        # Add new fields
         alter_queries = [
             "ALTER TABLE cash_flows ADD COLUMN currency_id INTEGER REFERENCES currencies(id)",
             "ALTER TABLE cash_flows ADD COLUMN usd_rate DECIMAL(10,6) DEFAULT 1.000000",
@@ -33,28 +33,28 @@ def update_cash_flows_table():
         for query in alter_queries:
             try:
                 cursor.execute(query)
-                print(f"✅ הוספת שדה: {query}")
+                print(f"✅ Added field: {query}")
             except sqlite3.OperationalError as e:
                 if "duplicate column name" in str(e):
-                    print(f"⚠️  השדה כבר קיים: {query}")
+                    print(f"⚠️  Field already exists: {query}")
                 else:
-                    print(f"❌ שגיאה בהוספת שדה: {e}")
+                    print(f"❌ Error adding field: {e}")
         
         conn.commit()
-        print("✅ השדות נוספו בהצלחה")
+        print("✅ Fields added successfully")
         
-        # הצגת המבנה החדש
+        # Display new structure
         cursor.execute("PRAGMA table_info(cash_flows)")
         columns = cursor.fetchall()
         
-        print("\n📊 מבנה טבלת cash_flows החדש:")
+        print("\n📊 New cash_flows table structure:")
         for col in columns:
             print(f"  {col[1]} ({col[2]}) - {col[3]}")
         
-        # עדכון רשומות קיימות עם ערכים ברירת מחדל
-        print("\n🔄 מעדכן רשומות קיימות...")
+        # Update existing records with default values
+        print("\n🔄 Updating existing records...")
         
-        # קבלת מזהה המטבע ברירת המחדל (USD)
+        # Get default currency ID (USD)
         cursor.execute("SELECT id FROM currencies WHERE symbol = 'USD' LIMIT 1")
         usd_currency = cursor.fetchone()
         
@@ -65,19 +65,19 @@ def update_cash_flows_table():
                 SET currency_id = ?, usd_rate = 1.000000, source = 'manual', external_id = '0'
                 WHERE currency_id IS NULL
             """, (usd_id,))
-            print(f"✅ עודכנו {cursor.rowcount} רשומות עם ערכי ברירת מחדל")
+            print(f"✅ Updated {cursor.rowcount} records with default values")
         else:
-            print("⚠️  לא נמצא מטבע USD, יש ליצור אותו תחילה")
+            print("⚠️  USD currency not found, please create it first")
         
         conn.commit()
         
     except Exception as e:
-        print(f"❌ שגיאה בעדכון הטבלה: {e}")
+        print(f"❌ Error updating table: {e}")
         conn.rollback()
     finally:
         conn.close()
 
 if __name__ == "__main__":
-    print("🔄 עדכון טבלת cash_flows...")
+    print("🔄 Updating cash_flows table...")
     update_cash_flows_table()
-    print("✅ הסתיים")
+    print("✅ Completed")

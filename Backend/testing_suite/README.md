@@ -1,84 +1,84 @@
-# TikTrack Testing Suite - מערכת הבדיקות של TikTrack
+# TikTrack Testing Suite - TikTrack Testing System
 
-## ⚠️ **חשוב: זהו קובץ מערכת הבדיקות בלבד!**
+## ⚠️ **Important: This is a testing system file only!**
 
-**אין קשר לקונפיגורציות השרת או סביבת הפיתוח!**
+**No connection to server configurations or development environment!**
 
-- **מערכת הבדיקות**: תיקייה זו מכילה את כל הבדיקות של TikTrack
-- **קונפיגורציות השרת**: נמצאות ב-`Backend/SERVER_CONFIGURATIONS.md`
-- **סביבת הפיתוח**: מוגדרת ב-`Backend/` עם קבצי `run_*.py`
+- **Testing System**: This directory contains all TikTrack tests
+- **Server Configurations**: Located in `Backend/SERVER_CONFIGURATIONS.md`
+- **Development Environment**: Defined in `Backend/` with `run_*.py` files
 
-## 🎯 **מטרת מערכת הבדיקות:**
-- בדיקת תקינות הקוד והפונקציונליות
-- איתור באגים לפני שחרור
-- וידוא יציבות המערכת
-- בדיקת אבטחה וביצועים
+## 🎯 **Testing System Purpose:**
+- Testing code integrity and functionality
+- Bug detection before release
+- Ensuring system stability
+- Security and performance testing
 
-## 🚫 **מה לא נמצא כאן:**
-- ❌ קונפיגורציות שרת
-- ❌ הגדרות סביבת פיתוח
-- ❌ סקריפטי הפעלת שרת
-- ❌ הגדרות פרודקשן
+## 🚫 **What's Not Here:**
+- ❌ Server configurations
+- ❌ Development environment settings
+- ❌ Server startup scripts
+- ❌ Production settings
 
-## 📁 **מבנה התיקיות**
+## 📁 **Directory Structure**
 
 ```
 testing_suite/
-├── unit_tests/           # בדיקות יחידה למודלים ושירותים
-├── integration_tests/    # בדיקות אינטגרציה ל-API
-├── e2e_tests/           # בדיקות end-to-end
-├── performance_tests/   # בדיקות ביצועים
-├── load_tests/          # בדיקות עומס
-├── security_tests/      # בדיקות אבטחה
-├── documentation/       # תיעוד הבדיקות
-├── logs/               # לוגים של הבדיקות
-├── reports/            # דוחות כיסוי ותוצאות
-├── configs/            # קבצי הגדרות לבדיקות
-├── conftest.py         # הגדרות pytest
-└── README.md           # קובץ זה
+├── unit_tests/           # Unit tests for models and services
+├── integration_tests/    # Integration tests for API
+├── e2e_tests/           # End-to-end tests
+├── performance_tests/   # Performance tests
+├── load_tests/          # Load tests
+├── security_tests/      # Security tests
+├── documentation/       # Test documentation
+├── logs/               # Test logs
+├── reports/            # Coverage and results reports
+├── configs/            # Test configuration files
+├── conftest.py         # Pytest configuration
+└── README.md           # This file
 ```
 
-## סוגי הבדיקות
+## Test Types
 
-### Unit Tests (בדיקות יחידה)
-- **מטרה**: בדיקת פונקציונליות של רכיבים בודדים
-- **מיקום**: `unit_tests/`
-- **דוגמאות**: בדיקות מודלים, שירותים, utilities
+### Unit Tests
+- **Purpose**: Testing functionality of individual components
+- **Location**: `unit_tests/`
+- **Examples**: Model tests, service tests, utilities
 
-### Integration Tests (בדיקות אינטגרציה)
-- **מטרה**: בדיקת אינטראקציה בין רכיבים
-- **מיקום**: `integration_tests/`
-- **דוגמאות**: בדיקות API endpoints, חיבור לבסיס נתונים
+### Integration Tests
+- **Purpose**: Testing interaction between components
+- **Location**: `integration_tests/`
+- **Examples**: API endpoint tests, database connection tests
 
-### End-to-End Tests (בדיקות E2E)
-- **מטרה**: בדיקת זרימות עבודה מלאות
-- **מיקום**: `e2e_tests/`
-- **דוגמאות**: בדיקות UI, workflows של משתמשים
+### End-to-End Tests (E2E)
+- **Purpose**: Testing complete workflows
+- **Location**: `e2e_tests/`
+- **Examples**: UI tests, user workflows
 
-### Performance Tests (בדיקות ביצועים)
-- **מטרה**: בדיקת זמני תגובה ויעילות
-- **מיקום**: `performance_tests/`
-- **דוגמאות**: בדיקות זמני תגובה, ניצול משאבים
+### Performance Tests
+- **Purpose**: Testing response times and efficiency
+- **Location**: `performance_tests/`
+- **Examples**: Response time tests, resource utilization
 
-### Load Tests (בדיקות עומס)
-- **מטרה**: בדיקת התנהגות תחת עומס
-- **מיקום**: `load_tests/`
-- **דוגמאות**: בדיקות עם משתמשים מרובים, עומס נתונים
+### Load Tests
+- **Purpose**: Testing behavior under load
+- **Location**: `load_tests/`
+- **Examples**: Multi-user tests, data load tests
 
-### Security Tests (בדיקות אבטחה)
-- **מטרה**: בדיקת אבטחה ופגיעויות
-- **מיקום**: `security_tests/`
-- **דוגמאות**: בדיקות SQL injection, XSS, authentication
+### Security Tests
+- **Purpose**: Testing security and vulnerabilities
+- **Location**: `security_tests/`
+- **Examples**: SQL injection tests, XSS tests, authentication tests
 
-## הרצת הבדיקות
+## Running Tests
 
-### הרצת כל הבדיקות
+### Run All Tests
 ```bash
 cd testing_suite
 python3 -m pytest -v
 ```
 
-### הרצת סוג בדיקה ספציפי
+### Run Specific Test Type
 ```bash
 # Unit tests
 python3 -m pytest unit_tests/ -v

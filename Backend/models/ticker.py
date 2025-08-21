@@ -5,33 +5,33 @@ from typing import Dict, Any, Optional, List
 
 class Ticker(BaseModel):
     """
-    מודל טיקר - מייצג מניה, ETF, מטבע קריפטו או כל נכס פיננסי אחר
+    Ticker model - represents a stock, ETF, cryptocurrency or any other financial asset
     
     Attributes:
-        symbol (str): סימבול הטיקר - חייב להיות ייחודי, מקסימום 10 תווים
-        name (str): שם החברה או הנכס - מקסימום 100 תווים
-        type (str): סוג הנכס - stock, etf, crypto, forex, commodity
-        remarks (str): הערות נוספות - מקסימום 500 תווים
-        currency_id (int): מזהה המטבע מטבלת המטבעות
-        active_trades (bool): האם יש טריידים פעילים בנכס זה
+        symbol (str): Ticker symbol - must be unique, maximum 10 characters
+        name (str): Company or asset name - maximum 100 characters
+        type (str): Asset type - stock, etf, crypto, forex, commodity
+        remarks (str): Additional notes - maximum 500 characters
+        currency_id (int): Currency ID from currencies table
+        active_trades (bool): Whether there are active trades for this asset
         
     Relationships:
-        trades: רשימת הטריידים המקושרים לטיקר זה
-        trade_plans: רשימת תכנוני הטרייד המקושרים לטיקר זה
+        trades: List of trades linked to this ticker
+        trade_plans: List of trade plans linked to this ticker
         
     Constraints:
-        - symbol חייב להיות ייחודי במערכת
-        - symbol לא יכול להיות ריק
-        - symbol מוגבל ל-10 תווים
-        - currency_id חייב להתייחס למטבע קיים בטבלת המטבעות
+        - symbol must be unique in the system
+        - symbol cannot be empty
+        - symbol limited to 10 characters
+        - currency_id must reference existing currency in currencies table
         
     Example:
         >>> ticker = Ticker(
         ...     symbol="AAPL",
         ...     name="Apple Inc.",
         ...     type="stock",
-        ...     currency_id=1,  # מזהה USD בטבלת המטבעות
-        ...     remarks="חברת טכנולוגיה אמריקאית"
+        ...     currency_id=1,  # USD ID in currencies table
+        ...     remarks="American technology company"
         ... )
     """
     __tablename__ = "tickers"
@@ -39,17 +39,17 @@ class Ticker(BaseModel):
     
     # Primary fields
     symbol = Column(String(10), unique=True, nullable=False, index=True, 
-                   comment="סימבול הטיקר - חייב להיות ייחודי")
+                   comment="Ticker symbol - must be unique")
     name = Column(String(100), nullable=True, 
-                 comment="שם החברה או הנכס")
+                 comment="Company or asset name")
     type = Column(String(20), nullable=True, 
-                 comment="סוג הנכס: stock, etf, crypto, forex, commodity")
+                 comment="Asset type: stock, etf, crypto, forex, commodity")
     remarks = Column(String(500), nullable=True, 
-                    comment="הערות נוספות על הטיקר")
+                    comment="Additional notes about the ticker")
     currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False,
-                        comment="מזהה המטבע מטבלת המטבעות")
+                        comment="Currency ID from currencies table")
     active_trades = Column(Boolean, default=False, nullable=True, 
-                          comment="האם יש טריידים פעילים")
+                          comment="Whether there are active trades")
     
     # Relationships
     # Each ticker belongs to one currency
@@ -61,15 +61,15 @@ class Ticker(BaseModel):
                               cascade="all, delete-orphan")
     
     def __repr__(self) -> str:
-        """ייצוג מחרוזת של הטיקר"""
+        """String representation of the ticker"""
         return f"<Ticker(symbol='{self.symbol}', name='{self.name}', type='{self.type}')>"
     
     def to_dict(self) -> Dict[str, Any]:
         """
-        המרת הטיקר למילון JSON
+        Convert ticker to JSON dictionary
         
         Returns:
-            Dict[str, Any]: מילון עם כל שדות הטיקר
+            Dict[str, Any]: Dictionary with all ticker fields
             
         Example:
             >>> ticker = Ticker(symbol="AAPL", name="Apple Inc.")
@@ -79,7 +79,7 @@ class Ticker(BaseModel):
         result: Dict[str, Any] = {}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
-            if hasattr(value, 'strftime'):  # אם זה תאריך
+            if hasattr(value, 'strftime'):  # If it's a date
                 result[c.name] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
             else:
                 result[c.name] = value
@@ -88,10 +88,10 @@ class Ticker(BaseModel):
     @property
     def display_name(self) -> str:
         """
-        שם תצוגה של הטיקר - שילוב של סימבול ושם
+        Display name of the ticker - combination of symbol and name
         
         Returns:
-            str: שם תצוגה בפורמט "SYMBOL - Name"
+            str: Display name in format "SYMBOL - Name"
             
         Example:
             >>> ticker = Ticker(symbol="AAPL", name="Apple Inc.")
@@ -104,19 +104,19 @@ class Ticker(BaseModel):
     
     def is_active(self) -> bool:
         """
-        בדיקה האם הטיקר פעיל (יש לו טריידים או תכנונים פתוחים)
+        Check if the ticker is active (has trades or open plans)
         
         Returns:
-            bool: True אם הטיקר פעיל, False אחרת
+            bool: True if ticker is active, False otherwise
         """
         return self.active_trades or len(self.trades) > 0 or len(self.trade_plans) > 0
     
     def get_linked_items_count(self) -> Dict[str, int]:
         """
-        ספירת פריטים מקושרים לטיקר
+        Count linked items to ticker
         
         Returns:
-            Dict[str, int]: מילון עם מספר הפריטים המקושרים
+            Dict[str, int]: Dictionary with count of linked items
             
         Example:
             >>> ticker.get_linked_items_count()
@@ -125,6 +125,6 @@ class Ticker(BaseModel):
         return {
             'trades': len(self.trades),
             'trade_plans': len(self.trade_plans),
-            'notes': 0,  # יטען בנפרד אם נדרש
-            'alerts': 0   # יטען בנפרד אם נדרש
+            'notes': 0,  # Will be loaded separately if needed
+            'alerts': 0   # Will be loaded separately if needed
         }

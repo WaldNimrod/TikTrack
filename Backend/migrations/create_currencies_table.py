@@ -25,13 +25,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from config.settings import DATABASE_URL
 
 def create_currencies_table():
-    """יצירת טבלת המטבעות"""
+    """Create currencies table"""
     
     try:
-        # יצירת חיבור לבסיס הנתונים
+        # Create database connection
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
-        # SQL ליצירת הטבלה
+        # SQL to create the table
         create_table_sql = """
         CREATE TABLE IF NOT EXISTS currencies (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,51 +42,51 @@ def create_currencies_table():
         );
         """
         
-        # יצירת אינדקס על הסמל
+        # Create index on symbol
         create_index_sql = """
         CREATE INDEX IF NOT EXISTS idx_currencies_symbol ON currencies(symbol);
         """
         
-        # ביצוע ה-migration
+        # Execute migration
         with engine.connect() as connection:
-            # יצירת הטבלה
+            # Create table
             connection.execute(text(create_table_sql))
             connection.commit()
-            print("✓ טבלת currencies נוצרה בהצלחה")
+            print("✓ Currencies table created successfully")
             
-            # יצירת האינדקס
+            # Create index
             connection.execute(text(create_index_sql))
             connection.commit()
-            print("✓ אינדקס על שדה symbol נוצר בהצלחה")
+            print("✓ Index on symbol field created successfully")
             
-            # בדיקה שהטבלה נוצרה
+            # Verify table was created
             result = connection.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='currencies'"))
             if result.fetchone():
-                print("✓ הטבלה קיימת ומזוהה במערכת")
+                print("✓ Table exists and recognized by system")
             else:
-                print("✗ שגיאה: הטבלה לא נוצרה כראוי")
+                print("✗ Error: Table was not created properly")
                 return False
         
-        print("\n🎉 Migration הושלם בהצלחה!")
-        print("📋 השלב הבא: הרצת הסקריפט add_currencies.py להוספת המטבעות הראשוניים")
+        print("\n🎉 Migration completed successfully!")
+        print("📋 Next step: Run add_currencies.py script to add initial currencies")
         return True
         
     except Exception as e:
-        print(f"✗ שגיאה ביצירת הטבלה: {e}")
+        print(f"✗ Error creating table: {e}")
         return False
 
 def verify_table_structure():
-    """בדיקת מבנה הטבלה שנוצרה"""
+    """Verify the structure of the created table"""
     
     try:
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
         with engine.connect() as connection:
-            # בדיקת מבנה הטבלה
+            # Check table structure
             result = connection.execute(text("PRAGMA table_info(currencies)"))
             columns = result.fetchall()
             
-            print("\n📋 מבנה טבלת currencies:")
+            print("\n📋 Currencies table structure:")
             print("=" * 50)
             
             expected_columns = {

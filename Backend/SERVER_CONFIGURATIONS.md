@@ -31,12 +31,12 @@
 
 | צורך | קובץ מומלץ | סקריפט מומלץ |
 |------|-------------|---------------|
-| פיתוח יומיומי | `run_flask_simple.py` | `./start_dev.sh` |
+| פיתוח יומיומי | `dev_server.py` | `./start_dev.sh` |
 | הפעלה ישירה | `app.py` | ישירות |
 
 ## קבצים זמינים:
 
-### ✅ **run_flask_simple.py** - השרת הפשוט (מומלץ לפיתוח)
+### ✅ **dev_server.py** - השרת הפשוט (מומלץ לפיתוח)
 - Flask development server עם הגדרות יציבות
 - `debug=True`, `use_reloader=False` - יציבות משופרת
 - `host='127.0.0.1'`, `port=8080` - הגדרות ברורות
@@ -47,7 +47,7 @@
 **הפעלה:**
 ```bash
 cd Backend
-python3 run_flask_simple.py
+python3 dev_server.py
 ```
 
 ### ✅ **app.py** - השרת הראשי (הפעלה ישירה)
@@ -68,7 +68,7 @@ python3 app.py
 ```bash
 ./start_dev.sh
 ```
-- מפעיל את `run_flask_simple.py`
+- מפעיל את `dev_server.py`
 - מתאים לפיתוח יומיומי
 - יציב ומהיר
 

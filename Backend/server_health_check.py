@@ -101,24 +101,24 @@ def find_running_server() -> Optional[Tuple[str, int]]:
     
     for host in hosts:
         if check_port_open(host, target_port):
-            print(f"🔍 נמצא שירות TikTrack על {host}:{target_port}")
+            print(f"🔍 Found TikTrack service on {host}:{target_port}")
             return host, target_port
     
     return None
 
 def check_server_health() -> dict:
     """
-    בדיקה מלאה של בריאות השרת - מותאמת ל-TikTrack
+    Complete server health check - adapted for TikTrack
     
     Returns:
-        dict: מידע מפורט על בריאות השרת כולל:
-            - running (bool): האם השרת רץ
-            - host (str): כתובת השרת
-            - port (int): פורט השרת
-            - response_time (float): זמן תגובה
-            - status (str): סטטוס השרת
-            - server_type (str): סוג השרת
-            - error (str): הודעת שגיאה אם יש
+        dict: Detailed server health information including:
+            - running (bool): Whether the server is running
+            - host (str): Server address
+            - port (int): Server port
+            - response_time (float): Response time
+            - status (str): Server status
+            - server_type (str): Server type
+            - error (str): Error message if any
     """
     result = {
         "running": False,
@@ -130,23 +130,23 @@ def check_server_health() -> dict:
         "server_type": None
     }
     
-    # מצא שרת רץ
+    # Find running server
     server_info = find_running_server()
     if not server_info:
-        result["error"] = "לא נמצא שרת TikTrack רץ על פורט 8080"
+        result["error"] = "No running TikTrack server found on port 8080"
         return result
     
     host, port = server_info
     result["host"] = host
     result["port"] = port
     
-    # בדוק תגובה מהשרת
+    # Check server response
     start_time = time.time()
     url = f"http://{host}:{port}"
     
-    # נסה endpoints של TikTrack
+    # Try TikTrack endpoints
     endpoints = [
-        "/api/health",  # endpoint בריאות ראשי
+        "/api/health",  # main health endpoint
         "/api/v1/health",
         "/health",
         "/"  # fallback
@@ -162,7 +162,7 @@ def check_server_health() -> dict:
             result["endpoint"] = endpoint
             result["response_preview"] = response
             
-            # זיהוי סוג השרת
+            # Identify server type
             if "database" in response and "connected" in response:
                 result["server_type"] = "TikTrack API Server"
             else:
@@ -170,16 +170,16 @@ def check_server_health() -> dict:
             break
     
     if not result["running"]:
-        result["error"] = f"השרת על {host}:{port} לא מגיב"
+        result["error"] = f"Server on {host}:{port} is not responding"
     
     return result
 
 def get_process_info() -> list:
     """
-    מחזיר מידע על תהליכי Python רצים - מותאם ל-TikTrack
+    Returns information about running Python processes - adapted for TikTrack
     
     Returns:
-        Tuple[list, list]: (תהליכי TikTrack, תהליכי Python אחרים)
+        Tuple[list, list]: (TikTrack processes, other Python processes)
     """
     try:
         result = subprocess.run(
@@ -201,16 +201,16 @@ def get_process_info() -> list:
         
         return tiktrack_processes, processes
     except Exception as e:
-        return [], [f"שגיאה בקבלת מידע על תהליכים: {e}"]
+        return [], [f"Error getting process information: {e}"]
 
 def check_monitoring_system() -> dict:
     """
-    בודק את מערכת המוניטורינג
+    Checks the monitoring system
     
     Returns:
-        dict: מידע על מערכת המוניטורינג:
-            - monitor_process_running (bool): האם תהליך מוניטורינג רץ
-            - log_files_exist (bool): האם קבצי לוג קיימים
+        dict: Information about the monitoring system:
+            - monitor_process_running (bool): Whether monitoring process is running
+            - log_files_exist (bool): Whether log files exist
     """
     monitoring_info = {
         "monitored_server_running": False,
@@ -218,7 +218,7 @@ def check_monitoring_system() -> dict:
         "log_files_exist": False
     }
     
-    # בדוק אם יש תהליך מוניטורינג
+    # Check if there's a monitoring process
     try:
         result = subprocess.run(
             ["ps", "aux"], 
@@ -234,7 +234,7 @@ def check_monitoring_system() -> dict:
     except:
         pass
     
-    # בדוק קבצי לוג
+    # Check log files
     log_files = ['server_detailed.log', 'server.log']
     for log_file in log_files:
         if os.path.exists(log_file):
@@ -245,59 +245,59 @@ def check_monitoring_system() -> dict:
 
 def main():
     """
-    פונקציה ראשית לבדיקת בריאות השרת - מותאמת ל-TikTrack
+    Main function for server health check - adapted for TikTrack
     
     Returns:
-        dict: תוצאות הבדיקה המלאה
+        dict: Complete check results
     
     Note:
-        - מציג מידע מפורט על השרת
-        - נותן המלצות לפתרון בעיות
-        - מתאים לשימוש ב-Cursor
+        - Displays detailed server information
+        - Provides troubleshooting recommendations
+        - Suitable for use in Cursor
     """
-    print("🏥 בודק בריאות שרת TikTrack...")
+    print("🏥 Checking TikTrack server health...")
     
-    # בדוק מערכת מוניטורינג
+    # Check monitoring system
     monitoring = check_monitoring_system()
     if monitoring["monitor_process_running"]:
-        print("🔄 מערכת מוניטורינג פעילה")
+        print("🔄 Monitoring system active")
     if monitoring["log_files_exist"]:
-        print("📝 קבצי לוג קיימים")
+        print("📝 Log files exist")
     
-    # בדוק תהליכים
+    # Check processes
     tiktrack_processes, other_processes = get_process_info()
     if tiktrack_processes:
-        print("📋 תהליכי TikTrack רצים:")
+        print("📋 Running TikTrack processes:")
         for proc in tiktrack_processes:
             print(f"  🟢 {proc}")
     
     if other_processes:
-        print("📋 תהליכי Python אחרים:")
+        print("📋 Other Python processes:")
         for proc in other_processes:
             print(f"  ⚪ {proc}")
     
-    # בדוק בריאות השרת
+    # Check server health
     health = check_server_health()
     
-    print(f"\n📊 תוצאות בדיקה:")
-    print(f"  🟢 רץ: {health['running']}")
+    print(f"\n📊 Check results:")
+    print(f"  🟢 Running: {health['running']}")
     if health['host'] and health['port']:
-        print(f"  🌐 כתובת: {health['host']}:{health['port']}")
+        print(f"  🌐 Address: {health['host']}:{health['port']}")
     if health['server_type']:
-        print(f"  🖥️  סוג שרת: {health['server_type']}")
+        print(f"  🖥️  Server type: {health['server_type']}")
     if health['response_time']:
-        print(f"  ⏱️  זמן תגובה: {health['response_time']}s")
+        print(f"  ⏱️  Response time: {health['response_time']}s")
     if health['status']:
-        print(f"  📈 סטטוס: {health['status']}")
+        print(f"  📈 Status: {health['status']}")
     if health['error']:
-        print(f"  ❌ שגיאה: {health['error']}")
+        print(f"  ❌ Error: {health['error']}")
     
-    # המלצות
+    # Recommendations
     if not health['running']:
-        print(f"\n💡 המלצות:")
-        print(f"  1. הפעל: ./run_monitored.sh")
-        print(f"  2. או: ./run_stable.sh")
-        print(f"  3. בדוק: lsof -i :8080")
+        print(f"\n💡 Recommendations:")
+        print(f"  1. Run: ./run_monitored.sh")
+        print(f"  2. Or: ./run_stable.sh")
+        print(f"  3. Check: lsof -i :8080")
     
     return health
 

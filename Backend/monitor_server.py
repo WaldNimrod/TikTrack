@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 TikTrack Server Monitor
-מנטר את השרת ומפעיל אותו מחדש אם הוא נופל
+Monitors the server and restarts it if it crashes
 """
 
 import subprocess
@@ -19,7 +19,7 @@ class ServerMonitor:
         self.restart_count = 0
         self.max_restarts = 10
         
-        # הגדרת signal handlers
+        # Set signal handlers
         signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGTERM, self.signal_handler)
     
@@ -31,7 +31,7 @@ class ServerMonitor:
         sys.exit(0)
     
     def check_server_health(self):
-        """בודק אם השרת עובד"""
+        """Checks if the server is working"""
         try:
             response = requests.get("http://127.0.0.1:8080/api/health", timeout=5)
             return response.status_code == 200
@@ -39,7 +39,7 @@ class ServerMonitor:
             return False
     
     def start_server(self):
-        """מפעיל את השרת"""
+        """Starts the server"""
         try:
             print(f"🚀 Starting server (attempt {self.restart_count + 1}/{self.max_restarts})...")
             self.server_process = subprocess.Popen(
@@ -54,7 +54,7 @@ class ServerMonitor:
             return False
     
     def stop_server(self):
-        """עוצר את השרת"""
+        """Stops the server"""
         if self.server_process:
             try:
                 self.server_process.terminate()
@@ -66,35 +66,35 @@ class ServerMonitor:
             self.server_process = None
     
     def monitor(self):
-        """הלולאה הראשית של המנטור"""
+        """Main monitor loop"""
         print("🔍 TikTrack Server Monitor Started")
         print("📍 Monitoring server at http://127.0.0.1:8080")
         print("🔄 Auto-restart enabled")
         print("-" * 50)
         
         while self.is_running and self.restart_count < self.max_restarts:
-            # בדיקה אם השרת רץ
+            # Check if server is running
             if self.server_process and self.server_process.poll() is None:
-                # השרת רץ, בודק בריאות
+                # Server is running, check health
                 if self.check_server_health():
                     print(f"✅ Server healthy at {datetime.now().strftime('%H:%M:%S')}")
-                    time.sleep(15)  # בדיקה כל 15 שניות
+                    time.sleep(15)  # Check every 15 seconds
                     continue
                 else:
                     print(f"⚠️  Server not responding at {datetime.now().strftime('%H:%M:%S')}")
             
-            # השרת לא רץ או לא מגיב
+            # Server is not running or not responding
             print(f"🔄 Server down, restarting...")
             self.stop_server()
-            time.sleep(2)  # המתנה קצרה
+            time.sleep(2)  # Short wait
             
             if self.start_server():
                 self.restart_count += 1
                 print(f"✅ Server restarted successfully")
-                time.sleep(10)  # המתנה שהשרת יעלה
+                time.sleep(10)  # Wait for server to start
             else:
                 print(f"❌ Failed to restart server")
-                time.sleep(30)  # המתנה ארוכה יותר
+                time.sleep(30)  # Longer wait
         
         if self.restart_count >= self.max_restarts:
             print(f"❌ Maximum restart attempts ({self.max_restarts}) reached")

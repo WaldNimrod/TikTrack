@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-תיקון תאריכי טריידים שנוצרו לפני תכנונים
-מתקן תאריכי created_at של טריידים כך שיהיו אחרי תאריכי התכנונים
+Fix trade dates created before plans
+Fixes created_at dates of trades to be after plan dates
 """
 
 import sys
@@ -14,114 +14,114 @@ from models import Trade, TradePlan
 from datetime import datetime, timedelta
 
 def fix_trade_dates():
-    """תיקון תאריכי טריידים"""
-    print("🔧 מתקן תאריכי טריידים...")
+    """Fix trade dates"""
+    print("🔧 Fixing trade dates...")
     
     db = SessionLocal()
     
     try:
-        # מציאת טריידים שנוצרו לפני תכנונים
+        # Find trades created before plans
         trades_before_plans = db.query(Trade).join(TradePlan).filter(
             Trade.created_at < TradePlan.created_at
         ).all()
         
-        print(f"📊 נמצאו {len(trades_before_plans)} טריידים שנוצרו לפני תכנונים")
+        print(f"📊 Found {len(trades_before_plans)} trades created before plans")
         
-        # תיקון תאריכים
+        # Fix dates
         fixed_count = 0
         
         if not trades_before_plans:
-            print("✅ כל הטריידים נוצרו אחרי תכנונים")
+            print("✅ All trades were created after plans")
         else:
             for trade in trades_before_plans:
                 plan = trade.trade_plan
                 if plan and plan.created_at:
-                    # הגדרת תאריך הטרייד ליום אחרי יצירת התוכנית
+                    # Set trade date to day after plan creation
                     new_date = plan.created_at + timedelta(days=1)
                     trade.created_at = new_date
                     fixed_count += 1
-                    print(f"✅ טרייד {trade.id}: תאריך עודכן ל-{new_date}")
+                    print(f"✅ Trade {trade.id}: date updated to {new_date}")
         
 
         
-        # תיקון תאריכי closed_at לפני created_at
+        # Fix closed_at dates before created_at
         trades_with_invalid_closed = db.query(Trade).filter(
             Trade.closed_at.isnot(None),
             Trade.closed_at < Trade.created_at
         ).all()
         
-        print(f"📊 נמצאו {len(trades_with_invalid_closed)} טריידים עם תאריך סגירה לפני יצירה")
+        print(f"📊 Found {len(trades_with_invalid_closed)} trades with closing date before creation")
         
         for trade in trades_with_invalid_closed:
-            # הגדרת תאריך הסגירה ליום אחרי תאריך היצירה
+            # Set closing date to day after creation date
             new_closed_date = trade.created_at + timedelta(days=1)
             old_closed_date = trade.closed_at
             trade.closed_at = new_closed_date
             fixed_count += 1
-            print(f"✅ טרייד {trade.id}: תאריך סגירה עודכן מ-{old_closed_date} ל-{new_closed_date}")
+            print(f"✅ Trade {trade.id}: closing date updated from {old_closed_date} to {new_closed_date}")
         
         db.commit()
-        print(f"✅ תוקנו {fixed_count} תאריכי טריידים")
+        print(f"✅ Fixed {fixed_count} trade dates")
         
-        # בדיקה סופית
+        # Final check
         remaining_before_plans = db.query(Trade).join(TradePlan).filter(
             Trade.created_at < TradePlan.created_at
         ).count()
-        print(f"📊 נשארו {remaining_before_plans} טריידים שנוצרו לפני תכנונים")
+        print(f"📊 Remaining {remaining_before_plans} trades created before plans")
         
     except Exception as e:
-        print(f"❌ שגיאה בתיקון תאריכים: {str(e)}")
+        print(f"❌ Error fixing dates: {str(e)}")
         db.rollback()
     finally:
         db.close()
 
 def validate_trade_dates():
-    """בדיקת תקינות תאריכי טריידים"""
-    print("🔍 בודק תקינות תאריכי טריידים...")
+    """Validate trade date integrity"""
+    print("🔍 Checking trade date integrity...")
     
     db = SessionLocal()
     
     try:
-        # בדיקת טריידים שנוצרו לפני תכנונים
+        # Check trades created before plans
         trades_before_plans = db.query(Trade).join(TradePlan).filter(
             Trade.created_at < TradePlan.created_at
         ).count()
-        print(f"📊 טריידים שנוצרו לפני תכנונים: {trades_before_plans}")
+        print(f"📊 Trades created before plans: {trades_before_plans}")
         
-        # בדיקת טריידים עם תאריכי closed_at לפני created_at
+        # Check trades with closed_at before created_at
         invalid_closed_dates = db.query(Trade).filter(
             Trade.closed_at.isnot(None),
             Trade.closed_at < Trade.created_at
         ).count()
-        print(f"📊 טריידים עם תאריך סגירה לפני יצירה: {invalid_closed_dates}")
+        print(f"📊 Trades with closing date before creation: {invalid_closed_dates}")
         
         if trades_before_plans == 0 and invalid_closed_dates == 0:
-            print("✅ כל התאריכים תקינים!")
+            print("✅ All dates are valid!")
         else:
-            print("⚠️ נמצאו בעיות בתאריכים")
+            print("⚠️ Found date issues")
             
     except Exception as e:
-        print(f"❌ שגיאה בבדיקה: {str(e)}")
+        print(f"❌ Error in validation: {str(e)}")
     finally:
         db.close()
 
 def main():
-    """פונקציה ראשית"""
-    print("🚀 מתחיל תיקון תאריכי טריידים...")
+    """Main function"""
+    print("🚀 Starting trade date fix...")
     
-    # בדיקה לפני תיקון
-    print("\n📋 בדיקה לפני תיקון:")
+    # Check before fix
+    print("\n📋 Check before fix:")
     validate_trade_dates()
     
-    # תיקון תאריכים
-    print("\n🔧 מתקן תאריכים...")
+    # Fix dates
+    print("\n🔧 Fixing dates...")
     fix_trade_dates()
     
-    # בדיקה אחרי תיקון
-    print("\n📋 בדיקה אחרי תיקון:")
+    # Check after fix
+    print("\n📋 Check after fix:")
     validate_trade_dates()
     
-    print("\n🎉 תיקון הושלם!")
+    print("\n🎉 Fix completed!")
 
 if __name__ == "__main__":
     main()

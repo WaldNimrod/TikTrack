@@ -4,7 +4,127 @@
 if (!window.tickersData) {
     window.tickersData = [];
 }
+if (!window.currenciesData) {
+    window.currenciesData = [];
+}
+if (!window.currenciesLoaded) {
+    window.currenciesLoaded = false;
+}
 let tickersData = window.tickersData;
+
+// פונקציה לטעינת מטבעות מהשרת
+async function loadCurrenciesFromServer() {
+    console.log('🔄 === Loading currencies from server ===');
+
+    try {
+        const token = localStorage.getItem('authToken');
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch('http://127.0.0.1:8080/api/v1/currencies/', {
+            method: 'GET',
+            headers: headers
+        });
+
+        console.log('🔄 Currencies response status:', response.status);
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log('🔄 Currencies response from server:', responseData);
+
+            const currencies = responseData.data || responseData;
+            window.currenciesData = currencies;
+            window.currenciesLoaded = true;
+            console.log('🔄 Currencies loaded from server:', currencies.length, 'currencies');
+            console.log('🔄 Currencies details:', currencies);
+
+            // עדכון אפשרויות בטופס
+            updateCurrencyOptions();
+        } else {
+            console.log('🔄 Error loading currencies from server, status:', response.status);
+            const errorText = await response.text();
+            console.log('🔄 Error response:', errorText);
+            // טעינת מטבעות ברירת מחדל
+            window.currenciesData = [
+                { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
+            ];
+            window.currenciesLoaded = true;
+
+            // עדכון אפשרויות בטופס
+            updateCurrencyOptions();
+        }
+
+    } catch (error) {
+        console.log('🔄 Error loading currencies from server:', error);
+        // טעינת מטבעות ברירת מחדל
+        window.currenciesData = [
+            { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
+        ];
+        window.currenciesLoaded = true;
+
+        // עדכון אפשרויות בטופס
+        updateCurrencyOptions();
+    }
+}
+
+// פונקציה עזר להצגת מטבע
+function getTickerCurrencyDisplay(ticker) {
+    if (ticker.currency && ticker.currency.symbol) {
+        // אם יש פרטי מטבע מלאים
+        return ticker.currency.symbol;
+    } else if (ticker.currency_id && window.currenciesData.length > 0) {
+        // אם יש רק currency_id, נחפש את המטבע
+        const currency = window.currenciesData.find(c => c.id === ticker.currency_id);
+        if (currency) {
+            return currency.symbol;
+        }
+    } else if (ticker.currency) {
+        // fallback למטבע הישן
+        return ticker.currency;
+    }
+    return '-';
+}
+
+// פונקציה ליצירת אפשרויות מטבע בטופס
+function generateTickerCurrencyOptions(ticker = null) {
+    if (!window.currenciesData || window.currenciesData.length === 0) {
+        // אם אין מטבעות, נחזיר ברירת מחדל
+        return `
+            <option value="1" ${ticker && (ticker.currency_id === 1 || (ticker.currency && ticker.currency.symbol === 'USD') || ticker.currency === 'USD') ? 'selected' : ''}>דולר אמריקאי (USD)</option>
+        `;
+    }
+
+    return window.currenciesData.map(currency => {
+        const isSelected = ticker && (
+            ticker.currency_id === currency.id ||
+            (ticker.currency && ticker.currency.symbol === currency.symbol) ||
+            ticker.currency === currency.symbol
+        );
+
+        return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
+    }).join('');
+}
+
+// פונקציה לעדכון אפשרויות מטבע בטופס
+function updateCurrencyOptions() {
+    const addSelect = document.getElementById('addTickerCurrency');
+    const editSelect = document.getElementById('editTickerCurrency');
+
+    if (addSelect) {
+        const addOptions = generateTickerCurrencyOptions();
+        addSelect.innerHTML = '<option value="">בחר מטבע...</option>' + addOptions;
+    }
+
+    if (editSelect) {
+        const editOptions = generateTickerCurrencyOptions();
+        editSelect.innerHTML = '<option value="">בחר מטבע...</option>' + editOptions;
+    }
+}
 
 // פונקציות בסיסיות
 function openTickerDetails(id) {
@@ -126,7 +246,27 @@ function showEditTickerModal(id) {
     document.getElementById('editTickerSymbol').value = ticker.symbol;
     document.getElementById('editTickerName').value = ticker.name;
     document.getElementById('editTickerType').value = ticker.type;
-    document.getElementById('editTickerCurrency').value = ticker.currency;
+
+    // עדכון מטבע - תמיכה במערכת החדשה
+    const currencySelect = document.getElementById('editTickerCurrency');
+    if (currencySelect) {
+        if (ticker.currency_id) {
+            currencySelect.value = ticker.currency_id;
+        } else if (ticker.currency && ticker.currency.symbol) {
+            // אם יש פרטי מטבע מלאים
+            const currency = window.currenciesData.find(c => c.symbol === ticker.currency.symbol);
+            if (currency) {
+                currencySelect.value = currency.id;
+            }
+        } else if (ticker.currency) {
+            // fallback למטבע הישן
+            const currency = window.currenciesData.find(c => c.symbol === ticker.currency);
+            if (currency) {
+                currencySelect.value = currency.id;
+            }
+        }
+    }
+
     document.getElementById('editTickerRemarks').value = ticker.remarks || '';
 
     clearTickerValidationErrors();
@@ -288,13 +428,13 @@ async function saveTicker() {
     const symbol = document.getElementById('addTickerSymbol').value.trim().toUpperCase();
     const name = document.getElementById('addTickerName').value.trim();
     const type = document.getElementById('addTickerType').value;
-    const currency = document.getElementById('addTickerCurrency').value;
+    const currency_id = parseInt(document.getElementById('addTickerCurrency').value);
     const remarks = document.getElementById('addTickerRemarks').value.trim();
 
     // בדיקת ולידציה
     if (!validateTickerSymbol(document.getElementById('addTickerSymbol')) ||
         !validateTickerName(document.getElementById('addTickerName')) ||
-        !type || !currency) {
+        !type || !currency_id) {
         showNotification('❌ יש לתקן את השגיאות בטופס', 'error');
         return;
     }
@@ -304,7 +444,7 @@ async function saveTicker() {
             symbol: symbol,
             name: name,
             type: type,
-            currency: currency,
+            currency_id: currency_id,
             remarks: remarks || null
         };
 
@@ -354,13 +494,13 @@ async function updateTicker() {
     const symbol = document.getElementById('editTickerSymbol').value.trim().toUpperCase();
     const name = document.getElementById('editTickerName').value.trim();
     const type = document.getElementById('editTickerType').value;
-    const currency = document.getElementById('editTickerCurrency').value;
+    const currency_id = parseInt(document.getElementById('editTickerCurrency').value);
     const remarks = document.getElementById('editTickerRemarks').value.trim();
 
     // בדיקת ולידציה
     if (!validateTickerSymbol(document.getElementById('editTickerSymbol')) ||
         !validateTickerName(document.getElementById('editTickerName')) ||
-        !type || !currency) {
+        !type || !currency_id) {
         showNotification('❌ יש לתקן את השגיאות בטופס', 'error');
         return;
     }
@@ -370,7 +510,7 @@ async function updateTicker() {
             symbol: symbol,
             name: name,
             type: type,
-            currency: currency,
+            currency_id: currency_id,
             remarks: remarks || null
         };
 
@@ -888,7 +1028,7 @@ function updateTickersTable(tickers) {
             <td>${ticker.name}</td>
             <td>${ticker.type}</td>
             <td>${ticker.remarks || ''}</td>
-            <td>${ticker.currency}</td>
+            <td>${getTickerCurrencyDisplay(ticker)}</td>
             <td>${ticker.active_trades ? 'כן' : 'לא'}</td>
             <td>${formatDate(ticker.created_at)}</td>
             <td>${formatDate(ticker.updated_at)}</td>
@@ -951,6 +1091,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // שחזור מצב הסגירה
     restoreTickersSectionState();
+
+    // טעינת מטבעות
+    loadCurrenciesFromServer();
 
     // טעינת נתונים
     loadTickersData();

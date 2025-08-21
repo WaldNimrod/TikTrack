@@ -11,11 +11,11 @@ def create_trade_plans_table():
         return
     
     try:
-        # חיבור לבסיס הנתונים
+        # Connect to database
         conn = sqlite3.connect(current_db)
         cursor = conn.cursor()
         
-        # יצירת טבלת trade_plans לפי המודל
+        # Create trade_plans table according to model
         cursor.execute("""
             CREATE TABLE trade_plans (
                 id INTEGER PRIMARY KEY,
@@ -39,7 +39,7 @@ def create_trade_plans_table():
         
         print("✅ Trade plans table created successfully!")
         
-        # בדיקה שהטבלה נוצרה
+        # Verify table was created
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='trade_plans'")
         if cursor.fetchone():
             print("✅ Table verification successful!")
@@ -47,40 +47,40 @@ def create_trade_plans_table():
             print("❌ Table creation failed!")
             return
         
-        # הכנסת נתוני דמה
+        # Insert sample data
         sample_data = [
-            # תכנון 1: Apple - סווינג
-            (1, 1, 'swing', 'Long', 'open', 10000.0, 'מחיר מתחת ל-150$', 140.0, 180.0, 'חברה חזקה עם מוצרים איכותיים', None, None),
+            # Plan 1: Apple - swing
+            (1, 1, 'swing', 'Long', 'open', 10000.0, 'Price below $150', 140.0, 180.0, 'Strong company with quality products', None, None),
             
-            # תכנון 2: Google - השקעה
-            (2, 2, 'investment', 'Long', 'open', 8000.0, 'מחיר מתחת ל-120$', 110.0, 150.0, 'דומיננטיות בחיפוש ופרסום', None, None),
+            # Plan 2: Google - investment
+            (2, 2, 'investment', 'Long', 'open', 8000.0, 'Price below $120', 110.0, 150.0, 'Dominance in search and advertising', None, None),
             
-            # תכנון 3: SPY ETF - פאסיבי
-            (2, 9, 'passive', 'Long', 'open', 5000.0, 'מחיר מתחת ל-400$', 380.0, 450.0, 'השקעה במדד S&P 500', None, None),
+            # Plan 3: SPY ETF - passive
+            (2, 9, 'passive', 'Long', 'open', 5000.0, 'Price below $400', 380.0, 450.0, 'Investment in S&P 500 index', None, None),
             
-            # תכנון 4: Microsoft - סווינג
-            (1, 3, 'swing', 'Long', 'open', 12000.0, 'מחיר מתחת ל-400$', 380.0, 450.0, 'חברה טכנולוגית חזקה', None, None),
+            # Plan 4: Microsoft - swing
+            (1, 3, 'swing', 'Long', 'open', 12000.0, 'Price below $400', 380.0, 450.0, 'Strong technology company', None, None),
             
-            # תכנון 5: Tesla - השקעה
-            (2, 4, 'investment', 'Long', 'open', 15000.0, 'מחיר מתחת ל-200$', 180.0, 300.0, 'חדשנות בתחום הרכב החשמלי', None, None),
+            # Plan 5: Tesla - investment
+            (2, 4, 'investment', 'Long', 'open', 15000.0, 'Price below $200', 180.0, 300.0, 'Innovation in electric vehicles', None, None),
             
-            # תכנון 6: NVIDIA - סווינג
-            (1, 5, 'swing', 'Long', 'open', 20000.0, 'מחיר מתחת ל-800$', 750.0, 1000.0, 'דומיננטיות בתחום ה-AI', None, None),
+            # Plan 6: NVIDIA - swing
+            (1, 5, 'swing', 'Long', 'open', 20000.0, 'Price below $800', 750.0, 1000.0, 'Dominance in AI field', None, None),
             
-            # תכנון 7: QQQ ETF - פאסיבי
-            (3, 10, 'passive', 'Long', 'open', 3000.0, 'מחיר מתחת ל-380$', 360.0, 420.0, 'השקעה ב-ETF טכנולוגיה', None, None),
+            # Plan 7: QQQ ETF - passive
+            (3, 10, 'passive', 'Long', 'open', 3000.0, 'Price below $380', 360.0, 420.0, 'Investment in technology ETF', None, None),
             
-            # תכנון 8: Amazon - השקעה (סגור)
-            (1, 6, 'investment', 'Long', 'closed', 18000.0, 'מחיר מתחת ל-3200$', 3000.0, 4000.0, 'דומיננטיות במסחר אלקטרוני', None, None),
+            # Plan 8: Amazon - investment (closed)
+            (1, 6, 'investment', 'Long', 'closed', 18000.0, 'Price below $3200', 3000.0, 4000.0, 'Dominance in e-commerce', None, None),
             
-            # תכנון 9: Meta - סווינג (מבוטל)
-            (2, 7, 'swing', 'Long', 'cancelled', 9000.0, 'מחיר מתחת ל-380$', 350.0, 450.0, 'מדיה חברתית מתקדמת', datetime.now(), 'שינוי אסטרטגיה'),
+            # Plan 9: Meta - swing (cancelled)
+            (2, 7, 'swing', 'Long', 'cancelled', 9000.0, 'Price below $380', 350.0, 450.0, 'Advanced social media', datetime.now(), 'Strategy change'),
             
-            # תכנון 10: Netflix - השקעה
-            (1, 8, 'investment', 'Long', 'open', 7000.0, 'מחיר מתחת ל-580$', 550.0, 700.0, 'דומיננטיות בסטרימינג', None, None)
+            # Plan 10: Netflix - investment
+            (1, 8, 'investment', 'Long', 'open', 7000.0, 'Price below $580', 550.0, 700.0, 'Dominance in streaming', None, None)
         ]
         
-        # הכנסת הנתונים
+        # Insert data
         for data in sample_data:
             cursor.execute("""
                 INSERT INTO trade_plans (
@@ -92,10 +92,10 @@ def create_trade_plans_table():
         
         print(f"✅ Inserted {len(sample_data)} sample trade plans!")
         
-        # בדיקת הקשרים
+        # Test relationships
         print("\n🔍 Testing relationships...")
         
-        # בדיקת קשר עם חשבונות
+        # Test account relationships
         cursor.execute("""
             SELECT tp.id, tp.investment_type, tp.status, a.name as account_name
             FROM trade_plans tp
@@ -105,7 +105,7 @@ def create_trade_plans_table():
         accounts_test = cursor.fetchall()
         print(f"✅ Account relationships: {len(accounts_test)} records found")
         
-        # בדיקת קשר עם טיקרים
+        # Test ticker relationships
         cursor.execute("""
             SELECT tp.id, tp.investment_type, tp.status, t.symbol as ticker_symbol
             FROM trade_plans tp
@@ -115,7 +115,7 @@ def create_trade_plans_table():
         tickers_test = cursor.fetchall()
         print(f"✅ Ticker relationships: {len(tickers_test)} records found")
         
-        # בדיקת סטטיסטיקות
+        # Check statistics
         cursor.execute("SELECT COUNT(*) FROM trade_plans")
         total_count = cursor.fetchone()[0]
         
@@ -130,7 +130,7 @@ def create_trade_plans_table():
         print(f"  - Status breakdown: {dict(status_stats)}")
         print(f"  - Type breakdown: {dict(type_stats)}")
         
-        # הצגת דוגמאות
+        # Show examples
         cursor.execute("""
             SELECT tp.id, tp.investment_type, tp.status, tp.planned_amount,
                    a.name as account_name, t.symbol as ticker_symbol
@@ -145,7 +145,7 @@ def create_trade_plans_table():
         for example in examples:
             print(f"  - ID: {example[0]}, Type: {example[1]}, Status: {example[2]}, Amount: ${example[3]}, Account: {example[4]}, Ticker: {example[5]}")
         
-        # שמירת השינויים
+        # Save changes
         conn.commit()
         print("\n✅ Trade plans table created and populated successfully!")
         

@@ -10,7 +10,7 @@ currencies_bp = Blueprint('currencies', __name__, url_prefix='/api/v1/currencies
 
 @currencies_bp.route('/', methods=['GET'])
 def get_currencies():
-    """קבלת כל המטבעות"""
+    """Get all currencies"""
     try:
         db: Session = next(get_db())
         currencies = db.query(Currency).order_by(Currency.symbol).all()
@@ -32,7 +32,7 @@ def get_currencies():
 
 @currencies_bp.route('/<int:currency_id>', methods=['GET'])
 def get_currency(currency_id: int):
-    """קבלת מטבע לפי מזהה"""
+    """Get currency by ID"""
     try:
         db: Session = next(get_db())
         currency = db.query(Currency).filter(Currency.id == currency_id).first()
@@ -60,7 +60,7 @@ def get_currency(currency_id: int):
 
 @currencies_bp.route('/', methods=['POST'])
 def create_currency():
-    """יצירת מטבע חדש"""
+    """Create new currency"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -86,7 +86,7 @@ def create_currency():
 
 @currencies_bp.route('/<int:currency_id>', methods=['PUT'])
 def update_currency(currency_id: int):
-    """עדכון מטבע"""
+    """Update currency"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -120,7 +120,7 @@ def update_currency(currency_id: int):
 
 @currencies_bp.route('/<int:currency_id>', methods=['DELETE'])
 def delete_currency(currency_id: int):
-    """מחיקת מטבע"""
+    """Delete currency"""
     try:
         db: Session = next(get_db())
         currency = db.query(Currency).filter(Currency.id == currency_id).first()

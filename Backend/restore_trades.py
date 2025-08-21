@@ -15,36 +15,36 @@ def restore_trades():
         return
     
     try:
-        # חיבור לבסיס הנתונים הנוכחי
+        # Connect to current database
         current_conn = sqlite3.connect(current_db)
         current_cursor = current_conn.cursor()
         
-        # חיבור לבסיס הנתונים של הגיבוי
+        # Connect to backup database
         backup_conn = sqlite3.connect(backup_db)
         backup_cursor = backup_conn.cursor()
         
-        # מחיקת כל הנתונים הנוכחיים מטבלת הטריידים
+        # Delete all current data from trades table
         current_cursor.execute("DELETE FROM trades")
         print("✅ Cleared current trades table")
         
-        # קבלת כל הנתונים מהגיבוי
+        # Get all data from backup
         backup_cursor.execute("SELECT account_id, ticker_id, trade_plan_id, status, type, closed_at, cancelled_at, cancel_reason, total_pl, notes, id, created_at FROM trades")
         trades_data = backup_cursor.fetchall()
         
         print(f"📊 Found {len(trades_data)} trades in backup")
         
-        # הכנסת הנתונים לבסיס הנתונים הנוכחי
+        # Insert data into current database
         for trade in trades_data:
             current_cursor.execute("""
                 INSERT INTO trades (account_id, ticker_id, trade_plan_id, status, type, closed_at, cancelled_at, cancel_reason, total_pl, notes, id, created_at, side) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, trade + ('Long',))  # הוספת ברירת מחדל 'Long' לעמודה side
+            """, trade + ('Long',))  # Add default 'Long' for side column
         
-        # שמירת השינויים
+        # Save changes
         current_conn.commit()
         print("✅ Trades restored successfully!")
         
-        # בדיקה שהנתונים הוכנסו
+        # Verify data was inserted
         current_cursor.execute("SELECT COUNT(*) FROM trades")
         count = current_cursor.fetchone()[0]
         print(f"📊 Current trades count: {count}")

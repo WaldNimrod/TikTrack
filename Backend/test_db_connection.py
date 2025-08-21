@@ -11,28 +11,28 @@ from models.account import Account
 from models.ticker import Ticker
 
 def test_db_connection():
-    """בדיקת database connection"""
+    """Test database connection"""
     try:
         db: Session = next(get_db())
         print("✅ Database connection successful")
         
-        # בדיקת trade_plans
+        # Check trade_plans
         plans = db.query(TradePlan).all()
         print(f"✅ Found {len(plans)} trade plans")
         
-        # בדיקת trades
+        # Check trades
         trades = db.query(Trade).all()
         print(f"✅ Found {len(trades)} trades")
         
-        # בדיקת accounts
+        # Check accounts
         accounts = db.query(Account).all()
         print(f"✅ Found {len(accounts)} accounts")
         
-        # בדיקת tickers
+        # Check tickers
         tickers = db.query(Ticker).all()
         print(f"✅ Found {len(tickers)} tickers")
         
-        # בדיקת trade_plans עם relationships
+        # Check trade_plans with relationships
         plans_with_relations = db.query(TradePlan).options(
             joinedload(TradePlan.ticker),
             joinedload(TradePlan.account)

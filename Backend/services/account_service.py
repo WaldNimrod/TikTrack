@@ -8,17 +8,17 @@ logger = logging.getLogger(__name__)
 class AccountService:
     @staticmethod
     def get_all(db: Session) -> List[Account]:
-        """קבלת כל החשבונות"""
+        """Get all accounts"""
         return db.query(Account).all()
     
     @staticmethod
     def get_by_id(db: Session, account_id: int) -> Optional[Account]:
-        """קבלת חשבון לפי מזהה"""
+        """Get account by ID"""
         return db.query(Account).filter(Account.id == account_id).first()
     
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> Account:
-        """יצירת חשבון חדש"""
+        """Create new account"""
         account = Account(**data)
         db.add(account)
         db.commit()
@@ -28,7 +28,7 @@ class AccountService:
     
     @staticmethod
     def update(db: Session, account_id: int, data: Dict[str, Any]) -> Optional[Account]:
-        """עדכון חשבון"""
+        """Update account"""
         account = db.query(Account).filter(Account.id == account_id).first()
         if account:
             for key, value in data.items():
@@ -42,7 +42,7 @@ class AccountService:
     
     @staticmethod
     def delete(db: Session, account_id: int) -> bool:
-        """מחיקת חשבון"""
+        """Delete account"""
         account = db.query(Account).filter(Account.id == account_id).first()
         if account:
             db.delete(account)
@@ -53,7 +53,7 @@ class AccountService:
     
     @staticmethod
     def get_stats(db: Session, account_id: int) -> Dict[str, Any]:
-        """קבלת סטטיסטיקות חשבון"""
+        """Get account statistics"""
         from models.trade import Trade
         from models.cash_flow import CashFlow
         
@@ -61,12 +61,12 @@ class AccountService:
         if not account:
             return {}
         
-        # סטטיסטיקות טריידים
+        # Trade statistics
         trades = db.query(Trade).filter(Trade.account_id == account_id).all()
         open_trades = [t for t in trades if t.status == 'open']
         closed_trades = [t for t in trades if t.status == 'closed']
         
-        # סטטיסטיקות cash flow
+        # Cash flow statistics
         cash_flows = db.query(CashFlow).filter(CashFlow.account_id == account_id).all()
         
         total_pl = sum(trade.total_pl for trade in trades)
@@ -87,18 +87,18 @@ class AccountService:
     
     @staticmethod
     def update_account_values(db: Session, account_id: int) -> bool:
-        """עדכון ערכי החשבון"""
+        """Update account values"""
         from models.trade import Trade
         
         account = db.query(Account).filter(Account.id == account_id).first()
         if not account:
             return False
         
-        # חישוב ערכים מחדש
+        # Recalculate values
         trades = db.query(Trade).filter(Trade.account_id == account_id).all()
         total_pl = sum(trade.total_pl for trade in trades)
         
-        # עדכון החשבון
+        # Update account
         account.total_pl = total_pl
         db.commit()
         logger.info(f"Updated account values for: {account.name}")
@@ -108,11 +108,11 @@ class AccountService:
     
     @staticmethod
     def get_open_trades(db: Session, account_id: int) -> List[Dict[str, Any]]:
-        """קבלת טריידים פתוחים של חשבון"""
+        """Get open trades for account"""
         from models.trade import Trade
         from models.ticker import Ticker
         
-        # קבלת טריידים פתוחים עם פרטי הטיקר
+        # Get open trades with ticker details
         trades = db.query(Trade, Ticker).join(
             Ticker, Trade.ticker_id == Ticker.id
         ).filter(
@@ -120,7 +120,7 @@ class AccountService:
             Trade.status == 'open'
         ).all()
         
-        # המרה למילון
+        # Convert to dictionary
         open_trades = []
         for trade, ticker in trades:
             open_trades.append({

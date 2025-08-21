@@ -1097,10 +1097,45 @@ function showEditAlertModal(alert) {
 /**
  * ביטול התראה
  */
-function cancelAlert(alertId, alertType) {
-  console.log(`ביטול התראה ${alertId} מסוג ${alertType}`);
-  if (confirm('האם אתה בטוח שברצונך לבטל התראה זו?')) {
-    alert('פונקציית ביטול התראה תתווסף בקרוב');
+async function cancelAlert(alertId) {
+  console.log(`ביטול התראה ${alertId}`);
+  if (!confirm('האם אתה בטוח שברצונך לבטל התראה זו?')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/v1/alerts/${alertId}/cancel`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      console.log('התראה בוטלה בהצלחה');
+      
+      // רענון הנתונים
+      if (typeof window.loadAlertsData === 'function') {
+        window.loadAlertsData();
+      }
+      
+      // הצגת הודעה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('התראה בוטלה', 'התראה בוטלה בהצלחה!');
+      } else {
+        alert('התראה בוטלה בהצלחה!');
+      }
+    } else {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'שגיאה בביטול התראה');
+    }
+  } catch (error) {
+    console.error('שגיאה בביטול התראה:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בביטול התראה', error.message);
+    } else {
+      alert('שגיאה בביטול התראה: ' + error.message);
+    }
   }
 }
 

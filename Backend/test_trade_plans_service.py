@@ -8,12 +8,12 @@ from config.database import get_db
 from services.trade_plan_service import TradePlanService
 
 def test_trade_plans_service():
-    """בדיקת trade_plans service"""
+    """Test trade_plans service"""
     try:
         db: Session = next(get_db())
         print("✅ Database connection successful")
         
-        # בדיקת trade_plans service
+        # Check trade_plans service
         plans = TradePlanService.get_all(db)
         print(f"✅ Found {len(plans)} trade plans via service")
         
@@ -21,7 +21,7 @@ def test_trade_plans_service():
             plan = plans[0]
             print(f"✅ First plan: ID={plan.id}, Ticker={plan.ticker.symbol if plan.ticker else 'None'}, Account={plan.account.name if plan.account else 'None'}")
             
-            # בדיקת to_dict
+            # Check to_dict
             plan_dict = plan.to_dict()
             print(f"✅ Plan dict: {plan_dict}")
         

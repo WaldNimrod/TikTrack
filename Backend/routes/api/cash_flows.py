@@ -10,7 +10,7 @@ cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/v1/cash_flows
 
 @cash_flows_bp.route('/', methods=['GET'])
 def get_cash_flows():
-    """קבלת כל תזרימי המזומנים"""
+    """Get all cash flows"""
     try:
         db: Session = next(get_db())
         cash_flows = db.query(CashFlow).options(
@@ -18,7 +18,7 @@ def get_cash_flows():
             joinedload(CashFlow.currency)
         ).all()
         
-        # המרה למילון עם מידע נוסף
+        # Convert to dictionary with additional information
         cash_flows_data = []
         for cf in cash_flows:
             cf_dict = cf.to_dict()
@@ -47,7 +47,7 @@ def get_cash_flows():
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['GET'])
 def get_cash_flow(cash_flow_id: int):
-    """קבלת תזרים מזומנים לפי מזהה"""
+    """Get cash flow by ID"""
     try:
         db: Session = next(get_db())
         cash_flow = db.query(CashFlow).options(
@@ -86,12 +86,12 @@ def get_cash_flow(cash_flow_id: int):
 
 @cash_flows_bp.route('/', methods=['POST'])
 def create_cash_flow():
-    """יצירת תזרים מזומנים חדש"""
+    """Create new cash flow"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
         
-        # הגדרת ערכי ברירת מחדל
+        # Set default values
         if 'currency_id' not in data:
             data['currency_id'] = 1  # USD
         if 'usd_rate' not in data:
@@ -106,7 +106,7 @@ def create_cash_flow():
         db.commit()
         db.refresh(cash_flow)
         
-        # החזרת הנתונים עם מידע נוסף
+        # Return data with additional information
         cf_dict = cash_flow.to_dict()
         if cash_flow.account:
             cf_dict['account_name'] = cash_flow.account.name
@@ -132,7 +132,7 @@ def create_cash_flow():
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['PUT'])
 def update_cash_flow(cash_flow_id: int):
-    """עדכון תזרים מזומנים"""
+    """Update cash flow"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -146,7 +146,7 @@ def update_cash_flow(cash_flow_id: int):
             db.commit()
             db.refresh(cash_flow)
             
-            # החזרת הנתונים עם מידע נוסף
+            # Return data with additional information
             cf_dict = cash_flow.to_dict()
             if cash_flow.account:
                 cf_dict['account_name'] = cash_flow.account.name
@@ -177,7 +177,7 @@ def update_cash_flow(cash_flow_id: int):
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['DELETE'])
 def delete_cash_flow(cash_flow_id: int):
-    """מחיקת תזרים מזומנים"""
+    """Delete cash flow"""
     try:
         db: Session = next(get_db())
         cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()

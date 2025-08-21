@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Debug script לבדיקת הבעיה
+Debug script to check the issue
 """
 
 import sys
@@ -14,28 +14,28 @@ from services.auth_service import AuthService
 import traceback
 
 def debug_create_user():
-    """בדיקת יצירת משתמש"""
+    """Test user creation"""
     print("🔍 Debugging user creation...")
     
-    # יצירת בסיס הנתונים
+    # Create database
     init_db()
     
-    # יצירת session
+    # Create session
     db = SessionLocal()
     
     try:
-        # יצירת תפקיד
+        # Create role
         print("📋 Creating role...")
         existing_role = db.query(Role).filter(Role.name == "admin").first()
         if not existing_role:
-            role = Role(name="admin", description="מנהל מערכת", permissions='["read", "write", "delete", "admin"]')
+            role = Role(name="admin", description="System administrator", permissions='["read", "write", "delete", "admin"]')
             db.add(role)
             db.commit()
             print("✅ Role created")
         else:
             print("✅ Role already exists")
         
-        # יצירת משתמש
+        # Create user
         print("👤 Creating user...")
         user = AuthService.create_user(db, "admin", "admin@tiktrack.com", "admin123", ["admin"])
         print(f"✅ User created: {user.username}")

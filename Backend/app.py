@@ -355,6 +355,20 @@ def cash_flows_html_page() -> Any:
     """
     return send_from_directory(UI_DIR, "cash_flows.html")
 
+@app.route("/currencies")
+def currencies_page() -> Any:
+    """
+    דף מטבעות - נתיב ללא .html
+    """
+    return send_from_directory(UI_DIR, "currencies.html")
+
+@app.route("/currencies.html")
+def currencies_html_page() -> Any:
+    """
+    דף מטבעות - נתיב עם .html (גיבוי)
+    """
+    return send_from_directory(UI_DIR, "currencies.html")
+
 @app.route("/notification-demo")
 def notification_demo_page() -> Any:
     """

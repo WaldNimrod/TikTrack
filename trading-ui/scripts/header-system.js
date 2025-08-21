@@ -80,14 +80,15 @@ class HeaderSystem {
         z-index: 1000;
       }
 
-      /* Header Top */
-      .header-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 2rem;
-        border-bottom: 1px solid var(--apple-border-light);
-      }
+              /* Header Top */
+        .header-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem 2rem;
+          border-bottom: 1px solid var(--apple-border-light);
+          position: relative;
+        }
 
       .logo-section {
         display: flex;
@@ -181,27 +182,39 @@ class HeaderSystem {
         position: relative;
       }
 
-      .nav-link {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1rem;
-        color: var(--apple-text-secondary);
-        text-decoration: none;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-        font-weight: 500;
-      }
+              .nav-link {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem 1rem;
+          color: var(--apple-text-secondary);
+          text-decoration: none;
+          border-radius: 8px;
+          transition: all 0.2s ease;
+          font-weight: 500;
+          position: relative;
+        }
 
-      .nav-link:hover {
-        color: var(--apple-text-primary);
-        background: var(--apple-bg-secondary);
-      }
+        .nav-link:hover {
+          color: var(--apple-text-primary);
+          background: var(--apple-bg-secondary);
+        }
 
-      .nav-item.active .nav-link {
-        color: var(--apple-accent);
-        background: var(--apple-accent-bg);
-      }
+        .nav-item.active .nav-link {
+          color: var(--apple-accent);
+          background: var(--apple-accent-bg);
+        }
+
+        .nav-item.active .nav-link::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: var(--apple-accent);
+          border-radius: 1px;
+        }
 
       /* Dropdowns */
       .dropdown {

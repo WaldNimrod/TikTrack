@@ -164,14 +164,14 @@ class TypeAnnotationChecker:
             return """
 @staticmethod
 def get_by_id(db: Session, item_id: int) -> Optional[Model]:
-    \"\"\"קבלת רשומה לפי מזהה\"\"\"
+    \"\"\"Get record by ID\"\"\"
     return db.query(Model).filter(Model.id == item_id).first()
 """
         elif 'create' in name:
             return """
 @staticmethod
 def create(db: Session, data: Dict[str, Any]) -> Model:
-    \"\"\"יצירת רשומה חדשה\"\"\"
+    \"\"\"Create new record\"\"\"
     item = Model(**data)
     db.add(item)
     db.commit()
@@ -181,7 +181,7 @@ def create(db: Session, data: Dict[str, Any]) -> Model:
         elif 'validate' in name:
             return """
 def validate_data(data: Dict[str, Any]) -> Tuple[bool, str]:
-    \"\"\"בדיקת תקינות נתונים\"\"\"
+    \"\"\"Validate data\"\"\"
     errors: List[str] = []
     
     if not data.get('required_field'):
@@ -195,7 +195,7 @@ def validate_data(data: Dict[str, Any]) -> Tuple[bool, str]:
         else:
             return """
 def function_name(param1: str, param2: Optional[int] = None) -> Dict[str, Any]:
-    \"\"\"תיאור הפונקציה\"\"\"
+    \"\"\"Function description\"\"\"
     result: Dict[str, Any] = {}
     return result
 """
@@ -207,7 +207,7 @@ def function_name(param1: str, param2: Optional[int] = None) -> Dict[str, Any]:
         if name == 'to_dict':
             return """
 def to_dict(self) -> Dict[str, Any]:
-    \"\"\"המרה למילון\"\"\"
+    \"\"\"Convert to dictionary\"\"\"
     result: Dict[str, Any] = {}
     for c in self.__table__.columns:
         value = getattr(self, c.name)
@@ -220,13 +220,13 @@ def to_dict(self) -> Dict[str, Any]:
         elif name == '__repr__':
             return """
 def __repr__(self) -> str:
-    \"\"\"ייצוג מחרוזת\"\"\"
+    \"\"\"String representation\"\"\"
     return f"<{self.__class__.__name__}(id={self.id})>"
 """
         else:
             return """
 def method_name(self, param: str) -> Any:
-    \"\"\"תיאור המתודה\"\"\"
+    \"\"\"Method description\"\"\"
     result: Any = None
     return result
 """

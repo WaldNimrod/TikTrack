@@ -30,39 +30,39 @@
     - ריכוז פונקציות חשבונות ב-accounts.js
   -->
 
-  <!-- Apple Theme CSS - בסיס כללי -->
+  <!-- Apple Theme CSS - General base -->
   <link rel="stylesheet" href="styles/apple-theme.css">
 
-  <!-- Main Styles - סגנונות הפרויקט -->
+  <!-- Main Styles - Project styles -->
   <link rel="stylesheet" href="styles/styles.css">
 
-  <!-- Menu CSS - תפריט -->
+  <!-- Menu CSS - Menu -->
   <link rel="stylesheet" href="styles/menu.css">
 
-  <!-- Table CSS - טבלאות -->
+  <!-- Table CSS - Tables -->
   <link rel="stylesheet" href="styles/table.css">
 
-  <!-- Typography CSS - טיפוגרפיה ופונטים -->
+  <!-- Typography CSS - Typography and fonts -->
   <link rel="stylesheet" href="styles/typography.css">
 
-  <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+  <!-- Bootstrap CSS - Loaded last to avoid overriding custom settings -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- קבצים מודולריים של הגריד - נטענים בסוף הקובץ -->
+  <!-- Modular grid files - loaded at end of file -->
 </head>
 
 <body>
-  <!-- רקע כללי -->
+  <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- כותרת האפליקציה -->
+    <!-- Application header -->
     <app-header></app-header>
 
-    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <!-- Page body - All content after header -->
     <div class="page-body">
-      <!-- אזור עיצובים - top-Section -->
+      <!-- Designs area - top-Section -->
       <div class="top-section">
-        <!-- כותרת ראשית -->
+        <!-- Main header -->
         <div class="section-header">
           <div class="table-title">
             📋 כותרת ראשית
@@ -74,11 +74,11 @@
           </div>
         </div>
 
-        <!-- כרטיסיות התראות -->
+        <!-- Alert cards -->
         <div class="section-body">
           <active-alerts></active-alerts>
 
-          <!-- סיכום נתונים -->
+          <!-- Data summary -->
           <div class="info-summary" id="summaryStats">
             <div>סה"כ תכנונים: <strong id="totalDesigns">0</strong></div>
             <div>סה"כ השקעה: <strong id="totalInvestment">$0</strong></div>
@@ -86,14 +86,14 @@
             <div>רווח כולל: <strong id="totalProfit">$0</strong></div>
           </div>
         </div>
-      </div> <!-- סוף top-section -->
+      </div> <!-- End top-section -->
 
-      <!-- תוכן ראשי -->
+      <!-- Main content -->
       <div class="main-content">
 
-        <!-- אזור עיצובים - content-section -->
+        <!-- Designs area - content-section -->
         <div class="content-section">
-          <!-- כותרת עיצובים -->
+          <!-- Designs header -->
           <div class="section-header">
             <div class="table-title">
               📋 כותרת הסקשן
@@ -110,7 +110,7 @@
             </div>
           </div>
 
-          <!-- טבלת עיצובים -->
+          <!-- Designs table -->
           <div class="section-body">
             <div class="table-responsive" id="designsContainer">
               <table class="table" id="designsTable" data-table-type="designs">
@@ -290,9 +290,9 @@
         </div>
       </div>
 
-      <!-- האלמנט השני - טבלת חשבונות -->
+      <!-- Second element - Accounts table -->
       <div class="content-section">
-        <!-- כותרת חשבונות -->
+        <!-- Accounts header -->
         <div class="section-header">
           <div class="table-title">
             💰 כותרת סקשן 2
@@ -309,7 +309,7 @@
           </div>
         </div>
 
-        <!-- טבלת חשבונות -->
+        <!-- Accounts table -->
         <div class="section-body">
           <div class="table-responsive">
             <table class="table">
@@ -380,22 +380,22 @@
           </div>
         </div>
       </div>
-    </div> <!-- סוף page-body -->
+    </div> <!-- End page-body -->
 
-    <!-- מרווח בתחתית הדף -->
+    <!-- Bottom page spacing -->
     <div class="bottom-spacer"></div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- קבצים מודולריים -->
+    <!-- Modular files -->
     <script src="scripts/app-header.js"></script>
     <script src="scripts/account-modal.js"></script>
     <script src="scripts/designs.js"></script>
 
-    <!-- ניקוי הודעות קונסולה -->
+    <!-- Console message cleanup -->
     <script>
-      // ניקוי הודעות קונסולה אחרי זמן קצר
+      // Clear console messages after short time
       setTimeout(() => {
         console.log('🧹 Clearing console messages to reduce clutter...');
         if (console.clear) {
@@ -403,9 +403,9 @@
         }
       }, 25000);
 
-      // אתחול הדף
+      // Page initialization
       document.addEventListener('DOMContentLoaded', function () {
-        console.log('🔄 אתחול דף עיצובים...');
+        console.log('🔄 Initializing designs page...');
         if (typeof initializeDesignsPage === 'function') {
           initializeDesignsPage();
         }

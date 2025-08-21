@@ -106,9 +106,9 @@ def update_tickers_currency_table():
             connection.commit()
             
             if result.rowcount > 0:
-                print(f"✓ הוגדר מטבע ברירת מחדל (USD) ל-{result.rowcount} טיקרים")
+                print(f"✓ Set default currency (USD) for {result.rowcount} tickers")
             
-            # 8. בדיקת תקינות הנתונים
+            # 8. Data validation check
             result = connection.execute(text("""
                 SELECT COUNT(*) as invalid_count 
                 FROM tickers t 
@@ -118,38 +118,38 @@ def update_tickers_currency_table():
             
             invalid_count = result.fetchone()[0]
             if invalid_count > 0:
-                print(f"❌ שגיאה: נמצאו {invalid_count} טיקרים עם מזהי מטבע לא תקינים")
+                print(f"❌ Error: Found {invalid_count} tickers with invalid currency IDs")
                 return False
             
-            print("✓ כל מזהי המטבע בטיקרים תקינים")
+            print("✓ All currency IDs in tickers are valid")
             
-            print("\n🎉 עדכון טבלת הטיקרים הושלם בהצלחה!")
+            print("\n🎉 Tickers table update completed successfully!")
             return True
             
     except Exception as e:
-        print(f"❌ שגיאה בעדכון טבלת הטיקרים: {e}")
+        print(f"❌ Error updating tickers table: {e}")
         return False
 
 def verify_tickers_update():
-    """בדיקת תוצאות העדכון"""
+    """Check update results"""
     
     try:
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
         with engine.connect() as connection:
-            print("\n📋 בדיקת תוצאות העדכון:")
+            print("\n📋 Checking update results:")
             print("=" * 50)
             
-            # בדיקת מבנה הטבלה
+            # Check table structure
             result = connection.execute(text("PRAGMA table_info(tickers)"))
             columns = result.fetchall()
             
-            print("מבנה טבלת הטיקרים:")
+            print("Tickers table structure:")
             for col in columns:
                 col_name, col_type = col[1], col[2]
                 print(f"  {col_name}: {col_type}")
             
-            # בדיקת הנתונים
+            # Check data
             result = connection.execute(text("""
                 SELECT 
                     t.id, 
@@ -165,24 +165,24 @@ def verify_tickers_update():
             
             tickers = result.fetchall()
             if tickers:
-                print("\nדוגמאות טיקרים:")
+                print("\nSample tickers:")
                 for ticker in tickers:
-                    print(f"  {ticker[1]} ({ticker[2]}): מטבע {ticker[4]} ({ticker[5]})")
+                    print(f"  {ticker[1]} ({ticker[2]}): Currency {ticker[4]} ({ticker[5]})")
             
             return True
             
     except Exception as e:
-        print(f"❌ שגיאה בבדיקת העדכון: {e}")
+        print(f"❌ Error checking update: {e}")
         return False
 
 if __name__ == "__main__":
-    print("🔄 עדכון טבלת הטיקרים לשימוש במזהי מטבע - TikTrack")
+    print("🔄 Updating tickers table to use currency IDs - TikTrack")
     print("=" * 70)
     
-    # עדכון הטבלה
+    # Update table
     if update_tickers_currency_table():
-        # בדיקת התוצאות
+        # Check results
         verify_tickers_update()
     else:
-        print("\n❌ העדכון נכשל")
+        print("\n❌ Update failed")
         sys.exit(1)

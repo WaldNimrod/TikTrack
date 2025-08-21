@@ -1,25 +1,3 @@
 {
-  "defaults": {
-    "primaryCurrency": "USD",
-    "defaultStopLoss": 5,
-    "defaultTargetPrice": 10,
-    "timezone": "Asia/Jerusalem",
-    "defaultStatusFilter": "all",
-    "defaultTypeFilter": "all",
-    "defaultAccountFilter": "all",
-    "defaultDateRangeFilter": "all",
-    "defaultSearchFilter": ""
-  },
-  "user": {
-    "primaryCurrency": "USD",
-    "defaultStopLoss": 5,
-    "defaultTargetPrice": 10,
-    "timezone": "Asia/Jerusalem",
-    "defaultStatusFilter": "all",
-    "defaultTypeFilter": "all",
-    "defaultAccountFilter": "all",
-    "defaultDateRangeFilter": "all",
-    "defaultSearchFilter": "",
-    "testSaveAll": "testValue"
-  }
+  "test": "value"
 }

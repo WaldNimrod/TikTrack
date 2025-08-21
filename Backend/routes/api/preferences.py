@@ -11,14 +11,14 @@ preferences_bp = Blueprint('preferences', __name__)
 
 @preferences_bp.route('/api/preferences', methods=['GET'])
 def get_preferences() -> Any:
-    """טוען את כל ההעדפות מקובץ JSON"""
+    """Load all preferences from JSON file"""
     try:
         preferences_path = os.path.join(os.path.dirname(__file__), '..', '..', 'trading-ui', 'config', 'preferences.json')
         with open(preferences_path, 'r', encoding='utf-8') as f:
             preferences = json.load(f)
         return jsonify(preferences)
     except FileNotFoundError:
-        # אם הקובץ לא קיים, מחזיר ברירות מחדל מלאות
+        # If file doesn't exist, return full defaults
         default_preferences = {
             "defaults": {
                 "primaryCurrency": "USD",
@@ -49,28 +49,28 @@ def get_preferences() -> Any:
 
 @preferences_bp.route('/api/preferences', methods=['POST'])
 def save_preferences() -> Any:
-    """שומר את כל ההעדפות לקובץ JSON"""
+    """Save all preferences to JSON file"""
     try:
         data = request.json
         preferences_path = os.path.join(os.path.dirname(__file__), '..', '..', 'trading-ui', 'config', 'preferences.json')
         
-        # יוצר את התיקייה אם היא לא קיימת
+        # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(preferences_path), exist_ok=True)
         
         with open(preferences_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         
-        return jsonify({"status": "success", "message": "העדפות נשמרו בהצלחה"})
+        return jsonify({"status": "success", "message": "Preferences saved successfully"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @preferences_bp.route('/api/preferences/<key>', methods=['PUT'])
 def update_preference(key: str) -> Any:
-    """מעדכן הגדרה ספציפית"""
+    """Update specific setting"""
     try:
         preferences_path = os.path.join(os.path.dirname(__file__), '..', '..', 'trading-ui', 'config', 'preferences.json')
         
-        # טוען העדפות קיימות
+        # Load existing preferences
         try:
             with open(preferences_path, 'r', encoding='utf-8') as f:
                 preferences = json.load(f)
@@ -100,16 +100,16 @@ def update_preference(key: str) -> Any:
                 }
             }
         
-        # מעדכן את ההגדרה
+        # Update the setting
         data = request.json
         if 'value' in data:
             preferences['user'][key] = data['value']
         
-        # שומר חזרה לקובץ
+        # Save back to file
         os.makedirs(os.path.dirname(preferences_path), exist_ok=True)
         with open(preferences_path, 'w', encoding='utf-8') as f:
             json.dump(preferences, f, indent=2, ensure_ascii=False)
         
-        return jsonify({"status": "success", "message": f"הגדרה {key} עודכנה בהצלחה"})
+        return jsonify({"status": "success", "message": f"Setting {key} updated successfully"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

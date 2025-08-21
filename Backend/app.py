@@ -1499,7 +1499,7 @@ if __name__ == "__main__":
     # - **Date:** August 20, 2025
     # - **Status:** Archive - not in use
     #
-    # ✅ **הקונפיגורציה החדשה:** Flask development server פשוט ויציב
+    # ✅ **New Configuration:** Simple and stable Flask development server
     
     print("🚀 Starting Flask development server...")
     print("📍 Server running on http://127.0.0.1:8080")

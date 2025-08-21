@@ -104,31 +104,31 @@ def verify_table_structure():
                 found_columns[col_name] = col_type
                 print(f"  {col_name}: {col_type}")
             
-            # בדיקה שכל השדות הנדרשים קיימים
+            # Check that all required fields exist
             missing_columns = []
             for expected_col, expected_type in expected_columns.items():
                 if expected_col not in found_columns:
                     missing_columns.append(expected_col)
             
             if missing_columns:
-                print(f"\n⚠️  שדות חסרים: {', '.join(missing_columns)}")
+                print(f"\n⚠️  Missing fields: {', '.join(missing_columns)}")
                 return False
             else:
-                print("\n✓ כל השדות הנדרשים קיימים")
+                print("\n✓ All required fields exist")
                 return True
                 
     except Exception as e:
-        print(f"✗ שגיאה בבדיקת מבנה הטבלה: {e}")
+        print(f"✗ Error checking table structure: {e}")
         return False
 
 if __name__ == "__main__":
-    print("🔄 יצירת טבלת מטבעות - TikTrack")
+    print("🔄 Creating currencies table - TikTrack")
     print("=" * 50)
     
-    # יצירת הטבלה
+    # Create table
     if create_currencies_table():
-        # בדיקת המבנה
+        # Check structure
         verify_table_structure()
     else:
-        print("\n❌ Migration נכשל")
+        print("\n❌ Migration failed")
         sys.exit(1)

@@ -52,126 +52,126 @@ class TickerService:
     MAX_SYMBOL_LENGTH: int = 10
     MAX_NAME_LENGTH: int = 100
     MAX_REMARKS_LENGTH: int = 500
-    # CURRENCY_LENGTH: int = 3  # הוסר - עכשיו משתמשים ב-currency_id
+    # CURRENCY_LENGTH: int = 3  # Removed - now using currency_id
     @staticmethod
     def get_all(db: Session) -> List[Ticker]:
         """
-        קבלת כל הטיקרים מהמערכת
+        Get all tickers from the system
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
+            db (Session): Database connection
             
         Returns:
-            List[Ticker]: רשימת כל הטיקרים במערכת
+            List[Ticker]: List of all tickers in the system
             
         Example:
             >>> tickers = TickerService.get_all(db_session)
-            >>> print(f"מספר טיקרים במערכת: {len(tickers)}")
+            >>> print(f"Number of tickers in system: {len(tickers)}")
         """
         return db.query(Ticker).all()
     
     @staticmethod
     def get_by_id(db: Session, ticker_id: int) -> Optional[Ticker]:
         """
-        קבלת טיקר לפי מזהה
+        Get ticker by ID
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
-            ticker_id (int): מזהה הטיקר
+            db (Session): Database connection
+            ticker_id (int): Ticker ID
             
         Returns:
-            Optional[Ticker]: הטיקר אם נמצא, None אחרת
+            Optional[Ticker]: Ticker if found, None otherwise
             
         Example:
             >>> ticker = TickerService.get_by_id(db_session, 1)
             >>> if ticker:
-            ...     print(f"נמצא טיקר: {ticker.symbol}")
+            ...     print(f"Found ticker: {ticker.symbol}")
         """
         return db.query(Ticker).filter(Ticker.id == ticker_id).first()
     
     @staticmethod
     def get_by_symbol(db: Session, symbol: str) -> Optional[Ticker]:
         """
-        קבלת טיקר לפי סימבול
+        Get ticker by symbol
         
         Args:
-            db (Session): חיבור לבסיס הנתונים
-            symbol (str): סימבול הטיקר
+            db (Session): Database connection
+            symbol (str): Ticker symbol
             
         Returns:
-            Optional[Ticker]: הטיקר אם נמצא, None אחרת
+            Optional[Ticker]: Ticker if found, None otherwise
             
         Example:
             >>> ticker = TickerService.get_by_symbol(db_session, "AAPL")
             >>> if ticker:
-            ...     print(f"נמצא טיקר: {ticker.name}")
+            ...     print(f"Found ticker: {ticker.name}")
         """
         return db.query(Ticker).filter(Ticker.symbol == symbol.upper()).first()
     
     @staticmethod
     def validate_ticker_data(ticker_data: dict) -> Dict[str, Any]:
         """
-        ולידציה של נתוני טיקר
+        Validate ticker data
         
-        פונקציה זו בודקת את תקינות הנתונים לפני שמירה לבסיס הנתונים.
-        כוללת בדיקות אורך, פורמט, ערכים מותרים ועוד.
+        This function checks data validity before saving to database.
+        Includes length checks, format validation, allowed values and more.
         
         Args:
-            ticker_data (dict): מילון עם נתוני הטיקר לוולידציה
-                - symbol (str): סימבול הטיקר
-                - name (str): שם הטיקר
-                - type (str): סוג הטיקר
-                - currency (str): מטבע הטיקר
-                - remarks (str): הערות
+            ticker_data (dict): Dictionary with ticker data for validation
+                - symbol (str): Ticker symbol
+                - name (str): Ticker name
+                - type (str): Ticker type
+                - currency (str): Ticker currency
+                - remarks (str): Remarks
                 
         Returns:
-            Dict[str, Any]: מילון עם תוצאות הולידציה
-                - is_valid (bool): האם הנתונים תקינים
-                - errors (List[str]): רשימת שגיאות
-                - warnings (List[str]): רשימת אזהרות
+            Dict[str, Any]: Dictionary with validation results
+                - is_valid (bool): Whether data is valid
+                - errors (List[str]): List of errors
+                - warnings (List[str]): List of warnings
                 
         Example:
             >>> data = {'symbol': 'AAPL', 'name': 'Apple Inc.', 'type': 'stock'}
             >>> result = TickerService.validate_ticker_data(data)
-            >>> print(f"תקין: {result['is_valid']}")
-            >>> print(f"שגיאות: {result['errors']}")
+            >>> print(f"Valid: {result['is_valid']}")
+            >>> print(f"Errors: {result['errors']}")
         """
         errors = []
         warnings = []
         
-        # בדיקת סימבול
+        # Symbol validation
         symbol = ticker_data.get('symbol', '').strip().upper()
         if not symbol:
-            errors.append("סימבול הוא שדה חובה")
+            errors.append("Symbol is required")
         elif len(symbol) > TickerService.MAX_SYMBOL_LENGTH:
-            errors.append(f"סימבול לא יכול להיות ארוך מ-{TickerService.MAX_SYMBOL_LENGTH} תווים")
+            errors.append(f"Symbol cannot be longer than {TickerService.MAX_SYMBOL_LENGTH} characters")
         elif not symbol.isalnum():
-            errors.append("סימבול יכול להכיל רק אותיות ומספרים באנגלית")
+            errors.append("Symbol can only contain English letters and numbers")
         
-        # בדיקת שם
+        # Name validation
         name = ticker_data.get('name', '').strip()
         if name and len(name) > TickerService.MAX_NAME_LENGTH:
-            errors.append(f"שם לא יכול להיות ארוך מ-{TickerService.MAX_NAME_LENGTH} תווים")
+            errors.append(f"Name cannot be longer than {TickerService.MAX_NAME_LENGTH} characters")
         
-        # בדיקת סוג
+        # Type validation
         ticker_type = ticker_data.get('type', '').strip()
         if ticker_type and ticker_type not in TickerService.VALID_TICKER_TYPES:
-            warnings.append(f"סוג לא מוכר: {ticker_type}. סוגים מוכרים: {', '.join(TickerService.VALID_TICKER_TYPES)}")
+            warnings.append(f"Unknown type: {ticker_type}. Known types: {', '.join(TickerService.VALID_TICKER_TYPES)}")
         
-        # בדיקת מטבע - עכשיו בודקים currency_id
+        # Currency validation - now checking currency_id
         currency_id = ticker_data.get('currency_id')
         if currency_id is not None:
             try:
                 currency_id = int(currency_id)
                 if currency_id <= 0:
-                    errors.append("מזהה מטבע חייב להיות מספר חיובי")
+                    errors.append("Currency ID must be a positive number")
             except (ValueError, TypeError):
-                errors.append("מזהה מטבע חייב להיות מספר תקין")
+                errors.append("Currency ID must be a valid number")
         
-        # בדיקת הערות
+        # Remarks validation
         remarks = ticker_data.get('remarks', '').strip()
         if remarks and len(remarks) > TickerService.MAX_REMARKS_LENGTH:
-            errors.append(f"הערות לא יכולות להיות ארוכות מ-{TickerService.MAX_REMARKS_LENGTH} תווים")
+            errors.append(f"Remarks cannot be longer than {TickerService.MAX_REMARKS_LENGTH} characters")
         
         return {
             'is_valid': len(errors) == 0,
@@ -182,15 +182,15 @@ class TickerService:
     @staticmethod
     def check_symbol_exists(db: Session, symbol: str, exclude_id: int = None) -> bool:
         """
-        בדיקה אם סימבול כבר קיים
+        Check if symbol already exists
         
         Args:
-            db: Session - חיבור לבסיס הנתונים
-            symbol: str - הסימבול לבדיקה
-            exclude_id: int - מזהה טיקר לא לכלול בבדיקה (לעריכה)
+            db: Session - Database connection
+            symbol: str - Symbol to check
+            exclude_id: int - Ticker ID to exclude from check (for editing)
         
         Returns:
-            bool - True אם הסימבול קיים, False אחרת
+            bool - True if symbol exists, False otherwise
         """
         query = db.query(Ticker).filter(Ticker.symbol == symbol.upper())
         if exclude_id:
@@ -199,22 +199,22 @@ class TickerService:
     
     @staticmethod
     def create(db: Session, ticker_data: dict) -> Ticker:
-        """יצירת טיקר חדש עם ולידציה"""
-        # ולידציה של הנתונים
+        """Create new ticker with validation"""
+        # Data validation
         validation = TickerService.validate_ticker_data(ticker_data)
         if not validation['is_valid']:
-            raise ValueError(f"נתונים לא תקינים: {'; '.join(validation['errors'])}")
+            raise ValueError(f"Invalid data: {'; '.join(validation['errors'])}")
         
-        # בדיקה שהסימבול לא קיים
+        # Check that symbol doesn't exist
         symbol = ticker_data.get('symbol', '').strip().upper()
         if TickerService.check_symbol_exists(db, symbol):
-            raise ValueError(f"סימבול {symbol} כבר קיים במערכת")
+            raise ValueError(f"Symbol {symbol} already exists in system")
         
-        # נרמול הנתונים
+        # Normalize data
         ticker_data['symbol'] = symbol
         if 'name' in ticker_data:
             ticker_data['name'] = ticker_data['name'].strip()
-        # currency_id לא צריך נרמול - הוא כבר מספר
+        # currency_id doesn't need normalization - it's already a number
         
         ticker = Ticker(**ticker_data)
         db.add(ticker)
@@ -224,29 +224,29 @@ class TickerService:
     
     @staticmethod
     def update(db: Session, ticker_id: int, ticker_data: dict) -> Optional[Ticker]:
-        """עדכון טיקר עם ולידציה"""
+        """Update ticker with validation"""
         ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
         if not ticker:
-            raise ValueError(f"טיקר עם מזהה {ticker_id} לא נמצא")
+            raise ValueError(f"Ticker with ID {ticker_id} not found")
         
-        # ולידציה של הנתונים
+        # Data validation
         validation = TickerService.validate_ticker_data(ticker_data)
         if not validation['is_valid']:
-            raise ValueError(f"נתונים לא תקינים: {'; '.join(validation['errors'])}")
+            raise ValueError(f"Invalid data: {'; '.join(validation['errors'])}")
         
-        # בדיקה שהסימבול לא קיים (אם השתנה)
+        # Check that symbol doesn't exist (if changed)
         if 'symbol' in ticker_data:
             symbol = ticker_data.get('symbol', '').strip().upper()
             if TickerService.check_symbol_exists(db, symbol, exclude_id=ticker_id):
-                raise ValueError(f"סימבול {symbol} כבר קיים במערכת")
+                raise ValueError(f"Symbol {symbol} already exists in system")
             ticker_data['symbol'] = symbol
         
-        # נרמול הנתונים
+        # Normalize data
         if 'name' in ticker_data:
             ticker_data['name'] = ticker_data['name'].strip()
-        # currency_id לא צריך נרמול - הוא כבר מספר
+        # currency_id doesn't need normalization - it's already a number
         
-        # עדכון השדות
+        # Update fields
         for key, value in ticker_data.items():
             setattr(ticker, key, value)
         
@@ -257,14 +257,14 @@ class TickerService:
     @staticmethod
     def check_linked_items(db: Session, ticker_id: int) -> Dict[str, Any]:
         """
-        בדיקת פריטים מקושרים לטיקר לפני מחיקה
+        Check linked items to ticker before deletion
         
-        מחזיר מילון עם:
-        - has_linked_items: האם יש פריטים מקושרים
-        - open_trades: רשימת טריידים פתוחים
-        - open_trade_plans: רשימת תכנונים פתוחים
-        - notes: רשימת הערות מקושרות
-        - alerts: רשימת התראות מקושרות
+        Returns dictionary with:
+        - has_linked_items: Whether there are linked items
+        - open_trades: List of open trades
+        - open_trade_plans: List of open trade plans
+        - notes: List of linked notes
+        - alerts: List of linked alerts
         """
         result = {
             'has_linked_items': False,
@@ -274,7 +274,7 @@ class TickerService:
             'alerts': []
         }
         
-        # בדיקת טריידים פתוחים
+        # Check open trades
         open_trades = db.query(Trade).filter(
             Trade.ticker_id == ticker_id,
             Trade.status == 'open'
@@ -284,7 +284,7 @@ class TickerService:
             result['open_trades'] = [trade.to_dict() for trade in open_trades]
             result['has_linked_items'] = True
         
-        # בדיקת תכנונים פתוחים
+        # Check open trade plans
         open_trade_plans = db.query(TradePlan).filter(
             TradePlan.ticker_id == ticker_id,
             TradePlan.status == 'open'
@@ -294,7 +294,7 @@ class TickerService:
             result['open_trade_plans'] = [plan.to_dict() for plan in open_trade_plans]
             result['has_linked_items'] = True
         
-        # בדיקת הערות מקושרות (related_type_id = 4 עבור ticker)
+        # Check linked notes (related_type_id = 4 for ticker)
         notes = db.query(Note).filter(
             Note.related_type_id == 4,  # ticker
             Note.related_id == ticker_id
@@ -304,7 +304,7 @@ class TickerService:
             result['notes'] = [note.to_dict() for note in notes]
             result['has_linked_items'] = True
         
-        # בדיקת התראות מקושרות (related_type_id = 4 עבור ticker)
+        # Check linked alerts (related_type_id = 4 for ticker)
         alerts = db.query(Alert).filter(
             Alert.related_type_id == 4,  # ticker
             Alert.related_id == ticker_id
@@ -319,44 +319,44 @@ class TickerService:
     @staticmethod
     def delete(db: Session, ticker_id: int) -> bool:
         """
-        מחיקת טיקר - רק אם אין פריטים מקושרים
-        מחזיר True אם הטיקר נמחק בהצלחה, False אחרת
+        Delete ticker - only if no linked items
+        Returns True if ticker deleted successfully, False otherwise
         """
-        # בדיקה שהטיקר קיים
+        # Check that ticker exists
         ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
         if not ticker:
             return False
         
-        # בדיקת פריטים מקושרים
+        # Check linked items
         linked_items = TickerService.check_linked_items(db, ticker_id)
         if linked_items['has_linked_items']:
-            # יש פריטים מקושרים - לא ניתן למחוק
+            # Has linked items - cannot delete
             raise ValueError("Cannot delete ticker with linked items (open trades, trade plans, notes, or alerts)")
         
-        # אין פריטים מקושרים - ניתן למחוק
+        # No linked items - can delete
         db.delete(ticker)
         db.commit()
         return True
     
     @staticmethod
     def update_open_status(db: Session, ticker_id: int) -> bool:
-        """עדכון סטטוס פתיחה של טיקר"""
+        """Update ticker open status"""
         from models.trade import Trade
         from models.trade_plan import TradePlan
         
-        # בדיקה אם יש תכנונים פתוחים
+        # Check if there are open plans
         open_plans = db.query(TradePlan).filter(
             TradePlan.ticker_id == ticker_id,
             TradePlan.status == 'open'
         ).count()
         
-        # בדיקה אם יש טריידים פתוחים
+        # Check if there are open trades
         open_trades = db.query(Trade).filter(
             Trade.ticker_id == ticker_id,
             Trade.status == 'open'
         ).count()
         
-        # עדכון סטטוס
+        # Update status
         ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
         if ticker:
             ticker.active_trades = (open_plans > 0 or open_trades > 0)

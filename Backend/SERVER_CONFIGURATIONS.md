@@ -1,20 +1,19 @@
 # TikTrack Server Configurations
-# קונפיגורציות השרת של TikTrack
 
-## ⚠️ **חשוב: זהו קובץ קונפיגורציות השרת בלבד!**
+## ⚠️ **Important: This is a server configurations file only!**
 
-**אין קשר למערכת הבדיקות או לתיעוד הכללי!**
+**No relation to testing system or general documentation!**
 
-🎯 **מטרה**: הגדרות שרת, סקריפטי הפעלה, סביבות פיתוח
-📍 **מיקום**: Backend/SERVER_CONFIGURATIONS.md
-🔗 **README ראשי**: README.md
-🔗 **מערכת הבדיקות**: Backend/testing_suite/README.md
+🎯 **Purpose**: Server settings, startup scripts, development environments
+📍 **Location**: Backend/SERVER_CONFIGURATIONS.md
+🔗 **Main README**: README.md
+🔗 **Testing System**: Backend/testing_suite/README.md
 
-## 🚫 **מה לא נמצא כאן:**
-- ❌ מערכת הבדיקות
-- ❌ תיעוד כללי של הפרויקט
-- ❌ ארכיטקטורת קבצים
-- ❌ הוראות פיתוח כללי
+## 🚫 **What's not here:**
+- ❌ Testing system
+- ❌ General project documentation
+- ❌ File architecture
+- ❌ General development instructions
 
 ## 🎯 **סיכום מהותקן:**
 

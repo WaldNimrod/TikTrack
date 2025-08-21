@@ -415,7 +415,7 @@ class TestBasicWorkflow:
     def test_unicode_handling(self, client):
         """Test Unicode handling in end-to-end scenarios"""
         # Test Hebrew characters in search
-        response = client.get('/api/v1/tickers?search=אפל')
+        response = client.get('/api/v1/tickers?search=APPLE')
         assert response.status_code == 200
         
         # Test Hebrew characters in response

@@ -113,7 +113,7 @@ class TestCurrencyAPI:
         """Test POST /api/v1/currencies/ with invalid data"""
         # Test without required fields
         currency_data = {
-            'name': 'מטבע ללא סמל',
+            'name': 'Currency without symbol',
             'usd_rate': 1.0
         }
         
@@ -134,8 +134,8 @@ class TestCurrencyAPI:
         
         # Update data
         update_data = {
-            'name': 'אירו מעודכן',
-            'usd_rate': 0.90
+            'name': 'Updated Euro',
+            'usd_rate': 0.86
         }
         
         response = client.put(f'/api/v1/currencies/{currency.id}',
@@ -145,14 +145,14 @@ class TestCurrencyAPI:
         
         data = json.loads(response.data)
         assert data['status'] == 'success'
-        assert data['data']['name'] == 'אירו מעודכן'
-        assert data['data']['usd_rate'] == 0.90
+        assert data['data']['name'] == 'Updated Euro'
+        assert data['data']['usd_rate'] == 0.86
         assert data['data']['symbol'] == 'EUR'  # Should not change
     
     def test_update_currency_not_found(self, client, db_session: Session):
         """Test PUT /api/v1/currencies/<id> with non-existent ID"""
         update_data = {
-            'name': 'מטבע לא קיים',
+            'name': 'Currency not found',
             'usd_rate': 1.0
         }
         

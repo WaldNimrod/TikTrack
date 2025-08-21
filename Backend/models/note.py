@@ -4,18 +4,18 @@ from typing import Dict, Any, Optional
 
 class Note(BaseModel):
     """
-    מודל הערות עם מערכת שיוך גמישה
+    Notes model with flexible association system
     
-    מערכת השיוך מאפשרת לקשר הערות לישויות שונות במערכת:
-    - account (id=1): הערה משויכת לחשבון
-    - trade (id=2): הערה משויכת לטרייד  
-    - trade_plan (id=3): הערה משויכת לתכנון טרייד
-    - ticker (id=4): הערה משויכת לטיקר
+    The association system allows linking notes to different entities in the system:
+    - account (id=1): Note associated with account
+    - trade (id=2): Note associated with trade  
+    - trade_plan (id=3): Note associated with trade plan
+    - ticker (id=4): Note associated with ticker
     
-    יתרונות המערכת:
-    - גמישות: אפשרות לשייך הערות לכל סוג של ישות
-    - הרחבה קלה: הוספת סוגי ישות חדשים ללא שינוי מבנה הטבלה
-    - עקביות: שימוש באותה מערכת שיוך כמו התראות
+    System advantages:
+    - Flexibility: Ability to associate notes with any type of entity
+    - Easy expansion: Adding new entity types without changing table structure
+    - Consistency: Using the same association system as alerts
     """
     __tablename__ = "notes"
     
@@ -29,10 +29,10 @@ class Note(BaseModel):
         return f"<Note(id={self.id}, related_type='{related_type}', related_id={self.related_id}, content='{self.content[:50]}...')>"
     
     def to_dict(self) -> Dict[str, Any]:
-        """המרה למילון עם תאימות לאחור"""
+        """Convert to dictionary with backward compatibility"""
         result: Dict[str, Any] = super().to_dict()
         
-        # קביעת related_type לפי related_type_id
+        # Determine related_type based on related_type_id
         if self.related_type_id == 1:
             result['related_type'] = 'account'
         elif self.related_type_id == 2:
@@ -44,7 +44,7 @@ class Note(BaseModel):
         
         result['related_id'] = self.related_id
         
-        # הוספת שדות לתאימות לאחור
+        # Add fields for backward compatibility
         if self.related_type_id == 1:  # account
             result['account_id'] = self.related_id
             result['trade_id'] = None

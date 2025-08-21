@@ -4,59 +4,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>מעקב טריידים - Tik.track</title>
+  <title>Trade Tracking - Tik.track</title>
 
   <!-- 
-    ===== דף מעקב טריידים - TikTrack =====
+    ===== Trade Tracking Page - TikTrack =====
     
-    דף זה מכיל:
-    1. טבלת מעקב טריידים - הסקשן הראשי
-    2. כרטיסיות התראות - בחלק העליון
-    3. מערכת פילטרים ומיון מתקדמת
+    This page contains:
+    1. Trade tracking table - Main section
+    2. Alert cards - In the upper part
+    3. Advanced filtering and sorting system
     
-    מבנה הדף:
-    - app-header: כותרת האפליקציה עם ניווט
-    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
-      - top-section: כרטיסיות התראות וסיכום נתונים
-      - content-section: טבלת מעקב טריידים
+    Page structure:
+    - app-header: Application header with navigation
+    - page-body: Main content limited in width (1400px)
+      - top-section: Alert cards and data summary
+      - content-section: Trade tracking table
     
-    עדכון: אוגוסט 2025
-    שינויים עיקריים:
-    - פיצול פונקציות טריידים לקובץ trades.js נפרד
-    - עדכון מבנה בסיס נתונים (הסרת opened_at, החלפת ב-created_at)
-    - הגבלת סוגי טריידים לשלושה: swing, invest, pasive
-    - שיפור מבנה טופסי עריכה והוספה
-    - עיצוב כפתורי שמירה עם צבע הלוגו ורקע לבן
-    - צמצום רווחים בטופסים (mb-3 -> mb-2)
-    - הוספת איקונים לכפתורי שמירה (💾)
+    Update: August 2025
+    Main changes:
+    - Split trade functions to separate trades.js file
+    - Update database structure (removed opened_at, replaced with created_at)
+    - Limited trade types to three: swing, invest, pasive
+    - Improved edit and add form structure
+    - Design save buttons with logo color and white background
+    - Reduced spacing in forms (mb-3 -> mb-2)
+    - Added icons to save buttons (💾)
     
-    תלות: trades.js - פונקציות ייעודיות לטריידים
-    תלות: main.js - פונקציות כלליות לטבלאות
-    תלות: alerts.js - פונקציות התראות
+    Dependency: trades.js - Trade-specific functions
+    Dependency: main.js - General table functions
+    Dependency: alerts.js - Alert functions
   -->
 
-  <!-- Apple Theme CSS - בסיס כללי -->
+  <!-- Apple Theme CSS - General base -->
   <link rel="stylesheet" href="styles/apple-theme.css">
 
-  <!-- Main Styles - סגנונות הפרויקט -->
+  <!-- Main Styles - Project styles -->
   <link rel="stylesheet" href="styles/styles.css">
 
-  <!-- Menu CSS - תפריט -->
+  <!-- Menu CSS - Menu -->
   <link rel="stylesheet" href="styles/menu.css">
 
-  <!-- Table CSS - טבלאות -->
+  <!-- Table CSS - Tables -->
   <link rel="stylesheet" href="styles/table.css">
 
-  <!-- Typography CSS - טיפוגרפיה ופונטים -->
+  <!-- Typography CSS - Typography and fonts -->
   <link rel="stylesheet" href="styles/typography.css">
 
-  <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+  <!-- Bootstrap CSS - Loaded last to avoid overriding custom settings -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 
 
-  <!-- קבצים מודולריים של הגריד -->
+  <!-- Modular grid files -->
   <script src="scripts/app-header.js"></script>
+  <script src="scripts/header-system.js"></script>
+  <script src="scripts/filter-system.js"></script>
   <script src="scripts/main.js"></script>
 
   <script src="scripts/alerts.js"></script>
@@ -66,17 +68,17 @@
 </head>
 
 <body>
-  <!-- רקע כללי -->
+  <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- כותרת האפליקציה -->
+    <!-- Application header -->
     <app-header></app-header>
 
-    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <!-- Page body - All content after header -->
     <div class="page-body">
-      <!-- אזור מעקב טריידים - top-Section -->
+      <!-- Trade tracking area - top-Section -->
       <div class="top-section">
-        <!-- כותרת מעקב טריידים -->
+        <!-- Trade tracking header -->
         <div class="section-header">
           <div class="table-title">
             📋 מעקב טריידים
@@ -92,12 +94,12 @@
           </div>
         </div>
 
-        <!-- כרטיסיות התראות -->
+        <!-- Alert cards -->
         <div class="section-body">
-          <!-- ווב קומפוננט של התראות פעילות -->
+          <!-- Web component for active alerts -->
           <active-alerts></active-alerts>
 
-          <!-- סיכום נתונים -->
+          <!-- Data summary -->
           <div class="info-summary" id="summaryStats">
             <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
             <div>טריידים פתוחים: <strong id="openTrades">0</strong></div>
@@ -105,14 +107,14 @@
             <div>רווח/הפסד כולל: <strong id="totalPL">$0</strong></div>
           </div>
         </div>
-      </div> <!-- סוף top-section -->
+      </div> <!-- End top-section -->
 
-      <!-- תוכן ראשי -->
+      <!-- Main content -->
       <div class="main-content">
 
-        <!-- אזור הטריידים שלי - content-section -->
+        <!-- My trades area - content-section -->
         <div class="content-section">
-          <!-- כותרת הטריידים שלי -->
+          <!-- My trades header -->
           <div class="section-header">
             <div class="table-title">
               📈 הטריידים שלי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trades</span>
@@ -135,7 +137,7 @@
             </div>
           </div>
 
-          <!-- טבלת טריידים -->
+          <!-- Trades table -->
           <div class="section-body">
             <div class="table-responsive" id="tradesContainer">
               <table class="table" id="tradesTable" data-table-type="trades">
@@ -226,15 +228,15 @@
             </div>
           </div>
           <div class="table-footer">
-            <!-- כפתורי ההוספה עברו לכותרת הטבלה -->
+            <!-- Add buttons moved to table header -->
           </div>
         </div>
       </div>
 
 
-    </div> <!-- סוף page-body -->
+    </div> <!-- End page-body -->
 
-    <!-- מרווח בתחתית הדף -->
+    <!-- Bottom page spacing -->
     <div style="height: 3rem;"></div>
 
     <!-- Bootstrap JS -->
@@ -243,11 +245,11 @@
 
 
     <script>
-      // פונקציות מותאמות לעמוד טריידים
-      // showAddTradeModal מוגדרת בקובץ trades.js
+      // Custom functions for trades page
+      // showAddTradeModal is defined in trades.js file
 
       function loadTrades() {
-        console.log('טעינת טריידים');
+        console.log('Loading trades');
         if (typeof window.loadTradesData === 'function') {
           window.loadTradesData();
         } else {
@@ -256,69 +258,69 @@
       }
 
       function editTrade(id) {
-        console.log('עריכת טרייד:', id);
-        // כאן יוכנס קוד לעריכת טרייד
+        console.log('Editing trade:', id);
+        // Code for editing trade will be inserted here
       }
 
       function cancelTrade(id) {
-        console.log('ביטול טרייד:', id);
+        console.log('Canceling trade:', id);
 
-        // מציאת הטרייד במערך
+        // Finding the trade in the array
         const tradeIndex = tradesData.findIndex(trade => trade.id === id);
         if (tradeIndex !== -1) {
-          // עדכון הסטטוס לבוטל
+          // Update status to canceled
           tradesData[tradeIndex].status = 'canceled';
 
-          // רענון הטבלה
+          // Refresh table
           if (typeof window.loadTradesData === 'function') {
             window.loadTradesData();
           } else {
             console.error('loadTradesData function not found');
           }
 
-          // הצגת הודעה
-          showNotification(`טרייד ${id} בוטל בהצלחה`, 'success');
+          // Show notification
+          showNotification(`Trade ${id} canceled successfully`, 'success');
         } else {
-          showNotification(`טרייד ${id} לא נמצא`, 'error');
+          showNotification(`Trade ${id} not found`, 'error');
         }
       }
 
       function deleteTrade(id) {
-        console.log('מחיקת טרייד:', id);
+        console.log('Deleting trade:', id);
 
-        // הסרת הטרייד מהמערך
+        // Remove trade from array
         tradesData = tradesData.filter(trade => trade.id !== id);
 
-        // רענון הטבלה
+        // Refresh table
         if (typeof window.loadTradesData === 'function') {
           window.loadTradesData();
         } else {
           console.error('loadTradesData function not found');
         }
 
-        // הצגת הודעה
-        showNotification(`טרייד ${id} נמחק בהצלחה`, 'success');
+        // Show notification
+        showNotification(`Trade ${id} deleted successfully`, 'success');
       }
 
       function viewTickerDetails(tickerId) {
-        console.log('צפייה בפרטי טיקר:', tickerId);
-        // כאן יוכנס קוד לצפייה בפרטי טיקר
+        console.log('Viewing ticker details:', tickerId);
+        // Code for viewing ticker details will be inserted here
       }
 
-      // פונקציות לפעולות על רשומות - עכשיו מוגדרות בקובץ trades.js
-      // הפונקציות הישנות הוסרו לטובת הפונקציות החדשות בקובץ trades.js
+      // Functions for record operations - now defined in trades.js file
+      // Old functions removed in favor of new functions in trades.js file
 
-      // הגדרת הפונקציות כגלובליות
+      // Define functions as global
       window.loadTrades = loadTrades;
       window.editTrade = editTrade;
       window.cancelTrade = cancelTrade;
       window.deleteTrade = deleteTrade;
       window.viewTickerDetails = viewTickerDetails;
-      // showAddTradeModal מוגדרת בקובץ trades.js
+      // showAddTradeModal is defined in trades.js file
 
-      // ===== מערכת מיון - נבנה מחדש =====
+      // ===== Sorting system - rebuilt =====
 
-      // משתנים גלובליים למיון
+      // Global variables for sorting
       let tradesCurrentSortColumn = null;
       let tradesCurrentSortDirection = 'asc';
 
@@ -975,7 +977,7 @@
       });
     </script>
 
-    <!-- מודל עריכת טרייד -->
+    <!-- Edit trade modal -->
     <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -985,7 +987,7 @@
           </div>
           <div class="modal-body">
             <form id="editTradeForm">
-              <!-- שורה ראשונה: תוכנית + טיקר + מחיר -->
+              <!-- First row: Plan + Ticker + Price -->
               <div class="row">
                 <div class="col-md-4">
                   <div class="mb-2">
@@ -1010,7 +1012,7 @@
                 </div>
               </div>
 
-              <!-- שורה שנייה: שינוי יומי + סוג + חשבון -->
+              <!-- Second row: Daily change + Type + Account -->
               <div class="row">
                 <div class="col-md-4">
                   <div class="mb-2">
@@ -1047,7 +1049,7 @@
                 </div>
               </div>
 
-              <!-- שורה שלישית: תאריך יצירה + תאריך סגירה -->
+              <!-- Third row: Creation date + Closing date -->
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
@@ -1063,7 +1065,7 @@
                 </div>
               </div>
 
-              <!-- שורה רביעית: סטטוס -->
+              <!-- Fourth row: Status -->
               <div class="row">
                 <div class="col-md-12">
                   <div class="mb-3">
@@ -1077,7 +1079,7 @@
                 </div>
               </div>
 
-              <!-- שורה חמישית: הערות -->
+              <!-- Fifth row: Remarks -->
               <div class="row">
                 <div class="col-md-12">
                   <div class="mb-3">
@@ -1087,7 +1089,7 @@
                 </div>
               </div>
 
-              <!-- שדות נסתרים -->
+              <!-- Hidden fields -->
               <input type="hidden" id="editTradeId">
               <div class="form-control-plaintext" id="editTradeIdDisplay" style="display: none;"></div>
               <div class="mb-3" style="display: none;">
@@ -1106,7 +1108,7 @@
       </div>
     </div>
 
-    <!-- מודל הוספת טרייד -->
+    <!-- Add trade modal -->
     <div class="modal fade" id="addTradeModal" tabindex="-1" aria-labelledby="addTradeModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -1116,7 +1118,7 @@
           </div>
           <div class="modal-body">
             <form id="addTradeForm">
-              <!-- שורה ראשונה: תוכנית + טיקר + מחיר -->
+              <!-- First row: Plan + Ticker + Price -->
               <div class="row">
                 <div class="col-md-4">
                   <div class="mb-2">
@@ -1141,7 +1143,7 @@
                 </div>
               </div>
 
-              <!-- שורה שנייה: שינוי יומי + סוג + צד + חשבון -->
+              <!-- Second row: Daily change + Type + Side + Account -->
               <div class="row">
                 <div class="col-md-3">
                   <div class="mb-2">
@@ -1178,7 +1180,7 @@
                 </div>
               </div>
 
-              <!-- שורה שלישית: תאריך יצירה + תאריך סגירה -->
+              <!-- Third row: Creation date + Closing date -->
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
@@ -1194,7 +1196,7 @@
                 </div>
               </div>
 
-              <!-- שורה רביעית: הערות -->
+              <!-- Fourth row: Remarks -->
               <div class="row">
                 <div class="col-md-12">
                   <div class="mb-3">
@@ -1204,7 +1206,7 @@
                 </div>
               </div>
 
-              <!-- שדות נסתרים -->
+              <!-- Hidden fields -->
               <div class="mb-3" style="display: none;">
                 <label for="addTradeStatus" class="form-label">סטטוס</label>
                 <select class="form-select" id="addTradeStatus" required>
@@ -1260,6 +1262,27 @@
 
       // הפעלת הבדיקה אחרי טעינת הדף
       document.addEventListener('DOMContentLoaded', () => {
+        // אתחול המערכת החדשה
+        if (typeof window.headerSystem !== 'undefined' && typeof window.filterSystem !== 'undefined') {
+          console.log('🔄 Initializing new header and filter systems...');
+
+          // רישום טבלת טריידים במערכת הפילטרים
+          const tradesTable = document.querySelector('#tradesTable');
+          if (tradesTable) {
+            window.filterSystem.registerTable('trades', tradesTable, {
+              hasStatus: true,
+              hasType: true,
+              hasAccount: true,
+              hasDates: true,
+              searchFields: ['ticker', 'notes', 'account_name']
+            });
+          }
+
+          // אתחול המערכות
+          window.headerSystem.initialize();
+          window.filterSystem.initialize();
+        }
+
         setTimeout(testAccountsFilter, 2000);
 
         // טעינת מצב המיון

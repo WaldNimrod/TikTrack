@@ -55,7 +55,7 @@ def save_uploaded_file(file: FileStorage) -> Optional[str]:
         return None
 
 def delete_uploaded_file(filename: str) -> bool:
-    """מחיקת קובץ שהועלה"""
+    """Delete uploaded file"""
     if filename:
         try:
             file_path = os.path.join(UPLOAD_FOLDER, filename)
@@ -72,19 +72,19 @@ def delete_uploaded_file(filename: str) -> bool:
     return False
 
 def cleanup_orphaned_files() -> int:
-    """ניקוי קבצים יתומים (קבצים שלא מקושרים להערות)"""
+    """Cleanup orphaned files (files not linked to notes)"""
     try:
         db = next(get_db())
         
-        # קבלת כל שמות הקבצים המקושרים להערות
+        # Get all file names linked to notes
         notes = db.query(Note).filter(Note.attachment.isnot(None)).all()
         attached_files = {note.attachment for note in notes if note.attachment}
         
-        # קבלת כל הקבצים בתיקייה
+        # Get all files in directory
         if os.path.exists(UPLOAD_FOLDER):
             files_in_folder = set(os.listdir(UPLOAD_FOLDER))
             
-            # מציאת קבצים יתומים
+            # Find orphaned files
             orphaned_files = files_in_folder - attached_files
             
             deleted_count = 0
@@ -106,22 +106,22 @@ def cleanup_orphaned_files() -> int:
 
 @notes_bp.route('/', methods=['GET'])
 def get_notes():
-    """קבלת כל ההערות"""
+    """Get all notes"""
     try:
         logger.info("🔄 Starting get_notes function")
         db = next(get_db())
         logger.info("✅ Database connection established")
         
-        # שימוש ב-SQL ישיר עם text() מ-SQLAlchemy
+        # Use direct SQL with text() from SQLAlchemy
         try:
             result = db.execute(text("SELECT * FROM notes ORDER BY created_at DESC"))
             notes_data = result.fetchall()
             logger.info(f"✅ Successfully retrieved {len(notes_data)} notes using direct SQL")
             
-            # המרה למילונים
+            # Convert to dictionaries
             notes_list = []
             for row in notes_data:
-                # קביעת related_type לפי related_type_id
+                # Set related_type according to related_type_id
                 related_type = None
                 if row[3] == 1:  # related_type_id
                     related_type = 'account'
@@ -142,7 +142,7 @@ def get_notes():
                     'related_type': related_type
                 }
                 
-                # הוספת שדות לתאימות לאחור
+                # Add fields for backward compatibility
                 if row[3] == 1:  # account
                     note_dict['account_id'] = row[4]
                     note_dict['trade_id'] = None
@@ -191,7 +191,7 @@ def get_notes():
 
 @notes_bp.route('/<int:note_id>', methods=['GET'])
 def get_note(note_id: int):
-    """קבלת הערה לפי מזהה"""
+    """Get note by ID"""
     try:
         db = next(get_db())
         note = db.query(Note).filter(Note.id == note_id).first()
@@ -219,7 +219,7 @@ def get_note(note_id: int):
 
 @notes_bp.route('/', methods=['POST'])
 def create_note():
-    """יצירת הערה חדשה"""
+    """Create new note"""
     db = None
     try:
         db = next(get_db())

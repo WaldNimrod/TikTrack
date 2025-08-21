@@ -100,9 +100,9 @@ class TestCurrencyPerformance:
     def test_currency_filtering_performance(self, db_session: Session):
         """Test performance of filtering by currency"""
         # Create test data
-        usd = Currency(symbol="USD", name="דולר אמריקאי", usd_rate=Decimal('1.000000'))
-        eur = Currency(symbol="EUR", name="אירו", usd_rate=Decimal('0.850000'))
-        ils = Currency(symbol="ILS", name="שקל ישראלי", usd_rate=Decimal('3.650000'))
+        usd = Currency(symbol="USD", name="US Dollar", usd_rate=Decimal('1.000000'))
+        eur = Currency(symbol="EUR", name="Euro", usd_rate=Decimal('0.850000'))
+        ils = Currency(symbol="ILS", name="Israeli Shekel", usd_rate=Decimal('3.650000'))
         
         db_session.add_all([usd, eur, ils])
         db_session.commit()
@@ -116,7 +116,6 @@ class TestCurrencyPerformance:
                 currency_id=currency.id,
                 status="active"
             )
-            accounts.append(account)
         
         db_session.add_all(accounts)
         db_session.commit()

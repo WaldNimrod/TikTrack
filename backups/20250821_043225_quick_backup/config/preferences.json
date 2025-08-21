@@ -1,0 +1,28 @@
+{
+  "defaults": {
+    "primaryCurrency": "USD",
+    "defaultStopLoss": 10,
+    "defaultTargetPrice": 10,
+    "timezone": "Asia/Jerusalem",
+    "filterDefaults": {
+      "statusFilter": "all",
+      "typeFilter": "all", 
+      "accountFilter": "all",
+      "dateRangeFilter": "all",
+      "searchFilter": ""
+    }
+  },
+  "user": {
+    "primaryCurrency": "USD",
+    "defaultStopLoss": 10,
+    "defaultTargetPrice": 10,
+    "timezone": "Asia/Jerusalem",
+    "filterDefaults": {
+      "statusFilter": "all",
+      "typeFilter": "all",
+      "accountFilter": "all", 
+      "dateRangeFilter": "all",
+      "searchFilter": ""
+    }
+  }
+}

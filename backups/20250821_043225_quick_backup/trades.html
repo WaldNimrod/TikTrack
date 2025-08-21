@@ -141,21 +141,80 @@
               <table class="table" id="tradesTable" data-table-type="trades">
                 <thead>
                   <tr>
-                    <th>חשבון<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Account</span></th>
-                    <th>טיקר<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Ticker</span></th>
-                    <th>תוכנית<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade Plan ID</span>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>חשבון
+                        <br><span class="header-subtitle">Account</span>
+                      </button>
                     </th>
-                    <th>סטטוס<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Status</span></th>
-                    <th>סוג<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type</span></th>
-                    <th>צד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Side</span></th>
-                    <th>נוצר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At</span>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(1)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>טיקר
+                        <br><span class="header-subtitle">Ticker</span>
+                      </button>
                     </th>
-                    <th>נסגר ב<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Closed At</span>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>תוכנית
+                        <br><span class="header-subtitle">Trade Plan ID</span>
+                      </button>
                     </th>
-                    <th>רווח/הפסד<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Total P/L</span>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>סטטוס
+                        <br><span class="header-subtitle">Status</span>
+                      </button>
                     </th>
-                    <th>הערות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Notes</span></th>
-                    <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(4)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>סוג
+                        <br><span class="header-subtitle">Type</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>צד
+                        <br><span class="header-subtitle">Side</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(6)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>נוצר ב
+                        <br><span class="header-subtitle">Created At</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(7)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>נסגר ב
+                        <br><span class="header-subtitle">Closed At</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(8)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>רווח/הפסד
+                        <br><span class="header-subtitle">Total P/L</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(9)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        <span class="sort-icon">↕</span>הערות
+                        <br><span class="header-subtitle">Notes</span>
+                      </button>
+                    </th>
+                    <th class="actions-header">
+                      פעולות
+                      <br><span class="header-subtitle">Actions</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -263,102 +322,38 @@
       let tradesCurrentSortColumn = null;
       let tradesCurrentSortDirection = 'asc';
 
-      // פונקציה למיון הטבלה - נבנה מחדש
+      /**
+       * פונקציה לסידור הטבלה
+       * 
+       * פונקציה זו משתמשת במערכת הסידור הגלובלית מ-main.js
+       * כדי לסדר את טבלת הטריידים לפי העמודה הנבחרת.
+       * 
+       * @param {number} columnIndex - אינדקס העמודה לסידור (0-7)
+       * 
+       * @requires window.sortTableData - פונקציה גלובלית מ-main.js
+       * @requires window.filteredTradesData - נתונים מסוננים
+       * @requires tradesData - נתונים מקוריים
+       * @requires updateTradesTable - פונקציה לעדכון הטבלה
+       * 
+       * @since 2.0
+       */
       function sortTable(columnIndex) {
-        console.log('🔄 === SORT TABLE FUNCTION CALLED ===');
-        console.log('🔄 Column clicked:', columnIndex);
-        console.log('🔄 Current sort column:', tradesCurrentSortColumn);
-        console.log('🔄 Current sort direction:', tradesCurrentSortDirection);
+        console.log(`🔄 מיון טבלת טריידים לפי עמודה ${columnIndex}`);
 
-        // קבלת הנתונים הנוכחיים
-        let trades = [...tradesData];
-        console.log('🔄 Original data:', trades.map(t => `${t.ticker_id}: ${t.total_pl}`));
+        // שימוש בפונקציה הגלובלית
+        if (typeof window.sortTableData === 'function') {
+          const sortedData = window.sortTableData(
+            columnIndex,
+            window.filteredTradesData || tradesData,
+            'tracking',
+            updateTradesTable
+          );
 
-        // החלת פילטרים קיימים
-        trades = window.filterDataByFilters(trades, 'trades');
-        console.log('🔄 After filtering:', trades.map(t => `${t.ticker_id}: ${t.total_pl}`));
-
-        // עדכון המשתנים הגלובליים
-        if (tradesCurrentSortColumn === columnIndex) {
-          tradesCurrentSortDirection = tradesCurrentSortDirection === 'asc' ? 'desc' : 'asc';
-          console.log('🔄 Same column clicked, direction changed to:', tradesCurrentSortDirection);
+          // עדכון הנתונים המסוננים
+          window.filteredTradesData = sortedData;
         } else {
-          tradesCurrentSortColumn = columnIndex;
-          tradesCurrentSortDirection = 'asc';
-          console.log('🔄 New column clicked, set to column:', columnIndex, 'direction: asc');
+          console.error('❌ sortTableData function not found in main.js');
         }
-
-        // מיון הנתונים
-        trades.sort((a, b) => {
-          let aValue, bValue;
-
-          switch (columnIndex) {
-            case 0: // נכס (Ticker)
-              aValue = a.ticker.toLowerCase();
-              bValue = b.ticker.toLowerCase();
-              break;
-            case 1: // תאריך
-              aValue = parseDateForSort(a.date);
-              bValue = parseDateForSort(b.date);
-              break;
-            case 2: // סוג
-              aValue = a.type.toLowerCase();
-              bValue = b.type.toLowerCase();
-              break;
-            case 3: // סכום
-              aValue = parseFloat(a.amount);
-              bValue = parseFloat(b.amount);
-              break;
-            case 4: // יעד
-              aValue = parseFloat(a.target);
-              bValue = parseFloat(b.target);
-              break;
-            case 5: // סטופ
-              aValue = parseFloat(a.stop);
-              bValue = parseFloat(b.stop);
-              break;
-            case 6: // נוכחי
-              aValue = parseFloat(a.current);
-              bValue = parseFloat(b.current);
-              break;
-            case 7: // סטטוס
-              aValue = getStatusForSort(a.status);
-              bValue = getStatusForSort(b.status);
-              break;
-            default:
-              return 0;
-          }
-
-          console.log(`🔄 Comparing: ${aValue} vs ${bValue}`);
-
-          // השוואה
-          if (aValue < bValue) {
-            const result = designsCurrentSortDirection === 'asc' ? -1 : 1;
-            console.log(`🔄 ${aValue} < ${bValue}, returning ${result}`);
-            return result;
-          } else if (aValue > bValue) {
-            const result = designsCurrentSortDirection === 'asc' ? 1 : -1;
-            console.log(`🔄 ${aValue} > ${bValue}, returning ${result}`);
-            return result;
-          } else {
-            console.log(`🔄 ${aValue} = ${bValue}, returning 0`);
-            return 0;
-          }
-        });
-
-        console.log('🔄 Sorted data:', designs.map(d => `${d.ticker}: ${d.amount}`));
-
-        // עדכון הטבלה
-        updateTradesTable(trades);
-
-        // עדכון אייקונים
-        updateSortIcons(columnIndex);
-
-        // שמירת מצב המיון ב-localStorage
-        localStorage.setItem('designsSortColumn', columnIndex.toString());
-        localStorage.setItem('designsSortDirection', designsCurrentSortDirection);
-
-        console.log('🔄 === SORT TABLE FUNCTION COMPLETED ===');
       }
 
       // פונקציה להמרת תאריך למיון
@@ -499,8 +494,7 @@
         return typeMap[type] || type;
       }
 
-      // נתוני טריידים - יטענו מה-API
-      let tradesData = [];
+      // נתוני טריידים - יטענו מה-API (מוגדר בקובץ trades.js)
 
       // פונקציה לטעינת נתוני טריידים - מוגדרת בקובץ trades.js
 
@@ -1282,6 +1276,11 @@
       // הפעלת הבדיקה אחרי טעינת הדף
       document.addEventListener('DOMContentLoaded', () => {
         setTimeout(testAccountsFilter, 2000);
+
+        // טעינת מצב המיון
+        if (typeof window.loadSortState === 'function') {
+          window.loadSortState('tracking');
+        }
       });
 
       // פונקציה גלובלית לבדיקה מהירה
@@ -1299,35 +1298,7 @@
         console.log('🔄 === END QUICK TEST ===');
       };
 
-      // Global Scripts - סקריפטים כלליים
-      // הוספת הסקריפטים הנדרשים
-      const script1 = document.createElement('script');
-      script1.src = 'scripts/app-header.js';
-      document.head.appendChild(script1);
-
-      const script2 = document.createElement('script');
-      script2.src = 'scripts/main.js';
-      document.head.appendChild(script2);
-
-      const script3 = document.createElement('script');
-      script3.src = 'scripts/grid-filters.js';
-      document.head.appendChild(script3);
-
-      const script4 = document.createElement('script');
-      script4.src = 'scripts/alerts.js';
-      document.head.appendChild(script4);
-
-      const script5 = document.createElement('script');
-      script5.src = 'scripts/active-alerts-component.js';
-      document.head.appendChild(script5);
-
-      const script6 = document.createElement('script');
-      script6.src = 'scripts/accounts.js';
-      document.head.appendChild(script6);
-
-      const script7 = document.createElement('script');
-      script7.src = 'scripts/trades.js';
-      document.head.appendChild(script7);
+      // הסקריפטים כבר נטענים ב-<head> - אין צורך בטעינה כפולה
     </script>
 </body>
 

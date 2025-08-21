@@ -38,7 +38,7 @@ class AppHeader extends HTMLElement {
 
     // טעינת חשבונות בכל הדפים שצריכים פילטר חשבונות
     const currentPage = window.location.pathname;
-    const pagesNeedingAccounts = ['/planning.html', '/tracking.html', '/database.html', '/planning', '/tracking', '/database', '/notes.html', '/notes'];
+    const pagesNeedingAccounts = ['/planning.html', '/trades.html', '/database.html', '/planning', '/trades', '/database', '/notes.html', '/notes'];
 
     if (pagesNeedingAccounts.some(page => currentPage.includes(page))) {
       console.log('🔄 Page needs accounts, loading...');
@@ -952,7 +952,7 @@ class AppHeader extends HTMLElement {
                 <span class="nav-text">תכנון</span>
               </a>
               
-              <a href="/tracking" class="nav-item" data-page="tracking">
+              <a href="/trades" class="nav-item" data-page="tracking">
                 <span class="nav-text">מעקב</span>
               </a>
               
@@ -970,6 +970,7 @@ class AppHeader extends HTMLElement {
                   <li><a class="dropdown-item" href="/notes">הערות</a></li>
                   <li><a class="dropdown-item" href="/alerts">התראות</a></li>
                   <li><a class="dropdown-item" href="/tickers">טיקרים</a></li>
+                  <li><a class="dropdown-item" href="/executions">עסקעות</a></li>
                   <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="/database">בסיס נתונים</a></li>
@@ -1173,7 +1174,7 @@ class AppHeader extends HTMLElement {
       this.shadowRoot.querySelector('[data-page="home"]')?.classList.add('active');
     } else if (currentPath === '/planning') {
       this.shadowRoot.querySelector('[data-page="planning"]')?.classList.add('active');
-    } else if (currentPath === '/tracking') {
+    } else if (currentPath === '/trades') {
       this.shadowRoot.querySelector('[data-page="tracking"]')?.classList.add('active');
     } else if (currentPath === '/research') {
       this.shadowRoot.querySelector('[data-page="research"]')?.classList.add('active');
@@ -1324,8 +1325,8 @@ class AppHeader extends HTMLElement {
       pageName = 'designs';
     } else if (currentPath.includes('/planning')) {
       pageName = 'planning';
-    } else if (currentPath.includes('/tracking')) {
-      pageName = 'tracking';
+    } else if (currentPath.includes('/trades')) {
+      pageName = 'trades';
     } else if (currentPath.includes('/notes')) {
       pageName = 'notes';
     } else if (currentPath.includes('/accounts')) {
@@ -2504,8 +2505,8 @@ class AppHeader extends HTMLElement {
 
     if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
       pageName = 'designs';
-    } else if (currentPath.includes('/tracking')) {
-      pageName = 'tracking';
+    } else if (currentPath.includes('/trades')) {
+      pageName = 'trades';
     } else if (currentPath.includes('/notes')) {
       pageName = 'notes';
     } else if (currentPath.includes('/accounts')) {
@@ -2560,8 +2561,8 @@ class AppHeader extends HTMLElement {
 
     if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
       pageName = 'designs';
-    } else if (currentPath.includes('/tracking')) {
-      pageName = 'tracking';
+    } else if (currentPath.includes('/trades')) {
+      pageName = 'trades';
     } else if (currentPath.includes('/notes')) {
       pageName = 'notes';
     } else if (currentPath.includes('/accounts')) {
@@ -2610,8 +2611,8 @@ class AppHeader extends HTMLElement {
 
     if (currentPath.includes('/designs') || currentPath.includes('/planning')) {
       pageName = 'designs';
-    } else if (currentPath.includes('/tracking')) {
-      pageName = 'tracking';
+    } else if (currentPath.includes('/trades')) {
+      pageName = 'trades';
     } else if (currentPath.includes('/notes')) {
       pageName = 'notes';
     } else if (currentPath.includes('/accounts')) {
@@ -2841,8 +2842,8 @@ class AppHeader extends HTMLElement {
       pageName = 'designs';
     } else if (currentPath.includes('/planning')) {
       pageName = 'planning';
-    } else if (currentPath.includes('/tracking')) {
-      pageName = 'tracking';
+    } else if (currentPath.includes('/trades')) {
+      pageName = 'trades';
     } else if (currentPath.includes('/notes')) {
       pageName = 'notes';
     } else if (currentPath.includes('/accounts')) {

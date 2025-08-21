@@ -4,11 +4,11 @@
  * ========================================
  * 
  * קובץ ייעודי לניהול טריידים (trades.js)
- * משמש גם בדף "מעקב" (tracking.html) וגם בדף "דאטאבייס" (database.html)
+ * משמש גם בדף "מעקב" (trades.html) וגם בדף "דאטאבייס" (database.html)
  * מכיל את כל הפונקציות הספציפיות לטריידים
  * 
  * דפים שמשתמשים בקובץ זה:
- * - tracking.html - דף מעקב טריידים
+ * - trades.html - דף מעקב טריידים
  * - database.html - דף דאטאבייס (טבלת טריידים)
  * 
  * פונקציות עיקריות:
@@ -82,7 +82,7 @@ async function loadTradesData() {
     console.log('📡 נתונים מה-API:', apiData);
     console.log('📡 אורך הנתונים:', apiData ? apiData.length : 'null');
 
-    // עדכון הנתונים המקומיים
+    // עדכון הנתונים המקומיים - שימוש בשמות אחידים מה-API
     tradesData = apiData.map(trade => ({
       id: trade.id,
       account_id: trade.account_id,
@@ -92,8 +92,10 @@ async function loadTradesData() {
       trade_plan_id: trade.trade_plan_id,
       status: trade.status,
       type: trade.type,
-      opened_at: trade.created_at,
+      side: trade.side,
+      created_at: trade.created_at,
       closed_at: trade.closed_at,
+      cancelled_at: trade.cancelled_at,
       total_pl: trade.total_pl,
       notes: trade.notes
     }));
@@ -176,7 +178,7 @@ function updateTradesTable(trades) {
       <td>${typeDisplay}</td>
       <td>${trade.side || 'Long'}</td>
       <td>${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
-      <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : ''}</td>
+      <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
       <td class="${trade.total_pl >= 0 ? 'text-success' : 'text-danger'}">${trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00'}</td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
@@ -586,53 +588,156 @@ window.clearTradeValidationErrors = clearTradeValidationErrors; // ניקוי ש
 // פונקציות עזר:
 window.loadModalData = loadModalData;                      // טעינת נתונים למודל
 
-// פונקציות לפתיחה/סגירה של סקשנים
-function toggleMainSection() {
-  console.log('🔄 toggleMainSection נקראה');
-  const contentSections = document.querySelectorAll('.content-section');
-  console.log('📋 מספר content-sections נמצא:', contentSections.length);
-  const tradesSection = contentSections[0]; // הסקשן הראשון - טריידים
-  
-  if (!tradesSection) {
-    console.error('❌ לא נמצא סקשן טריידים');
-    return;
+// פונקציות סידור:
+window.updateTradesSortIcons = updateTradesSortIcons;      // עדכון אייקוני סידור
+window.loadTradesSortState = loadTradesSortState;          // טעינת מצב סידור
+window.getTradesStatusForSort = getTradesStatusForSort;    // מיון סטטוסים
+
+// פונקציית סידור מותאמת לטבלת טריידים
+function sortTable(columnIndex) {
+  console.log('🔄 === SORT TRADES TABLE ===');
+  console.log('🔄 Column clicked:', columnIndex);
+
+  // קבלת הנתונים הנוכחיים
+  let sortedData = [...(window.tradesData || [])];
+
+  // עדכון כיוון הסידור
+  if (window.tradesCurrentSortColumn === columnIndex) {
+    window.tradesCurrentSortDirection = window.tradesCurrentSortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    window.tradesCurrentSortColumn = columnIndex;
+    window.tradesCurrentSortDirection = 'asc';
   }
-  console.log('✅ סקשן טריידים נמצא:', tradesSection);
 
-  const sectionBody = tradesSection.querySelector('.section-body');
-  const toggleBtn = tradesSection.querySelector('button[onclick="toggleMainSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-  
-  console.log('🎯 sectionBody נמצא:', !!sectionBody);
-  console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
-  console.log('🎨 icon נמצא:', !!icon);
+  console.log('🔄 Sort direction:', window.tradesCurrentSortDirection);
 
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-    console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
+  // מיון הנתונים לפי העמודה הנבחרת
+  sortedData.sort((a, b) => {
+    let aValue, bValue;
 
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
+    switch (columnIndex) {
+      case 0: // חשבון
+        aValue = (a.account_name || a.account_id || '').toLowerCase();
+        bValue = (b.account_name || b.account_id || '').toLowerCase();
+        break;
+      case 1: // טיקר
+        aValue = (a.ticker_symbol || a.symbol || '').toLowerCase();
+        bValue = (b.ticker_symbol || b.symbol || '').toLowerCase();
+        break;
+      case 2: // תוכנית
+        aValue = (a.trade_plan_id || '').toString();
+        bValue = (b.trade_plan_id || '').toString();
+        break;
+      case 3: // סטטוס
+        aValue = getTradesStatusForSort(a.status);
+        bValue = getTradesStatusForSort(b.status);
+        break;
+      case 4: // סוג
+        aValue = (a.type || '').toLowerCase();
+        bValue = (b.type || '').toLowerCase();
+        break;
+      case 5: // צד
+        aValue = (a.side || 'Long').toLowerCase();
+        bValue = (b.side || 'Long').toLowerCase();
+        break;
+      case 6: // נוצר ב
+        aValue = new Date(a.created_at || '').getTime();
+        bValue = new Date(b.created_at || '').getTime();
+        break;
+      case 7: // נסגר ב
+        aValue = new Date(a.closed_at || a.cancelled_at || '').getTime();
+        bValue = new Date(b.closed_at || b.cancelled_at || '').getTime();
+        break;
+      case 8: // רווח/הפסד
+        aValue = parseFloat(a.total_pl) || 0;
+        bValue = parseFloat(b.total_pl) || 0;
+        break;
+      case 9: // הערות
+        aValue = (a.notes || '').toLowerCase();
+        bValue = (b.notes || '').toLowerCase();
+        break;
+      default:
+        return 0;
+    }
+
+    // השוואה
+    if (aValue < bValue) {
+      return window.tradesCurrentSortDirection === 'asc' ? -1 : 1;
+    } else if (aValue > bValue) {
+      return window.tradesCurrentSortDirection === 'asc' ? 1 : -1;
     } else {
-      sectionBody.style.display = 'none';
+      return 0;
     }
+  });
 
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
+  // עדכון הטבלה
+  window.updateTradesTable(sortedData);
 
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('tradesSectionCollapsed', !isCollapsed);
+  // עדכון אייקונים
+  updateTradesSortIcons(columnIndex);
+
+  // שמירת מצב המיון ב-localStorage
+  localStorage.setItem('tradesSortColumn', columnIndex.toString());
+  localStorage.setItem('tradesSortDirection', window.tradesCurrentSortDirection);
+
+  console.log('✅ Trades table sorted successfully');
+  return sortedData;
+}
+
+// פונקציה לקבלת ערך מספרי לסטטוס טריידים
+function getTradesStatusForSort(status) {
+  switch (status) {
+    case 'open': return 1;
+    case 'closed': return 2;
+    case 'cancelled': return 3;
+    case 'canceled': return 3;
+    default: return 0;
   }
 }
 
-window.toggleMainSection = toggleMainSection;
+// פונקציה לעדכון אייקוני המיון בטבלת טריידים
+function updateTradesSortIcons(activeColumnIndex) {
+  const buttons = document.querySelectorAll('#tradesContainer .sortable-header');
+
+  buttons.forEach((button, index) => {
+    const sortIcon = button.querySelector('.sort-icon');
+    if (sortIcon) {
+      if (index === activeColumnIndex) {
+        const iconText = window.tradesCurrentSortDirection === 'asc' ? '↑' : '↓';
+        sortIcon.textContent = iconText;
+        sortIcon.style.color = '#ff9c05';
+        button.classList.add('active-sort');
+      } else {
+        sortIcon.textContent = '↕';
+        sortIcon.style.color = '#999';
+        button.classList.remove('active-sort');
+      }
+    }
+  });
+}
+
+window.sortTable = sortTable;
+
+// פונקציה לטעינת מצב הסידור השמור
+function loadTradesSortState() {
+  const savedColumn = localStorage.getItem('tradesSortColumn');
+  const savedDirection = localStorage.getItem('tradesSortDirection');
+
+  if (savedColumn !== null) {
+    window.tradesCurrentSortColumn = parseInt(savedColumn);
+    window.tradesCurrentSortDirection = savedDirection || 'asc';
+
+    // עדכון אייקונים
+    updateTradesSortIcons(window.tradesCurrentSortColumn);
+  }
+}
 
 // קריאה לטעינת נתונים כשהדף נטען
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function () {
     console.log('🔄 === TRADES.JS DOM CONTENT LOADED ===');
+    // טעינת מצב הסידור השמור
+    loadTradesSortState();
     setTimeout(() => {
       if (typeof window.loadTradesData === 'function') {
         console.log('🔄 Calling loadTradesData from trades.js');
@@ -643,6 +748,8 @@ if (document.readyState === 'loading') {
 } else {
   // הדף כבר נטען
   console.log('🔄 === TRADES.JS PAGE ALREADY LOADED ===');
+  // טעינת מצב הסידור השמור
+  loadTradesSortState();
   setTimeout(() => {
     if (typeof window.loadTradesData === 'function') {
       console.log('🔄 Calling loadTradesData from trades.js (already loaded)');

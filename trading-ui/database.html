@@ -20,17 +20,7 @@
   <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- קבצים מודולריים של הגריד -->
-  <script src="scripts/auth.js"></script>
-  <script src="scripts/app-header.js"></script>
-  <script src="scripts/main.js"></script>
-  <script src="scripts/grid-filters.js"></script>
-  <script src="scripts/accounts.js"></script>
-  <script src="scripts/tickers.js"></script>
-  <script src="scripts/alerts.js"></script>
-  <script src="scripts/notes.js"></script>
-  <script src="scripts/executions.js"></script>
-  <script src="scripts/trades.js"></script>
+  <!-- קבצים מודולריים של הגריד - נטענים בסוף הקובץ -->
 
   <style>
     /* סגנונות ייחודיים לדף בסיס נתונים שלא קיימים בקבצים הכלליים */
@@ -1767,17 +1757,7 @@
       }
 
       // Helper functions
-      function formatDate(dateString) {
-        if (!dateString) return '-';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('he-IL');
-      }
-
-      function formatDateTime(dateString) {
-        if (!dateString) return '-';
-        const date = new Date(dateString);
-        return date.toLocaleString('he-IL');
-      }
+      // פונקציות formatDate ו-formatDateTime מוגדרות בקובץ main.js
 
 
 
@@ -1832,41 +1812,141 @@
 
       async function loadAccounts() {
         try {
+          console.log('🔄 === LOAD ACCOUNTS FUNCTION STARTED ===');
           console.log('🔄 טוען חשבונות...');
 
-          const response = await window.apiCall('/api/v1/accounts/');
-          const accounts = response.data || response;
+          // בדיקה שהפונקציות זמינות
+          console.log('🔍 בדיקת זמינות פונקציות:', {
+            loadAccountsDataFromAPI: typeof window.loadAccountsDataFromAPI,
+            apiCall: typeof window.apiCall,
+            formatCurrency: typeof window.formatCurrency,
+            formatDateTime: typeof window.formatDateTime
+          });
 
-          const tbody = document.querySelector('#accountsTable tbody');
-          if (!tbody) {
-            console.error('❌ לא נמצא tbody לטבלת חשבונות');
-            return;
+          if (typeof window.loadAccountsDataFromAPI === 'function') {
+            console.log('🔄 loadAccountsDataFromAPI function found, calling it...');
+            const accounts = await window.loadAccountsDataFromAPI();
+            console.log('🔄 נתונים שהתקבלו:', accounts);
+            console.log('🔄 מספר חשבונות:', accounts.length);
+            console.log('🔄 סוג הנתונים:', typeof accounts);
+            console.log('🔄 האם מערך:', Array.isArray(accounts));
+
+            const tbody = document.querySelector('#accountsTable tbody');
+            console.log('🔄 מחפש tbody:', tbody);
+            console.log('🔄 האם tbody נמצא:', !!tbody);
+            console.log('🔄 תוכן tbody לפני עדכון:', tbody ? tbody.innerHTML.substring(0, 100) + '...' : 'לא נמצא');
+
+            if (!tbody) {
+              console.error('❌ לא נמצא tbody לטבלת חשבונות');
+              console.log('🔄 מחפש אלמנטים עם id accountsTable:', document.getElementById('accountsTable'));
+              return;
+            }
+
+            console.log('🔄 נמצא tbody, מעדכן טבלה...');
+
+            const tableHTML = accounts.map(account => `
+            <tr>
+              <td>${account.id}</td>
+              <td>${account.name || '-'}</td>
+              <td>${account.currency || '-'}</td>
+              <td>${account.status || '-'}</td>
+              <td>${window.formatCurrency ? window.formatCurrency(account.cash_balance) : account.cash_balance || '-'}</td>
+              <td>${window.formatCurrency ? window.formatCurrency(account.total_value) : account.total_value || '-'}</td>
+              <td>${window.formatCurrency ? window.formatCurrency(account.total_pl) : account.total_pl || '-'}</td>
+              <td>${account.notes || '-'}</td>
+              <td>${window.formatDateTime ? window.formatDateTime(account.created_at) : account.created_at || '-'}</td>
+              <td>
+                <button class="btn btn-sm btn-secondary" onclick="editRecord('accounts', ${account.id})" title="ערוך">✏️</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteRecord('accounts', ${account.id})" title="מחק">🗑️</button>
+              </td>
+            </tr>
+          `).join('');
+
+            console.log('🔄 HTML שנוצר:', tableHTML.substring(0, 200) + '...');
+            console.log('🔄 אורך ה-HTML:', tableHTML.length);
+            console.log('🔄 מספר שורות שנוצרו:', accounts.length);
+
+            tbody.innerHTML = tableHTML;
+            console.log('🔄 tbody עודכן בהצלחה');
+            console.log('🔄 תוכן tbody אחרי עדכון:', tbody.innerHTML.substring(0, 100) + '...');
+
+            const countElement = document.getElementById('accountsCount');
+            if (countElement) {
+              countElement.textContent = `${accounts.length} חשבונות`;
+              console.log('🔄 עדכון ספירה:', `${accounts.length} חשבונות`);
+            } else {
+              console.error('❌ לא נמצא אלמנט ספירה');
+            }
+
+            console.log('✅ טבלת חשבונות עודכנה בהצלחה');
+            console.log('🔄 === LOAD ACCOUNTS FUNCTION COMPLETED ===');
+          } else {
+            console.error('❌ loadAccountsDataFromAPI function not found');
+
+            // ניסיון להשתמש ב-apiCall ישירות
+            if (typeof window.apiCall === 'function') {
+              console.log('🔄 מנסה להשתמש ב-apiCall ישירות...');
+              try {
+                const response = await window.apiCall('/api/v1/accounts/');
+                const accounts = response.data || response;
+
+                console.log('🔄 נתונים שהתקבלו:', accounts);
+                console.log('🔄 מספר חשבונות:', accounts.length);
+
+                const tbody = document.querySelector('#accountsTable tbody');
+                if (!tbody) {
+                  console.error('❌ לא נמצא tbody לטבלת חשבונות');
+                  return;
+                }
+
+                const tableHTML = accounts.map(account => `
+                <tr>
+                  <td>${account.id}</td>
+                  <td>${account.name || '-'}</td>
+                  <td>${account.currency || '-'}</td>
+                  <td>${account.status || '-'}</td>
+                  <td>${window.formatCurrency ? window.formatCurrency(account.cash_balance) : account.cash_balance || '-'}</td>
+                  <td>${window.formatCurrency ? window.formatCurrency(account.total_value) : account.total_value || '-'}</td>
+                  <td>${window.formatCurrency ? window.formatCurrency(account.total_pl) : account.total_pl || '-'}</td>
+                  <td>${account.notes || '-'}</td>
+                  <td>${window.formatDateTime ? window.formatDateTime(account.created_at) : account.created_at || '-'}</td>
+                  <td>
+                    <button class="btn btn-sm btn-secondary" onclick="editRecord('accounts', ${account.id})" title="ערוך">✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteRecord('accounts', ${account.id})" title="מחק">🗑️</button>
+                  </td>
+                </tr>
+              `).join('');
+
+                tbody.innerHTML = tableHTML;
+
+                const countElement = document.getElementById('accountsCount');
+                if (countElement) {
+                  countElement.textContent = `${accounts.length} חשבונות`;
+                }
+
+                console.log('✅ טבלת חשבונות עודכנה בהצלחה באמצעות apiCall');
+              } catch (apiError) {
+                console.error('❌ שגיאה בשימוש ב-apiCall:', apiError);
+                document.querySelector('#accountsTable tbody').innerHTML = `<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת חשבונות: ${apiError.message}</td></tr>`;
+                document.getElementById('accountsCount').textContent = 'שגיאה';
+              }
+            } else {
+              document.querySelector('#accountsTable tbody').innerHTML = `<tr><td colspan="10" class="text-center text-danger">פונקציות טעינת חשבונות לא זמינות</td></tr>`;
+              document.getElementById('accountsCount').textContent = 'שגיאה';
+            }
           }
-
-          tbody.innerHTML = accounts.map(account => `
-          <tr>
-            <td>${account.id}</td>
-            <td>${account.name || '-'}</td>
-            <td>${account.currency || '-'}</td>
-            <td>${account.status || '-'}</td>
-            <td>${window.formatCurrency(account.cash_balance)}</td>
-            <td>${window.formatCurrency(account.total_value)}</td>
-            <td>${window.formatCurrency(account.total_pl)}</td>
-            <td>${account.notes || '-'}</td>
-            <td>${window.formatDateTime(account.created_at)}</td>
-            <td>
-              <button class="btn btn-sm btn-secondary" onclick="editRecord('accounts', ${account.id})" title="ערוך">✏️</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteRecord('accounts', ${account.id})" title="מחק">🗑️</button>
-            </td>
-          </tr>
-        `).join('');
-
-          document.getElementById('accountsCount').textContent = `${accounts.length} חשבונות`;
 
         } catch (error) {
           console.error('❌ שגיאה בטעינת חשבונות:', error);
-          document.querySelector('#accountsTable tbody').innerHTML = `<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת חשבונות: ${error.message}</td></tr>`;
-          document.getElementById('accountsCount').textContent = 'שגיאה';
+          const tbody = document.querySelector('#accountsTable tbody');
+          if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת חשבונות: ${error.message}</td></tr>`;
+          }
+          const countElement = document.getElementById('accountsCount');
+          if (countElement) {
+            countElement.textContent = 'שגיאה';
+          }
+          console.log('🔄 === LOAD ACCOUNTS FUNCTION COMPLETED WITH ERROR ===');
         }
       }
 
@@ -2452,16 +2532,28 @@
 
       // Action functions
       function refreshAllTables() {
+        console.log('🔄 === REFRESH ALL TABLES STARTED ===');
+        console.log('🔄 Loading users...');
         loadUsers();
+        console.log('🔄 Loading accounts...');
         loadAccounts();
+        console.log('🔄 Loading tickers...');
         loadTickers();
+        console.log('🔄 Loading trades...');
         loadTrades();
+        console.log('🔄 Loading trade plans...');
         loadTradePlans();
+        console.log('🔄 Loading alerts...');
         loadAlerts();
+        console.log('🔄 Loading cash flows...');
         loadCashFlows();
+        console.log('🔄 Loading notes...');
         loadNotes();
+        console.log('🔄 Loading executions...');
         loadExecutions();
+        console.log('🔄 Loading user roles...');
         loadUserRoles();
+        console.log('🔄 === REFRESH ALL TABLES COMPLETED ===');
       }
 
       function exportDatabase() {
@@ -2565,7 +2657,9 @@
           console.log('🔄 === FILTERS INITIALIZED ===');
         }
 
+        console.log('🔄 === STARTING DATA LOAD ===');
         refreshAllTables(); // טוען נתונים ישירות
+        console.log('🔄 === DATA LOAD COMPLETED ===');
       });
 
       // Authentication system removed for simplicity
@@ -2621,6 +2715,14 @@
       // הפונקציות מוגדרות בקובץ main.js
       console.log('✅ editRecord function available:', typeof window.editRecord);
       console.log('✅ deleteRecord function available:', typeof window.deleteRecord);
+
+      // בדיקה שהפונקציות זמינות
+      if (!window.editRecord) {
+        console.warn('⚠️ editRecord function not available');
+      }
+      if (!window.deleteRecord) {
+        console.warn('⚠️ deleteRecord function not available');
+      }
 
       if (!window.cancelRecord) {
         window.cancelRecord = function (tableType, recordId) {
@@ -2694,36 +2796,12 @@
         }
       }
 
-      // פונקציות עזר לפורמט
-      if (!window.formatCurrency) {
-        window.formatCurrency = function (amount) {
-          if (amount === null || amount === undefined) return '-';
-          return new Intl.NumberFormat('he-IL', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2
-          }).format(amount);
-        };
-      }
+      // פונקציות formatCurrency ו-formatDateTime מוגדרות בקובץ main.js
 
-      if (!window.formatDateTime) {
-        window.formatDateTime = function (dateTime) {
-          if (!dateTime) return '-';
-          try {
-            const date = new Date(dateTime);
-            return date.toLocaleString('he-IL');
-          } catch (error) {
-            return dateTime;
-          }
-        };
-      }
-
-      // הגדרת פונקציות גלובליות
-      window.apiCall = apiCall;
-      window.cancelTrade = cancelTrade;
-      window.cancelTradePlan = cancelTradePlan;
-      window.loadTrades = loadTrades;
-      window.loadTradePlans = loadTradePlans;
+      // הגדרת פונקציות גלובליות - הפונקציות מוגדרות בקובץ main.js
+      // window.apiCall מוגדר בקובץ main.js
+      // window.cancelTrade, window.cancelTradePlan מוגדרים בקובץ main.js
+      // window.loadTrades, window.loadTradePlans מוגדרים בקובץ main.js
 
       // בדיקה שהפונקציות זמינות
       console.log('🔍 בדיקת זמינות פונקציות בסוף:', {
@@ -3000,13 +3078,9 @@
     <script src="scripts/alerts.js"></script>
     <script src="scripts/active-alerts-component.js"></script>
     <script src="scripts/accounts.js"></script>
-
-    <!-- Page Specific Scripts - סקריפטים ספציפיים לדף -->
     <script src="scripts/trades.js"></script>
-    <script src="scripts/accounts.js"></script>
     <script src="scripts/tickers.js"></script>
     <script src="scripts/notes.js"></script>
-    <script src="scripts/alerts.js"></script>
     <script src="scripts/planning.js"></script>
     <script src="scripts/executions.js"></script>
 

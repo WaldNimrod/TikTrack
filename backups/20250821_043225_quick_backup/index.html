@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<!--
+  ========================================
+  דף הבית - Dashboard
+  ========================================
+  
+  דף הבית של האפליקציה
+  מציג סיכום כללי של התיק והביצועים
+  
+  תכונות:
+  - סיכום סטטיסטיקות
+  - התראות פעילות
+  - גרפים של ביצועים
+  - שינויים יומיים
+  - Market-to-Market
+  - מערכת התראות גלובלית
+  
+  מחבר: Tik.track Development Team
+  תאריך עדכון אחרון: 2025
+  ========================================
+-->
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מערכת ניהול השקעות - TikTrack</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <!-- Apple Theme CSS - בסיס כללי -->
+  <link rel="stylesheet" href="styles/apple-theme.css" />
+  <!-- Main Styles - סגנונות הפרויקט -->
+  <link rel="stylesheet" href="styles/styles.css?v=10" />
+  <!-- Menu CSS - תפריט -->
+  <link rel="stylesheet" href="styles/menu.css?v=6" />
+  <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f7;
+    }
+
+    /* התאמת המרווחים לכותרת החדשה */
+    .background-wrapper {
+      padding-top: 120px !important;
+      /* מרווח לכותרת + פילטר + מרווח קטן */
+      padding-right: 32px;
+      transition: padding-top 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .background-wrapper.filter-collapsed {
+      padding-top: 30px !important;
+      /* מרווח לכותרת בלבד + מרווח קטן */
+    }
+
+    .dashboard {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      font-family: inherit;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e8e8e8;
+    }
+
+    /* Login Interface Styles */
+    .login-container {
+      max-width: 400px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e8e8e8;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1rem;
+      background: linear-gradient(135deg, var(--apple-blue), #29a6a8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+    }
+
+    .login-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--apple-text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+      color: var(--apple-text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: var(--apple-text-primary);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--apple-border-light);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s;
+      background: var(--apple-bg-secondary);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--apple-blue);
+      box-shadow: 0 0 0 0.2rem rgba(0, 122, 255, 0.25);
+      background: white;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--apple-blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 1rem;
+    }
+
+    .btn-login:hover {
+      background: #0056b3;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    }
+
+    .btn-login:disabled {
+      background: var(--apple-text-secondary);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .remember-me input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--apple-blue);
+    }
+
+    .remember-me label {
+      font-size: 0.9rem;
+      color: var(--apple-text-secondary);
+      cursor: pointer;
+    }
+
+    .login-error {
+      background: var(--apple-red-light);
+      color: var(--apple-red);
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .login-success {
+      background: var(--apple-green-light);
+      color: var(--apple-green);
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .demo-credentials {
+      background: var(--apple-bg-secondary);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      border: 1px solid var(--apple-border-light);
+    }
+
+    .demo-credentials h6 {
+      margin-bottom: 0.5rem;
+      color: var(--apple-text-primary);
+      font-size: 0.9rem;
+    }
+
+    .demo-credentials p {
+      margin-bottom: 0.25rem;
+      font-size: 0.8rem;
+      color: var(--apple-text-secondary);
+    }
+
+    .demo-credentials strong {
+      color: var(--apple-text-primary);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .dashboard-section {
+      background: var(--apple-bg-elevated);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--apple-border-light);
+      box-shadow: var(--apple-shadow-light);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--apple-border-light);
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--apple-text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--apple-bg-secondary);
+      padding: 0.25rem;
+      border-radius: 8px;
+    }
+
+    .view-toggle button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--apple-text-secondary);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .view-toggle button.active {
+      background: var(--apple-blue);
+      color: white;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .summary-card {
+      background: var(--apple-bg-secondary);
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .summary-label {
+      font-size: 0.9rem;
+      color: var(--apple-text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--apple-text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .summary-change {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .summary-change.positive {
+      color: var(--apple-green);
+    }
+
+    .summary-change.negative {
+      color: var(--apple-red);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-top: 1rem;
+    }
+
+    .daily-changes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .daily-card {
+      background: var(--apple-bg-secondary);
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .daily-date {
+      font-size: 0.9rem;
+      color: var(--apple-text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .daily-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .daily-percent {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .alerts-section {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+      border: 1px solid #ffc107;
+    }
+
+    .alerts-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .alerts-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #856404;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .alerts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .alert-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ffc107;
+    }
+
+    .alert-ticker {
+      font-weight: 600;
+      color: var(--apple-blue);
+      margin-bottom: 0.25rem;
+    }
+
+    .alert-description {
+      font-size: 0.9rem;
+      color: var(--apple-text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .alert-status {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .alert-status.active {
+      background: var(--apple-green-light);
+      color: var(--apple-green);
+    }
+
+    .alert-status.pending {
+      background: var(--apple-orange-light);
+      color: var(--apple-orange);
+    }
+
+    .trades-chart {
+      grid-column: 1 / -1;
+    }
+
+    .trades-filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--apple-bg-elevated);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--apple-border-light);
+      box-shadow: var(--apple-shadow-light);
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--apple-blue);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      color: var(--apple-text-secondary);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--apple-text-secondary);
+    }
+
+    .error {
+      background: var(--apple-red-light);
+      color: var(--apple-red);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Web Component של הכותרת -->
+  <app-header></app-header>
+
+  <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+  <div class="page-body">
+    <!-- Login Interface -->
+    <div class="background-wrapper" id="loginSection" style="display: block;">
+      <div class="login-container">
+        <div class="login-header">
+          <div class="login-logo">📊</div>
+          <h1 class="login-title">ברוכים הבאים ל-TikTrack</h1>
+          <p class="login-subtitle">מערכת ניהול השקעות מתקדמת</p>
+        </div>
+
+        <div class="login-error" id="loginError"></div>
+        <div class="login-success" id="loginSuccess"></div>
+
+        <form id="loginForm" onsubmit="return false;">
+          <div class="form-group">
+            <label class="form-label" for="username">שם משתמש</label>
+            <input type="text" id="username" class="form-control" placeholder="הכנס שם משתמש" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">סיסמה</label>
+            <input type="password" id="password" class="form-control" placeholder="הכנס סיסמה" required>
+          </div>
+
+          <div class="remember-me">
+            <input type="checkbox" id="rememberMe">
+            <label for="rememberMe">זכור אותי לתקופת הפיתוח</label>
+          </div>
+
+          <button type="submit" class="btn-login" id="loginBtn">
+            <span id="loginBtnText">התחבר</span>
+            <span id="loginBtnSpinner" style="display: none;">⏳ מתחבר...</span>
+          </button>
+        </form>
+
+        <div class="demo-credentials">
+          <h6>🔑 פרטי התחברות לבדיקה:</h6>
+          <p><strong>מנהל:</strong> username=admin, password=admin123</p>
+          <p><strong>משתמש:</strong> username=test, password=test123</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Content (Hidden initially) -->
+    <div class="background-wrapper" id="dashboardSection" style="display: none;">
+      <div class="dashboard">
+        <!-- סטטיסטיקות מרכזיות -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="loading">טוען נתונים...</div>
+        </div>
+
+        <!-- התראות פעילות -->
+        <div class="dashboard-section alerts-section">
+          <div class="alerts-header">
+            <div class="alerts-title">
+              🔔 התראות פעילות
+            </div>
+            <button class="btn btn-primary" onclick="viewAllAlerts()"
+              style="background: #29a6a8 !important; border-color: #29a6a8 !important; color: white !important; padding: 8px 16px !important; border-radius: 8px !important; font-size: 14px !important; font-weight: 500 !important; transition: all 0.2s ease !important; box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3) !important;">הצג
+              הכל</button>
+          </div>
+          <div class="alerts-grid" id="alertsGrid">
+            <div class="loading">טוען התראות...</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- סיכום חשבונות / סוגי השקעה -->
+          <div class="dashboard-section">
+            <div class="section-header">
+              <div class="section-title">
+                📊 סיכום חשבונות
+              </div>
+              <div class="view-toggle">
+                <button class="active" onclick="switchView('accounts')">חשבונות</button>
+                <button onclick="switchView('types')">סוגי השקעה</button>
+              </div>
+            </div>
+            <div class="summary-grid" id="summaryGrid">
+              <div class="loading">טוען סיכום...</div>
+            </div>
+          </div>
+
+          <!-- גרף טרנזקציות -->
+          <div class="dashboard-section">
+            <div class="section-header">
+              <div class="section-title">
+                📈 ביצועי תיק
+              </div>
+              <div class="view-toggle">
+                <button class="active" onclick="switchChartView('amount')">סכום</button>
+                <button onclick="switchChartView('percent')">אחוזים</button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="performanceChart"></canvas>
+            </div>
+          </div>
+
+          <!-- שינויים יומיים -->
+          <div class="dashboard-section">
+            <div class="section-header">
+              <div class="section-title">
+                📅 שינויים יומיים
+              </div>
+            </div>
+            <div class="daily-changes" id="dailyChanges">
+              <div class="loading">טוען שינויים יומיים...</div>
+            </div>
+          </div>
+
+          <!-- Market-to-Market -->
+          <div class="dashboard-section">
+            <div class="section-header">
+              <div class="section-title">
+                💰 Market-to-Market
+              </div>
+              <div class="view-toggle">
+                <button class="active" onclick="switchMTMView('accounts')">חשבונות</button>
+                <button onclick="switchMTMView('types')">סוגי השקעה</button>
+              </div>
+            </div>
+            <div class="summary-grid" id="mtmGrid">
+              <div class="loading">טוען MTM...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- גרף טריידים פתוחים -->
+        <div class="dashboard-section trades-chart">
+          <div class="section-header">
+            <div class="section-title">
+              📊 טריידים פתוחים
+            </div>
+
+          </div>
+          <div class="chart-container">
+            <canvas id="tradesChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- מערכת התראות -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Authentication System -->
+    <script src="scripts/auth.js"></script>
+
+    <script>
+      // פונקציה לטעינת נתוני הדשבורד
+      function loadDashboardData() {
+        displayStats();
+        displayAlerts();
+        displaySummary(mockData.accounts, 'accounts');
+        displayDailyChanges();
+        createPerformanceChart();
+        createTradesChart();
+      }
+
+      // Authentication system removed for simplicity
+
+      // נתוני דמה
+      const mockData = {
+        stats: {
+          totalValue: 1250000,
+          totalCost: 1180000,
+          totalPL: 70000,
+          realizedPL: 45000,
+          dailyChange: 2500,
+          dailyPercent: 0.2
+        },
+        accounts: [],
+        investmentTypes: [
+          { name: "מניות", value: 700000, cost: 650000, pl: 50000, change: 2000 },
+          { name: "ETF", value: 350000, cost: 340000, pl: 10000, change: 300 },
+          { name: "אופציות", value: 200000, cost: 190000, pl: 10000, change: 200 }
+        ],
+        dailyChanges: [
+          { date: "2025-08-08", value: 2500, percent: 0.2 },
+          { date: "2025-08-07", value: -1200, percent: -0.1 },
+          { date: "2025-08-06", value: 1800, percent: 0.15 }
+        ],
+        alerts: [
+          { ticker: "AAPL", description: "מחיר חצה את 180$", status: "active" },
+          { ticker: "TSLA", description: "מחיר ירד מתחת ל-700$", status: "pending" },
+          { ticker: "NVDA", description: "תזכורת לכניסה", status: "active" }
+        ],
+        trades: [
+          { ticker: "AAPL", totalPL: 8500, realizedPL: 3000, value: 25000, return: 34 },
+          { ticker: "TSLA", totalPL: -1200, realizedPL: 0, value: 18000, return: -6.7 },
+          { ticker: "NVDA", totalPL: 3200, realizedPL: 1500, value: 15000, return: 21.3 },
+          { ticker: "GOOG", totalPL: 1800, realizedPL: 800, value: 12000, return: 15 }
+        ]
+      };
+
+      // הצגת סטטיסטיקות
+      function displayStats() {
+        const statsGrid = document.getElementById('statsGrid');
+        statsGrid.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-number">₪${mockData.stats.totalValue.toLocaleString()}</div>
+          <div class="stat-label">שווי כולל</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">₪${mockData.stats.totalPL.toLocaleString()}</div>
+          <div class="stat-label">רווח/הפסד כולל</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">₪${mockData.stats.realizedPL.toLocaleString()}</div>
+          <div class="stat-label">רווח ממומש</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" style="color: ${mockData.stats.dailyChange >= 0 ? 'var(--apple-green)' : 'var(--apple-red)'}">
+            ${mockData.stats.dailyChange >= 0 ? '+' : ''}₪${mockData.stats.dailyChange.toLocaleString()}
+          </div>
+          <div class="stat-label">שינוי יומי</div>
+        </div>
+      `;
+      }
+
+      // הצגת התראות
+      function displayAlerts() {
+        const alertsGrid = document.getElementById('alertsGrid');
+        alertsGrid.innerHTML = mockData.alerts.map(alert => `
+        <div class="alert-card">
+          <div class="alert-ticker">${alert.ticker}</div>
+          <div class="alert-description">${alert.description}</div>
+          <span class="alert-status ${alert.status}">${alert.status === 'active' ? 'פעיל' : 'ממתין'}</span>
+        </div>
+      `).join('');
+      }
+
+      // הצגת סיכום חשבונות
+      function displaySummary(data, type) {
+        const summaryGrid = document.getElementById('summaryGrid');
+        summaryGrid.innerHTML = data.map(item => `
+        <div class="summary-card">
+          <div class="summary-label">${item.name}</div>
+          <div class="summary-value">₪${item.value.toLocaleString()}</div>
+          <div class="summary-change ${item.pl >= 0 ? 'positive' : 'negative'}">
+            ${item.pl >= 0 ? '+' : ''}₪${item.pl.toLocaleString()} (${item.change >= 0 ? '+' : ''}${item.change.toLocaleString()})
+          </div>
+        </div>
+      `).join('');
+      }
+
+      // הצגת שינויים יומיים
+      function displayDailyChanges() {
+        const dailyChanges = document.getElementById('dailyChanges');
+        dailyChanges.innerHTML = mockData.dailyChanges.map(day => `
+        <div class="daily-card">
+          <div class="daily-date">${new Date(day.date).toLocaleDateString('he-IL')}</div>
+          <div class="daily-value" style="color: ${day.value >= 0 ? 'var(--apple-green)' : 'var(--apple-red)'}">
+            ${day.value >= 0 ? '+' : ''}₪${day.value.toLocaleString()}
+          </div>
+          <div class="daily-percent" style="color: ${day.percent >= 0 ? 'var(--apple-green)' : 'var(--apple-red)'}">
+            ${day.percent >= 0 ? '+' : ''}${day.percent}%
+          </div>
+        </div>
+      `).join('');
+      }
+
+      // יצירת גרף טרנזקציות
+      function createPerformanceChart() {
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const labels = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט'];
+        const data = [1100000, 1120000, 1150000, 1180000, 1200000, 1220000, 1230000, 1250000];
+
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'שווי תיק',
+              data: data,
+              borderColor: 'var(--apple-blue)',
+              backgroundColor: 'rgba(0, 122, 255, 0.1)',
+              tension: 0.4,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                ticks: {
+                  callback: function (value) {
+                    return '₪' + (value / 1000) + 'K';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // יצירת גרף טריידים
+      function createTradesChart() {
+        const ctx = document.getElementById('tradesChart').getContext('2d');
+        const labels = mockData.trades.map(trade => trade.ticker);
+        const totalPL = mockData.trades.map(trade => trade.totalPL);
+        const realizedPL = mockData.trades.map(trade => trade.realizedPL);
+
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'רווח/הפסד כולל',
+              data: totalPL,
+              backgroundColor: totalPL.map(pl => pl >= 0 ? 'var(--apple-green)' : 'var(--apple-red)'),
+              borderColor: totalPL.map(pl => pl >= 0 ? 'var(--apple-green)' : 'var(--apple-red)'),
+              borderWidth: 1
+            }, {
+              label: 'רווח ממומש',
+              data: realizedPL,
+              backgroundColor: 'var(--apple-blue)',
+              borderColor: 'var(--apple-blue)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function (value) {
+                    return '₪' + value.toLocaleString();
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // פונקציות ניווט
+      function switchView(type) {
+        const buttons = document.querySelectorAll('.view-toggle button');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        if (type === 'accounts') {
+          displaySummary(mockData.accounts, 'accounts');
+        } else {
+          displaySummary(mockData.investmentTypes, 'types');
+        }
+      }
+
+      function switchChartView(type) {
+        const buttons = document.querySelectorAll('.view-toggle button');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        // כאן אפשר להוסיף לוגיקה לשינוי הגרף
+      }
+
+      function switchMTMView(type) {
+        const buttons = document.querySelectorAll('.view-toggle button');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        if (type === 'accounts') {
+          displaySummary(mockData.accounts, 'accounts');
+        } else {
+          displaySummary(mockData.investmentTypes, 'types');
+        }
+      }
+
+      function viewAllAlerts() {
+        // ניווט למסך ההתראות
+        window.location.href = '/alerts';
+      }
+
+      // הגדרת האזנה לכותרת
+      function setupHeaderListener() {
+        const header = document.querySelector('app-header');
+        if (header) {
+          // האזנה לשינויים בפילטר
+          const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
+                if (filterSection) {
+                  const isCollapsed = filterSection.classList.contains('collapsed');
+                  updateBackgroundPadding(isCollapsed);
+                }
+              }
+            });
+          });
+
+          // התחלת ההאזנה
+          setTimeout(() => {
+            const filterSection = header.shadowRoot?.querySelector('#statusFilterSection');
+            if (filterSection) {
+              observer.observe(filterSection, { attributes: true });
+            }
+          }, 1000);
+        }
+      }
+
+      // פונקציה לעדכון המרווחים בהתאם למצב הפילטר
+      function updateBackgroundPadding(isCollapsed) {
+        const backgroundWrapper = document.querySelector('.background-wrapper');
+        const body = document.body;
+
+        if (backgroundWrapper) {
+          if (isCollapsed) {
+            backgroundWrapper.classList.add('filter-collapsed');
+          } else {
+            backgroundWrapper.classList.remove('filter-collapsed');
+          }
+        }
+
+        if (body) {
+          if (isCollapsed) {
+            body.classList.add('filter-collapsed');
+          } else {
+            body.classList.remove('filter-collapsed');
+          }
+        }
+      }
+
+      // פונקציה להגדרת טופס התחברות
+      function setupLoginForm(formId) {
+        const form = document.getElementById(formId);
+        if (!form) {
+          console.error('Login form not found:', formId);
+          return;
+        }
+
+        // הסרת event listeners קיימים
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+
+        // הוספת event listener חדש
+        newForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+          const rememberMe = document.getElementById('rememberMe').checked;
+
+          if (!username || !password) {
+            showError('אנא מלא את כל השדות');
+            return;
+          }
+
+          try {
+            // הצגת מצב טעינה
+            const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const loginBtnSpinner = document.getElementById('loginBtnSpinner');
+
+            loginBtn.disabled = true;
+            loginBtnText.style.display = 'none';
+            loginBtnSpinner.style.display = 'inline';
+
+            // ניסיון התחברות
+            const result = await login(username, password, rememberMe);
+
+            if (result && result.data && result.data.access_token) {
+              // שמירת ה-token
+              localStorage.setItem('authToken', result.data.access_token);
+              localStorage.setItem('currentUser', JSON.stringify(result.data.user));
+
+              showSuccess('התחברות הצליחה!');
+              // הצגת הדשבורד
+              document.getElementById('loginSection').style.display = 'none';
+              document.getElementById('dashboardSection').style.display = 'block';
+              loadDashboardData();
+            } else {
+              showError('שם משתמש או סיסמה שגויים');
+            }
+          } catch (error) {
+            console.error('Login error:', error);
+            showError('שגיאה בהתחברות. אנא נסה שוב.');
+          } finally {
+            // החזרת מצב הכפתור
+            const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const loginBtnSpinner = document.getElementById('loginBtnSpinner');
+
+            loginBtn.disabled = false;
+            loginBtnText.style.display = 'inline';
+            loginBtnSpinner.style.display = 'none';
+          }
+        });
+
+        console.log('✅ Login form setup completed');
+      }
+
+      // פונקציה להצגת שגיאה
+      function showError(message) {
+        const errorDiv = document.getElementById('loginError');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+
+        // הסתרת שגיאה אחרי 5 שניות
+        setTimeout(() => {
+          errorDiv.style.display = 'none';
+        }, 5000);
+      }
+
+      // פונקציה להצגת הצלחה
+      function showSuccess(message) {
+        const successDiv = document.getElementById('loginSuccess');
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+
+        // הסתרת הודעה אחרי 3 שניות
+        setTimeout(() => {
+          successDiv.style.display = 'none';
+        }, 3000);
+      }
+
+      // טעינת הדף - ללא בדיקת התחברות
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('🔍 DOM loaded, showing dashboard directly...');
+
+        // הגדרת האזנה לכותרת
+        setupHeaderListener();
+
+        // הצגת הדשבורד ישירות ללא התחברות
+        console.log('✅ מציג דשבורד ישירות');
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('dashboardSection').style.display = 'block';
+        loadDashboardData();
+      });
+    </script>
+  </div> <!-- סוף page-body -->
+
+  <!-- Scripts -->
+  <script src="scripts/app-header.js"></script>
+</body>
+
+</html>

@@ -107,10 +107,6 @@ async function loadNotesData() {
     // עדכון הטבלה
     updateNotesTable(notes);
 
-    if (typeof window.showNotification === 'function') {
-      window.showNotification(`נטענו ${notes.length} הערות בהצלחה`, 'success');
-    }
-
   } catch (error) {
     console.error('❌ שגיאה בטעינת נתונים:', error);
 
@@ -186,13 +182,25 @@ function updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccoun
 // פונקציות מודלים
 function showAddNoteModal() {
   console.log('🔄 showAddNoteModal נקראה');
-  
+
   // איפוס הטופס
   document.getElementById('addNoteForm').reset();
-  
+
+  // ניקוי ולידציה
+  clearNoteValidationErrors();
+
+  // הסרת קלאסים של ולידציה
+  const fields = document.querySelectorAll('.is-valid, .is-invalid');
+  fields.forEach(field => {
+    field.classList.remove('is-valid', 'is-invalid');
+  });
+
+  // בחירת טיקר כברירת מחדל
+  document.getElementById('noteRelationTicker').checked = true;
+
   // טעינת נתונים למודל
   loadModalData();
-  
+
   // הצגת המודל
   const modal = new bootstrap.Modal(document.getElementById('addNoteModal'));
   modal.show();
@@ -200,10 +208,10 @@ function showAddNoteModal() {
 
 function showEditNoteModal(noteId) {
   console.log('🔄 showEditNoteModal נקראה עבור ID:', noteId);
-  
+
   // טעינת נתוני ההערה
   loadNoteData(noteId);
-  
+
   // הצגת המודל
   const modal = new bootstrap.Modal(document.getElementById('editNoteModal'));
   modal.show();
@@ -215,29 +223,31 @@ async function loadNoteData(noteId) {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const note = await response.json();
     console.log('✅ נטענו נתוני הערה:', note);
-    
+
     // מילוי הטופס
     document.getElementById('editNoteId').value = note.id;
     document.getElementById('editNoteContent').value = note.content || '';
-    
+
     // בחירת סוג הקשר
     const relationType = note.related_type_id;
     if (relationType) {
       document.querySelector(`input[name="editNoteRelationType"][value="${relationType}"]`).checked = true;
       onNoteRelationTypeChange();
-      
+
       // בחירת האובייקט המקושר
       setTimeout(() => {
         document.getElementById('editNoteRelatedObjectSelect').value = note.related_id;
       }, 100);
     }
-    
+
   } catch (error) {
     console.error('❌ שגיאה בטעינת נתוני הערה:', error);
-    if (typeof window.showNotification === 'function') {
+    if (typeof window.showModalNotification === 'function') {
+      window.showModalNotification('שגיאה בטעינת נתוני הערה', 'error');
+    } else if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בטעינת נתוני הערה', 'error');
     }
   }
@@ -246,107 +256,239 @@ async function loadNoteData(noteId) {
 async function loadModalData() {
   try {
     console.log('🔄 טוען נתונים למודלים...');
-    
-    // טעינת חשבונות
-    const accountsResponse = await fetch('/api/v1/accounts/');
-    const accounts = accountsResponse.ok ? await accountsResponse.json() : [];
-    
-    // טעינת טריידים
-    const tradesResponse = await fetch('/api/trades');
-    const trades = tradesResponse.ok ? await tradesResponse.json() : [];
-    
-    // טעינת תכנונים
-    const tradePlansResponse = await fetch('/api/v1/trade_plans/');
-    const tradePlans = tradePlansResponse.ok ? await tradePlansResponse.json() : [];
-    
-    // טעינת טיקרים
-    const tickersResponse = await fetch('/api/tickers');
-    const tickers = tickersResponse.ok ? await tickersResponse.json() : [];
-    
-    console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תכנונים, ${tickers.length} טיקרים`);
-    
-    // שמירת הנתונים במשתנים גלובליים
-    window.modalAccounts = accounts;
-    window.modalTrades = trades;
-    window.modalTradePlans = tradePlans;
-    window.modalTickers = tickers;
-    
+
+        // טעינת נתונים במקביל
+    const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
+      fetch('/api/database_v2/accounts').then(r => r.json()).catch(() => []),
+      fetch('/api/database_v2/trades').then(r => r.json()).catch(() => []),
+      fetch('/api/database_v2/trade_plans').then(r => r.json()).catch(() => []),
+      fetch('/api/database_v2/tickers').then(r => r.json()).catch(() => [])
+    ]);
+
+    const accounts = Array.isArray(accountsResponse) ? accountsResponse : [];
+    const trades = Array.isArray(tradesResponse) ? tradesResponse : [];
+    const tradePlans = Array.isArray(tradePlansResponse) ? tradePlansResponse : [];
+    const tickers = Array.isArray(tickersResponse) ? tickersResponse : [];
+
+        console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
+
+    // עדכון רדיו באטונים
+    updateRadioButtons(accounts, trades, tradePlans, tickers);
+
   } catch (error) {
-    console.error('❌ שגיאה בטעינת נתונים למודלים:', error);
+    console.error('שגיאה בטעינת נתונים למודל:', error);
+    // המשך עם מערכים ריקים
+    updateRadioButtons([], [], [], []);
   }
+}
+
+/**
+ * עדכון רדיו באטונים
+ */
+function updateRadioButtons(accounts, trades, tradePlans, tickers) {
+  // עדכון רדיו באטון לחשבונות
+  const accountRadio = document.getElementById('noteRelationAccount');
+  const editAccountRadio = document.getElementById('editNoteRelationAccount');
+
+  if (accountRadio) {
+    accountRadio.addEventListener('change', () => {
+      populateSelect('noteRelatedObjectSelect', accounts, 'name', 'חשבון');
+    });
+  }
+
+  if (editAccountRadio) {
+    editAccountRadio.addEventListener('change', () => {
+      populateSelect('editNoteRelatedObjectSelect', accounts, 'name', 'חשבון');
+    });
+  }
+
+  // עדכון רדיו באטון לטריידים
+  const tradeRadio = document.getElementById('noteRelationTrade');
+  const editTradeRadio = document.getElementById('editNoteRelationTrade');
+
+  if (tradeRadio) {
+    tradeRadio.addEventListener('change', () => {
+      populateSelect('noteRelatedObjectSelect', trades, 'id', 'טרייד');
+    });
+  }
+
+  if (editTradeRadio) {
+    editTradeRadio.addEventListener('change', () => {
+      populateSelect('editNoteRelatedObjectSelect', trades, 'id', 'טרייד');
+    });
+  }
+
+  // עדכון רדיו באטון לתכנונים
+  const planRadio = document.getElementById('noteRelationTradePlan');
+  const editPlanRadio = document.getElementById('editNoteRelationTradePlan');
+
+  if (planRadio) {
+    planRadio.addEventListener('change', () => {
+      populateSelect('noteRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+    });
+  }
+
+  if (editPlanRadio) {
+    editPlanRadio.addEventListener('change', () => {
+      populateSelect('editNoteRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+    });
+  }
+
+  // עדכון רדיו באטון לטיקרים
+  const tickerRadio = document.getElementById('noteRelationTicker');
+  const editTickerRadio = document.getElementById('editNoteRelationTicker');
+
+  if (tickerRadio) {
+    tickerRadio.addEventListener('change', () => {
+      populateSelect('noteRelatedObjectSelect', tickers, 'symbol', '');
+    });
+  }
+
+  if (editTickerRadio) {
+    editTickerRadio.addEventListener('change', () => {
+      populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
+    });
+  }
+}
+
+/**
+ * מילוי select עם נתונים
+ */
+function populateSelect(selectId, data, field, prefix = '') {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+
+  console.log(`🔄 מילוי ${selectId} עם ${data.length} פריטים מסוג ${prefix}`);
+  if (data.length > 0) {
+    console.log('📋 דוגמה לפריט ראשון:', data[0]);
+  }
+
+  select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+  data.forEach(item => {
+    const option = document.createElement('option');
+    option.value = item.id;
+
+    // יצירת טקסט מותאם לכל סוג אובייקט
+    let displayText = '';
+
+    if (prefix === 'חשבון') {
+      // עבור חשבון: שם החשבון + מטבע
+      const name = item.name || item.account_name || 'לא מוגדר';
+      const currency = item.currency || 'ILS';
+      displayText = `${name} (${currency})`;
+    } else if (prefix === 'טרייד') {
+      // עבור טרייד: סימבול + תאריך
+      const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
+      const date = item.created_at || item.date;
+      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      displayText = `${symbol} - ${formattedDate}`;
+    } else if (prefix === 'תכנון') {
+      // עבור תכנון: סימבול + תאריך
+      const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
+      const date = item.created_at || item.date;
+      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      displayText = `${symbol} - ${formattedDate}`;
+    } else {
+      // עבור טיקר: רק סימבול
+      displayText = item[field] || item.symbol || 'לא מוגדר';
+    }
+
+    option.textContent = displayText;
+    select.appendChild(option);
+  });
 }
 
 function onNoteRelationTypeChange() {
   const selectedType = document.querySelector('input[name="noteRelationType"]:checked')?.value;
   const editSelectedType = document.querySelector('input[name="editNoteRelationType"]:checked')?.value;
-  
+
   const isEdit = editSelectedType !== undefined;
   const relationType = isEdit ? editSelectedType : selectedType;
   const selectId = isEdit ? 'editNoteRelatedObjectSelect' : 'noteRelatedObjectSelect';
-  
+
   console.log('🔄 onNoteRelationTypeChange:', relationType, 'isEdit:', isEdit);
-  
+
   const select = document.getElementById(selectId);
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
-  
+
   if (!relationType) return;
-  
+
   let options = [];
-  
+
   switch (relationType) {
     case '1': // חשבון
-      options = window.modalAccounts?.map(account => 
-        `<option value="${account.id}">${account.name}</option>`
-      ) || [];
+      if (Array.isArray(window.modalAccounts)) {
+        const activeAccounts = window.modalAccounts.filter(account => account.status === 'active' || account.status === 'פעיל');
+        options = activeAccounts.map(account =>
+          `<option value="${account.id}">${account.name}</option>`
+        );
+      }
       break;
     case '2': // טרייד
-      options = window.modalTrades?.map(trade => 
-        `<option value="${trade.id}">טרייד #${trade.id} - ${trade.ticker || 'לא מוגדר'}</option>`
-      ) || [];
+      if (Array.isArray(window.modalTrades)) {
+        const openTrades = window.modalTrades.filter(trade => trade.status === 'open' || trade.status === 'פתוח');
+        options = openTrades.map(trade =>
+          `<option value="${trade.id}">טרייד #${trade.id} - ${trade.ticker || 'לא מוגדר'}</option>`
+        );
+      }
       break;
     case '3': // תכנון
-      options = window.modalTradePlans?.map(plan => 
-        `<option value="${plan.id}">תכנון #${plan.id} - ${plan.ticker || 'לא מוגדר'}</option>`
-      ) || [];
+      if (Array.isArray(window.modalTradePlans)) {
+        const openPlans = window.modalTradePlans.filter(plan => plan.status === 'open');
+        options = openPlans.map(plan =>
+          `<option value="${plan.id}">תכנון #${plan.id} - ${plan.ticker_symbol || 'לא מוגדר'}</option>`
+        );
+      }
       break;
     case '4': // טיקר
-      options = window.modalTickers?.map(ticker => 
-        `<option value="${ticker.id}">${ticker.symbol} - ${ticker.name || 'לא מוגדר'}</option>`
-      ) || [];
+      if (Array.isArray(window.modalTickers)) {
+        options = window.modalTickers.map(ticker =>
+          `<option value="${ticker.id}">${ticker.symbol}</option>`
+        );
+      }
       break;
   }
-  
+
+  console.log(`🔍 נטענו ${options.length} אפשרויות עבור סוג ${relationType}`);
+  console.log('🔍 נתונים זמינים:', {
+    accounts: window.modalAccounts?.length || 0,
+    trades: window.modalTrades?.length || 0,
+    tradePlans: window.modalTradePlans?.length || 0,
+    tickers: window.modalTickers?.length || 0
+  });
+  console.log('🔍 אפשרויות שנוצרו:', options);
   select.innerHTML += options.join('');
 }
 
 // פונקציות שמירה ומחיקה
 async function saveNote() {
   console.log('🔄 saveNote נקראה');
-  
+
   // איסוף נתונים מהטופס
   const content = document.getElementById('noteContent').value.trim();
   const relationType = document.querySelector('input[name="noteRelationType"]:checked')?.value;
   const relatedId = document.getElementById('noteRelatedObjectSelect').value;
   const attachment = document.getElementById('noteAttachment').files[0];
-  
+
   // ולידציה
   if (!content) {
     showNoteValidationError('contentError', 'תוכן הערה הוא שדה חובה');
     return;
   }
-  
+
   if (!relationType) {
     showNoteValidationError('relationTypeError', 'יש לבחור סוג אובייקט לשיוך');
     return;
   }
-  
+
   if (!relatedId) {
     showNoteValidationError('relatedObjectError', 'יש לבחור אובייקט לשיוך');
     return;
   }
-  
+
   clearNoteValidationErrors();
-  
+
   try {
     const formData = new FormData();
     formData.append('content', content);
@@ -355,32 +497,36 @@ async function saveNote() {
     if (attachment) {
       formData.append('attachment', attachment);
     }
-    
+
     const response = await fetch('/api/notes', {
       method: 'POST',
       body: formData
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const result = await response.json();
     console.log('✅ הערה נשמרה בהצלחה:', result);
-    
-    if (typeof window.showNotification === 'function') {
+
+    if (typeof window.showModalNotification === 'function') {
+      window.showModalNotification('הערה נשמרה בהצלחה!', 'success');
+    } else if (typeof window.showNotification === 'function') {
       window.showNotification('הערה נשמרה בהצלחה!', 'success');
     }
-    
+
     // סגירת המודל וטעינה מחדש
     const modal = bootstrap.Modal.getInstance(document.getElementById('addNoteModal'));
     modal.hide();
-    
+
     loadNotesData();
-    
+
   } catch (error) {
     console.error('❌ שגיאה בשמירת הערה:', error);
-    if (typeof window.showNotification === 'function') {
+    if (typeof window.showModalNotification === 'function') {
+      window.showModalNotification('שגיאה בשמירת הערה', 'error');
+    } else if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בשמירת הערה', 'error');
     }
   }
@@ -388,32 +534,32 @@ async function saveNote() {
 
 async function updateNoteFromModal() {
   console.log('🔄 updateNoteFromModal נקראה');
-  
+
   // איסוף נתונים מהטופס
   const noteId = document.getElementById('editNoteId').value;
   const content = document.getElementById('editNoteContent').value.trim();
   const relationType = document.querySelector('input[name="editNoteRelationType"]:checked')?.value;
   const relatedId = document.getElementById('editNoteRelatedObjectSelect').value;
   const attachment = document.getElementById('editNoteAttachment').files[0];
-  
+
   // ולידציה
   if (!content) {
     showNoteValidationError('editContentError', 'תוכן הערה הוא שדה חובה');
     return;
   }
-  
+
   if (!relationType) {
     showNoteValidationError('editRelationTypeError', 'יש לבחור סוג אובייקט לשיוך');
     return;
   }
-  
+
   if (!relatedId) {
     showNoteValidationError('editRelatedObjectError', 'יש לבחור אובייקט לשיוך');
     return;
   }
-  
+
   clearNoteValidationErrors();
-  
+
   try {
     const formData = new FormData();
     formData.append('content', content);
@@ -422,32 +568,36 @@ async function updateNoteFromModal() {
     if (attachment) {
       formData.append('attachment', attachment);
     }
-    
+
     const response = await fetch(`/api/notes/${noteId}`, {
       method: 'PUT',
       body: formData
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const result = await response.json();
     console.log('✅ הערה עודכנה בהצלחה:', result);
-    
-    if (typeof window.showNotification === 'function') {
+
+    if (typeof window.showModalNotification === 'function') {
+      window.showModalNotification('הערה עודכנה בהצלחה!', 'success');
+    } else if (typeof window.showNotification === 'function') {
       window.showNotification('הערה עודכנה בהצלחה!', 'success');
     }
-    
+
     // סגירת המודל וטעינה מחדש
     const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
     modal.hide();
-    
+
     loadNotesData();
-    
+
   } catch (error) {
     console.error('❌ שגיאה בעדכון הערה:', error);
-    if (typeof window.showNotification === 'function') {
+    if (typeof window.showModalNotification === 'function') {
+      window.showModalNotification('שגיאה בעדכון הערה', 'error');
+    } else if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בעדכון הערה', 'error');
     }
   }
@@ -458,22 +608,26 @@ async function deleteNoteFromServer(noteId) {
     const response = await fetch(`/api/notes/${noteId}`, {
       method: 'DELETE'
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     console.log('✅ הערה נמחקה בהצלחה');
-    
-    if (typeof window.showNotification === 'function') {
+
+    if (typeof window.showModalNotification === 'function') {
+      window.showModalNotification('הערה נמחקה בהצלחה!', 'success');
+    } else if (typeof window.showNotification === 'function') {
       window.showNotification('הערה נמחקה בהצלחה!', 'success');
     }
-    
+
     loadNotesData();
-    
+
   } catch (error) {
     console.error('❌ שגיאה במחיקת הערה:', error);
-    if (typeof window.showNotification === 'function') {
+    if (typeof window.showModalNotification === 'function') {
+      window.showModalNotification('שגיאה במחיקת הערה', 'error');
+    } else if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה במחיקת הערה', 'error');
     }
   }
@@ -486,6 +640,12 @@ function showNoteValidationError(fieldId, message) {
     errorElement.textContent = message;
     errorElement.style.display = 'block';
   }
+
+  // הוספת קלאס is-invalid לשדה הקשור
+  const field = getFieldByErrorId(fieldId);
+  if (field) {
+    field.classList.add('is-invalid');
+  }
 }
 
 function clearNoteValidationErrors() {
@@ -494,6 +654,31 @@ function clearNoteValidationErrors() {
     element.textContent = '';
     element.style.display = 'none';
   });
+
+  // הסרת קלאס is-invalid מכל השדות
+  const fields = document.querySelectorAll('.is-invalid');
+  fields.forEach(field => {
+    field.classList.remove('is-invalid');
+  });
+}
+
+function getFieldByErrorId(errorId) {
+  switch (errorId) {
+    case 'contentError':
+      return document.getElementById('noteContent');
+    case 'editContentError':
+      return document.getElementById('editNoteContent');
+    case 'relationTypeError':
+      return document.querySelector('input[name="noteRelationType"]:checked')?.closest('.col-md-6');
+    case 'editRelationTypeError':
+      return document.querySelector('input[name="editNoteRelationType"]:checked')?.closest('.col-md-6');
+    case 'relatedObjectError':
+      return document.getElementById('noteRelatedObjectSelect');
+    case 'editRelatedObjectError':
+      return document.getElementById('editNoteRelatedObjectSelect');
+    default:
+      return null;
+  }
 }
 
 window.loadNotesData = loadNotesData;
@@ -505,6 +690,7 @@ window.saveNote = saveNote;
 window.updateNoteFromModal = updateNoteFromModal;
 window.deleteNoteFromServer = deleteNoteFromServer;
 window.onNoteRelationTypeChange = onNoteRelationTypeChange;
+window.setupNoteValidationEvents = setupNoteValidationEvents;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
@@ -516,6 +702,92 @@ document.addEventListener('DOMContentLoaded', function () {
   // טעינת נתונים
   loadNotesData();
 
+  // הוספת ולידציה בזמן אמת
+  setupNoteValidationEvents();
+
   console.log('דף הערות נטען בהצלחה');
 });
+
+// פונקציה להגדרת אירועי ולידציה
+function setupNoteValidationEvents() {
+  // ולידציה לשדה תוכן
+  const contentField = document.getElementById('noteContent');
+  if (contentField) {
+    contentField.addEventListener('input', function () {
+      if (this.value.trim()) {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+        const errorElement = document.getElementById('contentError');
+        if (errorElement) {
+          errorElement.style.display = 'none';
+        }
+      } else {
+        this.classList.remove('is-valid');
+      }
+    });
+  }
+
+  // ולידציה לשדה תוכן בעריכה
+  const editContentField = document.getElementById('editNoteContent');
+  if (editContentField) {
+    editContentField.addEventListener('input', function () {
+      if (this.value.trim()) {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+        const errorElement = document.getElementById('editContentError');
+        if (errorElement) {
+          errorElement.style.display = 'none';
+        }
+      } else {
+        this.classList.remove('is-valid');
+      }
+    });
+  }
+
+  // ולידציה לבחירת אובייקט
+  const relatedObjectSelect = document.getElementById('noteRelatedObjectSelect');
+  if (relatedObjectSelect) {
+    relatedObjectSelect.addEventListener('change', function () {
+      if (this.value) {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+        const errorElement = document.getElementById('relatedObjectError');
+        if (errorElement) {
+          errorElement.style.display = 'none';
+        }
+      } else {
+        this.classList.remove('is-valid');
+        this.classList.add('is-invalid');
+        const errorElement = document.getElementById('relatedObjectError');
+        if (errorElement) {
+          errorElement.textContent = 'יש לבחור אובייקט לשיוך';
+          errorElement.style.display = 'block';
+        }
+      }
+    });
+  }
+
+  // ולידציה לבחירת אובייקט בעריכה
+  const editRelatedObjectSelect = document.getElementById('editNoteRelatedObjectSelect');
+  if (editRelatedObjectSelect) {
+    editRelatedObjectSelect.addEventListener('change', function () {
+      if (this.value) {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+        const errorElement = document.getElementById('editRelatedObjectError');
+        if (errorElement) {
+          errorElement.style.display = 'none';
+        }
+      } else {
+        this.classList.remove('is-valid');
+        this.classList.add('is-invalid');
+        const errorElement = document.getElementById('editRelatedObjectError');
+        if (errorElement) {
+          errorElement.textContent = 'יש לבחור אובייקט לשיוך';
+          errorElement.style.display = 'block';
+        }
+      }
+    });
+  }
+}
 

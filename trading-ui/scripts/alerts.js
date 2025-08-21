@@ -124,7 +124,7 @@ function updateAlertsTable(alerts) {
 
   const tbody = document.querySelector('#alertsTable tbody');
   if (!tbody) {
-    console.error('Table body not found');
+    console.log('📋 No alerts table found on this page - skipping table update');
     return;
   }
 
@@ -140,15 +140,15 @@ function updateAlertsTable(alerts) {
       console.log('🔄 טוען נתונים נוספים...');
       const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
         fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/trades').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/tickers').then(r => r.json()).catch(() => ({ data: [] }))
+        fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
       ]);
 
-      accounts = accountsResponse.data || accountsResponse || [];
-      trades = tradesResponse.data || tradesResponse || [];
-      tradePlans = tradePlansResponse.data || tradePlansResponse || [];
-      tickers = tickersResponse.data || tickersResponse || [];
+      accounts = (accountsResponse.data || accountsResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
+      trades = (tradesResponse.data || tradesResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
+      tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
+      tickers = (tickersResponse.data || tickersResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
 
       console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
     } catch (error) {
@@ -187,7 +187,7 @@ function updateAlertsTable(alerts) {
         case 2: // טרייד
           const trade = trades.find(t => t.id === alert.related_id);
           if (trade) {
-            const date = trade.created_at || trade.opened_at || trade.date;
+            const date = trade.created_at || trade.date;
             const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
             relatedDisplay = `טרייד ${alert.related_id} - ${formattedDate}`;
           } else {
@@ -199,7 +199,7 @@ function updateAlertsTable(alerts) {
         case 3: // תוכנית
           const plan = tradePlans.find(p => p.id === alert.related_id);
           if (plan) {
-            const date = plan.created_at || plan.opened_at || plan.date;
+            const date = plan.created_at || plan.date;
             const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
             relatedDisplay = `תוכנית ${alert.related_id} - ${formattedDate}`;
           } else {
@@ -578,13 +578,13 @@ function populateSelect(selectId, data, field, prefix = '') {
     } else if (prefix === 'טרייד') {
       // עבור טרייד: סימבול + תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
-      const date = item.created_at || item.opened_at || item.date;
+      const date = item.created_at || item.date;
       const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
       displayText = `${symbol} - ${formattedDate}`;
     } else if (prefix === 'תכנון') {
       // עבור תכנון: סימבול + תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
-      const date = item.created_at || item.opened_at || item.date;
+      const date = item.created_at || item.date;
       const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
       displayText = `${symbol} - ${formattedDate}`;
     } else {
@@ -1318,11 +1318,47 @@ async function deleteAlert(alertId) {
 }
 
 /**
- * מיון טבלה
+ * פונקציה לסידור הטבלה
+ * 
+ * פונקציה זו משתמשת במערכת הסידור הגלובלית מ-main.js
+ * כדי לסדר את טבלת ההתראות לפי העמודה הנבחרת.
+ * 
+ * הפונקציה:
+ * - משתמשת ב-sortTableData הגלובלית
+ * - מעדכנת את הנתונים המסוננים
+ * - שומרת את מצב הסידור ב-localStorage
+ * 
+ * @param {number} columnIndex - אינדקס העמודה לסידור (0-7)
+ * 
+ * @example
+ * sortTable(0); // סידור לפי עמודת סימבול
+ * sortTable(1); // סידור לפי עמודת אובייקט משיוך
+ * sortTable(7); // סידור לפי עמודת תאריך יצירה
+ * 
+ * @requires window.sortTableData - פונקציה גלובלית מ-main.js
+ * @requires window.filteredAlertsData - נתונים מסוננים
+ * @requires alertsData - נתונים מקוריים
+ * @requires updateAlertsTable - פונקציה לעדכון הטבלה
+ * 
+ * @since 2.0
  */
 function sortTable(columnIndex) {
-  // פונקציה זו תתווסף בהמשך
-  console.log(`מיון לפי עמודה ${columnIndex}`);
+  console.log(`🔄 מיון טבלת התראות לפי עמודה ${columnIndex}`);
+
+  // שימוש בפונקציה הגלובלית
+  if (typeof window.sortTableData === 'function') {
+    const sortedData = window.sortTableData(
+      columnIndex,
+      window.filteredAlertsData || alertsData,
+      'alerts',
+      updateAlertsTable
+    );
+
+    // עדכון הנתונים המסוננים
+    window.filteredAlertsData = sortedData;
+  } else {
+    console.error('❌ sortTableData function not found in main.js');
+  }
 }
 
 /**
@@ -1463,7 +1499,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // טעינת נתונים
   loadAlertsData();
+
+  // טעינת מצב המיון
+  if (typeof window.loadSortState === 'function') {
+    window.loadSortState('alerts');
+  }
 });
+
+// פונקציה לעדכון הטבלה מפילטרים
+if (window.location.pathname.includes('/alerts')) {
+  window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+    console.log('🔄 === UPDATE GRID FROM COMPONENT (alerts) ===');
+    console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
+
+    // קריאה לפונקציה הגלובלית
+    if (typeof window.updateGridFromComponentGlobal === 'function') {
+      window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'alerts');
+    } else {
+      console.log('🔄 updateGridFromComponentGlobal not available, using local filtering...');
+
+      // טיפול מקומי בפילטרים אם הפונקציה הגלובלית לא זמינה
+      if (alertsData && typeof window.filterDataByFilters === 'function') {
+        const filteredData = window.filterDataByFilters(alertsData, 'alerts');
+        if (typeof window.updateAlertsTable === 'function') {
+          window.updateAlertsTable(filteredData);
+        }
+      } else {
+        console.error('❌ Local filtering not available either');
+      }
+    }
+  };
+}
+
+// פונקציה גלובלית לעדכון הטבלה
+function updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName) {
+  console.log(`🔄 === UPDATE GRID FROM COMPONENT GLOBAL (${pageName}) ===`);
+  console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName });
+
+  if (pageName === 'alerts' && alertsData) {
+    // החלת פילטרים על הנתונים
+    let filteredData = [...alertsData];
+
+    if (typeof window.filterDataByFilters === 'function') {
+      filteredData = window.filterDataByFilters(alertsData, 'alerts');
+    }
+
+    // עדכון הטבלה
+    if (typeof window.updateAlertsTable === 'function') {
+      window.updateAlertsTable(filteredData);
+    }
+  }
+}
 
 // הוספת הפונקציות לגלובל
 window.loadAlertsData = loadAlertsData;
@@ -1483,6 +1569,7 @@ window.checkAlertVariable = checkAlertVariable;
 window.checkAlertOperator = checkAlertOperator;
 window.buildAlertCondition = buildAlertCondition;
 window.parseAlertCondition = parseAlertCondition;
+window.updateGridFromComponentGlobal = updateGridFromComponentGlobal;
 
 // פונקציות התראה מיובאות מ-main.js - אין צורך בייצוא כפול
 

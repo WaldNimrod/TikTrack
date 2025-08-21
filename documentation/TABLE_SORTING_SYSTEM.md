@@ -30,10 +30,14 @@
 trading-ui/
 ├── scripts/
 │   ├── main.js              # פונקציות גלובליות לסידור
-│   └── planning.js          # יישום ספציפי לדף תכנונים
+│   ├── planning.js          # יישום ספציפי לדף תכנונים
+│   ├── trades.js            # יישום ספציפי לדף מעקב טריידים
+│   └── alerts.js            # יישום ספציפי לדף התראות
 ├── styles/
 │   └── grid-table.css       # עיצובי אייקוני סידור
-└── planning.html            # HTML עם כפתורי סידור
+├── planning.html            # HTML עם כפתורי סידור
+├── trades.html              # HTML עם כפתורי סידור למעקב
+└── alerts.html              # HTML עם כפתורי סידור להתראות
 ```
 
 ### פונקציות גלובליות (main.js)

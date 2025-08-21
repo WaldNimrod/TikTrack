@@ -968,7 +968,7 @@ function toggleSection(sectionId) {
     pageName = 'trades';
   } else if (currentPath.includes('/planning')) {
     pageName = 'planning';
-  } else if (currentPath.includes('/tracking')) {
+  } else if (currentPath.includes('/trades')) {
     pageName = 'tracking';
   } else if (currentPath.includes('/designs')) {
     pageName = 'designs';
@@ -1408,7 +1408,7 @@ async function loadDataByType(dataType, customConfig = {}) {
       apiEndpoint: 'http://127.0.0.1:8080/api/trades',
       dataMapping: {
         ticker: 'ticker',
-        date: 'opened_at',
+        date: 'created_at',
         type: 'type',
         amount: 'total_pl',
         target: 'target_price',
@@ -1918,7 +1918,7 @@ function loadSectionStates() {
     pageName = 'trades';
   } else if (currentPath.includes('/planning')) {
     pageName = 'planning';
-  } else if (currentPath.includes('/tracking')) {
+  } else if (currentPath.includes('/trades')) {
     pageName = 'tracking';
   } else if (currentPath.includes('/designs')) {
     pageName = 'designs';
@@ -2051,45 +2051,94 @@ function sortTableData(columnIndex, data, pageName, updateTableFunction) {
   sortedData.sort((a, b) => {
     let aValue, bValue;
 
-    switch (columnIndex) {
-      case 0: // נכס (Ticker)
-        aValue = getTickerValue(a).toLowerCase();
-        bValue = getTickerValue(b).toLowerCase();
-        break;
-      case 1: // תאריך
-        aValue = new Date(getDateValue(a)).getTime();
-        bValue = new Date(getDateValue(b)).getTime();
-        break;
-      case 2: // סוג
-        aValue = getTypeValue(a).toLowerCase();
-        bValue = getTypeValue(b).toLowerCase();
-        break;
-      case 3: // צד
-        aValue = (getSideValue(a) || 'Long').toLowerCase();
-        bValue = (getSideValue(b) || 'Long').toLowerCase();
-        break;
-      case 4: // סכום
-        aValue = parseFloat(getAmountValue(a)) || 0;
-        bValue = parseFloat(getAmountValue(b)) || 0;
-        break;
-      case 5: // יעד
-        aValue = parseFloat(getTargetValue(a)) || 0;
-        bValue = parseFloat(getTargetValue(b)) || 0;
-        break;
-      case 6: // סטופ
-        aValue = parseFloat(getStopValue(a)) || 0;
-        bValue = parseFloat(getStopValue(b)) || 0;
-        break;
-      case 7: // נוכחי
-        aValue = parseFloat(getCurrentValue(a)) || 0;
-        bValue = parseFloat(getCurrentValue(b)) || 0;
-        break;
-      case 8: // סטטוס
-        aValue = getStatusForSort(getStatusValue(a));
-        bValue = getStatusForSort(getStatusValue(b));
-        break;
-      default:
-        return 0;
+    // טיפול מיוחד לדף מעקב טריידים
+    if (pageName === 'trades') {
+      switch (columnIndex) {
+        case 0: // חשבון
+          aValue = (a.account_name || a.account_id || '').toLowerCase();
+          bValue = (b.account_name || b.account_id || '').toLowerCase();
+          break;
+        case 1: // טיקר
+          aValue = (a.ticker_symbol || a.symbol || '').toLowerCase();
+          bValue = (b.ticker_symbol || b.symbol || '').toLowerCase();
+          break;
+        case 2: // תוכנית
+          aValue = (a.trade_plan_id || '').toString();
+          bValue = (b.trade_plan_id || '').toString();
+          break;
+        case 3: // סטטוס
+          aValue = getStatusForSort(a.status);
+          bValue = getStatusForSort(b.status);
+          break;
+        case 4: // סוג
+          aValue = (a.type || '').toLowerCase();
+          bValue = (b.type || '').toLowerCase();
+          break;
+        case 5: // צד
+          aValue = (a.side || 'Long').toLowerCase();
+          bValue = (b.side || 'Long').toLowerCase();
+          break;
+        case 6: // נוצר ב
+          aValue = new Date(a.created_at || '').getTime();
+          bValue = new Date(b.created_at || '').getTime();
+          break;
+        case 7: // נסגר ב
+          aValue = new Date(a.closed_at || a.cancelled_at || '').getTime();
+          bValue = new Date(b.closed_at || b.cancelled_at || '').getTime();
+          break;
+        case 8: // רווח/הפסד
+          aValue = parseFloat(a.total_pl) || 0;
+          bValue = parseFloat(b.total_pl) || 0;
+          break;
+        case 9: // הערות
+          aValue = (a.notes || '').toLowerCase();
+          bValue = (b.notes || '').toLowerCase();
+          break;
+        default:
+          return 0;
+      }
+    } else {
+      // טיפול כללי לשאר הדפים
+      switch (columnIndex) {
+        case 0: // נכס (Ticker)
+          aValue = getTickerValue(a).toLowerCase();
+          bValue = getTickerValue(b).toLowerCase();
+          break;
+        case 1: // תאריך
+          aValue = new Date(getDateValue(a)).getTime();
+          bValue = new Date(getDateValue(b)).getTime();
+          break;
+        case 2: // סוג
+          aValue = getTypeValue(a).toLowerCase();
+          bValue = getTypeValue(b).toLowerCase();
+          break;
+        case 3: // צד
+          aValue = (getSideValue(a) || 'Long').toLowerCase();
+          bValue = (getSideValue(b) || 'Long').toLowerCase();
+          break;
+        case 4: // סכום
+          aValue = parseFloat(getAmountValue(a)) || 0;
+          bValue = parseFloat(getAmountValue(b)) || 0;
+          break;
+        case 5: // יעד
+          aValue = parseFloat(getTargetValue(a)) || 0;
+          bValue = parseFloat(getTargetValue(b)) || 0;
+          break;
+        case 6: // סטופ
+          aValue = parseFloat(getStopValue(a)) || 0;
+          bValue = parseFloat(getStopValue(b)) || 0;
+          break;
+        case 7: // נוכחי
+          aValue = parseFloat(getCurrentValue(a)) || 0;
+          bValue = parseFloat(getCurrentValue(b)) || 0;
+          break;
+        case 8: // סטטוס
+          aValue = getStatusForSort(getStatusValue(a));
+          bValue = getStatusForSort(getStatusValue(b));
+          break;
+        default:
+          return 0;
+      }
     }
 
     // השוואה
@@ -2135,7 +2184,7 @@ function getTickerValue(item) {
   if (item.ticker && typeof item.ticker === 'object') {
     return item.ticker.symbol || item.ticker.name || '';
   }
-  return item.ticker || item.ticker_symbol || '';
+  return item.ticker || item.ticker_symbol || item.symbol || '';
 }
 
 /**
@@ -2163,7 +2212,7 @@ function getDateValue(item) {
  * getTypeValue({type: 'investment'}) // 'investment'
  */
 function getTypeValue(item) {
-  return item.investment_type || item.type || '';
+  return item.investment_type || item.type || item.trade_type || '';
 }
 
 /**

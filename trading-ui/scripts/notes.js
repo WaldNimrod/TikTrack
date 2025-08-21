@@ -19,6 +19,39 @@ function deleteNote(id) {
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים
+function toggleTopSection() {
+  console.log('🔄 toggleTopSection נקראה');
+  const topSection = document.querySelector('.top-section');
+
+  if (!topSection) {
+    console.error('❌ לא נמצא top-section');
+    return;
+  }
+  console.log('✅ top-section נמצא:', topSection);
+
+  const sectionBody = topSection.querySelector('.section-body');
+  const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (sectionBody) {
+    const isCollapsed = sectionBody.style.display === 'none';
+
+    if (isCollapsed) {
+      sectionBody.style.display = 'block';
+    } else {
+      sectionBody.style.display = 'none';
+    }
+
+    // עדכון האייקון
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // שמירת המצב ב-localStorage
+    localStorage.setItem('notesTopSectionHidden', !isCollapsed);
+  }
+}
+
 function toggleMainSection() {
   console.log('🔄 toggleMainSection נקראה');
   const contentSections = document.querySelectorAll('.content-section');
@@ -58,6 +91,23 @@ function toggleMainSection() {
 
 // פונקציה לשחזור מצב הסגירה
 function restoreNotesSectionState() {
+  // שחזור מצב top-section (התראות וסיכום)
+  const topCollapsed = localStorage.getItem('notesTopSectionHidden') === 'true';
+  const topSection = document.querySelector('.top-section');
+
+  if (topSection) {
+    const sectionBody = topSection.querySelector('.section-body');
+    const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    if (sectionBody && topCollapsed) {
+      sectionBody.style.display = 'none';
+      if (icon) {
+        icon.textContent = '▼';
+      }
+    }
+  }
+
   // שחזור מצב סקשן ההערות
   const notesCollapsed = localStorage.getItem('notesMainSectionHidden') === 'true';
   const contentSections = document.querySelectorAll('.content-section');
@@ -86,6 +136,7 @@ function resetAllFiltersAndReloadData() {
 window.openNoteDetails = openNoteDetails;
 window.editNote = editNote;
 window.deleteNote = deleteNote;
+window.toggleTopSection = toggleTopSection;
 window.toggleMainSection = toggleMainSection;
 window.restoreNotesSectionState = restoreNotesSectionState;
 window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;

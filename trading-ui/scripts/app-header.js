@@ -971,6 +971,7 @@ class AppHeader extends HTMLElement {
                   <li><a class="dropdown-item" href="/alerts">התראות</a></li>
                   <li><a class="dropdown-item" href="/tickers">טיקרים</a></li>
                   <li><a class="dropdown-item" href="/executions">עסקעות</a></li>
+                  <li><a class="dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
                   <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="/database">בסיס נתונים</a></li>

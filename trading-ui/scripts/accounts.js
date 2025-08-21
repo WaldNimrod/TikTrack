@@ -24,6 +24,116 @@
 // משתנים גלובליים לחשבונות
 window.accountsData = [];
 window.accountsLoaded = false;
+window.currenciesData = [];
+window.currenciesLoaded = false;
+
+// פונקציה לטעינת מטבעות מהשרת
+async function loadCurrenciesFromServer() {
+  console.log('🔄 === Loading currencies from server ===');
+
+  try {
+    const token = localStorage.getItem('authToken');
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch('http://127.0.0.1:8080/api/v1/currencies/', {
+      method: 'GET',
+      headers: headers
+    });
+
+    console.log('🔄 Currencies response status:', response.status);
+
+    if (response.ok) {
+      const responseData = await response.json();
+      console.log('🔄 Currencies response from server:', responseData);
+
+      const currencies = responseData.data || responseData;
+      window.currenciesData = currencies;
+      window.currenciesLoaded = true;
+      console.log('🔄 Currencies loaded from server:', currencies.length, 'currencies');
+      console.log('🔄 Currencies details:', currencies);
+    } else {
+      console.log('🔄 Error loading currencies from server, status:', response.status);
+      const errorText = await response.text();
+      console.log('🔄 Error response:', errorText);
+      // טעינת מטבעות ברירת מחדל
+      window.currenciesData = [
+        { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
+      ];
+      window.currenciesLoaded = true;
+    }
+
+  } catch (error) {
+    console.log('🔄 Error loading currencies from server:', error);
+    // טעינת מטבעות ברירת מחדל
+    window.currenciesData = [
+      { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
+    ];
+    window.currenciesLoaded = true;
+  }
+}
+
+// פונקציה עזר להצגת מטבע
+function getCurrencyDisplay(account) {
+  if (account.currency && account.currency.symbol) {
+    // אם יש פרטי מטבע מלאים
+    const symbol = account.currency.symbol;
+    switch (symbol) {
+      case 'USD': return '$';
+      case 'ILS': return '₪';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      default: return symbol;
+    }
+  } else if (account.currency_id && window.currenciesData.length > 0) {
+    // אם יש רק currency_id, נחפש את המטבע
+    const currency = window.currenciesData.find(c => c.id === account.currency_id);
+    if (currency) {
+      switch (currency.symbol) {
+        case 'USD': return '$';
+        case 'ILS': return '₪';
+        case 'EUR': return '€';
+        case 'GBP': return '£';
+        default: return currency.symbol;
+      }
+    }
+  } else if (account.currency) {
+    // fallback למטבע הישן
+    switch (account.currency) {
+      case 'USD': return '$';
+      case 'ILS': return '₪';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      default: return account.currency;
+    }
+  }
+  return '-';
+}
+
+// פונקציה ליצירת אפשרויות מטבע בטופס
+function generateCurrencyOptions(account = null) {
+  if (!window.currenciesData || window.currenciesData.length === 0) {
+    // אם אין מטבעות, נחזיר ברירת מחדל
+    return `
+      <option value="1" ${account && (account.currency_id === 1 || (account.currency && account.currency.symbol === 'USD')) ? 'selected' : ''}>דולר אמריקאי (USD)</option>
+    `;
+  }
+
+  return window.currenciesData.map(currency => {
+    const isSelected = account && (
+      account.currency_id === currency.id ||
+      (account.currency && account.currency.symbol === currency.symbol) ||
+      (account.currency === currency.symbol)
+    );
+
+    return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
+  }).join('');
+}
 
 // פונקציה לטעינת חשבונות מהשרת
 async function loadAccountsFromServer() {
@@ -230,7 +340,7 @@ function updateAccountsTable(accounts) {
   tbody.innerHTML = accounts.map(account => `
     <tr>
       <td>${account.name || '-'}</td>
-      <td>${account.currency === 'USD' ? '$' : account.currency === 'ILS' ? '₪' : account.currency === 'EUR' ? '€' : account.currency === 'GBP' ? '£' : account.currency || '-'}</td>
+      <td>${getCurrencyDisplay(account)}</td>
       <td>${window.convertAccountStatusToHebrew ? window.convertAccountStatusToHebrew(account.status) : (account.status || '-')}</td>
       <td>${window.formatCurrency ? window.formatCurrency(account.cash_balance) : (account.cash_balance || '-')}</td>
       <td>${window.formatCurrency ? window.formatCurrency(account.total_value) : (account.total_value || '-')}</td>
@@ -325,7 +435,7 @@ function updateAccountsTableInDesigns(accounts) {
   tbody.innerHTML = accounts.map(account => `
     <tr>
       <td>${account.name || '-'}</td>
-      <td>${account.currency === 'USD' ? '$' : account.currency === 'ILS' ? '₪' : account.currency === 'EUR' ? '€' : account.currency === 'GBP' ? '£' : account.currency || '-'}</td>
+      <td>${getCurrencyDisplay(account)}</td>
       <td>${window.convertAccountStatusToHebrew ? window.convertAccountStatusToHebrew(account.status) : (account.status || '-')}</td>
       <td>${window.formatCurrency ? window.formatCurrency(account.cash_balance) : (account.cash_balance || '-')}</td>
       <td>${window.formatCurrency ? window.formatCurrency(account.total_value) : (account.total_value || '-')}</td>
@@ -553,6 +663,11 @@ window.debugAccountsFilter = function () {
 
 console.log('✅ קובץ accounts.js נטען בהצלחה - פונקציות זמינות גלובלית');
 
+// טעינת מטבעות בתחילת הטעינה
+if (typeof loadCurrenciesFromServer === 'function') {
+  loadCurrenciesFromServer();
+}
+
 // בדיקה שהפונקציות מיוצאות כראוי
 console.log('🔄 בדיקת ייצוא פונקציות:');
 console.log('- showEditAccountModalById:', typeof window.showEditAccountModalById);
@@ -628,12 +743,9 @@ function createAccountModal(mode, account = null) {
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="accountCurrency" class="form-label">מטבע *</label>
-                  <select class="form-select" id="accountCurrency" name="currency" required>
+                  <select class="form-select" id="accountCurrency" name="currency_id" required>
                     <option value="">בחר מטבע</option>
-                    <option value="ILS" ${account && account.currency === 'ILS' ? 'selected' : ''}>שקל (ILS)</option>
-                    <option value="USD" ${account && account.currency === 'USD' ? 'selected' : ''}>דולר אמריקאי (USD)</option>
-                    <option value="EUR" ${account && account.currency === 'EUR' ? 'selected' : ''}>אירו (EUR)</option>
-                    <option value="GBP" ${account && account.currency === 'GBP' ? 'selected' : ''}>פאונד (GBP)</option>
+                    ${generateCurrencyOptions(account)}
                   </select>
                   <div class="invalid-feedback" id="currencyError"></div>
                 </div>
@@ -748,7 +860,7 @@ function validateAccountData(accountData) {
   }
 
   // בדיקת מטבע
-  if (!accountData.currency || accountData.currency === '') {
+  if (!accountData.currency_id || accountData.currency_id === '') {
     return { isValid: false, message: 'יש לבחור מטבע' };
   }
 
@@ -790,7 +902,7 @@ async function saveAccount(mode, accountId = null) {
 
     const accountData = {
       name: formData.get('name'),
-      currency: formData.get('currency'),
+      currency_id: parseInt(formData.get('currency_id')),
       status: formData.get('status'),
       cash_balance: parseFloat(formData.get('cash_balance')) || 0,
       notes: formData.get('notes')

@@ -16,7 +16,7 @@ Last Updated: 2025-08-16
 - Always follow: Models → Services → Routes → App architecture
 """
 
-from sqlalchemy import Column, String, Float, Integer, DateTime
+from sqlalchemy import Column, String, Float, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from models.base import BaseModel
@@ -31,19 +31,21 @@ class Account(BaseModel):
     """
     
     __tablename__ = "accounts"
+    __table_args__ = {'extend_existing': True}
     
     # Database columns - matching actual database schema
-    id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False)
-    currency = Column(String(3), default='USD')
+    currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False)
     status = Column(String(20), default='open')
     cash_balance = Column(Float, default=0)
     total_value = Column(Float, default=0)
     total_pl = Column(Float, default=0)
     notes = Column(String(500))
-    created_at = Column(DateTime, server_default=func.now())
     
     # Relationships with other entities
+    # Each account belongs to one currency
+    currency = relationship("Currency", backref="accounts")
+    
     # Each account can have multiple trades
     trades = relationship("Trade", back_populates="account", cascade="all, delete-orphan")
     
@@ -60,7 +62,8 @@ class Account(BaseModel):
     
     def __repr__(self) -> str:
         """String representation of the Account object."""
-        return f"<Account(name='{self.name}', currency='{self.currency}', status='{self.status}')>"
+        currency_symbol = self.currency.symbol if self.currency else 'N/A'
+        return f"<Account(name='{self.name}', currency='{currency_symbol}', status='{self.status}')>"
     
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -72,7 +75,8 @@ class Account(BaseModel):
         return {
             'id': self.id,
             'name': self.name,
-            'currency': self.currency,
+            'currency_id': self.currency_id,
+            'currency': self.currency.to_dict() if self.currency else None,
             'status': self.status,
             'cash_balance': self.cash_balance,
             'total_value': self.total_value,
@@ -94,9 +98,10 @@ class Account(BaseModel):
     
     def get_balance_info(self) -> Dict[str, str]:
         """Get formatted balance information for display."""
+        currency_symbol = self.currency.symbol if self.currency else 'N/A'
         return {
-            'cash_balance': f"{self.cash_balance:,.2f} {self.currency}" if self.cash_balance else "0.00",
-            'total_value': f"{self.total_value:,.2f} {self.currency}" if self.total_value else "0.00",
-            'total_pl': f"{self.total_pl:,.2f} {self.currency}" if self.total_pl else "0.00",
+            'cash_balance': f"{self.cash_balance:,.2f} {currency_symbol}" if self.cash_balance else "0.00",
+            'total_value': f"{self.total_value:,.2f} {currency_symbol}" if self.total_value else "0.00",
+            'total_pl': f"{self.total_pl:,.2f} {currency_symbol}" if self.total_pl else "0.00",
             'pl_percentage': f"{((self.total_pl / self.cash_balance) * 100):.2f}%" if self.cash_balance and self.cash_balance > 0 else "0.00%"
         }

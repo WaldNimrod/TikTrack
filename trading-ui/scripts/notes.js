@@ -195,11 +195,18 @@ function showAddNoteModal() {
     field.classList.remove('is-valid', 'is-invalid');
   });
 
-  // בחירת טיקר כברירת מחדל
-  document.getElementById('noteRelationTicker').checked = true;
-
   // טעינת נתונים למודל
   loadModalData();
+
+  // בחירת טיקר כברירת מחדל אחרי טעינת הנתונים
+  setTimeout(() => {
+    document.getElementById('noteRelationTicker').checked = true;
+    // טעינת אפשרויות לטיקר
+    const tickerRadio = document.getElementById('noteRelationTicker');
+    if (tickerRadio && window.modalTickers) {
+      populateSelect('noteRelatedObjectSelect', window.modalTickers, 'symbol', '');
+    }
+  }, 200);
 
   // הצגת המודל
   const modal = new bootstrap.Modal(document.getElementById('addNoteModal'));
@@ -257,7 +264,7 @@ async function loadModalData() {
   try {
     console.log('🔄 טוען נתונים למודלים...');
 
-        // טעינת נתונים במקביל
+    // טעינת נתונים במקביל
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
       fetch('/api/database_v2/accounts').then(r => r.json()).catch(() => []),
       fetch('/api/database_v2/trades').then(r => r.json()).catch(() => []),
@@ -270,7 +277,7 @@ async function loadModalData() {
     const tradePlans = Array.isArray(tradePlansResponse) ? tradePlansResponse : [];
     const tickers = Array.isArray(tickersResponse) ? tickersResponse : [];
 
-        console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
+    console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
 
     // עדכון רדיו באטונים
     updateRadioButtons(accounts, trades, tradePlans, tickers);
@@ -400,65 +407,8 @@ function populateSelect(selectId, data, field, prefix = '') {
 }
 
 function onNoteRelationTypeChange() {
-  const selectedType = document.querySelector('input[name="noteRelationType"]:checked')?.value;
-  const editSelectedType = document.querySelector('input[name="editNoteRelationType"]:checked')?.value;
-
-  const isEdit = editSelectedType !== undefined;
-  const relationType = isEdit ? editSelectedType : selectedType;
-  const selectId = isEdit ? 'editNoteRelatedObjectSelect' : 'noteRelatedObjectSelect';
-
-  console.log('🔄 onNoteRelationTypeChange:', relationType, 'isEdit:', isEdit);
-
-  const select = document.getElementById(selectId);
-  select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
-
-  if (!relationType) return;
-
-  let options = [];
-
-  switch (relationType) {
-    case '1': // חשבון
-      if (Array.isArray(window.modalAccounts)) {
-        const activeAccounts = window.modalAccounts.filter(account => account.status === 'active' || account.status === 'פעיל');
-        options = activeAccounts.map(account =>
-          `<option value="${account.id}">${account.name}</option>`
-        );
-      }
-      break;
-    case '2': // טרייד
-      if (Array.isArray(window.modalTrades)) {
-        const openTrades = window.modalTrades.filter(trade => trade.status === 'open' || trade.status === 'פתוח');
-        options = openTrades.map(trade =>
-          `<option value="${trade.id}">טרייד #${trade.id} - ${trade.ticker || 'לא מוגדר'}</option>`
-        );
-      }
-      break;
-    case '3': // תכנון
-      if (Array.isArray(window.modalTradePlans)) {
-        const openPlans = window.modalTradePlans.filter(plan => plan.status === 'open');
-        options = openPlans.map(plan =>
-          `<option value="${plan.id}">תכנון #${plan.id} - ${plan.ticker_symbol || 'לא מוגדר'}</option>`
-        );
-      }
-      break;
-    case '4': // טיקר
-      if (Array.isArray(window.modalTickers)) {
-        options = window.modalTickers.map(ticker =>
-          `<option value="${ticker.id}">${ticker.symbol}</option>`
-        );
-      }
-      break;
-  }
-
-  console.log(`🔍 נטענו ${options.length} אפשרויות עבור סוג ${relationType}`);
-  console.log('🔍 נתונים זמינים:', {
-    accounts: window.modalAccounts?.length || 0,
-    trades: window.modalTrades?.length || 0,
-    tradePlans: window.modalTradePlans?.length || 0,
-    tickers: window.modalTickers?.length || 0
-  });
-  console.log('🔍 אפשרויות שנוצרו:', options);
-  select.innerHTML += options.join('');
+  // פונקציה זו לא נדרשת יותר - הוחלפה ב-updateRadioButtons
+  console.log('🔄 onNoteRelationTypeChange - פונקציה זו הוחלפה ב-updateRadioButtons');
 }
 
 // פונקציות שמירה ומחיקה
@@ -691,6 +641,8 @@ window.updateNoteFromModal = updateNoteFromModal;
 window.deleteNoteFromServer = deleteNoteFromServer;
 window.onNoteRelationTypeChange = onNoteRelationTypeChange;
 window.setupNoteValidationEvents = setupNoteValidationEvents;
+window.updateRadioButtons = updateRadioButtons;
+window.populateSelect = populateSelect;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {

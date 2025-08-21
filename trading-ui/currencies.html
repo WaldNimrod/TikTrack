@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מטבעות - Tik.track</title>
+
+  <!-- 
+    ===== דף מטבעות - TikTrack =====
+    
+    דף זה מכיל:
+    1. טבלת מטבעות - הסקשן הראשי
+    2. כרטיסיות התראות - בחלק העליון
+    3. מערכת פילטרים ומיון מתקדמת
+    
+    מבנה הדף:
+    - app-header: כותרת האפליקציה עם ניווט
+    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+      - top-section: כרטיסיות התראות וסיכום נתונים
+      - content-section: טבלת מטבעות
+    
+    שינויים אחרונים:
+    - יצירת דף חדש למטבעות
+    - התאמת מבנה הטבלה לשדות מטבעות
+    - שימוש במערכת הפילטרים והסידור הקיימת
+  -->
+
+  <!-- Apple Theme CSS - בסיס כללי -->
+  <link rel="stylesheet" href="styles/apple-theme.css">
+
+  <!-- Main Styles - סגנונות הפרויקט -->
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- Menu CSS - תפריט -->
+  <link rel="stylesheet" href="styles/menu.css">
+
+  <!-- Grid Table CSS - טבלאות וגרידים -->
+  <link rel="stylesheet" href="styles/grid-table.css">
+
+  <!-- Typography CSS - טיפוגרפיה ופונטים -->
+  <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- קבצים מודולריים של הגריד - נטענים בסוף הקובץ -->
+</head>
+
+<body>
+  <!-- רקע כללי -->
+  <div class="background-wrapper">
+
+    <!-- כותרת האפליקציה -->
+    <app-header></app-header>
+
+    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <div class="page-body">
+      <!-- אזור עיצובים - top-Section -->
+      <div class="top-section">
+        <!-- כותרת ראשית -->
+        <div class="section-header">
+          <div class="table-title">
+            💱 מטבעות
+          </div>
+          <div class="table-actions">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור מטבעות">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- כרטיסיות התראות -->
+        <div class="section-body">
+          <active-alerts></active-alerts>
+
+          <!-- סיכום נתונים -->
+          <div class="info-summary" id="summaryStats">
+            <div>סה"כ מטבעות: <strong id="totalCurrencies">0</strong></div>
+            <div>מטבע בסיס: <strong id="baseCurrency">USD</strong></div>
+            <div>שער מקסימלי: <strong id="maxRate">1.00</strong></div>
+            <div>שער מינימלי: <strong id="minRate">1.00</strong></div>
+          </div>
+        </div>
+      </div> <!-- סוף top-section -->
+
+      <!-- תוכן ראשי -->
+      <div class="main-content">
+
+        <!-- אזור עיצובים - content-section -->
+        <div class="content-section">
+          <!-- כותרת מטבעות -->
+          <div class="section-header">
+            <div class="table-title">
+              💱 המטבעות שלי
+            </div>
+            <div class="table-count">0 מטבעות</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="showAddCurrencyModal()" title="הוסף מטבע חדש">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleCurrenciesSection()" title="הצג/הסתר אזור מטבעות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- טבלת מטבעות -->
+          <div class="section-body">
+            <div class="table-responsive" id="currenciesContainer">
+              <table class="table" id="currenciesTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTableData('currenciesTable', 0, 'number')" style="cursor: pointer;">
+                      מזהה <span class="sort-icon" id="sort-icon-0">↕</span>
+                      <br><span style="font-weight: normal; font-size: 0.8em; color: #666;">ID (Integer)</span>
+                    </th>
+                    <th onclick="sortTableData('currenciesTable', 1, 'text')" style="cursor: pointer;">
+                      סמל <span class="sort-icon" id="sort-icon-1">↕</span>
+                      <br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Symbol (String)</span>
+                    </th>
+                    <th onclick="sortTableData('currenciesTable', 2, 'text')" style="cursor: pointer;">
+                      שם <span class="sort-icon" id="sort-icon-2">↕</span>
+                      <br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Name (String)</span>
+                    </th>
+                    <th onclick="sortTableData('currenciesTable', 3, 'number')" style="cursor: pointer;">
+                      שער דולר <span class="sort-icon" id="sort-icon-3">↕</span>
+                      <br><span style="font-weight: normal; font-size: 0.8em; color: #666;">USD Rate (Decimal)</span>
+                    </th>
+                    <th onclick="sortTableData('currenciesTable', 4, 'datetime')" style="cursor: pointer;">
+                      נוצר ב <span class="sort-icon" id="sort-icon-4">↕</span>
+                      <br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Created At (DateTime)</span>
+                    </th>
+                    <th>פעולות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- הנתונים יטענו דינמית מה-JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- סוף page-body -->
+
+    <!-- מרווח בתחתית הדף -->
+    <div class="bottom-spacer"></div>
+
+    <!-- מערכת התראות -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Add Currency Modal -->
+    <div class="modal fade" id="addCurrencyModal" tabindex="-1" aria-labelledby="addCurrencyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCurrencyModalLabel">הוספת מטבע חדש</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCurrencyForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="currencySymbol" class="form-label">סמל המטבע</label>
+                                    <input type="text" class="form-control" id="currencySymbol" required 
+                                           placeholder="USD, EUR, ILS..." maxlength="10">
+                                    <div class="invalid-feedback" id="currencySymbolError"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="currencyName" class="form-label">שם המטבע</label>
+                                    <input type="text" class="form-control" id="currencyName" required
+                                           placeholder="US Dollar, Euro..." maxlength="100">
+                                    <div class="invalid-feedback" id="currencyNameError"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="currencyUsdRate" class="form-label">שער דולר</label>
+                                    <input type="number" class="form-control" id="currencyUsdRate" step="0.000001" 
+                                           required placeholder="1.000000" value="1.000000">
+                                    <div class="invalid-feedback" id="currencyUsdRateError"></div>
+                                    <small class="form-text text-muted">שער המטבע מול הדולר האמריקאי</small>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-success" onclick="saveCurrency()" 
+                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
+                        הוסף מטבע
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Currency Modal -->
+    <div class="modal fade" id="editCurrencyModal" tabindex="-1" aria-labelledby="editCurrencyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCurrencyModalLabel">עריכת מטבע</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCurrencyForm">
+                        <input type="hidden" id="editCurrencyId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editCurrencySymbol" class="form-label">סמל המטבע</label>
+                                    <input type="text" class="form-control" id="editCurrencySymbol" required 
+                                           placeholder="USD, EUR, ILS..." maxlength="10">
+                                    <div class="invalid-feedback" id="editCurrencySymbolError"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editCurrencyName" class="form-label">שם המטבע</label>
+                                    <input type="text" class="form-control" id="editCurrencyName" required
+                                           placeholder="US Dollar, Euro..." maxlength="100">
+                                    <div class="invalid-feedback" id="editCurrencyNameError"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="editCurrencyUsdRate" class="form-label">שער דולר</label>
+                                    <input type="number" class="form-control" id="editCurrencyUsdRate" step="0.000001" 
+                                           required placeholder="1.000000">
+                                    <div class="invalid-feedback" id="editCurrencyUsdRateError"></div>
+                                    <small class="form-text text-muted">שער המטבע מול הדולר האמריקאי</small>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-success" onclick="updateCurrency()" 
+                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
+                        עדכן מטבע
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Currency Modal -->
+    <div class="modal fade" id="deleteCurrencyModal" tabindex="-1" aria-labelledby="deleteCurrencyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCurrencyModalLabel">מחיקת מטבע</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>האם אתה בטוח שברצונך למחוק את המטבע <strong id="deleteCurrencyName"></strong>?</p>
+                    <p class="text-danger">פעולה זו אינה הפיכה!</p>
+                    <input type="hidden" id="deleteCurrencyId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDeleteCurrency()" 
+                            style="border: 2px solid #dc3545; background-color: white; color: #dc3545; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
+                        מחק מטבע
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- קבצים מודולריים -->
+    <script src="http://localhost:8080/scripts/main.js"></script>
+    <script src="http://localhost:8080/scripts/currencies.js"></script>
+    
+    <!-- אתחול הדף -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCurrenciesPage();
+        });
+    </script>
+</body>
+
+</html>
+                    <td>stock</td>
+                    <td>טכנולוגיה</td>
+                    <td>USD</td>
+                    <td>לא</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>
+                      <button class="btn btn-sm btn-secondary" onclick="editTicker(2)" title="ערוך">✏️</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(2)" title="מחק">X</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td><strong>MSFT</strong></td>
+                    <td>Microsoft Corporation</td>
+                    <td>stock</td>
+                    <td>טכנולוגיה</td>
+                    <td>USD</td>
+                    <td>לא</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>
+                      <button class="btn btn-sm btn-secondary" onclick="editTicker(3)" title="ערוך">✏️</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(3)" title="מחק">X</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td><strong>TSLA</strong></td>
+                    <td>Tesla Inc.</td>
+                    <td>stock</td>
+                    <td>רכב חשמלי</td>
+                    <td>USD</td>
+                    <td>לא</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>
+                      <button class="btn btn-sm btn-secondary" onclick="editTicker(4)" title="ערוך">✏️</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(4)" title="מחק">X</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td><strong>NVDA</strong></td>
+                    <td>NVIDIA Corporation</td>
+                    <td>stock</td>
+                    <td>צ'יפים</td>
+                    <td>USD</td>
+                    <td>לא</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>
+                      <button class="btn btn-sm btn-secondary" onclick="editTicker(5)" title="ערוך">✏️</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(5)" title="מחק">X</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>6</td>
+                    <td><strong>AMZN</strong></td>
+                    <td>Amazon.com Inc.</td>
+                    <td>stock</td>
+                    <td>מסחר אלקטרוני</td>
+                    <td>USD</td>
+                    <td>לא</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>
+                      <button class="btn btn-sm btn-secondary" onclick="editTicker(6)" title="ערוך">✏️</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(6)" title="מחק">X</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>7</td>
+                    <td><strong>META</strong></td>
+                    <td>Meta Platforms Inc.</td>
+                    <td>stock</td>
+                    <td>מדיה חברתית</td>
+                    <td>USD</td>
+                    <td>לא</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>
+                      <button class="btn btn-sm btn-secondary" onclick="editTicker(7)" title="ערוך">✏️</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(7)" title="מחק">X</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>8</td>
+                    <td><strong>NFLX</strong></td>
+                    <td>Netflix Inc.</td>
+                    <td>stock</td>
+                    <td>סטרימינג</td>
+                    <td>USD</td>
+                    <td>לא</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>
+                      <button class="btn btn-sm btn-secondary" onclick="editTicker(8)" title="ערוך">✏️</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(8)" title="מחק">X</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>9</td>
+                    <td><strong>SPY</strong></td>
+                    <td>SPDR S&P 500 ETF</td>
+                    <td>etf</td>
+                    <td>ETF מדד S&P 500</td>
+                    <td>USD</td>
+                    <td>לא</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>18.8.2025, 20:16:00</td>
+                    <td>
+                      <button class="btn btn-sm btn-secondary" onclick="editTicker(9)" title="ערוך">✏️</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(9)" title="מחק">X</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div> <!-- סוף page-body -->
+
+    <!-- מרווח בתחתית הדף -->
+    <div class="bottom-spacer"></div>
+
+    <!-- מערכת התראות -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- CSS למודולים -->
+    <style>
+      /* וידוא שהודעות שגיאה מופיעות מעל המודול */
+      .modal .invalid-feedback {
+        position: relative;
+        z-index: 1060;
+      }
+
+      /* וידוא שהמודול מופיע מעל הכל */
+      .modal {
+        z-index: 1055;
+      }
+
+      .modal-backdrop {
+        z-index: 1050;
+      }
+
+      /* הודעות שגיאה בתוך המודול */
+      .modal-body .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+      }
+
+      /* שדות עם שגיאה */
+      .modal-body .form-control.is-invalid,
+      .modal-body .form-select.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+      }
+    </style>
+
+    <!-- Add Ticker Modal -->
+    <div class="modal fade" id="addTickerModal" tabindex="-1" aria-labelledby="addTickerModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addTickerModalLabel">הוספת טיקר חדש</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="addTickerForm">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="addTickerSymbol" class="form-label">סמל טיקר *</label>
+                    <input type="text" class="form-control" id="addTickerSymbol" required placeholder="למשל: AAPL"
+                      maxlength="10" onblur="validateTickerSymbol(this)">
+                    <div class="invalid-feedback" id="addTickerSymbolError"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="addTickerName" class="form-label">שם החברה *</label>
+                    <input type="text" class="form-control" id="addTickerName" required placeholder="למשל: Apple Inc."
+                      maxlength="100" onblur="validateTickerName(this)">
+                    <div class="invalid-feedback" id="addTickerNameError"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="addTickerType" class="form-label">סוג *</label>
+                    <select class="form-select" id="addTickerType" required>
+                      <option value="">בחר סוג...</option>
+                      <option value="stock">מניה</option>
+                      <option value="etf">ETF</option>
+                      <option value="bond">אגרת חוב</option>
+                      <option value="crypto">קריפטו</option>
+                      <option value="forex">מטבע חוץ</option>
+                      <option value="commodity">סחורה</option>
+                      <option value="other">אחר</option>
+                    </select>
+                    <div class="invalid-feedback" id="addTickerTypeError"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="addTickerCurrency" class="form-label">מטבע *</label>
+                    <select class="form-select" id="addTickerCurrency" required>
+                      <option value="">בחר מטבע...</option>
+                      <option value="ILS">שקל ישראלי (ILS)</option>
+                      <option value="USD">דולר אמריקאי (USD)</option>
+                      <option value="EUR">אירו (EUR)</option>
+                    </select>
+                    <div class="invalid-feedback" id="addTickerCurrencyError"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="addTickerRemarks" class="form-label">הערות</label>
+                    <textarea class="form-control" id="addTickerRemarks" rows="3" placeholder="הערות נוספות על הטיקר..."
+                      maxlength="500"></textarea>
+                    <div class="invalid-feedback" id="addTickerRemarksError"></div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+            <button type="button" class="btn btn-success" onclick="saveTicker()"
+              style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
+              שמור טיקר
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Ticker Modal -->
+    <div class="modal fade" id="editTickerModal" tabindex="-1" aria-labelledby="editTickerModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editTickerModalLabel">עריכת טיקר</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="editTickerForm">
+              <input type="hidden" id="editTickerId">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editTickerSymbol" class="form-label">סמל טיקר *</label>
+                    <input type="text" class="form-control" id="editTickerSymbol" required placeholder="למשל: AAPL"
+                      maxlength="10" onblur="validateTickerSymbol(this)">
+                    <div class="invalid-feedback" id="editTickerSymbolError"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editTickerName" class="form-label">שם החברה *</label>
+                    <input type="text" class="form-control" id="editTickerName" required placeholder="למשל: Apple Inc."
+                      maxlength="100" onblur="validateTickerName(this)">
+                    <div class="invalid-feedback" id="editTickerNameError"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editTickerType" class="form-label">סוג *</label>
+                    <select class="form-select" id="editTickerType" required>
+                      <option value="">בחר סוג...</option>
+                      <option value="stock">מניה</option>
+                      <option value="etf">ETF</option>
+                      <option value="bond">אגרת חוב</option>
+                      <option value="crypto">קריפטו</option>
+                      <option value="forex">מטבע חוץ</option>
+                      <option value="commodity">סחורה</option>
+                      <option value="other">אחר</option>
+                    </select>
+                    <div class="invalid-feedback" id="editTickerTypeError"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editTickerCurrency" class="form-label">מטבע *</label>
+                    <select class="form-select" id="editTickerCurrency" required>
+                      <option value="">בחר מטבע...</option>
+                      <option value="ILS">שקל ישראלי (ILS)</option>
+                      <option value="USD">דולר אמריקאי (USD)</option>
+                      <option value="EUR">אירו (EUR)</option>
+                    </select>
+                    <div class="invalid-feedback" id="editTickerCurrencyError"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="editTickerRemarks" class="form-label">הערות</label>
+                    <textarea class="form-control" id="editTickerRemarks" rows="3"
+                      placeholder="הערות נוספות על הטיקר..." maxlength="500"></textarea>
+                    <div class="invalid-feedback" id="editTickerRemarksError"></div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+            <button type="button" class="btn btn-success" onclick="updateTicker()"
+              style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
+              עדכן טיקר
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Ticker Modal -->
+    <div class="modal fade" id="deleteTickerModal" tabindex="-1" aria-labelledby="deleteTickerModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteTickerModalLabel">מחיקת טיקר</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>האם אתה בטוח שברצונך למחוק את הטיקר <strong id="deleteTickerName"></strong>?</p>
+            <p class="text-danger">פעולה זו אינה הפיכה!</p>
+            <input type="hidden" id="deleteTickerId">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+            <button type="button" class="btn btn-danger" onclick="confirmDeleteTicker()"
+              style="border: 2px solid #dc3545; background-color: white; color: #dc3545; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
+              מחק טיקר
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Linked Items Modal -->
+    <div class="modal fade" id="linkedItemsModal" tabindex="-1" aria-labelledby="linkedItemsModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="linkedItemsModalLabel">לא ניתן למחוק טיקר עם פריטים מקושרים</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-warning">
+              <strong>⚠️ לא ניתן למחוק את הטיקר <span id="linkedTickerName"></span></strong>
+              <br>
+              הטיקר מקושר לפריטים הבאים במערכת. יש לטפל בהם תחילה:
+            </div>
+
+            <div id="linkedItemsContent">
+              <!-- תוכן הפריטים המקושרים יוצג כאן -->
+            </div>
+
+            <div class="alert alert-info mt-3">
+              <strong>💡 מה ניתן לעשות:</strong>
+              <ul class="mb-0">
+                <li>סגור או בטל את כל הטריידים הפתוחים</li>
+                <li>סגור או בטל את כל התכנונים הפתוחים</li>
+                <li>מחק את כל ההתראות הקשורות לטיקר</li>
+                <li>מחק את כל ההערות הקשורות לטיקר</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+            <button type="button" class="btn btn-primary" onclick="goToLinkedItems()">
+              עבור לניהול פריטים
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- קבצים מודולריים -->
+    <script src="scripts/tickers.js"></script>
+</body>
+
+</html>

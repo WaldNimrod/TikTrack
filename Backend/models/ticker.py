@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey
 from sqlalchemy.orm import relationship, Mapped
 from .base import BaseModel
 from typing import Dict, Any, Optional, List
@@ -12,7 +12,7 @@ class Ticker(BaseModel):
         name (str): שם החברה או הנכס - מקסימום 100 תווים
         type (str): סוג הנכס - stock, etf, crypto, forex, commodity
         remarks (str): הערות נוספות - מקסימום 500 תווים
-        currency (str): מטבע הנכס - בדיוק 3 תווים (USD, ILS, EUR וכו')
+        currency_id (int): מזהה המטבע מטבלת המטבעות
         active_trades (bool): האם יש טריידים פעילים בנכס זה
         
     Relationships:
@@ -23,18 +23,19 @@ class Ticker(BaseModel):
         - symbol חייב להיות ייחודי במערכת
         - symbol לא יכול להיות ריק
         - symbol מוגבל ל-10 תווים
-        - currency מוגבל ל-3 תווים
+        - currency_id חייב להתייחס למטבע קיים בטבלת המטבעות
         
     Example:
         >>> ticker = Ticker(
         ...     symbol="AAPL",
         ...     name="Apple Inc.",
         ...     type="stock",
-        ...     currency="USD",
+        ...     currency_id=1,  # מזהה USD בטבלת המטבעות
         ...     remarks="חברת טכנולוגיה אמריקאית"
         ... )
     """
     __tablename__ = "tickers"
+    __table_args__ = {'extend_existing': True}
     
     # Primary fields
     symbol = Column(String(10), unique=True, nullable=False, index=True, 
@@ -45,12 +46,15 @@ class Ticker(BaseModel):
                  comment="סוג הנכס: stock, etf, crypto, forex, commodity")
     remarks = Column(String(500), nullable=True, 
                     comment="הערות נוספות על הטיקר")
-    currency = Column(String(3), default='USD', nullable=True, 
-                     comment="מטבע הנכס - 3 תווים")
+    currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False,
+                        comment="מזהה המטבע מטבלת המטבעות")
     active_trades = Column(Boolean, default=False, nullable=True, 
                           comment="האם יש טריידים פעילים")
     
     # Relationships
+    # Each ticker belongs to one currency
+    currency = relationship("Currency", backref="tickers")
+    
     trades = relationship("Trade", back_populates="ticker", 
                          cascade="all, delete-orphan")
     trade_plans = relationship("TradePlan", back_populates="ticker", 

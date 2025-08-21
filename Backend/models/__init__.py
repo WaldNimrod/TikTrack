@@ -8,6 +8,7 @@ from .cash_flow import CashFlow
 from .note import Note
 from .note_relation_type import NoteRelationType
 from .execution import Execution
+from .currency import Currency
 
 __all__ = [
     'BaseModel',
@@ -19,5 +20,6 @@ __all__ = [
     'CashFlow',
     'Note',
     'NoteRelationType',
-    'Execution'
+    'Execution',
+    'Currency'
 ]

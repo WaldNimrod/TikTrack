@@ -68,6 +68,7 @@ from routes.api.notes import notes_bp
 from routes.api.executions import executions_bp
 from routes.api.preferences import preferences_bp
 from routes.api.tests import tests_bp
+from routes.api.currencies import currencies_bp
 from routes.pages import pages_bp
 
 app = Flask(__name__)
@@ -89,6 +90,7 @@ app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
 app.register_blueprint(preferences_bp)
 app.register_blueprint(tests_bp)
+app.register_blueprint(currencies_bp)
 app.register_blueprint(pages_bp)
 
 # הגדרת טיפול בשגיאות
@@ -338,6 +340,20 @@ def notes_html_page() -> Any:
     דף הערות - נתיב עם .html (גיבוי)
     """
     return send_from_directory(UI_DIR, "notes.html")
+
+@app.route("/cash_flows")
+def cash_flows_page() -> Any:
+    """
+    דף תזרימי מזומנים - נתיב ללא .html
+    """
+    return send_from_directory(UI_DIR, "cash_flows.html")
+
+@app.route("/cash_flows.html")
+def cash_flows_html_page() -> Any:
+    """
+    דף תזרימי מזומנים - נתיב עם .html (גיבוי)
+    """
+    return send_from_directory(UI_DIR, "cash_flows.html")
 
 @app.route("/notification-demo")
 def notification_demo_page() -> Any:

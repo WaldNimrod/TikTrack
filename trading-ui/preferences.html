@@ -1943,6 +1943,7 @@
           if (allSaved) {
             showNotification(`✅ כל ההגדרות נשמרו בהצלחה! (${savedPreferences.length} הגדרות)`, 'success');
             console.log('✅ כל ההגדרות נשמרו בהצלחה:', savedPreferences);
+            markAsSaved(); // מסמן שכל השינויים נשמרו
           } else {
             showNotification('⚠️ חלק מההגדרות לא נשמרו. בדוק את הקונסול לפרטים.', 'error');
             console.error('❌ חלק מההגדרות לא נשמרו');
@@ -2116,11 +2117,11 @@
 
       async function saveSystemPreferences() {
         console.log('🔄 שומר הגדרות מערכת...');
-        
+
         try {
           let allSaved = true;
           const savedPreferences = [];
-          
+
           // שמירת מטבע ראשי
           const primaryCurrencySelect = document.getElementById('primaryCurrencySelect');
           if (primaryCurrencySelect) {
@@ -2131,7 +2132,7 @@
               allSaved = false;
             }
           }
-          
+
           // שמירת אזור זמן
           const timezoneSelect = document.getElementById('timezoneSelect');
           if (timezoneSelect) {
@@ -2142,13 +2143,14 @@
               allSaved = false;
             }
           }
-          
+
           if (allSaved) {
             showNotification(`✅ הגדרות מערכת נשמרו בהצלחה! (${savedPreferences.length} הגדרות)`, 'success');
+            markAsSaved(); // מסמן שכל השינויים נשמרו
           } else {
             showNotification('⚠️ חלק מהגדרות המערכת לא נשמרו', 'error');
           }
-          
+
         } catch (error) {
           console.error('❌ שגיאה בשמירת הגדרות מערכת:', error);
           showNotification('❌ שגיאה בשמירת הגדרות מערכת', 'error');
@@ -2179,11 +2181,11 @@
 
       async function savePersonalPreferences() {
         console.log('🔄 שומר הגדרות אישיות...');
-        
+
         try {
           let allSaved = true;
           const savedPreferences = [];
-          
+
           // שמירת סטופ ברירת מחדל
           const stopLossInput = document.getElementById('defaultStopLossInput');
           if (stopLossInput) {
@@ -2194,7 +2196,7 @@
               allSaved = false;
             }
           }
-          
+
           // שמירת מחיר יעד ברירת מחדל
           const targetPriceInput = document.getElementById('defaultTargetPriceInput');
           if (targetPriceInput) {
@@ -2205,13 +2207,14 @@
               allSaved = false;
             }
           }
-          
+
           if (allSaved) {
             showNotification(`✅ הגדרות אישיות נשמרו בהצלחה! (${savedPreferences.length} הגדרות)`, 'success');
+            markAsSaved(); // מסמן שכל השינויים נשמרו
           } else {
             showNotification('⚠️ חלק מהגדרות האישיות לא נשמרו', 'error');
           }
-          
+
         } catch (error) {
           console.error('❌ שגיאה בשמירת הגדרות אישיות:', error);
           showNotification('❌ שגיאה בשמירת הגדרות אישיות', 'error');
@@ -2285,11 +2288,11 @@
 
       async function saveDisplayPreferences() {
         console.log('🔄 שומר הגדרות תצוגה...');
-        
+
         try {
           let allSaved = true;
           const savedPreferences = [];
-          
+
           // שמירת פילטר סטטוס ברירת מחדל
           const statusFilterSelect = document.getElementById('defaultStatusFilterSelect');
           if (statusFilterSelect) {
@@ -2300,7 +2303,7 @@
               allSaved = false;
             }
           }
-          
+
           // שמירת פילטר סוג ברירת מחדל
           const typeFilterSelect = document.getElementById('defaultTypeFilterSelect');
           if (typeFilterSelect) {
@@ -2311,7 +2314,7 @@
               allSaved = false;
             }
           }
-          
+
           // שמירת פילטר חשבונות ברירת מחדל
           const accountFilterSelect = document.getElementById('defaultAccountFilterSelect');
           if (accountFilterSelect) {
@@ -2322,7 +2325,7 @@
               allSaved = false;
             }
           }
-          
+
           // שמירת פילטר טווח תאריכים ברירת מחדל
           const dateRangeFilterSelect = document.getElementById('defaultDateRangeFilterSelect');
           if (dateRangeFilterSelect) {
@@ -2333,7 +2336,7 @@
               allSaved = false;
             }
           }
-          
+
           // שמירת פילטר חיפוש ברירת מחדל
           const searchFilterInput = document.getElementById('defaultSearchFilterInput');
           if (searchFilterInput) {
@@ -2344,17 +2347,116 @@
               allSaved = false;
             }
           }
-          
+
           if (allSaved) {
             showNotification(`✅ הגדרות תצוגה נשמרו בהצלחה! (${savedPreferences.length} הגדרות)`, 'success');
           } else {
             showNotification('⚠️ חלק מהגדרות התצוגה לא נשמרו', 'error');
           }
-          
+
         } catch (error) {
           console.error('❌ שגיאה בשמירת הגדרות תצוגה:', error);
           showNotification('❌ שגיאה בשמירת הגדרות תצוגה', 'error');
         }
+      }
+
+      // ===== מערכת מעקב אחרי שינויים =====
+      
+      // משתנה גלובלי לעקוב אחרי שינויים
+      let hasUnsavedChanges = false;
+      let originalValues = {};
+
+      /**
+       * מסמן שיש שינויים שלא נשמרו
+       */
+      function markAsChanged() {
+        hasUnsavedChanges = true;
+        console.log('🔄 שינוי זוהה - יש שינויים שלא נשמרו');
+        updatePageTitle();
+      }
+
+      /**
+       * מסמן שכל השינויים נשמרו
+       */
+      function markAsSaved() {
+        hasUnsavedChanges = false;
+        console.log('✅ כל השינויים נשמרו');
+        updatePageTitle();
+      }
+
+      /**
+       * מעדכן את כותרת הדף עם סימן אזהרה
+       */
+      function updatePageTitle() {
+        const originalTitle = 'העדפות והגדרות';
+        if (hasUnsavedChanges) {
+          document.title = `⚠️ ${originalTitle} - יש שינויים שלא נשמרו`;
+        } else {
+          document.title = originalTitle;
+        }
+      }
+
+      /**
+       * בודק אם יש שינויים שלא נשמרו
+       */
+      function checkForUnsavedChanges() {
+        if (!hasUnsavedChanges) return false;
+        
+        const userChoice = confirm(
+          '⚠️ יש שינויים שלא נשמרו!\n\n' +
+          'האם תרצה לחזור לדף ולשמור את השינויים?\n\n' +
+          'לחץ "אישור" כדי לחזור לדף\n' +
+          'לחץ "ביטול" כדי לצאת ללא שמירה'
+        );
+        
+        return userChoice; // true = חזור לדף, false = צא ללא שמירה
+      }
+
+      /**
+       * שומר את הערכים המקוריים לטעינה
+       */
+      function saveOriginalValues() {
+        originalValues = {
+          primaryCurrency: document.getElementById('primaryCurrencySelect')?.value,
+          timezone: document.getElementById('timezoneSelect')?.value,
+          defaultStopLoss: document.getElementById('defaultStopLossInput')?.value,
+          defaultTargetPrice: document.getElementById('defaultTargetPriceInput')?.value,
+          defaultStatusFilter: document.getElementById('defaultStatusFilterSelect')?.value,
+          defaultTypeFilter: document.getElementById('defaultTypeFilterSelect')?.value,
+          defaultAccountFilter: document.getElementById('defaultAccountFilterSelect')?.value,
+          defaultDateRangeFilter: document.getElementById('defaultDateRangeFilterSelect')?.value,
+          defaultSearchFilter: document.getElementById('defaultSearchFilterInput')?.value
+        };
+        console.log('💾 שמירת ערכים מקוריים:', originalValues);
+      }
+
+      /**
+       * בודק אם יש שינויים מהערכים המקוריים
+       */
+      function checkForChanges() {
+        const currentValues = {
+          primaryCurrency: document.getElementById('primaryCurrencySelect')?.value,
+          timezone: document.getElementById('timezoneSelect')?.value,
+          defaultStopLoss: document.getElementById('defaultStopLossInput')?.value,
+          defaultTargetPrice: document.getElementById('defaultTargetPriceInput')?.value,
+          defaultStatusFilter: document.getElementById('defaultStatusFilterSelect')?.value,
+          defaultTypeFilter: document.getElementById('defaultTypeFilterSelect')?.value,
+          defaultAccountFilter: document.getElementById('defaultAccountFilterSelect')?.value,
+          defaultDateRangeFilter: document.getElementById('defaultDateRangeFilterSelect')?.value,
+          defaultSearchFilter: document.getElementById('defaultSearchFilterInput')?.value
+        };
+
+        const hasChanges = Object.keys(originalValues).some(key => {
+          return originalValues[key] !== currentValues[key];
+        });
+
+        if (hasChanges && !hasUnsavedChanges) {
+          markAsChanged();
+        } else if (!hasChanges && hasUnsavedChanges) {
+          markAsSaved();
+        }
+
+        return hasChanges;
       }
 
       // ===== מערכת חדשה לניהול מצב סקשנים =====

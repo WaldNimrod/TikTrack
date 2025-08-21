@@ -1018,10 +1018,10 @@ def update_all_tickers_active() -> Any:
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
-# API לטרנזקציות
+# API for transactions
 
 
-# API לתזרים מזומנים
+# API for cash flows
 @app.route("/api/cash_flows", methods=["GET"])
 def get_cash_flows() -> Any:
     conn = get_db_connection()
@@ -1088,7 +1088,7 @@ def create_cash_flow() -> Any:
 
 
 
-# API להערות
+# API for notes
 @app.route("/api/notes", methods=["GET"])
 def get_notes() -> Any:
     conn = get_db_connection()
@@ -1483,21 +1483,21 @@ def get_user_role(user_role_id: int) -> Any:
 
 
 if __name__ == "__main__":
-    # 🎯 **הקונפיגורציה החדשה - Flask Simple Development Server**
+    # 🎯 **New Configuration - Flask Simple Development Server**
     # 
-    # 🚀 **הפעלה:**
+    # 🚀 **Startup:**
     # ```bash
-    # # הפעלה מהירה (מומלץ)
+    # # Quick startup (recommended)
     # ./start_dev.sh
     #
-    # # או הפעלה ישירה
+    # # Or direct startup
     # python3 run_flask_simple.py
     # ```
     #
-    # 📁 **ארכיון קונפיגורציות ישנות:**
-    # - **מיקום:** `backups/20250820_flask_simple_configuration/`
-    # - **תאריך:** 20 באוגוסט 2025
-    # - **סטטוס:** ארכיון - לא בשימוש
+    # 📁 **Old Configuration Archive:**
+    # - **Location:** `backups/20250820_flask_simple_configuration/`
+    # - **Date:** August 20, 2025
+    # - **Status:** Archive - not in use
     #
     # ✅ **הקונפיגורציה החדשה:** Flask development server פשוט ויציב
     

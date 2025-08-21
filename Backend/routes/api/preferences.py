@@ -18,13 +18,29 @@ def get_preferences() -> Any:
             preferences = json.load(f)
         return jsonify(preferences)
     except FileNotFoundError:
-        # אם הקובץ לא קיים, מחזיר ברירות מחדל
+        # אם הקובץ לא קיים, מחזיר ברירות מחדל מלאות
         default_preferences = {
             "defaults": {
-                "primaryCurrency": "USD"
+                "primaryCurrency": "USD",
+                "defaultStopLoss": 5,
+                "defaultTargetPrice": 10,
+                "timezone": "Asia/Jerusalem",
+                "defaultStatusFilter": "all",
+                "defaultTypeFilter": "all",
+                "defaultAccountFilter": "all",
+                "defaultDateRangeFilter": "all",
+                "defaultSearchFilter": ""
             },
             "user": {
-                "primaryCurrency": "USD"
+                "primaryCurrency": "USD",
+                "defaultStopLoss": 5,
+                "defaultTargetPrice": 10,
+                "timezone": "Asia/Jerusalem",
+                "defaultStatusFilter": "all",
+                "defaultTypeFilter": "all",
+                "defaultAccountFilter": "all",
+                "defaultDateRangeFilter": "all",
+                "defaultSearchFilter": ""
             }
         }
         return jsonify(default_preferences)
@@ -61,10 +77,26 @@ def update_preference(key: str) -> Any:
         except FileNotFoundError:
             preferences = {
                 "defaults": {
-                    "primaryCurrency": "USD"
+                    "primaryCurrency": "USD",
+                    "defaultStopLoss": 5,
+                    "defaultTargetPrice": 10,
+                    "timezone": "Asia/Jerusalem",
+                    "defaultStatusFilter": "all",
+                    "defaultTypeFilter": "all",
+                    "defaultAccountFilter": "all",
+                    "defaultDateRangeFilter": "all",
+                    "defaultSearchFilter": ""
                 },
                 "user": {
-                    "primaryCurrency": "USD"
+                    "primaryCurrency": "USD",
+                    "defaultStopLoss": 5,
+                    "defaultTargetPrice": 10,
+                    "timezone": "Asia/Jerusalem",
+                    "defaultStatusFilter": "all",
+                    "defaultTypeFilter": "all",
+                    "defaultAccountFilter": "all",
+                    "defaultDateRangeFilter": "all",
+                    "defaultSearchFilter": ""
                 }
             }
         

@@ -24,52 +24,52 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from config.settings import DATABASE_URL
 
 def update_tickers_currency_table():
-    """עדכון טבלת הטיקרים לשימוש במזהה מטבע"""
+    """Update tickers table to use currency ID"""
     
     try:
-        # יצירת חיבור לבסיס הנתונים
+        # Create database connection
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
         with engine.connect() as connection:
-            print("🔄 מתחיל עדכון טבלת הטיקרים...")
+            print("🔄 Starting tickers table update...")
             
-            # 1. בדיקה שטבלת המטבעות קיימת
+            # 1. Check that currencies table exists
             result = connection.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='currencies'"))
             if not result.fetchone():
-                print("❌ שגיאה: טבלת המטבעות לא קיימת. יש להריץ את create_currencies_table.py קודם")
+                print("❌ Error: Currencies table does not exist. Run create_currencies_table.py first")
                 return False
             
-            # 2. בדיקה שיש מטבעות בטבלה
+            # 2. Check that there are currencies in the table
             result = connection.execute(text("SELECT COUNT(*) as count FROM currencies"))
             currency_count = result.fetchone()[0]
             if currency_count == 0:
-                print("❌ שגיאה: אין מטבעות בטבלת המטבעות. יש להריץ את add_currencies.py קודם")
+                print("❌ Error: No currencies in currencies table. Run add_currencies.py first")
                 return False
             
-            print(f"✓ נמצאו {currency_count} מטבעות בטבלת המטבעות")
+            print(f"✓ Found {currency_count} currencies in currencies table")
             
-            # 3. בדיקה האם העמודה currency_id כבר קיימת
+            # 3. Check if currency_id column already exists
             result = connection.execute(text("PRAGMA table_info(tickers)"))
             columns = [col[1] for col in result.fetchall()]
             
             if 'currency_id' in columns:
-                print("⚠️  העמודה currency_id כבר קיימת בטבלת הטיקרים")
+                print("⚠️  Currency_id column already exists in tickers table")
                 return True
             
-            # 4. יצירת העמודה החדשה currency_id
+            # 4. Create new currency_id column
             connection.execute(text("ALTER TABLE tickers ADD COLUMN currency_id INTEGER"))
             connection.commit()
-            print("✓ נוספה העמודה currency_id לטבלת הטיקרים")
+            print("✓ Added currency_id column to tickers table")
             
-            # 5. מיפוי מטבעות קיימים למזהים
+            # 5. Map existing currencies to IDs
             currency_mapping = {}
             result = connection.execute(text("SELECT id, symbol FROM currencies"))
             for row in result.fetchall():
                 currency_mapping[row[1]] = row[0]
             
-            print(f"✓ מיפוי מטבעות: {currency_mapping}")
+            print(f"✓ Currency mapping: {currency_mapping}")
             
-            # 6. עדכון הרשומות הקיימות
+            # 6. Update existing records
             result = connection.execute(text("SELECT id, symbol, currency FROM tickers WHERE currency IS NOT NULL"))
             tickers_to_update = result.fetchall()
             
@@ -85,19 +85,19 @@ def update_tickers_currency_table():
                     )
                     updated_count += 1
                 else:
-                    # אם המטבע לא קיים, השתמש ב-USD כברירת מחדל
+                    # If currency doesn't exist, use USD as default
                     default_currency_id = currency_mapping.get('USD', 1)
                     connection.execute(
                         text("UPDATE tickers SET currency_id = :currency_id WHERE id = :ticker_id"),
                         {"currency_id": default_currency_id, "ticker_id": ticker_id}
                     )
                     updated_count += 1
-                    print(f"⚠️  טיקר {symbol}: מטבע '{currency_str}' לא נמצא, הוגדר ל-USD")
+                    print(f"⚠️  Ticker {symbol}: Currency '{currency_str}' not found, set to USD")
             
             connection.commit()
-            print(f"✓ עודכנו {updated_count} טיקרים עם מזהי מטבע")
+            print(f"✓ Updated {updated_count} tickers with currency IDs")
             
-            # 7. הגדרת ברירת מחדל לרשומות ללא מטבע
+            # 7. Set default for records without currency
             usd_id = currency_mapping.get('USD', 1)
             result = connection.execute(
                 text("UPDATE tickers SET currency_id = :usd_id WHERE currency_id IS NULL"),

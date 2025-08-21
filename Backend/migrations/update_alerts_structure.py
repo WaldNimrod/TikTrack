@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-מיגרציה לעדכון מבנה טבלת alerts
-==================================
+Migration to update alerts table structure
+==========================================
 
-מיגרציה זו מעדכנת את טבלת alerts לשימוש במערכת שיוך גמישה:
-- מוסיפה שדות related_type_id ו-related_id
-- מסירה שדות account_id ו-ticker_id
-- מעבירה נתונים קיימים למערכת החדשה
-- מוסיפה את סוג השיוך 'ticker' לטבלת note_relation_types
+This migration updates the alerts table to use a flexible association system:
+- Adds related_type_id and related_id fields
+- Removes account_id and ticker_id fields
+- Transfers existing data to the new system
+- Adds 'ticker' association type to note_relation_types table
 
 Author: TikTrack Development Team
 Date: 2025-08-18
@@ -18,77 +18,77 @@ import os
 from datetime import datetime
 
 def update_alerts_structure():
-    """עדכון מבנה טבלת alerts למערכת שיוך גמישה"""
+    """Update alerts table structure to flexible association system"""
     
-    # נתיב לבסיס הנתונים
+    # Database path
     db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'simpleTrade_new.db')
     
     if not os.path.exists(db_path):
-        print(f"❌ בסיס הנתונים לא נמצא: {db_path}")
+        print(f"❌ Database not found: {db_path}")
         return False
     
-    print("🚀 מתחיל מיגרציה לעדכון מבנה טבלת alerts...")
+    print("🚀 Starting migration to update alerts table structure...")
     
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # בדיקה אם השדות החדשים כבר קיימים
+        # Check if new fields already exist
         cursor.execute("PRAGMA table_info(alerts)")
         columns = [column[1] for column in cursor.fetchall()]
         
         if 'related_type_id' in columns and 'related_id' in columns:
-            print("✅ השדות החדשים כבר קיימים בטבלת alerts")
+            print("✅ New fields already exist in alerts table")
             return True
         
-        # 1. הוספת סוג שיוך 'ticker' לטבלת note_relation_types
-        print("📝 מוסיף סוג שיוך 'ticker'...")
+        # 1. Add 'ticker' association type to note_relation_types table
+        print("📝 Adding 'ticker' association type...")
         try:
             cursor.execute("INSERT INTO note_relation_types (note_relation_type) VALUES (?)", ('ticker',))
             ticker_relation_id = cursor.lastrowid
-            print(f"   ✅ נוסף סוג שיוך 'ticker' עם מזהה {ticker_relation_id}")
+            print(f"   ✅ Added 'ticker' association type with ID {ticker_relation_id}")
         except sqlite3.IntegrityError:
-            # אם כבר קיים, קבל את המזהה
+            # If already exists, get the ID
             cursor.execute("SELECT id FROM note_relation_types WHERE note_relation_type = ?", ('ticker',))
             ticker_relation_id = cursor.fetchone()[0]
-            print(f"   ℹ️ סוג שיוך 'ticker' כבר קיים עם מזהה {ticker_relation_id}")
+            print(f"   ℹ️ 'ticker' association type already exists with ID {ticker_relation_id}")
         
-        # קבלת מזהי סוגי השיוך הקיימים
+        # Get existing association type IDs
         cursor.execute("SELECT id, note_relation_type FROM note_relation_types")
         relation_types = {row[1]: row[0] for row in cursor.fetchall()}
-        print(f"   📊 סוגי שיוך קיימים: {relation_types}")
+        print(f"   📊 Existing association types: {relation_types}")
         
-        # 2. הוספת השדות החדשים
-        print("📝 מוסיף שדות חדשים לטבלת alerts...")
+        # 2. Add new fields
+        print("📝 Adding new fields to alerts table...")
         cursor.execute("ALTER TABLE alerts ADD COLUMN related_type_id INTEGER")
         cursor.execute("ALTER TABLE alerts ADD COLUMN related_id INTEGER")
-        print("   ✅ נוספו שדות related_type_id ו-related_id")
+        print("   ✅ Added related_type_id and related_id fields")
         
-        # 3. העברת נתונים קיימים
-        print("📝 מעביר נתונים קיימים למערכת החדשה...")
+        # 3. Transfer existing data
+        print("📝 Transferring existing data to new system...")
         
-        # העברת התראות משויכות לחשבונות
+        # Transfer alerts associated with accounts
         cursor.execute("""
             UPDATE alerts 
             SET related_type_id = ?, related_id = account_id 
             WHERE account_id IS NOT NULL
         """, (relation_types.get('account', 1),))
         account_alerts_updated = cursor.rowcount
-        print(f"   ✅ עודכנו {account_alerts_updated} התראות משויכות לחשבונות")
+        print(f"   ✅ Updated {account_alerts_updated} alerts associated with accounts")
         
-        # העברת התראות משויכות לטיקרים
+        # Transfer alerts associated with tickers
         cursor.execute("""
             UPDATE alerts 
             SET related_type_id = ?, related_id = ticker_id 
             WHERE ticker_id IS NOT NULL
         """, (ticker_relation_id,))
         ticker_alerts_updated = cursor.rowcount
-        print(f"   ✅ עודכנו {ticker_alerts_updated} התראות משויכות לטיקרים")
+        print(f"   ✅ Updated {ticker_alerts_updated} alerts associated with tickers")
         
-        # 4. הסרת השדות הישנים
-        print("📝 מסיר שדות ישנים...")
+        # 4. Remove old fields
+        print("📝 Removing old fields...")
         
-        # יצירת טבלה זמנית עם המבנה החדש
+        # Create temporary table with new structure
         cursor.execute("""
             CREATE TABLE alerts_new (
                 id INTEGER PRIMARY KEY,

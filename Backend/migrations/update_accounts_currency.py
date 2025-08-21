@@ -106,10 +106,10 @@ def update_accounts_currency_table():
             connection.commit()
             
             if result.rowcount > 0:
-                print(f"✓ הוגדר מטבע ברירת מחדל (USD) ל-{result.rowcount} חשבונות")
+                print(f"✓ Default currency (USD) set for {result.rowcount} accounts")
             
-            # 8. יצירת Foreign Key constraint (בצורה עקיפה ב-SQLite)
-            # SQLite לא תומך ב-ALTER TABLE ADD CONSTRAINT, אז נוודא שהנתונים תקינים
+            # 8. Create Foreign Key constraint (indirectly in SQLite)
+            # SQLite doesn't support ALTER TABLE ADD CONSTRAINT, so verify data integrity
             result = connection.execute(text("""
                 SELECT COUNT(*) as invalid_count 
                 FROM accounts a 
@@ -119,39 +119,39 @@ def update_accounts_currency_table():
             
             invalid_count = result.fetchone()[0]
             if invalid_count > 0:
-                print(f"❌ שגיאה: נמצאו {invalid_count} חשבונות עם מזהי מטבע לא תקינים")
+                print(f"❌ Error: Found {invalid_count} accounts with invalid currency IDs")
                 return False
             
-            print("✓ כל מזהי המטבע בחשבונות תקינים")
+            print("✓ All currency IDs in accounts are valid")
             
-            print("\n🎉 עדכון טבלת החשבונות הושלם בהצלחה!")
-            print("📋 השלב הבא: עדכון טבלת הטיקרים")
+            print("\n🎉 Accounts table update completed successfully!")
+            print("📋 Next step: Update tickers table")
             return True
             
     except Exception as e:
-        print(f"❌ שגיאה בעדכון טבלת החשבונות: {e}")
+        print(f"❌ Error updating accounts table: {e}")
         return False
 
 def verify_accounts_update():
-    """בדיקת תוצאות העדכון"""
+    """Verify update results"""
     
     try:
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
         with engine.connect() as connection:
-            print("\n📋 בדיקת תוצאות העדכון:")
+            print("\n📋 Verifying update results:")
             print("=" * 50)
             
-            # בדיקת מבנה הטבלה
+            # Check table structure
             result = connection.execute(text("PRAGMA table_info(accounts)"))
             columns = result.fetchall()
             
-            print("מבנה טבלת החשבונות:")
+            print("Accounts table structure:")
             for col in columns:
                 col_name, col_type = col[1], col[2]
                 print(f"  {col_name}: {col_type}")
             
-            # בדיקת הנתונים
+            # Check data
             result = connection.execute(text("""
                 SELECT 
                     a.id, 
@@ -166,24 +166,24 @@ def verify_accounts_update():
             
             accounts = result.fetchall()
             if accounts:
-                print("\nדוגמאות חשבונות:")
+                print("\nAccount examples:")
                 for acc in accounts:
-                    print(f"  חשבון {acc[0]}: {acc[1]} | מטבע: {acc[3]} ({acc[4]})")
+                    print(f"  Account {acc[0]}: {acc[1]} | Currency: {acc[3]} ({acc[4]})")
             
             return True
             
     except Exception as e:
-        print(f"❌ שגיאה בבדיקת העדכון: {e}")
+        print(f"❌ Error verifying update: {e}")
         return False
 
 if __name__ == "__main__":
-    print("🔄 עדכון טבלת החשבונות לשימוש במזהי מטבע - TikTrack")
+    print("🔄 Updating accounts table to use currency IDs - TikTrack")
     print("=" * 70)
     
-    # עדכון הטבלה
+    # Update table
     if update_accounts_currency_table():
-        # בדיקת התוצאות
+        # Verify results
         verify_accounts_update()
     else:
-        print("\n❌ העדכון נכשל")
+        print("\n❌ Update failed")
         sys.exit(1)

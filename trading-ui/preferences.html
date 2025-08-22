@@ -60,6 +60,9 @@
   <!-- Bootstrap CSS - Loaded last to avoid overriding custom settings -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+  <!-- Header System CSS -->
+  <link rel="stylesheet" href="styles/header-system.css">
+
   <style>
     /* ===== Styles for preferences interface ===== */
 
@@ -867,7 +870,151 @@
   <div class="background-wrapper">
 
     <!-- Application header -->
-    <app-header></app-header>
+    <div id="unified-header">
+      <div class="unified-header">
+        <!-- Logo and menu area -->
+        <div class="header-top">
+          <!-- Navigation menu -->
+          <div class="header-nav">
+            <div class="nav-item">
+              <a href="index.html" class="nav-link">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Home</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="trades.html" class="nav-link">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Trades</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="accounts.html" class="nav-link">
+                <span class="nav-icon">💼</span>
+                <span class="nav-text">Accounts</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="alerts.html" class="nav-link">
+                <span class="nav-icon">🔔</span>
+                <span class="nav-text">Alerts</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="planning.html" class="nav-link">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">Planning</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="database.html" class="nav-link">
+                <span class="nav-icon">🗄️</span>
+                <span class="nav-text">Database</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="notes.html" class="nav-link">
+                <span class="nav-icon">📝</span>
+                <span class="nav-text">Notes</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="cash_flows.html" class="nav-link">
+                <span class="nav-icon">💰</span>
+                <span class="nav-text">Cash Flows</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="currencies.html" class="nav-link">
+                <span class="nav-icon">💱</span>
+                <span class="nav-text">Currencies</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="designs.html" class="nav-link">
+                <span class="nav-icon">🎨</span>
+                <span class="nav-text">Designs</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="executions.html" class="nav-link">
+                <span class="nav-icon">⚡</span>
+                <span class="nav-text">Executions</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="tickers.html" class="nav-link">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">Tickers</span>
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="research.html" class="nav-link">
+                <span class="nav-icon">🔬</span>
+                <span class="nav-text">Research</span>
+              </a>
+            </div>
+            <div class="nav-item active">
+              <a href="preferences.html" class="nav-link">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Preferences</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter area -->
+        <div class="header-filters">
+          <!-- Date filter -->
+          <div class="filter-dropdown">
+            <button class="filter-toggle date-range-filter-toggle" id="dateRangeFilterToggle" onclick="toggleDateRangeFilter()">
+              <span class="selected-value selected-date-range-text" id="selectedDateRange">All Time</span>
+              <span class="dropdown-arrow">▼</span>
+            </button>
+            <div class="filter-menu" id="dateRangeFilterMenu">
+              <div class="filter-item date-range-filter-item" data-value="today" onclick="selectDateRangeOption('today')">
+                <span class="check-mark"></span>
+                Today
+              </div>
+              <div class="filter-item date-range-filter-item" data-value="week" onclick="selectDateRangeOption('week')">
+                <span class="check-mark"></span>
+                This Week
+              </div>
+              <div class="filter-item date-range-filter-item" data-value="month" onclick="selectDateRangeOption('month')">
+                <span class="check-mark"></span>
+                This Month
+              </div>
+              <div class="filter-item date-range-filter-item" data-value="quarter" onclick="selectDateRangeOption('quarter')">
+                <span class="check-mark"></span>
+                This Quarter
+              </div>
+              <div class="filter-item date-range-filter-item" data-value="year" onclick="selectDateRangeOption('year')">
+                <span class="check-mark"></span>
+                This Year
+              </div>
+            </div>
+          </div>
+
+          <!-- Search filter -->
+          <div class="search-filter">
+            <input type="text" class="search-filter-input" id="searchFilterInput" placeholder="Search..." oninput="updateSearchFilter(this.value)">
+            <button class="search-clear-btn" onclick="clearSearchFilter()" title="Clear search">
+              <span class="search-clear-icon">×</span>
+            </button>
+          </div>
+
+          <!-- Reset filter -->
+          <button class="reset-btn" onclick="resetFilters()" title="Reset all filters">
+            <span class="reset-icon">🔄</span>
+          </button>
+
+          <!-- Clear filter -->
+          <button class="search-clear-btn" onclick="clearAllFilters()" title="Clear all filters">
+            <span class="search-clear-icon">×</span>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Page body - All content after header -->
     <div class="page-body">
@@ -883,7 +1030,7 @@
               <span class="action-icon">💾</span> שמור הכל
             </button>
             <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="סגור/פתח את כל הסקשנים">
+            <button class="filter-toggle-btn" data-toggle="all" onclick="toggleAllSections()" title="סגור/פתח את כל הסקשנים">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -901,7 +1048,7 @@
       <div class="main-content">
 
         <!-- System settings area - content-section -->
-        <div class="content-section">
+        <div class="content-section" data-section="system">
           <!-- System settings header -->
           <div class="section-header">
             <div class="table-title">
@@ -916,7 +1063,7 @@
                 <span class="action-icon">💾</span> שמור
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleSystemSection()" title="הצג/הסתר אזור הגדרות מערכת">
+              <button class="filter-toggle-btn" data-toggle="system" onclick="toggleSection('system')" title="הצג/הסתר אזור הגדרות מערכת">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -1011,7 +1158,7 @@
 
 
         <!-- Personal settings area - content-section -->
-        <div class="content-section">
+        <div class="content-section" data-section="personal">
           <!-- Personal settings header -->
           <div class="section-header">
             <div class="table-title">
@@ -1074,46 +1221,8 @@
           </div>
         </div>
 
-        <!-- Security settings area - content-section -->
-        <div class="content-section">
-          <!-- Security settings header -->
-          <div class="section-header">
-            <div class="table-title">
-              🔒 Security Settings
-            </div>
-
-            <div class="table-actions">
-              <button class="refresh-btn" onclick="resetSecurityPreferences()" title="Reset security settings">
-                <span class="action-icon">🔄</span> Reset
-              </button>
-              <button class="refresh-btn" onclick="saveSecurityPreferences()" title="Save security settings">
-                <span class="action-icon">💾</span> Save
-              </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleSecuritySection()"
-                title="Show/hide security settings area">
-                <span class="filter-icon">▲</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Security settings content -->
-          <div class="section-body">
-            <div class="preferences-container">
-              <div class="coming-soon-message">
-                <h3 style="text-align: center; color: #6c757d; margin: 2rem 0;">
-                  🔒 Coming Soon
-                </h3>
-                <p style="text-align: center; color: #6c757d; font-size: 1.1rem; margin-bottom: 2rem;">
-                  Security settings will be configured and updated in the next version of the system
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Display settings area - content-section -->
-        <div class="content-section">
+        <div class="content-section" data-section="display">
           <!-- Display settings header -->
           <div class="section-header">
             <div class="table-title">
@@ -1128,7 +1237,7 @@
                 <span class="action-icon">💾</span> Save
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleDisplaySection()"
+              <button class="filter-toggle-btn" data-toggle="display" onclick="toggleSection('display')"
                 title="Show/hide display settings area">
                 <span class="filter-icon">▲</span>
               </button>
@@ -1245,11 +1354,11 @@
         </div>
 
         <!-- Testing management area - content-section -->
-        <div class="content-section">
+        <div class="content-section" data-section="testing">
           <!-- Testing management header -->
           <div class="section-header">
             <div class="table-title">
-              🧪 Testing Management
+              🧪 Testing Settings
             </div>
 
             <div class="table-actions">
@@ -1263,7 +1372,7 @@
                 <span class="action-icon">🔄</span> Reset
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleTestingSection()"
+              <button class="filter-toggle-btn" data-toggle="testing" onclick="toggleSection('testing')"
                 title="Show/hide testing management area">
                 <span class="filter-icon">▲</span>
               </button>
@@ -1543,11 +1652,11 @@
         </div>
 
         <!-- CRUD Testing area - content-section -->
-        <div class="content-section">
+        <div class="content-section" data-section="crud">
           <!-- CRUD Testing header -->
           <div class="section-header">
             <div class="table-title">
-              🧪 בדיקות CRUD
+              🧪 CRUD Testing
             </div>
             <div class="table-count">מערכת בדיקות CRUD</div>
             <div class="table-actions">
@@ -1561,7 +1670,7 @@
                 <span class="action-icon">🔄</span> רענן
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleCRUDSection()" title="הצג/הסתר אזור בדיקות CRUD">
+              <button class="filter-toggle-btn" data-toggle="crud" onclick="toggleSection('crud')" title="הצג/הסתר אזור בדיקות CRUD">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -1589,51 +1698,6 @@
                   <div class="stat-number" id="crudOperations">24</div>
                   <div class="stat-label">פעולות CRUD</div>
                 </div>
-              </div>
-            </div>
-
-            <!-- הגדרות בדיקות CRUD -->
-            <div class="settings-section">
-              <h3><i class="fas fa-cogs"></i> הגדרות בדיקות</h3>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">בדיקות מקבילות</div>
-                  <div class="setting-description">הרצת בדיקות CRUD במקביל לביצועים טובים יותר</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="parallelCRUDTests" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">עצירה בכשל</div>
-                  <div class="setting-description">עצירת הבדיקות בכשל ראשון</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="stopCRUDOnFailure">
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">פלט מפורט</div>
-                  <div class="setting-description">הצגת מידע מפורט על כל בדיקה</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="verboseCRUDOutput" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">ניקוי נתונים</div>
-                  <div class="setting-description">מחיקת נתוני בדיקה אחרי כל בדיקה</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="cleanupCRUDData" checked>
-                  <span class="slider"></span>
-                </label>
               </div>
             </div>
 
@@ -2061,6 +2125,57 @@
             </div>
           </div>
         </div>
+
+        <!-- Security Tests area - content-section -->
+        <div class="content-section">
+          <!-- Security Tests header -->
+          <div class="section-header">
+            <div class="table-title">
+              🔒 Security Tests
+            </div>
+
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="resetSecurityPreferences()" title="Reset security settings">
+                <span class="action-icon">🔄</span> Reset
+              </button>
+              <button class="refresh-btn" onclick="saveSecurityPreferences()" title="Save security settings">
+                <span class="action-icon">💾</span> Save
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleSecuritySection()"
+                title="Show/hide security settings area">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Security Tests content -->
+          <div class="section-body">
+            <div class="settings-section">
+              <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
+              <div class="setting-item">
+                <div>
+                  <div class="setting-label">Security Tests</div>
+                  <div class="setting-description">Run special security tests</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="securityTests">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div>
+                  <div class="setting-label">Penetration Tests</div>
+                  <div class="setting-description">Run basic penetration tests</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="penetrationTests">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div> <!-- End page-body -->
 
@@ -2071,11 +2186,73 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Scripts -->
-    <script src="scripts/app-header.js" onerror="console.error('Failed to load app-header.js')"></script>
+    <!-- Header System Scripts -->
+  <script src="scripts/header-system.js" onerror="console.error('Failed to load header-system.js')"></script>
+  <script src="scripts/main.js" onerror="console.error('Failed to load main.js')"></script>
     <script src="scripts/main.js" onerror="console.error('Failed to load main.js')"></script>
     <script src="scripts/grid-filters.js" onerror="console.error('Failed to load grid-filters.js')"></script>
     <script src="scripts/console-cleanup.js" onerror="console.error('Failed to load console-cleanup.js')"></script>
     <script src="scripts/preferences.js" onerror="console.error('Failed to load preferences.js')"></script>
+
+    <script>
+      // Global filter functions for preferences page
+      window.toggleDateRangeFilter = function() {
+        console.log('🔍 toggleDateRangeFilter called');
+        if (window.headerSystem && window.headerSystem.toggleDateRangeFilter) {
+          window.headerSystem.toggleDateRangeFilter();
+        }
+      };
+
+      window.selectDateRangeOption = function(dateRange) {
+        console.log('🔍 selectDateRangeOption called with:', dateRange);
+        if (window.headerSystem && window.headerSystem.selectDateRangeOption) {
+          window.headerSystem.selectDateRangeOption(dateRange);
+        }
+      };
+
+      window.updateSearchFilter = function(value) {
+        console.log('🔍 updateSearchFilter called with:', value);
+        if (window.headerSystem && window.headerSystem.updateSearchFilter) {
+          window.headerSystem.updateSearchFilter(value);
+        }
+      };
+
+      window.clearSearchFilter = function() {
+        console.log('🔍 clearSearchFilter called');
+        if (window.headerSystem && window.headerSystem.clearSearchFilter) {
+          window.headerSystem.clearSearchFilter();
+        }
+      };
+
+      window.resetFilters = function() {
+        console.log('🔍 resetFilters called');
+        if (window.headerSystem && window.headerSystem.resetFilters) {
+          window.headerSystem.resetFilters();
+        }
+      };
+
+      window.clearAllFilters = function() {
+        console.log('🔍 clearAllFilters called');
+        if (window.headerSystem && window.headerSystem.clearAllFilters) {
+          window.headerSystem.clearAllFilters();
+        }
+      };
+
+      // Initialize preferences page
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Loading preferences page...');
+        
+        // Initialize HeaderSystem
+        if (window.headerSystem) {
+          window.headerSystem.init();
+        }
+        
+        // Initialize preferences
+        if (typeof initializePreferences === 'function') {
+          initializePreferences();
+        }
+      });
+    </script>
 
 </body>
 

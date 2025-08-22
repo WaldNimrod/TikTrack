@@ -388,10 +388,10 @@ async function loadAccounts() {
     // קריאה לפונקציה מ-accounts.js
     if (typeof window.loadAccountsDataFromAPI === 'function') {
       const accounts = await window.loadAccountsDataFromAPI();
-      updateAccountsTableInDesigns(accounts);
+      updateAccountsTableForPlanningPage(accounts);
     } else {
       const accounts = await loadAccountsData();
-      updateAccountsTableInDesigns(accounts);
+      updateAccountsTableForPlanningPage(accounts);
     }
 
   } catch (error) {
@@ -414,8 +414,8 @@ async function loadAccounts() {
  * 
  * @param {Array} accounts - מערך של חשבונות
  */
-function updateAccountsTableInDesigns(accounts) {
-  console.log('🔄 מעדכן טבלת חשבונות ב-designs.html עם', accounts.length, 'חשבונות');
+function updateAccountsTableForPlanningPage(accounts) {
+  console.log('🔄 מעדכן טבלת חשבונות בדף תכנונים עם', accounts.length, 'חשבונות');
 
   // מציאת הטבלה השנייה (חשבונות) בדף designs.html
   const contentSections = document.querySelectorAll('.content-section');
@@ -455,7 +455,7 @@ function updateAccountsTableInDesigns(accounts) {
     countElement.textContent = `${accounts.length} חשבונות`;
   }
 
-  console.log('✅ טבלת חשבונות ב-designs.html עודכנה בהצלחה');
+  console.log('✅ טבלת חשבונות בדף תכנונים עודכנה בהצלחה');
 }
 
 // פונקציה לעדכון טקסט פילטר החשבונות
@@ -512,7 +512,7 @@ window.isAccountsLoaded = isAccountsLoaded;
 window.loadAccountsData = loadAccountsData;
 window.updateAccountsTable = updateAccountsTable;
 window.loadAccounts = loadAccounts;
-window.updateAccountsTableInDesigns = updateAccountsTableInDesigns;
+window.updateAccountsTableForPlanningPage = updateAccountsTableForPlanningPage;
 
 // פונקציה גלובלית לעדכון ידני של תפריט החשבונות
 window.refreshAccountFilterMenu = function () {

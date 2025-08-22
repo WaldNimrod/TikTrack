@@ -542,7 +542,7 @@ activate_venv() {
 
 # Function to install missing Python packages
 # 
-# Automatically installs missing Python packages using pip
+# Automatically installs missing Python packages using pip3
 # Logs installation progress to detailed log
 # Returns 1 if any package installation fails
 install_missing_packages() {
@@ -551,7 +551,7 @@ install_missing_packages() {
     
     for package in "${missing_packages[@]}"; do
         log_info "Installing package: $package"
-        if pip install "$package" >> "$DETAILED_LOG" 2>&1; then
+        if pip3 install "$package" >> "$DETAILED_LOG" 2>&1; then
             log_success "Successfully installed: $package"
         else
             log_error "Failed to install: $package"
@@ -678,7 +678,7 @@ fix_common_issues() {
             local common_packages=("flask" "flask-cors" "sqlite3")
             for package in "${common_packages[@]}"; do
                 log_info "Installing: $package"
-                pip install "$package" >> "$DETAILED_LOG" 2>&1 || log_warning "Failed to install $package"
+                pip3 install "$package" >> "$DETAILED_LOG" 2>&1 || log_warning "Failed to install $package"
             done
             ;;
         "database_locks")

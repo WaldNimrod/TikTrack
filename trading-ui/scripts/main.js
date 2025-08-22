@@ -1215,13 +1215,13 @@ function filterTable(tableId, searchTerm) {
   });
 
   // עדכון ספירה
-  updateTableCount(tableId);
+  updateTableRowCount(tableId);
 }
 
 /**
  * עדכון ספירת שורות בטבלה
  */
-function updateTableCount(tableId) {
+function updateTableRowCount(tableId) {
   const table = document.getElementById(tableId);
   if (!table) return;
 
@@ -1901,7 +1901,7 @@ window.formatCurrency = formatCurrency;
 window.formatDate = formatDate;
 window.formatDateTime = formatDateTime;
 window.filterTable = filterTable;
-window.updateTableCount = updateTableCount;
+window.updateTableRowCount = updateTableRowCount;
 window.getCountElementForTable = getCountElementForTable;
 window.getTableNameForTable = getTableNameForTable;
 window.toggleSection = toggleSection;

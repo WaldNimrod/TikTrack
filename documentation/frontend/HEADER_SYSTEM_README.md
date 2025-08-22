@@ -1,49 +1,49 @@
-# מערכת הכותרת החדשה - TikTrack
+# New Header System - TikTrack
 
-## סקירה כללית
+## General Overview
 
-מערכת הכותרת החדשה היא מערכת עצמאית לחלוטין שלא תלויה ב-`app-header` הישן. היא יוצרת אלמנט `unified-header` חדש עם תפריט ופילטרים משלה.
+The new header system is a completely independent system that does not rely on the old `app-header`. It creates a new `unified-header` element with its own menu and filters.
 
-## תכונות עיקריות
+## Main Features
 
-### ✅ תכונות שהושלמו
-- [x] **עצמאות מלאה** - לא תלויה ב-app-header הישן
-- [x] **עיצוב אחיד** - סגנון עקבי בכל העמודים
-- [x] **פילטרים חכמים** - מערכת פילטרים שמתאימה את עצמה לכל טבלה
-- [x] **עיצוב רספונסיבי** - מותאם למובייל
-- [x] **שמירת מצב** - שומר מצב פילטרים והעדפות UI
-- [x] **תפריט ניווט** - ניווט מלא לכל העמודים עם עיצוב משופר
-- [x] **סימון עמוד פעיל** - סימון ירוק לעמוד הפעיל בתפריט הראשי ובתפריט המשנה
-- [x] **פילטר סטטוס** - פילטר רב-בחירה לסטטוסים
-- [x] **פילטר טיפוס** - פילטר רב-בחירה לטיפוסים (סווינג, השקעה, פסיבי)
-- [x] **פילטר חשבונות** - פילטר דינמי לחשבונות עם עיצוב אחיד
-- [x] **פילטר תאריכים** - פילטר תאריכים מתקדם עם לוגיקה מלאה
-- [x] **פילטר חיפוש** - חיפוש טקסט בזמן אמת
-- [x] **כפתור איפוס** - איפוס כל הפילטרים
-- [x] **כפתור ניקוי** - סגירת כל תפריטי הפילטרים
-- [x] **כפתור הצג/הסתר** - הצגה/הסתרה של אזור הפילטרים
-- [x] **סגירה אוטומטית** - סגירת פילטרים בלחיצה מחוץ לתפריט
-- [x] **שדות בדיקה** - מידע דיבאג בזמן אמת על טווחי תאריכים
+### ✅ Completed Features
+- [x] **Complete Independence** - Does not rely on the old app-header
+- [x] **Unified Design** - Consistent styling across all pages
+- [x] **Smart Filters** - Filter system that adapts to any table
+- [x] **Responsive Design** - Mobile-friendly
+- [x] **State Persistence** - Saves filter states and UI preferences
+- [x] **Navigation Menu** - Full navigation to all pages with improved design
+- [x] **Active Page Marking** - Green marking for active page in main menu and submenu
+- [x] **Status Filter** - Multi-select filter for statuses
+- [x] **Type Filter** - Multi-select filter for types (Swing, Investment, Passive)
+- [x] **Account Filter** - Dynamic filter for accounts with unified design
+- [x] **Date Filter** - Advanced date filter with full logic
+- [x] **Search Filter** - Real-time text search
+- [x] **Reset Button** - Reset all filters
+- [x] **Clear Button** - Close all filter menus
+- [x] **Show/Hide Button** - Show/hide filter area
+- [x] **Auto-close** - Close filters when clicking outside menu
+- [x] **Debug Fields** - Real-time debug information on date ranges
 
-### 🔄 תכונות בפיתוח
-- [ ] **פילטר תאריכים מתקדם** - בחירת תאריכים מותאמת אישית
-- [ ] **שמירת פילטרים** - שמירה וטעינה של קומבינציות פילטרים
-- [ ] **ייצוא נתונים מסוננים** - ייצוא תוצאות מסוננות
-- [ ] **ניווט מקלדת** - נגישות מלאה למקלדת
-- [ ] **אנליטיקת פילטרים** - סטטיסטיקות שימוש ותובנות
+### 🔄 Features in Development
+- [ ] **Advanced Date Filter** - Custom date selection
+- [ ] **Filter Saving** - Save and load filter combinations
+- [ ] **Export Filtered Data** - Export filtered results
+- [ ] **Keyboard Navigation** - Full keyboard accessibility
+- [ ] **Filter Analytics** - Usage statistics and insights
 
-## קבצים
+## Files
 
-### קבצי JavaScript
-- `trading-ui/scripts/header-system.js` - הקובץ הראשי של מערכת הכותרת
+### JavaScript Files
+- `trading-ui/scripts/header-system.js` - Main header system file
 
-### קבצי CSS
-- `trading-ui/styles/header-system.css` - סגנונות מערכת הכותרת
+### CSS Files
+- `trading-ui/styles/header-system.css` - Header system styles
 
-### דף בדיקה
-- `trading-ui/test-header-only.html` - דף בדיקה עצמאי עם שדות דיבאג
+### Test Page
+- `trading-ui/test-header-only.html` - Standalone test page with debug fields
 
-## מבנה המערכת
+## System Structure
 
 ### HeaderSystem Class
 ```javascript
@@ -61,7 +61,7 @@ class HeaderSystem {
   }
 
   closeAllFilterMenus() {
-    // סגירת כל תפריטי הפילטרים
+    // Close all filter menus
   }
 }
 ```
@@ -80,58 +80,58 @@ class SimpleFilter {
   }
 
   updateFilter(filterType, value) {
-    // לוגיקת עדכון פילטר
+    // Filter update logic
   }
 
   applyFilters() {
-    // הפעלת פילטרים על טבלאות
+    // Apply filters to tables
   }
 
-  // פונקציות עזר לתאריכים
+  // Date helper functions
   isSameDay(date1, date2) { ... }
   isThisWeek(date) { ... }
   isLastWeek(date) { ... }
-  // ועוד...
+  // and more...
 }
 ```
 
-## פונקציות גלובליות
+## Global Functions
 
-### פונקציות טוגל פילטרים
+### Filter Toggle Functions
 ```javascript
-window.toggleStatusFilter()     // פתיחה/סגירה של פילטר סטטוס
-window.toggleTypeFilter()       // פתיחה/סגירה של פילטר טיפוס
-window.toggleAccountFilter()    // פתיחה/סגירה של פילטר חשבונות
-window.toggleDateRangeFilter()  // פתיחה/סגירה של פילטר תאריכים
+window.toggleStatusFilter()     // Open/close status filter
+window.toggleTypeFilter()       // Open/close type filter
+window.toggleAccountFilter()    // Open/close account filter
+window.toggleDateRangeFilter()  // Open/close date range filter
 ```
 
-### פונקציות בחירת אופציות
+### Option Selection Functions
 ```javascript
-window.selectStatusOption(status)     // בחירת סטטוס
-window.selectTypeOption(type)         // בחירת טיפוס
-window.selectAccountOption(account)   // בחירת חשבון
-window.selectDateRangeOption(dateRange) // בחירת טווח תאריכים
+window.selectStatusOption(status)     // Select status
+window.selectTypeOption(type)         // Select type
+window.selectAccountOption(account)   // Select account
+window.selectDateRangeOption(dateRange) // Select date range
 ```
 
-### פונקציות סגירת פילטרים
+### Filter Close Functions
 ```javascript
-window.closeStatusFilter()     // סגירת פילטר סטטוס
-window.closeTypeFilter()       // סגירת פילטר טיפוס
-window.closeAccountFilter()    // סגירת פילטר חשבונות
-window.closeDateRangeFilter()  // סגירת פילטר תאריכים
+window.closeStatusFilter()     // Close status filter
+window.closeTypeFilter()       // Close type filter
+window.closeAccountFilter()    // Close account filter
+window.closeDateRangeFilter()  // Close date range filter
 ```
 
-## שימוש בסיסי
+## Basic Usage
 
-### 1. הוספה לעמוד HTML
+### 1. Adding to HTML Page
 ```html
-<!-- הוספת CSS -->
+<!-- Add CSS -->
 <link rel="stylesheet" href="styles/header-system.css">
 
-<!-- הוספת JavaScript -->
+<!-- Add JavaScript -->
 <script src="scripts/header-system.js"></script>
 
-<!-- אתחול אוטומטי -->
+<!-- Automatic initialization -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (window.headerSystem && !window.headerSystem.isInitialized) {
@@ -141,165 +141,165 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 ```
 
-### 2. עדכון פילטר חשבונות
+### 2. Update Account Filter
 ```javascript
-// עדכון פילטר חשבונות עם נתונים אמיתיים
+// Update account filter with real data
 window.updateAccountFilterMenu([
-  { id: 1, name: 'חשבון ראשי' },
-  { id: 2, name: 'חשבון משני' }
+  { id: 1, name: 'Main Account' },
+  { id: 2, name: 'Secondary Account' }
 ]);
 ```
 
-### 3. האזנה לשינויים בפילטרים
+### 3. Listening to Filter Changes
 ```javascript
-// האזנה לשינויים בפילטרים
+// Listen to filter changes
 if (window.filterSystem) {
-  window.filterSystem.updateFilter('status', ['פתוח']);
+  window.filterSystem.updateFilter('status', ['Open']);
 }
 ```
 
-## ניהול מצב
+## State Management
 
 ### Local Storage
-המערכת שומרת את המצב ב-Local Storage:
+The system saves state in Local Storage:
 
 ```javascript
-// מצב הכותרת
+// Header state
 headerState: {
   isFilterCollapsed: false
 }
 
-// מצב אזור הפילטרים
+// Filter area state
 filtersSectionOpen: true
 
-// מצב הפילטרים
+// Filter states
 filterStates: {
-  status: ['פתוח', 'סגור'],
-  type: ['סווינג', 'השקעה'],
-  account: ['חשבון ראשי'],
-  dateRange: ['השבוע'],
+  status: ['Open', 'Closed'],
+  type: ['Swing', 'Investment'],
+  account: ['Main Account'],
+  dateRange: ['This Week'],
   search: 'AAPL'
 }
 ```
 
-## אינטגרציה עם טבלאות
+## Table Integration
 
-### זיהוי אוטומטי
-המערכת מזהה אוטומטית טבלאות עם IDs:
+### Automatic Detection
+The system automatically detects tables with IDs:
 - `tradesTable`
 - `testTable`
-- **לא כולל**: `notificationsTable`
+- **Excludes**: `notificationsTable`
 
-### פילטור אוטומטי
-הפילטרים מופעלים אוטומטית על כל הטבלאות המזוהות.
+### Automatic Filtering
+Filters are automatically applied to all detected tables.
 
 ### Data Attributes
-הטבלאות צריכות לכלול data attributes לפילטור:
+Tables need to include data attributes for filtering:
 ```html
-<td data-status="פתוח">פתוח</td>
-<td data-type="מניה">מניה</td>
-<td data-account="חשבון א">חשבון א</td>
+<td data-status="Open">Open</td>
+<td data-type="Stock">Stock</td>
+<td data-account="Account A">Account A</td>
 <td data-date="2025-01-15">2025-01-15</td>
 ```
 
-## פילטרים זמינים
+## Available Filters
 
-### פילטר סטטוס
-- **אופציות**: פתוח, סגור, בוטל
-- **סוג**: רב-בחירה
-- **סמלים**: ✓ ירוק לבחירות
+### Status Filter
+- **Options**: Open, Closed, Canceled
+- **Type**: Multi-select
+- **Symbols**: ✓ Green for selections
 
-### פילטר טיפוס
-- **אופציות**: סווינג, השקעה, פסיבי
-- **סוג**: רב-בחירה
-- **סמלים**: ✓ ירוק לבחירות
+### Type Filter
+- **Options**: Swing, Investment, Passive
+- **Type**: Multi-select
+- **Symbols**: ✓ Green for selections
 
-### פילטר חשבונות
-- **אופציות**: דינמיות מהמסד נתונים
-- **סוג**: רב-בחירה
-- **עיצוב**: אחיד עם שאר הפילטרים
-- **סמלים**: ✓ ירוק לבחירות
+### Account Filter
+- **Options**: Dynamic from database
+- **Type**: Multi-select
+- **Design**: Unified with other filters
+- **Symbols**: ✓ Green for selections
 
-### פילטר תאריכים
-- **אופציות**: היום, אתמול, השבוע, שבוע אחרון, חודש אחרון, 3 חודשים, MTD, YTD, 30 יום, 60 יום, 90 יום, שנה, שנה קודמת, כל זמן
-- **סוג**: בחירה יחידה
-- **סמלים**: ✓ ירוק לבחירה
-- **לוגיקה**: חישוב טווחי תאריכים מלא
+### Date Filter
+- **Options**: Today, Yesterday, This Week, Last Week, Last Month, 3 Months, MTD, YTD, 30 Days, 60 Days, 90 Days, Year, Previous Year, All Time
+- **Type**: Single select
+- **Symbols**: ✓ Green for selection
+- **Logic**: Full date range calculation
 
-### פילטר חיפוש
-- **סוג**: חיפוש טקסט בזמן אמת
-- **כפתור ניקוי**: × לניקוי מהיר
+### Search Filter
+- **Type**: Real-time text search
+- **Clear Button**: × for quick clearing
 
-## כפתורי פעולה
+## Action Buttons
 
-### כפתור איפוס (↻)
-- **תפקיד**: איפוס כל הפילטרים והחיפוש
-- **פעולה**: מסיר כל בחירה ומנקה חיפוש
-- **עיצוב**: ירוק, 30x30px
-- **אנימציה**: סיבוב 180 מעלות
+### Reset Button (↻)
+- **Function**: Reset all filters and search
+- **Action**: Removes all selections and clears search
+- **Design**: Green, 30x30px
+- **Animation**: 180° rotation
 
-### כפתור ניקוי (×)
-- **תפקיד**: סגירת כל תפריטי הפילטרים
-- **פעולה**: סוגר תפריטים פתוחים
-- **עיצוב**: כתום, 30x30px
-- **אנימציה**: הגדלה קלה
+### Clear Button (×)
+- **Function**: Close all filter menus
+- **Action**: Closes open menus
+- **Design**: Orange, 30x30px
+- **Animation**: Slight scaling
 
-### כפתור הצג/הסתר (▼/▶)
-- **תפקיד**: הצגה/הסתרה של אזור הפילטרים
-- **פעולה**: מסתיר/מציג את כל אזור הפילטרים
-- **עיצוב**: עגול לבן עם צל, ללא מסגרת
-- **אנימציה**: שינוי חץ
+### Show/Hide Button (▼/▶)
+- **Function**: Show/hide filter area
+- **Action**: Hides/shows entire filter area
+- **Design**: White circle with shadow, no border
+- **Animation**: Arrow change
 
-## אינטראקציה
+## Interaction
 
-### סגירה אוטומטית
-- **לחיצה מחוץ לתפריט**: סוגרת את כל הפילטרים הפתוחים
-- **זיהוי אזורים**: תפריטים, כפתורים, שדות חיפוש
-- **איפוס מצב**: מסיר מצב פעיל מכפתורים
+### Auto-close
+- **Click outside menu**: Closes all open filters
+- **Area detection**: Menus, buttons, search fields
+- **State reset**: Removes active state from buttons
 
-### עדכון בזמן אמת
-- **פילטרים**: מתעדכנים מיד עם בחירה
-- **סטטיסטיקות**: מספר שורות נראות/סה"כ
-- **טווחי תאריכים**: חישוב אוטומטי של טווחים
+### Real-time Updates
+- **Filters**: Update immediately with selection
+- **Statistics**: Number of visible rows/total
+- **Date ranges**: Automatic range calculation
 
-## בדיקות
+## Testing
 
-### דף בדיקה
-הדף `test-header-only.html` מספק סביבת בדיקה עצמאית עם:
+### Test Page
+The page `test-header-only.html` provides a standalone testing environment with:
 
-#### מידע דיבאג
-- **מצב מערכות**: זמינות HeaderSystem ו-FilterSystem
-- **מצב פילטרים**: ערכים נוכחיים של כל הפילטרים
-- **טווח תאריכים**: תאריך התחלה, סיום ותיאור
-- **סטטיסטיקות טבלאות**: מספר שורות נראות/סה"כ
+#### Debug Information
+- **System Status**: HeaderSystem and FilterSystem availability
+- **Filter Status**: Current values of all filters
+- **Date Range**: Start date, end date and description
+- **Table Statistics**: Number of visible rows/total
 
-#### בדיקת פונקציונליות
-1. פתיחת/סגירת פילטרים
-2. בחירת אופציות בפילטרים
-3. חיפוש טקסט
-4. איפוס פילטרים
-5. ניקוי תפריטים
-6. שמירת/שחזור מצב
-7. סגירה אוטומטית בלחיצה מחוץ לתפריט
+#### Functionality Testing
+1. Opening/closing filters
+2. Selecting options in filters
+3. Text search
+4. Resetting filters
+5. Clearing menus
+6. Saving/restoring state
+7. Auto-close when clicking outside menu
 
-## פתרון בעיות
+## Troubleshooting
 
-### בעיות נפוצות
+### Common Issues
 
-#### 1. פילטרים לא נפתחים
+#### 1. Filters Don't Open
 ```javascript
-// בדיקה אם האלמנטים קיימים
+// Check if elements exist
 console.log('Status menu:', document.getElementById('statusFilterMenu'));
 console.log('Type menu:', document.getElementById('typeFilterMenu'));
 ```
 
-#### 2. פילטרים לא עובדים על טבלאות
+#### 2. Filters Don't Work on Tables
 ```javascript
-// בדיקה אם הטבלה מזוהה
+// Check if table is detected
 const tables = document.querySelectorAll('table[id]');
 console.log('Found tables:', tables.length);
 
-// בדיקה אם יש data attributes
+// Check if there are data attributes
 const rows = document.querySelectorAll('tr[data-status]');
 console.log('Rows with data-status:', rows.length);
 ```

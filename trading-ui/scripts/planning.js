@@ -216,7 +216,7 @@ async function loadDesignsData() {
         window.filteredDesignsData = [];
 
         // Updating statistics
-        updateSummaryStats();
+        updatePageSummaryStats();
 
         return designsData;
     }
@@ -299,7 +299,7 @@ function updateDesignsTable(designs) {
         }
 
         // Updating statistics
-        updateSummaryStats();
+        updatePageSummaryStats();
         return;
     }
 
@@ -353,14 +353,14 @@ function updateDesignsTable(designs) {
 
         // Type correction - ensuring a valid value is passed
         console.log('🔄 Processing type for design:', design.id, 'investment_type:', design.investment_type, 'type:', typeof design.investment_type);
-        const typeDisplay = design.investment_type ? getTypeDisplay(design.investment_type) : 'לא מוגדר';
+        const typeDisplay = design.investment_type ? (window.translateTradePlanType ? window.translateTradePlanType(design.investment_type) : design.investment_type) : 'לא מוגדר';
         console.log('🔄 Type display result:', typeDisplay);
         const sideDisplay = design.side === 'Long' ? 'Long' : 'Short';
         const amountDisplay = formatCurrency(design.planned_amount);
         const targetDisplay = formatCurrency(design.target_price);
         const stopDisplay = formatCurrency(design.stop_price);
         const currentDisplay = formatCurrency(design.current || 0);
-        const statusDisplay = getStatusDisplay(design.status);
+        const statusDisplay = window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status;
 
         // Displaying ticker symbol or name
         const tickerDisplay = design.ticker ? (design.ticker.symbol || design.ticker.name || 'לא מוגדר') : 'לא מוגדר';
@@ -397,13 +397,13 @@ function updateDesignsTable(designs) {
     }
 
     // Updating statistics
-    updateSummaryStats();
+    updatePageSummaryStats();
 }
 
 /**
  * עדכון סטטיסטיקות סיכום
  */
-function updateSummaryStats() {
+function updatePageSummaryStats() {
     // Using filtered data if available, otherwise all data
     const dataToUse = window.filteredDesignsData || designsData;
     const totalDesigns = dataToUse.length;
@@ -730,36 +730,12 @@ function getTypeClass(type) {
 /**
  * Getting type display
  */
-function getTypeDisplay(type) {
-    // Safeguarding against invalid values
-    if (type === null || type === undefined) {
-        return 'לא מוגדר';
-    }
-
-    const typeMap = {
-        'swing': 'סווינג',
-        'investment': 'השקעה',
-        'passive': 'פאסיבי'
-    };
-    return typeMap[type] || type;
-}
+// פונקציה הועברה ל-translation-utils.js בשם translateTradePlanType
 
 /**
  * Getting status display
  */
-function getStatusDisplay(status) {
-    // Safeguarding against invalid values
-    if (status === null || status === undefined) {
-        return 'לא מוגדר';
-    }
-
-    const statusMap = {
-        'open': 'פתוח',
-        'closed': 'סגור',
-        'cancelled': 'מבוטל'
-    };
-    return statusMap[status] || status;
-}
+// פונקציה הועברה ל-translation-utils.js בשם translateTradePlanStatus
 
 /**
  * טעינת העדפות המשתמש

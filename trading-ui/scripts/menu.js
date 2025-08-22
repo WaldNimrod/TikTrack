@@ -4,29 +4,29 @@ async function loadMenu() {
     console.log('Loading menu...');
     const response = await fetch('menu.html');
     console.log('Menu response status:', response.status);
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const menuHtml = await response.text();
     console.log('Menu HTML loaded, length:', menuHtml.length);
-    
+
     // הכנסת התפריט בתחילת הדף
     document.body.insertAdjacentHTML('afterbegin', menuHtml);
     console.log('Menu inserted into page');
-    
+
     // הגדרת הפריט הפעיל לפי הדף הנוכחי
     setActiveMenuItem();
-    
+
     // הוספת event listeners לכפתורי הניווט
     addMenuEventListeners();
-    
+
     // הוספת event listeners לתפריט הנפתח
     addDropdownEventListeners();
-    
+
     console.log('Menu loaded successfully');
-    
+
   } catch (error) {
     console.error('שגיאה בטעינת התפריט:', error);
     // יצירת תפריט בסיסי במקרה של שגיאה
@@ -81,7 +81,7 @@ function createBasicMenu() {
       </div>
     </div>
   `;
-  
+
   document.body.insertAdjacentHTML('afterbegin', basicMenu);
   console.log('Basic menu created');
 }
@@ -90,10 +90,10 @@ function createBasicMenu() {
 function setActiveMenuItem() {
   const currentPath = window.location.pathname;
   const navItems = document.querySelectorAll('.nav-item');
-  
+
   // הסרת active מכל הפריטים
   navItems.forEach(item => item.classList.remove('active'));
-  
+
   // הגדרת הפריט הפעיל לפי הנתיב הנוכחי
   if (currentPath === '/' || currentPath === '/index.html') {
     document.querySelector('[data-page="home"]')?.classList.add('active');
@@ -135,7 +135,7 @@ function addMenuEventListeners() {
 function closeDropdown() {
   const dropdownToggle = document.querySelector('.dropdown-toggle');
   const dropdownMenu = document.querySelector('.dropdown-menu');
-  
+
   if (dropdownToggle && dropdownMenu) {
     // ניסיון לסגור עם Bootstrap
     try {
@@ -147,7 +147,7 @@ function closeDropdown() {
       dropdownToggle.setAttribute('aria-expanded', 'false');
     }
   }
-  
+
 
 }
 
@@ -156,7 +156,7 @@ function addDropdownEventListeners() {
   const dropdownToggle = document.querySelector('.dropdown-toggle');
   const dropdownMenu = document.querySelector('.dropdown-menu');
   const dropdownItems = document.querySelectorAll('.dropdown-item');
-  
+
   if (dropdownToggle && dropdownMenu) {
     // סגירת התפריט כשלוחצים על פריט
     dropdownItems.forEach(item => {
@@ -164,28 +164,28 @@ function addDropdownEventListeners() {
         closeDropdown();
       });
     });
-    
+
     // סגירת התפריט כשלוחצים מחוץ לו
     document.addEventListener('click', (e) => {
       if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
         closeDropdown();
       }
     });
-    
+
     // סגירת התפריט כשלוחצים על מקש Escape
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeDropdown();
       }
     });
-    
+
     // סגירת התפריט כשלוחצים על מקש Tab
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Tab') {
         closeDropdown();
       }
     });
-    
+
     // סגירת התפריט כשמחליפים דף
     window.addEventListener('beforeunload', () => {
       closeDropdown();
@@ -200,7 +200,7 @@ function addDropdownEventListeners() {
 
 
 // פונקציה להצגת התראות
-window.showNotification = function(message, type = 'info') {
+window.showNotification = function (message, type = 'info') {
   // יצירת התראה זמנית
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
@@ -216,7 +216,7 @@ window.showNotification = function(message, type = 'info') {
     z-index: 10000;
     animation: slideIn 0.3s ease;
   `;
-  
+
   if (type === 'success') {
     notification.style.background = '#29a6a8';
   } else if (type === 'error') {
@@ -224,9 +224,9 @@ window.showNotification = function(message, type = 'info') {
   } else {
     notification.style.background = '#6c757d';
   }
-  
+
   document.body.appendChild(notification);
-  
+
   setTimeout(() => {
     notification.style.animation = 'slideOut 0.3s ease';
     setTimeout(() => {
@@ -276,13 +276,13 @@ function addNotificationStyles() {
 
 
 // פונקציות לפילטר סטטוס
-window.toggleStatusFilter = function() {
+window.toggleStatusFilter = function () {
   const menu = document.getElementById('statusFilterMenu');
   const toggle = document.querySelector('.status-filter-toggle');
   const filterSection = document.getElementById('statusFilterSection');
-  
+
   if (!menu || !toggle || !filterSection) return;
-  
+
   if (menu.classList.contains('show')) {
     // סגירת התפריט
     menu.classList.remove('show');
@@ -294,9 +294,9 @@ window.toggleStatusFilter = function() {
     toggle.classList.add('active');
     filterSection.style.minHeight = '220px';
   }
-  
+
   updateStatusFilterText();
-  
+
   // מניעת סגירת הדרופדאון רק בלחיצה על הכפתור - לא בלחיצה מחוץ לו
   if (event) {
     event.stopPropagation();
@@ -304,41 +304,41 @@ window.toggleStatusFilter = function() {
 }
 
 // פונקציה לסגירת הדרופדאון של הפילטר בלחיצה על כפתור סגירה
-window.closeStatusFilter = function() {
+window.closeStatusFilter = function () {
   const menu = document.getElementById('statusFilterMenu');
   const toggle = document.querySelector('.status-filter-toggle');
   const filterSection = document.getElementById('statusFilterSection');
-  
+
   if (menu && toggle && filterSection) {
     menu.classList.remove('show');
     toggle.classList.remove('active');
     filterSection.style.minHeight = '30px';
   }
-  
+
   // מניעת סגירת הדרופדאון רק בלחיצה על כפתור הסגירה - לא בלחיצה מחוץ לו
   if (event) {
     event.stopPropagation();
   }
 }
 
-window.selectStatusOption = function(status) {
+window.selectStatusOption = function (status) {
   const menu = document.getElementById('statusFilterMenu');
   if (!menu) return;
-  
+
   const item = Array.from(menu.querySelectorAll('.status-filter-item'))
     .find(item => item.querySelector('.option-text').textContent === status);
-  
+
   if (item) {
     item.classList.toggle('selected');
     updateStatusFilterText();
-    
+
     // עדכון אוטומטי של הגריד
     const selectedItems = menu.querySelectorAll('.status-filter-item.selected');
     const selectedValues = Array.from(selectedItems)
       .map(item => item.querySelector('.option-text').textContent);
-    
+
     console.log('Selected statuses:', selectedValues);
-    
+
     // עדכון ישיר של הגריד
     if (typeof gridApi !== 'undefined' && gridApi) {
       if (selectedValues.length === 0 || selectedValues.length === 3) {
@@ -358,12 +358,12 @@ window.selectStatusOption = function(status) {
     } else {
       console.log('Grid API not available');
     }
-    
+
     // עדכון הצ'קבוקסים בדף הגריד
     if (typeof updateTestCheckboxes === 'function') {
       updateTestCheckboxes(selectedValues);
     }
-    
+
     // מניעת סגירת הדרופדאון
     if (event) {
       event.stopPropagation();
@@ -372,21 +372,21 @@ window.selectStatusOption = function(status) {
   }
 }
 
-window.updateStatusFilterText = function() {
+window.updateStatusFilterText = function () {
   const menu = document.getElementById('statusFilterMenu');
   if (!menu) return;
-  
+
   const toggle = menu.previousElementSibling;
   if (!toggle) return;
-  
+
   const selectedText = toggle.querySelector('.selected-status-text');
   if (!selectedText) return;
-  
+
   const selectedItems = menu.querySelectorAll('.status-filter-item.selected');
-  
+
   const selectedValues = Array.from(selectedItems)
     .map(item => item.querySelector('.option-text').textContent);
-  
+
   if (selectedValues.length === 0) {
     selectedText.textContent = 'כל הסטטוסים';
   } else if (selectedValues.length === menu.querySelectorAll('.status-filter-item').length) {
@@ -396,16 +396,16 @@ window.updateStatusFilterText = function() {
   }
 }
 
-window.applyStatusFilter = function() {
+window.applyStatusFilter = function () {
   const menu = document.getElementById('statusFilterMenu');
   if (!menu) return;
-  
+
   const selectedItems = menu.querySelectorAll('.status-filter-item.selected');
   const selectedValues = Array.from(selectedItems)
     .map(item => item.querySelector('.option-text').textContent);
-  
+
   console.log('Applying status filter:', selectedValues);
-  
+
   // עדכון ישיר של הגריד
   if (typeof gridApi !== 'undefined' && gridApi) {
     if (selectedValues.length === 0 || selectedValues.length === 3) {
@@ -425,26 +425,26 @@ window.applyStatusFilter = function() {
   } else {
     console.log('Grid API not available');
   }
-  
+
   // עדכון הצ'קבוקסים בדף הגריד
   if (typeof updateTestCheckboxes === 'function') {
     updateTestCheckboxes(selectedValues);
   }
-  
+
 
 }
 
-window.clearStatusFilter = function() {
+window.clearStatusFilter = function () {
   const menu = document.getElementById('statusFilterMenu');
   if (!menu) return;
-  
+
   // בחירת כל האפשרויות
   menu.querySelectorAll('.status-filter-item').forEach(item => {
     item.classList.add('selected');
   });
-  
+
   updateStatusFilterText();
-  
+
   // ניקוי הפילטר מהגריד
   if (typeof gridApi !== 'undefined' && gridApi) {
     if (typeof window.rowData !== 'undefined') {
@@ -452,37 +452,37 @@ window.clearStatusFilter = function() {
     }
     console.log('Grid filter cleared');
   }
-  
+
   console.log('Status filter cleared');
-  
+
 
 }
 
-window.toggleFilterSection = function() {
+window.toggleFilterSection = function () {
   const filterSection = document.getElementById('statusFilterSection');
   const backgroundWrapper = document.querySelector('.background-wrapper');
-  
+
   if (!filterSection) return;
-  
+
   if (filterSection.classList.contains('collapsed')) {
     // פתיחת הפילטר
     filterSection.classList.remove('collapsed');
-    
+
     // עדכון המרווח
     if (backgroundWrapper) {
       backgroundWrapper.classList.remove('filter-collapsed');
     }
-    
+
   } else {
     // סגירת הפילטר
     filterSection.classList.add('collapsed');
-    
+
     // עדכון המרווח
     if (backgroundWrapper) {
       backgroundWrapper.classList.add('filter-collapsed');
     }
   }
-  
+
   // מניעת סגירת הדרופדאון רק בלחיצה על החץ - לא בלחיצה מחוץ לו
   if (event) {
     event.stopPropagation();
@@ -493,7 +493,7 @@ window.toggleFilterSection = function() {
 document.addEventListener('click', (e) => {
   const statusFilterDropdown = document.querySelector('.status-filter-dropdown');
   const statusFilterMenu = document.getElementById('statusFilterMenu');
-  
+
   // בדיקה אם זה לא הדרופדאון של הפילטר
   if (statusFilterDropdown && !statusFilterDropdown.contains(e.target)) {
     // סגירת דרופדאונים אחרים (לא הפילטר)
@@ -504,7 +504,7 @@ document.addEventListener('click', (e) => {
       }
     });
   }
-  
+
   // סגירת פילטרים בלחיצה מחוץ להם
   if (typeof window.closeAllFilters === 'function') {
     // בדיקה אם הלחיצה היא מחוץ לפילטרים
@@ -565,10 +565,10 @@ document.addEventListener('keydown', (e) => {
 });
 
 // טעינת התפריט בעת טעינת הדף
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   loadMenu();
   addNotificationStyles();
-  
+
   // אתחול הפילטר - בחירת כל האפשרויות
   setTimeout(() => {
     const menu = document.getElementById('statusFilterMenu');
@@ -577,7 +577,7 @@ document.addEventListener('DOMContentLoaded', function() {
         item.classList.add('selected');
       });
       updateStatusFilterText();
-      
+
       // עדכון הגריד עם כל הסטטוסים
       if (typeof gridApi !== 'undefined' && gridApi) {
         gridApi.setFilterModel(null);
@@ -585,7 +585,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }, 500);
-  
+
   // אתחול נוסף לאחר זמן ארוך יותר לוודא שהגריד נטען
   setTimeout(() => {
     const menu = document.getElementById('statusFilterMenu');
@@ -597,29 +597,29 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }, 2000);
-  
+
   // בדיקה תקופתית של זמינות הגריד
-const checkGridInterval = setInterval(() => {
-  if (typeof gridApi !== 'undefined' && gridApi) {
-    console.log('Grid API is available, clearing interval');
-    clearInterval(checkGridInterval);
-    
-    // אתחול הפילטר
-    const menu = document.getElementById('statusFilterMenu');
-    if (menu) {
-      menu.querySelectorAll('.status-filter-item').forEach(item => {
-        item.classList.add('selected');
-      });
-      updateStatusFilterText();
-      gridApi.setFilterModel(null);
-      console.log('Grid filter initialized successfully');
+  const checkGridInterval = setInterval(() => {
+    if (typeof gridApi !== 'undefined' && gridApi) {
+      console.log('Grid API is available, clearing interval');
+      clearInterval(checkGridInterval);
+
+      // אתחול הפילטר
+      const menu = document.getElementById('statusFilterMenu');
+      if (menu) {
+        menu.querySelectorAll('.status-filter-item').forEach(item => {
+          item.classList.add('selected');
+        });
+        updateStatusFilterText();
+        gridApi.setFilterModel(null);
+        console.log('Grid filter initialized successfully');
+      }
     }
-  }
-  
-  // עצירת הבדיקה לאחר 10 שניות
-  setTimeout(() => {
-    clearInterval(checkGridInterval);
-    console.log('Grid API check timeout');
-  }, 10000);
-}, 100);
+
+    // עצירת הבדיקה לאחר 10 שניות
+    setTimeout(() => {
+      clearInterval(checkGridInterval);
+      console.log('Grid API check timeout');
+    }, 10000);
+  }, 100);
 });

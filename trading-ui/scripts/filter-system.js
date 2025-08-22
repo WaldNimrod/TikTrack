@@ -521,8 +521,11 @@ window.filterSystem = new FilterSystem();
 
 // אתחול אוטומטי כשהדף נטען
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.filterSystem && !window.filterSystem.initialized) {
-    window.filterSystem.initialize();
-  }
+  // המתן קצת כדי שהאלמנטים יטענו
+  setTimeout(() => {
+    if (window.filterSystem && !window.filterSystem.initialized) {
+      window.filterSystem.initialize();
+    }
+  }, 100);
 });
 

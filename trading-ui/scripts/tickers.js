@@ -1067,13 +1067,12 @@ function updateTickersTable(tickers) {
     if (!tbody) return;
 
     if (tickers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center">לא נמצאו טיקרים</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">לא נמצאו טיקרים</td></tr>';
         return;
     }
 
     tbody.innerHTML = tickers.map(ticker => `
         <tr>
-            <td>${ticker.id}</td>
             <td><strong>${ticker.symbol}</strong></td>
             <td>${ticker.name}</td>
             <td>${ticker.type}</td>

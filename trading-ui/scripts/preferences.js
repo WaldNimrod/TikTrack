@@ -1781,15 +1781,8 @@ function toggleAllTestsInCategory(category) {
  * @returns {string} Display name
  */
 function getCategoryDisplayName(category) {
-  const categoryNames = {
-    'unit_tests': 'יחידה',
-    'integration_tests': 'אינטגרציה',
-    'e2e_tests': 'End-to-End',
-    'performance_tests': 'ביצועים',
-    'security_tests': 'אבטחה',
-    'load_tests': 'עומס'
-  };
-  return categoryNames[category] || category;
+  // שימוש בפונקציה החדשה מקובץ התרגום
+  return window.translateTestCategory ? window.translateTestCategory(category) : category;
 }
 
 /**

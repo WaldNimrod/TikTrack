@@ -303,7 +303,7 @@
     border-radius: 8px;
     transition: all 0.2s ease;
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 400;
     border: 2px solid transparent;
 }
 
@@ -315,8 +315,9 @@
 #unified-header .tiktrack-nav-link.active {
     background: transparent;
     color: #333333;
-    font-weight: 700;
-    border: 2px solid #26baac;
+    font-weight: 500;
+    border: none;
+    box-shadow: 0 2px 8px rgba(38, 186, 172, 0.3);
 }
 
 #unified-header .nav-icon {
@@ -324,13 +325,13 @@
 }
 
 #unified-header .nav-text {
-    font-weight: 600;
+    font-weight: 400;
     color: #333333;
 }
 
 #unified-header .tiktrack-nav-link.active .nav-text {
     color: #333333;
-    font-weight: 700;
+    font-weight: 500;
 }
 
 #unified-header .tiktrack-dropdown-arrow {
@@ -367,7 +368,8 @@
     color: #333333;
     text-decoration: none;
     transition: background-color 0.2s ease;
-    font-weight: 500;
+    font-weight: 300;
+    font-size: 0.85rem;
 }
 
 #unified-header .tiktrack-dropdown-item:hover {
@@ -379,7 +381,8 @@
     background: transparent;
     color: #333333;
     font-weight: 600;
-    border: 1px solid #26baac;
+    border: none;
+    box-shadow: 0 1px 4px rgba(38, 186, 172, 0.3);
 }
 
 #unified-header .dropdown-divider {
@@ -818,7 +821,6 @@
     color: #ff9c05;
     font-size: 0.8rem;
     cursor: pointer;
-    transition: transform 0.2s ease;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -836,12 +838,15 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+#unified-header .filter-toggle-btn:hover .filter-arrow {
+    color: #ff9c05;
+}
+
 #unified-header .filter-toggle-btn.collapsed .filter-arrow {
     transform: rotate(180deg);
 }
 
 #unified-header .filter-arrow {
-    transition: transform 0.2s ease;
     color: #ff9c05;
     font-weight: bold;
 }

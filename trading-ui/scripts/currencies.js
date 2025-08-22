@@ -177,7 +177,7 @@ async function loadCurrencies() {
             currenciesData = result.data;
             console.log('✅ מטבעות נטענו:', currenciesData.length);
             renderCurrenciesTable();
-            updateSummaryStats();
+            updatePageSummaryStats();
         } else {
             console.error('❌ שגיאה בטעינת מטבעות:', result.error);
         }
@@ -364,7 +364,7 @@ function renderCurrenciesTable() {
 /**
  * עדכון סטטיסטיקות סיכום
  */
-function updateSummaryStats() {
+function updatePageSummaryStats() {
     const totalCurrencies = currenciesData.length;
     const rates = currenciesData.map(c => parseFloat(c.usd_rate));
     const maxRate = rates.length > 0 ? Math.max(...rates) : 1.0;

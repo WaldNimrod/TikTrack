@@ -235,7 +235,7 @@ async function loadCashFlows() {
             cashFlowsData = result.data;
             console.log('✅ תזרימי מזומנים נטענו:', cashFlowsData.length);
             renderCashFlowsTable();
-            updateSummaryStats();
+            updatePageSummaryStats();
         } else {
             console.error('❌ שגיאה בטעינת תזרימי מזומנים:', result.error);
         }
@@ -251,7 +251,7 @@ async function saveCashFlow() {
     try {
         console.log('🔄 שמירת תזרים מזומנים חדש...');
 
-                // איסוף נתונים מהטופס
+        // איסוף נתונים מהטופס
         const formData = {
             account_id: parseInt(document.getElementById('cashFlowAccountId').value),
             type: document.getElementById('cashFlowType').value,
@@ -263,7 +263,7 @@ async function saveCashFlow() {
             source: document.getElementById('cashFlowSource').value,
             external_id: '0' // כרגע תמיד 0
         };
-        
+
         // בדיקת תקינות
         if (!formData.account_id || !formData.type || !formData.amount || !formData.currency_id || !formData.date) {
             alert('יש למלא את כל השדות הנדרשים');
@@ -312,7 +312,7 @@ async function updateCashFlow() {
 
         const id = parseInt(document.getElementById('editCashFlowId').value);
 
-                // איסוף נתונים מהטופס
+        // איסוף נתונים מהטופס
         const formData = {
             account_id: parseInt(document.getElementById('editCashFlowAccountId').value),
             type: document.getElementById('editCashFlowType').value,
@@ -324,7 +324,7 @@ async function updateCashFlow() {
             source: document.getElementById('editCashFlowSource').value,
             external_id: '0' // כרגע תמיד 0
         };
-        
+
         // בדיקת תקינות
         if (!formData.account_id || !formData.type || !formData.amount || !formData.currency_id || !formData.date) {
             alert('יש למלא את כל השדות הנדרשים');
@@ -442,7 +442,7 @@ async function loadAccountsForEditCashFlow() {
             if (result.status === 'success') {
                 const select = document.getElementById('editCashFlowAccountId');
                 select.innerHTML = '<option value="">בחר חשבון...</option>';
-                
+
                 result.data.forEach(account => {
                     const option = document.createElement('option');
                     option.value = account.id;
@@ -467,7 +467,7 @@ async function loadCurrenciesForCashFlow() {
             if (result.status === 'success') {
                 const select = document.getElementById('cashFlowCurrencyId');
                 select.innerHTML = '<option value="">בחר מטבע...</option>';
-                
+
                 result.data.forEach(currency => {
                     const option = document.createElement('option');
                     option.value = currency.id;
@@ -492,7 +492,7 @@ async function loadCurrenciesForEditCashFlow() {
             if (result.status === 'success') {
                 const select = document.getElementById('editCashFlowCurrencyId');
                 select.innerHTML = '<option value="">בחר מטבע...</option>';
-                
+
                 result.data.forEach(currency => {
                     const option = document.createElement('option');
                     option.value = currency.id;
@@ -520,13 +520,13 @@ function renderCashFlowsTable() {
         row.innerHTML = `
             <td>${cashFlow.id}</td>
             <td>${cashFlow.account_id}</td>
-            <td><strong>${getTypeDisplayName(cashFlow.type)}</strong></td>
+            <td><strong>${window.translateCashFlowType ? window.translateCashFlowType(cashFlow.type) : cashFlow.type}</strong></td>
             <td>${formatAmount(cashFlow.amount)}</td>
             <td>${cashFlow.currency_symbol || '-'}</td>
             <td>${cashFlow.usd_rate || '1.000000'}</td>
             <td>${formatDate(cashFlow.date)}</td>
             <td>${cashFlow.description || '-'}</td>
-            <td>${getSourceDisplayName(cashFlow.source)}</td>
+            <td>${window.translateCashFlowSource ? window.translateCashFlowSource(cashFlow.source) : cashFlow.source}</td>
             <td>${cashFlow.external_id || '0'}</td>
             <td>${formatDateTime(cashFlow.created_at)}</td>
             <td>
@@ -547,7 +547,7 @@ function renderCashFlowsTable() {
 /**
  * עדכון סטטיסטיקות סיכום
  */
-function updateSummaryStats() {
+function updatePageSummaryStats() {
     const totalCashFlows = cashFlowsData.length;
     const totalDeposits = cashFlowsData
         .filter(cf => cf.type === 'deposit')
@@ -563,31 +563,9 @@ function updateSummaryStats() {
     document.getElementById('currentBalance').textContent = formatAmount(currentBalance);
 }
 
-/**
- * המרת סוג תזרים לשם תצוגה
- */
-function getTypeDisplayName(type) {
-    const typeNames = {
-        'deposit': 'הפקדה',
-        'withdrawal': 'משיכה',
-        'dividend': 'דיבידנד',
-        'fee': 'עמלה',
-        'other': 'אחר'
-    };
-    return typeNames[type] || type;
-}
-
-/**
- * המרת מקור לשם תצוגה
- */
-function getSourceDisplayName(source) {
-    const sourceNames = {
-        'manual': 'ידני',
-        'file_import': 'ייבוא מקובץ',
-        'direct_import': 'ייבוא ישיר'
-    };
-    return sourceNames[source] || source;
-}
+// פונקציות הועברו ל-translation-utils.js:
+// getTypeDisplayName -> translateCashFlowType
+// getSourceDisplayName -> translateCashFlowSource
 
 /**
  * פורמט סכום

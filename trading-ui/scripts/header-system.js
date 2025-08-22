@@ -615,7 +615,7 @@ class HeaderSystem {
                     </a>
                     <ul class="tiktrack-dropdown-menu">
                       <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/executions">ביצועים</a></li>
+                      <li><a class="tiktrack-dropdown-item" href="/executions">עסקעות</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
@@ -678,7 +678,7 @@ class HeaderSystem {
             <div class="filter-group type-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle type-filter-toggle" id="typeFilterToggle" onclick="toggleTypeFilter()">
-                  <span class="selected-value selected-type-text" id="selectedType">כל טיפוס</span>
+                                          <span class="selected-value selected-type-text" id="selectedType">כל טיפוס</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="filter-menu" id="typeFilterMenu">
@@ -897,10 +897,10 @@ class HeaderSystem {
 
   updateFilterTexts() {
     // עדכון טקסטים של כל הפילטרים
-    updateStatusFilterText();
-    updateTypeFilterText();
-    updateAccountFilterText();
-    updateDateRangeFilterText();
+    updateStatusFilterDisplayText();
+    updateTypeFilterDisplayText();
+    updateAccountFilterDisplayText();
+    updateDateRangeFilterDisplayText();
 
     // שמירת מצב הפילטרים
     this.saveFilterStates();
@@ -1615,10 +1615,10 @@ class HeaderSystem {
 
   // פונקציה לעדכון טקסטים
   updateFilterTexts() {
-    updateStatusFilterText();
-    updateTypeFilterText();
-    updateAccountFilterText();
-    updateDateRangeFilterText();
+    updateStatusFilterDisplayText();
+    updateTypeFilterDisplayText();
+    updateAccountFilterDisplayText();
+    updateDateRangeFilterDisplayText();
   }
 }
 
@@ -1894,7 +1894,7 @@ function closeOtherFilters(excludeFilter) {
 }
 
 // פונקציות לעדכון טקסטים
-function updateStatusFilterText() {
+function updateStatusFilterDisplayText() {
   console.log('🔍 updateStatusFilterText called');
   const menu = document.getElementById('statusFilterMenu');
   const toggle = document.querySelector('.status-filter-toggle');
@@ -1918,7 +1918,7 @@ function updateStatusFilterText() {
   }
 }
 
-function updateTypeFilterText() {
+function updateTypeFilterDisplayText() {
   console.log('🔍 updateTypeFilterText called');
   const menu = document.getElementById('typeFilterMenu');
   const toggle = document.querySelector('.type-filter-toggle');
@@ -1942,7 +1942,7 @@ function updateTypeFilterText() {
   }
 }
 
-function updateAccountFilterText() {
+function updateAccountFilterDisplayText() {
   console.log('🔍 updateAccountFilterText called');
   const menu = document.getElementById('accountFilterMenu');
   const toggle = document.querySelector('.account-filter-toggle');
@@ -1966,7 +1966,7 @@ function updateAccountFilterText() {
   }
 }
 
-function updateDateRangeFilterText() {
+function updateDateRangeFilterDisplayText() {
   console.log('🔍 updateDateRangeFilterText called');
   const menu = document.getElementById('dateRangeFilterMenu');
   const toggle = document.querySelector('.date-range-filter-toggle');
@@ -2460,10 +2460,10 @@ class SimpleFilter {
   }
 
   updateFilterTexts() {
-    updateStatusFilterText();
-    updateTypeFilterText();
-    updateAccountFilterText();
-    updateDateRangeFilterText();
+    updateStatusFilterDisplayText();
+    updateTypeFilterDisplayText();
+    updateAccountFilterDisplayText();
+    updateDateRangeFilterDisplayText();
   }
 
   saveFilterStates() {

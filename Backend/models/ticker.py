@@ -50,6 +50,8 @@ class Ticker(BaseModel):
                      comment="Currency symbol (USD, EUR, etc.)")
     active_trades = Column(Boolean, default=False, nullable=True, 
                           comment="Whether there are active trades")
+    updated_at = Column(String(20), nullable=True, 
+                       comment="Last update timestamp")
     
     # Relationships
     # Currency is now a simple string field, not a relationship

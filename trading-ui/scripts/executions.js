@@ -351,9 +351,9 @@ function validateExecutionForm() {
     const executionDate = document.getElementById('addExecutionDate').value;
 
     return validateExecutionTradeId(document.getElementById('addExecutionTradeId')) &&
-           validateExecutionQuantity(document.getElementById('addExecutionQuantity')) &&
-           validateExecutionPrice(document.getElementById('addExecutionPrice')) &&
-           type && executionDate;
+        validateExecutionQuantity(document.getElementById('addExecutionQuantity')) &&
+        validateExecutionPrice(document.getElementById('addExecutionPrice')) &&
+        type && executionDate;
 }
 
 // ========================================
@@ -939,11 +939,12 @@ async function loadExecutionsData() {
     try {
         console.log('🔄 טעינת נתוני עסקעות');
 
-        const response = await fetch('/api/v1/executions');
+        const response = await fetch('/api/v1/executions/?_t=' + Date.now());
         if (response.ok) {
             const data = await response.json();
             executionsData = data.data || data;
             console.log('✅ נטענו', executionsData.length, 'עסקעות');
+            console.log('📊 נתוני עסקעות:', executionsData);
 
             // עדכון הטבלה
             updateExecutionsTable(executionsData);
@@ -962,7 +963,10 @@ async function loadExecutionsData() {
 /**
  * עדכון טבלת עסקעות
  */
-function updateExecutionsTable(executions) {
+async function updateExecutionsTable(executions) {
+    console.log('🔄 updateExecutionsTable נקראה עם', executions.length, 'עסקעות');
+    console.log('📊 נתוני עסקעות:', executions);
+    
     const tbody = document.querySelector('#executionsTable tbody');
     if (!tbody) return;
 
@@ -971,23 +975,65 @@ function updateExecutionsTable(executions) {
         return;
     }
 
-    tbody.innerHTML = executions.map(execution => `
-        <tr>
-            <td>${execution.id}</td>
-            <td><strong>${execution.trade_id}</strong></td>
-            <td>${execution.type}</td>
-            <td>${execution.quantity}</td>
-            <td>$${execution.price}</td>
-            <td>${formatDate(execution.execution_date)}</td>
-            <td>${execution.commission ? '$' + execution.commission : '-'}</td>
-            <td>${execution.notes || ''}</td>
-            <td>${formatDate(execution.created_at)}</td>
-            <td>
-                <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">X</button>
-            </td>
-        </tr>
-    `).join('');
+    // טעינת נתוני טריידים וטיקרים
+    let trades = [];
+    let tickers = [];
+
+    try {
+        const [tradesResponse, tickersResponse] = await Promise.all([
+            fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
+            fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
+        ]);
+
+        trades = tradesResponse.data || tradesResponse || [];
+        tickers = tickersResponse.data || tickersResponse || [];
+
+        console.log(`✅ נטענו ${trades.length} טריידים ו-${tickers.length} טיקרים`);
+    } catch (error) {
+        console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
+    }
+
+    tbody.innerHTML = executions.map(execution => {
+        // מציאת הטרייד המקושר
+        const trade = trades.find(t => t.id === execution.trade_id);
+        let symbol = 'לא מוגדר';
+        let tradeInfo = '';
+
+        if (trade) {
+            // מציאת הטיקר
+            const ticker = tickers.find(t => t.id === trade.ticker_id);
+            symbol = ticker ? ticker.symbol : 'לא מוגדר';
+
+            // מידע על הטרייד: תאריך פתיחה | צד | סוג
+            const openDate = trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+            const side = trade.side || 'לא מוגדר';
+            const type = trade.type || 'לא מוגדר';
+
+            tradeInfo = `${openDate} | ${side} | ${type}`;
+        } else {
+            tradeInfo = `טרייד ${execution.trade_id}`;
+        }
+
+        return `
+            <tr>
+                <td><strong>${symbol}</strong></td>
+                <td><small style="color: #666;">${tradeInfo}</small></td>
+                <td>${execution.action || execution.type}</td>
+                <td>${execution.quantity}</td>
+                <td>$${execution.price}</td>
+                <td>${execution.fee ? '$' + execution.fee : '-'}</td>
+                <td style="color: red;">$0</td>
+                <td>${execution.notes || ''}</td>
+                <td>${formatDate(execution.created_at)}</td>
+                <td>${formatDate(execution.date || execution.execution_date)}</td>
+                <td>${execution.source || '-'}</td>
+                <td>
+                    <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">X</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
 
     // עדכון הספירה
     const countElement = document.querySelector('.table-count');
@@ -1035,7 +1081,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('🔄 === DOM CONTENT LOADED ===');
 
     // שחזור מצב הסגירה
-    restoreTickersSectionState();
+    // restoreTickersSectionState(); // לא רלוונטי לעמוד עסקעות
 
     // טעינת נתונים
     loadExecutionsData();

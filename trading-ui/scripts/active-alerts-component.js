@@ -438,3 +438,5 @@ window.addEventListener('load', () => {
     }
   }, 1000);
 });
+
+// הפונקציות formatAlertCondition ו-parseAlertCondition הועברו לקובץ alerts.js

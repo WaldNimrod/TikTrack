@@ -137,6 +137,7 @@ function updateAlertsTable(alerts) {
   // פונקציה לטעינת נתונים נוספים
   const loadAdditionalData = async () => {
     try {
+      console.log('🔄 === LOADING ADDITIONAL DATA ===');
       console.log('🔄 טוען נתונים נוספים...');
       const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
         fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
@@ -151,6 +152,7 @@ function updateAlertsTable(alerts) {
       tickers = (tickersResponse.data || tickersResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
 
       console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
+      console.log('🔄 === ADDITIONAL DATA LOADED ===');
     } catch (error) {
       console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
       // המשך עם מערכים ריקים
@@ -158,11 +160,21 @@ function updateAlertsTable(alerts) {
       trades = [];
       tradePlans = [];
       tickers = [];
+      console.log('🔄 === USING EMPTY ARRAYS ===');
     }
   };
 
   // טעינת נתונים ועדכון הטבלה
   loadAdditionalData().then(() => {
+    console.log('🔄 === STARTING TABLE UPDATE ===');
+    console.log('🔄 Processing alerts:', alerts.length);
+    console.log('🔄 Available data:', {
+      accounts: accounts.length,
+      trades: trades.length,
+      tradePlans: tradePlans.length,
+      tickers: tickers.length
+    });
+
     const tableHTML = alerts.map(alert => {
       const statusClass = getStatusClass(alert.status);
       const typeClass = getTypeClass(alert.type);
@@ -171,53 +183,97 @@ function updateAlertsTable(alerts) {
       let relatedIcon = '';
       let relatedClass = '';
 
-      switch (alert.related_type_id) {
-        case 1: // חשבון
-          const account = accounts.find(a => a.id === alert.related_id);
-          if (account) {
-            const name = account.name || account.account_name || 'לא מוגדר';
-            const currency = account.currency || 'ILS';
-            relatedDisplay = `${name} (${currency})`;
-          } else {
-            relatedDisplay = `חשבון ${alert.related_id}`;
-          }
-          relatedIcon = '🏦';
-          relatedClass = 'related-account';
-          break;
-        case 2: // טרייד
-          const trade = trades.find(t => t.id === alert.related_id);
-          if (trade) {
-            const date = trade.created_at || trade.date;
-            const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-            relatedDisplay = `טרייד ${alert.related_id} - ${formattedDate}`;
-          } else {
-            relatedDisplay = `טרייד ${alert.related_id}`;
-          }
-          relatedIcon = '📈';
-          relatedClass = 'related-trade';
-          break;
-        case 3: // תוכנית
-          const plan = tradePlans.find(p => p.id === alert.related_id);
-          if (plan) {
-            const date = plan.created_at || plan.date;
-            const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-            relatedDisplay = `תוכנית ${alert.related_id} - ${formattedDate}`;
-          } else {
-            relatedDisplay = `תוכנית ${alert.related_id}`;
-          }
-          relatedIcon = '📋';
-          relatedClass = 'related-plan';
-          break;
-        case 4: // טיקר
-          const ticker = tickers.find(t => t.id === alert.related_id);
-          relatedDisplay = ticker ? ticker.symbol : `טיקר ${alert.related_id}`;
-          relatedIcon = '📊';
-          relatedClass = 'related-ticker';
-          break;
-        default:
-          relatedDisplay = `אובייקט ${alert.related_id}`;
-          relatedIcon = '❓';
-          relatedClass = 'related-other';
+      console.log(`🔍 === PROCESSING ALERT ${alert.id} ===`);
+      console.log(`🔍 Alert data:`, {
+        id: alert.id,
+        related_type_id: alert.related_type_id,
+        related_id: alert.related_id,
+        type: alert.type,
+        status: alert.status
+      });
+      console.log(`🔍 Available data counts:`, {
+        accounts: accounts.length,
+        trades: trades.length,
+        tradePlans: tradePlans.length,
+        tickers: tickers.length
+      });
+
+      // טיפול במקרים שבהם related_type_id הוא null
+      if (alert.related_type_id === null || alert.related_id === null) {
+        relatedDisplay = 'כללי';
+        relatedIcon = '🌐';
+        relatedClass = 'related-general';
+        console.log(`ℹ️ Alert ${alert.id} is general (not linked to specific object)`);
+      } else {
+        switch (alert.related_type_id) {
+          case 1: // חשבון
+            console.log(`🔍 Looking for account with ID: ${alert.related_id}`);
+            console.log(`🔍 Available accounts:`, accounts.map(a => ({ id: a.id, name: a.name || a.account_name })));
+            const account = accounts.find(a => a.id === alert.related_id);
+            if (account) {
+              const name = account.name || account.account_name || 'לא מוגדר';
+              const currency = account.currency || 'ILS';
+              relatedDisplay = `${name} (${currency})`;
+              console.log(`✅ Found account: ${name} (${currency})`);
+            } else {
+              relatedDisplay = `חשבון ${alert.related_id}`;
+              console.log(`❌ Account not found for ID: ${alert.related_id}`);
+            }
+            relatedIcon = '🏦';
+            relatedClass = 'related-account';
+            break;
+          case 2: // טרייד
+            console.log(`🔍 Looking for trade with ID: ${alert.related_id}`);
+            console.log(`🔍 Available trades:`, trades.map(t => ({ id: t.id, created_at: t.created_at, date: t.date })));
+            const trade = trades.find(t => t.id === alert.related_id);
+            if (trade) {
+              const date = trade.created_at || trade.date;
+              const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+              relatedDisplay = `טרייד ${alert.related_id} - ${formattedDate}`;
+              console.log(`✅ Found trade: ${relatedDisplay}`);
+            } else {
+              relatedDisplay = `טרייד ${alert.related_id}`;
+              console.log(`❌ Trade not found for ID: ${alert.related_id}`);
+            }
+            relatedIcon = '📈';
+            relatedClass = 'related-trade';
+            break;
+          case 3: // תוכנית
+            console.log(`🔍 Looking for trade plan with ID: ${alert.related_id}`);
+            console.log(`🔍 Available trade plans:`, tradePlans.map(p => ({ id: p.id, created_at: p.created_at, date: p.date })));
+            const plan = tradePlans.find(p => p.id === alert.related_id);
+            if (plan) {
+              const date = plan.created_at || plan.date;
+              const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+              relatedDisplay = `תוכנית ${alert.related_id} - ${formattedDate}`;
+              console.log(`✅ Found trade plan: ${relatedDisplay}`);
+            } else {
+              relatedDisplay = `תוכנית ${alert.related_id}`;
+              console.log(`❌ Trade plan not found for ID: ${alert.related_id}`);
+            }
+            relatedIcon = '📋';
+            relatedClass = 'related-plan';
+            break;
+          case 4: // טיקר
+            console.log(`🔍 Looking for ticker with ID: ${alert.related_id}`);
+            console.log(`🔍 Available tickers:`, tickers.map(t => ({ id: t.id, symbol: t.symbol })));
+            const ticker = tickers.find(t => t.id === alert.related_id);
+            if (ticker) {
+              relatedDisplay = ticker.symbol;
+              console.log(`✅ Found ticker: ${ticker.symbol}`);
+            } else {
+              relatedDisplay = `טיקר ${alert.related_id}`;
+              console.log(`❌ Ticker not found for ID: ${alert.related_id}`);
+            }
+            relatedIcon = '📊';
+            relatedClass = 'related-ticker';
+            break;
+          default:
+            relatedDisplay = `אובייקט ${alert.related_id}`;
+            relatedIcon = '❓';
+            relatedClass = 'related-other';
+            console.log(`❓ Unknown related_type_id: ${alert.related_type_id}`);
+        }
       }
 
       // קביעת הסימבול לטור הראשון
@@ -312,12 +368,12 @@ function updateAlertsTable(alerts) {
               ${relatedDisplay}
             </div>
           </td>
-          <td><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+          <td data-status="${statusDisplay}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
-          <td><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
+          <td data-type="${typeDisplay}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
           <td><span class="condition-text">${alert.condition || '-'}</span></td>
           <td><span class="message-text">${alert.message || '-'}</span></td>
-          <td><span class="date-text">${createdAt}</span></td>
+          <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
             <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">
               ✏️
@@ -335,6 +391,9 @@ function updateAlertsTable(alerts) {
       `;
     }).join('');
 
+    console.log('🔄 === FINISHED PROCESSING ALERTS ===');
+    console.log('🔄 Generated HTML length:', tableHTML.length);
+
     tbody.innerHTML = tableHTML;
 
     // עדכון ספירת רשומות
@@ -344,14 +403,16 @@ function updateAlertsTable(alerts) {
     }
 
     // עדכון סטטיסטיקות
-    updateSummaryStats();
+    updatePageSummaryStats();
+
+    console.log('🔄 === TABLE UPDATE COMPLETED ===');
   });
 }
 
 /**
  * עדכון סטטיסטיקות סיכום
  */
-function updateSummaryStats() {
+function updatePageSummaryStats() {
   // סטטיסטיקות לפי הדוקומנטציה של מערכת ההתראות
   const totalAlerts = alertsData.length;
   const openAlerts = alertsData.filter(alert => alert.status === 'open').length; // התראות פעילות
@@ -1567,5 +1628,91 @@ setTimeout(() => {
     console.clear();
   }
 }, 18000);
+
+// ========================================
+// פונקציות לתרגום תנאי התראות
+// ========================================
+
+/**
+ * פונקציה לתרגום תנאי התראה לעברית
+ * @param {string} condition - תנאי ההתראה בפורמט: variable|operator|value
+ * @returns {string} - התנאי מתורגם לעברית
+ */
+window.formatAlertCondition = function (condition) {
+  if (!condition) return '-';
+
+  const parts = condition.split('|');
+  if (parts.length >= 3) {
+    const variable = parts[0] || '';
+    const operator = parts[1] || '';
+    const value = parts[2] || '';
+
+    // המרת משתנה לעברית
+    const variableLabels = {
+      'price': 'מחיר',
+      'daily_change': 'שינוי יומי',
+      'moving_average': 'ממוצע נע',
+      'volume': 'נפח מסחר'
+    };
+
+    // המרת אופרטור לעברית
+    const operatorLabels = {
+      'greater_than': '>',
+      'less_than': '<',
+      'crosses': 'חוצה',
+      'crosses_up': 'חוצה למעלה',
+      'crosses_down': 'חוצה למטה',
+      'increases_by': 'עולה ב',
+      'decreases_by': 'יורד ב',
+      'increases_by_percent': 'עולה ב%',
+      'decreases_by_percent': 'יורד ב%'
+    };
+
+    const variableDisplay = variableLabels[variable] || variable;
+    const operatorDisplay = operatorLabels[operator] || operator;
+
+    if (operator && value) {
+      return `${variableDisplay} ${operatorDisplay} ${value}`;
+    } else if (variable) {
+      return variable;
+    } else {
+      return condition;
+    }
+  }
+
+  return condition;
+};
+
+/**
+ * פונקציה לפרסור תנאי התראה
+ * @param {string} condition - תנאי ההתראה בפורמט: variable|operator|value
+ * @returns {object} - אובייקט עם המשתנה, האופרטור והערך
+ */
+window.parseAlertCondition = function (condition) {
+  if (!condition) return { variable: '', operator: '', value: '' };
+
+  const parts = condition.split('|');
+  if (parts.length >= 3) {
+    return {
+      variable: parts[0] || '',
+      operator: parts[1] || '',
+      value: parts[2] || ''
+    };
+  } else if (parts.length === 2) {
+    return {
+      variable: parts[0] || '',
+      operator: parts[1] || '',
+      value: ''
+    };
+  } else if (parts.length === 1) {
+    return {
+      variable: parts[0] || '',
+      operator: '',
+      value: ''
+    };
+  }
+
+  return { variable: '', operator: '', value: '' };
+};
 
 

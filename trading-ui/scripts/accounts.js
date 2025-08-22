@@ -315,6 +315,10 @@ async function loadAccountsData() {
  * updateAccountsTable(accounts);
  */
 function updateAccountsTable(accounts) {
+  console.log('🔄 === UPDATE ACCOUNTS TABLE CALLED ===');
+  console.log('🔄 Function called from:', new Error().stack.split('\n')[2]);
+  console.log('🔄 Accounts parameter:', accounts);
+
   // בדיקה שהפרמטר תקין
   if (!accounts || !Array.isArray(accounts)) {
     console.error('❌ Invalid accounts parameter:', accounts);
@@ -323,33 +327,36 @@ function updateAccountsTable(accounts) {
 
   console.log('🔄 מעדכן טבלת חשבונות עם', accounts.length, 'חשבונות');
 
-  // בדיקה שהפונקציות הנדרשות קיימות
-  if (!window.convertAccountStatusToHebrew) {
-    console.warn('⚠️ convertAccountStatusToHebrew function not found, using fallback');
-  }
-  if (!window.formatCurrency) {
-    console.warn('⚠️ formatCurrency function not found, using fallback');
-  }
-
   const tbody = document.querySelector('#accountsTable tbody');
   if (!tbody) {
     console.error('❌ לא נמצא tbody לטבלת חשבונות');
     throw new Error('טבלת החשבונות לא נמצאה בדף');
   }
 
+  // בניית הטבלה מחדש לפי הכותרות בדיוק
   tbody.innerHTML = accounts.map(account => `
-    <tr>
-      <td>${account.name || '-'}</td>
-      <td>${getCurrencyDisplay(account)}</td>
-      <td>${window.convertAccountStatusToHebrew ? window.convertAccountStatusToHebrew(account.status) : (account.status || '-')}</td>
-      <td>${window.formatCurrency ? window.formatCurrency(account.cash_balance) : (account.cash_balance || '-')}</td>
-      <td>${window.formatCurrency ? window.formatCurrency(account.total_value) : (account.total_value || '-')}</td>
-      <td>${window.formatCurrency ? window.formatCurrency(account.total_pl) : (account.total_pl || '-')}</td>
-      <td>${account.notes || '-'}</td>
+    <tr data-account-id="${account.id}">
+      <td><strong>${account.name || '-'}</strong></td>
+      <td>${account.currency || '-'}</td>
       <td>
-        <button class="btn btn-sm btn-secondary" onclick="showEditAccountModalLocal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
-        <button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">X</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק">🗑️</button>
+        <span class="status-badge status-${account.status === 'active' ? 'active' : account.status === 'inactive' ? 'inactive' : 'cancelled'}">
+          ${account.status === 'active' ? 'פעיל' : account.status === 'inactive' ? 'לא פעיל' : account.status === 'cancelled' ? 'מבוטל' : (account.status || '-')}
+        </span>
+      </td>
+      <td>$${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}</td>
+      <td>$${account.total_value ? account.total_value.toLocaleString() : '0'}</td>
+      <td style="color: ${account.total_pl >= 0 ? 'green' : 'red'};">$${account.total_pl ? account.total_pl.toLocaleString() : '0'}</td>
+      <td>${account.notes || '-'}</td>
+      <td class="actions-cell">
+        <button class="btn btn-sm btn-outline-primary" onclick="editAccount(${account.id})" title="ערוך חשבון">
+          ✏️
+        </button>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteAccount(${account.id})" title="מחק חשבון">
+          🗑️
+        </button>
+        <button class="btn btn-sm btn-outline-info" onclick="viewLinkedItems(${account.id})" title="צפה באלמנטים מקושרים">
+          🔗
+        </button>
       </td>
     </tr>
   `).join('');
@@ -360,21 +367,8 @@ function updateAccountsTable(accounts) {
     countElement.textContent = `${accounts.length} חשבונות`;
   }
 
-  // הצגת הטבלה אם היא מוסתרת
-  const section = document.getElementById('accountsSection');
-  const container = document.getElementById('accountsContainer');
-  const footer = document.querySelector('#accountsSection .table-footer');
-  const icon = document.querySelector('#accountsSection .filter-icon');
-
-  if (section && section.classList.contains('collapsed')) {
-    section.classList.remove('collapsed');
-    if (container) container.style.display = 'block';
-    if (footer) footer.style.display = 'block';
-    if (icon) icon.textContent = '▲';
-    localStorage.setItem('accountsSectionOpen', 'true');
-  }
-
-  console.log('✅ טבלת חשבונות עודכנה בהצלחה');
+  console.log('✅ טבלת חשבונות עודכנה בהצלחה עם', accounts.length, 'חשבונות');
+  console.log('🔄 === END UPDATE ACCOUNTS TABLE ===');
 }
 
 /**
@@ -388,10 +382,10 @@ async function loadAccounts() {
     // קריאה לפונקציה מ-accounts.js
     if (typeof window.loadAccountsDataFromAPI === 'function') {
       const accounts = await window.loadAccountsDataFromAPI();
-      updateAccountsTableForPlanningPage(accounts);
+      updateAccountsTable(accounts);
     } else {
       const accounts = await loadAccountsData();
-      updateAccountsTableForPlanningPage(accounts);
+      updateAccountsTable(accounts);
     }
 
   } catch (error) {
@@ -434,12 +428,12 @@ function updateAccountsTableForPlanningPage(accounts) {
 
   tbody.innerHTML = accounts.map(account => `
     <tr>
-      <td>${account.name || '-'}</td>
-      <td>${getCurrencyDisplay(account)}</td>
-      <td>${window.convertAccountStatusToHebrew ? window.convertAccountStatusToHebrew(account.status) : (account.status || '-')}</td>
-      <td>${window.formatCurrency ? window.formatCurrency(account.cash_balance) : (account.cash_balance || '-')}</td>
-      <td>${window.formatCurrency ? window.formatCurrency(account.total_value) : (account.total_value || '-')}</td>
-      <td>${window.formatCurrency ? window.formatCurrency(account.total_pl) : (account.total_pl || '-')}</td>
+      <td><strong>${account.name || '-'}</strong></td>
+      <td>${account.currency || '-'}</td>
+      <td>${account.status === 'active' ? 'פעיל' : account.status === 'inactive' ? 'לא פעיל' : account.status === 'cancelled' ? 'מבוטל' : (account.status || '-')}</td>
+      <td>$${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}</td>
+      <td>$${account.total_value ? account.total_value.toLocaleString() : '0'}</td>
+      <td style="color: ${account.total_pl >= 0 ? 'green' : 'red'};">$${account.total_pl ? account.total_pl.toLocaleString() : '0'}</td>
       <td>${account.notes || '-'}</td>
       <td>
         <button class="btn btn-sm btn-secondary" onclick="showEditAccountModal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
@@ -459,7 +453,7 @@ function updateAccountsTableForPlanningPage(accounts) {
 }
 
 // פונקציה לעדכון טקסט פילטר החשבונות
-function updateAccountFilterText() {
+function updateAccountFilterDisplayText() {
   console.log('🔄 updateAccountFilterText called');
 
   const appHeader = document.querySelector('app-header');
@@ -1602,7 +1596,10 @@ async function loadAccountsDataForAccountsPage() {
     window.filteredAccountsData = filteredAccounts;
 
     // עדכון הטבלה עם הנתונים המסוננים
+    console.log('🔄 Calling updateAccountsTable with filtered accounts:', filteredAccounts.length);
+    console.log('🔄 updateAccountsTable function exists:', typeof window.updateAccountsTable === 'function');
     if (typeof window.updateAccountsTable === 'function') {
+      console.log('🔄 About to call updateAccountsTable...');
       window.updateAccountsTable(filteredAccounts);
 
       // בדיקה שהטבלה התעדכנה כראוי
@@ -1703,7 +1700,7 @@ function setupSortableHeaders() {
 
       // עדכון אייקונים
       if (typeof window.updateSortIcons === 'function') {
-        window.updateSortIcons(window.currentSortColumn, 'accounts');
+        window.updateTableSortIcons(window.currentSortColumn, 'accounts');
       }
 
       // מיון הנתונים
@@ -1884,6 +1881,11 @@ window.setupSortableHeaders = setupSortableHeaders;
 // updateGridFromComponentGlobal הועבר ל-app-header.js
 window.updateAccountFilterMenu = updateAccountFilterMenu;
 window.filterAccountsLocally = filterAccountsLocally;
+window.updateAccountsTable = updateAccountsTable;
+window.editAccount = editAccount;
+window.deleteAccount = deleteAccount;
+window.viewLinkedItems = viewLinkedItems;
+window.showNotification = showNotification;
 
 // בדיקה סופית שהפונקציות מיוצאות
 console.log('🔄 === בדיקה סופית של ייצוא פונקציות ===');
@@ -1891,7 +1893,38 @@ console.log('- showEditAccountModalById:', typeof window.showEditAccountModalByI
 console.log('- showEditAccountModal:', typeof window.showEditAccountModal);
 console.log('- showAddAccountModal:', typeof window.showAddAccountModal);
 console.log('- toggleMainSection:', typeof window.toggleMainSection);
+console.log('- updateAccountsTable:', typeof window.updateAccountsTable);
+console.log('- editAccount:', typeof window.editAccount);
+console.log('- deleteAccount:', typeof window.deleteAccount);
+console.log('- viewLinkedItems:', typeof window.viewLinkedItems);
+console.log('- showNotification:', typeof window.showNotification);
 console.log('✅ === סיום בדיקת ייצוא ===');
+
+// פונקציות נוספות לטבלת החשבונות
+function editAccount(accountId) {
+  console.log('🔄 עריכת חשבון:', accountId);
+  showNotification('פונקציית עריכת חשבון תפותח בקרוב', 'info');
+}
+
+function deleteAccount(accountId) {
+  console.log('🔄 מחיקת חשבון:', accountId);
+  if (confirm('האם אתה בטוח שברצונך למחוק חשבון זה?')) {
+    showNotification('פונקציית מחיקת חשבון תפותח בקרוב', 'info');
+  }
+}
+
+function viewLinkedItems(accountId) {
+  console.log('🔄 צפייה באלמנטים מקושרים לחשבון:', accountId);
+  showNotification('פונקציית צפייה באלמנטים מקושרים תפותח בקרוב', 'info');
+}
+
+function showNotification(message, type = 'info') {
+  if (typeof window.showNotification === 'function') {
+    window.showNotification(message, type);
+  } else {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+  }
+}
 
 // ניקוי הודעות קונסולה אחרי זמן קצר
 setTimeout(() => {

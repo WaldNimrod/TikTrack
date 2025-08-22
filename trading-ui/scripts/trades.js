@@ -167,7 +167,7 @@ function updateTradesTable(trades) {
 
   const tableHTML = trades.map(trade => {
     const statusDisplay = trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח';
-    const typeDisplay = getTypeDisplay(trade.type);
+    const typeDisplay = window.translateTradeType ? window.translateTradeType(trade.type) : trade.type;
 
     return `
     <tr>
@@ -200,19 +200,7 @@ function updateTradesTable(trades) {
   }
 }
 
-/**
- * פונקציה לתרגום סוג לעברית
- */
-function getTypeDisplay(type) {
-  const typeMap = {
-    'swing': 'סווינג',
-    'investment': 'השקעה',
-    'passive': 'פאסיבי',
-    'buy': 'קנייה',
-    'sell': 'מכירה'
-  };
-  return typeMap[type] || type;
-}
+// פונקציה הועברה ל-translation-utils.js בשם translateTradeType
 
 /**
  * פונקציות נוספות

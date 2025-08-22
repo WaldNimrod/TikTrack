@@ -840,7 +840,7 @@ function extractAmount(amountString) {
 }
 
 // פונקציה לעדכון סטטיסטיקות
-function updateSummaryStats(data = null) {
+function updatePageSummaryStats(data = null) {
   console.log('=== updateSummaryStats called ===');
   console.log('Input data:', data);
   console.log('window.rowData:', window.rowData);
@@ -1215,13 +1215,13 @@ function filterTable(tableId, searchTerm) {
   });
 
   // עדכון ספירה
-  updateTableRowCount(tableId);
+  updateTableCount(tableId);
 }
 
 /**
  * עדכון ספירת שורות בטבלה
  */
-function updateTableRowCount(tableId) {
+function updateTableCount(tableId) {
   const table = document.getElementById(tableId);
   if (!table) return;
 
@@ -1328,7 +1328,7 @@ async function loadDataFromDatabase(config = {}) {
       // הסטטיסטיקות יתעדכנו על ידי הפילטר
     } else {
       // אם הגריד לא קיים, עדכן רק את הסטטיסטיקות
-      updateSummaryStats(processedData);
+      updatePageSummaryStats(processedData);
     }
 
     console.log('Data loaded successfully:', processedData.length, 'items');
@@ -1543,7 +1543,7 @@ async function initializeGridSystem(containerId = '#agGridFloating', customOptio
 
     // 5. עדכון סטטיסטיקות
     console.log('5. Updating statistics...');
-    updateSummaryStats(data);
+          updatePageSummaryStats(data);
 
     console.log('=== Grid System Initialized Successfully ===');
     return true;
@@ -1653,7 +1653,7 @@ async function refreshGridSystem() {
     }
 
     // רענון סטטיסטיקות
-    updateSummaryStats(newData);
+          updatePageSummaryStats(newData);
 
     console.log('Grid system refreshed successfully');
     return true;
@@ -1901,7 +1901,7 @@ window.formatCurrency = formatCurrency;
 window.formatDate = formatDate;
 window.formatDateTime = formatDateTime;
 window.filterTable = filterTable;
-window.updateTableRowCount = updateTableRowCount;
+window.updateTableCount = updateTableCount;
 window.getCountElementForTable = getCountElementForTable;
 window.getTableNameForTable = getTableNameForTable;
 window.toggleSection = toggleSection;
@@ -2192,7 +2192,7 @@ function sortTableData(columnIndex, data, pageName, updateTableFunction) {
   }
 
   // עדכון אייקונים
-  updateSortIcons(columnIndex, pageName);
+      updateTableSortIcons(columnIndex, pageName);
 
   // שמירת מצב המיון ב-localStorage
   localStorage.setItem(`${pageName}SortColumn`, columnIndex.toString());
@@ -2369,7 +2369,7 @@ function getStatusForSort(status) {
  * @example
  * updateSortIcons(0, 'planning'); // מעדכן אייקון בעמודה הראשונה
  */
-function updateSortIcons(activeColumnIndex, pageName) {
+function updateTableSortIcons(activeColumnIndex, pageName) {
   const buttons = document.querySelectorAll('.sortable-header');
 
   buttons.forEach((button, index) => {
@@ -2408,7 +2408,7 @@ function loadSortState(pageName) {
     window.currentSortDirection = savedDirection || 'asc';
 
     // עדכון אייקונים
-    updateSortIcons(window.currentSortColumn, pageName);
+    updateTableSortIcons(window.currentSortColumn, pageName);
   }
 }
 

@@ -787,6 +787,13 @@ class HeaderSystem {
               </div>
             </div>
 
+            <!-- כפתור איפוס -->
+            <div class="filter-group reset-filter">
+              <button class="reset-btn" id="resetFiltersBtn" title="נקה פילטרים">
+                <span class="reset-icon">↻</span>
+              </button>
+            </div>
+
             <!-- פילטר חיפוש -->
             <div class="filter-group search-filter">
               <div class="search-input-wrapper">
@@ -801,13 +808,6 @@ class HeaderSystem {
                   <span class="search-clear-icon">×</span>
                 </button>
               </div>
-            </div>
-
-            <!-- כפתור איפוס -->
-            <div class="filter-group reset-filter">
-              <button class="reset-btn" id="resetFiltersBtn" title="נקה פילטרים">
-                <span class="reset-icon">↻</span>
-              </button>
             </div>
           </div>
         </div>

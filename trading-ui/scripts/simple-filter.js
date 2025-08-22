@@ -1,6 +1,6 @@
 /**
- * פילטר פשוט לטבלת טריידים
- * עובד ישירות על הטבלה ללא מורכבות
+ * Simple filter for trades table
+ * Works directly on the table without complexity
  */
 
 class SimpleFilter {
@@ -16,7 +16,7 @@ class SimpleFilter {
     init() {
         console.log('🔧 SimpleFilter initializing...');
 
-        // בדיקה מיידית אם האלמנטים קיימים
+        // Immediate check if elements exist
         const headerElement = document.getElementById('unified-header');
         console.log('🔧 Header element exists:', !!headerElement);
 
@@ -33,12 +33,12 @@ class SimpleFilter {
             }
         }
 
-        // המתן עד שהאלמנטים יהיו זמינים
+        // Wait until elements are available
         this.waitForElements();
     }
 
     waitForElements() {
-        // בדיקה אם האלמנטים קיימים - מחפש בתוך unified-header
+        // Check if elements exist - search within unified-header
         const headerElement = document.getElementById('unified-header');
         if (!headerElement) {
             console.log('🔧 Header element not ready, waiting...');
@@ -53,7 +53,7 @@ class SimpleFilter {
         if (statusMenu && typeMenu && accountMenu) {
             console.log('🔧 Filter elements found, setting up listeners...');
 
-            // בדיקה נוספת - האם יש פריטים בתוך התפריטים
+            // Additional check - are there items in the menus
             const statusItems = statusMenu.querySelectorAll('.filter-item');
             const typeItems = typeMenu.querySelectorAll('.filter-item');
             const accountItems = accountMenu.querySelectorAll('.filter-item');
@@ -80,7 +80,7 @@ class SimpleFilter {
             return;
         }
 
-        // פילטר סטטוס
+        // Status filter
         const statusItems = headerElement.querySelectorAll('#statusFilterMenu .filter-item');
         console.log('🔧 Found status items:', statusItems.length);
         statusItems.forEach(item => {
@@ -112,7 +112,7 @@ class SimpleFilter {
             });
         });
 
-        // פילטר סוג
+        // Type filter
         const typeItems = headerElement.querySelectorAll('#typeFilterMenu .filter-item');
         console.log('🔧 Found type items:', typeItems.length);
         typeItems.forEach(item => {
@@ -143,7 +143,7 @@ class SimpleFilter {
             });
         });
 
-        // פילטר חיפוש
+        // Search filter
         const searchInput = document.getElementById('searchFilterInput');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
@@ -153,7 +153,7 @@ class SimpleFilter {
             });
         }
 
-        // פילטר חשבון
+        // Account filter
         const accountItems = headerElement.querySelectorAll('#accountFilterMenu .filter-item');
         console.log('🔧 Found account items:', accountItems.length);
         accountItems.forEach(item => {
@@ -161,7 +161,7 @@ class SimpleFilter {
                 e.preventDefault();
                 e.stopPropagation();
 
-                // החשבונות נבנים דינמית - נקח את הטקסט של החשבון
+                // The accounts are dynamically built - take the text of the account
                 const accountText = item.querySelector('.option-text')?.textContent || item.textContent.trim();
                 console.log('🔍 Account text:', accountText);
                 console.log('🔍 Account filter clicked:', accountText);
@@ -169,7 +169,7 @@ class SimpleFilter {
                 // toggle selection
                 item.classList.toggle('selected');
 
-                // collect selected accounts - קח את הטקסט של החשבונות הנבחרים
+                // collect selected accounts - take the text of the selected accounts
                 this.currentFilters.account = Array.from(headerElement.querySelectorAll('#accountFilterMenu .filter-item.selected'))
                     .map(item => item.querySelector('.option-text')?.textContent || item.textContent.trim());
 
@@ -183,7 +183,7 @@ class SimpleFilter {
             });
         });
 
-        // כפתור איפוס
+        // Reset button
         const resetBtn = document.getElementById('resetFiltersBtn');
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
@@ -200,11 +200,11 @@ class SimpleFilter {
         if (!statusElement) return;
 
         if (this.currentFilters.status.length === 0) {
-            statusElement.textContent = 'כל הסטטוסים';
+            statusElement.textContent = 'All statuses';
         } else if (this.currentFilters.status.length === 1) {
             statusElement.textContent = this.currentFilters.status[0];
         } else {
-            statusElement.textContent = `${this.currentFilters.status.length} סטטוסים`;
+            statusElement.textContent = `${this.currentFilters.status.length} statuses`;
         }
     }
 
@@ -216,11 +216,11 @@ class SimpleFilter {
         if (!typeElement) return;
 
         if (this.currentFilters.type.length === 0) {
-            typeElement.textContent = 'כל הסוגים';
+            typeElement.textContent = 'All types';
         } else if (this.currentFilters.type.length === 1) {
             typeElement.textContent = this.currentFilters.type[0];
         } else {
-            typeElement.textContent = `${this.currentFilters.type.length} סוגים`;
+            typeElement.textContent = `${this.currentFilters.type.length} types`;
         }
     }
 
@@ -232,18 +232,18 @@ class SimpleFilter {
         if (!accountElement) return;
 
         if (this.currentFilters.account.length === 0) {
-            accountElement.textContent = 'כל החשבונות';
+            accountElement.textContent = 'All accounts';
         } else if (this.currentFilters.account.length === 1) {
             accountElement.textContent = this.currentFilters.account[0];
         } else {
-            accountElement.textContent = `${this.currentFilters.account.length} חשבונות`;
+            accountElement.textContent = `${this.currentFilters.account.length} accounts`;
         }
     }
 
     applyFilters() {
         console.log('🔍 Applying filters:', this.currentFilters);
 
-        // רשימת הטבלאות לסינון
+        // List of tables for filtering
         const tables = ['tradesTable', 'testTable'];
 
         tables.forEach(tableId => {
@@ -262,17 +262,17 @@ class SimpleFilter {
                 const cells = row.querySelectorAll('td');
                 if (cells.length < 4) return;
 
-                // התאמת העמודות לכל טבלה
+                // Match columns for each table
                 let ticker, status, type, account;
 
                 if (tableId === 'tradesTable') {
-                    // טבלת טריידים: טיקר, סטטוס, סוג, חשבון
+                    // Trades table: Ticker, Status, Type, Account
                     ticker = cells[0].textContent.trim();
                     status = cells[1].textContent.trim();
                     type = cells[2].textContent.trim();
                     account = cells[3].textContent.trim();
                 } else if (tableId === 'testTable') {
-                    // טבלת בדיקה: שם, סטטוס, סוג, חשבון
+                    // Test table: Name, Status, Type, Account
                     ticker = cells[0].textContent.trim();
                     status = cells[1].textContent.trim();
                     type = cells[2].textContent.trim();
@@ -283,7 +283,7 @@ class SimpleFilter {
 
                 let show = true;
 
-                // פילטר סטטוס
+                // Status filter
                 if (this.currentFilters.status.length > 0) {
                     if (!this.currentFilters.status.includes(status)) {
                         show = false;
@@ -291,7 +291,7 @@ class SimpleFilter {
                     }
                 }
 
-                // פילטר סוג
+                // Type filter
                 if (show && this.currentFilters.type.length > 0) {
                     if (!this.currentFilters.type.includes(type)) {
                         show = false;
@@ -299,7 +299,7 @@ class SimpleFilter {
                     }
                 }
 
-                // פילטר חשבון
+                // Account filter
                 if (show && this.currentFilters.account.length > 0) {
                     if (!this.currentFilters.account.includes(account)) {
                         show = false;
@@ -307,7 +307,7 @@ class SimpleFilter {
                     }
                 }
 
-                // פילטר חיפוש
+                // Search filter
                 if (show && this.currentFilters.search) {
                     const searchLower = this.currentFilters.search.toLowerCase();
                     const searchableText = `${ticker} ${status} ${type} ${account}`.toLowerCase();
@@ -364,10 +364,10 @@ class SimpleFilter {
     }
 }
 
-// יצירת instance גלובלי
+// Create global instance
 window.simpleFilter = new SimpleFilter();
 
-// אתחול כשהדף נטען
+// Initialize when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     if (window.simpleFilter) {
         window.simpleFilter.init();

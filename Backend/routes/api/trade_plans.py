@@ -241,3 +241,34 @@ def get_trade_plan_summary():
         }), 500
     finally:
         db.close()
+
+@trade_plans_bp.route('/<int:plan_id>', methods=['DELETE'])
+def delete_trade_plan(plan_id: int):
+    """Delete trade plan"""
+    try:
+        db: Session = next(get_db())
+        success = TradePlanService.delete(db, plan_id)
+        if success:
+            return jsonify({
+                "status": "success",
+                "message": "Trade plan deleted successfully",
+                "version": "v1"
+            })
+        
+        # If deletion failed, it means there are linked items or plan not found
+        return jsonify({
+            "status": "error",
+            "error": {
+                "message": "Cannot delete trade plan - it has linked trades or other items"
+            },
+            "version": "v1"
+        }), 400
+    except Exception as e:
+        logger.error(f"Error deleting trade plan {plan_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 400
+    finally:
+        db.close()

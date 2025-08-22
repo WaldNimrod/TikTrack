@@ -41,6 +41,9 @@ class HeaderSystem {
     // אתחול מערכת הפילטרים
     this.initFilterSystem();
 
+    // טעינת חשבונות לפילטר
+    this.loadAccountsForFilter();
+
     // הגדרת event listeners
     this.setupEventListeners();
 
@@ -611,16 +614,16 @@ class HeaderSystem {
                       <span class="tiktrack-dropdown-arrow">▼</span>
                     </a>
                     <ul class="tiktrack-dropdown-menu">
+                      <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
+                      <li><a class="tiktrack-dropdown-item" href="/executions">ביצועים</a></li>
+                      <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
+                      <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/alerts">ניהול התראות</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="tiktrack-dropdown-item" href="/database">בסיס נתונים</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/currencies">מטבעות</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/executions">ביצועים</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/trade_plans">תכניות מסחר</a></li>
                     </ul>
                   </li>
@@ -674,22 +677,10 @@ class HeaderSystem {
             <div class="filter-group type-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle type-filter-toggle" id="typeFilterToggle" onclick="toggleTypeFilter()">
-                                          <span class="selected-value selected-type-text" id="selectedType">כל טיפוס</span>
+                  <span class="selected-value selected-type-text" id="selectedType">כל טיפוס</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="filter-menu" id="typeFilterMenu">
-                  <div class="type-filter-item" data-value="מניה" onclick="selectTypeOption('מניה')">
-                    <span class="option-text">מניה</span>
-                    <span class="check-mark">●</span>
-                  </div>
-                  <div class="type-filter-item" data-value="ETF" onclick="selectTypeOption('ETF')">
-                    <span class="option-text">ETF</span>
-                    <span class="check-mark">●</span>
-                  </div>
-                  <div class="type-filter-item" data-value="קריפטו" onclick="selectTypeOption('קריפטו')">
-                    <span class="option-text">קריפטו</span>
-                    <span class="check-mark">●</span>
-                  </div>
                   <div class="type-filter-item" data-value="סווינג" onclick="selectTypeOption('סווינג')">
                     <span class="option-text">סווינג</span>
                     <span class="check-mark">●</span>
@@ -739,24 +730,12 @@ class HeaderSystem {
                     <span class="option-text">השבוע</span>
                     <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="שבוע אחרון" onclick="selectDateRangeOption('שבוע אחרון')">
-                    <span class="option-text">שבוע אחרון</span>
-                    <span class="check-mark">●</span>
-                  </div>
-                  <div class="date-range-filter-item" data-value="חודש אחרון" onclick="selectDateRangeOption('חודש אחרון')">
-                    <span class="option-text">חודש אחרון</span>
-                    <span class="check-mark">●</span>
-                  </div>
-                  <div class="date-range-filter-item" data-value="3 חודשים" onclick="selectDateRangeOption('3 חודשים')">
-                    <span class="option-text">3 חודשים</span>
+                  <div class="date-range-filter-item" data-value="שבוע" onclick="selectDateRangeOption('שבוע')">
+                    <span class="option-text">שבוע</span>
                     <span class="check-mark">●</span>
                   </div>
                   <div class="date-range-filter-item" data-value="MTD" onclick="selectDateRangeOption('MTD')">
                     <span class="option-text">MTD</span>
-                    <span class="check-mark">●</span>
-                  </div>
-                  <div class="date-range-filter-item" data-value="YTD" onclick="selectDateRangeOption('YTD')">
-                    <span class="option-text">YTD</span>
                     <span class="check-mark">●</span>
                   </div>
                   <div class="date-range-filter-item" data-value="30 יום" onclick="selectDateRangeOption('30 יום')">
@@ -771,8 +750,20 @@ class HeaderSystem {
                     <span class="option-text">90 יום</span>
                     <span class="check-mark">●</span>
                   </div>
+                  <div class="date-range-filter-item" data-value="YTD" onclick="selectDateRangeOption('YTD')">
+                    <span class="option-text">YTD</span>
+                    <span class="check-mark">●</span>
+                  </div>
                   <div class="date-range-filter-item" data-value="שנה" onclick="selectDateRangeOption('שנה')">
                     <span class="option-text">שנה</span>
+                    <span class="check-mark">●</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="שבוע קודם" onclick="selectDateRangeOption('שבוע קודם')">
+                    <span class="option-text">שבוע קודם</span>
+                    <span class="check-mark">●</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="חודש קודם" onclick="selectDateRangeOption('חודש קודם')">
+                    <span class="option-text">חודש קודם</span>
                     <span class="check-mark">●</span>
                   </div>
                   <div class="date-range-filter-item" data-value="שנה קודמת" onclick="selectDateRangeOption('שנה קודמת')">
@@ -803,10 +794,13 @@ class HeaderSystem {
               </div>
             </div>
 
-            <!-- כפתור איפוס -->
-            <div class="filter-group reset-filter">
+            <!-- כפתורי איפוס וניקוי -->
+            <div class="filter-group action-buttons">
               <button class="reset-btn" id="resetFiltersBtn" title="נקה פילטרים">
                 <span class="reset-icon">↻</span>
+              </button>
+              <button class="clear-btn" id="clearFiltersBtn" title="נקה הכל">
+                <span class="clear-icon">×</span>
               </button>
             </div>
           </div>
@@ -830,6 +824,13 @@ class HeaderSystem {
       }
     });
 
+    // כפתור ניקוי פילטרים
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#clearFiltersBtn')) {
+        this.clearAllFilters();
+      }
+    });
+
     // כפתור נקה חיפוש
     document.addEventListener('click', (e) => {
       if (e.target.closest('#searchClearBtn')) {
@@ -837,12 +838,19 @@ class HeaderSystem {
       }
     });
 
-    // סגירת דרופדאונים בלחיצה מחוץ - DISABLED
-    // document.addEventListener('click', (e) => {
-    //   if (!e.target.closest('.filter-dropdown')) {
-    //     this.closeAllDropdowns();
-    //   }
-    // });
+    // סגירת פילטרים בלחיצה מחוץ לתפריט
+    document.addEventListener('click', (e) => {
+      // בדיקה אם הלחיצה הייתה מחוץ לכל תפריטי הפילטרים
+      const isClickInsideFilter = e.target.closest('.filter-menu') ||
+        e.target.closest('.filter-toggle') ||
+        e.target.closest('#searchFilterInput') ||
+        e.target.closest('#searchClearBtn');
+
+      if (!isClickInsideFilter) {
+        // סגירת כל הפילטרים
+        this.closeAllFilterMenus();
+      }
+    });
 
     // Event listeners לדרופדאונים
     this.setupDropdownEventListeners();
@@ -869,40 +877,21 @@ class HeaderSystem {
     setTimeout(() => {
       this.restoreFilterStates();
     }, 100);
+  }
 
-    // הוספת event listener לסגירת פילטר בלחיצה על הכותרת
-    const statusToggle = document.querySelector('.status-filter-toggle');
-    if (statusToggle) {
-      statusToggle.addEventListener('click', (event) => {
-        event.stopPropagation(); // מונע סגירה מיידית
-        window.toggleStatusFilter();
-      });
-    }
+  // פונקציה לסגירת כל תפריטי הפילטרים
+  closeAllFilterMenus() {
+    // סגירת כל הפילטרים
+    window.closeStatusFilter();
+    window.closeTypeFilter();
+    window.closeAccountFilter();
+    window.closeDateRangeFilter();
 
-    // הוספת event listener לסגירת פילטר בלחיצה מחוץ לתפריט - DISABLED
-    // document.addEventListener('click', (event) => {
-    //   const statusMenu = document.getElementById('statusFilterMenu');
-    //   const statusToggle = document.querySelector('.status-filter-toggle');
-
-    //   if (statusMenu && statusMenu.classList.contains('show')) {
-    //     // בדיקה אם הלחיצה הייתה מחוץ לתפריט
-    //     if (!statusMenu.contains(event.target) && !statusToggle.contains(event.target)) {
-    //       console.log('🔍 Click outside status filter, closing...');
-    //       window.closeStatusFilter();
-    //     }
-    //   }
-    // });
-
-    // הוספת event listener לסגירת פילטר בלחיצה על Escape - DISABLED
-    // document.addEventListener('keydown', (event) => {
-    //   if (event.key === 'Escape') {
-    //     const statusMenu = document.getElementById('statusFilterMenu');
-    //     if (statusMenu && statusMenu.classList.contains('show')) {
-    //       console.log('🔍 Escape pressed, closing status filter...');
-    //       window.closeStatusFilter();
-    //     }
-    //   }
-    // });
+    // איפוס מצב פעיל של כפתורים
+    const toggles = document.querySelectorAll('.filter-toggle.active');
+    toggles.forEach(toggle => {
+      toggle.classList.remove('active');
+    });
   }
 
   updateFilterTexts() {
@@ -1041,33 +1030,46 @@ class HeaderSystem {
     }
   }
 
-  // פונקציה להגדרת הפריט הפעיל (מתוך menu.js)
+  // פונקציה להגדרת הפריט הפעיל
   setActiveMenuItem() {
     const currentPath = window.location.pathname;
-    const navItems = document.querySelectorAll('.nav-item');
+    const navLinks = document.querySelectorAll('.tiktrack-nav-link');
+    const dropdownItems = document.querySelectorAll('.tiktrack-dropdown-item');
 
-    // הסרת active מכל הפריטים
-    navItems.forEach(item => item.classList.remove('active'));
+    // איפוס כל הפריטים
+    navLinks.forEach(link => link.classList.remove('active'));
+    dropdownItems.forEach(item => item.classList.remove('active'));
 
-    // הגדרת הפריט הפעיל לפי הנתיב הנוכחי
+    // סימון הפריט הפעיל בתפריט הראשי
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && href !== '#' && currentPath.includes(href)) {
+        link.classList.add('active');
+      }
+    });
+
+    // סימון הפריט הפעיל בתפריט המשנה
+    dropdownItems.forEach(item => {
+      const href = item.getAttribute('href');
+      if (href && currentPath.includes(href)) {
+        item.classList.add('active');
+        // סימון גם הפריט הראשי אם יש פריט פעיל בתפריט המשנה
+        const parentDropdown = item.closest('.tiktrack-nav-item');
+        if (parentDropdown) {
+          const parentLink = parentDropdown.querySelector('.tiktrack-nav-link');
+          if (parentLink) {
+            parentLink.classList.add('active');
+          }
+        }
+      }
+    });
+
+    // סימון מיוחד לעמוד הבית
     if (currentPath === '/' || currentPath === '/index.html') {
-      document.querySelector('[data-page="home"]')?.classList.add('active');
-    } else if (currentPath.includes('/planning')) {
-      document.querySelector('[data-page="planning"]')?.classList.add('active');
-    } else if (currentPath.includes('/trades')) {
-      document.querySelector('[data-page="trades"]')?.classList.add('active');
-    } else if (currentPath.includes('/research')) {
-      document.querySelector('[data-page="research"]')?.classList.add('active');
-    } else if (currentPath.includes('/accounts')) {
-      document.querySelector('[data-page="accounts"]')?.classList.add('active');
-    } else if (currentPath.includes('/notes')) {
-      document.querySelector('[data-page="notes"]')?.classList.add('active');
-    } else if (currentPath.includes('/alerts')) {
-      document.querySelector('[data-page="alerts"]')?.classList.add('active');
-    } else if (currentPath.includes('/preferences')) {
-      document.querySelector('[data-page="preferences"]')?.classList.add('active');
-    } else if (currentPath.includes('/database')) {
-      document.querySelector('[data-page="database"]')?.classList.add('active');
+      const homeLink = document.querySelector('.tiktrack-nav-link[data-page="home"]');
+      if (homeLink) {
+        homeLink.classList.add('active');
+      }
     }
   }
 
@@ -1122,22 +1124,23 @@ class HeaderSystem {
   }
 
   setupDropdownEventListeners() {
-    const dropdowns = [
-      { toggle: 'dateRangeFilterToggle', menu: 'dateRangeFilterMenu' },
-      { toggle: 'statusFilterToggle', menu: 'statusFilterMenu' },
-      { toggle: 'typeFilterToggle', menu: 'typeFilterMenu' },
-      { toggle: 'accountFilterToggle', menu: 'accountFilterMenu' }
-    ];
+    // DISABLED - Using global toggle functions instead
+    // const dropdowns = [
+    //   { toggle: 'dateRangeFilterToggle', menu: 'dateRangeFilterMenu' },
+    //   { toggle: 'statusFilterToggle', menu: 'statusFilterMenu' },
+    //   { toggle: 'typeFilterToggle', menu: 'typeFilterMenu' },
+    //   { toggle: 'accountFilterToggle', menu: 'accountFilterMenu' }
+    // ];
 
-    dropdowns.forEach(({ toggle, menu }) => {
-      const toggleElement = document.getElementById(toggle);
-      if (toggleElement) {
-        toggleElement.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.toggleDropdown(menu);
-        });
-      }
-    });
+    // dropdowns.forEach(({ toggle, menu }) => {
+    //   const toggleElement = document.getElementById(toggle);
+    //   if (toggleElement) {
+    //     toggleElement.addEventListener('click', (e) => {
+    //       e.stopPropagation();
+    //       this.toggleDropdown(menu);
+    //     });
+    //   }
+    // });
   }
 
   toggleFilters() {
@@ -1161,19 +1164,21 @@ class HeaderSystem {
   }
 
   toggleDropdown(menuId) {
-    const menu = document.getElementById(menuId);
-    const isVisible = menu.classList.contains('show');
+    // DISABLED - Using global toggle functions instead
+    // const menu = document.getElementById(menuId);
+    // const isVisible = menu.classList.contains('show');
 
-    this.closeAllDropdowns();
+    // this.closeAllDropdowns();
 
-    if (!isVisible) {
-      menu.classList.add('show');
-    }
+    // if (!isVisible) {
+    //   menu.classList.add('show');
+    // }
   }
 
   closeAllDropdowns() {
-    const menus = document.querySelectorAll('.filter-menu');
-    menus.forEach(menu => menu.classList.remove('show'));
+    // DISABLED - Using global toggle functions instead
+    // const menus = document.querySelectorAll('.filter-menu');
+    // menus.forEach(menu => menu.classList.remove('show'));
   }
 
   loadSavedState() {
@@ -1212,12 +1217,32 @@ class HeaderSystem {
 
     accounts.forEach(account => {
       const item = document.createElement('div');
-      item.className = 'filter-item';
+      item.className = 'account-filter-item';
       item.setAttribute('data-account-id', account.id);
+      item.setAttribute('data-value', account.name);
       item.innerHTML = `
         <span class="option-text">${account.name}</span>
         <span class="check-mark">●</span>
       `;
+
+      // הוספת event listener
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        item.classList.toggle('selected');
+
+        // עדכון הפילטר
+        if (window.headerSystem && window.headerSystem.updateAccountFilterText) {
+          window.headerSystem.updateAccountFilterText();
+        } else {
+          updateAccountFilterText();
+        }
+        if (window.headerSystem && window.headerSystem.updateAccountFilter) {
+          window.headerSystem.updateAccountFilter();
+        } else {
+          updateAccountFilter();
+        }
+      });
+
       accountMenu.appendChild(item);
     });
   }
@@ -1243,19 +1268,21 @@ class HeaderSystem {
   }
 
   toggleDropdown(menuId) {
-    const menu = document.getElementById(menuId);
-    const isVisible = menu.classList.contains('show');
+    // DISABLED - Using global toggle functions instead (duplicate function)
+    // const menu = document.getElementById(menuId);
+    // const isVisible = menu.classList.contains('show');
 
-    this.closeAllDropdowns();
+    // this.closeAllDropdowns();
 
-    if (!isVisible) {
-      menu.classList.add('show');
-    }
+    // if (!isVisible) {
+    //   menu.classList.add('show');
+    // }
   }
 
   closeAllDropdowns() {
-    const menus = document.querySelectorAll('.filter-menu');
-    menus.forEach(menu => menu.classList.remove('show'));
+    // DISABLED - Using global toggle functions instead (duplicate function)
+    // const menus = document.querySelectorAll('.filter-menu');
+    // menus.forEach(menu => menu.classList.remove('show'));
   }
 
   setupFilterItemEventListeners() {
@@ -1496,6 +1523,102 @@ class HeaderSystem {
       }
     }
   }
+
+  // פונקציה לאיפוס כל הפילטרים
+  resetAllFilters() {
+    console.log('🔍 Resetting all filters');
+
+    // איפוס פילטר סטטוס
+    const statusMenu = document.getElementById('statusFilterMenu');
+    if (statusMenu) {
+      statusMenu.querySelectorAll('.status-filter-item.selected').forEach(item => {
+        item.classList.remove('selected');
+      });
+    }
+
+    // איפוס פילטר טיפוס
+    const typeMenu = document.getElementById('typeFilterMenu');
+    if (typeMenu) {
+      typeMenu.querySelectorAll('.type-filter-item.selected').forEach(item => {
+        item.classList.remove('selected');
+      });
+    }
+
+    // איפוס פילטר חשבונות
+    const accountMenu = document.getElementById('accountFilterMenu');
+    if (accountMenu) {
+      accountMenu.querySelectorAll('.account-filter-item.selected').forEach(item => {
+        item.classList.remove('selected');
+      });
+    }
+
+    // איפוס פילטר תאריכים
+    const dateMenu = document.getElementById('dateRangeFilterMenu');
+    if (dateMenu) {
+      dateMenu.querySelectorAll('.date-range-filter-item.selected').forEach(item => {
+        item.classList.remove('selected');
+      });
+    }
+
+    // איפוס חיפוש
+    const searchInput = document.getElementById('searchFilterInput');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    // עדכון טקסטים
+    this.updateFilterTexts();
+
+    // עדכון פילטרים
+    if (window.filterSystem) {
+      window.filterSystem.updateFilter('status', []);
+      window.filterSystem.updateFilter('type', []);
+      window.filterSystem.updateFilter('account', []);
+      window.filterSystem.updateFilter('dateRange', '');
+      window.filterSystem.updateFilter('search', '');
+    }
+
+    // שמירת מצב
+    this.saveFilterStates();
+  }
+
+  // פונקציה לניקוי כל הפילטרים (סגירת תפריטים)
+  clearAllFilters() {
+    console.log('🔍 Clearing all filters (closing menus)');
+
+    // סגירת כל הפילטרים
+    window.closeStatusFilter();
+    window.closeTypeFilter();
+    window.closeAccountFilter();
+    window.closeDateRangeFilter();
+
+    // איפוס מצב פעיל של כפתורים
+    const toggles = document.querySelectorAll('.filter-toggle.active');
+    toggles.forEach(toggle => {
+      toggle.classList.remove('active');
+    });
+  }
+
+  // פונקציה לנקות חיפוש
+  clearSearchFilter() {
+    console.log('🔍 Clearing search filter');
+    const searchInput = document.getElementById('searchFilterInput');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    if (window.filterSystem) {
+      window.filterSystem.updateFilter('search', '');
+    }
+  }
+
+  // פונקציה לעדכון טקסטים
+  updateFilterTexts() {
+    updateStatusFilterText();
+    updateTypeFilterText();
+    updateAccountFilterText();
+    updateDateRangeFilterText();
+  }
 }
 
 // יצירת מופע גלובלי
@@ -1523,24 +1646,13 @@ window.toggleStatusFilter = function () {
   const menu = document.getElementById('statusFilterMenu');
   const toggle = document.querySelector('.status-filter-toggle');
 
-  console.log('🔍 Menu element:', menu);
-  console.log('🔍 Toggle element:', toggle);
-
   if (!menu || !toggle) {
     console.log('🔍 Missing status filter elements');
     return;
   }
 
-  console.log('🔍 Menu classes before:', menu.className);
-  console.log('🔍 Toggle classes before:', toggle.className);
-
-  const isVisible = menu.classList.contains('show') || menu.style.display === 'block' || window.getComputedStyle(menu).display === 'block';
+  const isVisible = menu.classList.contains('show');
   console.log('🔍 Status filter is visible:', isVisible);
-  console.log('🔍 Status menu has show class:', menu.classList.contains('show'));
-  console.log('🔍 Status menu style.display:', menu.style.display);
-  console.log('🔍 Status menu computed display:', window.getComputedStyle(menu).display);
-  console.log('🔍 Status menu computed visibility:', window.getComputedStyle(menu).visibility);
-  console.log('🔍 Status menu computed opacity:', window.getComputedStyle(menu).opacity);
 
   if (isVisible) {
     window.closeStatusFilter();
@@ -1550,180 +1662,35 @@ window.toggleStatusFilter = function () {
 
     menu.classList.add('show');
     toggle.classList.add('active');
-
-    // הוספת CSS inline כדי לוודא שהוא עובד
-    menu.style.display = 'block';
-    menu.style.position = 'absolute';
-    menu.style.top = '100%';
-    menu.style.right = '0';
-    menu.style.background = 'white';
-    menu.style.border = '1px solid #e8e8e8';
-    menu.style.borderRadius = '8px';
-    menu.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-    menu.style.minWidth = '180px';
-    menu.style.zIndex = '10001';
-    menu.style.opacity = '1';
-    menu.style.visibility = 'visible';
-    menu.style.transform = 'translateY(0)';
-
     console.log('🔍 Status filter opened');
-    console.log('🔍 Menu classes after open:', menu.className);
-    console.log('🔍 Toggle classes after open:', toggle.className);
-    console.log('🔍 Menu has show class:', menu.classList.contains('show'));
-    console.log('🔍 Menu style display before:', menu.style.display);
-    console.log('🔍 Menu style display after:', menu.style.display);
-    console.log('🔍 Menu computed display before:', window.getComputedStyle(menu).display);
-    console.log('🔍 Menu computed display after:', window.getComputedStyle(menu).display);
-
-    // בדיקת CSS
-    console.log('🔍 Menu computed style display:', window.getComputedStyle(menu).display);
-    console.log('🔍 Menu computed style visibility:', window.getComputedStyle(menu).visibility);
-    console.log('🔍 Menu computed style opacity:', window.getComputedStyle(menu).opacity);
-    console.log('🔍 Menu computed style position:', window.getComputedStyle(menu).position);
-    console.log('🔍 Menu computed style z-index:', window.getComputedStyle(menu).zIndex);
-    console.log('🔍 Menu computed style width:', window.getComputedStyle(menu).width);
-    console.log('🔍 Menu computed style height:', window.getComputedStyle(menu).height);
-    console.log('🔍 Menu computed style min-width:', window.getComputedStyle(menu).minWidth);
-    console.log('🔍 Menu computed style background:', window.getComputedStyle(menu).background);
-    console.log('🔍 Menu computed style border:', window.getComputedStyle(menu).border);
   }
-
-  updateStatusFilterText();
 };
 
-// פונקציות לפילטר טיפוס
 window.toggleTypeFilter = function () {
   console.log('🔍 toggleTypeFilter called');
   const menu = document.getElementById('typeFilterMenu');
   const toggle = document.querySelector('.type-filter-toggle');
-
-  console.log('🔍 Type menu element:', menu);
-  console.log('🔍 Type toggle element:', toggle);
 
   if (!menu || !toggle) {
     console.log('🔍 Missing type filter elements');
     return;
   }
 
-  const isVisible = menu.classList.contains('show') || menu.style.display === 'block' || window.getComputedStyle(menu).display === 'block';
+  const isVisible = menu.classList.contains('show');
   console.log('🔍 Type filter is visible:', isVisible);
-  console.log('🔍 Type menu has show class:', menu.classList.contains('show'));
-  console.log('🔍 Type menu style.display:', menu.style.display);
-  console.log('🔍 Type menu computed display:', window.getComputedStyle(menu).display);
-  console.log('🔍 Type menu computed visibility:', window.getComputedStyle(menu).visibility);
-  console.log('🔍 Type menu computed opacity:', window.getComputedStyle(menu).opacity);
 
   if (isVisible) {
-    console.log('🔍 Closing type filter');
     window.closeTypeFilter();
   } else {
-    console.log('🔍 Opening type filter');
     // סגירת פילטרים אחרים
     closeOtherFilters('type');
 
     menu.classList.add('show');
     toggle.classList.add('active');
-
-    // הוספת CSS inline כדי לוודא שהוא עובד
-    menu.style.display = 'block';
-    menu.style.position = 'absolute';
-    menu.style.top = '100%';
-    menu.style.right = '0';
-    menu.style.background = 'white';
-    menu.style.border = '1px solid #e8e8e8';
-    menu.style.borderRadius = '8px';
-    menu.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-    menu.style.minWidth = '180px';
-    menu.style.zIndex = '10001';
-    menu.style.opacity = '1';
-    menu.style.visibility = 'visible';
-    menu.style.transform = 'translateY(0)';
-
-    console.log('🔍 Type menu classes after open:', menu.className);
-    console.log('🔍 Type toggle classes after open:', toggle.className);
-    console.log('🔍 Type menu has show class:', menu.classList.contains('show'));
-    console.log('🔍 Type menu computed display:', window.getComputedStyle(menu).display);
-    console.log('🔍 Type menu computed visibility:', window.getComputedStyle(menu).visibility);
-    console.log('🔍 Type menu computed opacity:', window.getComputedStyle(menu).opacity);
-
-    // בדיקה אם הפילטר באמת פתוח
-    setTimeout(() => {
-      console.log('🔍 Type menu after 100ms - display:', window.getComputedStyle(menu).display);
-      console.log('🔍 Type menu after 100ms - visibility:', window.getComputedStyle(menu).visibility);
-      console.log('🔍 Type menu after 100ms - has show class:', menu.classList.contains('show'));
-    }, 100);
-  }
-
-  if (window.headerSystem && window.headerSystem.updateTypeFilterText) {
-    window.headerSystem.updateTypeFilterText();
-  } else {
-    console.log('🔍 updateTypeFilterText not available, calling global function');
-    updateTypeFilterText();
+    console.log('🔍 Type filter opened');
   }
 };
 
-window.selectTypeOption = function (type) {
-  console.log('🔍 selectTypeOption called with:', type);
-  const menu = document.getElementById('typeFilterMenu');
-  const item = menu.querySelector(`[data-value="${type}"]`);
-
-  if (item) {
-    item.classList.toggle('selected');
-    if (window.headerSystem && window.headerSystem.updateTypeFilterText) {
-      window.headerSystem.updateTypeFilterText();
-    } else {
-      console.log('🔍 updateTypeFilterText not available, calling global function');
-      updateTypeFilterText();
-    }
-    if (window.headerSystem && window.headerSystem.updateTypeFilter) {
-      window.headerSystem.updateTypeFilter();
-    } else {
-      console.log('🔍 updateTypeFilter not available, calling global function');
-      updateTypeFilter();
-    }
-  }
-};
-
-window.closeTypeFilter = function () {
-  console.log('🔍 closeTypeFilter called');
-  const menu = document.getElementById('typeFilterMenu');
-  const toggle = document.querySelector('.type-filter-toggle');
-
-  console.log('🔍 Type menu before close:', menu);
-  console.log('🔍 Type menu classes before close:', menu ? menu.classList.toString() : 'null');
-  console.log('🔍 Type menu style.display before close:', menu ? menu.style.display : 'null');
-
-  if (menu) {
-    menu.classList.remove('show');
-
-    // ניקוי inline styles
-    menu.style.display = '';
-    menu.style.position = '';
-    menu.style.top = '';
-    menu.style.right = '';
-    menu.style.background = '';
-    menu.style.border = '';
-    menu.style.borderRadius = '';
-    menu.style.boxShadow = '';
-    menu.style.minWidth = '';
-    menu.style.zIndex = '';
-    menu.style.opacity = '';
-    menu.style.visibility = '';
-    menu.style.transform = '';
-
-    console.log('🔍 Type menu classes after remove show:', menu.classList.toString());
-    console.log('🔍 Type menu has show class after remove:', menu.classList.contains('show'));
-  }
-  if (toggle) {
-    toggle.classList.remove('active');
-    console.log('🔍 Type toggle classes after remove active:', toggle.classList.toString());
-  }
-
-  console.log('🔍 Type menu final computed display:', menu ? window.getComputedStyle(menu).display : 'null');
-  console.log('🔍 Type menu final computed visibility:', menu ? window.getComputedStyle(menu).visibility : 'null');
-};
-
-// פונקציות לפילטר חשבונות
 window.toggleAccountFilter = function () {
   console.log('🔍 toggleAccountFilter called');
   const menu = document.getElementById('accountFilterMenu');
@@ -1734,13 +1701,8 @@ window.toggleAccountFilter = function () {
     return;
   }
 
-  const isVisible = menu.classList.contains('show') || menu.style.display === 'block' || window.getComputedStyle(menu).display === 'block';
+  const isVisible = menu.classList.contains('show');
   console.log('🔍 Account filter is visible:', isVisible);
-  console.log('🔍 Account menu has show class:', menu.classList.contains('show'));
-  console.log('🔍 Account menu style.display:', menu.style.display);
-  console.log('🔍 Account menu computed display:', window.getComputedStyle(menu).display);
-  console.log('🔍 Account menu computed visibility:', window.getComputedStyle(menu).visibility);
-  console.log('🔍 Account menu computed opacity:', window.getComputedStyle(menu).opacity);
 
   if (isVisible) {
     window.closeAccountFilter();
@@ -1750,85 +1712,10 @@ window.toggleAccountFilter = function () {
 
     menu.classList.add('show');
     toggle.classList.add('active');
-
-    // הוספת CSS inline כדי לוודא שהוא עובד
-    menu.style.display = 'block';
-    menu.style.position = 'absolute';
-    menu.style.top = '100%';
-    menu.style.right = '0';
-    menu.style.background = 'white';
-    menu.style.border = '1px solid #e8e8e8';
-    menu.style.borderRadius = '8px';
-    menu.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-    menu.style.minWidth = '180px';
-    menu.style.zIndex = '10001';
-    menu.style.opacity = '1';
-    menu.style.visibility = 'visible';
-    menu.style.transform = 'translateY(0)';
-  }
-
-  updateAccountFilterText();
-};
-
-window.selectAccountOption = function (account) {
-  console.log('🔍 selectAccountOption called with:', account);
-  const menu = document.getElementById('accountFilterMenu');
-  const item = menu.querySelector(`[data-value="${account}"]`);
-
-  if (item) {
-    item.classList.toggle('selected');
-    if (window.headerSystem && window.headerSystem.updateAccountFilterText) {
-      window.headerSystem.updateAccountFilterText();
-    } else {
-      console.log('🔍 updateAccountFilterText not available, calling global function');
-      updateAccountFilterText();
-    }
-    if (window.headerSystem && window.headerSystem.updateAccountFilter) {
-      window.headerSystem.updateAccountFilter();
-    } else {
-      console.log('🔍 updateAccountFilter not available, calling global function');
-      updateAccountFilter();
-    }
+    console.log('🔍 Account filter opened');
   }
 };
 
-window.closeAccountFilter = function () {
-  console.log('🔍 closeAccountFilter called');
-  const menu = document.getElementById('accountFilterMenu');
-  const toggle = document.querySelector('.account-filter-toggle');
-
-  console.log('🔍 Account menu before close:', menu);
-  console.log('🔍 Account menu classes before close:', menu ? menu.classList.toString() : 'null');
-
-  if (menu) {
-    menu.classList.remove('show');
-
-    // ניקוי inline styles
-    menu.style.display = '';
-    menu.style.position = '';
-    menu.style.top = '';
-    menu.style.right = '';
-    menu.style.background = '';
-    menu.style.border = '';
-    menu.style.borderRadius = '';
-    menu.style.boxShadow = '';
-    menu.style.minWidth = '';
-    menu.style.zIndex = '';
-    menu.style.opacity = '';
-    menu.style.visibility = '';
-    menu.style.transform = '';
-
-    console.log('🔍 Account menu classes after remove show:', menu.classList.toString());
-  }
-  if (toggle) {
-    toggle.classList.remove('active');
-    console.log('🔍 Account toggle classes after remove active:', toggle.classList.toString());
-  }
-
-  console.log('🔍 Account menu final computed display:', menu ? window.getComputedStyle(menu).display : 'null');
-};
-
-// פונקציות לפילטר תאריכים
 window.toggleDateRangeFilter = function () {
   console.log('🔍 toggleDateRangeFilter called');
   const menu = document.getElementById('dateRangeFilterMenu');
@@ -1839,13 +1726,8 @@ window.toggleDateRangeFilter = function () {
     return;
   }
 
-  const isVisible = menu.classList.contains('show') || menu.style.display === 'block' || window.getComputedStyle(menu).display === 'block';
+  const isVisible = menu.classList.contains('show');
   console.log('🔍 Date filter is visible:', isVisible);
-  console.log('🔍 Date menu has show class:', menu.classList.contains('show'));
-  console.log('🔍 Date menu style.display:', menu.style.display);
-  console.log('🔍 Date menu computed display:', window.getComputedStyle(menu).display);
-  console.log('🔍 Date menu computed visibility:', window.getComputedStyle(menu).visibility);
-  console.log('🔍 Date menu computed opacity:', window.getComputedStyle(menu).opacity);
 
   if (isVisible) {
     window.closeDateRangeFilter();
@@ -1855,24 +1737,66 @@ window.toggleDateRangeFilter = function () {
 
     menu.classList.add('show');
     toggle.classList.add('active');
-
-    // הוספת CSS inline כדי לוודא שהוא עובד
-    menu.style.display = 'block';
-    menu.style.position = 'absolute';
-    menu.style.top = '100%';
-    menu.style.right = '0';
-    menu.style.background = 'white';
-    menu.style.border = '1px solid #e8e8e8';
-    menu.style.borderRadius = '8px';
-    menu.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-    menu.style.minWidth = '180px';
-    menu.style.zIndex = '10001';
-    menu.style.opacity = '1';
-    menu.style.visibility = 'visible';
-    menu.style.transform = 'translateY(0)';
+    console.log('🔍 Date filter opened');
   }
+};
 
-  updateDateRangeFilterText();
+// פונקציות לבחירת אופציות
+window.selectStatusOption = function (status) {
+  console.log('🔍 selectStatusOption called with:', status);
+  const menu = document.getElementById('statusFilterMenu');
+  const item = menu.querySelector(`[data-value="${status}"]`);
+
+  if (item) {
+    item.classList.toggle('selected');
+    updateStatusFilterText();
+
+    // עדכון פילטר
+    if (window.filterSystem) {
+      const selectedItems = menu.querySelectorAll('.status-filter-item.selected');
+      const selectedValues = Array.from(selectedItems)
+        .map(item => item.getAttribute('data-value'));
+      window.filterSystem.updateFilter('status', selectedValues);
+    }
+  }
+};
+
+window.selectTypeOption = function (type) {
+  console.log('🔍 selectTypeOption called with:', type);
+  const menu = document.getElementById('typeFilterMenu');
+  const item = menu.querySelector(`[data-value="${type}"]`);
+
+  if (item) {
+    item.classList.toggle('selected');
+    updateTypeFilterText();
+
+    // עדכון פילטר
+    if (window.filterSystem) {
+      const selectedItems = menu.querySelectorAll('.type-filter-item.selected');
+      const selectedValues = Array.from(selectedItems)
+        .map(item => item.getAttribute('data-value'));
+      window.filterSystem.updateFilter('type', selectedValues);
+    }
+  }
+};
+
+window.selectAccountOption = function (account) {
+  console.log('🔍 selectAccountOption called with:', account);
+  const menu = document.getElementById('accountFilterMenu');
+  const item = menu.querySelector(`[data-value="${account}"]`);
+
+  if (item) {
+    item.classList.toggle('selected');
+    updateAccountFilterText();
+
+    // עדכון פילטר
+    if (window.filterSystem) {
+      const selectedItems = menu.querySelectorAll('.account-filter-item.selected');
+      const selectedValues = Array.from(selectedItems)
+        .map(item => item.getAttribute('data-value'));
+      window.filterSystem.updateFilter('account', selectedValues);
+    }
+  }
 };
 
 window.selectDateRangeOption = function (dateRange) {
@@ -1888,18 +1812,52 @@ window.selectDateRangeOption = function (dateRange) {
   const item = menu.querySelector(`[data-value="${dateRange}"]`);
   if (item) {
     item.classList.add('selected');
-    if (window.headerSystem && window.headerSystem.updateDateRangeFilterText) {
-      window.headerSystem.updateDateRangeFilterText();
-    } else {
-      console.log('🔍 updateDateRangeFilterText not available, calling global function');
-      updateDateRangeFilterText();
+    updateDateRangeFilterText();
+
+    // עדכון פילטר
+    if (window.filterSystem) {
+      window.filterSystem.updateFilter('dateRange', dateRange);
     }
-    if (window.headerSystem && window.headerSystem.updateDateRangeFilter) {
-      window.headerSystem.updateDateRangeFilter();
-    } else {
-      console.log('🔍 updateDateRangeFilter not available, calling global function');
-      updateDateRangeFilter();
-    }
+  }
+};
+
+// פונקציות לסגירת פילטרים
+window.closeStatusFilter = function () {
+  console.log('🔍 closeStatusFilter called');
+  const menu = document.getElementById('statusFilterMenu');
+  const toggle = document.querySelector('.status-filter-toggle');
+
+  if (menu) {
+    menu.classList.remove('show');
+  }
+  if (toggle) {
+    toggle.classList.remove('active');
+  }
+};
+
+window.closeTypeFilter = function () {
+  console.log('🔍 closeTypeFilter called');
+  const menu = document.getElementById('typeFilterMenu');
+  const toggle = document.querySelector('.type-filter-toggle');
+
+  if (menu) {
+    menu.classList.remove('show');
+  }
+  if (toggle) {
+    toggle.classList.remove('active');
+  }
+};
+
+window.closeAccountFilter = function () {
+  console.log('🔍 closeAccountFilter called');
+  const menu = document.getElementById('accountFilterMenu');
+  const toggle = document.querySelector('.account-filter-toggle');
+
+  if (menu) {
+    menu.classList.remove('show');
+  }
+  if (toggle) {
+    toggle.classList.remove('active');
   }
 };
 
@@ -1908,113 +1866,58 @@ window.closeDateRangeFilter = function () {
   const menu = document.getElementById('dateRangeFilterMenu');
   const toggle = document.querySelector('.date-range-filter-toggle');
 
-  console.log('🔍 Date menu before close:', menu);
-  console.log('🔍 Date menu classes before close:', menu ? menu.classList.toString() : 'null');
-
   if (menu) {
     menu.classList.remove('show');
-
-    // ניקוי inline styles
-    menu.style.display = '';
-    menu.style.position = '';
-    menu.style.top = '';
-    menu.style.right = '';
-    menu.style.background = '';
-    menu.style.border = '';
-    menu.style.borderRadius = '';
-    menu.style.boxShadow = '';
-    menu.style.minWidth = '';
-    menu.style.zIndex = '';
-    menu.style.opacity = '';
-    menu.style.visibility = '';
-    menu.style.transform = '';
-
-    console.log('🔍 Date menu classes after remove show:', menu.classList.toString());
   }
   if (toggle) {
     toggle.classList.remove('active');
-    console.log('🔍 Date toggle classes after remove active:', toggle.classList.toString());
   }
-
-  console.log('🔍 Date menu final computed display:', menu ? window.getComputedStyle(menu).display : 'null');
 };
 
-// פונקציות לסגירת פילטרים
-window.closeStatusFilter = function () {
-  console.log('🔍 window.closeStatusFilter called');
+// פונקציה לסגירת פילטרים אחרים
+function closeOtherFilters(excludeFilter) {
+  console.log('🔍 closeOtherFilters called with excludeFilter:', excludeFilter);
+
+  if (excludeFilter !== 'status') {
+    window.closeStatusFilter();
+  }
+  if (excludeFilter !== 'type') {
+    window.closeTypeFilter();
+  }
+  if (excludeFilter !== 'account') {
+    window.closeAccountFilter();
+  }
+  if (excludeFilter !== 'dateRange') {
+    window.closeDateRangeFilter();
+  }
+}
+
+// פונקציות לעדכון טקסטים
+function updateStatusFilterText() {
+  console.log('🔍 updateStatusFilterText called');
   const menu = document.getElementById('statusFilterMenu');
   const toggle = document.querySelector('.status-filter-toggle');
 
-  if (menu) {
-    menu.classList.remove('show');
+  if (!menu || !toggle) {
+    console.log('🔍 Status filter elements not found');
+    return;
   }
 
-  if (toggle) toggle.classList.remove('active');
+  const selectedItems = menu.querySelectorAll('.status-filter-item.selected');
+  const selectedText = toggle.querySelector('.selected-status-text');
 
-  console.log('🔍 window.closeStatusFilter completed');
-};
-
-// פונקציות גלובליות לפילטרים
-window.updateTypeFilter = function () {
-  console.log('🔍 updateTypeFilter called');
-  const selectedTypes = [];
-  const menu = document.getElementById('typeFilterMenu');
-
-  if (menu) {
-    menu.querySelectorAll('.type-filter-item.selected').forEach(item => {
-      selectedTypes.push(item.getAttribute('data-value'));
-    });
+  if (selectedItems.length === 0) {
+    selectedText.textContent = 'כל סטטוס';
+  } else if (selectedItems.length === 1) {
+    const optionText = selectedItems[0].querySelector('.option-text');
+    const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
+    selectedText.textContent = textContent;
+  } else {
+    selectedText.textContent = `${selectedItems.length} סטטוסים`;
   }
+}
 
-  console.log('🔍 Updating type filter with:', selectedTypes);
-
-  if (window.headerSystem && window.headerSystem.currentFilters) {
-    window.headerSystem.currentFilters.type = selectedTypes;
-    window.headerSystem.applyFilters();
-  }
-};
-
-window.updateAccountFilter = function () {
-  console.log('🔍 updateAccountFilter called');
-  const selectedAccounts = [];
-  const menu = document.getElementById('accountFilterMenu');
-
-  if (menu) {
-    menu.querySelectorAll('.account-filter-item.selected').forEach(item => {
-      selectedAccounts.push(item.getAttribute('data-value'));
-    });
-  }
-
-  console.log('🔍 Updating account filter with:', selectedAccounts);
-
-  if (window.headerSystem && window.headerSystem.currentFilters) {
-    window.headerSystem.currentFilters.account = selectedAccounts;
-    window.headerSystem.applyFilters();
-  }
-};
-
-window.updateDateRangeFilter = function () {
-  console.log('🔍 updateDateRangeFilter called');
-  let selectedDateRange = null;
-  const menu = document.getElementById('dateRangeFilterMenu');
-
-  if (menu) {
-    const selectedItem = menu.querySelector('.date-range-filter-item.selected');
-    if (selectedItem) {
-      selectedDateRange = selectedItem.getAttribute('data-value');
-    }
-  }
-
-  console.log('🔍 Updating date range filter with:', selectedDateRange);
-
-  if (window.headerSystem && window.headerSystem.currentFilters) {
-    window.headerSystem.currentFilters.dateRange = selectedDateRange;
-    window.headerSystem.applyFilters();
-  }
-};
-
-// פונקציות גלובליות לעדכון טקסט
-window.updateTypeFilterText = function () {
+function updateTypeFilterText() {
   console.log('🔍 updateTypeFilterText called');
   const menu = document.getElementById('typeFilterMenu');
   const toggle = document.querySelector('.type-filter-toggle');
@@ -2025,20 +1928,20 @@ window.updateTypeFilterText = function () {
   }
 
   const selectedItems = menu.querySelectorAll('.type-filter-item.selected');
-  const selectedTextElement = toggle.querySelector('.selected-type-text');
+  const selectedText = toggle.querySelector('.selected-type-text');
 
-  if (selectedTextElement) {
-    if (selectedItems.length === 0) {
-      selectedTextElement.textContent = 'כל סוג';
-    } else if (selectedItems.length === 1) {
-      selectedTextElement.textContent = selectedItems[0].getAttribute('data-value');
-    } else {
-      selectedTextElement.textContent = `${selectedItems.length} סוגים`;
-    }
+  if (selectedItems.length === 0) {
+    selectedText.textContent = 'כל טיפוס';
+  } else if (selectedItems.length === 1) {
+    const optionText = selectedItems[0].querySelector('.option-text');
+    const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
+    selectedText.textContent = textContent;
+  } else {
+    selectedText.textContent = `${selectedItems.length} סוגים`;
   }
-};
+}
 
-window.updateAccountFilterText = function () {
+function updateAccountFilterText() {
   console.log('🔍 updateAccountFilterText called');
   const menu = document.getElementById('accountFilterMenu');
   const toggle = document.querySelector('.account-filter-toggle');
@@ -2049,20 +1952,20 @@ window.updateAccountFilterText = function () {
   }
 
   const selectedItems = menu.querySelectorAll('.account-filter-item.selected');
-  const selectedTextElement = toggle.querySelector('.selected-account-text');
+  const selectedText = toggle.querySelector('.selected-account-text');
 
-  if (selectedTextElement) {
-    if (selectedItems.length === 0) {
-      selectedTextElement.textContent = 'כל חשבון';
-    } else if (selectedItems.length === 1) {
-      selectedTextElement.textContent = selectedItems[0].getAttribute('data-value');
-    } else {
-      selectedTextElement.textContent = `${selectedItems.length} חשבונות`;
-    }
+  if (selectedItems.length === 0) {
+    selectedText.textContent = 'כל חשבון';
+  } else if (selectedItems.length === 1) {
+    const optionText = selectedItems[0].querySelector('.option-text');
+    const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
+    selectedText.textContent = textContent;
+  } else {
+    selectedText.textContent = `${selectedItems.length} חשבונות`;
   }
-};
+}
 
-window.updateDateRangeFilterText = function () {
+function updateDateRangeFilterText() {
   console.log('🔍 updateDateRangeFilterText called');
   const menu = document.getElementById('dateRangeFilterMenu');
   const toggle = document.querySelector('.date-range-filter-toggle');
@@ -2073,269 +1976,14 @@ window.updateDateRangeFilterText = function () {
   }
 
   const selectedItem = menu.querySelector('.date-range-filter-item.selected');
-  const selectedTextElement = toggle.querySelector('.selected-date-range-text');
-
-  if (selectedTextElement) {
-    if (selectedItem) {
-      selectedTextElement.textContent = selectedItem.getAttribute('data-value');
-    } else {
-      selectedTextElement.textContent = 'כל זמן';
-    }
-  }
-};
-
-// פונקציות לבחירת אופציות - יוסיפו בהמשך
-
-// פונקציות לסגירת פילטרים - יוסיפו בהמשך
-
-function closeTypeFilter() {
-  const menu = document.getElementById('typeFilterMenu');
-  const toggle = document.querySelector('.type-filter-toggle');
-  if (menu) menu.classList.remove('show');
-  if (toggle) toggle.classList.remove('active');
-}
-
-function closeAccountFilter() {
-  const menu = document.getElementById('accountFilterMenu');
-  const toggle = document.querySelector('.account-filter-toggle');
-  if (menu) menu.classList.remove('show');
-  if (toggle) toggle.classList.remove('active');
-}
-
-function closeDateRangeFilter() {
-  const menu = document.getElementById('dateRangeFilterMenu');
-  const toggle = document.querySelector('.date-range-filter-toggle');
-  if (menu) menu.classList.remove('show');
-  if (toggle) toggle.classList.remove('active');
-}
-
-// פונקציה לסגירת פילטרים אחרים
-function closeOtherFilters(excludeFilter) {
-  console.log('🔍 closeOtherFilters called with excludeFilter:', excludeFilter);
-
-  // סגירת פילטר סטטוס אם לא הוא הפילטר החריג
-  if (excludeFilter !== 'status') {
-    console.log('🔍 Closing status filter');
-    window.closeStatusFilter();
-  }
-
-  // סגירת פילטר טיפוס אם לא הוא הפילטר החריג
-  if (excludeFilter !== 'type') {
-    console.log('🔍 Closing type filter');
-    window.closeTypeFilter();
-  }
-
-  // סגירת פילטר חשבונות אם לא הוא הפילטר החריג
-  if (excludeFilter !== 'account') {
-    console.log('🔍 Closing account filter');
-    window.closeAccountFilter();
-  }
-
-  // סגירת פילטר תאריכים אם לא הוא הפילטר החריג
-  if (excludeFilter !== 'dateRange') {
-    console.log('🔍 Closing date range filter');
-    window.closeDateRangeFilter();
-  }
-
-  console.log('🔍 closeOtherFilters completed');
-}
-
-// פונקציות לבחירת אופציות
-window.selectStatusOption = function (status) {
-  console.log('🔍 selectStatusOption called with:', status);
-  const menu = document.getElementById('statusFilterMenu');
-  console.log('🔍 Status menu element:', menu);
-
-  if (!menu) {
-    console.log('🔍 Status menu not found!');
-    return;
-  }
-
-  const items = menu.querySelectorAll('.status-filter-item');
-  console.log('🔍 Found status filter items:', items.length);
-
-  const item = Array.from(items)
-    .find(item => {
-      const optionText = item.querySelector('.option-text');
-      const textContent = optionText ? optionText.textContent : item.textContent;
-      console.log('🔍 Checking item text:', textContent, 'against:', status);
-      return textContent === status;
-    });
-
-  console.log('🔍 Found matching item:', item);
-
-  if (item) {
-    console.log('🔍 Before toggle - item classes:', item.className);
-    item.classList.toggle('selected');
-    console.log('🔍 After toggle - item classes:', item.className);
-
-    // בדיקה אם ה-class נוסף
-    const hasSelected = item.classList.contains('selected');
-    console.log('🔍 Item has selected class:', hasSelected);
-
-    updateStatusFilterText();
-
-    // עדכון פילטר
-    if (window.filterSystem) {
-      const selectedItems = menu.querySelectorAll('.status-filter-item.selected');
-      console.log('🔍 Selected items count:', selectedItems.length);
-      const selectedValues = Array.from(selectedItems)
-        .map(item => {
-          const optionText = item.querySelector('.option-text');
-          return optionText ? optionText.textContent : item.textContent;
-        });
-
-      console.log('🔍 Selected values:', selectedValues);
-      window.filterSystem.updateFilter('status', selectedValues);
-    }
-
-    // שמירת מצב הפילטרים
-    if (window.headerSystem) {
-      window.headerSystem.saveFilterStates();
-    }
-  } else {
-    console.log('🔍 No matching item found for status:', status);
-  }
-};
-
-// פונקציות לבחירת אופציות - יוסיפו בהמשך
-
-// פונקציות עזר לעדכון טקסטים
-function updateStatusFilterText() {
-  console.log('🔍 updateStatusFilterText called');
-  const menu = document.getElementById('statusFilterMenu');
-  const toggle = document.querySelector('.status-filter-toggle');
-
-  console.log('🔍 Menu element:', menu);
-  console.log('🔍 Toggle element:', toggle);
-
-  if (!menu || !toggle) {
-    console.log('🔍 Menu or toggle not found');
-    return;
-  }
-
-  const selectedItems = menu.querySelectorAll('.status-filter-item.selected');
-  console.log('🔍 Selected items found:', selectedItems.length);
-
-  const selectedText = toggle.querySelector('.selected-status-text');
-  console.log('🔍 Selected text element:', selectedText);
-
-  if (selectedItems.length === 0) {
-    selectedText.textContent = 'כל סטטוס';
-    console.log('🔍 Updated text to: כל סטטוס');
-  } else if (selectedItems.length === 1) {
-    const optionText = selectedItems[0].querySelector('.option-text');
-    const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
-    selectedText.textContent = textContent;
-    console.log('🔍 Updated text to:', textContent);
-  } else {
-    selectedText.textContent = `${selectedItems.length} סטטוסים`;
-    console.log('🔍 Updated text to:', `${selectedItems.length} סטטוסים`);
-  }
-
-  // בדיקת CSS נוספת
-  console.log('🔍 Menu final computed style display:', window.getComputedStyle(menu).display);
-  console.log('🔍 Menu final computed style visibility:', window.getComputedStyle(menu).visibility);
-  console.log('🔍 Menu final computed style opacity:', window.getComputedStyle(menu).opacity);
-  console.log('🔍 Menu final computed style position:', window.getComputedStyle(menu).position);
-  console.log('🔍 Menu final computed style z-index:', window.getComputedStyle(menu).zIndex);
-  console.log('🔍 Menu final computed style top:', window.getComputedStyle(menu).top);
-  console.log('🔍 Menu final computed style right:', window.getComputedStyle(menu).right);
-}
-
-function updateTypeFilterText() {
-  console.log('🔍 updateTypeFilterText called');
-  const menu = document.getElementById('typeFilterMenu');
-  const toggle = document.querySelector('.type-filter-toggle');
-
-  console.log('🔍 Type menu element:', menu);
-  console.log('🔍 Type toggle element:', toggle);
-
-  if (!menu || !toggle) {
-    console.log('🔍 Type menu or toggle not found');
-    return;
-  }
-
-  const selectedItems = menu.querySelectorAll('.type-filter-item.selected');
-  console.log('🔍 Type selected items found:', selectedItems.length);
-
-  const selectedText = toggle.querySelector('.selected-type-text');
-  console.log('🔍 Type selected text element:', selectedText);
-
-  if (selectedItems.length === 0) {
-    selectedText.textContent = 'כל טיפוס';
-    console.log('🔍 Updated type text to: כל טיפוס');
-  } else if (selectedItems.length === 1) {
-    const optionText = selectedItems[0].querySelector('.option-text');
-    const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
-    selectedText.textContent = textContent;
-    console.log('🔍 Updated type text to:', textContent);
-  } else {
-    selectedText.textContent = `${selectedItems.length} סוגים`;
-    console.log('🔍 Updated type text to:', `${selectedItems.length} סוגים`);
-  }
-}
-
-function updateAccountFilterText() {
-  console.log('🔍 updateAccountFilterText called');
-  const menu = document.getElementById('accountFilterMenu');
-  const toggle = document.querySelector('.account-filter-toggle');
-
-  console.log('🔍 Account menu element:', menu);
-  console.log('🔍 Account toggle element:', toggle);
-
-  if (!menu || !toggle) {
-    console.log('🔍 Account menu or toggle not found');
-    return;
-  }
-
-  const selectedItems = menu.querySelectorAll('.account-filter-item.selected');
-  console.log('🔍 Account selected items found:', selectedItems.length);
-
-  const selectedText = toggle.querySelector('.selected-account-text');
-  console.log('🔍 Account selected text element:', selectedText);
-
-  if (selectedItems.length === 0) {
-    selectedText.textContent = 'כל חשבון';
-    console.log('🔍 Updated account text to: כל חשבון');
-  } else if (selectedItems.length === 1) {
-    const optionText = selectedItems[0].querySelector('.option-text');
-    const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
-    selectedText.textContent = textContent;
-    console.log('🔍 Updated account text to:', textContent);
-  } else {
-    selectedText.textContent = `${selectedItems.length} חשבונות`;
-    console.log('🔍 Updated account text to:', `${selectedItems.length} חשבונות`);
-  }
-}
-
-function updateDateRangeFilterText() {
-  console.log('🔍 updateDateRangeFilterText called');
-  const menu = document.getElementById('dateRangeFilterMenu');
-  const toggle = document.querySelector('.date-range-filter-toggle');
-
-  console.log('🔍 Date range menu element:', menu);
-  console.log('🔍 Date range toggle element:', toggle);
-
-  if (!menu || !toggle) {
-    console.log('🔍 Date range menu or toggle not found');
-    return;
-  }
-
-  const selectedItem = menu.querySelector('.date-range-filter-item.selected');
-  console.log('🔍 Date range selected item:', selectedItem);
-
   const selectedText = toggle.querySelector('.selected-date-range-text');
-  console.log('🔍 Date range selected text element:', selectedText);
 
   if (selectedItem) {
     const optionText = selectedItem.querySelector('.option-text');
     const textContent = optionText ? optionText.textContent : selectedItem.textContent;
     selectedText.textContent = textContent;
-    console.log('🔍 Updated date range text to:', textContent);
   } else {
     selectedText.textContent = 'כל זמן';
-    console.log('🔍 Updated date range text to: כל זמן');
   }
 }
 
@@ -2444,138 +2092,274 @@ class SimpleFilter {
   }
 
   updateFilter(filterType, value) {
-    console.log(`🔍 Updating ${filterType} filter with:`, value);
+    console.log(`🔍 Updating filter: ${filterType} =`, value);
 
-    if (filterType === 'status') {
-      this.currentFilters.status = Array.isArray(value) ? value : [value];
-    } else if (filterType === 'type') {
-      this.currentFilters.type = Array.isArray(value) ? value : [value];
-    } else if (filterType === 'account') {
-      this.currentFilters.account = Array.isArray(value) ? value : [value];
+    // עדכון הפילטר הנוכחי
+    if (filterType === 'dateRange') {
+      this.currentFilters.dateRange = value;
     } else if (filterType === 'search') {
       this.currentFilters.search = value;
+    } else {
+      this.currentFilters[filterType] = Array.isArray(value) ? value : [value];
     }
 
+    // הפעלת הפילטרים על הטבלאות
     this.applyFilters();
+
+    // שמירת מצב הפילטרים
+    this.saveFilterStates();
+
+    // עדכון שדות הבדיקה אם קיימים
+    if (typeof updateDateRangeInfo === 'function') {
+      updateDateRangeInfo();
+    }
+
+    // עדכון מידע דיבאג אם קיים
+    this.updateDebugInfo();
   }
 
   applyFilters() {
     console.log('🔍 Applying filters:', this.currentFilters);
 
-    // מציאת כל הטבלאות בדף
+    // זיהוי כל הטבלאות הרלוונטיות
     const tables = document.querySelectorAll('table[id]');
-    console.log('🔍 Found tables:', tables.length);
+    const excludedTables = ['notificationsTable']; // טבלאות שלא נכללות בפילטור
 
     tables.forEach(table => {
-      this.filterTable(table);
+      if (excludedTables.includes(table.id)) {
+        return; // דילוג על טבלאות שלא נכללות
+      }
+
+      const rows = table.querySelectorAll('tbody tr');
+      let visibleRows = 0;
+
+      rows.forEach(row => {
+        let shouldShow = true;
+
+        // פילטר סטטוס
+        if (this.currentFilters.status.length > 0) {
+          const statusCell = row.querySelector('[data-status]');
+          if (statusCell) {
+            const rowStatus = statusCell.getAttribute('data-status');
+            if (!this.currentFilters.status.includes(rowStatus)) {
+              shouldShow = false;
+            }
+          }
+        }
+
+        // פילטר טיפוס
+        if (shouldShow && this.currentFilters.type.length > 0) {
+          const typeCell = row.querySelector('[data-type]');
+          if (typeCell) {
+            const rowType = typeCell.getAttribute('data-type');
+            if (!this.currentFilters.type.includes(rowType)) {
+              shouldShow = false;
+            }
+          }
+        }
+
+        // פילטר חשבון
+        if (shouldShow && this.currentFilters.account.length > 0) {
+          const accountCell = row.querySelector('[data-account]');
+          if (accountCell) {
+            const rowAccount = accountCell.getAttribute('data-account');
+            if (!this.currentFilters.account.includes(rowAccount)) {
+              shouldShow = false;
+            }
+          }
+        }
+
+        // פילטר תאריכים
+        if (shouldShow && this.currentFilters.dateRange && this.currentFilters.dateRange !== 'כל זמן') {
+          const dateCell = row.querySelector('[data-date]');
+          if (dateCell) {
+            const dateString = dateCell.getAttribute('data-date');
+            const rowDate = new Date(dateString);
+            const today = new Date();
+
+            let shouldIncludeDate = false;
+
+            switch (this.currentFilters.dateRange) {
+              case 'היום':
+                shouldIncludeDate = this.isSameDay(rowDate, today);
+                break;
+              case 'אתמול':
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                shouldIncludeDate = this.isSameDay(rowDate, yesterday);
+                break;
+              case 'השבוע':
+                shouldIncludeDate = this.isThisWeekCalendar(rowDate);
+                break;
+              case 'שבוע':
+                shouldIncludeDate = this.isLast7Days(rowDate);
+                break;
+              case 'MTD':
+                shouldIncludeDate = this.isMonthToDate(rowDate);
+                break;
+              case 'YTD':
+                shouldIncludeDate = this.isYearToDate(rowDate);
+                break;
+              case '30 יום':
+                shouldIncludeDate = this.isLast30Days(rowDate);
+                break;
+              case '60 יום':
+                shouldIncludeDate = this.isLast60Days(rowDate);
+                break;
+              case '90 יום':
+                shouldIncludeDate = this.isLast90Days(rowDate);
+                break;
+              case 'שנה':
+                shouldIncludeDate = this.isThisYear(rowDate);
+                break;
+              case 'שבוע קודם':
+                shouldIncludeDate = this.isLastWeekCalendar(rowDate);
+                break;
+              case 'חודש קודם':
+                shouldIncludeDate = this.isLastMonthCalendar(rowDate);
+                break;
+              case 'שנה קודמת':
+                shouldIncludeDate = this.isLastYear(rowDate);
+                break;
+            }
+
+            if (!shouldIncludeDate) {
+              shouldShow = false;
+            }
+          }
+        }
+
+        // פילטר חיפוש
+        if (shouldShow && this.currentFilters.search) {
+          const searchText = this.currentFilters.search.toLowerCase();
+          const rowText = row.textContent.toLowerCase();
+          if (!rowText.includes(searchText)) {
+            shouldShow = false;
+          }
+        }
+
+        // הצגה/הסתרה של השורה
+        row.style.display = shouldShow ? '' : 'none';
+        if (shouldShow) visibleRows++;
+      });
+
+      console.log(`📊 Table ${table.id}: ${visibleRows}/${rows.length} rows visible`);
     });
   }
 
-  filterTable(table) {
-    const tableId = table.id;
-
-    // עקיפת טבלאות מסוימות שלא צריכות פילטר
-    if (tableId === 'notificationsTable') {
-      console.log(`🔍 Skipping notifications table - no filtering applied`);
-      return;
-    }
-
-    const rows = table.querySelectorAll('tbody tr');
-    console.log(`🔍 Filtering table: ${tableId} with ${rows.length} rows`);
-
-    let visibleCount = 0;
-
-    rows.forEach((row, index) => {
-      const isVisible = this.shouldShowRow(row);
-
-      if (isVisible) {
-        row.style.display = '';
-        visibleCount++;
-        console.log(`✅ ${tableId} Row ${index} visible`);
-      } else {
-        row.style.display = 'none';
-        console.log(`❌ ${tableId} Row ${index} hidden by filters`);
-      }
-    });
-
-    console.log(`🎯 ${tableId} filter result: ${visibleCount}/${rows.length} rows visible`);
+  // פונקציות עזר לתאריכים
+  isSameDay(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate();
   }
 
-  shouldShowRow(row) {
-    const cells = row.querySelectorAll('td');
-    if (cells.length === 0) return true;
+  // השבוע - מתחילת השבוע הקלנדרי ועד היום כולל
+  isThisWeekCalendar(date) {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
 
-    // בדיקת פילטר סטטוס
-    if (this.currentFilters.status.length > 0) {
-      const statusCell = this.findStatusCell(cells);
-      if (statusCell && !this.currentFilters.status.includes(statusCell.textContent.trim())) {
-        console.log(`❌ Row hidden by status filter`);
-        return false;
-      }
-    }
-
-    // בדיקת פילטר טיפוס
-    if (this.currentFilters.type.length > 0) {
-      const typeCell = this.findTypeCell(cells);
-      if (typeCell && !this.currentFilters.type.includes(typeCell.textContent.trim())) {
-        console.log(`❌ Row hidden by type filter`);
-        return false;
-      }
-    }
-
-    // בדיקת פילטר חשבון
-    if (this.currentFilters.account.length > 0) {
-      const accountCell = this.findAccountCell(cells);
-      if (accountCell && !this.currentFilters.account.includes(accountCell.textContent.trim())) {
-        console.log(`❌ Row hidden by account filter`);
-        return false;
-      }
-    }
-
-    // בדיקת פילטר חיפוש
-    if (this.currentFilters.search && this.currentFilters.search.trim() !== '') {
-      const searchTerm = this.currentFilters.search.toLowerCase();
-      const rowText = row.textContent.toLowerCase();
-      if (!rowText.includes(searchTerm)) {
-        console.log(`❌ Row hidden by search filter`);
-        return false;
-      }
-    }
-
-    return true;
+    return date >= startOfWeek && date <= today;
   }
 
-  findStatusCell(cells) {
-    // מחפש תא סטטוס - בדרך כלל עמודה שנייה או שלישית
-    for (let i = 0; i < cells.length; i++) {
-      const cellText = cells[i].textContent.trim();
-      if (['פתוח', 'סגור', 'בוטל', 'Open', 'Closed', 'Cancelled'].includes(cellText)) {
-        return cells[i];
-      }
-    }
-    return cells[1]; // ברירת מחדל - עמודה שנייה
+  // שבוע - שבעת ימים אחרונים
+  isLast7Days(date) {
+    const today = new Date();
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    return date >= sevenDaysAgo && date <= today;
   }
 
-  findTypeCell(cells) {
-    // מחפש תא סוג - בדרך כלל עמודה שלישית
-    for (let i = 0; i < cells.length; i++) {
-      const cellText = cells[i].textContent.trim();
-      if (['מניה', 'מניות', 'ETF', 'קריפטו', 'Stock', 'Crypto'].includes(cellText)) {
-        return cells[i];
-      }
-    }
-    return cells[2]; // ברירת מחדל - עמודה שלישית
+  // שבוע קודם - מתחילת השבוע הקודם ועד סופו
+  isLastWeekCalendar(date) {
+    const today = new Date();
+    const startOfThisWeek = new Date(today);
+    startOfThisWeek.setDate(today.getDate() - today.getDay());
+    startOfThisWeek.setHours(0, 0, 0, 0);
+
+    const startOfLastWeek = new Date(startOfThisWeek);
+    startOfLastWeek.setDate(startOfThisWeek.getDate() - 7);
+
+    const endOfLastWeek = new Date(startOfLastWeek);
+    endOfLastWeek.setDate(startOfLastWeek.getDate() + 6);
+    endOfLastWeek.setHours(23, 59, 59, 999);
+
+    return date >= startOfLastWeek && date <= endOfLastWeek;
   }
 
-  findAccountCell(cells) {
-    // מחפש תא חשבון - בדרך כלל עמודה רביעית
-    for (let i = 0; i < cells.length; i++) {
-      const cellText = cells[i].textContent.trim();
-      if (cellText.includes('חשבון') || cellText.includes('Account')) {
-        return cells[i];
-      }
+  // חודש קודם - מתחילת החודש הקלנדרי הקודם ועד סופו
+  isLastMonthCalendar(date) {
+    const today = new Date();
+    const startOfThisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+
+    return date >= startOfLastMonth && date <= endOfLastMonth;
+  }
+
+  isMonthToDate(date) {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    return date >= startOfMonth && date <= today;
+  }
+
+  isYearToDate(date) {
+    const today = new Date();
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
+
+    return date >= startOfYear && date <= today;
+  }
+
+  isLast30Days(date) {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+
+    return date >= thirtyDaysAgo && date <= today;
+  }
+
+  isLast60Days(date) {
+    const today = new Date();
+    const sixtyDaysAgo = new Date(today);
+    sixtyDaysAgo.setDate(today.getDate() - 60);
+
+    return date >= sixtyDaysAgo && date <= today;
+  }
+
+  isLast90Days(date) {
+    const today = new Date();
+    const ninetyDaysAgo = new Date(today);
+    ninetyDaysAgo.setDate(today.getDate() - 90);
+
+    return date >= ninetyDaysAgo && date <= today;
+  }
+
+  isThisYear(date) {
+    const today = new Date();
+    const oneYearAgo = new Date(today);
+    oneYearAgo.setDate(today.getDate() - 365);
+
+    return date >= oneYearAgo && date <= today;
+  }
+
+  isLastYear(date) {
+    const today = new Date();
+    const startOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
+    const endOfLastYear = new Date(today.getFullYear() - 1, 11, 31);
+
+    return date >= startOfLastYear && date <= endOfLastYear;
+  }
+
+  updateDebugInfo() {
+    // עדכון מידע דיבאג אם קיים
+    if (typeof updateDebugInfo === 'function') {
+      updateDebugInfo();
     }
-    return cells[3]; // ברירת מחדל - עמודה רביעית
   }
 
   resetFilters() {
@@ -2675,95 +2459,72 @@ class SimpleFilter {
   }
 
   updateFilterTexts() {
-    this.updateStatusFilterText();
-    this.updateTypeFilterText();
-    this.updateAccountFilterText();
-    this.updateDateRangeFilterText();
+    updateStatusFilterText();
+    updateTypeFilterText();
+    updateAccountFilterText();
+    updateDateRangeFilterText();
   }
 
-  updateTypeFilterText() {
-    console.log('🔍 updateTypeFilterText called');
-    const menu = document.getElementById('typeFilterMenu');
-    const toggle = document.querySelector('.type-filter-toggle');
+  saveFilterStates() {
+    const filterStates = {
+      status: [],
+      type: [],
+      account: [],
+      dateRange: []
+    };
 
-    if (!menu || !toggle) {
-      console.log('🔍 Type menu or toggle not found');
-      return;
+    // שמירת פילטר סטטוס
+    const statusItems = document.querySelectorAll('.status-filter-item.selected');
+    statusItems.forEach(item => {
+      const optionText = item.querySelector('.option-text');
+      if (optionText) {
+        filterStates.status.push(optionText.textContent);
+      }
+    });
+
+    // שמירת פילטר טיפוס
+    const typeItems = document.querySelectorAll('.type-filter-item.selected');
+    typeItems.forEach(item => {
+      const optionText = item.querySelector('.option-text');
+      if (optionText) {
+        filterStates.type.push(optionText.textContent);
+      }
+    });
+
+    // שמירת פילטר חשבון
+    const accountItems = document.querySelectorAll('.account-filter-item.selected');
+    accountItems.forEach(item => {
+      const optionText = item.querySelector('.option-text');
+      if (optionText) {
+        filterStates.account.push(optionText.textContent);
+      }
+    });
+
+    // שמירת פילטר תאריכים
+    const dateRangeItems = document.querySelectorAll('.date-range-filter-item.selected');
+    dateRangeItems.forEach(item => {
+      const optionText = item.querySelector('.option-text');
+      if (optionText) {
+        filterStates.dateRange.push(optionText.textContent);
+      }
+    });
+
+    // שמירת חיפוש
+    const searchInput = document.getElementById('searchFilterInput');
+    if (searchInput) {
+      filterStates.search = searchInput.value;
     }
 
-    const selectedItems = menu.querySelectorAll('.type-filter-item.selected');
-    const selectedText = toggle.querySelector('.selected-type-text');
-
-    if (selectedItems.length === 0) {
-      selectedText.textContent = 'כל סוג';
-      console.log('🔍 Updated type text to: כל סוג');
-    } else if (selectedItems.length === 1) {
-      const optionText = selectedItems[0].querySelector('.option-text');
-      const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
-      selectedText.textContent = textContent;
-      console.log('🔍 Updated type text to:', textContent);
-    } else {
-      selectedText.textContent = `${selectedItems.length} סוגים`;
-      console.log('🔍 Updated type text to:', selectedItems.length, 'סוגים');
-    }
-  }
-
-  updateAccountFilterText() {
-    console.log('🔍 updateAccountFilterText called');
-    const menu = document.getElementById('accountFilterMenu');
-    const toggle = document.querySelector('.account-filter-toggle');
-
-    if (!menu || !toggle) {
-      console.log('🔍 Account menu or toggle not found');
-      return;
-    }
-
-    const selectedItems = menu.querySelectorAll('.account-filter-item.selected');
-    const selectedText = toggle.querySelector('.selected-account-text');
-
-    if (selectedItems.length === 0) {
-      selectedText.textContent = 'כל חשבון';
-      console.log('🔍 Updated account text to: כל חשבון');
-    } else if (selectedItems.length === 1) {
-      const optionText = selectedItems[0].querySelector('.option-text');
-      const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
-      selectedText.textContent = textContent;
-      console.log('🔍 Updated account text to:', textContent);
-    } else {
-      selectedText.textContent = `${selectedItems.length} חשבונות`;
-      console.log('🔍 Updated account text to:', selectedItems.length, 'חשבונות');
-    }
-  }
-
-  updateDateRangeFilterText() {
-    console.log('🔍 updateDateRangeFilterText called');
-    const menu = document.getElementById('dateRangeFilterMenu');
-    const toggle = document.querySelector('.date-range-filter-toggle');
-
-    if (!menu || !toggle) {
-      console.log('🔍 Date range menu or toggle not found');
-      return;
-    }
-
-    const selectedItem = menu.querySelector('.date-range-filter-item.selected');
-    const selectedText = toggle.querySelector('.selected-date-range-text');
-
-    if (!selectedItem) {
-      selectedText.textContent = 'כל זמן';
-      console.log('🔍 Updated date range text to: כל זמן');
-    } else {
-      const optionText = selectedItem.querySelector('.option-text');
-      const textContent = optionText ? optionText.textContent : selectedItem.textContent;
-      selectedText.textContent = textContent;
-      console.log('🔍 Updated date range text to:', textContent);
-    }
+    localStorage.setItem('filterStates', JSON.stringify(filterStates));
   }
 }
 
 // יצירת instance גלובלי
-window.headerSystem = new HeaderSystem();
+window.filterSystem = new SimpleFilter();
 
 // אתחול אוטומטי
 document.addEventListener('DOMContentLoaded', () => {
-  window.headerSystem.init();
+  if (window.filterSystem) {
+    window.filterSystem.init();
+  }
 });

@@ -237,24 +237,92 @@ function editTradeRecord(tradeId) {
 function cancelTradeRecord(tradeId) {
   console.log('ביטול טרייד:', tradeId);
   if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
-    // TODO: Implement cancel trade API call
-    alert('פונקציית ביטול טרייד תתווסף בקרוב');
+    // Implement cancel trade API call
+    fetch(`/api/v1/trades/${tradeId}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        cancel_reason: 'בוטל על ידי המשתמש'
+      })
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('שגיאה בביטול הטרייד');
+      })
+      .then(data => {
+        console.log('טרייד בוטל בהצלחה:', data);
+        showNotification('טרייד בוטל בהצלחה', 'success');
+        loadTradesData(); // Reload the table
+      })
+      .catch(error => {
+        console.error('שגיאה בביטול טרייד:', error);
+        showNotification('שגיאה בביטול הטרייד', 'error');
+      });
   }
 }
 
 function deleteTradeRecord(tradeId) {
   console.log('מחיקת טרייד:', tradeId);
-  if (confirm('האם אתה בטוח שברצונך למחוק טרייד זה?')) {
-    // TODO: Implement delete trade API call
-    alert('פונקציית מחיקת טרייד תתווסף בקרוב');
+  if (confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+    // Implement delete trade API call
+    fetch(`/api/v1/trades/${tradeId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('שגיאה במחיקת הטרייד');
+      })
+      .then(data => {
+        console.log('טרייד נמחק בהצלחה:', data);
+        showNotification('טרייד נמחק בהצלחה', 'success');
+        loadTradesData(); // Reload the table
+      })
+      .catch(error => {
+        console.error('שגיאה במחיקת טרייד:', error);
+        showNotification('שגיאה במחיקת הטרייד', 'error');
+      });
   }
 }
 
 // פונקציה להצגת מודל עריכת טרייד
 function showEditTradeModal(trade) {
   console.log('הצגת מודל עריכת טרייד:', trade);
-  // TODO: Implement edit trade modal
-  alert(`עריכת טרייד ${trade.id} - ${trade.ticker_symbol} תתווסף בקרוב`);
+
+  // Populate the edit form with trade data
+  const editForm = document.getElementById('editTradeForm');
+  if (editForm) {
+    // Set form values
+    document.getElementById('editTradeId').value = trade.id;
+    document.getElementById('editTradeType').value = trade.type || '';
+    document.getElementById('editTradeSide').value = trade.side || '';
+    document.getElementById('editTradeAccount').value = trade.account_id || '';
+    document.getElementById('editTradeNotes').value = trade.notes || '';
+
+    // Set date if exists
+    if (trade.opened_at) {
+      const openedDate = new Date(trade.opened_at);
+      const dateStr = openedDate.toISOString().slice(0, 16);
+      document.getElementById('editTradeOpenedAt').value = dateStr;
+    }
+  }
+
+  // Show the modal
+  const modalElement = document.getElementById('editTradeModal');
+  if (modalElement) {
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  } else {
+    console.error('Edit trade modal element not found');
+  }
 }
 
 /**

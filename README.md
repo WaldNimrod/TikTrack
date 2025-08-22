@@ -12,7 +12,41 @@
 ## 📋 תיאור כללי
 TikTrack היא מערכת ניהול השקעות מתקדמת המאפשרת מעקב, תכנון וניהול השקעות בשוק ההון.
 
-## 🆕 **עדכונים אחרונים - השלמת CRUD למטבעות ותזרימי מזומנים**
+## 🆕 **עדכונים אחרונים - ארגון CSS מושלם**
+
+### ✅ **ארגון CSS מושלם - ארכיטקטורה חדשה:**
+- 🎨 **ארכיטקטורת CSS חדשה** - 6 קבצים מאורגנים עם אחריות ברורה
+- 🔄 **ביטול כפילויות** - 20+ הגדרות כפולות נוקו
+- 🧹 **ניקוי דריסות** - 10+ הגדרות דורסות נוקו
+- 📁 **היררכיה ברורה** - סדר טעינה מ-weakest ל-strongest
+- 🎯 **ארגון לפי קומפוננטים** - כל סגנון במקום המתאים
+
+### 🔧 **שינויים טכניים:**
+- **קבצים שהוסרו:** `menu.css`, `research_new.html`
+- **קבצים ששונו:** 34 קבצים (CSS + HTML)
+- **שורות שנוספו:** 1,734 שורות
+- **שורות שהוסרו:** 1,240 שורות
+
+### 📚 **דוקומנטציה חדשה:**
+- **CSS Architecture** - `documentation/frontend/css/CSS_ARCHITECTURE.md`
+- **CSS Organization Process** - `documentation/frontend/css/CSS_ORGANIZATION_PROCESS.md`
+- **CSS Variables Reference** - `documentation/frontend/css/CSS_VARIABLES.md`
+- **Component Style Guide** - `documentation/frontend/css/COMPONENT_STYLE_GUIDE.md`
+
+### 🏗️ **ארכיטקטורה חדשה:**
+```
+trading-ui/styles/
+├── apple-theme.css          # משתנים וסגנונות בסיס
+├── typography.css           # פונטים וכותרות
+├── styles.css              # קומפוננטים כלליים
+├── table.css               # סגנונות טבלאות
+├── header-system.css       # מערכת ראש דף
+└── research-summary.css    # סגנונות ייעודיים
+```
+
+---
+
+## 🆕 **Previous Updates - השלמת CRUD למטבעות ותזרימי מזומנים**
 
 ### ✅ **פונקציונאליות חדשה - CRUD מלא למטבעות:**
 - 💱 **דף ניהול מטבעות חדש** - `/currencies` עם ממשק גרافי מלא

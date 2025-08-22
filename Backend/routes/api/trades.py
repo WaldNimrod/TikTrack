@@ -223,11 +223,15 @@ def delete_trade(trade_id: int):
                 "message": "Trade deleted successfully",
                 "version": "v1"
             })
+        
+        # If deletion failed, it means there are linked items or trade not found
         return jsonify({
             "status": "error",
-            "error": {"message": "Trade not found"},
+            "error": {
+                "message": "Cannot delete trade - it has linked executions or other items"
+            },
             "version": "v1"
-        }), 404
+        }), 400
     except Exception as e:
         logger.error(f"Error deleting trade {trade_id}: {str(e)}")
         return jsonify({

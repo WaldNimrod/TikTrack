@@ -36,6 +36,18 @@ This directory contains all server-related documentation for the TikTrack system
 
 ### Starting the Server
 
+#### 🆕 **Complete Server Restart (Recommended)**
+```bash
+./restart_server_complete.sh
+```
+- **Complete server shutdown and restart**
+- **Automatic error detection and fixing**
+- **Comprehensive logging and monitoring**
+- **Cache and temporary files cleanup**
+- **Health checks and validation**
+- **Retry logic with up to 10 attempts**
+- **Port: 8080**
+
 #### Development Mode
 ```bash
 ./start_dev.sh

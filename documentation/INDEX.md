@@ -41,6 +41,7 @@ This index provides quick access to all documentation files in the TikTrack proj
 - [GUIDELINES.md](server/GUIDELINES.md) - Development guidelines
 - [ISSUES.md](server/ISSUES.md) - Server issues and problems
 - [TROUBLESHOOTING.md](server/TROUBLESHOOTING.md) - Server troubleshooting guide
+- **[RESTART_SCRIPT_GUIDE.md](server/RESTART_SCRIPT_GUIDE.md)** - Complete server restart script guide
 
 ### 🎨 **Frontend Documentation** (`frontend/`)
 - [README.md](frontend/README.md) - Frontend system overview

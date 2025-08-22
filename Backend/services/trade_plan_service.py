@@ -71,13 +71,23 @@ class TradePlanService:
     @staticmethod
     def delete(db: Session, plan_id: int) -> bool:
         """Delete trade plan"""
+        from models.trade import Trade
+        
         plan = db.query(TradePlan).filter(TradePlan.id == plan_id).first()
-        if plan:
-            db.delete(plan)
-            db.commit()
-            logger.info(f"Deleted trade plan: {plan_id}")
-            return True
-        return False
+        if not plan:
+            return False
+        
+        # Check for linked trades
+        trades = db.query(Trade).filter(Trade.trade_plan_id == plan_id).all()
+        if trades:
+            logger.warning(f"Cannot delete trade plan {plan_id}: has {len(trades)} linked trades")
+            return False
+        
+        # Safe to delete
+        db.delete(plan)
+        db.commit()
+        logger.info(f"Deleted trade plan: {plan_id}")
+        return True
     
     @staticmethod
     def cancel_plan(db: Session, plan_id: int, cancel_reason: str) -> Optional[TradePlan]:

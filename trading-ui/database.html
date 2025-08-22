@@ -1967,8 +1967,13 @@
 
       // פונקציות הצגת מודלים להוספה - משתמשות בפונקציות הכלליות
       function showAddAccountModal() {
-        // TODO: Implement add account modal
-        alert('פונקציית הוספת חשבון תתווסף בקרוב');
+        // Use existing function from accounts.js
+        if (typeof window.showAddAccountModal === 'function') {
+          window.showAddAccountModal();
+        } else {
+          console.error('showAddAccountModal function not available');
+          alert('פונקציית הוספת חשבון לא זמינה');
+        }
       }
 
       function showAddTickerModal() {
@@ -1979,8 +1984,13 @@
       // showAddTradeModal מוגדרת בקובץ trades.js
 
       function showAddTradePlanModal() {
-        // TODO: Implement add trade plan modal
-        alert('פונקציית הוספת תוכנית טרייד תתווסף בקרוב');
+        // Use existing function from planning.js
+        if (typeof window.showAddTradePlanModal === 'function') {
+          window.showAddTradePlanModal();
+        } else {
+          console.error('showAddTradePlanModal function not available');
+          alert('פונקציית הוספת תוכנית טרייד לא זמינה');
+        }
       }
 
       function showAddAlertModal() {
@@ -1989,8 +1999,13 @@
       }
 
       function showAddCashFlowModal() {
-        // TODO: Implement add cash flow modal
-        alert('פונקציית הוספת תזרים מזומנים תתווסף בקרוב');
+        // Use existing function from cash_flows.js
+        if (typeof window.showAddCashFlowModal === 'function') {
+          window.showAddCashFlowModal();
+        } else {
+          console.error('showAddCashFlowModal function not available');
+          alert('פונקציית הוספת תזרים מזומנים לא זמינה');
+        }
       }
 
       function showAddNoteModal() {
@@ -2019,8 +2034,13 @@
       }
 
       function showEditTradeModal(trade) {
-        // TODO: Implement edit trade modal
-        alert('פונקציית עריכת טרייד תתווסף בקרוב');
+        // Use existing function from trades.js
+        if (typeof window.showEditTradeModal === 'function') {
+          window.showEditTradeModal(trade);
+        } else {
+          console.error('showEditTradeModal function not available');
+          alert('פונקציית עריכת טרייד לא זמינה');
+        }
       }
 
       function showEditTradePlanModal(plan) {

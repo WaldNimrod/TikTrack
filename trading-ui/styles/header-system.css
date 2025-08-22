@@ -85,7 +85,7 @@
 #unified-header .header-wrapper {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -93,10 +93,12 @@
 }
 
 #unified-header .header-top {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
     border-bottom: 1px solid var(--apple-border-light);
     position: relative;
     min-height: 70px;
@@ -105,15 +107,17 @@
 }
 
 #unified-header .header-top .logo-section {
-    order: 2;
+    order: 3;
+    margin-right: auto;
 }
 
 #unified-header .header-top .header-nav {
     order: 1;
+    margin-left: auto;
 }
 
 #unified-header .header-top .filter-toggle-section {
-    order: 3;
+    order: 2;
 }
 
 #unified-header .page-title {
@@ -294,22 +298,25 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    color: var(--apple-text-primary);
+    color: #333333;
     text-decoration: none;
     border-radius: 8px;
     transition: all 0.2s ease;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
+    border: 2px solid transparent;
 }
 
 #unified-header .tiktrack-nav-link:hover {
     background: var(--apple-bg-secondary);
-    color: var(--apple-text-primary);
+    color: #333333;
 }
 
 #unified-header .tiktrack-nav-link.active {
-    background: var(--apple-accent-color);
-    color: white;
+    background: transparent;
+    color: #333333;
+    font-weight: 700;
+    border: 2px solid #26baac;
 }
 
 #unified-header .nav-icon {
@@ -317,12 +324,23 @@
 }
 
 #unified-header .nav-text {
-    font-weight: 500;
+    font-weight: 600;
+    color: #333333;
+}
+
+#unified-header .tiktrack-nav-link.active .nav-text {
+    color: #333333;
+    font-weight: 700;
 }
 
 #unified-header .tiktrack-dropdown-arrow {
     font-size: 0.8rem;
     transition: transform 0.2s ease;
+    color: #333333;
+}
+
+#unified-header .tiktrack-nav-link.active .tiktrack-dropdown-arrow {
+    color: #333333;
 }
 
 #unified-header .tiktrack-dropdown-menu {
@@ -346,13 +364,22 @@
 #unified-header .tiktrack-dropdown-item {
     display: block;
     padding: 0.5rem 1rem;
-    color: var(--apple-text-primary);
+    color: #333333;
     text-decoration: none;
     transition: background-color 0.2s ease;
+    font-weight: 500;
 }
 
 #unified-header .tiktrack-dropdown-item:hover {
     background: var(--apple-bg-secondary);
+    color: #333333;
+}
+
+#unified-header .tiktrack-dropdown-item.active {
+    background: transparent;
+    color: #333333;
+    font-weight: 600;
+    border: 1px solid #26baac;
 }
 
 #unified-header .dropdown-divider {
@@ -372,7 +399,7 @@
 /* תמיכה במכשירים ניידים */
 @media (max-width: 768px) {
     #unified-header .header-container {
-        padding: 0 1rem;
+        padding: 0;
         height: 44px;
     }
 
@@ -416,14 +443,11 @@
 
 /* אזור פילטרים */
 #unified-header .header-filters {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
     background: var(--apple-bg-elevated);
     border-top: 1px solid var(--apple-border-light);
-    padding: 1rem 2rem;
-    display: none;
-}
-
-#unified-header .header-filters.show {
-    display: block;
 }
 
 #unified-header .filters-container {
@@ -431,14 +455,15 @@
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
+    direction: rtl;
 }
 
 #unified-header .filter-group {
-    position: relative !important;
+    position: relative;
 }
 
 #unified-header .filter-dropdown {
-    position: relative !important;
+    position: relative;
 }
 
 #unified-header .filter-toggle {
@@ -466,50 +491,6 @@
     color: #28a745 !important;
     border-color: #28a745 !important;
     box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
-}
-
-/* שמירת המסגרת של השדה הראשי */
-#unified-header .status-filter-toggle.active {
-    border: 1px solid #28a745 !important;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
-    background: transparent !important;
-    color: #28a745 !important;
-}
-
-/* CSS ספציפי לכפתור פילטר סטטוס */
-#statusFilterToggle.active {
-    border: 1px solid #28a745 !important;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
-    background: transparent !important;
-    color: #28a745 !important;
-}
-
-/* CSS ספציפי לכפתור פילטר טיפוס */
-#typeFilterToggle.active {
-    border: 1px solid #28a745 !important;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
-    background: transparent !important;
-    color: #28a745 !important;
-}
-
-/* CSS ספציפי לכפתור פילטר חשבונות */
-#accountFilterToggle.active {
-    border: 1px solid #28a745 !important;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
-    background: transparent !important;
-    color: #28a745 !important;
-}
-
-/* CSS ספציפי לכפתור פילטר תאריכים */
-#dateRangeFilterToggle.active {
-    border: 1px solid #28a745 !important;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
-    background: transparent !important;
-    color: #28a745 !important;
-}
-
-#unified-header .filter-toggle.active .dropdown-arrow {
-    transform: rotate(180deg) !important;
 }
 
 #unified-header .filter-label {
@@ -540,65 +521,18 @@
     border-radius: 8px !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
     min-width: 180px !important;
-    width: auto !important;
     z-index: 10001 !important;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.2s ease;
-    margin-top: 5px;
     display: none;
-}
-
-/* סגנונות בסיס לפילטרים - רק למצב סגור */
-#unified-header .filter-menu {
-    position: absolute !important;
-    top: 100% !important;
-    right: 0 !important;
-    background: white !important;
-    border: 1px solid #e8e8e8 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    min-width: 180px !important;
-    width: auto !important;
-    z-index: 10001 !important;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.2s ease;
     margin-top: 5px;
-    display: none;
+    padding: 0.5rem 0;
 }
 
 /* סגנונות לפילטרים פתוחים */
 #unified-header .filter-menu.show {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
     display: block !important;
 }
 
-/* CSS ספציפי לפילטר סטטוס - רק תוספות מיוחדות */
-#statusFilterMenu.show {
-    flex-direction: unset !important;
-    align-items: unset !important;
-    justify-content: unset !important;
-    flex: unset !important;
-}
-
-/* CSS ספציפי לפילטר טיפוס - אין צורך בתוספות */
-
-/* CSS ספציפי לפילטר חשבונות - אין צורך בתוספות */
-
-/* CSS ספציפי לפילטר תאריכים - רק תוספות מיוחדות */
-#dateRangeFilterMenu {
-    max-height: 400px !important;
-    overflow-y: auto !important;
-}
-
-
-
-/* פריטי פילטר סטטוס ספציפיים */
+/* פריטי פילטר סטטוס */
 #statusFilterMenu .status-filter-item {
     display: flex !important;
     align-items: center !important;
@@ -629,23 +563,7 @@
     box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
 }
 
-/* הסתרת הנקודה במצב לא נבחר */
-#statusFilterMenu .status-filter-item .check-mark {
-    opacity: 0 !important;
-    visibility: hidden !important;
-}
-
-/* הצגת סימן V במצב נבחר */
-#statusFilterMenu .status-filter-item.selected .check-mark::before {
-    content: "✓" !important;
-    color: #28a745 !important;
-    font-weight: bold !important;
-    font-size: 1.2rem !important;
-    text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
-}
-
-/* ===== פילטר טיפוס ===== */
-/* פריטי פילטר טיפוס ספציפיים */
+/* פריטי פילטר טיפוס */
 #typeFilterMenu .type-filter-item {
     display: flex !important;
     align-items: center !important;
@@ -676,23 +594,7 @@
     box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
 }
 
-/* הסתרת הנקודה במצב לא נבחר */
-#typeFilterMenu .type-filter-item .check-mark {
-    opacity: 0 !important;
-    visibility: hidden !important;
-}
-
-/* הצגת סימן V במצב נבחר */
-#typeFilterMenu .type-filter-item.selected .check-mark::before {
-    content: "✓" !important;
-    color: #28a745 !important;
-    font-weight: bold !important;
-    font-size: 1.2rem !important;
-    text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
-}
-
-/* ===== פילטר חשבונות ===== */
-/* פריטי פילטר חשבונות ספציפיים */
+/* פריטי פילטר חשבונות */
 #accountFilterMenu .account-filter-item {
     display: flex !important;
     align-items: center !important;
@@ -704,6 +606,7 @@
     border-bottom: 1px solid #f0f0f0 !important;
     background: white !important;
     color: #333 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
 }
 
 #accountFilterMenu .account-filter-item:last-child {
@@ -738,8 +641,7 @@
     text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
 }
 
-/* ===== פילטר תאריכים ===== */
-/* פריטי פילטר תאריכים ספציפיים */
+/* פריטי פילטר תאריכים */
 #dateRangeFilterMenu .date-range-filter-item {
     display: flex !important;
     align-items: center !important;
@@ -770,384 +672,19 @@
     box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
 }
 
-/* הסתרת הנקודה בפילטר תאריכים */
-#dateRangeFilterMenu .date-range-filter-item .check-mark {
+/* הסתרת הנקודה במצב לא נבחר */
+#unified-header .filter-menu .check-mark {
     opacity: 0 !important;
     visibility: hidden !important;
 }
 
-/* הגדלת התפריט כדי למנוע גלילה */
-#dateRangeFilterMenu {
-    max-height: 400px !important;
-    overflow-y: auto !important;
-}
-
-/* ===== CSS ספציפי לכל התפריטים ===== */
-/* פילטר טיפוס */
-#unified-header #typeFilterMenu {
-    display: none !important;
-    position: absolute !important;
-    top: 100% !important;
-    left: 0 !important;
-    background: white !important;
-    border: 1px solid #ddd !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    z-index: 10001 !important;
-    min-width: 150px !important;
-    max-height: 200px !important;
-    overflow-y: auto !important;
-    flex-direction: unset !important;
-    align-items: unset !important;
-    justify-content: unset !important;
-    flex: unset !important;
-}
-
-#unified-header #typeFilterMenu.show {
-    display: block !important;
-}
-
-/* פילטר חשבונות */
-#unified-header #accountFilterMenu {
-    display: none !important;
-    position: absolute !important;
-    top: 100% !important;
-    left: 0 !important;
-    background: white !important;
-    border: 1px solid #ddd !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    z-index: 10001 !important;
-    min-width: 150px !important;
-    max-height: 200px !important;
-    overflow-y: auto !important;
-    flex-direction: unset !important;
-    align-items: unset !important;
-    justify-content: unset !important;
-    flex: unset !important;
-}
-
-#unified-header #accountFilterMenu.show {
-    display: block !important;
-}
-
-/* פילטר תאריכים */
-#unified-header #dateRangeFilterMenu {
-    display: none !important;
-    position: absolute !important;
-    top: 100% !important;
-    left: 0 !important;
-    background: white !important;
-    border: 1px solid #ddd !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    z-index: 10001 !important;
-    min-width: 150px !important;
-    max-height: 200px !important;
-    overflow-y: auto !important;
-    flex-direction: unset !important;
-    align-items: unset !important;
-    justify-content: unset !important;
-    flex: unset !important;
-}
-
-#unified-header #dateRangeFilterMenu.show {
-    display: block !important;
-}
-
-/* ===== פריטי פילטר טיפוס ===== */
-#unified-header #typeFilterMenu .type-filter-item {
-    padding: 8px 12px !important;
-    cursor: pointer !important;
-    transition: background-color 0.2s ease !important;
-    border-radius: 4px !important;
-    margin: 2px 4px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-}
-
-#unified-header #typeFilterMenu .type-filter-item:hover {
-    background-color: rgba(40, 167, 69, 0.05) !important;
-}
-
-#unified-header #typeFilterMenu .type-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.08) !important;
+/* הצגת סימן V במצב נבחר */
+#unified-header .filter-menu .filter-item.selected .check-mark::before {
+    content: "✓" !important;
     color: #28a745 !important;
-    font-weight: 500 !important;
-    border: none !important;
-    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
-}
-
-/* ===== פריטי פילטר חשבונות ===== */
-#unified-header #accountFilterMenu .account-filter-item {
-    padding: 8px 12px !important;
-    cursor: pointer !important;
-    transition: background-color 0.2s ease !important;
-    border-radius: 4px !important;
-    margin: 2px 4px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-}
-
-#unified-header #accountFilterMenu .account-filter-item:hover {
-    background-color: rgba(40, 167, 69, 0.05) !important;
-}
-
-#unified-header #accountFilterMenu .account-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.08) !important;
-    color: #28a745 !important;
-    font-weight: 500 !important;
-    border: none !important;
-    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
-}
-
-
-
-/* מיכל פילטר סטטוס */
-#unified-header .status-filter {
-    position: relative !important;
-}
-
-#unified-header .status-filter .filter-dropdown {
-    position: relative !important;
-}
-
-/* CSS חזק יותר לפילטר סטטוס */
-.status-filter .filter-dropdown {
-    position: relative !important;
-}
-
-.status-filter .filter-dropdown #statusFilterMenu {
-    position: absolute !important;
-    top: 100% !important;
-    right: 0 !important;
-    background: white !important;
-    border: 1px solid #e8e8e8 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    min-width: 180px !important;
-    width: auto !important;
-    z-index: 10001 !important;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.2s ease;
-    margin-top: 5px;
-    display: none;
-}
-
-.status-filter .filter-dropdown #statusFilterMenu.show {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
-    display: block !important;
-    position: absolute !important;
-    z-index: 10001 !important;
-    flex-direction: unset !important;
-    align-items: unset !important;
-    justify-content: unset !important;
-    flex: unset !important;
-}
-
-/* סגנונות פריטי פילטר */
-#unified-header .filter-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
-    white-space: nowrap;
-    min-width: 180px;
-    overflow: hidden;
-}
-
-#unified-header .filter-item:hover {
-    background-color: #f8f9fa;
-}
-
-#unified-header .filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.2) !important;
-    /* ירוק 20% שקוף */
-    color: #155724 !important;
-    border: 1px solid #28a745 !important;
-    font-weight: 600 !important;
-}
-
-/* סגנונות ספציפיים לפילטרים שונים */
-#unified-header .status-filter-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.4rem 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-#unified-header .status-filter-item:last-child {
-    border-bottom: none;
-}
-
-#unified-header .status-filter-item:hover {
-    background-color: #f8f9fa;
-    color: #29a6a8;
-}
-
-#unified-header .status-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.08) !important;
-    color: #28a745 !important;
-    border: none !important;
-    font-weight: 500 !important;
-    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
-}
-
-#unified-header .status-filter-item {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 0.4rem 1rem !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    font-size: 0.9rem !important;
-    border-bottom: 1px solid #f0f0f0 !important;
-}
-
-#unified-header .type-filter-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.4rem 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-#unified-header .type-filter-item:last-child {
-    border-bottom: none;
-}
-
-#unified-header .type-filter-item:hover {
-    background-color: #f8f9fa;
-    color: #29a6a8;
-}
-
-#unified-header .type-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.2) !important;
-    color: #155724 !important;
-    border: 1px solid #28a745 !important;
-    font-weight: 600 !important;
-}
-
-#unified-header .type-filter-item {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 0.4rem 1rem !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    font-size: 0.9rem !important;
-    border-bottom: 1px solid #f0f0f0 !important;
-}
-
-#unified-header .account-filter-item {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 0.4rem 1rem !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    font-size: 0.9rem !important;
-    border-bottom: 1px solid #f0f0f0 !important;
-}
-
-#unified-header .account-filter-item:last-child {
-    border-bottom: none;
-}
-
-#unified-header .account-filter-item:hover {
-    background-color: #f8f9fa;
-    color: #29a6a8;
-}
-
-#unified-header .account-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.2) !important;
-    color: #155724 !important;
-    border: 1px solid #28a745 !important;
-    font-weight: 600 !important;
-}
-
-#unified-header .date-range-filter-item {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 0.4rem 1rem !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    font-size: 0.9rem !important;
-    border-bottom: 1px solid #f0f0f0 !important;
-}
-
-#unified-header .date-range-filter-item:last-child {
-    border-bottom: none;
-}
-
-#unified-header .date-range-filter-item:hover {
-    background-color: #f8f9fa;
-    color: #29a6a8;
-}
-
-#unified-header .date-range-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.2) !important;
-    color: #155724 !important;
-    border: 1px solid #28a745 !important;
-    font-weight: 600 !important;
-}
-
-/* סגנונות כפתורי פילטר */
-#unified-header .filter-toggle {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 0.5rem 1rem !important;
-    background: white !important;
-    border: 1px solid #ddd !important;
-    border-radius: 6px !important;
-    cursor: pointer !important;
-    font-size: 0.9rem !important;
-    transition: all 0.2s ease !important;
-    min-width: 120px !important;
-}
-
-#unified-header .filter-toggle:hover {
-    border-color: #29a6a8;
-    background: #f8f9fa;
-}
-
-#unified-header .filter-toggle.active {
-    border-color: #29a6a8;
-    background: #e3f2fd;
-}
-
-/* סגנונות טקסט נבחר */
-#unified-header .selected-text {
-    color: #333;
-    font-weight: 500;
-}
-
-#unified-header .filter-arrow {
-    font-size: 0.8rem;
-    color: #666;
-    transition: transform 0.2s ease;
-}
-
-#unified-header .filter-toggle.active .filter-arrow {
-    transform: rotate(180deg);
+    font-weight: bold !important;
+    font-size: 1.2rem !important;
+    text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
 }
 
 /* סגנונות חיפוש */
@@ -1156,198 +693,47 @@
     position: relative;
 }
 
+#unified-header .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 200px;
+}
+
 #unified-header .search-filter-input {
     width: 100%;
     padding: 0.5rem 1rem 0.5rem 2rem;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
     font-size: 0.9rem;
-    transition: all 0.2s ease;
+    background: var(--apple-bg-elevated);
+    color: var(--apple-text-primary);
 }
 
 #unified-header .search-filter-input:focus {
     outline: none;
-    border-color: #29a6a8;
-    box-shadow: 0 0 0 2px rgba(41, 166, 168, 0.2);
+    border-color: var(--apple-accent);
+    box-shadow: 0 0 0 2px var(--apple-accent-bg);
 }
 
 #unified-header .search-clear-btn {
     position: absolute;
     left: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
     background: none;
     border: none;
-    color: #999;
+    color: var(--apple-text-secondary);
     cursor: pointer;
-    font-size: 0.8rem;
-    padding: 0.2rem;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
 }
 
 #unified-header .search-clear-btn:hover {
-    color: #666;
-}
-
-/* סגנונות כפתור הצג/הסתר פילטרים */
-#unified-header .filter-toggle-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 8px;
-    color: var(--apple-text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-#unified-header .filter-toggle-btn:hover {
     background: var(--apple-bg-secondary);
     color: var(--apple-text-primary);
 }
 
-#unified-header .filter-toggle-btn.collapsed .filter-arrow {
-    transform: rotate(180deg);
-}
-
-/* סגנונות כפתור פילטר */
-#unified-header .filter-toggle-section {
-    display: flex;
-    align-items: center;
-}
-
-#unified-header .filter-toggle-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 8px;
-    color: var(--apple-text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-#unified-header .filter-toggle-btn:hover {
-    background: var(--apple-bg-secondary);
-    color: var(--apple-text-primary);
-}
-
-#unified-header .filter-toggle-btn.collapsed .filter-arrow {
-    transform: rotate(180deg);
-}
-
-#unified-header .filter-arrow {
-    font-size: 1rem;
-    transition: transform 0.2s ease;
-}
-
-/* כפתור סגירת אזור הפילטרים */
-#unified-header .close-filters-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: var(--apple-bg-secondary);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 6px;
-    color: var(--apple-text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-left: auto;
-}
-
-#unified-header .close-filters-btn:hover {
-    background: var(--apple-bg-tertiary);
-    color: var(--apple-text-primary);
-    transform: scale(1.05);
-}
-
-#unified-header .close-filters-btn .close-icon {
-    font-size: 1rem;
-    font-weight: bold;
-}
-
-/* כפתור הצג/הסתר פילטרים */
-#unified-header .toggle-filters-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 8px;
-    color: var(--apple-text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-/* כפתור פילטר עגול */
-#unified-header .filter-toggle-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 50%;
-    color: var(--apple-text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-#unified-header .filter-toggle-btn:hover {
-    background: var(--apple-bg-secondary);
-    color: var(--apple-text-primary);
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-#unified-header .filter-toggle-btn.active {
-    background: var(--apple-accent-color);
-    color: white;
-    border-color: var(--apple-accent-color);
-    transform: scale(1.1);
-}
-
-#unified-header .filter-toggle-btn .filter-arrow {
-    font-size: 1rem;
-    transition: transform 0.2s ease;
-}
-
-#unified-header .filter-toggle-btn.active .filter-arrow {
-    transform: rotate(180deg);
-}
-
-#unified-header .toggle-filters-btn:hover {
-    background: var(--apple-bg-secondary);
-    color: var(--apple-text-primary);
-}
-
-#unified-header .toggle-filters-btn.active {
-    background: var(--apple-accent-color);
-    color: white;
-    border-color: var(--apple-accent-color);
-}
-
-#unified-header .toggle-filters-btn .toggle-icon {
-    font-size: 1rem;
-    transition: transform 0.2s ease;
-}
-
-#unified-header .toggle-filters-btn.active .toggle-icon {
-    transform: rotate(180deg);
-}
-
-/* סגנונות כפתור איפוס */
+/* כפתור איפוס - רקע לבן, מסגרת ואיקון ירוק */
 #unified-header .reset-filter {
     margin-left: auto;
 }
@@ -1357,127 +743,113 @@
     align-items: center;
     justify-content: center;
     width: 30px;
-    height: 27px;
-    background: white !important;
-    border: 1px solid #28a745 !important;
-    border-radius: 6px !important;
-    color: #28a745 !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    font-size: 0.8rem !important;
+    height: 30px;
+    background: white;
+    border: 2px solid #26baac;
+    border-radius: 6px;
+    color: #26baac;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
 }
 
 #unified-header .reset-btn:hover {
-    background: #f8f9fa !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2) !important;
-}
-
-/* כפתור איפוס מורחב */
-#unified-header .reset-filters-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 8px;
-    color: var(--apple-text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-left: auto;
-}
-
-#unified-header .reset-filters-btn:hover {
-    background: var(--apple-bg-secondary);
-    color: var(--apple-text-primary);
-    transform: scale(1.05);
-}
-
-#unified-header .reset-filters-btn .reset-icon {
-    font-size: 1rem;
-    transition: transform 0.2s ease;
-}
-
-#unified-header .reset-filters-btn:hover .reset-icon {
+    background: #f8f9fa;
     transform: rotate(180deg);
+    box-shadow: 0 2px 4px rgba(38, 186, 172, 0.3);
 }
 
 #unified-header .reset-icon {
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: transform 0.2s ease;
 }
 
-/* סגנונות חיפוש */
-#unified-header .search-filter {
+/* כפתורי פעולה - איפוס וניקוי צמודים */
+#unified-header .action-buttons {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    min-width: 250px;
+    margin-left: auto;
 }
 
-#unified-header .search-filter-input {
-    flex: 1;
-    padding: 0.5rem 1rem;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 8px;
-    color: var(--apple-text-primary);
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-}
-
-#unified-header .search-filter-input:focus {
-    outline: none;
-    border-color: var(--apple-accent-color);
-    box-shadow: 0 0 0 2px rgba(255, 156, 5, 0.2);
-}
-
-#unified-header .search-clear-btn {
+#unified-header .clear-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 30px;
-    height: 27px;
-    background: white !important;
-    border: 1px solid #ff9c05 !important;
-    border-radius: 6px !important;
-    color: #ff9c05 !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    font-size: 0.8rem !important;
+    height: 30px;
+    background: white;
+    border: 2px solid #ff9c05;
+    border-radius: 6px;
+    color: #ff9c05;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
 }
 
-#unified-header .search-clear-btn:hover {
-    background: #f8f9fa !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 2px 4px rgba(255, 156, 5, 0.2) !important;
+#unified-header .clear-btn:hover {
+    background: #fff8f0;
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(255, 156, 5, 0.3);
+}
+
+#unified-header .clear-icon {
+    font-size: 1rem;
+    font-weight: bold;
+    transition: transform 0.2s ease;
+}
+
+/* כפתור הצג/הסתר פילטרים - עגול ללא מסגרת, רקע לבן + צל */
+#unified-header .filter-toggle-section {
+    display: flex;
+    align-items: center;
+}
+
+/* כפתור פילטר ייחודי - עגול כתום ללא מסגרת */
+#unified-header .filter-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    color: #ff9c05;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -100px;
+    z-index: 1001;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+#unified-header .filter-toggle-btn.collapsed {
+    bottom: -20px;
+}
+
+#unified-header .filter-toggle-btn:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#unified-header .filter-toggle-btn.collapsed .filter-arrow {
+    transform: rotate(180deg);
+}
+
+#unified-header .filter-arrow {
+    transition: transform 0.2s ease;
+    color: #ff9c05;
+    font-weight: bold;
 }
 
 /* התאמה למסכים קטנים */
 @media (max-width: 768px) {
-    #unified-header .header-container {
-        padding: 0 1rem;
-        height: 44px;
-    }
-
-    #unified-header .nav-menu {
-        gap: 0;
-    }
-
-    #unified-header .nav-item {
-        padding: 0.5rem 0.625rem;
-        font-size: 0.8125rem;
-        margin: 0 0.0625rem;
-    }
-
-    #unified-header .logo-text {
-        font-size: 0.9375rem;
-    }
-
     #unified-header .header-filters {
-        padding: 1rem;
+        padding: 1rem 0;
     }
 
     #unified-header .filters-container {

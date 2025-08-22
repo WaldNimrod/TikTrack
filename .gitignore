@@ -67,8 +67,8 @@ temporary_backups/*.zip
 temporary_backups/*.tar.gz
 temporary_backups/*.rar
 
-# Documentation (local only)
-documentation/
+# Documentation (local only) - Now tracked in git
+# documentation/
 
 # Mockups (reference only)
 mockups/

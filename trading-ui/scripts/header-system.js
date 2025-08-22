@@ -621,6 +621,7 @@ class HeaderSystem {
                       <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                      <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="tiktrack-dropdown-item" href="/database">בסיס נתונים</a></li>
                       <li><a class="tiktrack-dropdown-item" href="/currencies">מטבעות</a></li>

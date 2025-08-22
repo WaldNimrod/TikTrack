@@ -77,7 +77,7 @@
 
 
   <!-- Modular grid files -->
-  <script src="scripts/app-header.js"></script>
+  <script src="scripts/header-system.js"></script>
   <script src="scripts/console-cleanup.js"></script>
   <script src="scripts/header-system.js"></script>
   <script src="scripts/filter-system.js"></script>
@@ -92,7 +92,8 @@
   <div class="background-wrapper">
 
     <!-- Application header -->
-    <app-header></app-header>
+    <!-- Unified Header System -->
+    <div id="unified-header-container"></div>
 
     <!-- Page body - all content after header -->
     <div class="page-body">
@@ -605,6 +606,18 @@
       document.addEventListener('DOMContentLoaded', function () {
         console.log('🚀 Initializing accounts page...');
         loadAccountsData();
+      });
+    </script>
+    <script>
+      // אתחול מערכת הכותרת החדשה
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof window.HeaderSystem !== "undefined") {
+          console.log("🔄 Initializing new unified header system...");
+          window.headerSystem = new window.HeaderSystem();
+          window.headerSystem.initialize();
+          window.filterSystem = new window.SimpleFilter();
+          window.filterSystem.initialize();
+        }
       });
     </script>
 </body>

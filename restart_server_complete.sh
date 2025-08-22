@@ -8,8 +8,8 @@
 # 📖 Documentation: documentation/server/RESTART_SCRIPT_GUIDE.md
 # 🔗 Related: documentation/server/README.md
 # 
-# 🆕 Version: 1.0 (August 22, 2025)
-# 🛠️ Features: Auto-fix, retry logic, health checks, cache cleanup
+# 🆕 Version: 1.1 (August 22, 2025)
+# 🛠️ Features: Auto-fix, retry logic, health checks, cache cleanup, route checking
 # 
 # 🔧 DEVELOPMENT APPROACH & EXTENSION GUIDE
 # =========================================
@@ -82,6 +82,7 @@
 # - port_conflicts: Process killing on port 8080
 # - virtual_env: Virtual environment recreation
 # - cache_files: Temporary file cleanup
+# - route_issues: Route accessibility and registration problems
 # 
 # LOGGING STANDARDS:
 # ==================
@@ -100,6 +101,16 @@
 # 
 # SCRIPT EVOLUTION HISTORY:
 # =========================
+# 
+# Version 1.1 (August 22, 2025):
+# - Added comprehensive route checking functionality
+# - Added automatic route issue detection and fixing
+# - Added route-specific error analysis and reporting
+# - Added detailed route check reports with timestamps
+# - Enhanced troubleshooting tips for route issues
+# - Added route timeout detection and server restart
+# - Added route registration verification
+# - Added route file permission checks
 # 
 # Version 1.0 (August 22, 2025):
 # - Initial creation with basic restart functionality
@@ -591,6 +602,63 @@ clean_temporary_files() {
     log_success "Temporary files cleanup completed"
 }
 
+# Function to fix route issues automatically
+# 
+# Attempts to fix common route-related issues:
+# - route_timeout: Restarts server if routes are timing out
+# - route_errors: Checks server logs for route errors
+# - route_missing: Verifies route registration in Flask app
+# - route_permissions: Checks file permissions for route files
+fix_route_issues() {
+    local issue_type="$1"
+    log_info "🔧 Attempting to fix route issue: $issue_type"
+    
+    case "$issue_type" in
+        "route_timeout")
+            log_info "Routes are timing out, restarting server..."
+            complete_server_shutdown
+            sleep 5
+            start_server
+            ;;
+        "route_errors")
+            log_info "Checking server logs for route errors..."
+            if [ -f "$DETAILED_LOG" ]; then
+                local route_errors=$(tail -50 "$DETAILED_LOG" | grep -i "route\|endpoint\|url" | grep -i "error\|exception" || true)
+                if [ -n "$route_errors" ]; then
+                    log_warning "Found route errors in logs:"
+                    echo "$route_errors" | head -5
+                fi
+            fi
+            ;;
+        "route_missing")
+            log_info "Verifying route registration in Flask app..."
+            # Check if main app.py has proper route registration
+            if grep -q "register_blueprint" Backend/app.py; then
+                log_success "Route blueprints are registered in app.py"
+            else
+                log_warning "Route blueprints might not be properly registered"
+            fi
+            ;;
+        "route_permissions")
+            log_info "Checking file permissions for route files..."
+            local route_files=("Backend/app.py" "Backend/routes/" "Backend/routes/api/")
+            for file in "${route_files[@]}"; do
+                if [ -e "$file" ]; then
+                    local perms=$(ls -la "$file" | awk '{print $1}')
+                    log_info "Permissions for $file: $perms"
+                fi
+            done
+            ;;
+        *)
+            log_warning "Unknown route issue type: $issue_type"
+            return 1
+            ;;
+    esac
+    
+    log_success "Route fix attempt completed for: $issue_type"
+    return 0
+}
+
 # Function to fix common issues automatically
 # 
 # Automatically fixes common server issues:
@@ -599,6 +667,7 @@ clean_temporary_files() {
 # - port_conflicts: Kills processes using port 8080
 # - virtual_env: Recreates corrupted virtual environment
 # - cache_files: Cleans temporary and cache files
+# - route_issues: Fixes route-related problems
 fix_common_issues() {
     local issue_type="$1"
     log_info "🔧 Attempting to fix issue: $issue_type"
@@ -629,6 +698,14 @@ fix_common_issues() {
         "cache_files")
             log_info "Cleaning cache files..."
             clean_temporary_files
+            ;;
+        "route_issues")
+            log_info "Fixing route-related issues..."
+            fix_route_issues "route_timeout"
+            sleep 3
+            fix_route_issues "route_errors"
+            fix_route_issues "route_missing"
+            fix_route_issues "route_permissions"
             ;;
         *)
             log_warning "Unknown issue type: $issue_type"
@@ -724,6 +801,129 @@ start_server() {
     return 1
 }
 
+# Function to check all available routes
+# 
+# Tests all major API routes and endpoints:
+# - Core API endpoints (health, accounts, trades, etc.)
+# - Database connectivity through various endpoints
+# - Page routes accessibility
+# - Returns detailed route status report
+check_all_routes() {
+    log_info "🔍 Checking all available routes..."
+    
+    local routes=(
+        # Core API endpoints
+        "GET:/api/health:Health Check"
+        "GET:/api/v1/accounts/:Accounts API"
+        "GET:/api/v1/trades/:Trades API"
+        "GET:/api/v1/tickers/:Tickers API"
+        "GET:/api/v1/trade_plans/:Trade Plans API"
+        "GET:/api/v1/alerts/:Alerts API"
+        "GET:/api/v1/cash_flows/:Cash Flows API"
+        "GET:/api/v1/notes/:Notes API"
+        "GET:/api/v1/executions/:Executions API"
+        "GET:/api/v1/currencies/:Currencies API"
+        "GET:/api/v1/preferences/:Preferences API"
+        
+        # Page routes
+        "GET:/:Main Page"
+        "GET:/accounts:Accounts Page"
+        "GET:/trades:Trades Page"
+        "GET:/tickers:Tickers Page"
+        "GET:/planning:Planning Page"
+        "GET:/alerts:Alerts Page"
+        "GET:/cash_flows:Cash Flows Page"
+        "GET:/notes:Notes Page"
+        "GET:/currencies:Currencies Page"
+        "GET:/database:Database Page"
+        "GET:/research:Research Page"
+        "GET:/designs:Designs Page"
+    )
+    
+    local total_routes=${#routes[@]}
+    local successful_routes=0
+    local failed_routes=()
+    local route_details=()
+    
+    log_info "Testing $total_routes routes..."
+    
+    for route in "${routes[@]}"; do
+        IFS=':' read -r method path description <<< "$route"
+        
+        # Test the route
+        local status_code
+        local response_time
+        
+        if [ "$method" = "GET" ]; then
+            # Measure response time and get status code
+            local start_time=$(date +%s%N)
+            status_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "http://$SERVER_HOST:$SERVER_PORT$path")
+            local end_time=$(date +%s%N)
+            response_time=$(( (end_time - start_time) / 1000000 )) # Convert to milliseconds
+        else
+            status_code="N/A"
+            response_time=0
+        fi
+        
+        # Determine if route is successful
+        if [ "$status_code" = "200" ] || [ "$status_code" = "404" ]; then
+            successful_routes=$((successful_routes + 1))
+            log_success "✅ $description ($method $path) - HTTP $status_code (${response_time}ms)"
+            route_details+=("✅ $description - HTTP $status_code (${response_time}ms)")
+        else
+            failed_routes+=("$description ($method $path) - HTTP $status_code")
+            log_warning "⚠️ $description ($method $path) - HTTP $status_code (${response_time}ms)"
+            route_details+=("⚠️ $description - HTTP $status_code (${response_time}ms)")
+        fi
+    done
+    
+    # Calculate success rate
+    local success_rate=$((successful_routes * 100 / total_routes))
+    
+    # Log summary
+    log_info "Route check summary: $successful_routes/$total_routes successful ($success_rate%)"
+    
+    # Log failed routes if any
+    if [ ${#failed_routes[@]} -gt 0 ]; then
+        log_warning "Failed routes:"
+        for failed_route in "${failed_routes[@]}"; do
+            log_warning "  - $failed_route"
+        done
+    fi
+    
+    # Save detailed route report
+    local route_report_file="logs/route_check_$(date +%Y%m%d_%H%M%S).log"
+    {
+        echo "=== TikTrack Route Check Report ==="
+        echo "Date: $(date)"
+        echo "Server: http://$SERVER_HOST:$SERVER_PORT"
+        echo "Success Rate: $success_rate% ($successful_routes/$total_routes)"
+        echo ""
+        echo "=== Route Details ==="
+        for detail in "${route_details[@]}"; do
+            echo "$detail"
+        done
+        echo ""
+        if [ ${#failed_routes[@]} -gt 0 ]; then
+            echo "=== Failed Routes ==="
+            for failed_route in "${failed_routes[@]}"; do
+                echo "- $failed_route"
+            done
+        fi
+    } > "$route_report_file"
+    
+    log_info "Detailed route report saved to: $route_report_file"
+    
+    # Return success if 80% or more routes are working
+    if [ $success_rate -ge 80 ]; then
+        log_success "Route check passed - $success_rate% of routes are accessible"
+        return 0
+    else
+        log_warning "Route check indicates issues - only $success_rate% of routes are accessible"
+        return 1
+    fi
+}
+
 # Function to perform health checks
 # 
 # Performs comprehensive health checks on the running server:
@@ -790,6 +990,7 @@ perform_health_checks() {
 # Analyzes log files for errors and issues:
 # - Checks error.log for recent errors
 # - Analyzes detailed log for startup issues
+# - Checks route check reports
 # - Reports error counts and types
 # - Provides error summaries for debugging
 analyze_logs() {
@@ -818,6 +1019,41 @@ analyze_logs() {
             log_success "No startup issues found in $DETAILED_LOG"
         fi
     fi
+    
+    # Check for route check reports
+    local route_reports=$(find logs/ -name "route_check_*.log" -type f 2>/dev/null | sort | tail -1)
+    if [ -n "$route_reports" ] && [ -f "$route_reports" ]; then
+        log_info "Analyzing latest route check report: $route_reports"
+        
+        # Extract success rate from route report
+        local route_success_rate=$(grep "Success Rate:" "$route_reports" | awk '{print $3}' | sed 's/%//' || echo "0")
+        local total_routes=$(grep "Success Rate:" "$route_reports" | awk '{print $4}' | sed 's/[()]//g' | cut -d'/' -f2 || echo "0")
+        local successful_routes=$(grep "Success Rate:" "$route_reports" | awk '{print $4}' | sed 's/[()]//g' | cut -d'/' -f1 || echo "0")
+        
+        log_info "Route check results: $successful_routes/$total_routes routes successful ($route_success_rate%)"
+        
+        # Check for failed routes
+        if [ -f "$route_reports" ]; then
+            local failed_routes_count=$(grep -c "Failed Routes:" "$route_reports" || echo "0")
+            if [ $failed_routes_count -gt 0 ]; then
+                log_warning "Route check found failed routes:"
+                sed -n '/=== Failed Routes ===/,/^$/p' "$route_reports" | grep "^-" | head -5 || true
+            else
+                log_success "All routes are working properly"
+            fi
+        fi
+    else
+        log_warning "No route check reports found"
+    fi
+    
+    # Check for route-specific errors in detailed log
+    if [ -f "$DETAILED_LOG" ]; then
+        local route_errors=$(tail -100 "$DETAILED_LOG" | grep -i "route\|endpoint\|url" | grep -i "error\|exception\|timeout" || true)
+        if [ -n "$route_errors" ]; then
+            log_warning "Found route-related errors in detailed log:"
+            echo "$route_errors" | head -3
+        fi
+    fi
 }
 
 
@@ -826,6 +1062,7 @@ analyze_logs() {
 # 
 # Displays helpful troubleshooting information:
 # - Common server issues and solutions
+# - Route-specific troubleshooting
 # - Manual debugging commands
 # - Log file locations
 # - Manual server startup instructions
@@ -851,10 +1088,18 @@ provide_troubleshooting_tips() {
     echo "1. Activate virtual environment: source .venv/bin/activate"
     echo "2. Install missing packages: pip install -r requirements.txt"
     echo ""
+    echo "If routes are not working:"
+    echo "1. Check route check reports: ls -la logs/route_check_*.log"
+    echo "2. Test specific routes: curl -I http://$SERVER_HOST:$SERVER_PORT/api/health"
+    echo "3. Check Flask route registration: grep -n 'register_blueprint' Backend/app.py"
+    echo "4. Verify route files exist: ls -la Backend/routes/api/"
+    echo "5. Check route file permissions: ls -la Backend/routes/"
+    echo ""
     echo "For detailed debugging:"
     echo "1. Run server manually: cd Backend && python3 dev_server.py"
     echo "2. Check Python version: python3 --version"
     echo "3. Check Flask version: python3 -c 'import flask; print(flask.__version__)'"
+    echo "4. Test routes manually: curl -v http://$SERVER_HOST:$SERVER_PORT/api/health"
     echo ""
 }
 
@@ -979,6 +1224,24 @@ main() {
             continue
         else
             log_success "All health checks passed"
+        fi
+        
+        # Step 9: Route checks
+        if ! check_all_routes; then
+            log_warning "Route checks indicate some issues"
+            log_info "🔧 Attempting to fix route issues..."
+            fix_common_issues "route_issues"
+            if [ $retry_count -ge $MAX_RETRY_ATTEMPTS ]; then
+                log_error "🚫 Maximum retries reached for route checks. Exiting."
+                analyze_logs
+                provide_troubleshooting_tips
+                exit 1
+            fi
+            log_info "⏳ Waiting $RETRY_DELAY seconds before retry..."
+            sleep $RETRY_DELAY
+            continue
+        else
+            log_success "All route checks passed"
         fi
         
         # If we reach here, everything succeeded

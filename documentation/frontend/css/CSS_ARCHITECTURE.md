@@ -67,12 +67,12 @@ The new header system is completely independent and does not rely on the old `ap
 The filter system includes:
 
 ###### Status Filter
-- Options: פתוח, סגור, בוטל
+- Options: Open, Closed, Canceled
 - Multi-select capability
 - Visual indicators for selected items
 
 ###### Type Filter
-- Options: סווינג, השקעה, פסיבי
+- Options: Swing, Investment, Passive
 - Multi-select capability
 - Dynamic text updates
 
@@ -83,7 +83,7 @@ The filter system includes:
 - **Uniform styling** with other filters
 
 ###### Date Range Filter
-- Options: היום, אתמול, השבוע, שבוע אחרון, חודש אחרון, 3 חודשים, MTD, YTD, 30 יום, 60 יום, 90 יום, שנה, שנה קודמת, כל זמן
+- Options: Today, Yesterday, This Week, Last Week, Last Month, 3 Months, MTD, YTD, 30 Days, 60 Days, 90 Days, Year, Previous Year, All Time
 - Single-select (exclusive)
 - Date calculation logic
 
@@ -388,10 +388,10 @@ window.clearAllFilters = function() { ... }
 ##### 2. Filter State Structure
 ```javascript
 {
-  status: ['פתוח', 'סגור'],
-  type: ['סווינג', 'השקעה'],
-  account: ['חשבון ראשי'],
-  dateRange: ['השבוע'],
+  status: ['Open', 'Closed'],
+  type: ['Swing', 'Investment'],
+  account: ['Main Account'],
+  dateRange: ['This Week'],
   search: 'AAPL'
 }
 ```
@@ -466,8 +466,8 @@ document.addEventListener('DOMContentLoaded', () => {
 ```javascript
 // Update account filter with real data
 window.updateAccountFilterMenu([
-  { id: 1, name: 'חשבון ראשי' },
-  { id: 2, name: 'חשבון משני' }
+  { id: 1, name: 'Main Account' },
+  { id: 2, name: 'Secondary Account' }
 ]);
 ```
 
@@ -475,7 +475,7 @@ window.updateAccountFilterMenu([
 ```javascript
 // Listen for filter changes
 if (window.filterSystem) {
-  window.filterSystem.updateFilter('status', ['פתוח']);
+  window.filterSystem.updateFilter('status', ['Open']);
 }
 ```
 

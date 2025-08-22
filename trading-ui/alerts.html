@@ -47,7 +47,7 @@
   <link rel="stylesheet" href="styles/header-system.css">
 
   <!-- Modular grid files -->
-  <script src="scripts/app-header.js"></script>
+  <script src="scripts/header-system.js"></script>
   <script src="scripts/console-cleanup.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/grid-filters.js"></script>
@@ -60,7 +60,8 @@
   <div class="background-wrapper">
 
     <!-- Application header -->
-    <app-header></app-header>
+    <!-- Unified Header System -->
+    <div id="unified-header-container"></div>
 
     <!-- Page body - All content after header -->
     <div class="page-body">
@@ -447,7 +448,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Global Scripts - Global scripts -->
-    <script src="scripts/app-header.js"></script>
+    <script src="scripts/header-system.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/grid-filters.js"></script>
     <script src="scripts/active-alerts-component.js"></script>
@@ -457,6 +458,18 @@
     <script src="scripts/alerts.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+    <script>
+      // אתחול מערכת הכותרת החדשה
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof window.HeaderSystem !== "undefined") {
+          console.log("🔄 Initializing new unified header system...");
+          window.headerSystem = new window.HeaderSystem();
+          window.headerSystem.initialize();
+          window.filterSystem = new window.SimpleFilter();
+          window.filterSystem.initialize();
+        }
+      });
+    </script>
 </body>
 
 </html>

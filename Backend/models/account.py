@@ -35,7 +35,7 @@ class Account(BaseModel):
     
     # Database columns - matching actual database schema
     name = Column(String(100), nullable=False)
-    currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False)
+    currency = Column(String(3), nullable=True)  # Currency symbol (USD, EUR, etc.)
     status = Column(String(20), default='open')
     cash_balance = Column(Float, default=0)
     total_value = Column(Float, default=0)
@@ -43,8 +43,7 @@ class Account(BaseModel):
     notes = Column(String(500))
     
     # Relationships with other entities
-    # Each account belongs to one currency
-    currency = relationship("Currency", backref="accounts")
+    # Currency is now a simple string field, not a relationship
     
     # Each account can have multiple trades
     trades = relationship("Trade", back_populates="account", cascade="all, delete-orphan")
@@ -62,7 +61,7 @@ class Account(BaseModel):
     
     def __repr__(self) -> str:
         """String representation of the Account object."""
-        currency_symbol = self.currency.symbol if self.currency else 'N/A'
+        currency_symbol = self.currency if self.currency else 'N/A'
         return f"<Account(name='{self.name}', currency='{currency_symbol}', status='{self.status}')>"
     
     def to_dict(self) -> Dict[str, Any]:
@@ -75,8 +74,7 @@ class Account(BaseModel):
         return {
             'id': self.id,
             'name': self.name,
-            'currency_id': self.currency_id,
-            'currency': self.currency.to_dict() if self.currency else None,
+            'currency': self.currency,
             'status': self.status,
             'cash_balance': self.cash_balance,
             'total_value': self.total_value,
@@ -98,7 +96,7 @@ class Account(BaseModel):
     
     def get_balance_info(self) -> Dict[str, str]:
         """Get formatted balance information for display."""
-        currency_symbol = self.currency.symbol if self.currency else 'N/A'
+        currency_symbol = self.currency if self.currency else 'N/A'
         return {
             'cash_balance': f"{self.cash_balance:,.2f} {currency_symbol}" if self.cash_balance else "0.00",
             'total_value': f"{self.total_value:,.2f} {currency_symbol}" if self.total_value else "0.00",

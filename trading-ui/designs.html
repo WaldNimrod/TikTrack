@@ -174,7 +174,7 @@
                     <td>$750.00</td>
                     <td>$900.00</td>
                     <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-canceled">מבוטל</span></td>
+                    <td><span class="status-badge status-cancelled">מבוטל</span></td>
                     <td class="actions-cell">
                       <button class="btn btn-sm btn-secondary" onclick="editDesign('7')" title="ערוך">
                         <span class="btn-icon">✏️</span>
@@ -191,7 +191,7 @@
                     <td>$380.00</td>
                     <td>$300.00</td>
                     <td>$0.00 (0.0%)</td>
-                    <td><span class="status-badge status-canceled">מבוטל</span></td>
+                    <td><span class="status-badge status-cancelled">מבוטל</span></td>
                     <td class="actions-cell">
                       <button class="btn btn-sm btn-secondary" onclick="editDesign('6')" title="ערוך">
                         <span class="btn-icon">✏️</span>
@@ -392,18 +392,11 @@
     <!-- Modular files -->
     <script src="scripts/app-header.js"></script>
     <script src="scripts/account-modal.js"></script>
+    <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/designs.js"></script>
 
-    <!-- Console message cleanup -->
+    <!-- Page initialization -->
     <script>
-      // Clear console messages after short time
-      setTimeout(() => {
-        console.log('🧹 Clearing console messages to reduce clutter...');
-        if (console.clear) {
-          console.clear();
-        }
-      }, 25000);
-
       // Page initialization
       document.addEventListener('DOMContentLoaded', function () {
         console.log('🔄 Initializing designs page...');

@@ -10,13 +10,13 @@ class TradePlan(BaseModel):
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
     investment_type = Column(String(20), default='swing', nullable=True)
     side = Column(String(10), default='Long', nullable=True)  # Long, Short
-    status = Column(String(20), default='open', nullable=True)
+    status = Column(String(20), default='open', nullable=True)  # open, closed, cancelled
     planned_amount = Column(Float, default=0, nullable=True)
     entry_conditions = Column(String(500), nullable=True)
     stop_price = Column(Float, nullable=True)
     target_price = Column(Float, nullable=True)
     reasons = Column(String(500), nullable=True)
-    canceled_at = Column(DateTime, nullable=True)
+    cancelled_at = Column(DateTime, nullable=True)
     cancel_reason = Column(String(500), nullable=True)
     
     # Relationships

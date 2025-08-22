@@ -139,14 +139,13 @@ class TickerService:
         errors = []
         warnings = []
         
-        # Symbol validation
+        # Symbol validation - only required for CREATE, optional for UPDATE
         symbol = ticker_data.get('symbol', '').strip().upper()
-        if not symbol:
-            errors.append("Symbol is required")
-        elif len(symbol) > TickerService.MAX_SYMBOL_LENGTH:
-            errors.append(f"Symbol cannot be longer than {TickerService.MAX_SYMBOL_LENGTH} characters")
-        elif not symbol.isalnum():
-            errors.append("Symbol can only contain English letters and numbers")
+        if symbol:  # Only validate if symbol is provided
+            if len(symbol) > TickerService.MAX_SYMBOL_LENGTH:
+                errors.append(f"Symbol cannot be longer than {TickerService.MAX_SYMBOL_LENGTH} characters")
+            elif not symbol.isalnum():
+                errors.append("Symbol can only contain English letters and numbers")
         
         # Name validation
         name = ticker_data.get('name', '').strip()

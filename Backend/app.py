@@ -77,7 +77,29 @@ CORS(app)
 # Initialize new architecture
 logger = setup_logging()
 app.logger = logger
-init_db()
+
+# Add detailed logging for server startup
+logger.info("🚀 Starting TikTrack server...")
+logger.info("📁 Current working directory: %s", os.getcwd())
+logger.info("🐍 Python version: %s", sys.version)
+try:
+    import flask
+    logger.info("📦 Flask version: %s", flask.__version__)
+except:
+    logger.info("📦 Flask version: unknown")
+
+try:
+    logger.info("🗄️ Initializing database...")
+    init_db()
+    logger.info("✅ Database initialized successfully")
+except Exception as e:
+    logger.error("❌ Database initialization failed: %s", str(e))
+    logger.error("🔍 Full error details: %s", e.__class__.__name__)
+    import traceback
+    logger.error("📋 Traceback: %s", traceback.format_exc())
+    sys.exit(1)
+
+logger.info("✅ Server initialization completed")
 
 # Register blueprints
 app.register_blueprint(accounts_bp)
@@ -398,7 +420,7 @@ def get_trade_plans() -> Any:
         tp.target_price,
         tp.reasons,
         tp.created_at,
-        tp.canceled_at,
+        tp.cancelled_at,
         tp.cancel_reason,
         t.symbol as ticker_symbol,
         t.name as ticker_name,
@@ -477,7 +499,7 @@ def get_trade_plan(plan_id: int) -> Any:
             tp.target_price,
             tp.reasons,
             tp.created_at,
-            tp.canceled_at,
+            tp.cancelled_at,
             tp.cancel_reason,
             t.symbol as ticker,
             t.symbol as ticker_name,

@@ -1,26 +1,26 @@
-# רשימת TO-DO לבדיקות CRUD סופיות - TikTrack
+# Final CRUD Testing TODO List - TikTrack
 
-## 🎯 מטרה
-להשלים את כל בדיקות CRUD ולפתור את הבעיות הפתוחות שזוהו בדוח.
+## 🎯 Goal
+Complete all CRUD tests and resolve open issues identified in the report.
 
-## ⚠️ בעיות פתוחות שדורשות טיפול
+## ⚠️ Open Issues Requiring Attention
 
-### 1. Tickers UPDATE - עדיין לא עובד
-**תיאור:** למרות התיקון בקוד, השרת עדיין מחזיר שגיאה "Symbol is required"
-**סטטוס:** 🔄 תוקן בקוד אבל לא נטען בשרת
+### 1. Tickers UPDATE - Still not working
+**Description:** Despite code fix, server still returns "Symbol is required" error
+**Status:** 🔄 Fixed in code but not loaded on server
 
-### 2. Trade Plans CANCEL - לא עובד
-**תיאור:** פעולת ביטול לא משנה את הסטטוס מ-"open" ל-"canceled"
-**סטטוס:** ❌ לא נבדק עדיין
+### 2. Trade Plans CANCEL - Not working
+**Description:** Cancel operation doesn't change status from "open" to "cancelled"
+**Status:** ❌ Not tested yet
 
-## 📋 רשימת בדיקות סופיות
+## 📋 Final Testing Checklist
 
-### שלב 1: תיקון בעיות פתוחות
-- [ ] בדיקת Tickers UPDATE
-- [ ] בדיקת Trade Plans CANCEL
-- [ ] תיקון בעיות אם נדרש
+### Step 1: Fix Open Issues
+- [ ] Test Tickers UPDATE
+- [ ] Test Trade Plans CANCEL
+- [ ] Fix issues if required
 
-### שלב 2: בדיקה סופית של כל CRUD
+### Step 2: Final CRUD Testing for All
 - [ ] Accounts: CREATE, READ, UPDATE, DELETE
 - [ ] Tickers: CREATE, READ, UPDATE, DELETE
 - [ ] Trades: CREATE, READ, UPDATE, CLOSE, CANCEL
@@ -30,26 +30,26 @@
 - [ ] Alerts: CREATE, READ, UPDATE, DELETE
 - [ ] Cash Flows: CREATE, READ, UPDATE, DELETE
 
-### שלב 3: עדכון דוח סופי
-- [ ] עדכון סטטוס כל הבדיקות
-- [ ] תיעוד בעיות שנותרו
-- [ ] המלצות להמשך
+### Step 3: Update Final Report
+- [ ] Update status of all tests
+- [ ] Document remaining issues
+- [ ] Recommendations for continuation
 
-## 🚀 פקודות לביצוע
+## 🚀 Commands to Execute
 
-### בדיקת Tickers UPDATE:
+### Testing Tickers UPDATE:
 ```bash
 curl -s -X PUT http://localhost:8080/api/v1/tickers/1 \
   -H "Content-Type: application/json" \
-  -d '{"name": "Test Stock Updated", "remarks": "טיקר מעודכן"}'
+  -d '{"name": "Test Stock Updated", "remarks": "Updated ticker"}'
 ```
 
-### בדיקת Trade Plans CANCEL:
+### Testing Trade Plans CANCEL:
 ```bash
 curl -s -X PUT http://localhost:8080/api/v1/trade-plans/1/cancel
 ```
 
-### בדיקות CRUD מלאות לכל ישות:
+### Complete CRUD Tests for All Entities:
 ```bash
 # Accounts
 curl -s http://localhost:8080/api/v1/accounts/
@@ -102,5 +102,6 @@ curl -s -X DELETE http://localhost:8080/api/v1/cash-flows/1
 ```
 
 ---
-**תאריך יצירה:** 22 באוגוסט 2025
-**סטטוס:** 🔄 בהכנה לביצוע
+**Creation Date:** August 22, 2025
+**Status:** 🔄 Preparing for execution
+

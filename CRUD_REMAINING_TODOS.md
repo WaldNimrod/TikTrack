@@ -24,7 +24,7 @@
 **סטטוס:** 🔴 דורש תיקון
 
 ### 4. Trade Plans CANCEL - בעיה קטנה
-**תיאור:** הסטטוס לא משתנה ל-"canceled" למרות שיש `canceled_at`
+**תיאור:** הסטטוס לא משתנה ל-"cancelled" למרות שיש `cancelled_at`
 **מיקום:** `Backend/models/trade_plan.py` או `Backend/services/trade_plan_service.py`
 **סטטוס:** ⚠️ בעיה קטנה
 
@@ -100,3 +100,4 @@ curl -s -X DELETE http://localhost:8080/api/v1/cash_flows/1
 ---
 **תאריך יצירה:** 22 באוגוסט 2025
 **סטטוס:** 🔄 בהכנה לביצוע
+

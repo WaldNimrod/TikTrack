@@ -690,7 +690,7 @@ function getTradesStatusForSort(status) {
     case 'open': return 1;
     case 'closed': return 2;
     case 'cancelled': return 3;
-    case 'canceled': return 3;
+    case 'cancelled': return 3;
     default: return 0;
   }
 }

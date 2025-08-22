@@ -136,6 +136,80 @@ async function updateTimezone(value) {
 }
 
 /**
+ * מעדכן את זמן ניקוי הקונסולה במערכת
+ * 
+ * פונקציה זו נקראת כאשר המשתמש משנה את זמן ניקוי הקונסולה
+ * היא שומרת את ההגדרה החדשה לשרת ומציגה משוב למשתמש
+ * 
+ * @param {string} value - זמן הניקוי החדש במילישניות (למשל: '60000' לדקה אחת)
+ * @returns {Promise<void>}
+ * 
+ * @example
+ * // עדכון זמן ניקוי לדקה אחת
+ * updateConsoleCleanupInterval('60000');
+ * 
+ * @example
+ * // ביטול ניקוי אוטומטי
+ * updateConsoleCleanupInterval('0');
+ */
+async function updateConsoleCleanupInterval(value) {
+  console.log('🔄 עדכון זמן ניקוי קונסולה:', value);
+
+  // וידוא שהערך תקין
+  const numValue = parseInt(value);
+  if (isNaN(numValue) || numValue < 0) {
+    showNotification('זמן ניקוי הקונסולה חייב להיות מספר חיובי או 0', 'error');
+    return;
+  }
+
+  // מסמן שיש שינויים
+  markAsChanged();
+
+  // מציאת אלמנטי הממשק
+  const selectElement = document.getElementById('consoleCleanupIntervalSelect');
+  const preferenceItem = selectElement.closest('.preference-item');
+
+  // הוספת מצב טעינה לממשק
+  preferenceItem.classList.add('loading');
+
+  try {
+    // שמירת ההגדרה החדשה לשרת
+    const success = await savePreference('consoleCleanupInterval', numValue);
+
+    if (success) {
+      // עדכון התצוגה עם הערך החדש
+      selectElement.value = value;
+
+      // עדכון המערכת הגלובלית
+      if (typeof window.updateConsoleCleanupInterval === 'function') {
+        await window.updateConsoleCleanupInterval(numValue);
+      }
+
+      // הצגת הודעה מתאימה
+      if (numValue === 0) {
+        showNotification('ניקוי אוטומטי של הקונסולה בוטל', 'success');
+      } else {
+        const seconds = Math.floor(numValue / 1000);
+        showNotification(`זמן ניקוי קונסולה עודכן ל-${seconds} שניות`, 'success');
+      }
+
+      console.log('✅ זמן ניקוי קונסולה עודכן בהצלחה');
+    } else {
+      // אם השמירה נכשלה, החזרת הערך הקודם
+      const currentValue = await getCurrentPreference('consoleCleanupInterval');
+      selectElement.value = currentValue;
+      showNotification('שגיאה בעדכון זמן ניקוי קונסולה', 'error');
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון זמן ניקוי קונסולה:', error);
+    showNotification('שגיאה בעדכון זמן ניקוי קונסולה', 'error');
+  } finally {
+    // הסרת מצב הטעינה מהממשק
+    preferenceItem.classList.remove('loading');
+  }
+}
+
+/**
        * מעדכן את הסטופ לוס ברירת המחדל במערכת
        * 
        * פונקציה זו נקראת כאשר המשתמש משנה את אחוז הסטופ לוס ברירת המחדל
@@ -286,6 +360,15 @@ async function loadPreferencesToUI() {
         const currentTimezone = preferences.user.timezone || preferences.defaults.timezone;
         timezoneSelect.value = currentTimezone;
         console.log('✅ אזור זמן נטען:', currentTimezone);
+      }
+
+      // עדכון זמן ניקוי קונסולה
+      const consoleCleanupSelect = document.getElementById('consoleCleanupIntervalSelect');
+      if (consoleCleanupSelect) {
+        // שימוש בהגדרת המשתמש או ברירת המחדל
+        const currentCleanupInterval = preferences.user.consoleCleanupInterval || preferences.defaults.consoleCleanupInterval || 60000;
+        consoleCleanupSelect.value = currentCleanupInterval;
+        console.log('✅ זמן ניקוי קונסולה נטען:', currentCleanupInterval);
       }
 
       // עדכון סטופ לוס ברירת מחדל

@@ -46,14 +46,13 @@ class Ticker(BaseModel):
                  comment="Asset type: stock, etf, crypto, forex, commodity")
     remarks = Column(String(500), nullable=True, 
                     comment="Additional notes about the ticker")
-    currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False,
-                        comment="Currency ID from currencies table")
+    currency = Column(String(3), nullable=True, 
+                     comment="Currency symbol (USD, EUR, etc.)")
     active_trades = Column(Boolean, default=False, nullable=True, 
                           comment="Whether there are active trades")
     
     # Relationships
-    # Each ticker belongs to one currency
-    currency = relationship("Currency", backref="tickers")
+    # Currency is now a simple string field, not a relationship
     
     trades = relationship("Trade", back_populates="ticker", 
                          cascade="all, delete-orphan")

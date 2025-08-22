@@ -85,7 +85,7 @@ Customize how information is displayed and filtered throughout the application.
 These settings control the initial filter values when you open different pages:
 
 #### Status Filter
-- **Options**: All, Active, Closed, Canceled
+- **Options**: All, Active, Closed, Cancelled
 - **Default**: All
 - **Purpose**: Default status filter for trade lists
 

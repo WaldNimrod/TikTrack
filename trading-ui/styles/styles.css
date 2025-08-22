@@ -106,6 +106,7 @@
   align-items: center;
   gap: 0.5rem;
 }
+
 /**
  * קובץ CSS ראשי לאתר TikTrack
  * 
@@ -543,7 +544,7 @@ button.btn-primary-emphasized {
     box-shadow: 0 2px 6px rgba(149, 117, 205, 0.1) !important;
   }
 
-  .design-card .card-status.status-canceled {
+  .design-card .card-status.status-cancelled {
     background: linear-gradient(135deg, rgba(255, 183, 77, 0.2) 0%, rgba(255, 167, 38, 0.2) 100%) !important;
     color: #f57c00 !important;
     box-shadow: 0 2px 6px rgba(255, 183, 77, 0.1) !important;

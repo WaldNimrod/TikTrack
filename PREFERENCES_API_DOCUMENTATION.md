@@ -167,7 +167,7 @@ interface PreferenceSettings {
   defaultTargetPrice: number;     // Percentage (0-1000)
   
   // Display Settings - Filter Defaults
-  defaultStatusFilter: string;    // "all" | "active" | "closed" | "canceled"
+  defaultStatusFilter: string;    // "all" | "active" | "closed" | "cancelled"
   defaultTypeFilter: string;      // "all" | "buy" | "sell"
   defaultAccountFilter: string;   // "all" | specific account ID
   defaultDateRangeFilter: string; // "all" | "today" | "last7days" | "last30days" | "custom"
@@ -212,7 +212,7 @@ interface ApiResponse {
 ### Display Settings
 | Key | Type | Description | Valid Values |
 |-----|------|-------------|--------------|
-| `defaultStatusFilter` | string | Default status filter | "all", "active", "closed", "canceled" |
+| `defaultStatusFilter` | string | Default status filter | "all", "active", "closed", "cancelled" |
 | `defaultTypeFilter` | string | Default type filter | "all", "buy", "sell" |
 | `defaultAccountFilter` | string | Default account filter | "all" or account ID |
 | `defaultDateRangeFilter` | string | Default date range | "all", "today", "last7days", "last30days", "custom" |

@@ -11,7 +11,7 @@ class NoteRelationType(BaseModel):
         return f"<NoteRelationType(id={self.id}, type='{self.note_relation_type}')>"
     
     def to_dict(self) -> Dict[str, Any]:
-        """המרה למילון"""
+        """Convert to dictionary"""
         result: Dict[str, Any] = super().to_dict()
         result['note_relation_type'] = self.note_relation_type
         return result

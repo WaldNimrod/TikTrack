@@ -510,7 +510,7 @@ body.modal-open {
   box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15) !important;
 }
 
-.status-badge.status-canceled {
+.status-badge.status-cancelled {
   background: linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 143, 0, 0.15) 100%) !important;
   color: #ef6c00 !important;
   border: 1px solid rgba(255, 152, 0, 0.3) !important;

@@ -224,14 +224,14 @@ def create_note():
     try:
         db = next(get_db())
         
-        # בדיקה אם יש קובץ או JSON
+        # Check if there's a file or JSON
         if request.files:
-            # טיפול בקבצים
+            # File handling
             file = request.files.get('attachment')
             attachment_filename = None
             
             if file and file.filename:
-                # בדיקת גודל הקובץ
+                # Check file size
                 if file.content_length and file.content_length > MAX_FILE_SIZE:
                     return jsonify({
                         "status": "error",
@@ -247,13 +247,13 @@ def create_note():
                         "version": "v1"
                     }), 400
             
-            # קבלת נתונים מ-form data
+            # Get data from form data
             content = request.form.get('content', '')
             trade_plan_id = request.form.get('trade_plan_id')
             trade_id = request.form.get('trade_id')
             account_id = request.form.get('account_id')
         else:
-            # קבלת נתונים מ-JSON
+            # Get data from JSON
             data = request.get_json()
             content = data.get('content', '')
             trade_plan_id = data.get('trade_plan_id')
@@ -261,7 +261,7 @@ def create_note():
             account_id = data.get('account_id')
             attachment_filename = data.get('attachment')
         
-        # קביעת הקשר לפי עדיפות: trade_plan > trade > account
+        # Determine relation by priority: trade_plan > trade > account
         related_type_id = None
         related_id = None
         
@@ -281,7 +281,7 @@ def create_note():
                 "version": "v1"
             }), 400
         
-        # יצירת הערה עם המבנה החדש
+        # Create note with new structure
         note_data = {
             'content': content,
             'attachment': attachment_filename,
@@ -301,7 +301,7 @@ def create_note():
         }), 201
     except Exception as e:
         logger.error(f"Error creating note: {str(e)}")
-        # מחיקת הקובץ אם הייתה שגיאה ביצירת ההערה
+        # Delete file if there was an error creating the note
         if 'attachment_filename' in locals() and attachment_filename:
             delete_uploaded_file(attachment_filename)
         return jsonify({
@@ -315,7 +315,7 @@ def create_note():
 
 @notes_bp.route('/<int:note_id>', methods=['PUT'])
 def update_note(note_id: int):
-    """עדכון הערה"""
+    """Update note"""
     db = None
     try:
         logger.info(f"🔄 Starting update_note for note_id: {note_id}")
@@ -330,16 +330,16 @@ def update_note(note_id: int):
         if note:
             logger.info(f"✅ Found note: {note.id}")
             
-            # בדיקה אם יש קובץ או JSON
+            # Check if there's a file or JSON
             if request.files:
                 logger.info("📎 Processing file upload")
-                # טיפול בקבצים
+                # File handling
                 file = request.files.get('attachment')
                 attachment_filename = None
                 
                 if file and file.filename:
                     logger.info(f"📎 File received: {file.filename}, size: {file.content_length}")
-                    # בדיקת גודל הקובץ
+                    # Check file size
                     if file.content_length and file.content_length > MAX_FILE_SIZE:
                         logger.warning(f"❌ File too large: {file.content_length} > {MAX_FILE_SIZE}")
                         return jsonify({
@@ -358,7 +358,7 @@ def update_note(note_id: int):
                             "version": "v1"
                         }), 400
                 
-                # קבלת נתונים מ-form data
+                # Get data from form data
                 content = request.form.get('content', '')
                 trade_plan_id = request.form.get('trade_plan_id')
                 trade_id = request.form.get('trade_id')
@@ -366,7 +366,7 @@ def update_note(note_id: int):
                 logger.info(f"📋 Form data - content: {content[:50]}..., trade_plan_id: {trade_plan_id}, trade_id: {trade_id}, account_id: {account_id}")
             else:
                 logger.info("📋 Processing JSON data")
-                # קבלת נתונים מ-JSON
+                # Get data from JSON
                 data = request.get_json()
                 content = data.get('content', '')
                 trade_plan_id = data.get('trade_plan_id')
@@ -375,8 +375,7 @@ def update_note(note_id: int):
                 attachment_filename = data.get('attachment')
                 logger.info(f"📋 JSON data - content: {content[:50]}..., trade_plan_id: {trade_plan_id}, trade_id: {trade_id}, account_id: {account_id}, attachment: {attachment_filename}")
             
-            # קביעת הקשר לפי עדיפות: trade_plan > trade > account
-            # בעדכון, אם לא נשלחו נתוני קשר, נשתמש בקשר הקיים
+            # Determine relation by priority: trade_plan > trade > account
             related_type_id = None
             related_id = None
             
@@ -392,18 +391,20 @@ def update_note(note_id: int):
                 related_type_id = 1  # account
                 related_id = account_id
             else:
-                # בעדכון, אם לא נשלחו נתוני קשר, נשתמש בקשר הקיים
-                logger.info("📝 No new relation provided, keeping existing relation")
-                related_type_id = note.related_type_id
-                related_id = note.related_id
+                logger.error("❌ No relation found")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Note must be related to account, trade, or trade plan"},
+                    "version": "v1"
+                }), 400
             
             logger.info(f"✅ Relation determined: related_type_id={related_type_id} -> {related_id}")
             
-            # עדכון השדות
+            # Update fields
             logger.info(f"📝 Updating note fields - content: {content[:50]}..., attachment: {attachment_filename}")
             note.content = content
             if attachment_filename:
-                # מחיקת הקובץ הישן אם קיים
+                # Delete old file if exists
                 if note.attachment:
                     logger.info(f"🗑️ Deleting old attachment: {note.attachment}")
                     delete_uploaded_file(note.attachment)
@@ -434,7 +435,7 @@ def update_note(note_id: int):
         import traceback
         logger.error(f"❌ Full traceback: {traceback.format_exc()}")
         
-        # מחיקת הקובץ החדש אם הייתה שגיאה בעדכון ההערה
+        # Delete new file if there was an error updating the note
         if 'attachment_filename' in locals() and attachment_filename:
             logger.info(f"🗑️ Cleaning up attachment file: {attachment_filename}")
             delete_uploaded_file(attachment_filename)
@@ -450,16 +451,16 @@ def update_note(note_id: int):
 
 @notes_bp.route('/<int:note_id>', methods=['DELETE'])
 def delete_note(note_id: int):
-    """מחיקת הערה"""
+    """Delete note"""
     try:
         db = next(get_db())
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
-            # מחיקת הקובץ המצורף אם קיים
+            # Delete attached file if exists
             if note.attachment:
                 delete_uploaded_file(note.attachment)
             
-            # מחיקת ההערה מהמסד נתונים
+            # Delete note from database
             db.delete(note)
             db.commit()
             return jsonify({
@@ -484,7 +485,7 @@ def delete_note(note_id: int):
 
 @notes_bp.route('/files/cleanup', methods=['POST'])
 def cleanup_files():
-    """ניקוי קבצים יתומים"""
+    """Clean up orphaned files"""
     try:
         deleted_count = cleanup_orphaned_files()
         return jsonify({
@@ -503,9 +504,9 @@ def cleanup_files():
 
 @notes_bp.route('/files/<filename>', methods=['GET', 'DELETE'])
 def handle_file(filename: str):
-    """טיפול בקבצים - הצגה ומחיקה"""
+    """File handling - display and delete"""
     if request.method == 'GET':
-        """הצגת קובץ שהועלה"""
+        """Display uploaded file"""
         try:
             return send_from_directory(UPLOAD_FOLDER, filename)
         except Exception as e:
@@ -516,7 +517,7 @@ def handle_file(filename: str):
                 "version": "v1"
             }), 404
     elif request.method == 'DELETE':
-        """מחיקת קובץ בודד (למטרות תחזוקה)"""
+        """Delete single file (for maintenance purposes)"""
         try:
             if delete_uploaded_file(filename):
                 return jsonify({

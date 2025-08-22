@@ -13,7 +13,7 @@ Comprehensive improvements were made to the database page in the TikTrack system
   - Updated headers according to the actual structure in the database
   - Added data types in header (Integer, String, DateTime, Float)
   - Fixed `loadTradePlans` function for correct field mapping
-  - Added fields: Account Name, Ticker Symbol, Ticker Name, Investment Type, Side, Status, Planned Amount, Entry Conditions, Stop Price, Target Price, Reasons, Canceled At, Cancel Reason
+  - Added fields: Account Name, Ticker Symbol, Ticker Name, Investment Type, Side, Status, Planned Amount, Entry Conditions, Stop Price, Target Price, Reasons, Cancelled At, Cancel Reason
 
 #### 1.2 Trades Table
 - **Problem**: Missing fields in table

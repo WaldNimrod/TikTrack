@@ -10,7 +10,7 @@ executions_bp = Blueprint('executions', __name__, url_prefix='/api/v1/executions
 
 @executions_bp.route('/', methods=['GET'])
 def get_executions():
-    """קבלת כל הביצועים"""
+    """Get all executions"""
     try:
         db: Session = next(get_db())
         executions = db.query(Execution).all()
@@ -32,7 +32,7 @@ def get_executions():
 
 @executions_bp.route('/<int:execution_id>', methods=['GET'])
 def get_execution(execution_id: int):
-    """קבלת ביצוע לפי מזהה"""
+    """Get execution by ID"""
     try:
         db: Session = next(get_db())
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
@@ -60,7 +60,7 @@ def get_execution(execution_id: int):
 
 @executions_bp.route('/', methods=['POST'])
 def create_execution():
-    """יצירת ביצוע חדש"""
+    """Create new execution"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -86,7 +86,7 @@ def create_execution():
 
 @executions_bp.route('/<int:execution_id>', methods=['PUT'])
 def update_execution(execution_id: int):
-    """עדכון ביצוע"""
+    """Update execution"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -120,7 +120,7 @@ def update_execution(execution_id: int):
 
 @executions_bp.route('/<int:execution_id>', methods=['DELETE'])
 def delete_execution(execution_id: int):
-    """מחיקת ביצוע"""
+    """Delete execution"""
     try:
         db: Session = next(get_db())
         execution = db.query(Execution).filter(Execution.id == execution_id).first()

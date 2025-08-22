@@ -1,32 +1,32 @@
 # TikTrack Backend - Testing Overview
 
-## מערכת הבדיקות
+## Testing System
 
-מערכת הבדיקות של TikTrack מאורגנת בתיקייה ייעודית `testing_suite/` המכילה את כל הקבצים הקשורים לבדיקות מערכת שונות.
+TikTrack's testing system is organized in a dedicated `testing_suite/` folder containing all files related to various system tests.
 
-## מיקום מערכת הבדיקות
+## Testing System Location
 
 ```
 Backend/
-├── testing_suite/          # מערכת הבדיקות המלאה
-│   ├── unit_tests/         # בדיקות יחידה
-│   ├── integration_tests/  # בדיקות אינטגרציה
-│   ├── e2e_tests/         # בדיקות end-to-end
-│   ├── performance_tests/ # בדיקות ביצועים
-│   ├── load_tests/        # בדיקות עומס
-│   ├── security_tests/    # בדיקות אבטחה
-│   ├── documentation/     # תיעוד הבדיקות
-│   ├── logs/             # לוגים
-│   ├── reports/          # דוחות
-│   ├── configs/          # הגדרות
-│   ├── Makefile          # פקודות להרצה
-│   └── README.md         # תיעוד מפורט
-└── README_TESTING.md     # קובץ זה
+├── testing_suite/          # Complete testing system
+│   ├── unit_tests/         # Unit tests
+│   ├── integration_tests/  # Integration tests
+│   ├── e2e_tests/         # End-to-end tests
+│   ├── performance_tests/ # Performance tests
+│   ├── load_tests/        # Load tests
+│   ├── security_tests/    # Security tests
+│   ├── documentation/     # Test documentation
+│   ├── logs/             # Logs
+│   ├── reports/          # Reports
+│   ├── configs/          # Configurations
+│   ├── Makefile          # Run commands
+│   └── README.md         # Detailed documentation
+└── README_TESTING.md     # This file
 ```
 
-## הרצת בדיקות מהירה
+## Quick Test Execution
 
-### מהתיקייה הראשית
+### From Main Directory
 ```bash
 # הרצת כל הבדיקות
 cd testing_suite && make test

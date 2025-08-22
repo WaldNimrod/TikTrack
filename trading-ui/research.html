@@ -399,19 +399,12 @@
     <!-- Modular files -->
     <script src="scripts/app-header.js"></script>
     <script src="scripts/account-modal.js"></script>
+    <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/trades.js"></script>
     <script src="scripts/research.js"></script>
 
-    <!-- Console message cleanup -->
+    <!-- Page initialization -->
     <script>
-      // ניקוי הודעות קונסולה אחרי זמן קצר
-      setTimeout(() => {
-        console.log('🧹 Clearing console messages to reduce clutter...');
-        if (console.clear) {
-          console.clear();
-        }
-      }, 25000);
-
       // אתחול הדף
       document.addEventListener('DOMContentLoaded', function () {
         console.log('🔄 אתחול דף תחקיר...');

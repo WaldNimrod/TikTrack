@@ -22,7 +22,7 @@ class Trade(BaseModel):
     total_pl = Column(Float, default=0, nullable=True)
     notes = Column(String(500), nullable=True)
     
-    # יחסים
+    # Relationships
     account = relationship("Account", back_populates="trades")
     ticker = relationship("Ticker")
     trade_plan = relationship("TradePlan", back_populates="trades")
@@ -30,7 +30,7 @@ class Trade(BaseModel):
     # Notes relationship removed - notes now use related_type and related_id
     
     def to_dict(self) -> Dict[str, Any]:
-        """המרה למילון עם יחסים"""
+        """Convert to dictionary with relationships"""
         import logging
         logger = logging.getLogger(__name__)
         
@@ -42,7 +42,7 @@ class Trade(BaseModel):
             else:
                 result[c.name] = value
         
-        # הוספת יחסים
+        # Add relationships
         try:
             if hasattr(self, 'account') and self.account:
                 result['account_name'] = self.account.name
@@ -72,41 +72,41 @@ class Trade(BaseModel):
     
     def validate_trade_plan_link(self, trade_plan: 'TradePlan') -> Tuple[bool, str]:
         """
-        בדיקת תקינות הקישור לתוכנית
+        Validate trade plan link
         
-        כללים:
-        1. טרייד פתוח חייב להיות מקושר לתוכנית במצב פתוח או סגור
-        2. טרייד סגור או מבוטל יכול להיות משוייך לתוכנית בכל סטטוס
-        3. תאריך יצירת הטרייד לא יכול להיות מוקדם לתאריך יצירת התוכנית
-        4. צד הטרייד חייב להיות זהה לצד התוכנית
-        5. סוג הטרייד יכול להיות שונה מסוג התוכנית
+        Rules:
+        1. Open trade must be linked to a plan in open or closed status
+        2. Closed or cancelled trade can be linked to a plan in any status
+        3. Trade creation date cannot be earlier than plan creation date
+        4. Trade side must be identical to plan side
+        5. Trade type can be different from plan type
         """
         if not trade_plan:
-            return False, "טרייד חייב להיות מקושר לתוכנית"
+            return False, "Trade must be linked to a plan"
         
-        # בדיקת תאריך יצירה
+        # Check creation date
         if self.created_at and trade_plan.created_at:
             if self.created_at < trade_plan.created_at:
-                return False, f"תאריך יצירת הטרייד ({self.created_at}) לא יכול להיות מוקדם לתאריך יצירת התוכנית ({trade_plan.created_at})"
+                return False, f"Trade creation date ({self.created_at}) cannot be earlier than plan creation date ({trade_plan.created_at})"
         
-        # בדיקת סטטוס
+        # Check status
         if self.status == 'open':
             if trade_plan.status not in ['open', 'closed']:
-                return False, f"טרייד פתוח חייב להיות מקושר לתוכנית במצב פתוח או סגור, לא {trade_plan.status}"
+                return False, f"Open trade must be linked to a plan in open or closed status, not {trade_plan.status}"
         
-        # בדיקת צד - חייב להיות זהה
+        # Check side - must be identical
         if self.side != trade_plan.side:
-            return False, f"צד הטרייד ({self.side}) חייב להיות זהה לצד התוכנית ({trade_plan.side})"
+            return False, f"Trade side ({self.side}) must be identical to plan side ({trade_plan.side})"
         
-        return True, "תקין"
+        return True, "Valid"
     
     def validate_before_save(self, db_session) -> List[str]:
         """
-        בדיקת תקינות לפני שמירה
+        Validate before saving
         """
         errors: List[str] = []
         
-        # בדיקת קישור לתוכנית
+        # Check plan link
         if self.trade_plan_id:
             trade_plan = db_session.query(TradePlan).filter(TradePlan.id == self.trade_plan_id).first()
             if trade_plan:
@@ -114,8 +114,8 @@ class Trade(BaseModel):
                 if not is_valid:
                     errors.append(message)
             else:
-                errors.append(f"תוכנית {self.trade_plan_id} לא נמצאה")
+                errors.append(f"Plan {self.trade_plan_id} not found")
         else:
-            errors.append("טרייד חייב להיות מקושר לתוכנית")
+            errors.append("Trade must be linked to a plan")
         
         return errors

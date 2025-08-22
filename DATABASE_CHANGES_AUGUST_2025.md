@@ -68,7 +68,7 @@ CREATE TABLE trades (
 - `cancelled` - טרייד מבוטל
 
 #### שינוי:
-- `canceled` → `cancelled` (תיקון איות)
+- `cancelled` → `cancelled` (תיקון איות)
 
 ## קבצי מיגרציה
 

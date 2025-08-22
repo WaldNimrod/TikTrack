@@ -315,19 +315,12 @@
         <!-- Modular files -->
         <script src="scripts/app-header.js"></script>
         <script src="scripts/account-modal.js"></script>
+        <script src="scripts/console-cleanup.js"></script>
         <script src="scripts/trades.js"></script>
         <script src="scripts/research.js"></script>
 
-        <!-- Console message cleanup -->
+        <!-- Page initialization -->
         <script>
-            // Clear console messages after short time
-            setTimeout(() => {
-                console.log('🧹 Clearing console messages to reduce clutter...');
-                if (console.clear) {
-                    console.clear();
-                }
-            }, 25000);
-
             // Page initialization
             document.addEventListener('DOMContentLoaded', function () {
                 console.log('🔄 Initializing research page...');

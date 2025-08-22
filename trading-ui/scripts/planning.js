@@ -1,38 +1,38 @@
 /**
  * ========================================
- * דף התכנון - Planning Page
+ * Planning Page - Planning Page
  * ========================================
  * 
- * קובץ ייעודי לדף התכנון (planning.html)
+ * Dedicated file for the planning page (planning.html)
  * 
- * תכולת הקובץ:
- * - טעינת נתוני תכנונים מהשרת
- * - הצגת טבלת תכנונים עם מיון ופילטרים
- * - הוספת תכנון חדש
- * - עריכת תכנון קיים
- * - מחיקת תכנון
- * - ניהול סטטוסים ומצבים
- * - שימוש במערכת התראות גלובלית
+ * File contents:
+ * - Loading planning data from server
+ * - Displaying planning table with sorting and filters
+ * - Adding new planning
+ * - Editing existing planning
+ * - Deleting planning
+ * - Managing statuses and states
+ * - Using global notification system
  * 
- * מערכת התראות:
- * - כל הודעות המשתמש משתמשות במערכת ההתראות הגלובלית
- * - showSuccessNotification() - הודעות הצלחה
- * - showErrorNotification() - הודעות שגיאה
- * - showWarningNotification() - הודעות אזהרה
+ * Notification system:
+ * - All user messages use the global notification system
+ * - showSuccessNotification() - Success messages
+ * - showErrorNotification() - Error messages
+ * - showWarningNotification() - Warning messages
  * 
- * מחבר: Tik.track Development Team
- * תאריך עדכון אחרון: 2025
+ * Author: Tik.track Development Team
+ * Last update date: 2025
  * ========================================
  */
 
-// משתנים גלובליים
+// Global variables
 let designsData = [];
 
-// הפונקציה translateDateRangeToDates כבר מוגדרת בתחילת הקובץ
+// The translateDateRangeToDates function is already defined at the beginning of the file
 
-// הגדרת הפונקציה updateGridFromComponent מיד בתחילת הקובץ
+// Defining the updateGridFromComponent function immediately at the beginning of the file
 console.log('🔄 Planning.js: Setting up updateGridFromComponent for planning page');
-// וידוא שהפונקציה מוגדרת רק בדף התכנונים
+// Ensuring the function is only defined on the planning page
 if (window.location.pathname.includes('/planning')) {
     window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
         console.log('🔄 updateGridFromComponent called for planning page with:', {
@@ -44,19 +44,19 @@ if (window.location.pathname.includes('/planning')) {
 
         console.log('✅ This is the PLANNING page updateGridFromComponent function!');
 
-        // שמירת הפילטרים במשתנים גלובליים
+        // Saving filters in global variables
         window.selectedStatusesForFilter = selectedStatuses || [];
         window.selectedTypesForFilter = selectedTypes || [];
         window.selectedDateRangeForFilter = selectedDateRange || null;
         window.searchTermForFilter = searchTerm || '';
 
-        // חילוץ תאריכי התחלה וסיום מטווח התאריכים
+        // Extracting start and end dates from date range
         let startDate = 'לא נבחר';
         let endDate = 'לא נבחר';
 
         if (selectedDateRange && selectedDateRange !== 'כל זמן') {
             console.log('🔄 Translating date range:', selectedDateRange);
-            // תרגום טווח התאריכים לתאריכים אמיתיים
+            // Translating date range to actual dates
             const dateRange = translateDateRangeToDates(selectedDateRange);
             startDate = dateRange.startDate;
             endDate = dateRange.endDate;
@@ -75,12 +75,12 @@ if (window.location.pathname.includes('/planning')) {
             searchTermForFilter: window.searchTermForFilter
         });
 
-        // עדכון חלון הבדיקה
+        // Updating debug panel
         if (typeof updateFilterDebugPanel === 'function') {
             updateFilterDebugPanel();
         }
 
-        // קריאה ישירה לפונקציה המקומית
+        // Direct call to local function
         console.log('🔄 Calling loadDesignsData directly for planning page');
         if (typeof window.loadDesignsData === 'function') {
             window.loadDesignsData();
@@ -91,18 +91,18 @@ if (window.location.pathname.includes('/planning')) {
 }
 
 /**
- * טעינת נתוני תכנונים מהשרת
+ * Loading planning data from server
  * 
- * פונקציה זו טוענת את כל התכנונים מהשרת ומעדכנת את הטבלה
- * אם השרת לא זמין, משתמשת בנתוני דמו
+ * This function loads all planning from the server and updates the table
+ * If server is not available, uses demo data
  * 
- * @returns {Array} מערך של תכנונים
+ * @returns {Array} Array of planning
  */
 async function loadDesignsData() {
     try {
-        console.log('🔄 טוען תכנונים מהשרת...');
+        console.log('🔄 Loading designs from server...');
 
-        // הגדרת base URL
+        // Setting base URL
         const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
         const response = await fetch(`${base}/api/v1/trade_plans/`);
 
@@ -111,25 +111,25 @@ async function loadDesignsData() {
         }
 
         const data = await response.json();
-        console.log('🔄 נתונים שהתקבלו מהשרת:', data);
+        console.log('🔄 Data received from server:', data);
 
-        // בדיקה שהנתונים הם מערך
+        // Checking that data is an array
         let designs = data;
         if (!Array.isArray(designs)) {
-            console.log('🔄 הנתונים שהתקבלו אינם מערך, מחפש data.data');
+            console.log('🔄 Received data is not an array, looking for data.data');
             if (data && data.data && Array.isArray(data.data)) {
                 designs = data.data;
             } else {
-                throw new Error('הנתונים שהתקבלו מהשרת אינם בפורמט הנכון');
+                throw new Error('Data received from server is not in correct format');
             }
         }
 
-        console.log(`✅ נטענו ${designs.length} תכנונים`);
+        console.log(`✅ Loaded ${designs.length} designs`);
 
-        // עדכון המשתנה הגלובלי - שימוש בשדות המקוריים מהשרת
+        // Updating global variable - using original fields from server
         designsData = designs;
 
-        // לוג לדיבוג - בדיקת הנתונים הראשונים
+        // Debug log - checking first data structure
         if (designsData.length > 0) {
             console.log('🔄 First design data structure:', {
                 id: designsData[0].id,
@@ -141,10 +141,10 @@ async function loadDesignsData() {
             });
         }
 
-        // החלת פילטרים על הנתונים
+        // Applying filters to data
         let filteredDesigns = [...designsData];
 
-        // בדיקה אם יש פילטרים פעילים
+        // Checking if there are active filters
         const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
             (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
             (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
@@ -163,7 +163,7 @@ async function loadDesignsData() {
             if (typeof window.filterDataByFilters === 'function') {
                 filteredDesigns = window.filterDataByFilters(designsData, 'planning');
             } else {
-                // פונקציה מקומית לפילטור אם הפונקציה הגלובלית לא זמינה
+                // Local filtering function if global function is not available
                 filteredDesigns = filterDesignsLocally(designsData, window.selectedStatusesForFilter, window.selectedTypesForFilter, window.selectedDateRangeForFilter, window.searchTermForFilter);
             }
             console.log('🔄 After filtering:', filteredDesigns.length, 'designs');
@@ -171,13 +171,13 @@ async function loadDesignsData() {
             console.log('🔄 No active filters, showing all designs');
         }
 
-        // שמירת הנתונים המסוננים לגלובלי
+        // Saving filtered data to global
         window.filteredDesignsData = filteredDesigns;
 
-        // עדכון הטבלה עם הנתונים המסוננים
+        // Updating table with filtered data
         updateDesignsTable(filteredDesigns);
 
-        // עדכון חלון הבדיקה
+        // Updating debug panel
         updateFilterDebugPanel();
 
         return designsData;
@@ -186,10 +186,10 @@ async function loadDesignsData() {
         console.error('❌ Error loading designs data:', error);
         console.error('❌ Error details:', error.message);
 
-        // הצגת הודעת שגיאה מפורטת בטבלה
+        // Displaying detailed error message in table
         const tbody = document.querySelector('#designsTable tbody');
         if (tbody) {
-            // זיהוי סוג השגיאה
+            // Identifying error type
             let errorMessage = 'שגיאה בטעינת נתונים';
             let errorDetails = error.message;
 
@@ -211,11 +211,11 @@ async function loadDesignsData() {
             </td></tr>`;
         }
 
-        // איפוס הנתונים
+        // Resetting data
         designsData = [];
         window.filteredDesignsData = [];
 
-        // עדכון סטטיסטיקות
+        // Updating statistics
         updateSummaryStats();
 
         return designsData;
@@ -240,19 +240,19 @@ function updateDesignsTable(designs) {
         return;
     }
 
-    // בדיקה אם יש נתונים להצגה
+    // Checking if there is data to display
     if (!designs || designs.length === 0) {
-        // בדיקה אם זה בגלל פילטר או שאין נתונים בכלל
+        // Checking if it's because of filters or if there are no data at all
         const hasOriginalData = designsData && designsData.length > 0;
 
-        // בדיקה אם יש פילטרים פעילים
+        // Checking if there are active filters
         const hasActiveFilters = (() => {
-            // בדיקת חיפוש
+            // Search check
             if (window.searchTermForFilter && window.searchTermForFilter.trim() !== '') {
                 return true;
             }
 
-            // בדיקת סטטוסים (אם לא כל הסטטוסים מסומנים)
+            // Status check (if not all statuses are selected)
             if (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) {
                 const allStatuses = ['open', 'closed', 'cancelled'];
                 const selectedStatuses = window.selectedStatusesForFilter.map(s => s.toLowerCase());
@@ -261,7 +261,7 @@ function updateDesignsTable(designs) {
                 }
             }
 
-            // בדיקת סוגים (אם לא כל הסוגים מסומנים)
+            // Type check (if not all types are selected)
             if (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) {
                 const allTypes = ['swing', 'investment', 'passive'];
                 const selectedTypes = window.selectedTypesForFilter.map(t => t.toLowerCase());
@@ -270,7 +270,7 @@ function updateDesignsTable(designs) {
                 }
             }
 
-            // בדיקת טווח תאריכים
+            // Date range check
             if (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') {
                 return true;
             }
@@ -279,38 +279,38 @@ function updateDesignsTable(designs) {
         })();
 
         if (hasOriginalData && hasActiveFilters) {
-            // יש נתונים אבל הפילטר לא מצא תוצאות
+            // There is data but the filter didn't find results
             tbody.innerHTML = `<tr><td colspan="10" class="text-center text-info">
                 <i class="fas fa-search"></i> לא נמצאו תוצאות
                 <br><small>נסה לשנות את הפילטרים או מונח החיפוש</small>
             </td></tr>`;
         } else {
-            // אין נתונים בכלל
+            // No data at all
             tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted">
                 <i class="fas fa-info-circle"></i> אין תכנונים להצגה
                 <br><small>לא נמצאו תכנונים במערכת</small>
             </td></tr>`;
         }
 
-        // עדכון ספירת רשומות
+        // Updating record count
         const countElement = document.querySelector('#designsCount');
         if (countElement) {
             countElement.textContent = '0 תכנונים';
         }
 
-        // עדכון סטטיסטיקות
+        // Updating statistics
         updateSummaryStats();
         return;
     }
 
     const tableHTML = designs.map(design => {
-        // הגנה מפני נתונים לא תקינים
+        // Safeguarding against invalid data
         if (!design || typeof design !== 'object') {
             console.warn('Invalid design data in table:', design);
             return '';
         }
 
-        // לוג לדיבוג
+        // Debug log
         console.log('🔄 Processing design for table:', {
             id: design.id,
             ticker: design.ticker,
@@ -325,7 +325,7 @@ function updateDesignsTable(designs) {
         const statusClass = getStatusClass(design.status);
         const typeClass = getTypeClass(design.investment_type);
 
-        // תיקון תאריך - המרה לפורמט עברי
+        // Date correction - converting to Hebrew format
         let dateDisplay = 'לא מוגדר';
         console.log('🔄 Processing date for design:', design.id, 'created_at:', design.created_at, 'type:', typeof design.created_at);
 
@@ -351,7 +351,7 @@ function updateDesignsTable(designs) {
             console.log('🔄 No created_at field for design:', design.id);
         }
 
-        // תיקון סוג - וידוא שהפונקציה מקבלת ערך תקין
+        // Type correction - ensuring a valid value is passed
         console.log('🔄 Processing type for design:', design.id, 'investment_type:', design.investment_type, 'type:', typeof design.investment_type);
         const typeDisplay = design.investment_type ? getTypeDisplay(design.investment_type) : 'לא מוגדר';
         console.log('🔄 Type display result:', typeDisplay);
@@ -362,7 +362,7 @@ function updateDesignsTable(designs) {
         const currentDisplay = formatCurrency(design.current || 0);
         const statusDisplay = getStatusDisplay(design.status);
 
-        // הצגת ticker symbol או שם
+        // Displaying ticker symbol or name
         const tickerDisplay = design.ticker ? (design.ticker.symbol || design.ticker.name || 'לא מוגדר') : 'לא מוגדר';
 
         return `
@@ -390,13 +390,13 @@ function updateDesignsTable(designs) {
 
     tbody.innerHTML = tableHTML;
 
-    // עדכון ספירת רשומות
+    // Updating record count
     const countElement = document.querySelector('#designsCount');
     if (countElement) {
         countElement.textContent = `${designs.length} תכנונים`;
     }
 
-    // עדכון סטטיסטיקות
+    // Updating statistics
     updateSummaryStats();
 }
 
@@ -404,25 +404,25 @@ function updateDesignsTable(designs) {
  * עדכון סטטיסטיקות סיכום
  */
 function updateSummaryStats() {
-    // שימוש בנתונים המסוננים אם יש, אחרת בכל הנתונים
+    // Using filtered data if available, otherwise all data
     const dataToUse = window.filteredDesignsData || designsData;
     const totalDesigns = dataToUse.length;
     const openDesigns = dataToUse.filter(design => design.status === 'open').length;
     const closedDesigns = dataToUse.filter(design => design.status === 'closed').length;
     const cancelledDesigns = dataToUse.filter(design => design.status === 'cancelled').length;
 
-    // חישוב סכומים
+    // Calculating sums
     let totalInvestment = 0;
     let totalProfit = 0;
 
     designsData.forEach(design => {
-        // הגנה מפני נתונים לא תקינים
+        // Safeguarding against invalid data
         if (!design || typeof design !== 'object') {
             console.warn('Invalid design data:', design);
             return;
         }
 
-        // טיפול בנתונים מהשרת (מספרים) או מחרוזות
+        // Handling data from server (numbers) or strings
         let amount = 0;
         if (design.amount !== null && design.amount !== undefined) {
             if (typeof design.amount === 'string') {
@@ -433,7 +433,7 @@ function updateSummaryStats() {
         }
         totalInvestment += amount;
 
-        // חישוב רווח פשוט (לצורך הדוגמה)
+        // Simple profit calculation (for example)
         if (design.status === 'closed') {
             let current = 0;
             let target = 0;
@@ -455,7 +455,7 @@ function updateSummaryStats() {
             }
 
             if (current > target) {
-                totalProfit += amount * 0.1; // רווח של 10% לדוגמה
+                totalProfit += amount * 0.1; // 10% profit for example
             }
         }
     });
@@ -472,20 +472,20 @@ function updateSummaryStats() {
  * הצגת מודל הוספת תכנון
  */
 function showAddTradePlanModal() {
-    // ניקוי הטופס
+    // Clearing the form
     const form = document.getElementById('addTradePlanForm');
     if (form) {
         form.reset();
     }
 
-    // קביעת תאריך היום
+    // Setting today's date
     const today = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('addTradePlanDate');
     if (dateInput) {
         dateInput.value = today;
     }
 
-    // הצגת המודל
+    // Displaying the modal
     const modalElement = document.getElementById('addTradePlanModal');
     if (modalElement) {
         if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
@@ -508,14 +508,14 @@ async function saveNewTradePlan() {
         return;
     }
 
-    // בדיקת תקינות הטופס
+    // Validating the form
     if (!form.checkValidity()) {
         form.reportValidity();
         return;
     }
 
     const formData = {
-        account_id: 1, // ברירת מחדל לחשבון ראשי
+        account_id: 1, // Default to main account
         ticker_id: parseInt(document.getElementById('addTradePlanTickerId').value),
         investment_type: document.getElementById('addTradePlanInvestmentType').value,
         side: document.getElementById('addTradePlanSide').value,
@@ -524,10 +524,10 @@ async function saveNewTradePlan() {
         target_price: parseFloat(document.getElementById('addTradePlanTargetPrice').value) || null,
         entry_conditions: document.getElementById('addTradePlanEntryConditions').value || '',
         reasons: document.getElementById('addTradePlanReasons').value || '',
-        status: 'open' // ברירת מחדל לסטטוס פתוח
+        status: 'open' // Default to open status
     };
 
-    console.log('שולח תכנון חדש:', formData);
+    console.log('Sending new trade plan:', formData);
 
     try {
         const response = await fetch('/api/v1/trade_plans/', {
@@ -538,8 +538,8 @@ async function saveNewTradePlan() {
             body: JSON.stringify(formData)
         });
 
-        // לוג מפורט של התגובה
-        console.log('תגובת השרת:', {
+        // Detailed log of the response
+        console.log('Server response:', {
             status: response.status,
             statusText: response.statusText,
             ok: response.ok
@@ -547,28 +547,28 @@ async function saveNewTradePlan() {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('תגובת שגיאה מהשרת:', errorText);
-            throw new Error(`שגיאה בשמירת תכנון: ${response.status} - ${errorText}`);
+            console.error('Error response from server:', errorText);
+            throw new Error(`Error saving trade plan: ${response.status} - ${errorText}`);
         }
 
         if (response.ok) {
             const newDesign = await response.json();
-            console.log('תכנון נשמר בהצלחה:', newDesign);
+            console.log('Trade plan saved successfully:', newDesign);
 
-            // סגירת המודל
+            // Closing the modal
             closeModal('addTradePlanModal');
 
-            // רענון הנתונים
+            // Refreshing data
             loadDesignsData();
 
-            // הצגת הודעה
-            showSuccessNotification('תכנון נשמר', 'תכנון נשמר בהצלחה!');
+            // Displaying success message
+            showSuccessNotification('Trade plan saved', 'Trade plan saved successfully!');
         } else {
-            throw new Error(`שגיאה בשמירת תכנון: ${response.status}`);
+            throw new Error(`Error saving trade plan: ${response.status}`);
         }
     } catch (error) {
-        console.error('שגיאה בשמירת תכנון:', error);
-        showErrorNotification('שגיאה בשמירת תכנון', 'שגיאה בשמירת תכנון: ' + error.message);
+        console.error('Error saving trade plan:', error);
+        showErrorNotification('Error saving trade plan', 'Error saving trade plan: ' + error.message);
     }
 }
 
@@ -578,44 +578,44 @@ async function saveNewTradePlan() {
 function editDesign(designId) {
     const design = designsData.find(d => d.id === designId);
     if (!design) {
-        showErrorNotification('תכנון לא נמצא', 'תכנון לא נמצא');
+        showErrorNotification('Trade plan not found', 'Trade plan not found');
         return;
     }
 
-    // כאן תהיה פתיחת מודל עריכה
-    console.log('עריכת תכנון:', design);
-    showInfoNotification('עריכת תכנון', 'פונקציית עריכת תכנון תתווסף בקרוב');
+    // Here will be the edit modal opening
+    console.log('Editing trade plan:', design);
+    showInfoNotification('Editing trade plan', 'Edit trade plan function will be added soon');
 }
 
 /**
  * מחיקת תכנון
  */
 async function deleteDesign(designId) {
-    if (!confirm('האם אתה בטוח שברצונך למחוק תכנון זה?')) {
+    if (!confirm('Are you sure you want to delete this trade plan?')) {
         return;
     }
 
     try {
-        console.log('מוחק תכנון:', designId);
+        console.log('Deleting trade plan:', designId);
 
         const response = await fetch(`/api/v1/trade_plans/${designId}`, {
             method: 'DELETE'
         });
 
         if (response.ok) {
-            console.log('תכנון נמחק בהצלחה');
+            console.log('Trade plan deleted successfully');
 
-            // רענון הנתונים
+            // Refreshing data
             loadDesignsData();
 
-            // הצגת הודעה
-            showSuccessNotification('תכנון נמחק', 'תכנון נמחק בהצלחה!');
+            // Displaying success message
+            showSuccessNotification('Trade plan deleted', 'Trade plan deleted successfully!');
         } else {
-            throw new Error(`שגיאה במחיקת תכנון: ${response.status}`);
+            throw new Error(`Error deleting trade plan: ${response.status}`);
         }
     } catch (error) {
-        console.error('שגיאה במחיקת תכנון:', error);
-        showErrorNotification('שגיאה במחיקת תכנון', 'שגיאה במחיקת תכנון: ' + error.message);
+        console.error('Error deleting trade plan:', error);
+        showErrorNotification('Error deleting trade plan', 'Error deleting trade plan: ' + error.message);
     }
 }
 
@@ -641,9 +641,9 @@ function closeModal(modalId) {
  * פילטור נתוני תכנונים
  */
 function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
-    console.log('פילטור תכנונים:', { statuses, types, accounts, dateRange, searchTerm });
+    console.log('Filtering trade plans:', { statuses, types, accounts, dateRange, searchTerm });
 
-    // קריאה לפונקציה הגלובלית עם pageName
+    // Calling global function with pageName
     if (typeof window.updateGridFromComponentGlobal === 'function') {
         window.updateGridFromComponentGlobal(statuses, types, accounts, dateRange, searchTerm, 'planning');
     }
@@ -663,21 +663,21 @@ function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
  * @param {number} columnIndex - אינדקס העמודה לסידור (0-8)
  * 
  * @example
- * sortTable(0); // סידור לפי עמודת נכס
- * sortTable(1); // סידור לפי עמודת תאריך
- * sortTable(8); // סידור לפי עמודת סטטוס
+ * sortTable(0); // Sort by asset column
+ * sortTable(1); // Sort by date column
+ * sortTable(8); // Sort by status column
  * 
- * @requires window.sortTableData - פונקציה גלובלית מ-main.js
- * @requires window.filteredDesignsData - נתונים מסוננים
- * @requires designsData - נתונים מקוריים
- * @requires updateDesignsTable - פונקציה לעדכון הטבלה
+ * @requires window.sortTableData - Global function from main.js
+ * @requires window.filteredDesignsData - Filtered data
+ * @requires designsData - Original data
+ * @requires updateDesignsTable - Function to update table
  * 
  * @since 2.0
  */
 function sortTable(columnIndex) {
-    console.log(`🔄 מיון טבלת תכנונים לפי עמודה ${columnIndex}`);
+    console.log(`🔄 Sorting table by column ${columnIndex}`);
 
-    // שימוש בפונקציה הגלובלית
+    // Using global function
     if (typeof window.sortTableData === 'function') {
         const sortedData = window.sortTableData(
             columnIndex,
@@ -686,7 +686,7 @@ function sortTable(columnIndex) {
             updateDesignsTable
         );
 
-        // עדכון הנתונים המסוננים
+        // Updating filtered data
         window.filteredDesignsData = sortedData;
     } else {
         console.error('❌ sortTableData function not found in main.js');
@@ -694,10 +694,10 @@ function sortTable(columnIndex) {
 }
 
 /**
- * קבלת מחלקת סטטוס
+ * Getting status class
  */
 function getStatusClass(status) {
-    // הגנה מפני ערכים לא תקינים
+    // Safeguarding against invalid values
     if (status === null || status === undefined) {
         return 'status-inactive';
     }
@@ -711,10 +711,10 @@ function getStatusClass(status) {
 }
 
 /**
- * קבלת מחלקת CSS לסוג
+ * Getting CSS class for type
  */
 function getTypeClass(type) {
-    // הגנה מפני ערכים לא תקינים
+    // Safeguarding against invalid values
     if (type === null || type === undefined) {
         return 'type-other';
     }
@@ -728,10 +728,10 @@ function getTypeClass(type) {
 }
 
 /**
- * קבלת תצוגת סוג
+ * Getting type display
  */
 function getTypeDisplay(type) {
-    // הגנה מפני ערכים לא תקינים
+    // Safeguarding against invalid values
     if (type === null || type === undefined) {
         return 'לא מוגדר';
     }
@@ -745,10 +745,10 @@ function getTypeDisplay(type) {
 }
 
 /**
- * קבלת תצוגת סטטוס
+ * Getting status display
  */
 function getStatusDisplay(status) {
-    // הגנה מפני ערכים לא תקינים
+    // Safeguarding against invalid values
     if (status === null || status === undefined) {
         return 'לא מוגדר';
     }
@@ -784,7 +784,7 @@ function createDateWithTimezone(year, month, day) {
     const preferences = loadUserPreferences();
     const timezone = preferences?.timezone || 'Asia/Jerusalem';
 
-    // יצירת תאריך עם timezone
+    // Creating date with timezone
     const date = new Date(year, month, day);
     const options = {
         timeZone: timezone,
@@ -858,7 +858,7 @@ function translateDateRangeToDates(dateRange) {
             case 'השבוע':
                 const startOfWeek = new Date(today);
                 const dayOfWeek = today.getDay();
-                // בישראל השבוע מתחיל ביום ראשון (0)
+                // In Israel, the week starts on Sunday (0)
                 startOfWeek.setDate(today.getDate() - dayOfWeek);
                 startDate = startOfWeek.toISOString().split('T')[0];
                 endDate = todayStr;
@@ -935,7 +935,7 @@ function translateDateRangeToDates(dateRange) {
             case 'שנה קודמת':
                 startDate = createDateWithTimezone(today.getFullYear() - 1, 0, 1);
                 endDate = createDateWithTimezone(today.getFullYear() - 1, 11, 31);
-                console.log('🔄 שנה קודמת calculation:', {
+                console.log('🔄 Previous year calculation:', {
                     today: todayStr,
                     lastYear: today.getFullYear() - 1,
                     startDate: startDate,
@@ -944,7 +944,7 @@ function translateDateRangeToDates(dateRange) {
                 break;
 
             default:
-                // ניסיון לחלץ תאריכים מטקסט
+                // Attempting to extract dates from text
                 if (dateRange.includes(' - ')) {
                     const dates = dateRange.split(' - ');
                     startDate = dates[0] || 'לא נבחר';
@@ -1047,7 +1047,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
 
     let filteredDesigns = [...designs];
 
-    // חילוץ תאריכי התחלה וסיום
+    // Extracting start and end dates
     let startDate = null;
     let endDate = null;
 
@@ -1061,7 +1061,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
 
     console.log('🔄 Extracted dates:', { startDate, endDate });
 
-    // פילטר לפי סטטוס
+    // Filtering by status
     if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
         console.log('🔄 Filtering by status:', selectedStatuses);
         filteredDesigns = filteredDesigns.filter(design => {
@@ -1080,7 +1080,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
         console.log('🔄 After status filter:', filteredDesigns.length, 'designs');
     }
 
-    // פילטר לפי סוג
+    // Filtering by type
     if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
         console.log('🔄 Filtering by type:', selectedTypes);
         filteredDesigns = filteredDesigns.filter(design => {
@@ -1105,7 +1105,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
         console.log('🔄 After type filter:', filteredDesigns.length, 'designs');
     }
 
-    // פילטר לפי תאריכים
+    // Filtering by dates
     if (startDate && endDate) {
         console.log('🔄 Filtering by date range:', { startDate, endDate });
         filteredDesigns = filteredDesigns.filter(design => {
@@ -1115,7 +1115,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
             const start = new Date(startDate);
             const end = new Date(endDate);
 
-            // הגדרת זמן לתחילת היום לתאריך התחלה ולסוף היום לתאריך סיום
+            // Setting time to start of day for start date and end of day for end date
             start.setHours(0, 0, 0, 0);
             end.setHours(23, 59, 59, 999);
 
@@ -1126,14 +1126,14 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
         console.log('🔄 After date filter:', filteredDesigns.length, 'designs');
     }
 
-    // פילטר לפי חיפוש
+    // Filtering by search term
     if (searchTerm && searchTerm.trim() !== '') {
         console.log('🔄 Filtering by search term:', searchTerm);
         const searchLower = searchTerm.toLowerCase();
 
-        // תרגום מונחי חיפוש דו-כיווני
+        // Bi-directional search term translations
         const searchTranslations = {
-            // תרגום סטטוסים
+            // Status translations
             'פתוח': 'open',
             'סגור': 'closed',
             'בוטל': 'cancelled',
@@ -1142,7 +1142,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
             'closed': 'closed',
             'cancelled': 'cancelled',
 
-            // תרגום סוגי השקעות
+            // Investment type translations
             'סווינג': 'swing',
             'השקעה': 'investment',
             'פאסיבי': 'passive',
@@ -1150,13 +1150,13 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
             'investment': 'investment',
             'passive': 'passive',
 
-            // תרגום צדדים
+            // Side translations
             'לונג': 'long',
             'שורט': 'short',
             'long': 'long',
             'short': 'short',
 
-            // תרגום מספרים
+            // Number translations
             'אפס': '0',
             'אחת': '1',
             'שתיים': '2',
@@ -1170,15 +1170,15 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
             'עשר': '10'
         };
 
-        // יצירת מערך מונחי חיפוש כולל התרגום
+        // Creating an array of search terms including translations
         const searchTerms = [searchLower];
 
-        // הוספת תרגום מדויק
+        // Adding exact translation
         if (searchTranslations[searchLower]) {
             searchTerms.push(searchTranslations[searchLower]);
         }
 
-        // הוספת חיפוש חלקי - אם המשתמש מחפש חלק ממילה
+        // Adding partial search - if user searches for part of a word
         Object.keys(searchTranslations).forEach(hebrewTerm => {
             if (hebrewTerm.includes(searchLower) && !searchTerms.includes(searchTranslations[hebrewTerm])) {
                 searchTerms.push(searchTranslations[hebrewTerm]);
@@ -1186,7 +1186,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
         });
 
         filteredDesigns = filteredDesigns.filter(design => {
-            // חיפוש בכל השדות הרלוונטיים - לפי המבנה האמיתי מהשרת
+            // Searching in all relevant fields - based on actual server structure
             const tickerMatch = design.ticker && searchTerms.some(term =>
                 (design.ticker.symbol && design.ticker.symbol.toLowerCase().includes(term)) ||
                 (design.ticker.name && design.ticker.name.toLowerCase().includes(term))
@@ -1254,7 +1254,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
  * עיצוב מטבע
  */
 function formatCurrency(amount) {
-    // טיפול במקרים של null, undefined או ערכים לא תקינים
+    // Handling null, undefined or invalid values
     if (amount === null || amount === undefined || amount === '') {
         return '$0';
     }
@@ -1270,7 +1270,7 @@ function formatCurrency(amount) {
         }
     }
 
-    // אם לא הצלחנו לפרסר, נחזיר 0
+    // If we couldn't parse, return 0
     return '$0';
 }
 
@@ -1280,7 +1280,7 @@ function formatCurrency(amount) {
  * פונקציה זו משתמשת בפונקציה הגלובלית מ-main.js
  */
 function restoreDesignsSectionState() {
-    // שימוש בפונקציה הגלובלית החדשה
+    // Using the new global function
     if (typeof window.restoreAllSectionStates === 'function') {
         window.restoreAllSectionStates();
     } else {
@@ -1288,7 +1288,7 @@ function restoreDesignsSectionState() {
     }
 }
 
-// הגנה - וידוא שהפונקציות הגלובליות זמינות
+// Safeguarding - ensuring global functions are available
 if (typeof window.toggleTopSection !== 'function') {
     window.toggleTopSection = function () {
         console.warn('toggleTopSection fallback called - main.js may not be loaded properly');
@@ -1297,28 +1297,28 @@ if (typeof window.toggleTopSection !== 'function') {
 
 if (typeof window.toggleMainSection !== 'function') {
     window.toggleMainSection = function () {
-        console.log('🔄 toggleMainSection fallback נקראה');
+        console.log('🔄 toggleMainSection fallback called');
         const contentSections = document.querySelectorAll('.content-section');
-        console.log('📋 מספר content-sections נמצא:', contentSections.length);
-        const planningSection = contentSections[0]; // הסקשן הראשון - תכנונים
+        console.log('📋 Number of content-sections found:', contentSections.length);
+        const planningSection = contentSections[0]; // The first section - planning
 
         if (!planningSection) {
-            console.error('❌ לא נמצא סקשן תכנונים');
+            console.error('❌ Planning section not found');
             return;
         }
-        console.log('✅ סקשן תכנונים נמצא:', planningSection);
+        console.log('✅ Planning section found:', planningSection);
 
         const sectionBody = planningSection.querySelector('.section-body');
         const toggleBtn = planningSection.querySelector('button[onclick="toggleMainSection()"]');
         const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-        console.log('🎯 sectionBody נמצא:', !!sectionBody);
-        console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
-        console.log('🎨 icon נמצא:', !!icon);
+        console.log('🎯 sectionBody found:', !!sectionBody);
+        console.log('🔘 toggleBtn found:', !!toggleBtn);
+        console.log('🎨 icon found:', !!icon);
 
         if (sectionBody) {
             const isCollapsed = sectionBody.style.display === 'none';
-            console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
+            console.log('📊 Current state - isCollapsed:', isCollapsed);
 
             if (isCollapsed) {
                 sectionBody.style.display = 'block';
@@ -1326,22 +1326,22 @@ if (typeof window.toggleMainSection !== 'function') {
                 sectionBody.style.display = 'none';
             }
 
-            // עדכון האייקון
+            // Updating icon
             if (icon) {
                 icon.textContent = isCollapsed ? '▲' : '▼';
             }
 
-            // שמירת המצב ב-localStorage
+            // Saving state to localStorage
             localStorage.setItem('planningSectionCollapsed', !isCollapsed);
         }
     };
 }
 
-// אתחול הדף
+// Initialization
 document.addEventListener('DOMContentLoaded', function () {
     console.log('🔄 === DOM CONTENT LOADED (PLANNING) ===');
 
-    // בדיקת זמינות פונקציות גלובליות
+    // Checking global function availability
     console.log('🔍 Checking global functions:', {
         toggleTopSection: typeof window.toggleTopSection,
         toggleMainSection: typeof window.toggleMainSection,
@@ -1350,31 +1350,31 @@ document.addEventListener('DOMContentLoaded', function () {
         updateGridFromComponentGlobal: typeof window.updateGridFromComponentGlobal
     });
 
-    // שחזור מצב הסקשנים
+    // Restoring section state
     restoreDesignsSectionState();
 
-    // אתחול פילטרים
+    // Initializing filters
     if (typeof window.initializePageFilters === 'function') {
         window.initializePageFilters('planning');
     }
 
-    // טעינת נתונים
+    // Loading data
     loadDesignsData();
 
-    // עדכון חלון הבדיקה בטעינת הדף
+    // Updating debug panel on page load
     setTimeout(() => {
         updateFilterDebugPanel();
     }, 1000);
 
-    // טעינת מצב המיון
+    // Loading sort state
     if (typeof window.loadSortState === 'function') {
         window.loadSortState('planning');
     }
 });
 
-// הפונקציה updateGridFromComponent כבר מוגדרת בתחילת הקובץ
+// updateGridFromComponent is already defined at the beginning of the file
 
-// הוספת הפונקציות לגלובל
+// Adding functions to global scope
 window.loadDesignsData = loadDesignsData;
 window.updateDesignsTable = updateDesignsTable;
 window.showAddTradePlanModal = showAddTradePlanModal;
@@ -1387,7 +1387,7 @@ window.filterDesignsLocally = filterDesignsLocally;
 window.updateFilterDebugPanel = updateFilterDebugPanel;
 window.translateDateRangeToDates = translateDateRangeToDates;
 
-// בדיקה שהפונקציות זמינות
+// Checking if functions are available
 console.log('🔄 Planning.js loaded. Available functions:', {
     loadDesignsData: typeof window.loadDesignsData,
     updateDesignsTable: typeof window.updateDesignsTable,
@@ -1396,12 +1396,12 @@ console.log('🔄 Planning.js loaded. Available functions:', {
     updateGridFromComponent: typeof window.updateGridFromComponent
 });
 
-// וידוא שהפונקציה שלנו מוגדרת
+// Verifying that our function is defined
 if (window.location.pathname.includes('/planning')) {
     console.log('✅ Planning page detected - updateGridFromComponent should be ours');
     console.log('✅ Our updateGridFromComponent function:', typeof window.updateGridFromComponent);
 
-    // בדיקה שהפונקציה שלנו נקראת
+    // Verifying that our function is called
     if (typeof window.updateGridFromComponent === 'function') {
         console.log('✅ Our updateGridFromComponent function is properly defined');
     } else {

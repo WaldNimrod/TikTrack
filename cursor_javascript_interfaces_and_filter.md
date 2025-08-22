@@ -26582,7 +26582,7 @@ function getStatusForSort(status) {
     switch (status) {
         case 'open': return 1;
         case 'closed': return 2;
-        case 'canceled': return 3;
+        case 'cancelled': return 3;
         default: return 0;
     }
 }
@@ -26607,7 +26607,7 @@ function getStatusDisplay(status) {
         case 'open': return 'פתוח';
         case 'closed': return 'סגור';
         case 'cancelled': return 'מבוטל';
-        case 'canceled': return 'מבוטל';
+        case 'cancelled': return 'מבוטל';
         default: return status;
     }
 }

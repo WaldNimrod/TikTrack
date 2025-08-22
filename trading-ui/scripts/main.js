@@ -1113,12 +1113,12 @@ async function cancelAlert(alertId) {
 
     if (response.ok) {
       console.log('התראה בוטלה בהצלחה');
-      
+
       // רענון הנתונים
       if (typeof window.loadAlertsData === 'function') {
         window.loadAlertsData();
       }
-      
+
       // הצגת הודעה
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('התראה בוטלה', 'התראה בוטלה בהצלחה!');
@@ -2353,7 +2353,7 @@ function getStatusForSort(status) {
     case 'open': return 1;
     case 'closed': return 2;
     case 'cancelled': return 3;
-    case 'canceled': return 3;
+    case 'cancelled': return 3;
     default: return 0;
   }
 }

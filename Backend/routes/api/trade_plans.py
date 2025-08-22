@@ -10,14 +10,14 @@ trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/v1/trade_pl
 
 @trade_plans_bp.route('/', methods=['GET'])
 def get_trade_plans():
-    """קבלת כל תוכניות הטרייד"""
+    """Get all trade plans"""
     try:
         db: Session = next(get_db())
         logger.info("Fetching all trade plans from database")
         plans = TradePlanService.get_all(db)
         logger.info(f"Retrieved {len(plans)} trade plans")
         
-        # המרה למילונים
+        # Convert to dictionaries
         plans_data = []
         for plan in plans:
             try:
@@ -26,7 +26,7 @@ def get_trade_plans():
                 logger.debug(f"Converted plan {plan.id} to dict: {plan_dict}")
             except Exception as e:
                 logger.error(f"Error converting plan {plan.id} to dict: {str(e)}")
-                # ננסה המרה בסיסית
+                # Try basic conversion
                 basic_dict = {
                     'id': plan.id,
                     'ticker_id': plan.ticker_id,
@@ -59,7 +59,7 @@ def get_trade_plans():
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['GET'])
 def get_trade_plan(plan_id: int):
-    """קבלת תוכנית טרייד לפי מזהה"""
+    """Get trade plan by ID"""
     try:
         db: Session = next(get_db())
         plan = TradePlanService.get_by_id(db, plan_id)
@@ -87,7 +87,7 @@ def get_trade_plan(plan_id: int):
 
 @trade_plans_bp.route('/account/<int:account_id>', methods=['GET'])
 def get_trade_plans_by_account(account_id: int):
-    """קבלת תוכניות טרייד לפי חשבון"""
+    """Get trade plans by account"""
     try:
         db: Session = next(get_db())
         plans = TradePlanService.get_by_account(db, account_id)
@@ -109,7 +109,7 @@ def get_trade_plans_by_account(account_id: int):
 
 @trade_plans_bp.route('/', methods=['POST'])
 def create_trade_plan():
-    """יצירת תוכנית טרייד חדשה"""
+    """Create new trade plan"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -132,7 +132,7 @@ def create_trade_plan():
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['PUT'])
 def update_trade_plan(plan_id: int):
-    """עדכון תוכנית טרייד"""
+    """Update trade plan"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
@@ -161,7 +161,7 @@ def update_trade_plan(plan_id: int):
 
 @trade_plans_bp.route('/<int:plan_id>/cancel', methods=['POST'])
 def cancel_trade_plan(plan_id: int):
-    """ביטול תוכנית טרייד"""
+    """Cancel trade plan"""
     try:
         data = request.get_json()
         cancel_reason = data.get('cancel_reason', 'Cancelled by user')
@@ -191,7 +191,7 @@ def cancel_trade_plan(plan_id: int):
 
 @trade_plans_bp.route('/<int:plan_id>/activate', methods=['POST'])
 def activate_trade_plan(plan_id: int):
-    """הפעלת תוכנית טרייד"""
+    """Activate trade plan"""
     try:
         db: Session = next(get_db())
         plan = TradePlanService.activate_plan(db, plan_id)
@@ -219,7 +219,7 @@ def activate_trade_plan(plan_id: int):
 
 @trade_plans_bp.route('/summary', methods=['GET'])
 def get_trade_plan_summary():
-    """קבלת סיכום תוכניות טרייד"""
+    """Get trade plan summary"""
     try:
         account_id = request.args.get('account_id', type=int)
         db: Session = next(get_db())

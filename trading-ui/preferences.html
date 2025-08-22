@@ -964,6 +964,28 @@
                 </div>
               </div>
 
+              <!-- Console cleanup interval setting -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">🧹</span>
+                  <div class="preference-text">
+                    <h4>זמן ניקוי קונסולה</h4>
+                    <p>זמן (בשניות) עד לניקוי אוטומטי של הודעות הקונסולה</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <select id="consoleCleanupIntervalSelect" class="form-select"
+                    onchange="updateConsoleCleanupInterval(this.value)">
+                    <option value="30000">30 שניות</option>
+                    <option value="60000">דקה אחת</option>
+                    <option value="120000">2 דקות</option>
+                    <option value="300000">5 דקות</option>
+                    <option value="600000">10 דקות</option>
+                    <option value="0">אין ניקוי אוטומטי</option>
+                  </select>
+                </div>
+              </div>
+
 
             </div>
           </div>
@@ -1515,6 +1537,7 @@
     <script src="scripts/app-header.js" onerror="console.error('Failed to load app-header.js')"></script>
     <script src="scripts/main.js" onerror="console.error('Failed to load main.js')"></script>
     <script src="scripts/grid-filters.js" onerror="console.error('Failed to load grid-filters.js')"></script>
+    <script src="scripts/console-cleanup.js" onerror="console.error('Failed to load console-cleanup.js')"></script>
     <script src="scripts/preferences.js" onerror="console.error('Failed to load preferences.js')"></script>
 
 </body>

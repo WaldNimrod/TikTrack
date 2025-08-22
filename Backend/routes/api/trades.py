@@ -207,6 +207,33 @@ def cancel_trade(trade_id: int):
     finally:
         db.close()
 
+@trades_bp.route('/<int:trade_id>', methods=['DELETE'])
+def delete_trade(trade_id: int):
+    """Delete trade"""
+    try:
+        db: Session = next(get_db())
+        success = TradeService.delete(db, trade_id)
+        if success:
+            return jsonify({
+                "status": "success",
+                "message": "Trade deleted successfully",
+                "version": "v1"
+            })
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Trade not found"},
+            "version": "v1"
+        }), 404
+    except Exception as e:
+        logger.error(f"Error deleting trade {trade_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 400
+    finally:
+        db.close()
+
 @trades_bp.route('/summary', methods=['GET'])
 def get_trade_summary():
     """Get trade summary"""

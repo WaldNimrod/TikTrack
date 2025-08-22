@@ -15,10 +15,15 @@ def database() -> Any:
     """Database page"""
     return send_from_directory(UI_DIR, "database.html")
 
+@pages_bp.route('/trades')
+def trades() -> Any:
+    """Trades page"""
+    return send_from_directory(UI_DIR, "trades.html")
+
 @pages_bp.route('/tracking')
 def tracking() -> Any:
-    """Tracking page"""
-    return send_from_directory(UI_DIR, "tracking.html")
+    """Tracking page - redirect to trades"""
+    return send_from_directory(UI_DIR, "trades.html")
 
 @pages_bp.route('/planning')
 def planning() -> Any:
@@ -55,10 +60,40 @@ def research() -> Any:
     """Research page"""
     return send_from_directory(UI_DIR, "research.html")
 
+@pages_bp.route('/research_new')
+def research_new() -> Any:
+    """Research new page"""
+    return send_from_directory(UI_DIR, "research_new.html")
+
+@pages_bp.route('/cash_flows')
+def cash_flows() -> Any:
+    """Cash flows page"""
+    return send_from_directory(UI_DIR, "cash_flows.html")
+
+@pages_bp.route('/currencies')
+def currencies() -> Any:
+    """Currencies page"""
+    return send_from_directory(UI_DIR, "currencies.html")
+
+@pages_bp.route('/designs')
+def designs() -> Any:
+    """Designs page"""
+    return send_from_directory(UI_DIR, "designs.html")
+
 @pages_bp.route('/preferences')
 def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
+
+@pages_bp.route('/notification-demo')
+def notification_demo() -> Any:
+    """Notification demo page"""
+    return send_from_directory(UI_DIR, "notification-demo.html")
+
+@pages_bp.route('/test-header-only')
+def test_header_only() -> Any:
+    """Test header only page"""
+    return send_from_directory(UI_DIR, "test-header-only.html")
 
 @pages_bp.route('/<path:filename>')
 def static_files(filename: str) -> Any:

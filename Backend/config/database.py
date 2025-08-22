@@ -35,6 +35,6 @@ def get_db() -> Generator[Session, None, None]:
 def init_db() -> None:
     """יצירת כל הטבלאות"""
     from models.base import Base
-    from models import ticker, trade, account, trade_plan, alert, cash_flow, note, execution
+    from models import ticker, trade, account, trade_plan, alert, cash_flow, note, execution, currency
     Base.metadata.create_all(bind=engine)
     print("✅ Database tables created successfully!")

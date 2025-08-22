@@ -437,116 +437,116 @@ case 'שבוע':  // 7 days back
 - **Dropdown Design:** Improved filter menu design
 - **Consistent Text:** Updated filter texts to consistent Hebrew
 
-#### 🔗 פונקציות חדשות:
+#### 🔗 New Functions:
 ```javascript
-// פונקציה גלובלית לטיפול בפילטרים
+// Global function for handling filters
 window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName)
 
-// פונקציות ספציפיות לכל דף
+// Page-specific functions
 window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
   window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'pageName');
 }
 
-// פונקציה לטעינת כל החשבונות
+// Function for loading all accounts
 window.loadAllAccountsFromServer()
 ```
 
-#### 📊 קבצים שנוצרו/עודכנו:
-- ✅ `trading-ui/scripts/designs.js` - קובץ חדש לדף התכנונים
-- ✅ `trading-ui/scripts/tracking.js` - שינוי שם מ-`trades.js`
-- ✅ `trading-ui/scripts/grid-filters.js` - עדכון פונקציות פילטרים
-- ✅ `trading-ui/scripts/app-header.js` - עדכון פילטר חשבונות ותאריכים
-- ✅ `trading-ui/scripts/accounts.js` - הוספת פונקציה `updateGridFromComponent`
-- ✅ `trading-ui/scripts/notes.js` - הוספת פונקציה `updateGridFromComponent`
-- ✅ `trading-ui/scripts/alerts.js` - הוספת פונקציה `updateGridFromComponent`
+#### 📊 Files Created/Updated:
+- ✅ `trading-ui/scripts/designs.js` - New file for planning page
+- ✅ `trading-ui/scripts/tracking.js` - Renamed from `trades.js`
+- ✅ `trading-ui/scripts/grid-filters.js` - Updated filter functions
+- ✅ `trading-ui/scripts/app-header.js` - Updated account and date filters
+- ✅ `trading-ui/scripts/accounts.js` - Added `updateGridFromComponent` function
+- ✅ `trading-ui/scripts/notes.js` - Added `updateGridFromComponent` function
+- ✅ `trading-ui/scripts/alerts.js` - Added `updateGridFromComponent` function
 
-#### 🗑️ קבצים שנמחקו:
-- ❌ `trading-ui/scripts/trades.js` - הוחלף ב-`tracking.js`
-- ❌ `trading-ui/scripts/grid-data.js` - אוחד לתוך `main.js`
+#### 🗑️ Deleted Files:
+- ❌ `trading-ui/scripts/trades.js` - Replaced by `tracking.js`
+- ❌ `trading-ui/scripts/grid-data.js` - Merged into `main.js`
 
-#### 🚨 בעיות שפתרנו:
-- **בעיית עקביות פילטרים:** פילטרים עבדו בדף אחד וקלקלו דף אחר
-- **בעיית טעינת חשבונות:** פילטר חשבונות הציג חשבונות מחוקים מ-localStorage
-- **בעיית סטטוסים:** אי-עקביות בין `cancelled` ו-`cancelled` בבסיס הנתונים
-- **בעיית מבנה דפים:** דף התכנונים לא טען את הקובץ `designs.js`
-- **בעיית פונקציות גלובליות:** פונקציות לא היו זמינות בין קבצים שונים
+#### 🚨 Issues We Solved:
+- **Filter Consistency Issue:** Filters worked on one page and broke another
+- **Account Loading Issue:** Account filter displayed deleted accounts from localStorage
+- **Status Issue:** Inconsistency between `cancelled` and `cancelled` in database
+- **Page Structure Issue:** Planning page didn't load `designs.js` file
+- **Global Functions Issue:** Functions weren't available between different files
 
-#### 📚 לקחים שנלמדו:
-- **ארכיטקטורה מודולרית:** הפרדת פונקציות ספציפיות לקבצים ייעודיים
-- **פונקציות גלובליות:** חשיפת פונקציות דרך `window` object לזמינות בין קבצים
-- **עקביות נתונים:** שמירת נתונים באנגלית בבסיס הנתונים ותרגום רק ב-UI
-- **בדיקת תלויות:** וידוא שכל הקבצים הנדרשים נטענים בדפים
-- **תיעוד שינויים:** תיעוד מפורט של כל שינוי לאיתור בעיות עתידיות
+#### 📚 Lessons Learned:
+- **Modular Architecture:** Separating specific functions to dedicated files
+- **Global Functions:** Exposing functions through `window` object for availability between files
+- **Data Consistency:** Storing data in English in database and translating only in UI
+- **Dependency Checking:** Ensuring all required files are loaded on pages
+- **Change Documentation:** Detailed documentation of each change for future problem identification
 
-#### 🔍 בדיקות איכות:
-- ✅ כל הדפים טוענים את הקבצים הנכונים
-- ✅ פילטרים עובדים באופן עקבי בכל הדפים
-- ✅ פונקציות גלובליות זמינות בין קבצים
-- ✅ טקסטים בפילטרים עקביים בעברית
-- ✅ נתונים בבסיס הנתונים עקביים באנגלית
+#### 🔍 Quality Tests:
+- ✅ All pages load the correct files
+- ✅ Filters work consistently on all pages
+- ✅ Global functions available between files
+- ✅ Filter texts consistent in Hebrew
+- ✅ Database data consistent in English
 
-### גרסה 2.3 (אוגוסט 2025)
-- **איחוד קבצי JavaScript:** איחוד `grid-table.js` ו-`grid-data.js` לתוך `main.js`
-- **שיפור ארכיטקטורה:** הגדרת כללים ברורים לחלוקת פונקציות בין קבצים
-- **תיעוד משופר:** הוספת תיעוד מפורט על מבנה הקבצים
-- **תיקון באגים:** תיקון בעיות בטעינת נתונים ופילטרים
+### Version 2.3 (August 2025)
+- **JavaScript File Consolidation:** Merging `grid-table.js` and `grid-data.js` into `main.js`
+- **Architecture Improvement:** Defining clear rules for function distribution between files
+- **Improved Documentation:** Adding detailed documentation about file structure
+- **Bug Fixes:** Fixing issues in data loading and filters
 
-### גרסה 2.2 (אוגוסט 2025)
-- **תיקון באגים:** תיקון שגיאת `joinedload` בשרת
-- **שיפור UI:** תיקון כפתורי סגירה/פתיחה של סקשנים
-- **אופטימיזציה:** שיפור ביצועים בטעינת נתונים
+### Version 2.2 (August 2025)
+- **Bug Fixes:** Fixed `joinedload` error in server
+- **UI Improvement:** Fixed section open/close buttons
+- **Optimization:** Improved performance in data loading
 
-## 🤝 תרומה לפרויקט
+## 🤝 Project Contribution
 
-### כללי פיתוח:
-1. **תיעוד:** כל פונקציה חדשה חייבת להיות מתועדת
-2. **בדיקות:** בדיקת הפונקציונליות לפני commit
-3. **גיבוי:** יצירת גיבוי לפני שינויים משמעותיים
-4. **ארכיטקטורה:** שמירה על הכללים שהוגדרו לחלוקת קבצים
+### Development Rules:
+1. **Documentation:** Every new function must be documented
+2. **Testing:** Testing functionality before commit
+3. **Backup:** Creating backup before significant changes
+4. **Architecture:** Maintaining defined rules for file distribution
 
-### תהליך פיתוח:
-1. יצירת branch חדש
-2. פיתוח ותיעוד
-3. בדיקות מקיפות
-4. יצירת Pull Request
+### Development Process:
+1. Creating new branch
+2. Development and documentation
+3. Comprehensive testing
+4. Creating Pull Request
 5. Code Review
-6. Merge ל-main
+6. Merge to main
 
-## 🔗 **קישורים חשובים:**
+## 🔗 **Important Links:**
 
-### 🧪 **מערכת הבדיקות:**
-- **קובץ**: `Backend/testing_suite/README.md`
-- **תוכן**: בדיקות אוטומטיות, אמצעי אבטחה, דוחות
-- **מתי להשתמש**: כשצריך להריץ בדיקות או לפתח בדיקות חדשות
+### 🧪 **Testing System:**
+- **File**: `Backend/testing_suite/README.md`
+- **Content**: Automated tests, security measures, reports
+- **When to use**: When you need to run tests or develop new tests
 
-### 🚀 **הגדרות שרת:**
-- **קובץ**: `Backend/SERVER_CONFIGURATIONS.md`
-- **תוכן**: הגדרות שרת, סקריפטי הפעלה, סביבות פיתוח
-- **מתי להשתמש**: כשצריך להבין הגדרות שרת או לפתור בעיות שרת
+### 🚀 **Server Settings:**
+- **File**: `Backend/SERVER_CONFIGURATIONS.md`
+- **Content**: Server settings, startup scripts, development environments
+- **When to use**: When you need to understand server settings or solve server issues
 
-### 📊 **מערכת סידור טבלאות:**
-- **קובץ**: `documentation/TABLE_SORTING_SYSTEM.md`
-- **תוכן**: מערכת סידור גלובלית, פונקציות, עיצוב, הרחבה
-- **מתי להשתמש**: כשצריך להוסיף סידור לדף חדש או לפתור בעיות סידור
+### 📊 **Table Sorting System:**
+- **File**: `documentation/TABLE_SORTING_SYSTEM.md`
+- **Content**: Global sorting system, functions, design, extension
+- **When to use**: When you need to add sorting to a new page or solve sorting issues
 
-### 🚀 **הפעלת השרת:**
+### 🚀 **Server Startup:**
 ```bash
-# הקונפיגורציה היחידה בשימוש
+# Single configuration in use
 ./start_dev.sh
 
-# או הפעלה ישירה
+# Or direct startup
 cd Backend && python3 dev_server.py
 ```
 
-### 🧪 **הרצת בדיקות:**
+### 🧪 **Running Tests:**
 ```bash
-# בדיקות בטוחות (מומלץ)
+# Safe tests (recommended)
 cd Backend/testing_suite && make test-safe
 
-# כל הבדיקות
+# All tests
 cd Backend/testing_suite && make test
 
-# בדיקות ספציפיות
+# Specific tests
 cd Backend/testing_suite && make test-unit
 ```
 

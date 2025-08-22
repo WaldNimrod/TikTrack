@@ -17,3 +17,35 @@ class Alert(BaseModel):
     
     def __repr__(self) -> str:
         return f"<Alert(id={self.id}, type='{self.type}', active={self.is_active})>"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary with backward compatibility"""
+        result: Dict[str, Any] = super().to_dict()
+        
+        # Determine related_type based on related_type_id
+        if self.related_type_id == 1:
+            result['related_type'] = 'account'
+        elif self.related_type_id == 2:
+            result['related_type'] = 'trade'
+        elif self.related_type_id == 3:
+            result['related_type'] = 'trade_plan'
+        else:
+            result['related_type'] = None
+        
+        result['related_id'] = self.related_id
+        
+        # Add fields for backward compatibility
+        if self.related_type_id == 1:  # account
+            result['account_id'] = self.related_id
+            result['trade_id'] = None
+            result['trade_plan_id'] = None
+        elif self.related_type_id == 2:  # trade
+            result['account_id'] = None
+            result['trade_id'] = self.related_id
+            result['trade_plan_id'] = None
+        elif self.related_type_id == 3:  # trade_plan
+            result['account_id'] = None
+            result['trade_id'] = None
+            result['trade_plan_id'] = self.related_id
+        
+        return result

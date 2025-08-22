@@ -1031,60 +1031,6 @@ function toggleAllSections() {
 /**
  * המרת סטטוס חשבון לעברית
  */
-function convertAccountStatusToHebrew(status) {
-  const statusMap = {
-    'active': 'פעיל',
-    'inactive': 'לא פעיל',
-    'suspended': 'מושעה',
-    'closed': 'סגור'
-  };
-  return statusMap[status] || status;
-}
-
-/**
- * המרת סטטוס טיקר לעברית
- */
-function convertTickerStatusToHebrew(status) {
-  const statusMap = {
-    'active': 'פעיל',
-    'inactive': 'לא פעיל',
-    'suspended': 'מושעה',
-    'delisted': 'הוסר מהמסחר'
-  };
-  return statusMap[status] || status;
-}
-
-/**
- * המרת סטטוס הערה לעברית
- */
-function convertNoteStatusToHebrew(status) {
-  const statusMap = {
-    'active': 'פעיל',
-    'archived': 'בארכיון',
-    'deleted': 'נמחק'
-  };
-  return statusMap[status] || status;
-}
-
-/**
- * המרת סטטוס התראה לעברית
- */
-function convertAlertStatusToHebrew(status) {
-  const statusMap = {
-    'active': 'פעיל',
-    'inactive': 'לא פעיל',
-    'triggered': 'הופעל',
-    'cancelled': 'מבוטל'
-  };
-  return statusMap[status] || status;
-}
-
-/**
- * המרת מצב הפעלה לעברית
- */
-function convertIsTriggeredToHebrew(isTriggered) {
-  return isTriggered ? 'כן' : 'לא';
-}
 
 /**
  * הצגת מודל עריכת התראה
@@ -1543,7 +1489,7 @@ async function initializeGridSystem(containerId = '#agGridFloating', customOptio
 
     // 5. עדכון סטטיסטיקות
     console.log('5. Updating statistics...');
-          updatePageSummaryStats(data);
+    updatePageSummaryStats(data);
 
     console.log('=== Grid System Initialized Successfully ===');
     return true;
@@ -1653,7 +1599,7 @@ async function refreshGridSystem() {
     }
 
     // רענון סטטיסטיקות
-          updatePageSummaryStats(newData);
+    updatePageSummaryStats(newData);
 
     console.log('Grid system refreshed successfully');
     return true;
@@ -1889,11 +1835,6 @@ window.editRecord = editRecord;
 window.deleteRecord = deleteRecord;
 window.saveRecord = saveRecord;
 window.cancelRecord = cancelRecord;
-window.convertAccountStatusToHebrew = convertAccountStatusToHebrew;
-window.convertTickerStatusToHebrew = convertTickerStatusToHebrew;
-window.convertNoteStatusToHebrew = convertNoteStatusToHebrew;
-window.convertAlertStatusToHebrew = convertAlertStatusToHebrew;
-window.convertIsTriggeredToHebrew = convertIsTriggeredToHebrew;
 window.showEditAlertModal = showEditAlertModal;
 window.cancelAlert = cancelAlert;
 window.markAlertAsTriggered = markAlertAsTriggered;
@@ -1922,7 +1863,7 @@ window.showModalInfoNotification = showModalInfoNotification;
 // פונקציות נתונים
 window.getDefaultRowData = getDefaultRowData;
 window.loadPlansFromServer = loadPlansFromServer;
-window.updateSummaryStats = updateSummaryStats;
+window.updatePageSummaryStats = updatePageSummaryStats;
 window.updateStatsDisplay = updateStatsDisplay;
 window.loadDataFromDatabase = loadDataFromDatabase;
 window.processDataForGrid = processDataForGrid;
@@ -2192,7 +2133,7 @@ function sortTableData(columnIndex, data, pageName, updateTableFunction) {
   }
 
   // עדכון אייקונים
-      updateTableSortIcons(columnIndex, pageName);
+  updateTableSortIcons(columnIndex, pageName);
 
   // שמירת מצב המיון ב-localStorage
   localStorage.setItem(`${pageName}SortColumn`, columnIndex.toString());
@@ -2415,7 +2356,7 @@ function loadSortState(pageName) {
 // ייצוא הפונקציות הגלובליות
 window.sortTableData = sortTableData;
 window.getStatusForSort = getStatusForSort;
-window.updateSortIcons = updateSortIcons;
+window.updateTableSortIcons = updateTableSortIcons;
 window.loadSortState = loadSortState;
 
 // ===== סיום הקובץ =====

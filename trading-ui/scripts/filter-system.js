@@ -239,6 +239,26 @@ class FilterSystem {
     });
   }
 
+  // פונקציה לתרגום סטטוס מעברית לאנגלית
+  translateStatusToEnglish(hebrewStatus) {
+    const statusMap = {
+      'פתוח': 'open',
+      'סגור': 'closed',
+      'מבוטל': 'cancelled'
+    };
+    return statusMap[hebrewStatus] || hebrewStatus;
+  }
+
+  // פונקציה לתרגום סטטוס מאנגלית לעברית
+  translateStatusToHebrew(englishStatus) {
+    const statusMap = {
+      'open': 'פתוח',
+      'closed': 'סגור',
+      'cancelled': 'מבוטל'
+    };
+    return statusMap[englishStatus] || englishStatus;
+  }
+
   // פילטר סטטוס
   applyStatusFilter(data, selectedStatuses) {
     if (selectedStatuses.length === 0) return data;
@@ -246,13 +266,17 @@ class FilterSystem {
     console.log('🔍 Applying status filter:', selectedStatuses);
     console.log('🔍 Data before filter:', data);
 
+    // תרגום הסטטוסים הנבחרים לאנגלית
+    const translatedStatuses = selectedStatuses.map(status => this.translateStatusToEnglish(status));
+    console.log('🔍 Translated statuses:', translatedStatuses);
+
     return data.filter(item => {
       const itemStatus = item.status;
       const itemSymbol = item.ticker || item.symbol || item.name || 'unknown';
-      console.log(`🔍 Checking item ${itemSymbol}: status="${itemStatus}" against selectedStatuses:`, selectedStatuses);
+      console.log(`🔍 Checking item ${itemSymbol}: status="${itemStatus}" against translatedStatuses:`, translatedStatuses);
 
-      // בדיקה ישירה - אם הסטטוס של הפריט נמצא ברשימת הסטטוסים הנבחרים
-      const isMatch = selectedStatuses.includes(itemStatus);
+      // בדיקה - אם הסטטוס של הפריט נמצא ברשימת הסטטוסים המתורגמים
+      const isMatch = translatedStatuses.includes(itemStatus);
       console.log(`🔍 Item ${itemSymbol}: ${isMatch ? '✅ MATCH' : '❌ NO MATCH'}`);
 
       return isMatch;

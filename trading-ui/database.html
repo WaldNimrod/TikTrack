@@ -2343,8 +2343,8 @@
           <td>${alert.type || '-'}</td>
           <td>${alert.condition || '-'}</td>
             <td>${alert.message || '-'}</td>
-          <td>${window.convertAlertStatusToHebrew(alert.status)}</td>
-          <td>${window.convertIsTriggeredToHebrew(alert.is_triggered)}</td>
+          <td>${window.translateAlertStatus(alert.status)}</td>
+          <td>${window.translateIsTriggered(alert.is_triggered)}</td>
           <td>${window.formatDateTime(alert.triggered_at)}</td>
           <td>
             <button class="btn btn-sm btn-secondary" onclick="showEditAlertModal(${JSON.stringify(alert).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
@@ -2536,7 +2536,7 @@
           <tr>
             <td>${execution.id}</td>
             <td>${execution.trade_id || '-'}</td>
-          <td>${window.convertExecutionActionToHebrew(execution.action)}</td>
+          <td>${window.translateExecutionAction(execution.action)}</td>
           <td>${window.formatDateTime(execution.date)}</td>
             <td>${execution.quantity || '-'}</td>
           <td>${window.formatCurrency(execution.price)}</td>
@@ -3103,7 +3103,8 @@
     <!-- Global Scripts - סקריפטים כלליים -->
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/header-system.js"></script>
-    <script src="scripts/main.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/main.js"></script>
     <!-- Removed grid-filters.js - not needed for database page -->
     <script src="scripts/alerts.js"></script>
     <script src="scripts/active-alerts-component.js"></script>

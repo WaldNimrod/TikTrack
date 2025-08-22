@@ -666,8 +666,8 @@ class HeaderSystem {
                     <span class="option-text">סגור</span>
                     <span class="check-mark">●</span>
                   </div>
-                  <div class="status-filter-item" data-value="בוטל" onclick="selectStatusOption('בוטל')">
-                    <span class="option-text">בוטל</span>
+                  <div class="status-filter-item" data-value="מבוטל" onclick="selectStatusOption('מבוטל')">
+                    <span class="option-text">מבוטל</span>
                     <span class="check-mark">●</span>
                   </div>
                 </div>
@@ -1232,10 +1232,10 @@ class HeaderSystem {
         item.classList.toggle('selected');
 
         // עדכון הפילטר
-        if (window.headerSystem && window.headerSystem.updateAccountFilterText) {
-          window.headerSystem.updateAccountFilterText();
+        if (window.headerSystem && window.headerSystem.updateAccountFilterDisplayText) {
+          window.headerSystem.updateAccountFilterDisplayText();
         } else {
-          updateAccountFilterText();
+          updateAccountFilterDisplayText();
         }
         if (window.headerSystem && window.headerSystem.updateAccountFilter) {
           window.headerSystem.updateAccountFilter();
@@ -1750,7 +1750,7 @@ window.selectStatusOption = function (status) {
 
   if (item) {
     item.classList.toggle('selected');
-    updateStatusFilterText();
+    updateStatusFilterDisplayText();
 
     // עדכון פילטר
     if (window.filterSystem) {
@@ -1769,7 +1769,7 @@ window.selectTypeOption = function (type) {
 
   if (item) {
     item.classList.toggle('selected');
-    updateTypeFilterText();
+    updateTypeFilterDisplayText();
 
     // עדכון פילטר
     if (window.filterSystem) {
@@ -1788,7 +1788,7 @@ window.selectAccountOption = function (account) {
 
   if (item) {
     item.classList.toggle('selected');
-    updateAccountFilterText();
+    updateAccountFilterDisplayText();
 
     // עדכון פילטר
     if (window.filterSystem) {
@@ -1813,7 +1813,7 @@ window.selectDateRangeOption = function (dateRange) {
   const item = menu.querySelector(`[data-value="${dateRange}"]`);
   if (item) {
     item.classList.add('selected');
-    updateDateRangeFilterText();
+    updateDateRangeFilterDisplayText();
 
     // עדכון פילטר
     if (window.filterSystem) {

@@ -295,7 +295,7 @@ window.toggleStatusFilter = function () {
     filterSection.style.minHeight = '220px';
   }
 
-  updateStatusFilterText();
+  updateStatusFilterDisplayText();
 
   // מניעת סגירת הדרופדאון רק בלחיצה על הכפתור - לא בלחיצה מחוץ לו
   if (event) {
@@ -330,7 +330,7 @@ window.selectStatusOption = function (status) {
 
   if (item) {
     item.classList.toggle('selected');
-    updateStatusFilterText();
+    updateStatusFilterDisplayText();
 
     // עדכון אוטומטי של הגריד
     const selectedItems = menu.querySelectorAll('.status-filter-item.selected');
@@ -372,7 +372,7 @@ window.selectStatusOption = function (status) {
   }
 }
 
-window.updateStatusFilterText = function () {
+window.updateStatusFilterDisplayText = function () {
   const menu = document.getElementById('statusFilterMenu');
   if (!menu) return;
 
@@ -443,7 +443,7 @@ window.clearStatusFilter = function () {
     item.classList.add('selected');
   });
 
-  updateStatusFilterText();
+  updateStatusFilterDisplayText();
 
   // ניקוי הפילטר מהגריד
   if (typeof gridApi !== 'undefined' && gridApi) {
@@ -576,7 +576,7 @@ document.addEventListener('DOMContentLoaded', function () {
       menu.querySelectorAll('.status-filter-item').forEach(item => {
         item.classList.add('selected');
       });
-      updateStatusFilterText();
+      updateStatusFilterDisplayText();
 
       // עדכון הגריד עם כל הסטטוסים
       if (typeof gridApi !== 'undefined' && gridApi) {
@@ -610,7 +610,7 @@ document.addEventListener('DOMContentLoaded', function () {
         menu.querySelectorAll('.status-filter-item').forEach(item => {
           item.classList.add('selected');
         });
-        updateStatusFilterText();
+        updateStatusFilterDisplayText();
         gridApi.setFilterModel(null);
         console.log('Grid filter initialized successfully');
       }

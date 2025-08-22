@@ -59,6 +59,7 @@
   <!-- Modular grid files -->
   <script src="scripts/console-cleanup.js"></script>
   <script src="scripts/header-system.js"></script>
+  <script src="scripts/translation-utils.js"></script>
   <script src="scripts/main.js"></script>
 
   <script src="scripts/alerts.js"></script>
@@ -381,7 +382,7 @@
       }
 
       // פונקציה לעדכון אייקוני המיון - משתמשת בפונקציה המקומית
-      function updateSortIcons(activeColumnIndex) {
+      function window.updateTableSortIcons(activeColumnIndex) {
         if (typeof updateTradesSortIcons === 'function') {
           updateTradesSortIcons(activeColumnIndex);
         } else {
@@ -451,7 +452,7 @@
         localStorage.removeItem('tradesSortDirection');
 
         // איפוס אייקונים
-        updateSortIcons(-1);
+        window.updateTableSortIcons(-1);
 
         // רענון הנתונים
         if (typeof window.loadTradesData === 'function') {
@@ -471,7 +472,7 @@
       // ===== פונקציות פילטרים =====
 
       // פונקציה לתרגום סוג לעברית
-      function getTypeDisplay(type) {
+      function window.translateTradeType(type) {
         const typeMap = {
           'swing': 'סווינג',
           'investment': 'השקעה',
@@ -585,7 +586,7 @@
           const statusDisplay = trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח';
 
           // המרת סוגים מאנגלית לעברית
-          const typeDisplay = getTypeDisplay(trade.type);
+          const typeDisplay = window.translateTradeType(trade.type);
 
           return `
         <tr>
@@ -736,7 +737,7 @@
         localStorage.removeItem('designsSortDirection');
 
         // איפוס אייקונים
-        updateSortIcons(-1);
+        window.updateTableSortIcons(-1);
 
         // רענון הנתונים
         if (typeof window.loadTradesData === 'function') {

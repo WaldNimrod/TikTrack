@@ -769,7 +769,7 @@ async function loadLinkedItemsFromMultipleSources(tickerId) {
                 const alerts = alertsData.data || alertsData;
                 linkedItems.alerts = alerts.filter(alert =>
                     alert.related_type_id === 4 && alert.related_id == tickerId &&
-                    alert.status === 'active'
+                    alert.status === 'open'
                 );
             }
         } catch (e) { console.warn('לא ניתן לטעון התראות:', e); }

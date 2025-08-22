@@ -1395,7 +1395,7 @@ class AppHeader extends HTMLElement {
           console.log(`Status filter initialized with default for ${pageName}`);
         }
 
-        this.updateStatusFilterText();
+        this.updateStatusFilterDisplayText();
 
         // עדכון הפילטר בטבלה אחרי האתחול
         setTimeout(() => {
@@ -1438,7 +1438,7 @@ class AppHeader extends HTMLElement {
           console.log(`Type filter initialized with default for ${pageName} (all items selected)`);
         }
 
-        this.updateTypeFilterText();
+        this.updateTypeFilterDisplayText();
       } else {
         console.log('Type menu not found in initializeFilter');
       }
@@ -1468,7 +1468,7 @@ class AppHeader extends HTMLElement {
           console.log(`Account filter initialized with default for ${pageName} (all items selected)`);
         }
 
-        this.updateAccountFilterText();
+        this.updateAccountFilterDisplayText();
       } else {
         console.log('Account menu not found in initializeFilter');
       }
@@ -1504,7 +1504,7 @@ class AppHeader extends HTMLElement {
           console.log(`Date range filter initialized with default for ${pageName} (only "כל זמן" selected)`);
         }
 
-        this.updateDateRangeFilterText();
+        this.updateDateRangeFilterDisplayText();
       } else {
         console.log('Date range menu not found in initializeFilter');
       }
@@ -1791,7 +1791,7 @@ class AppHeader extends HTMLElement {
       console.log('Filter menu opened');
     }
 
-    this.updateStatusFilterText();
+    this.updateStatusFilterDisplayText();
   }
 
   closeStatusFilter() {
@@ -1834,7 +1834,7 @@ class AppHeader extends HTMLElement {
       console.log('Type filter menu opened');
     }
 
-    this.updateTypeFilterText();
+    this.updateTypeFilterDisplayText();
   }
 
   closeTypeFilter() {
@@ -1937,7 +1937,7 @@ class AppHeader extends HTMLElement {
       });
     }
 
-    this.updateDateRangeFilterText();
+    this.updateDateRangeFilterDisplayText();
   }
 
   closeDateRangeFilter() {
@@ -1989,7 +1989,7 @@ class AppHeader extends HTMLElement {
 
       console.log(`Status ${status}: was ${wasSelected}, now ${isNowSelected}`);
 
-      this.updateStatusFilterText();
+      this.updateStatusFilterDisplayText();
 
       // עדכון אוטומטי של הגריד
       this.updateGridFilter();
@@ -2023,7 +2023,7 @@ class AppHeader extends HTMLElement {
 
       console.log(`Type ${type}: was ${wasSelected}, now ${isNowSelected}`);
 
-      this.updateTypeFilterText();
+      this.updateTypeFilterDisplayText();
 
       // עדכון אוטומטי של הגריד
       this.updateGridFilter();
@@ -2058,7 +2058,7 @@ class AppHeader extends HTMLElement {
 
       console.log(`Account ${account}: was ${wasSelected}, now ${isNowSelected}`);
 
-      this.updateAccountFilterText();
+      this.updateAccountFilterDisplayText();
 
       // עדכון אוטומטי של הגריד
       this.updateGridFilter();
@@ -2097,7 +2097,7 @@ class AppHeader extends HTMLElement {
 
       console.log(`🔍 Date range ${dateRange} selected (single selection)`);
 
-      this.updateDateRangeFilterText();
+      this.updateDateRangeFilterDisplayText();
 
       // עדכון אוטומטי של הגריד
       this.updateGridFilter();
@@ -2114,23 +2114,23 @@ class AppHeader extends HTMLElement {
 
 
 
-  updateStatusFilterText() {
-    console.log('updateStatusFilterText called');
+  updateStatusFilterDisplayText() {
+    console.log('updateStatusFilterDisplayText called');
     const menu = this.shadowRoot.getElementById('statusFilterMenu');
     if (!menu) {
-      console.log('Menu not found in updateStatusFilterText');
+      console.log('Menu not found in updateStatusFilterDisplayText');
       return;
     }
 
     const toggle = this.shadowRoot.querySelector('.status-filter-toggle');
     if (!toggle) {
-      console.log('Toggle not found in updateStatusFilterText');
+      console.log('Toggle not found in updateStatusFilterDisplayText');
       return;
     }
 
     const selectedText = toggle.querySelector('.selected-status-text');
     if (!selectedText) {
-      console.log('Selected text element not found in updateStatusFilterText');
+      console.log('Selected text element not found in updateStatusFilterDisplayText');
       return;
     }
 
@@ -2154,23 +2154,23 @@ class AppHeader extends HTMLElement {
     console.log('Updated filter text to:', selectedText.textContent);
   }
 
-  updateTypeFilterText() {
-    console.log('updateTypeFilterText called');
+  updateTypeFilterDisplayText() {
+    console.log('updateTypeFilterDisplayText called');
     const menu = this.shadowRoot.getElementById('typeFilterMenu');
     if (!menu) {
-      console.log('Type menu not found in updateTypeFilterText');
+      console.log('Type menu not found in updateTypeFilterDisplayText');
       return;
     }
 
     const toggle = this.shadowRoot.querySelector('.type-filter-toggle');
     if (!toggle) {
-      console.log('Type toggle not found in updateTypeFilterText');
+      console.log('Type toggle not found in updateTypeFilterDisplayText');
       return;
     }
 
     const selectedText = toggle.querySelector('.selected-type-text');
     if (!selectedText) {
-      console.log('Selected type text element not found in updateTypeFilterText');
+      console.log('Selected type text element not found in updateTypeFilterDisplayText');
       return;
     }
 
@@ -2192,23 +2192,23 @@ class AppHeader extends HTMLElement {
     console.log('Updated type filter text to:', selectedText.textContent);
   }
 
-  updateAccountFilterText() {
-    console.log('updateAccountFilterText called');
+  updateAccountFilterDisplayText() {
+    console.log('updateAccountFilterDisplayText called');
     const menu = this.shadowRoot.getElementById('accountFilterMenu');
     if (!menu) {
-      console.log('Account menu not found in updateAccountFilterText');
+      console.log('Account menu not found in updateAccountFilterDisplayText');
       return;
     }
 
     const toggle = this.shadowRoot.querySelector('.account-filter-toggle');
     if (!toggle) {
-      console.log('Account toggle not found in updateAccountFilterText');
+      console.log('Account toggle not found in updateAccountFilterDisplayText');
       return;
     }
 
     const selectedText = toggle.querySelector('.selected-account-text');
     if (!selectedText) {
-      console.log('Selected account text element not found in updateAccountFilterText');
+      console.log('Selected account text element not found in updateAccountFilterDisplayText');
       return;
     }
 
@@ -2230,23 +2230,23 @@ class AppHeader extends HTMLElement {
     console.log('Updated account filter text to:', selectedText.textContent);
   }
 
-  updateDateRangeFilterText() {
-    console.log('🔍 updateDateRangeFilterText called');
+  updateDateRangeFilterDisplayText() {
+    console.log('🔍 updateDateRangeFilterDisplayText called');
     const menu = this.shadowRoot.getElementById('dateRangeFilterMenu');
     if (!menu) {
-      console.log('🔍 Date range menu not found in updateDateRangeFilterText');
+      console.log('🔍 Date range menu not found in updateDateRangeFilterDisplayText');
       return;
     }
 
     const toggle = this.shadowRoot.querySelector('.date-range-filter-toggle');
     if (!toggle) {
-      console.log('🔍 Date range toggle not found in updateDateRangeFilterText');
+      console.log('🔍 Date range toggle not found in updateDateRangeFilterDisplayText');
       return;
     }
 
     const selectedText = toggle.querySelector('.selected-date-range-text');
     if (!selectedText) {
-      console.log('🔍 Selected date range text element not found in updateDateRangeFilterText');
+      console.log('🔍 Selected date range text element not found in updateDateRangeFilterDisplayText');
       return;
     }
 
@@ -2288,7 +2288,7 @@ class AppHeader extends HTMLElement {
           item.classList.remove('selected');
         }
       });
-      this.updateStatusFilterText();
+      this.updateStatusFilterDisplayText();
     }
 
     // ניקוי הפילטר השמור ב-localStorage
@@ -2311,7 +2311,7 @@ class AppHeader extends HTMLElement {
       typeMenu.querySelectorAll('.type-filter-item').forEach(item => {
         item.classList.add('selected');
       });
-      this.updateTypeFilterText();
+      this.updateTypeFilterDisplayText();
     }
 
     // ניקוי הפילטר השמור ב-localStorage
@@ -2334,7 +2334,7 @@ class AppHeader extends HTMLElement {
       accountMenu.querySelectorAll('.account-filter-item').forEach(item => {
         item.classList.add('selected');
       });
-      this.updateAccountFilterText();
+      this.updateAccountFilterDisplayText();
     }
 
     // ניקוי הפילטר השמור ב-localStorage
@@ -2362,7 +2362,7 @@ class AppHeader extends HTMLElement {
           item.classList.remove('selected');
         }
       });
-      this.updateDateRangeFilterText();
+      this.updateDateRangeFilterDisplayText();
     }
 
     // ניקוי הפילטר השמור ב-localStorage
@@ -2524,7 +2524,7 @@ class AppHeader extends HTMLElement {
           }
         }
       });
-      this.updateStatusFilterText();
+      this.updateStatusFilterDisplayText();
     }
 
     // ניקוי פילטר הסוג - כל הסוגים מסומנים
@@ -2533,7 +2533,7 @@ class AppHeader extends HTMLElement {
       typeMenu.querySelectorAll('.type-filter-item').forEach(item => {
         item.classList.add('selected');
       });
-      this.updateTypeFilterText();
+      this.updateTypeFilterDisplayText();
     }
 
     // ניקוי פילטר החשבונות - כל החשבונות מסומנים
@@ -2542,7 +2542,7 @@ class AppHeader extends HTMLElement {
       accountMenu.querySelectorAll('.account-filter-item').forEach(item => {
         item.classList.add('selected');
       });
-      this.updateAccountFilterText();
+      this.updateAccountFilterDisplayText();
     }
 
     // ניקוי פילטר טווח תאריכים - רק "כל זמן" מסומן
@@ -2556,7 +2556,7 @@ class AppHeader extends HTMLElement {
           item.classList.remove('selected');
         }
       });
-      this.updateDateRangeFilterText();
+      this.updateDateRangeFilterDisplayText();
 
       // סגירת התפריט של פילטר התאריך
       this.closeDateRangeFilter();

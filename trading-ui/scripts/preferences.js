@@ -1780,9 +1780,6 @@ function toggleAllTestsInCategory(category) {
  * @param {string} category - The test category
  * @returns {string} Display name
  */
-function getCategoryDisplayName(category) {
-  // שימוש בפונקציה החדשה מקובץ התרגום
-  return window.translateTestCategory ? window.translateTestCategory(category) : category;
 }
 
 /**

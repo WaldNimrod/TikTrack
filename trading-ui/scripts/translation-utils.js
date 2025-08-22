@@ -15,9 +15,7 @@
  */
 function translateAccountStatus(status) {
     const statusMap = {
-        'active': 'פעיל',
-        'inactive': 'לא פעיל',
-        'suspended': 'מושעה',
+        'open': 'פתוח',
         'closed': 'סגור',
         'cancelled': 'מבוטל'
     };
@@ -31,10 +29,9 @@ function translateAccountStatus(status) {
  */
 function translateTickerStatus(status) {
     const statusMap = {
-        'active': 'פעיל',
-        'inactive': 'לא פעיל',
-        'suspended': 'מושעה',
-        'delisted': 'הוסר מהמסחר'
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'cancelled': 'מבוטל'
     };
     return statusMap[status] || status;
 }
@@ -60,9 +57,8 @@ function translateNoteStatus(status) {
  */
 function translateAlertStatus(status) {
     const statusMap = {
-        'active': 'פעיל',
-        'inactive': 'לא פעיל',
-        'triggered': 'הופעל',
+        'open': 'פתוח',
+        'closed': 'סגור',
         'cancelled': 'מבוטל'
     };
     return statusMap[status] || status;
@@ -82,9 +78,7 @@ function translateTradePlanStatus(status) {
     const statusMap = {
         'open': 'פתוח',
         'closed': 'סגור',
-        'cancelled': 'בוטל',
-        'active': 'פעיל',
-        'inactive': 'לא פעיל'
+        'cancelled': 'מבוטל'
     };
 
     return statusMap[status.toLowerCase()] || status;
@@ -227,3 +221,23 @@ if (typeof window !== 'undefined') {
 
     console.log('✅ Translation utilities loaded successfully');
 }
+
+/**
+ * תרגום פעולת ביצוע לעברית
+ * @param {string} action - הפעולה באנגלית
+ * @returns {string} הפעולה בעברית
+ */
+function translateExecutionAction(action) {
+    const actionMap = {
+        'buy': 'קנה',
+        'sell': 'מכר',
+        'hold': 'החזק',
+        'close': 'סגר',
+        'cancel': 'בטל'
+    };
+    return actionMap[action] || action;
+}
+
+// Execution Action Translations
+window.translateExecutionAction = translateExecutionAction;
+window.convertExecutionActionToHebrew = translateExecutionAction; // Backward compatibility

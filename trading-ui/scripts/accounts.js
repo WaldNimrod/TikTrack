@@ -339,8 +339,8 @@ function updateAccountsTable(accounts) {
       <td><strong>${account.name || '-'}</strong></td>
       <td>${account.currency || '-'}</td>
       <td>
-        <span class="status-badge status-${account.status === 'active' ? 'active' : account.status === 'inactive' ? 'inactive' : 'cancelled'}">
-          ${account.status === 'active' ? 'פעיל' : account.status === 'inactive' ? 'לא פעיל' : account.status === 'cancelled' ? 'מבוטל' : (account.status || '-')}
+        <span class="status-badge status-${account.status}">
+          ${account.status === 'open' ? 'פתוח' : account.status === 'closed' ? 'סגור' : account.status === 'cancelled' ? 'מבוטל' : (account.status || '-')}
         </span>
       </td>
       <td>$${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}</td>
@@ -408,49 +408,6 @@ async function loadAccounts() {
  * 
  * @param {Array} accounts - מערך של חשבונות
  */
-function updateAccountsTableForPlanningPage(accounts) {
-  console.log('🔄 מעדכן טבלת חשבונות בדף תכנונים עם', accounts.length, 'חשבונות');
-
-  // מציאת הטבלה השנייה (חשבונות) בדף designs.html
-  const contentSections = document.querySelectorAll('.content-section');
-  const accountsSection = contentSections[1]; // הטבלה השנייה
-
-  if (!accountsSection) {
-    console.error('❌ לא נמצאה טבלת חשבונות בדף designs.html');
-    return;
-  }
-
-  const tbody = accountsSection.querySelector('tbody');
-  if (!tbody) {
-    console.error('❌ לא נמצא tbody לטבלת חשבונות');
-    return;
-  }
-
-  tbody.innerHTML = accounts.map(account => `
-    <tr>
-      <td><strong>${account.name || '-'}</strong></td>
-      <td>${account.currency || '-'}</td>
-      <td>${account.status === 'active' ? 'פעיל' : account.status === 'inactive' ? 'לא פעיל' : account.status === 'cancelled' ? 'מבוטל' : (account.status || '-')}</td>
-      <td>$${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}</td>
-      <td>$${account.total_value ? account.total_value.toLocaleString() : '0'}</td>
-      <td style="color: ${account.total_pl >= 0 ? 'green' : 'red'};">$${account.total_pl ? account.total_pl.toLocaleString() : '0'}</td>
-      <td>${account.notes || '-'}</td>
-      <td>
-        <button class="btn btn-sm btn-secondary" onclick="showEditAccountModal(${JSON.stringify(account).replace(/"/g, '&quot;')})" title="ערוך">✏️</button>
-        <button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name}')" title="ביטול">X</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name}')" title="מחק">🗑️</button>
-      </td>
-    </tr>
-  `).join('');
-
-  // עדכון ספירת רשומות
-  const countElement = accountsSection.querySelector('.table-count');
-  if (countElement) {
-    countElement.textContent = `${accounts.length} חשבונות`;
-  }
-
-  console.log('✅ טבלת חשבונות בדף תכנונים עודכנה בהצלחה');
-}
 
 // פונקציה לעדכון טקסט פילטר החשבונות
 function updateAccountFilterDisplayText() {
@@ -500,13 +457,12 @@ window.loadAccountsFromServer = loadAccountsFromServer;
 window.loadAllAccountsFromServer = loadAllAccountsFromServer;
 window.loadDefaultAccounts = loadDefaultAccounts;
 // הערה: updateAccountFilterMenu מיוצאת מ-grid-filters.js
-window.updateAccountFilterText = updateAccountFilterText;
+window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;
 window.getAccounts = getAccounts;
 window.isAccountsLoaded = isAccountsLoaded;
 window.loadAccountsData = loadAccountsData;
 window.updateAccountsTable = updateAccountsTable;
 window.loadAccounts = loadAccounts;
-window.updateAccountsTableForPlanningPage = updateAccountsTableForPlanningPage;
 
 // פונקציה גלובלית לעדכון ידני של תפריט החשבונות
 window.refreshAccountFilterMenu = function () {

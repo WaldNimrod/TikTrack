@@ -699,14 +699,14 @@ function sortTable(columnIndex) {
 function getStatusClass(status) {
     // Safeguarding against invalid values
     if (status === null || status === undefined) {
-        return 'status-inactive';
+        return 'status-cancelled';
     }
 
     switch (status) {
         case 'open': return 'status-open';
         case 'closed': return 'status-closed';
         case 'cancelled': return 'status-cancelled';
-        default: return 'status-inactive';
+        default: return 'status-cancelled';
     }
 }
 
@@ -1112,7 +1112,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
             // Status translations
             'פתוח': 'open',
             'סגור': 'closed',
-            'בוטל': 'cancelled',
+            'מבוטל': 'cancelled',
             'מבוטל': 'cancelled',
             'open': 'open',
             'closed': 'closed',

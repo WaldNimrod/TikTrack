@@ -670,16 +670,16 @@ class HeaderSystem {
               </div>
             </div>
 
-            <!-- פילטר סוג -->
+            <!-- פילטר טיפוס -->
             <div class="filter-group type-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle type-filter-toggle" id="typeFilterToggle" onclick="toggleTypeFilter()">
-                  <span class="selected-value selected-type-text" id="selectedType">כל סוג</span>
+                                          <span class="selected-value selected-type-text" id="selectedType">כל טיפוס</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="filter-menu" id="typeFilterMenu">
-                  <div class="type-filter-item" data-value="מניות" onclick="selectTypeOption('מניות')">
-                    <span class="option-text">מניות</span>
+                  <div class="type-filter-item" data-value="מניה" onclick="selectTypeOption('מניה')">
+                    <span class="option-text">מניה</span>
                     <span class="check-mark">●</span>
                   </div>
                   <div class="type-filter-item" data-value="ETF" onclick="selectTypeOption('ETF')">
@@ -690,12 +690,16 @@ class HeaderSystem {
                     <span class="option-text">קריפטו</span>
                     <span class="check-mark">●</span>
                   </div>
-                  <div class="type-filter-item" data-value="סחורות" onclick="selectTypeOption('סחורות')">
-                    <span class="option-text">סחורות</span>
+                  <div class="type-filter-item" data-value="סווינג" onclick="selectTypeOption('סווינג')">
+                    <span class="option-text">סווינג</span>
                     <span class="check-mark">●</span>
                   </div>
-                  <div class="type-filter-item" data-value="פורקס" onclick="selectTypeOption('פורקס')">
-                    <span class="option-text">פורקס</span>
+                  <div class="type-filter-item" data-value="השקעה" onclick="selectTypeOption('השקעה')">
+                    <span class="option-text">השקעה</span>
+                    <span class="check-mark">●</span>
+                  </div>
+                  <div class="type-filter-item" data-value="פסיבי" onclick="selectTypeOption('פסיבי')">
+                    <span class="option-text">פסיבי</span>
                     <span class="check-mark">●</span>
                   </div>
                 </div>
@@ -822,16 +826,14 @@ class HeaderSystem {
     // כפתור איפוס פילטרים
     document.addEventListener('click', (e) => {
       if (e.target.closest('#resetFiltersBtn')) {
-        window.filterSystem.resetFilters();
-        this.updateFilterTexts();
+        this.resetAllFilters();
       }
     });
 
     // כפתור נקה חיפוש
     document.addEventListener('click', (e) => {
       if (e.target.closest('#searchClearBtn')) {
-        document.getElementById('searchFilterInput').value = '';
-        window.filterSystem.updateFilter('search', '');
+        this.clearSearchFilter();
       }
     });
 
@@ -932,7 +934,7 @@ class HeaderSystem {
       }
     });
 
-    // שמירת פילטר סוג
+    // שמירת פילטר טיפוס
     const typeItems = document.querySelectorAll('.type-filter-item.selected');
     typeItems.forEach(item => {
       const optionText = item.querySelector('.option-text');
@@ -985,7 +987,7 @@ class HeaderSystem {
           });
         }
 
-        // שחזור פילטר סוג
+        // שחזור פילטר טיפוס
         if (filterStates.type && filterStates.type.length > 0) {
           filterStates.type.forEach(type => {
             const item = document.querySelector(`.type-filter-item[data-value="${type}"]`);
@@ -1311,7 +1313,7 @@ class HeaderSystem {
       });
     });
 
-    // Event listeners לפריטי פילטר סוג
+    // Event listeners לפריטי פילטר טיפוס
     const typeItems = document.querySelectorAll('#typeFilterMenu .filter-item');
     typeItems.forEach(item => {
       item.addEventListener('click', (e) => {
@@ -1584,9 +1586,163 @@ window.toggleStatusFilter = function () {
   updateStatusFilterText();
 };
 
-// פונקציות לפילטרים אחרים - יוסיפו בהמשך
+// פונקציות לפילטר טיפוס
+window.toggleTypeFilter = function () {
+  console.log('🔍 toggleTypeFilter called');
+  const menu = document.getElementById('typeFilterMenu');
+  const toggle = document.querySelector('.type-filter-toggle');
 
-// פונקציות לפילטרים אחרים - יוסיפו בהמשך
+  if (!menu || !toggle) {
+    console.log('🔍 Missing type filter elements');
+    return;
+  }
+
+  const isVisible = menu.classList.contains('show');
+
+  if (isVisible) {
+    window.closeTypeFilter();
+  } else {
+    // סגירת פילטרים אחרים
+    closeOtherFilters('type');
+
+    menu.classList.add('show');
+    toggle.classList.add('active');
+  }
+
+  if (window.headerSystem) {
+    window.headerSystem.updateTypeFilterText();
+  }
+};
+
+window.selectTypeOption = function (type) {
+  console.log('🔍 selectTypeOption called with:', type);
+  const menu = document.getElementById('typeFilterMenu');
+  const item = menu.querySelector(`[data-value="${type}"]`);
+
+  if (item) {
+    item.classList.toggle('selected');
+    updateTypeFilterText();
+    updateTypeFilter();
+  }
+};
+
+window.closeTypeFilter = function () {
+  const menu = document.getElementById('typeFilterMenu');
+  const toggle = document.querySelector('.type-filter-toggle');
+
+  if (menu) {
+    menu.classList.remove('show');
+  }
+  if (toggle) {
+    toggle.classList.remove('active');
+  }
+};
+
+// פונקציות לפילטר חשבונות
+window.toggleAccountFilter = function () {
+  console.log('🔍 toggleAccountFilter called');
+  const menu = document.getElementById('accountFilterMenu');
+  const toggle = document.querySelector('.account-filter-toggle');
+
+  if (!menu || !toggle) {
+    console.log('🔍 Missing account filter elements');
+    return;
+  }
+
+  const isVisible = menu.classList.contains('show');
+
+  if (isVisible) {
+    window.closeAccountFilter();
+  } else {
+    // סגירת פילטרים אחרים
+    closeOtherFilters('account');
+
+    menu.classList.add('show');
+    toggle.classList.add('active');
+  }
+
+  updateAccountFilterText();
+};
+
+window.selectAccountOption = function (account) {
+  console.log('🔍 selectAccountOption called with:', account);
+  const menu = document.getElementById('accountFilterMenu');
+  const item = menu.querySelector(`[data-value="${account}"]`);
+
+  if (item) {
+    item.classList.toggle('selected');
+    updateAccountFilterText();
+    updateAccountFilter();
+  }
+};
+
+window.closeAccountFilter = function () {
+  const menu = document.getElementById('accountFilterMenu');
+  const toggle = document.querySelector('.account-filter-toggle');
+
+  if (menu) {
+    menu.classList.remove('show');
+  }
+  if (toggle) {
+    toggle.classList.remove('active');
+  }
+};
+
+// פונקציות לפילטר תאריכים
+window.toggleDateRangeFilter = function () {
+  console.log('🔍 toggleDateRangeFilter called');
+  const menu = document.getElementById('dateRangeFilterMenu');
+  const toggle = document.querySelector('.date-range-filter-toggle');
+
+  if (!menu || !toggle) {
+    console.log('🔍 Missing date range filter elements');
+    return;
+  }
+
+  const isVisible = menu.classList.contains('show');
+
+  if (isVisible) {
+    window.closeDateRangeFilter();
+  } else {
+    // סגירת פילטרים אחרים
+    closeOtherFilters('dateRange');
+
+    menu.classList.add('show');
+    toggle.classList.add('active');
+  }
+
+  updateDateRangeFilterText();
+};
+
+window.selectDateRangeOption = function (dateRange) {
+  console.log('🔍 selectDateRangeOption called with:', dateRange);
+  const menu = document.getElementById('dateRangeFilterMenu');
+
+  // הסרת בחירה מכל הפריטים
+  menu.querySelectorAll('.date-range-filter-item').forEach(item => {
+    item.classList.remove('selected');
+  });
+
+  // בחירת הפריט הנבחר
+  const item = menu.querySelector(`[data-value="${dateRange}"]`);
+  if (item) {
+    item.classList.add('selected');
+    updateDateRangeFilterText();
+    updateDateRangeFilter();
+  }
+};
+
+window.closeDateRangeFilter = function () {
+  const menu = document.getElementById('dateRangeFilterMenu');
+  const toggle = document.querySelector('.date-range-filter-toggle');
+
+  if (menu) {
+    menu.classList.remove('show');
+  }
+  if (toggle) {
+    toggle.classList.remove('active');
+  }
+};
 
 // פונקציות לסגירת פילטרים
 window.closeStatusFilter = function () {
@@ -1645,10 +1801,29 @@ function closeDateRangeFilter() {
 // פונקציה לסגירת פילטרים אחרים
 function closeOtherFilters(excludeFilter) {
   console.log('🔍 closeOtherFilters called with excludeFilter:', excludeFilter);
-  // כרגע רק פילטר סטטוס קיים
+
+  // סגירת פילטר סטטוס אם לא הוא הפילטר החריג
   if (excludeFilter !== 'status') {
     console.log('🔍 Closing status filter');
     window.closeStatusFilter();
+  }
+
+  // סגירת פילטר טיפוס אם לא הוא הפילטר החריג
+  if (excludeFilter !== 'type') {
+    console.log('🔍 Closing type filter');
+    window.closeTypeFilter();
+  }
+
+  // סגירת פילטר חשבונות אם לא הוא הפילטר החריג
+  if (excludeFilter !== 'account') {
+    console.log('🔍 Closing account filter');
+    window.closeAccountFilter();
+  }
+
+  // סגירת פילטר תאריכים אם לא הוא הפילטר החריג
+  if (excludeFilter !== 'dateRange') {
+    console.log('🔍 Closing date range filter');
+    window.closeDateRangeFilter();
   }
 }
 
@@ -1775,8 +1950,8 @@ function updateTypeFilterText() {
   console.log('🔍 Type selected text element:', selectedText);
 
   if (selectedItems.length === 0) {
-    selectedText.textContent = 'כל סוג';
-    console.log('🔍 Updated type text to: כל סוג');
+    selectedText.textContent = 'כל טיפוס';
+    console.log('🔍 Updated type text to: כל טיפוס');
   } else if (selectedItems.length === 1) {
     const optionText = selectedItems[0].querySelector('.option-text');
     const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
@@ -2026,7 +2201,7 @@ class SimpleFilter {
       }
     }
 
-    // בדיקת פילטר סוג
+    // בדיקת פילטר טיפוס
     if (this.currentFilters.type.length > 0) {
       const typeCell = this.findTypeCell(cells);
       if (typeCell && !this.currentFilters.type.includes(typeCell.textContent.trim())) {
@@ -2115,6 +2290,160 @@ class SimpleFilter {
     }
 
     this.applyFilters();
+  }
+
+  resetAllFilters() {
+    console.log('🔍 Resetting all filters');
+
+    // איפוס פילטר סטטוס
+    const statusMenu = document.getElementById('statusFilterMenu');
+    if (statusMenu) {
+      statusMenu.querySelectorAll('.status-filter-item.selected').forEach(item => {
+        item.classList.remove('selected');
+      });
+    }
+
+    // איפוס פילטר טיפוס
+    const typeMenu = document.getElementById('typeFilterMenu');
+    if (typeMenu) {
+      typeMenu.querySelectorAll('.type-filter-item.selected').forEach(item => {
+        item.classList.remove('selected');
+      });
+    }
+
+    // איפוס פילטר חשבונות
+    const accountMenu = document.getElementById('accountFilterMenu');
+    if (accountMenu) {
+      accountMenu.querySelectorAll('.account-filter-item.selected').forEach(item => {
+        item.classList.remove('selected');
+      });
+    }
+
+    // איפוס פילטר תאריכים
+    const dateMenu = document.getElementById('dateRangeFilterMenu');
+    if (dateMenu) {
+      dateMenu.querySelectorAll('.date-range-filter-item.selected').forEach(item => {
+        item.classList.remove('selected');
+      });
+    }
+
+    // איפוס חיפוש
+    const searchInput = document.getElementById('searchFilterInput');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    // עדכון טקסטים
+    this.updateFilterTexts();
+
+    // עדכון פילטרים
+    if (window.filterSystem) {
+      window.filterSystem.updateFilter('status', []);
+      window.filterSystem.updateFilter('type', []);
+      window.filterSystem.updateFilter('account', []);
+      window.filterSystem.updateFilter('dateRange', '');
+      window.filterSystem.updateFilter('search', '');
+    }
+
+    // שמירת מצב
+    this.saveFilterStates();
+  }
+
+  clearSearchFilter() {
+    console.log('🔍 Clearing search filter');
+    const searchInput = document.getElementById('searchFilterInput');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    if (window.filterSystem) {
+      window.filterSystem.updateFilter('search', '');
+    }
+  }
+
+  updateFilterTexts() {
+    this.updateStatusFilterText();
+    this.updateTypeFilterText();
+    this.updateAccountFilterText();
+    this.updateDateRangeFilterText();
+  }
+
+  updateTypeFilterText() {
+    console.log('🔍 updateTypeFilterText called');
+    const menu = document.getElementById('typeFilterMenu');
+    const toggle = document.querySelector('.type-filter-toggle');
+
+    if (!menu || !toggle) {
+      console.log('🔍 Type menu or toggle not found');
+      return;
+    }
+
+    const selectedItems = menu.querySelectorAll('.type-filter-item.selected');
+    const selectedText = toggle.querySelector('.selected-type-text');
+
+    if (selectedItems.length === 0) {
+      selectedText.textContent = 'כל סוג';
+      console.log('🔍 Updated type text to: כל סוג');
+    } else if (selectedItems.length === 1) {
+      const optionText = selectedItems[0].querySelector('.option-text');
+      const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
+      selectedText.textContent = textContent;
+      console.log('🔍 Updated type text to:', textContent);
+    } else {
+      selectedText.textContent = `${selectedItems.length} סוגים`;
+      console.log('🔍 Updated type text to:', selectedItems.length, 'סוגים');
+    }
+  }
+
+  updateAccountFilterText() {
+    console.log('🔍 updateAccountFilterText called');
+    const menu = document.getElementById('accountFilterMenu');
+    const toggle = document.querySelector('.account-filter-toggle');
+
+    if (!menu || !toggle) {
+      console.log('🔍 Account menu or toggle not found');
+      return;
+    }
+
+    const selectedItems = menu.querySelectorAll('.account-filter-item.selected');
+    const selectedText = toggle.querySelector('.selected-account-text');
+
+    if (selectedItems.length === 0) {
+      selectedText.textContent = 'כל חשבון';
+      console.log('🔍 Updated account text to: כל חשבון');
+    } else if (selectedItems.length === 1) {
+      const optionText = selectedItems[0].querySelector('.option-text');
+      const textContent = optionText ? optionText.textContent : selectedItems[0].textContent;
+      selectedText.textContent = textContent;
+      console.log('🔍 Updated account text to:', textContent);
+    } else {
+      selectedText.textContent = `${selectedItems.length} חשבונות`;
+      console.log('🔍 Updated account text to:', selectedItems.length, 'חשבונות');
+    }
+  }
+
+  updateDateRangeFilterText() {
+    console.log('🔍 updateDateRangeFilterText called');
+    const menu = document.getElementById('dateRangeFilterMenu');
+    const toggle = document.querySelector('.date-range-filter-toggle');
+
+    if (!menu || !toggle) {
+      console.log('🔍 Date range menu or toggle not found');
+      return;
+    }
+
+    const selectedItem = menu.querySelector('.date-range-filter-item.selected');
+    const selectedText = toggle.querySelector('.selected-date-range-text');
+
+    if (!selectedItem) {
+      selectedText.textContent = 'כל זמן';
+      console.log('🔍 Updated date range text to: כל זמן');
+    } else {
+      const optionText = selectedItem.querySelector('.option-text');
+      const textContent = optionText ? optionText.textContent : selectedItem.textContent;
+      selectedText.textContent = textContent;
+      console.log('🔍 Updated date range text to:', textContent);
+    }
   }
 }
 

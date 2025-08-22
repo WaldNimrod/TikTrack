@@ -1541,6 +1541,527 @@
             </div>
           </div>
         </div>
+
+        <!-- CRUD Testing area - content-section -->
+        <div class="content-section">
+          <!-- CRUD Testing header -->
+          <div class="section-header">
+            <div class="table-title">
+              🧪 בדיקות CRUD
+            </div>
+            <div class="table-count">מערכת בדיקות CRUD</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="runAllCRUDTests()" title="הרץ את כל בדיקות CRUD">
+                <span class="action-icon">▶️</span> הרץ הכל
+              </button>
+              <button class="refresh-btn" onclick="saveCRUDPreferences()" title="שמור העדפות בדיקות CRUD">
+                <span class="action-icon">💾</span> שמור
+              </button>
+              <button class="refresh-btn" onclick="resetCRUDPreferences()" title="רענן לברירות מחדל">
+                <span class="action-icon">🔄</span> רענן
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleCRUDSection()" title="הצג/הסתר אזור בדיקות CRUD">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- CRUD Testing content -->
+          <div class="section-body">
+            <!-- סיכום בדיקות CRUD -->
+            <div class="test-summary">
+              <h3><i class="fas fa-chart-bar"></i> סיכום בדיקות CRUD</h3>
+              <div class="summary-stats">
+                <div class="stat-item">
+                  <div class="stat-number" id="totalCRUDTests">8</div>
+                  <div class="stat-label">סה"כ ישויות</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number" id="activeCRUDTests">8</div>
+                  <div class="stat-label">ישויות פעילות</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number" id="inactiveCRUDTests">0</div>
+                  <div class="stat-label">ישויות כבויות</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number" id="crudOperations">24</div>
+                  <div class="stat-label">פעולות CRUD</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- הגדרות בדיקות CRUD -->
+            <div class="settings-section">
+              <h3><i class="fas fa-cogs"></i> הגדרות בדיקות</h3>
+              <div class="setting-item">
+                <div>
+                  <div class="setting-label">בדיקות מקבילות</div>
+                  <div class="setting-description">הרצת בדיקות CRUD במקביל לביצועים טובים יותר</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="parallelCRUDTests" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div>
+                  <div class="setting-label">עצירה בכשל</div>
+                  <div class="setting-description">עצירת הבדיקות בכשל ראשון</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="stopCRUDOnFailure">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div>
+                  <div class="setting-label">פלט מפורט</div>
+                  <div class="setting-description">הצגת מידע מפורט על כל בדיקה</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="verboseCRUDOutput" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div>
+                  <div class="setting-label">ניקוי נתונים</div>
+                  <div class="setting-description">מחיקת נתוני בדיקה אחרי כל בדיקה</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="cleanupCRUDData" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- ישויות CRUD -->
+            <div class="test-category">
+              <div class="category-header">
+                <h3><i class="fas fa-database"></i> ישויות CRUD</h3>
+                <button class="category-toggle-btn" onclick="toggleAllCRUDTests()"
+                  title="הפעל/כבה את כל בדיקות CRUD">
+                  <span class="toggle-text">כבה הכל</span>
+                  <i class="fas fa-power-off"></i>
+                </button>
+              </div>
+              <div class="category-description">
+                בדיקות CRUD בודקות את כל הפעולות (Create, Read, Update, Delete) לכל ישות במערכת.
+              </div>
+              
+              <!-- Accounts -->
+              <div class="test-group">
+                <h4>חשבונות (Accounts)</h4>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CREATE Account</div>
+                    <div class="test-description">יצירת חשבון חדש</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="accounts.create" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">READ Account</div>
+                    <div class="test-description">קריאת חשבון קיים</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="accounts.read" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">UPDATE Account</div>
+                    <div class="test-description">עדכון חשבון קיים</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="accounts.update" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">DELETE Account</div>
+                    <div class="test-description">מחיקת חשבון</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="accounts.delete" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Tickers -->
+              <div class="test-group">
+                <h4>טיקרים (Tickers)</h4>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CREATE Ticker</div>
+                    <div class="test-description">יצירת טיקר חדש</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="tickers.create" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">READ Ticker</div>
+                    <div class="test-description">קריאת טיקר קיים</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="tickers.read" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">UPDATE Ticker</div>
+                    <div class="test-description">עדכון טיקר קיים</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="tickers.update" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">DELETE Ticker</div>
+                    <div class="test-description">מחיקת טיקר</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="tickers.delete" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Trades -->
+              <div class="test-group">
+                <h4>טריידים (Trades)</h4>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CREATE Trade</div>
+                    <div class="test-description">יצירת טרייד חדש</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="trades.create" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">READ Trade</div>
+                    <div class="test-description">קריאת טרייד קיים</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="trades.read" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">UPDATE Trade</div>
+                    <div class="test-description">עדכון טרייד קיים</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="trades.update" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CLOSE Trade</div>
+                    <div class="test-description">סגירת טרייד</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="trades.close" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CANCEL Trade</div>
+                    <div class="test-description">ביטול טרייד</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="trades.cancel" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">DELETE Trade</div>
+                    <div class="test-description">מחיקת טרייד</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="trades.delete" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Trade Plans -->
+              <div class="test-group">
+                <h4>תוכניות מסחר (Trade Plans)</h4>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CREATE Trade Plan</div>
+                    <div class="test-description">יצירת תוכנית מסחר חדשה</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="trade_plans.create" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">READ Trade Plan</div>
+                    <div class="test-description">קריאת תוכנית מסחר קיימת</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="trade_plans.read" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">UPDATE Trade Plan</div>
+                    <div class="test-description">עדכון תוכנית מסחר קיימת</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="trade_plans.update" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CANCEL Trade Plan</div>
+                    <div class="test-description">ביטול תוכנית מסחר</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="trade_plans.cancel" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Notes -->
+              <div class="test-group">
+                <h4>הערות (Notes)</h4>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CREATE Note</div>
+                    <div class="test-description">יצירת הערה חדשה</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="notes.create" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">READ Note</div>
+                    <div class="test-description">קריאת הערה קיימת</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="notes.read" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">UPDATE Note</div>
+                    <div class="test-description">עדכון הערה קיימת</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="notes.update" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">DELETE Note</div>
+                    <div class="test-description">מחיקת הערה</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="notes.delete" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Alerts -->
+              <div class="test-group">
+                <h4>התראות (Alerts)</h4>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CREATE Alert</div>
+                    <div class="test-description">יצירת התראה חדשה</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="alerts.create" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">READ Alert</div>
+                    <div class="test-description">קריאת התראה קיימת</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="alerts.read" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">UPDATE Alert</div>
+                    <div class="test-description">עדכון התראה קיימת</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="alerts.update" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">DELETE Alert</div>
+                    <div class="test-description">מחיקת התראה</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="alerts.delete" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Executions -->
+              <div class="test-group">
+                <h4>ביצועים (Executions)</h4>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CREATE Execution</div>
+                    <div class="test-description">יצירת ביצוע חדש</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="executions.create" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">READ Execution</div>
+                    <div class="test-description">קריאת ביצוע קיים</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="executions.read" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">UPDATE Execution</div>
+                    <div class="test-description">עדכון ביצוע קיים</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="executions.update" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">DELETE Execution</div>
+                    <div class="test-description">מחיקת ביצוע</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="executions.delete" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Cash Flows -->
+              <div class="test-group">
+                <h4>תזרימי מזומן (Cash Flows)</h4>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">CREATE Cash Flow</div>
+                    <div class="test-description">יצירת תזרים מזומן חדש</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="cash_flows.create" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">READ Cash Flow</div>
+                    <div class="test-description">קריאת תזרים מזומן קיים</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="cash_flows.read" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">UPDATE Cash Flow</div>
+                    <div class="test-description">עדכון תזרים מזומן קיים</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="cash_flows.update" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="test-item">
+                  <div>
+                    <div class="test-name">DELETE Cash Flow</div>
+                    <div class="test-description">מחיקת תזרים מזומן</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-test="cash_flows.delete" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- אזור תוצאות בדיקות -->
+            <div id="crudTestResultsArea" style="display: none;">
+              <div class="test-results-header">
+                <h4><i class="fas fa-clipboard-list"></i> תוצאות בדיקות CRUD</h4>
+                <button class="btn" onclick="closeCRUDTestResults()">
+                  <span class="action-icon">✕</span> סגור
+                </button>
+              </div>
+              <div id="crudTestResultsContent">
+                <!-- תוצאות הבדיקות יוכנסו כאן דינמית -->
+              </div>
+            </div>
+
+            <!-- כפתורי פעולה -->
+            <div class="action-buttons">
+              <button class="action-btn run-btn" onclick="runSelectedCRUDTests()">
+                <span class="action-icon">▶️</span>
+                <span class="action-text">הרץ בדיקות נבחרות</span>
+              </button>
+              <button class="action-btn save-btn" onclick="saveCRUDPreferences()">
+                <span class="action-icon">💾</span>
+                <span class="action-text">שמור העדפות</span>
+              </button>
+              <button class="action-btn reset-btn" onclick="resetCRUDPreferences()">
+                <span class="action-icon">🔄</span>
+                <span class="action-text">אפס לברירות מחדל</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div> <!-- End page-body -->
 

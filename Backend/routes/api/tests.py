@@ -61,7 +61,8 @@ def run_tests():
             'e2e_tests.',
             'performance_tests.',
             'load_tests.',
-            'security_tests.'
+            'security_tests.',
+            'crud_tests.'
         ]
         
         for test in tests:
@@ -384,6 +385,271 @@ def list_available_tests():
             'status': 'error',
             'message': f'Failed to list tests: {str(e)}'
         }), 500
+
+@tests_bp.route('/api/v1/tests/crud', methods=['POST'])
+def run_crud_tests():
+    """
+    Run CRUD tests for selected entities
+    
+    Expected JSON payload:
+    {
+        "entities": ["accounts", "tickers", "trades", "trade_plans", "notes", "alerts", "executions", "cash_flows"],
+        "operations": ["create", "read", "update", "delete", "close", "cancel"],
+        "settings": {
+            "parallel": false,
+            "stop_on_failure": false,
+            "verbose": true,
+            "cleanup": true
+        }
+    }
+    """
+    try:
+        # Parse request data
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'message': 'No data provided'
+            }), 400
+        
+        entities = data.get('entities', [])
+        operations = data.get('operations', [])
+        settings = data.get('settings', {})
+        
+        if not entities:
+            return jsonify({
+                'status': 'error',
+                'message': 'No entities specified'
+            }), 400
+        
+        # Validate entities
+        valid_entities = [
+            'accounts', 'tickers', 'trades', 'trade_plans', 
+            'notes', 'alerts', 'executions', 'cash_flows'
+        ]
+        
+        for entity in entities:
+            if entity not in valid_entities:
+                return jsonify({
+                    'status': 'error',
+                    'message': f'Invalid entity: {entity}'
+                }), 400
+        
+        # Validate operations
+        valid_operations = ['create', 'read', 'update', 'delete', 'close', 'cancel']
+        
+        for operation in operations:
+            if operation not in valid_operations:
+                return jsonify({
+                    'status': 'error',
+                    'message': f'Invalid operation: {operation}'
+                }), 400
+        
+        # Run CRUD tests
+        results = execute_crud_tests(entities, operations, settings)
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'CRUD tests completed',
+            'results': results,
+            'passed': results.get('passed', 0),
+            'failed': results.get('failed', 0),
+            'total': results.get('total', 0),
+            'execution_time': results.get('execution_time', 0)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'CRUD test execution failed: {str(e)}'
+        }), 500
+
+def execute_crud_tests(entities, operations, settings):
+    """Execute CRUD tests for specified entities and operations"""
+    try:
+        import requests
+        import time
+        
+        base_url = 'http://localhost:8080/api/v1'
+        results = []
+        start_time = time.time()
+        
+        for entity in entities:
+            for operation in operations:
+                # Skip invalid combinations
+                if operation in ['close', 'cancel'] and entity not in ['trades', 'trade_plans']:
+                    continue
+                
+                test_result = {
+                    'entity': entity,
+                    'operation': operation,
+                    'status': 'running',
+                    'message': '',
+                    'start_time': time.time(),
+                    'end_time': None
+                }
+                
+                try:
+                    # Execute CRUD operation
+                    operation_result = perform_crud_operation(base_url, entity, operation, settings)
+                    
+                    test_result['status'] = 'passed' if operation_result['success'] else 'failed'
+                    test_result['message'] = operation_result['message']
+                    test_result['end_time'] = time.time()
+                    
+                except Exception as e:
+                    test_result['status'] = 'failed'
+                    test_result['message'] = str(e)
+                    test_result['end_time'] = time.time()
+                
+                results.append(test_result)
+                
+                # Stop on failure if requested
+                if settings.get('stop_on_failure', False) and test_result['status'] == 'failed':
+                    break
+            
+            # Stop on failure if requested
+            if settings.get('stop_on_failure', False) and any(r['status'] == 'failed' for r in results):
+                break
+        
+        end_time = time.time()
+        execution_time = end_time - start_time
+        
+        # Calculate statistics
+        passed = len([r for r in results if r['status'] == 'passed'])
+        failed = len([r for r in results if r['status'] == 'failed'])
+        total = len(results)
+        
+        return {
+            'status': 'success' if failed == 0 else 'partial_success' if passed > 0 else 'failed',
+            'passed': passed,
+            'failed': failed,
+            'total': total,
+            'execution_time': execution_time,
+            'results': results
+        }
+        
+    except Exception as e:
+        return {
+            'status': 'error',
+            'message': str(e),
+            'passed': 0,
+            'failed': 0,
+            'total': 0,
+            'execution_time': 0,
+            'results': []
+        }
+
+def perform_crud_operation(base_url, entity, operation, settings):
+    """Perform a single CRUD operation"""
+    try:
+        import requests
+        
+        # Get test data
+        test_data = get_crud_test_data(entity, operation)
+        
+        # Build request
+        if operation == 'create':
+            url = f"{base_url}/{entity}/"
+            method = 'POST'
+            data = test_data
+        elif operation == 'read':
+            url = f"{base_url}/{entity}/"
+            method = 'GET'
+            data = None
+        elif operation == 'update':
+            url = f"{base_url}/{entity}/1"
+            method = 'PUT'
+            data = test_data
+        elif operation == 'delete':
+            url = f"{base_url}/{entity}/1"
+            method = 'DELETE'
+            data = None
+        elif operation == 'close':
+            url = f"{base_url}/{entity}/1/close"
+            method = 'POST'
+            data = {}
+        elif operation == 'cancel':
+            url = f"{base_url}/{entity}/1/cancel"
+            method = 'POST'
+            data = {'cancel_reason': 'Test cancellation'}
+        else:
+            raise ValueError(f"Unknown operation: {operation}")
+        
+        # Make request
+        response = requests.request(
+            method=method,
+            url=url,
+            json=data,
+            headers={'Content-Type': 'application/json'},
+            timeout=30
+        )
+        
+        # Parse response
+        if response.status_code < 400:
+            return {
+                'success': True,
+                'message': f'{operation.upper()} {entity} successful',
+                'status_code': response.status_code
+            }
+        else:
+            try:
+                error_data = response.json()
+                error_message = error_data.get('error', {}).get('message', f'HTTP {response.status_code}')
+            except:
+                error_message = f'HTTP {response.status_code}'
+            
+            return {
+                'success': False,
+                'message': error_message,
+                'status_code': response.status_code
+            }
+            
+    except Exception as e:
+        return {
+            'success': False,
+            'message': str(e),
+            'status_code': None
+        }
+
+def get_crud_test_data(entity, operation):
+    """Get test data for CRUD operations"""
+    test_data = {
+        'accounts': {
+            'create': {'name': 'Test Account', 'currency': 'USD', 'cash_balance': 10000.0},
+            'update': {'name': 'Updated Test Account'}
+        },
+        'tickers': {
+            'create': {'symbol': 'TEST', 'name': 'Test Ticker', 'type': 'stock', 'currency': 'USD'},
+            'update': {'name': 'Updated Test Ticker'}
+        },
+        'trades': {
+            'create': {'ticker_id': 1, 'account_id': 1, 'type': 'swing', 'side': 'Long'},
+            'update': {'notes': 'Updated test trade'}
+        },
+        'trade_plans': {
+            'create': {'ticker_id': 1, 'type': 'swing', 'side': 'Long', 'reasons': 'Test plan'},
+            'update': {'reasons': 'Updated test plan'}
+        },
+        'notes': {
+            'create': {'content': 'Test note', 'related_type': 'account', 'related_id': 1},
+            'update': {'content': 'Updated test note'}
+        },
+        'alerts': {
+            'create': {'type': 'price_alert', 'condition': 'Price > $100', 'message': 'Test alert', 'related_type': 'ticker', 'related_id': 1},
+            'update': {'message': 'Updated test alert'}
+        },
+        'executions': {
+            'create': {'trade_id': 1, 'action': 'buy', 'quantity': 100, 'price': 50.0},
+            'update': {'quantity': 150}
+        },
+        'cash_flows': {
+            'create': {'account_id': 1, 'type': 'deposit', 'amount': 1000.0, 'currency_id': 1},
+            'update': {'amount': 1500.0}
+        }
+    }
+    
+    return test_data.get(entity, {}).get(operation, {})
 
 # Register blueprint
 def init_app(app):

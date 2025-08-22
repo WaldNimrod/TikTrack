@@ -1903,12 +1903,30 @@ function initializePreferences() {
     // טעינת העדפות בדיקות
     loadTestPreferences();
     updateTestSummary();
+    
+    // טעינת העדפות בדיקות CRUD
+    loadCRUDPreferences();
+    updateCRUDSummary();
 
     // Setup event listeners for test checkboxes - הוסר כי אלמנטי הבדיקות לא קיימים
     console.log('ℹ️ אלמנטי בדיקות הוסרו מהדף - לא מוסיפים event listeners');
 
     // Setup event listeners for test settings - הוסר כי אלמנטי ההגדרות לא קיימים
     console.log('ℹ️ אלמנטי הגדרות בדיקות הוסרו מהדף - לא מוסיפים event listeners');
+    
+    // Setup event listeners for CRUD test checkboxes
+    const crudTestCheckboxes = document.querySelectorAll('[data-test]');
+    crudTestCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateCRUDSummary);
+    });
+    
+    // Setup event listeners for CRUD test settings
+    const crudSettingsCheckboxes = document.querySelectorAll('#parallelCRUDTests, #stopCRUDOnFailure, #verboseCRUDOutput, #cleanupCRUDData');
+    crudSettingsCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        console.log(`CRUD setting changed: ${checkbox.id} = ${checkbox.checked}`);
+      });
+    });
 
     // עדכון מצב כפתורי הקטגוריות
     updateCategoryButtonStates();
@@ -1992,3 +2010,324 @@ document.addEventListener('DOMContentLoaded', function () {
 //     `;
 //   }
 // }
+
+// ===== CRUD Testing Functions =====
+
+/**
+ * Toggle CRUD section visibility
+ */
+function toggleCRUDSection() {
+  const section = document.querySelector('.main-content .content-section:nth-child(2) .section-body');
+  const toggleBtn = document.querySelector('.main-content .content-section:nth-child(2) button[onclick="toggleCRUDSection()"]');
+  
+  if (section && toggleBtn) {
+    const isVisible = section.style.display !== 'none';
+    section.style.display = isVisible ? 'none' : 'block';
+    toggleBtn.querySelector('.filter-icon').textContent = isVisible ? '▼' : '▲';
+  }
+}
+
+/**
+ * Load CRUD test preferences from localStorage
+ */
+function loadCRUDPreferences() {
+  try {
+    const savedPreferences = localStorage.getItem('crudTestPreferences');
+    if (savedPreferences) {
+      const preferences = JSON.parse(savedPreferences);
+      
+      // Load test settings
+      if (preferences.settings) {
+        document.getElementById('parallelCRUDTests').checked = preferences.settings.parallel || false;
+        document.getElementById('stopCRUDOnFailure').checked = preferences.settings.stopOnFailure || false;
+        document.getElementById('verboseCRUDOutput').checked = preferences.settings.verbose || true;
+        document.getElementById('cleanupCRUDData').checked = preferences.settings.cleanup || true;
+      }
+      
+      // Load test selections
+      if (preferences.tests) {
+        Object.keys(preferences.tests).forEach(testId => {
+          const checkbox = document.querySelector(`[data-test="${testId}"]`);
+          if (checkbox) {
+            checkbox.checked = preferences.tests[testId];
+          }
+        });
+      }
+      
+      updateCRUDSummary();
+      console.log('✅ CRUD preferences loaded successfully');
+    }
+  } catch (error) {
+    console.error('❌ Error loading CRUD preferences:', error);
+  }
+}
+
+/**
+ * Save CRUD test preferences to localStorage
+ */
+function saveCRUDPreferences() {
+  try {
+    const preferences = {
+      settings: {
+        parallel: document.getElementById('parallelCRUDTests').checked,
+        stopOnFailure: document.getElementById('stopCRUDOnFailure').checked,
+        verbose: document.getElementById('verboseCRUDOutput').checked,
+        cleanup: document.getElementById('cleanupCRUDData').checked
+      },
+      tests: {}
+    };
+    
+    // Collect test selections
+    const testCheckboxes = document.querySelectorAll('[data-test]');
+    testCheckboxes.forEach(checkbox => {
+      preferences.tests[checkbox.getAttribute('data-test')] = checkbox.checked;
+    });
+    
+    localStorage.setItem('crudTestPreferences', JSON.stringify(preferences));
+    showNotification('העדפות בדיקות CRUD נשמרו בהצלחה', 'success');
+    console.log('✅ CRUD preferences saved successfully');
+  } catch (error) {
+    console.error('❌ Error saving CRUD preferences:', error);
+    showNotification('שגיאה בשמירת העדפות בדיקות CRUD', 'error');
+  }
+}
+
+/**
+ * Reset CRUD test preferences to defaults
+ */
+function resetCRUDPreferences() {
+  try {
+    // Reset settings to defaults
+    document.getElementById('parallelCRUDTests').checked = true;
+    document.getElementById('stopCRUDOnFailure').checked = false;
+    document.getElementById('verboseCRUDOutput').checked = true;
+    document.getElementById('cleanupCRUDData').checked = true;
+    
+    // Reset all test checkboxes to checked
+    const testCheckboxes = document.querySelectorAll('[data-test]');
+    testCheckboxes.forEach(checkbox => {
+      checkbox.checked = true;
+    });
+    
+    // Clear saved preferences
+    localStorage.removeItem('crudTestPreferences');
+    
+    updateCRUDSummary();
+    showNotification('העדפות בדיקות CRUD אופסו לברירות מחדל', 'success');
+    console.log('✅ CRUD preferences reset to defaults');
+  } catch (error) {
+    console.error('❌ Error resetting CRUD preferences:', error);
+    showNotification('שגיאה באיפוס העדפות בדיקות CRUD', 'error');
+  }
+}
+
+/**
+ * Update CRUD test summary statistics
+ */
+function updateCRUDSummary() {
+  try {
+    const testCheckboxes = document.querySelectorAll('[data-test]');
+    const totalTests = testCheckboxes.length;
+    const activeTests = Array.from(testCheckboxes).filter(cb => cb.checked).length;
+    const inactiveTests = totalTests - activeTests;
+    
+    document.getElementById('totalCRUDTests').textContent = '8'; // Fixed number of entities
+    document.getElementById('activeCRUDTests').textContent = activeTests;
+    document.getElementById('inactiveCRUDTests').textContent = inactiveTests;
+    document.getElementById('crudOperations').textContent = totalTests;
+  } catch (error) {
+    console.error('❌ Error updating CRUD summary:', error);
+  }
+}
+
+/**
+ * Toggle all CRUD tests on/off
+ */
+function toggleAllCRUDTests() {
+  try {
+    const testCheckboxes = document.querySelectorAll('[data-test]');
+    const allChecked = Array.from(testCheckboxes).every(cb => cb.checked);
+    
+    testCheckboxes.forEach(checkbox => {
+      checkbox.checked = !allChecked;
+    });
+    
+    const toggleBtn = document.querySelector('.category-toggle-btn[onclick="toggleAllCRUDTests()"]');
+    if (toggleBtn) {
+      const toggleText = toggleBtn.querySelector('.toggle-text');
+      toggleText.textContent = allChecked ? 'כבה הכל' : 'הפעל הכל';
+    }
+    
+    updateCRUDSummary();
+  } catch (error) {
+    console.error('❌ Error toggling CRUD tests:', error);
+  }
+}
+
+/**
+ * Run all CRUD tests
+ */
+function runAllCRUDTests() {
+  try {
+    // Check all test checkboxes
+    const testCheckboxes = document.querySelectorAll('[data-test]');
+    testCheckboxes.forEach(checkbox => {
+      checkbox.checked = true;
+    });
+    
+    updateCRUDSummary();
+    runSelectedCRUDTests();
+  } catch (error) {
+    console.error('❌ Error running all CRUD tests:', error);
+  }
+}
+
+/**
+ * Run selected CRUD tests
+ */
+async function runSelectedCRUDTests() {
+  try {
+    const selectedTests = getSelectedCRUDTests();
+    
+    if (selectedTests.length === 0) {
+      showNotification('לא נבחרו בדיקות להרצה', 'warning');
+      return;
+    }
+    
+    showNotification(`מתחיל הרצת ${selectedTests.length} בדיקות CRUD...`, 'info');
+    
+    // Show results area
+    document.getElementById('crudTestResultsArea').style.display = 'block';
+    const resultsContent = document.getElementById('crudTestResultsContent');
+    resultsContent.innerHTML = '<div class="test-result-item running"><span class="test-result-name">מתחיל בדיקות...</span><span class="test-result-status running">רץ</span></div>';
+    
+    // Run tests
+    const results = await executeCRUDTests(selectedTests);
+    
+    // Display results
+    displayCRUDTestResults(results);
+    
+  } catch (error) {
+    console.error('❌ Error running CRUD tests:', error);
+    showNotification('שגיאה בהרצת בדיקות CRUD', 'error');
+  }
+}
+
+/**
+ * Get selected CRUD tests
+ */
+function getSelectedCRUDTests() {
+  const selectedTests = [];
+  const testCheckboxes = document.querySelectorAll('[data-test]:checked');
+  
+  testCheckboxes.forEach(checkbox => {
+    selectedTests.push(checkbox.getAttribute('data-test'));
+  });
+  
+  return selectedTests;
+}
+
+/**
+ * Execute CRUD tests using the new API
+ */
+async function executeCRUDTests(testList) {
+  try {
+    // Convert test list to entities and operations
+    const entities = new Set();
+    const operations = new Set();
+    
+    testList.forEach(testId => {
+      const [entity, operation] = testId.split('.');
+      entities.add(entity);
+      operations.add(operation);
+    });
+    
+    const settings = {
+      parallel: document.getElementById('parallelCRUDTests').checked,
+      stop_on_failure: document.getElementById('stopCRUDOnFailure').checked,
+      verbose: document.getElementById('verboseCRUDOutput').checked,
+      cleanup: document.getElementById('cleanupCRUDData').checked
+    };
+    
+    // Call the new CRUD API
+    const response = await fetch('/api/v1/tests/crud', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        entities: Array.from(entities),
+        operations: Array.from(operations),
+        settings: settings
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      return data.results.results || [];
+    } else {
+      throw new Error(data.message || 'CRUD test execution failed');
+    }
+  } catch (error) {
+    console.error('❌ Error executing CRUD tests:', error);
+    return [];
+  }
+}
+
+// Functions removed - now using the new CRUD API endpoint
+
+/**
+ * Display CRUD test results
+ */
+function displayCRUDTestResults(results) {
+  const resultsContent = document.getElementById('crudTestResultsContent');
+  const passedTests = results.filter(r => r.status === 'passed').length;
+  const failedTests = results.filter(r => r.status === 'failed').length;
+  
+  let html = `
+    <div class="test-summary">
+      <h4>סיכום תוצאות</h4>
+      <div class="summary-stats">
+        <div class="stat-item">
+          <div class="stat-number">${results.length}</div>
+          <div class="stat-label">סה"כ בדיקות</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" style="color: #28a745;">${passedTests}</div>
+          <div class="stat-label">עברו</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" style="color: #dc3545;">${failedTests}</div>
+          <div class="stat-label">נכשלו</div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  results.forEach(result => {
+    const statusClass = result.status === 'passed' ? 'passed' : 'failed';
+    const statusText = result.status === 'passed' ? 'עבר' : 'נכשל';
+    const executionTime = result.end_time && result.start_time ? 
+      ((result.end_time - result.start_time) * 1000).toFixed(0) + 'ms' : '';
+    
+    html += `
+      <div class="test-result-item ${statusClass}">
+        <div>
+          <div class="test-result-name">${result.entity} - ${result.operation.toUpperCase()}</div>
+          <div class="test-description">${result.message} ${executionTime ? `(${executionTime})` : ''}</div>
+        </div>
+        <span class="test-result-status ${statusClass}">${statusText}</span>
+      </div>
+    `;
+  });
+  
+  resultsContent.innerHTML = html;
+}
+
+/**
+ * Close CRUD test results
+ */
+function closeCRUDTestResults() {
+  document.getElementById('crudTestResultsArea').style.display = 'none';
+}

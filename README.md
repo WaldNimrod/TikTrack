@@ -314,20 +314,20 @@ cd Backend && python3 dev_server.py
 
 #### 🎯 Message Improvements:
 - **Notification System:** Green messages in corner that disappear automatically
-- **Demo Page:** `http://127.0.0.1:8080/notification-demo` to demonstrate the difference
+- **Demo Page:** Removed - no longer needed
 - **Conversion from alert:** Instructions for converting from alert to notification
 - **Message Types:** success (green), error (red), warning (yellow), info (blue)
 
 #### 🔗 Path Improvements:
 - **Paths without .html:** All pages available without .html at the end
 - **Dual Support:** Each page available both with .html and without
-- **New routes:** Adding routes for notes and notification-demo
+- **New routes:** Adding routes for notes
 
 #### 📁 Updated Files:
 - ✅ `Backend/app.py` - Adding new routes and annotations
 - ✅ `Backend/run_flask_simple.py` - Updated startup messages
 - ✅ `Backend/SERVER_CONFIGURATIONS.md` - Updated documentation
-- ✅ `trading-ui/notification-demo.html` - Message demo page
+
 - ✅ `README.md` - Documentation update
 
 ### Version 2.6 (August 2025) - Unified Configuration
@@ -339,7 +339,7 @@ cd Backend && python3 dev_server.py
 - **Documentation simplification:** Updating documentation to show only the new configuration
 - **Direct startup:** Updating `app.py` to allow direct startup with Flask development server
 - **Creating run_flask_simple.py:** Simple and stable Flask file without auto-reload
-- **Adding routes:** Adding routes for `notes` and `notification-demo` without .html
+- **Adding routes:** Adding routes for `notes` without .html
 - **Message improvement:** Transition from alert to notification system
 
 #### 📁 Updated Files:
@@ -349,7 +349,7 @@ cd Backend && python3 dev_server.py
 - ✅ `Backend/app.py` - Direct startup with Flask development server + new routes
 - ✅ `Backend/run_flask_simple.py` - Simple and stable Flask file
 - ✅ `start_dev.sh` - Update to use `run_flask_simple.py`
-- ✅ `trading-ui/notification-demo.html` - Message demo page
+
 - ✅ `trading-ui/scripts/notes.js` - Success message update (coming soon)
 - ✅ `trading-ui/scripts/alerts.js` - Success message update (coming soon)
 
@@ -550,27 +550,27 @@ cd Backend/testing_suite && make test
 cd Backend/testing_suite && make test-unit
 ```
 
-## ⚠️ **הבדלים חשובים:**
+## ⚠️ **Important Differences:**
 
-| README ראשי | הגדרות שרת | מערכת הבדיקות | ארכיון קונפיגורציות |
+| Main README | Server Settings | Testing System | Configuration Archive |
 |-------------|-------------|----------------|---------------------|
-| תיעוד כללי | הגדרות שרת | בדיקות קוד | קונפיגורציות ישנות |
-| ארכיטקטורה | סקריפטי הפעלה | אמצעי אבטחה | היסטוריית שינויים |
-| פיתוח | סביבות פיתוח | דוחות תוצאות | שחזור (אם נדרש) |
-| UI/UX | ניהול תהליכים | איתור באגים | ארכיון |
+| General Documentation | Server Settings | Code Testing | Old Configurations |
+| Architecture | Startup Scripts | Security Measures | Change History |
+| Development | Development Environments | Result Reports | Recovery (if needed) |
+| UI/UX | Process Management | Bug Detection | Archive |
 
-## 📞 תמיכה
+## 📞 Support
 
-לשאלות ותמיכה טכנית, פנה אל צוות הפיתוח.
+For questions and technical support, contact the development team.
 
 ---
 
-**© 2025 TikTrack - כל הזכויות שמורות**
+**© 2025 TikTrack - All Rights Reserved**
 
-**🎯 זכור: הקונפיגורציה היחידה בשימוש היא `dev_server.py` ו-`./start_dev.sh`!**
+**🎯 Remember: The single configuration in use is `dev_server.py` and `./start_dev.sh`!**
 
-**📚 תיעוד מעודכן:**
-- **מערכת סידור טבלאות**: `documentation/TABLE_SORTING_SYSTEM.md`
-- **JSDoc מלא** בכל הפונקציות החדשות
-- **דוגמאות שימוש** לכל פונקציה
-- **מדריך הרחבה** להוספת סידור לדפים חדשים
+**📚 Updated Documentation:**
+- **Table Sorting System**: `documentation/TABLE_SORTING_SYSTEM.md`
+- **Complete JSDoc** in all new functions
+- **Usage Examples** for each function
+- **Extension Guide** for adding sorting to new pages

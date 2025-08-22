@@ -430,26 +430,26 @@
 
 /* CSS ספציפי לכפתור פילטר טיפוס */
 #typeFilterToggle.active {
-    border: 1px solid var(--apple-accent-color) !important;
-    box-shadow: 0 2px 8px rgba(255, 156, 5, 0.3) !important;
-    background: var(--apple-accent-color) !important;
-    color: white !important;
+    border: 1px solid #28a745 !important;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
+    background: transparent !important;
+    color: #28a745 !important;
 }
 
 /* CSS ספציפי לכפתור פילטר חשבונות */
 #accountFilterToggle.active {
-    border: 1px solid var(--apple-accent-color) !important;
-    box-shadow: 0 2px 8px rgba(255, 156, 5, 0.3) !important;
-    background: var(--apple-accent-color) !important;
-    color: white !important;
+    border: 1px solid #28a745 !important;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
+    background: transparent !important;
+    color: #28a745 !important;
 }
 
 /* CSS ספציפי לכפתור פילטר תאריכים */
 #dateRangeFilterToggle.active {
-    border: 1px solid var(--apple-accent-color) !important;
-    box-shadow: 0 2px 8px rgba(255, 156, 5, 0.3) !important;
-    background: var(--apple-accent-color) !important;
-    color: white !important;
+    border: 1px solid #28a745 !important;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
+    background: transparent !important;
+    color: #28a745 !important;
 }
 
 #unified-header .filter-toggle.active .dropdown-arrow {
@@ -569,10 +569,11 @@
 }
 
 #statusFilterMenu .status-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.1) !important;
-    color: #155724 !important;
-    border: 1px solid #28a745 !important;
-    font-weight: 600 !important;
+    background-color: rgba(40, 167, 69, 0.08) !important;
+    color: #28a745 !important;
+    border: none !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
 }
 
 /* הסתרת הנקודה במצב לא נבחר */
@@ -582,9 +583,7 @@
 }
 
 /* הצגת סימן V במצב נבחר */
-#statusFilterMenu .status-filter-item.selected .check-mark {
-    opacity: 1 !important;
-    visibility: visible !important;
+#statusFilterMenu .status-filter-item.selected .check-mark::before {
     content: "✓" !important;
     color: #28a745 !important;
     font-weight: bold !important;
@@ -592,12 +591,38 @@
     text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
 }
 
-/* הסתרת התוכן המקורי של הנקודה */
-#statusFilterMenu .status-filter-item.selected .check-mark {
-    content: "✓" !important;
+/* ===== פילטר טיפוס ===== */
+/* פריטי פילטר טיפוס ספציפיים */
+#typeFilterMenu .type-filter-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.4rem 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.9rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    background: white !important;
+    color: #333 !important;
 }
 
-/* ===== פילטר טיפוס ===== */
+#typeFilterMenu .type-filter-item:last-child {
+    border-bottom: none !important;
+}
+
+#typeFilterMenu .type-filter-item:hover {
+    background-color: #f8f9fa !important;
+    color: #29a6a8 !important;
+}
+
+#typeFilterMenu .type-filter-item.selected {
+    background-color: rgba(40, 167, 69, 0.08) !important;
+    color: #28a745 !important;
+    border: none !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
+}
+
 /* הסתרת הנקודה במצב לא נבחר */
 #typeFilterMenu .type-filter-item .check-mark {
     opacity: 0 !important;
@@ -605,21 +630,46 @@
 }
 
 /* הצגת סימן V במצב נבחר */
-#typeFilterMenu .type-filter-item.selected .check-mark {
-    opacity: 1 !important;
-    visibility: visible !important;
+#typeFilterMenu .type-filter-item.selected .check-mark::before {
     content: "✓" !important;
     color: #28a745 !important;
     font-weight: bold !important;
-    font-size: 1.1rem !important;
-}
-
-/* הסתרת התוכן המקורי של הנקודה */
-#typeFilterMenu .type-filter-item.selected .check-mark {
-    content: "✓" !important;
+    font-size: 1.2rem !important;
+    text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
 }
 
 /* ===== פילטר חשבונות ===== */
+/* פריטי פילטר חשבונות ספציפיים */
+#accountFilterMenu .account-filter-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.4rem 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.9rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    background: white !important;
+    color: #333 !important;
+}
+
+#accountFilterMenu .account-filter-item:last-child {
+    border-bottom: none !important;
+}
+
+#accountFilterMenu .account-filter-item:hover {
+    background-color: #f8f9fa !important;
+    color: #29a6a8 !important;
+}
+
+#accountFilterMenu .account-filter-item.selected {
+    background-color: rgba(40, 167, 69, 0.08) !important;
+    color: #28a745 !important;
+    border: none !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
+}
+
 /* הסתרת הנקודה במצב לא נבחר */
 #accountFilterMenu .account-filter-item .check-mark {
     opacity: 0 !important;
@@ -627,31 +677,36 @@
 }
 
 /* הצגת סימן V במצב נבחר */
-#accountFilterMenu .account-filter-item.selected .check-mark {
-    opacity: 1 !important;
-    visibility: visible !important;
+#accountFilterMenu .account-filter-item.selected .check-mark::before {
     content: "✓" !important;
     color: #28a745 !important;
     font-weight: bold !important;
-    font-size: 1.1rem !important;
-}
-
-/* הסתרת התוכן המקורי של הנקודה */
-#accountFilterMenu .account-filter-item.selected .check-mark {
-    content: "✓" !important;
+    font-size: 1.2rem !important;
+    text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
 }
 
 /* ===== פילטר תאריכים ===== */
-/* פילטר תאריכים אינו מולטיסלקט - רק מסגרת וצל */
+/* פריטי פילטר תאריכים ספציפיים */
 #dateRangeFilterMenu .date-range-filter-item {
-    padding: 8px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.4rem 1rem !important;
     cursor: pointer !important;
-    transition: background-color 0.2s ease !important;
-    border-radius: 4px !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.9rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    background: white !important;
+    color: #333 !important;
+}
+
+#dateRangeFilterMenu .date-range-filter-item:last-child {
+    border-bottom: none !important;
 }
 
 #dateRangeFilterMenu .date-range-filter-item:hover {
-    background-color: rgba(255, 156, 5, 0.1) !important;
+    background-color: #f8f9fa !important;
+    color: #29a6a8 !important;
 }
 
 #dateRangeFilterMenu .date-range-filter-item.selected {
@@ -659,6 +714,19 @@
     color: #28a745 !important;
     font-weight: 500 !important;
     border: none !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
+}
+
+/* הסתרת הנקודה בפילטר תאריכים */
+#dateRangeFilterMenu .date-range-filter-item .check-mark {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* הגדלת התפריט כדי למנוע גלילה */
+#dateRangeFilterMenu {
+    max-height: 400px !important;
+    overflow-y: auto !important;
 }
 
 /* ===== CSS ספציפי לכל התפריטים ===== */
@@ -747,13 +815,15 @@
 }
 
 #unified-header #typeFilterMenu .type-filter-item:hover {
-    background-color: rgba(255, 156, 5, 0.1) !important;
+    background-color: rgba(40, 167, 69, 0.05) !important;
 }
 
 #unified-header #typeFilterMenu .type-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.1) !important;
+    background-color: rgba(40, 167, 69, 0.08) !important;
     color: #28a745 !important;
     font-weight: 500 !important;
+    border: none !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
 }
 
 /* ===== פריטי פילטר חשבונות ===== */
@@ -769,13 +839,15 @@
 }
 
 #unified-header #accountFilterMenu .account-filter-item:hover {
-    background-color: rgba(255, 156, 5, 0.1) !important;
+    background-color: rgba(40, 167, 69, 0.05) !important;
 }
 
 #unified-header #accountFilterMenu .account-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.1) !important;
+    background-color: rgba(40, 167, 69, 0.08) !important;
     color: #28a745 !important;
     font-weight: 500 !important;
+    border: none !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
 }
 
 
@@ -1231,20 +1303,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 8px;
-    color: var(--apple-text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    width: 30px;
+    height: 27px;
+    background: white !important;
+    border: 1px solid #28a745 !important;
+    border-radius: 6px !important;
+    color: #28a745 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.8rem !important;
 }
 
 #unified-header .reset-btn:hover {
-    background: var(--apple-bg-secondary);
-    color: var(--apple-text-primary);
-    transform: rotate(180deg);
+    background: #f8f9fa !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2) !important;
 }
 
 /* כפתור איפוס מורחב */
@@ -1312,19 +1385,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: var(--apple-bg-secondary);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 6px;
-    color: var(--apple-text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    width: 30px;
+    height: 27px;
+    background: white !important;
+    border: 1px solid #ff9c05 !important;
+    border-radius: 6px !important;
+    color: #ff9c05 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.8rem !important;
 }
 
 #unified-header .search-clear-btn:hover {
-    background: var(--apple-bg-tertiary);
-    color: var(--apple-text-primary);
+    background: #f8f9fa !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(255, 156, 5, 0.2) !important;
 }
 
 /* התאמה למסכים קטנים */

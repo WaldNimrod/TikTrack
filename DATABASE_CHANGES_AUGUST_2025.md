@@ -97,11 +97,11 @@ CREATE TABLE trades (
 
 ## Ticker Validation
 
-### 4. הוספת ולידציה לטבלת `tickers`
+### 4. Adding Validation to `tickers` Table
 
-#### סקירה כללית
-הוספנו מערכת ולידציה מקיפה לטבלת הטיקרים במערכת. המערכת כוללת ולידציה Backend ו-Frontend, 
-בדיקת כפילות סימבולים, ומניעת שגיאות בזמן הוספה ועריכה.
+#### General Overview
+We added a comprehensive validation system to the tickers table in the system. The system includes Backend and Frontend validation,
+symbol duplication checking, and error prevention during addition and editing.
 
 #### ולידציות שהוספו:
 
@@ -137,7 +137,7 @@ checkSymbolExists(symbol, existingTickers, excludeId)
 2. `Backend/models/ticker.py` - אימות ייחודיות סימבול
 3. `trading-ui/scripts/tickers.js` - הוספת ולידציה צד לקוח
 
-#### קבועים שהוספו:
+#### Constants Added:
 ```python
 # Backend Constants
 VALID_TICKER_TYPES = ['stock', 'etf', 'crypto', 'forex', 'commodity']
@@ -147,29 +147,29 @@ MAX_REMARKS_LENGTH = 500
 CURRENCY_LENGTH = 3
 ```
 
-#### דוגמאות שימוש:
+#### Usage Examples:
 
 **Backend:**
 ```python
-# ולידציה של נתונים
+# Data validation
 data = {'symbol': 'AAPL', 'name': 'Apple Inc.', 'type': 'stock'}
 validation = TickerService.validate_ticker_data(data)
 if not validation['is_valid']:
-    print(f"שגיאות: {validation['errors']}")
+    print(f"Errors: {validation['errors']}")
 
-# בדיקת כפילות
+# Duplication check
 exists = TickerService.check_symbol_exists(db, 'AAPL')
 
-# יצירת טיקר חדש
+# Creating new ticker
 ticker = Ticker(
     symbol="AAPL",
     name="Apple Inc.",
     type="stock",
     currency="USD",
-    remarks="חברת טכנולוגיה אמריקאית"
+    remarks="American technology company"
 )
 
-# שימוש בפונקציות החדשות
+# Using new functions
 print(ticker.display_name)  # "AAPL - Apple Inc."
 print(ticker.is_active())   # True/False
 print(ticker.get_linked_items_count())  # {'trades': 5, 'trade_plans': 2, ...}
@@ -177,7 +177,7 @@ print(ticker.get_linked_items_count())  # {'trades': 5, 'trade_plans': 2, ...}
 
 **Frontend:**
 ```javascript
-// ולידציה של נתונים
+// Data validation
 const tickerData = {
     symbol: 'AAPL',
     name: 'Apple Inc.',
@@ -186,20 +186,20 @@ const tickerData = {
 };
 const validation = validateTickerData(tickerData);
 if (!validation.isValid) {
-    console.log('שגיאות:', validation.errors);
+    console.log('Errors:', validation.errors);
 }
 
-// בדיקת כפילות
+// Duplication check
 const exists = checkSymbolExists('AAPL', tickersList);
 
-// שמירת טיקר חדש
+// Saving new ticker
 await saveTicker();
 
-// עדכון טיקר קיים
+// Updating existing ticker
 await updateTickerFromModal();
 ```
 
-#### מבנה המודל המעודכן:
+#### Updated Model Structure:
 
 ```python
 class Ticker(BaseModel):
@@ -255,9 +255,9 @@ checkSymbolExists(symbol, existingTickers, excludeId)
 2. `Backend/models/ticker.py` - אימות ייחודיות סימבול
 3. `trading-ui/scripts/tickers.js` - הוספת ולידציה צד לקוח
 
-## הוראות הפעלה
+## Operating Instructions
 
-### עדכון בסיס נתונים קיים:
+### Updating Existing Database:
 ```bash
 cd Backend
 python3 remove_opened_at_column.py
@@ -265,155 +265,155 @@ python3 update_trade_dates.py
 python3 update_status_values.py
 ```
 
-### בדיקת תקינות:
+### Integrity Check:
 ```bash
 python3 debug_data.py
 ```
 
-## גיבויים
+## Backups
 
-### גיבוי אוטומטי:
-- גיבוי אוטומטי נוצר לפני כל שינוי
-- מיקום: `backups/YYYYMMDD_HHMMSS/`
-- כולל: בסיס נתונים מלא + לוג שינויים
+### Automatic Backup:
+- Automatic backup created before each change
+- Location: `backups/YYYYMMDD_HHMMSS/`
+- Includes: Complete database + change log
 
-### שחזור:
+### Recovery:
 ```bash
-# שחזור מגיבוי
+# Recovery from backup
 cp backups/YYYYMMDD_HHMMSS/simpleTrade_new.db db/
 ```
 
-## בדיקות
+## Tests
 
-### בדיקות שבוצעו:
-- [x] טעינת רשימת טריידים
-- [x] עריכת טרייד קיים
-- [x] הוספת טרייד חדש
-- [x] ביטול טרייד
-- [x] מחיקת טרייד
-- [x] פילטרים לפי סוג
-- [x] פילטרים לפי סטטוס
-- [x] תצוגת תאריכים
+### Tests Performed:
+- [x] Loading trades list
+- [x] Editing existing trade
+- [x] Adding new trade
+- [x] Cancelling trade
+- [x] Deleting trade
+- [x] Filters by type
+- [x] Filters by status
+- [x] Date display
 
-### בדיקות נוספות:
-- [x] תאימות עם תוכניות טרייד
-- [x] תאימות עם חשבונות
-- [x] תאימות עם טיקרים
-- [x] תאימות עם הערות
+### Additional Tests:
+- [x] Compatibility with trade plans
+- [x] Compatibility with accounts
+- [x] Compatibility with tickers
+- [x] Compatibility with notes
 
-## 4. איחוד סוגי טריידים - 19.08.2025
+## 4. Trade Types Consolidation - 19.08.2025
 
-### מטרה
-איחוד כל סוגי הטריידים לשלושה ערכים קבועים וממוסמסים במערכת.
+### Goal
+Consolidating all trade types to three fixed and standardized values in the system.
 
-### הבעיה שזוהתה
-במערכת היו אי-עקביות רבה בסוגי הטריידים:
+### Identified Problem
+There was much inconsistency in trade types in the system:
 
-#### בקבצי JavaScript:
+#### In JavaScript Files:
 - `swing`, `invest`, `pasive`
 - `swing`, `investment`, `passive`
 
-#### במודלים:
-- **Trades**: `buy` (ברירת מחדל)
-- **Trade Plans**: `long` (ברירת מחדל)
+#### In Models:
+- **Trades**: `buy` (default)
+- **Trade Plans**: `long` (default)
 
-#### בתרגום לעברית:
+#### In Hebrew Translation:
 - `סווינג`, `השקעה`, `פאסיבי`
 
-### הפתרון
-איחוד כל הערכים לשלושה ערכים קבועים:
+### Solution
+Consolidating all values to three fixed values:
 
-| ערך באנגלית | ערך בעברית | תיאור |
+| English Value | Hebrew Value | Description |
 |-------------|------------|-------|
-| `swing` | סווינג | טריידים קצרי טווח |
-| `investment` | השקעה | השקעות ארוכות טווח |
-| `passive` | פאסיבי | השקעות פאסיביות |
+| `swing` | סווינג | Short-term trades |
+| `investment` | השקעה | Long-term investments |
+| `passive` | פאסיבי | Passive investments |
 
-### שינויים שבוצעו
+### Changes Made
 
-#### עדכון מודלים:
-- **`Backend/models/trade.py`**: שינוי ברירת מחדל מ-`buy` ל-`swing`
-- **`Backend/models/trade_plan.py`**: שינוי ברירת מחדל מ-`long` ל-`swing`
+#### Model Updates:
+- **`Backend/models/trade.py`**: Changed default from `buy` to `swing`
+- **`Backend/models/trade_plan.py`**: Changed default from `long` to `swing`
 
-#### עדכון קבצי HTML:
-- **`trading-ui/database.html`**: עדכון ערכי `value` מ-`invest`/`pasive` ל-`investment`/`passive`
-- **`trading-ui/tracking.html`**: עדכון ערכי `value` מ-`invest`/`pasive` ל-`investment`/`passive`
+#### HTML File Updates:
+- **`trading-ui/database.html`**: Updated `value` from `invest`/`pasive` to `investment`/`passive`
+- **`trading-ui/tracking.html`**: Updated `value` from `invest`/`pasive` to `investment`/`passive`
 
-#### עדכון קבצי JavaScript:
+#### JavaScript File Updates:
 - **`trading-ui/scripts/trades.js`**: 
-  - עדכון מיפוי ערכים
-  - הוספת תאימות לאחור (`invest` -> `investment`, `pasive` -> `passive`)
-  - עדכון וולידציה
+  - Updated value mapping
+  - Added backward compatibility (`invest` -> `investment`, `pasive` -> `passive`)
+  - Updated validation
 
-### תאימות לאחור
-המערכת תומכת בערכים ישנים וממירה אותם אוטומטית:
+### Backward Compatibility
+The system supports old values and converts them automatically:
 
-| ערך ישן | ערך חדש |
+| Old Value | New Value |
 |---------|---------|
 | `buy` | `swing` |
 | `long` | `swing` |
 | `invest` | `investment` |
 | `pasive` | `passive` |
 
-### מיגרציית נתונים
-- **סקריפט מיגרציה**: `update_trade_types.py` (הוסר לאחר השימוש)
-- **גיבוי אוטומטי**: נוצר לפני השינויים
-- **תוצאות**:
-  - 10 רשומות trades עודכנו מ-`buy` ל-`swing`
-  - 3 רשומות trade_plans עודכנו מ-`long` ל-`swing`
+### Data Migration
+- **Migration Script**: `update_trade_types.py` (removed after use)
+- **Automatic Backup**: Created before changes
+- **Results**:
+  - 10 trade records updated from `buy` to `swing`
+  - 3 trade_plans records updated from `long` to `swing`
 
-### בדיקות שבוצעו
-- [x] בדיקות יחידה - עוברות בהצלחה
-- [x] בדיקת בסיס נתונים - כל הערכים תקינים
-- [x] בדיקת שרת - עובד כרגיל
-- [x] בדיקת מיגרציה - הושלמה בהצלחה
+### Tests Performed
+- [x] Unit tests - Pass successfully
+- [x] Database check - All values valid
+- [x] Server check - Working normally
+- [x] Migration check - Completed successfully
 
-## 5. הוספת שדה Side - 19.08.2025
+## 5. Adding Side Field - 19.08.2025
 
-### מטרה
-הוספת שדה `side` לטריידים ותוכניות טרייד כדי להבדיל בין Long ו-Short.
+### Goal
+Adding `side` field to trades and trade plans to distinguish between Long and Short.
 
-### הפתרון
-הוספת שדה `side` עם שני ערכים אפשריים:
-- `Long` - פוזיציה ארוכה (ברירת מחדל)
-- `Short` - פוזיציה קצרה
+### Solution
+Adding `side` field with two possible values:
+- `Long` - Long position (default)
+- `Short` - Short position
 
-### שינויים שבוצעו
+### Changes Made
 
-#### עדכון מודלים:
-- **`Backend/models/trade.py`**: הוספת שדה `side` עם ברירת מחדל `Long`
-- **`Backend/models/trade_plan.py`**: הוספת שדה `side` עם ברירת מחדל `Long`
+#### Model Updates:
+- **`Backend/models/trade.py`**: Added `side` field with default `Long`
+- **`Backend/models/trade_plan.py`**: Added `side` field with default `Long`
 
-#### עדכון בסיס נתונים:
-- **הוספת עמודת side** לטבלת `trades`
-- **הוספת עמודת side** לטבלת `trade_plans`
-- **גיבוי אוטומטי** לפני השינויים
+#### Database Updates:
+- **Added side column** to `trades` table
+- **Added side column** to `trade_plans` table
+- **Automatic backup** before changes
 
-#### עדכון קבצי HTML:
-- **`trading-ui/tracking.html`**: הוספת שדה side למודלי עריכה והוספת טריידים
-- **`trading-ui/database.html`**: הוספת שדה side למודל עריכת תוכניות טרייד
+#### HTML File Updates:
+- **`trading-ui/tracking.html`**: Added side field to edit and add trade modals
+- **`trading-ui/database.html`**: Added side field to trade plan edit modal
 
-#### עדכון קבצי JavaScript:
-- **`trading-ui/scripts/trades.js`**: עדכון פונקציות שמירה ועריכה
-- **`trading-ui/scripts/grid-table.js`**: עדכון איסוף נתונים ממודלים
+#### JavaScript File Updates:
+- **`trading-ui/scripts/trades.js`**: Updated save and edit functions
+- **`trading-ui/scripts/grid-table.js`**: Updated data collection from modals
 
-### מיגרציית נתונים
-- **סקריפט מיגרציה**: `add_side_column.py` (הוסר לאחר השימוש)
-- **גיבוי אוטומטי**: נוצר לפני השינויים
-- **תוצאות**:
-  - עמודת side נוספה לטבלת trades
-  - עמודת side נוספה לטבלת trade_plans
-  - כל הרשומות קיבלו ערך ברירת מחדל `Long`
+### Data Migration
+- **Migration Script**: `add_side_column.py` (removed after use)
+- **Automatic Backup**: Created before changes
+- **Results**:
+  - Side column added to trades table
+  - Side column added to trade_plans table
+  - All records received default value `Long`
 
-### בדיקות שבוצעו
-- [x] בדיקות יחידה - 6 בדיקות עוברות, 1 דילוג
-- [x] בדיקת בסיס נתונים - עמודות side נוספו בהצלחה
-- [x] בדיקת שרת - API עובד כרגיל
-- [x] בדיקת מודלים - Trade ו-TradePlan עם שדה side
+### Tests Performed
+- [x] Unit tests - 6 tests pass, 1 skip
+- [x] Database check - Side columns added successfully
+- [x] Server check - API working normally
+- [x] Model check - Trade and TradePlan with side field
 
-### קבצים חדשים/עדכנים
-- **קבצים חדשים**: אין
-- **קבצים שעודכנו**:
+### New/Updated Files
+- **New Files**: None
+- **Updated Files**:
   - `Backend/models/trade.py`
   - `Backend/models/trade_plan.py`
   - `trading-ui/tracking.html`
@@ -422,117 +422,117 @@ cp backups/YYYYMMDD_HHMMSS/simpleTrade_new.db db/
   - `trading-ui/scripts/grid-table.js`
   - `Backend/testing_suite/unit_tests/test_models.py`
 
-## סיכום
+## Summary
 
-השינויים שבוצעו שיפרו את:
-- **בהירות המבנה**: פחות בלבול בין שדות
-- **עקביות הנתונים**: ערכים מוגדרים היטב
-- **תחזוקתיות**: קוד נקי יותר
-- **חוויית משתמש**: ממשק ברור יותר
-- **תקפות המערכת**: איחוד סוגי טריידים לסטנדרט אחד
-- **גמישות המסחר**: תמיכה ב-Long ו-Short
+The changes made improved:
+- **Structure Clarity**: Less confusion between fields
+- **Data Consistency**: Well-defined values
+- **Maintainability**: Cleaner code
+- **User Experience**: Clearer interface
+- **System Validity**: Consolidating trade types to one standard
+- **Trading Flexibility**: Support for Long and Short
 
-כל השינויים בוצעו עם גיבוי מלא ותמיכה בשחזור במקרה הצורך.
+All changes were made with full backup and recovery support if needed.
 
-## 6. שיפור מערכת הפילטרים - 20.08.2025
+## 6. Filter System Improvement - 20.08.2025
 
-### מטרה
-שיפור מערכת הפילטרים עם תיקון פילטרי תאריכים מדויק.
+### Goal
+Improving the filter system with precise date filter fixes.
 
-### הבעיות שזוהו
-1. **פילטר "שבוע" לא עבד נכון** - הציג נתונים מ-1970 במקום מלפני 7 ימים
-2. **אי-עקביות בפילטרי תאריכים** - חלק מהפילטרים לא עבדו לפי ההגדרות הנכונות
-3. **חוסר פילטר "השבוע"** - לא היה פילטר לשבוע קלנדרי (יום ראשון עד היום)
+### Identified Problems
+1. **"Week" filter didn't work correctly** - Showed data from 1970 instead of 7 days ago
+2. **Date filter inconsistency** - Some filters didn't work according to correct definitions
+3. **Missing "This Week" filter** - No filter for calendar week (Sunday to today)
 
-### הפתרון
+### Solution
 
-#### שיפור פילטרי תאריכים:
-- **פילטר "השבוע"**: מציג נתונים מיום ראשון האחרון ועד היום כולל (שבוע קלנדרי)
-- **פילטר "שבוע"**: מציג נתונים מלפני 7 ימים ועד היום
-- **פילטר "MTD"**: מציג נתונים מתחילת החודש הקלנדרי ועד היום
-- **פילטר "30 יום"**: מציג נתונים מלפני 30 יום ועד היום
-- **פילטר "60 יום"**: מציג נתונים מלפני 60 יום ועד היום
-- **פילטר "90 יום"**: מציג נתונים מלפני 90 יום ועד היום
-- **פילטר "שנה"**: מציג נתונים מלפני 365 ימים ועד היום
-- **פילטר "YTD"**: מציג נתונים מתחילת השנה הקלנדרית ועד היום
-- **פילטר "שנה קודמת"**: מציג נתונים מתחילת השנה הקלנדרית הקודמת ועד סופה
+#### Date Filter Improvements:
+- **"This Week" filter**: Shows data from the start of the current calendar week (Sunday) to today
+- **"Week" filter**: Shows data from 7 days ago to today
+- **"MTD" filter**: Shows data from the start of the current calendar month to today
+- **"30 Days" filter**: Shows data from 30 days ago to today
+- **"60 Days" filter**: Shows data from 60 days ago to today
+- **"90 Days" filter**: Shows data from 90 days ago to today
+- **"Year" filter**: Shows data from 365 days ago to today
+- **"YTD" filter**: Shows data from the start of the current calendar year to today
+- **"Previous Year" filter**: Shows data from the start of the previous calendar year to the end
 
-### שינויים שבוצעו
+### Changes Made
 
-#### עדכון קבצי JavaScript:
+#### JavaScript File Updates:
 - **`trading-ui/scripts/grid-filters.js`**:
-  - שיפור פונקציה `getDateRange` עם לוגיקה מדויקת לכל פילטר תאריכים
-  - תמיכה כפולה בפילטרים "השבוע" ו"שבוע" עם לוגיקה שונה
-  - תיקון באג בפילטר "שבוע" שהציג נתונים מ-1970
+  - Improved `getDateRange` function with precise logic for all date filters
+  - Double support for "Week" and "This Week" filters with different logic
+  - Fixed bug in "Week" filter that showed data from 1970
 
 - **`trading-ui/scripts/app-header.js`**:
-  - הוספת פילטר "השבוע" לתפריט הפילטרים
-  - עדכון סדר הפילטרים בתפריט
+  - Added "This Week" filter to the filter menu
+  - Updated filter order in the menu
 
-#### פונקציות משופרות:
+#### Improved Functions:
 ```javascript
-// פונקציה משופרת לחישוב טווחי תאריכים
+// Improved function for calculating date ranges
 getDateRange(dateRange)
 
-// תמיכה בפילטרים "השבוע" ו"שבוע"
-case 'השבוע': // שבוע קלנדרי - מיום ראשון האחרון ועד היום
-case 'שבוע':  // 7 ימים אחורה - מלפני 7 ימים ועד היום
+// Support for "Week" and "This Week" filters
+case 'Week': // Calendar week - from the start of the last Sunday to today
+case 'This Week':  // 7 days ago - from 7 days ago to today
 ```
 
-### בדיקות שבוצעו
-- [x] בדיקת פילטר "השבוע" - עובד נכון עם שבוע קלנדרי
-- [x] בדיקת פילטר "שבוע" - עובד נכון עם 7 ימים אחורה
-- [x] בדיקת כל פילטרי התאריכים - עובדים לפי ההגדרות
-- [x] בדיקת תאימות לאחור - פילטרים ישנים עובדים כרגיל
+### Tests Performed
+- [x] Filter "This Week" - Works correctly with calendar week
+- [x] Filter "Week" - Works correctly with 7 days ago
+- [x] All date filters - Work according to definitions
+- [x] Backward compatibility - Older filters work as expected
 
-### קבצים שעודכנו
-- ✅ `trading-ui/scripts/app-header.js` - הוספת פילטר "השבוע" לתפריט
-- ✅ `trading-ui/scripts/grid-filters.js` - שיפור פונקציה `getDateRange` עם לוגיקה מדויקת
+### Updated Files
+- ✅ `trading-ui/scripts/app-header.js` - Added filter "This Week" to menu
+- ✅ `trading-ui/scripts/grid-filters.js` - Improved `getDateRange` function with precise logic
 
-### תוצאות
-- **דיוק פילטרים**: כל פילטרי התאריכים עובדים לפי ההגדרות הנכונות
-- **תמיכה בשני סוגי שבוע**: שבוע קלנדרי ו-7 ימים אחורה
-- **תיקון באגים**: פילטר "שבוע" עובד נכון
-- **חוויית משתמש משופרת**: יותר אפשרויות פילטור מדויקות
+### Results
+- **Filter Accuracy**: All date filters work according to correct definitions
+- **Support for Two Week Types**: Calendar week and 7 days ago
+- **Bug Fixes**: Filter "Week" works correctly
+- **Enhanced User Experience**: More precise filter options
 
-## סיכום כללי
+## Summary
 
-השינויים שבוצעו שיפרו את:
-- **בהירות המבנה**: פחות בלבול בין שדות
-- **עקביות הנתונים**: ערכים מוגדרים היטב
-- **תחזוקתיות**: קוד נקי יותר
-- **חוויית משתמש**: ממשק ברור יותר
-- **תקפות המערכת**: איחוד סוגי טריידים לסטנדרט אחד
-- **גמישות המסחר**: תמיכה ב-Long ו-Short
-- **דיוק פילטרים**: פילטרי תאריכים מדויקים עם תמיכה בשני סוגי שבוע
-- **תיקון באגים**: פילטר "שבוע" עובד נכון
-- **מערכת מטבעות מרכזית**: נרמול נתונים עם טבלה נפרדת למטבעות
-- **גמישות מטבעות**: קל להוסיף מטבעות חדשים ולעדכן שערים
-- **תזרימי מזומנים מתקדמים**: תמיכה במטבעות, מקור נתונים ושערי חליפין
-- **ממשק CRUD מלא למטבעות**: ניהול מטבעות עם ממשק גרפי נוח
+The changes made improved:
+- **Structure Clarity**: Less confusion between fields
+- **Data Consistency**: Well-defined values
+- **Maintainability**: Cleaner code
+- **User Experience**: Clearer interface
+- **System Validity**: Consolidating trade types to one standard
+- **Trading Flexibility**: Support for Long and Short
+- **Filter Accuracy**: Precise date filters with support for two week types
+- **Bug Fixes**: Filter "Week" works correctly
+- **Centralized Currency System**: Normalized data with a separate currency table
+- **Currency Flexibility**: Easy to add new currencies and update rates
+- **Advanced Cash Flows**: Support for currencies, data sources, and exchange rates
+- **Full CRUD for Currencies**: Convenient graphical interface for currency management
 
-### מצב נוכחי של המערכת (21.08.2025):
-- ✅ **מערכת מטבעות מרכזית**: טבלה נפרדת עם API מלא
-- ✅ **תזרימי מזומנים מתקדמים**: תמיכה מלאה במטבעות ומקור נתונים
-- ✅ **CRUD מלא למטבעות**: ממשק גרפי לניהול מטבעות
-- ✅ **אינטגרציה מלאה**: כל הרכיבים מחוברים ועובדים
+### Current System State (21.08.2025):
+- ✅ **Centralized Currency System**: Separate table with full API
+- ✅ **Advanced Cash Flows**: Full support for currencies and data sources
+- ✅ **Full CRUD for Currencies**: Graphical interface for currency management
+- ✅ **Full Integration**: All components are connected and working
 
-כל השינויים בוצעו עם גיבוי מלא ותמיכה בשחזור במקרה הצורך.
+All changes were made with full backup and recovery support if needed.
 
-## 7. מיגרציה למערכת מטבעות מרכזית - 21.08.2025
+## 7. Centralized Currency System - 21.08.2025
 
-### מטרה
-יצירת מערכת מטבעות מרכזית עם טבלה נפרדת למטבעות במקום שדות מטבע מפוזרים בטבלאות שונות.
+### Goal
+Creating a centralized currency system with a separate table for currencies instead of currency fields scattered across tables.
 
-### הבעיות שזוהו
-1. **פיזור נתונים**: מטבעות מאוחסנים כטקסט בטבלאות שונות
-2. **חוסר עקביות**: אין נרמול של נתוני מטבעות
-3. **קושי בתחזוקה**: עדכון שערי מטבע דורש שינוי בקוד
-4. **חוסר גמישות**: קשה להוסיף מטבעות חדשים
+### Identified Problems
+1. **Data Dispersal**: Currencies are stored as text in different tables
+2. **Inconsistency**: No currency normalization
+3. **Complexity in Maintenance**: Updating currency rates requires code changes
+4. **Lack of Flexibility**: Difficult to add new currencies
 
-### הפתרון
+### Solution
 
-#### יצירת טבלת מטבעות מרכזית:
+#### Creating a Currency Table:
 ```sql
 CREATE TABLE currencies (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -543,76 +543,76 @@ CREATE TABLE currencies (
 );
 ```
 
-#### עדכון טבלאות קיימות:
-1. **טבלת `accounts`**:
-   - הוספת שדה `currency_id` (INTEGER, ForeignKey)
-   - הסרת שדה `currency` (VARCHAR)
-   - הוספת relationship לטבלת `currencies`
+#### Updating Existing Tables:
+1. **`accounts` table**:
+   - Added `currency_id` (INTEGER, ForeignKey)
+   - Removed `currency` (VARCHAR)
+   - Added relationship to `currencies` table
 
-2. **טבלת `tickers`**:
-   - הוספת שדה `currency_id` (INTEGER, ForeignKey)
-   - הסרת שדה `currency` (VARCHAR)
-   - הוספת relationship לטבלת `currencies`
+2. **`tickers` table**:
+   - Added `currency_id` (INTEGER, ForeignKey)
+   - Removed `currency` (VARCHAR)
+   - Added relationship to `currencies` table
 
-3. **טבלת `cash_flows`**:
-   - כבר עודכן לעבוד עם `currency_id`
+3. **`cash_flows` table**:
+   - Already updated to work with `currency_id`
 
-### שינויים שבוצעו
+### Changes Made
 
-#### קבצי מיגרציה חדשים:
-- **`Backend/migrations/create_currencies_table.py`**: יצירת טבלת מטבעות
-- **`Backend/migrations/update_accounts_currency.py`**: עדכון טבלת חשבונות
-- **`Backend/migrations/update_tickers_currency.py`**: עדכון טבלת טיקרים
-- **`add_currencies.py`**: הוספת מטבעות ראשוניים
+#### New Migration Files:
+- **`Backend/migrations/create_currencies_table.py`**: Create currency table
+- **`Backend/migrations/update_accounts_currency.py`**: Update account table
+- **`Backend/migrations/update_tickers_currency.py`**: Update ticker table
+- **`add_currencies.py`**: Add primary currencies
 
-#### מודלים חדשים/עודכנים:
-- **`Backend/models/currency.py`**: מודל חדש למטבעות
-- **`Backend/models/account.py`**: עדכון לעבוד עם `currency_id`
-- **`Backend/models/ticker.py`**: עדכון לעבוד עם `currency_id`
-- **`Backend/models/__init__.py`**: הוספת מודל Currency
+#### New Models/Updated:
+- **`Backend/models/currency.py`**: New currency model
+- **`Backend/models/account.py`**: Update to work with `currency_id`
+- **`Backend/models/ticker.py`**: Update to work with `currency_id`
+- **`Backend/models/__init__.py`**: Added Currency model
 
-#### שירותים חדשים/עודכנים:
-- **`Backend/services/currency_service.py`**: שירות חדש למטבעות
-- **`Backend/services/ticker_service.py`**: עדכון לעבוד עם `currency_id`
-- **`Backend/services/__init__.py`**: הוספת CurrencyService
+#### New Services/Updated:
+- **`Backend/services/currency_service.py`**: New currency service
+- **`Backend/services/ticker_service.py`**: Update to work with `currency_id`
+- **`Backend/services/__init__.py`**: Added CurrencyService
 
-#### API Routes חדשים:
-- **`Backend/routes/api/currencies.py`**: API חדש למטבעות
-- **`Backend/app.py`**: רישום blueprint חדש
+#### New API Routes:
+- **`Backend/routes/api/currencies.py`**: New currency API
+- **`Backend/app.py`**: Register new blueprint
 
-#### Frontend עודכן:
-- **`trading-ui/scripts/accounts.js`**: עדכון לעבוד עם מערכת מטבעות חדשה
-- **`trading-ui/scripts/tickers.js`**: עדכון לעבוד עם מערכת מטבעות חדשה
-- **`trading-ui/accounts.html`**: עדכון טופסים
-- **`trading-ui/tickers.html`**: עדכון טופסים
+#### Frontend Updated:
+- **`trading-ui/scripts/accounts.js`**: Update to work with new currency system
+- **`trading-ui/scripts/tickers.js`**: Update to work with new currency system
+- **`trading-ui/accounts.html`**: Update forms
+- **`trading-ui/tickers.html`**: Update forms
 
-#### תיעוד:
-- **`CURRENCY_MIGRATION_DOCUMENTATION.md`**: תיעוד מפורט של המיגרציה
+#### Documentation:
+- **`CURRENCY_MIGRATION_DOCUMENTATION.md`**: Detailed documentation of the migration
 
-### מטבעות ראשוניים שנוספו:
-1. **USD** - דולר אמריקאי (שער: 1.000000)
-2. **EUR** - אירו (שער: 0.850000)
-3. **ILS** - שקל ישראלי (שער: 3.650000)
+### Primary Currencies Added:
+1. **USD** - American Dollar (Rate: 1.000000)
+2. **EUR** - Euro (Rate: 0.850000)
+3. **ILS** - Israeli Shekel (Rate: 3.650000)
 
-### יתרונות המערכת החדשה:
-1. **נרמול נתונים**: מטבעות מאוחסנים בטבלה נפרדת
-2. **גמישות**: קל להוסיף מטבעות חדשים
-3. **עקביות**: כל הטבלאות משתמשות באותה מערכת מטבעות
-4. **תחזוקה**: עדכון שער מטבע במקום אחד
-5. **תאימות**: תמיכה במטבעות חדשים ללא שינוי קוד
+### Benefits of the New System:
+1. **Normalized Data**: Currencies stored in a separate table
+2. **Flexibility**: Easy to add new currencies
+3. **Consistency**: All tables use the same currency system
+4. **Maintainability**: Update currency rate in one place
+5. **Compatibility**: Support for new currencies without code changes
 
-### בדיקות שבוצעו
-- [x] יצירת טבלת מטבעות
-- [x] הוספת מטבעות ראשוניים
-- [x] מיגרציה של נתוני חשבונות
-- [x] מיגרציה של נתוני טיקרים
-- [x] בדיקת API endpoints
-- [x] בדיקת Frontend
-- [x] בדיקת תאימות לאחור
+### Tests Performed
+- [x] Create currency table
+- [x] Add primary currencies
+- [x] Migrate account data
+- [x] Migrate ticker data
+- [x] API endpoint checks
+- [x] Frontend checks
+- [x] Backward compatibility
 
-### קבצים שנוצרו/עודכנו
+### New/Updated Files
 
-#### נוצרו:
+#### Created:
 - `Backend/models/currency.py`
 - `Backend/services/currency_service.py`
 - `Backend/routes/api/currencies.py`
@@ -622,7 +622,7 @@ CREATE TABLE currencies (
 - `add_currencies.py`
 - `CURRENCY_MIGRATION_DOCUMENTATION.md`
 
-#### עודכנו:
+#### Updated:
 - `Backend/models/account.py`
 - `Backend/models/ticker.py`
 - `Backend/models/__init__.py`
@@ -635,138 +635,138 @@ CREATE TABLE currencies (
 - `trading-ui/accounts.html`
 - `trading-ui/tickers.html`
 
-### תוצאות
-- **מערכת מטבעות מרכזית**: טבלה נפרדת למטבעות
-- **נרמול נתונים**: מבנה נתונים תקין
-- **API מלא**: endpoints למטבעות
-- **Frontend מעודכן**: תמיכה במערכת החדשה
-- **תאימות לאחור**: המערכת ממשיכה לעבוד עם נתונים קיימים
+### Results
+- **Centralized Currency System**: Separate table for currencies
+- **Normalized Data**: Well-structured data
+- **Full API**: Endpoints for currencies
+- **Frontend Updated**: Support for new system
+- **Backward Compatibility**: System continues to work with existing data
 
-## 8. הרחבת מערכת תזרימי המזומנים - 21.08.2025
+## 8. Enhanced Cash Flow System - 21.08.2025
 
-### מטרה
-הוספת שדות חדשים לטבלת `cash_flows` לתמיכה במערכת מטבעות מרכזית ומקור הנתונים.
+### Goal
+Adding new fields to `cash_flows` table for support of the centralized currency system and data sources.
 
-### השדות החדשים שנוספו
+### New Fields Added
 
-#### 1. מטבע הפעולה (`currency_id`)
-- **סוג**: INTEGER, ForeignKey לטבלת `currencies`
-- **מטרה**: קישור לטבלת המטבעות המרכזית
-- **ברירת מחדל**: מזהה הדולר האמריקאי (USD)
+#### 1. Action Currency (`currency_id`)
+- **Type**: INTEGER, ForeignKey to `currencies` table
+- **Purpose**: Link to the centralized currency system
+- **Default**: USD currency ID (USD)
 
-#### 2. שער דולר ביום הפעולה (`usd_rate`)
-- **סוג**: DECIMAL(10,6)
-- **מטרה**: שמירת שער המטבע מול הדולר ביום הפעולה
-- **ברירת מחדל**: 1.000000 (כרגע הרדקודד)
-- **הערה**: בעתיד יתווסף עדכון אוטומטי של שערי חליפין
+#### 2. Action USD Rate (`usd_rate`)
+- **Type**: DECIMAL(10,6)
+- **Purpose**: Store the currency rate against USD on the action date
+- **Default**: 1.000000 (currently hardcoded)
+- **Note**: Exchange rate updates will be added in the future
 
-#### 3. מקור המידע (`source`)
-- **סוג**: VARCHAR(20)
-- **ערכים אפשריים**:
-  - `manual` - הזנה ידנית (ברירת מחדל)
-  - `file_import` - ייבוא מקובץ
-  - `direct_import` - ייבוא ישיר מהברוקר
-- **הערה**: כרגע נתמך רק `manual`, האחרים יתווספו בעתיד
+#### 3. Data Source (`source`)
+- **Type**: VARCHAR(20)
+- **Possible Values**:
+  - `manual` - Manual entry (default)
+  - `file_import` - Import from file
+  - `direct_import` - Direct import from broker
+- **Note**: Currently only `manual` is supported, others will be added in the future
 
-#### 4. מזהה פעולה חיצוני (`external_id`)
-- **סוג**: VARCHAR(100)
-- **מטרה**: שמירת מזהה הרשומה אצל הברוקר (לייבוא עתידי)
-- **ברירת מחדל**: '0' (לפעולות ידניות)
+#### 4. External ID (`external_id`)
+- **Type**: VARCHAR(100)
+- **Purpose**: Store the record ID from the broker (for future imports)
+- **Default**: '0' (for manual entries)
 
-### שינויים שבוצעו
+### Changes Made
 
-#### עדכון מודל:
+#### Model Update:
 - **`Backend/models/cash_flow.py`**: 
-  - הוספת השדות החדשים
-  - הוספת relationship לטבלת `currencies`
+  - Added new fields
+  - Added relationship to `currencies` table
 
-#### עדכון API:
+#### API Update:
 - **`Backend/routes/api/cash_flows.py`**:
-  - עדכון פונקציות GET לכלול נתוני מטבע
-  - עדכון פונקציות POST/PUT לתמוך בשדות החדשים
-  - שימוש ב-`joinedload` לטעינת נתוני מטבע
+  - Updated GET functions to include currency data
+  - Updated POST/PUT functions to support new fields
+  - Used `joinedload` for currency data loading
 
-#### עדכון Frontend:
+#### Frontend Update:
 - **`trading-ui/cash_flows.html`**:
-  - עדכון כותרות טבלה
-  - הוספת שדות חדשים למודלי הוספה ועריכה
-  - הוספת הערות מידע למשתמש
+  - Updated table headers
+  - Added new fields to add and edit modals
+  - Added information notes for users
   
 - **`trading-ui/scripts/cash_flows.js`**:
-  - עדכון פונקציות שמירה ועדכון
-  - הוספת טעינת מטבעות לדרופדאון
-  - עדכון רינדור הטבלה
+  - Updated save and update functions
+  - Added currency loading to dropdown
+  - Updated table rendering
 
-#### עדכון תפריט:
-- **`trading-ui/scripts/app-header.js`**: הוספת קישור לדף תזרימי מזומנים
+#### Menu Update:
+- **`trading-ui/scripts/app-header.js`**: Added link to cash flows page
 
-#### סקריפטי מיגרציה:
-- **`update_cash_flows_table.py`**: הוספת השדות החדשים לטבלה קיימת
-- **`add_cash_flows.py`**: עדכון סקריפט הנתונים לדוגמה
+#### Migration Scripts:
+- **`update_cash_flows_table.py`**: Added new fields to existing table
+- **`add_cash_flows.py`**: Updated data script for example
 
-### בדיקות שבוצעו
-- [x] הוספת שדות לטבלה
-- [x] עדכון נתונים קיימים עם ברירות מחדל
-- [x] בדיקת API endpoints
-- [x] בדיקת Frontend
-- [x] בדיקת טעינת מטבעות
-- [x] בדיקת שמירה ועדכון
+### Tests Performed
+- [x] Added fields to table
+- [x] Updated existing data with default values
+- [x] API endpoint checks
+- [x] Frontend checks
+- [x] Currency loading checks
+- [x] Save and update checks
 
-## 9. השלמת CRUD למטבעות - 21.08.2025
+## 9. Full CRUD for Currencies - 21.08.2025
 
-### מטרה
-יצירת ממשק CRUD מלא למטבעות כחלק מהשלמת הרשימה המתוכננת.
+### Goal
+Creating a full CRUD interface for currencies as part of the planned list.
 
-### מה שבוצע
+### What Was Done
 
-#### יצירת דף מטבעות:
+#### Creating Currency Page:
 - **`trading-ui/currencies.html`**:
-  - דף HTML מלא למטבעות
-  - טבלה עם כותרות: מזהה, סמל, שם, שער דולר, נוצר ב, פעולות
-  - מודלים להוספה, עריכה ומחיקה
-  - סיכום נתונים מותאם למטבעות
-  - הערות מידע על מטבעות
+  - Full HTML page for currencies
+  - Table with headers: ID, Symbol, Name, USD Rate, Created, Actions
+  - Add, Edit, Delete models
+  - Summarize data for currencies
+  - Information notes about currencies
 
-#### יצירת JavaScript למטבעות:
+#### Creating JavaScript for Currencies:
 - **`trading-ui/scripts/currencies.js`**:
-  - פונקציות CRUD מלאות (Create, Read, Update, Delete)
-  - טעינת נתונים מה-API
-  - רינדור טבלה דינמי
-  - עדכון סטטיסטיקות
-  - ולידציה של נתונים
+  - Full CRUD functions (Create, Read, Update, Delete)
+  - Data loading from API
+  - Dynamic table rendering
+  - Update statistics
+  - Data validation
 
-#### הוספת נתבים:
-- **`Backend/app.py`**: הוספת `/currencies` ו-`/currencies.html`
+#### Added Items:
+- **`Backend/app.py`**: Added `/currencies` and `/currencies.html`
 
-#### הוספת קישור בתפריט:
-- **`trading-ui/scripts/app-header.js`**: הוספת קישור אחרי "בסיס נתונים"
+#### Added Link in Menu:
+- **`trading-ui/scripts/app-header.js`**: Added link after "Database"
 
-### תכונות הדף
-- **הצגת מטבעות**: טבלה דינמית עם כל המטבעות
-- **הוספת מטבע**: מודל עם שדות סמל, שם ושער דולר
-- **עריכת מטבע**: מודל לעדכון פרטי מטבע קיים
-- **מחיקת מטבע**: אישור מחיקה עם אזהרה
-- **סטטיסטיקות**: סה"כ מטבעות, מטבע בסיס, שערים מקסימלי ומינימלי
+### Page Features
+- **Display Currencies**: Dynamic table with all currencies
+- **Add Currency**: Model with symbol, name, and USD rate
+- **Edit Currency**: Model for editing existing currency details
+- **Delete Currency**: Confirmation of deletion with warning
+- **Statistics**: Total currencies, base currency, max and min rates
 
-### בדיקות שבוצעו
-- [x] טעינת דף מטבעות
-- [x] הצגת רשימת מטבעות
-- [x] הוספת מטבע חדש
-- [x] עריכת מטבע קיים
-- [x] מחיקת מטבע
-- [x] עדכון סטטיסטיקות
-- [x] ולידציה של נתונים
+### Tests Performed
+- [x] Currency page loading
+- [x] Displaying currency list
+- [x] Adding new currency
+- [x] Editing existing currency
+- [x] Deleting currency
+- [x] Updating statistics
+- [x] Data validation
 
-### קבצים שנוצרו
+### New Files
 - `trading-ui/currencies.html`
 - `trading-ui/scripts/currencies.js`
 
-### קבצים שעודכנו
+### Updated Files
 - `Backend/app.py`
 - `trading-ui/scripts/app-header.js`
 
-### תוצאות
-- **CRUD מלא למטבעות**: כל הפעולות זמינות
-- **ממשק משתמש אינטואיטיבי**: דף מעוצב ונוח לשימוש
-- **אינטגרציה מלאה**: מחובר למערכת הקיימת
-- **תמיכה בתפריט**: נגיש מהתפריט הראשי
+### Results
+- **Full CRUD for Currencies**: All operations available
+- **User-friendly Interface**: Well-designed and easy-to-use page
+- **Full Integration**: Connected to existing system
+- **Menu Support**: Accessible from main menu

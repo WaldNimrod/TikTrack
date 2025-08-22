@@ -160,10 +160,7 @@ cd Backend && python3 app.py
 - **סוגים:** success (ירוק), error (אדום), warning (צהוב), info (כחול)
 - **יתרונות:** לא חוסם את המסך, נעלם אוטומטית, נראה מקצועי
 
-### **דף דמו:**
-- **כתובת:** `http://127.0.0.1:8080/notification-demo`
-- **תכולה:** השוואה בין alert ו-notification
-- **מטרה:** הדגמת ההבדל בין השיטות
+
 
 ### **המרה מ-alert ל-notification:**
 ```javascript
@@ -200,7 +197,7 @@ if (typeof window.showNotification === 'function') {
 - `/research` - דף מחקר
 
 ### **דפים מיוחדים:**
-- `/notification-demo` - דמו הודעות
+
 
 ### **תמיכה כפולה:**
 כל דף זמין גם עם `.html` וגם בלי:

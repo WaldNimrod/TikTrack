@@ -85,10 +85,7 @@ def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
 
-@pages_bp.route('/notification-demo')
-def notification_demo() -> Any:
-    """Notification demo page"""
-    return send_from_directory(UI_DIR, "notification-demo.html")
+
 
 @pages_bp.route('/test-header-only')
 def test_header_only() -> Any:

@@ -162,8 +162,9 @@ def update_trade_plan(plan_id: int):
 @trade_plans_bp.route('/<int:plan_id>/cancel', methods=['POST'])
 def cancel_trade_plan(plan_id: int):
     """Cancel trade plan"""
+    db = None
     try:
-        data = request.get_json()
+        data = request.get_json() if request.is_json else {}
         cancel_reason = data.get('cancel_reason', 'Cancelled by user')
         db: Session = next(get_db())
         plan = TradePlanService.cancel_plan(db, plan_id, cancel_reason)
@@ -187,7 +188,8 @@ def cancel_trade_plan(plan_id: int):
             "version": "v1"
         }), 400
     finally:
-        db.close()
+        if db:
+            db.close()
 
 @trade_plans_bp.route('/<int:plan_id>/activate', methods=['POST'])
 def activate_trade_plan(plan_id: int):

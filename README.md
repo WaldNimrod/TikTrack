@@ -124,318 +124,318 @@ cd Backend && python3 ../backups/debug_files/create_initial_data.py
 
 ### 🎯 **Startup:**
 ```bash
-# הפעלה מהירה (מומלץ)
+# Quick startup (recommended)
 ./start_dev.sh
 
-# או הפעלה ישירה
+# Or direct startup
 cd Backend && python3 run_flask_simple.py
 ```
 
-### ⚠️ **הערה חשובה - שינויים בקוד:**
-**כאשר משנים קוד Python (models, routes, services), יש צורך ב-restart של השרת כדי שהשינויים ייטענו!**
+### ⚠️ **Important Note - Code Changes:**
+**When changing Python code (models, routes, services), server restart is required for changes to load!**
 ```bash
-# עצירת השרת
+# Stop server
 pkill -f "python3.*run_flask_simple.py"
 
-# הפעלה מחדש
+# Restart
 cd Backend && python3 run_flask_simple.py &
 ```
 
-### 📊 **יתרונות הקונפיגורציה האחידה:**
-- ✅ **קונפיגורציה אחת בלבד** - אין בלבול
-- ✅ **מהירות** - השרת עולה תוך מספר שניות
-- ✅ **יציבות** - Flask development server יציב
-- ✅ **Debug mode** - מופעל לנוחות הפיתוח
-- ✅ **לוגים מפורטים** - לפיתוח ובדיקת בעיות
-- ✅ **פשטות** - קונפיגורציה פשוטה וברורה
+### 📊 **Unified Configuration Advantages:**
+- ✅ **Single configuration only** - No confusion
+- ✅ **Speed** - Server starts in seconds
+- ✅ **Stability** - Flask development server stable
+- ✅ **Debug mode** - Enabled for development convenience
+- ✅ **Detailed logs** - For development and troubleshooting
+- ✅ **Simplicity** - Simple and clear configuration
 
-### 📁 **ארכיון קונפיגורציות ישנות:**
-- **מיקום:** `Backend/backups/20250820_flask_simple_configuration/`
-- **תאריך:** 20 באוגוסט 2025
-- **סיבה:** מעבר לקונפיגורציה פשוטה ויציבה
-- **סטטוס:** ארכיון - לא בשימוש
+### 📁 **Old Configurations Archive:**
+- **Location:** `Backend/backups/20250820_flask_simple_configuration/`
+- **Date:** August 20, 2025
+- **Reason:** Transition to simple and stable configuration
+- **Status:** Archive - Not in use
 
-## 🏗️ ארכיטקטורת הקבצים
+## 🏗️ File Architecture
 
-### 📁 קבצי JavaScript
+### 📁 JavaScript Files
 
-#### `trading-ui/scripts/main.js` - קובץ כללי ראשי
-**תפקיד:** קובץ כללי המכיל את כל הפונקציונליות המשותפת לכל האתר.
+#### `trading-ui/scripts/main.js` - Main General File
+**Purpose:** General file containing all shared functionality for the entire site.
 
-**כללי חשובים:**
-1. **פונקציות כלליות:** פונקציות הקשורות לכל העמודים או הישויות נכתבות בקובץ הזה
-2. **פונקציות ספציפיות:** פונקציות שקשורות רק לישות אחת מישויות בסיס הנתונים נכתבות בקובץ ייעודי משלה
-3. **איחוד קבצים:** קובץ זה כולל את כל הפונקציונליות מ-`grid-table.js` ו-`grid-data.js`
+**Important Rules:**
+1. **General Functions:** Functions related to all pages or entities are written in this file
+2. **Specific Functions:** Functions related to only one database entity are written in their own dedicated file
+3. **File Consolidation:** This file includes all functionality from `grid-table.js` and `grid-data.js`
 
-**תוכן הקובץ:**
-- פונקציות API כללית
-- הגדרת עמודות הגריד הסטנדרטיות
-- ניהול נתונים מבסיס הנתונים
-- פונקציות סגירה/פתיחה של סקשנים
-- פונקציות המרה ופורמט
-- פונקציות פילטור טבלאות
-- **מערכת סידור טבלאות גלובלית** - פונקציונליות סידור אחידה לכל הטבלאות
-- פונקציות אתחול גריד
-- פונקציות מקוריות מ-main.js
+**File Contents:**
+- General API functions
+- Standard grid column definitions
+- Database data management
+- Section open/close functions
+- Conversion and format functions
+- Table filtering functions
+- **Global Table Sorting System** - Unified sorting functionality for all tables
+- Grid initialization functions
+- Original functions from main.js
 
-**מערכת סידור טבלאות:**
-- `sortTableData()` - פונקציה גלובלית לסידור טבלאות
-- `updateSortIcons()` - עדכון אייקוני סידור
-- `loadSortState()` - טעינת מצב סידור מ-localStorage
-- תמיכה בכל סוגי הנתונים (טקסט, מספרים, תאריכים, סטטוסים)
-- שמירת מצב נפרד לכל דף
+**Table Sorting System:**
+- `sortTableData()` - Global function for table sorting
+- `updateSortIcons()` - Update sorting icons
+- `loadSortState()` - Load sort state from localStorage
+- Support for all data types (text, numbers, dates, statuses)
+- Separate state saving for each page
 
-#### קבצים ייעודיים לישויות:
-- `accounts.js` - פונקציות ייעודיות לחשבונות (פונקציות פילטר הועברו ל-grid-filters.js)
-- `trades.js` - פונקציות ייעודיות לטריידים
-- `alerts.js` - פונקציות ייעודיות להתראות
-- `notes.js` - פונקציות ייעודיות להערות
+#### Entity-Specific Files:
+- `accounts.js` - Account-specific functions (filter functions moved to grid-filters.js)
+- `trades.js` - Trade-specific functions
+- `alerts.js` - Alert-specific functions
+- `notes.js` - Note-specific functions
 
-#### קבצים מודולריים:
-- `grid-filters.js` - מערכת הפילטרים (כולל פונקציות פילטר חשבונות שהועברו מ-accounts.js)
-- `app-header.js` - כותרת האפליקציה
-- `auth.js` - אימות משתמשים
+#### Modular Files:
+- `grid-filters.js` - Filter system (including account filter functions moved from accounts.js)
+- `app-header.js` - Application header
+- `auth.js` - User authentication
 
-### 📁 קבצי גיבוי
-- `backups/20250818_js_unification/` - גיבוי איחוד קבצי JavaScript (גרסה 2.3)
-  - `grid-table.js.backup` - גיבוי של הקובץ הישן
-  - `grid-data.js.backup` - גיבוי של הקובץ הישן
-  - `main.js.backup` - גיבוי של הקובץ המקורי
-  - `README.md` - תיעוד הגיבוי
+### 📁 Backup Files
+- `backups/20250818_js_unification/` - JavaScript file consolidation backup (version 2.3)
+  - `grid-table.js.backup` - Backup of old file
+  - `grid-data.js.backup` - Backup of old file
+  - `main.js.backup` - Backup of original file
+  - `README.md` - Backup documentation
 
-## 🔧 הוראות פיתוח
+## 🔧 Development Instructions
 
-### הוספת פונקציות חדשות:
-1. **פונקציות כלליות** → `main.js`
-2. **פונקציות פילטור גלובליות** → `grid-filters.js`
-3. **פונקציות ספציפיות לישות** → קובץ ייעודי (למשל `accounts.js`)
+### Adding New Functions:
+1. **General Functions** → `main.js`
+2. **Global Filter Functions** → `grid-filters.js`
+3. **Entity-Specific Functions** → Dedicated file (e.g., `accounts.js`)
 
-### עדכון דפים:
-- כל הדפים טוענים את `main.js` במקום `grid-table.js` ו-`grid-data.js`
-- אין צורך לטעון את הקבצים הישנים
+### Updating Pages:
+- All pages load `main.js` instead of `grid-table.js` and `grid-data.js`
+- No need to load old files
 
-## 🚀 הוראות פיתוח עתידיות
+## 🚀 Future Development Instructions
 
-### 📋 כללי פיתוח חדשים:
-1. **פונקציות ספציפיות לדף:** כל דף צריך קובץ `.js` ייעודי עם הפונקציות הספציפיות לו
-2. **פונקציה `updateGridFromComponent`:** כל דף חייב להגדיר פונקציה זו לקישור עם הפילטרים הגלובליים
-3. **חשיפת פונקציות:** כל הפונקציות הנדרשות חייבות להיות זמינות דרך `window` object
-4. **טעינת קבצים:** וידוא שכל הדפים טוענים את הקבצים הנדרשים
+### 📋 New Development Rules:
+1. **Page-Specific Functions:** Each page needs a dedicated `.js` file with its specific functions
+2. **`updateGridFromComponent` Function:** Each page must define this function to connect with global filters
+3. **Function Exposure:** All required functions must be available through `window` object
+4. **File Loading:** Ensure all pages load the required files
 
-### 🎯 הוספת דף חדש:
+### 🎯 Adding a New Page:
 ```javascript
-// 1. יצירת קובץ script ייעודי (למשל newpage.js)
-// 2. הגדרת פונקציה updateGridFromComponent
+// 1. Create dedicated script file (e.g., newpage.js)
+// 2. Define updateGridFromComponent function
 window.updateGridFromComponent = function(selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
   window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'newpage');
 };
 
-// 3. הוספת טעינת הקובץ ב-HTML
+// 3. Add file loading in HTML
 <script src="scripts/newpage.js"></script>
 ```
 
-### 🔧 הוספת פילטר חדש:
-1. **עדכון `app-header.js`:** הוספת הפילטר ל-HTML של הכותרת
-2. **עדכון `grid-filters.js`:** הוספת לוגיקת הפילטר לפונקציה `filterDataByFilters`
-3. **עדכון כל הדפים:** וידוא שכל הדפים תומכים בפילטר החדש
+### 🔧 Adding a New Filter:
+1. **Update `app-header.js`:** Add filter to header HTML
+2. **Update `grid-filters.js`:** Add filter logic to `filterDataByFilters` function
+3. **Update all pages:** Ensure all pages support the new filter
 
-### 📊 כללי נתונים:
-- **בסיס נתונים:** שמירת כל הנתונים באנגלית
-- **ממשק משתמש:** תרגום לעברית רק ב-UI
-- **סטטוסים:** שימוש ב-`cancelled` (עם שני 'l') במקום `cancelled`
+### 📊 Data Rules:
+- **Database:** Store all data in English
+- **User Interface:** Translate to Hebrew only in UI
+- **Statuses:** Use `cancelled` (with two 'l') instead of `cancelled`
 
-### 🧪 בדיקות לפני שחרור:
-- [ ] בדיקת פילטרים בכל הדפים
-- [ ] בדיקת טעינת נתונים
-- [ ] בדיקת פונקציות גלובליות
-- [ ] בדיקת עקביות טקסטים
-- [ ] בדיקת תמיכה RTL
+### 🧪 Pre-Release Testing:
+- [ ] Test filters on all pages
+- [ ] Test data loading
+- [ ] Test global functions
+- [ ] Test text consistency
+- [ ] Test RTL support
 
-## ⚠️ בעיות פתוחות ומוכרות
+## ⚠️ Open and Known Issues
 
-### 🔴 בעיות קריטיות:
-- **עדכון התראות:** API לעדכון `account_id` בהתראות לא עובד כראוי
-- **פילטר חיפוש:** בעיה בפילטר החיפוש החופשי - נשאר תו אחד אחרי מחיקה
+### 🔴 Critical Issues:
+- **Alert Updates:** API for updating `account_id` in alerts doesn't work properly
+- **Search Filter:** Issue with free search filter - one character remains after deletion
 
-### 🟡 בעיות בינוניות:
-- **שמירת מצב פילטרים:** פילטרים לא נשמרים בין מעברי דפים ורענונים
-- **רענון מיידי:** שינוי בפילטר לא מרענן את הטבלה מיד
+### 🟡 Medium Issues:
+- **Filter State Saving:** Filters don't save between page transitions and refreshes
+- **Immediate Refresh:** Filter change doesn't refresh table immediately
 
-### 🟢 שיפורים עתידיים:
-- **ביצועים:** אופטימיזציה של טעינת נתונים במקביל
-- **UX:** שיפור חוויית המשתמש בפילטרים
-- **תיעוד:** הוספת תיעוד מפורט לכל פונקציה
+### 🟢 Future Improvements:
+- **Performance:** Optimize parallel data loading
+- **UX:** Improve user experience in filters
+- **Documentation:** Add detailed documentation for each function
 
-### 📋 משימות עתידיות:
-- [ ] תיקון API עדכון התראות
-- [ ] תיקון פילטר חיפוש חופשי
-- [ ] יישום שמירת מצב פילטרים
-- [ ] יישום רענון מיידי של טבלאות
-- [ ] אופטימיזציית ביצועים
+### 📋 Future Tasks:
+- [ ] Fix alert update API
+- [ ] Fix free search filter
+- [ ] Implement filter state saving
+- [ ] Implement immediate table refresh
+- [ ] Performance optimization
 
-## 📊 מבנה בסיס הנתונים
+## 📊 Database Structure
 
-### ישויות עיקריות:
-- **Users** - משתמשים
-- **Accounts** - חשבונות
-- **Tickers** - טיקרים
-- **Trades** - טריידים
-- **Trade Plans** - תוכניות טרייד
-- **Alerts** - התראות
-- **Cash Flows** - תזרימי מזומנים
-- **Notes** - הערות
-- **Executions** - ביצועים
-- **User Roles** - תפקידי משתמשים
+### Main Entities:
+- **Users** - Users
+- **Accounts** - Accounts
+- **Tickers** - Tickers
+- **Trades** - Trades
+- **Trade Plans** - Trade Plans
+- **Alerts** - Alerts
+- **Cash Flows** - Cash Flows
+- **Notes** - Notes
+- **Executions** - Executions
+- **User Roles** - User Roles
 
-## 🚀 הפעלת המערכת
+## 🚀 System Startup
 
-### דרישות:
+### Requirements:
 - Python 3.8+
 - SQLite3
-- דפדפן מודרני
+- Modern browser
 
-### הפעלה:
+### Startup:
 ```bash
-# הפעלת השרת (הקונפיגורציה היחידה)
+# Start server (single configuration)
 ./start_dev.sh
 
-# או ידנית:
+# Or manually:
 cd Backend && python3 dev_server.py
 ```
 
-### גישה:
-- **ממשק משתמש:** http://localhost:8080
+### Access:
+- **User Interface:** http://localhost:8080
 - **API:** http://localhost:8080/api/v1/
 
-## 📝 שינויים אחרונים
+## 📝 Recent Changes
 
-### גרסה 2.7 (אוגוסט 2025) - שיפור הודעות ונתיבים
-**תיאור:** הוספת notification system ונתיבים ללא .html
+### Version 2.7 (August 2025) - Message and Path Improvements
+**Description:** Adding notification system and paths without .html
 
-#### 🎯 שיפורי הודעות:
-- **Notification System:** הודעות ירוקות בפינה שנעלמות אוטומטית
-- **דף דמו:** `http://127.0.0.1:8080/notification-demo` להדגמת ההבדל
-- **המרה מ-alert:** הוראות להמרה מ-alert ל-notification
-- **סוגי הודעות:** success (ירוק), error (אדום), warning (צהוב), info (כחול)
+#### 🎯 Message Improvements:
+- **Notification System:** Green messages in corner that disappear automatically
+- **Demo Page:** `http://127.0.0.1:8080/notification-demo` to demonstrate the difference
+- **Conversion from alert:** Instructions for converting from alert to notification
+- **Message Types:** success (green), error (red), warning (yellow), info (blue)
 
-#### 🔗 שיפורי נתיבים:
-- **נתיבים ללא .html:** כל הדפים זמינים ללא .html בסוף
-- **תמיכה כפולה:** כל דף זמין גם עם .html וגם בלי
-- **routes חדשים:** הוספת routes ל-notes ו-notification-demo
+#### 🔗 Path Improvements:
+- **Paths without .html:** All pages available without .html at the end
+- **Dual Support:** Each page available both with .html and without
+- **New routes:** Adding routes for notes and notification-demo
 
-#### 📁 קבצים שעודכנו:
-- ✅ `Backend/app.py` - הוספת routes חדשים ואנוטציות
-- ✅ `Backend/run_flask_simple.py` - עדכון הודעות הפעלה
-- ✅ `Backend/SERVER_CONFIGURATIONS.md` - דוקומנטציה מעודכנת
-- ✅ `trading-ui/notification-demo.html` - דף דמו להודעות
-- ✅ `README.md` - עדכון דוקומנטציה
+#### 📁 Updated Files:
+- ✅ `Backend/app.py` - Adding new routes and annotations
+- ✅ `Backend/run_flask_simple.py` - Updated startup messages
+- ✅ `Backend/SERVER_CONFIGURATIONS.md` - Updated documentation
+- ✅ `trading-ui/notification-demo.html` - Message demo page
+- ✅ `README.md` - Documentation update
 
-### גרסה 2.6 (אוגוסט 2025) - קונפיגורציה אחידה
-**תיאור:** מעבר לקונפיגורציה אחידה - רק `dev_server.py` ו-`./start_dev.sh`
+### Version 2.6 (August 2025) - Unified Configuration
+**Description:** Transition to unified configuration - only `dev_server.py` and `./start_dev.sh`
 
-#### 🔄 שינויי קונפיגורציה:
-- **ארכיון קונפיגורציות ישנות:** העברת `dev_server.py`, `run_flask_dev.py`, `start_server.sh`, `stop_server.sh` לארכיון
-- **קונפיגורציה פשוטה:** רק `run_flask_simple.py` ו-`./start_dev.sh` בשימוש
-- **פישוט דוקומנטציה:** עדכון הדוקומנטציה להציג רק את הקונפיגורציה החדשה
-- **הפעלה ישירה:** עדכון `app.py` לאפשר הפעלה ישירה עם Flask development server
-- **יצירת run_flask_simple.py:** קובץ Flask פשוט ויציב ללא auto-reload
-- **הוספת נתיבים:** הוספת routes ל-`notes` ו-`notification-demo` ללא .html
-- **שיפור הודעות:** מעבר מ-alert ל-notification system
+#### 🔄 Configuration Changes:
+- **Archive old configurations:** Moving `dev_server.py`, `run_flask_dev.py`, `start_server.sh`, `stop_server.sh` to archive
+- **Simple configuration:** Only `run_flask_simple.py` and `./start_dev.sh` in use
+- **Documentation simplification:** Updating documentation to show only the new configuration
+- **Direct startup:** Updating `app.py` to allow direct startup with Flask development server
+- **Creating run_flask_simple.py:** Simple and stable Flask file without auto-reload
+- **Adding routes:** Adding routes for `notes` and `notification-demo` without .html
+- **Message improvement:** Transition from alert to notification system
 
-#### 📁 קבצים שעודכנו:
-- ✅ `README.md` - עדכון להציג רק את הקונפיגורציה החדשה
-- ✅ `backups/20250820_flask_simple_configuration/` - ארכיון הקונפיגורציות הישנות
-- ✅ `backups/20250820_flask_simple_configuration/README_BACKUP.md` - תיעוד הגיבוי
-- ✅ `Backend/app.py` - הפעלה ישירה עם Flask development server + routes חדשים
-- ✅ `Backend/run_flask_simple.py` - קובץ Flask פשוט ויציב
-- ✅ `start_dev.sh` - עדכון להשתמש ב-`run_flask_simple.py`
-- ✅ `trading-ui/notification-demo.html` - דף דמו להודעות
-- ✅ `trading-ui/scripts/notes.js` - עדכון הודעות הצלחה (בקרוב)
-- ✅ `trading-ui/scripts/alerts.js` - עדכון הודעות הצלחה (בקרוב)
+#### 📁 Updated Files:
+- ✅ `README.md` - Update to show only the new configuration
+- ✅ `backups/20250820_flask_simple_configuration/` - Archive of old configurations
+- ✅ `backups/20250820_flask_simple_configuration/README_BACKUP.md` - Backup documentation
+- ✅ `Backend/app.py` - Direct startup with Flask development server + new routes
+- ✅ `Backend/run_flask_simple.py` - Simple and stable Flask file
+- ✅ `start_dev.sh` - Update to use `run_flask_simple.py`
+- ✅ `trading-ui/notification-demo.html` - Message demo page
+- ✅ `trading-ui/scripts/notes.js` - Success message update (coming soon)
+- ✅ `trading-ui/scripts/alerts.js` - Success message update (coming soon)
 
-#### 🎯 יתרונות השינוי:
-- ✅ **קונפיגורציה אחת בלבד** - אין בלבול
-- ✅ **מהירות** - השרת עולה תוך מספר שניות
-- ✅ **יציבות** - Flask development server יציב
-- ✅ **Debug mode** - מופעל לנוחות הפיתוח
-- ✅ **לוגים מפורטים** - לפיתוח ובדיקת בעיות
-- ✅ **פשטות** - קונפיגורציה פשוטה וברורה
-- ✅ **הפעלה ישירה** - `app.py` מאפשר הפעלה ישירה
-- ✅ **קונפיגורציה לשלב פיתוח** - מותאם במיוחד לפיתוח פעיל
+#### 🎯 Change Benefits:
+- ✅ **Single configuration only** - No confusion
+- ✅ **Speed** - Server starts in seconds
+- ✅ **Stability** - Flask development server stable
+- ✅ **Debug mode** - Enabled for development convenience
+- ✅ **Detailed logs** - For development and troubleshooting
+- ✅ **Simplicity** - Simple and clear configuration
+- ✅ **Direct startup** - `app.py` allows direct startup
+- ✅ **Development stage configuration** - Specifically adapted for active development
 
-### גרסה 2.5 (אוגוסט 2025) - מערכת פילטרים מתקדמת ותיקון פילטרי תאריכים
-**תיאור:** שיפור מקיף של מערכת הפילטרים עם תיקון פילטרי תאריכים מדויק
+### Version 2.5 (August 2025) - Advanced Filter System and Date Filter Fixes
+**Description:** Comprehensive improvement of the filter system with precise date filter fixes
 
-#### 📅 שיפור פילטרי תאריכים:
-- **פילטר "השבוע":** מציג נתונים מיום ראשון האחרון ועד היום כולל (שבוע קלנדרי)
-- **פילטר "שבוע":** מציג נתונים מלפני 7 ימים ועד היום
-- **פילטר "MTD":** מציג נתונים מתחילת החודש הקלנדרי ועד היום
-- **פילטר "30 יום":** מציג נתונים מלפני 30 יום ועד היום
-- **פילטר "60 יום":** מציג נתונים מלפני 60 יום ועד היום
-- **פילטר "90 יום":** מציג נתונים מלפני 90 יום ועד היום
-- **פילטר "שנה":** מציג נתונים מלפני 365 ימים ועד היום
-- **פילטר "YTD":** מציג נתונים מתחילת השנה הקלנדרית ועד היום
-- **פילטר "שנה קודמת":** מציג נתונים מתחילת השנה הקלנדרית הקודמת ועד סופה
+#### 📅 Date Filter Improvements:
+- **"This Week" Filter:** Shows data from last Sunday to today inclusive (calendar week)
+- **"Week" Filter:** Shows data from 7 days ago to today
+- **"MTD" Filter:** Shows data from beginning of calendar month to today
+- **"30 Days" Filter:** Shows data from 30 days ago to today
+- **"60 Days" Filter:** Shows data from 60 days ago to today
+- **"90 Days" Filter:** Shows data from 90 days ago to today
+- **"Year" Filter:** Shows data from 365 days ago to today
+- **"YTD" Filter:** Shows data from beginning of calendar year to today
+- **"Previous Year" Filter:** Shows data from beginning of previous calendar year to its end
 
-#### 🔧 שיפורי קוד:
-- **פונקציה `getDateRange`:** שיפור הפונקציה עם לוגיקה מדויקת לכל פילטר תאריכים
-- **תמיכה כפולה:** תמיכה בפילטרים "השבוע" ו"שבוע" עם לוגיקה שונה
-- **תיקון באגים:** תיקון פילטר "שבוע" שהציג נתונים מ-1970 במקום מלפני 7 ימים
-- **עדכון AppHeader:** הוספת פילטר "השבוע" לתפריט הפילטרים
+#### 🔧 Code Improvements:
+- **`getDateRange` Function:** Improved function with precise logic for each date filter
+- **Dual Support:** Support for "This Week" and "Week" filters with different logic
+- **Bug Fix:** Fixed "Week" filter that showed data from 1970 instead of 7 days ago
+- **AppHeader Update:** Added "This Week" filter to filter menu
 
-#### 📊 קבצים שעודכנו:
-- ✅ `trading-ui/scripts/app-header.js` - הוספת פילטר "השבוע" לתפריט
-- ✅ `trading-ui/scripts/grid-filters.js` - שיפור פונקציה `getDateRange` עם לוגיקה מדויקת
+#### 📊 Updated Files:
+- ✅ `trading-ui/scripts/app-header.js` - Added "This Week" filter to menu
+- ✅ `trading-ui/scripts/grid-filters.js` - Improved `getDateRange` function with precise logic
 
-#### 🎯 פונקציות משופרות:
+#### 🎯 Improved Functions:
 ```javascript
-// פונקציה משופרת לחישוב טווחי תאריכים
+// Improved function for calculating date ranges
 getDateRange(dateRange)
 
-// תמיכה בפילטרים "השבוע" ו"שבוע"
-case 'השבוע': // שבוע קלנדרי
-case 'שבוע':  // 7 ימים אחורה
+// Support for "This Week" and "Week" filters
+case 'השבוע': // Calendar week
+case 'שבוע':  // 7 days back
 ```
 
-### גרסה 2.4 (אוגוסט 2025) - מערכת פילטרים מאוחדת
-**תיאור:** רפקטורינג מקיף של מערכת הפילטרים וארכיטקטורת הסקריפטים
+### Version 2.4 (August 2025) - Unified Filter System
+**Description:** Comprehensive refactoring of the filter system and script architecture
 
-#### 🔄 רפקטורינג ארכיטקטורת הסקריפטים:
-- **הפרדת פונקציות:** העברת פונקציות ספציפיות לדפים לקבצים ייעודיים
-- **קובץ `designs.js`:** יצירת קובץ ייעודי לדף התכנונים עם כל הפונקציות הספציפיות
-- **קובץ `tracking.js`:** שינוי שם מ-`trades.js` ל-`tracking.js` להתאמה לשם הדף
-- **פונקציות גלובליות:** חשיפת כל הפונקציות הנדרשות דרך `window` object
+#### 🔄 Script Architecture Refactoring:
+- **Function Separation:** Moving page-specific functions to dedicated files
+- **`designs.js` File:** Creating dedicated file for planning page with all specific functions
+- **`tracking.js` File:** Renaming from `trades.js` to `tracking.js` to match page name
+- **Global Functions:** Exposing all required functions through `window` object
 
-#### 🎯 מערכת פילטרים מאוחדת:
-- **קובץ `grid-filters.js`:** ריכוז כל הפונקציות המשותפות של הפילטרים
-- **פונקציה `updateGridFromComponentGlobal`:** פונקציה מרכזית לטיפול בפילטרים בכל הדפים
-- **פונקציה `filterDataByFilters`:** פונקציה מאוחדת לסינון נתונים לפי כל סוגי הפילטרים
-- **תמיכה בדפים מרובים:** תמיכה בפילטרים עבור `planning`, `tracking`, `accounts`, `notes`, `alerts`, `designs`
+#### 🎯 Unified Filter System:
+- **`grid-filters.js` File:** Centralizing all shared filter functions
+- **`updateGridFromComponentGlobal` Function:** Central function for handling filters on all pages
+- **`filterDataByFilters` Function:** Unified function for filtering data by all filter types
+- **Multi-Page Support:** Filter support for `planning`, `tracking`, `accounts`, `notes`, `alerts`, `designs`
 
-#### 🔧 שיפורי פילטרים:
-- **פילטר חשבונות:** תיקון הצגת "כל החשבונות" כשכל החשבונות נבחרים
-- **פילטר תאריכים:** שינוי "הכול" ל"כל זמן" בכל המופעים
-- **טעינת חשבונות:** שימוש ב-`loadAllAccountsFromServer` לטעינת כל החשבונות (לא רק 'open')
-- **עקביות סטטוסים:** תיקון עקביות בין `cancelled` ל-`cancelled` בהתאם לבסיס הנתונים
+#### 🔧 Filter Improvements:
+- **Account Filter:** Fixed display of "All Accounts" when all accounts are selected
+- **Date Filter:** Changed "All" to "All Time" in all instances
+- **Account Loading:** Using `loadAllAccountsFromServer` to load all accounts (not just 'open')
+- **Status Consistency:** Fixed consistency between `cancelled` and `cancelled` according to database
 
-#### 📄 עדכוני דפים:
-- **דף תכנונים (`planning.html`):** עדכון לטעינת `designs.js` במקום קוד מוטמע
-- **דף מעקב (`tracking.html`):** עדכון לטעינת `tracking.js` במקום `trades.js`
-- **דף חשבונות (`accounts.html`):** הוספת פונקציה `updateGridFromComponent`
-- **דף הערות (`notes.html`):** הוספת פונקציה `updateGridFromComponent`
-- **דף התראות (`alerts.html`):** הוספת פונקציה `updateGridFromComponent`
-- **דף עיצובים (`designs.html`):** הוספת טעינת `designs.js`
+#### 📄 Page Updates:
+- **Planning Page (`planning.html`):** Updated to load `designs.js` instead of embedded code
+- **Tracking Page (`tracking.html`):** Updated to load `tracking.js` instead of `trades.js`
+- **Accounts Page (`accounts.html`):** Added `updateGridFromComponent` function
+- **Notes Page (`notes.html`):** Added `updateGridFromComponent` function
+- **Alerts Page (`alerts.html`):** Added `updateGridFromComponent` function
+- **Designs Page (`designs.html`):** Added loading of `designs.js`
 
-#### 🗄️ ניקוי בסיס נתונים:
-- **מחיקת חשבונות:** מחיקת חשבונות ללא טריידים מקושרים
-- **עדכון טריידים:** ביטול טריידים פתוחים לפני מחיקת חשבונות
-- **עדכון הערות:** וידוא שכל ההערות מקושרות לחשבונות קיימים
-- **עדכון התראות:** ניסיון לעדכן התראות עם `account_id` (בעיה פתוחה)
+#### 🗄️ Database Cleanup:
+- **Account Deletion:** Deleting accounts without linked trades
+- **Trade Updates:** Cancelling open trades before deleting accounts
+- **Note Updates:** Ensuring all notes are linked to existing accounts
+- **Alert Updates:** Attempting to update alerts with `account_id` (open issue)
 
-#### 🎨 שיפורי ממשק:
-- **תמיכה RTL:** שיפור תמיכה בעברית ו-RTL בפילטרים
-- **עיצוב דרופדאונים:** שיפור עיצוב תפריטי הפילטרים
-- **טקסטים עקביים:** עדכון טקסטים בפילטרים לעברית עקבית
+#### 🎨 Interface Improvements:
+- **RTL Support:** Improved Hebrew and RTL support in filters
+- **Dropdown Design:** Improved filter menu design
+- **Consistent Text:** Updated filter texts to consistent Hebrew
 
 #### 🔗 פונקציות חדשות:
 ```javascript

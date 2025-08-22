@@ -1,0 +1,129 @@
+/* ===== סגנונות מיוחדים לדף בסיס נתונים ===== */
+
+/* כותרת טבלה - גודל רגיל (לא בתוך טבלה) */
+.db-display-page .table-title {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+}
+
+/* סוג השדה - פונט עוד יותר קטן, לא בולד */
+.db-display-page th {
+    font-size: 0.75rem !important;
+    font-weight: normal !important;
+    color: #666 !important;
+}
+
+/* כל הטקסט בתוך הטבלה - יותר קטן */
+.db-display-page .table td {
+    font-size: 0.8rem !important;
+    padding: 0.3rem 0.5rem !important;
+    line-height: 1.2 !important;
+}
+
+/* פחות רווח בין השורות */
+.db-display-page .table tbody tr {
+    height: auto !important;
+    min-height: 2rem !important;
+}
+
+/* פחות רווח בתוכן */
+.db-display-page .table {
+    margin-bottom: 0.5rem !important;
+}
+
+/* רווח קטן יותר בין הסקשנים */
+.db-display-page .content-section {
+    margin-bottom: 1rem !important;
+}
+
+/* רווח קטן יותר בתוך הסקשנים */
+.db-display-page .section-body {
+    padding: 0.5rem 0 !important;
+}
+
+/* כפתור הוסף - סגנון מיוחד */
+.db-display-page .add-btn {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: white !important;
+    font-size: 0.8rem !important;
+    padding: 0.25rem 0.5rem !important;
+}
+
+.db-display-page .add-btn:hover {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+}
+
+/* כותרות טבלה - גודל קטן יותר */
+.db-display-page .table thead th {
+    font-size: 0.75rem !important;
+    padding: 0.4rem 0.5rem !important;
+    font-weight: 600 !important;
+}
+
+/* תאי פעולות - גודל קטן יותר */
+.db-display-page .actions-cell {
+    padding: 0.2rem !important;
+    white-space: nowrap !important;
+}
+
+.db-display-page .actions-cell .btn {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem !important;
+    margin: 0.1rem !important;
+    display: inline-block !important;
+    float: none !important;
+}
+
+/* רווח קטן יותר בין הכפתורים */
+.db-display-page .action-separator {
+    margin: 0 0.2rem !important;
+}
+
+/* כפתורים בטבלה - אחד ליד השני */
+.db-display-page .table .actions-cell {
+    text-align: center !important;
+}
+
+.db-display-page .table .actions-cell .btn {
+    display: inline-block !important;
+    vertical-align: middle !important;
+    margin: 0 0.1rem !important;
+}
+
+/* כותרות סקשנים - גודל קטן יותר */
+.db-display-page .section-header {
+    padding: 0.5rem 0 !important;
+}
+
+/* סטטיסטיקות - גודל קטן יותר */
+.db-display-page .info-summary {
+    font-size: 0.8rem !important;
+    padding: 0.5rem 0 !important;
+}
+
+.db-display-page .info-summary div {
+    margin: 0.2rem 0 !important;
+}
+
+/* רווח קטן יותר בין אלמנטים */
+.db-display-page .table-responsive {
+    margin-bottom: 0.5rem !important;
+}
+
+/* כותרות עמודות - רווח קטן יותר */
+.db-display-page .table th {
+    padding: 0.3rem 0.4rem !important;
+}
+
+/* תאים - רווח קטן יותר */
+.db-display-page .table td {
+    padding: 0.25rem 0.4rem !important;
+    vertical-align: middle !important;
+}
+
+/* רווח קטן יותר בין הסקשנים */
+.db-display-page .content-section+.content-section {
+    margin-top: 0.5rem !important;
+}

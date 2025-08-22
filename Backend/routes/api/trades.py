@@ -101,6 +101,15 @@ def create_trade():
     """Create a new trade"""
     try:
         data = request.get_json()
+        
+        # Handle backward compatibility for type field
+        if 'type' in data:
+            data['investment_type'] = data.pop('type')
+        
+        # Ensure investment_type has a default value
+        if 'investment_type' not in data or not data['investment_type']:
+            data['investment_type'] = 'swing'
+        
         db: Session = next(get_db())
         trade = TradeService.create(db, data)
         return jsonify({
@@ -124,6 +133,15 @@ def update_trade(trade_id: int):
     """Update trade"""
     try:
         data = request.get_json()
+        
+        # Handle backward compatibility for type field
+        if 'type' in data:
+            data['investment_type'] = data.pop('type')
+        
+        # Ensure investment_type has a default value
+        if 'investment_type' not in data or not data['investment_type']:
+            data['investment_type'] = 'swing'
+        
         db: Session = next(get_db())
         trade = TradeService.update(db, trade_id, data)
         if trade:

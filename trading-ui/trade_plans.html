@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trade Tracking - Tik.track</title>
+  <title>תכנון - Tik.track</title>
 
   <!-- 
     ===== Trade Tracking Page - TikTrack =====
@@ -82,14 +82,14 @@
         <!-- Trade tracking header -->
         <div class="section-header">
           <div class="table-title">
-            📋 מעקב טריידים
+            📋 תכנון
           </div>
           <div class="table-actions">
             <button class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
               <span class="action-icon">➕</span> הוסף
             </button>
             <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור מעקב טריידים">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור תכנון">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -1154,8 +1154,8 @@
                 </div>
                 <div class="col-md-3">
                   <div class="mb-2">
-                    <label for="addTradeType" class="form-label">סוג</label>
-                    <select class="form-select" id="addTradeType" required>
+                    <label for="addTradeInvestmentType" class="form-label">סוג השקעה</label>
+                    <select class="form-select" id="addTradeInvestmentType" required>
                       <option value="swing">סווינג</option>
                       <option value="investment">השקעה</option>
                       <option value="passive">פאסיבי</option>
@@ -1266,11 +1266,11 @@
         // אתחול מערכת הכותרת החדשה
         if (typeof window.HeaderSystem !== 'undefined') {
           console.log('🔄 Initializing new unified header system...');
-          
+
           // יצירת מערכת הכותרת החדשה
           window.headerSystem = new window.HeaderSystem();
           window.headerSystem.initialize();
-          
+
           // יצירת מערכת הפילטרים
           window.filterSystem = new window.SimpleFilter();
           window.filterSystem.initialize();

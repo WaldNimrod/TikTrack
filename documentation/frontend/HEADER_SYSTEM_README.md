@@ -24,6 +24,8 @@ The new header system is a completely independent system that does not rely on t
 - [x] **Show/Hide Button** - Show/hide filter area
 - [x] **Auto-close** - Close filters when clicking outside menu
 - [x] **Debug Fields** - Real-time debug information on date ranges
+- [x] **Page Restructuring** - Updated navigation from "מעקב" to "תכנון" for trade plans page
+- [x] **Menu Cleanup** - Removed duplicate "תוכניות מסחר" from settings dropdown
 
 ### 🔄 Features in Development
 - [ ] **Advanced Date Filter** - Custom date selection

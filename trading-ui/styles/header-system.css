@@ -69,22 +69,19 @@
 
 /* הגבלת סגנונות לאלמנט הספציפי */
 #unified-header .header-container {
-    width: 100%;
-    margin: 0;
-    padding: 5px 0;
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 1rem 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 44px;
-    direction: ltr;
-    /* התפריט צריך להיות LTR */
-    border-bottom: 1px solid var(--apple-border-light);
-    box-shadow: var(--apple-shadow-light);
+    width: 100%;
+    direction: rtl;
 }
 
 #unified-header .header-wrapper {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 0;
     padding: 0;
     display: flex;
     justify-content: space-between;
@@ -93,11 +90,10 @@
 }
 
 #unified-header .header-top {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem 2rem;
+    margin: 0;
+    padding: 0;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     border-bottom: 1px solid var(--apple-border-light);
     position: relative;
@@ -301,23 +297,32 @@
     color: #333333;
     text-decoration: none;
     border-radius: 8px;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease, background-color 0.2s ease;
     font-size: 0.9rem;
     font-weight: 400;
     border: 2px solid transparent;
+    position: relative;
+    transform: none;
+    margin: 0;
+    height: auto;
+    line-height: normal;
+    vertical-align: baseline;
 }
 
 #unified-header .tiktrack-nav-link:hover {
     background: var(--apple-bg-secondary);
     color: #333333;
+    transform: none;
+    margin: 0;
 }
 
 #unified-header .tiktrack-nav-link.active {
     background: transparent;
     color: #333333;
-    font-weight: 500;
+    /* font-weight: 700; - הסרתי לבדיקה */
     border: none;
-    box-shadow: 0 2px 8px rgba(38, 186, 172, 0.3);
+    transform: none;
+    margin: 0;
 }
 
 #unified-header .nav-icon {
@@ -331,7 +336,18 @@
 
 #unified-header .tiktrack-nav-link.active .nav-text {
     color: #333333;
-    font-weight: 500;
+    /* font-weight: 700; - הסרתי לבדיקה */
+}
+
+#unified-header .tiktrack-nav-link:focus {
+    outline: none;
+    transform: none;
+    margin: 0;
+}
+
+#unified-header .tiktrack-nav-link:active {
+    transform: none;
+    margin: 0;
 }
 
 #unified-header .tiktrack-dropdown-arrow {
@@ -365,24 +381,23 @@
 #unified-header .tiktrack-dropdown-item {
     display: block;
     padding: 0.5rem 1rem;
-    color: #333333;
+    color: #000000;
     text-decoration: none;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     font-weight: 300;
     font-size: 0.85rem;
 }
 
 #unified-header .tiktrack-dropdown-item:hover {
-    background: var(--apple-bg-secondary);
-    color: #333333;
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
 }
 
 #unified-header .tiktrack-dropdown-item.active {
-    background: transparent;
-    color: #333333;
-    font-weight: 600;
+    background: rgba(38, 186, 172, 0.15);
+    color: #26baac;
+    font-weight: 700;
     border: none;
-    box-shadow: 0 1px 4px rgba(38, 186, 172, 0.3);
 }
 
 #unified-header .dropdown-divider {
@@ -446,9 +461,9 @@
 
 /* אזור פילטרים */
 #unified-header .header-filters {
-    max-width: 1200px;
+    max-width: 1380px;
     margin: 0 auto;
-    padding: 1rem 2rem;
+    padding: 1rem 10px;
     background: var(--apple-bg-elevated);
     border-top: 1px solid var(--apple-border-light);
 }
@@ -459,6 +474,10 @@
     gap: 1rem;
     flex-wrap: wrap;
     direction: rtl;
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 0 10px;
+    width: 100%;
 }
 
 #unified-header .filter-group {

@@ -10,20 +10,20 @@ def home() -> Any:
     """Home page"""
     return send_from_directory(UI_DIR, "index.html")
 
-@pages_bp.route('/database')
-def database() -> Any:
-    """Database page"""
-    return send_from_directory(UI_DIR, "database.html")
+@pages_bp.route('/db_display')
+def db_display() -> Any:
+    """Database display page"""
+    return send_from_directory(UI_DIR, "db_display.html")
 
-@pages_bp.route('/trades')
-def trades() -> Any:
-    """Trades page"""
-    return send_from_directory(UI_DIR, "trades.html")
+@pages_bp.route('/trade_plans')
+def trade_plans() -> Any:
+    """Trade plans page"""
+    return send_from_directory(UI_DIR, "trade_plans.html")
 
 @pages_bp.route('/tracking')
 def tracking() -> Any:
-    """Tracking page - redirect to trades"""
-    return send_from_directory(UI_DIR, "trades.html")
+    """Tracking page - redirect to trade_plans"""
+    return send_from_directory(UI_DIR, "trade_plans.html")
 
 @pages_bp.route('/planning')
 def planning() -> Any:
@@ -79,6 +79,11 @@ def currencies() -> Any:
 def designs() -> Any:
     """Designs page"""
     return send_from_directory(UI_DIR, "designs.html")
+
+@pages_bp.route('/db_extradata')
+def db_extradata() -> Any:
+    """Extra data tables page"""
+    return send_from_directory(UI_DIR, "db_extradata.html")
 
 @pages_bp.route('/preferences')
 def preferences() -> Any:

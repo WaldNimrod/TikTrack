@@ -21,7 +21,7 @@ class Note(BaseModel):
     
     content = Column(String(1000), nullable=False)
     attachment = Column(String(500), nullable=True)  # path to file
-    related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False)
+    related_type_id = Column(Integer, nullable=False)
     related_id = Column(Integer, nullable=False)
     
     def __repr__(self) -> str:
@@ -44,18 +44,6 @@ class Note(BaseModel):
         
         result['related_id'] = self.related_id
         
-        # Add fields for backward compatibility
-        if self.related_type_id == 1:  # account
-            result['account_id'] = self.related_id
-            result['trade_id'] = None
-            result['trade_plan_id'] = None
-        elif self.related_type_id == 2:  # trade
-            result['account_id'] = None
-            result['trade_id'] = self.related_id
-            result['trade_plan_id'] = None
-        elif self.related_type_id == 3:  # trade_plan
-            result['account_id'] = None
-            result['trade_id'] = None
-            result['trade_plan_id'] = self.related_id
+        # No backward compatibility needed - using only related_type_id and related_id
         
         return result

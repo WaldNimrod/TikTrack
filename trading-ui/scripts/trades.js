@@ -1,23 +1,36 @@
 /**
- * ========================================
- * טריידים - Trades Management
- * ========================================
+ * Trades.js - TikTrack Frontend
+ * =============================
  * 
- * קובץ ייעודי לניהול טריידים (trades.js)
- * משמש גם בדף "מעקב" (trades.html) וגם בדף "דאטאבייס" (database.html)
- * מכיל את כל הפונקציות הספציפיות לטריידים
+ * This file contains all trade management functionality for the TikTrack application.
+ * It handles trade CRUD operations, table updates, filtering, and user interactions.
  * 
- * דפים שמשתמשים בקובץ זה:
- * - trades.html - דף מעקב טריידים
- * - database.html - דף דאטאבייס (טבלת טריידים)
+ * Usage:
+ * - Used in trade_plans.html (trade plans page)
+ * - Used in database.html (database page - trades table)
+ * 
+ * Features:
+ * - Trade data loading and management
+ * - Trade table updates and display
+ * - Trade filtering and search functionality
+ * - Trade creation, editing, and deletion
+ * - Integration with global translation system
+ * 
+ * Architecture:
+ * - Modular function organization by responsibility
+ * - Integration with global translation system
+ * - Comprehensive error handling and user feedback
+ * - State management for trade operations
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * - header-system.js (filter functionality)
+ * 
+ * @version 2.1
+ * @lastUpdated August 22, 2025
  * 
  * פונקציות עיקריות:
- * - loadTradesData() - טעינת נתוני טריידים
- * - updateTradesTable() - עדכון טבלת הטריידים
- * - filterTradesData() - פילטור נתוני טריידים
- * - showAddTradeModal() - הצגת מודל הוספת טרייד
- * - saveNewTradeRecord() - שמירת טרייד חדש
- * - editTradeRecord() - עריכת טרייד
  * - cancelTradeRecord() - ביטול טרייד
  * - deleteTradeRecord() - מחיקת טרייד
  * - validateTradeForm() - ולידציה של טופס
@@ -52,6 +65,22 @@ window.tradesData = tradesData;
  * - טיפול בשגיאות עם הודעה למשתמש
  * 
  * @returns {Promise<void>}
+ */
+/**
+ * Load trades data from server
+ * 
+ * This function fetches trade data from the backend API and updates
+ * the trades table with the retrieved data. It handles loading states,
+ * error handling, and data processing.
+ * 
+ * @returns {Promise<void>}
+ * 
+ * Features:
+ * - Async/await pattern for clean error handling
+ * - Loading state management
+ * - Comprehensive error handling and user feedback
+ * - Integration with global notification system
+ * - Automatic table updates after data loading
  */
 async function loadTradesData() {
   try {
@@ -91,7 +120,7 @@ async function loadTradesData() {
       ticker_symbol: trade.ticker_symbol,
       trade_plan_id: trade.trade_plan_id,
       status: trade.status,
-      type: trade.type,
+      investment_type: trade.investment_type,
       side: trade.side,
       created_at: trade.created_at,
       closed_at: trade.closed_at,
@@ -148,6 +177,22 @@ function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, sel
 /**
  * פונקציה לעדכון טבלת הטריידים
  */
+/**
+ * Update trades table with provided data
+ * 
+ * This function updates the trades table display with the provided trade data.
+ * It handles HTML generation, data formatting, and table state management.
+ * 
+ * @param {Array} trades - Array of trade objects to display
+ * @returns {void}
+ * 
+ * Features:
+ * - Dynamic HTML generation for trade rows
+ * - Integration with translation system for type display
+ * - Currency formatting and color coding for P&L values
+ * - Action buttons for edit, cancel, and delete operations
+ * - Automatic row count updates
+ */
 function updateTradesTable(trades) {
   console.log('🔄 === UPDATE TRADES TABLE ===');
   console.log('🔄 Trades to display:', trades ? trades.length : 'null');
@@ -167,7 +212,7 @@ function updateTradesTable(trades) {
 
   const tableHTML = trades.map(trade => {
     const statusDisplay = trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח';
-    const typeDisplay = window.translateTradeType ? window.translateTradeType(trade.type) : trade.type;
+    const typeDisplay = window.translateTradeType ? window.translateTradeType(trade.investment_type) : trade.investment_type;
 
     return `
     <tr>
@@ -179,7 +224,7 @@ function updateTradesTable(trades) {
       <td>${trade.side || 'Long'}</td>
       <td>${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
-      <td class="${trade.total_pl >= 0 ? 'text-success' : 'text-danger'}">${trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00'}</td>
+      <td>${window.colorAmount(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editTradeRecord('${trade.id}')" title="ערוך">✏️</button>
@@ -193,10 +238,12 @@ function updateTradesTable(trades) {
   tbody.innerHTML = tableHTML;
   console.log('✅ Table updated successfully');
 
-  // עדכון ספירת רשומות
-  const countElement = document.querySelector('.section-header .table-title');
-  if (countElement) {
-    countElement.textContent = `📋 מעקב טריידים (${trades.length})`;
+  // עדכון ספירת רשומות - רק בדף תכנון
+  if (window.location.pathname === '/trade_plans' || window.location.pathname === '/trade_plans.html') {
+    const countElement = document.querySelector('.section-header .table-title');
+    if (countElement) {
+      countElement.textContent = `📋 תכנון (${trades.length})`;
+    }
   }
 }
 
@@ -290,7 +337,7 @@ function showEditTradeModal(trade) {
   if (editForm) {
     // Set form values
     document.getElementById('editTradeId').value = trade.id;
-    document.getElementById('editTradeType').value = trade.type || '';
+    document.getElementById('editTradeInvestmentType').value = trade.investment_type || '';
     document.getElementById('editTradeSide').value = trade.side || '';
     document.getElementById('editTradeAccount').value = trade.account_id || '';
     document.getElementById('editTradeNotes').value = trade.notes || '';
@@ -395,7 +442,7 @@ function validateTradeForm() {
   let isValid = true;
 
   // בדיקת סוג טרייד
-  const typeElement = document.getElementById('addTradeType');
+  const typeElement = document.getElementById('addTradeInvestmentType');
   if (!typeElement.value) {
     showTradeValidationError('typeError', 'יש לבחור סוג טרייד');
     isValid = false;
@@ -492,7 +539,7 @@ async function saveNewTradeRecord() {
     account_id: parseInt(document.getElementById('addTradeAccountId').value),
     ticker_id: parseInt(document.getElementById('addTradeTickerId').value) || null,
     trade_plan_id: parseInt(document.getElementById('addTradeTradePlanId').value) || null,
-    type: document.getElementById('addTradeType').value,
+    investment_type: document.getElementById('addTradeInvestmentType').value,
     side: document.getElementById('addTradeSide').value,
     status: 'open',
     created_at: document.getElementById('addTradeOpenedAt').value,

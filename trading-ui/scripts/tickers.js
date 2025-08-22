@@ -973,14 +973,14 @@ function goToLinkedItems() {
     modal.hide();
 
     // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
-    window.location.href = '/trades'; // ברירת מחדל - דף מעקב
+    window.location.href = '/trade_plans'; // ברירת מחדל - דף תכנון
 }
 
 /**
  * מעבר לטרייד ספציפי
  */
 function goToTrade(tradeId) {
-    window.location.href = `/trades#trade-${tradeId}`;
+    window.location.href = `/trade_plans#trade-${tradeId}`;
 }
 
 /**

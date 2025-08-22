@@ -167,11 +167,14 @@ async function loadCurrencies() {
         console.log('🔄 טעינת מטבעות...');
 
         const response = await fetch('http://localhost:8080/api/v1/currencies/');
+        console.log('📡 תגובת השרת:', response.status, response.statusText);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
         }
 
         const result = await response.json();
+        console.log('📊 נתונים מהשרת:', result);
 
         if (result.status === 'success') {
             currenciesData = result.data;
@@ -180,9 +183,19 @@ async function loadCurrencies() {
             updatePageSummaryStats();
         } else {
             console.error('❌ שגיאה בטעינת מטבעות:', result.error);
+            // הצגת שגיאה למשתמש
+            const tbody = document.querySelector('#currenciesTable tbody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים: ' + result.error + '</td></tr>';
+            }
         }
     } catch (error) {
         console.error('❌ שגיאה בטעינת מטבעות:', error);
+        // הצגת שגיאה למשתמש
+        const tbody = document.querySelector('#currenciesTable tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים: ' + error.message + '</td></tr>';
+        }
     }
 }
 

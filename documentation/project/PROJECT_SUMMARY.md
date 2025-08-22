@@ -30,10 +30,11 @@ TikTrack is an advanced trading tracking system with a modern user interface and
 - **Statuses:** Open, Closed, Cancelled
 - **Advanced Filters** by date, type, status
 
-### 📋 Trade Planning
+### 📋 Trade Planning (תכנון)
 - **Detailed Plans** with price targets and stops
 - **Link to Accounts** and tickers
 - **Performance Tracking** with statistics
+- **Page Route:** `/trade_plans` (formerly `/trades`)
 
 ### 💰 Account Management
 - **Multiple Accounts** with different currencies

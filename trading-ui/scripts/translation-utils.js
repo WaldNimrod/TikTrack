@@ -219,6 +219,14 @@ if (typeof window !== 'undefined') {
     window.getTypeDisplayName = translateCashFlowType; // cash_flows.js
     window.getCategoryDisplayName = translateTestCategory; // preferences.js
 
+    // פונקציה כללית לצביעת סכומים - ירוק לחיובי, אדום לשלילי
+    window.colorAmount = function (amount, displayText = null) {
+        const numAmount = parseFloat(amount);
+        const color = numAmount >= 0 ? '#28a745' : '#dc3545'; // ירוק לחיובי, אדום לשלילי
+        const text = displayText || (numAmount.toLocaleString ? numAmount.toLocaleString() : numAmount.toString());
+        return `<span style="color: ${color}; font-weight: bold;">${text}</span>`;
+    };
+
     console.log('✅ Translation utilities loaded successfully');
 }
 

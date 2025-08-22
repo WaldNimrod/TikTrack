@@ -123,42 +123,24 @@ def get_notes():
             for row in notes_data:
                 # Set related_type according to related_type_id
                 related_type = None
-                if row[3] == 1:  # related_type_id
+                if row[4] == 1:  # related_type_id (now at index 4)
                     related_type = 'account'
-                elif row[3] == 2:
+                elif row[4] == 2:
                     related_type = 'trade'
-                elif row[3] == 3:
+                elif row[4] == 3:
                     related_type = 'trade_plan'
-                elif row[3] == 4:
+                elif row[4] == 4:
                     related_type = 'ticker'
                 
                 note_dict = {
                     'id': row[0],
                     'content': row[1],
                     'attachment': row[2],
-                    'related_type_id': row[3],
-                    'related_id': row[4],
-                    'created_at': row[5],
+                    'created_at': row[3],
+                    'related_type_id': row[4],
+                    'related_id': row[5],
                     'related_type': related_type
                 }
-                
-                # Add fields for backward compatibility
-                if row[3] == 1:  # account
-                    note_dict['account_id'] = row[4]
-                    note_dict['trade_id'] = None
-                    note_dict['trade_plan_id'] = None
-                elif row[3] == 2:  # trade
-                    note_dict['account_id'] = None
-                    note_dict['trade_id'] = row[4]
-                    note_dict['trade_plan_id'] = None
-                elif row[3] == 3:  # trade_plan
-                    note_dict['account_id'] = None
-                    note_dict['trade_id'] = None
-                    note_dict['trade_plan_id'] = row[4]
-                else:
-                    note_dict['account_id'] = None
-                    note_dict['trade_id'] = None
-                    note_dict['trade_plan_id'] = None
                 
                 notes_list.append(note_dict)
             
@@ -249,47 +231,35 @@ def create_note():
             
             # Get data from form data
             content = request.form.get('content', '')
-            trade_plan_id = request.form.get('trade_plan_id')
-            trade_id = request.form.get('trade_id')
-            account_id = request.form.get('account_id')
+            related_type = request.form.get('related_type')
+            related_id = request.form.get('related_id')
         else:
             # Get data from JSON
             data = request.get_json()
             content = data.get('content', '')
-            trade_plan_id = data.get('trade_plan_id')
-            trade_id = data.get('trade_id')
-            account_id = data.get('account_id')
             related_type = data.get('related_type')
             related_id = data.get('related_id')
             attachment_filename = data.get('attachment')
         
-        # Determine relation by priority: related_type/related_id > trade_plan > trade > account
-        related_type_id = None
-        final_related_id = None
-        
-        if related_type and related_id:
-            # Use provided related_type and related_id
-            type_mapping = {
-                'account': 1,
-                'trade': 2,
-                'trade_plan': 3,
-                'ticker': 4
-            }
-            related_type_id = type_mapping.get(related_type)
-            final_related_id = related_id
-        elif trade_plan_id:
-            related_type_id = 3  # trade_plan
-            final_related_id = trade_plan_id
-        elif trade_id:
-            related_type_id = 2  # trade
-            final_related_id = trade_id
-        elif account_id:
-            related_type_id = 1  # account
-            final_related_id = account_id
-        else:
+        # Determine relation using related_type and related_id
+        if not related_type or not related_id:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Note must be related to account, trade, or trade plan"},
+                "error": {"message": "Note must have related_type and related_id"},
+                "version": "v1"
+            }), 400
+        
+        type_mapping = {
+            'account': 1,
+            'trade': 2,
+            'trade_plan': 3,
+            'ticker': 4
+        }
+        related_type_id = type_mapping.get(related_type)
+        if not related_type_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Invalid related_type. Must be: account, trade, trade_plan, or ticker"},
                 "version": "v1"
             }), 400
         
@@ -298,7 +268,7 @@ def create_note():
             'content': content,
             'attachment': attachment_filename,
             'related_type_id': related_type_id,
-            'related_id': final_related_id
+            'related_id': related_id
         }
         
         note = Note(**note_data)
@@ -372,41 +342,42 @@ def update_note(note_id: int):
                 
                 # Get data from form data
                 content = request.form.get('content', '')
-                trade_plan_id = request.form.get('trade_plan_id')
-                trade_id = request.form.get('trade_id')
-                account_id = request.form.get('account_id')
-                logger.info(f"📋 Form data - content: {content[:50]}..., trade_plan_id: {trade_plan_id}, trade_id: {trade_id}, account_id: {account_id}")
+                related_type = request.form.get('related_type')
+                related_id = request.form.get('related_id')
+                logger.info(f"📋 Form data - content: {content[:50]}..., related_type: {related_type}, related_id: {related_id}")
             else:
                 logger.info("📋 Processing JSON data")
                 # Get data from JSON
                 data = request.get_json()
                 content = data.get('content', '')
-                trade_plan_id = data.get('trade_plan_id')
-                trade_id = data.get('trade_id')
-                account_id = data.get('account_id')
+                related_type = data.get('related_type')
+                related_id = data.get('related_id')
                 attachment_filename = data.get('attachment')
-                logger.info(f"📋 JSON data - content: {content[:50]}..., trade_plan_id: {trade_plan_id}, trade_id: {trade_id}, account_id: {account_id}, attachment: {attachment_filename}")
+                logger.info(f"📋 JSON data - content: {content[:50]}..., related_type: {related_type}, related_id: {related_id}, attachment: {attachment_filename}")
             
-            # Determine relation by priority: trade_plan > trade > account
-            related_type_id = None
-            related_id = None
-            
-            logger.info(f"🔍 Determining relation - trade_plan_id: {trade_plan_id}, trade_id: {trade_id}, account_id: {account_id}")
-            
-            if trade_plan_id:
-                related_type_id = 3  # trade_plan
-                related_id = trade_plan_id
-            elif trade_id:
-                related_type_id = 2  # trade
-                related_id = trade_id
-            elif account_id:
-                related_type_id = 1  # account
-                related_id = account_id
-            else:
+            # Determine relation using related_type and related_id
+            if not related_type or not related_id:
                 logger.error("❌ No relation found")
                 return jsonify({
                     "status": "error",
-                    "error": {"message": "Note must be related to account, trade, or trade plan"},
+                    "error": {"message": "Note must have related_type and related_id"},
+                    "version": "v1"
+                }), 400
+            
+            logger.info(f"🔍 Determining relation - related_type: {related_type}, related_id: {related_id}")
+            
+            type_mapping = {
+                'account': 1,
+                'trade': 2,
+                'trade_plan': 3,
+                'ticker': 4
+            }
+            related_type_id = type_mapping.get(related_type)
+            if not related_type_id:
+                logger.error(f"❌ Invalid related_type: {related_type}")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Invalid related_type. Must be: account, trade, trade_plan, or ticker"},
                     "version": "v1"
                 }), 400
             

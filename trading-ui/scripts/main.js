@@ -1,7 +1,34 @@
+/**
+ * Main.js - TikTrack Frontend
+ * ============================
+ * 
+ * This file contains global utility functions used across the entire TikTrack application.
+ * It serves as the central hub for common functionality including:
+ * - Notification system
+ * - Table operations (sorting, filtering)
+ * - Page summary statistics
+ * - Global event handlers
+ * - Utility functions
+ * 
+ * Architecture:
+ * - All functions are exported to the global scope (window object)
+ * - Functions are organized by category and responsibility
+ * - Comprehensive error handling and logging
+ * - Backward compatibility maintained for existing functions
+ * 
+ * Dependencies:
+ * - translation-utils.js (loaded before this file)
+ * - All page-specific JavaScript files
+ * 
+ * @version 2.1
+ * @lastUpdated August 22, 2025
+ */
+
 // ===== MAIN.JS - קובץ כללי לכל האתר =====
 
 /**
  * מערכת התראות גלובלית - CSS
+ * Global notification system CSS injection
  */
 function addNotificationStyles() {
   if (document.getElementById('notificationStyles')) {
@@ -840,6 +867,21 @@ function extractAmount(amountString) {
 }
 
 // פונקציה לעדכון סטטיסטיקות
+/**
+ * Update page summary statistics
+ * 
+ * This function updates the summary statistics displayed on various pages.
+ * It calculates and displays counts, totals, and other aggregated data
+ * based on the current page's data.
+ * 
+ * @param {Object|null} data - Optional data object. If null, uses current page data
+ * @returns {void}
+ * 
+ * Usage:
+ * - Called automatically when page data changes
+ * - Can be called manually with specific data
+ * - Updates summary elements on the current page
+ */
 function updatePageSummaryStats(data = null) {
   console.log('=== updateSummaryStats called ===');
   console.log('Input data:', data);
@@ -964,12 +1006,10 @@ function toggleSection(sectionId) {
     pageName = 'accounts';
   } else if (currentPath.includes('/tickers')) {
     pageName = 'tickers';
-  } else if (currentPath.includes('/trades')) {
-    pageName = 'trades';
+  } else if (currentPath.includes('/trade_plans')) {
+    pageName = 'trade_plans';
   } else if (currentPath.includes('/planning')) {
     pageName = 'planning';
-  } else if (currentPath.includes('/trades')) {
-    pageName = 'tracking';
   } else if (currentPath.includes('/designs')) {
     pageName = 'designs';
   } else if (currentPath.includes('/notes')) {
@@ -1890,12 +1930,10 @@ function loadSectionStates() {
     pageName = 'accounts';
   } else if (currentPath.includes('/tickers')) {
     pageName = 'tickers';
-  } else if (currentPath.includes('/trades')) {
-    pageName = 'trades';
+  } else if (currentPath.includes('/trade_plans')) {
+    pageName = 'trade_plans';
   } else if (currentPath.includes('/planning')) {
     pageName = 'planning';
-  } else if (currentPath.includes('/trades')) {
-    pageName = 'tracking';
   } else if (currentPath.includes('/designs')) {
     pageName = 'designs';
   } else if (currentPath.includes('/notes')) {
@@ -2008,6 +2046,26 @@ window.currentSortDirection = 'asc';
  * 
  * @since 2.0
  */
+/**
+ * Sort table data globally
+ * 
+ * This is the global table sorting function used across all pages.
+ * It provides unified sorting functionality for different data types
+ * including text, numbers, dates, and statuses.
+ * 
+ * @param {number} columnIndex - Index of the column to sort by
+ * @param {Array} data - Array of data objects to sort
+ * @param {string} pageName - Name of the current page for state management
+ * @param {Function} updateTableFunction - Function to call after sorting to update the table
+ * @returns {Array} Sorted data array
+ * 
+ * Features:
+ * - Automatic data type detection
+ * - Hebrew text sorting support
+ * - State persistence in localStorage
+ * - Dynamic sort direction toggling
+ * - Comprehensive error handling
+ */
 function sortTableData(columnIndex, data, pageName, updateTableFunction) {
   console.log(`🔄 === SORT TABLE (${pageName}) ===`);
   console.log('🔄 Column clicked:', columnIndex);
@@ -2027,8 +2085,8 @@ function sortTableData(columnIndex, data, pageName, updateTableFunction) {
   sortedData.sort((a, b) => {
     let aValue, bValue;
 
-    // טיפול מיוחד לדף מעקב טריידים
-    if (pageName === 'trades') {
+    // טיפול מיוחד לדף תכנון
+    if (pageName === 'trade_plans') {
       switch (columnIndex) {
         case 0: // חשבון
           aValue = (a.account_name || a.account_id || '').toLowerCase();
@@ -2309,6 +2367,23 @@ function getStatusForSort(status) {
  * 
  * @example
  * updateSortIcons(0, 'planning'); // מעדכן אייקון בעמודה הראשונה
+ */
+/**
+ * Update table sorting icons
+ * 
+ * This function updates the visual indicators (arrows) in table headers
+ * to show the current sorting state. It manages the display of sort icons
+ * across all tables in the application.
+ * 
+ * @param {number} activeColumnIndex - Index of the currently sorted column (-1 for no sorting)
+ * @param {string} pageName - Name of the current page for state management
+ * @returns {void}
+ * 
+ * Features:
+ * - Visual feedback for sort state
+ * - Consistent icon display across all tables
+ * - Automatic icon positioning and styling
+ * - Integration with global sorting system
  */
 function updateTableSortIcons(activeColumnIndex, pageName) {
   const buttons = document.querySelectorAll('.sortable-header');

@@ -13,7 +13,7 @@ class Trade(BaseModel):
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
     trade_plan_id = Column(Integer, ForeignKey('trade_plans.id'), nullable=True)
     status = Column(String(20), default='open', nullable=True)
-    type = Column(String(20), default='swing', nullable=True)
+    investment_type = Column(String(20), default='swing', nullable=True)  # Changed from 'type' to 'investment_type'
     side = Column(String(10), default='Long', nullable=True)  # Long, Short
     # opened_at field removed - using created_at from BaseModel instead
     closed_at = Column(DateTime, nullable=True)
@@ -68,7 +68,7 @@ class Trade(BaseModel):
         return result
     
     def __repr__(self) -> str:
-        return f"<Trade(id={self.id}, status='{self.status}', type='{self.type}')>"
+        return f"<Trade(id={self.id}, status='{self.status}', investment_type='{self.investment_type}')>"
     
     def validate_trade_plan_link(self, trade_plan: 'TradePlan') -> Tuple[bool, str]:
         """
@@ -79,7 +79,7 @@ class Trade(BaseModel):
         2. Closed or cancelled trade can be linked to a plan in any status
         3. Trade creation date cannot be earlier than plan creation date
         4. Trade side must be identical to plan side
-        5. Trade type can be different from plan type
+        5. Trade investment_type can be different from plan investment_type
         """
         if not trade_plan:
             return False, "Trade must be linked to a plan"

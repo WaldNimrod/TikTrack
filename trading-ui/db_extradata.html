@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>טבלאות עזר - Tik.track</title>
+
+  <!-- 
+    ===== דף טבלאות עזר - TikTrack =====
+    
+    דף זה מכיל:
+    1. טבלאות עזר נוספות - הסקשן הראשון
+    2. כרטיסיות התראות - בחלק העליון
+    3. מערכת פילטרים ומיון מתקדמת
+    
+    מבנה הדף:
+    - app-header: כותרת האפליקציה עם ניווט
+    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+      - top-section: כרטיסיות התראות וסיכום נתונים
+      - content-section: טבלאות עזר
+    
+    שינויים אחרונים:
+    - יצירת דף חדש לטבלאות עזר
+    - שימוש בסגנונות של דף בסיס נתונים
+    - מערכת פילטרים מתקדמת
+  -->
+
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <!-- 1. Apple theme (base) -->
+  <link rel="stylesheet" href="styles/apple-theme.css">
+
+  <!-- 2. Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- 3. General styles -->
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- 4. Typography -->
+  <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
+  <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Header system styles (highest priority) -->
+  <link rel="stylesheet" href="styles/header-system.css">
+
+  <!-- 7. Database page styles (for extra data tables) -->
+  <link rel="stylesheet" href="styles/database.css">
+
+  <!-- Modular grid files - loaded at end of file -->
+</head>
+
+<body>
+  <!-- General background -->
+  <div class="background-wrapper">
+
+    <!-- Application header -->
+    <!-- Unified Header System -->
+    <div id="unified-header-container"></div>
+
+    <!-- Page body - All content after header -->
+    <div class="page-body">
+      <!-- Designs area - top-Section -->
+      <div class="top-section">
+        <!-- Main header -->
+        <div class="section-header">
+          <div class="table-title">
+            📊 טבלאות עזר
+          </div>
+          <div class="table-actions">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור טבלאות עזר">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alert cards -->
+        <div class="section-body">
+          <active-alerts></active-alerts>
+
+          <!-- Data summary -->
+          <div class="info-summary" id="summaryStats">
+            <div>סה"כ טבלאות: <strong id="totalTables">0</strong></div>
+            <div>סה"כ רשומות: <strong id="totalRecords">0</strong></div>
+            <div>טבלאות פעילות: <strong id="activeTables">0</strong></div>
+            <div>עדכון אחרון: <strong id="lastUpdate">-</strong></div>
+          </div>
+        </div>
+      </div> <!-- End top-section -->
+
+      <!-- Main content -->
+      <div class="main-content">
+
+        <!-- Designs area - content-section -->
+        <div class="content-section">
+          <!-- Designs header -->
+          <div class="section-header">
+            <div class="table-title">
+              📊 טבלאות עזר
+            </div>
+            <div class="table-count">0 טבלאות</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="openExtraDataDetails()" title="הוסף טבלה חדשה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleExtraDataSection()" title="הצג/הסתר אזור טבלאות עזר">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Extra Data tables -->
+          <div class="section-body">
+            <div class="table-responsive" id="extraDataContainer">
+              <table class="table" id="extraDataTable" data-table-type="extra-data">
+                <thead>
+                  <tr>
+                    <th>שם הטבלה<br><span class="header-subtitle">Table Name</span></th>
+                    <th>סוג<br><span class="header-subtitle">Type</span></th>
+                    <th>תיאור<br><span class="header-subtitle">Description</span></th>
+                    <th>מספר רשומות<br><span class="header-subtitle">Records</span></th>
+                    <th>סטטוס<br><span class="header-subtitle">Status</span></th>
+                    <th>נוצר ב<br><span class="header-subtitle">Created</span></th>
+                    <th>עודכן ב<br><span class="header-subtitle">Updated</span></th>
+                    <th class="actions-header">
+                      פעולות
+                      <br><span class="header-subtitle">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong><a href="#" onclick="openExtraDataDetails('1')" class="table-link">טבלת עזר
+                          1</a></strong></td>
+                    <td>reference</td>
+                    <td>טבלת עזר לנתונים נוספים</td>
+                    <td>150</td>
+                    <td><span class="status-badge status-open">פעיל</span></td>
+                    <td>15.1.2025</td>
+                    <td>22.8.2025</td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="editExtraData('1')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteExtraData('1')" title="מחק">X</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong><a href="#" onclick="openExtraDataDetails('2')" class="table-link">טבלת עזר
+                          2</a></strong></td>
+                    <td>metadata</td>
+                    <td>טבלת מטא-דאטה</td>
+                    <td>75</td>
+                    <td><span class="status-badge status-open">פעיל</span></td>
+                    <td>10.1.2025</td>
+                    <td>20.8.2025</td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="editExtraData('2')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteExtraData('2')" title="מחק">X</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong><a href="#" onclick="openExtraDataDetails('3')" class="table-link">טבלת עזר
+                          3</a></strong></td>
+                    <td>archive</td>
+                    <td>טבלת ארכיון</td>
+                    <td>300</td>
+                    <td><span class="status-badge status-closed">לא פעיל</span></td>
+                    <td>15.8.2025</td>
+                    <td>18.8.2025</td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="editExtraData('3')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteExtraData('3')" title="מחק">X</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong><a href="#" onclick="openDesignDetails('5')" class="ticker-link">GOOGL</a></strong></td>
+                    <td>15.8.2025</td>
+                    <td>short</td>
+                    <td>$12,000</td>
+                    <td>$2500.00</td>
+                    <td>$2950.00</td>
+                    <td>$0.00 (0.0%)</td>
+                    <td><span class="status-badge status-open">פתוח</span></td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="editDesign('5')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteDesign('5')" title="מחק">X</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong><a href="#" onclick="openDesignDetails('4')" class="ticker-link">AAPL</a></strong></td>
+                    <td>15.8.2025</td>
+                    <td>long</td>
+                    <td>$15,000</td>
+                    <td>$200.00</td>
+                    <td>$145.00</td>
+                    <td>$0.00 (0.0%)</td>
+                    <td><span class="status-badge status-open">פתוח</span></td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="editDesign('4')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteDesign('4')" title="מחק">X</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong><a href="#" onclick="openDesignDetails('1')" class="ticker-link">AAPL</a></strong></td>
+                    <td>15.8.2025</td>
+                    <td>long</td>
+                    <td>$10,000</td>
+                    <td>$180.00</td>
+                    <td>$140.00</td>
+                    <td>$0.00 (0.0%)</td>
+                    <td><span class="status-badge status-open">פתוח</span></td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="editDesign('1')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteDesign('1')" title="מחק">X</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong><a href="#" onclick="openDesignDetails('2')" class="ticker-link">GOOGL</a></strong></td>
+                    <td>15.8.2025</td>
+                    <td>long</td>
+                    <td>$8,000</td>
+                    <td>$150.00</td>
+                    <td>$110.00</td>
+                    <td>$0.00 (0.0%)</td>
+                    <td><span class="status-badge status-open">פתוח</span></td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="editDesign('2')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteDesign('2')" title="מחק">X</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong><a href="#" onclick="openDesignDetails('3')" class="ticker-link">SPY</a></strong></td>
+                    <td>15.8.2025</td>
+                    <td>long</td>
+                    <td>$5,000</td>
+                    <td>$450.00</td>
+                    <td>$380.00</td>
+                    <td>$0.00 (0.0%)</td>
+                    <td><span class="status-badge status-open">פתוח</span></td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="editDesign('3')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteDesign('3')" title="מחק">X</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second element - Accounts table -->
+      <div class="content-section">
+        <!-- Accounts header -->
+        <div class="section-header">
+          <div class="table-title">
+            💰 כותרת סקשן 2
+          </div>
+          <div class="table-count">3 חשבונות</div>
+          <div class="table-actions">
+            <button class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש">
+              <span class="action-icon">➕</span> הוסף
+            </button>
+            <div class="action-separator"></div>
+            <button class="filter-toggle-btn" onclick="toggleAccountsSection()" title="הצג/הסתר אזור חשבונות">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Accounts table -->
+        <div class="section-body">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>מזהה<br><span class="header-subtitle">ID</span></th>
+                  <th>שם<br><span class="header-subtitle">Name</span></th>
+                  <th>מטבע<br><span class="header-subtitle">Currency</span></th>
+                  <th>סטטוס<br><span class="header-subtitle">Status</span></th>
+                  <th>יתרה<br><span class="header-subtitle">Cash Balance</span></th>
+                  <th>שווי כולל<br><span class="header-subtitle">Total Value</span></th>
+                  <th>רווח/הפסד<br><span class="header-subtitle">Total P&L</span></th>
+                  <th>הערות<br><span class="header-subtitle">Notes</span></th>
+                  <th>פעולות<br><span class="header-subtitle">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>חשבון ראשי</td>
+                  <td>USD</td>
+                  <td><span class="status-badge status-active">פעיל</span></td>
+                  <td>$25,000</td>
+                  <td>$45,250</td>
+                  <td class="profit-positive">+$2,500 (5.8%)</td>
+                  <td>חשבון המסחר הראשי</td>
+                  <td class="actions-cell">
+                    <button class="btn btn-sm btn-secondary" title="ערוך">
+                      <span class="btn-icon">✏️</span>
+                    </button>
+                    <button class="btn btn-sm btn-danger" title="מחק">X</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>חשבון משני</td>
+                  <td>USD</td>
+                  <td><span class="status-badge status-active">פעיל</span></td>
+                  <td>$15,000</td>
+                  <td>$18,750</td>
+                  <td class="profit-positive">+$750 (4.2%)</td>
+                  <td>חשבון למסחר משני</td>
+                  <td class="actions-cell">
+                    <button class="btn btn-sm btn-secondary" title="ערוך">
+                      <span class="btn-icon">✏️</span>
+                    </button>
+                    <button class="btn btn-sm btn-danger" title="מחק">X</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>חשבון בדיקה</td>
+                  <td>USD</td>
+                  <td><span class="status-badge status-inactive">לא פעיל</span></td>
+                  <td>$5,000</td>
+                  <td>$5,000</td>
+                  <td>$0 (0.0%)</td>
+                  <td>חשבון לבדיקות</td>
+                  <td class="actions-cell">
+                    <button class="btn btn-sm btn-secondary" title="ערוך">
+                      <span class="btn-icon">✏️</span>
+                    </button>
+                    <button class="btn btn-sm btn-danger" title="מחק">X</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div> <!-- End page-body -->
+
+    <!-- Bottom page spacing -->
+    <div class="bottom-spacer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Modular files -->
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/account-modal.js"></script>
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/db_extradata.js"></script>
+
+    <!-- Page initialization -->
+    <script>
+      // Page initialization
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('🔄 Initializing extra data page...');
+        if (typeof initializeExtraDataPage === 'function') {
+          initializeExtraDataPage();
+        }
+      });
+    </script>
+    <script>
+      // אתחול מערכת הכותרת החדשה
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof window.HeaderSystem !== "undefined") {
+          console.log("🔄 Initializing new unified header system...");
+          window.headerSystem = new window.HeaderSystem();
+          window.headerSystem.initialize();
+          window.filterSystem = new window.SimpleFilter();
+          window.filterSystem.initialize();
+        }
+      });
+    </script>
+</body>
+
+</html>

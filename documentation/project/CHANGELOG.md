@@ -1,5 +1,71 @@
 # Changelog - TikTrack
 
+## [2.6] - 2025-08-22
+
+### 🆕 **New Extra Data Tables Page**
+- **New Page:** Created `db_extradata.html` for additional data tables
+- **Page Structure:** Cloned from designs page with custom modifications
+- **Database Styles:** Added link to database page styles for consistent design
+- **Custom Content:** Updated table structure for extra data management
+- **JavaScript:** Created `db_extradata.js` with page-specific functions
+- **Server Route:** Added `/db_extradata` route to backend
+
+### 🔧 **Technical Changes**
+- **File Creation:** `trading-ui/db_extradata.html` - New extra data page
+- **File Creation:** `trading-ui/scripts/db_extradata.js` - Page-specific JavaScript
+- **Route Addition:** `Backend/routes/pages.py` - New route for extra data page
+- **Style Integration:** Added database.css link for consistent styling
+
+### 📁 **New Files**
+- `trading-ui/db_extradata.html` - Extra data tables page
+- `trading-ui/scripts/db_extradata.js` - Extra data page JavaScript
+
+### 🎯 **Page Features**
+- **Table Management:** Display and manage additional data tables
+- **Status Tracking:** Active/inactive table status
+- **Record Counting:** Track number of records per table
+- **Consistent Design:** Uses database page styling for uniformity
+
+---
+
+## [2.5] - 2025-08-22
+
+### 🏗️ **Page Restructuring - Trade Plans**
+- **Page Rename:** Changed `trades.html` to `trade_plans.html` to better reflect content
+- **Menu Update:** Changed "מעקב" to "תכנון" in main menu to match actual page content
+- **Route Update:** Updated server route from `/trades` to `/trade_plans`
+- **Menu Cleanup:** Removed "תוכניות מסחר" from settings dropdown menu (duplicate)
+- **Title Update:** Changed page title from "מעקב טריידים" to "תכנון"
+
+### 🔧 **Technical Changes**
+- **File Rename:** `trading-ui/trades.html` → `trading-ui/trade_plans.html`
+- **Route Update:** `Backend/routes/pages.py` - Added `/trade_plans` route, updated `/tracking` redirect
+- **Menu System:** Updated `header-system.js` and `menu.js` with new page names and titles
+- **JavaScript Updates:** Updated all references from `trades` to `trade_plans` in navigation functions
+- **Link Updates:** Fixed all internal links in `executions.js` and `tickers.js` to point to new route
+
+### 📁 **File Changes**
+- **Renamed:** `trading-ui/trades.html` → `trading-ui/trade_plans.html`
+- **Updated:** `Backend/routes/pages.py` - New route structure
+- **Updated:** `trading-ui/scripts/header-system.js` - Menu structure and navigation
+- **Updated:** `trading-ui/scripts/menu.js` - Menu items and active state handling
+- **Updated:** `trading-ui/scripts/main.js` - Page name detection and routing
+- **Updated:** `trading-ui/scripts/trades.js` - Title update logic
+- **Updated:** `trading-ui/scripts/executions.js` - Navigation links
+- **Updated:** `trading-ui/scripts/tickers.js` - Navigation links
+
+### 🎯 **User Experience Improvements**
+- **Clearer Navigation:** Menu now accurately reflects page content (תכנון vs מעקב)
+- **Reduced Confusion:** Removed duplicate menu item from settings dropdown
+- **Consistent Naming:** Page name now matches actual functionality (trade plans)
+
+### 🐛 **Bug Fixes**
+- **Currency Page Data Loading:** Fixed currency page not displaying data by adding sample currencies
+- **Error Handling:** Improved error messages in currency page with detailed logging
+- **Navigation Consistency:** Fixed all internal links to use correct page routes
+
+---
+
 ## [2.4] - 2025-08-21
 
 ### 🏦 **Central Currency System**

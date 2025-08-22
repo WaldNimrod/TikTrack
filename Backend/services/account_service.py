@@ -144,7 +144,7 @@ class AccountService:
                 'id': trade.id,
                 'ticker_id': trade.ticker_id,
                 'ticker_symbol': ticker.symbol,
-                'type': trade.type,
+                'investment_type': trade.investment_type,
                 'status': trade.status,
                 'created_at': trade.created_at.isoformat() if trade.created_at else None,
                 'total_pl': trade.total_pl,

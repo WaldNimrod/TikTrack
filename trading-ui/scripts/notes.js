@@ -147,19 +147,73 @@ async function loadNotesData() {
 
   try {
     // קריאה לשרת לקבלת נתוני הערות
-    const response = await fetch('/api/notes');
+    const response = await fetch('/api/v1/notes/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const notes = await response.json();
+    const responseData = await response.json();
+    const notes = responseData.data || responseData;
     console.log('✅ נטענו', notes.length, 'הערות מהשרת');
 
-    // עדכון הטבלה
-    updateNotesTable(notes);
+    // בדיקה אם הנתונים ריקים או לא תקינים
+    if (!notes || notes.length === 0) {
+      console.warn('⚠️ לא נמצאו הערות בשרת');
+      const tbody = document.querySelector('#notesTable tbody');
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center text-muted">
+              <div style="padding: 20px;">
+                <h5>📝 אין הערות</h5>
+                <p>לא נמצאו הערות במערכת</p>
+                <button class="btn btn-sm btn-primary" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+      return;
+    }
+
+    // טעינת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים)
+    console.log('🔄 טוען נתונים נוספים...');
+    const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
+      fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
+    ]);
+
+    const accounts = (accountsResponse.data || accountsResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
+    const trades = (tradesResponse.data || tradesResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
+    const tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
+    const tickers = (tickersResponse.data || tickersResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
+
+    console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
+
+    // עדכון הטבלה עם הנתונים הנוספים
+    updateNotesTable(notes, accounts, trades, tradePlans, tickers);
 
   } catch (error) {
     console.error('❌ שגיאה בטעינת נתונים:', error);
+
+    // הצגת הודעת שגיאה בטבלה
+    const tbody = document.querySelector('#notesTable tbody');
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center text-danger">
+            <div style="padding: 20px;">
+              <h5>❌ שגיאה בטעינת נתונים</h5>
+              <p>לא ניתן לטעון נתונים מהשרת</p>
+              <p class="small text-muted">${error.message}</p>
+              <button class="btn btn-sm btn-primary" onclick="loadNotesData()">נסה שוב</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
 
     if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בטעינת נתונים מהשרת', 'error');
@@ -170,8 +224,9 @@ async function loadNotesData() {
 }
 
 // פונקציה לעדכון הטבלה
-function updateNotesTable(notes) {
+function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], tickers = []) {
   console.log('🔄 updateNotesTable נקראה עם', notes.length, 'הערות');
+  console.log('🔄 נתונים נוספים:', { accounts: accounts.length, trades: trades.length, tradePlans: tradePlans.length, tickers: tickers.length });
 
   const tbody = document.querySelector('#notesTable tbody');
   if (!tbody) {
@@ -196,17 +251,106 @@ function updateNotesTable(notes) {
 
   // בניית שורות הטבלה
   const rows = notes.map(note => {
-    const date = new Date(note.created_at).toLocaleDateString('he-IL');
-    const status = note.status || 'פעילה';
-    const statusClass = status === 'פעילה' ? 'status-active' : 'status-archived';
+    const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+    const content = note.content || 'ללא תוכן';
+    const attachment = note.attachment || '-';
+
+    // קביעת סימבול ואובייקט מקושר (כמו בעמוד התראות)
+    let symbolDisplay = '-';
+    let relatedDisplay = 'כללי';
+    let relatedIcon = '🌐';
+    let relatedClass = 'related-general';
+
+    if (note.related_type_id && note.related_id) {
+      switch (note.related_type_id) {
+        case 1: // חשבון
+          const account = accounts.find(a => a.id === note.related_id);
+          if (account) {
+            const name = account.name || account.account_name || 'לא מוגדר';
+            relatedDisplay = `${name}`;
+          } else {
+            relatedDisplay = `חשבון ${note.related_id}`;
+          }
+          relatedIcon = '🏦';
+          relatedClass = 'related-account';
+          symbolDisplay = ''; // חשבון - ריק לחלוטין
+          break;
+        case 2: // טרייד
+          const trade = trades.find(t => t.id === note.related_id);
+          if (trade) {
+            const date = trade.created_at || trade.date;
+            const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+            const side = trade.side || 'לא מוגדר';
+            relatedDisplay = `טרייד | ${side} | ${formattedDate}`;
+            // קביעת סימבול לטרייד
+            if (trade.ticker_id) {
+              const ticker = tickers.find(tick => tick.id === trade.ticker_id);
+              symbolDisplay = ticker ? ticker.symbol : '-';
+            } else {
+              symbolDisplay = '-';
+            }
+          } else {
+            relatedDisplay = `טרייד | לא מוגדר | לא מוגדר`;
+            symbolDisplay = '-';
+          }
+          relatedIcon = '📈';
+          relatedClass = 'related-trade';
+          break;
+        case 3: // תוכנית
+          const plan = tradePlans.find(p => p.id === note.related_id);
+          if (plan) {
+            const date = plan.created_at || plan.date;
+            const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+            const side = plan.side || 'לא מוגדר';
+            relatedDisplay = `תוכנית | ${side} | ${formattedDate}`;
+            // קביעת סימבול לתוכנית
+            if (plan.ticker_id) {
+              const ticker = tickers.find(tick => tick.id === plan.ticker_id);
+              symbolDisplay = ticker ? ticker.symbol : '-';
+            } else {
+              symbolDisplay = '-';
+            }
+          } else {
+            relatedDisplay = `תוכנית | לא מוגדר | לא מוגדר`;
+            symbolDisplay = '-';
+          }
+          relatedIcon = '📋';
+          relatedClass = 'related-plan';
+          break;
+        case 4: // טיקר
+          const ticker = tickers.find(t => t.id === note.related_id);
+          if (ticker) {
+            relatedDisplay = ticker.symbol;
+            symbolDisplay = ticker.symbol;
+          } else {
+            relatedDisplay = `טיקר ${note.related_id}`;
+            symbolDisplay = `טיקר ${note.related_id}`;
+          }
+          relatedIcon = '📊';
+          relatedClass = 'related-ticker';
+          break;
+        default:
+          symbolDisplay = `אובייקט ${note.related_id}`;
+          relatedDisplay = `אובייקט ${note.related_id}`;
+          relatedIcon = '❓';
+          relatedClass = 'related-other';
+      }
+    }
+
+    // הוספת האייקון לפני האובייקט
+    relatedDisplay = relatedIcon + relatedDisplay;
 
     return `
       <tr>
+        <td><span class="symbol-text">${symbolDisplay}</span></td>
+        <td style="padding: 0;">
+          <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px;">
+            ${relatedDisplay}
+          </div>
+        </td>
+        <td>${content}</td>
+        <td>${attachment}</td>
         <td>${date}</td>
-        <td>${note.content || 'ללא תוכן'}</td>
-        <td>${note.related_object || 'לא מקושר'}</td>
-        <td>${note.related_type || 'כללי'}</td>
-        <td><span class="status-badge ${statusClass}">${status}</span></td>
         <td class="actions-cell">
           <button class="btn btn-sm btn-secondary" onclick="editNote('${note.id}')" title="ערוך">
             <span class="btn-icon">✏️</span>
@@ -277,7 +421,7 @@ function showEditNoteModal(noteId) {
 
 async function loadNoteData(noteId) {
   try {
-    const response = await fetch(`/api/notes/${noteId}`);
+    const response = await fetch(`/api/v1/notes/${noteId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -499,7 +643,7 @@ async function saveNote() {
       formData.append('attachment', attachment);
     }
 
-    const response = await fetch('/api/notes', {
+    const response = await fetch('/api/v1/notes/', {
       method: 'POST',
       body: formData
     });
@@ -570,7 +714,7 @@ async function updateNoteFromModal() {
       formData.append('attachment', attachment);
     }
 
-    const response = await fetch(`/api/notes/${noteId}`, {
+    const response = await fetch(`/api/v1/notes/${noteId}`, {
       method: 'PUT',
       body: formData
     });
@@ -606,7 +750,7 @@ async function updateNoteFromModal() {
 
 async function deleteNoteFromServer(noteId) {
   try {
-    const response = await fetch(`/api/notes/${noteId}`, {
+    const response = await fetch(`/api/v1/notes/${noteId}`, {
       method: 'DELETE'
     });
 

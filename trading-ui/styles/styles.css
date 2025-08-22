@@ -310,15 +310,15 @@ button:hover,
 /* כל הקישורים יהיו בצבע הלוגו */
 a,
 strong[onclick] {
-  color: #29a6a8 !important;
-  text-decoration: none !important;
-  transition: color 0.2s ease !important;
+  color: #29a6a8;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 a:hover,
 strong[onclick]:hover {
-  color: #1f8a8c !important;
-  text-decoration: none !important;
+  color: #1f8a8c;
+  text-decoration: none;
 }
 
 /* כפתורי סגירה לחלונות קופצים - רקע לבן עם מסגרת כתומה */

@@ -91,13 +91,13 @@ class TradeService:
     def create(db: Session, data: Dict[str, Any]) -> Trade:
         """Create a new trade"""
         
-        # If there's trade_plan_id, assign the type from the plan as default
+        # If there's trade_plan_id, assign the investment_type from the plan as default
         if 'trade_plan_id' in data and data['trade_plan_id']:
             trade_plan = db.query(TradePlan).filter(TradePlan.id == data['trade_plan_id']).first()
             if trade_plan:
-                # Assign type from plan if not defined
-                if 'type' not in data or not data['type']:
-                    data['type'] = trade_plan.investment_type
+                # Assign investment_type from plan if not defined
+                if 'investment_type' not in data or not data['investment_type']:
+                    data['investment_type'] = trade_plan.investment_type
                     logger.info(f"Assigned type '{trade_plan.investment_type}' from trade plan {trade_plan.id}")
                 
                 # Assign side from plan if not defined

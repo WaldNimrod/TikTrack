@@ -669,7 +669,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
                 const alerts = alertsData.data || alertsData;
                 linkedItems.alerts = alerts.filter(alert =>
                     alert.related_type_id === 5 && alert.related_id == executionId &&
-                    alert.status === 'active'
+                    alert.status === 'open'
                 );
             }
         } catch (e) { console.warn('לא ניתן לטעון התראות:', e); }
@@ -873,14 +873,14 @@ function goToLinkedItems() {
     modal.hide();
 
     // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
-    window.location.href = '/trades'; // ברירת מחדל - דף מעקב
+    window.location.href = '/trade_plans'; // ברירת מחדל - דף תכנון
 }
 
 /**
  * מעבר לטרייד ספציפי
  */
 function goToTrade(tradeId) {
-    window.location.href = `/trades#trade-${tradeId}`;
+    window.location.href = `/trade_plans#trade-${tradeId}`;
 }
 
 /**
@@ -966,7 +966,7 @@ async function loadExecutionsData() {
 async function updateExecutionsTable(executions) {
     console.log('🔄 updateExecutionsTable נקראה עם', executions.length, 'עסקעות');
     console.log('📊 נתוני עסקעות:', executions);
-    
+
     const tbody = document.querySelector('#executionsTable tbody');
     if (!tbody) return;
 
@@ -1022,7 +1022,7 @@ async function updateExecutionsTable(executions) {
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td>${execution.fee ? '$' + execution.fee : '-'}</td>
-                <td style="color: red;">$0</td>
+                <td>${window.colorAmount(0, '$0')}</td>
                 <td>${execution.notes || ''}</td>
                 <td>${formatDate(execution.created_at)}</td>
                 <td>${formatDate(execution.date || execution.execution_date)}</td>

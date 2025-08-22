@@ -345,7 +345,7 @@ function updateAccountsTable(accounts) {
       </td>
       <td>$${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}</td>
       <td>$${account.total_value ? account.total_value.toLocaleString() : '0'}</td>
-      <td style="color: ${account.total_pl >= 0 ? 'green' : 'red'};">$${account.total_pl ? account.total_pl.toLocaleString() : '0'}</td>
+      <td>${window.colorAmount(account.total_pl || 0, `$${account.total_pl ? account.total_pl.toLocaleString() : '0'}`)}</td>
       <td>${account.notes || '-'}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-outline-primary" onclick="editAccount(${account.id})" title="ערוך חשבון">

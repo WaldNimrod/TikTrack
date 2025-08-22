@@ -54,8 +54,8 @@ function createBasicMenu() {
             <span class="nav-text">תכנון</span>
           </a>
           
-          <a href="/trades" class="nav-item" data-page="trades">
-            <span class="nav-text">מעקב</span>
+          <a href="/trade_plans" class="nav-item" data-page="trade_plans">
+            <span class="nav-text">תכנון</span>
           </a>
           
           <a href="/research" class="nav-item" data-page="research">
@@ -99,8 +99,8 @@ function setActiveMenuItem() {
     document.querySelector('[data-page="home"]')?.classList.add('active');
   } else if (currentPath === '/planning') {
     document.querySelector('[data-page="planning"]')?.classList.add('active');
-  } else if (currentPath === '/trades') {
-    document.querySelector('[data-page="trades"]')?.classList.add('active');
+  } else if (currentPath === '/trade_plans') {
+    document.querySelector('[data-page="trade_plans"]')?.classList.add('active');
   } else if (currentPath === '/research') {
     document.querySelector('[data-page="research"]')?.classList.add('active');
   } else if (currentPath === '/settings') {

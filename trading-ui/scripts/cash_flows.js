@@ -6,6 +6,9 @@ if (!window.cashFlowsData) {
 }
 let cashFlowsData = window.cashFlowsData;
 
+// השתמש בפונקציה הכללית מ-translation-utils.js
+// הפונקציה colorAmount זמינה גלובלית מ-translation-utils.js
+
 // פונקציות בסיסיות
 function openCashFlowDetails(id) {
     console.log('פתיחת פרטי תזרים מזומנים:', id);
@@ -517,12 +520,14 @@ function renderCashFlowsTable() {
 
     cashFlowsData.forEach(cashFlow => {
         const row = document.createElement('tr');
+        const accountName = cashFlow.account_name || `חשבון ${cashFlow.account_id}`;
+        const currencySymbol = cashFlow.currency_symbol || '$';
+
         row.innerHTML = `
-            <td>${cashFlow.id}</td>
-            <td>${cashFlow.account_id}</td>
+            <td><strong>${accountName}</strong></td>
             <td><strong>${window.translateCashFlowType ? window.translateCashFlowType(cashFlow.type) : cashFlow.type}</strong></td>
-            <td>${formatAmount(cashFlow.amount)}</td>
-            <td>${cashFlow.currency_symbol || '-'}</td>
+            <td>${window.colorAmount(cashFlow.amount)}</td>
+            <td>${currencySymbol}</td>
             <td>${cashFlow.usd_rate || '1.000000'}</td>
             <td>${formatDate(cashFlow.date)}</td>
             <td>${cashFlow.description || '-'}</td>
@@ -531,7 +536,7 @@ function renderCashFlowsTable() {
             <td>${formatDateTime(cashFlow.created_at)}</td>
             <td>
                 <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">✏️</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">X</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>
             </td>
         `;
         tbody.appendChild(row);

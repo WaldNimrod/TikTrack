@@ -305,6 +305,30 @@ function refreshSummaryData() {
   console.log('✅ נתוני סיכום רועננו');
 }
 
+/**
+ * שחזור מצב סקשן החשבונות
+ */
+function restoreAccountsSectionState() {
+  console.log('🔄 שחזור מצב סקשן חשבונות...');
+
+  const savedState = localStorage.getItem('accountsSectionCollapsed');
+  if (savedState === 'true') {
+    const accountsSection = document.querySelector('.accounts-section');
+    if (accountsSection) {
+      const sectionBody = accountsSection.querySelector('.section-body');
+      const toggleBtn = accountsSection.querySelector('button[onclick="toggleAccountsSection()"]');
+
+      if (sectionBody && toggleBtn) {
+        sectionBody.style.display = 'none';
+        toggleBtn.textContent = 'הצג חשבונות';
+        console.log('✅ סקשן חשבונות נסגר');
+      }
+    }
+  } else {
+    console.log('✅ סקשן חשבונות נפתח (ברירת מחדל)');
+  }
+}
+
 // הגדרת הפונקציה updateGridFromComponent לדף התחקיר
 window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
   console.log('🔄 updateGridFromComponent called for research page with:', {
@@ -360,6 +384,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // שחזור מצב הסגירה
   restoreTopSectionState();
   restoreResearchSectionState();
+  restoreAccountsSectionState();
 
   // בדיקת זמינות פונקציות גלובליות
   setTimeout(() => {

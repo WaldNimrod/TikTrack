@@ -1435,7 +1435,7 @@ function getStatusClass(status) {
     case 'open': return 'status-open';
     case 'closed': return 'status-closed';
     case 'cancelled': return 'status-cancelled';
-    default: return 'status-inactive';
+    default: return 'status-cancelled';
   }
 }
 

@@ -1,19 +1,31 @@
 /**
- * ========================================
- * אלמנט ראש הדף החדש - Header System
- * ========================================
+ * Header System - TikTrack Frontend
+ * ==================================
  * 
- * אלמנט ראש דף מאוחד עם תפריט, לוגו ופילטר חכם
+ * Unified header element with menu, logo, and smart filtering system
  * 
- * תכונות:
- * - לוגו וכותרת
- * - תפריט ניווט
- * - פילטר מאוחד שמתאים את עצמו לכל טבלה
- * - עיצוב אחיד בכל העמודים
+ * Features:
+ * - Logo and title display
+ * - Navigation menu
+ * - Unified filter system that adapts to each table
+ * - Consistent design across all pages
+ * - Dynamic filter text updates
+ * - Responsive design and mobile support
  * 
- * מחבר: TikTrack Development Team
- * תאריך: 2025
- * ========================================
+ * Architecture:
+ * - Web Component based implementation
+ * - Shadow DOM for encapsulation
+ * - Event-driven communication with pages
+ * - Modular filter system
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * - CSS: header-system.css
+ * 
+ * @author TikTrack Development Team
+ * @version 2.1
+ * @lastUpdated August 22, 2025
  */
 
 /**
@@ -580,70 +592,72 @@ class HeaderSystem {
         <div class="unified-header">
           <!-- אזור לוגו ותפריט -->
           <div class="header-top">
-            <!-- תפריט ניווט -->
-            <div class="header-nav">
-              <nav class="main-nav">
-                <ul class="tiktrack-nav-list">
-                  <li class="tiktrack-nav-item">
-                    <a href="/" class="tiktrack-nav-link" data-page="home">
-                      <span class="nav-icon">🏡</span>
-                    </a>
-                  </li>
-                  
-                  <li class="tiktrack-nav-item">
-                    <a href="/planning" class="tiktrack-nav-link" data-page="planning">
-                      <span class="nav-text">תכנון</span>
-                    </a>
-                  </li>
-                  
-                  <li class="tiktrack-nav-item">
-                    <a href="/trades" class="tiktrack-nav-link" data-page="trades">
-                      <span class="nav-text">מעקב</span>
-                    </a>
-                  </li>
-                  
-                  <li class="tiktrack-nav-item">
-                    <a href="/research" class="tiktrack-nav-link" data-page="research">
-                      <span class="nav-text">מחקר</span>
-                    </a>
-                  </li>
-                  
-                  <li class="tiktrack-nav-item dropdown">
-                    <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
-                      <span class="nav-text">הגדרות</span>
-                      <span class="tiktrack-dropdown-arrow">▼</span>
-                    </a>
-                    <ul class="tiktrack-dropdown-menu">
-                      <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/executions">עסקעות</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="tiktrack-dropdown-item" href="/database">בסיס נתונים</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/currencies">מטבעות</a></li>
-                      <li><a class="tiktrack-dropdown-item" href="/trade_plans">תכניות מסחר</a></li>
-                    </ul>
-                  </li>
-                </ul>
-              </nav>
-            </div>
+            <div class="header-container">
+              <!-- תפריט ניווט -->
+              <div class="header-nav">
+                <nav class="main-nav">
+                  <ul class="tiktrack-nav-list">
+                    <li class="tiktrack-nav-item">
+                      <a href="/" class="tiktrack-nav-link" data-page="home">
+                        <span class="nav-icon">🏡</span>
+                      </a>
+                    </li>
+                    
+                    <li class="tiktrack-nav-item">
+                      <a href="/planning" class="tiktrack-nav-link" data-page="planning">
+                        <span class="nav-text">תכנון</span>
+                      </a>
+                    </li>
+                    
+                    <li class="tiktrack-nav-item">
+                      <a href="/trade_plans" class="tiktrack-nav-link" data-page="trade_plans">
+                        <span class="nav-text">תכנון</span>
+                      </a>
+                    </li>
+                    
+                    <li class="tiktrack-nav-item">
+                      <a href="/research" class="tiktrack-nav-link" data-page="research">
+                        <span class="nav-text">מחקר</span>
+                      </a>
+                    </li>
+                    
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
+                        <span class="nav-text">הגדרות</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
+                      </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/executions">עסקעות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/currencies">מטבעות</a></li>
 
-            <div class="logo-section">
-              <div class="logo">
-                <img src="images/logo.svg" alt="TikTrack Logo" class="logo-image">
-                <span class="logo-text">פשוט לנהל תיק</span>
+                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </nav>
               </div>
-            </div>
-            
-            <!-- כפתור פילטר עגול -->
-            <div class="filter-toggle-section">
-              <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים">
-                <span class="filter-arrow">▼</span>
-              </button>
+
+              <div class="logo-section">
+                <div class="logo">
+                  <img src="images/logo.svg" alt="TikTrack Logo" class="logo-image">
+                  <span class="logo-text">פשוט לנהל תיק</span>
+                </div>
+              </div>
+              
+              <!-- כפתור פילטר עגול -->
+              <div class="filter-toggle-section">
+                <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים">
+                  <span class="filter-arrow">▼</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -859,6 +873,20 @@ class HeaderSystem {
     // הגדרת הפריט הפעיל
     this.setActiveMenuItem();
 
+    // בדיקה אם ה-class active נוסף
+    setTimeout(() => {
+      const activeLinks = document.querySelectorAll('.tiktrack-nav-link.active');
+      const activeDropdownItems = document.querySelectorAll('.tiktrack-dropdown-item.active');
+      console.log('🔍 Active nav links found:', activeLinks.length);
+      console.log('🔍 Active dropdown items found:', activeDropdownItems.length);
+      activeLinks.forEach(link => {
+        console.log('🔍 Active nav link:', link.getAttribute('href'), 'classes:', link.className);
+      });
+      activeDropdownItems.forEach(item => {
+        console.log('🔍 Active dropdown item:', item.getAttribute('href'), 'classes:', item.className);
+      });
+    }, 100);
+
     // הוספת event listeners לכפתורי הניווט
     this.addMenuEventListeners();
 
@@ -1037,6 +1065,10 @@ class HeaderSystem {
     const navLinks = document.querySelectorAll('.tiktrack-nav-link');
     const dropdownItems = document.querySelectorAll('.tiktrack-dropdown-item');
 
+    console.log('🔍 setActiveMenuItem - currentPath:', currentPath);
+    console.log('🔍 setActiveMenuItem - navLinks found:', navLinks.length);
+    console.log('🔍 setActiveMenuItem - dropdownItems found:', dropdownItems.length);
+
     // איפוס כל הפריטים
     navLinks.forEach(link => link.classList.remove('active'));
     dropdownItems.forEach(item => item.classList.remove('active'));
@@ -1046,6 +1078,7 @@ class HeaderSystem {
       const href = link.getAttribute('href');
       if (href && href !== '#' && currentPath.includes(href)) {
         link.classList.add('active');
+        console.log('✅ Added active to nav link:', href);
       }
     });
 
@@ -1054,12 +1087,14 @@ class HeaderSystem {
       const href = item.getAttribute('href');
       if (href && currentPath.includes(href)) {
         item.classList.add('active');
+        console.log('✅ Added active to dropdown item:', href);
         // סימון גם הפריט הראשי אם יש פריט פעיל בתפריט המשנה
         const parentDropdown = item.closest('.tiktrack-nav-item');
         if (parentDropdown) {
           const parentLink = parentDropdown.querySelector('.tiktrack-nav-link');
           if (parentLink) {
             parentLink.classList.add('active');
+            console.log('✅ Added active to parent nav link for dropdown item:', href);
           }
         }
       }
@@ -1070,13 +1105,14 @@ class HeaderSystem {
       const homeLink = document.querySelector('.tiktrack-nav-link[data-page="home"]');
       if (homeLink) {
         homeLink.classList.add('active');
+        console.log('✅ Added active to home link');
       }
     }
   }
 
   // הוספת event listeners לכפתורי הניווט (מתוך menu.js)
   addMenuEventListeners() {
-    const navItems = document.querySelectorAll('.nav-item');
+    const navItems = document.querySelectorAll('.tiktrack-nav-item');
 
     navItems.forEach(item => {
       item.addEventListener('click', (e) => {
@@ -1894,6 +1930,21 @@ function closeOtherFilters(excludeFilter) {
 }
 
 // פונקציות לעדכון טקסטים
+/**
+ * Update status filter display text
+ * 
+ * This function updates the status filter button text to show the currently
+ * selected status filter. It provides visual feedback to users about the
+ * active filter state.
+ * 
+ * @returns {void}
+ * 
+ * Features:
+ * - Dynamic text updates based on selected filter
+ * - Integration with global filter state
+ * - Visual feedback for active filters
+ * - Consistent display across all pages
+ */
 function updateStatusFilterDisplayText() {
   console.log('🔍 updateStatusFilterText called');
   const menu = document.getElementById('statusFilterMenu');
@@ -1918,6 +1969,21 @@ function updateStatusFilterDisplayText() {
   }
 }
 
+/**
+ * Update type filter display text
+ * 
+ * This function updates the type filter button text to show the currently
+ * selected type filter. It provides visual feedback to users about the
+ * active filter state.
+ * 
+ * @returns {void}
+ * 
+ * Features:
+ * - Dynamic text updates based on selected filter
+ * - Integration with global filter state
+ * - Visual feedback for active filters
+ * - Consistent display across all pages
+ */
 function updateTypeFilterDisplayText() {
   console.log('🔍 updateTypeFilterText called');
   const menu = document.getElementById('typeFilterMenu');
@@ -1942,6 +2008,21 @@ function updateTypeFilterDisplayText() {
   }
 }
 
+/**
+ * Update account filter display text
+ * 
+ * This function updates the account filter button text to show the currently
+ * selected account filter. It provides visual feedback to users about the
+ * active filter state.
+ * 
+ * @returns {void}
+ * 
+ * Features:
+ * - Dynamic text updates based on selected filter
+ * - Integration with global filter state
+ * - Visual feedback for active filters
+ * - Consistent display across all pages
+ */
 function updateAccountFilterDisplayText() {
   console.log('🔍 updateAccountFilterText called');
   const menu = document.getElementById('accountFilterMenu');

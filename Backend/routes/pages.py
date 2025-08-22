@@ -20,10 +20,15 @@ def trade_plans() -> Any:
     """Trade plans page"""
     return send_from_directory(UI_DIR, "trade_plans.html")
 
+@pages_bp.route('/trades')
+def trades() -> Any:
+    """Trades tracking page"""
+    return send_from_directory(UI_DIR, "trades.html")
+
 @pages_bp.route('/tracking')
 def tracking() -> Any:
-    """Tracking page - redirect to trade_plans"""
-    return send_from_directory(UI_DIR, "trade_plans.html")
+    """Tracking page - redirect to trades"""
+    return send_from_directory(UI_DIR, "trades.html")
 
 @pages_bp.route('/planning')
 def planning() -> Any:

@@ -1007,7 +1007,7 @@ async function updateExecutionsTable(executions) {
             // מידע על הטרייד: תאריך פתיחה | צד | סוג
             const openDate = trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
             const side = trade.side || 'לא מוגדר';
-            const type = trade.type || 'לא מוגדר';
+            const type = trade.investment_type || 'לא מוגדר';
 
             tradeInfo = `${openDate} | ${side} | ${type}`;
         } else {

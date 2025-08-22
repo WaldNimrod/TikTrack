@@ -604,14 +604,14 @@ class HeaderSystem {
                     </li>
                     
                     <li class="tiktrack-nav-item">
-                      <a href="/planning" class="tiktrack-nav-link" data-page="planning">
+                      <a href="/trade_plans" class="tiktrack-nav-link" data-page="trade_plans">
                         <span class="nav-text">תכנון</span>
                       </a>
                     </li>
                     
                     <li class="tiktrack-nav-item">
-                      <a href="/trade_plans" class="tiktrack-nav-link" data-page="trade_plans">
-                        <span class="nav-text">תכנון</span>
+                      <a href="/trades" class="tiktrack-nav-link" data-page="trades">
+                        <span class="nav-text">מעקב</span>
                       </a>
                     </li>
                     
@@ -636,6 +636,7 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/currencies">מטבעות</a></li>
 
                         <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>

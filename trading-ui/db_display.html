@@ -97,7 +97,7 @@
             </div>
             <div class="table-count" id="tradePlansCount">טוען...</div>
             <div class="table-actions">
-              <button class="add-btn" onclick="addRecord()" title="הוסף רשומה">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
               </button>
               <div class="action-separator"></div>
@@ -149,7 +149,7 @@
             </div>
             <div class="table-count" id="tradesCount">טוען...</div>
             <div class="table-actions">
-              <button class="add-btn" onclick="addRecord()" title="הוסף רשומה">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
               </button>
               <div class="action-separator"></div>
@@ -201,7 +201,7 @@
             </div>
             <div class="table-count" id="accountsCount">טוען...</div>
             <div class="table-actions">
-              <button class="add-btn" onclick="addRecord()" title="הוסף רשומה">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
               </button>
               <div class="action-separator"></div>
@@ -238,48 +238,239 @@
             </div>
           </div>
         </div>
+
+
+        <!-- Tickers Section -->
+        <div class="content-section">
+          <!-- Tickers header -->
+          <div class="section-header">
+            <div class="table-title">
+              📊 טיקרים
+            </div>
+            <div class="table-count" id="tickersCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור טיקרים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tickers table -->
+          <div class="section-body">
+            <div class="table-responsive" id="tickersContainer">
+              <table class="table" id="tickersTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'tickersTable')">Symbol (VARCHAR)</th>
+                    <th onclick="sortTable(1, 'tickersTable')">Name (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'tickersTable')">Type (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'tickersTable')">Remarks (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'tickersTable')">Currency (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'tickersTable')">Active Trades (BOOLEAN)</th>
+                    <th onclick="sortTable(6, 'tickersTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(7, 'tickersTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(8, 'tickersTable')">Updated At (DATETIME)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="9" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Executions Section -->
+        <div class="content-section">
+          <!-- Executions header -->
+          <div class="section-header">
+            <div class="table-title">
+              💼 ביצועים
+            </div>
+            <div class="table-count" id="executionsCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור ביצועים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Executions table -->
+          <div class="section-body">
+            <div class="table-responsive" id="executionsContainer">
+              <table class="table" id="executionsTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'executionsTable')">Trade ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'executionsTable')">Action (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'executionsTable')">Date (DATETIME)</th>
+                    <th onclick="sortTable(3, 'executionsTable')">Quantity (FLOAT)</th>
+                    <th onclick="sortTable(4, 'executionsTable')">Price (FLOAT)</th>
+                    <th onclick="sortTable(5, 'executionsTable')">Fee (FLOAT)</th>
+                    <th onclick="sortTable(6, 'executionsTable')">Source (VARCHAR)</th>
+                    <th onclick="sortTable(7, 'executionsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(8, 'executionsTable')">Created At (DATETIME)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="9" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cash Flows Section -->
+        <div class="content-section">
+          <!-- Cash Flows header -->
+          <div class="section-header">
+            <div class="table-title">
+              💰 תזרימי מזומנים
+            </div>
+            <div class="table-count" id="cashFlowsCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תזרימי מזומנים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cash Flows table -->
+          <div class="section-body">
+            <div class="table-responsive" id="cashFlowsContainer">
+              <table class="table" id="cashFlowsTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'cashFlowsTable')">Account ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'cashFlowsTable')">Type (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'cashFlowsTable')">Amount (FLOAT)</th>
+                    <th onclick="sortTable(3, 'cashFlowsTable')">Date (DATE)</th>
+                    <th onclick="sortTable(4, 'cashFlowsTable')">Description (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'cashFlowsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(6, 'cashFlowsTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(7, 'cashFlowsTable')">Currency (VARCHAR)</th>
+                    <th onclick="sortTable(8, 'cashFlowsTable')">Currency ID (INTEGER)</th>
+                    <th onclick="sortTable(9, 'cashFlowsTable')">USD Rate (DECIMAL)</th>
+                    <th onclick="sortTable(10, 'cashFlowsTable')">Source (VARCHAR)</th>
+                    <th onclick="sortTable(11, 'cashFlowsTable')">External ID (VARCHAR)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="12" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerts Section -->
+        <div class="content-section">
+          <!-- Alerts header -->
+          <div class="section-header">
+            <div class="table-title">
+              🔔 התראות
+            </div>
+            <div class="table-count" id="alertsCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התראות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="table-responsive" id="alertsContainer">
+              <table class="table" id="alertsTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'alertsTable')">Account ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'alertsTable')">Ticker ID (INTEGER)</th>
+                    <th onclick="sortTable(2, 'alertsTable')">Type (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'alertsTable')">Condition (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'alertsTable')">Message (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'alertsTable')">Is Active (BOOLEAN)</th>
+                    <th onclick="sortTable(6, 'alertsTable')">Triggered At (DATETIME)</th>
+                    <th onclick="sortTable(7, 'alertsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(8, 'alertsTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(9, 'alertsTable')">Status (VARCHAR)</th>
+                    <th onclick="sortTable(10, 'alertsTable')">Is Triggered (VARCHAR)</th>
+                    <th onclick="sortTable(11, 'alertsTable')">Related Type ID (INTEGER)</th>
+                    <th onclick="sortTable(12, 'alertsTable')">Related ID (INTEGER)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="13" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Tickers Section -->
+      <!-- Notes Section -->
       <div class="content-section">
-        <!-- Tickers header -->
+        <!-- Notes header -->
         <div class="section-header">
           <div class="table-title">
-            📊 טיקרים
+            📝 הערות
           </div>
-          <div class="table-count" id="tickersCount">טוען...</div>
+          <div class="table-count" id="notesCount">טוען...</div>
           <div class="table-actions">
-            <button class="add-btn" onclick="addRecord()" title="הוסף רשומה">
+            <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
               <span class="action-icon">➕</span> הוסף
             </button>
             <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור טיקרים">
+            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור הערות">
               <span class="filter-icon">▲</span>
             </button>
           </div>
         </div>
-
-        <!-- Tickers table -->
         <div class="section-body">
-          <div class="table-responsive" id="tickersContainer">
-            <table class="table" id="tickersTable">
+          <div class="table-responsive" id="notesContainer">
+            <table class="table" id="notesTable">
               <thead>
                 <tr>
-                  <th onclick="sortTable(0, 'tickersTable')">Symbol (VARCHAR)</th>
-                  <th onclick="sortTable(1, 'tickersTable')">Name (VARCHAR)</th>
-                  <th onclick="sortTable(2, 'tickersTable')">Type (VARCHAR)</th>
-                  <th onclick="sortTable(3, 'tickersTable')">Remarks (VARCHAR)</th>
-                  <th onclick="sortTable(4, 'tickersTable')">Currency (VARCHAR)</th>
-                  <th onclick="sortTable(5, 'tickersTable')">Active Trades (BOOLEAN)</th>
-                  <th onclick="sortTable(6, 'tickersTable')">ID (INTEGER)</th>
-                  <th onclick="sortTable(7, 'tickersTable')">Created At (DATETIME)</th>
-                  <th onclick="sortTable(8, 'tickersTable')">Updated At (DATETIME)</th>
+                  <th onclick="sortTable(0, 'notesTable')">ID (INTEGER)</th>
+                  <th onclick="sortTable(1, 'notesTable')">Content (VARCHAR)</th>
+                  <th onclick="sortTable(2, 'notesTable')">Attachment (VARCHAR)</th>
+                  <th onclick="sortTable(3, 'notesTable')">Created At (DATETIME)</th>
+                  <th onclick="sortTable(4, 'notesTable')">Related Type ID (INTEGER)</th>
+                  <th onclick="sortTable(5, 'notesTable')">Related ID (INTEGER)</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td colspan="9" class="text-center">טוען נתונים...</td>
+                  <td colspan="6" class="text-center">טוען נתונים...</td>
                 </tr>
               </tbody>
             </table>
@@ -288,96 +479,42 @@
       </div>
     </div>
 
-    <!-- Executions Section -->
+    <!-- Currencies Section -->
     <div class="content-section">
-      <!-- Executions header -->
+      <!-- Currencies header -->
       <div class="section-header">
         <div class="table-title">
-          💼 ביצועים
+          💱 מטבעות
         </div>
-        <div class="table-count" id="executionsCount">טוען...</div>
+        <div class="table-count" id="currenciesCount">טוען...</div>
         <div class="table-actions">
-          <button class="add-btn" onclick="addRecord()" title="הוסף רשומה">
+          <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
             <span class="action-icon">➕</span> הוסף
           </button>
           <div class="action-separator"></div>
-          <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור ביצועים">
+          <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור מטבעות">
             <span class="filter-icon">▲</span>
           </button>
         </div>
       </div>
 
-      <!-- Executions table -->
+      <!-- Currencies table -->
       <div class="section-body">
-        <div class="table-responsive" id="executionsContainer">
-          <table class="table" id="executionsTable">
+        <div class="table-responsive" id="currenciesContainer">
+          <table class="table" id="currenciesTable">
             <thead>
               <tr>
-                <th onclick="sortTable(0, 'executionsTable')">Trade ID (INTEGER)</th>
-                <th onclick="sortTable(1, 'executionsTable')">Action (VARCHAR)</th>
-                <th onclick="sortTable(2, 'executionsTable')">Date (DATETIME)</th>
-                <th onclick="sortTable(3, 'executionsTable')">Quantity (FLOAT)</th>
-                <th onclick="sortTable(4, 'executionsTable')">Price (FLOAT)</th>
-                <th onclick="sortTable(5, 'executionsTable')">Fee (FLOAT)</th>
-                <th onclick="sortTable(6, 'executionsTable')">Source (VARCHAR)</th>
-                <th onclick="sortTable(7, 'executionsTable')">ID (INTEGER)</th>
-                <th onclick="sortTable(8, 'executionsTable')">Created At (DATETIME)</th>
+                <th onclick="sortTable(0, 'currenciesTable')">Symbol (VARCHAR)</th>
+                <th onclick="sortTable(1, 'currenciesTable')">Name (VARCHAR)</th>
+                <th onclick="sortTable(2, 'currenciesTable')">USD Rate (NUMERIC)</th>
+                <th onclick="sortTable(3, 'currenciesTable')">ID (INTEGER)</th>
+                <th onclick="sortTable(4, 'currenciesTable')">Created At (DATETIME)</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="9" class="text-center">טוען נתונים...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Cash Flows Section -->
-    <div class="content-section">
-      <!-- Cash Flows header -->
-      <div class="section-header">
-        <div class="table-title">
-          💰 תזרימי מזומנים
-        </div>
-        <div class="table-count" id="cashFlowsCount">טוען...</div>
-        <div class="table-actions">
-          <button class="add-btn" onclick="addRecord()" title="הוסף רשומה">
-            <span class="action-icon">➕</span> הוסף
-          </button>
-          <div class="action-separator"></div>
-          <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תזרימי מזומנים">
-            <span class="filter-icon">▲</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Cash Flows table -->
-      <div class="section-body">
-        <div class="table-responsive" id="cashFlowsContainer">
-          <table class="table" id="cashFlowsTable">
-            <thead>
-              <tr>
-                <th onclick="sortTable(0, 'cashFlowsTable')">Account ID (INTEGER)</th>
-                <th onclick="sortTable(1, 'cashFlowsTable')">Type (VARCHAR)</th>
-                <th onclick="sortTable(2, 'cashFlowsTable')">Amount (FLOAT)</th>
-                <th onclick="sortTable(3, 'cashFlowsTable')">Date (DATE)</th>
-                <th onclick="sortTable(4, 'cashFlowsTable')">Description (VARCHAR)</th>
-                <th onclick="sortTable(5, 'cashFlowsTable')">ID (INTEGER)</th>
-                <th onclick="sortTable(6, 'cashFlowsTable')">Created At (DATETIME)</th>
-                <th onclick="sortTable(7, 'cashFlowsTable')">Currency (VARCHAR)</th>
-                <th onclick="sortTable(8, 'cashFlowsTable')">Currency ID (INTEGER)</th>
-                <th onclick="sortTable(9, 'cashFlowsTable')">USD Rate (DECIMAL)</th>
-                <th onclick="sortTable(10, 'cashFlowsTable')">Source (VARCHAR)</th>
-                <th onclick="sortTable(11, 'cashFlowsTable')">External ID (VARCHAR)</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="12" class="text-center">טוען נתונים...</td>
+                <td colspan="5" class="text-center">טוען נתונים...</td>
               </tr>
             </tbody>
           </table>
@@ -385,137 +522,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Alerts Section -->
-  <div class="content-section">
-    <div class="section-header">
-      <div class="table-title">
-        🔔 התראות
-      </div>
-      <div class="table-actions">
-        <div class="table-count" id="alertsCount">טוען...</div>
-        <button class="filter-toggle-btn" onclick="toggleMainSection()">
-          <span class="filter-icon">▼</span>
-          <span class="btn-text">הצג/הסתר</span>
-        </button>
-      </div>
-    </div>
-    <div class="section-body">
-      <div class="">
-        <div class="table-responsive" id="alertsContainer">
-          <table class="table" id="alertsTable">
-            <thead>
-              <tr>
-                <th onclick="sortTable(0, 'alertsTable')">Account ID (INTEGER)</th>
-                <th onclick="sortTable(1, 'alertsTable')">Ticker ID (INTEGER)</th>
-                <th onclick="sortTable(2, 'alertsTable')">Type (VARCHAR)</th>
-                <th onclick="sortTable(3, 'alertsTable')">Condition (VARCHAR)</th>
-                <th onclick="sortTable(4, 'alertsTable')">Message (VARCHAR)</th>
-                <th onclick="sortTable(5, 'alertsTable')">Is Active (BOOLEAN)</th>
-                <th onclick="sortTable(6, 'alertsTable')">Triggered At (DATETIME)</th>
-                <th onclick="sortTable(7, 'alertsTable')">ID (INTEGER)</th>
-                <th onclick="sortTable(8, 'alertsTable')">Created At (DATETIME)</th>
-                <th onclick="sortTable(9, 'alertsTable')">Status (VARCHAR)</th>
-                <th onclick="sortTable(10, 'alertsTable')">Is Triggered (VARCHAR)</th>
-                <th onclick="sortTable(11, 'alertsTable')">Related Type ID (INTEGER)</th>
-                <th onclick="sortTable(12, 'alertsTable')">Related ID (INTEGER)</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="13" class="text-center">טוען נתונים...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Notes Section -->
-  <div class="content-section">
-    <div class="section-header">
-      <div class="table-title">
-        📝 הערות
-      </div>
-      <div class="table-actions">
-        <div class="table-count" id="notesCount">טוען...</div>
-        <button class="filter-toggle-btn" onclick="toggleMainSection()">
-          <span class="filter-icon">▼</span>
-          <span class="btn-text">הצג/הסתר</span>
-        </button>
-      </div>
-    </div>
-    <div class="section-body">
-      <div class="">
-        <div class="table-responsive" id="notesContainer">
-          <table class="table" id="notesTable">
-            <thead>
-              <tr>
-                <th onclick="sortTable(0, 'notesTable')">ID (INTEGER)</th>
-                <th onclick="sortTable(1, 'notesTable')">Content (VARCHAR)</th>
-                <th onclick="sortTable(2, 'notesTable')">Attachment (VARCHAR)</th>
-                <th onclick="sortTable(3, 'notesTable')">Created At (DATETIME)</th>
-                <th onclick="sortTable(4, 'notesTable')">Related Type ID (INTEGER)</th>
-                <th onclick="sortTable(5, 'notesTable')">Related ID (INTEGER)</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="6" class="text-center">טוען נתונים...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Currencies Section -->
-  <div class="content-section">
-    <!-- Currencies header -->
-    <div class="section-header">
-      <div class="table-title">
-        💱 מטבעות
-      </div>
-      <div class="table-count" id="currenciesCount">טוען...</div>
-      <div class="table-actions">
-        <button class="add-btn" onclick="addRecord()" title="הוסף רשומה">
-          <span class="action-icon">➕</span> הוסף
-        </button>
-        <div class="action-separator"></div>
-        <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור מטבעות">
-          <span class="filter-icon">▲</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Currencies table -->
-    <div class="section-body">
-      <div class="table-responsive" id="currenciesContainer">
-        <table class="table" id="currenciesTable">
-          <thead>
-            <tr>
-              <th onclick="sortTable(0, 'currenciesTable')">Symbol (VARCHAR)</th>
-              <th onclick="sortTable(1, 'currenciesTable')">Name (VARCHAR)</th>
-              <th onclick="sortTable(2, 'currenciesTable')">USD Rate (NUMERIC)</th>
-              <th onclick="sortTable(3, 'currenciesTable')">ID (INTEGER)</th>
-              <th onclick="sortTable(4, 'currenciesTable')">Created At (DATETIME)</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colspan="5" class="text-center">טוען נתונים...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
   </div> <!-- End page-body -->
 
   <!-- Bottom page spacing -->

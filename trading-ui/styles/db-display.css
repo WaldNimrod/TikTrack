@@ -41,19 +41,7 @@
     padding: 0.5rem 0 !important;
 }
 
-/* כפתור הוסף - סגנון מיוחד */
-.db-display-page .add-btn {
-    background-color: #28a745 !important;
-    border-color: #28a745 !important;
-    color: white !important;
-    font-size: 0.8rem !important;
-    padding: 0.25rem 0.5rem !important;
-}
 
-.db-display-page .add-btn:hover {
-    background-color: #218838 !important;
-    border-color: #1e7e34 !important;
-}
 
 /* כותרות טבלה - גודל קטן יותר */
 .db-display-page .table thead th {

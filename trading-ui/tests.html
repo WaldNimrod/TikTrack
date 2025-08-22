@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>בדיקות - Tik.track</title>
+
+  <!-- 
+    ===== דף בדיקות - TikTrack =====
+    
+    דף זה מכיל:
+    1. טבלת בדיקות - הסקשן הראשון
+    2. טבלת תוצאות בדיקות - הסקשן השני
+    3. כרטיסיות התראות - בחלק העליון
+    4. מערכת פילטרים ומיון מתקדמת
+    
+    מבנה הדף:
+    - app-header: כותרת האפליקציה עם ניווט
+    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+      - top-section: כרטיסיות התראות וסיכום נתונים
+      - content-section (1): טבלת בדיקות
+      - content-section (2): טבלת תוצאות בדיקות
+    
+    שינויים אחרונים:
+    - יצירת עמוד בדיקות חדש
+    - הוספת טבלת תוצאות בדיקות
+    - שיפור עיצוב כרטיסיות התראות
+    - תיקון כפתורי סגירה עצמאיים
+    - ריכוז פונקציות בדיקות ב-tests.js
+  -->
+
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <!-- 1. Apple theme (base) -->
+  <link rel="stylesheet" href="styles/apple-theme.css">
+
+  <!-- 2. Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- 3. General styles -->
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- 4. Typography -->
+  <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
+  <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Header system styles (highest priority) -->
+  <link rel="stylesheet" href="styles/header-system.css">
+
+  <!-- Modular grid files - loaded at end of file -->
+</head>
+
+<body>
+  <!-- General background -->
+  <div class="background-wrapper">
+
+    <!-- Application header -->
+    <!-- Unified Header System -->
+    <div id="unified-header-container"></div>
+
+    <!-- Page body - All content after header -->
+    <div class="page-body">
+      <!-- Tests area - top-Section -->
+      <div class="top-section">
+        <!-- Main header -->
+        <div class="section-header">
+          <div class="table-title">
+            🧪 בדיקות מערכת
+          </div>
+          <div class="table-actions">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בדיקות">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alert cards -->
+        <div class="section-body">
+          <active-alerts></active-alerts>
+
+          <!-- Data summary -->
+          <div class="info-summary" id="summaryStats">
+            <div>סה"כ בדיקות: <strong id="totalTests">0</strong></div>
+            <div>בדיקות עברו: <strong id="passedTests">0</strong></div>
+            <div>בדיקות נכשלו: <strong id="failedTests">0</strong></div>
+            <div>אחוז הצלחה: <strong id="successRate">0%</strong></div>
+          </div>
+        </div>
+      </div> <!-- End top-section -->
+
+      <!-- Main content -->
+      <div class="main-content">
+
+        <!-- Tests area - content-section -->
+        <div class="content-section">
+          <!-- Tests header -->
+          <div class="section-header">
+            <div class="table-title">
+              🧪 בדיקות מערכת
+            </div>
+            <div class="table-count" id="testsCount">0 בדיקות</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="runAllTests()" title="הרץ כל הבדיקות">
+                <span class="action-icon">▶️</span> הרץ בדיקות
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור בדיקות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tests table -->
+          <div class="section-body">
+            <div class="table-responsive" id="testsContainer">
+              <table class="table" id="testsTable" data-table-type="tests">
+                <thead>
+                  <tr>
+                    <th>שם הבדיקה<br><span class="header-subtitle">Test Name</span></th>
+                    <th>תיאור<br><span class="header-subtitle">Description</span></th>
+                    <th>קטגוריה<br><span class="header-subtitle">Category</span></th>
+                    <th>סטטוס<br><span class="header-subtitle">Status</span></th>
+                    <th>זמן ריצה<br><span class="header-subtitle">Duration</span></th>
+                    <th>תאריך אחרון<br><span class="header-subtitle">Last Run</span></th>
+                    <th>תוצאה<br><span class="header-subtitle">Result</span></th>
+                    <th class="actions-header">
+                      פעולות
+                      <br><span class="header-subtitle">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>בדיקת חיבור בסיס נתונים</strong></td>
+                    <td>בדיקה שחיבור לבסיס הנתונים עובד</td>
+                    <td>Database</td>
+                    <td><span class="status-badge status-active">פעיל</span></td>
+                    <td>0.5s</td>
+                    <td>15.1.2025</td>
+                    <td><span class="status-badge status-passed">עבר</span></td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="runTest('db_connection')" title="הרץ בדיקה">
+                        <span class="btn-icon">▶️</span>
+                      </button>
+                      <button class="btn btn-sm btn-secondary" onclick="editTest('db_connection')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTest('db_connection')" title="מחק">🗑️</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong>בדיקת API חשבונות</strong></td>
+                    <td>בדיקה שכל נקודות הקצה של API חשבונות עובדות</td>
+                    <td>API</td>
+                    <td><span class="status-badge status-active">פעיל</span></td>
+                    <td>2.1s</td>
+                    <td>15.1.2025</td>
+                    <td><span class="status-badge status-passed">עבר</span></td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="runTest('accounts_api')" title="הרץ בדיקה">
+                        <span class="btn-icon">▶️</span>
+                      </button>
+                      <button class="btn btn-sm btn-secondary" onclick="editTest('accounts_api')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTest('accounts_api')" title="מחק">🗑️</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong>בדיקת טעינת דפים</strong></td>
+                    <td>בדיקה שכל הדפים נטענים ללא שגיאות</td>
+                    <td>Frontend</td>
+                    <td><span class="status-badge status-active">פעיל</span></td>
+                    <td>1.8s</td>
+                    <td>15.1.2025</td>
+                    <td><span class="status-badge status-failed">נכשל</span></td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="runTest('page_loading')" title="הרץ בדיקה">
+                        <span class="btn-icon">▶️</span>
+                      </button>
+                      <button class="btn btn-sm btn-secondary" onclick="editTest('page_loading')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTest('page_loading')" title="מחק">🗑️</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong>בדיקת אימות נתונים</strong></td>
+                    <td>בדיקה שכל הנתונים מאומתים נכון</td>
+                    <td>Validation</td>
+                    <td><span class="status-badge status-inactive">לא פעיל</span></td>
+                    <td>0.0s</td>
+                    <td>-</td>
+                    <td><span class="status-badge status-pending">ממתין</span></td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="runTest('data_validation')" title="הרץ בדיקה">
+                        <span class="btn-icon">▶️</span>
+                      </button>
+                      <button class="btn btn-sm btn-secondary" onclick="editTest('data_validation')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTest('data_validation')" title="מחק">🗑️</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Test Results area - content-section -->
+        <div class="content-section">
+          <!-- Test Results header -->
+          <div class="section-header">
+            <div class="table-title">
+              📊 תוצאות בדיקות
+            </div>
+            <div class="table-count" id="testResultsCount">0 תוצאות</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="clearTestResults()" title="נקה תוצאות">
+                <span class="action-icon">🗑️</span> נקה
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תוצאות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Test Results table -->
+          <div class="section-body">
+            <div class="table-responsive" id="testResultsContainer">
+              <table class="table" id="testResultsTable" data-table-type="testResults">
+                <thead>
+                  <tr>
+                    <th>מזהה<br><span class="header-subtitle">ID</span></th>
+                    <th>שם בדיקה<br><span class="header-subtitle">Test Name</span></th>
+                    <th>תוצאה<br><span class="header-subtitle">Result</span></th>
+                    <th>זמן ריצה<br><span class="header-subtitle">Duration</span></th>
+                    <th>הודעת שגיאה<br><span class="header-subtitle">Error Message</span></th>
+                    <th>תאריך ריצה<br><span class="header-subtitle">Run Date</span></th>
+                    <th>פרטים<br><span class="header-subtitle">Details</span></th>
+                    <th class="actions-header">
+                      פעולות
+                      <br><span class="header-subtitle">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>בדיקת חיבור בסיס נתונים</td>
+                    <td><span class="status-badge status-passed">עבר</span></td>
+                    <td>0.5s</td>
+                    <td>-</td>
+                    <td>15.1.2025 10:30</td>
+                    <td>חיבור מוצלח לבסיס הנתונים</td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="viewTestResult(1)" title="צפייה">
+                        <span class="btn-icon">👁️</span>
+                      </button>
+                      <button class="btn btn-sm btn-secondary" onclick="exportTestResult(1)" title="ייצא">
+                        <span class="btn-icon">📤</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTestResult(1)" title="מחק">🗑️</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>בדיקת API חשבונות</td>
+                    <td><span class="status-badge status-passed">עבר</span></td>
+                    <td>2.1s</td>
+                    <td>-</td>
+                    <td>15.1.2025 10:32</td>
+                    <td>כל נקודות הקצה עובדות</td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="viewTestResult(2)" title="צפייה">
+                        <span class="btn-icon">👁️</span>
+                      </button>
+                      <button class="btn btn-sm btn-secondary" onclick="exportTestResult(2)" title="ייצא">
+                        <span class="btn-icon">📤</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTestResult(2)" title="מחק">🗑️</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>בדיקת טעינת דפים</td>
+                    <td><span class="status-badge status-failed">נכשל</span></td>
+                    <td>1.8s</td>
+                    <td>שגיאה בטעינת דף הערות</td>
+                    <td>15.1.2025 10:35</td>
+                    <td>דף הערות לא נטען כראוי</td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="viewTestResult(3)" title="צפייה">
+                        <span class="btn-icon">👁️</span>
+                      </button>
+                      <button class="btn btn-sm btn-secondary" onclick="exportTestResult(3)" title="ייצא">
+                        <span class="btn-icon">📤</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTestResult(3)" title="מחק">🗑️</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- End page-body -->
+
+    <!-- Bottom page spacing -->
+    <div class="bottom-spacer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Modular files -->
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/account-modal.js"></script>
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/tests.js"></script>
+
+    <!-- Page initialization -->
+    <script>
+      // Page initialization
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('🔄 Initializing tests page...');
+        if (typeof initializeTestsPage === 'function') {
+          initializeTestsPage();
+        }
+      });
+    </script>
+    <script>
+      // אתחול מערכת הכותרת החדשה
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof window.HeaderSystem !== "undefined") {
+          console.log("🔄 Initializing new unified header system...");
+          window.headerSystem = new window.HeaderSystem();
+          window.headerSystem.initialize();
+          window.filterSystem = new window.SimpleFilter();
+          window.filterSystem.initialize();
+        }
+      });
+    </script>
+</body>
+
+</html>

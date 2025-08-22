@@ -4,26 +4,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>טבלאות עזר - Tik.track</title>
+  <title>תכנונים - Tik.track</title>
 
   <!-- 
-    ===== דף טבלאות עזר - TikTrack =====
+    ===== דף תכנונים - TikTrack =====
     
     דף זה מכיל:
-    1. טבלאות עזר נוספות - הסקשן הראשון
-    2. כרטיסיות התראות - בחלק העליון
-    3. מערכת פילטרים ומיון מתקדמת
+    1. טבלת תכנונים (עיצובים) - הסקשן הראשון
+    2. טבלת חשבונות - הסקשן השני (נוסף לאחרונה)
+    3. כרטיסיות התראות - בחלק העליון
+    4. מערכת פילטרים ומיון מתקדמת
     
     מבנה הדף:
     - app-header: כותרת האפליקציה עם ניווט
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות התראות וסיכום נתונים
-      - content-section: טבלאות עזר
+      - content-section (1): טבלת תכנונים
+      - content-section (2): טבלת חשבונות
     
     שינויים אחרונים:
-    - יצירת דף חדש לטבלאות עזר
-    - שימוש בסגנונות של דף בסיס נתונים
-    - מערכת פילטרים מתקדמת
+    - שינוי שם מ"עיצובים" ל"תכנונים"
+    - הוספת טבלת חשבונות מלאים
+    - שיפור עיצוב כרטיסיות התראות
+    - תיקון כפתורי סגירה עצמאיים
+    - ריכוז פונקציות חשבונות ב-accounts.js
   -->
 
   <!-- CSS Files - Ordered by priority (weak to strong) -->
@@ -45,9 +49,6 @@
   <!-- 6. Header system styles (highest priority) -->
   <link rel="stylesheet" href="styles/header-system.css">
 
-  <!-- 7. Database page styles (for extra data tables) -->
-  <link rel="stylesheet" href="styles/database.css">
-
   <!-- Modular grid files - loaded at end of file -->
 </head>
 
@@ -66,10 +67,10 @@
         <!-- Main header -->
         <div class="section-header">
           <div class="table-title">
-            📊 טבלאות עזר
+            📋 כותרת ראשית
           </div>
           <div class="table-actions">
-            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור טבלאות עזר">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור עיצובים">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -81,10 +82,10 @@
 
           <!-- Data summary -->
           <div class="info-summary" id="summaryStats">
-            <div>סה"כ טבלאות: <strong id="totalTables">0</strong></div>
-            <div>סה"כ רשומות: <strong id="totalRecords">0</strong></div>
-            <div>טבלאות פעילות: <strong id="activeTables">0</strong></div>
-            <div>עדכון אחרון: <strong id="lastUpdate">-</strong></div>
+            <div>סה"כ תכנונים: <strong id="totalDesigns">0</strong></div>
+            <div>סה"כ השקעה: <strong id="totalInvestment">$0</strong></div>
+            <div>השקעה ממוצעת: <strong id="avgInvestment">$0</strong></div>
+            <div>רווח כולל: <strong id="totalProfit">$0</strong></div>
           </div>
         </div>
       </div> <!-- End top-section -->
@@ -94,91 +95,103 @@
 
         <!-- Designs area - content-section -->
         <div class="content-section">
-          <!-- Designs header -->
+          <!-- Currencies header -->
           <div class="section-header">
             <div class="table-title">
-              📊 טבלאות עזר
+              💱 מטבעות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">currencies</span>
             </div>
-            <div class="table-count">0 טבלאות</div>
+            <div class="table-count" id="currenciesCount">טוען...</div>
             <div class="table-actions">
-              <button class="refresh-btn" onclick="openExtraDataDetails()" title="הוסף טבלה חדשה">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleExtraDataSection()" title="הצג/הסתר אזור טבלאות עזר">
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור מטבעות">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
           </div>
 
-          <!-- Extra Data tables -->
+          <!-- Currencies table -->
           <div class="section-body">
-            <div class="table-responsive" id="extraDataContainer">
-              <table class="table" id="extraDataTable" data-table-type="extra-data">
+            <div class="table-responsive" id="currenciesContainer">
+              <table class="table" id="currenciesTable">
                 <thead>
                   <tr>
-                    <th>שם הטבלה<br><span class="header-subtitle">Table Name</span></th>
-                    <th>סוג<br><span class="header-subtitle">Type</span></th>
-                    <th>תיאור<br><span class="header-subtitle">Description</span></th>
-                    <th>מספר רשומות<br><span class="header-subtitle">Records</span></th>
-                    <th>סטטוס<br><span class="header-subtitle">Status</span></th>
-                    <th>נוצר ב<br><span class="header-subtitle">Created</span></th>
-                    <th>עודכן ב<br><span class="header-subtitle">Updated</span></th>
-                    <th class="actions-header">
-                      פעולות
-                      <br><span class="header-subtitle">Actions</span>
-                    </th>
+                    <th onclick="sortTable(0, 'currenciesTable')">Symbol (VARCHAR)</th>
+                    <th onclick="sortTable(1, 'currenciesTable')">Name (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'currenciesTable')">USD Rate (NUMERIC)</th>
+                    <th onclick="sortTable(3, 'currenciesTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(4, 'currenciesTable')">Created At (DATETIME)</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong><a href="#" onclick="openExtraDataDetails('1')" class="table-link">טבלת עזר
-                          1</a></strong></td>
-                    <td>reference</td>
-                    <td>טבלת עזר לנתונים נוספים</td>
-                    <td>150</td>
-                    <td><span class="status-badge status-open">פעיל</span></td>
+                    <td><strong><a href="#" onclick="openDesignDetails('8')" class="ticker-link">AAPL</a></strong></td>
                     <td>15.1.2025</td>
-                    <td>22.8.2025</td>
+                    <td>investment</td>
+                    <td>$25,000</td>
+                    <td>$200.00</td>
+                    <td>$170.00</td>
+                    <td>$0.00 (0.0%)</td>
+                    <td><span class="status-badge status-closed">סגור</span></td>
                     <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editExtraData('1')" title="ערוך">
+                      <button class="btn btn-sm btn-secondary" onclick="editDesign('8')" title="ערוך">
                         <span class="btn-icon">✏️</span>
                       </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteExtraData('1')" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteDesign('8')" title="מחק">X</button>
                     </td>
                   </tr>
 
                   <tr>
-                    <td><strong><a href="#" onclick="openExtraDataDetails('2')" class="table-link">טבלת עזר
-                          2</a></strong></td>
-                    <td>metadata</td>
-                    <td>טבלת מטא-דאטה</td>
-                    <td>75</td>
-                    <td><span class="status-badge status-open">פעיל</span></td>
+                    <td><strong><a href="#" onclick="openDesignDetails('9')" class="ticker-link">TSLA</a></strong></td>
                     <td>10.1.2025</td>
-                    <td>20.8.2025</td>
+                    <td>swing</td>
+                    <td>$30,000</td>
+                    <td>$250.00</td>
+                    <td>$200.00</td>
+                    <td>$0.00 (0.0%)</td>
+                    <td><span class="status-badge status-closed">סגור</span></td>
                     <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editExtraData('2')" title="ערוך">
+                      <button class="btn btn-sm btn-secondary" onclick="editDesign('9')" title="ערוך">
                         <span class="btn-icon">✏️</span>
                       </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteExtraData('2')" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteDesign('9')" title="מחק">X</button>
                     </td>
                   </tr>
 
                   <tr>
-                    <td><strong><a href="#" onclick="openExtraDataDetails('3')" class="table-link">טבלת עזר
-                          3</a></strong></td>
-                    <td>archive</td>
-                    <td>טבלת ארכיון</td>
-                    <td>300</td>
-                    <td><span class="status-badge status-closed">לא פעיל</span></td>
+                    <td><strong><a href="#" onclick="openDesignDetails('7')" class="ticker-link">TSLA</a></strong></td>
                     <td>15.8.2025</td>
-                    <td>18.8.2025</td>
+                    <td>short</td>
+                    <td>$10,000</td>
+                    <td>$750.00</td>
+                    <td>$900.00</td>
+                    <td>$0.00 (0.0%)</td>
+                    <td><span class="status-badge status-cancelled">מבוטל</span></td>
                     <td class="actions-cell">
-                      <button class="btn btn-sm btn-secondary" onclick="editExtraData('3')" title="ערוך">
+                      <button class="btn btn-sm btn-secondary" onclick="editDesign('7')" title="ערוך">
                         <span class="btn-icon">✏️</span>
                       </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteExtraData('3')" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteDesign('7')" title="מחק">X</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><strong><a href="#" onclick="openDesignDetails('6')" class="ticker-link">MSFT</a></strong></td>
+                    <td>15.8.2025</td>
+                    <td>long</td>
+                    <td>$8,000</td>
+                    <td>$380.00</td>
+                    <td>$300.00</td>
+                    <td>$0.00 (0.0%)</td>
+                    <td><span class="status-badge status-cancelled">מבוטל</span></td>
+                    <td class="actions-cell">
+                      <button class="btn btn-sm btn-secondary" onclick="editDesign('6')" title="ערוך">
+                        <span class="btn-icon">✏️</span>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteDesign('6')" title="מחק">X</button>
                     </td>
                   </tr>
 
@@ -375,15 +388,15 @@
     <script src="scripts/header-system.js"></script>
     <script src="scripts/account-modal.js"></script>
     <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/db_extradata.js"></script>
+    <script src="scripts/designs.js"></script>
 
     <!-- Page initialization -->
     <script>
       // Page initialization
       document.addEventListener('DOMContentLoaded', function () {
-        console.log('🔄 Initializing extra data page...');
-        if (typeof initializeExtraDataPage === 'function') {
-          initializeExtraDataPage();
+        console.log('🔄 Initializing designs page...');
+        if (typeof initializeDesignsPage === 'function') {
+          initializeDesignsPage();
         }
       });
     </script>

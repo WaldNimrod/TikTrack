@@ -4,67 +4,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>תחקיר - Tik.track</title>
+    <title>Research - Tik.track</title>
 
     <!-- 
-    ===== דף תחקיר - TikTrack =====
+    ===== Research Page - TikTrack =====
     
-    דף זה מכיל:
-    1. טבלת חשבונות - הסקשן הראשון
-    2. טבלת טריידים - הסקשן השני
-    3. כרטיסיות התראות - בחלק העליון
-    4. מערכת פילטרים ומיון מתקדמת
+    This page contains:
+    1. Accounts table - First section
+    2. Trades table - Second section
+    3. Alert cards - In the upper part
+    4. Advanced filtering and sorting system
     
-    מבנה הדף:
-    - app-header: כותרת האפליקציה עם ניווט
-    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
-      - top-section: כרטיסיות התראות וסיכום נתונים
-      - content-section (1): טבלת חשבונות
-      - content-section (2): טבלת טריידים
+    Page structure:
+    - app-header: Application header with navigation
+    - page-body: Main content limited in width (1400px)
+      - top-section: Alert cards and data summary
+      - content-section (1): Accounts table
+      - content-section (2): Trades table
     
-    שינויים אחרונים:
-    - יצירת דף תחקיר חדש כשיכפול של עמוד העיצובים
-    - תוכן דמה ללא חיבור לבסיס נתונים
-    - הוספת טבלת חשבונות מלאים
-    - שיפור עיצוב כרטיסיות התראות
-    - תיקון כפתורי סגירה עצמאיים
-    - ריכוז פונקציות חשבונות ב-accounts.js
-    - שינוי סדר: חשבונות לפני טריידים
+    Recent changes:
+    - Creating new research page as copy of designs page
+    - Dummy content without database connection
+    - Adding complete accounts table
+    - Improving alert cards design
+    - Fixing independent close buttons
+    - Centralizing account functions in accounts.js
+    - Changing order: accounts before trades
   -->
 
-    <!-- Apple Theme CSS - בסיס כללי -->
+    <!-- Apple Theme CSS - General base -->
     <link rel="stylesheet" href="styles/apple-theme.css">
 
-    <!-- Main Styles - סגנונות הפרויקט -->
+    <!-- Main Styles - Project styles -->
     <link rel="stylesheet" href="styles/styles.css">
 
-    <!-- Menu CSS - תפריט -->
+    <!-- Menu CSS - Menu -->
     <link rel="stylesheet" href="styles/menu.css">
 
-    <!-- Grid Table CSS - טבלאות וגרידים -->
+    <!-- Grid Table CSS - Tables and grids -->
     <link rel="stylesheet" href="styles/grid-table.css">
 
-    <!-- Typography CSS - טיפוגרפיה ופונטים -->
+    <!-- Typography CSS - Typography and fonts -->
     <link rel="stylesheet" href="styles/typography.css">
 
-    <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+    <!-- Bootstrap CSS - Loaded last to avoid overriding custom settings -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- קבצים מודולריים של הגריד - נטענים בסוף הקובץ -->
+    <!-- Modular grid files - loaded at end of file -->
 </head>
 
 <body>
-    <!-- רקע כללי -->
+    <!-- General background -->
     <div class="background-wrapper">
 
-        <!-- כותרת האפליקציה -->
+        <!-- Application header -->
         <app-header></app-header>
 
-        <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+        <!-- Page body - All content after header -->
         <div class="page-body">
-            <!-- אזור תחקיר - top-Section -->
+            <!-- Research area - top-Section -->
             <div class="top-section">
-                <!-- כותרת ראשית -->
+                <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
                         🔍 תחקיר
@@ -76,11 +76,11 @@
                     </div>
                 </div>
 
-                <!-- כרטיסיות התראות -->
+                <!-- Alert cards -->
                 <div class="section-body">
                     <active-alerts></active-alerts>
 
-                    <!-- סיכום נתונים -->
+                    <!-- Data summary -->
                     <div class="info-summary" id="summaryStats">
                         <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
                         <div>טריידים פתוחים: <strong id="openTrades">0</strong></div>
@@ -88,14 +88,14 @@
                         <div>רווח/הפסד כולל: <strong id="totalPL">$0</strong></div>
                     </div>
                 </div>
-            </div> <!-- סוף top-section -->
+            </div> <!-- End top-section -->
 
-            <!-- תוכן ראשי -->
+            <!-- Main content -->
             <div class="main-content">
 
-                <!-- האלמנט הראשון - טבלת חשבונות -->
+                <!-- First element - Accounts table -->
                 <div class="content-section">
-                    <!-- כותרת חשבונות -->
+                    <!-- Accounts header -->
                     <div class="section-header">
                         <div class="table-title">
                             💰 חשבונות
@@ -113,7 +113,7 @@
                         </div>
                     </div>
 
-                    <!-- טבלת חשבונות -->
+                    <!-- Accounts table -->
                     <div class="section-body">
                         <div class="table-responsive">
                             <table class="table">
@@ -185,9 +185,9 @@
                     </div>
                 </div>
 
-                <!-- האלמנט השני - טבלת טריידים -->
+                <!-- Second element - Trades table -->
                 <div class="content-section">
-                    <!-- כותרת טריידים -->
+                    <!-- Trades header -->
                     <div class="section-header">
                         <div class="table-title">
                             📈 הטריידים שלי<br><span
@@ -212,7 +212,7 @@
                         </div>
                     </div>
 
-                    <!-- טבלת טריידים -->
+                    <!-- Trades table -->
                     <div class="section-body">
                         <div class="table-responsive" id="tradesContainer">
                             <table class="table" id="tradesTable" data-table-type="trades">
@@ -304,23 +304,23 @@
                     </div>
                 </div>
             </div>
-        </div> <!-- סוף page-body -->
+        </div> <!-- End page-body -->
 
-        <!-- מרווח בתחתית הדף -->
+        <!-- Bottom page spacing -->
         <div class="bottom-spacer"></div>
 
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-        <!-- קבצים מודולריים -->
+        <!-- Modular files -->
         <script src="scripts/app-header.js"></script>
         <script src="scripts/account-modal.js"></script>
         <script src="scripts/trades.js"></script>
         <script src="scripts/research.js"></script>
 
-        <!-- ניקוי הודעות קונסולה -->
+        <!-- Console message cleanup -->
         <script>
-            // ניקוי הודעות קונסולה אחרי זמן קצר
+            // Clear console messages after short time
             setTimeout(() => {
                 console.log('🧹 Clearing console messages to reduce clutter...');
                 if (console.clear) {
@@ -328,9 +328,9 @@
                 }
             }, 25000);
 
-            // אתחול הדף
+            // Page initialization
             document.addEventListener('DOMContentLoaded', function () {
-                console.log('🔄 אתחול דף תחקיר...');
+                console.log('🔄 Initializing research page...');
                 if (typeof initializeResearchPage === 'function') {
                     initializeResearchPage();
                 }

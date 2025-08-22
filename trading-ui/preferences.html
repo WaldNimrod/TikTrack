@@ -7,74 +7,74 @@
   <title>העדפות - Tik.track</title>
 
   <!-- 
-    ===== דף העדפות - TikTrack =====
+    ===== User Preferences Page - TikTrack =====
     
-    ⚠️  חשוב: זהו דף העדפות המשתמש בלבד!
+    ⚠️  Important: This is a user preferences page only!
     
-    אין קשר לקונפיגורציות השרת או מערכת הבדיקות!
+    No relation to server configurations or testing system!
     
-    🎯 מטרה: ממשק משתמש להגדרת העדפות אישיות
-    📍 מיקום: trading-ui/preferences.html
-    🔗 קונפיגורציות שרת: Backend/SERVER_CONFIGURATIONS.md
-    🔗 מערכת הבדיקות: Backend/testing_suite/
+    🎯 Purpose: User interface for setting personal preferences
+    📍 Location: trading-ui/preferences.html
+    🔗 Server Configurations: Backend/SERVER_CONFIGURATIONS.md
+    🔗 Testing System: Backend/testing_suite/
     
-    דף זה מכיל:
-    1. הגדרות מערכת - הסקשן הראשון
-    2. מערכת בדיקות - הסקשן השני (ממשק להרצת בדיקות)
-    3. הגדרות אישיות - הסקשן השלישי
-    4. הגדרות אבטחה - הסקשן הרביעי
-    5. הגדרות תצוגה - הסקשן החמישי
+    This page contains:
+    1. System Settings - First section
+    2. Testing System - Second section (interface for running tests)
+    3. Personal Settings - Third section
+    4. Security Settings - Fourth section
+    5. Display Settings - Fifth section
     
-    מבנה הדף:
-    - app-header: כותרת האפליקציה עם ניווט
-    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
-      - top-section: סיכום הגדרות
-      - content-section (1): הגדרות מערכת
-      - content-section (2): מערכת בדיקות (ממשק משתמש)
-      - content-section (3): הגדרות אישיות
-      - content-section (4): הגדרות אבטחה
-      - content-section (5): הגדרות תצוגה
+    Page structure:
+    - app-header: Application header with navigation
+    - page-body: Main content limited in width (1400px)
+      - top-section: Settings summary
+      - content-section (1): System settings
+      - content-section (2): Testing system (user interface)
+      - content-section (3): Personal settings
+      - content-section (4): Security settings
+      - content-section (5): Display settings
     
-    🚫 מה לא נמצא כאן:
-    - ❌ קונפיגורציות שרת
-    - ❌ הגדרות סביבת פיתוח
-    - ❌ סקריפטי הפעלת שרת
-    - ❌ קבצי בדיקות עצמם
+    🚫 What's not here:
+    - ❌ Server configurations
+    - ❌ Development environment settings
+    - ❌ Server startup scripts
+    - ❌ Test files themselves
   -->
 
-  <!-- Apple Theme CSS - בסיס כללי -->
+  <!-- Apple Theme CSS - General base -->
   <link rel="stylesheet" href="styles/apple-theme.css">
 
-  <!-- Main Styles - סגנונות הפרויקט -->
+  <!-- Main Styles - Project styles -->
   <link rel="stylesheet" href="styles/styles.css">
 
-  <!-- Menu CSS - תפריט -->
+  <!-- Menu CSS - Menu -->
   <link rel="stylesheet" href="styles/menu.css">
 
-  <!-- Table CSS - טבלאות -->
+  <!-- Table CSS - Tables -->
   <link rel="stylesheet" href="styles/table.css">
 
-  <!-- Typography CSS - טיפוגרפיה ופונטים -->
+  <!-- Typography CSS - Typography and fonts -->
   <link rel="stylesheet" href="styles/typography.css">
 
-  <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+  <!-- Bootstrap CSS - Loaded last to avoid overriding custom settings -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-    /* ===== סגנונות לממשק העדפות ===== */
+    /* ===== Styles for preferences interface ===== */
 
     /**
-     * מיכל ראשי לכל ההעדפות
-     * מספק מרווחים ואת המבנה הבסיסי
+     * Main container for all preferences
+     * Provides spacing and basic structure
      */
     .preferences-container {
       padding: 1rem 0;
     }
 
     /**
-     * פריט העדפה בודד
-     * מכיל את התיאור ואת אלמנט הבקרה
-     * כולל אפקטי hover ואנימציות
+     * Single preference item
+     * Contains description and control element
+     * Includes hover effects and animations
      */
     .preference-item {
       display: flex;
@@ -89,8 +89,8 @@
     }
 
     /**
-     * אפקט hover לפריט העדפה
-     * מעלה את הפריט ומציג צל
+     * Hover effect for preference item
+     * Lifts the item and shows shadow
      */
     .preference-item:hover {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -98,8 +98,8 @@
     }
 
     /**
-     * תווית ההעדפה - הצד השמאלי
-     * מכיל את האייקון והטקסט
+     * Preference label - Left side
+     * Contains icon and text
      */
     .preference-label {
       display: flex;
@@ -109,8 +109,8 @@
     }
 
     /**
-     * אייקון ההעדפה
-     * עיגול צבעוני עם אייקון אמוג'י
+     * Preference icon
+     * Colored circle with emoji icon
      */
     .preference-icon {
       font-size: 1.5rem;
@@ -125,8 +125,8 @@
     }
 
     /**
-     * כותרת ההעדפה
-     * טקסט גדול ומודגש
+     * Preference title
+     * Large and bold text
      */
     .preference-text h4 {
       margin: 0;
@@ -136,8 +136,8 @@
     }
 
     /**
-     * תיאור ההעדפה
-     * טקסט קטן יותר בצבע משני
+     * Preference description
+     * Smaller text in secondary color
      */
     .preference-text p {
       margin: 0.25rem 0 0 0;
@@ -146,16 +146,16 @@
     }
 
     /**
-     * מיכל אלמנט הבקרה - הצד הימני
-     * מספק רוחב מינימלי לאלמנטי הבקרה
+     * Control element container - Right side
+     * Provides minimum width for control elements
      */
     .preference-control {
       min-width: 200px;
     }
 
     /**
-     * אלמנט בחירה (select)
-     * עיצוב מותאם לסגנון Apple
+     * Selection element (select)
+     * Design adapted to Apple style
      */
     .preference-control .form-select {
       border: 1px solid #e8e8e8;
@@ -167,8 +167,8 @@
     }
 
     /**
-     * מצב focus לאלמנט הבחירה
-     * מציג מסגרת בצבע האקצנט של הפרויקט
+     * Focus state for selection element
+     * Displays border in project accent color
      */
     .preference-control .form-select:focus {
       border-color: var(--apple-accent);
@@ -177,16 +177,16 @@
     }
 
     /**
-     * אפשרויות בחירה
-     * מרווחים נוחים לאפשרויות
+     * Selection options
+     * Comfortable spacing for options
      */
     .preference-control .form-select option {
       padding: 0.5rem;
     }
 
     /**
-     * מצב טעינה לפריט העדפה
-     * מקטין שקיפות ומבטל אינטראקציה
+     * Loading state for preference item
+     * Reduces opacity and disables interaction
      */
     .preference-item.loading {
       opacity: 0.7;
@@ -194,8 +194,8 @@
     }
 
     /**
-     * ספינר טעינה
-     * מופיע בצד ימין של אלמנט הבקרה במצב טעינה
+     * Loading spinner
+     * Appears on the right side of control element in loading state
      */
     .preference-item.loading .preference-control::after {
       content: "⏳";
@@ -207,8 +207,8 @@
     }
 
     /**
-     * אנימציית סיבוב לספינר
-     * מסובב את הספינר 360 מעלות
+     * Spinner rotation animation
+     * Rotates the spinner 360 degrees
      */
     @keyframes spin {
       0% {
@@ -220,7 +220,7 @@
       }
     }
 
-    /* ===== סגנונות לממשק בדיקות ===== */
+    /* ===== Testing Interface Styles ===== */
 
     .test-category {
       background: #f8f9fa;
@@ -512,7 +512,7 @@
       background-color: #f8d7da;
     }
 
-    /* סגנונות לאזור תוצאות בדיקות */
+    /* Styles for test results area */
     .test-results-header {
       display: flex;
       justify-content: space-between;
@@ -681,7 +681,7 @@
       word-wrap: break-word;
     }
 
-    /* כפתורי קטגוריה */
+    /* Category buttons */
     .category-header {
       display: flex;
       justify-content: space-between;
@@ -727,7 +727,7 @@
       transform: rotate(180deg);
     }
 
-    /* מצב כבוי */
+    /* Off state */
     .category-toggle-btn.off {
       background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
       box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
@@ -737,7 +737,7 @@
       box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
     }
 
-    /* מצב מופעל */
+    /* On state */
     .category-toggle-btn.on {
       background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
       box-shadow: 0 2px 8px rgba(81, 207, 102, 0.3);
@@ -747,7 +747,7 @@
       box-shadow: 0 4px 12px rgba(81, 207, 102, 0.4);
     }
 
-    /* כפתורי פעולה בסוף חלק ניהול בדיקות */
+    /* Action buttons at end of testing management section */
     .action-buttons {
       display: flex;
       gap: 15px;
@@ -792,7 +792,7 @@
       font-weight: 600;
     }
 
-    /* כפתור שמירה */
+    /* Save button */
     .action-btn.save-btn {
       background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
       color: white;
@@ -803,7 +803,7 @@
       box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
     }
 
-    /* כפתור הרצה */
+    /* Run button */
     .action-btn.run-btn {
       background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
       color: white;
@@ -826,7 +826,7 @@
       box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
     }
 
-    /* כפתור איפוס */
+    /* Reset button */
     .action-btn.reset-btn {
       background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
       color: #212529;
@@ -837,7 +837,7 @@
       box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
     }
 
-    /* כפתור סגירה באזור תוצאות */
+    /* Close button in results area */
     .test-results-header .btn {
       display: flex;
       align-items: center;
@@ -859,21 +859,21 @@
     }
   </style>
 
-  <!-- קבצים מודולריים של הגריד -->
+  <!-- Modular grid files -->
 </head>
 
 <body>
-  <!-- רקע כללי -->
+  <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- כותרת האפליקציה -->
+    <!-- Application header -->
     <app-header></app-header>
 
-    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <!-- Page body - All content after header -->
     <div class="page-body">
-      <!-- אזור סיכום - top-Section -->
+      <!-- Summary area - top-Section -->
       <div class="top-section">
-        <!-- כותרת סיכום -->
+        <!-- Summary header -->
         <div class="section-header">
           <div class="table-title">
             ⚙️ העדפות והגדרות
@@ -889,20 +889,20 @@
           </div>
         </div>
 
-        <!-- סיכום הגדרות -->
+        <!-- Settings summary -->
         <div class="section-body">
           <div class="preferences-summary">
-            <!-- סיכום ההגדרות יוכנס כאן דינמית -->
+            <!-- Settings summary will be inserted here dynamically -->
           </div>
         </div>
-      </div> <!-- סוף top-section -->
+      </div> <!-- End top-section -->
 
-      <!-- תוכן ראשי -->
+      <!-- Main content -->
       <div class="main-content">
 
-        <!-- אזור הגדרות מערכת - content-section -->
+        <!-- System settings area - content-section -->
         <div class="content-section">
-          <!-- כותרת הגדרות מערכת -->
+          <!-- System settings header -->
           <div class="section-header">
             <div class="table-title">
               🔧 הגדרות מערכת
@@ -922,10 +922,10 @@
             </div>
           </div>
 
-          <!-- תוכן הגדרות מערכת -->
+          <!-- System settings content -->
           <div class="section-body">
             <div class="preferences-container">
-              <!-- הגדרת מטבע ראשי -->
+              <!-- Primary currency setting -->
               <div class="preference-item">
                 <div class="preference-label">
                   <span class="preference-icon">💰</span>
@@ -943,7 +943,7 @@
                 </div>
               </div>
 
-              <!-- הגדרת אזור זמן -->
+              <!-- Timezone setting -->
               <div class="preference-item">
                 <div class="preference-label">
                   <span class="preference-icon">🌍</span>
@@ -971,9 +971,9 @@
 
 
 
-        <!-- אזור הגדרות אישיות - content-section -->
+        <!-- Personal settings area - content-section -->
         <div class="content-section">
-          <!-- כותרת הגדרות אישיות -->
+          <!-- Personal settings header -->
           <div class="section-header">
             <div class="table-title">
               👤 הגדרות אישיות
@@ -993,10 +993,10 @@
             </div>
           </div>
 
-          <!-- תוכן הגדרות אישיות -->
+          <!-- Personal settings content -->
           <div class="section-body">
             <div class="preferences-container">
-              <!-- הגדרת סטופ ברירת מחדל -->
+              <!-- Default stop loss setting -->
               <div class="preference-item">
                 <div class="preference-label">
                   <span class="preference-icon">🛑</span>
@@ -1014,13 +1014,13 @@
                 </div>
               </div>
 
-              <!-- הגדרת מחיר יעד ברירת מחדל -->
+              <!-- Default target price setting -->
               <div class="preference-item">
                 <div class="preference-label">
                   <span class="preference-icon">🎯</span>
                   <div class="preference-text">
-                    <h4>מחיר יעד ברירת מחדל</h4>
-                    <p>אחוז מחיר היעד ברירת המחדל לטריידים חדשים</p>
+                    <h4>Default Target Price</h4>
+                    <p>Default target price percentage for new trades</p>
                   </div>
                 </div>
                 <div class="preference-control">
@@ -1035,78 +1035,80 @@
           </div>
         </div>
 
-        <!-- אזור הגדרות אבטחה - content-section -->
+        <!-- Security settings area - content-section -->
         <div class="content-section">
-          <!-- כותרת הגדרות אבטחה -->
+          <!-- Security settings header -->
           <div class="section-header">
             <div class="table-title">
-              🔒 הגדרות אבטחה
+              🔒 Security Settings
             </div>
 
             <div class="table-actions">
-              <button class="refresh-btn" onclick="resetSecurityPreferences()" title="אפס הגדרות אבטחה">
-                <span class="action-icon">🔄</span> אפס
+              <button class="refresh-btn" onclick="resetSecurityPreferences()" title="Reset security settings">
+                <span class="action-icon">🔄</span> Reset
               </button>
-              <button class="refresh-btn" onclick="saveSecurityPreferences()" title="שמור הגדרות אבטחה">
-                <span class="action-icon">💾</span> שמור
+              <button class="refresh-btn" onclick="saveSecurityPreferences()" title="Save security settings">
+                <span class="action-icon">💾</span> Save
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleSecuritySection()" title="הצג/הסתר אזור הגדרות אבטחה">
+              <button class="filter-toggle-btn" onclick="toggleSecuritySection()"
+                title="Show/hide security settings area">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
           </div>
 
-          <!-- תוכן הגדרות אבטחה -->
+          <!-- Security settings content -->
           <div class="section-body">
             <div class="preferences-container">
               <div class="coming-soon-message">
                 <h3 style="text-align: center; color: #6c757d; margin: 2rem 0;">
-                  🔒 יעודכן בהמשך
+                  🔒 Coming Soon
                 </h3>
                 <p style="text-align: center; color: #6c757d; font-size: 1.1rem; margin-bottom: 2rem;">
-                  הגדרות אבטחה יותקנו ויעודכנו בגרסה הבאה של המערכת
+                  Security settings will be configured and updated in the next version of the system
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- אזור הגדרות תצוגה - content-section -->
+        <!-- Display settings area - content-section -->
         <div class="content-section">
-          <!-- כותרת הגדרות תצוגה -->
+          <!-- Display settings header -->
           <div class="section-header">
             <div class="table-title">
-              🎨 הגדרות תצוגה
+              🎨 Display Settings
             </div>
 
             <div class="table-actions">
-              <button class="refresh-btn" onclick="resetDisplayPreferences()" title="אפס הגדרות תצוגה">
-                <span class="action-icon">🔄</span> אפס
+              <button class="refresh-btn" onclick="resetDisplayPreferences()" title="Reset display settings">
+                <span class="action-icon">🔄</span> Reset
               </button>
-              <button class="refresh-btn" onclick="saveDisplayPreferences()" title="שמור הגדרות תצוגה">
-                <span class="action-icon">💾</span> שמור
+              <button class="refresh-btn" onclick="saveDisplayPreferences()" title="Save display settings">
+                <span class="action-icon">💾</span> Save
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleDisplaySection()" title="הצג/הסתר אזור הגדרות תצוגה">
+              <button class="filter-toggle-btn" onclick="toggleDisplaySection()"
+                title="Show/hide display settings area">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
           </div>
 
-          <!-- תוכן הגדרות תצוגה -->
+          <!-- Display settings content -->
           <div class="section-body">
             <div class="preferences-container">
-              <!-- הגדרות ברירות מחדל לפילטרים -->
-              <h5 style="margin-bottom: 1.5rem; color: #495057; font-weight: 600;">🔍 ברירות מחדל לפילטרים</h5>
+              <!-- Default filter settings -->
+              <h5 style="margin-bottom: 1.5rem; color: #495057; font-weight: 600;">🔍 Default Filter Settings</h5>
 
-              <!-- פילטר סטטוס ברירת מחדל -->
+              <!-- Default status filter -->
               <div class="preference-item">
                 <div class="preference-label">
                   <span class="preference-icon">📊</span>
                   <div class="preference-text">
-                    <h4>פילטר סטטוס ברירת מחדל</h4>
-                    <p>בחר איזה סטטוס יוצג כברירת מחדל בפילטרים</p>
+                    <h4>Default Status Filter</h4>
+                    <p>Choose which status will be displayed by default in filters</p>
                   </div>
                 </div>
                 <div class="preference-control">
@@ -1120,13 +1122,13 @@
                 </div>
               </div>
 
-              <!-- פילטר סוג ברירת מחדל -->
+              <!-- Default type filter -->
               <div class="preference-item">
                 <div class="preference-label">
                   <span class="preference-icon">🏷️</span>
                   <div class="preference-text">
-                    <h4>פילטר סוג ברירת מחדל</h4>
-                    <p>בחר איזה סוג יוצג כברירת מחדל בפילטרים</p>
+                    <h4>Default Type Filter</h4>
+                    <p>Choose which type will be displayed by default in filters</p>
                   </div>
                 </div>
                 <div class="preference-control">
@@ -1140,31 +1142,31 @@
                 </div>
               </div>
 
-              <!-- פילטר חשבונות ברירת מחדל -->
+              <!-- Default account filter -->
               <div class="preference-item">
                 <div class="preference-label">
                   <span class="preference-icon">🏦</span>
                   <div class="preference-text">
-                    <h4>פילטר חשבונות ברירת מחדל</h4>
-                    <p>בחר איזה חשבון יוצג כברירת מחדל בפילטרים</p>
+                    <h4>Default Account Filter</h4>
+                    <p>Choose which account will be displayed by default in filters</p>
                   </div>
                 </div>
                 <div class="preference-control">
                   <select id="defaultAccountFilterSelect" class="form-select"
                     onchange="updateDefaultAccountFilter(this.value)">
-                    <option value="all">הכול</option>
-                    <!-- החשבונות יטענו דינמית -->
+                    <option value="all">All</option>
+                    <!-- Accounts will be loaded dynamically -->
                   </select>
                 </div>
               </div>
 
-              <!-- פילטר טווח תאריכים ברירת מחדל -->
+              <!-- Default date range filter -->
               <div class="preference-item">
                 <div class="preference-label">
                   <span class="preference-icon">📅</span>
                   <div class="preference-text">
-                    <h4>פילטר טווח תאריכים ברירת מחדל</h4>
-                    <p>בחר איזה טווח תאריכים יוצג כברירת מחדל</p>
+                    <h4>Default Date Range Filter</h4>
+                    <p>Choose which date range will be displayed by default</p>
                   </div>
                 </div>
                 <div class="preference-control">
@@ -1184,18 +1186,18 @@
                 </div>
               </div>
 
-              <!-- פילטר חיפוש ברירת מחדל -->
+              <!-- Default search filter -->
               <div class="preference-item">
                 <div class="preference-label">
                   <span class="preference-icon">🔎</span>
                   <div class="preference-text">
-                    <h4>טקסט חיפוש ברירת מחדל</h4>
-                    <p>הגדר טקסט חיפוש שיופיע כברירת מחדל (אופציונלי)</p>
+                    <h4>Default Search Text</h4>
+                    <p>Set search text that will appear by default (optional)</p>
                   </div>
                 </div>
                 <div class="preference-control">
                   <input type="text" id="defaultSearchFilterInput" class="form-control"
-                    onchange="updateDefaultSearchFilter(this.value)" placeholder="השאר ריק עבור חיפוש ריק">
+                    onchange="updateDefaultSearchFilter(this.value)" placeholder="Leave empty for blank search">
                 </div>
               </div>
 
@@ -1203,63 +1205,64 @@
           </div>
         </div>
 
-        <!-- אזור ניהול בדיקות - content-section -->
+        <!-- Testing management area - content-section -->
         <div class="content-section">
-          <!-- כותרת ניהול בדיקות -->
+          <!-- Testing management header -->
           <div class="section-header">
             <div class="table-title">
-              🧪 ניהול בדיקות
+              🧪 Testing Management
             </div>
 
             <div class="table-actions">
-              <button class="refresh-btn" onclick="runSelectedTests()" title="הרץ בדיקות נבחרות">
-                <span class="action-icon">▶️</span> הרץ בדיקות
+              <button class="refresh-btn" onclick="runSelectedTests()" title="Run selected tests">
+                <span class="action-icon">▶️</span> Run Tests
               </button>
-              <button class="refresh-btn" onclick="saveTestPreferences()" title="שמור העדפות בדיקות">
-                <span class="action-icon">💾</span> שמור
+              <button class="refresh-btn" onclick="saveTestPreferences()" title="Save test preferences">
+                <span class="action-icon">💾</span> Save
               </button>
-              <button class="refresh-btn" onclick="resetTestPreferences()" title="רענן לברירות מחדל">
-                <span class="action-icon">🔄</span> רענן
+              <button class="refresh-btn" onclick="resetTestPreferences()" title="Reset to defaults">
+                <span class="action-icon">🔄</span> Reset
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleTestingSection()" title="הצג/הסתר אזור ניהול בדיקות">
+              <button class="filter-toggle-btn" onclick="toggleTestingSection()"
+                title="Show/hide testing management area">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
           </div>
 
-          <!-- תוכן ניהול בדיקות -->
+          <!-- Testing management content -->
           <div class="section-body">
-            <!-- סיכום בדיקות -->
+            <!-- Test summary -->
             <div class="test-summary">
-              <h3><i class="fas fa-chart-bar"></i> סיכום בדיקות</h3>
+              <h3><i class="fas fa-chart-bar"></i> Test Summary</h3>
               <div class="summary-stats">
                 <div class="stat-item">
                   <div class="stat-number" id="totalTests">0</div>
-                  <div class="stat-label">סה"כ בדיקות</div>
+                  <div class="stat-label">Total Tests</div>
                 </div>
                 <div class="stat-item">
                   <div class="stat-number" id="activeTests">0</div>
-                  <div class="stat-label">בדיקות פעילות</div>
+                  <div class="stat-label">Active Tests</div>
                 </div>
                 <div class="stat-item">
                   <div class="stat-number" id="inactiveTests">0</div>
-                  <div class="stat-label">בדיקות כבויות</div>
+                  <div class="stat-label">Inactive Tests</div>
                 </div>
                 <div class="stat-item">
                   <div class="stat-number" id="testCategories">0</div>
-                  <div class="stat-label">קטגוריות בדיקות</div>
+                  <div class="stat-label">Test Categories</div>
                 </div>
               </div>
             </div>
 
-            <!-- הגדרות בסיס נתונים -->
+            <!-- Database settings -->
             <div class="settings-section">
-              <h3><i class="fas fa-database"></i> הגדרות בסיס נתונים</h3>
+              <h3><i class="fas fa-database"></i> Database Settings</h3>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">שימוש בבסיס נתונים זמני</div>
-                  <div class="setting-description">יצירת העתק של בסיס הנתונים לבדיקות</div>
+                  <div class="setting-label">Use Temporary Database</div>
+                  <div class="setting-description">Create a copy of the database for testing</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="useTempDatabase" checked>
@@ -1268,8 +1271,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">גיבוי לפני בדיקות</div>
-                  <div class="setting-description">יצירת גיבוי אוטומטי לפני הרצת בדיקות</div>
+                  <div class="setting-label">Backup Before Tests</div>
+                  <div class="setting-description">Create automatic backup before running tests</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="backupBeforeTests" checked>
@@ -1278,8 +1281,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">ניקוי אחרי בדיקות</div>
-                  <div class="setting-description">מחיקת קבצים זמניים אחרי בדיקות</div>
+                  <div class="setting-label">Cleanup After Tests</div>
+                  <div class="setting-description">Delete temporary files after tests</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="cleanupAfterTests" checked>
@@ -1288,13 +1291,13 @@
               </div>
             </div>
 
-            <!-- הגדרות הרצה -->
+            <!-- Execution settings -->
             <div class="settings-section">
-              <h3><i class="fas fa-play-circle"></i> הגדרות הרצה</h3>
+              <h3><i class="fas fa-play-circle"></i> Execution Settings</h3>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">בדיקות מקבילות</div>
-                  <div class="setting-description">הרצת בדיקות במקביל לביצועים טובים יותר</div>
+                  <div class="setting-label">Parallel Tests</div>
+                  <div class="setting-description">Run tests in parallel for better performance</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="parallelTests">
@@ -1303,8 +1306,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">הצגת התקדמות</div>
-                  <div class="setting-description">הצגת התקדמות בזמן הרצת בדיקות</div>
+                  <div class="setting-label">Show Progress</div>
+                  <div class="setting-description">Show progress during test execution</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="showProgress" checked>
@@ -1313,8 +1316,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">עצירה על שגיאה</div>
-                  <div class="setting-description">עצירת הבדיקות כאשר מתגלה שגיאה ראשונה</div>
+                  <div class="setting-label">Stop on Error</div>
+                  <div class="setting-description">Stop tests when first error is detected</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="stopOnError">
@@ -1323,13 +1326,13 @@
               </div>
             </div>
 
-            <!-- הגדרות דיווח -->
+            <!-- Reporting settings -->
             <div class="settings-section">
-              <h3><i class="fas fa-file-alt"></i> הגדרות דיווח</h3>
+              <h3><i class="fas fa-file-alt"></i> Reporting Settings</h3>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">יצירת דוח מפורט</div>
-                  <div class="setting-description">יצירת דוח מפורט עם כל הפרטים</div>
+                  <div class="setting-label">Create Detailed Report</div>
+                  <div class="setting-description">Create detailed report with all details</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="detailedReport" checked>
@@ -1338,8 +1341,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">שמירת דוחות</div>
-                  <div class="setting-description">שמירת דוחות בדיקות לקבצים</div>
+                  <div class="setting-label">Save Reports</div>
+                  <div class="setting-description">Save test reports to files</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="saveReports" checked>
@@ -1348,8 +1351,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">דוח HTML</div>
-                  <div class="setting-description">יצירת דוח בפורמט HTML</div>
+                  <div class="setting-label">HTML Report</div>
+                  <div class="setting-description">Create report in HTML format</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="htmlReport" checked>
@@ -1358,13 +1361,13 @@
               </div>
             </div>
 
-            <!-- הגדרות התראות -->
+            <!-- Notification settings -->
             <div class="settings-section">
-              <h3><i class="fas fa-bell"></i> הגדרות התראות</h3>
+              <h3><i class="fas fa-bell"></i> Notification Settings</h3>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">התראות על שגיאות</div>
-                  <div class="setting-description">הצגת התראות כאשר מתגלות שגיאות בבדיקות</div>
+                  <div class="setting-label">Error Notifications</div>
+                  <div class="setting-description">Show notifications when errors are detected in tests</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="errorNotifications" checked>
@@ -1373,8 +1376,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">התראות על הצלחה</div>
-                  <div class="setting-description">הצגת התראות כאשר כל הבדיקות עוברות בהצלחה</div>
+                  <div class="setting-label">Success Notifications</div>
+                  <div class="setting-description">Show notifications when all tests pass successfully</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="successNotifications" checked>
@@ -1383,13 +1386,13 @@
               </div>
             </div>
 
-            <!-- הגדרות ביצועים -->
+            <!-- Performance settings -->
             <div class="settings-section">
-              <h3><i class="fas fa-tachometer-alt"></i> הגדרות ביצועים</h3>
+              <h3><i class="fas fa-tachometer-alt"></i> Performance Settings</h3>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">מדידת זמן</div>
-                  <div class="setting-description">מדידת זמן הרצה לכל בדיקה</div>
+                  <div class="setting-label">Time Measurement</div>
+                  <div class="setting-description">Measure execution time for each test</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="measureTime" checked>
@@ -1398,8 +1401,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">מדידת זיכרון</div>
-                  <div class="setting-description">מדידת שימוש בזיכרון במהלך הבדיקות</div>
+                  <div class="setting-label">Memory Measurement</div>
+                  <div class="setting-description">Measure memory usage during tests</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="measureMemory">
@@ -1408,13 +1411,13 @@
               </div>
             </div>
 
-            <!-- הגדרות אבטחה -->
+            <!-- Security settings -->
             <div class="settings-section">
-              <h3><i class="fas fa-shield-alt"></i> הגדרות אבטחה</h3>
+              <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">בדיקות אבטחה</div>
-                  <div class="setting-description">הרצת בדיקות אבטחה מיוחדות</div>
+                  <div class="setting-label">Security Tests</div>
+                  <div class="setting-description">Run special security tests</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="securityTests">
@@ -1423,8 +1426,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">בדיקות חדירה</div>
-                  <div class="setting-description">הרצת בדיקות חדירה בסיסיות</div>
+                  <div class="setting-label">Penetration Tests</div>
+                  <div class="setting-description">Run basic penetration tests</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="penetrationTests">
@@ -1433,13 +1436,13 @@
               </div>
             </div>
 
-            <!-- הגדרות מתקדמות -->
+            <!-- Advanced settings -->
             <div class="settings-section">
-              <h3><i class="fas fa-cogs"></i> הגדרות מתקדמות</h3>
+              <h3><i class="fas fa-cogs"></i> Advanced Settings</h3>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">מצב דיבוג</div>
-                  <div class="setting-description">הפעלת מצב דיבוג לבדיקות</div>
+                  <div class="setting-label">Debug Mode</div>
+                  <div class="setting-description">Enable debug mode for tests</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="debugMode">
@@ -1448,8 +1451,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">בדיקות ניסיון</div>
-                  <div class="setting-description">הרצת בדיקות ניסיון לפני הבדיקות האמיתיות</div>
+                  <div class="setting-label">Dry Run Tests</div>
+                  <div class="setting-description">Run trial tests before real tests</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="dryRun">
@@ -1458,8 +1461,8 @@
               </div>
               <div class="setting-item">
                 <div>
-                  <div class="setting-label">בדיקות מבודדות</div>
-                  <div class="setting-description">הרצת כל בדיקה בסביבה מבודדת</div>
+                  <div class="setting-label">Isolated Tests</div>
+                  <div class="setting-description">Run each test in isolated environment</div>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="isolatedTests">
@@ -1468,41 +1471,41 @@
               </div>
             </div>
 
-            <!-- כפתורי פעולה -->
+            <!-- Action buttons -->
             <div class="action-buttons">
-              <button class="action-btn save-btn" onclick="saveTestPreferences()" title="שמירת העדפות">
+              <button class="action-btn save-btn" onclick="saveTestPreferences()" title="Save preferences">
                 <span class="action-icon">💾</span>
-                <span class="action-text">שמירת העדפות</span>
+                <span class="action-text">Save Preferences</span>
               </button>
               <button class="action-btn run-btn" onclick="runSelectedTests()" id="runTestsBtn"
-                title="הרץ בדיקות נבחרות">
+                title="Run selected tests">
                 <span class="action-icon">▶️</span>
-                <span class="action-text">הרצת בדיקות נבחרות</span>
+                <span class="action-text">Run Selected Tests</span>
               </button>
-              <button class="action-btn reset-btn" onclick="resetTestPreferences()" title="איפוס לברירות מחדל">
+              <button class="action-btn reset-btn" onclick="resetTestPreferences()" title="Reset to defaults">
                 <span class="action-icon">🔄</span>
-                <span class="action-text">איפוס לברירות מחדל</span>
+                <span class="action-text">Reset to Defaults</span>
               </button>
             </div>
 
-            <!-- אזור תוצאות בדיקות -->
+            <!-- Test results area -->
             <div id="testResultsArea" style="display: none;">
               <div class="test-results-header">
-                <h4><i class="fas fa-chart-bar"></i> תוצאות בדיקות</h4>
+                <h4><i class="fas fa-chart-bar"></i> Test Results</h4>
                 <button class="btn btn-sm btn-outline-secondary" onclick="hideTestResults()">
-                  <i class="fas fa-times"></i> סגור
+                  <i class="fas fa-times"></i> Close
                 </button>
               </div>
               <div id="testResultsContent">
-                <!-- תוצאות הבדיקות יוצגו כאן -->
+                <!-- Test results will be displayed here -->
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div> <!-- סוף page-body -->
+    </div> <!-- End page-body -->
 
-    <!-- מרווח בתחתית הדף -->
+    <!-- Bottom page spacing -->
     <div style="height: 3rem;"></div>
 
     <!-- Bootstrap JS -->

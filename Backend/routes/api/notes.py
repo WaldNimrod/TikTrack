@@ -376,6 +376,7 @@ def update_note(note_id: int):
                 logger.info(f"📋 JSON data - content: {content[:50]}..., trade_plan_id: {trade_plan_id}, trade_id: {trade_id}, account_id: {account_id}, attachment: {attachment_filename}")
             
             # קביעת הקשר לפי עדיפות: trade_plan > trade > account
+            # בעדכון, אם לא נשלחו נתוני קשר, נשתמש בקשר הקיים
             related_type_id = None
             related_id = None
             
@@ -391,12 +392,10 @@ def update_note(note_id: int):
                 related_type_id = 1  # account
                 related_id = account_id
             else:
-                logger.error("❌ No relation found")
-                return jsonify({
-                    "status": "error",
-                    "error": {"message": "Note must be related to account, trade, or trade plan"},
-                    "version": "v1"
-                }), 400
+                # בעדכון, אם לא נשלחו נתוני קשר, נשתמש בקשר הקיים
+                logger.info("📝 No new relation provided, keeping existing relation")
+                related_type_id = note.related_type_id
+                related_id = note.related_id
             
             logger.info(f"✅ Relation determined: related_type_id={related_type_id} -> {related_id}")
             

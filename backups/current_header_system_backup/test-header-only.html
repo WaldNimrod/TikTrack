@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Header System Test (without app-header) - Tik.track</title>
+    <title>בדיקת מערכת ראש דף חדשה (ללא app-header) - Tik.track</title>
 
     <!-- CSS Files - Ordered by priority (weak to strong) -->
     <!-- 1. Apple theme (base) -->
@@ -22,8 +22,8 @@
     <!-- 5. Table styles -->
     <link rel="stylesheet" href="styles/table.css">
 
-    <!-- 6. Menu styles (old working version) -->
-    <link rel="stylesheet" href="styles/menu.css">
+    <!-- Header system - STRONGEST (overrides everything) -->
+    <link rel="stylesheet" href="styles/header-system.css">
 
     <!-- Additional styles for test page -->
     <style>
@@ -75,13 +75,14 @@
         /* סגנונות נוספים לדף הבדיקה */
     </style>
 
-    <!-- Scripts - Using new Header System -->
+    <!-- Scripts - Only the new system -->
     <script src="scripts/header-system.js"></script>
+    <script src="scripts/simple-filter.js"></script>
     <script src="scripts/main.js"></script>
 
     <script>
         // בדיקת timing
-        console.log('🚀 טעינת דף בדיקה עם Header System החדש...');
+        console.log('🚀 טעינת דף בדיקה (ללא app-header)...');
 
         // בדיקה אם HeaderSystem זמין
         if (window.headerSystem) {
@@ -97,20 +98,19 @@
             console.log('❌ FilterSystem לא זמין');
         }
 
-        // בדיקה אם אלמנט unified-header נוצר
-        const unifiedHeader = document.querySelector('#unified-header');
-        if (unifiedHeader) {
-            console.log('✅ אלמנט unified-header נוצר');
+        // בדיקה אם אלמנט כותרת נוצר
+        const headerElement = document.getElementById('unified-header');
+        if (headerElement) {
+            console.log('✅ אלמנט כותרת חדש נוצר');
         } else {
-            console.log('❌ אלמנט unified-header לא נוצר');
+            console.log('❌ אלמנט כותרת לא נוצר');
         }
     </script>
 </head>
 
 <body>
     <div class="background-wrapper">
-        <!-- Using existing Web Component -->
-        <app-header></app-header>
+        <!-- The new system will create the header automatically -->
 
         <!-- Page body -->
         <div class="page-body">

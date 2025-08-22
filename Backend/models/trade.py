@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from .base import BaseModel
 from typing import Dict, Any, Optional, List, Tuple
 from datetime import datetime
+from .trade_plan import TradePlan
 
 class Trade(BaseModel):
     __tablename__ = "trades"

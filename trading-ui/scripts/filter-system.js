@@ -81,13 +81,18 @@ class FilterSystem {
     const rows = table.element.querySelectorAll('tbody tr');
     const data = [];
 
-    rows.forEach(row => {
+    console.log(`📊 Loading data for table ${tableId} with ${rows.length} rows`);
+    console.log(`📊 Table fields:`, table.fields);
+
+    rows.forEach((row, rowIndex) => {
       const cells = row.querySelectorAll('td');
       const rowData = {};
 
       table.fields.forEach((field, index) => {
         if (cells[index]) {
-          rowData[field] = cells[index].textContent.trim();
+          const value = cells[index].textContent.trim();
+          rowData[field] = value;
+          console.log(`📊 Row ${rowIndex}, Field ${field}: "${value}"`);
         }
       });
 
@@ -125,34 +130,48 @@ class FilterSystem {
     const table = this.tables.get(tableId);
     if (!table) return;
 
+    console.log(`🔍 === FILTER PROCESS FOR TABLE ${tableId} ===`);
+    console.log(`🔍 Current filters:`, this.currentFilters);
+
     let filteredData = [...table.data];
+    console.log(`🔍 Starting filter process for table ${tableId} with ${filteredData.length} rows`);
 
     // פילטר חיפוש (סטטי)
     if (this.currentFilters.search && table.fields.some(field =>
       ['name', 'description', 'title', 'symbol', 'account_name'].includes(field))) {
+      console.log(`🔍 Applying search filter: "${this.currentFilters.search}"`);
       filteredData = this.applySearchFilter(filteredData, this.currentFilters.search);
+      console.log(`🔍 After search filter: ${filteredData.length} rows`);
     }
 
     // פילטר תאריכים (סטטי)
     if (this.currentFilters.dateRange && this.currentFilters.dateRange !== 'כל זמן' &&
       table.fields.includes('date')) {
+      console.log(`🔍 Applying date filter: "${this.currentFilters.dateRange}"`);
       const dateRange = this.getDateRangeFromText(this.currentFilters.dateRange);
       filteredData = this.applyDateFilter(filteredData, dateRange);
+      console.log(`🔍 After date filter: ${filteredData.length} rows`);
     }
 
     // פילטר סטטוס (דינמי)
     if (this.currentFilters.status.length > 0 && table.fields.includes('status')) {
+      console.log(`🔍 Applying status filter:`, this.currentFilters.status);
       filteredData = this.applyStatusFilter(filteredData, this.currentFilters.status);
+      console.log(`🔍 After status filter: ${filteredData.length} rows`);
     }
 
     // פילטר סוג (דינמי)
     if (this.currentFilters.type.length > 0 && table.fields.includes('type')) {
+      console.log(`🔍 Applying type filter:`, this.currentFilters.type);
       filteredData = this.applyTypeFilter(filteredData, this.currentFilters.type);
+      console.log(`🔍 After type filter: ${filteredData.length} rows`);
     }
 
     // פילטר חשבון (דינמי)
     if (this.currentFilters.account.length > 0 && table.fields.includes('account_id')) {
+      console.log(`🔍 Applying account filter:`, this.currentFilters.account);
       filteredData = this.applyAccountFilter(filteredData, this.currentFilters.account);
+      console.log(`🔍 After account filter: ${filteredData.length} rows`);
     }
 
     table.filteredData = filteredData;
@@ -184,19 +203,26 @@ class FilterSystem {
 
     console.log(`🎯 Updated table ${tableId}: showing ${filteredData.length} of ${table.data.length} rows`);
   }
-  }
 
   // פילטר חיפוש
   applySearchFilter(data, searchTerm) {
-    if (!searchTerm) return data;
+    if (!searchTerm || searchTerm.trim() === '') return data;
+
+    const searchLower = searchTerm.toLowerCase().trim();
 
     return data.filter(item => {
-      return Object.values(item).some(value => {
-        if (typeof value === 'string') {
-          return value.toLowerCase().includes(searchTerm.toLowerCase());
-        }
-        return false;
-      });
+      // חיפוש בשדות ספציפיים
+      const searchableFields = [
+        item.symbol || '',
+        item.type || '',
+        item.status || '',
+        item.account_name || '',
+        item.notes || ''
+      ];
+
+      return searchableFields.some(field =>
+        field.toString().toLowerCase().includes(searchLower)
+      );
     });
   }
 
@@ -217,8 +243,19 @@ class FilterSystem {
   applyStatusFilter(data, selectedStatuses) {
     if (selectedStatuses.length === 0) return data;
 
+    console.log('🔍 Applying status filter:', selectedStatuses);
+    console.log('🔍 Data before filter:', data);
+
     return data.filter(item => {
-      return selectedStatuses.includes(item.status);
+      const itemStatus = item.status;
+      const itemSymbol = item.ticker || item.symbol || item.name || 'unknown';
+      console.log(`🔍 Checking item ${itemSymbol}: status="${itemStatus}" against selectedStatuses:`, selectedStatuses);
+
+      // בדיקה ישירה - אם הסטטוס של הפריט נמצא ברשימת הסטטוסים הנבחרים
+      const isMatch = selectedStatuses.includes(itemStatus);
+      console.log(`🔍 Item ${itemSymbol}: ${isMatch ? '✅ MATCH' : '❌ NO MATCH'}`);
+
+      return isMatch;
     });
   }
 

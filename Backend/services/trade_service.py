@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from models.trade import Trade
+from models.trade_plan import TradePlan
 from typing import List, Optional, Dict, Any
 import logging
 from datetime import datetime
@@ -92,7 +93,6 @@ class TradeService:
         
         # If there's trade_plan_id, assign the type from the plan as default
         if 'trade_plan_id' in data and data['trade_plan_id']:
-            from models.trade_plan import TradePlan
             trade_plan = db.query(TradePlan).filter(TradePlan.id == data['trade_plan_id']).first()
             if trade_plan:
                 # Assign type from plan if not defined

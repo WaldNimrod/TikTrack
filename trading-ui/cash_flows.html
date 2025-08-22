@@ -26,39 +26,40 @@
     - שימוש במערכת הפילטרים והסידור הקיימת
   -->
 
-    <!-- Apple Theme CSS - בסיס כללי -->
+    <!-- CSS Files - Ordered by priority (weak to strong) -->
+    <!-- 1. Apple theme (base) -->
     <link rel="stylesheet" href="styles/apple-theme.css">
 
-    <!-- Main Styles - סגנונות הפרויקט -->
-    <link rel="stylesheet" href="styles/styles.css">
-
-    <!-- Menu CSS - תפריט -->
-    <link rel="stylesheet" href="styles/menu.css">
-
-    <!-- Table CSS - טבלאות -->
-    <link rel="stylesheet" href="styles/table.css">
-
-    <!-- Typography CSS - טיפוגרפיה ופונטים -->
-    <link rel="stylesheet" href="styles/typography.css">
-
-    <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+    <!-- 2. Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- קבצים מודולריים של הגריד - נטענים בסוף הקובץ -->
+    <!-- 3. General styles -->
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- 4. Typography -->
+    <link rel="stylesheet" href="styles/typography.css">
+
+    <!-- 5. Table styles -->
+    <link rel="stylesheet" href="styles/table.css">
+
+    <!-- 6. Menu styles (old working version) -->
+    <link rel="stylesheet" href="styles/menu.css">
+
+    <!-- Modular grid files - loaded at end of file -->
 </head>
 
 <body>
-    <!-- רקע כללי -->
+    <!-- General background -->
     <div class="background-wrapper">
 
-        <!-- כותרת האפליקציה -->
+        <!-- Application header -->
         <app-header></app-header>
 
-        <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+        <!-- Page body - All content after header -->
         <div class="page-body">
-            <!-- אזור תזרימי מזומנים - top-Section -->
+            <!-- Cash flows area - top-Section -->
             <div class="top-section">
-                <!-- כותרת ראשית -->
+                <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
                         💰 תזרימי מזומנים
@@ -71,11 +72,11 @@
                     </div>
                 </div>
 
-                <!-- כרטיסיות התראות -->
+                <!-- Alert cards -->
                 <div class="section-body">
                     <active-alerts></active-alerts>
 
-                    <!-- סיכום נתונים -->
+                    <!-- Data summary -->
                     <div class="info-summary" id="summaryStats">
                         <div>סה"כ תזרימים: <strong id="totalCashFlows">0</strong></div>
                         <div>סה"כ הפקדות: <strong id="totalDeposits">$0</strong></div>
@@ -83,7 +84,7 @@
                         <div>יתרה נוכחית: <strong id="currentBalance">$0</strong></div>
                     </div>
 
-                    <!-- הערות על השדות החדשים -->
+                    <!-- Notes about new fields -->
                     <div class="alert alert-info mt-3">
                         <strong>💡 מידע על השדות החדשים:</strong>
                         <ul class="mb-0">
@@ -94,14 +95,14 @@
                         </ul>
                     </div>
                 </div>
-            </div> <!-- סוף top-section -->
+            </div> <!-- End top-section -->
 
-            <!-- תוכן ראשי -->
+            <!-- Main content -->
             <div class="main-content">
 
-                <!-- אזור תזרימי מזומנים - content-section -->
+                <!-- Cash flows area - content-section -->
                 <div class="content-section">
-                    <!-- כותרת תזרימי מזומנים -->
+                    <!-- Cash flows header -->
                     <div class="section-header">
                         <div class="table-title">
                             💰 תזרימי המזומנים שלי
@@ -119,7 +120,7 @@
                         </div>
                     </div>
 
-                    <!-- טבלת תזרימי מזומנים -->
+                    <!-- Cash flows table -->
                     <div class="section-body">
                         <div class="table-responsive" id="cashFlowsContainer">
                             <table class="table" id="cashFlowsTable">
@@ -203,18 +204,18 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- נתונים יוכנסו דינמית -->
+                                    <!-- Data will be inserted dynamically -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div> <!-- סוף content-section -->
+                </div> <!-- End content-section -->
 
-            </div> <!-- סוף main-content -->
+            </div> <!-- End main-content -->
 
-        </div> <!-- סוף page-body -->
+        </div> <!-- End page-body -->
 
-    </div> <!-- סוף background-wrapper -->
+    </div> <!-- End background-wrapper -->
 
     <!-- Add Cash Flow Modal -->
     <div class="modal fade" id="addCashFlowModal" tabindex="-1" aria-labelledby="addCashFlowModalLabel"
@@ -441,14 +442,14 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- קבצים מודולריים -->
+    <!-- Modular files -->
     <script src="scripts/app-header.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/grid-filters.js"></script>
     <script src="scripts/alerts.js"></script>
     <script src="scripts/cash_flows.js"></script>
 
-    <!-- אתחול הדף -->
+    <!-- Page initialization -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             initializeCashFlowsPage();

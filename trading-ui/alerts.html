@@ -27,24 +27,26 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <!-- Apple Theme CSS - בסיס כללי -->
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <!-- 1. Apple theme (base) -->
   <link rel="stylesheet" href="styles/apple-theme.css">
 
-  <!-- Main Styles - סגנונות הפרויקט -->
-  <link rel="stylesheet" href="styles/styles.css">
-
-  <!-- Menu CSS - תפריט -->
-  <link rel="stylesheet" href="styles/menu.css">
-
-  <!-- Table CSS - טבלאות -->
-  <link rel="stylesheet" href="styles/table.css">
-
-  <!-- Typography CSS - טיפוגרפיה ופונטים -->
-  <link rel="stylesheet" href="styles/typography.css">
-  <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+  <!-- 2. Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- קבצים מודולריים של הגריד -->
+  <!-- 3. General styles -->
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- 4. Typography -->
+  <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
+  <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Menu styles (old working version) -->
+  <link rel="stylesheet" href="styles/menu.css">
+
+  <!-- Modular grid files -->
   <script src="scripts/app-header.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/grid-filters.js"></script>
@@ -53,17 +55,17 @@
 </head>
 
 <body>
-  <!-- רקע כללי -->
+  <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- כותרת האפליקציה -->
+    <!-- Application header -->
     <app-header></app-header>
 
-    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <!-- Page body - All content after header -->
     <div class="page-body">
-      <!-- אזור התראות - top-Section -->
+      <!-- Alerts area - top-Section -->
       <div class="top-section" id="alertsTopSection">
-        <!-- כותרת התראות -->
+        <!-- Alerts header -->
         <div class="section-header">
           <div class="table-title">
             🔔 התראות
@@ -79,12 +81,12 @@
           </div>
         </div>
 
-        <!-- כרטיסיות התראות -->
+        <!-- Alert cards -->
         <div class="section-body">
-          <!-- ווב קומפוננט של התראות פעילות -->
+          <!-- Active alerts web component -->
           <active-alerts></active-alerts>
 
-          <!-- סיכום נתונים -->
+          <!-- Data summary -->
           <div class="info-summary" id="summaryStats">
             <div>סה"כ התראות: <strong id="totalAlerts">0</strong></div>
             <div>התראות פעילות: <strong id="activeAlerts">0</strong></div>
@@ -93,14 +95,14 @@
             <div>התראות השבוע: <strong id="weekAlerts">0</strong></div>
           </div>
         </div>
-      </div> <!-- סוף top-section -->
+      </div> <!-- End top-section -->
 
-      <!-- תוכן ראשי -->
+      <!-- Main content -->
       <div class="main-content">
 
-        <!-- אזור התראות - content-section -->
+        <!-- Alerts area - content-section -->
         <div class="content-section" id="alertsMainSection">
-          <!-- כותרת התראות -->
+          <!-- Alerts header -->
           <div class="section-header">
             <div class="table-title">
               🔔 ההתראות שלי
@@ -117,7 +119,7 @@
             </div>
           </div>
 
-          <!-- טבלת התראות -->
+          <!-- Alerts table -->
           <div class="section-body">
             <div class="table-responsive" id="alertsContainer">
               <table class="table" id="alertsTable" data-table-type="alerts">
@@ -195,12 +197,12 @@
           </div>
         </div>
       </div>
-    </div> <!-- סוף page-body -->
+    </div> <!-- End page-body -->
 
-    <!-- מרווח בתחתית הדף -->
+    <!-- Bottom page spacing -->
     <div style="height: 3rem;"></div>
 
-    <!-- מערכת התראות -->
+    <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>
 
     <!-- Add Alert Modal -->
@@ -443,14 +445,14 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Global Scripts - סקריפטים כלליים -->
+    <!-- Global Scripts - Global scripts -->
     <script src="scripts/app-header.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/grid-filters.js"></script>
     <script src="scripts/active-alerts-component.js"></script>
     <script src="scripts/accounts.js"></script>
 
-    <!-- Page Specific Scripts - סקריפטים ספציפיים לדף -->
+    <!-- Page Specific Scripts - Page specific scripts -->
     <script src="scripts/alerts.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>

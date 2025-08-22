@@ -279,6 +279,14 @@ def menu_file() -> Any:
 def test_menu() -> Any:
     return send_from_directory(UI_DIR, "test-menu.html")
 
+@app.route("/test-header-only")
+def test_header_only() -> Any:
+    return send_from_directory(UI_DIR, "test-header-only.html")
+
+@app.route("/test-header-only.html")
+def test_header_only_html() -> Any:
+    return send_from_directory(UI_DIR, "test-header-only.html")
+
 
 
 @app.route("/research")

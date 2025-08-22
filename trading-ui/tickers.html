@@ -30,39 +30,40 @@
     - ריכוז פונקציות חשבונות ב-accounts.js
   -->
 
-  <!-- Apple Theme CSS - בסיס כללי -->
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <!-- 1. Apple theme (base) -->
   <link rel="stylesheet" href="styles/apple-theme.css">
 
-  <!-- Main Styles - סגנונות הפרויקט -->
-  <link rel="stylesheet" href="styles/styles.css">
-
-  <!-- Menu CSS - תפריט -->
-  <link rel="stylesheet" href="styles/menu.css">
-
-  <!-- Table CSS - טבלאות -->
-  <link rel="stylesheet" href="styles/table.css">
-
-  <!-- Typography CSS - טיפוגרפיה ופונטים -->
-  <link rel="stylesheet" href="styles/typography.css">
-
-  <!-- Bootstrap CSS - נטען אחרון כדי לא לדרוס הגדרות מותאמות -->
+  <!-- 2. Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- קבצים מודולריים של הגריד - נטענים בסוף הקובץ -->
+  <!-- 3. General styles -->
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- 4. Typography -->
+  <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
+  <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Menu styles (old working version) -->
+  <link rel="stylesheet" href="styles/menu.css">
+
+  <!-- Modular grid files - loaded at end of file -->
 </head>
 
 <body>
-  <!-- רקע כללי -->
+  <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- כותרת האפליקציה -->
+    <!-- Application header -->
     <app-header></app-header>
 
-    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <!-- Page body - All content after header -->
     <div class="page-body">
-      <!-- אזור עיצובים - top-Section -->
+      <!-- Designs area - top-Section -->
       <div class="top-section">
-        <!-- כותרת ראשית -->
+        <!-- Main header -->
         <div class="section-header">
           <div class="table-title">
             📊 טיקרים
@@ -74,11 +75,11 @@
           </div>
         </div>
 
-        <!-- כרטיסיות התראות -->
+        <!-- Alert cards -->
         <div class="section-body">
           <active-alerts></active-alerts>
 
-          <!-- סיכום נתונים -->
+          <!-- Data summary -->
           <div class="info-summary" id="summaryStats">
             <div>סה"כ תכנונים: <strong id="totalDesigns">0</strong></div>
             <div>סה"כ השקעה: <strong id="totalInvestment">$0</strong></div>
@@ -86,14 +87,14 @@
             <div>רווח כולל: <strong id="totalProfit">$0</strong></div>
           </div>
         </div>
-      </div> <!-- סוף top-section -->
+      </div> <!-- End top-section -->
 
-      <!-- תוכן ראשי -->
+      <!-- Main content -->
       <div class="main-content">
 
-        <!-- אזור עיצובים - content-section -->
+        <!-- Designs area - content-section -->
         <div class="content-section">
-          <!-- כותרת עיצובים -->
+          <!-- Designs header -->
           <div class="section-header">
             <div class="table-title">
               📊 הטיקרים שלי
@@ -110,7 +111,7 @@
             </div>
           </div>
 
-          <!-- טבלת טיקרים -->
+          <!-- Tickers table -->
           <div class="section-body">
             <div class="table-responsive" id="tickersContainer">
               <table class="table" id="tickersTable">
@@ -281,15 +282,15 @@
       </div>
 
 
-    </div> <!-- סוף page-body -->
+    </div> <!-- End page-body -->
 
-    <!-- מרווח בתחתית הדף -->
+    <!-- Bottom page spacing -->
     <div class="bottom-spacer"></div>
 
-    <!-- מערכת התראות -->
+    <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>
 
-    <!-- CSS למודולים -->
+    <!-- CSS for modals -->
     <style>
       /* וידוא שהודעות שגיאה מופיעות מעל המודול */
       .modal .invalid-feedback {
@@ -372,7 +373,7 @@
                     <label for="addTickerCurrency" class="form-label">מטבע *</label>
                     <select class="form-select" id="addTickerCurrency" name="currency_id" required>
                       <option value="">בחר מטבע...</option>
-                      <!-- האפשרויות יטענו דינמית -->
+                      <!-- Options will be loaded dynamically -->
                     </select>
                     <div class="invalid-feedback" id="addTickerCurrencyError"></div>
                   </div>
@@ -453,7 +454,7 @@
                     <label for="editTickerCurrency" class="form-label">מטבע *</label>
                     <select class="form-select" id="editTickerCurrency" name="currency_id" required>
                       <option value="">בחר מטבע...</option>
-                      <!-- האפשרויות יטענו דינמית -->
+                      <!-- Options will be loaded dynamically -->
                     </select>
                     <div class="invalid-feedback" id="editTickerCurrencyError"></div>
                   </div>
@@ -524,7 +525,7 @@
             </div>
 
             <div id="linkedItemsContent">
-              <!-- תוכן הפריטים המקושרים יוצג כאן -->
+              <!-- Linked items content will be displayed here -->
             </div>
 
             <div class="alert alert-info mt-3">
@@ -550,7 +551,7 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- קבצים מודולריים -->
+    <!-- Modular files -->
     <script src="scripts/app-header.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/grid-filters.js"></script>

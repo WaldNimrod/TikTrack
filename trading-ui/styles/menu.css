@@ -1,37 +1,4 @@
 /* ===== סגנונות תפריט וניווט ===== */
-
-/* ===== סגנונות פילטרים ===== */
-.filter-section {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-}
-
-.filter-row {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.filter-group label {
-  font-weight: 600;
-  color: #495057;
-  font-size: 0.9rem;
-}
-
-.multiselect-dropdown {
-  position: relative;
-  min-width: 150px;
-  font-size: 0.9rem;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.multiselect-item:last-child {
-  border-bottom: none;
-}
 /*
  * קובץ זה מכיל את כל הסגנונות הקשורים לתפריט וניווט
  * כולל header, dropdown menus, filter sections ו-navigation

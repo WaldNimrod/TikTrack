@@ -886,7 +886,7 @@ class HeaderSystem {
         // בדיקה אם הלחיצה הייתה מחוץ לתפריט
         if (!statusMenu.contains(event.target) && !statusToggle.contains(event.target)) {
           console.log('🔍 Click outside status filter, closing...');
-          closeStatusFilter();
+          window.closeStatusFilter();
         }
       }
     });
@@ -897,7 +897,7 @@ class HeaderSystem {
         const statusMenu = document.getElementById('statusFilterMenu');
         if (statusMenu && statusMenu.classList.contains('show')) {
           console.log('🔍 Escape pressed, closing status filter...');
-          closeStatusFilter();
+          window.closeStatusFilter();
         }
       }
     });
@@ -1508,8 +1508,8 @@ window.updateAccountFilterMenu = function (accounts) {
 
 // אתחול אוטומטי כשהדף נטען
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.headerSystem && !window.headerSystem.initialized) {
-    window.headerSystem.initialize();
+  if (window.headerSystem && !window.headerSystem.isInitialized) {
+    window.headerSystem.init();
   }
 });
 
@@ -1536,7 +1536,7 @@ window.toggleStatusFilter = function () {
   console.log('🔍 Status filter is visible:', isVisible);
 
   if (isVisible) {
-    closeStatusFilter();
+    window.closeStatusFilter();
   } else {
     // סגירת פילטרים אחרים
     closeOtherFilters('status');
@@ -1590,23 +1590,9 @@ window.toggleStatusFilter = function () {
 
 // פונקציות לסגירת פילטרים
 window.closeStatusFilter = function () {
+  console.log('🔍 window.closeStatusFilter called');
   const menu = document.getElementById('statusFilterMenu');
   const toggle = document.querySelector('.status-filter-toggle');
-  if (menu && toggle) {
-    menu.classList.remove('show');
-    toggle.classList.remove('active');
-  }
-};
-
-// פונקציות לבחירת אופציות - יוסיפו בהמשך
-
-// פונקציות לסגירת פילטרים
-function closeStatusFilter() {
-  console.log('🔍 closeStatusFilter called');
-  const menu = document.getElementById('statusFilterMenu');
-  const toggle = document.querySelector('.status-filter-toggle');
-  console.log('🔍 Status menu before close:', menu?.className);
-  console.log('🔍 Status toggle before close:', toggle?.className);
 
   if (menu) {
     menu.classList.remove('show');
@@ -1628,10 +1614,12 @@ function closeStatusFilter() {
 
   if (toggle) toggle.classList.remove('active');
 
-  console.log('🔍 Status menu after close:', menu?.className);
-  console.log('🔍 Status toggle after close:', toggle?.className);
-  console.log('🔍 Status filter closed successfully');
-}
+  console.log('🔍 window.closeStatusFilter completed');
+};
+
+// פונקציות לבחירת אופציות - יוסיפו בהמשך
+
+// פונקציות לסגירת פילטרים - יוסיפו בהמשך
 
 function closeTypeFilter() {
   const menu = document.getElementById('typeFilterMenu');
@@ -1660,7 +1648,7 @@ function closeOtherFilters(excludeFilter) {
   // כרגע רק פילטר סטטוס קיים
   if (excludeFilter !== 'status') {
     console.log('🔍 Closing status filter');
-    closeStatusFilter();
+    window.closeStatusFilter();
   }
 }
 
@@ -1997,6 +1985,13 @@ class SimpleFilter {
 
   filterTable(table) {
     const tableId = table.id;
+
+    // עקיפת טבלאות מסוימות שלא צריכות פילטר
+    if (tableId === 'notificationsTable') {
+      console.log(`🔍 Skipping notifications table - no filtering applied`);
+      return;
+    }
+
     const rows = table.querySelectorAll('tbody tr');
     console.log(`🔍 Filtering table: ${tableId} with ${rows.length} rows`);
 

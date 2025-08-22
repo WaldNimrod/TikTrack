@@ -406,8 +406,8 @@
 }
 
 #unified-header .filter-toggle.active {
-    background: #28a745 !important;
-    color: white !important;
+    background: transparent !important;
+    color: #28a745 !important;
     border-color: #28a745 !important;
     box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
 }
@@ -416,16 +416,16 @@
 #unified-header .status-filter-toggle.active {
     border: 1px solid #28a745 !important;
     box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
-    background: #28a745 !important;
-    color: white !important;
+    background: transparent !important;
+    color: #28a745 !important;
 }
 
 /* CSS ספציפי לכפתור פילטר סטטוס */
 #statusFilterToggle.active {
     border: 1px solid #28a745 !important;
     box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
-    background: #28a745 !important;
-    color: white !important;
+    background: transparent !important;
+    color: #28a745 !important;
 }
 
 /* CSS ספציפי לכפתור פילטר טיפוס */
@@ -588,7 +588,8 @@
     content: "✓" !important;
     color: #28a745 !important;
     font-weight: bold !important;
-    font-size: 1.1rem !important;
+    font-size: 1.2rem !important;
+    text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
 }
 
 /* הסתרת התוכן המקורי של הנקודה */
@@ -654,9 +655,10 @@
 }
 
 #dateRangeFilterMenu .date-range-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.05) !important;
+    background-color: rgba(40, 167, 69, 0.08) !important;
     color: #28a745 !important;
     font-weight: 500 !important;
+    border: none !important;
 }
 
 /* ===== CSS ספציפי לכל התפריטים ===== */
@@ -872,10 +874,11 @@
 }
 
 #unified-header .status-filter-item.selected {
-    background-color: rgba(40, 167, 69, 0.2) !important;
-    color: #155724 !important;
-    border: 1px solid #28a745 !important;
-    font-weight: 600 !important;
+    background-color: rgba(40, 167, 69, 0.08) !important;
+    color: #28a745 !important;
+    border: none !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
 }
 
 #unified-header .status-filter-item {

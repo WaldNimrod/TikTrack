@@ -151,8 +151,9 @@ def update_trade(trade_id: int):
 @trades_bp.route('/<int:trade_id>/close', methods=['POST'])
 def close_trade(trade_id: int):
     """Close trade"""
+    db = None
     try:
-        data = request.get_json()
+        data = request.get_json() if request.is_json else {}
         db: Session = next(get_db())
         trade = TradeService.close_trade(db, trade_id, data)
         if trade:
@@ -175,13 +176,15 @@ def close_trade(trade_id: int):
             "version": "v1"
         }), 400
     finally:
-        db.close()
+        if db:
+            db.close()
 
 @trades_bp.route('/<int:trade_id>/cancel', methods=['POST'])
 def cancel_trade(trade_id: int):
     """Cancel trade"""
+    db = None
     try:
-        data = request.get_json()
+        data = request.get_json() if request.is_json else {}
         cancel_reason = data.get('cancel_reason', 'Cancelled by user')
         db: Session = next(get_db())
         trade = TradeService.cancel_trade(db, trade_id, cancel_reason)
@@ -205,7 +208,8 @@ def cancel_trade(trade_id: int):
             "version": "v1"
         }), 400
     finally:
-        db.close()
+        if db:
+            db.close()
 
 @trades_bp.route('/<int:trade_id>', methods=['DELETE'])
 def delete_trade(trade_id: int):

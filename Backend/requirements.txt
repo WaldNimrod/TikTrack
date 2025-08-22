@@ -1,12 +1,12 @@
-# TikTrack Server Dependencies - תלויות השרת
+# TikTrack Server Dependencies
 # ==============================================
-# ⚠️  חשוב: זהו קובץ תלויות השרת בלבד!
+# ⚠️  Important: This is server dependencies only!
 # 
-# אין קשר למערכת הבדיקות!
+# Not related to testing system!
 # 
-# 🎯 מטרה: תלויות Python הנדרשות להפעלת שרת TikTrack
-# 📍 מיקום: Backend/requirements.txt
-# 🔗 מערכת הבדיקות: Backend/testing_suite/requirements.txt
+# 🎯 Purpose: Python dependencies required for running TikTrack server
+# 📍 Location: Backend/requirements.txt
+# 🔗 Testing system: Backend/testing_suite/requirements.txt
 # 
 # ==============================================
 

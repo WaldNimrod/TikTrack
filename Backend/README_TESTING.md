@@ -28,47 +28,47 @@ Backend/
 
 ### From Main Directory
 ```bash
-# הרצת כל הבדיקות
+# Run all tests
 cd testing_suite && make test
 
-# הרצת בדיקות יחידה
+# Run unit tests
 cd testing_suite && make test-unit
 
-# הרצת בדיקות אינטגרציה
+# Run integration tests
 cd testing_suite && make test-integration
 
-# הרצת בדיקות E2E
+# Run E2E tests
 cd testing_suite && make test-e2e
 
-# הרצה עם דוח כיסוי
+# Run with coverage report
 cd testing_suite && make coverage
 ```
 
-### מהתיקייה הראשית (קצר)
+### From Main Directory (Short)
 ```bash
-# הרצת כל הבדיקות
+# Run all tests
 python3 -m pytest testing_suite/ -v
 
-# הרצת בדיקות יחידה
+# Run unit tests
 python3 -m pytest testing_suite/unit_tests/ -v
 
-# הרצת בדיקות אינטגרציה
+# Run integration tests
 python3 -m pytest testing_suite/integration_tests/ -v
 
-# הרצת בדיקות E2E
+# Run E2E tests
 python3 -m pytest testing_suite/e2e_tests/ -v
 ```
 
-## סטטוס נוכחי
+## Current Status
 
-✅ **Unit Tests**: 5 בדיקות פעילות  
-✅ **Integration Tests**: 10 בדיקות פעילות  
-✅ **E2E Tests**: 9 בדיקות פעילות  
-⏳ **Performance Tests**: מוכן להרחבה  
-⏳ **Load Tests**: מוכן להרחבה  
-⏳ **Security Tests**: מוכן להרחבה  
+✅ **Unit Tests**: 5 active tests  
+✅ **Integration Tests**: 10 active tests  
+✅ **E2E Tests**: 9 active tests  
+⏳ **Performance Tests**: Ready for expansion  
+⏳ **Load Tests**: Ready for expansion  
+⏳ **Security Tests**: Ready for expansion  
 
-**סה"כ**: 23 בדיקות עוברות, 2 דילוגו
+**Total**: 23 tests passing, 2 skipped
 
 ## סוגי הבדיקות
 

@@ -259,21 +259,33 @@ def create_note():
             trade_plan_id = data.get('trade_plan_id')
             trade_id = data.get('trade_id')
             account_id = data.get('account_id')
+            related_type = data.get('related_type')
+            related_id = data.get('related_id')
             attachment_filename = data.get('attachment')
         
-        # Determine relation by priority: trade_plan > trade > account
+        # Determine relation by priority: related_type/related_id > trade_plan > trade > account
         related_type_id = None
-        related_id = None
+        final_related_id = None
         
-        if trade_plan_id:
+        if related_type and related_id:
+            # Use provided related_type and related_id
+            type_mapping = {
+                'account': 1,
+                'trade': 2,
+                'trade_plan': 3,
+                'ticker': 4
+            }
+            related_type_id = type_mapping.get(related_type)
+            final_related_id = related_id
+        elif trade_plan_id:
             related_type_id = 3  # trade_plan
-            related_id = trade_plan_id
+            final_related_id = trade_plan_id
         elif trade_id:
             related_type_id = 2  # trade
-            related_id = trade_id
+            final_related_id = trade_id
         elif account_id:
             related_type_id = 1  # account
-            related_id = account_id
+            final_related_id = account_id
         else:
             return jsonify({
                 "status": "error",
@@ -286,7 +298,7 @@ def create_note():
             'content': content,
             'attachment': attachment_filename,
             'related_type_id': related_type_id,
-            'related_id': related_id
+            'related_id': final_related_id
         }
         
         note = Note(**note_data)

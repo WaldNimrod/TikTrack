@@ -83,27 +83,35 @@
         // בדיקת timing
         console.log('🚀 טעינת דף בדיקה עם Header System החדש...');
 
-        // בדיקה אם HeaderSystem זמין
-        if (window.headerSystem) {
-            console.log('✅ HeaderSystem זמין');
-        } else {
-            console.log('❌ HeaderSystem לא זמין');
-        }
+        // אתחול HeaderSystem
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('🏠 DOM loaded, initializing HeaderSystem...');
 
-        // בדיקה אם FilterSystem זמין
-        if (window.filterSystem) {
-            console.log('✅ FilterSystem זמין');
-        } else {
-            console.log('❌ FilterSystem לא זמין');
-        }
+            if (window.headerSystem) {
+                console.log('✅ HeaderSystem found, initializing...');
+                window.headerSystem.init();
 
-        // בדיקה אם אלמנט unified-header נוצר
-        const unifiedHeader = document.querySelector('#unified-header');
-        if (unifiedHeader) {
-            console.log('✅ אלמנט unified-header נוצר');
-        } else {
-            console.log('❌ אלמנט unified-header לא נוצר');
-        }
+                // בדיקה אם HeaderSystem זמין
+                console.log('✅ HeaderSystem זמין');
+
+                // בדיקה אם FilterSystem זמין
+                if (window.filterSystem) {
+                    console.log('✅ FilterSystem זמין');
+                } else {
+                    console.log('❌ FilterSystem לא זמין');
+                }
+
+                // בדיקה אם אלמנט unified-header נוצר
+                const unifiedHeader = document.querySelector('#unified-header');
+                if (unifiedHeader) {
+                    console.log('✅ אלמנט unified-header נוצר');
+                } else {
+                    console.log('❌ אלמנט unified-header לא נוצר');
+                }
+            } else {
+                console.log('❌ HeaderSystem לא זמין');
+            }
+        });
     </script>
 </head>
 
@@ -307,6 +315,9 @@
                 </div>
             </div>
         </div>
+
+        <!-- Console cleanup system -->
+        <script src="scripts/console-cleanup.js"></script>
 
         <script>
             // פונקציות בדיקה

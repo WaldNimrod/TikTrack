@@ -1,14 +1,14 @@
-# שינויים בבסיס הנתונים - אוגוסט 2025
+# Database Changes - August 2025
 
-## סקירה כללית
+## General Overview
 
-מסמך זה מתאר את השינויים שבוצעו במבנה בסיס הנתונים של TikTrack במהלך אוגוסט 2025.
+This document describes the changes made to TikTrack's database structure during August 2025.
 
-## שינויים עיקריים
+## Main Changes
 
-### 1. הסרת שדה `opened_at` מטבלת `trades`
+### 1. Removing `opened_at` field from `trades` table
 
-#### לפני השינוי:
+#### Before Change:
 ```sql
 CREATE TABLE trades (
     id INTEGER PRIMARY KEY,
@@ -17,14 +17,14 @@ CREATE TABLE trades (
     account_id INTEGER,
     type TEXT,
     status TEXT,
-    opened_at DATETIME,  -- שדה שהוסר
+    opened_at DATETIME,  -- removed field
     closed_at DATETIME,
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
-#### אחרי השינוי:
+#### After Change:
 ```sql
 CREATE TABLE trades (
     id INTEGER PRIMARY KEY,
@@ -39,63 +39,63 @@ CREATE TABLE trades (
 );
 ```
 
-#### סיבות לשינוי:
-- **בלבול**: השדה `opened_at` יצר בלבול עם `created_at`
-- **עקביות**: `created_at` מספק את המידע הנדרש
-- **פשטות**: פחות שדות לתחזוקה
+#### Reasons for Change:
+- **Confusion**: The `opened_at` field created confusion with `created_at`
+- **Consistency**: `created_at` provides the required information
+- **Simplicity**: Fewer fields to maintain
 
-### 2. הגבלת ערכי שדה `type` בטבלת `trades`
+### 2. Limiting `type` field values in `trades` table
 
-#### ערכים מותרים:
-- `swing` - טריידים קצרי טווח
-- `invest` - השקעות ארוכות טווח  
-- `pasive` - השקעות פאסיביות
+#### Allowed Values:
+- `swing` - Short-term trades
+- `invest` - Long-term investments  
+- `pasive` - Passive investments
 
-#### ערכים שהוסרו:
-- `long` - הוחלף ב-`swing`
-- `short` - הוחלף ב-`invest`
+#### Removed Values:
+- `long` - Replaced with `swing`
+- `short` - Replaced with `invest`
 
-#### סיבות לשינוי:
-- **בהירות**: שמות ברורים יותר
-- **עקביות**: שלושה סוגים מוגדרים היטב
-- **תחזוקה**: פחות ערכים לתחזוקה
+#### Reasons for Change:
+- **Clarity**: Clearer names
+- **Consistency**: Three well-defined types
+- **Maintenance**: Fewer values to maintain
 
-### 3. עדכון ערכי שדה `status` בטבלת `trades`
+### 3. Updating `status` field values in `trades` table
 
-#### ערכים מותרים:
-- `open` - טרייד פתוח
-- `closed` - טרייד סגור
-- `cancelled` - טרייד מבוטל
+#### Allowed Values:
+- `open` - Open trade
+- `closed` - Closed trade
+- `cancelled` - Cancelled trade
 
-#### שינוי:
-- `cancelled` → `cancelled` (תיקון איות)
+#### Change:
+- `cancelled` → `cancelled` (spelling fix)
 
-## קבצי מיגרציה
+## Migration Files
 
-### קבצים שנוצרו:
-1. `remove_opened_at_column.py` - הסרת עמודת `opened_at`
-2. `update_trade_dates.py` - עדכון תאריכים קיימים
-3. `update_status_values.py` - עדכון ערכי סטטוס
+### Created Files:
+1. `remove_opened_at_column.py` - Remove `opened_at` column
+2. `update_trade_dates.py` - Update existing dates
+3. `update_status_values.py` - Update status values
 
-### קבצים שעודכנו:
-1. `models/trade.py` - עדכון מודל הטרייד
-2. `services/trade_service.py` - עדכון שירות הטריידים
-3. `routes/api/trades.py` - עדכון API הטריידים
+### Updated Files:
+1. `models/trade.py` - Update trade model
+2. `services/trade_service.py` - Update trade service
+3. `routes/api/trades.py` - Update trades API
 
-## השפעה על הקוד
+## Code Impact
 
-### קבצי Frontend שעודכנו:
-1. `trading-ui/tracking.html` - עדכון טופסי טריידים
-2. `trading-ui/database.html` - עדכון טופסי טריידים
-3. `trading-ui/scripts/trades.js` - עדכון פונקציות טריידים
+### Updated Frontend Files:
+1. `trading-ui/tracking.html` - Update trade forms
+2. `trading-ui/database.html` - Update trade forms
+3. `trading-ui/scripts/trades.js` - Update trade functions
 
-### שינויים עיקריים בקוד:
-- החלפת `opened_at` ב-`created_at` בכל המקומות
-- עדכון תרגומים עברית-אנגלית לסוגי טריידים
-- עדכון תרגומים עברית-אנגלית לסטטוסים
-- עדכון מבנה הטופסים
+### Main Code Changes:
+- Replace `opened_at` with `created_at` everywhere
+- Update Hebrew-English translations for trade types
+- Update Hebrew-English translations for statuses
+- Update form structure
 
-## ולידציה של טיקרים
+## Ticker Validation
 
 ### 4. הוספת ולידציה לטבלת `tickers`
 

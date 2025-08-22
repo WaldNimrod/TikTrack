@@ -976,13 +976,30 @@
                 <div class="preference-control">
                   <select id="consoleCleanupIntervalSelect" class="form-select"
                     onchange="updateConsoleCleanupInterval(this.value)">
-                    <option value="30000">30 שניות</option>
                     <option value="60000">דקה אחת</option>
+                    <option value="30000">30 שניות</option>
                     <option value="120000">2 דקות</option>
                     <option value="300000">5 דקות</option>
                     <option value="600000">10 דקות</option>
                     <option value="0">אין ניקוי אוטומטי</option>
                   </select>
+                </div>
+              </div>
+
+              <!-- Manual console cleanup -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">🧽</span>
+                  <div class="preference-text">
+                    <h4>ניקוי ידני של קונסולה</h4>
+                    <p>ניקוי מיידי של כל הודעות הקונסולה</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <button class="btn btn-outline-secondary" onclick="manualConsoleCleanup()"
+                    title="ניקוי מיידי של הקונסולה">
+                    <span class="btn-icon">🧹</span> נקה עכשיו
+                  </button>
                 </div>
               </div>
 

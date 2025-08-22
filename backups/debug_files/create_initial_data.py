@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-Creating dummy data for database - Updated 21.08.2025
+Creating dummy data for database - Updated 22.08.2025
 
 This file creates a new database with dummy data compatible with the current active structure:
+✅ Updated with all CRUD fixes and spelling corrections
+✅ Compatible with current database schema
+✅ Includes all recent field updates (side, cancelled_at, etc.)
 
 Table structure (compatible with current structure):
 - tickers: symbol, name, type, remarks, currency, active_trades
 - accounts: name, currency, status, cash_balance, total_value, total_pl, notes
 - trade_plans: account_id, ticker_id, investment_type, side, status, planned_amount, entry_conditions, stop_price, target_price, reasons
-- trades: account_id, ticker_id, trade_plan_id, status, type, side, closed_at, cancelled_at, cancel_reason, total_pl, notes
+- trades: account_id, ticker_id, trade_plan_id, status, type, side, opened_at, closed_at, cancelled_at, cancel_reason, total_pl, notes
 - alerts: related_type_id, related_id, type, condition, message, status, is_triggered
 - cash_flows: account_id, type, amount, date, description
 - notes: content, attachment, related_type_id, related_id
@@ -813,11 +816,12 @@ def create_executions(db: Session):
 def main():
     """Main function"""
     print("🚀 Starting data creation...")
-    print("📋 Creating database with current schema (21.08.2025)")
+    print("📋 Creating database with current schema (22.08.2025)")
     print("✅ Compatible with current database structure")
-    print("✅ Using: swing/investment/passive types, side field, active_trades field")
+    print("✅ Using: swing/investment/passive types, side field (Long/Short), active_trades field")
     print("✅ Flexible notes system with related_type_id")
     print("✅ Mandatory trade-plan linking")
+    print("✅ All CRUD fixes and spelling corrections applied")
     
     # Create database
     init_db()
@@ -850,6 +854,7 @@ def main():
         print("")
         print("✅ Database structure matches current active schema")
         print("✅ All relationships and constraints validated")
+        print("✅ All CRUD fixes and spelling corrections applied")
         print("✅ Ready for production use")
         
     except Exception as e:

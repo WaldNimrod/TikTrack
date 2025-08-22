@@ -7,21 +7,21 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Create engine
+# יצירת engine
 engine = create_engine(
     DATABASE_URL,
     connect_args={"check_same_thread": False},
     poolclass=StaticPool,
     echo=False,
-    pool_pre_ping=True,  # Check connection before use
-    pool_recycle=3600    # Refresh connections every hour
+    pool_pre_ping=True,  # בדיקת חיבור לפני שימוש
+    pool_recycle=3600    # רענון חיבורים כל שעה
 )
 
-# Create session factory
+# יצירת session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db() -> Generator[Session, None, None]:
-    """Function to get DB session"""
+    """פונקציה לקבלת DB session"""
     db = SessionLocal()
     try:
         yield db
@@ -33,7 +33,7 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 def init_db() -> None:
-    """Create all tables"""
+    """יצירת כל הטבלאות"""
     from models.base import Base
     from models import ticker, trade, account, trade_plan, alert, cash_flow, note, execution
     Base.metadata.create_all(bind=engine)

@@ -140,13 +140,18 @@ async function updateTimezone(value) {
  * 
  * פונקציה זו נקראת כאשר המשתמש משנה את זמן ניקוי הקונסולה
  * היא שומרת את ההגדרה החדשה לשרת ומציגה משוב למשתמש
+ * ברירת המחדל היא 60 שניות (דקה אחת)
  * 
  * @param {string} value - זמן הניקוי החדש במילישניות (למשל: '60000' לדקה אחת)
  * @returns {Promise<void>}
  * 
  * @example
- * // עדכון זמן ניקוי לדקה אחת
+ * // עדכון זמן ניקוי לדקה אחת (ברירת מחדל)
  * updateConsoleCleanupInterval('60000');
+ * 
+ * @example
+ * // עדכון זמן ניקוי ל-30 שניות
+ * updateConsoleCleanupInterval('30000');
  * 
  * @example
  * // ביטול ניקוי אוטומטי
@@ -362,7 +367,7 @@ async function loadPreferencesToUI() {
         console.log('✅ אזור זמן נטען:', currentTimezone);
       }
 
-      // עדכון זמן ניקוי קונסולה
+      // עדכון זמן ניקוי קונסולה (ברירת מחדל: 60 שניות)
       const consoleCleanupSelect = document.getElementById('consoleCleanupIntervalSelect');
       if (consoleCleanupSelect) {
         // שימוש בהגדרת המשתמש או ברירת המחדל
@@ -423,6 +428,14 @@ async function loadPreferencesToUI() {
         console.log('✅ פילטר חיפוש ברירת מחדל נטען:', currentSearchFilter);
       }
 
+      // שמירת העדפות ב-localStorage לשימוש מהיר
+      try {
+        localStorage.setItem('tiktrack_preferences', JSON.stringify(preferences));
+        console.log('✅ העדפות נשמרו ב-localStorage');
+      } catch (localStorageError) {
+        console.warn('⚠️ שגיאה בשמירת העדפות ב-localStorage:', localStorageError);
+      }
+
       console.log('✅ העדפות נטענו לממשק בהצלחה');
     } else {
       console.error('❌ שגיאה בטעינת העדפות מהשרת:', response.status);
@@ -467,6 +480,16 @@ async function saveAllPreferences() {
       const success = await savePreference('timezone', timezoneSelect.value);
       if (success) {
         savedPreferences.push('אזור זמן');
+      } else {
+        allSaved = false;
+      }
+    }
+
+    const consoleCleanupSelect = document.getElementById('consoleCleanupIntervalSelect');
+    if (consoleCleanupSelect) {
+      const success = await savePreference('consoleCleanupInterval', parseInt(consoleCleanupSelect.value));
+      if (success) {
+        savedPreferences.push('זמן ניקוי קונסולה');
       } else {
         allSaved = false;
       }
@@ -579,6 +602,22 @@ async function saveAllPreferences() {
 async function savePreference(key, value) {
   try {
     console.log(`🔄 שומר הגדרה: ${key} = ${value}`);
+
+    // עדכון localStorage מיד (לשימוש מהיר)
+    try {
+      const storedPreferences = localStorage.getItem('tiktrack_preferences');
+      let preferences = storedPreferences ? JSON.parse(storedPreferences) : {};
+
+      if (!preferences.user) {
+        preferences.user = {};
+      }
+
+      preferences.user[key] = value;
+      localStorage.setItem('tiktrack_preferences', JSON.stringify(preferences));
+      console.log(`✅ הגדרה ${key} נשמרה ב-localStorage`);
+    } catch (localStorageError) {
+      console.warn(`⚠️ שגיאה בשמירה ב-localStorage:`, localStorageError);
+    }
 
     // שליחת בקשה לשרת
     const response = await fetch(`/api/preferences/${key}`, {
@@ -716,6 +755,14 @@ async function resetSystemPreferences() {
     showNotification('אזור זמן אופס לישראל', 'success');
   }
 
+  // איפוס זמן ניקוי קונסולה - ברירת מחדל 60 שניות (דקה אחת)
+  const consoleCleanupSelect = document.getElementById('consoleCleanupIntervalSelect');
+  if (consoleCleanupSelect) {
+    consoleCleanupSelect.value = '60000';
+    await savePreference('consoleCleanupInterval', 60000);
+    showNotification('זמן ניקוי קונסולה אופס ל-60 שניות (דקה אחת)', 'success');
+  }
+
   showNotification('הגדרות מערכת אופסו ונשמרו לברירות מחדל', 'success');
   markAsSaved(); // מסמן שכל השינויים נשמרו
 }
@@ -744,6 +791,17 @@ async function saveSystemPreferences() {
       const success = await savePreference('timezone', timezoneSelect.value);
       if (success) {
         savedPreferences.push('אזור זמן');
+      } else {
+        allSaved = false;
+      }
+    }
+
+    // שמירת זמן ניקוי קונסולה
+    const consoleCleanupSelect = document.getElementById('consoleCleanupIntervalSelect');
+    if (consoleCleanupSelect) {
+      const success = await savePreference('consoleCleanupInterval', parseInt(consoleCleanupSelect.value));
+      if (success) {
+        savedPreferences.push('זמן ניקוי קונסולה');
       } else {
         allSaved = false;
       }
@@ -1336,7 +1394,16 @@ window.getCurrentPreference = getCurrentPreference;
 window.showNotification = showNotification;
 window.updatePrimaryCurrency = updatePrimaryCurrency;
 window.updateTimezone = updateTimezone;
+window.updateConsoleCleanupInterval = updateConsoleCleanupInterval;
 window.updateDefaultStopLoss = updateDefaultStopLoss;
+window.manualConsoleCleanup = function () {
+  if (typeof window.manualConsoleCleanup === 'function') {
+    window.manualConsoleCleanup();
+    showNotification('הקונסולה נוקתה בהצלחה', 'success');
+  } else {
+    showNotification('פונקציית ניקוי קונסולה לא זמינה', 'error');
+  }
+};
 window.updateDefaultTargetPrice = updateDefaultTargetPrice;
 window.updateDefaultStatusFilter = updateDefaultStatusFilter;
 window.updateDefaultTypeFilter = updateDefaultTypeFilter;

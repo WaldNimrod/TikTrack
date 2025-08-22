@@ -5,13 +5,19 @@
  * across all pages in the TikTrack application.
  * 
  * Features:
- * - Configurable cleanup interval from user preferences
+ * - Configurable cleanup interval from user preferences (default: 60 seconds)
  * - Automatic cleanup on page load
  * - Manual cleanup function
  * - Integration with preferences system
+ * - localStorage caching for fast access
+ * 
+ * Default Settings:
+ * - Default cleanup interval: 60 seconds (60000ms)
+ * - Can be disabled by setting interval to 0
+ * - Available intervals: 30s, 60s, 2min, 5min, 10min, disabled
  * 
  * @file console-cleanup.js
- * @version 1.0
+ * @version 1.1
  * @author TikTrack Development Team
  * @since August 2025
  */
@@ -25,7 +31,7 @@ let consoleCleanupTimeout = null;
  * Initializes console cleanup based on user preferences
  * 
  * This function loads the cleanup interval from preferences and sets up
- * the automatic cleanup timer.
+ * the automatic cleanup timer. Default interval is 60 seconds.
  * 
  * @returns {Promise<void>}
  * 
@@ -39,7 +45,7 @@ async function initializeConsoleCleanup() {
 
         // Load preferences from localStorage first (faster)
         const storedPreferences = localStorage.getItem('tiktrack_preferences');
-        let cleanupInterval = 60000; // Default: 60 seconds
+        let cleanupInterval = 60000; // Default: 60 seconds (1 minute)
 
         if (storedPreferences) {
             try {

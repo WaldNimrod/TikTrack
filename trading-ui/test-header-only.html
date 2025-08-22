@@ -149,10 +149,18 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5>בדיקת פילטרים</h5>
+                                        <h5>🔍 מצב פילטרים (Debug)</h5>
                                     </div>
                                     <div class="card-body">
-                                        <p>הפילטר עובד אוטומטית - אין צורך בכפתורים</p>
+                                        <div id="filterDebugInfo"
+                                            style="font-family: monospace; font-size: 11px; background: #f8f9fa; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
+                                            <div><strong>Status:</strong> <span id="statusDebug">-</span></div>
+                                            <div><strong>Type:</strong> <span id="typeDebug">-</span></div>
+                                            <div><strong>Account:</strong> <span id="accountDebug">-</span></div>
+                                            <div><strong>Date:</strong> <span id="dateDebug">-</span></div>
+                                        </div>
+                                        <button onclick="updateDebugInfo()" class="btn btn-sm btn-primary mt-2">🔄
+                                            עדכן</button>
                                     </div>
                                 </div>
                             </div>
@@ -403,9 +411,52 @@
 
 
 
+            // פונקציית debug למצב פילטרים
+            function updateDebugInfo() {
+                const filters = ['status', 'type', 'account', 'date'];
+
+                filters.forEach(filterType => {
+                    const menuId = filterType === 'status' ? 'statusFilterMenu' :
+                        filterType === 'type' ? 'typeFilterMenu' :
+                            filterType === 'account' ? 'accountFilterMenu' :
+                                'dateRangeFilterMenu';
+
+                    const menu = document.getElementById(menuId);
+                    const debugSpan = document.getElementById(filterType + 'Debug');
+
+                    if (menu && debugSpan) {
+                        const hasShow = menu.classList.contains('show');
+                        const computedDisplay = window.getComputedStyle(menu).display;
+                        const computedVisibility = window.getComputedStyle(menu).visibility;
+                        const inlineDisplay = menu.style.display;
+
+                        debugSpan.innerHTML = `
+                            Show: ${hasShow} | 
+                            Display: ${computedDisplay} | 
+                            Inline: ${inlineDisplay || 'none'}
+                        `;
+
+                        // צבע לפי מצב
+                        if (hasShow && computedDisplay === 'block') {
+                            debugSpan.style.color = 'green';
+                            debugSpan.style.fontWeight = 'bold';
+                        } else if (hasShow && computedDisplay === 'none') {
+                            debugSpan.style.color = 'red';
+                            debugSpan.style.fontWeight = 'bold';
+                        } else {
+                            debugSpan.style.color = 'gray';
+                            debugSpan.style.fontWeight = 'normal';
+                        }
+                    }
+                });
+            }
+
             // אתחול הדף
             document.addEventListener('DOMContentLoaded', function () {
                 log('🚀 טעינת דף בדיקה (ללא app-header)...');
+
+                // עדכון debug כל 2 שניות
+                setInterval(updateDebugInfo, 2000);
 
                 // בדיקת זמינות המערכות
                 setTimeout(() => {

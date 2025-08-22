@@ -2940,4 +2940,331 @@ window.closeAllFilters = function () {
   }
 };
 
+// ========================================
+// פונקציות גלובליות לפילטור - הועברו מ-grid-filters.js
+// ========================================
+
+/**
+ * פונקציה לקבלת סוג הטבלה לפי מזהה הדף
+ * @param {string} pageName - שם הדף
+ * @returns {string} - סוג הטבלה
+ */
+function getTableType(pageName) {
+  // מיפוי דפים לסוגי טבלאות
+  const tableTypeMap = {
+    'designs': 'designs',
+    'planning': 'designs',
+    'tracking': 'trades',
+    'trades': 'trades',
+    'accounts': 'accounts',
+    'notes': 'notes',
+    'alerts': 'alerts'
+  };
+
+  return tableTypeMap[pageName] || pageName;
+}
+
+/**
+ * פונקציה לקבלת טווח תאריכים
+ * @param {string} dateRange - טווח התאריכים
+ * @returns {object} - אובייקט עם תאריך התחלה וסיום
+ */
+function getDateRange(dateRange) {
+  const now = new Date();
+  const start = new Date(now);
+  const end = new Date(now);
+
+  switch (dateRange) {
+    case 'today':
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'week':
+      start.setDate(now.getDate() - now.getDay());
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'month':
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'quarter':
+      const quarter = Math.floor(now.getMonth() / 3);
+      start.setMonth(quarter * 3, 1);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'year':
+      start.setMonth(0, 1);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    default:
+      start.setFullYear(1900);
+      end.setHours(23, 59, 59, 999);
+  }
+
+  return { start, end };
+}
+
+/**
+ * פונקציה לפילטור נתונים לפי כל הפילטרים
+ * פונקציה גלובלית שמשותפת לכל הדפים
+ */
+function filterDataByFilters(data, pageName) {
+  console.log(`🔄 === FILTER DATA BY FILTERS (${pageName}) ===`);
+  console.log('🔄 Original data length:', data.length);
+
+  if (!data || data.length === 0) {
+    console.log('🔄 No data to filter');
+    return [];
+  }
+
+  let filteredData = [...data];
+
+  // קבלת סוג הטבלה
+  const tableType = getTableType(pageName);
+
+  // קבלת פילטרים שמורים
+  const selectedStatuses = window.selectedStatusesForFilter || [];
+  const selectedTypes = window.selectedTypesForFilter || [];
+  const selectedAccounts = window.selectedAccountsForFilter || [];
+  const selectedDateRange = window.selectedDateRangeForFilter || null;
+  const searchTerm = window.searchTermForFilter || '';
+
+  console.log('🔄 Filters to apply:', {
+    selectedStatuses,
+    selectedTypes,
+    selectedAccounts,
+    selectedDateRange,
+    searchTerm
+  });
+
+  // פילטר לפי סטטוס (לא חל על הערות)
+  if (tableType !== 'notes' && selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
+    console.log('🔄 Filtering by status:', selectedStatuses);
+    filteredData = filteredData.filter(item => {
+      let itemStatus;
+
+      if (pageName === 'planning') {
+        // מיפוי סטטוסים לדף התכנון
+        if (item.status === 'cancelled') {
+          itemStatus = 'מבוטל';
+        } else if (item.status === 'closed') {
+          itemStatus = 'סגור';
+        } else {
+          itemStatus = 'פתוח';
+        }
+      } else if (pageName === 'tracking') {
+        // מיפוי סטטוסים לדף המעקב
+        if (item.status === 'closed') {
+          itemStatus = 'סגור';
+        } else if (item.status === 'cancelled') {
+          itemStatus = 'מבוטל';
+        } else {
+          itemStatus = 'פתוח';
+        }
+      } else {
+        itemStatus = item.status;
+      }
+
+      return selectedStatuses.includes(itemStatus);
+    });
+  }
+
+  // פילטר לפי סוג (לא חל על הערות)
+  if (tableType !== 'notes' && selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
+    console.log('🔄 Filtering by type:', selectedTypes);
+    filteredData = filteredData.filter(item => {
+      const itemType = item.type || item.trade_type;
+      return selectedTypes.includes(itemType);
+    });
+  }
+
+  // פילטר לפי חשבון
+  if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('all')) {
+    console.log('🔄 Filtering by account:', selectedAccounts);
+    filteredData = filteredData.filter(item => {
+      const itemAccount = item.account_name || item.account_id;
+      return selectedAccounts.includes(itemAccount);
+    });
+  }
+
+  // פילטר לפי טווח תאריכים
+  if (selectedDateRange && selectedDateRange !== 'all') {
+    console.log('🔄 Filtering by date range:', selectedDateRange);
+    const { start, end } = getDateRange(selectedDateRange);
+
+    filteredData = filteredData.filter(item => {
+      const itemDate = new Date(item.date || item.created_at || item.opened_at);
+      return itemDate >= start && itemDate <= end;
+    });
+  }
+
+  // פילטר לפי חיפוש
+  if (searchTerm && searchTerm.trim() !== '') {
+    console.log('🔄 Filtering by search term:', searchTerm);
+    const searchLower = searchTerm.toLowerCase();
+
+    filteredData = filteredData.filter(item => {
+      // חיפוש בשדות שונים לפי סוג הטבלה
+      if (tableType === 'notes') {
+        return (item.title && item.title.toLowerCase().includes(searchLower)) ||
+          (item.content && item.content.toLowerCase().includes(searchLower));
+      } else if (tableType === 'accounts') {
+        return (item.name && item.name.toLowerCase().includes(searchLower)) ||
+          (item.currency && item.currency.toLowerCase().includes(searchLower));
+      } else {
+        return (item.symbol && item.symbol.toLowerCase().includes(searchLower)) ||
+          (item.name && item.name.toLowerCase().includes(searchLower)) ||
+          (item.description && item.description.toLowerCase().includes(searchLower));
+      }
+    });
+  }
+
+  console.log('🔄 Filtered data length:', filteredData.length);
+  return filteredData;
+}
+
+/**
+ * פונקציה לעדכון גלובלי של הטבלה
+ */
+function updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName) {
+  console.log(`🔄 === UPDATE GRID FROM COMPONENT GLOBAL (${pageName}) ===`);
+  console.log('🔄 Filters:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm });
+
+  // שמירת הפילטרים בגלובל
+  window.selectedStatusesForFilter = selectedStatuses;
+  window.selectedTypesForFilter = selectedTypes;
+  window.selectedAccountsForFilter = selectedAccounts;
+  window.selectedDateRangeForFilter = selectedDateRange;
+  window.searchTermForFilter = searchTerm;
+
+  // קריאה לפונקציה הספציפית לדף
+  let pageUpdateFunction;
+  if (pageName === 'tracking') {
+    pageUpdateFunction = window.updateTradesGrid;
+  } else if (pageName === 'planning') {
+    pageUpdateFunction = window.updateDesignsGrid;
+  } else if (pageName === 'notes') {
+    pageUpdateFunction = window.updateNotesGrid;
+  } else if (pageName === 'accounts') {
+    pageUpdateFunction = window.updateAccountsGrid;
+  } else if (pageName === 'alerts') {
+    pageUpdateFunction = window.updateAlertsGrid;
+  } else {
+    pageUpdateFunction = window[`update${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Grid`];
+  }
+
+  if (pageUpdateFunction && typeof pageUpdateFunction === 'function') {
+    console.log(`🔄 Calling page-specific update function: ${pageUpdateFunction.name}`);
+    pageUpdateFunction();
+  } else {
+    console.log(`🔍 Page-specific update function not found for ${pageName}`);
+  }
+}
+
+/**
+ * פונקציה לטעינת פילטרים שמורים
+ */
+function loadSavedFiltersForPage(pageName) {
+  console.log(`🔄 === LOAD SAVED FILTERS FOR PAGE (${pageName}) ===`);
+
+  try {
+    // טעינת פילטרים שמורים מ-localStorage
+    const savedFilters = localStorage.getItem(`${pageName}Filters`);
+    if (savedFilters) {
+      const filters = JSON.parse(savedFilters);
+
+      window.selectedStatusesForFilter = filters.statuses || [];
+      window.selectedTypesForFilter = filters.types || [];
+      window.selectedAccountsForFilter = filters.accounts || [];
+      window.selectedDateRangeForFilter = filters.dateRange || 'all';
+      window.searchTermForFilter = filters.search || '';
+
+      console.log('🔄 Loaded saved filters:', filters);
+    } else {
+      console.log('🔄 No saved filters found for page:', pageName);
+    }
+  } catch (error) {
+    console.error('❌ Error loading saved filters:', error);
+  }
+}
+
+/**
+ * פונקציה לאיפוס כל הפילטרים
+ */
+function resetAllFiltersForPage(pageName) {
+  console.log(`🔄 === RESET ALL FILTERS FOR PAGE (${pageName}) ===`);
+
+  // איפוס הפילטרים בגלובל
+  window.selectedStatusesForFilter = [];
+  window.selectedTypesForFilter = [];
+  window.selectedAccountsForFilter = [];
+  window.selectedDateRangeForFilter = 'all';
+  window.searchTermForFilter = '';
+
+  // מחיקת הפילטרים השמורים
+  try {
+    localStorage.removeItem(`${pageName}Filters`);
+    console.log('🔄 Cleared saved filters for page:', pageName);
+  } catch (error) {
+    console.error('❌ Error clearing saved filters:', error);
+  }
+
+  // עדכון הגריד
+  updateGridFromComponentGlobal([], [], [], 'all', '', pageName);
+}
+
+/**
+ * פונקציה לאתחול פילטרים לדף
+ */
+function initializePageFilters(pageName) {
+  console.log(`🔄 === INITIALIZE PAGE FILTERS (${pageName}) ===`);
+
+  // טעינת פילטרים שמורים
+  loadSavedFiltersForPage(pageName);
+
+  // קריאה לפונקציה הספציפית לדף
+  let pageLoadFunction;
+  if (pageName === 'tracking') {
+    pageLoadFunction = window.loadTradesData;
+  } else if (pageName === 'planning') {
+    pageLoadFunction = window.loadDesignsData;
+  } else if (pageName === 'notes') {
+    pageLoadFunction = window.loadNotesData;
+  } else if (pageName === 'accounts') {
+    pageLoadFunction = window.loadAccountsData;
+  } else if (pageName === 'alerts') {
+    pageLoadFunction = window.loadAlertsData;
+  } else if (pageName === 'database') {
+    pageLoadFunction = window.refreshAllTables;
+  } else {
+    pageLoadFunction = window[`load${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`];
+  }
+
+  if (pageLoadFunction && typeof pageLoadFunction === 'function') {
+    console.log(`🔄 Calling page-specific load function: ${pageLoadFunction.name}`);
+    pageLoadFunction();
+  } else {
+    console.log(`🔍 Page-specific load function not found for ${pageName}`);
+  }
+}
+
+// הוספת הפונקציות לגלובל
+window.filterDataByFilters = filterDataByFilters;
+window.getTableType = getTableType;
+window.getDateRange = getDateRange;
+window.updateGridFromComponentGlobal = updateGridFromComponentGlobal;
+window.loadSavedFiltersForPage = loadSavedFiltersForPage;
+window.resetAllFiltersForPage = resetAllFiltersForPage;
+window.initializePageFilters = initializePageFilters;
+
+// בדיקה שהפונקציות הוגדרו נכון
+console.log('🔄 Grid filters loaded. Available functions:', {
+  filterDataByFilters: typeof window.filterDataByFilters,
+  updateGridFromComponentGlobal: typeof window.updateGridFromComponentGlobal
+});
+
 

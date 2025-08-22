@@ -34,33 +34,33 @@
   --apple-yellow: #FFCC02;
   --apple-purple: #AF52DE;
   --apple-pink: #FF2D92;
-  
+
   /* רקעים */
   --apple-bg-primary: #FFFFFF;
   --apple-bg-secondary: #F2F2F7;
   --apple-bg-tertiary: #FFFFFF;
   --apple-bg-elevated: #FFFFFF;
-  
+
   /* טקסט */
   --apple-text-primary: #000000;
   --apple-text-secondary: #3C3C43;
   --apple-text-tertiary: #3C3C4399;
   --apple-text-quaternary: #3C3C434D;
-  
+
   /* גבולות */
   --apple-border: #C6C6C8;
   --apple-border-light: #E5E5EA;
-  
+
   /* צללים */
   --apple-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
   --apple-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
   --apple-shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.2);
-  
+
   /* רדיוס */
   --apple-radius-small: 6px;
   --apple-radius-medium: 10px;
   --apple-radius-large: 16px;
-  
+
   /* מרווחים */
   --apple-spacing-xs: 4px;
   --apple-spacing-sm: 8px;
@@ -69,8 +69,8 @@
   --apple-spacing-xl: 32px;
 }
 
-/* סגנון בסיסי */
-body { 
+/* סגנון בסיסי - font-family מנוהל ב-typography.css */
+body {
   background-color: var(--apple-bg-secondary);
   color: var(--apple-text-primary);
   margin: 0;
@@ -78,63 +78,19 @@ body {
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', sans-serif;
 }
 
-/* תפריט ראשי בסגנון אפל */
-.main-header {
-  background: var(--apple-bg-elevated);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding: var(--apple-spacing-sm) 0;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
+/* תפריט ראשי - הועבר ל-header-system.css */
 
-.header-container {
-  width: 100%;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 5px 0;
-}
+/* .logo-section - הועבר ל-header-system.css */
 
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: var(--apple-spacing-sm);
-}
+/* .logo-icon ו-.logo-text - הועברו ל-header-system.css */
 
-.logo-icon {
-  font-size: 24px;
-  color: var(--apple-blue);
-}
+/* .nav-menu - הועבר ל-header-system.css */
 
-.logo-text {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--apple-text-primary);
-  letter-spacing: -0.01em;
-}
+/* .nav-item - הועבר ל-header-system.css */
 
-.nav-menu {
-  display: flex;
-  gap: var(--apple-spacing-sm);
-  align-items: center;
-}
-
-/* .nav-item - הועבר ל-menu.css */
-
-.nav-icon {
-  font-size: 18px;
-}
-
-.nav-text {
-  font-size: 15px;
-  font-weight: 500;
-}
+/* .nav-icon ו-.nav-text - הועברו ל-header-system.css */
 
 /* כפתורים בסגנון אפל - משתמשים בסגנונות הגלובליים */
 

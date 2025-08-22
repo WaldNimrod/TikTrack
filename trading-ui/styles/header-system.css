@@ -1,6 +1,62 @@
 /* ===== סגנונות אלמנט ראש הדף החדש ===== */
 /* סגנונות אלה מיועדים רק לאלמנט unified-header */
 
+/* סגנונות לוגו - מועברים מ-menu.css */
+#unified-header .logo-section {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    direction: ltr;
+    /* הלוגו צריך להיות LTR */
+}
+
+#unified-header .logo-text {
+    margin-bottom: 10px;
+}
+
+#unified-header .logo-icon {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 16px 0;
+}
+
+#unified-header .home-icon {
+    color: #09384d;
+    font-size: 48px;
+    font-weight: 500;
+}
+
+/* אנימציות נוספות לפריטי ניווט - מועברים מ-menu.css */
+#unified-header .nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+#unified-header .nav-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(41, 166, 168, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    border-radius: 6px;
+}
+
+#unified-header .nav-item:hover::before {
+    opacity: 1;
+}
+
+#unified-header .nav-item.active::before {
+    opacity: 0;
+    background: transparent;
+}
+
 /* סגנונות בסיסיים לכותרת */
 #unified-header {
     background: var(--apple-bg-elevated);
@@ -494,24 +550,8 @@
     display: none;
 }
 
-#unified-header .filter-menu.show {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
-    display: block !important;
-    position: absolute !important;
-    z-index: 10000 !important;
-}
-
-/* וידוא שהתפריטים נפתחים */
-#unified-header .filter-menu.show {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-/* CSS ספציפי לפילטר סטטוס */
-#statusFilterMenu {
+/* סגנונות בסיס לפילטרים - רק למצב סגור */
+#unified-header .filter-menu {
     position: absolute !important;
     top: 100% !important;
     right: 0 !important;
@@ -530,17 +570,30 @@
     display: none;
 }
 
-#statusFilterMenu.show {
+/* סגנונות לפילטרים פתוחים */
+#unified-header .filter-menu.show {
     opacity: 1 !important;
     visibility: visible !important;
     transform: translateY(0) !important;
     display: block !important;
-    position: absolute !important;
-    z-index: 10001 !important;
+}
+
+/* CSS ספציפי לפילטר סטטוס - רק תוספות מיוחדות */
+#statusFilterMenu.show {
     flex-direction: unset !important;
     align-items: unset !important;
     justify-content: unset !important;
     flex: unset !important;
+}
+
+/* CSS ספציפי לפילטר טיפוס - אין צורך בתוספות */
+
+/* CSS ספציפי לפילטר חשבונות - אין צורך בתוספות */
+
+/* CSS ספציפי לפילטר תאריכים - רק תוספות מיוחדות */
+#dateRangeFilterMenu {
+    max-height: 400px !important;
+    overflow-y: auto !important;
 }
 
 

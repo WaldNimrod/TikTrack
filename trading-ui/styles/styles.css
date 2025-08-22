@@ -889,14 +889,13 @@ button.btn-primary-emphasized {
     min-height: 48px !important;
   }
 
-  /* עיצוב כללי */
+  /* עיצוב כללי - font-family מנוהל ב-typography.css */
   html,
   body {
     margin: 0;
     padding: 0;
     background-color: white;
     color: #222;
-    font-family: Georgia, 'Times New Roman', serif;
     direction: rtl;
   }
 
@@ -915,15 +914,7 @@ button.btn-primary-emphasized {
 
   /* הגדרות RTL לגריד - הועבר ל-apple-theme.css */
 
-  /* הגדרות RTL לטקסטים */
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    direction: rtl;
-  }
+  /* הגדרות RTL לטקסטים - font-family מנוהל ב-typography.css */
 
   label,
   span,
@@ -944,13 +935,7 @@ button.btn-primary-emphasized {
     text-align: right;
   }
 
-  /* מרווחים לכותרת עם Web Component */
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: Georgia, 'Times New Roman', serif;
-    background-color: #f5f5f7;
-  }
+  /* מרווחים לכותרת עם Web Component - הגדרות body מנוהלות ב-apple-theme.css */
 
 
   .background-wrapper.filter-collapsed {
@@ -972,11 +957,7 @@ button.btn-primary-emphasized {
     box-sizing: border-box;
   }
 
-  /* עיצוב הכותרת */
-  h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
+  /* עיצוב הכותרת - font-family וגודל מנוהלים ב-typography.css */
 
   .button-primary {
     background-color: #29a6a8;
@@ -1517,13 +1498,7 @@ button.btn-primary-emphasized {
 
   /* עיצוב לגריד - הוסר (AG Grid) */
 
-  /* סגנונות ייחודיים לדפים */
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', sans-serif;
-    background-color: #f5f5f7;
-  }
+  /* סגנונות ייחודיים לדפים - הגדרות body מנוהלות ב-apple-theme.css */
 
 
   .background-wrapper.filter-collapsed {
@@ -2655,92 +2630,7 @@ button[title="שמור"] span,
   font-size: 0.875rem !important;
 }
 
-/* ===== צבעים לאובייקטים מקושרים בטבלת הערות ===== */
-
-/* חשבון - רקע כחול עדין */
-.related-account {
-  background: linear-gradient(135deg, rgba(100, 181, 246, 0.1) 0%, rgba(66, 165, 245, 0.1) 100%) !important;
-  border-left: 4px solid #1976d2 !important;
-  padding: 8px 12px !important;
-  border-radius: 6px !important;
-  font-weight: 500 !important;
-  color: #1565c0 !important;
-  position: relative !important;
-}
-
-.related-account::before {
-  content: '🏦' !important;
-  margin-left: 4px !important;
-  font-size: 0.9em !important;
-}
-
-/* טרייד - רקע ירוק עדין */
-.related-trade {
-  background: linear-gradient(135deg, rgba(129, 199, 132, 0.1) 0%, rgba(102, 187, 106, 0.1) 100%) !important;
-  border-left: 4px solid #388e3c !important;
-  padding: 8px 12px !important;
-  border-radius: 6px !important;
-  font-weight: 500 !important;
-  color: #2e7d32 !important;
-  position: relative !important;
-}
-
-.related-trade::before {
-  content: '📈' !important;
-  margin-left: 4px !important;
-  font-size: 0.9em !important;
-}
-
-/* תוכנית טרייד - רקע כתום עדין */
-.related-plan {
-  background: linear-gradient(135deg, rgba(255, 183, 77, 0.1) 0%, rgba(255, 167, 38, 0.1) 100%) !important;
-  border-left: 4px solid #f57c00 !important;
-  padding: 8px 12px !important;
-  border-radius: 6px !important;
-  font-weight: 500 !important;
-  color: #ef6c00 !important;
-  position: relative !important;
-}
-
-.related-plan::before {
-  content: '📋' !important;
-  margin-left: 4px !important;
-  font-size: 0.9em !important;
-}
-
-.related-ticker::before {
-  content: '🎯' !important;
-  margin-left: 4px !important;
-  font-size: 0.9em !important;
-}
-
-/* אפקט hover לכל האובייקטים המקושרים */
-.related-account:hover,
-.related-trade:hover,
-.related-plan:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  transition: all 0.2s ease !important;
-}
-
-/* אנימציה עדינה בטעינה */
-.related-account,
-.related-trade,
-.related-plan {
-  animation: fadeInUp 0.3s ease-out !important;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* צבעים לאובייקטים מקושרים - משתמש בהגדרות מ-table.css */
 
 /* ===== סגנונות למודול הוספת חשבון ===== */
 /* הגדרות ספציפיות למודל החשבון - עיצוב גלובלי מוחל אוטומטית */
@@ -3071,108 +2961,7 @@ button[onclick*="showAddAccountModalLocal"]:hover {
   border-color: #1f8a8c !important;
 }
 
-/* ========================================
-   עיצוב אובייקטים מקושרים - Related Objects
-   ======================================== */
-
-/* עיצוב שדה האובייקט המקושר */
-.related-object-cell {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 0.9rem;
-  text-align: right;
-  min-height: 40px;
-  box-sizing: border-box;
-  transition: all 0.2s ease-in-out;
-  direction: rtl;
-}
-
-/* צבעים לאובייקטים מקושרים */
-.related-account {
-  background-color: #e3f2fd;
-  color: #1565c0;
-  border: 1px solid #bbdefb;
-}
-
-.related-trade {
-  background-color: #e8f5e8;
-  color: #2e7d32;
-  border: 1px solid #c8e6c9;
-}
-
-.related-plan {
-  background-color: #fff3e0;
-  color: #ef6c00;
-  border: 1px solid #ffcc02;
-}
-
-.related-ticker {
-  background-color: #fce4ec;
-  color: #c2185b;
-  border: 1px solid #f8bbd9;
-}
-
-.related-other {
-  background-color: #f5f5f5;
-  color: #616161;
-  border: 1px solid #e0e0e0;
-}
-
-/* Hover effects */
-.related-account:hover {
-  background-color: #bbdefb;
-  color: #0d47a1;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.related-trade:hover {
-  background-color: #c8e6c9;
-  color: #1b5e20;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.related-plan:hover {
-  background-color: #ffcc02;
-  color: #e65100;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.related-ticker:hover {
-  background-color: #f8bbd9;
-  color: #880e4f;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.related-other:hover {
-  background-color: #e0e0e0;
-  color: #424242;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* עיצוב לטבלאות עם אובייקטים מקושרים */
-.table td[style*="padding: 0"] {
-  padding: 0 !important;
-}
-
-/* התאמה למסכים קטנים */
-@media (max-width: 768px) {
-  .related-object-cell {
-    padding: 6px 8px;
-    font-size: 0.8rem;
-    min-height: 35px;
-  }
-}
+/* עיצוב אובייקטים מקושרים - משתמש בהגדרות מ-table.css */
 
 /* ========================================
  * עיצוב אחיד לכל המודלים באתר

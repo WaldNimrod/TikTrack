@@ -145,13 +145,23 @@ class TradeService:
     @staticmethod
     def delete(db: Session, trade_id: int) -> bool:
         """Delete trade"""
+        from models.execution import Execution
+        
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
-        if trade:
-            db.delete(trade)
-            db.commit()
-            logger.info(f"Deleted trade: {trade_id}")
-            return True
-        return False
+        if not trade:
+            return False
+        
+        # Check for linked executions
+        executions = db.query(Execution).filter(Execution.trade_id == trade_id).all()
+        if executions:
+            logger.warning(f"Cannot delete trade {trade_id}: has {len(executions)} linked executions")
+            return False
+        
+        # Safe to delete
+        db.delete(trade)
+        db.commit()
+        logger.info(f"Deleted trade: {trade_id}")
+        return True
     
     @staticmethod
     def close_trade(db: Session, trade_id: int, close_data: Dict[str, Any]) -> Optional[Trade]:

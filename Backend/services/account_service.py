@@ -43,13 +43,30 @@ class AccountService:
     @staticmethod
     def delete(db: Session, account_id: int) -> bool:
         """Delete account"""
+        from models.trade import Trade
+        from models.execution import Execution
+        
         account = db.query(Account).filter(Account.id == account_id).first()
-        if account:
-            db.delete(account)
-            db.commit()
-            logger.info(f"Deleted account: {account.name}")
-            return True
-        return False
+        if not account:
+            return False
+        
+        # Check for linked trades
+        trades = db.query(Trade).filter(Trade.account_id == account_id).all()
+        if trades:
+            logger.warning(f"Cannot delete account {account_id}: has {len(trades)} linked trades")
+            return False
+        
+        # Check for linked executions (through trades)
+        executions = db.query(Execution).join(Trade).filter(Trade.account_id == account_id).all()
+        if executions:
+            logger.warning(f"Cannot delete account {account_id}: has {len(executions)} linked executions")
+            return False
+        
+        # Safe to delete
+        db.delete(account)
+        db.commit()
+        logger.info(f"Deleted account: {account.name}")
+        return True
     
     @staticmethod
     def get_stats(db: Session, account_id: int) -> Dict[str, Any]:

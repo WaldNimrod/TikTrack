@@ -150,6 +150,7 @@ def delete_account(account_id: int):
                 "version": "v1"
             }), 400
         
+        # Try to delete (this will check for all linked items)
         success = AccountService.delete(db, account_id)
         if success:
             return jsonify({
@@ -157,11 +158,15 @@ def delete_account(account_id: int):
                 "message": "Account deleted successfully",
                 "version": "v1"
             })
+        
+        # If deletion failed, it means there are linked items
         return jsonify({
             "status": "error",
-            "error": {"message": "Account not found"},
+            "error": {
+                "message": "Cannot delete account - it has linked trades, executions, or other items"
+            },
             "version": "v1"
-        }), 404
+        }), 400
     except Exception as e:
         logger.error(f"Error deleting account {account_id}: {str(e)}")
         return jsonify({

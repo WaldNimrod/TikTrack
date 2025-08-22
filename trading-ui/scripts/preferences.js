@@ -344,102 +344,95 @@ async function loadPreferencesToUI() {
   try {
     console.log('🔄 טוען העדפות לממשק...');
 
-    // טעינת העדפות מהשרת
-    const response = await fetch('/api/preferences');
-    if (response.ok) {
-      const preferences = await response.json();
+    // ברירות מחדל
+    const defaultPreferences = {
+      primaryCurrency: 'USD',
+      timezone: 'Asia/Jerusalem',
+      consoleCleanupInterval: 60000,
+      defaultStopLoss: 5.0,
+      defaultTargetPrice: 10.0,
+      defaultStatusFilter: 'all',
+      defaultTypeFilter: 'all',
+      defaultAccountFilter: 'all',
+      defaultDateRangeFilter: 'all',
+      defaultSearchFilter: ''
+    };
 
-      // עדכון ממשק המשתמש עם הערכים הנוכחיים
-      const currencySelect = document.getElementById('primaryCurrencySelect');
-      if (currencySelect) {
-        // שימוש בהגדרת המשתמש או ברירת המחדל
-        const currentCurrency = preferences.user.primaryCurrency || preferences.defaults.primaryCurrency;
-        currencySelect.value = currentCurrency;
-        console.log('✅ מטבע ראשי נטען:', currentCurrency);
-      }
-
-      // עדכון אזור זמן
-      const timezoneSelect = document.getElementById('timezoneSelect');
-      if (timezoneSelect) {
-        // שימוש בהגדרת המשתמש או ברירת המחדל
-        const currentTimezone = preferences.user.timezone || preferences.defaults.timezone;
-        timezoneSelect.value = currentTimezone;
-        console.log('✅ אזור זמן נטען:', currentTimezone);
-      }
-
-      // עדכון זמן ניקוי קונסולה (ברירת מחדל: 60 שניות)
-      const consoleCleanupSelect = document.getElementById('consoleCleanupIntervalSelect');
-      if (consoleCleanupSelect) {
-        // שימוש בהגדרת המשתמש או ברירת המחדל
-        const currentCleanupInterval = preferences.user.consoleCleanupInterval || preferences.defaults.consoleCleanupInterval || 60000;
-        consoleCleanupSelect.value = currentCleanupInterval;
-        console.log('✅ זמן ניקוי קונסולה נטען:', currentCleanupInterval);
-      }
-
-      // עדכון סטופ לוס ברירת מחדל
-      const stopLossInput = document.getElementById('defaultStopLossInput');
-      if (stopLossInput) {
-        const currentStopLoss = preferences.user.defaultStopLoss || preferences.defaults.defaultStopLoss;
-        stopLossInput.value = currentStopLoss;
-        console.log('✅ סטופ לוס ברירת מחדל נטען:', currentStopLoss);
-      }
-
-      // עדכון מחיר יעד ברירת מחדל
-      const targetPriceInput = document.getElementById('defaultTargetPriceInput');
-      if (targetPriceInput) {
-        const currentTargetPrice = preferences.user.defaultTargetPrice || preferences.defaults.defaultTargetPrice;
-        targetPriceInput.value = currentTargetPrice;
-        console.log('✅ מחיר יעד ברירת מחדל נטען:', currentTargetPrice);
-      }
-
-      // עדכון הגדרות תצוגה
-      const statusFilterSelect = document.getElementById('defaultStatusFilterSelect');
-      if (statusFilterSelect) {
-        const currentStatusFilter = preferences.user.defaultStatusFilter || preferences.defaults.defaultStatusFilter || 'all';
-        statusFilterSelect.value = currentStatusFilter;
-        console.log('✅ פילטר סטטוס ברירת מחדל נטען:', currentStatusFilter);
-      }
-
-      const typeFilterSelect = document.getElementById('defaultTypeFilterSelect');
-      if (typeFilterSelect) {
-        const currentTypeFilter = preferences.user.defaultTypeFilter || preferences.defaults.defaultTypeFilter || 'all';
-        typeFilterSelect.value = currentTypeFilter;
-        console.log('✅ פילטר סוג ברירת מחדל נטען:', currentTypeFilter);
-      }
-
-      const accountFilterSelect = document.getElementById('defaultAccountFilterSelect');
-      if (accountFilterSelect) {
-        const currentAccountFilter = preferences.user.defaultAccountFilter || preferences.defaults.defaultAccountFilter || 'all';
-        accountFilterSelect.value = currentAccountFilter;
-        console.log('✅ פילטר חשבון ברירת מחדל נטען:', currentAccountFilter);
-      }
-
-      const dateRangeFilterSelect = document.getElementById('defaultDateRangeFilterSelect');
-      if (dateRangeFilterSelect) {
-        const currentDateRangeFilter = preferences.user.defaultDateRangeFilter || preferences.defaults.defaultDateRangeFilter || 'all';
-        dateRangeFilterSelect.value = currentDateRangeFilter;
-        console.log('✅ פילטר טווח תאריכים ברירת מחדל נטען:', currentDateRangeFilter);
-      }
-
-      const searchFilterInput = document.getElementById('defaultSearchFilterInput');
-      if (searchFilterInput) {
-        const currentSearchFilter = preferences.user.defaultSearchFilter || preferences.defaults.defaultSearchFilter || '';
-        searchFilterInput.value = currentSearchFilter;
-        console.log('✅ פילטר חיפוש ברירת מחדל נטען:', currentSearchFilter);
-      }
-
-      // שמירת העדפות ב-localStorage לשימוש מהיר
-      try {
-        localStorage.setItem('tiktrack_preferences', JSON.stringify(preferences));
-        console.log('✅ העדפות נשמרו ב-localStorage');
-      } catch (localStorageError) {
-        console.warn('⚠️ שגיאה בשמירת העדפות ב-localStorage:', localStorageError);
-      }
-
-      console.log('✅ העדפות נטענו לממשק בהצלחה');
-    } else {
-      console.error('❌ שגיאה בטעינת העדפות מהשרת:', response.status);
+    // עדכון ממשק המשתמש עם ברירות המחדל
+    const currencySelect = document.getElementById('primaryCurrencySelect');
+    if (currencySelect) {
+      currencySelect.value = defaultPreferences.primaryCurrency;
+      console.log('✅ מטבע ראשי נטען:', defaultPreferences.primaryCurrency);
     }
+
+    // עדכון אזור זמן
+    const timezoneSelect = document.getElementById('timezoneSelect');
+    if (timezoneSelect) {
+      timezoneSelect.value = defaultPreferences.timezone;
+      console.log('✅ אזור זמן נטען:', defaultPreferences.timezone);
+    }
+
+    // עדכון זמן ניקוי קונסולה
+    const consoleCleanupSelect = document.getElementById('consoleCleanupIntervalSelect');
+    if (consoleCleanupSelect) {
+      consoleCleanupSelect.value = defaultPreferences.consoleCleanupInterval;
+      console.log('✅ זמן ניקוי קונסולה נטען:', defaultPreferences.consoleCleanupInterval);
+    }
+
+    // עדכון סטופ לוס ברירת מחדל
+    const stopLossInput = document.getElementById('defaultStopLossInput');
+    if (stopLossInput) {
+      stopLossInput.value = defaultPreferences.defaultStopLoss;
+      console.log('✅ סטופ לוס ברירת מחדל נטען:', defaultPreferences.defaultStopLoss);
+    }
+
+    // עדכון מחיר יעד ברירת מחדל
+    const targetPriceInput = document.getElementById('defaultTargetPriceInput');
+    if (targetPriceInput) {
+      targetPriceInput.value = defaultPreferences.defaultTargetPrice;
+      console.log('✅ מחיר יעד ברירת מחדל נטען:', defaultPreferences.defaultTargetPrice);
+    }
+
+    // עדכון הגדרות תצוגה
+    const statusFilterSelect = document.getElementById('defaultStatusFilterSelect');
+    if (statusFilterSelect) {
+      statusFilterSelect.value = defaultPreferences.defaultStatusFilter;
+      console.log('✅ פילטר סטטוס ברירת מחדל נטען:', defaultPreferences.defaultStatusFilter);
+    }
+
+    const typeFilterSelect = document.getElementById('defaultTypeFilterSelect');
+    if (typeFilterSelect) {
+      typeFilterSelect.value = defaultPreferences.defaultTypeFilter;
+      console.log('✅ פילטר סוג ברירת מחדל נטען:', defaultPreferences.defaultTypeFilter);
+    }
+
+    const accountFilterSelect = document.getElementById('defaultAccountFilterSelect');
+    if (accountFilterSelect) {
+      accountFilterSelect.value = defaultPreferences.defaultAccountFilter;
+      console.log('✅ פילטר חשבון ברירת מחדל נטען:', defaultPreferences.defaultAccountFilter);
+    }
+
+    const dateRangeFilterSelect = document.getElementById('defaultDateRangeFilterSelect');
+    if (dateRangeFilterSelect) {
+      dateRangeFilterSelect.value = defaultPreferences.defaultDateRangeFilter;
+      console.log('✅ פילטר טווח תאריכים ברירת מחדל נטען:', defaultPreferences.defaultDateRangeFilter);
+    }
+
+    const searchFilterInput = document.getElementById('defaultSearchFilterInput');
+    if (searchFilterInput) {
+      searchFilterInput.value = defaultPreferences.defaultSearchFilter;
+      console.log('✅ פילטר חיפוש ברירת מחדל נטען:', defaultPreferences.defaultSearchFilter);
+    }
+
+    // שמירת העדפות ב-localStorage לשימוש מהיר
+    try {
+      localStorage.setItem('tiktrack_preferences', JSON.stringify(defaultPreferences));
+      console.log('✅ העדפות נשמרו ב-localStorage');
+    } catch (localStorageError) {
+      console.warn('⚠️ שגיאה בשמירת העדפות ב-localStorage:', localStorageError);
+    }
+
+    console.log('✅ העדפות נטענו לממשק בהצלחה');
   } catch (error) {
     console.error('❌ שגיאה בטעינת העדפות לממשק:', error);
   }
@@ -1209,11 +1202,11 @@ function toggleAllSections() {
 
 function clearAllSectionsState() {
   console.log('🧹 Clearing all section states...');
-  
+
   const keys = Object.keys(localStorage);
   const sectionKeys = keys.filter(key => key.startsWith('section_'));
   sectionKeys.forEach(key => localStorage.removeItem(key));
-  
+
   console.log(`🧹 Cleared ${sectionKeys.length} section states`);
   showNotification('Section states cleared successfully', 'success');
 }
@@ -1238,47 +1231,57 @@ function clearAllSectionsState() {
 // Simple and clean section toggle system
 
 function toggleSection(sectionId) {
+  console.log(`🔄 === TOGGLE SECTION ${sectionId} ===`);
   const section = document.querySelector(`[data-section="${sectionId}"]`);
   const toggleBtn = document.querySelector(`[data-toggle="${sectionId}"]`);
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-  
+
+  console.log(`🔍 סקשן ${sectionId}: section=${!!section}, toggleBtn=${!!toggleBtn}, icon=${!!icon}`);
+
   if (section && toggleBtn) {
-    const isCollapsed = section.style.display === 'none';
-    
+    const isCollapsed = section.classList.contains('collapsed');
+    console.log(`🔍 סקשן ${sectionId} מצב נוכחי: isCollapsed=${isCollapsed}`);
+
     if (isCollapsed) {
-      section.style.display = 'block';
+      section.classList.remove('collapsed');
       if (icon) icon.textContent = '▲';
       localStorage.setItem(`section_${sectionId}`, 'expanded');
+      console.log(`📂 סקשן ${sectionId} נפתח`);
     } else {
-      section.style.display = 'none';
+      section.classList.add('collapsed');
       if (icon) icon.textContent = '▼';
       localStorage.setItem(`section_${sectionId}`, 'collapsed');
+      console.log(`📁 סקשן ${sectionId} נסגר`);
     }
+  } else {
+    console.error(`❌ לא נמצאו אלמנטים לסקשן ${sectionId}`);
+    console.error(`❌ section:`, section);
+    console.error(`❌ toggleBtn:`, toggleBtn);
   }
 }
 
 function toggleAllSections() {
   const allSections = document.querySelectorAll('[data-section]');
-  const isAnyOpen = Array.from(allSections).some(section => section.style.display !== 'none');
-  
+  const isAnyOpen = Array.from(allSections).some(section => !section.classList.contains('collapsed'));
+
   allSections.forEach(section => {
     const sectionId = section.getAttribute('data-section');
     const toggleBtn = document.querySelector(`[data-toggle="${sectionId}"]`);
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-    
+
     if (isAnyOpen) {
       // Close all sections
-      section.style.display = 'none';
+      section.classList.add('collapsed');
       if (icon) icon.textContent = '▼';
       localStorage.setItem(`section_${sectionId}`, 'collapsed');
     } else {
       // Open all sections
-      section.style.display = 'block';
+      section.classList.remove('collapsed');
       if (icon) icon.textContent = '▲';
       localStorage.setItem(`section_${sectionId}`, 'expanded');
     }
   });
-  
+
   // Update main toggle button
   const mainToggleBtn = document.querySelector('[data-toggle="all"]');
   if (mainToggleBtn) {
@@ -1290,22 +1293,36 @@ function toggleAllSections() {
 }
 
 function restoreSectionsState() {
+  console.log('🔄 === RESTORE SECTIONS STATE ===');
   const allSections = document.querySelectorAll('[data-section]');
-  
+  console.log(`📋 נמצאו ${allSections.length} סקשנים`);
+
   allSections.forEach(section => {
     const sectionId = section.getAttribute('data-section');
     const savedState = localStorage.getItem(`section_${sectionId}`);
     const toggleBtn = document.querySelector(`[data-toggle="${sectionId}"]`);
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-    
-    if (savedState === 'collapsed' || savedState === null) {
-      section.style.display = 'none';
+
+    console.log(`🔍 סקשן ${sectionId}: savedState=${savedState}, toggleBtn=${!!toggleBtn}, icon=${!!icon}`);
+
+    // ברירת מחדל: פתוח (expanded) אם אין מצב שמור
+    if (savedState === 'collapsed') {
+      section.classList.add('collapsed');
       if (icon) icon.textContent = '▼';
+      console.log(`📁 סקשן ${sectionId} נסגר (מצב שמור)`);
     } else {
-      section.style.display = 'block';
+      // ברירת מחדל: פתוח
+      section.classList.remove('collapsed');
       if (icon) icon.textContent = '▲';
+      if (!savedState) {
+        localStorage.setItem(`section_${sectionId}`, 'expanded');
+        console.log(`📂 סקשן ${sectionId} נפתח (ברירת מחדל)`);
+      } else {
+        console.log(`📂 סקשן ${sectionId} נפתח (מצב שמור)`);
+      }
     }
   });
+  console.log('✅ === RESTORE SECTIONS STATE COMPLETED ===');
 }
 
 // פונקציה לבדיקת מצב הסקשנים (לבדיקה)
@@ -1832,7 +1849,7 @@ function initializePreferences() {
 
   try {
     // שחזור מצב הסגירה
-    restoreAllSectionsState();
+    restoreSectionsState();
 
     // טעינת העדפות לממשק
     loadPreferencesToUI();

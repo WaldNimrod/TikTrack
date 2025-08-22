@@ -1827,25 +1827,7 @@ function filterAccountsLocally(accounts, selectedStatuses, selectedTypes, select
   return filteredAccounts;
 }
 
-// פונקציה גלובלית לעדכון הטבלה
-function updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName) {
-  console.log(`🔄 === UPDATE GRID FROM COMPONENT GLOBAL (${pageName}) ===`);
-  console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName });
-
-  if (pageName === 'accounts' && window.accountsData) {
-    // החלת פילטרים על הנתונים
-    let filteredData = [...window.accountsData];
-
-    if (typeof window.filterDataByFilters === 'function') {
-      filteredData = window.filterDataByFilters(window.accountsData, 'accounts');
-    }
-
-    // עדכון הטבלה
-    if (typeof window.updateAccountsTable === 'function') {
-      window.updateAccountsTable(filteredData);
-    }
-  }
-}
+// פונקציה גלובלית לעדכון הטבלה - הועברה ל-app-header.js
 
 // פונקציה לעדכון תפריט פילטר החשבונות
 function updateAccountFilterMenu(accounts) {
@@ -1899,7 +1881,7 @@ function updateAccountFilterMenu(accounts) {
 window.loadAccountsDataForAccountsPage = loadAccountsDataForAccountsPage;
 window.toggleMainSection = toggleMainSection;
 window.setupSortableHeaders = setupSortableHeaders;
-window.updateGridFromComponentGlobal = updateGridFromComponentGlobal;
+// updateGridFromComponentGlobal הועבר ל-app-header.js
 window.updateAccountFilterMenu = updateAccountFilterMenu;
 window.filterAccountsLocally = filterAccountsLocally;
 

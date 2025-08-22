@@ -1536,25 +1536,7 @@ if (window.location.pathname.includes('/alerts')) {
   };
 }
 
-// פונקציה גלובלית לעדכון הטבלה
-function updateGridFromComponentGlobal(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName) {
-  console.log(`🔄 === UPDATE GRID FROM COMPONENT GLOBAL (${pageName}) ===`);
-  console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName });
-
-  if (pageName === 'alerts' && alertsData) {
-    // החלת פילטרים על הנתונים
-    let filteredData = [...alertsData];
-
-    if (typeof window.filterDataByFilters === 'function') {
-      filteredData = window.filterDataByFilters(alertsData, 'alerts');
-    }
-
-    // עדכון הטבלה
-    if (typeof window.updateAlertsTable === 'function') {
-      window.updateAlertsTable(filteredData);
-    }
-  }
-}
+// פונקציה גלובלית לעדכון הטבלה - הועברה ל-app-header.js
 
 // הוספת הפונקציות לגלובל
 window.loadAlertsData = loadAlertsData;
@@ -1574,7 +1556,7 @@ window.checkAlertVariable = checkAlertVariable;
 window.checkAlertOperator = checkAlertOperator;
 window.buildAlertCondition = buildAlertCondition;
 window.parseAlertCondition = parseAlertCondition;
-window.updateGridFromComponentGlobal = updateGridFromComponentGlobal;
+// updateGridFromComponentGlobal הועבר ל-app-header.js
 
 // פונקציות התראה מיובאות מ-main.js - אין צורך בייצוא כפול
 

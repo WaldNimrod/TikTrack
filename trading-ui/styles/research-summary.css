@@ -267,19 +267,4 @@
     background-color: rgba(255, 156, 5, 0.05);
 }
 
-/* כפתור רענון */
-.refresh-btn {
-    background: linear-gradient(135deg, #ff9c05 0%, #ffb74d 100%);
-    border: none;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.refresh-btn:hover {
-    background: linear-gradient(135deg, #e68900 0%, #ff9c05 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 156, 5, 0.3);
-}
+/* כפתור רענון - משתמש בסגנונות הגלובליים מ-styles.css */

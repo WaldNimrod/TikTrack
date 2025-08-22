@@ -13,46 +13,7 @@
  * היררכיה: נטען רביעי, סגנונות ייעודיים לטבלאות
  */
 
-/* סגנונות למודלים - חייב להיות בתחילת הקובץ */
-.modal {
-  z-index: 99999 !important;
-}
-
-.modal-backdrop {
-  z-index: 99998 !important;
-}
-
-.modal-dialog {
-  z-index: 100000 !important;
-}
-
-.modal-content {
-  z-index: 100001 !important;
-}
-
-.modal.show {
-  display: block !important;
-}
-
-body.modal-open {
-  overflow: hidden !important;
-}
-
-/* תיקון למודלים ספציפיים */
-#addAlertModal,
-#editAlertModal {
-  z-index: 99999 !important;
-}
-
-#addAlertModal .modal-dialog,
-#editAlertModal .modal-dialog {
-  z-index: 100000 !important;
-}
-
-#addAlertModal .modal-content,
-#editAlertModal .modal-content {
-  z-index: 100001 !important;
-}
+/* סגנונות למודלים - משתמש בהגדרות הגלובליות מ-styles.css */
 
 /* פתרון קבוע לרדיו באטונים בעברית */
 .radio-group-item {
@@ -245,25 +206,7 @@ body.modal-open {
 
 /* סגנונות למודלים - הועברו ל-styles.css הגלובלי */
 
-#addAccountModal .modal-header {
-  background-color: #f8f9fa !important;
-  border-bottom: 1px solid #dee2e6 !important;
-}
-
-#addAccountModal .modal-body {
-  background-color: white !important;
-  padding: 1rem !important;
-}
-
-#addAccountModal .modal-footer {
-  background-color: #f8f9fa !important;
-  border-top: 1px solid #dee2e6 !important;
-}
-
-/* סגנונות למודל אזהרה כללי */
-#warningModal .modal-header {
-  border-bottom: 1px solid #dee2e6;
-}
+/* סגנונות למודלים - משתמש בהגדרות הגלובליות מ-styles.css */
 
 /* #warningModal .modal-content - הועבר ל-apple-theme.css */
 
@@ -704,17 +647,7 @@ select:focus {
 
 /* סגנונות כפתורים לטבלאות - .btn-sm הועבר ל-styles.css */
 
-/* .btn-primary - הועבר ל-styles.css */
-
-
-/* הגדרות מקומיות ל-btn-secondary:hover הוסרו - משתמשים בהגדרות הכלליות */
-
-
-.btn-danger:hover {
-  background-color: #fff8f0 !important;
-  border-color: #dc3545 !important;
-  transform: translateY(-1px) !important;
-}
+/* כפתורים - משתמשים בסגנונות הגלובליים מ-styles.css */
 
 /* סגנון לאיקונים בכפתורים */
 
@@ -836,11 +769,7 @@ select:focus {
 
 
 
-.btn-danger:hover {
-  background-color: #fff8f0 !important;
-  border-color: #dc3545 !important;
-  transform: translateY(-1px) !important;
-}
+/* כפתור מחיקה - משתמש בסגנונות הגלובליים מ-styles.css */
 
 #alertsSection.collapsed #alertsContainer {
   opacity: 0;

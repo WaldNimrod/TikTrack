@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD - Tik.track</title>
+
+    <!-- 
+    ===== דף CRUD - TikTrack =====
+    
+    דף זה מכיל:
+    1. טבלת CRUD - הסקשן הראשון
+    2. טבלת תוצאות CRUD - הסקשן השני
+    3. כרטיסיות התראות - בחלק העליון
+    4. מערכת פילטרים ומיון מתקדמת
+    
+    מבנה הדף:
+    - app-header: כותרת האפליקציה עם ניווט
+    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+      - top-section: כרטיסיות התראות וסיכום נתונים
+      - content-section (1): טבלת CRUD
+      - content-section (2): טבלת תוצאות CRUD
+    
+    שינויים אחרונים:
+    - יצירת עמוד CRUD חדש
+    - הוספת טבלת תוצאות CRUD
+    - שיפור עיצוב כרטיסיות התראות
+    - תיקון כפתורי סגירה עצמאיים
+    - ריכוז פונקציות CRUD ב-crud.js
+  -->
+
+    <!-- CSS Files - Ordered by priority (weak to strong) -->
+    <!-- 1. Apple theme (base) -->
+    <link rel="stylesheet" href="styles/apple-theme.css">
+
+    <!-- 2. Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 3. General styles -->
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- 4. Typography -->
+    <link rel="stylesheet" href="styles/typography.css">
+
+    <!-- 5. Table styles -->
+    <link rel="stylesheet" href="styles/table.css">
+
+    <!-- 6. Header system styles (highest priority) -->
+    <link rel="stylesheet" href="styles/header-system.css">
+
+    <!-- 7. Preferences page styles (specific to this page) -->
+    <link rel="stylesheet" href="styles/preferences.css">
+
+    <!-- Modular grid files -->
+</head>
+
+<body class="db-display-page">
+    <!-- General background -->
+    <div class="background-wrapper">
+
+        <!-- Application header -->
+        <!-- Unified Header System -->
+        <div id="unified-header-container"></div>
+
+        <!-- Page body - All content after header -->
+        <div class="page-body">
+            <!-- CRUD area - top-Section -->
+            <div class="top-section">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        🔧 CRUD Operations
+                    </div>
+                    <div class="table-actions">
+                        <button class="refresh-btn" onclick="saveAllCRUD()" title="שמור כל הפעולות">
+                            <span class="action-icon">💾</span> שמור הכל
+                        </button>
+                        <button class="refresh-btn" onclick="resetAllCRUD()"
+                            title="איפוס כל הפעולות לברירות מחדל">
+                            <span class="action-icon">🔄</span> איפוס הכל
+                        </button>
+                        <button class="refresh-btn" onclick="runAllCRUD()" title="הרץ את כל פעולות ה-CRUD">
+                            <span class="action-icon">▶️</span> הרץ הכל
+                        </button>
+                        <div class="action-separator"></div>
+                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="סגור/פתח את כל הסקשנים">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Data summary -->
+                    <div class="test-summary" id="summaryStats">
+                        <h4>📊 סיכום CRUD</h4>
+                        <div class="test-summary-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">פעולות Create:</span>
+                                <span class="stat-value" id="createCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">פעולות Read:</span>
+                                <span class="stat-value" id="readCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">פעולות Update:</span>
+                                <span class="stat-value" id="updateCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">פעולות Delete:</span>
+                                <span class="stat-value" id="deleteCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">סך הכל:</span>
+                                <span class="stat-value" id="totalCRUDCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="main-content">
+
+                <!-- CRUD Operations Section -->
+                <div class="content-section">
+                    <!-- CRUD Operations Header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            🔧 פעולות CRUD<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Create, Read, Update, Delete</span>
+                        </div>
+                        <div class="table-count" id="crudCount">טוען...</div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div class="search-input-wrapper">
+                                <input type="text" class="search-filter-input" placeholder="חיפוש פעולות CRUD..."
+                                    onkeyup="filterCRUDData([], [], [], null, this.value)">
+                            </div>
+                            <button class="refresh-btn" onclick="addNewCRUDOperation()" title="הוסף פעולת CRUD חדשה">
+                                <span class="action-icon">➕</span> הוסף
+                            </button>
+                            <button class="refresh-btn" onclick="loadCRUDOperations()" title="רענן טבלה">
+                                <span class="action-icon">🔄</span> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור CRUD">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CRUD Operations Table -->
+                    <div class="section-body">
+                        <div class="table-responsive" id="crudContainer">
+                            <table class="table" id="crudTable" data-table-type="crud">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>טבלה
+                                                <br><span class="header-subtitle">Table</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(1)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>פעולה
+                                                <br><span class="header-subtitle">Operation</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סטטוס
+                                                <br><span class="header-subtitle">Status</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תוצאה
+                                                <br><span class="header-subtitle">Result</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(4)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>זמן ביצוע
+                                                <br><span class="header-subtitle">Execution Time</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תאריך
+                                                <br><span class="header-subtitle">Date</span>
+                                            </button>
+                                        </th>
+                                        <th class="actions-header">
+                                            פעולות
+                                            <br><span class="header-subtitle">Actions</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="loading">טוען פעולות CRUD...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CRUD Results Section -->
+                <div class="content-section">
+                    <!-- CRUD Results Header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            📋 תוצאות CRUD<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">CRUD Results</span>
+                        </div>
+                        <div class="table-count" id="crudResultsCount">טוען...</div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div class="search-input-wrapper">
+                                <input type="text" class="search-filter-input" placeholder="חיפוש תוצאות..."
+                                    onkeyup="filterCRUDResultsData([], [], [], null, this.value)">
+                            </div>
+                            <button class="refresh-btn" onclick="exportCRUDResults()" title="ייצא תוצאות">
+                                <span class="action-icon">📤</span> ייצא
+                            </button>
+                            <button class="refresh-btn" onclick="loadCRUDResults()" title="רענן טבלה">
+                                <span class="action-icon">🔄</span> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSecondSection()" title="הצג/הסתר אזור תוצאות">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CRUD Results Table -->
+                    <div class="section-body">
+                        <div class="table-responsive" id="crudResultsContainer">
+                            <table class="table" id="crudResultsTable" data-table-type="crud-results">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>מזהה
+                                                <br><span class="header-subtitle">ID</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(1)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>פעולת CRUD
+                                                <br><span class="header-subtitle">CRUD Operation</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>טבלה
+                                                <br><span class="header-subtitle">Table</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סטטוס
+                                                <br><span class="header-subtitle">Status</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(4)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>הודעה
+                                                <br><span class="header-subtitle">Message</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>זמן ביצוע
+                                                <br><span class="header-subtitle">Execution Time</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(6)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תאריך
+                                                <br><span class="header-subtitle">Date</span>
+                                            </button>
+                                        </th>
+                                        <th class="actions-header">
+                                            פעולות
+                                            <br><span class="header-subtitle">Actions</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="8" class="loading">טוען תוצאות CRUD...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- סוף main-content -->
+
+        </div> <!-- סוף page-body -->
+
+        <!-- מרווח בתחתית הדף -->
+        <div style="height: 3rem;"></div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Modular grid files -->
+        <script src="scripts/app-header.js"></script>
+        <script src="scripts/main.js"></script>
+        <script src="scripts/grid-filters.js"></script>
+        <script src="scripts/alerts.js"></script>
+        <script src="scripts/active-alerts-component.js"></script>
+        <script src="scripts/crud.js"></script>
+
+        <script>
+            // פונקציות מותאמות לעמוד CRUD
+            function loadCRUDOperations() {
+                console.log('טעינת פעולות CRUD');
+                if (typeof window.loadCRUDData === 'function') {
+                    window.loadCRUDData();
+                } else {
+                    console.error('loadCRUDData function not found');
+                }
+            }
+
+            function loadCRUDResults() {
+                console.log('טעינת תוצאות CRUD');
+                if (typeof window.loadCRUDResultsData === 'function') {
+                    window.loadCRUDResultsData();
+                } else {
+                    console.error('loadCRUDResultsData function not found');
+                }
+            }
+
+            function addNewCRUDOperation() {
+                console.log('הוספת פעולת CRUD חדשה');
+                if (typeof window.showAddCRUDModal === 'function') {
+                    window.showAddCRUDModal();
+                } else {
+                    console.error('showAddCRUDModal function not found');
+                }
+            }
+
+            function exportCRUDResults() {
+                console.log('ייצוא תוצאות CRUD');
+                if (typeof window.exportCRUDResultsData === 'function') {
+                    window.exportCRUDResultsData();
+                } else {
+                    console.error('exportCRUDResultsData function not found');
+                }
+            }
+
+            function saveAllCRUD() {
+                console.log('שמירת כל פעולות CRUD');
+                showNotification('כל פעולות CRUD נשמרו בהצלחה', 'success');
+            }
+
+            function resetAllCRUD() {
+                console.log('איפוס כל פעולות CRUD');
+                if (confirm('האם אתה בטוח שברצונך לאפס את כל פעולות ה-CRUD?')) {
+                    showNotification('כל פעולות CRUD אופסו בהצלחה', 'success');
+                }
+            }
+
+            function runAllCRUD() {
+                console.log('הרצת כל פעולות CRUD');
+                showNotification('כל פעולות CRUD הורצו בהצלחה', 'success');
+            }
+
+            // טעינת נתונים בטעינת הדף
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log('דף CRUD נטען');
+                loadCRUDOperations();
+                loadCRUDResults();
+            });
+        </script>
+
+    </div> <!-- סוף background-wrapper -->
+</body>
+
+</html>

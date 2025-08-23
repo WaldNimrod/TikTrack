@@ -1,4 +1,5 @@
 // ===== קובץ JavaScript לדף בסיס נתונים =====
+console.log('🔄 database.js נטען!');
 
 // משתנים גלובליים
 let allData = {
@@ -81,7 +82,7 @@ function toggleMainSection() {
   console.log('📋 מספר content-sections נמצא:', contentSections.length);
 
   // מציאת הסקשן הנוכחי (הכי קרוב לכפתור שנלחץ)
-  const clickedButton = event.target.closest('button');
+  const clickedButton = window.event ? window.event.target.closest('button') : null;
   const currentSection = clickedButton ? clickedButton.closest('.content-section') : contentSections[0];
 
   if (!currentSection) {
@@ -153,10 +154,13 @@ function restoreDatabaseSectionState() {
 
 // פונקציה לטעינת כל הנתונים
 async function loadAllData() {
+  console.log('🔄 === loadAllData נקראה! ===');
   console.log('🔄 === טוען את כל הנתונים ===');
   console.log('📊 allData לפני טעינה:', allData);
 
   try {
+    console.log('🌐 מתחיל בקשות API...');
+
     // טעינת כל הנתונים במקביל
     const [
       accountsResponse,
@@ -168,18 +172,65 @@ async function loadAllData() {
       alertsResponse,
       notesResponse
     ] = await Promise.all([
-      fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/executions/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/cash_flows/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/alerts/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/notes/').then(r => r.json()).catch(() => ({ data: [] }))
+      fetch('/api/v1/accounts/').then(r => {
+        console.log('📡 Accounts API response status:', r.status);
+        return r.json();
+      }).catch(e => {
+        console.error('❌ Accounts API error:', e);
+        return { data: [] };
+      }),
+      fetch('/api/v1/trades/').then(r => {
+        console.log('📡 Trades API response status:', r.status);
+        return r.json();
+      }).catch(e => {
+        console.error('❌ Trades API error:', e);
+        return { data: [] };
+      }),
+      fetch('/api/v1/tickers/').then(r => {
+        console.log('📡 Tickers API response status:', r.status);
+        return r.json();
+      }).catch(e => {
+        console.error('❌ Tickers API error:', e);
+        return { data: [] };
+      }),
+      fetch('/api/v1/trade_plans/').then(r => {
+        console.log('📡 Trade Plans API response status:', r.status);
+        return r.json();
+      }).catch(e => {
+        console.error('❌ Trade Plans API error:', e);
+        return { data: [] };
+      }),
+      fetch('/api/v1/executions/').then(r => {
+        console.log('📡 Executions API response status:', r.status);
+        return r.json();
+      }).catch(e => {
+        console.error('❌ Executions API error:', e);
+        return { data: [] };
+      }),
+      fetch('/api/v1/cash_flows/').then(r => {
+        console.log('📡 Cash Flows API response status:', r.status);
+        return r.json();
+      }).catch(e => {
+        console.error('❌ Cash Flows API error:', e);
+        return { data: [] };
+      }),
+      fetch('/api/v1/alerts/').then(r => {
+        console.log('📡 Alerts API response status:', r.status);
+        return r.json();
+      }).catch(e => {
+        console.error('❌ Alerts API error:', e);
+        return { data: [] };
+      }),
+      fetch('/api/v1/notes/').then(r => {
+        console.log('📡 Notes API response status:', r.status);
+        return r.json();
+      }).catch(e => {
+        console.error('❌ Notes API error:', e);
+        return { data: [] };
+      })
     ]);
 
-    // שמירת הנתונים
-    console.log('📥 תגובות API:', {
+    console.log('📥 תגובות API גולמיות:', {
       accounts: accountsResponse,
       trades: tradesResponse,
       tickers: tickersResponse,
@@ -190,6 +241,7 @@ async function loadAllData() {
       notes: notesResponse
     });
 
+    // שמירת הנתונים
     allData.accounts = accountsResponse.data || accountsResponse || [];
     allData.trades = tradesResponse.data || tradesResponse || [];
     allData.tickers = tickersResponse.data || tickersResponse || [];
@@ -198,7 +250,6 @@ async function loadAllData() {
     allData.cashFlows = cashFlowsResponse.data || cashFlowsResponse || [];
     allData.alerts = alertsResponse.data || alertsResponse || [];
     allData.notes = notesResponse.data || notesResponse || [];
-
 
     console.log('✅ נטענו נתונים:', {
       accounts: allData.accounts.length,
@@ -209,30 +260,56 @@ async function loadAllData() {
       cashFlows: allData.cashFlows.length,
       alerts: allData.alerts.length,
       notes: allData.notes.length,
-
     });
 
+    console.log('🔄 מתחיל עדכון טבלאות...');
     // עדכון כל הטבלאות
     updateAllTables();
     updateStatistics();
+    console.log('✅ עדכון טבלאות הושלם');
 
   } catch (error) {
     console.error('❌ שגיאה בטעינת נתונים:', error);
+    console.error('❌ Stack trace:', error.stack);
     showError('שגיאה בטעינת נתונים מהשרת: ' + error.message);
   }
 }
 
 // פונקציה לעדכון כל הטבלאות
 function updateAllTables() {
-  updateAccountsTable();
-  updateTradesTable();
-  updateTickersTable();
-  updateTradePlansTable();
-  updateExecutionsTable();
-  updateCashFlowsTable();
-  updateAlertsTable();
-  updateNotesTable();
+  console.log('🔄 === עדכון כל הטבלאות ===');
+  console.log('📊 נתונים לעדכון:', allData);
 
+  try {
+    console.log('🔄 מעדכן טבלת חשבונות...');
+    updateAccountsTable();
+
+    console.log('🔄 מעדכן טבלת טריידים...');
+    updateTradesTable();
+
+    console.log('🔄 מעדכן טבלת טיקרים...');
+    updateTickersTable();
+
+    console.log('🔄 מעדכן טבלת תוכניות...');
+    updateTradePlansTable();
+
+    console.log('🔄 מעדכן טבלת ביצועים...');
+    updateExecutionsTable();
+
+    console.log('🔄 מעדכן טבלת תזרימי מזומנים...');
+    updateCashFlowsTable();
+
+    console.log('🔄 מעדכן טבלת התראות...');
+    updateAlertsTable();
+
+    console.log('🔄 מעדכן טבלת הערות...');
+    updateNotesTable();
+
+    console.log('✅ עדכון כל הטבלאות הושלם');
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון טבלאות:', error);
+    console.error('❌ Stack trace:', error.stack);
+  }
 }
 
 // פונקציה לעדכון סטטיסטיקות
@@ -630,8 +707,8 @@ function showDatabaseInfo() {
     'ביצועים: ' + allData.executions.length + '\n' +
     'תזרימי מזומנים: ' + allData.cashFlows.length + '\n' +
     'התראות: ' + allData.alerts.length + '\n' +
-    'הערות: ' + allData.notes.length + '\n' +
-
+    'הערות: ' + allData.notes.length + '\n'
+  );
 }
 
 function showBackupOptions() {
@@ -724,12 +801,23 @@ window.deleteCurrency = deleteCurrency;
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
   console.log('🔄 === DOM CONTENT LOADED (DATABASE) ===');
+  console.log('📄 Current page:', window.location.pathname);
+  console.log('🔍 Document ready state:', document.readyState);
 
-  // שחזור מצב הסגירה
-  restoreDatabaseSectionState();
+  try {
+    console.log('🔄 שחזור מצב הסגירה...');
+    // שחזור מצב הסגירה
+    restoreDatabaseSectionState();
+    console.log('✅ מצב הסגירה שוחזר');
 
-  // טעינת נתונים
-  loadAllData();
+    console.log('🔄 מתחיל טעינת נתונים...');
+    // טעינת נתונים
+    loadAllData();
+    console.log('✅ טעינת נתונים הוזמנה');
 
-  console.log('דף בסיס נתונים נטען בהצלחה');
+    console.log('✅ דף בסיס נתונים נטען בהצלחה');
+  } catch (error) {
+    console.error('❌ שגיאה באתחול דף בסיס נתונים:', error);
+    console.error('❌ Stack trace:', error.stack);
+  }
 });

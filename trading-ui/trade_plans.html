@@ -35,13 +35,14 @@
     4. מערכת פילטרים ומיון מתקדמת
     
     מבנה הדף:
-    - app-header: כותרת האפליקציה עם ניווט
+    - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות התראות וסיכום נתונים
       - content-section (1): טבלת תכנונים
       - content-section (2): טבלת חשבונות
     
     שינויים אחרונים:
+    - החלפת app-header במערכת header-system החדשה
     - העתקת תוכן מדף עיצובים לדף תכנון טריידים
     - הוספת טבלת חשבונות מלאים
     - שיפור עיצוב כרטיסיות התראות
@@ -86,9 +87,8 @@
   <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- Application header -->
-    <!-- Unified Header System -->
-    <div id="unified-header-container"></div>
+    <!-- כותרת האפליקציה החדשה - נוצרת אוטומטית על ידי header-system.js -->
+    <!-- unified-header ייווצר כאן אוטומטית -->
 
     <!-- Page body - All content after header -->
     <div class="page-body">
@@ -465,7 +465,7 @@
     let designsData = [];
 
     // פונקציה לתרגום סוג לעברית
-    function window.translateTradePlanType(type) {
+    function translateTradePlanType(type) {
       const typeMap = {
         'swing': 'סווינג',
         'investment': 'השקעה',
@@ -582,19 +582,12 @@
 
     // אתחול הדף
     document.addEventListener('DOMContentLoaded', function () {
-      console.log('🔄 === DOM CONTENT LOADED ===');
+      console.log('🚀 טעינת דף תכנון טריידים עם מערכת ראש דף חדשה...');
 
-      // אתחול מערכת הכותרת החדשה
-      if (typeof window.HeaderSystem !== 'undefined') {
-        console.log('🔄 Initializing new unified header system...');
-
-        // יצירת מערכת הכותרת החדשה
-        window.headerSystem = new window.HeaderSystem();
-        window.headerSystem.initialize();
-
-        // יצירת מערכת הפילטרים
-        window.filterSystem = new window.SimpleFilter();
-        window.filterSystem.initialize();
+      // אתחול HeaderSystem
+      if (window.headerSystem && !window.headerSystem.isInitialized) {
+        console.log('✅ אתחול HeaderSystem...');
+        window.headerSystem.init();
       }
 
       // טעינת מצב הסקשנים לפי הדף הנוכחי

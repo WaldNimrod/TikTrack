@@ -211,14 +211,15 @@ function updateTestResultsTable() {
 
 // Update summary statistics
 function updateSummaryStats() {
-    const totalTests = testsData.length;
-    const passedTests = testsData.filter(test => test.result === 'passed').length;
-    const failedTests = testsData.filter(test => test.result === 'failed').length;
-    const successRate = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;
+    // Update test results statistics
+    const totalResults = testResultsData.length;
+    const passedResults = testResultsData.filter(result => result.result === 'passed').length;
+    const failedResults = testResultsData.filter(result => result.result === 'failed').length;
+    const successRate = totalResults > 0 ? Math.round((passedResults / totalResults) * 100) : 0;
 
-    document.getElementById('totalTests').textContent = totalTests;
-    document.getElementById('passedTests').textContent = passedTests;
-    document.getElementById('failedTests').textContent = failedTests;
+    document.getElementById('totalTests').textContent = totalResults;
+    document.getElementById('passedTests').textContent = passedResults;
+    document.getElementById('failedTests').textContent = failedResults;
     document.getElementById('successRate').textContent = `${successRate}%`;
 }
 
@@ -409,33 +410,37 @@ function toggleMainSection() {
 }
 
 function restoreTestsSectionState() {
-    // Restore top section state
-    const topSectionCollapsed = localStorage.getItem('tests_top_section_collapsed') === 'true';
+    console.log('🔄 שחזור מצב סקשנים בדף בדיקות');
+
+    // שחזור מצב top-section
+    const topSectionHidden = localStorage.getItem('testsTopSectionHidden') === 'true';
     const topSection = document.querySelector('.top-section');
-    if (topSection && topSectionCollapsed) {
-        topSection.classList.add('collapsed');
-        const button = topSection.querySelector('.filter-toggle-btn');
-        if (button) {
-            const icon = button.querySelector('.filter-icon');
-            icon.textContent = '▼';
-        }
-    }
+    if (topSection) {
+        const topSectionBody = topSection.querySelector('.section-body');
+        const toggleBtn = topSection.querySelector('button[onclick="toggleAllSections()"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-    // Restore main sections state
-    const sections = document.querySelectorAll('.content-section');
-    sections.forEach(section => {
-        const sectionTitle = section.querySelector('.table-title')?.textContent.trim() || 'unknown';
-        const isCollapsed = localStorage.getItem(`tests_${sectionTitle}_collapsed`) === 'true';
-
-        if (isCollapsed) {
-            section.classList.add('collapsed');
-            const button = section.querySelector('.filter-toggle-btn');
-            if (button) {
-                const icon = button.querySelector('.filter-icon');
+        if (topSectionBody && topSectionHidden) {
+            topSectionBody.style.display = 'none';
+            if (icon) {
                 icon.textContent = '▼';
             }
         }
+    }
+
+    // שחזור מצב content-sections
+    const contentSections = document.querySelectorAll('.content-section');
+    contentSections.forEach(section => {
+        const sectionTitle = section.querySelector('.table-title')?.textContent.trim() || 'unknown';
+        const sectionHidden = localStorage.getItem(`testsSectionHidden_${sectionTitle}`) === 'true';
+        const sectionBody = section.querySelector('.section-body');
+
+        if (sectionBody && sectionHidden) {
+            sectionBody.style.display = 'none';
+        }
     });
+
+    console.log('✅ מצב סקשנים שוחזר בהצלחה');
 }
 
 // Error handling
@@ -564,17 +569,25 @@ function resetAllPreferences() {
     }
 }
 
-function runAllCRUDTests() {
+async function runAllCRUDTests() {
     console.log('▶️ Running all CRUD tests...');
     const activeTests = document.querySelectorAll('input[data-test]:checked');
     if (activeTests.length === 0) {
-        alert('אין בדיקות CRUD פעילות להרצה');
+        showNotification('אין בדיקות CRUD פעילות להרצה', 'warning');
         return;
     }
 
     if (confirm(`האם להריץ את כל ${activeTests.length} בדיקות CRUD הפעילות?`)) {
-        alert('הרצת בדיקות CRUD תתבצע בקרוב...');
-        // TODO: Implement actual CRUD test execution
+        showNotification(`מתחיל הרצת ${activeTests.length} בדיקות CRUD...`, 'info');
+
+        try {
+            const results = await executeCRUDTests(activeTests);
+            displayCRUDTestResults(results);
+            showNotification('בדיקות CRUD הושלמו בהצלחה!', 'success');
+        } catch (error) {
+            console.error('❌ Error running CRUD tests:', error);
+            showNotification('שגיאה בהרצת בדיקות CRUD', 'error');
+        }
     }
 }
 
@@ -597,34 +610,57 @@ function toggleAllCRUDTests() {
 }
 
 function toggleAllSections() {
-    console.log('🔄 Toggling all sections...');
-    const sections = document.querySelectorAll('.content-section');
-    const allCollapsed = Array.from(sections).every(section => section.classList.contains('collapsed'));
+    console.log('🔄 toggleAllSections נקראה - סגירה/פתיחה של כל הסקשנים');
 
-    sections.forEach(section => {
-        if (allCollapsed) {
-            section.classList.remove('collapsed');
-        } else {
-            section.classList.add('collapsed');
-        }
+    const topSection = document.querySelector('.top-section');
+    const contentSections = document.querySelectorAll('.content-section');
+    const toggleBtn = topSection ? topSection.querySelector('button[onclick="toggleAllSections()"]') : null;
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-        const button = section.querySelector('.filter-toggle-btn');
-        if (button) {
-            const icon = button.querySelector('.filter-icon');
-            if (icon) {
-                icon.textContent = allCollapsed ? '▲' : '▼';
-            }
+    if (!topSection) {
+        console.error('❌ לא נמצא top-section');
+        return;
+    }
+
+    // בדיקה אם כל הסקשנים סגורים
+    const topSectionBody = topSection.querySelector('.section-body');
+    const isTopCollapsed = topSectionBody ? topSectionBody.style.display === 'none' : false;
+
+    let allSectionsCollapsed = isTopCollapsed;
+    contentSections.forEach(section => {
+        const sectionBody = section.querySelector('.section-body');
+        if (sectionBody && sectionBody.style.display !== 'none') {
+            allSectionsCollapsed = false;
         }
     });
 
-    // Update main toggle button
-    const mainButton = document.querySelector('.top-section .filter-toggle-btn');
-    if (mainButton) {
-        const icon = mainButton.querySelector('.filter-icon');
-        if (icon) {
-            icon.textContent = allCollapsed ? '▲' : '▼';
-        }
+    // אם כל הסקשנים סגורים - פתח את כולם
+    // אם יש סקשנים פתוחים - סגור את כולם
+    const shouldCollapse = !allSectionsCollapsed;
+
+    // סגירה/פתיחה של top-section
+    if (topSectionBody) {
+        topSectionBody.style.display = shouldCollapse ? 'none' : 'block';
+        localStorage.setItem('testsTopSectionHidden', shouldCollapse);
     }
+
+    // סגירה/פתיחה של כל content-sections
+    contentSections.forEach(section => {
+        const sectionBody = section.querySelector('.section-body');
+        const sectionTitle = section.querySelector('.table-title').textContent.trim();
+
+        if (sectionBody) {
+            sectionBody.style.display = shouldCollapse ? 'none' : 'block';
+            localStorage.setItem(`testsSectionHidden_${sectionTitle}`, shouldCollapse);
+        }
+    });
+
+    // עדכון האייקון של הכפתור הראשי
+    if (icon) {
+        icon.textContent = shouldCollapse ? '▼' : '▲';
+    }
+
+    console.log(`✅ ${shouldCollapse ? 'סגירת' : 'פתיחת'} כל הסקשנים הושלמה`);
 }
 
 // Export functions to global scope
@@ -656,6 +692,16 @@ window.resetAllPreferences = resetAllPreferences;
 window.runAllCRUDTests = runAllCRUDTests;
 window.toggleAllCRUDTests = toggleAllCRUDTests;
 window.toggleAllSections = toggleAllSections;
+window.executeCRUDTests = executeCRUDTests;
+window.displayCRUDTestResults = displayCRUDTestResults;
+window.getSelectedCRUDTests = getSelectedCRUDTests;
+window.checkServerHealth = checkServerHealth;
+window.clearCRUDTestResults = clearCRUDTestResults;
+window.closeCRUDTestResults = closeCRUDTestResults;
+window.toggleCRUDResultsSection = toggleCRUDResultsSection;
+window.runSelectedCRUDTests = runSelectedCRUDTests;
+window.saveCRUDPreferences = saveCRUDPreferences;
+window.resetCRUDPreferences = resetCRUDPreferences;
 
 // ===== Server Tests Functions =====
 
@@ -967,6 +1013,247 @@ function showNotification(message, type = 'info') {
             notification.parentNode.removeChild(notification);
         }
     }, 5000);
+}
+
+/**
+ * Check server health before running tests
+ */
+async function checkServerHealth() {
+    try {
+        const response = await fetch('/api/health', {
+            method: 'GET',
+            timeout: 5000
+        });
+
+        if (response.ok) {
+            return true;
+        } else {
+            throw new Error(`Server health check failed: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('❌ Server health check failed:', error);
+        return false;
+    }
+}
+
+/**
+ * Execute CRUD tests using the API
+ */
+async function executeCRUDTests(activeTests) {
+    try {
+        // Check server health first
+        const serverHealthy = await checkServerHealth();
+        if (!serverHealthy) {
+            throw new Error('השרת לא זמין. אנא ודא שהשרת פועל לפני הרצת הבדיקות.');
+        }
+
+        // Convert test checkboxes to entities and operations
+        const entities = new Set();
+        const operations = new Set();
+
+        activeTests.forEach(checkbox => {
+            const testId = checkbox.getAttribute('data-test');
+            const [entity, operation] = testId.split('.');
+            entities.add(entity);
+            operations.add(operation);
+        });
+
+        const settings = {
+            parallel: document.getElementById('parallelTests')?.checked || false,
+            stop_on_failure: document.getElementById('stopOnError')?.checked || false,
+            verbose: document.getElementById('showProgress')?.checked || true,
+            cleanup: document.getElementById('cleanupAfterTests')?.checked || true
+        };
+
+        console.log('🔌 Executing CRUD tests with settings:', settings);
+
+        const response = await fetch('/api/v1/tests/crud', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                entities: Array.from(entities),
+                operations: Array.from(operations),
+                settings: settings
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ CRUD tests executed successfully:', result);
+        return result;
+
+    } catch (error) {
+        console.error('❌ Error executing CRUD tests:', error);
+        throw error;
+    }
+}
+
+/**
+ * Display CRUD test results in the test results table
+ */
+function displayCRUDTestResults(results) {
+    console.log('📊 Displaying CRUD test results:', results);
+
+    if (results.results && results.results.results) {
+        const crudResults = results.results.results;
+
+        crudResults.forEach(test => {
+            const newResult = {
+                id: testResultsData.length + 1,
+                testName: `CRUD: ${test.entity}.${test.operation}`,
+                result: test.status === 'passed' ? 'passed' : 'failed',
+                duration: test.end_time && test.start_time ?
+                    `${((test.end_time - test.start_time) * 1000).toFixed(1)}ms` : 'N/A',
+                errorMessage: test.status === 'failed' ? test.message : '-',
+                runDate: new Date().toLocaleString('he-IL'),
+                details: test.message
+            };
+
+            testResultsData.unshift(newResult);
+        });
+
+        updateTestResultsTable();
+        updateSummaryStats();
+    }
+}
+
+/**
+ * Clear CRUD test results
+ */
+function clearCRUDTestResults() {
+    console.log('🗑️ Clearing CRUD test results...');
+    if (confirm('האם אתה בטוח שברצונך לנקות את כל תוצאות בדיקות CRUD?')) {
+        document.getElementById('crudTestResultsContent').innerHTML = '';
+        document.getElementById('crudTestResultsArea').style.display = 'none';
+        document.getElementById('crudTestResultsCount').textContent = '0 תוצאות';
+        showNotification('תוצאות בדיקות CRUD נוקו בהצלחה', 'success');
+    }
+}
+
+/**
+ * Close CRUD test results area
+ */
+function closeCRUDTestResults() {
+    console.log('✕ Closing CRUD test results area...');
+    document.getElementById('crudTestResultsArea').style.display = 'none';
+}
+
+/**
+ * Toggle CRUD results section
+ */
+function toggleCRUDResultsSection() {
+    console.log('🔄 Toggling CRUD results section...');
+    const section = document.querySelector('.content-section:has(#crudTestResultsArea)');
+    const sectionBody = section?.querySelector('.section-body');
+    const button = document.querySelector('button[onclick="toggleCRUDResultsSection()"]');
+    const icon = button?.querySelector('.filter-icon');
+
+    if (sectionBody) {
+        const isHidden = sectionBody.style.display === 'none';
+        sectionBody.style.display = isHidden ? 'block' : 'none';
+
+        if (icon) {
+            icon.textContent = isHidden ? '▲' : '▼';
+        }
+    }
+}
+
+/**
+ * Run selected CRUD tests
+ */
+async function runSelectedCRUDTests() {
+    console.log('▶️ Running selected CRUD tests...');
+    const selectedTests = getSelectedCRUDTests();
+
+    if (selectedTests.length === 0) {
+        showNotification('לא נבחרו בדיקות CRUD להרצה', 'warning');
+        return;
+    }
+
+    showNotification(`מתחיל הרצת ${selectedTests.length} בדיקות CRUD נבחרות...`, 'info');
+
+    try {
+        // Show results area
+        document.getElementById('crudTestResultsArea').style.display = 'block';
+        const resultsContent = document.getElementById('crudTestResultsContent');
+        resultsContent.innerHTML = '<div class="test-result-item running"><span class="test-result-name">מתחיל בדיקות...</span><span class="test-result-status running">רץ</span></div>';
+
+        // Convert test IDs to checkboxes for execution
+        const activeTests = [];
+        selectedTests.forEach(testId => {
+            const checkbox = document.querySelector(`input[data-test="${testId}"]`);
+            if (checkbox) {
+                activeTests.push(checkbox);
+            }
+        });
+
+        const results = await executeCRUDTests(activeTests);
+        displayCRUDTestResults(results);
+
+        // Update results count
+        const resultsCount = results.results?.results?.length || 0;
+        document.getElementById('crudTestResultsCount').textContent = `${resultsCount} תוצאות`;
+
+        showNotification('בדיקות CRUD נבחרות הושלמו בהצלחה!', 'success');
+
+    } catch (error) {
+        console.error('❌ Error running selected CRUD tests:', error);
+        showNotification('שגיאה בהרצת בדיקות CRUD נבחרות', 'error');
+    }
+}
+
+/**
+ * Save CRUD preferences
+ */
+function saveCRUDPreferences() {
+    console.log('💾 Saving CRUD preferences...');
+    const preferences = {};
+
+    // Get all CRUD test checkboxes
+    const testCheckboxes = document.querySelectorAll('input[data-test]');
+    testCheckboxes.forEach(checkbox => {
+        const testId = checkbox.getAttribute('data-test');
+        preferences[testId] = checkbox.checked;
+    });
+
+    localStorage.setItem('crudPreferences', JSON.stringify(preferences));
+    showNotification('העדפות בדיקות CRUD נשמרו בהצלחה!', 'success');
+}
+
+/**
+ * Reset CRUD preferences
+ */
+function resetCRUDPreferences() {
+    console.log('🔄 Resetting CRUD preferences...');
+    if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות CRUD לברירות מחדל?')) {
+        // Reset all CRUD test checkboxes to checked
+        const testCheckboxes = document.querySelectorAll('input[data-test]');
+        testCheckboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+
+        localStorage.removeItem('crudPreferences');
+        showNotification('העדפות בדיקות CRUD אופסו לברירות מחדל!', 'success');
+    }
+}
+
+/**
+ * Get selected CRUD tests
+ */
+function getSelectedCRUDTests() {
+    const selectedTests = [];
+    const testCheckboxes = document.querySelectorAll('[data-test]:checked');
+
+    testCheckboxes.forEach(checkbox => {
+        selectedTests.push(checkbox.getAttribute('data-test'));
+    });
+
+    return selectedTests;
 }
 
 /**

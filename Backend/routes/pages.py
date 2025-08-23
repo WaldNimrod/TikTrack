@@ -92,6 +92,26 @@ def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
 
+@pages_bp.route('/constraints')
+def constraints() -> Any:
+    """Constraints management page"""
+    return send_from_directory(UI_DIR, "constraints.html")
+
+@pages_bp.route('/test_crud')
+def test_crud() -> Any:
+    """CRUD test page"""
+    return send_from_directory(UI_DIR, "test_crud.html")
+
+@pages_bp.route('/test_api')
+def test_api() -> Any:
+    """API test page"""
+    return send_from_directory(UI_DIR, "test_api.html")
+
+@pages_bp.route('/test_security')
+def test_security() -> Any:
+    """Security test page"""
+    return send_from_directory(UI_DIR, "test_security.html")
+
 @pages_bp.route('/tests')
 def tests() -> Any:
     """Tests page"""

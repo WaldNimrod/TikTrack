@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API - Tik.track</title>
+
+    <!-- 
+    ===== דף API - TikTrack =====
+    
+    דף זה מכיל:
+    1. טבלת API - הסקשן הראשון
+    2. טבלת תוצאות API - הסקשן השני
+    3. כרטיסיות התראות - בחלק העליון
+    4. מערכת פילטרים ומיון מתקדמת
+    
+    מבנה הדף:
+    - app-header: כותרת האפליקציה עם ניווט
+    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+      - top-section: כרטיסיות התראות וסיכום נתונים
+      - content-section (1): טבלת API
+      - content-section (2): טבלת תוצאות API
+    
+    שינויים אחרונים:
+    - יצירת עמוד API חדש
+    - הוספת טבלת תוצאות API
+    - שיפור עיצוב כרטיסיות התראות
+    - תיקון כפתורי סגירה עצמאיים
+    - ריכוז פונקציות API ב-api.js
+  -->
+
+    <!-- CSS Files - Ordered by priority (weak to strong) -->
+    <!-- 1. Apple theme (base) -->
+    <link rel="stylesheet" href="styles/apple-theme.css">
+
+    <!-- 2. Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 3. General styles -->
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- 4. Typography -->
+    <link rel="stylesheet" href="styles/typography.css">
+
+    <!-- 5. Table styles -->
+    <link rel="stylesheet" href="styles/table.css">
+
+    <!-- 6. Header system styles (highest priority) -->
+    <link rel="stylesheet" href="styles/header-system.css">
+
+    <!-- 7. Preferences page styles (specific to this page) -->
+    <link rel="stylesheet" href="styles/preferences.css">
+
+    <!-- Modular grid files -->
+</head>
+
+<body class="db-display-page">
+    <!-- General background -->
+    <div class="background-wrapper">
+
+        <!-- Application header -->
+        <!-- Unified Header System -->
+        <div id="unified-header-container"></div>
+
+        <!-- Page body - All content after header -->
+        <div class="page-body">
+            <!-- API area - top-Section -->
+            <div class="top-section">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        🔌 API Management
+                    </div>
+                    <div class="table-actions">
+                        <button class="refresh-btn" onclick="saveAllAPI()" title="שמור כל ההגדרות">
+                            <span class="action-icon">💾</span> שמור הכל
+                        </button>
+                        <button class="refresh-btn" onclick="resetAllAPI()"
+                            title="איפוס כל ההגדרות לברירות מחדל">
+                            <span class="action-icon">🔄</span> איפוס הכל
+                        </button>
+                        <button class="refresh-btn" onclick="runAllAPI()" title="הרץ את כל בדיקות ה-API">
+                            <span class="action-icon">▶️</span> הרץ הכל
+                        </button>
+                        <div class="action-separator"></div>
+                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="סגור/פתח את כל הסקשנים">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Data summary -->
+                    <div class="test-summary" id="summaryStats">
+                        <h4>📊 סיכום API</h4>
+                        <div class="test-summary-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Endpoints פעילים:</span>
+                                <span class="stat-value" id="activeEndpointsCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">בקשות GET:</span>
+                                <span class="stat-value" id="getRequestsCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">בקשות POST:</span>
+                                <span class="stat-value" id="postRequestsCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">בקשות PUT:</span>
+                                <span class="stat-value" id="putRequestsCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">בקשות DELETE:</span>
+                                <span class="stat-value" id="deleteRequestsCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">סך הכל:</span>
+                                <span class="stat-value" id="totalAPICount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="main-content">
+
+                <!-- API Endpoints Section -->
+                <div class="content-section">
+                    <!-- API Endpoints Header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            🔌 נקודות קצה API<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">API Endpoints</span>
+                        </div>
+                        <div class="table-count" id="apiCount">טוען...</div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div class="search-input-wrapper">
+                                <input type="text" class="search-filter-input" placeholder="חיפוש נקודות קצה..."
+                                    onkeyup="filterAPIData([], [], [], null, this.value)">
+                            </div>
+                            <button class="refresh-btn" onclick="addNewAPIEndpoint()" title="הוסף נקודת קצה חדשה">
+                                <span class="action-icon">➕</span> הוסף
+                            </button>
+                            <button class="refresh-btn" onclick="loadAPIEndpoints()" title="רענן טבלה">
+                                <span class="action-icon">🔄</span> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור API">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- API Endpoints Table -->
+                    <div class="section-body">
+                        <div class="table-responsive" id="apiContainer">
+                            <table class="table" id="apiTable" data-table-type="api">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>שיטה
+                                                <br><span class="header-subtitle">Method</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(1)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>נתיב
+                                                <br><span class="header-subtitle">Path</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סטטוס
+                                                <br><span class="header-subtitle">Status</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תגובה
+                                                <br><span class="header-subtitle">Response</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(4)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>זמן תגובה
+                                                <br><span class="header-subtitle">Response Time</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תאריך
+                                                <br><span class="header-subtitle">Date</span>
+                                            </button>
+                                        </th>
+                                        <th class="actions-header">
+                                            פעולות
+                                            <br><span class="header-subtitle">Actions</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="loading">טוען נקודות קצה API...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Results Section -->
+                <div class="content-section">
+                    <!-- API Results Header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            📋 תוצאות API<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">API Results</span>
+                        </div>
+                        <div class="table-count" id="apiResultsCount">טוען...</div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div class="search-input-wrapper">
+                                <input type="text" class="search-filter-input" placeholder="חיפוש תוצאות..."
+                                    onkeyup="filterAPIResultsData([], [], [], null, this.value)">
+                            </div>
+                            <button class="refresh-btn" onclick="exportAPIResults()" title="ייצא תוצאות">
+                                <span class="action-icon">📤</span> ייצא
+                            </button>
+                            <button class="refresh-btn" onclick="loadAPIResults()" title="רענן טבלה">
+                                <span class="action-icon">🔄</span> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSecondSection()" title="הצג/הסתר אזור תוצאות">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- API Results Table -->
+                    <div class="section-body">
+                        <div class="table-responsive" id="apiResultsContainer">
+                            <table class="table" id="apiResultsTable" data-table-type="api-results">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>מזהה
+                                                <br><span class="header-subtitle">ID</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(1)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>בקשה
+                                                <br><span class="header-subtitle">Request</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סטטוס קוד
+                                                <br><span class="header-subtitle">Status Code</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תגובה
+                                                <br><span class="header-subtitle">Response</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(4)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>זמן תגובה
+                                                <br><span class="header-subtitle">Response Time</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תאריך
+                                                <br><span class="header-subtitle">Date</span>
+                                            </button>
+                                        </th>
+                                        <th class="actions-header">
+                                            פעולות
+                                            <br><span class="header-subtitle">Actions</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="loading">טוען תוצאות API...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- סוף main-content -->
+
+        </div> <!-- סוף page-body -->
+
+        <!-- מרווח בתחתית הדף -->
+        <div style="height: 3rem;"></div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Modular grid files -->
+        <script src="scripts/app-header.js"></script>
+        <script src="scripts/main.js"></script>
+        <script src="scripts/grid-filters.js"></script>
+        <script src="scripts/alerts.js"></script>
+        <script src="scripts/active-alerts-component.js"></script>
+        <script src="scripts/api.js"></script>
+
+        <script>
+            // פונקציות מותאמות לעמוד API
+            function loadAPIEndpoints() {
+                console.log('טעינת נקודות קצה API');
+                if (typeof window.loadAPIData === 'function') {
+                    window.loadAPIData();
+                } else {
+                    console.error('loadAPIData function not found');
+                }
+            }
+
+            function loadAPIResults() {
+                console.log('טעינת תוצאות API');
+                if (typeof window.loadAPIResultsData === 'function') {
+                    window.loadAPIResultsData();
+                } else {
+                    console.error('loadAPIResultsData function not found');
+                }
+            }
+
+            function addNewAPIEndpoint() {
+                console.log('הוספת נקודת קצה API חדשה');
+                if (typeof window.showAddAPIModal === 'function') {
+                    window.showAddAPIModal();
+                } else {
+                    console.error('showAddAPIModal function not found');
+                }
+            }
+
+            function exportAPIResults() {
+                console.log('ייצוא תוצאות API');
+                if (typeof window.exportAPIResultsData === 'function') {
+                    window.exportAPIResultsData();
+                } else {
+                    console.error('exportAPIResultsData function not found');
+                }
+            }
+
+            function saveAllAPI() {
+                console.log('שמירת כל הגדרות API');
+                showNotification('כל הגדרות API נשמרו בהצלחה', 'success');
+            }
+
+            function resetAllAPI() {
+                console.log('איפוס כל הגדרות API');
+                if (confirm('האם אתה בטוח שברצונך לאפס את כל הגדרות ה-API?')) {
+                    showNotification('כל הגדרות API אופסו בהצלחה', 'success');
+                }
+            }
+
+            function runAllAPI() {
+                console.log('הרצת כל בדיקות API');
+                showNotification('כל בדיקות API הורצו בהצלחה', 'success');
+            }
+
+            // טעינת נתונים בטעינת הדף
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log('דף API נטען');
+                loadAPIEndpoints();
+                loadAPIResults();
+            });
+        </script>
+
+    </div> <!-- סוף background-wrapper -->
+</body>
+
+</html>

@@ -448,6 +448,10 @@ def run_crud_tests():
         # Run CRUD tests
         results = execute_crud_tests(entities, operations, settings)
         
+        # Cleanup test data if requested
+        if settings.get('cleanup', True):
+            cleanup_crud_test_data()
+        
         return jsonify({
             'status': 'success',
             'message': 'CRUD tests completed',
@@ -613,43 +617,154 @@ def perform_crud_operation(base_url, entity, operation, settings):
         }
 
 def get_crud_test_data(entity, operation):
-    """Get test data for CRUD operations"""
+    """Get test data for CRUD operations - SAFE TEST DATA ONLY"""
+    # Add timestamp to ensure uniqueness and identify test data
+    timestamp = int(time.time())
+    
     test_data = {
         'accounts': {
-            'create': {'name': 'Test Account', 'currency': 'USD', 'cash_balance': 10000.0},
-            'update': {'name': 'Updated Test Account'}
+            'create': {
+                'name': f'TEST_ACCOUNT_{timestamp}',
+                'currency': 'USD',
+                'cash_balance': 10000.0,
+                'notes': f'Test account created at {timestamp} - SAFE TO DELETE'
+            },
+            'update': {
+                'name': f'UPDATED_TEST_ACCOUNT_{timestamp}',
+                'notes': f'Updated test account at {timestamp} - SAFE TO DELETE'
+            }
         },
         'tickers': {
-            'create': {'symbol': 'TEST', 'name': 'Test Ticker', 'type': 'stock', 'currency': 'USD'},
-            'update': {'name': 'Updated Test Ticker'}
+            'create': {
+                'symbol': f'TEST{timestamp}',
+                'name': f'Test Ticker {timestamp}',
+                'type': 'stock',
+                'currency': 'USD',
+                'remarks': f'Test ticker created at {timestamp} - SAFE TO DELETE'
+            },
+            'update': {
+                'name': f'Updated Test Ticker {timestamp}',
+                'remarks': f'Updated test ticker at {timestamp} - SAFE TO DELETE'
+            }
         },
         'trades': {
-            'create': {'ticker_id': 1, 'account_id': 1, 'type': 'swing', 'side': 'Long'},
-            'update': {'notes': 'Updated test trade'}
+            'create': {
+                'ticker_id': 1,
+                'account_id': 1,
+                'type': 'swing',
+                'side': 'Long',
+                'notes': f'Test trade created at {timestamp} - SAFE TO DELETE'
+            },
+            'update': {
+                'notes': f'Updated test trade at {timestamp} - SAFE TO DELETE'
+            }
         },
         'trade_plans': {
-            'create': {'ticker_id': 1, 'type': 'swing', 'side': 'Long', 'reasons': 'Test plan'},
-            'update': {'reasons': 'Updated test plan'}
+            'create': {
+                'ticker_id': 1,
+                'type': 'swing',
+                'side': 'Long',
+                'reasons': f'Test plan created at {timestamp} - SAFE TO DELETE'
+            },
+            'update': {
+                'reasons': f'Updated test plan at {timestamp} - SAFE TO DELETE'
+            }
         },
         'notes': {
-            'create': {'content': 'Test note', 'related_type': 'account', 'related_id': 1},
-            'update': {'content': 'Updated test note'}
+            'create': {
+                'content': f'Test note created at {timestamp} - SAFE TO DELETE',
+                'related_type': 'account',
+                'related_id': 1
+            },
+            'update': {
+                'content': f'Updated test note at {timestamp} - SAFE TO DELETE'
+            }
         },
         'alerts': {
-            'create': {'type': 'price_alert', 'condition': 'Price > $100', 'message': 'Test alert', 'related_type': 'ticker', 'related_id': 1},
-            'update': {'message': 'Updated test alert'}
+            'create': {
+                'type': 'price_alert',
+                'condition': 'Price > $100',
+                'message': f'Test alert created at {timestamp} - SAFE TO DELETE',
+                'related_type': 'ticker',
+                'related_id': 1
+            },
+            'update': {
+                'message': f'Updated test alert at {timestamp} - SAFE TO DELETE'
+            }
         },
         'executions': {
-            'create': {'trade_id': 1, 'action': 'buy', 'quantity': 100, 'price': 50.0},
-            'update': {'quantity': 150}
+            'create': {
+                'trade_id': 1,
+                'action': 'buy',
+                'quantity': 100,
+                'price': 50.0,
+                'notes': f'Test execution created at {timestamp} - SAFE TO DELETE'
+            },
+            'update': {
+                'quantity': 150,
+                'notes': f'Updated test execution at {timestamp} - SAFE TO DELETE'
+            }
         },
         'cash_flows': {
-            'create': {'account_id': 1, 'type': 'deposit', 'amount': 1000.0, 'currency_id': 1},
-            'update': {'amount': 1500.0}
+            'create': {
+                'account_id': 1,
+                'type': 'deposit',
+                'amount': 1000.0,
+                'currency_id': 1,
+                'notes': f'Test cash flow created at {timestamp} - SAFE TO DELETE'
+            },
+            'update': {
+                'amount': 1500.0,
+                'notes': f'Updated test cash flow at {timestamp} - SAFE TO DELETE'
+            }
         }
     }
     
+    # Ensure we only return test data for supported entities and operations
+    if entity not in test_data or operation not in test_data[entity]:
+        print(f"Warning: No test data available for {entity}.{operation}")
+        return {}
+    
+    print(f"✅ Generated safe test data for {entity}.{operation}: {test_data[entity][operation]}")
     return test_data.get(entity, {}).get(operation, {})
+
+def cleanup_crud_test_data():
+    """Clean up test data created during CRUD tests"""
+    try:
+        from Backend.config.database import get_db
+        from sqlalchemy import text
+        
+        db = next(get_db())
+        
+        # Clean up test data with timestamp identification
+        cleanup_queries = [
+            "DELETE FROM accounts WHERE name LIKE 'TEST_ACCOUNT_%' OR notes LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM tickers WHERE symbol LIKE 'TEST%' OR remarks LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM currencies WHERE symbol LIKE 'TEST%' OR remarks LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM trades WHERE notes LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM trade_plans WHERE reasons LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM notes WHERE content LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM alerts WHERE message LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM executions WHERE notes LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM cash_flows WHERE notes LIKE '%SAFE TO DELETE%'"
+        ]
+        
+        cleaned_count = 0
+        for query in cleanup_queries:
+            try:
+                result = db.execute(text(query))
+                cleaned_count += result.rowcount
+                db.commit()
+            except Exception as e:
+                print(f"Warning: Could not clean up CRUD test data with query '{query}': {e}")
+                db.rollback()
+        
+        print(f"✅ Cleaned up {cleaned_count} CRUD test records")
+        return cleaned_count
+        
+    except Exception as e:
+        print(f"❌ Error cleaning up CRUD test data: {e}")
+        return 0
 
 # Register blueprint
 def init_app(app):

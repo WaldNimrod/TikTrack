@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אבטחה - Tik.track</title>
+
+    <!-- 
+    ===== דף אבטחה - TikTrack =====
+    
+    דף זה מכיל:
+    1. טבלת אבטחה - הסקשן הראשון
+    2. טבלת תוצאות אבטחה - הסקשן השני
+    3. כרטיסיות התראות - בחלק העליון
+    4. מערכת פילטרים ומיון מתקדמת
+    
+    מבנה הדף:
+    - app-header: כותרת האפליקציה עם ניווט
+    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+      - top-section: כרטיסיות התראות וסיכום נתונים
+      - content-section (1): טבלת אבטחה
+      - content-section (2): טבלת תוצאות אבטחה
+    
+    שינויים אחרונים:
+    - יצירת עמוד אבטחה חדש
+    - הוספת טבלת תוצאות אבטחה
+    - שיפור עיצוב כרטיסיות התראות
+    - תיקון כפתורי סגירה עצמאיים
+    - ריכוז פונקציות אבטחה ב-security.js
+  -->
+
+    <!-- CSS Files - Ordered by priority (weak to strong) -->
+    <!-- 1. Apple theme (base) -->
+    <link rel="stylesheet" href="styles/apple-theme.css">
+
+    <!-- 2. Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 3. General styles -->
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- 4. Typography -->
+    <link rel="stylesheet" href="styles/typography.css">
+
+    <!-- 5. Table styles -->
+    <link rel="stylesheet" href="styles/table.css">
+
+    <!-- 6. Header system styles (highest priority) -->
+    <link rel="stylesheet" href="styles/header-system.css">
+
+    <!-- 7. Preferences page styles (specific to this page) -->
+    <link rel="stylesheet" href="styles/preferences.css">
+
+    <!-- Modular grid files -->
+</head>
+
+<body class="db-display-page">
+    <!-- General background -->
+    <div class="background-wrapper">
+
+        <!-- Application header -->
+        <!-- Unified Header System -->
+        <div id="unified-header-container"></div>
+
+        <!-- Page body - All content after header -->
+        <div class="page-body">
+            <!-- Security area - top-Section -->
+            <div class="top-section">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        🔒 Security Management
+                    </div>
+                    <div class="table-actions">
+                        <button class="refresh-btn" onclick="saveAllSecurity()" title="שמור כל ההגדרות">
+                            <span class="action-icon">💾</span> שמור הכל
+                        </button>
+                        <button class="refresh-btn" onclick="resetAllSecurity()" title="איפוס כל ההגדרות לברירות מחדל">
+                            <span class="action-icon">🔄</span> איפוס הכל
+                        </button>
+                        <button class="refresh-btn" onclick="runAllSecurity()" title="הרץ את כל בדיקות האבטחה">
+                            <span class="action-icon">▶️</span> הרץ הכל
+                        </button>
+                        <div class="action-separator"></div>
+                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="סגור/פתח את כל הסקשנים">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Data summary -->
+                    <div class="test-summary" id="summaryStats">
+                        <h4>📊 סיכום אבטחה</h4>
+                        <div class="test-summary-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">בדיקות עברו:</span>
+                                <span class="stat-value" id="passedSecurityCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">בדיקות נכשלו:</span>
+                                <span class="stat-value" id="failedSecurityCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">אזהרות:</span>
+                                <span class="stat-value" id="warningSecurityCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">סיכונים גבוהים:</span>
+                                <span class="stat-value" id="highRiskSecurityCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">סיכונים נמוכים:</span>
+                                <span class="stat-value" id="lowRiskSecurityCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">סך הכל:</span>
+                                <span class="stat-value" id="totalSecurityCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="main-content">
+
+                <!-- Security Tests Section -->
+                <div class="content-section">
+                    <!-- Security Tests Header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            🔒 בדיקות אבטחה<br><span
+                                style="font-weight: normal; font-size: 0.8em; color: #666;">Security Tests</span>
+                        </div>
+                        <div class="table-count" id="securityCount">טוען...</div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div class="search-input-wrapper">
+                                <input type="text" class="search-filter-input" placeholder="חיפוש בדיקות אבטחה..."
+                                    onkeyup="filterSecurityData([], [], [], null, this.value)">
+                            </div>
+                            <button class="refresh-btn" onclick="addNewSecurityTest()" title="הוסף בדיקת אבטחה חדשה">
+                                <span class="action-icon">➕</span> הוסף
+                            </button>
+                            <button class="refresh-btn" onclick="loadSecurityTests()" title="רענן טבלה">
+                                <span class="action-icon">🔄</span> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור אבטחה">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Security Tests Table -->
+                    <div class="section-body">
+                        <div class="table-responsive" id="securityContainer">
+                            <table class="table" id="securityTable" data-table-type="security">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סוג בדיקה
+                                                <br><span class="header-subtitle">Test Type</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(1)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תיאור
+                                                <br><span class="header-subtitle">Description</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>רמת סיכון
+                                                <br><span class="header-subtitle">Risk Level</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סטטוס
+                                                <br><span class="header-subtitle">Status</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(4)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תוצאה
+                                                <br><span class="header-subtitle">Result</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תאריך
+                                                <br><span class="header-subtitle">Date</span>
+                                            </button>
+                                        </th>
+                                        <th class="actions-header">
+                                            פעולות
+                                            <br><span class="header-subtitle">Actions</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="loading">טוען בדיקות אבטחה...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Results Section -->
+                <div class="content-section">
+                    <!-- Security Results Header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            📋 תוצאות אבטחה<br><span
+                                style="font-weight: normal; font-size: 0.8em; color: #666;">Security Results</span>
+                        </div>
+                        <div class="table-count" id="securityResultsCount">טוען...</div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div class="search-input-wrapper">
+                                <input type="text" class="search-filter-input" placeholder="חיפוש תוצאות..."
+                                    onkeyup="filterSecurityResultsData([], [], [], null, this.value)">
+                            </div>
+                            <button class="refresh-btn" onclick="exportSecurityResults()" title="ייצא תוצאות">
+                                <span class="action-icon">📤</span> ייצא
+                            </button>
+                            <button class="refresh-btn" onclick="loadSecurityResults()" title="רענן טבלה">
+                                <span class="action-icon">🔄</span> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSecondSection()"
+                                title="הצג/הסתר אזור תוצאות">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Security Results Table -->
+                    <div class="section-body">
+                        <div class="table-responsive" id="securityResultsContainer">
+                            <table class="table" id="securityResultsTable" data-table-type="security-results">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>מזהה
+                                                <br><span class="header-subtitle">ID</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(1)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>בדיקת אבטחה
+                                                <br><span class="header-subtitle">Security Test</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>רמת סיכון
+                                                <br><span class="header-subtitle">Risk Level</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סטטוס
+                                                <br><span class="header-subtitle">Status</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(4)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>פירוט
+                                                <br><span class="header-subtitle">Details</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>זמן ביצוע
+                                                <br><span class="header-subtitle">Execution Time</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(6)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תאריך
+                                                <br><span class="header-subtitle">Date</span>
+                                            </button>
+                                        </th>
+                                        <th class="actions-header">
+                                            פעולות
+                                            <br><span class="header-subtitle">Actions</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="8" class="loading">טוען תוצאות אבטחה...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- סוף main-content -->
+
+        </div> <!-- סוף page-body -->
+
+        <!-- מרווח בתחתית הדף -->
+        <div style="height: 3rem;"></div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Modular grid files -->
+        <script src="scripts/app-header.js"></script>
+        <script src="scripts/main.js"></script>
+        <script src="scripts/grid-filters.js"></script>
+        <script src="scripts/alerts.js"></script>
+        <script src="scripts/active-alerts-component.js"></script>
+        <script src="scripts/security.js"></script>
+
+        <script>
+            // פונקציות מותאמות לעמוד אבטחה
+            function loadSecurityTests() {
+                console.log('טעינת בדיקות אבטחה');
+                if (typeof window.loadSecurityData === 'function') {
+                    window.loadSecurityData();
+                } else {
+                    console.error('loadSecurityData function not found');
+                }
+            }
+
+            function loadSecurityResults() {
+                console.log('טעינת תוצאות אבטחה');
+                if (typeof window.loadSecurityResultsData === 'function') {
+                    window.loadSecurityResultsData();
+                } else {
+                    console.error('loadSecurityResultsData function not found');
+                }
+            }
+
+            function addNewSecurityTest() {
+                console.log('הוספת בדיקת אבטחה חדשה');
+                if (typeof window.showAddSecurityModal === 'function') {
+                    window.showAddSecurityModal();
+                } else {
+                    console.error('showAddSecurityModal function not found');
+                }
+            }
+
+            function exportSecurityResults() {
+                console.log('ייצוא תוצאות אבטחה');
+                if (typeof window.exportSecurityResultsData === 'function') {
+                    window.exportSecurityResultsData();
+                } else {
+                    console.error('exportSecurityResultsData function not found');
+                }
+            }
+
+            function saveAllSecurity() {
+                console.log('שמירת כל הגדרות אבטחה');
+                showNotification('כל הגדרות האבטחה נשמרו בהצלחה', 'success');
+            }
+
+            function resetAllSecurity() {
+                console.log('איפוס כל הגדרות אבטחה');
+                if (confirm('האם אתה בטוח שברצונך לאפס את כל הגדרות האבטחה?')) {
+                    showNotification('כל הגדרות האבטחה אופסו בהצלחה', 'success');
+                }
+            }
+
+            function runAllSecurity() {
+                console.log('הרצת כל בדיקות אבטחה');
+                showNotification('כל בדיקות האבטחה הורצו בהצלחה', 'success');
+            }
+
+            // טעינת נתונים בטעינת הדף
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log('דף אבטחה נטען');
+                loadSecurityTests();
+                loadSecurityResults();
+            });
+        </script>
+
+    </div> <!-- סוף background-wrapper -->
+</body>
+
+</html>

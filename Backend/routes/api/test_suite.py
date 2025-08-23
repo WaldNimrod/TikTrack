@@ -89,6 +89,10 @@ def run_test_suite():
             })
             
         finally:
+            # Cleanup test data if requested
+            if settings.get('database', {}).get('cleanup_after_tests', True):
+                cleanup_test_data()
+            
             # Cleanup backup if requested
             if settings.get('database', {}).get('cleanup_after_tests', True) and backup_path:
                 cleanup_backup(backup_path)
@@ -171,25 +175,76 @@ def create_database_backup():
         )
         
         if not os.path.exists(production_db_path):
+            print(f"Warning: Production database not found at {production_db_path}")
             return None
         
-        # Create backup directory
+        # Create backup directory with timestamp
+        timestamp = int(time.time())
         backup_dir = os.path.join(
             os.path.dirname(production_db_path),
             'backups',
-            f'test_suite_backup_{int(time.time())}'
+            f'test_suite_backup_{timestamp}'
         )
         os.makedirs(backup_dir, exist_ok=True)
         
-        # Copy database
+        # Copy database with verification
         backup_path = os.path.join(backup_dir, 'simpleTrade_new.db')
         shutil.copy2(production_db_path, backup_path)
         
+        # Verify backup was created successfully
+        if not os.path.exists(backup_path):
+            raise Exception("Backup file was not created successfully")
+        
+        # Verify backup file size matches original
+        original_size = os.path.getsize(production_db_path)
+        backup_size = os.path.getsize(backup_path)
+        if original_size != backup_size:
+            raise Exception(f"Backup file size mismatch: original={original_size}, backup={backup_size}")
+        
+        print(f"✅ Database backup created successfully: {backup_path}")
         return backup_path
     
     except Exception as e:
-        print(f"Warning: Could not create database backup: {e}")
+        print(f"❌ Error creating database backup: {e}")
         return None
+
+def cleanup_test_data():
+    """Clean up test data created during tests"""
+    try:
+        from Backend.config.database import get_db
+        from sqlalchemy import text
+        
+        db = next(get_db())
+        
+        # Clean up test data with timestamp identification
+        cleanup_queries = [
+            "DELETE FROM accounts WHERE name LIKE 'TEST_ACCOUNT_%' OR notes LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM tickers WHERE symbol LIKE 'TEST%' OR remarks LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM currencies WHERE symbol LIKE 'TEST%' OR remarks LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM trades WHERE notes LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM trade_plans WHERE reasons LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM notes WHERE content LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM alerts WHERE message LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM executions WHERE notes LIKE '%SAFE TO DELETE%'",
+            "DELETE FROM cash_flows WHERE notes LIKE '%SAFE TO DELETE%'"
+        ]
+        
+        cleaned_count = 0
+        for query in cleanup_queries:
+            try:
+                result = db.execute(text(query))
+                cleaned_count += result.rowcount
+                db.commit()
+            except Exception as e:
+                print(f"Warning: Could not clean up test data with query '{query}': {e}")
+                db.rollback()
+        
+        print(f"✅ Cleaned up {cleaned_count} test records")
+        return cleaned_count
+        
+    except Exception as e:
+        print(f"❌ Error cleaning up test data: {e}")
+        return 0
 
 def cleanup_backup(backup_path):
     """Clean up test backup"""
@@ -197,8 +252,9 @@ def cleanup_backup(backup_path):
         if backup_path and os.path.exists(backup_path):
             backup_dir = os.path.dirname(backup_path)
             shutil.rmtree(backup_dir)
+            print(f"✅ Cleaned up backup directory: {backup_dir}")
     except Exception as e:
-        print(f"Warning: Could not cleanup backup: {e}")
+        print(f"❌ Error cleaning up backup: {e}")
 
 def execute_test_suite(tests: List[str], settings: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -378,28 +434,37 @@ def run_table_tests(table_name: str) -> Dict[str, Any]:
     return results
 
 def get_test_data_for_table(table_name: str) -> Dict[str, Any]:
-    """Get test data for table creation"""
+    """Get test data for table creation - SAFE TEST DATA ONLY"""
+    # Add timestamp to ensure uniqueness and identify test data
+    timestamp = int(time.time())
+    
     test_data = {
         'accounts': {
-            'name': 'Test Account',
+            'name': f'TEST_ACCOUNT_{timestamp}',
             'currency': 'USD',
             'status': 'open',
             'cash_balance': 10000.0,
-            'notes': 'Test account for testing'
+            'notes': f'Test account created at {timestamp} - SAFE TO DELETE'
         },
         'tickers': {
-            'symbol': 'TEST',
-            'name': 'Test Ticker',
+            'symbol': f'TEST{timestamp}',
+            'name': f'Test Ticker {timestamp}',
             'type': 'stock',
             'currency': 'USD',
-            'remarks': 'Test ticker for testing'
+            'remarks': f'Test ticker created at {timestamp} - SAFE TO DELETE'
         },
         'currencies': {
-            'symbol': 'TEST',
-            'name': 'Test Currency',
+            'symbol': f'TEST{timestamp}',
+            'name': f'Test Currency {timestamp}',
             'usd_rate': 1.0,
-            'remarks': 'Test currency for testing'
+            'remarks': f'Test currency created at {timestamp} - SAFE TO DELETE'
         }
     }
     
+    # Ensure we only return test data for supported tables
+    if table_name not in test_data:
+        print(f"Warning: No test data available for table {table_name}")
+        return {}
+    
+    print(f"✅ Generated safe test data for {table_name}: {test_data[table_name]}")
     return test_data.get(table_name, {})

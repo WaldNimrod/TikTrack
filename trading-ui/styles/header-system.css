@@ -400,6 +400,57 @@
     border: none;
 }
 
+/* Submenu styles */
+#unified-header .dropdown-submenu {
+    position: relative;
+}
+
+#unified-header .dropdown-submenu .submenu {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 12px;
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 150px;
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 1001;
+}
+
+#unified-header .dropdown-submenu:hover .submenu {
+    display: block;
+    animation: submenuFadeIn 0.2s ease-out;
+}
+
+@keyframes submenuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+#unified-header .submenu .tiktrack-dropdown-item {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#unified-header .submenu .tiktrack-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#unified-header .submenu .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
 #unified-header .dropdown-divider {
     margin: 0.5rem 0;
     border: none;

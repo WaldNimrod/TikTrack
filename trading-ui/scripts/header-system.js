@@ -637,8 +637,15 @@ class HeaderSystem {
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/tests">בדיקות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/currencies">מטבעות</a></li>
 
+                        <li class="dropdown-submenu">
+                          <a class="tiktrack-dropdown-item" href="/tests">בדיקות</a>
+                          <ul class="submenu">
+                            <li><a class="tiktrack-dropdown-item" href="/tests#settings">הגדרות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/tests#server">שרת</a></li>
+                          </ul>
+                        </li>
                         <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
                       </ul>
                     </li>
@@ -826,6 +833,50 @@ class HeaderSystem {
   }
 
   setupEventListeners() {
+    // Event listeners for dropdown menus
+    document.addEventListener('click', (e) => {
+      const dropdownToggle = e.target.closest('.tiktrack-dropdown-toggle');
+      if (dropdownToggle) {
+        const dropdownMenu = dropdownToggle.nextElementSibling;
+        if (dropdownMenu && dropdownMenu.classList.contains('tiktrack-dropdown-menu')) {
+          this.toggleDropdown(dropdownMenu);
+        }
+      }
+    });
+
+    // Event listeners for submenu
+    document.addEventListener('mouseenter', (e) => {
+      const submenuItem = e.target.closest('.dropdown-submenu');
+      if (submenuItem) {
+        this.showSubmenu(submenuItem);
+      }
+    });
+
+    document.addEventListener('mouseleave', (e) => {
+      const submenuItem = e.target.closest('.dropdown-submenu');
+      if (submenuItem) {
+        this.hideSubmenu(submenuItem);
+      }
+    });
+
+    // Handle submenu item clicks
+    document.addEventListener('click', (e) => {
+      const submenuItem = e.target.closest('.submenu .tiktrack-dropdown-item');
+      if (submenuItem) {
+        const href = submenuItem.getAttribute('href');
+        if (href) {
+          this.handleSubmenuNavigation(href);
+        }
+      }
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.tiktrack-dropdown-toggle') && !e.target.closest('.tiktrack-dropdown-menu')) {
+        this.closeAllDropdowns();
+      }
+    });
+
     // כפתור הצג/הסתר פילטרים
     document.addEventListener('click', (e) => {
       if (e.target.closest('#filterToggleBtn')) {
@@ -907,6 +958,39 @@ class HeaderSystem {
     setTimeout(() => {
       this.restoreFilterStates();
     }, 100);
+  }
+
+  showSubmenu(submenuItem) {
+    const submenu = submenuItem.querySelector('.submenu');
+    if (submenu) {
+      submenu.style.display = 'block';
+      submenu.classList.add('show');
+    }
+  }
+
+  hideSubmenu(submenuItem) {
+    const submenu = submenuItem.querySelector('.submenu');
+    if (submenu) {
+      submenu.style.display = 'none';
+      submenu.classList.remove('show');
+    }
+  }
+
+  toggleDropdown(dropdownMenu) {
+    dropdownMenu.classList.toggle('show');
+  }
+
+  closeAllDropdowns() {
+    const dropdowns = document.querySelectorAll('.tiktrack-dropdown-menu.show');
+    dropdowns.forEach(dropdown => {
+      dropdown.classList.remove('show');
+    });
+
+    const submenus = document.querySelectorAll('.submenu.show');
+    submenus.forEach(submenu => {
+      submenu.classList.remove('show');
+      submenu.style.display = 'none';
+    });
   }
 
   // פונקציה לסגירת כל תפריטי הפילטרים
@@ -1656,6 +1740,44 @@ class HeaderSystem {
     updateTypeFilterDisplayText();
     updateAccountFilterDisplayText();
     updateDateRangeFilterDisplayText();
+  }
+
+  handleSubmenuNavigation(href) {
+    console.log('🧭 Navigating to:', href);
+
+    // Close all dropdowns
+    this.closeAllDropdowns();
+
+    // Handle different navigation types
+    if (href.includes('#')) {
+      // Handle anchor navigation (e.g., /tests#settings)
+      const [path, anchor] = href.split('#');
+      if (path === '/tests') {
+        // Navigate to tests page and scroll to specific section
+        window.location.href = '/tests';
+
+        // Wait for page load and scroll to section
+        setTimeout(() => {
+          this.scrollToSection(anchor);
+        }, 500);
+      }
+    } else {
+      // Regular navigation
+      window.location.href = href;
+    }
+  }
+
+  scrollToSection(sectionId) {
+    const section = document.querySelector(`[data-section="${sectionId}"]`);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Highlight the section briefly
+      section.style.backgroundColor = 'rgba(255, 156, 5, 0.1)';
+      setTimeout(() => {
+        section.style.backgroundColor = '';
+      }, 2000);
+    }
   }
 }
 

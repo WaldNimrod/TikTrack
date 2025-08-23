@@ -965,9 +965,15 @@ class AppHeader extends HTMLElement {
                   <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="/database">בסיס נתונים</a></li>
+                  <li><a class="dropdown-item" href="/constraints">אילוצים</a></li>
+                  <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="/designs">עיצובים</a></li>
                   <li><a class="dropdown-item" href="/grid-test">גריד</a></li>
                   <li><a class="dropdown-item" href="/grid-table-test">גריד טבלה</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="/test_crud">CRUD</a></li>
+                  <li><a class="dropdown-item" href="/test_api">API</a></li>
+                  <li><a class="dropdown-item" href="/test_security">אבטחה</a></li>
                 </ul>
               </div>
             </nav>

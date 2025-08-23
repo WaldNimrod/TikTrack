@@ -2,6 +2,14 @@
  * Active Alerts Component (Light DOM)
  * קומפוננטה להצגת התראות פעילות שמשתמשת בסגנונות הכלליים של האתר
  * שימוש: <active-alerts></active-alerts>
+ * 
+ * Dependencies:
+ * - main.js (global utilities and alert functions)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/active-alerts-component.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
  */
 
 class ActiveAlertsComponent extends HTMLElement {

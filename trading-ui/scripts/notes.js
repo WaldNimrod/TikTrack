@@ -1,4 +1,25 @@
 // ===== קובץ JavaScript פשוט לדף הערות =====
+/*
+ * Notes.js - Notes Page Management
+ * =================================
+ * 
+ * This file contains all notes management functionality for the TikTrack application.
+ * It handles notes CRUD operations, table updates, and user interactions.
+ * 
+ * Dependencies:
+ * - table-mappings.js (for column mappings and sorting)
+ * - main.js (global utilities and sorting functions)
+ * - translation-utils.js (translation functions)
+ * 
+ * Table Mapping:
+ * - Uses 'notes' table type from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * - Sorting uses global window.sortTableData() function
+ * 
+ * File: trading-ui/scripts/notes.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
 
 // פונקציות בסיסיות
 function openNoteDetails(id) {
@@ -340,17 +361,29 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     // הוספת האייקון לפני האובייקט
     relatedDisplay = relatedIcon + relatedDisplay;
 
+    // קביעת סוג לפילטר
+    let typeForFilter = 'כללי';
+    if (note.related_type_id) {
+      switch (note.related_type_id) {
+        case 1: typeForFilter = 'חשבון'; break;
+        case 2: typeForFilter = 'טרייד'; break;
+        case 3: typeForFilter = 'תוכנית'; break;
+        case 4: typeForFilter = 'טיקר'; break;
+        default: typeForFilter = 'כללי';
+      }
+    }
+
     return `
       <tr>
         <td><span class="symbol-text">${symbolDisplay}</span></td>
-        <td style="padding: 0;">
+        <td style="padding: 0;" data-type="${typeForFilter}">
           <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px;">
             ${relatedDisplay}
           </div>
         </td>
         <td>${content}</td>
         <td>${attachment}</td>
-        <td>${date}</td>
+        <td data-date="${note.created_at}">${date}</td>
         <td class="actions-cell">
           <button class="btn btn-sm btn-secondary" onclick="editNote('${note.id}')" title="ערוך">
             <span class="btn-icon">✏️</span>
@@ -852,6 +885,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // הוספת ולידציה בזמן אמת
   setupNoteValidationEvents();
 
+  // שחזור מצב סידור
+  restoreSortState();
+
   console.log('דף הערות נטען בהצלחה');
 });
 
@@ -937,4 +973,45 @@ function setupNoteValidationEvents() {
     });
   }
 }
+
+// ===== פונקציות סידור =====
+
+/**
+ * פונקציה לסידור טבלת הערות
+ * @param {number} columnIndex - אינדקס העמודה לסידור
+ * 
+ * דוגמאות שימוש:
+ * sortTable(0); // סידור לפי עמודת ID
+ * sortTable(1); // סידור לפי עמודת תוכן
+ * sortTable(3); // סידור לפי עמודת תאריך יצירה
+ * 
+ * @requires window.sortTableData - פונקציה גלובלית מ-main.js
+ */
+function sortTable(columnIndex) {
+  console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
+
+  if (typeof window.sortTableData === 'function') {
+    const sortedData = window.sortTableData(
+      columnIndex,
+      window.notesData || [],
+      'notes',
+      updateNotesTable
+    );
+    console.log('✅ נתונים מסודרים:', sortedData);
+  } else {
+    console.error('❌ sortTableData function not found in main.js');
+  }
+}
+
+/**
+ * שחזור מצב סידור
+ */
+function restoreSortState() {
+  if (typeof window.restoreAnyTableSort === 'function') {
+    window.restoreAnyTableSort('notes', window.notesData || [], updateNotesTable);
+  }
+}
+
+// הגדרת הפונקציה כגלובלית
+window.sortTable = sortTable;
 

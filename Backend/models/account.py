@@ -35,7 +35,7 @@ class Account(BaseModel):
     
     # Database columns - matching actual database schema
     name = Column(String(100), nullable=False)
-    currency = Column(String(3), nullable=True)  # Currency symbol (USD, EUR, etc.)
+    currency = Column(String(3), nullable=False)  # Currency symbol (USD, EUR, etc.) - NOT NULL per constraints
     status = Column(String(20), default='open')
     cash_balance = Column(Float, default=0)
     total_value = Column(Float, default=0)

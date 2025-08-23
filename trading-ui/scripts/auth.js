@@ -1,6 +1,14 @@
 /**
  * TikTrack Authentication System
  * מערכת התחברות גלובלית לאתר
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/auth.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
  */
 
 // משתנים גלובליים

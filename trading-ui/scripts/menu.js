@@ -1,3 +1,22 @@
+/*
+ * Menu.js - Menu System Management
+ * ===============================
+ * 
+ * This file contains all menu system functionality for the TikTrack application.
+ * It handles menu loading, navigation, and user interactions.
+ * 
+ * Note: This file is part of the legacy menu system. The current system
+ * uses header-system.js for unified header and navigation.
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/menu.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
+
 // פונקציה לטעינת התפריט
 async function loadMenu() {
   try {

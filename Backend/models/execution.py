@@ -7,10 +7,10 @@ class Execution(BaseModel):
     __tablename__ = "executions"
     
     trade_id = Column(Integer, ForeignKey('trades.id'), nullable=False)
-    action = Column(String(20), nullable=False)  # buy, sell
+    action = Column(String(20), nullable=False, default='buy')  # Default per constraints
     date = Column(DateTime, nullable=True)
-    quantity = Column(Float, nullable=False)
-    price = Column(Float, nullable=False)
+    quantity = Column(Float, nullable=False)  # NOT NULL per constraints
+    price = Column(Float, nullable=False)  # NOT NULL per constraints
     fee = Column(Float, default=0, nullable=True)
     source = Column(String(50), default='manual', nullable=True)  # manual, api, etc.
     

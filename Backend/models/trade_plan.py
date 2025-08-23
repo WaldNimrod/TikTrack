@@ -8,10 +8,10 @@ class TradePlan(BaseModel):
     
     account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
-    investment_type = Column(String(20), default='swing', nullable=True)
-    side = Column(String(10), default='Long', nullable=True)  # Long, Short
-    status = Column(String(20), default='open', nullable=True)  # open, closed, cancelled
-    planned_amount = Column(Float, default=0, nullable=True)
+    investment_type = Column(String(20), default='swing', nullable=False)  # NOT NULL per constraints
+    side = Column(String(10), default='Long', nullable=False)  # NOT NULL per constraints
+    status = Column(String(20), default='open', nullable=False)  # NOT NULL per constraints
+    planned_amount = Column(Float, default=1, nullable=True)  # Default 1 per constraints
     entry_conditions = Column(String(500), nullable=True)
     stop_price = Column(Float, nullable=True)
     target_price = Column(Float, nullable=True)

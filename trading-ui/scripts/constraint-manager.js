@@ -2,6 +2,14 @@
  * Constraint Manager - JavaScript for managing database constraints
  * Date: August 23, 2025
  * Description: Frontend JavaScript for the constraints management interface
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/constraint-manager.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
  */
 
 class ConstraintManager {

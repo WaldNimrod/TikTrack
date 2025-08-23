@@ -124,75 +124,69 @@
                     <!-- Cash flows table -->
                     <div class="section-body">
                         <div class="table-responsive" id="cashFlowsContainer">
-                            <table class="table" id="cashFlowsTable">
+                            <table class="table" id="cashFlowsTable" data-table-type="cash_flows">
                                 <thead>
                                     <tr>
 
-                                        <th onclick="sortTableData('cashFlowsTable', 0, 'text')"
-                                            style="cursor: pointer;">
-                                            חשבון <span class="sort-icon" id="sort-icon-0">↕</span>
-                                            <br><span
-                                                style="font-weight: normal; font-size: 0.8em; color: #666;">Account
-                                                (String)</span>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>חשבון
+                                            </button>
                                         </th>
-                                        <th onclick="sortTableData('cashFlowsTable', 1, 'text')"
-                                            style="cursor: pointer;">
-                                            סוג <span class="sort-icon" id="sort-icon-1">↕</span>
-                                            <br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Type
-                                                (String)</span>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(1)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סוג
+                                            </button>
                                         </th>
-                                        <th onclick="sortTableData('cashFlowsTable', 2, 'number')"
-                                            style="cursor: pointer;">
-                                            סכום <span class="sort-icon" id="sort-icon-2">↕</span>
-                                            <br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Amount
-                                                (Float)</span>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סכום
+                                            </button>
                                         </th>
-                                        <th onclick="sortTableData('cashFlowsTable', 3, 'text')"
-                                            style="cursor: pointer;">
-                                            מטבע <span class="sort-icon" id="sort-icon-3">↕</span>
-                                            <br><span
-                                                style="font-weight: normal; font-size: 0.8em; color: #666;">Currency
-                                                (String)</span>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>מטבע
+                                            </button>
                                         </th>
-                                        <th onclick="sortTableData('cashFlowsTable', 4, 'number')"
-                                            style="cursor: pointer;">
-                                            שער דולר <span class="sort-icon" id="sort-icon-4">↕</span>
-                                            <br><span style="font-weight: normal; font-size: 0.8em; color: #666;">USD
-                                                Rate
-                                                (Decimal)</span>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(4)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>שער דולר
+                                            </button>
                                         </th>
-                                        <th onclick="sortTableData('cashFlowsTable', 5, 'date')"
-                                            style="cursor: pointer;">
-                                            תאריך <span class="sort-icon" id="sort-icon-6">↕</span>
-                                            <br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Date
-                                                (Date)</span>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תאריך
+                                            </button>
                                         </th>
-                                        <th onclick="sortTableData('cashFlowsTable', 7, 'text')"
-                                            style="cursor: pointer;">
-                                            תיאור <span class="sort-icon" id="sort-icon-7">↕</span>
-                                            <br><span
-                                                style="font-weight: normal; font-size: 0.8em; color: #666;">Description
-                                                (String)</span>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(6)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תיאור
+                                            </button>
                                         </th>
-                                        <th onclick="sortTableData('cashFlowsTable', 8, 'text')"
-                                            style="cursor: pointer;">
-                                            מקור <span class="sort-icon" id="sort-icon-8">↕</span>
-                                            <br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Source
-                                                (String)</span>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(7)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>מקור
+                                            </button>
                                         </th>
-                                        <th onclick="sortTableData('cashFlowsTable', 9, 'text')"
-                                            style="cursor: pointer;">
-                                            מזהה חיצוני <span class="sort-icon" id="sort-icon-9">↕</span>
-                                            <br><span
-                                                style="font-weight: normal; font-size: 0.8em; color: #666;">External ID
-                                                (String)</span>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(8)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>מזהה חיצוני
+                                            </button>
                                         </th>
-                                        <th onclick="sortTableData('cashFlowsTable', 10, 'datetime')"
-                                            style="cursor: pointer;">
-                                            נוצר ב <span class="sort-icon" id="sort-icon-10">↕</span>
-                                            <br><span
-                                                style="font-weight: normal; font-size: 0.8em; color: #666;">Created At
-                                                (DateTime)</span>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(9)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>נוצר ב
+                                            </button>
                                         </th>
                                         <th>פעולות<br><span
                                                 style="font-weight: normal; font-size: 0.8em; color: #666;">Actions</span>
@@ -442,7 +436,8 @@
     <script src="scripts/header-system.js"></script>
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/translation-utils.js"></script>
-  <script src="scripts/main.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/main.js"></script>
     <!-- Removed grid-filters.js - not needed for cash flows page -->
     <script src="scripts/alerts.js"></script>
     <script src="scripts/cash_flows.js"></script>

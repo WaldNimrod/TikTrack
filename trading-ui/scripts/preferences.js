@@ -12,8 +12,12 @@
  * - Real-time change tracking
  * - State persistence via localStorage
  * 
- * @file preferences.js
- * @version 1.0
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/preferences.js
+ * @version 2.2
  * @author TikTrack Development Team
  * @since August 2025
  */

@@ -1,4 +1,21 @@
 // ===== קובץ JavaScript לדף טבלאות עזר =====
+/*
+ * DB_Extradata.js - Database Extra Data Page Management (Alternative)
+ * =================================================================
+ * 
+ * This file contains alternative database extra data management functionality for the TikTrack application.
+ * It handles display and management of auxiliary database tables.
+ * 
+ * Note: This is an alternative implementation to db-extradata.js
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/db_extradata.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
 
 // פונקציות בסיסיות
 function openExtraDataDetails(id) {

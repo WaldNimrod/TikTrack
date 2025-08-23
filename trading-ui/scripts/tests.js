@@ -3,6 +3,14 @@
  * 
  * קובץ זה מכיל את כל הפונקציות הנדרשות לעמוד הבדיקות
  * כולל ניהול בדיקות, תוצאות בדיקות, וסטטיסטיקות
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/tests.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
  */
 
 // Global variables
@@ -183,14 +191,19 @@ function updateTestResultsTable() {
     const rows = testResultsData.map(result => {
         const resultClass = getResultClass(result.result);
 
+        // המרת סטטוס לפילטר
+        const statusForFilter = result.result === 'passed' ? 'עבר' :
+            result.result === 'failed' ? 'נכשל' :
+                result.result === 'pending' ? 'ממתין' : 'לא מוגדר';
+
         return `
       <tr>
         <td>${result.id}</td>
-        <td>${result.testName}</td>
-        <td><span class="test-result-status ${resultClass}">${getResultText(result.result)}</span></td>
+        <td data-type="${result.testName}">${result.testName}</td>
+        <td data-status="${statusForFilter}"><span class="test-result-status ${resultClass}">${getResultText(result.result)}</span></td>
         <td>${result.duration}</td>
         <td>${result.errorMessage}</td>
-        <td>${result.runDate}</td>
+        <td data-date="${result.runDate}">${result.runDate}</td>
         <td>${result.details}</td>
         <td class="actions-cell">
           <button class="btn btn-sm btn-secondary" onclick="viewTestResult(${result.id})" title="צפייה">

@@ -590,6 +590,19 @@
         window.headerSystem.init();
       }
 
+      // טעינת חשבונות לפילטר
+      if (typeof window.loadAccountsFromServer === 'function') {
+        console.log('✅ טעינת חשבונות לפילטר...');
+        window.loadAccountsFromServer().then(() => {
+          if (window.accountsData && window.accountsData.length > 0) {
+            console.log('✅ חשבונות נטענו:', window.accountsData);
+            if (window.updateAccountFilterMenu) {
+              window.updateAccountFilterMenu(window.accountsData);
+            }
+          }
+        });
+      }
+
       // טעינת מצב הסקשנים לפי הדף הנוכחי
       if (typeof window.loadSectionStates === 'function') {
         window.loadSectionStates();

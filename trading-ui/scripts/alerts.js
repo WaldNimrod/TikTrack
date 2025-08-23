@@ -5,6 +5,16 @@
  * 
  * קובץ ייעודי לדף ההתראות (alerts.html)
  * 
+ * Dependencies:
+ * - table-mappings.js (for column mappings and sorting)
+ * - main.js (global utilities and sorting functions)
+ * - translation-utils.js (translation functions)
+ * 
+ * Table Mapping:
+ * - Uses 'alerts' table type from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * - Sorting uses global window.sortTableData() function
+ * 
  * תכולת הקובץ:
  * - טעינת נתוני התראות מהשרת
  * - הצגת טבלת התראות עם מיון ופילטרים
@@ -406,6 +416,14 @@ function updateAlertsTable(alerts) {
     updatePageSummaryStats();
 
     console.log('🔄 === TABLE UPDATE COMPLETED ===');
+
+    // הפעלת פילטרים אחרי עדכון הטבלה
+    setTimeout(() => {
+      if (typeof window.applyFilters === 'function') {
+        console.log('🔄 Applying filters after table update...');
+        window.applyFilters();
+      }
+    }, 100);
   });
 }
 

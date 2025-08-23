@@ -1,6 +1,21 @@
 // ===== קובץ JavaScript לפונקציות מודל חשבונות =====
 // קובץ זה מכיל רק את הפונקציות הקשורות למודל הוספה/עריכה של חשבונות
 // נוצר כדי להפריד את הפונקציונליות ולהימנע מטעינת accounts.js שלם בדפים שלא צריכים אותו
+/*
+ * Account Modal - Account Modal Management
+ * =======================================
+ * 
+ * This file contains all account modal functionality for the TikTrack application.
+ * It handles account creation and editing modals.
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/account-modal.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
 
 /**
  * הצגת מודל הוספת חשבון

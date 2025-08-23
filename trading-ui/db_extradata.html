@@ -48,9 +48,10 @@
 
   <!-- 6. Header system styles (highest priority) -->
   <link rel="stylesheet" href="styles/header-system.css">
+  <!-- 7. Table rules styles -->
+  <link rel="stylesheet" href="styles/table-rules.css">
 
-  <!-- 7. Database display specific styles (highest priority) -->
-  <link rel="stylesheet" href="styles/db-display.css">
+  <!-- Modular grid files - loaded at end of file -->
 </head>
 
 <body>
@@ -85,8 +86,8 @@
           <div class="info-summary" id="summaryStats">
             <div>סה"כ טבלאות: <strong id="totalTables">2</strong></div>
             <div>סה"כ רשומות: <strong id="totalRecords">0</strong></div>
-            <div>מטבעות: <strong id="currenciesCount">0</strong></div>
-            <div>סוגי קישור: <strong id="noteRelationTypesCount">0</strong></div>
+            <div>מטבעות: <strong id="summaryCurrenciesCount">0</strong></div>
+            <div>סוגי קישור: <strong id="summaryNoteRelationTypesCount">0</strong></div>
           </div>
         </div>
       </div> <!-- End top-section -->
@@ -101,13 +102,13 @@
             <div class="table-title">
               💱 מטבעות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">currencies</span>
             </div>
-            <div class="table-count" id="currenciesCount">טוען...</div>
+            <div class="table-count" id="currenciesCount">💱 מטבעות: טוען...</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור מטבעות">
+              <button class="filter-toggle-btn" onclick="toggleCurrenciesSection()" title="הצג/הסתר אזור מטבעות">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -146,13 +147,14 @@
             🔗 סוגי קישור הערות<br><span
               style="font-weight: normal; font-size: 0.8em; color: #666;">note_relation_types</span>
           </div>
-          <div class="table-count" id="noteRelationTypesCount">טוען...</div>
+          <div class="table-count" id="noteRelationTypesCount">🔗 סוגי קישור: טוען...</div>
           <div class="table-actions">
             <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
               <span class="action-icon">➕</span> הוסף
             </button>
             <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור סוגי קישור">
+            <button class="filter-toggle-btn" onclick="toggleNoteRelationTypesSection()"
+              title="הצג/הסתר אזור סוגי קישור">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -164,7 +166,7 @@
             <table class="table" id="noteRelationTypesTable">
               <thead>
                 <tr>
-                  <th onclick="sortTable(0, 'noteRelationTypesTable')">Type Name (VARCHAR)</th>
+                  <th onclick="sortTable(0, 'noteRelationTypesTable')">Note Relation Type (VARCHAR)</th>
                   <th onclick="sortTable(1, 'noteRelationTypesTable')">Description (VARCHAR)</th>
                   <th onclick="sortTable(2, 'noteRelationTypesTable')">ID (INTEGER)</th>
                   <th onclick="sortTable(3, 'noteRelationTypesTable')">Created At (DATETIME)</th>
@@ -177,6 +179,22 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Table Rules -->
+          <div class="table-rules-container fade-in">
+            <div class="table-rules-header">
+              <span class="rules-icon">📋</span>
+              <h6 class="table-rules-title">Table Rules & Constraints</h6>
+            </div>
+            <ul class="table-rules-list">
+              <li class="constraint">Note_relation_type is required (NOT NULL)</li>
+              <li class="constraint">ID is required (NOT NULL)</li>
+              <li class="unique">Note_relation_type has unique constraint</li>
+              <li class="unique">ID is primary key</li>
+              <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+              <li class="index">Index on id: ix_note_relation_types_id</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -192,16 +210,48 @@
     <script src="scripts/header-system.js"></script>
     <script src="scripts/account-modal.js"></script>
     <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/designs.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/db-extradata.js"></script>
 
     <!-- Page initialization -->
     <script>
       // Page initialization
       document.addEventListener('DOMContentLoaded', function () {
-        console.log('🔄 Initializing designs page...');
-        if (typeof initializeDesignsPage === 'function') {
-          initializeDesignsPage();
+        console.log('🔄 Initializing db_extradata page...');
+
+        // שחזור מצב הסגירה
+        const contentSections = document.querySelectorAll('.content-section');
+        contentSections.forEach((section, index) => {
+          const collapsed = localStorage.getItem(`section${index}Collapsed`) === 'true';
+          const sectionBody = section.querySelector('.section-body');
+          const toggleBtn = section.querySelector('.filter-toggle-btn');
+          const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+          if (sectionBody && collapsed) {
+            sectionBody.style.display = 'none';
+            if (icon) {
+              icon.textContent = '▼';
+            }
+          }
+        });
+
+        // שחזור מצב הסקשן הראשי
+        const mainCollapsed = localStorage.getItem('mainSectionCollapsed') === 'true';
+        if (mainCollapsed && contentSections.length > 0) {
+          const mainSection = contentSections[0];
+          const sectionBody = mainSection.querySelector('.section-body');
+          const toggleBtn = mainSection.querySelector('button[onclick="toggleMainSection()"]');
+          const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+          if (sectionBody) {
+            sectionBody.style.display = 'none';
+            if (icon) {
+              icon.textContent = '▼';
+            }
+          }
         }
+
+        console.log('✅ דף טבלאות עזר אותחל בהצלחה');
       });
     </script>
     <script>

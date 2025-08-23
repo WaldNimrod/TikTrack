@@ -41,13 +41,13 @@ class Ticker(BaseModel):
     symbol = Column(String(10), unique=True, nullable=False, index=True, 
                    comment="Ticker symbol - must be unique")
     name = Column(String(100), nullable=True, 
-                 comment="Company or asset name")
+                 comment="Company or asset name - max 25 chars per constraints")
     type = Column(String(20), nullable=True, 
                  comment="Asset type: stock, etf, crypto, forex, commodity")
     remarks = Column(String(500), nullable=True, 
                     comment="Additional notes about the ticker")
-    currency = Column(String(3), nullable=True, 
-                     comment="Currency symbol (USD, EUR, etc.)")
+    currency = Column(String(3), nullable=False, 
+                     comment="Currency symbol (USD, EUR, etc.) - NOT NULL per constraints")
     active_trades = Column(Boolean, default=False, nullable=True, 
                           comment="Whether there are active trades")
     updated_at = Column(String(20), nullable=True, 

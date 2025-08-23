@@ -74,6 +74,7 @@
     <script src="scripts/header-system.js"></script>
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/table-mappings.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/grid-filters.js"></script>
     <script src="scripts/alerts.js"></script>
@@ -122,10 +123,10 @@
 
                     <!-- Data summary -->
                     <div class="info-summary" id="summaryStats">
-                        <div>סה"כ תכנונים: <strong id="totalDesigns">0</strong></div>
-                        <div>סה"כ השקעה: <strong id="totalInvestment">$0</strong></div>
-                        <div>השקעה ממוצעת: <strong id="avgInvestment">$0</strong></div>
-                        <div>רווח כולל: <strong id="totalProfit">$0</strong></div>
+                        <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
+                        <div>טריידים פתוחים: <strong id="openTrades">0</strong></div>
+                        <div>טריידים סגורים: <strong id="closedTrades">0</strong></div>
+                        <div>רווח/הפסד כולל: <strong id="totalPL">$0</strong></div>
                     </div>
 
 
@@ -140,20 +141,10 @@
                     <!-- My planning header -->
                     <div class="section-header">
                         <div class="table-title">
-                            📋 התכנונים שלי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade
-                                Plans</span>
+                            📋 התכנונים שלי
                         </div>
                         <div class="table-count" id="designsCount">טוען...</div>
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            <div class="search-input-wrapper">
-                                <input type="text" class="search-filter-input" placeholder="חיפוש תכנונים..."
-                                    onkeyup="if (typeof window.filterDesignsData === 'function') { window.filterDesignsData([], [], [], null, this.value); } else { console.error('filterDesignsData function not found'); }">
-                            </div>
-                            <button class="refresh-btn"
-                                onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); } else { console.error('showAddTradePlanModal function not found'); }"
-                                title="הוסף תכנון חדש">
-                                <span class="action-icon">➕</span> הוסף
-                            </button>
                             <button class="filter-toggle-btn" onclick="toggleMainSection()"
                                 title="הצג/הסתר אזור התכנונים שלי">
                                 <span class="filter-icon">▲</span>
@@ -164,7 +155,7 @@
                     <!-- Planning table -->
                     <div class="section-body">
                         <div class="table-responsive" id="designsContainer">
-                            <table class="table" id="designsTable">
+                            <table class="table" id="designsTable" data-table-type="planning">
                                 <thead>
                                     <tr>
                                         <th>
@@ -172,7 +163,6 @@
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>נכס
-                                                <br><span class="header-subtitle">Ticker</span>
                                             </button>
                                         </th>
                                         <th>
@@ -180,7 +170,6 @@
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>תאריך
-                                                <br><span class="header-subtitle">Date</span>
                                             </button>
                                         </th>
                                         <th>
@@ -188,7 +177,6 @@
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>סוג
-                                                <br><span class="header-subtitle">Type</span>
                                             </button>
                                         </th>
                                         <th>
@@ -196,7 +184,6 @@
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>צד
-                                                <br><span class="header-subtitle">Side</span>
                                             </button>
                                         </th>
                                         <th>
@@ -204,7 +191,6 @@
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>סכום
-                                                <br><span class="header-subtitle">Amount</span>
                                             </button>
                                         </th>
                                         <th>
@@ -212,7 +198,6 @@
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>יעד
-                                                <br><span class="header-subtitle">Target</span>
                                             </button>
                                         </th>
                                         <th>
@@ -220,7 +205,6 @@
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>סטופ
-                                                <br><span class="header-subtitle">Stop</span>
                                             </button>
                                         </th>
                                         <th>
@@ -228,7 +212,6 @@
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>נוכחי
-                                                <br><span class="header-subtitle">Current</span>
                                             </button>
                                         </th>
                                         <th>
@@ -236,12 +219,10 @@
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); } else { console.error('sortTable function not found'); }"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>סטטוס
-                                                <br><span class="header-subtitle">Status</span>
                                             </button>
                                         </th>
                                         <th class="actions-header">
                                             פעולות
-                                            <br><span class="header-subtitle">Actions</span>
                                         </th>
                                     </tr>
                                 </thead>

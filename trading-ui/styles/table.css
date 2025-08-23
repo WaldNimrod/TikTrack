@@ -167,7 +167,7 @@
   font-weight: 500;
   color: var(--apple-text-secondary);
   font-size: 0.85rem;
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
 }
 
 .triggered-badge {
@@ -282,6 +282,22 @@
   font-size: 1rem !important;
   font-weight: 500 !important;
   background: transparent !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+}
+
+/* סגנון ספציפי לתאריכים בטבלאות */
+.data-table td.date-cell {
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+}
+
+/* סגנון גלובלי לכל התאים בטבלאות data-table */
+.data-table td {
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+}
+
+/* סגנון גלובלי לכל התאים בכל הטבלאות באתר */
+.table td {
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
 }
 
 .data-table tbody tr {
@@ -958,3 +974,138 @@ select:focus {
 /* ===== סגנונות לסטטוס אינדיקטור - הועברו ל-styles.css ===== */
 
 /* .status-dot - הועבר ל-styles.css */
+
+/* ===== Table Rules Styles ===== */
+
+/* Table Rules Container */
+.table-rules-container {
+  margin-top: 15px;
+  padding: 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  border-left: 4px solid #ff9c05;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-rules-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.table-rules-header .rules-icon {
+  margin-left: 8px;
+  font-size: 1.1em;
+  color: #ff9c05;
+}
+
+.table-rules-title {
+  font-size: 0.95em;
+  font-weight: 600;
+  color: #495057;
+  margin: 0;
+}
+
+.table-rules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.table-rules-list li {
+  position: relative;
+  padding: 4px 0 4px 20px;
+  font-size: 0.85em;
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+.table-rules-list li::before {
+  content: "•";
+  position: absolute;
+  right: 8px;
+  color: #ff9c05;
+  font-weight: bold;
+}
+
+.table-rules-list li.constraint {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.table-rules-list li.constraint::before {
+  content: "⚠";
+  color: #dc3545;
+}
+
+.table-rules-list li.foreign-key {
+  color: #0d6efd;
+  font-weight: 500;
+}
+
+.table-rules-list li.foreign-key::before {
+  content: "🔗";
+  color: #0d6efd;
+}
+
+.table-rules-list li.unique {
+  color: #198754;
+  font-weight: 500;
+}
+
+.table-rules-list li.unique::before {
+  content: "✓";
+  color: #198754;
+}
+
+.table-rules-list li.default {
+  color: #6f42c1;
+  font-weight: 500;
+}
+
+.table-rules-list li.default::before {
+  content: "⚙";
+  color: #6f42c1;
+}
+
+.table-rules-list li.index {
+  color: #fd7e14;
+  font-weight: 500;
+}
+
+.table-rules-list li.index::before {
+  content: "📊";
+  color: #fd7e14;
+}
+
+/* Responsive design for table rules */
+@media (max-width: 768px) {
+  .table-rules-container {
+    padding: 12px;
+    margin-top: 12px;
+  }
+
+  .table-rules-list li {
+    font-size: 0.8em;
+    padding: 3px 0 3px 18px;
+  }
+}
+
+/* Animation for new rules */
+.table-rules-container.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

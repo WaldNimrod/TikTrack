@@ -1,4 +1,25 @@
 // ===== קובץ JavaScript לדף עסקעות =====
+/*
+ * Executions.js - Executions Page Management
+ * =========================================
+ * 
+ * This file contains all executions management functionality for the TikTrack application.
+ * It handles executions CRUD operations, table updates, and user interactions.
+ * 
+ * Dependencies:
+ * - table-mappings.js (for column mappings and sorting)
+ * - main.js (global utilities and sorting functions)
+ * - translation-utils.js (translation functions)
+ * 
+ * Table Mapping:
+ * - Uses 'executions' table type from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * - Sorting uses global window.sortTableData() function
+ * 
+ * File: trading-ui/scripts/executions.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
 
 // משתנים גלובליים
 if (!window.executionsData) {
@@ -1014,18 +1035,23 @@ async function updateExecutionsTable(executions) {
             tradeInfo = `טרייד ${execution.trade_id}`;
         }
 
+        // המרת סוגים לעברית לפילטר
+        const typeForFilter = (execution.action || execution.type) === 'buy' ? 'קנייה' :
+            (execution.action || execution.type) === 'sell' ? 'מכירה' :
+                (execution.action || execution.type);
+
         return `
             <tr>
                 <td><strong>${symbol}</strong></td>
                 <td><small style="color: #666;">${tradeInfo}</small></td>
-                <td>${execution.action || execution.type}</td>
+                <td data-type="${typeForFilter}">${execution.action || execution.type}</td>
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td>${execution.fee ? '$' + execution.fee : '-'}</td>
                 <td>${window.colorAmount(0, '$0')}</td>
                 <td>${execution.notes || ''}</td>
-                <td>${formatDate(execution.created_at)}</td>
-                <td>${formatDate(execution.date || execution.execution_date)}</td>
+                <td data-date="${execution.created_at}">${formatDate(execution.created_at)}</td>
+                <td data-date="${execution.date || execution.execution_date}">${formatDate(execution.date || execution.execution_date)}</td>
                 <td>${execution.source || '-'}</td>
                 <td>
                     <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
@@ -1076,15 +1102,59 @@ window.goToPlan = goToPlan;
 window.goToAlert = goToAlert;
 window.goToNote = goToNote;
 
+// ===== פונקציות סידור =====
+
+/**
+ * פונקציה לסידור טבלת עסקעות
+ * @param {number} columnIndex - אינדקס העמודה לסידור
+ * 
+ * דוגמאות שימוש:
+ * sortTable(0); // סידור לפי עמודת נכס
+ * sortTable(2); // סידור לפי עמודת פעולה
+ * sortTable(8); // סידור לפי עמודת תאריך יצירה
+ * 
+ * @requires window.sortTableData - פונקציה גלובלית מ-main.js
+ */
+function sortTable(columnIndex) {
+    console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
+
+    if (typeof window.sortTableData === 'function') {
+        const sortedData = window.sortTableData(
+            columnIndex,
+            window.executionsData || [],
+            'executions',
+            updateExecutionsTable
+        );
+        console.log('✅ נתונים מסודרים:', sortedData);
+    } else {
+        console.error('❌ sortTableData function not found in main.js');
+    }
+}
+
+/**
+ * שחזור מצב סידור
+ */
+function restoreSortState() {
+    if (typeof window.restoreAnyTableSort === 'function') {
+        window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTable);
+    }
+}
+
+// הגדרת הפונקציה כגלובלית
+window.sortTable = sortTable;
+
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
     console.log('🔄 === DOM CONTENT LOADED ===');
 
     // שחזור מצב הסגירה
-    // restoreTickersSectionState(); // לא רלוונטי לעמוד עסקעות
+    restoreExecutionsSectionState();
 
     // טעינת נתונים
     loadExecutionsData();
+
+    // שחזור מצב סידור
+    restoreSortState();
 
     console.log('דף עסקעות נטען בהצלחה');
 });

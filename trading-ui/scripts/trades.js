@@ -6,7 +6,7 @@
  * It handles trade CRUD operations, table updates, filtering, and user interactions.
  * 
  * Usage:
- * - Used in trade_plans.html (trade plans page)
+ * - Used in trades.html (trades/tracking page)
  * - Used in database.html (database page - trades table)
  * 
  * Features:
@@ -23,12 +23,18 @@
  * - State management for trade operations
  * 
  * Dependencies:
- * - main.js (global utilities)
+ * - table-mappings.js (for column mappings and sorting)
+ * - main.js (global utilities and sorting functions)
  * - translation-utils.js (translation functions)
  * - header-system.js (filter functionality)
  * 
- * @version 2.1
- * @lastUpdated August 22, 2025
+ * Table Mapping:
+ * - Uses 'trades' table type from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * - Sorting uses global window.sortTableData() function
+ * 
+ * @version 2.2
+ * @lastUpdated August 23, 2025
  * 
  * פונקציות עיקריות:
  * - cancelTradeRecord() - ביטול טרייד
@@ -136,7 +142,32 @@ async function loadTradesData() {
 
     // עדכון ישיר של הטבלה - ללא פילטרים מורכבים
     console.log('🔄 Updating trades table directly with', tradesData.length, 'trades');
-    updateTradesTable(tradesData);
+    
+    // בדיקה אם יש פילטרים פעילים
+    const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
+        (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
+        (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
+        (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
+
+    console.log('🔄 Checking filters for trades page:', {
+        hasActiveFilters,
+        selectedStatusesForFilter: window.selectedStatusesForFilter,
+        selectedTypesForFilter: window.selectedTypesForFilter,
+        selectedDateRangeForFilter: window.selectedDateRangeForFilter,
+        searchTermForFilter: window.searchTermForFilter
+    });
+
+    let filteredTrades = [...tradesData];
+
+    if (hasActiveFilters) {
+        console.log('🔄 Applying filters to trades data...');
+        filteredTrades = filterTradesLocally(tradesData, window.selectedStatusesForFilter, window.selectedTypesForFilter, window.selectedDateRangeForFilter, window.searchTermForFilter);
+        console.log('🔄 After filtering:', filteredTrades.length, 'trades');
+    } else {
+        console.log('🔄 No active filters, showing all trades');
+    }
+
+    updateTradesTable(filteredTrades);
 
   } catch (error) {
     console.error('❌ Error loading trades data:', error);
@@ -172,6 +203,184 @@ function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, sel
   console.log('🔄 Returning all trades without filtering:', globalTradesData.length, 'trades');
 
   updateTradesTable(globalTradesData);
+}
+
+/**
+ * פילטור מקומי לטריידים
+ */
+function filterTradesLocally(trades, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+    console.log('🔄 === FILTER TRADES LOCALLY ===');
+    console.log('🔄 Original trades:', trades.length);
+    console.log('🔄 Filters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
+
+    let filteredTrades = [...trades];
+
+    // Extracting start and end dates
+    let startDate = null;
+    let endDate = null;
+
+    if (selectedDateRange && selectedDateRange !== 'כל זמן') {
+        console.log('🔄 Filter: Translating date range:', selectedDateRange);
+        const dateRange = window.translateDateRangeToDates ? window.translateDateRangeToDates(selectedDateRange) : { startDate: null, endDate: null };
+        startDate = dateRange.startDate;
+        endDate = dateRange.endDate;
+        console.log('🔄 Filter: Translation result:', { startDate, endDate });
+    }
+
+    console.log('🔄 Extracted dates:', { startDate, endDate });
+
+    // Filtering by status
+    if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
+        console.log('🔄 Filtering by status:', selectedStatuses);
+        filteredTrades = filteredTrades.filter(trade => {
+            // המרת הערכים הנבחרים לאנגלית
+            const statusTranslations = {
+                'פתוח': 'open',
+                'סגור': 'closed',
+                'מבוטל': 'cancelled'
+            };
+            
+            const translatedSelectedStatuses = selectedStatuses.map(status => 
+                statusTranslations[status] || status
+            );
+            
+            const isMatch = translatedSelectedStatuses.includes(trade.status);
+            console.log(`🔄 Trade ${trade.id}: status=${trade.status}, selected=${selectedStatuses}, translated=${translatedSelectedStatuses}, match=${isMatch}`);
+            return isMatch;
+        });
+        console.log('🔄 After status filter:', filteredTrades.length, 'trades');
+    }
+
+    // Filtering by type
+    if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
+        console.log('🔄 Filtering by type:', selectedTypes);
+        filteredTrades = filteredTrades.filter(trade => {
+            // המרת הערכים הנבחרים לאנגלית
+            const typeTranslations = {
+                'סווינג': 'swing',
+                'השקעה': 'investment',
+                'פסיבי': 'passive'
+            };
+            
+            const translatedSelectedTypes = selectedTypes.map(type => 
+                typeTranslations[type] || type
+            );
+            
+            const tradeType = trade.investment_type;
+            const isMatch = translatedSelectedTypes.includes(tradeType);
+            console.log(`🔄 Trade ${trade.id}: type=${tradeType}, selected=${selectedTypes}, translated=${translatedSelectedTypes}, match=${isMatch}`);
+            return isMatch;
+        });
+        console.log('🔄 After type filter:', filteredTrades.length, 'trades');
+    }
+
+    // Filtering by dates
+    if (startDate && endDate) {
+        console.log('🔄 Filtering by date range:', { startDate, endDate });
+        filteredTrades = filteredTrades.filter(trade => {
+            if (!trade.created_at) return false;
+
+            const tradeDate = new Date(trade.created_at);
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            // Setting time to start of day for start date and end of day for end date
+            start.setHours(0, 0, 0, 0);
+            end.setHours(23, 59, 59, 999);
+
+            const isInRange = tradeDate >= start && tradeDate <= end;
+            console.log(`🔄 Trade ${trade.id}: created_at=${trade.created_at}, inRange=${isInRange}`);
+            return isInRange;
+        });
+        console.log('🔄 After date filter:', filteredTrades.length, 'trades');
+    }
+
+    // Filtering by search term
+    if (searchTerm && searchTerm.trim() !== '') {
+        console.log('🔄 Filtering by search term:', searchTerm);
+        const searchLower = searchTerm.toLowerCase();
+
+        // Bi-directional search term translations
+        const searchTranslations = {
+            // Status translations
+            'פתוח': 'open',
+            'סגור': 'closed',
+            'מבוטל': 'cancelled',
+            'open': 'open',
+            'closed': 'closed',
+            'cancelled': 'cancelled',
+
+            // Investment type translations
+            'סווינג': 'swing',
+            'השקעה': 'investment',
+            'פסיבי': 'passive',
+            'swing': 'swing',
+            'investment': 'investment',
+            'passive': 'passive',
+
+            // Side translations
+            'לונג': 'long',
+            'שורט': 'short',
+            'long': 'long',
+            'short': 'short'
+        };
+
+        // Creating an array of search terms including translations
+        const searchTerms = [searchLower];
+
+        // Adding exact translation
+        if (searchTranslations[searchLower]) {
+            searchTerms.push(searchTranslations[searchLower]);
+        }
+
+        // Adding partial search - if user searches for part of a word
+        Object.keys(searchTranslations).forEach(hebrewTerm => {
+            if (hebrewTerm.includes(searchLower) && !searchTerms.includes(searchTranslations[hebrewTerm])) {
+                searchTerms.push(searchTranslations[hebrewTerm]);
+            }
+        });
+
+        filteredTrades = filteredTrades.filter(trade => {
+            // Searching in all relevant fields
+            const tickerMatch = trade.ticker_symbol && searchTerms.some(term =>
+                trade.ticker_symbol.toLowerCase().includes(term)
+            );
+
+            const typeMatch = trade.investment_type && searchTerms.some(term =>
+                trade.investment_type.toLowerCase().includes(term)
+            );
+
+            const sideMatch = trade.side && searchTerms.some(term =>
+                trade.side.toLowerCase().includes(term)
+            );
+
+            const statusMatch = trade.status && searchTerms.some(term =>
+                trade.status.toLowerCase().includes(term)
+            );
+
+            const notesMatch = trade.notes && searchTerms.some(term =>
+                trade.notes.toLowerCase().includes(term)
+            );
+
+            const isMatch = tickerMatch || typeMatch || sideMatch || statusMatch || notesMatch;
+
+            console.log(`🔄 Trade ${trade.id} search:`, {
+                ticker: trade.ticker_symbol,
+                type: trade.investment_type,
+                side: trade.side,
+                status: trade.status,
+                searchTerms: searchTerms,
+                originalSearch: searchLower,
+                match: isMatch
+            });
+
+            return isMatch;
+        });
+        console.log('🔄 After search filter:', filteredTrades.length, 'trades');
+    }
+
+    console.log('🔄 Final filtered trades:', filteredTrades.length);
+    return filteredTrades;
 }
 
 /**
@@ -214,17 +423,19 @@ function updateTradesTable(trades) {
     const statusDisplay = trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח';
     const typeDisplay = window.translateTradeType ? window.translateTradeType(trade.investment_type) : trade.investment_type;
 
+    // שמירת הערכים המקוריים באנגלית לפילטר
+    const typeForFilter = trade.investment_type || '';
+
     return `
     <tr>
-      <td><strong>${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</strong></td>
       <td><strong><a href="#" onclick="viewTickerDetails('${trade.ticker_id}')" class="ticker-link">${trade.ticker_symbol || 'טיקר לא ידוע'}</a></strong></td>
-      <td>${trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-'}</td>
-      <td><span class="status-badge status-${trade.status || 'open'}">${statusDisplay}</span></td>
-      <td>${typeDisplay}</td>
+      <td data-status="${trade.status || ''}"><span class="status-badge status-${trade.status || 'open'}">${statusDisplay}</span></td>
+      <td data-type="${typeForFilter}">${typeDisplay}</td>
       <td>${trade.side || 'Long'}</td>
-      <td>${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
-      <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
       <td>${window.colorAmount(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
+      <td>${trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-'}</td>
+      <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
+      <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editTradeRecord('${trade.id}')" title="ערוך">✏️</button>
@@ -441,8 +652,22 @@ function validateTradeForm() {
 
   let isValid = true;
 
-  // בדיקת סוג טרייד
-  const typeElement = document.getElementById('addTradeInvestmentType');
+  // בדיקת תוכנית טרייד (חובה לפי האילוצים)
+  const tradePlanElement = document.getElementById('addTradeTradePlanId');
+  if (!tradePlanElement.value) {
+    showTradeValidationError('tradePlanError', 'יש לבחור תוכנית טרייד');
+    isValid = false;
+  }
+
+  // בדיקת טיקר (חובה לפי האילוצים)
+  const tickerElement = document.getElementById('addTradeTickerId');
+  if (!tickerElement.value) {
+    showTradeValidationError('tickerError', 'יש לבחור טיקר');
+    isValid = false;
+  }
+
+  // בדיקת סוג טרייד (תיקון שם השדה)
+  const typeElement = document.getElementById('addTradeType');
   if (!typeElement.value) {
     showTradeValidationError('typeError', 'יש לבחור סוג טרייד');
     isValid = false;
@@ -459,6 +684,13 @@ function validateTradeForm() {
   const accountElement = document.getElementById('addTradeAccountId');
   if (!accountElement.value) {
     showTradeValidationError('accountError', 'יש לבחור חשבון');
+    isValid = false;
+  }
+
+  // בדיקת תאריך יצירה (חובה לפי האילוצים)
+  const createdAtElement = document.getElementById('addTradeOpenedAt');
+  if (!createdAtElement.value) {
+    showTradeValidationError('createdAtError', 'יש למלא תאריך יצירה');
     isValid = false;
   }
 
@@ -537,12 +769,12 @@ async function saveNewTradeRecord() {
   // איסוף נתונים מהטופס
   const formData = {
     account_id: parseInt(document.getElementById('addTradeAccountId').value),
-    ticker_id: parseInt(document.getElementById('addTradeTickerId').value) || null,
-    trade_plan_id: parseInt(document.getElementById('addTradeTradePlanId').value) || null,
-    investment_type: document.getElementById('addTradeInvestmentType').value,
+    ticker_id: parseInt(document.getElementById('addTradeTickerId').value), // NOT NULL - לא יכול להיות null
+    trade_plan_id: parseInt(document.getElementById('addTradeTradePlanId').value), // NOT NULL - לא יכול להיות null
+    investment_type: document.getElementById('addTradeType').value, // תיקון שם השדה
     side: document.getElementById('addTradeSide').value,
     status: 'open',
-    created_at: document.getElementById('addTradeOpenedAt').value,
+    created_at: document.getElementById('addTradeOpenedAt').value, // NOT NULL - לא יכול להיות null
     closed_at: document.getElementById('addTradeClosedAt').value || null,
     notes: document.getElementById('addTradeNotes').value || null
   };
@@ -671,6 +903,7 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
 window.loadTradesData = loadTradesData;                    // טעינת נתוני טריידים
 window.updateTradesTable = updateTradesTable;              // עדכון טבלת טריידים
 window.filterTradesData = filterTradesData;                // פילטור נתוני טריידים
+window.filterTradesLocally = filterTradesLocally;          // פילטור מקומי לטריידים
 
 // פונקציות פעולות:
 window.viewTickerDetails = viewTickerDetails;              // צפייה בפרטי טיקר
@@ -701,90 +934,17 @@ function sortTable(columnIndex) {
   console.log('🔄 === SORT TRADES TABLE ===');
   console.log('🔄 Column clicked:', columnIndex);
 
-  // קבלת הנתונים הנוכחיים
-  let sortedData = [...(window.tradesData || [])];
-
-  // עדכון כיוון הסידור
-  if (window.tradesCurrentSortColumn === columnIndex) {
-    window.tradesCurrentSortDirection = window.tradesCurrentSortDirection === 'asc' ? 'desc' : 'asc';
+  if (typeof window.sortTableData === 'function') {
+    const sortedData = window.sortTableData(
+      columnIndex,
+      window.tradesData || [],
+      'trades',
+      window.updateTradesTable
+    );
+    console.log('✅ נתונים מסודרים:', sortedData);
   } else {
-    window.tradesCurrentSortColumn = columnIndex;
-    window.tradesCurrentSortDirection = 'asc';
+    console.error('❌ sortTableData function not found in main.js');
   }
-
-  console.log('🔄 Sort direction:', window.tradesCurrentSortDirection);
-
-  // מיון הנתונים לפי העמודה הנבחרת
-  sortedData.sort((a, b) => {
-    let aValue, bValue;
-
-    switch (columnIndex) {
-      case 0: // חשבון
-        aValue = (a.account_name || a.account_id || '').toLowerCase();
-        bValue = (b.account_name || b.account_id || '').toLowerCase();
-        break;
-      case 1: // טיקר
-        aValue = (a.ticker_symbol || a.symbol || '').toLowerCase();
-        bValue = (b.ticker_symbol || b.symbol || '').toLowerCase();
-        break;
-      case 2: // תוכנית
-        aValue = (a.trade_plan_id || '').toString();
-        bValue = (b.trade_plan_id || '').toString();
-        break;
-      case 3: // סטטוס
-        aValue = getTradesStatusForSort(a.status);
-        bValue = getTradesStatusForSort(b.status);
-        break;
-      case 4: // סוג
-        aValue = (a.type || '').toLowerCase();
-        bValue = (b.type || '').toLowerCase();
-        break;
-      case 5: // צד
-        aValue = (a.side || 'Long').toLowerCase();
-        bValue = (b.side || 'Long').toLowerCase();
-        break;
-      case 6: // נוצר ב
-        aValue = new Date(a.created_at || '').getTime();
-        bValue = new Date(b.created_at || '').getTime();
-        break;
-      case 7: // נסגר ב
-        aValue = new Date(a.closed_at || a.cancelled_at || '').getTime();
-        bValue = new Date(b.closed_at || b.cancelled_at || '').getTime();
-        break;
-      case 8: // רווח/הפסד
-        aValue = parseFloat(a.total_pl) || 0;
-        bValue = parseFloat(b.total_pl) || 0;
-        break;
-      case 9: // הערות
-        aValue = (a.notes || '').toLowerCase();
-        bValue = (b.notes || '').toLowerCase();
-        break;
-      default:
-        return 0;
-    }
-
-    // השוואה
-    if (aValue < bValue) {
-      return window.tradesCurrentSortDirection === 'asc' ? -1 : 1;
-    } else if (aValue > bValue) {
-      return window.tradesCurrentSortDirection === 'asc' ? 1 : -1;
-    } else {
-      return 0;
-    }
-  });
-
-  // עדכון הטבלה
-  window.updateTradesTable(sortedData);
-
-  // עדכון אייקונים
-  updateTradesSortIcons(columnIndex);
-
-  // שמירת מצב המיון ב-localStorage
-  localStorage.setItem('tradesSortColumn', columnIndex.toString());
-  localStorage.setItem('tradesSortDirection', window.tradesCurrentSortDirection);
-
-  console.log('✅ Trades table sorted successfully');
-  return sortedData;
 }
 
 // פונקציה לקבלת ערך מספרי לסטטוס טריידים

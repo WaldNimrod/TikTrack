@@ -16,13 +16,14 @@
     4. מערכת פילטרים ומיון מתקדמת
     
     מבנה הדף:
-    - app-header: כותרת האפליקציה עם ניווט
+    - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות התראות וסיכום נתונים
       - content-section (1): טבלת חשבונות
       - content-section (2): טבלת טריידים
     
     שינויים אחרונים:
+    - החלפת app-header במערכת header-system החדשה
     - יצירת דף תחקיר חדש כשיכפול של עמוד העיצובים
     - תוכן דמה ללא חיבור לבסיס נתונים
     - הוספת טבלת חשבונות מלאים
@@ -61,9 +62,8 @@
   <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- Application header -->
-    <!-- Unified Header System -->
-    <div id="unified-header-container"></div>
+    <!-- כותרת האפליקציה החדשה - נוצרת אוטומטית על ידי header-system.js -->
+    <!-- unified-header ייווצר כאן אוטומטית -->
 
     <!-- Page body - All content after header -->
     <div class="page-body">
@@ -408,21 +408,17 @@
     <script>
       // אתחול הדף
       document.addEventListener('DOMContentLoaded', function () {
-        console.log('🔄 אתחול דף תחקיר...');
+        console.log('🚀 טעינת דף תחקיר עם מערכת ראש דף חדשה...');
+
+        // אתחול HeaderSystem
+        if (window.headerSystem && !window.headerSystem.isInitialized) {
+          console.log('✅ אתחול HeaderSystem...');
+          window.headerSystem.init();
+        }
+
+        // אתחול דף התחקיר
         if (typeof initializeResearchPage === 'function') {
           initializeResearchPage();
-        }
-      });
-    </script>
-    <script>
-      // אתחול מערכת הכותרת החדשה
-      document.addEventListener("DOMContentLoaded", () => {
-        if (typeof window.HeaderSystem !== "undefined") {
-          console.log("🔄 Initializing new unified header system...");
-          window.headerSystem = new window.HeaderSystem();
-          window.headerSystem.initialize();
-          window.filterSystem = new window.SimpleFilter();
-          window.filterSystem.initialize();
         }
       });
     </script>

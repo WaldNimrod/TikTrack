@@ -6,6 +6,17 @@
  * הערה חשובה: פונקציות פילטר כלליות (updateAccountFilterMenu, updateAccountFilterText)
  * הועברו לקובץ grid-filters.js כדי להיות משותפות לכל הדפים
  * 
+ * Dependencies:
+ * - table-mappings.js (for column mappings and sorting)
+ * - main.js (global utilities and sorting functions)
+ * - translation-utils.js (translation functions)
+ * - filter-system.js (filter functionality)
+ * 
+ * Table Mapping:
+ * - Uses 'accounts' table type from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * - Sorting uses global window.sortTableData() function
+ * 
  * תכולת הקובץ:
  * - loadAccountsFromServer: טעינת חשבונות מהשרת
  * - updateAccountsTable: עדכון טבלת חשבונות
@@ -334,13 +345,19 @@ function updateAccountsTable(accounts) {
   }
 
   // בניית הטבלה מחדש לפי הכותרות בדיוק
-  tbody.innerHTML = accounts.map(account => `
+  tbody.innerHTML = accounts.map(account => {
+    // המרת סטטוס לעברית לפילטר
+    const statusForFilter = account.status === 'open' ? 'פתוח' :
+      account.status === 'closed' ? 'סגור' :
+        account.status === 'cancelled' ? 'מבוטל' : (account.status || '-');
+
+    return `
     <tr data-account-id="${account.id}">
-      <td><strong>${account.name || '-'}</strong></td>
+      <td data-account="${account.name || '-'}"><strong>${account.name || '-'}</strong></td>
       <td>${account.currency || '-'}</td>
-      <td>
+      <td data-status="${statusForFilter}">
         <span class="status-badge status-${account.status}">
-          ${account.status === 'open' ? 'פתוח' : account.status === 'closed' ? 'סגור' : account.status === 'cancelled' ? 'מבוטל' : (account.status || '-')}
+          ${statusForFilter}
         </span>
       </td>
       <td>$${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}</td>
@@ -359,7 +376,7 @@ function updateAccountsTable(accounts) {
         </button>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 
   // עדכון ספירת רשומות
   const countElement = document.getElementById('accountsCount');
@@ -686,7 +703,7 @@ function createAccountModal(mode, account = null) {
                 <div class="mb-3">
                   <label for="accountName" class="form-label">שם החשבון *</label>
                   <input type="text" class="form-control" id="accountName" name="name" required 
-                         value="${account ? account.name : ''}" placeholder="הכנס שם חשבון" maxlength="18">
+                         value="${account ? account.name : ''}" placeholder="הכנס שם חשבון (לפחות 3 תווים)" minlength="3" maxlength="18">
                   <div class="invalid-feedback" id="nameError"></div>
                 </div>
               </div>
@@ -751,12 +768,15 @@ function createAccountModal(mode, account = null) {
       const value = this.value.trim();
       const errorElement = modal.querySelector('#nameError');
 
-      if (value.length > 18) {
-        this.classList.add('is-invalid');
-        errorElement.textContent = 'שם החשבון לא יכול לעלות על 18 תווים';
-      } else if (value === '') {
+      if (value === '') {
         this.classList.add('is-invalid');
         errorElement.textContent = 'שם החשבון הוא שדה חובה';
+      } else if (value.length < 3) {
+        this.classList.add('is-invalid');
+        errorElement.textContent = 'שם החשבון חייב להכיל לפחות 3 תווים';
+      } else if (value.length > 18) {
+        this.classList.add('is-invalid');
+        errorElement.textContent = 'שם החשבון לא יכול לעלות על 18 תווים';
       } else {
         this.classList.remove('is-invalid');
         errorElement.textContent = '';
@@ -803,6 +823,10 @@ function validateAccountData(accountData) {
   // בדיקת שם החשבון
   if (!accountData.name || accountData.name.trim() === '') {
     return { isValid: false, message: 'שם החשבון הוא שדה חובה' };
+  }
+
+  if (accountData.name.length < 3) {
+    return { isValid: false, message: 'שם החשבון חייב להכיל לפחות 3 תווים' };
   }
 
   if (accountData.name.length > 18) {

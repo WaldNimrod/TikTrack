@@ -1,4 +1,22 @@
 // ===== קובץ JavaScript לדף מטבעות =====
+/*
+ * Currencies.js - Currencies Page Management
+ * =========================================
+ * 
+ * This file contains all currencies management functionality for the TikTrack application.
+ * It handles currencies CRUD operations, table updates, and user interactions.
+ * 
+ * Note: This file is preserved for potential future use, but the currencies page
+ * has been removed from the main navigation menu.
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/currencies.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
 
 // משתנים גלובליים
 if (!window.currenciesData) {

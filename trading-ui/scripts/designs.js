@@ -1,6 +1,27 @@
-// ===== קובץ JavaScript פשוט לדף עיצובים =====
+// ===== קובץ JavaScript ייעודי לדף עיצובים =====
+/*
+ * Designs.js - Designs Page Management
+ * ===================================
+ * 
+ * This file contains all designs management functionality for the TikTrack application.
+ * It handles designs CRUD operations, table updates, and user interactions.
+ * 
+ * Dependencies:
+ * - table-mappings.js (for column mappings and sorting)
+ * - main.js (global utilities and sorting functions)
+ * - translation-utils.js (translation functions)
+ * 
+ * Table Mapping:
+ * - Uses 'designs' table type from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * - Sorting uses global window.sortTableData() function
+ * 
+ * File: trading-ui/scripts/designs.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
 
-// פונקציות בסיסיות
+// פונקציות ספציפיות לדף עיצובים
 function openDesignDetails(id) {
   console.log('פתיחת פרטי עיצוב:', id);
 }
@@ -13,113 +34,17 @@ function deleteDesign(id) {
   console.log('מחיקת עיצוב:', id);
 }
 
-// פונקציות לפתיחה/סגירה של סקשנים
-function toggleTopSection() {
-  console.log('🔄 toggleTopSection נקראה');
-  const topSection = document.querySelector('.top-section');
-  
-  if (!topSection) {
-    console.error('❌ לא נמצא top-section');
-    return;
-  }
-  
-  const sectionBody = topSection.querySelector('.section-body');
-  const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-  
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-    sectionBody.style.display = isCollapsed ? 'block' : 'none';
-    
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-    
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('topSectionCollapsed', !isCollapsed);
-    
-    console.log(`✅ top-section ${isCollapsed ? 'נפתח' : 'נסגר'}`);
-  }
-}
-
-function toggleDesignsSection() {
-  console.log('🔄 toggleDesignsSection נקראה');
-  const contentSections = document.querySelectorAll('.content-section');
-  console.log('📋 מספר content-sections נמצא:', contentSections.length);
-  const designsSection = contentSections[0]; // הסקשן הראשון - עיצובים
-
-  if (!designsSection) {
-    console.error('❌ לא נמצא סקשן עיצובים');
-    return;
-  }
-  console.log('✅ סקשן עיצובים נמצא:', designsSection);
-
-  const sectionBody = designsSection.querySelector('.section-body');
-  const toggleBtn = designsSection.querySelector('button[onclick="toggleDesignsSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
-    } else {
-      sectionBody.style.display = 'none';
-    }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('designsSectionCollapsed', !isCollapsed);
-  }
-}
-
-function toggleAccountsSection() {
-  const contentSections = document.querySelectorAll('.content-section');
-  const accountsSection = contentSections[1]; // הסקשן השני - חשבונות
-
-  if (!accountsSection) {
-    console.error('❌ לא נמצא סקשן חשבונות');
-    return;
-  }
-
-  const sectionBody = accountsSection.querySelector('.section-body');
-  const toggleBtn = accountsSection.querySelector('button[onclick="toggleAccountsSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
-    } else {
-      sectionBody.style.display = 'none';
-    }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('accountsSectionCollapsed', !isCollapsed);
-  }
-}
-
-// פונקציה לשחזור מצב הסגירה
+// פונקציות לשחזור מצב הסגירה
 function restoreTopSectionState() {
   // שחזור מצב הסקשן העליון
   const topCollapsed = localStorage.getItem('topSectionCollapsed') === 'true';
   const topSection = document.querySelector('.top-section');
-  
+
   if (topSection) {
     const sectionBody = topSection.querySelector('.section-body');
     const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-    
+
     if (sectionBody && topCollapsed) {
       sectionBody.style.display = 'none';
       if (icon) {
@@ -198,12 +123,11 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
 // פונקציה לאתחול הדף
 function initializeDesignsPage() {
   console.log('🔄 אתחול דף עיצובים...');
-  
+
   // שחזור מצב הסגירה
   restoreTopSectionState();
   restoreDesignsSectionState();
-  restoreAccountsSectionState();
-  
+
   console.log('✅ דף עיצובים אותחל בהצלחה');
 }
 
@@ -211,24 +135,12 @@ function initializeDesignsPage() {
 window.openDesignDetails = openDesignDetails;
 window.editDesign = editDesign;
 window.deleteDesign = deleteDesign;
-window.toggleTopSection = toggleTopSection;
-window.toggleDesignsSection = toggleDesignsSection;
-window.toggleAccountsSection = toggleAccountsSection;
-window.restoreTopSectionState = restoreTopSectionState;
-window.restoreDesignsSectionState = restoreDesignsSectionState;
-window.restoreAccountsSectionState = restoreAccountsSectionState;
 window.initializeDesignsPage = initializeDesignsPage;
 window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
 
-// בדיקת זמינות פונקציות מיד אחרי הגדרתן
-console.log('🔍 === DESIGNS.JS FUNCTIONS CHECK ===');
-console.log('🔍 updateGridFromComponent available:', typeof window.updateGridFromComponent);
-
-
-
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🔄 === DOM CONTENT LOADED ===');
+  console.log('🔄 === DOM CONTENT LOADED (DESIGNS) ===');
 
   // אתחול הדף
   if (typeof initializeDesignsPage === 'function') {

@@ -50,8 +50,9 @@
   <script src="scripts/console-cleanup.js"></script>
   <script src="scripts/header-system.js"></script>
   <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/table-mappings.js"></script>
   <script src="scripts/main.js"></script>
-      <!-- Removed grid-filters.js - not needed for alerts page -->
+  <!-- Removed grid-filters.js - not needed for alerts page -->
   <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
   <script src="scripts/accounts.js"></script>
@@ -61,9 +62,8 @@
   <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- Application header -->
-    <!-- Unified Header System -->
-    <div id="unified-header-container"></div>
+    <!-- כותרת האפליקציה החדשה - נוצרת אוטומטית על ידי header-system.js -->
+    <!-- unified-header ייווצר כאן אוטומטית -->
 
     <!-- Page body - All content after header -->
     <div class="page-body">
@@ -453,14 +453,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
     <script>
-      // אתחול מערכת הכותרת החדשה
+      // אתחול מערכת ראש הדף החדשה
       document.addEventListener("DOMContentLoaded", () => {
-        if (typeof window.HeaderSystem !== "undefined") {
-          console.log("🔄 Initializing new unified header system...");
-          window.headerSystem = new window.HeaderSystem();
-          window.headerSystem.initialize();
-          window.filterSystem = new window.SimpleFilter();
-          window.filterSystem.initialize();
+        console.log('🚀 טעינת דף התראות עם מערכת ראש דף חדשה...');
+
+        // אתחול HeaderSystem
+        if (window.headerSystem && !window.headerSystem.isInitialized) {
+          console.log('✅ אתחול HeaderSystem...');
+          window.headerSystem.init();
         }
       });
     </script>

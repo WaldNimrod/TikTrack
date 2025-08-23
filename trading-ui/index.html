@@ -494,9 +494,8 @@
 </head>
 
 <body>
-  <!-- Web Component of the header -->
-      <!-- Unified Header System -->
-    <div id="unified-header-container"></div>
+  <!-- כותרת האפליקציה החדשה - נוצרת אוטומטית על ידי header-system.js -->
+  <!-- unified-header ייווצר כאן אוטומטית -->
 
   <!-- Page body - All content after header -->
   <div class="page-body">
@@ -1034,19 +1033,12 @@
 
       // טעינת הדף - ללא בדיקת התחברות
       document.addEventListener('DOMContentLoaded', () => {
-        console.log('🔍 DOM loaded, showing dashboard directly...');
+        console.log('🚀 טעינת דף הבית עם מערכת ראש דף חדשה...');
 
-        // אתחול מערכת הכותרת החדשה
-        if (typeof window.HeaderSystem !== 'undefined') {
-          console.log('🔄 Initializing new unified header system...');
-          
-          // יצירת מערכת הכותרת החדשה
-          window.headerSystem = new window.HeaderSystem();
-          window.headerSystem.initialize();
-          
-          // יצירת מערכת הפילטרים
-          window.filterSystem = new window.SimpleFilter();
-          window.filterSystem.initialize();
+        // אתחול HeaderSystem
+        if (window.headerSystem && !window.headerSystem.isInitialized) {
+          console.log('✅ אתחול HeaderSystem...');
+          window.headerSystem.init();
         }
 
         // הגדרת האזנה לכותרת
@@ -1062,7 +1054,7 @@
   </div> <!-- End page-body -->
 
   <!-- Scripts -->
-      <script src="scripts/header-system.js"></script>
+  <script src="scripts/header-system.js"></script>
   <script src="scripts/console-cleanup.js"></script>
 </body>
 

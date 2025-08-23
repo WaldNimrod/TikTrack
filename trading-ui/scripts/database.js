@@ -1,4 +1,27 @@
 // ===== קובץ JavaScript לדף בסיס נתונים =====
+/*
+ * Database.js - Database Page Management
+ * =====================================
+ * 
+ * This file contains all database page functionality for the TikTrack application.
+ * It handles displaying all tables in one unified view with sorting and filtering.
+ * 
+ * Dependencies:
+ * - table-mappings.js (for column mappings and sorting)
+ * - main.js (global utilities and sorting functions)
+ * - translation-utils.js (translation functions)
+ * - All page-specific scripts for individual table functionality
+ * 
+ * Table Mapping:
+ * - Uses all table types from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * - Sorting uses global window.sortTableData() function
+ * 
+ * File: trading-ui/scripts/database.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
+
 console.log('🔄 database.js נטען!');
 
 // משתנים גלובליים
@@ -355,28 +378,34 @@ function updateAccountsTable() {
     return;
   }
 
-  const rows = allData.accounts.map(account => `
+    const rows = allData.accounts.map(account => {
+    // המרת סטטוס לעברית לפילטר
+    const statusForFilter = account.status === 'open' ? 'פתוח' :
+      account.status === 'closed' ? 'סגור' :
+        account.status === 'cancelled' ? 'מבוטל' : (account.status || '');
+
+    return `
     <tr>
       <td>${account.name || ''}</td>
       <td>${account.currency || ''}</td>
-      <td>${account.status || ''}</td>
+      <td data-status="${statusForFilter}">${translateAccountStatus(account.status) || ''}</td>
       <td>${account.cash_balance || 0}</td>
       <td>${account.total_value || 0}</td>
       <td>${account.total_pl || 0}</td>
       <td>${account.notes || ''}</td>
       <td>${account.id || ''}</td>
-      <td>${account.created_at || ''}</td>
+      <td data-date="${account.created_at}">${account.created_at || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editAccount(${account.id})" title="ערוך">
           <span class="btn-icon">✏️</span>
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק">🗑️</button>
         ${account.status && account.status !== 'cancelled' ?
-      `<button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>` :
-      ''}
+          `<button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>` :
+          ''}
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 
   tbody.innerHTML = rows;
   document.getElementById('accountsCount').textContent = `${allData.accounts.length} רשומות`;
@@ -391,21 +420,32 @@ function updateTradesTable() {
     return;
   }
 
-  const rows = allData.trades.map(trade => `
+    const rows = allData.trades.map(trade => {
+    // המרת סוגים לעברית לפילטר
+    const typeForFilter = trade.investment_type === 'swing' ? 'סווינג' :
+      trade.investment_type === 'investment' ? 'השקעה' :
+        trade.investment_type === 'passive' ? 'פסיבי' : (trade.investment_type || '');
+
+    // המרת סטטוס לעברית לפילטר
+    const statusForFilter = trade.status === 'open' ? 'פתוח' :
+      trade.status === 'closed' ? 'סגור' :
+        trade.status === 'cancelled' ? 'מבוטל' : (trade.status || '');
+
+    return `
     <tr>
       <td>${trade.account_id || ''}</td>
       <td>${trade.ticker_id || ''}</td>
       <td>${trade.trade_plan_id || ''}</td>
-      <td>${trade.status || ''}</td>
-      <td>${trade.investment_type || ''}</td>
-      <td>${trade.opened_at || ''}</td>
-      <td>${trade.closed_at || ''}</td>
-      <td>${trade.cancelled_at || ''}</td>
+      <td data-status="${statusForFilter}">${trade.status || ''}</td>
+      <td data-type="${typeForFilter}">${trade.investment_type || ''}</td>
+      <td data-date="${trade.opened_at}">${trade.opened_at || ''}</td>
+      <td data-date="${trade.closed_at}">${trade.closed_at || ''}</td>
+      <td data-date="${trade.cancelled_at}">${trade.cancelled_at || ''}</td>
       <td>${trade.cancel_reason || ''}</td>
       <td>${trade.total_pl || 0}</td>
       <td>${trade.notes || ''}</td>
       <td>${trade.id || ''}</td>
-      <td>${trade.created_at || ''}</td>
+      <td data-date="${trade.created_at}">${trade.created_at || ''}</td>
       <td>${trade.side || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editTrade(${trade.id})" title="ערוך">
@@ -413,11 +453,11 @@ function updateTradesTable() {
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteTrade(${trade.id})" title="מחק">🗑️</button>
         ${trade.status && trade.status !== 'cancelled' ?
-      `<button class="btn btn-sm btn-warning" onclick="cancelTrade(${trade.id})" title="ביטול">❌</button>` :
-      ''}
+          `<button class="btn btn-sm btn-warning" onclick="cancelTrade(${trade.id})" title="ביטול">❌</button>` :
+          ''}
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 
   tbody.innerHTML = rows;
   document.getElementById('tradesCount').textContent = `${allData.trades.length} רשומות`;
@@ -432,17 +472,27 @@ function updateTickersTable() {
     return;
   }
 
-  const rows = allData.tickers.map(ticker => `
+  const rows = allData.tickers.map(ticker => {
+    // המרת סוגים לעברית לפילטר
+    const typeForFilter = ticker.type === 'stock' ? 'מניה' :
+      ticker.type === 'etf' ? 'ETF' :
+        ticker.type === 'bond' ? 'אג"ח' :
+          ticker.type === 'crypto' ? 'קריפטו' : (ticker.type || '');
+
+    // המרת סטטוס לפילטר
+    const statusForFilter = ticker.active_trades ? 'פעיל' : 'לא פעיל';
+
+    return `
     <tr>
       <td>${ticker.symbol || ''}</td>
       <td>${ticker.name || ''}</td>
-      <td>${ticker.type || ''}</td>
+      <td data-type="${typeForFilter}">${ticker.type || ''}</td>
       <td>${ticker.remarks || ''}</td>
       <td>${ticker.currency || ''}</td>
-      <td>${ticker.active_trades ? 'כן' : 'לא'}</td>
+      <td data-status="${statusForFilter}">${ticker.active_trades ? 'כן' : 'לא'}</td>
       <td>${ticker.id || ''}</td>
-      <td>${ticker.created_at || ''}</td>
-      <td>${ticker.updated_at || ''}</td>
+      <td data-date="${ticker.created_at}">${ticker.created_at || ''}</td>
+      <td data-date="${ticker.updated_at}">${ticker.updated_at || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">
           <span class="btn-icon">✏️</span>
@@ -450,7 +500,7 @@ function updateTickersTable() {
         <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})" title="מחק">🗑️</button>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 
   tbody.innerHTML = rows;
   document.getElementById('tickersCount').textContent = `${allData.tickers.length} רשומות`;
@@ -465,33 +515,44 @@ function updateTradePlansTable() {
     return;
   }
 
-  const rows = allData.tradePlans.map(plan => `
+  const rows = allData.tradePlans.map(plan => {
+    // המרת סוגים לעברית לפילטר
+    const typeForFilter = plan.investment_type === 'swing' ? 'סווינג' :
+      plan.investment_type === 'investment' ? 'השקעה' :
+        plan.investment_type === 'passive' ? 'פסיבי' : (plan.investment_type || '');
+
+    // המרת סטטוס לעברית לפילטר
+    const statusForFilter = plan.status === 'open' ? 'פתוח' :
+      plan.status === 'closed' ? 'סגור' :
+        plan.status === 'cancelled' ? 'מבוטל' : (plan.status || '');
+
+    return `
     <tr>
       <td>${plan.id || ''}</td>
-      <td>${plan.account_id || ''}</td>
+      <td data-account="${plan.account_id || ''}">${plan.account_id || ''}</td>
       <td>${plan.ticker_id || ''}</td>
-      <td>${plan.investment_type || ''}</td>
+      <td data-type="${typeForFilter}">${plan.investment_type || ''}</td>
       <td>${plan.planned_amount || 0}</td>
       <td>${plan.entry_conditions || ''}</td>
       <td>${plan.stop_price || 0}</td>
       <td>${plan.target_price || 0}</td>
       <td>${plan.reasons || ''}</td>
-      <td>${plan.cancelled_at || ''}</td>
+      <td data-date="${plan.cancelled_at}">${plan.cancelled_at || ''}</td>
       <td>${plan.cancel_reason || ''}</td>
-      <td>${plan.created_at || ''}</td>
+      <td data-date="${plan.created_at}">${plan.created_at || ''}</td>
       <td>${plan.side || ''}</td>
-      <td>${plan.status || ''}</td>
+      <td data-status="${statusForFilter}">${plan.status || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editTradePlan(${plan.id})" title="ערוך">
           <span class="btn-icon">✏️</span>
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteTradePlan(${plan.id})" title="מחק">🗑️</button>
         ${plan.status && plan.status !== 'cancelled' ?
-      `<button class="btn btn-sm btn-warning" onclick="cancelTradePlan(${plan.id})" title="ביטול">❌</button>` :
-      ''}
+        `<button class="btn btn-sm btn-warning" onclick="cancelTradePlan(${plan.id})" title="ביטול">❌</button>` :
+        ''}
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 
   tbody.innerHTML = rows;
   document.getElementById('tradePlansCount').textContent = `${allData.tradePlans.length} רשומות`;
@@ -506,17 +567,22 @@ function updateExecutionsTable() {
     return;
   }
 
-  const rows = allData.executions.map(execution => `
+  const rows = allData.executions.map(execution => {
+    // המרת סוגים לעברית לפילטר
+    const typeForFilter = execution.action === 'buy' ? 'קנייה' :
+      execution.action === 'sell' ? 'מכירה' : (execution.action || '');
+
+    return `
     <tr>
       <td>${execution.trade_id || ''}</td>
-      <td>${execution.action || ''}</td>
-      <td>${execution.date || ''}</td>
+      <td data-type="${typeForFilter}">${execution.action || ''}</td>
+      <td data-date="${execution.date}">${execution.date || ''}</td>
       <td>${execution.quantity || 0}</td>
       <td>${execution.price || 0}</td>
       <td>${execution.fee || 0}</td>
       <td>${execution.source || ''}</td>
       <td>${execution.id || ''}</td>
-      <td>${execution.created_at || ''}</td>
+      <td data-date="${execution.created_at}">${execution.created_at || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">
           <span class="btn-icon">✏️</span>
@@ -524,7 +590,7 @@ function updateExecutionsTable() {
         <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 
   tbody.innerHTML = rows;
   document.getElementById('executionsCount').textContent = `${allData.executions.length} רשומות`;
@@ -539,15 +605,23 @@ function updateCashFlowsTable() {
     return;
   }
 
-  const rows = allData.cashFlows.map(cashFlow => `
+  const rows = allData.cashFlows.map(cashFlow => {
+    // המרת סוגים לעברית לפילטר
+    const typeForFilter = cashFlow.type === 'deposit' ? 'הפקדה' :
+      cashFlow.type === 'withdrawal' ? 'משיכה' :
+        cashFlow.type === 'dividend' ? 'דיבידנד' :
+          cashFlow.type === 'fee' ? 'עמלה' :
+            cashFlow.type === 'interest' ? 'ריבית' : (cashFlow.type || '');
+
+    return `
     <tr>
-      <td>${cashFlow.account_id || ''}</td>
-      <td>${cashFlow.type || ''}</td>
+      <td data-account="${cashFlow.account_id || ''}">${cashFlow.account_id || ''}</td>
+      <td data-type="${typeForFilter}">${cashFlow.type || ''}</td>
       <td>${cashFlow.amount || 0}</td>
-      <td>${cashFlow.date || ''}</td>
+      <td data-date="${cashFlow.date}">${cashFlow.date || ''}</td>
       <td>${cashFlow.description || ''}</td>
       <td>${cashFlow.id || ''}</td>
-      <td>${cashFlow.created_at || ''}</td>
+      <td data-date="${cashFlow.created_at}">${cashFlow.created_at || ''}</td>
       <td>${cashFlow.currency || ''}</td>
       <td>${cashFlow.currency_id || ''}</td>
       <td>${cashFlow.usd_rate || 0}</td>
@@ -560,7 +634,7 @@ function updateCashFlowsTable() {
         <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 
   tbody.innerHTML = rows;
   document.getElementById('cashFlowsCount').textContent = `${allData.cashFlows.length} רשומות`;
@@ -575,18 +649,30 @@ function updateAlertsTable() {
     return;
   }
 
-  const rows = allData.alerts.map(alert => `
+  const rows = allData.alerts.map(alert => {
+    // המרת סוגים לעברית לפילטר
+    const typeForFilter = alert.type === 'price_alert' ? 'התראה על מחיר' :
+      alert.type === 'stop_loss' ? 'סטופ לוס' :
+        alert.type === 'volume_alert' ? 'התראה על נפח' :
+          alert.type === 'custom_alert' ? 'התראה מותאמת' : (alert.type || '');
+
+    // המרת סטטוס לעברית לפילטר
+    const statusForFilter = alert.status === 'open' ? 'פתוח' :
+      alert.status === 'closed' ? 'סגור' :
+        alert.status === 'cancelled' ? 'מבוטל' : (alert.status || '');
+
+    return `
     <tr>
-      <td>${alert.account_id || ''}</td>
+      <td data-account="${alert.account_id || ''}">${alert.account_id || ''}</td>
       <td>${alert.ticker_id || ''}</td>
-      <td>${alert.type || ''}</td>
+      <td data-type="${typeForFilter}">${alert.type || ''}</td>
       <td>${alert.condition || ''}</td>
       <td>${alert.message || ''}</td>
-      <td>${alert.is_active ? 'כן' : 'לא'}</td>
-      <td>${alert.triggered_at || ''}</td>
+      <td data-status="${alert.is_active ? 'פעיל' : 'לא פעיל'}">${alert.is_active ? 'כן' : 'לא'}</td>
+      <td data-date="${alert.triggered_at}">${alert.triggered_at || ''}</td>
       <td>${alert.id || ''}</td>
-      <td>${alert.created_at || ''}</td>
-      <td>${alert.status || ''}</td>
+      <td data-date="${alert.created_at}">${alert.created_at || ''}</td>
+      <td data-status="${statusForFilter}">${alert.status || ''}</td>
       <td>${alert.is_triggered || ''}</td>
       <td>${alert.related_type_id || ''}</td>
       <td>${alert.related_id || ''}</td>
@@ -596,11 +682,11 @@ function updateAlertsTable() {
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
         ${alert.status && alert.status !== 'cancelled' ?
-      `<button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>` :
-      ''}
+        `<button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>` :
+        ''}
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 
   tbody.innerHTML = rows;
   document.getElementById('alertsCount').textContent = `${allData.alerts.length} רשומות`;
@@ -620,7 +706,7 @@ function updateNotesTable() {
       <td>${note.id || ''}</td>
       <td>${note.content || ''}</td>
       <td>${note.attachment || ''}</td>
-      <td>${note.created_at || ''}</td>
+      <td data-date="${note.created_at}">${note.created_at || ''}</td>
       <td>${note.related_type_id || ''}</td>
       <td>${note.related_id || ''}</td>
       <td class="actions-cell">

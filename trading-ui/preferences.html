@@ -83,7 +83,7 @@
         <!-- Summary header -->
         <div class="section-header">
           <div class="table-title">
-            ⚙️ העדפות והגדרות
+            ⚙️ העדפות
           </div>
           <div class="table-actions">
             <button class="refresh-btn" onclick="saveAllPreferences()" title="שמור כל ההגדרות">
@@ -416,908 +416,792 @@
           </div>
         </div>
 
-        <!-- Testing management area - content-section -->
-        <div class="content-section" data-section="testing">
-          <!-- Testing management header -->
-          <div class="section-header">
-            <div class="table-title">
-              🧪 Testing Settings
-            </div>
 
-            <div class="table-actions">
-              <button class="refresh-btn" onclick="runSelectedTests()" title="Run selected tests">
-                <span class="action-icon">▶️</span> Run Tests
-              </button>
-              <button class="refresh-btn" onclick="saveTestPreferences()" title="Save test preferences">
-                <span class="action-icon">💾</span> Save
-              </button>
-              <button class="refresh-btn" onclick="resetTestPreferences()" title="Reset to defaults">
-                <span class="action-icon">🔄</span> Reset
-              </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" data-toggle="testing" onclick="toggleSection('testing')"
-                title="Show/hide testing management area">
-                <span class="filter-icon">▲</span>
-              </button>
-            </div>
-          </div>
 
-          <!-- Testing management content -->
-          <div class="section-body">
-            <!-- Test summary -->
-            <div class="test-summary">
-              <h3><i class="fas fa-chart-bar"></i> Test Summary</h3>
-              <div class="summary-stats">
-                <div class="stat-item">
-                  <div class="stat-number" id="totalTests">0</div>
-                  <div class="stat-label">Total Tests</div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-number" id="activeTests">0</div>
-                  <div class="stat-label">Active Tests</div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-number" id="inactiveTests">0</div>
-                  <div class="stat-label">Inactive Tests</div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-number" id="testCategories">0</div>
-                  <div class="stat-label">Test Categories</div>
-                </div>
-              </div>
+        <!-- Test summary -->
+        <div class="test-summary">
+          <h3><i class="fas fa-chart-bar"></i> Test Summary</h3>
+          <div class="summary-stats">
+            <div class="stat-item">
+              <div class="stat-number" id="totalTests">0</div>
+              <div class="stat-label">Total Tests</div>
             </div>
-
-            <!-- Database settings -->
-            <div class="settings-section">
-              <h3><i class="fas fa-database"></i> Database Settings</h3>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Use Temporary Database</div>
-                  <div class="setting-description">Create a copy of the database for testing</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="useTempDatabase" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Backup Before Tests</div>
-                  <div class="setting-description">Create automatic backup before running tests</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="backupBeforeTests" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Cleanup After Tests</div>
-                  <div class="setting-description">Delete temporary files after tests</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="cleanupAfterTests" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
+            <div class="stat-item">
+              <div class="stat-number" id="activeTests">0</div>
+              <div class="stat-label">Active Tests</div>
             </div>
-
-            <!-- Execution settings -->
-            <div class="settings-section">
-              <h3><i class="fas fa-play-circle"></i> Execution Settings</h3>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Parallel Tests</div>
-                  <div class="setting-description">Run tests in parallel for better performance</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="parallelTests">
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Show Progress</div>
-                  <div class="setting-description">Show progress during test execution</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="showProgress" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Stop on Error</div>
-                  <div class="setting-description">Stop tests when first error is detected</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="stopOnError">
-                  <span class="slider"></span>
-                </label>
-              </div>
+            <div class="stat-item">
+              <div class="stat-number" id="inactiveTests">0</div>
+              <div class="stat-label">Inactive Tests</div>
             </div>
-
-            <!-- Reporting settings -->
-            <div class="settings-section">
-              <h3><i class="fas fa-file-alt"></i> Reporting Settings</h3>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Create Detailed Report</div>
-                  <div class="setting-description">Create detailed report with all details</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="detailedReport" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Save Reports</div>
-                  <div class="setting-description">Save test reports to files</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="saveReports" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">HTML Report</div>
-                  <div class="setting-description">Create report in HTML format</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="htmlReport" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Notification settings -->
-            <div class="settings-section">
-              <h3><i class="fas fa-bell"></i> Notification Settings</h3>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Error Notifications</div>
-                  <div class="setting-description">Show notifications when errors are detected in tests</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="errorNotifications" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Success Notifications</div>
-                  <div class="setting-description">Show notifications when all tests pass successfully</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="successNotifications" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Performance settings -->
-            <div class="settings-section">
-              <h3><i class="fas fa-tachometer-alt"></i> Performance Settings</h3>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Time Measurement</div>
-                  <div class="setting-description">Measure execution time for each test</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="measureTime" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Memory Measurement</div>
-                  <div class="setting-description">Measure memory usage during tests</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="measureMemory">
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Security settings -->
-            <div class="settings-section">
-              <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Security Tests</div>
-                  <div class="setting-description">Run special security tests</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="securityTests">
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Penetration Tests</div>
-                  <div class="setting-description">Run basic penetration tests</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="penetrationTests">
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Advanced settings -->
-            <div class="settings-section">
-              <h3><i class="fas fa-cogs"></i> Advanced Settings</h3>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Debug Mode</div>
-                  <div class="setting-description">Enable debug mode for tests</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="debugMode">
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Dry Run Tests</div>
-                  <div class="setting-description">Run trial tests before real tests</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="dryRun">
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <div>
-                  <div class="setting-label">Isolated Tests</div>
-                  <div class="setting-description">Run each test in isolated environment</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="isolatedTests">
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Action buttons -->
-            <div class="action-buttons">
-              <button class="action-btn save-btn" onclick="saveTestPreferences()" title="Save preferences">
-                <span class="action-icon">💾</span>
-                <span class="action-text">Save Preferences</span>
-              </button>
-              <button class="action-btn run-btn" onclick="runSelectedTests()" id="runTestsBtn"
-                title="Run selected tests">
-                <span class="action-icon">▶️</span>
-                <span class="action-text">Run Selected Tests</span>
-              </button>
-              <button class="action-btn reset-btn" onclick="resetTestPreferences()" title="Reset to defaults">
-                <span class="action-icon">🔄</span>
-                <span class="action-text">Reset to Defaults</span>
-              </button>
-            </div>
-
-            <!-- Test results area -->
-            <div id="testResultsArea" style="display: none;">
-              <div class="test-results-header">
-                <h4><i class="fas fa-chart-bar"></i> Test Results</h4>
-                <button class="btn btn-sm btn-outline-secondary" onclick="hideTestResults()">
-                  <i class="fas fa-times"></i> Close
-                </button>
-              </div>
-              <div id="testResultsContent">
-                <!-- Test results will be displayed here -->
-              </div>
+            <div class="stat-item">
+              <div class="stat-number" id="testCategories">0</div>
+              <div class="stat-label">Test Categories</div>
             </div>
           </div>
         </div>
 
-        <!-- CRUD Testing area - content-section -->
-        <div class="content-section" data-section="crud">
-          <!-- CRUD Testing header -->
-          <div class="section-header">
-            <div class="table-title">
-              🧪 CRUD Testing
+        <!-- Database settings -->
+        <div class="settings-section">
+          <h3><i class="fas fa-database"></i> Database Settings</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Use Temporary Database</div>
+              <div class="setting-description">Create a copy of the database for testing</div>
             </div>
-            <div class="table-count">מערכת בדיקות CRUD</div>
-            <div class="table-actions">
-              <button class="refresh-btn" onclick="runAllCRUDTests()" title="הרץ את כל בדיקות CRUD">
-                <span class="action-icon">▶️</span> הרץ הכל
-              </button>
-              <button class="refresh-btn" onclick="saveCRUDPreferences()" title="שמור העדפות בדיקות CRUD">
-                <span class="action-icon">💾</span> שמור
-              </button>
-              <button class="refresh-btn" onclick="resetCRUDPreferences()" title="רענן לברירות מחדל">
-                <span class="action-icon">🔄</span> רענן
-              </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" data-toggle="crud" onclick="toggleSection('crud')"
-                title="הצג/הסתר אזור בדיקות CRUD">
-                <span class="filter-icon">▲</span>
-              </button>
-            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="useTempDatabase" checked>
+              <span class="slider"></span>
+            </label>
           </div>
-
-          <!-- CRUD Testing content -->
-          <div class="section-body">
-            <!-- סיכום בדיקות CRUD -->
-            <div class="test-summary">
-              <h3><i class="fas fa-chart-bar"></i> סיכום בדיקות CRUD</h3>
-              <div class="summary-stats">
-                <div class="stat-item">
-                  <div class="stat-number" id="totalCRUDTests">8</div>
-                  <div class="stat-label">סה"כ ישויות</div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-number" id="activeCRUDTests">8</div>
-                  <div class="stat-label">ישויות פעילות</div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-number" id="inactiveCRUDTests">0</div>
-                  <div class="stat-label">ישויות כבויות</div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-number" id="crudOperations">24</div>
-                  <div class="stat-label">פעולות CRUD</div>
-                </div>
-              </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Backup Before Tests</div>
+              <div class="setting-description">Create automatic backup before running tests</div>
             </div>
-
-            <!-- ישויות CRUD -->
-            <div class="test-category">
-              <div class="category-header">
-                <h3><i class="fas fa-database"></i> ישויות CRUD</h3>
-                <button class="category-toggle-btn" onclick="toggleAllCRUDTests()" title="הפעל/כבה את כל בדיקות CRUD">
-                  <span class="toggle-text">כבה הכל</span>
-                  <i class="fas fa-power-off"></i>
-                </button>
-              </div>
-              <div class="category-description">
-                בדיקות CRUD בודקות את כל הפעולות (Create, Read, Update, Delete) לכל ישות במערכת.
-              </div>
-
-              <!-- Accounts -->
-              <div class="test-group">
-                <h4>חשבונות (Accounts)</h4>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CREATE Account</div>
-                    <div class="test-description">יצירת חשבון חדש</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="accounts.create" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">READ Account</div>
-                    <div class="test-description">קריאת חשבון קיים</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="accounts.read" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">UPDATE Account</div>
-                    <div class="test-description">עדכון חשבון קיים</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="accounts.update" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">DELETE Account</div>
-                    <div class="test-description">מחיקת חשבון</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="accounts.delete" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Tickers -->
-              <div class="test-group">
-                <h4>טיקרים (Tickers)</h4>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CREATE Ticker</div>
-                    <div class="test-description">יצירת טיקר חדש</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="tickers.create" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">READ Ticker</div>
-                    <div class="test-description">קריאת טיקר קיים</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="tickers.read" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">UPDATE Ticker</div>
-                    <div class="test-description">עדכון טיקר קיים</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="tickers.update" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">DELETE Ticker</div>
-                    <div class="test-description">מחיקת טיקר</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="tickers.delete" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Trades -->
-              <div class="test-group">
-                <h4>טריידים (Trades)</h4>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CREATE Trade</div>
-                    <div class="test-description">יצירת טרייד חדש</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="trades.create" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">READ Trade</div>
-                    <div class="test-description">קריאת טרייד קיים</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="trades.read" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">UPDATE Trade</div>
-                    <div class="test-description">עדכון טרייד קיים</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="trades.update" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CLOSE Trade</div>
-                    <div class="test-description">סגירת טרייד</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="trades.close" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CANCEL Trade</div>
-                    <div class="test-description">ביטול טרייד</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="trades.cancel" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">DELETE Trade</div>
-                    <div class="test-description">מחיקת טרייד</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="trades.delete" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Trade Plans -->
-              <div class="test-group">
-                <h4>תוכניות מסחר (Trade Plans)</h4>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CREATE Trade Plan</div>
-                    <div class="test-description">יצירת תוכנית מסחר חדשה</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="trade_plans.create" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">READ Trade Plan</div>
-                    <div class="test-description">קריאת תוכנית מסחר קיימת</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="trade_plans.read" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">UPDATE Trade Plan</div>
-                    <div class="test-description">עדכון תוכנית מסחר קיימת</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="trade_plans.update" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CANCEL Trade Plan</div>
-                    <div class="test-description">ביטול תוכנית מסחר</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="trade_plans.cancel" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Notes -->
-              <div class="test-group">
-                <h4>הערות (Notes)</h4>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CREATE Note</div>
-                    <div class="test-description">יצירת הערה חדשה</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="notes.create" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">READ Note</div>
-                    <div class="test-description">קריאת הערה קיימת</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="notes.read" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">UPDATE Note</div>
-                    <div class="test-description">עדכון הערה קיימת</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="notes.update" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">DELETE Note</div>
-                    <div class="test-description">מחיקת הערה</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="notes.delete" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Alerts -->
-              <div class="test-group">
-                <h4>התראות (Alerts)</h4>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CREATE Alert</div>
-                    <div class="test-description">יצירת התראה חדשה</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="alerts.create" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">READ Alert</div>
-                    <div class="test-description">קריאת התראה קיימת</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="alerts.read" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">UPDATE Alert</div>
-                    <div class="test-description">עדכון התראה קיימת</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="alerts.update" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">DELETE Alert</div>
-                    <div class="test-description">מחיקת התראה</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="alerts.delete" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Executions -->
-              <div class="test-group">
-                <h4>ביצועים (Executions)</h4>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CREATE Execution</div>
-                    <div class="test-description">יצירת ביצוע חדש</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="executions.create" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">READ Execution</div>
-                    <div class="test-description">קריאת ביצוע קיים</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="executions.read" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">UPDATE Execution</div>
-                    <div class="test-description">עדכון ביצוע קיים</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="executions.update" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">DELETE Execution</div>
-                    <div class="test-description">מחיקת ביצוע</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="executions.delete" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Cash Flows -->
-              <div class="test-group">
-                <h4>תזרימי מזומן (Cash Flows)</h4>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">CREATE Cash Flow</div>
-                    <div class="test-description">יצירת תזרים מזומן חדש</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="cash_flows.create" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">READ Cash Flow</div>
-                    <div class="test-description">קריאת תזרים מזומן קיים</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="cash_flows.read" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">UPDATE Cash Flow</div>
-                    <div class="test-description">עדכון תזרים מזומן קיים</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="cash_flows.update" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="test-item">
-                  <div>
-                    <div class="test-name">DELETE Cash Flow</div>
-                    <div class="test-description">מחיקת תזרים מזומן</div>
-                  </div>
-                  <label class="toggle-switch">
-                    <input type="checkbox" data-test="cash_flows.delete" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="backupBeforeTests" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Cleanup After Tests</div>
+              <div class="setting-description">Delete temporary files after tests</div>
             </div>
-
-            <!-- אזור תוצאות בדיקות -->
-            <div id="crudTestResultsArea" style="display: none;">
-              <div class="test-results-header">
-                <h4><i class="fas fa-clipboard-list"></i> תוצאות בדיקות CRUD</h4>
-                <button class="btn" onclick="closeCRUDTestResults()">
-                  <span class="action-icon">✕</span> סגור
-                </button>
-              </div>
-              <div id="crudTestResultsContent">
-                <!-- תוצאות הבדיקות יוכנסו כאן דינמית -->
-              </div>
-            </div>
-
-            <!-- כפתורי פעולה -->
-            <div class="action-buttons">
-              <button class="action-btn run-btn" onclick="runSelectedCRUDTests()">
-                <span class="action-icon">▶️</span>
-                <span class="action-text">הרץ בדיקות נבחרות</span>
-              </button>
-              <button class="action-btn save-btn" onclick="saveCRUDPreferences()">
-                <span class="action-icon">💾</span>
-                <span class="action-text">שמור העדפות</span>
-              </button>
-              <button class="action-btn reset-btn" onclick="resetCRUDPreferences()">
-                <span class="action-icon">🔄</span>
-                <span class="action-text">אפס לברירות מחדל</span>
-              </button>
-            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="cleanupAfterTests" checked>
+              <span class="slider"></span>
+            </label>
           </div>
         </div>
 
-        <!-- Security Tests area - content-section -->
-        <div class="content-section" data-section="security">
-          <!-- Security Tests header -->
-          <div class="section-header">
-            <div class="table-title">
-              🔒 Security Tests
+        <!-- Execution settings -->
+        <div class="settings-section">
+          <h3><i class="fas fa-play-circle"></i> Execution Settings</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Parallel Tests</div>
+              <div class="setting-description">Run tests in parallel for better performance</div>
             </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="parallelTests">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Show Progress</div>
+              <div class="setting-description">Show progress during test execution</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="showProgress" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Stop on Error</div>
+              <div class="setting-description">Stop tests when first error is detected</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="stopOnError">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
 
-            <div class="table-actions">
-              <button class="refresh-btn" onclick="resetSecurityPreferences()" title="Reset security settings">
-                <span class="action-icon">🔄</span> Reset
-              </button>
-              <button class="refresh-btn" onclick="saveSecurityPreferences()" title="Save security settings">
-                <span class="action-icon">💾</span> Save
-              </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" data-toggle="security" onclick="toggleSection('security')"
-                title="Show/hide security settings area">
-                <span class="filter-icon">▲</span>
-              </button>
+        <!-- Reporting settings -->
+        <div class="settings-section">
+          <h3><i class="fas fa-file-alt"></i> Reporting Settings</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Create Detailed Report</div>
+              <div class="setting-description">Create detailed report with all details</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="detailedReport" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Save Reports</div>
+              <div class="setting-description">Save test reports to files</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="saveReports" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">HTML Report</div>
+              <div class="setting-description">Create report in HTML format</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="htmlReport" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Notification settings -->
+        <div class="settings-section">
+          <h3><i class="fas fa-bell"></i> Notification Settings</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Error Notifications</div>
+              <div class="setting-description">Show notifications when errors are detected in tests</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="errorNotifications" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Success Notifications</div>
+              <div class="setting-description">Show notifications when all tests pass successfully</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="successNotifications" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Performance settings -->
+        <div class="settings-section">
+          <h3><i class="fas fa-tachometer-alt"></i> Performance Settings</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Time Measurement</div>
+              <div class="setting-description">Measure execution time for each test</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="measureTime" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Memory Measurement</div>
+              <div class="setting-description">Measure memory usage during tests</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="measureMemory">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Security settings -->
+        <div class="settings-section">
+          <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Security Tests</div>
+              <div class="setting-description">Run special security tests</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="securityTests">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Penetration Tests</div>
+              <div class="setting-description">Run basic penetration tests</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="penetrationTests">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Advanced settings -->
+        <div class="settings-section">
+          <h3><i class="fas fa-cogs"></i> Advanced Settings</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Debug Mode</div>
+              <div class="setting-description">Enable debug mode for tests</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="debugMode">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Dry Run Tests</div>
+              <div class="setting-description">Run trial tests before real tests</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="dryRun">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Isolated Tests</div>
+              <div class="setting-description">Run each test in isolated environment</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="isolatedTests">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="action-buttons">
+          <button class="action-btn save-btn" onclick="saveTestPreferences()" title="Save preferences">
+            <span class="action-icon">💾</span>
+            <span class="action-text">Save Preferences</span>
+          </button>
+          <button class="action-btn run-btn" onclick="runSelectedTests()" id="runTestsBtn" title="Run selected tests">
+            <span class="action-icon">▶️</span>
+            <span class="action-text">Run Selected Tests</span>
+          </button>
+          <button class="action-btn reset-btn" onclick="resetTestPreferences()" title="Reset to defaults">
+            <span class="action-icon">🔄</span>
+            <span class="action-text">Reset to Defaults</span>
+          </button>
+        </div>
+
+        <!-- Test results area -->
+        <div id="testResultsArea" style="display: none;">
+          <div class="test-results-header">
+            <h4><i class="fas fa-chart-bar"></i> Test Results</h4>
+            <button class="btn btn-sm btn-outline-secondary" onclick="hideTestResults()">
+              <i class="fas fa-times"></i> Close
+            </button>
+          </div>
+
+
+
+
+          <!-- סיכום בדיקות CRUD -->
+          <div class="test-summary">
+            <h3><i class="fas fa-chart-bar"></i> סיכום בדיקות CRUD</h3>
+            <div class="summary-stats">
+              <div class="stat-item">
+                <div class="stat-number" id="totalCRUDTests">8</div>
+                <div class="stat-label">סה"כ ישויות</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="activeCRUDTests">8</div>
+                <div class="stat-label">ישויות פעילות</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="inactiveCRUDTests">0</div>
+                <div class="stat-label">ישויות כבויות</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="crudOperations">24</div>
+                <div class="stat-label">פעולות CRUD</div>
+              </div>
             </div>
           </div>
 
-          <!-- Security Tests content -->
-          <div class="section-body">
-            <div class="settings-section">
-              <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
-              <div class="setting-item">
+          <!-- ישויות CRUD -->
+          <div class="test-category">
+            <div class="category-header">
+              <h3><i class="fas fa-database"></i> ישויות CRUD</h3>
+              <button class="category-toggle-btn" onclick="toggleAllCRUDTests()" title="הפעל/כבה את כל בדיקות CRUD">
+                <span class="toggle-text">כבה הכל</span>
+                <i class="fas fa-power-off"></i>
+              </button>
+            </div>
+            <div class="category-description">
+              בדיקות CRUD בודקות את כל הפעולות (Create, Read, Update, Delete) לכל ישות במערכת.
+            </div>
+
+            <!-- Accounts -->
+            <div class="test-group">
+              <h4>חשבונות (Accounts)</h4>
+              <div class="test-item">
                 <div>
-                  <div class="setting-label">Security Tests</div>
-                  <div class="setting-description">Run special security tests</div>
+                  <div class="test-name">CREATE Account</div>
+                  <div class="test-description">יצירת חשבון חדש</div>
                 </div>
                 <label class="toggle-switch">
-                  <input type="checkbox" id="securityTests">
+                  <input type="checkbox" data-test="accounts.create" checked>
                   <span class="slider"></span>
                 </label>
               </div>
-              <div class="setting-item">
+              <div class="test-item">
                 <div>
-                  <div class="setting-label">Penetration Tests</div>
-                  <div class="setting-description">Run basic penetration tests</div>
+                  <div class="test-name">READ Account</div>
+                  <div class="test-description">קריאת חשבון קיים</div>
                 </div>
                 <label class="toggle-switch">
-                  <input type="checkbox" id="penetrationTests">
+                  <input type="checkbox" data-test="accounts.read" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">UPDATE Account</div>
+                  <div class="test-description">עדכון חשבון קיים</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="accounts.update" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">DELETE Account</div>
+                  <div class="test-description">מחיקת חשבון</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="accounts.delete" checked>
                   <span class="slider"></span>
                 </label>
               </div>
             </div>
+
+            <!-- Tickers -->
+            <div class="test-group">
+              <h4>טיקרים (Tickers)</h4>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">CREATE Ticker</div>
+                  <div class="test-description">יצירת טיקר חדש</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="tickers.create" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">READ Ticker</div>
+                  <div class="test-description">קריאת טיקר קיים</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="tickers.read" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">UPDATE Ticker</div>
+                  <div class="test-description">עדכון טיקר קיים</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="tickers.update" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">DELETE Ticker</div>
+                  <div class="test-description">מחיקת טיקר</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="tickers.delete" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Trades -->
+            <div class="test-group">
+              <h4>טריידים (Trades)</h4>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">CREATE Trade</div>
+                  <div class="test-description">יצירת טרייד חדש</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="trades.create" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">READ Trade</div>
+                  <div class="test-description">קריאת טרייד קיים</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="trades.read" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">UPDATE Trade</div>
+                  <div class="test-description">עדכון טרייד קיים</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="trades.update" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">CLOSE Trade</div>
+                  <div class="test-description">סגירת טרייד</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="trades.close" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">CANCEL Trade</div>
+                  <div class="test-description">ביטול טרייד</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="trades.cancel" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">DELETE Trade</div>
+                  <div class="test-description">מחיקת טרייד</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="trades.delete" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Trade Plans -->
+            <div class="test-group">
+              <h4>תוכניות מסחר (Trade Plans)</h4>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">CREATE Trade Plan</div>
+                  <div class="test-description">יצירת תוכנית מסחר חדשה</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="trade_plans.create" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">READ Trade Plan</div>
+                  <div class="test-description">קריאת תוכנית מסחר קיימת</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="trade_plans.read" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">UPDATE Trade Plan</div>
+                  <div class="test-description">עדכון תוכנית מסחר קיימת</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="trade_plans.update" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">CANCEL Trade Plan</div>
+                  <div class="test-description">ביטול תוכנית מסחר</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="trade_plans.cancel" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="test-group">
+              <h4>הערות (Notes)</h4>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">CREATE Note</div>
+                  <div class="test-description">יצירת הערה חדשה</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="notes.create" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">READ Note</div>
+                  <div class="test-description">קריאת הערה קיימת</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="notes.read" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">UPDATE Note</div>
+                  <div class="test-description">עדכון הערה קיימת</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="notes.update" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">DELETE Note</div>
+                  <div class="test-description">מחיקת הערה</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="notes.delete" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Alerts -->
+            <div class="test-group">
+              <h4>התראות (Alerts)</h4>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">CREATE Alert</div>
+                  <div class="test-description">יצירת התראה חדשה</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="alerts.create" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">READ Alert</div>
+                  <div class="test-description">קריאת התראה קיימת</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="alerts.read" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">UPDATE Alert</div>
+                  <div class="test-description">עדכון התראה קיימת</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="alerts.update" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">DELETE Alert</div>
+                  <div class="test-description">מחיקת התראה</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="alerts.delete" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Executions -->
+            <div class="test-group">
+              <h4>ביצועים (Executions)</h4>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">CREATE Execution</div>
+                  <div class="test-description">יצירת ביצוע חדש</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="executions.create" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">READ Execution</div>
+                  <div class="test-description">קריאת ביצוע קיים</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="executions.read" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">UPDATE Execution</div>
+                  <div class="test-description">עדכון ביצוע קיים</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="executions.update" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">DELETE Execution</div>
+                  <div class="test-description">מחיקת ביצוע</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="executions.delete" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Cash Flows -->
+            <div class="test-group">
+              <h4>תזרימי מזומן (Cash Flows)</h4>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">CREATE Cash Flow</div>
+                  <div class="test-description">יצירת תזרים מזומן חדש</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="cash_flows.create" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">READ Cash Flow</div>
+                  <div class="test-description">קריאת תזרים מזומן קיים</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="cash_flows.read" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">UPDATE Cash Flow</div>
+                  <div class="test-description">עדכון תזרים מזומן קיים</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="cash_flows.update" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="test-item">
+                <div>
+                  <div class="test-name">DELETE Cash Flow</div>
+                  <div class="test-description">מחיקת תזרים מזומן</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" data-test="cash_flows.delete" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div> <!-- End page-body -->
-  </div> <!-- End background-wrapper -->
 
-  <!-- Bottom page spacing -->
-  <div style="height: 3rem;"></div>
+          <!-- אזור תוצאות בדיקות -->
+          <div id="crudTestResultsArea" style="display: none;">
+            <div class="test-results-header">
+              <h4><i class="fas fa-clipboard-list"></i> תוצאות בדיקות CRUD</h4>
+              <button class="btn" onclick="closeCRUDTestResults()">
+                <span class="action-icon">✕</span> סגור
+              </button>
+            </div>
+            <div id="crudTestResultsContent">
+              <!-- תוצאות הבדיקות יוכנסו כאן דינמית -->
+            </div>
+          </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+          <!-- כפתורי פעולה -->
+          <div class="action-buttons">
+            <button class="action-btn run-btn" onclick="runSelectedCRUDTests()">
+              <span class="action-icon">▶️</span>
+              <span class="action-text">הרץ בדיקות נבחרות</span>
+            </button>
 
-  <!-- Scripts -->
-  <!-- Header System Scripts -->
-  <script src="scripts/header-system.js" onerror="console.error('Failed to load header-system.js')"></script>
-  <script src="scripts/main.js" onerror="console.error('Failed to load main.js')"></script>
-  <script src="scripts/main.js" onerror="console.error('Failed to load main.js')"></script>
-  <!-- Removed grid-filters.js - not needed for preferences page -->
-  <script src="scripts/console-cleanup.js" onerror="console.error('Failed to load console-cleanup.js')"></script>
-  <script src="scripts/preferences.js" onerror="console.error('Failed to load preferences.js')"></script>
 
-  <script>
-    // Global filter functions for preferences page
-    window.toggleDateRangeFilter = function () {
-      console.log('🔍 toggleDateRangeFilter called');
-      if (window.headerSystem && window.headerSystem.toggleDateRangeFilter) {
-        window.headerSystem.toggleDateRangeFilter();
-      }
-    };
 
-    window.selectDateRangeOption = function (dateRange) {
-      console.log('🔍 selectDateRangeOption called with:', dateRange);
-      if (window.headerSystem && window.headerSystem.selectDateRangeOption) {
-        window.headerSystem.selectDateRangeOption(dateRange);
-      }
-    };
 
-    window.updateSearchFilter = function (value) {
-      console.log('🔍 updateSearchFilter called with:', value);
-      if (window.headerSystem && window.headerSystem.updateSearchFilter) {
-        window.headerSystem.updateSearchFilter(value);
-      }
-    };
+          </div>
+        </div> <!-- End page-body -->
+      </div> <!-- End background-wrapper -->
 
-    window.clearSearchFilter = function () {
-      console.log('🔍 clearSearchFilter called');
-      if (window.headerSystem && window.headerSystem.clearSearchFilter) {
-        window.headerSystem.clearSearchFilter();
-      }
-    };
+      <!-- Bottom page spacing -->
+      <div style="height: 3rem;"></div>
 
-    window.resetFilters = function () {
-      console.log('🔍 resetFilters called');
-      if (window.headerSystem && window.headerSystem.resetFilters) {
-        window.headerSystem.resetFilters();
-      }
-    };
+      <!-- Bootstrap JS -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    window.clearAllFilters = function () {
-      console.log('🔍 clearAllFilters called');
-      if (window.headerSystem && window.headerSystem.clearAllFilters) {
-        window.headerSystem.clearAllFilters();
-      }
-    };
+      <!-- Scripts -->
+      <!-- Header System Scripts -->
+      <script src="scripts/header-system.js" onerror="console.error('Failed to load header-system.js')"></script>
+      <script src="scripts/main.js" onerror="console.error('Failed to load main.js')"></script>
+      <script src="scripts/main.js" onerror="console.error('Failed to load main.js')"></script>
+      <!-- Removed grid-filters.js - not needed for preferences page -->
+      <script src="scripts/console-cleanup.js" onerror="console.error('Failed to load console-cleanup.js')"></script>
+      <script src="scripts/preferences.js" onerror="console.error('Failed to load preferences.js')"></script>
 
-    // Initialize preferences page
-    document.addEventListener('DOMContentLoaded', function () {
-      console.log('🚀 Loading preferences page...');
+      <script>
+        // Global filter functions for preferences page
+        window.toggleDateRangeFilter = function () {
+          console.log('🔍 toggleDateRangeFilter called');
+          if (window.headerSystem && window.headerSystem.toggleDateRangeFilter) {
+            window.headerSystem.toggleDateRangeFilter();
+          }
+        };
 
-      // Initialize HeaderSystem
-      if (window.headerSystem) {
-        window.headerSystem.init();
-      }
+        window.selectDateRangeOption = function (dateRange) {
+          console.log('🔍 selectDateRangeOption called with:', dateRange);
+          if (window.headerSystem && window.headerSystem.selectDateRangeOption) {
+            window.headerSystem.selectDateRangeOption(dateRange);
+          }
+        };
 
-      // Initialize preferences
-      if (typeof initializePreferences === 'function') {
-        initializePreferences();
-      }
-    });
-  </script>
+        window.updateSearchFilter = function (value) {
+          console.log('🔍 updateSearchFilter called with:', value);
+          if (window.headerSystem && window.headerSystem.updateSearchFilter) {
+            window.headerSystem.updateSearchFilter(value);
+          }
+        };
+
+        window.clearSearchFilter = function () {
+          console.log('🔍 clearSearchFilter called');
+          if (window.headerSystem && window.headerSystem.clearSearchFilter) {
+            window.headerSystem.clearSearchFilter();
+          }
+        };
+
+        window.resetFilters = function () {
+          console.log('🔍 resetFilters called');
+          if (window.headerSystem && window.headerSystem.resetFilters) {
+            window.headerSystem.resetFilters();
+          }
+        };
+
+        window.clearAllFilters = function () {
+          console.log('🔍 clearAllFilters called');
+          if (window.headerSystem && window.headerSystem.clearAllFilters) {
+            window.headerSystem.clearAllFilters();
+          }
+        };
+
+        // Initialize preferences page
+        document.addEventListener('DOMContentLoaded', function () {
+          console.log('🚀 Loading preferences page...');
+
+          // Initialize HeaderSystem
+          if (window.headerSystem) {
+            window.headerSystem.init();
+          }
+
+          // Initialize preferences
+          if (typeof initializePreferences === 'function') {
+            initializePreferences();
+          }
+        });
+      </script>
 
 </body>
 

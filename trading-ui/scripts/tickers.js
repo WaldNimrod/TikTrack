@@ -1,4 +1,25 @@
 // ===== קובץ JavaScript לדף טיקרים =====
+/*
+ * Tickers.js - Tickers Page Management
+ * ====================================
+ * 
+ * This file contains all tickers management functionality for the TikTrack application.
+ * It handles tickers CRUD operations, table updates, and user interactions.
+ * 
+ * Dependencies:
+ * - table-mappings.js (for column mappings and sorting)
+ * - main.js (global utilities and sorting functions)
+ * - translation-utils.js (translation functions)
+ * 
+ * Table Mapping:
+ * - Uses 'tickers' table type from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * - Sorting uses global window.sortTableData() function
+ * 
+ * File: trading-ui/scripts/tickers.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
 
 // משתנים גלובליים
 if (!window.tickersData) {
@@ -402,8 +423,8 @@ function validateTickerName(input) {
         return false;
     }
 
-    if (name.length < 2 || name.length > 100) {
-        showFieldError(input, errorElement, 'שם החברה חייב להיות בין 2 ל-100 תווים');
+    if (name.length < 2 || name.length > 25) {
+        showFieldError(input, errorElement, 'שם החברה חייב להיות בין 2 ל-25 תווים');
         return false;
     }
 
@@ -1071,22 +1092,32 @@ function updateTickersTable(tickers) {
         return;
     }
 
-    tbody.innerHTML = tickers.map(ticker => `
+    tbody.innerHTML = tickers.map(ticker => {
+        // המרת סוגים לעברית לפילטר
+        const typeForFilter = ticker.type === 'stock' ? 'מניה' :
+            ticker.type === 'etf' ? 'ETF' :
+                ticker.type === 'bond' ? 'אג"ח' :
+                    ticker.type === 'crypto' ? 'קריפטו' : ticker.type;
+
+        // המרת סטטוס לפילטר
+        const statusForFilter = ticker.active_trades ? 'פעיל' : 'לא פעיל';
+
+        return `
         <tr>
             <td><strong>${ticker.symbol}</strong></td>
             <td>${ticker.name}</td>
-            <td>${ticker.type}</td>
+            <td data-type="${typeForFilter}">${ticker.type}</td>
             <td>${ticker.remarks || ''}</td>
             <td>${getTickerCurrencyDisplay(ticker)}</td>
-            <td>${ticker.active_trades ? 'כן' : 'לא'}</td>
-            <td>${formatDate(ticker.created_at)}</td>
-            <td>${formatDate(ticker.updated_at)}</td>
+            <td data-status="${statusForFilter}">${ticker.active_trades ? 'כן' : 'לא'}</td>
+            <td data-date="${ticker.created_at}">${formatDate(ticker.created_at)}</td>
+            <td data-date="${ticker.updated_at}">${formatDate(ticker.updated_at)}</td>
             <td>
                 <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">✏️</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})" title="מחק">X</button>
             </td>
         </tr>
-    `).join('');
+    `}).join('');
 
     // עדכון הספירה
     const countElement = document.querySelector('.table-count');
@@ -1135,6 +1166,47 @@ window.goToPlan = goToPlan;
 window.goToAlert = goToAlert;
 window.goToNote = goToNote;
 
+// ===== פונקציות סידור =====
+
+/**
+ * פונקציה לסידור טבלת טיקרים
+ * @param {number} columnIndex - אינדקס העמודה לסידור
+ * 
+ * דוגמאות שימוש:
+ * sortTable(0); // סידור לפי עמודת סימבול
+ * sortTable(1); // סידור לפי עמודת שם
+ * sortTable(2); // סידור לפי עמודת סוג
+ * 
+ * @requires window.sortTableData - פונקציה גלובלית מ-main.js
+ */
+function sortTable(columnIndex) {
+    console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
+
+    if (typeof window.sortTableData === 'function') {
+        const sortedData = window.sortTableData(
+            columnIndex,
+            window.tickersData || [],
+            'tickers',
+            updateTickersTable
+        );
+        console.log('✅ נתונים מסודרים:', sortedData);
+    } else {
+        console.error('❌ sortTableData function not found in main.js');
+    }
+}
+
+/**
+ * שחזור מצב סידור
+ */
+function restoreSortState() {
+    if (typeof window.restoreAnyTableSort === 'function') {
+        window.restoreAnyTableSort('tickers', window.tickersData || [], updateTickersTable);
+    }
+}
+
+// הגדרת הפונקציה כגלובלית
+window.sortTable = sortTable;
+
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
     console.log('🔄 === DOM CONTENT LOADED ===');
@@ -1147,6 +1219,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // טעינת נתונים
     loadTickersData();
+
+    // שחזור מצב סידור
+    restoreSortState();
 
     console.log('דף טיקרים נטען בהצלחה');
 });

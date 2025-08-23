@@ -1,6 +1,15 @@
 /**
  * Simple filter for trades table
  * Works directly on the table without complexity
+ * 
+ * Dependencies:
+ * - header-system.js (for filter menu elements)
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/simple-filter.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
  */
 
 class SimpleFilter {

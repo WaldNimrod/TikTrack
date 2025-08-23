@@ -35,7 +35,7 @@
     4. מערכת אישור כפול למחיקת חשבונות
     
     מבנה הדף:
-    - app-header: כותרת האפליקציה עם ניווט
+    - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות התראות וסיכום נתונים
       - content-section: טבלת חשבונות
@@ -46,6 +46,7 @@
     - תצוגה מפורטת של אובייקטים מקושרים עם אפשרות הרחבה
     
     שינויים אחרונים:
+    - החלפת app-header במערכת header-system החדשה
     - העתקת מבנה מדף העיצובים
     - הסרת טבלת התכנונים
     - התמקדות בחשבונות בלבד
@@ -81,6 +82,7 @@
   <script src="scripts/console-cleanup.js"></script>
   <script src="scripts/filter-system.js"></script>
   <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/table-mappings.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
@@ -91,9 +93,8 @@
   <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- Application header -->
-    <!-- Unified Header System -->
-    <div id="unified-header-container"></div>
+    <!-- כותרת האפליקציה החדשה - נוצרת אוטומטית על ידי header-system.js -->
+    <!-- unified-header ייווצר כאן אוטומטית -->
 
     <!-- Page body - all content after header -->
     <div class="page-body">
@@ -327,23 +328,19 @@
 
       // Initialize page
       document.addEventListener('DOMContentLoaded', function () {
-        console.log('🚀 Initializing accounts page...');
+        console.log('🚀 טעינת דף חשבונות עם מערכת ראש דף חדשה...');
+
+        // אתחול HeaderSystem
+        if (window.headerSystem && !window.headerSystem.isInitialized) {
+          console.log('✅ אתחול HeaderSystem...');
+          window.headerSystem.init();
+        }
+
+        // טעינת נתוני חשבונות
         if (typeof window.loadAccountsDataForAccountsPage === 'function') {
           window.loadAccountsDataForAccountsPage();
         } else {
           loadAccountsData();
-        }
-      });
-    </script>
-    <script>
-      // אתחול מערכת הכותרת החדשה
-      document.addEventListener("DOMContentLoaded", () => {
-        if (typeof window.HeaderSystem !== "undefined") {
-          console.log("🔄 Initializing new unified header system...");
-          window.headerSystem = new window.HeaderSystem();
-          window.headerSystem.initialize();
-          window.filterSystem = new window.SimpleFilter();
-          window.filterSystem.initialize();
         }
       });
     </script>

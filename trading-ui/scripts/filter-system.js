@@ -5,11 +5,24 @@
  * 
  * מערכת פילטרים מאוחדת שמתאימה את עצמה לכל טבלה
  * 
+ * Dependencies:
+ * - table-mappings.js (for column mappings)
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * Table Mapping:
+ * - Uses table types from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * 
  * תכונות:
  * - פילטר אחד עובד על כל הטבלאות
  * - שמירת מצב בין עמודים
  * - התאמה אוטומטית לכל טבלה
  * - תרגום תאריכים חכם
+ * 
+ * File: trading-ui/scripts/filter-system.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
  * 
  * מחבר: TikTrack Development Team
  * תאריך: 2025

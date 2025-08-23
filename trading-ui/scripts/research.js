@@ -1,4 +1,19 @@
 // ===== קובץ JavaScript פשוט לדף תחקיר =====
+/*
+ * Research.js - Research Page Management
+ * =====================================
+ * 
+ * This file contains all research page functionality for the TikTrack application.
+ * It handles research data display and user interactions.
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/research.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
 
 // פונקציות בסיסיות
 function openResearchDetails(id) {

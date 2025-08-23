@@ -18,13 +18,224 @@
  * 
  * Dependencies:
  * - translation-utils.js (loaded before this file)
+ * - table-mappings.js (loaded before this file for column mappings)
  * - All page-specific JavaScript files
  * 
- * @version 2.1
- * @lastUpdated August 22, 2025
+ * Table Mapping System:
+ * - Column mappings are centralized in table-mappings.js
+ * - This file uses window.getColumnValue() from table-mappings.js
+ * - Local getColumnValue() function is deprecated
+ * 
+ * @version 2.2
+ * @lastUpdated August 23, 2025
  */
 
 // ===== MAIN.JS - קובץ כללי לכל האתר =====
+
+// ===== מערכת סידור גלובלית =====
+// Global sorting system for all tables
+
+/**
+ * פונקציה גלובלית לסידור טבלאות
+ * Global function for sorting tables
+ * 
+ * @param {number} columnIndex - אינדקס העמודה לסידור
+ * @param {Array} data - הנתונים לסידור
+ * @param {string} tableType - סוג הטבלה (planning, trades, accounts, etc.)
+ * @param {Function} updateFunction - פונקציה לעדכון הטבלה
+ * @returns {Array} הנתונים המסודרים
+ */
+window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
+  console.log(`🔄 Global sortTableData called for ${tableType} table, column ${columnIndex}`);
+
+  // שמירת מצב הסידור הנוכחי
+  const currentSortState = window.getSortState(tableType);
+
+  // קביעת כיוון הסידור החדש
+  let newDirection = 'asc';
+  if (currentSortState.columnIndex === columnIndex) {
+    // אם אותה עמודה - החלף כיוון
+    newDirection = currentSortState.direction === 'asc' ? 'desc' : 'asc';
+  }
+
+  // שמירת מצב הסידור החדש
+  window.saveSortState(tableType, columnIndex, newDirection);
+
+  // סידור הנתונים
+  const sortedData = [...data].sort((a, b) => {
+    let aValue = getColumnValue(a, columnIndex, tableType);
+    let bValue = getColumnValue(b, columnIndex, tableType);
+
+    // המרה למספרים אם אפשר
+    if (!isNaN(aValue) && !isNaN(bValue)) {
+      aValue = parseFloat(aValue);
+      bValue = parseFloat(bValue);
+    }
+
+    // המרה לתאריכים אם אפשר
+    if (isDateValue(aValue) && isDateValue(bValue)) {
+      aValue = new Date(aValue);
+      bValue = new Date(bValue);
+    }
+
+    // סידור
+    if (aValue < bValue) {
+      return newDirection === 'asc' ? -1 : 1;
+    }
+    if (aValue > bValue) {
+      return newDirection === 'asc' ? 1 : -1;
+    }
+    return 0;
+  });
+
+  // עדכון הטבלה
+  if (typeof updateFunction === 'function') {
+    updateFunction(sortedData);
+  }
+
+  // עדכון האייקונים
+  updateSortIcons(tableType, columnIndex, newDirection);
+
+  console.log(`✅ Table ${tableType} sorted by column ${columnIndex}, direction: ${newDirection}`);
+  return sortedData;
+};
+
+/**
+ * קבלת ערך עמודה מפריט נתונים
+ * Get column value from data item
+ * @deprecated Use window.getColumnValue from table-mappings.js instead
+ * 
+ * This function is deprecated and will be removed in future versions.
+ * All table column mappings are now centralized in table-mappings.js
+ * 
+ * @see trading-ui/scripts/table-mappings.js for the centralized mapping system
+ */
+function getColumnValue(item, columnIndex, tableType) {
+  // שימוש בפונקציה המרוכזת מקובץ table-mappings.js
+  if (typeof window.getColumnValue === 'function') {
+    return window.getColumnValue(item, columnIndex, tableType);
+  }
+
+  console.warn('⚠️ window.getColumnValue not available, using fallback');
+  return item[columnIndex] || '';
+}
+
+/**
+ * בדיקה אם ערך הוא תאריך
+ * Check if value is a date
+ */
+function isDateValue(value) {
+  if (!value) return false;
+  const date = new Date(value);
+  return !isNaN(date.getTime());
+}
+
+/**
+ * שמירת מצב סידור
+ * Save sort state
+ */
+window.saveSortState = function (tableType, columnIndex, direction) {
+  const sortState = {
+    columnIndex: columnIndex,
+    direction: direction,
+    timestamp: Date.now()
+  };
+
+  localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState));
+  console.log(`💾 Sort state saved for ${tableType}:`, sortState);
+};
+
+/**
+ * קבלת מצב סידור
+ * Get sort state
+ */
+window.getSortState = function (tableType) {
+  const savedState = localStorage.getItem(`sortState_${tableType}`);
+  if (savedState) {
+    return JSON.parse(savedState);
+  }
+  return { columnIndex: -1, direction: 'asc' };
+};
+
+/**
+ * עדכון אייקוני סידור
+ * Update sort icons
+ */
+function updateSortIcons(tableType, activeColumnIndex, direction) {
+  const table = document.querySelector(`[data-table-type="${tableType}"]`);
+  if (!table) return;
+
+  // הסרת כל האייקונים הקיימים
+  const headers = table.querySelectorAll('th');
+  headers.forEach((header, index) => {
+    const existingIcon = header.querySelector('.sort-icon');
+    if (existingIcon) {
+      existingIcon.remove();
+    }
+  });
+
+  // הוספת אייקון לעמודה הפעילה
+  if (activeColumnIndex >= 0 && activeColumnIndex < headers.length) {
+    const activeHeader = headers[activeColumnIndex];
+    const icon = document.createElement('span');
+    icon.className = 'sort-icon';
+    icon.textContent = direction === 'asc' ? ' ▲' : ' ▼';
+    icon.style.marginRight = '5px';
+    icon.style.color = '#007bff';
+    activeHeader.appendChild(icon);
+  }
+}
+
+/**
+ * פונקציה גלובלית לסידור כל הטבלאות
+ * Global function for sorting all tables
+ * 
+ * @param {string} tableType - סוג הטבלה
+ * @param {number} columnIndex - אינדקס העמודה
+ * @param {Array} data - הנתונים
+ * @param {Function} updateFunction - פונקציה לעדכון הטבלה
+ */
+window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
+  console.log(`🔄 Global sortAnyTable called for ${tableType} table`);
+
+  // בדיקה אם הפונקציה הגלובלית זמינה
+  if (typeof window.sortTableData === 'function') {
+    return window.sortTableData(columnIndex, data, tableType, updateFunction);
+  } else {
+    console.error('❌ Global sortTableData function not available');
+    return data;
+  }
+};
+
+/**
+ * פונקציה גלובלית לשחזור מצב סידור
+ * Global function for restoring sort state
+ * 
+ * @param {string} tableType - סוג הטבלה
+ * @param {Array} data - הנתונים
+ * @param {Function} updateFunction - פונקציה לעדכון הטבלה
+ */
+window.restoreAnyTableSort = function (tableType, data, updateFunction) {
+  console.log(`🔄 Global restoreAnyTableSort called for ${tableType} table`);
+
+  if (typeof window.getSortState === 'function') {
+    const sortState = window.getSortState(tableType);
+
+    if (sortState.columnIndex >= 0 && data && data.length > 0) {
+      console.log(`🔄 Restoring sort for ${tableType}: column ${sortState.columnIndex}, direction: ${sortState.direction}`);
+
+      // עדכון האייקונים
+      updateSortIcons(tableType, sortState.columnIndex, sortState.direction);
+
+      // סידור הנתונים
+      setTimeout(() => {
+        window.sortAnyTable(tableType, sortState.columnIndex, data, updateFunction);
+      }, 100);
+    }
+  } else {
+    console.log('⚠️ getSortState function not available');
+  }
+};
 
 /**
  * מערכת התראות גלובלית - CSS
@@ -981,1457 +1192,146 @@ function updateStatsDisplay(stats) {
   console.log('Stats display updated:', stats);
 }
 
-// ===== פונקציות כללית לסגירה/פתיחה של סקשנים =====
+// ===== Section Toggle Functions =====
 
 /**
- * פונקציה כללית לפתיחה/סגירה של סקשנים
+ * פונקציה לפתיחה וסגירה של סקשן ספציפי
  * @param {string} sectionId - מזהה הסקשן
  */
 function toggleSection(sectionId) {
-  const section = document.getElementById(sectionId);
-  const icon = document.querySelector(`#${sectionId} .filter-icon`);
-
-  if (!section || !icon) {
-    console.error(`❌ לא נמצא סקשן או אייקון עבור: ${sectionId}`);
+  console.log(`🔄 Toggling section: ${sectionId}`);
+  
+  const section = document.querySelector(`[data-section="${sectionId}"]`);
+  if (!section) {
+    console.warn(`Section with data-section="${sectionId}" not found`);
     return;
   }
 
-  // קביעת שם הדף לפי ה-URL הנוכחי
-  const currentPath = window.location.pathname;
-  let pageName = 'default';
+  const sectionBody = section.querySelector('.section-body');
+  const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"]`);
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-  if (currentPath.includes('/database')) {
-    pageName = 'database';
-  } else if (currentPath.includes('/accounts')) {
-    pageName = 'accounts';
-  } else if (currentPath.includes('/tickers')) {
-    pageName = 'tickers';
-  } else if (currentPath.includes('/trade_plans')) {
-    pageName = 'trade_plans';
-  } else if (currentPath.includes('/planning')) {
-    pageName = 'planning';
-  } else if (currentPath.includes('/designs')) {
-    pageName = 'designs';
-  } else if (currentPath.includes('/notes')) {
-    pageName = 'notes';
-  } else if (currentPath.includes('/alerts')) {
-    pageName = 'alerts';
-  }
+  if (sectionBody) {
+    const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
 
-  // הוספת שם הדף למפתח כדי שכל דף ישמור את הסטטוס שלו בנפרד
-  const storageKey = `${pageName}_${sectionId}Collapsed`;
+    if (isCollapsed) {
+      sectionBody.classList.remove('collapsed');
+      sectionBody.style.display = 'block';
+      console.log(`📖 Section ${sectionId} expanded`);
+    } else {
+      sectionBody.classList.add('collapsed');
+      sectionBody.style.display = 'none';
+      console.log(`📖 Section ${sectionId} collapsed`);
+    }
 
-  if (section.classList.contains('collapsed')) {
-    section.classList.remove('collapsed');
-    icon.textContent = '▲';
-    localStorage.setItem(storageKey, 'false');
-  } else {
-    section.classList.add('collapsed');
-    icon.textContent = '▼';
-    localStorage.setItem(storageKey, 'true');
+    // עדכון האייקון
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // שמירת המצב ב-localStorage
+    const storageKey = `${sectionId}SectionCollapsed`;
+    localStorage.setItem(storageKey, !isCollapsed);
   }
 }
 
 /**
- * פונקציה לסגירה/פתיחה של כל הסקשנים
+ * פונקציה לפתיחה וסגירה של כל הסקשנים
  */
 function toggleAllSections() {
+  console.log('🔄 Toggling all sections');
+  
   const sections = document.querySelectorAll('.content-section');
-  const isAnyOpen = Array.from(sections).some(section => !section.classList.contains('collapsed'));
-  const pageName = 'database';
+  const toggleBtn = document.querySelector('button[onclick*="toggleAllSections"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-  sections.forEach(section => {
-    const sectionId = section.id;
-    const storageKey = `${pageName}_${sectionId}Collapsed`;
-
-    if (isAnyOpen) {
-      section.classList.add('collapsed');
-      const icon = section.querySelector('.filter-icon');
-      if (icon) icon.textContent = '▼';
-      localStorage.setItem(storageKey, 'true');
-    } else {
-      section.classList.remove('collapsed');
-      const icon = section.querySelector('.filter-icon');
-      if (icon) icon.textContent = '▲';
-      localStorage.setItem(storageKey, 'false');
-    }
-  });
-
-  // עדכון האייקון בכפתור הראשי
-  const mainButton = document.querySelector('button[onclick="toggleAllSections()"]');
-  if (mainButton) {
-    const icon = isAnyOpen ? '▼' : '▲';
-    const buttonIcon = mainButton.querySelector('.filter-icon');
-    if (buttonIcon) buttonIcon.textContent = icon;
-  }
-}
-
-// ===== פונקציות המרה ופורמט =====
-
-/**
- * המרת סטטוס חשבון לעברית
- */
-
-/**
- * הצגת מודל עריכת התראה
- */
-function showEditAlertModal(alert) {
-  console.log('עריכת התראה:', alert);
-  alert('פונקציית עריכת התראה תתווסף בקרוב');
-}
-
-/**
- * ביטול התראה
- */
-async function cancelAlert(alertId) {
-  console.log(`ביטול התראה ${alertId}`);
-  if (!confirm('האם אתה בטוח שברצונך לבטל התראה זו?')) {
+  if (sections.length === 0) {
+    console.warn('No sections found');
     return;
   }
 
-  try {
-    const response = await fetch(`/api/v1/alerts/${alertId}/cancel`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+  // בדיקה אם כל הסקשנים סגורים
+  const allCollapsed = Array.from(sections).every(section => {
+    const sectionBody = section.querySelector('.section-body');
+    return sectionBody && (sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none');
+  });
 
-    if (response.ok) {
-      console.log('התראה בוטלה בהצלחה');
-
-      // רענון הנתונים
-      if (typeof window.loadAlertsData === 'function') {
-        window.loadAlertsData();
-      }
-
-      // הצגת הודעה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('התראה בוטלה', 'התראה בוטלה בהצלחה!');
+  // פתיחה או סגירה של כל הסקשנים
+  sections.forEach(section => {
+    const sectionBody = section.querySelector('.section-body');
+    const sectionId = section.getAttribute('data-section');
+    
+    if (sectionBody) {
+      if (allCollapsed) {
+        // פתיחת כל הסקשנים
+        sectionBody.classList.remove('collapsed');
+        sectionBody.style.display = 'block';
+        localStorage.setItem(`${sectionId}SectionCollapsed`, false);
       } else {
-        alert('התראה בוטלה בהצלחה!');
+        // סגירת כל הסקשנים
+        sectionBody.classList.add('collapsed');
+        sectionBody.style.display = 'none';
+        localStorage.setItem(`${sectionId}SectionCollapsed`, true);
       }
-    } else {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'שגיאה בביטול התראה');
-    }
-  } catch (error) {
-    console.error('שגיאה בביטול התראה:', error);
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בביטול התראה', error.message);
-    } else {
-      alert('שגיאה בביטול התראה: ' + error.message);
-    }
-  }
-}
-
-/**
- * סימון התראה כמופעלת
- */
-function markAlertAsTriggered(alertId) {
-  console.log(`סימון התראה ${alertId} כמופעלת`);
-  alert('פונקציית סימון התראה כמופעלת תתווסף בקרוב');
-}
-
-/**
- * עיצוב מטבע
- */
-function formatCurrency(amount) {
-  if (typeof amount === 'number') {
-    return `$${amount.toLocaleString('he-IL')}`;
-  }
-  return amount;
-}
-
-/**
- * עיצוב תאריך
- */
-function formatDate(dateString) {
-  try {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
-  } catch (error) {
-    return dateString;
-  }
-}
-
-/**
- * עיצוב תאריך ושעה
- */
-function formatDateTime(dateString) {
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleString('he-IL');
-  } catch (error) {
-    return dateString;
-  }
-}
-
-// ===== פונקציות פילטור טבלאות =====
-
-/**
- * פילטור טבלה לפי טקסט
- */
-function filterTable(tableId, searchTerm) {
-  const table = document.getElementById(tableId);
-  if (!table) return;
-
-  const tbody = table.querySelector('tbody');
-  if (!tbody) return;
-
-  const rows = tbody.querySelectorAll('tr');
-  const term = searchTerm.toLowerCase();
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll('td');
-    let found = false;
-
-    cells.forEach(cell => {
-      const text = cell.textContent.toLowerCase();
-      if (text.includes(term)) {
-        found = true;
-      }
-    });
-
-    if (found || term === '') {
-      row.style.display = '';
-    } else {
-      row.style.display = 'none';
     }
   });
 
-  // עדכון ספירה
-  updateTableCount(tableId);
-}
-
-/**
- * עדכון ספירת שורות בטבלה
- */
-function updateTableCount(tableId) {
-  const table = document.getElementById(tableId);
-  if (!table) return;
-
-  const tbody = table.querySelector('tbody');
-  if (!tbody) return;
-
-  const visibleRows = Array.from(tbody.querySelectorAll('tr')).filter(row =>
-    row.style.display !== 'none'
-  ).length;
-
-  // עדכון הספירה בהתאם לטבלה
-  const countElement = getCountElementForTable(tableId);
-  if (countElement) {
-    const tableName = getTableNameForTable(tableId);
-    countElement.textContent = `${visibleRows} ${tableName}`;
-  }
-}
-
-/**
- * קבלת אלמנט הספירה המתאים
- */
-function getCountElementForTable(tableId) {
-  const countMap = {
-    'usersTable': 'usersCount',
-    'accountsTable': 'accountsCount',
-    'tickersTable': 'tickersCount',
-    'tradesTable': 'tradesCount',
-    'tradePlansTable': 'tradePlansCount',
-    'alertsTable': 'alertsCount',
-    'cashFlowsTable': 'cashFlowsCount',
-    'notesTable': 'notesCount',
-    'executionsTable': 'executionsCount',
-    'userRolesTable': 'userRolesCount'
-  };
-
-  const countId = countMap[tableId];
-  return countId ? document.getElementById(countId) : null;
-}
-
-/**
- * קבלת שם הטבלה
- */
-function getTableNameForTable(tableId) {
-  const nameMap = {
-    'usersTable': 'משתמשים',
-    'accountsTable': 'חשבונות',
-    'tickersTable': 'טיקרים',
-    'tradesTable': 'טריידים',
-    'tradePlansTable': 'תוכניות טרייד',
-    'alertsTable': 'התראות',
-    'cashFlowsTable': 'תזרימי מזומנים',
-    'notesTable': 'הערות',
-    'executionsTable': 'ביצועים',
-    'userRolesTable': 'תפקידי משתמשים'
-  };
-
-  return nameMap[tableId] || '';
-}
-
-// ===== פונקציות לטעינת נתונים מבסיס הנתונים =====
-
-// משתנים גלובליים לנתונים
-let currentDataSource = null;
-let currentDataConfig = null;
-
-// הגדרות ברירת מחדל לנתונים - הוסרו הגדרות ספציפיות לתכנונים
-const DEFAULT_DATA_CONFIG = {
-  apiEndpoint: 'http://127.0.0.1:8080/api/data',
-  dataMapping: {},
-  statusMapping: {},
-  typeMapping: {},
-  defaultFilters: {}
-};
-
-// פונקציה לטעינת נתונים מבסיס הנתונים
-async function loadDataFromDatabase(config = {}) {
-  try {
-    console.log('Loading data from database with config:', config);
-
-    // מיזוג הגדרות מותאמות אישית עם ברירת המחדל
-    const dataConfig = { ...DEFAULT_DATA_CONFIG, ...config };
-    currentDataConfig = dataConfig;
-
-    // קריאה לשרת
-    const response = await fetch(dataConfig.apiEndpoint);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const rawData = await response.json();
-    console.log('Raw data from server:', rawData);
-
-    // המרת הנתונים לפורמט הנדרש לגריד
-    const processedData = processDataForGrid(rawData, dataConfig);
-    console.log('Processed data for grid:', processedData);
-
-    // שמירת הנתונים הגלובליים
-    window.rowData = processedData;
-    currentDataSource = processedData;
-
-    // עדכון הגריד אם הוא קיים
-    if (window.gridApi) {
-      updateGridData(processedData);
-      // הסטטיסטיקות יתעדכנו על ידי הפילטר
-    } else {
-      // אם הגריד לא קיים, עדכן רק את הסטטיסטיקות
-      updatePageSummaryStats(processedData);
-    }
-
-    console.log('Data loaded successfully:', processedData.length, 'items');
-    return processedData;
-
-  } catch (error) {
-    console.error('Error loading data from database:', error);
-
-    // במקרה של שגיאה, נחזיר נתוני דוגמה
-    const fallbackData = getDefaultRowData();
-    window.rowData = fallbackData;
-    currentDataSource = fallbackData;
-
-    if (window.gridApi) {
-      updateGridData(fallbackData);
-    }
-
-    return fallbackData;
-  }
-}
-
-// פונקציה להמרת נתונים לפורמט הגריד
-function processDataForGrid(rawData, config) {
-  console.log('=== processDataForGrid called ===');
-  console.log('Raw data:', rawData);
-  console.log('Config:', config);
-
-  const mapping = config.dataMapping;
-  const statusMapping = config.statusMapping;
-  const typeMapping = config.typeMapping;
-
-  const processedData = rawData.map(item => {
-    // המרת תאריך
-    const date = item[mapping.date] ? formatDate(item[mapping.date]) : 'N/A';
-
-    // המרת סטטוס
-    const rawStatus = item[mapping.status] || 'open';
-    const status = statusMapping[rawStatus] || rawStatus;
-
-    // המרת סוג
-    const rawType = item[mapping.type] || 'long';
-    const type = typeMapping[rawType] || rawType;
-
-    // המרת סכום
-    const amount = item[mapping.amount] ? formatAmount(item[mapping.amount]) : 'N/A';
-
-    // המרת מחירים
-    const target = item[mapping.target] ? formatPrice(item[mapping.target]) : 'N/A';
-    const stop = item[mapping.stop] ? formatPrice(item[mapping.stop]) : 'N/A';
-    const current = item[mapping.current] ? formatPrice(item[mapping.current]) : 'N/A';
-
-    const processedItem = {
-      ticker: item[mapping.ticker] || 'N/A',
-      date: date,
-      type: type,
-      amount: amount,
-      target: target,
-      stop: stop,
-      current: current,
-      status: status,
-      action: '⬅️',
-      account: item[mapping.account] || 'N/A'
-    };
-
-    console.log('Processed item:', processedItem);
-    return processedItem;
-  });
-
-  console.log('Final processed data:', processedData);
-  return processedData;
-}
-
-// פונקציה לעיצוב סכום
-function formatAmount(amount) {
-  if (typeof amount === 'number') {
-    return `$${amount.toLocaleString()}`;
-  }
-  return amount;
-}
-
-// פונקציה לעיצוב מחיר
-function formatPrice(price) {
-  if (typeof price === 'number') {
-    return `$${price.toFixed(2)}`;
-  }
-  return price;
-}
-
-// פונקציה לקבלת נתונים לפי סוג
-async function loadDataByType(dataType, customConfig = {}) {
-  console.log('=== loadDataByType called ===');
-  console.log('Data type:', dataType);
-  console.log('Custom config:', customConfig);
-
-  const dataTypes = {
-    'tradeplans': {
-      apiEndpoint: 'http://127.0.0.1:8080/api/tradeplans',
-      dataMapping: {
-        ticker: 'ticker',
-        date: 'created_at',
-        type: 'investment_type',
-        amount: 'planned_amount',
-        target: 'target_price',
-        stop: 'stop_price',
-        current: 'current_price',
-        status: 'status',
-        action: 'action',
-        account: 'account_name'
-      }
-    },
-    'trades': {
-      apiEndpoint: 'http://127.0.0.1:8080/api/trades',
-      dataMapping: {
-        ticker: 'ticker',
-        date: 'created_at',
-        type: 'type',
-        amount: 'total_pl',
-        target: 'target_price',
-        stop: 'stop_price',
-        current: 'current_price',
-        status: 'status',
-        action: 'action',
-        account: 'account_name'
-      }
-    },
-    'alerts': {
-      apiEndpoint: 'http://127.0.0.1:8080/api/alerts',
-      dataMapping: {
-        ticker: 'ticker',
-        date: 'created_at',
-        type: 'alert_type',
-        amount: 'condition',
-        target: 'target_price',
-        stop: 'stop_price',
-        current: 'current_price',
-        status: 'status',
-        action: 'action',
-        account: 'account_name'
-      }
-    }
-  };
-
-  const config = dataTypes[dataType];
-  if (!config) {
-    console.error('Unknown data type:', dataType);
-    return null;
+  // עדכון האייקון
+  if (icon) {
+    icon.textContent = allCollapsed ? '▼' : '▲';
   }
 
-  // מיזוג עם הגדרות מותאמות אישית
-  const finalConfig = { ...config, ...customConfig };
-  console.log('Final config:', finalConfig);
-
-  const result = await loadDataFromDatabase(finalConfig);
-  console.log('loadDataByType result:', result);
-
-  return result;
+  console.log(`📖 All sections ${allCollapsed ? 'expanded' : 'collapsed'}`);
 }
 
-// פונקציה לקבלת מידע על מקור הנתונים הנוכחי
-function getCurrentDataSourceInfo() {
-  return {
-    dataSource: currentDataSource,
-    config: currentDataConfig,
-    count: currentDataSource ? currentDataSource.length : 0
-  };
-}
-
-// פונקציה לבדיקת זמינות השרת
-async function checkServerAvailability() {
-  try {
-    const response = await fetch('http://127.0.0.1:8080/api/tradeplans');
-    return response.ok;
-  } catch (error) {
-    console.error('Server not available:', error);
-    return false;
-  }
-}
-
-// ===== פונקציות אתחול גריד =====
-
-/**
- * פונקציה לאתחול מלא של מערכת הגריד
- */
-async function initializeGridSystem(containerId = '#agGridFloating', customOptions = {}) {
-  console.log('=== Initializing Grid System ===');
-
-  try {
-    // 1. אתחול נתונים
-    console.log('1. Initializing data...');
-    const data = await initializeData();
-
-    // 2. יצירת הגריד
-    console.log('2. Creating grid...');
-    const gridOptions = createGrid(containerId, data, customOptions);
-
-    if (!gridOptions) {
-      console.error('Failed to create grid');
-      return false;
-    }
-
-    // 3. אתחול מערכת הפילטרים
-    console.log('3. Initializing filter system...');
-    initializeFilterSystem();
-
-    // 4. טעינת פילטרים שמורים
-    console.log('4. Loading saved filters...');
-    const savedFilters = loadSavedFilters();
-    if (savedFilters && savedFilters.statuses) {
-      console.log('Found saved filters, will apply after grid creation:', savedFilters);
-      window.pendingFilter = savedFilters.statuses;
-    }
-
-    // 5. עדכון סטטיסטיקות
-    console.log('5. Updating statistics...');
-    updatePageSummaryStats(data);
-
-    console.log('=== Grid System Initialized Successfully ===');
-    return true;
-
-  } catch (error) {
-    console.error('Error initializing grid system:', error);
-    return false;
-  }
-}
-
-/**
- * פונקציה לאתחול מהיר של גריד בסיסי
- */
-function initializeBasicGrid(containerId = '#agGridFloating') {
-  console.log('=== Initializing Basic Grid ===');
-
-  try {
-    // שימוש בנתוני דוגמה
-    const data = getDefaultRowData();
-    window.rowData = data;
-
-    // יצירת גריד בסיסי
-    const gridOptions = createGrid(containerId, data);
-
-    if (gridOptions) {
-      console.log('Basic grid initialized successfully');
-      return true;
-    } else {
-      console.error('Failed to initialize basic grid');
-      return false;
-    }
-
-  } catch (error) {
-    console.error('Error initializing basic grid:', error);
-    return false;
-  }
-}
-
-/**
- * פונקציה ליצירת גריד עם פילטרים מותאמים אישית
- */
-function initializeGridWithFilters(containerId = '#agGridFloating', filters = {}) {
-  console.log('=== Initializing Grid with Custom Filters ===');
-
-  try {
-    // טעינת נתונים עם פילטרים
-    const data = getDefaultRowData();
-    window.rowData = data;
-
-    // יצירת הגריד
-    const gridOptions = createGrid(containerId, data);
-
-    if (gridOptions) {
-      // החלת פילטרים מותאמים אישית
-      if (filters.statuses) {
-        applyStatusFilterToGrid(filters.statuses, filters.accounts);
-      }
-
-      console.log('Grid with custom filters initialized successfully');
-      return true;
-    } else {
-      console.error('Failed to initialize grid with filters');
-      return false;
-    }
-
-  } catch (error) {
-    console.error('Error initializing grid with filters:', error);
-    return false;
-  }
-}
-
-/**
- * פונקציה לבדיקת זמינות המערכת
- */
-function checkSystemAvailability() {
-  console.log('=== Checking System Availability ===');
-
-  const checks = {
-    agGrid: typeof agGrid !== 'undefined',
-    gridApi: !!window.gridApi,
-    rowData: !!window.rowData,
-    filterSystem: typeof applyStatusFilterToGrid === 'function',
-    dataSystem: typeof getDefaultRowData === 'function'
-  };
-
-  console.log('System availability:', checks);
-
-  const allAvailable = Object.values(checks).every(check => check);
-  console.log('All systems available:', allAvailable);
-
-  return allAvailable;
-}
-
-/**
- * פונקציה לרענון מלא של המערכת
- */
-async function refreshGridSystem() {
-  console.log('=== Refreshing Grid System ===');
-
-  try {
-    // רענון נתונים
-    const newData = await refreshData();
-
-    // רענון הגריד
-    if (window.gridApi) {
-      refreshGrid();
-    }
-
-    // רענון סטטיסטיקות
-    updatePageSummaryStats(newData);
-
-    console.log('Grid system refreshed successfully');
-    return true;
-
-  } catch (error) {
-    console.error('Error refreshing grid system:', error);
-    return false;
-  }
-}
-
-/**
- * פונקציה לניקוי המערכת
- */
-function clearGridSystem() {
-  console.log('=== Clearing Grid System ===');
-
-  try {
-    // ניקוי הגריד
-    clearGrid();
-
-    // ניקוי נתונים
-    clearDataFromLocalStorage();
-
-    // ניקוי פילטרים
-    clearTestFilter();
-
-    console.log('Grid system cleared successfully');
-    return true;
-
-  } catch (error) {
-    console.error('Error clearing grid system:', error);
-    return false;
-  }
-}
-
-// ===== פונקציות מקוריות מ-main.js =====
-
-document.addEventListener('DOMContentLoaded', () => {
-  const gridDiv = document.querySelector("#agGrid");
-  if (!gridDiv) return;
-
-  const columnDefs = [
-    {
-      headerName: "נכס",
-      field: "ticker",
-      cellRenderer: params => `<a href="#" onclick="openPlanDetails('${params.value}'); return false;">${params.value}</a>`
-    },
-    { headerName: "תאריך", field: "date" },
-    { headerName: "סוג השקעה", field: "type" },
-    { headerName: "סכום/כמות", field: "amount" },
-    { headerName: "יעד", field: "target" },
-    { headerName: "סטופ", field: "stop" },
-    { headerName: "נוכחי", field: "current" },
-    { headerName: "סטטוס", field: "status" },
-    { headerName: "המרה לטרייד", field: "action", cellRenderer: () => '⬅️' }
-  ];
-
-  const rowData = [
-    { ticker: "AAPL", date: "2025-08-01", type: "סווינג", amount: "$25,000 (#100)", target: "$210 (12.3%)", stop: "$180 (-6.7%)", current: "$184.32 (+1.2%)", status: "פתוח", action: "" },
-    { ticker: "TSLA", date: "2025-07-30", type: "השקעה", amount: "$20,000 (#100)", target: "$780 (10.1%)", stop: "$690 (-4.8%)", current: "$688.90 (-2.1%)", status: "סגור", action: "" },
-    { ticker: "NVDA", date: "2025-07-28", type: "השקעה", amount: "$15,000 (#75)", target: "$540 (8.2%)", stop: "$480 (-4.5%)", current: "$503.20 (+0.5%)", status: "פתוח", action: "" },
-    { ticker: "AMZN", date: "2025-07-27", type: "פאסיבי", amount: "$10,000 (#50)", target: "$140 (6.3%)", stop: "$126 (-3.1%)", current: "$129.00 (-1.0%)", status: "מבוטל", action: "" },
-    { ticker: "GOOG", date: "2025-07-26", type: "השקעה", amount: "$20,000 (#60)", target: "$148 (9.0%)", stop: "$130 (-3.4%)", current: "$141.00 (+1.6%)", status: "פתוח", action: "" },
-    { ticker: "MSFT", date: "2025-07-25", type: "סווינג", amount: "$18,000 (#90)", target: "$355 (11.2%)", stop: "$320 (-4.2%)", current: "$342.00 (+2.4%)", status: "סגור", action: "" }
-  ];
-
-  const gridOptions = {
-    columnDefs,
-    rowData,
-    defaultColDef: {
-      sortable: true,
-      filter: true,
-      resizable: true
-    }
-  };
-
-  agGrid.createGrid(gridDiv, gridOptions);
-});
-
-function openPlanDetails(ticker = null) {
-  const modal = document.getElementById("planModal");
-  const content = document.getElementById("planDetailsContent");
-
-  // קבלת תאריך נוכחי
-  const today = new Date().toISOString().split('T')[0];
-
-  if (ticker) {
-    // עריכת תכנון קיים
-    content.innerHTML = `<h2>עריכת תכנון - ${ticker}</h2>
-      <form id="planForm">
-        <div class="form-group">
-          <label>נכס:</label>
-          <input type="text" value="${ticker}" readonly>
-        </div>
-        <div class="form-group">
-          <label>תאריך:</label>
-          <input type="date" value="${today}">
-        </div>
-        <div class="form-group">
-          <label>סוג השקעה:</label>
-          <select>
-            <option value="סווינג">סווינג</option>
-            <option value="השקעה">השקעה</option>
-            <option value="פאסיבי">פאסיבי</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>סכום השקעה:</label>
-          <input type="number" placeholder="הכנס סכום">
-        </div>
-        <div class="form-group">
-          <label>כמות מניות:</label>
-          <input type="number" placeholder="הכנס כמות">
-        </div>
-        <div class="form-group">
-          <label>מחיר יעד:</label>
-          <input type="number" step="0.01" placeholder="הכנס מחיר יעד">
-        </div>
-        <div class="form-group">
-          <label>מחיר סטופ:</label>
-          <input type="number" step="0.01" placeholder="הכנס מחיר סטופ">
-        </div>
-        <div class="form-actions">
-          <button type="submit">שמור</button>
-          <button type="button" onclick="closePlanDetails()">ביטול</button>
-        </div>
-      </form>`;
-  } else {
-    // הוספת תכנון חדש
-    content.innerHTML = `<h2>הוספת תכנון חדש</h2>
-      <form id="planForm">
-        <div class="form-group">
-          <label>נכס:</label>
-          <input type="text" placeholder="הכנס סימול הנכס">
-        </div>
-        <div class="form-group">
-          <label>תאריך:</label>
-          <input type="date" value="${today}">
-        </div>
-        <div class="form-group">
-          <label>סוג השקעה:</label>
-          <select>
-            <option value="סווינג">סווינג</option>
-            <option value="השקעה">השקעה</option>
-            <option value="פאסיבי">פאסיבי</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>סכום השקעה:</label>
-          <input type="number" placeholder="הכנס סכום">
-        </div>
-        <div class="form-group">
-          <label>כמות מניות:</label>
-          <input type="number" placeholder="הכנס כמות">
-        </div>
-        <div class="form-group">
-          <label>מחיר יעד:</label>
-          <input type="number" step="0.01" placeholder="הכנס מחיר יעד">
-        </div>
-        <div class="form-group">
-          <label>מחיר סטופ:</label>
-          <input type="number" step="0.01" placeholder="הכנס מחיר סטופ">
-        </div>
-        <div class="form-actions">
-          <button type="submit">שמור</button>
-          <button type="button" onclick="closePlanDetails()">ביטול</button>
-        </div>
-      </form>`;
-  }
-
-  modal.style.display = "block";
-}
-
-function closePlanDetails() {
-  document.getElementById("planModal").style.display = "none";
-}
-
-// ===== פונקציות עריכה ומחיקה =====
-
-// פונקציה לעריכת רשומה
-function editRecord(tableType, recordId) {
-  console.log(`עריכת ${tableType} עם מזהה ${recordId}`);
-  alert(`פונקציית עריכה עבור ${tableType} עם מזהה ${recordId} תתווסף בקרוב`);
-}
-
-// פונקציה למחיקת רשומה
-function deleteRecord(tableType, recordId) {
-  console.log(`מחיקת ${tableType} עם מזהה ${recordId}`);
-  if (confirm('האם אתה בטוח שברצונך למחוק רשומה זו?')) {
-    alert(`פונקציית מחיקה עבור ${tableType} עם מזהה ${recordId} תתווסף בקרוב`);
-  }
-}
-
-// פונקציה לשמירת רשומה
-function saveRecord(tableType) {
-  console.log(`שמירת ${tableType}`);
-  alert(`פונקציית שמירה עבור ${tableType} תתווסף בקרוב`);
-}
-
-// פונקציה לביטול רשומה
-function cancelRecord(tableType, recordId) {
-  console.log(`ביטול ${tableType} עם מזהה ${recordId}`);
-
-  if (tableType === 'trades') {
-    // ביטול טרייד - שינוי סטטוס לבוטל
-    if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
-      // קריאה לפונקציה הספציפית לדף
-      if (typeof window.cancelTrade === 'function') {
-        window.cancelTrade(recordId);
-      } else {
-        alert('פונקציית ביטול טרייד לא זמינה');
-      }
-    }
-  } else if (tableType === 'trade_plans') {
-    // ביטול תוכנית טרייד - העברה לפונקציה הספציפית
-    if (typeof window.cancelTradePlan === 'function') {
-      window.cancelTradePlan(recordId);
-    } else {
-      alert('פונקציית ביטול תוכנית טרייד לא זמינה');
-    }
-  } else {
-    alert('ביטול לא נתמך עבור סוג זה של רשומה');
-  }
-}
-
-// פונקציה להצגת הודעות - הוסרה כפילות, משתמשים במערכת ההתראות המתקדמת למעלה
-
-// ===== הוספת הפונקציות החדשות לגלובל =====
-
-// הוספת הפונקציות החדשות לגלובל
-window.apiCall = apiCall;
-window.editRecord = editRecord;
-window.deleteRecord = deleteRecord;
-window.saveRecord = saveRecord;
-window.cancelRecord = cancelRecord;
-window.showEditAlertModal = showEditAlertModal;
-window.cancelAlert = cancelAlert;
-window.markAlertAsTriggered = markAlertAsTriggered;
-window.formatCurrency = formatCurrency;
-window.formatDate = formatDate;
-window.formatDateTime = formatDateTime;
-window.filterTable = filterTable;
-window.updateTableCount = updateTableCount;
-window.getCountElementForTable = getCountElementForTable;
-window.getTableNameForTable = getTableNameForTable;
+// חשיפת הפונקציות הגלובליות
 window.toggleSection = toggleSection;
 window.toggleAllSections = toggleAllSections;
-window.showNotification = showNotification;
-window.showSuccessNotification = showSuccessNotification;
-window.showErrorNotification = showErrorNotification;
-window.showWarningNotification = showWarningNotification;
-window.showInfoNotification = showInfoNotification;
 
-// פונקציות התראות בתוך מודול
-window.showModalNotification = showModalNotification;
-window.showModalSuccessNotification = showModalSuccessNotification;
-window.showModalErrorNotification = showModalErrorNotification;
-window.showModalWarningNotification = showModalWarningNotification;
-window.showModalInfoNotification = showModalInfoNotification;
-
-// פונקציות נתונים
-window.getDefaultRowData = getDefaultRowData;
-window.loadPlansFromServer = loadPlansFromServer;
-window.updatePageSummaryStats = updatePageSummaryStats;
-window.updateStatsDisplay = updateStatsDisplay;
-window.loadDataFromDatabase = loadDataFromDatabase;
-window.processDataForGrid = processDataForGrid;
-window.loadDataByType = loadDataByType;
-window.getCurrentDataSourceInfo = getCurrentDataSourceInfo;
-window.checkServerAvailability = checkServerAvailability;
-
-// פונקציות אתחול גריד
-window.initializeGridSystem = initializeGridSystem;
-window.initializeBasicGrid = initializeBasicGrid;
-window.initializeGridWithFilters = initializeGridWithFilters;
-window.checkSystemAvailability = checkSystemAvailability;
-window.refreshGridSystem = refreshGridSystem;
-window.clearGridSystem = clearGridSystem;
-
-// פונקציה לטעינת מצב הסקשנים לפי הדף הנוכחי
-function loadSectionStates() {
-  const currentPath = window.location.pathname;
-  let pageName = 'default';
-
-  if (currentPath.includes('/database')) {
-    pageName = 'database';
-  } else if (currentPath.includes('/accounts')) {
-    pageName = 'accounts';
-  } else if (currentPath.includes('/tickers')) {
-    pageName = 'tickers';
-  } else if (currentPath.includes('/trade_plans')) {
-    pageName = 'trade_plans';
-  } else if (currentPath.includes('/planning')) {
-    pageName = 'planning';
-  } else if (currentPath.includes('/designs')) {
-    pageName = 'designs';
-  } else if (currentPath.includes('/notes')) {
-    pageName = 'notes';
-  } else if (currentPath.includes('/alerts')) {
-    pageName = 'alerts';
-  }
-
+/**
+ * פונקציה לשחזור המצב השמור של הסקשנים
+ */
+function restoreSectionStates() {
+  console.log('🔄 Restoring section states from localStorage');
+  
   const sections = document.querySelectorAll('.content-section');
+  
   sections.forEach(section => {
-    const sectionId = section.id;
-    const icon = section.querySelector('.filter-icon');
-
-    if (icon) {
-      const storageKey = `${pageName}_${sectionId}Collapsed`;
+    const sectionId = section.getAttribute('data-section');
+    const sectionBody = section.querySelector('.section-body');
+    const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"]`);
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+    
+    if (sectionId && sectionBody) {
+      const storageKey = `${sectionId}SectionCollapsed`;
       const isCollapsed = localStorage.getItem(storageKey) === 'true';
-
+      
       if (isCollapsed) {
-        section.classList.add('collapsed');
-        icon.textContent = '▼';
+        sectionBody.classList.add('collapsed');
+        sectionBody.style.display = 'none';
+        if (icon) {
+          icon.textContent = '▼';
+        }
+        console.log(`📖 Section ${sectionId} restored as collapsed`);
       } else {
-        section.classList.remove('collapsed');
-        icon.textContent = '▲';
+        sectionBody.classList.remove('collapsed');
+        sectionBody.style.display = 'block';
+        if (icon) {
+          icon.textContent = '▲';
+        }
+        console.log(`📖 Section ${sectionId} restored as expanded`);
       }
     }
   });
 }
 
-window.loadSectionStates = loadSectionStates;
-
-// ===== פונקציות גלובליות לסגירת סקשנים =====
-// הפונקציות מוגדרות בתחילת הקובץ כפונקציות גלובליות
-
-// וידוא שהפונקציות זמינות מיד
-console.log('✅ Global toggle functions loaded and ready:', {
-  toggleTopSection: typeof window.toggleTopSection,
-  toggleMainSection: typeof window.toggleMainSection,
-  restoreAllSectionStates: typeof window.restoreAllSectionStates
+// הוספת event listener לטעינת המצב השמור
+document.addEventListener('DOMContentLoaded', function() {
+  // המתנה קצרה לוודא שהדף נטען לחלוטין
+  setTimeout(() => {
+    restoreSectionStates();
+  }, 100);
 });
 
-// ניקוי הודעות קונסולה אחרי זמן קצר
-setTimeout(() => {
-  console.log('🧹 Clearing console messages to reduce clutter...');
-  if (console.clear) {
-    console.clear();
-  }
-}, 20000);
-
-// אתחול אוטומטי של הגדרות תצוגה בדף הערות
-if (typeof window.autoResetNotesDisplay === 'function') {
-  window.autoResetNotesDisplay();
-}
-
-// אתחול אוטומטי כשהדף נטען
-document.addEventListener('DOMContentLoaded', function () {
-  if (typeof window.autoResetNotesDisplay === 'function') {
-    window.autoResetNotesDisplay();
-  }
-});
-
-// ===== פונקציות סידור טבלאות גלובליות =====
-/**
- * מערכת סידור טבלאות גלובלית
- * 
- * מערכת זו מספקת פונקציונליות סידור אחידה לכל הטבלאות באתר.
- * 
- * תכונות:
- * - סידור לפי כל סוגי הנתונים (טקסט, מספרים, תאריכים, סטטוסים)
- * - שמירת מצב הסידור ב-localStorage
- * - אייקונים דינמיים המציגים כיוון הסידור
- * - תמיכה במבני נתונים שונים (אובייקטים, מחרוזות)
- * 
- * שימוש:
- * 1. הוסף class="sortable-header" לכפתורי הכותרות
- * 2. הוסף <span class="sort-icon">↕</span> בתוך הכפתור
- * 3. קרא ל-sortTableData עם הפרמטרים הנכונים
- * 
- * דוגמה:
- * <button class="sortable-header" onclick="sortTable(0)">
- *   <span class="sort-icon">↕</span>כותרת
- * </button>
- * 
- * @author TikTrack Development Team
- * @version 2.0
- * @since 2025-08-21
- */
-
-// משתנים גלובליים לסידור
-window.currentSortColumn = -1;
-window.currentSortDirection = 'asc';
-
-/**
- * פונקציה גלובלית לסידור טבלאות
- * 
- * פונקציה זו מבצעת סידור של נתונים לפי עמודה מסוימת ומעדכנת את הטבלה.
- * הפונקציה תומכת בסידור עולה ויורד, שומרת את המצב ב-localStorage,
- * ומעדכנת את אייקוני הסידור.
- * 
- * @param {number} columnIndex - אינדקס העמודה לסידור (0-8)
- * @param {Array} data - מערך הנתונים לסידור
- * @param {string} pageName - שם הדף לשמירת מצב (למשל: 'planning', 'alerts')
- * @param {Function} updateTableFunction - פונקציה לעדכון הטבלה עם הנתונים המסודרים
- * @returns {Array} הנתונים המסודרים
- * 
- * @example
- * // סידור טבלת תכנונים לפי עמודת נכס
- * const sortedData = sortTableData(0, designsData, 'planning', updateDesignsTable);
- * 
- * @throws {Error} אם הפונקציה updateTableFunction לא קיימת
- * 
- * @since 2.0
- */
-/**
- * Sort table data globally
- * 
- * This is the global table sorting function used across all pages.
- * It provides unified sorting functionality for different data types
- * including text, numbers, dates, and statuses.
- * 
- * @param {number} columnIndex - Index of the column to sort by
- * @param {Array} data - Array of data objects to sort
- * @param {string} pageName - Name of the current page for state management
- * @param {Function} updateTableFunction - Function to call after sorting to update the table
- * @returns {Array} Sorted data array
- * 
- * Features:
- * - Automatic data type detection
- * - Hebrew text sorting support
- * - State persistence in localStorage
- * - Dynamic sort direction toggling
- * - Comprehensive error handling
- */
-function sortTableData(columnIndex, data, pageName, updateTableFunction) {
-  console.log(`🔄 === SORT TABLE (${pageName}) ===`);
-  console.log('🔄 Column clicked:', columnIndex);
-
-  // קבלת הנתונים הנוכחיים
-  let sortedData = [...data];
-
-  // עדכון כיוון הסידור
-  if (window.currentSortColumn === columnIndex) {
-    window.currentSortDirection = window.currentSortDirection === 'asc' ? 'desc' : 'asc';
-  } else {
-    window.currentSortColumn = columnIndex;
-    window.currentSortDirection = 'asc';
-  }
-
-  // מיון הנתונים
-  sortedData.sort((a, b) => {
-    let aValue, bValue;
-
-    // טיפול מיוחד לדף תכנון
-    if (pageName === 'trade_plans') {
-      switch (columnIndex) {
-        case 0: // חשבון
-          aValue = (a.account_name || a.account_id || '').toLowerCase();
-          bValue = (b.account_name || b.account_id || '').toLowerCase();
-          break;
-        case 1: // טיקר
-          aValue = (a.ticker_symbol || a.symbol || '').toLowerCase();
-          bValue = (b.ticker_symbol || b.symbol || '').toLowerCase();
-          break;
-        case 2: // תוכנית
-          aValue = (a.trade_plan_id || '').toString();
-          bValue = (b.trade_plan_id || '').toString();
-          break;
-        case 3: // סטטוס
-          aValue = getStatusForSort(a.status);
-          bValue = getStatusForSort(b.status);
-          break;
-        case 4: // סוג
-          aValue = (a.type || '').toLowerCase();
-          bValue = (b.type || '').toLowerCase();
-          break;
-        case 5: // צד
-          aValue = (a.side || 'Long').toLowerCase();
-          bValue = (b.side || 'Long').toLowerCase();
-          break;
-        case 6: // נוצר ב
-          aValue = new Date(a.created_at || '').getTime();
-          bValue = new Date(b.created_at || '').getTime();
-          break;
-        case 7: // נסגר ב
-          aValue = new Date(a.closed_at || a.cancelled_at || '').getTime();
-          bValue = new Date(b.closed_at || b.cancelled_at || '').getTime();
-          break;
-        case 8: // רווח/הפסד
-          aValue = parseFloat(a.total_pl) || 0;
-          bValue = parseFloat(b.total_pl) || 0;
-          break;
-        case 9: // הערות
-          aValue = (a.notes || '').toLowerCase();
-          bValue = (b.notes || '').toLowerCase();
-          break;
-        default:
-          return 0;
-      }
-    } else {
-      // טיפול כללי לשאר הדפים
-      switch (columnIndex) {
-        case 0: // נכס (Ticker)
-          aValue = getTickerValue(a).toLowerCase();
-          bValue = getTickerValue(b).toLowerCase();
-          break;
-        case 1: // תאריך
-          aValue = new Date(getDateValue(a)).getTime();
-          bValue = new Date(getDateValue(b)).getTime();
-          break;
-        case 2: // סוג
-          aValue = getTypeValue(a).toLowerCase();
-          bValue = getTypeValue(b).toLowerCase();
-          break;
-        case 3: // צד
-          aValue = (getSideValue(a) || 'Long').toLowerCase();
-          bValue = (getSideValue(b) || 'Long').toLowerCase();
-          break;
-        case 4: // סכום
-          aValue = parseFloat(getAmountValue(a)) || 0;
-          bValue = parseFloat(getAmountValue(b)) || 0;
-          break;
-        case 5: // יעד
-          aValue = parseFloat(getTargetValue(a)) || 0;
-          bValue = parseFloat(getTargetValue(b)) || 0;
-          break;
-        case 6: // סטופ
-          aValue = parseFloat(getStopValue(a)) || 0;
-          bValue = parseFloat(getStopValue(b)) || 0;
-          break;
-        case 7: // נוכחי
-          aValue = parseFloat(getCurrentValue(a)) || 0;
-          bValue = parseFloat(getCurrentValue(b)) || 0;
-          break;
-        case 8: // סטטוס
-          aValue = getStatusForSort(getStatusValue(a));
-          bValue = getStatusForSort(getStatusValue(b));
-          break;
-        default:
-          return 0;
-      }
-    }
-
-    // השוואה
-    if (aValue < bValue) {
-      return window.currentSortDirection === 'asc' ? -1 : 1;
-    } else if (aValue > bValue) {
-      return window.currentSortDirection === 'asc' ? 1 : -1;
-    } else {
-      return 0;
-    }
-  });
-
-  // עדכון הטבלה
-  if (typeof updateTableFunction === 'function') {
-    updateTableFunction(sortedData);
-  }
-
-  // עדכון אייקונים
-  updateTableSortIcons(columnIndex, pageName);
-
-  // שמירת מצב המיון ב-localStorage
-  localStorage.setItem(`${pageName}SortColumn`, columnIndex.toString());
-  localStorage.setItem(`${pageName}SortDirection`, window.currentSortDirection);
-
-  return sortedData;
-}
-
-/**
- * פונקציות עזר לחילוץ ערכים מנתונים
- */
-
-/**
- * חילוץ ערך ticker מפריט נתונים
- * 
- * @param {Object} item - פריט הנתונים
- * @returns {string} ערך ה-ticker (symbol או name)
- * 
- * @example
- * getTickerValue({ticker: {symbol: 'AAPL', name: 'Apple Inc.'}}) // 'AAPL'
- * getTickerValue({ticker: 'AAPL'}) // 'AAPL'
- */
-function getTickerValue(item) {
-  if (item.ticker && typeof item.ticker === 'object') {
-    return item.ticker.symbol || item.ticker.name || '';
-  }
-  return item.ticker || item.ticker_symbol || item.symbol || '';
-}
-
-/**
- * חילוץ ערך תאריך מפריט נתונים
- * 
- * @param {Object} item - פריט הנתונים
- * @returns {string} ערך התאריך
- * 
- * @example
- * getDateValue({created_at: '2025-08-21'}) // '2025-08-21'
- * getDateValue({date: '2025-08-21'}) // '2025-08-21'
- */
-function getDateValue(item) {
-  return item.created_at || item.date || '';
-}
-
-/**
- * חילוץ ערך סוג מפריט נתונים
- * 
- * @param {Object} item - פריט הנתונים
- * @returns {string} ערך הסוג
- * 
- * @example
- * getTypeValue({investment_type: 'swing'}) // 'swing'
- * getTypeValue({type: 'investment'}) // 'investment'
- */
-function getTypeValue(item) {
-  return item.investment_type || item.type || item.trade_type || '';
-}
-
-/**
- * חילוץ ערך צד מפריט נתונים
- * 
- * @param {Object} item - פריט הנתונים
- * @returns {string} ערך הצד (ברירת מחדל: 'Long')
- * 
- * @example
- * getSideValue({side: 'Short'}) // 'Short'
- * getSideValue({}) // 'Long'
- */
-function getSideValue(item) {
-  return item.side || 'Long';
-}
-
-/**
- * חילוץ ערך סכום מפריט נתונים
- * 
- * @param {Object} item - פריט הנתונים
- * @returns {number} ערך הסכום (ברירת מחדל: 0)
- * 
- * @example
- * getAmountValue({planned_amount: 1000}) // 1000
- * getAmountValue({amount: 500}) // 500
- */
-function getAmountValue(item) {
-  return item.planned_amount || item.amount || 0;
-}
-
-/**
- * חילוץ ערך יעד מפריט נתונים
- * 
- * @param {Object} item - פריט הנתונים
- * @returns {number} ערך היעד (ברירת מחדל: 0)
- * 
- * @example
- * getTargetValue({target_price: 150}) // 150
- * getTargetValue({target: 200}) // 200
- */
-function getTargetValue(item) {
-  return item.target_price || item.target || 0;
-}
-
-/**
- * חילוץ ערך סטופ מפריט נתונים
- * 
- * @param {Object} item - פריט הנתונים
- * @returns {number} ערך הסטופ (ברירת מחדל: 0)
- * 
- * @example
- * getStopValue({stop_price: 100}) // 100
- * getStopValue({stop: 90}) // 90
- */
-function getStopValue(item) {
-  return item.stop_price || item.stop || 0;
-}
-
-/**
- * חילוץ ערך נוכחי מפריט נתונים
- * 
- * @param {Object} item - פריט הנתונים
- * @returns {number} הערך הנוכחי (ברירת מחדל: 0)
- * 
- * @example
- * getCurrentValue({current_price: 120}) // 120
- * getCurrentValue({current: 110}) // 110
- */
-function getCurrentValue(item) {
-  return item.current_price || item.current || 0;
-}
-
-/**
- * חילוץ ערך סטטוס מפריט נתונים
- * 
- * @param {Object} item - פריט הנתונים
- * @returns {string} ערך הסטטוס
- * 
- * @example
- * getStatusValue({status: 'open'}) // 'open'
- * getStatusValue({status: 'closed'}) // 'closed'
- */
-function getStatusValue(item) {
-  return item.status || '';
-}
-
-/**
- * פונקציה לקבלת ערך מספרי לסטטוס לסידור
- * 
- * ממירה סטטוסים טקסטואליים לערכים מספריים לצורך סידור עקבי.
- * 
- * @param {string} status - הסטטוס לסידור
- * @returns {number} ערך מספרי לסידור (1=open, 2=closed, 3=cancelled, 0=אחר)
- * 
- * @example
- * getStatusForSort('open') // 1
- * getStatusForSort('closed') // 2
- * getStatusForSort('cancelled') // 3
- * getStatusForSort('unknown') // 0
- */
-function getStatusForSort(status) {
-  switch (status) {
-    case 'open': return 1;
-    case 'closed': return 2;
-    case 'cancelled': return 3;
-    case 'cancelled': return 3;
-    default: return 0;
-  }
-}
-
-/**
- * פונקציה לעדכון אייקוני המיון
- * 
- * מעדכנת את אייקוני הסידור בטבלה לפי העמודה הפעילה וכיוון הסידור.
- * 
- * @param {number} activeColumnIndex - אינדקס העמודה הפעילה
- * @param {string} pageName - שם הדף (לא בשימוש כרגע)
- * 
- * @example
- * updateSortIcons(0, 'planning'); // מעדכן אייקון בעמודה הראשונה
- */
-/**
- * Update table sorting icons
- * 
- * This function updates the visual indicators (arrows) in table headers
- * to show the current sorting state. It manages the display of sort icons
- * across all tables in the application.
- * 
- * @param {number} activeColumnIndex - Index of the currently sorted column (-1 for no sorting)
- * @param {string} pageName - Name of the current page for state management
- * @returns {void}
- * 
- * Features:
- * - Visual feedback for sort state
- * - Consistent icon display across all tables
- * - Automatic icon positioning and styling
- * - Integration with global sorting system
- */
-function updateTableSortIcons(activeColumnIndex, pageName) {
-  const buttons = document.querySelectorAll('.sortable-header');
-
-  buttons.forEach((button, index) => {
-    const sortIcon = button.querySelector('.sort-icon');
-    if (sortIcon) {
-      if (index === activeColumnIndex) {
-        const iconText = window.currentSortDirection === 'asc' ? '↑' : '↓';
-        sortIcon.textContent = iconText;
-        sortIcon.style.color = '#ff9c05';
-        button.classList.add('active-sort');
-      } else {
-        sortIcon.textContent = '↕';
-        sortIcon.style.color = '#999';
-        button.classList.remove('active-sort');
-      }
-    }
-  });
-}
-
-/**
- * פונקציה לטעינת מצב המיון מ-localStorage
- * 
- * טוענת את מצב הסידור השמור ומעדכנת את האייקונים בהתאם.
- * 
- * @param {string} pageName - שם הדף לטעינת המצב
- * 
- * @example
- * loadSortState('planning'); // טוען מצב סידור לדף תכנונים
- */
-function loadSortState(pageName) {
-  const savedColumn = localStorage.getItem(`${pageName}SortColumn`);
-  const savedDirection = localStorage.getItem(`${pageName}SortDirection`);
-
-  if (savedColumn !== null) {
-    window.currentSortColumn = parseInt(savedColumn);
-    window.currentSortDirection = savedDirection || 'asc';
-
-    // עדכון אייקונים
-    updateTableSortIcons(window.currentSortColumn, pageName);
-  }
-}
-
-// ייצוא הפונקציות הגלובליות
-window.sortTableData = sortTableData;
-window.getStatusForSort = getStatusForSort;
-window.updateTableSortIcons = updateTableSortIcons;
-window.loadSortState = loadSortState;
-
-// ===== סיום הקובץ =====
+// חשיפת הפונקציה הגלובלית
+window.restoreSectionStates = restoreSectionStates;

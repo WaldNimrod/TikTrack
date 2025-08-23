@@ -16,8 +16,11 @@
  * - Can be disabled by setting interval to 0
  * - Available intervals: 30s, 60s, 2min, 5min, 10min, disabled
  * 
- * @file console-cleanup.js
- * @version 1.1
+ * Dependencies: None (standalone utility file)
+ * Dependents: All HTML pages
+ * 
+ * File: trading-ui/scripts/console-cleanup.js
+ * @version 2.2
  * @author TikTrack Development Team
  * @since August 2025
  */

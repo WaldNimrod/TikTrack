@@ -1,4 +1,25 @@
 // ===== קובץ JavaScript לדף תזרימי מזומנים =====
+/*
+ * Cash Flows.js - Cash Flows Page Management
+ * ==========================================
+ * 
+ * This file contains all cash flows management functionality for the TikTrack application.
+ * It handles cash flows CRUD operations, table updates, and user interactions.
+ * 
+ * Dependencies:
+ * - table-mappings.js (for column mappings and sorting)
+ * - main.js (global utilities and sorting functions)
+ * - translation-utils.js (translation functions)
+ * 
+ * Table Mapping:
+ * - Uses 'cash_flows' table type from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * - Sorting uses global window.sortTableData() function
+ * 
+ * File: trading-ui/scripts/cash_flows.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
 
 // משתנים גלובליים
 if (!window.cashFlowsData) {
@@ -99,7 +120,7 @@ function toggleCashFlowsSection() {
     }
 }
 
-// פונקציה לשחזור מצב הסגירה
+// פונקציות לשחזור מצב הסגירה
 function restoreCashFlowsSectionState() {
     // שחזור מצב top-section (התראות וסיכום)
     const topCollapsed = localStorage.getItem('cashFlowsTopSectionHidden') === 'true';
@@ -601,8 +622,117 @@ function formatDateTime(dateTimeString) {
 }
 
 // ========================================
+// פונקציות עדכון טבלה
+// ========================================
+
+/**
+ * עדכון טבלת תזרימי מזומנים
+ * @param {Array} cashFlows - מערך של תזרימי מזומנים
+ */
+function updateCashFlowsTable(cashFlows) {
+    console.log('🔄 עדכון טבלת תזרימי מזומנים עם', cashFlows.length, 'רשומות');
+
+    const tbody = document.querySelector('#cashFlowsTable tbody');
+    if (!tbody) {
+        console.error('❌ לא נמצא tbody לטבלת תזרימי מזומנים');
+        return;
+    }
+
+    if (cashFlows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = cashFlows.map(cashFlow => {
+        // המרת סוגים לעברית לפילטר
+        const typeForFilter = cashFlow.type === 'deposit' ? 'הפקדה' :
+            cashFlow.type === 'withdrawal' ? 'משיכה' :
+                cashFlow.type === 'dividend' ? 'דיבידנד' :
+                    cashFlow.type === 'fee' ? 'עמלה' :
+                        cashFlow.type === 'interest' ? 'ריבית' : cashFlow.type;
+
+        // המרת סטטוס לפילטר
+        const statusForFilter = cashFlow.status === 'completed' ? 'הושלם' :
+            cashFlow.status === 'pending' ? 'ממתין' :
+                cashFlow.status === 'cancelled' ? 'בוטל' : cashFlow.status;
+
+        return `
+            <tr>
+                <td data-account="${cashFlow.account_name || cashFlow.account_id || '-'}">${cashFlow.account_name || cashFlow.account_id || '-'}</td>
+                <td data-type="${typeForFilter}">${cashFlow.type}</td>
+                <td>${cashFlow.description || '-'}</td>
+                <td>${window.colorAmount(cashFlow.amount || 0, `$${cashFlow.amount ? cashFlow.amount.toLocaleString() : '0'}`)}</td>
+                <td data-status="${statusForFilter}">${cashFlow.status}</td>
+                <td data-date="${cashFlow.date}">${formatDate(cashFlow.date)}</td>
+                <td>${cashFlow.notes || '-'}</td>
+                <td>
+                    <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">X</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    // עדכון הספירה
+    const countElement = document.querySelector('.table-count');
+    if (countElement) {
+        countElement.textContent = `${cashFlows.length} תזרימי מזומנים`;
+    }
+}
+
+// הגדרת הפונקציה כגלובלית
+window.updateCashFlowsTable = updateCashFlowsTable;
+
+// ========================================
 // אתחול הדף
 // ========================================
+
+/**
+ * טעינת נתוני תזרימי מזומנים
+ */
+async function loadCashFlows() {
+    try {
+        console.log('🔄 טעינת נתוני תזרימי מזומנים...');
+
+        const response = await fetch('/api/v1/cash_flows/');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const cashFlows = data.data || data || [];
+
+        console.log('✅ נטענו', cashFlows.length, 'תזרימי מזומנים');
+
+        // עדכון המשתנה הגלובלי
+        window.cashFlowsData = cashFlows;
+        cashFlowsData = cashFlows;
+
+        // עדכון הטבלה
+        updateCashFlowsTable(cashFlows);
+
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת תזרימי מזומנים:', error);
+
+        // שימוש בנתוני דוגמה אם השרת לא זמין
+        const sampleData = [
+            {
+                id: 1,
+                account_name: 'חשבון ראשי',
+                type: 'deposit',
+                description: 'הפקדה ראשונית',
+                amount: 10000,
+                status: 'completed',
+                date: '2025-01-15',
+                notes: 'הפקדה ראשונית'
+            }
+        ];
+
+        window.cashFlowsData = sampleData;
+        cashFlowsData = sampleData;
+        updateCashFlowsTable(sampleData);
+    }
+}
 
 /**
  * אתחול הדף
@@ -616,10 +746,8 @@ async function initializeCashFlowsPage() {
     // שחזור מצב הסגירה
     restoreCashFlowsSectionState();
 
-    // טעינת מצב הסידור
-    if (typeof loadSortState === 'function') {
-        loadSortState('cashFlowsTable');
-    }
+    // שחזור מצב סידור
+    restoreSortState();
 
     console.log('✅ דף תזרימי מזומנים אותחל בהצלחה');
 }
@@ -640,3 +768,44 @@ window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
 window.saveCashFlow = saveCashFlow;
 window.updateCashFlow = updateCashFlow;
 window.confirmDeleteCashFlow = confirmDeleteCashFlow;
+
+// ===== פונקציות סידור =====
+
+/**
+ * פונקציה לסידור טבלת תזרימי מזומנים
+ * @param {number} columnIndex - אינדקס העמודה לסידור
+ * 
+ * דוגמאות שימוש:
+ * sortTable(0); // סידור לפי עמודת חשבון
+ * sortTable(2); // סידור לפי עמודת סכום
+ * sortTable(4); // סידור לפי עמודת תאריך
+ * 
+ * @requires window.sortTableData - פונקציה גלובלית מ-main.js
+ */
+function sortTable(columnIndex) {
+    console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
+
+    if (typeof window.sortTableData === 'function') {
+        const sortedData = window.sortTableData(
+            columnIndex,
+            window.cashFlowsData || [],
+            'cash_flows',
+            updateCashFlowsTable
+        );
+        console.log('✅ נתונים מסודרים:', sortedData);
+    } else {
+        console.error('❌ sortTableData function not found in main.js');
+    }
+}
+
+/**
+ * שחזור מצב סידור
+ */
+function restoreSortState() {
+    if (typeof window.restoreAnyTableSort === 'function') {
+        window.restoreAnyTableSort('cash_flows', window.cashFlowsData || [], updateCashFlowsTable);
+    }
+}
+
+// הגדרת הפונקציה כגלובלית
+window.sortTable = sortTable;

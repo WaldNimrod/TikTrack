@@ -7,12 +7,12 @@ class CashFlow(BaseModel):
     __tablename__ = "cash_flows"
     
     account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
-    type = Column(String(50), nullable=False)  # deposit, withdrawal, dividend, etc.
+    type = Column(String(50), nullable=False, default='new')  # Default per constraints
     amount = Column(Float, nullable=False)
     date = Column(Date, nullable=True)
     description = Column(String(500), nullable=True)
-    currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=True)
-    usd_rate = Column(Numeric(10, 6), nullable=True, default=1.000000)
+    currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False)  # NOT NULL per constraints
+    usd_rate = Column(Numeric(10, 6), nullable=False, default=1.000000)  # NOT NULL per constraints
     source = Column(String(20), nullable=True, default='manual')  # manual, file_import, direct_import
     external_id = Column(String(100), nullable=True, default='0')
     

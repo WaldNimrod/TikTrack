@@ -5,6 +5,9 @@
  * 
  * קומפוננט כותרת האתר עם מערכת פילטרים גלובלית
  * 
+ * Note: This file is part of the legacy header system. The current system
+ * uses header-system.js for unified header and navigation.
+ * 
  * תכונות עיקריות:
  * - ניווט בין דפים
  * - מערכת פילטרים גלובלית (סטטוס, סוג, חשבון, תאריכים, חיפוש)
@@ -17,6 +20,14 @@
  * - designs - עיצובים (כל הפילטרים)
  * - tracking - מעקב (כל הפילטרים)
  * - accounts - חשבונות (פילטרים רלוונטיים: סטטוס, חיפוש, תאריכים)
+ * 
+ * Dependencies:
+ * - main.js (global utilities)
+ * - translation-utils.js (translation functions)
+ * 
+ * File: trading-ui/scripts/app-header.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
  * 
  * מחבר: Tik.track Development Team
  * תאריך עדכון אחרון: 2025

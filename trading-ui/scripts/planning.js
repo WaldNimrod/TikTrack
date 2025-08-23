@@ -14,6 +14,16 @@
  * - Managing statuses and states
  * - Using global notification system
  * 
+ * Dependencies:
+ * - table-mappings.js (for column mappings and sorting)
+ * - main.js (for global sorting functions)
+ * - translation-utils.js (for status translations)
+ * 
+ * Table Mapping:
+ * - Uses 'planning' table type from table-mappings.js
+ * - Column mappings are centralized in table-mappings.js
+ * - Sorting uses global window.sortTableData() function
+ * 
  * Notification system:
  * - All user messages use the global notification system
  * - showSuccessNotification() - Success messages
@@ -365,17 +375,21 @@ function updateDesignsTable(designs) {
         // Displaying ticker symbol or name
         const tickerDisplay = design.ticker ? (design.ticker.symbol || design.ticker.name || 'לא מוגדר') : 'לא מוגדר';
 
+        // שמירת הערכים המקוריים באנגלית לפילטר
+        const typeForFilter = design.investment_type || '';
+        const statusForFilter = design.status || '';
+
         return `
       <tr>
         <td><span class="ticker-text">${tickerDisplay}</span></td>
-        <td><span class="date-text">${dateDisplay}</span></td>
-        <td><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
+        <td data-date="${design.created_at}"><span class="date-text">${dateDisplay}</span></td>
+        <td data-type="${typeForFilter}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
         <td><span class="side-badge ${design.side.toLowerCase()}">${sideDisplay}</span></td>
         <td><span class="amount-text">${amountDisplay}</span></td>
         <td><span class="target-text">${targetDisplay}</span></td>
         <td><span class="stop-text">${stopDisplay}</span></td>
         <td><span class="current-text">${currentDisplay}</span></td>
-        <td><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+        <td data-status="${statusForFilter}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
         <td class="actions-cell">
           <button class="btn btn-sm btn-secondary" onclick="editDesign(${design.id})" title="ערוך">
             ✏️
@@ -675,9 +689,9 @@ function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
  * @since 2.0
  */
 function sortTable(columnIndex) {
-    console.log(`🔄 Sorting table by column ${columnIndex}`);
+    console.log(`🔄 Sorting planning table by column ${columnIndex}`);
 
-    // Using global function
+    // Using global function from main.js
     if (typeof window.sortTableData === 'function') {
         const sortedData = window.sortTableData(
             columnIndex,
@@ -688,8 +702,127 @@ function sortTable(columnIndex) {
 
         // Updating filtered data
         window.filteredDesignsData = sortedData;
+
+        console.log(`✅ Planning table sorted by column ${columnIndex}`);
     } else {
         console.error('❌ sortTableData function not found in main.js');
+        // Fallback to local sorting if global function not available
+        console.log('🔄 Using fallback local sorting');
+        performLocalSort(columnIndex);
+    }
+}
+
+/**
+ * פונקציה מקומית לסידור (fallback)
+ * Local sorting function (fallback)
+ */
+function performLocalSort(columnIndex) {
+    const data = window.filteredDesignsData || designsData;
+    const currentSortState = window.getSortState ? window.getSortState('planning') : { columnIndex: -1, direction: 'asc' };
+
+    // קביעת כיוון הסידור
+    let direction = 'asc';
+    if (currentSortState.columnIndex === columnIndex) {
+        direction = currentSortState.direction === 'asc' ? 'desc' : 'asc';
+    }
+
+    // שמירת מצב הסידור
+    if (window.saveSortState) {
+        window.saveSortState('planning', columnIndex, direction);
+    }
+
+    // סידור הנתונים
+    const sortedData = [...data].sort((a, b) => {
+        let aValue = getPlanningColumnValue(a, columnIndex);
+        let bValue = getPlanningColumnValue(b, columnIndex);
+
+        // המרה למספרים אם אפשר
+        if (!isNaN(aValue) && !isNaN(bValue)) {
+            aValue = parseFloat(aValue);
+            bValue = parseFloat(bValue);
+        }
+
+        // המרה לתאריכים אם אפשר
+        if (isDateValue(aValue) && isDateValue(bValue)) {
+            aValue = new Date(aValue);
+            bValue = new Date(bValue);
+        }
+
+        // סידור
+        if (aValue < bValue) {
+            return direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+            return direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+    });
+
+    // עדכון הטבלה
+    updateDesignsTable(sortedData);
+    window.filteredDesignsData = sortedData;
+
+    console.log(`✅ Local sorting completed for column ${columnIndex}, direction: ${direction}`);
+}
+
+/**
+ * קבלת ערך עמודה לטבלת תכנונים
+ * Get column value for planning table
+ */
+function getPlanningColumnValue(item, columnIndex) {
+    const columns = ['ticker', 'created_at', 'investment_type', 'side', 'planned_amount', 'target_price', 'stop_price', 'current', 'status'];
+    const fieldName = columns[columnIndex];
+
+    if (!fieldName) {
+        console.warn(`⚠️ No column mapping found for planning column ${columnIndex}`);
+        return '';
+    }
+
+    // טיפול מיוחד בשדות מורכבים
+    if (fieldName === 'ticker') {
+        return item.ticker ? (item.ticker.symbol || item.ticker.name || '') : '';
+    }
+
+    return item[fieldName] || '';
+}
+
+/**
+ * בדיקה אם ערך הוא תאריך
+ * Check if value is a date
+ */
+function isDateValue(value) {
+    if (!value) return false;
+    const date = new Date(value);
+    return !isNaN(date.getTime());
+}
+
+/**
+ * שחזור מצב סידור
+ * Restore sort state
+ */
+function restoreSortState() {
+    console.log('🔄 Restoring sort state for planning table');
+
+    if (typeof window.getSortState === 'function') {
+        const sortState = window.getSortState('planning');
+
+        if (sortState.columnIndex >= 0) {
+            console.log(`🔄 Restoring sort: column ${sortState.columnIndex}, direction: ${sortState.direction}`);
+
+            // עדכון האייקונים
+            if (typeof updateSortIcons === 'function') {
+                updateSortIcons('planning', sortState.columnIndex, sortState.direction);
+            }
+
+            // סידור הנתונים אם יש נתונים
+            if (designsData && designsData.length > 0) {
+                setTimeout(() => {
+                    sortTable(sortState.columnIndex);
+                }, 100);
+            }
+        }
+    } else {
+        console.log('⚠️ getSortState function not available');
     }
 }
 
@@ -1041,16 +1174,19 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
     if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
         console.log('🔄 Filtering by status:', selectedStatuses);
         filteredDesigns = filteredDesigns.filter(design => {
-            let itemStatus;
-            if (design.status === 'cancelled') {
-                itemStatus = 'מבוטל';
-            } else if (design.status === 'closed') {
-                itemStatus = 'סגור';
-            } else {
-                itemStatus = 'פתוח';
-            }
-            const isMatch = selectedStatuses.includes(itemStatus);
-            console.log(`🔄 Design ${design.id}: status=${design.status}, mapped=${itemStatus}, selected=${selectedStatuses}, match=${isMatch}`);
+            // המרת הערכים הנבחרים לאנגלית
+            const statusTranslations = {
+                'פתוח': 'open',
+                'סגור': 'closed',
+                'מבוטל': 'cancelled'
+            };
+            
+            const translatedSelectedStatuses = selectedStatuses.map(status => 
+                statusTranslations[status] || status
+            );
+            
+            const isMatch = translatedSelectedStatuses.includes(design.status);
+            console.log(`🔄 Design ${design.id}: status=${design.status}, selected=${selectedStatuses}, translated=${translatedSelectedStatuses}, match=${isMatch}`);
             return isMatch;
         });
         console.log('🔄 After status filter:', filteredDesigns.length, 'designs');
@@ -1060,22 +1196,20 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
     if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
         console.log('🔄 Filtering by type:', selectedTypes);
         filteredDesigns = filteredDesigns.filter(design => {
-            let typeDisplay;
-            switch (design.type || design.investment_type) {
-                case 'swing':
-                    typeDisplay = 'סווינג';
-                    break;
-                case 'investment':
-                    typeDisplay = 'השקעה';
-                    break;
-                case 'passive':
-                    typeDisplay = 'פאסיבי';
-                    break;
-                default:
-                    typeDisplay = design.type || design.investment_type;
-            }
-            const isMatch = selectedTypes.includes(typeDisplay);
-            console.log(`🔄 Design ${design.id}: type=${design.type}, mapped=${typeDisplay}, selected=${selectedTypes}, match=${isMatch}`);
+            // המרת הערכים הנבחרים לאנגלית
+            const typeTranslations = {
+                'סווינג': 'swing',
+                'השקעה': 'investment',
+                'פסיבי': 'passive'
+            };
+            
+            const translatedSelectedTypes = selectedTypes.map(type => 
+                typeTranslations[type] || type
+            );
+            
+            const designType = design.investment_type || design.type;
+            const isMatch = translatedSelectedTypes.includes(designType);
+            console.log(`🔄 Design ${design.id}: type=${designType}, selected=${selectedTypes}, translated=${translatedSelectedTypes}, match=${isMatch}`);
             return isMatch;
         });
         console.log('🔄 After type filter:', filteredDesigns.length, 'designs');
@@ -1085,9 +1219,9 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
     if (startDate && endDate) {
         console.log('🔄 Filtering by date range:', { startDate, endDate });
         filteredDesigns = filteredDesigns.filter(design => {
-            if (!design.date) return false;
+            if (!design.created_at) return false;
 
-            const designDate = new Date(design.date);
+            const designDate = new Date(design.created_at);
             const start = new Date(startDate);
             const end = new Date(endDate);
 
@@ -1096,7 +1230,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
             end.setHours(23, 59, 59, 999);
 
             const isInRange = designDate >= start && designDate <= end;
-            console.log(`🔄 Design ${design.id}: date=${design.date}, inRange=${isInRange}`);
+            console.log(`🔄 Design ${design.id}: created_at=${design.created_at}, inRange=${isInRange}`);
             return isInRange;
         });
         console.log('🔄 After date filter:', filteredDesigns.length, 'designs');
@@ -1346,6 +1480,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof window.loadSortState === 'function') {
         window.loadSortState('planning');
     }
+
+    // שחזור מצב סידור
+    restoreSortState();
 });
 
 // updateGridFromComponent is already defined at the beginning of the file
@@ -1362,6 +1499,7 @@ window.sortTable = sortTable;
 window.filterDesignsLocally = filterDesignsLocally;
 window.updateFilterDebugPanel = updateFilterDebugPanel;
 window.translateDateRangeToDates = translateDateRangeToDates;
+window.restoreSortState = restoreSortState;
 
 // Checking if functions are available
 console.log('🔄 Planning.js loaded. Available functions:', {

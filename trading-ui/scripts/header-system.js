@@ -637,16 +637,18 @@ class HeaderSystem {
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/currencies">מטבעות</a></li>
 
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="/tests">בדיקות</a>
                           <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/tests#settings">הגדרות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/tests#server">שרת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/tests#settings">הגדרות בדיקות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/tests#crud">בדיקות CRUD</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/tests#server">בדיקות שרת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/tests#results">תוצאות בדיקות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/tests#crud-results">תוצאות CRUD</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
                           </ul>
                         </li>
-                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
                       </ul>
                     </li>
                   </ul>
@@ -833,6 +835,9 @@ class HeaderSystem {
   }
 
   setupEventListeners() {
+    // משתנים לטיימרים
+    this.menuTimers = {};
+
     // Event listeners for dropdown menus
     document.addEventListener('click', (e) => {
       const dropdownToggle = e.target.closest('.tiktrack-dropdown-toggle');
@@ -846,34 +851,59 @@ class HeaderSystem {
 
     // Event listeners for submenu
     document.addEventListener('mouseenter', (e) => {
-      const submenuItem = e.target.closest('.dropdown-submenu');
-      if (submenuItem) {
-        this.showSubmenu(submenuItem);
+      if (e.target && typeof e.target.closest === 'function') {
+        const submenuItem = e.target.closest('.dropdown-submenu');
+        if (submenuItem) {
+          this.showSubmenu(submenuItem);
+        }
       }
     });
 
     document.addEventListener('mouseleave', (e) => {
-      const submenuItem = e.target.closest('.dropdown-submenu');
-      if (submenuItem) {
-        this.hideSubmenu(submenuItem);
+      if (e.target && typeof e.target.closest === 'function') {
+        const submenuItem = e.target.closest('.dropdown-submenu');
+        if (submenuItem) {
+          this.hideSubmenu(submenuItem);
+        }
       }
     });
 
     // Handle submenu item clicks
     document.addEventListener('click', (e) => {
-      const submenuItem = e.target.closest('.submenu .tiktrack-dropdown-item');
-      if (submenuItem) {
-        const href = submenuItem.getAttribute('href');
-        if (href) {
-          this.handleSubmenuNavigation(href);
+      if (e.target && typeof e.target.closest === 'function') {
+        const submenuItem = e.target.closest('.submenu .tiktrack-dropdown-item');
+        if (submenuItem) {
+          const href = submenuItem.getAttribute('href');
+          if (href) {
+            this.handleSubmenuNavigation(href);
+          }
         }
       }
     });
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.tiktrack-dropdown-toggle') && !e.target.closest('.tiktrack-dropdown-menu')) {
-        this.closeAllDropdowns();
+      if (e.target && typeof e.target.closest === 'function') {
+        if (!e.target.closest('.tiktrack-dropdown-toggle') && !e.target.closest('.tiktrack-dropdown-menu')) {
+          this.closeAllDropdowns();
+        }
+      }
+    });
+
+    // סגירת תפריטים בלחיצה מחוץ לאזור התפריט
+    document.addEventListener('click', (e) => {
+      // בדיקה אם הלחיצה הייתה מחוץ לכל תפריטי הפילטרים
+      const isClickInsideFilter = e.target.closest('.filter-menu') ||
+        e.target.closest('.filter-toggle') ||
+        e.target.closest('#searchFilterInput') ||
+        e.target.closest('#searchClearBtn') ||
+        e.target.closest('.tiktrack-dropdown-menu') ||
+        e.target.closest('.tiktrack-dropdown-toggle') ||
+        e.target.closest('.submenu');
+
+      if (!isClickInsideFilter) {
+        // סגירת כל התפריטים
+        this.closeAllMenus();
       }
     });
 
@@ -977,7 +1007,20 @@ class HeaderSystem {
   }
 
   toggleDropdown(dropdownMenu) {
-    dropdownMenu.classList.toggle('show');
+    const isVisible = dropdownMenu.classList.contains('show');
+
+    if (isVisible) {
+      dropdownMenu.classList.remove('show');
+      // ניקוי טיימר
+      if (this.menuTimers && this.menuTimers['dropdown']) {
+        clearTimeout(this.menuTimers['dropdown']);
+        delete this.menuTimers['dropdown'];
+      }
+    } else {
+      dropdownMenu.classList.add('show');
+      // הפעלת טיימר לסגירה אוטומטית
+      this.startMenuTimer('dropdown', 3000);
+    }
   }
 
   closeAllDropdowns() {
@@ -991,6 +1034,68 @@ class HeaderSystem {
       submenu.classList.remove('show');
       submenu.style.display = 'none';
     });
+
+    // ניקוי טיימר דרופדאון
+    if (this.menuTimers && this.menuTimers['dropdown']) {
+      clearTimeout(this.menuTimers['dropdown']);
+      delete this.menuTimers['dropdown'];
+    }
+  }
+
+  // פונקציה לסגירת כל התפריטים
+  closeAllMenus() {
+    console.log('🔍 closeAllMenus called');
+
+    // סגירת דרופדאונים
+    this.closeAllDropdowns();
+
+    // סגירת פילטרים
+    window.closeStatusFilter();
+    window.closeTypeFilter();
+    window.closeAccountFilter();
+    window.closeDateRangeFilter();
+
+    // ניקוי כל הטיימרים
+    this.clearAllMenuTimers();
+  }
+
+  // פונקציה לניקוי כל הטיימרים
+  clearAllMenuTimers() {
+    Object.keys(this.menuTimers).forEach(timerId => {
+      clearTimeout(this.menuTimers[timerId]);
+      delete this.menuTimers[timerId];
+    });
+  }
+
+  // פונקציה להפעלת טיימר לסגירה אוטומטית
+  startMenuTimer(menuType, duration = 3000) {
+    // ניקוי טיימר קיים אם יש
+    if (this.menuTimers[menuType]) {
+      clearTimeout(this.menuTimers[menuType]);
+    }
+
+    // הפעלת טיימר חדש
+    this.menuTimers[menuType] = setTimeout(() => {
+      console.log(`🔍 Auto-closing menu: ${menuType}`);
+      switch (menuType) {
+        case 'status':
+          window.closeStatusFilter();
+          break;
+        case 'type':
+          window.closeTypeFilter();
+          break;
+        case 'account':
+          window.closeAccountFilter();
+          break;
+        case 'dateRange':
+          window.closeDateRangeFilter();
+          break;
+        case 'dropdown':
+          this.closeAllDropdowns();
+          break;
+      }
+      delete this.menuTimers[menuType];
+    }, duration);
   }
 
   // פונקציה לסגירת כל תפריטי הפילטרים
@@ -1823,6 +1928,11 @@ window.toggleStatusFilter = function () {
     menu.classList.add('show');
     toggle.classList.add('active');
     console.log('🔍 Status filter opened');
+
+    // הפעלת טיימר לסגירה אוטומטית
+    if (window.headerSystem) {
+      window.headerSystem.startMenuTimer('status', 3000);
+    }
   }
 };
 
@@ -1848,6 +1958,11 @@ window.toggleTypeFilter = function () {
     menu.classList.add('show');
     toggle.classList.add('active');
     console.log('🔍 Type filter opened');
+
+    // הפעלת טיימר לסגירה אוטומטית
+    if (window.headerSystem) {
+      window.headerSystem.startMenuTimer('type', 3000);
+    }
   }
 };
 
@@ -1873,6 +1988,11 @@ window.toggleAccountFilter = function () {
     menu.classList.add('show');
     toggle.classList.add('active');
     console.log('🔍 Account filter opened');
+
+    // הפעלת טיימר לסגירה אוטומטית
+    if (window.headerSystem) {
+      window.headerSystem.startMenuTimer('account', 3000);
+    }
   }
 };
 
@@ -1898,6 +2018,11 @@ window.toggleDateRangeFilter = function () {
     menu.classList.add('show');
     toggle.classList.add('active');
     console.log('🔍 Date filter opened');
+
+    // הפעלת טיימר לסגירה אוטומטית
+    if (window.headerSystem) {
+      window.headerSystem.startMenuTimer('dateRange', 3000);
+    }
   }
 };
 
@@ -1918,6 +2043,11 @@ window.selectStatusOption = function (status) {
         .map(item => item.getAttribute('data-value'));
       window.filterSystem.updateFilter('status', selectedValues);
     }
+
+    // הפעלה מחדש של הטיימר
+    if (window.headerSystem) {
+      window.headerSystem.startMenuTimer('status', 3000);
+    }
   }
 };
 
@@ -1937,6 +2067,11 @@ window.selectTypeOption = function (type) {
         .map(item => item.getAttribute('data-value'));
       window.filterSystem.updateFilter('type', selectedValues);
     }
+
+    // הפעלה מחדש של הטיימר
+    if (window.headerSystem) {
+      window.headerSystem.startMenuTimer('type', 3000);
+    }
   }
 };
 
@@ -1955,6 +2090,11 @@ window.selectAccountOption = function (account) {
       const selectedValues = Array.from(selectedItems)
         .map(item => item.getAttribute('data-value'));
       window.filterSystem.updateFilter('account', selectedValues);
+    }
+
+    // הפעלה מחדש של הטיימר
+    if (window.headerSystem) {
+      window.headerSystem.startMenuTimer('account', 3000);
     }
   }
 };
@@ -1978,6 +2118,11 @@ window.selectDateRangeOption = function (dateRange) {
     if (window.filterSystem) {
       window.filterSystem.updateFilter('dateRange', dateRange);
     }
+
+    // הפעלה מחדש של הטיימר
+    if (window.headerSystem) {
+      window.headerSystem.startMenuTimer('dateRange', 3000);
+    }
   }
 };
 
@@ -1993,6 +2138,12 @@ window.closeStatusFilter = function () {
   if (toggle) {
     toggle.classList.remove('active');
   }
+
+  // ניקוי טיימר
+  if (window.headerSystem && window.headerSystem.menuTimers && window.headerSystem.menuTimers['status']) {
+    clearTimeout(window.headerSystem.menuTimers['status']);
+    delete window.headerSystem.menuTimers['status'];
+  }
 };
 
 window.closeTypeFilter = function () {
@@ -2005,6 +2156,12 @@ window.closeTypeFilter = function () {
   }
   if (toggle) {
     toggle.classList.remove('active');
+  }
+
+  // ניקוי טיימר
+  if (window.headerSystem && window.headerSystem.menuTimers && window.headerSystem.menuTimers['type']) {
+    clearTimeout(window.headerSystem.menuTimers['type']);
+    delete window.headerSystem.menuTimers['type'];
   }
 };
 
@@ -2019,6 +2176,12 @@ window.closeAccountFilter = function () {
   if (toggle) {
     toggle.classList.remove('active');
   }
+
+  // ניקוי טיימר
+  if (window.headerSystem && window.headerSystem.menuTimers && window.headerSystem.menuTimers['account']) {
+    clearTimeout(window.headerSystem.menuTimers['account']);
+    delete window.headerSystem.menuTimers['account'];
+  }
 };
 
 window.closeDateRangeFilter = function () {
@@ -2031,6 +2194,12 @@ window.closeDateRangeFilter = function () {
   }
   if (toggle) {
     toggle.classList.remove('active');
+  }
+
+  // ניקוי טיימר
+  if (window.headerSystem && window.headerSystem.menuTimers && window.headerSystem.menuTimers['dateRange']) {
+    clearTimeout(window.headerSystem.menuTimers['dateRange']);
+    delete window.headerSystem.menuTimers['dateRange'];
   }
 };
 
@@ -2308,6 +2477,8 @@ class SimpleFilter {
       this.currentFilters[filterType] = Array.isArray(value) ? value : [value];
     }
 
+    console.log(`🔍 Current filters after update:`, this.currentFilters);
+
     // הפעלת הפילטרים על הטבלאות
     this.applyFilters();
 
@@ -2330,10 +2501,18 @@ class SimpleFilter {
     const tables = document.querySelectorAll('table[id]');
     const excludedTables = ['notificationsTable']; // טבלאות שלא נכללות בפילטור
 
+    console.log('🔍 Found tables:', tables.length);
+    tables.forEach(table => {
+      console.log('🔍 Table ID:', table.id);
+    });
+
     tables.forEach(table => {
       if (excludedTables.includes(table.id)) {
+        console.log('🔍 Skipping excluded table:', table.id);
         return; // דילוג על טבלאות שלא נכללות
       }
+
+      console.log('🔍 Processing table:', table.id);
 
       const rows = table.querySelectorAll('tbody tr');
       let visibleRows = 0;
@@ -2346,9 +2525,13 @@ class SimpleFilter {
           const statusCell = row.querySelector('[data-status]');
           if (statusCell) {
             const rowStatus = statusCell.getAttribute('data-status');
+            console.log('🔍 Status filter - row status:', rowStatus, 'filter statuses:', this.currentFilters.status);
             if (!this.currentFilters.status.includes(rowStatus)) {
               shouldShow = false;
+              console.log('🔍 Status filter - hiding row');
             }
+          } else {
+            console.log('🔍 Status filter - no data-status found in row');
           }
         }
 
@@ -2357,9 +2540,13 @@ class SimpleFilter {
           const typeCell = row.querySelector('[data-type]');
           if (typeCell) {
             const rowType = typeCell.getAttribute('data-type');
+            console.log('🔍 Type filter - row type:', rowType, 'filter types:', this.currentFilters.type);
             if (!this.currentFilters.type.includes(rowType)) {
               shouldShow = false;
+              console.log('🔍 Type filter - hiding row');
             }
+          } else {
+            console.log('🔍 Type filter - no data-type found in row');
           }
         }
 
@@ -2368,9 +2555,13 @@ class SimpleFilter {
           const accountCell = row.querySelector('[data-account]');
           if (accountCell) {
             const rowAccount = accountCell.getAttribute('data-account');
+            console.log('🔍 Account filter - row account:', rowAccount, 'filter accounts:', this.currentFilters.account);
             if (!this.currentFilters.account.includes(rowAccount)) {
               shouldShow = false;
+              console.log('🔍 Account filter - hiding row');
             }
+          } else {
+            console.log('🔍 Account filter - no data-account found in row');
           }
         }
 

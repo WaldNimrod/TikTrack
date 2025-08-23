@@ -4,6 +4,13 @@
  * 
  * מטרה: ריכוז כל פונקציות התרגום במקום אחד לתחזוקה קלה יותר
  * כל פונקציה נקראת בשם ברור שמציין לאיזה ישות/עמוד היא מתייחסת
+ * 
+ * Dependencies: None (standalone utility file)
+ * Dependents: All page-specific scripts, main.js, header-system.js
+ * 
+ * File: trading-ui/scripts/translation-utils.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
  */
 
 // ===== תרגום סטטוסים =====
@@ -17,7 +24,8 @@ function translateAccountStatus(status) {
     const statusMap = {
         'open': 'פתוח',
         'closed': 'סגור',
-        'cancelled': 'מבוטל'
+        'cancelled': 'מבוטל',
+        'canceled': 'מבוטל'
     };
     return statusMap[status] || status;
 }
@@ -31,7 +39,8 @@ function translateTickerStatus(status) {
     const statusMap = {
         'open': 'פתוח',
         'closed': 'סגור',
-        'cancelled': 'מבוטל'
+        'cancelled': 'מבוטל',
+        'canceled': 'מבוטל'
     };
     return statusMap[status] || status;
 }
@@ -59,7 +68,8 @@ function translateAlertStatus(status) {
     const statusMap = {
         'open': 'פתוח',
         'closed': 'סגור',
-        'cancelled': 'מבוטל'
+        'cancelled': 'מבוטל',
+        'canceled': 'מבוטל'
     };
     return statusMap[status] || status;
 }
@@ -78,7 +88,8 @@ function translateTradePlanStatus(status) {
     const statusMap = {
         'open': 'פתוח',
         'closed': 'סגור',
-        'cancelled': 'מבוטל'
+        'cancelled': 'מבוטל',
+        'canceled': 'מבוטל'
     };
 
     return statusMap[status.toLowerCase()] || status;

@@ -46,6 +46,8 @@
 
   <!-- 7. Database display specific styles (highest priority) -->
   <link rel="stylesheet" href="styles/db-display.css">
+  <!-- 8. Table rules styles -->
+  <link rel="stylesheet" href="styles/table-rules.css">
 </head>
 
 <body class="db-display-page">
@@ -137,6 +139,24 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Account_id and ticker_id are required (NOT NULL)</li>
+                <li class="foreign-key">Foreign key: ticker_id references tickers(id)</li>
+                <li class="foreign-key">Foreign key: account_id references accounts(id)</li>
+                <li class="default">Side defaults to 'Long'</li>
+                <li class="default">Status defaults to 'open'</li>
+                <li class="default">Investment_type defaults to 'swing'</li>
+                <li class="default">Planned_amount defaults to 1</li>
+                <li class="unique">ID is auto-incrementing primary key</li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -189,6 +209,21 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Account_id and ticker_id are required (NOT NULL)</li>
+                <li class="default">Side defaults to 'Long'</li>
+                <li class="default">Investment_type defaults to 'swing'</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="unique">ID is primary key</li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -235,6 +270,20 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Name field is required (NOT NULL)</li>
+                <li class="default">Status defaults to 'open'</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="unique">ID is auto-incrementing primary key</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -284,6 +333,23 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Symbol field is required (NOT NULL)</li>
+                <li class="constraint">ID field is required (NOT NULL)</li>
+                <li class="unique">Symbol has unique constraint</li>
+                <li class="unique">ID is primary key</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="index">Index on id: ix_tickers_id</li>
+                <li class="index">Unique index on symbol: ix_tickers_symbol</li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -332,6 +398,22 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Trade_id, action, quantity, and price are required (NOT NULL)</li>
+                <li class="foreign-key">Foreign key: trade_id references trades(id)</li>
+                <li class="default">Action defaults to 'buy'</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="unique">ID is primary key</li>
+                <li class="index">Index on id: ix_executions_id</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -383,6 +465,26 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Account_id, type, and amount are required (NOT NULL)</li>
+                <li class="foreign-key">Foreign key: account_id references accounts(id)</li>
+                <li class="default">Currency defaults to 'USD'</li>
+                <li class="default">Currency_id defaults to 1</li>
+                <li class="default">Usd_rate defaults to 1.000000</li>
+                <li class="default">Source defaults to 'manual'</li>
+                <li class="default">External_id defaults to '0'</li>
+                <li class="default">Type defaults to 'new'</li>
+                <li class="unique">ID is primary key</li>
+                <li class="index">Index on id: ix_cash_flows_id</li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -432,6 +534,23 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Type and condition are required (NOT NULL)</li>
+                <li class="default">Status defaults to 'open'</li>
+                <li class="default">Is_triggered defaults to 'false'</li>
+                <li class="default">Type defaults to 'price'</li>
+                <li class="default">Related_type_id defaults to 4</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="unique">ID is auto-incrementing primary key</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -474,6 +593,19 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Table Rules -->
+          <div class="table-rules-container fade-in">
+            <div class="table-rules-header">
+              <span class="rules-icon">📋</span>
+              <h6 class="table-rules-title">Table Rules & Constraints</h6>
+            </div>
+            <ul class="table-rules-list">
+              <li class="constraint">Content, related_type_id, and related_id are required (NOT NULL)</li>
+              <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+              <li class="unique">ID is auto-incrementing primary key</li>
+            </ul>
           </div>
         </div>
       </div>

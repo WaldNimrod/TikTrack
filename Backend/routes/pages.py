@@ -75,10 +75,7 @@ def cash_flows() -> Any:
     """Cash flows page"""
     return send_from_directory(UI_DIR, "cash_flows.html")
 
-@pages_bp.route('/currencies')
-def currencies() -> Any:
-    """Currencies page"""
-    return send_from_directory(UI_DIR, "currencies.html")
+
 
 @pages_bp.route('/designs')
 def designs() -> Any:
@@ -94,6 +91,11 @@ def db_extradata() -> Any:
 def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
+
+@pages_bp.route('/tests')
+def tests() -> Any:
+    """Tests page"""
+    return send_from_directory(UI_DIR, "tests.html")
 
 
 

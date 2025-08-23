@@ -637,7 +637,7 @@ class HeaderSystem {
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/currencies">מטבעות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tests">בדיקות</a></li>
 
                         <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
                       </ul>

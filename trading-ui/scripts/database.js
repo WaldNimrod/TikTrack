@@ -10,41 +10,69 @@ let allData = {
   cashFlows: [],
   alerts: [],
   notes: [],
-  currencies: []
+
 };
 
 // פונקציות לפתיחה/סגירה של סקשנים
 function toggleTopSection() {
-  console.log('🔄 toggleTopSection נקראה');
+  console.log('🔄 toggleTopSection נקראה - סגירה/פתיחה של כל הסקשנים');
+
   const topSection = document.querySelector('.top-section');
+  const contentSections = document.querySelectorAll('.content-section');
+  const toggleBtn = topSection ? topSection.querySelector('button[onclick="toggleTopSection()"]') : null;
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
   if (!topSection) {
     console.error('❌ לא נמצא top-section');
     return;
   }
-  console.log('✅ top-section נמצא:', topSection);
 
-  const sectionBody = topSection.querySelector('.section-body');
-  const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+  // בדיקה אם כל הסקשנים סגורים
+  const topSectionBody = topSection.querySelector('.section-body');
+  const isTopCollapsed = topSectionBody ? topSectionBody.style.display === 'none' : false;
 
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
-    } else {
-      sectionBody.style.display = 'none';
+  let allSectionsCollapsed = isTopCollapsed;
+  contentSections.forEach(section => {
+    const sectionBody = section.querySelector('.section-body');
+    if (sectionBody && sectionBody.style.display !== 'none') {
+      allSectionsCollapsed = false;
     }
+  });
 
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
+  // אם כל הסקשנים סגורים - פתח את כולם
+  // אם יש סקשנים פתוחים - סגור את כולם
+  const shouldCollapse = !allSectionsCollapsed;
 
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('databaseTopSectionHidden', !isCollapsed);
+  // סגירה/פתיחה של top-section
+  if (topSectionBody) {
+    topSectionBody.style.display = shouldCollapse ? 'none' : 'block';
+    localStorage.setItem('databaseTopSectionHidden', shouldCollapse);
   }
+
+  // סגירה/פתיחה של כל content-sections
+  contentSections.forEach(section => {
+    const sectionBody = section.querySelector('.section-body');
+    const sectionToggleBtn = section.querySelector('button[onclick="toggleMainSection()"]');
+    const sectionIcon = sectionToggleBtn ? sectionToggleBtn.querySelector('.filter-icon') : null;
+    const sectionTitle = section.querySelector('.table-title').textContent.trim();
+
+    if (sectionBody) {
+      sectionBody.style.display = shouldCollapse ? 'none' : 'block';
+      localStorage.setItem(`databaseSectionHidden_${sectionTitle}`, shouldCollapse);
+
+      // עדכון האייקון של הסקשן
+      if (sectionIcon) {
+        sectionIcon.textContent = shouldCollapse ? '▼' : '▲';
+      }
+    }
+  });
+
+  // עדכון האייקון של הכפתור הראשי
+  if (icon) {
+    icon.textContent = shouldCollapse ? '▼' : '▲';
+  }
+
+  console.log(`✅ ${shouldCollapse ? 'סגירת' : 'פתיחת'} כל הסקשנים הושלמה`);
 }
 
 function toggleMainSection() {
@@ -126,6 +154,7 @@ function restoreDatabaseSectionState() {
 // פונקציה לטעינת כל הנתונים
 async function loadAllData() {
   console.log('🔄 === טוען את כל הנתונים ===');
+  console.log('📊 allData לפני טעינה:', allData);
 
   try {
     // טעינת כל הנתונים במקביל
@@ -137,8 +166,7 @@ async function loadAllData() {
       executionsResponse,
       cashFlowsResponse,
       alertsResponse,
-      notesResponse,
-      currenciesResponse
+      notesResponse
     ] = await Promise.all([
       fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
@@ -147,11 +175,21 @@ async function loadAllData() {
       fetch('/api/v1/executions/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/v1/cash_flows/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/v1/alerts/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/notes/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/currencies/').then(r => r.json()).catch(() => ({ data: [] }))
+      fetch('/api/v1/notes/').then(r => r.json()).catch(() => ({ data: [] }))
     ]);
 
     // שמירת הנתונים
+    console.log('📥 תגובות API:', {
+      accounts: accountsResponse,
+      trades: tradesResponse,
+      tickers: tickersResponse,
+      tradePlans: tradePlansResponse,
+      executions: executionsResponse,
+      cashFlows: cashFlowsResponse,
+      alerts: alertsResponse,
+      notes: notesResponse
+    });
+
     allData.accounts = accountsResponse.data || accountsResponse || [];
     allData.trades = tradesResponse.data || tradesResponse || [];
     allData.tickers = tickersResponse.data || tickersResponse || [];
@@ -160,7 +198,7 @@ async function loadAllData() {
     allData.cashFlows = cashFlowsResponse.data || cashFlowsResponse || [];
     allData.alerts = alertsResponse.data || alertsResponse || [];
     allData.notes = notesResponse.data || notesResponse || [];
-    allData.currencies = currenciesResponse.data || currenciesResponse || [];
+
 
     console.log('✅ נטענו נתונים:', {
       accounts: allData.accounts.length,
@@ -171,7 +209,7 @@ async function loadAllData() {
       cashFlows: allData.cashFlows.length,
       alerts: allData.alerts.length,
       notes: allData.notes.length,
-      currencies: allData.currencies.length
+
     });
 
     // עדכון כל הטבלאות
@@ -194,7 +232,7 @@ function updateAllTables() {
   updateCashFlowsTable();
   updateAlertsTable();
   updateNotesTable();
-  updateCurrenciesTable();
+
 }
 
 // פונקציה לעדכון סטטיסטיקות
@@ -210,7 +248,7 @@ function showError(message) {
   console.error('❌ שגיאה:', message);
   // הצגת הודעת שגיאה בכל הטבלאות
   const tables = ['accountsTable', 'tradesTable', 'tickersTable', 'tradePlansTable',
-    'executionsTable', 'cashFlowsTable', 'alertsTable', 'notesTable', 'currenciesTable'];
+    'executionsTable', 'cashFlowsTable', 'alertsTable', 'notesTable'];
 
   tables.forEach(tableId => {
     const tbody = document.querySelector(`#${tableId} tbody`);
@@ -256,9 +294,9 @@ function updateAccountsTable() {
           <span class="btn-icon">✏️</span>
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק">🗑️</button>
-        ${account.status && account.status !== 'cancelled' ? 
-          `<button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>` : 
-          ''}
+        ${account.status && account.status !== 'cancelled' ?
+      `<button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>` :
+      ''}
       </td>
     </tr>
   `).join('');
@@ -297,9 +335,9 @@ function updateTradesTable() {
           <span class="btn-icon">✏️</span>
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteTrade(${trade.id})" title="מחק">🗑️</button>
-        ${trade.status && trade.status !== 'cancelled' ? 
-          `<button class="btn btn-sm btn-warning" onclick="cancelTrade(${trade.id})" title="ביטול">❌</button>` : 
-          ''}
+        ${trade.status && trade.status !== 'cancelled' ?
+      `<button class="btn btn-sm btn-warning" onclick="cancelTrade(${trade.id})" title="ביטול">❌</button>` :
+      ''}
       </td>
     </tr>
   `).join('');
@@ -371,9 +409,9 @@ function updateTradePlansTable() {
           <span class="btn-icon">✏️</span>
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteTradePlan(${plan.id})" title="מחק">🗑️</button>
-        ${plan.status && plan.status !== 'cancelled' ? 
-          `<button class="btn btn-sm btn-warning" onclick="cancelTradePlan(${plan.id})" title="ביטול">❌</button>` : 
-          ''}
+        ${plan.status && plan.status !== 'cancelled' ?
+      `<button class="btn btn-sm btn-warning" onclick="cancelTradePlan(${plan.id})" title="ביטול">❌</button>` :
+      ''}
       </td>
     </tr>
   `).join('');
@@ -480,9 +518,9 @@ function updateAlertsTable() {
           <span class="btn-icon">✏️</span>
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
-        ${alert.status && alert.status !== 'cancelled' ? 
-          `<button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>` : 
-          ''}
+        ${alert.status && alert.status !== 'cancelled' ?
+      `<button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>` :
+      ''}
       </td>
     </tr>
   `).join('');
@@ -521,34 +559,7 @@ function updateNotesTable() {
   document.getElementById('notesCount').textContent = `${allData.notes.length} רשומות`;
 }
 
-function updateCurrenciesTable() {
-  const tbody = document.querySelector('#currenciesTable tbody');
-  if (!tbody) return;
 
-  if (allData.currencies.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center">אין נתונים</td></tr>';
-    return;
-  }
-
-  const rows = allData.currencies.map(currency => `
-    <tr>
-      <td>${currency.symbol || ''}</td>
-      <td>${currency.name || ''}</td>
-      <td>${currency.usd_rate || 0}</td>
-      <td>${currency.id || ''}</td>
-      <td>${currency.created_at || ''}</td>
-      <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editCurrency(${currency.id})" title="ערוך">
-          <span class="btn-icon">✏️</span>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteCurrency(${currency.id})" title="מחק">🗑️</button>
-      </td>
-    </tr>
-  `).join('');
-
-  tbody.innerHTML = rows;
-  document.getElementById('currenciesCount').textContent = `${allData.currencies.length} רשומות`;
-}
 
 // פונקציות פעולות
 function refreshAllData() {
@@ -620,7 +631,7 @@ function showDatabaseInfo() {
     'תזרימי מזומנים: ' + allData.cashFlows.length + '\n' +
     'התראות: ' + allData.alerts.length + '\n' +
     'הערות: ' + allData.notes.length + '\n' +
-    'מטבעות: ' + allData.currencies.length);
+
 }
 
 function showBackupOptions() {

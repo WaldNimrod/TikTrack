@@ -229,7 +229,7 @@ APP_LOG="logs/app.log"
 MAX_STARTUP_TIME=30
 HEALTH_CHECK_INTERVAL=5
 MAX_HEALTH_CHECKS=6
-MAX_RETRY_ATTEMPTS=10
+MAX_RETRY_ATTEMPTS=5
 RETRY_DELAY=3
 
 # Colors for output
@@ -320,6 +320,12 @@ check_system_resources() {
 # Returns 1 if any dependency is missing
 check_dependencies() {
     log_info "Checking dependencies..."
+    
+    # Make sure we're in the root directory to check dependencies
+    if [ ! -d ".venv" ] && [ -d "../.venv" ]; then
+        cd ..
+        log_info "Moved back to root directory to check dependencies"
+    fi
     
     # Check if virtual environment exists
     if [ ! -d ".venv" ]; then
@@ -524,9 +530,16 @@ clean_database_locks() {
 activate_venv() {
     log_info "Activating virtual environment..."
     
+    # Make sure we're in the root directory to find .venv
     if [ ! -f ".venv/bin/activate" ]; then
-        log_error "Virtual environment activation script not found"
-        return 1
+        # Try to go back to root directory if we're in Backend
+        if [ -d "../.venv" ]; then
+            cd ..
+            log_info "Moved back to root directory to find .venv"
+        else
+            log_error "Virtual environment activation script not found"
+            return 1
+        fi
     fi
     
     source .venv/bin/activate
@@ -764,6 +777,12 @@ check_python_packages() {
 # - Validates server is responding
 start_server() {
     log_info "Starting server with detailed logging..."
+    
+    # Make sure we're in the root directory first
+    if [ ! -d ".venv" ] && [ -d "../.venv" ]; then
+        cd ..
+        log_info "Moved back to root directory before starting server"
+    fi
     
     # Change to Backend directory
     cd Backend

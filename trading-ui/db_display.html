@@ -100,10 +100,6 @@
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
               </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תוכניות מסחר">
-                <span class="filter-icon">▲</span>
-              </button>
             </div>
           </div>
 
@@ -151,10 +147,6 @@
             <div class="table-actions">
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
-              </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור טריידים">
-                <span class="filter-icon">▲</span>
               </button>
             </div>
           </div>
@@ -204,10 +196,6 @@
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
               </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור חשבונות">
-                <span class="filter-icon">▲</span>
-              </button>
             </div>
           </div>
 
@@ -251,10 +239,6 @@
             <div class="table-actions">
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
-              </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור טיקרים">
-                <span class="filter-icon">▲</span>
               </button>
             </div>
           </div>
@@ -301,10 +285,6 @@
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
               </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור ביצועים">
-                <span class="filter-icon">▲</span>
-              </button>
             </div>
           </div>
 
@@ -347,10 +327,6 @@
             <div class="table-actions">
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
-              </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תזרימי מזומנים">
-                <span class="filter-icon">▲</span>
               </button>
             </div>
           </div>
@@ -398,10 +374,6 @@
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
                 <span class="action-icon">➕</span> הוסף
               </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התראות">
-                <span class="filter-icon">▲</span>
-              </button>
             </div>
           </div>
           <div class="section-body">
@@ -448,10 +420,6 @@
             <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
               <span class="action-icon">➕</span> הוסף
             </button>
-            <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור הערות">
-              <span class="filter-icon">▲</span>
-            </button>
           </div>
         </div>
         <div class="section-body">
@@ -479,48 +447,7 @@
       </div>
     </div>
 
-    <!-- Currencies Section -->
-    <div class="content-section">
-      <!-- Currencies header -->
-      <div class="section-header">
-        <div class="table-title">
-          💱 מטבעות
-        </div>
-        <div class="table-count" id="currenciesCount">טוען...</div>
-        <div class="table-actions">
-          <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
-            <span class="action-icon">➕</span> הוסף
-          </button>
-          <div class="action-separator"></div>
-          <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור מטבעות">
-            <span class="filter-icon">▲</span>
-          </button>
-        </div>
-      </div>
 
-      <!-- Currencies table -->
-      <div class="section-body">
-        <div class="table-responsive" id="currenciesContainer">
-          <table class="table" id="currenciesTable">
-            <thead>
-              <tr>
-                <th onclick="sortTable(0, 'currenciesTable')">Symbol (VARCHAR)</th>
-                <th onclick="sortTable(1, 'currenciesTable')">Name (VARCHAR)</th>
-                <th onclick="sortTable(2, 'currenciesTable')">USD Rate (NUMERIC)</th>
-                <th onclick="sortTable(3, 'currenciesTable')">ID (INTEGER)</th>
-                <th onclick="sortTable(4, 'currenciesTable')">Created At (DATETIME)</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="5" class="text-center">טוען נתונים...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   </div>
   </div> <!-- End page-body -->
 
@@ -533,10 +460,8 @@
   <!-- Modular files -->
   <script src="scripts/header-system.js"></script>
   <script src="scripts/console-cleanup.js"></script>
-  <script src="scripts/filter-system.js"></script>
   <script src="scripts/translation-utils.js"></script>
   <script src="scripts/main.js"></script>
-  <script src="scripts/grid-table.js"></script>
   <script src="scripts/database.js"></script>
 
   <!-- Page initialization -->
@@ -553,8 +478,6 @@
         console.log("➕ Initializing new unified header system...");
         window.headerSystem = new window.HeaderSystem();
         window.headerSystem.initialize();
-        window.filterSystem = new window.SimpleFilter();
-        window.filterSystem.initialize();
       }
     });
   </script>

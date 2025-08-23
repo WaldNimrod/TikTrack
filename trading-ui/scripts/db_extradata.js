@@ -14,6 +14,57 @@ function deleteExtraData(id) {
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים
+function toggleAllSections() {
+  console.log('🔄 toggleAllSections נקראה');
+  const contentSections = document.querySelectorAll('.content-section');
+  const toggleBtn = document.querySelector('button[onclick="toggleAllSections()"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (contentSections.length === 0) {
+    console.error('❌ לא נמצאו content-sections');
+    return;
+  }
+
+  // בדיקה אם כל הסקשנים פתוחים או סגורים
+  let allCollapsed = true;
+  for (const section of contentSections) {
+    const sectionBody = section.querySelector('.section-body');
+    if (sectionBody && sectionBody.style.display !== 'none') {
+      allCollapsed = false;
+      break;
+    }
+  }
+
+  // החלטה אם לסגור או לפתוח הכל
+  const shouldCollapse = !allCollapsed;
+
+  // עדכון כל הסקשנים
+  for (const section of contentSections) {
+    const sectionBody = section.querySelector('.section-body');
+    const sectionToggleBtn = section.querySelector('.filter-toggle-btn');
+    const sectionIcon = sectionToggleBtn ? sectionToggleBtn.querySelector('.filter-icon') : null;
+
+    if (sectionBody) {
+      sectionBody.style.display = shouldCollapse ? 'none' : 'block';
+
+      // עדכון האייקון של כל סקשן
+      if (sectionIcon) {
+        sectionIcon.textContent = shouldCollapse ? '▼' : '▲';
+      }
+    }
+  }
+
+  // עדכון האייקון הראשי
+  if (icon) {
+    icon.textContent = shouldCollapse ? '▼' : '▲';
+  }
+
+  // שמירת המצב ב-localStorage
+  localStorage.setItem('allSectionsCollapsed', shouldCollapse);
+
+  console.log(`✅ כל הסקשנים ${shouldCollapse ? 'נסגרו' : 'נפתחו'}`);
+}
+
 function toggleTopSection() {
   console.log('🔄 toggleTopSection נקראה');
   const topSection = document.querySelector('.top-section');
@@ -222,7 +273,7 @@ function initializeExtraDataPage() {
 
   // שחזור מצב הסגירה
   restoreTopSectionState();
-  restoreExtraDataSectionState();
+  restoreAllSectionsState();
 
   console.log('✅ דף טבלאות עזר אותחל בהצלחה');
 }
@@ -233,8 +284,10 @@ window.editExtraData = editExtraData;
 window.deleteExtraData = deleteExtraData;
 window.toggleTopSection = toggleTopSection;
 window.toggleExtraDataSection = toggleExtraDataSection;
+window.toggleAllSections = toggleAllSections;
 window.restoreTopSectionState = restoreTopSectionState;
 window.restoreExtraDataSectionState = restoreExtraDataSectionState;
+window.restoreAllSectionsState = restoreAllSectionsState;
 window.initializeExtraDataPage = initializeExtraDataPage;
 window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
 

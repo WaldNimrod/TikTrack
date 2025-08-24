@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from models.trade_plan import TradePlan
+from services.validation_service import ValidationService
 from typing import List, Optional, Dict, Any
 import logging
 from datetime import datetime
@@ -47,18 +48,43 @@ class TradePlanService:
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> TradePlan:
         """Create new trade plan"""
-        plan = TradePlan(**data)
-        db.add(plan)
-        db.commit()
-        db.refresh(plan)
-        logger.info(f"Created trade plan: {plan.id} for ticker {plan.ticker_id}")
-        return plan
+        try:
+            # Validate data against constraints
+            logger.info("Validating trade plan data before creation")
+            is_valid, errors = ValidationService.validate_data(db, 'trade_plans', data)
+            if not is_valid:
+                error_message = "; ".join(errors)
+                logger.error(f"Trade plan validation failed: {error_message}")
+                raise ValueError(f"Trade plan validation failed: {error_message}")
+            
+            plan = TradePlan(**data)
+            db.add(plan)
+            db.commit()
+            db.refresh(plan)
+            logger.info(f"Created trade plan: {plan.id} for ticker {plan.ticker_id}")
+            return plan
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error creating trade plan: {e}")
+            raise
     
     @staticmethod
     def update(db: Session, plan_id: int, data: Dict[str, Any]) -> Optional[TradePlan]:
         """Update trade plan"""
-        plan = db.query(TradePlan).filter(TradePlan.id == plan_id).first()
-        if plan:
+        try:
+            plan = db.query(TradePlan).filter(TradePlan.id == plan_id).first()
+            if not plan:
+                logger.warning(f"Trade plan {plan_id} not found for update")
+                return None
+            
+            # Validate data against constraints
+            logger.info("Validating trade plan data before update")
+            is_valid, errors = ValidationService.validate_data(db, 'trade_plans', data, exclude_id=plan_id)
+            if not is_valid:
+                error_message = "; ".join(errors)
+                logger.error(f"Trade plan validation failed: {error_message}")
+                raise ValueError(f"Trade plan validation failed: {error_message}")
+            
             for key, value in data.items():
                 if hasattr(plan, key):
                     setattr(plan, key, value)
@@ -66,7 +92,10 @@ class TradePlanService:
             db.refresh(plan)
             logger.info(f"Updated trade plan: {plan.id}")
             return plan
-        return None
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error updating trade plan {plan_id}: {e}")
+            raise
     
     @staticmethod
     def delete(db: Session, plan_id: int) -> bool:

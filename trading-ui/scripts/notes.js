@@ -990,25 +990,29 @@ function setupNoteValidationEvents() {
 function sortTable(columnIndex) {
   console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
 
-  if (typeof window.sortTableData === 'function') {
-    const sortedData = window.sortTableData(
+  if (typeof window.sortTable === 'function') {
+    window.sortTable(
+      'notes',
       columnIndex,
       window.notesData || [],
-      'notes',
       updateNotesTable
     );
-    console.log('✅ נתונים מסודרים:', sortedData);
   } else {
-    console.error('❌ sortTableData function not found in main.js');
+    console.error('❌ sortTable function not found in main.js');
   }
 }
 
 /**
- * שחזור מצב סידור
+ * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
+  console.log('🔄 Restoring sort state for notes table');
+
   if (typeof window.restoreAnyTableSort === 'function') {
     window.restoreAnyTableSort('notes', window.notesData || [], updateNotesTable);
+  } else {
+    console.error('❌ restoreAnyTableSort function not found in main.js');
   }
 }
 

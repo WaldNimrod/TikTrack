@@ -423,37 +423,14 @@ function toggleMainSection() {
 }
 
 function restoreTestsSectionState() {
-    console.log('🔄 שחזור מצב סקשנים בדף בדיקות');
-
-    // שחזור מצב top-section
-    const topSectionHidden = localStorage.getItem('testsTopSectionHidden') === 'true';
-    const topSection = document.querySelector('.top-section');
-    if (topSection) {
-        const topSectionBody = topSection.querySelector('.section-body');
-        const toggleBtn = topSection.querySelector('button[onclick="toggleAllSections()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (topSectionBody && topSectionHidden) {
-            topSectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
-            }
-        }
+    console.log('🔄 שחזור מצב סקשנים בדף בדיקות - שימוש במערכת הגלובלית');
+    
+    // שימוש בפונקציה הגלובלית מ-main.js
+    if (typeof window.restoreSectionStates === 'function') {
+        window.restoreSectionStates();
+    } else {
+        console.error('❌ הפונקציה הגלובלית restoreSectionStates לא זמינה');
     }
-
-    // שחזור מצב content-sections
-    const contentSections = document.querySelectorAll('.content-section');
-    contentSections.forEach(section => {
-        const sectionTitle = section.querySelector('.table-title')?.textContent.trim() || 'unknown';
-        const sectionHidden = localStorage.getItem(`testsSectionHidden_${sectionTitle}`) === 'true';
-        const sectionBody = section.querySelector('.section-body');
-
-        if (sectionBody && sectionHidden) {
-            sectionBody.style.display = 'none';
-        }
-    });
-
-    console.log('✅ מצב סקשנים שוחזר בהצלחה');
 }
 
 // Error handling
@@ -623,57 +600,14 @@ function toggleAllCRUDTests() {
 }
 
 function toggleAllSections() {
-    console.log('🔄 toggleAllSections נקראה - סגירה/פתיחה של כל הסקשנים');
-
-    const topSection = document.querySelector('.top-section');
-    const contentSections = document.querySelectorAll('.content-section');
-    const toggleBtn = topSection ? topSection.querySelector('button[onclick="toggleAllSections()"]') : null;
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (!topSection) {
-        console.error('❌ לא נמצא top-section');
-        return;
+    console.log('🔄 toggleAllSections נקראה - שימוש במערכת הגלובלית');
+    
+    // שימוש בפונקציה הגלובלית מ-main.js
+    if (typeof window.toggleAllSections === 'function') {
+        window.toggleAllSections();
+    } else {
+        console.error('❌ הפונקציה הגלובלית toggleAllSections לא זמינה');
     }
-
-    // בדיקה אם כל הסקשנים סגורים
-    const topSectionBody = topSection.querySelector('.section-body');
-    const isTopCollapsed = topSectionBody ? topSectionBody.style.display === 'none' : false;
-
-    let allSectionsCollapsed = isTopCollapsed;
-    contentSections.forEach(section => {
-        const sectionBody = section.querySelector('.section-body');
-        if (sectionBody && sectionBody.style.display !== 'none') {
-            allSectionsCollapsed = false;
-        }
-    });
-
-    // אם כל הסקשנים סגורים - פתח את כולם
-    // אם יש סקשנים פתוחים - סגור את כולם
-    const shouldCollapse = !allSectionsCollapsed;
-
-    // סגירה/פתיחה של top-section
-    if (topSectionBody) {
-        topSectionBody.style.display = shouldCollapse ? 'none' : 'block';
-        localStorage.setItem('testsTopSectionHidden', shouldCollapse);
-    }
-
-    // סגירה/פתיחה של כל content-sections
-    contentSections.forEach(section => {
-        const sectionBody = section.querySelector('.section-body');
-        const sectionTitle = section.querySelector('.table-title').textContent.trim();
-
-        if (sectionBody) {
-            sectionBody.style.display = shouldCollapse ? 'none' : 'block';
-            localStorage.setItem(`testsSectionHidden_${sectionTitle}`, shouldCollapse);
-        }
-    });
-
-    // עדכון האייקון של הכפתור הראשי
-    if (icon) {
-        icon.textContent = shouldCollapse ? '▼' : '▲';
-    }
-
-    console.log(`✅ ${shouldCollapse ? 'סגירת' : 'פתיחת'} כל הסקשנים הושלמה`);
 }
 
 // Export functions to global scope
@@ -707,6 +641,7 @@ window.toggleAllCRUDTests = toggleAllCRUDTests;
 window.toggleAllSections = toggleAllSections;
 window.executeCRUDTests = executeCRUDTests;
 window.displayCRUDTestResults = displayCRUDTestResults;
+window.showNotification = showNotification;
 window.getSelectedCRUDTests = getSelectedCRUDTests;
 window.checkServerHealth = checkServerHealth;
 window.clearCRUDTestResults = clearCRUDTestResults;

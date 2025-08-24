@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>דף הבית - דוגמה עם גרפים | TikTrack</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles/apple-theme.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/typography.css">
+    <link rel="stylesheet" href="styles/table.css">
+    <link rel="stylesheet" href="styles/header-system.css">
+    <link rel="stylesheet" href="styles/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="page-body">
+        <div class="background-wrapper">
+            <div class="dashboard-container">
+                <div class="dashboard-charts">
+                    <!-- כותרת הדשבורד -->
+                    <div class="charts-header">
+                        <div class="charts-title">📊 דשבורד עם גרפים</div>
+                        <div class="charts-controls">
+                            <select class="charts-select" onchange="updateChartPeriod(this.value)">
+                                <option value="7">7 ימים</option>
+                                <option value="30" selected>30 ימים</option>
+                                <option value="90">90 ימים</option>
+                                <option value="365">שנה</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshData()">רענן</button>
+                        </div>
+                    </div>
+
+                    <!-- תוכן ראשי -->
+                    <div class="charts-content">
+                        <!-- גרף ביצועים -->
+                        <div class="charts-section">
+                            <div class="charts-section-title">
+                                📈 ביצועי תיק
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- גרף חלוקת נכסים -->
+                        <div class="charts-section">
+                            <div class="charts-section-title">
+                                🥧 חלוקת נכסים
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="allocationChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- טבלת טריידים מובילים -->
+                        <div class="charts-section">
+                            <div class="charts-section-title">
+                                🏆 טריידים מובילים
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>טיקר</th>
+                                            <th>רווח/הפסד</th>
+                                            <th>אחוז</th>
+                                            <th>סטטוס</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>NVDA</strong></td>
+                                            <td class="text-success">+₪12,500</td>
+                                            <td class="text-success">+15.2%</td>
+                                            <td><span class="badge bg-success">פתוח</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>AAPL</strong></td>
+                                            <td class="text-success">+₪8,750</td>
+                                            <td class="text-success">+8.9%</td>
+                                            <td><span class="badge bg-success">פתוח</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>MSFT</strong></td>
+                                            <td class="text-success">+₪6,200</td>
+                                            <td class="text-success">+6.1%</td>
+                                            <td><span class="badge bg-success">פתוח</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TSLA</strong></td>
+                                            <td class="text-danger">-₪2,100</td>
+                                            <td class="text-danger">-4.2%</td>
+                                            <td><span class="badge bg-success">פתוח</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- סטטיסטיקות מהירות -->
+                        <div class="charts-section">
+                            <div class="charts-section-title">
+                                📊 סטטיסטיקות
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="text-center mb-3">
+                                        <div class="h4 text-success">₪1,250,000</div>
+                                        <div class="small text-muted">שווי כולל</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center mb-3">
+                                        <div class="h4 text-success">+5.6%</div>
+                                        <div class="small text-muted">רווח שנתי</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center mb-3">
+                                        <div class="h4">15</div>
+                                        <div class="small text-muted">טריידים פעילים</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center mb-3">
+                                        <div class="h4">8</div>
+                                        <div class="small text-muted">התראות פעילות</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/console-cleanup.js"></script>
+
+    <script>
+        // נתונים לדוגמה
+        const performanceData = {
+            labels: ['1/8', '8/8', '15/8', '22/8', '29/8', '5/9', '12/9', '19/9', '26/9', '3/10'],
+            datasets: [{
+                label: 'שווי תיק',
+                data: [1200000, 1215000, 1198000, 1223000, 1241000, 1235000, 1258000, 1272000, 1269000, 1250000],
+                borderColor: '#ff9c05',
+                backgroundColor: 'rgba(255, 156, 5, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        };
+
+        const allocationData = {
+            labels: ['מניות טכנולוגיה', 'מניות פיננסים', 'ETF', 'מזומן', 'אחר'],
+            datasets: [{
+                data: [45, 25, 20, 8, 2],
+                backgroundColor: [
+                    '#ff9c05',
+                    '#28a745',
+                    '#007bff',
+                    '#6c757d',
+                    '#dc3545'
+                ]
+            }]
+        };
+
+        // יצירת גרף ביצועים
+        const performanceChart = new Chart(document.getElementById('performanceChart'), {
+            type: 'line',
+            data: performanceData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function (value) {
+                                return '₪' + (value / 1000) + 'K';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // יצירת גרף חלוקה
+        const allocationChart = new Chart(document.getElementById('allocationChart'), {
+            type: 'doughnut',
+            data: allocationData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        function updateChartPeriod(period) {
+            // כאן יהיה קוד לעדכון הנתונים לפי התקופה הנבחרת
+            console.log('עדכון תקופה:', period);
+        }
+
+        function refreshData() {
+            // כאן יהיה קוד לרענון הנתונים
+            console.log('רענון נתונים');
+        }
+
+        // אתחול HeaderSystem
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.headerSystem && !window.headerSystem.isInitialized) {
+                window.headerSystem.init();
+            }
+        });
+    </script>
+</body>
+
+</html>

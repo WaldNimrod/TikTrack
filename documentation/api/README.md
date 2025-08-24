@@ -1,6 +1,14 @@
 # TikTrack API Documentation
 
 ## Overview
+
+> 📋 **לפרטים מלאים על הפרויקט:** ראה [PROJECT_STATUS_SUMMARY.md](../../PROJECT_STATUS_SUMMARY.md)
+
+## 🆕 **Latest Updates (August 24, 2025)**
+- ✅ **ValidationService Integration** - All endpoints now use dynamic validation
+- ✅ **Constraint Management API** - Complete CRUD operations for constraints
+- ✅ **Real-time Validation** - Data validated against dynamic constraints
+- ✅ **Enhanced Error Handling** - Detailed error messages for validation failures
 The TikTrack API provides a comprehensive RESTful interface for managing trading operations, accounts, alerts, and system configuration. All endpoints return JSON responses and follow standard HTTP status codes.
 
 ## Base URL

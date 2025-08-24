@@ -100,25 +100,8 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   return sortedData;
 };
 
-/**
- * קבלת ערך עמודה מפריט נתונים
- * Get column value from data item
- * @deprecated Use window.getColumnValue from table-mappings.js instead
- * 
- * This function is deprecated and will be removed in future versions.
- * All table column mappings are now centralized in table-mappings.js
- * 
- * @see trading-ui/scripts/table-mappings.js for the centralized mapping system
- */
-function getColumnValue(item, columnIndex, tableType) {
-  // שימוש בפונקציה המרוכזת מקובץ table-mappings.js
-  if (typeof window.getColumnValue === 'function') {
-    return window.getColumnValue(item, columnIndex, tableType);
-  }
-
-  console.warn('⚠️ window.getColumnValue not available, using fallback');
-  return item[columnIndex] || '';
-}
+// REMOVED: getColumnValue function - now using window.getColumnValue from table-mappings.js
+// הסרה: פונקציה getColumnValue - כעת משתמשים ב-window.getColumnValue מ-table-mappings.js
 
 /**
  * בדיקה אם ערך הוא תאריך
@@ -208,6 +191,75 @@ window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
 };
 
 /**
+ * פונקציה גלובלית לסידור טבלה (wrapper)
+ * Global function for table sorting (wrapper for page-specific usage)
+ * 
+ * This function provides a unified interface for all page-specific sortTable calls.
+ * It automatically handles the data source and update function based on the table type.
+ * 
+ * @param {string} tableType - סוג הטבלה (planning, trades, accounts, etc.)
+ * @param {number} columnIndex - אינדקס העמודה לסידור
+ * @param {Array} dataArray - מערך הנתונים לסידור
+ * @param {Function} updateFunction - פונקציה לעדכון הטבלה
+ * @returns {Array} הנתונים המסודרים
+ */
+window.sortTable = function (tableType, columnIndex, dataArray, updateFunction) {
+  console.log(`🔄 Global sortTable called for ${tableType} table, column ${columnIndex}`);
+
+  // שימוש בפונקציה הגלובלית הקיימת
+  if (typeof window.sortTableData === 'function') {
+    const sortedData = window.sortTableData(columnIndex, dataArray, tableType, updateFunction);
+
+    // עדכון הנתונים המסוננים בהתאם לסוג הטבלה
+    switch (tableType) {
+      case 'alerts':
+        if (typeof window.filteredAlertsData !== 'undefined') {
+          window.filteredAlertsData = sortedData;
+        }
+        break;
+      case 'planning':
+        if (typeof window.filteredDesignsData !== 'undefined') {
+          window.filteredDesignsData = sortedData;
+        }
+        break;
+      case 'trades':
+        if (typeof window.filteredTradesData !== 'undefined') {
+          window.filteredTradesData = sortedData;
+        }
+        break;
+      case 'notes':
+        if (typeof window.notesData !== 'undefined') {
+          window.notesData = sortedData;
+        }
+        break;
+      case 'tickers':
+        if (typeof window.tickersData !== 'undefined') {
+          window.tickersData = sortedData;
+        }
+        break;
+      case 'cash_flows':
+        if (typeof window.cashFlowsData !== 'undefined') {
+          window.cashFlowsData = sortedData;
+        }
+        break;
+      case 'executions':
+        if (typeof window.executionsData !== 'undefined') {
+          window.executionsData = sortedData;
+        }
+        break;
+      default:
+        // For other table types, no specific filtered data handling needed
+        break;
+    }
+
+    return sortedData;
+  } else {
+    console.error('❌ sortTableData function not found in main.js');
+    return dataArray;
+  }
+};
+
+/**
  * פונקציה גלובלית לשחזור מצב סידור
  * Global function for restoring sort state
  * 
@@ -234,6 +286,55 @@ window.restoreAnyTableSort = function (tableType, data, updateFunction) {
     }
   } else {
     console.log('⚠️ getSortState function not available');
+  }
+};
+
+/**
+ * פונקציה גלובלית לסגירת מודלים
+ * Global function for closing modals
+ * 
+ * This function provides a unified way to close Bootstrap modals across the application.
+ * It handles both Bootstrap 5 modal instances and fallback for older implementations.
+ * 
+ * @param {string} modalId - מזהה המודל לסגירה
+ */
+window.closeModal = function (modalId) {
+  console.log(`🔄 Closing modal: ${modalId}`);
+
+  const modalElement = document.getElementById(modalId);
+  if (modalElement) {
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+        console.log(`✅ Modal ${modalId} closed via Bootstrap`);
+      } else {
+        // יצירת instance חדש אם לא קיים
+        const newModal = new bootstrap.Modal(modalElement);
+        newModal.hide();
+        console.log(`✅ Modal ${modalId} closed via new Bootstrap instance`);
+      }
+    } else {
+      // fallback לסגירה ידנית
+      modalElement.style.display = 'none';
+      modalElement.classList.remove('show');
+
+      // הסרת backdrop אם קיים
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
+
+      // הסרת מחלקות מ-body
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+
+      console.log(`✅ Modal ${modalId} closed via fallback method`);
+    }
+  } else {
+    console.warn(`⚠️ Modal element ${modalId} not found`);
   }
 };
 
@@ -1200,7 +1301,7 @@ function updateStatsDisplay(stats) {
  */
 function toggleSection(sectionId) {
   console.log(`🔄 Toggling section: ${sectionId}`);
-  
+
   const section = document.querySelector(`[data-section="${sectionId}"]`);
   if (!section) {
     console.warn(`Section with data-section="${sectionId}" not found`);
@@ -1208,18 +1309,18 @@ function toggleSection(sectionId) {
   }
 
   const sectionBody = section.querySelector('.section-body');
-  const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"]`);
+  const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
   if (sectionBody) {
     const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
 
     if (isCollapsed) {
-      sectionBody.classList.remove('collapsed');
+      section.classList.remove('collapsed');
       sectionBody.style.display = 'block';
       console.log(`📖 Section ${sectionId} expanded`);
     } else {
-      sectionBody.classList.add('collapsed');
+      section.classList.add('collapsed');
       sectionBody.style.display = 'none';
       console.log(`📖 Section ${sectionId} collapsed`);
     }
@@ -1240,7 +1341,7 @@ function toggleSection(sectionId) {
  */
 function toggleAllSections() {
   console.log('🔄 Toggling all sections');
-  
+
   const sections = document.querySelectorAll('.content-section');
   const toggleBtn = document.querySelector('button[onclick*="toggleAllSections"]');
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
@@ -1260,7 +1361,7 @@ function toggleAllSections() {
   sections.forEach(section => {
     const sectionBody = section.querySelector('.section-body');
     const sectionId = section.getAttribute('data-section');
-    
+
     if (sectionBody) {
       if (allCollapsed) {
         // פתיחת כל הסקשנים
@@ -1293,19 +1394,19 @@ window.toggleAllSections = toggleAllSections;
  */
 function restoreSectionStates() {
   console.log('🔄 Restoring section states from localStorage');
-  
+
   const sections = document.querySelectorAll('.content-section');
-  
+
   sections.forEach(section => {
     const sectionId = section.getAttribute('data-section');
     const sectionBody = section.querySelector('.section-body');
-    const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"]`);
+    const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-    
+
     if (sectionId && sectionBody) {
       const storageKey = `${sectionId}SectionCollapsed`;
       const isCollapsed = localStorage.getItem(storageKey) === 'true';
-      
+
       if (isCollapsed) {
         sectionBody.classList.add('collapsed');
         sectionBody.style.display = 'none';
@@ -1326,7 +1427,7 @@ function restoreSectionStates() {
 }
 
 // הוספת event listener לטעינת המצב השמור
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   // המתנה קצרה לוודא שהדף נטען לחלוטין
   setTimeout(() => {
     restoreSectionStates();

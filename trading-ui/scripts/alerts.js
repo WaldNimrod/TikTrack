@@ -104,7 +104,33 @@ async function loadAlertsData() {
     }));
 
     // עדכון הטבלה
-    updateAlertsTable(alertsData);
+    console.log('🔄 Updating alerts table with', alertsData.length, 'alerts');
+
+    // בדיקה אם יש פילטרים פעילים
+    const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
+      (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
+      (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
+      (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
+
+    console.log('🔄 Checking filters for alerts page:', {
+      hasActiveFilters,
+      selectedStatusesForFilter: window.selectedStatusesForFilter,
+      selectedTypesForFilter: window.selectedTypesForFilter,
+      selectedDateRangeForFilter: window.selectedDateRangeForFilter,
+      searchTermForFilter: window.searchTermForFilter
+    });
+
+    let filteredAlerts = [...alertsData];
+
+    if (hasActiveFilters) {
+      console.log('🔄 Applying filters to alerts data...');
+      filteredAlerts = filterAlertsLocally(alertsData, window.selectedStatusesForFilter, window.selectedTypesForFilter, window.selectedDateRangeForFilter, window.searchTermForFilter);
+      console.log('🔄 After filtering:', filteredAlerts.length, 'alerts');
+    } else {
+      console.log('🔄 No active filters, showing all alerts');
+    }
+
+    updateAlertsTable(filteredAlerts);
 
     return alertsData;
 
@@ -118,6 +144,181 @@ async function loadAlertsData() {
 
     return alertsData;
   }
+}
+
+/**
+ * פילטור מקומי להתראות
+ */
+function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+  console.log('🔄 === FILTER ALERTS LOCALLY ===');
+  console.log('🔄 Original alerts:', alerts.length);
+  console.log('🔄 Filters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
+
+  let filteredAlerts = [...alerts];
+
+  // Extracting start and end dates
+  let startDate = null;
+  let endDate = null;
+
+  if (selectedDateRange && selectedDateRange !== 'כל זמן') {
+    console.log('🔄 Filter: Translating date range:', selectedDateRange);
+    const dateRange = window.translateDateRangeToDates ? window.translateDateRangeToDates(selectedDateRange) : { startDate: null, endDate: null };
+    startDate = dateRange.startDate;
+    endDate = dateRange.endDate;
+    console.log('🔄 Filter: Translation result:', { startDate, endDate });
+  }
+
+  console.log('🔄 Extracted dates:', { startDate, endDate });
+
+  // Filtering by status
+  if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
+    console.log('🔄 Filtering by status:', selectedStatuses);
+    filteredAlerts = filteredAlerts.filter(alert => {
+      // המרת הערכים הנבחרים לאנגלית
+      const statusTranslations = {
+        'פתוח': 'open',
+        'סגור': 'closed',
+        'מבוטל': 'cancelled'
+      };
+
+      const translatedSelectedStatuses = selectedStatuses.map(status =>
+        statusTranslations[status] || status
+      );
+
+      const isMatch = translatedSelectedStatuses.includes(alert.status);
+      console.log(`🔄 Alert ${alert.id}: status=${alert.status}, selected=${selectedStatuses}, translated=${translatedSelectedStatuses}, match=${isMatch}`);
+      return isMatch;
+    });
+    console.log('🔄 After status filter:', filteredAlerts.length, 'alerts');
+  }
+
+  // Filtering by type
+  if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
+    console.log('🔄 Filtering by type:', selectedTypes);
+    filteredAlerts = filteredAlerts.filter(alert => {
+      // המרת הערכים הנבחרים לאנגלית
+      const typeTranslations = {
+        'התראה על מחיר': 'price_alert',
+        'סטופ לוס': 'stop_loss',
+        'התראה על נפח': 'volume_alert',
+        'התראה מותאמת': 'custom_alert'
+      };
+
+      const translatedSelectedTypes = selectedTypes.map(type =>
+        typeTranslations[type] || type
+      );
+
+      const isMatch = translatedSelectedTypes.includes(alert.type);
+      console.log(`🔄 Alert ${alert.id}: type=${alert.type}, selected=${selectedTypes}, translated=${translatedSelectedTypes}, match=${isMatch}`);
+      return isMatch;
+    });
+    console.log('🔄 After type filter:', filteredAlerts.length, 'alerts');
+  }
+
+  // Filtering by dates
+  if (startDate && endDate) {
+    console.log('🔄 Filtering by date range:', { startDate, endDate });
+    filteredAlerts = filteredAlerts.filter(alert => {
+      if (!alert.created_at) return false;
+
+      const alertDate = new Date(alert.created_at);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      // Setting time to start of day for start date and end of day for end date
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+
+      const isInRange = alertDate >= start && alertDate <= end;
+      console.log(`🔄 Alert ${alert.id}: created_at=${alert.created_at}, inRange=${isInRange}`);
+      return isInRange;
+    });
+    console.log('🔄 After date filter:', filteredAlerts.length, 'alerts');
+  }
+
+  // Filtering by search term
+  if (searchTerm && searchTerm.trim() !== '') {
+    console.log('🔄 Filtering by search term:', searchTerm);
+    const searchLower = searchTerm.toLowerCase();
+
+    // Bi-directional search term translations
+    const searchTranslations = {
+      // Status translations
+      'פתוח': 'open',
+      'סגור': 'closed',
+      'מבוטל': 'cancelled',
+      'open': 'open',
+      'closed': 'closed',
+      'cancelled': 'cancelled',
+
+      // Alert type translations
+      'התראה על מחיר': 'price_alert',
+      'סטופ לוס': 'stop_loss',
+      'התראה על נפח': 'volume_alert',
+      'התראה מותאמת': 'custom_alert',
+      'price_alert': 'price_alert',
+      'stop_loss': 'stop_loss',
+      'volume_alert': 'volume_alert',
+      'custom_alert': 'custom_alert'
+    };
+
+    // Creating an array of search terms including translations
+    const searchTerms = [searchLower];
+
+    // Adding exact translation
+    if (searchTranslations[searchLower]) {
+      searchTerms.push(searchTranslations[searchLower]);
+    }
+
+    // Adding partial search - if user searches for part of a word
+    Object.keys(searchTranslations).forEach(hebrewTerm => {
+      if (hebrewTerm.includes(searchLower) && !searchTerms.includes(searchTranslations[hebrewTerm])) {
+        searchTerms.push(searchTranslations[hebrewTerm]);
+      }
+    });
+
+    filteredAlerts = filteredAlerts.filter(alert => {
+      // Searching in all relevant fields
+      const titleMatch = alert.title && searchTerms.some(term =>
+        alert.title.toLowerCase().includes(term)
+      );
+
+      const typeMatch = alert.type && searchTerms.some(term =>
+        alert.type.toLowerCase().includes(term)
+      );
+
+      const statusMatch = alert.status && searchTerms.some(term =>
+        alert.status.toLowerCase().includes(term)
+      );
+
+      const conditionMatch = alert.condition && searchTerms.some(term =>
+        alert.condition.toLowerCase().includes(term)
+      );
+
+      const messageMatch = alert.message && searchTerms.some(term =>
+        alert.message.toLowerCase().includes(term)
+      );
+
+      const isMatch = titleMatch || typeMatch || statusMatch || conditionMatch || messageMatch;
+
+      console.log(`🔄 Alert ${alert.id} search:`, {
+        title: alert.title,
+        type: alert.type,
+        status: alert.status,
+        condition: alert.condition,
+        message: alert.message,
+        searchTerms: searchTerms,
+        originalSearch: searchLower,
+        match: isMatch
+      });
+
+      return isMatch;
+    });
+    console.log('🔄 After search filter:', filteredAlerts.length, 'alerts');
+  }
+
+  console.log('🔄 Final filtered alerts:', filteredAlerts.length);
+  return filteredAlerts;
 }
 
 /**
@@ -378,9 +579,9 @@ function updateAlertsTable(alerts) {
               ${relatedDisplay}
             </div>
           </td>
-          <td data-status="${statusDisplay}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+          <td data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
-          <td data-type="${typeDisplay}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
+          <td data-type="${alert.type || ''}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
           <td><span class="condition-text">${alert.condition || '-'}</span></td>
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
@@ -682,29 +883,15 @@ function populateSelect(selectId, data, field, prefix = '') {
 }
 
 /**
- * סגירת מודל
+ * סגירת מודל - שימוש בפונקציה גלובלית
+ * @deprecated Use window.closeModal from main.js instead
  */
 function closeModal(modalId) {
-  const modalElement = document.getElementById(modalId);
-  if (modalElement) {
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-      const modal = bootstrap.Modal.getInstance(modalElement);
-      if (modal) {
-        modal.hide();
-      }
-    } else {
-      // אם Bootstrap לא זמין, נסגור את המודל באופן ידני
-      modalElement.style.display = 'none';
-      modalElement.classList.remove('show');
-      document.body.classList.remove('modal-open');
-
-      // הסרת backdrop
-      const backdrop = document.getElementById('modalBackdrop');
-      if (backdrop) {
-        backdrop.remove();
-      }
-    }
+  // שימוש בפונקציה הגלובלית
+  if (typeof window.closeModal === 'function') {
+    window.closeModal(modalId);
+  } else {
+    console.error('❌ closeModal function not found in main.js');
   }
 }
 
@@ -1429,19 +1616,16 @@ async function deleteAlert(alertId) {
 function sortTable(columnIndex) {
   console.log(`🔄 מיון טבלת התראות לפי עמודה ${columnIndex}`);
 
-  // שימוש בפונקציה הגלובלית
-  if (typeof window.sortTableData === 'function') {
-    const sortedData = window.sortTableData(
+  // שימוש בפונקציה הגלובלית החדשה
+  if (typeof window.sortTable === 'function') {
+    window.sortTable(
+      'alerts',
       columnIndex,
       window.filteredAlertsData || alertsData,
-      'alerts',
       updateAlertsTable
     );
-
-    // עדכון הנתונים המסוננים
-    window.filteredAlertsData = sortedData;
   } else {
-    console.error('❌ sortTableData function not found in main.js');
+    console.error('❌ sortTable function not found in main.js');
   }
 }
 
@@ -1596,21 +1780,18 @@ if (window.location.pathname.includes('/alerts')) {
     console.log('🔄 === UPDATE GRID FROM COMPONENT (alerts) ===');
     console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
 
-    // קריאה לפונקציה הגלובלית
-    if (typeof window.updateGridFromComponentGlobal === 'function') {
-      window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'alerts');
-    } else {
-      console.log('🔄 updateGridFromComponentGlobal not available, using local filtering...');
+    // שמירת הפילטרים
+    window.selectedStatusesForFilter = selectedStatuses || [];
+    window.selectedTypesForFilter = selectedTypes || [];
+    window.selectedDateRangeForFilter = selectedDateRange || null;
+    window.searchTermForFilter = searchTerm || '';
 
-      // טיפול מקומי בפילטרים אם הפונקציה הגלובלית לא זמינה
-      if (alertsData && typeof window.filterDataByFilters === 'function') {
-        const filteredData = window.filterDataByFilters(alertsData, 'alerts');
-        if (typeof window.updateAlertsTable === 'function') {
-          window.updateAlertsTable(filteredData);
-        }
-      } else {
-        console.error('❌ Local filtering not available either');
-      }
+    // טעינת נתונים מחדש עם הפילטרים החדשים
+    if (typeof window.loadAlertsData === 'function') {
+      console.log('🔄 Calling loadAlertsData with new filters');
+      window.loadAlertsData();
+    } else {
+      console.error('❌ loadAlertsData function not found');
     }
   };
 }
@@ -1620,6 +1801,7 @@ if (window.location.pathname.includes('/alerts')) {
 // הוספת הפונקציות לגלובל
 window.loadAlertsData = loadAlertsData;
 window.updateAlertsTable = updateAlertsTable;
+window.filterAlertsLocally = filterAlertsLocally;
 window.showAddAlertModal = showAddAlertModal;
 window.editAlert = editAlert;
 window.deleteAlert = deleteAlert;

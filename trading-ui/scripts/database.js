@@ -378,7 +378,7 @@ function updateAccountsTable() {
     return;
   }
 
-    const rows = allData.accounts.map(account => {
+  const rows = allData.accounts.map(account => {
     // המרת סטטוס לעברית לפילטר
     const statusForFilter = account.status === 'open' ? 'פתוח' :
       account.status === 'closed' ? 'סגור' :
@@ -401,8 +401,8 @@ function updateAccountsTable() {
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק">🗑️</button>
         ${account.status && account.status !== 'cancelled' ?
-          `<button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>` :
-          ''}
+        `<button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>` :
+        ''}
       </td>
     </tr>
   `}).join('');
@@ -420,7 +420,7 @@ function updateTradesTable() {
     return;
   }
 
-    const rows = allData.trades.map(trade => {
+  const rows = allData.trades.map(trade => {
     // המרת סוגים לעברית לפילטר
     const typeForFilter = trade.investment_type === 'swing' ? 'סווינג' :
       trade.investment_type === 'investment' ? 'השקעה' :
@@ -453,8 +453,8 @@ function updateTradesTable() {
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteTrade(${trade.id})" title="מחק">🗑️</button>
         ${trade.status && trade.status !== 'cancelled' ?
-          `<button class="btn btn-sm btn-warning" onclick="cancelTrade(${trade.id})" title="ביטול">❌</button>` :
-          ''}
+        `<button class="btn btn-sm btn-warning" onclick="cancelTrade(${trade.id})" title="ביטול">❌</button>` :
+        ''}
       </td>
     </tr>
   `}).join('');

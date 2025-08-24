@@ -24,6 +24,13 @@ TikTrack is a comprehensive trading management system designed to simplify portf
 - **Validation System**: Real-time constraint validation
 - **Migration Support**: Automated constraint migration tools
 
+### Unified Filter System
+- **Smart Filtering**: Advanced filtering across all pages with "All" option
+- **User Preferences**: Multi-user support with default user "nimrod"
+- **Local Filtering**: Client-side filtering for better performance
+- **State Persistence**: Filter states saved between sessions
+- **RTL Support**: Full Hebrew interface support
+
 ### Notes and Documentation
 - **Trade Notes**: Document trading decisions and analysis
 - **File Attachments**: Support for PDF, images, and documents
@@ -44,11 +51,81 @@ git clone https://github.com/WaldNimrod/TikTrack.git
 cd TikTrack
 
 # Start the development server
-./start_dev.sh
+./restart quick
 
 # Access the application
 http://localhost:8080
 ```
+
+### 📋 **Important Files**
+- **[PROJECT_STATUS_SUMMARY.md](PROJECT_STATUS_SUMMARY.md)** - Complete project status and progress
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and updates
+- **[FILTER_UPDATE_SUMMARY.md](FILTER_UPDATE_SUMMARY.md)** - Filter system update summary
+- **[documentation/](documentation/)** - Comprehensive documentation
+
+## 🚀 Server Restart System
+
+TikTrack includes a sophisticated server restart system with multiple modes for different scenarios:
+
+> 📋 **לפרטים מלאים:** ראה [PROJECT_STATUS_SUMMARY.md](PROJECT_STATUS_SUMMARY.md)
+
+### Quick Restart Mode
+```bash
+./restart quick          # Fast restart (5-10 seconds)
+```
+**Use for:** Development, testing, minor changes
+- Stops server processes
+- Cleans port conflicts  
+- Basic health checks
+- Simple API testing
+
+### Complete Restart Mode
+```bash
+./restart complete       # Comprehensive restart (30-60 seconds)
+```
+**Use for:** Production, troubleshooting, major issues
+- Complete system analysis
+- Database lock cleanup
+- Cache and temp file cleanup
+- Package dependency checks
+- Route validation (23+ endpoints)
+- Performance monitoring
+- Automatic problem fixing
+
+### Smart Auto Mode
+```bash
+./restart                # Automatic mode selection
+```
+**Features:**
+- Intelligent mode detection based on system health
+- Memory usage analysis
+- Error pattern recognition
+- Database lock detection
+- Automatic problem diagnosis
+
+### Interactive Mode
+```bash
+./restart --interactive  # User choice with menu
+```
+
+### Additional Options
+```bash
+./restart --help         # Show all options
+./restart --status       # Show system status
+./restart --info         # Show mode information
+./restart --verbose      # Detailed output
+```
+
+### Troubleshooting
+If you encounter issues:
+1. **Quick restart fails:** Try `./restart complete`
+2. **Complete restart too slow:** Try `./restart quick`
+3. **Persistent issues:** Use `./restart --verbose complete`
+4. **Interactive troubleshooting:** Use `./restart --interactive`
+
+For detailed documentation, see: `documentation/server/RESTART_SCRIPT_GUIDE.md`
+
+> 📋 **לפרטים מלאים על הפרויקט:** ראה [PROJECT_STATUS_SUMMARY.md](PROJECT_STATUS_SUMMARY.md)
 
 ### First Steps
 1. **Create Accounts**: Add your trading accounts

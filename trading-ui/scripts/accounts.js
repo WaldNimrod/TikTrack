@@ -198,6 +198,9 @@ async function loadAccountsFromServer() {
       } else {
         console.log('🔄 updateAccountFilterMenu not available yet');
       }
+
+      // החזרת הנתונים לטעינה חוזרת
+      return openAccounts;
     } else {
       console.log('🔄 Error loading accounts from server, status:', response.status);
       const errorText = await response.text();
@@ -248,22 +251,26 @@ async function loadAllAccountsFromServer() {
       } else {
         console.log('🔄 updateAccountFilterMenu not available yet, trying direct update...');
         // ניסיון לעדכן ישירות
-        if (typeof window.updateAccountFilterMenuDirectly === 'function') {
-          window.updateAccountFilterMenuDirectly(openAccounts);
-        } else {
-          console.log('🔄 updateAccountFilterMenuDirectly not available either');
-        }
       }
-      return openAccounts;
-    } else {
-      console.log('🔄 Error loading all accounts from server, status:', response.status);
-      return [];
-    }
 
-  } catch (error) {
-    console.log('🔄 Error loading all accounts from server:', error);
+      // החזרת הנתונים לטעינה חוזרת
+      return openAccounts;
+      if (typeof window.updateAccountFilterMenuDirectly === 'function') {
+        window.updateAccountFilterMenuDirectly(openAccounts);
+      } else {
+        console.log('🔄 updateAccountFilterMenuDirectly not available either');
+      }
+    }
+    return openAccounts;
+  } else {
+    console.log('🔄 Error loading all accounts from server, status:', response.status);
     return [];
   }
+
+} catch (error) {
+  console.log('🔄 Error loading all accounts from server:', error);
+  return [];
+}
 }
 
 // פונקציה לטעינת חשבונות ברירת מחדל

@@ -350,7 +350,7 @@
                 </div>
 
                 <!-- CRUD Testing area - content-section -->
-                <div class="content-section">
+                <div class="content-section" data-section="crud">
                     <!-- CRUD Testing header -->
                     <div class="section-header">
                         <div class="table-title">
@@ -553,7 +553,7 @@
                 </div>
 
                 <!-- Security Tests area - content-section -->
-                <div class="content-section">
+                <div class="content-section" data-section="security">
                     <!-- Security Tests header -->
                     <div class="section-header">
                         <div class="table-title">
@@ -603,7 +603,7 @@
                 </div>
 
                 <!-- Future Section 1 area - content-section -->
-                <div class="content-section">
+                <div class="content-section" data-section="future1">
                     <!-- Future Section 1 header -->
                     <div class="section-header">
                         <div class="table-title">
@@ -1119,6 +1119,8 @@
         <script src="scripts/header-system.js"></script>
         <script src="scripts/account-modal.js"></script>
         <script src="scripts/console-cleanup.js"></script>
+        <script src="scripts/translation-utils.js"></script>
+        <script src="scripts/main.js"></script>
         <script src="scripts/tests.js"></script>
 
         <!-- Page initialization -->
@@ -1134,12 +1136,12 @@
         <script>
             // אתחול מערכת הכותרת החדשה
             document.addEventListener("DOMContentLoaded", () => {
-                if (typeof window.HeaderSystem !== "undefined") {
-                    console.log("🔄 Initializing new unified header system...");
-                    window.headerSystem = new window.HeaderSystem();
-                    window.headerSystem.initialize();
-                    window.filterSystem = new window.SimpleFilter();
-                    window.filterSystem.initialize();
+                console.log("🔄 Initializing unified header system...");
+                if (window.headerSystem) {
+                    window.headerSystem.init();
+                }
+                if (window.simpleFilter) {
+                    window.simpleFilter.init();
                 }
             });
         </script>

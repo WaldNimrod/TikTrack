@@ -16,6 +16,9 @@ This directory contains all server-related documentation for the TikTrack system
 - **[ISSUES.md](ISSUES.md)** - Known server issues and solutions
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Troubleshooting guide for common problems
 
+### 📋 **Project Status**
+- **[PROJECT_STATUS_SUMMARY.md](../../PROJECT_STATUS_SUMMARY.md)** - Complete project status and progress summary
+
 ## 🖥️ Server Architecture
 
 ### Technology Stack
@@ -34,9 +37,57 @@ This directory contains all server-related documentation for the TikTrack system
 
 ## 🚀 Server Management
 
-### Starting the Server
+### 🆕 **Unified Server Restart System (Recommended)**
 
-#### 🆕 **Complete Server Restart (Recommended)**
+TikTrack now includes a sophisticated unified restart system with multiple modes:
+
+#### **Smart Auto Mode (Default)**
+```bash
+./restart
+```
+- **Intelligent mode detection** based on system health
+- **Automatic problem diagnosis** and mode selection
+- **Memory usage analysis** and error pattern recognition
+- **Database lock detection** and automatic cleanup
+
+#### **Quick Restart Mode**
+```bash
+./restart quick
+```
+- **Fast restart** (5-10 seconds)
+- **Development and testing** scenarios
+- **Basic health checks** and port cleanup
+- **Minimal logging** and resource usage
+
+#### **Complete Restart Mode**
+```bash
+./restart complete
+```
+- **Comprehensive restart** (30-60 seconds)
+- **Production and troubleshooting** scenarios
+- **Complete system analysis** and validation
+- **Route validation** (23+ endpoints)
+- **Automatic problem fixing** and recovery
+
+#### **Interactive Mode**
+```bash
+./restart --interactive
+```
+- **User choice** with detailed menu
+- **Mode comparison** and recommendations
+- **System status** display
+
+#### **Additional Options**
+```bash
+./restart --help         # Show all options
+./restart --status       # Show system status
+./restart --info         # Show mode information
+./restart --verbose      # Detailed output
+```
+
+### Legacy Server Management
+
+#### **Complete Server Restart (Legacy)**
 ```bash
 ./restart_server_complete.sh
 ```

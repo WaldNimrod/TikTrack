@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from models.trade import Trade
 from models.trade_plan import TradePlan
+from services.validation_service import ValidationService
 from typing import List, Optional, Dict, Any
 import logging
 from datetime import datetime
@@ -105,13 +106,41 @@ class TradeService:
                     data['side'] = trade_plan.side
                     logger.info(f"Assigned side '{trade_plan.side}' from trade plan {trade_plan.id}")
         
+        # Convert string dates to datetime objects
+        if 'created_at' in data and isinstance(data['created_at'], str):
+            try:
+                data['created_at'] = datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
+            except ValueError:
+                # Try other date formats
+                try:
+                    data['created_at'] = datetime.strptime(data['created_at'], '%Y-%m-%d %H:%M:%S')
+                except ValueError:
+                    raise ValueError(f"Invalid date format for created_at: {data['created_at']}")
+        
+        if 'closed_at' in data and isinstance(data['closed_at'], str):
+            try:
+                data['closed_at'] = datetime.fromisoformat(data['closed_at'].replace('Z', '+00:00'))
+            except ValueError:
+                try:
+                    data['closed_at'] = datetime.strptime(data['closed_at'], '%Y-%m-%d %H:%M:%S')
+                except ValueError:
+                    raise ValueError(f"Invalid date format for closed_at: {data['closed_at']}")
+        
+        # Validate data against dynamic constraints
+        logger.info("About to call ValidationService.validate_data")
+        logger.info(f"Data to validate: {data}")
+        is_valid, errors = ValidationService.validate_data(db, 'trades', data)
+        logger.info(f"ValidationService returned: is_valid={is_valid}, errors={errors}")
+        if not is_valid:
+            raise ValueError(f"Validation failed: {'; '.join(errors)}")
+        
         trade = Trade(**data)
         
-        # Validation before saving
-        validation_errors = trade.validate_before_save(db)
+        # Additional custom validation (if needed)
+        validation_errors = trade.validate_before_save(db) if hasattr(trade, 'validate_before_save') else []
         if validation_errors:
             error_message = "; ".join(validation_errors)
-            logger.error(f"Validation errors for trade: {error_message}")
+            logger.error(f"Custom validation errors for trade: {error_message}")
             raise ValueError(f"Trade validation errors: {error_message}")
         
         db.add(trade)
@@ -124,23 +153,29 @@ class TradeService:
     def update(db: Session, trade_id: int, data: Dict[str, Any]) -> Optional[Trade]:
         """Update trade"""
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
-        if trade:
-            for key, value in data.items():
-                if hasattr(trade, key):
-                    setattr(trade, key, value)
-            
-            # Validation before saving
-            validation_errors = trade.validate_before_save(db)
-            if validation_errors:
-                error_message = "; ".join(validation_errors)
-                logger.error(f"Validation errors for trade {trade_id}: {error_message}")
-                raise ValueError(f"Trade validation errors: {error_message}")
-            
-            db.commit()
-            db.refresh(trade)
-            logger.info(f"Updated trade: {trade.id}")
-            return trade
-        return None
+        if not trade:
+            return None
+        
+        # Validate data against dynamic constraints (excluding current ID for unique checks)
+        is_valid, errors = ValidationService.validate_data(db, 'trades', data, exclude_id=trade_id)
+        if not is_valid:
+            raise ValueError(f"Validation failed: {'; '.join(errors)}")
+        
+        for key, value in data.items():
+            if hasattr(trade, key):
+                setattr(trade, key, value)
+        
+        # Additional custom validation (if needed)
+        validation_errors = trade.validate_before_save(db) if hasattr(trade, 'validate_before_save') else []
+        if validation_errors:
+            error_message = "; ".join(validation_errors)
+            logger.error(f"Custom validation errors for trade {trade_id}: {error_message}")
+            raise ValueError(f"Trade validation errors: {error_message}")
+        
+        db.commit()
+        db.refresh(trade)
+        logger.info(f"Updated trade: {trade.id}")
+        return trade
     
     @staticmethod
     def delete(db: Session, trade_id: int) -> bool:

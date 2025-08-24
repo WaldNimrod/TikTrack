@@ -683,6 +683,98 @@ function updateCashFlowsTable(cashFlows) {
 // הגדרת הפונקציה כגלובלית
 window.updateCashFlowsTable = updateCashFlowsTable;
 
+// פונקציית פילטור מקומי לתזרימי מזומנים
+function filterCashFlowsLocally(cashFlows, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
+    console.log('🔍 filterCashFlowsLocally called with:', { selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm });
+
+    return cashFlows.filter(cashFlow => {
+        // פילטר חיפוש
+        if (searchTerm && searchTerm.trim() !== '') {
+            const searchLower = searchTerm.toLowerCase();
+            const accountName = cashFlow.account_name || '';
+            const description = cashFlow.description || '';
+            const notes = cashFlow.notes || '';
+
+            if (!accountName.toLowerCase().includes(searchLower) &&
+                !description.toLowerCase().includes(searchLower) &&
+                !notes.toLowerCase().includes(searchLower)) {
+                return false;
+            }
+        }
+
+        // פילטר סוג (type)
+        if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('הכול')) {
+            const cashFlowType = cashFlow.type === 'deposit' ? 'הפקדה' :
+                cashFlow.type === 'withdrawal' ? 'משיכה' :
+                    cashFlow.type === 'dividend' ? 'דיבידנד' :
+                        cashFlow.type === 'fee' ? 'עמלה' :
+                            cashFlow.type === 'interest' ? 'ריבית' : cashFlow.type;
+
+            if (!selectedTypes.includes(cashFlowType)) {
+                return false;
+            }
+        }
+
+        // פילטר סטטוס
+        if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('הכול')) {
+            const cashFlowStatus = cashFlow.status === 'completed' ? 'הושלם' :
+                cashFlow.status === 'pending' ? 'ממתין' :
+                    cashFlow.status === 'cancelled' ? 'בוטל' : cashFlow.status;
+
+            if (!selectedStatuses.includes(cashFlowStatus)) {
+                return false;
+            }
+        }
+
+        // פילטר חשבון
+        if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('הכול')) {
+            const accountName = cashFlow.account_name || cashFlow.account_id || '';
+            if (!selectedAccounts.includes(accountName)) {
+                return false;
+            }
+        }
+
+        // פילטר תאריך
+        if (dateRange && dateRange !== 'כל זמן' && dateRange !== 'הכול') {
+            const cashFlowDate = new Date(cashFlow.date);
+            const now = new Date();
+
+            let startDate, endDate;
+
+            switch (dateRange) {
+                case 'היום':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                    break;
+                case 'אתמול':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    break;
+                case 'השבוע':
+                    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+                    startDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                    break;
+                case '30 יום':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                    break;
+                default:
+                    return true; // אם לא מוכר, לא מסנן
+            }
+
+            if (cashFlowDate < startDate || cashFlowDate >= endDate) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+}
+
+// הגדרת הפונקציה כגלובלית
+window.filterCashFlowsLocally = filterCashFlowsLocally;
+
 // ========================================
 // אתחול הדף
 // ========================================
@@ -707,6 +799,30 @@ async function loadCashFlows() {
         // עדכון המשתנה הגלובלי
         window.cashFlowsData = cashFlows;
         cashFlowsData = cashFlows;
+
+        // בדיקה אם יש פילטרים פעילים
+        if (window.headerSystem && window.headerSystem.currentFilters) {
+            const filters = window.headerSystem.currentFilters;
+            const hasActiveFilters = (filters.status && filters.status.length > 0) ||
+                (filters.type && filters.type.length > 0) ||
+                (filters.account && filters.account.length > 0) ||
+                (filters.dateRange && filters.dateRange !== '') ||
+                (filters.search && filters.search !== '');
+
+            if (hasActiveFilters) {
+                console.log('🔍 יש פילטרים פעילים, מסנן נתונים מקומית');
+                const filteredData = filterCashFlowsLocally(
+                    cashFlows,
+                    filters.status,
+                    filters.type,
+                    filters.account,
+                    filters.dateRange,
+                    filters.search
+                );
+                updateCashFlowsTable(filteredData);
+                return;
+            }
+        }
 
         // עדכון הטבלה
         updateCashFlowsTable(cashFlows);
@@ -785,25 +901,29 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
 function sortTable(columnIndex) {
     console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
 
-    if (typeof window.sortTableData === 'function') {
-        const sortedData = window.sortTableData(
+    if (typeof window.sortTable === 'function') {
+        window.sortTable(
+            'cash_flows',
             columnIndex,
             window.cashFlowsData || [],
-            'cash_flows',
             updateCashFlowsTable
         );
-        console.log('✅ נתונים מסודרים:', sortedData);
     } else {
-        console.error('❌ sortTableData function not found in main.js');
+        console.error('❌ sortTable function not found in main.js');
     }
 }
 
 /**
- * שחזור מצב סידור
+ * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
+    console.log('🔄 Restoring sort state for cash flows table');
+
     if (typeof window.restoreAnyTableSort === 'function') {
         window.restoreAnyTableSort('cash_flows', window.cashFlowsData || [], updateCashFlowsTable);
+    } else {
+        console.error('❌ restoreAnyTableSort function not found in main.js');
     }
 }
 

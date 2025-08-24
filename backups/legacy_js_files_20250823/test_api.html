@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>אבטחה - Tik.track</title>
+    <title>API - Tik.track</title>
 
     <!-- 
-    ===== דף אבטחה - TikTrack =====
+    ===== דף API - TikTrack =====
     
     דף זה מכיל:
-    1. טבלת אבטחה - הסקשן הראשון
-    2. טבלת תוצאות אבטחה - הסקשן השני
+    1. טבלת API - הסקשן הראשון
+    2. טבלת תוצאות API - הסקשן השני
     3. כרטיסיות התראות - בחלק העליון
     4. מערכת פילטרים ומיון מתקדמת
     
@@ -19,15 +19,15 @@
     - app-header: כותרת האפליקציה עם ניווט
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות התראות וסיכום נתונים
-      - content-section (1): טבלת אבטחה
-      - content-section (2): טבלת תוצאות אבטחה
+      - content-section (1): טבלת API
+      - content-section (2): טבלת תוצאות API
     
     שינויים אחרונים:
-    - יצירת עמוד אבטחה חדש
-    - הוספת טבלת תוצאות אבטחה
+    - יצירת עמוד API חדש
+    - הוספת טבלת תוצאות API
     - שיפור עיצוב כרטיסיות התראות
     - תיקון כפתורי סגירה עצמאיים
-    - ריכוז פונקציות אבטחה ב-security.js
+    - ריכוז פונקציות API ב-api.js
   -->
 
     <!-- CSS Files - Ordered by priority (weak to strong) -->
@@ -65,21 +65,22 @@
 
         <!-- Page body - All content after header -->
         <div class="page-body">
-            <!-- Security area - top-Section -->
+            <!-- API area - top-Section -->
             <div class="top-section">
                 <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
-                        🔒 Security Management
+                        🔌 API Management
                     </div>
                     <div class="table-actions">
-                        <button class="refresh-btn" onclick="saveAllSecurity()" title="שמור כל ההגדרות">
+                        <button class="refresh-btn" onclick="saveAllAPI()" title="שמור כל ההגדרות">
                             <span class="action-icon">💾</span> שמור הכל
                         </button>
-                        <button class="refresh-btn" onclick="resetAllSecurity()" title="איפוס כל ההגדרות לברירות מחדל">
+                        <button class="refresh-btn" onclick="resetAllAPI()"
+                            title="איפוס כל ההגדרות לברירות מחדל">
                             <span class="action-icon">🔄</span> איפוס הכל
                         </button>
-                        <button class="refresh-btn" onclick="runAllSecurity()" title="הרץ את כל בדיקות האבטחה">
+                        <button class="refresh-btn" onclick="runAllAPI()" title="הרץ את כל בדיקות ה-API">
                             <span class="action-icon">▶️</span> הרץ הכל
                         </button>
                         <div class="action-separator"></div>
@@ -95,31 +96,31 @@
 
                     <!-- Data summary -->
                     <div class="test-summary" id="summaryStats">
-                        <h4>📊 סיכום אבטחה</h4>
+                        <h4>📊 סיכום API</h4>
                         <div class="test-summary-stats">
                             <div class="stat-item">
-                                <span class="stat-label">בדיקות עברו:</span>
-                                <span class="stat-value" id="passedSecurityCount">0</span>
+                                <span class="stat-label">Endpoints פעילים:</span>
+                                <span class="stat-value" id="activeEndpointsCount">0</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">בדיקות נכשלו:</span>
-                                <span class="stat-value" id="failedSecurityCount">0</span>
+                                <span class="stat-label">בקשות GET:</span>
+                                <span class="stat-value" id="getRequestsCount">0</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">אזהרות:</span>
-                                <span class="stat-value" id="warningSecurityCount">0</span>
+                                <span class="stat-label">בקשות POST:</span>
+                                <span class="stat-value" id="postRequestsCount">0</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">סיכונים גבוהים:</span>
-                                <span class="stat-value" id="highRiskSecurityCount">0</span>
+                                <span class="stat-label">בקשות PUT:</span>
+                                <span class="stat-value" id="putRequestsCount">0</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">סיכונים נמוכים:</span>
-                                <span class="stat-value" id="lowRiskSecurityCount">0</span>
+                                <span class="stat-label">בקשות DELETE:</span>
+                                <span class="stat-value" id="deleteRequestsCount">0</span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-label">סך הכל:</span>
-                                <span class="stat-value" id="totalSecurityCount">0</span>
+                                <span class="stat-value" id="totalAPICount">0</span>
                             </div>
                         </div>
                     </div>
@@ -129,71 +130,70 @@
             <!-- Main content -->
             <div class="main-content">
 
-                <!-- Security Tests Section -->
+                <!-- API Endpoints Section -->
                 <div class="content-section">
-                    <!-- Security Tests Header -->
+                    <!-- API Endpoints Header -->
                     <div class="section-header">
                         <div class="table-title">
-                            🔒 בדיקות אבטחה<br><span
-                                style="font-weight: normal; font-size: 0.8em; color: #666;">Security Tests</span>
+                            🔌 נקודות קצה API<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">API Endpoints</span>
                         </div>
-                        <div class="table-count" id="securityCount">טוען...</div>
+                        <div class="table-count" id="apiCount">טוען...</div>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <div class="search-input-wrapper">
-                                <input type="text" class="search-filter-input" placeholder="חיפוש בדיקות אבטחה..."
-                                    onkeyup="filterSecurityData([], [], [], null, this.value)">
+                                <input type="text" class="search-filter-input" placeholder="חיפוש נקודות קצה..."
+                                    onkeyup="filterAPIData([], [], [], null, this.value)">
                             </div>
-                            <button class="refresh-btn" onclick="addNewSecurityTest()" title="הוסף בדיקת אבטחה חדשה">
+                            <button class="refresh-btn" onclick="addNewAPIEndpoint()" title="הוסף נקודת קצה חדשה">
                                 <span class="action-icon">➕</span> הוסף
                             </button>
-                            <button class="refresh-btn" onclick="loadSecurityTests()" title="רענן טבלה">
+                            <button class="refresh-btn" onclick="loadAPIEndpoints()" title="רענן טבלה">
                                 <span class="action-icon">🔄</span> רענן
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור אבטחה">
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור API">
                                 <span class="filter-icon">▲</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Security Tests Table -->
+                    <!-- API Endpoints Table -->
                     <div class="section-body">
-                        <div class="table-responsive" id="securityContainer">
-                            <table class="table" id="securityTable" data-table-type="security">
+                        <div class="table-responsive" id="apiContainer">
+                            <table class="table" id="apiTable" data-table-type="api">
                                 <thead>
                                     <tr>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(0)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>סוג בדיקה
-                                                <br><span class="header-subtitle">Test Type</span>
+                                                <span class="sort-icon">↕</span>שיטה
+                                                <br><span class="header-subtitle">Method</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(1)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>תיאור
-                                                <br><span class="header-subtitle">Description</span>
+                                                <span class="sort-icon">↕</span>נתיב
+                                                <br><span class="header-subtitle">Path</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(2)"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>רמת סיכון
-                                                <br><span class="header-subtitle">Risk Level</span>
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button class="btn btn-link sortable-header" onclick="sortTable(3)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>סטטוס
                                                 <br><span class="header-subtitle">Status</span>
                                             </button>
                                         </th>
                                         <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תגובה
+                                                <br><span class="header-subtitle">Response</span>
+                                            </button>
+                                        </th>
+                                        <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(4)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>תוצאה
-                                                <br><span class="header-subtitle">Result</span>
+                                                <span class="sort-icon">↕</span>זמן תגובה
+                                                <br><span class="header-subtitle">Response Time</span>
                                             </button>
                                         </th>
                                         <th>
@@ -211,7 +211,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="7" class="loading">טוען בדיקות אבטחה...</td>
+                                        <td colspan="7" class="loading">טוען נקודות קצה API...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -219,37 +219,35 @@
                     </div>
                 </div>
 
-                <!-- Security Results Section -->
+                <!-- API Results Section -->
                 <div class="content-section">
-                    <!-- Security Results Header -->
+                    <!-- API Results Header -->
                     <div class="section-header">
                         <div class="table-title">
-                            📋 תוצאות אבטחה<br><span
-                                style="font-weight: normal; font-size: 0.8em; color: #666;">Security Results</span>
+                            📋 תוצאות API<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">API Results</span>
                         </div>
-                        <div class="table-count" id="securityResultsCount">טוען...</div>
+                        <div class="table-count" id="apiResultsCount">טוען...</div>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <div class="search-input-wrapper">
                                 <input type="text" class="search-filter-input" placeholder="חיפוש תוצאות..."
-                                    onkeyup="filterSecurityResultsData([], [], [], null, this.value)">
+                                    onkeyup="filterAPIResultsData([], [], [], null, this.value)">
                             </div>
-                            <button class="refresh-btn" onclick="exportSecurityResults()" title="ייצא תוצאות">
+                            <button class="refresh-btn" onclick="exportAPIResults()" title="ייצא תוצאות">
                                 <span class="action-icon">📤</span> ייצא
                             </button>
-                            <button class="refresh-btn" onclick="loadSecurityResults()" title="רענן טבלה">
+                            <button class="refresh-btn" onclick="loadAPIResults()" title="רענן טבלה">
                                 <span class="action-icon">🔄</span> רענן
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleSecondSection()"
-                                title="הצג/הסתר אזור תוצאות">
+                            <button class="filter-toggle-btn" onclick="toggleSecondSection()" title="הצג/הסתר אזור תוצאות">
                                 <span class="filter-icon">▲</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Security Results Table -->
+                    <!-- API Results Table -->
                     <div class="section-body">
-                        <div class="table-responsive" id="securityResultsContainer">
-                            <table class="table" id="securityResultsTable" data-table-type="security-results">
+                        <div class="table-responsive" id="apiResultsContainer">
+                            <table class="table" id="apiResultsTable" data-table-type="api-results">
                                 <thead>
                                     <tr>
                                         <th>
@@ -262,40 +260,33 @@
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(1)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>בדיקת אבטחה
-                                                <br><span class="header-subtitle">Security Test</span>
+                                                <span class="sort-icon">↕</span>בקשה
+                                                <br><span class="header-subtitle">Request</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(2)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>רמת סיכון
-                                                <br><span class="header-subtitle">Risk Level</span>
+                                                <span class="sort-icon">↕</span>סטטוס קוד
+                                                <br><span class="header-subtitle">Status Code</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(3)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>סטטוס
-                                                <br><span class="header-subtitle">Status</span>
+                                                <span class="sort-icon">↕</span>תגובה
+                                                <br><span class="header-subtitle">Response</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(4)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>פירוט
-                                                <br><span class="header-subtitle">Details</span>
+                                                <span class="sort-icon">↕</span>זמן תגובה
+                                                <br><span class="header-subtitle">Response Time</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(5)"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>זמן ביצוע
-                                                <br><span class="header-subtitle">Execution Time</span>
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button class="btn btn-link sortable-header" onclick="sortTable(6)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>תאריך
                                                 <br><span class="header-subtitle">Date</span>
@@ -309,7 +300,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="8" class="loading">טוען תוצאות אבטחה...</td>
+                                        <td colspan="7" class="loading">טוען תוצאות API...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -328,73 +319,73 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
         <!-- Modular grid files -->
-        <script src="scripts/app-header.js"></script>
+        <script src="scripts/header-system.js"></script>
         <script src="scripts/main.js"></script>
         <script src="scripts/grid-filters.js"></script>
         <script src="scripts/alerts.js"></script>
         <script src="scripts/active-alerts-component.js"></script>
-        <script src="scripts/security.js"></script>
+        <script src="scripts/api.js"></script>
 
         <script>
-            // פונקציות מותאמות לעמוד אבטחה
-            function loadSecurityTests() {
-                console.log('טעינת בדיקות אבטחה');
-                if (typeof window.loadSecurityData === 'function') {
-                    window.loadSecurityData();
+            // פונקציות מותאמות לעמוד API
+            function loadAPIEndpoints() {
+                console.log('טעינת נקודות קצה API');
+                if (typeof window.loadAPIData === 'function') {
+                    window.loadAPIData();
                 } else {
-                    console.error('loadSecurityData function not found');
+                    console.error('loadAPIData function not found');
                 }
             }
 
-            function loadSecurityResults() {
-                console.log('טעינת תוצאות אבטחה');
-                if (typeof window.loadSecurityResultsData === 'function') {
-                    window.loadSecurityResultsData();
+            function loadAPIResults() {
+                console.log('טעינת תוצאות API');
+                if (typeof window.loadAPIResultsData === 'function') {
+                    window.loadAPIResultsData();
                 } else {
-                    console.error('loadSecurityResultsData function not found');
+                    console.error('loadAPIResultsData function not found');
                 }
             }
 
-            function addNewSecurityTest() {
-                console.log('הוספת בדיקת אבטחה חדשה');
-                if (typeof window.showAddSecurityModal === 'function') {
-                    window.showAddSecurityModal();
+            function addNewAPIEndpoint() {
+                console.log('הוספת נקודת קצה API חדשה');
+                if (typeof window.showAddAPIModal === 'function') {
+                    window.showAddAPIModal();
                 } else {
-                    console.error('showAddSecurityModal function not found');
+                    console.error('showAddAPIModal function not found');
                 }
             }
 
-            function exportSecurityResults() {
-                console.log('ייצוא תוצאות אבטחה');
-                if (typeof window.exportSecurityResultsData === 'function') {
-                    window.exportSecurityResultsData();
+            function exportAPIResults() {
+                console.log('ייצוא תוצאות API');
+                if (typeof window.exportAPIResultsData === 'function') {
+                    window.exportAPIResultsData();
                 } else {
-                    console.error('exportSecurityResultsData function not found');
+                    console.error('exportAPIResultsData function not found');
                 }
             }
 
-            function saveAllSecurity() {
-                console.log('שמירת כל הגדרות אבטחה');
-                showNotification('כל הגדרות האבטחה נשמרו בהצלחה', 'success');
+            function saveAllAPI() {
+                console.log('שמירת כל הגדרות API');
+                showNotification('כל הגדרות API נשמרו בהצלחה', 'success');
             }
 
-            function resetAllSecurity() {
-                console.log('איפוס כל הגדרות אבטחה');
-                if (confirm('האם אתה בטוח שברצונך לאפס את כל הגדרות האבטחה?')) {
-                    showNotification('כל הגדרות האבטחה אופסו בהצלחה', 'success');
+            function resetAllAPI() {
+                console.log('איפוס כל הגדרות API');
+                if (confirm('האם אתה בטוח שברצונך לאפס את כל הגדרות ה-API?')) {
+                    showNotification('כל הגדרות API אופסו בהצלחה', 'success');
                 }
             }
 
-            function runAllSecurity() {
-                console.log('הרצת כל בדיקות אבטחה');
-                showNotification('כל בדיקות האבטחה הורצו בהצלחה', 'success');
+            function runAllAPI() {
+                console.log('הרצת כל בדיקות API');
+                showNotification('כל בדיקות API הורצו בהצלחה', 'success');
             }
 
             // טעינת נתונים בטעינת הדף
             document.addEventListener('DOMContentLoaded', function () {
-                console.log('דף אבטחה נטען');
-                loadSecurityTests();
-                loadSecurityResults();
+                console.log('דף API נטען');
+                loadAPIEndpoints();
+                loadAPIResults();
             });
         </script>
 

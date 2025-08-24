@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from models.alert import Alert
 from models.note_relation_type import NoteRelationType
+from services.validation_service import ValidationService
 from datetime import datetime
 import logging
 from typing import List, Optional, Dict, Any
@@ -56,6 +57,14 @@ class AlertService:
                 related_type_id = AlertService._get_relation_type_id(db, related_type)
                 alert_data['related_type_id'] = related_type_id
             
+            # Validate data against constraints
+            logger.info("Validating alert data before creation")
+            is_valid, errors = ValidationService.validate_data(db, 'alerts', alert_data)
+            if not is_valid:
+                error_message = "; ".join(errors)
+                logger.error(f"Alert validation failed: {error_message}")
+                raise ValueError(f"Alert validation failed: {error_message}")
+            
             alert = Alert(**alert_data)
             db.add(alert)
             db.commit()
@@ -81,6 +90,14 @@ class AlertService:
                 related_type = alert_data.pop('related_type')
                 related_type_id = AlertService._get_relation_type_id(db, related_type)
                 alert_data['related_type_id'] = related_type_id
+            
+            # Validate data against constraints
+            logger.info("Validating alert data before update")
+            is_valid, errors = ValidationService.validate_data(db, 'alerts', alert_data, exclude_id=alert_id)
+            if not is_valid:
+                error_message = "; ".join(errors)
+                logger.error(f"Alert validation failed: {error_message}")
+                raise ValueError(f"Alert validation failed: {error_message}")
             
             # Update fields
             for field, value in alert_data.items():

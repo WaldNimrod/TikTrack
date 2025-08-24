@@ -36,7 +36,7 @@
  */
 
 // Global variables
-let designsData = [];
+let trade_plansData = [];
 
 // The translateDateRangeToDates function is already defined at the beginning of the file
 
@@ -110,7 +110,7 @@ if (window.location.pathname.includes('/planning')) {
  */
 async function loadDesignsData() {
     try {
-        console.log('🔄 Loading designs from server...');
+        console.log('🔄 Loading trade_plans from server...');
 
         // Setting base URL
         const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
@@ -124,35 +124,35 @@ async function loadDesignsData() {
         console.log('🔄 Data received from server:', data);
 
         // Checking that data is an array
-        let designs = data;
-        if (!Array.isArray(designs)) {
+        let trade_plans = data;
+        if (!Array.isArray(trade_plans)) {
             console.log('🔄 Received data is not an array, looking for data.data');
             if (data && data.data && Array.isArray(data.data)) {
-                designs = data.data;
+                trade_plans = data.data;
             } else {
                 throw new Error('Data received from server is not in correct format');
             }
         }
 
-        console.log(`✅ Loaded ${designs.length} designs`);
+        console.log(`✅ Loaded ${trade_plans.length} trade_plans`);
 
         // Updating global variable - using original fields from server
-        designsData = designs;
+        trade_plansData = trade_plans;
 
         // Debug log - checking first data structure
-        if (designsData.length > 0) {
+        if (trade_plansData.length > 0) {
             console.log('🔄 First design data structure:', {
-                id: designsData[0].id,
-                created_at: designsData[0].created_at,
-                investment_type: designsData[0].investment_type,
-                status: designsData[0].status,
-                ticker: designsData[0].ticker,
-                side: designsData[0].side
+                id: trade_plansData[0].id,
+                created_at: trade_plansData[0].created_at,
+                investment_type: trade_plansData[0].investment_type,
+                status: trade_plansData[0].status,
+                ticker: trade_plansData[0].ticker,
+                side: trade_plansData[0].side
             });
         }
 
         // Applying filters to data
-        let filteredDesigns = [...designsData];
+        let filteredDesigns = [...trade_plansData];
 
         // Checking if there are active filters
         const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
@@ -169,35 +169,35 @@ async function loadDesignsData() {
         });
 
         if (hasActiveFilters) {
-            console.log('🔄 Applying filters to designs data...');
+            console.log('🔄 Applying filters to trade_plans data...');
             if (typeof window.filterDataByFilters === 'function') {
-                filteredDesigns = window.filterDataByFilters(designsData, 'planning');
+                filteredDesigns = window.filterDataByFilters(trade_plansData, 'planning');
             } else {
                 // Local filtering function if global function is not available
-                filteredDesigns = filterDesignsLocally(designsData, window.selectedStatusesForFilter, window.selectedTypesForFilter, window.selectedDateRangeForFilter, window.searchTermForFilter);
+                filteredDesigns = filterDesignsLocally(trade_plansData, window.selectedStatusesForFilter, window.selectedTypesForFilter, window.selectedDateRangeForFilter, window.searchTermForFilter);
             }
-            console.log('🔄 After filtering:', filteredDesigns.length, 'designs');
+            console.log('🔄 After filtering:', filteredDesigns.length, 'trade_plans');
         } else {
-            console.log('🔄 No active filters, showing all designs');
+            console.log('🔄 No active filters, showing all trade_plans');
         }
 
         // Saving filtered data to global
         window.filteredDesignsData = filteredDesigns;
 
         // Updating table with filtered data
-        updateDesignsTable(filteredDesigns);
+        updateTradePlansTable(filteredTradePlans);
 
         // Updating debug panel
         updateFilterDebugPanel();
 
-        return designsData;
+        return trade_plansData;
 
     } catch (error) {
-        console.error('❌ Error loading designs data:', error);
+        console.error('❌ Error loading trade_plans data:', error);
         console.error('❌ Error details:', error.message);
 
         // Displaying detailed error message in table
-        const tbody = document.querySelector('#designsTable tbody');
+        const tbody = document.querySelector('#trade_plansTable tbody');
         if (tbody) {
             // Identifying error type
             let errorMessage = 'שגיאה בטעינת נתונים';
@@ -222,13 +222,13 @@ async function loadDesignsData() {
         }
 
         // Resetting data
-        designsData = [];
+        trade_plansData = [];
         window.filteredDesignsData = [];
 
         // Updating statistics
         updatePageSummaryStats();
 
-        return designsData;
+        return trade_plansData;
     }
 }
 
@@ -238,22 +238,22 @@ async function loadDesignsData() {
  * פונקציה זו מעדכנת את הטבלה עם הנתונים החדשים
  * כולל המרת ערכים לעברית ועיצוב תאים
  * 
- * @param {Array} designs - מערך של תכנונים לעדכון
+ * @param {Array} trade_plans - מערך של תכנונים לעדכון
  */
-function updateDesignsTable(designs) {
-    console.log('🔄 === UPDATE DESIGNS TABLE ===');
-    console.log('🔄 Designs to display:', designs.length);
+function updateTradePlansTable(trade_plans) {
+    console.log('🔄 === UPDATE TRADE PLANS TABLE ===');
+    console.log('🔄 Designs to display:', trade_plans.length);
 
-    const tbody = document.querySelector('#designsTable tbody');
+    const tbody = document.querySelector('#trade_plansTable tbody');
     if (!tbody) {
         console.error('Table body not found');
         return;
     }
 
     // Checking if there is data to display
-    if (!designs || designs.length === 0) {
+    if (!trade_plans || trade_plans.length === 0) {
         // Checking if it's because of filters or if there are no data at all
-        const hasOriginalData = designsData && designsData.length > 0;
+        const hasOriginalData = trade_plansData && trade_plansData.length > 0;
 
         // Checking if there are active filters
         const hasActiveFilters = (() => {
@@ -303,7 +303,7 @@ function updateDesignsTable(designs) {
         }
 
         // Updating record count
-        const countElement = document.querySelector('#designsCount');
+        const countElement = document.querySelector('#trade_plansCount');
         if (countElement) {
             countElement.textContent = '0 תכנונים';
         }
@@ -313,7 +313,7 @@ function updateDesignsTable(designs) {
         return;
     }
 
-    const tableHTML = designs.map(design => {
+    const tableHTML = trade_plans.map(design => {
         // Safeguarding against invalid data
         if (!design || typeof design !== 'object') {
             console.warn('Invalid design data in table:', design);
@@ -391,10 +391,10 @@ function updateDesignsTable(designs) {
         <td><span class="current-text">${currentDisplay}</span></td>
         <td data-status="${statusForFilter}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
         <td class="actions-cell">
-          <button class="btn btn-sm btn-secondary" onclick="editDesign(${design.id})" title="ערוך">
+          <button class="btn btn-sm btn-secondary" onclick="editTradePlan(${design.id})" title="ערוך">
             ✏️
           </button>
-          <button class="btn btn-sm btn-danger" onclick="deleteDesign(${design.id})" title="מחק">
+          <button class="btn btn-sm btn-danger" onclick="deleteTradePlan(${design.id})" title="מחק">
             🗑️
           </button>
         </td>
@@ -405,9 +405,9 @@ function updateDesignsTable(designs) {
     tbody.innerHTML = tableHTML;
 
     // Updating record count
-    const countElement = document.querySelector('#designsCount');
+    const countElement = document.querySelector('#trade_plansCount');
     if (countElement) {
-        countElement.textContent = `${designs.length} תכנונים`;
+        countElement.textContent = `${trade_plans.length} תכנונים`;
     }
 
     // Updating statistics
@@ -419,7 +419,7 @@ function updateDesignsTable(designs) {
  */
 function updatePageSummaryStats() {
     // Using filtered data if available, otherwise all data
-    const dataToUse = window.filteredDesignsData || designsData;
+    const dataToUse = window.filteredDesignsData || trade_plansData;
     const totalDesigns = dataToUse.length;
     const openDesigns = dataToUse.filter(design => design.status === 'open').length;
     const closedDesigns = dataToUse.filter(design => design.status === 'closed').length;
@@ -429,7 +429,7 @@ function updatePageSummaryStats() {
     let totalInvestment = 0;
     let totalProfit = 0;
 
-    designsData.forEach(design => {
+    trade_plansData.forEach(design => {
         // Safeguarding against invalid data
         if (!design || typeof design !== 'object') {
             console.warn('Invalid design data:', design);
@@ -589,65 +589,41 @@ async function saveNewTradePlan() {
 /**
  * עריכת תכנון
  */
-function editDesign(designId) {
-    const design = designsData.find(d => d.id === designId);
-    if (!design) {
-        showErrorNotification('Trade plan not found', 'Trade plan not found');
-        return;
+function editTradePlan(designId) {
+    console.log('Opening edit modal for trade plan:', designId);
+    // קריאה לפונקציה הגלובלית לפתיחת מודל עריכה
+    if (typeof window.openEditTradePlanModal === 'function') {
+        window.openEditTradePlanModal(designId);
+    } else {
+        console.error('openEditTradePlanModal function not found');
+        showErrorNotification('Error opening edit modal', 'Edit modal function not found');
     }
-
-    // Here will be the edit modal opening
-    console.log('Editing trade plan:', design);
-    showInfoNotification('Editing trade plan', 'Edit trade plan function will be added soon');
 }
 
 /**
  * מחיקת תכנון
  */
-async function deleteDesign(designId) {
-    if (!confirm('Are you sure you want to delete this trade plan?')) {
-        return;
-    }
-
-    try {
-        console.log('Deleting trade plan:', designId);
-
-        const response = await fetch(`/api/v1/trade_plans/${designId}`, {
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-            console.log('Trade plan deleted successfully');
-
-            // Refreshing data
-            loadDesignsData();
-
-            // Displaying success message
-            showSuccessNotification('Trade plan deleted', 'Trade plan deleted successfully!');
-        } else {
-            throw new Error(`Error deleting trade plan: ${response.status}`);
-        }
-    } catch (error) {
-        console.error('Error deleting trade plan:', error);
-        showErrorNotification('Error deleting trade plan', 'Error deleting trade plan: ' + error.message);
+async function deleteTradePlan(designId) {
+    console.log('Opening delete modal for trade plan:', designId);
+    // קריאה לפונקציה הגלובלית לפתיחת מודל מחיקה
+    if (typeof window.openDeleteTradePlanModal === 'function') {
+        window.openDeleteTradePlanModal(designId);
+    } else {
+        console.error('openDeleteTradePlanModal function not found');
+        showErrorNotification('Error opening delete modal', 'Delete modal function not found');
     }
 }
 
 /**
- * סגירת מודל
+ * סגירת מודל - שימוש בפונקציה גלובלית
+ * @deprecated Use window.closeModal from main.js instead
  */
 function closeModal(modalId) {
-    const modalElement = document.getElementById(modalId);
-    if (modalElement) {
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) {
-                modal.hide();
-            }
-        } else {
-            modalElement.style.display = 'none';
-            modalElement.classList.remove('show');
-        }
+    // שימוש בפונקציה הגלובלית
+    if (typeof window.closeModal === 'function') {
+        window.closeModal(modalId);
+    } else {
+        console.error('❌ closeModal function not found in main.js');
     }
 }
 
@@ -683,7 +659,7 @@ function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
  * 
  * @requires window.sortTableData - Global function from main.js
  * @requires window.filteredDesignsData - Filtered data
- * @requires designsData - Original data
+ * @requires trade_plansData - Original data
  * @requires updateDesignsTable - Function to update table
  * 
  * @since 2.0
@@ -691,21 +667,16 @@ function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
 function sortTable(columnIndex) {
     console.log(`🔄 Sorting planning table by column ${columnIndex}`);
 
-    // Using global function from main.js
-    if (typeof window.sortTableData === 'function') {
-        const sortedData = window.sortTableData(
-            columnIndex,
-            window.filteredDesignsData || designsData,
+    // Using new global function from main.js
+    if (typeof window.sortTable === 'function') {
+        window.sortTable(
             'planning',
+            columnIndex,
+            window.filteredDesignsData || trade_plansData,
             updateDesignsTable
         );
-
-        // Updating filtered data
-        window.filteredDesignsData = sortedData;
-
-        console.log(`✅ Planning table sorted by column ${columnIndex}`);
     } else {
-        console.error('❌ sortTableData function not found in main.js');
+        console.error('❌ sortTable function not found in main.js');
         // Fallback to local sorting if global function not available
         console.log('🔄 Using fallback local sorting');
         performLocalSort(columnIndex);
@@ -717,7 +688,7 @@ function sortTable(columnIndex) {
  * Local sorting function (fallback)
  */
 function performLocalSort(columnIndex) {
-    const data = window.filteredDesignsData || designsData;
+    const data = window.filteredDesignsData || trade_plansData;
     const currentSortState = window.getSortState ? window.getSortState('planning') : { columnIndex: -1, direction: 'asc' };
 
     // קביעת כיוון הסידור
@@ -797,32 +768,16 @@ function isDateValue(value) {
 }
 
 /**
- * שחזור מצב סידור
- * Restore sort state
+ * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
     console.log('🔄 Restoring sort state for planning table');
 
-    if (typeof window.getSortState === 'function') {
-        const sortState = window.getSortState('planning');
-
-        if (sortState.columnIndex >= 0) {
-            console.log(`🔄 Restoring sort: column ${sortState.columnIndex}, direction: ${sortState.direction}`);
-
-            // עדכון האייקונים
-            if (typeof updateSortIcons === 'function') {
-                updateSortIcons('planning', sortState.columnIndex, sortState.direction);
-            }
-
-            // סידור הנתונים אם יש נתונים
-            if (designsData && designsData.length > 0) {
-                setTimeout(() => {
-                    sortTable(sortState.columnIndex);
-                }, 100);
-            }
-        }
+    if (typeof window.restoreAnyTableSort === 'function') {
+        window.restoreAnyTableSort('planning', trade_plansData, updateDesignsTable);
     } else {
-        console.log('⚠️ getSortState function not available');
+        console.error('❌ restoreAnyTableSort function not found in main.js');
     }
 }
 
@@ -1149,12 +1104,12 @@ function updateFilterDebugPanel() {
 /**
  * פילטור מקומי של תכנונים
  */
-function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+function filterDesignsLocally(trade_plans, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
     console.log('🔄 === FILTER DESIGNS LOCALLY ===');
-    console.log('🔄 Original designs:', designs.length);
+    console.log('🔄 Original trade_plans:', trade_plans.length);
     console.log('🔄 Filters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
 
-    let filteredDesigns = [...designs];
+    let filteredDesigns = [...trade_plans];
 
     // Extracting start and end dates
     let startDate = null;
@@ -1180,16 +1135,16 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
                 'סגור': 'closed',
                 'מבוטל': 'cancelled'
             };
-            
-            const translatedSelectedStatuses = selectedStatuses.map(status => 
+
+            const translatedSelectedStatuses = selectedStatuses.map(status =>
                 statusTranslations[status] || status
             );
-            
+
             const isMatch = translatedSelectedStatuses.includes(design.status);
             console.log(`🔄 Design ${design.id}: status=${design.status}, selected=${selectedStatuses}, translated=${translatedSelectedStatuses}, match=${isMatch}`);
             return isMatch;
         });
-        console.log('🔄 After status filter:', filteredDesigns.length, 'designs');
+        console.log('🔄 After status filter:', filteredDesigns.length, 'trade_plans');
     }
 
     // Filtering by type
@@ -1202,17 +1157,17 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
                 'השקעה': 'investment',
                 'פסיבי': 'passive'
             };
-            
-            const translatedSelectedTypes = selectedTypes.map(type => 
+
+            const translatedSelectedTypes = selectedTypes.map(type =>
                 typeTranslations[type] || type
             );
-            
+
             const designType = design.investment_type || design.type;
             const isMatch = translatedSelectedTypes.includes(designType);
             console.log(`🔄 Design ${design.id}: type=${designType}, selected=${selectedTypes}, translated=${translatedSelectedTypes}, match=${isMatch}`);
             return isMatch;
         });
-        console.log('🔄 After type filter:', filteredDesigns.length, 'designs');
+        console.log('🔄 After type filter:', filteredDesigns.length, 'trade_plans');
     }
 
     // Filtering by dates
@@ -1233,7 +1188,7 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
             console.log(`🔄 Design ${design.id}: created_at=${design.created_at}, inRange=${isInRange}`);
             return isInRange;
         });
-        console.log('🔄 After date filter:', filteredDesigns.length, 'designs');
+        console.log('🔄 After date filter:', filteredDesigns.length, 'trade_plans');
     }
 
     // Filtering by search term
@@ -1353,10 +1308,10 @@ function filterDesignsLocally(designs, selectedStatuses, selectedTypes, selected
 
             return isMatch;
         });
-        console.log('🔄 After search filter:', filteredDesigns.length, 'designs');
+        console.log('🔄 After search filter:', filteredDesigns.length, 'trade_plans');
     }
 
-    console.log('🔄 Final filtered designs:', filteredDesigns.length);
+    console.log('🔄 Final filtered trade_plans:', filteredDesigns.length);
     return filteredDesigns;
 }
 
@@ -1400,14 +1355,23 @@ function restoreDesignsSectionState() {
 
 // Safeguarding - ensuring global functions are available
 if (typeof window.toggleTopSection !== 'function') {
+    console.warn('⚠️ toggleTopSection not found in main.js - creating fallback');
     window.toggleTopSection = function () {
-        console.warn('toggleTopSection fallback called - main.js may not be loaded properly');
+        console.warn('🔄 toggleTopSection fallback called - main.js may not be loaded properly');
+        console.log('📍 Current page:', window.location.pathname);
+        console.log('📍 Available functions:', Object.keys(window).filter(key => key.includes('toggle')));
     };
+} else {
+    console.log('✅ toggleTopSection found in main.js');
 }
 
 if (typeof window.toggleMainSection !== 'function') {
+    console.warn('⚠️ toggleMainSection not found in main.js - creating fallback');
     window.toggleMainSection = function () {
         console.log('🔄 toggleMainSection fallback called');
+        console.log('📍 Current page:', window.location.pathname);
+        console.log('📍 Available functions:', Object.keys(window).filter(key => key.includes('toggle')));
+        
         const contentSections = document.querySelectorAll('.content-section');
         console.log('📋 Number of content-sections found:', contentSections.length);
         const planningSection = contentSections[0]; // The first section - planning
@@ -1445,6 +1409,8 @@ if (typeof window.toggleMainSection !== 'function') {
             localStorage.setItem('planningSectionCollapsed', !isCollapsed);
         }
     };
+} else {
+    console.log('✅ toggleMainSection found in main.js');
 }
 
 // Initialization
@@ -1500,6 +1466,27 @@ window.filterDesignsLocally = filterDesignsLocally;
 window.updateFilterDebugPanel = updateFilterDebugPanel;
 window.translateDateRangeToDates = translateDateRangeToDates;
 window.restoreSortState = restoreSortState;
+
+// פונקציות חסרות
+window.loadPlanningData = function() {
+    console.log('🔄 loadPlanningData called - redirecting to loadDesignsData');
+    loadDesignsData();
+};
+
+window.setupSortableHeaders = function() {
+    console.log('🔄 setupSortableHeaders called for planning page');
+    // הפונקציה כבר מוגדרת ב-main.js
+    if (typeof window.setupSortableHeadersGlobal === 'function') {
+        window.setupSortableHeadersGlobal('planning');
+    } else {
+        console.warn('⚠️ setupSortableHeadersGlobal not found');
+    }
+};
+
+window.updateTableStats = function() {
+    console.log('🔄 updateTableStats called for planning page');
+    updatePageSummaryStats();
+};
 
 // Checking if functions are available
 console.log('🔄 Planning.js loaded. Available functions:', {

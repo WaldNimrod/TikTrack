@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from models.execution import Execution
+from services.validation_service import ValidationService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -64,6 +65,19 @@ def create_execution():
     try:
         data = request.get_json()
         db: Session = next(get_db())
+        
+        # Validate data against constraints
+        logger.info("Validating execution data before creation")
+        is_valid, errors = ValidationService.validate_data(db, 'executions', data)
+        if not is_valid:
+            error_message = "; ".join(errors)
+            logger.error(f"Execution validation failed: {error_message}")
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Execution validation failed: {error_message}"},
+                "version": "v1"
+            }), 400
+        
         execution = Execution(**data)
         db.add(execution)
         db.commit()
@@ -92,6 +106,18 @@ def update_execution(execution_id: int):
         db: Session = next(get_db())
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
         if execution:
+            # Validate data against constraints
+            logger.info("Validating execution data before update")
+            is_valid, errors = ValidationService.validate_data(db, 'executions', data, exclude_id=execution_id)
+            if not is_valid:
+                error_message = "; ".join(errors)
+                logger.error(f"Execution validation failed: {error_message}")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": f"Execution validation failed: {error_message}"},
+                    "version": "v1"
+                }), 400
+            
             for key, value in data.items():
                 if hasattr(execution, key):
                     setattr(execution, key, value)

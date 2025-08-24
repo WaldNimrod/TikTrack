@@ -142,29 +142,29 @@ async function loadTradesData() {
 
     // עדכון ישיר של הטבלה - ללא פילטרים מורכבים
     console.log('🔄 Updating trades table directly with', tradesData.length, 'trades');
-    
+
     // בדיקה אם יש פילטרים פעילים
     const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
-        (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
-        (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
-        (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
+      (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
+      (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
+      (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
 
     console.log('🔄 Checking filters for trades page:', {
-        hasActiveFilters,
-        selectedStatusesForFilter: window.selectedStatusesForFilter,
-        selectedTypesForFilter: window.selectedTypesForFilter,
-        selectedDateRangeForFilter: window.selectedDateRangeForFilter,
-        searchTermForFilter: window.searchTermForFilter
+      hasActiveFilters,
+      selectedStatusesForFilter: window.selectedStatusesForFilter,
+      selectedTypesForFilter: window.selectedTypesForFilter,
+      selectedDateRangeForFilter: window.selectedDateRangeForFilter,
+      searchTermForFilter: window.searchTermForFilter
     });
 
     let filteredTrades = [...tradesData];
 
     if (hasActiveFilters) {
-        console.log('🔄 Applying filters to trades data...');
-        filteredTrades = filterTradesLocally(tradesData, window.selectedStatusesForFilter, window.selectedTypesForFilter, window.selectedDateRangeForFilter, window.searchTermForFilter);
-        console.log('🔄 After filtering:', filteredTrades.length, 'trades');
+      console.log('🔄 Applying filters to trades data...');
+      filteredTrades = filterTradesLocally(tradesData, window.selectedStatusesForFilter, window.selectedTypesForFilter, window.selectedDateRangeForFilter, window.searchTermForFilter);
+      console.log('🔄 After filtering:', filteredTrades.length, 'trades');
     } else {
-        console.log('🔄 No active filters, showing all trades');
+      console.log('🔄 No active filters, showing all trades');
     }
 
     updateTradesTable(filteredTrades);
@@ -209,178 +209,178 @@ function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, sel
  * פילטור מקומי לטריידים
  */
 function filterTradesLocally(trades, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-    console.log('🔄 === FILTER TRADES LOCALLY ===');
-    console.log('🔄 Original trades:', trades.length);
-    console.log('🔄 Filters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
+  console.log('🔄 === FILTER TRADES LOCALLY ===');
+  console.log('🔄 Original trades:', trades.length);
+  console.log('🔄 Filters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
 
-    let filteredTrades = [...trades];
+  let filteredTrades = [...trades];
 
-    // Extracting start and end dates
-    let startDate = null;
-    let endDate = null;
+  // Extracting start and end dates
+  let startDate = null;
+  let endDate = null;
 
-    if (selectedDateRange && selectedDateRange !== 'כל זמן') {
-        console.log('🔄 Filter: Translating date range:', selectedDateRange);
-        const dateRange = window.translateDateRangeToDates ? window.translateDateRangeToDates(selectedDateRange) : { startDate: null, endDate: null };
-        startDate = dateRange.startDate;
-        endDate = dateRange.endDate;
-        console.log('🔄 Filter: Translation result:', { startDate, endDate });
+  if (selectedDateRange && selectedDateRange !== 'כל זמן') {
+    console.log('🔄 Filter: Translating date range:', selectedDateRange);
+    const dateRange = window.translateDateRangeToDates ? window.translateDateRangeToDates(selectedDateRange) : { startDate: null, endDate: null };
+    startDate = dateRange.startDate;
+    endDate = dateRange.endDate;
+    console.log('🔄 Filter: Translation result:', { startDate, endDate });
+  }
+
+  console.log('🔄 Extracted dates:', { startDate, endDate });
+
+  // Filtering by status
+  if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
+    console.log('🔄 Filtering by status:', selectedStatuses);
+    filteredTrades = filteredTrades.filter(trade => {
+      // המרת הערכים הנבחרים לאנגלית
+      const statusTranslations = {
+        'פתוח': 'open',
+        'סגור': 'closed',
+        'מבוטל': 'cancelled'
+      };
+
+      const translatedSelectedStatuses = selectedStatuses.map(status =>
+        statusTranslations[status] || status
+      );
+
+      const isMatch = translatedSelectedStatuses.includes(trade.status);
+      console.log(`🔄 Trade ${trade.id}: status=${trade.status}, selected=${selectedStatuses}, translated=${translatedSelectedStatuses}, match=${isMatch}`);
+      return isMatch;
+    });
+    console.log('🔄 After status filter:', filteredTrades.length, 'trades');
+  }
+
+  // Filtering by type
+  if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
+    console.log('🔄 Filtering by type:', selectedTypes);
+    filteredTrades = filteredTrades.filter(trade => {
+      // המרת הערכים הנבחרים לאנגלית
+      const typeTranslations = {
+        'סווינג': 'swing',
+        'השקעה': 'investment',
+        'פסיבי': 'passive'
+      };
+
+      const translatedSelectedTypes = selectedTypes.map(type =>
+        typeTranslations[type] || type
+      );
+
+      const tradeType = trade.investment_type;
+      const isMatch = translatedSelectedTypes.includes(tradeType);
+      console.log(`🔄 Trade ${trade.id}: type=${tradeType}, selected=${selectedTypes}, translated=${translatedSelectedTypes}, match=${isMatch}`);
+      return isMatch;
+    });
+    console.log('🔄 After type filter:', filteredTrades.length, 'trades');
+  }
+
+  // Filtering by dates
+  if (startDate && endDate) {
+    console.log('🔄 Filtering by date range:', { startDate, endDate });
+    filteredTrades = filteredTrades.filter(trade => {
+      if (!trade.created_at) return false;
+
+      const tradeDate = new Date(trade.created_at);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      // Setting time to start of day for start date and end of day for end date
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+
+      const isInRange = tradeDate >= start && tradeDate <= end;
+      console.log(`🔄 Trade ${trade.id}: created_at=${trade.created_at}, inRange=${isInRange}`);
+      return isInRange;
+    });
+    console.log('🔄 After date filter:', filteredTrades.length, 'trades');
+  }
+
+  // Filtering by search term
+  if (searchTerm && searchTerm.trim() !== '') {
+    console.log('🔄 Filtering by search term:', searchTerm);
+    const searchLower = searchTerm.toLowerCase();
+
+    // Bi-directional search term translations
+    const searchTranslations = {
+      // Status translations
+      'פתוח': 'open',
+      'סגור': 'closed',
+      'מבוטל': 'cancelled',
+      'open': 'open',
+      'closed': 'closed',
+      'cancelled': 'cancelled',
+
+      // Investment type translations
+      'סווינג': 'swing',
+      'השקעה': 'investment',
+      'פסיבי': 'passive',
+      'swing': 'swing',
+      'investment': 'investment',
+      'passive': 'passive',
+
+      // Side translations
+      'לונג': 'long',
+      'שורט': 'short',
+      'long': 'long',
+      'short': 'short'
+    };
+
+    // Creating an array of search terms including translations
+    const searchTerms = [searchLower];
+
+    // Adding exact translation
+    if (searchTranslations[searchLower]) {
+      searchTerms.push(searchTranslations[searchLower]);
     }
 
-    console.log('🔄 Extracted dates:', { startDate, endDate });
+    // Adding partial search - if user searches for part of a word
+    Object.keys(searchTranslations).forEach(hebrewTerm => {
+      if (hebrewTerm.includes(searchLower) && !searchTerms.includes(searchTranslations[hebrewTerm])) {
+        searchTerms.push(searchTranslations[hebrewTerm]);
+      }
+    });
 
-    // Filtering by status
-    if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
-        console.log('🔄 Filtering by status:', selectedStatuses);
-        filteredTrades = filteredTrades.filter(trade => {
-            // המרת הערכים הנבחרים לאנגלית
-            const statusTranslations = {
-                'פתוח': 'open',
-                'סגור': 'closed',
-                'מבוטל': 'cancelled'
-            };
-            
-            const translatedSelectedStatuses = selectedStatuses.map(status => 
-                statusTranslations[status] || status
-            );
-            
-            const isMatch = translatedSelectedStatuses.includes(trade.status);
-            console.log(`🔄 Trade ${trade.id}: status=${trade.status}, selected=${selectedStatuses}, translated=${translatedSelectedStatuses}, match=${isMatch}`);
-            return isMatch;
-        });
-        console.log('🔄 After status filter:', filteredTrades.length, 'trades');
-    }
+    filteredTrades = filteredTrades.filter(trade => {
+      // Searching in all relevant fields
+      const tickerMatch = trade.ticker_symbol && searchTerms.some(term =>
+        trade.ticker_symbol.toLowerCase().includes(term)
+      );
 
-    // Filtering by type
-    if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
-        console.log('🔄 Filtering by type:', selectedTypes);
-        filteredTrades = filteredTrades.filter(trade => {
-            // המרת הערכים הנבחרים לאנגלית
-            const typeTranslations = {
-                'סווינג': 'swing',
-                'השקעה': 'investment',
-                'פסיבי': 'passive'
-            };
-            
-            const translatedSelectedTypes = selectedTypes.map(type => 
-                typeTranslations[type] || type
-            );
-            
-            const tradeType = trade.investment_type;
-            const isMatch = translatedSelectedTypes.includes(tradeType);
-            console.log(`🔄 Trade ${trade.id}: type=${tradeType}, selected=${selectedTypes}, translated=${translatedSelectedTypes}, match=${isMatch}`);
-            return isMatch;
-        });
-        console.log('🔄 After type filter:', filteredTrades.length, 'trades');
-    }
+      const typeMatch = trade.investment_type && searchTerms.some(term =>
+        trade.investment_type.toLowerCase().includes(term)
+      );
 
-    // Filtering by dates
-    if (startDate && endDate) {
-        console.log('🔄 Filtering by date range:', { startDate, endDate });
-        filteredTrades = filteredTrades.filter(trade => {
-            if (!trade.created_at) return false;
+      const sideMatch = trade.side && searchTerms.some(term =>
+        trade.side.toLowerCase().includes(term)
+      );
 
-            const tradeDate = new Date(trade.created_at);
-            const start = new Date(startDate);
-            const end = new Date(endDate);
+      const statusMatch = trade.status && searchTerms.some(term =>
+        trade.status.toLowerCase().includes(term)
+      );
 
-            // Setting time to start of day for start date and end of day for end date
-            start.setHours(0, 0, 0, 0);
-            end.setHours(23, 59, 59, 999);
+      const notesMatch = trade.notes && searchTerms.some(term =>
+        trade.notes.toLowerCase().includes(term)
+      );
 
-            const isInRange = tradeDate >= start && tradeDate <= end;
-            console.log(`🔄 Trade ${trade.id}: created_at=${trade.created_at}, inRange=${isInRange}`);
-            return isInRange;
-        });
-        console.log('🔄 After date filter:', filteredTrades.length, 'trades');
-    }
+      const isMatch = tickerMatch || typeMatch || sideMatch || statusMatch || notesMatch;
 
-    // Filtering by search term
-    if (searchTerm && searchTerm.trim() !== '') {
-        console.log('🔄 Filtering by search term:', searchTerm);
-        const searchLower = searchTerm.toLowerCase();
+      console.log(`🔄 Trade ${trade.id} search:`, {
+        ticker: trade.ticker_symbol,
+        type: trade.investment_type,
+        side: trade.side,
+        status: trade.status,
+        searchTerms: searchTerms,
+        originalSearch: searchLower,
+        match: isMatch
+      });
 
-        // Bi-directional search term translations
-        const searchTranslations = {
-            // Status translations
-            'פתוח': 'open',
-            'סגור': 'closed',
-            'מבוטל': 'cancelled',
-            'open': 'open',
-            'closed': 'closed',
-            'cancelled': 'cancelled',
+      return isMatch;
+    });
+    console.log('🔄 After search filter:', filteredTrades.length, 'trades');
+  }
 
-            // Investment type translations
-            'סווינג': 'swing',
-            'השקעה': 'investment',
-            'פסיבי': 'passive',
-            'swing': 'swing',
-            'investment': 'investment',
-            'passive': 'passive',
-
-            // Side translations
-            'לונג': 'long',
-            'שורט': 'short',
-            'long': 'long',
-            'short': 'short'
-        };
-
-        // Creating an array of search terms including translations
-        const searchTerms = [searchLower];
-
-        // Adding exact translation
-        if (searchTranslations[searchLower]) {
-            searchTerms.push(searchTranslations[searchLower]);
-        }
-
-        // Adding partial search - if user searches for part of a word
-        Object.keys(searchTranslations).forEach(hebrewTerm => {
-            if (hebrewTerm.includes(searchLower) && !searchTerms.includes(searchTranslations[hebrewTerm])) {
-                searchTerms.push(searchTranslations[hebrewTerm]);
-            }
-        });
-
-        filteredTrades = filteredTrades.filter(trade => {
-            // Searching in all relevant fields
-            const tickerMatch = trade.ticker_symbol && searchTerms.some(term =>
-                trade.ticker_symbol.toLowerCase().includes(term)
-            );
-
-            const typeMatch = trade.investment_type && searchTerms.some(term =>
-                trade.investment_type.toLowerCase().includes(term)
-            );
-
-            const sideMatch = trade.side && searchTerms.some(term =>
-                trade.side.toLowerCase().includes(term)
-            );
-
-            const statusMatch = trade.status && searchTerms.some(term =>
-                trade.status.toLowerCase().includes(term)
-            );
-
-            const notesMatch = trade.notes && searchTerms.some(term =>
-                trade.notes.toLowerCase().includes(term)
-            );
-
-            const isMatch = tickerMatch || typeMatch || sideMatch || statusMatch || notesMatch;
-
-            console.log(`🔄 Trade ${trade.id} search:`, {
-                ticker: trade.ticker_symbol,
-                type: trade.investment_type,
-                side: trade.side,
-                status: trade.status,
-                searchTerms: searchTerms,
-                originalSearch: searchLower,
-                match: isMatch
-            });
-
-            return isMatch;
-        });
-        console.log('🔄 After search filter:', filteredTrades.length, 'trades');
-    }
-
-    console.log('🔄 Final filtered trades:', filteredTrades.length);
-    return filteredTrades;
+  console.log('🔄 Final filtered trades:', filteredTrades.length);
+  return filteredTrades;
 }
 
 /**
@@ -934,16 +934,15 @@ function sortTable(columnIndex) {
   console.log('🔄 === SORT TRADES TABLE ===');
   console.log('🔄 Column clicked:', columnIndex);
 
-  if (typeof window.sortTableData === 'function') {
-    const sortedData = window.sortTableData(
+  if (typeof window.sortTable === 'function') {
+    window.sortTable(
+      'trades',
       columnIndex,
       window.tradesData || [],
-      'trades',
       window.updateTradesTable
     );
-    console.log('✅ נתונים מסודרים:', sortedData);
   } else {
-    console.error('❌ sortTableData function not found in main.js');
+    console.error('❌ sortTable function not found in main.js');
   }
 }
 

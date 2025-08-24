@@ -3,6 +3,15 @@
 ## Overview
 This document provides comprehensive guidance for developers working on the TikTrack system, including setup, development workflow, and best practices.
 
+> 📋 **לפרטים מלאים על הפרויקט:** ראה [PROJECT_STATUS_SUMMARY.md](../../PROJECT_STATUS_SUMMARY.md)
+
+## 🆕 **Latest Updates (August 24, 2025)**
+- ✅ **Server Restart System** - Smart restart with multiple modes
+- ✅ **ValidationService Integration** - Real-time validation in development
+- ✅ **Enhanced Logging** - Detailed logs for debugging
+- ✅ **Development Tools** - Improved development workflow
+- ✅ **Documentation Updates** - Comprehensive guides and examples
+
 ## Development Environment Setup
 
 ### Prerequisites

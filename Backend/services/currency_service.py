@@ -19,6 +19,7 @@ from models.account import Account
 from models.trade import Trade
 from models.trade_plan import TradePlan
 from models.cash_flow import CashFlow
+from services.validation_service import ValidationService
 from typing import List, Optional, Dict, Any
 from decimal import Decimal
 import logging
@@ -138,6 +139,14 @@ class CurrencyService:
         # Data validation
         CurrencyService._validate_currency_data(data)
         
+        # Validate data against constraints
+        logger.info("Validating currency data before creation")
+        is_valid, errors = ValidationService.validate_data(db, 'currencies', data)
+        if not is_valid:
+            error_message = "; ".join(errors)
+            logger.error(f"Currency validation failed: {error_message}")
+            raise ValueError(f"Currency validation failed: {error_message}")
+        
         # Convert symbol to uppercase
         data['symbol'] = data['symbol'].upper()
         
@@ -177,6 +186,14 @@ class CurrencyService:
         # Validate data if there are new fields
         if data:
             CurrencyService._validate_currency_data(data, is_update=True)
+            
+            # Validate data against constraints
+            logger.info("Validating currency data before update")
+            is_valid, errors = ValidationService.validate_data(db, 'currencies', data, exclude_id=currency_id)
+            if not is_valid:
+                error_message = "; ".join(errors)
+                logger.error(f"Currency validation failed: {error_message}")
+                raise ValueError(f"Currency validation failed: {error_message}")
         
         # Update fields
         for key, value in data.items():

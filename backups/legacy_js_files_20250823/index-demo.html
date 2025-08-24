@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>דוגמאות דף הבית | TikTrack</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles/apple-theme.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/typography.css">
+    <link rel="stylesheet" href="styles/table.css">
+    <link rel="stylesheet" href="styles/header-system.css">
+    <link rel="stylesheet" href="styles/index.css">
+</head>
+
+<body>
+    <div class="page-body">
+        <div class="background-wrapper">
+            <div class="dashboard-container">
+                <div class="bg-white p-4 rounded shadow-sm border">
+                    <h2 class="mb-4 text-center">🎨 דוגמאות דף הבית</h2>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">📊 דוגמה 1: קומפקטי</h5>
+                                    <p class="card-text">דשבורד קומפקטי עם טבלאות וסטטיסטיקות מהירות</p>
+                                    <a href="index-compact.html" class="btn btn-primary" target="_blank">צפה בדוגמה</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">📋 דוגמה 2: מפורט</h5>
+                                    <p class="card-text">דשבורד עם טבלאות מפורטות וטאבים</p>
+                                    <a href="index-detailed.html" class="btn btn-primary" target="_blank">צפה בדוגמה</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">📈 דוגמה 3: גרפים</h5>
+                                    <p class="card-text">דשבורד עם גרפים מתקדמים ונתונים ויזואליים</p>
+                                    <a href="index-charts.html" class="btn btn-primary" target="_blank">צפה בדוגמה</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">⚡ דוגמה 4: מהיר</h5>
+                                    <p class="card-text">דשבורד עם מידע מהיר ופעולות נגישות</p>
+                                    <a href="index-quick.html" class="btn btn-primary" target="_blank">צפה בדוגמה</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">🎯 דוגמה 5: מקיף</h5>
+                                    <p class="card-text">דשבורד מקיף עם כל המידע והכלים</p>
+                                    <a href="index-comprehensive.html" class="btn btn-primary" target="_blank">צפה
+                                        בדוגמה</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">🏠 דף הבית הנוכחי</h5>
+                                    <p class="card-text">דף הבית הנוכחי של המערכת</p>
+                                    <a href="index.html" class="btn btn-secondary" target="_blank">צפה בדף הנוכחי</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-primary">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">🚀 דף הבית האולטימטיבי</h5>
+                                    <p class="card-text">דף הבית המלא והמקיף ביותר - עם באנר עיצובי ואילוסטרציה</p>
+                                    <a href="index-ultimate.html" class="btn btn-primary" target="_blank">צפה בדף
+                                        האולטימטיבי</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted">
+                            כל הדוגמאות עוקבות אחרי העיצוב הקיים של האתר ומשתמשות בסגנונות המרכזיים.<br>
+                            בחר את הדוגמה המתאימה ביותר לדף הבית שלך.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/console-cleanup.js"></script>
+
+    <script>
+        // אתחול HeaderSystem
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.headerSystem && !window.headerSystem.isInitialized) {
+                window.headerSystem.init();
+            }
+        });
+    </script>
+</body>
+
+</html>

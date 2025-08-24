@@ -18,6 +18,7 @@ from models.trade import Trade
 from models.trade_plan import TradePlan
 from models.note import Note
 from models.alert import Alert
+from services.validation_service import ValidationService
 from typing import List, Optional, Dict, Any, Union
 
 class TickerService:
@@ -199,17 +200,18 @@ class TickerService:
     @staticmethod
     def create(db: Session, ticker_data: dict) -> Ticker:
         """Create new ticker with validation"""
-        # Data validation
+        # Validate data against dynamic constraints
+        is_valid, errors = ValidationService.validate_data(db, 'tickers', ticker_data)
+        if not is_valid:
+            raise ValueError(f"Validation failed: {'; '.join(errors)}")
+        
+        # Additional custom validation
         validation = TickerService.validate_ticker_data(ticker_data)
         if not validation['is_valid']:
             raise ValueError(f"Invalid data: {'; '.join(validation['errors'])}")
         
-        # Check that symbol doesn't exist
-        symbol = ticker_data.get('symbol', '').strip().upper()
-        if TickerService.check_symbol_exists(db, symbol):
-            raise ValueError(f"Symbol {symbol} already exists in system")
-        
         # Normalize data
+        symbol = ticker_data.get('symbol', '').strip().upper()
         ticker_data['symbol'] = symbol
         if 'name' in ticker_data:
             ticker_data['name'] = ticker_data['name'].strip()

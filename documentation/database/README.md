@@ -1,6 +1,15 @@
 # TikTrack Database Documentation
 
 ## Overview
+
+> 📋 **לפרטים מלאים על הפרויקט:** ראה [PROJECT_STATUS_SUMMARY.md](../../PROJECT_STATUS_SUMMARY.md)
+
+## 🆕 **Latest Updates (August 24, 2025)**
+- ✅ **Dynamic Constraint System** - 90 constraints defined across all tables
+- ✅ **Schema Updates** - `trades.type` → `trades.investment_type`
+- ✅ **Model Updates** - All models updated with NOT NULL constraints
+- ✅ **Default Values** - Proper defaults for all required fields
+- ✅ **Validation Integration** - Real-time validation against constraints
 The TikTrack database is built on SQLite with SQLAlchemy ORM, providing a robust foundation for trading management operations. The database includes dynamic constraint management capabilities and comprehensive data integrity features.
 
 ## Database File

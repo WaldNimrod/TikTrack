@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from models.account import Account
+from services.validation_service import ValidationService
 from typing import List, Optional, Dict, Any
 import logging
 
@@ -19,6 +20,11 @@ class AccountService:
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> Account:
         """Create new account"""
+        # Validate data against dynamic constraints
+        is_valid, errors = ValidationService.validate_data(db, 'accounts', data)
+        if not is_valid:
+            raise ValueError(f"Validation failed: {'; '.join(errors)}")
+        
         account = Account(**data)
         db.add(account)
         db.commit()
@@ -30,15 +36,21 @@ class AccountService:
     def update(db: Session, account_id: int, data: Dict[str, Any]) -> Optional[Account]:
         """Update account"""
         account = db.query(Account).filter(Account.id == account_id).first()
-        if account:
-            for key, value in data.items():
-                if hasattr(account, key):
-                    setattr(account, key, value)
-            db.commit()
-            db.refresh(account)
-            logger.info(f"Updated account: {account.name}")
-            return account
-        return None
+        if not account:
+            return None
+        
+        # Validate data against dynamic constraints (excluding current ID for unique checks)
+        is_valid, errors = ValidationService.validate_data(db, 'accounts', data, exclude_id=account_id)
+        if not is_valid:
+            raise ValueError(f"Validation failed: {'; '.join(errors)}")
+        
+        for key, value in data.items():
+            if hasattr(account, key):
+                setattr(account, key, value)
+        db.commit()
+        db.refresh(account)
+        logger.info(f"Updated account: {account.name}")
+        return account
     
     @staticmethod
     def delete(db: Session, account_id: int) -> bool:

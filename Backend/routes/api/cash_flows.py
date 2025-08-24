@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session, joinedload
 from config.database import get_db
 from models.cash_flow import CashFlow
+from services.validation_service import ValidationService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -101,6 +102,18 @@ def create_cash_flow():
         if 'external_id' not in data:
             data['external_id'] = '0'
         
+        # Validate data against constraints
+        logger.info("Validating cash flow data before creation")
+        is_valid, errors = ValidationService.validate_data(db, 'cash_flows', data)
+        if not is_valid:
+            error_message = "; ".join(errors)
+            logger.error(f"Cash flow validation failed: {error_message}")
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Cash flow validation failed: {error_message}"},
+                "version": "v1"
+            }), 400
+        
         cash_flow = CashFlow(**data)
         db.add(cash_flow)
         db.commit()
@@ -139,6 +152,18 @@ def update_cash_flow(cash_flow_id: int):
         cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
         
         if cash_flow:
+            # Validate data against constraints
+            logger.info("Validating cash flow data before update")
+            is_valid, errors = ValidationService.validate_data(db, 'cash_flows', data, exclude_id=cash_flow_id)
+            if not is_valid:
+                error_message = "; ".join(errors)
+                logger.error(f"Cash flow validation failed: {error_message}")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": f"Cash flow validation failed: {error_message}"},
+                    "version": "v1"
+                }), 400
+            
             for key, value in data.items():
                 if hasattr(cash_flow, key):
                     setattr(cash_flow, key, value)

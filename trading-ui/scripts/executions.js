@@ -967,6 +967,30 @@ async function loadExecutionsData() {
             console.log('✅ נטענו', executionsData.length, 'עסקעות');
             console.log('📊 נתוני עסקעות:', executionsData);
 
+            // בדיקה אם יש פילטרים פעילים
+            if (window.headerSystem && window.headerSystem.currentFilters) {
+                const filters = window.headerSystem.currentFilters;
+                const hasActiveFilters = (filters.status && filters.status.length > 0) ||
+                    (filters.type && filters.type.length > 0) ||
+                    (filters.account && filters.account.length > 0) ||
+                    (filters.dateRange && filters.dateRange !== '') ||
+                    (filters.search && filters.search !== '');
+
+                if (hasActiveFilters) {
+                    console.log('🔍 יש פילטרים פעילים, מסנן נתונים מקומית');
+                    const filteredData = filterExecutionsLocally(
+                        executionsData,
+                        filters.status,
+                        filters.type,
+                        filters.account,
+                        filters.dateRange,
+                        filters.search
+                    );
+                    updateExecutionsTable(filteredData);
+                    return;
+                }
+            }
+
             // עדכון הטבלה
             updateExecutionsTable(executionsData);
 
@@ -1035,7 +1059,7 @@ async function updateExecutionsTable(executions) {
             tradeInfo = `טרייד ${execution.trade_id}`;
         }
 
-        // המרת סוגים לעברית לפילטר
+        // שמירת הערכים המקוריים באנגלית לפילטר
         const typeForFilter = (execution.action || execution.type) === 'buy' ? 'קנייה' :
             (execution.action || execution.type) === 'sell' ? 'מכירה' :
                 (execution.action || execution.type);
@@ -1069,6 +1093,76 @@ async function updateExecutionsTable(executions) {
 }
 
 // פונקציה formatDate מוגדרת בקובץ main.js
+
+// פונקציית פילטור מקומי לעסקאות
+function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
+    console.log('🔍 filterExecutionsLocally called with:', { selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm });
+
+    return executions.filter(execution => {
+        // פילטר חיפוש
+        if (searchTerm && searchTerm.trim() !== '') {
+            const searchLower = searchTerm.toLowerCase();
+            const symbol = execution.symbol || '';
+            const action = execution.action || execution.type || '';
+            const notes = execution.notes || '';
+
+            if (!symbol.toLowerCase().includes(searchLower) &&
+                !action.toLowerCase().includes(searchLower) &&
+                !notes.toLowerCase().includes(searchLower)) {
+                return false;
+            }
+        }
+
+        // פילטר סוג (type)
+        if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('הכול')) {
+            const executionType = (execution.action || execution.type) === 'buy' ? 'קנייה' :
+                (execution.action || execution.type) === 'sell' ? 'מכירה' : (execution.action || execution.type);
+
+            if (!selectedTypes.includes(executionType)) {
+                return false;
+            }
+        }
+
+        // פילטר תאריך
+        if (dateRange && dateRange !== 'כל זמן' && dateRange !== 'הכול') {
+            const executionDate = new Date(execution.created_at || execution.date || execution.execution_date);
+            const now = new Date();
+
+            let startDate, endDate;
+
+            switch (dateRange) {
+                case 'היום':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                    break;
+                case 'אתמול':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    break;
+                case 'השבוע':
+                    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+                    startDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                    break;
+                case '30 יום':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                    break;
+                default:
+                    return true; // אם לא מוכר, לא מסנן
+            }
+
+            if (executionDate < startDate || executionDate >= endDate) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+}
+
+// הגדרת הפונקציה כגלובלית
+window.filterExecutionsLocally = filterExecutionsLocally;
 
 // הגדרת הפונקציות כגלובליות
 window.openExecutionDetails = openExecutionDetails;
@@ -1118,25 +1212,29 @@ window.goToNote = goToNote;
 function sortTable(columnIndex) {
     console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
 
-    if (typeof window.sortTableData === 'function') {
-        const sortedData = window.sortTableData(
+    if (typeof window.sortTable === 'function') {
+        window.sortTable(
+            'executions',
             columnIndex,
             window.executionsData || [],
-            'executions',
             updateExecutionsTable
         );
-        console.log('✅ נתונים מסודרים:', sortedData);
     } else {
-        console.error('❌ sortTableData function not found in main.js');
+        console.error('❌ sortTable function not found in main.js');
     }
 }
 
 /**
- * שחזור מצב סידור
+ * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
+    console.log('🔄 Restoring sort state for executions table');
+
     if (typeof window.restoreAnyTableSort === 'function') {
         window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTable);
+    } else {
+        console.error('❌ restoreAnyTableSort function not found in main.js');
     }
 }
 

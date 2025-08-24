@@ -1163,44 +1163,6 @@ function checkForChanges() {
  * or closes all sections if all are currently open. It also updates the main
  * toggle button text and saves the state changes.
  * 
- * @function toggleAllSections
- * @returns {void}
- * 
- * @example
- * // Toggle all sections (called by main toggle button)
- * toggleAllSections();
- */
-function toggleAllSections() {
-  const allSections = document.querySelectorAll('.section-body');
-  const isAnyOpen = Array.from(allSections).some(section => section.style.display !== 'none');
-
-  allSections.forEach(section => {
-    const sectionContainer = section.closest('.content-section, .top-section');
-    const toggleBtn = sectionContainer.querySelector('.filter-toggle-btn');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (isAnyOpen) {
-      // סגירת כל הסקשנים
-      section.style.display = 'none';
-      if (icon) icon.textContent = '▼';
-      saveSectionState(sectionContainer, true);
-    } else {
-      // פתיחת כל הסקשנים
-      section.style.display = 'block';
-      if (icon) icon.textContent = '▲';
-      saveSectionState(sectionContainer, false);
-    }
-  });
-
-  // עדכון כפתור הראשי
-  const mainButton = document.querySelector('button[onclick="toggleAllSections()"]');
-  if (mainButton) {
-    const buttonIcon = mainButton.querySelector('.filter-icon');
-    if (buttonIcon) {
-      buttonIcon.textContent = isAnyOpen ? '▼' : '▲';
-    }
-  }
-}
 
 // === SECTION MANAGEMENT FUNCTIONS ===
 
@@ -1234,67 +1196,8 @@ function clearAllSectionsState() {
 // === SECTION TOGGLE FUNCTIONS ===
 // Simple and clean section toggle system
 
-function toggleSection(sectionId) {
-  console.log(`🔄 === TOGGLE SECTION ${sectionId} ===`);
-  const section = document.querySelector(`[data-section="${sectionId}"]`);
-  const toggleBtn = document.querySelector(`[data-toggle="${sectionId}"]`);
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+// Using global toggleSection from main.js
 
-  console.log(`🔍 סקשן ${sectionId}: section=${!!section}, toggleBtn=${!!toggleBtn}, icon=${!!icon}`);
-
-  if (section && toggleBtn) {
-    const isCollapsed = section.classList.contains('collapsed');
-    console.log(`🔍 סקשן ${sectionId} מצב נוכחי: isCollapsed=${isCollapsed}`);
-
-    if (isCollapsed) {
-      section.classList.remove('collapsed');
-      if (icon) icon.textContent = '▲';
-      localStorage.setItem(`section_${sectionId}`, 'expanded');
-      console.log(`📂 סקשן ${sectionId} נפתח`);
-    } else {
-      section.classList.add('collapsed');
-      if (icon) icon.textContent = '▼';
-      localStorage.setItem(`section_${sectionId}`, 'collapsed');
-      console.log(`📁 סקשן ${sectionId} נסגר`);
-    }
-  } else {
-    console.error(`❌ לא נמצאו אלמנטים לסקשן ${sectionId}`);
-    console.error(`❌ section:`, section);
-    console.error(`❌ toggleBtn:`, toggleBtn);
-  }
-}
-
-function toggleAllSections() {
-  const allSections = document.querySelectorAll('[data-section]');
-  const isAnyOpen = Array.from(allSections).some(section => !section.classList.contains('collapsed'));
-
-  allSections.forEach(section => {
-    const sectionId = section.getAttribute('data-section');
-    const toggleBtn = document.querySelector(`[data-toggle="${sectionId}"]`);
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (isAnyOpen) {
-      // Close all sections
-      section.classList.add('collapsed');
-      if (icon) icon.textContent = '▼';
-      localStorage.setItem(`section_${sectionId}`, 'collapsed');
-    } else {
-      // Open all sections
-      section.classList.remove('collapsed');
-      if (icon) icon.textContent = '▲';
-      localStorage.setItem(`section_${sectionId}`, 'expanded');
-    }
-  });
-
-  // Update main toggle button
-  const mainToggleBtn = document.querySelector('[data-toggle="all"]');
-  if (mainToggleBtn) {
-    const mainIcon = mainToggleBtn.querySelector('.filter-icon');
-    if (mainIcon) {
-      mainIcon.textContent = isAnyOpen ? '▼' : '▲';
-    }
-  }
-}
 
 function restoreSectionsState() {
   console.log('🔄 === RESTORE SECTIONS STATE ===');
@@ -1303,14 +1206,14 @@ function restoreSectionsState() {
 
   allSections.forEach(section => {
     const sectionId = section.getAttribute('data-section');
-    const savedState = localStorage.getItem(`section_${sectionId}`);
-    const toggleBtn = document.querySelector(`[data-toggle="${sectionId}"]`);
+    const savedState = localStorage.getItem(`${sectionId}SectionCollapsed`);
+    const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
     console.log(`🔍 סקשן ${sectionId}: savedState=${savedState}, toggleBtn=${!!toggleBtn}, icon=${!!icon}`);
 
     // ברירת מחדל: פתוח (expanded) אם אין מצב שמור
-    if (savedState === 'collapsed') {
+    if (savedState === 'true') {
       section.classList.add('collapsed');
       if (icon) icon.textContent = '▼';
       console.log(`📁 סקשן ${sectionId} נסגר (מצב שמור)`);
@@ -1319,7 +1222,7 @@ function restoreSectionsState() {
       section.classList.remove('collapsed');
       if (icon) icon.textContent = '▲';
       if (!savedState) {
-        localStorage.setItem(`section_${sectionId}`, 'expanded');
+        localStorage.setItem(`${sectionId}SectionCollapsed`, 'false');
         console.log(`📂 סקשן ${sectionId} נפתח (ברירת מחדל)`);
       } else {
         console.log(`📂 סקשן ${sectionId} נפתח (מצב שמור)`);
@@ -1784,7 +1687,6 @@ function toggleAllTestsInCategory(category) {
  * @param {string} category - The test category
  * @returns {string} Display name
  */
-}
 
 /**
  * Update category button states based on current test selections
@@ -1838,86 +1740,46 @@ window.updateCategoryButtonStates = updateCategoryButtonStates;
 /**
  * Initialize preferences page
  */
-function initializePreferences() {
+async function initializePreferences() {
   console.log('🔄 === INITIALIZING PREFERENCES PAGE ===');
 
   try {
-    // שחזור מצב הסגירה
-    restoreSectionsState();
+    console.log('📂 Step 1: Starting restoreSectionStates (global)...');
+    // שחזור מצב הסגירה - שימוש בפונקציה הגלובלית
+    if (typeof window.restoreSectionStates === 'function') {
+      window.restoreSectionStates();
+      console.log('✅ Step 1: window.restoreSectionStates completed');
+    } else {
+      console.error('❌ window.restoreSectionStates function not found!');
+      throw new Error('window.restoreSectionStates function not found');
+    }
 
+    console.log('📂 Step 2: Starting loadPreferencesToUI...');
     // טעינת העדפות לממשק
-    loadPreferencesToUI();
+    await loadPreferencesToUI();
+    console.log('✅ Step 2: loadPreferencesToUI completed');
 
+    console.log('📂 Step 3: Starting saveOriginalValues...');
     // שמירת ערכים מקוריים למעקב אחרי שינויים
     setTimeout(() => {
       saveOriginalValues();
+      console.log('✅ Step 3: saveOriginalValues completed');
     }, 1000); // המתנה קצרה לטעינת הערכים
-
-    // טעינת העדפות בדיקות
-    loadTestPreferences();
-    updateTestSummary();
-
-    // טעינת העדפות בדיקות CRUD
-    loadCRUDPreferences();
-    updateCRUDSummary();
-
-    // Setup event listeners for test checkboxes - הוסר כי אלמנטי הבדיקות לא קיימים
-    console.log('ℹ️ אלמנטי בדיקות הוסרו מהדף - לא מוסיפים event listeners');
-
-    // Setup event listeners for test settings - הוסר כי אלמנטי ההגדרות לא קיימים
-    console.log('ℹ️ אלמנטי הגדרות בדיקות הוסרו מהדף - לא מוסיפים event listeners');
-
-    // Setup event listeners for CRUD test checkboxes
-    const crudTestCheckboxes = document.querySelectorAll('[data-test]');
-    crudTestCheckboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', updateCRUDSummary);
-    });
-
-    // Setup event listeners for CRUD test settings
-    const crudSettingsCheckboxes = document.querySelectorAll('#parallelTests, #stopOnFailure, #verboseOutput, #cleanupAfterTests');
-    crudSettingsCheckboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', () => {
-        console.log(`CRUD setting changed: ${checkbox.id} = ${checkbox.checked}`);
-      });
-    });
-
-    // עדכון מצב כפתורי הקטגוריות
-    updateCategoryButtonStates();
-
-    // הוספת event listener לבדיקה לפני יציאה מהדף
-    window.addEventListener('beforeunload', function (e) {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = 'יש שינויים שלא נשמרו. האם אתה בטוח שברצונך לעזוב?';
-        return e.returnValue;
-      }
-    });
-
-    // הוספת event listener לבדיקה לפני ניווט
-    document.addEventListener('click', function (e) {
-      const link = e.target.closest('a');
-      if (link && link.href && !link.href.includes('preferences') && hasUnsavedChanges) {
-        const userChoice = checkForUnsavedChanges();
-        if (userChoice) {
-          e.preventDefault();
-          return false;
-        }
-      }
-    });
 
     console.log('✅ Preferences page initialized successfully');
   } catch (error) {
     console.error('❌ Error initializing preferences page:', error);
+    console.error('❌ Error stack:', error.stack);
     throw error;
   }
 }
 
 // אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
   console.log('🔄 === DOM CONTENT LOADED - PREFERENCES ===');
 
   try {
-    initializePreferences();
+    await initializePreferences();
   } catch (error) {
     console.error('❌ Failed to initialize preferences page:', error);
     // Show error to user

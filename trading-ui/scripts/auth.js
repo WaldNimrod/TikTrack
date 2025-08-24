@@ -27,7 +27,7 @@ async function login(username, password) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.error?.message || 'שגיאה בהתחברות');
     }
@@ -44,7 +44,7 @@ function showLoginError(message, containerId = 'loginError') {
   if (errorDiv) {
     errorDiv.textContent = message;
     errorDiv.style.display = 'block';
-    
+
     // הסתרת הודעת שגיאה אחרי 5 שניות
     setTimeout(() => {
       errorDiv.style.display = 'none';
@@ -60,7 +60,7 @@ function showLoginSuccess(message, containerId = 'loginSuccess') {
   if (successDiv) {
     successDiv.textContent = message;
     successDiv.style.display = 'block';
-    
+
     // הסתרת הודעת הצלחה אחרי 3 שניות
     setTimeout(() => {
       successDiv.style.display = 'none';
@@ -72,7 +72,7 @@ function setLoadingState(isLoading, buttonId = 'loginBtn', textId = 'loginBtnTex
   const loginBtn = document.getElementById(buttonId);
   const loginBtnText = document.getElementById(textId);
   const loginBtnSpinner = document.getElementById(spinnerId);
-  
+
   if (loginBtn && loginBtnText && loginBtnSpinner) {
     if (isLoading) {
       loginBtn.disabled = true;
@@ -104,12 +104,12 @@ function loadSavedCredentials(usernameId = 'username', passwordId = 'password', 
   if (rememberCredentials === 'true') {
     const savedUsername = localStorage.getItem('savedUsername');
     const savedPassword = localStorage.getItem('savedPassword');
-    
+
     if (savedUsername && savedPassword) {
       const usernameField = document.getElementById(usernameId);
       const passwordField = document.getElementById(passwordId);
       const rememberMeField = document.getElementById(rememberMeId);
-      
+
       if (usernameField) usernameField.value = savedUsername;
       if (passwordField) passwordField.value = savedPassword;
       if (rememberMeField) rememberMeField.checked = true;
@@ -120,10 +120,10 @@ function loadSavedCredentials(usernameId = 'username', passwordId = 'password', 
 function showDashboard(loginSectionId = 'loginSection', dashboardSectionId = 'dashboardSection') {
   const loginSection = document.getElementById(loginSectionId);
   const dashboardSection = document.getElementById(dashboardSectionId);
-  
+
   if (loginSection) loginSection.style.display = 'none';
   if (dashboardSection) dashboardSection.style.display = 'block';
-  
+
   // הפעלת פונקציה גלובלית לטעינת הדשבורד אם קיימת
   if (typeof loadDashboardData === 'function') {
     loadDashboardData();
@@ -133,7 +133,7 @@ function showDashboard(loginSectionId = 'loginSection', dashboardSectionId = 'da
 function showLogin(loginSectionId = 'loginSection', dashboardSectionId = 'dashboardSection') {
   const loginSection = document.getElementById(loginSectionId);
   const dashboardSection = document.getElementById(dashboardSectionId);
-  
+
   if (loginSection) loginSection.style.display = 'block';
   if (dashboardSection) dashboardSection.style.display = 'none';
 }
@@ -143,7 +143,7 @@ function logout() {
   currentUser = null;
   localStorage.removeItem('authToken');
   localStorage.removeItem('currentUser');
-  
+
   // הפעלת פונקציה גלובלית להתנתקות אם קיימת
   if (typeof onLogout === 'function') {
     onLogout();
@@ -169,34 +169,34 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
   const form = document.getElementById(formId);
   if (!form) return;
 
-  form.addEventListener('submit', async function(e) {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
-    
+
     const username = document.getElementById('username')?.value;
     const password = document.getElementById('password')?.value;
-    
+
     if (!username || !password) {
       showLoginError('אנא מלא את כל השדות');
       return;
     }
 
     setLoadingState(true);
-    
+
     try {
       const loginData = await login(username, password);
-      
+
       // שמירת פרטי התחברות
       authToken = loginData.data.access_token;
       currentUser = loginData.data.user;
-      
+
       localStorage.setItem('authToken', authToken);
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
-      
+
       // שמירת פרטי התחברות אם נבחר "זכור אותי"
       saveCredentials(username, password);
-      
+
       showLoginSuccess('התחברות הצליחה! מעביר לדשבורד...');
-      
+
       // הפעלת callback אם קיים
       if (onSuccess && typeof onSuccess === 'function') {
         setTimeout(() => {
@@ -208,7 +208,7 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
           showDashboard();
         }, 1000);
       }
-      
+
     } catch (error) {
       showLoginError(error.message);
     } finally {
@@ -221,15 +221,15 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
   // טעינת פרטי התחברות שמורים
   loadSavedCredentials();
-  
+
   // בדיקת token קיים
   const token = localStorage.getItem('authToken');
   const user = localStorage.getItem('currentUser');
-  
+
   if (token && user) {
     authToken = token;
     currentUser = JSON.parse(user);
-    
+
     if (onAuthenticated && typeof onAuthenticated === 'function') {
       onAuthenticated();
     } else {
@@ -309,7 +309,7 @@ function createLogoutButton(containerId) {
 // פונקציה לבדיקת הרשאות
 function hasPermission(permission) {
   if (!currentUser || !currentUser.roles) return false;
-  
+
   // כאן אפשר להוסיף לוגיקה לבדיקת הרשאות
   // כרגע נחזיר true לכל משתמש מחובר
   return true;

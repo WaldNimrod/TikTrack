@@ -1066,6 +1066,30 @@ async function loadTickersData() {
             tickersData = data.data || data;
             console.log('✅ נטענו', tickersData.length, 'טיקרים');
 
+            // בדיקה אם יש פילטרים פעילים
+            if (window.headerSystem && window.headerSystem.currentFilters) {
+                const filters = window.headerSystem.currentFilters;
+                const hasActiveFilters = (filters.status && filters.status.length > 0) ||
+                    (filters.type && filters.type.length > 0) ||
+                    (filters.account && filters.account.length > 0) ||
+                    (filters.dateRange && filters.dateRange !== '') ||
+                    (filters.search && filters.search !== '');
+
+                if (hasActiveFilters) {
+                    console.log('🔍 יש פילטרים פעילים, מסנן נתונים מקומית');
+                    const filteredData = filterTickersLocally(
+                        tickersData,
+                        filters.status,
+                        filters.type,
+                        filters.account,
+                        filters.dateRange,
+                        filters.search
+                    );
+                    updateTickersTable(filteredData);
+                    return;
+                }
+            }
+
             // עדכון הטבלה
             updateTickersTable(tickersData);
 
@@ -1135,6 +1159,87 @@ function formatDate(dateString) {
     return date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 }
 
+// פונקציית פילטור מקומי לטיקרים
+function filterTickersLocally(tickers, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
+    console.log('🔍 filterTickersLocally called with:', { selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm });
+
+    return tickers.filter(ticker => {
+        // פילטר חיפוש
+        if (searchTerm && searchTerm.trim() !== '') {
+            const searchLower = searchTerm.toLowerCase();
+            const symbol = ticker.symbol || '';
+            const name = ticker.name || '';
+            const remarks = ticker.remarks || '';
+
+            if (!symbol.toLowerCase().includes(searchLower) &&
+                !name.toLowerCase().includes(searchLower) &&
+                !remarks.toLowerCase().includes(searchLower)) {
+                return false;
+            }
+        }
+
+        // פילטר סוג (type)
+        if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('הכול')) {
+            const tickerType = ticker.type === 'stock' ? 'מניה' :
+                ticker.type === 'etf' ? 'ETF' :
+                    ticker.type === 'bond' ? 'אג"ח' :
+                        ticker.type === 'crypto' ? 'קריפטו' : ticker.type;
+
+            if (!selectedTypes.includes(tickerType)) {
+                return false;
+            }
+        }
+
+        // פילטר סטטוס
+        if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('הכול')) {
+            const tickerStatus = ticker.active_trades ? 'פעיל' : 'לא פעיל';
+
+            if (!selectedStatuses.includes(tickerStatus)) {
+                return false;
+            }
+        }
+
+        // פילטר תאריך
+        if (dateRange && dateRange !== 'כל זמן' && dateRange !== 'הכול') {
+            const tickerDate = new Date(ticker.created_at);
+            const now = new Date();
+
+            let startDate, endDate;
+
+            switch (dateRange) {
+                case 'היום':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                    break;
+                case 'אתמול':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    break;
+                case 'השבוע':
+                    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+                    startDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                    break;
+                case '30 יום':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                    break;
+                default:
+                    return true; // אם לא מוכר, לא מסנן
+            }
+
+            if (tickerDate < startDate || tickerDate >= endDate) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+}
+
+// הגדרת הפונקציה כגלובלית
+window.filterTickersLocally = filterTickersLocally;
+
 // הגדרת הפונקציות כגלובליות
 window.openTickerDetails = openTickerDetails;
 window.editTicker = editTicker;
@@ -1182,25 +1287,29 @@ window.goToNote = goToNote;
 function sortTable(columnIndex) {
     console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
 
-    if (typeof window.sortTableData === 'function') {
-        const sortedData = window.sortTableData(
+    if (typeof window.sortTable === 'function') {
+        window.sortTable(
+            'tickers',
             columnIndex,
             window.tickersData || [],
-            'tickers',
             updateTickersTable
         );
-        console.log('✅ נתונים מסודרים:', sortedData);
     } else {
-        console.error('❌ sortTableData function not found in main.js');
+        console.error('❌ sortTable function not found in main.js');
     }
 }
 
 /**
- * שחזור מצב סידור
+ * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
+    console.log('🔄 Restoring sort state for tickers table');
+
     if (typeof window.restoreAnyTableSort === 'function') {
         window.restoreAnyTableSort('tickers', window.tickersData || [], updateTickersTable);
+    } else {
+        console.error('❌ restoreAnyTableSort function not found in main.js');
     }
 }
 

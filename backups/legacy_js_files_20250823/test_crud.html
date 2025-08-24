@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API - Tik.track</title>
+    <title>CRUD - Tik.track</title>
 
     <!-- 
-    ===== דף API - TikTrack =====
+    ===== דף CRUD - TikTrack =====
     
     דף זה מכיל:
-    1. טבלת API - הסקשן הראשון
-    2. טבלת תוצאות API - הסקשן השני
+    1. טבלת CRUD - הסקשן הראשון
+    2. טבלת תוצאות CRUD - הסקשן השני
     3. כרטיסיות התראות - בחלק העליון
     4. מערכת פילטרים ומיון מתקדמת
     
@@ -19,15 +19,15 @@
     - app-header: כותרת האפליקציה עם ניווט
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות התראות וסיכום נתונים
-      - content-section (1): טבלת API
-      - content-section (2): טבלת תוצאות API
+      - content-section (1): טבלת CRUD
+      - content-section (2): טבלת תוצאות CRUD
     
     שינויים אחרונים:
-    - יצירת עמוד API חדש
-    - הוספת טבלת תוצאות API
+    - יצירת עמוד CRUD חדש
+    - הוספת טבלת תוצאות CRUD
     - שיפור עיצוב כרטיסיות התראות
     - תיקון כפתורי סגירה עצמאיים
-    - ריכוז פונקציות API ב-api.js
+    - ריכוז פונקציות CRUD ב-crud.js
   -->
 
     <!-- CSS Files - Ordered by priority (weak to strong) -->
@@ -65,22 +65,22 @@
 
         <!-- Page body - All content after header -->
         <div class="page-body">
-            <!-- API area - top-Section -->
+            <!-- CRUD area - top-Section -->
             <div class="top-section">
                 <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
-                        🔌 API Management
+                        🔧 CRUD Operations
                     </div>
                     <div class="table-actions">
-                        <button class="refresh-btn" onclick="saveAllAPI()" title="שמור כל ההגדרות">
+                        <button class="refresh-btn" onclick="saveAllCRUD()" title="שמור כל הפעולות">
                             <span class="action-icon">💾</span> שמור הכל
                         </button>
-                        <button class="refresh-btn" onclick="resetAllAPI()"
-                            title="איפוס כל ההגדרות לברירות מחדל">
+                        <button class="refresh-btn" onclick="resetAllCRUD()"
+                            title="איפוס כל הפעולות לברירות מחדל">
                             <span class="action-icon">🔄</span> איפוס הכל
                         </button>
-                        <button class="refresh-btn" onclick="runAllAPI()" title="הרץ את כל בדיקות ה-API">
+                        <button class="refresh-btn" onclick="runAllCRUD()" title="הרץ את כל פעולות ה-CRUD">
                             <span class="action-icon">▶️</span> הרץ הכל
                         </button>
                         <div class="action-separator"></div>
@@ -96,31 +96,27 @@
 
                     <!-- Data summary -->
                     <div class="test-summary" id="summaryStats">
-                        <h4>📊 סיכום API</h4>
+                        <h4>📊 סיכום CRUD</h4>
                         <div class="test-summary-stats">
                             <div class="stat-item">
-                                <span class="stat-label">Endpoints פעילים:</span>
-                                <span class="stat-value" id="activeEndpointsCount">0</span>
+                                <span class="stat-label">פעולות Create:</span>
+                                <span class="stat-value" id="createCount">0</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">בקשות GET:</span>
-                                <span class="stat-value" id="getRequestsCount">0</span>
+                                <span class="stat-label">פעולות Read:</span>
+                                <span class="stat-value" id="readCount">0</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">בקשות POST:</span>
-                                <span class="stat-value" id="postRequestsCount">0</span>
+                                <span class="stat-label">פעולות Update:</span>
+                                <span class="stat-value" id="updateCount">0</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">בקשות PUT:</span>
-                                <span class="stat-value" id="putRequestsCount">0</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">בקשות DELETE:</span>
-                                <span class="stat-value" id="deleteRequestsCount">0</span>
+                                <span class="stat-label">פעולות Delete:</span>
+                                <span class="stat-value" id="deleteCount">0</span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-label">סך הכל:</span>
-                                <span class="stat-value" id="totalAPICount">0</span>
+                                <span class="stat-value" id="totalCRUDCount">0</span>
                             </div>
                         </div>
                     </div>
@@ -130,49 +126,49 @@
             <!-- Main content -->
             <div class="main-content">
 
-                <!-- API Endpoints Section -->
+                <!-- CRUD Operations Section -->
                 <div class="content-section">
-                    <!-- API Endpoints Header -->
+                    <!-- CRUD Operations Header -->
                     <div class="section-header">
                         <div class="table-title">
-                            🔌 נקודות קצה API<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">API Endpoints</span>
+                            🔧 פעולות CRUD<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Create, Read, Update, Delete</span>
                         </div>
-                        <div class="table-count" id="apiCount">טוען...</div>
+                        <div class="table-count" id="crudCount">טוען...</div>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <div class="search-input-wrapper">
-                                <input type="text" class="search-filter-input" placeholder="חיפוש נקודות קצה..."
-                                    onkeyup="filterAPIData([], [], [], null, this.value)">
+                                <input type="text" class="search-filter-input" placeholder="חיפוש פעולות CRUD..."
+                                    onkeyup="filterCRUDData([], [], [], null, this.value)">
                             </div>
-                            <button class="refresh-btn" onclick="addNewAPIEndpoint()" title="הוסף נקודת קצה חדשה">
+                            <button class="refresh-btn" onclick="addNewCRUDOperation()" title="הוסף פעולת CRUD חדשה">
                                 <span class="action-icon">➕</span> הוסף
                             </button>
-                            <button class="refresh-btn" onclick="loadAPIEndpoints()" title="רענן טבלה">
+                            <button class="refresh-btn" onclick="loadCRUDOperations()" title="רענן טבלה">
                                 <span class="action-icon">🔄</span> רענן
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור API">
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור CRUD">
                                 <span class="filter-icon">▲</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- API Endpoints Table -->
+                    <!-- CRUD Operations Table -->
                     <div class="section-body">
-                        <div class="table-responsive" id="apiContainer">
-                            <table class="table" id="apiTable" data-table-type="api">
+                        <div class="table-responsive" id="crudContainer">
+                            <table class="table" id="crudTable" data-table-type="crud">
                                 <thead>
                                     <tr>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(0)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>שיטה
-                                                <br><span class="header-subtitle">Method</span>
+                                                <span class="sort-icon">↕</span>טבלה
+                                                <br><span class="header-subtitle">Table</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(1)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>נתיב
-                                                <br><span class="header-subtitle">Path</span>
+                                                <span class="sort-icon">↕</span>פעולה
+                                                <br><span class="header-subtitle">Operation</span>
                                             </button>
                                         </th>
                                         <th>
@@ -185,15 +181,15 @@
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(3)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>תגובה
-                                                <br><span class="header-subtitle">Response</span>
+                                                <span class="sort-icon">↕</span>תוצאה
+                                                <br><span class="header-subtitle">Result</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(4)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>זמן תגובה
-                                                <br><span class="header-subtitle">Response Time</span>
+                                                <span class="sort-icon">↕</span>זמן ביצוע
+                                                <br><span class="header-subtitle">Execution Time</span>
                                             </button>
                                         </th>
                                         <th>
@@ -211,7 +207,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="7" class="loading">טוען נקודות קצה API...</td>
+                                        <td colspan="7" class="loading">טוען פעולות CRUD...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -219,23 +215,23 @@
                     </div>
                 </div>
 
-                <!-- API Results Section -->
+                <!-- CRUD Results Section -->
                 <div class="content-section">
-                    <!-- API Results Header -->
+                    <!-- CRUD Results Header -->
                     <div class="section-header">
                         <div class="table-title">
-                            📋 תוצאות API<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">API Results</span>
+                            📋 תוצאות CRUD<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">CRUD Results</span>
                         </div>
-                        <div class="table-count" id="apiResultsCount">טוען...</div>
+                        <div class="table-count" id="crudResultsCount">טוען...</div>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <div class="search-input-wrapper">
                                 <input type="text" class="search-filter-input" placeholder="חיפוש תוצאות..."
-                                    onkeyup="filterAPIResultsData([], [], [], null, this.value)">
+                                    onkeyup="filterCRUDResultsData([], [], [], null, this.value)">
                             </div>
-                            <button class="refresh-btn" onclick="exportAPIResults()" title="ייצא תוצאות">
+                            <button class="refresh-btn" onclick="exportCRUDResults()" title="ייצא תוצאות">
                                 <span class="action-icon">📤</span> ייצא
                             </button>
-                            <button class="refresh-btn" onclick="loadAPIResults()" title="רענן טבלה">
+                            <button class="refresh-btn" onclick="loadCRUDResults()" title="רענן טבלה">
                                 <span class="action-icon">🔄</span> רענן
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleSecondSection()" title="הצג/הסתר אזור תוצאות">
@@ -244,10 +240,10 @@
                         </div>
                     </div>
 
-                    <!-- API Results Table -->
+                    <!-- CRUD Results Table -->
                     <div class="section-body">
-                        <div class="table-responsive" id="apiResultsContainer">
-                            <table class="table" id="apiResultsTable" data-table-type="api-results">
+                        <div class="table-responsive" id="crudResultsContainer">
+                            <table class="table" id="crudResultsTable" data-table-type="crud-results">
                                 <thead>
                                     <tr>
                                         <th>
@@ -260,33 +256,40 @@
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(1)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>בקשה
-                                                <br><span class="header-subtitle">Request</span>
+                                                <span class="sort-icon">↕</span>פעולת CRUD
+                                                <br><span class="header-subtitle">CRUD Operation</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(2)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>סטטוס קוד
-                                                <br><span class="header-subtitle">Status Code</span>
+                                                <span class="sort-icon">↕</span>טבלה
+                                                <br><span class="header-subtitle">Table</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(3)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>תגובה
-                                                <br><span class="header-subtitle">Response</span>
+                                                <span class="sort-icon">↕</span>סטטוס
+                                                <br><span class="header-subtitle">Status</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(4)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                <span class="sort-icon">↕</span>זמן תגובה
-                                                <br><span class="header-subtitle">Response Time</span>
+                                                <span class="sort-icon">↕</span>הודעה
+                                                <br><span class="header-subtitle">Message</span>
                                             </button>
                                         </th>
                                         <th>
                                             <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>זמן ביצוע
+                                                <br><span class="header-subtitle">Execution Time</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(6)"
                                                 style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                                                 <span class="sort-icon">↕</span>תאריך
                                                 <br><span class="header-subtitle">Date</span>
@@ -300,7 +303,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="7" class="loading">טוען תוצאות API...</td>
+                                        <td colspan="8" class="loading">טוען תוצאות CRUD...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -319,73 +322,73 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
         <!-- Modular grid files -->
-        <script src="scripts/app-header.js"></script>
+        <script src="scripts/header-system.js"></script>
         <script src="scripts/main.js"></script>
-        <script src="scripts/grid-filters.js"></script>
+        <script src="scripts/filter-system.js"></script>
         <script src="scripts/alerts.js"></script>
         <script src="scripts/active-alerts-component.js"></script>
-        <script src="scripts/api.js"></script>
+        <script src="scripts/crud.js"></script>
 
         <script>
-            // פונקציות מותאמות לעמוד API
-            function loadAPIEndpoints() {
-                console.log('טעינת נקודות קצה API');
-                if (typeof window.loadAPIData === 'function') {
-                    window.loadAPIData();
+            // פונקציות מותאמות לעמוד CRUD
+            function loadCRUDOperations() {
+                console.log('טעינת פעולות CRUD');
+                if (typeof window.loadCRUDData === 'function') {
+                    window.loadCRUDData();
                 } else {
-                    console.error('loadAPIData function not found');
+                    console.error('loadCRUDData function not found');
                 }
             }
 
-            function loadAPIResults() {
-                console.log('טעינת תוצאות API');
-                if (typeof window.loadAPIResultsData === 'function') {
-                    window.loadAPIResultsData();
+            function loadCRUDResults() {
+                console.log('טעינת תוצאות CRUD');
+                if (typeof window.loadCRUDResultsData === 'function') {
+                    window.loadCRUDResultsData();
                 } else {
-                    console.error('loadAPIResultsData function not found');
+                    console.error('loadCRUDResultsData function not found');
                 }
             }
 
-            function addNewAPIEndpoint() {
-                console.log('הוספת נקודת קצה API חדשה');
-                if (typeof window.showAddAPIModal === 'function') {
-                    window.showAddAPIModal();
+            function addNewCRUDOperation() {
+                console.log('הוספת פעולת CRUD חדשה');
+                if (typeof window.showAddCRUDModal === 'function') {
+                    window.showAddCRUDModal();
                 } else {
-                    console.error('showAddAPIModal function not found');
+                    console.error('showAddCRUDModal function not found');
                 }
             }
 
-            function exportAPIResults() {
-                console.log('ייצוא תוצאות API');
-                if (typeof window.exportAPIResultsData === 'function') {
-                    window.exportAPIResultsData();
+            function exportCRUDResults() {
+                console.log('ייצוא תוצאות CRUD');
+                if (typeof window.exportCRUDResultsData === 'function') {
+                    window.exportCRUDResultsData();
                 } else {
-                    console.error('exportAPIResultsData function not found');
+                    console.error('exportCRUDResultsData function not found');
                 }
             }
 
-            function saveAllAPI() {
-                console.log('שמירת כל הגדרות API');
-                showNotification('כל הגדרות API נשמרו בהצלחה', 'success');
+            function saveAllCRUD() {
+                console.log('שמירת כל פעולות CRUD');
+                showNotification('כל פעולות CRUD נשמרו בהצלחה', 'success');
             }
 
-            function resetAllAPI() {
-                console.log('איפוס כל הגדרות API');
-                if (confirm('האם אתה בטוח שברצונך לאפס את כל הגדרות ה-API?')) {
-                    showNotification('כל הגדרות API אופסו בהצלחה', 'success');
+            function resetAllCRUD() {
+                console.log('איפוס כל פעולות CRUD');
+                if (confirm('האם אתה בטוח שברצונך לאפס את כל פעולות ה-CRUD?')) {
+                    showNotification('כל פעולות CRUD אופסו בהצלחה', 'success');
                 }
             }
 
-            function runAllAPI() {
-                console.log('הרצת כל בדיקות API');
-                showNotification('כל בדיקות API הורצו בהצלחה', 'success');
+            function runAllCRUD() {
+                console.log('הרצת כל פעולות CRUD');
+                showNotification('כל פעולות CRUD הורצו בהצלחה', 'success');
             }
 
             // טעינת נתונים בטעינת הדף
             document.addEventListener('DOMContentLoaded', function () {
-                console.log('דף API נטען');
-                loadAPIEndpoints();
-                loadAPIResults();
+                console.log('דף CRUD נטען');
+                loadCRUDOperations();
+                loadCRUDResults();
             });
         </script>
 

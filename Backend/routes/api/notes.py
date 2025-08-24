@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, send_from_directory
 from config.database import get_db
 from models.note import Note
+from services.validation_service import ValidationService
 import logging
 import os
 import uuid
@@ -271,6 +272,21 @@ def create_note():
             'related_id': related_id
         }
         
+        # Validate data against constraints
+        logger.info("Validating note data before creation")
+        is_valid, errors = ValidationService.validate_data(db, 'notes', note_data)
+        if not is_valid:
+            error_message = "; ".join(errors)
+            logger.error(f"Note validation failed: {error_message}")
+            # Delete file if validation failed
+            if attachment_filename:
+                delete_uploaded_file(attachment_filename)
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Note validation failed: {error_message}"},
+                "version": "v1"
+            }), 400
+        
         note = Note(**note_data)
         db.add(note)
         db.commit()
@@ -382,6 +398,30 @@ def update_note(note_id: int):
                 }), 400
             
             logger.info(f"✅ Relation determined: related_type_id={related_type_id} -> {related_id}")
+            
+            # Prepare data for validation
+            update_data = {
+                'content': content,
+                'related_type_id': related_type_id,
+                'related_id': related_id
+            }
+            if attachment_filename:
+                update_data['attachment'] = attachment_filename
+            
+            # Validate data against constraints
+            logger.info("Validating note data before update")
+            is_valid, errors = ValidationService.validate_data(db, 'notes', update_data, exclude_id=note_id)
+            if not is_valid:
+                error_message = "; ".join(errors)
+                logger.error(f"Note validation failed: {error_message}")
+                # Delete new file if validation failed
+                if attachment_filename:
+                    delete_uploaded_file(attachment_filename)
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": f"Note validation failed: {error_message}"},
+                    "version": "v1"
+                }), 400
             
             # Update fields
             logger.info(f"📝 Updating note fields - content: {content[:50]}..., attachment: {attachment_filename}")

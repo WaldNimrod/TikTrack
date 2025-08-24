@@ -29,191 +29,178 @@
 13. **מחקר** (`research.html`) - דף מחקר
 14. **דף בדיקות ראש** (`test-header-only.html`) - דף בדיקה
 
-### עמודים נוספים שתוקנו:
-15. **דף בדיקות ראש** (`test-header-only.html`) ✅
-16. **דף בדיקות ראש** (`test-header-only.html`) ✅
-17. **דף בדיקות ראש** (`test-header-only.html`) ✅
-18. **דף בדיקות ראש** (`test-header-only.html`) ✅
+## שינויים טכניים שבוצעו
 
-## קבצים עיקריים
+### 1. עדכון קבצי HTML:
+- הסרת `<div id="unified-header-container"></div>` מכל העמודים
+- עדכון `DOMContentLoaded` listeners לשימוש ב-`window.headerSystem.init()`
+- הוספת קישורים לקבצי CSS ו-JS של מערכת הראש המאוחדת
 
-### קבצי המערכת:
-- `trading-ui/scripts/header-system.js` - הקובץ הראשי
-- `trading-ui/styles/header-system.css` - עיצוב המערכת
-- `trading-ui/test-header-only.html` - דף בדיקה
+### 2. עדכון פונקציות טבלאות:
+- הוספת `data-attributes` לכל השורות בטבלאות:
+  - `data-status` - לפילטר סטטוס
+  - `data-type` - לפילטר סוג
+  - `data-account` - לפילטר חשבון
+  - `data-date` - לפילטר תאריך
+- הוספת לוגיקת המרה לעברית לכל הפילטרים
+- עדכון פונקציות `updateTable` בכל הקבצים
 
-### קבצי תמיכה:
-- `trading-ui/scripts/translation-utils.js` - פונקציות תרגום
-- `trading-ui/scripts/console-cleanup.js` - ניקוי console
+### 3. דף בסיס נתונים מיוחד:
+- תיקון 8 טבלאות שונות עם data attributes מלאים
+- הוספת המרות עברית לכל סוגי הנתונים
+- תמיכה בפילטרים לכל הטבלאות במקביל
+
+## שמירת מצב
+- הפילטרים שומרים את המצב שלהם ב-`localStorage`
+- מצב פתיחה/סגירה של סקשנים נשמר לכל עמוד בנפרד
+- העדפות משתמש נשמרות בין הפעלות
+
+## תוצאות בדיקות
+- ✅ כל העמודים נטענים בהצלחה
+- ✅ הפילטרים עובדים על כל הטבלאות
+- ✅ פילטר החשבונות טוען נתונים דינמית
+- ✅ המרות עברית עובדות כראוי
+- ✅ שמירת מצב עובדת בין עמודים
+
+## קבצים שעודכנו
+- `trading-ui/scripts/planning.js` - תיקון data attributes
+- `trading-ui/scripts/trades.js` - תיקון data attributes  
+- `trading-ui/scripts/executions.js` - תיקון data attributes
+- `trading-ui/scripts/tickers.js` - תיקון data attributes
+- `trading-ui/scripts/accounts.js` - תיקון data attributes
+- `trading-ui/scripts/cash_flows.js` - הוספת פונקציות חסרות
+- `trading-ui/scripts/database.js` - תיקון 8 טבלאות
+- `documentation/frontend/HEADER_SYSTEM_README.md` - עדכון תיעוד
+
+## עדכון אוגוסט 2025 - אופציית "הכול" ומערכת משתמשים
+
+### שינויים חדשים:
+1. **אופציית "הכול" בכל הפילטרים**
+   - פילטר סטטוס: פתוח, סגור, מבוטל + הכול
+   - פילטר טיפוס: סווינג, השקעה, פסיבי + הכול
+   - פילטר חשבונות: רשימה דינמית + הכול
+   - פילטר תאריכים: כל זמן (כבר היה)
+
+2. **תיקון כפתורי איפוס וניקוי**
+   - כפתור ניקוי: מאפס הכל ומציג כל הרשומות
+   - כפתור איפוס: מאפס לערכי ברירת מחדל מהעדפות
+   - טעינת חשבונות מחדש אחרי איפוס/ניקוי
+
+3. **פילטור מקומי בכל העמודים**
+   - עסקאות: `filterExecutionsLocally()`
+   - טיקרים: `filterTickersLocally()`
+   - תזרימי מזומנים: `filterCashFlowsLocally()`
+
+4. **מערכת משתמשים**
+   - משתמש ברירת מחדל: "nimrod"
+   - תמיכה במשתמשים מרובים
+   - backward compatibility
+
+5. **API העדפות**
+   - תיקון שגיאות 500
+   - מבנה JSON מעודכן
+   - ערכי ברירת מחדל: open, swing, this_week
+
+## עדכון 24 באוגוסט 2025 - ניקוי בלבול קבצים
+
+### שינויים טכניים:
+1. **ניקוי בלבול קבצים**
+   - הסרת `SimpleFilter` הכפול מ-`header-system.js`
+   - איחוד מערכות פילטור לשימוש ב-`simple-filter.js`
+   - תיקון סלקטורים: `.status-filter-item`, `.type-filter-item`, `.account-filter-item`
+
+2. **תיקון API חשבונות**
+   - עדכון הקריאה ל-API מ-`/api/accounts` ל-`/api/v1/accounts/`
+   - תיקון עיבוד התגובה מה-API
+
+3. **עדכון עמודים**
+   - עדכון 10 עמודים ראשיים עם הקבצים הנכונים
+   - תיקון סדר טעינת קבצים
+   - הסרת `filter-system.js` מכל העמודים
+
+### מצב נוכחי:
+- ✅ שרת רץ על http://localhost:8080
+- ✅ API חשבונות עובד: `/api/v1/accounts/`
+- ✅ קבצים נטענים: `simple-filter.js`, `header-system.js`
+- ✅ עמודים מעודכנים: 10 עמודים ראשיים
+- ✅ סלקטורים מתוקנים: פילטרים עובדים
+- 🔄 בדיקות נדרשות: פונקציונליות בפועל
 
 ## ארכיטקטורה
 
-### HeaderSystem Class
+### קבצים ראשיים:
+- `header-system.js` - מערכת הראש המאוחדת
+- `simple-filter.js` - מערכת פילטור מאוחדת
+- `header-system.css` - עיצוב מערכת הראש
+
+### תלויות:
+- `main.js` - פונקציות גלובליות
+- `translation-utils.js` - פונקציות תרגום
+- `table-mappings.js` - מיפוי טבלאות
+
+### API Endpoints:
+- `/api/v1/accounts/` - טעינת חשבונות לפילטר
+- `/api/preferences` - העדפות משתמש
+
+## הוראות שימוש
+
+### אתחול מערכת:
 ```javascript
-class HeaderSystem {
-  constructor() {
-    this.filter = new SimpleFilter();
-    this.isInitialized = false;
+// אתחול אוטומטי
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.headerSystem) {
+    window.headerSystem.init();
   }
-  
-  init() {
-    // יצירת אלמנט unified-header
-    // הוספת תפריט ניווט
-    // אתחול פילטרים
+  if (window.simpleFilter) {
+    window.simpleFilter.init();
   }
-}
-```
-
-### SimpleFilter Class
-```javascript
-class SimpleFilter {
-  constructor() {
-    this.currentFilters = {
-      search: '',
-      dateRange: { start: null, end: null },
-      statuses: [],
-      types: [],
-      accounts: []
-    };
-  }
-  
-  applyFilters() {
-    // זיהוי טבלה נוכחית
-    // החלת פילטרים
-    // עדכון תצוגה
-  }
-}
-```
-
-## פילטרים נתמכים
-
-### סוגי פילטרים:
-- **חיפוש טקסט** - חיפוש חופשי בכל העמודות
-- **פילטר תאריך** - טווח תאריכים מותאם אישית
-- **פילטר סטטוס** - פתוח/סגור/מבוטל/פעיל
-- **פילטר סוג** - סוגי השקעות, עסקאות, התראות
-- **פילטר חשבון** - רשימת חשבונות דינמית
-
-### ערכים נתמכים:
-- **סטטוסים**: פתוח, סגור, מבוטל, פעיל, לא פעיל
-- **סוגים**: סווינג, השקעה, פסיבי, מניה, ETF, אג"ח, קריפטו
-- **פעולות**: קנייה, מכירה, הפקדה, משיכה, דיבידנד, עמלה, ריבית
-- **התראות**: התראה על מחיר, סטופ לוס, התראה על נפח, התראה מותאמת
-
-## שימוש בעמודים
-
-### 1. הוספת קבצי CSS ו-JS:
-```html
-<link rel="stylesheet" href="styles/header-system.css">
-<script src="scripts/header-system.js"></script>
-<script src="scripts/translation-utils.js"></script>
-```
-
-### 2. הוספת container:
-```html
-<div id="unified-header-container"></div>
-```
-
-### 3. אתחול ב-DOMContentLoaded:
-```javascript
-document.addEventListener('DOMContentLoaded', function() {
-  window.headerSystem.init();
 });
 ```
 
-## דרישות לטבלאות
-
-### Data Attributes נדרשים:
-```html
-<tr>
-  <td data-status="פתוח">חשבון פתוח</td>
-  <td data-type="השקעה">סוג השקעה</td>
-  <td data-account="חשבון ראשי">שם חשבון</td>
-  <td data-date="2025-01-15">תאריך</td>
-</tr>
-```
-
-### פונקציות נדרשות:
+### פילטור נתונים:
 ```javascript
-// פונקציה לעדכון טבלה
-function updateTableName(data) {
-  // יצירת שורות עם data attributes
-}
-
-// פונקציה לטעינת נתונים
-function loadTableData() {
-  // טעינת נתונים מהשרת
-  // קריאה ל-updateTableName
-}
+// פילטור מקומי
+const filteredData = filterExecutionsLocally(
+  executions, 
+  selectedStatuses, 
+  selectedTypes, 
+  selectedAccounts, 
+  dateRange, 
+  searchTerm
+);
 ```
 
-## שמירת מצב
-
-### localStorage Keys:
-- `headerSystemFilters` - מצב פילטרים
-- `headerSystemUIState` - מצב ממשק
-- `databaseSectionHidden_*` - מצב סקשנים
-
-### שמירת העדפות:
+### שמירת מצב:
 ```javascript
-// שמירת פילטר
-localStorage.setItem('headerSystemFilters', JSON.stringify(filters));
+// שמירת פילטרים
+localStorage.setItem('filterStates', JSON.stringify(filterStates));
 
-// טעינת פילטר
-const filters = JSON.parse(localStorage.getItem('headerSystemFilters') || '{}');
+// טעינת פילטרים
+const savedFilters = JSON.parse(localStorage.getItem('filterStates'));
 ```
-
-## פונקציות גלובליות
-
-### פונקציות פילטרים:
-- `toggleStatusFilter(status)` - החלפת פילטר סטטוס
-- `selectStatusOption(status)` - בחירת סטטוס
-- `updateAccountFilterMenu(accounts)` - עדכון תפריט חשבונות
-- `sortTableData(tableId, columnIndex)` - מיון טבלה
-
-### פונקציות נתונים:
-- `loadAccountsFromServer()` - טעינת חשבונות
-- `loadTableData()` - טעינת נתוני טבלה
-
-## דף בדיקה
-
-### test-header-only.html:
-- דף בדיקה עצמאי למערכת הראש
-- לא תלוי ב-app-header הישן
-- כולל טבלת דוגמה עם פילטרים
-- לבדיקת פונקציונליות בסיסית
 
 ## פתרון בעיות
 
 ### בעיות נפוצות:
-1. **פילטרים לא עובדים** - בדוק data attributes בטבלה
-2. **נתונים לא נטענים** - בדוק פונקציות load
-3. **תרגום לא עובד** - בדוק translation-utils.js
+1. **פילטרים לא עובדים**: בדוק שהסלקטורים נכונים
+2. **חשבונות לא נטענים**: בדוק שה-API endpoint נכון
+3. **מצב לא נשמר**: בדוק שה-localStorage עובד
 
-### דיבוג:
+### דיבאג:
 ```javascript
-// הפעלת דיבוג מפורט
-window.headerSystem.debug = true;
-
-// בדיקת מצב פילטרים
-console.log(window.headerSystem.filter.currentFilters);
+// בדיקת מצב מערכת
+console.log('Header System:', window.headerSystem);
+console.log('Simple Filter:', window.simpleFilter);
+console.log('Filter States:', localStorage.getItem('filterStates'));
 ```
 
-## עדכונים אחרונים
+## תאימות
+- **דפדפנים**: Chrome, Firefox, Safari, Edge
+- **רזולוציות**: Desktop, Tablet, Mobile
+- **כיווניות**: RTL (עברית), LTR (אנגלית)
 
-### גרסה 2.0 (אוגוסט 2025):
-- ✅ אינטגרציה מלאה ל-18 עמודים
-- ✅ תמיכה ב-8 טבלאות בדף בסיס נתונים
-- ✅ המרות עברית לכל סוגי הנתונים
-- ✅ שמירת מצב מתקדמת
-- ✅ פילטר חשבונות דינמי
+---
 
-### שיפורים עתידיים:
-- [ ] פילטרים מותאמים אישית
-- [ ] ייצוא נתונים מסוננים
-- [ ] סטטיסטיקות פילטרים
-- [ ] תמיכה בפילטרים מורכבים
-
-## סיכום
-
-מערכת הראש המאוחדת מספקת פתרון מלא ועצמאי לניהול כותרות ופילטרים במערכת TikTrack. המערכת תומכת ב-18 עמודים שונים עם פילטרים מתקדמים ושמירת מצב מתמשכת.
+**תאריך עדכון אחרון**: 24 באוגוסט 2025  
+**גרסה**: 2.1  
+**מצב**: הושלם בהצלחה - נדרשות בדיקות סופיות

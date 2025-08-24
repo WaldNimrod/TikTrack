@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
-import sqlite3
-import os
-from datetime import datetime
+from sqlalchemy.orm import Session
+from config.database import get_db
+from services.currency_service import CurrencyService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,28 +21,12 @@ def get_db_connection():
 def get_currencies():
     """Get all currencies"""
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("SELECT * FROM currencies ORDER BY symbol")
-        currencies = cursor.fetchall()
-        
-        # Convert to list of dictionaries
-        currencies_list = []
-        for currency in currencies:
-            currencies_list.append({
-                'id': currency[3],  # id is at index 3
-                'symbol': currency[0],  # symbol is at index 0
-                'name': currency[1],  # name is at index 1
-                'usd_rate': currency[2],  # usd_rate is at index 2
-                'created_at': currency[4]  # created_at is at index 4
-            })
-        
-        conn.close()
+        db: Session = next(get_db())
+        currencies = CurrencyService.get_all(db)
         
         return jsonify({
             "status": "success",
-            "data": currencies_list,
+            "data": [currency.to_dict() for currency in currencies],
             "message": "Currencies retrieved successfully",
             "version": "v1"
         })
@@ -53,6 +37,8 @@ def get_currencies():
             "error": {"message": "Failed to retrieve currencies"},
             "version": "v1"
         }), 500
+    finally:
+        db.close()
 
 @currencies_bp.route('/<int:currency_id>', methods=['GET'])
 def get_currency(currency_id: int):
@@ -100,26 +86,16 @@ def create_currency():
     """Create new currency"""
     try:
         data = request.get_json()
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        db: Session = next(get_db())
         
-        # Insert new currency
-        cursor.execute("""
-            INSERT INTO currencies (symbol, name, usd_rate, created_at)
-            VALUES (?, ?, ?, ?)
-        """, (
-            data.get('symbol'),
-            data.get('name'),
-            data.get('usd_rate'),
-            datetime.now().isoformat()
-        ))
+        currency = CurrencyService.create(db, data)
         
-        currency_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
-        
-        # Get the created currency
-        return get_currency(currency_id)
+        return jsonify({
+            "status": "success",
+            "data": currency.to_dict(),
+            "message": "Currency created successfully",
+            "version": "v1"
+        }), 201
     except Exception as e:
         logger.error(f"Error creating currency: {str(e)}")
         return jsonify({
@@ -127,42 +103,30 @@ def create_currency():
             "error": {"message": str(e)},
             "version": "v1"
         }), 400
+    finally:
+        db.close()
 
 @currencies_bp.route('/<int:currency_id>', methods=['PUT'])
 def update_currency(currency_id: int):
     """Update currency"""
     try:
         data = request.get_json()
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        db: Session = next(get_db())
         
-        # Check if currency exists
-        cursor.execute("SELECT id FROM currencies WHERE id = ?", (currency_id,))
-        if not cursor.fetchone():
-            conn.close()
-            return jsonify({
-                "status": "error",
-                "error": {"message": "Currency not found"},
-                "version": "v1"
-            }), 404
+        currency = CurrencyService.update(db, currency_id, data)
         
-        # Update currency
-        cursor.execute("""
-            UPDATE currencies 
-            SET symbol = ?, name = ?, usd_rate = ?
-            WHERE id = ?
-        """, (
-            data.get('symbol'),
-            data.get('name'),
-            data.get('usd_rate'),
-            currency_id
-        ))
-        
-        conn.commit()
-        conn.close()
-        
-        # Get the updated currency
-        return get_currency(currency_id)
+        return jsonify({
+            "status": "success",
+            "data": currency.to_dict(),
+            "message": "Currency updated successfully",
+            "version": "v1"
+        })
+    except ValueError as e:
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 404
     except Exception as e:
         logger.error(f"Error updating currency {currency_id}: {str(e)}")
         return jsonify({
@@ -170,6 +134,8 @@ def update_currency(currency_id: int):
             "error": {"message": "Failed to update currency"},
             "version": "v1"
         }), 500
+    finally:
+        db.close()
 
 @currencies_bp.route('/<int:currency_id>', methods=['DELETE'])
 def delete_currency(currency_id: int):

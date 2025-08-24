@@ -87,20 +87,20 @@
  * @param {string} pageName - Name of the page to initialize filters for
  */
 function initializePageFilters(pageName) {
-    console.log(`🔍 Initializing filters for page: ${pageName}`);
+    // Initializing filters for page
 
     try {
         // Load saved filter state
         const savedFilters = loadPageState(pageName);
         if (savedFilters && savedFilters.filters) {
-            console.log('📋 Restoring saved filters:', savedFilters.filters);
+            // Restoring saved filters
             applySavedFilters(savedFilters.filters);
         }
 
         // Setup filter event handlers
         setupFilterEventHandlers(pageName);
 
-        console.log(`✅ Filters initialized for ${pageName}`);
+        // Filters initialized for page
     } catch (error) {
         console.error(`❌ Error initializing filters for ${pageName}:`, error);
     }
@@ -115,7 +115,7 @@ function initializePageFilters(pageName) {
  * @param {string} pageName - Name of the page
  */
 function setupSortableHeaders(pageName) {
-    console.log(`📊 Setting up sortable headers for ${pageName}`);
+    // Setting up sortable headers for page
 
     try {
         // Find all sortable headers
@@ -131,11 +131,11 @@ function setupSortableHeaders(pageName) {
         // Restore previous sort state
         const savedState = loadPageState(pageName);
         if (savedState && savedState.sort) {
-            console.log('🔄 Restoring sort state:', savedState.sort);
+            // Restoring sort state
             restoreSortState(pageName, savedState.sort);
         }
 
-        console.log(`✅ Sortable headers setup for ${pageName}`);
+        // Sortable headers setup for page
     } catch (error) {
         console.error(`❌ Error setting up sortable headers for ${pageName}:`, error);
     }
@@ -151,7 +151,7 @@ function setupSortableHeaders(pageName) {
  * @param {Array} data - Current table data
  */
 function updateTableStats(pageName, data = null) {
-    console.log(`📈 Updating table stats for ${pageName}`);
+    // Updating table stats for page
 
     try {
         // Get current data if not provided
@@ -165,7 +165,7 @@ function updateTableStats(pageName, data = null) {
         // Update display
         updateStatsDisplay(pageName, stats);
 
-        console.log(`✅ Table stats updated for ${pageName}:`, stats);
+        // Table stats updated for page
     } catch (error) {
         console.error(`❌ Error updating table stats for ${pageName}:`, error);
     }
@@ -179,15 +179,15 @@ function updateTableStats(pageName, data = null) {
  * @param {string} pageName - Name of the page to debug
  */
 function debugSavedFilters(pageName) {
-    console.log(`🔍 Debugging saved filters for ${pageName}`);
+    // Debugging saved filters for page
 
     const savedState = loadPageState(pageName);
-    console.log('📋 Saved state:', savedState);
+    // Saved state
 
     if (savedState && savedState.filters) {
-        console.log('🔍 Active filters:', savedState.filters);
+        // Active filters
     } else {
-        console.log('ℹ️ No saved filters found');
+        // No saved filters found
     }
 }
 
@@ -198,7 +198,7 @@ function debugSavedFilters(pageName) {
  * Used specifically on the designs/trade plans page
  */
 function restoreDesignsSectionState() {
-    console.log('🎨 Restoring designs section state');
+    // Restoring designs section state
 
     try {
         const collapsed = localStorage.getItem('designsSectionCollapsed') === 'true';
@@ -213,7 +213,7 @@ function restoreDesignsSectionState() {
             }
         }
 
-        console.log('✅ Designs section state restored');
+        // Designs section state restored
     } catch (error) {
         console.error('❌ Error restoring designs section state:', error);
     }
@@ -228,7 +228,7 @@ function restoreDesignsSectionState() {
  * @param {string} pageName - Name of the page to initialize
  */
 function initializePage(pageName) {
-    console.log(`🚀 Initializing page: ${pageName}`);
+    // Initializing page
 
     try {
         // Initialize page filters
@@ -258,7 +258,7 @@ function initializePage(pageName) {
             // Add more page-specific initializations as needed
         }
 
-        console.log(`✅ Page ${pageName} initialized successfully`);
+        // Page initialized successfully
     } catch (error) {
         console.error(`❌ Error initializing page ${pageName}:`, error);
     }
@@ -284,7 +284,7 @@ function savePageState(pageName, state) {
         };
 
         localStorage.setItem(key, JSON.stringify(stateToSave));
-        console.log(`💾 Page state saved for ${pageName}:`, stateToSave);
+        // Page state saved for page
     } catch (error) {
         console.error(`❌ Error saving page state for ${pageName}:`, error);
     }
@@ -306,7 +306,7 @@ function loadPageState(pageName) {
 
         if (savedState) {
             const state = JSON.parse(savedState);
-            console.log(`📋 Page state loaded for ${pageName}:`, state);
+            // Page state loaded for page
             return state;
         }
 
@@ -328,7 +328,7 @@ function clearPageState(pageName) {
     try {
         const key = `pageState_${pageName}`;
         localStorage.removeItem(key);
-        console.log(`🗑️ Page state cleared for ${pageName}`);
+        // Page state cleared for page
     } catch (error) {
         console.error(`❌ Error clearing page state for ${pageName}:`, error);
     }
@@ -393,7 +393,7 @@ function getPageInfo(pageName) {
  * @param {Object} options.state - State to pass to the new page
  */
 function navigateToPage(pageName, options = {}) {
-    console.log(`🧭 Navigating to page: ${pageName}`, options);
+    // Navigating to page
 
     try {
         if (!isPageAvailable(pageName)) {
@@ -462,7 +462,7 @@ function isCurrentPage(pageName) {
  */
 function applySavedFilters(filters) {
     // Implementation for applying saved filters
-    console.log('🔍 Applying saved filters:', filters);
+    // Applying saved filters
 }
 
 /**
@@ -472,7 +472,7 @@ function applySavedFilters(filters) {
  */
 function setupFilterEventHandlers(pageName) {
     // Implementation for setting up filter event handlers
-    console.log(`🔍 Setting up filter event handlers for ${pageName}`);
+    // Setting up filter event handlers for page
 }
 
 /**
@@ -483,7 +483,7 @@ function setupFilterEventHandlers(pageName) {
  */
 function handleHeaderSort(pageName, columnIndex) {
     // Implementation for handling header sort
-    console.log(`📊 Handling header sort for ${pageName}, column ${columnIndex}`);
+    // Handling header sort for page
 }
 
 /**
@@ -494,7 +494,7 @@ function handleHeaderSort(pageName, columnIndex) {
  */
 function restoreSortState(pageName, sortState) {
     // Implementation for restoring sort state
-    console.log(`🔄 Restoring sort state for ${pageName}:`, sortState);
+    // Restoring sort state for page
 }
 
 /**
@@ -505,7 +505,7 @@ function restoreSortState(pageName, sortState) {
  */
 function getCurrentTableData(pageName) {
     // Implementation for getting current table data
-    console.log(`📊 Getting current table data for ${pageName}`);
+    // Getting current table data for page
     return [];
 }
 
@@ -518,7 +518,7 @@ function getCurrentTableData(pageName) {
  */
 function calculateTableStats(data, pageName) {
     // Implementation for calculating table statistics
-    console.log(`📈 Calculating table stats for ${pageName}`);
+    // Calculating table stats for page
     return {
         total: data.length,
         active: data.filter(item => item.status === 'active').length,
@@ -534,7 +534,7 @@ function calculateTableStats(data, pageName) {
  */
 function updateStatsDisplay(pageName, stats) {
     // Implementation for updating statistics display
-    console.log(`📊 Updating stats display for ${pageName}:`, stats);
+    // Updating stats display for page
 }
 
 /**
@@ -544,7 +544,7 @@ function updateStatsDisplay(pageName, stats) {
  */
 function getCurrentPageState() {
     // Implementation for getting current page state
-    console.log('📋 Getting current page state');
+    // Getting current page state
     return {
         filters: {},
         sort: {},
@@ -557,7 +557,7 @@ function getCurrentPageState() {
  * Initialize trades page
  */
 function initializeTradesPage() {
-    console.log('📈 Initializing trades page');
+    // Initializing trades page
     // Trades-specific initialization
 }
 
@@ -565,7 +565,7 @@ function initializeTradesPage() {
  * Initialize accounts page
  */
 function initializeAccountsPage() {
-    console.log('💰 Initializing accounts page');
+    // Initializing accounts page
     // Accounts-specific initialization
 }
 
@@ -573,7 +573,7 @@ function initializeAccountsPage() {
  * Initialize alerts page
  */
 function initializeAlertsPage() {
-    console.log('🔔 Initializing alerts page');
+    // Initializing alerts page
     // Alerts-specific initialization
 }
 
@@ -618,4 +618,4 @@ window.pageUtils = {
     initializeAlertsPage
 };
 
-console.log('✅ Page Utils loaded successfully');
+// Page Utils loaded successfully

@@ -40,7 +40,7 @@
  * updatePrimaryCurrency('EUR'); // Shows error message and reverts
  */
 async function updatePrimaryCurrency(value) {
-          // עדכון מטבע ראשי
+  // עדכון מטבע ראשי
 
   // בדיקה - רק USD מותר
   if (value !== 'USD') {
@@ -73,7 +73,7 @@ async function updatePrimaryCurrency(value) {
       // עדכון התצוגה עם הערך החדש
       selectElement.value = value;
       showNotification(`מטבע ראשי עודכן ל-${value}`, 'success');
-              // מטבע ראשי עודכן בהצלחה
+      // מטבע ראשי עודכן בהצלחה
     } else {
       // אם השמירה נכשלה, החזרת הערך הקודם
       const currentValue = await getCurrentPreference('primaryCurrency');
@@ -103,7 +103,7 @@ async function updatePrimaryCurrency(value) {
        * updateTimezone('Asia/Jerusalem');
        */
 async function updateTimezone(value) {
-          // עדכון אזור זמן
+  // עדכון אזור זמן
 
   // מסמן שיש שינויים
   markAsChanged();
@@ -123,7 +123,7 @@ async function updateTimezone(value) {
       // עדכון התצוגה עם הערך החדש
       selectElement.value = value;
       showNotification(`אזור זמן עודכן ל-${value}`, 'success');
-              // אזור זמן עודכן בהצלחה
+      // אזור זמן עודכן בהצלחה
     } else {
       // אם השמירה נכשלה, החזרת הערך הקודם
       const currentValue = await getCurrentPreference('timezone');
@@ -162,7 +162,7 @@ async function updateTimezone(value) {
  * updateConsoleCleanupInterval('0');
  */
 async function updateConsoleCleanupInterval(value) {
-          // עדכון זמן ניקוי קונסולה
+  // עדכון זמן ניקוי קונסולה
 
   // וידוא שהערך תקין
   const numValue = parseInt(value);
@@ -202,7 +202,7 @@ async function updateConsoleCleanupInterval(value) {
         showNotification(`זמן ניקוי קונסולה עודכן ל-${seconds} שניות`, 'success');
       }
 
-              // זמן ניקוי קונסולה עודכן בהצלחה
+      // זמן ניקוי קונסולה עודכן בהצלחה
     } else {
       // אם השמירה נכשלה, החזרת הערך הקודם
       const currentValue = await getCurrentPreference('consoleCleanupInterval');
@@ -232,7 +232,7 @@ async function updateConsoleCleanupInterval(value) {
        * updateDefaultStopLoss(15);
        */
 async function updateDefaultStopLoss(value) {
-          // עדכון סטופ לוס ברירת מחדל
+  // עדכון סטופ לוס ברירת מחדל
 
   // וידוא שהערך תקין
   const numValue = parseFloat(value);
@@ -259,7 +259,7 @@ async function updateDefaultStopLoss(value) {
       // עדכון התצוגה עם הערך החדש
       inputElement.value = numValue;
       showNotification(`סטופ לוס ברירת מחדל עודכן ל-${numValue}%`, 'success');
-              // סטופ לוס ברירת מחדל עודכן בהצלחה
+      // סטופ לוס ברירת מחדל עודכן בהצלחה
     } else {
       // אם השמירה נכשלה, החזרת הערך הקודם
       const currentValue = await getCurrentPreference('defaultStopLoss');
@@ -289,7 +289,7 @@ async function updateDefaultStopLoss(value) {
        * updateDefaultTargetPrice(20);
        */
 async function updateDefaultTargetPrice(value) {
-          // עדכון מחיר יעד ברירת מחדל
+  // עדכון מחיר יעד ברירת מחדל
 
   // וידוא שהערך תקין
   const numValue = parseFloat(value);
@@ -316,7 +316,7 @@ async function updateDefaultTargetPrice(value) {
       // עדכון התצוגה עם הערך החדש
       inputElement.value = numValue;
       showNotification(`מחיר יעד ברירת מחדל עודכן ל-${numValue}%`, 'success');
-              // מחיר יעד ברירת מחדל עודכן בהצלחה
+      // מחיר יעד ברירת מחדל עודכן בהצלחה
     } else {
       // אם השמירה נכשלה, החזרת הערך הקודם
       const currentValue = await getCurrentPreference('defaultTargetPrice');
@@ -346,7 +346,7 @@ async function updateDefaultTargetPrice(value) {
  */
 async function loadPreferencesToUI() {
   try {
-            // טוען העדפות לממשק
+    // טוען העדפות לממשק
 
     // ברירות מחדל
     const defaultPreferences = {
@@ -366,77 +366,77 @@ async function loadPreferencesToUI() {
     const currencySelect = document.getElementById('primaryCurrencySelect');
     if (currencySelect) {
       currencySelect.value = defaultPreferences.primaryCurrency;
-              // מטבע ראשי נטען
+      // מטבע ראשי נטען
     }
 
     // עדכון אזור זמן
     const timezoneSelect = document.getElementById('timezoneSelect');
     if (timezoneSelect) {
       timezoneSelect.value = defaultPreferences.timezone;
-              // אזור זמן נטען
+      // אזור זמן נטען
     }
 
     // עדכון זמן ניקוי קונסולה
     const consoleCleanupSelect = document.getElementById('consoleCleanupIntervalSelect');
     if (consoleCleanupSelect) {
       consoleCleanupSelect.value = defaultPreferences.consoleCleanupInterval;
-              // זמן ניקוי קונסולה נטען
+      // זמן ניקוי קונסולה נטען
     }
 
     // עדכון סטופ לוס ברירת מחדל
     const stopLossInput = document.getElementById('defaultStopLossInput');
     if (stopLossInput) {
       stopLossInput.value = defaultPreferences.defaultStopLoss;
-              // סטופ לוס ברירת מחדל נטען
+      // סטופ לוס ברירת מחדל נטען
     }
 
     // עדכון מחיר יעד ברירת מחדל
     const targetPriceInput = document.getElementById('defaultTargetPriceInput');
     if (targetPriceInput) {
       targetPriceInput.value = defaultPreferences.defaultTargetPrice;
-              // מחיר יעד ברירת מחדל נטען
+      // מחיר יעד ברירת מחדל נטען
     }
 
     // עדכון הגדרות תצוגה
     const statusFilterSelect = document.getElementById('defaultStatusFilterSelect');
     if (statusFilterSelect) {
       statusFilterSelect.value = defaultPreferences.defaultStatusFilter;
-              // פילטר סטטוס ברירת מחדל נטען
+      // פילטר סטטוס ברירת מחדל נטען
     }
 
     const typeFilterSelect = document.getElementById('defaultTypeFilterSelect');
     if (typeFilterSelect) {
       typeFilterSelect.value = defaultPreferences.defaultTypeFilter;
-              // פילטר סוג ברירת מחדל נטען
+      // פילטר סוג ברירת מחדל נטען
     }
 
     const accountFilterSelect = document.getElementById('defaultAccountFilterSelect');
     if (accountFilterSelect) {
       accountFilterSelect.value = defaultPreferences.defaultAccountFilter;
-              // פילטר חשבון ברירת מחדל נטען
+      // פילטר חשבון ברירת מחדל נטען
     }
 
     const dateRangeFilterSelect = document.getElementById('defaultDateRangeFilterSelect');
     if (dateRangeFilterSelect) {
       dateRangeFilterSelect.value = defaultPreferences.defaultDateRangeFilter;
-              // פילטר טווח תאריכים ברירת מחדל נטען
+      // פילטר טווח תאריכים ברירת מחדל נטען
     }
 
     const searchFilterInput = document.getElementById('defaultSearchFilterInput');
     if (searchFilterInput) {
       searchFilterInput.value = defaultPreferences.defaultSearchFilter;
-              // פילטר חיפוש ברירת מחדל נטען
+      // פילטר חיפוש ברירת מחדל נטען
     }
 
     // שמירת העדפות ב-localStorage לשימוש מהיר
     try {
       localStorage.setItem('tiktrack_preferences', JSON.stringify(defaultPreferences));
-              // העדפות נשמרו ב-localStorage
+      // העדפות נשמרו ב-localStorage
     } catch (localStorageError) {
       console.warn('⚠️ שגיאה בשמירת העדפות ב-localStorage:', localStorageError);
     }
 
-            // העדפות נטענו לממשק בהצלחה
+    // העדפות נטענו לממשק בהצלחה
   } catch (error) {
     console.error('❌ שגיאה בטעינת העדפות לממשק:', error);
   }
@@ -455,7 +455,7 @@ async function loadPreferencesToUI() {
  * await saveAllPreferences();
  */
 async function saveAllPreferences() {
-          // שומר את כל ההעדפות
+  // שומר את כל ההעדפות
 
   try {
     let allSaved = true;
@@ -566,7 +566,7 @@ async function saveAllPreferences() {
 
     if (allSaved) {
       showNotification(`✅ כל ההגדרות נשמרו בהצלחה! (${savedPreferences.length} הגדרות)`, 'success');
-              // כל ההגדרות נשמרו בהצלחה
+      // כל ההגדרות נשמרו בהצלחה
       markAsSaved(); // מסמן שכל השינויים נשמרו
     } else {
       showNotification('⚠️ חלק מההגדרות לא נשמרו. בדוק את הקונסול לפרטים.', 'error');
@@ -598,7 +598,7 @@ async function saveAllPreferences() {
  */
 async function savePreference(key, value) {
   try {
-            // שומר הגדרה
+    // שומר הגדרה
 
     // עדכון localStorage מיד (לשימוש מהיר)
     try {
@@ -611,7 +611,7 @@ async function savePreference(key, value) {
 
       preferences.user[key] = value;
       localStorage.setItem('tiktrack_preferences', JSON.stringify(preferences));
-              // הגדרה נשמרה ב-localStorage
+      // הגדרה נשמרה ב-localStorage
     } catch (localStorageError) {
       console.warn(`⚠️ שגיאה בשמירה ב-localStorage:`, localStorageError);
     }
@@ -626,7 +626,7 @@ async function savePreference(key, value) {
     });
 
     if (response.ok) {
-              // הגדרה נשמרה בהצלחה
+      // הגדרה נשמרה בהצלחה
       return true;
     } else {
       console.error(`❌ שגיאה בשמירת הגדרה ${key}:`, response.status);
@@ -684,7 +684,7 @@ async function getCurrentPreference(key) {
 
 
 async function resetSystemPreferences() {
-          // איפוס הגדרות מערכת לברירות מחדל
+  // איפוס הגדרות מערכת לברירות מחדל
 
   // איפוס מטבע ראשי - תמיד USD
   const primaryCurrencySelect = document.getElementById('primaryCurrencySelect');
@@ -715,7 +715,7 @@ async function resetSystemPreferences() {
 }
 
 async function saveSystemPreferences() {
-          // שומר הגדרות מערכת
+  // שומר הגדרות מערכת
 
   try {
     let allSaved = true;
@@ -768,7 +768,7 @@ async function saveSystemPreferences() {
 }
 
 async function resetPersonalPreferences() {
-          // איפוס הגדרות אישיות לברירות מחדל
+  // איפוס הגדרות אישיות לברירות מחדל
 
   // איפוס סטופ ברירת מחדל - 5%
   const stopLossInput = document.getElementById('defaultStopLossInput');
@@ -791,7 +791,7 @@ async function resetPersonalPreferences() {
 }
 
 async function savePersonalPreferences() {
-          // שומר הגדרות אישיות
+  // שומר הגדרות אישיות
 
   try {
     let allSaved = true;
@@ -833,7 +833,7 @@ async function savePersonalPreferences() {
 }
 
 function resetSecurityPreferences() {
-          // איפוס הגדרות אבטחה לברירות מחדל
+  // איפוס הגדרות אבטחה לברירות מחדל
 
   // שאלת המשתמש על ברירות מחדל לאבטחה
   const userChoice = confirm('אין ברירות מחדל מוגדרות להגדרות אבטחה.\nהאם תרצה להגדיר ברירות מחדל עכשיו?');
@@ -847,12 +847,12 @@ function resetSecurityPreferences() {
 }
 
 function saveSecurityPreferences() {
-          // שמירת הגדרות אבטחה
+  // שמירת הגדרות אבטחה
   // כאן יוכנס קוד לשמירת הגדרות אבטחה
 }
 
 async function resetDisplayPreferences() {
-          // איפוס הגדרות תצוגה לברירות מחדל
+  // איפוס הגדרות תצוגה לברירות מחדל
 
   // איפוס פילטר סטטוס ברירת מחדל - "הכול"
   const statusFilterSelect = document.getElementById('defaultStatusFilterSelect');
@@ -899,7 +899,7 @@ async function resetDisplayPreferences() {
 }
 
 async function saveDisplayPreferences() {
-          // שומר הגדרות תצוגה
+  // שומר הגדרות תצוגה
 
   try {
     let allSaved = true;
@@ -1001,7 +1001,7 @@ let originalValues = {};
  */
 function markAsChanged() {
   hasUnsavedChanges = true;
-          // שינוי זוהה - יש שינויים שלא נשמרו
+  // שינוי זוהה - יש שינויים שלא נשמרו
   updatePageTitle();
 }
 
@@ -1010,7 +1010,7 @@ function markAsChanged() {
  */
 function markAsSaved() {
   hasUnsavedChanges = false;
-          // כל השינויים נשמרו
+  // כל השינויים נשמרו
   updatePageTitle();
 }
 
@@ -1057,7 +1057,7 @@ function saveOriginalValues() {
     defaultDateRangeFilter: document.getElementById('defaultDateRangeFilterSelect')?.value,
     defaultSearchFilter: document.getElementById('defaultSearchFilterInput')?.value
   };
-          // שמירת ערכים מקוריים
+  // שמירת ערכים מקוריים
 }
 
 /**
@@ -1171,7 +1171,7 @@ function getSectionId(sectionContainer) {
 
 
 function restoreSectionsState() {
-          // === RESTORE SECTIONS STATE ===
+  // === RESTORE SECTIONS STATE ===
   const allSections = document.querySelectorAll('[data-section]');
   // נמצאו סקשנים
 
@@ -1233,7 +1233,6 @@ window.debugSectionsState = debugSectionsState;
 window.saveAllPreferences = saveAllPreferences;
 window.savePreference = savePreference;
 window.getCurrentPreference = getCurrentPreference;
-window.showNotification = showNotification;
 window.updatePrimaryCurrency = updatePrimaryCurrency;
 window.updateTimezone = updateTimezone;
 window.updateConsoleCleanupInterval = updateConsoleCleanupInterval;
@@ -1271,34 +1270,169 @@ window.clearAllSectionsState = clearAllSectionsState;
 // ===== פונקציות עדכון הגדרות ברירת מחדל =====
 
 // פונקציות עדכון הגדרות תצוגה
-function updateDefaultStatusFilter(value) {
+async function updateDefaultStatusFilter(value) {
   console.log('🔄 עדכון פילטר סטטוס ברירת מחדל:', value);
-  markAsChanged(); // מסמן שיש שינויים
-  savePreference('defaultStatusFilter', value);
+  
+  // מציאת אלמנטי הממשק
+  const selectElement = document.getElementById('defaultStatusFilterSelect');
+  const preferenceItem = selectElement.closest('.preference-item');
+
+  // הוספת מצב טעינה לממשק
+  preferenceItem.classList.add('loading');
+
+  try {
+    // שמירת ההגדרה החדשה לשרת
+    const success = await savePreference('defaultStatusFilter', value);
+
+    if (success) {
+      // עדכון התצוגה עם הערך החדש
+      selectElement.value = value;
+      showNotification(`פילטר סטטוס ברירת מחדל עודכן ל-${value}`, 'success');
+    } else {
+      // אם השמירה נכשלה, החזרת הערך הקודם
+      const currentValue = await getCurrentPreference('defaultStatusFilter');
+      selectElement.value = currentValue;
+      showNotification('שגיאה בעדכון פילטר סטטוס ברירת מחדל', 'error');
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון פילטר סטטוס ברירת מחדל:', error);
+    showNotification('שגיאה בעדכון פילטר סטטוס ברירת מחדל', 'error');
+  } finally {
+    // הסרת מצב הטעינה מהממשק
+    preferenceItem.classList.remove('loading');
+  }
 }
 
-function updateDefaultTypeFilter(value) {
+async function updateDefaultTypeFilter(value) {
   console.log('🔄 עדכון פילטר סוג ברירת מחדל:', value);
-  markAsChanged(); // מסמן שיש שינויים
-  savePreference('defaultTypeFilter', value);
+  
+  // מציאת אלמנטי הממשק
+  const selectElement = document.getElementById('defaultTypeFilterSelect');
+  const preferenceItem = selectElement.closest('.preference-item');
+
+  // הוספת מצב טעינה לממשק
+  preferenceItem.classList.add('loading');
+
+  try {
+    // שמירת ההגדרה החדשה לשרת
+    const success = await savePreference('defaultTypeFilter', value);
+
+    if (success) {
+      // עדכון התצוגה עם הערך החדש
+      selectElement.value = value;
+      showNotification(`פילטר סוג ברירת מחדל עודכן ל-${value}`, 'success');
+    } else {
+      // אם השמירה נכשלה, החזרת הערך הקודם
+      const currentValue = await getCurrentPreference('defaultTypeFilter');
+      selectElement.value = currentValue;
+      showNotification('שגיאה בעדכון פילטר סוג ברירת מחדל', 'error');
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון פילטר סוג ברירת מחדל:', error);
+    showNotification('שגיאה בעדכון פילטר סוג ברירת מחדל', 'error');
+  } finally {
+    // הסרת מצב הטעינה מהממשק
+    preferenceItem.classList.remove('loading');
+  }
 }
 
-function updateDefaultAccountFilter(value) {
+async function updateDefaultAccountFilter(value) {
   console.log('🔄 עדכון פילטר חשבון ברירת מחדל:', value);
-  markAsChanged(); // מסמן שיש שינויים
-  savePreference('defaultAccountFilter', value);
+  
+  // מציאת אלמנטי הממשק
+  const selectElement = document.getElementById('defaultAccountFilterSelect');
+  const preferenceItem = selectElement.closest('.preference-item');
+
+  // הוספת מצב טעינה לממשק
+  preferenceItem.classList.add('loading');
+
+  try {
+    // שמירת ההגדרה החדשה לשרת
+    const success = await savePreference('defaultAccountFilter', value);
+
+    if (success) {
+      // עדכון התצוגה עם הערך החדש
+      selectElement.value = value;
+      showNotification(`פילטר חשבון ברירת מחדל עודכן ל-${value}`, 'success');
+    } else {
+      // אם השמירה נכשלה, החזרת הערך הקודם
+      const currentValue = await getCurrentPreference('defaultAccountFilter');
+      selectElement.value = currentValue;
+      showNotification('שגיאה בעדכון פילטר חשבון ברירת מחדל', 'error');
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון פילטר חשבון ברירת מחדל:', error);
+    showNotification('שגיאה בעדכון פילטר חשבון ברירת מחדל', 'error');
+  } finally {
+    // הסרת מצב הטעינה מהממשק
+    preferenceItem.classList.remove('loading');
+  }
 }
 
-function updateDefaultDateRangeFilter(value) {
+async function updateDefaultDateRangeFilter(value) {
   console.log('🔄 עדכון פילטר טווח תאריכים ברירת מחדל:', value);
-  markAsChanged(); // מסמן שיש שינויים
-  savePreference('defaultDateRangeFilter', value);
+  
+  // מציאת אלמנטי הממשק
+  const selectElement = document.getElementById('defaultDateRangeFilterSelect');
+  const preferenceItem = selectElement.closest('.preference-item');
+
+  // הוספת מצב טעינה לממשק
+  preferenceItem.classList.add('loading');
+
+  try {
+    // שמירת ההגדרה החדשה לשרת
+    const success = await savePreference('defaultDateRangeFilter', value);
+
+    if (success) {
+      // עדכון התצוגה עם הערך החדש
+      selectElement.value = value;
+      showNotification(`פילטר טווח תאריכים ברירת מחדל עודכן ל-${value}`, 'success');
+    } else {
+      // אם השמירה נכשלה, החזרת הערך הקודם
+      const currentValue = await getCurrentPreference('defaultDateRangeFilter');
+      selectElement.value = currentValue;
+      showNotification('שגיאה בעדכון פילטר טווח תאריכים ברירת מחדל', 'error');
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון פילטר טווח תאריכים ברירת מחדל:', error);
+    showNotification('שגיאה בעדכון פילטר טווח תאריכים ברירת מחדל', 'error');
+  } finally {
+    // הסרת מצב הטעינה מהממשק
+    preferenceItem.classList.remove('loading');
+  }
 }
 
-function updateDefaultSearchFilter(value) {
+async function updateDefaultSearchFilter(value) {
   console.log('🔄 עדכון פילטר חיפוש ברירת מחדל:', value);
-  markAsChanged(); // מסמן שיש שינויים
-  savePreference('defaultSearchFilter', value);
+  
+  // מציאת אלמנטי הממשק
+  const inputElement = document.getElementById('defaultSearchFilterInput');
+  const preferenceItem = inputElement.closest('.preference-item');
+
+  // הוספת מצב טעינה לממשק
+  preferenceItem.classList.add('loading');
+
+  try {
+    // שמירת ההגדרה החדשה לשרת
+    const success = await savePreference('defaultSearchFilter', value);
+
+    if (success) {
+      // עדכון התצוגה עם הערך החדש
+      inputElement.value = value;
+      showNotification(`פילטר חיפוש ברירת מחדל עודכן ל-${value}`, 'success');
+    } else {
+      // אם השמירה נכשלה, החזרת הערך הקודם
+      const currentValue = await getCurrentPreference('defaultSearchFilter');
+      inputElement.value = currentValue;
+      showNotification('שגיאה בעדכון פילטר חיפוש ברירת מחדל', 'error');
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון פילטר חיפוש ברירת מחדל:', error);
+    showNotification('שגיאה בעדכון פילטר חיפוש ברירת מחדל', 'error');
+  } finally {
+    // הסרת מצב הטעינה מהממשק
+    preferenceItem.classList.remove('loading');
+  }
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -1658,6 +1792,18 @@ function toggleAllTestsInCategory(category) {
  * @param {string} category - The test category
  * @returns {string} Display name
  */
+function getDisplayNameForTestCategory(category) {
+  const displayNames = {
+    'unit_tests': 'בדיקות יחידה',
+    'integration_tests': 'בדיקות אינטגרציה',
+    'e2e_tests': 'בדיקות קצה לקצה',
+    'performance_tests': 'בדיקות ביצועים',
+    'load_tests': 'בדיקות עומס',
+    'security_tests': 'בדיקות אבטחה'
+  };
+
+  return displayNames[category] || category;
+}
 
 /**
  * Update category button states based on current test selections

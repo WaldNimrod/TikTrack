@@ -674,7 +674,7 @@ window.toggleAllSections = function () {
  * This function restores the open/closed state of all content sections
  */
 window.restoreSectionStates = function () {
-  console.log('🔄 Restoring section states from localStorage');
+          // Restoring section states from localStorage
 
   const sections = document.querySelectorAll('.content-section');
 
@@ -694,14 +694,14 @@ window.restoreSectionStates = function () {
         if (icon) {
           icon.textContent = '▼';
         }
-        console.log(`📖 Section ${sectionId} restored as collapsed`);
+        // Section restored as collapsed
       } else {
         sectionBody.classList.remove('collapsed');
         sectionBody.style.display = 'block';
         if (icon) {
           icon.textContent = '▲';
         }
-        console.log(`📖 Section ${sectionId} restored as expanded`);
+        // Section restored as expanded
       }
     }
   });

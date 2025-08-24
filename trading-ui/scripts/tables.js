@@ -110,7 +110,7 @@
  * @returns {Array} Sorted data array
  */
 window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
-            // Global sortTableData called for table
+    // Global sortTableData called for table
 
     // Get current sort state
     const currentSortState = window.getSortState(tableType);
@@ -160,7 +160,7 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
     // Update sort icons
     updateSortIcons(tableType, columnIndex, newDirection);
 
-            // Table sorted by column
+    // Table sorted by column
     return sortedData;
 };
 
@@ -190,7 +190,7 @@ window.saveSortState = function (tableType, columnIndex, direction) {
         timestamp: Date.now()
     };
     localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState));
-            // Sort state saved for table
+    // Sort state saved for table
 };
 
 /**
@@ -355,4 +355,4 @@ window.tables = {
     getDefaultColumnDefs: window.getDefaultColumnDefs
 };
 
-console.log('✅ Tables.js loaded successfully');
+// Tables.js loaded successfully

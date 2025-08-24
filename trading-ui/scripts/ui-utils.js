@@ -11,6 +11,27 @@
 // ===== Notification Functions =====
 
 /**
+ * מקבל איקון לפי סוג הודעה
+ * Get notification icon by type
+ * 
+ * @param {string} type - סוג ההודעה
+ * @returns {string} HTML של האיקון
+ */
+function getNotificationIcon(type) {
+    switch (type) {
+        case 'success':
+            return '✅';
+        case 'error':
+            return '❌';
+        case 'warning':
+            return '⚠️';
+        case 'info':
+        default:
+            return 'ℹ️';
+    }
+}
+
+/**
  * הצגת הודעה במודל
  * Show notification in modal
  */
@@ -91,6 +112,60 @@ function confirmSecondAction() {
     if (modal) {
         modal.hide();
     }
+}
+
+/**
+ * הצגת מודל אישור שני
+ * Show second confirmation modal
+ */
+function showSecondConfirmationModal(title, message, onConfirm) {
+    console.log('🔄 Showing second confirmation modal');
+
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.id = 'secondConfirmationModal';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">${title}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>${message}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-danger btn-confirm">אישור</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // הגדרת פונקציית האישור
+    const confirmBtn = modal.querySelector('.btn-confirm');
+    if (confirmBtn) {
+        confirmBtn.onclick = () => {
+            const bootstrapModal = bootstrap.Modal.getInstance(modal);
+            if (bootstrapModal) {
+                bootstrapModal.hide();
+            }
+            if (onConfirm) onConfirm();
+        };
+    }
+
+    // הצגת המודל
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
+
+    // הסרת המודל מהדף אחרי שהוא נסגר
+    modal.addEventListener('hidden.bs.modal', () => {
+        if (document.body.contains(modal)) {
+            document.body.removeChild(modal);
+        }
+    });
 }
 
 // ===== Notification Functions =====

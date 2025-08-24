@@ -96,7 +96,7 @@ async function initializeConsoleCleanup() {
  */
 function clearConsole(showMessage = true) {
     if (showMessage) {
-        console.log('🧹 Clearing console messages to reduce clutter...');
+        // Clearing console messages to reduce clutter
     }
 
     if (console.clear) {
@@ -104,7 +104,7 @@ function clearConsole(showMessage = true) {
     } else {
         // ניקוי ידני אם console.clear לא זמין
         for (let i = 0; i < 100; i++) {
-            console.log('');
+            // Empty line
         }
     }
 }
@@ -162,11 +162,11 @@ async function updateConsoleCleanupInterval(newInterval) {
  * manualConsoleCleanup();
  */
 function manualConsoleCleanup() {
-    console.log('🧹 Manual console cleanup initiated...');
+            // Manual console cleanup initiated
     clearConsole(false);
-    
+
     if (typeof window.showNotification === 'function') {
-      window.showNotification('הקונסולה נוקתה בהצלחה', 'success');
+        window.showNotification('הקונסולה נוקתה בהצלחה', 'success');
     }
 }
 

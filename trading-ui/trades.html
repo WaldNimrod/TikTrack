@@ -959,8 +959,8 @@
         console.log('🔄 === DOM CONTENT LOADED ===');
 
         // טעינת מצב הסקשנים לפי הדף הנוכחי
-        if (typeof window.loadSectionStates === 'function') {
-          window.loadSectionStates();
+        if (typeof window.restoreAllSectionStates === 'function') {
+          window.restoreAllSectionStates();
         }
         window.initializePageFilters('trades');
 
@@ -1015,6 +1015,15 @@
 
         }, 1000);
       });
+
+      // הגדרת הפונקציה כגלובלית
+      window.loadTradesData = loadTradesData;
+      window.updateTableStats = updateTableStats;
+
+      // ===== פונקציות לניהול מצב הסקשנים =====
+      
+      // הפונקציות כבר מוגדרות ב-main.js - אין צורך להגדיר אותן מחדש
+      // window.loadSectionStates ו-window.restoreAllSectionStates זמינות ישירות מ-main.js
     </script>
 
     <!-- מודל עריכת טרייד -->
@@ -1290,9 +1299,6 @@
                 </button>
                 <button type="button" class="btn btn-warning me-2" onclick="addEditReminder()">
                   <span class="btn-icon">⏰</span> תזכיר לי כש...
-                </button>
-                <button type="button" class="btn btn-primary" onclick="addEditBuySell()">
-                  <span class="btn-icon">💰</span> הוסף קניה/מכירה
                 </button>
               </div>
 

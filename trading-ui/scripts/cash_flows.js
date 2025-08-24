@@ -1003,7 +1003,7 @@ async function loadCashFlows() {
         const data = await response.json();
         const cashFlows = data.data || data || [];
 
-        console.log('✅ נטענו', cashFlows.length, 'תזרימי מזומנים');
+        // נטענו תזרימי מזומנים
 
         // עדכון המשתנה הגלובלי
         window.cashFlowsData = cashFlows;

@@ -433,7 +433,7 @@ window.addMonths = addMonths;
 
 // אתחול Date Utils
 function initializeDateUtils() {
-  // Date Utils loaded successfully
+    // Date Utils loaded successfully
 }
 
 // ייצוא המודול עצמו

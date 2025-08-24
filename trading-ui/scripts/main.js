@@ -280,7 +280,7 @@ function showSystemError(message) {
  * This function restores the open/closed state of all collapsible sections
  */
 function restoreAllSectionStates() {
-  console.log('🔄 Restoring all section states from localStorage');
+  // Restoring all section states from localStorage
 
   try {
     // Get all section toggles
@@ -305,7 +305,7 @@ function restoreAllSectionStates() {
       }
     });
 
-    console.log('✅ All section states restored successfully');
+
   } catch (error) {
     console.error('❌ Error restoring section states:', error);
   }
@@ -505,7 +505,6 @@ window.restoreAllSectionStates = function () {
  * This function is called by trade_plans.js but is not relevant for the planning page
  */
 window.restoreDesignsSectionState = function () {
-  console.log('🔄 restoreDesignsSectionState called - not relevant for planning page');
   // This function is kept for backward compatibility but doesn't do anything
   // as the planning page doesn't have a designs section
 };
@@ -531,4 +530,4 @@ if (document.readyState === 'loading') {
   initializeApplication();
 }
 
-console.log('✅ Main.js loaded successfully');
+

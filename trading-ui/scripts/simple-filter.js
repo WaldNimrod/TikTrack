@@ -23,25 +23,6 @@ class SimpleFilter {
     }
 
     init() {
-        console.log('🔧 SimpleFilter initializing...');
-
-        // Immediate check if elements exist
-        const headerElement = document.getElementById('unified-header');
-        console.log('🔧 Header element exists:', !!headerElement);
-
-        if (headerElement) {
-            const statusMenu = headerElement.querySelector('#statusFilterMenu');
-            const typeMenu = headerElement.querySelector('#typeFilterMenu');
-            const accountMenu = headerElement.querySelector('#accountFilterMenu');
-
-            console.log('🔧 Menus exist - Status:', !!statusMenu, 'Type:', !!typeMenu, 'Account:', !!accountMenu);
-
-            if (statusMenu) {
-                const statusItems = statusMenu.querySelectorAll('.status-filter-item');
-                console.log('🔧 Status items count:', statusItems.length);
-            }
-        }
-
         // Wait until elements are available
         this.waitForElements();
     }
@@ -50,7 +31,6 @@ class SimpleFilter {
         // Check if elements exist - search within unified-header
         const headerElement = document.getElementById('unified-header');
         if (!headerElement) {
-            console.log('🔧 Header element not ready, waiting...');
             setTimeout(() => this.waitForElements(), 100);
             return;
         }
@@ -60,24 +40,17 @@ class SimpleFilter {
         const accountMenu = headerElement.querySelector('#accountFilterMenu');
 
         if (statusMenu && typeMenu && accountMenu) {
-            console.log('🔧 Filter elements found, setting up listeners...');
-
             // Additional check - are there items in the menus
             const statusItems = statusMenu.querySelectorAll('.status-filter-item');
             const typeItems = typeMenu.querySelectorAll('.type-filter-item');
             const accountItems = accountMenu.querySelectorAll('.account-filter-item');
 
-            console.log('🔧 Items found - Status:', statusItems.length, 'Type:', typeItems.length, 'Account:', accountItems.length);
-
             if (statusItems.length > 0 || typeItems.length > 0 || accountItems.length > 0) {
                 this.setupEventListeners();
             } else {
-                console.log('🔧 No filter items found yet, waiting...');
                 setTimeout(() => this.waitForElements(), 100);
             }
         } else {
-            console.log('🔧 Filter elements not ready, waiting...');
-            console.log(`Status: ${statusMenu ? '✅' : '❌'}, Type: ${typeMenu ? '✅' : '❌'}, Account: ${accountMenu ? '✅' : '❌'}`);
             setTimeout(() => this.waitForElements(), 100);
         }
     }
@@ -91,257 +64,218 @@ class SimpleFilter {
 
         // Status filter
         const statusItems = headerElement.querySelectorAll('#statusFilterMenu .status-filter-item');
-        console.log('🔧 Found status items:', statusItems.length);
         statusItems.forEach(item => {
-            console.log('🔧 Adding click listener to status item:', item.textContent.trim());
             item.addEventListener('click', (e) => {
-                console.log('🔍 CLICK DETECTED on status item!');
                 e.preventDefault();
                 e.stopPropagation();
-
-                const status = item.getAttribute('data-value');
-                console.log('🔍 Status filter clicked:', status);
-
-                // toggle selection
+                
+                const status = item.getAttribute('data-status');
                 item.classList.toggle('selected');
-                console.log('🔍 Toggled selected class. Has selected:', item.classList.contains('selected'));
-
-                // collect selected statuses
-                this.currentFilters.status = Array.from(headerElement.querySelectorAll('#statusFilterMenu .status-filter-item.selected'))
-                    .map(item => item.getAttribute('data-value'));
-
-                console.log('🔍 Selected statuses:', this.currentFilters.status);
-
-                // update display
+                
+                if (item.classList.contains('selected')) {
+                    if (!this.currentFilters.status.includes(status)) {
+                        this.currentFilters.status.push(status);
+                    }
+                } else {
+                    this.currentFilters.status = this.currentFilters.status.filter(s => s !== status);
+                }
+                
                 this.updateStatusDisplay();
-                console.log('🔍 Status display updated');
-
-                // apply filter
                 this.applyFilters();
             });
         });
 
         // Type filter
         const typeItems = headerElement.querySelectorAll('#typeFilterMenu .type-filter-item');
-        console.log('🔧 Found type items:', typeItems.length);
         typeItems.forEach(item => {
-            console.log('🔧 Adding click listener to type item:', item.textContent.trim());
             item.addEventListener('click', (e) => {
-                console.log('🔍 CLICK DETECTED on type item!');
                 e.preventDefault();
                 e.stopPropagation();
-
-                const type = item.getAttribute('data-value');
-                console.log('🔍 Type filter clicked:', type);
-
-                // toggle selection
+                
+                const type = item.getAttribute('data-type');
                 item.classList.toggle('selected');
-                console.log('🔍 Toggled selected class. Has selected:', item.classList.contains('selected'));
-
-                // collect selected types
-                this.currentFilters.type = Array.from(headerElement.querySelectorAll('#typeFilterMenu .type-filter-item.selected'))
-                    .map(item => item.getAttribute('data-value'));
-
-                console.log('🔍 Selected types:', this.currentFilters.type);
-
-                // update display
+                
+                if (item.classList.contains('selected')) {
+                    if (!this.currentFilters.type.includes(type)) {
+                        this.currentFilters.type.push(type);
+                    }
+                } else {
+                    this.currentFilters.type = this.currentFilters.type.filter(t => t !== type);
+                }
+                
                 this.updateTypeDisplay();
-
-                // apply filter
                 this.applyFilters();
             });
         });
 
         // Search filter
-        const searchInput = document.getElementById('searchFilterInput');
+        const searchInput = headerElement.querySelector('#searchFilterInput');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 this.currentFilters.search = e.target.value.trim();
-                console.log('🔍 Search filter:', this.currentFilters.search);
                 this.applyFilters();
             });
         }
 
         // Account filter
         const accountItems = headerElement.querySelectorAll('#accountFilterMenu .account-filter-item');
-        console.log('🔧 Found account items:', accountItems.length);
         accountItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-
-                // The accounts are dynamically built - take the text of the account
-                const accountText = item.querySelector('.option-text')?.textContent || item.textContent.trim();
-                console.log('🔍 Account text:', accountText);
-                console.log('🔍 Account filter clicked:', accountText);
-
-                // toggle selection
+                
+                const accountText = item.textContent.trim();
+                const accountId = item.getAttribute('data-account-id');
+                
                 item.classList.toggle('selected');
-
-                // collect selected accounts - take the text of the selected accounts
-                this.currentFilters.account = Array.from(headerElement.querySelectorAll('#accountFilterMenu .account-filter-item.selected'))
-                    .map(item => item.querySelector('.option-text')?.textContent || item.textContent.trim());
-
-                console.log('🔍 Selected accounts:', this.currentFilters.account);
-
-                // update display
+                
+                if (item.classList.contains('selected')) {
+                    if (!this.currentFilters.account.includes(accountId)) {
+                        this.currentFilters.account.push(accountId);
+                    }
+                } else {
+                    this.currentFilters.account = this.currentFilters.account.filter(a => a !== accountId);
+                }
+                
                 this.updateAccountDisplay();
-
-                // apply filter
                 this.applyFilters();
             });
         });
-
-        // Reset button
-        const resetBtn = document.getElementById('resetFiltersBtn');
-        if (resetBtn) {
-            resetBtn.addEventListener('click', () => {
-                this.resetFilters();
-            });
-        }
     }
 
     updateStatusDisplay() {
-        const headerElement = document.getElementById('unified-header');
-        if (!headerElement) return;
-
-        const statusElement = headerElement.querySelector('#selectedStatus');
-        if (!statusElement) return;
-
-        if (this.currentFilters.status.length === 0) {
-            statusElement.textContent = 'All statuses';
-        } else if (this.currentFilters.status.length === 1) {
-            statusElement.textContent = this.currentFilters.status[0];
-        } else {
-            statusElement.textContent = `${this.currentFilters.status.length} statuses`;
+        const statusDisplay = document.getElementById('statusFilterDisplay');
+        if (statusDisplay) {
+            if (this.currentFilters.status.length === 0) {
+                statusDisplay.textContent = 'כל הסטטוסים';
+            } else {
+                const statusTexts = this.currentFilters.status.map(status => {
+                    return this.translateStatus(status);
+                });
+                statusDisplay.textContent = statusTexts.join(', ');
+            }
         }
     }
 
     updateTypeDisplay() {
-        const headerElement = document.getElementById('unified-header');
-        if (!headerElement) return;
-
-        const typeElement = headerElement.querySelector('#selectedType');
-        if (!typeElement) return;
-
-        if (this.currentFilters.type.length === 0) {
-            typeElement.textContent = 'All types';
-        } else if (this.currentFilters.type.length === 1) {
-            typeElement.textContent = this.currentFilters.type[0];
-        } else {
-            typeElement.textContent = `${this.currentFilters.type.length} types`;
+        const typeDisplay = document.getElementById('typeFilterDisplay');
+        if (typeDisplay) {
+            if (this.currentFilters.type.length === 0) {
+                typeDisplay.textContent = 'כל הסוגים';
+            } else {
+                const typeTexts = this.currentFilters.type.map(type => {
+                    return this.translateType(type);
+                });
+                typeDisplay.textContent = typeTexts.join(', ');
+            }
         }
     }
 
     updateAccountDisplay() {
-        const headerElement = document.getElementById('unified-header');
-        if (!headerElement) return;
-
-        const accountElement = headerElement.querySelector('#selectedAccount');
-        if (!accountElement) return;
-
-        if (this.currentFilters.account.length === 0) {
-            accountElement.textContent = 'All accounts';
-        } else if (this.currentFilters.account.length === 1) {
-            accountElement.textContent = this.currentFilters.account[0];
-        } else {
-            accountElement.textContent = `${this.currentFilters.account.length} accounts`;
+        const accountDisplay = document.getElementById('accountFilterDisplay');
+        if (accountDisplay) {
+            if (this.currentFilters.account.length === 0) {
+                accountDisplay.textContent = 'כל החשבונות';
+            } else {
+                const accountTexts = this.currentFilters.account.map(accountId => {
+                    const item = document.querySelector(`[data-account-id="${accountId}"]`);
+                    return item ? item.textContent.trim() : accountId;
+                });
+                accountDisplay.textContent = accountTexts.join(', ');
+            }
         }
     }
 
+    translateStatus(status) {
+        const translations = {
+            'active': 'פעיל',
+            'closed': 'סגור',
+            'canceled': 'בוטל',
+            'pending': 'ממתין'
+        };
+        return translations[status] || status;
+    }
+
+    translateType(type) {
+        const translations = {
+            'buy': 'קנייה',
+            'sell': 'מכירה',
+            'long': 'לונג',
+            'short': 'שורט'
+        };
+        return translations[type] || type;
+    }
+
     applyFilters() {
-        console.log('🔍 Applying filters:', this.currentFilters);
+        // Apply to all tables that have the data attribute
+        const tables = document.querySelectorAll('[data-table-id]');
+        
+        tables.forEach(tableElement => {
+            const tableId = tableElement.getAttribute('data-table-id');
+            this.applyFiltersToTable(tableId);
+        });
+    }
 
-        // List of tables for filtering
-        const tables = ['tradesTable', 'testTable'];
+    applyFiltersToTable(tableId) {
+        const table = document.getElementById(tableId);
+        if (!table) {
+            console.warn(`⚠️ Table ${tableId} not found`);
+            return;
+        }
 
-        tables.forEach(tableId => {
-            const table = document.getElementById(tableId);
-            if (!table) {
-                console.log(`⚠️ Table ${tableId} not found`);
-                return;
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+
+        const rows = tbody.querySelectorAll('tr');
+        let visibleCount = 0;
+
+        rows.forEach((row, index) => {
+            const ticker = row.querySelector('[data-field="symbol"]')?.textContent?.trim() || '';
+            const status = row.querySelector('[data-field="status"]')?.textContent?.trim() || '';
+            const type = row.querySelector('[data-field="type"]')?.textContent?.trim() || '';
+            const account = row.querySelector('[data-field="account_name"]')?.textContent?.trim() || '';
+
+            let shouldShow = true;
+
+            // Status filter
+            if (this.currentFilters.status.length > 0) {
+                const translatedStatus = this.translateStatus(status);
+                if (!this.currentFilters.status.some(s => this.translateStatus(s) === translatedStatus)) {
+                    shouldShow = false;
+                }
             }
 
-            const rows = table.querySelectorAll('tbody tr');
-            let visibleCount = 0;
-
-            console.log(`🔍 Filtering table: ${tableId} with ${rows.length} rows`);
-
-            rows.forEach((row, index) => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length < 4) return;
-
-                // Match columns for each table
-                let ticker, status, type, account;
-
-                if (tableId === 'tradesTable') {
-                    // Trades table: Ticker, Status, Type, Account
-                    ticker = cells[0].textContent.trim();
-                    status = cells[1].textContent.trim();
-                    type = cells[2].textContent.trim();
-                    account = cells[3].textContent.trim();
-                } else if (tableId === 'testTable') {
-                    // Test table: Name, Status, Type, Account
-                    ticker = cells[0].textContent.trim();
-                    status = cells[1].textContent.trim();
-                    type = cells[2].textContent.trim();
-                    account = cells[3].textContent.trim();
+            // Type filter
+            if (shouldShow && this.currentFilters.type.length > 0) {
+                const translatedType = this.translateType(type);
+                if (!this.currentFilters.type.some(t => this.translateType(t) === translatedType)) {
+                    shouldShow = false;
                 }
+            }
 
-                console.log(`🔍 ${tableId} Row ${index}: ${ticker} - Status: "${status}", Type: "${type}", Account: "${account}"`);
-
-                let show = true;
-
-                // Status filter
-                if (this.currentFilters.status.length > 0) {
-                    if (!this.currentFilters.status.includes(status)) {
-                        show = false;
-                        console.log(`❌ ${tableId} Row ${index} hidden by status filter`);
-                    }
+            // Account filter
+            if (shouldShow && this.currentFilters.account.length > 0) {
+                const accountId = row.querySelector('[data-field="account_id"]')?.getAttribute('data-value');
+                if (!this.currentFilters.account.includes(accountId)) {
+                    shouldShow = false;
                 }
+            }
 
-                // Type filter
-                if (show && this.currentFilters.type.length > 0) {
-                    if (!this.currentFilters.type.includes(type)) {
-                        show = false;
-                        console.log(`❌ ${tableId} Row ${index} hidden by type filter`);
-                    }
+            // Search filter
+            if (shouldShow && this.currentFilters.search) {
+                const searchText = this.currentFilters.search.toLowerCase();
+                const searchableText = `${ticker} ${status} ${type} ${account}`.toLowerCase();
+                if (!searchableText.includes(searchText)) {
+                    shouldShow = false;
                 }
+            }
 
-                // Account filter
-                if (show && this.currentFilters.account.length > 0) {
-                    if (!this.currentFilters.account.includes(account)) {
-                        show = false;
-                        console.log(`❌ ${tableId} Row ${index} hidden by account filter`);
-                    }
-                }
-
-                // Search filter
-                if (show && this.currentFilters.search) {
-                    const searchLower = this.currentFilters.search.toLowerCase();
-                    const searchableText = `${ticker} ${status} ${type} ${account}`.toLowerCase();
-                    if (!searchableText.includes(searchLower)) {
-                        show = false;
-                        console.log(`❌ ${tableId} Row ${index} hidden by search filter`);
-                    }
-                }
-
-                if (show) {
-                    row.style.display = '';
-                    visibleCount++;
-                    console.log(`✅ ${tableId} Row ${index} visible`);
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            console.log(`🎯 ${tableId} filter result: ${visibleCount}/${rows.length} rows visible`);
+            row.style.display = shouldShow ? '' : 'none';
+            if (shouldShow) visibleCount++;
         });
     }
 
     resetFilters() {
-        console.log('🔄 Resetting filters');
-
         this.currentFilters = {
             status: [],
             type: [],
@@ -349,36 +283,36 @@ class SimpleFilter {
             search: ''
         };
 
-        // clear UI selections
+        // Clear selected classes
         const headerElement = document.getElementById('unified-header');
         if (headerElement) {
-            headerElement.querySelectorAll('.filter-item.selected').forEach(item => {
-                item.classList.remove('selected');
-            });
+            headerElement.querySelectorAll('.status-filter-item.selected, .type-filter-item.selected, .account-filter-item.selected')
+                .forEach(item => item.classList.remove('selected'));
         }
 
-        // clear search input
-        const searchInput = document.getElementById('searchFilterInput');
+        // Clear search input
+        const searchInput = headerElement?.querySelector('#searchFilterInput');
         if (searchInput) {
             searchInput.value = '';
         }
 
-        // update displays
+        // Update displays
         this.updateStatusDisplay();
         this.updateTypeDisplay();
         this.updateAccountDisplay();
 
-        // show all rows
+        // Apply filters (show all)
         this.applyFilters();
     }
 }
 
-// Create global instance
-window.simpleFilter = new SimpleFilter();
-
-// Initialize when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.simpleFilter) {
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.simpleFilter = new SimpleFilter();
         window.simpleFilter.init();
-    }
-});
+    });
+} else {
+    window.simpleFilter = new SimpleFilter();
+    window.simpleFilter.init();
+}

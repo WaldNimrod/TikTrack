@@ -304,6 +304,22 @@ window.convertAmountToShares = convertAmountToShares;
 window.convertSharesToAmount = convertSharesToAmount;
 window.calculateDefaultPrices = calculateDefaultPrices;
 
+// ייצוא המודול עצמו
+window.dataUtils = {
+    apiCall,
+    loadData,
+    saveData,
+    updateData,
+    deleteData,
+    validateRequired,
+    validateNumber,
+    validateDate,
+    getUserPreference,
+    convertAmountToShares,
+    convertSharesToAmount,
+    calculateDefaultPrices
+};
+
 console.log('✅ Data Utils loaded successfully');
 
 

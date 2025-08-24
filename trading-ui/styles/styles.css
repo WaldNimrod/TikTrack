@@ -2319,6 +2319,9 @@ button[onclick*="openDesignDetails"]:hover {
   background: #f8f9fa;
   border-radius: 12px;
   border: 1px solid #e9ecef;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
 }
 
 /* ===== סגנונות לאיקון התראות בכותרת הסקשן ===== */
@@ -2405,6 +2408,7 @@ button[onclick*="openDesignDetails"]:hover {
   position: relative;
   transform: translateY(5px);
   /* 5 פיקסל יותר נמוך */
+  padding-right: 20px;
 }
 
 .alert-bell-icon {
@@ -2902,14 +2906,7 @@ button[onclick*="openDesignDetails"]:hover {
   font-weight: 600;
 }
 
-.alerts-count {
-  background: #29a6a8;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
+
 
 .alerts-cards {
   display: grid;
@@ -2919,17 +2916,134 @@ button[onclick*="openDesignDetails"]:hover {
 }
 
 .alert-card {
-  background: white;
+  background: #fff;
+  border: 1px solid #e9ecef;
   border-radius: 12px;
   padding: 20px;
+  margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e9ecef;
   transition: all 0.3s ease;
   position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
   min-height: 220px;
+  /* צבעי רקע לפי סוג האובייקט המקושר - מוגדר דינמית ב-JavaScript */
+}
+
+/* צבעי רקע לכרטיסיות התראה לפי סוג האובייקט המקושר */
+.alert-card[data-related-type="1"] {
+  background-color: rgba(41, 166, 168, 0.1) !important;
+  border-left: 4px solid #1f8a8c !important;
+}
+
+.alert-card[data-related-type="2"] {
+  background-color: rgba(40, 167, 69, 0.1) !important;
+  border-left: 4px solid #1e7e34 !important;
+}
+
+.alert-card[data-related-type="3"] {
+  background-color: rgba(255, 149, 0, 0.1) !important;
+  border-left: 4px solid #e67e00 !important;
+}
+
+.alert-card[data-related-type="4"] {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+  border-left: 4px solid #c82333 !important;
+}
+
+/* צבעי כותרת לפי סוג האובייקט המקושר */
+.alert-card[data-related-type="1"] .alert-card-title {
+  color: #1f8a8c !important;
+}
+
+.alert-card[data-related-type="2"] .alert-card-title {
+  color: #1e7e34 !important;
+}
+
+.alert-card[data-related-type="3"] .alert-card-title {
+  color: #e67e00 !important;
+}
+
+.alert-card[data-related-type="4"] .alert-card-title {
+  color: #c82333 !important;
+}
+
+/* מפתח צבעים לכרטיסיות התראה */
+.alerts-color-legend {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+/* מפתח צבעים מתחת להתראות - מיקום משמאל */
+.alerts-color-legend-below {
+  background: transparent;
+  border: none;
+  padding: 8px 0;
+  margin-top: 16px;
+  font-size: 0.8rem;
+  text-align: right;
+  width: 100%;
+}
+
+.legend-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.legend-color {
+  width: 24px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* עיצוב שדה התנאי */
+.condition-item {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+/* סגנון גלובלי לקישורים */
+a,
+.clickable-link {
+  color: #28a745 !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid #28a745 !important;
+  transition: all 0.2s ease !important;
+}
+
+a:hover,
+.clickable-link:hover {
+  color: #1e7e34 !important;
+  border-bottom: 1px solid #1e7e34 !important;
 }
 
 .alert-card:hover {
@@ -3027,11 +3141,14 @@ button[onclick*="openDesignDetails"]:hover {
 .alert-card-title.clickable {
   cursor: pointer;
   transition: color 0.2s ease;
+  color: #28a745;
+  text-decoration: none;
+  border-bottom: 1px solid #28a745;
 }
 
 .alert-card-title.clickable:hover {
-  color: #29a6a8;
-  text-decoration: underline;
+  color: #1e7e34;
+  border-bottom: 1px solid #1e7e34;
 }
 
 /* פרטי אובייקט מקושר */
@@ -3064,13 +3181,17 @@ button[onclick*="openDesignDetails"]:hover {
   transition: all 0.2s ease;
   padding: 2px 4px;
   border-radius: 4px;
+  color: #28a745;
+  text-decoration: none;
+  border-bottom: 1px solid #28a745;
 }
 
 .linked-object-clickable:hover {
   background-color: #f8f9fa;
-  color: #007bff;
+  color: #1e7e34;
+  border-bottom: 1px solid #1e7e34;
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
 }
 
 .linked-object-clickable:active {
@@ -3578,11 +3699,11 @@ button[onclick*="openDesignDetails"]:hover {
     gap: 0.5rem;
     padding: 0.75rem;
   }
-  
+
   .linked-item-col {
     text-align: center;
   }
-  
+
   .linked-items-header h4 {
     font-size: 1.1rem;
   }

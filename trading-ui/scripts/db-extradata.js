@@ -19,7 +19,6 @@
 
 // פונקציה לפתיחה/סגירה של כל הסקשנים - משתמשת בפונקציה הגלובלית מ-main.js
 function toggleAllSections() {
-    console.log('🔄 toggleAllSections נקראה - שימוש בפונקציה הגלובלית');
     if (typeof window.toggleAllSections === 'function') {
         window.toggleAllSections();
     } else {
@@ -29,8 +28,6 @@ function toggleAllSections() {
 
 // פונקציה לפתיחה/סגירה של סקשן מטבעות
 function toggleCurrenciesSection() {
-    console.log('🔄 toggleCurrenciesSection נקראה');
-
     const contentSections = document.querySelectorAll('.content-section');
     const currenciesSection = contentSections[0]; // הסקשן הראשון - מטבעות
 
@@ -53,14 +50,11 @@ function toggleCurrenciesSection() {
 
         // שמירת המצב ב-localStorage
         localStorage.setItem('dbExtradataCurrenciesSectionCollapsed', !isCollapsed);
-
-        console.log(`✅ סקשן מטבעות ${isCollapsed ? 'נפתח' : 'נסגר'}`);
     }
 }
 
 // פונקציה לפתיחה/סגירה של סקשן סוגי קישור
 function toggleNoteRelationTypesSection() {
-    console.log('🔄 toggleNoteRelationTypesSection נקראה');
 
     const contentSections = document.querySelectorAll('.content-section');
     const noteRelationTypesSection = contentSections[1]; // הסקשן השני - סוגי קישור
@@ -85,13 +79,12 @@ function toggleNoteRelationTypesSection() {
         // שמירת המצב ב-localStorage
         localStorage.setItem('dbExtradataNoteRelationTypesSectionCollapsed', !isCollapsed);
 
-        console.log(`✅ סקשן סוגי קישור ${isCollapsed ? 'נפתח' : 'נסגר'}`);
+        // סקשן סוגי קישור
     }
 }
 
 // פונקציה לשחזור מצב הסגירה
 function restoreSectionsState() {
-    console.log('🔄 שחזור מצב הסגירה...');
 
     // שחזור מצב הסקשן העליון
     const topCollapsed = localStorage.getItem('dbExtradataTopSectionCollapsed') === 'true';
@@ -145,12 +138,11 @@ function restoreSectionsState() {
         }
     }
 
-    console.log('✅ מצב הסגירה שוחזר');
+    // מצב הסגירה שוחזר
 }
 
 // פונקציה לטעינת נתוני מטבעות
 async function loadCurrenciesData() {
-    console.log('🔄 טוען נתוני מטבעות...');
 
     try {
         const response = await fetch('/api/v1/currencies/');
@@ -163,7 +155,7 @@ async function loadCurrenciesData() {
         if (result.status === 'success') {
             updateCurrenciesTable(result.data);
             updateCurrenciesCount(result.data.length);
-            console.log(`✅ נטענו ${result.data.length} מטבעות`);
+            // נטענו מטבעות
         } else {
             throw new Error(result.error?.message || 'שגיאה בטעינת מטבעות');
         }
@@ -234,7 +226,6 @@ function showCurrenciesError() {
 
 // פונקציה לטעינת נתוני סוגי קישור הערות
 async function loadNoteRelationTypesData() {
-    console.log('🔄 טוען נתוני סוגי קישור הערות...');
 
     try {
         // כרגע אין API endpoint לסוגי קישור, נשתמש בנתונים סטטיים
@@ -247,7 +238,7 @@ async function loadNoteRelationTypesData() {
 
         updateNoteRelationTypesTable(noteRelationTypes);
         updateNoteRelationTypesCount(noteRelationTypes.length);
-        console.log(`✅ נטענו ${noteRelationTypes.length} סוגי קישור`);
+        // נטענו סוגי קישור
     } catch (error) {
         console.error('❌ שגיאה בטעינת סוגי קישור:', error);
         showNoteRelationTypesError();
@@ -321,24 +312,24 @@ function showNoteRelationTypesError() {
 
 // פונקציות עריכה ומחיקה (placeholder)
 function editCurrency(id) {
-    console.log('עריכת מטבע:', id);
+    // עריכת מטבע
     alert(`עריכת מטבע ${id} - לא מומשה עדיין`);
 }
 
 function deleteCurrency(id) {
-    console.log('מחיקת מטבע:', id);
+    // מחיקת מטבע
     if (confirm('האם אתה בטוח שברצונך למחוק מטבע זה?')) {
         alert(`מחיקת מטבע ${id} - לא מומשה עדיין`);
     }
 }
 
 function editNoteRelationType(id) {
-    console.log('עריכת סוג קישור:', id);
+    // עריכת סוג קישור
     alert(`עריכת סוג קישור ${id} - לא מומשה עדיין`);
 }
 
 function deleteNoteRelationType(id) {
-    console.log('מחיקת סוג קישור:', id);
+    // מחיקת סוג קישור
     if (confirm('האם אתה בטוח שברצונך למחוק סוג קישור זה?')) {
         alert(`מחיקת סוג קישור ${id} - לא מומשה עדיין`);
     }
@@ -361,8 +352,6 @@ function updateSummaryStats() {
 
 // פונקציה לטעינת כל הנתונים
 async function loadAllData() {
-    console.log('🔄 טוען את כל הנתונים...');
-
     // טעינת נתונים במקביל
     await Promise.all([
         loadCurrenciesData(),
@@ -371,8 +360,6 @@ async function loadAllData() {
 
     // עדכון סטטיסטיקות כלליות
     updateSummaryStats();
-
-    console.log('✅ כל הנתונים נטענו בהצלחה');
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -400,8 +387,6 @@ function updateLoadingText() {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('🔄 === DOM CONTENT LOADED (DB_EXTRADATA) ===');
-
     // שחזור מצב הסגירה
     restoreSectionsState();
 
@@ -410,6 +395,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // טעינת הנתונים
     loadAllData();
-
-    console.log('דף טבלאות עזר נטען בהצלחה');
 });

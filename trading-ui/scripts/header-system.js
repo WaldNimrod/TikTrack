@@ -200,6 +200,8 @@ class HeaderSystem {
           color: #ff9c05;
         }
 
+
+
               /* Navigation */
         .header-nav {
           padding: 0;
@@ -1239,23 +1241,26 @@ class HeaderSystem {
   // פונקציה להגדרת הפריט הפעיל
   setActiveMenuItem() {
     const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.tiktrack-nav-link');
-    const dropdownItems = document.querySelectorAll('.tiktrack-dropdown-item');
+    const navItems = document.querySelectorAll('#unified-header .tiktrack-nav-item');
+    const dropdownItems = document.querySelectorAll('#unified-header .tiktrack-dropdown-item');
 
     console.log('🔍 setActiveMenuItem - currentPath:', currentPath);
-    console.log('🔍 setActiveMenuItem - navLinks found:', navLinks.length);
+    console.log('🔍 setActiveMenuItem - navItems found:', navItems.length);
     console.log('🔍 setActiveMenuItem - dropdownItems found:', dropdownItems.length);
 
     // איפוס כל הפריטים
-    navLinks.forEach(link => link.classList.remove('active'));
+    navItems.forEach(item => item.classList.remove('active'));
     dropdownItems.forEach(item => item.classList.remove('active'));
 
     // סימון הפריט הפעיל בתפריט הראשי
-    navLinks.forEach(link => {
-      const href = link.getAttribute('href');
-      if (href && href !== '#' && currentPath.includes(href)) {
-        link.classList.add('active');
-        console.log('✅ Added active to nav link:', href);
+    navItems.forEach(item => {
+      const link = item.querySelector('.tiktrack-nav-link');
+      if (link) {
+        const href = link.getAttribute('href');
+        if (href && href !== '#' && currentPath.includes(href)) {
+          item.classList.add('active');
+          console.log('✅ Added active to nav item:', href);
+        }
       }
     });
 
@@ -1268,23 +1273,22 @@ class HeaderSystem {
         // סימון גם הפריט הראשי אם יש פריט פעיל בתפריט המשנה
         const parentDropdown = item.closest('.tiktrack-nav-item');
         if (parentDropdown) {
-          const parentLink = parentDropdown.querySelector('.tiktrack-nav-link');
-          if (parentLink) {
-            parentLink.classList.add('active');
-            console.log('✅ Added active to parent nav link for dropdown item:', href);
-          }
+          parentDropdown.classList.add('active');
+          console.log('✅ Added active to parent nav item for dropdown item:', href);
         }
       }
     });
 
     // סימון מיוחד לעמוד הבית
     if (currentPath === '/' || currentPath === '/index.html') {
-      const homeLink = document.querySelector('.tiktrack-nav-link[data-page="home"]');
-      if (homeLink) {
-        homeLink.classList.add('active');
-        console.log('✅ Added active to home link');
+      const homeItem = document.querySelector('#unified-header .tiktrack-nav-item[data-page="home"]');
+      if (homeItem) {
+        homeItem.classList.add('active');
+        console.log('✅ Added active to home item');
       }
     }
+
+
   }
 
   // הוספת event listeners לכפתורי הניווט (מתוך header-system.js)
@@ -2083,23 +2087,18 @@ class HeaderSystem {
 
   // פונקציות לעדכון טקסטי פילטרים
   updateStatusFilterDisplayText() {
-    console.log('🔄 updateStatusFilterDisplayText called');
-
     const statusToggle = document.getElementById('statusFilterToggle');
     if (!statusToggle) {
-      console.log('🔄 Status toggle not found');
       return;
     }
 
     const selectedText = statusToggle.querySelector('.selected-status-text');
     if (!selectedText) {
-      console.log('🔄 Selected status text element not found');
       return;
     }
 
     // קבלת הסטטוסים הנבחרים
     const selectedStatuses = window.selectedStatusesForFilter || [];
-    console.log('🔄 Selected status values for text update:', selectedStatuses);
 
     if (selectedStatuses.length === 0) {
       selectedText.textContent = 'כל הסטטוסים';
@@ -2108,28 +2107,21 @@ class HeaderSystem {
     } else {
       selectedText.textContent = `${selectedStatuses.length} נבחרו`;
     }
-
-    console.log('🔄 Updated status filter text to:', selectedText.textContent);
   }
 
   updateTypeFilterDisplayText() {
-    console.log('🔄 updateTypeFilterDisplayText called');
-
     const typeToggle = document.getElementById('typeFilterToggle');
     if (!typeToggle) {
-      console.log('🔄 Type toggle not found');
       return;
     }
 
     const selectedText = typeToggle.querySelector('.selected-type-text');
     if (!selectedText) {
-      console.log('🔄 Selected type text element not found');
       return;
     }
 
     // קבלת הטיפוסים הנבחרים
     const selectedTypes = window.selectedTypesForFilter || [];
-    console.log('🔄 Selected type values for text update:', selectedTypes);
 
     if (selectedTypes.length === 0) {
       selectedText.textContent = 'כל הטיפוסים';
@@ -2138,31 +2130,23 @@ class HeaderSystem {
     } else {
       selectedText.textContent = `${selectedTypes.length} נבחרו`;
     }
-
-    console.log('🔄 Updated type filter text to:', selectedText.textContent);
   }
 
   updateDateRangeFilterDisplayText() {
-    console.log('🔄 updateDateRangeFilterDisplayText called');
-
     const dateToggle = document.getElementById('dateRangeFilterToggle');
     if (!dateToggle) {
-      console.log('🔄 Date toggle not found');
       return;
     }
 
     const selectedText = dateToggle.querySelector('.selected-date-text');
     if (!selectedText) {
-      console.log('🔄 Selected date text element not found');
       return;
     }
 
     // קבלת טווח התאריכים הנבחר
     const selectedDateRange = window.selectedDateRangeForFilter || 'כל זמן';
-    console.log('🔄 Selected date range for text update:', selectedDateRange);
 
     selectedText.textContent = selectedDateRange;
-    console.log('🔄 Updated date range filter text to:', selectedText.textContent);
   }
 
   handleSubmenuNavigation(href) {
@@ -2223,6 +2207,254 @@ class HeaderSystem {
       this.clearMenuTimers(menu);
     });
   }
+
+  // עדכון תפריט פעיל
+  updateActiveMenu() {
+    const activeLinks = this.querySelectorAll('.nav-link.active');
+    const activeDropdownItems = this.querySelectorAll('.dropdown-item.active');
+
+    // הסרת כל הסימונים הפעילים
+    this.querySelectorAll('.nav-link, .dropdown-item').forEach(item => {
+      item.classList.remove('active');
+    });
+
+    // הוספת סימון פעיל לקישורים הפעילים
+    activeLinks.forEach(link => {
+      link.classList.add('active');
+    });
+
+    activeDropdownItems.forEach(item => {
+      item.classList.add('active');
+    });
+  }
+
+  // סגירת תפריטים אוטומטית
+  autoCloseMenus() {
+    const menus = this.querySelectorAll('.filter-menu');
+    menus.forEach(menu => {
+      const menuType = menu.id;
+      if (menu.classList.contains('show')) {
+        menu.classList.remove('show');
+      }
+    });
+  }
+
+  // הגדרת פריט תפריט פעיל
+  setActiveMenuItem() {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+
+    // הסרת כל הסימונים הפעילים
+    navLinks.forEach(link => link.classList.remove('active'));
+    dropdownItems.forEach(item => item.classList.remove('active'));
+
+    // מציאת הקישור המתאים לנתיב הנוכחי
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && currentPath.includes(href.replace('.html', ''))) {
+        link.classList.add('active');
+      }
+    });
+
+    dropdownItems.forEach(item => {
+      const href = item.getAttribute('href');
+      if (href && currentPath.includes(href.replace('.html', ''))) {
+        item.classList.add('active');
+
+        // הוספת סימון פעיל גם לפריט ההורה
+        const parentNav = item.closest('.nav-item');
+        if (parentNav) {
+          const parentLink = parentNav.querySelector('.nav-link');
+          if (parentLink) {
+            parentLink.classList.add('active');
+          }
+        }
+      }
+    });
+
+    // אם אין קישור פעיל, סמן את הבית
+    if (!document.querySelector('.nav-link.active, .dropdown-item.active')) {
+      const homeLink = document.querySelector('.nav-link[href="index.html"]');
+      if (homeLink) {
+        homeLink.classList.add('active');
+      }
+    }
+  }
+
+  // טעינת חשבונות לפילטר
+  async loadAccountsForFilter() {
+    try {
+      const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+      const response = await fetch(`${base}/api/v1/accounts`);
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const data = await response.json();
+
+      if (data.status === 'success' && Array.isArray(data.data)) {
+        this.updateAccountFilterOptions(data.data);
+      }
+    } catch (err) {
+      console.warn('Failed to load accounts for filter:', err);
+    }
+  }
+
+  // עדכון אפשרויות פילטר חשבון
+  updateAccountFilterOptions(accounts) {
+    const accountMenu = document.querySelector('#accountFilterMenu');
+    if (!accountMenu) return;
+
+    // ניקוי התפריט הקיים
+    accountMenu.innerHTML = '';
+
+    // הוספת אפשרות "כל החשבונות"
+    const allOption = document.createElement('div');
+    allOption.className = 'account-filter-item';
+    allOption.setAttribute('data-account-id', '');
+    allOption.innerHTML = '<span class="option-text">כל החשבונות</span>';
+    accountMenu.appendChild(allOption);
+
+    // הוספת החשבונות
+    accounts.forEach(account => {
+      const option = document.createElement('div');
+      option.className = 'account-filter-item';
+      option.setAttribute('data-account-id', account.id);
+      option.innerHTML = `<span class="option-text">${account.name}</span>`;
+      accountMenu.appendChild(option);
+    });
+  }
+
+  // איפוס כל הפילטרים
+  resetAllFilters() {
+    // איפוס פילטר סטטוס
+    document.querySelectorAll('#statusFilterMenu .status-filter-item.selected').forEach(item => {
+      item.classList.remove('selected');
+    });
+
+    // איפוס פילטר סוג
+    document.querySelectorAll('#typeFilterMenu .type-filter-item.selected').forEach(item => {
+      item.classList.remove('selected');
+    });
+
+    // איפוס פילטר חשבון
+    document.querySelectorAll('#accountFilterMenu .account-filter-item.selected').forEach(item => {
+      item.classList.remove('selected');
+    });
+
+    // איפוס פילטר חיפוש
+    const searchInput = document.querySelector('#searchFilterInput');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    // איפוס פילטר תאריכים
+    const dateRangeDisplay = document.querySelector('#dateRangeFilterDisplay');
+    if (dateRangeDisplay) {
+      dateRangeDisplay.textContent = 'כל זמן';
+    }
+
+    // הפעלת הפילטרים המעודכנים
+    if (window.filterSystem) {
+      window.filterSystem.resetFilters();
+    }
+  }
+
+  // ניקוי כל הפילטרים
+  clearAllFilters() {
+    // ניקוי פילטר סטטוס
+    document.querySelectorAll('#statusFilterMenu .status-filter-item.selected').forEach(item => {
+      item.classList.remove('selected');
+    });
+
+    // ניקוי פילטר סוג
+    document.querySelectorAll('#typeFilterMenu .type-filter-item.selected').forEach(item => {
+      item.classList.remove('selected');
+    });
+
+    // ניקוי פילטר חשבון
+    document.querySelectorAll('#accountFilterMenu .account-filter-item.selected').forEach(item => {
+      item.classList.remove('selected');
+    });
+
+    // ניקוי פילטר חיפוש
+    const searchInput = document.querySelector('#searchFilterInput');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    // ניקוי פילטר תאריכים
+    const dateRangeDisplay = document.querySelector('#dateRangeFilterDisplay');
+    if (dateRangeDisplay) {
+      dateRangeDisplay.textContent = 'כל זמן';
+    }
+
+    // הפעלת הפילטרים המעודכנים
+    if (window.filterSystem) {
+      window.filterSystem.resetFilters();
+    }
+  }
+
+  // ניקוי פילטר חיפוש
+  clearSearchFilter() {
+    const searchInput = this.querySelector('#searchFilterInput');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    if (window.filterSystem) {
+      window.filterSystem.currentFilters.search = '';
+      window.filterSystem.applyAllFilters();
+    }
+  }
+
+  // ניווט לדף
+  navigateToPage(href) {
+    if (href && href !== '#') {
+      window.location.href = href;
+    }
+  }
+
+  // פונקציות עזר לתפריטים
+  toggleDateRangeFilter() {
+    const menu = this.querySelector('#dateRangeFilterMenu');
+    if (!menu) return;
+
+    menu.classList.toggle('show');
+
+    // סגירת תפריטים אחרים
+    this.querySelectorAll('.filter-menu:not(#dateRangeFilterMenu)').forEach(otherMenu => {
+      otherMenu.classList.remove('show');
+    });
+  }
+
+  closeStatusFilter() {
+    const menu = this.querySelector('#statusFilterMenu');
+    if (menu) {
+      menu.classList.remove('show');
+    }
+  }
+
+  closeTypeFilter() {
+    const menu = this.querySelector('#typeFilterMenu');
+    if (menu) {
+      menu.classList.remove('show');
+    }
+  }
+
+  closeAccountFilter() {
+    const menu = this.querySelector('#accountFilterMenu');
+    if (menu) {
+      menu.classList.remove('show');
+    }
+  }
+
+  closeDateRangeFilter() {
+    const menu = this.querySelector('#dateRangeFilterMenu');
+    if (menu) {
+      menu.classList.remove('show');
+    }
+  }
 }
 
 // יצירת instance גלובלי
@@ -2253,7 +2485,6 @@ window.updateDateRangeFilterDisplayText = function () {
  * פתיחה/סגירה של פילטר סטטוס
  */
 function toggleStatusFilter() {
-  console.log('🔄 toggleStatusFilter called');
   const menu = document.getElementById('statusFilterMenu');
   if (menu) {
     const isVisible = menu.classList.contains('show');
@@ -2273,8 +2504,6 @@ function toggleStatusFilter() {
       menu.classList.add('show');
       setupFilterMenuAutoClose(menu);
     }
-
-    console.log('🔄 Status filter menu toggled, show class:', menu.classList.contains('show'));
   } else {
     console.warn('⚠️ Status filter menu not found');
   }
@@ -2284,7 +2513,6 @@ function toggleStatusFilter() {
  * פתיחה/סגירה של פילטר טיפוס
  */
 function toggleTypeFilter() {
-  console.log('🔄 toggleTypeFilter called');
   const menu = document.getElementById('typeFilterMenu');
   if (menu) {
     const isVisible = menu.classList.contains('show');
@@ -2304,8 +2532,6 @@ function toggleTypeFilter() {
       menu.classList.add('show');
       setupFilterMenuAutoClose(menu);
     }
-
-    console.log('🔄 Type filter menu toggled, show class:', menu.classList.contains('show'));
   } else {
     console.warn('⚠️ Type filter menu not found');
   }
@@ -2315,7 +2541,6 @@ function toggleTypeFilter() {
  * פתיחה/סגירה של פילטר חשבונות
  */
 function toggleAccountFilter() {
-  console.log('🔄 toggleAccountFilter called');
   const menu = document.getElementById('accountFilterMenu');
   if (menu) {
     const isVisible = menu.classList.contains('show');
@@ -2335,8 +2560,6 @@ function toggleAccountFilter() {
       menu.classList.add('show');
       setupFilterMenuAutoClose(menu);
     }
-
-    console.log('🔄 Account filter menu toggled, show class:', menu.classList.contains('show'));
   } else {
     console.warn('⚠️ Account filter menu not found');
   }

@@ -593,4 +593,29 @@ window.navigateToPage = navigateToPage;
 window.getCurrentPageName = getCurrentPageName;
 window.isCurrentPage = isCurrentPage;
 
+// ייצוא המודול עצמו
+window.pageUtils = {
+    initializePageFilters,
+    setupSortableHeaders,
+    updateTableStats,
+    debugSavedFilters,
+    restoreDesignsSectionState,
+    initializePage,
+    savePageState,
+    loadPageState,
+    clearPageState,
+    isPageAvailable,
+    getPageInfo,
+    navigateToPage,
+    getCurrentPageName,
+    isCurrentPage,
+    getCurrentTableData,
+    calculateTableStats,
+    updateStatsDisplay,
+    getCurrentPageState,
+    initializeTradesPage,
+    initializeAccountsPage,
+    initializeAlertsPage
+};
+
 console.log('✅ Page Utils loaded successfully');

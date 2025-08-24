@@ -238,6 +238,23 @@ if (typeof window !== 'undefined') {
         return `<span style="color: ${color}; font-weight: bold;">${text}</span>`;
     };
 
+    // ייצוא המודול עצמו
+    window.translationUtils = {
+        translateAccountStatus,
+        translateTickerStatus,
+        translateNoteStatus,
+        translateAlertStatus,
+        translateTradePlanStatus,
+        translateIsTriggered,
+        translateTradeType,
+        translateTradePlanType,
+        translateCashFlowType,
+        translateCashFlowSource,
+        translateTestCategory,
+        translateExecutionAction,
+        colorAmount: window.colorAmount
+    };
+
     console.log('✅ Translation utilities loaded successfully');
 }
 

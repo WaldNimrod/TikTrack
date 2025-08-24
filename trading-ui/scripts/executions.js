@@ -29,7 +29,7 @@ let executionsData = window.executionsData;
 
 // פונקציות בסיסיות
 function openExecutionDetails(id) {
-    console.log('פתיחת פרטי עסקה:', id);
+    // פתיחת פרטי עסקה
     showAddExecutionModal();
 }
 

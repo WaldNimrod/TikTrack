@@ -36,11 +36,11 @@ function openCashFlowDetails(id) {
 }
 
 function editCashFlow(id) {
-  showEditCashFlowModal(id);
+    showEditCashFlowModal(id);
 }
 
 function deleteCashFlow(id) {
-  showDeleteCashFlowModal(id);
+    showDeleteCashFlowModal(id);
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים
@@ -147,7 +147,7 @@ function restoreCashFlowsSectionState() {
 
 // פונקציות נוספות
 function resetAllFiltersAndReloadData() {
-    console.log('איפוס פילטרים');
+    // איפוס פילטרים
 }
 
 // ========================================
@@ -158,7 +158,6 @@ function resetAllFiltersAndReloadData() {
  * הצגת מודל הוספת תזרים מזומנים
  */
 function showAddCashFlowModal() {
-    console.log('🔄 הצגת מודל הוספת תזרים מזומנים');
 
     // איפוס הטופס
     document.getElementById('addCashFlowForm').reset();
@@ -176,7 +175,6 @@ function showAddCashFlowModal() {
  * הצגת מודל עריכת תזרים מזומנים
  */
 function showEditCashFlowModal(id) {
-    console.log('🔄 הצגת מודל עריכת תזרים מזומנים:', id);
 
     const cashFlow = cashFlowsData.find(cf => cf.id === id);
     if (!cashFlow) {
@@ -207,7 +205,6 @@ function showEditCashFlowModal(id) {
  * הצגת מודל מחיקת תזרים מזומנים
  */
 function showDeleteCashFlowModal(id) {
-    console.log('🔄 הצגת מודל מחיקת תזרים מזומנים:', id);
 
     const cashFlow = cashFlowsData.find(cf => cf.id === id);
     if (!cashFlow) {
@@ -233,7 +230,6 @@ function showDeleteCashFlowModal(id) {
  */
 async function loadCashFlows() {
     try {
-        console.log('🔄 טעינת תזרימי מזומנים...');
 
         const response = await fetch('http://localhost:8080/api/v1/cash_flows/');
         if (!response.ok) {
@@ -244,7 +240,6 @@ async function loadCashFlows() {
 
         if (result.status === 'success') {
             cashFlowsData = result.data;
-            console.log('✅ תזרימי מזומנים נטענו:', cashFlowsData.length);
             renderCashFlowsTable();
             updatePageSummaryStats();
         } else {
@@ -372,7 +367,6 @@ function clearValidationErrors() {
  */
 async function saveCashFlow() {
     try {
-        console.log('🔄 שמירת תזרים מזומנים חדש...');
 
         // איסוף נתונים מהטופס
         const formData = {
@@ -407,8 +401,6 @@ async function saveCashFlow() {
         const result = await response.json();
 
         if (result.status === 'success') {
-            console.log('✅ תזרים מזומנים נשמר בהצלחה');
-
             // סגירת המודל
             const modal = bootstrap.Modal.getInstance(document.getElementById('addCashFlowModal'));
             modal.hide();
@@ -542,7 +534,6 @@ function clearEditValidationErrors() {
  */
 async function updateCashFlow() {
     try {
-        console.log('🔄 עדכון תזרים מזומנים...');
 
         const id = parseInt(document.getElementById('editCashFlowId').value);
 
@@ -579,8 +570,6 @@ async function updateCashFlow() {
         const result = await response.json();
 
         if (result.status === 'success') {
-            console.log('✅ תזרים מזומנים עודכן בהצלחה');
-
             // סגירת המודל
             const modal = bootstrap.Modal.getInstance(document.getElementById('editCashFlowModal'));
             modal.hide();
@@ -602,7 +591,6 @@ async function updateCashFlow() {
  */
 async function confirmDeleteCashFlow() {
     try {
-        console.log('🔄 מחיקת תזרים מזומנים...');
 
         const id = parseInt(document.getElementById('deleteCashFlowId').value);
 
@@ -617,8 +605,6 @@ async function confirmDeleteCashFlow() {
         const result = await response.json();
 
         if (result.status === 'success') {
-            console.log('✅ תזרים מזומנים נמחק בהצלחה');
-
             // סגירת המודל
             const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCashFlowModal'));
             modal.hide();
@@ -902,7 +888,6 @@ function formatUsdRate(rate) {
  * @param {Array} cashFlows - מערך של תזרימי מזומנים
  */
 function updateCashFlowsTable(cashFlows) {
-    console.log('🔄 עדכון טבלת תזרימי מזומנים עם', cashFlows.length, 'רשומות');
 
     // עדכון הנתונים הגלובליים
     window.cashFlowsData = cashFlows;
@@ -920,7 +905,6 @@ window.updateCashFlowsTable = updateCashFlowsTable;
 
 // פונקציית פילטור מקומי לתזרימי מזומנים
 function filterCashFlowsLocally(cashFlows, selectedTypes, selectedAccounts, dateRange, searchTerm) {
-    console.log('🔍 filterCashFlowsLocally called with:', { selectedTypes, selectedAccounts, dateRange, searchTerm });
 
     return cashFlows.filter(cashFlow => {
         // פילטר חיפוש
@@ -1010,7 +994,6 @@ window.filterCashFlowsLocally = filterCashFlowsLocally;
  */
 async function loadCashFlows() {
     try {
-        console.log('🔄 טעינת נתוני תזרימי מזומנים...');
 
         const response = await fetch('/api/v1/cash_flows/');
         if (!response.ok) {
@@ -1036,7 +1019,6 @@ async function loadCashFlows() {
                 (filters.search && filters.search !== '');
 
             if (hasActiveFilters) {
-                console.log('🔍 יש פילטרים פעילים, מסנן נתונים מקומית');
                 const filteredData = filterCashFlowsLocally(
                     cashFlows,
                     filters.type,
@@ -1082,7 +1064,6 @@ async function loadCashFlows() {
  * אתחול הדף
  */
 async function initializeCashFlowsPage() {
-    console.log('🔄 אתחול דף תזרימי מזומנים...');
 
     // טעינת נתונים
     await loadCashFlows();
@@ -1092,13 +1073,10 @@ async function initializeCashFlowsPage() {
 
     // שחזור מצב סידור
     restoreSortState();
-
-    console.log('✅ דף תזרימי מזומנים אותחל בהצלחה');
 }
 
 // הפעלת אתחול כשהדף נטען
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('📄 DOM נטען - אתחול דף תזרימי מזומנים');
     initializeCashFlowsPage();
 });
 
@@ -1127,7 +1105,6 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
  */
 function sortTable(columnIndex) {
-    console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
 
     if (typeof window.sortTableData === 'function') {
         window.sortTableData(
@@ -1146,7 +1123,6 @@ function sortTable(columnIndex) {
  * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
-    console.log('🔄 Restoring sort state for cash flows table');
 
     if (typeof window.restoreAnyTableSort === 'function') {
         window.restoreAnyTableSort('cash_flows', window.cashFlowsData || [], updateCashFlowsTable);

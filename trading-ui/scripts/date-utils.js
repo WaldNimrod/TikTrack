@@ -431,4 +431,22 @@ window.daysDifference = daysDifference;
 window.addDays = addDays;
 window.addMonths = addMonths;
 
+// ייצוא המודול עצמו
+window.dateUtils = {
+    formatDate,
+    formatDateTime,
+    formatDateOnly,
+    formatShortDate,
+    formatLongDate,
+    formatTimeOnly,
+    toISOString,
+    toDate,
+    isValidDate,
+    isPastDate,
+    isFutureDate,
+    daysDifference,
+    addDays,
+    addMonths
+};
+
 console.log('✅ Date Utils loaded successfully');

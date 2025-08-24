@@ -201,7 +201,6 @@ async function loadLinkedItemsData(itemId, itemType) {
  * @param {string|number} itemId - ID of the item
  */
 function showLinkedItemsModal(data, itemType, itemId) {
-    console.log('🔄 Showing linked items modal:', { data, itemType, itemId });
 
     // Create modal content
     const modalContent = createLinkedItemsModalContent(data, itemType, itemId);
@@ -229,7 +228,6 @@ function showLinkedItemsModal(data, itemType, itemId) {
  * @returns {string} HTML content for the modal
  */
 function createLinkedItemsModalContent(data, itemType, itemId) {
-    console.log('🔄 Creating modal content for:', { data, itemType, itemId });
 
     // יצירת כותרת מותאמת לפי סוג האלמנט
     let headerTitle = '';
@@ -633,7 +631,6 @@ function createExecutionDetails(item) {
  * @returns {Object} Mock linked items data
  */
 function getMockLinkedData(itemType, itemId) {
-    console.log('🔄 Getting mock data for:', { itemType, itemId });
 
     // נתונים לדוגמה לפי סוג האלמנט
     switch (itemType) {
@@ -753,7 +750,7 @@ function getMockLinkedData(itemType, itemId) {
  * @returns {Promise<Object>} Promise resolving to linked items info
  */
 function checkLinkedItems(itemId, itemType = null) {
-    console.log(`🔍 Checking linked items for ${itemType || 'item'} ${itemId}`);
+    // Checking linked items
     // פונקציה פשוטה לבדיקת פריטים מקושרים
     return Promise.resolve({ hasLinkedItems: false, items: [] });
 }
@@ -767,7 +764,7 @@ function checkLinkedItems(itemId, itemType = null) {
  * @param {string|number} itemId - ID of item
  */
 function exportLinkedItemsData(itemType, itemId) {
-    console.log(`📤 Exporting linked items data for ${itemType} ${itemId}`);
+    // Exporting linked items data
     // Implementation for data export
     if (typeof window.showNotification === 'function') {
         window.showNotification('Export functionality coming soon', 'info');
@@ -783,7 +780,7 @@ function exportLinkedItemsData(itemType, itemId) {
  * @param {string|number} id - Item ID
  */
 function viewItemDetails(type, id) {
-    console.log(`👁️ Viewing details for ${type} ${id}`);
+    // Viewing details
     // Implementation for viewing item details
 }
 
@@ -796,7 +793,7 @@ function viewItemDetails(type, id) {
  * @param {string|number} id - Item ID
  */
 function editItem(type, id) {
-    console.log(`✏️ Editing ${type} ${id}`);
+    // Editing item
     // Implementation for editing item
 }
 
@@ -809,7 +806,7 @@ function editItem(type, id) {
  * @param {string|number} id - Item ID
  */
 function deleteItem(type, id) {
-    console.log(`🗑️ Deleting ${type} ${id}`);
+    // Deleting item
     // Implementation for deleting item
 }
 
@@ -822,7 +819,6 @@ function deleteItem(type, id) {
  * @param {number|string} itemId - Item ID
  */
 function openItemPage(itemType, itemId) {
-    console.log('🔄 Opening item page:', { itemType, itemId });
 
     // Show development message
     if (typeof window.showNotification === 'function') {
@@ -925,4 +921,28 @@ window.viewLinkedItemsForNote = viewLinkedItemsForNote;
 window.viewLinkedItemsForTradePlan = viewLinkedItemsForTradePlan;
 window.viewLinkedItemsForExecution = viewLinkedItemsForExecution;
 
-console.log('✅ Linked Items loaded successfully');
+// ייצוא המודול עצמו
+window.linkedItems = {
+    viewLinkedItems,
+    loadLinkedItemsData,
+    showLinkedItemsModal,
+    createLinkedItemsModalContent,
+    checkLinkedItems,
+    exportLinkedItemsData,
+    createDetailedItemInfo,
+    getItemTypeIcon,
+    getItemTypeDisplayName,
+    viewItemDetails,
+    editItem,
+    deleteItem,
+    viewLinkedItemsForTrade,
+    viewLinkedItemsForAccount,
+    viewLinkedItemsForTicker,
+    viewLinkedItemsForAlert,
+    viewLinkedItemsForCashFlow,
+    viewLinkedItemsForNote,
+    viewLinkedItemsForTradePlan,
+    viewLinkedItemsForExecution
+};
+
+    // Linked Items loaded successfully

@@ -212,13 +212,29 @@ window.getSortState = function (tableType) {
 };
 
 /**
+ * Set sort state for a table type
+ * 
+ * @param {string} tableType - Type of table
+ * @param {number} columnIndex - Column index
+ * @param {string} direction - Sort direction
+ */
+window.setSortState = function (tableType, columnIndex, direction) {
+    const sortState = {
+        columnIndex: columnIndex,
+        direction: direction,
+        timestamp: Date.now()
+    };
+    localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState));
+};
+
+/**
  * Update sort icons in table headers
  * 
  * @param {string} tableType - Type of table
  * @param {number} activeColumnIndex - Active column index
  * @param {string} direction - Sort direction
  */
-function updateSortIcons(tableType, activeColumnIndex, direction) {
+window.updateSortIcons = function (tableType, activeColumnIndex, direction) {
     const table = document.querySelector(`[data-table-type="${tableType}"]`);
     if (!table) return;
 
@@ -325,5 +341,18 @@ const getDefaultColumnDefs = () => [
  * Export default column definitions to global scope
  */
 window.getDefaultColumnDefs = getDefaultColumnDefs;
+
+// ייצוא המודול עצמו
+window.tables = {
+    sortTableData: window.sortTableData,
+    getSortState: window.getSortState,
+    setSortState: window.setSortState,
+    updateSortIcons: window.updateSortIcons,
+    sortAnyTable: window.sortAnyTable,
+    sortTable: window.sortTable,
+    restoreAnyTableSort: window.restoreAnyTableSort,
+    closeModal: window.closeModal,
+    getDefaultColumnDefs: window.getDefaultColumnDefs
+};
 
 console.log('✅ Tables.js loaded successfully');

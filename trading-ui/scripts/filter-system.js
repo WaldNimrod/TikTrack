@@ -134,48 +134,34 @@ class FilterSystem {
     const table = this.tables.get(tableId);
     if (!table) return;
 
-    console.log(`🔍 === FILTER PROCESS FOR TABLE ${tableId} ===`);
-    console.log(`🔍 Current filters:`, this.currentFilters);
-
     let filteredData = [...table.data];
-    console.log(`🔍 Starting filter process for table ${tableId} with ${filteredData.length} rows`);
 
     // פילטר חיפוש (סטטי)
     if (this.currentFilters.search && table.fields.some(field =>
       ['name', 'description', 'title', 'symbol', 'account_name'].includes(field))) {
-      console.log(`🔍 Applying search filter: "${this.currentFilters.search}"`);
       filteredData = this.applySearchFilter(filteredData, this.currentFilters.search);
-      console.log(`🔍 After search filter: ${filteredData.length} rows`);
     }
 
     // פילטר תאריכים (סטטי)
     if (this.currentFilters.dateRange && this.currentFilters.dateRange !== 'כל זמן' &&
       table.fields.includes('date')) {
-      console.log(`🔍 Applying date filter: "${this.currentFilters.dateRange}"`);
       const dateRange = this.getDateRangeFromText(this.currentFilters.dateRange);
       filteredData = this.applyDateFilter(filteredData, dateRange);
-      console.log(`🔍 After date filter: ${filteredData.length} rows`);
     }
 
     // פילטר סטטוס (דינמי)
     if (this.currentFilters.status.length > 0 && table.fields.includes('status')) {
-      console.log(`🔍 Applying status filter:`, this.currentFilters.status);
       filteredData = this.applyStatusFilter(filteredData, this.currentFilters.status);
-      console.log(`🔍 After status filter: ${filteredData.length} rows`);
     }
 
     // פילטר סוג (דינמי)
     if (this.currentFilters.type.length > 0 && table.fields.includes('type')) {
-      console.log(`🔍 Applying type filter:`, this.currentFilters.type);
       filteredData = this.applyTypeFilter(filteredData, this.currentFilters.type);
-      console.log(`🔍 After type filter: ${filteredData.length} rows`);
     }
 
     // פילטר חשבון (דינמי)
     if (this.currentFilters.account.length > 0 && table.fields.includes('account_id')) {
-      console.log(`🔍 Applying account filter:`, this.currentFilters.account);
       filteredData = this.applyAccountFilter(filteredData, this.currentFilters.account);
-      console.log(`🔍 After account filter: ${filteredData.length} rows`);
     }
 
     table.filteredData = filteredData;
@@ -204,8 +190,6 @@ class FilterSystem {
         rows[index].style.display = '';
       }
     });
-
-    console.log(`🎯 Updated table ${tableId}: showing ${filteredData.length} of ${table.data.length} rows`);
   }
 
   // פילטר חיפוש
@@ -265,24 +249,27 @@ class FilterSystem {
 
   // פילטר סטטוס
   applyStatusFilter(data, selectedStatuses) {
-    if (selectedStatuses.length === 0) return data;
+    if (!selectedStatuses || selectedStatuses.length === 0) return data;
 
-    console.log('🔍 Applying status filter:', selectedStatuses);
-    console.log('🔍 Data before filter:', data);
-
-    // תרגום הסטטוסים הנבחרים לאנגלית
-    const translatedStatuses = selectedStatuses.map(status => this.translateStatusToEnglish(status));
-    console.log('🔍 Translated statuses:', translatedStatuses);
+    // תרגום הסטטוסים לעברית
+    const translatedStatuses = selectedStatuses.map(status => {
+      const translations = {
+        'active': 'פעיל',
+        'closed': 'סגור',
+        'canceled': 'בוטל',
+        'pending': 'ממתין'
+      };
+      return translations[status] || status;
+    });
 
     return data.filter(item => {
-      const itemStatus = item.status;
-      const itemSymbol = item.ticker || item.symbol || item.name || 'unknown';
-      console.log(`🔍 Checking item ${itemSymbol}: status="${itemStatus}" against translatedStatuses:`, translatedStatuses);
-
-      // בדיקה - אם הסטטוס של הפריט נמצא ברשימת הסטטוסים המתורגמים
-      const isMatch = translatedStatuses.includes(itemStatus);
-      console.log(`🔍 Item ${itemSymbol}: ${isMatch ? '✅ MATCH' : '❌ NO MATCH'}`);
-
+      const itemStatus = item.status || '';
+      const itemSymbol = item.symbol || item.name || 'Unknown';
+      
+      const isMatch = translatedStatuses.some(status => 
+        itemStatus.includes(status) || status.includes(itemStatus)
+      );
+      
       return isMatch;
     });
   }
@@ -406,15 +393,22 @@ class FilterSystem {
 
   // שמירת פילטרים
   saveFilters() {
-    localStorage.setItem('globalFilters', JSON.stringify(this.currentFilters));
+    try {
+      localStorage.setItem('filterSystem_filters', JSON.stringify(this.currentFilters));
+    } catch (err) {
+      console.warn('Failed to save filters:', err);
+    }
   }
 
   // טעינת פילטרים שמורים
   loadSavedFilters() {
-    const saved = localStorage.getItem('globalFilters');
-    if (saved) {
-      this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
-      console.log('📥 Loaded saved filters:', this.currentFilters);
+    try {
+      const saved = localStorage.getItem('filterSystem_filters');
+      if (saved) {
+        this.currentFilters = JSON.parse(saved);
+      }
+    } catch (err) {
+      console.warn('Failed to load saved filters:', err);
     }
   }
 
@@ -427,9 +421,9 @@ class FilterSystem {
       type: [],
       account: []
     };
+    
     this.saveFilters();
     this.applyAllFilters();
-    console.log('🔄 Filters reset');
   }
 
   // הגדרת event listeners גלובליים
@@ -539,8 +533,27 @@ class FilterSystem {
 
   // עדכון אפשרויות חשבונות
   updateAccountOptions(accounts) {
-    console.log('🔧 Updating account options:', accounts);
-    // כאן נוכל להוסיף לוגיקה לעדכון רשימת החשבונות בפילטר
+    const accountMenu = document.getElementById('accountFilterMenu');
+    if (!accountMenu) return;
+
+    // ניקוי התפריט הקיים
+    accountMenu.innerHTML = '';
+
+    // הוספת אפשרות "כל החשבונות"
+    const allOption = document.createElement('div');
+    allOption.className = 'account-filter-item';
+    allOption.setAttribute('data-account-id', '');
+    allOption.innerHTML = '<span class="option-text">כל החשבונות</span>';
+    accountMenu.appendChild(allOption);
+
+    // הוספת החשבונות
+    accounts.forEach(account => {
+      const option = document.createElement('div');
+      option.className = 'account-filter-item';
+      option.setAttribute('data-account-id', account.id);
+      option.innerHTML = `<span class="option-text">${account.name}</span>`;
+      accountMenu.appendChild(option);
+    });
   }
 }
 

@@ -270,3 +270,13 @@ window.TABLE_COLUMN_MAPPINGS = TABLE_COLUMN_MAPPINGS;
 window.getColumnValue = getColumnValue;
 window.getTableMapping = getTableMapping;
 window.isTableSupported = isTableSupported;
+
+// ייצוא המודול עצמו
+window.tableMappings = {
+    TABLE_COLUMN_MAPPINGS,
+    getColumnValue,
+    getTableMapping,
+    isTableSupported
+};
+
+console.log('✅ Table Mappings loaded successfully');

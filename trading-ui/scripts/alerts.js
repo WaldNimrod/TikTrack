@@ -78,7 +78,6 @@ const demoAlerts = [
  */
 async function loadAlertsData() {
   try {
-    console.log('🔄 טוען התראות מהשרת...');
     const response = await fetch('/api/v1/alerts/');
 
     if (!response.ok) {
@@ -87,7 +86,6 @@ async function loadAlertsData() {
 
     const data = await response.json();
     const alerts = data.data || data;
-    console.log(`✅ נטענו ${alerts.length} התראות`);
 
     // עדכון המשתנה הגלובלי
     alertsData = alerts.map(alert => ({
@@ -104,7 +102,6 @@ async function loadAlertsData() {
     }));
 
     // עדכון הטבלה
-    console.log('🔄 Updating alerts table with', alertsData.length, 'alerts');
 
     // בדיקה אם יש פילטרים פעילים
     const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
@@ -112,22 +109,10 @@ async function loadAlertsData() {
       (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
       (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
 
-    console.log('🔄 Checking filters for alerts page:', {
-      hasActiveFilters,
-      selectedStatusesForFilter: window.selectedStatusesForFilter,
-      selectedTypesForFilter: window.selectedTypesForFilter,
-      selectedDateRangeForFilter: window.selectedDateRangeForFilter,
-      searchTermForFilter: window.searchTermForFilter
-    });
-
     let filteredAlerts = [...alertsData];
 
     if (hasActiveFilters) {
-      console.log('🔄 Applying filters to alerts data...');
       filteredAlerts = filterAlertsLocally(alertsData, window.selectedStatusesForFilter, window.selectedTypesForFilter, window.selectedDateRangeForFilter, window.searchTermForFilter);
-      console.log('🔄 After filtering:', filteredAlerts.length, 'alerts');
-    } else {
-      console.log('🔄 No active filters, showing all alerts');
     }
 
     updateAlertsTable(filteredAlerts);
@@ -136,7 +121,7 @@ async function loadAlertsData() {
 
   } catch (error) {
     console.error('Error loading alerts data:', error);
-    console.log('⚠️ משתמש בנתוני דמו');
+            // משתמש בנתוני דמו
 
     // שימוש בנתוני דמו
     alertsData = demoAlerts;
@@ -150,10 +135,6 @@ async function loadAlertsData() {
  * פילטור מקומי להתראות
  */
 function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-  console.log('🔄 === FILTER ALERTS LOCALLY ===');
-  console.log('🔄 Original alerts:', alerts.length);
-  console.log('🔄 Filters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
-
   let filteredAlerts = [...alerts];
 
   // Extracting start and end dates
@@ -161,18 +142,13 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
   let endDate = null;
 
   if (selectedDateRange && selectedDateRange !== 'כל זמן') {
-    console.log('🔄 Filter: Translating date range:', selectedDateRange);
     const dateRange = window.translateDateRangeToDates ? window.translateDateRangeToDates(selectedDateRange) : { startDate: null, endDate: null };
     startDate = dateRange.startDate;
     endDate = dateRange.endDate;
-    console.log('🔄 Filter: Translation result:', { startDate, endDate });
   }
-
-  console.log('🔄 Extracted dates:', { startDate, endDate });
 
   // Filtering by status
   if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
-    console.log('🔄 Filtering by status:', selectedStatuses);
     filteredAlerts = filteredAlerts.filter(alert => {
       // המרת הערכים הנבחרים לאנגלית
       const statusTranslations = {
@@ -186,15 +162,12 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
       );
 
       const isMatch = translatedSelectedStatuses.includes(alert.status);
-      console.log(`🔄 Alert ${alert.id}: status=${alert.status}, selected=${selectedStatuses}, translated=${translatedSelectedStatuses}, match=${isMatch}`);
       return isMatch;
     });
-    console.log('🔄 After status filter:', filteredAlerts.length, 'alerts');
   }
 
   // Filtering by type
   if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
-    console.log('🔄 Filtering by type:', selectedTypes);
     filteredAlerts = filteredAlerts.filter(alert => {
       // המרת הערכים הנבחרים לאנגלית
       const typeTranslations = {
@@ -209,15 +182,12 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
       );
 
       const isMatch = translatedSelectedTypes.includes(alert.type);
-      console.log(`🔄 Alert ${alert.id}: type=${alert.type}, selected=${selectedTypes}, translated=${translatedSelectedTypes}, match=${isMatch}`);
       return isMatch;
     });
-    console.log('🔄 After type filter:', filteredAlerts.length, 'alerts');
   }
 
   // Filtering by dates
   if (startDate && endDate) {
-    console.log('🔄 Filtering by date range:', { startDate, endDate });
     filteredAlerts = filteredAlerts.filter(alert => {
       if (!alert.created_at) return false;
 
@@ -230,15 +200,12 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
       end.setHours(23, 59, 59, 999);
 
       const isInRange = alertDate >= start && alertDate <= end;
-      console.log(`🔄 Alert ${alert.id}: created_at=${alert.created_at}, inRange=${isInRange}`);
       return isInRange;
     });
-    console.log('🔄 After date filter:', filteredAlerts.length, 'alerts');
   }
 
   // Filtering by search term
   if (searchTerm && searchTerm.trim() !== '') {
-    console.log('🔄 Filtering by search term:', searchTerm);
     const searchLower = searchTerm.toLowerCase();
 
     // Bi-directional search term translations
@@ -301,23 +268,10 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
 
       const isMatch = titleMatch || typeMatch || statusMatch || conditionMatch || messageMatch;
 
-      console.log(`🔄 Alert ${alert.id} search:`, {
-        title: alert.title,
-        type: alert.type,
-        status: alert.status,
-        condition: alert.condition,
-        message: alert.message,
-        searchTerms: searchTerms,
-        originalSearch: searchLower,
-        match: isMatch
-      });
-
       return isMatch;
     });
-    console.log('🔄 After search filter:', filteredAlerts.length, 'alerts');
   }
 
-  console.log('🔄 Final filtered alerts:', filteredAlerts.length);
   return filteredAlerts;
 }
 
@@ -330,9 +284,6 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
  * @param {Array} alerts - מערך של התראות לעדכון
  */
 function updateAlertsTable(alerts) {
-  console.log('🔄 === UPDATE ALERTS TABLE ===');
-  console.log('🔄 Alerts to display:', alerts.length);
-
   const tbody = document.querySelector('#alertsTable tbody');
   if (!tbody) {
     console.log('📋 No alerts table found on this page - skipping table update');
@@ -348,8 +299,6 @@ function updateAlertsTable(alerts) {
   // פונקציה לטעינת נתונים נוספים
   const loadAdditionalData = async () => {
     try {
-      console.log('🔄 === LOADING ADDITIONAL DATA ===');
-      console.log('🔄 טוען נתונים נוספים...');
       const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
         fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
@@ -361,9 +310,6 @@ function updateAlertsTable(alerts) {
       trades = (tradesResponse.data || tradesResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
       tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
       tickers = (tickersResponse.data || tickersResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-
-      console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
-      console.log('🔄 === ADDITIONAL DATA LOADED ===');
     } catch (error) {
       console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
       // המשך עם מערכים ריקים
@@ -371,20 +317,11 @@ function updateAlertsTable(alerts) {
       trades = [];
       tradePlans = [];
       tickers = [];
-      console.log('🔄 === USING EMPTY ARRAYS ===');
     }
   };
 
   // טעינת נתונים ועדכון הטבלה
   loadAdditionalData().then(() => {
-    console.log('🔄 === STARTING TABLE UPDATE ===');
-    console.log('🔄 Processing alerts:', alerts.length);
-    console.log('🔄 Available data:', {
-      accounts: accounts.length,
-      trades: trades.length,
-      tradePlans: tradePlans.length,
-      tickers: tickers.length
-    });
 
     const tableHTML = alerts.map(alert => {
       const statusClass = getStatusClass(alert.status);
@@ -609,9 +546,6 @@ function updateAlertsTable(alerts) {
       `;
     }).join('');
 
-    console.log('🔄 === FINISHED PROCESSING ALERTS ===');
-    console.log('🔄 Generated HTML length:', tableHTML.length);
-
     tbody.innerHTML = tableHTML;
 
     // עדכון ספירת רשומות
@@ -623,12 +557,9 @@ function updateAlertsTable(alerts) {
     // עדכון סטטיסטיקות
     updatePageSummaryStats();
 
-    console.log('🔄 === TABLE UPDATE COMPLETED ===');
-
     // הפעלת פילטרים אחרי עדכון הטבלה
     setTimeout(() => {
       if (typeof window.applyFilters === 'function') {
-        console.log('🔄 Applying filters after table update...');
         window.applyFilters();
       }
     }, 100);
@@ -678,20 +609,14 @@ function showAddAlertModal() {
 
   // בדיקת ערכים נוכחיים והצגת הודעות מתאימות
   setTimeout(() => {
-    console.log('🔍 === CHECKING VALUES IN SHOW ADD ALERT MODAL ===');
     const variableElement = document.getElementById('alertVariable');
     const operatorElement = document.getElementById('alertOperator');
 
-    console.log('🔍 Variable element:', variableElement);
-    console.log('🔍 Operator element:', operatorElement);
-
     if (variableElement && !checkAlertVariable(variableElement)) {
-      console.log('❌ Variable check failed');
       // הפונקציה תציג הודעת שגיאה ותאפס את השדה
     }
 
     if (operatorElement && !checkAlertOperator(operatorElement)) {
-      console.log('❌ Operator check failed');
       // הפונקציה תציג הודעת שגיאה ותאפס את השדה
     }
   }, 100);
@@ -746,7 +671,6 @@ function showAddAlertModal() {
  */
 async function loadModalData() {
   try {
-    console.log('🔄 טוען נתונים למודל...');
 
     // טעינת נתונים במקביל
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
@@ -847,11 +771,6 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
 function populateSelect(selectId, data, field, prefix = '') {
   const select = document.getElementById(selectId);
   if (!select) return;
-
-  console.log(`🔄 מילוי ${selectId} עם ${data.length} פריטים מסוג ${prefix}`);
-  if (data.length > 0) {
-    console.log('📋 דוגמה לפריט ראשון:', data[0]);
-  }
 
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
@@ -1670,8 +1589,6 @@ async function deleteAlert(alertId) {
  * @since 2.0
  */
 function sortTable(columnIndex) {
-  console.log(`🔄 מיון טבלת התראות לפי עמודה ${columnIndex}`);
-
   // שימוש בפונקציה הגלובלית החדשה
   if (typeof window.sortTableData === 'function') {
     window.sortTableData(
@@ -1762,28 +1679,20 @@ if (typeof window.toggleTopSection !== 'function') {
 
 if (typeof window.toggleMainSection !== 'function') {
   window.toggleMainSection = function () {
-    console.log('🔄 toggleMainSection fallback נקראה');
     const contentSections = document.querySelectorAll('.content-section');
-    console.log('📋 מספר content-sections נמצא:', contentSections.length);
     const alertsSection = contentSections[0]; // הסקשן הראשון - התראות
 
     if (!alertsSection) {
       console.error('❌ לא נמצא סקשן התראות');
       return;
     }
-    console.log('✅ סקשן התראות נמצא:', alertsSection);
 
     const sectionBody = alertsSection.querySelector('.section-body');
     const toggleBtn = alertsSection.querySelector('button[onclick="toggleMainSection()"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-    console.log('🎯 sectionBody נמצא:', !!sectionBody);
-    console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
-    console.log('🎨 icon נמצא:', !!icon);
-
     if (sectionBody) {
       const isCollapsed = sectionBody.style.display === 'none';
-      console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
 
       if (isCollapsed) {
         sectionBody.style.display = 'block';
@@ -1804,14 +1713,6 @@ if (typeof window.toggleMainSection !== 'function') {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🔄 === DOM CONTENT LOADED (ALERTS) ===');
-
-  // בדיקת זמינות פונקציות גלובליות
-  console.log('🔍 Checking global functions:', {
-    toggleTopSection: typeof window.toggleTopSection,
-    toggleMainSection: typeof window.toggleMainSection,
-    restoreAllSectionStates: typeof window.restoreAllSectionStates
-  });
 
   // שחזור מצב הסקשנים
   restoreAlertsSectionState();
@@ -1833,9 +1734,6 @@ document.addEventListener('DOMContentLoaded', function () {
 // פונקציה לעדכון הטבלה מפילטרים
 if (window.location.pathname.includes('/alerts')) {
   window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-    console.log('🔄 === UPDATE GRID FROM COMPONENT (alerts) ===');
-    console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
-
     // שמירת הפילטרים
     window.selectedStatusesForFilter = selectedStatuses || [];
     window.selectedTypesForFilter = selectedTypes || [];
@@ -1844,7 +1742,6 @@ if (window.location.pathname.includes('/alerts')) {
 
     // טעינת נתונים מחדש עם הפילטרים החדשים
     if (typeof window.loadAlertsData === 'function') {
-      console.log('🔄 Calling loadAlertsData with new filters');
       window.loadAlertsData();
     } else {
       console.error('❌ loadAlertsData function not found');
@@ -1876,7 +1773,6 @@ window.parseAlertCondition = parseAlertCondition;
 
 // פונקציה לטעינת התראות (alias ל-loadAlertsData)
 function loadAlerts() {
-  console.log('🔄 loadAlerts called - redirecting to loadAlertsData');
   return loadAlertsData();
 }
 

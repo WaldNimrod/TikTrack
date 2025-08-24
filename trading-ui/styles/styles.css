@@ -2255,6 +2255,32 @@ button[onclick*="openDesignDetails"]:hover {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
+.actions-cell .btn-sm.btn-info {
+  background: #ffffff !important;
+  color: #17a2b8 !important;
+  border: 1px solid #17a2b8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 0.2rem !important;
+}
+
+.actions-cell .btn-sm.btn-info:hover {
+  background: #ffffff !important;
+  color: #138496 !important;
+  border-color: #138496 !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
 /* ===== סגנונות לכרטיסיות התראות ===== */
 .alerts-cards-container {
   margin: 20px 0;
@@ -2262,6 +2288,114 @@ button[onclick*="openDesignDetails"]:hover {
   background: #f8f9fa;
   border-radius: 12px;
   border: 1px solid #e9ecef;
+}
+
+/* ===== יישור כפתורי פעולה לימין בכל הטבלאות ===== */
+/* יישור כפתורי פעולה לימין (שמאל במערכת RTL) */
+.actions-cell {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* יישור כפתורים בתוך תאי פעולות */
+.actions-cell .btn {
+  text-align: center !important;
+  direction: ltr !important;
+}
+
+/* יישור כפתורי secondary, danger ו-info */
+.actions-cell .btn-sm.btn-secondary,
+.actions-cell .btn-sm.btn-danger,
+.actions-cell .btn-sm.btn-info {
+  text-align: center !important;
+  direction: ltr !important;
+}
+
+/* ===== יישור עמודת פעולות בטבלאות ===== */
+/* יישור עמודת פעולות לימין (שמאל במערכת RTL) - רק תאים עם class actions-cell */
+.table th.actions-cell,
+.table td.actions-cell {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* יישור עמודת פעולות בטבלאות data-table */
+.data-table th.actions-cell,
+.data-table td.actions-cell {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* יישור עמודת פעולות בטבלאות Bootstrap */
+.table-responsive .table th.actions-cell,
+.table-responsive .table td.actions-cell {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* ===== סגנונות מיוחדים לטבלת תכנונים ===== */
+/* ===== סגנונות אחידים לכל הטבלאות ===== */
+/* צביעת עמודת נכס בירוק כהה עם צל */
+.table td.ticker-cell,
+.table td.asset-cell,
+.table td.symbol-cell {
+  color: #0d5a0d !important;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* צביעת עמודת סוג - כחול כהה */
+.table td.type-cell,
+.table td.category-cell,
+.table td.investment-type-cell {
+  color: #1e3a8a !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת צד לפי ערך */
+.table td.side-cell[data-side="Long"],
+.table td.side-cell[data-side="long"],
+.table td.direction-cell[data-direction="Long"],
+.table td.direction-cell[data-direction="long"] {
+  color: #28a745 !important;
+  font-weight: 600;
+}
+
+.table td.side-cell[data-side="Short"],
+.table td.side-cell[data-side="short"],
+.table td.direction-cell[data-direction="Short"],
+.table td.direction-cell[data-direction="short"] {
+  color: #dc3545 !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת יעד בירוק כהה */
+.table td.target-cell,
+.table td.target-price-cell,
+.table td.goal-cell {
+  color: #0d5a0d !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת סטופ באדום כהה */
+.table td.stop-cell,
+.table td.stop-loss-cell,
+.table td.stop-price-cell {
+  color: #8b0000 !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת סטטוס - סגול כהה */
+.table td.status-cell,
+.table td.state-cell {
+  color: #581c87 !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת רווח/הפסד - כחול כהה */
+.table td.pl-cell {
+  color: #1e3a8a !important;
+  font-weight: 600;
 }
 
 .alerts-header {
@@ -3273,3 +3407,93 @@ button[onclick*="showAddAccountModalLocal"]:hover {
 /* הגדרות ישנות למודל התראות הוסרו - עובר לעיצוב גלובלי אחיד */
 
 /* מודל אזהרה על רשומות מקושרות */
+
+/* יישור משמאל לימין לכל התוכן הנוסף בעמוד בסיס נתונים */
+.db-display-page .section-body .table-rules-container * {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* ===== סגנונות להודעות שגיאה מפורטות ===== */
+.no-data-message {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.no-data-message i {
+  display: block;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.no-data-message h5 {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.no-data-message p {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.no-data-message small {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* הודעות שגיאה ספציפיות לכל טבלה */
+.no-data-message.accounts {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.no-data-message.trades {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border-radius: 8px;
+  border: 1px solid #ffc107;
+}
+
+.no-data-message.alerts {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border-radius: 8px;
+  border: 1px solid #dc3545;
+}
+
+.no-data-message.tickers {
+  background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+  border-radius: 8px;
+  border: 1px solid #17a2b8;
+}
+
+.no-data-message.notes {
+  background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+  border-radius: 8px;
+  border: 1px solid #6c757d;
+}
+
+.no-data-message.cash-flows {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-radius: 8px;
+  border: 1px solid #28a745;
+}
+
+.no-data-message.executions {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);
+  border-radius: 8px;
+  border: 1px solid #ff9800;
+}
+
+.no-data-message.trade-plans {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 8px;
+  border: 1px solid #9c27b0;
+}
+
+.no-data-message.constraints {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+  border-radius: 8px;
+  border: 1px solid #4caf50;
+}

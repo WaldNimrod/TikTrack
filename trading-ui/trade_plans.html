@@ -79,7 +79,7 @@
   <script src="scripts/simple-filter.js"></script>
   <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
-  <script src="scripts/planning.js"></script>
+  <script src="scripts/trade_plans.js"></script>
   <script src="scripts/accounts.js"></script>
 </head>
 
@@ -140,15 +140,10 @@
           <!-- My planning header -->
           <div class="section-header">
             <div class="table-title">
-              📋 התכנונים שלי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trade
-                Plans</span>
+              📋 התכנונים שלי
             </div>
             <div class="table-count" id="designsCount">טוען...</div>
             <div style="display: flex; gap: 8px; align-items: center;">
-              <div class="search-input-wrapper">
-                <input type="text" class="search-filter-input" placeholder="חיפוש תכנונים..."
-                  onkeyup="if (typeof window.filterDesignsData === 'function') { window.filterDesignsData([], [], [], null, this.value); } else { console.error('filterDesignsData function not found'); }">
-              </div>
               <button class="refresh-btn"
                 onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); } else { console.error('showAddTradePlanModal function not found'); }"
                 title="הוסף תכנון חדש">
@@ -170,77 +165,67 @@
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>נכס
-                        <br><span class="header-subtitle">Ticker</span>
+                        נכס <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>תאריך
-                        <br><span class="header-subtitle">Date</span>
+                        תאריך <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>סוג
-                        <br><span class="header-subtitle">Type</span>
+                        סוג <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>צד
-                        <br><span class="header-subtitle">Side</span>
+                        צד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>סכום
-                        <br><span class="header-subtitle">Amount</span>
+                        סכום <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>יעד
-                        <br><span class="header-subtitle">Target</span>
+                        יעד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>סטופ
-                        <br><span class="header-subtitle">Stop</span>
+                        סטופ <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>נוכחי
-                        <br><span class="header-subtitle">Current</span>
+                        נוכחי <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>סטטוס
-                        <br><span class="header-subtitle">Status</span>
+                        סטטוס <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="actions-header">
+                    <th class="actions-cell">
                       פעולות
-                      <br><span class="header-subtitle">Actions</span>
                     </th>
                   </tr>
                 </thead>
@@ -440,10 +425,10 @@
       }
     }
 
-    // פונקציות התכנונים מרוכזות ב-designs.js
+    // פונקציות התכנונים מרוכזות ב-trade_plans.js
     // אין צורך להגדיר אותן כאן
 
-    // מערכת המיון מרוכזת ב-designs.js
+    // מערכת המיון מרוכזת ב-trade_plans.js
     // אין צורך להגדיר אותה כאן
 
     // ===== פונקציות פילטרים =====
@@ -461,13 +446,13 @@
       return typeMap[type] || type;
     }
 
-    // פונקציה לטעינת נתוני תכנונים - מרוכזת ב-planning.js
+    // פונקציה לטעינת נתוני תכנונים - מרוכזת ב-trade_plans.js
     // אין צורך להגדיר אותה כאן
 
-    // פונקציה לעדכון הטבלה - מרוכזת ב-planning.js
+    // פונקציה לעדכון הטבלה - מרוכזת ב-trade_plans.js
     // אין צורך להגדיר אותה כאן
 
-    // הגדרת הפונקציות כגלובליות - מרוכזות ב-planning.js
+    // הגדרת הפונקציות כגלובליות - מרוכזות ב-trade_plans.js
     // אין צורך להגדיר אותן כאן
 
     // הגדרת הפונקציה הגלובלית לעדכון מהפילטרים
@@ -501,7 +486,7 @@
       }
     }
 
-    // פונקציות UI מרוכזות ב-planning.js
+    // פונקציות UI מרוכזות ב-trade_plans.js
     // אין צורך להגדיר אותן כאן
 
     // פונקציה לשחזור מצב הסגירה
@@ -666,6 +651,104 @@
 
 
 
+  </script>
+
+  <!-- Page initialization script - loaded after all external scripts -->
+  <script>
+    // אתחול הדף - רץ אחרי שכל הסקריפטים החיצוניים נטענו
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('🚀 טעינת דף תכנון טריידים עם מערכת ראש דף חדשה...');
+
+      // אתחול HeaderSystem
+      if (window.headerSystem && !window.headerSystem.isInitialized) {
+        console.log('✅ אתחול HeaderSystem...');
+        window.headerSystem.init();
+      }
+
+      // טעינת חשבונות לפילטר
+      if (typeof window.loadAccountsFromServer === 'function') {
+        console.log('✅ טעינת חשבונות לפילטר...');
+        window.loadAccountsFromServer().then(() => {
+          if (window.accountsData && window.accountsData.length > 0) {
+            console.log('✅ חשבונות נטענו:', window.accountsData);
+            if (window.updateAccountFilterMenu) {
+              window.updateAccountFilterMenu(window.accountsData);
+            }
+          }
+        });
+      }
+
+      // טעינת מצב הסקשנים לפי הדף הנוכחי
+      if (typeof window.loadSectionStates === 'function') {
+        window.loadSectionStates();
+      }
+
+      // אתחול פילטרים לדף התכנון
+      if (typeof window.initializePageFilters === 'function') {
+        window.initializePageFilters('planning');
+      }
+
+      // שחזור מצב הסגירה
+      if (typeof window.restoreDesignsSectionState === 'function') {
+        window.restoreDesignsSectionState();
+      } else {
+        console.error('restoreDesignsSectionState function not found');
+      }
+
+      // טעינת נתוני תכנונים
+      if (typeof window.loadPlanningData === 'function') {
+        window.loadPlanningData();
+      } else {
+        console.error('loadPlanningData function not found');
+      }
+
+      // טעינת התראות - נטען אוטומטית על ידי ווב קומפוננט
+      console.log('🔄 === ALERTS WILL BE LOADED BY WEB COMPONENT ===');
+
+      // ווב קומפוננט של התראות פעילות נטען אוטומטית
+      console.log('🔄 === ActiveAlerts Web Component will load automatically ===');
+
+      // הגדרת כותרות למיון מיד
+      console.log('🔄 === SETUP SORTABLE HEADERS IMMEDIATE ===');
+      if (typeof window.setupSortableHeaders === 'function') {
+        window.setupSortableHeaders();
+      } else {
+        console.error('setupSortableHeaders function not found');
+      }
+
+      // הגדרת כותרות למיון אחרי טעינת הדף
+      setTimeout(() => {
+        console.log('🔄 === SETUP SORTABLE HEADERS TIMEOUT ===');
+        if (typeof window.setupSortableHeaders === 'function') {
+          window.setupSortableHeaders();
+        } else {
+          console.error('setupSortableHeaders function not found');
+        }
+      }, 500);
+
+      // בדיקת פילטרים שמורים אחרי 1 שנייה
+      setTimeout(() => {
+        // בדיקת פילטרים שמורים (ללא הצגת הודעה)
+        const savedStatuses = localStorage.getItem('designsFilterStatuses');
+        const savedDateRange = localStorage.getItem('designsFilterDateRange');
+        const savedSearch = localStorage.getItem('designsFilterSearch');
+
+        // הגדרת כותרות למיון אחרי טעינת הפילטרים
+        console.log('🔄 === SETUP SORTABLE HEADERS AFTER FILTERS ===');
+        if (typeof window.setupSortableHeaders === 'function') {
+          window.setupSortableHeaders();
+        } else {
+          console.error('setupSortableHeaders function not found');
+        }
+
+        // עדכון סטטיסטיקות הטבלה
+        if (typeof window.updateTableStats === 'function') {
+          window.updateTableStats('planning');
+        } else {
+          console.error('updateTableStats function not found');
+        }
+      }, 1000);
+    });
   </script>
 </body>
 

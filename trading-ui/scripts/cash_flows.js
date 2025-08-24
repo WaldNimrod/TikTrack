@@ -269,6 +269,118 @@ async function loadCashFlows() {
 }
 
 /**
+ * וולידציה של טופס תזרים מזומנים
+ * @param {Object} formData - נתוני הטופס
+ * @returns {boolean} true אם הטופס תקין, false אחרת
+ */
+function validateCashFlowForm(formData) {
+    let isValid = true;
+
+    // ניקוי הודעות שגיאה קודמות
+    clearValidationErrors();
+
+    // וולידציה של חשבון
+    if (!formData.account_id || isNaN(formData.account_id)) {
+        showFieldError('cashFlowAccountId', 'יש לבחור חשבון');
+        isValid = false;
+    }
+
+    // וולידציה של סוג
+    if (!formData.type) {
+        showFieldError('cashFlowType', 'יש לבחור סוג תזרים');
+        isValid = false;
+    }
+
+    // וולידציה של סכום
+    if (!formData.amount || isNaN(formData.amount)) {
+        showFieldError('cashFlowAmount', 'יש להזין סכום תקין');
+        isValid = false;
+    } else if (formData.amount === 0) {
+        showFieldError('cashFlowAmount', 'סכום לא יכול להיות 0');
+        isValid = false;
+    } else if (Math.abs(formData.amount) > 10000000) {
+        showFieldError('cashFlowAmount', 'סכום גבוה מדי (מקסימום 10,000,000)');
+        isValid = false;
+    }
+
+    // וולידציה של מטבע
+    if (!formData.currency_id || isNaN(formData.currency_id)) {
+        showFieldError('cashFlowCurrencyId', 'יש לבחור מטבע');
+        isValid = false;
+    }
+
+    // וולידציה של תאריך
+    if (!formData.date) {
+        showFieldError('cashFlowDate', 'יש להזין תאריך');
+        isValid = false;
+    } else {
+        const date = new Date(formData.date);
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+
+        if (date > maxDate) {
+            showFieldError('cashFlowDate', 'תאריך לא יכול להיות יותר משנה קדימה');
+            isValid = false;
+        }
+
+        const minDate = new Date(2000, 0, 1);
+        if (date < minDate) {
+            showFieldError('cashFlowDate', 'תאריך לא יכול להיות לפני שנת 2000');
+            isValid = false;
+        }
+    }
+
+    // וולידציה של מקור
+    if (!formData.source) {
+        showFieldError('cashFlowSource', 'יש לבחור מקור');
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+/**
+ * הצגת שגיאת וולידציה לשדה
+ * @param {string} fieldId - מזהה השדה
+ * @param {string} message - הודעת השגיאה
+ */
+function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(fieldId + 'Error');
+
+    if (field) {
+        field.classList.add('is-invalid');
+        field.focus();
+    }
+
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+}
+
+/**
+ * ניקוי הודעות שגיאה
+ */
+function clearValidationErrors() {
+    const fields = ['cashFlowAccountId', 'cashFlowType', 'cashFlowAmount', 'cashFlowCurrencyId', 'cashFlowDate', 'cashFlowSource'];
+
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.getElementById(fieldId + 'Error');
+
+        if (field) {
+            field.classList.remove('is-invalid');
+        }
+
+        if (errorDiv) {
+            errorDiv.textContent = '';
+            errorDiv.style.display = 'none';
+        }
+    });
+}
+
+/**
  * שמירת תזרים מזומנים חדש
  */
 async function saveCashFlow() {
@@ -288,9 +400,8 @@ async function saveCashFlow() {
             external_id: '0' // כרגע תמיד 0
         };
 
-        // בדיקת תקינות
-        if (!formData.account_id || !formData.type || !formData.amount || !formData.currency_id || !formData.date) {
-            alert('יש למלא את כל השדות הנדרשים');
+        // בדיקת תקינות מקיפה
+        if (!validateCashFlowForm(formData)) {
             return;
         }
 
@@ -328,6 +439,118 @@ async function saveCashFlow() {
 }
 
 /**
+ * וולידציה של טופס עריכת תזרים מזומנים
+ * @param {Object} formData - נתוני הטופס
+ * @returns {boolean} true אם הטופס תקין, false אחרת
+ */
+function validateEditCashFlowForm(formData) {
+    let isValid = true;
+
+    // ניקוי הודעות שגיאה קודמות
+    clearEditValidationErrors();
+
+    // וולידציה של חשבון
+    if (!formData.account_id || isNaN(formData.account_id)) {
+        showEditFieldError('editCashFlowAccountId', 'יש לבחור חשבון');
+        isValid = false;
+    }
+
+    // וולידציה של סוג
+    if (!formData.type) {
+        showEditFieldError('editCashFlowType', 'יש לבחור סוג תזרים');
+        isValid = false;
+    }
+
+    // וולידציה של סכום
+    if (!formData.amount || isNaN(formData.amount)) {
+        showEditFieldError('editCashFlowAmount', 'יש להזין סכום תקין');
+        isValid = false;
+    } else if (formData.amount === 0) {
+        showEditFieldError('editCashFlowAmount', 'סכום לא יכול להיות 0');
+        isValid = false;
+    } else if (Math.abs(formData.amount) > 10000000) {
+        showEditFieldError('editCashFlowAmount', 'סכום גבוה מדי (מקסימום 10,000,000)');
+        isValid = false;
+    }
+
+    // וולידציה של מטבע
+    if (!formData.currency_id || isNaN(formData.currency_id)) {
+        showEditFieldError('editCashFlowCurrencyId', 'יש לבחור מטבע');
+        isValid = false;
+    }
+
+    // וולידציה של תאריך
+    if (!formData.date) {
+        showEditFieldError('editCashFlowDate', 'יש להזין תאריך');
+        isValid = false;
+    } else {
+        const date = new Date(formData.date);
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+
+        if (date > maxDate) {
+            showEditFieldError('editCashFlowDate', 'תאריך לא יכול להיות יותר משנה קדימה');
+            isValid = false;
+        }
+
+        const minDate = new Date(2000, 0, 1);
+        if (date < minDate) {
+            showEditFieldError('editCashFlowDate', 'תאריך לא יכול להיות לפני שנת 2000');
+            isValid = false;
+        }
+    }
+
+    // וולידציה של מקור
+    if (!formData.source) {
+        showEditFieldError('editCashFlowSource', 'יש לבחור מקור');
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+/**
+ * הצגת שגיאת וולידציה לשדה עריכה
+ * @param {string} fieldId - מזהה השדה
+ * @param {string} message - הודעת השגיאה
+ */
+function showEditFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(fieldId + 'Error');
+
+    if (field) {
+        field.classList.add('is-invalid');
+        field.focus();
+    }
+
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+}
+
+/**
+ * ניקוי הודעות שגיאה לעריכה
+ */
+function clearEditValidationErrors() {
+    const fields = ['editCashFlowAccountId', 'editCashFlowType', 'editCashFlowAmount', 'editCashFlowCurrencyId', 'editCashFlowDate', 'editCashFlowSource'];
+
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.getElementById(fieldId + 'Error');
+
+        if (field) {
+            field.classList.remove('is-invalid');
+        }
+
+        if (errorDiv) {
+            errorDiv.textContent = '';
+            errorDiv.style.display = 'none';
+        }
+    });
+}
+
+/**
  * עדכון תזרים מזומנים
  */
 async function updateCashFlow() {
@@ -349,9 +572,8 @@ async function updateCashFlow() {
             external_id: '0' // כרגע תמיד 0
         };
 
-        // בדיקת תקינות
-        if (!formData.account_id || !formData.type || !formData.amount || !formData.currency_id || !formData.date) {
-            alert('יש למלא את כל השדות הנדרשים');
+        // בדיקת תקינות מקיפה
+        if (!validateEditCashFlowForm(formData)) {
             return;
         }
 
@@ -539,25 +761,42 @@ function renderCashFlowsTable() {
 
     tbody.innerHTML = '';
 
+    if (!cashFlowsData || cashFlowsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
+        return;
+    }
+
     cashFlowsData.forEach(cashFlow => {
         const row = document.createElement('tr');
         const accountName = cashFlow.account_name || `חשבון ${cashFlow.account_id}`;
         const currencySymbol = cashFlow.currency_symbol || '$';
 
+        // קבלת סוג עם צבע
+        const typeDisplay = getCashFlowTypeWithColor(cashFlow.type);
+
+        // עיצוב סכום עם יישור נכון וצביעה
+        const amountDisplay = formatCashFlowAmount(cashFlow.amount);
+
+        // עיצוב שער עם 2 ספרות אחרי הנקודה
+        const rateDisplay = formatUsdRate(cashFlow.usd_rate);
+
         row.innerHTML = `
-            <td><strong>${accountName}</strong></td>
-            <td><strong>${window.translateCashFlowType ? window.translateCashFlowType(cashFlow.type) : cashFlow.type}</strong></td>
-            <td>${window.colorAmount(cashFlow.amount)}</td>
-            <td>${currencySymbol}</td>
-            <td>${cashFlow.usd_rate || '1.000000'}</td>
-            <td>${formatDate(cashFlow.date)}</td>
+            <td class="ticker-cell"><strong>${accountName}</strong></td>
+            <td class="type-cell">${typeDisplay}</td>
+            <td style="text-align: left; direction: ltr;">${amountDisplay}</td>
+            <td style="text-align: center;">${currencySymbol}</td>
+            <td style="text-align: center;">${rateDisplay}</td>
+            <td style="text-align: center;">${formatDate(cashFlow.date)}</td>
             <td>${cashFlow.description || '-'}</td>
             <td>${window.translateCashFlowSource ? window.translateCashFlowSource(cashFlow.source) : cashFlow.source}</td>
             <td>${cashFlow.external_id || '0'}</td>
-            <td>${formatDateTime(cashFlow.created_at)}</td>
-            <td>
+            <td style="text-align: center;">${formatDateOnly(cashFlow.created_at)}</td>
+            <td class="actions-cell">
                 <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">✏️</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>
+                <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${cashFlow.id})" title="צפה באלמנטים מקושרים">
+                  🔗
+                </button>
             </td>
         `;
         tbody.appendChild(row);
@@ -574,13 +813,17 @@ function renderCashFlowsTable() {
  * עדכון סטטיסטיקות סיכום
  */
 function updatePageSummaryStats() {
+    if (!cashFlowsData) {
+        cashFlowsData = [];
+    }
+
     const totalCashFlows = cashFlowsData.length;
     const totalDeposits = cashFlowsData
         .filter(cf => cf.type === 'deposit')
-        .reduce((sum, cf) => sum + parseFloat(cf.amount), 0);
+        .reduce((sum, cf) => sum + parseFloat(cf.amount || 0), 0);
     const totalWithdrawals = cashFlowsData
         .filter(cf => cf.type === 'withdrawal')
-        .reduce((sum, cf) => sum + parseFloat(cf.amount), 0);
+        .reduce((sum, cf) => sum + parseFloat(cf.amount || 0), 0);
     const currentBalance = totalDeposits - totalWithdrawals;
 
     document.getElementById('totalCashFlows').textContent = totalCashFlows;
@@ -621,6 +864,73 @@ function formatDateTime(dateTimeString) {
     return date.toLocaleString('he-IL');
 }
 
+/**
+ * פורמט תאריך בלבד (ללא שעה)
+ */
+function formatDateOnly(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('he-IL');
+}
+
+/**
+ * קבלת סוג תזרים עם צבע
+ */
+function getCashFlowTypeWithColor(type) {
+    const typeTranslation = window.translateCashFlowType ? window.translateCashFlowType(type) : type;
+
+    let typeClass = '';
+    switch (type) {
+        case 'deposit':
+            typeClass = 'type-investment'; // ירוק - הפקדה
+            break;
+        case 'withdrawal':
+            typeClass = 'type-swing'; // כחול - משיכה
+            break;
+        case 'dividend':
+            typeClass = 'type-passive'; // צהוב - דיבידנד
+            break;
+        case 'fee':
+            typeClass = 'type-crypto'; // סגול - עמלה
+            break;
+        case 'interest':
+            typeClass = 'type-investment'; // ירוק - ריבית
+            break;
+        default:
+            typeClass = 'type-other';
+    }
+
+    return `<span class="${typeClass}"><strong>${typeTranslation}</strong></span>`;
+}
+
+/**
+ * עיצוב סכום עם יישור נכון וצביעה
+ */
+function formatCashFlowAmount(amount) {
+    if (!amount && amount !== 0) return '-';
+
+    const numAmount = parseFloat(amount);
+    const isPositive = numAmount >= 0;
+    const absAmount = Math.abs(numAmount);
+
+    // עיצוב הסכום עם סימן בצד הנכון (שמאל)
+    const formattedAmount = `${isPositive ? '+' : '-'}$${absAmount.toFixed(2)}`;
+
+    // צביעה לפי סכום
+    const colorClass = isPositive ? 'profit-positive' : 'profit-negative';
+
+    return `<span class="${colorClass}">${formattedAmount}</span>`;
+}
+
+/**
+ * עיצוב שער דולר עם 2 ספרות אחרי הנקודה
+ */
+function formatUsdRate(rate) {
+    if (!rate) return '1.00';
+    const numRate = parseFloat(rate);
+    return numRate.toFixed(2);
+}
+
 // ========================================
 // פונקציות עדכון טבלה
 // ========================================
@@ -632,60 +942,23 @@ function formatDateTime(dateTimeString) {
 function updateCashFlowsTable(cashFlows) {
     console.log('🔄 עדכון טבלת תזרימי מזומנים עם', cashFlows.length, 'רשומות');
 
-    const tbody = document.querySelector('#cashFlowsTable tbody');
-    if (!tbody) {
-        console.error('❌ לא נמצא tbody לטבלת תזרימי מזומנים');
-        return;
-    }
+    // עדכון הנתונים הגלובליים
+    window.cashFlowsData = cashFlows;
+    cashFlowsData = cashFlows;
 
-    if (cashFlows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
-        return;
-    }
+    // רינדור הטבלה
+    renderCashFlowsTable();
 
-    tbody.innerHTML = cashFlows.map(cashFlow => {
-        // המרת סוגים לעברית לפילטר
-        const typeForFilter = cashFlow.type === 'deposit' ? 'הפקדה' :
-            cashFlow.type === 'withdrawal' ? 'משיכה' :
-                cashFlow.type === 'dividend' ? 'דיבידנד' :
-                    cashFlow.type === 'fee' ? 'עמלה' :
-                        cashFlow.type === 'interest' ? 'ריבית' : cashFlow.type;
-
-        // המרת סטטוס לפילטר
-        const statusForFilter = cashFlow.status === 'completed' ? 'הושלם' :
-            cashFlow.status === 'pending' ? 'ממתין' :
-                cashFlow.status === 'cancelled' ? 'בוטל' : cashFlow.status;
-
-        return `
-            <tr>
-                <td data-account="${cashFlow.account_name || cashFlow.account_id || '-'}">${cashFlow.account_name || cashFlow.account_id || '-'}</td>
-                <td data-type="${typeForFilter}">${cashFlow.type}</td>
-                <td>${cashFlow.description || '-'}</td>
-                <td>${window.colorAmount(cashFlow.amount || 0, `$${cashFlow.amount ? cashFlow.amount.toLocaleString() : '0'}`)}</td>
-                <td data-status="${statusForFilter}">${cashFlow.status}</td>
-                <td data-date="${cashFlow.date}">${formatDate(cashFlow.date)}</td>
-                <td>${cashFlow.notes || '-'}</td>
-                <td>
-                    <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">✏️</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">X</button>
-                </td>
-            </tr>
-        `;
-    }).join('');
-
-    // עדכון הספירה
-    const countElement = document.querySelector('.table-count');
-    if (countElement) {
-        countElement.textContent = `${cashFlows.length} תזרימי מזומנים`;
-    }
+    // עדכון סטטיסטיקות
+    updatePageSummaryStats();
 }
 
 // הגדרת הפונקציה כגלובלית
 window.updateCashFlowsTable = updateCashFlowsTable;
 
 // פונקציית פילטור מקומי לתזרימי מזומנים
-function filterCashFlowsLocally(cashFlows, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
-    console.log('🔍 filterCashFlowsLocally called with:', { selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm });
+function filterCashFlowsLocally(cashFlows, selectedTypes, selectedAccounts, dateRange, searchTerm) {
+    console.log('🔍 filterCashFlowsLocally called with:', { selectedTypes, selectedAccounts, dateRange, searchTerm });
 
     return cashFlows.filter(cashFlow => {
         // פילטר חיפוש
@@ -693,11 +966,11 @@ function filterCashFlowsLocally(cashFlows, selectedStatuses, selectedTypes, sele
             const searchLower = searchTerm.toLowerCase();
             const accountName = cashFlow.account_name || '';
             const description = cashFlow.description || '';
-            const notes = cashFlow.notes || '';
+            const externalId = cashFlow.external_id || '';
 
             if (!accountName.toLowerCase().includes(searchLower) &&
                 !description.toLowerCase().includes(searchLower) &&
-                !notes.toLowerCase().includes(searchLower)) {
+                !externalId.toLowerCase().includes(searchLower)) {
                 return false;
             }
         }
@@ -715,16 +988,7 @@ function filterCashFlowsLocally(cashFlows, selectedStatuses, selectedTypes, sele
             }
         }
 
-        // פילטר סטטוס
-        if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('הכול')) {
-            const cashFlowStatus = cashFlow.status === 'completed' ? 'הושלם' :
-                cashFlow.status === 'pending' ? 'ממתין' :
-                    cashFlow.status === 'cancelled' ? 'בוטל' : cashFlow.status;
 
-            if (!selectedStatuses.includes(cashFlowStatus)) {
-                return false;
-            }
-        }
 
         // פילטר חשבון
         if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('הכול')) {
@@ -813,7 +1077,6 @@ async function loadCashFlows() {
                 console.log('🔍 יש פילטרים פעילים, מסנן נתונים מקומית');
                 const filteredData = filterCashFlowsLocally(
                     cashFlows,
-                    filters.status,
                     filters.type,
                     filters.account,
                     filters.dateRange,
@@ -838,9 +1101,12 @@ async function loadCashFlows() {
                 type: 'deposit',
                 description: 'הפקדה ראשונית',
                 amount: 10000,
-                status: 'completed',
+                currency: 'USD',
+                exchange_rate: 1.00,
                 date: '2025-01-15',
-                notes: 'הפקדה ראשונית'
+                source: 'ידני',
+                external_id: '',
+                created_at: '2025-01-15T10:00:00'
             }
         ];
 

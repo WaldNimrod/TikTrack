@@ -24,6 +24,117 @@
 
 console.log('🔄 database.js נטען!');
 
+// פונקציה לטעינת אילוצים דינמית
+async function loadConstraints() {
+    try {
+        console.log('🔄 טעינת אילוצים מהשרת');
+        const response = await fetch('/api/v1/constraints/');
+        if (response.ok) {
+            const data = await response.json();
+            allData.constraints = data.data || data;
+            console.log('✅ נטענו', allData.constraints.length, 'אילוצים');
+            updateConstraintsDisplay();
+        } else {
+            console.error('❌ שגיאה בטעינת אילוצים');
+        }
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת אילוצים:', error);
+    }
+}
+
+// פונקציה לעדכון תצוגת האילוצים
+function updateConstraintsDisplay() {
+    // קבלת כל הטבלאות עם האילוצים שלהן
+    const tableConstraints = {};
+    
+    // קיבוץ אילוצים לפי טבלה
+    allData.constraints.forEach(constraint => {
+        if (!tableConstraints[constraint.table_name]) {
+            tableConstraints[constraint.table_name] = [];
+        }
+        tableConstraints[constraint.table_name].push(constraint);
+    });
+    
+    // עדכון כל טבלה
+    Object.keys(tableConstraints).forEach(tableName => {
+        updateTableConstraints(tableName, tableConstraints[tableName]);
+    });
+}
+
+// פונקציה לעדכון אילוצים של טבלה ספציפית
+function updateTableConstraints(tableName, constraints) {
+    // מיפוי שמות טבלאות לאלמנטים ב-HTML
+    const tableMapping = {
+        'trade_plans': 'tradePlans',
+        'trades': 'trades', 
+        'accounts': 'accounts',
+        'tickers': 'tickers',
+        'executions': 'executions',
+        'cash_flows': 'cashFlows',
+        'alerts': 'alerts',
+        'notes': 'notes'
+    };
+    
+    const elementId = tableMapping[tableName];
+    if (!elementId) return;
+    
+    // חיפוש האלמנט של רשימת האילוצים
+    const rulesContainer = document.querySelector(`#${elementId}Section .table-rules-list`);
+    if (!rulesContainer) return;
+    
+    // יצירת HTML לאילוצים
+    const constraintsHtml = constraints.map(constraint => {
+        const typeClass = getConstraintTypeClass(constraint.constraint_type);
+        const description = getConstraintDescription(constraint);
+        return `<li class="${typeClass}">${description}</li>`;
+    }).join('');
+    
+    // עדכון התוכן
+    rulesContainer.innerHTML = constraintsHtml;
+    console.log(`✅ עודכנו אילוצים עבור טבלה ${tableName}: ${constraints.length} אילוצים`);
+}
+
+// פונקציה לקבלת CSS class לפי סוג אילוץ
+function getConstraintTypeClass(constraintType) {
+    switch (constraintType) {
+        case 'NOT_NULL': return 'constraint';
+        case 'UNIQUE': return 'unique';
+        case 'FOREIGN_KEY': return 'foreign-key';
+        case 'CHECK': return 'check';
+        case 'ENUM': return 'enum';
+        case 'RANGE': return 'range';
+        case 'COMPUTED': return 'computed';
+        default: return 'constraint';
+    }
+}
+
+// פונקציה לקבלת תיאור האילוץ
+function getConstraintDescription(constraint) {
+    const columnName = constraint.column_name;
+    const constraintType = constraint.constraint_type;
+    
+    switch (constraintType) {
+        case 'NOT_NULL':
+            return `${columnName} is required (NOT NULL)`;
+        case 'UNIQUE':
+            return `${columnName} must be unique`;
+        case 'FOREIGN_KEY':
+            return `Foreign key: ${constraint.constraint_definition}`;
+        case 'CHECK':
+            return `Check constraint: ${constraint.constraint_definition}`;
+        case 'ENUM':
+            const enumValues = constraint.enum_values ? 
+                constraint.enum_values.map(ev => ev.value).join(', ') : '';
+            return `${columnName} must be one of: ${enumValues}`;
+        case 'RANGE':
+            return `Range constraint: ${constraint.constraint_definition}`;
+        case 'COMPUTED':
+            return `Computed field: ${constraint.constraint_definition}`;
+        default:
+            return constraint.constraint_definition || `${constraintType} constraint on ${columnName}`;
+    }
+}
+
 // משתנים גלובליים
 let allData = {
   accounts: [],
@@ -34,7 +145,7 @@ let allData = {
   cashFlows: [],
   alerts: [],
   notes: [],
-
+  constraints: []
 };
 
 // פונקציות לפתיחה/סגירה של סקשנים
@@ -193,7 +304,8 @@ async function loadAllData() {
       executionsResponse,
       cashFlowsResponse,
       alertsResponse,
-      notesResponse
+      notesResponse,
+      constraintsResponse
     ] = await Promise.all([
       fetch('/api/v1/accounts/').then(r => {
         console.log('📡 Accounts API response status:', r.status);
@@ -250,6 +362,13 @@ async function loadAllData() {
       }).catch(e => {
         console.error('❌ Notes API error:', e);
         return { data: [] };
+      }),
+      fetch('/api/v1/constraints/').then(r => {
+        console.log('📡 Constraints API response status:', r.status);
+        return r.json();
+      }).catch(e => {
+        console.error('❌ Constraints API error:', e);
+        return { data: [] };
       })
     ]);
 
@@ -261,7 +380,8 @@ async function loadAllData() {
       executions: executionsResponse,
       cashFlows: cashFlowsResponse,
       alerts: alertsResponse,
-      notes: notesResponse
+      notes: notesResponse,
+      constraints: constraintsResponse
     });
 
     // שמירת הנתונים
@@ -273,6 +393,7 @@ async function loadAllData() {
     allData.cashFlows = cashFlowsResponse.data || cashFlowsResponse || [];
     allData.alerts = alertsResponse.data || alertsResponse || [];
     allData.notes = notesResponse.data || notesResponse || [];
+    allData.constraints = constraintsResponse.data || constraintsResponse || [];
 
     console.log('✅ נטענו נתונים:', {
       accounts: allData.accounts.length,
@@ -283,11 +404,15 @@ async function loadAllData() {
       cashFlows: allData.cashFlows.length,
       alerts: allData.alerts.length,
       notes: allData.notes.length,
+      constraints: allData.constraints.length,
     });
 
     console.log('🔄 מתחיל עדכון טבלאות...');
     // עדכון כל הטבלאות
     updateAllTables();
+    
+    // עדכון אילוצים
+    updateConstraintsDisplay();
     updateStatistics();
     console.log('✅ עדכון טבלאות הושלם');
 
@@ -681,9 +806,11 @@ function updateAlertsTable() {
           <span class="btn-icon">✏️</span>
         </button>
         <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
-        ${alert.status && alert.status !== 'cancelled' ?
-        `<button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>` :
-        ''}
+        ${alert.status === 'open' ? `
+        <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>
+        ` : `
+        <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
+        `}
       </td>
     </tr>
   `}).join('');

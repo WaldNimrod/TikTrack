@@ -5,23 +5,25 @@ TikTrack is a comprehensive trading management system designed to simplify portf
 
 ## Core Features
 
-### 1. Trading Management
-- **Trade Tracking**: Monitor open and closed trades
+### 1. Trading Management with Advanced Validation
+- **Trade Tracking**: Monitor open and closed trades with comprehensive validation
 - **Investment Types**: Support for swing, investment, and passive trading
-- **Profit/Loss Tracking**: Real-time P&L calculations
-- **Trade Plans**: Planning and execution tracking
+- **Profit/Loss Tracking**: Real-time P&L calculations with range validation
+- **Trade Plans**: Full CRUD operations with form validation and business rules
+- **Execution Management**: Trade execution tracking with price and quantity validation
 
-### 2. Account Management
-- **Multi-Account Support**: Manage multiple trading accounts
-- **Account Status**: Active, inactive, and suspended states
-- **Currency Support**: Multi-currency account management
-- **Balance Tracking**: Real-time account balances
+### 2. Account Management with Enhanced Validation
+- **Multi-Account Support**: Manage multiple trading accounts with name validation
+- **Account Status**: Active, inactive, and suspended states with validation
+- **Currency Support**: Multi-currency account management with validation
+- **Balance Tracking**: Real-time account balances with range validation
+- **Security Validation**: Input sanitization and special character prevention
 
-### 3. Alert System
-- **Price Alerts**: Set price-based notifications
-- **Condition Alerts**: Complex condition monitoring
-- **Email Notifications**: Automated alert delivery
-- **Alert Management**: Create, edit, and delete alerts
+### 3. Advanced Alert System
+- **Price Alerts**: Set price-based notifications with value validation
+- **Condition Alerts**: Complex condition monitoring with operator validation
+- **Status Management**: Sophisticated alert state combinations
+- **Alert Management**: Full CRUD operations with comprehensive validation
 
 ### 4. Dynamic Constraint Management System
 - **Database Constraints**: Dynamic constraint definition and management
@@ -30,13 +32,22 @@ TikTrack is a comprehensive trading management system designed to simplify portf
 - **Validation System**: Real-time constraint validation
 - **Migration Support**: Automated constraint migration tools
 
-### 5. Notes and Documentation
-- **Trade Notes**: Document trading decisions and analysis
-- **File Attachments**: Support for PDF, images, and documents
-- **Search and Filter**: Advanced note management
-- **Rich Text Support**: Formatted note content
+### 5. Notes and Documentation with Validation
+- **Trade Notes**: Document trading decisions with content validation (1-10,000 chars)
+- **File Attachments**: Support for PDF, images, documents with size/type validation
+- **Content Validation**: Real-time validation with clear error messages
+- **Linking Validation**: Secure linking to accounts, trades, plans, and tickers
 
-### 6. Preferences and Configuration
+### 6. Comprehensive Validation System
+- **Frontend Validation**: JavaScript validation across all 7 pages
+- **Backend Integration**: Real-time validation with ValidationService
+- **Input Sanitization**: XSS prevention and security validation
+- **Business Rules**: Status combinations, dependencies, constraints
+- **User Experience**: Clear error messages, auto-focus, real-time feedback
+- **Range Validation**: Min/max values for numbers, dates, text lengths
+- **Format Validation**: Email, phone, symbols, currency formats
+
+### 7. Preferences and Configuration
 - **User Preferences**: Personalized settings
 - **System Configuration**: Global system settings
 - **Theme Support**: Light and dark themes

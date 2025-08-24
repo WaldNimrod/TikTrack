@@ -559,3 +559,93 @@ class ConstraintService:
             return []
         finally:
             conn.close()
+    
+    def validate_active_trades_constraint(self) -> Tuple[bool, List[str]]:
+        """
+        Validate that all tickers active_trades field matches actual open trades/plans
+        
+        Returns:
+            Tuple of (is_valid, list_of_errors)
+        """
+        conn = self.get_db_connection()
+        cursor = conn.cursor()
+        
+        try:
+            logger.info("Validating active_trades constraint...")
+            
+            # Get all tickers with their current active_trades value
+            cursor.execute("""
+                SELECT id, symbol, active_trades 
+                FROM tickers
+            """)
+            
+            tickers = cursor.fetchall()
+            errors = []
+            
+            for ticker in tickers:
+                ticker_id, symbol, current_active = ticker
+                
+                # Calculate what active_trades should be
+                cursor.execute("""
+                    SELECT 
+                        (SELECT COUNT(*) > 0 FROM trades WHERE ticker_id = ? AND status = 'open') OR
+                        (SELECT COUNT(*) > 0 FROM trade_plans WHERE ticker_id = ? AND status = 'open')
+                """, (ticker_id, ticker_id))
+                
+                should_be_active = bool(cursor.fetchone()[0])
+                
+                if current_active != should_be_active:
+                    error_msg = f"Ticker {symbol} (ID: {ticker_id}): active_trades={current_active}, should be={should_be_active}"
+                    errors.append(error_msg)
+                    logger.warning(error_msg)
+            
+            is_valid = len(errors) == 0
+            logger.info(f"Active trades constraint validation: {len(errors)} errors found")
+            
+            return is_valid, errors
+            
+        except Exception as e:
+            logger.error(f"Error validating active_trades constraint: {e}")
+            return False, [f"Validation error: {str(e)}"]
+        finally:
+            conn.close()
+    
+    def fix_active_trades_constraint(self) -> Tuple[bool, int]:
+        """
+        Fix all tickers active_trades field to match actual open trades/plans
+        
+        Returns:
+            Tuple of (success, number_of_fixed_tickers)
+        """
+        conn = self.get_db_connection()
+        cursor = conn.cursor()
+        
+        try:
+            logger.info("Fixing active_trades constraint...")
+            
+            # Update all tickers active_trades field
+            cursor.execute("""
+                UPDATE tickers 
+                SET active_trades = (
+                    SELECT COUNT(*) > 0 
+                    FROM trades 
+                    WHERE ticker_id = tickers.id AND status = 'open'
+                ) OR (
+                    SELECT COUNT(*) > 0 
+                    FROM trade_plans 
+                    WHERE ticker_id = tickers.id AND status = 'open'
+                )
+            """)
+            
+            fixed_count = cursor.rowcount
+            conn.commit()
+            
+            logger.info(f"Fixed active_trades for {fixed_count} tickers")
+            return True, fixed_count
+            
+        except Exception as e:
+            logger.error(f"Error fixing active_trades constraint: {e}")
+            conn.rollback()
+            return False, 0
+        finally:
+            conn.close()

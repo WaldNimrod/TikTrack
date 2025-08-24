@@ -1309,7 +1309,7 @@ class HeaderSystem {
     }
   }
 
-  // הוספת event listeners לכפתורי הניווט (מתוך menu.js)
+  // הוספת event listeners לכפתורי הניווט (מתוך header-system.js)
   addMenuEventListeners() {
     const navItems = document.querySelectorAll('.tiktrack-nav-item');
 
@@ -1324,7 +1324,7 @@ class HeaderSystem {
     });
   }
 
-  // הוספת event listeners לתפריט הנפתח (מתוך menu.js)
+  // הוספת event listeners לתפריט הנפתח (מתוך header-system.js)
   addDropdownEventListeners() {
     const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
 
@@ -2017,29 +2017,16 @@ class HeaderSystem {
 
   // פונקציה לעדכון טקסטים
   updateFilterTexts() {
-    // פונקציות לעדכון טקסטי פילטרים
-    if (typeof updateStatusFilterDisplayText === 'function') {
-      updateStatusFilterDisplayText();
-    } else {
-      console.warn('⚠️ updateStatusFilterDisplayText not found');
-    }
+    // קריאה ישירה לפונקציות של המחלקה
+    this.updateStatusFilterDisplayText();
+    this.updateTypeFilterDisplayText();
+    this.updateDateRangeFilterDisplayText();
 
-    if (typeof updateTypeFilterDisplayText === 'function') {
-      updateTypeFilterDisplayText();
-    } else {
-      console.warn('⚠️ updateTypeFilterDisplayText not found');
-    }
-
+    // קריאה לפונקציה החיצונית של חשבונות
     if (typeof updateAccountFilterDisplayText === 'function') {
       updateAccountFilterDisplayText();
     } else {
       console.warn('⚠️ updateAccountFilterDisplayText not found');
-    }
-
-    if (typeof updateDateRangeFilterDisplayText === 'function') {
-      updateDateRangeFilterDisplayText();
-    } else {
-      console.warn('⚠️ updateDateRangeFilterDisplayText not found');
     }
   }
 
@@ -2199,6 +2186,70 @@ window.updateDateRangeFilterDisplayText = function () {
     window.headerSystem.updateDateRangeFilterDisplayText();
   }
 };
+
+// ===== פונקציות toggle לפילטרים =====
+
+/**
+ * פתיחה/סגירה של פילטר סטטוס
+ */
+function toggleStatusFilter() {
+  console.log('🔄 toggleStatusFilter called');
+  const menu = document.getElementById('statusFilterMenu');
+  if (menu) {
+    menu.classList.toggle('show');
+    console.log('🔄 Status filter menu toggled, show class:', menu.classList.contains('show'));
+  } else {
+    console.warn('⚠️ Status filter menu not found');
+  }
+}
+
+/**
+ * פתיחה/סגירה של פילטר טיפוס
+ */
+function toggleTypeFilter() {
+  console.log('🔄 toggleTypeFilter called');
+  const menu = document.getElementById('typeFilterMenu');
+  if (menu) {
+    menu.classList.toggle('show');
+    console.log('🔄 Type filter menu toggled, show class:', menu.classList.contains('show'));
+  } else {
+    console.warn('⚠️ Type filter menu not found');
+  }
+}
+
+/**
+ * פתיחה/סגירה של פילטר חשבונות
+ */
+function toggleAccountFilter() {
+  console.log('🔄 toggleAccountFilter called');
+  const menu = document.getElementById('accountFilterMenu');
+  if (menu) {
+    menu.classList.toggle('show');
+    console.log('🔄 Account filter menu toggled, show class:', menu.classList.contains('show'));
+  } else {
+    console.warn('⚠️ Account filter menu not found');
+  }
+}
+
+/**
+ * פתיחה/סגירה של פילטר תאריכים
+ */
+function toggleDateRangeFilter() {
+  console.log('🔄 toggleDateRangeFilter called');
+  const menu = document.getElementById('dateRangeFilterMenu');
+  if (menu) {
+    menu.classList.toggle('show');
+    console.log('🔄 Date range filter menu toggled, show class:', menu.classList.contains('show'));
+  } else {
+    console.warn('⚠️ Date range filter menu not found');
+  }
+}
+
+// ייצוא פונקציות toggle לגלובל
+window.toggleStatusFilter = toggleStatusFilter;
+window.toggleTypeFilter = toggleTypeFilter;
+window.toggleAccountFilter = toggleAccountFilter;
+window.toggleDateRangeFilter = toggleDateRangeFilter;
 
 // אתחול אוטומטי
 document.addEventListener('DOMContentLoaded', () => {

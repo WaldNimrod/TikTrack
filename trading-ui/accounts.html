@@ -81,7 +81,9 @@
   <script src="scripts/header-system.js"></script>
   <script src="scripts/console-cleanup.js"></script>
   <script src="scripts/simple-filter.js"></script>
-  <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/translation-utils.js
+  <script src=" scripts/data-utils.js"></script>
+  <script src="scripts/ui-utils.js"></script>"></script>
   <script src="scripts/table-mappings.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/alerts.js"></script>
@@ -154,61 +156,58 @@
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(0)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>שם
-                        <br><span class="header-subtitle">Name</span>
+                        שם <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(1)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>מטבע
-                        <br><span class="header-subtitle">Currency</span>
+                        מטבע <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(2)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>סטטוס
-                        <br><span class="header-subtitle">Status</span>
+                        סטטוס <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(3)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>יתרה במזומן
-                        <br><span class="header-subtitle">Cash Balance</span>
+                        יתרה במזומן <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(4)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>ערך כולל
-                        <br><span class="header-subtitle">Total Value</span>
+                        ערך כולל <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(5)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>רווח/הפסד
-                        <br><span class="header-subtitle">P&L</span>
+                        רווח/הפסד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(6)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        <span class="sort-icon">↕</span>הערות
-                        <br><span class="header-subtitle">Notes</span>
+                        הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="actions-header">
-                      פעולות
-                      <br><span class="header-subtitle">Actions</span>
-                    </th>
+                    <th class="actions-header">פעולות</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="8" class="loading">טוען חשבונות...</td>
+                    <td colspan="8" class="text-center text-muted">
+                      <div class="no-data-message accounts">
+                        <i class="fas fa-database" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <h5>אין נתונים זמינים</h5>
+                        <p>לא נמצאו חשבונות במערכת</p>
+                        <small>הנתונים יוצגו כאן כאשר יתווספו חשבונות למערכת</small>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>

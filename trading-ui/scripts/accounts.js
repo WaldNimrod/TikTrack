@@ -255,22 +255,15 @@ async function loadAllAccountsFromServer() {
 
       // החזרת הנתונים לטעינה חוזרת
       return openAccounts;
-      if (typeof window.updateAccountFilterMenuDirectly === 'function') {
-        window.updateAccountFilterMenuDirectly(openAccounts);
-      } else {
-        console.log('🔄 updateAccountFilterMenuDirectly not available either');
-      }
+    } else {
+      console.log('🔄 Error loading all accounts from server, status:', response.status);
+      return [];
     }
-    return openAccounts;
-  } else {
-    console.log('🔄 Error loading all accounts from server, status:', response.status);
+
+  } catch (error) {
+    console.log('🔄 Error loading all accounts from server:', error);
     return [];
   }
-
-} catch (error) {
-  console.log('🔄 Error loading all accounts from server:', error);
-  return [];
-}
 }
 
 // פונקציה לטעינת חשבונות ברירת מחדל
@@ -308,7 +301,8 @@ async function loadAccountsData() {
       return accounts;
     } else {
       // קריאה ישירה ל-API
-      const response = await fetch('/api/v1/accounts/');
+      const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+      const response = await fetch(`${base}/api/v1/accounts/`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -360,9 +354,9 @@ function updateAccountsTable(accounts) {
 
     return `
     <tr data-account-id="${account.id}">
-      <td data-account="${account.name || '-'}"><strong>${account.name || '-'}</strong></td>
+      <td class="ticker-cell" data-account="${account.name || '-'}"><strong>${account.name || '-'}</strong></td>
       <td>${account.currency || '-'}</td>
-      <td data-status="${statusForFilter}">
+      <td class="status-cell" data-status="${statusForFilter}">
         <span class="status-badge status-${account.status}">
           ${statusForFilter}
         </span>
@@ -372,13 +366,13 @@ function updateAccountsTable(accounts) {
       <td>${window.colorAmount(account.total_pl || 0, `$${account.total_pl ? account.total_pl.toLocaleString() : '0'}`)}</td>
       <td>${account.notes || '-'}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-outline-primary" onclick="editAccount(${account.id})" title="ערוך חשבון">
+        <button class="btn btn-sm btn-secondary" onclick="editAccount(${account.id})" title="ערוך חשבון">
           ✏️
         </button>
-        <button class="btn btn-sm btn-outline-danger" onclick="deleteAccount(${account.id})" title="מחק חשבון">
+        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק חשבון">
           🗑️
         </button>
-        <button class="btn btn-sm btn-outline-info" onclick="viewLinkedItems(${account.id})" title="צפה באלמנטים מקושרים">
+        <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${account.id})" title="צפה באלמנטים מקושרים">
           🔗
         </button>
       </td>
@@ -822,7 +816,7 @@ function createAccountModal(mode, account = null) {
 }
 
 /**
- * בדיקת תקינות נתוני חשבון
+ * בדיקת תקינות נתוני חשבון מקיפה
  * @param {Object} accountData - נתוני החשבון
  * @returns {Object} - תוצאה עם isValid ו-message
  */
@@ -832,12 +826,20 @@ function validateAccountData(accountData) {
     return { isValid: false, message: 'שם החשבון הוא שדה חובה' };
   }
 
-  if (accountData.name.length < 3) {
+  const trimmedName = accountData.name.trim();
+
+  if (trimmedName.length < 3) {
     return { isValid: false, message: 'שם החשבון חייב להכיל לפחות 3 תווים' };
   }
 
-  if (accountData.name.length > 18) {
-    return { isValid: false, message: 'שם החשבון לא יכול לעלות על 18 תווים' };
+  if (trimmedName.length > 50) {
+    return { isValid: false, message: 'שם החשבון לא יכול לעלות על 50 תווים' };
+  }
+
+  // בדיקת תווים לא חוקיים
+  const invalidChars = /[<>\"'&]/;
+  if (invalidChars.test(trimmedName)) {
+    return { isValid: false, message: 'שם החשבון מכיל תווים לא חוקיים' };
   }
 
   // בדיקת מטבע
@@ -845,12 +847,59 @@ function validateAccountData(accountData) {
     return { isValid: false, message: 'יש לבחור מטבע' };
   }
 
+  // בדיקת סטטוס
+  if (accountData.status && !['open', 'closed', 'cancelled'].includes(accountData.status)) {
+    return { isValid: false, message: 'סטטוס חשבון לא תקין' };
+  }
+
   // בדיקת יתרת מזומן
   const cashBalance = accountData.cash_balance;
   if (cashBalance !== null && cashBalance !== undefined && cashBalance !== '') {
-    if (isNaN(cashBalance) || cashBalance < 0) {
-      return { isValid: false, message: 'יתרת מזומן חייבת להיות מספר חיובי' };
+    const numBalance = parseFloat(cashBalance);
+    if (isNaN(numBalance)) {
+      return { isValid: false, message: 'יתרת מזומן חייבת להיות מספר תקין' };
     }
+    if (numBalance < -1000000) {
+      return { isValid: false, message: 'יתרת מזומן נמוכה מדי (מינימום -1,000,000)' };
+    }
+    if (numBalance > 100000000) {
+      return { isValid: false, message: 'יתרת מזומן גבוהה מדי (מקסימום 100,000,000)' };
+    }
+  }
+
+  // בדיקת ערך כולל
+  const totalValue = accountData.total_value;
+  if (totalValue !== null && totalValue !== undefined && totalValue !== '') {
+    const numValue = parseFloat(totalValue);
+    if (isNaN(numValue)) {
+      return { isValid: false, message: 'ערך כולל חייב להיות מספר תקין' };
+    }
+    if (numValue < -1000000) {
+      return { isValid: false, message: 'ערך כולל נמוך מדי (מינימום -1,000,000)' };
+    }
+    if (numValue > 100000000) {
+      return { isValid: false, message: 'ערך כולל גבוה מדי (מקסימום 100,000,000)' };
+    }
+  }
+
+  // בדיקת רווח/הפסד כולל
+  const totalPl = accountData.total_pl;
+  if (totalPl !== null && totalPl !== undefined && totalPl !== '') {
+    const numPl = parseFloat(totalPl);
+    if (isNaN(numPl)) {
+      return { isValid: false, message: 'רווח/הפסד כולל חייב להיות מספר תקין' };
+    }
+    if (numPl < -1000000) {
+      return { isValid: false, message: 'רווח/הפסד כולל נמוך מדי (מינימום -1,000,000)' };
+    }
+    if (numPl > 100000000) {
+      return { isValid: false, message: 'רווח/הפסד כולל גבוה מדי (מקסימום 100,000,000)' };
+    }
+  }
+
+  // בדיקת הערות
+  if (accountData.notes && accountData.notes.length > 1000) {
+    return { isValid: false, message: 'הערות ארוכות מדי (מקסימום 1,000 תווים)' };
   }
 
   return { isValid: true, message: '' };
@@ -1528,12 +1577,16 @@ if (window.location.pathname.includes('/accounts')) {
 async function loadAccountsDataForAccountsPage() {
   try {
     console.log('🔄 === LOADING ACCOUNTS DATA FOR ACCOUNTS PAGE ===');
+    console.log('🔄 loadAccountsDataFromAPI function exists:', typeof window.loadAccountsDataFromAPI === 'function');
+    console.log('🔄 loadAccountsData function exists:', typeof loadAccountsData === 'function');
 
     // טעינת נתונים מהשרת
     let accounts;
     if (typeof window.loadAccountsDataFromAPI === 'function') {
+      console.log('🔄 Using loadAccountsDataFromAPI...');
       accounts = await window.loadAccountsDataFromAPI();
     } else {
+      console.log('🔄 Using loadAccountsData...');
       accounts = await loadAccountsData();
     }
 
@@ -1811,7 +1864,7 @@ function filterAccountsLocally(accounts, selectedStatuses, selectedTypes, select
   return filteredAccounts;
 }
 
-// פונקציה גלובלית לעדכון הטבלה - הועברה ל-app-header.js
+// פונקציה גלובלית לעדכון הטבלה - הועברה ל-header-system.js
 
 // פונקציה לעדכון תפריט פילטר החשבונות
 function updateAccountFilterMenu(accounts) {
@@ -1865,7 +1918,7 @@ function updateAccountFilterMenu(accounts) {
 window.loadAccountsDataForAccountsPage = loadAccountsDataForAccountsPage;
 window.toggleMainSection = toggleMainSection;
 window.setupSortableHeaders = setupSortableHeaders;
-// updateGridFromComponentGlobal הועבר ל-app-header.js
+// updateGridFromComponentGlobal הועבר ל-header-system.js
 window.updateAccountFilterMenu = updateAccountFilterMenu;
 window.filterAccountsLocally = filterAccountsLocally;
 window.updateAccountsTable = updateAccountsTable;
@@ -1920,3 +1973,25 @@ setTimeout(() => {
     console.clear();
   }
 }, 15000);
+
+// אתחול הדף
+document.addEventListener('DOMContentLoaded', function () {
+  console.log('🔄 === DOM CONTENT LOADED (ACCOUNTS) ===');
+
+  // טעינת מטבעות
+  loadCurrenciesFromServer();
+
+  // בדיקה אם אנחנו בדף החשבונות
+  if (window.location.pathname.includes('/accounts')) {
+    console.log('🔄 Loading accounts page data...');
+
+    // טעינת נתוני חשבונות
+    if (typeof window.loadAccountsDataForAccountsPage === 'function') {
+      window.loadAccountsDataForAccountsPage();
+    } else {
+      console.error('❌ loadAccountsDataForAccountsPage function not found');
+    }
+  }
+
+  console.log('✅ Accounts page initialization completed');
+});

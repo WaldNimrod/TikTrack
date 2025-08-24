@@ -86,7 +86,7 @@
     <script src="scripts/active-alerts-component.js"></script>
 
     <!-- Page Specific -->
-    <script src="scripts/planning.js"></script>
+    <script src="scripts/trade_plans.js"></script>
     <script src="scripts/accounts.js"></script>
 </head>
 
@@ -289,6 +289,9 @@
                                 <div class="mb-3">
                                     <label for="addTradePlanDate" class="form-label">תאריך</label>
                                     <input type="date" class="form-control" id="addTradePlanDate" required>
+                                    <div class="invalid-feedback" id="addTradePlanDateError">
+                                        יש לבחור תאריך
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -403,6 +406,9 @@
                                         <option value="day">יום</option>
                                         <option value="scalp">סקלפינג</option>
                                     </select>
+                                    <div class="invalid-feedback" id="editTradePlanTypeError">
+                                        יש לבחור סוג תכנון
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -410,13 +416,18 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="editTradePlanEntryPrice" class="form-label">מחיר כניסה *</label>
-                                    <input type="number" class="form-control" id="editTradePlanEntryPrice" name="entry_price" step="0.01" required>
+                                    <input type="number" class="form-control" id="editTradePlanEntryPrice"
+                                        name="entry_price" step="0.01" required>
+                                    <div class="invalid-feedback" id="editTradePlanEntryPriceError">
+                                        יש להזין מחיר כניסה חיובי
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="editTradePlanTargetPrice" class="form-label">מחיר יעד</label>
-                                    <input type="number" class="form-control" id="editTradePlanTargetPrice" name="target_price" step="0.01">
+                                    <input type="number" class="form-control" id="editTradePlanTargetPrice"
+                                        name="target_price" step="0.01">
                                 </div>
                             </div>
                         </div>
@@ -424,13 +435,18 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="editTradePlanStopLoss" class="form-label">סטופ לוס</label>
-                                    <input type="number" class="form-control" id="editTradePlanStopLoss" name="stop_loss" step="0.01">
+                                    <input type="number" class="form-control" id="editTradePlanStopLoss"
+                                        name="stop_loss" step="0.01">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="editTradePlanQuantity" class="form-label">כמות *</label>
-                                    <input type="number" class="form-control" id="editTradePlanQuantity" name="quantity" required>
+                                    <input type="number" class="form-control" id="editTradePlanQuantity" name="quantity"
+                                        required>
+                                    <div class="invalid-feedback" id="editTradePlanQuantityError">
+                                        יש להזין כמות חיובית
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -442,7 +458,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-primary" onclick="saveEditTradePlan()">שמור שינויים</button>
+                    <button type="button" class="btn btn-primary" onclick="window.saveEditedTradePlan()">שמור שינויים</button>
                 </div>
             </div>
         </div>
@@ -465,7 +481,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-danger" onclick="confirmDeleteTradePlan()">מחק</button>
+                    <button type="button" class="btn btn-danger" onclick="window.confirmDeleteTradePlan()">מחק</button>
                 </div>
             </div>
         </div>
@@ -679,7 +695,7 @@
         // פונקציה לאישור מחיקת תכנון
         async function confirmDeleteTradePlan() {
             const tradePlanId = document.getElementById('deleteTradePlanModal').getAttribute('data-trade-plan-id');
-            
+
             try {
                 const response = await fetch(`/api/trade_plans/${tradePlanId}`, {
                     method: 'DELETE',
@@ -692,11 +708,11 @@
                     if (typeof window.showNotification === 'function') {
                         window.showNotification('תכנון נמחק בהצלחה!', 'success');
                     }
-                    
+
                     // סגירת המודל
                     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteTradePlanModal'));
                     modal.hide();
-                    
+
                     // רענון הטבלה
                     if (typeof window.loadTradePlansData === 'function') {
                         window.loadTradePlansData();
@@ -760,11 +776,11 @@
         }
 
         // ===== פונקציות וולידציה =====
-        
+
         // פונקציה לוולידציית טופס הוספת תכנון
         function validateAddTradePlanForm() {
             let isValid = true;
-            
+
             // וולידציית טיקר
             const tickerId = document.getElementById('addTradePlanTickerId').value;
             if (!tickerId) {
@@ -773,7 +789,7 @@
             } else {
                 clearFieldError('addTradePlanTickerId');
             }
-            
+
             // וולידציית סוג השקעה
             const investmentType = document.getElementById('addTradePlanInvestmentType').value;
             if (!investmentType) {
@@ -782,7 +798,7 @@
             } else {
                 clearFieldError('addTradePlanInvestmentType');
             }
-            
+
             // וולידציית צד
             const side = document.getElementById('addTradePlanSide').value;
             if (!side) {
@@ -791,7 +807,7 @@
             } else {
                 clearFieldError('addTradePlanSide');
             }
-            
+
             // וולידציית סכום מתוכנן
             const plannedAmount = parseFloat(document.getElementById('addTradePlanPlannedAmount').value);
             if (!plannedAmount || plannedAmount <= 0) {
@@ -800,7 +816,7 @@
             } else {
                 clearFieldError('addTradePlanPlannedAmount');
             }
-            
+
             // וולידציית תאריך
             const date = document.getElementById('addTradePlanDate').value;
             if (!date) {
@@ -809,14 +825,14 @@
             } else {
                 clearFieldError('addTradePlanDate');
             }
-            
+
             return isValid;
         }
-        
+
         // פונקציה לוולידציית טופס עריכת תכנון
         function validateEditTradePlanForm() {
             let isValid = true;
-            
+
             // וולידציית טיקר
             const tickerId = document.getElementById('editTradePlanTicker').value;
             if (!tickerId) {
@@ -825,7 +841,7 @@
             } else {
                 clearFieldError('editTradePlanTicker');
             }
-            
+
             // וולידציית סוג תכנון
             const type = document.getElementById('editTradePlanType').value;
             if (!type) {
@@ -834,7 +850,7 @@
             } else {
                 clearFieldError('editTradePlanType');
             }
-            
+
             // וולידציית מחיר כניסה
             const entryPrice = parseFloat(document.getElementById('editTradePlanEntryPrice').value);
             if (!entryPrice || entryPrice <= 0) {
@@ -843,7 +859,7 @@
             } else {
                 clearFieldError('editTradePlanEntryPrice');
             }
-            
+
             // וולידציית כמות
             const quantity = parseInt(document.getElementById('editTradePlanQuantity').value);
             if (!quantity || quantity <= 0) {
@@ -852,41 +868,41 @@
             } else {
                 clearFieldError('editTradePlanQuantity');
             }
-            
+
             return isValid;
         }
-        
+
         // פונקציה להצגת שגיאת שדה
         function showFieldError(fieldId, message) {
             const field = document.getElementById(fieldId);
-            const errorDiv = document.getElementById(fieldId + 'Error') || 
-                           field.parentNode.querySelector('.invalid-feedback');
-            
+            const errorDiv = document.getElementById(fieldId + 'Error') ||
+                field.parentNode.querySelector('.invalid-feedback');
+
             if (field) {
                 field.classList.add('is-invalid');
             }
-            
+
             if (errorDiv) {
                 errorDiv.textContent = message;
                 errorDiv.style.display = 'block';
             }
         }
-        
+
         // פונקציה לניקוי שגיאת שדה
         function clearFieldError(fieldId) {
             const field = document.getElementById(fieldId);
-            const errorDiv = document.getElementById(fieldId + 'Error') || 
-                           field.parentNode.querySelector('.invalid-feedback');
-            
+            const errorDiv = document.getElementById(fieldId + 'Error') ||
+                field.parentNode.querySelector('.invalid-feedback');
+
             if (field) {
                 field.classList.remove('is-invalid');
             }
-            
+
             if (errorDiv) {
                 errorDiv.style.display = 'none';
             }
         }
-        
+
         // פונקציה לשמירת עריכת תכנון
         async function saveEditTradePlan() {
             // וולידציה לפני שמירה
@@ -920,11 +936,11 @@
                     if (typeof window.showNotification === 'function') {
                         window.showNotification('תכנון עודכן בהצלחה!', 'success');
                     }
-                    
+
                     // סגירת המודל
                     const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
                     modal.hide();
-                    
+
                     // רענון הטבלה
                     if (typeof window.loadTradePlansData === 'function') {
                         window.loadTradePlansData();

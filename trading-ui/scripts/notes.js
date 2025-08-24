@@ -375,7 +375,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
 
     return `
       <tr>
-        <td><span class="symbol-text">${symbolDisplay}</span></td>
+        <td class="ticker-cell"><span class="symbol-text">${symbolDisplay}</span></td>
         <td style="padding: 0;" data-type="${typeForFilter}">
           <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px;">
             ${relatedDisplay}
@@ -388,7 +388,10 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
           <button class="btn btn-sm btn-secondary" onclick="editNote('${note.id}')" title="ערוך">
             <span class="btn-icon">✏️</span>
           </button>
-          <button class="btn btn-sm btn-danger" onclick="deleteNote('${note.id}')" title="מחק">X</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteNote('${note.id}')" title="מחק">🗑️</button>
+          <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${note.id})" title="צפה באלמנטים מקושרים">
+            🔗
+          </button>
         </td>
       </tr>
     `;
@@ -639,6 +642,124 @@ function onNoteRelationTypeChange() {
   console.log('🔄 onNoteRelationTypeChange - פונקציה זו הוחלפה ב-updateRadioButtons');
 }
 
+/**
+ * וולידציה מקיפה של טופס הערה חדשה
+ * @param {string} content - תוכן ההערה
+ * @param {string} relationType - סוג הקשר
+ * @param {string} relatedId - מזהה האובייקט הקשור
+ * @param {File} attachment - קובץ מצורף (אופציונלי)
+ * @returns {boolean} true אם הטופס תקין, false אחרת
+ */
+function validateNoteForm(content, relationType, relatedId, attachment) {
+  let isValid = true;
+
+  // ניקוי שגיאות קודמות
+  clearNoteValidationErrors();
+
+  // וולידציה של תוכן
+  if (!content) {
+    showNoteValidationError('contentError', 'תוכן הערה הוא שדה חובה');
+    isValid = false;
+  } else if (content.length < 1) {
+    showNoteValidationError('contentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
+    isValid = false;
+  } else if (content.length > 10000) {
+    showNoteValidationError('contentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
+    isValid = false;
+  }
+
+  // וולידציה של סוג קשר
+  if (!relationType) {
+    showNoteValidationError('relationTypeError', 'יש לבחור סוג אובייקט לשיוך');
+    isValid = false;
+  }
+
+  // וולידציה של אובייקט קשור
+  if (!relatedId) {
+    showNoteValidationError('relatedObjectError', 'יש לבחור אובייקט לשיוך');
+    isValid = false;
+  } else if (isNaN(parseInt(relatedId)) || parseInt(relatedId) <= 0) {
+    showNoteValidationError('relatedObjectError', 'מזהה אובייקט לא תקין');
+    isValid = false;
+  }
+
+  // וולידציה של קובץ מצורף (אם קיים)
+  if (attachment) {
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (attachment.size > maxSize) {
+      showNoteValidationError('attachmentError', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
+      isValid = false;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(attachment.type)) {
+      showNoteValidationError('attachmentError', 'סוג קובץ לא נתמך. מותרים: תמונות, PDF, Word, טקסט');
+      isValid = false;
+    }
+  }
+
+  return isValid;
+}
+
+/**
+ * וולידציה מקיפה של טופס עריכת הערה
+ * @param {string} content - תוכן ההערה
+ * @param {string} relationType - סוג הקשר
+ * @param {string} relatedId - מזהה האובייקט הקשור
+ * @param {File} attachment - קובץ מצורף (אופציונלי)
+ * @returns {boolean} true אם הטופס תקין, false אחרת
+ */
+function validateEditNoteForm(content, relationType, relatedId, attachment) {
+  let isValid = true;
+
+  // ניקוי שגיאות קודמות
+  clearNoteValidationErrors();
+
+  // וולידציה של תוכן
+  if (!content) {
+    showNoteValidationError('editContentError', 'תוכן הערה הוא שדה חובה');
+    isValid = false;
+  } else if (content.length < 1) {
+    showNoteValidationError('editContentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
+    isValid = false;
+  } else if (content.length > 10000) {
+    showNoteValidationError('editContentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
+    isValid = false;
+  }
+
+  // וולידציה של סוג קשר
+  if (!relationType) {
+    showNoteValidationError('editRelationTypeError', 'יש לבחור סוג אובייקט לשיוך');
+    isValid = false;
+  }
+
+  // וולידציה של אובייקט קשור
+  if (!relatedId) {
+    showNoteValidationError('editRelatedObjectError', 'יש לבחור אובייקט לשיוך');
+    isValid = false;
+  } else if (isNaN(parseInt(relatedId)) || parseInt(relatedId) <= 0) {
+    showNoteValidationError('editRelatedObjectError', 'מזהה אובייקט לא תקין');
+    isValid = false;
+  }
+
+  // וולידציה של קובץ מצורף (אם קיים)
+  if (attachment) {
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (attachment.size > maxSize) {
+      showNoteValidationError('editAttachmentError', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
+      isValid = false;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(attachment.type)) {
+      showNoteValidationError('editAttachmentError', 'סוג קובץ לא נתמך. מותרים: תמונות, PDF, Word, טקסט');
+      isValid = false;
+    }
+  }
+
+  return isValid;
+}
+
 // פונקציות שמירה ומחיקה
 async function saveNote() {
   console.log('🔄 saveNote נקראה');
@@ -649,19 +770,8 @@ async function saveNote() {
   const relatedId = document.getElementById('noteRelatedObjectSelect').value;
   const attachment = document.getElementById('noteAttachment').files[0];
 
-  // ולידציה
-  if (!content) {
-    showNoteValidationError('contentError', 'תוכן הערה הוא שדה חובה');
-    return;
-  }
-
-  if (!relationType) {
-    showNoteValidationError('relationTypeError', 'יש לבחור סוג אובייקט לשיוך');
-    return;
-  }
-
-  if (!relatedId) {
-    showNoteValidationError('relatedObjectError', 'יש לבחור אובייקט לשיוך');
+  // ולידציה מקיפה
+  if (!validateNoteForm(content, relationType, relatedId, attachment)) {
     return;
   }
 
@@ -720,19 +830,8 @@ async function updateNoteFromModal() {
   const relatedId = document.getElementById('editNoteRelatedObjectSelect').value;
   const attachment = document.getElementById('editNoteAttachment').files[0];
 
-  // ולידציה
-  if (!content) {
-    showNoteValidationError('editContentError', 'תוכן הערה הוא שדה חובה');
-    return;
-  }
-
-  if (!relationType) {
-    showNoteValidationError('editRelationTypeError', 'יש לבחור סוג אובייקט לשיוך');
-    return;
-  }
-
-  if (!relatedId) {
-    showNoteValidationError('editRelatedObjectError', 'יש לבחור אובייקט לשיוך');
+  // ולידציה מקיפה
+  if (!validateEditNoteForm(content, relationType, relatedId, attachment)) {
     return;
   }
 

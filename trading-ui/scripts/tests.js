@@ -154,13 +154,13 @@ function updateTestsTable() {
 
         return `
       <tr>
-        <td><strong>${test.name}</strong></td>
+        <td class="ticker-cell"><strong>${test.name}</strong></td>
         <td>${test.description}</td>
-        <td>${test.category}</td>
-        <td><span class="test-result-status ${statusClass}">${getStatusText(test.status)}</span></td>
+        <td class="type-cell">${test.category}</td>
+        <td class="status-cell"><span class="test-result-status ${statusClass}">${getStatusText(test.status)}</span></td>
         <td>${test.duration}</td>
         <td>${test.lastRun}</td>
-        <td><span class="test-result-status ${resultClass}">${getResultText(test.result)}</span></td>
+        <td class="status-cell"><span class="test-result-status ${resultClass}">${getResultText(test.result)}</span></td>
         <td class="actions-cell">
           <button class="btn btn-sm btn-secondary" onclick="runTest('${test.id}')" title="הרץ בדיקה">
             <span class="btn-icon">▶️</span>
@@ -198,9 +198,9 @@ function updateTestResultsTable() {
 
         return `
       <tr>
-        <td>${result.id}</td>
-        <td data-type="${result.testName}">${result.testName}</td>
-        <td data-status="${statusForFilter}"><span class="test-result-status ${resultClass}">${getResultText(result.result)}</span></td>
+        <td class="ticker-cell">${result.id}</td>
+        <td class="type-cell" data-type="${result.testName}">${result.testName}</td>
+        <td class="status-cell" data-status="${statusForFilter}"><span class="test-result-status ${resultClass}">${getResultText(result.result)}</span></td>
         <td>${result.duration}</td>
         <td>${result.errorMessage}</td>
         <td data-date="${result.runDate}">${result.runDate}</td>
@@ -390,41 +390,37 @@ function clearTestResults() {
 
 // Section management
 function toggleTopSection() {
-    const section = document.querySelector('.top-section');
-    if (section) {
-        const isCollapsed = section.classList.contains('collapsed');
-        section.classList.toggle('collapsed');
+    console.log('🔄 toggleTopSection נקראה - שימוש במערכת הגלובלית');
 
-        const button = event.target.closest('button');
-        const icon = button.querySelector('.filter-icon');
-        icon.textContent = isCollapsed ? '▲' : '▼';
-
-        // Save state
-        localStorage.setItem('tests_top_section_collapsed', !isCollapsed);
+    // שימוש בפונקציה הגלובלית מ-main.js
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('top');
+    } else {
+        console.error('❌ הפונקציה הגלובלית toggleSection לא זמינה');
     }
 }
 
 function toggleMainSection() {
-    const sections = document.querySelectorAll('.content-section');
-    sections.forEach(section => {
-        const isCollapsed = section.classList.contains('collapsed');
-        section.classList.toggle('collapsed');
+    console.log('🔄 toggleMainSection נקראה - שימוש במערכת הגלובלית');
 
-        const button = section.querySelector('.filter-toggle-btn');
-        if (button) {
-            const icon = button.querySelector('.filter-icon');
-            icon.textContent = isCollapsed ? '▲' : '▼';
+    // שימוש בפונקציה הגלובלית מ-main.js
+    if (typeof window.toggleSection === 'function') {
+        // מצא את הסקשן הקרוב לכפתור שנלחץ
+        const button = event.target.closest('button');
+        const section = button?.closest('.content-section');
+        if (section && section.dataset.section) {
+            window.toggleSection(section.dataset.section);
+        } else {
+            console.error('❌ לא ניתן למצוא סקשן עם data-section');
         }
-
-        // Save state
-        const sectionId = section.querySelector('.table-title')?.textContent.trim() || 'unknown';
-        localStorage.setItem(`tests_${sectionId}_collapsed`, !isCollapsed);
-    });
+    } else {
+        console.error('❌ הפונקציה הגלובלית toggleSection לא זמינה');
+    }
 }
 
 function restoreTestsSectionState() {
     console.log('🔄 שחזור מצב סקשנים בדף בדיקות - שימוש במערכת הגלובלית');
-    
+
     // שימוש בפונקציה הגלובלית מ-main.js
     if (typeof window.restoreSectionStates === 'function') {
         window.restoreSectionStates();
@@ -601,7 +597,7 @@ function toggleAllCRUDTests() {
 
 function toggleAllSections() {
     console.log('🔄 toggleAllSections נקראה - שימוש במערכת הגלובלית');
-    
+
     // שימוש בפונקציה הגלובלית מ-main.js
     if (typeof window.toggleAllSections === 'function') {
         window.toggleAllSections();
@@ -1095,19 +1091,13 @@ function closeCRUDTestResults() {
  * Toggle CRUD results section
  */
 function toggleCRUDResultsSection() {
-    console.log('🔄 Toggling CRUD results section...');
-    const section = document.querySelector('.content-section:has(#crudTestResultsArea)');
-    const sectionBody = section?.querySelector('.section-body');
-    const button = document.querySelector('button[onclick="toggleCRUDResultsSection()"]');
-    const icon = button?.querySelector('.filter-icon');
+    console.log('🔄 toggleCRUDResultsSection נקראה - שימוש במערכת הגלובלית');
 
-    if (sectionBody) {
-        const isHidden = sectionBody.style.display === 'none';
-        sectionBody.style.display = isHidden ? 'block' : 'none';
-
-        if (icon) {
-            icon.textContent = isHidden ? '▲' : '▼';
-        }
+    // שימוש בפונקציה הגלובלית מ-main.js
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('crud-results');
+    } else {
+        console.error('❌ הפונקציה הגלובלית toggleSection לא זמינה');
     }
 }
 

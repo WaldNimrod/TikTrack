@@ -69,21 +69,23 @@ Backend/
 ```
 trading-ui/
 ├── *.html              # Main application pages
-├── scripts/            # JavaScript files
+├── scripts/            # JavaScript files with comprehensive validation
 │   ├── header-system.js    # Header component and navigation
 │   ├── table-mappings.js   # Centralized table column mappings
 │   ├── main.js            # Global utility functions and sorting
 │   ├── translation-utils.js # Translation functions
 │   ├── filter-system.js   # Filter system
-│   ├── alerts.js          # Alert management
+│   ├── ui-utils.js        # Shared UI utility functions
+│   ├── data-utils.js      # Shared data utilities (API calls, validation)
+│   ├── alerts.js          # Alert management with advanced validation
 │   ├── active-alerts-component.js # Alert component
-│   ├── planning.js        # Planning page logic
+│   ├── trade_plans.js     # Trade plans with full CRUD and validation
 │   ├── trades.js          # Trades page logic
-│   ├── accounts.js        # Accounts page logic
-│   ├── notes.js           # Notes page logic
-│   ├── tickers.js         # Tickers page logic
-│   ├── executions.js      # Executions page logic
-│   ├── cash_flows.js      # Cash flows page logic
+│   ├── accounts.js        # Account management with enhanced validation
+│   ├── notes.js           # Notes with content and attachment validation
+│   ├── tickers.js         # Ticker management with symbol validation
+│   ├── executions.js      # Execution validation and management
+│   ├── cash_flows.js      # Cash flow validation and financial data
 │   └── *.js              # Other page-specific scripts
 ├── styles/            # CSS files
 │   ├── apple-theme.css
@@ -205,6 +207,90 @@ trading-ui/
    ```
 
 ## Frontend Architecture
+
+### Comprehensive Validation System
+
+The TikTrack frontend includes a comprehensive validation system across all pages:
+
+#### Validation Features
+- **Real-time Validation**: Immediate feedback on form inputs
+- **Range Validation**: Min/max values for numbers, dates, and text lengths
+- **Format Validation**: Email, phone, symbols, currency formats
+- **Business Logic Validation**: Status combinations, dependencies, constraints
+- **Security Validation**: Input sanitization, XSS prevention
+- **User Experience**: Clear error messages, auto-focus on error fields
+
+#### Page-Specific Validation
+
+**Trade Plans (`trade_plans.js`)**
+- Complete CRUD operations with modal management
+- Plan validation: dates, amounts, investment types
+- Status combination validation
+- Integration with ValidationService backend
+
+**Alerts (`alerts.js`)**
+- Advanced alert condition validation
+- Support for price alerts and stop-loss alerts
+- Variable, operator, and value validation
+- Status/trigger state combination validation
+
+**Cash Flows (`cash_flows.js`)**
+- Financial data validation (amounts, currencies, dates)
+- Account and transaction type validation
+- Range validation for amounts and dates
+- Source and external ID validation
+
+**Notes (`notes.js`)**
+- Content validation (1-10,000 characters)
+- File attachment validation (size, type restrictions)
+- Related object validation and linking
+- Support for multiple attachment types
+
+**Executions (`executions.js`)**
+- Trade execution validation (ID, quantity, price)
+- Date range and business day validation
+- Commission and fee validation
+- Integration with trade management
+
+**Accounts (`accounts.js`)**
+- Account name validation (length, special characters)
+- Currency and status validation
+- Balance and value range validation
+- Enhanced security checks
+
+**Tickers (`tickers.js`)**
+- Symbol uniqueness and format validation
+- Company name and type validation
+- Currency integration validation
+- Market data validation
+
+#### Validation Architecture
+```javascript
+// Unified validation pattern across all pages
+function validateCompleteForm(mode) {
+    const prefix = mode === 'add' ? 'add' : 'edit';
+    let isValid = true;
+    
+    // Field-specific validations
+    if (!validateRequiredFields(prefix)) isValid = false;
+    if (!validateDataTypes(prefix)) isValid = false;
+    if (!validateRanges(prefix)) isValid = false;
+    if (!validateBusinessRules(prefix)) isValid = false;
+    
+    return isValid;
+}
+
+// Error handling and user feedback
+function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(fieldId + 'Error');
+    
+    field.classList.add('is-invalid');
+    field.focus();
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+```
 
 ### Table Mapping System
 The application uses a centralized table mapping system located in `trading-ui/scripts/table-mappings.js`. This system provides:

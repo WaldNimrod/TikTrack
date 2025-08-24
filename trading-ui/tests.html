@@ -633,7 +633,7 @@
                 </div>
 
                 <!-- Future Section 2 area - content-section -->
-                <div class="content-section">
+                <div class="content-section" data-section="future2">
                     <!-- Future Section 2 header -->
                     <div class="section-header">
                         <div class="table-title">
@@ -760,7 +760,7 @@
                 </div>
 
                 <!-- API Tests area - content-section -->
-                <div class="content-section">
+                <div class="content-section" data-section="api">
                     <!-- API Tests header -->
                     <div class="section-header">
                         <div class="table-title">
@@ -945,7 +945,7 @@
                 </div>
 
                 <!-- CRUD Test Results area - content-section -->
-                <div class="content-section">
+                <div class="content-section" data-section="crud-results">
                     <!-- CRUD Test Results header -->
                     <div class="section-header">
                         <div class="table-title">
@@ -999,7 +999,7 @@
                 </div>
 
                 <!-- Test Results area - content-section -->
-                <div class="content-section">
+                <div class="content-section" data-section="test-results">
                     <!-- Test Results header -->
                     <div class="section-header">
                         <div class="table-title">
@@ -1128,6 +1128,14 @@
             // Page initialization
             document.addEventListener('DOMContentLoaded', function () {
                 console.log('🔄 Initializing tests page...');
+
+                // וודא שהפונקציות הגלובליות זמינות
+                if (typeof window.toggleSection === 'function' && typeof window.toggleAllSections === 'function') {
+                    console.log('✅ Global toggle functions are available');
+                } else {
+                    console.error('❌ Global toggle functions are not available');
+                }
+
                 if (typeof initializeTestsPage === 'function') {
                     initializeTestsPage();
                 }

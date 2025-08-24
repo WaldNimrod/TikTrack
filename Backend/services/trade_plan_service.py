@@ -129,6 +129,15 @@ class TradePlanService:
             db.commit()
             db.refresh(plan)
             logger.info(f"Cancelled trade plan: {plan_id}")
+            
+            # Update ticker active_trades status (triggers will handle this automatically)
+            try:
+                from app import update_ticker_open_status
+                update_ticker_open_status(plan.ticker_id)
+                logger.info(f"Updated ticker {plan.ticker_id} active_trades status after cancelling plan")
+            except Exception as e:
+                logger.warning(f"Could not update ticker active_trades status: {e}")
+            
             return plan
         return None
     

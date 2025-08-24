@@ -391,3 +391,62 @@ def health_check():
             'message': f'Constraints API health check failed: {str(e)}',
             'version': 'v1'
         }), 500
+
+@constraints_bp.route('/api/v1/constraints/active-trades/validate', methods=['GET'])
+def validate_active_trades_constraint():
+    """
+    Validate active_trades constraint for all tickers
+    """
+    try:
+        is_valid, errors = constraint_service.validate_active_trades_constraint()
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'is_valid': is_valid,
+                'error_count': len(errors),
+                'errors': errors
+            },
+            'message': f'Active trades constraint validation completed. Found {len(errors)} errors.',
+            'version': 'v1'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error validating active_trades constraint: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error validating active_trades constraint: {str(e)}',
+            'version': 'v1'
+        }), 500
+
+@constraints_bp.route('/api/v1/constraints/active-trades/fix', methods=['POST'])
+def fix_active_trades_constraint():
+    """
+    Fix active_trades constraint for all tickers
+    """
+    try:
+        success, fixed_count = constraint_service.fix_active_trades_constraint()
+        
+        if success:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'fixed_count': fixed_count
+                },
+                'message': f'Fixed active_trades for {fixed_count} tickers',
+                'version': 'v1'
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': 'Failed to fix active_trades constraint',
+                'version': 'v1'
+            }), 500
+        
+    except Exception as e:
+        logger.error(f"Error fixing active_trades constraint: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error fixing active_trades constraint: {str(e)}',
+            'version': 'v1'
+        }), 500

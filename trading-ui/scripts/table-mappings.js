@@ -54,12 +54,14 @@ const TABLE_COLUMN_MAPPINGS = {
 
     // טבלת טיקרים (Tickers)
     'tickers': [
-        'id',              // 0 - מזהה
-        'symbol',          // 1 - סמל
-        'name',            // 2 - שם
-        'type',            // 3 - סוג
+        'symbol',          // 0 - סמל
+        'name',            // 1 - שם
+        'type',            // 2 - סוג
+        'remarks',         // 3 - הערות
         'currency',        // 4 - מטבע
-        'created_at'       // 5 - נוצר ב
+        'active_trades',   // 5 - טריידים פעילים
+        'created_at',      // 6 - נוצר ב
+        'updated_at'       // 7 - עודכן ב
     ],
 
     // טבלת התראות (Alerts)
@@ -95,28 +97,19 @@ const TABLE_COLUMN_MAPPINGS = {
 
     // טבלת תזרימי מזומנים (Cash Flows)
     'cash_flows': [
-        'id',              // 0 - מזהה
-        'account_id',      // 1 - מזהה חשבון
-        'type',            // 2 - סוג
-        'amount',          // 3 - סכום
-        'date',            // 4 - תאריך
-        'description',     // 5 - תיאור
-        'currency',        // 6 - מטבע
-        'created_at'       // 7 - נוצר ב
+        'account_id',      // 0 - חשבון
+        'type',            // 1 - סוג
+        'amount',          // 2 - סכום
+        'currency',        // 3 - מטבע
+        'exchange_rate',   // 4 - שער דולר
+        'date',            // 5 - תאריך
+        'description',     // 6 - תיאור
+        'source',          // 7 - מקור
+        'external_id',     // 8 - מזהה חיצוני
+        'created_at'       // 9 - נוצר ב
     ],
 
-    // טבלת עיצובים (Designs) - זהה לתכנונים
-    'designs': [
-        'id',              // 0 - מזהה
-        'ticker',          // 1 - טיקר
-        'created_at',      // 2 - נוצר ב
-        'investment_type', // 3 - סוג השקעה
-        'side',            // 4 - צד
-        'planned_amount',  // 5 - סכום מתוכנן
-        'target_price',    // 6 - מחיר יעד
-        'stop_price',      // 7 - מחיר עצירה
-        'status'           // 8 - סטטוס
-    ]
+    // הערה: 'designs' הוסר - משתמשים ב-'trade_plans' במקום
 };
 
 /**
@@ -157,15 +150,47 @@ function getColumnValue(item, columnIndex, tableType) {
         }
     }
 
-    if (tableType === 'designs') {
+    // הערה: הלוגיקה עבור 'designs' הוסרה - משתמשים ב-'trade_plans' במקום
+
+    if (tableType === 'alerts') {
         if (fieldName === 'ticker') {
             return item.ticker ? (item.ticker.symbol || item.ticker.name || '') : '';
         }
     }
 
-    if (tableType === 'alerts') {
-        if (fieldName === 'ticker') {
-            return item.ticker ? (item.ticker.symbol || item.ticker.name || '') : '';
+    if (tableType === 'cash_flows') {
+        if (fieldName === 'account_id') {
+            return item.account_name || item.account_id || '';
+        }
+        if (fieldName === 'type') {
+            const typeDisplay = item.type === 'deposit' ? 'הפקדה' :
+                item.type === 'withdrawal' ? 'משיכה' :
+                    item.type === 'dividend' ? 'דיבידנד' :
+                        item.type === 'fee' ? 'עמלה' :
+                            item.type === 'interest' ? 'ריבית' : item.type;
+            return typeDisplay;
+        }
+    }
+
+    if (tableType === 'tickers') {
+        if (fieldName === 'type') {
+            const typeDisplay = item.type === 'stock' ? 'מניה' :
+                item.type === 'etf' ? 'ETF' :
+                    item.type === 'bond' ? 'אג"ח' :
+                        item.type === 'crypto' ? 'קריפטו' : item.type;
+            return typeDisplay;
+        }
+        if (fieldName === 'active_trades') {
+            return item.active_trades ? 'פעיל' : 'לא פעיל';
+        }
+        if (fieldName === 'currency') {
+            if (item.currency && item.currency.symbol) {
+                return item.currency.symbol;
+            } else if (item.currency_id && window.currenciesData && window.currenciesData.length > 0) {
+                const currency = window.currenciesData.find(c => c.id === item.currency_id);
+                return currency ? currency.symbol : item.currency || '';
+            }
+            return item.currency || '';
         }
     }
 

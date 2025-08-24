@@ -209,6 +209,16 @@ class TradeService:
             db.commit()
             db.refresh(trade)
             logger.info(f"Closed trade: {trade_id}")
+            
+            # Update ticker active_trades status (triggers will handle this automatically)
+            # But we can also call the manual update for immediate consistency
+            try:
+                from app import update_ticker_open_status
+                update_ticker_open_status(trade.ticker_id)
+                logger.info(f"Updated ticker {trade.ticker_id} active_trades status after closing trade")
+            except Exception as e:
+                logger.warning(f"Could not update ticker active_trades status: {e}")
+            
             return trade
         return None
     
@@ -223,6 +233,15 @@ class TradeService:
             db.commit()
             db.refresh(trade)
             logger.info(f"Cancelled trade: {trade_id}")
+            
+            # Update ticker active_trades status (triggers will handle this automatically)
+            try:
+                from app import update_ticker_open_status
+                update_ticker_open_status(trade.ticker_id)
+                logger.info(f"Updated ticker {trade.ticker_id} active_trades status after cancelling trade")
+            except Exception as e:
+                logger.warning(f"Could not update ticker active_trades status: {e}")
+            
             return trade
         return None
     

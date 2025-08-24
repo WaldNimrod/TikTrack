@@ -239,12 +239,12 @@ function updateCurrenciesTable(currencies) {
 
     const rows = currencies.map(currency => `
     <tr>
-      <td data-type="${currency.symbol || ''}">${currency.symbol || ''}</td>
+      <td class="ticker-cell" data-type="${currency.symbol || ''}">${currency.symbol || ''}</td>
       <td>${currency.name || ''}</td>
       <td>${currency.usd_rate || ''}</td>
       <td>${currency.id || ''}</td>
       <td data-date="${currency.created_at}">${currency.created_at || ''}</td>
-      <td>
+      <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editCurrency(${currency.id})" title="ערוך">✏️</button>
         <button class="btn btn-sm btn-danger" onclick="deleteCurrency(${currency.id})" title="מחק">🗑️</button>
       </td>

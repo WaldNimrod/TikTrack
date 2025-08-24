@@ -1436,3 +1436,81 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // חשיפת הפונקציה הגלובלית
 window.restoreSectionStates = restoreSectionStates;
+
+/**
+ * פונקציה לעיצוב תאריך
+ */
+function formatDate(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+}
+
+/**
+ * פונקציה לעיצוב תאריך ושעה
+ */
+function formatDateTime(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL');
+}
+
+/**
+ * פונקציה לעיצוב תאריך בלבד (ללא שעה)
+ */
+function formatDateOnly(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('he-IL');
+}
+
+// חשיפת פונקציות התאריך הגלובליות
+window.formatDate = formatDate;
+window.formatDateTime = formatDateTime;
+window.formatDateOnly = formatDateOnly;
+
+/**
+ * פונקציה לצביעת סכומים (חיובי/שלילי)
+ */
+function colorAmount(amount, displayText = null) {
+  const text = displayText || (amount >= 0 ? `+$${amount.toFixed(2)}` : `-$${Math.abs(amount).toFixed(2)}`);
+  const className = amount >= 0 ? 'profit-positive' : 'profit-negative';
+  return `<span class="${className}">${text}</span>`;
+}
+
+// חשיפת פונקציית הצביעה הגלובלית
+window.colorAmount = colorAmount;
+
+/**
+ * פונקציה לצפייה באלמנטים מקושרים
+ * Global function for viewing linked items
+ * 
+ * @param {number|string} itemId - מזהה האלמנט
+ * @param {string} itemType - סוג האלמנט (optional)
+ */
+function viewLinkedItems(itemId, itemType = null) {
+  console.log('🔄 צפייה באלמנטים מקושרים:', { itemId, itemType });
+
+  // זיהוי סוג האלמנט לפי הדף הנוכחי אם לא צוין
+  if (!itemType) {
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/accounts')) itemType = 'account';
+    else if (currentPath.includes('/trades')) itemType = 'trade';
+    else if (currentPath.includes('/tickers')) itemType = 'ticker';
+    else if (currentPath.includes('/alerts')) itemType = 'alert';
+    else if (currentPath.includes('/cash_flows')) itemType = 'cash_flow';
+    else if (currentPath.includes('/notes')) itemType = 'note';
+    else if (currentPath.includes('/trade_plans')) itemType = 'trade_plan';
+    else if (currentPath.includes('/executions')) itemType = 'execution';
+  }
+
+  // הצגת הודעה זמנית
+  if (typeof window.showNotification === 'function') {
+    window.showNotification(`פונקציית צפייה באלמנטים מקושרים ל-${itemType || 'אלמנט'} תפותח בקרוב`, 'info');
+  } else {
+    console.log(`[INFO] פונקציית צפייה באלמנטים מקושרים ל-${itemType || 'אלמנט'} תפותח בקרוב`);
+  }
+}
+
+// חשיפת פונקציית הצפייה באלמנטים מקושרים
+window.viewLinkedItems = viewLinkedItems;

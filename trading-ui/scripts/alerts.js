@@ -573,15 +573,15 @@ function updateAlertsTable(alerts) {
 
       return `
         <tr>
-          <td><span class="symbol-text">${symbolDisplay}</span></td>
+          <td class="ticker-cell"><span class="symbol-text">${symbolDisplay}</span></td>
           <td style="padding: 0;">
             <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px;">
               ${relatedDisplay}
             </div>
           </td>
-          <td data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+          <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
-          <td data-type="${alert.type || ''}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
+          <td class="type-cell" data-type="${alert.type || ''}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
           <td><span class="condition-text">${alert.condition || '-'}</span></td>
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
@@ -590,12 +590,19 @@ function updateAlertsTable(alerts) {
               ✏️
             </button>
             ${alert.status === 'open' ? `
-            <button class="btn btn-sm btn-warning" onclick="cancelAlert(${alert.id})" title="בטל">
-              ⏹️
+            <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">
+              ❌
             </button>
-            ` : ''}
+            ` : `
+            <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">
+              X
+            </button>
+            `}
             <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">
               🗑️
+            </button>
+            <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${alert.id})" title="צפה באלמנטים מקושרים">
+              🔗
             </button>
           </td>
         </tr>
@@ -1137,6 +1144,42 @@ async function saveAlert() {
     return;
   }
 
+  // וולידציה של ערך ההתראה
+  if (!value || value.trim() === '') {
+    showErrorNotification('ערך התראה חסר', 'יש להזין ערך לתנאי ההתראה');
+    valueElement.focus();
+    return;
+  }
+
+  // וולידציה של ערך מספרי
+  const numericValue = parseFloat(value);
+  if (isNaN(numericValue)) {
+    showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
+    valueElement.focus();
+    return;
+  }
+
+  // וולידציה של ערך חיובי למחיר
+  if (variable === 'price' && numericValue <= 0) {
+    showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
+    valueElement.focus();
+    return;
+  }
+
+  // וולידציה של ערך מקסימלי למחיר
+  if (variable === 'price' && numericValue > 1000000) {
+    showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
+    valueElement.focus();
+    return;
+  }
+
+  // וולידציה של אחוזים (לשינוי יומי)
+  if (variable === 'daily_change' && (numericValue < -100 || numericValue > 100)) {
+    showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי יומי חייב להיות בין -100% ל-100%');
+    valueElement.focus();
+    return;
+  }
+
   // בניית מחרוזת התנאי
   const condition = buildAlertCondition(variable, operator, value);
 
@@ -1494,6 +1537,42 @@ async function updateAlert() {
     return;
   }
 
+  // וולידציה של ערך ההתראה
+  if (!value || value.trim() === '') {
+    showErrorNotification('ערך התראה חסר', 'יש להזין ערך לתנאי ההתראה');
+    valueElement.focus();
+    return;
+  }
+
+  // וולידציה של ערך מספרי
+  const numericValue = parseFloat(value);
+  if (isNaN(numericValue)) {
+    showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
+    valueElement.focus();
+    return;
+  }
+
+  // וולידציה של ערך חיובי למחיר
+  if (variable === 'price' && numericValue <= 0) {
+    showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
+    valueElement.focus();
+    return;
+  }
+
+  // וולידציה של ערך מקסימלי למחיר
+  if (variable === 'price' && numericValue > 1000000) {
+    showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
+    valueElement.focus();
+    return;
+  }
+
+  // וולידציה של אחוזים (לשינוי יומי)
+  if (variable === 'daily_change' && (numericValue < -100 || numericValue > 100)) {
+    showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי יומי חייב להיות בין -100% ל-100%');
+    valueElement.focus();
+    return;
+  }
+
   // בניית מחרוזת התנאי
   const condition = buildAlertCondition(variable, operator, value);
 
@@ -1796,7 +1875,7 @@ if (window.location.pathname.includes('/alerts')) {
   };
 }
 
-// פונקציה גלובלית לעדכון הטבלה - הועברה ל-app-header.js
+// פונקציה גלובלית לעדכון הטבלה - הועברה ל-header-system.js
 
 // הוספת הפונקציות לגלובל
 window.loadAlertsData = loadAlertsData;
@@ -1817,7 +1896,7 @@ window.checkAlertVariable = checkAlertVariable;
 window.checkAlertOperator = checkAlertOperator;
 window.buildAlertCondition = buildAlertCondition;
 window.parseAlertCondition = parseAlertCondition;
-// updateGridFromComponentGlobal הועבר ל-app-header.js
+// updateGridFromComponentGlobal הועבר ל-header-system.js
 
 // פונקציות התראה מיובאות מ-main.js - אין צורך בייצוא כפול
 

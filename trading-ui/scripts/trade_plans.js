@@ -1,9 +1,9 @@
 /**
  * ========================================
- * Planning Page - Planning Page
+ * Trade Plans Page - Trade Plans Page
  * ========================================
  * 
- * Dedicated file for the planning page (planning.html)
+ * Dedicated file for the trade plans page (trade_plans.html)
  * 
  * File contents:
  * - Loading planning data from server
@@ -37,6 +37,85 @@
 
 // Global variables
 let trade_plansData = [];
+
+// ===== CRUD Modal Functions =====
+
+/**
+ * פתיחת מודל הוספת תכנון חדש
+ */
+function openAddTradePlanModal() {
+    console.log('🔄 Opening add trade plan modal');
+    const modal = new bootstrap.Modal(document.getElementById('addTradePlanModal'));
+
+    // קבע ברירת מחדל של היום לשדה התאריך
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    const dateInput = document.getElementById('addTradePlanDate');
+    if (dateInput) dateInput.value = todayStr;
+
+    modal.show();
+}
+
+/**
+ * פתיחת מודל עריכת תכנון קיים
+ */
+function openEditTradePlanModal(tradePlanId) {
+    console.log('🔄 Opening edit trade plan modal for ID:', tradePlanId);
+
+    const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
+    if (!tradePlan) {
+        console.error('Trade plan not found:', tradePlanId);
+        return;
+    }
+
+    // מילוי הטופס בנתונים קיימים
+    document.getElementById('editTradePlanId').value = tradePlan.id;
+    document.getElementById('editTradePlanTickerId').value = tradePlan.ticker_id;
+    document.getElementById('editTradePlanInvestmentType').value = tradePlan.investment_type;
+    document.getElementById('editTradePlanSide').value = tradePlan.side;
+    document.getElementById('editTradePlanPlannedAmount').value = tradePlan.planned_amount;
+    document.getElementById('editTradePlanStopPrice').value = tradePlan.stop_price || '';
+    document.getElementById('editTradePlanTargetPrice').value = tradePlan.target_price || '';
+    document.getElementById('editTradePlanEntryConditions').value = tradePlan.entry_conditions || '';
+    document.getElementById('editTradePlanReasons').value = tradePlan.reasons || '';
+
+    const modal = new bootstrap.Modal(document.getElementById('editTradePlanModal'));
+    modal.show();
+}
+
+/**
+ * פתיחת מודל מחיקת תכנון
+ */
+function openDeleteTradePlanModal(tradePlanId) {
+    console.log('🔄 Opening delete trade plan modal for ID:', tradePlanId);
+
+    const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
+    if (!tradePlan) {
+        console.error('Trade plan not found:', tradePlanId);
+        return;
+    }
+
+    // הצגת פרטי התכנון במודל המחיקה
+    document.getElementById('deleteTradePlanDetails').innerHTML = `
+        <strong>טיקר:</strong> ${tradePlan.ticker}<br>
+        <strong>סוג:</strong> ${tradePlan.investment_type}<br>
+        <strong>צד:</strong> ${tradePlan.side}<br>
+        <strong>סכום מתוכנן:</strong> ${tradePlan.planned_amount}
+    `;
+
+    document.getElementById('deleteTradePlanModal').setAttribute('data-trade-plan-id', tradePlanId);
+
+    const modal = new bootstrap.Modal(document.getElementById('deleteTradePlanModal'));
+    modal.show();
+}
+
+// ייצוא פונקציות לגלובל
+window.openAddTradePlanModal = openAddTradePlanModal;
+window.openEditTradePlanModal = openEditTradePlanModal;
+window.openDeleteTradePlanModal = openDeleteTradePlanModal;
 
 // The translateDateRangeToDates function is already defined at the beginning of the file
 
@@ -91,11 +170,11 @@ if (window.location.pathname.includes('/planning')) {
         }
 
         // Direct call to local function
-        console.log('🔄 Calling loadDesignsData directly for planning page');
-        if (typeof window.loadDesignsData === 'function') {
-            window.loadDesignsData();
+        console.log('🔄 Calling loadTradePlansData directly for trade plans page');
+        if (typeof window.loadTradePlansData === 'function') {
+            window.loadTradePlansData();
         } else {
-            console.error('❌ loadDesignsData function not found');
+            console.error('❌ loadTradePlansData function not found');
         }
     };
 }
@@ -108,7 +187,7 @@ if (window.location.pathname.includes('/planning')) {
  * 
  * @returns {Array} Array of planning
  */
-async function loadDesignsData() {
+async function loadTradePlansData() {
     try {
         console.log('🔄 Loading trade_plans from server...');
 
@@ -182,10 +261,10 @@ async function loadDesignsData() {
         }
 
         // Saving filtered data to global
-        window.filteredDesignsData = filteredDesigns;
+        window.filteredTradePlansData = filteredDesigns;
 
         // Updating table with filtered data
-        updateTradePlansTable(filteredTradePlans);
+        updateTradePlansTable(filteredDesigns);
 
         // Updating debug panel
         updateFilterDebugPanel();
@@ -197,7 +276,7 @@ async function loadDesignsData() {
         console.error('❌ Error details:', error.message);
 
         // Displaying detailed error message in table
-        const tbody = document.querySelector('#trade_plansTable tbody');
+        const tbody = document.querySelector('#designsTable tbody');
         if (tbody) {
             // Identifying error type
             let errorMessage = 'שגיאה בטעינת נתונים';
@@ -217,13 +296,13 @@ async function loadDesignsData() {
             tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger">
                 <i class="fas fa-exclamation-triangle"></i> ${errorMessage}
                 <br><small>${errorDetails}</small>
-                <br><button class="btn btn-sm btn-outline-primary mt-2" onclick="if (typeof window.loadDesignsData === 'function') { window.loadDesignsData(); } else { location.reload(); }">נסה שוב</button>
+                <br><button class="btn btn-sm btn-outline-primary mt-2" onclick="if (typeof window.loadTradePlansData === 'function') { window.loadTradePlansData(); } else { location.reload(); }">נסה שוב</button>
             </td></tr>`;
         }
 
         // Resetting data
         trade_plansData = [];
-        window.filteredDesignsData = [];
+        window.filteredTradePlansData = [];
 
         // Updating statistics
         updatePageSummaryStats();
@@ -244,7 +323,7 @@ function updateTradePlansTable(trade_plans) {
     console.log('🔄 === UPDATE TRADE PLANS TABLE ===');
     console.log('🔄 Designs to display:', trade_plans.length);
 
-    const tbody = document.querySelector('#trade_plansTable tbody');
+    const tbody = document.querySelector('#designsTable tbody');
     if (!tbody) {
         console.error('Table body not found');
         return;
@@ -303,7 +382,7 @@ function updateTradePlansTable(trade_plans) {
         }
 
         // Updating record count
-        const countElement = document.querySelector('#trade_plansCount');
+        const countElement = document.querySelector('#designsCount');
         if (countElement) {
             countElement.textContent = '0 תכנונים';
         }
@@ -381,21 +460,24 @@ function updateTradePlansTable(trade_plans) {
 
         return `
       <tr>
-        <td><span class="ticker-text">${tickerDisplay}</span></td>
+        <td class="ticker-cell"><span class="ticker-text">${tickerDisplay}</span></td>
         <td data-date="${design.created_at}"><span class="date-text">${dateDisplay}</span></td>
-        <td data-type="${typeForFilter}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
-        <td><span class="side-badge ${design.side.toLowerCase()}">${sideDisplay}</span></td>
+        <td class="type-cell" data-type="${typeForFilter}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
+        <td class="side-cell" data-side="${design.side}"><span class="side-badge ${design.side.toLowerCase()}">${sideDisplay}</span></td>
         <td><span class="amount-text">${amountDisplay}</span></td>
-        <td><span class="target-text">${targetDisplay}</span></td>
-        <td><span class="stop-text">${stopDisplay}</span></td>
+        <td class="target-cell"><span class="target-text">${targetDisplay}</span></td>
+        <td class="stop-cell"><span class="stop-text">${stopDisplay}</span></td>
         <td><span class="current-text">${currentDisplay}</span></td>
-        <td data-status="${statusForFilter}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+        <td class="status-cell" data-status="${statusForFilter}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
         <td class="actions-cell">
-          <button class="btn btn-sm btn-secondary" onclick="editTradePlan(${design.id})" title="ערוך">
+          <button class="btn btn-sm btn-secondary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">
             ✏️
           </button>
-          <button class="btn btn-sm btn-danger" onclick="deleteTradePlan(${design.id})" title="מחק">
+          <button class="btn btn-sm btn-danger" onclick="window.openDeleteTradePlanModal(${design.id})" title="מחק">
             🗑️
+          </button>
+          <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${design.id})" title="צפה באלמנטים מקושרים">
+            🔗
           </button>
         </td>
       </tr>
@@ -419,7 +501,7 @@ function updateTradePlansTable(trade_plans) {
  */
 function updatePageSummaryStats() {
     // Using filtered data if available, otherwise all data
-    const dataToUse = window.filteredDesignsData || trade_plansData;
+    const dataToUse = window.filteredTradePlansData || trade_plansData;
     const totalDesigns = dataToUse.length;
     const openDesigns = dataToUse.filter(design => design.status === 'open').length;
     const closedDesigns = dataToUse.filter(design => design.status === 'closed').length;
@@ -480,6 +562,12 @@ function updatePageSummaryStats() {
     document.getElementById('totalInvestment').textContent = formatCurrency(totalInvestment);
     document.getElementById('avgInvestment').textContent = formatCurrency(avgInvestment);
     document.getElementById('totalProfit').textContent = formatCurrency(totalProfit);
+
+    // עדכון מספר הרשומות בטבלה
+    const countElement = document.getElementById('designsCount');
+    if (countElement) {
+        countElement.textContent = `${totalDesigns} רשומות`;
+    }
 }
 
 /**
@@ -573,7 +661,7 @@ async function saveNewTradePlan() {
             closeModal('addTradePlanModal');
 
             // Refreshing data
-            loadDesignsData();
+            loadTradePlansData();
 
             // Displaying success message
             showSuccessNotification('Trade plan saved', 'Trade plan saved successfully!');
@@ -658,7 +746,7 @@ function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
  * sortTable(8); // Sort by status column
  * 
  * @requires window.sortTableData - Global function from main.js
- * @requires window.filteredDesignsData - Filtered data
+ * @requires window.filteredTradePlansData - Filtered data
  * @requires trade_plansData - Original data
  * @requires updateDesignsTable - Function to update table
  * 
@@ -672,7 +760,7 @@ function sortTable(columnIndex) {
         window.sortTable(
             'planning',
             columnIndex,
-            window.filteredDesignsData || trade_plansData,
+            window.filteredTradePlansData || trade_plansData,
             updateDesignsTable
         );
     } else {
@@ -688,7 +776,7 @@ function sortTable(columnIndex) {
  * Local sorting function (fallback)
  */
 function performLocalSort(columnIndex) {
-    const data = window.filteredDesignsData || trade_plansData;
+    const data = window.filteredTradePlansData || trade_plansData;
     const currentSortState = window.getSortState ? window.getSortState('planning') : { columnIndex: -1, direction: 'asc' };
 
     // קביעת כיוון הסידור
@@ -731,7 +819,7 @@ function performLocalSort(columnIndex) {
 
     // עדכון הטבלה
     updateDesignsTable(sortedData);
-    window.filteredDesignsData = sortedData;
+    window.filteredTradePlansData = sortedData;
 
     console.log(`✅ Local sorting completed for column ${columnIndex}, direction: ${direction}`);
 }
@@ -1371,7 +1459,7 @@ if (typeof window.toggleMainSection !== 'function') {
         console.log('🔄 toggleMainSection fallback called');
         console.log('📍 Current page:', window.location.pathname);
         console.log('📍 Available functions:', Object.keys(window).filter(key => key.includes('toggle')));
-        
+
         const contentSections = document.querySelectorAll('.content-section');
         console.log('📋 Number of content-sections found:', contentSections.length);
         const planningSection = contentSections[0]; // The first section - planning
@@ -1435,7 +1523,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Loading data
-    loadDesignsData();
+    loadTradePlansData();
 
     // Updating debug panel on page load
     setTimeout(() => {
@@ -1454,52 +1542,162 @@ document.addEventListener('DOMContentLoaded', function () {
 // updateGridFromComponent is already defined at the beginning of the file
 
 // Adding functions to global scope
-window.loadDesignsData = loadDesignsData;
-window.updateDesignsTable = updateDesignsTable;
+window.loadTradePlansData = loadTradePlansData;
+window.updateTradePlansTable = updateTradePlansTable;
 window.showAddTradePlanModal = showAddTradePlanModal;
 window.saveNewTradePlan = saveNewTradePlan;
-window.editDesign = editDesign;
-window.deleteDesign = deleteDesign;
-window.filterDesignsData = filterDesignsData;
+window.editTradePlan = editTradePlan;
+window.deleteTradePlan = deleteTradePlan;
+window.filterTradePlansData = filterTradePlansData;
 window.sortTable = sortTable;
-window.filterDesignsLocally = filterDesignsLocally;
+window.filterTradePlansLocally = filterTradePlansLocally;
 window.updateFilterDebugPanel = updateFilterDebugPanel;
 window.translateDateRangeToDates = translateDateRangeToDates;
 window.restoreSortState = restoreSortState;
 
 // פונקציות חסרות
-window.loadPlanningData = function() {
-    console.log('🔄 loadPlanningData called - redirecting to loadDesignsData');
-    loadDesignsData();
+window.loadPlanningData = function () {
+    console.log('🔄 loadPlanningData called - redirecting to loadTradePlansData');
+    loadTradePlansData();
 };
 
-window.setupSortableHeaders = function() {
+window.setupSortableHeaders = function () {
     console.log('🔄 setupSortableHeaders called for planning page');
     // הפונקציה כבר מוגדרת ב-main.js
     if (typeof window.setupSortableHeadersGlobal === 'function') {
         window.setupSortableHeadersGlobal('planning');
     } else {
-        console.warn('⚠️ setupSortableHeadersGlobal not found');
+        console.warn('⚠️ setupSortableHeadersGlobal not found - using local function');
+        // שימוש בפונקציה מקומית אם הגלובלית לא קיימת
+        setupSortableHeadersLocal();
     }
 };
 
-window.updateTableStats = function() {
+function setupSortableHeadersLocal() {
+    console.log('🔄 Setting up sortable headers locally for planning page');
+    const headers = document.querySelectorAll('#designsTable th[onclick]');
+    headers.forEach(header => {
+        header.style.cursor = 'pointer';
+        header.title = 'לחץ למיון';
+    });
+}
+
+// פונקציות נוספות שחסרות
+window.updateDateRangeFilterDisplayText = function () {
+    console.log('🔄 updateDateRangeFilterDisplayText called');
+    // הפונקציה כבר מוגדרת ב-header-system.js
+    if (typeof window.updateDateRangeFilterDisplayTextGlobal === 'function') {
+        window.updateDateRangeFilterDisplayTextGlobal();
+    } else {
+        console.warn('⚠️ updateDateRangeFilterDisplayTextGlobal not found');
+    }
+};
+
+window.updateAccountFilterDisplayText = function () {
+    console.log('🔄 updateAccountFilterDisplayText called');
+    // הפונקציה כבר מוגדרת ב-accounts.js
+    if (typeof window.updateAccountFilterDisplayTextGlobal === 'function') {
+        window.updateAccountFilterDisplayTextGlobal();
+    } else {
+        console.warn('⚠️ updateAccountFilterDisplayTextGlobal not found');
+    }
+};
+
+window.updateAccountFilterMenu = function (accounts) {
+    console.log('🔄 updateAccountFilterMenu called');
+    // הפונקציה כבר מוגדרת ב-accounts.js
+    if (typeof window.updateAccountFilterMenuGlobal === 'function') {
+        window.updateAccountFilterMenuGlobal(accounts);
+    } else {
+        console.warn('⚠️ updateAccountFilterMenuGlobal not found');
+    }
+};
+
+window.loadSectionStates = function () {
+    console.log('🔄 loadSectionStates called');
+    // הפונקציה כבר מוגדרת ב-main.js
+    if (typeof window.loadSectionStatesGlobal === 'function') {
+        window.loadSectionStatesGlobal();
+    } else {
+        console.warn('⚠️ loadSectionStatesGlobal not found');
+    }
+};
+
+window.restoreAllSectionStates = function () {
+    console.log('🔄 restoreAllSectionStates called');
+    // הפונקציה כבר מוגדרת ב-main.js
+    if (typeof window.restoreAllSectionStatesGlobal === 'function') {
+        window.restoreAllSectionStatesGlobal();
+    } else {
+        console.warn('⚠️ restoreAllSectionStatesGlobal not found');
+    }
+};
+
+window.filterDataByFilters = function (data, pageName) {
+    console.log('🔄 filterDataByFilters called for page:', pageName);
+    // הפונקציה כבר מוגדרת ב-main.js
+    if (typeof window.filterDataByFiltersGlobal === 'function') {
+        return window.filterDataByFiltersGlobal(data, pageName);
+    } else {
+        console.warn('⚠️ filterDataByFiltersGlobal not found');
+        return data;
+    }
+};
+
+window.updateGridFromComponentGlobal = function (selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName) {
+    console.log('🔄 updateGridFromComponentGlobal called for page:', pageName);
+    // הפונקציה כבר מוגדרת ב-main.js
+    if (typeof window.updateGridFromComponentGlobalMain === 'function') {
+        return window.updateGridFromComponentGlobalMain(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName);
+    } else {
+        console.warn('⚠️ updateGridFromComponentGlobalMain not found');
+        // שימוש בפונקציה מקומית
+        return updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName);
+    }
+};
+
+window.updateTableStats = function () {
     console.log('🔄 updateTableStats called for planning page');
     updatePageSummaryStats();
 };
 
+window.restoreDesignsSectionState = function () {
+    console.log('🔄 restoreDesignsSectionState called for planning page');
+    restoreDesignsSectionState();
+};
+
+window.initializePageFilters = function (pageName) {
+    console.log('🔄 initializePageFilters called for page:', pageName);
+    // הפונקציה כבר מוגדרת ב-main.js או header-system.js
+    if (typeof window.initializePageFiltersGlobal === 'function') {
+        window.initializePageFiltersGlobal(pageName);
+    } else {
+        console.warn('⚠️ initializePageFiltersGlobal not found');
+    }
+};
+
+window.loadSortState = function (pageName) {
+    console.log('🔄 loadSortState called for page:', pageName);
+    // הפונקציה כבר מוגדרת ב-main.js
+    if (typeof window.loadSortStateGlobal === 'function') {
+        window.loadSortStateGlobal(pageName);
+    } else {
+        console.warn('⚠️ loadSortStateGlobal not found');
+    }
+};
+
 // Checking if functions are available
-console.log('🔄 Planning.js loaded. Available functions:', {
-    loadDesignsData: typeof window.loadDesignsData,
-    updateDesignsTable: typeof window.updateDesignsTable,
+console.log('🔄 Trade_plans.js loaded. Available functions:', {
+    loadTradePlansData: typeof window.loadTradePlansData,
+    updateTradePlansTable: typeof window.updateTradePlansTable,
     filterDataByFilters: typeof window.filterDataByFilters,
     updateGridFromComponentGlobal: typeof window.updateGridFromComponentGlobal,
     updateGridFromComponent: typeof window.updateGridFromComponent
 });
 
 // Verifying that our function is defined
-if (window.location.pathname.includes('/planning')) {
-    console.log('✅ Planning page detected - updateGridFromComponent should be ours');
+if (window.location.pathname.includes('/trade_plans')) {
+    console.log('✅ Trade plans page detected - updateGridFromComponent should be ours');
     console.log('✅ Our updateGridFromComponent function:', typeof window.updateGridFromComponent);
 
     // Verifying that our function is called

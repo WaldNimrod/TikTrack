@@ -428,19 +428,26 @@ function updateTradesTable(trades) {
 
     return `
     <tr>
-      <td><strong><a href="#" onclick="viewTickerDetails('${trade.ticker_id}')" class="ticker-link">${trade.ticker_symbol || 'טיקר לא ידוע'}</a></strong></td>
-      <td data-status="${trade.status || ''}"><span class="status-badge status-${trade.status || 'open'}">${statusDisplay}</span></td>
-      <td data-type="${typeForFilter}">${typeDisplay}</td>
-      <td>${trade.side || 'Long'}</td>
-      <td>${window.colorAmount(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
+      <td class="ticker-cell"><strong><a href="#" onclick="viewTickerDetails('${trade.ticker_id}')" class="ticker-link">${trade.ticker_symbol || 'טיקר לא ידוע'}</a></strong></td>
+      <td class="status-cell" data-status="${trade.status || ''}"><span class="status-badge status-${trade.status || 'open'}">${statusDisplay}</span></td>
+      <td class="type-cell" data-type="${typeForFilter}">${typeDisplay}</td>
+      <td class="side-cell" data-side="${trade.side || 'Long'}">${trade.side || 'Long'}</td>
+      <td class="pl-cell">${window.colorAmount(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
       <td>${trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-'}</td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editTradeRecord('${trade.id}')" title="ערוך">✏️</button>
-        <button class="btn btn-sm btn-secondary" onclick="cancelTradeRecord('${trade.id}')" title="ביטול">X</button>
+        ${trade.status === 'open' ? `
+        <button class="btn btn-sm btn-secondary" onclick="cancelTradeRecord('${trade.id}')" title="ביטול">❌</button>
+        ` : `
+        <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל טרייד סגור">X</button>
+        `}
         <button class="btn btn-sm btn-danger" onclick="deleteTradeRecord('${trade.id}')" title="מחק">🗑️</button>
+        <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${trade.id})" title="צפה באלמנטים מקושרים">
+          🔗
+        </button>
       </td>
     </tr>
   `;

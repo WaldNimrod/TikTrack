@@ -362,7 +362,119 @@ function clearExecutionValidationErrors() {
 }
 
 /**
- * ולידציה של טופס עסקה
+ * וולידציה מקיפה של טופס עסקה
+ * @param {string} mode - 'add' או 'edit'
+ * @returns {boolean} true אם הטופס תקין, false אחרת
+ */
+function validateCompleteExecutionForm(mode) {
+    const prefix = mode === 'add' ? 'add' : 'edit';
+    let isValid = true;
+
+    // וולידציה של מזהה טרייד
+    const tradeIdField = document.getElementById(`${prefix}ExecutionTradeId`);
+    if (!validateExecutionTradeId(tradeIdField)) {
+        isValid = false;
+    }
+
+    // וולידציה של סוג עסקה
+    const typeField = document.getElementById(`${prefix}ExecutionType`);
+    if (!typeField.value) {
+        const errorElement = document.getElementById(typeField.id + 'Error');
+        showFieldError(typeField, errorElement, 'יש לבחור סוג עסקה');
+        isValid = false;
+    } else {
+        const errorElement = document.getElementById(typeField.id + 'Error');
+        clearFieldError(typeField, errorElement);
+    }
+
+    // וולידציה של כמות
+    const quantityField = document.getElementById(`${prefix}ExecutionQuantity`);
+    if (!validateExecutionQuantity(quantityField)) {
+        isValid = false;
+    } else {
+        // בדיקה נוספת - כמות לא יכולה להיות גדולה מדי
+        const quantity = parseInt(quantityField.value);
+        if (quantity > 1000000) {
+            const errorElement = document.getElementById(quantityField.id + 'Error');
+            showFieldError(quantityField, errorElement, 'כמות גבוהה מדי (מקסימום 1,000,000)');
+            isValid = false;
+        }
+    }
+
+    // וולידציה של מחיר
+    const priceField = document.getElementById(`${prefix}ExecutionPrice`);
+    if (!validateExecutionPrice(priceField)) {
+        isValid = false;
+    } else {
+        // בדיקה נוספת - מחיר לא יכול להיות גבוה מדי
+        const price = parseFloat(priceField.value);
+        if (price > 1000000) {
+            const errorElement = document.getElementById(priceField.id + 'Error');
+            showFieldError(priceField, errorElement, 'מחיר גבוה מדי (מקסימום 1,000,000)');
+            isValid = false;
+        }
+    }
+
+    // וולידציה של תאריך
+    const dateField = document.getElementById(`${prefix}ExecutionDate`);
+    if (!dateField.value) {
+        const errorElement = document.getElementById(dateField.id + 'Error');
+        showFieldError(dateField, errorElement, 'תאריך עסקה הוא שדה חובה');
+        isValid = false;
+    } else {
+        const date = new Date(dateField.value);
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+
+        if (date > maxDate) {
+            const errorElement = document.getElementById(dateField.id + 'Error');
+            showFieldError(dateField, errorElement, 'תאריך לא יכול להיות יותר משנה קדימה');
+            isValid = false;
+        } else {
+            const minDate = new Date(2000, 0, 1);
+            if (date < minDate) {
+                const errorElement = document.getElementById(dateField.id + 'Error');
+                showFieldError(dateField, errorElement, 'תאריך לא יכול להיות לפני שנת 2000');
+                isValid = false;
+            } else {
+                const errorElement = document.getElementById(dateField.id + 'Error');
+                clearFieldError(dateField, errorElement);
+            }
+        }
+    }
+
+    // וולידציה של עמלה (אופציונלי)
+    const commissionField = document.getElementById(`${prefix}ExecutionCommission`);
+    if (commissionField.value) {
+        if (!validateExecutionCommission(commissionField)) {
+            isValid = false;
+        } else {
+            // בדיקה נוספת - עמלה לא יכולה להיות גבוהה מדי
+            const commission = parseFloat(commissionField.value);
+            if (commission > 10000) {
+                const errorElement = document.getElementById(commissionField.id + 'Error');
+                showFieldError(commissionField, errorElement, 'עמלה גבוהה מדי (מקסימום 10,000)');
+                isValid = false;
+            }
+        }
+    }
+
+    // וולידציה של הערות (אופציונלי)
+    const notesField = document.getElementById(`${prefix}ExecutionNotes`);
+    if (notesField.value && notesField.value.length > 1000) {
+        const errorElement = document.getElementById(notesField.id + 'Error');
+        showFieldError(notesField, errorElement, 'הערות ארוכות מדי (מקסימום 1,000 תווים)');
+        isValid = false;
+    } else if (notesField.value) {
+        const errorElement = document.getElementById(notesField.id + 'Error');
+        clearFieldError(notesField, errorElement);
+    }
+
+    return isValid;
+}
+
+/**
+ * ולידציה של טופס עסקה (פונקציה ישנה - נשמרת לתאימות)
  */
 function validateExecutionForm() {
     const tradeId = document.getElementById('addExecutionTradeId').value;
@@ -396,11 +508,8 @@ async function saveExecution() {
     const commission = document.getElementById('addExecutionCommission').value;
     const notes = document.getElementById('addExecutionNotes').value.trim();
 
-    // בדיקת ולידציה
-    if (!validateExecutionTradeId(document.getElementById('addExecutionTradeId')) ||
-        !validateExecutionQuantity(document.getElementById('addExecutionQuantity')) ||
-        !validateExecutionPrice(document.getElementById('addExecutionPrice')) ||
-        !type || !executionDate) {
+    // בדיקת ולידציה מקיפה
+    if (!validateCompleteExecutionForm('add')) {
         showNotification('❌ יש לתקן את השגיאות בטופס', 'error');
         return;
     }
@@ -468,10 +577,7 @@ async function updateExecution() {
     const notes = document.getElementById('editExecutionNotes').value.trim();
 
     // בדיקת ולידציה
-    if (!validateExecutionTradeId(document.getElementById('editExecutionTradeId')) ||
-        !validateExecutionQuantity(document.getElementById('editExecutionQuantity')) ||
-        !validateExecutionPrice(document.getElementById('editExecutionPrice')) ||
-        !type || !executionDate) {
+    if (!validateCompleteExecutionForm('edit')) {
         showNotification('❌ יש לתקן את השגיאות בטופס', 'error');
         return;
     }
@@ -1068,18 +1174,25 @@ async function updateExecutionsTable(executions) {
             <tr>
                 <td><strong>${symbol}</strong></td>
                 <td><small style="color: #666;">${tradeInfo}</small></td>
-                <td data-type="${typeForFilter}">${execution.action || execution.type}</td>
+                <td data-type="${typeForFilter}">
+                    <span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
+                        ${(execution.action || execution.type) === 'buy' ? 'רכישה' : 'מכירה'}
+                    </span>
+                </td>
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td>${execution.fee ? '$' + execution.fee : '-'}</td>
                 <td>${window.colorAmount(0, '$0')}</td>
-                <td>${execution.notes || ''}</td>
-                <td data-date="${execution.created_at}">${formatDate(execution.created_at)}</td>
-                <td data-date="${execution.date || execution.execution_date}">${formatDate(execution.date || execution.execution_date)}</td>
-                <td>${execution.source || '-'}</td>
-                <td>
+                <td>-</td>
+                <td data-date="${execution.created_at}">${window.formatDateOnly(execution.created_at)}</td>
+                <td data-date="${execution.date || execution.execution_date}">${window.formatDateOnly(execution.date || execution.execution_date)}</td>
+                <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
+                <td class="actions-cell">
                     <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">X</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
+                    <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${execution.id})" title="צפה באלמנטים מקושרים">
+                      🔗
+                    </button>
                 </td>
             </tr>
         `;

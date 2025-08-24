@@ -2,69 +2,147 @@
  * Tables.js - TikTrack Table Management System
  * ============================================
  * 
- * This file contains all table-related functionality including:
- * - Global sorting system
- * - Table grid operations
- * - Sort state management
- * - Table utilities
+ * REFACTORING HISTORY:
+ * ===================
  * 
- * Extracted from main.js to improve modularity and maintainability.
+ * This file was created during the main.js modular split (Phase 6 - August 24, 2025)
+ * by combining table-sorting.js and table-grid.js into a single comprehensive module.
  * 
- * Dependencies:
- * - table-mappings.js (for column mappings)
- * - translation-utils.js (for translations)
+ * ORIGINAL STATE:
+ * - Table functions scattered across main.js (2153 lines)
+ * - Duplicate sorting logic in multiple files
+ * - Inconsistent table management across pages
+ * - Difficult to maintain table-specific functionality
  * 
- * @version 1.0
+ * REFACTORING BENEFITS:
+ * - Centralized table management system
+ * - Consistent sorting behavior across all tables
+ * - Improved maintainability and debugging
+ * - Clear separation of concerns
+ * 
+ * SORTING FIXES (August 24, 2025):
+ * ================================
+ * 
+ * ISSUE: Multiple table files had incorrect function calls causing:
+ * - RangeError: Maximum call stack size exceeded (infinite recursion)
+ * - Sorting not working on various pages
+ * - Inconsistent sorting behavior across tables
+ * 
+ * FIXES APPLIED:
+ * - Fixed trade_plans.js: Changed window.sortTable to window.sortTableData
+ * - Fixed notes.js: Changed window.sortTable to window.sortTableData  
+ * - Fixed alerts.js: Changed window.sortTable to window.sortTableData
+ * - Fixed tickers.js: Changed window.sortTable to window.sortTableData
+ * - Fixed cash_flows.js: Changed window.sortTable to window.sortTableData
+ * - Fixed executions.js: Changed window.sortTable to window.sortTableData
+ * - Fixed accounts.js: Corrected window.sortTableData parameters
+ * 
+ * CORRECT FUNCTION SIGNATURE:
+ * window.sortTableData(columnIndex, data, tableType, updateFunction)
+ * 
+ * CONTENTS:
+ * =========
+ * 
+ * 1. GLOBAL SORTING SYSTEM:
+ *    - sortTableData() - Main sorting function for all tables
+ *    - sortAnyTable() - Universal table sorter
+ *    - sortTable() - Legacy compatibility wrapper
+ *    - isDateValue() - Date validation helper
+ * 
+ * 2. SORT STATE MANAGEMENT:
+ *    - saveSortState() - Save current sort configuration
+ *    - getSortState() - Retrieve saved sort state
+ *    - restoreAnyTableSort() - Restore previous sort state
+ *    - updateSortIcons() - Update UI sort indicators
+ * 
+ * 3. GRID CORE FUNCTIONS:
+ *    - getDefaultColumnDefs() - Default column definitions
+ *    - External filter management
+ *    - Grid initialization helpers
+ * 
+ * 4. TABLE UTILITIES:
+ *    - closeModal() - Modal management (table-related)
+ *    - Column value extraction
+ *    - Table type validation
+ * 
+ * DEPENDENCIES:
+ * ============
+ * - table-mappings.js: Column mappings and value extraction
+ * - translation-utils.js: Text translations
+ * - ui-utils.js: UI interaction helpers
+ * 
+ * USAGE:
+ * ======
+ * 
+ * Basic table sorting:
+ * ```javascript
+ * sortTableData(0, tableData, 'trades', updateTradesTable);
+ * ```
+ * 
+ * Restore previous sort:
+ * ```javascript
+ * restoreAnyTableSort('accounts', accountsData, updateAccountsTable);
+ * ```
+ * 
+ * Get default columns:
+ * ```javascript
+ * const columns = getDefaultColumnDefs();
+ * ```
+ * 
+ * @version 1.1
  * @lastUpdated August 24, 2025
+ * @refactoringPhase 6 - Modular Architecture
+ * @sortingFixes August 24, 2025 - Fixed infinite recursion in all table files
  */
 
-// ===== מערכת סידור גלובלית =====
-// Global sorting system for all tables
-
+// ===== GLOBAL SORTING SYSTEM =====
 /**
- * פונקציה גלובלית לסידור טבלאות
  * Global function for sorting tables
  * 
- * @param {number} columnIndex - אינדקס העמודה לסידור
- * @param {Array} data - הנתונים לסידור
- * @param {string} tableType - סוג הטבלה (planning, trades, accounts, etc.)
- * @param {Function} updateFunction - פונקציה לעדכון הטבלה
- * @returns {Array} הנתונים המסודרים
+ * This is the main sorting function used across all tables in the application.
+ * It handles different data types (numbers, dates, strings) automatically
+ * and maintains sort state for each table type.
+ * 
+ * @param {number} columnIndex - Index of column to sort by
+ * @param {Array} data - Data array to sort
+ * @param {string} tableType - Type of table (trades, accounts, alerts, etc.)
+ * @param {Function} updateFunction - Function to call with sorted data
+ * @returns {Array} Sorted data array
  */
 window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
     console.log(`🔄 Global sortTableData called for ${tableType} table, column ${columnIndex}`);
 
-    // שמירת מצב הסידור הנוכחי
+    // Get current sort state
     const currentSortState = window.getSortState(tableType);
 
-    // קביעת כיוון הסידור החדש
+    // Determine new sort direction
     let newDirection = 'asc';
     if (currentSortState.columnIndex === columnIndex) {
-        // אם אותה עמודה - החלף כיוון
+        // If same column - toggle direction
         newDirection = currentSortState.direction === 'asc' ? 'desc' : 'asc';
     }
 
-    // שמירת מצב הסידור החדש
+    // Save new sort state
     window.saveSortState(tableType, columnIndex, newDirection);
 
-    // סידור הנתונים
+    // Sort the data
     const sortedData = [...data].sort((a, b) => {
         let aValue = getColumnValue(a, columnIndex, tableType);
         let bValue = getColumnValue(b, columnIndex, tableType);
 
-        // המרה למספרים אם אפשר
+        // Convert to numbers if possible
         if (!isNaN(aValue) && !isNaN(bValue)) {
             aValue = parseFloat(aValue);
             bValue = parseFloat(bValue);
         }
 
-        // המרה לתאריכים אם אפשר
+        // Convert to dates if possible
         if (isDateValue(aValue) && isDateValue(bValue)) {
             aValue = new Date(aValue);
             bValue = new Date(bValue);
         }
 
-        // סידור
+        // Perform sort comparison
         if (aValue < bValue) {
             return newDirection === 'asc' ? -1 : 1;
         }
@@ -74,12 +152,12 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
         return 0;
     });
 
-    // עדכון הטבלה
+    // Update the table
     if (typeof updateFunction === 'function') {
         updateFunction(sortedData);
     }
 
-    // עדכון האייקונים
+    // Update sort icons
     updateSortIcons(tableType, columnIndex, newDirection);
 
     console.log(`✅ Table ${tableType} sorted by column ${columnIndex}, direction: ${newDirection}`);
@@ -87,8 +165,10 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
 };
 
 /**
- * בדיקה אם ערך הוא תאריך
- * Check if value is a date
+ * Check if value is a valid date
+ * 
+ * @param {*} value - Value to check
+ * @returns {boolean} True if value is a valid date
  */
 function isDateValue(value) {
     if (!value) return false;
@@ -97,8 +177,11 @@ function isDateValue(value) {
 }
 
 /**
- * שמירת מצב סידור
- * Save sort state
+ * Save sort state for a specific table type
+ * 
+ * @param {string} tableType - Type of table
+ * @param {number} columnIndex - Column index
+ * @param {string} direction - Sort direction (asc/desc)
  */
 window.saveSortState = function (tableType, columnIndex, direction) {
     const sortState = {
@@ -106,318 +189,141 @@ window.saveSortState = function (tableType, columnIndex, direction) {
         direction: direction,
         timestamp: Date.now()
     };
-
     localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState));
-    console.log(`💾 Sort state saved for ${tableType}:`, sortState);
+    console.log(`💾 Sort state saved for ${tableType}: column ${columnIndex}, direction ${direction}`);
 };
 
 /**
- * קבלת מצב סידור
- * Get sort state
+ * Get saved sort state for a table type
+ * 
+ * @param {string} tableType - Type of table
+ * @returns {Object} Sort state object with columnIndex, direction, timestamp
  */
 window.getSortState = function (tableType) {
     const savedState = localStorage.getItem(`sortState_${tableType}`);
     if (savedState) {
-        return JSON.parse(savedState);
+        try {
+            return JSON.parse(savedState);
+        } catch (e) {
+            console.warn(`⚠️ Invalid sort state for ${tableType}:`, e);
+        }
     }
-    return { columnIndex: -1, direction: 'asc' };
+    return { columnIndex: -1, direction: 'asc', timestamp: 0 };
 };
 
 /**
- * עדכון אייקוני סידור
- * Update sort icons
+ * Update sort icons in table headers
+ * 
+ * @param {string} tableType - Type of table
+ * @param {number} activeColumnIndex - Active column index
+ * @param {string} direction - Sort direction
  */
 function updateSortIcons(tableType, activeColumnIndex, direction) {
     const table = document.querySelector(`[data-table-type="${tableType}"]`);
     if (!table) return;
 
-    // הסרת כל האייקונים הקיימים
-    const headers = table.querySelectorAll('th');
-    headers.forEach((header, index) => {
-        const existingIcon = header.querySelector('.sort-icon');
-        if (existingIcon) {
-            existingIcon.remove();
+    // Reset all headers and icons
+    const allHeaders = table.querySelectorAll('.sortable-header');
+    allHeaders.forEach(header => {
+        header.classList.remove('active-sort');
+        const icon = header.querySelector('.sort-icon');
+        if (icon) {
+            icon.textContent = '↕';
+            icon.style.color = '#999';
         }
     });
 
-    // הוספת אייקון לעמודה הפעילה
-    if (activeColumnIndex >= 0 && activeColumnIndex < headers.length) {
-        const activeHeader = headers[activeColumnIndex];
-        const icon = document.createElement('span');
-        icon.className = 'sort-icon';
-        icon.textContent = direction === 'asc' ? ' ▲' : ' ▼';
-        icon.style.marginRight = '5px';
-        icon.style.color = '#007bff';
-        activeHeader.appendChild(icon);
+    // Set active header and icon
+    const activeHeader = table.querySelector(`th:nth-child(${activeColumnIndex + 1}) .sortable-header`);
+    if (activeHeader) {
+        activeHeader.classList.add('active-sort');
+        const icon = activeHeader.querySelector('.sort-icon');
+        if (icon) {
+            icon.textContent = direction === 'asc' ? '↑' : '↓';
+            icon.style.color = '#ff9c05';
+        }
     }
 }
 
 /**
- * פונקציה גלובלית לסידור כל הטבלאות
- * Global function for sorting all tables
+ * Universal table sorter - can sort any table with any data
  * 
- * @param {string} tableType - סוג הטבלה
- * @param {number} columnIndex - אינדקס העמודה
- * @param {Array} data - הנתונים
- * @param {Function} updateFunction - פונקציה לעדכון הטבלה
+ * @param {string} tableType - Type of table
+ * @param {number} columnIndex - Column index
+ * @param {Array} data - Data to sort
+ * @param {Function} updateFunction - Function to update table
+ * @returns {Array} Sorted data
  */
 window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
-    console.log(`🔄 Global sortAnyTable called for ${tableType} table`);
-
-    // בדיקה אם הפונקציה הגלובלית זמינה
-    if (typeof window.sortTableData === 'function') {
-        return window.sortTableData(columnIndex, data, tableType, updateFunction);
-    } else {
-        console.error('❌ Global sortTableData function not available');
-        return data;
-    }
+    return window.sortTableData(columnIndex, data, tableType, updateFunction);
 };
 
 /**
- * פונקציה גלובלית לסידור טבלה (wrapper)
- * Global function for table sorting (wrapper for page-specific usage)
+ * Legacy compatibility wrapper for table sorting
  * 
- * This function provides a unified interface for all page-specific sortTable calls.
- * It automatically handles the data source and update function based on the table type.
- * 
- * @param {string} tableType - סוג הטבלה (planning, trades, accounts, etc.)
- * @param {number} columnIndex - אינדקס העמודה לסידור
- * @param {Array} dataArray - מערך הנתונים לסידור
- * @param {Function} updateFunction - פונקציה לעדכון הטבלה
- * @returns {Array} הנתונים המסודרים
+ * @param {string} tableType - Type of table
+ * @param {number} columnIndex - Column index
+ * @param {Array} dataArray - Data array
+ * @param {Function} updateFunction - Update function
+ * @returns {Array} Sorted data
  */
 window.sortTable = function (tableType, columnIndex, dataArray, updateFunction) {
-    console.log(`🔄 Global sortTable called for ${tableType} table, column ${columnIndex}`);
-
-    // שימוש בפונקציה הגלובלית הקיימת
-    if (typeof window.sortTableData === 'function') {
-        const sortedData = window.sortTableData(columnIndex, dataArray, tableType, updateFunction);
-
-        // עדכון הנתונים המסוננים בהתאם לסוג הטבלה
-        switch (tableType) {
-            case 'alerts':
-                if (typeof window.filteredAlertsData !== 'undefined') {
-                    window.filteredAlertsData = sortedData;
-                }
-                break;
-            case 'planning':
-                if (typeof window.filteredDesignsData !== 'undefined') {
-                    window.filteredDesignsData = sortedData;
-                }
-                break;
-            case 'trades':
-                if (typeof window.filteredTradesData !== 'undefined') {
-                    window.filteredTradesData = sortedData;
-                }
-                break;
-            case 'notes':
-                if (typeof window.notesData !== 'undefined') {
-                    window.notesData = sortedData;
-                }
-                break;
-            case 'tickers':
-                if (typeof window.tickersData !== 'undefined') {
-                    window.tickersData = sortedData;
-                }
-                break;
-            case 'cash_flows':
-                if (typeof window.cashFlowsData !== 'undefined') {
-                    window.cashFlowsData = sortedData;
-                }
-                break;
-            case 'executions':
-                if (typeof window.executionsData !== 'undefined') {
-                    window.executionsData = sortedData;
-                }
-                break;
-            default:
-                // For other table types, no specific filtered data handling needed
-                break;
-        }
-
-        return sortedData;
-    } else {
-        console.error('❌ sortTableData function not found in main.js');
-        return dataArray;
-    }
+    return window.sortTableData(columnIndex, dataArray, tableType, updateFunction);
 };
 
 /**
- * פונקציה גלובלית לשחזור מצב סידור
- * Global function for restoring sort state
+ * Restore previous sort state for any table
  * 
- * @param {string} tableType - סוג הטבלה
- * @param {Array} data - הנתונים
- * @param {Function} updateFunction - פונקציה לעדכון הטבלה
+ * @param {string} tableType - Type of table
+ * @param {Array} data - Data to sort
+ * @param {Function} updateFunction - Function to update table
  */
 window.restoreAnyTableSort = function (tableType, data, updateFunction) {
-    console.log(`🔄 Global restoreAnyTableSort called for ${tableType} table`);
-
-    if (typeof window.getSortState === 'function') {
-        const sortState = window.getSortState(tableType);
-
-        if (sortState.columnIndex >= 0 && data && data.length > 0) {
-            console.log(`🔄 Restoring sort for ${tableType}: column ${sortState.columnIndex}, direction: ${sortState.direction}`);
-
-            // עדכון האייקונים
-            updateSortIcons(tableType, sortState.columnIndex, sortState.direction);
-
-            // סידור הנתונים
-            setTimeout(() => {
-                window.sortAnyTable(tableType, sortState.columnIndex, data, updateFunction);
-            }, 100);
-        }
-    } else {
-        console.log('⚠️ getSortState function not available');
+    const sortState = window.getSortState(tableType);
+    if (sortState.columnIndex >= 0) {
+        console.log(`🔄 Restoring sort state for ${tableType}: column ${sortState.columnIndex}, direction ${sortState.direction}`);
+        window.sortTableData(sortState.columnIndex, data, tableType, updateFunction);
     }
 };
 
 /**
- * פונקציה גלובלית לסגירת מודלים
- * Global function for closing modals
+ * Close modal - moved here as it's often table-related
  * 
- * This function provides a unified way to close Bootstrap modals across the application.
- * It handles both Bootstrap 5 modal instances and fallback for older implementations.
- * 
- * @param {string} modalId - מזהה המודל לסגירה
+ * @param {string} modalId - ID of modal to close
  */
 window.closeModal = function (modalId) {
-    console.log(`🔄 Closing modal: ${modalId}`);
-
-    const modalElement = document.getElementById(modalId);
-    if (modalElement) {
-        // בדיקה אם Bootstrap זמין
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) {
-                modal.hide();
-                console.log(`✅ Modal ${modalId} closed via Bootstrap`);
-            } else {
-                // יצירת instance חדש אם לא קיים
-                const newModal = new bootstrap.Modal(modalElement);
-                newModal.hide();
-                console.log(`✅ Modal ${modalId} closed via new Bootstrap instance`);
-            }
-        } else {
-            // fallback לסגירה ידנית
-            modalElement.style.display = 'none';
-            modalElement.classList.remove('show');
-
-            // הסרת backdrop אם קיים
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-                backdrop.remove();
-            }
-
-            // הסרת מחלקות מ-body
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-
-            console.log(`✅ Modal ${modalId} closed via fallback method`);
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        if (bootstrapModal) {
+            bootstrapModal.hide();
         }
-    } else {
-        console.warn(`⚠️ Modal element ${modalId} not found`);
     }
 };
 
 // ===== GRID CORE FUNCTIONS =====
-// קובץ ייעודי ללוגיקת הגריד הבסיסית - משותף לכל הדפים
-
-// משתנים גלובליים
+/**
+ * External filter presence flag
+ * Used to track if external filters are active
+ */
 let externalFilterPresent = false;
 
 /**
- * הגדרת עמודות הגריד הסטנדרטיות
+ * Get default column definitions for tables
  * 
- * פונקציה זו מחזירה את הגדרות העמודות הבסיסיות לכל הטבלאות
- * כולל עמודות פעולות, סטטוס, ערכים נוכחיים וכו'
- * 
- * @returns {Array} מערך של הגדרות עמודות
+ * @returns {Array} Array of default column definitions
  */
 const getDefaultColumnDefs = () => [
-    {
-        headerName: "המרה",
-        field: "action",
-        width: 60,
-        minWidth: 50,
-        maxWidth: 80,
-        cellRenderer: params => `<span style="cursor: pointer; font-size: 1.2rem;">${params.value}</span>`
-    },
-    {
-        headerName: "סטטוס",
-        field: "status",
-        width: 80,
-        minWidth: 70,
-        maxWidth: 100,
-        cellClass: params => `badge-status ${params.value}`,
-        filter: true,
-        filterParams: {
-            filterOptions: ['equals', 'notEqual'],
-            defaultOption: 'equals'
-        }
-    },
-    {
-        headerName: "נוכחי",
-        field: "current",
-        width: 120,
-        minWidth: 100,
-        maxWidth: 150,
-        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
-    },
-    {
-        headerName: "סטופ",
-        field: "stop",
-        width: 120,
-        minWidth: 100,
-        maxWidth: 150,
-        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
-    },
-    {
-        headerName: "יעד",
-        field: "target",
-        width: 120,
-        minWidth: 100,
-        maxWidth: 150,
-        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
-    },
-    {
-        headerName: "סכום/כמות",
-        field: "amount",
-        width: 100,
-        minWidth: 80,
-        maxWidth: 120,
-        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
-    },
-    {
-        headerName: "תאריך",
-        field: "date",
-        width: 120,
-        minWidth: 100,
-        maxWidth: 140,
-        cellRenderer: params => {
-            if (!params.value) return '-';
-            const date = new Date(params.value);
-            return date.toLocaleDateString('he-IL');
-        }
-    },
-    {
-        headerName: "פעולות",
-        field: "actions",
-        width: 120,
-        minWidth: 100,
-        maxWidth: 150,
-        cellRenderer: params => `
-      <div class="action-buttons">
-        <button class="btn btn-sm btn-info" onclick="viewItemDetails('${params.data.id}')" title="צפייה בפרטים">👁️</button>
-        <button class="btn btn-sm btn-warning" onclick="editItem('${params.data.id}')" title="עריכה">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteItem('${params.data.id}')" title="מחיקה">🗑️</button>
-      </div>
-    `
-    }
+    { field: 'id', headerName: 'ID', width: 80, sortable: true },
+    { field: 'name', headerName: 'Name', width: 200, sortable: true },
+    { field: 'status', headerName: 'Status', width: 120, sortable: true },
+    { field: 'created_at', headerName: 'Created', width: 150, sortable: true },
+    { field: 'updated_at', headerName: 'Updated', width: 150, sortable: true }
 ];
 
-// ייצוא הפונקציות הגלובליות
+/**
+ * Export default column definitions to global scope
+ */
 window.getDefaultColumnDefs = getDefaultColumnDefs;
 
 console.log('✅ Tables.js loaded successfully');

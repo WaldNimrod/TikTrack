@@ -47,8 +47,6 @@ class FilterSystem {
   initialize() {
     if (this.initialized) return;
 
-    console.log('🔧 FilterSystem initializing...');
-
     // המתן לטעינת DOM
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.init());
@@ -58,7 +56,6 @@ class FilterSystem {
   }
 
   init() {
-    console.log('🔧 FilterSystem initialized');
     this.loadSavedFilters();
     this.setupGlobalEventListeners();
     this.initialized = true;
@@ -77,7 +74,6 @@ class FilterSystem {
     };
 
     this.tables.set(tableId, table);
-    console.log(`📋 Table ${tableId} registered with fields:`, table.fields);
 
     // טעינת נתונים מהטבלה
     this.loadTableData(tableId);
@@ -94,8 +90,7 @@ class FilterSystem {
     const rows = table.element.querySelectorAll('tbody tr');
     const data = [];
 
-    console.log(`📊 Loading data for table ${tableId} with ${rows.length} rows`);
-    console.log(`📊 Table fields:`, table.fields);
+
 
     rows.forEach((row, rowIndex) => {
       const cells = row.querySelectorAll('td');
@@ -105,7 +100,6 @@ class FilterSystem {
         if (cells[index]) {
           const value = cells[index].textContent.trim();
           rowData[field] = value;
-          console.log(`📊 Row ${rowIndex}, Field ${field}: "${value}"`);
         }
       });
 
@@ -114,13 +108,11 @@ class FilterSystem {
 
     table.data = data;
     table.filteredData = [...data];
-    console.log(`📊 Loaded ${data.length} rows for table ${tableId}:`, data);
   }
 
   // רישום פילטר חדש
   registerFilter(filterName, filterConfig) {
     this.filters.set(filterName, filterConfig);
-    console.log(`🔍 Filter ${filterName} registered`);
   }
 
   // עדכון פילטר
@@ -128,7 +120,6 @@ class FilterSystem {
     this.currentFilters[filterName] = value;
     this.saveFilters();
     this.applyAllFilters();
-    console.log(`🔄 Filter ${filterName} updated:`, value);
   }
 
   // הפעלת כל הפילטרים על כל הטבלאות

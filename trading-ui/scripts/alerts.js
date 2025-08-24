@@ -586,7 +586,7 @@ function updateAlertsTable(alerts) {
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
-            <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${alert.id})" title="צפה באלמנטים מקושרים">
+            <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">
               🔗
             </button>
             <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">
@@ -1673,15 +1673,15 @@ function sortTable(columnIndex) {
   console.log(`🔄 מיון טבלת התראות לפי עמודה ${columnIndex}`);
 
   // שימוש בפונקציה הגלובלית החדשה
-  if (typeof window.sortTable === 'function') {
-    window.sortTable(
-      'alerts',
+  if (typeof window.sortTableData === 'function') {
+    window.sortTableData(
       columnIndex,
       window.filteredAlertsData || alertsData,
+      'alerts',
       updateAlertsTable
     );
   } else {
-    console.error('❌ sortTable function not found in main.js');
+    console.error('❌ sortTableData function not found in tables.js');
   }
 }
 

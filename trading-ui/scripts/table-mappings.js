@@ -7,6 +7,37 @@
 // File: trading-ui/scripts/table-mappings.js
 // Dependencies: None (standalone utility file)
 // Dependents: main.js, all page-specific scripts
+// 
+// TABLE STRUCTURE FIXES (August 24, 2025):
+// =======================================
+// 
+// ISSUE: Table headers and data columns were inconsistent across pages
+// - Trades table had 10 columns in HTML but 11 columns in data
+// - Column order mismatch between HTML headers and JavaScript data rendering
+// - Sorting failed due to incorrect column mappings
+// 
+// FIXES APPLIED:
+// - Updated trades table mapping to include 11 columns (added account_name)
+// - Fixed column order to match HTML headers exactly
+// - Updated getColumnValue function to handle new field names
+// - Corrected colspan attributes in HTML tables
+// 
+// TRADES TABLE STRUCTURE (11 columns):
+// - account_name (0) - חשבון
+// - ticker_symbol (1) - טיקר  
+// - trade_plan_id (2) - תוכנית
+// - status (3) - סטטוס
+// - investment_type (4) - סוג
+// - side (5) - צד
+// - created_at (6) - נוצר ב
+// - closed_at (7) - נסגר ב
+// - total_pl (8) - רווח/הפסד
+// - notes (9) - הערות
+// - actions (10) - פעולות
+// 
+// @version 1.1
+// @lastUpdated August 24, 2025
+// @tableStructureFixes August 24, 2025 - Fixed column mappings and table structure
 
 /**
  * מיפוי עמודות לכל הטבלאות באתר
@@ -31,15 +62,17 @@ const TABLE_COLUMN_MAPPINGS = {
 
     // טבלת טריידים (Trades)
     'trades': [
-        'ticker',          // 0 - טיקר
-        'status',          // 1 - סטטוס
-        'investment_type', // 2 - סוג
-        'side',            // 3 - צד
-        'total_pl',        // 4 - רווח/הפסד
-        'trade_plan_id',   // 5 - תוכנית
+        'account_name',    // 0 - חשבון
+        'ticker_symbol',   // 1 - טיקר
+        'trade_plan_id',   // 2 - תוכנית
+        'status',          // 3 - סטטוס
+        'investment_type', // 4 - סוג
+        'side',            // 5 - צד
         'created_at',      // 6 - נוצר ב
         'closed_at',       // 7 - נסגר ב
-        'notes'            // 8 - הערות
+        'total_pl',        // 8 - רווח/הפסד
+        'notes',           // 9 - הערות
+        'actions'          // 10 - פעולות
     ],
 
     // טבלת חשבונות (Accounts)
@@ -140,14 +173,17 @@ function getColumnValue(item, columnIndex, tableType) {
     }
 
     if (tableType === 'trades') {
-        if (fieldName === 'account') {
-            return item.account ? (item.account.name || '') : '';
+        if (fieldName === 'account_name') {
+            return item.account_name || item.account_id || '';
         }
-        if (fieldName === 'ticker') {
-            return item.ticker ? (item.ticker.symbol || item.ticker.name || '') : '';
+        if (fieldName === 'ticker_symbol') {
+            return item.ticker_symbol || item.ticker_id || '';
         }
         if (fieldName === 'trade_plan_id') {
             return item.trade_plan_id || '';
+        }
+        if (fieldName === 'actions') {
+            return ''; // לא ממיינים לפי עמודת פעולות
         }
     }
 

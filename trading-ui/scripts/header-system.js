@@ -41,11 +41,8 @@ class HeaderSystem {
 
   init() {
     if (this.isInitialized) {
-      console.log('🏠 HeaderSystem already initialized');
       return;
     }
-
-    console.log('🏠 HeaderSystem initializing...');
 
     // יצירת אלמנט הכותרת
     this.createHeader();
@@ -60,7 +57,6 @@ class HeaderSystem {
     this.setupEventListeners();
 
     this.isInitialized = true;
-    console.log('🏠 HeaderSystem initialized');
   }
 
   createHeader() {
@@ -77,20 +73,12 @@ class HeaderSystem {
 
     // הכנסת הכותרת לתחילת הדף
     document.body.insertBefore(headerElement, document.body.firstChild);
-
-    console.log('🏠 New unified header created and inserted with app-header styles');
-    console.log('🏠 Header element ID:', headerElement.id);
-    console.log('🏠 Header element exists:', !!document.getElementById('unified-header'));
-    console.log('🏠 Header element HTML:', headerElement.outerHTML.substring(0, 200) + '...');
   }
 
   initFilterSystem() {
     // שימוש במערכת הפילטרים הקיימת
     if (window.simpleFilter) {
       this.filterSystem = window.simpleFilter;
-      console.log('🏠 Using existing simpleFilter instance');
-    } else {
-      console.log('🏠 No simpleFilter instance found');
     }
   }
 
@@ -902,8 +890,8 @@ class HeaderSystem {
 
     // סגירת תפריטים בלחיצה מחוץ לאזור התפריט
     document.addEventListener('click', (e) => {
-      // בדיקה אם הלחיצה הייתה מחוץ לכל תפריטי הפילטרים
-      const isClickInsideFilter = e.target.closest('.filter-menu') ||
+      // בדיקה אם הלחיצה הייתה מחוץ לכל תפריטי הפילטרים והתפריט הראשי
+      const isClickInsideMenu = e.target.closest('.filter-menu') ||
         e.target.closest('.filter-toggle') ||
         e.target.closest('#searchFilterInput') ||
         e.target.closest('#searchClearBtn') ||
@@ -911,7 +899,7 @@ class HeaderSystem {
         e.target.closest('.tiktrack-dropdown-toggle') ||
         e.target.closest('.submenu');
 
-      if (!isClickInsideFilter) {
+      if (!isClickInsideMenu) {
         // סגירת כל התפריטים
         this.closeAllMenus();
       }
@@ -921,6 +909,8 @@ class HeaderSystem {
     document.addEventListener('click', (e) => {
       if (e.target.closest('#filterToggleBtn')) {
         this.toggleFiltersNew();
+        // סגירת התפריט הראשי כשפותחים פילטרים
+        this.closeMainMenu();
       }
     });
 
@@ -942,20 +932,6 @@ class HeaderSystem {
     document.addEventListener('click', (e) => {
       if (e.target.closest('#searchClearBtn')) {
         this.clearSearchFilter();
-      }
-    });
-
-    // סגירת פילטרים בלחיצה מחוץ לתפריט
-    document.addEventListener('click', (e) => {
-      // בדיקה אם הלחיצה הייתה מחוץ לכל תפריטי הפילטרים
-      const isClickInsideFilter = e.target.closest('.filter-menu') ||
-        e.target.closest('.filter-toggle') ||
-        e.target.closest('#searchFilterInput') ||
-        e.target.closest('#searchClearBtn');
-
-      if (!isClickInsideFilter) {
-        // סגירת כל הפילטרים
-        this.closeAllFilterMenus();
       }
     });
 
@@ -1054,19 +1030,11 @@ class HeaderSystem {
 
   // פונקציה לסגירת כל התפריטים
   closeAllMenus() {
-    console.log('🔍 closeAllMenus called');
+    // סגירת התפריט הראשי
+    this.closeMainMenu();
 
-    // סגירת דרופדאונים
-    this.closeAllDropdowns();
-
-    // סגירת פילטרים
-    window.closeStatusFilter();
-    window.closeTypeFilter();
-    window.closeAccountFilter();
-    window.closeDateRangeFilter();
-
-    // ניקוי כל הטיימרים
-    this.clearAllMenuTimers();
+    // סגירת תפריטי הפילטרים
+    this.closeAllFilterMenus();
   }
 
   // פונקציה לניקוי כל הטיימרים
@@ -1115,6 +1083,15 @@ class HeaderSystem {
     window.closeTypeFilter();
     window.closeAccountFilter();
     window.closeDateRangeFilter();
+
+    // ניקוי טיימרים של כל תפריטי הפילטרים
+    const filterMenus = ['statusFilterMenu', 'typeFilterMenu', 'accountFilterMenu', 'dateRangeFilterMenu'];
+    filterMenus.forEach(menuId => {
+      const menu = document.getElementById(menuId);
+      if (menu) {
+        clearFilterMenuTimers(menu);
+      }
+    });
 
     // איפוס מצב פעיל של כפתורים
     const toggles = document.querySelectorAll('.filter-toggle.active');
@@ -1695,6 +1672,7 @@ class HeaderSystem {
             const otherMenu = otherToggle.nextElementSibling;
             if (otherMenu && otherMenu.classList.contains('tiktrack-dropdown-menu')) {
               otherMenu.classList.remove('show');
+              this.clearMenuTimers(otherMenu);
             }
           }
         });
@@ -1702,18 +1680,90 @@ class HeaderSystem {
         // פתיחה/סגירה של הדרופדאון הנוכחי
         const menu = toggle.nextElementSibling;
         if (menu && menu.classList.contains('tiktrack-dropdown-menu')) {
-          menu.classList.toggle('show');
+          const isVisible = menu.classList.contains('show');
+
+          if (isVisible) {
+            menu.classList.remove('show');
+            this.clearMenuTimers(menu);
+          } else {
+            menu.classList.add('show');
+            this.setupMenuAutoClose(menu);
+          }
         }
       });
     });
 
-    // סגירת דרופדאונים בלחיצה מחוץ - DISABLED
-    // document.addEventListener('click', (e) => {
-    //   if (!e.target.closest('.tiktrack-nav-item.dropdown')) {
-    //     const navMenus = document.querySelectorAll('.tiktrack-nav-item.dropdown .tiktrack-dropdown-menu');
-    //     navMenus.forEach(menu => menu.classList.remove('show'));
-    //   }
-    // });
+    // סגירת דרופדאונים בלחיצה מחוץ
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.tiktrack-nav-item.dropdown')) {
+        const navMenus = document.querySelectorAll('.tiktrack-nav-item.dropdown .tiktrack-dropdown-menu');
+        navMenus.forEach(menu => {
+          menu.classList.remove('show');
+          this.clearMenuTimers(menu);
+        });
+      }
+    });
+  }
+
+  setupMenuAutoClose(menu) {
+    // ניקוי טיימרים קודמים
+    this.clearMenuTimers(menu);
+
+    // טיימר לסגירה אוטומטית אחרי 10 שניות
+    const autoCloseTimer = setTimeout(() => {
+      menu.classList.remove('show');
+      this.clearMenuTimers(menu);
+    }, 10000);
+
+    // טיימר לסגירה אחרי יציאת העכבר
+    let mouseLeaveTimer = null;
+
+    const handleMouseEnter = () => {
+      if (mouseLeaveTimer) {
+        clearTimeout(mouseLeaveTimer);
+        mouseLeaveTimer = null;
+      }
+    };
+
+    const handleMouseLeave = () => {
+      mouseLeaveTimer = setTimeout(() => {
+        menu.classList.remove('show');
+        this.clearMenuTimers(menu);
+      }, 5000);
+    };
+
+    // הוספת event listeners
+    menu.addEventListener('mouseenter', handleMouseEnter);
+    menu.addEventListener('mouseleave', handleMouseLeave);
+
+    // שמירת הטיימרים לאלמנט
+    menu._autoCloseTimer = autoCloseTimer;
+    menu._mouseLeaveTimer = mouseLeaveTimer;
+    menu._handleMouseEnter = handleMouseEnter;
+    menu._handleMouseLeave = handleMouseLeave;
+  }
+
+  clearMenuTimers(menu) {
+    if (menu._autoCloseTimer) {
+      clearTimeout(menu._autoCloseTimer);
+      menu._autoCloseTimer = null;
+    }
+
+    if (menu._mouseLeaveTimer) {
+      clearTimeout(menu._mouseLeaveTimer);
+      menu._mouseLeaveTimer = null;
+    }
+
+    // הסרת event listeners
+    if (menu._handleMouseEnter) {
+      menu.removeEventListener('mouseenter', menu._handleMouseEnter);
+      menu._handleMouseEnter = null;
+    }
+
+    if (menu._handleMouseLeave) {
+      menu.removeEventListener('mouseleave', menu._handleMouseLeave);
+      menu._handleMouseLeave = null;
+    }
   }
 
   // פונקציה לטעינת חשבונות לפילטר
@@ -2164,6 +2214,15 @@ class HeaderSystem {
       }
     }
   }
+
+  closeMainMenu() {
+    // סגירת כל תפריטי הניווט הראשיים
+    const navMenus = document.querySelectorAll('.tiktrack-nav-item.dropdown .tiktrack-dropdown-menu');
+    navMenus.forEach(menu => {
+      menu.classList.remove('show');
+      this.clearMenuTimers(menu);
+    });
+  }
 }
 
 // יצירת instance גלובלי
@@ -2197,7 +2256,24 @@ function toggleStatusFilter() {
   console.log('🔄 toggleStatusFilter called');
   const menu = document.getElementById('statusFilterMenu');
   if (menu) {
-    menu.classList.toggle('show');
+    const isVisible = menu.classList.contains('show');
+
+    // סגירת תפריטי פילטר אחרים
+    closeOtherFilterMenus('statusFilterMenu');
+
+    // סגירת התפריט הראשי
+    if (window.headerSystem) {
+      window.headerSystem.closeMainMenu();
+    }
+
+    if (isVisible) {
+      menu.classList.remove('show');
+      clearFilterMenuTimers(menu);
+    } else {
+      menu.classList.add('show');
+      setupFilterMenuAutoClose(menu);
+    }
+
     console.log('🔄 Status filter menu toggled, show class:', menu.classList.contains('show'));
   } else {
     console.warn('⚠️ Status filter menu not found');
@@ -2211,7 +2287,24 @@ function toggleTypeFilter() {
   console.log('🔄 toggleTypeFilter called');
   const menu = document.getElementById('typeFilterMenu');
   if (menu) {
-    menu.classList.toggle('show');
+    const isVisible = menu.classList.contains('show');
+
+    // סגירת תפריטי פילטר אחרים
+    closeOtherFilterMenus('typeFilterMenu');
+
+    // סגירת התפריט הראשי
+    if (window.headerSystem) {
+      window.headerSystem.closeMainMenu();
+    }
+
+    if (isVisible) {
+      menu.classList.remove('show');
+      clearFilterMenuTimers(menu);
+    } else {
+      menu.classList.add('show');
+      setupFilterMenuAutoClose(menu);
+    }
+
     console.log('🔄 Type filter menu toggled, show class:', menu.classList.contains('show'));
   } else {
     console.warn('⚠️ Type filter menu not found');
@@ -2225,7 +2318,24 @@ function toggleAccountFilter() {
   console.log('🔄 toggleAccountFilter called');
   const menu = document.getElementById('accountFilterMenu');
   if (menu) {
-    menu.classList.toggle('show');
+    const isVisible = menu.classList.contains('show');
+
+    // סגירת תפריטי פילטר אחרים
+    closeOtherFilterMenus('accountFilterMenu');
+
+    // סגירת התפריט הראשי
+    if (window.headerSystem) {
+      window.headerSystem.closeMainMenu();
+    }
+
+    if (isVisible) {
+      menu.classList.remove('show');
+      clearFilterMenuTimers(menu);
+    } else {
+      menu.classList.add('show');
+      setupFilterMenuAutoClose(menu);
+    }
+
     console.log('🔄 Account filter menu toggled, show class:', menu.classList.contains('show'));
   } else {
     console.warn('⚠️ Account filter menu not found');
@@ -2239,7 +2349,24 @@ function toggleDateRangeFilter() {
   console.log('🔄 toggleDateRangeFilter called');
   const menu = document.getElementById('dateRangeFilterMenu');
   if (menu) {
-    menu.classList.toggle('show');
+    const isVisible = menu.classList.contains('show');
+
+    // סגירת תפריטי פילטר אחרים
+    closeOtherFilterMenus('dateRangeFilterMenu');
+
+    // סגירת התפריט הראשי
+    if (window.headerSystem) {
+      window.headerSystem.closeMainMenu();
+    }
+
+    if (isVisible) {
+      menu.classList.remove('show');
+      clearFilterMenuTimers(menu);
+    } else {
+      menu.classList.add('show');
+      setupFilterMenuAutoClose(menu);
+    }
+
     console.log('🔄 Date range filter menu toggled, show class:', menu.classList.contains('show'));
   } else {
     console.warn('⚠️ Date range filter menu not found');
@@ -2262,6 +2389,7 @@ function closeStatusFilter() {
   const menu = document.getElementById('statusFilterMenu');
   if (menu) {
     menu.classList.remove('show');
+    clearFilterMenuTimers(menu);
     console.log('🔄 Status filter menu closed');
   } else {
     console.warn('⚠️ Status filter menu not found');
@@ -2276,6 +2404,7 @@ function closeTypeFilter() {
   const menu = document.getElementById('typeFilterMenu');
   if (menu) {
     menu.classList.remove('show');
+    clearFilterMenuTimers(menu);
     console.log('🔄 Type filter menu closed');
   } else {
     console.warn('⚠️ Type filter menu not found');
@@ -2290,6 +2419,7 @@ function closeAccountFilter() {
   const menu = document.getElementById('accountFilterMenu');
   if (menu) {
     menu.classList.remove('show');
+    clearFilterMenuTimers(menu);
     console.log('🔄 Account filter menu closed');
   } else {
     console.warn('⚠️ Account filter menu not found');
@@ -2304,6 +2434,7 @@ function closeDateRangeFilter() {
   const menu = document.getElementById('dateRangeFilterMenu');
   if (menu) {
     menu.classList.remove('show');
+    clearFilterMenuTimers(menu);
     console.log('🔄 Date range filter menu closed');
   } else {
     console.warn('⚠️ Date range filter menu not found');
@@ -2323,3 +2454,89 @@ document.addEventListener('DOMContentLoaded', () => {
     window.headerSystem.init();
   }
 });
+
+// ===== פונקציות עזר לתפריטי פילטרים =====
+
+/**
+ * סגירת תפריטי פילטר אחרים
+ */
+function closeOtherFilterMenus(currentMenuId) {
+  const filterMenus = ['statusFilterMenu', 'typeFilterMenu', 'accountFilterMenu', 'dateRangeFilterMenu'];
+
+  filterMenus.forEach(menuId => {
+    if (menuId !== currentMenuId) {
+      const menu = document.getElementById(menuId);
+      if (menu && menu.classList.contains('show')) {
+        menu.classList.remove('show');
+        clearFilterMenuTimers(menu);
+      }
+    }
+  });
+}
+
+/**
+ * הגדרת סגירה אוטומטית לתפריט פילטר
+ */
+function setupFilterMenuAutoClose(menu) {
+  // ניקוי טיימרים קודמים
+  clearFilterMenuTimers(menu);
+
+  // טיימר לסגירה אוטומטית אחרי 10 שניות
+  const autoCloseTimer = setTimeout(() => {
+    menu.classList.remove('show');
+    clearFilterMenuTimers(menu);
+  }, 10000);
+
+  // טיימר לסגירה אחרי יציאת העכבר
+  let mouseLeaveTimer = null;
+
+  const handleMouseEnter = () => {
+    if (mouseLeaveTimer) {
+      clearTimeout(mouseLeaveTimer);
+      mouseLeaveTimer = null;
+    }
+  };
+
+  const handleMouseLeave = () => {
+    mouseLeaveTimer = setTimeout(() => {
+      menu.classList.remove('show');
+      clearFilterMenuTimers(menu);
+    }, 5000);
+  };
+
+  // הוספת event listeners
+  menu.addEventListener('mouseenter', handleMouseEnter);
+  menu.addEventListener('mouseleave', handleMouseLeave);
+
+  // שמירת הטיימרים לאלמנט
+  menu._filterAutoCloseTimer = autoCloseTimer;
+  menu._filterMouseLeaveTimer = mouseLeaveTimer;
+  menu._filterHandleMouseEnter = handleMouseEnter;
+  menu._filterHandleMouseLeave = handleMouseLeave;
+}
+
+/**
+ * ניקוי טיימרים של תפריט פילטר
+ */
+function clearFilterMenuTimers(menu) {
+  if (menu._filterAutoCloseTimer) {
+    clearTimeout(menu._filterAutoCloseTimer);
+    menu._filterAutoCloseTimer = null;
+  }
+
+  if (menu._filterMouseLeaveTimer) {
+    clearTimeout(menu._filterMouseLeaveTimer);
+    menu._filterMouseLeaveTimer = null;
+  }
+
+  // הסרת event listeners
+  if (menu._filterHandleMouseEnter) {
+    menu.removeEventListener('mouseenter', menu._filterHandleMouseEnter);
+    menu._filterHandleMouseEnter = null;
+  }
+
+  if (menu._filterHandleMouseLeave) {
+    menu.removeEventListener('mouseleave', menu._filterHandleMouseLeave);
+    menu._filterHandleMouseLeave = null;
+  }
+}

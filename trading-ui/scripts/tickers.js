@@ -1279,7 +1279,7 @@ function updateTickersTable(tickers) {
             <td data-date="${ticker.created_at}" style="text-align: center;">${formatDateOnly(ticker.created_at)}</td>
             <td data-date="${ticker.updated_at}" style="text-align: center;">${formatDateOnly(ticker.updated_at)}</td>
             <td class="actions-cell">
-                <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${ticker.id})" title="צפה באלמנטים מקושרים">
+                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(${ticker.id})" title="צפה באלמנטים מקושרים">
                   🔗
                 </button>
                 <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">✏️</button>
@@ -1426,15 +1426,15 @@ window.goToNote = goToNote;
 function sortTable(columnIndex) {
     console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
 
-    if (typeof window.sortTable === 'function') {
-        window.sortTable(
-            'tickers',
+    if (typeof window.sortTableData === 'function') {
+        window.sortTableData(
             columnIndex,
             window.tickersData || [],
+            'tickers',
             updateTickersTable
         );
     } else {
-        console.error('❌ sortTable function not found in main.js');
+        console.error('❌ sortTableData function not found in tables.js');
     }
 }
 

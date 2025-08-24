@@ -13,12 +13,40 @@
     1. טבלת מעקב טריידים - הסקשן הראשי
     2. כרטיסיות התראות - בחלק העליון
     3. מערכת פילטרים ומיון מתקדמת
+    4. כפתור "הצג פרטים מקושרים" בכל שורה
     
     מבנה הדף:
     - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות התראות וסיכום נתונים
       - content-section: טבלת מעקב טריידים
+    
+    TABLE STRUCTURE FIXES (August 24, 2025):
+    =======================================
+    
+    ISSUE: Table structure inconsistency
+    - HTML had 10 columns but data rendering had 11 columns
+    - Column order mismatch between headers and data
+    - Sorting failed due to incorrect column mappings
+    
+    FIXES APPLIED:
+    - Updated colspan from 10 to 11 in loading row
+    - Fixed table headers to match 11-column structure
+    - Added "Show Linked Details" button to actions column
+    - Integrated with linked-items.js for modal functionality
+    
+    TABLE COLUMNS (11 total):
+    - חשבון (account_name)
+    - טיקר (ticker_symbol) 
+    - תוכנית (trade_plan_id)
+    - סטטוס (status)
+    - סוג (investment_type)
+    - צד (side)
+    - נוצר ב (created_at)
+    - נסגר ב (closed_at)
+    - רווח/הפסד (total_pl)
+    - הערות (notes)
+    - פעולות (actions) - כולל כפתור "הצג פרטים מקושרים"
     
     עדכון: אוגוסט 2025
     שינויים עיקריים:
@@ -30,11 +58,14 @@
     - עיצוב כפתורי שמירה עם צבע הלוגו ורקע לבן
     - צמצום רווחים בטופסים (mb-3 -> mb-2)
     - הוספת איקונים לכפתורי שמירה (💾)
+    - הוספת כפתור "הצג פרטים מקושרים" לכל שורה
+    - תיקון מבנה הטבלה ל-11 עמודות
     
     תלות: header-system.js - מערכת ראש דף חדשה
     תלות: trades.js - פונקציות ייעודיות לטריידים
     תלות: main.js - פונקציות כלליות לטבלאות
     תלות: alerts.js - פונקציות התראות
+    תלות: linked-items.js - פונקציות פריטים מקושרים
   -->
 
   <!-- CSS Files - Ordered by priority (weak to strong) -->
@@ -148,37 +179,37 @@
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(0)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        טיקר <span class="sort-icon">↕</span>
+                        חשבון <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(1)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        סטטוס <span class="sort-icon">↕</span>
+                        טיקר <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(2)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        סוג <span class="sort-icon">↕</span>
+                        תוכנית <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(3)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        צד <span class="sort-icon">↕</span>
+                        סטטוס <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(4)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        רווח/הפסד <span class="sort-icon">↕</span>
+                        סוג <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(5)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        תוכנית <span class="sort-icon">↕</span>
+                        צד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
@@ -196,6 +227,12 @@
                     <th>
                       <button class="btn btn-link sortable-header" onclick="sortTable(8)"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        רווח/הפסד <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header" onclick="sortTable(9)"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
@@ -206,7 +243,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="10" class="loading">טוען טריידים...</td>
+                    <td colspan="11" class="loading">טוען טריידים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -982,48 +1019,56 @@
 
     <!-- מודל עריכת טרייד -->
     <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
+      <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="editTradeModalLabel">עריכת טרייד</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 class="modal-title" id="editTradeModalLabel" style="order: 1;">עריכת טרייד</h5>
+            <div style="order: 2; display: flex; gap: 10px;">
+              <button type="button" class="btn btn-lg"
+                style="background-color: white; border: 2px solid #28a745; color: #28a745; padding: 8px 12px; border-radius: 6px;"
+                onclick="viewLinkedItemsForTrade(document.getElementById('editTradeId').value)"
+                title="צפה באלמנטים מקושרים">
+                🔗
+              </button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
           </div>
           <div class="modal-body">
             <form id="editTradeForm">
-              <!-- שורה ראשונה: תוכנית + טיקר + מחיר -->
+              <!-- שורה ראשונה: טיקר + מחיר + שינוי יומי -->
               <div class="row">
                 <div class="col-md-4">
                   <div class="mb-2">
-                    <label for="editTradeTradePlanId" class="form-label">תוכנית טרייד</label>
-                    <select class="form-select" id="editTradeTradePlanId">
-                      <option value="">ללא תוכנית</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="mb-2">
                     <label class="form-label">טיקר</label>
-                    <div class="form-control-plaintext" id="editTradeTickerDisplay"></div>
+                    <div class="d-flex align-items-center">
+                      <button type="button" class="btn me-2"
+                        style="background-color: white; border: 2px solid #28a745; color: #28a745; padding: 6px 10px; border-radius: 4px;"
+                        onclick="viewLinkedItemsForTrade(document.getElementById('editTradeId').value)"
+                        title="צפה באלמנטים מקושרים">
+                        🔗
+                      </button>
+                      <div class="form-control-plaintext flex-grow-1" id="editTradeTickerDisplay"></div>
+                    </div>
                     <input type="hidden" id="editTradeTickerId">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="mb-2">
                     <label class="form-label">מחיר נוכחי</label>
-                    <div class="form-control-plaintext" id="editTradeCurrentPrice">$150.25</div>
+                    <div class="form-control-plaintext" id="editTradeCurrentPrice">-</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-2">
+                    <label class="form-label">שינוי יומי</label>
+                    <div class="form-control-plaintext" id="editTradeDailyChange">-</div>
                   </div>
                 </div>
               </div>
 
-              <!-- שורה שנייה: שינוי יומי + סוג + חשבון -->
+              <!-- שורה שנייה: סוג + צד -->
               <div class="row">
-                <div class="col-md-4">
-                  <div class="mb-2">
-                    <label class="form-label">שינוי יומי</label>
-                    <div class="form-control-plaintext text-success" id="editTradeDailyChange">+2.5%</div>
-                  </div>
-                </div>
-                <div class="col-md-3">
+                <div class="col-md-6">
                   <div class="mb-2">
                     <label for="editTradeType" class="form-label">סוג</label>
                     <select class="form-select" id="editTradeType" required>
@@ -1033,7 +1078,7 @@
                     </select>
                   </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-6">
                   <div class="mb-2">
                     <label for="editTradeSide" class="form-label">צד</label>
                     <select class="form-select" id="editTradeSide" required>
@@ -1042,35 +1087,35 @@
                     </select>
                   </div>
                 </div>
+              </div>
+
+              <!-- שורה שלישית: חשבון + תאריך יצירה -->
+              <div class="row">
                 <div class="col-md-6">
-                  <div class="mb-2">
+                  <div class="mb-3">
                     <label for="editTradeAccountId" class="form-label">חשבון</label>
                     <select class="form-select" id="editTradeAccountId" required>
                       <option value="">בחר חשבון</option>
                     </select>
                   </div>
                 </div>
-              </div>
-
-              <!-- שורה שלישית: תאריך יצירה + תאריך סגירה -->
-              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editTradeOpenedAt" class="form-label">תאריך יצירה</label>
                     <input type="datetime-local" class="form-control" id="editTradeOpenedAt">
                   </div>
                 </div>
+              </div>
+
+              <!-- שורה רביעית: תאריך סגירה + סטטוס -->
+              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editTradeClosedAt" class="form-label">תאריך סגירה</label>
                     <input type="datetime-local" class="form-control" id="editTradeClosedAt">
                   </div>
                 </div>
-              </div>
-
-              <!-- שורה רביעית: סטטוס -->
-              <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editTradeStatus" class="form-label">סטטוס</label>
                     <select class="form-select" id="editTradeStatus" required>
@@ -1092,20 +1137,145 @@
                 </div>
               </div>
 
+              <!-- שורה שישית: נתוני דוגמה -->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <div class="border rounded p-3" style="background-color: #f8f9fa;">
+                      <h6 class="mb-3 text-center" style="color: #dc3545; font-weight: bold;">דוגמה</h6>
+                      <div class="row">
+                        <div class="col-md-4">
+                          <label class="form-label small text-muted">פוזיציה</label>
+                          <div class="form-control-plaintext small">100 מניות</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label small text-muted">מחיר ממוצע</label>
+                          <div class="form-control-plaintext small">$45.25</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label small text-muted">רווח והפסד</label>
+                          <div class="form-control-plaintext small text-success">+$1,250</div>
+                        </div>
+                      </div>
+                      <div class="row mt-2">
+                        <div class="col-md-4">
+                          <label class="form-label small text-muted">רווח והפסד מוכר</label>
+                          <div class="form-control-plaintext small text-info">$0</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label small text-muted">סה"כ רווח והפסד</label>
+                          <div class="form-control-plaintext small text-success">+$1,250</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label small text-muted">משך הטרייד</label>
+                          <div class="form-control-plaintext small">5 ימים</div>
+                        </div>
+                      </div>
+                      <div class="row mt-2">
+                        <div class="col-md-4">
+                          <label class="form-label small text-muted">רווח הפסד מנורמל לשנה</label>
+                          <div class="form-control-plaintext small text-success">+$91,250 (365%)</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- שורה שביעית: תוכנית טרייד -->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="editTradeTradePlanId" class="form-label">תוכנית טרייד</label>
+                    <select class="form-select" id="editTradeTradePlanId">
+                      <option value="">ללא תוכנית</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- שורה שמינית: טבלת עסקאות -->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label class="form-label">עסקאות (Executions)</label>
+                    <div class="table-responsive">
+                      <table class="table table-sm table-striped table-bordered">
+                        <thead class="table-light">
+                          <tr>
+                            <th>תאריך</th>
+                            <th>סוג</th>
+                            <th>כמות</th>
+                            <th>מחיר</th>
+                            <th>עמלה</th>
+                            <th>סה"כ</th>
+                            <th>סטטוס</th>
+                          </tr>
+                        </thead>
+                        <tbody id="editTradeExecutionsTable">
+                          <tr>
+                            <td>2024-01-15 10:30</td>
+                            <td><span class="badge bg-success">קניה</span></td>
+                            <td>50</td>
+                            <td>$44.50</td>
+                            <td>$1.25</td>
+                            <td>$2,226.25</td>
+                            <td><span class="badge bg-success">הושלם</span></td>
+                          </tr>
+                          <tr>
+                            <td>2024-01-16 14:15</td>
+                            <td><span class="badge bg-success">קניה</span></td>
+                            <td>50</td>
+                            <td>$46.00</td>
+                            <td>$1.25</td>
+                            <td>$2,301.25</td>
+                            <td><span class="badge bg-success">הושלם</span></td>
+                          </tr>
+                          <tr>
+                            <td>2024-01-20 11:45</td>
+                            <td><span class="badge bg-danger">מכירה</span></td>
+                            <td>100</td>
+                            <td>$47.50</td>
+                            <td>$1.25</td>
+                            <td>$4,748.75</td>
+                            <td><span class="badge bg-success">הושלם</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- שדות נסתרים -->
               <input type="hidden" id="editTradeId">
               <div class="form-control-plaintext" id="editTradeIdDisplay" style="display: none;"></div>
-              <div class="mb-3" style="display: none;">
-                <label for="editTradeTotalPl" class="form-label">רווח/הפסד</label>
-                <input type="number" step="0.01" class="form-control" id="editTradeTotalPl">
-              </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-            <button type="button" class="btn btn-success" onclick="saveTradeRecord()">
-              <span class="btn-icon">💾</span> שמור
-            </button>
+            <div class="d-flex justify-content-between w-100">
+              <!-- כפתורים בצד שמאל -->
+              <div>
+                <button type="button" class="btn btn-info me-2" onclick="addEditImportantNote()">
+                  <span class="btn-icon">📝</span> יש לי עוד משהו חשוב
+                </button>
+                <button type="button" class="btn btn-warning me-2" onclick="addEditReminder()">
+                  <span class="btn-icon">⏰</span> תזכיר לי כש...
+                </button>
+                <button type="button" class="btn btn-primary" onclick="addEditBuySell()">
+                  <span class="btn-icon">💰</span> הוסף קניה/מכירה
+                </button>
+              </div>
+
+              <!-- כפתורים בצד ימין -->
+              <div>
+                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ביטול</button>
+                <button type="button" class="btn btn-success"
+                  onclick="if (typeof window.saveEditTrade === 'function') { window.saveEditTrade(); } else { console.error('saveEditTrade function not found'); }">
+                  שמור
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

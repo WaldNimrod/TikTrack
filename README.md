@@ -1,5 +1,120 @@
 # TikTrack - Trading Management System
 
+## JavaScript Refactoring (August 2025)
+
+### Overview
+The JavaScript codebase has undergone a comprehensive refactoring to improve maintainability, reduce code duplication, and create a more modular architecture.
+
+### Refactoring Phases
+
+#### Phase 1: Function Consolidation
+- Moved `showNotification`, `formatDate`, `formatDateTime`, `formatDateOnly`, `loadAccountsData` to `main.js`
+- Moved `createAccountModal`, `showAddAccountModal` to `accounts.js`
+- Moved `showModalNotification`, `showSecondConfirmationModal` to `ui-utils.js`
+- Moved `toggleSection`, `toggleAllSections` to `main.js`
+- Moved `apiCall` to `data-utils.js`
+- Moved `colorAmount` to `ui-utils.js`
+
+#### Phase 2: Date Functions Centralization
+- Consolidated date formatting functions into `main.js`
+- Removed duplicates from `cash_flows.js`, `tickers.js`, `currencies.js`
+
+#### Phase 3: Table Functions Analysis
+- Analyzed `update*Table` functions for 100% identity
+- Confirmed page-specific versions differ from `database.js` versions
+- Page-specific versions accept data parameters and include complex logic
+- `database.js` versions are simpler and operate on global `allData`
+
+#### Phase 4: loadAccountsData Unification
+- Found three versions: `loadAccountsData`, `loadAccountsDataFromAPI`, `loadAccountsDataForAccountsPage`
+- Kept `loadAccountsDataForAccountsPage` as most advanced
+- Commented out other two versions
+- Updated all references to use `loadAccountsDataForAccountsPage`
+
+#### Phase 5: Modal Functions Consolidation
+- Removed `showModalNotification` from `main.js`
+- Removed `showSecondConfirmationModal` from `accounts.js`
+- All calls updated to use versions in `ui-utils.js`
+
+#### Phase 6: Main.js Modular Split (August 24, 2025)
+Split `main.js` (2153 lines) into topic-based modules:
+
+- **`tables.js`** - All table-related functionality (sorting, grid operations)
+- **`date-utils.js`** - Date formatting, conversion, validation, calculations
+- **`linked-items.js`** - Linked items viewing, loading, display management
+- **`page-utils.js`** - Page-specific utilities, initialization, state management
+- **`main.js`** - Core initializer and dependency checker (reduced to ~300 lines)
+
+### New Architecture
+
+#### File Dependencies and Loading Order
+1. `header-system.js`
+2. `console-cleanup.js`
+3. `simple-filter.js`
+4. `translation-utils.js`
+5. `data-utils.js`
+6. `ui-utils.js`
+7. `table-mappings.js`
+8. `date-utils.js`
+9. `tables.js`
+10. `linked-items.js`
+11. `page-utils.js`
+12. `main.js`
+13. Page-specific files (alerts.js, accounts.js, etc.)
+
+#### Module Responsibilities
+
+**`main.js` (Core Initializer)**
+- Global initialization logic
+- Dependency checks and system validation
+- Auto-initialization on page load
+- Core utility functions that must remain global
+
+**`tables.js` (Table Management)**
+- Table sorting system (`sortTableData`, `sortAnyTable`, etc.)
+- Grid core functions
+- Sort state management
+- Table-specific utilities
+
+**`date-utils.js` (Date Utilities)**
+- Date formatting functions (`formatDate`, `formatDateTime`, etc.)
+- Date conversion utilities
+- Date validation functions
+- Date calculation helpers
+
+**`linked-items.js` (Linked Items Management)**
+- Linked items viewing system
+- Modal creation for linked items
+- Item type management
+- Export functionality
+
+**`page-utils.js` (Page Management)**
+- Page initialization functions
+- Page state management
+- Filter setup and management
+- Navigation utilities
+
+### Benefits Achieved
+
+1. **Improved Maintainability**: Each module has a clear, single responsibility
+2. **Reduced Code Duplication**: Functions are centralized in appropriate modules
+3. **Better Organization**: Related functionality is grouped together
+4. **Easier Debugging**: Issues can be isolated to specific modules
+5. **Enhanced Scalability**: New features can be added to appropriate modules
+6. **Consistent API**: All functions are exported to global scope for backward compatibility
+
+### Documentation
+Each module includes comprehensive English documentation explaining:
+- Refactoring history and benefits
+- Module contents and responsibilities
+- Dependencies and usage examples
+- Function descriptions and parameters
+
+### Backward Compatibility
+All existing function calls continue to work as functions are exported to the global scope (`window` object). No changes required to existing HTML or JavaScript code.
+
+---
+
 ## Overview
 TikTrack is a comprehensive trading management system designed to simplify portfolio management and trading operations. The system provides a modern web interface for managing trades, accounts, alerts, and trading plans with advanced constraint management capabilities.
 

@@ -3,14 +3,50 @@
  * קובץ זה מכיל את כל הסגנות הקשורים לטבלאות נתונים וגרידים
  * כולל data tables, sortable headers, status badges ו-modals
  * 
+ * LINKED ITEMS MODAL STYLES (August 24, 2025):
+ * ============================================
+ * 
+ * NEW FEATURES:
+ * - 3-column grid layout for linked items modal
+ * - Dynamic modal headers based on item type
+ * - Concise item information display
+ * - Background click to close functionality
+ * - Responsive design for mobile devices
+ * 
+ * SORTING UI IMPROVEMENTS:
+ * - Fixed sort icon highlighting (only arrow, not entire header)
+ * - Active sort state styling with proper color scheme
+ * - Consistent sorting indicators across all tables
+ * 
+ * CSS CLASSES ADDED:
+ * - .linked-items-header: Modal header styling
+ * - .linked-items-list: Container for linked items
+ * - .linked-item-row: Row container for 3-column grid
+ * - .linked-item-col: Column in the 3-column grid
+ * - .linked-item-icon: Icon for item type
+ * - .linked-item-type: Item type label
+ * - .linked-item-title: Item title
+ * - .linked-item-id: Item ID display
+ * - .linked-item-basic-details: Concise item details
+ * - .linked-item-action: Action button styling
+ * - .no-linked-items: Empty state styling
+ * - .sortable-header.active-sort: Active sort header styling
+ * - .sortable-header.active-sort .sort-icon: Active sort icon styling
+ * 
  * תכולת הקובץ:
  * - data tables: טבלאות נתונים עם מיון ופילטרים
  * - sortable headers: כותרות למיון עם אייקונים
  * - status badges: תגיות סטטוס צבעוניות
  * - modals: חלונות קופצים לעריכה והוספה
+ * - linked items modal: חלון הצגת פריטים מקושרים
  * - responsive design: התאמה למסכים שונים
  * 
  * היררכיה: נטען רביעי, סגנונות ייעודיים לטבלאות
+ * 
+ * @version 1.1
+ * @lastUpdated August 24, 2025
+ * @linkedItemsModal August 24, 2025 - Added 3-column modal layout
+ * @sortingUI August 24, 2025 - Fixed sort icon highlighting
  */
 
 /* סגנונות למודלים - משתמש בהגדרות הגלובליות מ-styles.css */
@@ -433,9 +469,17 @@
   opacity: 1 !important;
 }
 
+.sortable-header.active-sort {
+  background: none !important;
+}
+
 .sortable-header.active-sort .sort-icon {
   opacity: 1 !important;
   color: #ff9c05 !important;
+  background: rgba(255, 156, 5, 0.1) !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  font-weight: bold !important;
 }
 
 /* כותרות משנה */

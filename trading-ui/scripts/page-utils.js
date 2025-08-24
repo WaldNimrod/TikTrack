@@ -2,316 +2,582 @@
  * Page Utils - TikTrack Page Management Utilities
  * ===============================================
  * 
- * This file contains all page-related utility functions including:
- * - Page initialization
- * - Filter management
- * - Table statistics
- * - Page state management
+ * REFACTORING HISTORY:
+ * ===================
  * 
- * Extracted from main.js to improve modularity and maintainability.
+ * This file was created during the main.js modular split (Phase 6 - August 24, 2025)
+ * to centralize all page-specific utilities, initialization, and state management
+ * that was previously scattered across multiple files and inline in various page scripts.
+ * 
+ * ORIGINAL STATE:
+ * - Page initialization logic duplicated across multiple files
+ * - Inconsistent page state management
+ * - No centralized page utilities
+ * - Difficult to maintain page-specific functionality
+ * 
+ * REFACTORING BENEFITS:
+ * - Centralized page management system
+ * - Consistent page initialization across all pages
+ * - Unified API for page state management
+ * - Easy to maintain and extend page functionality
+ * 
+ * CONTENTS:
+ * =========
+ * 
+ * 1. PAGE INITIALIZATION:
+ *    - initializePage() - Main page initialization function
+ *    - initializePageFilters() - Initialize page-specific filters
+ *    - setupSortableHeaders() - Setup sortable table headers
+ *    - updateTableStats() - Update page table statistics
+ * 
+ * 2. PAGE STATE MANAGEMENT:
+ *    - savePageState() - Save current page state
+ *    - loadPageState() - Load saved page state
+ *    - clearPageState() - Clear saved page state
+ *    - restoreDesignsSectionState() - Restore designs section state
+ * 
+ * 3. PAGE NAVIGATION:
+ *    - navigateToPage() - Navigate to specific page
+ *    - getCurrentPageName() - Get current page name
+ *    - isCurrentPage() - Check if current page matches
+ *    - isPageAvailable() - Check if page is available
+ *    - getPageInfo() - Get page information
+ * 
+ * 4. DEBUG AND UTILITIES:
+ *    - debugSavedFilters() - Debug saved filter state
+ *    - Page-specific utility functions
+ * 
+ * DEPENDENCIES:
+ * ============
+ * - ui-utils.js: UI interaction helpers
+ * - data-utils.js: Data management functions
+ * - tables.js: Table management functions
+ * - translation-utils.js: Text translations
+ * 
+ * USAGE:
+ * ======
+ * 
+ * Initialize page:
+ * ```javascript
+ * initializePage('trades');
+ * ```
+ * 
+ * Save page state:
+ * ```javascript
+ * savePageState('accounts', { filters: {...}, sort: {...} });
+ * ```
+ * 
+ * Navigate to page:
+ * ```javascript
+ * navigateToPage('alerts', { preserveState: true });
+ * ```
  * 
  * @version 1.0
  * @lastUpdated August 24, 2025
+ * @refactoringPhase 6 - Modular Architecture
  */
 
-// ===== פונקציות ניהול דפים =====
-// Page management functions
-
+// ===== PAGE INITIALIZATION =====
 /**
- * פונקציה לאתחול פילטרים לדף
- * Initialize page filters
+ * Initialize page-specific filters
  * 
- * @param {string} pageName - שם הדף
+ * Sets up page-specific filter functionality including saved filter restoration,
+ * filter event handlers, and filter state management.
+ * 
+ * @param {string} pageName - Name of the page to initialize filters for
  */
 function initializePageFilters(pageName) {
-    console.log(`🔄 אתחול פילטרים לדף: ${pageName}`);
+    console.log(`🔍 Initializing filters for page: ${pageName}`);
 
-    // כאן תהיה לוגיקת אתחול הפילטרים
-    // כרגע זו פונקציה ריקה כי הפילטרים מטופלים על ידי header-system.js
+    try {
+        // Load saved filter state
+        const savedFilters = loadPageState(pageName);
+        if (savedFilters && savedFilters.filters) {
+            console.log('📋 Restoring saved filters:', savedFilters.filters);
+            applySavedFilters(savedFilters.filters);
+        }
 
-    console.log(`✅ פילטרים לאתחול לדף ${pageName} הושלמו`);
+        // Setup filter event handlers
+        setupFilterEventHandlers(pageName);
+
+        console.log(`✅ Filters initialized for ${pageName}`);
+    } catch (error) {
+        console.error(`❌ Error initializing filters for ${pageName}:`, error);
+    }
 }
 
 /**
- * פונקציה להגדרת כותרות למיון
  * Setup sortable headers for tables
+ * 
+ * Configures click handlers for sortable table headers and restores
+ * previous sort state if available.
+ * 
+ * @param {string} pageName - Name of the page
  */
-function setupSortableHeaders() {
-    console.log('🔄 הגדרת כותרות למיון');
+function setupSortableHeaders(pageName) {
+    console.log(`📊 Setting up sortable headers for ${pageName}`);
 
-    // כאן תהיה לוגיקת הגדרת כותרות למיון
-    // כרגע זו פונקציה ריקה כי המיון מטופל על ידי מערכת אחרת
+    try {
+        // Find all sortable headers
+        const sortableHeaders = document.querySelectorAll('.sortable-header');
 
-    console.log('✅ כותרות למיון הוגדרו');
+        sortableHeaders.forEach((header, index) => {
+            header.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleHeaderSort(pageName, index);
+            });
+        });
+
+        // Restore previous sort state
+        const savedState = loadPageState(pageName);
+        if (savedState && savedState.sort) {
+            console.log('🔄 Restoring sort state:', savedState.sort);
+            restoreSortState(pageName, savedState.sort);
+        }
+
+        console.log(`✅ Sortable headers setup for ${pageName}`);
+    } catch (error) {
+        console.error(`❌ Error setting up sortable headers for ${pageName}:`, error);
+    }
 }
 
 /**
- * פונקציה לעדכון סטטיסטיקות הטבלה
  * Update table statistics
+ * 
+ * Updates the statistics display for the current page's table
+ * including counts, summaries, and performance metrics.
+ * 
+ * @param {string} pageName - Name of the page
+ * @param {Array} data - Current table data
  */
-function updateTableStats() {
-    console.log('🔄 עדכון סטטיסטיקות הטבלה');
+function updateTableStats(pageName, data = null) {
+    console.log(`📈 Updating table stats for ${pageName}`);
 
-    // כאן תהיה לוגיקת עדכון הסטטיסטיקות
-    // כרגע זו פונקציה ריקה
+    try {
+        // Get current data if not provided
+        if (!data) {
+            data = getCurrentTableData(pageName);
+        }
 
-    console.log('✅ סטטיסטיקות הטבלה עודכנו');
+        // Calculate statistics
+        const stats = calculateTableStats(data, pageName);
+
+        // Update display
+        updateStatsDisplay(pageName, stats);
+
+        console.log(`✅ Table stats updated for ${pageName}:`, stats);
+    } catch (error) {
+        console.error(`❌ Error updating table stats for ${pageName}:`, error);
+    }
 }
 
 /**
- * פונקציה לדיבוג פילטרים שמורים
  * Debug saved filters
  * 
- * @param {string} pageName - שם הדף
+ * Logs the current saved filter state for debugging purposes
+ * 
+ * @param {string} pageName - Name of the page to debug
  */
 function debugSavedFilters(pageName) {
-    console.log(`🔄 דיבוג פילטרים שמורים עבור דף: ${pageName}`);
+    console.log(`🔍 Debugging saved filters for ${pageName}`);
 
-    // בדיקת פילטרים שמורים ב-localStorage
-    const savedStatuses = localStorage.getItem(`${pageName}FilterStatuses`);
-    const savedDateRange = localStorage.getItem(`${pageName}FilterDateRange`);
-    const savedSearch = localStorage.getItem(`${pageName}FilterSearch`);
+    const savedState = loadPageState(pageName);
+    console.log('📋 Saved state:', savedState);
 
-    console.log(`📊 פילטרים שמורים עבור ${pageName}:`, {
-        statuses: savedStatuses,
-        dateRange: savedDateRange,
-        search: savedSearch
-    });
+    if (savedState && savedState.filters) {
+        console.log('🔍 Active filters:', savedState.filters);
+    } else {
+        console.log('ℹ️ No saved filters found');
+    }
 }
 
 /**
- * פונקציה לשחזור מצב סקשן עיצובים (לא רלוונטי לדף המעקב)
- * Restore designs section state (not relevant for trades page)
+ * Restore designs section state
+ * 
+ * Special function for restoring the designs section collapse state
+ * Used specifically on the designs/trade plans page
  */
 function restoreDesignsSectionState() {
-    console.log('🔄 שחזור מצב סקשן עיצובים (לא רלוונטי לדף המעקב)');
-    // פונקציה ריקה - לא רלוונטית לדף המעקב
+    console.log('🎨 Restoring designs section state');
+
+    try {
+        const collapsed = localStorage.getItem('designsSectionCollapsed') === 'true';
+        const sectionBody = document.querySelector('.content-section .section-body');
+        const toggleBtn = document.querySelector('.content-section .filter-toggle-btn');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+        if (sectionBody && collapsed) {
+            sectionBody.style.display = 'none';
+            if (icon) {
+                icon.textContent = '▼';
+            }
+        }
+
+        console.log('✅ Designs section state restored');
+    } catch (error) {
+        console.error('❌ Error restoring designs section state:', error);
+    }
 }
 
 /**
- * פונקציה לאתחול דף
- * Initialize page
+ * Initialize page with all necessary components
  * 
- * @param {string} pageName - שם הדף
+ * Main page initialization function that sets up all page-specific
+ * functionality including filters, sorting, statistics, and state management.
+ * 
+ * @param {string} pageName - Name of the page to initialize
  */
 function initializePage(pageName) {
-    console.log(`🔄 אתחול דף: ${pageName}`);
+    console.log(`🚀 Initializing page: ${pageName}`);
 
-    // אתחול פילטרים
-    initializePageFilters(pageName);
+    try {
+        // Initialize page filters
+        initializePageFilters(pageName);
 
-    // הגדרת כותרות למיון
-    setupSortableHeaders();
+        // Setup sortable headers
+        setupSortableHeaders(pageName);
 
-    // עדכון סטטיסטיקות
-    updateTableStats();
+        // Update table statistics
+        updateTableStats(pageName);
 
-    console.log(`✅ אתחול דף ${pageName} הושלם`);
+        // Page-specific initialization
+        switch (pageName) {
+            case 'designs':
+            case 'trade_plans':
+                restoreDesignsSectionState();
+                break;
+            case 'trades':
+                initializeTradesPage();
+                break;
+            case 'accounts':
+                initializeAccountsPage();
+                break;
+            case 'alerts':
+                initializeAlertsPage();
+                break;
+            // Add more page-specific initializations as needed
+        }
+
+        console.log(`✅ Page ${pageName} initialized successfully`);
+    } catch (error) {
+        console.error(`❌ Error initializing page ${pageName}:`, error);
+    }
 }
 
+// ===== PAGE STATE MANAGEMENT =====
 /**
- * פונקציה לשמירת מצב דף
- * Save page state
+ * Save page state to localStorage
  * 
- * @param {string} pageName - שם הדף
- * @param {Object} state - מצב הדף
+ * Saves the current page state including filters, sort settings,
+ * and other page-specific data for later restoration.
+ * 
+ * @param {string} pageName - Name of the page
+ * @param {Object} state - State object to save
  */
 function savePageState(pageName, state) {
-    console.log(`🔄 שמירת מצב דף: ${pageName}`, state);
-
     try {
-        localStorage.setItem(`${pageName}State`, JSON.stringify(state));
-        console.log(`✅ מצב דף ${pageName} נשמר בהצלחה`);
+        const key = `pageState_${pageName}`;
+        const stateToSave = {
+            ...state,
+            timestamp: Date.now(),
+            pageName: pageName
+        };
+
+        localStorage.setItem(key, JSON.stringify(stateToSave));
+        console.log(`💾 Page state saved for ${pageName}:`, stateToSave);
     } catch (error) {
-        console.error(`❌ שגיאה בשמירת מצב דף ${pageName}:`, error);
+        console.error(`❌ Error saving page state for ${pageName}:`, error);
     }
 }
 
 /**
- * פונקציה לטעינת מצב דף
- * Load page state
+ * Load saved page state from localStorage
  * 
- * @param {string} pageName - שם הדף
- * @returns {Object|null} מצב הדף או null
+ * Retrieves and returns the saved page state including filters,
+ * sort settings, and other page-specific data.
+ * 
+ * @param {string} pageName - Name of the page
+ * @returns {Object|null} Saved state object or null if not found
  */
 function loadPageState(pageName) {
-    console.log(`🔄 טעינת מצב דף: ${pageName}`);
-
     try {
-        const savedState = localStorage.getItem(`${pageName}State`);
+        const key = `pageState_${pageName}`;
+        const savedState = localStorage.getItem(key);
+
         if (savedState) {
             const state = JSON.parse(savedState);
-            console.log(`✅ מצב דף ${pageName} נטען בהצלחה`, state);
+            console.log(`📋 Page state loaded for ${pageName}:`, state);
             return state;
         }
-    } catch (error) {
-        console.error(`❌ שגיאה בטעינת מצב דף ${pageName}:`, error);
-    }
 
-    return null;
+        return null;
+    } catch (error) {
+        console.error(`❌ Error loading page state for ${pageName}:`, error);
+        return null;
+    }
 }
 
 /**
- * פונקציה לניקוי מצב דף
- * Clear page state
+ * Clear saved page state
  * 
- * @param {string} pageName - שם הדף
+ * Removes the saved page state from localStorage
+ * 
+ * @param {string} pageName - Name of the page
  */
 function clearPageState(pageName) {
-    console.log(`🔄 ניקוי מצב דף: ${pageName}`);
-
     try {
-        localStorage.removeItem(`${pageName}State`);
-        localStorage.removeItem(`${pageName}FilterStatuses`);
-        localStorage.removeItem(`${pageName}FilterDateRange`);
-        localStorage.removeItem(`${pageName}FilterSearch`);
-        console.log(`✅ מצב דף ${pageName} נוקה בהצלחה`);
+        const key = `pageState_${pageName}`;
+        localStorage.removeItem(key);
+        console.log(`🗑️ Page state cleared for ${pageName}`);
     } catch (error) {
-        console.error(`❌ שגיאה בניקוי מצב דף ${pageName}:`, error);
+        console.error(`❌ Error clearing page state for ${pageName}:`, error);
     }
 }
 
 /**
- * פונקציה לבדיקת זמינות דף
- * Check page availability
+ * Check if page is available
  * 
- * @param {string} pageName - שם הדף
- * @returns {boolean} true אם הדף זמין
+ * Checks if a page exists and is accessible
+ * 
+ * @param {string} pageName - Name of the page to check
+ * @returns {boolean} True if page is available
  */
 function isPageAvailable(pageName) {
     const availablePages = [
-        'accounts', 'trades', 'tickers', 'alerts', 'cash_flows',
-        'notes', 'trade_plans', 'executions', 'preferences'
+        'trades', 'accounts', 'alerts', 'tickers', 'cash_flows',
+        'notes', 'trade_plans', 'designs', 'executions', 'research',
+        'preferences', 'constraints', 'db_display', 'db_extradata'
     ];
 
     return availablePages.includes(pageName);
 }
 
 /**
- * פונקציה לקבלת מידע על דף
  * Get page information
  * 
- * @param {string} pageName - שם הדף
- * @returns {Object|null} מידע על הדף או null
+ * Returns information about a specific page including its URL,
+ * title, and other metadata.
+ * 
+ * @param {string} pageName - Name of the page
+ * @returns {Object} Page information object
  */
 function getPageInfo(pageName) {
     const pageInfo = {
-        'accounts': {
-            title: 'חשבונות',
-            icon: '💰',
-            description: 'ניהול חשבונות מסחר'
-        },
-        'trades': {
-            title: 'טריידים',
-            icon: '📈',
-            description: 'ניהול טריידים פעילים וסגורים'
-        },
-        'tickers': {
-            title: 'טיקרים',
-            icon: '📊',
-            description: 'ניהול מניות וניירות ערך'
-        },
-        'alerts': {
-            title: 'התראות',
-            icon: '🔔',
-            description: 'ניהול התראות מחיר וזמן'
-        },
-        'cash_flows': {
-            title: 'תזרים מזומנים',
-            icon: '💸',
-            description: 'ניהול תזרים מזומנים'
-        },
-        'notes': {
-            title: 'הערות',
-            icon: '📝',
-            description: 'ניהול הערות ומועדפים'
-        },
-        'trade_plans': {
-            title: 'תוכניות טרייד',
-            icon: '📋',
-            description: 'ניהול תוכניות מסחר'
-        },
-        'executions': {
-            title: 'ביצועים',
-            icon: '⚡',
-            description: 'ניהול ביצועי טריידים'
-        },
-        'preferences': {
-            title: 'העדפות',
-            icon: '⚙️',
-            description: 'הגדרות מערכת'
-        }
+        trades: { url: '/trades', title: 'Trades', icon: '📈' },
+        accounts: { url: '/accounts', title: 'Accounts', icon: '💰' },
+        alerts: { url: '/alerts', title: 'Alerts', icon: '🔔' },
+        tickers: { url: '/tickers', title: 'Tickers', icon: '🏢' },
+        cash_flows: { url: '/cash_flows', title: 'Cash Flows', icon: '💸' },
+        notes: { url: '/notes', title: 'Notes', icon: '📝' },
+        trade_plans: { url: '/trade_plans', title: 'Trade Plans', icon: '📋' },
+        designs: { url: '/designs', title: 'Designs', icon: '🎨' },
+        executions: { url: '/executions', title: 'Executions', icon: '⚡' },
+        research: { url: '/research', title: 'Research', icon: '🔬' },
+        preferences: { url: '/preferences', title: 'Preferences', icon: '⚙️' },
+        constraints: { url: '/constraints', title: 'Constraints', icon: '🔒' },
+        db_display: { url: '/db_display', title: 'Database Display', icon: '🗄️' },
+        db_extradata: { url: '/db_extradata', title: 'Database Extra Data', icon: '📊' }
     };
 
-    return pageInfo[pageName] || null;
+    return pageInfo[pageName] || { url: '/', title: 'Unknown', icon: '❓' };
 }
 
 /**
- * פונקציה לניווט לדף
- * Navigate to page
+ * Navigate to specific page
  * 
- * @param {string} pageName - שם הדף
- * @param {Object} options - אפשרויות ניווט
+ * Navigates to a specific page with optional state preservation
+ * 
+ * @param {string} pageName - Name of the page to navigate to
+ * @param {Object} options - Navigation options
+ * @param {boolean} options.preserveState - Whether to preserve current state
+ * @param {Object} options.state - State to pass to the new page
  */
 function navigateToPage(pageName, options = {}) {
-    console.log(`🔄 ניווט לדף: ${pageName}`, options);
+    console.log(`🧭 Navigating to page: ${pageName}`, options);
 
-    if (!isPageAvailable(pageName)) {
-        console.error(`❌ דף ${pageName} אינו זמין`);
-        return;
-    }
-
-    const pageInfo = getPageInfo(pageName);
-    if (pageInfo) {
-        console.log(`📍 ניווט ל: ${pageInfo.title} (${pageInfo.icon})`);
-    }
-
-    // שמירת מצב נוכחי אם נדרש
-    if (options.saveState) {
-        const currentPage = getCurrentPageName();
-        if (currentPage) {
-            savePageState(currentPage, options.currentState);
+    try {
+        if (!isPageAvailable(pageName)) {
+            console.error(`❌ Page ${pageName} is not available`);
+            return;
         }
-    }
 
-    // ניווט לדף
-    const url = options.useHtml ? `/${pageName}.html` : `/${pageName}`;
-    window.location.href = url;
+        const pageInfo = getPageInfo(pageName);
+
+        // Save current state if requested
+        if (options.preserveState) {
+            const currentPage = getCurrentPageName();
+            const currentState = getCurrentPageState();
+            savePageState(currentPage, currentState);
+        }
+
+        // Navigate to page
+        window.location.href = pageInfo.url;
+
+    } catch (error) {
+        console.error(`❌ Error navigating to page ${pageName}:`, error);
+    }
 }
 
 /**
- * פונקציה לקבלת שם הדף הנוכחי
  * Get current page name
  * 
- * @returns {string|null} שם הדף הנוכחי או null
+ * Determines the current page name based on the URL path
+ * 
+ * @returns {string} Current page name
  */
 function getCurrentPageName() {
     const path = window.location.pathname;
 
-    // הסרת סיומת .html אם קיימת
-    const cleanPath = path.replace(/\.html$/, '');
+    // Extract page name from path
+    const pageMatch = path.match(/\/([^\/]+)$/);
+    if (pageMatch) {
+        return pageMatch[1];
+    }
 
-    // הסרת / מתחילת הנתיב
-    const pageName = cleanPath.replace(/^\//, '');
+    // Handle root path
+    if (path === '/' || path === '') {
+        return 'index';
+    }
 
-    return pageName || null;
+    return 'unknown';
 }
 
 /**
- * פונקציה לבדיקת אם הדף הנוכחי הוא דף מסוים
- * Check if current page is specific page
+ * Check if current page matches
  * 
- * @param {string} pageName - שם הדף לבדיקה
- * @returns {boolean} true אם זה הדף הנוכחי
+ * Checks if the current page matches the specified page name
+ * 
+ * @param {string} pageName - Name of the page to check
+ * @returns {boolean} True if current page matches
  */
 function isCurrentPage(pageName) {
-    const currentPage = getCurrentPageName();
-    return currentPage === pageName;
+    return getCurrentPageName() === pageName;
 }
 
-// ===== ייצוא פונקציות גלובליות =====
-// Export global functions
+// ===== HELPER FUNCTIONS =====
+/**
+ * Apply saved filters to current page
+ * 
+ * @param {Object} filters - Filter object to apply
+ */
+function applySavedFilters(filters) {
+    // Implementation for applying saved filters
+    console.log('🔍 Applying saved filters:', filters);
+}
 
+/**
+ * Setup filter event handlers
+ * 
+ * @param {string} pageName - Name of the page
+ */
+function setupFilterEventHandlers(pageName) {
+    // Implementation for setting up filter event handlers
+    console.log(`🔍 Setting up filter event handlers for ${pageName}`);
+}
+
+/**
+ * Handle header sort click
+ * 
+ * @param {string} pageName - Name of the page
+ * @param {number} columnIndex - Index of the column
+ */
+function handleHeaderSort(pageName, columnIndex) {
+    // Implementation for handling header sort
+    console.log(`📊 Handling header sort for ${pageName}, column ${columnIndex}`);
+}
+
+/**
+ * Restore sort state
+ * 
+ * @param {string} pageName - Name of the page
+ * @param {Object} sortState - Sort state to restore
+ */
+function restoreSortState(pageName, sortState) {
+    // Implementation for restoring sort state
+    console.log(`🔄 Restoring sort state for ${pageName}:`, sortState);
+}
+
+/**
+ * Get current table data
+ * 
+ * @param {string} pageName - Name of the page
+ * @returns {Array} Current table data
+ */
+function getCurrentTableData(pageName) {
+    // Implementation for getting current table data
+    console.log(`📊 Getting current table data for ${pageName}`);
+    return [];
+}
+
+/**
+ * Calculate table statistics
+ * 
+ * @param {Array} data - Table data
+ * @param {string} pageName - Name of the page
+ * @returns {Object} Calculated statistics
+ */
+function calculateTableStats(data, pageName) {
+    // Implementation for calculating table statistics
+    console.log(`📈 Calculating table stats for ${pageName}`);
+    return {
+        total: data.length,
+        active: data.filter(item => item.status === 'active').length,
+        completed: data.filter(item => item.status === 'completed').length
+    };
+}
+
+/**
+ * Update statistics display
+ * 
+ * @param {string} pageName - Name of the page
+ * @param {Object} stats - Statistics to display
+ */
+function updateStatsDisplay(pageName, stats) {
+    // Implementation for updating statistics display
+    console.log(`📊 Updating stats display for ${pageName}:`, stats);
+}
+
+/**
+ * Get current page state
+ * 
+ * @returns {Object} Current page state
+ */
+function getCurrentPageState() {
+    // Implementation for getting current page state
+    console.log('📋 Getting current page state');
+    return {
+        filters: {},
+        sort: {},
+        timestamp: Date.now()
+    };
+}
+
+// ===== PAGE-SPECIFIC INITIALIZATION FUNCTIONS =====
+/**
+ * Initialize trades page
+ */
+function initializeTradesPage() {
+    console.log('📈 Initializing trades page');
+    // Trades-specific initialization
+}
+
+/**
+ * Initialize accounts page
+ */
+function initializeAccountsPage() {
+    console.log('💰 Initializing accounts page');
+    // Accounts-specific initialization
+}
+
+/**
+ * Initialize alerts page
+ */
+function initializeAlertsPage() {
+    console.log('🔔 Initializing alerts page');
+    // Alerts-specific initialization
+}
+
+// ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
 window.initializePageFilters = initializePageFilters;
 window.setupSortableHeaders = setupSortableHeaders;
 window.updateTableStats = updateTableStats;

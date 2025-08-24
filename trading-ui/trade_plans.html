@@ -363,7 +363,8 @@
                   <input type="number" step="0.01" class="form-control" id="addTradePlanPlannedAmount" required
                     min="0.01" disabled
                     onchange="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); } else { console.error('updateSharesFromAmount not found'); }"
-                    oninput="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); }">
+                    oninput="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); }"
+                    style="background-color: #f8f9fa;">
                   <div class="invalid-feedback" id="plannedAmountError">
                     יש להזין סכום מתוכנן חיובי
                   </div>
@@ -434,6 +435,210 @@
                 onclick="if (typeof window.saveNewTradePlan === 'function') { window.saveNewTradePlan(); } else { console.error('saveNewTradePlan function not found'); }">שמור</button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Trade Plan Modal -->
+  <div class="modal fade" id="editTradePlanModal" tabindex="-1" aria-labelledby="editTradePlanModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editTradePlanModalLabel" style="order: 1;">ערוך תכנון</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2;"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editTradePlanForm">
+            <input type="hidden" id="editTradePlanId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanTickerId" class="form-label">
+                    טיקר <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="editTradePlanTickerId" required onchange="updateEditTickerInfo()">
+                    <option value="">בחר טיקר</option>
+                    <option value="1">AAPL</option>
+                    <option value="2">GOOGL</option>
+                    <option value="3">TSLA</option>
+                    <option value="4">MSFT</option>
+                    <option value="5">SPY</option>
+                  </select>
+                  <div class="invalid-feedback" id="editTickerError">
+                    יש לבחור טיקר
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanDate" class="form-label">תאריך</label>
+                  <input type="date" class="form-control" id="editTradePlanDate" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- שורת תצוגה לטיקר הנבחר -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">טיקר נבחר</label>
+                  <div class="form-control-plaintext" id="editSelectedTickerDisplay">לא נבחר</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">מחיר נוכחי</label>
+                  <div class="form-control-plaintext" id="editCurrentPriceDisplay">-</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">שינוי יומי</label>
+                  <div class="form-control-plaintext" id="editDailyChangeDisplay">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanInvestmentType" class="form-label">
+                    סוג השקעה <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="editTradePlanInvestmentType" required disabled>
+                    <option value="">בחר סוג השקעה</option>
+                    <option value="swing">סווינג</option>
+                    <option value="investment">השקעה</option>
+                    <option value="passive">פאסיבי</option>
+                  </select>
+                  <div class="invalid-feedback" id="editInvestmentTypeError">
+                    יש לבחור סוג השקעה
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanSide" class="form-label">
+                    צד <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="editTradePlanSide" required disabled>
+                    <option value="">בחר צד</option>
+                    <option value="Long">Long</option>
+                    <option value="Short">Short</option>
+                  </select>
+                  <div class="invalid-feedback" id="editSideError">
+                    יש לבחור צד
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanPlannedAmount" class="form-label">
+                    סכום מתוכנן <span class="text-danger">*</span>
+                  </label>
+                  <input type="number" step="0.01" class="form-control" id="editTradePlanPlannedAmount" required
+                    disabled onchange="updateEditSharesFromAmount()">
+                  <div class="invalid-feedback" id="editPlannedAmountError">
+                    יש להזין סכום מתוכנן
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanShares" class="form-label">מספר מניות</label>
+                  <input type="number" step="0.0001" class="form-control" id="editTradePlanShares" disabled
+                    onchange="updateEditAmountFromShares()">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanStopPrice" class="form-label">מחיר עצירה</label>
+                  <input type="number" step="0.01" class="form-control" id="editTradePlanStopPrice" disabled>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanTargetPrice" class="form-label">מחיר יעד</label>
+                  <input type="number" step="0.01" class="form-control" id="editTradePlanTargetPrice" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <label for="editTradePlanEntryConditions" class="form-label">תנאי כניסה</label>
+                  <textarea class="form-control" id="editTradePlanEntryConditions" rows="3" disabled></textarea>
+                  <div class="text-start">
+                    <button type="button" class="btn btn-info btn-sm mt-2" onclick="addEditCondition()">
+                      <span class="btn-icon">➕</span> הוסף תנאי
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <label for="editTradePlanReasons" class="form-label">סיבות</label>
+                  <textarea class="form-control" id="editTradePlanReasons" rows="3" disabled></textarea>
+                  <div class="text-start">
+                    <button type="button" class="btn btn-info btn-sm mt-2" onclick="addEditReason()">
+                      <span class="btn-icon">➕</span> הוסף סיבה
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <div class="d-flex justify-content-between w-100">
+            <!-- כפתורים בצד שמאל -->
+            <div>
+              <button type="button" class="btn btn-info me-2" onclick="addEditImportantNote()">
+                <span class="btn-icon">📝</span> יש לי עוד משהו חשוב
+              </button>
+              <button type="button" class="btn btn-info" onclick="addEditReminder()">
+                <span class="btn-icon">⏰</span> תזכיר לי כש...
+              </button>
+            </div>
+
+            <!-- כפתורים בצד ימין -->
+            <div>
+              <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ביטול</button>
+              <button type="button" class="btn btn-success"
+                onclick="if (typeof window.saveEditTradePlan === 'function') { window.saveEditTradePlan(); } else { console.error('saveEditTradePlan function not found'); }">שמור</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Trade Plan Modal -->
+  <div class="modal fade" id="deleteTradePlanModal" tabindex="-1" aria-labelledby="deleteTradePlanModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteTradePlanModalLabel" style="order: 1;">מחק תכנון</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2;"></button>
+        </div>
+        <div class="modal-body">
+          <p>האם אתה בטוח שברצונך למחוק את התכנון הבא?</p>
+          <div id="deleteTradePlanDetails" class="alert alert-info">
+            פרטי התכנון יוצגו כאן
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-danger"
+            onclick="if (typeof window.confirmDeleteTradePlan === 'function') { window.confirmDeleteTradePlan(); } else { console.error('confirmDeleteTradePlan function not found'); }">מחק</button>
         </div>
       </div>
     </div>

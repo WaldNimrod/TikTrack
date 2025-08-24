@@ -40,8 +40,6 @@ window.currenciesLoaded = false;
 
 // פונקציה לטעינת מטבעות מהשרת
 async function loadCurrenciesFromServer() {
-  console.log('🔄 === Loading currencies from server ===');
-
   try {
     const token = localStorage.getItem('authToken');
     const headers = {
@@ -57,21 +55,12 @@ async function loadCurrenciesFromServer() {
       headers: headers
     });
 
-    console.log('🔄 Currencies response status:', response.status);
-
     if (response.ok) {
       const responseData = await response.json();
-      console.log('🔄 Currencies response from server:', responseData);
-
       const currencies = responseData.data || responseData;
       window.currenciesData = currencies;
       window.currenciesLoaded = true;
-      console.log('🔄 Currencies loaded from server:', currencies.length, 'currencies');
-      console.log('🔄 Currencies details:', currencies);
     } else {
-      console.log('🔄 Error loading currencies from server, status:', response.status);
-      const errorText = await response.text();
-      console.log('🔄 Error response:', errorText);
       // טעינת מטבעות ברירת מחדל
       window.currenciesData = [
         { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
@@ -80,7 +69,6 @@ async function loadCurrenciesFromServer() {
     }
 
   } catch (error) {
-    console.log('🔄 Error loading currencies from server:', error);
     // טעינת מטבעות ברירת מחדל
     window.currenciesData = [
       { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
@@ -153,14 +141,7 @@ async function loadAccountsFromServer() {
   try {
     // בדיקה אם יש token שמור
     const token = localStorage.getItem('authToken');
-    console.log('🔄 Token found:', !!token);
 
-    if (!token) {
-      console.log('🔄 No auth token found, trying without token...');
-      // נסיון לטעון ללא token
-    }
-
-    console.log('🔄 Fetching accounts from server...');
     const headers = {
       'Content-Type': 'application/json'
     };
@@ -174,50 +155,35 @@ async function loadAccountsFromServer() {
       headers: headers
     });
 
-    console.log('🔄 Response status:', response.status);
-
     if (response.ok) {
       const responseData = await response.json();
-      console.log('🔄 Raw response from server:', responseData);
 
       // טיפול במבנה התשובה - יכול להיות ישירות מערך או בתוך data
       const allAccounts = responseData.data || responseData;
-      console.log('🔄 All accounts from server:', allAccounts);
 
       // סינון רק חשבונות בסטטוס open
       const openAccounts = allAccounts.filter(account => account.status === 'open');
       window.accountsData = openAccounts;
       window.accountsLoaded = true;
-      console.log('🔄 All accounts loaded from server:', allAccounts.length, 'accounts');
-      console.log('🔄 Open accounts filtered:', openAccounts.length, 'accounts');
-      console.log('🔄 Open accounts details:', openAccounts);
 
       // קריאה לעדכון התפריט
       if (typeof window.updateAccountFilterMenu === 'function') {
         window.updateAccountFilterMenu(openAccounts);
-      } else {
-        console.log('🔄 updateAccountFilterMenu not available yet');
       }
 
       // החזרת הנתונים לטעינה חוזרת
       return openAccounts;
     } else {
-      console.log('🔄 Error loading accounts from server, status:', response.status);
-      const errorText = await response.text();
-      console.log('🔄 Error response:', errorText);
       loadDefaultAccounts();
     }
 
   } catch (error) {
-    console.log('🔄 Error loading accounts from server:', error);
     loadDefaultAccounts();
   }
 }
 
 // פונקציה לטעינת כל החשבונות מהשרת (לפילטר)
 async function loadAllAccountsFromServer() {
-  console.log('🔄 === Loading all accounts from server ===');
-
   try {
     const token = localStorage.getItem('authToken');
     const headers = {
@@ -236,11 +202,9 @@ async function loadAllAccountsFromServer() {
     if (response.ok) {
       const responseData = await response.json();
       const allAccounts = responseData.data || responseData;
-      console.log('🔄 All accounts loaded for filter:', allAccounts.length, 'accounts');
 
       // סינון רק חשבונות בסטטוס open
       const openAccounts = allAccounts.filter(account => account.status === 'open');
-      console.log('🔄 Open accounts filtered:', openAccounts.length, 'accounts');
 
       // שמירת החשבונות הפתוחים במשתנה גלובלי
       window.allAccountsData = openAccounts;
@@ -248,20 +212,15 @@ async function loadAllAccountsFromServer() {
       // עדכון הפילטר עם החשבונות הפתוחים (אם הפונקציה קיימת)
       if (typeof window.updateAccountFilterMenu === 'function') {
         window.updateAccountFilterMenu(openAccounts);
-      } else {
-        console.log('🔄 updateAccountFilterMenu not available yet, trying direct update...');
-        // ניסיון לעדכן ישירות
       }
 
       // החזרת הנתונים לטעינה חוזרת
       return openAccounts;
     } else {
-      console.log('🔄 Error loading all accounts from server, status:', response.status);
       return [];
     }
 
   } catch (error) {
-    console.log('🔄 Error loading all accounts from server:', error);
     return [];
   }
 }
@@ -345,7 +304,7 @@ function updateAccountsTable(accounts) {
         <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק חשבון">
           🗑️
         </button>
-        <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${account.id})" title="צפה באלמנטים מקושרים">
+        <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAccount(${account.id})" title="צפה באלמנטים מקושרים">
           🔗
         </button>
       </td>
@@ -1424,10 +1383,7 @@ function confirmDeleteAccount(accountId, accountName) {
   deleteAccount(accountId, accountName);
 }
 
-function checkLinkedItems(accountId) {
-  // פונקציה פשוטה לבדיקת פריטים מקושרים
-  return Promise.resolve({ hasLinkedItems: false, items: [] });
-}
+// checkLinkedItems הועברה לקובץ linked-items.js
 
 function showOpenTradesWarning(accountId, accountName) {
   alert(`יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
@@ -1447,7 +1403,7 @@ window.showSuccessMessage = showSuccessMessage;
 window.showErrorMessage = showErrorMessage;
 window.showSecondConfirmationModal = window.showSecondConfirmationModal; // משתמש בגרסה מ-ui-utils.js
 window.confirmDeleteAccount = confirmDeleteAccount;
-window.checkLinkedItems = checkLinkedItems;
+// checkLinkedItems מיוצאת מקובץ linked-items.js
 window.showOpenTradesWarning = showOpenTradesWarning;
 window.createWarningModal = createWarningModal;
 window.deleteAccountFromAPI = deleteAccountFromAPI;
@@ -1682,10 +1638,7 @@ function setupSortableHeaders() {
 
       // מיון הנתונים
       if (typeof window.sortTableData === 'function' && window.accountsData) {
-        const sortedData = window.sortTableData(window.accountsData, window.currentSortColumn, window.currentSortDirection);
-        if (typeof window.updateAccountsTable === 'function') {
-          window.updateAccountsTable(sortedData);
-        }
+        const sortedData = window.sortTableData(window.currentSortColumn, window.accountsData, 'accounts', window.updateAccountsTable);
       }
     });
   });
@@ -1861,7 +1814,7 @@ window.filterAccountsLocally = filterAccountsLocally;
 window.updateAccountsTable = updateAccountsTable;
 window.editAccount = editAccount;
 window.deleteAccount = deleteAccount;
-window.viewLinkedItems = viewLinkedItems;
+// viewLinkedItems מיוצאת מקובץ linked-items.js
 
 
 // בדיקה סופית שהפונקציות מיוצאות
@@ -1894,19 +1847,8 @@ function deleteAccount(accountId) {
   }
 }
 
-function viewLinkedItems(accountId) {
-  console.log('🔄 צפייה באלמנטים מקושרים לחשבון:', accountId);
-  
-  // קריאה לפונקציה הגלובלית עם סוג האלמנט
-  if (typeof window.loadLinkedItemsData === 'function') {
-    window.loadLinkedItemsData(accountId, 'account');
-  } else {
-    console.error('❌ loadLinkedItemsData function not found');
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('פונקציית צפייה באלמנטים מקושרים תפותח בקרוב', 'info');
-    }
-  }
-}
+// הפונקציה viewLinkedItems הועברה לקובץ linked-items.js
+// אין צורך בפונקציה מקומית כאן
 
 
 

@@ -32,30 +32,25 @@ let cashFlowsData = window.cashFlowsData;
 
 // פונקציות בסיסיות
 function openCashFlowDetails(id) {
-    console.log('פתיחת פרטי תזרים מזומנים:', id);
     showAddCashFlowModal();
 }
 
 function editCashFlow(id) {
-    console.log('עריכת תזרים מזומנים:', id);
-    showEditCashFlowModal(id);
+  showEditCashFlowModal(id);
 }
 
 function deleteCashFlow(id) {
-    console.log('מחיקת תזרים מזומנים:', id);
-    showDeleteCashFlowModal(id);
+  showDeleteCashFlowModal(id);
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים
 function toggleTopSection() {
-    console.log('🔄 toggleTopSection נקראה');
     const topSection = document.querySelector('.top-section');
 
     if (!topSection) {
         console.error('❌ לא נמצא top-section');
         return;
     }
-    console.log('✅ top-section נמצא:', topSection);
 
     const sectionBody = topSection.querySelector('.section-body');
     const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
@@ -81,28 +76,20 @@ function toggleTopSection() {
 }
 
 function toggleCashFlowsSection() {
-    console.log('🔄 toggleCashFlowsSection נקראה');
     const contentSections = document.querySelectorAll('.content-section');
-    console.log('📋 מספר content-sections נמצא:', contentSections.length);
     const cashFlowsSection = contentSections[0]; // הסקשן הראשון - תזרימי מזומנים
 
     if (!cashFlowsSection) {
         console.error('❌ לא נמצא סקשן תזרימי מזומנים');
         return;
     }
-    console.log('✅ סקשן תזרימי מזומנים נמצא:', cashFlowsSection);
 
     const sectionBody = cashFlowsSection.querySelector('.section-body');
     const toggleBtn = cashFlowsSection.querySelector('button[onclick="toggleCashFlowsSection()"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-    console.log('🎯 sectionBody נמצא:', !!sectionBody);
-    console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
-    console.log('🎨 icon נמצא:', !!icon);
-
     if (sectionBody) {
         const isCollapsed = sectionBody.style.display === 'none';
-        console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
 
         if (isCollapsed) {
             sectionBody.style.display = 'block';
@@ -794,7 +781,7 @@ function renderCashFlowsTable() {
             <td class="actions-cell">
                 <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">✏️</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>
-                <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${cashFlow.id})" title="צפה באלמנטים מקושרים">
+                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForCashFlow(${cashFlow.id})" title="צפה באלמנטים מקושרים">
                   🔗
                 </button>
             </td>
@@ -1142,15 +1129,15 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
 function sortTable(columnIndex) {
     console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
 
-    if (typeof window.sortTable === 'function') {
-        window.sortTable(
-            'cash_flows',
+    if (typeof window.sortTableData === 'function') {
+        window.sortTableData(
             columnIndex,
             window.cashFlowsData || [],
+            'cash_flows',
             updateCashFlowsTable
         );
     } else {
-        console.error('❌ sortTable function not found in main.js');
+        console.error('❌ sortTableData function not found in tables.js');
     }
 }
 

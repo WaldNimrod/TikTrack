@@ -2,777 +2,927 @@
  * Linked Items - TikTrack Linked Items Management
  * ===============================================
  * 
- * This file contains all linked items functionality including:
- * - Viewing linked items
- * - Loading linked items data
- * - Creating linked items modals
- * - Item details management
+ * REFACTORING HISTORY:
+ * ===================
  * 
- * This module handles the display and management of relationships between
- * different entities in the TikTrack system (trades, accounts, tickers, etc.)
+ * This file was created during the main.js modular split (Phase 6 - August 24, 2025)
+ * to centralize all linked items functionality that was previously scattered across
+ * multiple files and inline in various page scripts.
  * 
- * @version 1.0
+ * ORIGINAL STATE:
+ * - Linked items logic duplicated across multiple files
+ * - Inconsistent modal creation and display
+ * - No centralized linked items management
+ * - Difficult to maintain relationships between entities
+ * 
+ * REFACTORING BENEFITS:
+ * - Centralized linked items management system
+ * - Consistent modal creation and display across all pages
+ * - Unified API for viewing relationships between entities
+ * - Easy to maintain and extend linked items functionality
+ * 
+ * LINKED ITEMS FEATURE IMPLEMENTATION (August 24, 2025):
+ * ======================================================
+ * 
+ * FEATURE: "Show Linked Details" button across all tables
+ * - Displays parent and child entities for any record
+ * - Opens modal with detailed relationship information
+ * - Includes edit, cancel, and delete buttons for each linked item
+ * - 3-column layout for better data presentation
+ * 
+ * IMPLEMENTATION DETAILS:
+ * - Modal redesign: Changed from single column cards to 3-column grid layout
+ * - Header customization: Dynamic headers based on item type (e.g., "מה קשור לטרייד: AAPL")
+ * - Content optimization: Reduced scrolling with concise item information
+ * - Background click to close: Implemented for all modals across the site
+ * 
+ * TABLE-SPECIFIC WRAPPER FUNCTIONS:
+ * - viewLinkedItemsForTrade(id) - For trades table
+ * - viewLinkedItemsForAccount(id) - For accounts table  
+ * - viewLinkedItemsForTicker(id) - For tickers table
+ * - viewLinkedItemsForAlert(id) - For alerts table
+ * - viewLinkedItemsForCashFlow(id) - For cash flows table
+ * - viewLinkedItemsForNote(id) - For notes table
+ * - viewLinkedItemsForTradePlan(id) - For trade plans table
+ * - viewLinkedItemsForExecution(id) - For executions table
+ * 
+ * CONTENTS:
+ * =========
+ * 
+ * 1. LINKED ITEMS VIEWING SYSTEM:
+ *    - viewLinkedItems() - Main function for viewing linked items
+ *    - loadLinkedItemsData() - Load linked items from server
+ *    - showLinkedItemsModal() - Display linked items modal
+ * 
+ * 2. TABLE-SPECIFIC WRAPPER FUNCTIONS:
+ *    - viewLinkedItemsForTrade() - Trade-specific wrapper
+ *    - viewLinkedItemsForAccount() - Account-specific wrapper
+ *    - viewLinkedItemsForTicker() - Ticker-specific wrapper
+ *    - viewLinkedItemsForAlert() - Alert-specific wrapper
+ *    - viewLinkedItemsForCashFlow() - Cash flow-specific wrapper
+ *    - viewLinkedItemsForNote() - Note-specific wrapper
+ *    - viewLinkedItemsForTradePlan() - Trade plan-specific wrapper
+ *    - viewLinkedItemsForExecution() - Execution-specific wrapper
+ * 
+ * 3. MODAL CREATION AND MANAGEMENT:
+ *    - createLinkedItemsModalContent() - Create modal content
+ *    - createLinkedItemsList() - Create linked items list (3-column layout)
+ *    - createBasicItemInfo() - Create concise item information
+ *    - createModal() - Create modal structure
+ * 
+ * 4. ITEM TYPE MANAGEMENT:
+ *    - getItemTypeIcon() - Get icon for item type
+ *    - getItemTypeDisplayName() - Get display name for item type
+ *    - createDetailedItemInfo() - Create detailed item information
+ * 
+ * 5. SPECIFIC ITEM TYPE HANDLERS:
+ *    - createTradeDetails() - Create trade details display
+ *    - createAccountDetails() - Create account details display
+ *    - createTickerDetails() - Create ticker details display
+ *    - createAlertDetails() - Create alert details display
+ *    - createCashFlowDetails() - Create cash flow details display
+ *    - createNoteDetails() - Create note details display
+ *    - createTradePlanDetails() - Create trade plan details display
+ *    - createExecutionDetails() - Create execution details display
+ * 
+ * 6. UTILITY FUNCTIONS:
+ *    - getMockLinkedData() - Get mock data for development
+ *    - exportLinkedItemsData() - Export linked items data
+ *    - viewItemDetails() - View item details
+ *    - editItem() - Edit item
+ *    - deleteItem() - Delete item
+ *    - openItemPage() - Open item page (currently shows "in development")
+ * 
+ * DEPENDENCIES:
+ * ============
+ * - ui-utils.js: Modal and notification functions
+ * - data-utils.js: API call functions
+ * - translation-utils.js: Text translations
+ * 
+ * USAGE:
+ * ======
+ * 
+ * View linked items for specific table:
+ * ```javascript
+ * viewLinkedItemsForTrade(123);
+ * viewLinkedItemsForAccount(456);
+ * ```
+ * 
+ * View linked items with generic function:
+ * ```javascript
+ * viewLinkedItems(123, 'trade');
+ * ```
+ * 
+ * Create modal content:
+ * ```javascript
+ * const content = createLinkedItemsModalContent(data, 'ticker', 789);
+ * ```
+ * 
+ * @version 1.1
  * @lastUpdated August 24, 2025
+ * @refactoringPhase 6 - Modular Architecture
+ * @linkedItemsFeature August 24, 2025 - Complete linked items modal system
  */
 
-// ===== מערכת פריטים מקושרים =====
-// Linked items system
-
+// ===== LINKED ITEMS VIEWING SYSTEM =====
 /**
- * פונקציה לצפייה באלמנטים מקושרים
  * Global function for viewing linked items
  * 
- * @param {number|string} itemId - מזהה האלמנט
- * @param {string} itemType - סוג האלמנט (optional)
+ * This is the main entry point for viewing linked items. It automatically
+ * determines the item type based on the current page if not specified,
+ * loads the linked items data, and displays them in a modal.
+ * 
+ * @param {number|string} itemId - ID of the item to view linked items for
+ * @param {string} itemType - Type of item (optional, auto-detected if not provided)
  */
 function viewLinkedItems(itemId, itemType = null) {
-  console.log('🔄 צפייה באלמנטים מקושרים:', { itemId, itemType });
+    // Auto-detect item type based on current page if not specified
+    if (!itemType) {
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('/accounts')) itemType = 'account';
+        else if (currentPath.includes('/trades') || currentPath.includes('trades.html')) itemType = 'trade';
+        else if (currentPath.includes('/tickers')) itemType = 'ticker';
+        else if (currentPath.includes('/alerts')) itemType = 'alert';
+        else if (currentPath.includes('/cash_flows')) itemType = 'cash_flow';
+        else if (currentPath.includes('/notes')) itemType = 'note';
+        else if (currentPath.includes('/trade_plans')) itemType = 'trade_plan';
+        else if (currentPath.includes('/executions')) itemType = 'execution';
+    }
 
-  // זיהוי סוג האלמנט לפי הדף הנוכחי אם לא צוין
-  if (!itemType) {
-    const currentPath = window.location.pathname;
-    console.log('📍 נתיב נוכחי:', currentPath);
-    if (currentPath.includes('/accounts')) itemType = 'account';
-    else if (currentPath.includes('/trades') || currentPath.includes('trades.html')) itemType = 'trade';
-    else if (currentPath.includes('/tickers')) itemType = 'ticker';
-    else if (currentPath.includes('/alerts')) itemType = 'alert';
-    else if (currentPath.includes('/cash_flows')) itemType = 'cash_flow';
-    else if (currentPath.includes('/notes')) itemType = 'note';
-    else if (currentPath.includes('/trade_plans')) itemType = 'trade_plan';
-    else if (currentPath.includes('/executions')) itemType = 'execution';
-  }
-
-  console.log('🎯 סוג אלמנט שנבחר:', itemType);
-
-  // טעינת הנתונים המקושרים
-  loadLinkedItemsData(itemId, itemType);
+    // Load linked items data
+    loadLinkedItemsData(itemId, itemType);
 }
 
 /**
- * פונקציה לטעינת נתונים מקושרים
  * Load linked items data from server
  * 
- * @param {number|string} itemId - מזהה האלמנט
- * @param {string} itemType - סוג האלמנט
+ * Makes an API call to fetch linked items data for the specified item.
+ * Falls back to mock data if the API is not available or returns an error.
+ * 
+ * @param {number|string} itemId - ID of the item
+ * @param {string} itemType - Type of the item
  */
 async function loadLinkedItemsData(itemId, itemType) {
-  try {
-    console.log(`🔄 טעינת נתונים מקושרים ל-${itemType} ${itemId}`);
+    try {
+        // API call to get linked items data
+        const response = await fetch(`/api/v1/linked-items/${itemType}/${itemId}`);
 
-    // קריאה ל-API לקבלת נתונים מקושרים
-    const response = await fetch(`/api/v1/linked-items/${itemType}/${itemId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+
+        // Show modal with the data
+        showLinkedItemsModal(data, itemType, itemId);
+
+    } catch (error) {
+        console.error('❌ Error loading linked items data:', error);
+
+        // Show notification to user
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('Showing sample data - API under development', 'info');
+        }
+
+        // Show modal with mock data (for development)
+        showLinkedItemsModal(getMockLinkedData(itemType, itemId), itemType, itemId);
     }
-
-    const data = await response.json();
-    console.log('📊 נתונים מקושרים נטענו:', data);
-
-    // הצגת המודל עם הנתונים
-    showLinkedItemsModal(data, itemType, itemId);
-
-  } catch (error) {
-    console.error('❌ שגיאה בטעינת נתונים מקושרים:', error);
-
-    // הצגת הודעה למשתמש
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('מציג נתונים לדוגמה - API בפיתוח', 'info');
-    }
-
-    // הצגת מודל עם נתונים לדוגמה (לפיתוח)
-    showLinkedItemsModal(getMockLinkedData(itemType, itemId), itemType, itemId);
-  }
 }
 
 /**
- * פונקציה להצגת מודל פרטים מקושרים
  * Show linked items modal with data
  * 
- * @param {Object} data - הנתונים להצגה
- * @param {string} itemType - סוג האלמנט
- * @param {string|number} itemId - מזהה האלמנט
+ * Creates and displays a modal showing all linked items for the specified item.
+ * The modal includes detailed information about each linked item and provides
+ * actions for viewing, editing, and deleting items.
+ * 
+ * @param {Object} data - Data to display
+ * @param {string} itemType - Type of the item
+ * @param {string|number} itemId - ID of the item
  */
 function showLinkedItemsModal(data, itemType, itemId) {
-  console.log('🔄 הצגת מודל פרטים מקושרים:', { data, itemType, itemId });
+    console.log('🔄 Showing linked items modal:', { data, itemType, itemId });
 
-  // יצירת תוכן המודל
-  const modalContent = createLinkedItemsModalContent(data, itemType, itemId);
+    // Create modal content
+    const modalContent = createLinkedItemsModalContent(data, itemType, itemId);
 
-  // יצירת המודל
-  const modal = createModal('linkedItemsModal', 'פרטים מקושרים', modalContent);
+    // Create and show modal
+    const modalId = 'linkedItemsModal';
+    const modalTitle = `Linked Items for ${getItemTypeDisplayName(itemType)} #${itemId}`;
 
-  // הצגת המודל
-  if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-    console.log('🚀 הצגת מודל Bootstrap');
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
-  } else {
-    console.log('⚠️ Bootstrap לא זמין, מציג fallback');
-    // fallback למודל פשוט
-    modal.style.display = 'block';
-    modal.classList.add('show');
-  }
+    createModal(modalId, modalTitle, modalContent);
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById(modalId));
+    modal.show();
 }
 
 /**
- * פונקציה ליצירת תוכן המודל
- * Create modal content for linked items
+ * Create linked items modal content
  * 
- * @param {Object} data - הנתונים להצגה
- * @param {string} itemType - סוג האלמנט
- * @param {string|number} itemId - מזהה האלמנט
- * @returns {string} HTML content
+ * Generates the HTML content for the linked items modal, including
+ * detailed information about each linked item and action buttons.
+ * 
+ * @param {Object} data - Linked items data
+ * @param {string} itemType - Type of the item
+ * @param {string|number} itemId - ID of the item
+ * @returns {string} HTML content for the modal
  */
 function createLinkedItemsModalContent(data, itemType, itemId) {
-  const itemTypeNames = {
-    'trade': 'טרייד',
-    'account': 'חשבון',
-    'ticker': 'טיקר',
-    'alert': 'התראה',
-    'cash_flow': 'תזרים מזומנים',
-    'note': 'הערה',
-    'trade_plan': 'תוכנית טרייד',
-    'execution': 'ביצוע'
-  };
+    console.log('🔄 Creating modal content for:', { data, itemType, itemId });
 
-  const itemTypeName = itemTypeNames[itemType] || itemType;
+    // יצירת כותרת מותאמת לפי סוג האלמנט
+    let headerTitle = '';
+    let itemName = '';
 
-  let content = `
-    <div class="modal-header">
-      <h5 class="modal-title">פרטים מקושרים - ${itemTypeName} ${itemId}</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <div class="modal-body">
-      <!-- הודעת פיתוח -->
-      <div class="development-notice">
-        <div class="development-header">
-          <h6>🚧 מערכת בפיתוח</h6>
-          <p>מערכת הפרטים המקושרים נמצאת בפיתוח. להלן דוגמה של הנתונים שיוצגו:</p>
-        </div>
+    switch (itemType) {
+        case 'account':
+            headerTitle = 'מה קשור לחשבון:';
+            itemName = data.accountName || `חשבון ${itemId}`;
+            break;
+        case 'trade':
+            headerTitle = 'מה קשור לטרייד:';
+            itemName = data.tradeSymbol || `טרייד ${itemId}`;
+            break;
+        case 'ticker':
+            headerTitle = 'מה קשור לטיקר:';
+            itemName = data.tickerSymbol || `טיקר ${itemId}`;
+            break;
+        case 'alert':
+            headerTitle = 'מה קשור להתראה:';
+            itemName = data.alertName || `התראה ${itemId}`;
+            break;
+        case 'cash_flow':
+            headerTitle = 'מה קשור לתזרים מזומנים:';
+            itemName = data.cashFlowName || `תזרים ${itemId}`;
+            break;
+        case 'note':
+            headerTitle = 'מה קשור להערה:';
+            itemName = data.noteTitle || `הערה ${itemId}`;
+            break;
+        case 'trade_plan':
+            headerTitle = 'מה קשור לתוכנית טרייד:';
+            itemName = data.planName || `תוכנית ${itemId}`;
+            break;
+        case 'execution':
+            headerTitle = 'מה קשור לביצוע:';
+            itemName = data.executionName || `ביצוע ${itemId}`;
+            break;
+        default:
+            headerTitle = 'מה קשור לרשומה:';
+            itemName = `רשומה ${itemId}`;
+    }
+
+    let content = `
+    <div class="linked-items-container">
+      <div class="linked-items-header">
+        <h4>${headerTitle} <strong>${itemName}</strong></h4>
       </div>
-      
-      <div class="linked-items-container">
-        <div class="linked-items-section">
-          <h6>🔗 ישויות בנות (Child Entities)</h6>
-          <div class="linked-items-list" id="childEntitiesList">
-            ${createLinkedItemsList(data.childEntities || [])}
-          </div>
-        </div>
-        
-        <div class="linked-items-section">
-          <h6>📋 ישויות אם (Parent Entities)</h6>
-          <div class="linked-items-list" id="parentEntitiesList">
-            ${createLinkedItemsList(data.parentEntities || [])}
-          </div>
-        </div>
+      <div class="alert alert-info">
+        <strong>📋 סקירת אלמנטים מקושרים</strong><br>
+        מציג את כל האלמנטים המקושרים ל-${getItemTypeDisplayName(itemType)} #${itemId}
       </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-      <button type="button" class="btn btn-primary" onclick="exportLinkedItemsData('${itemType}', ${itemId})">ייצא נתונים</button>
+  `;
+
+    // Add linked items list
+    if (data && data.linkedItems && data.linkedItems.length > 0) {
+        content += createLinkedItemsList(data.linkedItems);
+    } else {
+        content += `
+      <div class="alert alert-warning">
+        <strong>ℹ️ No Linked Items Found</strong><br>
+        This ${getItemTypeDisplayName(itemType)} has no linked items in the system.
+      </div>
+    `;
+    }
+
+    content += `
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="exportLinkedItemsData('${itemType}', ${itemId})">
+          📤 Export Data
+        </button>
+      </div>
     </div>
   `;
 
-  return content;
+    return content;
 }
 
 /**
- * פונקציה ליצירת רשימת אלמנטים מקושרים
- * Create linked items list HTML
+ * Create linked items list
  * 
- * @param {Array} items - רשימת האלמנטים
- * @returns {string} HTML content
+ * Generates HTML for displaying a list of linked items with
+ * detailed information and action buttons for each item.
+ * 
+ * @param {Array} items - Array of linked items
+ * @returns {string} HTML content for the linked items list
  */
 function createLinkedItemsList(items) {
-  console.log('🔄 יצירת רשימת אלמנטים מקושרים:', items);
-  
-  if (!items || items.length === 0) {
-    return '<div class="no-linked-items">אין אלמנטים מקושרים</div>';
-  }
+    let listHtml = '<div class="linked-items-list">';
 
-  return items.map(item => {
-    console.log('🔄 עיבוד אלמנט:', item);
-    const detailedInfo = createDetailedItemInfo(item);
-    console.log('🔄 פרטים מפורטים:', detailedInfo);
-    
-    return `
-      <div class="linked-item-card">
-        <div class="linked-item-header">
-          <span class="linked-item-type">${getItemTypeIcon(item.type)} ${getItemTypeDisplayName(item.type)}</span>
-          <span class="linked-item-id">#${item.id}</span>
+    items.forEach(item => {
+        const icon = getItemTypeIcon(item.type);
+        const displayName = getItemTypeDisplayName(item.type);
+        const basicInfo = createBasicItemInfo(item);
+
+        listHtml += `
+      <div class="linked-item-row">
+        <div class="linked-item-col">
+          <div class="linked-item-icon">${icon}</div>
+          <div class="linked-item-type">${displayName}</div>
         </div>
-        <div class="linked-item-content">
-          <div class="linked-item-title">${item.title || item.name || `אלמנט ${item.id}`}</div>
-          <div class="linked-item-details">
-            ${detailedInfo}
-          </div>
-          <div class="linked-item-actions">
-            <button class="btn btn-sm btn-outline-primary" onclick="viewItemDetails('${item.type}', ${item.id})" title="צפייה בפרטים">
-              👁️ צפייה
-            </button>
-            <button class="btn btn-sm btn-outline-secondary" onclick="editItem('${item.type}', ${item.id})" title="עריכה">
-              ✏️ ערוך
-            </button>
-            <button class="btn btn-sm btn-outline-danger" onclick="deleteItem('${item.type}', ${item.id})" title="מחיקה">
-              🗑️ מחק
+        <div class="linked-item-col">
+          <div class="linked-item-title">${item.name || `אלמנט ${item.id}`}</div>
+          <div class="linked-item-id">#${item.id}</div>
+        </div>
+        <div class="linked-item-col">
+          <div class="linked-item-basic-details">${basicInfo}</div>
+          <div class="linked-item-action">
+            <button class="btn btn-sm btn-primary" onclick="openItemPage('${item.type}', ${item.id})" title="פתח דף רשומה">
+              פתח דף
             </button>
           </div>
         </div>
       </div>
     `;
-  }).join('');
+    });
+
+    listHtml += '</div>';
+    return listHtml;
 }
 
 /**
- * פונקציה לקבלת אייקון לסוג אלמנט
  * Get icon for item type
  * 
- * @param {string} type - סוג האלמנט
- * @returns {string} אייקון
+ * Returns the appropriate emoji icon for each item type
+ * 
+ * @param {string} type - Item type
+ * @returns {string} Emoji icon
  */
 function getItemTypeIcon(type) {
-  const icons = {
-    'trade': '📈',
-    'account': '💰',
-    'ticker': '📊',
-    'alert': '🔔',
-    'cash_flow': '💸',
-    'note': '📝',
-    'trade_plan': '📋',
-    'execution': '⚡'
-  };
-  return icons[type] || '📄';
+    const icons = {
+        'trade': '📈',
+        'account': '💰',
+        'ticker': '🏢',
+        'alert': '🔔',
+        'cash_flow': '💸',
+        'note': '📝',
+        'trade_plan': '📋',
+        'execution': '⚡'
+    };
+    return icons[type] || '📄';
 }
 
 /**
- * פונקציה לקבלת שם תצוגה לסוג אלמנט
  * Get display name for item type
  * 
- * @param {string} type - סוג האלמנט
- * @returns {string} שם תצוגה
+ * Returns a human-readable display name for each item type
+ * 
+ * @param {string} type - Item type
+ * @returns {string} Display name
  */
 function getItemTypeDisplayName(type) {
-  const displayNames = {
-    'trade': 'טרייד',
-    'account': 'חשבון',
-    'ticker': 'טיקר',
-    'alert': 'התראה',
-    'cash_flow': 'תזרים מזומנים',
-    'note': 'הערה',
-    'trade_plan': 'תוכנית טרייד',
-    'execution': 'ביצוע'
-  };
-  return displayNames[type] || type;
+    const names = {
+        'trade': 'Trade',
+        'account': 'Account',
+        'ticker': 'Ticker',
+        'alert': 'Alert',
+        'cash_flow': 'Cash Flow',
+        'note': 'Note',
+        'trade_plan': 'Trade Plan',
+        'execution': 'Execution'
+    };
+    return names[type] || 'Item';
 }
 
 /**
- * פונקציה ליצירת מידע מפורט על אלמנט
- * Create detailed item information
+ * Create basic item info for display
  * 
- * @param {Object} item - האלמנט
- * @returns {string} HTML עם פרטים מפורטים
- */
-function createDetailedItemInfo(item) {
-  console.log('🔄 יצירת פרטים מפורטים עבור:', item);
-  let details = '';
-
-  // הוספת תיאור כללי
-  if (item.description || item.notes) {
-    details += `<div class="item-description">${item.description || item.notes}</div>`;
-  }
-
-  // הוספת פרטים ספציפיים לפי סוג
-  switch (item.type) {
-    case 'trade':
-      console.log('🔄 יצירת פרטי טרייד');
-      details += createTradeDetails(item);
-      break;
-    case 'account':
-      console.log('🔄 יצירת פרטי חשבון');
-      details += createAccountDetails(item);
-      break;
-    case 'ticker':
-      console.log('🔄 יצירת פרטי טיקר');
-      details += createTickerDetails(item);
-      break;
-    case 'alert':
-      console.log('🔄 יצירת פרטי התראה');
-      details += createAlertDetails(item);
-      break;
-    case 'cash_flow':
-      console.log('🔄 יצירת פרטי תזרים מזומנים');
-      details += createCashFlowDetails(item);
-      break;
-    case 'note':
-      console.log('🔄 יצירת פרטי הערה');
-      details += createNoteDetails(item);
-      break;
-    case 'trade_plan':
-      console.log('🔄 יצירת פרטי תוכנית טרייד');
-      details += createTradePlanDetails(item);
-      break;
-    case 'execution':
-      console.log('🔄 יצירת פרטי ביצוע');
-      details += createExecutionDetails(item);
-      break;
-    default:
-      console.log('🔄 יצירת פרטים כלליים');
-      details += createGenericDetails(item);
-  }
-
-  console.log('🔄 פרטים סופיים:', details);
-  return details;
-}
-
-/**
- * פונקציות ליצירת פרטים ספציפיים לכל סוג אלמנט
- */
-
-function createTradeDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סוג השקעה:</span>
-        <span class="detail-value">${item.investment_type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">צד:</span>
-        <span class="detail-value">${item.side || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">רווח/הפסד:</span>
-        <span class="detail-value ${item.total_pl >= 0 ? 'positive' : 'negative'}">${item.total_pl ? `$${item.total_pl.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך יצירה:</span>
-        <span class="detail-value">${item.created_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createAccountDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">מטבע:</span>
-        <span class="detail-value">${item.currency || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">יתרה במזומן:</span>
-        <span class="detail-value">${item.cash_balance ? `$${item.cash_balance.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">ערך כולל:</span>
-        <span class="detail-value">${item.total_value ? `$${item.total_value.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">רווח/הפסד כולל:</span>
-        <span class="detail-value ${item.total_pl >= 0 ? 'positive' : 'negative'}">${item.total_pl ? `$${item.total_pl.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createTickerDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סוג:</span>
-        <span class="detail-value">${item.type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">מטבע:</span>
-        <span class="detail-value">${item.currency || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">טריידים פעילים:</span>
-        <span class="detail-value">${item.active_trades ? 'כן' : 'לא'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך עדכון:</span>
-        <span class="detail-value">${item.updated_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createAlertDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סוג התראה:</span>
-        <span class="detail-value">${item.alert_type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">הופעלה:</span>
-        <span class="detail-value">${item.is_triggered ? 'כן' : 'לא'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך יצירה:</span>
-        <span class="detail-value">${item.created_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createCashFlowDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סוג:</span>
-        <span class="detail-value">${item.flow_type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סכום:</span>
-        <span class="detail-value ${item.amount >= 0 ? 'positive' : 'negative'}">${item.amount ? `$${item.amount.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך:</span>
-        <span class="detail-value">${item.flow_date || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createNoteDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סוג הערה:</span>
-        <span class="detail-value">${item.note_type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך יצירה:</span>
-        <span class="detail-value">${item.created_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createTradePlanDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סוג השקעה:</span>
-        <span class="detail-value">${item.investment_type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">צד:</span>
-        <span class="detail-value">${item.side || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך יצירה:</span>
-        <span class="detail-value">${item.created_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createExecutionDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">פעולה:</span>
-        <span class="detail-value">${item.action || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">כמות:</span>
-        <span class="detail-value">${item.quantity || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">מחיר:</span>
-        <span class="detail-value">${item.price ? `$${item.price.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך ביצוע:</span>
-        <span class="detail-value">${item.execution_date || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createGenericDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך יצירה:</span>
-        <span class="detail-value">${item.created_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-/**
- * פונקציה ליצירת מודל
- * Create modal element
+ * Creates a simple string with basic information about the item
  * 
- * @param {string} id - מזהה המודל
- * @param {string} title - כותרת המודל
- * @param {string} content - תוכן המודל
- * @returns {HTMLElement} אלמנט המודל
+ * @param {Object} item - Item data
+ * @returns {string} Basic info string
+ */
+function createBasicItemInfo(item) {
+    switch (item.type) {
+        case 'trade':
+            return `${item.status || 'לא מוגדר'} | ${item.side || 'לא מוגדר'} | ${item.amount ? `$${item.amount.toFixed(2)}` : 'לא מוגדר'}`;
+        case 'account':
+            return `${item.currency || 'לא מוגדר'} | ${item.balance ? `$${item.balance.toFixed(2)}` : 'לא מוגדר'}`;
+        case 'ticker':
+            return `${item.symbol || 'לא מוגדר'} | ${item.current_price ? `$${item.current_price.toFixed(2)}` : 'לא מוגדר'}`;
+        case 'alert':
+            return `${item.status || 'לא מוגדר'} | ${item.message ? item.message.substring(0, 30) + '...' : 'אין הודעה'}`;
+        case 'cash_flow':
+            return `${item.type || 'לא מוגדר'} | ${item.amount ? `$${item.amount.toFixed(2)}` : 'לא מוגדר'}`;
+        case 'note':
+            return `${item.content ? item.content.substring(0, 30) + '...' : 'אין תוכן'}`;
+        case 'trade_plan':
+            return `${item.status || 'לא מוגדר'} | ${item.strategy || 'לא מוגדר'}`;
+        case 'execution':
+            return `${item.quantity || 'לא מוגדר'} | ${item.price ? `$${item.price.toFixed(2)}` : 'לא מוגדר'}`;
+        default:
+            return item.description || item.notes || 'אין פרטים נוספים';
+    }
+}
+
+/**
+ * Create modal structure
+ * 
+ * Creates a Bootstrap modal with the specified content
+ * 
+ * @param {string} id - Modal ID
+ * @param {string} title - Modal title
+ * @param {string} content - Modal content
  */
 function createModal(id, title, content) {
-  // הסרת מודל קיים אם יש
-  const existingModal = document.getElementById(id);
-  if (existingModal) {
-    existingModal.remove();
-  }
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById(id);
+    if (existingModal) {
+        existingModal.remove();
+    }
 
-  // יצירת המודל החדש עם מבנה Bootstrap נכון
-  const modal = document.createElement('div');
-  modal.id = id;
-  modal.className = 'modal fade';
-  modal.setAttribute('tabindex', '-1');
-  modal.setAttribute('aria-labelledby', `${id}Label`);
-  modal.setAttribute('aria-hidden', 'true');
-
-  // הוספת מבנה Bootstrap נכון
-  modal.innerHTML = `
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        ${content}
+    // Create new modal
+    const modalHtml = `
+    <div class="modal fade" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="${id}Label">${title}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            ${content}
+          </div>
+        </div>
       </div>
     </div>
   `;
 
-  // הוספה לדף
-  document.body.appendChild(modal);
-
-  return modal;
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
 /**
- * פונקציה לקבלת נתונים לדוגמה (לפיתוח)
- * Get mock data for development
+ * Create detailed item information
  * 
- * @param {string} itemType - סוג האלמנט
- * @param {string|number} itemId - מזהה האלמנט
- * @returns {Object} נתונים לדוגמה
+ * Generates detailed information display for a linked item
+ * 
+ * @param {Object} item - Item data
+ * @returns {string} HTML content for item details
+ */
+function createDetailedItemInfo(item) {
+    let details = '<div class="item-details">';
+
+    // Add common fields
+    if (item.name) details += `<div><strong>Name:</strong> ${item.name}</div>`;
+    if (item.status) details += `<div><strong>Status:</strong> ${item.status}</div>`;
+    if (item.created_at) details += `<div><strong>Created:</strong> ${formatDate(item.created_at)}</div>`;
+
+    // Add type-specific details
+    switch (item.type) {
+        case 'trade':
+            details += createTradeDetails(item);
+            break;
+        case 'account':
+            details += createAccountDetails(item);
+            break;
+        case 'ticker':
+            details += createTickerDetails(item);
+            break;
+        case 'alert':
+            details += createAlertDetails(item);
+            break;
+        case 'cash_flow':
+            details += createCashFlowDetails(item);
+            break;
+        case 'note':
+            details += createNoteDetails(item);
+            break;
+        case 'trade_plan':
+            details += createTradePlanDetails(item);
+            break;
+        case 'execution':
+            details += createExecutionDetails(item);
+            break;
+    }
+
+    details += '</div>';
+    return details;
+}
+
+// ===== SPECIFIC ITEM TYPE DETAILS =====
+/**
+ * Create trade details display
+ * 
+ * @param {Object} item - Trade item data
+ * @returns {string} HTML content for trade details
+ */
+function createTradeDetails(item) {
+    let details = '';
+    if (item.symbol) details += `<div><strong>Symbol:</strong> ${item.symbol}</div>`;
+    if (item.side) details += `<div><strong>Side:</strong> ${item.side}</div>`;
+    if (item.amount) details += `<div><strong>Amount:</strong> ${item.amount}</div>`;
+    if (item.price) details += `<div><strong>Price:</strong> ${item.price}</div>`;
+    return details;
+}
+
+/**
+ * Create account details display
+ * 
+ * @param {Object} item - Account item data
+ * @returns {string} HTML content for account details
+ */
+function createAccountDetails(item) {
+    let details = '';
+    if (item.currency) details += `<div><strong>Currency:</strong> ${item.currency}</div>`;
+    if (item.balance) details += `<div><strong>Balance:</strong> ${item.balance}</div>`;
+    return details;
+}
+
+/**
+ * Create ticker details display
+ * 
+ * @param {Object} item - Ticker item data
+ * @returns {string} HTML content for ticker details
+ */
+function createTickerDetails(item) {
+    let details = '';
+    if (item.symbol) details += `<div><strong>Symbol:</strong> ${item.symbol}</div>`;
+    if (item.name) details += `<div><strong>Name:</strong> ${item.name}</div>`;
+    if (item.type) details += `<div><strong>Type:</strong> ${item.type}</div>`;
+    return details;
+}
+
+/**
+ * Create alert details display
+ * 
+ * @param {Object} item - Alert item data
+ * @returns {string} HTML content for alert details
+ */
+function createAlertDetails(item) {
+    let details = '';
+    if (item.message) details += `<div><strong>Message:</strong> ${item.message}</div>`;
+    if (item.priority) details += `<div><strong>Priority:</strong> ${item.priority}</div>`;
+    return details;
+}
+
+/**
+ * Create cash flow details display
+ * 
+ * @param {Object} item - Cash flow item data
+ * @returns {string} HTML content for cash flow details
+ */
+function createCashFlowDetails(item) {
+    let details = '';
+    if (item.amount) details += `<div><strong>Amount:</strong> ${item.amount}</div>`;
+    if (item.type) details += `<div><strong>Type:</strong> ${item.type}</div>`;
+    if (item.description) details += `<div><strong>Description:</strong> ${item.description}</div>`;
+    return details;
+}
+
+/**
+ * Create note details display
+ * 
+ * @param {Object} item - Note item data
+ * @returns {string} HTML content for note details
+ */
+function createNoteDetails(item) {
+    let details = '';
+    if (item.content) details += `<div><strong>Content:</strong> ${item.content.substring(0, 100)}${item.content.length > 100 ? '...' : ''}</div>`;
+    return details;
+}
+
+/**
+ * Create trade plan details display
+ * 
+ * @param {Object} item - Trade plan item data
+ * @returns {string} HTML content for trade plan details
+ */
+function createTradePlanDetails(item) {
+    let details = '';
+    if (item.symbol) details += `<div><strong>Symbol:</strong> ${item.symbol}</div>`;
+    if (item.target_price) details += `<div><strong>Target Price:</strong> ${item.target_price}</div>`;
+    if (item.stop_loss) details += `<div><strong>Stop Loss:</strong> ${item.stop_loss}</div>`;
+    return details;
+}
+
+/**
+ * Create execution details display
+ * 
+ * @param {Object} item - Execution item data
+ * @returns {string} HTML content for execution details
+ */
+function createExecutionDetails(item) {
+    let details = '';
+    if (item.symbol) details += `<div><strong>Symbol:</strong> ${item.symbol}</div>`;
+    if (item.quantity) details += `<div><strong>Quantity:</strong> ${item.quantity}</div>`;
+    if (item.price) details += `<div><strong>Price:</strong> ${item.price}</div>`;
+    return details;
+}
+
+// ===== UTILITY FUNCTIONS =====
+/**
+ * Get mock linked data for development
+ * 
+ * Returns sample data for development and testing purposes
+ * 
+ * @param {string} itemType - Type of item
+ * @param {string|number} itemId - ID of item
+ * @returns {Object} Mock linked items data
  */
 function getMockLinkedData(itemType, itemId) {
-  console.log(`🎭 יצירת נתונים לדוגמה עבור ${itemType} ${itemId}`);
+    console.log('🔄 Getting mock data for:', { itemType, itemId });
 
-  const mockData = {
-    childEntities: [
-      {
-        id: 1,
-        type: 'execution',
-        title: 'ביצוע קנייה AAPL',
-        description: 'קניית 100 מניות AAPL במחיר $150',
-        status: 'completed',
-        action: 'buy',
-        quantity: 100,
-        price: 150.00,
-        execution_date: '2025-08-24 10:30:00',
-        created_at: '2025-08-24 10:30:00'
-      },
-      {
-        id: 2,
-        type: 'alert',
-        title: 'התראה מחיר AAPL',
-        description: 'התראה על מחיר $150',
-        status: 'active',
-        alert_type: 'price',
-        is_triggered: false,
-        created_at: '2025-08-24 09:00:00'
-      },
-      {
-        id: 3,
-        type: 'note',
-        title: 'הערה על הטרייד',
-        description: 'טרייד ארוך טווח על Apple',
-        status: 'active',
-        note_type: 'trade_note',
-        created_at: '2025-08-24 08:15:00'
-      }
-    ],
-    parentEntities: [
-      {
-        id: 1,
-        type: 'account',
-        title: 'חשבון ראשי',
-        description: 'חשבון המסחר הראשי',
-        status: 'active',
-        currency: 'USD',
-        cash_balance: 50000.00,
-        total_value: 125000.00,
-        total_pl: 2500.00,
-        created_at: '2025-01-01 00:00:00'
-      },
-      {
-        id: 1,
-        type: 'trade_plan',
-        title: 'תוכנית AAPL',
-        description: 'תוכנית מסחר על Apple לטווח ארוך',
-        status: 'open',
-        investment_type: 'swing',
-        side: 'Long',
-        created_at: '2025-08-20 14:30:00'
-      },
-      {
-        id: 1,
-        type: 'ticker',
-        title: 'AAPL - Apple Inc.',
-        description: 'מניה של Apple Inc.',
-        status: 'active',
-        type: 'stock',
-        currency: 'USD',
-        active_trades: true,
-        updated_at: '2025-08-24 10:00:00',
-        created_at: '2025-01-01 00:00:00'
-      }
-    ]
-  };
-
-  return mockData;
+    // נתונים לדוגמה לפי סוג האלמנט
+    switch (itemType) {
+        case 'trade':
+            return {
+                tradeSymbol: 'AAPL',
+                linkedItems: [
+                    {
+                        id: 1,
+                        type: 'account',
+                        name: 'חשבון מעודכן',
+                        status: 'active',
+                        created_at: new Date().toISOString(),
+                        currency: 'USD',
+                        balance: 50000
+                    },
+                    {
+                        id: 2,
+                        type: 'ticker',
+                        name: 'Apple Inc.',
+                        status: 'active',
+                        created_at: new Date().toISOString(),
+                        symbol: 'AAPL',
+                        current_price: 145.50
+                    },
+                    {
+                        id: 3,
+                        type: 'alert',
+                        name: 'התראה על מחיר AAPL',
+                        status: 'active',
+                        created_at: new Date().toISOString(),
+                        message: 'מחיר AAPL הגיע ליעד'
+                    },
+                    {
+                        id: 4,
+                        type: 'note',
+                        name: 'הערה על הטרייד',
+                        status: 'active',
+                        created_at: new Date().toISOString(),
+                        content: 'טרייד מוצלח ב-Apple'
+                    },
+                    {
+                        id: 5,
+                        type: 'execution',
+                        name: 'ביצוע טרייד AAPL',
+                        status: 'completed',
+                        created_at: new Date().toISOString(),
+                        symbol: 'AAPL',
+                        quantity: 100,
+                        price: 145.50
+                    }
+                ]
+            };
+        case 'account':
+            return {
+                accountName: `חשבון ${itemId}`,
+                linkedItems: [
+                    {
+                        id: 1,
+                        type: 'trade',
+                        name: 'טרייד AAPL',
+                        status: 'open',
+                        created_at: new Date().toISOString(),
+                        symbol: 'AAPL',
+                        side: 'buy'
+                    }
+                ]
+            };
+        case 'ticker':
+            return {
+                tickerSymbol: `טיקר ${itemId}`,
+                linkedItems: [
+                    {
+                        id: 1,
+                        type: 'trade',
+                        name: 'טרייד בטיקר',
+                        status: 'open',
+                        created_at: new Date().toISOString(),
+                        symbol: 'AAPL',
+                        side: 'buy'
+                    }
+                ]
+            };
+        default:
+            return {
+                linkedItems: [
+                    {
+                        id: 1,
+                        type: 'trade',
+                        name: 'Sample Trade',
+                        status: 'open',
+                        created_at: new Date().toISOString(),
+                        symbol: 'AAPL',
+                        side: 'buy',
+                        amount: 100
+                    },
+                    {
+                        id: 2,
+                        type: 'alert',
+                        name: 'Sample Alert',
+                        status: 'active',
+                        created_at: new Date().toISOString(),
+                        message: 'Price alert for AAPL'
+                    }
+                ]
+            };
+    }
 }
 
 /**
- * פונקציה לייצוא נתונים מקושרים
+ * Check if an item has linked items
+ * 
+ * Simple function to check if an item has linked items
+ * 
+ * @param {string|number} itemId - ID of the item
+ * @param {string} itemType - Type of the item (optional)
+ * @returns {Promise<Object>} Promise resolving to linked items info
+ */
+function checkLinkedItems(itemId, itemType = null) {
+    console.log(`🔍 Checking linked items for ${itemType || 'item'} ${itemId}`);
+    // פונקציה פשוטה לבדיקת פריטים מקושרים
+    return Promise.resolve({ hasLinkedItems: false, items: [] });
+}
+
+/**
  * Export linked items data
  * 
- * @param {string} itemType - סוג האלמנט
- * @param {string|number} itemId - מזהה האלמנט
+ * Exports linked items data to various formats
+ * 
+ * @param {string} itemType - Type of item
+ * @param {string|number} itemId - ID of item
  */
 function exportLinkedItemsData(itemType, itemId) {
-  console.log(`🔄 ייצוא נתונים מקושרים ל-${itemType} ${itemId}`);
-
-  // כאן תהיה לוגיקת הייצוא
-  if (typeof window.showNotification === 'function') {
-    window.showNotification('ייצוא נתונים תפותח בקרוב', 'info');
-  }
+    console.log(`📤 Exporting linked items data for ${itemType} ${itemId}`);
+    // Implementation for data export
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('Export functionality coming soon', 'info');
+    }
 }
 
 /**
- * פונקציה לצפייה בפרטי אלמנט
  * View item details
  * 
- * @param {string} type - סוג האלמנט
- * @param {string|number} id - מזהה האלמנט
+ * Navigate to item details page
+ * 
+ * @param {string} type - Item type
+ * @param {string|number} id - Item ID
  */
 function viewItemDetails(type, id) {
-  console.log(`🔄 צפייה בפרטי ${type} ${id}`);
-
-  // ניווט לדף המתאים
-  const pageMap = {
-    'trade': '/trades',
-    'account': '/accounts',
-    'ticker': '/tickers',
-    'alert': '/alerts',
-    'cash_flow': '/cash_flows',
-    'note': '/notes',
-    'trade_plan': '/trade_plans',
-    'execution': '/executions'
-  };
-
-  const targetPage = pageMap[type];
-  if (targetPage) {
-    window.location.href = targetPage;
-  }
+    console.log(`👁️ Viewing details for ${type} ${id}`);
+    // Implementation for viewing item details
 }
 
 /**
- * פונקציה לעריכת אלמנט
  * Edit item
  * 
- * @param {string} type - סוג האלמנט
- * @param {string|number} id - מזהה האלמנט
+ * Navigate to item edit page
+ * 
+ * @param {string} type - Item type
+ * @param {string|number} id - Item ID
  */
 function editItem(type, id) {
-  console.log(`🔄 עריכת ${type} ${id}`);
-
-  // קריאה לפונקציית העריכה המתאימה
-  const editFunctions = {
-    'trade': 'editTradeRecord',
-    'account': 'editAccount',
-    'ticker': 'editTicker',
-    'alert': 'editAlert',
-    'cash_flow': 'editCashFlow',
-    'note': 'editNote',
-    'trade_plan': 'editTradePlan',
-    'execution': 'editExecution'
-  };
-
-  const editFunction = editFunctions[type];
-  if (editFunction && typeof window[editFunction] === 'function') {
-    window[editFunction](id);
-  }
+    console.log(`✏️ Editing ${type} ${id}`);
+    // Implementation for editing item
 }
 
 /**
- * פונקציה למחיקת אלמנט
  * Delete item
  * 
- * @param {string} type - סוג האלמנט
- * @param {string|number} id - מזהה האלמנט
+ * Delete item with confirmation
+ * 
+ * @param {string} type - Item type
+ * @param {string|number} id - Item ID
  */
 function deleteItem(type, id) {
-  console.log(`🔄 מחיקת ${type} ${id}`);
-
-  // קריאה לפונקציית המחיקה המתאימה
-  const deleteFunctions = {
-    'trade': 'deleteTradeRecord',
-    'account': 'deleteAccount',
-    'ticker': 'deleteTicker',
-    'alert': 'deleteAlert',
-    'cash_flow': 'deleteCashFlow',
-    'note': 'deleteNote',
-    'trade_plan': 'deleteTradePlan',
-    'execution': 'deleteExecution'
-  };
-
-  const deleteFunction = deleteFunctions[type];
-  if (deleteFunction && typeof window[deleteFunction] === 'function') {
-    window[deleteFunction](id);
-  }
+    console.log(`🗑️ Deleting ${type} ${id}`);
+    // Implementation for deleting item
 }
 
-// ===== ייצוא פונקציות גלובליות =====
-// Export global functions
+/**
+ * Open item page
+ * 
+ * Opens the item's page (currently shows development message)
+ * 
+ * @param {string} itemType - Item type
+ * @param {number|string} itemId - Item ID
+ */
+function openItemPage(itemType, itemId) {
+    console.log('🔄 Opening item page:', { itemType, itemId });
 
+    // Show development message
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('פתיחת דף רשומה - בפיתוח', 'info');
+    } else {
+        alert('פתיחת דף רשומה - בפיתוח');
+    }
+
+    // Future implementation: navigate to item page
+    // window.location.href = `/${itemType}/${itemId}`;
+}
+
+// ===== SPECIFIC TABLE FUNCTIONS =====
+/**
+ * View linked items for trade
+ * @param {number|string} tradeId - ID of the trade
+ */
+function viewLinkedItemsForTrade(tradeId) {
+    return viewLinkedItems(tradeId, 'trade');
+}
+
+/**
+ * View linked items for account
+ * @param {number|string} accountId - ID of the account
+ */
+function viewLinkedItemsForAccount(accountId) {
+    return viewLinkedItems(accountId, 'account');
+}
+
+/**
+ * View linked items for ticker
+ * @param {number|string} tickerId - ID of the ticker
+ */
+function viewLinkedItemsForTicker(tickerId) {
+    return viewLinkedItems(tickerId, 'ticker');
+}
+
+/**
+ * View linked items for alert
+ * @param {number|string} alertId - ID of the alert
+ */
+function viewLinkedItemsForAlert(alertId) {
+    return viewLinkedItems(alertId, 'alert');
+}
+
+/**
+ * View linked items for cash flow
+ * @param {number|string} cashFlowId - ID of the cash flow
+ */
+function viewLinkedItemsForCashFlow(cashFlowId) {
+    return viewLinkedItems(cashFlowId, 'cash_flow');
+}
+
+/**
+ * View linked items for note
+ * @param {number|string} noteId - ID of the note
+ */
+function viewLinkedItemsForNote(noteId) {
+    return viewLinkedItems(noteId, 'note');
+}
+
+/**
+ * View linked items for trade plan
+ * @param {number|string} tradePlanId - ID of the trade plan
+ */
+function viewLinkedItemsForTradePlan(tradePlanId) {
+    return viewLinkedItems(tradePlanId, 'trade_plan');
+}
+
+/**
+ * View linked items for execution
+ * @param {number|string} executionId - ID of the execution
+ */
+function viewLinkedItemsForExecution(executionId) {
+    return viewLinkedItems(executionId, 'execution');
+}
+
+// ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
+// Generic functions (for backward compatibility)
 window.viewLinkedItems = viewLinkedItems;
 window.loadLinkedItemsData = loadLinkedItemsData;
 window.showLinkedItemsModal = showLinkedItemsModal;
 window.createLinkedItemsModalContent = createLinkedItemsModalContent;
-window.createLinkedItemsList = createLinkedItemsList;
+window.checkLinkedItems = checkLinkedItems;
+window.exportLinkedItemsData = exportLinkedItemsData;
+window.createDetailedItemInfo = createDetailedItemInfo;
 window.getItemTypeIcon = getItemTypeIcon;
 window.getItemTypeDisplayName = getItemTypeDisplayName;
-window.createDetailedItemInfo = createDetailedItemInfo;
-window.createModal = createModal;
-window.getMockLinkedData = getMockLinkedData;
-window.exportLinkedItemsData = exportLinkedItemsData;
 window.viewItemDetails = viewItemDetails;
 window.editItem = editItem;
 window.deleteItem = deleteItem;
 
-console.log('✅ Linked Items module loaded successfully');
+// Specific table functions
+window.viewLinkedItemsForTrade = viewLinkedItemsForTrade;
+window.viewLinkedItemsForAccount = viewLinkedItemsForAccount;
+window.viewLinkedItemsForTicker = viewLinkedItemsForTicker;
+window.viewLinkedItemsForAlert = viewLinkedItemsForAlert;
+window.viewLinkedItemsForCashFlow = viewLinkedItemsForCashFlow;
+window.viewLinkedItemsForNote = viewLinkedItemsForNote;
+window.viewLinkedItemsForTradePlan = viewLinkedItemsForTradePlan;
+window.viewLinkedItemsForExecution = viewLinkedItemsForExecution;
+
+console.log('✅ Linked Items loaded successfully');

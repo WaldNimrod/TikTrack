@@ -372,6 +372,7 @@
     padding: 0.5rem 0;
     display: none;
     z-index: 1000;
+    list-style: none;
 }
 
 #unified-header .tiktrack-dropdown-menu.show {
@@ -386,6 +387,7 @@
     transition: all 0.2s ease;
     font-weight: 300;
     font-size: 0.85rem;
+    list-style: none;
 }
 
 #unified-header .tiktrack-dropdown-item:hover {
@@ -403,6 +405,7 @@
 /* Submenu styles */
 #unified-header .dropdown-submenu {
     position: relative;
+    list-style: none;
 }
 
 #unified-header .dropdown-submenu .submenu {
@@ -417,6 +420,7 @@
     padding: 0.5rem 0;
     display: none;
     z-index: 1001;
+    list-style: none;
 }
 
 #unified-header .dropdown-submenu:hover .submenu {
@@ -440,6 +444,13 @@
     padding: 0.4rem 1rem;
     font-size: 0.8rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    list-style: none;
+}
+
+#unified-header .submenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 #unified-header .submenu .tiktrack-dropdown-item:last-child {

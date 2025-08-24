@@ -385,7 +385,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td>${attachment}</td>
         <td data-date="${note.created_at}">${date}</td>
         <td class="actions-cell">
-          <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${note.id})" title="צפה באלמנטים מקושרים">
+          <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForNote(${note.id})" title="צפה באלמנטים מקושרים">
             🔗
           </button>
           <button class="btn btn-sm btn-secondary" onclick="editNote('${note.id}')" title="ערוך">
@@ -1089,15 +1089,15 @@ function setupNoteValidationEvents() {
 function sortTable(columnIndex) {
   console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
 
-  if (typeof window.sortTable === 'function') {
-    window.sortTable(
-      'notes',
+  if (typeof window.sortTableData === 'function') {
+    window.sortTableData(
       columnIndex,
       window.notesData || [],
+      'notes',
       updateNotesTable
     );
   } else {
-    console.error('❌ sortTable function not found in main.js');
+    console.error('❌ sortTableData function not found in tables.js');
   }
 }
 

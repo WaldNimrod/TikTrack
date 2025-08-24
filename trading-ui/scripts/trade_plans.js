@@ -5,6 +5,23 @@
  * 
  * Dedicated file for the trade plans page (trade_plans.html)
  * 
+ * SORTING FIX (August 24, 2025):
+ * =============================
+ * 
+ * ISSUE: RangeError: Maximum call stack size exceeded when clicking sort headers
+ * - Function was calling window.sortTable instead of window.sortTableData
+ * - This caused infinite recursion and browser crash
+ * 
+ * FIX APPLIED:
+ * - Changed window.sortTable to window.sortTableData in sortTable function
+ * - Updated function parameters to match global sorting system
+ * - Fixed function signature: (columnIndex, data, tableType, updateFunction)
+ * 
+ * LINKED ITEMS INTEGRATION:
+ * - Added "Show Linked Details" button to each row
+ * - Integrated with linked-items.js for modal functionality
+ * - Uses viewLinkedItemsForTradePlan() wrapper function
+ * 
  * File contents:
  * - Loading planning data from server
  * - Displaying planning table with sorting and filters
@@ -13,11 +30,13 @@
  * - Deleting planning
  * - Managing statuses and states
  * - Using global notification system
+ * - "Show Linked Details" functionality
  * 
  * Dependencies:
  * - table-mappings.js (for column mappings and sorting)
  * - main.js (for global sorting functions)
  * - translation-utils.js (for status translations)
+ * - linked-items.js (for linked items modal)
  * 
  * Table Mapping:
  * - Uses 'planning' table type from table-mappings.js
@@ -31,7 +50,8 @@
  * - showWarningNotification() - Warning messages
  * 
  * Author: Tik.track Development Team
- * Last update date: 2025
+ * Last update date: 2025-08-24
+ * @sortingFix August 24, 2025 - Fixed infinite recursion in sorting
  * ========================================
  */
 
@@ -82,8 +102,245 @@ function openEditTradePlanModal(tradePlanId) {
     document.getElementById('editTradePlanEntryConditions').value = tradePlan.entry_conditions || '';
     document.getElementById('editTradePlanReasons').value = tradePlan.reasons || '';
 
+    // עדכון תאריך
+    if (tradePlan.created_at) {
+        const date = new Date(tradePlan.created_at);
+        const dateStr = date.toISOString().split('T')[0];
+        document.getElementById('editTradePlanDate').value = dateStr;
+    }
+
+    // עדכון מידע על הטיקר
+    updateEditTickerInfo();
+
     const modal = new bootstrap.Modal(document.getElementById('editTradePlanModal'));
     modal.show();
+}
+
+/**
+ * עדכון מידע על הטיקר במודל העריכה
+ */
+function updateEditTickerInfo() {
+    const tickerId = document.getElementById('editTradePlanTickerId').value;
+    const tickerDisplay = document.getElementById('editSelectedTickerDisplay');
+    const priceDisplay = document.getElementById('editCurrentPriceDisplay');
+    const changeDisplay = document.getElementById('editDailyChangeDisplay');
+
+    if (!tickerId) {
+        tickerDisplay.textContent = 'לא נבחר';
+        priceDisplay.textContent = '-';
+        changeDisplay.textContent = '-';
+        return;
+    }
+
+    // מציאת הטיקר בנתונים
+    const ticker = window.tickersData?.find(t => t.id == tickerId);
+    if (ticker) {
+        tickerDisplay.textContent = ticker.symbol;
+        priceDisplay.textContent = `$${ticker.current_price || '0.00'}`;
+
+        const change = ticker.daily_change || 0;
+        const changeClass = change >= 0 ? 'positive' : 'negative';
+        const changeSign = change >= 0 ? '+' : '';
+        changeDisplay.textContent = `${changeSign}${change}%`;
+        changeDisplay.className = `form-control-plaintext ${changeClass}`;
+
+        // הפעלת השדות
+        enableEditFields();
+    } else {
+        tickerDisplay.textContent = 'לא נמצא';
+        priceDisplay.textContent = '-';
+        changeDisplay.textContent = '-';
+    }
+}
+
+/**
+ * הפעלת השדות במודל העריכה
+ */
+function enableEditFields() {
+    const fields = [
+        'editTradePlanInvestmentType',
+        'editTradePlanSide',
+        'editTradePlanPlannedAmount',
+        'editTradePlanShares',
+        'editTradePlanStopPrice',
+        'editTradePlanTargetPrice',
+        'editTradePlanEntryConditions',
+        'editTradePlanReasons'
+    ];
+
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.disabled = false;
+        }
+    });
+}
+
+/**
+ * עדכון מספר מניות מסכום מתוכנן במודל העריכה
+ */
+function updateEditSharesFromAmount() {
+    const amountInput = document.getElementById('editTradePlanPlannedAmount');
+    const sharesInput = document.getElementById('editTradePlanShares');
+    const priceDisplay = document.getElementById('editCurrentPriceDisplay');
+
+    if (!amountInput || !sharesInput || !priceDisplay) return;
+
+    const amount = parseFloat(amountInput.value) || 0;
+    const priceText = priceDisplay.textContent;
+    const price = parseFloat(priceText.replace('$', '')) || 0;
+
+    if (price > 0) {
+        const result = convertAmountToShares(amount, price);
+        sharesInput.value = result.shares;
+    }
+}
+
+/**
+ * עדכון סכום מתוכנן ממספר מניות במודל העריכה
+ */
+function updateEditAmountFromShares() {
+    const amountInput = document.getElementById('editTradePlanPlannedAmount');
+    const sharesInput = document.getElementById('editTradePlanShares');
+    const priceDisplay = document.getElementById('editCurrentPriceDisplay');
+
+    if (!amountInput || !sharesInput || !priceDisplay) return;
+
+    const shares = parseFloat(sharesInput.value) || 0;
+    const priceText = priceDisplay.textContent;
+    const price = parseFloat(priceText.replace('$', '')) || 0;
+
+    if (price > 0) {
+        const amount = convertSharesToAmount(shares, price);
+        amountInput.value = amount;
+    }
+}
+
+/**
+ * שמירת עריכת תכנון
+ */
+async function saveEditTradePlan() {
+    console.log('🔄 Saving edited trade plan');
+
+    const formData = {
+        id: document.getElementById('editTradePlanId').value,
+        ticker_id: document.getElementById('editTradePlanTickerId').value,
+        investment_type: document.getElementById('editTradePlanInvestmentType').value,
+        side: document.getElementById('editTradePlanSide').value,
+        planned_amount: parseFloat(document.getElementById('editTradePlanPlannedAmount').value),
+        stop_price: parseFloat(document.getElementById('editTradePlanStopPrice').value) || null,
+        target_price: parseFloat(document.getElementById('editTradePlanTargetPrice').value) || null,
+        entry_conditions: document.getElementById('editTradePlanEntryConditions').value,
+        reasons: document.getElementById('editTradePlanReasons').value,
+        created_at: document.getElementById('editTradePlanDate').value
+    };
+
+    try {
+        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+        const response = await fetch(`${base}/api/v1/trade_plans/${formData.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ Trade plan updated successfully:', result);
+
+        // הצגת הודעת הצלחה
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('תכנון עודכן בהצלחה!', 'success');
+        }
+
+        // סגירת המודל
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
+        modal.hide();
+
+        // רענון הטבלה
+        await loadTradePlansData();
+
+    } catch (error) {
+        console.error('❌ Error updating trade plan:', error);
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('שגיאה בעדכון התכנון', 'error');
+        }
+    }
+}
+
+/**
+ * אישור מחיקת תכנון
+ */
+async function confirmDeleteTradePlan() {
+    const modal = document.getElementById('deleteTradePlanModal');
+    const tradePlanId = modal.getAttribute('data-trade-plan-id');
+
+    if (!tradePlanId) {
+        console.error('No trade plan ID found');
+        return;
+    }
+
+    try {
+        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+        const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log('✅ Trade plan deleted successfully');
+
+        // הצגת הודעת הצלחה
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('תכנון נמחק בהצלחה!', 'success');
+        }
+
+        // סגירת המודל
+        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteTradePlanModal'));
+        deleteModal.hide();
+
+        // רענון הטבלה
+        await loadTradePlansData();
+
+    } catch (error) {
+        console.error('❌ Error deleting trade plan:', error);
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('שגיאה במחיקת התכנון', 'error');
+        }
+    }
+}
+
+/**
+ * פונקציות עזר למודל העריכה
+ */
+function addEditCondition() {
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('פונקציונליות זו תהיה זמינה בקרוב', 'info');
+    }
+}
+
+function addEditReason() {
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('פונקציונליות זו תהיה זמינה בקרוב', 'info');
+    }
+}
+
+function addEditImportantNote() {
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית', 'info');
+    }
+}
+
+function addEditReminder() {
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'info');
+    }
 }
 
 /**
@@ -100,10 +357,10 @@ function openDeleteTradePlanModal(tradePlanId) {
 
     // הצגת פרטי התכנון במודל המחיקה
     document.getElementById('deleteTradePlanDetails').innerHTML = `
-        <strong>טיקר:</strong> ${tradePlan.ticker}<br>
-        <strong>סוג:</strong> ${tradePlan.investment_type}<br>
-        <strong>צד:</strong> ${tradePlan.side}<br>
-        <strong>סכום מתוכנן:</strong> ${tradePlan.planned_amount}
+        <strong>טיקר:</strong> ${tradePlan.ticker?.symbol || 'לא מוגדר'}<br>
+        <strong>סוג:</strong> ${tradePlan.investment_type || 'לא מוגדר'}<br>
+        <strong>צד:</strong> ${tradePlan.side || 'לא מוגדר'}<br>
+        <strong>סכום מתוכנן:</strong> $${tradePlan.planned_amount || '0.00'}
     `;
 
     document.getElementById('deleteTradePlanModal').setAttribute('data-trade-plan-id', tradePlanId);
@@ -116,6 +373,15 @@ function openDeleteTradePlanModal(tradePlanId) {
 window.openAddTradePlanModal = openAddTradePlanModal;
 window.openEditTradePlanModal = openEditTradePlanModal;
 window.openDeleteTradePlanModal = openDeleteTradePlanModal;
+window.saveEditTradePlan = saveEditTradePlan;
+window.confirmDeleteTradePlan = confirmDeleteTradePlan;
+window.updateEditTickerInfo = updateEditTickerInfo;
+window.updateEditSharesFromAmount = updateEditSharesFromAmount;
+window.updateEditAmountFromShares = updateEditAmountFromShares;
+window.addEditCondition = addEditCondition;
+window.addEditReason = addEditReason;
+window.addEditImportantNote = addEditImportantNote;
+window.addEditReminder = addEditReminder;
 
 // The translateDateRangeToDates function is already defined at the beginning of the file
 
@@ -312,6 +578,75 @@ async function loadTradePlansData() {
 }
 
 /**
+ * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
+ */
+function updateDesignsTable(trade_plans) {
+    return updateTradePlansTable(trade_plans);
+}
+
+/**
+ * פילטור נתוני תכנונים
+ */
+function filterTradePlansData(filters) {
+    console.log('🔄 Filtering trade plans data with filters:', filters);
+
+    if (!window.tradePlansData || !Array.isArray(window.tradePlansData)) {
+        console.log('No trade plans data available for filtering');
+        return;
+    }
+
+    let filteredData = [...window.tradePlansData];
+
+    // פילטור לפי סטטוס
+    if (filters.statuses && filters.statuses.length > 0) {
+        filteredData = filteredData.filter(plan =>
+            filters.statuses.includes(plan.status)
+        );
+    }
+
+    // פילטור לפי סוג השקעה
+    if (filters.types && filters.types.length > 0) {
+        filteredData = filteredData.filter(plan =>
+            filters.types.includes(plan.investment_type)
+        );
+    }
+
+    // פילטור לפי חשבון
+    if (filters.accounts && filters.accounts.length > 0) {
+        filteredData = filteredData.filter(plan =>
+            filters.accounts.includes(plan.account_id)
+        );
+    }
+
+    // פילטור לפי תאריך
+    if (filters.dateRange) {
+        const { startDate, endDate } = filters.dateRange;
+        if (startDate && endDate) {
+            filteredData = filteredData.filter(plan => {
+                const planDate = new Date(plan.created_at);
+                return planDate >= startDate && planDate <= endDate;
+            });
+        }
+    }
+
+    // פילטור לפי חיפוש
+    if (filters.searchTerm) {
+        const searchTerm = filters.searchTerm.toLowerCase();
+        filteredData = filteredData.filter(plan =>
+            plan.ticker?.symbol?.toLowerCase().includes(searchTerm) ||
+            plan.ticker?.name?.toLowerCase().includes(searchTerm) ||
+            plan.entry_conditions?.toLowerCase().includes(searchTerm) ||
+            plan.reasons?.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    console.log(`✅ Filtered ${filteredData.length} trade plans from ${window.tradePlansData.length}`);
+
+    // עדכון הטבלה
+    updateTradePlansTable(filteredData);
+}
+
+/**
  * עדכון טבלת תכנונים
  * 
  * פונקציה זו מעדכנת את הטבלה עם הנתונים החדשים
@@ -470,7 +805,7 @@ function updateTradePlansTable(trade_plans) {
         <td><span class="current-text">${currentDisplay}</span></td>
         <td class="status-cell" data-status="${statusForFilter}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
         <td class="actions-cell">
-          <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${design.id})" title="צפה באלמנטים מקושרים">
+          <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">
             🔗
           </button>
           <button class="btn btn-sm btn-secondary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">
@@ -787,16 +1122,16 @@ function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
 function sortTable(columnIndex) {
     console.log(`🔄 Sorting planning table by column ${columnIndex}`);
 
-    // Using new global function from main.js
-    if (typeof window.sortTable === 'function') {
-        window.sortTable(
-            'planning',
+    // Using global function from tables.js
+    if (typeof window.sortTableData === 'function') {
+        window.sortTableData(
             columnIndex,
             window.filteredTradePlansData || trade_plansData,
+            'planning',
             updateDesignsTable
         );
     } else {
-        console.error('❌ sortTable function not found in main.js');
+        console.error('❌ sortTableData function not found in tables.js');
         // Fallback to local sorting if global function not available
         console.log('🔄 Using fallback local sorting');
         performLocalSort(columnIndex);
@@ -1222,217 +1557,52 @@ function updateFilterDebugPanel() {
 }
 
 /**
- * פילטור מקומי של תכנונים
+ * פילטור מקומי של נתוני תכנונים
+ * פונקציה זו מספקת פילטור מקומי כאשר הפונקציה הגלובלית לא זמינה
  */
-function filterDesignsLocally(trade_plans, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-    console.log('🔄 === FILTER DESIGNS LOCALLY ===');
-    console.log('🔄 Original trade_plans:', trade_plans.length);
-    console.log('🔄 Filters:', { selectedStatuses, selectedTypes, selectedDateRange, searchTerm });
+function filterTradePlansLocally(data, statuses, types, dateRange, searchTerm) {
+    console.log('🔄 Local filtering of trade plans data');
 
-    let filteredDesigns = [...trade_plans];
-
-    // Extracting start and end dates
-    let startDate = null;
-    let endDate = null;
-
-    if (selectedDateRange && selectedDateRange !== 'כל זמן') {
-        console.log('🔄 Filter: Translating date range:', selectedDateRange);
-        const dateRange = translateDateRangeToDates(selectedDateRange);
-        startDate = dateRange.startDate;
-        endDate = dateRange.endDate;
-        console.log('🔄 Filter: Translation result:', { startDate, endDate });
+    if (!data || !Array.isArray(data)) {
+        console.warn('No data to filter');
+        return [];
     }
 
-    console.log('🔄 Extracted dates:', { startDate, endDate });
+    let filteredData = [...data];
 
-    // Filtering by status
-    if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
-        console.log('🔄 Filtering by status:', selectedStatuses);
-        filteredDesigns = filteredDesigns.filter(design => {
-            // המרת הערכים הנבחרים לאנגלית
-            const statusTranslations = {
-                'פתוח': 'open',
-                'סגור': 'closed',
-                'מבוטל': 'cancelled'
-            };
-
-            const translatedSelectedStatuses = selectedStatuses.map(status =>
-                statusTranslations[status] || status
-            );
-
-            const isMatch = translatedSelectedStatuses.includes(design.status);
-            console.log(`🔄 Design ${design.id}: status=${design.status}, selected=${selectedStatuses}, translated=${translatedSelectedStatuses}, match=${isMatch}`);
-            return isMatch;
-        });
-        console.log('🔄 After status filter:', filteredDesigns.length, 'trade_plans');
+    // פילטור לפי סטטוס
+    if (statuses && statuses.length > 0) {
+        filteredData = filteredData.filter(plan =>
+            statuses.includes(plan.status)
+        );
     }
 
-    // Filtering by type
-    if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
-        console.log('🔄 Filtering by type:', selectedTypes);
-        filteredDesigns = filteredDesigns.filter(design => {
-            // המרת הערכים הנבחרים לאנגלית
-            const typeTranslations = {
-                'סווינג': 'swing',
-                'השקעה': 'investment',
-                'פסיבי': 'passive'
-            };
-
-            const translatedSelectedTypes = selectedTypes.map(type =>
-                typeTranslations[type] || type
-            );
-
-            const designType = design.investment_type || design.type;
-            const isMatch = translatedSelectedTypes.includes(designType);
-            console.log(`🔄 Design ${design.id}: type=${designType}, selected=${selectedTypes}, translated=${translatedSelectedTypes}, match=${isMatch}`);
-            return isMatch;
-        });
-        console.log('🔄 After type filter:', filteredDesigns.length, 'trade_plans');
+    // פילטור לפי סוג השקעה
+    if (types && types.length > 0) {
+        filteredData = filteredData.filter(plan =>
+            types.includes(plan.investment_type)
+        );
     }
 
-    // Filtering by dates
-    if (startDate && endDate) {
-        console.log('🔄 Filtering by date range:', { startDate, endDate });
-        filteredDesigns = filteredDesigns.filter(design => {
-            if (!design.created_at) return false;
-
-            const designDate = new Date(design.created_at);
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-
-            // Setting time to start of day for start date and end of day for end date
-            start.setHours(0, 0, 0, 0);
-            end.setHours(23, 59, 59, 999);
-
-            const isInRange = designDate >= start && designDate <= end;
-            console.log(`🔄 Design ${design.id}: created_at=${design.created_at}, inRange=${isInRange}`);
-            return isInRange;
-        });
-        console.log('🔄 After date filter:', filteredDesigns.length, 'trade_plans');
+    // פילטור לפי תאריך
+    if (dateRange && dateRange !== 'כל זמן') {
+        // כאן אפשר להוסיף לוגיקת פילטור לפי תאריך
+        console.log('Date range filtering not implemented yet');
     }
 
-    // Filtering by search term
+    // פילטור לפי חיפוש
     if (searchTerm && searchTerm.trim() !== '') {
-        console.log('🔄 Filtering by search term:', searchTerm);
-        const searchLower = searchTerm.toLowerCase();
-
-        // Bi-directional search term translations
-        const searchTranslations = {
-            // Status translations
-            'פתוח': 'open',
-            'סגור': 'closed',
-            'מבוטל': 'cancelled',
-            'מבוטל': 'cancelled',
-            'open': 'open',
-            'closed': 'closed',
-            'cancelled': 'cancelled',
-
-            // Investment type translations
-            'סווינג': 'swing',
-            'השקעה': 'investment',
-            'פאסיבי': 'passive',
-            'swing': 'swing',
-            'investment': 'investment',
-            'passive': 'passive',
-
-            // Side translations
-            'לונג': 'long',
-            'שורט': 'short',
-            'long': 'long',
-            'short': 'short',
-
-            // Number translations
-            'אפס': '0',
-            'אחת': '1',
-            'שתיים': '2',
-            'שלוש': '3',
-            'ארבע': '4',
-            'חמש': '5',
-            'שש': '6',
-            'שבע': '7',
-            'שמונה': '8',
-            'תשע': '9',
-            'עשר': '10'
-        };
-
-        // Creating an array of search terms including translations
-        const searchTerms = [searchLower];
-
-        // Adding exact translation
-        if (searchTranslations[searchLower]) {
-            searchTerms.push(searchTranslations[searchLower]);
-        }
-
-        // Adding partial search - if user searches for part of a word
-        Object.keys(searchTranslations).forEach(hebrewTerm => {
-            if (hebrewTerm.includes(searchLower) && !searchTerms.includes(searchTranslations[hebrewTerm])) {
-                searchTerms.push(searchTranslations[hebrewTerm]);
-            }
-        });
-
-        filteredDesigns = filteredDesigns.filter(design => {
-            // Searching in all relevant fields - based on actual server structure
-            const tickerMatch = design.ticker && searchTerms.some(term =>
-                (design.ticker.symbol && design.ticker.symbol.toLowerCase().includes(term)) ||
-                (design.ticker.name && design.ticker.name.toLowerCase().includes(term))
-            );
-
-            const typeMatch = design.investment_type && searchTerms.some(term =>
-                design.investment_type.toLowerCase().includes(term)
-            );
-
-            const sideMatch = design.side && searchTerms.some(term =>
-                design.side.toLowerCase().includes(term)
-            );
-
-            const statusMatch = design.status && searchTerms.some(term =>
-                design.status.toLowerCase().includes(term)
-            );
-
-            const amountMatch = design.planned_amount && searchTerms.some(term =>
-                design.planned_amount.toString().includes(term)
-            );
-
-            const targetMatch = design.target_price && searchTerms.some(term =>
-                design.target_price.toString().includes(term)
-            );
-
-            const stopMatch = design.stop_price && searchTerms.some(term =>
-                design.stop_price.toString().includes(term)
-            );
-
-            const entryMatch = design.entry_conditions && searchTerms.some(term =>
-                design.entry_conditions.toLowerCase().includes(term)
-            );
-
-            const reasonsMatch = design.reasons && searchTerms.some(term =>
-                design.reasons.toLowerCase().includes(term)
-            );
-
-            const accountMatch = design.account && design.account.name && searchTerms.some(term =>
-                design.account.name.toLowerCase().includes(term)
-            );
-
-            const isMatch = tickerMatch || typeMatch || sideMatch || statusMatch ||
-                amountMatch || targetMatch || stopMatch || entryMatch || reasonsMatch || accountMatch;
-
-            console.log(`🔄 Design ${design.id} search:`, {
-                ticker: design.ticker?.symbol,
-                type: design.investment_type,
-                side: design.side,
-                status: design.status,
-                searchTerms: searchTerms,
-                originalSearch: searchLower,
-                isMatch
-            });
-
-            return isMatch;
-        });
-        console.log('🔄 After search filter:', filteredDesigns.length, 'trade_plans');
+        const term = searchTerm.toLowerCase();
+        filteredData = filteredData.filter(plan =>
+            (plan.ticker?.symbol && plan.ticker.symbol.toLowerCase().includes(term)) ||
+            (plan.ticker?.name && plan.ticker.name.toLowerCase().includes(term)) ||
+            (plan.entry_conditions && plan.entry_conditions.toLowerCase().includes(term)) ||
+            (plan.reasons && plan.reasons.toLowerCase().includes(term))
+        );
     }
 
-    console.log('🔄 Final filtered trade_plans:', filteredDesigns.length);
-    return filteredDesigns;
+    console.log(`✅ Locally filtered ${filteredData.length} trade plans from ${data.length}`);
+    return filteredData;
 }
 
 /**
@@ -1465,73 +1635,47 @@ function formatCurrency(amount) {
  * פונקציה זו משתמשת בפונקציה הגלובלית מ-main.js
  */
 function restoreDesignsSectionState() {
-    // Using the new global function
-    if (typeof window.restoreAllSectionStates === 'function') {
-        window.restoreAllSectionStates();
-    } else {
-        console.error('restoreAllSectionStates function not found in main.js');
+    console.log('🔄 Restoring designs section state');
+
+    try {
+        // שחזור מצב הסקשן העליון
+        const topSectionOpen = localStorage.getItem('section_top-section_open') === 'true';
+        const topSectionBody = document.querySelector('#top-section .section-body');
+        const topSectionIcon = document.querySelector('#top-section .filter-icon');
+
+        if (topSectionBody && topSectionIcon) {
+            if (topSectionOpen) {
+                topSectionBody.style.display = 'block';
+                topSectionIcon.textContent = '▲';
+            } else {
+                topSectionBody.style.display = 'none';
+                topSectionIcon.textContent = '▼';
+            }
+        }
+
+        // שחזור מצב הסקשן הראשי
+        const mainSectionOpen = localStorage.getItem('section_content-section_open') === 'true';
+        const mainSectionBody = document.querySelector('#content-section .section-body');
+        const mainSectionIcon = document.querySelector('#content-section .filter-icon');
+
+        if (mainSectionBody && mainSectionIcon) {
+            if (mainSectionOpen) {
+                mainSectionBody.style.display = 'block';
+                mainSectionIcon.textContent = '▲';
+            } else {
+                mainSectionBody.style.display = 'none';
+                mainSectionIcon.textContent = '▼';
+            }
+        }
+
+        console.log('✅ Designs section state restored successfully');
+    } catch (error) {
+        console.error('❌ Error restoring designs section state:', error);
     }
 }
 
-// Safeguarding - ensuring global functions are available
-if (typeof window.toggleTopSection !== 'function') {
-    console.warn('⚠️ toggleTopSection not found in main.js - creating fallback');
-    window.toggleTopSection = function () {
-        console.warn('🔄 toggleTopSection fallback called - main.js may not be loaded properly');
-        console.log('📍 Current page:', window.location.pathname);
-        console.log('📍 Available functions:', Object.keys(window).filter(key => key.includes('toggle')));
-    };
-} else {
-    console.log('✅ toggleTopSection found in main.js');
-}
-
-if (typeof window.toggleMainSection !== 'function') {
-    console.warn('⚠️ toggleMainSection not found in main.js - creating fallback');
-    window.toggleMainSection = function () {
-        console.log('🔄 toggleMainSection fallback called');
-        console.log('📍 Current page:', window.location.pathname);
-        console.log('📍 Available functions:', Object.keys(window).filter(key => key.includes('toggle')));
-
-        const contentSections = document.querySelectorAll('.content-section');
-        console.log('📋 Number of content-sections found:', contentSections.length);
-        const planningSection = contentSections[0]; // The first section - planning
-
-        if (!planningSection) {
-            console.error('❌ Planning section not found');
-            return;
-        }
-        console.log('✅ Planning section found:', planningSection);
-
-        const sectionBody = planningSection.querySelector('.section-body');
-        const toggleBtn = planningSection.querySelector('button[onclick="toggleMainSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        console.log('🎯 sectionBody found:', !!sectionBody);
-        console.log('🔘 toggleBtn found:', !!toggleBtn);
-        console.log('🎨 icon found:', !!icon);
-
-        if (sectionBody) {
-            const isCollapsed = sectionBody.style.display === 'none';
-            console.log('📊 Current state - isCollapsed:', isCollapsed);
-
-            if (isCollapsed) {
-                sectionBody.style.display = 'block';
-            } else {
-                sectionBody.style.display = 'none';
-            }
-
-            // Updating icon
-            if (icon) {
-                icon.textContent = isCollapsed ? '▲' : '▼';
-            }
-
-            // Saving state to localStorage
-            localStorage.setItem('planningSectionCollapsed', !isCollapsed);
-        }
-    };
-} else {
-    console.log('✅ toggleMainSection found in main.js');
-}
+// Global functions are now properly defined in main.js
+console.log('✅ Global toggle functions available from main.js');
 
 // Initialization
 document.addEventListener('DOMContentLoaded', function () {
@@ -1547,7 +1691,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Restoring section state
-    restoreDesignsSectionState();
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    }
 
     // Initializing filters
     if (typeof window.initializePageFilters === 'function') {
@@ -1586,6 +1732,7 @@ window.filterTradePlansLocally = filterTradePlansLocally;
 window.updateFilterDebugPanel = updateFilterDebugPanel;
 window.translateDateRangeToDates = translateDateRangeToDates;
 window.restoreSortState = restoreSortState;
+window.restoreDesignsSectionState = restoreDesignsSectionState;
 
 // פונקציות חסרות
 window.loadPlanningData = function () {
@@ -1800,6 +1947,24 @@ function updateTickerInfo() {
         entryConditionsTextarea.disabled = false;
         reasonsTextarea.disabled = false;
 
+        console.log('✅ Fields enabled:', {
+            investmentType: !investmentTypeSelect.disabled,
+            side: !sideSelect.disabled,
+            amount: !amountInput.disabled,
+            shares: !sharesInput.disabled,
+            stopPrice: !stopPriceInput.disabled,
+            targetPrice: !targetPriceInput.disabled
+        });
+
+        // בדיקה נוספת של שדה הסכום
+        console.log('🔍 Amount field details:', {
+            disabled: amountInput.disabled,
+            readonly: amountInput.readOnly,
+            value: amountInput.value,
+            style: amountInput.style.backgroundColor,
+            classList: Array.from(amountInput.classList)
+        });
+
         // עדכון מחירי עצירה ויעד ברירת מחדל
         updateDefaultPrices(currentPrice);
 
@@ -1890,7 +2055,8 @@ function updateSharesFromAmount() {
                     const result = window.convertAmountToShares(amount, price);
                     console.log('Conversion result:', result);
                     sharesInput.value = result.shares;
-                    amountInput.value = result.adjustedAmount;
+                    // לא מעדכנים את הסכום חזרה - רק מספר מניות
+                    // amountInput.value = result.adjustedAmount;
                 } else {
                     console.error('convertAmountToShares function not found!');
                     console.log('Available global functions:', Object.keys(window).filter(key => key.includes('convert')));

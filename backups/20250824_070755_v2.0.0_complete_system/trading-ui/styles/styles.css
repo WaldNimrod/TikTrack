@@ -1,0 +1,3505 @@
+/* ===== סגנונות כלליים של הפרויקציה ===== */
+
+/* ===== סגנונות סקשנים וקונטיינרים ===== */
+.content-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: opacity 0.3s ease;
+}
+
+.section-container {
+  background: var(--apple-bg-elevated);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+  margin-bottom: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--apple-border-light);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-count {
+  background: #29a6a8;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.section-body {
+  background: var(--apple-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.section-body .table {
+  margin: 0;
+  background: var(--apple-bg);
+}
+
+/* ===== סגנונות החלק העליון ===== */
+#topSection {
+  transition: height 0.3s ease;
+  overflow: hidden;
+}
+
+#topSection .page-header {
+  position: relative;
+}
+
+#topSection .top-toggle-btn {
+  position: absolute;
+  left: 74px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: none !important;
+}
+
+#topSection .top-toggle-btn:hover {
+  transform: translateY(-50%) !important;
+}
+
+/* ===== סגנונות מיכלים נוספים ===== */
+#alertsContainer {
+  transition: opacity 0.3s ease;
+}
+
+.page-size-selector select {
+  padding: 6px 12px;
+  border: 1px solid var(--apple-border-light);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--apple-background);
+  color: var(--apple-text);
+}
+
+.stats-container {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stats-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/**
+ * קובץ CSS ראשי לאתר TikTrack
+ * 
+ * קובץ זה מכיל את כל הסגנונות הכלליים של האפליקציה
+ * כולל רכיבים בסיסיים, כפתורים, קישורים ומבנה הדף
+ * 
+ * תכולת הקובץ:
+ * - מערכת התראות: הודעות הצלחה, שגיאה, אזהרה ומידע
+ * - page-body: מבנה הדף הראשי
+ * - כפתורים: סגנונות לכל סוגי הכפתורים
+ * - קישורים: עיצוב קישורים ואזורים לחיצה
+ * - רכיבים בסיסיים: loading states, modals
+ * - סגנונות כללים: typography, spacing, colors
+ * 
+ * היררכיה: נטען שני, דורס הגדרות בסיסיות מ-apple-theme.css
+ * 
+ * מערכת התראות:
+ * - showSuccessNotification() - הודעות הצלחה (ירוק)
+ * - showErrorNotification() - הודעות שגיאה (אדום)
+ * - showWarningNotification() - הודעות אזהרה (כתום)
+ * - showInfoNotification() - הודעות מידע (כחול)
+ */
+
+/* ===== מערכת התראות ===== */
+/**
+ * מערכת התראות גלובלית לאתר
+ * 
+ * מערכת זו מספקת הודעות משתמש יפות ומודרניות במקום alert() הסטנדרטי
+ * ההתראות מוצגות בפינה הימנית העליונה של המסך ונעלמות אוטומטית
+ * 
+ * תכונות:
+ * - 4 סוגי התראות: הצלחה (ירוק), שגיאה (אדום), אזהרה (כתום), מידע (כחול)
+ * - אנימציות חלקות עם כניסה מימין ויציאה
+ * - עיצוב מודרני עם blur effect וצללים
+ * - כפתור סגירה ידני
+ * - תמיכה בעברית עם direction: rtl
+ * 
+ * שימוש:
+ * showSuccessNotification('כותרת', 'הודעה');
+ * showErrorNotification('כותרת', 'הודעה');
+ * showWarningNotification('כותרת', 'הודעה');
+ * showInfoNotification('כותרת', 'הודעה');
+ */
+
+/* Container להתראות - מיקום קבוע בפינה הימנית העליונה */
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100000;
+  max-width: 400px;
+  pointer-events: none;
+}
+
+/* התראה בודדת - עיצוב בסיסי */
+.notification {
+  background: var(--apple-bg-elevated);
+  border: 1px solid var(--apple-border-light);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(20px);
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  direction: rtl;
+}
+
+.notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.notification.hide {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.notification-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: var(--apple-text-primary);
+}
+
+.notification-message {
+  font-size: 13px;
+  color: var(--apple-text-secondary);
+  line-height: 1.4;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: var(--apple-text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.notification-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--apple-text-primary);
+}
+
+/* סוגי התראות - צבעים ואייקונים */
+/* הצלחה - ירוק */
+.notification.success {
+  border-left: 4px solid #4CAF50;
+}
+
+.notification.success .notification-icon {
+  color: #4CAF50;
+}
+
+/* שגיאה - אדום */
+.notification.error {
+  border-left: 4px solid #f44336;
+}
+
+.notification.error .notification-icon {
+  color: #f44336;
+}
+
+/* אזהרה - כתום */
+.notification.warning {
+  border-left: 4px solid #ff9800;
+}
+
+.notification.warning .notification-icon {
+  color: #ff9800;
+}
+
+/* מידע - כחול */
+.notification.info {
+  border-left: 4px solid #2196F3;
+}
+
+.notification.info .notification-icon {
+  color: #2196F3;
+}
+
+/* טעינת פונט Noto Sans Hebrew מגוגל - מושבת לחלוטין */
+/* @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;500;600;700&display=swap'); */
+
+/* הגדרות גורפות לכל האתר */
+
+/* ===== סגנונות ל-page-body ===== */
+.page-body {
+  background: transparent !important;
+  margin: 0 auto !important;
+  padding: 0 10px 0 10px !important;
+  /* התחלה בגובה 0 + רווח פנימי מימין ומשמאל */
+  width: 100% !important;
+  max-width: 1400px !important;
+  position: relative !important;
+  transition: padding-top 0.3s ease !important;
+}
+
+.page-body.filter-collapsed {
+  padding-top: 0 !important;
+  /* התחלה בגובה 0 */
+}
+
+/* ברירת מחדל לכפתורים - ירוקים ללא הגדרת חשיבות */
+button,
+.btn {
+  background-color: #29a6a8;
+  color: white;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+button:hover,
+.btn:hover {
+  background-color: #1f8a8c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* כל הקישורים יהיו בצבע הלוגו */
+a,
+strong[onclick] {
+  color: #29a6a8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover,
+strong[onclick]:hover {
+  color: #1f8a8c;
+  text-decoration: none;
+}
+
+/* כפתורי סגירה לחלונות קופצים - רקע לבן עם מסגרת כתומה */
+.btn-close,
+button[data-bs-dismiss="modal"],
+button[onclick*="close"],
+button[onclick*="Close"],
+.modal .btn-close,
+.modal-header .btn-close,
+.modal-footer .btn-close {
+  background-color: white !important;
+  background-image: none !important;
+  color: #ff6b35 !important;
+  border: 1px solid #ff6b35 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem 0.6rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  opacity: 1 !important;
+}
+
+.btn-close:hover,
+button[data-bs-dismiss="modal"]:hover,
+button[onclick*="close"]:hover,
+button[onclick*="Close"]:hover,
+.modal .btn-close:hover,
+.modal-header .btn-close:hover,
+.modal-footer .btn-close:hover {
+  background-color: #ffffff !important;
+  color: #e55a2b !important;
+  border-color: #e55a2b !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* כפתורי שמירה - ירוקים עם רקע לבן ומסגרת */
+/* עדכון: אוגוסט 2025 - עיצוב כפתורי שמירה עם צבע הלוגו */
+/* מיועד לכפתורי שמירה בטופסי טריידים */
+.btn-success[onclick*="save"],
+.btn-success[onclick*="Save"],
+button[onclick*="saveTradeRecord"],
+button[onclick*="saveNewTradeRecord"] {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  /* צבע הלוגו של האפליקציה */
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem 0.6rem !important;
+  /* גודל קטן יותר כמו כפתור ביטול */
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-success[onclick*="save"]:hover,
+.btn-success[onclick*="Save"]:hover,
+button[onclick*="saveTradeRecord"]:hover,
+button[onclick*="saveNewTradeRecord"]:hover {
+  background-color: #29a6a8 !important;
+  /* רקע ירוק של הלוגו */
+  color: white !important;
+  border-color: #29a6a8 !important;
+  transform: translateY(-1px) !important;
+  /* אפקט הרמה */
+  box-shadow: 0 4px 8px rgba(41, 166, 168, 0.3) !important;
+  /* צל ירוק */
+}
+
+/* כפתורי סגירה עם איקון X */
+.btn-close[aria-label="Close"],
+button[aria-label="Close"] {
+  background-color: white !important;
+  background-image: none !important;
+  color: #ff6b35 !important;
+  border: 1px solid #ff6b35 !important;
+  border-radius: 50% !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+}
+
+.btn-close[aria-label="Close"]:hover,
+button[aria-label="Close"]:hover {
+  background-color: #ffffff !important;
+  color: #e55a2b !important;
+  border-color: #e55a2b !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* כפתור מודגש בצבע כתום - לשימוש בכל המערכת */
+.btn-emphasized,
+.btn-primary-emphasized,
+button.btn-emphasized,
+button.btn-primary-emphasized {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 2px solid #ff9c05 !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+
+  /* ===== סגנונות לכרטיסיות ===== */
+
+  /* מיכל הכרטיסיות */
+  .cards-container {
+    display: flex !important;
+    gap: 0.8rem !important;
+    flex-wrap: nowrap !important;
+    padding: 0.8rem 0 !important;
+    background: transparent !important;
+    overflow-x: auto !important;
+  }
+
+  /* כרטיסיה בודדת - עיצוב מודרני ונקי */
+  .design-card {
+    background: #ffffff !important;
+    border: 1px solid #e9ecef !important;
+    border-radius: 10px !important;
+    padding: 1.2rem !important;
+    min-width: 250px !important;
+    max-width: 280px !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+    transition: all 0.3s ease !important;
+    margin-bottom: 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .design-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 6px !important;
+    background: linear-gradient(90deg, #29a6a8 0%, #ff9c05 50%, #4caf50 100%) !important;
+    opacity: 0 !important;
+    transition: opacity 0.3s ease !important;
+  }
+
+  .design-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+    transform: translateY(-2px) !important;
+    border-color: #29a6a8 !important;
+  }
+
+  .design-card:hover::before {
+    opacity: 1 !important;
+  }
+
+  /* כותרת הכרטיסיה - עיצוב מודרני */
+  .design-card .card-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 1rem !important;
+    padding-bottom: 1rem !important;
+    border-bottom: 1px solid #f1f3f4 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 0 1rem 0 !important;
+  }
+
+  .design-card .card-title {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    color: #1a1a1a !important;
+    font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1.3 !important;
+  }
+
+  /* סטטוס הכרטיסיה - עיצוב מודרני */
+  .design-card .card-status {
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 20px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .design-card .card-status::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
+    transition: left 0.5s ease !important;
+  }
+
+  .design-card .card-status:hover::before {
+    left: 100% !important;
+  }
+
+  .design-card .card-status.status-open {
+    background: linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(66, 165, 245, 0.2) 100%) !important;
+    color: #1976d2 !important;
+    box-shadow: 0 2px 6px rgba(100, 181, 246, 0.1) !important;
+  }
+
+  .design-card .card-status.status-closed {
+    background: linear-gradient(135deg, rgba(149, 117, 205, 0.2) 0%, rgba(126, 87, 194, 0.2) 100%) !important;
+    color: #512da8 !important;
+    box-shadow: 0 2px 6px rgba(149, 117, 205, 0.1) !important;
+  }
+
+  .design-card .card-status.status-cancelled {
+    background: linear-gradient(135deg, rgba(255, 183, 77, 0.2) 0%, rgba(255, 167, 38, 0.2) 100%) !important;
+    color: #f57c00 !important;
+    box-shadow: 0 2px 6px rgba(255, 183, 77, 0.1) !important;
+  }
+
+  /* תוכן הכרטיסיה - עיצוב מודרני */
+  .design-card .card-content {
+    margin-bottom: 2rem !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .design-card .card-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 1rem 0 !important;
+    border-bottom: 1px solid #f8f9fa !important;
+    transition: all 0.3s ease !important;
+    border-radius: 12px !important;
+    margin: 0.25rem 0 !important;
+  }
+
+  .design-card .card-row:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    border-radius: 12px !important;
+    padding: 1rem 1rem !important;
+    margin: 0.25rem -1rem !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .design-card .card-row:last-child {
+    border-bottom: none !important;
+  }
+
+  .design-card .card-row .label {
+    font-weight: 600 !important;
+    color: #6c757d !important;
+    font-size: 1rem !important;
+    font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .design-card .card-row .value {
+    font-weight: 800 !important;
+    color: #1a1a1a !important;
+    font-size: 1rem !important;
+    font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  /* כפתורי פעולה בכרטיסיה - עיצוב מודרני */
+  .design-card .card-actions {
+    display: flex !important;
+    gap: 1rem !important;
+    justify-content: flex-end !important;
+    padding-top: 1.5rem !important;
+    border-top: 3px solid #f1f3f4 !important;
+  }
+
+  /* כפתורים בתוך כרטיסיות - עיצוב מודרני */
+  .design-card .card-actions .btn {
+    padding: 0.75rem 1.5rem !important;
+    font-size: 0.9rem !important;
+    border-radius: 15px !important;
+    border: 2px solid !important;
+    font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+    min-width: 90px !important;
+    height: 45px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 700 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .design-card .card-actions .btn::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
+    transition: left 0.5s ease !important;
+  }
+
+  .design-card .card-actions .btn:hover::before {
+    left: 100% !important;
+  }
+
+  .design-card .card-actions .btn-secondary {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+    color: #29a6a8 !important;
+    border-color: #29a6a8 !important;
+  }
+
+  .design-card .card-actions .btn-secondary:hover {
+    background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
+    color: white !important;
+    border-color: #29a6a8 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(41, 166, 168, 0.4) !important;
+  }
+
+  .design-card .card-actions .btn-danger {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+    color: #dc3545 !important;
+    border-color: #dc3545 !important;
+  }
+
+  .design-card .card-actions .btn-danger:hover {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4) !important;
+  }
+
+  /* סגנונות ל-background-wrapper */
+  .background-wrapper {
+    background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 100%) !important;
+    min-height: 100vh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  /* סגנונות ל-page-body - גוף הדף */
+  .page-body {
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    /* התחלה בגובה 0 */
+    width: 100% !important;
+    position: relative !important;
+    transition: padding-top 0.3s ease !important;
+  }
+
+  .page-body.filter-collapsed {
+    padding-top: 0 !important;
+    /* התחלה בגובה 0 */
+  }
+
+  /* סגנונות ל-top-section */
+  .top-section {
+    background: transparent !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 1400px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .top-section .section-header {
+    margin-bottom: 2rem !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .top-section .content-section {
+    padding: 0 !important;
+  }
+
+  /* מצב סגור ל-content-section */
+  .content-section.collapsed {
+    padding: 20px 0 !important;
+  }
+
+  /* מצב סגור ל-section-body */
+  .section-body.collapsed {
+    padding: 20px 0 !important;
+  }
+
+  /* כפתורים בתוך כרטיסיות - עיצוב מודרני */
+  .design-card .card-actions .btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.85rem !important;
+    border-radius: 12px !important;
+    border: 2px solid !important;
+    font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+    min-width: 80px !important;
+    height: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 600 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .design-card .card-actions .btn-secondary {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+    color: #29a6a8 !important;
+    border-color: #29a6a8 !important;
+  }
+
+  .design-card .card-actions .btn-secondary:hover {
+    background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
+    color: white !important;
+    border-color: #29a6a8 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 16px rgba(41, 166, 168, 0.3) !important;
+  }
+
+  .design-card .card-actions .btn-danger {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+    color: #dc3545 !important;
+    border-color: #dc3545 !important;
+  }
+
+  .design-card .card-actions .btn-danger:hover {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3) !important;
+  }
+
+  /* התאמה למסכים קטנים */
+  @media (max-width: 768px) {
+    .cards-container {
+      flex-direction: column !important;
+      gap: 1rem !important;
+      padding: 1rem 0 !important;
+    }
+
+    .design-card {
+      min-width: auto !important;
+      padding: 1.25rem !important;
+      border-radius: 12px !important;
+    }
+
+    .design-card .card-title {
+      font-size: 1.1rem !important;
+    }
+
+    .design-card .card-status {
+      padding: 0.4rem 0.8rem !important;
+      font-size: 0.8rem !important;
+    }
+
+    .design-card .card-actions .btn {
+      padding: 0.4rem 0.8rem !important;
+      font-size: 0.8rem !important;
+      min-width: 70px !important;
+      height: 36px !important;
+    }
+  }
+
+  /* כפתור משני - רקע לבן עם מסגרת ירוקה - לשימוש כללי */
+  .btn-secondary-custom,
+  button.btn-secondary-custom {
+    background-color: white !important;
+    color: #29a6a8 !important;
+    border: 2px solid #29a6a8 !important;
+    border-radius: 4px !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .btn-secondary-custom:hover,
+  button.btn-secondary-custom:hover {
+    background-color: #f8f9fa !important;
+    color: #1f8a8c !important;
+    border-color: #1f8a8c !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(41, 166, 168, 0.2) !important;
+  }
+
+  /* כפתור מודגש */
+  .btn-emphasized,
+  .btn-primary-emphasized,
+  button.btn-emphasized,
+  button.btn-primary-emphasized {
+    background-color: #fff5e6 !important;
+    color: #ff9c05 !important;
+    border: 2px solid #ff9c05 !important;
+    text-transform: none !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 4px rgba(255, 156, 5, 0.2) !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 38px !important;
+  }
+
+  .btn-emphasized:hover,
+  .btn-primary-emphasized:hover,
+  button.btn-emphasized:hover,
+  button.btn-primary-emphasized:hover {
+    background-color: #fff5e6 !important;
+    border-color: #e68a00 !important;
+    color: #e68a00 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(255, 156, 5, 0.3) !important;
+  }
+
+  .btn-emphasized:active,
+  .btn-primary-emphasized:active,
+  button.btn-emphasized:active,
+  button.btn-primary-emphasized:active {
+    background-color: #ffe6cc !important;
+    border-color: #d47a00 !important;
+    color: #d47a00 !important;
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 6px rgba(255, 156, 5, 0.4) !important;
+  }
+
+  .btn-emphasized:focus,
+  .btn-primary-emphasized:focus,
+  button.btn-emphasized:focus,
+  button.btn-primary-emphasized:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(255, 156, 5, 0.3) !important;
+  }
+
+  /* כפתור מודגש קטן */
+  .btn-emphasized.btn-sm,
+  .btn-primary-emphasized.btn-sm {
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    min-height: 32px !important;
+  }
+
+  /* כפתור מודגש גדול */
+  .btn-emphasized.btn-lg,
+  .btn-primary-emphasized.btn-lg {
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1rem !important;
+    min-height: 48px !important;
+  }
+
+  /* עיצוב כללי - font-family מנוהל ב-typography.css */
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    color: #222;
+    direction: rtl;
+  }
+
+  /* הגדרות RTL גלובליות */
+  * {
+    direction: rtl;
+  }
+
+  /* הגדרות RTL ספציפיות לאלמנטים */
+  input,
+  textarea,
+  select {
+    direction: rtl;
+    text-align: right;
+  }
+
+  /* הגדרות RTL לגריד - הועבר ל-apple-theme.css */
+
+  /* הגדרות RTL לטקסטים - font-family מנוהל ב-typography.css */
+
+  label,
+  span,
+  p,
+  div {
+    direction: rtl;
+  }
+
+  /* הגדרות RTL לכפתורים */
+  button {
+    direction: rtl;
+  }
+
+  /* הגדרות RTL לתפריטים */
+
+  .dropdown-item {
+    direction: rtl;
+    text-align: right;
+  }
+
+  /* מרווחים לכותרת עם Web Component - הגדרות body מנוהלות ב-apple-theme.css */
+
+
+  .background-wrapper.filter-collapsed {
+    padding-top: 30px !important;
+    /* מרווח לכותרת בלבד + מרווח קטן */
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 1rem;
+  }
+
+  /* מגבלת רוחב מקסימלית לתוכן */
+  .content-wrapper {
+    max-width: 1390px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* עיצוב הכותרת - font-family וגודל מנוהלים ב-typography.css */
+
+  .button-primary {
+    background-color: #29a6a8;
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  /* .info-summary - הועבר ל-apple-theme.css */
+  .alert-section {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .alert-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .alert-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+    background: var(--apple-card-bg);
+    border: 1px solid var(--apple-border-light);
+    border-radius: var(--apple-radius-medium);
+    padding: 1rem;
+    position: relative;
+    box-shadow: var(--apple-shadow-light);
+    transition: all 0.2s ease;
+  }
+
+  @media (min-width: 600px) {
+    .alert-card {
+      flex: 1 1 30%;
+      max-width: 30%;
+    }
+  }
+
+  .alert-card strong {
+    cursor: pointer;
+    font-weight: 600;
+    transition: color 0.2s ease;
+  }
+
+  .alert-card .price {
+    font-size: 0.9rem;
+    color: var(--apple-text-secondary);
+    margin: 0.5rem 0;
+  }
+
+  .alert-card button {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    background-color: var(--apple-blue);
+    color: white;
+    border: none;
+    border-radius: var(--apple-radius-small);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .alert-card button:hover {
+    background-color: var(--apple-blue-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--apple-shadow-medium);
+  }
+
+  .alert-card.read {
+    opacity: 0.6;
+    background-color: var(--apple-gray-1);
+    border-color: var(--apple-gray-3);
+  }
+
+  .alert-card.read button {
+    background-color: var(--apple-gray-5);
+    color: var(--apple-text-secondary);
+    cursor: not-allowed;
+  }
+
+  .alert-card.read button:hover {
+    background-color: var(--apple-gray-5);
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* סגנונות ספציפיים לכפתורי Bootstrap בהתראות */
+  .alert-card .btn {
+    font-family: inherit;
+    font-weight: 500;
+    border-radius: var(--apple-radius-small);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    position: absolute;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  /* עיצוב סטטיסטיקות */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .stat-card {
+    background-color: var(--apple-bg-elevated);
+    padding: 1.5rem;
+    border-radius: var(--apple-radius-medium);
+    border: 1px solid var(--apple-border-light);
+    box-shadow: var(--apple-shadow-light);
+    text-align: center;
+  }
+
+  .stat-card h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--apple-text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .stat-card .value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--apple-text-primary);
+  }
+
+  /* סגנונות לכפתורי Bootstrap */
+
+
+  .btn-primary {
+    background-color: #007bff !important;
+    color: white !important;
+    border: 1px solid #007bff !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  }
+
+
+  /* הגדרות מקומיות ל-btn-secondary הוסרו - משתמשים בהגדרות הכלליות */
+
+
+  .btn-success {
+    background-color: #28a745 !important;
+    color: white !important;
+    border: 1px solid #28a745 !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .btn-success:hover {
+    background-color: #218838 !important;
+    border-color: #218838 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+  }
+
+  /* .btn-danger - אוחד עם ההגדרה למטה */
+
+  /* סגנונות לטבלאות - הועברו ל-grid-table.css */
+
+  /* סגנונות משותפים לכרטיסי התראות - הועברו להגדרות הראשונות */
+
+  /* סגנונות משותפים למודלים - הועברו ל-apple-theme.css */
+
+  /* סגנונות משותפים לטופסי פרטים */
+  .trade-details-grid,
+  .plan-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 1rem 0;
+  }
+
+  .trade-details-section,
+  .plan-details-section {
+    background: var(--apple-bg-secondary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--apple-border-light);
+  }
+
+  .trade-details-section h4,
+  .plan-details-section h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--apple-text-primary);
+    font-weight: 600;
+  }
+
+  /* סגנונות משותפים לכפתורים */
+
+  /* .btn-sm - אוחד עם ההגדרה למטה */
+
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+  }
+
+
+  /* הגדרות מקומיות ל-btn-secondary:hover הוסרו - משתמשים בהגדרות הכלליות */
+
+
+  .btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+  }
+
+  .btn-warning {
+    background-color: white !important;
+    color: #ff9c05 !important;
+    border: 1px solid #ff9c05 !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .btn-warning:hover {
+    background-color: #ff9c05 !important;
+    color: white !important;
+    border-color: #ff9c05 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+  }
+
+  .btn-danger {
+    background-color: white !important;
+    color: #dc3545 !important;
+    border: 1px solid #dc3545 !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .btn-danger:hover {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+  }
+
+  /* סגנונות לכפתורים */
+  .add-btn {
+    background: transparent !important;
+    color: #000000 !important;
+    border: 2px solid #29a6a8 !important;
+    box-shadow: none !important;
+    padding: 6px 13px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+
+  /* כפתורים קטנים */
+  .btn-sm {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.25rem !important;
+  }
+
+  /* כפתורים בטבלאות - סגנון אחיד לכל הדפים */
+  /* הגדרות מקומיות ל-btn-secondary הוסרו - משתמשים בהגדרות הכלליות */
+
+  .btn-sm.btn-warning {
+    background-color: white !important;
+    color: #ff9c05 !important;
+    border: 1px solid #ff9c05 !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.25rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .btn-sm.btn-warning:hover {
+    background-color: #ff9c05 !important;
+    color: white !important;
+    border-color: #ff9c05 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+  }
+
+  .btn-sm.btn-danger {
+    background-color: white !important;
+    color: #dc3545 !important;
+    border: 1px solid #dc3545 !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.25rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .btn-sm.btn-danger:hover {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+  }
+
+  .btn-sm.btn-primary {
+    background-color: #007bff !important;
+    color: white !important;
+    border: 1px solid #007bff !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.25rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .btn-sm.btn-primary:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .add-btn:hover {
+    background: rgba(41, 166, 168, 0.1) !important;
+    border-color: #1f8a8c !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+  }
+
+  .refresh-btn {
+    background: transparent !important;
+    color: #000000 !important;
+    border: 2px solid #29a6a8 !important;
+    box-shadow: none !important;
+    padding: 6px 13px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .refresh-btn:hover {
+    background: rgba(41, 166, 168, 0.1) !important;
+    border-color: #1f8a8c !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+  }
+
+
+  .delete-account-btn:hover {
+    background: #ffffff !important;
+    color: #e55a2b !important;
+    border-color: #e55a2b !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* סגנונות אחידים לכפתורי פעולות בטבלאות */
+  .edit-btn {
+    background: white !important;
+    color: #29a6a8 !important;
+    border: 1px solid #29a6a8 !important;
+    box-shadow: none !important;
+    padding: 6px !important;
+    width: 25px !important;
+    height: 25px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    margin: 0 2px !important;
+  }
+
+  .edit-btn:hover {
+    background: #ffffff !important;
+    color: #1f8a8c !important;
+    border-color: #1f8a8c !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* סגנונות מיוחדים לכפתור מחיקה - כתום של הלוגו */
+
+  .delete-account-btn:hover {
+    background: #ffffff !important;
+    color: #e55a2b !important;
+    border-color: #e55a2b !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* סגנונות מיוחדים לכפתורי עריכה עם action-btn class */
+  .edit-btn.action-btn {
+    /* שומר על הסגנונות הבסיסיים של edit-btn */
+    background: white !important;
+    color: #29a6a8 !important;
+    border: 1px solid #29a6a8 !important;
+    box-shadow: none !important;
+    padding: 6px !important;
+    width: 25px !important;
+    height: 25px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    margin: 0 2px !important;
+  }
+
+  .edit-btn.action-btn:hover {
+    background: #ffffff !important;
+    color: #1f8a8c !important;
+    border-color: #1f8a8c !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .stat-card .change {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  .stat-card .change.positive {
+    color: var(--apple-green);
+  }
+
+  .stat-card .change.negative {
+    color: var(--apple-red);
+  }
+
+  .filters {
+    margin-bottom: 1rem;
+  }
+
+  .filters-options {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .filters-options::before {
+    content: "סטטוס:";
+    margin-left: 0.5rem;
+    font-weight: bold;
+  }
+
+  .filters-options label {
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
+  /* הגדרות סטטוסים כלליות - לא לכרטיסי עיצובים */
+  .status-open {
+    background-color: #28a745 !important;
+    color: white !important;
+  }
+
+  .status-closed {
+    background-color: #29a6a8 !important;
+    color: white !important;
+  }
+
+  .status-cancelled {
+    background-color: #dc3545 !important;
+    color: white !important;
+  }
+
+  .badge-status {
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    color: white;
+  }
+
+  .badge-status.פתוח {
+    background-color: #28a745;
+  }
+
+  .badge-status.סגור {
+    background-color: #29a6a8;
+  }
+
+  .badge-status.מבוטל {
+    background-color: #dc3545;
+  }
+
+  .badge-type {
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    background-color: #f3e5f5;
+    color: #222;
+  }
+
+  .badge-type.סווינג {
+    background-color: #e8f5e9;
+  }
+
+  .badge-type.השקעה {
+    background-color: #fff8e1;
+  }
+
+  .badge-type.פאסיבי {
+    background-color: #ede7f6;
+  }
+
+  /* עיצוב לגריד - הוסר (AG Grid) */
+
+  /* סגנונות ייחודיים לדפים - הגדרות body מנוהלות ב-apple-theme.css */
+
+
+  .background-wrapper.filter-collapsed {
+    padding-top: 30px !important;
+  }
+
+  .main-content,
+  .database-page,
+  .grid-table-pages {
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e8e8e8;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', sans-serif;
+  }
+
+  .page-header {
+    background: transparent;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: none;
+    box-shadow: none;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--apple-text-primary);
+    margin: 0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .page-subtitle {
+    display: none;
+  }
+
+  /* צבע כתום לסטטוס ממתין */
+  :root {
+    --apple-orange: #ff9500;
+  }
+
+  /* סגנונות למספרים */
+  .number-cell {
+    text-align: left !important;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+    font-size: 13px !important;
+  }
+
+  /* סגנונות למזהה */
+  .id-cell {
+    font-weight: 600 !important;
+    color: var(--apple-blue) !important;
+    font-size: 12px !important;
+  }
+
+  .json-cell {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .json-cell:hover {
+    white-space: normal;
+    word-break: break-all;
+    max-width: none;
+    position: relative;
+    z-index: 100;
+    background: var(--apple-bg-elevated);
+    border-radius: 4px;
+    padding: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* סגנונות לסטטיסטיקות */
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  /* הגדרות .stat-card הועברו להגדרות הראשונות */
+
+  .stat-title {
+    color: var(--apple-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--apple-text);
+  }
+
+  .stat-value.positive {
+    color: #28a745;
+  }
+
+  .stat-value.negative {
+    color: #dc3545;
+  }
+
+  /* .ag-grid-reversed - הוסר (AG Grid) */
+  /* #agGrid - הוסר (AG Grid) */
+  .bg-open {
+    background-color: #28a745 !important;
+    color: white !important;
+  }
+
+  .bg-closed {
+    background-color: #29a6a8 !important;
+    color: white !important;
+  }
+
+  .bg-cancelled {
+    background-color: #dc3545 !important;
+    color: white !important;
+  }
+
+  .bg-swing {
+    background-color: #e8f5e9 !important;
+  }
+
+  .bg-invest {
+    background-color: #fff8e1 !important;
+  }
+
+  .bg-passive {
+    background-color: #ede7f6 !important;
+  }
+
+  .positive {
+    color: green !important;
+    font-weight: bold;
+  }
+
+  .negative {
+    color: red !important;
+    font-weight: bold;
+  }
+
+  /* סגנונות נוספים למצבי טעינה וריק */
+  .error {
+    background: var(--apple-red-light);
+    color: var(--apple-red);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+  }
+
+  /* .loading-spinner - הועבר ל-apple-theme.css */
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* סגנונות לכרטיסי תכנונים */
+  .plan-card {
+    position: relative;
+    overflow: hidden;
+    background: white;
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .plan-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--apple-blue);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .plan-card:hover::before {
+    opacity: 1;
+  }
+
+  .plan-card:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .plan-card.selected {
+    background-color: var(--apple-blue) !important;
+    color: white;
+    border-color: var(--apple-blue) !important;
+  }
+
+  .plan-card.selected::before {
+    opacity: 1;
+  }
+
+  /* סגנונות לטופס תכנון חדש */
+  #newPlanForm {
+    background: var(--apple-bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--apple-radius-medium);
+    border: 1px solid var(--apple-border-light);
+    margin-top: 1rem;
+  }
+
+  #newPlanForm h3 {
+    margin-top: 0;
+    color: var(--apple-text-primary);
+    border-bottom: 2px solid var(--apple-blue);
+    padding-bottom: 0.5rem;
+  }
+
+  /* התאמה למסכים קטנים */
+  @media (max-width: 768px) {
+    .content-wrapper {
+      max-width: 100%;
+      padding: 0 1rem;
+    }
+
+    .trade-details-grid,
+    .plan-details-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    /* .modal-content - הועבר ל-apple-theme.css */
+
+    .stats-cards {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* התאמה למסכים בינוניים */
+  @media (min-width: 769px) and (max-width: 1200px) {
+    .content-wrapper {
+      max-width: 100%;
+      padding: 0 2rem;
+    }
+
+    .stats-cards {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* עיצוב אינדיקטור סטטוס */
+  .status-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem 0;
+    gap: 1rem;
+  }
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .status-dot.success {
+    background-color: #4caf50;
+  }
+
+  .status-dot.error {
+    background-color: #f44336;
+  }
+
+  .status-dot.warning {
+    background-color: #ff9800;
+  }
+
+  /* סגנות שדות חיפוש */
+  .search-filter-container {
+    position: relative;
+  }
+
+  .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-filter-input {
+    width: 200px;
+    padding: 8px 35px 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+    font-size: 0.9rem;
+    background: white;
+    transition: all 0.2s ease;
+    direction: rtl;
+  }
+
+  .search-filter-input:focus {
+    outline: none;
+    border-color: #29a6a8;
+    box-shadow: 0 0 0 2px rgba(41, 166, 168, 0.1);
+  }
+
+  .search-filter-input::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  .search-clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .search-clear-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .search-clear-btn.show {
+    display: flex;
+  }
+
+  .search-clear-icon {
+    font-size: 16px;
+    color: #666;
+    font-weight: bold;
+  }
+
+  .search-clear-btn:hover .search-clear-icon {
+    color: #333;
+  }
+
+  /* איקונים בתוך כפתורים */
+  .btn-icon {
+    font-size: 0.7rem !important;
+    margin-right: 0.25rem !important;
+  }
+
+  /* מרווח בין כפתורים בטבלה */
+  td .btn+.btn {
+    margin-right: 0.25rem !important;
+  }
+}
+
+/* ===== סגנונות לכותרת העמוד ===== */
+/* .table-title - הועבר ל-grid-table.css */
+
+/* אזור פעולות הכותרת - עיצוב מודרני */
+.table-actions {
+  display: flex !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+  background: transparent !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 15px !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* כפתור הוספה - עיצוב מודרני */
+.refresh-btn {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  font-size: 0.65rem !important;
+  font-weight: 500 !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.2rem !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin: 2px !important;
+}
+
+.refresh-btn::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
+  transition: left 0.5s ease !important;
+}
+
+.refresh-btn:hover::before {
+  left: 100% !important;
+}
+
+.refresh-btn:hover {
+  background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
+  color: white !important;
+  border-color: #29a6a8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 8px rgba(41, 166, 168, 0.2) !important;
+}
+
+.refresh-btn .action-icon {
+  font-size: 0.8rem !important;
+}
+
+/* מפריד בין כפתורים */
+.action-separator {
+  width: 1px !important;
+  height: 20px !important;
+  background: linear-gradient(180deg, transparent, #e9ecef, transparent) !important;
+  margin: 0 0.3rem !important;
+}
+
+/* כפתור הצג/הסתר - עיצוב אחיד לכל האתר */
+.filter-toggle-btn {
+  background: #ffffff;
+  color: #ff9c05;
+  border: 2px solid #ff9c05;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+  cursor: pointer;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  margin: 2px;
+}
+
+.filter-toggle-btn:hover {
+  background: rgba(255, 156, 5, 0.1);
+  color: #e55a2b;
+  border-color: #e55a2b;
+  box-shadow: 0 4px 12px rgba(255, 156, 5, 0.2);
+}
+
+.filter-toggle-btn .filter-icon {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.filter-toggle-btn.active .filter-icon {
+  transform: rotate(180deg);
+}
+
+/* ===== סגנונות לכפתורי עריכה וביטול ===== */
+.btn-edit {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+}
+
+.btn-edit:hover {
+  background: #ffffff !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-delete {
+  background: #ffffff !important;
+  color: #dc3545 !important;
+  border: 1px solid #dc3545 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+}
+
+.btn-delete:hover {
+  background: #f8f9fa !important;
+  color: #c82333 !important;
+  border-color: #c82333 !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== סגנונות אחידים לכפתורי רענן והוסף ===== */
+
+/* כפתורי הוסף - סגנון אחיד לכל האתר */
+.refresh-btn[onclick*="showAdd"],
+.refresh-btn[onclick*="openNoteDetails"],
+.refresh-btn[onclick*="openDesignDetails"],
+.refresh-btn[onclick*="showAddTradePlanModal"],
+.refresh-btn[onclick*="showAddTradeModal"],
+.refresh-btn[onclick*="showAddAccountModal"],
+.refresh-btn[onclick*="showAddTickerModal"],
+.refresh-btn[onclick*="showAddExecutionModal"],
+.refresh-btn[onclick*="showAddCashFlowModal"],
+.refresh-btn[onclick*="showAddAlertModal"],
+.refresh-btn[onclick*="showAddNoteModal"],
+.refresh-btn[onclick*="showAddUserRoleModal"],
+.refresh-btn[onclick*="showAddUserModal"],
+button[onclick*="showAdd"],
+button[onclick*="openNoteDetails"],
+button[onclick*="openDesignDetails"] {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 6px 13px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  letter-spacing: -0.01em !important;
+}
+
+.refresh-btn[onclick*="showAdd"]:hover,
+.refresh-btn[onclick*="openNoteDetails"]:hover,
+.refresh-btn[onclick*="openDesignDetails"]:hover,
+.refresh-btn[onclick*="showAddTradePlanModal"]:hover,
+.refresh-btn[onclick*="showAddTradeModal"]:hover,
+.refresh-btn[onclick*="showAddAccountModal"]:hover,
+.refresh-btn[onclick*="showAddTickerModal"]:hover,
+.refresh-btn[onclick*="showAddExecutionModal"]:hover,
+.refresh-btn[onclick*="showAddCashFlowModal"]:hover,
+.refresh-btn[onclick*="showAddAlertModal"]:hover,
+.refresh-btn[onclick*="showAddNoteModal"]:hover,
+.refresh-btn[onclick*="showAddUserRoleModal"]:hover,
+.refresh-btn[onclick*="showAddUserModal"]:hover,
+button[onclick*="showAdd"]:hover,
+button[onclick*="openNoteDetails"]:hover,
+button[onclick*="openDesignDetails"]:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתורי רענן - סגנון אחיד לכל האתר */
+.refresh-btn[onclick*="refresh"],
+.refresh-btn[onclick*="resetAllFiltersAndReloadData"],
+.refresh-btn[onclick*="loadTrades"],
+.refresh-btn[onclick*="loadAccounts"],
+.refresh-btn[onclick*="resetTestPreferences"] {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 6px 13px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  letter-spacing: -0.01em !important;
+}
+
+.refresh-btn[onclick*="refresh"]:hover,
+.refresh-btn[onclick*="resetAllFiltersAndReloadData"]:hover,
+.refresh-btn[onclick*="loadTrades"]:hover,
+.refresh-btn[onclick*="loadAccounts"]:hover,
+.refresh-btn[onclick*="resetTestPreferences"]:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתורי הוסף - סגנון אחיד לכל האתר */
+.btn-add {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 6px 13px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  letter-spacing: -0.01em !important;
+}
+
+.btn-add:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== סגנונות לכפתורי עריכה וביטול בטבלה ===== */
+/* כפתורי עריכה - נשארים כחולים-ירוקים */
+.btn-secondary {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+}
+
+.btn-secondary:hover {
+  background: #ffffff !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* כפתורי ביטול - משתמשים בהגדרה הכללית של btn-warning (כתום) */
+
+.btn-danger {
+  background: #ffffff !important;
+  color: #dc3545 !important;
+  border: 1px solid #dc3545 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+}
+
+.btn-danger:hover {
+  background: #ffffff !important;
+  color: #c82333 !important;
+  border-color: #c82333 !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== סגנונות לכפתורים קטנים ===== */
+.btn-sm {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 6px !important;
+}
+
+.btn-sm.btn-secondary,
+.btn-sm.btn-danger {
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0.25rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 0.2rem !important;
+}
+
+/* הגדרות ספציפיות לכפתורים בטבלאות */
+.actions-cell .btn-sm.btn-secondary {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 0.2rem !important;
+}
+
+.actions-cell .btn-sm.btn-secondary:hover {
+  background: #ffffff !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.actions-cell .btn-sm.btn-danger {
+  background: #ffffff !important;
+  color: #dc3545 !important;
+  border: 1px solid #dc3545 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 0.2rem !important;
+}
+
+.actions-cell .btn-sm.btn-danger:hover {
+  background: #ffffff !important;
+  color: #c82333 !important;
+  border-color: #c82333 !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.actions-cell .btn-sm.btn-info {
+  background: #ffffff !important;
+  color: #17a2b8 !important;
+  border: 1px solid #17a2b8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 0.2rem !important;
+}
+
+.actions-cell .btn-sm.btn-info:hover {
+  background: #ffffff !important;
+  color: #138496 !important;
+  border-color: #138496 !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== סגנונות לכרטיסיות התראות ===== */
+.alerts-cards-container {
+  margin: 20px 0;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+/* ===== יישור כפתורי פעולה לימין בכל הטבלאות ===== */
+/* יישור כפתורי פעולה לימין (שמאל במערכת RTL) */
+.actions-cell {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* יישור כפתורים בתוך תאי פעולות */
+.actions-cell .btn {
+  text-align: center !important;
+  direction: ltr !important;
+}
+
+/* יישור כפתורי secondary, danger ו-info */
+.actions-cell .btn-sm.btn-secondary,
+.actions-cell .btn-sm.btn-danger,
+.actions-cell .btn-sm.btn-info {
+  text-align: center !important;
+  direction: ltr !important;
+}
+
+/* ===== יישור עמודת פעולות בטבלאות ===== */
+/* יישור עמודת פעולות לימין (שמאל במערכת RTL) - רק תאים עם class actions-cell */
+.table th.actions-cell,
+.table td.actions-cell {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* יישור עמודת פעולות בטבלאות data-table */
+.data-table th.actions-cell,
+.data-table td.actions-cell {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* יישור עמודת פעולות בטבלאות Bootstrap */
+.table-responsive .table th.actions-cell,
+.table-responsive .table td.actions-cell {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* ===== סגנונות מיוחדים לטבלת תכנונים ===== */
+/* ===== סגנונות אחידים לכל הטבלאות ===== */
+/* צביעת עמודת נכס בירוק כהה עם צל */
+.table td.ticker-cell,
+.table td.asset-cell,
+.table td.symbol-cell {
+  color: #0d5a0d !important;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* צביעת עמודת סוג - כחול כהה */
+.table td.type-cell,
+.table td.category-cell,
+.table td.investment-type-cell {
+  color: #1e3a8a !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת צד לפי ערך */
+.table td.side-cell[data-side="Long"],
+.table td.side-cell[data-side="long"],
+.table td.direction-cell[data-direction="Long"],
+.table td.direction-cell[data-direction="long"] {
+  color: #28a745 !important;
+  font-weight: 600;
+}
+
+.table td.side-cell[data-side="Short"],
+.table td.side-cell[data-side="short"],
+.table td.direction-cell[data-direction="Short"],
+.table td.direction-cell[data-direction="short"] {
+  color: #dc3545 !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת יעד בירוק כהה */
+.table td.target-cell,
+.table td.target-price-cell,
+.table td.goal-cell {
+  color: #0d5a0d !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת סטופ באדום כהה */
+.table td.stop-cell,
+.table td.stop-loss-cell,
+.table td.stop-price-cell {
+  color: #8b0000 !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת סטטוס - סגול כהה */
+.table td.status-cell,
+.table td.state-cell {
+  color: #581c87 !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת רווח/הפסד - כחול כהה */
+.table td.pl-cell {
+  color: #1e3a8a !important;
+  font-weight: 600;
+}
+
+/* צביעת עמודת תוכנית - כתום כהה */
+.table td.plan-cell {
+  color: #d97706 !important;
+  font-weight: 600;
+}
+
+.alerts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.alerts-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.alerts-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.alerts-count {
+  background: #29a6a8;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.alerts-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  max-width: 100%;
+}
+
+.alert-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+}
+
+.alert-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.alert-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #29a6a8, #1f8a8c);
+}
+
+.alert-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.alert-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  flex: 1;
+}
+
+.alert-card-time {
+  font-size: 0.85rem;
+  color: #666;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.alert-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.alert-card-message {
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  flex: 1;
+}
+
+.alert-card-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.alert-detail-item {
+  background: #f8f9fa;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #666;
+  border: 1px solid #e9ecef;
+}
+
+.alert-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.alert-ticker-info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.positive-change {
+  color: #28a745 !important;
+}
+
+.negative-change {
+  color: #dc3545 !important;
+}
+
+.btn-mark-read {
+  background: #29a6a8 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.btn-mark-read:hover {
+  background: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3) !important;
+}
+
+.btn-mark-read:disabled {
+  background: #ccc !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* תצוגה רספונסיבית לכרטיסיות */
+@media (max-width: 768px) {
+  .alerts-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .alerts-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .alert-card {
+    padding: 15px;
+  }
+
+  .alert-card-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* ===== סגנונות לאיקונים של כפתורים ===== */
+
+/* כפתור ערוך עם איקון עיפרון */
+button[title="ערוך"],
+.btn[title="ערוך"],
+button:has(span:contains("✏️")),
+.btn:has(span:contains("✏️")) {
+  background-color: #6c757d !important;
+  color: white !important;
+  border: 1px solid #6c757d !important;
+  border-radius: 6px !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 32px !important;
+}
+
+button[title="ערוך"]:hover,
+.btn[title="ערוך"]:hover,
+button:has(span:contains("✏️")):hover,
+.btn:has(span:contains("✏️")):hover {
+  background-color: #5a6268 !important;
+  border-color: #5a6268 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3) !important;
+}
+
+/* כפתור ביטול עם איקון X */
+button[title="ביטול"],
+.btn[title="ביטול"],
+button:has(span:contains("❌")),
+.btn:has(span:contains("❌")) {
+  background-color: #6c757d !important;
+  color: white !important;
+  border: 1px solid #6c757d !important;
+  border-radius: 6px !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 32px !important;
+}
+
+button[title="ביטול"]:hover,
+.btn[title="ביטול"]:hover,
+button:has(span:contains("❌")):hover,
+.btn:has(span:contains("❌")):hover {
+  background-color: #5a6268 !important;
+  border-color: #5a6268 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3) !important;
+}
+
+/* כפתור מחיקה עם איקון פח */
+button[title="מחק"],
+.btn[title="מחק"],
+button:has(span:contains("🗑️")),
+.btn:has(span:contains("🗑️")) {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border: 1px solid #dc3545 !important;
+  border-radius: 6px !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 32px !important;
+}
+
+button[title="מחק"]:hover,
+.btn[title="מחק"]:hover,
+button:has(span:contains("🗑️")):hover,
+.btn:has(span:contains("🗑️")):hover {
+  background-color: #c82333 !important;
+  border-color: #c82333 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* סגנונות לאיקונים עצמם */
+button[title="ערוך"] span,
+.btn[title="ערוך"] span,
+button[title="ביטול"] span,
+.btn[title="ביטול"] span,
+button[title="מחק"] span,
+.btn[title="מחק"] span {
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  display: inline-block !important;
+}
+
+/* כפתורים קטנים עם איקונים */
+.btn-sm[title="ערוך"],
+.btn-sm[title="ביטול"],
+.btn-sm[title="מחק"] {
+  min-width: 28px !important;
+  height: 28px !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+.btn-sm[title="ערוך"] span,
+.btn-sm[title="ביטול"] span,
+.btn-sm[title="מחק"] span {
+  font-size: 0.875rem !important;
+}
+
+/* כפתור שמירה עם איקון דיסקט */
+button[title="שמור"],
+.btn[title="שמור"],
+button:has(span:contains("💾")),
+.btn:has(span:contains("💾")) {
+  background-color: #28a745 !important;
+  color: white !important;
+  border: 1px solid #28a745 !important;
+  border-radius: 6px !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 32px !important;
+}
+
+button[title="שמור"]:hover,
+.btn[title="שמור"]:hover,
+button:has(span:contains("💾")):hover,
+.btn:has(span:contains("💾")):hover {
+  background-color: #218838 !important;
+  border-color: #218838 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
+}
+
+/* סגנונות לאיקון השמירה */
+button[title="שמור"] span,
+.btn[title="שמור"] span {
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  display: inline-block !important;
+}
+
+/* כפתור שמירה קטן */
+.btn-sm[title="שמור"] {
+  min-width: 28px !important;
+  height: 28px !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+.btn-sm[title="שמור"] span {
+  font-size: 0.875rem !important;
+}
+
+/* צבעים לאובייקטים מקושרים - משתמש בהגדרות מ-table.css */
+
+/* ===== סגנונות למודול הוספת חשבון ===== */
+/* הגדרות ספציפיות למודל החשבון - עיצוב גלובלי מוחל אוטומטית */
+
+/* ========================================
+ * הגדרות גלובליות לכל המודלים
+ * ========================================
+ * 
+ * הגדרות אלו מבטיחות שכל המודלים יופיעו מעל כל התוכן
+ * וזמינים לעריכה ללא בעיות z-index
+ * 
+ * תכונות:
+ * - z-index גבוה (99999) לכל המודלים
+ * - כפיית הצגה עם display: block
+ * - הגדרות z-index לכל הרכיבים (dialog, content)
+ * - תמיכה בכל סוגי המודלים באתר
+ * - הגדרות חזקות יותר עם !important לכל הרכיבים
+ */
+
+/* הגדרות בסיסיות למודלים */
+.modal {
+  z-index: 99999 !important;
+  position: fixed !important;
+}
+
+.modal.show {
+  display: block !important;
+  z-index: 99999 !important;
+}
+
+.modal.show .modal-dialog {
+  display: block !important;
+  z-index: 100000 !important;
+}
+
+.modal-dialog {
+  z-index: 100000 !important;
+  position: relative !important;
+}
+
+.modal-content {
+  z-index: 100001 !important;
+  position: relative !important;
+}
+
+/* הגדרות נוספות לוודא שהמודלים עובדים */
+.modal-backdrop {
+  z-index: 99998 !important;
+}
+
+.modal-header,
+.modal-body,
+.modal-footer {
+  z-index: 100002 !important;
+  position: relative !important;
+}
+
+/* הגדרות ספציפיות למודלים שונים */
+#addTradePlanModal,
+#editTradePlanModal,
+#addAlertModal,
+#editAlertModal,
+#addNoteModal,
+#editNoteModal,
+#addTickerModal,
+#editTickerModal,
+#addTradeModal,
+#editTradeModal,
+#addAccountModal,
+#editAccountModal {
+  z-index: 99999 !important;
+}
+
+#addTradePlanModal .modal-dialog,
+#editTradePlanModal .modal-dialog,
+#addAlertModal .modal-dialog,
+#editAlertModal .modal-dialog,
+#addNoteModal .modal-dialog,
+#editNoteModal .modal-dialog,
+#addTickerModal .modal-dialog,
+#editTickerModal .modal-dialog,
+#addTradeModal .modal-dialog,
+#editTradeModal .modal-dialog,
+#addAccountModal .modal-dialog,
+#editAccountModal .modal-dialog {
+  z-index: 100000 !important;
+}
+
+#addTradePlanModal .modal-content,
+#editTradePlanModal .modal-content,
+#addAlertModal .modal-content,
+#editAlertModal .modal-content,
+#addNoteModal .modal-content,
+#editNoteModal .modal-content,
+#addTickerModal .modal-content,
+#editTickerModal .modal-content,
+#addTradeModal .modal-content,
+#editTradeModal .modal-content,
+#addAccountModal .modal-content,
+#editAccountModal .modal-content {
+  z-index: 100001 !important;
+}
+
+/* הגדרות ישנות הוסרו - עובר לעיצוב גלובלי אחיד */
+
+/* מודל אזהרה על רשומות מקושרות */
+#linkedItemsWarningModal .modal-header {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border-bottom: 2px solid #c82333 !important;
+}
+
+#linkedItemsWarningModal .modal-title {
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+}
+
+#linkedItemsWarningModal .btn-close-white {
+  background-color: white !important;
+  background-image: none !important;
+  color: #dc3545 !important;
+  border: 2px solid white !important;
+  border-radius: 50% !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+}
+
+#linkedItemsWarningModal .btn-close-white:hover {
+  background-color: #f8f9fa !important;
+  color: #c82333 !important;
+  border-color: #f8f9fa !important;
+  transform: scale(1.05) !important;
+}
+
+#linkedItemsWarningModal .linked-items-list {
+  margin-top: 1rem !important;
+}
+
+#linkedItemsWarningModal .linked-item {
+  transition: all 0.2s ease !important;
+  border-left: 4px solid #ffc107 !important;
+  background-color: #f8f9fa !important;
+  padding: 0.75rem !important;
+  border-radius: 6px !important;
+  margin-bottom: 0.5rem !important;
+  cursor: pointer !important;
+}
+
+#linkedItemsWarningModal .linked-item:hover {
+  background-color: #e9ecef !important;
+  border-left-color: #ffb300 !important;
+  transform: translateX(2px) !important;
+}
+
+#linkedItemsWarningModal .alert {
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+#linkedItemsWarningModal .alert-danger {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+  border-left: 4px solid #dc3545 !important;
+}
+
+#linkedItemsWarningModal .alert-warning {
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+  border-left: 4px solid #ffc107 !important;
+}
+
+#linkedItemsWarningModal .alert-info {
+  background-color: #d1ecf1 !important;
+  color: #0c5460 !important;
+  border-left: 4px solid #17a2b8 !important;
+}
+
+/* כפתור ביטול במודל אזהרה */
+#linkedItemsWarningModal .btn-secondary {
+  background-color: white !important;
+  color: #6c757d !important;
+  border: 2px solid #6c757d !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  min-width: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#linkedItemsWarningModal .btn-secondary:hover {
+  background-color: #6c757d !important;
+  color: white !important;
+  border-color: #6c757d !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3) !important;
+}
+
+#linkedItemsWarningModal .btn-secondary span {
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+}
+
+/* כפתור ביטול במודל אישור שני */
+#secondConfirmationModal .btn-secondary {
+  background-color: white !important;
+  color: #6c757d !important;
+  border: 2px solid #6c757d !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  min-width: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#secondConfirmationModal .btn-secondary:hover {
+  background-color: #6c757d !important;
+  color: white !important;
+  border-color: #6c757d !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3) !important;
+}
+
+#secondConfirmationModal .btn-secondary span {
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+}
+
+/* הגדרות ספציפיות למודל החשבון - עיצוב גלובלי מוחל אוטומטית */
+
+/* טופס החשבון */
+#accountForm {
+  background: white !important;
+  padding: 1.5rem !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* תוויות השדות */
+#accountForm .form-label {
+  font-weight: 600 !important;
+  color: #333 !important;
+  margin-bottom: 0.5rem !important;
+  font-size: 0.95rem !important;
+}
+
+/* שדות קלט */
+#accountForm .form-control,
+#accountForm .form-select {
+  border: 2px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 1rem !important;
+  transition: all 0.2s ease !important;
+  background-color: white !important;
+}
+
+#accountForm .form-control:focus,
+#accountForm .form-select:focus {
+  border-color: #29a6a8 !important;
+  box-shadow: 0 0 0 3px rgba(41, 166, 168, 0.1) !important;
+  outline: none !important;
+}
+
+/* שדות עם שגיאה */
+#accountForm .form-control.is-invalid,
+#accountForm .form-select.is-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+}
+
+#accountForm .form-control.is-invalid:focus,
+#accountForm .form-select.is-invalid:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25) !important;
+}
+
+/* הודעות שגיאה */
+#accountForm .invalid-feedback {
+  display: block !important;
+  color: #dc3545 !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  margin-top: 0.25rem !important;
+}
+
+/* הגדרות ספציפיות למודל החשבון - עיצוב גלובלי מוחל אוטומטית */
+
+/* ===== כפתור הוספת חשבון בדף החשבונות ===== */
+
+/* טיפוגרפיה לכפתור הוספת חשבון */
+.refresh-btn[onclick*="showAddAccountModal"],
+.refresh-btn[onclick*="showAddAccountModalLocal"],
+button[onclick*="showAddAccountModal"],
+button[onclick*="showAddAccountModalLocal"] {
+  font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* כפתור הוסף חשבון - רק צבעים, שומר על גודל מקורי */
+.refresh-btn[onclick*="showAddAccountModal"],
+.refresh-btn[onclick*="showAddAccountModalLocal"],
+button[onclick*="showAddAccountModal"],
+button[onclick*="showAddAccountModalLocal"] {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+}
+
+.refresh-btn[onclick*="showAddAccountModal"]:hover,
+.refresh-btn[onclick*="showAddAccountModalLocal"]:hover,
+button[onclick*="showAddAccountModal"]:hover,
+button[onclick*="showAddAccountModalLocal"]:hover {
+  background: rgba(41, 166, 168, 0.1) !important;
+  border-color: #1f8a8c !important;
+}
+
+/* עיצוב אובייקטים מקושרים - משתמש בהגדרות מ-table.css */
+
+/* ========================================
+ * עיצוב אחיד לכל המודלים באתר
+ * ========================================
+ * 
+ * הגדרות אלו מבטיחות עיצוב אחיד לכל המודלים
+ * בהתבסס על עיצוב מודל ההתראות
+ * 
+ * תכונות:
+ * - כותרות צבעוניות עם gradient
+ * - כפתורי סגירה מעוצבים
+ * - כפתורי פעולה אחידים
+ * - גוף מודל מעוצב
+ */
+
+/* הגדרות כלליות לכל המודלים */
+.modal-header {
+  background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
+  color: white !important;
+  border-bottom: none !important;
+  padding: 1.5rem 2rem !important;
+  border-radius: 12px 12px 0 0 !important;
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.modal-title {
+  font-size: 1.4rem !important;
+  font-weight: 600 !important;
+  color: white !important;
+  margin: 0 !important;
+  order: 2 !important;
+  text-align: right !important;
+}
+
+.modal-body {
+  padding: 2rem !important;
+  background-color: #fafafa !important;
+  border-radius: 0 !important;
+}
+
+.modal-footer {
+  padding: 1.5rem 2rem !important;
+  background-color: #f8f9fa !important;
+  border-top: 1px solid #e9ecef !important;
+  border-radius: 0 0 12px 12px !important;
+}
+
+/* כפתור סגירה מעוצב לכל המודלים */
+.modal .btn-close {
+  background-color: white !important;
+  background-image: none !important;
+  color: #ff6b35 !important;
+  border: 2px solid #ff6b35 !important;
+  border-radius: 6px !important;
+  padding: 0.25rem !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+  order: 1 !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+.modal .btn-close:hover {
+  background-color: #fff8f5 !important;
+  color: #e55a2b !important;
+  border-color: #e55a2b !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
+}
+
+.modal .btn-close::before {
+  content: '✕' !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+}
+
+/* כפתורי פעולה אחידים */
+.modal-footer .btn {
+  padding: 0.75rem 1.5rem !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  margin-left: 0.5rem !important;
+}
+
+/* כפתור ביטול - טקסט ומסגרת כתומה על רקע לבן */
+.modal-footer .btn-secondary {
+  background-color: white !important;
+  border: 2px solid #ff6b35 !important;
+  color: #ff6b35 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-footer .btn-secondary:hover {
+  background-color: #fff8f5 !important;
+  border-color: #e55a2b !important;
+  color: #e55a2b !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
+}
+
+/* כפתור שמירה ראשי - טקסט ומסגרת ירוקה על רקע לבן (צבע הלוגו) */
+.modal-footer .btn-primary {
+  background-color: white !important;
+  border: 2px solid #29a6a8 !important;
+  color: #29a6a8 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: #f0fafa !important;
+  border-color: #1f8a8c !important;
+  color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתור הצלחה - טקסט ומסגרת ירוקה על רקע לבן */
+.modal-footer .btn-success {
+  background-color: white !important;
+  border: 2px solid #28a745 !important;
+  color: #28a745 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-footer .btn-success:hover {
+  background-color: #f8fff9 !important;
+  border-color: #1e7e34 !important;
+  color: #1e7e34 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2) !important;
+}
+
+/* כפתור מחיקה */
+.modal-footer .btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+  border: 2px solid #dc3545 !important;
+  color: white !important;
+}
+
+.modal-footer .btn-danger:hover {
+  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%) !important;
+  border-color: #c82333 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* עיצוב שדות הטופס */
+.modal-body .form-label {
+  font-weight: 600 !important;
+  color: #495057 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.modal-body .form-control,
+.modal-body .form-select {
+  border: 2px solid #e9ecef !important;
+  border-radius: 8px !important;
+  padding: 0.75rem !important;
+  font-size: 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-body .form-control:focus,
+.modal-body .form-select:focus {
+  border-color: #29a6a8 !important;
+  box-shadow: 0 0 0 0.2rem rgba(41, 166, 168, 0.25) !important;
+  background-color: white !important;
+}
+
+/* עיצוב שדות עם שגיאות */
+.modal-body .form-control.is-invalid,
+.modal-body .form-select.is-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+  background-color: #fff5f5 !important;
+}
+
+.modal-body .form-control.is-invalid:focus,
+.modal-body .form-select.is-invalid:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+  background-color: #fff5f5 !important;
+}
+
+/* עיצוב הודעות שגיאה */
+.modal-body .invalid-feedback {
+  display: none !important;
+  color: #dc3545 !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  margin-top: 0.25rem !important;
+  padding: 0.25rem 0.5rem !important;
+  background-color: #fff5f5 !important;
+  border: 1px solid #ffebee !important;
+  border-radius: 4px !important;
+}
+
+/* עיצוב כוכבית שדות חובה */
+.modal-body .form-label .text-danger {
+  color: #dc3545 !important;
+  font-weight: bold !important;
+  margin-right: 0.25rem !important;
+}
+
+/* עיצוב רדיו כפתורים */
+.modal-body .radio-group-item {
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 0.5rem !important;
+  padding: 0.5rem !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-body .radio-group-item:hover {
+  background-color: #f8f9fa !important;
+}
+
+.modal-body .radio-group-item input[type="radio"] {
+  margin-left: 0.5rem !important;
+  accent-color: #29a6a8 !important;
+}
+
+.modal-body .radio-group-item label {
+  margin: 0 !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+}
+
+/* עיצוב מיוחד למודלים ספציפיים */
+
+/* מודל תכנונים - כותרת כחולה */
+#addTradePlanModal .modal-header,
+#editTradePlanModal .modal-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+}
+
+/* מודל הערות - כותרת ירוקה */
+#addNoteModal .modal-header,
+#editNoteModal .modal-header {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
+}
+
+/* מודל טיקרים - כותרת סגולה */
+#addTickerModal .modal-header,
+#editTickerModal .modal-header {
+  background: linear-gradient(135deg, #6f42c1 0%, #5a2d91 100%) !important;
+}
+
+/* מודל טריידים - כותרת כתומה */
+#addTradeModal .modal-header,
+#editTradeModal .modal-header {
+  background: linear-gradient(135deg, #fd7e14 0%, #e55a2b 100%) !important;
+}
+
+/* מודל חשבונות - כותרת ירוקה כהה */
+#addAccountModal .modal-header,
+#editAccountModal .modal-header {
+  background: linear-gradient(135deg, #20c997 0%, #1a9f7a 100%) !important;
+}
+
+/* הגדרות נוספות לגמישות */
+.modal-content {
+  border-radius: 12px !important;
+  border: none !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+}
+
+.modal-dialog {
+  margin: 2rem auto !important;
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 1rem !important;
+  }
+
+  .modal-header {
+    padding: 1rem 1.5rem !important;
+  }
+
+  .modal-body {
+    padding: 1.5rem !important;
+  }
+
+  .modal-footer {
+    padding: 1rem 1.5rem !important;
+  }
+
+  .modal-title {
+    font-size: 1.2rem !important;
+  }
+}
+
+/* הגדרות ישנות למודל התראות הוסרו - עובר לעיצוב גלובלי אחיד */
+
+/* מודל אזהרה על רשומות מקושרות */
+
+/* יישור משמאל לימין לכל התוכן הנוסף בעמוד בסיס נתונים */
+.db-display-page .section-body .table-rules-container * {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* ===== סגנונות להודעות שגיאה מפורטות ===== */
+.no-data-message {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.no-data-message i {
+  display: block;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.no-data-message h5 {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.no-data-message p {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.no-data-message small {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* הודעות שגיאה ספציפיות לכל טבלה */
+.no-data-message.accounts {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.no-data-message.trades {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border-radius: 8px;
+  border: 1px solid #ffc107;
+}
+
+.no-data-message.alerts {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border-radius: 8px;
+  border: 1px solid #dc3545;
+}
+
+.no-data-message.tickers {
+  background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+  border-radius: 8px;
+  border: 1px solid #17a2b8;
+}
+
+.no-data-message.notes {
+  background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+  border-radius: 8px;
+  border: 1px solid #6c757d;
+}
+
+.no-data-message.cash-flows {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-radius: 8px;
+  border: 1px solid #28a745;
+}
+
+.no-data-message.executions {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);
+  border-radius: 8px;
+  border: 1px solid #ff9800;
+}
+
+.no-data-message.trade-plans {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-radius: 8px;
+  border: 1px solid #9c27b0;
+}
+
+.no-data-message.constraints {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+  border-radius: 8px;
+  border: 1px solid #4caf50;
+}

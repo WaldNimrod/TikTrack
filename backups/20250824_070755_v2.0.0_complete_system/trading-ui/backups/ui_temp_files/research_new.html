@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research - Tik.track</title>
+
+    <!-- 
+    ===== Research Page - TikTrack =====
+    
+    This page contains:
+    1. Accounts table - First section
+    2. Trades table - Second section
+    3. Alert cards - In the upper part
+    4. Advanced filtering and sorting system
+    
+    Page structure:
+    - app-header: Application header with navigation
+    - page-body: Main content limited in width (1400px)
+      - top-section: Alert cards and data summary
+      - content-section (1): Accounts table
+      - content-section (2): Trades table
+    
+    Recent changes:
+    - Creating new research page as copy of designs page
+    - Dummy content without database connection
+    - Adding complete accounts table
+    - Improving alert cards design
+    - Fixing independent close buttons
+    - Centralizing account functions in accounts.js
+    - Changing order: accounts before trades
+  -->
+
+    <!-- Apple Theme CSS - General base -->
+    <link rel="stylesheet" href="styles/apple-theme.css">
+
+    <!-- Main Styles - Project styles -->
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- Menu CSS - Menu -->
+    <!-- <link rel="stylesheet" href="styles/menu.css"> - REMOVED: migrated to header-system.css -->
+
+    <!-- Grid Table CSS - Tables and grids -->
+    <link rel="stylesheet" href="styles/grid-table.css">
+
+    <!-- Typography CSS - Typography and fonts -->
+    <link rel="stylesheet" href="styles/typography.css">
+
+    <!-- Bootstrap CSS - Loaded last to avoid overriding custom settings -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Modular grid files - loaded at end of file -->
+</head>
+
+<body>
+    <!-- General background -->
+    <div class="background-wrapper">
+
+        <!-- Application header -->
+        <app-header></app-header>
+
+        <!-- Page body - All content after header -->
+        <div class="page-body">
+            <!-- Research area - top-Section -->
+            <div class="top-section">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        🔍 תחקיר
+                    </div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר את כל הסקשנים">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Data summary -->
+                    <div class="info-summary" id="summaryStats">
+                        <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
+                        <div>טריידים פתוחים: <strong id="openTrades">0</strong></div>
+                        <div>טריידים סגורים: <strong id="closedTrades">0</strong></div>
+                        <div>רווח/הפסד כולל: <strong id="totalPL">$0</strong></div>
+                    </div>
+                </div>
+            </div> <!-- End top-section -->
+
+            <!-- Main content -->
+            <div class="main-content">
+
+                <!-- First element - Accounts table -->
+                <div class="content-section">
+                    <!-- Accounts header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            💰 חשבונות
+                        </div>
+                        <div class="table-count">3 חשבונות</div>
+                        <div class="table-actions">
+                            <button class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש">
+                                <span class="action-icon">➕</span> הוסף
+                            </button>
+                            <div class="action-separator"></div>
+                            <button class="filter-toggle-btn" onclick="toggleAccountsSection()"
+                                title="הצג/הסתר אזור חשבונות">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Accounts table -->
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>מזהה<br><span class="header-subtitle">ID</span></th>
+                                        <th>שם<br><span class="header-subtitle">Name</span></th>
+                                        <th>מטבע<br><span class="header-subtitle">Currency</span></th>
+                                        <th>סטטוס<br><span class="header-subtitle">Status</span></th>
+                                        <th>יתרה<br><span class="header-subtitle">Cash Balance</span></th>
+                                        <th>שווי כולל<br><span class="header-subtitle">Total Value</span></th>
+                                        <th>רווח/הפסד<br><span class="header-subtitle">Total P&L</span></th>
+                                        <th>הערות<br><span class="header-subtitle">Notes</span></th>
+                                        <th>פעולות<br><span class="header-subtitle">Actions</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>חשבון ראשי</td>
+                                        <td>USD</td>
+                                        <td><span class="status-badge status-active">פעיל</span></td>
+                                        <td>$25,000</td>
+                                        <td>$45,250</td>
+                                        <td class="profit-positive">+$2,500 (5.8%)</td>
+                                        <td>חשבון המסחר הראשי</td>
+                                        <td class="actions-cell">
+                                            <button class="btn btn-sm btn-secondary" title="ערוך">
+                                                <span class="btn-icon">✏️</span>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="מחק">X</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>חשבון משני</td>
+                                        <td>USD</td>
+                                        <td><span class="status-badge status-active">פעיל</span></td>
+                                        <td>$15,000</td>
+                                        <td>$18,750</td>
+                                        <td class="profit-positive">+$750 (4.2%)</td>
+                                        <td>חשבון למסחר משני</td>
+                                        <td class="actions-cell">
+                                            <button class="btn btn-sm btn-secondary" title="ערוך">
+                                                <span class="btn-icon">✏️</span>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="מחק">X</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>חשבון בדיקה</td>
+                                        <td>USD</td>
+                                        <td><span class="status-badge status-inactive">לא פעיל</span></td>
+                                        <td>$5,000</td>
+                                        <td>$5,000</td>
+                                        <td>$0 (0.0%)</td>
+                                        <td>חשבון לבדיקות</td>
+                                        <td class="actions-cell">
+                                            <button class="btn btn-sm btn-secondary" title="ערוך">
+                                                <span class="btn-icon">✏️</span>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="מחק">X</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second element - Trades table -->
+                <div class="content-section">
+                    <!-- Trades header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            📈 הטריידים שלי<br><span
+                                style="font-weight: normal; font-size: 0.8em; color: #666;">Trades</span>
+                        </div>
+                        <div class="table-count" id="tradesCount">טוען...</div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div class="search-input-wrapper">
+                                <input type="text" class="search-filter-input" placeholder="חיפוש טריידים..."
+                                    onkeyup="filterTradesData([], [], [], null, this.value)">
+                            </div>
+                            <button class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
+                                <span class="action-icon">➕</span> הוסף
+                            </button>
+                            <button class="refresh-btn" onclick="loadTrades()" title="רענן טבלה">
+                                <span class="action-icon">🔄</span> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleResearchSection()"
+                                title="הצג/הסתר אזור הטריידים שלי">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Trades table -->
+                    <div class="section-body">
+                        <div class="table-responsive" id="tradesContainer">
+                            <table class="table" id="tradesTable" data-table-type="trades">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>חשבון
+                                                <br><span class="header-subtitle">Account</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(1)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>טיקר
+                                                <br><span class="header-subtitle">Ticker</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>תוכנית
+                                                <br><span class="header-subtitle">Trade Plan ID</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(3)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סטטוס
+                                                <br><span class="header-subtitle">Status</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(4)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>סוג
+                                                <br><span class="header-subtitle">Type</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>צד
+                                                <br><span class="header-subtitle">Side</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(6)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>נוצר ב
+                                                <br><span class="header-subtitle">Created At</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(7)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>נסגר ב
+                                                <br><span class="header-subtitle">Closed At</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(8)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>רווח/הפסד
+                                                <br><span class="header-subtitle">Total P/L</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="btn btn-link sortable-header" onclick="sortTable(9)"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                <span class="sort-icon">↕</span>הערות
+                                                <br><span class="header-subtitle">Notes</span>
+                                            </button>
+                                        </th>
+                                        <th class="actions-header">
+                                            פעולות
+                                            <br><span class="header-subtitle">Actions</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="11" class="loading">טוען טריידים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End page-body -->
+
+        <!-- Bottom page spacing -->
+        <div class="bottom-spacer"></div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Modular files -->
+        <script src="scripts/app-header.js"></script>
+        <script src="scripts/account-modal.js"></script>
+        <script src="scripts/console-cleanup.js"></script>
+        <script src="scripts/trades.js"></script>
+        <script src="scripts/research.js"></script>
+
+        <!-- Page initialization -->
+        <script>
+            // Page initialization
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log('🔄 Initializing research page...');
+                if (typeof initializeResearchPage === 'function') {
+                    initializeResearchPage();
+                }
+            });
+        </script>
+</body>
+
+</html>

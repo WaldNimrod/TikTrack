@@ -470,14 +470,14 @@ function updateTradePlansTable(trade_plans) {
         <td><span class="current-text">${currentDisplay}</span></td>
         <td class="status-cell" data-status="${statusForFilter}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
         <td class="actions-cell">
+          <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${design.id})" title="צפה באלמנטים מקושרים">
+            🔗
+          </button>
           <button class="btn btn-sm btn-secondary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">
             ✏️
           </button>
           <button class="btn btn-sm btn-danger" onclick="window.openDeleteTradePlanModal(${design.id})" title="מחק">
             🗑️
-          </button>
-          <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${design.id})" title="צפה באלמנטים מקושרים">
-            🔗
           </button>
         </td>
       </tr>
@@ -1686,13 +1686,49 @@ window.loadSortState = function (pageName) {
     }
 };
 
+// ===== פונקציות לכפתורים החדשים =====
+
+/**
+ * הוספת הערה חשובה
+ */
+function addImportantNote() {
+  console.log('🔄 הודעת הערות עשירות');
+  
+  // הצגת הודעה למשתמש
+  if (typeof showNotification === 'function') {
+    showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית', 'info');
+  } else {
+    alert('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית');
+  }
+}
+
+/**
+ * הוספת תזכורת
+ */
+function addReminder() {
+  console.log('🔄 הודעת התראות');
+  
+  // הצגת הודעה למשתמש
+  if (typeof showNotification === 'function') {
+    showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'warning');
+  } else {
+    alert('המודול יאפשר בקרוב לייצר התראות לתוכנית');
+  }
+}
+
+// ייצוא הפונקציות החדשות
+window.addImportantNote = addImportantNote;
+window.addReminder = addReminder;
+
 // Checking if functions are available
 console.log('🔄 Trade_plans.js loaded. Available functions:', {
     loadTradePlansData: typeof window.loadTradePlansData,
     updateTradePlansTable: typeof window.updateTradePlansTable,
     filterDataByFilters: typeof window.filterDataByFilters,
     updateGridFromComponentGlobal: typeof window.updateGridFromComponentGlobal,
-    updateGridFromComponent: typeof window.updateGridFromComponent
+    updateGridFromComponent: typeof window.updateGridFromComponent,
+    addImportantNote: typeof window.addImportantNote,
+    addReminder: typeof window.addReminder
 });
 
 // Verifying that our function is defined

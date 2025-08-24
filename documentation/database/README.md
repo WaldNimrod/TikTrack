@@ -58,17 +58,32 @@ CREATE TABLE accounts (
 ```sql
 CREATE TABLE alerts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ticker TEXT NOT NULL,
-    price DECIMAL(10,2),
+    type TEXT NOT NULL DEFAULT 'price',
+    status TEXT DEFAULT 'open',
     condition TEXT NOT NULL,
-    status TEXT DEFAULT 'active',
-    related_type_id TEXT,
-    related_id INTEGER,
-    is_triggered BOOLEAN DEFAULT 0,
+    message TEXT,
+    triggered_at TIMESTAMP,
+    is_triggered TEXT DEFAULT 'false',
+    related_type_id INTEGER NOT NULL DEFAULT 4,
+    related_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (related_type_id) REFERENCES note_relation_types(id)
 );
 ```
+
+**Condition Field Format:**
+The `condition` field follows a specific format: `[string1] | [string2] | [Number]`
+
+- **string1** (Data Type): `price`, `change`, `ma`, `volume`
+- **string2** (Operator): `lessThen`, `moreThen`, `cross`, `crossUp`, `crossDown`, `upBy`, `downBy`, `changeBy`, `upByPre`, `downByPre`, `changeByPre`
+- **Number**: Numeric value for comparison
+
+**Examples:**
+- `price | moreThen | 150` - Price greater than 150
+- `change | upByPre | 5` - Change increases by 5%
+- `ma | crossUp | 200` - Moving average crosses up 200
+- `volume | moreThen | 1000000` - Volume greater than 1M
 
 ### 4. Trade Plans Table
 ```sql

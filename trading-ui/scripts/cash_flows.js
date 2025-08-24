@@ -846,32 +846,7 @@ function formatAmount(amount) {
     }).format(amount);
 }
 
-/**
- * פורמט תאריך
- */
-function formatDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('he-IL');
-}
 
-/**
- * פורמט תאריך ושעה
- */
-function formatDateTime(dateTimeString) {
-    if (!dateTimeString) return '-';
-    const date = new Date(dateTimeString);
-    return date.toLocaleString('he-IL');
-}
-
-/**
- * פורמט תאריך בלבד (ללא שעה)
- */
-function formatDateOnly(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('he-IL');
-}
 
 /**
  * קבלת סוג תזרים עם צבע

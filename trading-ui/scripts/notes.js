@@ -385,13 +385,13 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td>${attachment}</td>
         <td data-date="${note.created_at}">${date}</td>
         <td class="actions-cell">
+          <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${note.id})" title="צפה באלמנטים מקושרים">
+            🔗
+          </button>
           <button class="btn btn-sm btn-secondary" onclick="editNote('${note.id}')" title="ערוך">
             <span class="btn-icon">✏️</span>
           </button>
           <button class="btn btn-sm btn-danger" onclick="deleteNote('${note.id}')" title="מחק">🗑️</button>
-          <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${note.id})" title="צפה באלמנטים מקושרים">
-            🔗
-          </button>
         </td>
       </tr>
     `;

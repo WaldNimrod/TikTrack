@@ -681,57 +681,7 @@ async function getCurrentPreference(key) {
  * // הצגת הודעת שגיאה
  * showNotification('שגיאה בשמירת הגדרות', 'error');
 */
-function showNotification(message, type = 'success') {
-  try {
-    // יצירת אלמנט ההודעה
-    const notification = document.createElement('div');
 
-    // הגדרת צבעים לפי סוג ההודעה
-    const bgColor = type === 'error' ? '#f8d7da' : '#d4edda';
-    const textColor = type === 'error' ? '#721c24' : '#155724';
-    const borderColor = type === 'error' ? '#f5c6cb' : '#c3e6cb';
-
-    // הגדרת סגנונות ההודעה
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      padding: 12px 20px;
-      border-radius: 8px;
-      background-color: ${bgColor};
-      color: ${textColor};
-      border: 1px solid ${borderColor};
-      font-size: 14px;
-      font-weight: 500;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: opacity 0.3s ease;
-      opacity: 0;
-    `;
-
-    // הוספת הטקסט להודעה
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    // הצגת ההודעה עם אנימציה
-    setTimeout(() => {
-      notification.style.opacity = '1';
-    }, 100);
-
-    // הסתרת ההודעה אחרי 3 שניות
-    setTimeout(() => {
-      notification.style.opacity = '0';
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      }, 300);
-    }, 3000);
-
-  } catch (error) {
-    console.error('❌ שגיאה בהצגת הודעה:', error);
-  }
-}
 
 async function resetSystemPreferences() {
   console.log('🔄 איפוס הגדרות מערכת לברירות מחדל');

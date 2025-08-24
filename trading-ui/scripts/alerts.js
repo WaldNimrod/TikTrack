@@ -582,10 +582,13 @@ function updateAlertsTable(alerts) {
           <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
           <td class="type-cell" data-type="${alert.type || ''}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
-          <td><span class="condition-text">${alert.condition || '-'}</span></td>
+          <td><span class="condition-text">${formatAlertCondition(alert.condition) || '-'}</span></td>
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
+            <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${alert.id})" title="צפה באלמנטים מקושרים">
+              🔗
+            </button>
             <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">
               ✏️
             </button>
@@ -600,9 +603,6 @@ function updateAlertsTable(alerts) {
             `}
             <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">
               🗑️
-            </button>
-            <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${alert.id})" title="צפה באלמנטים מקושרים">
-              🔗
             </button>
           </td>
         </tr>
@@ -964,29 +964,20 @@ function checkAlertVariable(selectElement) {
   console.log('🔍 Element:', selectElement);
   console.log('🔍 Selected value:', selectElement.value);
 
-  const supportedVariables = ['price'];
+  const supportedVariables = ['price', 'change', 'ma', 'volume'];
   const selectedValue = selectElement.value;
 
   if (!supportedVariables.includes(selectedValue)) {
     console.log('❌ Variable not supported:', selectedValue);
-    let message = '';
-    if (selectedValue === 'daily_change') {
-      message = 'שינוי יומי עדיין בפיתוח. כרגע נתמך רק "מחיר".';
-    } else if (selectedValue === 'moving_average') {
-      message = 'ממוצע נע עדיין בפיתוח. כרגע נתמך רק "מחיר".';
-    } else if (selectedValue === 'volume') {
-      message = 'נפח מסחר עדיין בפיתוח. כרגע נתמך רק "מחיר".';
-    } else {
-      message = 'משתנה זה עדיין בפיתוח. כרגע נתמך רק "מחיר".';
-    }
+    let message = 'משתנה זה לא נתמך. המשתנים הנתמכים: מחיר, שינוי, ממוצע נע, נפח מסחר.';
     console.log('🔍 Showing warning notification:', message);
 
     // בדיקה אם אנחנו בתוך מודול
     const modal = selectElement.closest('.modal');
     if (modal && modal.id) {
-      showModalWarningNotification(modal.id, 'פיצ\'ר בפיתוח', message);
+      showModalWarningNotification(modal.id, 'משתנה לא נתמך', message);
     } else {
-      showWarningNotification('פיצ\'ר בפיתוח', message);
+      showWarningNotification('משתנה לא נתמך', message);
     }
 
     // החזרת הבחירה למחיר
@@ -1013,33 +1004,19 @@ function checkAlertOperator(selectElement) {
   console.log('🔍 Element:', selectElement);
   console.log('🔍 Selected value:', selectElement.value);
 
-  const supportedOperators = ['greater_than', 'less_than'];
+  const supportedOperators = [
+    'lessThen', 'moreThen', 'cross', 'crossUp', 'crossDown',
+    'upBy', 'downBy', 'changeBy', 'upByPre', 'downByPre', 'changeByPre'
+  ];
   const selectedValue = selectElement.value;
 
   if (!supportedOperators.includes(selectedValue)) {
     console.log('❌ Operator not supported:', selectedValue);
-    let message = '';
-    if (selectedValue === 'crosses') {
-      message = 'אופרטור "חוצה" עדיין בפיתוח. כרגע נתמכים רק "גדול מ" ו"קטן מ".';
-    } else if (selectedValue === 'crosses_up') {
-      message = 'אופרטור "חוצה למעלה" עדיין בפיתוח. כרגע נתמכים רק "גדול מ" ו"קטן מ".';
-    } else if (selectedValue === 'crosses_down') {
-      message = 'אופרטור "חוצה למטה" עדיין בפיתוח. כרגע נתמכים רק "גדול מ" ו"קטן מ".';
-    } else if (selectedValue === 'increases_by') {
-      message = 'אופרטור "עולה ב" עדיין בפיתוח. כרגע נתמכים רק "גדול מ" ו"קטן מ".';
-    } else if (selectedValue === 'decreases_by') {
-      message = 'אופרטור "יורד ב" עדיין בפיתוח. כרגע נתמכים רק "גדול מ" ו"קטן מ".';
-    } else if (selectedValue === 'increases_by_percent') {
-      message = 'אופרטור "עולה ב%" עדיין בפיתוח. כרגע נתמכים רק "גדול מ" ו"קטן מ".';
-    } else if (selectedValue === 'decreases_by_percent') {
-      message = 'אופרטור "יורד ב%" עדיין בפיתוח. כרגע נתמכים רק "גדול מ" ו"קטן מ".';
-    } else {
-      message = 'אופרטור זה עדיין בפיתוח. כרגע נתמכים רק "גדול מ" ו"קטן מ".';
-    }
+    let message = 'אופרטור זה לא נתמך. האופרטורים הנתמכים: קטן מ, גדול מ, חוצה, חוצה למעלה, חוצה למטה, עולה ב, יורד ב, משתנה ב, עולה ב%, יורד ב%, משתנה ב%.';
     console.log('🔍 Showing warning notification:', message);
-    showWarningNotification('פיצ\'ר בפיתוח', message);
+    showWarningNotification('אופרטור לא נתמך', message);
     // החזרת הבחירה לגדול מ
-    selectElement.value = 'greater_than';
+    selectElement.value = 'moreThen';
     console.log('🔍 Reset value to:', selectElement.value);
     return false;
   }
@@ -1060,7 +1037,7 @@ function checkAlertOperator(selectElement) {
  * @returns {string} מחרוזת התנאי
  */
 function buildAlertCondition(variable, operator, value) {
-  return `${variable}|${operator}|${value}`;
+  return `${variable} | ${operator} | ${value}`;
 }
 
 /**
@@ -1072,14 +1049,14 @@ function buildAlertCondition(variable, operator, value) {
  * @returns {object} אובייקט עם variable, operator, value
  */
 function parseAlertCondition(condition) {
-  if (!condition || !condition.includes('|')) {
-    return { variable: 'price', operator: 'greater_than', value: '' };
+  if (!condition || !condition.includes(' | ')) {
+    return { variable: 'price', operator: 'moreThen', value: '' };
   }
 
-  const parts = condition.split('|');
+  const parts = condition.split(' | ');
   return {
     variable: parts[0] || 'price',
-    operator: parts[1] || 'greater_than',
+    operator: parts[1] || 'moreThen',
     value: parts[2] || ''
   };
 }
@@ -1896,6 +1873,15 @@ window.checkAlertVariable = checkAlertVariable;
 window.checkAlertOperator = checkAlertOperator;
 window.buildAlertCondition = buildAlertCondition;
 window.parseAlertCondition = parseAlertCondition;
+
+// פונקציה לטעינת התראות (alias ל-loadAlertsData)
+function loadAlerts() {
+  console.log('🔄 loadAlerts called - redirecting to loadAlertsData');
+  return loadAlertsData();
+}
+
+// חשיפת פונקציית loadAlerts
+window.loadAlerts = loadAlerts;
 // updateGridFromComponentGlobal הועבר ל-header-system.js
 
 // פונקציות התראה מיובאות מ-main.js - אין צורך בייצוא כפול
@@ -1920,7 +1906,7 @@ setTimeout(() => {
 window.formatAlertCondition = function (condition) {
   if (!condition) return '-';
 
-  const parts = condition.split('|');
+  const parts = condition.split(' | ');
   if (parts.length >= 3) {
     const variable = parts[0] || '';
     const operator = parts[1] || '';
@@ -1929,29 +1915,36 @@ window.formatAlertCondition = function (condition) {
     // המרת משתנה לעברית
     const variableLabels = {
       'price': 'מחיר',
-      'daily_change': 'שינוי יומי',
-      'moving_average': 'ממוצע נע',
+      'change': 'שינוי',
+      'ma': 'ממוצע נע',
       'volume': 'נפח מסחר'
     };
 
-    // המרת אופרטור לעברית
+    // המרת אופרטור לעברית עם סימנים חשבונאיים
     const operatorLabels = {
-      'greater_than': '>',
-      'less_than': '<',
-      'crosses': 'חוצה',
-      'crosses_up': 'חוצה למעלה',
-      'crosses_down': 'חוצה למטה',
-      'increases_by': 'עולה ב',
-      'decreases_by': 'יורד ב',
-      'increases_by_percent': 'עולה ב%',
-      'decreases_by_percent': 'יורד ב%'
+      'lessThen': '<',
+      'moreThen': '>',
+      'cross': '=',
+      'crossUp': '↗',
+      'crossDown': '↘',
+      'upBy': '+',
+      'downBy': '-',
+      'changeBy': '±',
+      'upByPre': '+%',
+      'downByPre': '-%',
+      'changeByPre': '±%'
     };
 
     const variableDisplay = variableLabels[variable] || variable;
     const operatorDisplay = operatorLabels[operator] || operator;
 
     if (operator && value) {
-      return `${variableDisplay} ${operatorDisplay} ${value}`;
+      // פורמט מיוחד לאופרטורים חשבונאיים
+      if (['upBy', 'downBy', 'changeBy', 'upByPre', 'downByPre', 'changeByPre'].includes(operator)) {
+        return `${variableDisplay} ${operatorDisplay}${value}`;
+      } else {
+        return `${variableDisplay} ${operatorDisplay} ${value}`;
+      }
     } else if (variable) {
       return variable;
     } else {
@@ -1970,7 +1963,7 @@ window.formatAlertCondition = function (condition) {
 window.parseAlertCondition = function (condition) {
   if (!condition) return { variable: '', operator: '', value: '' };
 
-  const parts = condition.split('|');
+  const parts = condition.split(' | ');
   if (parts.length >= 3) {
     return {
       variable: parts[0] || '',

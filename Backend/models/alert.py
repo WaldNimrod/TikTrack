@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import BaseModel
 from typing import Dict, Any, Optional
+import re
 
 class Alert(BaseModel):
     __tablename__ = "alerts"
@@ -14,6 +15,49 @@ class Alert(BaseModel):
     is_triggered = Column(String(20), default='false', nullable=True)  # false, new, true
     related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False, default=4)  # Default ticker per constraints
     related_id = Column(Integer, nullable=False)
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if 'condition' in kwargs:
+            self.validate_condition(kwargs['condition'])
+    
+    def validate_condition(self, condition: str) -> bool:
+        """
+        Validate condition format: [string1]&" | "&[string2]&" |"&[Number]
+        
+        string1: price, change, ma, volume
+        string2: lessThen, moreThen, cross, crossUp, crossDown, upBy, downBy, changeBy, upByPre, downByPre, changeByPre
+        """
+        if not condition:
+            raise ValueError("Condition cannot be empty")
+        
+        # Split by " | " to get the three parts
+        parts = condition.split(" | ")
+        if len(parts) != 3:
+            raise ValueError("Condition must have exactly 3 parts separated by ' | '")
+        
+        string1, string2, number_str = parts
+        
+        # Validate string1
+        valid_string1 = ['price', 'change', 'ma', 'volume']
+        if string1 not in valid_string1:
+            raise ValueError(f"string1 must be one of: {valid_string1}")
+        
+        # Validate string2
+        valid_string2 = [
+            'lessThen', 'moreThen', 'cross', 'crossUp', 'crossDown',
+            'upBy', 'downBy', 'changeBy', 'upByPre', 'downByPre', 'changeByPre'
+        ]
+        if string2 not in valid_string2:
+            raise ValueError(f"string2 must be one of: {valid_string2}")
+        
+        # Validate number
+        try:
+            float(number_str)
+        except ValueError:
+            raise ValueError("Third part must be a valid number")
+        
+        return True
     
     def __repr__(self) -> str:
         return f"<Alert(id={self.id}, type='{self.type}', active={self.is_active})>"

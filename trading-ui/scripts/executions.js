@@ -138,7 +138,9 @@ function showEditExecutionModal(id) {
     // מציאת העסקה לפי ID
     const execution = executionsData.find(e => e.id == id);
     if (!execution) {
-        showNotification('❌ עסקה לא נמצאה', 'error');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('❌ עסקה לא נמצאה', 'error');
+        }
         return;
     }
 
@@ -168,7 +170,9 @@ function showDeleteExecutionModal(id) {
     // מציאת העסקה לפי ID
     const execution = executionsData.find(e => e.id == id);
     if (!execution) {
-        showNotification('❌ עסקה לא נמצאה', 'error');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('❌ עסקה לא נמצאה', 'error');
+        }
         return;
     }
 
@@ -510,7 +514,9 @@ async function saveExecution() {
 
     // בדיקת ולידציה מקיפה
     if (!validateCompleteExecutionForm('add')) {
-        showNotification('❌ יש לתקן את השגיאות בטופס', 'error');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('❌ יש לתקן את השגיאות בטופס', 'error');
+        }
         return;
     }
 
@@ -544,7 +550,9 @@ async function saveExecution() {
             modal.hide();
 
             // הצגת הודעת הצלחה
-            showNotification('✅ עסקה נשמרה בהצלחה', 'success');
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('✅ עסקה נשמרה בהצלחה', 'success');
+            }
 
             // רענון הנתונים
             await loadExecutionsData();
@@ -552,12 +560,16 @@ async function saveExecution() {
         } else {
             const error = await response.text();
             console.error('❌ שגיאה בשמירת עסקה:', error);
-            showNotification('❌ שגיאה בשמירת עסקה: ' + error, 'error');
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('❌ שגיאה בשמירת עסקה: ' + error, 'error');
+            }
         }
 
     } catch (error) {
         console.error('❌ שגיאה בשמירת עסקה:', error);
-        showNotification('❌ שגיאה בשמירת עסקה', 'error');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('❌ שגיאה בשמירת עסקה', 'error');
+        }
     }
 }
 
@@ -578,7 +590,9 @@ async function updateExecution() {
 
     // בדיקת ולידציה
     if (!validateCompleteExecutionForm('edit')) {
-        showNotification('❌ יש לתקן את השגיאות בטופס', 'error');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('❌ יש לתקן את השגיאות בטופס', 'error');
+        }
         return;
     }
 
@@ -612,7 +626,9 @@ async function updateExecution() {
             modal.hide();
 
             // הצגת הודעת הצלחה
-            showNotification('✅ עסקה עודכנה בהצלחה', 'success');
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('✅ עסקה עודכנה בהצלחה', 'success');
+            }
 
             // רענון הנתונים
             await loadExecutionsData();
@@ -620,73 +636,83 @@ async function updateExecution() {
         } else {
             const error = await response.text();
             console.error('❌ שגיאה בעדכון עסקה:', error);
-            showNotification('❌ שגיאה בעדכון עסקה: ' + error, 'error');
-        }
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('❌ שגיאה בעדכון עסקה: ' + error, 'error');
+            }
 
-    } catch (error) {
-        console.error('❌ שגיאה בעדכון עסקה:', error);
-        showNotification('❌ שגיאה בעדכון עסקה', 'error');
+        } catch (error) {
+            console.error('❌ שגיאה בעדכון עסקה:', error);
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('❌ שגיאה בעדכון עסקה', 'error');
+            }
+        }
     }
-}
 
 /**
  * אישור מחיקת עסקה
  */
 async function confirmDeleteExecution() {
-    console.log('🔄 אישור מחיקת עסקה');
+        console.log('🔄 אישור מחיקת עסקה');
 
-    const id = document.getElementById('deleteExecutionId').value;
+        const id = document.getElementById('deleteExecutionId').value;
 
-    try {
-        const response = await fetch(`/api/v1/executions/${id}`, {
-            method: 'DELETE'
-        });
+        try {
+            const response = await fetch(`/api/v1/executions/${id}`, {
+                method: 'DELETE'
+            });
 
-        if (response.ok) {
-            console.log('✅ עסקה נמחקה בהצלחה');
+            if (response.ok) {
+                console.log('✅ עסקה נמחקה בהצלחה');
 
-            // סגירת המודל
-            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteExecutionModal'));
-            modal.hide();
+                // סגירת המודל
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteExecutionModal'));
+                modal.hide();
 
-            // הצגת הודעת הצלחה
-            showNotification('✅ עסקה נמחקה בהצלחה', 'success');
-
-            // רענון הנתונים
-            await loadExecutionsData();
-
-        } else {
-            const errorResponse = await response.text();
-            console.error('❌ שגיאה במחיקת עסקה:', errorResponse);
-
-            try {
-                const errorData = JSON.parse(errorResponse);
-
-                // בדיקה אם השגיאה קשורה לפריטים מקושרים
-                if (errorData.error && errorData.error.message &&
-                    errorData.error.message.includes('linked items')) {
-
-                    // סגירת מודל המחיקה הרגיל
-                    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteTickerModal'));
-                    deleteModal.hide();
-
-                    // הצגת מודל הפריטים המקושרים
-                    await showLinkedItemsModal(id, errorData);
-                    return;
+                // הצגת הודעת הצלחה
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('✅ עסקה נמחקה בהצלחה', 'success');
                 }
 
-                showNotification('❌ שגיאה במחיקת טיקר: ' + errorData.error.message, 'error');
+                // רענון הנתונים
+                await loadExecutionsData();
 
-            } catch (parseError) {
-                showNotification('❌ שגיאה במחיקת טיקר: ' + errorResponse, 'error');
+            } else {
+                const errorResponse = await response.text();
+                console.error('❌ שגיאה במחיקת עסקה:', errorResponse);
+
+                try {
+                    const errorData = JSON.parse(errorResponse);
+
+                    // בדיקה אם השגיאה קשורה לפריטים מקושרים
+                    if (errorData.error && errorData.error.message &&
+                        errorData.error.message.includes('linked items')) {
+
+                        // סגירת מודל המחיקה הרגיל
+                        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteTickerModal'));
+                        deleteModal.hide();
+
+                        // הצגת מודל הפריטים המקושרים
+                        await showLinkedItemsModal(id, errorData);
+                        return;
+                    }
+
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('❌ שגיאה במחיקת טיקר: ' + errorData.error.message, 'error');
+                    }
+
+                } catch (parseError) {
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('❌ שגיאה במחיקת טיקר: ' + errorResponse, 'error');
+                    }
+                }
+
+            } catch (error) {
+                console.error('❌ שגיאה במחיקת טיקר:', error);
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('❌ שגיאה במחיקת טיקר', 'error');
+                }
             }
         }
-
-    } catch (error) {
-        console.error('❌ שגיאה במחיקת טיקר:', error);
-        showNotification('❌ שגיאה במחיקת טיקר', 'error');
-    }
-}
 
 // ========================================
 // פונקציות מודל פריטים מקושרים
@@ -696,150 +722,152 @@ async function confirmDeleteExecution() {
  * הצגת מודל פריטים מקושרים
  */
 async function showLinkedItemsModal(executionId, errorData) {
-    console.log('🔄 הצגת מודל פריטים מקושרים לעסקה:', executionId);
+            console.log('🔄 הצגת מודל פריטים מקושרים לעסקה:', executionId);
 
-    // מציאת העסקה לפי ID
-    const execution = executionsData.find(e => e.id == executionId);
-    if (!execution) {
-        showNotification('❌ עסקה לא נמצאה', 'error');
-        return;
-    }
+            // מציאת העסקה לפי ID
+            const execution = executionsData.find(e => e.id == executionId);
+            if (!execution) {
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('❌ עסקה לא נמצאה', 'error');
+                }
+                return;
+            }
 
-    // עדכון שם העסקה
-    document.getElementById('linkedExecutionName').textContent = `עסקה ${execution.id} - טרייד ${execution.trade_id}`;
+            // עדכון שם העסקה
+            document.getElementById('linkedExecutionName').textContent = `עסקה ${execution.id} - טרייד ${execution.trade_id}`;
 
-    // טעינת פרטי הפריטים המקושרים
-    await loadLinkedItemsDetails(executionId, errorData);
+            // טעינת פרטי הפריטים המקושרים
+            await loadLinkedItemsDetails(executionId, errorData);
 
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'));
-    modal.show();
-}
-
-/**
- * טעינת פרטי הפריטים המקושרים
- */
-async function loadLinkedItemsDetails(executionId, errorData = null) {
-    console.log('🔄 טעינת פרטי פריטים מקושרים לעסקה:', executionId);
-    console.log('📊 errorData:', errorData);
-
-    const contentDiv = document.getElementById('linkedItemsContent');
-    contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><br>טוען פרטים...</div>';
-
-    try {
-        // קריאה ל-API לקבלת פרטי הפריטים המקושרים
-        const response = await fetch(`/api/v1/executions/${executionId}/linked-items`);
-
-        if (response.ok) {
-            const data = await response.json();
-            console.log('📊 נתונים מהשרת:', data);
-            displayLinkedItems(data.data);
-        } else {
-            console.log('⚠️ API לא זמין, מנסה לטעון ממקורות מרובים');
-            // אם אין API ספציפי, ננסה לטעון מכל ה-APIs
-            await loadLinkedItemsFromMultipleSources(executionId);
+            // הצגת המודל
+            const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'));
+            modal.show();
         }
 
-    } catch (error) {
-        console.error('❌ שגיאה בטעינת פריטים מקושרים:', error);
-        // אם יש שגיאה, ננסה לטעון מכל ה-APIs
-        await loadLinkedItemsFromMultipleSources(executionId);
-    }
-}
+        /**
+         * טעינת פרטי הפריטים המקושרים
+         */
+        async function loadLinkedItemsDetails(executionId, errorData = null) {
+            console.log('🔄 טעינת פרטי פריטים מקושרים לעסקה:', executionId);
+            console.log('📊 errorData:', errorData);
 
-/**
- * טעינת פריטים מקושרים ממקורות מרובים
- */
-async function loadLinkedItemsFromMultipleSources(executionId) {
-    console.log('🔄 טעינת פריטים מקושרים ממקורות מרובים');
+            const contentDiv = document.getElementById('linkedItemsContent');
+            contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><br>טוען פרטים...</div>';
 
-    const execution = executionsData.find(e => e.id == executionId);
-    if (!execution) return;
+            try {
+                // קריאה ל-API לקבלת פרטי הפריטים המקושרים
+                const response = await fetch(`/api/v1/executions/${executionId}/linked-items`);
 
-    const linkedItems = {
-        trades: [],
-        trade_plans: [],
-        alerts: [],
-        notes: []
-    };
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📊 נתונים מהשרת:', data);
+                    displayLinkedItems(data.data);
+                } else {
+                    console.log('⚠️ API לא זמין, מנסה לטעון ממקורות מרובים');
+                    // אם אין API ספציפי, ננסה לטעון מכל ה-APIs
+                    await loadLinkedItemsFromMultipleSources(executionId);
+                }
 
-    try {
-        // טעינת טריידים
-        try {
-            const tradesResponse = await fetch('/api/v1/trades/');
-            if (tradesResponse.ok) {
-                const tradesData = await tradesResponse.json();
-                const trades = tradesData.data || tradesData;
-                linkedItems.trades = trades.filter(trade =>
-                    trade.id == execution.trade_id
-                );
+            } catch (error) {
+                console.error('❌ שגיאה בטעינת פריטים מקושרים:', error);
+                // אם יש שגיאה, ננסה לטעון מכל ה-APIs
+                await loadLinkedItemsFromMultipleSources(executionId);
             }
-        } catch (e) { console.warn('לא ניתן לטעון טריידים:', e); }
+        }
 
-        // טעינת תכנונים
-        try {
-            const plansResponse = await fetch('/api/v1/trade_plans/');
-            if (plansResponse.ok) {
-                const plansData = await plansResponse.json();
-                const plans = plansData.data || plansData;
-                linkedItems.trade_plans = plans.filter(plan =>
-                    plan.trade_id == execution.trade_id
-                );
+        /**
+         * טעינת פריטים מקושרים ממקורות מרובים
+         */
+        async function loadLinkedItemsFromMultipleSources(executionId) {
+            console.log('🔄 טעינת פריטים מקושרים ממקורות מרובים');
+
+            const execution = executionsData.find(e => e.id == executionId);
+            if (!execution) return;
+
+            const linkedItems = {
+                trades: [],
+                trade_plans: [],
+                alerts: [],
+                notes: []
+            };
+
+            try {
+                // טעינת טריידים
+                try {
+                    const tradesResponse = await fetch('/api/v1/trades/');
+                    if (tradesResponse.ok) {
+                        const tradesData = await tradesResponse.json();
+                        const trades = tradesData.data || tradesData;
+                        linkedItems.trades = trades.filter(trade =>
+                            trade.id == execution.trade_id
+                        );
+                    }
+                } catch (e) { console.warn('לא ניתן לטעון טריידים:', e); }
+
+                // טעינת תכנונים
+                try {
+                    const plansResponse = await fetch('/api/v1/trade_plans/');
+                    if (plansResponse.ok) {
+                        const plansData = await plansResponse.json();
+                        const plans = plansData.data || plansData;
+                        linkedItems.trade_plans = plans.filter(plan =>
+                            plan.trade_id == execution.trade_id
+                        );
+                    }
+                } catch (e) { console.warn('לא ניתן לטעון תכנונים:', e); }
+
+                // טעינת התראות
+                try {
+                    const alertsResponse = await fetch('/api/v1/alerts/');
+                    if (alertsResponse.ok) {
+                        const alertsData = await alertsResponse.json();
+                        const alerts = alertsData.data || alertsData;
+                        linkedItems.alerts = alerts.filter(alert =>
+                            alert.related_type_id === 5 && alert.related_id == executionId &&
+                            alert.status === 'open'
+                        );
+                    }
+                } catch (e) { console.warn('לא ניתן לטעון התראות:', e); }
+
+                // טעינת הערות
+                try {
+                    const notesResponse = await fetch('/api/v1/notes/');
+                    if (notesResponse.ok) {
+                        const notesData = await notesResponse.json();
+                        const notes = notesData.data || notesData;
+                        linkedItems.notes = notes.filter(note =>
+                            note.related_type_id === 5 && note.related_id == executionId
+                        );
+                    }
+                } catch (e) { console.warn('לא ניתן לטעון הערות:', e); }
+
+                displayLinkedItems(linkedItems);
+
+            } catch (error) {
+                console.error('❌ שגיאה בטעינת פריטים מקושרים:', error);
+                document.getElementById('linkedItemsContent').innerHTML =
+                    '<div class="alert alert-danger">שגיאה בטעינת פרטי הפריטים המקושרים</div>';
             }
-        } catch (e) { console.warn('לא ניתן לטעון תכנונים:', e); }
+        }
 
-        // טעינת התראות
-        try {
-            const alertsResponse = await fetch('/api/v1/alerts/');
-            if (alertsResponse.ok) {
-                const alertsData = await alertsResponse.json();
-                const alerts = alertsData.data || alertsData;
-                linkedItems.alerts = alerts.filter(alert =>
-                    alert.related_type_id === 5 && alert.related_id == executionId &&
-                    alert.status === 'open'
-                );
-            }
-        } catch (e) { console.warn('לא ניתן לטעון התראות:', e); }
+        /**
+         * הצגת הפריטים המקושרים
+         */
+        function displayLinkedItems(linkedItems) {
+            console.log('🔄 הצגת פריטים מקושרים:', linkedItems);
+            console.log('📊 סוג הנתונים:', typeof linkedItems);
+            console.log('📊 מפתחות:', Object.keys(linkedItems || {}));
 
-        // טעינת הערות
-        try {
-            const notesResponse = await fetch('/api/v1/notes/');
-            if (notesResponse.ok) {
-                const notesData = await notesResponse.json();
-                const notes = notesData.data || notesData;
-                linkedItems.notes = notes.filter(note =>
-                    note.related_type_id === 5 && note.related_id == executionId
-                );
-            }
-        } catch (e) { console.warn('לא ניתן לטעון הערות:', e); }
+            const contentDiv = document.getElementById('linkedItemsContent');
+            let html = '';
 
-        displayLinkedItems(linkedItems);
-
-    } catch (error) {
-        console.error('❌ שגיאה בטעינת פריטים מקושרים:', error);
-        document.getElementById('linkedItemsContent').innerHTML =
-            '<div class="alert alert-danger">שגיאה בטעינת פרטי הפריטים המקושרים</div>';
-    }
-}
-
-/**
- * הצגת הפריטים המקושרים
- */
-function displayLinkedItems(linkedItems) {
-    console.log('🔄 הצגת פריטים מקושרים:', linkedItems);
-    console.log('📊 סוג הנתונים:', typeof linkedItems);
-    console.log('📊 מפתחות:', Object.keys(linkedItems || {}));
-
-    const contentDiv = document.getElementById('linkedItemsContent');
-    let html = '';
-
-    // טריידים מקושרים
-    console.log('🔍 בדיקת טריידים מקושרים:', linkedItems.trades);
-    console.log('🔍 האם קיים trades?', !!linkedItems.trades);
-    console.log('🔍 אורך trades:', linkedItems.trades ? linkedItems.trades.length : 'undefined');
-    if (linkedItems.trades && linkedItems.trades.length > 0) {
-        console.log('✅ נמצאו טריידים מקושרים, יוצר HTML');
-        html += `
+            // טריידים מקושרים
+            console.log('🔍 בדיקת טריידים מקושרים:', linkedItems.trades);
+            console.log('🔍 האם קיים trades?', !!linkedItems.trades);
+            console.log('🔍 אורך trades:', linkedItems.trades ? linkedItems.trades.length : 'undefined');
+            if (linkedItems.trades && linkedItems.trades.length > 0) {
+                console.log('✅ נמצאו טריידים מקושרים, יוצר HTML');
+                html += `
             <div class="card mb-3">
                 <div class="card-header bg-warning text-dark">
                     <h6 class="mb-0">🔄 טריידים מקושרים (${linkedItems.trades.length})</h6>
@@ -859,12 +887,12 @@ function displayLinkedItems(linkedItems) {
                 </div>
             </div>
         `;
-    }
+            }
 
-    // תכנונים מקושרים
-    console.log('🔍 בדיקת תכנונים מקושרים:', linkedItems.trade_plans);
-    if (linkedItems.trade_plans && linkedItems.trade_plans.length > 0) {
-        html += `
+            // תכנונים מקושרים
+            console.log('🔍 בדיקת תכנונים מקושרים:', linkedItems.trade_plans);
+            if (linkedItems.trade_plans && linkedItems.trade_plans.length > 0) {
+                html += `
             <div class="card mb-3">
                 <div class="card-header bg-info text-white">
                     <h6 class="mb-0">📋 תכנונים מקושרים (${linkedItems.trade_plans.length})</h6>
@@ -901,11 +929,11 @@ function displayLinkedItems(linkedItems) {
                 </div>
             </div>
         `;
-    }
+            }
 
-    // התראות פעילות
-    if (linkedItems.alerts && linkedItems.alerts.length > 0) {
-        html += `
+            // התראות פעילות
+            if (linkedItems.alerts && linkedItems.alerts.length > 0) {
+                html += `
             <div class="card mb-3">
                 <div class="card-header bg-danger text-white">
                     <h6 class="mb-0">🚨 התראות פעילות (${linkedItems.alerts.length})</h6>
@@ -942,11 +970,11 @@ function displayLinkedItems(linkedItems) {
                 </div>
             </div>
         `;
-    }
+            }
 
-    // הערות
-    if (linkedItems.notes && linkedItems.notes.length > 0) {
-        html += `
+            // הערות
+            if (linkedItems.notes && linkedItems.notes.length > 0) {
+                html += `
             <div class="card mb-3">
                 <div class="card-header bg-secondary text-white">
                     <h6 class="mb-0">📝 הערות (${linkedItems.notes.length})</h6>
@@ -981,196 +1009,180 @@ function displayLinkedItems(linkedItems) {
                 </div>
         </div>
     `;
-    }
-
-    console.log('🔍 HTML שנוצר:', html);
-    if (!html) {
-        html = '<div class="alert alert-success">✅ לא נמצאו פריטים מקושרים פתוחים. ניתן למחוק את הטיקר בבטחה.</div>';
-    }
-
-    contentDiv.innerHTML = html;
-}
-
-/**
- * מעבר לניהול פריטים מקושרים
- */
-function goToLinkedItems() {
-    // סגירת המודל
-    const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsModal'));
-    modal.hide();
-
-    // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
-    window.location.href = '/trade_plans'; // ברירת מחדל - דף תכנון
-}
-
-/**
- * מעבר לטרייד ספציפי
- */
-function goToTrade(tradeId) {
-    window.location.href = `/trade_plans#trade-${tradeId}`;
-}
-
-/**
- * מעבר לתכנון ספציפי
- */
-function goToPlan(planId) {
-    window.location.href = `/planning#plan-${planId}`;
-}
-
-/**
- * מעבר להתראה ספציפית
- */
-function goToAlert(alertId) {
-    window.location.href = `/alerts#alert-${alertId}`;
-}
-
-/**
- * מעבר להערה ספציפית
- */
-function goToNote(noteId) {
-    window.location.href = `/notes#note-${noteId}`;
-}
-
-// ========================================
-// פונקציות עזר
-// ========================================
-
-/**
- * הצגת הודעה
- */
-function showNotification(message, type = 'info') {
-    const container = document.getElementById('notificationContainer');
-    if (!container) return;
-
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
-    notification.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-
-    container.appendChild(notification);
-
-    // הסרה אוטומטית אחרי 5 שניות
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, 5000);
-}
-
-/**
- * טעינת נתוני עסקעות
- */
-async function loadExecutionsData() {
-    try {
-        console.log('🔄 טעינת נתוני עסקעות');
-
-        const response = await fetch('/api/v1/executions/?_t=' + Date.now());
-        if (response.ok) {
-            const data = await response.json();
-            executionsData = data.data || data;
-            console.log('✅ נטענו', executionsData.length, 'עסקעות');
-            console.log('📊 נתוני עסקעות:', executionsData);
-
-            // בדיקה אם יש פילטרים פעילים
-            if (window.headerSystem && window.headerSystem.currentFilters) {
-                const filters = window.headerSystem.currentFilters;
-                const hasActiveFilters = (filters.status && filters.status.length > 0) ||
-                    (filters.type && filters.type.length > 0) ||
-                    (filters.account && filters.account.length > 0) ||
-                    (filters.dateRange && filters.dateRange !== '') ||
-                    (filters.search && filters.search !== '');
-
-                if (hasActiveFilters) {
-                    console.log('🔍 יש פילטרים פעילים, מסנן נתונים מקומית');
-                    const filteredData = filterExecutionsLocally(
-                        executionsData,
-                        filters.status,
-                        filters.type,
-                        filters.account,
-                        filters.dateRange,
-                        filters.search
-                    );
-                    updateExecutionsTable(filteredData);
-                    return;
-                }
             }
 
-            // עדכון הטבלה
-            updateExecutionsTable(executionsData);
+            console.log('🔍 HTML שנוצר:', html);
+            if (!html) {
+                html = '<div class="alert alert-success">✅ לא נמצאו פריטים מקושרים פתוחים. ניתן למחוק את הטיקר בבטחה.</div>';
+            }
 
-        } else {
-            console.error('❌ שגיאה בטעינת עסקעות');
-            showNotification('❌ שגיאה בטעינת נתונים', 'error');
+            contentDiv.innerHTML = html;
         }
 
-    } catch (error) {
-        console.error('❌ שגיאה בטעינת עסקעות:', error);
-        showNotification('❌ שגיאה בטעינת נתונים', 'error');
-    }
-}
+        /**
+         * מעבר לניהול פריטים מקושרים
+         */
+        function goToLinkedItems() {
+            // סגירת המודל
+            const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsModal'));
+            modal.hide();
+
+            // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
+            window.location.href = '/trade_plans'; // ברירת מחדל - דף תכנון
+        }
+
+        /**
+         * מעבר לטרייד ספציפי
+         */
+        function goToTrade(tradeId) {
+            window.location.href = `/trade_plans#trade-${tradeId}`;
+        }
+
+        /**
+         * מעבר לתכנון ספציפי
+         */
+        function goToPlan(planId) {
+            window.location.href = `/planning#plan-${planId}`;
+        }
+
+        /**
+         * מעבר להתראה ספציפית
+         */
+        function goToAlert(alertId) {
+            window.location.href = `/alerts#alert-${alertId}`;
+        }
+
+        /**
+         * מעבר להערה ספציפית
+         */
+        function goToNote(noteId) {
+            window.location.href = `/notes#note-${noteId}`;
+        }
+
+        // ========================================
+        // פונקציות עזר
+        // ========================================
+
+        /**
+         * הצגת הודעה
+         */
+
+
+        /**
+         * טעינת נתוני עסקעות
+         */
+        async function loadExecutionsData() {
+            try {
+                console.log('🔄 טעינת נתוני עסקעות');
+
+                const response = await fetch('/api/v1/executions/?_t=' + Date.now());
+                if (response.ok) {
+                    const data = await response.json();
+                    executionsData = data.data || data;
+                    console.log('✅ נטענו', executionsData.length, 'עסקעות');
+                    console.log('📊 נתוני עסקעות:', executionsData);
+
+                    // בדיקה אם יש פילטרים פעילים
+                    if (window.headerSystem && window.headerSystem.currentFilters) {
+                        const filters = window.headerSystem.currentFilters;
+                        const hasActiveFilters = (filters.status && filters.status.length > 0) ||
+                            (filters.type && filters.type.length > 0) ||
+                            (filters.account && filters.account.length > 0) ||
+                            (filters.dateRange && filters.dateRange !== '') ||
+                            (filters.search && filters.search !== '');
+
+                        if (hasActiveFilters) {
+                            console.log('🔍 יש פילטרים פעילים, מסנן נתונים מקומית');
+                            const filteredData = filterExecutionsLocally(
+                                executionsData,
+                                filters.status,
+                                filters.type,
+                                filters.account,
+                                filters.dateRange,
+                                filters.search
+                            );
+                            updateExecutionsTable(filteredData);
+                            return;
+                        }
+                    }
+
+                    // עדכון הטבלה
+                    updateExecutionsTable(executionsData);
+
+                } else {
+                    console.error('❌ שגיאה בטעינת עסקעות');
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('❌ שגיאה בטעינת נתונים', 'error');
+                    }
+
+                } catch (error) {
+                    console.error('❌ שגיאה בטעינת עסקעות:', error);
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('❌ שגיאה בטעינת נתונים', 'error');
+                    }
+                }
+            }
 
 /**
  * עדכון טבלת עסקעות
  */
 async function updateExecutionsTable(executions) {
-    console.log('🔄 updateExecutionsTable נקראה עם', executions.length, 'עסקעות');
-    console.log('📊 נתוני עסקעות:', executions);
+                console.log('🔄 updateExecutionsTable נקראה עם', executions.length, 'עסקעות');
+                console.log('📊 נתוני עסקעות:', executions);
 
-    const tbody = document.querySelector('#executionsTable tbody');
-    if (!tbody) return;
+                const tbody = document.querySelector('#executionsTable tbody');
+                if (!tbody) return;
 
-    if (executions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center">לא נמצאו עסקעות</td></tr>';
-        return;
-    }
+                if (executions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center">לא נמצאו עסקעות</td></tr>';
+                    return;
+                }
 
-    // טעינת נתוני טריידים וטיקרים
-    let trades = [];
-    let tickers = [];
+                // טעינת נתוני טריידים וטיקרים
+                let trades = [];
+                let tickers = [];
 
-    try {
-        const [tradesResponse, tickersResponse] = await Promise.all([
-            fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-            fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
-        ]);
+                try {
+                    const [tradesResponse, tickersResponse] = await Promise.all([
+                        fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
+                        fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
+                    ]);
 
-        trades = tradesResponse.data || tradesResponse || [];
-        tickers = tickersResponse.data || tickersResponse || [];
+                    trades = tradesResponse.data || tradesResponse || [];
+                    tickers = tickersResponse.data || tickersResponse || [];
 
-        console.log(`✅ נטענו ${trades.length} טריידים ו-${tickers.length} טיקרים`);
-    } catch (error) {
-        console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
-    }
+                    console.log(`✅ נטענו ${trades.length} טריידים ו-${tickers.length} טיקרים`);
+                } catch (error) {
+                    console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
+                }
 
-    tbody.innerHTML = executions.map(execution => {
-        // מציאת הטרייד המקושר
-        const trade = trades.find(t => t.id === execution.trade_id);
-        let symbol = 'לא מוגדר';
-        let tradeInfo = '';
+                tbody.innerHTML = executions.map(execution => {
+                    // מציאת הטרייד המקושר
+                    const trade = trades.find(t => t.id === execution.trade_id);
+                    let symbol = 'לא מוגדר';
+                    let tradeInfo = '';
 
-        if (trade) {
-            // מציאת הטיקר
-            const ticker = tickers.find(t => t.id === trade.ticker_id);
-            symbol = ticker ? ticker.symbol : 'לא מוגדר';
+                    if (trade) {
+                        // מציאת הטיקר
+                        const ticker = tickers.find(t => t.id === trade.ticker_id);
+                        symbol = ticker ? ticker.symbol : 'לא מוגדר';
 
-            // מידע על הטרייד: תאריך פתיחה | צד | סוג
-            const openDate = trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-            const side = trade.side || 'לא מוגדר';
-            const type = trade.investment_type || 'לא מוגדר';
+                        // מידע על הטרייד: תאריך פתיחה | צד | סוג
+                        const openDate = trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+                        const side = trade.side || 'לא מוגדר';
+                        const type = trade.investment_type || 'לא מוגדר';
 
-            tradeInfo = `${openDate} | ${side} | ${type}`;
-        } else {
-            tradeInfo = `טרייד ${execution.trade_id}`;
-        }
+                        tradeInfo = `${openDate} | ${side} | ${type}`;
+                    } else {
+                        tradeInfo = `טרייד ${execution.trade_id}`;
+                    }
 
-        // שמירת הערכים המקוריים באנגלית לפילטר
-        const typeForFilter = (execution.action || execution.type) === 'buy' ? 'קנייה' :
-            (execution.action || execution.type) === 'sell' ? 'מכירה' :
-                (execution.action || execution.type);
+                    // שמירת הערכים המקוריים באנגלית לפילטר
+                    const typeForFilter = (execution.action || execution.type) === 'buy' ? 'קנייה' :
+                        (execution.action || execution.type) === 'sell' ? 'מכירה' :
+                            (execution.action || execution.type);
 
-        return `
+                    return `
             <tr>
                 <td class="ticker-cell"><strong>${symbol}</strong></td>
                 <td><small style="color: #666;">${tradeInfo}</small></td>
@@ -1188,184 +1200,184 @@ async function updateExecutionsTable(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${window.formatDateOnly(execution.date || execution.execution_date)}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="actions-cell">
-                    <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
                     <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${execution.id})" title="צפה באלמנטים מקושרים">
                       🔗
                     </button>
+                    <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
                 </td>
             </tr>
         `;
-    }).join('');
+                }).join('');
 
-    // עדכון הספירה
-    const countElement = document.querySelector('.table-count');
-    if (countElement) {
-        countElement.textContent = `${executions.length} עסקעות`;
-    }
-}
-
-// פונקציה formatDate מוגדרת בקובץ main.js
-
-// פונקציית פילטור מקומי לעסקאות
-function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
-    console.log('🔍 filterExecutionsLocally called with:', { selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm });
-
-    return executions.filter(execution => {
-        // פילטר חיפוש
-        if (searchTerm && searchTerm.trim() !== '') {
-            const searchLower = searchTerm.toLowerCase();
-            const symbol = execution.symbol || '';
-            const action = execution.action || execution.type || '';
-            const notes = execution.notes || '';
-
-            if (!symbol.toLowerCase().includes(searchLower) &&
-                !action.toLowerCase().includes(searchLower) &&
-                !notes.toLowerCase().includes(searchLower)) {
-                return false;
-            }
-        }
-
-        // פילטר סוג (type)
-        if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('הכול')) {
-            const executionType = (execution.action || execution.type) === 'buy' ? 'קנייה' :
-                (execution.action || execution.type) === 'sell' ? 'מכירה' : (execution.action || execution.type);
-
-            if (!selectedTypes.includes(executionType)) {
-                return false;
-            }
-        }
-
-        // פילטר תאריך
-        if (dateRange && dateRange !== 'כל זמן' && dateRange !== 'הכול') {
-            const executionDate = new Date(execution.created_at || execution.date || execution.execution_date);
-            const now = new Date();
-
-            let startDate, endDate;
-
-            switch (dateRange) {
-                case 'היום':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-                    break;
-                case 'אתמול':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    break;
-                case 'השבוע':
-                    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
-                    startDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-                    break;
-                case '30 יום':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-                    break;
-                default:
-                    return true; // אם לא מוכר, לא מסנן
+                // עדכון הספירה
+                const countElement = document.querySelector('.table-count');
+                if (countElement) {
+                    countElement.textContent = `${executions.length} עסקעות`;
+                }
             }
 
-            if (executionDate < startDate || executionDate >= endDate) {
-                return false;
+            // פונקציה formatDate מוגדרת בקובץ main.js
+
+            // פונקציית פילטור מקומי לעסקאות
+            function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
+                console.log('🔍 filterExecutionsLocally called with:', { selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm });
+
+                return executions.filter(execution => {
+                    // פילטר חיפוש
+                    if (searchTerm && searchTerm.trim() !== '') {
+                        const searchLower = searchTerm.toLowerCase();
+                        const symbol = execution.symbol || '';
+                        const action = execution.action || execution.type || '';
+                        const notes = execution.notes || '';
+
+                        if (!symbol.toLowerCase().includes(searchLower) &&
+                            !action.toLowerCase().includes(searchLower) &&
+                            !notes.toLowerCase().includes(searchLower)) {
+                            return false;
+                        }
+                    }
+
+                    // פילטר סוג (type)
+                    if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('הכול')) {
+                        const executionType = (execution.action || execution.type) === 'buy' ? 'קנייה' :
+                            (execution.action || execution.type) === 'sell' ? 'מכירה' : (execution.action || execution.type);
+
+                        if (!selectedTypes.includes(executionType)) {
+                            return false;
+                        }
+                    }
+
+                    // פילטר תאריך
+                    if (dateRange && dateRange !== 'כל זמן' && dateRange !== 'הכול') {
+                        const executionDate = new Date(execution.created_at || execution.date || execution.execution_date);
+                        const now = new Date();
+
+                        let startDate, endDate;
+
+                        switch (dateRange) {
+                            case 'היום':
+                                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                                break;
+                            case 'אתמול':
+                                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                                endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                break;
+                            case 'השבוע':
+                                const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+                                startDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+                                endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                                break;
+                            case '30 יום':
+                                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
+                                endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                                break;
+                            default:
+                                return true; // אם לא מוכר, לא מסנן
+                        }
+
+                        if (executionDate < startDate || executionDate >= endDate) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                });
             }
-        }
 
-        return true;
-    });
-}
+            // הגדרת הפונקציה כגלובלית
+            window.filterExecutionsLocally = filterExecutionsLocally;
 
-// הגדרת הפונקציה כגלובלית
-window.filterExecutionsLocally = filterExecutionsLocally;
+            // הגדרת הפונקציות כגלובליות
+            window.openExecutionDetails = openExecutionDetails;
+            window.editExecution = editExecution;
+            window.deleteExecution = deleteExecution;
+            window.toggleExecutionsSection = toggleExecutionsSection;
+            window.restoreExecutionsSectionState = restoreExecutionsSectionState;
+            window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
 
-// הגדרת הפונקציות כגלובליות
-window.openExecutionDetails = openExecutionDetails;
-window.editExecution = editExecution;
-window.deleteExecution = deleteExecution;
-window.toggleExecutionsSection = toggleExecutionsSection;
-window.restoreExecutionsSectionState = restoreExecutionsSectionState;
-window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
+            // פונקציות מודלים
+            window.showAddExecutionModal = showAddExecutionModal;
+            window.showEditExecutionModal = showEditExecutionModal;
+            window.showDeleteExecutionModal = showDeleteExecutionModal;
+            window.saveExecution = saveExecution;
+            window.updateExecution = updateExecution;
+            window.confirmDeleteExecution = confirmDeleteExecution;
 
-// פונקציות מודלים
-window.showAddExecutionModal = showAddExecutionModal;
-window.showEditExecutionModal = showEditExecutionModal;
-window.showDeleteExecutionModal = showDeleteExecutionModal;
-window.saveExecution = saveExecution;
-window.updateExecution = updateExecution;
-window.confirmDeleteExecution = confirmDeleteExecution;
+            // פונקציות ולידציה
+            window.validateExecutionTradeId = validateExecutionTradeId;
+            window.validateExecutionQuantity = validateExecutionQuantity;
+            window.validateExecutionPrice = validateExecutionPrice;
+            window.validateExecutionCommission = validateExecutionCommission;
 
-// פונקציות ולידציה
-window.validateExecutionTradeId = validateExecutionTradeId;
-window.validateExecutionQuantity = validateExecutionQuantity;
-window.validateExecutionPrice = validateExecutionPrice;
-window.validateExecutionCommission = validateExecutionCommission;
+            // פונקציות מודל פריטים מקושרים
+            window.showLinkedItemsModal = showLinkedItemsModal;
+            window.loadLinkedItemsDetails = loadLinkedItemsDetails;
+            window.displayLinkedItems = displayLinkedItems;
+            window.goToLinkedItems = goToLinkedItems;
+            window.goToTrade = goToTrade;
+            window.goToPlan = goToPlan;
+            window.goToAlert = goToAlert;
+            window.goToNote = goToNote;
 
-// פונקציות מודל פריטים מקושרים
-window.showLinkedItemsModal = showLinkedItemsModal;
-window.loadLinkedItemsDetails = loadLinkedItemsDetails;
-window.displayLinkedItems = displayLinkedItems;
-window.goToLinkedItems = goToLinkedItems;
-window.goToTrade = goToTrade;
-window.goToPlan = goToPlan;
-window.goToAlert = goToAlert;
-window.goToNote = goToNote;
+            // ===== פונקציות סידור =====
 
-// ===== פונקציות סידור =====
+            /**
+             * פונקציה לסידור טבלת עסקעות
+             * @param {number} columnIndex - אינדקס העמודה לסידור
+             * 
+             * דוגמאות שימוש:
+             * sortTable(0); // סידור לפי עמודת נכס
+             * sortTable(2); // סידור לפי עמודת פעולה
+             * sortTable(8); // סידור לפי עמודת תאריך יצירה
+             * 
+             * @requires window.sortTableData - פונקציה גלובלית מ-main.js
+             */
+            function sortTable(columnIndex) {
+                console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
 
-/**
- * פונקציה לסידור טבלת עסקעות
- * @param {number} columnIndex - אינדקס העמודה לסידור
- * 
- * דוגמאות שימוש:
- * sortTable(0); // סידור לפי עמודת נכס
- * sortTable(2); // סידור לפי עמודת פעולה
- * sortTable(8); // סידור לפי עמודת תאריך יצירה
- * 
- * @requires window.sortTableData - פונקציה גלובלית מ-main.js
- */
-function sortTable(columnIndex) {
-    console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
+                if (typeof window.sortTable === 'function') {
+                    window.sortTable(
+                        'executions',
+                        columnIndex,
+                        window.executionsData || [],
+                        updateExecutionsTable
+                    );
+                } else {
+                    console.error('❌ sortTable function not found in main.js');
+                }
+            }
 
-    if (typeof window.sortTable === 'function') {
-        window.sortTable(
-            'executions',
-            columnIndex,
-            window.executionsData || [],
-            updateExecutionsTable
-        );
-    } else {
-        console.error('❌ sortTable function not found in main.js');
-    }
-}
+            /**
+             * שחזור מצב סידור - שימוש בפונקציה גלובלית
+             * @deprecated Use window.restoreAnyTableSort from main.js instead
+             */
+            function restoreSortState() {
+                console.log('🔄 Restoring sort state for executions table');
 
-/**
- * שחזור מצב סידור - שימוש בפונקציה גלובלית
- * @deprecated Use window.restoreAnyTableSort from main.js instead
- */
-function restoreSortState() {
-    console.log('🔄 Restoring sort state for executions table');
+                if (typeof window.restoreAnyTableSort === 'function') {
+                    window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTable);
+                } else {
+                    console.error('❌ restoreAnyTableSort function not found in main.js');
+                }
+            }
 
-    if (typeof window.restoreAnyTableSort === 'function') {
-        window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTable);
-    } else {
-        console.error('❌ restoreAnyTableSort function not found in main.js');
-    }
-}
+            // הגדרת הפונקציה כגלובלית
+            window.sortTable = sortTable;
 
-// הגדרת הפונקציה כגלובלית
-window.sortTable = sortTable;
+            // אתחול הדף
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log('🔄 === DOM CONTENT LOADED ===');
 
-// אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('🔄 === DOM CONTENT LOADED ===');
+                // שחזור מצב הסגירה
+                restoreExecutionsSectionState();
 
-    // שחזור מצב הסגירה
-    restoreExecutionsSectionState();
+                // טעינת נתונים
+                loadExecutionsData();
 
-    // טעינת נתונים
-    loadExecutionsData();
+                // שחזור מצב סידור
+                restoreSortState();
 
-    // שחזור מצב סידור
-    restoreSortState();
-
-    console.log('דף עסקעות נטען בהצלחה');
-});
+                console.log('דף עסקעות נטען בהצלחה');
+            });

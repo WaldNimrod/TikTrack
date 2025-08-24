@@ -288,34 +288,7 @@ function isAccountsLoaded() {
   return window.accountsLoaded || false;
 }
 
-// פונקציה לטעינת נתוני חשבונות מהשרת
-async function loadAccountsData() {
-  try {
-    console.log('🔄 טוען נתוני חשבונות מהשרת...');
-
-    // בדיקה אם יש פונקציה apiCall זמינה
-    if (typeof window.apiCall === 'function') {
-      const response = await window.apiCall('/api/v1/accounts/');
-      const accounts = response.data || response;
-      console.log('📊 חשבונות שהתקבלו:', accounts);
-      return accounts;
-    } else {
-      // קריאה ישירה ל-API
-      const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-      const response = await fetch(`${base}/api/v1/accounts/`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const accounts = result.data || result;
-      console.log('📊 חשבונות שהתקבלו:', accounts);
-      return accounts;
-    }
-  } catch (error) {
-    console.error('❌ שגיאה בטעינת נתוני חשבונות:', error);
-    throw error;
-  }
-}
+// הועבר ל-loadAccountsDataForAccountsPage - גרסה מאוחדת
 
 /**
  * עדכון טבלת חשבונות בדף database.html
@@ -478,7 +451,7 @@ window.loadDefaultAccounts = loadDefaultAccounts;
 window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;
 window.getAccounts = getAccounts;
 window.isAccountsLoaded = isAccountsLoaded;
-window.loadAccountsData = loadAccountsData;
+window.loadAccountsData = loadAccountsDataForAccountsPage;
 window.updateAccountsTable = updateAccountsTable;
 window.loadAccounts = loadAccounts;
 
@@ -1271,39 +1244,7 @@ async function updateAccountFromModal() {
   }
 }
 
-/**
- * טעינת נתוני חשבונות מ-API
- * @returns {Promise<Array>} מערך של חשבונות
- */
-async function loadAccountsDataFromAPI() {
-  try {
-    console.log('🔄 קורא נתוני חשבונות מ-API...');
-    const response = await fetch('/api/v1/accounts/');
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log('🔄 נתונים נטענו מ-API:', result);
-
-    // בדיקה אם התוצאה מכילה מערך נתונים
-    if (result.data && Array.isArray(result.data)) {
-      console.log('🔄 מערך נתונים נמצא:', result.data.length, 'חשבונות');
-      return result.data;
-    } else if (Array.isArray(result)) {
-      console.log('🔄 מערך ישיר נמצא:', result.length, 'חשבונות');
-      return result;
-    } else {
-      console.error('❌ מבנה נתונים לא צפוי:', result);
-      throw new Error('מבנה נתונים לא צפוי מה-API');
-    }
-
-  } catch (error) {
-    console.error('❌ שגיאה בקריאה ל-API:', error);
-    throw error;
-  }
-}
+// הועבר ל-loadAccountsDataForAccountsPage - גרסה מאוחדת
 
 /**
  * מחיקת חשבון מהשרת
@@ -1477,11 +1418,7 @@ function showErrorMessage(message) {
 }
 
 // פונקציות עזר חסרות
-function showSecondConfirmationModal(message, onConfirm) {
-  if (confirm(message)) {
-    onConfirm();
-  }
-}
+// showSecondConfirmationModal הועבר ל-ui-utils.js
 
 function confirmDeleteAccount(accountId, accountName) {
   deleteAccount(accountId, accountName);
@@ -1508,13 +1445,13 @@ window.cancelAccount = cancelAccount;
 window.deleteAccount = deleteAccount;
 window.showSuccessMessage = showSuccessMessage;
 window.showErrorMessage = showErrorMessage;
-window.showSecondConfirmationModal = showSecondConfirmationModal;
+window.showSecondConfirmationModal = window.showSecondConfirmationModal; // משתמש בגרסה מ-ui-utils.js
 window.confirmDeleteAccount = confirmDeleteAccount;
 window.checkLinkedItems = checkLinkedItems;
 window.showOpenTradesWarning = showOpenTradesWarning;
 window.createWarningModal = createWarningModal;
 window.deleteAccountFromAPI = deleteAccountFromAPI;
-window.loadAccountsDataFromAPI = loadAccountsDataFromAPI;
+window.loadAccountsDataFromAPI = loadAccountsDataForAccountsPage;
 window.addAccountToAPI = addAccountToAPI;
 window.updateAccountInAPI = updateAccountInAPI;
 window.createAccountModal = createAccountModal;
@@ -1925,7 +1862,7 @@ window.updateAccountsTable = updateAccountsTable;
 window.editAccount = editAccount;
 window.deleteAccount = deleteAccount;
 window.viewLinkedItems = viewLinkedItems;
-window.showNotification = showNotification;
+
 
 // בדיקה סופית שהפונקציות מיוצאות
 console.log('🔄 === בדיקה סופית של ייצוא פונקציות ===');
@@ -1937,34 +1874,34 @@ console.log('- updateAccountsTable:', typeof window.updateAccountsTable);
 console.log('- editAccount:', typeof window.editAccount);
 console.log('- deleteAccount:', typeof window.deleteAccount);
 console.log('- viewLinkedItems:', typeof window.viewLinkedItems);
-console.log('- showNotification:', typeof window.showNotification);
+
 console.log('✅ === סיום בדיקת ייצוא ===');
 
 // פונקציות נוספות לטבלת החשבונות
 function editAccount(accountId) {
   console.log('🔄 עריכת חשבון:', accountId);
-  showNotification('פונקציית עריכת חשבון תפותח בקרוב', 'info');
+  if (typeof window.showNotification === 'function') {
+    window.showNotification('פונקציית עריכת חשבון תפותח בקרוב', 'info');
+  }
 }
 
 function deleteAccount(accountId) {
   console.log('🔄 מחיקת חשבון:', accountId);
   if (confirm('האם אתה בטוח שברצונך למחוק חשבון זה?')) {
-    showNotification('פונקציית מחיקת חשבון תפותח בקרוב', 'info');
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('פונקציית מחיקת חשבון תפותח בקרוב', 'info');
+    }
   }
 }
 
 function viewLinkedItems(accountId) {
   console.log('🔄 צפייה באלמנטים מקושרים לחשבון:', accountId);
-  showNotification('פונקציית צפייה באלמנטים מקושרים תפותח בקרוב', 'info');
-}
-
-function showNotification(message, type = 'info') {
   if (typeof window.showNotification === 'function') {
-    window.showNotification(message, type);
-  } else {
-    console.log(`[${type.toUpperCase()}] ${message}`);
+    window.showNotification('פונקציית צפייה באלמנטים מקושרים תפותח בקרוב', 'info');
   }
 }
+
+
 
 // ניקוי הודעות קונסולה אחרי זמן קצר
 setTimeout(() => {

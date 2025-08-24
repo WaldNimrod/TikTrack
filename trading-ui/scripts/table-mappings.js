@@ -69,8 +69,9 @@ const TABLE_COLUMN_MAPPINGS = {
         'id',              // 0 - מזהה
         'ticker',          // 1 - טיקר
         'type',            // 2 - סוג
-        'status',          // 3 - סטטוס
-        'created_at'       // 4 - נוצר ב
+        'condition',       // 3 - תנאי
+        'status',          // 4 - סטטוס
+        'created_at'       // 5 - נוצר ב
     ],
 
     // טבלת הערות (Notes)

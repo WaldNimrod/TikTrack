@@ -937,27 +937,7 @@ function resetAPIPreferences() {
 /**
  * Show notification
  */
-function showNotification(message, type = 'info') {
-    // Simple notification - can be enhanced with toast library
-    console.log(`${type.toUpperCase()}: ${message}`);
 
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `test-notification alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} alert-dismissible fade show`;
-    notification.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-
-    document.body.appendChild(notification);
-
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 5000);
-}
 
 /**
  * Check server health before running tests

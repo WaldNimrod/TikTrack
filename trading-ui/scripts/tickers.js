@@ -1174,26 +1174,7 @@ function goToNote(noteId) {
 /**
  * הצגת הודעה
  */
-function showNotification(message, type = 'info') {
-    const container = document.getElementById('notificationContainer');
-    if (!container) return;
 
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
-    notification.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-
-    container.appendChild(notification);
-
-    // הסרה אוטומטית אחרי 5 שניות
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, 5000);
-}
 
 /**
  * טעינת נתוני טיקרים
@@ -1298,11 +1279,11 @@ function updateTickersTable(tickers) {
             <td data-date="${ticker.created_at}" style="text-align: center;">${formatDateOnly(ticker.created_at)}</td>
             <td data-date="${ticker.updated_at}" style="text-align: center;">${formatDateOnly(ticker.updated_at)}</td>
             <td class="actions-cell">
-                <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">✏️</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})" title="מחק">🗑️</button>
                 <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${ticker.id})" title="צפה באלמנטים מקושרים">
                   🔗
                 </button>
+                <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">✏️</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})" title="מחק">🗑️</button>
             </td>
         </tr>
     `}).join('');
@@ -1314,23 +1295,7 @@ function updateTickersTable(tickers) {
     }
 }
 
-/**
- * עיצוב תאריך
- */
-function formatDate(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
-}
 
-/**
- * עיצוב תאריך בלבד (ללא שעה)
- */
-function formatDateOnly(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('he-IL');
-}
 
 // פונקציית פילטור מקומי לטיקרים
 function filterTickersLocally(tickers, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {

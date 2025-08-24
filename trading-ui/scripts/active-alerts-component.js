@@ -8,8 +8,13 @@
  * - translation-utils.js (translation functions)
  * 
  * File: trading-ui/scripts/active-alerts-component.js
- * Version: 2.2
- * Last Updated: August 23, 2025
+ * Version: 2.3
+ * Last Updated: August 24, 2025
+ * 
+ * New Features:
+ * - מציג איקון פעמון עם מספר אדום בכותרת הסקשן כשיש התראות חדשות
+ * - עובד גםסקשן סגור
+ * - עדכון אוטומטי של האיקון כשהתראות משתנות
  */
 
 class ActiveAlertsComponent extends HTMLElement {
@@ -20,12 +25,28 @@ class ActiveAlertsComponent extends HTMLElement {
     this._checkAttempts = 0;
     this._functionsChecked = false;
     this._checkTimeout = null;
+    this._sectionHeader = null;
+    this._alertIcon = null;
   }
 
   connectedCallback() {
     this.render();
     this.checkGlobalFunctions();
     this.loadActiveAlerts();
+    this.setupSectionHeaderAlertIcon();
+
+    // עדכון איקון ההתראות כל 5 שניות
+    this._alertIconInterval = setInterval(() => {
+      if (this.isConnected) {
+        this.updateSectionHeaderAlertIcon();
+      }
+    }, 5000);
+
+    // האזנה לשינויים במצב הסקשן
+    this.setupSectionToggleListener();
+
+    // בדיקה שהסגנונות נטענו
+    this.checkStylesLoaded();
 
     // ניקוי הודעות קונסולה ישנות אחרי 10 שניות (רק אם יש הרבה הודעות)
     setTimeout(() => {
@@ -45,6 +66,15 @@ class ActiveAlertsComponent extends HTMLElement {
       clearTimeout(this._checkTimeout);
       this._checkTimeout = null;
     }
+
+    // ניקוי interval אם הקומפוננטה מוסרת
+    if (this._alertIconInterval) {
+      clearInterval(this._alertIconInterval);
+      this._alertIconInterval = null;
+    }
+
+    // הסרת איקון ההתראות מהכותרת
+    this.removeSectionHeaderAlertIcon();
   }
 
   render() {
@@ -118,21 +148,35 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   async loadActiveAlerts() {
-    if (this.isLoading) return;
+    console.log('🔄 Loading active alerts...');
+
+    if (this.isLoading) {
+      console.log('🔄 Already loading, skipping...');
+      return;
+    }
+
     this.isLoading = true;
     try {
       const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+      console.log('🔄 Fetching from:', `${base}/api/v1/alerts/unread`);
+
       const response = await fetch(`${base}/api/v1/alerts/unread`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
       const apiData = await response.json();
+      console.log('🔄 API response:', apiData);
+
       this.alerts = (apiData && apiData.status === 'success' && Array.isArray(apiData.data)) ? apiData.data : [];
+      console.log('🔄 Parsed alerts:', this.alerts);
 
       this.updateCount();
       this.renderAlerts();
+      this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
     } catch (err) {
-      console.error('failed loading active alerts', err);
+      console.error('❌ Failed loading active alerts:', err);
       this.alerts = [];
       this.renderAlerts();
+      this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
     } finally {
       this.isLoading = false;
     }
@@ -155,10 +199,11 @@ class ActiveAlertsComponent extends HTMLElement {
 
     if (titleEl) {
       if (this.alerts.length === 0) {
-        titleEl.textContent = '🔕 אין התראות חדשות';
+        titleEl.innerHTML = '🔕 אין התראות חדשות';
         titleEl.style.opacity = '0.5';
       } else {
-        titleEl.textContent = '🔔 התראות פעילות';
+        // החלפת האיקון הקיים באיקון עם מספר
+        titleEl.innerHTML = this.createTitleWithIcon();
         titleEl.style.opacity = '1';
       }
     }
@@ -174,59 +219,97 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   renderAlerts() {
-    const container = this.querySelector('#alertsCards');
-    if (!container) return;
+    console.log('🎨 Rendering alerts, count:', this.alerts?.length);
 
-    if (!this.alerts.length) {
-      // הסתרת המיכל כשאין התראות
-      container.style.display = 'none';
-      this.updateCount(); // עדכון הכותרת למצב ריק
+    const container = this.querySelector('#alertsCards');
+    if (!container) {
+      console.warn('❌ No alertsCards container found');
       return;
     }
 
+    console.log('✅ Found alertsCards container');
+
+    if (!this.alerts.length) {
+      console.log('🎨 No alerts to display');
+      // הסתרת המיכל כשאין התראות
+      container.style.display = 'none';
+      this.updateCount(); // עדכון הכותרת למצב ריק
+      this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
+      return;
+    }
+
+    console.log('🎨 Rendering', this.alerts.length, 'alerts');
     // הצגת המיכל כשיש התראות
     container.style.display = 'grid';
     container.innerHTML = this.alerts.map(a => this.createAlertCardHTML(a)).join('');
     this.setupCardEventListeners();
     this.updateCount(); // עדכון הכותרת למצב עם התראות
+    this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
   }
 
   createAlertCardHTML(alert) {
+    console.log('🔍 Creating alert card for:', alert);
+
     const timeAgo = this.getTimeAgo(alert.created_at);
+    const triggeredTime = this.getTriggeredTime(alert);
     const icon = this.getAlertIcon(alert.type);
-    const ticker = this.extractTickerFromCondition(alert.condition) || this.getRandomTicker();
-    const currentPrice = this.getCurrentPrice(ticker);
-    const dailyChange = this.getDailyChange(ticker);
-    const changeClass = this.getDailyChangeClass(ticker);
+
+    // קבלת הסימבול מהאובייקט המקושר
+    console.log('🔍 Alert related data:', {
+      related_type_id: alert.related_type_id,
+      related_object_id: alert.related_object_id,
+      related_id: alert.related_id, // בדיקה אם יש שדה אחר
+      ticker_id: alert.ticker_id,
+      ticker_symbol: alert.ticker_symbol
+    });
+
+    // נסה לקבל סימבול מהטיקר ישירות
+    let symbol = alert.ticker_symbol || this.getSymbolFromRelatedObject(alert.related_type_id, alert.related_object_id);
+    console.log('🔍 Symbol:', symbol);
 
     // שימוש בפונקציה formatAlertCondition לתרגום התנאי
+    console.log('🔍 Raw condition:', alert.condition);
     const formattedCondition = window.formatAlertCondition ? window.formatAlertCondition(alert.condition) : this.formatAlertCondition(alert.condition);
+    console.log('🔍 Formatted condition:', formattedCondition);
+
+    // נתוני דמה לטיקר
+    const currentPrice = this.getCurrentPrice(symbol);
+    const dailyChange = this.getDailyChange(symbol);
+    const changeClass = dailyChange.startsWith('+') ? 'positive' : 'negative';
+    console.log('🔍 Price data:', { currentPrice, dailyChange, changeClass });
 
     // טיפול בשדות undefined
     const message = alert.message || '';
     const relatedType = this.getRelatedTypeFromId(alert.related_type_id);
+    // נסה להשתמש ב-related_id אם related_object_id לא קיים
+    const relatedObjectId = alert.related_object_id || alert.related_id;
+    const relatedObjectDetails = this.getRelatedObjectDetails(alert.related_type_id, relatedObjectId);
 
-    return `
+    const html = `
       <div class="alert-card" data-alert-id="${alert.id}">
         <div class="alert-card-header">
-          <h4 class="alert-card-title">${icon} ${ticker || 'התראה'}</h4>
-          <span class="alert-card-time">${timeAgo}</span>
+          <h4 class="alert-card-title clickable" onclick="showLinkedObjectMessage()">${icon} ${symbol || 'התראה'}</h4>
+          <span class="alert-card-time">${triggeredTime}</span>
         </div>
         <div class="alert-card-content">
           ${message ? `<p class="alert-card-message"><strong>${message}</strong></p>` : ''}
-          <p class="alert-card-message">${formattedCondition}</p>
           <div class="alert-card-details">
-            <span class="alert-detail-item">${this.getAlertTypeDisplay(alert.type)}</span>
-            <span class="alert-detail-item">${this.getEntityTypeDisplay(relatedType)}</span>
-            <span class="alert-detail-item">$${currentPrice}</span>
-            <span class="alert-detail-item ${changeClass}">${dailyChange}%</span>
+            <span class="alert-detail-item">${formattedCondition}</span>
+            <span class="alert-detail-item ${changeClass}">${currentPrice}</span>
+            <span class="alert-detail-item ${changeClass}">${dailyChange}</span>
           </div>
         </div>
-        <div class="alert-card-footer" style="justify-content:flex-end;">
+        <div class="alert-card-footer">
+          <div class="related-object-info">
+            ${relatedObjectDetails}
+          </div>
           <button class="button-primary btn-mark-read" data-alert-id="${alert.id}">✓ קראתי</button>
         </div>
       </div>
     `;
+
+    console.log('🔍 Generated HTML:', html);
+    return html;
   }
 
   setupCardEventListeners() {
@@ -254,6 +337,7 @@ class ActiveAlertsComponent extends HTMLElement {
           card.remove();
           this.alerts = this.alerts.filter(a => a.id !== alertId);
           this.updateCount();
+          this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
           if (!this.alerts.length) this.renderAlerts();
           setTimeout(() => this.loadActiveAlerts(), 400);
         }, 220);
@@ -276,6 +360,72 @@ class ActiveAlertsComponent extends HTMLElement {
     if (hours < 24) return `לפני ${hours} שעות`;
     if (days < 7) return `לפני ${days} ימים`;
     return d.toLocaleDateString('he-IL');
+  }
+
+  /**
+   * קבלת זמן הפעלת ההתראה עם תאריך ושעה
+   */
+  getTriggeredTime(alert) {
+    // אם יש שדה triggered_at, נשתמש בו
+    if (alert.triggered_at) {
+      return this.formatDateTime(alert.triggered_at);
+    }
+
+    // אם יש שדה is_triggered ויש created_at, נשתמש ב-created_at
+    if (alert.is_triggered && alert.created_at) {
+      return this.formatDateTime(alert.created_at);
+    }
+
+    // אחרת נשתמש ב-created_at כרגיל
+    return this.getTimeAgo(alert.created_at);
+  }
+
+  /**
+   * עיצוב תאריך ושעה
+   */
+  formatDateTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    // אם זה היום - הצג רק שעה
+    if (diffDays === 0) {
+      return date.toLocaleTimeString('he-IL', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    }
+
+    // אם זה אתמול - הצג "אתמול" + שעה
+    if (diffDays === 1) {
+      return `אתמול ${date.toLocaleTimeString('he-IL', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })}`;
+    }
+
+    // אם זה השבוע - הצג יום + שעה
+    if (diffDays < 7) {
+      const dayNames = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+      const dayName = dayNames[date.getDay()];
+      return `${dayName} ${date.toLocaleTimeString('he-IL', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })}`;
+    }
+
+    // אם זה יותר משבוע - הצג תאריך + שעה
+    return `${date.toLocaleDateString('he-IL')} ${date.toLocaleTimeString('he-IL', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    })}`;
   }
 
   getAlertIcon(t) {
@@ -314,30 +464,7 @@ class ActiveAlertsComponent extends HTMLElement {
     return tickers[Math.floor(Math.random() * tickers.length)];
   }
 
-  getCurrentPrice(sym) {
-    const p = {
-      AAPL: '185.50', GOOGL: '2750.00', MSFT: '420.75', TSLA: '250.25',
-      NVDA: '850.00', SPY: '450.30', QQQ: '380.45', IWM: '185.20',
-      AMZN: '3200.00', META: '380.50', NFLX: '580.25', AMD: '120.75',
-      INTC: '45.80', ORCL: '125.40', CRM: '280.90', ADBE: '520.60'
-    };
-    return p[sym] || '—';
-  }
 
-  getDailyChange(sym) {
-    const c = {
-      AAPL: '+2.5', GOOGL: '-1.2', MSFT: '+3.1', TSLA: '-0.8',
-      NVDA: '+5.2', SPY: '+1.8', QQQ: '+2.3', IWM: '-0.5',
-      AMZN: '+1.7', META: '-2.1', NFLX: '+4.3', AMD: '+6.8',
-      INTC: '-1.5', ORCL: '+0.9', CRM: '+2.4', ADBE: '-0.7'
-    };
-    return c[sym] || '—';
-  }
-
-  getDailyChangeClass(sym) {
-    const v = this.getDailyChange(sym);
-    return typeof v === 'string' && v.startsWith('+') ? 'positive-change' : (typeof v === 'string' && v.startsWith('-') ? 'negative-change' : '');
-  }
 
   /**
    * פונקציה לתרגום תנאי התראה לעברית
@@ -351,6 +478,32 @@ class ActiveAlertsComponent extends HTMLElement {
 
     // גרסה מקומית כגיבוי
     if (!condition) return '-';
+
+    // מגוון תנאי התראות לדוגמה
+    const conditionExamples = {
+      'below': 'מחיר < 150',
+      'above': 'מחיר > 200',
+      'crosses_up': 'מחיר חוצה למעלה 180',
+      'crosses_down': 'מחיר חוצה למטה 160',
+      'volume_high': 'נפח מסחר > 1M',
+      'daily_change_positive': 'שינוי יומי > 2%',
+      'daily_change_negative': 'שינוי יומי < -1%',
+      'moving_average_cross': 'ממוצע נע חוצה 50',
+      'price_target': 'מחיר מגיע ליעד',
+      'stop_loss': 'מחיר מגיע לעצירת הפסד',
+      'breakout': 'פריצת התנגדות',
+      'breakdown': 'פריצת תמיכה',
+      'rsi_overbought': 'RSI > 70',
+      'rsi_oversold': 'RSI < 30',
+      'macd_signal': 'MACD חוצה אות',
+      'bollinger_upper': 'מחיר מגיע לגבול עליון',
+      'bollinger_lower': 'מחיר מגיע לגבול תחתון'
+    };
+
+    // אם יש תנאי מוכן, נחזיר אותו
+    if (conditionExamples[condition]) {
+      return conditionExamples[condition];
+    }
 
     const parsed = this.parseAlertCondition(condition);
 
@@ -423,6 +576,392 @@ class ActiveAlertsComponent extends HTMLElement {
 
     return { variable: '', operator: '', value: '' };
   }
+
+  /**
+ * מציאת כותרת הסקשן והוספת איקון התראות
+ */
+  setupSectionHeaderAlertIcon() {
+    // חיפוש כותרת הסקשן - נחפש את הכותרת הקרובה ביותר
+    let currentElement = this;
+    while (currentElement && currentElement !== document.body) {
+      // חיפוש בסקשן האב
+      const parentSection = currentElement.closest('.content-section, .top-section, .section-container');
+      if (parentSection) {
+        const sectionHeader = parentSection.querySelector('.section-header');
+        if (sectionHeader) {
+          this._sectionHeader = sectionHeader;
+          this.createAlertIcon();
+          break;
+        }
+      }
+
+      // חיפוש בתוך הסקשן הנוכחי (רק אם לא מצאנו בסקשן האב)
+      if (!this._sectionHeader) {
+        const sectionHeader = currentElement.querySelector('.section-header, .alerts-header');
+        if (sectionHeader) {
+          this._sectionHeader = sectionHeader;
+          this.createAlertIcon();
+          break;
+        }
+      }
+
+      currentElement = currentElement.parentElement;
+    }
+  }
+
+  /**
+   * יצירת איקון התראות בכותרת הסקשן
+   */
+  createAlertIcon() {
+    if (!this._sectionHeader) return;
+
+    // הסרת איקון קיים אם יש
+    this.removeSectionHeaderAlertIcon();
+
+    // יצירת איקון חדש
+    this._alertIcon = document.createElement('div');
+    this._alertIcon.className = 'section-alert-icon';
+    this._alertIcon.innerHTML = `
+      <div class="alert-bell-icon" title="לחץ לפתיחת התראות">
+        <span class="bell-emoji">🔔</span>
+        <span class="alert-count-badge" id="sectionAlertCount">0</span>
+      </div>
+    `;
+
+    // הוספת event listener לאיקון
+    const bellIcon = this._alertIcon.querySelector('.alert-bell-icon');
+    if (bellIcon) {
+      bellIcon.addEventListener('click', () => {
+        this.openSectionWithAlerts();
+      });
+    }
+
+    // הוספה לכותרת הסקשן - בצד שמאל (ימין ב-RTL) ליד כפתור הסגירה
+    const tableActions = this._sectionHeader.querySelector('.table-actions');
+    if (tableActions) {
+      // הוספה בתחילת table-actions (לפני כפתור הסגירה)
+      tableActions.insertBefore(this._alertIcon, tableActions.firstChild);
+    } else {
+      // אם אין table-actions, נוסיף בסוף הכותרת
+      this._sectionHeader.appendChild(this._alertIcon);
+    }
+
+    // עדכון האיקון עם מספר ההתראות הנוכחי
+    this.updateSectionHeaderAlertIcon();
+  }
+
+  /**
+   * פתיחת הסקשן שמכיל את ההתראות
+   */
+  openSectionWithAlerts() {
+    // חיפוש הסקשן שמכיל את הקומפוננט
+    let currentElement = this;
+    while (currentElement && currentElement !== document.body) {
+      // חיפוש בסקשן האב
+      const parentSection = currentElement.closest('.content-section, .top-section, .section-container');
+      if (parentSection) {
+        // חיפוש כפתור פתיחה/סגירה של הסקשן
+        const toggleBtn = parentSection.querySelector('.filter-toggle-btn, .top-toggle-btn, [onclick*="toggle"]');
+        if (toggleBtn) {
+          // בדיקה אם הסקשן סגור
+          const sectionBody = parentSection.querySelector('.section-body, .alerts-cards-container');
+          if (sectionBody && sectionBody.style.display === 'none') {
+            // לחיצה על כפתור הפתיחה
+            toggleBtn.click();
+          }
+        }
+        break;
+      }
+      currentElement = currentElement.parentElement;
+    }
+
+    // גלילה לסקשן ההתראות
+    setTimeout(() => {
+      this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  }
+
+  /**
+ * עדכון איקון ההתראות בכותרת הסקשן
+ */
+  updateSectionHeaderAlertIcon() {
+    // בדיקה אם האיקון קיים, אם לא - יצירתו מחדש
+    if (!this._alertIcon || !this._alertIcon.isConnected) {
+      this.setupSectionHeaderAlertIcon();
+      return;
+    }
+
+    const countBadge = this._alertIcon.querySelector('#sectionAlertCount');
+    if (countBadge) {
+      countBadge.textContent = this.alerts.length;
+
+      // בדיקה אם הסקשן סגור
+      const isSectionClosed = this.isSectionClosed();
+
+      // הצגה/הסתרה לפי מספר ההתראות ומצב הסקשן
+      if (this.alerts.length > 0 && isSectionClosed) {
+        this._alertIcon.style.display = 'inline-flex';
+        countBadge.style.display = 'inline-flex';
+
+        // הוספת אפקט הדגשה כשיש התראות חדשות
+        this._alertIcon.classList.add('has-alerts');
+      } else {
+        this._alertIcon.style.display = 'none';
+        countBadge.style.display = 'none';
+        this._alertIcon.classList.remove('has-alerts');
+      }
+    }
+
+    // עדכון האיקון הפנימי
+    this.updateInternalAlertIcon();
+  }
+
+  /**
+   * עדכון האיקון הפנימי של הקומפוננט
+   */
+  updateInternalAlertIcon() {
+    const titleCountBadge = this.querySelector('.title-count-badge');
+    if (titleCountBadge) {
+      titleCountBadge.textContent = this.alerts.length;
+    }
+  }
+
+  /**
+   * בדיקה אם הסקשן סגור
+   */
+  isSectionClosed() {
+    // חיפוש הסקשן שמכיל את הקומפוננט
+    let currentElement = this;
+    while (currentElement && currentElement !== document.body) {
+      const parentSection = currentElement.closest('.content-section, .top-section, .section-container');
+      if (parentSection) {
+        // חיפוש הגוף של הסקשן
+        const sectionBody = parentSection.querySelector('.section-body, .alerts-cards-container');
+        if (sectionBody) {
+          // בדיקה אם הגוף מוסתר
+          return sectionBody.style.display === 'none' ||
+            sectionBody.style.height === '0px' ||
+            sectionBody.classList.contains('collapsed');
+        }
+        break;
+      }
+      currentElement = currentElement.parentElement;
+    }
+    return false;
+  }
+
+  /**
+   * הגדרת האזנה לשינויים במצב הסקשן
+   */
+  setupSectionToggleListener() {
+    // חיפוש הסקשן שמכיל את הקומפוננט
+    let currentElement = this;
+    while (currentElement && currentElement !== document.body) {
+      const parentSection = currentElement.closest('.content-section, .top-section, .section-container');
+      if (parentSection) {
+        // חיפוש כפתור הפתיחה/סגירה
+        const toggleBtn = parentSection.querySelector('.filter-toggle-btn, .top-toggle-btn, [onclick*="toggle"]');
+        if (toggleBtn) {
+          // האזנה ללחיצות על כפתור הפתיחה/סגירה
+          toggleBtn.addEventListener('click', () => {
+            // עדכון האיקון אחרי קצת זמן (לתת לסקשן להתעדכן)
+            setTimeout(() => {
+              this.updateSectionHeaderAlertIcon();
+            }, 100);
+          });
+        }
+        break;
+      }
+      currentElement = currentElement.parentElement;
+    }
+  }
+
+  /**
+   * בדיקה שהסגנונות נטענו
+   */
+  checkStylesLoaded() {
+    // בדיקה שהסגנונות שלנו נטענו
+    const styleSheets = Array.from(document.styleSheets);
+    const hasStyles = styleSheets.some(sheet => {
+      try {
+        return sheet.href && sheet.href.includes('styles.css');
+      } catch (e) {
+        return false;
+      }
+    });
+
+    if (!hasStyles) {
+      console.warn('⚠️ Active Alerts Component: styles.css not found - icon may not display correctly');
+    } else {
+      console.log('✅ Active Alerts Component: styles loaded successfully');
+    }
+  }
+
+  /**
+   * יצירת כותרת עם איקון פעמון ומספר
+   */
+  createTitleWithIcon() {
+    return `
+      <span class="title-bell-icon">
+        <span class="bell-emoji">🔔</span>
+        <span class="title-count-badge">${this.alerts.length}</span>
+      </span>
+      התראות פעילות
+    `;
+  }
+
+  /**
+   * קבלת פרטי האובייקט המקושר - כמו בטבלת ההתראות
+   */
+  getRelatedObjectDetails(relatedTypeId, relatedObjectId) {
+    console.log('🔍 Getting related object details:', { relatedTypeId, relatedObjectId });
+
+    // בדיקה אם השדות קיימים
+    if (relatedTypeId === null || relatedTypeId === undefined || relatedObjectId === null || relatedObjectId === undefined) {
+      console.log('🔍 No related object - showing general');
+      return '<span class="no-linked-object">כללי</span>';
+    }
+
+    // קביעת האובייקט המקושר לפי הטבלה
+    let relatedDisplay = '';
+    let relatedIcon = '🔗'; // איקון קישור קבוע
+
+    switch (relatedTypeId) {
+      case 1: // חשבון
+        relatedDisplay = `חשבון ${relatedObjectId}`;
+        break;
+      case 2: // טרייד
+        relatedDisplay = `טרייד ${relatedObjectId}`;
+        break;
+      case 3: // תוכנית
+        relatedDisplay = `תוכנית ${relatedObjectId}`;
+        break;
+      case 4: // טיקר - נציג את הסימבול עם המילה "טיקר:"
+        const symbol = this.getSymbolFromRelatedObject(relatedTypeId, relatedObjectId);
+        relatedDisplay = symbol ? `טיקר: ${symbol}` : `טיקר ${relatedObjectId}`;
+        break;
+      default:
+        relatedDisplay = `אובייקט ${relatedObjectId}`;
+    }
+
+    console.log('🔍 Related object display:', relatedDisplay);
+
+    return `
+      <div class="linked-object-details">
+        <span class="linked-object-icon">${relatedIcon}</span>
+        <span class="linked-object-text">${relatedDisplay}</span>
+      </div>
+    `;
+  }
+
+  /**
+   * קבלת הסימבול מהאובייקט המקושר
+   */
+  getSymbolFromRelatedObject(relatedTypeId, relatedObjectId) {
+    console.log('🔍 getSymbolFromRelatedObject called with:', { relatedTypeId, relatedObjectId });
+
+    if (!relatedObjectId) {
+      console.log('🔍 No relatedObjectId, returning null');
+      return null;
+    }
+
+    const relatedType = this.getRelatedTypeFromId(relatedTypeId);
+    console.log('🔍 Related type:', relatedType);
+
+    // כרגע נחזיר סימבול דמה - בהמשך יטען מהשרת
+    // בהתבסס על סוג האובייקט המקושר
+    switch (relatedType) {
+      case 'ticker':
+        // אם זה טיקר, נחזיר סימבול אקראי
+        const tickerSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'IWM', 'AMZN', 'META', 'NFLX', 'AMD', 'INTC', 'ORCL', 'CRM', 'ADBE'];
+        const symbol = tickerSymbols[relatedObjectId % tickerSymbols.length];
+        console.log('🔍 Ticker symbol:', symbol);
+        return symbol;
+      case 'trade':
+        // אם זה טרייד, נחזיר סימבול דמה
+        const tradeSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'];
+        return tradeSymbols[relatedObjectId % tradeSymbols.length];
+      case 'trade_plan':
+        // אם זה תכנון טרייד, נחזיר סימבול דמה
+        const planSymbols = ['SPY', 'QQQ', 'IWM', 'AMZN', 'META'];
+        return planSymbols[relatedObjectId % planSymbols.length];
+      case 'account':
+        // אם זה חשבון, נחזיר שם החשבון
+        const accountNames = ['חשבון מעודכן', 'חשבון השקעות', 'חשבון מסחר', 'חשבון פנסיה'];
+        return accountNames[relatedObjectId % accountNames.length];
+      default:
+        console.log('🔍 Unknown related type, returning התראה');
+        return 'התראה';
+    }
+  }
+
+  /**
+   * קבלת מחיר נוכחי (נתוני דמה)
+   */
+  getCurrentPrice(symbol) {
+    if (!symbol) return 'N/A';
+
+    // נתוני דמה - בהמשך יטען מהשרת
+    const prices = {
+      'AAPL': '$150.25',
+      'GOOGL': '$2,850.75',
+      'MSFT': '$320.50',
+      'TSLA': '$245.80',
+      'NVDA': '$450.30',
+      'SPY': '$450.30',
+      'QQQ': '$380.45',
+      'IWM': '$185.20',
+      'AMZN': '$3,200.00',
+      'META': '$380.50',
+      'NFLX': '$580.25',
+      'AMD': '$120.75',
+      'INTC': '$45.80',
+      'ORCL': '$125.40',
+      'CRM': '$280.90',
+      'ADBE': '$520.60'
+    };
+
+    return prices[symbol] || '$100.00';
+  }
+
+  /**
+   * קבלת שינוי יומי (נתוני דמה)
+   */
+  getDailyChange(symbol) {
+    if (!symbol) return 'N/A';
+
+    // נתוני דמה - בהמשך יטען מהשרת
+    const changes = {
+      'AAPL': '+2.5%',
+      'GOOGL': '-1.2%',
+      'MSFT': '+3.1%',
+      'TSLA': '-0.8%',
+      'NVDA': '+5.2%',
+      'SPY': '+1.8%',
+      'QQQ': '+2.3%',
+      'IWM': '-0.5%',
+      'AMZN': '+1.7%',
+      'META': '-2.1%',
+      'NFLX': '+4.3%',
+      'AMD': '+6.8%',
+      'INTC': '-1.5%',
+      'ORCL': '+0.9%',
+      'CRM': '+2.4%',
+      'ADBE': '-0.7%'
+    };
+
+    return changes[symbol] || '+0.0%';
+  }
+
+  /**
+   * הסרת איקון ההתראות מהכותרת
+   */
+  removeSectionHeaderAlertIcon() {
+    if (this._alertIcon && this._alertIcon.parentNode) {
+      this._alertIcon.parentNode.removeChild(this._alertIcon);
+      this._alertIcon = null;
+    }
+  }
 }
 
 customElements.define('active-alerts', ActiveAlertsComponent);
@@ -433,6 +972,20 @@ window.updateActiveAlertsComponent = function () {
   components.forEach(component => {
     if (component.checkGlobalFunctions && !component._functionsChecked) {
       component.checkGlobalFunctions();
+    }
+    // עדכון איקון ההתראות
+    if (component.updateSectionHeaderAlertIcon) {
+      component.updateSectionHeaderAlertIcon();
+    }
+  });
+};
+
+// פונקציה לעדכון איקון ההתראות בכל הקומפוננטים
+window.updateAllAlertIcons = function () {
+  const components = document.querySelectorAll('active-alerts');
+  components.forEach(component => {
+    if (component.updateSectionHeaderAlertIcon) {
+      component.updateSectionHeaderAlertIcon();
     }
   });
 };
@@ -447,4 +1000,34 @@ window.addEventListener('load', () => {
   }, 1000);
 });
 
+// האזנה לשינויים בדף (כמו פתיחה/סגירה של סקשנים)
+window.addEventListener('DOMContentLoaded', () => {
+  // עדכון איקונים אחרי טעינת הדף
+  setTimeout(() => {
+    window.updateAllAlertIcons();
+  }, 500);
+});
+
+// האזנה לשינויים ב-URL (ניווט בין עמודים)
+let currentUrl = window.location.href;
+window.addEventListener('popstate', () => {
+  if (currentUrl !== window.location.href) {
+    currentUrl = window.location.href;
+    // עדכון איקונים אחרי ניווט
+    setTimeout(() => {
+      window.updateAllAlertIcons();
+    }, 300);
+  }
+});
+
+// פונקציה גלובלית להצגת הודעה על אובייקט מקושר
+window.showLinkedObjectMessage = function () {
+  if (window.showInfoNotification) {
+    window.showInfoNotification('אובייקט מקושר', 'הקישור לאובייקט המקושר יופעל בהמשך');
+  } else {
+    alert('הקישור לאובייקט המקושר יופעל בהמשך');
+  }
+};
+
 // הפונקציות formatAlertCondition ו-parseAlertCondition הועברו לקובץ alerts.js
+

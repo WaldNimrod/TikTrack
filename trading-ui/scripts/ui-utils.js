@@ -96,9 +96,22 @@ function confirmSecondAction() {
     }
 }
 
+// ===== Color Functions =====
+
+/**
+ * פונקציה לצביעת סכומים (חיובי/שלילי)
+ * Function for coloring amounts (positive/negative)
+ */
+function colorAmount(amount, displayText = null) {
+    const text = displayText || (amount >= 0 ? `+$${amount.toFixed(2)}` : `-$${Math.abs(amount).toFixed(2)}`);
+    const className = amount >= 0 ? 'profit-positive' : 'profit-negative';
+    return `<span class="${className}">${text}</span>`;
+}
+
 // ===== Export Functions =====
 window.showModalNotification = showModalNotification;
 window.showSecondConfirmationModal = showSecondConfirmationModal;
 window.confirmSecondAction = confirmSecondAction;
+window.colorAmount = colorAmount;
 
 console.log('✅ UI Utils loaded successfully');

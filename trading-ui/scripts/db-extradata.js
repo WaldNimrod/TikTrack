@@ -17,65 +17,14 @@
 
 // ===== פונקציות לפתיחה/סגירה של סקשנים =====
 
-// פונקציה לפתיחה/סגירה של כל הסקשנים
+// פונקציה לפתיחה/סגירה של כל הסקשנים - משתמשת בפונקציה הגלובלית מ-main.js
 function toggleAllSections() {
-    console.log('🔄 toggleAllSections נקראה');
-
-    const topSection = document.querySelector('.top-section');
-    const contentSections = document.querySelectorAll('.content-section');
-
-    if (!topSection) {
-        console.error('❌ לא נמצא top-section');
-        return;
+    console.log('🔄 toggleAllSections נקראה - שימוש בפונקציה הגלובלית');
+    if (typeof window.toggleAllSections === 'function') {
+        window.toggleAllSections();
+    } else {
+        console.error('❌ הפונקציה הגלובלית toggleAllSections לא זמינה');
     }
-
-    // בדיקה אם כל הסקשנים סגורים
-    const topSectionBody = topSection.querySelector('.section-body');
-    const isTopCollapsed = topSectionBody ? topSectionBody.style.display === 'none' : false;
-
-    let allSectionsCollapsed = isTopCollapsed;
-    contentSections.forEach(section => {
-        const sectionBody = section.querySelector('.section-body');
-        if (sectionBody && sectionBody.style.display !== 'none') {
-            allSectionsCollapsed = false;
-        }
-    });
-
-    // אם כל הסקשנים סגורים - פתח את כולם
-    // אם יש סקשנים פתוחים - סגור את כולם
-    const shouldCollapse = !allSectionsCollapsed;
-
-    // סגירה/פתיחה של top-section
-    if (topSectionBody) {
-        topSectionBody.style.display = shouldCollapse ? 'none' : 'block';
-        localStorage.setItem('dbExtradataTopSectionCollapsed', shouldCollapse);
-    }
-
-    // סגירה/פתיחה של כל content-sections
-    contentSections.forEach((section, index) => {
-        const sectionBody = section.querySelector('.section-body');
-        const sectionToggleBtn = section.querySelector('.filter-toggle-btn');
-        const sectionIcon = sectionToggleBtn ? sectionToggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody) {
-            sectionBody.style.display = shouldCollapse ? 'none' : 'block';
-            localStorage.setItem(`dbExtradataSection${index}Collapsed`, shouldCollapse);
-
-            // עדכון האייקון של הסקשן
-            if (sectionIcon) {
-                sectionIcon.textContent = shouldCollapse ? '▼' : '▲';
-            }
-        }
-    });
-
-    // עדכון האייקון של הכפתור הראשי
-    const mainToggleBtn = topSection.querySelector('button[onclick="toggleAllSections()"]');
-    const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
-    if (mainIcon) {
-        mainIcon.textContent = shouldCollapse ? '▼' : '▲';
-    }
-
-    console.log(`✅ ${shouldCollapse ? 'סגירת' : 'פתיחת'} כל הסקשנים הושלמה`);
 }
 
 // פונקציה לפתיחה/סגירה של סקשן מטבעות

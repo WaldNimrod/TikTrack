@@ -410,11 +410,7 @@ function updatePageSummaryStats() {
 /**
  * פורמט תאריך ושעה
  */
-function formatDateTime(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleString('he-IL');
-}
+// פונקציות formatDateTime מוגדרות כעת ב-main.js
 
 // ========================================
 // פונקציות אתחול

@@ -69,7 +69,8 @@
   <!-- 6. Header system styles (highest priority) -->
   <link rel="stylesheet" href="styles/header-system.css">
 
-
+  <!-- Bootstrap JS - חייב להיות ראשון -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Modular grid files -->
   <script src="scripts/header-system.js"></script>
@@ -96,7 +97,7 @@
 
 
       <!-- Planning area - top-Section -->
-      <div class="top-section">
+      <div class="top-section planning-page">
         <!-- Planning header -->
         <div class="section-header">
           <div class="table-title">
@@ -120,6 +121,9 @@
           <!-- Active alerts web component -->
           <active-alerts></active-alerts>
 
+          <!-- Alerts cards container -->
+          <div class="alerts-cards" id="alertsCards"></div>
+
           <!-- Data summary -->
           <div class="info-summary" id="summaryStats">
             <div>סה"כ תכנונים: <strong id="totalDesigns">0</strong></div>
@@ -136,7 +140,7 @@
       <!-- Main content -->
       <div class="main-content">
         <!-- My planning area - content-section -->
-        <div class="content-section">
+        <div class="content-section planning-page">
           <!-- My planning header -->
           <div class="section-header">
             <div class="table-title">
@@ -254,11 +258,11 @@
   <!-- Add Trade Plan Modal -->
   <div class="modal fade" id="addTradePlanModal" tabindex="-1" aria-labelledby="addTradePlanModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addTradePlanModalLabel">הוסף תכנון חדש</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title" id="addTradePlanModalLabel" style="order: 1;">הוסף תכנון חדש</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2;"></button>
         </div>
         <div class="modal-body">
           <form id="addTradePlanForm">
@@ -289,7 +293,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <div class="mb-3">
                   <label for="addTradePlanInvestmentType" class="form-label">
                     סוג השקעה <span class="text-danger">*</span>
@@ -305,7 +309,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <div class="mb-3">
                   <label for="addTradePlanSide" class="form-label">
                     צד <span class="text-danger">*</span>
@@ -320,7 +324,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-4">
+            </div>
+            <div class="row">
+              <div class="col-md-6">
                 <div class="mb-3">
                   <label for="addTradePlanPlannedAmount" class="form-label">
                     סכום מתוכנן <span class="text-danger">*</span>
@@ -332,14 +338,14 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="row">
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="addTradePlanStopPrice" class="form-label">מחיר עצירה</label>
                   <input type="number" step="0.01" class="form-control" id="addTradePlanStopPrice">
                 </div>
               </div>
+            </div>
+            <div class="row">
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="addTradePlanTargetPrice" class="form-label">מחיר יעד</label>
@@ -347,6 +353,7 @@
                 </div>
               </div>
             </div>
+
             <div class="mb-3">
               <label for="addTradePlanEntryConditions" class="form-label">תנאי כניסה</label>
               <textarea class="form-control" id="addTradePlanEntryConditions" rows="2"></textarea>
@@ -358,9 +365,24 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary"
-            onclick="if (typeof window.saveNewTradePlan === 'function') { window.saveNewTradePlan(); } else { console.error('saveNewTradePlan function not found'); }">שמור</button>
+          <div class="d-flex justify-content-between w-100">
+            <!-- כפתורים בצד שמאל -->
+            <div>
+              <button type="button" class="btn btn-info me-2" onclick="addImportantNote()">
+                <span class="btn-icon">📝</span> יש לי עוד משהו חשוב
+              </button>
+              <button type="button" class="btn btn-warning" onclick="addReminder()">
+                <span class="btn-icon">⏰</span> תזכיר לי כש...
+              </button>
+            </div>
+
+            <!-- כפתורים בצד ימין -->
+            <div>
+              <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ביטול</button>
+              <button type="button" class="btn btn-success"
+                onclick="if (typeof window.saveNewTradePlan === 'function') { window.saveNewTradePlan(); } else { console.error('saveNewTradePlan function not found'); }">שמור</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

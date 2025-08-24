@@ -265,6 +265,23 @@ body {
   font-size: 16px;
 }
 
+.loading-spinner {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--apple-border-light);
+  border-radius: 50%;
+  border-top-color: var(--logo-orange);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* סגנונות לדפדפן */
 .pagination-container {
   display: flex;

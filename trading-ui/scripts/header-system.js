@@ -1248,6 +1248,13 @@ class HeaderSystem {
     console.log('🔍 setActiveMenuItem - navItems found:', navItems.length);
     console.log('🔍 setActiveMenuItem - dropdownItems found:', dropdownItems.length);
 
+    // בדיקה נוספת - הדפסת כל הכפתורים שנמצאו
+    navItems.forEach((item, index) => {
+      const link = item.querySelector('.tiktrack-nav-link');
+      const href = link ? link.getAttribute('href') : 'no href';
+      console.log(`🔍 Nav item ${index}:`, item.className, 'href:', href);
+    });
+
     // איפוס כל הפריטים
     navItems.forEach(item => item.classList.remove('active'));
     dropdownItems.forEach(item => item.classList.remove('active'));
@@ -1260,6 +1267,7 @@ class HeaderSystem {
         if (href && href !== '#' && currentPath.includes(href)) {
           item.classList.add('active');
           console.log('✅ Added active to nav item:', href);
+          console.log('✅ Item classes after adding active:', item.className);
         }
       }
     });
@@ -1288,7 +1296,14 @@ class HeaderSystem {
       }
     }
 
-
+    // בדיקה סופית - כמה פריטים פעילים יש
+    const activeItems = document.querySelectorAll('#unified-header .tiktrack-nav-item.active');
+    console.log('🔍 Final check - active items found:', activeItems.length);
+    activeItems.forEach((item, index) => {
+      const link = item.querySelector('.tiktrack-nav-link');
+      const href = link ? link.getAttribute('href') : 'no href';
+      console.log(`🔍 Active item ${index}:`, item.className, 'href:', href);
+    });
   }
 
   // הוספת event listeners לכפתורי הניווט (מתוך header-system.js)
@@ -2763,3 +2778,191 @@ function clearFilterMenuTimers(menu) {
     menu._filterHandleMouseLeave = null;
   }
 }
+
+// ===== פונקציות בחירת אפשרויות פילטר =====
+
+/**
+ * בחירת אפשרות פילטר סטטוס
+ */
+function selectStatusOption(status) {
+  console.log('🔄 selectStatusOption called with status:', status);
+  
+  // עדכון הטקסט הנבחר
+  const selectedStatusElement = document.getElementById('selectedStatus');
+  if (selectedStatusElement) {
+    selectedStatusElement.textContent = status === 'הכול' ? 'כל סטטוס' : status;
+  }
+  
+  // עדכון סימון ויזואלי
+  const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
+  statusItems.forEach(item => {
+    const itemValue = item.getAttribute('data-value');
+    if (itemValue === status) {
+      item.classList.add('selected');
+    } else {
+      item.classList.remove('selected');
+    }
+  });
+  
+  // סגירת התפריט
+  closeStatusFilter();
+  
+  // הפעלת הפילטר
+  applyStatusFilter(status);
+}
+
+/**
+ * בחירת אפשרות פילטר טיפוס
+ */
+function selectTypeOption(type) {
+  console.log('🔄 selectTypeOption called with type:', type);
+  
+  // עדכון הטקסט הנבחר
+  const selectedTypeElement = document.getElementById('selectedType');
+  if (selectedTypeElement) {
+    selectedTypeElement.textContent = type === 'הכול' ? 'כל טיפוס' : type;
+  }
+  
+  // עדכון סימון ויזואלי
+  const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
+  typeItems.forEach(item => {
+    const itemValue = item.getAttribute('data-value');
+    if (itemValue === type) {
+      item.classList.add('selected');
+    } else {
+      item.classList.remove('selected');
+    }
+  });
+  
+  // סגירת התפריט
+  closeTypeFilter();
+  
+  // הפעלת הפילטר
+  applyTypeFilter(type);
+}
+
+/**
+ * בחירת אפשרות פילטר חשבון
+ */
+function selectAccountOption(account) {
+  console.log('🔄 selectAccountOption called with account:', account);
+  
+  // עדכון הטקסט הנבחר
+  const selectedAccountElement = document.getElementById('selectedAccount');
+  if (selectedAccountElement) {
+    selectedAccountElement.textContent = account === 'הכול' ? 'כל חשבון' : account;
+  }
+  
+  // עדכון סימון ויזואלי
+  const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
+  accountItems.forEach(item => {
+    const itemValue = item.getAttribute('data-value');
+    if (itemValue === account) {
+      item.classList.add('selected');
+    } else {
+      item.classList.remove('selected');
+    }
+  });
+  
+  // סגירת התפריט
+  closeAccountFilter();
+  
+  // הפעלת הפילטר
+  applyAccountFilter(account);
+}
+
+/**
+ * בחירת אפשרות פילטר תאריכים
+ */
+function selectDateRangeOption(dateRange) {
+  console.log('🔄 selectDateRangeOption called with dateRange:', dateRange);
+  
+  // עדכון הטקסט הנבחר
+  const selectedDateRangeElement = document.getElementById('selectedDateRange');
+  if (selectedDateRangeElement) {
+    selectedDateRangeElement.textContent = dateRange === 'כל זמן' ? 'כל זמן' : dateRange;
+  }
+  
+  // עדכון סימון ויזואלי
+  const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+  dateRangeItems.forEach(item => {
+    const itemValue = item.getAttribute('data-value');
+    if (itemValue === dateRange) {
+      item.classList.add('selected');
+    } else {
+      item.classList.remove('selected');
+    }
+  });
+  
+  // סגירת התפריט
+  closeDateRangeFilter();
+  
+  // הפעלת הפילטר
+  applyDateRangeFilter(dateRange);
+}
+
+// ===== פונקציות הפעלת פילטרים =====
+
+/**
+ * הפעלת פילטר סטטוס
+ */
+function applyStatusFilter(status) {
+  console.log('🔄 applyStatusFilter called with status:', status);
+  
+  // כאן תהיה הלוגיקה של הפעלת הפילטר
+  // כרגע רק לוג - יש להוסיף את הלוגיקה האמיתית בהמשך
+  if (window.simpleFilter) {
+    window.simpleFilter.applyStatusFilter(status);
+  }
+}
+
+/**
+ * הפעלת פילטר טיפוס
+ */
+function applyTypeFilter(type) {
+  console.log('🔄 applyTypeFilter called with type:', type);
+  
+  // כאן תהיה הלוגיקה של הפעלת הפילטר
+  // כרגע רק לוג - יש להוסיף את הלוגיקה האמיתית בהמשך
+  if (window.simpleFilter) {
+    window.simpleFilter.applyTypeFilter(type);
+  }
+}
+
+/**
+ * הפעלת פילטר חשבון
+ */
+function applyAccountFilter(account) {
+  console.log('🔄 applyAccountFilter called with account:', account);
+  
+  // כאן תהיה הלוגיקה של הפעלת הפילטר
+  // כרגע רק לוג - יש להוסיף את הלוגיקה האמיתית בהמשך
+  if (window.simpleFilter) {
+    window.simpleFilter.applyAccountFilter(account);
+  }
+}
+
+/**
+ * הפעלת פילטר תאריכים
+ */
+function applyDateRangeFilter(dateRange) {
+  console.log('🔄 applyDateRangeFilter called with dateRange:', dateRange);
+  
+  // כאן תהיה הלוגיקה של הפעלת הפילטר
+  // כרגע רק לוג - יש להוסיף את הלוגיקה האמיתית בהמשך
+  if (window.simpleFilter) {
+    window.simpleFilter.applyDateRangeFilter(dateRange);
+  }
+}
+
+// ייצוא פונקציות בחירה לגלובל
+window.selectStatusOption = selectStatusOption;
+window.selectTypeOption = selectTypeOption;
+window.selectAccountOption = selectAccountOption;
+window.selectDateRangeOption = selectDateRangeOption;
+
+// ייצוא פונקציות הפעלת פילטרים לגלובל
+window.applyStatusFilter = applyStatusFilter;
+window.applyTypeFilter = applyTypeFilter;
+window.applyAccountFilter = applyAccountFilter;
+window.applyDateRangeFilter = applyDateRangeFilter;

@@ -40,7 +40,7 @@
  * updatePrimaryCurrency('EUR'); // Shows error message and reverts
  */
 async function updatePrimaryCurrency(value) {
-  console.log('🔄 עדכון מטבע ראשי:', value);
+          // עדכון מטבע ראשי
 
   // בדיקה - רק USD מותר
   if (value !== 'USD') {
@@ -73,7 +73,7 @@ async function updatePrimaryCurrency(value) {
       // עדכון התצוגה עם הערך החדש
       selectElement.value = value;
       showNotification(`מטבע ראשי עודכן ל-${value}`, 'success');
-      console.log('✅ מטבע ראשי עודכן בהצלחה');
+              // מטבע ראשי עודכן בהצלחה
     } else {
       // אם השמירה נכשלה, החזרת הערך הקודם
       const currentValue = await getCurrentPreference('primaryCurrency');
@@ -103,7 +103,7 @@ async function updatePrimaryCurrency(value) {
        * updateTimezone('Asia/Jerusalem');
        */
 async function updateTimezone(value) {
-  console.log('🔄 עדכון אזור זמן:', value);
+          // עדכון אזור זמן
 
   // מסמן שיש שינויים
   markAsChanged();
@@ -123,7 +123,7 @@ async function updateTimezone(value) {
       // עדכון התצוגה עם הערך החדש
       selectElement.value = value;
       showNotification(`אזור זמן עודכן ל-${value}`, 'success');
-      console.log('✅ אזור זמן עודכן בהצלחה');
+              // אזור זמן עודכן בהצלחה
     } else {
       // אם השמירה נכשלה, החזרת הערך הקודם
       const currentValue = await getCurrentPreference('timezone');
@@ -162,7 +162,7 @@ async function updateTimezone(value) {
  * updateConsoleCleanupInterval('0');
  */
 async function updateConsoleCleanupInterval(value) {
-  console.log('🔄 עדכון זמן ניקוי קונסולה:', value);
+          // עדכון זמן ניקוי קונסולה
 
   // וידוא שהערך תקין
   const numValue = parseInt(value);

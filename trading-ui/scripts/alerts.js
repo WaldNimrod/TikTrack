@@ -121,7 +121,7 @@ async function loadAlertsData() {
 
   } catch (error) {
     console.error('Error loading alerts data:', error);
-            // משתמש בנתוני דמו
+    // משתמש בנתוני דמו
 
     // שימוש בנתוני דמו
     alertsData = demoAlerts;
@@ -286,7 +286,7 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
 function updateAlertsTable(alerts) {
   const tbody = document.querySelector('#alertsTable tbody');
   if (!tbody) {
-    console.log('📋 No alerts table found on this page - skipping table update');
+    // No alerts table found on this page - skipping table update
     return;
   }
 
@@ -685,7 +685,7 @@ async function loadModalData() {
     const tradePlans = tradePlansResponse.data || tradePlansResponse || [];
     const tickers = tickersResponse.data || tickersResponse || [];
 
-    console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
+    // נטענו נתונים נוספים
 
     // עדכון רדיו באטונים
     updateRadioButtons(accounts, trades, tradePlans, tickers);
@@ -1090,7 +1090,7 @@ async function saveAlert() {
     is_triggered: 'false'
   };
 
-  console.log('שולח התראה חדשה:', alertData);
+  // שולח התראה חדשה
 
   try {
     const response = await fetch('/api/v1/alerts/', {
@@ -1103,7 +1103,7 @@ async function saveAlert() {
 
     if (response.ok) {
       const newAlert = await response.json();
-      console.log('התראה נשמרה בהצלחה:', newAlert);
+      // התראה נשמרה בהצלחה
 
       // סגירת המודל
       closeModal('addAlertModal');
@@ -1186,7 +1186,7 @@ function editAlert(alertId) {
     const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
     if (relatedObjectSelect && alert.related_id) {
       relatedObjectSelect.value = alert.related_id;
-      console.log('✅ נבחר אובייקט:', alert.related_id, 'בסוג:', alert.related_type_id);
+      // נבחר אובייקט
     }
   }, 100);
 
@@ -1483,7 +1483,7 @@ async function updateAlert() {
     is_triggered: document.getElementById('editAlertIsTriggered').value
   };
 
-  console.log('מעדכן התראה:', alertId, alertData);
+  // מעדכן התראה
   console.log('🔍 בדיקת נתונים לפני שליחה:');
   console.log('- related_type_id:', relatedTypeId, '(valid:', !isNaN(relatedTypeId), ')');
   console.log('- related_id:', relatedId, '(valid:', !isNaN(relatedId), ')');
@@ -1501,7 +1501,7 @@ async function updateAlert() {
 
     if (response.ok) {
       const updatedAlert = await response.json();
-      console.log('התראה עודכנה בהצלחה:', updatedAlert);
+      // התראה עודכנה בהצלחה
 
       // סגירת המודל
       closeModal('editAlertModal');
@@ -1529,14 +1529,14 @@ async function deleteAlert(alertId) {
   }
 
   try {
-    console.log('מוחק התראה:', alertId);
+    // מוחק התראה
 
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
       method: 'DELETE'
     });
 
     if (response.ok) {
-      console.log('התראה נמחקה בהצלחה');
+      // התראה נמחקה בהצלחה
 
       // רענון הנתונים
       loadAlertsData();
@@ -1552,7 +1552,7 @@ async function deleteAlert(alertId) {
           errorMessage = errorData.error.message;
         }
       } catch (e) {
-        console.log('לא ניתן לקרוא פרטי שגיאה מהשרת');
+        // לא ניתן לקרוא פרטי שגיאה מהשרת
       }
 
       throw new Error(errorMessage);
@@ -1784,7 +1784,7 @@ window.loadAlerts = loadAlerts;
 
 // ניקוי הודעות קונסולה אחרי זמן קצר
 setTimeout(() => {
-  console.log('🧹 Clearing console messages to reduce clutter...');
+  // Clearing console messages
   if (console.clear) {
     console.clear();
   }

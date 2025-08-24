@@ -582,8 +582,11 @@ function updateExecutionsTable(executions) {
 /**
  * פונקציה להצגת מודל עריכת טרייד
  */
-function showEditTradeModal(trade) {
+async function showEditTradeModal(trade) {
   console.log('הצגת מודל עריכת טרייד:', trade);
+
+  // טעינת נתונים למודל העריכה
+  await loadEditModalData();
 
   // Populate the edit form with trade data
   const editForm = document.getElementById('editTradeForm');
@@ -657,6 +660,82 @@ function showEditTradeModal(trade) {
     modal.show();
   } else {
     console.error('Edit trade modal element not found');
+  }
+}
+
+/**
+ * טעינת נתונים למודל העריכה
+ */
+async function loadEditModalData() {
+  console.log('🔄 loadEditModalData מתחילה');
+  try {
+    // טעינת חשבונות ותוכניות טרייד
+    const [accountsResponse, tradePlansResponse] = await Promise.all([
+      fetch('/api/v1/accounts/'),
+      fetch('/api/v1/trade_plans/')
+    ]);
+
+    if (!accountsResponse.ok || !tradePlansResponse.ok) {
+      throw new Error('שגיאה בטעינת נתונים');
+    }
+
+    const accounts = await accountsResponse.json();
+    const tradePlans = await tradePlansResponse.json();
+
+    console.log('✅ נתונים נטענו למודל עריכה:', {
+      accounts: accounts.data.length,
+      tradePlans: tradePlans.data.length
+    });
+
+    // מילוי רשימת חשבונות - רק חשבונות פתוחים
+    const accountSelect = document.getElementById('editTradeAccountId');
+    if (accountSelect) {
+      accountSelect.innerHTML = '<option value="">בחר חשבון</option>';
+      const openAccounts = accounts.data.filter(account => account.status === 'open');
+      openAccounts.forEach(account => {
+        const option = document.createElement('option');
+        option.value = account.id;
+        option.textContent = `${account.name} (${account.currency})`;
+        accountSelect.appendChild(option);
+      });
+    }
+
+    // מילוי רשימת תוכניות טרייד - רק תוכניות פתוחות
+    const tradePlanSelect = document.getElementById('editTradeTradePlanId');
+    if (tradePlanSelect) {
+      tradePlanSelect.innerHTML = '<option value="">בחר תוכנית טרייד</option>';
+      const openPlans = tradePlans.data.filter(plan => plan.status === 'open');
+      openPlans.forEach(plan => {
+        const option = document.createElement('option');
+        option.value = plan.id;
+        // הצגת: סימבול | צד | סוג השקעה | תאריך
+        const createdDate = new Date(plan.created_at).toLocaleDateString('he-IL');
+        const side = plan.side || 'לא מוגדר';
+        const investmentType = plan.investment_type || 'לא מוגדר';
+
+        // קבלת סימבול הטיקר - בדיקה אם יש אובייקט ticker או שדה ישיר
+        let tickerSymbol = 'לא מוגדר';
+        let tickerId = null;
+
+        if (plan.ticker && plan.ticker.symbol) {
+          tickerSymbol = plan.ticker.symbol;
+          tickerId = plan.ticker.id;
+        } else if (plan.ticker_symbol) {
+          tickerSymbol = plan.ticker_symbol;
+          tickerId = plan.ticker_id;
+        }
+
+        // יצירת טקסט עם הסימבול בבולד
+        const boldSymbol = `<strong>${tickerSymbol}</strong>`;
+        option.innerHTML = `${boldSymbol} | ${side} | ${investmentType} | ${createdDate}`;
+        option.setAttribute('data-ticker-symbol', tickerSymbol);
+        option.setAttribute('data-ticker-id', tickerId);
+        tradePlanSelect.appendChild(option);
+      });
+    }
+
+  } catch (error) {
+    console.error('שגיאה בטעינת נתונים למודל עריכה:', error);
   }
 }
 
@@ -1312,6 +1391,7 @@ window.clearTradeValidationErrors = clearTradeValidationErrors; // ניקוי ש
 
 // פונקציות עזר:
 window.loadModalData = loadModalData;                      // טעינת נתונים למודל
+window.loadEditModalData = loadEditModalData;              // טעינת נתונים למודל עריכה
 window.updateTickerFromTradePlan = updateTickerFromTradePlan; // עדכון טיקר מתוכנית
 
 // פונקציות כפתורים חדשות

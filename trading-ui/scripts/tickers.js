@@ -35,7 +35,7 @@ let tickersData = window.tickersData;
 
 // פונקציה לעדכון שדה active_trades לפי טריידים פתוחים
 async function updateActiveTradesField() {
-    console.log('🔄 === Updating active_trades field for tickers ===');
+    // Updating active_trades field for tickers
 
     try {
         // טעינת טריידים מהשרת
@@ -56,14 +56,14 @@ async function updateActiveTradesField() {
             }
         });
 
-        console.log('🔄 Tickers with open trades:', Array.from(tickersWithOpenTrades));
+        // Tickers with open trades
 
         // עדכון שדה active_trades בטיקרים
         tickersData.forEach(ticker => {
             ticker.active_trades = tickersWithOpenTrades.has(ticker.id);
         });
 
-        console.log('✅ Active trades field updated for all tickers');
+        // Active trades field updated for all tickers
 
     } catch (error) {
         console.error('❌ Error updating active_trades field:', error);
@@ -72,7 +72,7 @@ async function updateActiveTradesField() {
 
 // פונקציה לטעינת מטבעות מהשרת
 async function loadCurrenciesFromServer() {
-    console.log('🔄 === Loading currencies from server ===');
+    // Loading currencies from server
 
     try {
         const token = localStorage.getItem('authToken');
@@ -89,24 +89,22 @@ async function loadCurrenciesFromServer() {
             headers: headers
         });
 
-        console.log('🔄 Currencies response status:', response.status);
+        // Currencies response status
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log('🔄 Currencies response from server:', responseData);
+            // Currencies response from server
 
             const currencies = responseData.data || responseData;
             window.currenciesData = currencies;
             window.currenciesLoaded = true;
-            console.log('🔄 Currencies loaded from server:', currencies.length, 'currencies');
-            console.log('🔄 Currencies details:', currencies);
+            // Currencies loaded from server
 
             // עדכון אפשרויות בטופס
             updateCurrencyOptions();
         } else {
-            console.log('🔄 Error loading currencies from server, status:', response.status);
+            // Error loading currencies from server
             const errorText = await response.text();
-            console.log('🔄 Error response:', errorText);
             // טעינת מטבעות ברירת מחדל
             window.currenciesData = [
                 { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
@@ -118,7 +116,7 @@ async function loadCurrenciesFromServer() {
         }
 
     } catch (error) {
-        console.log('🔄 Error loading currencies from server:', error);
+        // Error loading currencies from server
         // טעינת מטבעות ברירת מחדל
         window.currenciesData = [
             { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
@@ -238,17 +236,17 @@ function updateCurrencyOptions() {
 
 // פונקציות בסיסיות
 function openTickerDetails(id) {
-    console.log('פתיחת פרטי תיקר:', id);
+    // פתיחת פרטי תיקר
     showAddTickerModal();
 }
 
 function editTicker(id) {
-    console.log('עריכת תיקר:', id);
+    // עריכת תיקר
     showEditTickerModal(id);
 }
 
 function deleteTicker(id) {
-    console.log('מחיקת תיקר:', id);
+    // מחיקת תיקר
     showDeleteTickerModal(id);
 }
 

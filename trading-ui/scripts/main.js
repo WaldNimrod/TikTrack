@@ -913,11 +913,117 @@ function showWarningNotification(title, message, duration = 5000) {
  * @param {string} type - סוג ההתראה (success, error, warning, info)
  * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 3000ms)
  */
-// פונקציות showModalNotification הועברו ל-ui-utils.js
+function showModalNotification(modalId, title, message, type = 'info', duration = 3000) {
+  const containerId = `notificationContainer_${modalId}`;
+  showNotification(title, message, type, duration, containerId, true);
+}
 
+/**
+ * הצגת התראת הצלחה בתוך מודול
+ * @param {string} modalId - מזהה המודול
+ * @param {string} title - כותרת ההתראה
+ * @param {string} message - תוכן ההתראה
+ * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 3000ms)
+ */
+function showModalSuccessNotification(modalId, title, message, duration = 3000) {
+  showModalNotification(modalId, title, message, 'success', duration);
+}
 
+/**
+ * הצגת התראת שגיאה בתוך מודול
+ * @param {string} modalId - מזהה המודול
+ * @param {string} title - כותרת ההתראה
+ * @param {string} message - תוכן ההתראה
+ * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 4000ms)
+ */
+function showModalErrorNotification(modalId, title, message, duration = 4000) {
+  showModalNotification(modalId, title, message, 'error', duration);
+}
 
+/**
+ * הצגת התראת אזהרה בתוך מודול
+ * @param {string} modalId - מזהה המודול
+ * @param {string} title - כותרת ההתראה
+ * @param {string} message - תוכן ההתראה
+ * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 3500ms)
+ */
+function showModalWarningNotification(modalId, title, message, duration = 3500) {
+  showModalNotification(modalId, title, message, 'warning', duration);
+}
 
+/**
+ * הצגת התראת מידע בתוך מודול
+ * @param {string} modalId - מזהה המודול
+ * @param {string} title - כותרת ההתראה
+ * @param {string} message - תוכן ההתראה
+ * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 3000ms)
+ */
+function showModalInfoNotification(modalId, title, message, duration = 3000) {
+  showModalNotification(modalId, title, message, 'info', duration);
+}
+
+/**
+ * הצגת התראת מידע
+ * @param {string} title - כותרת ההתראה
+ * @param {string} message - תוכן ההתראה
+ * @param {number} duration - משך זמן בהצגה (ברירת מחדל: 4000ms)
+ */
+function showInfoNotification(title, message, duration = 4000) {
+  showNotification(title, message, 'info', duration);
+}
+
+/**
+ * פונקציית API כללית
+ * 
+ * פונקציה זו מספקת ממשק אחיד לכל קריאות ה-API לאתר
+ * כולל טיפול אוטומטי ב-headers, שגיאות ולוגים
+ * 
+ * @param {string} endpoint - נקודת הקצה של ה-API (למשל: '/api/v1/alerts/')
+ * @param {Object} options - אפשרויות הבקשה (method, body, headers, וכו')
+ * @returns {Promise<Object>} תגובת השרת
+ * @throws {Error} שגיאה אם הבקשה נכשלה
+ */
+async function apiCall(endpoint, options = {}) {
+  const baseUrl = 'http://127.0.0.1:8080';
+  const url = `${baseUrl}${endpoint}`;
+
+  // הגדרת headers
+  let headers = {};
+
+  // אם יש FormData, לא שולח Content-Type
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  // הוספת headers נוספים אם יש
+  if (options.headers) {
+    headers = { ...headers, ...options.headers };
+  }
+
+  const finalOptions = {
+    ...options,
+    headers
+  };
+
+  try {
+    console.log('📡 שולח בקשה ל:', url);
+    console.log('📋 סוג body:', options.body instanceof FormData ? 'FormData' : 'JSON');
+
+    const response = await fetch(url, finalOptions);
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('❌ שגיאה בתגובה:', response.status, data);
+      throw new Error(data.error?.message || data.message || `HTTP ${response.status}`);
+    }
+
+    console.log('✅ תגובה מוצלחת:', data);
+    return data;
+  } catch (error) {
+    console.error(`❌ שגיאת API (${endpoint}):`, error);
+    throw error;
+  }
+}
 
 /**
  * הגדרת עמודות הגריד הסטנדרטיות
@@ -1363,790 +1469,18 @@ window.formatDate = formatDate;
 window.formatDateTime = formatDateTime;
 window.formatDateOnly = formatDateOnly;
 
-
-
 /**
- * פונקציה לצפייה באלמנטים מקושרים
- * Global function for viewing linked items
- * 
- * @param {number|string} itemId - מזהה האלמנט
- * @param {string} itemType - סוג האלמנט (optional)
+ * פונקציה לצביעת סכומים (חיובי/שלילי)
  */
-function viewLinkedItems(itemId, itemType = null) {
-  console.log('🔄 צפייה באלמנטים מקושרים:', { itemId, itemType });
-
-  // זיהוי סוג האלמנט לפי הדף הנוכחי אם לא צוין
-  if (!itemType) {
-    const currentPath = window.location.pathname;
-    console.log('📍 נתיב נוכחי:', currentPath);
-    if (currentPath.includes('/accounts')) itemType = 'account';
-    else if (currentPath.includes('/trades') || currentPath.includes('trades.html')) itemType = 'trade';
-    else if (currentPath.includes('/tickers')) itemType = 'ticker';
-    else if (currentPath.includes('/alerts')) itemType = 'alert';
-    else if (currentPath.includes('/cash_flows')) itemType = 'cash_flow';
-    else if (currentPath.includes('/notes')) itemType = 'note';
-    else if (currentPath.includes('/trade_plans')) itemType = 'trade_plan';
-    else if (currentPath.includes('/executions')) itemType = 'execution';
-  }
-
-  console.log('🎯 סוג אלמנט שנבחר:', itemType);
-
-  // טעינת הנתונים המקושרים
-  loadLinkedItemsData(itemId, itemType);
+function colorAmount(amount, displayText = null) {
+  const text = displayText || (amount >= 0 ? `+$${amount.toFixed(2)}` : `-$${Math.abs(amount).toFixed(2)}`);
+  const className = amount >= 0 ? 'profit-positive' : 'profit-negative';
+  return `<span class="${className}">${text}</span>`;
 }
 
-/**
- * פונקציה לטעינת נתונים מקושרים
- * Load linked items data from server
- * 
- * @param {number|string} itemId - מזהה האלמנט
- * @param {string} itemType - סוג האלמנט
- */
-async function loadLinkedItemsData(itemId, itemType) {
-  try {
-    console.log(`🔄 טעינת נתונים מקושרים ל-${itemType} ${itemId}`);
+// חשיפת פונקציית הצביעה הגלובלית
+window.colorAmount = colorAmount;
 
-    // קריאה ל-API לקבלת נתונים מקושרים
-    const response = await fetch(`/api/v1/linked-items/${itemType}/${itemId}`);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
 
-    const data = await response.json();
-    console.log('📊 נתונים מקושרים נטענו:', data);
 
-    // הצגת המודל עם הנתונים
-    showLinkedItemsModal(data, itemType, itemId);
-
-  } catch (error) {
-    console.error('❌ שגיאה בטעינת נתונים מקושרים:', error);
-
-    // הצגת הודעה למשתמש
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('מציג נתונים לדוגמה - API בפיתוח', 'info');
-    }
-
-    // הצגת מודל עם נתונים לדוגמה (לפיתוח)
-    showLinkedItemsModal(getMockLinkedData(itemType, itemId), itemType, itemId);
-  }
-}
-
-/**
- * פונקציה להצגת מודל פרטים מקושרים
- * Show linked items modal with data
- * 
- * @param {Object} data - הנתונים להצגה
- * @param {string} itemType - סוג האלמנט
- * @param {string|number} itemId - מזהה האלמנט
- */
-function showLinkedItemsModal(data, itemType, itemId) {
-  console.log('🔄 הצגת מודל פרטים מקושרים:', { data, itemType, itemId });
-
-  // יצירת תוכן המודל
-  const modalContent = createLinkedItemsModalContent(data, itemType, itemId);
-
-  // יצירת המודל
-  const modal = createModal('linkedItemsModal', 'פרטים מקושרים', modalContent);
-
-  // הצגת המודל
-  if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-    console.log('🚀 הצגת מודל Bootstrap');
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
-  } else {
-    console.log('⚠️ Bootstrap לא זמין, מציג fallback');
-    // fallback למודל פשוט
-    modal.style.display = 'block';
-    modal.classList.add('show');
-  }
-}
-
-/**
- * פונקציה ליצירת תוכן המודל
- * Create modal content for linked items
- * 
- * @param {Object} data - הנתונים להצגה
- * @param {string} itemType - סוג האלמנט
- * @param {string|number} itemId - מזהה האלמנט
- * @returns {string} HTML content
- */
-function createLinkedItemsModalContent(data, itemType, itemId) {
-  const itemTypeNames = {
-    'trade': 'טרייד',
-    'account': 'חשבון',
-    'ticker': 'טיקר',
-    'alert': 'התראה',
-    'cash_flow': 'תזרים מזומנים',
-    'note': 'הערה',
-    'trade_plan': 'תוכנית טרייד',
-    'execution': 'ביצוע'
-  };
-
-  const itemTypeName = itemTypeNames[itemType] || itemType;
-
-  let content = `
-    <div class="modal-header">
-      <h5 class="modal-title">פרטים מקושרים - ${itemTypeName} ${itemId}</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <div class="modal-body">
-      <!-- הודעת פיתוח -->
-      <div class="development-notice">
-        <div class="development-header">
-          <h6>🚧 מערכת בפיתוח</h6>
-          <p>מערכת הפרטים המקושרים נמצאת בפיתוח. להלן דוגמה של הנתונים שיוצגו:</p>
-        </div>
-      </div>
-      
-      <div class="linked-items-container">
-        <div class="linked-items-section">
-          <h6>🔗 ישויות בנות (Child Entities)</h6>
-          <div class="linked-items-list" id="childEntitiesList">
-            ${createLinkedItemsList(data.childEntities || [])}
-          </div>
-        </div>
-        
-        <div class="linked-items-section">
-          <h6>📋 ישויות אם (Parent Entities)</h6>
-          <div class="linked-items-list" id="parentEntitiesList">
-            ${createLinkedItemsList(data.parentEntities || [])}
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-      <button type="button" class="btn btn-primary" onclick="exportLinkedItemsData('${itemType}', ${itemId})">ייצא נתונים</button>
-    </div>
-  `;
-
-  return content;
-}
-
-/**
- * פונקציה ליצירת רשימת אלמנטים מקושרים
- * Create linked items list HTML
- * 
- * @param {Array} items - רשימת האלמנטים
- * @returns {string} HTML content
- */
-function createLinkedItemsList(items) {
-  if (!items || items.length === 0) {
-    return '<div class="no-linked-items">אין אלמנטים מקושרים</div>';
-  }
-
-  return items.map(item => `
-    <div class="linked-item-card">
-      <div class="linked-item-header">
-        <span class="linked-item-type">${getItemTypeIcon(item.type)} ${getItemTypeDisplayName(item.type)}</span>
-        <span class="linked-item-id">#${item.id}</span>
-      </div>
-      <div class="linked-item-content">
-        <div class="linked-item-title">${item.title || item.name || `אלמנט ${item.id}`}</div>
-        <div class="linked-item-details">
-          ${createDetailedItemInfo(item)}
-        </div>
-        <div class="linked-item-actions">
-          <button class="btn btn-sm btn-outline-primary" onclick="viewItemDetails('${item.type}', ${item.id})" title="צפייה בפרטים">
-            👁️ צפייה
-          </button>
-          <button class="btn btn-sm btn-outline-secondary" onclick="editItem('${item.type}', ${item.id})" title="עריכה">
-            ✏️ ערוך
-          </button>
-          <button class="btn btn-sm btn-outline-danger" onclick="deleteItem('${item.type}', ${item.id})" title="מחיקה">
-            🗑️ מחק
-          </button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-/**
- * פונקציה לקבלת אייקון לסוג אלמנט
- * Get icon for item type
- * 
- * @param {string} type - סוג האלמנט
- * @returns {string} אייקון
- */
-function getItemTypeIcon(type) {
-  const icons = {
-    'trade': '📈',
-    'account': '💰',
-    'ticker': '📊',
-    'alert': '🔔',
-    'cash_flow': '💸',
-    'note': '📝',
-    'trade_plan': '📋',
-    'execution': '⚡'
-  };
-  return icons[type] || '📄';
-}
-
-/**
- * פונקציה ליצירת מודל
- * Create modal element
- * 
- * @param {string} id - מזהה המודל
- * @param {string} title - כותרת המודל
- * @param {string} content - תוכן המודל
- * @returns {HTMLElement} אלמנט המודל
- */
-function createModal(id, title, content) {
-  // הסרת מודל קיים אם יש
-  const existingModal = document.getElementById(id);
-  if (existingModal) {
-    existingModal.remove();
-  }
-
-  // יצירת המודל החדש עם מבנה Bootstrap נכון
-  const modal = document.createElement('div');
-  modal.id = id;
-  modal.className = 'modal fade';
-  modal.setAttribute('tabindex', '-1');
-  modal.setAttribute('aria-labelledby', `${id}Label`);
-  modal.setAttribute('aria-hidden', 'true');
-
-  // הוספת מבנה Bootstrap נכון
-  modal.innerHTML = `
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        ${content}
-      </div>
-    </div>
-  `;
-
-  // הוספה לדף
-  document.body.appendChild(modal);
-
-  return modal;
-}
-
-/**
- * פונקציה ליצירת מידע מפורט על אלמנט
- * Create detailed item information
- * 
- * @param {Object} item - האלמנט
- * @returns {string} HTML עם פרטים מפורטים
- */
-function createDetailedItemInfo(item) {
-  console.log('🔄 יצירת פרטים מפורטים עבור:', item);
-  let details = '';
-
-  // הוספת תיאור כללי
-  if (item.description || item.notes) {
-    details += `<div class="item-description">${item.description || item.notes}</div>`;
-  }
-
-  // הוספת פרטים ספציפיים לפי סוג
-  switch (item.type) {
-    case 'trade':
-      console.log('🔄 יצירת פרטי טרייד');
-      details += createTradeDetails(item);
-      break;
-    case 'account':
-      console.log('🔄 יצירת פרטי חשבון');
-      details += createAccountDetails(item);
-      break;
-    case 'ticker':
-      console.log('🔄 יצירת פרטי טיקר');
-      details += createTickerDetails(item);
-      break;
-    case 'alert':
-      console.log('🔄 יצירת פרטי התראה');
-      details += createAlertDetails(item);
-      break;
-    case 'cash_flow':
-      console.log('🔄 יצירת פרטי תזרים מזומנים');
-      details += createCashFlowDetails(item);
-      break;
-    case 'note':
-      console.log('🔄 יצירת פרטי הערה');
-      details += createNoteDetails(item);
-      break;
-    case 'trade_plan':
-      console.log('🔄 יצירת פרטי תוכנית טרייד');
-      details += createTradePlanDetails(item);
-      break;
-    case 'execution':
-      console.log('🔄 יצירת פרטי ביצוע');
-      details += createExecutionDetails(item);
-      break;
-    default:
-      console.log('🔄 יצירת פרטים כלליים');
-      details += createGenericDetails(item);
-  }
-
-  console.log('🔄 פרטים סופיים:', details);
-  return details;
-}
-
-/**
- * פונקציות ליצירת פרטים ספציפיים לכל סוג אלמנט
- */
-
-function createTradeDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סוג השקעה:</span>
-        <span class="detail-value">${item.investment_type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">צד:</span>
-        <span class="detail-value">${item.side || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">רווח/הפסד:</span>
-        <span class="detail-value ${item.total_pl >= 0 ? 'positive' : 'negative'}">${item.total_pl ? `$${item.total_pl.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך יצירה:</span>
-        <span class="detail-value">${item.created_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createAccountDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">מטבע:</span>
-        <span class="detail-value">${item.currency || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">יתרה במזומן:</span>
-        <span class="detail-value">${item.cash_balance ? `$${item.cash_balance.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">ערך כולל:</span>
-        <span class="detail-value">${item.total_value ? `$${item.total_value.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">רווח/הפסד כולל:</span>
-        <span class="detail-value ${item.total_pl >= 0 ? 'positive' : 'negative'}">${item.total_pl ? `$${item.total_pl.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createTickerDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סוג:</span>
-        <span class="detail-value">${item.type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">מטבע:</span>
-        <span class="detail-value">${item.currency || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">טריידים פעילים:</span>
-        <span class="detail-value">${item.active_trades ? 'כן' : 'לא'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך עדכון:</span>
-        <span class="detail-value">${item.updated_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createAlertDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סוג התראה:</span>
-        <span class="detail-value">${item.alert_type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">הופעלה:</span>
-        <span class="detail-value">${item.is_triggered ? 'כן' : 'לא'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך יצירה:</span>
-        <span class="detail-value">${item.created_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createCashFlowDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סוג:</span>
-        <span class="detail-value">${item.flow_type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סכום:</span>
-        <span class="detail-value ${item.amount >= 0 ? 'positive' : 'negative'}">${item.amount ? `$${item.amount.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך:</span>
-        <span class="detail-value">${item.flow_date || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createNoteDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סוג הערה:</span>
-        <span class="detail-value">${item.note_type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך יצירה:</span>
-        <span class="detail-value">${item.created_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createTradePlanDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">סוג השקעה:</span>
-        <span class="detail-value">${item.investment_type || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">צד:</span>
-        <span class="detail-value">${item.side || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך יצירה:</span>
-        <span class="detail-value">${item.created_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createExecutionDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">פעולה:</span>
-        <span class="detail-value">${item.action || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">כמות:</span>
-        <span class="detail-value">${item.quantity || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">מחיר:</span>
-        <span class="detail-value">${item.price ? `$${item.price.toFixed(2)}` : 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך ביצוע:</span>
-        <span class="detail-value">${item.execution_date || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-function createGenericDetails(item) {
-  return `
-    <div class="item-details-grid">
-      <div class="detail-item">
-        <span class="detail-label">סטטוס:</span>
-        <span class="detail-value status-${item.status || 'unknown'}">${item.status || 'לא מוגדר'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">תאריך יצירה:</span>
-        <span class="detail-value">${item.created_at || 'לא מוגדר'}</span>
-      </div>
-    </div>
-  `;
-}
-
-/**
- * פונקציה לקבלת נתונים לדוגמה (לפיתוח)
- * Get mock data for development
- * 
- * @param {string} itemType - סוג האלמנט
- * @param {string|number} itemId - מזהה האלמנט
- * @returns {Object} נתונים לדוגמה
- */
-function getMockLinkedData(itemType, itemId) {
-  console.log(`🎭 יצירת נתונים לדוגמה עבור ${itemType} ${itemId}`);
-
-  const mockData = {
-    childEntities: [
-      {
-        id: 1,
-        type: 'execution',
-        title: 'ביצוע קנייה AAPL',
-        description: 'קניית 100 מניות AAPL במחיר $150',
-        status: 'completed'
-      },
-      {
-        id: 2,
-        type: 'alert',
-        title: 'התראה מחיר AAPL',
-        description: 'התראה על מחיר $150',
-        status: 'active'
-      },
-      {
-        id: 3,
-        type: 'note',
-        title: 'הערה על הטרייד',
-        description: 'טרייד ארוך טווח על Apple',
-        status: 'active'
-      }
-    ],
-    parentEntities: [
-      {
-        id: 1,
-        type: 'account',
-        title: 'חשבון ראשי',
-        description: 'חשבון המסחר הראשי',
-        status: 'active'
-      },
-      {
-        id: 1,
-        type: 'trade_plan',
-        title: 'תוכנית AAPL',
-        description: 'תוכנית מסחר על Apple לטווח ארוך',
-        status: 'open'
-      },
-      {
-        id: 1,
-        type: 'ticker',
-        title: 'AAPL - Apple Inc.',
-        description: 'מניה של Apple Inc.',
-        status: 'active'
-      }
-    ]
-  };
-
-  return mockData;
-}
-
-/**
- * פונקציה לייצוא נתונים מקושרים
- * Export linked items data
- * 
- * @param {string} itemType - סוג האלמנט
- * @param {string|number} itemId - מזהה האלמנט
- */
-function exportLinkedItemsData(itemType, itemId) {
-  console.log(`🔄 ייצוא נתונים מקושרים ל-${itemType} ${itemId}`);
-
-  // כאן תהיה לוגיקת הייצוא
-  if (typeof window.showNotification === 'function') {
-    window.showNotification('ייצוא נתונים תפותח בקרוב', 'info');
-  }
-}
-
-/**
- * פונקציה לצפייה בפרטי אלמנט
- * View item details
- * 
- * @param {string} type - סוג האלמנט
- * @param {string|number} id - מזהה האלמנט
- */
-function viewItemDetails(type, id) {
-  console.log(`🔄 צפייה בפרטי ${type} ${id}`);
-
-  // ניווט לדף המתאים
-  const pageMap = {
-    'trade': '/trades',
-    'account': '/accounts',
-    'ticker': '/tickers',
-    'alert': '/alerts',
-    'cash_flow': '/cash_flows',
-    'note': '/notes',
-    'trade_plan': '/trade_plans',
-    'execution': '/executions'
-  };
-
-  const targetPage = pageMap[type];
-  if (targetPage) {
-    window.location.href = targetPage;
-  }
-}
-
-/**
- * פונקציה לעריכת אלמנט
- * Edit item
- * 
- * @param {string} type - סוג האלמנט
- * @param {string|number} id - מזהה האלמנט
- */
-function editItem(type, id) {
-  console.log(`🔄 עריכת ${type} ${id}`);
-
-  // קריאה לפונקציית העריכה המתאימה
-  const editFunctions = {
-    'trade': 'editTradeRecord',
-    'account': 'editAccount',
-    'ticker': 'editTicker',
-    'alert': 'editAlert',
-    'cash_flow': 'editCashFlow',
-    'note': 'editNote',
-    'trade_plan': 'editTradePlan',
-    'execution': 'editExecution'
-  };
-
-  const editFunction = editFunctions[type];
-  if (editFunction && typeof window[editFunction] === 'function') {
-    window[editFunction](id);
-  }
-}
-
-/**
- * פונקציה למחיקת אלמנט
- * Delete item
- * 
- * @param {string} type - סוג האלמנט
- * @param {string|number} id - מזהה האלמנט
- */
-function deleteItem(type, id) {
-  console.log(`🔄 מחיקת ${type} ${id}`);
-
-  // קריאה לפונקציית המחיקה המתאימה
-  const deleteFunctions = {
-    'trade': 'deleteTradeRecord',
-    'account': 'deleteAccount',
-    'ticker': 'deleteTicker',
-    'alert': 'deleteAlert',
-    'cash_flow': 'deleteCashFlow',
-    'note': 'deleteNote',
-    'trade_plan': 'deleteTradePlan',
-    'execution': 'deleteExecution'
-  };
-
-  const deleteFunction = deleteFunctions[type];
-  if (deleteFunction && typeof window[deleteFunction] === 'function') {
-    window[deleteFunction](id);
-  }
-}
-
-// חשיפת פונקציות גלובליות
-window.viewLinkedItems = viewLinkedItems;
-window.loadLinkedItemsData = loadLinkedItemsData;
-window.showLinkedItemsModal = showLinkedItemsModal;
-window.createLinkedItemsModalContent = createLinkedItemsModalContent;
-window.exportLinkedItemsData = exportLinkedItemsData;
-window.createDetailedItemInfo = createDetailedItemInfo;
-window.getItemTypeIcon = getItemTypeIcon;
-window.getItemTypeDisplayName = getItemTypeDisplayName;
-window.viewItemDetails = viewItemDetails;
-window.editItem = editItem;
-window.deleteItem = deleteItem;
-
-/**
- * פונקציה לאתחול פילטרים לדף
- * Initialize page filters
- * 
- * @param {string} pageName - שם הדף
- */
-function initializePageFilters(pageName) {
-  console.log(`🔄 אתחול פילטרים לדף: ${pageName}`);
-
-  // כאן תהיה לוגיקת אתחול הפילטרים
-  // כרגע זו פונקציה ריקה כי הפילטרים מטופלים על ידי header-system.js
-
-  console.log(`✅ פילטרים לאתחול לדף ${pageName} הושלמו`);
-}
-
-// חשיפת פונקציית אתחול הפילטרים
-window.initializePageFilters = initializePageFilters;
-
-/**
- * פונקציה להגדרת כותרות למיון
- * Setup sortable headers for tables
- */
-function setupSortableHeaders() {
-  console.log('🔄 הגדרת כותרות למיון');
-
-  // כאן תהיה לוגיקת הגדרת כותרות למיון
-  // כרגע זו פונקציה ריקה כי המיון מטופל על ידי מערכת אחרת
-
-  console.log('✅ כותרות למיון הוגדרו');
-}
-
-// חשיפת פונקציית הגדרת כותרות למיון
-window.setupSortableHeaders = setupSortableHeaders;
-
-/**
- * פונקציה לעדכון סטטיסטיקות הטבלה
- * Update table statistics
- */
-function updateTableStats() {
-  console.log('🔄 עדכון סטטיסטיקות הטבלה');
-
-  // כאן תהיה לוגיקת עדכון הסטטיסטיקות
-  // כרגע זו פונקציה ריקה
-
-  console.log('✅ סטטיסטיקות הטבלה עודכנו');
-}
-
-// חשיפת פונקציית עדכון סטטיסטיקות
-window.updateTableStats = updateTableStats;
-
-/**
- * פונקציה לדיבוג פילטרים שמורים
- * Debug saved filters
- * 
- * @param {string} pageName - שם הדף
- */
-function debugSavedFilters(pageName) {
-  console.log(`🔄 דיבוג פילטרים שמורים עבור דף: ${pageName}`);
-
-  // בדיקת פילטרים שמורים ב-localStorage
-  const savedStatuses = localStorage.getItem(`${pageName}FilterStatuses`);
-  const savedDateRange = localStorage.getItem(`${pageName}FilterDateRange`);
-  const savedSearch = localStorage.getItem(`${pageName}FilterSearch`);
-
-  console.log(`📊 פילטרים שמורים עבור ${pageName}:`, {
-    statuses: savedStatuses,
-    dateRange: savedDateRange,
-    search: savedSearch
-  });
-}
-
-// חשיפת פונקציית דיבוג פילטרים
-window.debugSavedFilters = debugSavedFilters;
-
-/**
- * פונקציה לשחזור מצב סקשן עיצובים (לא רלוונטי לדף המעקב)
- * Restore designs section state (not relevant for trades page)
- */
-function restoreDesignsSectionState() {
-  console.log('🔄 שחזור מצב סקשן עיצובים (לא רלוונטי לדף המעקב)');
-  // פונקציה ריקה - לא רלוונטית לדף המעקב
-}
-
-// חשיפת פונקציית שחזור מצב עיצובים
-window.restoreDesignsSectionState = restoreDesignsSectionState;

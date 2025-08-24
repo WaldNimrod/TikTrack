@@ -1896,8 +1896,15 @@ function deleteAccount(accountId) {
 
 function viewLinkedItems(accountId) {
   console.log('🔄 צפייה באלמנטים מקושרים לחשבון:', accountId);
-  if (typeof window.showNotification === 'function') {
-    window.showNotification('פונקציית צפייה באלמנטים מקושרים תפותח בקרוב', 'info');
+  
+  // קריאה לפונקציה הגלובלית עם סוג האלמנט
+  if (typeof window.loadLinkedItemsData === 'function') {
+    window.loadLinkedItemsData(accountId, 'account');
+  } else {
+    console.error('❌ loadLinkedItemsData function not found');
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('פונקציית צפייה באלמנטים מקושרים תפותח בקרוב', 'info');
+    }
   }
 }
 

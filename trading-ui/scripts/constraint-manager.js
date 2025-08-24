@@ -77,11 +77,60 @@ class ConstraintManager {
             if (data.status === 'success') {
                 this.constraints = data.data;
                 this.renderConstraintsList();
+            } else {
+                console.error('Error loading constraints:', data);
+                this.showMessage('שגיאה בטעינת האילוצים', 'error');
             }
         } catch (error) {
             console.error('Error loading constraints:', error);
             this.showMessage('שגיאה בטעינת האילוצים', 'error');
+            // הצגת נתונים לדוגמה במקרה של שגיאה
+            this.showSampleData();
         }
+    }
+
+    showSampleData() {
+        console.log('הצגת נתונים לדוגמה');
+        this.constraints = [
+            {
+                id: 1,
+                table_name: 'trades',
+                column_name: 'status',
+                constraint_type: 'ENUM',
+                constraint_name: 'status_enum',
+                constraint_definition: "CHECK (status IN ('open', 'closed', 'canceled'))",
+                enum_values: [
+                    { value: 'open', display_name: 'פתוח', sort_order: 1 },
+                    { value: 'closed', display_name: 'סגור', sort_order: 2 },
+                    { value: 'canceled', display_name: 'מבוטל', sort_order: 3 }
+                ]
+            },
+            {
+                id: 2,
+                table_name: 'trades',
+                column_name: 'type',
+                constraint_type: 'ENUM',
+                constraint_name: 'type_enum',
+                constraint_definition: "CHECK (type IN ('swing', 'investment', 'passive'))",
+                enum_values: [
+                    { value: 'swing', display_name: 'סווינג', sort_order: 1 },
+                    { value: 'investment', display_name: 'השקעה', sort_order: 2 },
+                    { value: 'passive', display_name: 'פסיבי', sort_order: 3 }
+                ]
+            }
+        ];
+        this.renderConstraintsList();
+        this.updateStats();
+    }
+
+    updateStats() {
+        document.getElementById('total-constraints').textContent = this.constraints.length;
+        document.getElementById('total-tables').textContent = new Set(this.constraints.map(c => c.table_name)).size;
+        document.getElementById('active-constraints').textContent = this.constraints.length;
+
+        const enumCount = this.constraints.filter(c => c.constraint_type === 'ENUM')
+            .reduce((sum, c) => sum + (c.enum_values?.length || 0), 0);
+        document.getElementById('total-enums').textContent = enumCount;
     }
 
     populateTableFilter() {
@@ -108,6 +157,18 @@ class ConstraintManager {
         container.innerHTML = html;
     }
 
+    renderFilteredConstraints(filteredConstraints) {
+        const container = document.getElementById('constraints-list-container');
+
+        if (filteredConstraints.length === 0) {
+            container.innerHTML = '<div class="text-center text-muted">לא נמצאו אילוצים התואמים לחיפוש</div>';
+            return;
+        }
+
+        const html = filteredConstraints.map(constraint => this.renderConstraintItem(constraint)).join('');
+        container.innerHTML = html;
+    }
+
     renderConstraintItem(constraint) {
         const badgeClass = this.getBadgeClass(constraint.constraint_type);
         const badgeText = this.getBadgeText(constraint.constraint_type);
@@ -128,7 +189,7 @@ class ConstraintManager {
         }
 
         return `
-            <div class="constraint-item" data-constraint-id="${constraint.id}" onclick="constraintManager.selectConstraint(${constraint.id})">
+            <div class="constraint-item" data-constraint-id="${constraint.id}" onclick="selectConstraint(${constraint.id})">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <strong>${constraint.table_name}.${constraint.column_name}</strong>
@@ -180,6 +241,13 @@ class ConstraintManager {
         this.currentConstraint = this.constraints.find(c => c.id === constraintId);
         if (this.currentConstraint) {
             this.renderConstraintEditor();
+        }
+    }
+
+    // Global function for selecting constraint
+    static selectConstraint(constraintId) {
+        if (constraintManager) {
+            constraintManager.selectConstraint(constraintId);
         }
     }
 
@@ -296,25 +364,36 @@ class ConstraintManager {
 
     setupEventListeners() {
         // Table filter
-        document.getElementById('table-filter').addEventListener('change', (e) => {
-            this.loadConstraints(e.target.value);
-        });
+        const tableFilter = document.getElementById('table-filter');
+        if (tableFilter) {
+            tableFilter.addEventListener('change', (e) => {
+                this.loadConstraints(e.target.value);
+            });
+        }
 
         // Add constraint form
-        document.getElementById('add-constraint-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleAddConstraint();
-        });
+        const addForm = document.getElementById('add-constraint-form');
+        if (addForm) {
+            addForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleAddConstraint();
+            });
+        }
 
         // Constraint type change
-        document.getElementById('constraint-type').addEventListener('change', (e) => {
-            const enumSection = document.getElementById('enum-values-section');
-            if (e.target.value === 'ENUM') {
-                enumSection.style.display = 'block';
-            } else {
-                enumSection.style.display = 'none';
-            }
-        });
+        const constraintType = document.getElementById('constraint-type');
+        if (constraintType) {
+            constraintType.addEventListener('change', (e) => {
+                const enumSection = document.getElementById('enum-values-section');
+                if (enumSection) {
+                    if (e.target.value === 'ENUM') {
+                        enumSection.style.display = 'block';
+                    } else {
+                        enumSection.style.display = 'none';
+                    }
+                }
+            });
+        }
     }
 
     handleAddConstraint() {
@@ -351,6 +430,13 @@ class ConstraintManager {
         this.addConstraint(formData);
     }
 
+    // Global function for adding new constraint
+    static addNewConstraint() {
+        if (constraintManager) {
+            constraintManager.handleAddConstraint();
+        }
+    }
+
     showMessage(message, type) {
         const messagesContainer = document.getElementById('messages');
         const messageDiv = document.createElement('div');
@@ -363,6 +449,81 @@ class ConstraintManager {
         setTimeout(() => {
             messageDiv.remove();
         }, 5000);
+    }
+
+    handleModalAddConstraint() {
+        const formData = {
+            table_name: document.getElementById('modal-table-name').value,
+            column_name: document.getElementById('modal-column-name').value,
+            constraint_type: document.getElementById('modal-constraint-type').value,
+            constraint_name: document.getElementById('modal-constraint-name').value,
+            constraint_definition: document.getElementById('modal-constraint-definition').value
+        };
+
+        // Add enum values if it's an ENUM constraint
+        if (formData.constraint_type === 'ENUM') {
+            const enumValues = [];
+            const enumItems = document.querySelectorAll('#enum-values-container .enum-value-item');
+
+            enumItems.forEach(item => {
+                const value = item.querySelector('[name="enum-value"]').value;
+                const display = item.querySelector('[name="enum-display"]').value;
+                const sort = item.querySelector('[name="enum-sort"]').value;
+
+                if (value && display) {
+                    enumValues.push({
+                        value: value,
+                        display_name: display,
+                        sort_order: parseInt(sort) || 1
+                    });
+                }
+            });
+
+            formData.enum_values = enumValues;
+        }
+
+        this.addConstraint(formData);
+
+        // Close modal
+        const modal = document.getElementById('add-constraint-modal');
+        if (modal && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const bootstrapModal = bootstrap.Modal.getInstance(modal);
+            if (bootstrapModal) {
+                bootstrapModal.hide();
+            }
+        }
+    }
+
+    // Global function for handling modal add constraint
+    static handleModalAddConstraint() {
+        if (constraintManager) {
+            constraintManager.handleModalAddConstraint();
+        }
+    }
+
+    async addConstraint(formData) {
+        try {
+            const response = await fetch(this.apiBase, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                this.showMessage('האילוץ נוסף בהצלחה', 'success');
+                await this.loadConstraints();
+                this.updateStats();
+            } else {
+                this.showMessage('שגיאה בהוספת האילוץ', 'error');
+            }
+        } catch (error) {
+            console.error('Error adding constraint:', error);
+            this.showMessage('שגיאה בהוספת האילוץ', 'error');
+        }
     }
 }
 
@@ -384,10 +545,71 @@ function addEnumValue() {
 
 // Global function to show add constraint modal
 function showAddConstraintModal() {
-    const modal = document.getElementById('add-constraint-modal');
-    if (modal) {
+    console.log('הצגת מודל הוספת אילוץ');
+    // יצירת מודל דינמי אם לא קיים
+    let modal = document.getElementById('add-constraint-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'add-constraint-modal';
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">הוספת אילוץ חדש</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="modal-add-constraint-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="modal-table-name" class="form-label">שם הטבלה</label>
+                                        <input type="text" class="form-control" id="modal-table-name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="modal-column-name" class="form-label">שם העמודה</label>
+                                        <input type="text" class="form-control" id="modal-column-name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="modal-constraint-type" class="form-label">סוג האילוץ</label>
+                                        <select class="form-select" id="modal-constraint-type" required>
+                                            <option value="">בחר סוג אילוץ</option>
+                                            <option value="ENUM">ENUM - ערכים מותרים</option>
+                                            <option value="NOT_NULL">NOT NULL - שדה חובה</option>
+                                            <option value="RANGE">RANGE - טווח ערכים</option>
+                                            <option value="UNIQUE">UNIQUE - ערך ייחודי</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="modal-constraint-name" class="form-label">שם האילוץ</label>
+                                        <input type="text" class="form-control" id="modal-constraint-name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="modal-constraint-definition" class="form-label">הגדרת האילוץ</label>
+                                        <input type="text" class="form-control" id="modal-constraint-definition" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="handleModalAddConstraint()">שמור</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
         const bootstrapModal = new bootstrap.Modal(modal);
         bootstrapModal.show();
+    } else {
+        modal.style.display = 'block';
     }
 }
 
@@ -395,8 +617,87 @@ function removeEnumValue(button) {
     button.closest('.enum-value-item').remove();
 }
 
+// Global functions for enum values
+window.addEnumValue = function () {
+    const container = document.getElementById('enum-values-container');
+    if (container) {
+        const newItem = document.createElement('div');
+        newItem.className = 'enum-value-item';
+        newItem.innerHTML = `
+            <input type="text" class="form-control" placeholder="ערך" name="enum-value">
+            <input type="text" class="form-control" placeholder="שם תצוגה" name="enum-display">
+            <input type="number" class="form-control" placeholder="סדר" name="enum-sort" value="1">
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeEnumValue(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(newItem);
+    }
+};
+
+window.removeEnumValue = function (button) {
+    button.closest('.enum-value-item').remove();
+};
+
+window.showAddConstraintModal = function () {
+    showAddConstraintModal();
+};
+
+// Global function for selecting constraint
+window.selectConstraint = function (constraintId) {
+    if (constraintManager) {
+        constraintManager.selectConstraint(constraintId);
+    }
+};
+
+// Global function for adding new constraint
+window.addNewConstraint = function () {
+    if (constraintManager) {
+        constraintManager.handleAddConstraint();
+    }
+};
+
+// Global function for handling modal add constraint
+window.handleModalAddConstraint = function () {
+    if (constraintManager) {
+        constraintManager.handleModalAddConstraint();
+    }
+};
+
 // Initialize constraint manager when page loads
 let constraintManager;
 document.addEventListener('DOMContentLoaded', () => {
     constraintManager = new ConstraintManager();
 });
+
+// Global function for loading constraints data (for compatibility with main.js)
+window.loadConstraintsData = function () {
+    if (constraintManager) {
+        constraintManager.loadConstraints();
+    } else {
+        console.error('Constraint manager not initialized');
+    }
+};
+
+// Global function for filtering constraints data
+window.filterConstraintsData = function (statusValues, typeValues, accountValues, dateRange, searchText) {
+    console.log('סינון אילוצים:', { statusValues, typeValues, accountValues, dateRange, searchText });
+    if (constraintManager) {
+        // Filter constraints based on search text
+        const filteredConstraints = constraintManager.constraints.filter(constraint => {
+            if (!searchText) return true;
+
+            const searchLower = searchText.toLowerCase();
+            return (
+                constraint.table_name.toLowerCase().includes(searchLower) ||
+                constraint.column_name.toLowerCase().includes(searchLower) ||
+                constraint.constraint_name.toLowerCase().includes(searchLower) ||
+                constraint.constraint_definition.toLowerCase().includes(searchLower)
+            );
+        });
+
+        constraintManager.renderFilteredConstraints(filteredConstraints);
+    } else {
+        console.error('Constraint manager not initialized');
+    }
+};

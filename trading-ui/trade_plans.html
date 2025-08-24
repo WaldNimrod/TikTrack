@@ -75,9 +75,16 @@
   <!-- Modular grid files -->
   <script src="scripts/header-system.js"></script>
   <script src="scripts/console-cleanup.js"></script>
-  <script src="scripts/translation-utils.js"></script>
-  <script src="scripts/main.js"></script>
   <script src="scripts/simple-filter.js"></script>
+  <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/data-utils.js"></script>
+  <script src="scripts/ui-utils.js"></script>
+  <script src="scripts/table-mappings.js"></script>
+  <script src="scripts/date-utils.js"></script>
+  <script src="scripts/tables.js"></script>
+  <script src="scripts/linked-items.js"></script>
+  <script src="scripts/page-utils.js"></script>
+  <script src="scripts/main.js"></script>
   <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
   <script src="scripts/trade_plans.js"></script>
@@ -272,7 +279,7 @@
                   <label for="addTradePlanTickerId" class="form-label">
                     טיקר <span class="text-danger">*</span>
                   </label>
-                  <select class="form-control" id="addTradePlanTickerId" required>
+                  <select class="form-control" id="addTradePlanTickerId" required onchange="updateTickerInfo()">
                     <option value="">בחר טיקר</option>
                     <option value="1">AAPL</option>
                     <option value="2">GOOGL</option>
@@ -292,13 +299,35 @@
                 </div>
               </div>
             </div>
+
+            <!-- שורת תצוגה לטיקר הנבחר -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">טיקר נבחר</label>
+                  <div class="form-control-plaintext" id="selectedTickerDisplay">לא נבחר</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">מחיר נוכחי</label>
+                  <div class="form-control-plaintext" id="currentPriceDisplay">-</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">שינוי יומי</label>
+                  <div class="form-control-plaintext" id="dailyChangeDisplay">-</div>
+                </div>
+              </div>
+            </div>
             <div class="row">
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="addTradePlanInvestmentType" class="form-label">
                     סוג השקעה <span class="text-danger">*</span>
                   </label>
-                  <select class="form-control" id="addTradePlanInvestmentType" required>
+                  <select class="form-control" id="addTradePlanInvestmentType" required disabled>
                     <option value="">בחר סוג השקעה</option>
                     <option value="swing">סווינג</option>
                     <option value="investment">השקעה</option>
@@ -314,7 +343,7 @@
                   <label for="addTradePlanSide" class="form-label">
                     צד <span class="text-danger">*</span>
                   </label>
-                  <select class="form-control" id="addTradePlanSide" required>
+                  <select class="form-control" id="addTradePlanSide" required disabled>
                     <option value="">בחר צד</option>
                     <option value="Long">Long</option>
                     <option value="Short">Short</option>
@@ -332,7 +361,9 @@
                     סכום מתוכנן <span class="text-danger">*</span>
                   </label>
                   <input type="number" step="0.01" class="form-control" id="addTradePlanPlannedAmount" required
-                    min="0.01">
+                    min="0.01" disabled
+                    onchange="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); } else { console.error('updateSharesFromAmount not found'); }"
+                    oninput="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); }">
                   <div class="invalid-feedback" id="plannedAmountError">
                     יש להזין סכום מתוכנן חיובי
                   </div>
@@ -340,27 +371,47 @@
               </div>
               <div class="col-md-6">
                 <div class="mb-3">
-                  <label for="addTradePlanStopPrice" class="form-label">מחיר עצירה</label>
-                  <input type="number" step="0.01" class="form-control" id="addTradePlanStopPrice">
+                  <label for="addTradePlanShares" class="form-label">
+                    מספר מניות
+                  </label>
+                  <input type="number" step="1" class="form-control" id="addTradePlanShares" min="1" disabled
+                    onchange="if(typeof updateAmountFromShares === 'function') { updateAmountFromShares(); } else { console.error('updateAmountFromShares not found'); }"
+                    oninput="if(typeof updateAmountFromShares === 'function') { updateAmountFromShares(); }">
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-md-6">
                 <div class="mb-3">
+                  <label for="addTradePlanStopPrice" class="form-label">מחיר עצירה</label>
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanStopPrice" disabled>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
                   <label for="addTradePlanTargetPrice" class="form-label">מחיר יעד</label>
-                  <input type="number" step="0.01" class="form-control" id="addTradePlanTargetPrice">
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanTargetPrice" disabled>
                 </div>
               </div>
             </div>
 
             <div class="mb-3">
               <label for="addTradePlanEntryConditions" class="form-label">תנאי כניסה</label>
-              <textarea class="form-control" id="addTradePlanEntryConditions" rows="2"></textarea>
+              <textarea class="form-control" id="addTradePlanEntryConditions" rows="2" disabled></textarea>
+              <div class="text-start">
+                <button type="button" class="btn btn-info btn-sm mt-2" onclick="addEntryCondition()">
+                  <span class="btn-icon">➕</span> הוסף תנאי
+                </button>
+              </div>
             </div>
             <div class="mb-3">
               <label for="addTradePlanReasons" class="form-label">סיבות</label>
-              <textarea class="form-control" id="addTradePlanReasons" rows="3"></textarea>
+              <textarea class="form-control" id="addTradePlanReasons" rows="3" disabled></textarea>
+              <div class="text-start">
+                <button type="button" class="btn btn-info btn-sm mt-2" onclick="addReason()">
+                  <span class="btn-icon">➕</span> הוסף סיבה
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -371,7 +422,7 @@
               <button type="button" class="btn btn-info me-2" onclick="addImportantNote()">
                 <span class="btn-icon">📝</span> יש לי עוד משהו חשוב
               </button>
-              <button type="button" class="btn btn-warning" onclick="addReminder()">
+              <button type="button" class="btn btn-info" onclick="addReminder()">
                 <span class="btn-icon">⏰</span> תזכיר לי כש...
               </button>
             </div>

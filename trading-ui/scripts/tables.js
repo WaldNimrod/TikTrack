@@ -32,58 +32,58 @@
  * @returns {Array} הנתונים המסודרים
  */
 window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
-  console.log(`🔄 Global sortTableData called for ${tableType} table, column ${columnIndex}`);
+    console.log(`🔄 Global sortTableData called for ${tableType} table, column ${columnIndex}`);
 
-  // שמירת מצב הסידור הנוכחי
-  const currentSortState = window.getSortState(tableType);
+    // שמירת מצב הסידור הנוכחי
+    const currentSortState = window.getSortState(tableType);
 
-  // קביעת כיוון הסידור החדש
-  let newDirection = 'asc';
-  if (currentSortState.columnIndex === columnIndex) {
-    // אם אותה עמודה - החלף כיוון
-    newDirection = currentSortState.direction === 'asc' ? 'desc' : 'asc';
-  }
-
-  // שמירת מצב הסידור החדש
-  window.saveSortState(tableType, columnIndex, newDirection);
-
-  // סידור הנתונים
-  const sortedData = [...data].sort((a, b) => {
-    let aValue = getColumnValue(a, columnIndex, tableType);
-    let bValue = getColumnValue(b, columnIndex, tableType);
-
-    // המרה למספרים אם אפשר
-    if (!isNaN(aValue) && !isNaN(bValue)) {
-      aValue = parseFloat(aValue);
-      bValue = parseFloat(bValue);
+    // קביעת כיוון הסידור החדש
+    let newDirection = 'asc';
+    if (currentSortState.columnIndex === columnIndex) {
+        // אם אותה עמודה - החלף כיוון
+        newDirection = currentSortState.direction === 'asc' ? 'desc' : 'asc';
     }
 
-    // המרה לתאריכים אם אפשר
-    if (isDateValue(aValue) && isDateValue(bValue)) {
-      aValue = new Date(aValue);
-      bValue = new Date(bValue);
+    // שמירת מצב הסידור החדש
+    window.saveSortState(tableType, columnIndex, newDirection);
+
+    // סידור הנתונים
+    const sortedData = [...data].sort((a, b) => {
+        let aValue = getColumnValue(a, columnIndex, tableType);
+        let bValue = getColumnValue(b, columnIndex, tableType);
+
+        // המרה למספרים אם אפשר
+        if (!isNaN(aValue) && !isNaN(bValue)) {
+            aValue = parseFloat(aValue);
+            bValue = parseFloat(bValue);
+        }
+
+        // המרה לתאריכים אם אפשר
+        if (isDateValue(aValue) && isDateValue(bValue)) {
+            aValue = new Date(aValue);
+            bValue = new Date(bValue);
+        }
+
+        // סידור
+        if (aValue < bValue) {
+            return newDirection === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+            return newDirection === 'asc' ? 1 : -1;
+        }
+        return 0;
+    });
+
+    // עדכון הטבלה
+    if (typeof updateFunction === 'function') {
+        updateFunction(sortedData);
     }
 
-    // סידור
-    if (aValue < bValue) {
-      return newDirection === 'asc' ? -1 : 1;
-    }
-    if (aValue > bValue) {
-      return newDirection === 'asc' ? 1 : -1;
-    }
-    return 0;
-  });
+    // עדכון האייקונים
+    updateSortIcons(tableType, columnIndex, newDirection);
 
-  // עדכון הטבלה
-  if (typeof updateFunction === 'function') {
-    updateFunction(sortedData);
-  }
-
-  // עדכון האייקונים
-  updateSortIcons(tableType, columnIndex, newDirection);
-
-  console.log(`✅ Table ${tableType} sorted by column ${columnIndex}, direction: ${newDirection}`);
-  return sortedData;
+    console.log(`✅ Table ${tableType} sorted by column ${columnIndex}, direction: ${newDirection}`);
+    return sortedData;
 };
 
 /**
@@ -91,9 +91,9 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
  * Check if value is a date
  */
 function isDateValue(value) {
-  if (!value) return false;
-  const date = new Date(value);
-  return !isNaN(date.getTime());
+    if (!value) return false;
+    const date = new Date(value);
+    return !isNaN(date.getTime());
 }
 
 /**
@@ -101,14 +101,14 @@ function isDateValue(value) {
  * Save sort state
  */
 window.saveSortState = function (tableType, columnIndex, direction) {
-  const sortState = {
-    columnIndex: columnIndex,
-    direction: direction,
-    timestamp: Date.now()
-  };
+    const sortState = {
+        columnIndex: columnIndex,
+        direction: direction,
+        timestamp: Date.now()
+    };
 
-  localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState));
-  console.log(`💾 Sort state saved for ${tableType}:`, sortState);
+    localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState));
+    console.log(`💾 Sort state saved for ${tableType}:`, sortState);
 };
 
 /**
@@ -116,11 +116,11 @@ window.saveSortState = function (tableType, columnIndex, direction) {
  * Get sort state
  */
 window.getSortState = function (tableType) {
-  const savedState = localStorage.getItem(`sortState_${tableType}`);
-  if (savedState) {
-    return JSON.parse(savedState);
-  }
-  return { columnIndex: -1, direction: 'asc' };
+    const savedState = localStorage.getItem(`sortState_${tableType}`);
+    if (savedState) {
+        return JSON.parse(savedState);
+    }
+    return { columnIndex: -1, direction: 'asc' };
 };
 
 /**
@@ -128,28 +128,28 @@ window.getSortState = function (tableType) {
  * Update sort icons
  */
 function updateSortIcons(tableType, activeColumnIndex, direction) {
-  const table = document.querySelector(`[data-table-type="${tableType}"]`);
-  if (!table) return;
+    const table = document.querySelector(`[data-table-type="${tableType}"]`);
+    if (!table) return;
 
-  // הסרת כל האייקונים הקיימים
-  const headers = table.querySelectorAll('th');
-  headers.forEach((header, index) => {
-    const existingIcon = header.querySelector('.sort-icon');
-    if (existingIcon) {
-      existingIcon.remove();
+    // הסרת כל האייקונים הקיימים
+    const headers = table.querySelectorAll('th');
+    headers.forEach((header, index) => {
+        const existingIcon = header.querySelector('.sort-icon');
+        if (existingIcon) {
+            existingIcon.remove();
+        }
+    });
+
+    // הוספת אייקון לעמודה הפעילה
+    if (activeColumnIndex >= 0 && activeColumnIndex < headers.length) {
+        const activeHeader = headers[activeColumnIndex];
+        const icon = document.createElement('span');
+        icon.className = 'sort-icon';
+        icon.textContent = direction === 'asc' ? ' ▲' : ' ▼';
+        icon.style.marginRight = '5px';
+        icon.style.color = '#007bff';
+        activeHeader.appendChild(icon);
     }
-  });
-
-  // הוספת אייקון לעמודה הפעילה
-  if (activeColumnIndex >= 0 && activeColumnIndex < headers.length) {
-    const activeHeader = headers[activeColumnIndex];
-    const icon = document.createElement('span');
-    icon.className = 'sort-icon';
-    icon.textContent = direction === 'asc' ? ' ▲' : ' ▼';
-    icon.style.marginRight = '5px';
-    icon.style.color = '#007bff';
-    activeHeader.appendChild(icon);
-  }
 }
 
 /**
@@ -162,15 +162,15 @@ function updateSortIcons(tableType, activeColumnIndex, direction) {
  * @param {Function} updateFunction - פונקציה לעדכון הטבלה
  */
 window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
-  console.log(`🔄 Global sortAnyTable called for ${tableType} table`);
+    console.log(`🔄 Global sortAnyTable called for ${tableType} table`);
 
-  // בדיקה אם הפונקציה הגלובלית זמינה
-  if (typeof window.sortTableData === 'function') {
-    return window.sortTableData(columnIndex, data, tableType, updateFunction);
-  } else {
-    console.error('❌ Global sortTableData function not available');
-    return data;
-  }
+    // בדיקה אם הפונקציה הגלובלית זמינה
+    if (typeof window.sortTableData === 'function') {
+        return window.sortTableData(columnIndex, data, tableType, updateFunction);
+    } else {
+        console.error('❌ Global sortTableData function not available');
+        return data;
+    }
 };
 
 /**
@@ -187,59 +187,59 @@ window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
  * @returns {Array} הנתונים המסודרים
  */
 window.sortTable = function (tableType, columnIndex, dataArray, updateFunction) {
-  console.log(`🔄 Global sortTable called for ${tableType} table, column ${columnIndex}`);
+    console.log(`🔄 Global sortTable called for ${tableType} table, column ${columnIndex}`);
 
-  // שימוש בפונקציה הגלובלית הקיימת
-  if (typeof window.sortTableData === 'function') {
-    const sortedData = window.sortTableData(columnIndex, dataArray, tableType, updateFunction);
+    // שימוש בפונקציה הגלובלית הקיימת
+    if (typeof window.sortTableData === 'function') {
+        const sortedData = window.sortTableData(columnIndex, dataArray, tableType, updateFunction);
 
-    // עדכון הנתונים המסוננים בהתאם לסוג הטבלה
-    switch (tableType) {
-      case 'alerts':
-        if (typeof window.filteredAlertsData !== 'undefined') {
-          window.filteredAlertsData = sortedData;
+        // עדכון הנתונים המסוננים בהתאם לסוג הטבלה
+        switch (tableType) {
+            case 'alerts':
+                if (typeof window.filteredAlertsData !== 'undefined') {
+                    window.filteredAlertsData = sortedData;
+                }
+                break;
+            case 'planning':
+                if (typeof window.filteredDesignsData !== 'undefined') {
+                    window.filteredDesignsData = sortedData;
+                }
+                break;
+            case 'trades':
+                if (typeof window.filteredTradesData !== 'undefined') {
+                    window.filteredTradesData = sortedData;
+                }
+                break;
+            case 'notes':
+                if (typeof window.notesData !== 'undefined') {
+                    window.notesData = sortedData;
+                }
+                break;
+            case 'tickers':
+                if (typeof window.tickersData !== 'undefined') {
+                    window.tickersData = sortedData;
+                }
+                break;
+            case 'cash_flows':
+                if (typeof window.cashFlowsData !== 'undefined') {
+                    window.cashFlowsData = sortedData;
+                }
+                break;
+            case 'executions':
+                if (typeof window.executionsData !== 'undefined') {
+                    window.executionsData = sortedData;
+                }
+                break;
+            default:
+                // For other table types, no specific filtered data handling needed
+                break;
         }
-        break;
-      case 'planning':
-        if (typeof window.filteredDesignsData !== 'undefined') {
-          window.filteredDesignsData = sortedData;
-        }
-        break;
-      case 'trades':
-        if (typeof window.filteredTradesData !== 'undefined') {
-          window.filteredTradesData = sortedData;
-        }
-        break;
-      case 'notes':
-        if (typeof window.notesData !== 'undefined') {
-          window.notesData = sortedData;
-        }
-        break;
-      case 'tickers':
-        if (typeof window.tickersData !== 'undefined') {
-          window.tickersData = sortedData;
-        }
-        break;
-      case 'cash_flows':
-        if (typeof window.cashFlowsData !== 'undefined') {
-          window.cashFlowsData = sortedData;
-        }
-        break;
-      case 'executions':
-        if (typeof window.executionsData !== 'undefined') {
-          window.executionsData = sortedData;
-        }
-        break;
-      default:
-        // For other table types, no specific filtered data handling needed
-        break;
+
+        return sortedData;
+    } else {
+        console.error('❌ sortTableData function not found in main.js');
+        return dataArray;
     }
-
-    return sortedData;
-  } else {
-    console.error('❌ sortTableData function not found in main.js');
-    return dataArray;
-  }
 };
 
 /**
@@ -251,25 +251,25 @@ window.sortTable = function (tableType, columnIndex, dataArray, updateFunction) 
  * @param {Function} updateFunction - פונקציה לעדכון הטבלה
  */
 window.restoreAnyTableSort = function (tableType, data, updateFunction) {
-  console.log(`🔄 Global restoreAnyTableSort called for ${tableType} table`);
+    console.log(`🔄 Global restoreAnyTableSort called for ${tableType} table`);
 
-  if (typeof window.getSortState === 'function') {
-    const sortState = window.getSortState(tableType);
+    if (typeof window.getSortState === 'function') {
+        const sortState = window.getSortState(tableType);
 
-    if (sortState.columnIndex >= 0 && data && data.length > 0) {
-      console.log(`🔄 Restoring sort for ${tableType}: column ${sortState.columnIndex}, direction: ${sortState.direction}`);
+        if (sortState.columnIndex >= 0 && data && data.length > 0) {
+            console.log(`🔄 Restoring sort for ${tableType}: column ${sortState.columnIndex}, direction: ${sortState.direction}`);
 
-      // עדכון האייקונים
-      updateSortIcons(tableType, sortState.columnIndex, sortState.direction);
+            // עדכון האייקונים
+            updateSortIcons(tableType, sortState.columnIndex, sortState.direction);
 
-      // סידור הנתונים
-      setTimeout(() => {
-        window.sortAnyTable(tableType, sortState.columnIndex, data, updateFunction);
-      }, 100);
+            // סידור הנתונים
+            setTimeout(() => {
+                window.sortAnyTable(tableType, sortState.columnIndex, data, updateFunction);
+            }, 100);
+        }
+    } else {
+        console.log('⚠️ getSortState function not available');
     }
-  } else {
-    console.log('⚠️ getSortState function not available');
-  }
 };
 
 /**
@@ -282,43 +282,43 @@ window.restoreAnyTableSort = function (tableType, data, updateFunction) {
  * @param {string} modalId - מזהה המודל לסגירה
  */
 window.closeModal = function (modalId) {
-  console.log(`🔄 Closing modal: ${modalId}`);
+    console.log(`🔄 Closing modal: ${modalId}`);
 
-  const modalElement = document.getElementById(modalId);
-  if (modalElement) {
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-      const modal = bootstrap.Modal.getInstance(modalElement);
-      if (modal) {
-        modal.hide();
-        console.log(`✅ Modal ${modalId} closed via Bootstrap`);
-      } else {
-        // יצירת instance חדש אם לא קיים
-        const newModal = new bootstrap.Modal(modalElement);
-        newModal.hide();
-        console.log(`✅ Modal ${modalId} closed via new Bootstrap instance`);
-      }
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        // בדיקה אם Bootstrap זמין
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+                console.log(`✅ Modal ${modalId} closed via Bootstrap`);
+            } else {
+                // יצירת instance חדש אם לא קיים
+                const newModal = new bootstrap.Modal(modalElement);
+                newModal.hide();
+                console.log(`✅ Modal ${modalId} closed via new Bootstrap instance`);
+            }
+        } else {
+            // fallback לסגירה ידנית
+            modalElement.style.display = 'none';
+            modalElement.classList.remove('show');
+
+            // הסרת backdrop אם קיים
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+
+            // הסרת מחלקות מ-body
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+
+            console.log(`✅ Modal ${modalId} closed via fallback method`);
+        }
     } else {
-      // fallback לסגירה ידנית
-      modalElement.style.display = 'none';
-      modalElement.classList.remove('show');
-
-      // הסרת backdrop אם קיים
-      const backdrop = document.querySelector('.modal-backdrop');
-      if (backdrop) {
-        backdrop.remove();
-      }
-
-      // הסרת מחלקות מ-body
-      document.body.classList.remove('modal-open');
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-
-      console.log(`✅ Modal ${modalId} closed via fallback method`);
+        console.warn(`⚠️ Modal element ${modalId} not found`);
     }
-  } else {
-    console.warn(`⚠️ Modal element ${modalId} not found`);
-  }
 };
 
 // ===== GRID CORE FUNCTIONS =====
@@ -336,85 +336,85 @@ let externalFilterPresent = false;
  * @returns {Array} מערך של הגדרות עמודות
  */
 const getDefaultColumnDefs = () => [
-  {
-    headerName: "המרה",
-    field: "action",
-    width: 60,
-    minWidth: 50,
-    maxWidth: 80,
-    cellRenderer: params => `<span style="cursor: pointer; font-size: 1.2rem;">${params.value}</span>`
-  },
-  {
-    headerName: "סטטוס",
-    field: "status",
-    width: 80,
-    minWidth: 70,
-    maxWidth: 100,
-    cellClass: params => `badge-status ${params.value}`,
-    filter: true,
-    filterParams: {
-      filterOptions: ['equals', 'notEqual'],
-      defaultOption: 'equals'
-    }
-  },
-  {
-    headerName: "נוכחי",
-    field: "current",
-    width: 120,
-    minWidth: 100,
-    maxWidth: 150,
-    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
-  },
-  {
-    headerName: "סטופ",
-    field: "stop",
-    width: 120,
-    minWidth: 100,
-    maxWidth: 150,
-    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
-  },
-  {
-    headerName: "יעד",
-    field: "target",
-    width: 120,
-    minWidth: 100,
-    maxWidth: 150,
-    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
-  },
-  {
-    headerName: "סכום/כמות",
-    field: "amount",
-    width: 100,
-    minWidth: 80,
-    maxWidth: 120,
-    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
-  },
-  {
-    headerName: "תאריך",
-    field: "date",
-    width: 120,
-    minWidth: 100,
-    maxWidth: 140,
-    cellRenderer: params => {
-      if (!params.value) return '-';
-      const date = new Date(params.value);
-      return date.toLocaleDateString('he-IL');
-    }
-  },
-  {
-    headerName: "פעולות",
-    field: "actions",
-    width: 120,
-    minWidth: 100,
-    maxWidth: 150,
-    cellRenderer: params => `
+    {
+        headerName: "המרה",
+        field: "action",
+        width: 60,
+        minWidth: 50,
+        maxWidth: 80,
+        cellRenderer: params => `<span style="cursor: pointer; font-size: 1.2rem;">${params.value}</span>`
+    },
+    {
+        headerName: "סטטוס",
+        field: "status",
+        width: 80,
+        minWidth: 70,
+        maxWidth: 100,
+        cellClass: params => `badge-status ${params.value}`,
+        filter: true,
+        filterParams: {
+            filterOptions: ['equals', 'notEqual'],
+            defaultOption: 'equals'
+        }
+    },
+    {
+        headerName: "נוכחי",
+        field: "current",
+        width: 120,
+        minWidth: 100,
+        maxWidth: 150,
+        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
+    },
+    {
+        headerName: "סטופ",
+        field: "stop",
+        width: 120,
+        minWidth: 100,
+        maxWidth: 150,
+        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
+    },
+    {
+        headerName: "יעד",
+        field: "target",
+        width: 120,
+        minWidth: 100,
+        maxWidth: 150,
+        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
+    },
+    {
+        headerName: "סכום/כמות",
+        field: "amount",
+        width: 100,
+        minWidth: 80,
+        maxWidth: 120,
+        cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : ''
+    },
+    {
+        headerName: "תאריך",
+        field: "date",
+        width: 120,
+        minWidth: 100,
+        maxWidth: 140,
+        cellRenderer: params => {
+            if (!params.value) return '-';
+            const date = new Date(params.value);
+            return date.toLocaleDateString('he-IL');
+        }
+    },
+    {
+        headerName: "פעולות",
+        field: "actions",
+        width: 120,
+        minWidth: 100,
+        maxWidth: 150,
+        cellRenderer: params => `
       <div class="action-buttons">
         <button class="btn btn-sm btn-info" onclick="viewItemDetails('${params.data.id}')" title="צפייה בפרטים">👁️</button>
         <button class="btn btn-sm btn-warning" onclick="editItem('${params.data.id}')" title="עריכה">✏️</button>
         <button class="btn btn-sm btn-danger" onclick="deleteItem('${params.data.id}')" title="מחיקה">🗑️</button>
       </div>
     `
-  }
+    }
 ];
 
 // ייצוא הפונקציות הגלובליות

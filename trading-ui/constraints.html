@@ -238,7 +238,7 @@
             🔧 ניהול אילוצים
           </div>
           <div class="table-actions">
-            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור סטטיסטיקה">
+            <button class="filter-toggle-btn" onclick="window.toggleTopSection()" title="הצג/הסתר אזור סטטיסטיקה">
               <span class="filter-icon">▲</span>
             </button>
           </div>
@@ -282,12 +282,13 @@
             <div style="display: flex; gap: 8px; align-items: center;">
               <div class="search-input-wrapper">
                 <input type="text" class="search-filter-input" placeholder="חיפוש אילוצים..."
-                  onkeyup="filterConstraintsData([], [], [], null, this.value)">
+                  onkeyup="window.filterConstraintsData([], [], [], null, this.value)">
               </div>
-              <button class="refresh-btn" onclick="showAddConstraintModal()" title="הוסף אילוץ חדש">
+              <button class="refresh-btn" onclick="window.showAddConstraintModal()" title="הוסף אילוץ חדש">
                 <span class="action-icon">➕</span> הוסף
               </button>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור ניהול אילוצים">
+              <button class="filter-toggle-btn" onclick="window.toggleMainSection()"
+                title="הצג/הסתר אזור ניהול אילוצים">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -409,6 +410,7 @@
   <!-- קבצים מודולריים של הגריד -->
   <script src="scripts/translation-utils.js"></script>
   <script src="scripts/header-system.js"></script>
+  <script src="scripts/linked-items.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/simple-filter.js"></script>
   <script src="scripts/constraint-manager.js"></script>
@@ -432,6 +434,74 @@
     function filterConstraintsData() {
       console.log('סינון אילוצים');
       // הפונקציה מוגדרת ב-constraint-manager.js
+    }
+
+    // פונקציות גלובליות לניהול אילוצים
+    window.showAddConstraintModal = function () {
+      console.log('הצגת מודל הוספת אילוץ');
+      // הפונקציה מוגדרת ב-constraint-manager.js
+    };
+
+    window.addEnumValue = function () {
+      console.log('הוספת ערך ENUM');
+      // הפונקציה מוגדרת ב-constraint-manager.js
+    };
+
+    window.removeEnumValue = function (button) {
+      console.log('הסרת ערך ENUM');
+      // הפונקציה מוגדרת ב-constraint-manager.js
+    };
+
+    window.selectConstraint = function (constraintId) {
+      console.log('בחירת אילוץ:', constraintId);
+      // הפונקציה מוגדרת ב-constraint-manager.js
+    };
+
+    window.handleModalAddConstraint = function () {
+      console.log('טיפול בהוספת אילוץ במודל');
+      // הפונקציה מוגדרת ב-constraint-manager.js
+    };
+
+    window.toggleTopSection = function () {
+      toggleTopSection();
+    };
+
+    window.toggleMainSection = function () {
+      toggleMainSection();
+    };
+
+    window.filterConstraintsData = function (statusValues, typeValues, accountValues, dateRange, searchText) {
+      console.log('סינון אילוצים:', { statusValues, typeValues, accountValues, dateRange, searchText });
+      // הפונקציה מוגדרת ב-constraint-manager.js
+    };
+
+    // פונקציות לטיפול בכפתורי הצגה/הסתרה
+    function toggleTopSection() {
+      const topSection = document.querySelector('.top-section');
+      const sectionBody = topSection.querySelector('.section-body');
+      const filterIcon = topSection.querySelector('.filter-icon');
+
+      if (sectionBody.style.display === 'none') {
+        sectionBody.style.display = 'block';
+        filterIcon.textContent = '▲';
+      } else {
+        sectionBody.style.display = 'none';
+        filterIcon.textContent = '▼';
+      }
+    }
+
+    function toggleMainSection() {
+      const mainSection = document.querySelector('.content-section');
+      const sectionBody = mainSection.querySelector('.section-body');
+      const filterIcon = mainSection.querySelector('.filter-icon');
+
+      if (sectionBody.style.display === 'none') {
+        sectionBody.style.display = 'block';
+        filterIcon.textContent = '▲';
+      } else {
+        sectionBody.style.display = 'none';
+        filterIcon.textContent = '▼';
+      }
     }
 
     // טעינת נתונים בטעינת הדף

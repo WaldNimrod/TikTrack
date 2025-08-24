@@ -2712,6 +2712,77 @@ button[onclick*="openDesignDetails"]:hover {
   color: white !important;
 }
 
+/* ===== תבנית גלובלית לכל המודולים ===== */
+
+/* תבנית בסיס לכל המודולים */
+.modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+}
+
+.modal .modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  order: 1;
+}
+
+.modal .btn-close {
+  background: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  margin: 0;
+  order: 2;
+  filter: none;
+  color: #ff9c05 !important;
+  position: relative;
+}
+
+.modal .btn-close::before {
+  content: '✕';
+  color: #ff9c05;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.modal .btn-close:hover {
+  opacity: 1;
+  color: #ff8c00 !important;
+}
+
+.modal .btn-close:hover::before {
+  color: #ff8c00;
+}
+
+/* התאמה ל-RTL לכל המודולים */
+.modal .modal-body {
+  direction: rtl;
+  text-align: right;
+}
+
+.modal .form-label {
+  text-align: right;
+}
+
+.modal .form-control,
+.modal .form-select {
+  text-align: right;
+}
+
+/* גודל מודל אחיד */
+.modal .modal-dialog {
+  max-width: 800px;
+  margin: 1.75rem auto;
+}
+
 /* ===== צבעים גלובליים לכל המודולים ===== */
 /* סגנונות ספציפיים למודל תכנון */
 #addTradePlanModal .modal-header {
@@ -2986,6 +3057,25 @@ button[onclick*="openDesignDetails"]:hover {
 .linked-object-text {
   font-weight: 500;
   color: #333;
+}
+
+.linked-object-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.linked-object-clickable:hover {
+  background-color: #f8f9fa;
+  color: #007bff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.linked-object-clickable:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 123, 255, 0.2);
 }
 
 .linked-object-type {

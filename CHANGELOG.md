@@ -1,5 +1,37 @@
 # Changelog - TikTrack
 
+## [2025-08-24] - Active Alerts Component Enhancement & Database Constraints
+
+### ✅ Active Alerts Component (v2.4)
+- **Enhanced Related Object Display**: Added link icon (🔗) before related object titles
+- **Interactive Click Functionality**: Click on related object shows "בפיתוח" message
+- **Improved Visual Design**: Hover effects and smooth transitions for linked objects
+- **Updated Display Format**:
+  - Trade: `🔗 טרייד | סווינג | Long | 24.3.25`
+  - Plan: `🔗 תוכנית | השקעה | Short | 24.3.25`
+  - Account: `🔗 חשבון מעודכן (USD)`
+  - Ticker: `🔗 טיקר: AAPL`
+
+### 🗄️ Database Constraints Implementation
+- **Alert Condition Field**: Added CHECK constraint for `condition` field in alerts table
+- **Complex Structure Support**: `variable | operator | value` format (e.g., `price | moreThen | 210$`)
+- **Simple Values Support**: Direct values like `price_target`, `stop_loss`, `breakout`
+- **Data Validation**: Prevents invalid condition values from being inserted
+- **15 Diverse Sample Alerts**: Created with various condition types and related objects
+
+### 🎯 Technical Improvements
+- **CSS Enhancements**: Added `.linked-object-clickable` styles with hover effects
+- **Global Function**: `window.showLinkedObjectMessage()` for consistent messaging
+- **Error Prevention**: Database-level validation for alert conditions
+- **Performance**: Optimized component rendering and icon updates
+
+### 📁 Files Updated
+- `trading-ui/scripts/active-alerts-component.js` - Enhanced with link functionality
+- `trading-ui/styles/styles.css` - Added interactive link styles
+- `Backend/db/simpleTrade_new.db` - Added CHECK constraints and sample data
+
+---
+
 ## [2025-08-24] - Complete Validation System Implementation
 
 ### ✅ Major Features Completed

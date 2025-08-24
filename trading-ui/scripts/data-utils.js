@@ -100,6 +100,93 @@ async function saveData(endpoint, data, reloadFunction = null) {
     }
 }
 
+// ===== פונקציות המרה מניות וסכומים =====
+
+/**
+ * קבלת העדפת משתמש
+ */
+function getUserPreference(key, defaultValue) {
+    try {
+        // ניסיון לקבל מהעדפות מקומיות
+        const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+        return preferences[key] !== undefined ? preferences[key] : defaultValue;
+    } catch (error) {
+        console.log('שגיאה בקריאת העדפות:', error);
+        return defaultValue;
+    }
+}
+
+/**
+ * המרת סכום למספר מניות
+ * @param {number} amount - הסכום בדולרים
+ * @param {number} price - מחיר המניה
+ * @param {boolean} allowFractionalShares - האם מותרות מניות חלקיות
+ * @returns {object} - מספר מניות וסכום מתוקן
+ */
+function convertAmountToShares(amount, price, allowFractionalShares = null) {
+    if (!amount || !price || price <= 0) {
+        return { shares: 0, adjustedAmount: 0 };
+    }
+
+    // קבלת העדפה אם לא הועברה
+    if (allowFractionalShares === null) {
+        allowFractionalShares = getUserPreference('allowFractionalShares', false);
+    }
+
+    if (allowFractionalShares) {
+        // מניות חלקיות - הצג עם נקודה עשרונית
+        const shares = amount / price;
+        return {
+            shares: parseFloat(shares.toFixed(4)),
+            adjustedAmount: amount
+        };
+    } else {
+        // מניות שלמות בלבד - עגל למטה ועדכן סכום
+        const shares = Math.floor(amount / price);
+        const adjustedAmount = shares * price;
+        return {
+            shares: shares,
+            adjustedAmount: parseFloat(adjustedAmount.toFixed(2))
+        };
+    }
+}
+
+/**
+ * המרת מספר מניות לסכום
+ * @param {number} shares - מספר המניות
+ * @param {number} price - מחיר המניה
+ * @returns {number} - הסכום בדולרים
+ */
+function convertSharesToAmount(shares, price) {
+    if (!shares || !price || price <= 0) {
+        return 0;
+    }
+
+    const amount = shares * price;
+    return parseFloat(amount.toFixed(2));
+}
+
+/**
+ * עדכון מחירי עצירה ויעד ברירת מחדל
+ * @param {number} currentPrice - המחיר הנוכחי
+ * @param {object} options - אפשרויות נוספות
+ * @returns {object} - מחירי עצירה ויעד
+ */
+function calculateDefaultPrices(currentPrice, options = {}) {
+    const {
+        defaultStopPercent = getUserPreference('defaultStopLossPercent', 5),
+        defaultTargetPercent = getUserPreference('defaultTargetPercent', 10)
+    } = options;
+
+    const stopPrice = currentPrice * (1 - defaultStopPercent / 100);
+    const targetPrice = currentPrice * (1 + defaultTargetPercent / 100);
+
+    return {
+        stopPrice: parseFloat(stopPrice.toFixed(2)),
+        targetPrice: parseFloat(targetPrice.toFixed(2))
+    };
+}
+
 /**
  * עדכון נתונים כללי
  * Generic data updating
@@ -210,6 +297,12 @@ window.deleteData = deleteData;
 window.validateRequired = validateRequired;
 window.validateNumber = validateNumber;
 window.validateDate = validateDate;
+
+// ייצוא פונקציות המרה
+window.getUserPreference = getUserPreference;
+window.convertAmountToShares = convertAmountToShares;
+window.convertSharesToAmount = convertSharesToAmount;
+window.calculateDefaultPrices = calculateDefaultPrices;
 
 console.log('✅ Data Utils loaded successfully');
 

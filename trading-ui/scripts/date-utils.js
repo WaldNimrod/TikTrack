@@ -24,9 +24,9 @@
  * @returns {string} תאריך מעוצב
  */
 function formatDate(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 }
 
 /**
@@ -37,9 +37,9 @@ function formatDate(dateString) {
  * @returns {string} תאריך ושעה מעוצבים
  */
 function formatDateTime(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL');
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL');
 }
 
 /**
@@ -50,9 +50,9 @@ function formatDateTime(dateString) {
  * @returns {string} תאריך בלבד מעוצב
  */
 function formatDateOnly(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('he-IL');
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('he-IL');
 }
 
 /**
@@ -63,13 +63,13 @@ function formatDateOnly(dateString) {
  * @returns {string} תאריך קצר
  */
 function formatShortDate(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('he-IL', { 
-    day: '2-digit', 
-    month: '2-digit', 
-    year: '2-digit' 
-  });
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('he-IL', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+    });
 }
 
 /**
@@ -80,14 +80,14 @@ function formatShortDate(dateString) {
  * @returns {string} תאריך ארוך
  */
 function formatLongDate(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('he-IL', { 
-    weekday: 'long',
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('he-IL', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
 }
 
 /**
@@ -98,12 +98,12 @@ function formatLongDate(dateString) {
  * @returns {string} זמן בלבד
  */
 function formatTimeOnly(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleTimeString('he-IL', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  });
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('he-IL', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 }
 
 // ===== פונקציות המרה =====
@@ -117,9 +117,9 @@ function formatTimeOnly(dateString) {
  * @returns {string} מחרוזת ISO
  */
 function toISOString(date) {
-  if (!date) return '';
-  const dateObj = new Date(date);
-  return dateObj.toISOString();
+    if (!date) return '';
+    const dateObj = new Date(date);
+    return dateObj.toISOString();
 }
 
 /**
@@ -130,9 +130,9 @@ function toISOString(date) {
  * @returns {Date|null} אובייקט תאריך או null
  */
 function toDate(date) {
-  if (!date) return null;
-  const dateObj = new Date(date);
-  return isNaN(dateObj.getTime()) ? null : dateObj;
+    if (!date) return null;
+    const dateObj = new Date(date);
+    return isNaN(dateObj.getTime()) ? null : dateObj;
 }
 
 // ===== פונקציות ולידציה =====
@@ -146,9 +146,9 @@ function toDate(date) {
  * @returns {boolean} true אם תאריך תקין
  */
 function isValidDate(dateString) {
-  if (!dateString) return false;
-  const date = new Date(dateString);
-  return !isNaN(date.getTime());
+    if (!dateString) return false;
+    const date = new Date(dateString);
+    return !isNaN(date.getTime());
 }
 
 /**
@@ -159,10 +159,10 @@ function isValidDate(dateString) {
  * @returns {boolean} true אם בעבר
  */
 function isPastDate(date) {
-  if (!date) return false;
-  const dateObj = new Date(date);
-  const now = new Date();
-  return dateObj < now;
+    if (!date) return false;
+    const dateObj = new Date(date);
+    const now = new Date();
+    return dateObj < now;
 }
 
 /**
@@ -173,10 +173,10 @@ function isPastDate(date) {
  * @returns {boolean} true אם בעתיד
  */
 function isFutureDate(date) {
-  if (!date) return false;
-  const dateObj = new Date(date);
-  const now = new Date();
-  return dateObj > now;
+    if (!date) return false;
+    const dateObj = new Date(date);
+    const now = new Date();
+    return dateObj > now;
 }
 
 // ===== פונקציות חישוב =====
@@ -191,12 +191,12 @@ function isFutureDate(date) {
  * @returns {number} הפרש ימים
  */
 function daysDifference(date1, date2) {
-  if (!date1 || !date2) return 0;
-  const d1 = new Date(date1);
-  const d2 = new Date(date2);
-  const diffTime = Math.abs(d2 - d1);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays;
+    if (!date1 || !date2) return 0;
+    const d1 = new Date(date1);
+    const d2 = new Date(date2);
+    const diffTime = Math.abs(d2 - d1);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
 }
 
 /**
@@ -208,10 +208,10 @@ function daysDifference(date1, date2) {
  * @returns {Date} תאריך חדש
  */
 function addDays(date, days) {
-  if (!date) return new Date();
-  const dateObj = new Date(date);
-  dateObj.setDate(dateObj.getDate() + days);
-  return dateObj;
+    if (!date) return new Date();
+    const dateObj = new Date(date);
+    dateObj.setDate(dateObj.getDate() + days);
+    return dateObj;
 }
 
 /**
@@ -223,10 +223,10 @@ function addDays(date, days) {
  * @returns {Date} תאריך חדש
  */
 function addMonths(date, months) {
-  if (!date) return new Date();
-  const dateObj = new Date(date);
-  dateObj.setMonth(dateObj.getMonth() + months);
-  return dateObj;
+    if (!date) return new Date();
+    const dateObj = new Date(date);
+    dateObj.setMonth(dateObj.getMonth() + months);
+    return dateObj;
 }
 
 // ===== ייצוא פונקציות גלובליות =====

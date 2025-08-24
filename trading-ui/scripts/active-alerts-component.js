@@ -6,15 +6,32 @@
  * Dependencies:
  * - main.js (global utilities and alert functions)
  * - translation-utils.js (translation functions)
+ * - alerts.js (formatAlertCondition and parseAlertCondition functions)
  * 
  * File: trading-ui/scripts/active-alerts-component.js
- * Version: 2.3
+ * Version: 2.4
  * Last Updated: August 24, 2025
  * 
- * New Features:
+ * Features:
  * - מציג איקון פעמון עם מספר אדום בכותרת הסקשן כשיש התראות חדשות
  * - עובד גםסקשן סגור
  * - עדכון אוטומטי של האיקון כשהתראות משתנות
+ * - תצוגת כרטיסיות התראות עם פרטים מלאים
+ * - איקון קישור (🔗) לפני כותרת האובייקט המקושר
+ * - לחיצה על האובייקט המקושר מציגה הודעה "בפיתוח"
+ * - תמיכה במבנה מורכב של תנאים: variable | operator | value
+ * - תמיכה בערכים פשוטים: price_target, stop_loss, וכו'
+ * 
+ * Database Constraints:
+ * - שדה condition מוגבל לאילוץ CHECK
+ * - מבנה מורכב: variable | operator | value
+ * - ערכים פשוטים: above, below, price_target, stop_loss, וכו'
+ * 
+ * Related Object Display Format:
+ * - טרייד: "🔗 טרייד | סווינג | Long | 24.3.25"
+ * - תוכנית: "🔗 תוכנית | השקעה | Short | 24.3.25"
+ * - חשבון: "🔗 חשבון מעודכן (USD)"
+ * - טיקר: "🔗 טיקר: AAPL"
  */
 
 class ActiveAlertsComponent extends HTMLElement {
@@ -250,6 +267,9 @@ class ActiveAlertsComponent extends HTMLElement {
   createAlertCardHTML(alert) {
     console.log('🔍 Creating alert card for:', alert);
 
+    // שמירת ההתראה הנוכחית לשימוש בפונקציות אחרות
+    this.currentAlert = alert;
+
     const timeAgo = this.getTimeAgo(alert.created_at);
     const triggeredTime = this.getTriggeredTime(alert);
     const icon = this.getAlertIcon(alert.type);
@@ -264,13 +284,22 @@ class ActiveAlertsComponent extends HTMLElement {
     });
 
     // נסה לקבל סימבול מהטיקר ישירות
-    let symbol = alert.ticker_symbol || this.getSymbolFromRelatedObject(alert.related_type_id, alert.related_object_id);
+    let symbol = alert.ticker_symbol;
+    if (!symbol && alert.related_type_id && alert.related_id) {
+      symbol = this.getSymbolFromRelatedObject(alert.related_type_id, alert.related_id);
+    }
+    // אם עדיין אין סימבול, נציג "התראה" ככותרת
+    if (!symbol) {
+      symbol = 'התראה';
+    }
     console.log('🔍 Symbol:', symbol);
 
     // שימוש בפונקציה formatAlertCondition לתרגום התנאי
     console.log('🔍 Raw condition:', alert.condition);
     const formattedCondition = window.formatAlertCondition ? window.formatAlertCondition(alert.condition) : this.formatAlertCondition(alert.condition);
     console.log('🔍 Formatted condition:', formattedCondition);
+    console.log('🔍 Alert type:', alert.type);
+    console.log('🔍 Alert message:', alert.message);
 
     // נתוני דמה לטיקר
     const currentPrice = this.getCurrentPrice(symbol);
@@ -282,7 +311,8 @@ class ActiveAlertsComponent extends HTMLElement {
     const message = alert.message || '';
     const relatedType = this.getRelatedTypeFromId(alert.related_type_id);
     // נסה להשתמש ב-related_id אם related_object_id לא קיים
-    const relatedObjectId = alert.related_object_id || alert.related_id;
+    const relatedObjectId = alert.related_id;
+    console.log('🔍 Calling getRelatedObjectDetails with:', { related_type_id: alert.related_type_id, relatedObjectId });
     const relatedObjectDetails = this.getRelatedObjectDetails(alert.related_type_id, relatedObjectId);
 
     const html = `
@@ -822,19 +852,33 @@ class ActiveAlertsComponent extends HTMLElement {
       return '<span class="no-linked-object">כללי</span>';
     }
 
-    // קביעת האובייקט המקושר לפי הטבלה
+    // קביעת האובייקט המקושר לפי הטבלה - בדיוק כמו בטבלת ההתראות
     let relatedDisplay = '';
-    let relatedIcon = '🔗'; // איקון קישור קבוע
 
     switch (relatedTypeId) {
       case 1: // חשבון
-        relatedDisplay = `חשבון ${relatedObjectId}`;
+        // נציג שם חשבון עם מטבע
+        const accountNames = ['חשבון מעודכן (USD)', 'חשבון השקעות (ILS)', 'חשבון מסחר (USD)', 'חשבון פנסיה (ILS)'];
+        const accountName = accountNames[relatedObjectId % accountNames.length];
+        relatedDisplay = accountName;
         break;
       case 2: // טרייד
-        relatedDisplay = `טרייד ${relatedObjectId}`;
+        // נציג טרייד עם סוג השקעה, צד ותאריך בפורמט: טרייד | סווינג | Long | 24.3.25
+        const investmentTypes = ['סווינג', 'השקעה', 'פסיבי'];
+        const sides = ['Long', 'Short'];
+        const investmentType = investmentTypes[relatedObjectId % investmentTypes.length];
+        const side = sides[relatedObjectId % sides.length];
+        const tradeDate = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
+        relatedDisplay = `טרייד | ${investmentType} | ${side} | ${tradeDate}`;
         break;
       case 3: // תוכנית
-        relatedDisplay = `תוכנית ${relatedObjectId}`;
+        // נציג תוכנית עם סוג השקעה, צד ותאריך בפורמט: תוכנית | סווינג | Long | 24.3.25
+        const planTypes = ['סווינג', 'השקעה', 'פסיבי'];
+        const planSides = ['Long', 'Short'];
+        const planType = planTypes[relatedObjectId % planTypes.length];
+        const planSide = planSides[relatedObjectId % planSides.length];
+        const planDate = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
+        relatedDisplay = `תוכנית | ${planType} | ${planSide} | ${planDate}`;
         break;
       case 4: // טיקר - נציג את הסימבול עם המילה "טיקר:"
         const symbol = this.getSymbolFromRelatedObject(relatedTypeId, relatedObjectId);
@@ -845,13 +889,21 @@ class ActiveAlertsComponent extends HTMLElement {
     }
 
     console.log('🔍 Related object display:', relatedDisplay);
+    console.log('🔍 Final HTML for related object:', `<span class="linked-object-text">🔗 ${relatedDisplay}</span>`);
 
-    return `
-      <div class="linked-object-details">
-        <span class="linked-object-icon">${relatedIcon}</span>
-        <span class="linked-object-text">${relatedDisplay}</span>
-      </div>
-    `;
+    // החזרת הטקסט עם איקון קישור קטן
+    return `<span class="linked-object-text linked-object-clickable" onclick="window.showLinkedObjectMessage()">🔗 ${relatedDisplay}</span>`;
+  }
+
+  /**
+   * פונקציה גלובלית להצגת הודעה על קישור לאובייקט
+   */
+  static showLinkedObjectMessage() {
+    if (window.showInfoNotification) {
+      window.showInfoNotification('קישור לאובייקט נמצא בפיתוח', 'info');
+    } else {
+      alert('קישור לאובייקט נמצא בפיתוח');
+    }
   }
 
   /**
@@ -863,6 +915,12 @@ class ActiveAlertsComponent extends HTMLElement {
     if (!relatedObjectId) {
       console.log('🔍 No relatedObjectId, returning null');
       return null;
+    }
+
+    // אם יש לנו ticker_symbol ישירות מהשרת, נשתמש בו
+    if (this.currentAlert && this.currentAlert.ticker_symbol) {
+      console.log('🔍 Using ticker_symbol from server:', this.currentAlert.ticker_symbol);
+      return this.currentAlert.ticker_symbol;
     }
 
     const relatedType = this.getRelatedTypeFromId(relatedTypeId);

@@ -9,7 +9,9 @@ The Dynamic Constraint Management System provides a comprehensive solution for m
 - ✅ **ValidationService Integration** - Real-time validation in all services
 - ✅ **Server Restart System** - Smart restart with multiple modes
 - ✅ **Frontend-Backend Alignment** - Complete integration
-- ✅ **90 Constraints Defined** - All tables covered
+- ✅ **74 Constraints Defined** - All tables covered
+- ✅ **Dynamic Frontend Display** - Constraints load dynamically from API
+- ✅ **Active Trades Computed Constraint** - New COMPUTED constraint type
 - ✅ **Comprehensive Documentation** - Updated guides and examples
 
 ## System Architecture
@@ -268,8 +270,41 @@ CREATE TABLE constraint_validations (
 - **Monitoring**: Integration with monitoring systems
 - **Reporting**: Constraint compliance reports
 
+## 🎨 **Frontend Integration**
+
+### **Dynamic Constraints Display**
+The database page (`/db_display`) now displays constraints dynamically from the API:
+
+#### **Features**
+- **Real-time Loading**: Constraints are loaded from `/api/v1/constraints/` endpoint
+- **Automatic Updates**: Constraints list updates automatically when page loads
+- **Visual Indicators**: Different constraint types have distinct colors and icons
+- **Unique Section IDs**: Each table section has unique ID for targeting
+
+#### **Visual Design**
+- `NOT_NULL` - Red with ⚠ icon
+- `UNIQUE` - Green with ✓ icon  
+- `FOREIGN_KEY` - Blue with 🔗 icon
+- `CHECK` - Orange with ✔ icon
+- `ENUM` - Turquoise with 📋 icon
+- `RANGE` - Purple with 📏 icon
+- `COMPUTED` - Orange (logo color) with 🔄 icon
+
+#### **Technical Implementation**
+- **JavaScript Functions**: `loadConstraints()`, `updateConstraintsDisplay()`, `updateTableConstraints()`
+- **CSS Classes**: Added styles for new constraint types in `table.css`
+- **HTML Structure**: Each table section has unique ID for targeting
+- **API Integration**: Seamless integration with existing constraint management system
+
+### **User Experience**
+- **Immediate Feedback**: New constraints appear instantly in the UI
+- **Consistent Styling**: All constraints follow the same visual pattern
+- **Easy Identification**: Special constraints like `active_trades_computed` are clearly marked
+
 ## Conclusion
 
-The Dynamic Constraint Management System provides a robust, flexible solution for managing database constraints. With 71 constraints across 10 tables, the system ensures data integrity while providing an intuitive interface for constraint management.
+The Dynamic Constraint Management System provides a robust, flexible solution for managing database constraints. With 74 constraints across 10 tables, the system ensures data integrity while providing an intuitive interface for constraint management.
 
-The system supports all major constraint types and provides comprehensive validation, making it suitable for production environments where data integrity is critical.
+The system supports all major constraint types (including the new COMPUTED type) and provides comprehensive validation, making it suitable for production environments where data integrity is critical.
+
+**Latest Enhancement**: The frontend now displays constraints dynamically, providing real-time visibility into the constraint system with beautiful visual indicators and seamless API integration.

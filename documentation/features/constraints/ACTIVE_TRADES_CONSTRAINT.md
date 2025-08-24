@@ -183,6 +183,33 @@ update_ticker_open_status(ticker_id)
 - **Performance** - Fast queries without joins
 - **Scalability** - Efficient for large datasets
 
+## 🎨 **Frontend Integration**
+
+### **Dynamic Constraints Display**
+The database page now displays constraints dynamically from the API:
+
+- **Real-time Loading**: Constraints are loaded from `/api/v1/constraints/` endpoint
+- **Automatic Updates**: Constraints list updates automatically when page loads
+- **Visual Indicators**: Different constraint types have distinct colors and icons:
+  - `NOT_NULL` - Red with ⚠ icon
+  - `UNIQUE` - Green with ✓ icon  
+  - `FOREIGN_KEY` - Blue with 🔗 icon
+  - `CHECK` - Orange with ✔ icon
+  - `ENUM` - Turquoise with 📋 icon
+  - `RANGE` - Purple with 📏 icon
+  - `COMPUTED` - Orange (logo color) with 🔄 icon
+
+### **Implementation Details**
+- **JavaScript Functions**: `loadConstraints()`, `updateConstraintsDisplay()`, `updateTableConstraints()`
+- **CSS Classes**: Added styles for new constraint types in `table.css`
+- **HTML Structure**: Each table section has unique ID for targeting
+- **API Integration**: Seamless integration with existing constraint management system
+
+### **User Experience**
+- **Immediate Feedback**: New constraints appear instantly in the UI
+- **Consistent Styling**: All constraints follow the same visual pattern
+- **Easy Identification**: The `active_trades_computed` constraint is clearly marked with 🔄 icon
+
 ## 📋 **API Reference**
 
 ### **Validation Endpoint**

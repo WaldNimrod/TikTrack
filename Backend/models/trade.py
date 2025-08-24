@@ -11,7 +11,7 @@ class Trade(BaseModel):
     
     account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
-    trade_plan_id = Column(Integer, ForeignKey('trade_plans.id'), nullable=False)  # NOT NULL per constraints
+    trade_plan_id = Column(Integer, ForeignKey('trade_plans.id'), nullable=True)  # Allow NULL for trades without plans
     status = Column(String(20), default='open', nullable=True)
     investment_type = Column(String(20), default='swing', nullable=False)  # NOT NULL per constraints
     side = Column(String(10), default='Long', nullable=True)  # Long, Short
@@ -69,53 +69,3 @@ class Trade(BaseModel):
     
     def __repr__(self) -> str:
         return f"<Trade(id={self.id}, status='{self.status}', investment_type='{self.investment_type}')>"
-    
-    def validate_trade_plan_link(self, trade_plan: 'TradePlan') -> Tuple[bool, str]:
-        """
-        Validate trade plan link
-        
-        Rules:
-        1. Open trade must be linked to a plan in open or closed status
-        2. Closed or cancelled trade can be linked to a plan in any status
-        3. Trade creation date cannot be earlier than plan creation date
-        4. Trade side must be identical to plan side
-        5. Trade investment_type can be different from plan investment_type
-        """
-        if not trade_plan:
-            return False, "Trade must be linked to a plan"
-        
-        # Check creation date
-        if self.created_at and trade_plan.created_at:
-            if self.created_at < trade_plan.created_at:
-                return False, f"Trade creation date ({self.created_at}) cannot be earlier than plan creation date ({trade_plan.created_at})"
-        
-        # Check status
-        if self.status == 'open':
-            if trade_plan.status not in ['open', 'closed']:
-                return False, f"Open trade must be linked to a plan in open or closed status, not {trade_plan.status}"
-        
-        # Check side - must be identical
-        if self.side != trade_plan.side:
-            return False, f"Trade side ({self.side}) must be identical to plan side ({trade_plan.side})"
-        
-        return True, "Valid"
-    
-    def validate_before_save(self, db_session) -> List[str]:
-        """
-        Validate before saving
-        """
-        errors: List[str] = []
-        
-        # Check plan link
-        if self.trade_plan_id:
-            trade_plan = db_session.query(TradePlan).filter(TradePlan.id == self.trade_plan_id).first()
-            if trade_plan:
-                is_valid, message = self.validate_trade_plan_link(trade_plan)
-                if not is_valid:
-                    errors.append(message)
-            else:
-                errors.append(f"Plan {self.trade_plan_id} not found")
-        else:
-            errors.append("Trade must be linked to a plan")
-        
-        return errors

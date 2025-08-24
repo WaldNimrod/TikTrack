@@ -1636,6 +1636,23 @@ function updateAccountFilterMenu(accounts) {
 
 }
 
+// פונקצית סידור מותאמת לטבלת חשבונות
+function sortTable(columnIndex) {
+  console.log('🔄 === SORT ACCOUNTS TABLE ===');
+  console.log('🔄 Column clicked:', columnIndex);
+
+  if (typeof window.sortTableData === 'function') {
+    window.sortTableData(
+      columnIndex,
+      window.accountsData || [],
+      'accounts',
+      window.updateAccountsTable
+    );
+  } else {
+    console.error('❌ sortTableData function not found in tables.js');
+  }
+}
+
 // ייצוא הפונקציות
 window.loadAccountsDataForAccountsPage = loadAccountsDataForAccountsPage;
 window.toggleMainSection = toggleMainSection;
@@ -1646,6 +1663,7 @@ window.filterAccountsLocally = filterAccountsLocally;
 window.updateAccountsTable = updateAccountsTable;
 window.editAccount = editAccount;
 window.deleteAccount = deleteAccount;
+window.sortTable = sortTable;
 // viewLinkedItems מיוצאת מקובץ linked-items.js
 
 

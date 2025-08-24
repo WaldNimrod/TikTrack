@@ -542,7 +542,7 @@ async function loadTradePlansData() {
         console.error('❌ Error details:', error.message);
 
         // Displaying detailed error message in table
-        const tbody = document.querySelector('#designsTable tbody');
+        const tbody = document.querySelector('#trade_plansTable tbody');
         if (tbody) {
             // Identifying error type
             let errorMessage = 'שגיאה בטעינת נתונים';
@@ -658,7 +658,7 @@ function updateTradePlansTable(trade_plans) {
     console.log('🔄 === UPDATE TRADE PLANS TABLE ===');
     console.log('🔄 Designs to display:', trade_plans.length);
 
-    const tbody = document.querySelector('#designsTable tbody');
+    const tbody = document.querySelector('#trade_plansTable tbody');
     if (!tbody) {
         console.error('Table body not found');
         return;
@@ -717,7 +717,7 @@ function updateTradePlansTable(trade_plans) {
         }
 
         // Updating record count
-        const countElement = document.querySelector('#designsCount');
+        const countElement = document.querySelector('#trade_plansCount');
         if (countElement) {
             countElement.textContent = '0 תכנונים';
         }
@@ -893,13 +893,13 @@ function updatePageSummaryStats() {
 
     const avgInvestment = totalDesigns > 0 ? totalInvestment / totalDesigns : 0;
 
-    document.getElementById('totalDesigns').textContent = totalDesigns;
-    document.getElementById('totalInvestment').textContent = formatCurrency(totalInvestment);
-    document.getElementById('avgInvestment').textContent = formatCurrency(avgInvestment);
-    document.getElementById('totalProfit').textContent = formatCurrency(totalProfit);
+    document.getElementById('totalTradePlans').textContent = totalDesigns;
+    document.getElementById('totalTradePlansInvestment').textContent = formatCurrency(totalInvestment);
+    document.getElementById('avgTradePlansInvestment').textContent = formatCurrency(avgInvestment);
+    document.getElementById('totalTradePlansProfit').textContent = formatCurrency(totalProfit);
 
     // עדכון מספר הרשומות בטבלה
-    const countElement = document.getElementById('designsCount');
+    const countElement = document.getElementById('trade_plansCount');
     if (countElement) {
         countElement.textContent = `${totalDesigns} רשומות`;
     }
@@ -1127,7 +1127,7 @@ function sortTable(columnIndex) {
         window.sortTableData(
             columnIndex,
             window.filteredTradePlansData || trade_plansData,
-            'planning',
+            'trade_plans',
             updateDesignsTable
         );
     } else {
@@ -1144,7 +1144,7 @@ function sortTable(columnIndex) {
  */
 function performLocalSort(columnIndex) {
     const data = window.filteredTradePlansData || trade_plansData;
-    const currentSortState = window.getSortState ? window.getSortState('planning') : { columnIndex: -1, direction: 'asc' };
+    const currentSortState = window.getSortState ? window.getSortState('trade_plans') : { columnIndex: -1, direction: 'asc' };
 
     // קביעת כיוון הסידור
     let direction = 'asc';
@@ -1154,7 +1154,7 @@ function performLocalSort(columnIndex) {
 
     // שמירת מצב הסידור
     if (window.saveSortState) {
-        window.saveSortState('planning', columnIndex, direction);
+        window.saveSortState('trade_plans', columnIndex, direction);
     }
 
     // סידור הנתונים
@@ -1754,7 +1754,7 @@ window.setupSortableHeaders = function () {
 
 function setupSortableHeadersLocal() {
     console.log('🔄 Setting up sortable headers locally for planning page');
-    const headers = document.querySelectorAll('#designsTable th[onclick]');
+    const headers = document.querySelectorAll('#trade_plansTable th[onclick]');
     headers.forEach(header => {
         header.style.cursor = 'pointer';
         header.title = 'לחץ למיון';
@@ -2157,6 +2157,7 @@ window.updateSharesFromAmount = updateSharesFromAmount;
 window.updateAmountFromShares = updateAmountFromShares;
 window.addEntryCondition = addEntryCondition;
 window.addReason = addReason;
+window.sortTable = sortTable;
 
 console.log('✅ Trade plans functions exported:', {
     updateSharesFromAmount: typeof updateSharesFromAmount,

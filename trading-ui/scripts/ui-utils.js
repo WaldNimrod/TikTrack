@@ -331,7 +331,319 @@ window.uiUtils = {
     showNotification
 };
 
+/**
+ * Show warning modal for deletion with linked items
+ * 
+ * Creates a warning modal that displays linked items that prevent deletion,
+ * similar to the linked items modal but with warning styling and deletion-specific content.
+ * 
+ * @param {Object} data - Linked items data
+ * @param {string} itemType - Type of the item
+ * @param {string|number} itemId - ID of the item
+ * @param {Function} onConfirm - Callback function when user confirms deletion
+ */
+function showLinkedItemsWarningModal(data, itemType, itemId, onConfirm) {
+
+    // Create modal content
+    const modalContent = createLinkedItemsWarningContent(data, itemType, itemId, onConfirm);
+
+    // Create and show modal
+    const modalId = 'linkedItemsWarningModal';
+    const modalTitle = `⚠️ אזהרה: לא ניתן למחוק ${getItemTypeDisplayName(itemType)} #${itemId}`;
+
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Create new modal with linked-items-modal class
+    const modalHtml = `
+    <div class="modal fade linked-items-modal" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="${modalId}Label">${modalTitle}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            ${modalContent}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+            <button type="button" class="btn btn-danger" onclick="forceDeleteWithLinkedItems('${itemType}', ${itemId}, ${onConfirm})">
+              מחק בכל זאת
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById(modalId));
+    modal.show();
+}
+
+/**
+ * Create linked items warning modal content
+ * 
+ * Generates the HTML content for the linked items warning modal, including
+ * warning message and detailed information about linked items that prevent deletion.
+ * 
+ * @param {Object} data - Linked items data
+ * @param {string} itemType - Type of the item
+ * @param {string|number} itemId - ID of the item
+ * @param {Function} onConfirm - Callback function when user confirms deletion
+ * @returns {string} HTML content for the modal
+ */
+function createLinkedItemsWarningContent(data, itemType, itemId, onConfirm) {
+
+    // יצירת כותרת מותאמת לפי סוג האלמנט
+    let headerTitle = '';
+    let itemName = '';
+
+    switch (itemType) {
+        case 'account':
+            headerTitle = 'לא ניתן למחוק חשבון:';
+            itemName = data.accountName || `חשבון ${itemId}`;
+            break;
+        case 'trade':
+            headerTitle = 'לא ניתן למחוק טרייד:';
+            itemName = data.tradeSymbol || `טרייד ${itemId}`;
+            break;
+        case 'ticker':
+            headerTitle = 'לא ניתן למחוק טיקר:';
+            itemName = data.tickerSymbol || `טיקר ${itemId}`;
+            break;
+        case 'alert':
+            headerTitle = 'לא ניתן למחוק התראה:';
+            itemName = data.alertName || `התראה ${itemId}`;
+            break;
+        case 'cash_flow':
+            headerTitle = 'לא ניתן למחוק תזרים מזומנים:';
+            itemName = data.cashFlowName || `תזרים ${itemId}`;
+            break;
+        case 'note':
+            headerTitle = 'לא ניתן למחוק הערה:';
+            itemName = data.noteTitle || `הערה ${itemId}`;
+            break;
+        case 'trade_plan':
+            headerTitle = 'לא ניתן למחוק תוכנית טרייד:';
+            itemName = data.planName || `תוכנית ${itemId}`;
+            break;
+        case 'execution':
+            headerTitle = 'לא ניתן למחוק ביצוע:';
+            itemName = data.executionName || `ביצוע ${itemId}`;
+            break;
+        default:
+            headerTitle = 'לא ניתן למחוק רשומה:';
+            itemName = `רשומה ${itemId}`;
+    }
+
+    let content = `
+    <div class="linked-items-container">
+      <div class="alert alert-warning">
+        <strong>⚠️ ${headerTitle} <span class="text-danger">${itemName}</span></strong>
+        <br>
+        ${getItemTypeDisplayName(itemType)} זה מקושר לפריטים הבאים במערכת. יש לטפל בהם תחילה:
+      </div>
+
+      <div class="linked-items-section">
+        <h6>📋 פריטים מקושרים (${data && data.linkedItems ? data.linkedItems.length : 0})</h6>
+        <div class="linked-items-list">
+  `;
+
+    // Add linked items list
+    if (data && data.linkedItems && data.linkedItems.length > 0) {
+        content += createLinkedItemsWarningList(data.linkedItems);
+    } else {
+        content += `
+          <div class="no-linked-items">
+            <strong>ℹ️ לא נמצאו אובייקטים מקושרים</strong><br>
+            למרות זאת, לא ניתן למחוק ${getItemTypeDisplayName(itemType)} זה.
+          </div>
+        `;
+    }
+
+    content += `
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <strong>💡 מה ניתן לעשות:</strong>
+        <ul class="mb-0">
+          <li>בטל את הקישור לפריטים המקושרים</li>
+          <li>מחק את הפריטים המקושרים תחילה</li>
+          <li>או בחר "מחק בכל זאת" (זהירות!)</li>
+        </ul>
+      </div>
+    </div>
+  `;
+
+    return content;
+}
+
+/**
+ * Create linked items warning list
+ * 
+ * Creates a 3-column grid layout for displaying linked items in warning modal.
+ * 
+ * @param {Array} linkedItems - Array of linked items
+ * @returns {string} HTML content for the linked items list
+ */
+function createLinkedItemsWarningList(linkedItems) {
+    if (!linkedItems || linkedItems.length === 0) {
+        return '<div class="alert alert-info">אין אובייקטים מקושרים</div>';
+    }
+
+    linkedItems.forEach(item => {
+        content += `
+        <div class="linked-item-card">
+          <div class="linked-item-header">
+            <span class="linked-item-type">${getItemTypeIcon(item.type)} ${getItemTypeDisplayName(item.type)}</span>
+            <span class="linked-item-id">#${item.id}</span>
+          </div>
+          <div class="linked-item-content">
+            <div class="linked-item-title">${item.title || item.name || `#${item.id}`}</div>
+            <div class="linked-item-details">
+              ${createBasicItemInfo(item)}
+            </div>
+          </div>
+          <div class="linked-item-actions">
+            <button class="btn btn-outline-primary" onclick="viewItemDetails('${item.type}', ${item.id})">
+              <i class="fas fa-eye"></i> צפייה
+            </button>
+            <button class="btn btn-outline-warning" onclick="unlinkItem('${item.type}', ${item.id})">
+              <i class="fas fa-unlink"></i> נתק
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    return content;
+}
+
+/**
+ * Force delete with linked items
+ * 
+ * Handles the force deletion when user clicks "מחק בכל זאת"
+ * 
+ * @param {string} itemType - Type of the item
+ * @param {string|number} itemId - ID of the item
+ * @param {Function} onConfirm - Callback function when user confirms deletion
+ */
+function forceDeleteWithLinkedItems(itemType, itemId, onConfirm) {
+    // Close the warning modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsWarningModal'));
+    if (modal) {
+        modal.hide();
+    }
+
+    // Show final confirmation
+    if (confirm(`האם אתה בטוח שברצונך למחוק ${getItemTypeDisplayName(itemType)} #${itemId} יחד עם כל האובייקטים המקושרים אליו?`)) {
+        if (onConfirm && typeof onConfirm === 'function') {
+            onConfirm();
+        }
+    }
+}
+
+/**
+ * Get item type icon
+ * 
+ * @param {string} itemType - Type of the item
+ * @returns {string} Icon HTML
+ */
+function getItemTypeIcon(itemType) {
+    const icons = {
+        'account': '🏦',
+        'trade': '📈',
+        'ticker': '📊',
+        'alert': '🔔',
+        'cash_flow': '💰',
+        'note': '📝',
+        'trade_plan': '📋',
+        'execution': '⚡'
+    };
+    return icons[itemType] || '📄';
+}
+
+/**
+ * Get item type display name
+ * 
+ * @param {string} itemType - Type of the item
+ * @returns {string} Display name
+ */
+function getItemTypeDisplayName(itemType) {
+    const names = {
+        'account': 'חשבון',
+        'trade': 'טרייד',
+        'ticker': 'טיקר',
+        'alert': 'התראה',
+        'cash_flow': 'תזרים מזומנים',
+        'note': 'הערה',
+        'trade_plan': 'תוכנית טרייד',
+        'execution': 'ביצוע'
+    };
+    return names[itemType] || 'אובייקט';
+}
+
+/**
+ * Create basic item info
+ * 
+ * @param {Object} item - Item data
+ * @returns {string} HTML content
+ */
+function createBasicItemInfo(item) {
+    let info = '';
+
+    if (item.status) {
+        const statusClass = item.status === 'open' ? 'text-success' :
+            item.status === 'closed' ? 'text-warning' : 'text-danger';
+        info += `<div class="item-status ${statusClass}">סטטוס: ${item.status}</div>`;
+    }
+
+    if (item.created_at) {
+        info += `<div class="item-date">נוצר: ${item.created_at}</div>`;
+    }
+
+    if (item.notes) {
+        info += `<div class="item-notes">הערות: ${item.notes.substring(0, 50)}${item.notes.length > 50 ? '...' : ''}</div>`;
+    }
+
+    return info || '<div class="item-no-info">אין מידע נוסף</div>';
+}
+
 // אתחול UI Utils
 function initializeUIUtils() {
     // UI Utils loaded successfully
 }
+
+// Export functions to global scope
+window.uiUtils = {
+    showErrorNotification,
+    showSuccessNotification,
+    showInfoNotification,
+    createToastContainer,
+    showSecondConfirmationModal,
+    showNotification,
+    showLinkedItemsWarningModal,
+    createLinkedItemsWarningContent,
+    createLinkedItemsWarningList,
+    forceDeleteWithLinkedItems,
+    getItemTypeIcon,
+    getItemTypeDisplayName,
+    createBasicItemInfo
+};
+
+// Export individual functions to global scope
+window.showLinkedItemsWarningModal = showLinkedItemsWarningModal;
+window.createLinkedItemsWarningContent = createLinkedItemsWarningContent;
+window.createLinkedItemsWarningList = createLinkedItemsWarningList;
+window.forceDeleteWithLinkedItems = forceDeleteWithLinkedItems;
+window.getItemTypeIcon = getItemTypeIcon;
+window.getItemTypeDisplayName = getItemTypeDisplayName;
+window.createBasicItemInfo = createBasicItemInfo;

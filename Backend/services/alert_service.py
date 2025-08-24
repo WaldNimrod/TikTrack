@@ -57,6 +57,9 @@ class AlertService:
                 related_type_id = AlertService._get_relation_type_id(db, related_type)
                 alert_data['related_type_id'] = related_type_id
             
+            # Handle new condition fields
+            AlertService._process_condition_fields(alert_data)
+            
             # Validate data against constraints
             logger.info("Validating alert data before creation")
             is_valid, errors = ValidationService.validate_data(db, 'alerts', alert_data)
@@ -90,6 +93,9 @@ class AlertService:
                 related_type = alert_data.pop('related_type')
                 related_type_id = AlertService._get_relation_type_id(db, related_type)
                 alert_data['related_type_id'] = related_type_id
+            
+            # Handle new condition fields
+            AlertService._process_condition_fields(alert_data)
             
             # Validate data against constraints
             logger.info("Validating alert data before update")
@@ -317,4 +323,73 @@ class AlertService:
             return relation_type_obj.id
         except Exception as e:
             logger.error(f"שגיאה בקבלת מזהה סוג שיוך '{relation_type}': {e}")
+            raise
+    
+    @staticmethod
+    def _process_condition_fields(alert_data: Dict[str, Any]) -> None:
+        """Process condition fields for new format"""
+        try:
+            # If legacy condition field is provided, convert to new format
+            if 'condition' in alert_data and alert_data['condition']:
+                legacy_condition = alert_data['condition']
+                
+                # Check if it's already in new format (contains |)
+                if ' | ' in legacy_condition:
+                    parts = legacy_condition.split(' | ')
+                    if len(parts) == 3:
+                        alert_data['condition_attribute'] = parts[0].strip()
+                        alert_data['condition_operator'] = parts[1].strip()
+                        alert_data['condition_number'] = parts[2].strip()
+                        # Remove legacy field
+                        del alert_data['condition']
+                else:
+                    # Convert old format to new format
+                    condition_mapping = {
+                        'below': ('price', 'less_than', '0'),
+                        'above': ('price', 'more_than', '0'),
+                        'equals': ('price', 'equals', '0'),
+                        'price_target': ('price', 'more_than', '0'),
+                        'volume_high': ('volume', 'more_than', '0'),
+                        'stop_loss': ('price', 'less_than', '0'),
+                        'breakout': ('price', 'more_than', '0'),
+                        'daily_change_positive': ('change', 'more_than', '0'),
+                        'profit_target': ('price', 'more_than', '0'),
+                        'entry_condition': ('price', 'cross', '0'),
+                        'balance_low': ('price', 'less_than', '0'),
+                        'profit_milestone': ('price', 'more_than', '0')
+                    }
+                    
+                    if legacy_condition in condition_mapping:
+                        attribute, operator, number = condition_mapping[legacy_condition]
+                        alert_data['condition_attribute'] = attribute
+                        alert_data['condition_operator'] = operator
+                        alert_data['condition_number'] = number
+                        # Remove legacy field
+                        del alert_data['condition']
+            
+            # Set defaults for new fields if not provided
+            if 'condition_attribute' not in alert_data:
+                alert_data['condition_attribute'] = 'price'
+            if 'condition_operator' not in alert_data:
+                alert_data['condition_operator'] = 'more_than'
+            if 'condition_number' not in alert_data:
+                alert_data['condition_number'] = '0'
+            
+            # Validate new condition fields
+            valid_attributes = ['price', 'change', 'ma', 'volume']
+            valid_operators = ['more_than', 'less_than', 'cross', 'cross_up', 'cross_down', 'change', 'change_up', 'change_down', 'equals']
+            
+            if alert_data['condition_attribute'] not in valid_attributes:
+                raise ValueError(f"Invalid condition_attribute: {alert_data['condition_attribute']}")
+            if alert_data['condition_operator'] not in valid_operators:
+                raise ValueError(f"Invalid condition_operator: {alert_data['condition_operator']}")
+            
+            # Validate condition_number is numeric
+            try:
+                float(alert_data['condition_number'])
+            except ValueError:
+                raise ValueError(f"Invalid condition_number: {alert_data['condition_number']}")
+                
+        except Exception as e:
+            logger.error(f"Error processing condition fields: {e}")
             raise

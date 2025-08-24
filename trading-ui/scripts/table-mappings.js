@@ -47,8 +47,21 @@
  * Each table is defined with an array of field names in column order.
  */
 const TABLE_COLUMN_MAPPINGS = {
-    // טבלת תכנונים (Planning)
-    'planning': [
+    // טבלת תכנונים (Trade Plans)
+    'trade_plans': [
+        'ticker',           // 0 - נכס
+        'created_at',       // 1 - תאריך
+        'investment_type',  // 2 - סוג
+        'side',            // 3 - צד
+        'planned_amount',  // 4 - סכום
+        'target_price',    // 5 - יעד
+        'stop_price',      // 6 - סטופ
+        'current',         // 7 - נוכחי
+        'status'           // 8 - סטטוס
+    ],
+
+    // טבלת עיצובים (Designs)
+    'designs': [
         'ticker',           // 0 - נכס
         'created_at',       // 1 - תאריך
         'investment_type',  // 2 - סוג
@@ -143,7 +156,31 @@ const TABLE_COLUMN_MAPPINGS = {
         'created_at'       // 9 - נוצר ב
     ],
 
-    // הערה: 'designs' הוסר - משתמשים ב-'trade_plans' במקום
+    // טבלת תוצאות בדיקות (Test Results)
+    'testResults': [
+        'test_name',       // 0 - שם הבדיקה
+        'status',          // 1 - סטטוס
+        'duration',        // 2 - משך זמן
+        'created_at',      // 3 - נוצר ב
+        'details'          // 4 - פרטים
+    ],
+
+    // טבלת מטבעות (Currencies)
+    'currencies': [
+        'symbol',          // 0 - סמל
+        'name',            // 1 - שם
+        'usd_rate',        // 2 - שער דולר
+        'id',              // 3 - מזהה
+        'created_at'       // 4 - נוצר ב
+    ],
+
+    // טבלת סוגי קישור הערות (Note Relation Types)
+    'note_relation_types': [
+        'note_relation_type', // 0 - סוג קישור
+        'description',        // 1 - תיאור
+        'id',                 // 2 - מזהה
+        'created_at'          // 3 - נוצר ב
+    ]
 };
 
 /**
@@ -168,7 +205,7 @@ function getColumnValue(item, columnIndex, tableType) {
     }
 
     // טיפול מיוחד בשדות מורכבים
-    if (tableType === 'planning' && fieldName === 'ticker') {
+    if ((tableType === 'trade_plans' || tableType === 'designs') && fieldName === 'ticker') {
         return item.ticker ? (item.ticker.symbol || item.ticker.name || '') : '';
     }
 
@@ -281,5 +318,5 @@ window.tableMappings = {
 
 // אתחול Table Mappings
 function initializeTableMappings() {
-  // Table Mappings loaded successfully
+    // Table Mappings loaded successfully
 }

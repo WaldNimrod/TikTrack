@@ -36,6 +36,7 @@ This directory contains all planned features, tasks, and improvements for the Ti
 18. **Tagging System** - Comprehensive tagging for all entities
 19. **Data Update Verification** - Real-time updates across all pages
 20. **Symbol Page** - Dedicated page for symbol/ticker information
+21. **Linked Objects Modal Windows** - Modal windows for linked objects with table and modal phases
 
 ### Low Priority
 21. **Test Management Functions** - Edit test functions (Found in code)
@@ -43,9 +44,9 @@ This directory contains all planned features, tasks, and improvements for the Ti
 23. **Field Name Change: "Reasons" to "Strategy"** - Rename field in trade planning
 
 ## 📊 Summary
-- **Total Features Found:** 24
+- **Total Features Found:** 25
 - **Features Found in Code:** 13
-- **Features Originally Planned:** 11
+- **Features Originally Planned:** 12
 
 ## 📝 How to Add New Features
 

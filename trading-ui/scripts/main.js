@@ -674,7 +674,7 @@ window.toggleAllSections = function () {
  * This function restores the open/closed state of all content sections
  */
 window.restoreSectionStates = function () {
-          // Restoring section states from localStorage
+  // Restoring section states from localStorage
 
   const sections = document.querySelectorAll('.content-section');
 

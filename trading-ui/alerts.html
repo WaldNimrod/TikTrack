@@ -61,6 +61,7 @@
   <script src="scripts/main.js"></script>
   <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
+  <script src="scripts/condition-translator.js"></script>
   <script src="scripts/accounts.js"></script>
 </head>
 
@@ -136,59 +137,59 @@
                 <thead>
                   <tr>
                     <th>
-                      <button class="btn btn-link sortable-header" onclick="sortTable(0)"
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        סימבול <span class="sort-icon">↕</span>
-                        <br><span class="header-subtitle">Symbol</span>
+                        טיקר <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header" onclick="sortTable(1)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        אובייקט משיוך <span class="sort-icon">↕</span>
-                        <br><span class="header-subtitle">Related Object</span>
-                      </button>
-                    </th>
-                    <th>
-                      <button class="btn btn-link sortable-header" onclick="sortTable(3)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        סטטוס <span class="sort-icon">↕</span>
-                        <br><span class="header-subtitle">Status</span>
-                      </button>
-                    </th>
-                    <th>
-                      <button class="btn btn-link sortable-header" onclick="sortTable(4)"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        הופעל <span class="sort-icon">↕</span>
-                        <br><span class="header-subtitle">Triggered</span>
-                      </button>
-                    </th>
-                    <th>
-                      <button class="btn btn-link sortable-header" onclick="sortTable(2)"
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         סוג התראה <span class="sort-icon">↕</span>
-                        <br><span class="header-subtitle">Alert Type</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header" onclick="sortTable(5)"
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         תנאי <span class="sort-icon">↕</span>
-                        <br><span class="header-subtitle">Condition</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header" onclick="sortTable(6)"
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        סטטוס <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        הופעל <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        קשור ל: <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         הודעה <span class="sort-icon">↕</span>
-                        <br><span class="header-subtitle">Message</span>
                       </button>
                     </th>
                     <th>
-                      <button class="btn btn-link sortable-header" onclick="sortTable(7)"
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        נוצר ב <span class="sort-icon">↕</span>
-                        <br><span class="header-subtitle">Created At</span>
+                        נוצר ב: <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th class="actions-cell">
@@ -274,7 +275,8 @@
                     <label class="form-label">תנאי התראה *</label>
                     <div class="row">
                       <div class="col-md-4">
-                        <select class="form-select" id="alertVariable" required onchange="checkAlertVariable(this)">
+                        <select class="form-select" id="conditionAttribute" required>
+                          <option value="">בחר תכונה...</option>
                           <option value="price">מחיר</option>
                           <option value="change">שינוי</option>
                           <option value="ma">ממוצע נע</option>
@@ -282,25 +284,24 @@
                         </select>
                       </div>
                       <div class="col-md-4">
-                        <select class="form-select" id="alertOperator" required onchange="checkAlertOperator(this)">
-                          <option value="lessThen">קטן מ</option>
-                          <option value="moreThen">גדול מ</option>
+                        <select class="form-select" id="conditionOperator" required>
+                          <option value="">בחר אופרטור...</option>
+                          <option value="more_than">יותר מ</option>
+                          <option value="less_than">פחות מ</option>
                           <option value="cross">חוצה</option>
-                          <option value="crossUp">חוצה למעלה</option>
-                          <option value="crossDown">חוצה למטה</option>
-                          <option value="upBy">עולה ב</option>
-                          <option value="downBy">יורד ב</option>
-                          <option value="changeBy">משתנה ב</option>
-                          <option value="upByPre">עולה ב%</option>
-                          <option value="downByPre">יורד ב%</option>
-                          <option value="changeByPre">משתנה ב%</option>
+                          <option value="cross_up">חוצה למעלה</option>
+                          <option value="cross_down">חוצה למטה</option>
+                          <option value="change">שינוי</option>
+                          <option value="change_up">שינוי למעלה</option>
+                          <option value="change_down">שינוי למטה</option>
+                          <option value="equals">שווה</option>
                         </select>
                       </div>
                       <div class="col-md-4">
-                        <input type="number" class="form-control" id="alertValue" step="0.01" placeholder="ערך">
+                        <input type="number" class="form-control" id="conditionNumber" step="0.01" placeholder="ערך"
+                          required>
                       </div>
                     </div>
-                    <input type="hidden" id="alertCondition" required>
                   </div>
                 </div>
               </div>
@@ -392,7 +393,8 @@
                     <label class="form-label">תנאי התראה *</label>
                     <div class="row">
                       <div class="col-md-4">
-                        <select class="form-select" id="editAlertVariable" required onchange="checkAlertVariable(this)">
+                        <select class="form-select" id="editConditionAttribute" required>
+                          <option value="">בחר תכונה...</option>
                           <option value="price">מחיר</option>
                           <option value="change">שינוי</option>
                           <option value="ma">ממוצע נע</option>
@@ -400,25 +402,24 @@
                         </select>
                       </div>
                       <div class="col-md-4">
-                        <select class="form-select" id="editAlertOperator" required onchange="checkAlertOperator(this)">
-                          <option value="lessThen">קטן מ</option>
-                          <option value="moreThen">גדול מ</option>
+                        <select class="form-select" id="editConditionOperator" required>
+                          <option value="">בחר אופרטור...</option>
+                          <option value="more_than">יותר מ</option>
+                          <option value="less_than">פחות מ</option>
                           <option value="cross">חוצה</option>
-                          <option value="crossUp">חוצה למעלה</option>
-                          <option value="crossDown">חוצה למטה</option>
-                          <option value="upBy">עולה ב</option>
-                          <option value="downBy">יורד ב</option>
-                          <option value="changeBy">משתנה ב</option>
-                          <option value="upByPre">עולה ב%</option>
-                          <option value="downByPre">יורד ב%</option>
-                          <option value="changeByPre">משתנה ב%</option>
+                          <option value="cross_up">חוצה למעלה</option>
+                          <option value="cross_down">חוצה למטה</option>
+                          <option value="change">שינוי</option>
+                          <option value="change_up">שינוי למעלה</option>
+                          <option value="change_down">שינוי למטה</option>
+                          <option value="equals">שווה</option>
                         </select>
                       </div>
                       <div class="col-md-4">
-                        <input type="number" class="form-control" id="editAlertValue" step="0.01" placeholder="ערך">
+                        <input type="number" class="form-control" id="editConditionNumber" step="0.01" placeholder="ערך"
+                          required>
                       </div>
                     </div>
-                    <input type="hidden" id="editAlertCondition" required>
                   </div>
                 </div>
               </div>

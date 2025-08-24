@@ -38,6 +38,11 @@
 // משתנים גלובליים
 let alertsData = [];
 
+// בדיקה שהפונקציות הגלובליות זמינות
+console.log('🔧 Checking global functions in alerts.js...');
+console.log('🔧 translateConditionFields available:', typeof window.translateConditionFields);
+console.log('🔧 translateLegacyCondition available:', typeof window.translateLegacyCondition);
+
 
 
 // נתוני דמה
@@ -462,12 +467,10 @@ function updateAlertsTable(alerts) {
       const typeLabel = typeLabels[alert.related_type_id] || '❓ ';
       relatedDisplay = typeLabel + relatedDisplay;
 
-      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleString('he-IL', {
+      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL', {
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
+        day: '2-digit'
       }) : 'לא מוגדר';
 
       // המרת סטטוס לעברית להצגה
@@ -519,7 +522,18 @@ function updateAlertsTable(alerts) {
           <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
           <td class="type-cell" data-type="${alert.type || ''}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
-          <td><span class="condition-text">${formatAlertCondition(alert.condition) || '-'}</span></td>
+          <td><span class="condition-text">${(() => {
+          // בדיקה אם יש שדות חדשים
+          if (alert.condition_attribute && alert.condition_operator && alert.condition_number && window.translateConditionFields) {
+            return window.translateConditionFields(alert.condition_attribute, alert.condition_operator, alert.condition_number);
+          }
+          // בדיקה אם יש תנאי ישן
+          if (alert.condition && window.formatAlertCondition) {
+            return window.formatAlertCondition(alert.condition);
+          }
+          // fallback
+          return alert.condition || '-';
+        })()}</span></td>
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
@@ -1013,78 +1027,61 @@ async function saveAlert() {
   const relatedId = document.getElementById('alertRelatedObjectSelect').value;
 
   // בדיקת תנאי התראה
-  const variableElement = document.getElementById('alertVariable');
-  const operatorElement = document.getElementById('alertOperator');
-  const valueElement = document.getElementById('alertValue');
+  const conditionAttributeElement = document.getElementById('conditionAttribute');
+  const conditionOperatorElement = document.getElementById('conditionOperator');
+  const conditionNumberElement = document.getElementById('conditionNumber');
 
-  const variable = variableElement.value;
-  const operator = operatorElement.value;
-  const value = valueElement.value;
+  const conditionAttribute = conditionAttributeElement.value;
+  const conditionOperator = conditionOperatorElement.value;
+  const conditionNumber = conditionNumberElement.value;
 
   if (!relatedType || !relatedId) {
     showErrorNotification('שדות חובה חסרים', 'יש למלא את כל השדות החובה');
     return;
   }
 
-  // בדיקת משתנה ואופרטור נתמכים
-  if (!checkAlertVariable(variableElement)) {
-    return; // הפונקציה תציג הודעת שגיאה ותאפס את השדה
-  }
-
-  if (!checkAlertOperator(operatorElement)) {
-    return; // הפונקציה תציג הודעת שגיאה ותאפס את השדה
-  }
-
-  if (!variable || !operator) {
-    showErrorNotification('תנאי התראה חסר', 'יש לבחור משתנה ואופרטור');
-    return;
-  }
-
-  // וולידציה של ערך ההתראה
-  if (!value || value.trim() === '') {
-    showErrorNotification('ערך התראה חסר', 'יש להזין ערך לתנאי ההתראה');
-    valueElement.focus();
+  if (!conditionAttribute || !conditionOperator || !conditionNumber) {
+    showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
     return;
   }
 
   // וולידציה של ערך מספרי
-  const numericValue = parseFloat(value);
+  const numericValue = parseFloat(conditionNumber);
   if (isNaN(numericValue)) {
     showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
-    valueElement.focus();
+    conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך חיובי למחיר
-  if (variable === 'price' && numericValue <= 0) {
+  if (conditionAttribute === 'price' && numericValue <= 0) {
     showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
-    valueElement.focus();
+    conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך מקסימלי למחיר
-  if (variable === 'price' && numericValue > 1000000) {
+  if (conditionAttribute === 'price' && numericValue > 1000000) {
     showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
-    valueElement.focus();
+    conditionNumberElement.focus();
     return;
   }
 
-  // וולידציה של אחוזים (לשינוי יומי)
-  if (variable === 'daily_change' && (numericValue < -100 || numericValue > 100)) {
-    showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי יומי חייב להיות בין -100% ל-100%');
-    valueElement.focus();
+  // וולידציה של אחוזים (לשינוי)
+  if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
+    showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
+    conditionNumberElement.focus();
     return;
   }
-
-  // בניית מחרוזת התנאי
-  const condition = buildAlertCondition(variable, operator, value);
 
   // המשך הקוד הקיים...
   const alertData = {
     related_type_id: parseInt(formData.get('alertRelationType')),
     related_id: parseInt(document.getElementById('alertRelatedObjectSelect').value),
     type: alertType,
-    condition: condition,
+    condition_attribute: conditionAttribute,
+    condition_operator: conditionOperator,
+    condition_number: conditionNumber,
     message: document.getElementById('alertMessage').value || null,
     status: 'open',
     is_triggered: 'false'
@@ -1155,27 +1152,13 @@ function editAlert(alertId) {
   if (editAlertIsTriggered) editAlertIsTriggered.value = alert.is_triggered || 'false';
 
   // מילוי תנאי התראה
-  const conditionParts = parseAlertCondition(alert.condition || '');
-  const editAlertVariable = document.getElementById('editAlertVariable');
-  const editAlertOperator = document.getElementById('editAlertOperator');
-  const editAlertValue = document.getElementById('editAlertValue');
-  const editAlertCondition = document.getElementById('editAlertCondition');
+  const editConditionAttribute = document.getElementById('editConditionAttribute');
+  const editConditionOperator = document.getElementById('editConditionOperator');
+  const editConditionNumber = document.getElementById('editConditionNumber');
 
-  if (editAlertVariable) editAlertVariable.value = conditionParts.variable;
-  if (editAlertOperator) editAlertOperator.value = conditionParts.operator;
-  if (editAlertValue) editAlertValue.value = conditionParts.value;
-  if (editAlertCondition) editAlertCondition.value = alert.condition || '';
-
-  // בדיקת ערכים נוכחיים והצגת הודעות מתאימות
-  setTimeout(() => {
-    if (editAlertVariable && !checkAlertVariable(editAlertVariable)) {
-      // הפונקציה תציג הודעת שגיאה ותאפס את השדה
-    }
-
-    if (editAlertOperator && !checkAlertOperator(editAlertOperator)) {
-      // הפונקציה תציג הודעת שגיאה ותאפס את השדה
-    }
-  }, 100);
+  if (editConditionAttribute) editConditionAttribute.value = alert.condition_attribute || 'price';
+  if (editConditionOperator) editConditionOperator.value = alert.condition_operator || 'more_than';
+  if (editConditionNumber) editConditionNumber.value = alert.condition_number || '0';
 
   // קביעת המצב הנכון לפי status ו-is_triggered
   const currentState = getAlertState(alert.status, alert.is_triggered);
@@ -1411,73 +1394,56 @@ async function updateAlert() {
   }
 
   // בדיקת תנאי התראה
-  const variableElement = document.getElementById('editAlertVariable');
-  const operatorElement = document.getElementById('editAlertOperator');
-  const valueElement = document.getElementById('editAlertValue');
+  const conditionAttributeElement = document.getElementById('editConditionAttribute');
+  const conditionOperatorElement = document.getElementById('editConditionOperator');
+  const conditionNumberElement = document.getElementById('editConditionNumber');
 
-  const variable = variableElement.value;
-  const operator = operatorElement.value;
-  const value = valueElement.value;
+  const conditionAttribute = conditionAttributeElement.value;
+  const conditionOperator = conditionOperatorElement.value;
+  const conditionNumber = conditionNumberElement.value;
 
-  // בדיקת משתנה ואופרטור נתמכים
-  if (!checkAlertVariable(variableElement)) {
-    return; // הפונקציה תציג הודעת שגיאה ותאפס את השדה
-  }
-
-  if (!checkAlertOperator(operatorElement)) {
-    return; // הפונקציה תציג הודעת שגיאה ותאפס את השדה
-  }
-
-  if (!variable || !operator) {
-    showErrorNotification('תנאי התראה חסר', 'יש לבחור משתנה ואופרטור');
-    return;
-  }
-
-  // וולידציה של ערך ההתראה
-  if (!value || value.trim() === '') {
-    showErrorNotification('ערך התראה חסר', 'יש להזין ערך לתנאי ההתראה');
-    valueElement.focus();
+  if (!conditionAttribute || !conditionOperator || !conditionNumber) {
+    showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
     return;
   }
 
   // וולידציה של ערך מספרי
-  const numericValue = parseFloat(value);
+  const numericValue = parseFloat(conditionNumber);
   if (isNaN(numericValue)) {
     showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
-    valueElement.focus();
+    conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך חיובי למחיר
-  if (variable === 'price' && numericValue <= 0) {
+  if (conditionAttribute === 'price' && numericValue <= 0) {
     showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
-    valueElement.focus();
+    conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך מקסימלי למחיר
-  if (variable === 'price' && numericValue > 1000000) {
+  if (conditionAttribute === 'price' && numericValue > 1000000) {
     showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
-    valueElement.focus();
+    conditionNumberElement.focus();
     return;
   }
 
-  // וולידציה של אחוזים (לשינוי יומי)
-  if (variable === 'daily_change' && (numericValue < -100 || numericValue > 100)) {
-    showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי יומי חייב להיות בין -100% ל-100%');
-    valueElement.focus();
+  // וולידציה של אחוזים (לשינוי)
+  if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
+    showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
+    conditionNumberElement.focus();
     return;
   }
-
-  // בניית מחרוזת התנאי
-  const condition = buildAlertCondition(variable, operator, value);
 
   const alertId = document.getElementById('editAlertId').value;
   const alertData = {
     related_type_id: relatedTypeId,
     related_id: relatedId,
     type: alertType,
-    condition: condition,
+    condition_attribute: conditionAttribute,
+    condition_operator: conditionOperator,
+    condition_number: conditionNumber,
     message: document.getElementById('editAlertMessage').value || null,
     status: document.getElementById('editAlertStatus').value,
     is_triggered: document.getElementById('editAlertIsTriggered').value
@@ -1802,6 +1768,12 @@ setTimeout(() => {
 window.formatAlertCondition = function (condition) {
   if (!condition) return '-';
 
+  // Use the new global translation function
+  if (window.translateLegacyCondition) {
+    return window.translateLegacyCondition(condition);
+  }
+
+  // Fallback to old format if new function not available
   const parts = condition.split(' | ');
   if (parts.length >= 3) {
     const variable = parts[0] || '';

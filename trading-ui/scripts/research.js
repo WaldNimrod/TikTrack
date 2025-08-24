@@ -368,6 +368,23 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
   }
 };
 
+// פונקצית סידור מותאמת לטבלת טריידים בדף התחקיר
+function sortTable(columnIndex) {
+  console.log('🔄 === SORT RESEARCH TRADES TABLE ===');
+  console.log('🔄 Column clicked:', columnIndex);
+
+  if (typeof window.sortTableData === 'function') {
+    window.sortTableData(
+      columnIndex,
+      window.tradesData || [],
+      'trades',
+      window.updateTradesTable
+    );
+  } else {
+    console.error('❌ sortTableData function not found in tables.js');
+  }
+}
+
 // הגדרת הפונקציות כגלובליות
 window.openResearchDetails = openResearchDetails;
 window.editResearch = editResearch;
@@ -385,6 +402,7 @@ window.initializeResearchPage = initializeResearchPage;
 window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
 window.toggleSummarySection = toggleSummarySection;
 window.refreshSummaryData = refreshSummaryData;
+window.sortTable = sortTable;
 
 // בדיקת זמינות פונקציות מיד אחרי הגדרתן
 console.log('🔍 === RESEARCH.JS FUNCTIONS CHECK ===');

@@ -426,6 +426,41 @@
 
 ---
 
+### 25. Linked Objects Modal Windows
+**Status:** 🟡 Planned  
+**Priority:** Medium  
+**Description:** Modal windows for linked objects module with two implementation phases
+
+**Phase A - Table Design:**
+- [ ] Design linked objects module in tables
+- [ ] Create table structure for linked objects
+- [ ] Implement linked objects display in grid format
+- [ ] Add linking/unlinking functionality in tables
+- [ ] Design table-based navigation between linked objects
+
+**Phase B - Modal Design:**
+- [ ] Design linked objects module in modal windows
+- [ ] Create modal interface for linked objects management
+- [ ] Implement modal-based linking/unlinking functionality
+- [ ] Add modal navigation between linked objects
+- [ ] Create test window 2 for modal functionality
+
+**Technical Requirements:**
+- [ ] Consistent UI/UX with existing modal patterns
+- [ ] Responsive design for different screen sizes
+- [ ] Real-time updates when objects are linked/unlinked
+- [ ] Proper error handling and validation
+- [ ] Integration with existing object linking system
+
+**Features:**
+- [ ] Visual representation of object relationships
+- [ ] Bulk linking/unlinking operations
+- [ ] Search and filter linked objects
+- [ ] Relationship type indicators
+- [ ] Quick navigation between related objects
+
+---
+
 ## 🚀 Implementation Priority
 
 ### Phase 1 - Critical Foundation
@@ -450,15 +485,16 @@
 15. **Advanced Alert Types** (Medium) - Found in code
 16. **Linked Items View** (Medium) - Found in code
 17. **Object Linking System** (Medium) - Found in code
+18. **Linked Objects Modal Windows** (Medium) - New feature
 
 ### Phase 4 - Advanced Features
-18. **Symbol Page** (Medium)
-19. **Advanced Entry Conditions** (Medium) - Found in code
-20. **Advanced Reasons/Strategy System** (Medium) - Found in code
-21. **Advanced Template Features** (Medium)
-22. **Test Management Functions** (Low) - Found in code
-23. **General Functionality Placeholders** (Low) - Found in code
-24. **Field Name Change: "Reasons" to "Strategy"** (Low)
+19. **Symbol Page** (Medium)
+20. **Advanced Entry Conditions** (Medium) - Found in code
+21. **Advanced Reasons/Strategy System** (Medium) - Found in code
+22. **Advanced Template Features** (Medium)
+23. **Test Management Functions** (Low) - Found in code
+24. **General Functionality Placeholders** (Low) - Found in code
+25. **Field Name Change: "Reasons" to "Strategy"** (Low)
 
 ---
 

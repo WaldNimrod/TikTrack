@@ -71,7 +71,9 @@
         <!-- Main header -->
         <div class="section-header">
           <div class="table-title">
-            🔍 תחקיר
+            <img src="images/icons/research.svg" alt="תחקיר"
+              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            תחקיר
           </div>
           <div class="table-actions">
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר את כל הסקשנים">
@@ -102,12 +104,15 @@
           <!-- Status summary header -->
           <div class="section-header">
             <div class="table-title">
-              📊 סיכום מצב עכשווי ושינוי יומי
+              <img src="images/icons/research.svg" alt="סיכום מצב עכשווי ושינוי יומי"
+                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              סיכום מצב עכשווי ושינוי יומי
             </div>
 
             <div class="table-actions">
               <button class="refresh-btn" onclick="refreshSummaryData()" title="רענן נתונים">
-                <span class="action-icon">🔄</span> רענן
+                <img src="images/icons/research.svg" alt="רענן" class="action-icon" style="width: 16px; height: 16px;">
+                רענן
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleSummarySection()" title="הצג/הסתר אזור סיכום">
@@ -276,7 +281,9 @@
           <!-- Trades header -->
           <div class="section-header">
             <div class="table-title">
-              📈 הטריידים שלי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trades</span>
+              <img src="images/icons/trades.svg" alt="הטריידים שלי"
+                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              הטריידים שלי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trades</span>
             </div>
 
             <div style="display: flex; gap: 8px; align-items: center;">
@@ -285,10 +292,12 @@
                   onkeyup="filterTradesData([], [], [], null, this.value)">
               </div>
               <button class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
-                <span class="action-icon">➕</span> הוסף
+                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
+                הוסף
               </button>
               <button class="refresh-btn" onclick="loadTrades()" title="רענן טבלה">
-                <span class="action-icon">🔄</span> רענן
+                <img src="images/icons/trades.svg" alt="רענן" class="action-icon" style="width: 16px; height: 16px;">
+                רענן
               </button>
               <button class="filter-toggle-btn" onclick="toggleResearchSection()" title="הצג/הסתר אזור הטריידים שלי">
                 <span class="filter-icon">▲</span>

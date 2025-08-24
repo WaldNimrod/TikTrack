@@ -411,6 +411,11 @@
                             <div class="action-btn-icon">⚙️</div>
                             <div class="action-btn-text">הגדרות</div>
                         </button>
+
+                        <button class="action-btn" onclick="quickAction('documentation')">
+                            <div class="action-btn-icon">📚</div>
+                            <div class="action-btn-text">דוקומנטציה</div>
+                        </button>
                     </div>
                 </div>
 
@@ -869,6 +874,9 @@
                     break;
                 case 'settings':
                     console.log('פתיחת הגדרות');
+                    break;
+                case 'documentation':
+                    window.open('../JAVASCRIPT_SCRIPTS_ARCHITECTURE.md', '_blank');
                     break;
             }
         }

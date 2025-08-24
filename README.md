@@ -5,6 +5,9 @@
 ### Overview
 The JavaScript codebase has undergone a comprehensive refactoring to improve maintainability, reduce code duplication, and create a more modular architecture.
 
+### 📚 Documentation
+- **[JavaScript Scripts Architecture Documentation](JAVASCRIPT_SCRIPTS_ARCHITECTURE.md)** - Complete documentation of all scripts, functions, and architecture
+
 ### Refactoring Phases
 
 #### Phase 1: Function Consolidation

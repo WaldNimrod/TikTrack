@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import BaseModel
 from typing import Dict, Any, Optional
@@ -7,17 +7,21 @@ import re
 class Alert(BaseModel):
     __tablename__ = "alerts"
     
-    type = Column(String(50), nullable=False, default='price')  # Default per constraints
+    # Fields that exist in the database
+    account_id = Column(Integer, nullable=True)
+    ticker_id = Column(Integer, nullable=True)
+    type = Column(String(50), nullable=False, default='price')
+    message = Column(String(500), nullable=True)
+    triggered_at = Column(DateTime, nullable=True)
     status = Column(String(20), default='open', nullable=True)
-    condition = Column(String(500), nullable=True)  # Legacy field - will be removed
+    is_triggered = Column(String(20), default='false', nullable=True)  # false, new, true
+    related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False, default=4)
+    related_id = Column(Integer, nullable=False)
+    type_default = Column(String(50), nullable=True)
+    related_type_id_default = Column(Integer, nullable=True)
     condition_attribute = Column(String(50), nullable=False, default='price')
     condition_operator = Column(String(50), nullable=False, default='more_than')
     condition_number = Column(String(20), nullable=False, default='0')
-    message = Column(String(500), nullable=True)
-    triggered_at = Column(DateTime, nullable=True)
-    is_triggered = Column(String(20), default='false', nullable=True)  # false, new, true
-    related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False, default=4)  # Default ticker per constraints
-    related_id = Column(Integer, nullable=False)
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -83,11 +87,30 @@ class Alert(BaseModel):
         return f"{attribute} {operator} {number}"
     
     def __repr__(self) -> str:
-        return f"<Alert(id={self.id}, type='{self.type}', active={self.is_active})>"
+        return f"<Alert(id={self.id}, type='{self.type}', triggered={self.is_triggered})>"
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary with backward compatibility"""
-        result: Dict[str, Any] = super().to_dict()
+        # Create result dictionary manually to avoid accessing non-existent columns
+        result: Dict[str, Any] = {
+            'id': self.id,
+            'account_id': self.account_id,
+            'ticker_id': self.ticker_id,
+            'type': self.type,
+            'message': self.message,
+            'triggered_at': self.triggered_at.strftime('%Y-%m-%d %H:%M:%S') if self.triggered_at else None,
+            'status': self.status,
+            'is_triggered': self.is_triggered,
+            'related_type_id': self.related_type_id,
+            'related_id': self.related_id,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
+            'type_default': self.type_default,
+            'related_type_id_default': self.related_type_id_default,
+            'condition_attribute': self.condition_attribute,
+            'condition_operator': self.condition_operator,
+            'condition_number': self.condition_number,
+            'condition_display_text': self.get_condition_display_text()
+        }
         
         # Determine related_type based on related_type_id
         if self.related_type_id == 1:
@@ -99,20 +122,8 @@ class Alert(BaseModel):
         else:
             result['related_type'] = None
         
-        result['related_id'] = self.related_id
-        
-        # Add new condition fields
-        result['condition_attribute'] = self.condition_attribute
-        result['condition_operator'] = self.condition_operator
-        result['condition_number'] = self.condition_number
-        result['condition_display_text'] = self.get_condition_display_text()
-        
-        # Add legacy condition field for backward compatibility
-        if self.condition:
-            result['condition'] = self.condition
-        else:
-            # Create legacy condition string from new fields
-            result['condition'] = f"{self.condition_attribute} | {self.condition_operator} | {self.condition_number}"
+        # Create legacy condition string from new fields for backward compatibility
+        result['condition'] = f"{self.condition_attribute} | {self.condition_operator} | {self.condition_number}"
         
         # Add fields for backward compatibility
         if self.related_type_id == 1:  # account

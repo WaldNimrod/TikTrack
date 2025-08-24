@@ -138,11 +138,96 @@ body {
   box-shadow: 0 0 0 3px rgba(41, 166, 168, 0.1);
 }
 
-/* מודל בסגנון אפל */
+/* מודל בסגנון אפל - הגדרה כללית לכל האתר */
 .modal {
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  z-index: 999999999 !important;
+}
+
+/* הגדרות z-index גבוהות לכל המודלים באתר */
+.modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+.modal-content {
+  z-index: 1000000001 !important;
+}
+
+.modal-backdrop {
+  z-index: 999999998 !important;
+}
+
+/* הודעות - וידוא שהן מופיעות מעל הכל */
+.notification {
+  z-index: 100000000 !important;
+}
+
+.notification-container {
+  z-index: 100000000 !important;
+}
+
+.toast {
+  z-index: 100000000 !important;
+}
+
+.toast-container {
+  z-index: 100000000 !important;
+}
+
+/* וידוא שכל המודלים מופיעים מעל הכל */
+.modal.show {
+  z-index: 999999999 !important;
+}
+
+.modal.show .modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+.modal.show .modal-content {
+  z-index: 1000000001 !important;
+}
+
+/* וידוא שהרקע לא חוסם את המודלים */
+.modal-backdrop.show {
+  z-index: 999999998 !important;
+}
+
+/* מודלים ספציפיים עם z-index גבוה יותר */
+#addAlertModal,
+#editAlertModal,
+#addExecutionModal,
+#editExecutionModal,
+#deleteExecutionModal,
+#linkedItemsModal,
+#warningModal {
+  z-index: 999999999 !important;
+}
+
+#addAlertModal .modal-dialog,
+#editAlertModal .modal-dialog,
+#addExecutionModal .modal-dialog,
+#editExecutionModal .modal-dialog,
+#deleteExecutionModal .modal-dialog,
+#linkedItemsModal .modal-dialog,
+#warningModal .modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+#addAlertModal .modal-content,
+#editAlertModal .modal-content,
+#addExecutionModal .modal-content,
+#editExecutionModal .modal-content,
+#deleteExecutionModal .modal-content,
+#linkedItemsModal .modal-content,
+#warningModal .modal-content {
+  z-index: 1000000001 !important;
+}
+
+/* וידוא שהמודלים מופיעים מעל הכל */
+.modal-backdrop {
+  z-index: 999999998 !important;
 }
 
 .modal-content {
@@ -150,11 +235,21 @@ body {
   border-radius: var(--apple-radius-large);
   box-shadow: var(--apple-shadow-heavy);
   border: 1px solid var(--apple-border-light);
+  z-index: 1000000000 !important;
 }
 
 .alert-card:hover {
   box-shadow: var(--apple-shadow-medium);
   transform: translateY(-1px);
+}
+
+/* הודעות - וידוא שהן מופיעות מעל הכל */
+.notification {
+  z-index: 1000000002 !important;
+}
+
+.notification-container {
+  z-index: 1000000002 !important;
 }
 
 /* טבלה בסגנון אפל - הוסרה (AG Grid) */

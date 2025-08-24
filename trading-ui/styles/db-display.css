@@ -54,6 +54,10 @@
 .db-display-page .actions-cell {
     padding: 0.2rem !important;
     white-space: nowrap !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.1rem !important;
+    flex-wrap: wrap !important;
 }
 
 .db-display-page .actions-cell .btn {

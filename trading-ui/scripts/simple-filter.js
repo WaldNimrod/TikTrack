@@ -601,6 +601,18 @@ class SimpleFilter {
     }
 }
 
+// פונקציה גלובלית לעדכון טקסט פילטר חשבונות
+window.updateAccountFilterDisplayTextGlobal = function () {
+    console.log('🔄 updateAccountFilterDisplayTextGlobal called');
+
+    // חיפוש הפונקציה הספציפית לדף הנוכחי
+    if (typeof window.updateAccountFilterDisplayText === 'function') {
+        window.updateAccountFilterDisplayText();
+    } else {
+        console.warn('⚠️ updateAccountFilterDisplayText not found in current page');
+    }
+};
+
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {

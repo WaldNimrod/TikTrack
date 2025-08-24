@@ -1,5 +1,34 @@
 # Changelog - TikTrack
 
+## [2.7] - 2025-08-24
+
+### 🔧 **Trades Page Technical Fixes**
+- **API Preferences Route**: Fixed routing mismatch from `/api/preferences` to `/api/v1/preferences`
+- **Missing Modal**: Added `linkedItemsModal` HTML structure to trades.html
+- **Sorting Function Loading**: Resolved timing issue by removing inline `onclick` attributes and implementing event listeners in JavaScript
+- **Global Functions**: Added missing global function exports: `viewAccountDetails`, `deleteTradeRecord`
+- **Table Structure**: Fixed table layout by adding notes column and removing P&L column
+
+### 🐛 **Bug Fixes**
+- **Sorting Timing Issue**: Fixed `sortTable` function not available during HTML parsing
+- **Modal Missing**: Added complete `linkedItemsModal` structure for linked items viewing
+- **API Route Mismatch**: Corrected preferences API endpoint routing
+- **Function Export**: Added missing global function exports for account details and trade deletion
+
+### 🔧 **Technical Changes**
+- **HTML Updates**: Replaced all `onclick` attributes with `data-sort-column` attributes in trades.html
+- **JavaScript Enhancement**: Added `setupSortEventListeners()` function in trades.js
+- **API Route Fix**: Updated preferences blueprint to use correct URL prefix
+- **Modal Addition**: Added complete linked items modal HTML structure
+
+### 📁 **Files Modified**
+- `trading-ui/trades.html` - Fixed sorting buttons and added modal
+- `trading-ui/scripts/trades.js` - Added event listeners and global functions
+- `Backend/routes/api/preferences.py` - Fixed API routing
+- `MODULE_TESTING_CHECKLIST.md` - Updated testing status
+
+---
+
 ## [2.6] - 2025-08-22
 
 ### 🆕 **New Extra Data Tables Page**

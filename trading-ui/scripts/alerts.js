@@ -377,12 +377,14 @@ function updateAlertsTable(alerts) {
             break;
           case 2: // טרייד
             console.log(`🔍 Looking for trade with ID: ${alert.related_id}`);
-            console.log(`🔍 Available trades:`, trades.map(t => ({ id: t.id, created_at: t.created_at, date: t.date })));
+            console.log(`🔍 Available trades:`, trades.map(t => ({ id: t.id, created_at: t.created_at, date: t.date, side: t.side, investment_type: t.investment_type })));
             const trade = trades.find(t => t.id === alert.related_id);
             if (trade) {
               const date = trade.created_at || trade.date;
               const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-              relatedDisplay = `טרייד ${alert.related_id} - ${formattedDate}`;
+              const side = trade.side || 'לא מוגדר';
+              const investmentType = trade.investment_type || 'לא מוגדר';
+              relatedDisplay = `טרייד | ${side} | ${investmentType} | ${formattedDate}`;
               console.log(`✅ Found trade: ${relatedDisplay}`);
             } else {
               relatedDisplay = `טרייד ${alert.related_id}`;
@@ -393,12 +395,14 @@ function updateAlertsTable(alerts) {
             break;
           case 3: // תוכנית
             console.log(`🔍 Looking for trade plan with ID: ${alert.related_id}`);
-            console.log(`🔍 Available trade plans:`, tradePlans.map(p => ({ id: p.id, created_at: p.created_at, date: p.date })));
+            console.log(`🔍 Available trade plans:`, tradePlans.map(p => ({ id: p.id, created_at: p.created_at, date: p.date, side: p.side, investment_type: p.investment_type })));
             const plan = tradePlans.find(p => p.id === alert.related_id);
             if (plan) {
               const date = plan.created_at || plan.date;
               const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-              relatedDisplay = `תוכנית ${alert.related_id} - ${formattedDate}`;
+              const side = plan.side || 'לא מוגדר';
+              const investmentType = plan.investment_type || 'לא מוגדר';
+              relatedDisplay = `תוכנית | ${side} | ${investmentType} | ${formattedDate}`;
               console.log(`✅ Found trade plan: ${relatedDisplay}`);
             } else {
               relatedDisplay = `תוכנית ${alert.related_id}`;
@@ -530,8 +534,8 @@ function updateAlertsTable(alerts) {
               ${relatedDisplay}
             </div>
           </td>
-          <td><span class="message-text">${alert.message || '-'}</span></td>
           <td class="type-cell" data-type="${alert.type || ''}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
+          <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
             <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">
@@ -618,17 +622,13 @@ function showAddAlertModal() {
     form.reset();
   }
 
-  // בדיקת ערכים נוכחיים והצגת הודעות מתאימות
+  // הוספת event listeners לשדות התנאי
   setTimeout(() => {
-    const variableElement = document.getElementById('alertVariable');
-    const operatorElement = document.getElementById('alertOperator');
-
-    if (variableElement && !checkAlertVariable(variableElement)) {
-      // הפונקציה תציג הודעת שגיאה ותאפס את השדה
-    }
-
-    if (operatorElement && !checkAlertOperator(operatorElement)) {
-      // הפונקציה תציג הודעת שגיאה ותאפס את השדה
+    const conditionAttributeElement = document.getElementById('conditionAttribute');
+    if (conditionAttributeElement) {
+      conditionAttributeElement.addEventListener('change', function () {
+        checkAlertVariable(this);
+      });
     }
   }, 100);
 
@@ -636,7 +636,7 @@ function showAddAlertModal() {
   const modalElement = document.getElementById('addAlertModal');
   if (modalElement) {
     // הגדרת z-index גבוה מאוד
-    modalElement.style.zIndex = '99999';
+    modalElement.style.zIndex = '999999';
 
     // בדיקה אם Bootstrap זמין
     if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
@@ -648,28 +648,28 @@ function showAddAlertModal() {
 
       // וידוא שהמודל מופיע מעל הכל
       setTimeout(() => {
-        modalElement.style.zIndex = '99999';
+        modalElement.style.zIndex = '999999';
         const dialog = modalElement.querySelector('.modal-dialog');
         if (dialog) {
-          dialog.style.zIndex = '100000';
+          dialog.style.zIndex = '1000000';
         }
         const content = modalElement.querySelector('.modal-content');
         if (content) {
-          content.style.zIndex = '100001';
+          content.style.zIndex = '1000001';
         }
       }, 100);
     } else {
       // אם Bootstrap לא זמין, נציג את המודל באופן ידני
       modalElement.style.display = 'block';
       modalElement.classList.add('show');
-      modalElement.style.zIndex = '99999';
+      modalElement.style.zIndex = '999999';
       document.body.classList.add('modal-open');
 
       // הוספת backdrop
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
       backdrop.id = 'modalBackdrop';
-      backdrop.style.zIndex = '99998';
+      backdrop.style.zIndex = '999998';
       document.body.appendChild(backdrop);
     }
   } else {
@@ -684,11 +684,12 @@ async function loadModalData() {
   try {
 
     // טעינת נתונים במקביל
+    console.log('🔧 Loading modal data...');
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
       fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/trades').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/tickers').then(r => r.json()).catch(() => ({ data: [] }))
+      fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
     ]);
 
     const accounts = accountsResponse.data || accountsResponse || [];
@@ -696,10 +697,21 @@ async function loadModalData() {
     const tradePlans = tradePlansResponse.data || tradePlansResponse || [];
     const tickers = tickersResponse.data || tickersResponse || [];
 
+    console.log('🔧 Modal data loaded:');
+    console.log('🔧 Accounts:', accounts.length);
+    console.log('🔧 Trades:', trades.length);
+    console.log('🔧 Trade Plans:', tradePlans.length);
+    console.log('🔧 Tickers:', tickers.length);
+
     // נטענו נתונים נוספים
 
     // עדכון רדיו באטונים
     updateRadioButtons(accounts, trades, tradePlans, tickers);
+
+    // הגדרת נתונים ראשוניים (ברירת מחדל לטיקר)
+    console.log('🔧 Setting initial data for tickers...');
+    populateSelect('alertRelatedObjectSelect', tickers, 'symbol', '');
+    populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol', '');
   } catch (error) {
     console.error('שגיאה בטעינת נתונים למודל:', error);
     // המשך עם מערכים ריקים
@@ -780,10 +792,25 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
  * מילוי select עם נתונים
  */
 function populateSelect(selectId, data, field, prefix = '') {
+  console.log('🔧 populateSelect called:', { selectId, dataLength: data?.length, field, prefix });
+
   const select = document.getElementById(selectId);
-  if (!select) return;
+  if (!select) {
+    console.error('🔧 Select element not found:', selectId);
+    return;
+  }
 
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+  if (!data || data.length === 0) {
+    console.log('🔧 No data available for:', selectId);
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'אין רשומות זמינות';
+    option.disabled = true;
+    select.appendChild(option);
+    return;
+  }
 
   data.forEach(item => {
     const option = document.createElement('option');
@@ -798,17 +825,21 @@ function populateSelect(selectId, data, field, prefix = '') {
       const currency = item.currency || 'ILS';
       displayText = `${name} (${currency})`;
     } else if (prefix === 'טרייד') {
-      // עבור טרייד: סימבול + תאריך
+      // עבור טרייד: סימבול + צד + סוג השקעה + תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
+      const side = item.side || 'לא מוגדר';
+      const investmentType = item.investment_type || 'לא מוגדר';
       const date = item.created_at || item.date;
       const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-      displayText = `${symbol} - ${formattedDate}`;
+      displayText = `${symbol} | ${side} | ${investmentType} | ${formattedDate}`;
     } else if (prefix === 'תכנון') {
-      // עבור תכנון: סימבול + תאריך
+      // עבור תכנון: סימבול + צד + סוג השקעה + תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
+      const side = item.side || 'לא מוגדר';
+      const investmentType = item.investment_type || 'לא מוגדר';
       const date = item.created_at || item.date;
       const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-      displayText = `${symbol} - ${formattedDate}`;
+      displayText = `${symbol} | ${side} | ${investmentType} | ${formattedDate}`;
     } else {
       // עבור טיקר: רק סימבול
       displayText = item[field] || item.symbol || 'לא מוגדר';
@@ -817,6 +848,8 @@ function populateSelect(selectId, data, field, prefix = '') {
     option.textContent = displayText;
     select.appendChild(option);
   });
+
+  console.log('🔧 populateSelect completed for:', selectId, 'with', data.length, 'items');
 }
 
 /**
@@ -838,8 +871,8 @@ function closeModal(modalId) {
 function onAlertTypeChange(selectElement) {
   const selectedType = selectElement.value;
   if (selectedType && !checkAlertType(selectedType, selectElement)) {
-    // החזרת הבחירה הקודמת
-    selectElement.value = '';
+    // החזרת הבחירה למחיר (ברירת מחדל)
+    selectElement.value = 'price_alert';
   }
 }
 
@@ -850,6 +883,7 @@ function onAlertTypeChange(selectElement) {
  * @returns {boolean} true אם נתמך, false אם לא
  */
 function checkAlertType(alertType, element = null) {
+  const supportedTypes = ['price_alert', 'stop_loss'];
   const unsupportedTypes = ['volume_alert', 'custom_alert'];
 
   if (unsupportedTypes.includes(alertType)) {
@@ -866,12 +900,12 @@ function checkAlertType(alertType, element = null) {
     if (element) {
       const modal = element.closest('.modal');
       if (modal && modal.id) {
-        showModalWarningNotification(modal.id, 'פיצ\'ר בפיתוח', message);
+        showModalNotification('warning', 'פיצ\'ר בפיתוח', message, modal.id);
       } else {
-        showWarningNotification('פיצ\'ר בפיתוח', message);
+        showModalNotification('warning', 'פיצ\'ר בפיתוח', message, 'addAlertModal');
       }
     } else {
-      showWarningNotification('פיצ\'ר בפיתוח', message);
+      showModalNotification('warning', 'פיצ\'ר בפיתוח', message, 'addAlertModal');
     }
 
     return false;
@@ -894,20 +928,20 @@ function checkAlertVariable(selectElement) {
   console.log('🔍 Element:', selectElement);
   console.log('🔍 Selected value:', selectElement.value);
 
-  const supportedVariables = ['price', 'change', 'ma', 'volume'];
+  const supportedVariables = ['price', 'change'];
   const selectedValue = selectElement.value;
 
   if (!supportedVariables.includes(selectedValue)) {
     console.log('❌ Variable not supported:', selectedValue);
-    let message = 'משתנה זה לא נתמך. המשתנים הנתמכים: מחיר, שינוי, ממוצע נע, נפח מסחר.';
+    let message = 'משתנה זה עדיין בפיתוח. כרגע נתמכים רק: מחיר ושינוי.';
     console.log('🔍 Showing warning notification:', message);
 
     // בדיקה אם אנחנו בתוך מודול
     const modal = selectElement.closest('.modal');
     if (modal && modal.id) {
-      showModalWarningNotification(modal.id, 'משתנה לא נתמך', message);
+      showModalNotification('warning', 'פיצ\'ר בפיתוח', message, modal.id);
     } else {
-      showWarningNotification('משתנה לא נתמך', message);
+      showModalNotification('warning', 'פיצ\'ר בפיתוח', message, 'addAlertModal');
     }
 
     // החזרת הבחירה למחיר
@@ -944,7 +978,7 @@ function checkAlertOperator(selectElement) {
     console.log('❌ Operator not supported:', selectedValue);
     let message = 'אופרטור זה לא נתמך. האופרטורים הנתמכים: קטן מ, גדול מ, חוצה, חוצה למעלה, חוצה למטה, עולה ב, יורד ב, משתנה ב, עולה ב%, יורד ב%, משתנה ב%.';
     console.log('🔍 Showing warning notification:', message);
-    showWarningNotification('אופרטור לא נתמך', message);
+    showModalNotification('warning', 'אופרטור לא נתמך', message, 'addAlertModal');
     // החזרת הבחירה לגדול מ
     selectElement.value = 'moreThen';
     console.log('🔍 Reset value to:', selectElement.value);
@@ -1008,7 +1042,9 @@ async function saveAlert() {
   // בדיקת סוג ההתראה
   const alertTypeElement = document.getElementById('alertType');
   const alertType = alertTypeElement.value;
+  console.log('🔧 Alert type:', alertType);
   if (!checkAlertType(alertType, alertTypeElement)) {
+    console.log('🔧 Alert type validation failed');
     return; // עצירת השמירה אם הסוג לא נתמך
   }
 
@@ -1023,6 +1059,10 @@ async function saveAlert() {
   const relatedType = formData.get('alertRelationType');
   const relatedId = document.getElementById('alertRelatedObjectSelect').value;
 
+  console.log('🔧 Form validation:');
+  console.log('🔧 Related type:', relatedType);
+  console.log('🔧 Related ID:', relatedId);
+
   // בדיקת תנאי התראה
   const conditionAttributeElement = document.getElementById('conditionAttribute');
   const conditionOperatorElement = document.getElementById('conditionOperator');
@@ -1032,50 +1072,69 @@ async function saveAlert() {
   const conditionOperator = conditionOperatorElement.value;
   const conditionNumber = conditionNumberElement.value;
 
+  console.log('🔧 Condition validation:');
+  console.log('🔧 Condition attribute:', conditionAttribute);
+  console.log('🔧 Condition operator:', conditionOperator);
+  console.log('🔧 Condition number:', conditionNumber);
+
   if (!relatedType || !relatedId) {
-    showErrorNotification('שדות חובה חסרים', 'יש למלא את כל השדות החובה');
+    console.log('🔧 Validation failed: missing required fields');
+    showModalNotification('error', 'שדות חובה חסרים', 'יש למלא את כל השדות החובה', 'addAlertModal');
     return;
   }
 
   if (!conditionAttribute || !conditionOperator || !conditionNumber) {
-    showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
+    console.log('🔧 Validation failed: missing condition fields');
+    showModalNotification('error', 'תנאי התראה חסר', 'יש למלא את כל שדות התנאי', 'addAlertModal');
     return;
   }
 
   // וולידציה של ערך מספרי
   const numericValue = parseFloat(conditionNumber);
   if (isNaN(numericValue)) {
-    showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
+    showModalNotification('error', 'ערך לא תקין', 'הערך חייב להיות מספר', 'addAlertModal');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך חיובי למחיר
   if (conditionAttribute === 'price' && numericValue <= 0) {
-    showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
+    showModalNotification('error', 'ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0', 'addAlertModal');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך מקסימלי למחיר
   if (conditionAttribute === 'price' && numericValue > 1000000) {
-    showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
+    showModalNotification('error', 'ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000', 'addAlertModal');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של אחוזים (לשינוי)
   if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
-    showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
+    showModalNotification('error', 'ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%', 'addAlertModal');
     conditionNumberElement.focus();
     return;
   }
 
   // המשך הקוד הקיים...
+  // המרת סוג התראה לפורמט הנתמך
+  let convertedType = alertType;
+  if (alertType === 'price_alert') {
+    convertedType = 'price';
+  } else if (alertType === 'stop_loss') {
+    convertedType = 'stop';
+  } else if (alertType === 'volume_alert') {
+    convertedType = 'volume';
+  } else if (alertType === 'custom_alert') {
+    convertedType = 'custom';
+  }
+
   const alertData = {
     related_type_id: parseInt(formData.get('alertRelationType')),
     related_id: parseInt(document.getElementById('alertRelatedObjectSelect').value),
-    type: alertType,
+    type: convertedType,
     condition_attribute: conditionAttribute,
     condition_operator: conditionOperator,
     condition_number: conditionNumber,
@@ -1085,6 +1144,11 @@ async function saveAlert() {
   };
 
   // שולח התראה חדשה
+  console.log('🔧 === SAVING ALERT ===');
+  console.log('🔧 Alert data:', alertData);
+  console.log('🔧 Request URL:', '/api/v1/alerts/');
+  console.log('🔧 Request method:', 'POST');
+  console.log('🔧 Request body:', JSON.stringify(alertData, null, 2));
 
   try {
     const response = await fetch('/api/v1/alerts/', {
@@ -1095,8 +1159,13 @@ async function saveAlert() {
       body: JSON.stringify(alertData)
     });
 
+    console.log('🔧 Response status:', response.status);
+    console.log('🔧 Response ok:', response.ok);
+
     if (response.ok) {
       const newAlert = await response.json();
+      console.log('🔧 New alert created:', newAlert);
+
       // התראה נשמרה בהצלחה
 
       // סגירת המודל
@@ -1106,13 +1175,15 @@ async function saveAlert() {
       loadAlertsData();
 
       // הצגת הודעה
-      showSuccessNotification('התראה נשמרה', 'התראה נשמרה בהצלחה!');
+      showModalNotification('success', 'התראה נשמרה', 'התראה נשמרה בהצלחה!', 'addAlertModal');
     } else {
-      throw new Error(`שגיאה בשמירת התראה: ${response.status}`);
+      const errorText = await response.text();
+      console.error('🔧 Server error response:', errorText);
+      throw new Error(`שגיאה בשמירת התראה: ${response.status} - ${errorText}`);
     }
   } catch (error) {
-    console.error('שגיאה בשמירת התראה:', error);
-    showErrorNotification('שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message);
+    console.error('🔧 Error saving alert:', error);
+    showModalNotification('error', 'שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message, 'addAlertModal');
   }
 }
 
@@ -1543,7 +1614,7 @@ async function deleteAlert(alertId) {
  */
 function sortTable(columnIndex) {
   console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex} - התראות`);
-  
+
   // שימוש בפונקציה הגלובלית החדשה
   if (typeof window.sortTableData === 'function') {
     window.sortTableData(

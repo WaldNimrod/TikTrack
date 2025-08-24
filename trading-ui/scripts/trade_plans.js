@@ -388,7 +388,7 @@ window.addEditReminder = addEditReminder;
 // Defining the updateGridFromComponent function immediately at the beginning of the file
 console.log('🔄 Planning.js: Setting up updateGridFromComponent for planning page');
 // Ensuring the function is only defined on the planning page
-if (window.location.pathname.includes('/planning')) {
+if (window.location.pathname.includes('/planning') || window.location.pathname.includes('/trade_plans')) {
     window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
         console.log('🔄 updateGridFromComponent called for planning page with:', {
             selectedStatuses,
@@ -893,13 +893,29 @@ function updatePageSummaryStats() {
 
     const avgInvestment = totalDesigns > 0 ? totalInvestment / totalDesigns : 0;
 
-    document.getElementById('totalTradePlans').textContent = totalDesigns;
-    document.getElementById('totalTradePlansInvestment').textContent = formatCurrency(totalInvestment);
-    document.getElementById('avgTradePlansInvestment').textContent = formatCurrency(avgInvestment);
-    document.getElementById('totalTradePlansProfit').textContent = formatCurrency(totalProfit);
+    // עדכון אלמנטי הסיכום - בדיקה אם הם קיימים לפני הגישה
+    const totalDesignsElement = document.getElementById('totalDesigns');
+    if (totalDesignsElement) {
+        totalDesignsElement.textContent = totalDesigns;
+    }
+
+    const totalInvestmentElement = document.getElementById('totalInvestment');
+    if (totalInvestmentElement) {
+        totalInvestmentElement.textContent = formatCurrency(totalInvestment);
+    }
+
+    const avgInvestmentElement = document.getElementById('avgInvestment');
+    if (avgInvestmentElement) {
+        avgInvestmentElement.textContent = formatCurrency(avgInvestment);
+    }
+
+    const totalProfitElement = document.getElementById('totalProfit');
+    if (totalProfitElement) {
+        totalProfitElement.textContent = formatCurrency(totalProfit);
+    }
 
     // עדכון מספר הרשומות בטבלה
-    const countElement = document.getElementById('trade_plansCount');
+    const countElement = document.getElementById('designsCount');
     if (countElement) {
         countElement.textContent = `${totalDesigns} רשומות`;
     }
@@ -1634,45 +1650,7 @@ function formatCurrency(amount) {
  * 
  * פונקציה זו משתמשת בפונקציה הגלובלית מ-main.js
  */
-function restoreDesignsSectionState() {
-    console.log('🔄 Restoring designs section state');
-
-    try {
-        // שחזור מצב הסקשן העליון
-        const topSectionOpen = localStorage.getItem('section_top-section_open') === 'true';
-        const topSectionBody = document.querySelector('#top-section .section-body');
-        const topSectionIcon = document.querySelector('#top-section .filter-icon');
-
-        if (topSectionBody && topSectionIcon) {
-            if (topSectionOpen) {
-                topSectionBody.style.display = 'block';
-                topSectionIcon.textContent = '▲';
-            } else {
-                topSectionBody.style.display = 'none';
-                topSectionIcon.textContent = '▼';
-            }
-        }
-
-        // שחזור מצב הסקשן הראשי
-        const mainSectionOpen = localStorage.getItem('section_content-section_open') === 'true';
-        const mainSectionBody = document.querySelector('#content-section .section-body');
-        const mainSectionIcon = document.querySelector('#content-section .filter-icon');
-
-        if (mainSectionBody && mainSectionIcon) {
-            if (mainSectionOpen) {
-                mainSectionBody.style.display = 'block';
-                mainSectionIcon.textContent = '▲';
-            } else {
-                mainSectionBody.style.display = 'none';
-                mainSectionIcon.textContent = '▼';
-            }
-        }
-
-        console.log('✅ Designs section state restored successfully');
-    } catch (error) {
-        console.error('❌ Error restoring designs section state:', error);
-    }
-}
+// restoreDesignsSectionState is already defined in page-utils.js
 
 // Global functions are now properly defined in main.js
 console.log('✅ Global toggle functions available from main.js');
@@ -1782,88 +1760,23 @@ window.updateAccountFilterDisplayText = function () {
     }
 };
 
-window.updateAccountFilterMenu = function (accounts) {
-    console.log('🔄 updateAccountFilterMenu called');
-    // הפונקציה כבר מוגדרת ב-accounts.js
-    if (typeof window.updateAccountFilterMenuGlobal === 'function') {
-        window.updateAccountFilterMenuGlobal(accounts);
-    } else {
-        console.warn('⚠️ updateAccountFilterMenuGlobal not found');
-    }
-};
+// updateAccountFilterMenu is already defined in accounts.js
 
-window.loadSectionStates = function () {
-    console.log('🔄 loadSectionStates called');
-    // הפונקציה כבר מוגדרת ב-main.js
-    if (typeof window.loadSectionStatesGlobal === 'function') {
-        window.loadSectionStatesGlobal();
-    } else {
-        console.warn('⚠️ loadSectionStatesGlobal not found');
-    }
-};
+// loadSectionStates is not needed - using global functions
 
-window.restoreAllSectionStates = function () {
-    console.log('🔄 restoreAllSectionStates called');
-    // הפונקציה כבר מוגדרת ב-main.js
-    if (typeof window.restoreAllSectionStatesGlobal === 'function') {
-        window.restoreAllSectionStatesGlobal();
-    } else {
-        console.warn('⚠️ restoreAllSectionStatesGlobal not found');
-    }
-};
+// restoreAllSectionStates is already defined in main.js
 
-window.filterDataByFilters = function (data, pageName) {
-    console.log('🔄 filterDataByFilters called for page:', pageName);
-    // הפונקציה כבר מוגדרת ב-main.js
-    if (typeof window.filterDataByFiltersGlobal === 'function') {
-        return window.filterDataByFiltersGlobal(data, pageName);
-    } else {
-        console.warn('⚠️ filterDataByFiltersGlobal not found');
-        return data;
-    }
-};
+// filterDataByFilters is not needed - using local filtering
 
-window.updateGridFromComponentGlobal = function (selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName) {
-    console.log('🔄 updateGridFromComponentGlobal called for page:', pageName);
-    // הפונקציה כבר מוגדרת ב-main.js
-    if (typeof window.updateGridFromComponentGlobalMain === 'function') {
-        return window.updateGridFromComponentGlobalMain(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName);
-    } else {
-        console.warn('⚠️ updateGridFromComponentGlobalMain not found');
-        // שימוש בפונקציה מקומית
-        return updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageName);
-    }
-};
+// updateGridFromComponentGlobal is not needed - using local updateGridFromComponent
 
-window.updateTableStats = function () {
-    console.log('🔄 updateTableStats called for planning page');
-    updatePageSummaryStats();
-};
+// updateTableStats is not needed - using local updatePageSummaryStats
 
-window.restoreDesignsSectionState = function () {
-    console.log('🔄 restoreDesignsSectionState called for planning page');
-    restoreDesignsSectionState();
-};
+// restoreDesignsSectionState is not needed - using global restoreAllSectionStates
 
-window.initializePageFilters = function (pageName) {
-    console.log('🔄 initializePageFilters called for page:', pageName);
-    // הפונקציה כבר מוגדרת ב-main.js או header-system.js
-    if (typeof window.initializePageFiltersGlobal === 'function') {
-        window.initializePageFiltersGlobal(pageName);
-    } else {
-        console.warn('⚠️ initializePageFiltersGlobal not found');
-    }
-};
+// initializePageFilters is already defined in main.js
 
-window.loadSortState = function (pageName) {
-    console.log('🔄 loadSortState called for page:', pageName);
-    // הפונקציה כבר מוגדרת ב-main.js
-    if (typeof window.loadSortStateGlobal === 'function') {
-        window.loadSortStateGlobal(pageName);
-    } else {
-        console.warn('⚠️ loadSortStateGlobal not found');
-    }
-};
+// loadSortState is already defined in main.js
 
 // ===== פונקציות לכפתורים החדשים =====
 

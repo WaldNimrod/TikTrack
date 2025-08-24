@@ -213,6 +213,20 @@ function showInfoNotification(title, message) {
 }
 
 /**
+ * הצגת הודעת אזהרה
+ * Show warning notification
+ */
+function showWarningNotification(title, message) {
+    // Warning notification
+
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(`${title}: ${message}`, 'warning');
+    } else {
+        showModalNotification('warning', title, message);
+    }
+}
+
+/**
  * יצירת מיכל התראות אם לא קיים
  * Create toast container if not exists
  */
@@ -314,6 +328,7 @@ window.confirmSecondAction = confirmSecondAction;
 window.showErrorNotification = showErrorNotification;
 window.showSuccessNotification = showSuccessNotification;
 window.showInfoNotification = showInfoNotification;
+window.showWarningNotification = showWarningNotification;
 window.createToastContainer = createToastContainer;
 window.colorAmount = colorAmount;
 window.showNotification = showNotification;
@@ -326,6 +341,7 @@ window.uiUtils = {
     showErrorNotification,
     showSuccessNotification,
     showInfoNotification,
+    showWarningNotification,
     createToastContainer,
     colorAmount,
     showNotification

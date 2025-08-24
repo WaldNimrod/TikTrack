@@ -986,9 +986,10 @@ select:focus {
   }
 
   .actions-cell {
-    flex-direction: column !important;
-    gap: 0.5rem !important;
+    flex-direction: row !important;
+    gap: 0.25rem !important;
     padding: 0.5rem !important;
+    flex-wrap: wrap !important;
   }
 
   .actions-cell .btn {

@@ -10,6 +10,7 @@
 - ✅ **Model Updates** - All models updated with NOT NULL constraints
 - ✅ **Default Values** - Proper defaults for all required fields
 - ✅ **Validation Integration** - Real-time validation against constraints
+- ✅ **Alerts Table Migration** - Migrated from single condition field to three separate fields ([Details](ALERTS_TABLE_MIGRATION.md))
 The TikTrack database is built on SQLite with SQLAlchemy ORM, providing a robust foundation for trading management operations. The database includes dynamic constraint management capabilities and comprehensive data integrity features.
 
 ## Database File
@@ -60,7 +61,6 @@ CREATE TABLE alerts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     type TEXT NOT NULL DEFAULT 'price',
     status TEXT DEFAULT 'open',
-    condition TEXT NOT NULL,
     message TEXT,
     triggered_at TIMESTAMP,
     is_triggered TEXT DEFAULT 'false',
@@ -68,22 +68,28 @@ CREATE TABLE alerts (
     related_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    condition_attribute VARCHAR(50),
+    condition_operator VARCHAR(50),
+    condition_number DECIMAL(10,2),
     FOREIGN KEY (related_type_id) REFERENCES note_relation_types(id)
 );
 ```
 
-**Condition Field Format:**
-The `condition` field follows a specific format: `[string1] | [string2] | [Number]`
+**New Condition Fields Format:**
+The alerts table now uses three separate fields for better flexibility:
 
-- **string1** (Data Type): `price`, `change`, `ma`, `volume`
-- **string2** (Operator): `lessThen`, `moreThen`, `cross`, `crossUp`, `crossDown`, `upBy`, `downBy`, `changeBy`, `upByPre`, `downByPre`, `changeByPre`
-- **Number**: Numeric value for comparison
+- **condition_attribute** (Data Type): `price`, `change`, `ma`, `volume`
+- **condition_operator** (Operator): `more_than`, `less_than`, `cross`, `cross_up`, `cross_down`, `equals`, `change`, `change_up`, `change_down`
+- **condition_number** (Number): Numeric value for comparison
 
 **Examples:**
-- `price | moreThen | 150` - Price greater than 150
-- `change | upByPre | 5` - Change increases by 5%
-- `ma | crossUp | 200` - Moving average crosses up 200
-- `volume | moreThen | 1000000` - Volume greater than 1M
+- `condition_attribute: 'price'`, `condition_operator: 'more_than'`, `condition_number: 150` - Price greater than 150
+- `condition_attribute: 'change'`, `condition_operator: 'more_than'`, `condition_number: 5` - Change increases by 5%
+- `condition_attribute: 'ma'`, `condition_operator: 'cross_up'`, `condition_number: 200` - Moving average crosses up 200
+- `condition_attribute: 'volume'`, `condition_operator: 'more_than'`, `condition_number: 1000000` - Volume greater than 1M
+
+**Legacy Support:**
+The API still returns a `condition` field in the format: `"{condition_attribute} | {condition_operator} | {condition_number}"` for backward compatibility.
 
 ### 4. Trade Plans Table
 ```sql

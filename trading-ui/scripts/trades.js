@@ -117,20 +117,18 @@ async function loadTradesData() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const apiData = await response.json();
-    console.log('🔄 Server response:', apiData);
+    const responseData = await response.json();
+    console.log('🔄 Server response:', responseData);
 
-    if (apiData.status !== 'success') {
-      throw new Error(`API error: ${apiData.message || 'Unknown error'}`);
+    if (responseData.status !== 'success') {
+      throw new Error(`API error: ${responseData.message || 'Unknown error'}`);
     }
 
     console.log('🔄 Processing trades data...');
-    console.log('🔄 Number of trades received:', apiData.data ? apiData.data.length : 0);
+    console.log('🔄 Number of trades received:', responseData.data ? responseData.data.length : 0);
 
     // בדיקה שהנתונים בפורמט הנכון
-    if (apiData && apiData.data && Array.isArray(apiData.data)) {
-      apiData = apiData.data;
-    }
+    let apiData = responseData.data || responseData;
 
     // עדכון הנתונים המקומיים - שימוש בשמות אחידים מה-API
     let tradesData = apiData.map(trade => ({
@@ -371,6 +369,7 @@ function updateTradesTable(trades) {
       <td class="side-cell" data-side="${trade.side || 'Long'}">
         <span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>
       </td>
+      <td class="plan-cell">${trade.trade_plan_id ? `<a href="#" onclick="viewTradePlanDetails('${trade.trade_plan_id}')" class="plan-link">#${trade.trade_plan_id}</a>` : '-'}</td>
       <td class="pl-cell">${window.colorAmount(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
@@ -420,6 +419,15 @@ function viewAccountDetails(accountId) {
     window.showNotification('פונקציונליות צפייה בפרטי חשבון תהיה זמינה בקרוב', 'info');
   } else {
     alert('פונקציונליות צפייה בפרטי חשבון תהיה זמינה בקרוב');
+  }
+}
+
+function viewTradePlanDetails(tradePlanId) {
+  // צפייה בפרטי תוכנית טרייד
+  if (typeof window.showNotification === 'function') {
+    window.showNotification(`פונקציונליות צפייה בתוכנית טרייד #${tradePlanId} תהיה זמינה בקרוב`, 'info');
+  } else {
+    alert(`פונקציונליות צפייה בתוכנית טרייד #${tradePlanId} תהיה זמינה בקרוב`);
   }
 }
 

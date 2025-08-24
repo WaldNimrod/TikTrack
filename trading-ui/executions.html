@@ -66,7 +66,9 @@
         <!-- Main header -->
         <div class="section-header">
           <div class="table-title">
-            📊 עסקעות
+            <img src="images/icons/executions.svg" alt="עסקעות"
+              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            עסקעות
           </div>
           <div class="table-actions">
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור עיצובים">
@@ -97,12 +99,15 @@
           <!-- Designs header -->
           <div class="section-header">
             <div class="table-title">
-              📊 העסקעות שלי
+              <img src="images/icons/executions.svg" alt="העסקעות שלי"
+                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              העסקעות שלי
             </div>
             <div class="table-count">12 עסקעות</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="openExecutionDetails()" title="הוסף עסקה חדשה">
-                <span class="action-icon">➕</span> הוסף
+                <img src="images/icons/executions.svg" alt="הוסף" class="action-icon"
+                  style="width: 16px; height: 16px;"> הוסף
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleExecutionsSection()" title="הצג/הסתר אזור עסקעות">
@@ -255,21 +260,44 @@
       aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header"
+            style="background: linear-gradient(135deg, #29a6a8, #1f8a8c) !important; color: white !important; border-radius: 12px 12px 0 0; border-bottom: none;">
             <h5 class="modal-title" id="addExecutionModalLabel">הוספת עסקה חדשה</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+              style="color: white !important; filter: brightness(0) invert(1); background: none; border: none; font-size: 1.5rem; font-weight: bold;">
+              ×
+            </button>
           </div>
           <div class="modal-body">
             <form id="addExecutionForm">
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
+                    <label for="addExecutionTicker" class="form-label">טיקר *</label>
+                    <select class="form-select" id="addExecutionTicker" required onchange="loadActiveTradesForTicker()">
+                      <option value="">בחר טיקר...</option>
+                    </select>
+                    <div class="invalid-feedback" id="addExecutionTickerError"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
                     <label for="addExecutionTradeId" class="form-label">מזהה טרייד *</label>
-                    <input type="number" class="form-control" id="addExecutionTradeId" required placeholder="למשל: 15"
-                      min="1" onblur="validateExecutionTradeId(this)">
+                    <div class="input-group">
+                      <select class="form-select" id="addExecutionTradeId" required
+                        onchange="validateExecutionTradeId(this)">
+                        <option value="">בחר טרייד...</option>
+                      </select>
+                      <button type="button" class="btn btn-outline-secondary" id="addExecutionTradeLink"
+                        onclick="goToLinkedTrade('add')" title="עבור לטרייד" style="display: none;">
+                        🔗
+                      </button>
+                    </div>
                     <div class="invalid-feedback" id="addExecutionTradeIdError"></div>
                   </div>
                 </div>
+              </div>
+              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addExecutionType" class="form-label">פעולה *</label>
@@ -281,22 +309,31 @@
                     <div class="invalid-feedback" id="addExecutionTypeError"></div>
                   </div>
                 </div>
-              </div>
-              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addExecutionQuantity" class="form-label">כמות *</label>
                     <input type="number" class="form-control" id="addExecutionQuantity" required placeholder="למשל: 100"
-                      min="1" onblur="validateExecutionQuantity(this)">
+                      min="1" onblur="validateExecutionQuantity(this)" oninput="calculateAddExecutionValues()">
                     <div class="invalid-feedback" id="addExecutionQuantityError"></div>
                   </div>
                 </div>
+              </div>
+              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addExecutionPrice" class="form-label">מחיר *</label>
                     <input type="number" class="form-control" id="addExecutionPrice" required placeholder="למשל: 150.25"
-                      step="0.01" min="0" onblur="validateExecutionPrice(this)">
+                      step="0.01" min="0" onblur="validateExecutionPrice(this)" oninput="calculateAddExecutionValues()">
                     <div class="invalid-feedback" id="addExecutionPriceError"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="addExecutionCommission" class="form-label">עמלה</label>
+                    <input type="number" class="form-control" id="addExecutionCommission" placeholder="למשל: 1.50"
+                      step="0.01" min="0" onblur="validateExecutionCommission(this)"
+                      oninput="calculateAddExecutionValues()">
+                    <div class="invalid-feedback" id="addExecutionCommissionError"></div>
                   </div>
                 </div>
               </div>
@@ -310,10 +347,35 @@
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="addExecutionCommission" class="form-label">עמלה</label>
-                    <input type="number" class="form-control" id="addExecutionCommission" placeholder="למשל: 1.50"
-                      step="0.01" min="0" onblur="validateExecutionCommission(this)">
-                    <div class="invalid-feedback" id="addExecutionCommissionError"></div>
+                    <label for="addExecutionSource" class="form-label">מקור</label>
+                    <input type="text" class="form-control" id="addExecutionSource" placeholder="למשל: IBKR">
+                    <div class="invalid-feedback" id="addExecutionSourceError"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <div class="calculated-values"
+                      style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px;">
+                      <h6 style="margin-bottom: 15px; color: #495057; font-weight: 600;">ערכים מחושבים:</h6>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="calculated-item">
+                            <label class="form-label" style="font-weight: 500; color: #6c757d;">סה"כ עסקה:</label>
+                            <span id="addExecutionTotal"
+                              style="font-size: 1.1rem; font-weight: 600; color: #28a745;">$0.00</span>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="calculated-item">
+                            <label class="form-label" style="font-weight: 500; color: #6c757d;">רווח/הפסד:</label>
+                            <span id="addExecutionPL"
+                              style="font-size: 1.1rem; font-weight: 600; color: #dc3545;">בפיתוח</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -345,9 +407,13 @@
       aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header"
+            style="background: linear-gradient(135deg, #29a6a8, #1f8a8c) !important; color: white !important; border-radius: 12px 12px 0 0; border-bottom: none;">
             <h5 class="modal-title" id="editExecutionModalLabel">עריכת עסקה</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+              style="color: white !important; filter: brightness(0) invert(1); background: none; border: none; font-size: 1.5rem; font-weight: bold;">
+              ×
+            </button>
           </div>
           <div class="modal-body">
             <form id="editExecutionForm">
@@ -355,12 +421,32 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
+                    <label for="editExecutionTicker" class="form-label">טיקר *</label>
+                    <select class="form-select" id="editExecutionTicker" required
+                      onchange="loadActiveTradesForTicker('edit')">
+                      <option value="">בחר טיקר...</option>
+                    </select>
+                    <div class="invalid-feedback" id="editExecutionTickerError"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
                     <label for="editExecutionTradeId" class="form-label">מזהה טרייד *</label>
-                    <input type="number" class="form-control" id="editExecutionTradeId" required placeholder="למשל: 15"
-                      min="1" onblur="validateExecutionTradeId(this)">
+                    <div class="input-group">
+                      <select class="form-select" id="editExecutionTradeId" required
+                        onchange="validateExecutionTradeId(this)">
+                        <option value="">בחר טרייד...</option>
+                      </select>
+                      <button type="button" class="btn btn-outline-secondary" id="editExecutionTradeLink"
+                        onclick="goToLinkedTrade()" title="עבור לטרייד" style="display: none;">
+                        🔗
+                      </button>
+                    </div>
                     <div class="invalid-feedback" id="editExecutionTradeIdError"></div>
                   </div>
                 </div>
+              </div>
+              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editExecutionType" class="form-label">פעולה *</label>
@@ -372,22 +458,33 @@
                     <div class="invalid-feedback" id="editExecutionTypeError"></div>
                   </div>
                 </div>
-              </div>
-              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editExecutionQuantity" class="form-label">כמות *</label>
                     <input type="number" class="form-control" id="editExecutionQuantity" required
-                      placeholder="למשל: 100" min="1" onblur="validateExecutionQuantity(this)">
+                      placeholder="למשל: 100" min="1" onblur="validateExecutionQuantity(this)"
+                      oninput="calculateEditExecutionValues()">
                     <div class="invalid-feedback" id="editExecutionQuantityError"></div>
                   </div>
                 </div>
+              </div>
+              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editExecutionPrice" class="form-label">מחיר *</label>
                     <input type="number" class="form-control" id="editExecutionPrice" required
-                      placeholder="למשל: 150.25" step="0.01" min="0" onblur="validateExecutionPrice(this)">
+                      placeholder="למשל: 150.25" step="0.01" min="0" onblur="validateExecutionPrice(this)"
+                      oninput="calculateEditExecutionValues()">
                     <div class="invalid-feedback" id="editExecutionPriceError"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editExecutionCommission" class="form-label">עמלה</label>
+                    <input type="number" class="form-control" id="editExecutionCommission" placeholder="למשל: 1.50"
+                      step="0.01" min="0" onblur="validateExecutionCommission(this)"
+                      oninput="calculateEditExecutionValues()">
+                    <div class="invalid-feedback" id="editExecutionCommissionError"></div>
                   </div>
                 </div>
               </div>
@@ -401,10 +498,35 @@
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="editExecutionCommission" class="form-label">עמלה</label>
-                    <input type="number" class="form-control" id="editExecutionCommission" placeholder="למשל: 1.50"
-                      step="0.01" min="0" onblur="validateExecutionCommission(this)">
-                    <div class="invalid-feedback" id="editExecutionCommissionError"></div>
+                    <label for="editExecutionSource" class="form-label">מקור</label>
+                    <input type="text" class="form-control" id="editExecutionSource" placeholder="למשל: IBKR">
+                    <div class="invalid-feedback" id="editExecutionSourceError"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <div class="calculated-values"
+                      style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px;">
+                      <h6 style="margin-bottom: 15px; color: #495057; font-weight: 600;">ערכים מחושבים:</h6>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="calculated-item">
+                            <label class="form-label" style="font-weight: 500; color: #6c757d;">סה"כ עסקה:</label>
+                            <span id="editExecutionTotal"
+                              style="font-size: 1.1rem; font-weight: 600; color: #28a745;">$0.00</span>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="calculated-item">
+                            <label class="form-label" style="font-weight: 500; color: #6c757d;">רווח/הפסד:</label>
+                            <span id="editExecutionPL"
+                              style="font-size: 1.1rem; font-weight: 600; color: #dc3545;">בפיתוח</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -436,9 +558,13 @@
       aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header"
+            style="background: linear-gradient(135deg, #dc3545, #c82333) !important; color: white !important; border-radius: 12px 12px 0 0; border-bottom: none;">
             <h5 class="modal-title" id="deleteExecutionModalLabel">מחיקת עסקה</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+              style="color: white !important; filter: brightness(0) invert(1); background: none; border: none; font-size: 1.5rem; font-weight: bold;">
+              ×
+            </button>
           </div>
           <div class="modal-body">
             <p>האם אתה בטוח שברצונך למחוק את העסקה <strong id="deleteExecutionName"></strong>?</p>
@@ -446,7 +572,8 @@
             <input type="hidden" id="deleteExecutionId">
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+              style="font-size: 0.9rem; padding: 0.375rem 0.75rem;">ביטול</button>
             <button type="button" class="btn btn-danger" onclick="confirmDeleteExecution()"
               style="border: 2px solid #dc3545; background-color: white; color: #dc3545; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
               מחק עסקה
@@ -503,6 +630,7 @@
     <script src="scripts/header-system.js"></script>
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/simple-filter.js"></script>
+    <script src="scripts/filter-system.js"></script>
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/ui-utils.js"></script>
@@ -511,6 +639,9 @@
     <script src="scripts/tables.js"></script>
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
+    <script src="scripts/condition-translator.js"></script>
+    <script src="scripts/alerts.js"></script>
+    <script src="scripts/active-alerts-component.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/executions.js"></script>
     <script>

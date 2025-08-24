@@ -111,12 +111,14 @@ const TABLE_COLUMN_MAPPINGS = {
 
     // טבלת התראות (Alerts)
     'alerts': [
-        'id',              // 0 - מזהה
-        'ticker',          // 1 - טיקר
-        'type',            // 2 - סוג
-        'condition',       // 3 - תנאי
-        'status',          // 4 - סטטוס
-        'created_at'       // 5 - נוצר ב
+        'ticker_symbol',   // 0 - טיקר
+        'condition',       // 1 - תנאי
+        'status',          // 2 - סטטוס
+        'is_triggered',    // 3 - הופעל
+        'related_object',  // 4 - קשור ל
+        'message',         // 5 - הודעה
+        'type',            // 6 - סוג התראה
+        'created_at'       // 7 - נוצר ב
     ],
 
     // טבלת הערות (Notes)
@@ -130,15 +132,18 @@ const TABLE_COLUMN_MAPPINGS = {
 
     // טבלת עסקעות (Executions)
     'executions': [
-        'id',              // 0 - מזהה
-        'trade_id',        // 1 - מזהה טרייד
+        'symbol',          // 0 - סימבול
+        'trade_info',      // 1 - מידע טרייד
         'action',          // 2 - פעולה
-        'date',            // 3 - תאריך
-        'quantity',        // 4 - כמות
-        'price',           // 5 - מחיר
-        'fee',             // 6 - עמלה
-        'source',          // 7 - מקור
-        'created_at'       // 8 - נוצר ב
+        'quantity',        // 3 - כמות
+        'price',           // 4 - מחיר
+        'fee',             // 5 - עמלה
+        'pl',              // 6 - רווח/הפסד
+        'notes',           // 7 - הערות
+        'created_at',      // 8 - נוצר ב
+        'date',            // 9 - תאריך ביצוע
+        'source',          // 10 - מקור
+        'actions'          // 11 - פעולות
     ],
 
     // טבלת תזרימי מזומנים (Cash Flows)
@@ -239,11 +244,89 @@ function getColumnValue(item, columnIndex, tableType) {
         }
     }
 
+    if (tableType === 'executions') {
+        console.log('🔍 getColumnValue - executions table:', { fieldName, item });
+
+        if (fieldName === 'symbol') {
+            // נדרש לטעון נתוני טריידים וטיקרים
+            return item.symbol || item.ticker_symbol || '';
+        }
+        if (fieldName === 'trade_info') {
+            return item.trade_info || '';
+        }
+        if (fieldName === 'action') {
+            const actionDisplay = (item.action || item.type) === 'buy' ? 'רכישה' :
+                (item.action || item.type) === 'sell' ? 'מכירה' : (item.action || item.type);
+            return actionDisplay;
+        }
+        if (fieldName === 'pl') {
+            return '0'; // לא ממיינים לפי רווח/הפסד
+        }
+        if (fieldName === 'notes') {
+            return item.notes || '';
+        }
+        if (fieldName === 'date') {
+            return item.date || item.execution_date || item.created_at || '';
+        }
+        if (fieldName === 'actions') {
+            return ''; // לא ממיינים לפי עמודת פעולות
+        }
+    }
+
     // הערה: הלוגיקה עבור 'designs' הוסרה - משתמשים ב-'trade_plans' במקום
 
     if (tableType === 'alerts') {
-        if (fieldName === 'ticker') {
-            return item.ticker ? (item.ticker.symbol || item.ticker.name || '') : '';
+        if (fieldName === 'ticker_symbol') {
+            // טיפול בטיקר - נדרש לטעון נתוני טיקרים
+            return item.ticker_symbol || item.ticker_id || '';
+        }
+        if (fieldName === 'condition') {
+            // טיפול בתנאי - שימוש בפונקציית התרגום אם זמינה
+            if (item.condition_attribute && item.condition_operator && item.condition_number && window.translateConditionFields) {
+                return window.translateConditionFields(item.condition_attribute, item.condition_operator, item.condition_number);
+            }
+            return item.condition || '-';
+        }
+        if (fieldName === 'status') {
+            // המרת סטטוס לעברית
+            switch (item.status) {
+                case 'open': return 'פתוח';
+                case 'closed': return 'סגור';
+                case 'cancelled': return 'מבוטל';
+                default: return item.status || '';
+            }
+        }
+        if (fieldName === 'is_triggered') {
+            // המרת מצב הפעלה לעברית
+            if (item.is_triggered === 'true' || item.is_triggered === true) {
+                return 'כן';
+            } else if (item.is_triggered === 'false' || item.is_triggered === false) {
+                return 'לא';
+            } else if (item.is_triggered === 'new') {
+                return 'חדש';
+            }
+            return 'לא מוגדר';
+        }
+        if (fieldName === 'related_object') {
+            // טיפול באובייקט מקושר - נדרש לטעון נתונים נוספים
+            return item.related_object || '-';
+        }
+        if (fieldName === 'message') {
+            return item.message || '-';
+        }
+        if (fieldName === 'type') {
+            // המרת סוג התראה לעברית
+            switch (item.type) {
+                case 'price_alert': return 'התראה על מחיר';
+                case 'stop_loss': return 'סטופ לוס';
+                case 'volume_alert': return 'התראה על נפח';
+                case 'custom_alert': return 'התראה מותאמת';
+                case 'price': return 'התראה על מחיר';
+                case 'volume': return 'התראה על נפח';
+                case 'change': return 'התראה על שינוי';
+                case 'ma': return 'התראה על ממוצע נע';
+                default: return item.type || '';
+            }
         }
     }
 

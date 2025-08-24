@@ -2349,6 +2349,17 @@ button[onclick*="openDesignDetails"]:hover {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
+/* ===== הגדרה גלובלית לתאי פעולות ===== */
+.actions-cell {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 0.25rem !important;
+  padding: 0.5rem !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 /* ===== סגנונות לכרטיסיות התראות ===== */
 .alerts-cards-container {
   margin: 20px 0;
@@ -2769,6 +2780,113 @@ button[onclick*="openDesignDetails"]:hover {
 
 /* ===== תבנית גלובלית לכל המודולים ===== */
 
+/* הגדרות z-index גבוהות לכל המודלים */
+/* הערה: הגדרות בסיסיות נמצאות ב-apple-theme.css */
+
+/* מודלים ספציפיים עם z-index גבוה */
+#addTradeModal,
+#editTradeModal,
+#addTradePlanModal,
+#editTradePlanModal,
+#addAlertModal,
+#editAlertModal,
+#addNoteModal,
+#editNoteModal,
+#addTickerModal,
+#editTickerModal,
+#addAccountModal,
+#editAccountModal,
+#addExecutionModal,
+#editExecutionModal,
+#deleteExecutionModal,
+#linkedItemsModal,
+#warningModal {
+  z-index: 999999999 !important;
+}
+
+#addTradeModal .modal-dialog,
+#editTradeModal .modal-dialog,
+#addTradePlanModal .modal-dialog,
+#editTradePlanModal .modal-dialog,
+#addAlertModal .modal-dialog,
+#editAlertModal .modal-dialog,
+#addNoteModal .modal-dialog,
+#editNoteModal .modal-dialog,
+#addTickerModal .modal-dialog,
+#editTickerModal .modal-dialog,
+#addAccountModal .modal-dialog,
+#editAccountModal .modal-dialog,
+#addExecutionModal .modal-dialog,
+#editExecutionModal .modal-dialog,
+#deleteExecutionModal .modal-dialog,
+#linkedItemsModal .modal-dialog,
+#warningModal .modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+#addTradeModal .modal-content,
+#editTradeModal .modal-content,
+#addTradePlanModal .modal-content,
+#editTradePlanModal .modal-content,
+#addAlertModal .modal-content,
+#editAlertModal .modal-content,
+#addNoteModal .modal-content,
+#editNoteModal .modal-content,
+#addTickerModal .modal-content,
+#editTickerModal .modal-content,
+#addAccountModal .modal-content,
+#editAccountModal .modal-content,
+#addExecutionModal .modal-content,
+#editExecutionModal .modal-content,
+#deleteExecutionModal .modal-content,
+#linkedItemsModal .modal-content,
+#warningModal .modal-content {
+  z-index: 1000000001 !important;
+}
+
+/* הודעות - וידוא שהן מופיעות מעל הכל */
+.notification {
+  z-index: 1000000002 !important;
+}
+
+.notification-container {
+  z-index: 1000000002 !important;
+}
+
+.toast {
+  z-index: 1000000002 !important;
+}
+
+.toast-container {
+  z-index: 1000000002 !important;
+}
+
+/* מודלים דינמיים - וידוא שהם מופיעים מעל הכל */
+[class*="modal"] {
+  z-index: 999999999 !important;
+}
+
+[class*="modal"] .modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+[class*="modal"] .modal-content {
+  z-index: 1000000001 !important;
+}
+
+/* Bootstrap modals - וידוא תאימות */
+.bootstrap-modal {
+  z-index: 999999999 !important;
+}
+
+.bootstrap-modal .modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+.bootstrap-modal .modal-content {
+  z-index: 1000000001 !important;
+}
+
 /* תבנית בסיס לכל המודולים */
 .modal .modal-header {
   display: flex;
@@ -2848,6 +2966,81 @@ button[onclick*="openDesignDetails"]:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* סגנונות ספציפיים למודל התראות */
+#addAlertModal .modal-header,
+#editAlertModal .modal-header {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  color: white !important;
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#addAlertModal .modal-title,
+#editAlertModal .modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  order: 1;
+}
+
+#addAlertModal .btn-close,
+#editAlertModal .btn-close {
+  background: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  margin: 0;
+  order: 2;
+  filter: none;
+  color: #dc3545 !important;
+  position: relative;
+}
+
+#addAlertModal .btn-close::before,
+#editAlertModal .btn-close::before {
+  content: '✕';
+  color: #dc3545;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+#addAlertModal .btn-close:hover,
+#editAlertModal .btn-close:hover {
+  opacity: 1;
+  color: #c82333 !important;
+}
+
+#addAlertModal .btn-close:hover::before,
+#editAlertModal .btn-close:hover::before {
+  color: #c82333;
+}
+
+/* התאמה ל-RTL למודל התראות */
+#addAlertModal .modal-body,
+#editAlertModal .modal-body {
+  direction: rtl;
+  text-align: right;
+}
+
+#addAlertModal .form-label,
+#editAlertModal .form-label {
+  text-align: right;
+}
+
+#addAlertModal .form-control,
+#addAlertModal .form-select,
+#editAlertModal .form-control,
+#editAlertModal .form-select {
+  text-align: right;
 }
 
 #addTradePlanModal .modal-title {
@@ -3817,3 +4010,6 @@ a:hover,
   outline: 2px solid #007bff;
   outline-offset: 2px;
 }
+
+/* ===== הגדרות z-index גבוהות למודלים ===== */
+/* הערה: הגדרות בסיסיות נמצאות ב-apple-theme.css */

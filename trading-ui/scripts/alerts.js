@@ -456,16 +456,8 @@ function updateAlertsTable(alerts) {
         symbolDisplay = `אובייקט ${alert.related_id}`;
       }
 
-      // הוספת הסוג לפני האובייקט
-      const typeLabels = {
-        1: '🏦 ',
-        2: '📈 ',
-        3: '📋 ',
-        4: '📊 '
-      };
-
-      const typeLabel = typeLabels[alert.related_type_id] || '❓ ';
-      relatedDisplay = typeLabel + relatedDisplay;
+      // הוספת איקון קישור לפני האובייקט
+      relatedDisplay = '🔗 ' + relatedDisplay;
 
       const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL', {
         year: 'numeric',
@@ -490,6 +482,14 @@ function updateAlertsTable(alerts) {
         case 'stop_loss': typeDisplay = 'סטופ לוס'; break;
         case 'volume_alert': typeDisplay = 'התראה על נפח'; break;
         case 'custom_alert': typeDisplay = 'התראה מותאמת'; break;
+        case 'account_alert': typeDisplay = 'התראה על חשבון'; break;
+        case 'plan_alert': typeDisplay = 'התראה על תוכנית'; break;
+        case 'trade_alert': typeDisplay = 'התראה על טרייד'; break;
+        case 'ticker_alert': typeDisplay = 'התראה על טיקר'; break;
+        case 'price': typeDisplay = 'התראה על מחיר'; break;
+        case 'volume': typeDisplay = 'התראה על נפח'; break;
+        case 'change': typeDisplay = 'התראה על שינוי'; break;
+        case 'ma': typeDisplay = 'התראה על ממוצע נע'; break;
         default: typeDisplay = alert.type;
       }
 
@@ -512,29 +512,26 @@ function updateAlertsTable(alerts) {
       }
 
       return `
-        <tr>
-          <td class="ticker-cell"><span class="symbol-text">${symbolDisplay}</span></td>
-          <td style="padding: 0;">
-            <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px;">
-              ${relatedDisplay}
-            </div>
+        <tr data-status="${alert.status || ''}" data-type="${alert.type || ''}" data-date="${alert.created_at || ''}">
+          <td class="ticker-cell">
+            <span class="link-icon" title="חיבור לעמוד טרייד - בפיתוח" style="cursor: pointer; margin-left: 5px;">🔗</span>
+            <span class="symbol-text">${symbolDisplay}</span>
           </td>
-          <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
-          <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
-          <td class="type-cell" data-type="${alert.type || ''}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
           <td><span class="condition-text">${(() => {
-          // בדיקה אם יש שדות חדשים
           if (alert.condition_attribute && alert.condition_operator && alert.condition_number && window.translateConditionFields) {
             return window.translateConditionFields(alert.condition_attribute, alert.condition_operator, alert.condition_number);
           }
-          // בדיקה אם יש תנאי ישן
-          if (alert.condition && window.formatAlertCondition) {
-            return window.formatAlertCondition(alert.condition);
-          }
-          // fallback
           return alert.condition || '-';
         })()}</span></td>
+          <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+          <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
+          <td style="padding: 0;">
+            <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer;" title="קישור לדף אובייקט - בפיתוח">
+              ${relatedDisplay}
+            </div>
+          </td>
           <td><span class="message-text">${alert.message || '-'}</span></td>
+          <td class="type-cell" data-type="${alert.type || ''}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
             <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">
@@ -1530,31 +1527,23 @@ async function deleteAlert(alertId) {
 }
 
 /**
- * פונקציה לסידור הטבלה
+ * פונקציה לסידור טבלת התראות
  * 
- * פונקציה זו משתמשת במערכת הסידור הגלובלית מ-main.js
- * כדי לסדר את טבלת ההתראות לפי העמודה הנבחרת.
+ * פונקציה זו מטפלת בסידור טבלת ההתראות לפי עמודה
+ * משתמשת ב-sortTableData הגלובלית
  * 
- * הפונקציה:
- * - משתמשת ב-sortTableData הגלובלית
- * - מעדכנת את הנתונים המסוננים
- * - שומרת את מצב הסידור ב-localStorage
- * 
- * @param {number} columnIndex - אינדקס העמודה לסידור (0-7)
- * 
- * @example
+ * דוגמאות שימוש:
  * sortTable(0); // סידור לפי עמודת סימבול
  * sortTable(1); // סידור לפי עמודת אובייקט משיוך
  * sortTable(7); // סידור לפי עמודת תאריך יצירה
  * 
+ * @param {number} columnIndex - אינדקס העמודה לסידור
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
- * @requires window.filteredAlertsData - נתונים מסוננים
- * @requires alertsData - נתונים מקוריים
  * @requires updateAlertsTable - פונקציה לעדכון הטבלה
- * 
- * @since 2.0
  */
 function sortTable(columnIndex) {
+  console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex} - התראות`);
+  
   // שימוש בפונקציה הגלובלית החדשה
   if (typeof window.sortTableData === 'function') {
     window.sortTableData(

@@ -98,6 +98,20 @@ Split `main.js` (2153 lines) into topic-based modules:
 
 1. **Improved Maintainability**: Each module has a clear, single responsibility
 2. **Reduced Code Duplication**: Functions are centralized in appropriate modules
+
+## Recent Fixes (August 24, 2025)
+
+### Trades Page Technical Fixes
+- **API Preferences Route**: Fixed routing mismatch from `/api/preferences` to `/api/v1/preferences`
+- **Missing Modal**: Added `linkedItemsModal` HTML structure to trades.html
+- **Sorting Function Loading**: Resolved timing issue by removing inline `onclick` attributes and implementing event listeners in JavaScript
+- **Global Functions**: Added missing global function exports: `viewAccountDetails`, `deleteTradeRecord`
+- **Table Structure**: Fixed table layout by adding notes column and removing P&L column
+
+### Technical Details
+- **Problem**: `sortTable` function not available during HTML parsing due to inline `onclick` attributes
+- **Solution**: Replaced `onclick` with `data-sort-column` attributes and added `setupSortEventListeners()` function
+- **Result**: All sorting functionality now works correctly without timing issues
 3. **Better Organization**: Related functionality is grouped together
 4. **Easier Debugging**: Issues can be isolated to specific modules
 5. **Enhanced Scalability**: New features can be added to appropriate modules

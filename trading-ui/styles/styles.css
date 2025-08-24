@@ -3800,3 +3800,20 @@ a:hover,
   background-color: #f5c6cb;
   border-color: #f1b0b7;
 }
+
+/* Account Link Styles */
+.account-link {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.account-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.account-link:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}

@@ -75,17 +75,16 @@ const TABLE_COLUMN_MAPPINGS = {
 
     // טבלת טריידים (Trades)
     'trades': [
-        'account_name',    // 0 - חשבון
-        'ticker_symbol',   // 1 - טיקר
-        'trade_plan_id',   // 2 - תוכנית
-        'status',          // 3 - סטטוס
-        'investment_type', // 4 - סוג
-        'side',            // 5 - צד
-        'created_at',      // 6 - נוצר ב
-        'closed_at',       // 7 - נסגר ב
-        'total_pl',        // 8 - רווח/הפסד
-        'notes',           // 9 - הערות
-        'actions'          // 10 - פעולות
+        'ticker_symbol',   // 0 - טיקר
+        'status',          // 1 - סטטוס
+        'investment_type', // 2 - סוג
+        'side',            // 3 - צד
+        'total_pl',        // 4 - רווח/הפסד
+        'created_at',      // 5 - נוצר ב
+        'closed_at',       // 6 - נסגר ב
+        'account_name',    // 7 - חשבון
+        'notes',           // 8 - הערות
+        'actions'          // 9 - פעולות
     ],
 
     // טבלת חשבונות (Accounts)
@@ -204,6 +203,8 @@ function getColumnValue(item, columnIndex, tableType) {
         return '';
     }
 
+    console.log(`🔍 getColumnValue: tableType=${tableType}, columnIndex=${columnIndex}, fieldName=${fieldName}, item:`, item);
+
     // טיפול מיוחד בשדות מורכבים
     if ((tableType === 'trade_plans' || tableType === 'designs') && fieldName === 'ticker') {
         return item.ticker ? (item.ticker.symbol || item.ticker.name || '') : '';
@@ -216,8 +217,22 @@ function getColumnValue(item, columnIndex, tableType) {
         if (fieldName === 'ticker_symbol') {
             return item.ticker_symbol || item.ticker_id || '';
         }
-        if (fieldName === 'trade_plan_id') {
-            return item.trade_plan_id || '';
+        if (fieldName === 'investment_type') {
+            // טיפול מיוחד בסוג השקעה - שימוש בפונקציה הגלובלית
+            if (typeof window.translateTradeType === 'function') {
+                const result = window.translateTradeType(item.investment_type) || item.investment_type || '';
+                console.log(`🔍 investment_type returning: ${result} (translated)`);
+                return result;
+            }
+            // fallback אם הפונקציה לא זמינה
+            const typeDisplay = item.investment_type === 'long' ? 'לונג' :
+                item.investment_type === 'short' ? 'שורט' :
+                    item.investment_type === 'swing' ? 'סווינג' :
+                        item.investment_type === 'day' ? 'יומי' :
+                            item.investment_type === 'scalp' ? 'סקלפינג' :
+                                item.investment_type || '';
+            console.log(`🔍 investment_type returning: ${typeDisplay} (fallback)`);
+            return typeDisplay;
         }
         if (fieldName === 'actions') {
             return ''; // לא ממיינים לפי עמודת פעולות

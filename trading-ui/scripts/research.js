@@ -273,6 +273,14 @@ function initializeResearchPage() {
   restoreResearchSectionState();
   restoreAccountsSectionState();
 
+  // טעינת נתונים
+  console.log('🔄 Loading trades data...');
+  if (typeof window.loadTrades === 'function') {
+    window.loadTrades();
+  } else {
+    console.error('❌ loadTrades function not found');
+  }
+
   console.log('✅ דף תחקיר אותחל בהצלחה');
 }
 
@@ -372,14 +380,34 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
 function sortTable(columnIndex) {
   console.log('🔄 === SORT RESEARCH TRADES TABLE ===');
   console.log('🔄 Column clicked:', columnIndex);
+  console.log('🔄 window.sortTableData available:', typeof window.sortTableData);
+  console.log('🔄 window.tradesData available:', typeof window.tradesData);
+  console.log('🔄 window.tradesData length:', window.tradesData ? window.tradesData.length : 'undefined');
+  console.log('🔄 window.updateTradesTable available:', typeof window.updateTradesTable);
+
+  // בדיקת נתונים לדוגמה
+  if (window.tradesData && window.tradesData.length > 0) {
+    console.log('🔄 Sample trade data:', window.tradesData[0]);
+    console.log('🔄 Sample trade investment_type:', window.tradesData[0].investment_type);
+    console.log('🔄 Sample trade trade_plan_created_at:', window.tradesData[0].trade_plan_created_at);
+  }
 
   if (typeof window.sortTableData === 'function') {
+    console.log('🔄 Calling window.sortTableData with:', {
+      columnIndex,
+      data: window.tradesData || [],
+      tableType: 'trades',
+      updateFunction: window.updateTradesTable
+    });
+
     window.sortTableData(
       columnIndex,
       window.tradesData || [],
       'trades',
       window.updateTradesTable
     );
+
+    console.log('✅ sortTableData called successfully');
   } else {
     console.error('❌ sortTableData function not found in tables.js');
   }
@@ -424,6 +452,9 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('🔍 === CHECKING GLOBAL FUNCTIONS (RESEARCH) ===');
     console.log('🔍 updateGridFromComponent available:', typeof window.updateGridFromComponent);
     console.log('🔍 updateGridFromComponentGlobal available:', typeof window.updateGridFromComponentGlobal);
+    console.log('🔍 sortTable available:', typeof window.sortTable);
+    console.log('🔍 tradesData available:', typeof window.tradesData);
+    console.log('🔍 tradesData length:', window.tradesData ? window.tradesData.length : 'undefined');
 
     if (typeof window.updateGridFromComponent === 'function') {
       console.log('✅ updateGridFromComponent is properly defined for research page');

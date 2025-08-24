@@ -7,9 +7,9 @@ from flask import request, jsonify
 from flask import Blueprint
 from typing import Dict, Any, Union
 
-preferences_bp = Blueprint('preferences', __name__)
+preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/v1/preferences')
 
-@preferences_bp.route('/api/preferences', methods=['GET'])
+@preferences_bp.route('/', methods=['GET'])
 def get_preferences() -> Any:
     """Load all preferences from JSON file"""
     try:
@@ -128,7 +128,7 @@ def get_preferences() -> Any:
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@preferences_bp.route('/api/preferences', methods=['POST'])
+@preferences_bp.route('/', methods=['POST'])
 def save_preferences() -> Any:
     """Save all preferences to JSON file"""
     try:
@@ -145,7 +145,7 @@ def save_preferences() -> Any:
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@preferences_bp.route('/api/preferences/<key>', methods=['PUT'])
+@preferences_bp.route('/<key>', methods=['PUT'])
 def update_preference(key: str) -> Any:
     """Update specific setting"""
     try:

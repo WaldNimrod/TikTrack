@@ -265,8 +265,9 @@ class SimpleFilter {
             this.applyFiltersToTable(tableId);
         });
 
-        // Also apply to trade plans table specifically
+        // Apply to specific tables based on current page
         this.applyFiltersToTradePlansTable();
+        this.applyFiltersToAlertsTable();
     }
 
     applyFiltersToTable(tableId) {
@@ -405,6 +406,77 @@ class SimpleFilter {
         });
 
         console.log(`🔄 Trade plans table filtering complete: ${visibleCount}/${rows.length} rows visible`);
+    }
+
+    applyFiltersToAlertsTable() {
+        const table = document.getElementById('alertsTable');
+        if (!table) {
+            console.log('🔄 Alerts table not found, skipping filter application');
+            return;
+        }
+
+        console.log('🔄 Applying filters to alerts table');
+        const tbody = table.querySelector('tbody');
+        if (!tbody) {
+            console.log('🔄 Alerts table tbody not found');
+            return;
+        }
+
+        const rows = tbody.querySelectorAll('tr');
+        let visibleCount = 0;
+
+        console.log(`🔄 Processing ${rows.length} rows in alerts table`);
+
+        rows.forEach((row, index) => {
+            // Get data from alerts table structure using existing data attributes
+            const ticker = row.querySelector('.ticker-cell')?.textContent?.trim() || '';
+            const status = row.getAttribute('data-status') || row.querySelector('.status-cell')?.textContent?.trim() || '';
+            const type = row.getAttribute('data-type') || row.querySelector('.type-cell')?.textContent?.trim() || '';
+            const account = row.querySelector('.account-cell')?.textContent?.trim() || '';
+
+            console.log(`🔄 Row ${index + 1}: ticker="${ticker}", status="${status}", type="${type}", account="${account}"`);
+
+            let shouldShow = true;
+
+            // Status filter
+            if (this.currentFilters.status && this.currentFilters.status.length > 0) {
+                const rawStatus = row.getAttribute('data-status') || status;
+                if (!this.currentFilters.status.includes(rawStatus)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by status filter`);
+                }
+            }
+
+            // Type filter
+            if (shouldShow && this.currentFilters.type && this.currentFilters.type.length > 0) {
+                const rawType = row.getAttribute('data-type') || type;
+                if (!this.currentFilters.type.includes(rawType)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by type filter`);
+                }
+            }
+
+            // Account filter - skip for now since alerts don't have account info
+            if (shouldShow && this.currentFilters.account && this.currentFilters.account.length > 0) {
+                console.log(`🔄 Account filter: skipping for alerts table`);
+                // Account filtering not implemented for alerts yet
+            }
+
+            // Search filter
+            if (shouldShow && this.currentFilters.search) {
+                const searchText = this.currentFilters.search.toLowerCase();
+                const searchableText = `${ticker} ${status} ${type} ${account}`.toLowerCase();
+                if (!searchableText.includes(searchText)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by search filter`);
+                }
+            }
+
+            row.style.display = shouldShow ? '' : 'none';
+            if (shouldShow) visibleCount++;
+        });
+
+        console.log(`🔄 Alerts table filtering complete: ${visibleCount}/${rows.length} rows visible`);
     }
 
     resetFilters() {

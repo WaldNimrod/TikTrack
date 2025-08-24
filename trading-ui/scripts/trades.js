@@ -98,40 +98,34 @@ window.tradesData = tradesData;
  * 
  * תכונות:
  * - קריאה ל-API `/api/v1/trades/`
- * - טיפול בפורמט נתונים שונה
- * - עדכון משתנה גלובלי
- * - עדכון ישיר של הטבלה
- * - טיפול בשגיאות עם הודעה למשתמש
+ * - טיפול בשגיאות רשת
+ * - עדכון המשתנה הגלובלי window.tradesData
+ * - עדכון הטבלה עם הנתונים החדשים
+ * - תמיכה בפילטרים מקומיים
  * 
  * @returns {Promise<void>}
- */
-/**
- * Load trades data from server
- * 
- * This function fetches trade data from the backend API and updates
- * the trades table with the retrieved data. It handles loading states,
- * error handling, and data processing.
- * 
- * @returns {Promise<void>}
- * 
- * Features:
- * - Async/await pattern for clean error handling
- * - Loading state management
- * - Comprehensive error handling and user feedback
- * - Integration with global notification system
- * - Automatic table updates after data loading
  */
 async function loadTradesData() {
+  console.log('🔄 === LOADING TRADES DATA ===');
+  console.log('🔄 Current page:', window.location.pathname);
+
   try {
-    // קריאה מה-API
+    console.log('🔄 Fetching trades from server...');
     const response = await fetch('/api/v1/trades/');
 
     if (!response.ok) {
-      console.error('❌ HTTP error:', response.status, response.statusText);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    let apiData = await response.json();
+    const apiData = await response.json();
+    console.log('🔄 Server response:', apiData);
+
+    if (apiData.status !== 'success') {
+      throw new Error(`API error: ${apiData.message || 'Unknown error'}`);
+    }
+
+    console.log('🔄 Processing trades data...');
+    console.log('🔄 Number of trades received:', apiData.data ? apiData.data.length : 0);
 
     // בדיקה שהנתונים בפורמט הנכון
     if (apiData && apiData.data && Array.isArray(apiData.data)) {
@@ -139,13 +133,14 @@ async function loadTradesData() {
     }
 
     // עדכון הנתונים המקומיים - שימוש בשמות אחידים מה-API
-    tradesData = apiData.map(trade => ({
+    let tradesData = apiData.map(trade => ({
       id: trade.id,
       account_id: trade.account_id,
       account_name: trade.account_name,
       ticker_id: trade.ticker_id,
       ticker_symbol: trade.ticker_symbol,
       trade_plan_id: trade.trade_plan_id,
+      trade_plan_created_at: trade.trade_plan_created_at, // תאריך יצירה של התוכנית
       status: trade.status,
       investment_type: trade.investment_type,
       side: trade.side,
@@ -370,17 +365,16 @@ function updateTradesTable(trades) {
 
     return `
     <tr>
-      <td><strong>${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</strong></td>
       <td class="ticker-cell"><strong><a href="#" onclick="viewTickerDetails('${trade.ticker_id}')" class="ticker-link">${trade.ticker_symbol || 'טיקר לא ידוע'}</a></strong></td>
-      <td class="plan-cell">${trade.trade_plan_created_at ? new Date(trade.trade_plan_created_at).toLocaleDateString('he-IL') : (trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-')}</td>
       <td class="status-cell" data-status="${trade.status || ''}"><span class="status-badge status-${trade.status || 'open'}">${statusDisplay}</span></td>
       <td class="type-cell" data-type="${typeForFilter}">${typeDisplay || trade.investment_type || '-'}</td>
       <td class="side-cell" data-side="${trade.side || 'Long'}">
         <span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>
       </td>
+      <td class="pl-cell">${window.colorAmount(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
-      <td class="pl-cell">${window.colorAmount(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
+      <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTrade(${trade.id})" title="צפה באלמנטים מקושרים">
@@ -419,6 +413,16 @@ function viewTickerDetails(tickerId) {
   // כאן יוכנס קוד לצפייה בפרטי טיקר
 }
 
+function viewAccountDetails(accountId) {
+  // צפייה בפרטי חשבון
+  // כאן יוכנס קוד לצפייה בפרטי חשבון
+  if (typeof window.showNotification === 'function') {
+    window.showNotification('פונקציונליות צפייה בפרטי חשבון תהיה זמינה בקרוב', 'info');
+  } else {
+    alert('פונקציונליות צפייה בפרטי חשבון תהיה זמינה בקרוב');
+  }
+}
+
 function editTradeRecord(tradeId) {
   // עריכת טרייד
   // מציאת הטרייד במערך
@@ -432,34 +436,159 @@ function editTradeRecord(tradeId) {
 }
 
 function cancelTradeRecord(tradeId) {
-  // ביטול טרייד
-  if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
-    // Implement cancel trade API call
-    fetch(`/api/v1/trades/${tradeId}/cancel`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        cancel_reason: 'בוטל על ידי המשתמש'
-      })
-    })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
+  // ביטול טרייד - בדיקה אם יש אובייקטים מקושרים
+  checkLinkedItemsBeforeCancel(tradeId);
+}
+
+/**
+ * בדיקת אובייקטים מקושרים לפני ביטול
+ * 
+ * @param {string|number} tradeId - מזהה הטרייד
+ */
+function checkLinkedItemsBeforeCancel(tradeId) {
+  // קבלת נתוני הטרייד כדי להציג את שמו בחלון האזהרה
+  fetch(`/api/v1/trades/${tradeId}`)
+    .then(response => response.json())
+    .then(tradeData => {
+      if (tradeData.status === 'success') {
+        const trade = tradeData.data;
+
+        // בדיקה אם יש אובייקטים מקושרים (למשל executions)
+        fetch(`/api/v1/executions/?trade_id=${tradeId}`)
+          .then(response => response.json())
+          .then(executionsData => {
+            const linkedItems = [];
+
+            // הוספת executions אם יש
+            if (executionsData.status === 'success' && executionsData.data && executionsData.data.length > 0) {
+              executionsData.data.forEach(execution => {
+                linkedItems.push({
+                  id: execution.id,
+                  type: 'execution',
+                  title: `ביצוע ${execution.action} - ${execution.quantity} יחידות`,
+                  status: execution.status || 'active',
+                  created_at: execution.created_at,
+                  notes: execution.notes,
+                  action: execution.action,
+                  quantity: execution.quantity,
+                  price: execution.price
+                });
+              });
+            }
+
+            // בדיקה אם יש notes מקושרות
+            fetch(`/api/v1/notes/?related_type_id=2&related_id=${tradeId}`)
+              .then(response => response.json())
+              .then(notesData => {
+                if (notesData.status === 'success' && notesData.data && notesData.data.length > 0) {
+                  notesData.data.forEach(note => {
+                    linkedItems.push({
+                      id: note.id,
+                      type: 'note',
+                      title: note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''),
+                      status: note.status || 'active',
+                      created_at: note.created_at,
+                      notes: note.content,
+                      content: note.content
+                    });
+                  });
+                }
+
+                // אם יש אובייקטים מקושרים, הצג חלון אזהרה ללא אפשרות ביטול
+                if (linkedItems.length > 0) {
+                  const warningData = {
+                    tradeSymbol: trade.ticker_symbol,
+                    linkedItems: linkedItems
+                  };
+
+                  if (typeof window.showLinkedItemsBlockingModal === 'function') {
+                    window.showLinkedItemsBlockingModal(
+                      warningData,
+                      'trade',
+                      tradeId,
+                      'cancel'
+                    );
+                  } else {
+                    // גיבוי אם הפונקציה לא זמינה
+                    alert(`לא ניתן לבטל טרייד זה כי יש ${linkedItems.length} אובייקטים מקושרים אליו.`);
+                  }
+                } else {
+                  // אין אובייקטים מקושרים, רק אישור רגיל
+                  if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
+                    performTradeCancellation(tradeId);
+                  }
+                }
+              })
+              .catch(error => {
+                console.error('שגיאה בבדיקת הערות מקושרות:', error);
+                // במקרה של שגיאה, רק אישור רגיל
+                if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
+                  performTradeCancellation(tradeId);
+                }
+              });
+          })
+          .catch(error => {
+            console.error('שגיאה בבדיקת ביצועים מקושרים:', error);
+            // במקרה של שגיאה, רק אישור רגיל
+            if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
+              performTradeCancellation(tradeId);
+            }
+          });
+      } else {
+        console.error('שגיאה בקבלת נתוני טרייד:', tradeData);
+        // במקרה של שגיאה, רק אישור רגיל
+        if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
+          performTradeCancellation(tradeId);
         }
-        throw new Error('שגיאה בביטול הטרייד');
-      })
-      .then(data => {
-        // טרייד בוטל בהצלחה
-        showNotification('טרייד בוטל בהצלחה', 'success');
-        loadTradesData(); // Reload the table
-      })
-      .catch(error => {
-        console.error('שגיאה בביטול טרייד:', error);
-        showNotification('שגיאה בביטול הטרייד', 'error');
-      });
-  }
+      }
+    })
+    .catch(error => {
+      console.error('שגיאה בקבלת נתוני טרייד:', error);
+      // במקרה של שגיאה, רק אישור רגיל
+      if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
+        performTradeCancellation(tradeId);
+      }
+    });
+}
+
+/**
+ * ביצוע ביטול הטרייד
+ * 
+ * @param {string|number} tradeId - מזהה הטרייד
+ */
+function performTradeCancellation(tradeId) {
+  fetch(`/api/v1/trades/${tradeId}/cancel`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      cancel_reason: 'בוטל על ידי המשתמש'
+    })
+  })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('שגיאה בביטול הטרייד');
+    })
+    .then(data => {
+      // טרייד בוטל בהצלחה
+      if (typeof window.showNotification === 'function') {
+        window.showNotification('טרייד בוטל בהצלחה', 'success');
+      } else {
+        alert('טרייד בוטל בהצלחה');
+      }
+      loadTradesData(); // Reload the table
+    })
+    .catch(error => {
+      console.error('שגיאה בביטול טרייד:', error);
+      if (typeof window.showNotification === 'function') {
+        window.showNotification('שגיאה בביטול הטרייד', 'error');
+      } else {
+        alert('שגיאה בביטול הטרייד');
+      }
+    });
 }
 
 function deleteTradeRecord(tradeId) {
@@ -498,7 +627,10 @@ function checkLinkedItemsBeforeDelete(tradeId) {
                   title: `ביצוע ${execution.action} - ${execution.quantity} יחידות`,
                   status: execution.status || 'active',
                   created_at: execution.created_at,
-                  notes: execution.notes
+                  notes: execution.notes,
+                  action: execution.action,
+                  quantity: execution.quantity,
+                  price: execution.price
                 });
               });
             }
@@ -515,73 +647,69 @@ function checkLinkedItemsBeforeDelete(tradeId) {
                       title: note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''),
                       status: note.status || 'active',
                       created_at: note.created_at,
-                      notes: note.content
+                      notes: note.content,
+                      content: note.content
                     });
                   });
                 }
 
-                // אם יש אובייקטים מקושרים, הצג חלון אזהרה
+                // אם יש אובייקטים מקושרים, הצג חלון אזהרה ללא אפשרות מחיקה
                 if (linkedItems.length > 0) {
                   const warningData = {
                     tradeSymbol: trade.ticker_symbol,
                     linkedItems: linkedItems
                   };
 
-                  if (typeof window.showLinkedItemsWarningModal === 'function') {
-                    window.showLinkedItemsWarningModal(
+                  if (typeof window.showLinkedItemsBlockingModal === 'function') {
+                    window.showLinkedItemsBlockingModal(
                       warningData,
                       'trade',
-                      tradeId,
-                      () => performTradeDeletion(tradeId)
+                      tradeId
                     );
                   } else {
                     // גיבוי אם הפונקציה לא זמינה
                     alert(`לא ניתן למחוק טרייד זה כי יש ${linkedItems.length} אובייקטים מקושרים אליו.`);
                   }
                 } else {
-                  // אין אובייקטים מקושרים, המשך עם אישור שני
-                  proceedWithSecondConfirmation(tradeId);
+                  // אין אובייקטים מקושרים, רק אישור רגיל
+                  if (confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+                    performTradeDeletion(tradeId);
+                  }
                 }
               })
               .catch(error => {
                 console.error('שגיאה בבדיקת הערות מקושרות:', error);
-                proceedWithSecondConfirmation(tradeId);
+                // במקרה של שגיאה, רק אישור רגיל
+                if (confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+                  performTradeDeletion(tradeId);
+                }
               });
           })
           .catch(error => {
             console.error('שגיאה בבדיקת ביצועים מקושרים:', error);
-            proceedWithSecondConfirmation(tradeId);
+            // במקרה של שגיאה, רק אישור רגיל
+            if (confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+              performTradeDeletion(tradeId);
+            }
           });
       } else {
         console.error('שגיאה בקבלת נתוני טרייד:', tradeData);
-        proceedWithSecondConfirmation(tradeId);
+        // במקרה של שגיאה, רק אישור רגיל
+        if (confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+          performTradeDeletion(tradeId);
+        }
       }
     })
     .catch(error => {
       console.error('שגיאה בקבלת נתוני טרייד:', error);
-      proceedWithSecondConfirmation(tradeId);
+      // במקרה של שגיאה, רק אישור רגיל
+      if (confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+        performTradeDeletion(tradeId);
+      }
     });
 }
 
-/**
- * המשך עם אישור שני למחיקה
- * 
- * @param {string|number} tradeId - מזהה הטרייד
- */
-function proceedWithSecondConfirmation(tradeId) {
-  if (typeof window.showSecondConfirmationModal === 'function') {
-    window.showSecondConfirmationModal(
-      'אישור סופי למחיקה',
-      'פעולת המחיקה אינה הפיכה. האם אתה בטוח שברצונך להמשיך?',
-      () => performTradeDeletion(tradeId)
-    );
-  } else {
-    // גיבוי אם הפונקציה לא זמינה
-    if (confirm('אישור סופי: האם אתה בטוח שברצונך למחוק טרייד זה?')) {
-      performTradeDeletion(tradeId);
-    }
-  }
-}
+
 
 /**
  * ביצוע מחיקת הטרייד
@@ -1653,12 +1781,15 @@ window.filterTradesLocally = filterTradesLocally;          // פילטור מק�
 
 // פונקציות פעולות:
 window.viewTickerDetails = viewTickerDetails;              // צפייה בפרטי טיקר
+window.viewAccountDetails = viewAccountDetails;              // צפייה בפרטי חשבון
 window.editTradeRecord = editTradeRecord;                  // עריכת טרייד
 window.cancelTradeRecord = cancelTradeRecord;              // ביטול טרייד
 window.deleteTradeRecord = deleteTradeRecord;              // מחיקת טרייד
-window.checkLinkedItemsBeforeDelete = checkLinkedItemsBeforeDelete;  // בדיקת אובייקטים מקושרים
-window.proceedWithSecondConfirmation = proceedWithSecondConfirmation;  // אישור שני
+
+window.checkLinkedItemsBeforeDelete = checkLinkedItemsBeforeDelete;  // בדיקת אובייקטים מקושרים למחיקה
+window.checkLinkedItemsBeforeCancel = checkLinkedItemsBeforeCancel;  // בדיקת אובייקטים מקושרים לביטול
 window.performTradeDeletion = performTradeDeletion;        // ביצוע מחיקה
+window.performTradeCancellation = performTradeCancellation;  // ביצוע ביטול
 
 // פונקציות מודלים:
 window.showAddTradeModal = showAddTradeModal;              // הצגת מודל הוספה
@@ -1756,6 +1887,7 @@ window.editTradeRecord = editTradeRecord;
 window.cancelTradeRecord = cancelTradeRecord;
 window.deleteTradeRecord = deleteTradeRecord;
 
+
 // פונקציה לטעינת מצב הסידור השמור
 function loadTradesSortState() {
   const savedColumn = localStorage.getItem('tradesSortColumn');
@@ -1770,11 +1902,28 @@ function loadTradesSortState() {
   }
 }
 
+// הוספת event listeners לכפתורי המיון
+function setupSortEventListeners() {
+  const sortButtons = document.querySelectorAll('.sortable-header[data-sort-column]');
+  sortButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      const columnIndex = parseInt(this.getAttribute('data-sort-column'));
+      if (typeof window.sortTable === 'function') {
+        window.sortTable(columnIndex);
+      } else {
+        console.error('sortTable function not found');
+      }
+    });
+  });
+}
+
 // קריאה לטעינת נתונים כשהדף נטען
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function () {
     // טעינת מצב הסידור השמור
     loadTradesSortState();
+    // הוספת event listeners
+    setupSortEventListeners();
     setTimeout(() => {
       if (typeof window.loadTradesData === 'function') {
         window.loadTradesData();
@@ -1785,6 +1934,8 @@ if (document.readyState === 'loading') {
   // הדף כבר נטען
   // טעינת מצב הסידור השמור
   loadTradesSortState();
+  // הוספת event listeners
+  setupSortEventListeners();
   setTimeout(() => {
     if (typeof window.loadTradesData === 'function') {
       window.loadTradesData();

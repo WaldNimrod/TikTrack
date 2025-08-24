@@ -44,8 +44,6 @@ let consoleCleanupTimeout = null;
  */
 async function initializeConsoleCleanup() {
     try {
-        console.log('🔄 מאתחל ניקוי קונסולה...');
-
         // Load preferences from localStorage first (faster)
         const storedPreferences = localStorage.getItem('tiktrack_preferences');
         let cleanupInterval = 60000; // Default: 60 seconds (1 minute)
@@ -61,7 +59,6 @@ async function initializeConsoleCleanup() {
 
         // If no cleanup interval or set to 0, don't set up cleanup
         if (!cleanupInterval || cleanupInterval === 0) {
-            console.log('ℹ️ ניקוי אוטומטי של קונסולה מבוטל');
             return;
         }
 
@@ -74,8 +71,6 @@ async function initializeConsoleCleanup() {
         consoleCleanupTimeout = setTimeout(() => {
             clearConsole();
         }, cleanupInterval);
-
-        console.log(`✅ ניקוי קונסולה מוגדר ל-${Math.floor(cleanupInterval / 1000)} שניות`);
 
     } catch (error) {
         console.error('❌ שגיאה באתחול ניקוי קונסולה:', error);
@@ -106,10 +101,12 @@ function clearConsole(showMessage = true) {
 
     if (console.clear) {
         console.clear();
+    } else {
+        // ניקוי ידני אם console.clear לא זמין
+        for (let i = 0; i < 100; i++) {
+            console.log('');
+        }
     }
-
-    // Re-initialize cleanup for continuous operation
-    initializeConsoleCleanup();
 }
 
 /**
@@ -131,8 +128,6 @@ function clearConsole(showMessage = true) {
  */
 async function updateConsoleCleanupInterval(newInterval) {
     try {
-        console.log(`🔄 עדכון זמן ניקוי קונסולה ל-${newInterval}ms`);
-
         // Clear existing timeout
         if (consoleCleanupTimeout) {
             clearTimeout(consoleCleanupTimeout);
@@ -141,7 +136,6 @@ async function updateConsoleCleanupInterval(newInterval) {
 
         // If interval is 0, disable cleanup
         if (!newInterval || newInterval === 0) {
-            console.log('ℹ️ ניקוי אוטומטי של קונסולה מבוטל');
             return;
         }
 
@@ -149,8 +143,6 @@ async function updateConsoleCleanupInterval(newInterval) {
         consoleCleanupTimeout = setTimeout(() => {
             clearConsole();
         }, newInterval);
-
-        console.log(`✅ זמן ניקוי קונסולה עודכן ל-${Math.floor(newInterval / 1000)} שניות`);
 
     } catch (error) {
         console.error('❌ שגיאה בעדכון זמן ניקוי קונסולה:', error);
@@ -172,6 +164,10 @@ async function updateConsoleCleanupInterval(newInterval) {
 function manualConsoleCleanup() {
     console.log('🧹 Manual console cleanup initiated...');
     clearConsole(false);
+    
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('הקונסולה נוקתה בהצלחה', 'success');
+    }
 }
 
 // Initialize cleanup when the script loads

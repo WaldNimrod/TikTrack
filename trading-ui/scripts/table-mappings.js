@@ -279,4 +279,7 @@ window.tableMappings = {
     isTableSupported
 };
 
-console.log('✅ Table Mappings loaded successfully');
+// אתחול Table Mappings
+function initializeTableMappings() {
+  // Table Mappings loaded successfully
+}

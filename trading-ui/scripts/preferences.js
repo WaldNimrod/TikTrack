@@ -202,7 +202,7 @@ async function updateConsoleCleanupInterval(value) {
         showNotification(`זמן ניקוי קונסולה עודכן ל-${seconds} שניות`, 'success');
       }
 
-      console.log('✅ זמן ניקוי קונסולה עודכן בהצלחה');
+              // זמן ניקוי קונסולה עודכן בהצלחה
     } else {
       // אם השמירה נכשלה, החזרת הערך הקודם
       const currentValue = await getCurrentPreference('consoleCleanupInterval');
@@ -232,7 +232,7 @@ async function updateConsoleCleanupInterval(value) {
        * updateDefaultStopLoss(15);
        */
 async function updateDefaultStopLoss(value) {
-  console.log('🔄 עדכון סטופ לוס ברירת מחדל:', value);
+          // עדכון סטופ לוס ברירת מחדל
 
   // וידוא שהערך תקין
   const numValue = parseFloat(value);
@@ -259,7 +259,7 @@ async function updateDefaultStopLoss(value) {
       // עדכון התצוגה עם הערך החדש
       inputElement.value = numValue;
       showNotification(`סטופ לוס ברירת מחדל עודכן ל-${numValue}%`, 'success');
-      console.log('✅ סטופ לוס ברירת מחדל עודכן בהצלחה');
+              // סטופ לוס ברירת מחדל עודכן בהצלחה
     } else {
       // אם השמירה נכשלה, החזרת הערך הקודם
       const currentValue = await getCurrentPreference('defaultStopLoss');
@@ -289,7 +289,7 @@ async function updateDefaultStopLoss(value) {
        * updateDefaultTargetPrice(20);
        */
 async function updateDefaultTargetPrice(value) {
-  console.log('🔄 עדכון מחיר יעד ברירת מחדל:', value);
+          // עדכון מחיר יעד ברירת מחדל
 
   // וידוא שהערך תקין
   const numValue = parseFloat(value);
@@ -316,7 +316,7 @@ async function updateDefaultTargetPrice(value) {
       // עדכון התצוגה עם הערך החדש
       inputElement.value = numValue;
       showNotification(`מחיר יעד ברירת מחדל עודכן ל-${numValue}%`, 'success');
-      console.log('✅ מחיר יעד ברירת מחדל עודכן בהצלחה');
+              // מחיר יעד ברירת מחדל עודכן בהצלחה
     } else {
       // אם השמירה נכשלה, החזרת הערך הקודם
       const currentValue = await getCurrentPreference('defaultTargetPrice');
@@ -346,7 +346,7 @@ async function updateDefaultTargetPrice(value) {
  */
 async function loadPreferencesToUI() {
   try {
-    console.log('🔄 טוען העדפות לממשק...');
+            // טוען העדפות לממשק
 
     // ברירות מחדל
     const defaultPreferences = {
@@ -366,77 +366,77 @@ async function loadPreferencesToUI() {
     const currencySelect = document.getElementById('primaryCurrencySelect');
     if (currencySelect) {
       currencySelect.value = defaultPreferences.primaryCurrency;
-      console.log('✅ מטבע ראשי נטען:', defaultPreferences.primaryCurrency);
+              // מטבע ראשי נטען
     }
 
     // עדכון אזור זמן
     const timezoneSelect = document.getElementById('timezoneSelect');
     if (timezoneSelect) {
       timezoneSelect.value = defaultPreferences.timezone;
-      console.log('✅ אזור זמן נטען:', defaultPreferences.timezone);
+              // אזור זמן נטען
     }
 
     // עדכון זמן ניקוי קונסולה
     const consoleCleanupSelect = document.getElementById('consoleCleanupIntervalSelect');
     if (consoleCleanupSelect) {
       consoleCleanupSelect.value = defaultPreferences.consoleCleanupInterval;
-      console.log('✅ זמן ניקוי קונסולה נטען:', defaultPreferences.consoleCleanupInterval);
+              // זמן ניקוי קונסולה נטען
     }
 
     // עדכון סטופ לוס ברירת מחדל
     const stopLossInput = document.getElementById('defaultStopLossInput');
     if (stopLossInput) {
       stopLossInput.value = defaultPreferences.defaultStopLoss;
-      console.log('✅ סטופ לוס ברירת מחדל נטען:', defaultPreferences.defaultStopLoss);
+              // סטופ לוס ברירת מחדל נטען
     }
 
     // עדכון מחיר יעד ברירת מחדל
     const targetPriceInput = document.getElementById('defaultTargetPriceInput');
     if (targetPriceInput) {
       targetPriceInput.value = defaultPreferences.defaultTargetPrice;
-      console.log('✅ מחיר יעד ברירת מחדל נטען:', defaultPreferences.defaultTargetPrice);
+              // מחיר יעד ברירת מחדל נטען
     }
 
     // עדכון הגדרות תצוגה
     const statusFilterSelect = document.getElementById('defaultStatusFilterSelect');
     if (statusFilterSelect) {
       statusFilterSelect.value = defaultPreferences.defaultStatusFilter;
-      console.log('✅ פילטר סטטוס ברירת מחדל נטען:', defaultPreferences.defaultStatusFilter);
+              // פילטר סטטוס ברירת מחדל נטען
     }
 
     const typeFilterSelect = document.getElementById('defaultTypeFilterSelect');
     if (typeFilterSelect) {
       typeFilterSelect.value = defaultPreferences.defaultTypeFilter;
-      console.log('✅ פילטר סוג ברירת מחדל נטען:', defaultPreferences.defaultTypeFilter);
+              // פילטר סוג ברירת מחדל נטען
     }
 
     const accountFilterSelect = document.getElementById('defaultAccountFilterSelect');
     if (accountFilterSelect) {
       accountFilterSelect.value = defaultPreferences.defaultAccountFilter;
-      console.log('✅ פילטר חשבון ברירת מחדל נטען:', defaultPreferences.defaultAccountFilter);
+              // פילטר חשבון ברירת מחדל נטען
     }
 
     const dateRangeFilterSelect = document.getElementById('defaultDateRangeFilterSelect');
     if (dateRangeFilterSelect) {
       dateRangeFilterSelect.value = defaultPreferences.defaultDateRangeFilter;
-      console.log('✅ פילטר טווח תאריכים ברירת מחדל נטען:', defaultPreferences.defaultDateRangeFilter);
+              // פילטר טווח תאריכים ברירת מחדל נטען
     }
 
     const searchFilterInput = document.getElementById('defaultSearchFilterInput');
     if (searchFilterInput) {
       searchFilterInput.value = defaultPreferences.defaultSearchFilter;
-      console.log('✅ פילטר חיפוש ברירת מחדל נטען:', defaultPreferences.defaultSearchFilter);
+              // פילטר חיפוש ברירת מחדל נטען
     }
 
     // שמירת העדפות ב-localStorage לשימוש מהיר
     try {
       localStorage.setItem('tiktrack_preferences', JSON.stringify(defaultPreferences));
-      console.log('✅ העדפות נשמרו ב-localStorage');
+              // העדפות נשמרו ב-localStorage
     } catch (localStorageError) {
       console.warn('⚠️ שגיאה בשמירת העדפות ב-localStorage:', localStorageError);
     }
 
-    console.log('✅ העדפות נטענו לממשק בהצלחה');
+            // העדפות נטענו לממשק בהצלחה
   } catch (error) {
     console.error('❌ שגיאה בטעינת העדפות לממשק:', error);
   }
@@ -455,7 +455,7 @@ async function loadPreferencesToUI() {
  * await saveAllPreferences();
  */
 async function saveAllPreferences() {
-  console.log('🔄 שומר את כל ההעדפות...');
+          // שומר את כל ההעדפות
 
   try {
     let allSaved = true;
@@ -566,7 +566,7 @@ async function saveAllPreferences() {
 
     if (allSaved) {
       showNotification(`✅ כל ההגדרות נשמרו בהצלחה! (${savedPreferences.length} הגדרות)`, 'success');
-      console.log('✅ כל ההגדרות נשמרו בהצלחה:', savedPreferences);
+              // כל ההגדרות נשמרו בהצלחה
       markAsSaved(); // מסמן שכל השינויים נשמרו
     } else {
       showNotification('⚠️ חלק מההגדרות לא נשמרו. בדוק את הקונסול לפרטים.', 'error');
@@ -598,7 +598,7 @@ async function saveAllPreferences() {
  */
 async function savePreference(key, value) {
   try {
-    console.log(`🔄 שומר הגדרה: ${key} = ${value}`);
+            // שומר הגדרה
 
     // עדכון localStorage מיד (לשימוש מהיר)
     try {
@@ -611,7 +611,7 @@ async function savePreference(key, value) {
 
       preferences.user[key] = value;
       localStorage.setItem('tiktrack_preferences', JSON.stringify(preferences));
-      console.log(`✅ הגדרה ${key} נשמרה ב-localStorage`);
+              // הגדרה נשמרה ב-localStorage
     } catch (localStorageError) {
       console.warn(`⚠️ שגיאה בשמירה ב-localStorage:`, localStorageError);
     }
@@ -626,7 +626,7 @@ async function savePreference(key, value) {
     });
 
     if (response.ok) {
-      console.log(`✅ הגדרה ${key} נשמרה בהצלחה`);
+              // הגדרה נשמרה בהצלחה
       return true;
     } else {
       console.error(`❌ שגיאה בשמירת הגדרה ${key}:`, response.status);
@@ -684,7 +684,7 @@ async function getCurrentPreference(key) {
 
 
 async function resetSystemPreferences() {
-  console.log('🔄 איפוס הגדרות מערכת לברירות מחדל');
+          // איפוס הגדרות מערכת לברירות מחדל
 
   // איפוס מטבע ראשי - תמיד USD
   const primaryCurrencySelect = document.getElementById('primaryCurrencySelect');
@@ -715,7 +715,7 @@ async function resetSystemPreferences() {
 }
 
 async function saveSystemPreferences() {
-  console.log('🔄 שומר הגדרות מערכת...');
+          // שומר הגדרות מערכת
 
   try {
     let allSaved = true;
@@ -768,7 +768,7 @@ async function saveSystemPreferences() {
 }
 
 async function resetPersonalPreferences() {
-  console.log('🔄 איפוס הגדרות אישיות לברירות מחדל');
+          // איפוס הגדרות אישיות לברירות מחדל
 
   // איפוס סטופ ברירת מחדל - 5%
   const stopLossInput = document.getElementById('defaultStopLossInput');
@@ -791,7 +791,7 @@ async function resetPersonalPreferences() {
 }
 
 async function savePersonalPreferences() {
-  console.log('🔄 שומר הגדרות אישיות...');
+          // שומר הגדרות אישיות
 
   try {
     let allSaved = true;
@@ -833,7 +833,7 @@ async function savePersonalPreferences() {
 }
 
 function resetSecurityPreferences() {
-  console.log('🔄 איפוס הגדרות אבטחה לברירות מחדל');
+          // איפוס הגדרות אבטחה לברירות מחדל
 
   // שאלת המשתמש על ברירות מחדל לאבטחה
   const userChoice = confirm('אין ברירות מחדל מוגדרות להגדרות אבטחה.\nהאם תרצה להגדיר ברירות מחדל עכשיו?');
@@ -847,12 +847,12 @@ function resetSecurityPreferences() {
 }
 
 function saveSecurityPreferences() {
-  console.log('שמירת הגדרות אבטחה');
+          // שמירת הגדרות אבטחה
   // כאן יוכנס קוד לשמירת הגדרות אבטחה
 }
 
 async function resetDisplayPreferences() {
-  console.log('🔄 איפוס הגדרות תצוגה לברירות מחדל');
+          // איפוס הגדרות תצוגה לברירות מחדל
 
   // איפוס פילטר סטטוס ברירת מחדל - "הכול"
   const statusFilterSelect = document.getElementById('defaultStatusFilterSelect');
@@ -899,7 +899,7 @@ async function resetDisplayPreferences() {
 }
 
 async function saveDisplayPreferences() {
-  console.log('🔄 שומר הגדרות תצוגה...');
+          // שומר הגדרות תצוגה
 
   try {
     let allSaved = true;
@@ -1001,7 +1001,7 @@ let originalValues = {};
  */
 function markAsChanged() {
   hasUnsavedChanges = true;
-  console.log('🔄 שינוי זוהה - יש שינויים שלא נשמרו');
+          // שינוי זוהה - יש שינויים שלא נשמרו
   updatePageTitle();
 }
 
@@ -1010,7 +1010,7 @@ function markAsChanged() {
  */
 function markAsSaved() {
   hasUnsavedChanges = false;
-  console.log('✅ כל השינויים נשמרו');
+          // כל השינויים נשמרו
   updatePageTitle();
 }
 
@@ -1057,7 +1057,7 @@ function saveOriginalValues() {
     defaultDateRangeFilter: document.getElementById('defaultDateRangeFilterSelect')?.value,
     defaultSearchFilter: document.getElementById('defaultSearchFilterInput')?.value
   };
-  console.log('💾 שמירת ערכים מקוריים:', originalValues);
+          // שמירת ערכים מקוריים
 }
 
 /**
@@ -1116,30 +1116,22 @@ function checkForChanges() {
 
 // === SECTION MANAGEMENT FUNCTIONS ===
 
+/**
+ * פונקציה לניקוי כל המצבים השמורים
+ * מנקה את כל מצבי הסקשנים מ-localStorage
+ */
 function clearAllSectionsState() {
-  console.log('🧹 Clearing all section states...');
+  // מנקה מצבי סקשנים
 
   const keys = Object.keys(localStorage);
   const sectionKeys = keys.filter(key => key.startsWith('section_'));
-  sectionKeys.forEach(key => localStorage.removeItem(key));
-
-  console.log(`🧹 Cleared ${sectionKeys.length} section states`);
-  showNotification('Section states cleared successfully', 'success');
-}
-
-// פונקציה לניקוי כל המצבים השמורים
-function clearAllSectionsState() {
-  console.log('🧹 מנקה מצבי סקשנים...');
-
-  const keys = Object.keys(localStorage);
   const preferencesKeys = keys.filter(key => key.startsWith('preferences_'));
 
-  preferencesKeys.forEach(key => {
-    localStorage.removeItem(key);
-    console.log(`🗑️ נמחק: ${key}`);
-  });
+  // מחיקת כל המפתחות הקשורים לסקשנים
+  sectionKeys.forEach(key => localStorage.removeItem(key));
+  preferencesKeys.forEach(key => localStorage.removeItem(key));
 
-  console.log('✅ ניקוי מצבי סקשנים הושלם');
+  // ניקוי מצבי סקשנים הושלם
   showNotification('מצבי הסקשנים אופסו', 'success');
 }
 
@@ -1148,11 +1140,40 @@ function clearAllSectionsState() {
 
 // Using global toggleSection from main.js
 
+/**
+ * מקבל את מזהה הסקשן מאלמנט
+ * @param {Element} sectionContainer - אלמנט הסקשן
+ * @returns {string} מזהה הסקשן
+ */
+function getSectionId(sectionContainer) {
+  // בדיקה אם יש data-section
+  const dataSection = sectionContainer.getAttribute('data-section');
+  if (dataSection) {
+    return dataSection;
+  }
+
+  // בדיקה אם יש id
+  const id = sectionContainer.id;
+  if (id) {
+    return id;
+  }
+
+  // בדיקה אם יש class מתאים
+  const classes = sectionContainer.className.split(' ');
+  const sectionClass = classes.find(cls => cls.includes('section'));
+  if (sectionClass) {
+    return sectionClass;
+  }
+
+  // ברירת מחדל
+  return 'unknown-section';
+}
+
 
 function restoreSectionsState() {
-  console.log('🔄 === RESTORE SECTIONS STATE ===');
+          // === RESTORE SECTIONS STATE ===
   const allSections = document.querySelectorAll('[data-section]');
-  console.log(`📋 נמצאו ${allSections.length} סקשנים`);
+  // נמצאו סקשנים
 
   allSections.forEach(section => {
     const sectionId = section.getAttribute('data-section');
@@ -1160,34 +1181,34 @@ function restoreSectionsState() {
     const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-    console.log(`🔍 סקשן ${sectionId}: savedState=${savedState}, toggleBtn=${!!toggleBtn}, icon=${!!icon}`);
+    // סקשן
 
     // ברירת מחדל: פתוח (expanded) אם אין מצב שמור
     if (savedState === 'true') {
       section.classList.add('collapsed');
       if (icon) icon.textContent = '▼';
-      console.log(`📁 סקשן ${sectionId} נסגר (מצב שמור)`);
+      // סקשן נסגר
     } else {
       // ברירת מחדל: פתוח
       section.classList.remove('collapsed');
       if (icon) icon.textContent = '▲';
       if (!savedState) {
         localStorage.setItem(`${sectionId}SectionCollapsed`, 'false');
-        console.log(`📂 סקשן ${sectionId} נפתח (ברירת מחדל)`);
+        // סקשן נפתח
       } else {
-        console.log(`📂 סקשן ${sectionId} נפתח (מצב שמור)`);
+        // סקשן נפתח
       }
     }
   });
-  console.log('✅ === RESTORE SECTIONS STATE COMPLETED ===');
+  // === RESTORE SECTIONS STATE COMPLETED ===
 }
 
 // פונקציה לבדיקת מצב הסקשנים (לבדיקה)
 function debugSectionsState() {
-  console.log('🔍 === בדיקת מצב סקשנים ===');
+  // === בדיקת מצב סקשנים ===
 
   const allSections = document.querySelectorAll('.content-section, .top-section');
-  console.log(`📋 נמצאו ${allSections.length} סקשנים`);
+  // נמצאו סקשנים
 
   allSections.forEach((sectionContainer, index) => {
     const sectionId = getSectionId(sectionContainer);
@@ -1195,14 +1216,14 @@ function debugSectionsState() {
     const section = sectionContainer.querySelector('.section-body');
     const isVisible = section && section.style.display !== 'none';
 
-    console.log(`📊 סקשן ${index + 1}:`);
-    console.log(`   - ID: ${sectionId}`);
-    console.log(`   - מצב שמור: ${savedState}`);
-    console.log(`   - נראה: ${isVisible}`);
-    console.log(`   - אלמנטים: section=${!!section}, toggleBtn=${!!sectionContainer.querySelector('.filter-toggle-btn')}`);
+    // סקשן
+    //   - ID: ${sectionId}
+    //   - מצב שמור: ${savedState}
+    //   - נראה: ${isVisible}
+    //   - אלמנטים: section=${!!section}, toggleBtn=${!!sectionContainer.querySelector('.filter-toggle-btn')}
   });
 
-  console.log('🔍 === סיום בדיקת מצב ===');
+  // === סיום בדיקת מצב ===
 }
 
 // הגדרת הפונקציה כגלובלית

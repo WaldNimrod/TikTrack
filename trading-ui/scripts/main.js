@@ -368,6 +368,26 @@ window.toggleTopSection = function () {
       storageKey = 'alertsTopSectionCollapsed';
     } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
       storageKey = 'planningTopSectionCollapsed';
+    } else if (currentPath.includes('/trades')) {
+      storageKey = 'tradesTopSectionCollapsed';
+    } else if (currentPath.includes('/accounts')) {
+      storageKey = 'accountsTopSectionCollapsed';
+    } else if (currentPath.includes('/tickers')) {
+      storageKey = 'tickersTopSectionCollapsed';
+    } else if (currentPath.includes('/cash_flows')) {
+      storageKey = 'cashFlowsTopSectionCollapsed';
+    } else if (currentPath.includes('/executions')) {
+      storageKey = 'executionsTopSectionCollapsed';
+    } else if (currentPath.includes('/research')) {
+      storageKey = 'researchTopSectionCollapsed';
+    } else if (currentPath.includes('/constraints')) {
+      storageKey = 'constraintsTopSectionCollapsed';
+    } else if (currentPath.includes('/tests')) {
+      storageKey = 'testsTopSectionCollapsed';
+    } else if (currentPath.includes('/db_display')) {
+      storageKey = 'dbDisplayTopSectionCollapsed';
+    } else if (currentPath.includes('/db_extradata')) {
+      storageKey = 'dbExtradataTopSectionCollapsed';
     } else if (currentPath.includes('/designs')) {
       storageKey = 'topSectionCollapsed';
     }
@@ -433,6 +453,26 @@ window.toggleMainSection = function () {
       storageKey = 'alertsMainSectionCollapsed';
     } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
       storageKey = 'planningMainSectionCollapsed';
+    } else if (currentPath.includes('/trades')) {
+      storageKey = 'tradesMainSectionCollapsed';
+    } else if (currentPath.includes('/accounts')) {
+      storageKey = 'accountsMainSectionCollapsed';
+    } else if (currentPath.includes('/tickers')) {
+      storageKey = 'tickersMainSectionCollapsed';
+    } else if (currentPath.includes('/cash_flows')) {
+      storageKey = 'cashFlowsMainSectionCollapsed';
+    } else if (currentPath.includes('/executions')) {
+      storageKey = 'executionsMainSectionCollapsed';
+    } else if (currentPath.includes('/research')) {
+      storageKey = 'researchMainSectionCollapsed';
+    } else if (currentPath.includes('/constraints')) {
+      storageKey = 'constraintsMainSectionCollapsed';
+    } else if (currentPath.includes('/tests')) {
+      storageKey = 'testsMainSectionCollapsed';
+    } else if (currentPath.includes('/db_display')) {
+      storageKey = 'dbDisplayMainSectionCollapsed';
+    } else if (currentPath.includes('/db_extradata')) {
+      storageKey = 'dbExtradataMainSectionCollapsed';
     } else if (currentPath.includes('/designs')) {
       storageKey = 'mainSectionCollapsed';
     }
@@ -455,6 +495,26 @@ window.restoreAllSectionStates = function () {
     topSectionKey = 'alertsTopSectionCollapsed';
   } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
     topSectionKey = 'planningTopSectionCollapsed';
+  } else if (currentPath.includes('/trades')) {
+    topSectionKey = 'tradesTopSectionCollapsed';
+  } else if (currentPath.includes('/accounts')) {
+    topSectionKey = 'accountsTopSectionCollapsed';
+  } else if (currentPath.includes('/tickers')) {
+    topSectionKey = 'tickersTopSectionCollapsed';
+  } else if (currentPath.includes('/cash_flows')) {
+    topSectionKey = 'cashFlowsTopSectionCollapsed';
+  } else if (currentPath.includes('/executions')) {
+    topSectionKey = 'executionsTopSectionCollapsed';
+  } else if (currentPath.includes('/research')) {
+    topSectionKey = 'researchTopSectionCollapsed';
+  } else if (currentPath.includes('/constraints')) {
+    topSectionKey = 'constraintsTopSectionCollapsed';
+  } else if (currentPath.includes('/tests')) {
+    topSectionKey = 'testsTopSectionCollapsed';
+  } else if (currentPath.includes('/db_display')) {
+    topSectionKey = 'dbDisplayTopSectionCollapsed';
+  } else if (currentPath.includes('/db_extradata')) {
+    topSectionKey = 'dbExtradataTopSectionCollapsed';
   }
 
   const topSectionCollapsed = localStorage.getItem(topSectionKey) === 'true';
@@ -480,6 +540,26 @@ window.restoreAllSectionStates = function () {
     mainSectionKey = 'alertsMainSectionCollapsed';
   } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
     mainSectionKey = 'planningMainSectionCollapsed';
+  } else if (currentPath.includes('/trades')) {
+    mainSectionKey = 'tradesMainSectionCollapsed';
+  } else if (currentPath.includes('/accounts')) {
+    mainSectionKey = 'accountsMainSectionCollapsed';
+  } else if (currentPath.includes('/tickers')) {
+    mainSectionKey = 'tickersMainSectionCollapsed';
+  } else if (currentPath.includes('/cash_flows')) {
+    mainSectionKey = 'cashFlowsMainSectionCollapsed';
+  } else if (currentPath.includes('/executions')) {
+    mainSectionKey = 'executionsMainSectionCollapsed';
+  } else if (currentPath.includes('/research')) {
+    mainSectionKey = 'researchMainSectionCollapsed';
+  } else if (currentPath.includes('/constraints')) {
+    mainSectionKey = 'constraintsMainSectionCollapsed';
+  } else if (currentPath.includes('/tests')) {
+    mainSectionKey = 'testsMainSectionCollapsed';
+  } else if (currentPath.includes('/db_display')) {
+    mainSectionKey = 'dbDisplayMainSectionCollapsed';
+  } else if (currentPath.includes('/db_extradata')) {
+    mainSectionKey = 'dbExtradataMainSectionCollapsed';
   }
 
   const mainSectionCollapsed = localStorage.getItem(mainSectionKey) === 'true';
@@ -507,6 +587,124 @@ window.restoreAllSectionStates = function () {
 window.restoreDesignsSectionState = function () {
   // This function is kept for backward compatibility but doesn't do anything
   // as the planning page doesn't have a designs section
+};
+
+/**
+ * Toggle a specific section
+ * Handles opening/closing of individual content sections
+ */
+window.toggleSection = function (sectionId) {
+  const section = document.querySelector(`[data-section="${sectionId}"]`);
+  const sectionBody = section ? section.querySelector('.section-body') : null;
+  const toggleBtn = section ? section.querySelector(`button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`) : null;
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (sectionBody && toggleBtn) {
+    const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
+
+    if (isCollapsed) {
+      sectionBody.classList.remove('collapsed');
+      sectionBody.style.display = 'block';
+      if (icon) {
+        icon.textContent = '▲';
+      }
+    } else {
+      sectionBody.classList.add('collapsed');
+      sectionBody.style.display = 'none';
+      if (icon) {
+        icon.textContent = '▼';
+      }
+    }
+
+    // Save state to localStorage
+    localStorage.setItem(`${sectionId}SectionCollapsed`, !isCollapsed);
+  }
+};
+
+/**
+ * Toggle all sections
+ * Handles opening/closing of all content sections at once
+ */
+window.toggleAllSections = function () {
+  const sections = document.querySelectorAll('.content-section');
+  const allCollapsed = Array.from(sections).every(section => {
+    const sectionBody = section.querySelector('.section-body');
+    return sectionBody && (sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none');
+  });
+
+  sections.forEach(section => {
+    const sectionId = section.getAttribute('data-section');
+    const sectionBody = section.querySelector('.section-body');
+    const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    if (sectionBody && toggleBtn) {
+      if (allCollapsed) {
+        // Open all sections
+        sectionBody.classList.remove('collapsed');
+        sectionBody.style.display = 'block';
+        if (icon) {
+          icon.textContent = '▲';
+        }
+        localStorage.setItem(`${sectionId}SectionCollapsed`, 'false');
+      } else {
+        // Close all sections
+        sectionBody.classList.add('collapsed');
+        sectionBody.style.display = 'none';
+        if (icon) {
+          icon.textContent = '▼';
+        }
+        localStorage.setItem(`${sectionId}SectionCollapsed`, 'true');
+      }
+    }
+  });
+
+  // Update the main toggle button text
+  const mainToggleBtn = document.querySelector('button[onclick="toggleAllSections()"]');
+  if (mainToggleBtn) {
+    const toggleText = mainToggleBtn.querySelector('.toggle-text');
+    if (toggleText) {
+      toggleText.textContent = allCollapsed ? 'סגור הכל' : 'פתח הכל';
+    }
+  }
+};
+
+/**
+ * Restore section states from localStorage
+ * This function restores the open/closed state of all content sections
+ */
+window.restoreSectionStates = function () {
+  console.log('🔄 Restoring section states from localStorage');
+
+  const sections = document.querySelectorAll('.content-section');
+
+  sections.forEach(section => {
+    const sectionId = section.getAttribute('data-section');
+    const sectionBody = section.querySelector('.section-body');
+    const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    if (sectionId && sectionBody) {
+      const storageKey = `${sectionId}SectionCollapsed`;
+      const isCollapsed = localStorage.getItem(storageKey) === 'true';
+
+      if (isCollapsed) {
+        sectionBody.classList.add('collapsed');
+        sectionBody.style.display = 'none';
+        if (icon) {
+          icon.textContent = '▼';
+        }
+        console.log(`📖 Section ${sectionId} restored as collapsed`);
+      } else {
+        sectionBody.classList.remove('collapsed');
+        sectionBody.style.display = 'block';
+        if (icon) {
+          icon.textContent = '▲';
+        }
+        console.log(`📖 Section ${sectionId} restored as expanded`);
+      }
+    }
+  });
 };
 
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====

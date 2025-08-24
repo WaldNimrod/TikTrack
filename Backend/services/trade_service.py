@@ -92,10 +92,14 @@ class TradeService:
     def create(db: Session, data: Dict[str, Any]) -> Trade:
         """Create a new trade"""
         
-        # If there's trade_plan_id, assign the investment_type from the plan as default
+        # If there's trade_plan_id, validate ticker match and assign defaults
         if 'trade_plan_id' in data and data['trade_plan_id']:
             trade_plan = db.query(TradePlan).filter(TradePlan.id == data['trade_plan_id']).first()
             if trade_plan:
+                # Validate that trade plan ticker matches trade ticker
+                if 'ticker_id' in data and data['ticker_id'] != trade_plan.ticker_id:
+                    raise ValueError(f"Trade plan ticker (ID: {trade_plan.ticker_id}) does not match trade ticker (ID: {data['ticker_id']})")
+                
                 # Assign investment_type from plan if not defined
                 if 'investment_type' not in data or not data['investment_type']:
                     data['investment_type'] = trade_plan.investment_type
@@ -155,6 +159,15 @@ class TradeService:
         trade = db.query(Trade).filter(Trade.id == trade_id).first()
         if not trade:
             return None
+        
+        # If there's trade_plan_id, validate ticker match
+        if 'trade_plan_id' in data and data['trade_plan_id']:
+            trade_plan = db.query(TradePlan).filter(TradePlan.id == data['trade_plan_id']).first()
+            if trade_plan:
+                # Get current ticker_id (either from data or existing trade)
+                ticker_id = data.get('ticker_id', trade.ticker_id)
+                if ticker_id != trade_plan.ticker_id:
+                    raise ValueError(f"Trade plan ticker (ID: {trade_plan.ticker_id}) does not match trade ticker (ID: {ticker_id})")
         
         # Validate data against dynamic constraints (excluding current ID for unique checks)
         is_valid, errors = ValidationService.validate_data(db, 'trades', data, exclude_id=trade_id)

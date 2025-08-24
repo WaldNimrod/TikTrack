@@ -431,6 +431,11 @@ window.daysDifference = daysDifference;
 window.addDays = addDays;
 window.addMonths = addMonths;
 
+// אתחול Date Utils
+function initializeDateUtils() {
+  // Date Utils loaded successfully
+}
+
 // ייצוא המודול עצמו
 window.dateUtils = {
     formatDate,
@@ -448,5 +453,3 @@ window.dateUtils = {
     addDays,
     addMonths
 };
-
-console.log('✅ Date Utils loaded successfully');

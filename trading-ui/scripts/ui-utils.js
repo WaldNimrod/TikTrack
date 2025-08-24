@@ -11,11 +11,11 @@
 // ===== Notification Functions =====
 
 /**
- * הצגת התראה במודל
+ * הצגת הודעה במודל
  * Show notification in modal
  */
-function showModalNotification(modalId, title, message, type = 'info', duration = 3000) {
-    console.log(`🔄 Showing ${type} notification in modal ${modalId}: ${title}`);
+function showModalNotification(type, title, message, modalId = 'notificationModal') {
+    // Showing notification in modal
 
     const modal = document.getElementById(modalId);
     if (!modal) {
@@ -23,63 +23,60 @@ function showModalNotification(modalId, title, message, type = 'info', duration 
         return;
     }
 
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type} alert-dismissible fade show`;
-    notification.innerHTML = `
-        <strong>${title}</strong> ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+    // עדכון תוכן המודל
+    const titleElement = modal.querySelector('.modal-title');
+    const messageElement = modal.querySelector('.modal-body');
+    const iconElement = modal.querySelector('.notification-icon');
 
-    const modalBody = modal.querySelector('.modal-body');
-    if (modalBody) {
-        modalBody.insertBefore(notification, modalBody.firstChild);
+    if (titleElement) titleElement.textContent = title;
+    if (messageElement) messageElement.textContent = message;
+
+    // עדכון איקון לפי סוג
+    if (iconElement) {
+        iconElement.className = `notification-icon ${type}`;
+        iconElement.innerHTML = getNotificationIcon(type);
     }
 
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, duration);
+    // הצגת המודל
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
 }
 
 /**
- * הצגת מודל אישור שני
+ * הצגת הודעת אישור שנייה
  * Show second confirmation modal
  */
-function showSecondConfirmationModal(message, onConfirm) {
-    console.log('🔄 Showing second confirmation modal');
+function showSecondConfirmation(title, message, onConfirm) {
+    // Showing second confirmation modal
 
-    const modal = document.createElement('div');
-    modal.className = 'modal fade';
-    modal.id = 'secondConfirmationModal';
-    modal.innerHTML = `
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">אישור נוסף</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>${message}</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-danger" onclick="confirmSecondAction()">אישור</button>
-                </div>
-            </div>
-        </div>
-    `;
+    const modal = document.getElementById('secondConfirmationModal');
+    if (!modal) {
+        console.error('❌ Second confirmation modal not found');
+        return;
+    }
 
-    document.body.appendChild(modal);
-    window.secondConfirmationCallback = onConfirm;
+    // עדכון תוכן המודל
+    const titleElement = modal.querySelector('.modal-title');
+    const messageElement = modal.querySelector('.modal-body');
 
+    if (titleElement) titleElement.textContent = title;
+    if (messageElement) messageElement.textContent = message;
+
+    // הגדרת פונקציית האישור
+    const confirmBtn = modal.querySelector('.btn-confirm');
+    if (confirmBtn) {
+        confirmBtn.onclick = () => {
+            const bootstrapModal = bootstrap.Modal.getInstance(modal);
+            if (bootstrapModal) {
+                bootstrapModal.hide();
+            }
+            if (onConfirm) onConfirm();
+        };
+    }
+
+    // הצגת המודל
     const bootstrapModal = new bootstrap.Modal(modal);
     bootstrapModal.show();
-
-    modal.addEventListener('hidden.bs.modal', () => {
-        document.body.removeChild(modal);
-        delete window.secondConfirmationCallback;
-    });
 }
 
 /**
@@ -99,81 +96,45 @@ function confirmSecondAction() {
 // ===== Notification Functions =====
 
 /**
- * הצגת התראת שגיאה
+ * הצגת הודעת שגיאה
  * Show error notification
  */
-function showErrorNotification(title, message, duration = 5000) {
-    console.log(`❌ Error notification: ${title} - ${message}`);
+function showErrorNotification(title, message) {
+    // Error notification
 
-    // יצירת התראה עם Bootstrap Toast
-    const toastContainer = document.getElementById('toastContainer') || createToastContainer();
-
-    const toast = document.createElement('div');
-    toast.className = 'toast align-items-center text-white bg-danger border-0';
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                <strong>${title}</strong><br>
-                ${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    `;
-
-    toastContainer.appendChild(toast);
-
-    const bsToast = new bootstrap.Toast(toast, { delay: duration });
-    bsToast.show();
-
-    // הסרת ההתראה מהדום אחרי שהיא נעלמת
-    toast.addEventListener('hidden.bs.toast', () => {
-        if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-        }
-    });
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(`${title}: ${message}`, 'error');
+    } else {
+        showModalNotification('error', title, message);
+    }
 }
 
 /**
- * הצגת התראת הצלחה
+ * הצגת הודעת הצלחה
  * Show success notification
  */
-function showSuccessNotification(title, message, duration = 3000) {
-    console.log(`✅ Success notification: ${title} - ${message}`);
+function showSuccessNotification(title, message) {
+    // Success notification
 
-    // יצירת התראה עם Bootstrap Toast
-    const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(`${title}: ${message}`, 'success');
+    } else {
+        showModalNotification('success', title, message);
+    }
+}
 
-    const toast = document.createElement('div');
-    toast.className = 'toast align-items-center text-white bg-success border-0';
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
+/**
+ * הצגת הודעת מידע
+ * Show info notification
+ */
+function showInfoNotification(title, message) {
+    // Info notification
 
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                <strong>${title}</strong><br>
-                ${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    `;
-
-    toastContainer.appendChild(toast);
-
-    const bsToast = new bootstrap.Toast(toast, { delay: duration });
-    bsToast.show();
-
-    // הסרת ההתראה מהדום אחרי שהיא נעלמת
-    toast.addEventListener('hidden.bs.toast', () => {
-        if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-        }
-    });
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(`${title}: ${message}`, 'info');
+    } else {
+        showModalNotification('info', title, message);
+    }
 }
 
 /**
@@ -201,14 +162,86 @@ function colorAmount(amount, displayText = null) {
     return `<span class="${className}">${text}</span>`;
 }
 
+// ===== Notification Functions =====
+
+/**
+ * הצגת הודעה למשתמש
+ * Show notification to user
+ * 
+ * @param {string} message - טקסט ההודעה להצגה
+ * @param {string} type - סוג ההודעה: 'success' (ירוק), 'error' (אדום), 'warning' (צהוב), 'info' (כחול)
+ */
+function showNotification(message, type = 'info') {
+    // יצירת מיכל התראות אם לא קיים
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+        container = createToastContainer();
+    }
+
+    // יצירת הודעה חדשה
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${getBootstrapColor(type)} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+
+    container.appendChild(toast);
+
+    // הצגת ההודעה
+    const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: type === 'error' ? 5000 : 3000
+    });
+    bsToast.show();
+
+    // הסרת ההודעה מהדף אחרי שהיא נעלמת
+    toast.addEventListener('hidden.bs.toast', () => {
+        if (container.contains(toast)) {
+            container.removeChild(toast);
+        }
+    });
+}
+
+/**
+ * המרת סוג הודעה לצבע Bootstrap
+ * Convert notification type to Bootstrap color
+ * 
+ * @param {string} type - סוג ההודעה
+ * @returns {string} צבע Bootstrap
+ */
+function getBootstrapColor(type) {
+    switch (type) {
+        case 'success':
+            return 'success';
+        case 'error':
+            return 'danger';
+        case 'warning':
+            return 'warning';
+        case 'info':
+        default:
+            return 'info';
+    }
+}
+
 // ===== Export Functions =====
 window.showModalNotification = showModalNotification;
 window.showSecondConfirmationModal = showSecondConfirmationModal;
 window.confirmSecondAction = confirmSecondAction;
 window.showErrorNotification = showErrorNotification;
 window.showSuccessNotification = showSuccessNotification;
+window.showInfoNotification = showInfoNotification;
 window.createToastContainer = createToastContainer;
 window.colorAmount = colorAmount;
+window.showNotification = showNotification;
 
 // ייצוא המודול עצמו
 window.uiUtils = {
@@ -217,8 +250,13 @@ window.uiUtils = {
     confirmSecondAction,
     showErrorNotification,
     showSuccessNotification,
+    showInfoNotification,
     createToastContainer,
-    colorAmount
+    colorAmount,
+    showNotification
 };
 
-console.log('✅ UI Utils loaded successfully');
+// אתחול UI Utils
+function initializeUIUtils() {
+    // UI Utils loaded successfully
+}

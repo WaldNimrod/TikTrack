@@ -890,6 +890,55 @@ class HeaderSystem {
       }
     });
 
+    // Event listeners לכפתורי איפוס וניקוי
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#resetFiltersBtn')) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🔄 Reset filters button clicked');
+        if (window.resetAllFilters) {
+          window.resetAllFilters();
+        }
+        return;
+      }
+
+      if (e.target.closest('#clearFiltersBtn')) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🔄 Clear filters button clicked');
+        if (window.clearAllFilters) {
+          window.clearAllFilters();
+        }
+        return;
+      }
+
+      if (e.target.closest('#searchClearBtn')) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🔄 Search clear button clicked');
+        const searchInput = document.getElementById('searchFilterInput');
+        if (searchInput) {
+          searchInput.value = '';
+          // הפעלת פילטר חיפוש ריק
+          if (window.simpleFilter) {
+            window.simpleFilter.applySearchFilter('');
+          }
+        }
+        return;
+      }
+    });
+
+    // Event listener לפילטר חיפוש
+    document.addEventListener('input', (e) => {
+      if (e.target.id === 'searchFilterInput') {
+        const searchTerm = e.target.value;
+        console.log('🔄 Search filter input:', searchTerm);
+        if (window.simpleFilter) {
+          window.simpleFilter.applySearchFilter(searchTerm);
+        }
+      }
+    });
+
     // סגירת תפריטים בלחיצה מחוץ לאזור התפריט
     document.addEventListener('click', (e) => {
       // בדיקה אם הלחיצה הייתה מחוץ לכל תפריטי הפילטרים והתפריט הראשי
@@ -957,8 +1006,8 @@ class HeaderSystem {
       });
     }, 100);
 
-    // הוספת event listeners לכפתורי הניווט
-    this.addMenuEventListeners();
+    // הוספת event listeners לכפתורי הניווט - DISABLED כדי לא לדרוס את הסימון הפעיל
+    // this.addMenuEventListeners();
 
     // הוספת event listeners לתפריט הנפתח
     this.addDropdownEventListeners();
@@ -2254,48 +2303,48 @@ class HeaderSystem {
     });
   }
 
-  // הגדרת פריט תפריט פעיל
-  setActiveMenuItem() {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-link');
-    const dropdownItems = document.querySelectorAll('.dropdown-item');
+  // הגדרת פריט תפריט פעיל - DISABLED - משתמשים בפונקציה החדשה
+  // setActiveMenuItem() {
+  //   const currentPath = window.location.pathname;
+  //   const navLinks = document.querySelectorAll('.nav-link');
+  //   const dropdownItems = document.querySelectorAll('.dropdown-item');
 
-    // הסרת כל הסימונים הפעילים
-    navLinks.forEach(link => link.classList.remove('active'));
-    dropdownItems.forEach(item => item.classList.remove('active'));
+  //   // הסרת כל הסימונים הפעילים
+  //   navLinks.forEach(link => link.classList.remove('active'));
+  //   dropdownItems.forEach(item => item.classList.remove('active'));
 
-    // מציאת הקישור המתאים לנתיב הנוכחי
-    navLinks.forEach(link => {
-      const href = link.getAttribute('href');
-      if (href && currentPath.includes(href.replace('.html', ''))) {
-        link.classList.add('active');
-      }
-    });
+  //   // מציאת הקישור המתאים לנתיב הנוכחי
+  //   navLinks.forEach(link => {
+  //     const href = link.getAttribute('href');
+  //     if (href && currentPath.includes(href.replace('.html', ''))) {
+  //       link.classList.add('active');
+  //     }
+  //   });
 
-    dropdownItems.forEach(item => {
-      const href = item.getAttribute('href');
-      if (href && currentPath.includes(href.replace('.html', ''))) {
-        item.classList.add('active');
+  //   dropdownItems.forEach(item => {
+  //     const href = item.getAttribute('href');
+  //     if (href && currentPath.includes(href.replace('.html', ''))) {
+  //       item.classList.add('active');
 
-        // הוספת סימון פעיל גם לפריט ההורה
-        const parentNav = item.closest('.nav-item');
-        if (parentNav) {
-          const parentLink = parentNav.querySelector('.nav-link');
-          if (parentLink) {
-            parentLink.classList.add('active');
-          }
-        }
-      }
-    });
+  //       // הוספת סימון פעיל גם לפריט ההורה
+  //       const parentNav = item.closest('.nav-item');
+  //       if (parentNav) {
+  //         const parentLink = parentNav.querySelector('.nav-link');
+  //         if (parentLink) {
+  //           parentLink.classList.add('active');
+  //           }
+  //         }
+  //       }
+  //     });
 
-    // אם אין קישור פעיל, סמן את הבית
-    if (!document.querySelector('.nav-link.active, .dropdown-item.active')) {
-      const homeLink = document.querySelector('.nav-link[href="index.html"]');
-      if (homeLink) {
-        homeLink.classList.add('active');
-      }
-    }
-  }
+  //     // אם אין קישור פעיל, סמן את הבית
+  //     if (!document.querySelector('.nav-link.active, .dropdown-item.active')) {
+  //       const homeLink = document.querySelector('.nav-link[href="index.html"]');
+  //       if (homeLink) {
+  //         homeLink.classList.add('active');
+  //       }
+  //     }
+  //   }
 
   // טעינת חשבונות לפילטר
   async loadAccountsForFilter() {
@@ -2327,6 +2376,8 @@ class HeaderSystem {
     const allOption = document.createElement('div');
     allOption.className = 'account-filter-item';
     allOption.setAttribute('data-account-id', '');
+    allOption.setAttribute('data-value', 'הכול');
+    allOption.onclick = () => selectAccountOption('הכול');
     allOption.innerHTML = '<span class="option-text">כל החשבונות</span>';
     accountMenu.appendChild(allOption);
 
@@ -2335,6 +2386,8 @@ class HeaderSystem {
       const option = document.createElement('div');
       option.className = 'account-filter-item';
       option.setAttribute('data-account-id', account.id);
+      option.setAttribute('data-value', account.name);
+      option.onclick = () => selectAccountOption(account.name);
       option.innerHTML = `<span class="option-text">${account.name}</span>`;
       accountMenu.appendChild(option);
     });
@@ -2719,38 +2772,10 @@ function setupFilterMenuAutoClose(menu) {
   // ניקוי טיימרים קודמים
   clearFilterMenuTimers(menu);
 
-  // טיימר לסגירה אוטומטית אחרי 10 שניות
-  const autoCloseTimer = setTimeout(() => {
-    menu.classList.remove('show');
-    clearFilterMenuTimers(menu);
-  }, 10000);
+  // ביטול סגירה אוטומטית - התפריטים יישארו פתוחים
+  // רק סגירה ידנית על ידי לחיצה על הכפתור או מחוץ לתפריט
 
-  // טיימר לסגירה אחרי יציאת העכבר
-  let mouseLeaveTimer = null;
-
-  const handleMouseEnter = () => {
-    if (mouseLeaveTimer) {
-      clearTimeout(mouseLeaveTimer);
-      mouseLeaveTimer = null;
-    }
-  };
-
-  const handleMouseLeave = () => {
-    mouseLeaveTimer = setTimeout(() => {
-      menu.classList.remove('show');
-      clearFilterMenuTimers(menu);
-    }, 5000);
-  };
-
-  // הוספת event listeners
-  menu.addEventListener('mouseenter', handleMouseEnter);
-  menu.addEventListener('mouseleave', handleMouseLeave);
-
-  // שמירת הטיימרים לאלמנט
-  menu._filterAutoCloseTimer = autoCloseTimer;
-  menu._filterMouseLeaveTimer = mouseLeaveTimer;
-  menu._filterHandleMouseEnter = handleMouseEnter;
-  menu._filterHandleMouseLeave = handleMouseLeave;
+  console.log('🔄 Filter menu auto-close disabled - menu will stay open');
 }
 
 /**
@@ -2786,29 +2811,30 @@ function clearFilterMenuTimers(menu) {
  */
 function selectStatusOption(status) {
   console.log('🔄 selectStatusOption called with status:', status);
-  
-  // עדכון הטקסט הנבחר
-  const selectedStatusElement = document.getElementById('selectedStatus');
-  if (selectedStatusElement) {
-    selectedStatusElement.textContent = status === 'הכול' ? 'כל סטטוס' : status;
-  }
-  
+
   // עדכון סימון ויזואלי
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
-  statusItems.forEach(item => {
-    const itemValue = item.getAttribute('data-value');
-    if (itemValue === status) {
-      item.classList.add('selected');
+  const clickedItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === status);
+
+  if (clickedItem) {
+    if (status === 'הכול') {
+      // אם בוחרים "הכול" - מסירים סימון מכל השאר
+      statusItems.forEach(item => item.classList.remove('selected'));
+      clickedItem.classList.add('selected');
     } else {
-      item.classList.remove('selected');
+      // אם בוחרים סטטוס ספציפי - מסירים סימון מ"הכול" ומוסיפים/מסירים מהסטטוס
+      const allItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
+      if (allItem) allItem.classList.remove('selected');
+
+      clickedItem.classList.toggle('selected');
     }
-  });
-  
-  // סגירת התפריט
-  closeStatusFilter();
-  
+  }
+
+  // עדכון הטקסט הנבחר
+  updateStatusFilterText();
+
   // הפעלת הפילטר
-  applyStatusFilter(status);
+  applyStatusFilter();
 }
 
 /**
@@ -2816,29 +2842,30 @@ function selectStatusOption(status) {
  */
 function selectTypeOption(type) {
   console.log('🔄 selectTypeOption called with type:', type);
-  
-  // עדכון הטקסט הנבחר
-  const selectedTypeElement = document.getElementById('selectedType');
-  if (selectedTypeElement) {
-    selectedTypeElement.textContent = type === 'הכול' ? 'כל טיפוס' : type;
-  }
-  
+
   // עדכון סימון ויזואלי
   const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
-  typeItems.forEach(item => {
-    const itemValue = item.getAttribute('data-value');
-    if (itemValue === type) {
-      item.classList.add('selected');
+  const clickedItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === type);
+
+  if (clickedItem) {
+    if (type === 'הכול') {
+      // אם בוחרים "הכול" - מסירים סימון מכל השאר
+      typeItems.forEach(item => item.classList.remove('selected'));
+      clickedItem.classList.add('selected');
     } else {
-      item.classList.remove('selected');
+      // אם בוחרים טיפוס ספציפי - מסירים סימון מ"הכול" ומוסיפים/מסירים מהטיפוס
+      const allItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
+      if (allItem) allItem.classList.remove('selected');
+
+      clickedItem.classList.toggle('selected');
     }
-  });
-  
-  // סגירת התפריט
-  closeTypeFilter();
-  
+  }
+
+  // עדכון הטקסט הנבחר
+  updateTypeFilterText();
+
   // הפעלת הפילטר
-  applyTypeFilter(type);
+  applyTypeFilter();
 }
 
 /**
@@ -2846,29 +2873,30 @@ function selectTypeOption(type) {
  */
 function selectAccountOption(account) {
   console.log('🔄 selectAccountOption called with account:', account);
-  
-  // עדכון הטקסט הנבחר
-  const selectedAccountElement = document.getElementById('selectedAccount');
-  if (selectedAccountElement) {
-    selectedAccountElement.textContent = account === 'הכול' ? 'כל חשבון' : account;
-  }
-  
+
   // עדכון סימון ויזואלי
   const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
-  accountItems.forEach(item => {
-    const itemValue = item.getAttribute('data-value');
-    if (itemValue === account) {
-      item.classList.add('selected');
+  const clickedItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === account);
+
+  if (clickedItem) {
+    if (account === 'הכול') {
+      // אם בוחרים "הכול" - מסירים סימון מכל השאר
+      accountItems.forEach(item => item.classList.remove('selected'));
+      clickedItem.classList.add('selected');
     } else {
-      item.classList.remove('selected');
+      // אם בוחרים חשבון ספציפי - מסירים סימון מ"הכול" ומוסיפים/מסירים מהחשבון
+      const allItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
+      if (allItem) allItem.classList.remove('selected');
+
+      clickedItem.classList.toggle('selected');
     }
-  });
-  
-  // סגירת התפריט
-  closeAccountFilter();
-  
+  }
+
+  // עדכון הטקסט הנבחר
+  updateAccountFilterText();
+
   // הפעלת הפילטר
-  applyAccountFilter(account);
+  applyAccountFilter();
 }
 
 /**
@@ -2876,13 +2904,13 @@ function selectAccountOption(account) {
  */
 function selectDateRangeOption(dateRange) {
   console.log('🔄 selectDateRangeOption called with dateRange:', dateRange);
-  
+
   // עדכון הטקסט הנבחר
   const selectedDateRangeElement = document.getElementById('selectedDateRange');
   if (selectedDateRangeElement) {
     selectedDateRangeElement.textContent = dateRange === 'כל זמן' ? 'כל זמן' : dateRange;
   }
-  
+
   // עדכון סימון ויזואלי
   const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
   dateRangeItems.forEach(item => {
@@ -2893,10 +2921,10 @@ function selectDateRangeOption(dateRange) {
       item.classList.remove('selected');
     }
   });
-  
+
   // סגירת התפריט
   closeDateRangeFilter();
-  
+
   // הפעלת הפילטר
   applyDateRangeFilter(dateRange);
 }
@@ -2906,39 +2934,51 @@ function selectDateRangeOption(dateRange) {
 /**
  * הפעלת פילטר סטטוס
  */
-function applyStatusFilter(status) {
-  console.log('🔄 applyStatusFilter called with status:', status);
-  
-  // כאן תהיה הלוגיקה של הפעלת הפילטר
-  // כרגע רק לוג - יש להוסיף את הלוגיקה האמיתית בהמשך
+function applyStatusFilter() {
+  console.log('🔄 applyStatusFilter called');
+
+  // איסוף כל הסטטוסים הנבחרים
+  const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+  const selectedStatuses = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
+
+  console.log('🔄 Selected statuses:', selectedStatuses);
+
   if (window.simpleFilter) {
-    window.simpleFilter.applyStatusFilter(status);
+    window.simpleFilter.applyStatusFilter(selectedStatuses);
   }
 }
 
 /**
  * הפעלת פילטר טיפוס
  */
-function applyTypeFilter(type) {
-  console.log('🔄 applyTypeFilter called with type:', type);
-  
-  // כאן תהיה הלוגיקה של הפעלת הפילטר
-  // כרגע רק לוג - יש להוסיף את הלוגיקה האמיתית בהמשך
+function applyTypeFilter() {
+  console.log('🔄 applyTypeFilter called');
+
+  // איסוף כל הטיפוסים הנבחרים
+  const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
+  const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
+
+  console.log('🔄 Selected types:', selectedTypes);
+
   if (window.simpleFilter) {
-    window.simpleFilter.applyTypeFilter(type);
+    window.simpleFilter.applyTypeFilter(selectedTypes);
   }
 }
 
 /**
  * הפעלת פילטר חשבון
  */
-function applyAccountFilter(account) {
-  console.log('🔄 applyAccountFilter called with account:', account);
-  
-  // כאן תהיה הלוגיקה של הפעלת הפילטר
-  // כרגע רק לוג - יש להוסיף את הלוגיקה האמיתית בהמשך
+function applyAccountFilter() {
+  console.log('🔄 applyAccountFilter called');
+
+  // איסוף כל החשבונות הנבחרים
+  const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+  const selectedAccounts = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
+
+  console.log('🔄 Selected accounts:', selectedAccounts);
+
   if (window.simpleFilter) {
-    window.simpleFilter.applyAccountFilter(account);
+    window.simpleFilter.applyAccountFilter(selectedAccounts);
   }
 }
 
@@ -2947,7 +2987,7 @@ function applyAccountFilter(account) {
  */
 function applyDateRangeFilter(dateRange) {
   console.log('🔄 applyDateRangeFilter called with dateRange:', dateRange);
-  
+
   // כאן תהיה הלוגיקה של הפעלת הפילטר
   // כרגע רק לוג - יש להוסיף את הלוגיקה האמיתית בהמשך
   if (window.simpleFilter) {
@@ -2961,8 +3001,151 @@ window.selectTypeOption = selectTypeOption;
 window.selectAccountOption = selectAccountOption;
 window.selectDateRangeOption = selectDateRangeOption;
 
+// ===== פונקציות עדכון טקסט פילטרים =====
+
+/**
+ * עדכון טקסט פילטר סטטוס
+ */
+function updateStatusFilterText() {
+  const selectedStatusElement = document.getElementById('selectedStatus');
+  const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+
+  if (selectedItems.length === 0) {
+    selectedStatusElement.textContent = 'כל סטטוס';
+  } else if (selectedItems.length === 1) {
+    const item = selectedItems[0];
+    const value = item.getAttribute('data-value');
+    selectedStatusElement.textContent = value === 'הכול' ? 'כל סטטוס' : value;
+  } else {
+    selectedStatusElement.textContent = `${selectedItems.length} סטטוסים`;
+  }
+}
+
+/**
+ * עדכון טקסט פילטר טיפוס
+ */
+function updateTypeFilterText() {
+  const selectedTypeElement = document.getElementById('selectedType');
+  const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
+
+  if (selectedItems.length === 0) {
+    selectedTypeElement.textContent = 'כל טיפוס';
+  } else if (selectedItems.length === 1) {
+    const item = selectedItems[0];
+    const value = item.getAttribute('data-value');
+    selectedTypeElement.textContent = value === 'הכול' ? 'כל טיפוס' : value;
+  } else {
+    selectedTypeElement.textContent = `${selectedItems.length} טיפוסים`;
+  }
+}
+
+/**
+ * עדכון טקסט פילטר חשבון
+ */
+function updateAccountFilterText() {
+  const selectedAccountElement = document.getElementById('selectedAccount');
+  const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+
+  if (selectedItems.length === 0) {
+    selectedAccountElement.textContent = 'כל חשבון';
+  } else if (selectedItems.length === 1) {
+    const item = selectedItems[0];
+    const value = item.getAttribute('data-value');
+    selectedAccountElement.textContent = value === 'הכול' ? 'כל חשבון' : value;
+  } else {
+    selectedAccountElement.textContent = `${selectedItems.length} חשבונות`;
+  }
+}
+
+// ===== פונקציות איפוס ונקה =====
+
+/**
+ * איפוס כל הפילטרים למצב ברירת מחדל
+ */
+function resetAllFilters() {
+  console.log('🔄 resetAllFilters called');
+
+  // איפוס פילטר סטטוס - בחירת "הכול"
+  const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
+  statusItems.forEach(item => item.classList.remove('selected'));
+  const allStatusItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
+  if (allStatusItem) allStatusItem.classList.add('selected');
+
+  // איפוס פילטר טיפוס - בחירת "הכול"
+  const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
+  typeItems.forEach(item => item.classList.remove('selected'));
+  const allTypeItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
+  if (allTypeItem) allTypeItem.classList.add('selected');
+
+  // איפוס פילטר חשבון - בחירת "הכול"
+  const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
+  accountItems.forEach(item => item.classList.remove('selected'));
+  const allAccountItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
+  if (allAccountItem) allAccountItem.classList.add('selected');
+
+  // איפוס פילטר תאריכים - בחירת "כל זמן"
+  const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+  dateRangeItems.forEach(item => item.classList.remove('selected'));
+  const allDateRangeItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === 'כל זמן');
+  if (allDateRangeItem) allDateRangeItem.classList.add('selected');
+
+  // איפוס פילטר חיפוש
+  const searchInput = document.querySelector('#searchFilterInput');
+  if (searchInput) {
+    searchInput.value = '';
+  }
+
+  // עדכון טקסטים
+  updateStatusFilterText();
+  updateTypeFilterText();
+  updateAccountFilterText();
+
+  // הפעלת הפילטרים
+  if (window.simpleFilter) {
+    window.simpleFilter.resetFilters();
+  }
+}
+
+/**
+ * ניקוי כל הפילטרים - הצגת כל הרשומות
+ */
+function clearAllFilters() {
+  console.log('🔄 clearAllFilters called');
+
+  // הסרת סימון מכל הפילטרים
+  document.querySelectorAll('#statusFilterMenu .status-filter-item.selected').forEach(item => item.classList.remove('selected'));
+  document.querySelectorAll('#typeFilterMenu .type-filter-item.selected').forEach(item => item.classList.remove('selected'));
+  document.querySelectorAll('#accountFilterMenu .account-filter-item.selected').forEach(item => item.classList.remove('selected'));
+  document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected').forEach(item => item.classList.remove('selected'));
+
+  // ניקוי פילטר חיפוש
+  const searchInput = document.querySelector('#searchFilterInput');
+  if (searchInput) {
+    searchInput.value = '';
+  }
+
+  // עדכון טקסטים
+  updateStatusFilterText();
+  updateTypeFilterText();
+  updateAccountFilterText();
+
+  // הפעלת הפילטרים
+  if (window.simpleFilter) {
+    window.simpleFilter.resetFilters();
+  }
+}
+
 // ייצוא פונקציות הפעלת פילטרים לגלובל
 window.applyStatusFilter = applyStatusFilter;
 window.applyTypeFilter = applyTypeFilter;
 window.applyAccountFilter = applyAccountFilter;
 window.applyDateRangeFilter = applyDateRangeFilter;
+
+// ייצוא פונקציות איפוס ונקה לגלובל
+window.resetAllFilters = resetAllFilters;
+window.clearAllFilters = clearAllFilters;
+
+// ייצוא פונקציות עדכון טקסט לגלובל
+window.updateStatusFilterText = updateStatusFilterText;
+window.updateTypeFilterText = updateTypeFilterText;
+window.updateAccountFilterText = updateAccountFilterText;

@@ -110,7 +110,7 @@
  * @returns {Array} Sorted data array
  */
 window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
-    console.log(`🔄 Global sortTableData called for ${tableType} table, column ${columnIndex}`);
+            // Global sortTableData called for table
 
     // Get current sort state
     const currentSortState = window.getSortState(tableType);
@@ -160,7 +160,7 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
     // Update sort icons
     updateSortIcons(tableType, columnIndex, newDirection);
 
-    console.log(`✅ Table ${tableType} sorted by column ${columnIndex}, direction: ${newDirection}`);
+            // Table sorted by column
     return sortedData;
 };
 
@@ -190,7 +190,7 @@ window.saveSortState = function (tableType, columnIndex, direction) {
         timestamp: Date.now()
     };
     localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState));
-    console.log(`💾 Sort state saved for ${tableType}: column ${columnIndex}, direction ${direction}`);
+            // Sort state saved for table
 };
 
 /**
@@ -297,7 +297,7 @@ window.sortTable = function (tableType, columnIndex, dataArray, updateFunction) 
 window.restoreAnyTableSort = function (tableType, data, updateFunction) {
     const sortState = window.getSortState(tableType);
     if (sortState.columnIndex >= 0) {
-        console.log(`🔄 Restoring sort state for ${tableType}: column ${sortState.columnIndex}, direction ${sortState.direction}`);
+        // Restoring sort state for table
         window.sortTableData(sortState.columnIndex, data, tableType, updateFunction);
     }
 };

@@ -2398,6 +2398,12 @@ button[onclick*="openDesignDetails"]:hover {
   font-weight: 600;
 }
 
+/* צביעת עמודת תוכנית - כתום כהה */
+.table td.plan-cell {
+  color: #d97706 !important;
+  font-weight: 600;
+}
+
 .alerts-header {
   display: flex;
   justify-content: space-between;

@@ -1,8 +1,0 @@
-{
-  "defaults": {
-    "primaryCurrency": "USD"
-  },
-  "user": {
-    "primaryCurrency": "USD"
-  }
-}

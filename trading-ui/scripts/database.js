@@ -61,6 +61,38 @@ function updateConstraintsDisplay() {
     });
 }
 
+// פונקציה למציאת אלמנט האילוצים של טבלה
+function findTableRulesContainer(tableName) {
+    // מיפוי שמות טבלאות לכותרות ב-HTML
+    const tableHeaders = {
+        'trade_plans': '📋 תוכניות מסחר',
+        'trades': '💼 טריידים',
+        'accounts': '👤 חשבונות',
+        'tickers': '📊 טיקרים',
+        'executions': '⚡ ביצועים',
+        'cash_flows': '💰 תזרימי מזומנים',
+        'alerts': '🔔 התראות',
+        'notes': '📝 הערות'
+    };
+    
+    const headerText = tableHeaders[tableName];
+    if (!headerText) return null;
+    
+    // חיפוש הכותרת ומשם האלמנט של האילוצים
+    const headers = document.querySelectorAll('.table-title');
+    for (const header of headers) {
+        if (header.textContent.trim() === headerText) {
+            // מחפשים את ה-content-section שמכיל את הכותרת הזו
+            const contentSection = header.closest('.content-section');
+            if (contentSection) {
+                return contentSection.querySelector('.table-rules-list');
+            }
+        }
+    }
+    
+    return null;
+}
+
 // פונקציה לעדכון אילוצים של טבלה ספציפית
 function updateTableConstraints(tableName, constraints) {
     // מיפוי שמות טבלאות לאלמנטים ב-HTML
@@ -80,7 +112,10 @@ function updateTableConstraints(tableName, constraints) {
     
     // חיפוש האלמנט של רשימת האילוצים
     const rulesContainer = document.querySelector(`#${elementId}Section .table-rules-list`);
-    if (!rulesContainer) return;
+    if (!rulesContainer) {
+        console.warn(`לא נמצא אלמנט אילוצים עבור טבלה ${tableName} (מחפש #${elementId}Section)`);
+        return;
+    }
     
     // יצירת HTML לאילוצים
     const constraintsHtml = constraints.map(constraint => {

@@ -433,7 +433,7 @@ function updateTradesTable(trades) {
       <td class="type-cell" data-type="${typeForFilter}">${typeDisplay}</td>
       <td class="side-cell" data-side="${trade.side || 'Long'}">${trade.side || 'Long'}</td>
       <td class="pl-cell">${window.colorAmount(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
-      <td>${trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-'}</td>
+      <td class="plan-cell">${trade.trade_plan_id ? `תוכנית ${trade.trade_plan_id}` : '-'}</td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
       <td>${trade.notes || ''}</td>

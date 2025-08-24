@@ -1172,9 +1172,9 @@ async function updateExecutionsTable(executions) {
 
         return `
             <tr>
-                <td><strong>${symbol}</strong></td>
+                <td class="ticker-cell"><strong>${symbol}</strong></td>
                 <td><small style="color: #666;">${tradeInfo}</small></td>
-                <td data-type="${typeForFilter}">
+                <td class="type-cell" data-type="${typeForFilter}">
                     <span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
                         ${(execution.action || execution.type) === 'buy' ? 'רכישה' : 'מכירה'}
                     </span>
@@ -1182,7 +1182,7 @@ async function updateExecutionsTable(executions) {
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td>${execution.fee ? '$' + execution.fee : '-'}</td>
-                <td>${window.colorAmount(0, '$0')}</td>
+                <td class="pl-cell">${window.colorAmount(0, '$0')}</td>
                 <td>-</td>
                 <td data-date="${execution.created_at}">${window.formatDateOnly(execution.created_at)}</td>
                 <td data-date="${execution.date || execution.execution_date}">${window.formatDateOnly(execution.date || execution.execution_date)}</td>

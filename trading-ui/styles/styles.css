@@ -2604,93 +2604,9 @@ button[onclick*="openDesignDetails"]:hover {
   align-items: center;
 }
 
-#addTradeModal .modal-title {
-  font-weight: 600;
-  font-size: 1.25rem;
-  order: 1;
-  /* כותרת בצד שמאל */
-}
 
 
 
-/* התאמה ל-RTL */
-#addTradeModal .modal-body {
-  direction: rtl;
-  text-align: right;
-}
-
-#addTradeModal .form-label {
-  text-align: right;
-}
-
-#addTradeModal .form-select,
-#addTradeModal .form-control {
-  text-align: right;
-}
-
-/* הקטנת שדה הערות */
-#addTradeModal #addTradeNotes {
-  height: 60px;
-  /* במקום 3 שורות */
-  resize: vertical;
-}
-
-/* סגנון לסימבול בבולד בתוכניות טרייד */
-#addTradeModal #addTradeTradePlanId option strong {
-  font-weight: bold;
-  color: #333;
-}
-
-/* סגנונות לכפתורים החדשים - בגודל של כפתורי ביטול ושמירה */
-#addTradeModal .btn-info {
-  background-color: white !important;
-  border: 2px solid #29a6a8 !important;
-  color: #29a6a8 !important;
-  border-radius: 6px !important;
-  padding: 9px 18px !important;
-  font-size: 0.825rem !important;
-  font-weight: 600 !important;
-  min-width: 90px !important;
-  height: 36px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-#addTradeModal .btn-info:hover {
-  background-color: #29a6a8 !important;
-  border-color: #29a6a8 !important;
-  color: white !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
-}
-
-#addTradeModal .btn-warning {
-  background-color: white !important;
-  border: 2px solid #29a6a8 !important;
-  color: #29a6a8 !important;
-  border-radius: 6px !important;
-  padding: 9px 18px !important;
-  font-size: 0.825rem !important;
-  font-weight: 600 !important;
-  min-width: 90px !important;
-  height: 36px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-#addTradeModal .btn-warning:hover {
-  background-color: #29a6a8 !important;
-  border-color: #29a6a8 !important;
-  color: white !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
-}
 
 /* סגנון מיוחד לכפתורי ביטול ושמירה במודלים */
 .modal-footer .btn-secondary,
@@ -2864,16 +2780,48 @@ button[onclick*="openDesignDetails"]:hover {
   align-items: center;
   border-radius: 6px 6px 0 0;
   border-bottom: none;
+  padding: 1rem 1.5rem;
 }
 
 .modal .modal-title {
   font-weight: 600;
   font-size: 1.25rem;
-  order: 2;
+  order: 1;
+  margin-left: auto;
 }
 
 .modal .btn-close {
-  order: 1;
+  order: 2;
+  border: 1px solid white !important;
+  border-radius: 4px;
+  padding: 6px;
+  background-color: transparent;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+}
+
+.modal .btn-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+/* הוספת האות X לכפתור הסגירה */
+.modal .btn-close::before {
+  content: "X";
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
 
@@ -2919,6 +2867,8 @@ button[onclick*="openDesignDetails"]:hover {
   align-items: center;
 }
 
+
+
 /* סגנונות ספציפיים למודל טיקרים */
 #addTickerModal .modal-header,
 #editTickerModal .modal-header {
@@ -2943,65 +2893,17 @@ button[onclick*="openDesignDetails"]:hover {
   align-items: center;
 }
 
-#addAlertModal .modal-title,
-#editAlertModal .modal-title {
-  font-weight: 600;
-  font-size: 1.25rem;
-  order: 1;
-}
-
-
-
-/* התאמה ל-RTL למודל התראות */
-#addAlertModal .modal-body,
-#editAlertModal .modal-body {
-  direction: rtl;
-  text-align: right;
-}
-
-#addAlertModal .form-label,
-#editAlertModal .form-label {
-  text-align: right;
-}
-
-#addAlertModal .form-control,
-#addAlertModal .form-select,
-#editAlertModal .form-control,
-#editAlertModal .form-select {
-  text-align: right;
-}
-
-#addTradePlanModal .modal-title {
-  font-weight: 600;
-  font-size: 1.25rem;
-  order: 1;
-}
-
-#addTickerModal .modal-title,
-#editTickerModal .modal-title {
-  font-weight: 600;
-  font-size: 1.25rem;
-  order: 1;
-}
 
 
 
 
 
-/* התאמה ל-RTL */
-#addTradePlanModal .modal-body {
-  direction: rtl;
-  text-align: right;
-}
 
-#addTradePlanModal .form-label {
-  text-align: right;
-}
 
-#addTradePlanModal .form-control,
-#addTradePlanModal .form-select {
-  text-align: right;
-}
+
+
+
+
 
 /* כל הכפתורים הירוקים - ירוק של הלוגו */
 .modal .btn-success,

@@ -72,6 +72,7 @@ from routes.api.test_suite import test_suite_bp
 from routes.api.constraints import constraints_bp
 from routes.api.currencies import currencies_bp
 from routes.api.linked_items import linked_items_bp
+from routes.api.note_relation_types import note_relation_types_bp
 
 from routes.pages import pages_bp
 
@@ -120,6 +121,7 @@ app.register_blueprint(test_suite_bp)
 app.register_blueprint(constraints_bp)
 app.register_blueprint(currencies_bp)
 app.register_blueprint(linked_items_bp)
+app.register_blueprint(note_relation_types_bp)
 
 app.register_blueprint(pages_bp)
 

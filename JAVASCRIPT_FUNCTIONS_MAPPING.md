@@ -1,8 +1,8 @@
 # דוקומנטציה למבנה הסקריפטים - TikTrack
 ## JavaScript Scripts Architecture Documentation
 
-### תאריך עדכון: 24 אוגוסט 2025
-### גרסה: 3.0 - ארכיטקטורה מודולרית
+### תאריך עדכון: 25 אוגוסט 2025
+### גרסה: 4.0 - ארכיטקטורה מודולרית עם מערכת אזהרות מרכזית
 
 ---
 
@@ -38,7 +38,8 @@ trading-ui/scripts/
 │   ├── linked-items.js            # מערכת פריטים מקושרים
 │   ├── translation-utils.js       # פונקציות תרגום
 │   ├── table-mappings.js          # מיפוי עמודות טבלאות
-│   └── simple-filter.js           # מערכת פילטרים פשוטה
+│   ├── simple-filter.js           # מערכת פילטרים פשוטה
+│   └── warning-system.js          # מערכת אזהרות מרכזית (חדש)
 │
 ├── 📄 Page Files (קבצי עמודים)
 │   ├── accounts.js                # ניהול חשבונות
@@ -98,6 +99,10 @@ trading-ui/scripts/
 <script src="scripts/tables.js"></script>
 
 <!-- 10. מערכת פריטים מקושרים -->
+<script src="scripts/linked-items.js"></script>
+
+<!-- 11. מערכת אזהרות מרכזית (חדש) -->
+<script src="scripts/warning-system.js"></script>
 <script src="scripts/linked-items.js"></script>
 
 <!-- 11. פונקציות עמודים -->
@@ -293,6 +298,24 @@ trading-ui/scripts/
 - `initializePage(pageName)` - אתחול עמוד
 - `savePageState(pageName, state)` - שמירת מצב עמוד
 - `loadPageState(pageName)` - טעינת מצב עמוד
+
+### 6. **warning-system.js** (498 שורות) - חדש
+**תפקיד:** מערכת אזהרות מרכזית
+**תלויות:** אין
+
+#### אינדקס פונקציות:
+- `showWarning(type, data, options, onConfirm, onCancel)` - הצגת אזהרה כללית
+- `showDeleteWarning(itemType, itemName, onConfirm, onCancel)` - אזהרת מחיקה
+- `showLinkedItemsWarning(itemType, linkedCount, onConfirm, onCancel)` - אזהרת פריטים מקושרים
+- `showValidationWarning(field, message)` - אזהרת ולידציה
+- `getWarningConfig(type, data)` - קבלת הגדרות אזהרה
+- `createWarningModal(config, options, onConfirm, onCancel)` - יצירת מודל אזהרה
+- `getWarningTheme(theme)` - קבלת ערכת נושא לאזהרה
+- `getWarningIcon(icon)` - קבלת אייקון לאזהרה
+- `getWarningActions(actions, defaultAction, theme, onConfirm, onCancel)` - קבלת פעולות אזהרה
+- `handleWarningAction(action, hasConfirm, hasCancel)` - טיפול בפעולת אזהרה
+- `getActionDisplayName(action)` - קבלת שם תצוגה לפעולה
+- `getItemTypeDisplayName(itemType)` - קבלת שם תצוגה לסוג פריט
 - `clearPageState(pageName)` - ניקוי מצב עמוד
 - `isPageAvailable(pageName)` - בדיקה אם עמוד זמין
 - `getPageInfo(pageName)` - קבלת מידע על עמוד

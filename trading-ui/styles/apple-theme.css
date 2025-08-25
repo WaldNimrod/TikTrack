@@ -627,6 +627,7 @@ body {
   border: none;
   font-size: 1.5rem;
   font-weight: bold;
+  content: none;
 }
 
 /* כפתור סגירה בכותרת רגילה - צבע ירוק */
@@ -639,6 +640,7 @@ body {
   border: none !important;
   font-size: 1.5rem !important;
   font-weight: bold !important;
+  content: none !important;
 }
 
 /* כותרות מודולים צבעוניות */

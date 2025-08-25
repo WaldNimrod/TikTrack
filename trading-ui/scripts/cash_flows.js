@@ -212,13 +212,20 @@ function showDeleteCashFlowModal(id) {
         return;
     }
 
-    // מילוי פרטי המחיקה
-    document.getElementById('deleteCashFlowId').value = cashFlow.id;
-    document.getElementById('deleteCashFlowName').textContent = `${cashFlow.type} - ${cashFlow.amount}`;
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('deleteCashFlowModal'));
-    modal.show();
+    // שימוש במערכת האזהרות המרכזית
+    const cashFlowName = `${cashFlow.type} - ${cashFlow.amount}`;
+    
+    window.showDeleteWarning(
+        'תזרים מזומנים',
+        cashFlowName,
+        () => confirmDeleteCashFlow(id),
+        () => {
+            console.log('מחיקת תזרים מזומנים בוטלה');
+            if (window.showNotification) {
+                window.showNotification('מחיקה בוטלה', 'info');
+            }
+        }
+    );
 }
 
 // ========================================
@@ -244,9 +251,19 @@ async function loadCashFlows() {
             updatePageSummaryStats();
         } else {
             console.error('❌ שגיאה בטעינת תזרימי מזומנים:', result.error);
+            
+            // הצגת הודעת שגיאה
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת תזרימי מזומנים');
+            }
         }
     } catch (error) {
         console.error('❌ שגיאה בטעינת תזרימי מזומנים:', error);
+        
+        // הצגת הודעת שגיאה
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת תזרימי מזומנים');
+        }
     }
 }
 
@@ -339,6 +356,11 @@ function showFieldError(fieldId, message) {
         errorDiv.textContent = message;
         errorDiv.style.display = 'block';
     }
+
+    // שימוש במערכת האזהרות החדשה
+    if (window.showValidationWarning) {
+        window.showValidationWarning(fieldId, message);
+    }
 }
 
 /**
@@ -405,15 +427,34 @@ async function saveCashFlow() {
             const modal = bootstrap.Modal.getInstance(document.getElementById('addCashFlowModal'));
             modal.hide();
 
+            // הצגת הודעת הצלחה
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('תזרים מזומנים', 'תזרים המזומנים נשמר בהצלחה');
+            } else {
+                alert('תזרים המזומנים נשמר בהצלחה');
+            }
+
             // טעינה מחדש של הנתונים
             await loadCashFlows();
         } else {
             console.error('❌ שגיאה בשמירת תזרים מזומנים:', result.error);
-            alert('שגיאה בשמירת תזרים מזומנים');
+            
+            // הצגת הודעת שגיאה
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת תזרים מזומנים');
+            } else {
+                alert('שגיאה בשמירת תזרים מזומנים');
+            }
         }
     } catch (error) {
         console.error('❌ שגיאה בשמירת תזרים מזומנים:', error);
-        alert('שגיאה בשמירת תזרים מזומנים');
+        
+        // הצגת הודעת שגיאה
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת תזרים מזומנים');
+        } else {
+            alert('שגיאה בשמירת תזרים מזומנים');
+        }
     }
 }
 
@@ -506,6 +547,11 @@ function showEditFieldError(fieldId, message) {
         errorDiv.textContent = message;
         errorDiv.style.display = 'block';
     }
+
+    // שימוש במערכת האזהרות החדשה
+    if (window.showValidationWarning) {
+        window.showValidationWarning(fieldId, message);
+    }
 }
 
 /**
@@ -574,25 +620,42 @@ async function updateCashFlow() {
             const modal = bootstrap.Modal.getInstance(document.getElementById('editCashFlowModal'));
             modal.hide();
 
+            // הצגת הודעת הצלחה
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('תזרים מזומנים', 'תזרים המזומנים נעדכן בהצלחה');
+            } else {
+                alert('תזרים המזומנים נעדכן בהצלחה');
+            }
+
             // טעינה מחדש של הנתונים
             await loadCashFlows();
         } else {
             console.error('❌ שגיאה בעדכון תזרים מזומנים:', result.error);
-            alert('שגיאה בעדכון תזרים מזומנים');
+            
+            // הצגת הודעת שגיאה
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון תזרים מזומנים');
+            } else {
+                alert('שגיאה בעדכון תזרים מזומנים');
+            }
         }
     } catch (error) {
         console.error('❌ שגיאה בעדכון תזרים מזומנים:', error);
-        alert('שגיאה בעדכון תזרים מזומנים');
+        
+        // הצגת הודעת שגיאה
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון תזרים מזומנים');
+        } else {
+            alert('שגיאה בעדכון תזרים מזומנים');
+        }
     }
 }
 
 /**
  * מחיקת תזרים מזומנים
  */
-async function confirmDeleteCashFlow() {
+async function confirmDeleteCashFlow(id) {
     try {
-
-        const id = parseInt(document.getElementById('deleteCashFlowId').value);
 
         const response = await fetch(`http://localhost:8080/api/v1/cash_flows/${id}`, {
             method: 'DELETE'
@@ -609,21 +672,89 @@ async function confirmDeleteCashFlow() {
             const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCashFlowModal'));
             modal.hide();
 
+            // הצגת הודעת הצלחה
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('תזרים מזומנים', 'תזרים המזומנים נמחק בהצלחה');
+            } else {
+                alert('תזרים המזומנים נמחק בהצלחה');
+            }
+
             // טעינה מחדש של הנתונים
             await loadCashFlows();
         } else {
             console.error('❌ שגיאה במחיקת תזרים מזומנים:', result.error);
-            alert('שגיאה במחיקת תזרים מזומנים');
+            
+            // הצגת הודעת שגיאה
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים מזומנים');
+            } else {
+                alert('שגיאה במחיקת תזרים מזומנים');
+            }
         }
     } catch (error) {
         console.error('❌ שגיאה במחיקת תזרים מזומנים:', error);
-        alert('שגיאה במחיקת תזרים מזומנים');
+        
+        // הצגת הודעת שגיאה
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים מזומנים');
+        } else {
+            alert('שגיאה במחיקת תזרים מזומנים');
+        }
+    }
+}
+
+// ========================================
+// פונקציות פריטים מקושרים
+// ========================================
+
+/**
+ * הצגת פריטים מקושרים לתזרים מזומנים
+ * @param {number} cashFlowId - מזהה תזרים המזומנים
+ */
+function viewLinkedItemsForCashFlow(cashFlowId) {
+    // שימוש במערכת הפריטים המקושרים הגלובלית
+    if (window.showLinkedItemsModal) {
+        window.showLinkedItemsModal('cash_flow', cashFlowId, 'תזרים מזומנים');
+    } else {
+        console.error('❌ מערכת הפריטים המקושרים לא זמינה');
+        
+        // הצגת הודעת שגיאה
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', 'מערכת הפריטים המקושרים לא זמינה כרגע');
+        } else {
+            alert('מערכת הפריטים המקושרים לא זמינה כרגע');
+        }
     }
 }
 
 // ========================================
 // פונקציות עזר
 // ========================================
+
+/**
+ * טעינת מטבעות מהשרת עם מערכת המטבעות החדשה
+ */
+async function loadCurrenciesFromServer() {
+    try {
+        const response = await fetch('/api/v1/currencies/dropdown');
+        if (response.ok) {
+            const result = await response.json();
+            if (result.status === 'success') {
+                // עדכון המשתנה הגלובלי של מטבעות
+                window.currenciesData = result.data;
+                return result.data;
+            }
+        }
+    } catch (error) {
+        console.error('שגיאה בטעינת מטבעות מהשרת:', error);
+        
+        // הצגת הודעת שגיאה
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת מטבעות מהשרת');
+        }
+    }
+    return [];
+}
 
 /**
  * טעינת רשימת חשבונות למודל הוספה
@@ -647,6 +778,11 @@ async function loadAccountsForCashFlow() {
         }
     } catch (error) {
         console.error('שגיאה בטעינת חשבונות:', error);
+        
+        // הצגת הודעת שגיאה
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת חשבונות');
+        }
     }
 }
 
@@ -680,23 +816,25 @@ async function loadAccountsForEditCashFlow() {
  */
 async function loadCurrenciesForCashFlow() {
     try {
-        const response = await fetch('http://localhost:8080/api/v1/currencies/');
-        if (response.ok) {
-            const result = await response.json();
-            if (result.status === 'success') {
-                const select = document.getElementById('cashFlowCurrencyId');
-                select.innerHTML = '<option value="">בחר מטבע...</option>';
+        // טעינת מטבעות מהשרת עם המערכת החדשה
+        const currencies = await loadCurrenciesFromServer();
+        
+        const select = document.getElementById('cashFlowCurrencyId');
+        select.innerHTML = '<option value="">בחר מטבע...</option>';
 
-                result.data.forEach(currency => {
-                    const option = document.createElement('option');
-                    option.value = currency.id;
-                    option.textContent = `${currency.symbol} - ${currency.name}`;
-                    select.appendChild(option);
-                });
-            }
-        }
+        currencies.forEach(currency => {
+            const option = document.createElement('option');
+            option.value = currency.id;
+            option.textContent = `${currency.symbol} - ${currency.name}`;
+            select.appendChild(option);
+        });
     } catch (error) {
         console.error('שגיאה בטעינת מטבעות:', error);
+        
+        // הצגת הודעת שגיאה
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת מטבעות');
+        }
     }
 }
 
@@ -705,21 +843,18 @@ async function loadCurrenciesForCashFlow() {
  */
 async function loadCurrenciesForEditCashFlow() {
     try {
-        const response = await fetch('http://localhost:8080/api/v1/currencies/');
-        if (response.ok) {
-            const result = await response.json();
-            if (result.status === 'success') {
-                const select = document.getElementById('editCashFlowCurrencyId');
-                select.innerHTML = '<option value="">בחר מטבע...</option>';
+        // טעינת מטבעות מהשרת עם המערכת החדשה
+        const currencies = await loadCurrenciesFromServer();
+        
+        const select = document.getElementById('editCashFlowCurrencyId');
+        select.innerHTML = '<option value="">בחר מטבע...</option>';
 
-                result.data.forEach(currency => {
-                    const option = document.createElement('option');
-                    option.value = currency.id;
-                    option.textContent = `${currency.symbol} - ${currency.name}`;
-                    select.appendChild(option);
-                });
-            }
-        }
+        currencies.forEach(currency => {
+            const option = document.createElement('option');
+            option.value = currency.id;
+            option.textContent = `${currency.symbol} - ${currency.name}`;
+            select.appendChild(option);
+        });
     } catch (error) {
         console.error('שגיאה בטעינת מטבעות:', error);
     }
@@ -742,7 +877,11 @@ function renderCashFlowsTable() {
     cashFlowsData.forEach(cashFlow => {
         const row = document.createElement('tr');
         const accountName = cashFlow.account_name || `חשבון ${cashFlow.account_id}`;
-        const currencySymbol = cashFlow.currency_symbol || '$';
+        
+        // שימוש במערכת המטבעות החדשה
+        const currencyDisplay = window.getCashFlowCurrencyDisplay ? 
+            window.getCashFlowCurrencyDisplay(cashFlow) : 
+            (cashFlow.currency_symbol || '$');
 
         // קבלת סוג עם צבע
         const typeDisplay = getCashFlowTypeWithColor(cashFlow.type);
@@ -757,7 +896,7 @@ function renderCashFlowsTable() {
             <td class="ticker-cell"><strong>${accountName}</strong></td>
             <td class="type-cell">${typeDisplay}</td>
             <td style="text-align: left; direction: ltr;">${amountDisplay}</td>
-            <td style="text-align: center;">${currencySymbol}</td>
+            <td style="text-align: center;">${currencyDisplay}</td>
             <td style="text-align: center;">${rateDisplay}</td>
             <td style="text-align: center;">${formatDate(cashFlow.date)}</td>
             <td>${cashFlow.description || '-'}</td>
@@ -823,6 +962,12 @@ function updatePageSummaryStats() {
  * פורמט סכום
  */
 function formatAmount(amount) {
+    // שימוש במערכת הפורמט החדשה
+    if (window.formatCurrencyWithCommas) {
+        return window.formatCurrencyWithCommas(amount, 'USD');
+    }
+    
+    // גיבוי למערכת הישנה
     return new Intl.NumberFormat('he-IL', {
         style: 'currency',
         currency: 'USD'
@@ -870,6 +1015,17 @@ function formatCashFlowAmount(amount) {
     const numAmount = parseFloat(amount);
     const isPositive = numAmount >= 0;
     const absAmount = Math.abs(numAmount);
+
+    // שימוש במערכת הפורמט החדשה
+    if (window.formatCurrencyWithCommas) {
+        const formattedAmount = window.formatCurrencyWithCommas(absAmount, 'USD');
+        const displayAmount = `${isPositive ? '+' : '-'}${formattedAmount}`;
+        
+        // שימוש במערכת הצביעה החדשה
+        if (window.colorAmountByValue) {
+            return window.colorAmountByValue(numAmount, displayAmount);
+        }
+    }
 
     // עיצוב הסכום עם סימן בצד הנכון (שמאל)
     const formattedAmount = `${isPositive ? '+' : '-'}$${absAmount.toFixed(2)}`;
@@ -1047,6 +1203,11 @@ async function loadCashFlows() {
     } catch (error) {
         console.error('❌ שגיאה בטעינת תזרימי מזומנים:', error);
 
+        // הצגת הודעת שגיאה
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת תזרימי מזומנים');
+        }
+
         // שימוש בנתוני דוגמה אם השרת לא זמין
         const sampleData = [
             {
@@ -1075,6 +1236,9 @@ async function loadCashFlows() {
  */
 async function initializeCashFlowsPage() {
 
+    // טעינת מטבעות מהשרת
+    await loadCurrenciesFromServer();
+
     // טעינת נתונים
     await loadCashFlows();
 
@@ -1100,6 +1264,7 @@ window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
 window.saveCashFlow = saveCashFlow;
 window.updateCashFlow = updateCashFlow;
 window.confirmDeleteCashFlow = confirmDeleteCashFlow;
+window.viewLinkedItemsForCashFlow = viewLinkedItemsForCashFlow;
 
 // ===== פונקציות סידור =====
 

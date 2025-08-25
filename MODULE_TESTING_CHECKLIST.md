@@ -30,7 +30,7 @@
 - [x] ✅ FIXED - Close button styling consistency
 - [x] ✅ FIXED - Delete modal styling and functionality
 
-### ✅ Tickers Page (עמוד טיקרים)
+### ✅ Tickers Page (עמוד טיקרים) - הושלם במלואו
 - [x] ✅ FIXED - Validation matches database constraints
 - [x] ✅ FIXED - All data meets all constraints and validations  
 - [x] ✅ FIXED - Add and edit forms match field structure
@@ -40,6 +40,16 @@
 - [x] ✅ FIXED - Header has background color according to general color key
 - [x] ✅ FIXED - Clicking backdrop outside modal closes modal
 - [x] ✅ FIXED - Currency field refactored from string to currency_id (foreign key)
+- [x] ✅ FIXED - Company name length updated from 12 to 25 characters
+- [x] ✅ FIXED - Centralized warning system implemented
+- [x] ✅ FIXED - Currency dropdown loads from server API
+- [x] ✅ FIXED - Table column order optimized (Symbol, Has Trades, Type, Currency, Updated At, Name, Created At, Remarks, Actions)
+- [x] ✅ FIXED - Has Trades icon with green/red background and 30% transparency
+- [x] ✅ FIXED - Modal header title and close button swapped positions
+- [x] ✅ FIXED - Close button styling with white background, blue text, orange border
+- [x] ✅ FIXED - Currency display with icons and symbols
+- [x] ✅ FIXED - Linked items warning system
+- [x] ✅ FIXED - Database migration for name field length update
 
 ### ✅ Cash Flows Page (עמוד תזרימי מזומנים)
 - [x] ✅ FIXED - Validation matches database constraints

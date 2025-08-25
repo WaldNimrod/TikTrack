@@ -181,9 +181,8 @@ const TABLE_COLUMN_MAPPINGS = {
     // טבלת סוגי קישור הערות (Note Relation Types)
     'note_relation_types': [
         'note_relation_type', // 0 - סוג קישור
-        'description',        // 1 - תיאור
-        'id',                 // 2 - מזהה
-        'created_at'          // 3 - נוצר ב
+        'id',                 // 1 - מזהה
+        'created_at'          // 2 - נוצר ב
     ]
 };
 

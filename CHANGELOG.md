@@ -1,5 +1,72 @@
 # Changelog - TikTrack
 
+## [2025-08-25] - Tickers Module Completion & Centralized Warning System
+
+### ✅ Tickers Module - Complete Implementation (v2.6)
+- **Company Name Length Update**: Extended from 12 to 25 characters
+- **Centralized Warning System**: New `warning-system.js` with callback support
+- **Enhanced Currency System**: API dropdown + display functions with icons
+- **UI/UX Improvements**: Optimized table column order and styling
+- **Database Migration**: Updated table structure and constraints
+- **Validation Enhancements**: 2-25 characters for name, mandatory currency
+- **Modal Header Improvements**: Title and close button swapped positions
+- **Close Button Styling**: White background, blue text, orange border
+- **Currency Display**: Icons and symbols with global functions
+- **Linked Items Warning**: Delete warnings with linked items support
+
+### 🛡️ Centralized Warning System (New)
+- **`warning-system.js`**: Centralized warning management with callbacks
+- **`warning-system.css`**: Consistent warning modal styling
+- **Multiple Warning Types**: Delete, linked items, validation, system, confirmation
+- **Callback Support**: Proper onConfirm/onCancel callback handling
+- **Global Integration**: Available across all pages
+- **Consistent Design**: Unified warning appearance and behavior
+
+### 💱 Enhanced Currency System
+- **API Endpoints**: `/api/v1/currencies/dropdown` for dropdown data
+- **Display Functions**: `getTickerCurrencyDisplay()`, `getTickerCurrencySymbol()`
+- **Currency Icons**: `getCurrencyIcon()` with emoji support
+- **Server Integration**: Currencies loaded from server with symbol and name
+- **Dropdown Enhancement**: Dynamic currency options with proper selection
+
+### 🎨 UI/UX Improvements
+- **Table Column Order**: Symbol, Has Trades, Type, Currency, Updated At, Name, Created At, Remarks, Actions
+- **Has Trades Icon**: Green/red background with 30% transparency
+- **Modal Header**: Title and close button swapped positions
+- **Close Button**: White background, blue text, orange border styling
+- **Responsive Design**: Better layout and visual hierarchy
+
+### 🔧 Technical Improvements
+- **Database Migration**: `update_ticker_name_length_to_25.py`
+- **Constraint Updates**: `LENGTH(name) <= 25` in constraints table
+- **Backend Updates**: Model and service updated to 25 characters
+- **Frontend Validation**: JavaScript validation updated to 25 characters
+- **API Integration**: Currency dropdown loads from server
+
+### 📁 Files Updated
+- `trading-ui/scripts/tickers.js` - Complete tickers page implementation
+- `trading-ui/scripts/warning-system.js` - New centralized warning system
+- `trading-ui/styles/warning-system.css` - Warning system styling
+- `trading-ui/scripts/translation-utils.js` - Enhanced currency functions
+- `Backend/models/ticker.py` - Updated name field to 25 characters
+- `Backend/services/ticker_service.py` - Updated MAX_NAME_LENGTH
+- `Backend/migrations/update_ticker_name_length_to_25.py` - Database migration
+- `Backend/routes/api/currencies.py` - Enhanced dropdown endpoint
+
+### 📊 Database Updates
+- **Tickers Table**: `name VARCHAR(25) NOT NULL` (was VARCHAR(100))
+- **Constraints Table**: Updated `LENGTH(name) <= 25` constraint
+- **Data Migration**: Existing names truncated to 25 characters
+
+### 🎯 User Experience Improvements
+- **Longer Company Names**: Support for 25-character company names
+- **Consistent Warnings**: Unified warning system across all pages
+- **Better Currency Display**: Icons and symbols for better recognition
+- **Improved Modals**: Better header layout and close button styling
+- **Enhanced Validation**: Clear error messages and proper constraints
+
+---
+
 ## [2025-08-25] - Executions Page Completion & Global System Improvements
 
 ### ✅ Executions Page - Complete Implementation (v2.5)

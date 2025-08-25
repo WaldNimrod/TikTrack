@@ -1,7 +1,8 @@
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text, DateTime
 from sqlalchemy.orm import relationship, Mapped
 from .base import BaseModel
 from typing import Dict, Any, Optional, List
+from datetime import datetime
 
 class Ticker(BaseModel):
     """
@@ -9,7 +10,7 @@ class Ticker(BaseModel):
     
     Attributes:
         symbol (str): Ticker symbol - must be unique, maximum 10 characters
-        name (str): Company or asset name - maximum 100 characters
+        name (str): Company or asset name - maximum 25 characters
         type (str): Asset type - stock, etf, crypto, forex, commodity
         remarks (str): Additional notes - maximum 500 characters
         currency_id (int): Currency ID from currencies table
@@ -23,6 +24,7 @@ class Ticker(BaseModel):
         - symbol must be unique in the system
         - symbol cannot be empty
         - symbol limited to 10 characters
+        - name limited to 25 characters
         - currency_id must reference existing currency in currencies table
         
     Example:
@@ -40,26 +42,26 @@ class Ticker(BaseModel):
     # Primary fields
     symbol = Column(String(10), unique=True, nullable=False, index=True, 
                    comment="Ticker symbol - must be unique")
-    name = Column(String(100), nullable=True, 
-                 comment="Company or asset name - max 12 chars per constraints")
-    type = Column(String(20), nullable=True, 
+    name = Column(String(25), nullable=False, 
+                 comment="Company or asset name - max 25 chars per constraints")
+    type = Column(String(20), nullable=False, 
                  comment="Asset type: stock, etf, crypto, forex, commodity")
-    remarks = Column(String(500), nullable=True, 
+    remarks = Column(Text, nullable=True, 
                     comment="Additional notes about the ticker")
     currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False, 
                         comment="Currency ID from currencies table")
     active_trades = Column(Boolean, default=False, nullable=True, 
                           comment="Whether there are active trades")
-    updated_at = Column(String(20), nullable=True, 
-                       comment="Last update timestamp")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
     currency = relationship("Currency")
-    
     trades = relationship("Trade", back_populates="ticker", 
                          cascade="all, delete-orphan")
     trade_plans = relationship("TradePlan", back_populates="ticker", 
                               cascade="all, delete-orphan")
+    alerts = relationship("Alert", back_populates="ticker")
     
     def __repr__(self) -> str:
         """String representation of the ticker"""

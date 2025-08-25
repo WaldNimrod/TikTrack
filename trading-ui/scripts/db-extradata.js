@@ -190,10 +190,10 @@ function updateCurrenciesTable(currencies) {
           <tbody>
             <tr>
               <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editCurrency(${currency.id})" title="ערוך">✏️</button>
+                <button class="btn btn-sm btn-secondary" onclick="editCurrencyRecord(${currency.id})" title="ערוך">✏️</button>
               </td>
               <td class="p-0">
-                <button class="btn btn-sm btn-danger" onclick="deleteCurrency(${currency.id})" title="מחק">🗑️</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCurrencyRecord(${currency.id})" title="מחק">🗑️</button>
               </td>
             </tr>
           </tbody>
@@ -238,17 +238,20 @@ function showCurrenciesError() {
 async function loadNoteRelationTypesData() {
 
     try {
-        // כרגע אין API endpoint לסוגי קישור, נשתמש בנתונים סטטיים
-        const noteRelationTypes = [
-            { id: 1, note_relation_type: 'account', description: 'קישור לחשבון' },
-            { id: 2, note_relation_type: 'trade', description: 'קישור לטרייד' },
-            { id: 3, note_relation_type: 'trade_plan', description: 'קישור לתכנית טרייד' },
-            { id: 4, note_relation_type: 'ticker', description: 'קישור לטיקר' }
-        ];
+        const response = await fetch('/api/v1/note_relation_types/');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-        updateNoteRelationTypesTable(noteRelationTypes);
-        updateNoteRelationTypesCount(noteRelationTypes.length);
-        // נטענו סוגי קישור
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            updateNoteRelationTypesTable(result.data);
+            updateNoteRelationTypesCount(result.data.length);
+            // נטענו סוגי קישור
+        } else {
+            throw new Error(result.error?.message || 'שגיאה בטעינת סוגי קישור');
+        }
     } catch (error) {
         console.error('❌ שגיאה בטעינת סוגי קישור:', error);
         showNoteRelationTypesError();
@@ -264,7 +267,7 @@ function updateNoteRelationTypesTable(noteRelationTypes) {
     }
 
     if (noteRelationTypes.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center">אין נתונים</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">אין נתונים</td></tr>';
         return;
     }
 
@@ -278,7 +281,6 @@ function updateNoteRelationTypesTable(noteRelationTypes) {
         return `
     <tr>
       <td data-type="${typeForFilter}">${type.note_relation_type || ''}</td>
-      <td>${type.description || ''}</td>
       <td>${type.id || ''}</td>
       <td data-date="${type.created_at}">${type.created_at || ''}</td>
       <td class="actions-cell">
@@ -286,10 +288,10 @@ function updateNoteRelationTypesTable(noteRelationTypes) {
           <tbody>
             <tr>
               <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editNoteRelationType(${type.id})" title="ערוך">✏️</button>
+                <button class="btn btn-sm btn-secondary" onclick="editNoteRelationTypeRecord(${type.id})" title="ערוך">✏️</button>
               </td>
               <td class="p-0">
-                <button class="btn btn-sm btn-danger" onclick="deleteNoteRelationType(${type.id})" title="מחק">🗑️</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteNoteRelationTypeRecord(${type.id})" title="מחק">🗑️</button>
               </td>
             </tr>
           </tbody>
@@ -326,34 +328,13 @@ function updateNoteRelationTypesCount(count) {
 function showNoteRelationTypesError() {
     const tbody = document.querySelector('#noteRelationTypesTable tbody');
     if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
     }
 }
 
 // פונקציות עריכה ומחיקה (placeholder)
-function editCurrency(id) {
-    // עריכת מטבע
-    alert(`עריכת מטבע ${id} - לא מומשה עדיין`);
-}
-
-function deleteCurrency(id) {
-    // מחיקת מטבע
-    if (confirm('האם אתה בטוח שברצונך למחוק מטבע זה?')) {
-        alert(`מחיקת מטבע ${id} - לא מומשה עדיין`);
-    }
-}
-
-function editNoteRelationType(id) {
-    // עריכת סוג קישור
-    alert(`עריכת סוג קישור ${id} - לא מומשה עדיין`);
-}
-
-function deleteNoteRelationType(id) {
-    // מחיקת סוג קישור
-    if (confirm('האם אתה בטוח שברצונך למחוק סוג קישור זה?')) {
-        alert(`מחיקת סוג קישור ${id} - לא מומשה עדיין`);
-    }
-}
+// פונקציות אלו הוחלפו בפונקציות החדשות עם שמות ברורים יותר
+// editCurrency, deleteCurrency, editNoteRelationType, deleteNoteRelationType
 
 // פונקציה לעדכון סטטיסטיקות כלליות
 function updateSummaryStats() {
@@ -386,10 +367,10 @@ async function loadAllData() {
 window.loadCurrenciesData = loadCurrenciesData;
 window.loadNoteRelationTypesData = loadNoteRelationTypesData;
 window.loadAllData = loadAllData;
-window.editCurrency = editCurrency;
-window.deleteCurrency = deleteCurrency;
-window.editNoteRelationType = editNoteRelationType;
-window.deleteNoteRelationType = deleteNoteRelationType;
+// window.editCurrency = editCurrencyRecord; // This line is removed as per the edit hint
+// window.deleteCurrency = deleteCurrencyRecord; // This line is removed as per the edit hint
+// window.editNoteRelationType = editNoteRelationTypeRecord; // This line is removed as per the edit hint
+// window.deleteNoteRelationType = deleteNoteRelationTypeRecord; // This line is removed as per the edit hint
 
 // פונקציה לעדכון טקסט טעינה
 function updateLoadingText() {
@@ -416,3 +397,767 @@ document.addEventListener('DOMContentLoaded', function () {
     // טעינת הנתונים
     loadAllData();
 });
+
+// ===== פונקציות וולידציה =====
+
+// פונקציה לוולידציה של סמל מטבע
+function validateCurrencySymbol(input) {
+    const symbol = input.value.trim().toUpperCase();
+    const symbolPattern = /^[A-Z]+$/;
+    
+    // זיהוי איזה מודל זה (הוספה או עריכה)
+    const isEditMode = input.id === 'editCurrencySymbol';
+    const errorElementId = isEditMode ? 'editCurrencySymbolError' : 'currencySymbolError';
+    const errorElement = document.getElementById(errorElementId);
+    
+    // עדכון הערך לשדה
+    input.value = symbol;
+    
+    // בדיקת תבנית
+    if (!symbolPattern.test(symbol)) {
+        input.classList.add('is-invalid');
+        if (errorElement) {
+            errorElement.textContent = 'סמל מטבע חייב להכיל רק אותיות אנגליות גדולות';
+        }
+        return false;
+    }
+    
+    // בדיקת אורך
+    if (symbol.length < 1) {
+        input.classList.add('is-invalid');
+        if (errorElement) {
+            errorElement.textContent = 'סמל מטבע הוא שדה חובה';
+        }
+        return false;
+    }
+    
+    if (symbol.length > 10) {
+        input.classList.add('is-invalid');
+        if (errorElement) {
+            errorElement.textContent = 'סמל מטבע לא יכול להיות יותר מ-10 תווים';
+        }
+        return false;
+    }
+    
+    // אם הכל תקין
+    input.classList.remove('is-invalid');
+    input.classList.add('is-valid');
+    return true;
+}
+
+// פונקציה לוולידציה של שם מטבע
+function validateCurrencyName(input) {
+    const name = input.value.trim();
+    
+    if (name.length === 0) {
+        input.classList.add('is-invalid');
+        return false;
+    }
+    
+    if (name.length > 100) {
+        input.classList.add('is-invalid');
+        return false;
+    }
+    
+    input.classList.remove('is-invalid');
+    input.classList.add('is-valid');
+    return true;
+}
+
+// פונקציה לוולידציה של שער דולר
+function validateCurrencyUsdRate(input) {
+    const rate = parseFloat(input.value);
+    
+    if (isNaN(rate) || rate < 0) {
+        input.classList.add('is-invalid');
+        return false;
+    }
+    
+    input.classList.remove('is-invalid');
+    input.classList.add('is-valid');
+    return true;
+}
+
+// פונקציה לוולידציה של כל הטופס
+function validateCurrencyForm() {
+    // בדיקה אם זה מודל הוספה או עריכה
+    const isEditMode = document.getElementById('editCurrencySymbol') !== null;
+    
+    const symbolInput = isEditMode ? 
+        document.getElementById('editCurrencySymbol') : 
+        document.getElementById('currencySymbol');
+    const nameInput = isEditMode ? 
+        document.getElementById('editCurrencyName') : 
+        document.getElementById('currencyName');
+    const rateInput = isEditMode ? 
+        document.getElementById('editCurrencyUsdRate') : 
+        document.getElementById('currencyUsdRate');
+    
+    const symbolValid = validateCurrencySymbol(symbolInput);
+    const nameValid = validateCurrencyName(nameInput);
+    const rateValid = validateCurrencyUsdRate(rateInput);
+    
+    return symbolValid && nameValid && rateValid;
+}
+
+// ===== פונקציות CRUD למטבעות (Currencies) =====
+
+// פונקציה להוספת מטבע חדש
+function addCurrencyRecord() {
+    showAddCurrencyModal();
+}
+
+// פונקציה לעריכת מטבע
+function editCurrencyRecord(id) {
+    showEditCurrencyModal(id);
+}
+
+// פונקציה למחיקת מטבע
+function deleteCurrencyRecord(id) {
+    showDeleteCurrencyModal(id);
+}
+
+// פונקציה להצגת מודל הוספת מטבע
+function showAddCurrencyModal() {
+    const modalHtml = `
+        <div class="modal fade" id="addCurrencyModal" tabindex="-1" aria-labelledby="addCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored bg-primary">
+                        <h5 class="modal-title text-white" id="addCurrencyModalLabel">הוסף מטבע חדש</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addCurrencyForm" novalidate>
+                            <div class="mb-3">
+                                <label for="currencySymbol" class="form-label">סמל מטבע *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="currencySymbol" 
+                                       name="symbol" 
+                                       required 
+                                       maxlength="10" 
+                                       pattern="^[A-Z]+$"
+                                       placeholder="USD"
+                                       oninput="validateCurrencySymbol(this)"
+                                       onblur="validateCurrencySymbol(this)">
+                                <div class="invalid-feedback" id="currencySymbolError">
+                                    סמל מטבע חייב להכיל רק אותיות אנגליות גדולות
+                                </div>
+                                <div class="form-text">רק אותיות אנגליות גדולות (למשל: USD, EUR, ILS)</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="currencyName" class="form-label">שם מטבע *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="currencyName" 
+                                       name="name" 
+                                       required 
+                                       maxlength="100" 
+                                       placeholder="US Dollar">
+                                <div class="invalid-feedback">
+                                    שם מטבע הוא שדה חובה
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="currencyUsdRate" class="form-label">שער דולר</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="currencyUsdRate" 
+                                       name="usd_rate" 
+                                       step="0.000001" 
+                                       min="0" 
+                                       value="1.0" 
+                                       placeholder="1.0">
+                                <div class="form-text">שער המרה לדולר אמריקאי (ברירת מחדל: 1.0)</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="saveCurrencyRecord()">שמור</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById('addCurrencyModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('addCurrencyModal'));
+    modal.show();
+}
+
+// פונקציה להצגת מודל עריכת מטבע
+function showEditCurrencyModal(id) {
+    // טעינת נתוני המטבע
+    fetch(`/api/v1/currencies/${id}`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                const currency = result.data;
+                showEditCurrencyModalWithData(currency);
+            } else {
+                showNotification('שגיאה בטעינת נתוני המטבע', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading currency:', error);
+            showNotification('שגיאה בטעינת נתוני המטבע', 'error');
+        });
+}
+
+// פונקציה להצגת מודל עריכת מטבע עם נתונים
+function showEditCurrencyModalWithData(currency) {
+    const modalHtml = `
+        <div class="modal fade" id="editCurrencyModal" tabindex="-1" aria-labelledby="editCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored bg-secondary">
+                        <h5 class="modal-title text-white" id="editCurrencyModalLabel">ערוך מטבע</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editCurrencyForm" novalidate>
+                            <input type="hidden" id="editCurrencyId" value="${currency.id}">
+                            <div class="mb-3">
+                                <label for="editCurrencySymbol" class="form-label">סמל מטבע *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="editCurrencySymbol" 
+                                       name="symbol" 
+                                       required 
+                                       maxlength="10" 
+                                       pattern="^[A-Z]+$"
+                                       value="${currency.symbol}"
+                                       oninput="validateCurrencySymbol(this)"
+                                       onblur="validateCurrencySymbol(this)">
+                                <div class="invalid-feedback" id="editCurrencySymbolError">
+                                    סמל מטבע חייב להכיל רק אותיות אנגליות גדולות
+                                </div>
+                                <div class="form-text">רק אותיות אנגליות גדולות (למשל: USD, EUR, ILS)</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCurrencyName" class="form-label">שם מטבע *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="editCurrencyName" 
+                                       name="name" 
+                                       required 
+                                       maxlength="100" 
+                                       value="${currency.name}">
+                                <div class="invalid-feedback">
+                                    שם מטבע הוא שדה חובה
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCurrencyUsdRate" class="form-label">שער דולר</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="editCurrencyUsdRate" 
+                                       name="usd_rate" 
+                                       step="0.000001" 
+                                       min="0" 
+                                       value="${currency.usd_rate}">
+                                <div class="form-text">שער המרה לדולר אמריקאי</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="updateCurrencyRecord()">עדכן</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById('editCurrencyModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('editCurrencyModal'));
+    modal.show();
+}
+
+// פונקציה להצגת מודל מחיקת מטבע
+function showDeleteCurrencyModal(id) {
+    const modalHtml = `
+        <div class="modal fade" id="deleteCurrencyModal" tabindex="-1" aria-labelledby="deleteCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored bg-danger">
+                        <h5 class="modal-title text-white" id="deleteCurrencyModalLabel">מחק מטבע</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>האם אתה בטוח שברצונך למחוק מטבע זה?</p>
+                        <p class="text-muted">פעולה זו אינה הפיכה.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmDeleteCurrencyRecord(${id})">מחק</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById('deleteCurrencyModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('deleteCurrencyModal'));
+    modal.show();
+}
+
+// פונקציה לשמירת מטבע חדש
+async function saveCurrencyRecord() {
+    // וולידציה של הטופס
+    if (!validateCurrencyForm()) {
+        showNotification('יש לתקן שגיאות בטופס לפני השמירה', 'error');
+        return;
+    }
+    
+    const form = document.getElementById('addCurrencyForm');
+    const formData = new FormData(form);
+    
+    const currencyData = {
+        symbol: formData.get('symbol').trim().toUpperCase(),
+        name: formData.get('name').trim(),
+        usd_rate: parseFloat(formData.get('usd_rate')) || 1.0
+    };
+    
+    try {
+        const response = await fetch('/api/v1/currencies/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(currencyData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            showNotification('מטבע נוסף בהצלחה', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('addCurrencyModal')).hide();
+            loadCurrenciesData(); // טעינה מחדש של הנתונים
+        } else {
+            // הודעות שגיאה ספציפיות
+            let errorMessage = 'שגיאה בהוספת מטבע';
+            
+            if (result.error && result.error.message) {
+                if (result.error.message.includes('UNIQUE constraint failed') || 
+                    result.error.message.includes('symbol')) {
+                    errorMessage = 'סמל מטבע זה כבר קיים במערכת';
+                } else if (result.error.message.includes('symbol and name are required')) {
+                    errorMessage = 'סמל מטבע ושם מטבע הם שדות חובה';
+                } else {
+                    errorMessage = result.error.message;
+                }
+            }
+            
+            showNotification(errorMessage, 'error');
+        }
+    } catch (error) {
+        console.error('Error saving currency:', error);
+        showNotification('שגיאה בתקשורת עם השרת', 'error');
+    }
+}
+
+// פונקציה לעדכון מטבע
+async function updateCurrencyRecord() {
+    // וולידציה של הטופס
+    if (!validateCurrencyForm()) {
+        showNotification('יש לתקן שגיאות בטופס לפני העדכון', 'error');
+        return;
+    }
+    
+    const form = document.getElementById('editCurrencyForm');
+    const formData = new FormData(form);
+    const currencyId = document.getElementById('editCurrencyId').value;
+    
+    const currencyData = {
+        symbol: formData.get('symbol').trim().toUpperCase(),
+        name: formData.get('name').trim(),
+        usd_rate: parseFloat(formData.get('usd_rate')) || 1.0
+    };
+    
+    try {
+        const response = await fetch(`/api/v1/currencies/${currencyId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(currencyData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            showNotification('מטבע עודכן בהצלחה', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editCurrencyModal')).hide();
+            loadCurrenciesData(); // טעינה מחדש של הנתונים
+        } else {
+            // הודעות שגיאה ספציפיות
+            let errorMessage = 'שגיאה בעדכון מטבע';
+            
+            if (result.error && result.error.message) {
+                if (result.error.message.includes('UNIQUE constraint failed') || 
+                    result.error.message.includes('symbol')) {
+                    errorMessage = 'סמל מטבע זה כבר קיים במערכת';
+                } else if (result.error.message.includes('symbol and name are required')) {
+                    errorMessage = 'סמל מטבע ושם מטבע הם שדות חובה';
+                } else if (result.error.message.includes('Currency not found')) {
+                    errorMessage = 'המטבע לא נמצא במערכת';
+                } else {
+                    errorMessage = result.error.message;
+                }
+            }
+            
+            showNotification(errorMessage, 'error');
+        }
+    } catch (error) {
+        console.error('Error updating currency:', error);
+        showNotification('שגיאה בתקשורת עם השרת', 'error');
+    }
+}
+
+// פונקציה לאישור מחיקת מטבע
+async function confirmDeleteCurrencyRecord(id) {
+    try {
+        const response = await fetch(`/api/v1/currencies/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            showNotification('מטבע נמחק בהצלחה', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('deleteCurrencyModal')).hide();
+            loadCurrenciesData(); // טעינה מחדש של הנתונים
+        } else {
+            showNotification(result.error?.message || 'שגיאה במחיקת מטבע', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting currency:', error);
+        showNotification('שגיאה במחיקת מטבע', 'error');
+    }
+}
+
+// ===== פונקציות CRUD לסוגי קישור הערות (Note Relation Types) =====
+
+// פונקציה להוספת סוג קישור חדש
+function addNoteRelationTypeRecord() {
+    showAddNoteRelationTypeModal();
+}
+
+// פונקציה לעריכת סוג קישור
+function editNoteRelationTypeRecord(id) {
+    showEditNoteRelationTypeModal(id);
+}
+
+// פונקציה למחיקת סוג קישור
+function deleteNoteRelationTypeRecord(id) {
+    showDeleteNoteRelationTypeModal(id);
+}
+
+// פונקציה להצגת מודל הוספת סוג קישור
+function showAddNoteRelationTypeModal() {
+    const modalHtml = `
+        <div class="modal fade" id="addNoteRelationTypeModal" tabindex="-1" aria-labelledby="addNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored bg-primary">
+                        <h5 class="modal-title text-white" id="addNoteRelationTypeModalLabel">הוסף סוג קישור חדש</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addNoteRelationTypeForm">
+                            <div class="mb-3">
+                                <label for="noteRelationType" class="form-label">סוג קישור *</label>
+                                <input type="text" class="form-control" id="noteRelationType" name="note_relation_type" required maxlength="20" placeholder="example_type">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="saveNoteRelationTypeRecord()">שמור</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById('addNoteRelationTypeModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('addNoteRelationTypeModal'));
+    modal.show();
+}
+
+// פונקציה להצגת מודל עריכת סוג קישור
+function showEditNoteRelationTypeModal(id) {
+    // טעינת נתוני סוג הקישור
+    fetch(`/api/v1/note_relation_types/${id}`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                const noteType = result.data;
+                showEditNoteRelationTypeModalWithData(noteType);
+            } else {
+                showNotification('שגיאה בטעינת נתוני סוג הקישור', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading note relation type:', error);
+            showNotification('שגיאה בטעינת נתוני סוג הקישור', 'error');
+        });
+}
+
+// פונקציה להצגת מודל עריכת סוג קישור עם נתונים
+function showEditNoteRelationTypeModalWithData(noteType) {
+    const modalHtml = `
+        <div class="modal fade" id="editNoteRelationTypeModal" tabindex="-1" aria-labelledby="editNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored bg-secondary">
+                        <h5 class="modal-title text-white" id="editNoteRelationTypeModalLabel">ערוך סוג קישור</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editNoteRelationTypeForm">
+                            <input type="hidden" id="editNoteRelationTypeId" value="${noteType.id}">
+                            <div class="mb-3">
+                                <label for="editNoteRelationType" class="form-label">סוג קישור *</label>
+                                <input type="text" class="form-control" id="editNoteRelationType" name="note_relation_type" required maxlength="20" value="${noteType.note_relation_type}">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="updateNoteRelationTypeRecord()">עדכן</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById('editNoteRelationTypeModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('editNoteRelationTypeModal'));
+    modal.show();
+}
+
+// פונקציה להצגת מודל מחיקת סוג קישור
+function showDeleteNoteRelationTypeModal(id) {
+    const modalHtml = `
+        <div class="modal fade" id="deleteNoteRelationTypeModal" tabindex="-1" aria-labelledby="deleteNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored bg-danger">
+                        <h5 class="modal-title text-white" id="deleteNoteRelationTypeModalLabel">מחק סוג קישור</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>האם אתה בטוח שברצונך למחוק סוג קישור זה?</p>
+                        <p class="text-muted">פעולה זו אינה הפיכה.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmDeleteNoteRelationTypeRecord(${id})">מחק</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById('deleteNoteRelationTypeModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('deleteNoteRelationTypeModal'));
+    modal.show();
+}
+
+// פונקציה לשמירת סוג קישור חדש
+async function saveNoteRelationTypeRecord() {
+    const form = document.getElementById('addNoteRelationTypeForm');
+    const formData = new FormData(form);
+    
+    const noteTypeData = {
+        note_relation_type: formData.get('note_relation_type')
+    };
+    
+    try {
+        const response = await fetch('/api/v1/note_relation_types/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(noteTypeData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            showNotification('סוג קישור נוסף בהצלחה', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('addNoteRelationTypeModal')).hide();
+            loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
+        } else {
+            showNotification(result.error?.message || 'שגיאה בהוספת סוג קישור', 'error');
+        }
+    } catch (error) {
+        console.error('Error saving note relation type:', error);
+        showNotification('שגיאה בהוספת סוג קישור', 'error');
+    }
+}
+
+// פונקציה לעדכון סוג קישור
+async function updateNoteRelationTypeRecord() {
+    const form = document.getElementById('editNoteRelationTypeForm');
+    const formData = new FormData(form);
+    const noteTypeId = document.getElementById('editNoteRelationTypeId').value;
+    
+    const noteTypeData = {
+        note_relation_type: formData.get('note_relation_type')
+    };
+    
+    try {
+        const response = await fetch(`/api/v1/note_relation_types/${noteTypeId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(noteTypeData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            showNotification('סוג קישור עודכן בהצלחה', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editNoteRelationTypeModal')).hide();
+            loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
+        } else {
+            showNotification(result.error?.message || 'שגיאה בעדכון סוג קישור', 'error');
+        }
+    } catch (error) {
+        console.error('Error updating note relation type:', error);
+        showNotification('שגיאה בעדכון סוג קישור', 'error');
+    }
+}
+
+// פונקציה לאישור מחיקת סוג קישור
+async function confirmDeleteNoteRelationTypeRecord(id) {
+    try {
+        const response = await fetch(`/api/v1/note_relation_types/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            showNotification('סוג קישור נמחק בהצלחה', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('deleteNoteRelationTypeModal')).hide();
+            loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
+        } else {
+            showNotification(result.error?.message || 'שגיאה במחיקת סוג קישור', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting note relation type:', error);
+        showNotification('שגיאה במחיקת סוג קישור', 'error');
+    }
+}
+
+// ===== פונקציות כלליות =====
+
+// פונקציה כללית להוספת רשומה (מטבע או סוג קישור)
+function addRecord() {
+    // נבדוק איזה טבלה פעילה
+    const activeSection = document.querySelector('.content-section:not(.collapsed)');
+    if (activeSection) {
+        const currenciesSection = activeSection.querySelector('#currenciesTable');
+        const noteTypesSection = activeSection.querySelector('#noteRelationTypesTable');
+        
+        if (currenciesSection) {
+            addCurrencyRecord();
+        } else if (noteTypesSection) {
+            addNoteRelationTypeRecord();
+        } else {
+            // ברירת מחדל - הוספת מטבע
+            addCurrencyRecord();
+        }
+    } else {
+        // ברירת מחדל - הוספת מטבע
+        addCurrencyRecord();
+    }
+}
+
+// ===== ייצוא פונקציות לגלובל =====
+
+// ייצוא פונקציות וולידציה
+window.validateCurrencySymbol = validateCurrencySymbol;
+window.validateCurrencyName = validateCurrencyName;
+window.validateCurrencyUsdRate = validateCurrencyUsdRate;
+window.validateCurrencyForm = validateCurrencyForm;
+
+// ייצוא פונקציות מטבעות
+window.addCurrencyRecord = addCurrencyRecord;
+window.editCurrencyRecord = editCurrencyRecord;
+window.deleteCurrencyRecord = deleteCurrencyRecord;
+window.saveCurrencyRecord = saveCurrencyRecord;
+window.updateCurrencyRecord = updateCurrencyRecord;
+window.confirmDeleteCurrencyRecord = confirmDeleteCurrencyRecord;
+
+// ייצוא פונקציות סוגי קישור
+window.addNoteRelationTypeRecord = addNoteRelationTypeRecord;
+window.editNoteRelationTypeRecord = editNoteRelationTypeRecord;
+window.deleteNoteRelationTypeRecord = deleteNoteRelationTypeRecord;
+window.saveNoteRelationTypeRecord = saveNoteRelationTypeRecord;
+window.updateNoteRelationTypeRecord = updateNoteRelationTypeRecord;
+window.confirmDeleteNoteRelationTypeRecord = confirmDeleteNoteRelationTypeRecord;
+
+// ייצוא פונקציה כללית
+window.addRecord = addRecord;

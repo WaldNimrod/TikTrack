@@ -511,8 +511,8 @@ function validateTickerName(input) {
         return false;
     }
 
-    if (name.length < 2 || name.length > 12) {
-        showFieldError(input, errorElement, 'שם החברה חייב להיות בין 2 ל-12 תווים');
+    if (name.length < 2 || name.length > 25) {  // Changed from 12 to 25
+        showFieldError(input, errorElement, 'שם החברה חייב להיות בין 2 ל-25 תווים');  // Changed from 12 to 25
         return false;
     }
 

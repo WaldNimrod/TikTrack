@@ -92,6 +92,29 @@ function translateAlertType(type) {
 }
 
 /**
+ * תרגום תנאי התראה לעברית
+ * @param {string} condition - התנאי באנגלית
+ * @returns {string} התנאי בעברית
+ */
+function translateAlertCondition(condition) {
+    const conditionMap = {
+        'above': 'מעל',
+        'below': 'מתחת',
+        'equals': 'שווה ל',
+        'not_equals': 'לא שווה ל',
+        'contains': 'מכיל',
+        'not_contains': 'לא מכיל',
+        'starts_with': 'מתחיל ב',
+        'ends_with': 'מסתיים ב',
+        'greater_than': 'גדול מ',
+        'less_than': 'קטן מ',
+        'greater_than_or_equal': 'גדול או שווה ל',
+        'less_than_or_equal': 'קטן או שווה ל'
+    };
+    return conditionMap[condition] || condition;
+}
+
+/**
  * תרגום סטטוס תכנון טרייד לעברית
  * @param {string} status - הסטטוס באנגלית
  * @returns {string} הסטטוס בעברית
@@ -125,20 +148,36 @@ function translateIsTriggered(isTriggered) {
 
 /**
  * תרגום סוג טרייד לעברית
- * @param {string} type - הסוג באנגלית
- * @returns {string} הסוג בעברית
+ * @param {string} type - סוג הטרייד באנגלית
+ * @returns {string} סוג הטרייד בעברית
  */
 function translateTradeType(type) {
     const typeMap = {
-        'swing': 'סווינג',
+        'swing': 'ספין',
         'investment': 'השקעה',
-        'passive': 'פאסיבי',
-        'buy': 'קנייה',
-        'sell': 'מכירה',
-        'long': 'לונג',
-        'short': 'שורט'
+        'passive': 'פסיבי',
+        'crypto': 'קריפטו',
+        'other': 'אחר'
     };
     return typeMap[type] || type;
+}
+
+/**
+ * תרגום סטטוס טרייד לעברית
+ * @param {string} status - הסטטוס באנגלית
+ * @returns {string} הסטטוס בעברית
+ */
+function translateTradeStatus(status) {
+    const statusMap = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'cancelled': 'מבוטל',
+        'canceled': 'מבוטל',
+        'pending': 'ממתין',
+        'active': 'פעיל',
+        'inactive': 'לא פעיל'
+    };
+    return statusMap[status] || status;
 }
 
 /**

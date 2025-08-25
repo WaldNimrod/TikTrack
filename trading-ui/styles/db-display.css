@@ -6,6 +6,13 @@
     font-weight: 600 !important;
 }
 
+/* כותרת משנה של טבלה */
+.db-display-page .table-subtitle {
+    font-weight: normal !important;
+    font-size: 0.8em !important;
+    color: #666 !important;
+}
+
 /* סוג השדה - פונט עוד יותר קטן, לא בולד */
 .db-display-page th {
     font-size: 0.75rem !important;
@@ -344,6 +351,142 @@
     background: #ffffff !important;
     color: #117a8b !important;
     border-color: #117a8b !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== סגנונות כפתורי שמירה במודלים ===== */
+
+/* כפתורי שמירה במודלים - רקע לבן, מסגרת ירוקה, גודל קבוע */
+.modal .btn-primary {
+    background: #ffffff !important;
+    color: #28a745 !important;
+    border: 1px solid #28a745 !important;
+    border-radius: 8px !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    min-width: 80px !important;
+    text-align: center !important;
+}
+
+.modal .btn-primary:hover {
+    background: #ffffff !important;
+    color: #1e7e34 !important;
+    border-color: #1e7e34 !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.modal .btn-primary:focus {
+    background: #ffffff !important;
+    color: #1e7e34 !important;
+    border-color: #1e7e34 !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+}
+
+.modal .btn-primary:active {
+    background: #ffffff !important;
+    color: #1e7e34 !important;
+    border-color: #1e7e34 !important;
+    transform: none !important;
+}
+
+/* כפתורי ביטול במודלים - שמירה על העיצוב המקורי */
+.modal .btn-secondary {
+    background: #ffffff !important;
+    color: #6c757d !important;
+    border: 1px solid #6c757d !important;
+    border-radius: 8px !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    min-width: 80px !important;
+    text-align: center !important;
+}
+
+.modal .btn-secondary:hover {
+    background: #ffffff !important;
+    color: #545b62 !important;
+    border-color: #545b62 !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.modal .btn-secondary:focus {
+    background: #ffffff !important;
+    color: #545b62 !important;
+    border-color: #545b62 !important;
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25) !important;
+}
+
+.modal .btn-secondary:active {
+    background: #ffffff !important;
+    color: #545b62 !important;
+    border-color: #545b62 !important;
+    transform: none !important;
+}
+
+/* כפתורי מחיקה במודלים - שמירה על העיצוב המקורי */
+.modal .btn-danger {
+    background: #ffffff !important;
+    color: #dc3545 !important;
+    border: 1px solid #dc3545 !important;
+    border-radius: 8px !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    min-width: 80px !important;
+    text-align: center !important;
+}
+
+.modal .btn-danger:hover {
+    background: #ffffff !important;
+    color: #c82333 !important;
+    border-color: #c82333 !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.modal .btn-danger:focus {
+    background: #ffffff !important;
+    color: #c82333 !important;
+    border-color: #c82333 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.modal .btn-danger:active {
+    background: #ffffff !important;
+    color: #c82333 !important;
+    border-color: #c82333 !important;
+    transform: none !important;
+}
+
+/* ביטול הגדרות כחול לכפתורי primary בעמוד בסיס נתונים */
+.db-display-page .btn-primary {
+    background: #ffffff !important;
+    color: #007bff !important;
+    border: 1px solid #007bff !important;
+    border-radius: 8px !important;
+    padding: 0.3rem !important;
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    direction: ltr !important;
+    text-align: center !important;
+}
+
+.db-display-page .btn-primary:hover {
+    background: #ffffff !important;
+    color: #0056b3 !important;
+    border-color: #0056b3 !important;
     transform: none !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }

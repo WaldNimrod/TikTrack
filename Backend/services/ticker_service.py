@@ -51,8 +51,9 @@ class TickerService:
     # Constants for validation
     VALID_TICKER_TYPES: List[str] = ['stock', 'etf', 'crypto', 'forex', 'commodity']
     MAX_SYMBOL_LENGTH: int = 10
-    MAX_NAME_LENGTH: int = 100
-    MAX_REMARKS_LENGTH: int = 500
+    MAX_NAME_LENGTH: int = 25  # Changed from 100 to 25
+    MAX_TYPE_LENGTH: int = 20
+    MAX_REMARKS_LENGTH: int = 1000
     # CURRENCY_LENGTH: int = 3  # Removed - now using currency_id
     @staticmethod
     def get_all(db: Session) -> List[Ticker]:

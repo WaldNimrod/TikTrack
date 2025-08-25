@@ -9,7 +9,7 @@ class Alert(BaseModel):
     
     # Fields that exist in the database
     account_id = Column(Integer, nullable=True)
-    ticker_id = Column(Integer, nullable=True)
+    ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
     type = Column(String(50), nullable=False, default='price')
     message = Column(String(500), nullable=True)
     triggered_at = Column(DateTime, nullable=True)
@@ -22,6 +22,9 @@ class Alert(BaseModel):
     condition_attribute = Column(String(50), nullable=False, default='price')
     condition_operator = Column(String(50), nullable=False, default='more_than')
     condition_number = Column(String(20), nullable=False, default='0')
+    
+    # Relationships
+    ticker = relationship("Ticker", back_populates="alerts")
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

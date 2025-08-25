@@ -5,6 +5,7 @@
 ### 🎯 מה הושלם עד כה
 - ✅ **מודול התראות (Alerts)** - הושלם במלואו
 - ✅ **מודול עסקאות (Executions)** - הושלם במלואו (עודכן)
+- ✅ **מודול טיקרים (Tickers)** - הושלם במלואו (עודכן)
 - ✅ **מערכת Header** - עובדת
 - ✅ **מערכת פילטרים** - עובדת
 - ✅ **מערכת מיון** - עובדת
@@ -12,12 +13,13 @@
 - ✅ **מערכת מודלים** - עובדת עם z-index נכון
 - ✅ **מערכת פורמט מספרים** - פונקציות גלובליות
 - ✅ **מערכת צביעת סכומים** - פונקציות גלובליות
+- ✅ **מערכת אזהרות מרכזית** - מערכת חדשה (עודכן)
+- ✅ **מערכת מטבעות** - API ושירותים (עודכן)
 - ✅ **בסיס נתונים** - 19 טבלאות, 13 התראות
 
 ### 🚧 מה נדרש להמשיך
 - ⏳ **מודול טריידים (Trades)** - פשוט יותר להתחיל איתו
 - ⏳ **מודול חשבונות (Accounts)** - פשוט יותר
-- ⏳ **מודול טיקרים (Tickers)** - פשוט יותר
 - ⏳ **מודול תוכניות (Trade Plans)** - בינוני
 
 ---
@@ -82,13 +84,7 @@ trading-ui/
    - API: `Backend/routes/api/accounts.py`
    - מודל: `Backend/models/account.py`
 
-2. **מודול טיקרים (Tickers)**
-   - קובץ: `trading-ui/tickers.html`
-   - סקריפט: `trading-ui/scripts/tickers.js`
-   - API: `Backend/routes/api/tickers.py`
-   - מודל: `Backend/models/ticker.py`
-
-3. **מודול טריידים (Trades)**
+2. **מודול טריידים (Trades)**
    - קובץ: `trading-ui/trades.html`
    - סקריפט: `trading-ui/scripts/trades.js`
    - API: `Backend/routes/api/trades.py`
@@ -166,6 +162,41 @@ window.translateTradeType(type)
 window.translateTradeStatus(status)
 window.translateExecutionAction(action)
 // ועוד פונקציות תרגום רבות...
+```
+
+### 7. מערכת אזהרות מרכזית (חדש - עודכן)
+```javascript
+// קובץ: trading-ui/scripts/warning-system.js
+// קובץ: trading-ui/styles/warning-system.css
+// פונקציות זמינות:
+window.showWarning(type, data, options, onConfirm, onCancel)
+window.showDeleteWarning(itemType, itemName, onConfirm, onCancel)
+window.showLinkedItemsWarning(itemType, linkedCount, onConfirm, onCancel)
+window.showValidationWarning(field, message)
+
+// סוגי אזהרות:
+// - DELETE: אזהרת מחיקה
+// - LINKED_ITEMS: אזהרת פריטים מקושרים
+// - VALIDATION: אזהרת ולידציה
+// - SYSTEM: אזהרת מערכת
+// - CONFIRMATION: אישור פעולה
+```
+
+### 8. מערכת מטבעות (חדש - עודכן)
+```javascript
+// קובץ: trading-ui/scripts/translation-utils.js
+// פונקציות זמינות:
+window.getCurrencyIcon(currencySymbol)           // אייקון מטבע
+window.getTickerCurrencyDisplay(ticker)          // הצגת מטבע טיקר עם אייקון
+window.getTickerCurrencySymbol(ticker)           // סמל מטבע בלבד
+window.getCashFlowCurrencyDisplay(cashFlow)      // הצגת מטבע תזרים מזומנים
+
+// API endpoints:
+// GET /api/v1/currencies/ - כל המטבעות
+// GET /api/v1/currencies/dropdown - מטבעות לדרופדאון
+// POST /api/v1/currencies/ - יצירת מטבע
+// PUT /api/v1/currencies/{id} - עדכון מטבע
+// DELETE /api/v1/currencies/{id} - מחיקת מטבע
 ```
 
 ---
@@ -247,6 +278,50 @@ window.resetModalForm(modalId)
 ```
 
 ---
+
+## 📋 שינויים אחרונים במודול טיקרים (חדש - עודכן)
+
+### 1. עדכון אילוץ שם החברה
+- **שינוי**: אורך שם החברה עודכן מ-12 ל-25 תווים
+- **קבצים שעודכנו**:
+  - `Backend/models/ticker.py`: `String(25), nullable=False`
+  - `Backend/services/ticker_service.py`: `MAX_NAME_LENGTH: int = 25`
+  - `trading-ui/scripts/tickers.js`: ולידציה ל-25 תווים
+  - `Backend/migrations/update_ticker_name_length_to_25.py`: מיגרציה
+- **בסיס נתונים**: טבלה עודכנה ל-`VARCHAR(25) NOT NULL`
+- **אילוצים**: עודכן ל-`LENGTH(name) <= 25`
+
+### 2. מערכת אזהרות מרכזית
+- **קבצים חדשים**:
+  - `trading-ui/scripts/warning-system.js`: מערכת האזהרות
+  - `trading-ui/styles/warning-system.css`: עיצוב האזהרות
+- **פונקציות זמינות**:
+  - `showDeleteWarning()`: אזהרת מחיקה
+  - `showLinkedItemsWarning()`: אזהרת פריטים מקושרים
+  - `showValidationWarning()`: אזהרת ולידציה
+- **שימוש**: החליף את המודלים הישנים של אזהרות
+
+### 3. מערכת מטבעות משופרת
+- **API endpoints**:
+  - `/api/v1/currencies/dropdown`: מטבעות לדרופדאון
+  - `/api/v1/currencies/`: ניהול מטבעות מלא
+- **פונקציות JavaScript**:
+  - `getTickerCurrencyDisplay()`: הצגת מטבע עם אייקון
+  - `getTickerCurrencySymbol()`: סמל מטבע בלבד
+  - `getCurrencyIcon()`: אייקון מטבע
+- **דרופדאון**: טוען מטבעות מהשרת עם symbol ו-name
+
+### 4. שיפורי UI/UX
+- **עמודות טבלה**: סדר חדש - סמל, יש טריידים, סוג, מטבע, עודכן ב, שם, נוצר ב, הערות, פעולות
+- **אייקון "יש טריידים"**: רקע ירוק/אדום עם 30% שקיפות
+- **כותרת מודל**: כותרת וכפתור סגירה מחליפים צדדים
+- **כפתור סגירה**: רקע לבן, טקסט כחול, מסגרת כתומה
+
+### 5. שיפורי ולידציה
+- **שם החברה**: 2-25 תווים במקום 2-12
+- **מטבע**: חובה לבחור מטבע מהרשימה
+- **סמל**: עדיין 10 תווים מקסימום
+- **סוג**: חובה לבחור סוג מהרשימה
 
 ## 🚨 בעיות נפוצות ופתרונות (חדש - עודכן)
 
@@ -336,6 +411,17 @@ const formattedCurrency = window.formatCurrencyWithCommas(1234.56);
 
 // צביעת סכום
 const coloredAmount = window.colorAmountByValue(1234.56, '$1,234.56');
+
+// מערכת אזהרות
+window.showDeleteWarning('חשבון', 'חשבון טכנולוגיה', 
+    () => deleteAccount(id), 
+    () => console.log('מחיקה בוטלה')
+);
+
+// מערכת מטבעות
+const currencyDisplay = window.getTickerCurrencyDisplay(ticker);
+const currencySymbol = window.getTickerCurrencySymbol(ticker);
+const currencyIcon = window.getCurrencyIcon('USD');
 ```
 
 ---
@@ -376,6 +462,67 @@ CREATE TABLE accounts (
 ]
 ```
 
+## 🔍 דוגמה למודול מורכב - טיקרים (הושלם)
+
+### מבנה הטבלה (Tickers)
+```sql
+CREATE TABLE tickers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    symbol VARCHAR(10) NOT NULL UNIQUE,
+    name VARCHAR(25) NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    currency_id INTEGER NOT NULL,
+    remarks TEXT,
+    active_trades BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME,
+    FOREIGN KEY (currency_id) REFERENCES currencies(id)
+);
+```
+
+### עמודות בטבלה
+1. סמל (symbol)
+2. יש טריידים (active_trades)
+3. סוג (type)
+4. מטבע (currency)
+5. עודכן ב (updated_at)
+6. שם (name)
+7. נוצר ב (created_at)
+8. הערות (remarks)
+9. פעולות (actions)
+
+### מיפוי עמודות
+```javascript
+// ב-table-mappings.js
+'tickers': [
+    'symbol',          // 0 - סמל
+    'active_trades',   // 1 - יש טריידים
+    'type',            // 2 - סוג
+    'currency',        // 3 - מטבע
+    'updated_at',      // 4 - עודכן ב
+    'name',            // 5 - שם
+    'created_at',      // 6 - נוצר ב
+    'remarks'          // 7 - הערות
+]
+```
+
+### שימוש במערכת האזהרות
+```javascript
+// מחיקת טיקר
+function deleteTicker(id) {
+    window.showDeleteWarning('טיקר', ticker.symbol, 
+        () => confirmDeleteTicker(id),
+        () => console.log('מחיקה בוטלה')
+    );
+}
+
+// טעינת מטבעות
+async function loadTickersData() {
+    await loadCurrenciesFromServer(); // טוען מטבעות מהשרת
+    // ... טעינת טיקרים
+}
+```
+
 ---
 
 ## ⚠️ דברים חשובים לזכור
@@ -411,6 +558,19 @@ CREATE TABLE accounts (
 - וודא שכפתורי הסגירה מיושרים נכון
 - השתמש במבנה טבלה לכפתורי פעולה
 
+### 7. מערכת אזהרות (חדש - עודכן)
+- השתמש ב-`window.showDeleteWarning()` לאזהרות מחיקה
+- השתמש ב-`window.showLinkedItemsWarning()` לאזהרות פריטים מקושרים
+- השתמש ב-`window.showValidationWarning()` לאזהרות ולידציה
+- הוסף `<link rel="stylesheet" href="styles/warning-system.css">` ל-HTML
+- הוסף `<script src="scripts/warning-system.js"></script>` ל-HTML
+
+### 8. מערכת מטבעות (חדש - עודכן)
+- השתמש ב-`window.getTickerCurrencyDisplay(ticker)` להצגת מטבע עם אייקון
+- השתמש ב-`window.getTickerCurrencySymbol(ticker)` לסמל מטבע בלבד
+- השתמש ב-`window.getCurrencyIcon(symbol)` לאייקון מטבע
+- טען מטבעות עם `loadCurrenciesFromServer()` בתחילת הדף
+
 ---
 
 ## 📞 תמיכה
@@ -432,7 +592,7 @@ CREATE TABLE accounts (
 
 **נוצר על ידי**: TikTrack Development Team  
 **תאריך**: 25 באוגוסט 2025  
-**עודכן על ידי**: Assistant (עבודה על עמוד עסקעות)  
+**עודכן על ידי**: Assistant (עבודה על מודול טיקרים)  
 **תאריך עדכון**: 25 באוגוסט 2025  
 **מטרה**: מסירת פרויקט למישהו אחר  
 **סטטוס**: מוכן להמשך עבודה

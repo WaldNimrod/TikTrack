@@ -461,6 +461,49 @@
 
 ---
 
+### 26. Open Plans Field for Tickers
+**Status:** 🟡 Planned  
+**Priority:** High  
+**Description:** Add open_plans field to tickers table with automatic database constraint updates
+
+**Requirements:**
+- [ ] Add open_plans field to tickers table (Boolean, default=False)
+- [ ] Create database triggers for automatic updates on trade_plans table changes
+- [ ] Implement SQLAlchemy event listeners for automatic updates
+- [ ] Create migration script for database schema changes
+- [ ] Update ticker model to include open_plans field
+- [ ] Add open_plans to ticker API responses
+- [ ] Update UI to display open_plans status
+- [ ] Implement real-time updates for open_plans field
+
+**Database Triggers:**
+- [ ] trigger_trade_plan_insert_open_plans (AFTER INSERT)
+- [ ] trigger_trade_plan_update_open_plans (AFTER UPDATE)  
+- [ ] trigger_trade_plan_delete_open_plans (AFTER DELETE)
+
+**Technical Requirements:**
+- [ ] Automatic field update when trade plans status changes to/from 'open'
+- [ ] Consistent behavior with existing active_trades field
+- [ ] Performance optimization for frequent updates
+- [ ] Proper error handling and rollback mechanisms
+- [ ] Integration with existing ticker update mechanisms
+
+**Features:**
+- [ ] Real-time open plans status for all tickers
+- [ ] Fast filtering of tickers with open plans
+- [ ] Consistent data integrity across all operations
+- [ ] Enhanced ticker overview with both active trades and open plans
+- [ ] Improved data update performance for planning operations
+
+**Benefits:**
+- [ ] Faster data retrieval for tickers with open plans
+- [ ] Consistent data integrity without manual updates
+- [ ] Enhanced user experience with real-time status updates
+- [ ] Better performance for planning-related operations
+- [ ] Foundation for advanced planning features
+
+---
+
 ## 🚀 Implementation Priority
 
 ### Phase 1 - Critical Foundation
@@ -469,6 +512,7 @@
 3. **Trading Journal Database Design** (High)
 4. **Transaction Association System** (High) - Found in code
 5. **Full Position Closing Interface** (High) - Found in code
+6. **Open Plans Field for Tickers** (High) - New feature
 
 ### Phase 2 - Core Features
 6. **Trading Journal Implementation** (High)

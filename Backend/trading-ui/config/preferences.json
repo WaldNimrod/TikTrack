@@ -20,7 +20,9 @@
       "defaultTypeFilter": "swing",
       "defaultAccountFilter": "all",
       "defaultDateRangeFilter": "this_week",
-      "defaultSearchFilter": "ררר"
+      "defaultSearchFilter": "ררר",
+      "defaultCommission": 1.5,
+      "consoleCleanupInterval": 60000
     }
   },
   "currentUser": "nimrod",
@@ -33,6 +35,8 @@
     "defaultTypeFilter": "swing",
     "defaultAccountFilter": "all",
     "defaultDateRangeFilter": "this_week",
-    "defaultSearchFilter": "ררר"
+    "defaultSearchFilter": "ררר",
+    "defaultCommission": 1.5,
+    "consoleCleanupInterval": 60000
   }
 }

@@ -137,6 +137,29 @@ def update_currency(currency_id: int):
     finally:
         db.close()
 
+@currencies_bp.route('/dropdown', methods=['GET'])
+def get_currencies_dropdown():
+    """Get currencies for dropdown display"""
+    try:
+        db: Session = next(get_db())
+        currencies = CurrencyService.get_currencies_for_dropdown(db)
+        
+        return jsonify({
+            "status": "success",
+            "data": currencies,
+            "message": "Currencies for dropdown retrieved successfully",
+            "version": "v1"
+        })
+    except Exception as e:
+        logger.error(f"Error getting currencies for dropdown: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to retrieve currencies for dropdown"},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()
+
 @currencies_bp.route('/<int:currency_id>', methods=['DELETE'])
 def delete_currency(currency_id: int):
     """Delete currency"""

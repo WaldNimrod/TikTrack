@@ -1,5 +1,85 @@
 # Changelog - TikTrack
 
+## [2025-08-25] - Executions Page Completion & Global System Improvements
+
+### ✅ Executions Page - Complete Implementation (v2.5)
+- **Full Data Display**: Complete table with linked tickers and trades information
+- **Advanced Modals**: Add, Edit, Delete modals with proper z-index management
+- **Global Number Formatting**: Thousands separators for all numbers (1,234,567)
+- **Currency Formatting**: Proper currency display with commas ($1,234.56)
+- **Amount Coloring**: Green for positive, red for negative amounts
+- **Summary Statistics**: Comprehensive buy/sell counts, amounts, and balance
+- **Dynamic Linking System**: Ticker and Trade ID dropdowns with filtering
+- **Step-by-Step Activation**: Progressive field activation for Add Execution
+- **Default Values**: Quantity (100), commission from preferences
+- **Calculated Fields**: Total transaction and Realized P&L labels
+- **Help System**: Add Ticker/Plan/Trade buttons with explanations
+- **Notes Integration**: Full notes field support with validation
+- **Date Validation**: Proper date formatting and validation
+- **Source Field**: Dropdown with conditional External ID field
+- **Show Closed Trades**: Checkbox for displaying closed trades
+- **Term Translation**: Updated "רכישה" to "קניה" throughout system
+
+### 🌐 Global System Improvements
+
+#### Number Formatting System
+- **`formatNumberWithCommas()`**: Global number formatting with thousands separators
+- **`formatCurrencyWithCommas()`**: Global currency formatting with commas
+- **`colorAmountByValue()`**: Global amount coloring (green/red)
+- **Backward Compatibility**: Maintained old function names for compatibility
+- **Global Integration**: Available across all pages
+
+#### Translation System Enhancement
+- **Reorganized `translation-utils.js`**: Better function names and organization
+- **Comprehensive Functions**: Translation for all data types
+- **Global Export**: All functions available in window scope
+- **Term Updates**: "רכישה" to "קניה" throughout system
+
+#### Modal System Improvements
+- **Z-Index Management**: Consolidated z-index definitions in `apple-theme.css`
+- **Close Button Styling**: Standardized close button appearance across all modals
+- **Backdrop Behavior**: Fixed modal closing on outside click
+- **Action Buttons**: Table structure for better layout on narrow screens
+
+#### CSS System Updates
+- **Removed Inline Styles**: Moved all inline styles to global CSS files
+- **Consolidated Button Styling**: Unified button styles in global CSS
+- **Standardized Modal Headers**: Consistent modal header styling
+- **Improved Responsive Design**: Better action button layout
+
+### 🔧 Technical Fixes
+- **Modal Z-Index Issue**: Fixed modals opening behind background
+- **Action Button Layout**: Replaced flex with table structure for narrow screens
+- **Close Button Consistency**: Standardized close button styling across all modals
+- **Number Formatting**: Applied thousands separators globally
+- **Database Integration**: Added notes field, date validation, source field
+- **Preferences Integration**: Default commission loading from preferences
+
+### 📁 Files Updated
+- `trading-ui/scripts/executions.js` - Complete executions page implementation
+- `trading-ui/executions.html` - Updated HTML structure and modals
+- `trading-ui/scripts/translation-utils.js` - Reorganized with new number formatting functions
+- `trading-ui/scripts/trades.js` - Updated to use new colorAmountByValue function
+- `trading-ui/scripts/accounts.js` - Updated to use new colorAmountByValue function
+- `trading-ui/styles/apple-theme.css` - Consolidated z-index and modal styling
+- `trading-ui/styles/styles.css` - Removed inline styles, consolidated button styling
+- `Backend/models/execution.py` - Added notes field support
+- `Backend/routes/api/executions.py` - Enhanced with date conversion and validation
+
+### 📊 Database Updates
+- **Executions Table**: Added `notes TEXT` field
+- **Date Field**: Made `date` field NOT NULL with proper validation
+- **Source Field**: Enhanced with dropdown options and conditional logic
+
+### 🎯 User Experience Improvements
+- **Better Number Readability**: Thousands separators for all numbers
+- **Consistent Styling**: Unified modal and button appearance
+- **Progressive Forms**: Step-by-step field activation for better UX
+- **Helpful Explanations**: Clear guidance for users
+- **Responsive Design**: Better layout on narrow screens
+
+---
+
 ## [2025-08-24] - Active Alerts Component Enhancement & Database Constraints
 
 ### ✅ Active Alerts Component (v2.4)
@@ -98,57 +178,3 @@
 - `trading-ui/scripts/notes.js` - Content and attachment validation
 - `trading-ui/scripts/executions.js` - Trade execution validation
 - `trading-ui/scripts/accounts.js` - Account management validation
-- `trading-ui/scripts/tickers.js` - Symbol and market data validation
-- `trading-ui/scripts/trade_plans.js` - Complete CRUD with validation
-
-### 🎯 Current Status
-- **7/7 Pages**: All pages have comprehensive validation
-- **28 New Functions**: Validation functions added across all pages
-- **0 Linter Errors**: Clean code with proper documentation
-- **Production Ready**: Complete validation system implemented
-
----
-
-## [2025-08-24] - Filter System Completion
-
-### ✅ הושלם
-- **ניקוי בלבול קבצים**: הסרת `SimpleFilter` הכפול מ-`header-system.js`
-- **איחוד מערכות פילטור**: שימוש ב-`simple-filter.js` בכל העמודים
-- **תיקון סלקטורים**: עדכון ל-`.status-filter-item`, `.type-filter-item`, `.account-filter-item`
-- **תיקון API חשבונות**: עדכון ל-`/api/v1/accounts/`
-- **עדכון עמודים**: 10 עמודים ראשיים מעודכנים עם הקבצים הנכונים
-- **תיקון DOMContentLoaded listeners**: עדכון כל העמודים לשימוש במערכת החדשה
-
-### 🔧 שינויים טכניים
-- עדכון `header-system.js` לשימוש ב-`window.simpleFilter` קיים
-- תיקון סדר טעינת קבצים בכל העמודים
-- הסרת `filter-system.js` מכל העמודים
-- הוספת `simple-filter.js` לכל העמודים
-
-### 📁 קבצים שעודכנו
-- `trading-ui/scripts/header-system.js`
-- `trading-ui/scripts/simple-filter.js`
-- `trading-ui/executions.html`
-- `trading-ui/tickers.html`
-- `trading-ui/cash_flows.html`
-- `trading-ui/trades.html`
-- `trading-ui/planning.html`
-- `trading-ui/accounts.html`
-- `trading-ui/alerts.html`
-- `trading-ui/notes.html`
-- `trading-ui/trade_plans.html`
-- `trading-ui/constraints.html`
-- `trading-ui/designs.html`
-- `trading-ui/db_extradata.html`
-- `trading-ui/db_display.html`
-- `trading-ui/tests.html`
-
-### 🎯 מצב נוכחי
-- שרת רץ על http://localhost:8080
-- API חשבונות עובד כראוי
-- כל הקבצים נטענים בהצלחה
-- מערכת פילטרים מאוחדת ופועלת
-
----
-
-## [2025-08-23] - עדכון מערכת הפילטרים

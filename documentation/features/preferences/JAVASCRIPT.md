@@ -4,6 +4,23 @@
 
 This document provides comprehensive technical documentation for the `preferences.js` file, which manages all client-side functionality for the TikTrack preferences page.
 
+## Recent Updates (Version 2.4.0)
+
+### Auto-Save System Implementation
+- **Removed all manual save buttons**: All settings now save automatically on every change
+- **Enhanced user experience**: No need to manually save preferences
+- **Improved API integration**: Direct saving to backend on every preference change
+
+### API Endpoint Updates
+- **Updated API paths**: Changed from `/api/preferences` to `/api/v1/preferences`
+- **Fixed trailing slash issues**: Corrected PUT request URLs
+- **Enhanced error handling**: Better handling of API responses
+
+### New Preference Fields
+- **Added `defaultCommission`**: Default commission rate setting
+- **Added `consoleCleanupInterval`**: Console cleanup interval setting
+- **Dynamic account filter population**: Account filter now loads from `window.accountsData`
+
 ## File Information
 
 - **File**: `trading-ui/scripts/preferences.js`

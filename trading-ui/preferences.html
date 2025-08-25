@@ -88,11 +88,6 @@
             העדפות
           </div>
           <div class="table-actions">
-            <button class="refresh-btn" onclick="saveAllPreferences()" title="שמור כל ההגדרות">
-              <img src="images/icons/preferences.svg" alt="שמור הכל" class="action-icon"
-                style="width: 16px; height: 16px;"> שמור הכל
-            </button>
-            <div class="action-separator"></div>
             <button class="filter-toggle-btn" data-toggle="all" onclick="toggleAllSections()"
               title="סגור/פתח את כל הסקשנים">
               <span class="filter-icon">▲</span>
@@ -122,15 +117,6 @@
             </div>
 
             <div class="table-actions">
-              <button class="refresh-btn" onclick="resetSystemPreferences()" title="אפס הגדרות מערכת">
-                <img src="images/icons/preferences.svg" alt="אפס" class="action-icon"
-                  style="width: 16px; height: 16px;"> אפס
-              </button>
-              <button class="refresh-btn" onclick="saveSystemPreferences()" title="שמור הגדרות מערכת">
-                <img src="images/icons/preferences.svg" alt="שמור" class="action-icon"
-                  style="width: 16px; height: 16px;"> שמור
-              </button>
-              <div class="action-separator"></div>
               <button class="filter-toggle-btn" data-toggle="system" onclick="toggleSection('system')"
                 title="הצג/הסתר אזור הגדרות מערכת">
                 <span class="filter-icon">▲</span>
@@ -253,15 +239,6 @@
             </div>
 
             <div class="table-actions">
-              <button class="refresh-btn" onclick="resetPersonalPreferences()" title="אפס הגדרות אישיות">
-                <img src="images/icons/preferences.svg" alt="אפס" class="action-icon"
-                  style="width: 16px; height: 16px;"> אפס
-              </button>
-              <button class="refresh-btn" onclick="savePersonalPreferences()" title="שמור הגדרות אישיות">
-                <img src="images/icons/preferences.svg" alt="שמור" class="action-icon"
-                  style="width: 16px; height: 16px;"> שמור
-              </button>
-              <div class="action-separator"></div>
               <button class="filter-toggle-btn" data-toggle="personal" onclick="toggleSection('personal')"
                 title="הצג/הסתר אזור הגדרות אישיות">
                 <span class="filter-icon">▲</span>
@@ -307,6 +284,24 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Default commission setting -->
+              <div class="preference-item">
+                <div class="preference-label">
+                  <span class="preference-icon">💰</span>
+                  <div class="preference-text">
+                    <h4>עמלה ברירת מחדל</h4>
+                    <p>עמלה ברירת מחדל לעסקאות קניה/מכירה</p>
+                  </div>
+                </div>
+                <div class="preference-control">
+                  <div class="input-group">
+                    <input type="number" id="defaultCommissionInput" class="form-control" min="0" step="0.01"
+                      onchange="updateDefaultCommission(this.value)" placeholder="1" value="1">
+                    <span class="input-group-text">$</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -322,15 +317,6 @@
             </div>
 
             <div class="table-actions">
-              <button class="refresh-btn" onclick="resetDisplayPreferences()" title="Reset display settings">
-                <img src="images/icons/preferences.svg" alt="Reset" class="action-icon"
-                  style="width: 16px; height: 16px;"> Reset
-              </button>
-              <button class="refresh-btn" onclick="saveDisplayPreferences()" title="Save display settings">
-                <img src="images/icons/preferences.svg" alt="Save" class="action-icon"
-                  style="width: 16px; height: 16px;"> Save
-              </button>
-              <div class="action-separator"></div>
               <button class="filter-toggle-btn" data-toggle="display" onclick="toggleSection('display')"
                 title="Show/hide display settings area">
                 <span class="filter-icon">▲</span>

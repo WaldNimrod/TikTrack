@@ -805,15 +805,21 @@ function updateTradePlansTable(trade_plans) {
         <td><span class="current-text">${currentDisplay}</span></td>
         <td class="status-cell" data-status="${statusForFilter}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
         <td class="actions-cell">
-          <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">
-            🔗
-          </button>
-          <button class="btn btn-sm btn-secondary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">
-            ✏️
-          </button>
-          <button class="btn btn-sm btn-danger" onclick="window.openDeleteTradePlanModal(${design.id})" title="מחק">
-            🗑️
-          </button>
+          <table class="table table-sm table-borderless mb-0">
+            <tbody>
+              <tr>
+                <td class="p-0 pe-1">
+                  <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                </td>
+                <td class="p-0 pe-1">
+                  <button class="btn btn-sm btn-secondary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">✏️</button>
+                </td>
+                <td class="p-0">
+                  <button class="btn btn-sm btn-danger" onclick="window.openDeleteTradePlanModal(${design.id})" title="מחק">🗑️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </td>
       </tr>
     `;

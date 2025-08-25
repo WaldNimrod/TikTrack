@@ -1,0 +1,864 @@
+אני אכין עבורך את קובץ ה-HTML המסכם של הפרויקט. הנה הקובץ המלא:
+
+```html
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTrack Project Snapshot - 2025-01-15</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f7;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #007AFF, #29a6a8);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            border-bottom: 1px solid #e8e8e8;
+            padding-bottom: 30px;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section h2 {
+            color: #007AFF;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007AFF;
+            padding-bottom: 10px;
+        }
+        
+        .section h3 {
+            color: #29a6a8;
+            font-size: 1.4rem;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        .file-tree {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .file-tree .folder {
+            color: #007AFF;
+            font-weight: bold;
+        }
+        
+        .file-tree .file {
+            color: #333;
+            margin-left: 20px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status-complete {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-in-progress {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-pending {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .card h4 {
+            color: #007AFF;
+            margin-top: 0;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: right;
+        }
+        
+        .table th {
+            background: #007AFF;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 TikTrack Project Snapshot</h1>
+            <div class="subtitle">מסמך מסכם מקיף של מערכת ניהול המסחר</div>
+            <div style="margin-top: 20px; font-size: 1.1rem;">
+                תאריך: 15 בינואר 2025 | גרסה: 2.0.0
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- סקירה כללית -->
+            <div class="section">
+                <h2>🎯 סקירה כללית</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>מטרת המערכת</h4>
+                        <p>מערכת ניהול מסחר מקיפה לניהול תיקי השקעות, מעקב אחר טריידים, תכנון עסקאות וניתוח ביצועים.</p>
+                    </div>
+                    <div class="card">
+                        <h4>טכנולוגיות</h4>
+                        <ul>
+                            <li><strong>Backend:</strong> Python Flask + SQLAlchemy</li>
+                            <li><strong>Frontend:</strong> HTML5 + CSS3 + JavaScript</li>
+                            <li><strong>Database:</strong> SQLite עם WAL mode</li>
+                            <li><strong>UI Framework:</strong> AG Grid + Bootstrap</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>סטטוס פיתוח</h4>
+                        <ul>
+                            <li><span class="status-badge status-complete">Backend API</span> מוכן</li>
+                            <li><span class="status-badge status-complete">Frontend UI</span> מוכן</li>
+                            <li><span class="status-badge status-in-progress">Authentication</span> בפיתוח</li>
+                            <li><span class="status-badge status-pending">Testing</span> נדרש</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ארכיטקטורה -->
+            <div class="section">
+                <h2>🏗️ ארכיטקטורה</h2>
+                
+                <h3>Backend Architecture</h3>
+                <div class="info">
+                    <strong>ארכיטקטורה מודולרית:</strong> המערכת בנויה בשכבות עם הפרדת אחריות ברורה
+                </div>
+                
+                <div class="code-block">
+┌─────────────────────────────────────┐
+│           Presentation Layer        │
+│         (Flask Routes/API)          │
+├─────────────────────────────────────┤
+│           Business Logic Layer      │
+│           (Services)                │
+├─────────────────────────────────────┤
+│           Data Access Layer         │
+│           (Models/ORM)              │
+├─────────────────────────────────────┤
+│           Database Layer            │
+│           (SQLite)                  │
+└─────────────────────────────────────┘
+                </div>
+                
+                <h3>Frontend Architecture</h3>
+                <div class="info">
+                    <strong>מערכת גריד מודולרית:</strong> מערכת AG Grid אחידה לכל הדפים עם פילטרים מתקדמים
+                </div>
+                
+                <div class="code-block">
+┌─────────────────────────────────────┐
+│           UI Pages                  │
+│         (HTML Templates)            │
+├─────────────────────────────────────┤
+│           Grid System               │
+│         (AG Grid + Filters)         │
+├─────────────────────────────────────┤
+│           Data Management           │
+│         (JavaScript Services)       │
+├─────────────────────────────────────┤
+│           API Communication         │
+│         (REST API Calls)            │
+└─────────────────────────────────────┘
+                </div>
+            </div>
+
+            <!-- מבנה בסיס הנתונים -->
+            <div class="section">
+                <h2>��️ מבנה בסיס הנתונים</h2>
+                
+                <h3>טבלאות ראשיות</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>טבלה</th>
+                            <th>תיאור</th>
+                            <th>שדות עיקריים</th>
+                            <th>סטטוס</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>users</strong></td>
+                            <td>משתמשי המערכת</td>
+                            <td>username, email, password_hash, is_active</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>roles</strong></td>
+                            <td>תפקידים והרשאות</td>
+                            <td>name, description, permissions</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>user_roles</strong></td>
+                            <td>קשר משתמש-תפקיד</td>
+                            <td>user_id, role_id</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>tickers</strong></td>
+                            <td>מניות וניירות ערך</td>
+                            <td>symbol, name, type, currency, active_trades</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>accounts</strong></td>
+                            <td>חשבונות מסחר</td>
+                            <td>name, currency, status, cash_balance, total_value</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>trades</strong></td>
+                            <td>עסקאות מסחר</td>
+                            <td>account_id, ticker_id, status, type, total_pl</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>trade_plans</strong></td>
+                            <td>תכנוני עסקאות</td>
+                            <td>account_id, ticker_id, investment_type, planned_amount</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>executions</strong></td>
+                            <td>ביצועי עסקאות</td>
+                            <td>trade_id, action, quantity, price, fee</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>alerts</strong></td>
+                            <td>התראות מערכת</td>
+                            <td>type, condition, message, is_active</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>cash_flows</strong></td>
+                            <td>תזרימי מזומנים</td>
+                            <td>account_id, type, amount, date</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>notes</strong></td>
+                            <td>הערות ומסמכים</td>
+                            <td>content, attachment, related_entity</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>אינדקסים ויחסים</h3>
+                <div class="success">
+                    <strong>אינדקסים אסטרטגיים:</strong> נוצרו אינדקסים על שדות שנשאלים לעתים קרובות
+                </div>
+                <ul>
+                    <li><strong>tickers:</strong> symbol (unique), active_trades</li>
+                    <li><strong>trades:</strong> account_id, ticker_id, status, opened_at</li>
+                    <li><strong>accounts:</strong> status, currency</li>
+                    <li><strong>users:</strong> username, email (unique)</li>
+                </ul>
+            </div>
+
+            <!-- עץ העמודים ומבנה התיקיות -->
+            <div class="section">
+                <h2>📁 מבנה התיקיות ועץ העמודים</h2>
+                
+                <h3>מבנה Backend</h3>
+                <div class="file-tree">
+<span class="folder">Backend/</span>
+<span class="file">├── app.py</span>                    # שרת ראשי (יציב)
+<span class="file">├── app_new.py</span>                 # שרת חדש (פיתוח)
+<span class="file">├── main.py</span>                    # נקודת כניסה
+<span class="file">├── requirements.txt</span>           # תלויות
+<span class="file">├── alembic.ini</span>               # הגדרות Alembic
+<span class="folder">├── config/</span>
+<span class="file">│   ├── __init__.py</span>
+<span class="file">│   ├── settings.py</span>           # הגדרות אפליקציה
+<span class="file">│   ├── database.py</span>           # הגדרות DB
+<span class="file">│   └── logging.py</span>           # הגדרות לוגים
+<span class="folder">├── models/</span>
+<span class="file">│   ├── __init__.py</span>
+<span class="file">│   ├── base.py</span>              # מודל בסיס
+<span class="file">│   ├── ticker.py</span>            # מודל מניות
+<span class="file">│   ├── account.py</span>           # מודל חשבונות
+<span class="file">│   ├── trade.py</span>             # מודל עסקאות
+<span class="file">│   ├── trade_plan.py</span>        # מודל תכנונים
+<span class="file">│   ├── alert.py</span>             # מודל התראות
+<span class="file">│   ├── cash_flow.py</span>         # מודל תזרימים
+<span class="file">│   ├── note.py</span>              # מודל הערות
+<span class="file">│   ├── execution.py</span>         # מודל ביצועים
+<span class="file">│   ├── user.py</span>              # מודל משתמשים
+<span class="file">│   ├── role.py</span>              # מודל תפקידים
+<span class="file">│   └── user_role.py</span>         # מודל קשר משתמש-תפקיד
+<span class="folder">├── services/</span>
+<span class="file">│   ├── __init__.py</span>
+<span class="file">│   ├── ticker_service.py</span>    # שירות מניות
+<span class="file">│   ├── account_service.py</span>   # שירות חשבונות
+<span class="file">│   ├── trade_service.py</span>     # שירות עסקאות
+<span class="file">│   ├── trade_plan_service.py</span> # שירות תכנונים
+<span class="file">│   └── auth_service.py</span>      # שירות אימות
+<span class="folder">├── routes/</span>
+<span class="file">│   ├── __init__.py</span>
+<span class="file">│   ├── pages.py</span>             # נתיבי דפים
+<span class="folder">│   └── api/</span>
+<span class="file">│       ├── __init__.py</span>
+<span class="file">│       ├── tickers.py</span>        # API מניות
+<span class="file">│       ├── accounts.py</span>       # API חשבונות
+<span class="file">│       ├── trades.py</span>         # API עסקאות
+<span class="file">│       ├── trade_plans.py</span>    # API תכנונים
+<span class="file">│       ├── alerts.py</span>         # API התראות
+<span class="file">│       ├── cash_flows.py</span>     # API תזרימים
+<span class="file">│       ├── notes.py</span>          # API הערות
+<span class="file">│       ├── executions.py</span>     # API ביצועים
+<span class="file">│       ├── auth.py</span>           # API אימות
+<span class="file">│       └── user_roles.py</span>     # API תפקידים
+<span class="folder">├── migrations/</span>
+<span class="file">│   ├── env.py</span>               # סביבת Alembic
+<span class="file">│   ├── script.py.mako</span>       # תבנית מיגרציה
+<span class="folder">│   └── versions/</span>
+<span class="file">│       └── 65880dacea01_initial_migration.py</span>
+<span class="folder">├── tests/</span>
+<span class="file">│   ├── __init__.py</span>
+<span class="file">│   ├── conftest.py</span>          # הגדרות בדיקות
+<span class="folder">│   ├── unit/</span>
+<span class="file">│   │   └── test_models.py</span>    # בדיקות מודלים
+<span class="folder">│   └── integration/</span>
+<span class="file">│       └── test_api.py</span>       # בדיקות API
+<span class="folder">├── utils/</span>
+<span class="file">│   ├── __init__.py</span>
+<span class="file">│   └── auth.py</span>              # כלי אימות
+<span class="folder">├── db/</span>
+<span class="file">│   ├── simpleTrade.db</span>       # בסיס נתונים ראשי
+<span class="file">│   ├── simpleTrade.db-shm</span>   # WAL shared memory
+<span class="file">│   └── simpleTrade.db-wal</span>   # WAL log
+<span class="folder">├── logs/</span>
+<span class="file">│   └── server_detailed.log</span>   # לוגי שרת
+<span class="folder">├── scripts/</span>
+<span class="file">│   └── deploy.sh</span>             # סקריפט deployment
+<span class="file">├── Dockerfile</span>               # Docker image
+<span class="file">├── docker-compose.yml</span>       # Docker orchestration
+<span class="file">├── nginx.conf</span>               # הגדרות Nginx
+<span class="file">└── Makefile</span>                 # פקודות פיתוח
+                </div>
+                
+                <h3>מבנה Frontend</h3>
+                <div class="file-tree">
+<span class="folder">trading-ui/</span>
+<span class="file">├── index.html</span>              # דף כניסה
+<span class="file">├── database.html</span>           # דף ניהול נתונים (ראשי)
+<span class="file">├── tracking.html</span>           # דף מעקב עסקאות
+<span class="file">├── planning.html</span>           # דף תכנון עסקאות
+<span class="file">├── accounts.html</span>           # דף ניהול חשבונות
+<span class="file">├── alerts.html</span>             # דף התראות
+<span class="file">├── research.html</span>           # דף מחקר
+<span class="file">├── preferences.html</span>        # דף העדפות
+<span class="file">├── test-api.html</span>           # דף בדיקת API
+<span class="file">├── test-dbconnect.html</span>     # דף בדיקת חיבור DB
+<span class="file">└── test-functions.html</span>     # דף בדיקת פונקציות
+<span class="folder">├── styles/</span>
+<span class="file">│   ├── styles.css</span>           # סגנונות מרכזיים
+<span class="file">│   ├── apple-theme.css</span>      # ערכת נושא Apple
+<span class="file">│   ├── menu.css</span>             # סגנונות תפריט
+<span class="file">│   ├── grid.css</span>             # סגנונות גריד
+<span class="file">│   └── grid-table.css</span>       # סגנונות טבלאות
+<span class="folder">├── scripts/</span>
+<span class="file">│   ├── main.js</span>              # סקריפט ראשי
+<span class="file">│   ├── auth.js</span>              # מערכת אימות
+<span class="file">│   ├── menu.js</span>              # ניהול תפריט
+<span class="file">│   ├── app-header.js</span>        # כותרת אפליקציה
+<span class="file">│   ├── grid-core.js</span>         # לוגיקת גריד בסיסית
+<span class="file">│   ├── grid-filters.js</span>      # מערכת פילטרים
+<span class="file">│   ├── grid-data.js</span>         # ניהול נתונים
+<span class="file">│   ├── grid-init.js</span>         # אתחול גריד
+<span class="file">│   ├── README_GRID_SYSTEM.md</span> # תיעוד מערכת גריד
+<span class="file">│   ├── README_GRID_UNIVERSAL.md</span> # מדריך גריד אוניברסלי
+<span class="file">│   └── README_COLUMN_SYSTEM.md</span> # מדריך מערכת עמודות
+<span class="folder">└── images/</span>
+<span class="file">│   ├── logo.svg</span>             # לוגו SVG
+<span class="file">│   ├── tiktrack_logo_32px.png</span> # לוגו 32px
+<span class="file">│   ├── tiktrack_logo_64px.png</span> # לוגו 64px
+<span class="file">│   ├── tiktrack_logo_128px.png</span> # לוגו 128px
+<span class="file">│   ├── tiktrack_logo_256px.png</span> # לוגו 256px
+<span class="file">│   └── tiktrack_logo_400px.png</span> # לוגו 400px
+                </div>
+            </div>
+
+            <!-- אובייקטים ושיטות -->
+            <div class="section">
+                <h2>�� אובייקטים ושיטות עיקריות</h2>
+                
+                <h3>Backend Services</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>TickerService</h4>
+                        <ul>
+                            <li><code>get_all_tickers()</code> - קבלת כל המניות</li>
+                            <li><code>get_ticker_by_id(id)</code> - קבלת מניה לפי ID</li>
+                            <li><code>create_ticker(data)</code> - יצירת מניה חדשה</li>
+                            <li><code>update_ticker(id, data)</code> - עדכון מניה</li>
+                            <li><code>delete_ticker(id)</code> - מחיקת מניה</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>AccountService</h4>
+                        <ul>
+                            <li><code>get_all_accounts()</code> - קבלת כל החשבונות</li>
+                            <li><code>get_account_by_id(id)</code> - קבלת חשבון לפי ID</li>
+                            <li><code>create_account(data)</code> - יצירת חשבון חדש</li>
+                            <li><code>update_account(id, data)</code> - עדכון חשבון</li>
+                            <li><code>get_account_stats(id)</code> - סטטיסטיקות חשבון</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>TradeService</h4>
+                        <ul>
+                            <li><code>get_all_trades()</code> - קבלת כל העסקאות</li>
+                            <li><code>get_trades_by_account(account_id)</code> - עסקאות לפי חשבון</li>
+                            <li><code>create_trade(data)</code> - יצירת עסקה חדשה</li>
+                            <li><code>update_trade(id, data)</code> - עדכון עסקה</li>
+                            <li><code>close_trade(id)</code> - סגירת עסקה</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>TradePlanService</h4>
+                        <ul>
+                            <li><code>get_all_plans()</code> - קבלת כל התכנונים</li>
+                            <li><code>get_plans_by_account(account_id)</code> - תכנונים לפי חשבון</li>
+                            <li><code>create_plan(data)</code> - יצירת תכנון חדש</li>
+                            <li><code>update_plan(id, data)</code> - עדכון תכנון</li>
+                            <li><code>cancel_plan(id, reason)</code> - ביטול תכנון</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h3>Frontend JavaScript Objects</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Grid System</h4>
+                        <ul>
+                            <li><code>initializeGridSystem()</code> - אתחול מערכת גריד</li>
+                            <li><code>createGrid(containerId, data)</code> - יצירת גריד חדש</li>
+                            <li><code>updateGridData(newData)</code> - עדכון נתוני גריד</li>
+                            <li><code>applyFilters(filters)</code> - החלת פילטרים</li>
+                            <li><code>exportGridData(format)</code> - ייצוא נתונים</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Authentication</h4>
+                        <ul>
+                            <li><code>login(username, password)</code> - התחברות</li>
+                            <li><code>logout()</code> - התנתקות</li>
+                            <li><code>refreshToken()</code> - רענון טוקן</li>
+                            <li><code>checkAuth()</code> - בדיקת אימות</li>
+                            <li><code>getCurrentUser()</code> - קבלת משתמש נוכחי</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>API Communication</h4>
+                        <ul>
+                            <li><code>apiCall(endpoint, method, data)</code> - קריאת API</li>
+                            <li><code>handleApiError(error)</code> - טיפול בשגיאות</li>
+                            <li><code>retryApiCall(call, maxRetries)</code> - ניסיון חוזר</li>
+                            <li><code>showNotification(message, type)</code> - הצגת הודעות</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Data Management</h4>
+                        <ul>
+                            <li><code>loadTableData(tableName)</code> - טעינת נתוני טבלה</li>
+                            <li><code>saveTableData(tableName, data)</code> - שמירת נתונים</li>
+                            <li><code>validateForm(formData)</code> - אימות טופס</li>
+                            <li><code>formatCurrency(amount)</code> - עיצוב מטבע</li>
+                            <li><code>formatDate(date)</code> - עיצוב תאריך</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Endpoints -->
+            <div class="section">
+                <h2>🌐 API Endpoints</h2>
+                
+                <h3>Authentication API</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>תיאור</th>
+                            <th>סטטוס</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/api/v1/auth/login</code></td>
+                            <td>התחברות משתמש</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/api/v1/auth/logout</code></td>
+                            <td>התנתקות משתמש</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/api/v1/auth/refresh</code></td>
+                            <td>רענון טוקן</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/api/v1/auth/me</code></td>
+                            <td>קבלת משתמש נוכחי</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Data Management API</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>תיאור</th>
+                            <th>סטטוס</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/api/v1/tickers/</code></td>
+                            <td>קבלת כל המניות</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/api/v1/tickers/</code></td>
+                            <td>יצירת מניה חדשה</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td><code>/api/v1/tickers/{id}/</code></td>
+                            <td>עדכון מניה</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td><code>/api/v1/tickers/{id}/</code></td>
+                            <td>מחיקת מניה</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/api/v1/accounts/</code></td>
+                            <td>קבלת כל החשבונות</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/api/v1/accounts/</code></td>
+                            <td>יצירת חשבון חדש</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td><code>/api/v1/accounts/{id}/</code></td>
+                            <td>עדכון חשבון</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td><code>/api/v1/accounts/{id}/</code></td>
+                            <td>מחיקת חשבון</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/api/v1/trades/</code></td>
+                            <td>קבלת כל העסקאות</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/api/v1/trades/</code></td>
+                            <td>יצירת עסקה חדשה</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td><code>/api/v1/trades/{id}/</code></td>
+                            <td>עדכון עסקה</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td><code>/api/v1/trades/{id}/</code></td>
+                            <td>מחיקת עסקה</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/api/v1/trade_plans/</code></td>
+                            <td>קבלת כל התכנונים</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/api/v1/trade_plans/</code></td>
+                            <td>יצירת תכנון חדש</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td><code>/api/v1/trade_plans/{id}/</code></td>
+                            <td>עדכון תכנון</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td><code>/api/v1/trade_plans/{id}/</code></td>
+                            <td>מחיקת תכנון</td>
+                            <td><span class="status-badge status-complete">מוכן</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- תכונות מתקדמות -->
+            <div class="section">
+                <h2>�� תכונות מתקדמות</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h4>מערכת גריד מודולרית</h4>
+                        <ul>
+                            <li><strong>AG Grid Enterprise:</strong> גריד מתקדם עם פילטרים</li>
+                            <li><strong>פילטרים דינמיים:</strong> סינון בזמן אמת</li>
+                            <li><strong>ייצוא נתונים:</strong> Excel, CSV, PDF</li>
+                            <li><strong>עיצוב מותאם:</strong> תמיכה בעברית ו-RTL</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>מערכת אימות מתקדמת</h4>
+                        <ul>
+                            <li><strong>JWT Tokens:</strong> אימות מאובטח</li>
+                            <li><strong>Role-Based Access:</strong> הרשאות מבוססות תפקיד</li>
+                            <li><strong>Auto Refresh:</strong> רענון אוטומטי של טוקנים</li>
+                            <li><strong>Session Management:</strong> ניהול סשנים</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>ניהול נתונים מתקדם</h4>
+                        <ul>
+                            <li><strong>SQLAlchemy ORM:</strong> ניהול נתונים מונחה עצמים</li>
+                            <li><strong>Alembic Migrations:</strong> ניהול גרסאות DB</li>
+                            <li><strong>Data Validation:</strong> אימות נתונים</li>
+                            <li><strong>Error Handling:</strong> טיפול בשגיאות מתקדם</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>DevOps ו-Deployment</h4>
+                        <ul>
+                            <li><strong>Docker Support:</strong> containerization</li>
+                            <li><strong>Nginx Reverse Proxy:</strong> פרוקסי הפוך</li>
+                            <li><strong>CI/CD Pipeline:</strong> אוטומציה של deployment</li>
+                            <li><strong>Health Checks:</strong> בדיקות בריאות שרת</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- בעיות ידועות ותכניות עתידיות -->
+            <div class="section">
+                <h2>⚠️ בעיות ידועות ותכניות עתידיות</h2>
+                
+                <h3>בעיות ידועות</h3>
+                <div class="warning">
+                    <strong>שרת חדש לא יציב:</strong> app_new.py נתקע וקורס לעתים קרובות
+                </div>
+                <ul>
+                    <li><strong>יציבות שרת:</strong> app_new.py לא יציב, app.py יציב יותר</li>
+                    <li><strong>שגיאות בטבלאות:</strong> טבלת משתמשים ו-tradeplans מחזירות 500 error</li>
+                    <li><strong>Authentication:</strong> בעיות בחלק מהטבלאות</li>
+                    <li><strong>Testing:</strong> חסרות בדיקות integration מקיפות</li>
+                </ul>
+                
+                <h3>תכניות עתידיות</h3>
+                <div class="success">
+                    <strong>שיפורים מתוכננים:</strong> רשימת תכונות לשיפור המערכת
+                </div>
+                <ul>
+                    <li><strong>OpenAPI Documentation:</strong> תיעוד API מלא עם Swagger</li>
+                    <li><strong>Performance Monitoring:</strong> ניטור ביצועים מתקדם</li>
+                    <li><strong>Advanced Analytics:</strong> כלי ניתוח מתקדמים</li>
+                    <li><strong>Real-time Updates:</strong> עדכונים בזמן אמת</li>
+                    <li><strong>Mobile App:</strong> אפליקציה למובייל</li>
+                    <li><strong>Market Data Integration:</strong> אינטגרציה עם נתוני שוק</li>
+                </ul>
+            </div>
+
+            <!-- סיכום -->
+            <div class="section">
+                <h2>📋 סיכום</h2>
+                
+                <div class="info">
+                    <strong>TikTrack היא מערכת ניהול מסחר מקיפה ומתקדמת</strong> המספקת פתרון מלא לניהול תיקי השקעות, מעקב אחר עסקאות ותכנון עסקאות עתידיות.
+                </div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h4>✅ מה עובד היטב</h4>
+                        <ul>
+                            <li>ארכיטקטורה מודולרית וברורה</li>
+                            <li>מערכת גריד מתקדמת ויציבה</li>
+                            <li>API מקיף עם כל הפונקציונליות הנדרשת</li>
+                            <li>מסד נתונים מתוכנן היטב</li>
+                            <li>ממשק משתמש מודרני וידידותי</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>🔧 מה צריך שיפור</h4>
+                        <ul>
+                            <li>יציבות שרת חדש</li>
+                            <li>בדיקות מקיפות</li>
+                            <li>תיעוד API מלא</li>
+                            <li>ניטור ביצועים</li>
+                            <li>אינטגרציה עם נתוני שוק</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="success">

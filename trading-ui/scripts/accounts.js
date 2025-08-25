@@ -287,18 +287,24 @@ function updateAccountsTable(accounts) {
       </td>
       <td>$${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}</td>
       <td>$${account.total_value ? account.total_value.toLocaleString() : '0'}</td>
-      <td>${window.colorAmount(account.total_pl || 0, `$${account.total_pl ? account.total_pl.toLocaleString() : '0'}`)}</td>
+                      <td>${window.colorAmountByValue(account.total_pl || 0, `$${account.total_pl ? account.total_pl.toLocaleString() : '0'}`)}</td>
       <td>${account.notes || '-'}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editAccount(${account.id})" title="ערוך חשבון">
-          ✏️
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק חשבון">
-          🗑️
-        </button>
-        <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAccount(${account.id})" title="צפה באלמנטים מקושרים">
-          🔗
-        </button>
+        <table class="table table-sm table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-secondary" onclick="editAccount(${account.id})" title="ערוך חשבון">✏️</button>
+              </td>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק חשבון">🗑️</button>
+              </td>
+              <td class="p-0">
+                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAccount(${account.id})" title="צפה באלמנטים מקושרים">🔗</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </td>
     </tr>
   `}).join('');

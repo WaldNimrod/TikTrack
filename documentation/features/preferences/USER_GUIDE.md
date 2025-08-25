@@ -4,6 +4,18 @@
 
 The TikTrack Preferences page allows you to customize your trading interface, set default values, and configure system settings to match your trading style and preferences.
 
+## Recent Updates (Version 2.4.0)
+
+### Auto-Save System
+- **Automatic Saving**: All settings now save automatically when you change them
+- **No Manual Save Required**: You no longer need to click "Save" buttons
+- **Instant Feedback**: Changes are applied immediately across the application
+
+### New Settings
+- **Default Commission**: Set your default commission rate for trades
+- **Console Cleanup Interval**: Configure how often the console is cleaned up
+- **Enhanced Account Filter**: Account filter now shows all your available accounts
+
 ## Accessing Preferences
 
 1. Open TikTrack application in your web browser
@@ -15,8 +27,8 @@ The TikTrack Preferences page allows you to customize your trading interface, se
 The preferences page is organized into collapsible sections:
 
 ### Main Controls
-- **Save All Settings**: Saves all your preferences at once
 - **Toggle All Sections**: Opens or closes all sections simultaneously
+- **Auto-Save**: All settings save automatically when changed (no manual save required)
 
 ### Sections Overview
 1. **System Settings**: Core system configuration
@@ -40,7 +52,7 @@ Configure core system parameters that affect the entire application.
 - **Purpose**: Controls how dates and times are displayed throughout the application
 
 ### Actions Available
-- **Save Settings**: Apply system setting changes
+- **Auto-Save**: Settings save automatically when changed
 - **Reset to Defaults**: Restore original system settings
 
 ## Personal Settings
@@ -59,8 +71,20 @@ Customize your individual trading preferences and default values.
 - **Purpose**: Automatically fills this percentage when creating new trades
 - **Example**: Setting 10% means new trades will default to 10% target price
 
+### Default Commission
+- **Range**: 0.0 to 100.0
+- **Default**: 0.0
+- **Purpose**: Sets the default commission rate for new trades
+- **Example**: Setting 2.5 means new trades will default to 2.5% commission
+
+### Console Cleanup Interval
+- **Range**: 60 to 3600 seconds
+- **Default**: 300 seconds (5 minutes)
+- **Purpose**: Controls how often the browser console is automatically cleaned
+- **Example**: Setting 600 means console will be cleaned every 10 minutes
+
 ### Actions Available
-- **Save Settings**: Apply personal setting changes
+- **Auto-Save**: Settings save automatically when changed
 - **Reset to Defaults**: Restore original personal settings
 
 ## Security Settings
@@ -191,7 +215,7 @@ The system provides feedback for all actions:
 ### Getting Started
 1. **Review Defaults**: Check all default values when first using the system
 2. **Test Settings**: Make small changes first to see how they affect your workflow
-3. **Save Regularly**: Use "Save All Settings" frequently to avoid losing changes
+3. **Auto-Save**: All changes save automatically - no manual saving required
 
 ### Optimization
 1. **Personal Defaults**: Set stop loss and target price defaults based on your trading strategy
@@ -261,7 +285,7 @@ Planned improvements to the preferences system:
 
 ### Issue: Page Shows Unsaved Changes Warning
 - **Cause**: You have modified settings but not saved them
-- **Solution**: Click "Save All Settings" or individual save buttons
+- **Solution**: Settings now save automatically - this warning should not appear in normal operation
 
 ### Issue: Sections Won't Open/Close
 - **Cause**: JavaScript error or browser compatibility issue

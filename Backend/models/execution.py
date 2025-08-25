@@ -13,6 +13,7 @@ class Execution(BaseModel):
     price = Column(Float, nullable=False)  # NOT NULL per constraints
     fee = Column(Float, default=0, nullable=True)
     source = Column(String(50), default='manual', nullable=True)  # manual, api, etc.
+    notes = Column(String(500), nullable=True)  # הערות על העסקה
     
     # Relationships
     trade = relationship("Trade", back_populates="executions")

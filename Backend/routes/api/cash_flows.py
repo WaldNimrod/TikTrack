@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session, joinedload
 from config.database import get_db
 from models.cash_flow import CashFlow
+from models.currency import Currency
 from services.validation_service import ValidationService
 import logging
 

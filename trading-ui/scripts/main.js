@@ -187,6 +187,36 @@ function initializeCoreSystems() {
   // Set up global error handlers
   window.addEventListener('error', handleGlobalError);
   window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+  // Set up global modal configurations
+  setupGlobalModalConfigurations();
+}
+
+/**
+ * Set up global modal configurations to prevent closing on backdrop click
+ */
+function setupGlobalModalConfigurations() {
+  console.log('🔄 Setting up global modal configurations...');
+  
+  // Find all modals and configure them
+  const modals = document.querySelectorAll('.modal');
+  
+  modals.forEach(modalElement => {
+    // Set backdrop to static and disable keyboard
+    modalElement.setAttribute('data-bs-backdrop', 'static');
+    modalElement.setAttribute('data-bs-keyboard', 'false');
+    
+    // Prevent closing on backdrop click
+    modalElement.addEventListener('click', function(event) {
+      if (event.target === modalElement) {
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+      }
+    });
+    
+    console.log(`✅ Modal ${modalElement.id || 'unnamed'} configured with static backdrop`);
+  });
 }
 
 /**

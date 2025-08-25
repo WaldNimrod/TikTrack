@@ -64,6 +64,7 @@ def create_execution():
     """Create new execution"""
     try:
         data = request.get_json()
+        logger.info(f"Received execution data: {data}")
         db: Session = next(get_db())
         
         # Validate data against constraints
@@ -77,6 +78,16 @@ def create_execution():
                 "error": {"message": f"Execution validation failed: {error_message}"},
                 "version": "v1"
             }), 400
+        
+        logger.info(f"Creating execution with data: {data}")
+        
+        # Convert date string to datetime object if provided
+        if 'date' in data and data['date']:
+            from datetime import datetime
+            try:
+                data['date'] = datetime.fromisoformat(data['date'].replace('Z', '+00:00'))
+            except ValueError:
+                data['date'] = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S')
         
         execution = Execution(**data)
         db.add(execution)
@@ -117,6 +128,14 @@ def update_execution(execution_id: int):
                     "error": {"message": f"Execution validation failed: {error_message}"},
                     "version": "v1"
                 }), 400
+            
+            # Convert date string to datetime object if provided
+            if 'date' in data and data['date']:
+                from datetime import datetime
+                try:
+                    data['date'] = datetime.fromisoformat(data['date'].replace('Z', '+00:00'))
+                except ValueError:
+                    data['date'] = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S')
             
             for key, value in data.items():
                 if hasattr(execution, key):

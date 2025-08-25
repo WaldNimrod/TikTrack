@@ -98,16 +98,16 @@ const TABLE_COLUMN_MAPPINGS = {
     ],
 
     // טבלת טיקרים (Tickers)
-    'tickers': [
-        'symbol',          // 0 - סמל
-        'name',            // 1 - שם
-        'type',            // 2 - סוג
-        'remarks',         // 3 - הערות
-        'currency',        // 4 - מטבע
-        'active_trades',   // 5 - טריידים פעילים
-        'created_at',      // 6 - נוצר ב
-        'updated_at'       // 7 - עודכן ב
-    ],
+            'tickers': [
+            'symbol',          // 0 - סמל
+            'active_trades',   // 1 - יש טריידים
+            'type',            // 2 - סוג
+            'currency',        // 3 - מטבע
+            'updated_at',      // 4 - עודכן ב
+            'name',            // 5 - שם
+            'created_at',      // 6 - נוצר ב
+            'remarks'          // 7 - הערות
+        ],
 
     // טבלת התראות (Alerts)
     'alerts': [
@@ -255,7 +255,7 @@ function getColumnValue(item, columnIndex, tableType) {
             return item.trade_info || '';
         }
         if (fieldName === 'action') {
-            const actionDisplay = (item.action || item.type) === 'buy' ? 'רכישה' :
+            const actionDisplay = (item.action || item.type) === 'buy' ? 'קניה' :
                 (item.action || item.type) === 'sell' ? 'מכירה' : (item.action || item.type);
             return actionDisplay;
         }

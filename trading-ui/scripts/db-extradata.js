@@ -186,8 +186,18 @@ function updateCurrenciesTable(currencies) {
       <td>${currency.id || ''}</td>
       <td data-date="${currency.created_at}">${currency.created_at || ''}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editCurrency(${currency.id})" title="ערוך">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteCurrency(${currency.id})" title="מחק">🗑️</button>
+        <table class="table table-sm table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-secondary" onclick="editCurrency(${currency.id})" title="ערוך">✏️</button>
+              </td>
+              <td class="p-0">
+                <button class="btn btn-sm btn-danger" onclick="deleteCurrency(${currency.id})" title="מחק">🗑️</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </td>
     </tr>
   `).join('');
@@ -271,9 +281,19 @@ function updateNoteRelationTypesTable(noteRelationTypes) {
       <td>${type.description || ''}</td>
       <td>${type.id || ''}</td>
       <td data-date="${type.created_at}">${type.created_at || ''}</td>
-      <td>
-        <button class="btn btn-sm btn-secondary" onclick="editNoteRelationType(${type.id})" title="ערוך">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteNoteRelationType(${type.id})" title="מחק">🗑️</button>
+      <td class="actions-cell">
+        <table class="table table-sm table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-secondary" onclick="editNoteRelationType(${type.id})" title="ערוך">✏️</button>
+              </td>
+              <td class="p-0">
+                <button class="btn btn-sm btn-danger" onclick="deleteNoteRelationType(${type.id})" title="מחק">🗑️</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </td>
     </tr>
   `}).join('');

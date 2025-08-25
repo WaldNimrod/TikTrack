@@ -99,6 +99,115 @@ This document provides a comprehensive style guide for all UI components in the 
 }
 ```
 
+## Modal Components
+
+### Standard Modal Structure
+```css
+/* Modal Dialog Container */
+.modal-dialog.modal-lg {
+  border: 2px solid #6c757d !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Modal Content */
+.modal-content {
+  background: var(--apple-bg-elevated);
+  border-radius: 6px;
+  box-shadow: var(--apple-shadow-heavy);
+  border: 1px solid var(--apple-border-light);
+  z-index: 1000000000 !important;
+}
+
+/* Modal Header Base */
+.modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+```
+
+### Modal Header Types
+
+#### Colored Header (Default)
+```css
+.modal-header-colored {
+  background: linear-gradient(135deg, #29a6a8, #1f8a8c) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+```
+
+#### Danger Header
+```css
+.modal-header-danger {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+```
+
+#### Success Header (Trade Plans)
+```css
+#addTradePlanModal .modal-header {
+  background: linear-gradient(135deg, #28a745, #20c997) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+```
+
+#### Info Header (Tickers)
+```css
+#addTickerModal .modal-header,
+#editTickerModal .modal-header {
+  background: linear-gradient(135deg, #17a2b8, #138496) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+```
+
+#### Warning Header (Alerts)
+```css
+#addAlertModal .modal-header,
+#editAlertModal .modal-header {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+}
+```
+
+#### Trade Header
+```css
+#addTradeModal .modal-header {
+  background: linear-gradient(135deg, #ff9c05, #ff8c00);
+  color: white;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+```
+
+### Modal Z-Index Hierarchy
+```css
+.modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+.modal-content {
+  z-index: 1000000001 !important;
+}
+
+.modal-backdrop {
+  z-index: 999999998 !important;
+}
+```
+
 ### Design Cards
 ```css
 .design-card {

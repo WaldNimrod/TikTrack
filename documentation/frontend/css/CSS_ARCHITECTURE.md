@@ -1,6 +1,6 @@
 ## Overview
 
-This document describes the CSS architecture for the TikTrack frontend, focusing on the new unified header system and filter components.
+This document describes the CSS architecture for the TikTrack frontend, focusing on the new unified header system, filter components, and modal styling standards.
 
 ## New Header System Architecture
 
@@ -526,8 +526,201 @@ if (window.filterSystem) {
 4. **Testing Framework**: Add comprehensive unit tests
 5. **Performance Monitoring**: Add performance metrics
 
+## Modal Styling Standards
+
+### Overview
+
+The modal system in TikTrack follows strict styling standards to ensure consistent visual appearance and eliminate visual artifacts like white gaps between modal components.
+
+### Border Radius Standardization
+
+#### Core Modal Components
+All modal components use a standardized 6px border radius for consistency:
+
+```css
+/* Modal Dialog Container */
+.modal-dialog.modal-lg {
+  border: 2px solid #6c757d !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Modal Content */
+.modal-content {
+  background: var(--apple-bg-elevated);
+  border-radius: 6px;
+  box-shadow: var(--apple-shadow-heavy);
+  border: 1px solid var(--apple-border-light);
+  z-index: 1000000000 !important;
+}
+
+/* Modal Headers */
+.modal-header-colored {
+  background: linear-gradient(135deg, #29a6a8, #1f8a8c) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+
+.modal-header-danger {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+
+/* Base Modal Header */
+.modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+```
+
+#### Specific Modal Types
+
+##### Trade Plan Modals
+```css
+#addTradePlanModal .modal-header {
+  background: linear-gradient(135deg, #28a745, #20c997) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+```
+
+##### Ticker Modals
+```css
+#addTickerModal .modal-header,
+#editTickerModal .modal-header {
+  background: linear-gradient(135deg, #17a2b8, #138496) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+```
+
+##### Alert Modals
+```css
+#addAlertModal .modal-header,
+#editAlertModal .modal-header {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+}
+```
+
+##### Trade Modals
+```css
+#addTradeModal .modal-header {
+  background: linear-gradient(135deg, #ff9c05, #ff8c00);
+  color: white;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+}
+```
+
+### Visual Consistency Rules
+
+#### 1. Border Radius Hierarchy
+- **Modal Dialog**: 6px (outer container)
+- **Modal Content**: 6px (inner container)
+- **Modal Header**: 6px 6px 0 0 (top corners only)
+
+#### 2. Gap Prevention
+- All border radius values must match between adjacent elements
+- No gaps should appear between modal header and content
+- Consistent styling across all modal types
+
+#### 3. Z-Index Management
+```css
+.modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+.modal-content {
+  z-index: 1000000001 !important;
+}
+
+.modal-backdrop {
+  z-index: 999999998 !important;
+}
+```
+
+### Implementation Guidelines
+
+#### 1. New Modal Creation
+When creating new modals, always follow these standards:
+
+```css
+/* Template for new modal */
+.new-modal .modal-dialog {
+  border-radius: 6px;
+}
+
+.new-modal .modal-content {
+  border-radius: 6px;
+}
+
+.new-modal .modal-header {
+  border-radius: 6px 6px 0 0;
+  /* Add specific styling here */
+}
+```
+
+#### 2. Modal Header Types
+Choose appropriate header styling based on modal purpose:
+
+- **Success/Add**: Green gradient (`#28a745` to `#20c997`)
+- **Info/Edit**: Blue gradient (`#17a2b8` to `#138496`)
+- **Warning/Danger**: Red gradient (`#dc3545` to `#c82333`)
+- **Trade**: Orange gradient (`#ff9c05` to `#ff8c00`)
+
+#### 3. Responsive Considerations
+- Modals maintain consistent border radius on all screen sizes
+- No scaling of border radius values
+- Consistent visual appearance across devices
+
+### Troubleshooting
+
+#### Common Issues
+
+##### 1. White Gap Between Header and Border
+**Cause**: Mismatched border radius values between modal dialog and header
+**Solution**: Ensure all components use 6px border radius
+
+##### 2. Inconsistent Modal Appearance
+**Cause**: Different border radius values across modal types
+**Solution**: Apply standardized 6px border radius to all modal components
+
+##### 3. Z-Index Conflicts
+**Cause**: Incorrect z-index hierarchy
+**Solution**: Follow the established z-index pattern (dialog: 1000000000, content: 1000000001, backdrop: 999999998)
+
+### Best Practices
+
+#### 1. CSS Organization
+- Keep modal styles in `apple-theme.css` for global consistency
+- Use specific selectors to avoid conflicts
+- Maintain clear separation between different modal types
+
+#### 2. Performance
+- Use efficient CSS selectors
+- Minimize use of `!important` declarations
+- Optimize for rendering performance
+
+#### 3. Maintenance
+- Document all modal styling changes
+- Test across different browsers and screen sizes
+- Maintain consistency with existing design patterns
+
 ## Conclusion
 
 The new header system provides a modern, responsive, and feature-rich interface for the TikTrack application. It maintains backward compatibility while offering enhanced functionality and improved user experience.
+
+The modal styling standards ensure consistent visual appearance across all modal dialogs, eliminating visual artifacts and providing a professional user interface.
 
 The modular architecture allows for easy maintenance and future enhancements, while the comprehensive documentation ensures smooth development and deployment processes.

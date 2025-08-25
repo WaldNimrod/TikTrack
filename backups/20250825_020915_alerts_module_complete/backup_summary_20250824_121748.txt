@@ -1,0 +1,29 @@
+=== GIT BACKUP COMPLETED ===
+Date: Sun Aug 24 12:17:48 IDT 2025
+Commit: 941c4b8c09a9f9c0c6951a09c58e9c3942f7ce80
+Branch: main
+
+Files included:
+Backend/app.py
+Backend/db/simpleTrade_new.db
+Backend/db/simpleTrade_new.db-shm
+Backend/db/simpleTrade_new.db.backup_20250824_070708
+Backend/migrations/update_alert_condition_constraint.py
+Backend/models/alert.py
+Backend/routes/api/linked_items.py
+TODO_GENERAL_CLEANUP.md
+add_sample_alerts.py
+backups/$(ls -t backups | head -1)/README_BACKUP.md
+documentation/database/README.md
+trading-ui/accounts.html
+trading-ui/alerts.html
+trading-ui/backups/ui_temp_files/research_new.html
+trading-ui/db_display.html
+trading-ui/db_extradata.html
+trading-ui/designs.html
+trading-ui/research.html
+trading-ui/scripts/account-modal.js
+trading-ui/scripts/accounts.js
+...
+Total files: 43
+Database included: Backend/db/simpleTrade_new.db

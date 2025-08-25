@@ -41,20 +41,20 @@ class Ticker(BaseModel):
     symbol = Column(String(10), unique=True, nullable=False, index=True, 
                    comment="Ticker symbol - must be unique")
     name = Column(String(100), nullable=True, 
-                 comment="Company or asset name - max 25 chars per constraints")
+                 comment="Company or asset name - max 12 chars per constraints")
     type = Column(String(20), nullable=True, 
                  comment="Asset type: stock, etf, crypto, forex, commodity")
     remarks = Column(String(500), nullable=True, 
                     comment="Additional notes about the ticker")
-    currency = Column(String(3), nullable=False, 
-                     comment="Currency symbol (USD, EUR, etc.) - NOT NULL per constraints")
+    currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False, 
+                        comment="Currency ID from currencies table")
     active_trades = Column(Boolean, default=False, nullable=True, 
                           comment="Whether there are active trades")
     updated_at = Column(String(20), nullable=True, 
                        comment="Last update timestamp")
     
     # Relationships
-    # Currency is now a simple string field, not a relationship
+    currency = relationship("Currency")
     
     trades = relationship("Trade", back_populates="ticker", 
                          cascade="all, delete-orphan")
@@ -77,13 +77,10 @@ class Ticker(BaseModel):
             >>> ticker.to_dict()
             {'id': 1, 'symbol': 'AAPL', 'name': 'Apple Inc.', ...}
         """
-        result: Dict[str, Any] = {}
-        for c in self.__table__.columns:
-            value = getattr(self, c.name)
-            if hasattr(value, 'strftime'):  # If it's a date
-                result[c.name] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
-            else:
-                result[c.name] = value
+        # Call parent to_dict method first
+        result = super().to_dict()
+        
+        # Add any ticker-specific formatting if needed
         return result
     
     @property

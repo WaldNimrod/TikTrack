@@ -393,3 +393,29 @@ class CurrencyService:
             'trade_plans': db.query(TradePlan).filter(TradePlan.currency == currency_id).count(),
             'cash_flows': db.query(CashFlow).filter(CashFlow.currency == currency_id).count()
         }
+    
+    @staticmethod
+    def get_currencies_for_dropdown(db: Session) -> List[Dict[str, Any]]:
+        """
+        Get all currencies for dropdown display with symbol and name
+        
+        Args:
+            db (Session): Database connection
+            
+        Returns:
+            List[Dict[str, Any]]: List of currencies with id, symbol, and name
+            
+        Example:
+            >>> currencies = CurrencyService.get_currencies_for_dropdown(db_session)
+            >>> for currency in currencies:
+            ...     print(f"{currency['symbol']} - {currency['name']}")
+        """
+        currencies = db.query(Currency).order_by(Currency.symbol).all()
+        return [
+            {
+                'id': currency.id,
+                'symbol': currency.symbol,
+                'name': currency.name
+            }
+            for currency in currencies
+        ]

@@ -48,6 +48,9 @@
   <!-- 6. Header system styles (highest priority) -->
   <link rel="stylesheet" href="styles/header-system.css">
 
+  <!-- Ticker Service - Global ticker management -->
+  <script src="scripts/ticker-service.js"></script>
+
   <!-- Modular grid files - loaded at end of file -->
 </head>
 
@@ -83,10 +86,12 @@
 
           <!-- Data summary -->
           <div class="info-summary" id="summaryStats">
-            <div>סה"כ עסקעות: <strong id="totalExecutions">0</strong></div>
-            <div>סה"כ כמות: <strong id="totalQuantity">0</strong></div>
-            <div>מחיר ממוצע: <strong id="avgPrice">$0</strong></div>
-            <div>ערך כולל: <strong id="totalValue">$0</strong></div>
+            <div>סה"כ עסקעות: <strong id="totalExecutions">0</strong> (<span id="totalBuyExecutions"
+                style="color: #28a745;">0</span> קניה / <span id="totalSellExecutions" style="color: #dc3545;">0</span>
+              מכירה)</div>
+            <div>סה"כ קניה: <strong id="totalBuyAmount">$0</strong></div>
+            <div>סה"כ מכירות: <strong id="totalSellAmount">$0</strong></div>
+            <div>מאזן: <strong id="balanceAmount">$0</strong></div>
           </div>
         </div>
       </div> <!-- End top-section -->
@@ -222,49 +227,16 @@
     <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>
 
-    <!-- CSS for modals -->
-    <style>
-      /* וידוא שהודעות שגיאה מופיעות מעל המודול */
-      .modal .invalid-feedback {
-        position: relative;
-        z-index: 1060;
-      }
 
-      /* וידוא שהמודול מופיע מעל הכל */
-      .modal {
-        z-index: 1055;
-      }
-
-      .modal-backdrop {
-        z-index: 1050;
-      }
-
-      /* הודעות שגיאה בתוך המודול */
-      .modal-body .invalid-feedback {
-        display: block;
-        color: #dc3545;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-      }
-
-      /* שדות עם שגיאה */
-      .modal-body .form-control.is-invalid,
-      .modal-body .form-select.is-invalid {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-      }
-    </style>
 
     <!-- Add Execution Modal -->
     <div class="modal fade" id="addExecutionModal" tabindex="-1" aria-labelledby="addExecutionModalLabel"
-      aria-hidden="true">
+      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header"
-            style="background: linear-gradient(135deg, #29a6a8, #1f8a8c) !important; color: white !important; border-radius: 12px 12px 0 0; border-bottom: none;">
+          <div class="modal-header modal-header-colored">
             <h5 class="modal-title" id="addExecutionModalLabel">הוספת עסקה חדשה</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-              style="color: white !important; filter: brightness(0) invert(1); background: none; border: none; font-size: 1.5rem; font-weight: bold;">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
               ×
             </button>
           </div>
@@ -274,7 +246,8 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addExecutionTicker" class="form-label">טיקר *</label>
-                    <select class="form-select" id="addExecutionTicker" required onchange="loadActiveTradesForTicker()">
+                    <select class="form-select" id="addExecutionTicker" required
+                      onchange="loadActiveTradesForTicker('add')">
                       <option value="">בחר טיקר...</option>
                     </select>
                     <div class="invalid-feedback" id="addExecutionTickerError"></div>
@@ -282,13 +255,13 @@
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="addExecutionTradeId" class="form-label">מזהה טרייד *</label>
+                    <label for="addExecutionTradeId" class="form-label">בחירת טרייד או תכנון *</label>
                     <div class="input-group">
-                      <select class="form-select" id="addExecutionTradeId" required
-                        onchange="validateExecutionTradeId(this)">
-                        <option value="">בחר טרייד...</option>
+                      <select class="form-select" id="addExecutionTradeId" required disabled
+                        onchange="validateExecutionTradeId(this); enableAllFields('add');">
+                        <option value="">בחר טרייד או תכנון...</option>
                       </select>
-                      <button type="button" class="btn btn-outline-secondary" id="addExecutionTradeLink"
+                      <button type="button" class="btn btn-outline-success link-button" id="addExecutionTradeLink"
                         onclick="goToLinkedTrade('add')" title="עבור לטרייד" style="display: none;">
                         🔗
                       </button>
@@ -298,12 +271,54 @@
                 </div>
               </div>
               <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="addExecutionShowClosedTrades"
+                        onchange="updateTradesOnCheckboxChange('add')">
+                      <label class="form-check-label" for="addExecutionShowClosedTrades">
+                        הצג טריידים סגורים
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <div class="ticker-help-section"
+                      style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px;">
+                      <div class="text-muted small mb-2">
+                        <strong>לא מוצא את הטיקר?</strong><br>
+                        מוצגים רק טיקרים שיש להם טרייד או תכנון במערכת.<br>
+                        <span class="text-info">💡 מומלץ: בדוק קודם אם יש להוסיף תכנון או טרייד, ורק אם לא מוצאים - הוסף
+                          טיקר חדש.</span>
+                      </div>
+                      <div class="ticker-help-buttons-container">
+                        <button type="button" class="btn btn-sm btn-outline-warning" onclick="addNewPlan()"
+                          title="הוספת תכנון חדש">
+                          הוסף תכנון
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addNewTrade()"
+                          title="הוספת טרייד חדש">
+                          הוסף טרייד
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success" onclick="addNewTicker()"
+                          title="הוספת טיקר חדש (רק אם אין תכנון או טרייד)">
+                          הוסף טיקר
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addExecutionType" class="form-label">פעולה *</label>
-                    <select class="form-select" id="addExecutionType" required>
+                    <select class="form-select" id="addExecutionType" required disabled>
                       <option value="">בחר פעולה...</option>
-                      <option value="buy">רכישה</option>
+                      <option value="buy">קניה</option>
                       <option value="sell">מכירה</option>
                     </select>
                     <div class="invalid-feedback" id="addExecutionTypeError"></div>
@@ -313,7 +328,8 @@
                   <div class="mb-3">
                     <label for="addExecutionQuantity" class="form-label">כמות *</label>
                     <input type="number" class="form-control" id="addExecutionQuantity" required placeholder="למשל: 100"
-                      min="1" onblur="validateExecutionQuantity(this)" oninput="calculateAddExecutionValues()">
+                      min="1" value="100" disabled onblur="validateExecutionQuantity(this)"
+                      oninput="calculateAddExecutionValues()">
                     <div class="invalid-feedback" id="addExecutionQuantityError"></div>
                   </div>
                 </div>
@@ -323,7 +339,8 @@
                   <div class="mb-3">
                     <label for="addExecutionPrice" class="form-label">מחיר *</label>
                     <input type="number" class="form-control" id="addExecutionPrice" required placeholder="למשל: 150.25"
-                      step="0.01" min="0" onblur="validateExecutionPrice(this)" oninput="calculateAddExecutionValues()">
+                      step="0.01" min="0" disabled onblur="validateExecutionPrice(this)"
+                      oninput="calculateAddExecutionValues()">
                     <div class="invalid-feedback" id="addExecutionPriceError"></div>
                   </div>
                 </div>
@@ -331,7 +348,7 @@
                   <div class="mb-3">
                     <label for="addExecutionCommission" class="form-label">עמלה</label>
                     <input type="number" class="form-control" id="addExecutionCommission" placeholder="למשל: 1.50"
-                      step="0.01" min="0" onblur="validateExecutionCommission(this)"
+                      step="0.01" min="0" disabled onblur="validateExecutionCommission(this)"
                       oninput="calculateAddExecutionValues()">
                     <div class="invalid-feedback" id="addExecutionCommissionError"></div>
                   </div>
@@ -340,17 +357,16 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="addExecutionDate" class="form-label">תאריך עסקה *</label>
-                    <input type="datetime-local" class="form-control" id="addExecutionDate" required>
+                    <label for="addExecutionDate" class="form-label">תאריך ביצוע *</label>
+                    <input type="datetime-local" class="form-control" id="addExecutionDate" required disabled>
                     <div class="invalid-feedback" id="addExecutionDateError"></div>
                   </div>
                 </div>
+
+              </div>
+              <div class="row">
                 <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="addExecutionSource" class="form-label">מקור</label>
-                    <input type="text" class="form-control" id="addExecutionSource" placeholder="למשל: IBKR">
-                    <div class="invalid-feedback" id="addExecutionSourceError"></div>
-                  </div>
+                  <!-- שדה ריק לעת עתה -->
                 </div>
               </div>
               <div class="row">
@@ -384,7 +400,7 @@
                   <div class="mb-3">
                     <label for="addExecutionNotes" class="form-label">הערות</label>
                     <textarea class="form-control" id="addExecutionNotes" rows="3"
-                      placeholder="הערות נוספות על העסקה..." maxlength="500"></textarea>
+                      placeholder="הערות נוספות על העסקה..." maxlength="500" disabled></textarea>
                     <div class="invalid-feedback" id="addExecutionNotesError"></div>
                   </div>
                 </div>
@@ -404,14 +420,12 @@
 
     <!-- Edit Execution Modal -->
     <div class="modal fade" id="editExecutionModal" tabindex="-1" aria-labelledby="editExecutionModalLabel"
-      aria-hidden="true">
+      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header"
-            style="background: linear-gradient(135deg, #29a6a8, #1f8a8c) !important; color: white !important; border-radius: 12px 12px 0 0; border-bottom: none;">
+          <div class="modal-header modal-header-colored">
             <h5 class="modal-title" id="editExecutionModalLabel">עריכת עסקה</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-              style="color: white !important; filter: brightness(0) invert(1); background: none; border: none; font-size: 1.5rem; font-weight: bold;">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
               ×
             </button>
           </div>
@@ -431,13 +445,13 @@
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="editExecutionTradeId" class="form-label">מזהה טרייד *</label>
+                    <label for="editExecutionTradeId" class="form-label">בחירת טרייד או תכנון *</label>
                     <div class="input-group">
                       <select class="form-select" id="editExecutionTradeId" required
-                        onchange="validateExecutionTradeId(this)">
-                        <option value="">בחר טרייד...</option>
+                        onchange="validateExecutionTradeId(this); enableAllFields('edit');">
+                        <option value="">בחר טרייד או תכנון...</option>
                       </select>
-                      <button type="button" class="btn btn-outline-secondary" id="editExecutionTradeLink"
+                      <button type="button" class="btn btn-outline-success link-button" id="editExecutionTradeLink"
                         onclick="goToLinkedTrade()" title="עבור לטרייד" style="display: none;">
                         🔗
                       </button>
@@ -447,12 +461,54 @@
                 </div>
               </div>
               <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="editExecutionShowClosedTrades"
+                        onchange="updateTradesOnCheckboxChange('edit')">
+                      <label class="form-check-label" for="editExecutionShowClosedTrades">
+                        הצג טריידים סגורים
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <div class="ticker-help-section"
+                      style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px;">
+                      <div class="text-muted small mb-2">
+                        <strong>לא מוצא את הטיקר?</strong><br>
+                        מוצגים רק טיקרים שיש להם טרייד או תכנון במערכת.<br>
+                        <span class="text-info">💡 מומלץ: בדוק קודם אם יש להוסיף תכנון או טרייד, ורק אם לא מוצאים - הוסף
+                          טיקר חדש.</span>
+                      </div>
+                      <div class="ticker-help-buttons-container">
+                        <button type="button" class="btn btn-sm btn-outline-warning" onclick="addNewPlan()"
+                          title="הוספת תכנון חדש">
+                          הוסף תכנון
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addNewTrade()"
+                          title="הוספת טרייד חדש">
+                          הוסף טרייד
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success" onclick="addNewTicker()"
+                          title="הוספת טיקר חדש (רק אם אין תכנון או טרייד)">
+                          הוסף טיקר
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editExecutionType" class="form-label">פעולה *</label>
                     <select class="form-select" id="editExecutionType" required>
                       <option value="">בחר פעולה...</option>
-                      <option value="buy">רכישה</option>
+                      <option value="buy">קניה</option>
                       <option value="sell">מכירה</option>
                     </select>
                     <div class="invalid-feedback" id="editExecutionTypeError"></div>
@@ -491,16 +547,34 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="editExecutionDate" class="form-label">תאריך עסקה *</label>
+                    <label for="editExecutionDate" class="form-label">תאריך ביצוע *</label>
                     <input type="datetime-local" class="form-control" id="editExecutionDate" required>
                     <div class="invalid-feedback" id="editExecutionDateError"></div>
                   </div>
                 </div>
+
+              </div>
+              <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editExecutionSource" class="form-label">מקור</label>
-                    <input type="text" class="form-control" id="editExecutionSource" placeholder="למשל: IBKR">
+                    <select class="form-select" id="editExecutionSource" onchange="toggleExternalIdField()">
+                      <option value="manual">ידני</option>
+                      <option value="ibkr">IBKR</option>
+                      <option value="etrade">E*TRADE</option>
+                      <option value="fidelity">Fidelity</option>
+                      <option value="schwab">Charles Schwab</option>
+                      <option value="other">אחר</option>
+                    </select>
                     <div class="invalid-feedback" id="editExecutionSourceError"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editExecutionExternalId" class="form-label">מזהה חיצוני</label>
+                    <input type="text" class="form-control" id="editExecutionExternalId" placeholder="למשל: IBKR-12345"
+                      disabled>
+                    <div class="invalid-feedback" id="editExecutionExternalIdError"></div>
                   </div>
                 </div>
               </div>
@@ -555,14 +629,12 @@
 
     <!-- Delete Execution Modal -->
     <div class="modal fade" id="deleteExecutionModal" tabindex="-1" aria-labelledby="deleteExecutionModalLabel"
-      aria-hidden="true">
+      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header"
-            style="background: linear-gradient(135deg, #dc3545, #c82333) !important; color: white !important; border-radius: 12px 12px 0 0; border-bottom: none;">
+          <div class="modal-header modal-header-danger">
             <h5 class="modal-title" id="deleteExecutionModalLabel">מחיקת עסקה</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-              style="color: white !important; filter: brightness(0) invert(1); background: none; border: none; font-size: 1.5rem; font-weight: bold;">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
               ×
             </button>
           </div>
@@ -572,10 +644,10 @@
             <input type="hidden" id="deleteExecutionId">
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-              style="font-size: 0.9rem; padding: 0.375rem 0.75rem;">ביטול</button>
-            <button type="button" class="btn btn-danger" onclick="confirmDeleteExecution()"
-              style="border: 2px solid #dc3545; background-color: white; color: #dc3545; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+              ביטול מחיקה
+            </button>
+            <button type="button" class="btn btn-danger" onclick="confirmDeleteExecution()">
               מחק עסקה
             </button>
           </div>

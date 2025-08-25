@@ -68,6 +68,64 @@
   border-bottom: 2px solid #6f42c1;
 }
 
+/* עמוד טיקרים - אדום */
+.tickers-page .section-header,
+.tickers-page .top-section .section-header {
+  border-bottom: 2px solid #dc3545;
+}
+
+/* עמוד הערות - כתום */
+.notes-page .section-header,
+.notes-page .top-section .section-header {
+  border-bottom: 2px solid #fd7e14;
+}
+
+/* עמוד בסיס נתונים - כחול כהה */
+.db-display-page .section-header,
+.db-display-page .top-section .section-header {
+  border-bottom: 2px solid #495057;
+}
+
+/* עמוד טבלאות עזר - אפור */
+.extra-data-page .section-header,
+.extra-data-page .top-section .section-header {
+  border-bottom: 2px solid #6c757d;
+}
+
+
+
+/* ===== סגנונות אייקון טריידים פעילים ===== */
+.active-trades-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.active-trades-icon.active-trades-true {
+  background-color: rgba(40, 167, 69, 0.3);
+  color: white;
+  border: 2px solid rgba(30, 126, 52, 0.3);
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.active-trades-icon.active-trades-false {
+  background-color: rgba(220, 53, 69, 0.3);
+  color: white;
+  border: 2px solid rgba(200, 35, 51, 0.3);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+.active-trades-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 /* ===== סגנונות סקשנים וקונטיינרים ===== */
 .content-section {
   background: white;
@@ -389,39 +447,7 @@ strong[onclick]:hover {
   text-decoration: none;
 }
 
-/* כפתורי סגירה לחלונות קופצים - רקע לבן עם מסגרת כתומה */
-.btn-close,
-button[data-bs-dismiss="modal"],
-button[onclick*="close"],
-button[onclick*="Close"],
-.modal .btn-close,
-.modal-header .btn-close,
-.modal-footer .btn-close {
-  background-color: white !important;
-  background-image: none !important;
-  color: #ff6b35 !important;
-  border: 1px solid #ff6b35 !important;
-  border-radius: 8px !important;
-  padding: 0.3rem 0.6rem !important;
-  font-size: 0.7rem !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-  opacity: 1 !important;
-}
 
-.btn-close:hover,
-button[data-bs-dismiss="modal"]:hover,
-button[onclick*="close"]:hover,
-button[onclick*="Close"]:hover,
-.modal .btn-close:hover,
-.modal-header .btn-close:hover,
-.modal-footer .btn-close:hover {
-  background-color: #ffffff !important;
-  color: #e55a2b !important;
-  border-color: #e55a2b !important;
-  transform: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-}
 
 /* כפתורי שמירה - ירוקים עם רקע לבן ומסגרת */
 /* עדכון: אוגוסט 2025 - עיצוב כפתורי שמירה עם צבע הלוגו */
@@ -429,7 +455,8 @@ button[onclick*="Close"]:hover,
 .btn-success[onclick*="save"],
 .btn-success[onclick*="Save"],
 button[onclick*="saveTradeRecord"],
-button[onclick*="saveNewTradeRecord"] {
+button[onclick*="saveNewTradeRecord"],
+.btn-success {
   background-color: white !important;
   color: #29a6a8 !important;
   /* צבע הלוגו של האפליקציה */
@@ -445,7 +472,8 @@ button[onclick*="saveNewTradeRecord"] {
 .btn-success[onclick*="save"]:hover,
 .btn-success[onclick*="Save"]:hover,
 button[onclick*="saveTradeRecord"]:hover,
-button[onclick*="saveNewTradeRecord"]:hover {
+button[onclick*="saveNewTradeRecord"]:hover,
+.btn-success:hover {
   background-color: #29a6a8 !important;
   /* רקע ירוק של הלוגו */
   color: white !important;
@@ -456,33 +484,7 @@ button[onclick*="saveNewTradeRecord"]:hover {
   /* צל ירוק */
 }
 
-/* כפתורי סגירה עם איקון X */
-.btn-close[aria-label="Close"],
-button[aria-label="Close"] {
-  background-color: white !important;
-  background-image: none !important;
-  color: #ff6b35 !important;
-  border: 1px solid #ff6b35 !important;
-  border-radius: 50% !important;
-  width: 30px !important;
-  height: 30px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 1.2rem !important;
-  font-weight: bold !important;
-  padding: 0 !important;
-  opacity: 1 !important;
-}
 
-.btn-close[aria-label="Close"]:hover,
-button[aria-label="Close"]:hover {
-  background-color: #ffffff !important;
-  color: #e55a2b !important;
-  border-color: #e55a2b !important;
-  transform: scale(1.05) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-}
 
 /* כפתור מודגש בצבע כתום - לשימוש בכל המערכת */
 .btn-emphasized,
@@ -1272,17 +1274,17 @@ button.btn-primary-emphasized {
     box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
   }
 
-  .btn-danger {
+  .modal .btn-danger {
     background-color: white !important;
     color: #dc3545 !important;
-    border: 1px solid #dc3545 !important;
+    border: 2px solid #dc3545 !important;
     padding: 0.375rem 0.75rem !important;
-    font-size: 0.875rem !important;
+    font-size: 0.9rem !important;
     border-radius: 0.25rem !important;
     transition: all 0.2s ease !important;
   }
 
-  .btn-danger:hover {
+  .modal .btn-danger:hover {
     background-color: #dc3545 !important;
     color: white !important;
     border-color: #dc3545 !important;
@@ -2595,7 +2597,7 @@ button[onclick*="openDesignDetails"]:hover {
 #addTradeModal .modal-header {
   background: linear-gradient(135deg, #ff9c05, #ff8c00);
   color: white;
-  border-radius: 12px 12px 0 0;
+  border-radius: 6px 6px 0 0;
   border-bottom: none;
   display: flex;
   justify-content: space-between;
@@ -2609,39 +2611,7 @@ button[onclick*="openDesignDetails"]:hover {
   /* כותרת בצד שמאל */
 }
 
-#addTradeModal .btn-close {
-  background: white;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.8;
-  margin: 0;
-  order: 2;
-  /* כפתור בצד ימין */
-  filter: none;
-  color: #ff9c05 !important;
-  position: relative;
-}
 
-#addTradeModal .btn-close::before {
-  content: '✕';
-  color: #ff9c05;
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1;
-}
-
-#addTradeModal .btn-close:hover {
-  opacity: 1;
-  color: #ff8c00 !important;
-}
-
-#addTradeModal .btn-close:hover::before {
-  color: #ff8c00;
-}
 
 /* התאמה ל-RTL */
 #addTradeModal .modal-body {
@@ -2892,48 +2862,21 @@ button[onclick*="openDesignDetails"]:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 12px 12px 0 0;
+  border-radius: 6px 6px 0 0;
   border-bottom: none;
 }
 
 .modal .modal-title {
   font-weight: 600;
   font-size: 1.25rem;
-  order: 1;
+  order: 2;
 }
 
 .modal .btn-close {
-  background: white;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.8;
-  margin: 0;
-  order: 2;
-  filter: none;
-  color: #ff9c05 !important;
-  position: relative;
+  order: 1;
 }
 
-.modal .btn-close::before {
-  content: '✕';
-  color: #ff9c05;
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1;
-}
 
-.modal .btn-close:hover {
-  opacity: 1;
-  color: #ff8c00 !important;
-}
-
-.modal .btn-close:hover::before {
-  color: #ff8c00;
-}
 
 /* התאמה ל-RTL לכל המודולים */
 .modal .modal-body {
@@ -2956,12 +2899,32 @@ button[onclick*="openDesignDetails"]:hover {
   margin: 1.75rem auto;
 }
 
+/* הגדרות מיוחדות למודלים גדולים */
+.modal-dialog.modal-lg {
+  border: 2px solid #6c757d !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
 /* ===== צבעים גלובליים לכל המודולים ===== */
 /* סגנונות ספציפיים למודל תכנון */
 #addTradePlanModal .modal-header {
   background: linear-gradient(135deg, #28a745, #20c997) !important;
   color: white !important;
-  border-radius: 12px 12px 0 0;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* סגנונות ספציפיים למודל טיקרים */
+#addTickerModal .modal-header,
+#editTickerModal .modal-header {
+  background: linear-gradient(135deg, #17a2b8, #138496) !important;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
   border-bottom: none;
   display: flex;
   justify-content: space-between;
@@ -2973,7 +2936,7 @@ button[onclick*="openDesignDetails"]:hover {
 #editAlertModal .modal-header {
   background: linear-gradient(135deg, #dc3545, #c82333) !important;
   color: white !important;
-  border-radius: 12px 12px 0 0;
+  border-radius: 6px 6px 0 0;
   border-bottom: none;
   display: flex;
   justify-content: space-between;
@@ -2987,42 +2950,7 @@ button[onclick*="openDesignDetails"]:hover {
   order: 1;
 }
 
-#addAlertModal .btn-close,
-#editAlertModal .btn-close {
-  background: white;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.8;
-  margin: 0;
-  order: 2;
-  filter: none;
-  color: #dc3545 !important;
-  position: relative;
-}
 
-#addAlertModal .btn-close::before,
-#editAlertModal .btn-close::before {
-  content: '✕';
-  color: #dc3545;
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1;
-}
-
-#addAlertModal .btn-close:hover,
-#editAlertModal .btn-close:hover {
-  opacity: 1;
-  color: #c82333 !important;
-}
-
-#addAlertModal .btn-close:hover::before,
-#editAlertModal .btn-close:hover::before {
-  color: #c82333;
-}
 
 /* התאמה ל-RTL למודל התראות */
 #addAlertModal .modal-body,
@@ -3049,38 +2977,16 @@ button[onclick*="openDesignDetails"]:hover {
   order: 1;
 }
 
-#addTradePlanModal .btn-close {
-  background: white;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.8;
-  margin: 0;
-  order: 2;
-  filter: none;
-  color: #ff9c05 !important;
-  position: relative;
+#addTickerModal .modal-title,
+#editTickerModal .modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  order: 1;
 }
 
-#addTradePlanModal .btn-close::before {
-  content: '✕';
-  color: #ff9c05;
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1;
-}
 
-#addTradePlanModal .btn-close:hover {
-  opacity: 1;
-  color: #ff8c00 !important;
-}
 
-#addTradePlanModal .btn-close:hover::before {
-  color: #ff8c00;
-}
+
 
 /* התאמה ל-RTL */
 #addTradePlanModal .modal-body {
@@ -3316,6 +3222,7 @@ a:hover,
   color: #333;
   margin: 0;
   flex: 1;
+  text-align: right;
 }
 
 .alert-card-time {
@@ -3538,9 +3445,7 @@ a:hover,
   font-size: 1.2rem;
 }
 
-.linked-items-modal .btn-close {
-  filter: invert(1);
-}
+
 
 .linked-items-container {
   display: flex;

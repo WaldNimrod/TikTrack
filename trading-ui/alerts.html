@@ -65,7 +65,7 @@
   <script src="scripts/accounts.js"></script>
 </head>
 
-<body>
+<body class="alerts-page">
   <!-- General background -->
   <div class="background-wrapper">
 
@@ -219,8 +219,12 @@
     <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>
 
+    <!-- Toast container for notifications -->
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
+
     <!-- Add Alert Modal -->
-    <div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true"
+      data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
@@ -331,7 +335,8 @@
     </div>
 
     <!-- Edit Alert Modal -->
-    <div class="modal fade" id="editAlertModal" tabindex="-1" aria-labelledby="editAlertModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editAlertModal" tabindex="-1" aria-labelledby="editAlertModalLabel" aria-hidden="true"
+      data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">

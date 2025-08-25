@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, CheckConstraint
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, CheckConstraint, event
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 from .base import BaseModel
@@ -69,3 +69,81 @@ class Trade(BaseModel):
     
     def __repr__(self) -> str:
         return f"<Trade(id={self.id}, status='{self.status}', investment_type='{self.investment_type}')>"
+
+
+# ========================================
+# SQLAlchemy Event Listeners for Automatic active_trades Updates
+# ========================================
+
+def update_ticker_active_trades(session, ticker_id: int) -> None:
+    """
+    Update the active_trades field for a specific ticker based on open trades
+    
+    Args:
+        session: SQLAlchemy session
+        ticker_id: ID of the ticker to update
+    """
+    try:
+        from .ticker import Ticker
+        
+        # Count open trades for this ticker
+        open_trades_count = session.query(Trade).filter(
+            Trade.ticker_id == ticker_id,
+            Trade.status == 'open'
+        ).count()
+        
+        # Update the ticker's active_trades field
+        ticker = session.query(Ticker).filter(Ticker.id == ticker_id).first()
+        if ticker:
+            ticker.active_trades = open_trades_count > 0
+            ticker.updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            session.flush()  # Flush to ensure the change is applied
+            
+            print(f"✅ Updated ticker {ticker.symbol} (ID: {ticker_id}) active_trades to: {ticker.active_trades}")
+        
+    except Exception as e:
+        print(f"❌ Error updating ticker {ticker_id} active_trades: {e}")
+        session.rollback()
+
+
+@event.listens_for(Trade, 'after_insert')
+def trade_inserted(mapper, connection, target):
+    """
+    Event listener for when a trade is inserted
+    Updates the active_trades field of the related ticker
+    """
+    print(f"🔄 Trade inserted: ID {target.id}, Ticker ID {target.ticker_id}, Status {target.status}")
+    
+    if target.status == 'open':
+        # Get the session from the connection
+        session = connection.session
+        if session:
+            update_ticker_active_trades(session, target.ticker_id)
+
+
+@event.listens_for(Trade, 'after_update')
+def trade_updated(mapper, connection, target):
+    """
+    Event listener for when a trade is updated
+    Updates the active_trades field of the related ticker
+    """
+    print(f"🔄 Trade updated: ID {target.id}, Ticker ID {target.ticker_id}, Status {target.status}")
+    
+    # Get the session from the connection
+    session = connection.session
+    if session:
+        update_ticker_active_trades(session, target.ticker_id)
+
+
+@event.listens_for(Trade, 'after_delete')
+def trade_deleted(mapper, connection, target):
+    """
+    Event listener for when a trade is deleted
+    Updates the active_trades field of the related ticker
+    """
+    print(f"🔄 Trade deleted: ID {target.id}, Ticker ID {target.ticker_id}")
+    
+    # Get the session from the connection
+    session = connection.session
+    if session:
+        update_ticker_active_trades(session, target.ticker_id)

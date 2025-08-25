@@ -538,24 +538,28 @@ function updateAlertsTable(alerts) {
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
-            <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">
-              🔗
-            </button>
-            <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">
-              ✏️
-            </button>
-            ${alert.status === 'open' ? `
-            <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">
-              ❌
-            </button>
-            ` : `
-            <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">
-              X
-            </button>
-            `}
-            <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">
-              🗑️
-            </button>
+            <table class="table table-sm table-borderless mb-0">
+              <tbody>
+                <tr>
+                  <td class="p-0 pe-1">
+                    <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                  </td>
+                  <td class="p-0 pe-1">
+                    <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
+                  </td>
+                  <td class="p-0 pe-1">
+                    ${alert.status === 'open' ? `
+                    <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>
+                    ` : `
+                    <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
+                    `}
+                  </td>
+                  <td class="p-0">
+                    <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </td>
         </tr>
       `;
@@ -628,6 +632,13 @@ function showAddAlertModal() {
     if (conditionAttributeElement) {
       conditionAttributeElement.addEventListener('change', function () {
         checkAlertVariable(this);
+      });
+    }
+
+    const conditionOperatorElement = document.getElementById('conditionOperator');
+    if (conditionOperatorElement) {
+      conditionOperatorElement.addEventListener('change', function () {
+        checkAlertOperator(this);
       });
     }
   }, 100);
@@ -870,9 +881,8 @@ function closeModal(modalId) {
  */
 function onAlertTypeChange(selectElement) {
   const selectedType = selectElement.value;
-  if (selectedType && !checkAlertType(selectedType, selectElement)) {
-    // החזרת הבחירה למחיר (ברירת מחדל)
-    selectElement.value = 'price_alert';
+  if (selectedType) {
+    checkAlertType(selectedType, selectElement);
   }
 }
 
@@ -883,34 +893,13 @@ function onAlertTypeChange(selectElement) {
  * @returns {boolean} true אם נתמך, false אם לא
  */
 function checkAlertType(alertType, element = null) {
-  const supportedTypes = ['price_alert', 'stop_loss'];
-  const unsupportedTypes = ['volume_alert', 'custom_alert'];
-
-  if (unsupportedTypes.includes(alertType)) {
-    let message = '';
-    if (alertType === 'volume_alert') {
-      message = 'התראה על נפח מסחר עדיין בפיתוח. כרגע נתמכים רק התראות על מחיר וסטופ לוס.';
-    } else if (alertType === 'custom_alert') {
-      message = 'התראה מותאמת אישית עדיין בפיתוח. כרגע נתמכים רק התראות על מחיר וסטופ לוס.';
-    } else {
-      message = 'סוג התראה זה עדיין בפיתוח. כרגע נתמכים רק התראות על מחיר וסטופ לוס.';
-    }
-
-    // בדיקה אם אנחנו בתוך מודול
-    if (element) {
-      const modal = element.closest('.modal');
-      if (modal && modal.id) {
-        showModalNotification('warning', 'פיצ\'ר בפיתוח', message, modal.id);
-      } else {
-        showModalNotification('warning', 'פיצ\'ר בפיתוח', message, 'addAlertModal');
-      }
-    } else {
-      showModalNotification('warning', 'פיצ\'ר בפיתוח', message, 'addAlertModal');
-    }
-
+  // כרגע מאפשרים את כל סוגי ההתראות
+  if (!alertType) {
+    console.log('❌ No alert type selected');
     return false;
   }
 
+  console.log('✅ Alert type accepted:', alertType);
   return true;
 }
 
@@ -928,29 +917,15 @@ function checkAlertVariable(selectElement) {
   console.log('🔍 Element:', selectElement);
   console.log('🔍 Selected value:', selectElement.value);
 
-  const supportedVariables = ['price', 'change'];
+  // כרגע מאפשרים את כל התכונות
   const selectedValue = selectElement.value;
 
-  if (!supportedVariables.includes(selectedValue)) {
-    console.log('❌ Variable not supported:', selectedValue);
-    let message = 'משתנה זה עדיין בפיתוח. כרגע נתמכים רק: מחיר ושינוי.';
-    console.log('🔍 Showing warning notification:', message);
-
-    // בדיקה אם אנחנו בתוך מודול
-    const modal = selectElement.closest('.modal');
-    if (modal && modal.id) {
-      showModalNotification('warning', 'פיצ\'ר בפיתוח', message, modal.id);
-    } else {
-      showModalNotification('warning', 'פיצ\'ר בפיתוח', message, 'addAlertModal');
-    }
-
-    // החזרת הבחירה למחיר
-    selectElement.value = 'price';
-    console.log('🔍 Reset value to:', selectElement.value);
+  if (!selectedValue) {
+    console.log('❌ No variable selected');
     return false;
   }
 
-  console.log('✅ Variable supported:', selectedValue);
+  console.log('✅ Variable accepted:', selectedValue);
   return true;
 }
 
@@ -968,24 +943,15 @@ function checkAlertOperator(selectElement) {
   console.log('🔍 Element:', selectElement);
   console.log('🔍 Selected value:', selectElement.value);
 
-  const supportedOperators = [
-    'lessThen', 'moreThen', 'cross', 'crossUp', 'crossDown',
-    'upBy', 'downBy', 'changeBy', 'upByPre', 'downByPre', 'changeByPre'
-  ];
+  // כרגע מאפשרים את כל האופרטורים
   const selectedValue = selectElement.value;
 
-  if (!supportedOperators.includes(selectedValue)) {
-    console.log('❌ Operator not supported:', selectedValue);
-    let message = 'אופרטור זה לא נתמך. האופרטורים הנתמכים: קטן מ, גדול מ, חוצה, חוצה למעלה, חוצה למטה, עולה ב, יורד ב, משתנה ב, עולה ב%, יורד ב%, משתנה ב%.';
-    console.log('🔍 Showing warning notification:', message);
-    showModalNotification('warning', 'אופרטור לא נתמך', message, 'addAlertModal');
-    // החזרת הבחירה לגדול מ
-    selectElement.value = 'moreThen';
-    console.log('🔍 Reset value to:', selectElement.value);
+  if (!selectedValue) {
+    console.log('❌ No operator selected');
     return false;
   }
 
-  console.log('✅ Operator supported:', selectedValue);
+  console.log('✅ Operator accepted:', selectedValue);
   return true;
 }
 
@@ -1119,17 +1085,8 @@ async function saveAlert() {
   }
 
   // המשך הקוד הקיים...
-  // המרת סוג התראה לפורמט הנתמך
-  let convertedType = alertType;
-  if (alertType === 'price_alert') {
-    convertedType = 'price';
-  } else if (alertType === 'stop_loss') {
-    convertedType = 'stop';
-  } else if (alertType === 'volume_alert') {
-    convertedType = 'volume';
-  } else if (alertType === 'custom_alert') {
-    convertedType = 'custom';
-  }
+  // כרגע שולחים את סוג ההתראה כמו שהוא ללא המרה
+  const convertedType = alertType;
 
   const alertData = {
     related_type_id: parseInt(formData.get('alertRelationType')),
@@ -1249,6 +1206,23 @@ function editAlert(alertId) {
     // הפעלת אירוע change לטעינת האובייקטים
     radioButton.dispatchEvent(new Event('change'));
   }
+
+  // הוספת event listeners לשדות התנאי במודל העריכה
+  setTimeout(() => {
+    const editConditionAttributeElement = document.getElementById('editConditionAttribute');
+    if (editConditionAttributeElement) {
+      editConditionAttributeElement.addEventListener('change', function () {
+        checkAlertVariable(this);
+      });
+    }
+
+    const editConditionOperatorElement = document.getElementById('editConditionOperator');
+    if (editConditionOperatorElement) {
+      editConditionOperatorElement.addEventListener('change', function () {
+        checkAlertOperator(this);
+      });
+    }
+  }, 100);
 
   // הצגת המודל
   const modalElement = document.getElementById('editAlertModal');

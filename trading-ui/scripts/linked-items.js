@@ -561,6 +561,7 @@ function createTickerDetails(item) {
  */
 function createAlertDetails(item) {
     let details = '';
+    if (item.symbol) details += `<div><strong>Symbol:</strong> ${item.symbol}</div>`;
     if (item.message) details += `<div><strong>Message:</strong> ${item.message}</div>`;
     if (item.priority) details += `<div><strong>Priority:</strong> ${item.priority}</div>`;
     return details;
@@ -588,6 +589,11 @@ function createCashFlowDetails(item) {
  */
 function createNoteDetails(item) {
     let details = '';
+    if (item.related_object_type && item.related_object_id) {
+        const objectType = getItemTypeDisplayName(item.related_object_type);
+        const objectId = item.related_object_id;
+        details += `<div><strong>קשור ל:</strong> ${objectType} #${objectId}</div>`;
+    }
     if (item.content) details += `<div><strong>Content:</strong> ${item.content.substring(0, 100)}${item.content.length > 100 ? '...' : ''}</div>`;
     return details;
 }

@@ -537,6 +537,9 @@ function createLinkedItemsWarningList(linkedItems) {
             <button class="btn btn-outline-warning" onclick="unlinkItem('${item.type}', ${item.id})">
               <i class="fas fa-unlink"></i> נתק
             </button>
+            <button class="btn btn-outline-info" onclick="openItemPage('${item.type}', ${item.id})">
+              <i class="fas fa-cog"></i> עבור לניהול פרטים
+            </button>
           </div>
         </div>
       `;

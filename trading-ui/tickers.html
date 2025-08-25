@@ -49,10 +49,13 @@
   <!-- 6. Header system styles (highest priority) -->
   <link rel="stylesheet" href="styles/header-system.css">
 
+  <!-- 7. Warning system styles -->
+  <link rel="stylesheet" href="styles/warning-system.css">
+
   <!-- Modular grid files - loaded at end of file -->
 </head>
 
-<body>
+<body class="tickers-page">
   <!-- General background -->
   <div class="background-wrapper">
 
@@ -117,6 +120,8 @@
             </div>
           </div>
 
+
+
           <!-- Tickers table -->
           <div class="section-body">
             <div class="table-responsive" id="tickersContainer">
@@ -134,7 +139,7 @@
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        שם <span class="sort-icon">↕</span>
+                        יש טריידים <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
@@ -148,21 +153,21 @@
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        הערות <span class="sort-icon">↕</span>
+                        מטבע <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        מטבע <span class="sort-icon">↕</span>
+                        עודכן ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        יש טרייד <span class="sort-icon">↕</span>
+                        שם <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
@@ -176,7 +181,7 @@
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        עודכן ב <span class="sort-icon">↕</span>
+                        הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th class="actions-cell">פעולות</th>
@@ -185,132 +190,164 @@
                 <tbody>
                   <tr>
                     <td><strong>AAPL</strong></td>
-                    <td>Apple Inc.</td>
-                    <td>stock</td>
-                    <td>טכנולוגיה</td>
-                    <td>USD</td>
                     <td>לא</td>
+                    <td>stock</td>
+                    <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>Apple Inc.</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>טכנולוגיה</td>
                     <td>
+                      <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(1)"
+                        title="צפה באלמנטים מקושרים">
+                        🔗
+                      </button>
                       <button class="btn btn-sm btn-secondary" onclick="editTicker(1)" title="ערוך">✏️</button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(1)" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(1)" title="מחק">🗑️</button>
                     </td>
                   </tr>
                   <tr>
                     <td><strong>GOOGL</strong></td>
-                    <td>Alphabet Inc.</td>
-                    <td>stock</td>
-                    <td>טכנולוגיה</td>
-                    <td>USD</td>
                     <td>לא</td>
+                    <td>stock</td>
+                    <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>Alphabet Inc.</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>טכנולוגיה</td>
                     <td>
+                      <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(2)"
+                        title="צפה באלמנטים מקושרים">
+                        🔗
+                      </button>
                       <button class="btn btn-sm btn-secondary" onclick="editTicker(2)" title="ערוך">✏️</button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(2)" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(2)" title="מחק">🗑️</button>
                     </td>
                   </tr>
                   <tr>
                     <td><strong>MSFT</strong></td>
-                    <td>Microsoft Corporation</td>
-                    <td>stock</td>
-                    <td>טכנולוגיה</td>
-                    <td>USD</td>
                     <td>לא</td>
+                    <td>stock</td>
+                    <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>Microsoft Corporation</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>טכנולוגיה</td>
                     <td>
+                      <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(3)"
+                        title="צפה באלמנטים מקושרים">
+                        🔗
+                      </button>
                       <button class="btn btn-sm btn-secondary" onclick="editTicker(3)" title="ערוך">✏️</button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(3)" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(3)" title="מחק">🗑️</button>
                     </td>
                   </tr>
                   <tr>
                     <td><strong>TSLA</strong></td>
-                    <td>Tesla Inc.</td>
-                    <td>stock</td>
-                    <td>רכב חשמלי</td>
-                    <td>USD</td>
                     <td>לא</td>
+                    <td>stock</td>
+                    <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>Tesla Inc.</td>
+                    <td>רכב חשמלי</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>
+                      <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(4)"
+                        title="צפה באלמנטים מקושרים">
+                        🔗
+                      </button>
                       <button class="btn btn-sm btn-secondary" onclick="editTicker(4)" title="ערוך">✏️</button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(4)" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(4)" title="מחק">🗑️</button>
                     </td>
                   </tr>
                   <tr>
                     <td><strong>NVDA</strong></td>
+                    <td>לא</td>
+                    <td>stock</td>
+                    <td>USD</td>
+                    <td>18.8.2025, 20:16:00</td>
                     <td>NVIDIA Corporation</td>
-                    <td>stock</td>
                     <td>צ'יפים</td>
-                    <td>USD</td>
-                    <td>לא</td>
-                    <td>18.8.2025, 20:16:00</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>
+                      <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(5)"
+                        title="צפה באלמנטים מקושרים">
+                        🔗
+                      </button>
                       <button class="btn btn-sm btn-secondary" onclick="editTicker(5)" title="ערוך">✏️</button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(5)" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(5)" title="מחק">🗑️</button>
                     </td>
                   </tr>
                   <tr>
-                    <td>6</td>
                     <td><strong>AMZN</strong></td>
+                    <td>לא</td>
+                    <td>stock</td>
+                    <td>USD</td>
+                    <td>18.8.2025, 20:16:00</td>
                     <td>Amazon.com Inc.</td>
-                    <td>stock</td>
                     <td>מסחר אלקטרוני</td>
-                    <td>USD</td>
-                    <td>לא</td>
-                    <td>18.8.2025, 20:16:00</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>
+                      <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(6)"
+                        title="צפה באלמנטים מקושרים">
+                        🔗
+                      </button>
                       <button class="btn btn-sm btn-secondary" onclick="editTicker(6)" title="ערוך">✏️</button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(6)" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(6)" title="מחק">🗑️</button>
                     </td>
                   </tr>
                   <tr>
-                    <td>7</td>
                     <td><strong>META</strong></td>
+                    <td>לא</td>
+                    <td>stock</td>
+                    <td>USD</td>
+                    <td>18.8.2025, 20:16:00</td>
                     <td>Meta Platforms Inc.</td>
-                    <td>stock</td>
                     <td>מדיה חברתית</td>
-                    <td>USD</td>
-                    <td>לא</td>
-                    <td>18.8.2025, 20:16:00</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>
+                      <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(7)"
+                        title="צפה באלמנטים מקושרים">
+                        🔗
+                      </button>
                       <button class="btn btn-sm btn-secondary" onclick="editTicker(7)" title="ערוך">✏️</button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(7)" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(7)" title="מחק">🗑️</button>
                     </td>
                   </tr>
                   <tr>
-                    <td>8</td>
                     <td><strong>NFLX</strong></td>
-                    <td>Netflix Inc.</td>
-                    <td>stock</td>
-                    <td>סטרימינג</td>
-                    <td>USD</td>
                     <td>לא</td>
+                    <td>stock</td>
+                    <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>Netflix Inc.</td>
+                    <td>סטרימינג</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>
+                      <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(8)"
+                        title="צפה באלמנטים מקושרים">
+                        🔗
+                      </button>
                       <button class="btn btn-sm btn-secondary" onclick="editTicker(8)" title="ערוך">✏️</button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(8)" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(8)" title="מחק">🗑️</button>
                     </td>
                   </tr>
                   <tr>
-                    <td>9</td>
                     <td><strong>SPY</strong></td>
-                    <td>SPDR S&P 500 ETF</td>
-                    <td>etf</td>
-                    <td>ETF מדד S&P 500</td>
-                    <td>USD</td>
                     <td>לא</td>
+                    <td>etf</td>
+                    <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>SPDR S&P 500 ETF</td>
+                    <td>ETF מדד S&P 500</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>
+                      <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(9)"
+                        title="צפה באלמנטים מקושרים">
+                        🔗
+                      </button>
                       <button class="btn btn-sm btn-secondary" onclick="editTicker(9)" title="ערוך">✏️</button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(9)" title="מחק">X</button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteTicker(9)" title="מחק">🗑️</button>
                     </td>
                   </tr>
                 </tbody>
@@ -363,7 +400,8 @@
     </style>
 
     <!-- Add Ticker Modal -->
-    <div class="modal fade" id="addTickerModal" tabindex="-1" aria-labelledby="addTickerModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addTickerModal" tabindex="-1" aria-labelledby="addTickerModalLabel" aria-hidden="true"
+      data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
@@ -385,7 +423,7 @@
                   <div class="mb-3">
                     <label for="addTickerName" class="form-label">שם החברה *</label>
                     <input type="text" class="form-control" id="addTickerName" required placeholder="למשל: Apple Inc."
-                      maxlength="25" onblur="validateTickerName(this)">
+                      maxlength="12" onblur="validateTickerName(this)">
                     <div class="invalid-feedback" id="addTickerNameError"></div>
                   </div>
                 </div>
@@ -442,8 +480,8 @@
     </div>
 
     <!-- Edit Ticker Modal -->
-    <div class="modal fade" id="editTickerModal" tabindex="-1" aria-labelledby="editTickerModalLabel"
-      aria-hidden="true">
+    <div class="modal fade" id="editTickerModal" tabindex="-1" aria-labelledby="editTickerModalLabel" aria-hidden="true"
+      data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
@@ -466,7 +504,7 @@
                   <div class="mb-3">
                     <label for="editTickerName" class="form-label">שם החברה *</label>
                     <input type="text" class="form-control" id="editTickerName" required placeholder="למשל: Apple Inc."
-                      maxlength="100" onblur="validateTickerName(this)">
+                      maxlength="12" onblur="validateTickerName(this)">
                     <div class="invalid-feedback" id="editTickerNameError"></div>
                   </div>
                 </div>
@@ -524,7 +562,7 @@
 
     <!-- Delete Ticker Modal -->
     <div class="modal fade" id="deleteTickerModal" tabindex="-1" aria-labelledby="deleteTickerModalLabel"
-      aria-hidden="true">
+      aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -549,7 +587,7 @@
 
     <!-- Linked Items Modal -->
     <div class="modal fade" id="linkedItemsModal" tabindex="-1" aria-labelledby="linkedItemsModalLabel"
-      aria-hidden="true">
+      aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
@@ -601,6 +639,7 @@
     <script src="scripts/date-utils.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/linked-items.js"></script>
+    <script src="scripts/warning-system.js"></script>
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/alerts.js"></script>

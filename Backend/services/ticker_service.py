@@ -141,22 +141,27 @@ class TickerService:
         warnings = []
         
         # Symbol validation - only required for CREATE, optional for UPDATE
-        symbol = ticker_data.get('symbol', '').strip().upper()
-        if symbol:  # Only validate if symbol is provided
+        symbol = ticker_data.get('symbol', '')
+        if symbol:
+            symbol = symbol.strip().upper()
             if len(symbol) > TickerService.MAX_SYMBOL_LENGTH:
                 errors.append(f"Symbol cannot be longer than {TickerService.MAX_SYMBOL_LENGTH} characters")
             elif not symbol.isalnum():
                 errors.append("Symbol can only contain English letters and numbers")
         
         # Name validation
-        name = ticker_data.get('name', '').strip()
-        if name and len(name) > TickerService.MAX_NAME_LENGTH:
-            errors.append(f"Name cannot be longer than {TickerService.MAX_NAME_LENGTH} characters")
+        name = ticker_data.get('name', '')
+        if name:
+            name = name.strip()
+            if len(name) > TickerService.MAX_NAME_LENGTH:
+                errors.append(f"Name cannot be longer than {TickerService.MAX_NAME_LENGTH} characters")
         
         # Type validation
-        ticker_type = ticker_data.get('type', '').strip()
-        if ticker_type and ticker_type not in TickerService.VALID_TICKER_TYPES:
-            warnings.append(f"Unknown type: {ticker_type}. Known types: {', '.join(TickerService.VALID_TICKER_TYPES)}")
+        ticker_type = ticker_data.get('type', '')
+        if ticker_type:
+            ticker_type = ticker_type.strip()
+            if ticker_type not in TickerService.VALID_TICKER_TYPES:
+                warnings.append(f"Unknown type: {ticker_type}. Known types: {', '.join(TickerService.VALID_TICKER_TYPES)}")
         
         # Currency validation - now checking currency_id
         currency_id = ticker_data.get('currency_id')
@@ -169,9 +174,11 @@ class TickerService:
                 errors.append("Currency ID must be a valid number")
         
         # Remarks validation
-        remarks = ticker_data.get('remarks', '').strip()
-        if remarks and len(remarks) > TickerService.MAX_REMARKS_LENGTH:
-            errors.append(f"Remarks cannot be longer than {TickerService.MAX_REMARKS_LENGTH} characters")
+        remarks = ticker_data.get('remarks', '')
+        if remarks:
+            remarks = remarks.strip()
+            if len(remarks) > TickerService.MAX_REMARKS_LENGTH:
+                errors.append(f"Remarks cannot be longer than {TickerService.MAX_REMARKS_LENGTH} characters")
         
         return {
             'is_valid': len(errors) == 0,
@@ -192,7 +199,9 @@ class TickerService:
         Returns:
             bool - True if symbol exists, False otherwise
         """
-        query = db.query(Ticker).filter(Ticker.symbol == symbol.upper())
+        if symbol:
+            symbol = symbol.upper()
+        query = db.query(Ticker).filter(Ticker.symbol == symbol)
         if exclude_id:
             query = query.filter(Ticker.id != exclude_id)
         return query.first() is not None
@@ -211,9 +220,12 @@ class TickerService:
             raise ValueError(f"Invalid data: {'; '.join(validation['errors'])}")
         
         # Normalize data
-        symbol = ticker_data.get('symbol', '').strip().upper()
+        symbol = ticker_data.get('symbol', '')
+        if symbol:
+            symbol = symbol.strip().upper()
         ticker_data['symbol'] = symbol
-        if 'name' in ticker_data:
+        
+        if 'name' in ticker_data and ticker_data['name']:
             ticker_data['name'] = ticker_data['name'].strip()
         # currency_id doesn't need normalization - it's already a number
         
@@ -237,13 +249,15 @@ class TickerService:
         
         # Check that symbol doesn't exist (if changed)
         if 'symbol' in ticker_data:
-            symbol = ticker_data.get('symbol', '').strip().upper()
+            symbol = ticker_data.get('symbol', '')
+            if symbol:
+                symbol = symbol.strip().upper()
             if TickerService.check_symbol_exists(db, symbol, exclude_id=ticker_id):
                 raise ValueError(f"Symbol {symbol} already exists in system")
             ticker_data['symbol'] = symbol
         
         # Normalize data
-        if 'name' in ticker_data:
+        if 'name' in ticker_data and ticker_data['name']:
             ticker_data['name'] = ticker_data['name'].strip()
         # currency_id doesn't need normalization - it's already a number
         

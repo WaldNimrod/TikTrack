@@ -765,11 +765,21 @@ function renderCashFlowsTable() {
             <td>${cashFlow.external_id || '0'}</td>
             <td style="text-align: center;">${formatDateOnly(cashFlow.created_at)}</td>
             <td class="actions-cell">
-                <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">✏️</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>
-                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForCashFlow(${cashFlow.id})" title="צפה באלמנטים מקושרים">
-                  🔗
-                </button>
+                <table class="table table-sm table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="p-0 pe-1">
+                                <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">✏️</button>
+                            </td>
+                            <td class="p-0 pe-1">
+                                <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>
+                            </td>
+                            <td class="p-0">
+                                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForCashFlow(${cashFlow.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </td>
         `;
         tbody.appendChild(row);

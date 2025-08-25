@@ -84,7 +84,7 @@ async function loadCurrenciesFromServer() {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch('http://127.0.0.1:8080/api/v1/currencies/', {
+        const response = await fetch('http://127.0.0.1:8080/api/v1/currencies/dropdown', {
             method: 'GET',
             headers: headers
         });
@@ -128,64 +128,10 @@ async function loadCurrenciesFromServer() {
     }
 }
 
-// פונקציה עזר להצגת מטבע עם סמל
-function getTickerCurrencyDisplay(ticker) {
-    let currencySymbol = '';
-
-    if (ticker.currency && ticker.currency.symbol) {
-        // אם יש פרטי מטבע מלאים
-        currencySymbol = ticker.currency.symbol;
-    } else if (ticker.currency_id && window.currenciesData && window.currenciesData.length > 0) {
-        // אם יש רק currency_id, נחפש את המטבע
-        const currency = window.currenciesData.find(c => c.id === ticker.currency_id);
-        if (currency) {
-            currencySymbol = currency.symbol;
-        }
-    } else if (ticker.currency) {
-        // fallback למטבע הישן
-        currencySymbol = ticker.currency;
-    }
-
-    // הוספת סמל מטבע מתאים
-    const currencyIcon = getCurrencyIcon(currencySymbol);
-    return currencySymbol ? `${currencyIcon} ${currencySymbol}` : '-';
-}
-
-// פונקציה עזר להצגת מטבע - רק סמל ללא איקון
-function getTickerCurrencySymbol(ticker) {
-    let currencySymbol = '';
-
-    if (ticker.currency && ticker.currency.symbol) {
-        // אם יש פרטי מטבע מלאים
-        currencySymbol = ticker.currency.symbol;
-    } else if (ticker.currency_id && window.currenciesData && window.currenciesData.length > 0) {
-        // אם יש רק currency_id, נחפש את המטבע
-        const currency = window.currenciesData.find(c => c.id === ticker.currency_id);
-        if (currency) {
-            currencySymbol = currency.symbol;
-        }
-    } else if (ticker.currency) {
-        // fallback למטבע הישן
-        currencySymbol = ticker.currency;
-    }
-
-    // החזרת רק סמל המטבע ללא איקון
-    return currencySymbol || '-';
-}
-
-// פונקציה לקבלת סמל מטבע
-function getCurrencyIcon(currencySymbol) {
-    const currencyIcons = {
-        'USD': '💵',
-        'EUR': '💶',
-        'GBP': '💷',
-        'JPY': '💴',
-        'ILS': '₪',
-        'BTC': '₿',
-        'ETH': 'Ξ'
-    };
-    return currencyIcons[currencySymbol] || '💰';
-}
+// פונקציות עזר להצגת מטבע - עכשיו ב-translation-utils.js
+// getTickerCurrencyDisplay(ticker) - זמין גלובלית
+// getTickerCurrencySymbol(ticker) - זמין גלובלית
+// getCurrencyIcon(currencySymbol) - זמין גלובלית
 
 // פונקציה לקבלת CSS class לסוג טיקר
 function getTickerTypeClass(type) {
@@ -198,28 +144,28 @@ function getTickerTypeClass(type) {
     }
 }
 
-// פונקציה ליצירת אפשרויות מטבע בטופס
+/**
+ * יצירת אפשרויות מטבע לטופס טיקר
+ * @param {Object} ticker - טיקר קיים (לעריכה)
+ * @returns {string} HTML עם אפשרויות מטבע
+ */
 function generateTickerCurrencyOptions(ticker = null) {
     if (!window.currenciesData || window.currenciesData.length === 0) {
         // אם אין מטבעות, נחזיר ברירת מחדל
         return `
-            <option value="1" ${ticker && (ticker.currency_id === 1 || (ticker.currency && ticker.currency.symbol === 'USD') || ticker.currency === 'USD') ? 'selected' : ''}>דולר אמריקאי (USD)</option>
+            <option value="1" ${ticker && (ticker.currency_id === 1) ? 'selected' : ''}>דולר אמריקאי (USD)</option>
         `;
     }
 
     return window.currenciesData.map(currency => {
-        const isSelected = ticker && (
-            ticker.currency_id === currency.id ||
-            (ticker.currency && ticker.currency.symbol === currency.symbol) ||
-            ticker.currency === currency.symbol
-        );
-
+        const isSelected = ticker && ticker.currency_id === currency.id;
+        
         return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
     }).join('');
 }
 
 // פונקציה לעדכון אפשרויות מטבע בטופס
-function updateCurrencyOptions() {
+function updateCurrencyOptions(ticker = null) {
     const addSelect = document.getElementById('addTickerCurrency');
     const editSelect = document.getElementById('editTickerCurrency');
 
@@ -229,7 +175,7 @@ function updateCurrencyOptions() {
     }
 
     if (editSelect) {
-        const editOptions = generateTickerCurrencyOptions();
+        const editOptions = generateTickerCurrencyOptions(ticker);
         editSelect.innerHTML = '<option value="">בחר מטבע...</option>' + editOptions;
     }
 }
@@ -377,12 +323,18 @@ function resetAllFiltersAndReloadData() {
 function showAddTickerModal() {
     console.log('🔄 הצגת מודל הוספת טיקר');
 
+    // עדכון אפשרויות מטבע לפני הצגת הטופס
+    updateCurrencyOptions();
+
     // ניקוי הטופס
     document.getElementById('addTickerForm').reset();
     clearTickerValidationErrors();
 
     // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('addTickerModal'));
+    const modal = new bootstrap.Modal(document.getElementById('addTickerModal'), {
+        backdrop: true,
+        keyboard: true
+    });
     modal.show();
 }
 
@@ -399,6 +351,9 @@ function showEditTickerModal(id) {
         return;
     }
 
+    // עדכון אפשרויות מטבע לפני מילוי הטופס
+    updateCurrencyOptions(ticker);
+
     // מילוי הטופס
     document.getElementById('editTickerId').value = ticker.id;
     document.getElementById('editTickerSymbol').value = ticker.symbol;
@@ -410,18 +365,6 @@ function showEditTickerModal(id) {
     if (currencySelect) {
         if (ticker.currency_id) {
             currencySelect.value = ticker.currency_id;
-        } else if (ticker.currency && ticker.currency.symbol) {
-            // אם יש פרטי מטבע מלאים
-            const currency = window.currenciesData.find(c => c.symbol === ticker.currency.symbol);
-            if (currency) {
-                currencySelect.value = currency.id;
-            }
-        } else if (ticker.currency) {
-            // fallback למטבע הישן
-            const currency = window.currenciesData.find(c => c.symbol === ticker.currency);
-            if (currency) {
-                currencySelect.value = currency.id;
-            }
         }
     }
 
@@ -430,7 +373,10 @@ function showEditTickerModal(id) {
     clearTickerValidationErrors();
 
     // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('editTickerModal'));
+    const modal = new bootstrap.Modal(document.getElementById('editTickerModal'), {
+        backdrop: true,
+        keyboard: true
+    });
     modal.show();
 }
 
@@ -447,13 +393,11 @@ function showDeleteTickerModal(id) {
         return;
     }
 
-    // מילוי המודל
-    document.getElementById('deleteTickerId').value = ticker.id;
-    document.getElementById('deleteTickerName').textContent = `${ticker.symbol} - ${ticker.name}`;
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('deleteTickerModal'));
-    modal.show();
+    // שימוש במערכת האזהרות המרכזית
+    showDeleteWarning('ticker', `${ticker.symbol} - ${ticker.name}`, 
+        () => confirmDeleteTicker(ticker.id), // onConfirm callback
+        () => console.log('מחיקת טיקר בוטלה') // onCancel callback
+    );
 }
 
 // ========================================
@@ -567,8 +511,8 @@ function validateTickerName(input) {
         return false;
     }
 
-    if (name.length < 2 || name.length > 25) {
-        showFieldError(input, errorElement, 'שם החברה חייב להיות בין 2 ל-25 תווים');
+    if (name.length < 2 || name.length > 12) {
+        showFieldError(input, errorElement, 'שם החברה חייב להיות בין 2 ל-12 תווים');
         return false;
     }
 
@@ -764,10 +708,8 @@ async function updateTicker() {
 /**
  * אישור מחיקת טיקר
  */
-async function confirmDeleteTicker() {
-    console.log('🔄 אישור מחיקת טיקר');
-
-    const id = document.getElementById('deleteTickerId').value;
+async function confirmDeleteTicker(id) {
+    console.log('🔄 אישור מחיקת טיקר:', id);
 
     try {
         const response = await fetch(`/api/v1/tickers/${id}`, {
@@ -776,10 +718,6 @@ async function confirmDeleteTicker() {
 
         if (response.ok) {
             console.log('✅ טיקר נמחק בהצלחה');
-
-            // סגירת המודל
-            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteTickerModal'));
-            modal.hide();
 
             // הצגת הודעת הצלחה
             showNotification('✅ טיקר נמחק בהצלחה', 'success');
@@ -798,12 +736,8 @@ async function confirmDeleteTicker() {
                 if (errorData.error && errorData.error.message &&
                     errorData.error.message.includes('linked items')) {
 
-                    // סגירת מודל המחיקה הרגיל
-                    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteTickerModal'));
-                    deleteModal.hide();
-
-                    // הצגת מודל הפריטים המקושרים
-                    await showLinkedItemsModal(id, errorData);
+                    // הצגת אזהרת פריטים מקושרים
+                    showLinkedItemsWarning('ticker', 5); // TODO: Get actual count
                     return;
                 }
 
@@ -844,7 +778,10 @@ async function showLinkedItemsModal(tickerId, errorData) {
     await loadLinkedItemsDetails(tickerId, errorData);
 
     // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'));
+    const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'), {
+        backdrop: true,
+        keyboard: true
+    });
     modal.show();
 }
 
@@ -1165,6 +1102,14 @@ function goToNote(noteId) {
     window.location.href = `/notes#note-${noteId}`;
 }
 
+/**
+ * הצגת פריטים מקושרים לטיקר
+ */
+function viewLinkedItemsForTicker(tickerId) {
+    console.log('🔄 הצגת פריטים מקושרים לטיקר:', tickerId);
+    showLinkedItemsModal(tickerId);
+}
+
 // ========================================
 // פונקציות עזר
 // ========================================
@@ -1187,8 +1132,9 @@ async function loadTickersData() {
             tickersData = data.data || data;
             console.log('✅ נטענו', tickersData.length, 'טיקרים');
 
-            // השדה active_trades מתעדכן אוטומטית בבסיס הנתונים
-            console.log('✅ השדה active_trades מתעדכן אוטומטית');
+            // עדכון שדה active_trades לפי טריידים פתוחים
+            await updateActiveTradesField();
+            console.log('✅ השדה active_trades עודכן לפי טריידים פתוחים');
 
             // בדיקה אם יש פילטרים פעילים
             if (window.headerSystem && window.headerSystem.currentFilters) {
@@ -1265,23 +1211,33 @@ function updateTickersTable(tickers) {
         return `
         <tr>
             <td><strong>${ticker.symbol}</strong></td>
-            <td style="text-align: left;">${ticker.name}</td>
-            <td data-type="${typeForFilter}"><span class="${typeClass}">${typeDisplay}</span></td>
-            <td>${ticker.remarks || ''}</td>
-            <td style="text-align: center;">${currencyDisplay}</td>
             <td data-status="${statusForFilter}" style="text-align: center;">
                 <span class="active-trades-icon ${ticker.active_trades ? 'active-trades-true' : 'active-trades-false'}">
                     ${ticker.active_trades ? '✓' : '✗'}
                 </span>
             </td>
-            <td data-date="${ticker.created_at}" style="text-align: center;">${formatDateOnly(ticker.created_at)}</td>
+            <td data-type="${typeForFilter}"><span class="${typeClass}">${typeDisplay}</span></td>
+            <td style="text-align: center;">${currencyDisplay}</td>
             <td data-date="${ticker.updated_at}" style="text-align: center;">${formatDateOnly(ticker.updated_at)}</td>
+            <td style="text-align: left;">${ticker.name}</td>
+            <td data-date="${ticker.created_at}" style="text-align: center;">${formatDateOnly(ticker.created_at)}</td>
+            <td>${ticker.remarks || ''}</td>
             <td class="actions-cell">
-                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(${ticker.id})" title="צפה באלמנטים מקושרים">
-                  🔗
-                </button>
-                <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">✏️</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})" title="מחק">🗑️</button>
+                <table class="table table-sm table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="p-0 pe-1">
+                                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(${ticker.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                            </td>
+                            <td class="p-0 pe-1">
+                                <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">✏️</button>
+                            </td>
+                            <td class="p-0">
+                                <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})" title="מחק">🗑️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </td>
         </tr>
     `}).join('');
@@ -1407,6 +1363,7 @@ window.goToTrade = goToTrade;
 window.goToPlan = goToPlan;
 window.goToAlert = goToAlert;
 window.goToNote = goToNote;
+window.viewLinkedItemsForTicker = viewLinkedItemsForTicker;
 
 // ===== פונקציות סידור =====
 

@@ -162,13 +162,21 @@ function updateTestsTable() {
         <td>${test.lastRun}</td>
         <td class="status-cell"><span class="test-result-status ${resultClass}">${getResultText(test.result)}</span></td>
         <td class="actions-cell">
-          <button class="btn btn-sm btn-secondary" onclick="runTest('${test.id}')" title="הרץ בדיקה">
-            <span class="btn-icon">▶️</span>
-          </button>
-          <button class="btn btn-sm btn-secondary" onclick="editTest('${test.id}')" title="ערוך">
-            <span class="btn-icon">✏️</span>
-          </button>
-          <button class="btn btn-sm btn-danger" onclick="deleteTest('${test.id}')" title="מחק">🗑️</button>
+          <table class="table table-sm table-borderless mb-0">
+            <tbody>
+              <tr>
+                <td class="p-0 pe-1">
+                  <button class="btn btn-sm btn-secondary" onclick="runTest('${test.id}')" title="הרץ בדיקה">▶️</button>
+                </td>
+                <td class="p-0 pe-1">
+                  <button class="btn btn-sm btn-secondary" onclick="editTest('${test.id}')" title="ערוך">✏️</button>
+                </td>
+                <td class="p-0">
+                  <button class="btn btn-sm btn-danger" onclick="deleteTest('${test.id}')" title="מחק">🗑️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </td>
       </tr>
     `;
@@ -206,13 +214,21 @@ function updateTestResultsTable() {
         <td data-date="${result.runDate}">${result.runDate}</td>
         <td>${result.details}</td>
         <td class="actions-cell">
-          <button class="btn btn-sm btn-secondary" onclick="viewTestResult(${result.id})" title="צפייה">
-            <span class="btn-icon">👁️</span>
-          </button>
-          <button class="btn btn-sm btn-secondary" onclick="exportTestResult(${result.id})" title="ייצא">
-            <span class="btn-icon">📤</span>
-          </button>
-          <button class="btn btn-sm btn-danger" onclick="deleteTestResult(${result.id})" title="מחק">🗑️</button>
+          <table class="table table-sm table-borderless mb-0">
+            <tbody>
+              <tr>
+                <td class="p-0 pe-1">
+                  <button class="btn btn-sm btn-secondary" onclick="viewTestResult(${result.id})" title="צפייה">👁️</button>
+                </td>
+                <td class="p-0 pe-1">
+                  <button class="btn btn-sm btn-secondary" onclick="exportTestResult(${result.id})" title="ייצא">📤</button>
+                </td>
+                <td class="p-0">
+                  <button class="btn btn-sm btn-danger" onclick="deleteTestResult(${result.id})" title="מחק">🗑️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </td>
       </tr>
     `;

@@ -6,10 +6,31 @@ This document describes the REST API endpoints for managing user preferences in 
 
 ## Base Information
 
-- **Base URL**: `http://localhost:8080/api`
+- **Base URL**: `http://localhost:8080/api/v1`
 - **Content-Type**: `application/json`
 - **Authentication**: Not required (session-based)
 - **Rate Limiting**: Not implemented
+
+## Recent Updates (Version 2.4.0)
+
+### API Endpoint Changes
+- **Updated base URL**: Changed from `/api/preferences` to `/api/v1/preferences`
+- **Enhanced preferences structure**: Added `defaultCommission` and `consoleCleanupInterval` fields
+- **Improved error handling**: Better handling of missing preference fields
+
+### New Preference Fields
+```json
+{
+  "defaults": {
+    "defaultCommission": 0.0,
+    "consoleCleanupInterval": 300
+  },
+  "user": {
+    "defaultCommission": 0.0,
+    "consoleCleanupInterval": 300
+  }
+}
+```
 
 ## API Endpoints
 

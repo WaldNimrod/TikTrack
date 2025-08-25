@@ -12,6 +12,7 @@ class Currency(BaseModel):
     
     # Relationships
     cash_flows = relationship("CashFlow", back_populates="currency")
+    tickers = relationship("Ticker", back_populates="currency")
     
     def __repr__(self) -> str:
         return f"<Currency(symbol='{self.symbol}', name='{self.name}', usd_rate={self.usd_rate})>"

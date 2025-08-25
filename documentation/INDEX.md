@@ -4,6 +4,18 @@
 
 This index provides quick access to all documentation files in the TikTrack project.
 
+## 🆕 Recent Updates (Version 2.4.0)
+
+### 📚 Updated Documentation
+- **[CHANGELOG.md](CHANGELOG.md)** - Added comprehensive version 2.4.0 documentation
+- **[VERSION_2.4.0_SUMMARY.md](VERSION_2.4.0_SUMMARY.md)** - Comprehensive summary of all changes
+- **[CSS_ARCHITECTURE.md](frontend/css/CSS_ARCHITECTURE.md)** - Added modal styling standards
+- **[COMPONENT_STYLE_GUIDE.md](frontend/css/COMPONENT_STYLE_GUIDE.md)** - Added modal components documentation
+- **[MODAL_STYLING_GUIDE.md](frontend/css/MODAL_STYLING_GUIDE.md)** - New comprehensive modal styling guide
+- **[API.md](features/preferences/API.md)** - Updated API endpoints and new fields
+- **[JAVASCRIPT.md](features/preferences/JAVASCRIPT.md)** - Added auto-save system documentation
+- **[USER_GUIDE.md](features/preferences/USER_GUIDE.md)** - Updated for auto-save functionality
+
 ## 🏗️ Project Structure
 
 ### 📊 **Project Documentation** (`project/`)
@@ -56,6 +68,7 @@ This index provides quick access to all documentation files in the TikTrack proj
 - [CSS_ORGANIZATION_PROCESS.md](frontend/css/CSS_ORGANIZATION_PROCESS.md) - CSS organization process
 - [CSS_VARIABLES.md](frontend/css/CSS_VARIABLES.md) - CSS variables reference
 - [COMPONENT_STYLE_GUIDE.md](frontend/css/COMPONENT_STYLE_GUIDE.md) - Component style guide
+- **[MODAL_STYLING_GUIDE.md](frontend/css/MODAL_STYLING_GUIDE.md)** - Modal styling standards and guidelines
 
 ### ⚙️ **Backend Documentation** (`backend/`)
 - [README.md](backend/README.md) - Backend system overview
@@ -83,6 +96,7 @@ This index provides quick access to all documentation files in the TikTrack proj
 ### 📖 **Core Documentation**
 - [README.md](README.md) - Main documentation overview (this directory)
 - [INDEX.md](INDEX.md) - This index file
+- **[VERSION_2.4.0_SUMMARY.md](VERSION_2.4.0_SUMMARY.md)** - Comprehensive summary of version 2.4.0 changes
 
 ### 🗂️ **System Documentation**
 - [TABLE_SORTING_SYSTEM.md](TABLE_SORTING_SYSTEM.md) - Table sorting system documentation

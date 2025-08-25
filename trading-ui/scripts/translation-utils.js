@@ -75,6 +75,23 @@ function translateAlertStatus(status) {
 }
 
 /**
+ * תרגום סוג התראה לעברית
+ * @param {string} type - סוג ההתראה באנגלית
+ * @returns {string} סוג ההתראה בעברית
+ */
+function translateAlertType(type) {
+    const typeMap = {
+        'price': 'מחיר',
+        'volume': 'נפח',
+        'technical': 'טכני',
+        'news': 'חדשות',
+        'time': 'זמן',
+        'custom': 'מותאם אישית'
+    };
+    return typeMap[type] || type;
+}
+
+/**
  * תרגום סטטוס תכנון טרייד לעברית
  * @param {string} status - הסטטוס באנגלית
  * @returns {string} הסטטוס בעברית
@@ -201,62 +218,135 @@ function translateTestCategory(category) {
 
 // ===== ייצוא פונקציות =====
 
-// ייצוא לשימוש גלובלי
-if (typeof window !== 'undefined') {
-    // תרגום סטטוסים
-    window.translateAccountStatus = translateAccountStatus;
-    window.translateTickerStatus = translateTickerStatus;
-    window.translateNoteStatus = translateNoteStatus;
-    window.translateAlertStatus = translateAlertStatus;
-    window.translateTradePlanStatus = translateTradePlanStatus;
-    window.translateIsTriggered = translateIsTriggered;
+// Export functions to global scope
+window.translateAccountStatus = translateAccountStatus;
+window.translateTickerStatus = translateTickerStatus;
+window.translateNoteStatus = translateNoteStatus;
+window.translateAlertStatus = translateAlertStatus;
+window.translateTradePlanStatus = translateTradePlanStatus;
+window.translateIsTriggered = translateIsTriggered;
+window.translateAlertType = translateAlertType;
+window.translateAlertCondition = translateAlertCondition;
+window.translateTradeType = translateTradeType;
+window.translateTradeStatus = translateTradeStatus;
+window.convertExecutionActionToHebrew = translateExecutionAction; // Backward compatibility
 
-    // תרגום סוגים
-    window.translateTradeType = translateTradeType;
-    window.translateTradePlanType = translateTradePlanType;
-    window.translateCashFlowType = translateCashFlowType;
-    window.translateCashFlowSource = translateCashFlowSource;
+// פונקציות מטבעות
+window.getCurrencyIcon = getCurrencyIcon;
+window.getTickerCurrencyDisplay = getTickerCurrencyDisplay;
+window.getTickerCurrencySymbol = getTickerCurrencySymbol;
+window.getCashFlowCurrencyDisplay = getCashFlowCurrencyDisplay;
 
-    // תרגום קטגוריות
-    window.translateTestCategory = translateTestCategory;
+// תאימות לאחור - שמות ישנים
+window.convertAccountStatusToHebrew = translateAccountStatus;
+window.convertTickerStatusToHebrew = translateTickerStatus;
+window.convertNoteStatusToHebrew = translateNoteStatus;
+window.convertAlertStatusToHebrew = translateAlertStatus;
+window.convertIsTriggeredToHebrew = translateIsTriggered;
+window.getTypeDisplay = translateTradeType; // trades.js
+window.getTypeDisplayName = translateCashFlowType; // cash_flows.js
+window.getCategoryDisplayName = translateTestCategory; // preferences.js
 
-    // תאימות לאחור - שמות ישנים
-    window.convertAccountStatusToHebrew = translateAccountStatus;
-    window.convertTickerStatusToHebrew = translateTickerStatus;
-    window.convertNoteStatusToHebrew = translateNoteStatus;
-    window.convertAlertStatusToHebrew = translateAlertStatus;
-    window.convertIsTriggeredToHebrew = translateIsTriggered;
-    window.getTypeDisplay = translateTradeType; // trades.js
-    window.getTypeDisplayName = translateCashFlowType; // cash_flows.js
-    window.getCategoryDisplayName = translateTestCategory; // preferences.js
+// ===== פונקציות פורמט מספרים =====
 
-    // פונקציה כללית לצביעת סכומים - ירוק לחיובי, אדום לשלילי
-    window.colorAmount = function (amount, displayText = null) {
-        const numAmount = parseFloat(amount);
-        const color = numAmount >= 0 ? '#28a745' : '#dc3545'; // ירוק לחיובי, אדום לשלילי
-        const text = displayText || (numAmount.toLocaleString ? numAmount.toLocaleString() : numAmount.toString());
-        return `<span style="color: ${color}; font-weight: bold;">${text}</span>`;
+/**
+ * פורמט מספר עם פסיקים כל שלוש ספרות
+ * @param {number|string} number - המספר לפורמט
+ * @param {Object} options - אפשרויות פורמט
+ * @returns {string} המספר בפורמט עם פסיקים
+ */
+function formatNumberWithCommas(number, options = {}) {
+    const num = parseFloat(number) || 0;
+    const defaultOptions = {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+        useGrouping: true
     };
-
-    // ייצוא המודול עצמו
-    window.translationUtils = {
-        translateAccountStatus,
-        translateTickerStatus,
-        translateNoteStatus,
-        translateAlertStatus,
-        translateTradePlanStatus,
-        translateIsTriggered,
-        translateTradeType,
-        translateTradePlanType,
-        translateCashFlowType,
-        translateCashFlowSource,
-        translateTestCategory,
-        translateExecutionAction,
-        colorAmount: window.colorAmount
-    };
-
-    console.log('✅ Translation utilities loaded successfully');
+    const finalOptions = { ...defaultOptions, ...options };
+    
+    return num.toLocaleString('he-IL', finalOptions);
 }
+
+/**
+ * פורמט סכום כסף עם פסיקים וסמל מטבע
+ * @param {number|string} amount - הסכום לפורמט
+ * @param {string} currency - סמל המטבע (ברירת מחדל: USD)
+ * @param {Object} options - אפשרויות פורמט
+ * @returns {string} הסכום בפורמט מטבע עם פסיקים
+ */
+function formatCurrencyWithCommas(amount, currency = 'USD', options = {}) {
+    const num = parseFloat(amount) || 0;
+    const defaultOptions = {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+    };
+    const finalOptions = { ...defaultOptions, ...options };
+    
+    return num.toLocaleString('he-IL', finalOptions);
+}
+
+/**
+ * צביעת סכום לפי ערך - ירוק לחיובי, אדום לשלילי
+ * @param {number|string} amount - הסכום לצביעה
+ * @param {string} displayText - טקסט להצגה (אופציונלי)
+ * @param {HTMLElement} element - אלמנט DOM לעדכון ישיר (אופציונלי)
+ * @returns {string|void} HTML עם צביעה או עדכון ישיר של האלמנט
+ */
+function colorAmountByValue(amount, displayText = null, element = null) {
+    const numAmount = parseFloat(amount);
+    const color = numAmount >= 0 ? '#28a745' : '#dc3545'; // ירוק לחיובי, אדום לשלילי
+    
+    // אם יש אלמנט, נעדכן אותו ישירות
+    if (element) {
+        element.textContent = displayText || formatNumberWithCommas(numAmount);
+        element.style.color = color;
+        element.style.fontWeight = 'bold';
+        return;
+    }
+    
+    // אחרת, נחזיר HTML
+    const text = displayText || formatNumberWithCommas(numAmount);
+    return `<span style="color: ${color}; font-weight: bold;">${text}</span>`;
+}
+
+// ייצוא פונקציות פורמט מספרים
+window.formatNumberWithCommas = formatNumberWithCommas;
+window.formatCurrencyWithCommas = formatCurrencyWithCommas;
+window.colorAmountByValue = colorAmountByValue;
+
+// תאימות לאחור - שמות ישנים
+window.formatNumber = formatNumberWithCommas;
+window.formatCurrency = formatCurrencyWithCommas;
+window.colorAmount = colorAmountByValue;
+
+// ייצוא המודול עצמו
+window.translationUtils = {
+    translateAccountStatus,
+    translateTickerStatus,
+    translateNoteStatus,
+    translateAlertStatus,
+    translateAlertType,
+    translateTradePlanStatus,
+    translateIsTriggered,
+    translateTradeType,
+    translateTradePlanType,
+    translateCashFlowType,
+    translateCashFlowSource,
+    translateTestCategory,
+    translateExecutionAction,
+    formatNumberWithCommas,
+    formatCurrencyWithCommas,
+    colorAmountByValue,
+    // תאימות לאחור
+    formatNumber: formatNumberWithCommas,
+    formatCurrency: formatCurrencyWithCommas,
+    colorAmount: colorAmountByValue
+};
+
+console.log('✅ Translation utilities loaded successfully');
 
 /**
  * תרגום פעולת ביצוע לעברית
@@ -277,3 +367,91 @@ function translateExecutionAction(action) {
 // Execution Action Translations
 window.translateExecutionAction = translateExecutionAction;
 window.convertExecutionActionToHebrew = translateExecutionAction; // Backward compatibility
+
+// ===== פונקציות מטבעות =====
+
+/**
+ * קבלת אייקון מטבע לפי סמל
+ * @param {string} currencySymbol - סמל המטבע (USD, EUR, וכו')
+ * @returns {string} אייקון המטבע
+ */
+function getCurrencyIcon(currencySymbol) {
+    if (!currencySymbol) return '💱';
+    
+    const currencyIcons = {
+        'USD': '💵',
+        'EUR': '💶',
+        'GBP': '💷',
+        'JPY': '💴',
+        'ILS': '₪',
+        'BTC': '₿',
+        'ETH': 'Ξ'
+    };
+    
+    return currencyIcons[currencySymbol.toUpperCase()] || '💱';
+}
+
+/**
+ * הצגת מטבע טיקר עם אייקון
+ * @param {Object} ticker - אובייקט טיקר
+ * @returns {string} HTML עם אייקון וסמל מטבע
+ */
+function getTickerCurrencyDisplay(ticker) {
+    let currencySymbol = '';
+
+    if (ticker.currency_id && window.currenciesData && window.currenciesData.length > 0) {
+        // אם יש currency_id, נחפש את המטבע
+        const currency = window.currenciesData.find(c => c.id === ticker.currency_id);
+        if (currency) {
+            currencySymbol = currency.symbol;
+        }
+    }
+
+    if (currencySymbol) {
+        const icon = getCurrencyIcon(currencySymbol);
+        return `<span class="currency-icon">${icon}</span> ${currencySymbol}`;
+    }
+    return '<span class="text-muted">לא מוגדר</span>';
+}
+
+/**
+ * הצגת סמל מטבע טיקר בלבד
+ * @param {Object} ticker - אובייקט טיקר
+ * @returns {string} סמל המטבע
+ */
+function getTickerCurrencySymbol(ticker) {
+    let currencySymbol = '';
+
+    if (ticker.currency_id && window.currenciesData && window.currenciesData.length > 0) {
+        // אם יש currency_id, נחפש את המטבע
+        const currency = window.currenciesData.find(c => c.id === ticker.currency_id);
+        if (currency) {
+            currencySymbol = currency.symbol;
+        }
+    }
+
+    return currencySymbol || 'לא מוגדר';
+}
+
+/**
+ * הצגת מטבע תזרים מזומנים עם אייקון
+ * @param {Object} cashFlow - אובייקט תזרים מזומנים
+ * @returns {string} HTML עם אייקון וסמל מטבע
+ */
+function getCashFlowCurrencyDisplay(cashFlow) {
+    let currencySymbol = '';
+
+    if (cashFlow.currency_id && window.currenciesData && window.currenciesData.length > 0) {
+        // אם יש currency_id, נחפש את המטבע
+        const currency = window.currenciesData.find(c => c.id === cashFlow.currency_id);
+        if (currency) {
+            currencySymbol = currency.symbol;
+        }
+    }
+
+    if (currencySymbol) {
+        const icon = getCurrencyIcon(currencySymbol);
+        return `<span class="currency-icon">${icon}</span> ${currencySymbol}`;
+    }
+    return '<span class="text-muted">לא מוגדר</span>';
+}

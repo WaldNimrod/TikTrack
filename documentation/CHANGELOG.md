@@ -1,5 +1,105 @@
 # TikTrack Changelog
 
+## Version 2.4.0 - August 25, 2025
+
+### 🎨 UI/UX Improvements
+
+#### Modal Styling Fixes
+- **Fixed white gap between modal header and border**
+  - Updated `.modal-dialog.modal-lg` border-radius from 8px to 6px
+  - Updated `.modal-content` border-radius from 16px to 6px
+  - Updated `.modal-header-colored` border-radius from 12px to 6px
+  - Updated `.modal-header-danger` border-radius from 12px to 6px
+  - Updated all modal header border-radius values to 6px for consistency
+  - Applied changes to both `apple-theme.css` and `styles.css`
+
+#### Preferences Page Enhancements
+- **Removed all "Save" buttons** from preferences page
+  - All settings now save automatically on every change
+  - Updated page icon to `preferences.svg`
+  - Fixed missing `translateAlertType` function in translation-utils.js
+  - Added `defaultCommission` and `consoleCleanupInterval` fields to backend preferences
+  - Fixed API endpoint paths from `/api/preferences` to `/api/v1/preferences`
+
+#### Table Header Updates
+- **Updated notes table header** from "אובייקט משויך" to "שייך ל"
+  - Applied consistent terminology across the application
+
+### 🔧 Bug Fixes
+
+#### API Endpoint Fixes
+- **Fixed preferences API endpoints**
+  - Corrected PUT request URLs to remove trailing slashes
+  - Added missing fields to preferences JSON structure
+  - Fixed 500 and 404 errors when updating default commission
+
+#### Missing Assets
+- **Created missing preferences icon** (`trading-ui/images/icons/preferences.svg`)
+- **Added missing translation function** (`translateAlertType` in translation-utils.js)
+
+### 🏗️ Architecture Improvements
+
+#### CSS Consistency
+- **Standardized modal border-radius** across all components
+- **Unified styling approach** for modal dialogs and headers
+- **Consistent visual appearance** across all modal types
+
+#### Backend Preferences Structure
+- **Enhanced preferences JSON structure** with new fields
+- **Improved API response consistency** for all preference types
+- **Better error handling** for missing preference fields
+
+### 📚 Documentation Updates
+
+#### Updated Files with Comprehensive Documentation
+- `apple-theme.css` - Added modal styling fixes documentation
+- `styles.css` - Added modal styling fixes documentation
+- `preferences.js` - Added automatic saving functionality documentation
+- `translation-utils.js` - Added missing function documentation
+- `preferences.html` - Added UI improvements documentation
+- `preferences.py` - Added backend structure improvements documentation
+
+### 🔄 Technical Details
+
+#### Modal Styling Standardization
+```css
+/* Consistent border-radius across all modal components */
+.modal-dialog.modal-lg {
+  border-radius: 6px;
+}
+
+.modal-content {
+  border-radius: 6px;
+}
+
+.modal-header-colored,
+.modal-header-danger,
+.modal .modal-header {
+  border-radius: 6px 6px 0 0;
+}
+```
+
+#### Preferences Auto-Save System
+```javascript
+// All preference update functions now save automatically
+updateDefaultCommission(value) {
+  // Saves immediately to backend
+  savePreference('defaultCommission', value);
+}
+
+updatePrimaryCurrency(value) {
+  // Saves immediately to backend
+  savePreference('primaryCurrency', value);
+}
+```
+
+### 🐛 Issues Resolved
+- White gap between modal header and border in all modals
+- Missing preferences icon causing 404 errors
+- Undefined `translateAlertType` function causing JavaScript errors
+- Preferences API returning 500 errors for missing fields
+- Manual save buttons causing inconsistent user experience
+
 ## Version 2.3.0 - August 24, 2025
 
 ### 🔧 Bug Fixes

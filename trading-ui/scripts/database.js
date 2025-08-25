@@ -556,13 +556,23 @@ function updateAccountsTable() {
       <td>${account.id || ''}</td>
       <td data-date="${account.created_at}">${account.created_at || ''}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editAccount(${account.id})" title="ערוך">
-          <span class="btn-icon">✏️</span>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק">🗑️</button>
-        ${account.status && account.status !== 'cancelled' ?
-        `<button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>` :
-        ''}
+        <table class="table table-sm table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-secondary" onclick="editAccount(${account.id})" title="ערוך">✏️</button>
+              </td>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק">🗑️</button>
+              </td>
+              ${account.status && account.status !== 'cancelled' ?
+              `<td class="p-0">
+                <button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>
+              </td>` :
+              ''}
+            </tr>
+          </tbody>
+        </table>
       </td>
     </tr>
   `}).join('');
@@ -608,13 +618,23 @@ function updateTradesTable() {
       <td data-date="${trade.created_at}">${trade.created_at || ''}</td>
       <td>${trade.side || ''}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editTrade(${trade.id})" title="ערוך">
-          <span class="btn-icon">✏️</span>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteTrade(${trade.id})" title="מחק">🗑️</button>
-        ${trade.status && trade.status !== 'cancelled' ?
-        `<button class="btn btn-sm btn-warning" onclick="cancelTrade(${trade.id})" title="ביטול">❌</button>` :
-        ''}
+        <table class="table table-sm table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-secondary" onclick="editTrade(${trade.id})" title="ערוך">✏️</button>
+              </td>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-danger" onclick="deleteTrade(${trade.id})" title="מחק">🗑️</button>
+              </td>
+              ${trade.status && trade.status !== 'cancelled' ?
+              `<td class="p-0">
+                <button class="btn btn-sm btn-warning" onclick="cancelTrade(${trade.id})" title="ביטול">❌</button>
+              </td>` :
+              ''}
+            </tr>
+          </tbody>
+        </table>
       </td>
     </tr>
   `}).join('');
@@ -654,10 +674,18 @@ function updateTickersTable() {
       <td data-date="${ticker.created_at}">${ticker.created_at || ''}</td>
       <td data-date="${ticker.updated_at}">${ticker.updated_at || ''}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">
-          <span class="btn-icon">✏️</span>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})" title="מחק">🗑️</button>
+        <table class="table table-sm table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">✏️</button>
+              </td>
+              <td class="p-0">
+                <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})" title="מחק">🗑️</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </td>
     </tr>
   `}).join('');
@@ -703,13 +731,23 @@ function updateTradePlansTable() {
       <td>${plan.side || ''}</td>
       <td data-status="${statusForFilter}">${plan.status || ''}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editTradePlan(${plan.id})" title="ערוך">
-          <span class="btn-icon">✏️</span>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteTradePlan(${plan.id})" title="מחק">🗑️</button>
-        ${plan.status && plan.status !== 'cancelled' ?
-        `<button class="btn btn-sm btn-warning" onclick="cancelTradePlan(${plan.id})" title="ביטול">❌</button>` :
-        ''}
+        <table class="table table-sm table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-secondary" onclick="editTradePlan(${plan.id})" title="ערוך">✏️</button>
+              </td>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-danger" onclick="deleteTradePlan(${plan.id})" title="מחק">🗑️</button>
+              </td>
+              ${plan.status && plan.status !== 'cancelled' ?
+              `<td class="p-0">
+                <button class="btn btn-sm btn-warning" onclick="cancelTradePlan(${plan.id})" title="ביטול">❌</button>
+              </td>` :
+              ''}
+            </tr>
+          </tbody>
+        </table>
       </td>
     </tr>
   `}).join('');
@@ -788,10 +826,18 @@ function updateCashFlowsTable() {
       <td>${cashFlow.source || ''}</td>
       <td>${cashFlow.external_id || ''}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">
-          <span class="btn-icon">✏️</span>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>
+        <table class="table table-sm table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">✏️</button>
+              </td>
+              <td class="p-0">
+                <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </td>
     </tr>
   `}).join('');
@@ -837,15 +883,25 @@ function updateAlertsTable() {
       <td>${alert.related_type_id || ''}</td>
       <td>${alert.related_id || ''}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">
-          <span class="btn-icon">✏️</span>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
-        ${alert.status === 'open' ? `
-        <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>
-        ` : `
-        <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
-        `}
+        <table class="table table-sm table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
+              </td>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
+              </td>
+              <td class="p-0">
+                ${alert.status === 'open' ? `
+                <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>
+                ` : `
+                <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
+                `}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </td>
     </tr>
   `}).join('');
@@ -872,10 +928,18 @@ function updateNotesTable() {
       <td>${note.related_type_id || ''}</td>
       <td>${note.related_id || ''}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editNote(${note.id})" title="ערוך">
-          <span class="btn-icon">✏️</span>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id})" title="מחק">🗑️</button>
+        <table class="table table-sm table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="p-0 pe-1">
+                <button class="btn btn-sm btn-secondary" onclick="editNote(${note.id})" title="ערוך">✏️</button>
+              </td>
+              <td class="p-0">
+                <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id})" title="מחק">🗑️</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </td>
     </tr>
   `).join('');

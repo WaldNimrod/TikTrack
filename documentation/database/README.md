@@ -1,324 +1,179 @@
 # TikTrack Database Documentation
 
 ## Overview
+The TikTrack system uses SQLite as its primary database with SQLAlchemy ORM for data management. The database includes dynamic constraint management, foreign key relationships, and comprehensive data validation.
 
-> 📋 **לפרטים מלאים על הפרויקט:** ראה [PROJECT_STATUS_SUMMARY.md](../../PROJECT_STATUS_SUMMARY.md)
+## Database Architecture
 
-## 🆕 **Latest Updates (August 24, 2025)**
-- ✅ **Dynamic Constraint System** - 90 constraints defined across all tables
-- ✅ **Schema Updates** - `trades.type` → `trades.investment_type`
-- ✅ **Model Updates** - All models updated with NOT NULL constraints
-- ✅ **Default Values** - Proper defaults for all required fields
-- ✅ **Validation Integration** - Real-time validation against constraints
-- ✅ **Alerts Table Migration** - Migrated from single condition field to three separate fields ([Details](ALERTS_TABLE_MIGRATION.md))
-The TikTrack database is built on SQLite with SQLAlchemy ORM, providing a robust foundation for trading management operations. The database includes dynamic constraint management capabilities and comprehensive data integrity features.
+### Core Tables
 
-## Database File
-- **Location**: `Backend/db/simpleTrade_new.db`
-- **Type**: SQLite 3
-- **Size**: ~151KB (as of August 2025)
-- **WAL Mode**: Enabled for better concurrency
+#### 1. Accounts
+- **Purpose**: Trading account management
+- **Key Fields**: id, name, status, currency_id, balance
+- **Relationships**: Linked to cash_flows, trades, alerts
+- **Constraints**: NOT NULL, FOREIGN KEY (currencies)
 
-## Core Tables
+#### 2. Cash Flows ✅ **RECENTLY ENHANCED**
+- **Purpose**: Cash flow tracking and management
+- **Key Fields**: id, account_id, type, amount, date, description, source, currency_id
+- **Relationships**: Linked to accounts, currencies
+- **Constraints**: 
+  - NOT NULL constraints on required fields
+  - FOREIGN KEY (accounts, currencies)
+  - ENUM constraint on type (income, expense, fee, tax, interest)
+  - ENUM constraint on source (manual, automatic)
+  - currency_id nullable with default value (1)
+- **Recent Improvements**:
+  - Fixed currency_id nullable constraint with default value
+  - Added missing ENUM values (fee, interest) to type constraints
+  - Implemented proper date handling for SQLite compatibility
+  - Enhanced validation and error handling
 
-### 1. Trades Table
-```sql
-CREATE TABLE trades (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    account_id INTEGER NOT NULL,
-    ticker TEXT NOT NULL,
-    investment_type TEXT DEFAULT 'swing',
-    status TEXT DEFAULT 'open',
-    entry_price DECIMAL(10,2),
-    current_price DECIMAL(10,2),
-    exit_price DECIMAL(10,2),
-    quantity INTEGER,
-    entry_date TIMESTAMP,
-    exit_date TIMESTAMP,
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (account_id) REFERENCES accounts(id)
-);
-```
+#### 3. Alerts
+- **Purpose**: Alert system management
+- **Key Fields**: id, account_id, ticker_id, condition, status
+- **Relationships**: Linked to accounts, tickers
+- **Constraints**: NOT NULL, FOREIGN KEY, ENUM constraints
 
-### 2. Accounts Table
-```sql
-CREATE TABLE accounts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    currency TEXT DEFAULT 'USD',
-    balance DECIMAL(15,2) DEFAULT 0.00,
-    status TEXT DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+#### 4. Currencies
+- **Purpose**: Currency management system
+- **Key Fields**: id, symbol, name, usd_rate
+- **Constraints**: UNIQUE (symbol), NOT NULL
+- **Integration**: Used across all modules for currency display
 
-### 3. Alerts Table
-```sql
-CREATE TABLE alerts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    type TEXT NOT NULL DEFAULT 'price',
-    status TEXT DEFAULT 'open',
-    message TEXT,
-    triggered_at TIMESTAMP,
-    is_triggered TEXT DEFAULT 'false',
-    related_type_id INTEGER NOT NULL DEFAULT 4,
-    related_id INTEGER NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    condition_attribute VARCHAR(50),
-    condition_operator VARCHAR(50),
-    condition_number DECIMAL(10,2),
-    FOREIGN KEY (related_type_id) REFERENCES note_relation_types(id)
-);
-```
+#### 5. Notes
+- **Purpose**: Note creation and relationship management
+- **Key Fields**: id, content, created_at
+- **Relationships**: Linked to note_relation_types
+- **Constraints**: NOT NULL, FOREIGN KEY
 
-**New Condition Fields Format:**
-The alerts table now uses three separate fields for better flexibility:
+#### 6. Note Relation Types
+- **Purpose**: Relationship type management for notes
+- **Key Fields**: id, note_relation_type, created_at
+- **Constraints**: NOT NULL, UNIQUE
 
-- **condition_attribute** (Data Type): `price`, `change`, `ma`, `volume`
-- **condition_operator** (Operator): `more_than`, `less_than`, `cross`, `cross_up`, `cross_down`, `equals`, `change`, `change_up`, `change_down`
-- **condition_number** (Number): Numeric value for comparison
-
-**Examples:**
-- `condition_attribute: 'price'`, `condition_operator: 'more_than'`, `condition_number: 150` - Price greater than 150
-- `condition_attribute: 'change'`, `condition_operator: 'more_than'`, `condition_number: 5` - Change increases by 5%
-- `condition_attribute: 'ma'`, `condition_operator: 'cross_up'`, `condition_number: 200` - Moving average crosses up 200
-- `condition_attribute: 'volume'`, `condition_operator: 'more_than'`, `condition_number: 1000000` - Volume greater than 1M
-
-**Legacy Support:**
-The API still returns a `condition` field in the format: `"{condition_attribute} | {condition_operator} | {condition_number}"` for backward compatibility.
-
-### 4. Trade Plans Table
-```sql
-CREATE TABLE trade_plans (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    account_id INTEGER NOT NULL,
-    ticker TEXT NOT NULL,
-    investment_type TEXT DEFAULT 'swing',
-    entry_price DECIMAL(10,2),
-    target_price DECIMAL(10,2),
-    stop_loss DECIMAL(10,2),
-    quantity INTEGER,
-    status TEXT DEFAULT 'open',
-    entry_conditions TEXT,
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (account_id) REFERENCES accounts(id)
-);
-```
-
-### 5. Notes Table
-```sql
-CREATE TABLE notes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    entity_type TEXT NOT NULL,
-    entity_id INTEGER NOT NULL,
-    title TEXT,
-    content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-## Dynamic Constraint Management System
-
-### 6. Constraints Table
-```sql
-CREATE TABLE constraints (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    table_name TEXT NOT NULL,
-    column_name TEXT NOT NULL,
-    constraint_type TEXT NOT NULL CHECK (constraint_type IN ('CHECK', 'NOT NULL', 'UNIQUE', 'FOREIGN KEY', 'ENUM')),
-    constraint_name TEXT NOT NULL,
-    constraint_definition TEXT,
-    is_active BOOLEAN DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### 7. Enum Values Table
-```sql
-CREATE TABLE enum_values (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    constraint_id INTEGER NOT NULL,
-    value TEXT NOT NULL,
-    display_name TEXT NOT NULL,
-    sort_order INTEGER DEFAULT 1,
-    is_active BOOLEAN DEFAULT 1,
-    FOREIGN KEY (constraint_id) REFERENCES constraints(id) ON DELETE CASCADE
-);
-```
-
-### 8. Constraint Validations Table
-```sql
-CREATE TABLE constraint_validations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    constraint_id INTEGER NOT NULL,
-    table_name TEXT NOT NULL,
-    column_name TEXT NOT NULL,
-    validation_result TEXT NOT NULL,
-    invalid_records_count INTEGER DEFAULT 0,
-    validation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (constraint_id) REFERENCES constraints(id) ON DELETE CASCADE
-);
-```
-
-## Indexes
-
-### Performance Indexes
-```sql
--- Trades table indexes
-CREATE INDEX idx_trades_account_id ON trades(account_id);
-CREATE INDEX idx_trades_status ON trades(status);
-CREATE INDEX idx_trades_investment_type ON trades(investment_type);
-CREATE INDEX idx_trades_entry_date ON trades(entry_date);
-
--- Alerts table indexes
-CREATE INDEX idx_alerts_ticker ON alerts(ticker);
-CREATE INDEX idx_alerts_status ON alerts(status);
-CREATE INDEX idx_alerts_related ON alerts(related_type_id, related_id);
-
--- Constraints table indexes
-CREATE INDEX idx_constraints_table_column ON constraints(table_name, column_name);
-CREATE INDEX idx_constraints_type ON constraints(constraint_type);
-CREATE INDEX idx_constraints_active ON constraints(is_active);
-
--- Enum values table indexes
-CREATE INDEX idx_enum_values_constraint ON enum_values(constraint_id);
-CREATE INDEX idx_enum_values_active ON enum_values(is_active);
-```
-
-## Relationships
-
-### Foreign Key Relationships
-1. **trades.account_id** → **accounts.id**
-2. **trade_plans.account_id** → **accounts.id**
-3. **enum_values.constraint_id** → **constraints.id**
-4. **constraint_validations.constraint_id** → **constraints.id**
-
-### Entity Relationships
-- **Alerts** can be linked to any entity via `related_type_id` and `related_id`
-- **Notes** can be linked to any entity via `entity_type` and `entity_id`
-- **Constraints** define validation rules for table columns
-
-## Data Types and Constraints
-
-### Standard Data Types
-- **INTEGER**: IDs, quantities, counts
-- **TEXT**: Names, descriptions, status values
-- **DECIMAL(10,2)**: Prices, balances, amounts
-- **TIMESTAMP**: Dates and times
-- **BOOLEAN**: True/false flags
+## Dynamic Constraint Management
 
 ### Constraint Types
-1. **CHECK**: Custom validation rules
-2. **NOT NULL**: Required field validation
-3. **UNIQUE**: Unique value enforcement
-4. **FOREIGN KEY**: Referential integrity
-5. **ENUM**: Predefined value lists
+1. **NOT NULL**: Ensures required fields have values
+2. **FOREIGN KEY**: Maintains referential integrity
+3. **UNIQUE**: Prevents duplicate values
+4. **ENUM**: Restricts values to predefined options
+5. **DEFAULT**: Provides default values for fields
 
-## Migration System
+### Constraint Tables
+- **constraints**: Stores constraint definitions
+- **enum_values**: Stores allowed values for ENUM constraints
+- **foreign_keys**: Stores foreign key relationships
 
-### Migration Files
-- `create_constraints_tables.py` - Creates constraint management tables
-- `insert_basic_constraints.py` - Inserts initial constraints
-- `remove_old_constraints.py` - Removes hardcoded constraints
-- `update_trades_investment_type.py` - Renames type column
+### Recent Enhancements
+- **ENUM Value Management**: Dynamic addition of new enum values
+- **Constraint Validation**: Real-time constraint checking
+- **Error Handling**: Comprehensive error messages for constraint violations
 
-### Running Migrations
-```bash
-cd Backend
-python3 migrations/migration_name.py
-```
+## Database Operations
 
-## Backup Strategy
+### Backup System
+- **Automated Backups**: Regular database snapshots
+- **Git Integration**: Version-controlled backups
+- **Recovery Procedures**: Documented recovery processes
 
-### Manual Backups
-```bash
-cp Backend/db/simpleTrade_new.db Backend/db/simpleTrade_new_backup_$(date +%Y%m%d_%H%M%S).db
-```
+### Migration System
+- **Schema Updates**: Dynamic schema modification
+- **Data Migration**: Safe data transformation
+- **Version Control**: Migration version tracking
 
-### Backup Files
-- Backup files are stored in `Backend/db/`
-- Naming convention: `simpleTrade_new_backup_YYYYMMDD_HHMMSS.db`
-- Backups are excluded from git via .gitignore
+### Validation System
+- **Client-Side**: Real-time form validation
+- **Server-Side**: Comprehensive data validation
+- **Database-Level**: Constraint enforcement
 
-### Restore Process
-1. Stop the application server
-2. Copy backup file to `simpleTrade_new.db`
-3. Restart the application server
+## API Integration
 
-## Performance Optimization
+### RESTful Endpoints
+- **CRUD Operations**: Complete create, read, update, delete functionality
+- **Validation**: Multi-layer validation system
+- **Error Handling**: Comprehensive error responses
+- **Logging**: Detailed request/response logging
 
-### Query Optimization
-- Use appropriate indexes for frequently queried columns
-- Implement pagination for large result sets
-- Use LIMIT clauses to restrict result sizes
-- Optimize JOIN operations
+### Data Formats
+- **JSON**: Primary data exchange format
+- **Date Handling**: ISO 8601 date format (YYYY-MM-DD)
+- **Currency**: Proper currency formatting and validation
 
-### Database Maintenance
-- Regular VACUUM operations
-- Analyze table statistics
-- Monitor query performance
-- Clean up old validation records
+## Recent Improvements
 
-## Security Considerations
+### Cash Flows Module
+1. **Currency Integration**: Proper currency_id handling with defaults
+2. **Date Compatibility**: SQLite-compatible date handling
+3. **Type Validation**: Enhanced type constraint management
+4. **Source Tracking**: Manual/automatic source differentiation
+5. **Form Validation**: Comprehensive client and server validation
 
-### Data Protection
-- Input validation at application level
-- Parameterized queries to prevent SQL injection
-- Access control through application logic
-- Regular security audits
+### System Enhancements
+1. **Warning System**: Centralized modal system for confirmations
+2. **Translation System**: Global translation utilities
+3. **Page Styling**: Consistent gradient backgrounds
+4. **Error Handling**: Improved error messages and logging
 
-### Backup Security
-- Encrypt sensitive backup files
-- Store backups in secure locations
-- Implement backup rotation policies
-- Test restore procedures regularly
+## Performance Considerations
 
-## Monitoring and Maintenance
+### Optimization Strategies
+- **Indexing**: Strategic index placement for query performance
+- **Query Optimization**: Efficient SQL query design
+- **Caching**: Consider implementing caching layer
+- **Connection Pooling**: Database connection management
 
-### Health Checks
-- Database connectivity
-- Constraint validation status
-- Performance metrics
-- Error rate monitoring
-
-### Maintenance Tasks
-- Regular constraint validation
-- Cleanup of old validation records
-- Performance optimization
-- Security updates
+### Monitoring
+- **Query Performance**: Monitor slow queries
+- **Constraint Validation**: Track constraint violation rates
+- **Error Rates**: Monitor API error frequencies
+- **Database Size**: Track database growth
 
 ## Development Guidelines
 
-### Adding New Tables
-1. Create migration script
-2. Define table schema
-3. Add appropriate indexes
-4. Update documentation
-5. Test thoroughly
+### Database Changes
+1. **Migration Scripts**: Always create migration scripts for schema changes
+2. **Constraint Management**: Use dynamic constraint system for flexibility
+3. **Data Validation**: Implement comprehensive validation at all layers
+4. **Backup Strategy**: Maintain regular backups before major changes
 
-### Modifying Existing Tables
-1. Create migration script
-2. Backup existing data
-3. Apply changes
-4. Validate data integrity
-5. Update documentation
+### Code Standards
+1. **Model Definitions**: Clear and documented model structures
+2. **Relationship Management**: Proper foreign key relationships
+3. **Validation Logic**: Consistent validation across all modules
+4. **Error Handling**: Comprehensive error handling and logging
 
-### Constraint Management
-1. Use dynamic constraint system
-2. Define constraints through UI
-3. Validate constraints regularly
-4. Monitor constraint violations
+## Troubleshooting
+
+### Common Issues
+1. **Constraint Violations**: Check enum_values table for missing values
+2. **Foreign Key Errors**: Verify referenced records exist
+3. **Date Format Issues**: Ensure proper date string formatting
+4. **Currency Issues**: Verify currency_id references valid currencies
+
+### Debugging Tools
+- **SQLite CLI**: Direct database access for debugging
+- **Log Files**: Comprehensive logging for error tracking
+- **API Testing**: Use curl or Postman for API testing
+- **Constraint Inspection**: Check constraints and enum_values tables
+
+## Future Enhancements
+
+### Planned Improvements
+1. **Advanced Filtering**: Implement complex filtering capabilities
+2. **Sorting System**: Add column sorting functionality
+3. **Performance Optimization**: Implement caching and query optimization
+4. **Migration System**: Enhanced migration management
+5. **Testing Suite**: Comprehensive database testing
+
+### Technical Debt
+1. **Testing Coverage**: Need comprehensive testing suite
+2. **Performance Monitoring**: Implement performance monitoring tools
+3. **Documentation**: Enhance technical documentation
+4. **Code Quality**: Implement code quality tools
 
 ---
 
-**Last Updated**: August 23, 2025  
-**Database Version**: 2.0.0  
-**Author**: TikTrack Development Team
+**Last Updated**: 2025-01-26  
+**Maintainer**: TikTrack Development Team

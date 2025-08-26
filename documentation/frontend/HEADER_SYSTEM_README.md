@@ -1,206 +1,261 @@
-# מערכת הראש המאוחדת - Header System
+# TikTrack Header System Documentation
 
-## סקירה כללית
+## Overview
+The TikTrack header system provides a consistent navigation and user interface across all pages. The system includes a centralized warning system, translation utilities, and responsive design components.
 
-מערכת הראש המאוחדת (`HeaderSystem`) היא רכיב JavaScript עצמאי המחליף את מערכת הראש הישנה (`app-header`). המערכת כוללת:
+## System Components
 
-- **כותרת מאוחדת** עם ניווט
-- **מערכת פילטרים חכמה** (`SimpleFilter`) שמתאימה את עצמה לטבלאות שונות
-- **שמירת מצב** ב-localStorage
-- **תמיכה ב-RTL** לעברית
+### 1. Header Navigation
+- **Main Menu**: Primary navigation menu with page links
+- **Settings Dropdown**: Secondary navigation and system settings
+- **Responsive Design**: Mobile-friendly navigation
+- **Active State Management**: Current page highlighting
 
-## עמודים שהושלמה בהם האינטגרציה (18 עמודים)
+### 2. Warning System ✅ **RECENTLY ENHANCED**
+- **Purpose**: Centralized modal system for confirmations and warnings
+- **File**: `scripts/warning-system.js`
+- **Features**:
+  - Delete confirmations with customizable messages
+  - Validation warnings with field-specific guidance
+  - Linked item warnings for data integrity
+  - Consistent UI across all modules
+  - Global callback management for actions
+- **Recent Improvements**:
+  - Enhanced global callback management
+  - Improved modal responsiveness
+  - Better error handling and user feedback
+  - Consistent styling across all modules
+  - Integration with Cash Flows module
 
-### עמודים ראשיים עם פילטרים מלאים:
-1. **תכנון** (`trade_plans.html`) ✅
-2. **מעקב** (`trades.html`) ✅  
-3. **התראות** (`alerts.html`) ✅
-4. **עסקאות** (`executions.html`) ✅
-5. **טיקרים** (`tickers.html`) ✅
-6. **חשבונות** (`accounts.html`) ✅
-7. **תזרימי מזומנים** (`cash_flows.html`) ✅
-8. **הערות** (`notes.html`) ✅
-9. **בסיס נתונים** (`db_display.html`) ✅ - 8 טבלאות
-10. **בדיקות** (`tests.html`) ✅
+### 3. Translation System ✅ **RECENTLY ENHANCED**
+- **Purpose**: Global translation utilities for consistent text display
+- **File**: `scripts/translation-utils.js`
+- **Features**:
+  - Alert condition translation
+  - Trade status translation
+  - Currency display formatting
+  - Consistent text rendering across modules
+- **Recent Additions**:
+  - `translateAlertCondition()` function
+  - `translateTradeStatus()` function
+  - Enhanced currency display utilities
 
-### עמודים ללא טבלאות (לא נדרשים פילטרים):
-11. **העדפות** (`preferences.html`) - דף הגדרות
-12. **דף הבית** (`index.html`) - דף ראשי
-13. **מחקר** (`research.html`) - דף מחקר
-14. **דף בדיקות ראש** (`test-header-only.html`) - דף בדיקה
+## File Structure
 
-## שינויים טכניים שבוצעו
+### Core Files
+```
+trading-ui/
+├── scripts/
+│   ├── header-system.js      # Header navigation and menu management
+│   ├── warning-system.js     # Centralized warning modal system
+│   ├── translation-utils.js  # Global translation utilities
+│   └── main.js              # General utilities and functions
+├── styles/
+│   ├── header-system.css     # Header and navigation styles
+│   └── styles.css           # Global styles and page themes
+└── images/
+    └── icons/               # Navigation icons and images
+```
 
-### 1. עדכון קבצי HTML:
-- הסרת `<div id="unified-header-container"></div>` מכל העמודים
-- עדכון `DOMContentLoaded` listeners לשימוש ב-`window.headerSystem.init()`
-- הוספת קישורים לקבצי CSS ו-JS של מערכת הראש המאוחדת
+### Page Integration
+- **HTML Structure**: Consistent header structure across all pages
+- **JavaScript Loading**: Standardized script loading order
+- **CSS Integration**: Unified styling approach
+- **Responsive Design**: Mobile-first responsive design
 
-### 2. עדכון פונקציות טבלאות:
-- הוספת `data-attributes` לכל השורות בטבלאות:
-  - `data-status` - לפילטר סטטוס
-  - `data-type` - לפילטר סוג
-  - `data-account` - לפילטר חשבון
-  - `data-date` - לפילטר תאריך
-- הוספת לוגיקת המרה לעברית לכל הפילטרים
-- עדכון פונקציות `updateTable` בכל הקבצים
+## Warning System Architecture
 
-### 3. דף בסיס נתונים מיוחד:
-- תיקון 8 טבלאות שונות עם data attributes מלאים
-- הוספת המרות עברית לכל סוגי הנתונים
-- תמיכה בפילטרים לכל הטבלאות במקביל
-
-## שמירת מצב
-- הפילטרים שומרים את המצב שלהם ב-`localStorage`
-- מצב פתיחה/סגירה של סקשנים נשמר לכל עמוד בנפרד
-- העדפות משתמש נשמרות בין הפעלות
-
-## תוצאות בדיקות
-- ✅ כל העמודים נטענים בהצלחה
-- ✅ הפילטרים עובדים על כל הטבלאות
-- ✅ פילטר החשבונות טוען נתונים דינמית
-- ✅ המרות עברית עובדות כראוי
-- ✅ שמירת מצב עובדת בין עמודים
-
-## קבצים שעודכנו
-- `trading-ui/scripts/planning.js` - תיקון data attributes
-- `trading-ui/scripts/trades.js` - תיקון data attributes  
-- `trading-ui/scripts/executions.js` - תיקון data attributes
-- `trading-ui/scripts/tickers.js` - תיקון data attributes
-- `trading-ui/scripts/accounts.js` - תיקון data attributes
-- `trading-ui/scripts/cash_flows.js` - הוספת פונקציות חסרות
-- `trading-ui/scripts/database.js` - תיקון 8 טבלאות
-- `documentation/frontend/HEADER_SYSTEM_README.md` - עדכון תיעוד
-
-## עדכון אוגוסט 2025 - אופציית "הכול" ומערכת משתמשים
-
-### שינויים חדשים:
-1. **אופציית "הכול" בכל הפילטרים**
-   - פילטר סטטוס: פתוח, סגור, מבוטל + הכול
-   - פילטר טיפוס: סווינג, השקעה, פסיבי + הכול
-   - פילטר חשבונות: רשימה דינמית + הכול
-   - פילטר תאריכים: כל זמן (כבר היה)
-
-2. **תיקון כפתורי איפוס וניקוי**
-   - כפתור ניקוי: מאפס הכל ומציג כל הרשומות
-   - כפתור איפוס: מאפס לערכי ברירת מחדל מהעדפות
-   - טעינת חשבונות מחדש אחרי איפוס/ניקוי
-
-3. **פילטור מקומי בכל העמודים**
-   - עסקאות: `filterExecutionsLocally()`
-   - טיקרים: `filterTickersLocally()`
-   - תזרימי מזומנים: `filterCashFlowsLocally()`
-
-4. **מערכת משתמשים**
-   - משתמש ברירת מחדל: "nimrod"
-   - תמיכה במשתמשים מרובים
-   - backward compatibility
-
-5. **API העדפות**
-   - תיקון שגיאות 500
-   - מבנה JSON מעודכן
-   - ערכי ברירת מחדל: open, swing, this_week
-
-## עדכון 24 באוגוסט 2025 - ניקוי בלבול קבצים
-
-### שינויים טכניים:
-1. **ניקוי בלבול קבצים**
-   - הסרת `SimpleFilter` הכפול מ-`header-system.js`
-   - איחוד מערכות פילטור לשימוש ב-`simple-filter.js`
-   - תיקון סלקטורים: `.status-filter-item`, `.type-filter-item`, `.account-filter-item`
-
-2. **תיקון API חשבונות**
-   - עדכון הקריאה ל-API מ-`/api/accounts` ל-`/api/v1/accounts/`
-   - תיקון עיבוד התגובה מה-API
-
-3. **עדכון עמודים**
-   - עדכון 10 עמודים ראשיים עם הקבצים הנכונים
-   - תיקון סדר טעינת קבצים
-   - הסרת `filter-system.js` מכל העמודים
-
-### מצב נוכחי:
-- ✅ שרת רץ על http://localhost:8080
-- ✅ API חשבונות עובד: `/api/v1/accounts/`
-- ✅ קבצים נטענים: `simple-filter.js`, `header-system.js`
-- ✅ עמודים מעודכנים: 10 עמודים ראשיים
-- ✅ סלקטורים מתוקנים: פילטרים עובדים
-- 🔄 בדיקות נדרשות: פונקציונליות בפועל
-
-## ארכיטקטורה
-
-### קבצים ראשיים:
-- `header-system.js` - מערכת הראש המאוחדת
-- `simple-filter.js` - מערכת פילטור מאוחדת
-- `header-system.css` - עיצוב מערכת הראש
-
-### תלויות:
-- `main.js` - פונקציות גלובליות
-- `translation-utils.js` - פונקציות תרגום
-- `table-mappings.js` - מיפוי טבלאות
-
-### API Endpoints:
-- `/api/v1/accounts/` - טעינת חשבונות לפילטר
-- `/api/preferences` - העדפות משתמש
-
-## הוראות שימוש
-
-### אתחול מערכת:
+### Modal Management
 ```javascript
-// אתחול אוטומטי
-document.addEventListener('DOMContentLoaded', () => {
-  if (window.headerSystem) {
-    window.headerSystem.init();
-  }
-  if (window.simpleFilter) {
-    window.simpleFilter.init();
-  }
+// Show warning modal
+window.showWarning({
+    title: 'Delete Confirmation',
+    message: 'Are you sure you want to delete this item?',
+    type: 'delete',
+    onConfirm: function() {
+        // Confirmation action
+    },
+    onCancel: function() {
+        // Cancellation action
+    }
 });
 ```
 
-### פילטור נתונים:
+### Global Callback Management
+- **Callback Storage**: Global storage for confirmation/cancellation callbacks
+- **Event Handling**: Consistent event handling across all modals
+- **Error Recovery**: Graceful error handling for failed operations
+- **User Feedback**: Clear feedback for user actions
+
+### Integration Examples
+
+#### Cash Flows Module
 ```javascript
-// פילטור מקומי
-const filteredData = filterExecutionsLocally(
-  executions, 
-  selectedStatuses, 
-  selectedTypes, 
-  selectedAccounts, 
-  dateRange, 
-  searchTerm
-);
+// Delete cash flow with warning
+function showDeleteCashFlowModal(id) {
+    window.showDeleteWarning(
+        'האם אתה בטוח שברצונך למחוק את תזרים המזומנים הזה?',
+        () => confirmDeleteCashFlow(id)
+    );
+}
 ```
 
-### שמירת מצב:
+#### Accounts Module
 ```javascript
-// שמירת פילטרים
-localStorage.setItem('filterStates', JSON.stringify(filterStates));
-
-// טעינת פילטרים
-const savedFilters = JSON.parse(localStorage.getItem('filterStates'));
+// Delete account with linked items warning
+function showDeleteAccountModal(id, linkedItems) {
+    if (linkedItems.length > 0) {
+        window.showLinkedItemsWarning(
+            'לא ניתן למחוק חשבון עם פריטים מקושרים',
+            linkedItems,
+            () => deleteAccount(id)
+        );
+    } else {
+        window.showDeleteWarning(
+            'האם אתה בטוח שברצונך למחוק את החשבון הזה?',
+            () => deleteAccount(id)
+        );
+    }
+}
 ```
 
-## פתרון בעיות
+## Translation System Architecture
 
-### בעיות נפוצות:
-1. **פילטרים לא עובדים**: בדוק שהסלקטורים נכונים
-2. **חשבונות לא נטענים**: בדוק שה-API endpoint נכון
-3. **מצב לא נשמר**: בדוק שה-localStorage עובד
-
-### דיבאג:
+### Global Functions
 ```javascript
-// בדיקת מצב מערכת
-console.log('Header System:', window.headerSystem);
-console.log('Simple Filter:', window.simpleFilter);
-console.log('Filter States:', localStorage.getItem('filterStates'));
+// Alert condition translation
+function translateAlertCondition(condition) {
+    const translations = {
+        'price': 'מחיר',
+        'change': 'שינוי',
+        'ma': 'ממוצע נע',
+        'volume': 'נפח'
+    };
+    return translations[condition] || condition;
+}
+
+// Trade status translation
+function translateTradeStatus(status) {
+    const translations = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'pending': 'ממתין'
+    };
+    return translations[status] || status;
+}
 ```
 
-## תאימות
-- **דפדפנים**: Chrome, Firefox, Safari, Edge
-- **רזולוציות**: Desktop, Tablet, Mobile
-- **כיווניות**: RTL (עברית), LTR (אנגלית)
+### Currency Display
+```javascript
+// Currency formatting with translation
+function getCashFlowCurrencyDisplay(currencyId) {
+    const currency = currencies.find(c => c.id === currencyId);
+    return currency ? `${currency.symbol} - ${currency.name}` : 'לא נבחר';
+}
+```
+
+## Styling System
+
+### Page-Specific Themes ✅ **RECENTLY ENHANCED**
+- **Color Schemes**: Each page has its own color theme
+- **Gradient Backgrounds**: Consistent header styling
+- **Component Styling**: Themed buttons, forms, and tables
+- **Visual Hierarchy**: Clear information architecture
+
+### CSS Architecture
+```css
+/* Page-specific styling */
+.cash-flows-page .section-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Warning system styling */
+.warning-modal {
+    z-index: 1050;
+    backdrop-filter: blur(5px);
+}
+
+.warning-modal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+```
+
+## Responsive Design
+
+### Mobile Navigation
+- **Hamburger Menu**: Collapsible navigation for mobile devices
+- **Touch-Friendly**: Large touch targets for mobile interaction
+- **Adaptive Layout**: Responsive grid system
+- **Performance**: Optimized for mobile performance
+
+### Desktop Navigation
+- **Full Menu**: Complete navigation menu for desktop
+- **Hover Effects**: Interactive hover states
+- **Keyboard Navigation**: Full keyboard accessibility
+- **High Resolution**: Optimized for high-DPI displays
+
+## Integration Guidelines
+
+### Adding New Pages
+1. **HTML Structure**: Use consistent header structure
+2. **Script Loading**: Include required JavaScript files
+3. **CSS Classes**: Apply page-specific CSS classes
+4. **Navigation**: Add page to navigation menu
+5. **Testing**: Test across different devices and browsers
+
+### Warning System Integration
+1. **Import Script**: Include warning-system.js
+2. **Define Callbacks**: Create confirmation/cancellation callbacks
+3. **Show Warnings**: Use appropriate warning functions
+4. **Handle Responses**: Process user responses appropriately
+5. **Error Handling**: Implement proper error handling
+
+### Translation Integration
+1. **Import Script**: Include translation-utils.js
+2. **Use Functions**: Call appropriate translation functions
+3. **Consistent Formatting**: Use consistent text formatting
+4. **Fallback Handling**: Provide fallbacks for missing translations
+5. **Testing**: Test with different languages and text lengths
+
+## Recent Improvements
+
+### System Enhancements
+1. **Warning System**: Centralized modal system for confirmations
+2. **Translation System**: Global translation utilities
+3. **Page Styling**: Consistent gradient backgrounds
+4. **Error Handling**: Improved error messages and logging
+
+### Cash Flows Module Integration
+1. **Delete Confirmations**: Integrated warning system for deletions
+2. **Form Validation**: Enhanced validation with warning system
+3. **Error Display**: Improved error message display
+4. **User Feedback**: Better user feedback for actions
+
+### Technical Improvements
+1. **Performance**: Optimized modal rendering and event handling
+2. **Accessibility**: Improved keyboard navigation and screen reader support
+3. **Mobile Support**: Enhanced mobile responsiveness
+4. **Code Quality**: Improved code organization and documentation
+
+## Future Enhancements
+
+### Planned Improvements
+1. **Advanced Modals**: More sophisticated modal types
+2. **Animation System**: Smooth transitions and animations
+3. **Theme System**: Dynamic theme switching
+4. **Accessibility**: Enhanced accessibility features
+
+### Technical Debt
+1. **Testing Coverage**: Need comprehensive testing suite
+2. **Performance Monitoring**: Implement performance monitoring
+3. **Code Quality**: Add code quality tools
+4. **Documentation**: Enhance technical documentation
 
 ---
 
-**תאריך עדכון אחרון**: 24 באוגוסט 2025  
-**גרסה**: 2.1  
-**מצב**: הושלם בהצלחה - נדרשות בדיקות סופיות
+**Last Updated**: 2025-01-26  
+**Maintainer**: TikTrack Development Team

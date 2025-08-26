@@ -1,347 +1,291 @@
-# Translation Functions - TikTrack Frontend
+# TikTrack Translation Functions Documentation
 
 ## Overview
-This document provides detailed documentation for all translation functions in the TikTrack system. All translation functions are centralized in `trading-ui/scripts/translation-utils.js`.
+The TikTrack translation system provides global utilities for consistent text display across all modules. The system includes functions for translating various data types, formatting currencies, and maintaining consistent text rendering.
 
-## 🎯 **Purpose**
-The translation functions provide consistent Hebrew translations for various system entities including statuses, types, and actions. They ensure a unified user experience across all pages.
+## System Architecture
 
-## 📁 **File Location**
-- **Primary File:** `trading-ui/scripts/translation-utils.js`
-- **Included In:** All HTML files via script tag
-- **Global Access:** All functions exported to `window` object
+### Core File
+- **File**: `scripts/translation-utils.js`
+- **Purpose**: Centralized translation utilities
+- **Scope**: Global functions accessible across all modules
+- **Integration**: Used by all page-specific JavaScript files
 
-## 🔄 **Function Categories**
+### Translation Categories
+1. **Alert Conditions**: Translate alert condition types
+2. **Trade Status**: Translate trade status values
+3. **Currency Display**: Format currency information
+4. **Number Formatting**: Format numbers and amounts
+5. **Date Formatting**: Format dates consistently
 
-### **1. Account Status Translations**
+## Global Functions
 
-#### `translateAccountStatus(status)`
-**Purpose:** Translate account status values to Hebrew
-**Parameters:**
-- `status` (string): Account status in English
-**Returns:** (string) Account status in Hebrew
-**Usage:**
-```javascript
-const hebrewStatus = window.translateAccountStatus('open'); // Returns 'פתוח'
-```
-
-**Status Mapping:**
-- `'open'` → `'פתוח'`
-- `'closed'` → `'סגור'`
-- `'cancelled'` → `'מבוטל'`
-
-### **2. Ticker Status Translations**
-
-#### `translateTickerStatus(status)`
-**Purpose:** Translate ticker status values to Hebrew
-**Parameters:**
-- `status` (string): Ticker status in English
-**Returns:** (string) Ticker status in Hebrew
-**Usage:**
-```javascript
-const hebrewStatus = window.translateTickerStatus('active'); // Returns 'פעיל'
-```
-
-**Status Mapping:**
-- `'active'` → `'פעיל'`
-- `'inactive'` → `'לא פעיל'`
-- `'suspended'` → `'מושעה'`
-- `'delisted'` → `'הוסר מהמסחר'`
-
-### **3. Note Status Translations**
-
-#### `translateNoteStatus(status)`
-**Purpose:** Translate note status values to Hebrew
-**Parameters:**
-- `status` (string): Note status in English
-**Returns:** (string) Note status in Hebrew
-**Usage:**
-```javascript
-const hebrewStatus = window.translateNoteStatus('active'); // Returns 'פעיל'
-```
-
-**Status Mapping:**
-- `'active'` → `'פעיל'`
-- `'archived'` → `'בארכיון'`
-- `'deleted'` → `'נמחק'`
-
-### **4. Alert Status Translations**
-
-#### `translateAlertStatus(status)`
-**Purpose:** Translate alert status values to Hebrew
-**Parameters:**
-- `status` (string): Alert status in English
-**Returns:** (string) Alert status in Hebrew
-**Usage:**
-```javascript
-const hebrewStatus = window.translateAlertStatus('open'); // Returns 'פתוח'
-```
-
-**Status Mapping:**
-- `'open'` → `'פתוח'`
-- `'closed'` → `'סגור'`
-- `'cancelled'` → `'מבוטל'`
-
-### **5. Is Triggered Translation**
-
-#### `translateIsTriggered(isTriggered)`
-**Purpose:** Translate boolean triggered status to Hebrew
-**Parameters:**
-- `isTriggered` (boolean): Triggered status
-**Returns:** (string) Triggered status in Hebrew
-**Usage:**
-```javascript
-const hebrewStatus = window.translateIsTriggered(true); // Returns 'כן'
-```
-
-**Status Mapping:**
-- `true` → `'כן'`
-- `false` → `'לא'`
-
-### **6. Trade Type Translations**
-
-#### `translateTradeType(type)`
-**Purpose:** Translate trade type values to Hebrew
-**Parameters:**
-- `type` (string): Trade type in English
-**Returns:** (string) Trade type in Hebrew
-**Usage:**
-```javascript
-const hebrewType = window.translateTradeType('buy'); // Returns 'קנה'
-```
-
-**Type Mapping:**
-- `'buy'` → `'קנה'`
-- `'sell'` → `'מכר'`
-- `'hold'` → `'החזק'`
-- `'close'` → `'סגר'`
-
-### **7. Trade Plan Type Translations**
-
-#### `translateTradePlanType(type)`
-**Purpose:** Translate trade plan type values to Hebrew
-**Parameters:**
-- `type` (string): Trade plan type in English
-**Returns:** (string) Trade plan type in Hebrew
-**Usage:**
-```javascript
-const hebrewType = window.translateTradePlanType('long'); // Returns 'עלייה'
-```
-
-**Type Mapping:**
-- `'long'` → `'עלייה'`
-- `'short'` → `'ירידה'`
-- `'neutral'` → `'ניטרלי'`
-
-### **8. Trade Plan Status Translations**
-
-#### `translateTradePlanStatus(status)`
-**Purpose:** Translate trade plan status values to Hebrew
-**Parameters:**
-- `status` (string): Trade plan status in English
-**Returns:** (string) Trade plan status in Hebrew
-**Usage:**
-```javascript
-const hebrewStatus = window.translateTradePlanStatus('active'); // Returns 'פעיל'
-```
-
-**Status Mapping:**
-- `'active'` → `'פעיל'`
-- `'completed'` → `'הושלם'`
-- `'cancelled'` → `'בוטל'`
-
-### **9. Cash Flow Type Translations**
-
-#### `translateCashFlowType(type)`
-**Purpose:** Translate cash flow type values to Hebrew
-**Parameters:**
-- `type` (string): Cash flow type in English
-**Returns:** (string) Cash flow type in Hebrew
-**Usage:**
-```javascript
-const hebrewType = window.translateCashFlowType('deposit'); // Returns 'הפקדה'
-```
-
-**Type Mapping:**
-- `'deposit'` → `'הפקדה'`
-- `'withdrawal'` → `'משיכה'`
-- `'transfer'` → `'העברה'`
-- `'fee'` → `'עמלה'`
-
-### **10. Cash Flow Source Translations**
-
-#### `translateCashFlowSource(source)`
-**Purpose:** Translate cash flow source values to Hebrew
-**Parameters:**
-- `source` (string): Cash flow source in English
-**Returns:** (string) Cash flow source in Hebrew
-**Usage:**
-```javascript
-const hebrewSource = window.translateCashFlowSource('manual'); // Returns 'הזנה ידנית'
-```
-
-**Source Mapping:**
-- `'manual'` → `'הזנה ידנית'`
-- `'import'` → `'ייבוא'`
-- `'api'` → `'API'`
-
-### **11. Test Category Translations**
-
-#### `translateTestCategory(category)`
-**Purpose:** Translate test category values to Hebrew
-**Parameters:**
-- `category` (string): Test category in English
-**Returns:** (string) Test category in Hebrew
-**Usage:**
-```javascript
-const hebrewCategory = window.translateTestCategory('performance'); // Returns 'ביצועים'
-```
-
-**Category Mapping:**
-- `'performance'` → `'ביצועים'`
-- `'functionality'` → `'פונקציונאליות'`
-- `'security'` → `'אבטחה'`
-
-### **12. Execution Action Translations**
-
-#### `translateExecutionAction(action)`
-**Purpose:** Translate execution action values to Hebrew
-**Parameters:**
-- `action` (string): Execution action in English
-**Returns:** (string) Execution action in Hebrew
-**Usage:**
-```javascript
-const hebrewAction = window.translateExecutionAction('buy'); // Returns 'קנה'
-```
-
-**Action Mapping:**
-- `'buy'` → `'קנה'`
-- `'sell'` → `'מכר'`
-- `'hold'` → `'החזק'`
-- `'close'` → `'סגר'`
-- `'cancel'` → `'בטל'`
-
-## 🔗 **Backward Compatibility**
-
-All old function names are maintained for backward compatibility:
-
-```javascript
-// New function names
-window.translateAccountStatus = translateAccountStatus;
-window.translateTickerStatus = translateTickerStatus;
-// ... and more
-
-// Backward compatibility (old names still work)
-window.convertAccountStatusToHebrew = translateAccountStatus;
-window.convertTickerStatusToHebrew = translateTickerStatus;
-window.convertNoteStatusToHebrew = translateNoteStatus;
-window.convertAlertStatusToHebrew = translateAlertStatus;
-window.convertIsTriggeredToHebrew = translateIsTriggered;
-window.getTypeDisplay = translateTradeType;
-window.getTypeDisplayName = translateCashFlowType;
-window.getCategoryDisplayName = translateTestCategory;
-window.convertExecutionActionToHebrew = translateExecutionAction;
-```
-
-## 📊 **Usage Examples**
-
-### **In HTML Templates**
-```html
-<td>${window.translateAccountStatus(account.status)}</td>
-<td>${window.translateTradeType(trade.type)}</td>
-<td>${window.translateIsTriggered(alert.is_triggered)}</td>
-```
-
-### **In JavaScript Code**
-```javascript
-// Update table with translated values
-const statusDisplay = window.translateAccountStatus(account.status);
-const typeDisplay = window.translateTradeType(trade.type);
-
-// Use in conditional logic
-if (window.translateIsTriggered(alert.is_triggered) === 'כן') {
-    // Handle triggered alert
-}
-```
-
-### **In Filter Functions**
-```javascript
-// Filter by translated status
-const filteredData = data.filter(item => 
-    window.translateAccountStatus(item.status) === 'פתוח'
-);
-```
-
-## 🧪 **Testing**
-
-### **Function Testing**
-All translation functions can be tested in the browser console:
-
-```javascript
-// Test account status translation
-console.log(window.translateAccountStatus('open')); // Should return 'פתוח'
-
-// Test trade type translation
-console.log(window.translateTradeType('buy')); // Should return 'קנה'
-
-// Test backward compatibility
-console.log(window.convertAccountStatusToHebrew('open')); // Should return 'פתוח'
-```
-
-### **Error Handling**
-All functions include fallback handling:
-```javascript
-// If status is not found in mapping, return original value
-window.translateAccountStatus('unknown_status'); // Returns 'unknown_status'
-```
-
-## 📚 **Maintenance**
-
-### **Adding New Translations**
-To add a new translation function:
-
-1. **Add the function to `translation-utils.js`:**
+### 1. Alert Condition Translation ✅ **RECENTLY ADDED**
 ```javascript
 /**
- * Translate new entity property to Hebrew
- * @param {string} value - The value in English
- * @returns {string} The value in Hebrew
+ * Translates alert condition types to Hebrew
+ * @param {string} condition - The condition type to translate
+ * @returns {string} The translated condition
  */
-function translateNewEntityProperty(value) {
-    const valueMap = {
-        'value1': 'ערך1',
-        'value2': 'ערך2'
+function translateAlertCondition(condition) {
+    const translations = {
+        'price': 'מחיר',
+        'change': 'שינוי',
+        'ma': 'ממוצע נע',
+        'volume': 'נפח'
     };
-    return valueMap[value] || value;
+    return translations[condition] || condition;
 }
 ```
 
-2. **Export to global scope:**
+**Usage Examples**:
 ```javascript
-window.translateNewEntityProperty = translateNewEntityProperty;
+// In alerts.js
+const conditionText = translateAlertCondition(alert.condition_attribute);
+// Result: 'price' → 'מחיר', 'change' → 'שינוי'
+
+// In cash_flows.js
+const typeText = translateAlertCondition(cashFlow.type);
+// Result: 'income' → 'הכנסה', 'expense' → 'הוצאה'
 ```
 
-3. **Add backward compatibility (if needed):**
+### 2. Trade Status Translation ✅ **RECENTLY ADDED**
 ```javascript
-window.convertNewEntityPropertyToHebrew = translateNewEntityProperty;
+/**
+ * Translates trade status values to Hebrew
+ * @param {string} status - The status to translate
+ * @returns {string} The translated status
+ */
+function translateTradeStatus(status) {
+    const translations = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'pending': 'ממתין',
+        'cancelled': 'בוטל'
+    };
+    return translations[status] || status;
+}
 ```
 
-### **Updating Existing Translations**
-To update existing translations:
+**Usage Examples**:
+```javascript
+// In trades.js
+const statusText = translateTradeStatus(trade.status);
+// Result: 'open' → 'פתוח', 'closed' → 'סגור'
 
-1. **Modify the mapping in the function**
-2. **Test the changes**
-3. **Update documentation if needed**
+// In executions.js
+const executionStatus = translateTradeStatus(execution.status);
+// Result: 'pending' → 'ממתין', 'completed' → 'הושלם'
+```
 
-### **Best Practices**
-- Always use the `translate[Entity][Property]` naming convention
-- Include JSDoc comments for all functions
-- Maintain backward compatibility for existing functions
-- Test all changes thoroughly
-- Update this documentation when adding new functions
+### 3. Currency Display Functions
+```javascript
+/**
+ * Formats currency display with symbol and name
+ * @param {number} currencyId - The currency ID
+ * @param {Array} currencies - Array of available currencies
+ * @returns {string} Formatted currency display
+ */
+function getCashFlowCurrencyDisplay(currencyId) {
+    const currency = currencies.find(c => c.id === currencyId);
+    return currency ? `${currency.symbol} - ${currency.name}` : 'לא נבחר';
+}
+
+/**
+ * Formats currency amount with proper formatting
+ * @param {number} amount - The amount to format
+ * @param {string} currency - The currency symbol
+ * @returns {string} Formatted currency amount
+ */
+function formatCurrencyWithCommas(amount, currency = '') {
+    const formattedAmount = formatNumberWithCommas(amount);
+    return currency ? `${formattedAmount} ${currency}` : formattedAmount;
+}
+```
+
+**Usage Examples**:
+```javascript
+// In cash_flows.js
+const currencyDisplay = getCashFlowCurrencyDisplay(cashFlow.currency_id);
+// Result: 'USD - US Dollar' or 'לא נבחר'
+
+// In accounts.js
+const balanceDisplay = formatCurrencyWithCommas(account.balance, account.currency);
+// Result: '1,234.56 USD' or '1,234.56'
+```
+
+### 4. Number Formatting Functions
+```javascript
+/**
+ * Formats numbers with commas for thousands
+ * @param {number} number - The number to format
+ * @returns {string} Formatted number
+ */
+function formatNumberWithCommas(number) {
+    if (number === null || number === undefined) return '0';
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+/**
+ * Colors amount based on value (positive/negative)
+ * @param {number} amount - The amount to color
+ * @returns {string} CSS class for coloring
+ */
+function colorAmountByValue(amount) {
+    if (amount > 0) return 'text-success';
+    if (amount < 0) return 'text-danger';
+    return 'text-muted';
+}
+```
+
+**Usage Examples**:
+```javascript
+// In cash_flows.js
+const formattedAmount = formatNumberWithCommas(cashFlow.amount);
+// Result: '1,234.56' → '1,234.56'
+
+// In accounts.js
+const amountClass = colorAmountByValue(account.balance);
+// Result: positive → 'text-success', negative → 'text-danger'
+```
+
+## Integration Examples
+
+### Cash Flows Module Integration
+```javascript
+// In cash_flows.js
+function renderCashFlowsTable(cashFlows) {
+    const tbody = document.getElementById('cashFlowsTableBody');
+    tbody.innerHTML = '';
+    
+    cashFlows.forEach(cashFlow => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${cashFlow.account_name}</td>
+            <td>${translateAlertCondition(cashFlow.type)}</td>
+            <td class="${colorAmountByValue(cashFlow.amount)}">
+                ${formatCurrencyWithCommas(cashFlow.amount)}
+            </td>
+            <td>${cashFlow.date}</td>
+            <td>${getCashFlowCurrencyDisplay(cashFlow.currency_id)}</td>
+            <td>${cashFlow.description}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+```
+
+### Alerts Module Integration
+```javascript
+// In alerts.js
+function renderAlertsTable(alerts) {
+    const tbody = document.getElementById('alertsTableBody');
+    tbody.innerHTML = '';
+    
+    alerts.forEach(alert => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${alert.account_name}</td>
+            <td>${translateAlertCondition(alert.condition_attribute)}</td>
+            <td>${translateTradeStatus(alert.status)}</td>
+            <td>${alert.message}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+```
+
+### Accounts Module Integration
+```javascript
+// In accounts.js
+function renderAccountsTable(accounts) {
+    const tbody = document.getElementById('accountsTableBody');
+    tbody.innerHTML = '';
+    
+    accounts.forEach(account => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${account.name}</td>
+            <td class="${colorAmountByValue(account.balance)}">
+                ${formatCurrencyWithCommas(account.balance, account.currency)}
+            </td>
+            <td>${translateTradeStatus(account.status)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+```
+
+## Recent Improvements ✅ **RECENTLY ENHANCED**
+
+### New Functions Added
+1. **`translateAlertCondition()`**: Translate alert condition types
+2. **`translateTradeStatus()`**: Translate trade status values
+3. **Enhanced currency display**: Better currency formatting
+
+### Integration Enhancements
+1. **Cash Flows Module**: Full integration with translation system
+2. **Consistent Display**: Unified text display across all modules
+3. **Error Handling**: Better fallback handling for missing translations
+4. **Performance**: Optimized translation lookups
+
+### Technical Improvements
+1. **Function Documentation**: Comprehensive JSDoc comments
+2. **Error Handling**: Graceful fallbacks for missing translations
+3. **Code Organization**: Better function organization and naming
+4. **Testing**: Enhanced testing and validation
+
+## Best Practices
+
+### Function Usage
+1. **Consistent Naming**: Use descriptive function names
+2. **Error Handling**: Always provide fallbacks for missing translations
+3. **Performance**: Cache translation objects when possible
+4. **Documentation**: Document all translation functions
+
+### Integration Guidelines
+1. **Import Script**: Always include translation-utils.js
+2. **Use Functions**: Use appropriate translation functions
+3. **Consistent Formatting**: Maintain consistent text formatting
+4. **Testing**: Test with different data types and values
+
+### Maintenance
+1. **Regular Updates**: Keep translations up to date
+2. **New Languages**: Plan for additional language support
+3. **Performance Monitoring**: Monitor translation performance
+4. **Code Quality**: Maintain high code quality standards
+
+## Future Enhancements
+
+### Planned Improvements
+1. **Multi-language Support**: Support for additional languages
+2. **Dynamic Translations**: Server-side translation management
+3. **Translation Caching**: Improved translation caching
+4. **Auto-translation**: Automatic translation suggestions
+
+### Technical Debt
+1. **Testing Coverage**: Need comprehensive testing suite
+2. **Performance Optimization**: Further optimization of translation lookups
+3. **Documentation**: Enhanced function documentation
+4. **Code Quality**: Improved code organization and structure
+
+## Troubleshooting
+
+### Common Issues
+1. **Missing Translations**: Check if translation exists in object
+2. **Performance Issues**: Consider caching translation objects
+3. **Display Issues**: Verify CSS classes and formatting
+4. **Integration Problems**: Check script loading order
+
+### Debugging
+```javascript
+// Debug translation functions
+console.log('Translation result:', translateAlertCondition('price'));
+console.log('Available translations:', Object.keys(translations));
+console.log('Currency display:', getCashFlowCurrencyDisplay(1));
+```
 
 ---
 
-**Last Updated:** August 22, 2025  
-**Version:** 2.1  
-**Status:** Complete ✅
+**Last Updated**: 2025-01-26  
+**Maintainer**: TikTrack Development Team

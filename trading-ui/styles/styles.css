@@ -4051,3 +4051,42 @@ a:hover,
 .editor-content a:hover {
   color: #1f8a8c;
 }
+
+/* Progressive disclosure styles for alerts */
+.disabled-field {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+}
+
+.disabled-field:focus {
+  box-shadow: none !important;
+  border-color: #ced4da !important;
+}
+
+.form-select:disabled,
+.form-control:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.form-select:disabled option {
+  color: #6c757d;
+}
+
+/* Visual feedback for progressive disclosure */
+.form-select:disabled,
+.form-control:disabled {
+  opacity: 0.6;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.form-select:disabled:focus,
+.form-control:disabled:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}

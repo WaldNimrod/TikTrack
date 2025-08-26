@@ -10,15 +10,12 @@ class Alert(BaseModel):
     # Fields that exist in the database
     account_id = Column(Integer, nullable=True)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
-    type = Column(String(50), nullable=False, default='price')
     message = Column(String(500), nullable=True)
     triggered_at = Column(DateTime, nullable=True)
     status = Column(String(20), default='open', nullable=True)
     is_triggered = Column(String(20), default='false', nullable=True)  # false, new, true
     related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False, default=4)
     related_id = Column(Integer, nullable=False)
-    type_default = Column(String(50), nullable=True)
-    related_type_id_default = Column(Integer, nullable=True)
     condition_attribute = Column(String(50), nullable=False, default='price')
     condition_operator = Column(String(50), nullable=False, default='more_than')
     condition_number = Column(String(20), nullable=False, default='0')
@@ -90,7 +87,7 @@ class Alert(BaseModel):
         return f"{attribute} {operator} {number}"
     
     def __repr__(self) -> str:
-        return f"<Alert(id={self.id}, type='{self.type}', triggered={self.is_triggered})>"
+        return f"<Alert(id={self.id}, condition='{self.get_condition_display_text()}', triggered={self.is_triggered})>"
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary with backward compatibility"""
@@ -99,7 +96,6 @@ class Alert(BaseModel):
             'id': self.id,
             'account_id': self.account_id,
             'ticker_id': self.ticker_id,
-            'type': self.type,
             'message': self.message,
             'triggered_at': self.triggered_at.strftime('%Y-%m-%d %H:%M:%S') if self.triggered_at else None,
             'status': self.status,
@@ -107,8 +103,6 @@ class Alert(BaseModel):
             'related_type_id': self.related_type_id,
             'related_id': self.related_id,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
-            'type_default': self.type_default,
-            'related_type_id_default': self.related_type_id_default,
             'condition_attribute': self.condition_attribute,
             'condition_operator': self.condition_operator,
             'condition_number': self.condition_number,

@@ -151,6 +151,10 @@ function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel =
         // Get warning configuration
         const config = getWarningConfig(type, data);
         
+        // Store callbacks globally
+        window.warningConfirmCallback = onConfirm;
+        window.warningCancelCallback = onCancel;
+        
         // Create warning modal
         const modalId = createWarningModal(config, options, onConfirm, onCancel);
         
@@ -390,7 +394,7 @@ function getWarningActions(actions, defaultAction, theme, onConfirm = null, onCa
         
         buttonsHtml += `
             <button type="button" class="btn ${buttonClass}" 
-                    onclick="handleWarningAction('${actionConfig.action}', ${onConfirm ? 'true' : 'false'}, ${onCancel ? 'true' : 'false'})">
+                    onclick="handleWarningAction('${actionConfig.action}')">
                 ${actionConfig.text}
             </button>
         `;
@@ -406,7 +410,9 @@ function getWarningActions(actions, defaultAction, theme, onConfirm = null, onCa
  * @param {boolean} hasConfirm - Whether confirm callback exists
  * @param {boolean} hasCancel - Whether cancel callback exists
  */
-function handleWarningAction(action, hasConfirm, hasCancel) {
+function handleWarningAction(action) {
+    console.log('🔧 Handling warning action:', action);
+    
     // Close modal
     const modal = bootstrap.Modal.getInstance(document.querySelector('.warning-modal'));
     if (modal) {
@@ -418,19 +424,28 @@ function handleWarningAction(action, hasConfirm, hasCancel) {
         case 'confirm':
         case 'ok':
         case 'delete':
-            if (hasConfirm && typeof window.warningConfirmCallback === 'function') {
+            if (typeof window.warningConfirmCallback === 'function') {
+                console.log('✅ Executing confirm callback');
                 window.warningConfirmCallback();
+            } else {
+                console.log('❌ No confirm callback found');
             }
             break;
         case 'cancel':
         case 'close':
-            if (hasCancel && typeof window.warningCancelCallback === 'function') {
+            if (typeof window.warningCancelCallback === 'function') {
+                console.log('❌ Executing cancel callback');
                 window.warningCancelCallback();
+            } else {
+                console.log('❌ No cancel callback found');
             }
             break;
         case 'force_delete':
-            if (hasConfirm && typeof window.warningConfirmCallback === 'function') {
+            if (typeof window.warningConfirmCallback === 'function') {
+                console.log('✅ Executing force delete callback');
                 window.warningConfirmCallback();
+            } else {
+                console.log('❌ No confirm callback found');
             }
             break;
         case 'manage_linked':

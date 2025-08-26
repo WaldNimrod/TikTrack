@@ -1,185 +1,414 @@
-# CSS Organization System - TikTrack
+# TikTrack CSS Documentation
 
-## 📋 Overview
+## Overview
+The TikTrack CSS system provides consistent styling across all pages with page-specific themes, gradient backgrounds, and responsive design. The system includes global styles, page-specific themes, and component styling.
 
-This document describes the comprehensive CSS organization system implemented in TikTrack, ensuring clean, maintainable, and efficient styling across the entire application.
+## Architecture
 
-## 🏗️ Architecture
-
-### File Hierarchy (Loading Order)
-The CSS files are loaded in the following order to establish proper cascading and specificity:
-
-1. **apple-theme.css** - CSS Variables and Base Styles (Weakest)
-2. **typography.css** - Font and Typography Definitions
-3. **styles.css** - General Components and Layout
-4. **table.css** - Table-specific Styles
-5. **header-system.css** - Header and Navigation System
-6. **research-summary.css** - Page-specific Styles (Strongest)
-
-### File Responsibilities
-
-#### `apple-theme.css`
-- **Purpose**: Base theme and CSS variables
-- **Contains**:
-  - CSS custom properties (variables)
-  - Base body styles
-  - Color schemes
-  - Spacing and shadow definitions
-  - Basic form elements
-  - Card components (excluding design cards)
-
-#### `typography.css`
-- **Purpose**: Centralized typography management
-- **Contains**:
-  - Font family definitions for all elements
-  - Heading styles (h1-h6)
-  - Text sizing and spacing
-  - RTL typography support
-
-#### `styles.css`
-- **Purpose**: General application styles
-- **Contains**:
-  - Button styles (`.btn-primary`, `.btn-secondary`, `.btn-danger`, `.btn-sm`)
-  - Modal components (`.modal-header`, `.modal-footer`)
-  - Refresh button styles (`.refresh-btn`)
-  - RTL layout definitions
-  - Page structure and layout
-  - Notification system
-  - General utility classes
-
-#### `table.css`
-- **Purpose**: Table and data grid styling
-- **Contains**:
-  - Data table styles
-  - Related object cells (`.related-account`, `.related-trade`, `.related-plan`)
-  - Table-specific buttons and actions
-  - Grid layout for data display
-
-#### `header-system.css`
-- **Purpose**: Unified header system
-- **Contains**:
-  - Logo section styles (`.logo-section`)
-  - Navigation items (`.nav-item`, `.nav-menu`)
-  - Header container and layout
-  - Filter system styling
-  - Responsive header behavior
-
-#### `research-summary.css`
-- **Purpose**: Page-specific styles
-- **Contains**:
-  - Research summary page specific styles
-  - Daily table styling
-  - Page-specific components
-
-## 🎯 Key Principles
-
-### 1. Single Source of Truth
-Each style definition exists in only one file to prevent conflicts and ensure maintainability.
-
-### 2. Logical Separation
-Styles are organized by functionality rather than page, allowing for better reusability.
-
-### 3. Specificity Management
-The loading order ensures that more specific styles can override general ones when needed.
-
-### 4. RTL Support
-All styles are designed with RTL (Right-to-Left) layout support for Hebrew interface.
-
-## 📁 File Structure
-
+### File Structure
 ```
 trading-ui/styles/
-├── apple-theme.css      # Base theme and variables
-├── typography.css       # Typography definitions
-├── styles.css          # General components
-├── table.css           # Table and grid styles
-├── header-system.css   # Header system
-└── research-summary.css # Page-specific styles
+├── styles.css              # Global styles and page themes ✅ RECENTLY ENHANCED
+├── header-system.css       # Header and navigation styles
+├── table.css              # Table-specific styles
+├── db-display.css         # Database display styles
+├── apple-theme.css        # Apple-inspired theme
+├── warning-system.css     # Warning modal styles
+└── [page-specific].css    # Page-specific stylesheets
 ```
 
-## 🔧 Implementation Details
+### CSS Organization
+- **Global Styles**: Base styles and utilities
+- **Page Themes**: Page-specific color schemes and gradients
+- **Component Styles**: Reusable component styling
+- **Responsive Design**: Mobile and tablet optimization
 
-### CSS Variables
-All colors, spacing, and common values are defined as CSS custom properties in `apple-theme.css`:
+## Global Styles ✅ **RECENTLY ENHANCED**
 
+### Page-Specific Themes
 ```css
-:root {
-  --apple-blue: #29a6a8;
-  --apple-text-primary: #1d1d1f;
-  --apple-bg-primary: #ffffff;
-  --apple-spacing-sm: 8px;
-  --apple-radius-medium: 8px;
-  --apple-shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
+/* Cash Flows Page Theme */
+.cash-flows-page .section-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Accounts Page Theme */
+.accounts-page .section-header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Alerts Page Theme */
+.alerts-page .section-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Executions Page Theme */
+.executions-page .section-header {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Tickers Page Theme */
+.tickers-page .section-header {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Notes Page Theme */
+.notes-page .section-header {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Database Display Page Theme */
+.db-display-page .section-header {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Extra Data Page Theme */
+.extra-data-page .section-header {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Constraints Page Theme */
+.constraints-page .section-header {
+    background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Designs Page Theme */
+.designs-page .section-header {
+    background: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Research Page Theme */
+.research-page .section-header {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
 }
 ```
 
-### Button System
-All button styles are centralized in `styles.css` with consistent naming and behavior:
-
+### Global Utility Classes
 ```css
-.btn-primary { /* Primary button styles */ }
-.btn-secondary { /* Secondary button styles */ }
-.btn-danger { /* Danger button styles */ }
-.btn-sm { /* Small button styles */ }
+/* Color utilities */
+.text-success { color: #28a745; }
+.text-danger { color: #dc3545; }
+.text-warning { color: #ffc107; }
+.text-info { color: #17a2b8; }
+.text-muted { color: #6c757d; }
+
+/* Background utilities */
+.bg-success { background-color: #d4edda; }
+.bg-danger { background-color: #f8d7da; }
+.bg-warning { background-color: #fff3cd; }
+.bg-info { background-color: #d1ecf1; }
+
+/* Spacing utilities */
+.mt-1 { margin-top: 0.25rem; }
+.mb-1 { margin-bottom: 0.25rem; }
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 1rem; }
 ```
 
-### Modal System
-Modal components are standardized across the application:
+## Component Styles
 
+### Warning System Styles ✅ **RECENTLY ENHANCED**
 ```css
-.modal-header { /* Modal header styles */ }
-.modal-footer { /* Modal footer styles */ }
-.modal-content { /* Modal content styles */ }
+/* Warning modal styling */
+.warning-modal {
+    z-index: 1050;
+    backdrop-filter: blur(5px);
+}
+
+.warning-modal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border: none;
+}
+
+.warning-modal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+.warning-modal .modal-body {
+    padding: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.warning-modal .modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+}
+
+/* Warning button styles */
+.warning-modal .btn-warning {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+}
+
+.warning-modal .btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+}
 ```
 
-## 🚀 Benefits
+### Table Styles
+```css
+/* Table styling */
+.table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
 
-1. **Maintainability**: Clear separation of concerns
-2. **Performance**: Reduced CSS conflicts and overrides
-3. **Consistency**: Standardized styling across components
-4. **Scalability**: Easy to add new styles without conflicts
-5. **Debugging**: Clear file organization for troubleshooting
+.table thead th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    color: #495057;
+}
 
-## 📝 Maintenance Guidelines
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.2s ease;
+}
 
-### Adding New Styles
-1. Identify the appropriate file based on functionality
-2. Follow existing naming conventions
-3. Use CSS variables for colors and spacing
-4. Ensure RTL compatibility
+.table tbody td {
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+```
 
-### Modifying Existing Styles
-1. Locate the style in the correct file
-2. Update only the specific file
-3. Test across different pages
-4. Update documentation if needed
+### Form Styles
+```css
+/* Form styling */
+.form-control {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem;
+    transition: border-color 0.2s ease;
+}
 
-### Removing Styles
-1. Remove from the specific file only
-2. Ensure no dependencies exist
-3. Test the application thoroughly
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
 
-## 🔍 Troubleshooting
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
 
-### Common Issues
-1. **Style not applying**: Check loading order and specificity
-2. **RTL issues**: Verify RTL properties are set correctly
-3. **Button inconsistencies**: Ensure using standardized button classes
-4. **Modal problems**: Check modal styles in `styles.css`
+.form-select {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+}
+```
 
-### Debugging Steps
-1. Check browser developer tools for CSS conflicts
-2. Verify file loading order in HTML
-3. Check for duplicate style definitions
-4. Validate CSS syntax
+### Button Styles
+```css
+/* Button styling */
+.btn {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease;
+    border: none;
+}
 
-## 📚 Related Documentation
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
 
-- [UI Documentation](../UI_DOCUMENTATION.md)
-- [Frontend Components](../components/)
-- [Project Architecture](../../project/)
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+    color: white;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+}
+```
+
+## Responsive Design
+
+### Mobile Optimization
+```css
+/* Mobile-first responsive design */
+@media (max-width: 768px) {
+    .section-header {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .table {
+        font-size: 0.9rem;
+    }
+    
+    .table td, .table th {
+        padding: 0.5rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .section-header {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .table {
+        font-size: 0.8rem;
+    }
+    
+    .table td, .table th {
+        padding: 0.25rem;
+    }
+    
+    .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+```
+
+### Tablet Optimization
+```css
+@media (min-width: 769px) and (max-width: 1024px) {
+    .section-header {
+        padding: 0.875rem;
+        margin-bottom: 0.875rem;
+    }
+    
+    .table {
+        font-size: 0.95rem;
+    }
+    
+    .table td, .table th {
+        padding: 0.625rem;
+    }
+}
+```
+
+## Recent Improvements ✅ **RECENTLY ENHANCED**
+
+### System Enhancements
+1. **Page-Specific Themes**: Added gradient backgrounds for all pages
+2. **Warning System Styling**: Enhanced modal styling with gradients
+3. **Consistent Design**: Unified design language across all components
+4. **Responsive Design**: Improved mobile and tablet optimization
+
+### Cash Flows Module
+1. **Page Theme**: Added cash flows specific gradient theme
+2. **Component Styling**: Enhanced form and table styling
+3. **Modal Integration**: Integrated with warning system styling
+4. **Responsive Design**: Optimized for all screen sizes
+
+### Technical Improvements
+1. **Performance**: Optimized CSS loading and rendering
+2. **Accessibility**: Improved color contrast and readability
+3. **Maintainability**: Better CSS organization and structure
+4. **Documentation**: Enhanced CSS documentation and examples
+
+## Best Practices
+
+### 1. CSS Organization
+- **Modular Design**: Organize CSS by component and page
+- **Consistent Naming**: Use consistent class naming conventions
+- **Responsive Design**: Mobile-first responsive design approach
+- **Performance**: Optimize CSS for fast loading and rendering
+
+### 2. Styling Guidelines
+- **Color Consistency**: Use consistent color schemes across pages
+- **Typography**: Maintain consistent font sizes and weights
+- **Spacing**: Use consistent spacing and padding
+- **Animations**: Subtle animations for better user experience
+
+### 3. Maintenance
+- **Documentation**: Document all CSS classes and their purposes
+- **Testing**: Test across different browsers and devices
+- **Performance**: Monitor CSS performance and optimize as needed
+- **Updates**: Regular updates to maintain consistency
+
+## Future Enhancements
+
+### Planned Improvements
+1. **Advanced Themes**: More sophisticated theme system
+2. **CSS Variables**: Enhanced CSS custom properties usage
+3. **Animation System**: Advanced animation and transition system
+4. **Dark Mode**: Dark mode theme support
+
+### Technical Debt
+1. **CSS Optimization**: Further CSS optimization and minification
+2. **Browser Support**: Enhanced browser compatibility
+3. **Performance Monitoring**: CSS performance monitoring tools
+4. **Code Quality**: CSS linting and quality tools
 
 ---
 
-*Last Updated: January 2025*
-*Version: 1.0*
+**Last Updated**: 2025-01-26  
+**Maintainer**: TikTrack Development Team

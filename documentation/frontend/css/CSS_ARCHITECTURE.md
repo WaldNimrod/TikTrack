@@ -1,726 +1,548 @@
+# TikTrack CSS Architecture Documentation
+
 ## Overview
+The TikTrack CSS architecture provides a comprehensive styling system with page-specific themes, gradient backgrounds, and responsive design. The system is organized for maintainability, performance, and consistency across all modules.
 
-This document describes the CSS architecture for the TikTrack frontend, focusing on the new unified header system, filter components, and modal styling standards.
+## Architecture Principles
 
-## New Header System Architecture
+### 1. Modular Design
+- **Component-Based**: Styles organized by component functionality
+- **Page-Specific**: Dedicated themes for each page
+- **Reusable**: Common styles shared across components
+- **Maintainable**: Clear separation of concerns
 
-### Unified Header System (`header-system.js` + `header-system.css`)
+### 2. Responsive Design
+- **Mobile-First**: Mobile-first responsive design approach
+- **Progressive Enhancement**: Enhanced features for larger screens
+- **Flexible Layouts**: Adaptive layouts for different screen sizes
+- **Touch-Friendly**: Optimized for touch interactions
 
-The new header system is completely independent and does not rely on the old `app-header`. It creates a new `unified-header` element with its own menu and filters.
+### 3. Performance Optimization
+- **Efficient Selectors**: Optimized CSS selectors for performance
+- **Minimal Redundancy**: Reduced duplicate styles
+- **Fast Loading**: Optimized CSS loading and rendering
+- **Caching Strategy**: Effective CSS caching
 
-#### Key Features:
-- **Independent Operation**: Works without the old app-header
-- **Unified Design**: Consistent styling across all pages
-- **Smart Filters**: Adaptive filtering system that works with any table
-- **Responsive Design**: Mobile-friendly layout
-- **State Persistence**: Saves filter states and UI preferences
+## File Structure ✅ **RECENTLY ENHANCED**
 
-#### Components:
-
-##### 1. Header Structure
-```html
-<div id="unified-header">
-  <div class="header-top">
-    <!-- Navigation Menu -->
-    <div class="header-nav">...</div>
-    
-    <!-- Logo Section -->
-    <div class="logo-section">...</div>
-    
-    <!-- Filter Toggle Button -->
-    <div class="filter-toggle-section">...</div>
-  </div>
-  
-  <!-- Filter Area -->
-  <div class="header-filters">
-    <div class="filters-container">
-      <!-- Status Filter -->
-      <!-- Type Filter -->
-      <!-- Account Filter -->
-      <!-- Date Range Filter -->
-      <!-- Search Filter -->
-      <!-- Reset Button -->
-      <!-- Clear Button -->
-    </div>
-  </div>
-</div>
+### Core Files
+```
+trading-ui/styles/
+├── styles.css              # Global styles and page themes ✅ RECENTLY ENHANCED
+├── header-system.css       # Header and navigation styles
+├── table.css              # Table-specific styles
+├── db-display.css         # Database display styles
+├── apple-theme.css        # Apple-inspired theme
+├── warning-system.css     # Warning modal styles ✅ RECENTLY ENHANCED
+└── [page-specific].css    # Page-specific stylesheets
 ```
 
-##### 2. Navigation Menu
-- **Home**: Dashboard link
-- **Planning**: Trade planning section
-- **Trades**: Trade tracking section
-- **Research**: Market research section
-- **Settings Dropdown**: 
-  - Accounts management
-  - Notes
-  - Alerts
-  - Preferences
-  - Database management
-  - Cash flows
-  - Currencies
-  - Tickers
-  - Executions
-  - Trade plans
+### Loading Order
+1. **apple-theme.css** - Base theme and variables (weakest)
+2. **styles.css** - Global styles and page themes
+3. **header-system.css** - Header and navigation
+4. **table.css** - Table-specific styles
+5. **warning-system.css** - Warning modal styles
+6. **db-display.css** - Database display styles
+7. **Page-specific CSS** - Page-specific styles (strongest)
 
-##### 3. Filter System
-The filter system includes:
+## Global Styles ✅ **RECENTLY ENHANCED**
 
-###### Status Filter
-- Options: Open, Closed, Canceled
-- Multi-select capability
-- Visual indicators for selected items
-
-###### Type Filter
-- Options: Swing, Investment, Passive
-- Multi-select capability
-- Dynamic text updates
-
-###### Account Filter
-- Dynamically loaded from database
-- Multi-select capability
-- Real-time updates
-- **Uniform styling** with other filters
-
-###### Date Range Filter
-- Options: Today, Yesterday, This Week, Last Week, Last Month, 3 Months, MTD, YTD, 30 Days, 60 Days, 90 Days, Year, Previous Year, All Time
-- Single-select (exclusive)
-- Date calculation logic
-
-###### Search Filter
-- Real-time text search
-- Clear button functionality
-- Searches across all table columns
-
-###### Reset Button (↻)
-- Clears all active filters
-- Resets search input
-- Updates UI state
-- **Animation**: 180° rotation
-
-###### Clear Button (×)
-- Closes all open filter menus
-- Resets active button states
-- **Animation**: Scale effect
-
-#### CSS Architecture
-
-##### 1. Base Styles (`header-system.css`)
+### Page-Specific Themes
 ```css
-#unified-header {
-  background: var(--apple-bg-elevated);
-  border-bottom: 1px solid var(--apple-border-light);
-  box-shadow: var(--apple-shadow-light);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-```
+/* Unified page theme system with gradient backgrounds */
 
-##### 2. Filter Styles
-```css
-#unified-header .filter-menu {
-  position: absolute !important;
-  top: 100% !important;
-  right: 0 !important;
-  background: white !important;
-  border: 1px solid #e8e8e8 !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  min-width: 180px !important;
-  z-index: 10001 !important;
-  display: none;
-  margin-top: 5px;
-  padding: 0.5rem 0;
-}
-
-#unified-header .filter-menu.show {
-  display: block !important;
-}
-```
-
-##### 3. Filter Item Styles
-```css
-#statusFilterMenu .status-filter-item {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  padding: 0.4rem 1rem !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  font-size: 0.9rem !important;
-  border-bottom: 1px solid #f0f0f0 !important;
-  background: white !important;
-  color: #333 !important;
-}
-
-#statusFilterMenu .status-filter-item.selected {
-  background-color: rgba(40, 167, 69, 0.08) !important;
-  color: #28a745 !important;
-  border: none !important;
-  font-weight: 500 !important;
-  box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
-}
-```
-
-##### 4. Account Filter Specific Styles
-```css
-#accountFilterMenu .account-filter-item {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  padding: 0.4rem 1rem !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  font-size: 0.9rem !important;
-  border-bottom: 1px solid #f0f0f0 !important;
-  background: white !important;
-  color: #333 !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
-}
-```
-
-##### 5. Action Button Styles
-```css
-/* Reset Button */
-#unified-header .reset-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  background: #28a745;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-}
-
-#unified-header .reset-btn:hover {
-  background: #218838;
-  transform: rotate(180deg);
-  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
-}
-
-/* Clear Button */
-#unified-header .clear-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  background: #ff9c05;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-}
-
-#unified-header .clear-btn:hover {
-  background: #e68900;
-  transform: scale(1.05);
-  box-shadow: 0 2px 4px rgba(255, 156, 5, 0.3);
-}
-
-/* Filter Toggle Button */
-#unified-header .filter-toggle-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: white;
-  border: none;
-  border-radius: 50%;
-  color: #ff9c05;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: -100px;
-  z-index: 1001;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-#unified-header .filter-toggle-btn:hover {
-  background: #f8f9fa;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transform: translateX(-50%) scale(1.05);
-}
-```
-
-##### 2. Navigation Styles
-```css
-#unified-header .tiktrack-nav-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  color: #333333;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-#unified-header .tiktrack-nav-link:hover {
-  background: var(--apple-bg-secondary);
-  color: #333333;
-}
-
-#unified-header .tiktrack-nav-link.active {
-  background: #28a745;
-  color: white;
-  font-weight: 700;
-}
-
-#unified-header .nav-text {
-  font-weight: 600;
-  color: #333333;
-}
-
-#unified-header .tiktrack-nav-link.active .nav-text {
-  color: white;
-  font-weight: 700;
-}
-
-#unified-header .tiktrack-dropdown-item {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: #333333;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-  font-weight: 500;
-}
-
-#unified-header .tiktrack-dropdown-item:hover {
-  background: var(--apple-bg-secondary);
-  color: #333333;
-}
-
-#unified-header .tiktrack-dropdown-item.active {
-  background: #28a745;
-  color: white;
-  font-weight: 600;
-}
-```
-
-#### JavaScript Architecture
-
-##### 1. HeaderSystem Class
-```javascript
-class HeaderSystem {
-  constructor() {
-    this.isInitialized = false;
-    this.filterSystem = null;
-  }
-
-  init() {
-    this.createHeader();
-    this.initFilterSystem();
-    this.loadAccountsForFilter();
-    this.setupEventListeners();
-  }
-}
-```
-
-##### 2. SimpleFilter Class
-```javascript
-class SimpleFilter {
-  constructor() {
-    this.currentFilters = {
-      status: [],
-      type: [],
-      account: [],
-      search: ''
-    };
-  }
-
-  updateFilter(filterType, value) {
-    // Update filter logic
-  }
-
-  applyFilters() {
-    // Apply filters to tables
-  }
-}
-```
-
-##### 3. Global Functions
-```javascript
-// Filter toggle functions
-window.toggleStatusFilter = function() { ... }
-window.toggleTypeFilter = function() { ... }
-window.toggleAccountFilter = function() { ... }
-window.toggleDateRangeFilter = function() { ... }
-
-// Filter selection functions
-window.selectStatusOption = function(status) { ... }
-window.selectTypeOption = function(type) { ... }
-window.selectAccountOption = function(account) { ... }
-window.selectDateRangeOption = function(dateRange) { ... }
-
-// Filter close functions
-window.closeStatusFilter = function() { ... }
-window.closeTypeFilter = function() { ... }
-window.closeAccountFilter = function() { ... }
-window.closeDateRangeFilter = function() { ... }
-
-// Action button functions
-window.resetAllFilters = function() { ... }
-window.clearAllFilters = function() { ... }
-```
-
-#### State Management
-
-##### 1. Local Storage
-- `headerState`: Header collapse state
-- `filtersSectionOpen`: Filter section visibility
-- `filterStates`: Individual filter selections
-
-##### 2. Filter State Structure
-```javascript
-{
-  status: ['Open', 'Closed'],
-  type: ['Swing', 'Investment'],
-  account: ['Main Account'],
-  dateRange: ['This Week'],
-  search: 'AAPL'
-}
-```
-
-#### Responsive Design
-
-##### Mobile Breakpoints
-```css
-@media (max-width: 768px) {
-  #unified-header .header-filters {
+/* Cash Flows Page Theme */
+.cash-flows-page .section-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 1rem;
-  }
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
 
-  #unified-header .filters-container {
-    flex-direction: column;
-    align-items: stretch;
-  }
+/* Accounts Page Theme */
+.accounts-page .section-header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
 
-  #unified-header .filter-group {
-    width: 100%;
-  }
+/* Alerts Page Theme */
+.alerts-page .section-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Executions Page Theme */
+.executions-page .section-header {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Tickers Page Theme */
+.tickers-page .section-header {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Notes Page Theme */
+.notes-page .section-header {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Database Display Page Theme */
+.db-display-page .section-header {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Extra Data Page Theme */
+.extra-data-page .section-header {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Constraints Page Theme */
+.constraints-page .section-header {
+    background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Designs Page Theme */
+.designs-page .section-header {
+    background: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Research Page Theme */
+.research-page .section-header {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
 }
 ```
 
-#### Integration Points
-
-##### 1. Table Integration
-The filter system automatically detects and filters tables with IDs:
-- `tradesTable`
-- `testTable`
-- Excludes: `notificationsTable`
-
-##### 2. Account Integration
-```javascript
-window.updateAccountFilterMenu = function(accounts) {
-  if (window.headerSystem) {
-    window.headerSystem.updateAccountFilter(accounts);
-  }
-};
-```
-
-#### Testing
-
-##### Test Page: `test-header-only.html`
-- Standalone testing environment
-- No dependency on old app-header
-- Debug information display
-- Multiple test tables
-- Real-time status monitoring
-
-#### Usage Instructions
-
-##### 1. Basic Implementation
-```html
-<!-- Include CSS -->
-<link rel="stylesheet" href="styles/header-system.css">
-
-<!-- Include JavaScript -->
-<script src="scripts/header-system.js"></script>
-
-<!-- Automatic initialization -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  if (window.headerSystem && !window.headerSystem.isInitialized) {
-    window.headerSystem.init();
-  }
-});
-</script>
-```
-
-##### 2. Custom Filter Integration
-```javascript
-// Update account filter with real data
-window.updateAccountFilterMenu([
-  { id: 1, name: 'Main Account' },
-  { id: 2, name: 'Secondary Account' }
-]);
-```
-
-##### 3. Filter Event Handling
-```javascript
-// Listen for filter changes
-if (window.filterSystem) {
-  window.filterSystem.updateFilter('status', ['Open']);
-}
-```
-
-#### Performance Considerations
-
-##### 1. CSS Optimization
-- Specific selectors to avoid conflicts
-- Minimal use of `!important`
-- Efficient positioning and layout
-
-##### 2. JavaScript Optimization
-- Event delegation for dynamic elements
-- Debounced search input
-- Efficient DOM queries
-
-##### 3. Memory Management
-- Proper cleanup of event listeners
-- State persistence optimization
-- Garbage collection friendly
-
-#### Browser Compatibility
-
-##### Supported Browsers
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-
-##### CSS Features Used
-- CSS Grid and Flexbox
-- CSS Custom Properties (variables)
-- CSS Transitions and Transforms
-- CSS Position: sticky
-
-#### Future Enhancements
-
-##### Planned Features
-1. **Advanced Date Picker**: Custom date range selection
-2. **Filter Presets**: Save and load filter combinations
-3. **Export Filtered Data**: Export filtered results
-4. **Keyboard Navigation**: Full keyboard accessibility
-5. **Filter Analytics**: Usage statistics and insights
-
-##### Technical Improvements
-1. **Web Components**: Convert to custom elements
-2. **TypeScript**: Add type safety
-3. **State Management**: Implement Redux-like pattern
-4. **Testing Framework**: Add comprehensive unit tests
-5. **Performance Monitoring**: Add performance metrics
-
-## Modal Styling Standards
-
-### Overview
-
-The modal system in TikTrack follows strict styling standards to ensure consistent visual appearance and eliminate visual artifacts like white gaps between modal components.
-
-### Border Radius Standardization
-
-#### Core Modal Components
-All modal components use a standardized 6px border radius for consistency:
-
+### CSS Variables System
 ```css
-/* Modal Dialog Container */
-.modal-dialog.modal-lg {
-  border: 2px solid #6c757d !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-/* Modal Content */
-.modal-content {
-  background: var(--apple-bg-elevated);
-  border-radius: 6px;
-  box-shadow: var(--apple-shadow-heavy);
-  border: 1px solid var(--apple-border-light);
-  z-index: 1000000000 !important;
-}
-
-/* Modal Headers */
-.modal-header-colored {
-  background: linear-gradient(135deg, #29a6a8, #1f8a8c) !important;
-  color: white !important;
-  border-radius: 6px 6px 0 0;
-  border-bottom: none;
-}
-
-.modal-header-danger {
-  background: linear-gradient(135deg, #dc3545, #c82333) !important;
-  color: white !important;
-  border-radius: 6px 6px 0 0;
-  border-bottom: none;
-}
-
-/* Base Modal Header */
-.modal .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 6px 6px 0 0;
-  border-bottom: none;
+:root {
+    /* Color Palette */
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --muted-color: #6c757d;
+    
+    /* Spacing System */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    /* Border Radius */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    
+    /* Shadows */
+    --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.2);
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease;
+    --transition-slow: 0.5s ease;
 }
 ```
 
-#### Specific Modal Types
+## Component Architecture
 
-##### Trade Plan Modals
+### 1. Warning System ✅ **RECENTLY ENHANCED**
 ```css
-#addTradePlanModal .modal-header {
-  background: linear-gradient(135deg, #28a745, #20c997) !important;
-  color: white !important;
-  border-radius: 6px 6px 0 0;
-  border-bottom: none;
+/* Warning modal system with enhanced styling */
+.warning-modal {
+    z-index: 1050;
+    backdrop-filter: blur(5px);
+}
+
+.warning-modal .modal-content {
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-heavy);
+    border: none;
+    overflow: hidden;
+}
+
+.warning-modal .modal-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    padding: var(--spacing-lg);
+}
+
+.warning-modal .modal-body {
+    padding: var(--spacing-lg);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.warning-modal .modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: #f8f9fa;
+}
+
+/* Warning button styles */
+.warning-modal .btn-warning {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    transition: var(--transition-fast);
+}
+
+.warning-modal .btn-secondary {
+    background: linear-gradient(135deg, var(--muted-color) 0%, #495057 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    transition: var(--transition-fast);
 }
 ```
 
-##### Ticker Modals
+### 2. Table System
 ```css
-#addTickerModal .modal-header,
-#editTickerModal .modal-header {
-  background: linear-gradient(135deg, #17a2b8, #138496) !important;
-  color: white !important;
-  border-radius: 6px 6px 0 0;
-  border-bottom: none;
+/* Enhanced table system with consistent styling */
+.table {
+    background: white;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+    margin-bottom: var(--spacing-lg);
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    color: #495057;
+    padding: var(--spacing-md);
+    text-align: right;
+}
+
+.table tbody tr {
+    transition: var(--transition-fast);
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-light);
+}
+
+.table tbody td {
+    border-bottom: 1px solid #dee2e6;
+    padding: var(--spacing-md);
+    vertical-align: middle;
+}
+
+/* Table responsive design */
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.9rem;
+    }
+    
+    .table td, .table th {
+        padding: var(--spacing-sm);
+    }
 }
 ```
 
-##### Alert Modals
+### 3. Form System
 ```css
-#addAlertModal .modal-header,
-#editAlertModal .modal-header {
-  background: linear-gradient(135deg, #dc3545, #c82333) !important;
-  color: white !important;
-  border-radius: 6px 6px 0 0;
+/* Enhanced form system with consistent styling */
+.form-control {
+    border-radius: var(--border-radius-md);
+    border: 2px solid #e9ecef;
+    padding: var(--spacing-md);
+    transition: var(--transition-fast);
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    outline: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: var(--spacing-sm);
+    display: block;
+}
+
+.form-select {
+    border-radius: var(--border-radius-md);
+    border: 2px solid #e9ecef;
+    padding: var(--spacing-md);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    padding-right: 2.5rem;
+}
+
+/* Form validation styles */
+.form-control.is-invalid {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control.is-valid {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
 }
 ```
 
-##### Trade Modals
+### 4. Button System
 ```css
-#addTradeModal .modal-header {
-  background: linear-gradient(135deg, #ff9c05, #ff8c00);
-  color: white;
-  border-radius: 6px 6px 0 0;
-  border-bottom: none;
+/* Enhanced button system with gradient backgrounds */
+.btn {
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    padding: var(--spacing-md) var(--spacing-lg);
+    transition: var(--transition-fast);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #fd7e14 100%);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333 0%, #e55a00 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--muted-color) 0%, #495057 100%);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* Button sizes */
+.btn-sm {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-size: 1.125rem;
 }
 ```
 
-### Visual Consistency Rules
+## Responsive Design Architecture
 
-#### 1. Border Radius Hierarchy
-- **Modal Dialog**: 6px (outer container)
-- **Modal Content**: 6px (inner container)
-- **Modal Header**: 6px 6px 0 0 (top corners only)
-
-#### 2. Gap Prevention
-- All border radius values must match between adjacent elements
-- No gaps should appear between modal header and content
-- Consistent styling across all modal types
-
-#### 3. Z-Index Management
+### 1. Breakpoint System
 ```css
-.modal-dialog {
-  z-index: 1000000000 !important;
+/* Mobile-first breakpoint system */
+/* Extra small devices (phones, 576px and down) */
+@media (max-width: 575.98px) {
+    /* Mobile-specific styles */
 }
 
-.modal-content {
-  z-index: 1000000001 !important;
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+    /* Small device styles */
 }
 
-.modal-backdrop {
-  z-index: 999999998 !important;
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    /* Tablet styles */
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    /* Desktop styles */
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    /* Large desktop styles */
 }
 ```
 
-### Implementation Guidelines
-
-#### 1. New Modal Creation
-When creating new modals, always follow these standards:
-
+### 2. Mobile Optimization
 ```css
-/* Template for new modal */
-.new-modal .modal-dialog {
-  border-radius: 6px;
-}
-
-.new-modal .modal-content {
-  border-radius: 6px;
-}
-
-.new-modal .modal-header {
-  border-radius: 6px 6px 0 0;
-  /* Add specific styling here */
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+    .section-header {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .table {
+        font-size: 0.9rem;
+    }
+    
+    .table td, .table th {
+        padding: var(--spacing-sm);
+    }
+    
+    .btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        padding: var(--spacing-sm);
+    }
+    
+    .warning-modal .modal-body {
+        padding: var(--spacing-md);
+        font-size: 1rem;
+    }
 }
 ```
 
-#### 2. Modal Header Types
-Choose appropriate header styling based on modal purpose:
+### 3. Tablet Optimization
+```css
+/* Tablet-specific optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .section-header {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .table {
+        font-size: 0.95rem;
+    }
+    
+    .table td, .table th {
+        padding: var(--spacing-sm);
+    }
+    
+    .btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+}
+```
 
-- **Success/Add**: Green gradient (`#28a745` to `#20c997`)
-- **Info/Edit**: Blue gradient (`#17a2b8` to `#138496`)
-- **Warning/Danger**: Red gradient (`#dc3545` to `#c82333`)
-- **Trade**: Orange gradient (`#ff9c05` to `#ff8c00`)
+## Recent Improvements ✅ **RECENTLY ENHANCED**
 
-#### 3. Responsive Considerations
-- Modals maintain consistent border radius on all screen sizes
-- No scaling of border radius values
-- Consistent visual appearance across devices
+### System Enhancements
+1. **Page-Specific Themes**: Added gradient backgrounds for all pages
+2. **Warning System Styling**: Enhanced modal styling with gradients
+3. **Consistent Design**: Unified design language across all components
+4. **Responsive Design**: Improved mobile and tablet optimization
 
-### Troubleshooting
+### Cash Flows Module
+1. **Page Theme**: Added cash flows specific gradient theme
+2. **Component Styling**: Enhanced form and table styling
+3. **Modal Integration**: Integrated with warning system styling
+4. **Responsive Design**: Optimized for all screen sizes
 
-#### Common Issues
+### Technical Improvements
+1. **Performance**: Optimized CSS loading and rendering
+2. **Accessibility**: Improved color contrast and readability
+3. **Maintainability**: Better CSS organization and structure
+4. **Documentation**: Enhanced CSS documentation and examples
 
-##### 1. White Gap Between Header and Border
-**Cause**: Mismatched border radius values between modal dialog and header
-**Solution**: Ensure all components use 6px border radius
+## Best Practices
 
-##### 2. Inconsistent Modal Appearance
-**Cause**: Different border radius values across modal types
-**Solution**: Apply standardized 6px border radius to all modal components
+### 1. CSS Organization
+- **Modular Design**: Organize CSS by component and page
+- **Consistent Naming**: Use consistent class naming conventions
+- **Responsive Design**: Mobile-first responsive design approach
+- **Performance**: Optimize CSS for fast loading and rendering
 
-##### 3. Z-Index Conflicts
-**Cause**: Incorrect z-index hierarchy
-**Solution**: Follow the established z-index pattern (dialog: 1000000000, content: 1000000001, backdrop: 999999998)
+### 2. Styling Guidelines
+- **Color Consistency**: Use consistent color schemes across pages
+- **Typography**: Maintain consistent font sizes and weights
+- **Spacing**: Use consistent spacing and padding
+- **Animations**: Subtle animations for better user experience
 
-### Best Practices
+### 3. Maintenance
+- **Documentation**: Document all CSS classes and their purposes
+- **Testing**: Test across different browsers and devices
+- **Performance**: Monitor CSS performance and optimize as needed
+- **Updates**: Regular updates to maintain consistency
 
-#### 1. CSS Organization
-- Keep modal styles in `apple-theme.css` for global consistency
-- Use specific selectors to avoid conflicts
-- Maintain clear separation between different modal types
+## Future Enhancements
 
-#### 2. Performance
-- Use efficient CSS selectors
-- Minimize use of `!important` declarations
-- Optimize for rendering performance
+### Planned Improvements
+1. **Advanced Themes**: More sophisticated theme system
+2. **CSS Variables**: Enhanced CSS custom properties usage
+3. **Animation System**: Advanced animation and transition system
+4. **Dark Mode**: Dark mode theme support
 
-#### 3. Maintenance
-- Document all modal styling changes
-- Test across different browsers and screen sizes
-- Maintain consistency with existing design patterns
+### Technical Debt
+1. **CSS Optimization**: Further CSS optimization and minification
+2. **Browser Support**: Enhanced browser compatibility
+3. **Performance Monitoring**: CSS performance monitoring tools
+4. **Code Quality**: CSS linting and quality tools
 
-## Conclusion
+---
 
-The new header system provides a modern, responsive, and feature-rich interface for the TikTrack application. It maintains backward compatibility while offering enhanced functionality and improved user experience.
-
-The modal styling standards ensure consistent visual appearance across all modal dialogs, eliminating visual artifacts and providing a professional user interface.
-
-The modular architecture allows for easy maintenance and future enhancements, while the comprehensive documentation ensures smooth development and deployment processes.
+**Last Updated**: 2025-01-26  
+**Maintainer**: TikTrack Development Team

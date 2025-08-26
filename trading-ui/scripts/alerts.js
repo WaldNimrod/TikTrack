@@ -73,6 +73,8 @@ const demoAlerts = [
   }
 ];
 
+
+
 /**
  * טעינת נתוני התראות מהשרת
  * 
@@ -96,11 +98,13 @@ async function loadAlertsData() {
     alertsData = alerts.map(alert => ({
       id: alert.id,
       title: alert.title,
-      type: alert.type,
       status: alert.status,
       related_type_id: alert.related_type_id,
       related_id: alert.related_id,
       condition: alert.condition,
+      condition_attribute: alert.condition_attribute,
+      condition_operator: alert.condition_operator,
+      condition_number: alert.condition_number,
       message: alert.message,
       created_at: alert.created_at,
       is_triggered: alert.is_triggered
@@ -186,7 +190,8 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
         typeTranslations[type] || type
       );
 
-      const isMatch = translatedSelectedTypes.includes(alert.type);
+      // הסרת פילטור לפי סוג התראה - השדה type הוסר
+      const isMatch = true;
       return isMatch;
     });
   }
@@ -255,9 +260,8 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
         alert.title.toLowerCase().includes(term)
       );
 
-      const typeMatch = alert.type && searchTerms.some(term =>
-        alert.type.toLowerCase().includes(term)
-      );
+      // הסרת חיפוש לפי סוג התראה - השדה type הוסר
+      const typeMatch = false;
 
       const statusMatch = alert.status && searchTerms.some(term =>
         alert.status.toLowerCase().includes(term)
@@ -330,7 +334,6 @@ function updateAlertsTable(alerts) {
 
     const tableHTML = alerts.map(alert => {
       const statusClass = getStatusClass(alert.status);
-      const typeClass = getTypeClass(alert.type);
       // קביעת האובייקט המקושר
       let relatedDisplay = '';
       let relatedIcon = '';
@@ -341,7 +344,7 @@ function updateAlertsTable(alerts) {
         id: alert.id,
         related_type_id: alert.related_type_id,
         related_id: alert.related_id,
-        type: alert.type,
+
         status: alert.status
       });
       console.log(`🔍 Available data counts:`, {
@@ -479,23 +482,7 @@ function updateAlertsTable(alerts) {
         default: statusDisplay = alert.status;
       }
 
-      // המרת סוג התראה לעברית להצגה
-      let typeDisplay;
-      switch (alert.type) {
-        case 'price_alert': typeDisplay = 'התראה על מחיר'; break;
-        case 'stop_loss': typeDisplay = 'סטופ לוס'; break;
-        case 'volume_alert': typeDisplay = 'התראה על נפח'; break;
-        case 'custom_alert': typeDisplay = 'התראה מותאמת'; break;
-        case 'account_alert': typeDisplay = 'התראה על חשבון'; break;
-        case 'plan_alert': typeDisplay = 'התראה על תוכנית'; break;
-        case 'trade_alert': typeDisplay = 'התראה על טרייד'; break;
-        case 'ticker_alert': typeDisplay = 'התראה על טיקר'; break;
-        case 'price': typeDisplay = 'התראה על מחיר'; break;
-        case 'volume': typeDisplay = 'התראה על נפח'; break;
-        case 'change': typeDisplay = 'התראה על שינוי'; break;
-        case 'ma': typeDisplay = 'התראה על ממוצע נע'; break;
-        default: typeDisplay = alert.type;
-      }
+
 
       // המרת מצב הפעלה לעברית להצגה
       // לפי הדוקומנטציה: false=לא הופעל, new=הופעל לא נקרא, true=נקרא/בוטל
@@ -516,7 +503,7 @@ function updateAlertsTable(alerts) {
       }
 
       return `
-        <tr data-status="${alert.status || ''}" data-type="${alert.type || ''}" data-date="${alert.created_at || ''}">
+        <tr data-status="${alert.status || ''}" data-date="${alert.created_at || ''}">
           <td class="ticker-cell">
             <span class="link-icon" title="חיבור לעמוד טרייד - בפיתוח" style="cursor: pointer; margin-left: 5px;">🔗</span>
             <span class="symbol-text">${symbolDisplay}</span>
@@ -534,7 +521,7 @@ function updateAlertsTable(alerts) {
               ${relatedDisplay}
             </div>
           </td>
-          <td class="type-cell" data-type="${alert.type || ''}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
+
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
@@ -876,31 +863,303 @@ function closeModal(modalId) {
   }
 }
 
+
+
 /**
- * בדיקת סוג התראה בזמן אמת
+ * טיפול בשינוי סוג שיוך
+ * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
  */
-function onAlertTypeChange(selectElement) {
-  const selectedType = selectElement.value;
-  if (selectedType) {
-    checkAlertType(selectedType, selectElement);
+function onRelationTypeChange(radioElement) {
+  console.log('🔧 Relation type changed:', radioElement.value);
+
+  // הפעלת שדה בחירת אובייקט
+  const relatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
+  if (relatedObjectSelect) {
+    relatedObjectSelect.disabled = false;
+    relatedObjectSelect.classList.remove('disabled-field');
+  }
+
+  // מילוי רשימת האובייקטים לפי הסוג שנבחר
+  populateRelatedObjects(parseInt(radioElement.value));
+}
+
+/**
+ * טיפול בבחירת אובייקט
+ * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
+ */
+function onRelatedObjectChange(selectElement) {
+  console.log('🔧 Related object changed:', selectElement.value);
+
+  if (selectElement.value) {
+    // הפעלת שדות התנאי ישירות
+    enableConditionFields();
+  } else {
+    // השבתת שדות התנאי
+    disableConditionFields();
+  }
+}
+
+
+
+/**
+ * הפעלת שדות התנאי
+ */
+function enableConditionFields() {
+  const conditionAttribute = document.getElementById('conditionAttribute');
+  const conditionOperator = document.getElementById('conditionOperator');
+  const conditionNumber = document.getElementById('conditionNumber');
+  const alertMessage = document.getElementById('alertMessage');
+
+  if (conditionAttribute) {
+    conditionAttribute.disabled = false;
+    conditionAttribute.classList.remove('disabled-field');
+  }
+  if (conditionOperator) {
+    conditionOperator.disabled = false;
+    conditionOperator.classList.remove('disabled-field');
+  }
+  if (conditionNumber) {
+    conditionNumber.disabled = false;
+    conditionNumber.classList.remove('disabled-field');
+  }
+  if (alertMessage) {
+    alertMessage.disabled = false;
+    alertMessage.classList.remove('disabled-field');
   }
 }
 
 /**
- * בדיקת סוג התראה והצגת התראה לסוגים לא נתמכים
- * @param {string} alertType - סוג ההתראה
- * @param {HTMLElement} element - אלמנט הבחירה (אופציונלי)
- * @returns {boolean} true אם נתמך, false אם לא
+ * השבתת שדות התנאי
  */
-function checkAlertType(alertType, element = null) {
-  // כרגע מאפשרים את כל סוגי ההתראות
-  if (!alertType) {
-    console.log('❌ No alert type selected');
-    return false;
-  }
+function disableConditionFields() {
+  const conditionAttribute = document.getElementById('conditionAttribute');
+  const conditionOperator = document.getElementById('conditionOperator');
+  const conditionNumber = document.getElementById('conditionNumber');
+  const alertMessage = document.getElementById('alertMessage');
 
-  console.log('✅ Alert type accepted:', alertType);
-  return true;
+  if (conditionAttribute) {
+    conditionAttribute.disabled = true;
+    conditionAttribute.classList.add('disabled-field');
+    conditionAttribute.value = '';
+  }
+  if (conditionOperator) {
+    conditionOperator.disabled = true;
+    conditionOperator.classList.add('disabled-field');
+    conditionOperator.value = '';
+  }
+  if (conditionNumber) {
+    conditionNumber.disabled = true;
+    conditionNumber.classList.add('disabled-field');
+    conditionNumber.value = '';
+  }
+  if (alertMessage) {
+    alertMessage.disabled = true;
+    alertMessage.classList.add('disabled-field');
+    alertMessage.value = '';
+  }
+}
+
+/**
+ * מילוי רשימת אובייקטים לפי סוג השיוך
+ * @param {number} relationTypeId - מזהה סוג השיוך
+ */
+function populateRelatedObjects(relationTypeId) {
+  const selectElement = document.getElementById('alertRelatedObjectSelect');
+  if (!selectElement) return;
+
+  // ניקוי הרשימה
+  selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+  // מילוי לפי סוג השיוך
+  switch (relationTypeId) {
+    case 1: // חשבון
+      if (accountsData && accountsData.length > 0) {
+        accountsData.forEach(account => {
+          const option = document.createElement('option');
+          option.value = account.id;
+          option.textContent = `${account.name} (${account.currency_name || 'N/A'})`;
+          selectElement.appendChild(option);
+        });
+      }
+      break;
+
+    case 2: // טרייד
+      if (tradesData && tradesData.length > 0) {
+        tradesData.forEach(trade => {
+          const option = document.createElement('option');
+          option.value = trade.id;
+          option.textContent = `${trade.symbol} - ${trade.type} (${trade.status})`;
+          selectElement.appendChild(option);
+        });
+      }
+      break;
+
+    case 3: // תכנון טרייד
+      if (tradePlansData && tradePlansData.length > 0) {
+        tradePlansData.forEach(plan => {
+          const option = document.createElement('option');
+          option.value = plan.id;
+          option.textContent = `${plan.symbol} - ${plan.type} (${plan.status})`;
+          selectElement.appendChild(option);
+        });
+      }
+      break;
+
+    case 4: // טיקר
+      if (tickersData && tickersData.length > 0) {
+        tickersData.forEach(ticker => {
+          const option = document.createElement('option');
+          option.value = ticker.id;
+          option.textContent = `${ticker.symbol} - ${ticker.name}`;
+          selectElement.appendChild(option);
+        });
+      }
+      break;
+  }
+}
+
+/**
+ * מילוי רשימת אובייקטים למודל העריכה
+ * @param {number} relationTypeId - מזהה סוג השיוך
+ */
+function populateEditRelatedObjects(relationTypeId) {
+  const selectElement = document.getElementById('editAlertRelatedObjectSelect');
+  if (!selectElement) return;
+
+  // ניקוי הרשימה
+  selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+  // מילוי לפי סוג השיוך
+  switch (relationTypeId) {
+    case 1: // חשבון
+      if (accountsData && accountsData.length > 0) {
+        accountsData.forEach(account => {
+          const option = document.createElement('option');
+          option.value = account.id;
+          option.textContent = `${account.name} (${account.currency_name || 'N/A'})`;
+          selectElement.appendChild(option);
+        });
+      }
+      break;
+
+    case 2: // טרייד
+      if (tradesData && tradesData.length > 0) {
+        tradesData.forEach(trade => {
+          const option = document.createElement('option');
+          option.value = trade.id;
+          option.textContent = `${trade.symbol} - ${trade.type} (${trade.status})`;
+          selectElement.appendChild(option);
+        });
+      }
+      break;
+
+    case 3: // תכנון טרייד
+      if (tradePlansData && tradePlansData.length > 0) {
+        tradePlansData.forEach(plan => {
+          const option = document.createElement('option');
+          option.value = plan.id;
+          option.textContent = `${plan.symbol} - ${plan.type} (${plan.status})`;
+          selectElement.appendChild(option);
+        });
+      }
+      break;
+
+    case 4: // טיקר
+      if (tickersData && tickersData.length > 0) {
+        tickersData.forEach(ticker => {
+          const option = document.createElement('option');
+          option.value = ticker.id;
+          option.textContent = `${ticker.symbol} - ${ticker.name}`;
+          selectElement.appendChild(option);
+        });
+      }
+      break;
+  }
+}
+
+/**
+ * טיפול בשינוי סוג שיוך במודל העריכה
+ * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
+ */
+function onEditRelationTypeChange(radioElement) {
+  console.log('🔧 Edit relation type changed:', radioElement.value);
+
+  // מילוי רשימת האובייקטים לפי הסוג שנבחר
+  populateEditRelatedObjects(parseInt(radioElement.value));
+}
+
+/**
+ * טיפול בבחירת אובייקט במודל העריכה
+ * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
+ */
+function onEditRelatedObjectChange(selectElement) {
+  console.log('🔧 Edit related object changed:', selectElement.value);
+
+  if (selectElement.value) {
+    // הפעלת שדות התנאי ישירות
+    enableEditConditionFields();
+  } else {
+    // השבתת שדות התנאי
+    disableEditConditionFields();
+  }
+}
+
+/**
+ * הפעלת שדות התנאי במודל העריכה
+ */
+function enableEditConditionFields() {
+  const conditionAttribute = document.getElementById('editConditionAttribute');
+  const conditionOperator = document.getElementById('editConditionOperator');
+  const conditionNumber = document.getElementById('editConditionNumber');
+  const alertMessage = document.getElementById('editAlertMessage');
+
+  if (conditionAttribute) {
+    conditionAttribute.disabled = false;
+    conditionAttribute.classList.remove('disabled-field');
+  }
+  if (conditionOperator) {
+    conditionOperator.disabled = false;
+    conditionOperator.classList.remove('disabled-field');
+  }
+  if (conditionNumber) {
+    conditionNumber.disabled = false;
+    conditionNumber.classList.remove('disabled-field');
+  }
+  if (alertMessage) {
+    alertMessage.disabled = false;
+    alertMessage.classList.remove('disabled-field');
+  }
+}
+
+/**
+ * השבתת שדות התנאי במודל העריכה
+ */
+function disableEditConditionFields() {
+  const conditionAttribute = document.getElementById('editConditionAttribute');
+  const conditionOperator = document.getElementById('editConditionOperator');
+  const conditionNumber = document.getElementById('editConditionNumber');
+  const alertMessage = document.getElementById('editAlertMessage');
+
+  if (conditionAttribute) {
+    conditionAttribute.disabled = true;
+    conditionAttribute.classList.add('disabled-field');
+    conditionAttribute.value = '';
+  }
+  if (conditionOperator) {
+    conditionOperator.disabled = true;
+    conditionOperator.classList.add('disabled-field');
+    conditionOperator.value = '';
+  }
+  if (conditionNumber) {
+    conditionNumber.disabled = true;
+    conditionNumber.classList.add('disabled-field');
+    conditionNumber.value = '';
+  }
+  if (alertMessage) {
+    alertMessage.disabled = true;
+    alertMessage.classList.add('disabled-field');
+    alertMessage.value = '';
+  }
 }
 
 /**
@@ -1005,14 +1264,7 @@ async function saveAlert() {
     return;
   }
 
-  // בדיקת סוג ההתראה
-  const alertTypeElement = document.getElementById('alertType');
-  const alertType = alertTypeElement.value;
-  console.log('🔧 Alert type:', alertType);
-  if (!checkAlertType(alertType, alertTypeElement)) {
-    console.log('🔧 Alert type validation failed');
-    return; // עצירת השמירה אם הסוג לא נתמך
-  }
+
 
   // בדיקת תקינות הטופס
   if (!form.checkValidity()) {
@@ -1084,14 +1336,9 @@ async function saveAlert() {
     return;
   }
 
-  // המשך הקוד הקיים...
-  // כרגע שולחים את סוג ההתראה כמו שהוא ללא המרה
-  const convertedType = alertType;
-
   const alertData = {
     related_type_id: parseInt(formData.get('alertRelationType')),
     related_id: parseInt(document.getElementById('alertRelatedObjectSelect').value),
-    type: convertedType,
     condition_attribute: conditionAttribute,
     condition_operator: conditionOperator,
     condition_number: conditionNumber,
@@ -1164,14 +1411,16 @@ function editAlert(alertId) {
 
   // מילוי הטופס
   const editAlertId = document.getElementById('editAlertId');
-  const editAlertType = document.getElementById('editAlertType');
+
   const editAlertMessage = document.getElementById('editAlertMessage');
   const editAlertStatus = document.getElementById('editAlertStatus');
   const editAlertIsTriggered = document.getElementById('editAlertIsTriggered');
   const editAlertState = document.getElementById('editAlertState');
 
   if (editAlertId) editAlertId.value = alert.id;
-  if (editAlertType) editAlertType.value = alert.type || '';
+
+
+
   if (editAlertMessage) editAlertMessage.value = alert.message || '';
   if (editAlertStatus) editAlertStatus.value = alert.status || 'open';
   if (editAlertIsTriggered) editAlertIsTriggered.value = alert.is_triggered || 'false';
@@ -1189,15 +1438,6 @@ function editAlert(alertId) {
   const currentState = getAlertState(alert.status, alert.is_triggered);
   if (editAlertState) editAlertState.value = currentState;
 
-  // בחירת האובייקט המקושר
-  setTimeout(() => {
-    const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
-    if (relatedObjectSelect && alert.related_id) {
-      relatedObjectSelect.value = alert.related_id;
-      // נבחר אובייקט
-    }
-  }, 100);
-
   // בחירת סוג הקשר
   const relationType = alert.related_type_id;
   const radioButton = document.querySelector(`input[name="editAlertRelationType"][value="${relationType}"]`);
@@ -1206,6 +1446,21 @@ function editAlert(alertId) {
     // הפעלת אירוע change לטעינת האובייקטים
     radioButton.dispatchEvent(new Event('change'));
   }
+
+  // בחירת האובייקט המקושר
+  setTimeout(() => {
+    const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
+    if (relatedObjectSelect && alert.related_id) {
+      relatedObjectSelect.value = alert.related_id;
+      // הפעלת אירוע change להפעלת שדות נוספים
+      relatedObjectSelect.dispatchEvent(new Event('change'));
+    }
+  }, 200);
+
+  // הפעלת שדות התנאי
+  setTimeout(() => {
+    enableEditConditionFields();
+  }, 300);
 
   // הוספת event listeners לשדות התנאי במודל העריכה
   setTimeout(() => {
@@ -1402,12 +1657,7 @@ async function updateAlert() {
     return;
   }
 
-  // בדיקת סוג ההתראה
-  const alertTypeElement = document.getElementById('editAlertType');
-  const alertType = alertTypeElement.value;
-  if (!checkAlertType(alertType, alertTypeElement)) {
-    return; // עצירת העדכון אם הסוג לא נתמך
-  }
+
 
   // עדכון status ו-is_triggered לפי המצב הנבחר
   updateStatusAndTriggered();
@@ -1482,7 +1732,6 @@ async function updateAlert() {
   const alertData = {
     related_type_id: relatedTypeId,
     related_id: relatedId,
-    type: alertType,
     condition_attribute: conditionAttribute,
     condition_operator: conditionOperator,
     condition_number: conditionNumber,
@@ -1614,24 +1863,7 @@ function getStatusClass(status) {
   }
 }
 
-/**
- * קבלת מחלקת CSS לסוג התראה
- * 
- * פונקציה זו מחזירה את שם המחלקה CSS המתאימה לסוג ההתראה
- * משמשת לעיצוב התאים בטבלה
- * 
- * @param {string} type - סוג ההתראה
- * @returns {string} שם המחלקה CSS
- */
-function getTypeClass(type) {
-  switch (type) {
-    case 'price_alert': return 'type-ticker';
-    case 'stop_loss': return 'type-trade-open';
-    case 'volume_alert': return 'type-other';
-    case 'custom_alert': return 'type-other';
-    default: return 'type-other';
-  }
-}
+
 
 /**
  * קבלת מחלקת CSS לאובייקט מקושר
@@ -1764,8 +1996,12 @@ window.updateStatusAndTriggered = updateStatusAndTriggered;
 window.getAlertState = getAlertState;
 window.validateAlertStatusCombination = validateAlertStatusCombination;
 window.sortTable = sortTable;
-window.checkAlertType = checkAlertType;
-window.onAlertTypeChange = onAlertTypeChange;
+
+
+window.onRelationTypeChange = onRelationTypeChange;
+window.onRelatedObjectChange = onRelatedObjectChange;
+window.onEditRelationTypeChange = onEditRelationTypeChange;
+window.onEditRelatedObjectChange = onEditRelatedObjectChange;
 window.checkAlertVariable = checkAlertVariable;
 window.checkAlertOperator = checkAlertOperator;
 window.buildAlertCondition = buildAlertCondition;

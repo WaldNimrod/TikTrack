@@ -1,355 +1,329 @@
-# Function Naming Conventions - TikTrack Frontend
+# TikTrack Function Naming Conventions
 
 ## Overview
-This document outlines the naming conventions used for functions in the TikTrack frontend system. Consistent naming is crucial for code maintainability and developer productivity.
+The TikTrack system follows consistent function naming conventions to ensure code readability, maintainability, and consistency across all modules. This document outlines the established naming patterns and guidelines for function development.
 
-## 🎯 **Naming Principles**
+## Naming Conventions
 
-### **1. Clarity and Specificity**
-- **Clear Purpose:** Function names should clearly indicate what they do
-- **Entity-Specific:** Include the entity/component the function serves
-- **Action-Oriented:** Use verbs to describe the function's action
-- **Consistent Patterns:** Follow established patterns across the codebase
+### 1. Global System Functions ✅ **RECENTLY ENHANCED**
 
-### **2. Separation of Concerns**
-- **Global Functions:** Functions used across multiple pages
-- **Page-Specific Functions:** Functions used only on specific pages
-- **Utility Functions:** Helper functions for common operations
-- **Translation Functions:** Functions for text translation
-
-## 📝 **Naming Patterns**
-
-### **Translation Functions**
-**Pattern:** `translate[Entity][Property]`
-
-**Examples:**
+#### Warning System Functions
 ```javascript
-translateAccountStatus()      // Account status translation
-translateTickerStatus()       // Ticker status translation
-translateTradeType()          // Trade type translation
-translateCashFlowType()       // Cash flow type translation
-translateIsTriggered()        // Boolean triggered status translation
+// Pattern: show[WarningType]
+window.showDeleteWarning(message, onConfirm);
+window.showLinkedItemsWarning(message, linkedItems, onConfirm);
+window.showValidationWarning(message, fieldName);
+window.showSuccessNotification(message);
+window.showErrorNotification(message);
 ```
 
-**Benefits:**
-- Clear indication of what entity is being translated
-- Consistent pattern across all translation functions
-- Easy to identify and maintain
-
-### **Update Functions**
-**Pattern:** `update[Component][Action]`
-
-**Examples:**
+#### Translation System Functions
 ```javascript
-updatePageSummaryStats()      // Update page summary statistics
-updateTableSortIcons()        // Update table sorting icons
-updateAccountFilterDisplayText() // Update account filter display text
-updateStatusFilterDisplayText()  // Update status filter display text
+// Pattern: translate[Entity][Property]
+function translateAlertCondition(condition) { /* ... */ }
+function translateTradeStatus(status) { /* ... */ }
+function translateAccountStatus(status) { /* ... */ }
+function translateCashFlowType(type) { /* ... */ }
 ```
 
-**Benefits:**
-- Clear indication of what component is being updated
-- Specific action description
-- Consistent with UI update patterns
-
-### **CRUD Functions**
-**Pattern:** `[action][Entity]`
-
-**Examples:**
+#### Number Formatting Functions
 ```javascript
-createAccount()               // Create new account
-updateAccount()               // Update existing account
-deleteAccount()               // Delete account
-loadAccounts()                // Load accounts data
-saveAccount()                 // Save account data
+// Pattern: format[Type]With[Feature]
+function formatNumberWithCommas(number) { /* ... */ }
+function formatCurrencyWithCommas(amount, currency) { /* ... */ }
+function colorAmountByValue(amount) { /* ... */ }
 ```
 
-**Benefits:**
-- Standard CRUD operation naming
-- Clear entity identification
-- Consistent across all entities
+### 2. Page-Specific Functions
 
-### **Event Handler Functions**
-**Pattern:** `handle[Event][Action]` or `on[Event][Action]`
-
-**Examples:**
+#### CRUD Operations
 ```javascript
-handleAccountSubmit()         // Handle account form submission
-onTradeClick()                // Handle trade row click
-handleFilterChange()          // Handle filter change event
-onSortColumnClick()           // Handle sort column click
+// Pattern: [action][Entity]
+function loadCashFlows() { /* ... */ }
+function saveCashFlow(data) { /* ... */ }
+function updateCashFlow(id, data) { /* ... */ }
+function deleteCashFlow(id) { /* ... */ }
+function renderCashFlowsTable(data) { /* ... */ }
 ```
 
-**Benefits:**
-- Clear event identification
-- Action description included
-- Consistent event handling pattern
-
-### **Validation Functions**
-**Pattern:** `validate[Entity][Property]` or `is[Property]Valid`
-
-**Examples:**
+#### Modal Management
 ```javascript
-validateAccountName()         // Validate account name
-isEmailValid()                // Check if email is valid
-validateTradeAmount()         // Validate trade amount
-isDateValid()                 // Check if date is valid
+// Pattern: show[Action][Entity]Modal
+function showAddCashFlowModal() { /* ... */ }
+function showEditCashFlowModal(id) { /* ... */ }
+function showDeleteCashFlowModal(id) { /* ... */ }
+function closeCashFlowModal() { /* ... */ }
 ```
 
-**Benefits:**
-- Clear validation purpose
-- Property-specific validation
-- Boolean return indication
-
-## 🔄 **Function Categories**
-
-### **Global Utility Functions**
-**Location:** `main.js`
-**Pattern:** `[action][Component]`
-
+#### Form Management
 ```javascript
-// Table operations
-sortTableData()               // Sort table data
-updateTableSortIcons()        // Update table sort icons
-loadSortState()               // Load table sort state
-
-// Page operations
-updatePageSummaryStats()      // Update page summary statistics
-showNotification()            // Show notification message
-formatCurrency()              // Format currency values
+// Pattern: [action][Entity]Form
+function validateCashFlowForm() { /* ... */ }
+function resetCashFlowForm() { /* ... */ }
+function populateCashFlowForm(data) { /* ... */ }
+function submitCashFlowForm() { /* ... */ }
 ```
 
-### **Translation Functions**
-**Location:** `translation-utils.js`
-**Pattern:** `translate[Entity][Property]`
+### 3. API Integration Functions
 
+#### Data Loading
 ```javascript
-// Status translations
-translateAccountStatus()      // Account status to Hebrew
-translateTickerStatus()       // Ticker status to Hebrew
-translateAlertStatus()        // Alert status to Hebrew
-
-// Type translations
-translateTradeType()          // Trade type to Hebrew
-translateCashFlowType()       // Cash flow type to Hebrew
-translateExecutionAction()    // Execution action to Hebrew
+// Pattern: load[Entity]From[Source]
+function loadCashFlowsFromServer() { /* ... */ }
+function loadAccountsFromServer() { /* ... */ }
+function loadCurrenciesFromServer() { /* ... */ }
 ```
 
-### **Page-Specific Functions**
-**Location:** `[page].js`
-**Pattern:** `[action][Entity][Context]`
-
+#### Data Operations
 ```javascript
-// Accounts page
-loadAccountsForDesignsPage()  // Load accounts for designs page
-updateAccountsTable()         // Update accounts table
-showEditAccountModal()        // Show account edit modal
-
-// Trades page
-loadTradesData()              // Load trades data
-updateTradesTable()           // Update trades table
-handleTradeFilter()           // Handle trade filtering
+// Pattern: [operation][Entity]On[Target]
+function saveCashFlowOnServer(data) { /* ... */ }
+function updateCashFlowOnServer(id, data) { /* ... */ }
+function deleteCashFlowOnServer(id) { /* ... */ }
 ```
 
-### **Component Functions**
-**Location:** `[component].js`
-**Pattern:** `[action][Component][Property]`
+### 4. Utility Functions
 
+#### Validation Functions
 ```javascript
-// Header system
-updateStatusFilterDisplayText()   // Update status filter text
-updateTypeFilterDisplayText()     // Update type filter text
-updateAccountFilterDisplayText()  // Update account filter text
-
-// Menu system
-toggleMenuVisibility()            // Toggle menu visibility
-updateMenuItems()                 // Update menu items
-handleMenuClick()                 // Handle menu click
+// Pattern: validate[Entity][Field]
+function validateCashFlowAmount(amount) { /* ... */ }
+function validateCashFlowDate(date) { /* ... */ }
+function validateCashFlowType(type) { /* ... */ }
 ```
 
-## 📊 **Naming Guidelines**
-
-### **Do's**
-✅ **Use descriptive names:**
+#### Helper Functions
 ```javascript
-// Good
-updateAccountBalance()
-validateTradeAmount()
-translateAccountStatus()
-
-// Avoid
-update()
-validate()
-translate()
+// Pattern: [action][Entity][Context]
+function getCashFlowCurrencyDisplay(currencyId) { /* ... */ }
+function formatCashFlowDate(date) { /* ... */ }
+function calculateCashFlowTotal(flows) { /* ... */ }
 ```
 
-✅ **Include entity context:**
+## Recent Improvements ✅ **RECENTLY ENHANCED**
+
+### 1. Warning System Integration
 ```javascript
-// Good
-updateAccountsTable()
-loadTradesData()
-deleteAlert()
+// New centralized warning system functions
+window.showDeleteWarning(message, onConfirm);
+window.showLinkedItemsWarning(message, linkedItems, onConfirm);
+window.showValidationWarning(message, fieldName);
 
-// Avoid
-updateTable()
-loadData()
-delete()
-```
-
-✅ **Use consistent verbs:**
-```javascript
-// Good - consistent update pattern
-updateAccountStatus()
-updateTradeType()
-updateAlertMessage()
-
-// Avoid - inconsistent verbs
-setAccountStatus()
-changeTradeType()
-modifyAlertMessage()
-```
-
-✅ **Group related functions:**
-```javascript
-// Good - related functions grouped
-translateAccountStatus()
-translateAccountType()
-translateAccountCurrency()
-
-// Good - different entities separated
-translateAccountStatus()
-translateTradeStatus()
-translateAlertStatus()
-```
-
-### **Don'ts**
-❌ **Avoid abbreviations:**
-```javascript
-// Avoid
-updAccStat()
-valTradeAmt()
-trnsAccStat()
-
-// Use full names
-updateAccountStatus()
-validateTradeAmount()
-translateAccountStatus()
-```
-
-❌ **Avoid generic names:**
-```javascript
-// Avoid
-update()
-process()
-handle()
-
-// Use specific names
-updateAccountTable()
-processTradeData()
-handleAccountSubmit()
-```
-
-❌ **Avoid inconsistent patterns:**
-```javascript
-// Avoid - mixed patterns
-updateAccount()
-setTradeStatus()
-modifyAlert()
-
-// Use consistent pattern
-updateAccount()
-updateTradeStatus()
-updateAlert()
-```
-
-## 🔗 **Backward Compatibility**
-
-### **Old Function Names**
-When renaming functions, maintain backward compatibility:
-
-```javascript
-// New function name
-function updatePageSummaryStats() {
-    // Implementation
-}
-
-// Backward compatibility
-window.updateSummaryStats = updatePageSummaryStats;
-```
-
-### **Migration Strategy**
-1. **Create new function** with proper naming
-2. **Export old name** pointing to new function
-3. **Update all calls** to use new name
-4. **Remove old exports** after migration complete
-
-## 📚 **Documentation Standards**
-
-### **JSDoc Comments**
-All functions should include comprehensive JSDoc comments:
-
-```javascript
-/**
- * Update account status in the accounts table
- * @param {string} accountId - The account ID to update
- * @param {string} newStatus - The new status value
- * @param {boolean} showNotification - Whether to show success notification
- * @returns {Promise<boolean>} Success status of the update operation
- * @throws {Error} When account is not found or update fails
- */
-function updateAccountStatus(accountId, newStatus, showNotification = true) {
-    // Implementation
+// Usage in page-specific modules
+function showDeleteCashFlowModal(id) {
+    window.showDeleteWarning(
+        'האם אתה בטוח שברצונך למחוק את תזרים המזומנים הזה?',
+        () => confirmDeleteCashFlow(id)
+    );
 }
 ```
 
-### **Function Documentation**
-Include in function documentation:
-- **Purpose:** What the function does
-- **Parameters:** Parameter types and descriptions
-- **Returns:** Return value type and description
-- **Examples:** Usage examples
-- **Related:** Related functions or components
+### 2. Translation System Functions
+```javascript
+// New translation functions for consistent text display
+function translateAlertCondition(condition) {
+    const translations = {
+        'price': 'מחיר',
+        'change': 'שינוי',
+        'ma': 'ממוצע נע',
+        'volume': 'נפח'
+    };
+    return translations[condition] || condition;
+}
 
-## 🧪 **Testing and Validation**
+function translateTradeStatus(status) {
+    const translations = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'pending': 'ממתין',
+        'cancelled': 'בוטל'
+    };
+    return translations[status] || status;
+}
+```
 
-### **Naming Validation**
-- **Consistency Check:** Ensure naming follows established patterns
-- **Clarity Review:** Verify function names are self-explanatory
-- **Entity Identification:** Confirm entity context is clear
-- **Action Description:** Validate action description is accurate
+### 3. Cash Flows Module Functions ✅ **RECENTLY COMPLETED**
+```javascript
+// Complete CRUD functionality with consistent naming
+async function loadCashFlows() { /* ... */ }
+function renderCashFlowsTable(cashFlows) { /* ... */ }
+function showAddCashFlowModal() { /* ... */ }
+function showEditCashFlowModal(id) { /* ... */ }
+function showDeleteCashFlowModal(id) { /* ... */ }
+function saveCashFlow() { /* ... */ }
+function updateCashFlow(id) { /* ... */ }
+function deleteCashFlow(id) { /* ... */ }
+function validateCashFlowForm() { /* ... */ }
+function loadAccountsForCashFlow() { /* ... */ }
+function loadCurrenciesForCashFlow() { /* ... */ }
+```
 
-### **Code Review Checklist**
-- [ ] Function name follows established pattern
-- [ ] Entity context is clearly identified
-- [ ] Action description is accurate
-- [ ] No abbreviations used
-- [ ] Consistent with similar functions
-- [ ] JSDoc comments included
-- [ ] Backward compatibility maintained (if applicable)
+## Function Categories
 
-## 🚀 **Future Guidelines**
+### 1. Data Management Functions
+```javascript
+// Loading and rendering
+function load[Entity]() { /* ... */ }
+function render[Entity]Table(data) { /* ... */ }
+function refresh[Entity]Data() { /* ... */ }
 
-### **Adding New Functions**
-When adding new functions:
+// CRUD operations
+function create[Entity](data) { /* ... */ }
+function read[Entity](id) { /* ... */ }
+function update[Entity](id, data) { /* ... */ }
+function delete[Entity](id) { /* ... */ }
+```
 
-1. **Identify the category** (utility, translation, page-specific, etc.)
-2. **Follow the appropriate pattern** for that category
-3. **Include entity context** in the name
-4. **Use descriptive action verbs**
-5. **Add comprehensive JSDoc comments**
-6. **Update this documentation** if new patterns are established
+### 2. UI Management Functions
+```javascript
+// Modal management
+function show[Action][Entity]Modal() { /* ... */ }
+function close[Entity]Modal() { /* ... */ }
+function toggle[Entity]Modal() { /* ... */ }
 
-### **Refactoring Guidelines**
-When refactoring function names:
+// Form management
+function validate[Entity]Form() { /* ... */ }
+function reset[Entity]Form() { /* ... */ }
+function populate[Entity]Form(data) { /* ... */ }
+```
 
-1. **Maintain backward compatibility** during transition
-2. **Update all call sites** to use new names
-3. **Update documentation** to reflect changes
-4. **Test thoroughly** to ensure no breaking changes
-5. **Remove old exports** after migration is complete
+### 3. Event Handler Functions
+```javascript
+// Event handlers
+function handle[Entity][Event]() { /* ... */ }
+function on[Entity][Action]() { /* ... */ }
+function process[Entity][Action]() { /* ... */ }
+```
+
+### 4. Utility Functions
+```javascript
+// Helper functions
+function get[Entity][Property]() { /* ... */ }
+function set[Entity][Property](value) { /* ... */ }
+function format[Entity][Property](value) { /* ... */ }
+function validate[Entity][Property](value) { /* ... */ }
+```
+
+## Best Practices
+
+### 1. Consistency
+- **Use consistent patterns** across all modules
+- **Follow established conventions** for similar functionality
+- **Maintain naming consistency** within each module
+- **Use descriptive names** that clearly indicate function purpose
+
+### 2. Clarity
+- **Choose descriptive names** that explain what the function does
+- **Use action verbs** at the beginning of function names
+- **Include entity names** to indicate what the function operates on
+- **Add context** when necessary for clarity
+
+### 3. Maintainability
+- **Follow established patterns** for easy maintenance
+- **Use consistent abbreviations** across the codebase
+- **Document naming conventions** for team reference
+- **Review and update** conventions as the system evolves
+
+### 4. Performance
+- **Use efficient naming** that doesn't impact performance
+- **Avoid overly long names** that reduce readability
+- **Balance clarity with conciseness** in function names
+- **Consider future scalability** in naming choices
+
+## Examples by Module
+
+### Cash Flows Module ✅ **RECENTLY COMPLETED**
+```javascript
+// Data management
+async function loadCashFlows() { /* ... */ }
+function renderCashFlowsTable(cashFlows) { /* ... */ }
+function refreshCashFlowsData() { /* ... */ }
+
+// CRUD operations
+function saveCashFlow() { /* ... */ }
+function updateCashFlow(id) { /* ... */ }
+function deleteCashFlow(id) { /* ... */ }
+function confirmDeleteCashFlow(id) { /* ... */ }
+
+// Modal management
+function showAddCashFlowModal() { /* ... */ }
+function showEditCashFlowModal(id) { /* ... */ }
+function showDeleteCashFlowModal(id) { /* ... */ }
+function closeCashFlowModal() { /* ... */ }
+
+// Form management
+function validateCashFlowForm() { /* ... */ }
+function validateEditCashFlowForm() { /* ... */ }
+function resetCashFlowForm() { /* ... */ }
+function populateCashFlowForm(data) { /* ... */ }
+
+// Data loading
+function loadAccountsForCashFlow() { /* ... */ }
+function loadCurrenciesForCashFlow() { /* ... */ }
+function loadAccountsForEditCashFlow() { /* ... */ }
+function loadCurrenciesForEditCashFlow() { /* ... */ }
+
+// Utility functions
+function getCashFlowCurrencyDisplay(currencyId) { /* ... */ }
+function formatCashFlowDate(date) { /* ... */ }
+function calculateCashFlowTotal(flows) { /* ... */ }
+```
+
+### Accounts Module
+```javascript
+// Data management
+async function loadAccounts() { /* ... */ }
+function renderAccountsTable(accounts) { /* ... */ }
+function refreshAccountsData() { /* ... */ }
+
+// CRUD operations
+function saveAccount() { /* ... */ }
+function updateAccount(id) { /* ... */ }
+function deleteAccount(id) { /* ... */ }
+function confirmDeleteAccount(id) { /* ... */ }
+
+// Modal management
+function showAddAccountModal() { /* ... */ }
+function showEditAccountModal(id) { /* ... */ }
+function showDeleteAccountModal(id) { /* ... */ }
+function closeAccountModal() { /* ... */ }
+```
+
+### Alerts Module
+```javascript
+// Data management
+async function loadAlerts() { /* ... */ }
+function renderAlertsTable(alerts) { /* ... */ }
+function refreshAlertsData() { /* ... */ }
+
+// CRUD operations
+function saveAlert() { /* ... */ }
+function updateAlert(id) { /* ... */ }
+function deleteAlert(id) { /* ... */ }
+function confirmDeleteAlert(id) { /* ... */ }
+
+// Modal management
+function showAddAlertModal() { /* ... */ }
+function showEditAlertModal(id) { /* ... */ }
+function showDeleteAlertModal(id) { /* ... */ }
+function closeAlertModal() { /* ... */ }
+```
+
+## Future Enhancements
+
+### Planned Improvements
+1. **Advanced Function Naming**: More sophisticated naming patterns
+2. **Automated Naming Validation**: Tools to enforce naming conventions
+3. **Documentation Generation**: Automatic documentation from naming patterns
+4. **Code Quality Tools**: Integration with code quality tools
+
+### Technical Debt
+1. **Naming Consistency**: Ensure all modules follow conventions
+2. **Documentation Updates**: Keep naming documentation current
+3. **Code Review**: Regular review of naming conventions
+4. **Team Training**: Ensure team understands naming patterns
 
 ---
 
-**Last Updated:** August 22, 2025  
-**Version:** 2.1  
-**Status:** Complete ✅
+**Last Updated**: 2025-01-26  
+**Maintainer**: TikTrack Development Team

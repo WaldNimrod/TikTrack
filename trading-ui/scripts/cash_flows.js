@@ -191,9 +191,11 @@ async function showEditCashFlowModal(id) {
     await loadCurrenciesForEditCashFlow();
 
     // מילוי הטופס אחרי שהרשימות נטענו
+    console.log('📝 מילוי טופס עריכה:', cashFlow);
     document.getElementById('editCashFlowId').value = cashFlow.id;
     document.getElementById('editCashFlowAccountId').value = cashFlow.account_id;
     document.getElementById('editCashFlowType').value = cashFlow.type;
+    console.log('🔍 ערך type שנקבע:', cashFlow.type);
     document.getElementById('editCashFlowAmount').value = cashFlow.amount;
     document.getElementById('editCashFlowCurrencyId').value = cashFlow.currency_id || '';
     document.getElementById('editCashFlowDate').value = cashFlow.date;
@@ -209,6 +211,7 @@ async function showEditCashFlowModal(id) {
  * הצגת מודל מחיקת תזרים מזומנים
  */
 function showDeleteCashFlowModal(id) {
+    console.log('🗑️ הצגת מודל מחיקה לתזרים:', id);
 
     const cashFlow = cashFlowsData.find(cf => cf.id === id);
     if (!cashFlow) {
@@ -218,13 +221,17 @@ function showDeleteCashFlowModal(id) {
 
     // שימוש במערכת האזהרות המרכזית
     const cashFlowName = `${cashFlow.type} - ${cashFlow.amount}`;
+    console.log('📝 שם התזרים למחיקה:', cashFlowName);
     
     window.showDeleteWarning(
         'תזרים מזומנים',
         cashFlowName,
-        () => confirmDeleteCashFlow(id),
         () => {
-            console.log('מחיקת תזרים מזומנים בוטלה');
+            console.log('✅ אישור מחיקה - מתחיל מחיקה');
+            confirmDeleteCashFlow(id);
+        },
+        () => {
+            console.log('❌ ביטול מחיקה');
             if (window.showNotification) {
                 window.showNotification('מחיקה בוטלה', 'info');
             }
@@ -603,6 +610,10 @@ async function updateCashFlow() {
             source: document.getElementById('editCashFlowSource').value,
             external_id: '0' // כרגע תמיד 0
         };
+
+        console.log('📝 נתונים לעדכון:', formData);
+        console.log('🔍 ערך type:', formData.type);
+        console.log('🔍 ערך type מהשדה:', document.getElementById('editCashFlowType').value);
 
         // בדיקת תקינות מקיפה
         if (!validateEditCashFlowForm(formData)) {

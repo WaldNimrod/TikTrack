@@ -182,13 +182,7 @@
                         הודעה <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th>
-                      <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
-                        סוג התראה <span class="sort-icon">↕</span>
-                      </button>
-                    </th>
+
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }"
@@ -203,7 +197,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="9" class="loading">טוען התראות...</td>
+                    <td colspan="8" class="loading">טוען התראות...</td>
                   </tr>
                 </tbody>
               </table>
@@ -240,24 +234,29 @@
                     <div class="row">
                       <div class="col-md-6">
                         <div class="radio-group-item">
-                          <input type="radio" name="alertRelationType" id="alertRelationTradePlan" value="3" required>
+                          <input type="radio" name="alertRelationType" id="alertRelationTradePlan" value="3" required
+                            onchange="onRelationTypeChange(this)">
                           <label for="alertRelationTradePlan">תוכנית טרייד</label>
                         </div>
                         <div class="radio-group-item">
-                          <input type="radio" name="alertRelationType" id="alertRelationTrade" value="2" required>
+                          <input type="radio" name="alertRelationType" id="alertRelationTrade" value="2" required
+                            onchange="onRelationTypeChange(this)">
                           <label for="alertRelationTrade">טרייד</label>
                         </div>
                         <div class="radio-group-item">
-                          <input type="radio" name="alertRelationType" id="alertRelationAccount" value="1" required>
+                          <input type="radio" name="alertRelationType" id="alertRelationAccount" value="1" required
+                            onchange="onRelationTypeChange(this)">
                           <label for="alertRelationAccount">חשבון</label>
                         </div>
                         <div class="radio-group-item">
-                          <input type="radio" name="alertRelationType" id="alertRelationTicker" value="4" required>
+                          <input type="radio" name="alertRelationType" id="alertRelationTicker" value="4" required
+                            onchange="onRelationTypeChange(this)">
                           <label for="alertRelationTicker">טיקר</label>
                         </div>
                       </div>
                       <div class="col-md-6">
-                        <select class="form-select" id="alertRelatedObjectSelect" style="width: 100%;">
+                        <select class="form-select" id="alertRelatedObjectSelect" style="width: 100%;" disabled
+                          onchange="onRelatedObjectChange(this)">
                           <option value="">בחר אובייקט לשיוך...</option>
                         </select>
                       </div>
@@ -266,24 +265,13 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="alertType" class="form-label">סוג התראה *</label>
-                    <select class="form-select" id="alertType" required onchange="onAlertTypeChange(this)">
-                      <option value="">בחר סוג התראה...</option>
-                      <option value="price_alert">התראה על מחיר</option>
-                      <option value="stop_loss">סטופ לוס</option>
-                      <option value="volume_alert">התראה על נפח</option>
-                      <option value="custom_alert">התראה מותאמת</option>
-                    </select>
-                  </div>
-                </div>
+
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label class="form-label">תנאי התראה *</label>
                     <div class="row">
                       <div class="col-md-4">
-                        <select class="form-select" id="conditionAttribute" required>
+                        <select class="form-select" id="conditionAttribute" required disabled>
                           <option value="">בחר תכונה...</option>
                           <option value="price">מחיר</option>
                           <option value="change">שינוי</option>
@@ -292,7 +280,7 @@
                         </select>
                       </div>
                       <div class="col-md-4">
-                        <select class="form-select" id="conditionOperator" required>
+                        <select class="form-select" id="conditionOperator" required disabled>
                           <option value="">בחר אופרטור...</option>
                           <option value="more_than">יותר מ</option>
                           <option value="less_than">פחות מ</option>
@@ -307,7 +295,7 @@
                       </div>
                       <div class="col-md-4">
                         <input type="number" class="form-control" id="conditionNumber" step="0.01" placeholder="ערך"
-                          required>
+                          required disabled>
                       </div>
                     </div>
                   </div>
@@ -317,8 +305,8 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="alertMessage" class="form-label">הודעת התראה</label>
-                    <input type="text" class="form-control" id="alertMessage"
-                      placeholder="הודעה שתוצג בעת הפעלת ההתראה">
+                    <input type="text" class="form-control" id="alertMessage" placeholder="הודעה שתוצג בעת הפעלת ההתראה"
+                      disabled>
                   </div>
                 </div>
               </div>
@@ -356,27 +344,28 @@
                       <div class="col-md-6">
                         <div class="radio-group-item">
                           <input type="radio" name="editAlertRelationType" id="editAlertRelationTradePlan" value="3"
-                            required>
+                            required onchange="onEditRelationTypeChange(this)">
                           <label for="editAlertRelationTradePlan">תוכנית טרייד</label>
                         </div>
                         <div class="radio-group-item">
                           <input type="radio" name="editAlertRelationType" id="editAlertRelationTrade" value="2"
-                            required>
+                            required onchange="onEditRelationTypeChange(this)">
                           <label for="editAlertRelationTrade">טרייד</label>
                         </div>
                         <div class="radio-group-item">
                           <input type="radio" name="editAlertRelationType" id="editAlertRelationAccount" value="1"
-                            required>
+                            required onchange="onEditRelationTypeChange(this)">
                           <label for="editAlertRelationAccount">חשבון</label>
                         </div>
                         <div class="radio-group-item">
                           <input type="radio" name="editAlertRelationType" id="editAlertRelationTicker" value="4"
-                            required>
+                            required onchange="onEditRelationTypeChange(this)">
                           <label for="editAlertRelationTicker">טיקר</label>
                         </div>
                       </div>
                       <div class="col-md-6">
-                        <select class="form-select" id="editAlertRelatedObjectSelect" style="width: 100%;">
+                        <select class="form-select" id="editAlertRelatedObjectSelect" style="width: 100%;"
+                          onchange="onEditRelatedObjectChange(this)">
                           <option value="">בחר אובייקט לשיוך...</option>
                         </select>
                       </div>
@@ -385,24 +374,13 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="editAlertType" class="form-label">סוג התראה *</label>
-                    <select class="form-select" id="editAlertType" required onchange="onAlertTypeChange(this)">
-                      <option value="">בחר סוג התראה...</option>
-                      <option value="price_alert">התראה על מחיר</option>
-                      <option value="stop_loss">סטופ לוס</option>
-                      <option value="volume_alert">התראה על נפח</option>
-                      <option value="custom_alert">התראה מותאמת</option>
-                    </select>
-                  </div>
-                </div>
+
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label class="form-label">תנאי התראה *</label>
                     <div class="row">
                       <div class="col-md-4">
-                        <select class="form-select" id="editConditionAttribute" required>
+                        <select class="form-select" id="editConditionAttribute" required disabled>
                           <option value="">בחר תכונה...</option>
                           <option value="price">מחיר</option>
                           <option value="change">שינוי</option>
@@ -411,7 +389,7 @@
                         </select>
                       </div>
                       <div class="col-md-4">
-                        <select class="form-select" id="editConditionOperator" required>
+                        <select class="form-select" id="editConditionOperator" required disabled>
                           <option value="">בחר אופרטור...</option>
                           <option value="more_than">יותר מ</option>
                           <option value="less_than">פחות מ</option>
@@ -426,7 +404,7 @@
                       </div>
                       <div class="col-md-4">
                         <input type="number" class="form-control" id="editConditionNumber" step="0.01" placeholder="ערך"
-                          required>
+                          required disabled>
                       </div>
                     </div>
                   </div>
@@ -437,7 +415,7 @@
                   <div class="mb-3">
                     <label for="editAlertMessage" class="form-label">הודעת התראה</label>
                     <input type="text" class="form-control" id="editAlertMessage"
-                      placeholder="הודעה שתוצג בעת הפעלת ההתראה">
+                      placeholder="הודעה שתוצג בעת הפעלת ההתראה" disabled>
                   </div>
                 </div>
                 <div class="col-md-6">

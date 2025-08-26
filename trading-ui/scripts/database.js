@@ -534,27 +534,25 @@ function updateAccountsTable() {
   if (!tbody) return;
 
   if (allData.accounts.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center">אין נתונים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center">אין נתונים</td></tr>';
     return;
   }
 
   const rows = allData.accounts.map(account => {
     // המרת סטטוס לעברית לפילטר
-    const statusForFilter = account.status === 'open' ? 'פתוח' :
-      account.status === 'closed' ? 'סגור' :
-        account.status === 'cancelled' ? 'מבוטל' : (account.status || '');
+    const statusForFilter = account.status === 'active' ? 'פעיל' :
+      account.status === 'inactive' ? 'לא פעיל' :
+        account.status === 'suspended' ? 'מושעה' : (account.status || '');
 
     return `
     <tr>
+      <td>${account.id || ''}</td>
       <td>${account.name || ''}</td>
       <td>${account.currency || ''}</td>
+      <td>${account.balance || 0}</td>
       <td data-status="${statusForFilter}">${translateAccountStatus(account.status) || ''}</td>
-      <td>${account.cash_balance || 0}</td>
-      <td>${account.total_value || 0}</td>
-      <td>${account.total_pl || 0}</td>
-      <td>${account.notes || ''}</td>
-      <td>${account.id || ''}</td>
       <td data-date="${account.created_at}">${account.created_at || ''}</td>
+      <td data-date="${account.updated_at}">${account.updated_at || ''}</td>
       <td class="actions-cell">
         <table class="table table-sm table-borderless mb-0">
           <tbody>
@@ -565,7 +563,7 @@ function updateAccountsTable() {
               <td class="p-0 pe-1">
                 <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק">🗑️</button>
               </td>
-              ${account.status && account.status !== 'cancelled' ?
+              ${account.status && account.status !== 'suspended' ?
               `<td class="p-0">
                 <button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>
               </td>` :
@@ -586,7 +584,7 @@ function updateTradesTable() {
   if (!tbody) return;
 
   if (allData.trades.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="14" class="text-center">אין נתונים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="15" class="text-center">אין נתונים</td></tr>';
     return;
   }
 
@@ -603,20 +601,21 @@ function updateTradesTable() {
 
     return `
     <tr>
+      <td>${trade.id || ''}</td>
       <td>${trade.account_id || ''}</td>
       <td>${trade.ticker_id || ''}</td>
-      <td>${trade.trade_plan_id || ''}</td>
-      <td data-status="${statusForFilter}">${trade.status || ''}</td>
       <td data-type="${typeForFilter}">${trade.investment_type || ''}</td>
-      <td data-date="${trade.opened_at}">${trade.opened_at || ''}</td>
-      <td data-date="${trade.closed_at}">${trade.closed_at || ''}</td>
-      <td data-date="${trade.cancelled_at}">${trade.cancelled_at || ''}</td>
-      <td>${trade.cancel_reason || ''}</td>
-      <td>${trade.total_pl || 0}</td>
-      <td>${trade.notes || ''}</td>
-      <td>${trade.id || ''}</td>
-      <td data-date="${trade.created_at}">${trade.created_at || ''}</td>
       <td>${trade.side || ''}</td>
+      <td data-status="${statusForFilter}">${trade.status || ''}</td>
+      <td>${trade.entry_price || 0}</td>
+      <td>${trade.current_price || 0}</td>
+      <td>${trade.exit_price || 0}</td>
+      <td>${trade.quantity || 0}</td>
+      <td data-date="${trade.entry_date}">${trade.entry_date || ''}</td>
+      <td data-date="${trade.exit_date}">${trade.exit_date || ''}</td>
+      <td>${trade.notes || ''}</td>
+      <td data-date="${trade.created_at}">${trade.created_at || ''}</td>
+      <td data-date="${trade.updated_at}">${trade.updated_at || ''}</td>
       <td class="actions-cell">
         <table class="table table-sm table-borderless mb-0">
           <tbody>
@@ -664,13 +663,13 @@ function updateTickersTable() {
 
     return `
     <tr>
+      <td>${ticker.id || ''}</td>
       <td>${ticker.symbol || ''}</td>
       <td>${ticker.name || ''}</td>
       <td data-type="${typeForFilter}">${ticker.type || ''}</td>
+      <td>${ticker.currency_id || ''}</td>
       <td>${ticker.remarks || ''}</td>
-      <td>${ticker.currency || ''}</td>
       <td data-status="${statusForFilter}">${ticker.active_trades ? 'כן' : 'לא'}</td>
-      <td>${ticker.id || ''}</td>
       <td data-date="${ticker.created_at}">${ticker.created_at || ''}</td>
       <td data-date="${ticker.updated_at}">${ticker.updated_at || ''}</td>
       <td class="actions-cell">
@@ -717,19 +716,19 @@ function updateTradePlansTable() {
     return `
     <tr>
       <td>${plan.id || ''}</td>
-      <td data-account="${plan.account_id || ''}">${plan.account_id || ''}</td>
+      <td>${plan.account_id || ''}</td>
       <td>${plan.ticker_id || ''}</td>
       <td data-type="${typeForFilter}">${plan.investment_type || ''}</td>
-      <td>${plan.planned_amount || 0}</td>
-      <td>${plan.entry_conditions || ''}</td>
-      <td>${plan.stop_price || 0}</td>
-      <td>${plan.target_price || 0}</td>
-      <td>${plan.reasons || ''}</td>
-      <td data-date="${plan.cancelled_at}">${plan.cancelled_at || ''}</td>
-      <td>${plan.cancel_reason || ''}</td>
-      <td data-date="${plan.created_at}">${plan.created_at || ''}</td>
       <td>${plan.side || ''}</td>
       <td data-status="${statusForFilter}">${plan.status || ''}</td>
+      <td>${plan.entry_price || 0}</td>
+      <td>${plan.target_price || 0}</td>
+      <td>${plan.stop_loss || 0}</td>
+      <td>${plan.quantity || 0}</td>
+      <td>${plan.entry_conditions || ''}</td>
+      <td>${plan.notes || ''}</td>
+      <td data-date="${plan.created_at}">${plan.created_at || ''}</td>
+      <td data-date="${plan.updated_at}">${plan.updated_at || ''}</td>
       <td class="actions-cell">
         <table class="table table-sm table-borderless mb-0">
           <tbody>
@@ -772,6 +771,7 @@ function updateExecutionsTable() {
 
     return `
     <tr>
+      <td>${execution.id || ''}</td>
       <td>${execution.trade_id || ''}</td>
       <td data-type="${typeForFilter}">${execution.action || ''}</td>
       <td data-date="${execution.date}">${execution.date || ''}</td>
@@ -779,7 +779,6 @@ function updateExecutionsTable() {
       <td>${execution.price || 0}</td>
       <td>${execution.fee || 0}</td>
       <td>${execution.source || ''}</td>
-      <td>${execution.id || ''}</td>
       <td data-date="${execution.created_at}">${execution.created_at || ''}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">
@@ -813,18 +812,18 @@ function updateCashFlowsTable() {
 
     return `
     <tr>
-      <td data-account="${cashFlow.account_id || ''}">${cashFlow.account_id || ''}</td>
+      <td>${cashFlow.id || ''}</td>
+      <td>${cashFlow.account_id || ''}</td>
       <td data-type="${typeForFilter}">${cashFlow.type || ''}</td>
       <td>${cashFlow.amount || 0}</td>
       <td data-date="${cashFlow.date}">${cashFlow.date || ''}</td>
       <td>${cashFlow.description || ''}</td>
-      <td>${cashFlow.id || ''}</td>
-      <td data-date="${cashFlow.created_at}">${cashFlow.created_at || ''}</td>
       <td>${cashFlow.currency || ''}</td>
       <td>${cashFlow.currency_id || ''}</td>
       <td>${cashFlow.usd_rate || 0}</td>
       <td>${cashFlow.source || ''}</td>
       <td>${cashFlow.external_id || ''}</td>
+      <td data-date="${cashFlow.created_at}">${cashFlow.created_at || ''}</td>
       <td class="actions-cell">
         <table class="table table-sm table-borderless mb-0">
           <tbody>
@@ -857,10 +856,10 @@ function updateAlertsTable() {
 
   const rows = allData.alerts.map(alert => {
     // המרת סוגים לעברית לפילטר
-    const typeForFilter = alert.type === 'price_alert' ? 'התראה על מחיר' :
+    const typeForFilter = alert.type === 'price' ? 'התראה על מחיר' :
       alert.type === 'stop_loss' ? 'סטופ לוס' :
-        alert.type === 'volume_alert' ? 'התראה על נפח' :
-          alert.type === 'custom_alert' ? 'התראה מותאמת' : (alert.type || '');
+        alert.type === 'volume' ? 'התראה על נפח' :
+          alert.type === 'custom' ? 'התראה מותאמת' : (alert.type || '');
 
     // המרת סטטוס לעברית לפילטר
     const statusForFilter = alert.status === 'open' ? 'פתוח' :
@@ -869,19 +868,19 @@ function updateAlertsTable() {
 
     return `
     <tr>
-      <td data-account="${alert.account_id || ''}">${alert.account_id || ''}</td>
-      <td>${alert.ticker_id || ''}</td>
-      <td data-type="${typeForFilter}">${alert.type || ''}</td>
-      <td>${alert.condition || ''}</td>
-      <td>${alert.message || ''}</td>
-      <td data-status="${alert.is_active ? 'פעיל' : 'לא פעיל'}">${alert.is_active ? 'כן' : 'לא'}</td>
-      <td data-date="${alert.triggered_at}">${alert.triggered_at || ''}</td>
       <td>${alert.id || ''}</td>
-      <td data-date="${alert.created_at}">${alert.created_at || ''}</td>
+      <td data-type="${typeForFilter}">${alert.type || ''}</td>
       <td data-status="${statusForFilter}">${alert.status || ''}</td>
+      <td>${alert.message || ''}</td>
+      <td data-date="${alert.triggered_at}">${alert.triggered_at || ''}</td>
       <td>${alert.is_triggered || ''}</td>
       <td>${alert.related_type_id || ''}</td>
       <td>${alert.related_id || ''}</td>
+      <td>${alert.condition_attribute || ''}</td>
+      <td>${alert.condition_operator || ''}</td>
+      <td>${alert.condition_number || 0}</td>
+      <td data-date="${alert.created_at}">${alert.created_at || ''}</td>
+      <td data-date="${alert.updated_at}">${alert.updated_at || ''}</td>
       <td class="actions-cell">
         <table class="table table-sm table-borderless mb-0">
           <tbody>
@@ -915,18 +914,19 @@ function updateNotesTable() {
   if (!tbody) return;
 
   if (allData.notes.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין נתונים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center">אין נתונים</td></tr>';
     return;
   }
 
   const rows = allData.notes.map(note => `
     <tr>
       <td>${note.id || ''}</td>
+      <td>${note.entity_type || ''}</td>
+      <td>${note.entity_id || ''}</td>
+      <td>${note.title || ''}</td>
       <td>${note.content || ''}</td>
-      <td>${note.attachment || ''}</td>
       <td data-date="${note.created_at}">${note.created_at || ''}</td>
-      <td>${note.related_type_id || ''}</td>
-      <td>${note.related_id || ''}</td>
+      <td data-date="${note.updated_at}">${note.updated_at || ''}</td>
       <td class="actions-cell">
         <table class="table table-sm table-borderless mb-0">
           <tbody>

@@ -6,6 +6,10 @@
 - ✅ **מודול התראות (Alerts)** - הושלם במלואו
 - ✅ **מודול עסקאות (Executions)** - הושלם במלואו (עודכן)
 - ✅ **מודול טיקרים (Tickers)** - הושלם במלואו (עודכן)
+- ✅ **מודול מטבעות (Currencies)** - הושלם במלואו (חדש)
+- ✅ **מודול סוגי קישור (Note Relation Types)** - הושלם במלואו (חדש)
+- ✅ **עמוד טבלאות עזר (DB Extra Data)** - הושלם במלואו (חדש)
+- ✅ **מודול הערות (Notes)** - הושלם במלואו (חדש - 26 באוגוסט 2025)
 - ✅ **מערכת Header** - עובדת
 - ✅ **מערכת פילטרים** - עובדת
 - ✅ **מערכת מיון** - עובדת
@@ -21,6 +25,7 @@
 - ⏳ **מודול טריידים (Trades)** - פשוט יותר להתחיל איתו
 - ⏳ **מודול חשבונות (Accounts)** - פשוט יותר
 - ⏳ **מודול תוכניות (Trade Plans)** - בינוני
+- ⏳ **פילטרים ומיון לעמוד הערות** - להוסיף מערכת פילטרים מתקדמת
 
 ---
 
@@ -35,13 +40,18 @@ Backend/
 │   ├── execution.py         # מודל עסקאות - מוכן (עודכן)
 │   ├── trade.py             # מודל טריידים - פשוט
 │   ├── account.py           # מודל חשבונות - פשוט
-│   └── ticker.py            # מודל טיקרים - פשוט
+│   ├── ticker.py            # מודל טיקרים - פשוט
+│   ├── currency.py          # מודל מטבעות - מוכן (חדש)
+│   └── note_relation_type.py # מודל סוגי קישור - מוכן (חדש)
 ├── routes/api/              # API endpoints
 │   ├── alerts.py            # התראות - מוכן
 │   ├── executions.py        # עסקאות - מוכן (עודכן)
 │   ├── trades.py            # טריידים - פשוט
 │   ├── accounts.py          # חשבונות - פשוט
-│   └── tickers.py           # טיקרים - פשוט
+│   ├── tickers.py           # טיקרים - פשוט
+│   ├── currencies.py        # מטבעות - מוכן (חדש)
+│   ├── note_relation_types.py # סוגי קישור - מוכן (חדש)
+│   └── notes.py             # הערות - מוכן (חדש - 26 באוגוסט 2025)
 ├── services/                # לוגיקה עסקית
 │   ├── alert_service.py     # התראות - מוכן
 │   └── validation_service.py # וולידציה - מוכן
@@ -54,12 +64,14 @@ Backend/
 trading-ui/
 ├── alerts.html              # דף התראות - מוכן
 ├── executions.html          # דף עסקאות - מוכן (עודכן)
+├── db_extradata.html        # דף טבלאות עזר - מוכן (חדש)
 ├── trades.html              # דף טריידים - להתחיל איתו
 ├── accounts.html            # דף חשבונות - פשוט
 ├── tickers.html             # דף טיקרים - פשוט
 ├── scripts/
 │   ├── alerts.js            # התראות - מוכן
 │   ├── executions.js        # עסקאות - מוכן (עודכן)
+│   ├── db-extradata.js      # טבלאות עזר - מוכן (חדש)
 │   ├── trades.js            # טריידים - להתחיל איתו
 │   ├── accounts.js          # חשבונות - פשוט
 │   ├── tickers.js           # טיקרים - פשוט
@@ -70,6 +82,7 @@ trading-ui/
 └── styles/
     ├── styles.css           # סגנונות כלליים - מוכן
     ├── table.css            # סגנונות טבלאות - מוכן
+    ├── db-display.css       # סגנונות דף בסיס נתונים - מוכן (חדש)
     └── apple-theme.css      # ערכת נושא - מוכן
 ```
 
@@ -91,14 +104,31 @@ trading-ui/
    - מודל: `Backend/models/trade.py`
 
 ### 🟡 רמה 2 - בינוני
-4. **מודול תוכניות (Trade Plans)**
+3. **מודול תוכניות (Trade Plans)**
    - קובץ: `trading-ui/trade_plans.html`
    - סקריפט: `trading-ui/scripts/trade_plans.js`
 
-### 🔴 רמה 3 - מורכב
-5. **מודול עסקאות (Executions)** ✅ **הושלם**
+### ✅ רמה 0 - הושלם
+4. **מודול עסקאות (Executions)** ✅ **הושלם**
    - קובץ: `trading-ui/executions.html`
    - סקריפט: `trading-ui/scripts/executions.js`
+
+5. **מודול מטבעות (Currencies)** ✅ **הושלם (חדש)**
+   - קובץ: `trading-ui/db_extradata.html` (חלק מטבלאות עזר)
+   - סקריפט: `trading-ui/scripts/db-extradata.js`
+   - API: `Backend/routes/api/currencies.py`
+   - מודל: `Backend/models/currency.py`
+
+6. **מודול סוגי קישור (Note Relation Types)** ✅ **הושלם (חדש)**
+   - קובץ: `trading-ui/db_extradata.html` (חלק מטבלאות עזר)
+   - סקריפט: `trading-ui/scripts/db-extradata.js`
+   - API: `Backend/routes/api/note_relation_types.py`
+   - מודל: `Backend/models/note_relation_type.py`
+
+7. **עמוד טבלאות עזר (DB Extra Data)** ✅ **הושלם (חדש)**
+   - קובץ: `trading-ui/db_extradata.html`
+   - סקריפט: `trading-ui/scripts/db-extradata.js`
+   - סגנונות: `trading-ui/styles/db-display.css`
 
 ---
 
@@ -197,6 +227,66 @@ window.getCashFlowCurrencyDisplay(cashFlow)      // הצגת מטבע תזרים
 // POST /api/v1/currencies/ - יצירת מטבע
 // PUT /api/v1/currencies/{id} - עדכון מטבע
 // DELETE /api/v1/currencies/{id} - מחיקת מטבע
+```
+
+### 9. מערכת טבלאות עזר (חדש - הושלם)
+```javascript
+// קובץ: trading-ui/scripts/db-extradata.js
+// פונקציות זמינות:
+
+// פונקציות מטבעות:
+window.addCurrencyRecord()                    // הוספת מטבע
+window.editCurrencyRecord(id)                 // עריכת מטבע
+window.deleteCurrencyRecord(id)               // מחיקת מטבע
+window.saveCurrencyRecord()                   // שמירת מטבע
+window.updateCurrencyRecord()                 // עדכון מטבע
+window.confirmDeleteCurrencyRecord(id)        // אישור מחיקת מטבע
+
+// פונקציות סוגי קישור:
+window.addNoteRelationTypeRecord()            // הוספת סוג קישור
+window.editNoteRelationTypeRecord(id)         // עריכת סוג קישור
+window.deleteNoteRelationTypeRecord(id)       // מחיקת סוג קישור
+window.saveNoteRelationTypeRecord()           // שמירת סוג קישור
+window.updateNoteRelationTypeRecord()         // עדכון סוג קישור
+window.confirmDeleteNoteRelationTypeRecord(id) // אישור מחיקת סוג קישור
+
+// פונקציות וולידציה:
+window.validateCurrencySymbol(input)          // וולידציה סמל מטבע
+window.validateCurrencyName(input)            // וולידציה שם מטבע
+window.validateCurrencyUsdRate(input)         // וולידציה שער דולר
+window.validateCurrencyForm()                 // וולידציה כללית
+
+// פונקציות סקשנים:
+window.toggleAllSections()                    // פתיחה/סגירה כל הסקשנים
+window.toggleCurrenciesSection()              // פתיחה/סגירה סקשן מטבעות
+window.toggleNoteRelationTypesSection()       // פתיחה/סגירה סקשן סוגי קישור
+
+// API endpoints:
+// GET /api/v1/note_relation_types/ - כל סוגי הקישור
+// POST /api/v1/note_relation_types/ - יצירת סוג קישור
+// PUT /api/v1/note_relation_types/{id} - עדכון סוג קישור
+// DELETE /api/v1/note_relation_types/{id} - מחיקת סוג קישור
+```
+
+### 10. מערכת אילוצים וולידציה (חדש - הושלם)
+```javascript
+// וולידציה בצד הלקוח:
+// - תבנית regex: ^[A-Z]+$ (רק אותיות אנגליות גדולות)
+// - אורך מקסימלי: 10 תווים
+// - שדות חובה: symbol, name
+// - מספר חיובי: usd_rate
+
+// וולידציה בצד השרת:
+// - בדיקת ייחודיות סמל מטבע
+// - הודעות שגיאה ספציפיות בעברית
+// - קודי שגיאה מתאימים (400, 404, 500)
+
+// אילוצי בסיס נתונים:
+// - symbol: VARCHAR(10) NOT NULL UNIQUE
+// - name: VARCHAR(100) NOT NULL
+// - usd_rate: NUMERIC(10,6) NOT NULL DEFAULT 1.000000
+// - id: INTEGER NOT NULL PRIMARY KEY
+// - created_at: DATETIME DEFAULT CURRENT_TIMESTAMP
 ```
 
 ---
@@ -571,6 +661,33 @@ async function loadTickersData() {
 - השתמש ב-`window.getCurrencyIcon(symbol)` לאייקון מטבע
 - טען מטבעות עם `loadCurrenciesFromServer()` בתחילת הדף
 
+### 9. מערכת טבלאות עזר (חדש - הושלם)
+- השתמש ב-`window.addCurrencyRecord()` להוספת מטבע
+- השתמש ב-`window.addNoteRelationTypeRecord()` להוספת סוג קישור
+- השתמש ב-`window.validateCurrencySymbol(input)` לוולידציה
+- השתמש ב-`window.toggleAllSections()` לפתיחה/סגירה כל הסקשנים
+- הוסף `<link rel="stylesheet" href="styles/db-display.css">` ל-HTML
+- הוסף `<script src="scripts/db-extradata.js"></script>` ל-HTML
+
+### 10. מערכת אילוצים וולידציה (חדש - הושלם)
+- וולידציה בצד הלקוח עם תבנית regex: `^[A-Z]+$`
+- וולידציה בצד השרת עם הודעות שגיאה בעברית
+- אילוצי בסיס נתונים: UNIQUE, NOT NULL, DEFAULT
+- הודעות שגיאה ספציפיות לכל שדה
+- צבעי שדות (ירוק לתקין, אדום לשגוי)
+
+### 11. עיצוב כפתורים במודלים (חדש - הושלם)
+- כפתורי שמירה: רקע לבן, מסגרת ירוקה, גודל קבוע
+- כפתורי ביטול: רקע לבן, מסגרת אפורה, גודל קבוע
+- כפתורי מחיקה: רקע לבן, מסגרת אדומה, גודל קבוע
+- סגנונות מיוחדים למודלים ב-`db-display.css`
+
+### 12. אילוצי טבלאות דינמיים (חדש - הושלם)
+- הצגת אילוצי טבלאות מתחת לכל טבלה
+- סוגי אילוצים: constraint, unique, default, index, format
+- צבעים ואייקונים לכל סוג אילוץ
+- עיצוב אחיד עם `table.css`
+
 ---
 
 ## 📞 תמיכה
@@ -592,7 +709,7 @@ async function loadTickersData() {
 
 **נוצר על ידי**: TikTrack Development Team  
 **תאריך**: 25 באוגוסט 2025  
-**עודכן על ידי**: Assistant (עבודה על מודול טיקרים)  
+**עודכן על ידי**: Assistant (עבודה על מודול טבלאות עזר)  
 **תאריך עדכון**: 25 באוגוסט 2025  
 **מטרה**: מסירת פרויקט למישהו אחר  
 **סטטוס**: מוכן להמשך עבודה

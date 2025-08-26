@@ -27,3 +27,15 @@ class Currency(BaseModel):
             else:
                 result[c.name] = value
         return result
+    
+    def is_base_record(self) -> bool:
+        """Check if this is the base currency record (ID=1)"""
+        return self.id == 1
+    
+    def can_be_modified(self) -> bool:
+        """Check if this record can be modified (not base record)"""
+        return not self.is_base_record()
+    
+    def can_be_deleted(self) -> bool:
+        """Check if this record can be deleted (not base record)"""
+        return not self.is_base_record()

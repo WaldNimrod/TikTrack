@@ -3,24 +3,35 @@
 ## 📋 Overview
 This is the main documentation directory for the TikTrack investment management system. All project documentation is organized here in a logical structure.
 
-## 🆕 Recent Updates (Version 2.4.0)
+## 🆕 Recent Updates (Version 2.5.0)
+
+### 🎯 New Completed Modules
+- **Currency Management System**: Complete CRUD operations for currencies with validation
+- **Note Relation Types System**: Complete CRUD operations for note relation types
+- **Database Extra Data Page**: New page for managing auxiliary database tables
+- **Dynamic Table Constraints**: Real-time display of database constraints under tables
 
 ### 🎨 UI/UX Improvements
 - **Modal Styling Fixes**: Fixed white gaps between modal headers and borders
 - **Preferences Auto-Save**: Removed all manual save buttons - settings save automatically
 - **Table Header Updates**: Updated terminology for consistency
+- **Button Styling**: Consistent button design for modals (white background, colored borders)
+- **Section Toggle System**: Improved section collapse/expand functionality
 
 ### 🔧 Bug Fixes
 - **API Endpoint Fixes**: Updated preferences API from `/api/preferences` to `/api/v1/preferences`
 - **Missing Assets**: Created missing preferences icon and translation functions
 - **Modal Consistency**: Standardized border-radius across all modal components
+- **Infinite Loop Fix**: Fixed toggleAllSections function to prevent stack overflow
+- **CSS File References**: Removed references to non-existent CSS files
 
 ### 📚 Documentation Updates
-- **Updated CHANGELOG.md**: Added comprehensive version 2.4.0 documentation
+- **Updated CHANGELOG.md**: Added comprehensive version 2.5.0 documentation
 - **Enhanced CSS Documentation**: Added modal styling standards to CSS_ARCHITECTURE.md
 - **Created MODAL_STYLING_GUIDE.md**: New comprehensive guide for modal styling standards
 - **Updated Preferences Documentation**: Added auto-save system and new fields documentation
-- **Created VERSION_2.4.0_SUMMARY.md**: Comprehensive summary of all version 2.4.0 changes
+- **Created VERSION_2.5.0_SUMMARY.md**: Comprehensive summary of all version 2.5.0 changes
+- **Updated HANDOVER_SUMMARY.md**: Added new completed modules and features
 
 ## 🏗️ Structure
 

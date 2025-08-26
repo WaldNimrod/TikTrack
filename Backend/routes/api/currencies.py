@@ -199,6 +199,14 @@ def create_currency():
 def update_currency(currency_id: int):
     """Update currency"""
     try:
+        # הגנה על רשומת הבסיס (מזהה 1)
+        if currency_id == 1:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "לא ניתן לערוך רשומת בסיס מוגנת"},
+                "version": "v1"
+            }), 403
+        
         data = request.get_json()
         symbol = data.get('symbol', '').strip().upper()
         name = data.get('name', '').strip()
@@ -347,6 +355,14 @@ def get_currencies_dropdown():
 def delete_currency(currency_id: int):
     """Delete currency"""
     try:
+        # הגנה על רשומת הבסיס (מזהה 1)
+        if currency_id == 1:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "לא ניתן למחוק רשומת בסיס מוגנת"},
+                "version": "v1"
+            }), 403
+        
         conn = get_db_connection()
         cursor = conn.cursor()
         

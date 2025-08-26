@@ -183,6 +183,10 @@ class CurrencyService:
         if not currency:
             raise ValueError(f"Currency with ID {currency_id} not found")
         
+        # הגנה על רשומת הבסיס (מזהה 1)
+        if currency_id == 1:
+            raise ValueError("Cannot update base currency record (ID=1)")
+        
         # Validate data if there are new fields
         if data:
             CurrencyService._validate_currency_data(data, is_update=True)
@@ -233,6 +237,10 @@ class CurrencyService:
         if not currency:
             raise ValueError(f"Currency with ID {currency_id} not found")
         
+        # הגנה על רשומת הבסיס (מזהה 1)
+        if currency_id == 1:
+            raise ValueError("Cannot update base currency record (ID=1)")
+        
         # Rate validation
         if not CurrencyService.MIN_USD_RATE <= usd_rate <= CurrencyService.MAX_USD_RATE:
             raise ValueError(f"USD rate must be between {CurrencyService.MIN_USD_RATE} and {CurrencyService.MAX_USD_RATE}")
@@ -267,6 +275,10 @@ class CurrencyService:
         currency = CurrencyService.get_by_id(db, currency_id)
         if not currency:
             raise ValueError(f"Currency with ID {currency_id} not found")
+        
+        # הגנה על רשומת הבסיס (מזהה 1)
+        if currency_id == 1:
+            raise ValueError("Cannot delete base currency record (ID=1)")
         
         # Check if currency is in use
         if CurrencyService.is_currency_in_use(db, currency_id):

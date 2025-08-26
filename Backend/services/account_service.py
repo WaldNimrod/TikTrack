@@ -62,6 +62,12 @@ class AccountService:
         if not account:
             return False
         
+        # הגנה על החשבון האחרון
+        all_accounts = db.query(Account).all()
+        if len(all_accounts) == 1:
+            logger.warning(f"Cannot delete account {account_id}: it is the last account in the system")
+            return False
+        
         # Check for linked trades
         trades = db.query(Trade).filter(Trade.account_id == account_id).all()
         if trades:

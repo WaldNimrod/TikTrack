@@ -90,11 +90,13 @@ def get_cash_flow(cash_flow_id: int):
 def create_cash_flow():
     """Create new cash flow"""
     try:
+        logger.info("=== CREATE CASH FLOW START ===")
         data = request.get_json()
+        logger.info(f"Received data: {data}")
         db: Session = next(get_db())
         
         # Set default values
-        if 'currency_id' not in data:
+        if 'currency_id' not in data or data['currency_id'] is None:
             data['currency_id'] = 1  # USD
         if 'usd_rate' not in data:
             data['usd_rate'] = 1.000000
@@ -102,6 +104,20 @@ def create_cash_flow():
             data['source'] = 'manual'
         if 'external_id' not in data:
             data['external_id'] = '0'
+        
+        # Convert date string to date object
+        if 'date' in data and data['date']:
+            from datetime import datetime
+            try:
+                logger.info(f"Converting date string: {data['date']}")
+                data['date'] = datetime.strptime(data['date'], '%Y-%m-%d').date()
+                logger.info(f"Converted to date object: {data['date']}")
+            except ValueError:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                    "version": "v1"
+                }), 400
         
         # Validate data against constraints
         logger.info("Validating cash flow data before creation")
@@ -153,6 +169,30 @@ def update_cash_flow(cash_flow_id: int):
         cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
         
         if cash_flow:
+            # Set default values for update
+            if 'currency_id' in data and data['currency_id'] is None:
+                data['currency_id'] = 1  # USD
+            if 'usd_rate' not in data:
+                data['usd_rate'] = 1.000000
+            if 'source' not in data:
+                data['source'] = 'manual'
+            if 'external_id' not in data:
+                data['external_id'] = '0'
+            
+            # Convert date string to date object
+            if 'date' in data and data['date']:
+                from datetime import datetime
+                try:
+                    logger.info(f"Converting date string: {data['date']}")
+                    data['date'] = datetime.strptime(data['date'], '%Y-%m-%d').date()
+                    logger.info(f"Converted to date object: {data['date']}")
+                except ValueError:
+                    return jsonify({
+                        "status": "error",
+                        "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                        "version": "v1"
+                    }), 400
+            
             # Validate data against constraints
             logger.info("Validating cash flow data before update")
             is_valid, errors = ValidationService.validate_data(db, 'cash_flows', data, exclude_id=cash_flow_id)

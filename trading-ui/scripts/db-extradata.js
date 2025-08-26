@@ -17,12 +17,77 @@
 
 // ===== פונקציות לפתיחה/סגירה של סקשנים =====
 
-// פונקציה לפתיחה/סגירה של כל הסקשנים - משתמשת בפונקציה הגלובלית מ-main.js
+// פונקציה לפתיחה/סגירה של כל הסקשנים
 function toggleAllSections() {
-    if (typeof window.toggleAllSections === 'function') {
-        window.toggleAllSections();
+    // נמנע מלולאה אינסופית על ידי בדיקה אם הפונקציה הגלובלית קיימת
+    if (typeof window.globalToggleAllSections === 'function') {
+        window.globalToggleAllSections();
     } else {
-        console.error('❌ הפונקציה הגלובלית toggleAllSections לא זמינה');
+        // מימוש מקומי אם הפונקציה הגלובלית לא זמינה
+        const contentSections = document.querySelectorAll('.content-section');
+        const topSection = document.querySelector('.top-section');
+        
+        // בדיקה אם כל הסקשנים פתוחים או סגורים
+        let allCollapsed = true;
+        let allExpanded = true;
+        
+        // בדיקת סקשן עליון
+        if (topSection) {
+            const topSectionBody = topSection.querySelector('.section-body');
+            if (topSectionBody) {
+                if (topSectionBody.style.display !== 'none') {
+                    allCollapsed = false;
+                } else {
+                    allExpanded = false;
+                }
+            }
+        }
+        
+        // בדיקת סקשני תוכן
+        contentSections.forEach(section => {
+            const sectionBody = section.querySelector('.section-body');
+            if (sectionBody) {
+                if (sectionBody.style.display !== 'none') {
+                    allCollapsed = false;
+                } else {
+                    allExpanded = false;
+                }
+            }
+        });
+        
+        // החלטה אם לסגור או לפתוח הכל
+        const shouldCollapse = !allCollapsed;
+        
+        // סגירה/פתיחה של סקשן עליון
+        if (topSection) {
+            const topSectionBody = topSection.querySelector('.section-body');
+            const toggleBtn = topSection.querySelector('button[onclick="toggleAllSections()"]');
+            const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+            
+            if (topSectionBody) {
+                topSectionBody.style.display = shouldCollapse ? 'none' : 'block';
+                if (icon) {
+                    icon.textContent = shouldCollapse ? '▼' : '▲';
+                }
+            }
+        }
+        
+        // סגירה/פתיחה של סקשני תוכן
+        contentSections.forEach(section => {
+            const sectionBody = section.querySelector('.section-body');
+            const toggleBtn = section.querySelector('.filter-toggle-btn');
+            const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+            
+            if (sectionBody) {
+                sectionBody.style.display = shouldCollapse ? 'none' : 'block';
+                if (icon) {
+                    icon.textContent = shouldCollapse ? '▼' : '▲';
+                }
+            }
+        });
+        
+        // שמירת המצב ב-localStorage
+        localStorage.setItem('dbExtradataAllSectionsCollapsed', shouldCollapse);
     }
 }
 
@@ -178,8 +243,13 @@ function updateCurrenciesTable(currencies) {
         return;
     }
 
-    const rows = currencies.map(currency => `
-    <tr>
+    const rows = currencies.map(currency => {
+        // בדיקה אם זה רשומת הבסיס (מזהה 1)
+        const isBaseRecord = currency.id === 1;
+        const isProtected = isBaseRecord;
+        
+        return `
+    <tr ${isProtected ? 'class="table-warning"' : ''}>
       <td class="ticker-cell" data-type="${currency.symbol || ''}">${currency.symbol || ''}</td>
       <td>${currency.name || ''}</td>
       <td>${currency.usd_rate || ''}</td>
@@ -190,17 +260,25 @@ function updateCurrenciesTable(currencies) {
           <tbody>
             <tr>
               <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editCurrencyRecord(${currency.id})" title="ערוך">✏️</button>
+                <button class="btn btn-sm btn-secondary" 
+                        onclick="editCurrencyRecord(${currency.id})" 
+                        title="${isProtected ? 'רשומת בסיס - לא ניתן לערוך' : 'ערוך'}"
+                        ${isProtected ? 'disabled' : ''}>✏️</button>
               </td>
               <td class="p-0">
-                <button class="btn btn-sm btn-danger" onclick="deleteCurrencyRecord(${currency.id})" title="מחק">🗑️</button>
+                <button class="btn btn-sm btn-danger" 
+                        onclick="deleteCurrencyRecord(${currency.id})" 
+                        title="${isProtected ? 'רשומת בסיס - לא ניתן למחוק' : 'מחק'}"
+                        ${isProtected ? 'disabled' : ''}>🗑️</button>
               </td>
             </tr>
           </tbody>
         </table>
+        ${isProtected ? '<small class="text-muted d-block mt-1">🔒 רשומת בסיס מוגנת</small>' : ''}
       </td>
     </tr>
-  `).join('');
+  `;
+    }).join('');
 
     tbody.innerHTML = rows;
 }
@@ -509,11 +587,21 @@ function addCurrencyRecord() {
 
 // פונקציה לעריכת מטבע
 function editCurrencyRecord(id) {
+    // בדיקה אם זה רשומת הבסיס (מזהה 1)
+    if (id === 1) {
+        showNotification('לא ניתן לערוך רשומת בסיס מוגנת', 'warning');
+        return;
+    }
     showEditCurrencyModal(id);
 }
 
 // פונקציה למחיקת מטבע
 function deleteCurrencyRecord(id) {
+    // בדיקה אם זה רשומת הבסיס (מזהה 1)
+    if (id === 1) {
+        showNotification('לא ניתן למחוק רשומת בסיס מוגנת', 'warning');
+        return;
+    }
     showDeleteCurrencyModal(id);
 }
 
@@ -1113,22 +1201,52 @@ async function confirmDeleteNoteRelationTypeRecord(id) {
 
 // ===== פונקציות כלליות =====
 
+// פונקציה להצגת התראות
+function showNotification(message, type = 'info') {
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+    } else {
+        // Fallback להצגת התראה פשוטה
+        console.log(`[${type.toUpperCase()}] ${message}`);
+        alert(`${type.toUpperCase()}: ${message}`);
+    }
+}
+
 // פונקציה כללית להוספת רשומה (מטבע או סוג קישור)
 function addRecord() {
-    // נבדוק איזה טבלה פעילה
-    const activeSection = document.querySelector('.content-section:not(.collapsed)');
-    if (activeSection) {
-        const currenciesSection = activeSection.querySelector('#currenciesTable');
-        const noteTypesSection = activeSection.querySelector('#noteRelationTypesTable');
-        
-        if (currenciesSection) {
-            addCurrencyRecord();
-        } else if (noteTypesSection) {
-            addNoteRelationTypeRecord();
-        } else {
-            // ברירת מחדל - הוספת מטבע
-            addCurrencyRecord();
+    // נבדוק איזה כפתור לחצו על ידי בדיקת event target
+    const event = window.event || arguments.callee.caller.arguments[0];
+    if (event && event.target) {
+        const button = event.target.closest('button');
+        if (button) {
+            const section = button.closest('.content-section');
+            if (section) {
+                const currenciesTable = section.querySelector('#currenciesTable');
+                const noteTypesTable = section.querySelector('#noteRelationTypesTable');
+                
+                if (currenciesTable) {
+                    addCurrencyRecord();
+                } else if (noteTypesTable) {
+                    addNoteRelationTypeRecord();
+                } else {
+                    // ברירת מחדל - הוספת מטבע
+                    addCurrencyRecord();
+                }
+                return;
+            }
         }
+    }
+    
+    // אם לא הצלחנו לזהות, נבדוק לפי הסקשן הפעיל
+    const contentSections = document.querySelectorAll('.content-section');
+    const firstSection = contentSections[0]; // מטבעות
+    const secondSection = contentSections[1]; // סוגי קישור
+    
+    // נבדוק איזה סקשן לא מוסתר
+    if (firstSection && firstSection.querySelector('.section-body').style.display !== 'none') {
+        addCurrencyRecord();
+    } else if (secondSection && secondSection.querySelector('.section-body').style.display !== 'none') {
+        addNoteRelationTypeRecord();
     } else {
         // ברירת מחדל - הוספת מטבע
         addCurrencyRecord();
@@ -1161,3 +1279,6 @@ window.confirmDeleteNoteRelationTypeRecord = confirmDeleteNoteRelationTypeRecord
 
 // ייצוא פונקציה כללית
 window.addRecord = addRecord;
+
+// ייצוא פונקציית התראות
+window.showNotification = showNotification;

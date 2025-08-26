@@ -4,17 +4,25 @@
 
 This index provides quick access to all documentation files in the TikTrack project.
 
-## 🆕 Recent Updates (Version 2.4.0)
+## 🆕 Recent Updates (Version 2.8.0)
+
+### 🎯 New Completed Modules
+- **[Database Extra Data System](database/)** - Complete currency and note relation types management
+- **[Dynamic Table Constraints](database/)** - Real-time display of database constraints
+- **[Validation System](database/)** - Comprehensive client and server-side validation
 
 ### 📚 Updated Documentation
-- **[CHANGELOG.md](CHANGELOG.md)** - Added comprehensive version 2.4.0 documentation
-- **[VERSION_2.4.0_SUMMARY.md](VERSION_2.4.0_SUMMARY.md)** - Comprehensive summary of all changes
-- **[CSS_ARCHITECTURE.md](frontend/css/CSS_ARCHITECTURE.md)** - Added modal styling standards
-- **[COMPONENT_STYLE_GUIDE.md](frontend/css/COMPONENT_STYLE_GUIDE.md)** - Added modal components documentation
-- **[MODAL_STYLING_GUIDE.md](frontend/css/MODAL_STYLING_GUIDE.md)** - New comprehensive modal styling guide
-- **[API.md](features/preferences/API.md)** - Updated API endpoints and new fields
-- **[JAVASCRIPT.md](features/preferences/JAVASCRIPT.md)** - Added auto-save system documentation
-- **[USER_GUIDE.md](features/preferences/USER_GUIDE.md)** - Updated for auto-save functionality
+- **[CHANGELOG.md](project/CHANGELOG.md)** - Added comprehensive version 2.8.0 documentation
+- **[HANDOVER_SUMMARY.md](../../HANDOVER_SUMMARY.md)** - Updated with new completed modules
+- **[README.md](README.md)** - Updated with version 2.8.0 changes
+- **[VERSION_2.8.0_SUMMARY.md](project/VERSION_2.8.0_SUMMARY.md)** - Comprehensive summary of all changes
+
+### 🔧 Technical Improvements
+- **Currency Management**: Complete CRUD operations with validation
+- **Note Relation Types**: Full management system with API integration
+- **Database Constraints**: Dynamic display with color coding
+- **Button Styling**: Consistent modal button design
+- **Section Toggle**: Improved collapse/expand functionality
 
 ## 🏗️ Project Structure
 

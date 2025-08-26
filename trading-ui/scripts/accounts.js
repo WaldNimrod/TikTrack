@@ -270,14 +270,18 @@ function updateAccountsTable(accounts) {
   }
 
   // בניית הטבלה מחדש לפי הכותרות בדיוק
-  tbody.innerHTML = accounts.map(account => {
+  tbody.innerHTML = accounts.map((account, index) => {
     // המרת סטטוס לעברית לפילטר
     const statusForFilter = account.status === 'open' ? 'פתוח' :
       account.status === 'closed' ? 'סגור' :
         account.status === 'cancelled' ? 'מבוטל' : (account.status || '-');
 
+    // בדיקה אם זה החשבון האחרון
+    const isLastAccount = accounts.length === 1;
+    const isProtected = isLastAccount;
+    
     return `
-    <tr data-account-id="${account.id}">
+    <tr data-account-id="${account.id}" ${isProtected ? 'class="table-warning"' : ''}>
       <td class="ticker-cell" data-account="${account.name || '-'}"><strong>${account.name || '-'}</strong></td>
       <td>${account.currency || '-'}</td>
       <td class="status-cell" data-status="${statusForFilter}">
@@ -297,7 +301,10 @@ function updateAccountsTable(accounts) {
                 <button class="btn btn-sm btn-secondary" onclick="editAccount(${account.id})" title="ערוך חשבון">✏️</button>
               </td>
               <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק חשבון">🗑️</button>
+                <button class="btn btn-sm btn-danger" 
+                        onclick="deleteAccount(${account.id})" 
+                        title="${isProtected ? 'חשבון אחרון - לא ניתן למחוק' : 'מחק חשבון'}"
+                        ${isProtected ? 'disabled' : ''}>🗑️</button>
               </td>
               <td class="p-0">
                 <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAccount(${account.id})" title="צפה באלמנטים מקושרים">🔗</button>
@@ -305,6 +312,7 @@ function updateAccountsTable(accounts) {
             </tr>
           </tbody>
         </table>
+        ${isProtected ? '<small class="text-muted d-block mt-1">🔒 חשבון אחרון מוגן</small>' : ''}
       </td>
     </tr>
   `}).join('');
@@ -1227,6 +1235,12 @@ async function cancelAccount(accountId, accountName) {
  * @param {string} accountName - שם החשבון
  */
 async function deleteAccount(accountId, accountName) {
+  // בדיקה אם זה החשבון האחרון
+  const currentAccounts = window.accountsData || window.allAccountsData || [];
+  if (currentAccounts.length === 1) {
+    showWarningMessage('לא ניתן למחוק את החשבון האחרון במערכת. חייב להיות לפחות חשבון אחד.');
+    return;
+  }
 
   // בדיקה ראשונה
   if (!confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
@@ -1294,6 +1308,19 @@ function showErrorMessage(message) {
   }
 }
 
+/**
+ * הצגת הודעת אזהרה
+ * @param {string} message - הודעת האזהרה
+ */
+function showWarningMessage(message) {
+  // אזהרה
+  if (typeof window.showNotification === 'function') {
+    window.showNotification(message, 'warning');
+  } else {
+    alert(`אזהרה: ${message}`);
+  }
+}
+
 // פונקציות עזר חסרות
 // showSecondConfirmationModal הועבר ל-ui-utils.js
 
@@ -1319,6 +1346,7 @@ window.cancelAccount = cancelAccount;
 window.deleteAccount = deleteAccount;
 window.showSuccessMessage = showSuccessMessage;
 window.showErrorMessage = showErrorMessage;
+window.showWarningMessage = showWarningMessage;
 window.showSecondConfirmationModal = window.showSecondConfirmationModal; // משתמש בגרסה מ-ui-utils.js
 window.confirmDeleteAccount = confirmDeleteAccount;
 // checkLinkedItems מיוצאת מקובץ linked-items.js
@@ -1364,6 +1392,30 @@ if (window.location.pathname.includes('/accounts')) {
       console.error('❌ loadAccountsDataForAccountsPage function not found');
     }
   };
+}
+
+/**
+ * פונקציה לטעינת נתוני חשבונות מה-API
+ */
+async function loadAccountsData() {
+  try {
+    const response = await fetch('/api/v1/accounts/');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error('❌ Error loading accounts data:', error);
+    throw error;
+  }
+}
+
+/**
+ * פונקציה לטעינת נתוני חשבונות מה-API - גרסה חלופית
+ */
+async function loadAccountsDataFromAPI() {
+  return await loadAccountsData();
 }
 
 /**
@@ -1436,9 +1488,13 @@ async function loadAccountsDataForAccountsPage() {
     }
 
     // עדכון ספירת רשומות
-    const countElement = document.getElementById('accountsCount');
-    if (countElement) {
-      countElement.textContent = 'שגיאה';
+    const totalElement = document.getElementById('totalAccounts');
+    const activeElement = document.getElementById('activeAccounts');
+    if (totalElement) {
+      totalElement.textContent = 'שגיאה';
+    }
+    if (activeElement) {
+      activeElement.textContent = 'שגיאה';
     }
   }
 }
@@ -1670,6 +1726,7 @@ window.updateAccountsTable = updateAccountsTable;
 window.editAccount = editAccount;
 window.deleteAccount = deleteAccount;
 window.sortTable = sortTable;
+window.showNotification = showNotification;
 // viewLinkedItems מיוצאת מקובץ linked-items.js
 
 
@@ -1683,6 +1740,17 @@ function editAccount(accountId) {
 }
 
 function deleteAccount(accountId) {
+  // בדיקה אם זה החשבון האחרון
+  const currentAccounts = window.accountsData || window.allAccountsData || [];
+  if (currentAccounts.length === 1) {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('לא ניתן למחוק את החשבון האחרון במערכת. חייב להיות לפחות חשבון אחד.', 'warning');
+    } else {
+      alert('לא ניתן למחוק את החשבון האחרון במערכת. חייב להיות לפחות חשבון אחד.');
+    }
+    return;
+  }
+  
   if (confirm('האם אתה בטוח שברצונך למחוק חשבון זה?')) {
     if (typeof window.showNotification === 'function') {
       window.showNotification('פונקציית מחיקת חשבון תפותח בקרוב', 'info');
@@ -1702,6 +1770,17 @@ setTimeout(() => {
     console.clear();
   }
 }, 15000);
+
+// פונקציה להצגת התראות
+function showNotification(message, type = 'info') {
+  if (typeof window.showNotification === 'function') {
+    window.showNotification(message, type);
+  } else {
+    // Fallback להצגת התראה פשוטה
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    alert(`${type.toUpperCase()}: ${message}`);
+  }
+}
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {

@@ -49,8 +49,6 @@
   <link rel="stylesheet" href="styles/header-system.css">
   <!-- 7. Database display specific styles (highest priority) -->
   <link rel="stylesheet" href="styles/db-display.css">
-  <!-- 8. Table rules styles -->
-  <link rel="stylesheet" href="styles/table-rules.css">
 
   <!-- Modular grid files - loaded at end of file -->
 </head>
@@ -97,7 +95,7 @@
       <div class="main-content">
 
         <!-- Designs area - content-section -->
-        <div class="content-section">
+        <div class="content-section extra-data-page">
           <!-- Currencies header -->
           <div class="section-header">
             <div class="table-title">
@@ -105,7 +103,7 @@
             </div>
             <div class="table-count" id="currenciesCount">💱 מטבעות: טוען...</div>
             <div class="table-actions">
-              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+              <button class="refresh-btn" onclick="addCurrencyRecord()" title="הוסף מטבע">
                 <span class="action-icon">➕</span> הוסף
               </button>
               <div class="action-separator"></div>
@@ -136,20 +134,42 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Symbol is required (NOT NULL)</li>
+                <li class="constraint">Name is required (NOT NULL)</li>
+                <li class="constraint">USD Rate is required (NOT NULL)</li>
+                <li class="constraint">ID is required (NOT NULL)</li>
+                <li class="unique">Symbol has unique constraint</li>
+                <li class="unique">ID is primary key</li>
+                <li class="default">USD Rate defaults to 1.000000</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="index">Index on id: ix_currencies_id</li>
+                <li class="format">Symbol: Only uppercase English letters (max 10 chars)</li>
+                <li class="format">Name: Maximum 100 characters</li>
+                <li class="format">USD Rate: Numeric with 6 decimal places</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Note Relation Types Section -->
-      <div class="content-section">
+      <div class="content-section extra-data-page">
         <!-- Note Relation Types header -->
         <div class="section-header">
-                      <div class="table-title">
-              🔗 סוגי קישור הערות<br><span class="table-subtitle">note_relation_types</span>
+          <div class="table-title">
+            🔗 סוגי קישור הערות<br><span class="table-subtitle">note_relation_types</span>
           </div>
           <div class="table-count" id="noteRelationTypesCount">🔗 סוגי קישור: טוען...</div>
           <div class="table-actions">
-            <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+            <button class="refresh-btn" onclick="addNoteRelationTypeRecord()" title="הוסף סוג קישור">
               <span class="action-icon">➕</span> הוסף
             </button>
             <div class="action-separator"></div>

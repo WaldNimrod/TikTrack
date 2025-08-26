@@ -138,6 +138,17 @@ def delete_account(account_id: int):
     try:
         db: Session = next(get_db())
         
+        # הגנה על החשבון האחרון
+        all_accounts = AccountService.get_all(db)
+        if len(all_accounts) == 1:
+            return jsonify({
+                "status": "error",
+                "error": {
+                    "message": "לא ניתן למחוק את החשבון האחרון במערכת. חייב להיות לפחות חשבון אחד."
+                },
+                "version": "v1"
+            }), 403
+        
         # Check if there are open trades
         open_trades = AccountService.get_open_trades(db, account_id)
         if open_trades:

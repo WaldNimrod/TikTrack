@@ -42,54 +42,130 @@
 .tracking-page .section-header,
 .tracking-page .top-section .section-header {
   border-bottom: 2px solid #ff9c05;
+  background: linear-gradient(135deg, rgba(255, 156, 5, 0.1) 0%, rgba(255, 156, 5, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 /* עמוד חשבונות - כחול */
 .accounts-page .section-header,
 .accounts-page .top-section .section-header {
   border-bottom: 2px solid #007bff;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(0, 123, 255, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 /* עמוד תכנון טריידים - ירוק */
 .planning-page .section-header,
 .planning-page .top-section .section-header {
   border-bottom: 2px solid #28a745;
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 /* עמוד התראות - אדום */
 .alerts-page .section-header,
 .alerts-page .top-section .section-header {
   border-bottom: 2px solid #dc3545;
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 /* עמוד תזרים מזומנים - סגול */
 .cash-flows-page .section-header,
 .cash-flows-page .top-section .section-header {
   border-bottom: 2px solid #6f42c1;
+  background: linear-gradient(135deg, rgba(111, 66, 193, 0.1) 0%, rgba(111, 66, 193, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* עמוד עסקאות - כחול כהה */
+.executions-page .section-header,
+.executions-page .top-section .section-header {
+  border-bottom: 2px solid #17a2b8;
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.1) 0%, rgba(23, 162, 184, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 /* עמוד טיקרים - אדום */
 .tickers-page .section-header,
 .tickers-page .top-section .section-header {
   border-bottom: 2px solid #dc3545;
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 /* עמוד הערות - כתום */
 .notes-page .section-header,
 .notes-page .top-section .section-header {
   border-bottom: 2px solid #fd7e14;
+  background: linear-gradient(135deg, rgba(253, 126, 20, 0.1) 0%, rgba(253, 126, 20, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 /* עמוד בסיס נתונים - כחול כהה */
 .db-display-page .section-header,
 .db-display-page .top-section .section-header {
   border-bottom: 2px solid #495057;
+  background: linear-gradient(135deg, rgba(73, 80, 87, 0.1) 0%, rgba(73, 80, 87, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 /* עמוד טבלאות עזר - אפור */
 .extra-data-page .section-header,
 .extra-data-page .top-section .section-header {
   border-bottom: 2px solid #6c757d;
+  background: linear-gradient(135deg, rgba(108, 117, 125, 0.1) 0%, rgba(108, 117, 125, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* עמוד אילוצים - כתום כהה */
+.constraints-page .section-header,
+.constraints-page .top-section .section-header {
+  border-bottom: 2px solid #fd7e14;
+  background: linear-gradient(135deg, rgba(253, 126, 20, 0.1) 0%, rgba(253, 126, 20, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* עמוד עיצובים - ירוק כהה */
+.designs-page .section-header,
+.designs-page .top-section .section-header {
+  border-bottom: 2px solid #20c997;
+  background: linear-gradient(135deg, rgba(32, 201, 151, 0.1) 0%, rgba(32, 201, 151, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* עמוד מחקר - כחול בהיר */
+.research-page .section-header,
+.research-page .top-section .section-header {
+  border-bottom: 2px solid #0dcaf0;
+  background: linear-gradient(135deg, rgba(13, 202, 240, 0.1) 0%, rgba(13, 202, 240, 0.05) 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 
@@ -417,18 +493,19 @@
   /* התחלה בגובה 0 */
 }
 
-/* ברירת מחדל לכפתורים - ירוקים ללא הגדרת חשיבות */
+/* ברירת מחדל לכפתורים - רקע לבן וטקסט ירוק */
 button,
 .btn {
-  background-color: #29a6a8;
-  color: white;
-  border: none;
+  background-color: white;
+  color: #29a6a8;
+  border: 1px solid #29a6a8;
   transition: all 0.2s ease;
 }
 
 button:hover,
 .btn:hover {
-  background-color: #1f8a8c;
+  background-color: #29a6a8;
+  color: white;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
@@ -1187,22 +1264,7 @@ button.btn-primary-emphasized {
   /* הגדרות מקומיות ל-btn-secondary הוסרו - משתמשים בהגדרות הכלליות */
 
 
-  .btn-success {
-    background-color: #28a745 !important;
-    color: white !important;
-    border: 1px solid #28a745 !important;
-    padding: 0.375rem 0.75rem !important;
-    font-size: 0.875rem !important;
-    border-radius: 0.25rem !important;
-    transition: all 0.2s ease !important;
-  }
 
-  .btn-success:hover {
-    background-color: #218838 !important;
-    border-color: #218838 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
-  }
 
   /* .btn-danger - אוחד עם ההגדרה למטה */
 
@@ -1251,10 +1313,7 @@ button.btn-primary-emphasized {
   /* הגדרות מקומיות ל-btn-secondary:hover הוסרו - משתמשים בהגדרות הכלליות */
 
 
-  .btn-success:hover {
-    background-color: #218838;
-    transform: translateY(-1px);
-  }
+
 
   .btn-warning {
     background-color: white !important;
@@ -2773,6 +2832,32 @@ button[onclick*="openDesignDetails"]:hover {
   z-index: 1000000001 !important;
 }
 
+/* סגנונות למודלים של הערות */
+#addNoteModal .modal-header,
+#editNoteModal .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+#addNoteModal .modal-header .modal-title,
+#editNoteModal .modal-header .modal-title {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+#addNoteModal .modal-header .btn-close,
+#editNoteModal .modal-header .btn-close {
+  filter: invert(1);
+  opacity: 0.8;
+}
+
+#addNoteModal .modal-header .btn-close:hover,
+#editNoteModal .modal-header .btn-close:hover {
+  opacity: 1;
+}
+
 /* תבנית בסיס לכל המודולים */
 .modal .modal-header {
   display: flex;
@@ -3820,3 +3905,149 @@ a:hover,
 
 /* ===== הגדרות z-index גבוהות למודלים ===== */
 /* הערה: הגדרות בסיסיות נמצאות ב-apple-theme.css */
+
+/* ===== סגנונות קישורי סימבול ===== */
+.symbol-link {
+  color: #29a6a8;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.symbol-link:hover {
+  color: #1f8a8c;
+  text-decoration: underline;
+  background-color: rgba(41, 166, 168, 0.1);
+}
+
+.symbol-link:focus {
+  outline: 2px solid #29a6a8;
+  outline-offset: 2px;
+}
+
+/* סגנון לתא עם קישור (כדי למנוע התנגשות עם הקליק) */
+.ticker-cell {
+  position: relative;
+}
+
+.ticker-cell .symbol-text {
+  display: inline-block;
+}
+
+/* סגנון לתא "קשור ל" עם קליק */
+.related-object-cell {
+  transition: background-color 0.2s ease;
+}
+
+.related-object-cell:hover {
+  background-color: rgba(41, 166, 168, 0.05);
+  border-radius: 4px;
+}
+
+/* ===== סגנונות עורך טקסט עשיר ===== */
+.rich-text-editor {
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  background: #f8f9fa;
+  border-bottom: 1px solid #ced4da;
+  padding: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.editor-toolbar .btn {
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #495057;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editor-toolbar .btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.editor-toolbar .btn:active {
+  background: #dee2e6;
+}
+
+.toolbar-separator {
+  color: #6c757d;
+  margin: 0 0.25rem;
+  font-weight: bold;
+}
+
+.editor-content {
+  min-height: 150px;
+  padding: 0.75rem;
+  background: white;
+  outline: none;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.editor-content:empty:before {
+  content: attr(placeholder);
+  color: #6c757d;
+  font-style: italic;
+}
+
+.editor-content:focus {
+  border-color: #29a6a8;
+  box-shadow: 0 0 0 0.2rem rgba(41, 166, 168, 0.25);
+}
+
+/* עיצוב תוכן העורך */
+.editor-content h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  color: #212529;
+}
+
+.editor-content h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  color: #212529;
+}
+
+.editor-content h3 {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  color: #212529;
+}
+
+.editor-content ul,
+.editor-content ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.editor-content li {
+  margin: 0.25rem 0;
+}
+
+.editor-content a {
+  color: #29a6a8;
+  text-decoration: underline;
+}
+
+.editor-content a:hover {
+  color: #1f8a8c;
+}

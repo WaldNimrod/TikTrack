@@ -103,3 +103,20 @@ class Account(BaseModel):
             'total_pl': f"{self.total_pl:,.2f} {currency_symbol}" if self.total_pl else "0.00",
             'pl_percentage': f"{((self.total_pl / self.cash_balance) * 100):.2f}%" if self.cash_balance and self.cash_balance > 0 else "0.00%"
         }
+    
+    @classmethod
+    def is_last_account(cls, db_session) -> bool:
+        """Check if this is the last account in the system"""
+        from sqlalchemy.orm import Session
+        if isinstance(db_session, Session):
+            count = db_session.query(cls).count()
+            return count == 1
+        return False
+    
+    def can_be_deleted(self, db_session) -> bool:
+        """Check if this account can be deleted (not the last account)"""
+        return not self.is_last_account(db_session)
+    
+    def is_protected(self, db_session) -> bool:
+        """Check if this account is protected from deletion (last account)"""
+        return self.is_last_account(db_session)

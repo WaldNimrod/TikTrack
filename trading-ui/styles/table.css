@@ -1334,6 +1334,18 @@ select:focus {
   color: #fd7e14;
 }
 
+.table-rules-list li.format {
+  color: #6f42c1;
+  font-weight: 500;
+  background: rgba(111, 66, 193, 0.05);
+  border-color: rgba(111, 66, 193, 0.2);
+}
+
+.table-rules-list li.format::before {
+  content: "📝";
+  color: #6f42c1;
+}
+
 /* Responsive design for table rules */
 @media (max-width: 768px) {
   .table-rules-container {

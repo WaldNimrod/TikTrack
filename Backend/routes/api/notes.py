@@ -232,35 +232,30 @@ def create_note():
             
             # Get data from form data
             content = request.form.get('content', '')
-            related_type = request.form.get('related_type')
+            related_type_id = request.form.get('related_type_id')
             related_id = request.form.get('related_id')
         else:
             # Get data from JSON
             data = request.get_json()
             content = data.get('content', '')
-            related_type = data.get('related_type')
+            related_type_id = data.get('related_type_id')
             related_id = data.get('related_id')
             attachment_filename = data.get('attachment')
         
-        # Determine relation using related_type and related_id
-        if not related_type or not related_id:
+        # Determine relation using related_type_id and related_id
+        if not related_type_id or not related_id:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Note must have related_type and related_id"},
+                "error": {"message": "Note must have related_type_id and related_id"},
                 "version": "v1"
             }), 400
         
-        type_mapping = {
-            'account': 1,
-            'trade': 2,
-            'trade_plan': 3,
-            'ticker': 4
-        }
-        related_type_id = type_mapping.get(related_type)
-        if not related_type_id:
+        # Validate related_type_id
+        valid_types = [1, 2, 3, 4]  # account, trade, trade_plan, ticker
+        if int(related_type_id) not in valid_types:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Invalid related_type. Must be: account, trade, trade_plan, or ticker"},
+                "error": {"message": "Invalid related_type_id. Must be: 1 (account), 2 (trade), 3 (trade_plan), or 4 (ticker)"},
                 "version": "v1"
             }), 400
         
@@ -358,44 +353,50 @@ def update_note(note_id: int):
                 
                 # Get data from form data
                 content = request.form.get('content', '')
-                related_type = request.form.get('related_type')
+                related_type_id = request.form.get('related_type_id')
                 related_id = request.form.get('related_id')
-                logger.info(f"📋 Form data - content: {content[:50]}..., related_type: {related_type}, related_id: {related_id}")
+                logger.info(f"📋 Form data - content: {content[:50]}..., related_type_id: {related_type_id}, related_id: {related_id}")
+                
+                # Validate related_type_id
+                if not related_type_id or related_type_id not in ['1', '2', '3', '4']:
+                    logger.error(f"❌ Invalid related_type_id: {related_type_id}")
+                    return jsonify({
+                        "status": "error",
+                        "error": {"message": "Invalid related_type_id. Must be: 1, 2, 3, or 4"},
+                        "version": "v1"
+                    }), 400
             else:
                 logger.info("📋 Processing JSON data")
                 # Get data from JSON
                 data = request.get_json()
                 content = data.get('content', '')
-                related_type = data.get('related_type')
+                related_type_id = data.get('related_type_id')
                 related_id = data.get('related_id')
                 attachment_filename = data.get('attachment')
-                logger.info(f"📋 JSON data - content: {content[:50]}..., related_type: {related_type}, related_id: {related_id}, attachment: {attachment_filename}")
+                logger.info(f"📋 JSON data - content: {content[:50]}..., related_type_id: {related_type_id}, related_id: {related_id}, attachment: {attachment_filename}")
+                
+                # Validate related_type_id
+                if not related_type_id or related_type_id not in [1, 2, 3, 4]:
+                    logger.error(f"❌ Invalid related_type_id: {related_type_id}")
+                    return jsonify({
+                        "status": "error",
+                        "error": {"message": "Invalid related_type_id. Must be: 1, 2, 3, or 4"},
+                        "version": "v1"
+                    }), 400
             
-            # Determine relation using related_type and related_id
-            if not related_type or not related_id:
+            # Determine relation using related_type_id and related_id
+            if not related_type_id or not related_id:
                 logger.error("❌ No relation found")
                 return jsonify({
                     "status": "error",
-                    "error": {"message": "Note must have related_type and related_id"},
+                    "error": {"message": "Note must have related_type_id and related_id"},
                     "version": "v1"
                 }), 400
             
-            logger.info(f"🔍 Determining relation - related_type: {related_type}, related_id: {related_id}")
+            logger.info(f"🔍 Determining relation - related_type_id: {related_type_id}, related_id: {related_id}")
             
-            type_mapping = {
-                'account': 1,
-                'trade': 2,
-                'trade_plan': 3,
-                'ticker': 4
-            }
-            related_type_id = type_mapping.get(related_type)
-            if not related_type_id:
-                logger.error(f"❌ Invalid related_type: {related_type}")
-                return jsonify({
-                    "status": "error",
-                    "error": {"message": "Invalid related_type. Must be: account, trade, trade_plan, or ticker"},
-                    "version": "v1"
-                }), 400
+            # Convert string to int if needed
+            related_type_id = int(related_type_id) if isinstance(related_type_id, str) else related_type_id
             
             logger.info(f"✅ Relation determined: related_type_id={related_type_id} -> {related_id}")
             

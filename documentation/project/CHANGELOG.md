@@ -1,5 +1,74 @@
 # Changelog - TikTrack
 
+## [2.8] - 2025-08-25
+
+### 🎯 **New Completed Modules - Database Extra Data**
+- **Currency Management System**: Complete CRUD operations for currencies with comprehensive validation
+- **Note Relation Types System**: Complete CRUD operations for note relation types
+- **Database Extra Data Page**: New page for managing auxiliary database tables
+- **Dynamic Table Constraints**: Real-time display of database constraints under tables
+
+### 🔧 **Currency System Features**
+- **Client-Side Validation**: Real-time validation with regex pattern `^[A-Z]+$` for currency symbols
+- **Server-Side Validation**: Comprehensive validation with specific Hebrew error messages
+- **Unique Constraints**: Database-level unique constraints for currency symbols
+- **Form Validation**: Complete form validation with field-specific error messages
+- **API Endpoints**: Full REST API with GET, POST, PUT, DELETE operations
+
+### 🔧 **Note Relation Types System Features**
+- **CRUD Operations**: Complete create, read, update, delete functionality
+- **API Integration**: New API endpoints for note relation types management
+- **Data Recovery**: Successfully restored deleted data from backup
+- **Table Structure**: Proper table structure with ID, note_relation_type, and created_at fields
+
+### 🎨 **UI/UX Improvements**
+- **Button Styling**: Consistent button design for modals (white background, colored borders)
+- **Section Toggle System**: Improved section collapse/expand functionality
+- **Dynamic Constraints Display**: Real-time display of database constraints with color coding
+- **Modal Consistency**: Standardized modal styling across all components
+- **Responsive Design**: Improved responsive behavior for all new components
+
+### 🔧 **Technical Fixes**
+- **Infinite Loop Fix**: Fixed toggleAllSections function to prevent stack overflow
+- **CSS File References**: Removed references to non-existent CSS files
+- **Function Naming**: Clear function names with table-specific prefixes
+- **Error Handling**: Improved error messages with specific field validation
+- **Data Integrity**: Added comprehensive validation to prevent data corruption
+
+### 📁 **New Files Created**
+- `trading-ui/db_extradata.html` - Database extra data page
+- `trading-ui/scripts/db-extradata.js` - Page-specific JavaScript with CRUD operations
+- `trading-ui/styles/db-display.css` - Database page specific styles
+- `Backend/routes/api/note_relation_types.py` - Note relation types API
+- `Backend/models/note_relation_type.py` - Note relation type model
+
+### 📁 **Files Modified**
+- `trading-ui/styles/table.css` - Added format constraint styling
+- `trading-ui/scripts/table-mappings.js` - Updated column mappings
+- `Backend/routes/api/currencies.py` - Enhanced validation and error handling
+- `Backend/app.py` - Added note_relation_types blueprint
+- `HANDOVER_SUMMARY.md` - Updated with new completed modules
+
+### 🎯 **Database Constraints Display**
+- **Constraint Types**: constraint, unique, default, index, format
+- **Color Coding**: Different colors for different constraint types
+- **Icons**: Specific icons for each constraint type
+- **Real-time Updates**: Constraints display updates with table changes
+
+### 🔒 **Validation System**
+- **Client-Side**: Real-time validation with immediate feedback
+- **Server-Side**: Comprehensive validation with specific error messages
+- **Database-Level**: Unique constraints and data type validation
+- **User Experience**: Clear error messages in Hebrew with field-specific guidance
+
+### 📊 **Data Management**
+- **Backup Integration**: Successfully restored data from backup systems
+- **Data Integrity**: Comprehensive validation prevents data corruption
+- **Error Recovery**: Robust error handling with user-friendly messages
+- **Performance**: Optimized API calls and data loading
+
+---
+
 ## [2.7] - 2025-08-24
 
 ### 🔧 **Trades Page Technical Fixes**

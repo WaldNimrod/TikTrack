@@ -202,20 +202,43 @@ function setupGlobalModalConfigurations() {
   const modals = document.querySelectorAll('.modal');
   
   modals.forEach(modalElement => {
-    // Set backdrop to static and disable keyboard
-    modalElement.setAttribute('data-bs-backdrop', 'static');
-    modalElement.setAttribute('data-bs-keyboard', 'false');
+    const modalId = modalElement.id;
+    const existingBackdrop = modalElement.getAttribute('data-bs-backdrop');
+    const existingKeyboard = modalElement.getAttribute('data-bs-keyboard');
     
-    // Prevent closing on backdrop click
-    modalElement.addEventListener('click', function(event) {
-      if (event.target === modalElement) {
-        event.preventDefault();
-        event.stopPropagation();
-        return false;
-      }
-    });
+    // If modal already has specific backdrop settings, respect them
+    if (existingBackdrop && existingKeyboard) {
+      console.log(`✅ Modal ${modalId || 'unnamed'} already configured: backdrop=${existingBackdrop}, keyboard=${existingKeyboard}`);
+      return;
+    }
     
-    console.log(`✅ Modal ${modalElement.id || 'unnamed'} configured with static backdrop`);
+    // Default configuration for modals without specific settings
+    modalElement.setAttribute('data-bs-backdrop', 'true');
+    modalElement.setAttribute('data-bs-keyboard', 'true');
+    
+    // Special handling for specific modals that should not close on backdrop click
+    if (modalId && (
+      modalId.includes('delete') || 
+      modalId.includes('warning') || 
+      modalId.includes('confirm') ||
+      (modalId.includes('linkedItems') && !modalId.includes('details'))
+    )) {
+      modalElement.setAttribute('data-bs-backdrop', 'static');
+      modalElement.setAttribute('data-bs-keyboard', 'false');
+      
+      // Prevent closing on backdrop click for these modals
+      modalElement.addEventListener('click', function(event) {
+        if (event.target === modalElement) {
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        }
+      });
+      
+      console.log(`✅ Modal ${modalId} configured with static backdrop (confirmation/warning modal)`);
+    } else {
+      console.log(`✅ Modal ${modalId || 'unnamed'} configured with clickable backdrop`);
+    }
   });
 }
 

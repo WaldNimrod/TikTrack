@@ -35,6 +35,7 @@ let tickersData = window.tickersData;
 
 // פונקציה לעדכון שדה active_trades לפי טריידים פתוחים
 async function updateActiveTradesField() {
+    console.log('🔄 updateActiveTradesField נקראה');
     // Updating active_trades field for tickers
 
     try {
@@ -56,131 +57,60 @@ async function updateActiveTradesField() {
             }
         });
 
-        // Tickers with open trades
+        console.log('🔍 טיקרים עם טריידים פתוחים:', Array.from(tickersWithOpenTrades));
 
-        // עדכון שדה active_trades בטיקרים
+        // עדכון שדה active_trades בטיקרים בזיכרון
         tickersData.forEach(ticker => {
-            ticker.active_trades = tickersWithOpenTrades.has(ticker.id);
+            const hasOpenTrades = tickersWithOpenTrades.has(ticker.id);
+            ticker.active_trades = hasOpenTrades;
         });
 
-        // Active trades field updated for all tickers
+        console.log('✅ שדה active_trades עודכן עבור כל הטיקרים');
 
     } catch (error) {
         console.error('❌ Error updating active_trades field:', error);
     }
 }
 
-// פונקציה לטעינת מטבעות מהשרת
-async function loadCurrenciesFromServer() {
-    // Loading currencies from server
+// פונקציה לשחזור מצב הסגירה
+function restoreTickersSectionState() {
+    // שחזור מצב top-section (התראות וסיכום)
+    const topCollapsed = localStorage.getItem('tickersTopSectionHidden') === 'true';
+    const topSection = document.querySelector('.top-section');
 
-    try {
-        const token = localStorage.getItem('authToken');
-        const headers = {
-            'Content-Type': 'application/json'
-        };
+    if (topSection) {
+        const sectionBody = topSection.querySelector('.section-body');
+        const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
+        if (sectionBody && topCollapsed) {
+            sectionBody.style.display = 'none';
+            if (icon) {
+                icon.textContent = '▼';
+            }
         }
+    }
 
-        const response = await fetch('http://127.0.0.1:8080/api/v1/currencies/dropdown', {
-            method: 'GET',
-            headers: headers
-        });
+    // שחזור מצב סקשן הטיקרים
+    const tickersCollapsed = localStorage.getItem('tickersSectionCollapsed') === 'true';
+    const contentSections = document.querySelectorAll('.content-section');
+    const tickersSection = contentSections[0];
 
-        // Currencies response status
+    if (tickersSection) {
+        const sectionBody = tickersSection.querySelector('.section-body');
+        const toggleBtn = tickersSection.querySelector('button[onclick="toggleTickersSection()"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-        if (response.ok) {
-            const responseData = await response.json();
-            // Currencies response from server
-
-            const currencies = responseData.data || responseData;
-            window.currenciesData = currencies;
-            window.currenciesLoaded = true;
-            // Currencies loaded from server
-
-            // עדכון אפשרויות בטופס
-            updateCurrencyOptions();
-        } else {
-            // Error loading currencies from server
-            const errorText = await response.text();
-            // טעינת מטבעות ברירת מחדל
-            window.currenciesData = [
-                { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
-            ];
-            window.currenciesLoaded = true;
-
-            // עדכון אפשרויות בטופס
-            updateCurrencyOptions();
+        if (sectionBody && tickersCollapsed) {
+            sectionBody.style.display = 'none';
+            if (icon) {
+                icon.textContent = '▼';
+            }
         }
-
-    } catch (error) {
-        // Error loading currencies from server
-        // טעינת מטבעות ברירת מחדל
-        window.currenciesData = [
-            { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
-        ];
-        window.currenciesLoaded = true;
-
-        // עדכון אפשרויות בטופס
-        updateCurrencyOptions();
     }
 }
 
-// פונקציות עזר להצגת מטבע - עכשיו ב-translation-utils.js
-// getTickerCurrencyDisplay(ticker) - זמין גלובלית
-// getTickerCurrencySymbol(ticker) - זמין גלובלית
-// getCurrencyIcon(currencySymbol) - זמין גלובלית
-
-// פונקציה לקבלת CSS class לסוג טיקר
-function getTickerTypeClass(type) {
-    switch (type) {
-        case 'stock': return 'type-swing';      // כחול - כמו swing
-        case 'etf': return 'type-investment';   // ירוק - כמו investment
-        case 'bond': return 'type-passive';     // צהוב - כמו passive
-        case 'crypto': return 'type-crypto';    // סגול - חדש לקריפטו
-        default: return 'type-other';
-    }
-}
-
-/**
- * יצירת אפשרויות מטבע לטופס טיקר
- * @param {Object} ticker - טיקר קיים (לעריכה)
- * @returns {string} HTML עם אפשרויות מטבע
- */
-function generateTickerCurrencyOptions(ticker = null) {
-    if (!window.currenciesData || window.currenciesData.length === 0) {
-        // אם אין מטבעות, נחזיר ברירת מחדל
-        return `
-            <option value="1" ${ticker && (ticker.currency_id === 1) ? 'selected' : ''}>דולר אמריקאי (USD)</option>
-        `;
-    }
-
-    return window.currenciesData.map(currency => {
-        const isSelected = ticker && ticker.currency_id === currency.id;
-        
-        return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
-    }).join('');
-}
-
-// פונקציה לעדכון אפשרויות מטבע בטופס
-function updateCurrencyOptions(ticker = null) {
-    const addSelect = document.getElementById('addTickerCurrency');
-    const editSelect = document.getElementById('editTickerCurrency');
-
-    if (addSelect) {
-        const addOptions = generateTickerCurrencyOptions();
-        addSelect.innerHTML = '<option value="">בחר מטבע...</option>' + addOptions;
-    }
-
-    if (editSelect) {
-        const editOptions = generateTickerCurrencyOptions(ticker);
-        editSelect.innerHTML = '<option value="">בחר מטבע...</option>' + editOptions;
-    }
-}
-
-// פונקציות בסיסיות
+// פונקציות נוספות
 function openTickerDetails(id) {
     // פתיחת פרטי תיקר
     showAddTickerModal();
@@ -267,44 +197,6 @@ function toggleTickersSection() {
 
         // שמירת המצב ב-localStorage
         localStorage.setItem('tickersSectionCollapsed', !isCollapsed);
-    }
-}
-
-// פונקציה לשחזור מצב הסגירה
-function restoreTickersSectionState() {
-    // שחזור מצב top-section (התראות וסיכום)
-    const topCollapsed = localStorage.getItem('tickersTopSectionHidden') === 'true';
-    const topSection = document.querySelector('.top-section');
-
-    if (topSection) {
-        const sectionBody = topSection.querySelector('.section-body');
-        const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && topCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
-            }
-        }
-    }
-
-    // שחזור מצב סקשן הטיקרים
-    const tickersCollapsed = localStorage.getItem('tickersSectionCollapsed') === 'true';
-    const contentSections = document.querySelectorAll('.content-section');
-    const tickersSection = contentSections[0];
-
-    if (tickersSection) {
-        const sectionBody = tickersSection.querySelector('.section-body');
-        const toggleBtn = tickersSection.querySelector('button[onclick="toggleTickersSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && tickersCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
-            }
-        }
     }
 }
 

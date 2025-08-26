@@ -190,3 +190,115 @@ def delete_ticker(ticker_id: int):
         }), 500
     finally:
         db.close()
+
+@tickers_bp.route('/<int:ticker_id>/update-active-trades', methods=['PUT'])
+def update_active_trades(ticker_id: int):
+    """Update only the active_trades field for a ticker"""
+    try:
+        db: Session = next(get_db())
+        ticker = TickerService.get_by_id(db, ticker_id)
+        
+        if not ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found"},
+                "version": "v1"
+            }), 404
+        
+        # Check if there are active plans or trades for this ticker
+        from models.trade import Trade
+        from models.trade_plan import TradePlan
+        
+        # Check active trades
+        active_trades = db.query(Trade).filter(
+            Trade.ticker_id == ticker_id,
+            Trade.status == 'open'
+        ).count()
+        
+        # Check active trade plans
+        active_plans = db.query(TradePlan).filter(
+            TradePlan.ticker_id == ticker_id,
+            TradePlan.status == 'open'
+        ).count()
+        
+        # Update active_trades field
+        ticker.active_trades = (active_trades > 0 or active_plans > 0)
+        db.commit()
+        
+        logger.info(f"Updated active_trades for ticker {ticker_id} to {ticker.active_trades} (trades: {active_trades}, plans: {active_plans})")
+        
+        return jsonify({
+            "status": "success",
+            "data": ticker.to_dict(),
+            "message": "Active trades field updated successfully",
+            "version": "v1"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error updating active_trades for ticker {ticker_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()
+
+@tickers_bp.route('/update-all-active-trades', methods=['POST'])
+def update_all_active_trades():
+    """Update active_trades field for all tickers based on open trades and plans"""
+    try:
+        db: Session = next(get_db())
+        
+        # Get all tickers
+        tickers = TickerService.get_all(db)
+        
+        updated_count = 0
+        
+        for ticker in tickers:
+            # Check active trades
+            from models.trade import Trade
+            from models.trade_plan import TradePlan
+            
+            active_trades = db.query(Trade).filter(
+                Trade.ticker_id == ticker.id,
+                Trade.status == 'open'
+            ).count()
+            
+            # Check active trade plans
+            active_plans = db.query(TradePlan).filter(
+                TradePlan.ticker_id == ticker.id,
+                TradePlan.status == 'open'
+            ).count()
+            
+            # Update active_trades field
+            new_active_trades = (active_trades > 0 or active_plans > 0)
+            
+            if ticker.active_trades != new_active_trades:
+                ticker.active_trades = new_active_trades
+                updated_count += 1
+                logger.info(f"Updated ticker {ticker.symbol}: active_trades = {new_active_trades} (trades: {active_trades}, plans: {active_plans})")
+        
+        db.commit()
+        
+        logger.info(f"Updated active_trades for {updated_count} tickers")
+        
+        return jsonify({
+            "status": "success",
+            "data": {
+                "updated_count": updated_count,
+                "total_tickers": len(tickers)
+            },
+            "message": f"Updated active_trades for {updated_count} tickers",
+            "version": "v1"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error updating all active_trades: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()

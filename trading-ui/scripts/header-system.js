@@ -2676,14 +2676,10 @@ window.toggleDateRangeFilter = toggleDateRangeFilter;
  * סגירת פילטר סטטוס
  */
 function closeStatusFilter() {
-  console.log('🔄 closeStatusFilter called');
   const menu = document.getElementById('statusFilterMenu');
   if (menu) {
     menu.classList.remove('show');
     clearFilterMenuTimers(menu);
-    console.log('🔄 Status filter menu closed');
-  } else {
-    console.warn('⚠️ Status filter menu not found');
   }
 }
 
@@ -2691,14 +2687,10 @@ function closeStatusFilter() {
  * סגירת פילטר טיפוס
  */
 function closeTypeFilter() {
-  console.log('🔄 closeTypeFilter called');
   const menu = document.getElementById('typeFilterMenu');
   if (menu) {
     menu.classList.remove('show');
     clearFilterMenuTimers(menu);
-    console.log('🔄 Type filter menu closed');
-  } else {
-    console.warn('⚠️ Type filter menu not found');
   }
 }
 
@@ -2706,14 +2698,10 @@ function closeTypeFilter() {
  * סגירת פילטר חשבונות
  */
 function closeAccountFilter() {
-  console.log('🔄 closeAccountFilter called');
   const menu = document.getElementById('accountFilterMenu');
   if (menu) {
     menu.classList.remove('show');
     clearFilterMenuTimers(menu);
-    console.log('🔄 Account filter menu closed');
-  } else {
-    console.warn('⚠️ Account filter menu not found');
   }
 }
 
@@ -2721,14 +2709,10 @@ function closeAccountFilter() {
  * סגירת פילטר תאריכים
  */
 function closeDateRangeFilter() {
-  console.log('🔄 closeDateRangeFilter called');
   const menu = document.getElementById('dateRangeFilterMenu');
   if (menu) {
     menu.classList.remove('show');
     clearFilterMenuTimers(menu);
-    console.log('🔄 Date range filter menu closed');
-  } else {
-    console.warn('⚠️ Date range filter menu not found');
   }
 }
 

@@ -86,28 +86,40 @@ def migrate():
         # 4. Copy data from old tables to new tables
         print("📊 Copying data to new tables...")
         
-        # Copy tickers data (excluding currency field)
+        # Copy tickers data (converting currency to currency_id)
         cursor.execute("""
             INSERT INTO tickers_new (
                 id, symbol, name, type, remarks, currency_id, 
                 active_trades, created_at, updated_at
             )
             SELECT 
-                id, symbol, name, type, remarks, currency_id,
-                active_trades, created_at, updated_at
-            FROM tickers_backup
+                t.id, t.symbol, t.name, t.type, t.remarks, 
+                CASE 
+                    WHEN t.currency = 'USD' THEN 1
+                    WHEN t.currency = 'EUR' THEN 2
+                    WHEN t.currency = 'ILS' THEN 3
+                    ELSE 1  -- Default to USD
+                END as currency_id,
+                t.active_trades, t.created_at, t.updated_at
+            FROM tickers_backup t
         """)
         
-        # Copy cash_flows data (excluding currency field)
+        # Copy cash_flows data (converting currency to currency_id)
         cursor.execute("""
             INSERT INTO cash_flows_new (
                 id, account_id, type, amount, date, description,
                 currency_id, usd_rate, source, external_id, created_at
             )
             SELECT 
-                id, account_id, type, amount, date, description,
-                currency_id, usd_rate, source, external_id, created_at
-            FROM cash_flows_backup
+                cf.id, cf.account_id, cf.type, cf.amount, cf.date, cf.description,
+                CASE 
+                    WHEN cf.currency = 'USD' THEN 1
+                    WHEN cf.currency = 'EUR' THEN 2
+                    WHEN cf.currency = 'ILS' THEN 3
+                    ELSE 1  -- Default to USD
+                END as currency_id,
+                cf.usd_rate, cf.source, cf.external_id, cf.created_at
+            FROM cash_flows_backup cf
         """)
         
         # 5. Drop old tables

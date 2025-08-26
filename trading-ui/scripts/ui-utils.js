@@ -203,11 +203,11 @@ function showSecondConfirmationModal(title, message, onConfirm) {
  * Show error notification
  */
 function showErrorNotification(title, message) {
-    // Error notification
-
-    if (typeof window.showNotification === 'function') {
-        window.showNotification(`${title}: ${message}`, 'error');
+    // Use the new notification system
+    if (window.notificationSystem && window.notificationSystem.showErrorNotification) {
+        window.notificationSystem.showErrorNotification(title, message);
     } else {
+        // Fallback to modal notification
         showModalNotification('error', title, message);
     }
 }
@@ -217,11 +217,11 @@ function showErrorNotification(title, message) {
  * Show success notification
  */
 function showSuccessNotification(title, message) {
-    // Success notification
-
-    if (typeof window.showNotification === 'function') {
-        window.showNotification(`${title}: ${message}`, 'success');
+    // Use the new notification system
+    if (window.notificationSystem && window.notificationSystem.showSuccessNotification) {
+        window.notificationSystem.showSuccessNotification(title, message);
     } else {
+        // Fallback to modal notification
         showModalNotification('success', title, message);
     }
 }
@@ -231,11 +231,11 @@ function showSuccessNotification(title, message) {
  * Show info notification
  */
 function showInfoNotification(title, message) {
-    // Info notification
-
-    if (typeof window.showNotification === 'function') {
-        window.showNotification(`${title}: ${message}`, 'info');
+    // Use the new notification system
+    if (window.notificationSystem && window.notificationSystem.showInfoNotification) {
+        window.notificationSystem.showInfoNotification(title, message);
     } else {
+        // Fallback to modal notification
         showModalNotification('info', title, message);
     }
 }
@@ -245,11 +245,11 @@ function showInfoNotification(title, message) {
  * Show warning notification
  */
 function showWarningNotification(title, message) {
-    // Warning notification
-
-    if (typeof window.showNotification === 'function') {
-        window.showNotification(`${title}: ${message}`, 'warning');
+    // Use the new notification system
+    if (window.notificationSystem && window.notificationSystem.showWarningNotification) {
+        window.notificationSystem.showWarningNotification(title, message);
     } else {
+        // Fallback to modal notification
         showModalNotification('warning', title, message);
     }
 }
@@ -699,6 +699,486 @@ window.uiUtils = {
     createBasicItemInfo
 };
 
+// ===== WARNING SYSTEM FUNCTIONS =====
+
+/**
+ * Predefined warning types and their configurations
+ */
+const WARNING_TYPES = {
+    // מחיקת פריט
+    DELETE: {
+        id: 'delete',
+        title: 'מחיקת {itemType}',
+        message: 'האם אתה בטוח שברצונך למחוק את {itemType} "{itemName}"?',
+        icon: 'fas fa-trash-alt',
+        theme: 'danger',
+        actions: ['cancel', 'delete'],
+        defaultAction: 'cancel'
+    },
+
+    // פריטים מקושרים
+    LINKED_ITEMS: {
+        id: 'linked_items',
+        title: 'לא ניתן למחוק {itemType}',
+        message: '{itemType} זה מקושר ל-{linkedCount} פריטים במערכת. יש לטפל בהם תחילה.',
+        icon: 'fas fa-link',
+        theme: 'warning',
+        actions: ['close', 'force_delete', 'manage_linked'],
+        defaultAction: 'close'
+    },
+
+    // שגיאת אימות
+    VALIDATION: {
+        id: 'validation',
+        title: 'שגיאת אימות',
+        message: 'שדה "{field}": {message}',
+        icon: 'fas fa-exclamation-triangle',
+        theme: 'warning',
+        actions: ['ok'],
+        defaultAction: 'ok'
+    },
+
+    // אזהרת מערכת
+    SYSTEM: {
+        id: 'system',
+        title: 'אזהרת מערכת',
+        message: '{message}',
+        icon: 'fas fa-exclamation-circle',
+        theme: 'info',
+        actions: ['ok'],
+        defaultAction: 'ok'
+    },
+
+    // אישור פעולה
+    CONFIRMATION: {
+        id: 'confirmation',
+        title: 'אישור פעולה',
+        message: '{message}',
+        icon: 'fas fa-question-circle',
+        theme: 'primary',
+        actions: ['cancel', 'confirm'],
+        defaultAction: 'cancel'
+    }
+};
+
+/**
+ * Get warning configuration by type
+ */
+function getWarningConfig(type, data = {}) {
+    console.log('🔧 getWarningConfig called with:', { type, data });
+    console.log('🔧 Available warning types:', Object.keys(WARNING_TYPES));
+
+    const config = WARNING_TYPES[type.toUpperCase()];
+    if (!config) {
+        throw new Error(`Unknown warning type: ${type}`);
+    }
+
+    const result = {
+        ...config,
+        title: formatWarningMessage(config.title, data),
+        message: formatWarningMessage(config.message, data)
+    };
+
+    console.log('🔧 Warning config result:', result);
+    return result;
+}
+
+/**
+ * Format warning message with data
+ */
+function formatWarningMessage(template, data) {
+    console.log('🔧 formatWarningMessage called with:', { template, data });
+
+    const result = template.replace(/\{(\w+)\}/g, (match, key) => {
+        const value = data[key] || match;
+        console.log(`🔧 Replacing ${match} with ${value}`);
+        return value;
+    });
+
+    console.log('🔧 Formatted message result:', result);
+    return result;
+}
+
+/**
+ * Validate warning data
+ */
+function validateWarningData(type, data) {
+    if (!type || typeof type !== 'string') {
+        throw new Error('Warning type must be a string');
+    }
+
+    if (!WARNING_TYPES[type.toUpperCase()]) {
+        throw new Error(`Unknown warning type: ${type}`);
+    }
+
+    if (data && typeof data !== 'object') {
+        throw new Error('Warning data must be an object');
+    }
+}
+
+/**
+ * Get warning theme configuration
+ */
+function getWarningTheme(theme) {
+    const themes = {
+        danger: {
+            headerClass: 'bg-danger text-white',
+            buttonClass: 'btn-danger'
+        },
+        warning: {
+            headerClass: 'bg-warning text-dark',
+            buttonClass: 'btn-warning'
+        },
+        info: {
+            headerClass: 'bg-info text-white',
+            buttonClass: 'btn-info'
+        },
+        primary: {
+            headerClass: 'bg-primary text-white',
+            buttonClass: 'btn-primary'
+        }
+    };
+
+    return themes[theme] || themes.warning;
+}
+
+/**
+ * Get warning icon
+ */
+function getWarningIcon(icon) {
+    const icons = {
+        'fas fa-trash-alt': '🗑️',
+        'fas fa-link': '🔗',
+        'fas fa-exclamation-triangle': '⚠️',
+        'fas fa-exclamation-circle': '❗',
+        'fas fa-question-circle': '❓'
+    };
+
+    return icons[icon] || icon;
+}
+
+/**
+ * Get warning action buttons
+ */
+function getWarningActions(actions, defaultAction, theme, onConfirm = null, onCancel = null) {
+    const actionConfigs = {
+        cancel: {
+            text: 'ביטול',
+            class: 'btn-secondary',
+            action: 'cancel'
+        },
+        ok: {
+            text: 'אישור',
+            class: 'btn-primary',
+            action: 'ok'
+        },
+        delete: {
+            text: 'מחק',
+            class: 'btn-danger',
+            action: 'delete'
+        },
+        confirm: {
+            text: 'אישור',
+            class: 'btn-primary',
+            action: 'confirm'
+        },
+        close: {
+            text: 'סגור',
+            class: 'btn-secondary',
+            action: 'close'
+        },
+        force_delete: {
+            text: 'מחק בכל זאת',
+            class: 'btn-danger',
+            action: 'force_delete'
+        },
+        manage_linked: {
+            text: 'ניהול מקושרים',
+            class: 'btn-info',
+            action: 'manage_linked'
+        }
+    };
+
+    let buttonsHtml = '';
+
+    actions.forEach(actionName => {
+        const actionConfig = actionConfigs[actionName];
+        if (!actionConfig) return;
+
+        const isDefault = actionName === defaultAction;
+        const buttonClass = isDefault ? actionConfig.class : 'btn-outline-secondary';
+
+        buttonsHtml += `
+            <button type="button" class="btn ${buttonClass}" 
+                    onclick="handleWarningAction('${actionConfig.action}')">
+                ${actionConfig.text}
+            </button>
+        `;
+    });
+
+    return buttonsHtml;
+}
+
+/**
+ * Create warning modal
+ */
+function createWarningModal(config, options = {}, onConfirm = null, onCancel = null) {
+    const modalId = `warningModal_${Date.now()}`;
+
+    console.log('🔧 Creating warning modal with ID:', modalId);
+    console.log('🔧 Config:', config);
+
+    // Create simple modal HTML
+    const modalHtml = `
+        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="${modalId}Label">
+                            🗑️ ${config.title}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ${config.message}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-danger" onclick="handleWarningAction('delete')">מחק</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Verify modal was created
+    const createdModal = document.getElementById(modalId);
+    if (!createdModal) {
+        throw new Error(`Failed to create modal with ID ${modalId}`);
+    }
+
+    console.log('✅ Modal created successfully with ID:', modalId);
+    return modalId;
+}
+
+/**
+ * Show warning modal
+ */
+function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel = null) {
+    try {
+        console.log('🔧 showWarning called with:', { type, data, options });
+
+        // Store callbacks globally
+        window.warningConfirmCallback = onConfirm;
+        window.warningCancelCallback = onCancel;
+
+        // Create simple modal for DELETE type
+        if (type === 'DELETE') {
+            const modalId = `warningModal_${Date.now()}`;
+            const itemType = data.itemType || 'פריט';
+            const itemName = data.itemName || 'זה';
+
+            const modalHtml = `
+                <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title" id="${modalId}Label">
+                                    🗑️ מחיקת ${itemType}
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                האם אתה בטוח שברצונך למחוק את ${itemType} "${itemName}"?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                                <button type="button" class="btn btn-danger" onclick="handleWarningAction('delete')">מחק</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if it exists
+            const existingModal = document.getElementById(modalId);
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            // Show modal
+            const modalElement = document.getElementById(modalId);
+            if (!modalElement) {
+                throw new Error(`Modal element with ID ${modalId} not found`);
+            }
+
+            // Check if Bootstrap is available
+            if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
+                throw new Error('Bootstrap Modal is not available');
+            }
+
+            const modal = new bootstrap.Modal(modalElement, {
+                backdrop: true,
+                keyboard: true,
+                focus: true
+            });
+
+            // Show the modal
+            modal.show();
+            console.log('✅ Modal shown successfully');
+
+            return modalId;
+        }
+
+        // For other types, use fallback
+        throw new Error(`Unsupported warning type: ${type}`);
+
+    } catch (error) {
+        console.error('Error showing warning:', error);
+
+        // Fallback to simple confirm
+        if (type === 'DELETE') {
+            const itemType = data.itemType || 'פריט';
+            const itemName = data.itemName || 'זה';
+            const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ${itemType} "${itemName}"?`);
+            if (confirmed && onConfirm) {
+                onConfirm();
+            }
+        } else {
+            // Fallback to simple alert
+            alert(data.message || 'שגיאה בהצגת האזהרה');
+        }
+    }
+}
+
+/**
+ * Handle warning action
+ */
+function handleWarningAction(action) {
+    console.log('🔧 Handling warning action:', action);
+
+    // Close modal - find any open modal
+    const openModal = document.querySelector('.modal.show');
+    if (openModal) {
+        const modal = bootstrap.Modal.getInstance(openModal);
+        if (modal) {
+            modal.hide();
+        }
+    }
+
+    // Handle action
+    switch (action) {
+        case 'confirm':
+        case 'ok':
+        case 'delete':
+            if (typeof window.warningConfirmCallback === 'function') {
+                console.log('✅ Executing confirm callback');
+                window.warningConfirmCallback();
+            } else {
+                console.log('❌ No confirm callback found');
+            }
+            break;
+        case 'cancel':
+        case 'close':
+            if (typeof window.warningCancelCallback === 'function') {
+                console.log('❌ Executing cancel callback');
+                window.warningCancelCallback();
+            } else {
+                console.log('❌ No cancel callback found');
+            }
+            break;
+        case 'force_delete':
+            if (typeof window.warningConfirmCallback === 'function') {
+                console.log('✅ Executing force delete callback');
+                window.warningConfirmCallback();
+            } else {
+                console.log('❌ No confirm callback found');
+            }
+            break;
+        case 'manage_linked':
+            // Handle linked items management
+            if (typeof window.showLinkedItemsModal === 'function') {
+                window.showLinkedItemsModal();
+            }
+            break;
+    }
+}
+
+/**
+ * Show delete warning
+ */
+function showDeleteWarning(itemType, itemName, onConfirm = null, onCancel = null) {
+    // Fallback mapping for item types
+    const itemTypeDisplay = itemType === 'alert' ? 'התראה' :
+        itemType === 'ticker' ? 'טיקר' :
+            itemType === 'account' ? 'חשבון' :
+                itemType === 'trade' ? 'טרייד' :
+                    itemType === 'trade_plan' ? 'תוכנית טרייד' :
+                        itemType === 'execution' ? 'ביצוע' :
+                            itemType === 'cash_flow' ? 'תזרים מזומנים' :
+                                itemType === 'note' ? 'הערה' : 'אובייקט';
+
+    console.log('🔧 showDeleteWarning called with:', { itemType, itemName, itemTypeDisplay });
+
+    // Try to use the warning system, fallback to simple confirm
+    try {
+        return showWarning('DELETE', {
+            itemType: itemTypeDisplay,
+            itemName: itemName
+        }, {}, onConfirm, onCancel);
+    } catch (error) {
+        console.error('Error in showDeleteWarning, using fallback:', error);
+
+        // Fallback to simple confirm
+        const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ${itemTypeDisplay} "${itemName}"?`);
+        if (confirmed && onConfirm) {
+            onConfirm();
+        }
+    }
+}
+
+/**
+ * Show linked items warning
+ */
+function showLinkedItemsWarning(itemType, linkedCount, onConfirm = null, onCancel = null) {
+    // Fallback mapping for item types
+    const itemTypeDisplay = itemType === 'alert' ? 'התראה' :
+        itemType === 'ticker' ? 'טיקר' :
+            itemType === 'account' ? 'חשבון' :
+                itemType === 'trade' ? 'טרייד' :
+                    itemType === 'trade_plan' ? 'תוכנית טרייד' :
+                        itemType === 'execution' ? 'ביצוע' :
+                            itemType === 'cash_flow' ? 'תזרים מזומנים' :
+                                itemType === 'note' ? 'הערה' : 'אובייקט';
+
+    console.log('🔧 showLinkedItemsWarning called with:', { itemType, linkedCount, itemTypeDisplay });
+
+    // Use simple alert directly - skip the complex warning system for now
+    alert(`${itemTypeDisplay} זה מקושר ל-${linkedCount} פריטים במערכת. יש לטפל בהם תחילה.`);
+}
+
+/**
+ * Show validation warning
+ */
+function showValidationWarning(field, message) {
+    console.log('🔧 showValidationWarning called with:', { field, message });
+
+    // Use simple alert directly - skip the complex warning system for now
+    alert(`שגיאת אימות בשדה "${field}": ${message}`);
+}
+
 // Export individual functions to global scope
 window.showLinkedItemsWarningModal = showLinkedItemsWarningModal;
 window.createLinkedItemsWarningContent = createLinkedItemsWarningContent;
@@ -711,6 +1191,15 @@ window.createDetailedItemInfo = createDetailedItemInfo;
 window.getItemTypeIcon = getItemTypeIcon;
 window.getItemTypeDisplayName = getItemTypeDisplayName;
 window.createBasicItemInfo = createBasicItemInfo;
+
+// Export warning system functions
+window.showWarning = showWarning;
+window.showDeleteWarning = showDeleteWarning;
+window.showLinkedItemsWarning = showLinkedItemsWarning;
+window.showValidationWarning = showValidationWarning;
+window.getWarningConfig = getWarningConfig;
+window.createWarningModal = createWarningModal;
+window.handleWarningAction = handleWarningAction;
 
 /**
  * Show linked items blocking modal

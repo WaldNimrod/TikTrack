@@ -181,6 +181,34 @@ function translateAccountStatus(status) {
   }
 }
 
+// פונקציה לעיגול מספרים עד 4 תווים אחרי הנקודה
+function formatNumber(value) {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+
+  const num = parseFloat(value);
+  if (isNaN(num)) {
+    return value;
+  }
+
+  // אם המספר שלם, החזר אותו
+  if (Number.isInteger(num)) {
+    return num.toString();
+  }
+
+  // עיגול עד 4 תווים אחרי הנקודה
+  return num.toFixed(4);
+}
+
+// פונקציה לזיהוי אם ערך הוא מספר
+function isNumeric(value) {
+  if (value === null || value === undefined || value === '') {
+    return false;
+  }
+  return !isNaN(parseFloat(value)) && isFinite(value);
+}
+
 // משתנים גלובליים
 let allData = {
   accounts: [],
@@ -194,7 +222,10 @@ let allData = {
   constraints: []
 };
 
-// פונקציות לפתיחה/סגירה של סקשנים
+// טקסטי כפתורים - ניתן לשינוי בקלות
+
+
+// פונקציה לפתיחה/סגירה של סקשנים
 function toggleTopSection() {
   console.log('🔄 toggleTopSection נקראה - סגירה/פתיחה של כל הסקשנים');
 
@@ -339,7 +370,7 @@ async function loadAllData() {
   console.log('📊 allData לפני טעינה:', allData);
 
   try {
-    console.log('🌐 מתחיל בקשות API...');
+    console.log('🌐 מתחיל קשות API...');
 
     // שימוש בפונקציה החדשה לטעינה מקבילה עם התקדמות
     await loadDataWithProgress();
@@ -501,10 +532,10 @@ function updateAllTables() {
 
 // פונקציה לעדכון סטטיסטיקות
 function updateStatistics() {
-  document.getElementById('accountsStats').textContent = allData.accounts.length;
-  document.getElementById('tradesStats').textContent = allData.trades.length;
-  document.getElementById('tickersStats').textContent = allData.tickers.length;
-  document.getElementById('tradePlansStats').textContent = allData.tradePlans.length;
+  document.getElementById('accountsStats').textContent = allData.accounts?.length || 0;
+  document.getElementById('tradesStats').textContent = allData.trades?.length || 0;
+  document.getElementById('tickersStats').textContent = allData.tickers?.length || 0;
+  document.getElementById('tradePlansStats').textContent = allData.tradePlans?.length || 0;
 }
 
 // פונקציה להצגת שגיאה
@@ -533,422 +564,312 @@ function showError(message) {
 }
 
 // פונקציות לעדכון טבלאות ספציפיות
-function updateAccountsTable() {
-  const tbody = document.querySelector('#accountsTable tbody');
-  if (!tbody) return;
-
-  if (allData.accounts.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center">אין נתונים</td></tr>';
-    return;
-  }
-
-  const rows = allData.accounts.map(account => {
-    // המרת סטטוס לעברית לפילטר
-    const statusForFilter = account.status === 'active' ? 'פעיל' :
-      account.status === 'inactive' ? 'לא פעיל' :
-        account.status === 'suspended' ? 'מושעה' : (account.status || '');
-
-    return `
-    <tr>
-      <td>${account.id || ''}</td>
-      <td>${account.name || ''}</td>
-      <td>${account.currency || ''}</td>
-      <td>${account.balance || 0}</td>
-      <td data-status="${statusForFilter}">${translateAccountStatus(account.status) || ''}</td>
-      <td data-date="${account.created_at}">${account.created_at || ''}</td>
-      <td data-date="${account.updated_at}">${account.updated_at || ''}</td>
-      <td class="actions-cell">
-        <table class="table table-sm table-borderless mb-0">
-          <tbody>
-            <tr>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editAccount(${account.id})" title="ערוך">✏️</button>
-              </td>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק">🗑️</button>
-              </td>
-              ${account.status && account.status !== 'suspended' ?
-        `<td class="p-0">
-                <button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>
-              </td>` :
-        ''}
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  `}).join('');
-
-  tbody.innerHTML = rows;
-  document.getElementById('accountsCount').textContent = `${allData.accounts.length} רשומות`;
-}
-
-function updateTradesTable() {
-  const tbody = document.querySelector('#tradesTable tbody');
-  if (!tbody) return;
-
-  if (allData.trades.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="15" class="text-center">אין נתונים</td></tr>';
-    return;
-  }
-
-  const rows = allData.trades.map(trade => {
-    // המרת סוגים לעברית לפילטר
-    const typeForFilter = trade.investment_type === 'swing' ? 'סווינג' :
-      trade.investment_type === 'investment' ? 'השקעה' :
-        trade.investment_type === 'passive' ? 'פסיבי' : (trade.investment_type || '');
-
-    // המרת סטטוס לעברית לפילטר
-    const statusForFilter = trade.status === 'open' ? 'פתוח' :
-      trade.status === 'closed' ? 'סגור' :
-        trade.status === 'cancelled' ? 'מבוטל' : (trade.status || '');
-
-    return `
-    <tr>
-      <td>${trade.id || ''}</td>
-      <td>${trade.account_id || ''}</td>
-      <td>${trade.ticker_id || ''}</td>
-      <td data-type="${typeForFilter}">${trade.investment_type || ''}</td>
-      <td>${trade.side || ''}</td>
-      <td data-status="${statusForFilter}">${trade.status || ''}</td>
-      <td>${trade.entry_price || 0}</td>
-      <td>${trade.current_price || 0}</td>
-      <td>${trade.exit_price || 0}</td>
-      <td>${trade.quantity || 0}</td>
-      <td data-date="${trade.entry_date}">${trade.entry_date || ''}</td>
-      <td data-date="${trade.exit_date}">${trade.exit_date || ''}</td>
-      <td>${trade.notes || ''}</td>
-      <td data-date="${trade.created_at}">${trade.created_at || ''}</td>
-      <td data-date="${trade.updated_at}">${trade.updated_at || ''}</td>
-      <td class="actions-cell">
-        <table class="table table-sm table-borderless mb-0">
-          <tbody>
-            <tr>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editTrade(${trade.id})" title="ערוך">✏️</button>
-              </td>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-danger" onclick="deleteTrade(${trade.id})" title="מחק">🗑️</button>
-              </td>
-              ${trade.status && trade.status !== 'cancelled' ?
-        `<td class="p-0">
-                <button class="btn btn-sm btn-warning" onclick="cancelTrade(${trade.id})" title="ביטול">❌</button>
-              </td>` :
-        ''}
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  `}).join('');
-
-  tbody.innerHTML = rows;
-  document.getElementById('tradesCount').textContent = `${allData.trades.length} רשומות`;
-}
-
-function updateTickersTable() {
-  const tbody = document.querySelector('#tickersTable tbody');
-  if (!tbody) return;
-
-  if (allData.tickers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center">אין נתונים</td></tr>';
-    return;
-  }
-
-  const rows = allData.tickers.map(ticker => {
-    // המרת סוגים לעברית לפילטר
-    const typeForFilter = ticker.type === 'stock' ? 'מניה' :
-      ticker.type === 'etf' ? 'ETF' :
-        ticker.type === 'bond' ? 'אג"ח' :
-          ticker.type === 'crypto' ? 'קריפטו' : (ticker.type || '');
-
-    // המרת סטטוס לפילטר
-    const statusForFilter = ticker.active_trades ? 'פעיל' : 'לא פעיל';
-
-    return `
-    <tr>
-      <td>${ticker.id || ''}</td>
-      <td>${ticker.symbol || ''}</td>
-      <td>${ticker.name || ''}</td>
-      <td data-type="${typeForFilter}">${ticker.type || ''}</td>
-      <td>${ticker.currency_id || ''}</td>
-      <td>${ticker.remarks || ''}</td>
-      <td data-status="${statusForFilter}">${ticker.active_trades ? 'כן' : 'לא'}</td>
-      <td data-date="${ticker.created_at}">${ticker.created_at || ''}</td>
-      <td data-date="${ticker.updated_at}">${ticker.updated_at || ''}</td>
-      <td class="actions-cell">
-        <table class="table table-sm table-borderless mb-0">
-          <tbody>
-            <tr>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">✏️</button>
-              </td>
-              <td class="p-0">
-                <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})" title="מחק">🗑️</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  `}).join('');
-
-  tbody.innerHTML = rows;
-  document.getElementById('tickersCount').textContent = `${allData.tickers.length} רשומות`;
-}
-
+// פונקציה לעדכון טבלת תכנונים
 function updateTradePlansTable() {
   const tbody = document.querySelector('#tradePlansTable tbody');
   if (!tbody) return;
 
-  if (allData.tradePlans.length === 0) {
+  // בדיקה אם tradePlans קיים ומערך
+  if (!allData.tradePlans || !Array.isArray(allData.tradePlans) || allData.tradePlans.length === 0) {
     tbody.innerHTML = '<tr><td colspan="14" class="text-center">אין נתונים</td></tr>';
+    document.getElementById('tradePlansCount').textContent = '0 רשומות';
     return;
   }
 
-  const rows = allData.tradePlans.map(plan => {
-    // המרת סוגים לעברית לפילטר
-    const typeForFilter = plan.investment_type === 'swing' ? 'סווינג' :
-      plan.investment_type === 'investment' ? 'השקעה' :
-        plan.investment_type === 'passive' ? 'פסיבי' : (plan.investment_type || '');
+  tbody.innerHTML = '';
 
-    // המרת סטטוס לעברית לפילטר
-    const statusForFilter = plan.status === 'open' ? 'פתוח' :
-      plan.status === 'closed' ? 'סגור' :
-        plan.status === 'cancelled' ? 'מבוטל' : (plan.status || '');
-
-    return `
-    <tr>
+  allData.tradePlans.forEach(plan => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
       <td>${plan.id || ''}</td>
       <td>${plan.account_id || ''}</td>
       <td>${plan.ticker_id || ''}</td>
-      <td data-type="${typeForFilter}">${plan.investment_type || ''}</td>
+      <td>${plan.investment_type || ''}</td>
       <td>${plan.side || ''}</td>
-      <td data-status="${statusForFilter}">${plan.status || ''}</td>
-      <td>${plan.entry_price || 0}</td>
-      <td>${plan.target_price || 0}</td>
-      <td>${plan.stop_loss || 0}</td>
-      <td>${plan.quantity || 0}</td>
+      <td>${plan.status || ''}</td>
+      <td class="number-cell">${formatNumber(plan.planned_amount)}</td>
       <td>${plan.entry_conditions || ''}</td>
-      <td>${plan.notes || ''}</td>
-      <td data-date="${plan.created_at}">${plan.created_at || ''}</td>
-      <td data-date="${plan.updated_at}">${plan.updated_at || ''}</td>
-      <td class="actions-cell">
-        <table class="table table-sm table-borderless mb-0">
-          <tbody>
-            <tr>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editTradePlan(${plan.id})" title="ערוך">✏️</button>
-              </td>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-danger" onclick="deleteTradePlan(${plan.id})" title="מחק">🗑️</button>
-              </td>
-              ${plan.status && plan.status !== 'cancelled' ?
-        `<td class="p-0">
-                <button class="btn btn-sm btn-warning" onclick="cancelTradePlan(${plan.id})" title="ביטול">❌</button>
-              </td>` :
-        ''}
-            </tr>
-          </tbody>
-        </table>
+      <td class="number-cell">${formatNumber(plan.stop_price)}</td>
+      <td class="number-cell">${formatNumber(plan.target_price)}</td>
+      <td>${plan.reasons || ''}</td>
+      <td>${plan.cancelled_at || ''}</td>
+      <td>${plan.cancel_reason || ''}</td>
+      <td>${plan.created_at || ''}</td>
+      <td>
+        ${createEditButton(`editRecord('trade_plans', ${plan.id})`)}
+        ${createDeleteButton(`deleteRecord('trade_plans', ${plan.id})`)}
       </td>
-    </tr>
-  `}).join('');
+    `;
+    tbody.appendChild(row);
+  });
 
-  tbody.innerHTML = rows;
   document.getElementById('tradePlansCount').textContent = `${allData.tradePlans.length} רשומות`;
 }
 
+// פונקציה לעדכון טבלת טריידים
+function updateTradesTable() {
+  const tbody = document.querySelector('#tradesTable tbody');
+  if (!tbody) return;
+
+  // בדיקה אם trades קיים ומערך
+  if (!allData.trades || !Array.isArray(allData.trades) || allData.trades.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="13" class="text-center">אין נתונים</td></tr>';
+    document.getElementById('tradesCount').textContent = '0 רשומות';
+    return;
+  }
+
+  tbody.innerHTML = '';
+
+  allData.trades.forEach(trade => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${trade.id || ''}</td>
+      <td>${trade.account_id || ''}</td>
+      <td>${trade.ticker_id || ''}</td>
+      <td>${trade.trade_plan_id || ''}</td>
+      <td>${trade.status || ''}</td>
+      <td>${trade.investment_type || ''}</td>
+      <td>${trade.side || ''}</td>
+      <td>${trade.closed_at || ''}</td>
+      <td>${trade.cancelled_at || ''}</td>
+      <td>${trade.cancel_reason || ''}</td>
+      <td class="number-cell">${formatNumber(trade.total_pl)}</td>
+      <td>${trade.notes || ''}</td>
+      <td>${trade.created_at || ''}</td>
+      <td>
+        ${createEditButton(`editRecord('trades', ${trade.id})`)}
+        ${createDeleteButton(`deleteRecord('trades', ${trade.id})`)}
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  document.getElementById('tradesCount').textContent = `${allData.trades.length} רשומות`;
+}
+
+// פונקציה לעדכון טבלת חשבונות
+function updateAccountsTable() {
+  const tbody = document.querySelector('#accountsTable tbody');
+  if (!tbody) return;
+
+  // בדיקה אם accounts קיים ומערך
+  if (!allData.accounts || !Array.isArray(allData.accounts) || allData.accounts.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center">אין נתונים</td></tr>';
+    document.getElementById('accountsCount').textContent = '0 רשומות';
+    return;
+  }
+
+  tbody.innerHTML = '';
+
+  allData.accounts.forEach(account => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${account.id || ''}</td>
+      <td>${account.name || ''}</td>
+      <td>${account.currency || ''}</td>
+      <td>${account.status || ''}</td>
+      <td class="number-cell">${formatNumber(account.cash_balance)}</td>
+      <td class="number-cell">${formatNumber(account.total_value)}</td>
+      <td class="number-cell">${formatNumber(account.total_pl)}</td>
+      <td>${account.notes || ''}</td>
+      <td>${account.created_at || ''}</td>
+      <td>
+        ${createEditButton(`editRecord('accounts', ${account.id})`)}
+        ${createDeleteButton(`deleteRecord('accounts', ${account.id})`)}
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  document.getElementById('accountsCount').textContent = `${allData.accounts.length} רשומות`;
+}
+
+// פונקציה לעדכון טבלת טיקרים
+function updateTickersTable() {
+  const tbody = document.querySelector('#tickersTable tbody');
+  if (!tbody) return;
+
+  // בדיקה אם tickers קיים ומערך
+  if (!allData.tickers || !Array.isArray(allData.tickers) || allData.tickers.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center">אין נתונים</td></tr>';
+    document.getElementById('tickersCount').textContent = '0 רשומות';
+    return;
+  }
+
+  tbody.innerHTML = '';
+
+  allData.tickers.forEach(ticker => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${ticker.id || ''}</td>
+      <td>${ticker.symbol || ''}</td>
+      <td>${ticker.name || ''}</td>
+      <td>${ticker.type || ''}</td>
+      <td>${ticker.remarks || ''}</td>
+      <td>${ticker.currency_id || ''}</td>
+      <td>${ticker.active_trades ? 'כן' : 'לא'}</td>
+      <td>${ticker.created_at || ''}</td>
+      <td>${ticker.updated_at || ''}</td>
+      <td>
+        ${createEditButton(`editRecord('tickers', ${ticker.id})`)}
+        ${createDeleteButton(`deleteRecord('tickers', ${ticker.id})`)}
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  document.getElementById('tickersCount').textContent = `${allData.tickers.length} רשומות`;
+}
+
+// פונקציה לעדכון טבלת ביצועים
 function updateExecutionsTable() {
   const tbody = document.querySelector('#executionsTable tbody');
   if (!tbody) return;
 
-  if (allData.executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center">אין נתונים</td></tr>';
+  // בדיקה אם executions קיים ומערך
+  if (!allData.executions || !Array.isArray(allData.executions) || allData.executions.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" class="text-center">אין נתונים</td></tr>';
+    document.getElementById('executionsCount').textContent = '0 רשומות';
     return;
   }
 
-  const rows = allData.executions.map(execution => {
-    // המרת סוגים לעברית לפילטר
-    const typeForFilter = execution.action === 'buy' ? 'קנייה' :
-      execution.action === 'sell' ? 'מכירה' : (execution.action || '');
+  tbody.innerHTML = '';
 
-    return `
-    <tr>
+  allData.executions.forEach(execution => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
       <td>${execution.id || ''}</td>
       <td>${execution.trade_id || ''}</td>
-      <td data-type="${typeForFilter}">${execution.action || ''}</td>
-      <td data-date="${execution.date}">${execution.date || ''}</td>
-      <td>${execution.quantity || 0}</td>
-      <td>${execution.price || 0}</td>
-      <td>${execution.fee || 0}</td>
+      <td>${execution.action || ''}</td>
+      <td>${execution.date || ''}</td>
+      <td class="number-cell">${formatNumber(execution.quantity)}</td>
+      <td class="number-cell">${formatNumber(execution.price)}</td>
+      <td class="number-cell">${formatNumber(execution.fee)}</td>
       <td>${execution.source || ''}</td>
-      <td data-date="${execution.created_at}">${execution.created_at || ''}</td>
-      <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">
-          <span class="btn-icon">✏️</span>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
+      <td>${execution.notes || ''}</td>
+      <td>${execution.created_at || ''}</td>
+      <td>
+        ${createEditButton(`editRecord('executions', ${execution.id})`)}
+        ${createDeleteButton(`deleteRecord('executions', ${execution.id})`)}
       </td>
-    </tr>
-  `}).join('');
+    `;
+    tbody.appendChild(row);
+  });
 
-  tbody.innerHTML = rows;
   document.getElementById('executionsCount').textContent = `${allData.executions.length} רשומות`;
 }
 
+// פונקציה לעדכון טבלת תזרימי מזומנים
 function updateCashFlowsTable() {
   const tbody = document.querySelector('#cashFlowsTable tbody');
   if (!tbody) return;
 
-  if (allData.cashFlows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="12" class="text-center">אין נתונים</td></tr>';
+  // בדיקה אם cashFlows קיים ומערך
+  if (!allData.cashFlows || !Array.isArray(allData.cashFlows) || allData.cashFlows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="11" class="text-center">אין נתונים</td></tr>';
+    document.getElementById('cashFlowsCount').textContent = '0 רשומות';
     return;
   }
 
-  const rows = allData.cashFlows.map(cashFlow => {
-    // המרת סוגים לעברית לפילטר
-    const typeForFilter = cashFlow.type === 'deposit' ? 'הפקדה' :
-      cashFlow.type === 'withdrawal' ? 'משיכה' :
-        cashFlow.type === 'dividend' ? 'דיבידנד' :
-          cashFlow.type === 'fee' ? 'עמלה' :
-            cashFlow.type === 'interest' ? 'ריבית' : (cashFlow.type || '');
+  tbody.innerHTML = '';
 
-    return `
-    <tr>
+  allData.cashFlows.forEach(cashFlow => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
       <td>${cashFlow.id || ''}</td>
       <td>${cashFlow.account_id || ''}</td>
-      <td data-type="${typeForFilter}">${cashFlow.type || ''}</td>
-      <td>${cashFlow.amount || 0}</td>
-      <td data-date="${cashFlow.date}">${cashFlow.date || ''}</td>
+      <td>${cashFlow.type || ''}</td>
+      <td class="number-cell">${formatNumber(cashFlow.amount)}</td>
+      <td>${cashFlow.date || ''}</td>
       <td>${cashFlow.description || ''}</td>
-      <td>${cashFlow.currency || ''}</td>
       <td>${cashFlow.currency_id || ''}</td>
-      <td>${cashFlow.usd_rate || 0}</td>
+      <td class="number-cell">${formatNumber(cashFlow.usd_rate)}</td>
       <td>${cashFlow.source || ''}</td>
       <td>${cashFlow.external_id || ''}</td>
-      <td data-date="${cashFlow.created_at}">${cashFlow.created_at || ''}</td>
-      <td class="actions-cell">
-        <table class="table table-sm table-borderless mb-0">
-          <tbody>
-            <tr>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">✏️</button>
-              </td>
-              <td class="p-0">
-                <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <td>${cashFlow.created_at || ''}</td>
+      <td>
+        ${createEditButton(`editRecord('cash_flows', ${cashFlow.id})`)}
+        ${createDeleteButton(`deleteRecord('cash_flows', ${cashFlow.id})`)}
       </td>
-    </tr>
-  `}).join('');
+    `;
+    tbody.appendChild(row);
+  });
 
-  tbody.innerHTML = rows;
   document.getElementById('cashFlowsCount').textContent = `${allData.cashFlows.length} רשומות`;
 }
 
+// פונקציה לעדכון טבלת התראות
 function updateAlertsTable() {
   const tbody = document.querySelector('#alertsTable tbody');
   if (!tbody) return;
 
-  if (allData.alerts.length === 0) {
+  // בדיקה אם alerts קיים ומערך
+  if (!allData.alerts || !Array.isArray(allData.alerts) || allData.alerts.length === 0) {
     tbody.innerHTML = '<tr><td colspan="13" class="text-center">אין נתונים</td></tr>';
+    document.getElementById('alertsCount').textContent = '0 רשומות';
     return;
   }
 
-  const rows = allData.alerts.map(alert => {
-    // המרת סוגים לעברית לפילטר
-    const typeForFilter = alert.type === 'price' ? 'התראה על מחיר' :
-      alert.type === 'stop_loss' ? 'סטופ לוס' :
-        alert.type === 'volume' ? 'התראה על נפח' :
-          alert.type === 'custom' ? 'התראה מותאמת' : (alert.type || '');
+  tbody.innerHTML = '';
 
-    // המרת סטטוס לעברית לפילטר
-    const statusForFilter = alert.status === 'open' ? 'פתוח' :
-      alert.status === 'closed' ? 'סגור' :
-        alert.status === 'cancelled' ? 'מבוטל' : (alert.status || '');
-
-    return `
-    <tr>
+  allData.alerts.forEach(alert => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
       <td>${alert.id || ''}</td>
-      <td data-type="${typeForFilter}">${alert.type || ''}</td>
-      <td data-status="${statusForFilter}">${alert.status || ''}</td>
+      <td>${alert.account_id || ''}</td>
+      <td>${alert.ticker_id || ''}</td>
       <td>${alert.message || ''}</td>
-      <td data-date="${alert.triggered_at}">${alert.triggered_at || ''}</td>
+      <td>${alert.triggered_at || ''}</td>
+      <td>${alert.status || ''}</td>
       <td>${alert.is_triggered || ''}</td>
       <td>${alert.related_type_id || ''}</td>
       <td>${alert.related_id || ''}</td>
       <td>${alert.condition_attribute || ''}</td>
       <td>${alert.condition_operator || ''}</td>
-      <td>${alert.condition_number || 0}</td>
-      <td data-date="${alert.created_at}">${alert.created_at || ''}</td>
-      <td data-date="${alert.updated_at}">${alert.updated_at || ''}</td>
-      <td class="actions-cell">
-        <table class="table table-sm table-borderless mb-0">
-          <tbody>
-            <tr>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
-              </td>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
-              </td>
-              <td class="p-0">
-                ${alert.status === 'open' ? `
-                <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>
-                ` : `
-                <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
-                `}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <td class="number-cell">${formatNumber(alert.condition_number)}</td>
+      <td>${alert.created_at || ''}</td>
+      <td>
+        ${createEditButton(`editRecord('alerts', ${alert.id})`)}
+        ${createDeleteButton(`deleteRecord('alerts', ${alert.id})`)}
       </td>
-    </tr>
-  `}).join('');
+    `;
+    tbody.appendChild(row);
+  });
 
-  tbody.innerHTML = rows;
   document.getElementById('alertsCount').textContent = `${allData.alerts.length} רשומות`;
 }
 
+// פונקציה לעדכון טבלת הערות
 function updateNotesTable() {
   const tbody = document.querySelector('#notesTable tbody');
   if (!tbody) return;
 
-  if (allData.notes.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center">אין נתונים</td></tr>';
+  // בדיקה אם notes קיים ומערך
+  if (!allData.notes || !Array.isArray(allData.notes) || allData.notes.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין נתונים</td></tr>';
+    document.getElementById('notesCount').textContent = '0 רשומות';
     return;
   }
 
-  const rows = allData.notes.map(note => `
-    <tr>
-      <td>${note.id || ''}</td>
-      <td>${note.entity_type || ''}</td>
-      <td>${note.entity_id || ''}</td>
-      <td>${note.title || ''}</td>
-      <td>${note.content || ''}</td>
-      <td data-date="${note.created_at}">${note.created_at || ''}</td>
-      <td data-date="${note.updated_at}">${note.updated_at || ''}</td>
-      <td class="actions-cell">
-        <table class="table table-sm table-borderless mb-0">
-          <tbody>
-            <tr>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editNote(${note.id})" title="ערוך">✏️</button>
-              </td>
-              <td class="p-0">
-                <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id})" title="מחק">🗑️</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = '';
 
-  tbody.innerHTML = rows;
+  allData.notes.forEach(note => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${note.id || ''}</td>
+      <td>${note.content || ''}</td>
+      <td>${note.attachment || ''}</td>
+      <td>${note.related_type_id || ''}</td>
+      <td>${note.related_id || ''}</td>
+      <td>${note.created_at || ''}</td>
+      <td>
+        ${createEditButton(`editRecord('notes', ${note.id})`)}
+        ${createDeleteButton(`deleteRecord('notes', ${note.id})`)}
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+
   document.getElementById('notesCount').textContent = `${allData.notes.length} רשומות`;
 }
 
@@ -1214,3 +1135,23 @@ document.addEventListener('DOMContentLoaded', function () {
     console.error('❌ Stack trace:', error.stack);
   }
 });
+
+// פונקציה לעדכון טקסט פילטר חשבונות (נדרשת למערכת הפילטרים)
+function updateAccountFilterDisplayText() {
+  console.log('🔄 updateAccountFilterDisplayText called');
+
+  // עדכון טקסט פילטר חשבונות ב-header
+  const accountFilterButton = document.getElementById('accountFilterButton');
+  if (accountFilterButton) {
+    const selectedAccounts = window.simpleFilter?.currentFilters?.account || [];
+    if (selectedAccounts && selectedAccounts.length > 0) {
+      accountFilterButton.textContent = `${selectedAccounts.length} חשבונות נבחרו`;
+    } else {
+      accountFilterButton.textContent = 'כל החשבונות';
+    }
+  }
+  console.log('✅ updateAccountFilterDisplayText completed');
+}
+
+// הגדרת הפונקציה כגלובלית
+window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;

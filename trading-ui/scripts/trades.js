@@ -380,20 +380,19 @@ function updateTradesTable(trades) {
           <tbody>
             <tr>
               <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTrade(${trade.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                ${createLinkButton(`viewLinkedItemsForTrade(${trade.id})`)}
               </td>
               <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editTradeRecord('${trade.id}')" title="ערוך">✏️</button>
+                ${createEditButton(`editTradeRecord('${trade.id}')`)}
               </td>
               <td class="p-0 pe-1">
-                ${trade.status === 'open' ? `
-                <button class="btn btn-sm btn-secondary" onclick="cancelTradeRecord('${trade.id}')" title="ביטול">❌</button>
-                ` : `
-                <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל טרייד סגור">X</button>
-                `}
+                ${trade.status === 'open' ?
+        createButton('CANCEL', `cancelTradeRecord('${trade.id}')`) :
+        `<button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל טרייד סגור">X</button>`
+      }
               </td>
               <td class="p-0">
-                <button class="btn btn-sm btn-danger" onclick="deleteTradeRecord('${trade.id}')" title="מחק">🗑️</button>
+                ${createDeleteButton(`deleteTradeRecord('${trade.id}')`)}
               </td>
             </tr>
           </tbody>
@@ -1553,12 +1552,16 @@ async function loadModalData() {
       });
     }
 
-    // מילוי רשימת תוכניות טרייד - רק תוכניות פתוחות
+    // מילוי רשימת תוכניות טרייד - הצג כל התוכניות (פתוחות וסגורות)
     const tradePlanSelect = document.getElementById('addTradeTradePlanId');
     if (tradePlanSelect) {
       tradePlanSelect.innerHTML = '<option value="">בחר תוכנית טרייד</option>';
-      const openPlans = tradePlans.data.filter(plan => plan.status === 'open');
-      openPlans.forEach(plan => {
+
+      // הצג כל התוכניות - פתוחות וסגורות
+      // זה מאפשר למשתמש לבחור מתוכנית קיימת גם אם היא סגורה
+      const allPlans = tradePlans.data;
+
+      allPlans.forEach(plan => {
         const option = document.createElement('option');
         option.value = plan.id;
         // הצגת: סימבול | צד | סוג השקעה | תאריך
@@ -1578,11 +1581,14 @@ async function loadModalData() {
           tickerId = plan.ticker_id;
         }
 
-        // יצירת טקסט עם הסימבול בבולד
+        // יצירת טקסט עם הסימבול בבולד ואינדיקציה לסטטוס
         const boldSymbol = `<strong>${tickerSymbol}</strong>`;
-        option.innerHTML = `${boldSymbol} | ${side} | ${investmentType} | ${createdDate}`;
+        const statusIndicator = plan.status === 'open' ? '🟢' : '🔴';
+        const statusText = plan.status === 'open' ? 'פתוח' : 'סגור';
+        option.innerHTML = `${statusIndicator} ${boldSymbol} | ${side} | ${investmentType} | ${createdDate} (${statusText})`;
         option.setAttribute('data-ticker-symbol', tickerSymbol);
         option.setAttribute('data-ticker-id', tickerId);
+        option.setAttribute('data-plan-status', plan.status);
         tradePlanSelect.appendChild(option);
       });
     }
@@ -1630,10 +1636,18 @@ async function updateTickerFromTradePlan(tradePlanId) {
     if (selectedOption) {
       const tickerSymbol = selectedOption.getAttribute('data-ticker-symbol');
       const tickerId = selectedOption.getAttribute('data-ticker-id');
+      const planStatus = selectedOption.getAttribute('data-plan-status');
 
       // עדכון שדות הטיקר
       document.getElementById('addTradeTickerDisplay').textContent = tickerSymbol;
       document.getElementById('addTradeTickerId').value = tickerId;
+
+      // הוספת אינדיקציה לסטטוס התוכנית
+      const tickerDisplayElement = document.getElementById('addTradeTickerDisplay');
+      if (tickerDisplayElement) {
+        const statusIndicator = planStatus === 'open' ? '🟢' : '🔴';
+        tickerDisplayElement.textContent = `${statusIndicator} ${tickerSymbol}`;
+      }
 
       // כאן אפשר להוסיף קריאה לקבלת מחיר נוכחי ושינוי יומי
       // כרגע נציג ערכים דמו
@@ -1659,6 +1673,52 @@ async function updateTickerFromTradePlan(tradePlanId) {
     console.error('שגיאה בעדכון טיקר:', error);
   }
 }
+
+/**
+ * עדכון רשימת טיקרים לפי פילטר "הצג טריידים סגורים"
+ * פונקציה זו מתעדכנת כשהמשתמש מסמן/מבטל את הפילטר
+ * @param {boolean} showClosed - האם להציג טריידים סגורים
+ */
+function updateTickersListForClosedTrades(showClosed) {
+  console.log('🔄 עדכון רשימת טיקרים לפי פילטר:', showClosed);
+
+  // עדכון רשימת התוכניות במודל הוספת טרייד
+  if (showClosed) {
+    console.log('🔄 פילטר "הצג טריידים סגורים" פעיל - מעדכן רשימת תוכניות...');
+    // טעינה מחדש של נתוני המודל כדי לכלול תוכניות סגורות
+    loadModalData();
+  } else {
+    console.log('🔄 פילטר "הצג טריידים סגורים" לא פעיל - מעדכן רשימת תוכניות...');
+    // טעינה מחדש של נתוני המודל
+    loadModalData();
+  }
+}
+
+/**
+ * פונקציה גלובלית לעדכון רשימת טיקרים לפי פילטר
+ * פונקציה זו נקראת ממערכת הפילטרים הגלובלית
+ * @param {boolean} showClosed - האם להציג טריידים סגורים
+ */
+window.updateTickersForClosedTradesFilter = function (showClosed) {
+  console.log('🔄 עדכון רשימת טיקרים לפי פילטר גלובלי:', showClosed);
+  updateTickersListForClosedTrades(showClosed);
+};
+
+/**
+ * פונקציה לעדכון רשימת טיקרים לפי פילטר "הצג טריידים סגורים"
+ * פונקציה זו נקראת כשהמשתמש מסמן/מבטל את הפילטר
+ * @param {Event} event - אירוע השינוי
+ */
+function onShowClosedTradesChange(event) {
+  const showClosed = event.target.checked;
+  console.log('🔄 פילטר "הצג טריידים סגורים" השתנה:', showClosed);
+  updateTickersListForClosedTrades(showClosed);
+}
+
+// ייצוא הפונקציה לגלובל
+window.onShowClosedTradesChange = onShowClosedTradesChange;
+
+
 
 /**
  * הוספת הערה חשובה
@@ -1826,6 +1886,9 @@ window.clearTradeValidationErrors = clearTradeValidationErrors; // ניקוי ש
 window.loadModalData = loadModalData;                      // טעינת נתונים למודל
 window.loadEditModalData = loadEditModalData;              // טעינת נתונים למודל עריכה
 window.updateTickerFromTradePlan = updateTickerFromTradePlan; // עדכון טיקר מתוכנית
+window.updateTickersListForClosedTrades = updateTickersListForClosedTrades; // עדכון רשימת טיקרים
+window.updateTickersForClosedTradesFilter = window.updateTickersForClosedTradesFilter; // פונקציה גלובלית לעדכון טיקרים
+window.onShowClosedTradesChange = onShowClosedTradesChange; // פונקציה לשינוי פילטר טריידים סגורים
 
 // פונקציות כפתורים חדשות
 window.addImportantNote = addImportantNote;                // הוספת הערה חשובה

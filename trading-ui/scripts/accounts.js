@@ -207,18 +207,18 @@ function updateAccountsTable(accounts) {
         <table class="table table-sm table-borderless mb-0">
           <tbody>
             <tr>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editAccount(${account.id})" title="ערוך חשבון">✏️</button>
-              </td>
-              <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-danger" 
-                        onclick="deleteAccount(${account.id})" 
-                        title="${isProtected ? 'חשבון אחרון - לא ניתן למחוק' : 'מחק חשבון'}"
-                        ${isProtected ? 'disabled' : ''}>🗑️</button>
-              </td>
-              <td class="p-0">
-                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAccount(${account.id})" title="צפה באלמנטים מקושרים">🔗</button>
-              </td>
+                    <td class="p-0 pe-1">
+        ${createEditButton(`editAccount(${account.id})`)}
+      </td>
+      <td class="p-0 pe-1">
+        ${isProtected ?
+        `<button class="btn btn-sm btn-danger" disabled title="חשבון אחרון - לא ניתן למחוק">${BUTTON_ICONS.DELETE}</button>` :
+        createDeleteButton(`deleteAccount(${account.id})`)
+      }
+      </td>
+      <td class="p-0">
+        ${createLinkButton(`viewLinkedItemsForAccount(${account.id})`)}
+      </td>
             </tr>
           </tbody>
         </table>

@@ -809,13 +809,13 @@ function updateTradePlansTable(trade_plans) {
             <tbody>
               <tr>
                 <td class="p-0 pe-1">
-                  <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                  ${createLinkButton(`viewLinkedItemsForTradePlan(${design.id})`)}
                 </td>
                 <td class="p-0 pe-1">
-                  <button class="btn btn-sm btn-secondary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">✏️</button>
+                  ${createEditButton(`window.openEditTradePlanModal(${design.id})`)}
                 </td>
                 <td class="p-0">
-                  <button class="btn btn-sm btn-danger" onclick="window.openDeleteTradePlanModal(${design.id})" title="מחק">🗑️</button>
+                  ${createDeleteButton(`window.openDeleteTradePlanModal(${design.id})`)}
                 </td>
               </tr>
             </tbody>

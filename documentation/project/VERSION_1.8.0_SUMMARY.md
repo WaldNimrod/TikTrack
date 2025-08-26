@@ -1,7 +1,7 @@
-# Version 2.8.0 Summary - Database Extra Data System
+# Version 1.8.0 Summary - Database Extra Data System
 
 ## 📋 Overview
-Version 2.8.0 introduces a comprehensive Database Extra Data management system, including complete Currency and Note Relation Types management with advanced validation, dynamic constraint display, and improved user experience.
+Version 1.8.0 introduces a comprehensive Database Extra Data management system, including complete Currency and Note Relation Types management with advanced validation, dynamic constraint display, and improved user experience.
 
 ## 🎯 Major Features
 
@@ -92,8 +92,8 @@ DELETE /api/v1/note_relation_types/{id}    // Delete note relation type
 
 ### Documentation Updates
 - `HANDOVER_SUMMARY.md` - Updated with new completed modules
-- `documentation/README.md` - Updated with version 2.8.0 changes
-- `documentation/project/CHANGELOG.md` - Added comprehensive version 2.8.0 documentation
+    - `documentation/README.md` - Updated with version 1.8.0 changes
+    - `documentation/project/CHANGELOG.md` - Added comprehensive version 1.8.0 documentation
 - `documentation/INDEX.md` - Updated navigation index
 
 ## 🔒 Database Constraints
@@ -241,7 +241,7 @@ CREATE TABLE note_relation_types (
 
 ---
 
-**Version**: 2.8.0  
+**Version**: 1.8.0  
 **Release Date**: August 25, 2025  
 **Status**: Complete and Production Ready  
-**Next Version**: 2.9.0 (Planned for Trade Plans module)
+**Next Version**: 1.9.0 (Planned for Trade Plans module)

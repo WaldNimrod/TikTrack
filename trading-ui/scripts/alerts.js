@@ -533,20 +533,19 @@ function updateAlertsTable(alerts) {
               <tbody>
                 <tr>
                   <td class="p-0 pe-1">
-                    <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                    ${createLinkButton(`viewLinkedItemsForAlert(${alert.id})`)}
                   </td>
                   <td class="p-0 pe-1">
-                    <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
+                    ${createEditButton(`editAlert(${alert.id})`)}
                   </td>
                   <td class="p-0 pe-1">
-                    ${alert.status === 'open' ? `
-                    <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>
-                    ` : `
-                    <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
-                    `}
+                    ${alert.status === 'open' ?
+          createButton('CANCEL', `cancelAlert(${alert.id})`) :
+          `<button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>`
+        }
                   </td>
                   <td class="p-0">
-                    <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
+                    ${createDeleteButton(`deleteAlert(${alert.id})`)}
                   </td>
                 </tr>
               </tbody>
@@ -1264,41 +1263,41 @@ async function saveAlert() {
 
   if (!relatedType || !relatedId) {
     console.log('🔧 Validation failed: missing required fields');
-    showModalNotification('error', 'שדות חובה חסרים', 'יש למלא את כל השדות החובה', 'addAlertModal');
+    showErrorNotification('שדות חובה חסרים', 'יש למלא את כל השדות החובה');
     return;
   }
 
   if (!conditionAttribute || !conditionOperator || !conditionNumber) {
     console.log('🔧 Validation failed: missing condition fields');
-    showModalNotification('error', 'תנאי התראה חסר', 'יש למלא את כל שדות התנאי', 'addAlertModal');
+    showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
     return;
   }
 
   // וולידציה של ערך מספרי
   const numericValue = parseFloat(conditionNumber);
   if (isNaN(numericValue)) {
-    showModalNotification('error', 'ערך לא תקין', 'הערך חייב להיות מספר', 'addAlertModal');
+    showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך חיובי למחיר
   if (conditionAttribute === 'price' && numericValue <= 0) {
-    showModalNotification('error', 'ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0', 'addAlertModal');
+    showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך מקסימלי למחיר
   if (conditionAttribute === 'price' && numericValue > 1000000) {
-    showModalNotification('error', 'ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000', 'addAlertModal');
+    showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של אחוזים (לשינוי)
   if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
-    showModalNotification('error', 'ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%', 'addAlertModal');
+    showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
     conditionNumberElement.focus();
     return;
   }
@@ -1345,8 +1344,10 @@ async function saveAlert() {
       // רענון הנתונים
       loadAlertsData();
 
-      // הצגת הודעה
-      showModalNotification('success', 'התראה נשמרה', 'התראה נשמרה בהצלחה!', 'addAlertModal');
+      // הצגת הודעת הצלחה דרך מערכת ההודעות
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification('התראה נשמרה', 'התראה נשמרה בהצלחה!');
+      }
     } else {
       const errorText = await response.text();
       console.error('🔧 Server error response:', errorText);
@@ -1354,7 +1355,7 @@ async function saveAlert() {
     }
   } catch (error) {
     console.error('🔧 Error saving alert:', error);
-    showModalNotification('error', 'שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message, 'addAlertModal');
+    showErrorNotification('שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message);
   }
 }
 
@@ -1709,8 +1710,10 @@ async function updateAlert() {
       // רענון הנתונים
       loadAlertsData();
 
-      // הצגת הודעה
-      showSuccessNotification('התראה עודכנה', 'התראה עודכנה בהצלחה!');
+      // הצגת הודעת הצלחה דרך מערכת ההודעות
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification('התראה עודכנה', 'התראה עודכנה בהצלחה!');
+      }
     } else {
       throw new Error(`שגיאה בעדכון התראה: ${response.status}`);
     }
@@ -1724,9 +1727,28 @@ async function updateAlert() {
  * מחיקת התראה
  */
 async function deleteAlert(alertId) {
-  if (!confirm('האם אתה בטוח שברצונך למחוק התראה זו?')) {
+  const alert = alertsData.find(a => a.id === alertId);
+  if (!alert) {
+    showErrorNotification('התראה לא נמצאה', 'התראה לא נמצאה');
     return;
   }
+
+  // הצגת חלון אישור מחיקה
+  showDeleteWarning('alert', `התראה #${alertId}`,
+    async () => {
+      // פונקציה שתרוץ אחרי אישור המחיקה
+      await performDeleteAlert(alertId);
+    },
+    () => {
+      console.log('מחיקת התראה בוטלה');
+    }
+  );
+}
+
+/**
+ * ביצוע מחיקת התראה בפועל
+ */
+async function performDeleteAlert(alertId) {
 
   try {
     // מוחק התראה
@@ -1741,8 +1763,10 @@ async function deleteAlert(alertId) {
       // רענון הנתונים
       loadAlertsData();
 
-      // הצגת הודעה
-      showSuccessNotification('התראה נמחקה', 'התראה נמחקה בהצלחה!');
+      // הצגת הודעת הצלחה דרך מערכת ההודעות
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification('התראה נמחקה', 'התראה נמחקה בהצלחה!');
+      }
     } else {
       // ניסיון לקרוא את פרטי השגיאה
       let errorMessage = `שגיאה במחיקת התראה: ${response.status}`;
@@ -1880,8 +1904,8 @@ if (typeof window.toggleMainSection !== 'function') {
         icon.textContent = isCollapsed ? '▲' : '▼';
       }
 
-      // שמירת המצב ב-localStorage
-      localStorage.setItem('alertsSectionCollapsed', !isCollapsed);
+      // שמירת המצב ב-localStorage עם המפתח הנכון
+      localStorage.setItem('alertsMainSectionCollapsed', !isCollapsed);
     }
   };
 }
@@ -1891,6 +1915,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // שחזור מצב הסקשנים
   restoreAlertsSectionState();
+
+  // קריאה נוספת לשחזור מצב הסקשנים מהמערכת הגלובלית
+  setTimeout(() => {
+    if (typeof window.restoreAllSectionStates === 'function') {
+      window.restoreAllSectionStates();
+    }
+  }, 100);
 
   // אתחול פילטרים
   if (typeof window.initializePageFilters === 'function') {
@@ -1933,6 +1964,7 @@ window.filterAlertsLocally = filterAlertsLocally;
 window.showAddAlertModal = showAddAlertModal;
 window.editAlert = editAlert;
 window.deleteAlert = deleteAlert;
+window.performDeleteAlert = performDeleteAlert;
 window.saveAlert = saveAlert;
 window.updateAlert = updateAlert;
 window.updateStatusAndTriggered = updateStatusAndTriggered;

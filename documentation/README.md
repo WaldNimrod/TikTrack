@@ -3,7 +3,7 @@
 ## 📋 Overview
 This is the main documentation directory for the TikTrack investment management system. All project documentation is organized here in a logical structure.
 
-## 🆕 Recent Updates (Version 2.5.0)
+## 🆕 Recent Updates (Version 1.5.0)
 
 ### 🎯 New Completed Modules
 - **Currency Management System**: Complete CRUD operations for currencies with validation
@@ -34,11 +34,11 @@ This is the main documentation directory for the TikTrack investment management 
 - **CSS File References**: Removed references to non-existent CSS files
 
 ### 📚 Documentation Updates
-- **Updated CHANGELOG.md**: Added comprehensive version 2.5.0 documentation
+- **Updated CHANGELOG.md**: Added comprehensive version 1.5.0 documentation
 - **Enhanced CSS Documentation**: Added modal styling standards to CSS_ARCHITECTURE.md
 - **Created MODAL_STYLING_GUIDE.md**: New comprehensive guide for modal styling standards
 - **Updated Preferences Documentation**: Added auto-save system and new fields documentation
-- **Created VERSION_2.5.0_SUMMARY.md**: Comprehensive summary of all version 2.5.0 changes
+- **Created VERSION_1.5.0_SUMMARY.md**: Comprehensive summary of all version 1.5.0 changes
 - **Updated HANDOVER_SUMMARY.md**: Added new completed modules and features
 
 ## 🏗️ Structure
@@ -73,6 +73,7 @@ This is the main documentation directory for the TikTrack investment management 
   - UI components
   - Console cleanup system
   - User guides
+  - [מערכת התראות והודעות](frontend/NOTIFICATION_SYSTEM.md) - הסבר מפורט על ההבדל בין מערכת ההתראות למערכת ההודעות
 
 #### ⚙️ **Backend Documentation**
 - **`backend/`** - Backend system documentation

@@ -1209,13 +1209,13 @@ function updateTickersTable(tickers) {
                     <tbody>
                         <tr>
                             <td class="p-0 pe-1">
-                                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(${ticker.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                                ${createLinkButton(`viewLinkedItemsForTicker(${ticker.id})`)}
                             </td>
                             <td class="p-0 pe-1">
-                                <button class="btn btn-sm btn-secondary" onclick="editTicker(${ticker.id})" title="ערוך">✏️</button>
+                                ${createEditButton(`editTicker(${ticker.id})`)}
                             </td>
                             <td class="p-0">
-                                <button class="btn btn-sm btn-danger" onclick="deleteTicker(${ticker.id})" title="מחק">🗑️</button>
+                                ${createDeleteButton(`deleteTicker(${ticker.id})`)}
                             </td>
                         </tr>
                     </tbody>

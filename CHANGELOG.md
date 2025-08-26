@@ -2,7 +2,7 @@
 
 ## [2025-08-25] - Tickers Module Completion & Centralized Warning System
 
-### ✅ Tickers Module - Complete Implementation (v2.6)
+### ✅ Tickers Module - Complete Implementation (v1.6)
 - **Company Name Length Update**: Extended from 12 to 25 characters
 - **Centralized Warning System**: New `warning-system.js` with callback support
 - **Enhanced Currency System**: API dropdown + display functions with icons
@@ -69,7 +69,7 @@
 
 ## [2025-08-25] - Executions Page Completion & Global System Improvements
 
-### ✅ Executions Page - Complete Implementation (v2.5)
+### ✅ Executions Page - Complete Implementation (v1.5)
 - **Full Data Display**: Complete table with linked tickers and trades information
 - **Advanced Modals**: Add, Edit, Delete modals with proper z-index management
 - **Global Number Formatting**: Thousands separators for all numbers (1,234,567)
@@ -149,7 +149,7 @@
 
 ## [2025-08-24] - Active Alerts Component Enhancement & Database Constraints
 
-### ✅ Active Alerts Component (v2.4)
+### ✅ Active Alerts Component (v1.4)
 - **Enhanced Related Object Display**: Added link icon (🔗) before related object titles
 - **Interactive Click Functionality**: Click on related object shows "בפיתוח" message
 - **Improved Visual Design**: Hover effects and smooth transitions for linked objects

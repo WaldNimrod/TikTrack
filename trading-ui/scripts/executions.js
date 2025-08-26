@@ -1500,13 +1500,13 @@ async function updateExecutionsTable(executions) {
                         <tbody>
                             <tr>
                                 <td class="p-0 pe-1">
-                                    <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
+                                    ${createEditButton(`editExecution(${execution.id})`)}
                                 </td>
                                 <td class="p-0 pe-1">
-                                    <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
+                                    ${createDeleteButton(`deleteExecution(${execution.id})`)}
                                 </td>
                                 <td class="p-0">
-                                    <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${execution.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                                    ${createLinkButton(`viewLinkedItems(${execution.id})`)}
                                 </td>
                             </tr>
                         </tbody>

@@ -12,6 +12,8 @@
 - **`translateStatus`** → הוחלף ב-`window.translateTradeStatus`
 - **`translateType`** → הוחלף ב-`window.translateTradeType`
 - **קריאות API** → תוקנו מ-`window.apiCall` ל-`fetch` רגיל
+- **`confirm()`** → הוחלף ב-`window.showDeleteWarning`
+- **`showModalNotification`** → הוחלף ב-`window.showSuccessNotification` ו-`window.showErrorNotification`
 
 ### 2. **simple-filter.js** ✅
 - **`translateStatus`** → הוחלף ב-`window.translateTradeStatus`
@@ -92,12 +94,22 @@
 - `window.showSuccessNotification(title, message)`
 - `window.showWarningNotification(title, message)`
 
+### פונקציות אזהרות:
+- `window.showDeleteWarning(itemType, itemName, onConfirm, onCancel)`
+- `window.showLinkedItemsWarning(itemType, linkedCount, onConfirm, onCancel)`
+- `window.showValidationWarning(field, message)`
+- `window.showWarning(type, data, options, onConfirm, onCancel)`
+
 ## 📝 הערות חשובות
 
 ### פונקציות שצריכות להישאר מקומיות:
 - פונקציות ספציפיות לעמוד (למשל `loadAlertsData`, `updateAlertsTable`)
 - פונקציות ולידציה ספציפיות (למשל `validateAlertStatusCombination`)
 - פונקציות UI ספציפיות (למשל `populateRelatedObjects`)
+
+## 📚 תיעוד נוסף
+
+- [מערכת התראות והודעות](../frontend/NOTIFICATION_SYSTEM.md) - הסבר מפורט על ההבדל בין מערכת ההתראות למערכת ההודעות
 
 ### פונקציות שצריכות להיות גלובליות:
 - פונקציות מודלים (סגירה, פתיחה)

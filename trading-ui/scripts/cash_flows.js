@@ -222,7 +222,7 @@ function showDeleteCashFlowModal(id) {
     // שימוש במערכת האזהרות המרכזית
     const cashFlowName = `${cashFlow.type} - ${cashFlow.amount}`;
     console.log('📝 שם התזרים למחיקה:', cashFlowName);
-    
+
     window.showDeleteWarning(
         'תזרים מזומנים',
         cashFlowName,
@@ -262,7 +262,7 @@ async function loadCashFlows() {
             updatePageSummaryStats();
         } else {
             console.error('❌ שגיאה בטעינת תזרימי מזומנים:', result.error);
-            
+
             // הצגת הודעת שגיאה
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת תזרימי מזומנים');
@@ -270,7 +270,7 @@ async function loadCashFlows() {
         }
     } catch (error) {
         console.error('❌ שגיאה בטעינת תזרימי מזומנים:', error);
-        
+
         // הצגת הודעת שגיאה
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת תזרימי מזומנים');
@@ -452,7 +452,7 @@ async function saveCashFlow() {
             await loadCashFlows();
         } else {
             console.error('❌ שגיאה בשמירת תזרים מזומנים:', result.error);
-            
+
             // הצגת הודעת שגיאה
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת תזרים מזומנים');
@@ -462,7 +462,7 @@ async function saveCashFlow() {
         }
     } catch (error) {
         console.error('❌ שגיאה בשמירת תזרים מזומנים:', error);
-        
+
         // הצגת הודעת שגיאה
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת תזרים מזומנים');
@@ -650,7 +650,7 @@ async function updateCashFlow() {
             await loadCashFlows();
         } else {
             console.error('❌ שגיאה בעדכון תזרים מזומנים:', result.error);
-            
+
             // הצגת הודעת שגיאה
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון תזרים מזומנים');
@@ -660,7 +660,7 @@ async function updateCashFlow() {
         }
     } catch (error) {
         console.error('❌ שגיאה בעדכון תזרים מזומנים:', error);
-        
+
         // הצגת הודעת שגיאה
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון תזרים מזומנים');
@@ -692,7 +692,7 @@ async function confirmDeleteCashFlow(id) {
 
         if (result.status === 'success') {
             console.log('✅ מחיקה הצליחה, סוגר מודל ומעדכן נתונים');
-            
+
             // הצגת הודעת הצלחה
             if (window.showSuccessNotification) {
                 window.showSuccessNotification('תזרים מזומנים', 'תזרים המזומנים נמחק בהצלחה');
@@ -706,7 +706,7 @@ async function confirmDeleteCashFlow(id) {
             console.log('✅ נתונים נטענו מחדש');
         } else {
             console.error('❌ שגיאה במחיקת תזרים מזומנים:', result.error);
-            
+
             // הצגת הודעת שגיאה
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים מזומנים');
@@ -716,7 +716,7 @@ async function confirmDeleteCashFlow(id) {
         }
     } catch (error) {
         console.error('❌ שגיאה במחיקת תזרים מזומנים:', error);
-        
+
         // הצגת הודעת שגיאה
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים מזומנים');
@@ -740,7 +740,7 @@ function viewLinkedItemsForCashFlow(cashFlowId) {
         window.showLinkedItemsModal('cash_flow', cashFlowId, 'תזרים מזומנים');
     } else {
         console.error('❌ מערכת הפריטים המקושרים לא זמינה');
-        
+
         // הצגת הודעת שגיאה
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', 'מערכת הפריטים המקושרים לא זמינה כרגע');
@@ -770,7 +770,7 @@ async function loadCurrenciesFromServer() {
         }
     } catch (error) {
         console.error('שגיאה בטעינת מטבעות מהשרת:', error);
-        
+
         // הצגת הודעת שגיאה
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת מטבעות מהשרת');
@@ -804,7 +804,7 @@ async function loadAccountsForCashFlow() {
         }
     } catch (error) {
         console.error('שגיאה בטעינת חשבונות:', error);
-        
+
         // הצגת הודעת שגיאה
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת חשבונות');
@@ -844,7 +844,7 @@ async function loadCurrenciesForCashFlow() {
     try {
         // טעינת מטבעות מהשרת עם המערכת החדשה
         const currencies = await loadCurrenciesFromServer();
-        
+
         const select = document.getElementById('cashFlowCurrencyId');
         select.innerHTML = '<option value="">בחר מטבע...</option>';
 
@@ -856,7 +856,7 @@ async function loadCurrenciesForCashFlow() {
         });
     } catch (error) {
         console.error('שגיאה בטעינת מטבעות:', error);
-        
+
         // הצגת הודעת שגיאה
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת מטבעות');
@@ -871,7 +871,7 @@ async function loadCurrenciesForEditCashFlow() {
     try {
         // טעינת מטבעות מהשרת עם המערכת החדשה
         const currencies = await loadCurrenciesFromServer();
-        
+
         const select = document.getElementById('editCashFlowCurrencyId');
         select.innerHTML = '<option value="">בחר מטבע...</option>';
 
@@ -903,10 +903,10 @@ function renderCashFlowsTable() {
     cashFlowsData.forEach(cashFlow => {
         const row = document.createElement('tr');
         const accountName = cashFlow.account_name || `חשבון ${cashFlow.account_id}`;
-        
+
         // שימוש במערכת המטבעות החדשה
-        const currencyDisplay = window.getCashFlowCurrencyDisplay ? 
-            window.getCashFlowCurrencyDisplay(cashFlow) : 
+        const currencyDisplay = window.getCashFlowCurrencyDisplay ?
+            window.getCashFlowCurrencyDisplay(cashFlow) :
             (cashFlow.currency_symbol || '$');
 
         // קבלת סוג עם צבע
@@ -934,13 +934,13 @@ function renderCashFlowsTable() {
                     <tbody>
                         <tr>
                             <td class="p-0 pe-1">
-                                <button class="btn btn-sm btn-secondary" onclick="editCashFlow(${cashFlow.id})" title="ערוך">✏️</button>
+                                ${createEditButton(`editCashFlow(${cashFlow.id})`)}
                             </td>
                             <td class="p-0 pe-1">
-                                <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>
+                                ${createDeleteButton(`deleteCashFlow(${cashFlow.id})`)}
                             </td>
                             <td class="p-0">
-                                <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForCashFlow(${cashFlow.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                                ${createLinkButton(`viewLinkedItemsForCashFlow(${cashFlow.id})`)}
                             </td>
                         </tr>
                     </tbody>
@@ -992,7 +992,7 @@ function formatAmount(amount) {
     if (window.formatCurrencyWithCommas) {
         return window.formatCurrencyWithCommas(amount, 'USD');
     }
-    
+
     // גיבוי למערכת הישנה
     return new Intl.NumberFormat('he-IL', {
         style: 'currency',
@@ -1046,7 +1046,7 @@ function formatCashFlowAmount(amount) {
     if (window.formatCurrencyWithCommas) {
         const formattedAmount = window.formatCurrencyWithCommas(absAmount, 'USD');
         const displayAmount = `${isPositive ? '+' : '-'}${formattedAmount}`;
-        
+
         // שימוש במערכת הצביעה החדשה
         if (window.colorAmountByValue) {
             return window.colorAmountByValue(numAmount, displayAmount);

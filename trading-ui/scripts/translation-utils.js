@@ -302,7 +302,7 @@ function formatNumberWithCommas(number, options = {}) {
         useGrouping: true
     };
     const finalOptions = { ...defaultOptions, ...options };
-    
+
     return num.toLocaleString('he-IL', finalOptions);
 }
 
@@ -323,7 +323,7 @@ function formatCurrencyWithCommas(amount, currency = 'USD', options = {}) {
         useGrouping: true
     };
     const finalOptions = { ...defaultOptions, ...options };
-    
+
     return num.toLocaleString('he-IL', finalOptions);
 }
 
@@ -337,7 +337,7 @@ function formatCurrencyWithCommas(amount, currency = 'USD', options = {}) {
 function colorAmountByValue(amount, displayText = null, element = null) {
     const numAmount = parseFloat(amount);
     const color = numAmount >= 0 ? '#28a745' : '#dc3545'; // ירוק לחיובי, אדום לשלילי
-    
+
     // אם יש אלמנט, נעדכן אותו ישירות
     if (element) {
         element.textContent = displayText || formatNumberWithCommas(numAmount);
@@ -345,7 +345,7 @@ function colorAmountByValue(amount, displayText = null, element = null) {
         element.style.fontWeight = 'bold';
         return;
     }
-    
+
     // אחרת, נחזיר HTML
     const text = displayText || formatNumberWithCommas(numAmount);
     return `<span style="color: ${color}; font-weight: bold;">${text}</span>`;
@@ -385,6 +385,14 @@ window.translationUtils = {
     colorAmount: colorAmountByValue
 };
 
+// Alert Condition Translation Functions
+window.translateAlertCondition = translateAlertConditionById;
+window.translateConditionFields = translateConditionFields;
+window.translateLegacyCondition = translateLegacyCondition;
+window.findAlertById = findAlertById;
+window.getConditionAttributeOptions = getConditionAttributeOptions;
+window.getConditionOperatorOptions = getConditionOperatorOptions;
+
 console.log('✅ Translation utilities loaded successfully');
 
 /**
@@ -416,7 +424,7 @@ window.convertExecutionActionToHebrew = translateExecutionAction; // Backward co
  */
 function getCurrencyIcon(currencySymbol) {
     if (!currencySymbol) return '💱';
-    
+
     const currencyIcons = {
         'USD': '💵',
         'EUR': '💶',
@@ -426,7 +434,7 @@ function getCurrencyIcon(currencySymbol) {
         'BTC': '₿',
         'ETH': 'Ξ'
     };
-    
+
     return currencyIcons[currencySymbol.toUpperCase()] || '💱';
 }
 
@@ -493,4 +501,151 @@ function getCashFlowCurrencyDisplay(cashFlow) {
         return `<span class="currency-icon">${icon}</span> ${currencySymbol}`;
     }
     return '<span class="text-muted">לא מוגדר</span>';
+}
+
+// ===== פונקציות תרגום תנאי התראות =====
+
+/**
+ * תרגום תנאי התראה לפי מזהה
+ * @param {number} alertId - מזהה ההתראה
+ * @returns {string} - מחרוזת מתורגמת לעברית
+ */
+function translateAlertConditionById(alertId) {
+    // חיפוש ההתראה בדאטהבייס או בזכרון
+    const alert = findAlertById(alertId);
+    if (!alert) {
+        return 'תנאי לא ידוע';
+    }
+
+    // אם יש שדות חדשים, השתמש בהם
+    if (alert.condition_attribute && alert.condition_operator && alert.condition_number !== undefined) {
+        return translateConditionFields(
+            alert.condition_attribute,
+            alert.condition_operator,
+            alert.condition_number
+        );
+    }
+
+    // אחרת, השתמש בפורמט הישן
+    if (alert.condition) {
+        return translateLegacyCondition(alert.condition);
+    }
+
+    return 'תנאי לא ידוע';
+}
+
+/**
+ * תרגום תנאי לפי שלושת השדות החדשים
+ * @param {string} attribute - condition_attribute
+ * @param {string} operator - condition_operator  
+ * @param {string|number} number - condition_number
+ * @returns {string} - מחרוזת מתורגמת לעברית
+ */
+function translateConditionFields(attribute, operator, number) {
+    // תרגום שדה התכונה
+    const attributeTranslations = {
+        'price': 'מחיר',
+        'change': 'שינוי',
+        'ma': 'ממוצע נע',
+        'volume': 'נפח מסחר'
+    };
+
+    // תרגום האופרטור לסימנים חשבונאיים
+    const operatorSymbols = {
+        'more_than': '>',
+        'less_than': '<',
+        'cross': '↔',
+        'cross_up': '↗',
+        'cross_down': '↘',
+        'change': 'Δ',
+        'change_up': '↗',
+        'change_down': '↘',
+        'equals': '='
+    };
+
+    const translatedAttribute = attributeTranslations[attribute] || attribute;
+    const operatorSymbol = operatorSymbols[operator] || operator;
+
+    // עיצוב המספר
+    let formattedNumber = number;
+    if (attribute === 'change' || attribute === 'ma') {
+        // הוספת סימן אחוזים לשינוי וממוצע
+        formattedNumber = `${number}%`;
+    } else if (attribute === 'volume') {
+        // עיצוב נפח עם פסיקים
+        formattedNumber = parseInt(number).toLocaleString('he-IL');
+    }
+
+    return `${translatedAttribute} ${operatorSymbol} ${formattedNumber}`;
+}
+
+/**
+ * תרגום תנאי בפורמט הישן (מחרוזת אחת)
+ * @param {string} conditionString - מחרוזת התנאי בפורמט "attribute | operator | number"
+ * @returns {string} - מחרוזת מתורגמת לעברית
+ */
+function translateLegacyCondition(conditionString) {
+    if (!conditionString || typeof conditionString !== 'string') {
+        return 'תנאי לא ידוע';
+    }
+
+    // פיצול המחרוזת לפי " | "
+    const parts = conditionString.split(' | ');
+    if (parts.length !== 3) {
+        return conditionString; // החזר את המחרוזת המקורית אם הפורמט לא נכון
+    }
+
+    const [attribute, operator, number] = parts;
+    return translateConditionFields(attribute, operator, number);
+}
+
+/**
+ * פונקציה עזר לחיפוש התראה לפי מזהה
+ * @param {number} alertId - מזהה ההתראה
+ * @returns {object|null} - אובייקט ההתראה או null
+ */
+function findAlertById(alertId) {
+    // חיפוש בקומפוננטת ההתראות הפעילות
+    const activeAlertsComponent = document.querySelector('active-alerts');
+    if (activeAlertsComponent && activeAlertsComponent.alerts) {
+        return activeAlertsComponent.alerts.find(alert => alert.id === alertId);
+    }
+
+    // חיפוש גלובלי (אם יש)
+    if (window.globalAlerts && window.globalAlerts.length) {
+        return window.globalAlerts.find(alert => alert.id === alertId);
+    }
+
+    return null;
+}
+
+/**
+ * פונקציה לקבלת אפשרויות התכונות (לטפסים)
+ * @returns {Array} - מערך של אובייקטים עם ערך ותווית
+ */
+function getConditionAttributeOptions() {
+    return [
+        { value: 'price', label: 'מחיר' },
+        { value: 'change', label: 'שינוי' },
+        { value: 'ma', label: 'ממוצע נע' },
+        { value: 'volume', label: 'נפח מסחר' }
+    ];
+}
+
+/**
+ * פונקציה לקבלת אפשרויות האופרטורים (לטפסים)
+ * @returns {Array} - מערך של אובייקטים עם ערך ותווית
+ */
+function getConditionOperatorOptions() {
+    return [
+        { value: 'more_than', label: 'יותר מ' },
+        { value: 'less_than', label: 'פחות מ' },
+        { value: 'cross', label: 'חוצה' },
+        { value: 'cross_up', label: 'חוצה למעלה' },
+        { value: 'cross_down', label: 'חוצה למטה' },
+        { value: 'change', label: 'שינוי' },
+        { value: 'change_up', label: 'שינוי למעלה' },
+        { value: 'change_down', label: 'שינוי למטה' },
+        { value: 'equals', label: 'שווה' }
+    ];
 }

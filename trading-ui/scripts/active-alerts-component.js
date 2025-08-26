@@ -455,7 +455,6 @@ class ActiveAlertsComponent extends HTMLElement {
           ${message ? `<p class="alert-card-message"><strong>${message}</strong></p>` : ''}
           <div class="alert-card-details">
             <span class="alert-detail-item condition-item">${window.translateConditionFields(alert.condition_attribute, alert.condition_operator, alert.condition_number)}</span>
-            <span class="alert-detail-item condition-raw">מבנה: ${alert.condition_attribute} | ${alert.condition_operator} | ${alert.condition_number}</span>
             <span class="alert-detail-item ${changeClass}">${currentPrice}</span>
             <span class="alert-detail-item ${changeClass}">${dailyChange}</span>
           </div>

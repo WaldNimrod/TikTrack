@@ -32,10 +32,10 @@ function editNote(id) {
   showEditNoteModal(id);
 }
 
-  function deleteNote(id) {
-    console.log('🔄 deleteNote נקראה עבור ID:', id);
-    showDeleteNoteModal(id);
-  }
+function deleteNote(id) {
+  console.log('🔄 deleteNote נקראה עבור ID:', id);
+  showDeleteNoteModal(id);
+}
 
 // פונקציות לפתיחה/סגירה של סקשנים
 function toggleTopSection() {
@@ -197,7 +197,7 @@ async function loadNotesData() {
 
     // טעינת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים)
     console.log('🔄 טוען נתונים נוספים...');
-    
+
     // פונקציה לטעינת נתונים עם טיפול בשגיאות
     const loadDataSafely = async (url, dataName) => {
       try {
@@ -287,7 +287,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
   // בניית שורות הטבלה
   const rows = notes.map(note => {
     const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-    
+
     // הצגת תוכן כטקסט פשוט בלבד
     let contentDisplay = note.content || 'ללא תוכן';
     // הסרת תגי HTML אם יש
@@ -296,14 +296,14 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     if (contentDisplay.length > 100) {
       contentDisplay = contentDisplay.substring(0, 100) + '...';
     }
-    
+
     // הצגת קובץ עם אייקון ו-10 תווים ראשונים
     let attachmentDisplay = '-';
     if (note.attachment) {
       const fileName = note.attachment;
       const fileExtension = fileName.split('.').pop()?.toLowerCase();
       let fileIcon = '📄'; // ברירת מחדל
-      
+
       // קביעת אייקון לפי סוג הקובץ
       if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
         fileIcon = '🖼️';
@@ -316,7 +316,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
       } else if (['xls', 'xlsx'].includes(fileExtension)) {
         fileIcon = '📊';
       }
-      
+
       // הצגת אייקון + 10 תווים ראשונים
       const shortName = fileName.length > 10 ? fileName.substring(0, 10) + '...' : fileName;
       attachmentDisplay = `${fileIcon} ${shortName}`;
@@ -445,13 +445,13 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
             <tbody>
               <tr>
                 <td class="p-0 pe-1">
-                  <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForNote(${note.id})" title="צפה באלמנטים מקושרים">🔗</button>
+                  ${createLinkButton(`viewLinkedItemsForNote(${note.id})`)}
                 </td>
                 <td class="p-0 pe-1">
-                  <button class="btn btn-sm btn-secondary" onclick="editNote('${note.id}')" title="ערוך">✏️</button>
+                  ${createEditButton(`editNote('${note.id}')`)}
                 </td>
                 <td class="p-0">
-                  <button class="btn btn-sm btn-danger" onclick="deleteNote('${note.id}')" title="מחק">🗑️</button>
+                  ${createDeleteButton(`deleteNote('${note.id}')`)}
                 </td>
               </tr>
             </tbody>
@@ -463,7 +463,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
 
   tbody.innerHTML = rows;
   console.log('✅ טבלת ההערות עודכנה בהצלחה');
-  
+
   // עדכון table-count ו-info-summary
   updateNotesSummary(notes);
 }
@@ -471,47 +471,47 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
 // פונקציה לעדכון סיכום הערות
 function updateNotesSummary(notes) {
   console.log('🔄 updateNotesSummary נקראה עם', notes.length, 'הערות');
-  
+
   // עדכון table-count
   const tableCountElement = document.querySelector('.table-count');
   if (tableCountElement) {
     tableCountElement.textContent = `${notes.length} הערות`;
   }
-  
+
   // עדכון info-summary
   const totalNotesElement = document.getElementById('totalNotes');
   const activeNotesElement = document.getElementById('activeNotes');
   const recentNotesElement = document.getElementById('recentNotes');
   const totalLinksElement = document.getElementById('totalLinks');
-  
+
   if (totalNotesElement) {
     totalNotesElement.textContent = notes.length;
   }
-  
+
   if (activeNotesElement) {
     // הערות פעילות = כל ההערות (כרגע)
     activeNotesElement.textContent = notes.length;
   }
-  
+
   if (recentNotesElement) {
     // הערות חדשות = הערות מה-7 ימים האחרונים
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
+
     const recentNotes = notes.filter(note => {
       const noteDate = new Date(note.created_at);
       return noteDate >= oneWeekAgo;
     });
-    
+
     recentNotesElement.textContent = recentNotes.length;
   }
-  
+
   if (totalLinksElement) {
     // סה"כ קישורים = הערות עם related_id
     const linkedNotes = notes.filter(note => note.related_id && note.related_type_id);
     totalLinksElement.textContent = linkedNotes.length;
   }
-  
+
   console.log('✅ סיכום הערות עודכן');
 }
 
@@ -530,7 +530,7 @@ function showAddNoteModal() {
 
   // איפוס הטופס
   document.getElementById('addNoteForm').reset();
-  
+
   // ניקוי עורך הטקסט
   setEditorContent('', 'add');
 
@@ -581,7 +581,7 @@ async function loadNoteData(noteId) {
 
     const responseData = await response.json();
     console.log('✅ נטענו נתוני הערה:', responseData);
-    
+
     // חילוץ הנתונים מהמבנה הנכון
     const note = responseData.data || responseData;
     console.log('🔧 נתוני הערה לחילוץ:', note);
@@ -593,22 +593,22 @@ async function loadNoteData(noteId) {
     // בחירת סוג הקשר
     const relationType = note.related_type_id;
     console.log('🔧 סוג קשר:', relationType, 'מזהה קשור:', note.related_id);
-    
+
     if (relationType) {
       // בחירת הרדיו באטון הנכון
       const radioButton = document.querySelector(`input[name="editNoteRelationType"][value="${relationType}"]`);
       console.log('🔧 רדיו באטון שנמצא:', radioButton);
-      
+
       if (radioButton) {
         radioButton.checked = true;
         console.log('✅ רדיו באטון נבחר');
-        
+
         // טעינת נתונים למודל אם עוד לא נטענו
         if (typeof window.loadModalData === 'function') {
           console.log('🔄 טוען נתונים למודל...');
           await window.loadModalData();
         }
-        
+
         // מילוי הרשימה הנכונה לפי סוג הקשר
         console.log('🔄 ממלא רשימה לפי סוג:', relationType);
         await populateEditSelectByType(relationType, note.related_id);
@@ -782,7 +782,7 @@ function populateSelect(selectId, data, field, prefix = '') {
 
 function onNoteRelationTypeChange() {
   console.log('🔄 onNoteRelationTypeChange נקראה');
-  
+
   // הפונקציה הזו נקראת בעת שינוי רדיו באטון
   // הלוגיקה האמיתית נמצאת ב-updateRadioButtons
   // אבל אנחנו צריכים אותה לעבוד גם בעת טעינת נתונים לעריכה
@@ -790,12 +790,12 @@ function onNoteRelationTypeChange() {
 
 async function populateEditSelectByType(relationType, selectedId) {
   console.log('🔄 populateEditSelectByType נקראה עבור:', relationType, selectedId);
-  
+
   try {
     let data = [];
     let displayField = '';
     let placeholder = '';
-    
+
     switch (parseInt(relationType)) {
       case 1: // חשבון
         const accountsResponse = await fetch('/api/v1/accounts/');
@@ -826,12 +826,12 @@ async function populateEditSelectByType(relationType, selectedId) {
         placeholder = 'טיקר';
         break;
     }
-    
+
     console.log('🔧 מילוי רשימה עם:', data.length, 'פריטים, שדה תצוגה:', displayField);
-    
+
     // מילוי הרשימה
     populateSelect('editNoteRelatedObjectSelect', data, displayField, placeholder);
-    
+
     // בחירת הערך הנכון
     if (selectedId) {
       console.log('🔧 בוחר ערך:', selectedId);
@@ -847,7 +847,7 @@ async function populateEditSelectByType(relationType, selectedId) {
     } else {
       console.warn('⚠️ אין מזהה נבחר');
     }
-    
+
   } catch (error) {
     console.error('❌ שגיאה במילוי רשימה לעריכה:', error);
   }
@@ -1093,11 +1093,11 @@ async function updateNoteFromModal() {
   }
 }
 
-  function showDeleteNoteModal(noteId) {
-    console.log('🔄 showDeleteNoteModal נקראה עבור ID:', noteId);
-    
-    // יצירת המודל דינמית
-    const modalHtml = `
+function showDeleteNoteModal(noteId) {
+  console.log('🔄 showDeleteNoteModal נקראה עבור ID:', noteId);
+
+  // יצירת המודל דינמית
+  const modalHtml = `
       <div class="modal fade" id="deleteNoteModal" tabindex="-1" aria-labelledby="deleteNoteModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -1117,40 +1117,40 @@ async function updateNoteFromModal() {
         </div>
       </div>
     `;
-    
-    // הסרת מודל קיים אם יש
-    const existingModal = document.getElementById('deleteNoteModal');
-    if (existingModal) {
-      existingModal.remove();
-    }
-    
-    // הוספת המודל לדף
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('deleteNoteModal'));
-    modal.show();
-    
-    // הסרת המודל מהדף אחרי סגירה
-    document.getElementById('deleteNoteModal').addEventListener('hidden.bs.modal', function () {
-      this.remove();
-    });
+
+  // הסרת מודל קיים אם יש
+  const existingModal = document.getElementById('deleteNoteModal');
+  if (existingModal) {
+    existingModal.remove();
   }
 
-  async function confirmDeleteNote(noteId) {
-    console.log('🔄 confirmDeleteNote נקראה עבור ID:', noteId);
-    
-    // סגירת המודל
-    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoteModal'));
-    if (modal) {
-      modal.hide();
-    }
-    
-    // מחיקת ההערה
-    await deleteNoteFromServer(noteId);
+  // הוספת המודל לדף
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+  // הצגת המודל
+  const modal = new bootstrap.Modal(document.getElementById('deleteNoteModal'));
+  modal.show();
+
+  // הסרת המודל מהדף אחרי סגירה
+  document.getElementById('deleteNoteModal').addEventListener('hidden.bs.modal', function () {
+    this.remove();
+  });
+}
+
+async function confirmDeleteNote(noteId) {
+  console.log('🔄 confirmDeleteNote נקראה עבור ID:', noteId);
+
+  // סגירת המודל
+  const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoteModal'));
+  if (modal) {
+    modal.hide();
   }
 
-  async function deleteNoteFromServer(noteId) {
+  // מחיקת ההערה
+  await deleteNoteFromServer(noteId);
+}
+
+async function deleteNoteFromServer(noteId) {
   try {
     const response = await fetch(`/api/v1/notes/${noteId}`, {
       method: 'DELETE'
@@ -1235,13 +1235,13 @@ window.updateGridFromComponent = updateGridFromComponent;
 window.showAddNoteModal = showAddNoteModal;
 window.showEditNoteModal = showEditNoteModal;
 window.saveNote = saveNote;
-  window.updateNoteFromModal = updateNoteFromModal;
-  window.deleteNoteFromServer = deleteNoteFromServer;
-  window.showDeleteNoteModal = showDeleteNoteModal;
-  window.confirmDeleteNote = confirmDeleteNote;
-  window.onNoteRelationTypeChange = onNoteRelationTypeChange;
-  window.populateEditSelectByType = populateEditSelectByType;
-  window.setupNoteValidationEvents = setupNoteValidationEvents;
+window.updateNoteFromModal = updateNoteFromModal;
+window.deleteNoteFromServer = deleteNoteFromServer;
+window.showDeleteNoteModal = showDeleteNoteModal;
+window.confirmDeleteNote = confirmDeleteNote;
+window.onNoteRelationTypeChange = onNoteRelationTypeChange;
+window.populateEditSelectByType = populateEditSelectByType;
+window.setupNoteValidationEvents = setupNoteValidationEvents;
 window.updateRadioButtons = updateRadioButtons;
 window.populateSelect = populateSelect;
 
@@ -1400,7 +1400,7 @@ window.sortTable = sortTable;
  */
 function showTickerPage(symbol) {
   console.log(`🔄 showTickerPage נקראה עבור סמל: ${symbol}`);
-  
+
   if (typeof window.showNotification === 'function') {
     window.showNotification(`דף הטיקר ${symbol} נמצא בפיתוח`, 'info');
   } else {
@@ -1423,14 +1423,14 @@ window.showTickerPage = showTickerPage;
 function formatText(command, mode = 'add') {
   const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
   const editor = document.getElementById(editorId);
-  
+
   if (!editor) {
     console.error(`❌ לא נמצא עורך עם ID: ${editorId}`);
     return;
   }
-  
+
   editor.focus();
-  
+
   switch (command) {
     case 'bold':
       document.execCommand('bold', false, null);
@@ -1477,12 +1477,12 @@ function formatText(command, mode = 'add') {
 function clearFormatting(mode = 'add') {
   const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
   const editor = document.getElementById(editorId);
-  
+
   if (!editor) {
     console.error(`❌ לא נמצא עורך עם ID: ${editorId}`);
     return;
   }
-  
+
   editor.focus();
   document.execCommand('removeFormat', false, null);
 }
@@ -1495,12 +1495,12 @@ function clearFormatting(mode = 'add') {
 function getEditorContent(mode = 'add') {
   const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
   const editor = document.getElementById(editorId);
-  
+
   if (!editor) {
     console.error(`❌ לא נמצא עורך עם ID: ${editorId}`);
     return '';
   }
-  
+
   return editor.innerHTML;
 }
 
@@ -1512,12 +1512,12 @@ function getEditorContent(mode = 'add') {
 function setEditorContent(content, mode = 'add') {
   const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
   const editor = document.getElementById(editorId);
-  
+
   if (!editor) {
     console.error(`❌ לא נמצא עורך עם ID: ${editorId}`);
     return;
   }
-  
+
   editor.innerHTML = content || '';
 }
 

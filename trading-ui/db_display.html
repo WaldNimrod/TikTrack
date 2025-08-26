@@ -122,16 +122,16 @@
                     <th onclick="sortTable(1, 'tradePlansTable')">Account ID (INTEGER)</th>
                     <th onclick="sortTable(2, 'tradePlansTable')">Ticker ID (INTEGER)</th>
                     <th onclick="sortTable(3, 'tradePlansTable')">Investment Type (VARCHAR)</th>
-                    <th onclick="sortTable(4, 'tradePlansTable')">Planned Amount (FLOAT)</th>
-                    <th onclick="sortTable(5, 'tradePlansTable')">Entry Conditions (VARCHAR)</th>
-                    <th onclick="sortTable(6, 'tradePlansTable')">Stop Price (FLOAT)</th>
-                    <th onclick="sortTable(7, 'tradePlansTable')">Target Price (FLOAT)</th>
-                    <th onclick="sortTable(8, 'tradePlansTable')">Reasons (VARCHAR)</th>
-                    <th onclick="sortTable(9, 'tradePlansTable')">Cancelled At (DATETIME)</th>
-                    <th onclick="sortTable(10, 'tradePlansTable')">Cancel Reason (VARCHAR)</th>
-                    <th onclick="sortTable(11, 'tradePlansTable')">Created At (DATETIME)</th>
-                    <th onclick="sortTable(12, 'tradePlansTable')">Side (VARCHAR)</th>
-                    <th onclick="sortTable(13, 'tradePlansTable')">Status (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'tradePlansTable')">Side (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'tradePlansTable')">Status (VARCHAR)</th>
+                    <th onclick="sortTable(6, 'tradePlansTable')">Planned Amount (FLOAT)</th>
+                    <th onclick="sortTable(7, 'tradePlansTable')">Entry Conditions (VARCHAR)</th>
+                    <th onclick="sortTable(8, 'tradePlansTable')">Stop Price (FLOAT)</th>
+                    <th onclick="sortTable(9, 'tradePlansTable')">Target Price (FLOAT)</th>
+                    <th onclick="sortTable(10, 'tradePlansTable')">Reasons (VARCHAR)</th>
+                    <th onclick="sortTable(11, 'tradePlansTable')">Cancelled At (DATETIME)</th>
+                    <th onclick="sortTable(12, 'tradePlansTable')">Cancel Reason (VARCHAR)</th>
+                    <th onclick="sortTable(13, 'tradePlansTable')">Created At (DATETIME)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -191,26 +191,25 @@
               <table class="table" id="tradesTable" data-table-type="trades">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'tradesTable')">Account ID (INTEGER)</th>
-                    <th onclick="sortTable(1, 'tradesTable')">Ticker ID (INTEGER)</th>
-                    <th onclick="sortTable(2, 'tradesTable')">Trade Plan ID (INTEGER)</th>
-                    <th onclick="sortTable(3, 'tradesTable')">Status (VARCHAR)</th>
-                    <th onclick="sortTable(4, 'tradesTable')">Investment Type (VARCHAR)</th>
-                    <th onclick="sortTable(5, 'tradesTable')">Opened At (DATETIME)</th>
-                    <th onclick="sortTable(6, 'tradesTable')">Closed At (DATETIME)</th>
-                    <th onclick="sortTable(7, 'tradesTable')">Cancelled At (DATETIME)</th>
-                    <th onclick="sortTable(8, 'tradesTable')">Cancel Reason (VARCHAR)</th>
-                    <th onclick="sortTable(9, 'tradesTable')">Total P&L (FLOAT)</th>
-                    <th onclick="sortTable(10, 'tradesTable')">Notes (VARCHAR)</th>
-                    <th onclick="sortTable(11, 'tradesTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(0, 'tradesTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'tradesTable')">Account ID (INTEGER)</th>
+                    <th onclick="sortTable(2, 'tradesTable')">Ticker ID (INTEGER)</th>
+                    <th onclick="sortTable(3, 'tradesTable')">Trade Plan ID (INTEGER)</th>
+                    <th onclick="sortTable(4, 'tradesTable')">Status (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'tradesTable')">Investment Type (VARCHAR)</th>
+                    <th onclick="sortTable(6, 'tradesTable')">Side (VARCHAR)</th>
+                    <th onclick="sortTable(7, 'tradesTable')">Closed At (DATETIME)</th>
+                    <th onclick="sortTable(8, 'tradesTable')">Cancelled At (DATETIME)</th>
+                    <th onclick="sortTable(9, 'tradesTable')">Cancel Reason (VARCHAR)</th>
+                    <th onclick="sortTable(10, 'tradesTable')">Total P&L (FLOAT)</th>
+                    <th onclick="sortTable(11, 'tradesTable')">Notes (VARCHAR)</th>
                     <th onclick="sortTable(12, 'tradesTable')">Created At (DATETIME)</th>
-                    <th onclick="sortTable(13, 'tradesTable')">Side (VARCHAR)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="14" class="text-center">טוען נתונים...</td>
+                    <td colspan="13" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -261,14 +260,14 @@
               <table class="table" id="accountsTable" data-table-type="accounts">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'accountsTable')">Name (VARCHAR)</th>
-                    <th onclick="sortTable(1, 'accountsTable')">Currency (VARCHAR)</th>
-                    <th onclick="sortTable(2, 'accountsTable')">Status (VARCHAR)</th>
-                    <th onclick="sortTable(3, 'accountsTable')">Cash Balance (FLOAT)</th>
-                    <th onclick="sortTable(4, 'accountsTable')">Total Value (FLOAT)</th>
-                    <th onclick="sortTable(5, 'accountsTable')">Total P&L (FLOAT)</th>
-                    <th onclick="sortTable(6, 'accountsTable')">Notes (VARCHAR)</th>
-                    <th onclick="sortTable(7, 'accountsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(0, 'accountsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'accountsTable')">Name (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'accountsTable')">Currency (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'accountsTable')">Status (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'accountsTable')">Cash Balance (FLOAT)</th>
+                    <th onclick="sortTable(5, 'accountsTable')">Total Value (FLOAT)</th>
+                    <th onclick="sortTable(6, 'accountsTable')">Total P&L (FLOAT)</th>
+                    <th onclick="sortTable(7, 'accountsTable')">Notes (VARCHAR)</th>
                     <th onclick="sortTable(8, 'accountsTable')">Created At (DATETIME)</th>
                     <th>Actions</th>
                   </tr>
@@ -326,13 +325,13 @@
               <table class="table" id="tickersTable" data-table-type="tickers">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'tickersTable')">Symbol (VARCHAR)</th>
-                    <th onclick="sortTable(1, 'tickersTable')">Name (VARCHAR)</th>
-                    <th onclick="sortTable(2, 'tickersTable')">Type (VARCHAR)</th>
-                    <th onclick="sortTable(3, 'tickersTable')">Remarks (VARCHAR)</th>
-                    <th onclick="sortTable(4, 'tickersTable')">Currency (VARCHAR)</th>
-                    <th onclick="sortTable(5, 'tickersTable')">Active Trades (BOOLEAN)</th>
-                    <th onclick="sortTable(6, 'tickersTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(0, 'tickersTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'tickersTable')">Symbol (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'tickersTable')">Name (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'tickersTable')">Type (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'tickersTable')">Remarks (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'tickersTable')">Currency ID (INTEGER)</th>
+                    <th onclick="sortTable(6, 'tickersTable')">Active Trades (BOOLEAN)</th>
                     <th onclick="sortTable(7, 'tickersTable')">Created At (DATETIME)</th>
                     <th onclick="sortTable(8, 'tickersTable')">Updated At (DATETIME)</th>
                     <th>Actions</th>
@@ -395,21 +394,22 @@
               <table class="table" id="executionsTable" data-table-type="executions">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'executionsTable')">Trade ID (INTEGER)</th>
-                    <th onclick="sortTable(1, 'executionsTable')">Action (VARCHAR)</th>
-                    <th onclick="sortTable(2, 'executionsTable')">Date (DATETIME)</th>
-                    <th onclick="sortTable(3, 'executionsTable')">Quantity (FLOAT)</th>
-                    <th onclick="sortTable(4, 'executionsTable')">Price (FLOAT)</th>
-                    <th onclick="sortTable(5, 'executionsTable')">Fee (FLOAT)</th>
-                    <th onclick="sortTable(6, 'executionsTable')">Source (VARCHAR)</th>
-                    <th onclick="sortTable(7, 'executionsTable')">ID (INTEGER)</th>
-                    <th onclick="sortTable(8, 'executionsTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(0, 'executionsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'executionsTable')">Trade ID (INTEGER)</th>
+                    <th onclick="sortTable(2, 'executionsTable')">Action (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'executionsTable')">Date (DATETIME)</th>
+                    <th onclick="sortTable(4, 'executionsTable')">Quantity (FLOAT)</th>
+                    <th onclick="sortTable(5, 'executionsTable')">Price (FLOAT)</th>
+                    <th onclick="sortTable(6, 'executionsTable')">Fee (FLOAT)</th>
+                    <th onclick="sortTable(7, 'executionsTable')">Source (VARCHAR)</th>
+                    <th onclick="sortTable(8, 'executionsTable')">Notes (VARCHAR)</th>
+                    <th onclick="sortTable(9, 'executionsTable')">Created At (DATETIME)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="9" class="text-center">טוען נתונים...</td>
+                    <td colspan="10" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -461,24 +461,23 @@
               <table class="table" id="cashFlowsTable" data-table-type="cash_flows">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'cashFlowsTable')">Account ID (INTEGER)</th>
-                    <th onclick="sortTable(1, 'cashFlowsTable')">Type (VARCHAR)</th>
-                    <th onclick="sortTable(2, 'cashFlowsTable')">Amount (FLOAT)</th>
-                    <th onclick="sortTable(3, 'cashFlowsTable')">Date (DATE)</th>
-                    <th onclick="sortTable(4, 'cashFlowsTable')">Description (VARCHAR)</th>
-                    <th onclick="sortTable(5, 'cashFlowsTable')">ID (INTEGER)</th>
-                    <th onclick="sortTable(6, 'cashFlowsTable')">Created At (DATETIME)</th>
-                    <th onclick="sortTable(7, 'cashFlowsTable')">Currency (VARCHAR)</th>
-                    <th onclick="sortTable(8, 'cashFlowsTable')">Currency ID (INTEGER)</th>
-                    <th onclick="sortTable(9, 'cashFlowsTable')">USD Rate (DECIMAL)</th>
-                    <th onclick="sortTable(10, 'cashFlowsTable')">Source (VARCHAR)</th>
-                    <th onclick="sortTable(11, 'cashFlowsTable')">External ID (VARCHAR)</th>
+                    <th onclick="sortTable(0, 'cashFlowsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'cashFlowsTable')">Account ID (INTEGER)</th>
+                    <th onclick="sortTable(2, 'cashFlowsTable')">Type (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'cashFlowsTable')">Amount (FLOAT)</th>
+                    <th onclick="sortTable(4, 'cashFlowsTable')">Date (DATE)</th>
+                    <th onclick="sortTable(5, 'cashFlowsTable')">Description (VARCHAR)</th>
+                    <th onclick="sortTable(6, 'cashFlowsTable')">Currency ID (INTEGER)</th>
+                    <th onclick="sortTable(7, 'cashFlowsTable')">USD Rate (DECIMAL)</th>
+                    <th onclick="sortTable(8, 'cashFlowsTable')">Source (VARCHAR)</th>
+                    <th onclick="sortTable(9, 'cashFlowsTable')">External ID (VARCHAR)</th>
+                    <th onclick="sortTable(10, 'cashFlowsTable')">Created At (DATETIME)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="12" class="text-center">טוען נתונים...</td>
+                    <td colspan="11" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -532,19 +531,19 @@
               <table class="table" id="alertsTable" data-table-type="alerts">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'alertsTable')">Account ID (INTEGER)</th>
-                    <th onclick="sortTable(1, 'alertsTable')">Ticker ID (INTEGER)</th>
-                    <th onclick="sortTable(2, 'alertsTable')">Type (VARCHAR)</th>
-                    <th onclick="sortTable(3, 'alertsTable')">Condition (VARCHAR)</th>
-                    <th onclick="sortTable(4, 'alertsTable')">Message (VARCHAR)</th>
-                    <th onclick="sortTable(5, 'alertsTable')">Is Active (BOOLEAN)</th>
-                    <th onclick="sortTable(6, 'alertsTable')">Triggered At (DATETIME)</th>
-                    <th onclick="sortTable(7, 'alertsTable')">ID (INTEGER)</th>
-                    <th onclick="sortTable(8, 'alertsTable')">Created At (DATETIME)</th>
-                    <th onclick="sortTable(9, 'alertsTable')">Status (VARCHAR)</th>
-                    <th onclick="sortTable(10, 'alertsTable')">Is Triggered (VARCHAR)</th>
-                    <th onclick="sortTable(11, 'alertsTable')">Related Type ID (INTEGER)</th>
-                    <th onclick="sortTable(12, 'alertsTable')">Related ID (INTEGER)</th>
+                    <th onclick="sortTable(0, 'alertsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'alertsTable')">Account ID (INTEGER)</th>
+                    <th onclick="sortTable(2, 'alertsTable')">Ticker ID (INTEGER)</th>
+                    <th onclick="sortTable(3, 'alertsTable')">Message (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'alertsTable')">Triggered At (DATETIME)</th>
+                    <th onclick="sortTable(5, 'alertsTable')">Status (VARCHAR)</th>
+                    <th onclick="sortTable(6, 'alertsTable')">Is Triggered (VARCHAR)</th>
+                    <th onclick="sortTable(7, 'alertsTable')">Related Type ID (INTEGER)</th>
+                    <th onclick="sortTable(8, 'alertsTable')">Related ID (INTEGER)</th>
+                    <th onclick="sortTable(9, 'alertsTable')">Condition Attribute (VARCHAR)</th>
+                    <th onclick="sortTable(10, 'alertsTable')">Condition Operator (VARCHAR)</th>
+                    <th onclick="sortTable(11, 'alertsTable')">Condition Number (DECIMAL)</th>
+                    <th onclick="sortTable(12, 'alertsTable')">Created At (DATETIME)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -604,9 +603,9 @@
                   <th onclick="sortTable(0, 'notesTable')">ID (INTEGER)</th>
                   <th onclick="sortTable(1, 'notesTable')">Content (VARCHAR)</th>
                   <th onclick="sortTable(2, 'notesTable')">Attachment (VARCHAR)</th>
-                  <th onclick="sortTable(3, 'notesTable')">Created At (DATETIME)</th>
-                  <th onclick="sortTable(4, 'notesTable')">Related Type ID (INTEGER)</th>
-                  <th onclick="sortTable(5, 'notesTable')">Related ID (INTEGER)</th>
+                  <th onclick="sortTable(3, 'notesTable')">Related Type ID (INTEGER)</th>
+                  <th onclick="sortTable(4, 'notesTable')">Related ID (INTEGER)</th>
+                  <th onclick="sortTable(5, 'notesTable')">Created At (DATETIME)</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -645,6 +644,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Modular files -->
+  <script src="scripts/button-icons.js"></script>
   <script src="scripts/header-system.js"></script>
   <script src="scripts/console-cleanup.js"></script>
   <script src="scripts/simple-filter.js"></script>

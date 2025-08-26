@@ -79,6 +79,22 @@ trading-ui/
   - Improved visual consistency
   - Better responsive design
 
+### 5. Button System ✅ **COMPLETED - CENTRALIZED**
+- **Purpose**: Centralized button management with consistent icons and styling
+- **File**: `scripts/button-icons.js`
+- **Features**:
+  - Unified button creation with icons and text
+  - Automatic CSS class assignment
+  - Accessibility support with title attributes
+  - Consistent styling across all pages
+  - Support for 20+ button types
+- **Recent Additions**:
+  - Centralized icon system with emoji support
+  - Automatic button class mapping
+  - Accessibility features
+  - Easy migration from old button system
+- **Migration Status**: ✅ **COMPLETED** - All main pages migrated successfully
+
 ## Page-Specific Modules
 
 ### 1. Cash Flows Module ✅ **RECENTLY COMPLETED**

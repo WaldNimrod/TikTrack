@@ -365,7 +365,8 @@
 
 /* התראה בודדת - עיצוב בסיסי */
 .notification {
-  background: var(--apple-bg-elevated);
+  background: rgba(255, 255, 255, 0.5);
+  /* 50% שקוף */
   border: 1px solid var(--apple-border-light);
   border-radius: 12px;
   padding: 16px 20px;
@@ -435,13 +436,14 @@
 }
 
 /* סוגי התראות - צבעים ואייקונים */
-/* הצלחה - ירוק */
+/* הצלחה - צבע הלוגו (ירוק טורקיז כמו table-count) */
 .notification.success {
-  border-left: 4px solid #4CAF50;
+  border-left: 4px solid #29a6a8;
+  background: linear-gradient(135deg, rgba(41, 166, 168, 0.1) 0%, rgba(31, 138, 140, 0.1) 100%);
 }
 
 .notification.success .notification-icon {
-  color: #4CAF50;
+  color: #29a6a8;
 }
 
 /* שגיאה - אדום */

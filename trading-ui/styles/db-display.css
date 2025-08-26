@@ -13,3 +13,123 @@
 .main-content {
     direction: rtl;
 }
+
+/* ========================================
+   Database Display Page - Compact Styling
+   ========================================
+   
+   Compact styling for database display page:
+   - Smaller field type headers (not bold, separate line)
+   - Smaller main headers
+   - Smaller regular font size
+   - Reduced cell and column spacing
+   
+   ======================================== */
+
+/* קטנת כותרות הטבלאות */
+.db-display-page .table-title {
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+}
+
+/* קטנת כותרות העמודות עם סוגי השדות */
+.db-display-page table thead th {
+    font-size: 0.75rem !important;
+    font-weight: bold !important;
+    padding: 0.3rem 0.2rem !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    max-width: 120px !important;
+    text-align: center !important;
+    border: none !important;
+    background: none !important;
+}
+
+/* הסרת גבולות בתוך הטבלאות */
+.db-display-page table {
+    border-spacing: 0 !important;
+    border-collapse: collapse !important;
+    border: none !important;
+}
+
+.db-display-page table th,
+.db-display-page table td {
+    border: none !important;
+    padding: 0.25rem 0.2rem !important;
+    text-align: center !important;
+}
+
+/* קטנת הפונט הרגיל בתאים */
+.db-display-page table tbody td {
+    font-size: 0.8rem !important;
+    padding: 0.25rem 0.2rem !important;
+    line-height: 1.1 !important;
+}
+
+/* הקטנת ריווח בין תאים */
+.db-display-page .table-responsive {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* הקטנת ריווח בתוך הטבלאות */
+.db-display-page .section-body {
+    padding: 0.5rem !important;
+}
+
+/* הקטנת כותרות הטבלאות */
+.db-display-page .section-header {
+    padding: 0.5rem !important;
+}
+
+/* הקטנת ריווח בין סקציות */
+.db-display-page .content-section {
+    margin-bottom: 1rem !important;
+}
+
+/* צביעה לסרוגין של השורות */
+.db-display-page table tbody tr:nth-child(even) {
+    background-color: rgba(255, 165, 0, 0.1) !important;
+    /* כתום 10% שקיפות */
+}
+
+.db-display-page table tbody tr:nth-child(odd) {
+    background-color: white !important;
+    /* לבן */
+}
+
+/* הובר על שורות */
+.db-display-page table tbody tr:hover {
+    background-color: rgba(255, 165, 0, 0.2) !important;
+    /* כתום 20% שקיפות בהובר */
+}
+
+/* תיקון סדר העמודות - LTR לטבלאות */
+.db-display-page table {
+    direction: ltr !important;
+}
+
+.db-display-page table thead,
+.db-display-page table tbody {
+    direction: ltr !important;
+}
+
+.db-display-page table th,
+.db-display-page table td {
+    direction: ltr !important;
+}
+
+/* יישור טקסט בתוך התאים */
+.db-display-page table tbody td {
+    text-align: center !important;
+}
+
+/* הסרת גבולות חיצוניים של הטבלאות */
+.db-display-page .table {
+    border: none !important;
+}
+
+.db-display-page .table-responsive {
+    border: none !important;
+}

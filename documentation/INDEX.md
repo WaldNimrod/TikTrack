@@ -15,10 +15,10 @@ This index provides quick access to all documentation files in the TikTrack proj
 - **[Number Formatting](frontend/)** - Global number and currency formatting system
 
 ### 📚 Updated Documentation
-- **[CHANGELOG.md](project/CHANGELOG.md)** - Added comprehensive version 2.8.0 documentation
+- **[CHANGELOG.md](project/CHANGELOG.md)** - Added comprehensive version 1.8.0 documentation
 - **[HANDOVER_SUMMARY.md](../../HANDOVER_SUMMARY.md)** - Updated with new completed modules
-- **[README.md](README.md)** - Updated with version 2.8.0 changes
-- **[VERSION_2.8.0_SUMMARY.md](project/VERSION_2.8.0_SUMMARY.md)** - Comprehensive summary of all changes
+- **[README.md](README.md)** - Updated with version 1.8.0 changes
+- **[VERSION_1.8.0_SUMMARY.md](project/VERSION_1.8.0_SUMMARY.md)** - Comprehensive summary of all changes
 
 ### 🔧 Technical Improvements
 - **Currency Management**: Complete CRUD operations with validation
@@ -36,7 +36,7 @@ This index provides quick access to all documentation files in the TikTrack proj
 - [PROJECT_SUMMARY.md](project/PROJECT_SUMMARY.md) - Complete project overview
 - [CHANGELOG.md](project/CHANGELOG.md) - Project changelog and version history
 - [SUMMARY_TABLE.md](project/SUMMARY_TABLE.md) - Project summary table
-- [VERSION_2.8.0_SUMMARY.md](project/VERSION_2.8.0_SUMMARY.md) - Version 2.8.0 comprehensive summary
+- [VERSION_1.8.0_SUMMARY.md](project/VERSION_1.8.0_SUMMARY.md) - Version 1.8.0 comprehensive summary
 
 ### 🎯 **Feature Documentation** (`features/`)
 
@@ -90,6 +90,7 @@ This index provides quick access to all documentation files in the TikTrack proj
 - [BACKWARD_COMPATIBILITY.md](frontend/BACKWARD_COMPATIBILITY.md) - Backward compatibility documentation
 - [TRANSLATION_FUNCTIONS.md](frontend/TRANSLATION_FUNCTIONS.md) - Translation functions documentation
 - [HEADER_SYSTEM_README.md](frontend/HEADER_SYSTEM_README.md) - Header system documentation
+- **[NOTIFICATION_SYSTEM.md](frontend/NOTIFICATION_SYSTEM.md)** - מערכת התראות והודעות - הסבר מפורט על ההבדל בין מערכת ההתראות למערכת ההודעות
 
 #### 🧩 **Components** (`frontend/components/`)
 - [ACTIVE_ALERTS.md](frontend/components/ACTIVE_ALERTS.md) - Active alerts component
@@ -135,13 +136,13 @@ This index provides quick access to all documentation files in the TikTrack proj
 - [README.md](README.md) - Main documentation overview (this directory)
 - [INDEX.md](INDEX.md) - This index file
 - **[CHANGELOG.md](../../CHANGELOG.md)** - Complete project changelog and version history
-- **[VERSION_2.4.0_SUMMARY.md](VERSION_2.4.0_SUMMARY.md)** - Comprehensive summary of version 2.4.0 changes
+- **[VERSION_1.4.0_SUMMARY.md](VERSION_1.4.0_SUMMARY.md)** - Comprehensive summary of version 1.4.0 changes
 
 ### 🗂️ **System Documentation**
 - [TABLE_SORTING_SYSTEM.md](TABLE_SORTING_SYSTEM.md) - Table sorting system documentation
 
 ### 📄 **Additional Documentation Files**
-- [VERSION_2.4.0_SUMMARY.md](VERSION_2.4.0_SUMMARY.md) - Version 2.4.0 comprehensive summary
+- [VERSION_1.4.0_SUMMARY.md](VERSION_1.4.0_SUMMARY.md) - Version 1.4.0 comprehensive summary
 - [backend_architecture_new.html](backend_architecture_new.html) - Backend architecture documentation
 - [TikTrack_ProjectSnapshot_2025-01-15.html](TikTrack_ProjectSnapshot_2025-01-15.html) - Project snapshot documentation
 - [Cursor_Performance_Quick_Guide.pdf](Cursor_Performance_Quick_Guide.pdf) - Performance quick guide

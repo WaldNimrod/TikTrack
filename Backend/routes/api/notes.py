@@ -427,6 +427,8 @@ def update_note(note_id: int):
             # Update fields
             logger.info(f"📝 Updating note fields - content: {content[:50]}..., attachment: {attachment_filename}")
             note.content = content
+            
+            # Handle attachment updates
             if attachment_filename:
                 # Delete old file if exists
                 if note.attachment:
@@ -434,6 +436,14 @@ def update_note(note_id: int):
                     delete_uploaded_file(note.attachment)
                 note.attachment = attachment_filename
                 logger.info(f"📎 New attachment set: {attachment_filename}")
+            elif request.form.get('remove_attachment') == 'true':
+                # Remove attachment if requested
+                if note.attachment:
+                    logger.info(f"🗑️ Removing attachment: {note.attachment}")
+                    delete_uploaded_file(note.attachment)
+                    note.attachment = None
+                    logger.info("📎 Attachment removed")
+            
             note.related_type_id = related_type_id
             note.related_id = related_id
             

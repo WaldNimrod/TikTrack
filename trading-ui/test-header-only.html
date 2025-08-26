@@ -182,7 +182,7 @@
                                         <h5>טבלת טריידים לבדיקה</h5>
                                     </div>
                                     <div class="card-body">
-                                        <table id="tradesTable" class="table table-striped">
+                                        <table id="tradesTable" class="table table-striped" data-table-type="test_trades">
                                             <thead>
                                                 <tr>
                                                     <th>טיקר</th>
@@ -280,7 +280,7 @@
                                         <h5>טבלת בדיקה כללית</h5>
                                     </div>
                                     <div class="card-body">
-                                        <table id="testTable" class="table table-striped">
+                                        <table id="testTable" class="table table-striped" data-table-type="test_general">
                                             <thead>
                                                 <tr>
                                                     <th>שם</th>
@@ -330,7 +330,7 @@
                                         <h5>טבלת הודעות (ללא פילטר סטטוס)</h5>
                                     </div>
                                     <div class="card-body">
-                                        <table id="notificationsTable" class="table table-striped">
+                                        <table id="notificationsTable" class="table table-striped" data-table-type="test_notifications">
                                             <thead>
                                                 <tr>
                                                     <th>תאריך</th>
@@ -437,6 +437,8 @@
                                                         נראות</span></p>
                                                 <p><strong>טבלת בדיקה:</strong> <span id="testTableStats">0/0 שורות
                                                         נראות</span></p>
+                                                <p><strong>טבלת הודעות:</strong> <span id="notificationsTableStats">0/0 שורות
+                                                        נראות</span></p>
                                             </div>
                                         </div>
                                     </div>
@@ -467,6 +469,26 @@
         <!-- Console cleanup system -->
 
         <script>
+            // פונקציה לעדכון מידע דיבאג פילטרים
+            function updateFilterDebugInfo() {
+                if (window.simpleFilter && window.simpleFilter.currentFilters) {
+                    const filters = window.simpleFilter.currentFilters;
+                    
+                    // עדכון מידע דיבאג
+                    document.getElementById('statusDebug').textContent = 
+                        filters.status ? (Array.isArray(filters.status) ? filters.status.join(', ') : filters.status) : 'כל הסטטוסים';
+                    
+                    document.getElementById('typeDebug').textContent = 
+                        filters.type ? (Array.isArray(filters.type) ? filters.type.join(', ') : filters.type) : 'כל הטיפוסים';
+                    
+                    document.getElementById('accountDebug').textContent = 
+                        filters.account ? (Array.isArray(filters.account) ? filters.account.join(', ') : filters.account) : 'כל החשבונות';
+                    
+                    document.getElementById('dateDebug').textContent = 
+                        filters.dateRange || 'כל התאריכים';
+                }
+            }
+
             // פונקציות בדיקה
             function log(message) {
                 const logElement = document.getElementById('testLog');
@@ -514,6 +536,9 @@
 
                 // עדכון סטטיסטיקות טבלאות
                 updateTableStats();
+
+                // עדכון מידע דיבאג פילטרים
+                updateFilterDebugInfo();
             }
 
             // פונקציה לעדכון מצב פילטרים נוכחי
@@ -669,6 +694,14 @@
                     const totalRows = testTable.querySelectorAll('tbody tr').length;
                     const visibleRows = testTable.querySelectorAll('tbody tr:not([style*="display: none"])').length;
                     document.getElementById('testTableStats').textContent = `${visibleRows}/${totalRows} שורות נראות`;
+                }
+
+                // טבלת הודעות
+                const notificationsTable = document.getElementById('notificationsTable');
+                if (notificationsTable) {
+                    const totalRows = notificationsTable.querySelectorAll('tbody tr').length;
+                    const visibleRows = notificationsTable.querySelectorAll('tbody tr:not([style*="display: none"])').length;
+                    document.getElementById('notificationsTableStats').textContent = `${visibleRows}/${totalRows} שורות נראות`;
                 }
             }
 

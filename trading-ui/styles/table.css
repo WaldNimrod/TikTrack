@@ -1079,6 +1079,54 @@ select:focus {
   transform: translateY(-1px) !important;
 }
 
+.type-stock {
+  color: #007bff !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(0, 123, 255, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-stock:hover {
+  background: rgba(0, 123, 255, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.type-etf {
+  color: #28a745 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(40, 167, 69, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-etf:hover {
+  background: rgba(40, 167, 69, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.type-bond {
+  color: #ffc107 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(255, 193, 7, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-bond:hover {
+  background: rgba(255, 193, 7, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
 .type-crypto {
   color: #6f42c1 !important;
   font-weight: 600 !important;
@@ -1092,6 +1140,38 @@ select:focus {
 
 .type-crypto:hover {
   background: rgba(111, 66, 193, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.type-forex {
+  color: #fd7e14 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(253, 126, 20, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-forex:hover {
+  background: rgba(253, 126, 20, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.type-commodity {
+  color: #795548 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(121, 85, 72, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-commodity:hover {
+  background: rgba(121, 85, 72, 0.15) !important;
   transform: translateY(-1px) !important;
 }
 

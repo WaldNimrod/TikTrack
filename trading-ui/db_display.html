@@ -83,6 +83,7 @@
             <div>סה"כ טריידים: <strong id="tradesStats">0</strong></div>
             <div>סה"כ טיקרים: <strong id="tickersStats">0</strong></div>
             <div>סה"כ תוכניות: <strong id="tradePlansStats">0</strong></div>
+            <div>סה"כ התראות: <strong id="alertsStats">0</strong></div>
           </div>
         </div>
       </div> <!-- End top-section -->
@@ -197,18 +198,19 @@
                     <th onclick="sortTable(4, 'tradesTable')">Status (VARCHAR)</th>
                     <th onclick="sortTable(5, 'tradesTable')">Investment Type (VARCHAR)</th>
                     <th onclick="sortTable(6, 'tradesTable')">Side (VARCHAR)</th>
-                    <th onclick="sortTable(7, 'tradesTable')">Closed At (DATETIME)</th>
-                    <th onclick="sortTable(8, 'tradesTable')">Cancelled At (DATETIME)</th>
-                    <th onclick="sortTable(9, 'tradesTable')">Cancel Reason (VARCHAR)</th>
-                    <th onclick="sortTable(10, 'tradesTable')">Total P&L (FLOAT)</th>
-                    <th onclick="sortTable(11, 'tradesTable')">Notes (VARCHAR)</th>
-                    <th onclick="sortTable(12, 'tradesTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(7, 'tradesTable')">Opened At (DATETIME)</th>
+                    <th onclick="sortTable(8, 'tradesTable')">Closed At (DATETIME)</th>
+                    <th onclick="sortTable(9, 'tradesTable')">Cancelled At (DATETIME)</th>
+                    <th onclick="sortTable(10, 'tradesTable')">Cancel Reason (VARCHAR)</th>
+                    <th onclick="sortTable(11, 'tradesTable')">Total P&L (FLOAT)</th>
+                    <th onclick="sortTable(12, 'tradesTable')">Notes (VARCHAR)</th>
+                    <th onclick="sortTable(13, 'tradesTable')">Created At (DATETIME)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="13" class="text-center">טוען נתונים...</td>
+                    <td colspan="14" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -395,21 +397,21 @@
                   <tr>
                     <th onclick="sortTable(0, 'executionsTable')">ID (INTEGER)</th>
                     <th onclick="sortTable(1, 'executionsTable')">Trade ID (INTEGER)</th>
-                    <th onclick="sortTable(2, 'executionsTable')">Action (VARCHAR)</th>
-                    <th onclick="sortTable(3, 'executionsTable')">Date (DATETIME)</th>
-                    <th onclick="sortTable(4, 'executionsTable')">Quantity (FLOAT)</th>
-                    <th onclick="sortTable(5, 'executionsTable')">Price (FLOAT)</th>
-                    <th onclick="sortTable(6, 'executionsTable')">Fee (FLOAT)</th>
-                    <th onclick="sortTable(7, 'executionsTable')">Source (VARCHAR)</th>
-                    <th onclick="sortTable(8, 'executionsTable')">External ID (VARCHAR)</th>
-                    <th onclick="sortTable(9, 'executionsTable')">Notes (VARCHAR)</th>
-                    <th onclick="sortTable(10, 'executionsTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(2, 'executionsTable')">Action (TEXT)</th>
+                    <th onclick="sortTable(3, 'executionsTable')">Date (NUMERIC)</th>
+                    <th onclick="sortTable(4, 'executionsTable')">Quantity (REAL)</th>
+                    <th onclick="sortTable(5, 'executionsTable')">Price (REAL)</th>
+                    <th onclick="sortTable(6, 'executionsTable')">Fee (REAL)</th>
+                    <th onclick="sortTable(7, 'executionsTable')">Source (TEXT)</th>
+                    <th onclick="sortTable(8, 'executionsTable')">Created At (NUMERIC)</th>
+                    <th onclick="sortTable(9, 'executionsTable')">Notes (TEXT)</th>
+                    <th onclick="sortTable(10, 'executionsTable')">External ID (VARCHAR)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="11" class="text-center">טוען נתונים...</td>
+                    <td colspan="12" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -528,16 +530,16 @@
                     <th onclick="sortTable(0, 'alertsTable')">ID (INTEGER)</th>
                     <th onclick="sortTable(1, 'alertsTable')">Account ID (INTEGER)</th>
                     <th onclick="sortTable(2, 'alertsTable')">Ticker ID (INTEGER)</th>
-                    <th onclick="sortTable(3, 'alertsTable')">Message (VARCHAR)</th>
-                    <th onclick="sortTable(4, 'alertsTable')">Triggered At (DATETIME)</th>
-                    <th onclick="sortTable(5, 'alertsTable')">Status (VARCHAR)</th>
-                    <th onclick="sortTable(6, 'alertsTable')">Is Triggered (VARCHAR)</th>
-                    <th onclick="sortTable(7, 'alertsTable')">Related Type ID (INTEGER)</th>
-                    <th onclick="sortTable(8, 'alertsTable')">Related ID (INTEGER)</th>
-                    <th onclick="sortTable(9, 'alertsTable')">Condition Attribute (VARCHAR)</th>
-                    <th onclick="sortTable(10, 'alertsTable')">Condition Operator (VARCHAR)</th>
-                    <th onclick="sortTable(11, 'alertsTable')">Condition Number (DECIMAL)</th>
-                    <th onclick="sortTable(12, 'alertsTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(3, 'alertsTable')">Message (TEXT)</th>
+                    <th onclick="sortTable(4, 'alertsTable')">Triggered At (NUMERIC)</th>
+                    <th onclick="sortTable(5, 'alertsTable')">Created At (NUMERIC)</th>
+                    <th onclick="sortTable(6, 'alertsTable')">Status (TEXT)</th>
+                    <th onclick="sortTable(7, 'alertsTable')">Is Triggered (TEXT)</th>
+                    <th onclick="sortTable(8, 'alertsTable')">Related Type ID (INTEGER)</th>
+                    <th onclick="sortTable(9, 'alertsTable')">Related ID (INTEGER)</th>
+                    <th onclick="sortTable(10, 'alertsTable')">Condition Attribute (TEXT)</th>
+                    <th onclick="sortTable(11, 'alertsTable')">Condition Operator (TEXT)</th>
+                    <th onclick="sortTable(12, 'alertsTable')">Condition Number (NUMERIC)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -592,19 +594,19 @@
             <table class="table" id="notesTable" data-table-type="notes">
               <thead>
                 <tr>
-                  <th onclick="sortTable(0, 'notesTable')">ID (INTEGER)</th>
-                  <th onclick="sortTable(1, 'notesTable')">Content (VARCHAR)</th>
-                  <th onclick="sortTable(2, 'notesTable')">Attachment (VARCHAR)</th>
-                  <th onclick="sortTable(3, 'notesTable')">Related Type ID (INTEGER)</th>
-                  <th onclick="sortTable(4, 'notesTable')">Related ID (INTEGER)</th>
-                  <th onclick="sortTable(5, 'notesTable')">Created At (DATETIME)</th>
-                  <th>Actions</th>
+                                      <th onclick="sortTable(0, 'notesTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'notesTable')">Content (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'notesTable')">Attachment (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'notesTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(4, 'notesTable')">Related Type ID (INTEGER)</th>
+                    <th onclick="sortTable(5, 'notesTable')">Related ID (INTEGER)</th>
+                    <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td colspan="6" class="text-center">טוען נתונים...</td>
-                </tr>
+                                  <tr>
+                    <td colspan="7" class="text-center">טוען נתונים...</td>
+                  </tr>
               </tbody>
             </table>
           </div>

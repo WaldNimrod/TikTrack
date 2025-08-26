@@ -145,7 +145,21 @@ function formatDateTime(dateString) {
  * @returns {string} Formatted date string (DD/MM/YYYY) or '-' for invalid dates
  */
 function formatDateOnly(dateString) {
-    return formatDate(dateString);
+    if (!dateString) return '-';
+
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '-';
+
+        return date.toLocaleDateString('he-IL', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    } catch (error) {
+        console.warn('⚠️ Error formatting date only:', dateString, error);
+        return '-';
+    }
 }
 
 /**

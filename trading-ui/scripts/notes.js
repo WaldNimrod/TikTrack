@@ -430,9 +430,9 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     }
 
     return `
-      <tr>
+      <tr onclick="viewNote(${note.id})" style="cursor: pointer;">
         <td class="ticker-cell"><span class="symbol-text">${symbolLink}</span></td>
-        <td style="padding: 0;" data-type="${typeForFilter}" onclick="viewLinkedItemsForNote(${note.id})" style="cursor: pointer;">
+        <td style="padding: 0;" data-type="${typeForFilter}">
           <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px;">
             ${relatedDisplay}
           </div>
@@ -440,7 +440,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td>${contentDisplay}</td>
         <td>${attachmentDisplay}</td>
         <td data-date="${note.created_at}">${date}</td>
-        <td class="actions-cell">
+        <td class="actions-cell" onclick="event.stopPropagation();">
           <table class="table table-sm table-borderless mb-0">
             <tbody>
               <tr>
@@ -471,6 +471,9 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
 // פונקציה לעדכון סיכום הערות
 function updateNotesSummary(notes) {
   console.log('🔄 updateNotesSummary נקראה עם', notes.length, 'הערות');
+
+  // שמירת המספר המקורי לחיפוש
+  window.originalNotesCount = notes.length;
 
   // עדכון table-count
   const tableCountElement = document.querySelector('.table-count');
@@ -564,6 +567,10 @@ function showAddNoteModal() {
 function showEditNoteModal(noteId) {
   console.log('🔄 showEditNoteModal נקראה עבור ID:', noteId);
 
+  // ניקוי דגלים
+  window.removeAttachmentFlag = false;
+  window.replaceAttachmentFlag = false;
+
   // טעינת נתוני ההערה
   loadNoteData(noteId);
 
@@ -589,6 +596,9 @@ async function loadNoteData(noteId) {
     // מילוי הטופס
     document.getElementById('editNoteId').value = note.id;
     setEditorContent(note.content || '', 'edit');
+
+    // הצגת קובץ מצורף נוכחי
+    displayCurrentAttachment(note.attachment);
 
     // בחירת סוג הקשר
     const relationType = note.related_type_id;
@@ -621,9 +631,7 @@ async function loadNoteData(noteId) {
 
   } catch (error) {
     console.error('❌ שגיאה בטעינת נתוני הערה:', error);
-    if (typeof window.showModalNotification === 'function') {
-      window.showModalNotification('שגיאה בטעינת נתוני הערה', 'error');
-    } else if (typeof window.showNotification === 'function') {
+    if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בטעינת נתוני הערה', 'error');
     }
   }
@@ -1009,9 +1017,7 @@ async function saveNote() {
     const result = await response.json();
     console.log('✅ הערה נשמרה בהצלחה:', result);
 
-    if (typeof window.showModalNotification === 'function') {
-      window.showModalNotification('הערה נשמרה בהצלחה!', 'success');
-    } else if (typeof window.showNotification === 'function') {
+    if (typeof window.showNotification === 'function') {
       window.showNotification('הערה נשמרה בהצלחה!', 'success');
     }
 
@@ -1023,9 +1029,7 @@ async function saveNote() {
 
   } catch (error) {
     console.error('❌ שגיאה בשמירת הערה:', error);
-    if (typeof window.showModalNotification === 'function') {
-      window.showModalNotification('שגיאה בשמירת הערה', 'error');
-    } else if (typeof window.showNotification === 'function') {
+    if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בשמירת הערה', 'error');
     }
   }
@@ -1041,6 +1045,10 @@ async function updateNoteFromModal() {
   const relatedId = document.getElementById('editNoteRelatedObjectSelect').value;
   const attachment = document.getElementById('editNoteAttachment').files[0];
 
+  // בדיקה אם נדרשת מחיקת קובץ
+  const shouldRemoveAttachment = window.removeAttachmentFlag === true;
+  const shouldReplaceAttachment = window.replaceAttachmentFlag === true;
+
   // ולידציה מקיפה
   if (!validateEditNoteForm(content, relationType, relatedId, attachment)) {
     return;
@@ -1049,20 +1057,43 @@ async function updateNoteFromModal() {
   clearNoteValidationErrors();
 
   try {
-    // יצירת אובייקט JSON במקום FormData
-    const data = {
-      content: content,
-      related_type_id: parseInt(relationType),
-      related_id: parseInt(relatedId)
-    };
+    let response;
 
-    const response = await fetch(`/api/v1/notes/${noteId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
+    // אם יש קובץ חדש או נדרשת מחיקת קובץ, השתמש ב-FormData
+    if (attachment || shouldRemoveAttachment) {
+      const formData = new FormData();
+      formData.append('content', content);
+      formData.append('related_type_id', relationType);
+      formData.append('related_id', relatedId);
+
+      if (attachment) {
+        formData.append('attachment', attachment);
+      }
+
+      if (shouldRemoveAttachment) {
+        formData.append('remove_attachment', 'true');
+      }
+
+      response = await fetch(`/api/v1/notes/${noteId}`, {
+        method: 'PUT',
+        body: formData
+      });
+    } else {
+      // אחרת, השתמש ב-JSON
+      const data = {
+        content: content,
+        related_type_id: parseInt(relationType),
+        related_id: parseInt(relatedId)
+      };
+
+      response = await fetch(`/api/v1/notes/${noteId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+    }
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -1071,11 +1102,13 @@ async function updateNoteFromModal() {
     const result = await response.json();
     console.log('✅ הערה עודכנה בהצלחה:', result);
 
-    if (typeof window.showModalNotification === 'function') {
-      window.showModalNotification('הערה עודכנה בהצלחה!', 'success');
-    } else if (typeof window.showNotification === 'function') {
+    if (typeof window.showNotification === 'function') {
       window.showNotification('הערה עודכנה בהצלחה!', 'success');
     }
+
+    // ניקוי דגלים
+    window.removeAttachmentFlag = false;
+    window.replaceAttachmentFlag = false;
 
     // סגירת המודל וטעינה מחדש
     const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
@@ -1085,9 +1118,7 @@ async function updateNoteFromModal() {
 
   } catch (error) {
     console.error('❌ שגיאה בעדכון הערה:', error);
-    if (typeof window.showModalNotification === 'function') {
-      window.showModalNotification('שגיאה בעדכון הערה', 'error');
-    } else if (typeof window.showNotification === 'function') {
+    if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בעדכון הערה', 'error');
     }
   }
@@ -1101,7 +1132,7 @@ function showDeleteNoteModal(noteId) {
       <div class="modal fade" id="deleteNoteModal" tabindex="-1" aria-labelledby="deleteNoteModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog">
           <div class="modal-content">
-            <div class="modal-header tiktrack-modal-header">
+            <div class="modal-header modal-header-danger">
               <h5 class="modal-title text-white" id="deleteNoteModalLabel">מחק הערה</h5>
               <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1162,9 +1193,7 @@ async function deleteNoteFromServer(noteId) {
 
     console.log('✅ הערה נמחקה בהצלחה');
 
-    if (typeof window.showModalNotification === 'function') {
-      window.showModalNotification('הערה נמחקה בהצלחה!', 'success');
-    } else if (typeof window.showNotification === 'function') {
+    if (typeof window.showNotification === 'function') {
       window.showNotification('הערה נמחקה בהצלחה!', 'success');
     }
 
@@ -1172,9 +1201,7 @@ async function deleteNoteFromServer(noteId) {
 
   } catch (error) {
     console.error('❌ שגיאה במחיקת הערה:', error);
-    if (typeof window.showModalNotification === 'function') {
-      window.showModalNotification('שגיאה במחיקת הערה', 'error');
-    } else if (typeof window.showNotification === 'function') {
+    if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה במחיקת הערה', 'error');
     }
   }
@@ -1347,6 +1374,79 @@ function setupNoteValidationEvents() {
       }
     });
   }
+
+  // אירוע להחלפת קובץ מצורף
+  const editAttachmentInput = document.getElementById('editNoteAttachment');
+  if (editAttachmentInput) {
+    editAttachmentInput.addEventListener('change', function () {
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        const fileName = file.name;
+        const fileExtension = fileName.split('.').pop()?.toLowerCase();
+        let fileIcon = '📄';
+
+        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+          fileIcon = '🖼️';
+        } else if (['pdf'].includes(fileExtension)) {
+          fileIcon = '📕';
+        } else if (['doc', 'docx'].includes(fileExtension)) {
+          fileIcon = '📘';
+        } else if (['txt'].includes(fileExtension)) {
+          fileIcon = '📄';
+        } else if (['xls', 'xlsx'].includes(fileExtension)) {
+          fileIcon = '📊';
+        }
+
+        const displayElement = document.getElementById('currentAttachmentDisplay');
+        if (displayElement) {
+          displayElement.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span>${fileIcon}</span>
+              <span>${fileName} (חדש)</span>
+              <span style="color: #28a745; font-weight: bold;">✓ נבחר</span>
+            </div>
+          `;
+        }
+
+        // עדכון כפתורי הפעולה
+        const actionsElement = document.getElementById('attachmentActions');
+        if (actionsElement) {
+          actionsElement.innerHTML = `
+            <button type="button" class="btn btn-sm btn-outline-success" disabled>
+              ✅ קובץ נבחר
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSelectedFile()">
+              ❌ בטל בחירה
+            </button>
+          `;
+          actionsElement.style.display = 'block';
+        }
+      }
+    });
+  }
+}
+
+// פונקציה לביטול בחירת קובץ
+function clearSelectedFile() {
+  const fileInput = document.getElementById('editNoteAttachment');
+  const displayElement = document.getElementById('currentAttachmentDisplay');
+  const actionsElement = document.getElementById('attachmentActions');
+
+  if (fileInput) {
+    fileInput.value = '';
+  }
+
+  if (displayElement) {
+    displayElement.textContent = 'אין קובץ מצורף';
+  }
+
+  if (actionsElement) {
+    actionsElement.style.display = 'none';
+  }
+
+  // ניקוי דגלים
+  window.removeAttachmentFlag = false;
+  window.replaceAttachmentFlag = false;
 }
 
 // ===== פונקציות סידור =====
@@ -1526,4 +1626,321 @@ window.formatText = formatText;
 window.clearFormatting = clearFormatting;
 window.getEditorContent = getEditorContent;
 window.setEditorContent = setEditorContent;
+window.filterNotesData = filterNotesData;
+window.filterNotesByType = filterNotesByType;
+window.getTypeDisplayName = getTypeDisplayName;
+window.viewNote = viewNote;
+window.loadNoteForViewing = loadNoteForViewing;
+window.getNoteRelatedDisplay = getNoteRelatedDisplay;
+window.editCurrentNote = editCurrentNote;
+window.displayCurrentAttachment = displayCurrentAttachment;
+window.removeCurrentAttachment = removeCurrentAttachment;
+window.replaceCurrentAttachment = replaceCurrentAttachment;
+window.clearSelectedFile = clearSelectedFile;
+
+// פונקציה לסינון הערות לפי חיפוש
+function filterNotesData(searchTerm) {
+  console.log('🔄 filterNotesData נקראה עם:', searchTerm);
+
+  const tbody = document.querySelector('#notesTable tbody');
+  if (!tbody) {
+    console.error('❌ לא נמצא tbody בטבלה');
+    return;
+  }
+
+  const rows = tbody.querySelectorAll('tr');
+  let visibleCount = 0;
+
+  rows.forEach(row => {
+    // דילוג על שורות ריקות או שגיאות
+    if (row.cells.length < 6) {
+      return;
+    }
+
+    const symbolCell = row.cells[0]?.textContent || '';
+    const relatedCell = row.cells[1]?.textContent || '';
+    const contentCell = row.cells[2]?.textContent || '';
+
+    const searchText = searchTerm.toLowerCase();
+    const rowText = `${symbolCell} ${relatedCell} ${contentCell}`.toLowerCase();
+
+    if (searchText === '' || rowText.includes(searchText)) {
+      row.style.display = '';
+      visibleCount++;
+    } else {
+      row.style.display = 'none';
+    }
+  });
+
+  // עדכון מונה ההערות המוצגות
+  const tableCountElement = document.querySelector('.table-count');
+  if (tableCountElement) {
+    if (searchTerm === '') {
+      // אם אין חיפוש, הצג את המספר המקורי
+      const originalCount = window.originalNotesCount || '0';
+      tableCountElement.textContent = `${originalCount} הערות`;
+    } else {
+      tableCountElement.textContent = `${visibleCount} הערות (מתוך ${window.originalNotesCount || '0'})`;
+    }
+  }
+
+  console.log(`✅ סוננו ${visibleCount} הערות מתוך ${rows.length} שורות`);
+}
+
+// פונקציה לסינון הערות לפי סוג
+function filterNotesByType(type) {
+  console.log('🔄 filterNotesByType נקראה עם:', type);
+
+  // עדכון מצב הכפתורים
+  const filterButtons = document.querySelectorAll('.quick-filters .btn');
+  filterButtons.forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.getAttribute('data-type') === type) {
+      btn.classList.add('active');
+    }
+  });
+
+  const tbody = document.querySelector('#notesTable tbody');
+  if (!tbody) {
+    console.error('❌ לא נמצא tbody בטבלה');
+    return;
+  }
+
+  const rows = tbody.querySelectorAll('tr');
+  let visibleCount = 0;
+
+  rows.forEach(row => {
+    // דילוג על שורות ריקות או שגיאות
+    if (row.cells.length < 6) {
+      return;
+    }
+
+    // קביעת סוג ההערה לפי העמודה השנייה
+    const relatedCell = row.cells[1];
+    const relatedText = relatedCell?.textContent || '';
+    let noteType = 'other';
+
+    if (relatedText.includes('🏦')) {
+      noteType = 'account';
+    } else if (relatedText.includes('📈')) {
+      noteType = 'trade';
+    } else if (relatedText.includes('📋')) {
+      noteType = 'trade_plan';
+    } else if (relatedText.includes('📊')) {
+      noteType = 'ticker';
+    }
+
+    if (type === 'all' || noteType === type) {
+      row.style.display = '';
+      visibleCount++;
+    } else {
+      row.style.display = 'none';
+    }
+  });
+
+  // עדכון מונה ההערות המוצגות
+  const tableCountElement = document.querySelector('.table-count');
+  if (tableCountElement) {
+    if (type === 'all') {
+      const originalCount = window.originalNotesCount || '0';
+      tableCountElement.textContent = `${originalCount} הערות`;
+    } else {
+      tableCountElement.textContent = `${visibleCount} הערות מסוג ${getTypeDisplayName(type)}`;
+    }
+  }
+
+  console.log(`✅ סוננו ${visibleCount} הערות מסוג ${type}`);
+}
+
+// פונקציה לקבלת שם תצוגה לסוג
+function getTypeDisplayName(type) {
+  switch (type) {
+    case 'account': return 'חשבונות';
+    case 'trade': return 'טריידים';
+    case 'trade_plan': return 'תוכניות';
+    case 'ticker': return 'טיקרים';
+    default: return type;
+  }
+}
+
+// פונקציה לצפייה בהערה
+function viewNote(noteId) {
+  console.log('🔄 viewNote נקראה עבור ID:', noteId);
+
+  // שמירת מזהה ההערה הנוכחית
+  window.currentViewingNoteId = noteId;
+
+  // טעינת נתוני ההערה
+  loadNoteForViewing(noteId);
+
+  // הצגת המודל
+  const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
+  modal.show();
+}
+
+// פונקציה לטעינת נתוני הערה לצפייה
+async function loadNoteForViewing(noteId) {
+  try {
+    const response = await fetch(`/api/v1/notes/${noteId}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    const note = responseData.data || responseData;
+
+    console.log('✅ נטענו נתוני הערה לצפייה:', note);
+
+    // מילוי המודל
+    document.getElementById('viewNoteRelated').textContent = getNoteRelatedDisplay(note);
+    document.getElementById('viewNoteContent').innerHTML = note.content || 'ללא תוכן';
+    document.getElementById('viewNoteCreated').textContent = note.created_at ? new Date(note.created_at).toLocaleString('he-IL') : 'לא מוגדר';
+
+    // הצגת קובץ מצורף
+    const attachmentElement = document.getElementById('viewNoteAttachment');
+    if (note.attachment) {
+      const fileName = note.attachment;
+      const fileExtension = fileName.split('.').pop()?.toLowerCase();
+      let fileIcon = '📄';
+
+      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+        fileIcon = '🖼️';
+      } else if (['pdf'].includes(fileExtension)) {
+        fileIcon = '📕';
+      } else if (['doc', 'docx'].includes(fileExtension)) {
+        fileIcon = '📘';
+      } else if (['txt'].includes(fileExtension)) {
+        fileIcon = '📄';
+      } else if (['xls', 'xlsx'].includes(fileExtension)) {
+        fileIcon = '📊';
+      }
+
+      attachmentElement.innerHTML = `
+        <a href="/api/v1/notes/files/${fileName}" target="_blank" class="btn btn-sm btn-outline-primary">
+          ${fileIcon} ${fileName}
+        </a>
+      `;
+    } else {
+      attachmentElement.textContent = 'אין קובץ מצורף';
+    }
+
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת נתוני הערה לצפייה:', error);
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בטעינת נתוני הערה', 'error');
+    }
+  }
+}
+
+// פונקציה לקבלת תצוגת הקשר של הערה
+function getNoteRelatedDisplay(note) {
+  if (!note.related_type_id || !note.related_id) {
+    return 'כללי';
+  }
+
+  switch (note.related_type_id) {
+    case 1: return `🏦 חשבון ${note.related_id}`;
+    case 2: return `📈 טרייד ${note.related_id}`;
+    case 3: return `📋 תוכנית ${note.related_id}`;
+    case 4: return `📊 טיקר ${note.related_id}`;
+    default: return `אובייקט ${note.related_id}`;
+  }
+}
+
+// פונקציה לעריכת הערה נוכחית
+function editCurrentNote() {
+  const noteId = window.currentViewingNoteId;
+  if (noteId) {
+    // סגירת מודל הצפייה
+    const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewNoteModal'));
+    viewModal.hide();
+
+    // פתיחת מודל העריכה
+    showEditNoteModal(noteId);
+  }
+}
+
+// פונקציה להצגת קובץ מצורף נוכחי במודל עריכה
+function displayCurrentAttachment(attachment) {
+  const displayElement = document.getElementById('currentAttachmentDisplay');
+  const actionsElement = document.getElementById('attachmentActions');
+
+  if (!displayElement || !actionsElement) {
+    console.error('❌ לא נמצאו אלמנטים להצגת קובץ מצורף');
+    return;
+  }
+
+  if (attachment) {
+    const fileName = attachment;
+    const fileExtension = fileName.split('.').pop()?.toLowerCase();
+    let fileIcon = '📄';
+
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+      fileIcon = '🖼️';
+    } else if (['pdf'].includes(fileExtension)) {
+      fileIcon = '📕';
+    } else if (['doc', 'docx'].includes(fileExtension)) {
+      fileIcon = '📘';
+    } else if (['txt'].includes(fileExtension)) {
+      fileIcon = '📄';
+    } else if (['xls', 'xlsx'].includes(fileExtension)) {
+      fileIcon = '📊';
+    }
+
+    displayElement.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span>${fileIcon}</span>
+        <span>${fileName}</span>
+        <a href="/api/v1/notes/files/${fileName}" target="_blank" class="btn btn-sm btn-outline-primary" style="margin-right: auto;">
+          👁️ צפה
+        </a>
+      </div>
+    `;
+    actionsElement.style.display = 'block';
+  } else {
+    displayElement.textContent = 'אין קובץ מצורף';
+    actionsElement.style.display = 'none';
+  }
+}
+
+// פונקציה למחיקת קובץ מצורף נוכחי
+function removeCurrentAttachment() {
+  console.log('🔄 removeCurrentAttachment נקראה');
+
+  const displayElement = document.getElementById('currentAttachmentDisplay');
+  const actionsElement = document.getElementById('attachmentActions');
+  const fileInput = document.getElementById('editNoteAttachment');
+
+  if (displayElement) {
+    displayElement.textContent = 'אין קובץ מצורף';
+  }
+
+  if (actionsElement) {
+    actionsElement.style.display = 'none';
+  }
+
+  if (fileInput) {
+    fileInput.value = '';
+  }
+
+  // סימון שמחיקת הקובץ נדרשת
+  window.removeAttachmentFlag = true;
+
+  if (typeof window.showNotification === 'function') {
+    window.showNotification('הקובץ המצורף יימחק בעת שמירת ההערה', 'info');
+  }
+}
+
+// פונקציה להחלפת קובץ מצורף
+function replaceCurrentAttachment() {
+  console.log('🔄 replaceCurrentAttachment נקראה');
+
+  const fileInput = document.getElementById('editNoteAttachment');
+  if (fileInput) {
+    fileInput.click();
+  }
+
+  // סימון שהחלפת הקובץ נדרשת
+  window.replaceAttachmentFlag = true;
+}
 

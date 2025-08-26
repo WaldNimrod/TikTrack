@@ -268,6 +268,36 @@ const TABLE_COLUMN_MAPPINGS = {
         'id',              // 0 - מזהה
         'note_relation_type', // 1 - סוג קשר
         'created_at'       // 2 - נוצר ב
+    ],
+
+    // Test Page Tables - דף הבדיקה
+    'test_trades': [
+        'ticker',          // 0 - טיקר
+        'status',          // 1 - סטטוס
+        'type',            // 2 - טיפוס
+        'account',         // 3 - חשבון
+        'date',            // 4 - תאריך
+        'quantity',        // 5 - כמות
+        'price',           // 6 - מחיר
+        'value'            // 7 - ערך
+    ],
+
+    'test_general': [
+        'name',            // 0 - שם
+        'status',          // 1 - סטטוס
+        'type',            // 2 - טיפוס
+        'account',         // 3 - חשבון
+        'date',            // 4 - תאריך
+        'amount'           // 5 - סכום
+    ],
+
+    'test_notifications': [
+        'date',            // 0 - תאריך
+        'type',            // 1 - טיפוס
+        'title',           // 2 - כותרת
+        'description',     // 3 - תיאור
+        'account',         // 4 - חשבון
+        'status'           // 5 - סטטוס
     ]
 };
 
@@ -300,6 +330,13 @@ function getColumnValue(item, columnIndex, tableType) {
         tableType === 'executions' || tableType === 'cash_flows') {
 
         // Return the field value directly from the item
+        return item[fieldName] || '';
+    }
+
+    // Test Page Tables - Direct field mapping from HTML cells
+    if (tableType === 'test_trades' || tableType === 'test_general' || tableType === 'test_notifications') {
+        // For test tables, the data comes from HTML cells, so we return the field name
+        // The actual value extraction is handled in the filter functions
         return item[fieldName] || '';
     }
 

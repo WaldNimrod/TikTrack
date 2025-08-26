@@ -40,7 +40,9 @@ let alertsData = [];
 let accountsData = [];
 let tradesData = [];
 let tradePlansData = [];
-let tickersData = [];
+// שימוש במשתנה הגלובלי כדי למנוע התנגשויות
+window.tickersData = window.tickersData || [];
+let tickersData = window.tickersData;
 
 // בדיקה שהפונקציות הגלובליות זמינות
 console.log('🔧 Checking global functions in alerts.js...');

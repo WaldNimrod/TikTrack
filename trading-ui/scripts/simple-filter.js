@@ -278,6 +278,9 @@ class SimpleFilter {
         this.applyFiltersToTradePlansTable();
         this.applyFiltersToAlertsTable();
         this.applyFiltersToDatabaseDisplayTables();
+        
+        // Apply to test page tables
+        this.applyFiltersToTestPageTables();
     }
 
     applyFiltersToTable(tableId) {
@@ -513,6 +516,245 @@ class SimpleFilter {
                 console.log(`🔄 Table ${tableId} not found, skipping`);
             }
         });
+
+        // Apply filters to test page tables
+        this.applyFiltersToTestPageTables();
+    }
+
+    applyFiltersToTestPageTables() {
+        console.log('🔄 Applying filters to test page tables');
+
+        // Apply to trades table
+        this.applyFiltersToTestTradesTable();
+        
+        // Apply to test table
+        this.applyFiltersToTestGeneralTable();
+        
+        // Apply to notifications table
+        this.applyFiltersToTestNotificationsTable();
+    }
+
+    applyFiltersToTestTradesTable() {
+        const table = document.getElementById('tradesTable');
+        if (!table) {
+            console.log('🔄 Test trades table not found, skipping filter application');
+            return;
+        }
+
+        console.log('🔄 Applying filters to test trades table');
+        const tbody = table.querySelector('tbody');
+        if (!tbody) {
+            console.log('🔄 Test trades table tbody not found');
+            return;
+        }
+
+        const rows = tbody.querySelectorAll('tr');
+        let visibleCount = 0;
+
+        console.log(`🔄 Processing ${rows.length} rows in test trades table`);
+
+        rows.forEach((row, index) => {
+            // Get data from test trades table structure
+            const ticker = row.cells[0]?.textContent?.trim() || '';
+            const status = row.cells[1]?.textContent?.trim() || '';
+            const type = row.cells[2]?.textContent?.trim() || '';
+            const account = row.cells[3]?.textContent?.trim() || '';
+            const date = row.cells[4]?.textContent?.trim() || '';
+
+            console.log(`🔄 Row ${index + 1}: ticker="${ticker}", status="${status}", type="${type}", account="${account}"`);
+
+            let shouldShow = true;
+
+            // Status filter
+            if (this.currentFilters.status && this.currentFilters.status.length > 0) {
+                if (!this.currentFilters.status.includes(status)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by status filter`);
+                }
+            }
+
+            // Type filter
+            if (shouldShow && this.currentFilters.type && this.currentFilters.type.length > 0) {
+                if (!this.currentFilters.type.includes(type)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by type filter`);
+                }
+            }
+
+            // Account filter
+            if (shouldShow && this.currentFilters.account && this.currentFilters.account.length > 0) {
+                if (!this.currentFilters.account.includes(account)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by account filter`);
+                }
+            }
+
+            // Search filter
+            if (shouldShow && this.currentFilters.search) {
+                const searchText = this.currentFilters.search.toLowerCase();
+                const searchableText = `${ticker} ${status} ${type} ${account} ${date}`.toLowerCase();
+                console.log(`🔄 Search filter: search="${searchText}", searchable="${searchableText}"`);
+
+                if (!searchableText.includes(searchText)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by search filter`);
+                }
+            }
+
+            row.style.display = shouldShow ? '' : 'none';
+            if (shouldShow) visibleCount++;
+        });
+
+        console.log(`🔄 Test trades table filtering complete: ${visibleCount}/${rows.length} rows visible`);
+    }
+
+    applyFiltersToTestGeneralTable() {
+        const table = document.getElementById('testTable');
+        if (!table) {
+            console.log('🔄 Test general table not found, skipping filter application');
+            return;
+        }
+
+        console.log('🔄 Applying filters to test general table');
+        const tbody = table.querySelector('tbody');
+        if (!tbody) {
+            console.log('🔄 Test general table tbody not found');
+            return;
+        }
+
+        const rows = tbody.querySelectorAll('tr');
+        let visibleCount = 0;
+
+        console.log(`🔄 Processing ${rows.length} rows in test general table`);
+
+        rows.forEach((row, index) => {
+            // Get data from test general table structure
+            const name = row.cells[0]?.textContent?.trim() || '';
+            const status = row.cells[1]?.textContent?.trim() || '';
+            const type = row.cells[2]?.textContent?.trim() || '';
+            const account = row.cells[3]?.textContent?.trim() || '';
+            const date = row.cells[4]?.textContent?.trim() || '';
+
+            console.log(`🔄 Row ${index + 1}: name="${name}", status="${status}", type="${type}", account="${account}"`);
+
+            let shouldShow = true;
+
+            // Status filter
+            if (this.currentFilters.status && this.currentFilters.status.length > 0) {
+                if (!this.currentFilters.status.includes(status)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by status filter`);
+                }
+            }
+
+            // Type filter
+            if (shouldShow && this.currentFilters.type && this.currentFilters.type.length > 0) {
+                if (!this.currentFilters.type.includes(type)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by type filter`);
+                }
+            }
+
+            // Account filter
+            if (shouldShow && this.currentFilters.account && this.currentFilters.account.length > 0) {
+                if (!this.currentFilters.account.includes(account)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by account filter`);
+                }
+            }
+
+            // Search filter
+            if (shouldShow && this.currentFilters.search) {
+                const searchText = this.currentFilters.search.toLowerCase();
+                const searchableText = `${name} ${status} ${type} ${account} ${date}`.toLowerCase();
+                console.log(`🔄 Search filter: search="${searchText}", searchable="${searchableText}"`);
+
+                if (!searchableText.includes(searchText)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by search filter`);
+                }
+            }
+
+            row.style.display = shouldShow ? '' : 'none';
+            if (shouldShow) visibleCount++;
+        });
+
+        console.log(`🔄 Test general table filtering complete: ${visibleCount}/${rows.length} rows visible`);
+    }
+
+    applyFiltersToTestNotificationsTable() {
+        const table = document.getElementById('notificationsTable');
+        if (!table) {
+            console.log('🔄 Test notifications table not found, skipping filter application');
+            return;
+        }
+
+        console.log('🔄 Applying filters to test notifications table');
+        const tbody = table.querySelector('tbody');
+        if (!tbody) {
+            console.log('🔄 Test notifications table tbody not found');
+            return;
+        }
+
+        const rows = tbody.querySelectorAll('tr');
+        let visibleCount = 0;
+
+        console.log(`🔄 Processing ${rows.length} rows in test notifications table`);
+
+        rows.forEach((row, index) => {
+            // Get data from test notifications table structure
+            const date = row.cells[0]?.textContent?.trim() || '';
+            const type = row.cells[1]?.textContent?.trim() || '';
+            const title = row.cells[2]?.textContent?.trim() || '';
+            const description = row.cells[3]?.textContent?.trim() || '';
+            const account = row.cells[4]?.textContent?.trim() || '';
+            const status = row.cells[5]?.textContent?.trim() || '';
+
+            console.log(`🔄 Row ${index + 1}: type="${type}", status="${status}", account="${account}"`);
+
+            let shouldShow = true;
+
+            // Status filter
+            if (this.currentFilters.status && this.currentFilters.status.length > 0) {
+                if (!this.currentFilters.status.includes(status)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by status filter`);
+                }
+            }
+
+            // Type filter
+            if (shouldShow && this.currentFilters.type && this.currentFilters.type.length > 0) {
+                if (!this.currentFilters.type.includes(type)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by type filter`);
+                }
+            }
+
+            // Account filter
+            if (shouldShow && this.currentFilters.account && this.currentFilters.account.length > 0) {
+                if (!this.currentFilters.account.includes(account)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by account filter`);
+                }
+            }
+
+            // Search filter
+            if (shouldShow && this.currentFilters.search) {
+                const searchText = this.currentFilters.search.toLowerCase();
+                const searchableText = `${date} ${type} ${title} ${description} ${account} ${status}`.toLowerCase();
+                console.log(`🔄 Search filter: search="${searchText}", searchable="${searchableText}"`);
+
+                if (!searchableText.includes(searchText)) {
+                    shouldShow = false;
+                    console.log(`🔄 Row ${index + 1} hidden by search filter`);
+                }
+            }
+
+            row.style.display = shouldShow ? '' : 'none';
+            if (shouldShow) visibleCount++;
+        });
+
+        console.log(`🔄 Test notifications table filtering complete: ${visibleCount}/${rows.length} rows visible`);
     }
 
     applyFiltersToDatabaseTable(tableId) {

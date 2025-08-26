@@ -107,6 +107,7 @@
   <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
   <script src="scripts/accounts.js"></script>
+  <script src="scripts/executions.js"></script>
   <script src="scripts/trades.js"></script>
 </head>
 
@@ -1319,7 +1320,7 @@
               <div>
                 <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ביטול</button>
                 <button type="button" class="btn btn-success"
-                  onclick="if (typeof window.saveEditTrade === 'function') { window.saveEditTrade(); } else { console.error('saveEditTrade function not found'); }">
+                  onclick="if (typeof window.saveEditTradeData === 'function') { window.saveEditTradeData(); } else { console.error('saveEditTradeData function not found'); }">
                   שמור
                 </button>
               </div>

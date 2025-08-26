@@ -536,6 +536,7 @@ function updateStatistics() {
   document.getElementById('tradesStats').textContent = allData.trades?.length || 0;
   document.getElementById('tickersStats').textContent = allData.tickers?.length || 0;
   document.getElementById('tradePlansStats').textContent = allData.tradePlans?.length || 0;
+  document.getElementById('alertsStats').textContent = allData.alerts?.length || 0;
 }
 
 
@@ -615,7 +616,7 @@ function updateTradesTable() {
 
   // בדיקה אם trades קיים ומערך
   if (!allData.trades || !Array.isArray(allData.trades) || allData.trades.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="13" class="text-center">אין נתונים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="14" class="text-center">אין נתונים</td></tr>';
     document.getElementById('tradesCount').textContent = '0 רשומות';
     return;
   }
@@ -632,6 +633,7 @@ function updateTradesTable() {
       <td>${trade.status || ''}</td>
       <td>${trade.investment_type || ''}</td>
       <td>${trade.side || ''}</td>
+      <td>${trade.opened_at || ''}</td>
       <td>${trade.closed_at || ''}</td>
       <td>${trade.cancelled_at || ''}</td>
       <td>${trade.cancel_reason || ''}</td>
@@ -730,7 +732,7 @@ function updateExecutionsTable() {
 
   // בדיקה אם executions קיים ומערך
   if (!allData.executions || !Array.isArray(allData.executions) || allData.executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="11" class="text-center">אין נתונים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" class="text-center">אין נתונים</td></tr>';
     document.getElementById('executionsCount').textContent = '0 רשומות';
     return;
   }
@@ -748,9 +750,9 @@ function updateExecutionsTable() {
       <td class="number-cell">${formatNumber(execution.price)}</td>
       <td class="number-cell">${formatNumber(execution.fee)}</td>
       <td>${execution.source || ''}</td>
-      <td>${execution.external_id || ''}</td>
-      <td>${execution.notes || ''}</td>
       <td>${execution.created_at || ''}</td>
+      <td>${execution.notes || ''}</td>
+      <td>${execution.external_id || ''}</td>
       <td>
         ${createEditButton(`editRecord('executions', ${execution.id})`)}
         ${createDeleteButton(`deleteRecord('executions', ${execution.id})`)}
@@ -823,6 +825,7 @@ function updateAlertsTable() {
       <td>${alert.ticker_id || ''}</td>
       <td>${alert.message || ''}</td>
       <td>${alert.triggered_at || ''}</td>
+      <td>${alert.created_at || ''}</td>
       <td>${alert.status || ''}</td>
       <td>${alert.is_triggered || ''}</td>
       <td>${alert.related_type_id || ''}</td>
@@ -830,7 +833,6 @@ function updateAlertsTable() {
       <td>${alert.condition_attribute || ''}</td>
       <td>${alert.condition_operator || ''}</td>
       <td class="number-cell">${formatNumber(alert.condition_number)}</td>
-      <td>${alert.created_at || ''}</td>
       <td>
         ${createEditButton(`editRecord('alerts', ${alert.id})`)}
         ${createDeleteButton(`deleteRecord('alerts', ${alert.id})`)}
@@ -849,7 +851,7 @@ function updateNotesTable() {
 
   // בדיקה אם notes קיים ומערך
   if (!allData.notes || !Array.isArray(allData.notes) || allData.notes.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין נתונים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center">אין נתונים</td></tr>';
     document.getElementById('notesCount').textContent = '0 רשומות';
     return;
   }
@@ -862,9 +864,9 @@ function updateNotesTable() {
       <td>${note.id || ''}</td>
       <td>${note.content || ''}</td>
       <td>${note.attachment || ''}</td>
+      <td>${note.created_at || ''}</td>
       <td>${note.related_type_id || ''}</td>
       <td>${note.related_id || ''}</td>
-      <td>${note.created_at || ''}</td>
       <td>
         ${createEditButton(`editRecord('notes', ${note.id})`)}
         ${createDeleteButton(`deleteRecord('notes', ${note.id})`)}

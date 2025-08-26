@@ -42,12 +42,12 @@ class Ticker(BaseModel):
     # Primary fields
     symbol = Column(String(10), unique=True, nullable=False, index=True, 
                    comment="Ticker symbol - must be unique")
-    name = Column(String(25), nullable=False, 
-                 comment="Company or asset name - max 25 chars per constraints")
+    name = Column(String(100), nullable=False, 
+                 comment="Company or asset name - max 100 chars per constraints")
     type = Column(String(20), nullable=False, 
                  comment="Asset type: stock, etf, crypto, forex, commodity")
-    remarks = Column(Text, nullable=True, 
-                    comment="Additional notes about the ticker")
+    remarks = Column(String(500), nullable=True, 
+                    comment="Additional notes about the ticker - max 500 chars")
     currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False, 
                         comment="Currency ID from currencies table")
     active_trades = Column(Boolean, default=False, nullable=True, 

@@ -15,7 +15,7 @@ class Trade(BaseModel):
     status = Column(String(20), default='open', nullable=True)
     investment_type = Column(String(20), default='swing', nullable=False)  # NOT NULL per constraints
     side = Column(String(10), default='Long', nullable=True)  # Long, Short
-    # opened_at field removed - using created_at from BaseModel instead
+    opened_at = Column(DateTime, nullable=True)
     closed_at = Column(DateTime, nullable=True)
     cancelled_at = Column(DateTime, nullable=True)
     cancel_reason = Column(String(500), nullable=True)

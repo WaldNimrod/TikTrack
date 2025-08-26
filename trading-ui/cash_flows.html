@@ -51,7 +51,7 @@
     <!-- Modular grid files - loaded at end of file -->
 </head>
 
-<body class="cash-flows-page">
+<body>
     <!-- General background -->
     <div class="background-wrapper">
 
@@ -62,7 +62,7 @@
         <!-- Page body - All content after header -->
         <div class="page-body">
             <!-- Cash flows area - top-Section -->
-            <div class="top-section cash-flows-page">
+            <div class="top-section">
                 <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
@@ -228,7 +228,7 @@
         aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header modal-header-colored">
                     <h5 class="modal-title" id="addCashFlowModalLabel">הוספת תזרים מזומנים חדש</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -301,12 +301,21 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="cashFlowDescription" class="form-label">תיאור</label>
                                     <textarea class="form-control" id="cashFlowDescription" rows="3"
                                         placeholder="תיאור התזרים..." maxlength="500"></textarea>
                                     <div class="invalid-feedback" id="cashFlowDescriptionError"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cashFlowExternalId" class="form-label">מזהה חיצוני</label>
+                                    <input type="text" class="form-control" id="cashFlowExternalId"
+                                        placeholder="מזהה הרשומה אצל הברוקר..." maxlength="100" disabled>
+                                    <div class="invalid-feedback" id="cashFlowExternalIdError"></div>
+                                    <small class="form-text text-muted">נדרש רק כאשר המקור אינו ידני</small>
                                 </div>
                             </div>
                         </div>
@@ -328,7 +337,7 @@
         aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header modal-header-colored">
                     <h5 class="modal-title" id="editCashFlowModalLabel">עריכת תזרים מזומנים</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -402,12 +411,21 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="editCashFlowDescription" class="form-label">תיאור</label>
                                     <textarea class="form-control" id="editCashFlowDescription" rows="3"
                                         placeholder="תיאור התזרים..." maxlength="500"></textarea>
                                     <div class="invalid-feedback" id="editCashFlowDescriptionError"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editCashFlowExternalId" class="form-label">מזהה חיצוני</label>
+                                    <input type="text" class="form-control" id="editCashFlowExternalId"
+                                        placeholder="מזהה הרשומה אצל הברוקר..." maxlength="100" disabled>
+                                    <div class="invalid-feedback" id="editCashFlowExternalIdError"></div>
+                                    <small class="form-text text-muted">נדרש רק כאשר המקור אינו ידני</small>
                                 </div>
                             </div>
                         </div>

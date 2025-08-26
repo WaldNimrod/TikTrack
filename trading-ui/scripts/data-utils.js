@@ -115,7 +115,7 @@ function generateCurrencyOptions(account = null) {
   if (!window.currenciesData || window.currenciesData.length === 0) {
     // אם אין מטבעות, נחזיר ברירת מחדל
     return `
-      <option value="1" ${account && (account.currency_id === 1 || (account.currency && account.currency.symbol === 'USD')) ? 'selected' : ''}>דולר אמריקאי (USD)</option>
+      <option value="USD" ${account && (account.currency_id === 1 || (account.currency && account.currency.symbol === 'USD') || (account.currency === 'USD')) ? 'selected' : ''}>דולר אמריקאי (USD)</option>
     `;
   }
 
@@ -123,10 +123,11 @@ function generateCurrencyOptions(account = null) {
     const isSelected = account && (
       account.currency_id === currency.id ||
       (account.currency && account.currency.symbol === currency.symbol) ||
-      (account.currency === currency.symbol)
+      (account.currency === currency.symbol) ||
+      (account.currency_id && account.currency_id === currency.id)
     );
 
-    return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
+    return `<option value="${currency.symbol}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
   }).join('');
 }
 
@@ -177,7 +178,7 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
     try {
       const response = await apiCall(endpoint);
       const data = response.data || response;
-      
+
       if (Array.isArray(data)) {
         console.log(`✅ Data loaded from ${endpoint}:`, data.length, 'items');
         return data;
@@ -187,12 +188,12 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
       }
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed for ${endpoint}:`, error);
-      
+
       if (attempt === maxRetries) {
         console.error(`❌ All ${maxRetries} attempts failed for ${endpoint}`);
         return [];
       }
-      
+
       // Wait before retry
       await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
     }
@@ -212,7 +213,7 @@ function validateDataStructure(data, type = 'data') {
     console.error(`❌ ${type} is not an array:`, typeof data);
     return false;
   }
-  
+
   console.log(`✅ ${type} validation passed:`, data.length, 'items');
   return true;
 }
@@ -230,7 +231,7 @@ function filterDataBySearch(data, searchTerm, searchFields = []) {
   }
 
   const term = searchTerm.toLowerCase().trim();
-  
+
   return data.filter(item => {
     return searchFields.some(field => {
       const value = item[field];

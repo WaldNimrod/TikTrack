@@ -166,9 +166,9 @@ async function showAddExecutionModal() {
     const todayString = today.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
     document.getElementById('addExecutionDate').value = todayString;
 
-    // הגדרת עמלה ברירת מחדל מהעדפות
+    // הגדרת עמלה ברירת מחדל
     try {
-        const defaultCommission = await getCurrentPreference('defaultCommission') || 1.0;
+        const defaultCommission = 1.0; // ערך ברירת מחדל קבוע
         document.getElementById('addExecutionCommission').value = defaultCommission;
         console.log('💰 עמלה ברירת מחדל נטענה:', defaultCommission);
     } catch (error) {
@@ -439,28 +439,21 @@ function validateTickerSymbol(input) {
 }
 
 /**
- * ולידציה של בחירת טרייד או תכנון
+ * ולידציה של מזהה טרייד
  */
 function validateExecutionTradeId(input) {
     const selectedValue = input.value.trim();
     const errorElement = document.getElementById(input.id + 'Error');
 
     if (!selectedValue) {
-        showFieldError(input, errorElement, 'בחירת טרייד או תכנון היא שדה חובה');
+        showFieldError(input, errorElement, 'בחירת טרייד היא שדה חובה');
         return false;
     }
 
-    // בדיקה שהערך מתחיל ב-trade_ או plan_
-    if (!selectedValue.startsWith('trade_') && !selectedValue.startsWith('plan_')) {
-        showFieldError(input, errorElement, 'יש לבחור טרייד או תכנון מהרשימה');
-        return false;
-    }
-
-    // בדיקה שיש מספר אחרי הקידומת
-    const idPart = selectedValue.replace('trade_', '').replace('plan_', '');
-    const numId = parseInt(idPart);
+    // בדיקה שהערך הוא מספר חיובי
+    const numId = parseInt(selectedValue);
     if (isNaN(numId) || numId < 0) {
-        showFieldError(input, errorElement, 'ערך לא תקין לטרייד או תכנון');
+        showFieldError(input, errorElement, 'מזהה טרייד חייב להיות מספר חיובי');
         return false;
     }
 
@@ -482,7 +475,7 @@ function validateExecutionQuantity(input) {
 
     const numQuantity = parseFloat(quantity);
     if (isNaN(numQuantity) || numQuantity <= 0) {
-        showFieldError(input, errorElement, 'כמות חייבת להיות מספר חיובי');
+        showFieldError(input, errorElement, 'כמות חייבת להיות מספר חיובי (לפי אילוץ quantity > 0)');
         return false;
     }
 
@@ -504,7 +497,7 @@ function validateExecutionPrice(input) {
 
     const numPrice = parseFloat(price);
     if (isNaN(numPrice) || numPrice <= 0) {
-        showFieldError(input, errorElement, 'מחיר חייב להיות מספר חיובי');
+        showFieldError(input, errorElement, 'מחיר חייב להיות מספר חיובי (לפי אילוץ price > 0)');
         return false;
     }
 
@@ -513,7 +506,7 @@ function validateExecutionPrice(input) {
 }
 
 /**
- * ולידציה של עמלה
+ * ולידציה של עמלה (fee)
  */
 function validateExecutionCommission(input) {
     const commission = input.value.trim();
@@ -522,9 +515,93 @@ function validateExecutionCommission(input) {
     if (commission) {
         const numCommission = parseFloat(commission);
         if (isNaN(numCommission) || numCommission < 0) {
-            showFieldError(input, errorElement, 'עמלה חייבת להיות מספר חיובי או אפס');
+            showFieldError(input, errorElement, 'עמלה חייבת להיות מספר חיובי או אפס (שדה fee אופציונלי)');
             return false;
         }
+    }
+
+    clearFieldError(input, errorElement);
+    return true;
+}
+
+/**
+ * ולידציה של מקור (source)
+ */
+function validateExecutionSource(input) {
+    const source = input.value.trim();
+    const errorElement = document.getElementById(input.id + 'Error');
+
+    if (source && source.length > 100) {
+        showFieldError(input, errorElement, 'מקור ארוך מדי (מקסימום 100 תווים)');
+        return false;
+    }
+
+    clearFieldError(input, errorElement);
+    return true;
+}
+
+/**
+ * ולידציה של הערות (notes)
+ */
+function validateExecutionNotes(input) {
+    const notes = input.value.trim();
+    const errorElement = document.getElementById(input.id + 'Error');
+
+    if (notes && notes.length > 500) {
+        showFieldError(input, errorElement, 'הערות ארוכות מדי (מקסימום 500 תווים לפי VARCHAR(500))');
+        return false;
+    }
+
+    clearFieldError(input, errorElement);
+    return true;
+}
+
+/**
+ * ולידציה של מזהה חיצוני (external_id)
+ */
+function validateExecutionExternalId(input) {
+    const externalId = input.value.trim();
+    const errorElement = document.getElementById(input.id + 'Error');
+
+    if (externalId && externalId.length > 100) {
+        showFieldError(input, errorElement, 'מזהה חיצוני ארוך מדי (מקסימום 100 תווים לפי VARCHAR(100))');
+        return false;
+    }
+
+    clearFieldError(input, errorElement);
+    return true;
+}
+
+/**
+ * ולידציה של תאריך (date)
+ */
+function validateExecutionDate(input) {
+    const date = input.value.trim();
+    const errorElement = document.getElementById(input.id + 'Error');
+
+    if (!date) {
+        showFieldError(input, errorElement, 'תאריך עסקה הוא שדה חובה (לפי אילוץ NOT NULL)');
+        return false;
+    }
+
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+        showFieldError(input, errorElement, 'תאריך לא תקין');
+        return false;
+    }
+
+    const today = new Date();
+    const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+
+    if (dateObj > maxDate) {
+        showFieldError(input, errorElement, 'תאריך לא יכול להיות יותר משנה קדימה');
+        return false;
+    }
+
+    const minDate = new Date(2000, 0, 1);
+    if (dateObj < minDate) {
+        showFieldError(input, errorElement, 'תאריך לא יכול להיות לפני שנת 2000');
+        return false;
     }
 
     clearFieldError(input, errorElement);
@@ -543,9 +620,9 @@ function validateExecutionType(input) {
         return false;
     }
 
-    // בדיקה שהערך הוא אחד מהערכים המותרים בבסיס הנתונים
+    // בדיקה שהערך הוא אחד מהערכים המותרים בבסיס הנתונים (ENUM: buy, sale)
     if (type !== 'buy' && type !== 'sale') {
-        showFieldError(input, errorElement, 'סוג עסקה חייב להיות "קנייה" או "מכירה"');
+        showFieldError(input, errorElement, 'סוג עסקה חייב להיות "קנייה" (buy) או "מכירה" (sale) לפי אילוץ ENUM');
         return false;
     }
 
@@ -615,19 +692,19 @@ function validateCompleteExecutionForm(mode) {
     const prefix = mode === 'add' ? 'add' : 'edit';
     let isValid = true;
 
-    // וולידציה של מזהה טרייד
+    // וולידציה של מזהה טרייד (trade_id - שדה חובה)
     const tradeIdField = document.getElementById(`${prefix}ExecutionTradeId`);
     if (!validateExecutionTradeId(tradeIdField)) {
         isValid = false;
     }
 
-    // וולידציה של סוג עסקה
+    // וולידציה של סוג עסקה (action - שדה חובה)
     const typeField = document.getElementById(`${prefix}ExecutionType`);
     if (!validateExecutionType(typeField)) {
         isValid = false;
     }
 
-    // וולידציה של כמות
+    // וולידציה של כמות (quantity - שדה חובה)
     const quantityField = document.getElementById(`${prefix}ExecutionQuantity`);
     if (!validateExecutionQuantity(quantityField)) {
         isValid = false;
@@ -641,7 +718,7 @@ function validateCompleteExecutionForm(mode) {
         }
     }
 
-    // וולידציה של מחיר
+    // וולידציה של מחיר (price - שדה חובה)
     const priceField = document.getElementById(`${prefix}ExecutionPrice`);
     if (!validateExecutionPrice(priceField)) {
         isValid = false;
@@ -655,43 +732,15 @@ function validateCompleteExecutionForm(mode) {
         }
     }
 
-    // וולידציה של תאריך (שדה חובה לפי האילוצים בבסיס הנתונים)
+    // וולידציה של תאריך (date - שדה חובה לפי האילוצים בבסיס הנתונים)
     const dateField = document.getElementById(`${prefix}ExecutionDate`);
-    if (!dateField.value) {
-        const errorElement = document.getElementById(dateField.id + 'Error');
-        showFieldError(dateField, errorElement, 'תאריך עסקה הוא שדה חובה');
+    if (!validateExecutionDate(dateField)) {
         isValid = false;
-    } else {
-        const date = new Date(dateField.value);
-        if (isNaN(date.getTime())) {
-            const errorElement = document.getElementById(dateField.id + 'Error');
-            showFieldError(dateField, errorElement, 'תאריך לא תקין');
-            isValid = false;
-        } else {
-            const today = new Date();
-            const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-
-            if (date > maxDate) {
-                const errorElement = document.getElementById(dateField.id + 'Error');
-                showFieldError(dateField, errorElement, 'תאריך לא יכול להיות יותר משנה קדימה');
-                isValid = false;
-            } else {
-                const minDate = new Date(2000, 0, 1);
-                if (date < minDate) {
-                    const errorElement = document.getElementById(dateField.id + 'Error');
-                    showFieldError(dateField, errorElement, 'תאריך לא יכול להיות לפני שנת 2000');
-                    isValid = false;
-                } else {
-                    const errorElement = document.getElementById(dateField.id + 'Error');
-                    clearFieldError(dateField, errorElement);
-                }
-            }
-        }
     }
 
-    // וולידציה של עמלה (אופציונלי)
+    // וולידציה של עמלה (fee - אופציונלי)
     const commissionField = document.getElementById(`${prefix}ExecutionCommission`);
-    if (commissionField.value) {
+    if (commissionField && commissionField.value) {
         if (!validateExecutionCommission(commissionField)) {
             isValid = false;
         } else {
@@ -705,16 +754,32 @@ function validateCompleteExecutionForm(mode) {
         }
     }
 
-    // וולידציה של הערות (אופציונלי)
+    // וולידציה של הערות (notes - אופציונלי)
     const notesField = document.getElementById(`${prefix}ExecutionNotes`);
-    if (notesField.value && notesField.value.length > 1000) {
-        const errorElement = document.getElementById(notesField.id + 'Error');
-        showFieldError(notesField, errorElement, 'הערות ארוכות מדי (מקסימום 1,000 תווים)');
-        isValid = false;
-    } else if (notesField.value) {
-        const errorElement = document.getElementById(notesField.id + 'Error');
-        clearFieldError(notesField, errorElement);
+    if (notesField && notesField.value) {
+        if (!validateExecutionNotes(notesField)) {
+            isValid = false;
+        }
     }
+
+    // וולידציה של מקור (source - אופציונלי)
+    const sourceField = document.getElementById(`${prefix}ExecutionSource`);
+    if (sourceField && sourceField.value) {
+        if (!validateExecutionSource(sourceField)) {
+            isValid = false;
+        }
+    }
+
+    // וולידציה של מזהה חיצוני (external_id - אופציונלי, VARCHAR(100))
+    const externalIdField = document.getElementById(`${prefix}ExecutionExternalId`);
+    if (externalIdField && externalIdField.value) {
+        if (!validateExecutionExternalId(externalIdField)) {
+            isValid = false;
+        }
+    }
+
+    // הערה: שדה created_at הוא שדה חובה אבל מוגדר אוטומטית על ידי השרת
+    // שדה id הוא PRIMARY KEY AUTOINCREMENT ומוגדר אוטומטית
 
     return isValid;
 }
@@ -766,15 +831,13 @@ async function saveExecution() {
         return;
     }
 
-    // עיבוד ערך trade_id - יכול להיות trade_X או plan_X
+    // עיבוד ערך trade_id - עכשיו זה מספר ישיר
     let tradeId = null;
     if (tradeIdValue) {
-        if (tradeIdValue.startsWith('trade_')) {
-            tradeId = parseInt(tradeIdValue.replace('trade_', ''));
-        } else if (tradeIdValue.startsWith('plan_')) {
-            tradeId = parseInt(tradeIdValue.replace('plan_', ''));
-        } else {
-            tradeId = parseInt(tradeIdValue);
+        tradeId = parseInt(tradeIdValue);
+        if (isNaN(tradeId) || tradeId < 0) {
+            showNotification('❌ מזהה טרייד לא תקין', 'error');
+            return;
         }
     }
 
@@ -854,23 +917,21 @@ async function updateExecution() {
         return;
     }
 
-    // עיבוד ערך trade_id - יכול להיות trade_X או plan_X
+    // עיבוד ערך trade_id - עכשיו זה מספר ישיר
     let tradeId = null;
     if (tradeIdValue) {
-        if (tradeIdValue.startsWith('trade_')) {
-            tradeId = parseInt(tradeIdValue.replace('trade_', ''));
-        } else if (tradeIdValue.startsWith('plan_')) {
-            tradeId = parseInt(tradeIdValue.replace('plan_', ''));
-        } else {
-            tradeId = parseInt(tradeIdValue);
+        tradeId = parseInt(tradeIdValue);
+        if (isNaN(tradeId) || tradeId < 0) {
+            showNotification('❌ מזהה טרייד לא תקין', 'error');
+            return;
         }
     }
 
     try {
-        const source = document.getElementById('editExecutionSource').value;
+        const source = document.getElementById('editExecutionSource')?.value || 'manual';
 
         const executionData = {
-            trade_id: parseInt(tradeId),
+            trade_id: tradeId,
             action: type,
             quantity: parseInt(quantity),
             price: parseFloat(price),
@@ -1352,14 +1413,17 @@ function goToNote(noteId) {
 async function loadExecutionsData() {
     console.log('🔄 === LOAD EXECUTIONS DATA FUNCTION CALLED ===');
     console.log('🔄 Function loadExecutionsData entered at:', new Date().toISOString());
+    console.log('🔄 Current page:', window.location.pathname);
 
     try {
         console.log('🔄 === LOAD EXECUTIONS DATA START ===');
         console.log('🔄 טעינת נתוני עסקעות');
 
         const response = await fetch('/api/v1/executions/?_t=' + Date.now());
+        console.log('🔄 API response status:', response.status);
         if (response.ok) {
             const data = await response.json();
+            console.log('🔄 API response data:', data);
             executionsData = data.data || data;
             console.log('✅ נטענו', executionsData.length, 'עסקעות');
             console.log('📊 נתוני עסקעות:', executionsData);
@@ -1383,13 +1447,15 @@ async function loadExecutionsData() {
                         filters.dateRange,
                         filters.search
                     );
-                    updateExecutionsTable(filteredData);
+                    updateExecutionsTableMain(filteredData);
                     return;
                 }
             }
 
             // עדכון הטבלה
-            updateExecutionsTable(executionsData);
+            console.log('🔄 About to call updateExecutionsTableMain with', executionsData.length, 'executions');
+            console.log('🔄 updateExecutionsTableMain function type:', typeof window.updateExecutionsTableMain);
+            updateExecutionsTableMain(executionsData);
 
         } else {
             console.error('❌ שגיאה בטעינת עסקעות');
@@ -1405,13 +1471,24 @@ async function loadExecutionsData() {
 /**
  * עדכון טבלת עסקעות
  */
-async function updateExecutionsTable(executions) {
-    console.log('🔄 === UPDATE EXECUTIONS TABLE START ===');
+async function updateExecutionsTableMain(executions) {
+    console.log('🔄 === UPDATE EXECUTIONS TABLE START (MAIN FUNCTION) ===');
     console.log('🔄 updateExecutionsTable נקראה עם', executions.length, 'עסקעות');
     console.log('📊 נתוני עסקעות:', executions);
+    console.log('🔄 Current page:', window.location.pathname);
 
+    const table = document.querySelector('#executionsTable');
+    console.log('🔍 Looking for #executionsTable:', table);
     const tbody = document.querySelector('#executionsTable tbody');
-    if (!tbody) return;
+    console.log('🔍 Looking for #executionsTable tbody:', tbody);
+    if (!tbody) {
+        console.error('❌ executionsTable tbody not found');
+        console.log('🔍 All tables on page:', document.querySelectorAll('table'));
+        console.log('🔍 All table IDs on page:', Array.from(document.querySelectorAll('table')).map(t => t.id));
+        console.log('🔍 Current page:', window.location.pathname);
+        return;
+    }
+    console.log('✅ Found executionsTable tbody, proceeding with update');
 
     if (executions.length === 0) {
         tbody.innerHTML = '<tr><td colspan="10" class="text-center">לא נמצאו עסקעות</td></tr>';
@@ -1637,6 +1714,10 @@ window.validateExecutionQuantity = validateExecutionQuantity;
 window.validateExecutionPrice = validateExecutionPrice;
 window.validateExecutionCommission = validateExecutionCommission;
 window.validateExecutionType = validateExecutionType;
+window.validateExecutionSource = validateExecutionSource;
+window.validateExecutionNotes = validateExecutionNotes;
+window.validateExecutionExternalId = validateExecutionExternalId;
+window.validateExecutionDate = validateExecutionDate;
 
 // פונקציות מודל פריטים מקושרים
 window.showExecutionLinkedItemsModal = showExecutionLinkedItemsModal;
@@ -1669,7 +1750,7 @@ function sortTable(columnIndex) {
             'executions',
             columnIndex,
             window.executionsData || [],
-            updateExecutionsTable
+            updateExecutionsTableMain
         );
     } else {
         console.error('❌ sortTable function not found in main.js');
@@ -1684,7 +1765,7 @@ function restoreSortState() {
     console.log('🔄 Restoring sort state for executions table');
 
     if (typeof window.restoreAnyTableSort === 'function') {
-        window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTable);
+        window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
     } else {
         console.error('❌ restoreAnyTableSort function not found in main.js');
     }
@@ -1884,7 +1965,7 @@ async function loadActiveTradesForTicker(mode = 'add') {
             // הוספת טריידים
             filteredTrades.forEach(trade => {
                 const option = document.createElement('option');
-                option.value = `trade_${trade.id}`;
+                option.value = trade.id; // מספר ישיר
                 const statusText = trade.status === 'active' ? 'פעיל' :
                     trade.status === 'closed' ? 'סגור' :
                         trade.status === 'cancelled' ? 'בוטל' : trade.status;
@@ -1900,14 +1981,14 @@ async function loadActiveTradesForTicker(mode = 'add') {
                     }
                 }
 
-                option.textContent = `${trade.side} ${trade.investment_type} - ${creationDate} (${statusText})`;
+                option.textContent = `טרייד: ${trade.side} ${trade.investment_type} - ${creationDate} (${statusText})`;
                 tradeSelect.appendChild(option);
             });
 
             // הוספת תכנונים
             filteredPlans.forEach(plan => {
                 const option = document.createElement('option');
-                option.value = `plan_${plan.id}`;
+                option.value = plan.id; // מספר ישיר
                 const statusText = plan.status === 'open' ? 'פתוח' :
                     plan.status === 'closed' ? 'סגור' :
                         plan.status === 'cancelled' ? 'בוטל' : plan.status;
@@ -1923,7 +2004,7 @@ async function loadActiveTradesForTicker(mode = 'add') {
                     }
                 }
 
-                option.textContent = `${plan.side} ${plan.investment_type} - ${creationDate} (${statusText})`;
+                option.textContent = `תכנון: ${plan.side} ${plan.investment_type} - ${creationDate} (${statusText})`;
                 tradeSelect.appendChild(option);
             });
 
@@ -2192,13 +2273,13 @@ function updateExecutionsSummary(executions) {
 
 // הגדרת הפונקציות כגלובליות
 window.loadTickersWithOpenOrClosedTradesAndPlans = loadTickersWithOpenOrClosedTradesAndPlans;
-window.loadTickersWithClosedTrades = loadTickersWithClosedTrades;
-window.loadActiveTradesForTicker = loadActiveTradesForTicker;
+// window.loadTickersWithClosedTrades = loadTickersWithClosedTrades; // פונקציה לא קיימת
+// window.loadActiveTradesForTicker = loadActiveTradesForTicker; // פונקציה לא קיימת
 window.enableAllFields = enableAllFields;
-window.toggleExternalIdField = toggleExternalIdField;
+// window.toggleExternalIdField = toggleExternalIdField; // פונקציה לא קיימת
 window.resetAddExecutionForm = resetAddExecutionForm;
 window.resetEditExecutionForm = resetEditExecutionForm;
-window.updateTradesOnCheckboxChange = updateTradesOnCheckboxChange;
+// window.updateTradesOnCheckboxChange = updateTradesOnCheckboxChange; // פונקציה לא קיימת
 window.goToTickerPage = goToTickerPage;
 window.updateExecutionsSummary = updateExecutionsSummary;
 window.showTickerHelp = showTickerHelp;
@@ -2263,3 +2344,161 @@ function goToLinkedTrade(mode = 'edit') {
 
 // הגדרת הפונקציה כגלובלית
 window.goToLinkedTrade = goToLinkedTrade;
+
+// ========================================
+// פונקציות שהועברו מ-trades.js
+// ========================================
+
+/**
+ * טעינת עסקאות לטרייד
+ * @param {number} tradeId - מזהה הטרייד
+ */
+function loadTradeExecutions(tradeId) {
+    console.log('🔄 טעינת עסקאות לטרייד:', tradeId);
+
+    try {
+        // כאן תהיה קריאה לשרת לטעינת העסקאות
+        // כרגע נציג נתוני דוגמה
+        const executionsData = [
+            {
+                id: 1,
+                date: '2024-01-15 10:30',
+                type: 'buy',
+                quantity: 50,
+                price: 44.50,
+                commission: 1.25,
+                total: 2226.25,
+                status: 'completed'
+            },
+            {
+                id: 2,
+                date: '2024-01-16 14:15',
+                type: 'buy',
+                quantity: 50,
+                price: 46.00,
+                commission: 1.25,
+                total: 2301.25,
+                status: 'completed'
+            },
+            {
+                id: 3,
+                date: '2024-01-20 11:45',
+                type: 'sell',
+                quantity: 100,
+                price: 47.50,
+                commission: 1.25,
+                total: 4748.75,
+                status: 'completed'
+            }
+        ];
+
+        // לא צריך לעדכן טבלה בדף executions (זו פונקציה למודל עריכת טרייד)
+        console.log('ℹ️ loadTradeExecutions called on executions page - no action needed');
+        console.log('✅ loadTradeExecutions completed successfully');
+    } catch (error) {
+        console.error('❌ Error in loadTradeExecutions:', error);
+    }
+}
+
+/**
+ * עדכון טבלת העסקאות במודל עריכת טרייד
+ * @param {Array} executions - מערך העסקאות
+ */
+function updateExecutionsTableForTradeModal(executions) {
+    console.log('🔄 updateExecutionsTableForTradeModal called with:', executions);
+
+    // בדיקה אם אנחנו בדף trades או בדף executions
+    const currentPath = window.location.pathname;
+    const isTradesPage = currentPath === '/trades' || currentPath.includes('trades');
+
+    if (isTradesPage) {
+        // בדף trades - עדכון טבלת העסקאות במודל העריכה
+        const tableBody = document.getElementById('editTradeExecutionsTable');
+        if (!tableBody) {
+            console.warn('⚠️ editTradeExecutionsTable element not found on trades page');
+            return;
+        }
+
+        tableBody.innerHTML = '';
+
+        executions.forEach(execution => {
+            const row = document.createElement('tr');
+
+            const typeBadge = execution.type === 'buy'
+                ? '<span class="badge bg-success">קניה</span>'
+                : '<span class="badge bg-danger">מכירה</span>';
+
+            const statusBadge = execution.status === 'completed'
+                ? '<span class="badge bg-success">הושלם</span>'
+                : '<span class="badge bg-warning">ממתין</span>';
+
+            row.innerHTML = `
+                <td>${execution.date}</td>
+                <td>${typeBadge}</td>
+                <td>${execution.quantity}</td>
+                <td>$${execution.price.toFixed(2)}</td>
+                <td>$${execution.commission.toFixed(2)}</td>
+                <td>$${execution.total.toFixed(2)}</td>
+                <td>${statusBadge}</td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+
+        console.log('✅ updateExecutionsTable completed for trades page');
+    } else {
+        // בדף executions - לא צריך לעדכן טבלה זו (זו פונקציה למודל עריכת טרייד)
+        console.log('ℹ️ updateExecutionsTableForTradeModal called on executions page - no action needed');
+    }
+}
+
+/**
+ * הוספת קניה/מכירה במודל עריכת טרייד
+ */
+function addEditBuySell() {
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח', 'info');
+    } else {
+        alert('פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח');
+    }
+}
+
+/**
+ * שיוך עסקה קיימת לטרייד
+ */
+function linkExistingExecution() {
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('פונקציונליות שיוך עסקה קיימת נמצאת בפיתוח', 'info');
+    } else {
+        alert('פונקציונליות שיוך עסקה קיימת נמצאת בפיתוח');
+    }
+}
+
+/**
+ * ביטול שיוך עסקה מטרייד
+ */
+function unlinkExecution() {
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('פונקציונליות ביטול שיוך עסקה נמצאת בפיתוח', 'info');
+    } else {
+        alert('פונקציונליות ביטול שיוך עסקה נמצאת בפיתוח');
+    }
+}
+
+// הגדרת הפונקציות כגלובליות
+window.loadTradeExecutions = loadTradeExecutions;
+window.updateExecutionsTableMain = updateExecutionsTableMain;
+window.updateExecutionsTableForTradeModal = updateExecutionsTableForTradeModal;
+window.addEditBuySell = addEditBuySell;
+window.linkExistingExecution = linkExistingExecution;
+window.unlinkExecution = unlinkExecution;
+
+// בדיקה שהפונקציות נטענו בהצלחה
+console.log('✅ Execution functions loaded:', {
+    loadTradeExecutions: typeof loadTradeExecutions,
+    updateExecutionsTableMain: typeof updateExecutionsTableMain,
+    updateExecutionsTableForTradeModal: typeof updateExecutionsTableForTradeModal,
+    addEditBuySell: typeof addEditBuySell,
+    linkExistingExecution: typeof linkExistingExecution,
+    unlinkExecution: typeof unlinkExecution
+});

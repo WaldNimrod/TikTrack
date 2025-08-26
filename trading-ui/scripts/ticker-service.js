@@ -281,7 +281,7 @@ async function getTickersWithOpenOrClosedTradesAndPlans(options = {}) {
     const relevantTickers = tickers.filter(ticker => {
         // בדיקת טריידים בסטטוס פתוח או סגור
         const hasOpenOrClosedTrades = trades.some(trade =>
-            trade.ticker.id === ticker.id &&
+            trade.ticker_id === ticker.id &&
             (trade.status === 'open' || trade.status === 'closed')
         );
 

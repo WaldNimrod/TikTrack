@@ -81,11 +81,11 @@
 /* עמוד תזרים מזומנים - סגול */
 .cash-flows-page .section-header,
 .cash-flows-page .top-section .section-header {
-  border-bottom: 2px solid #6f42c1;
-  background: linear-gradient(135deg, rgba(111, 66, 193, 0.1) 0%, rgba(111, 66, 193, 0.05) 100%);
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
+  border-bottom: 2px solid #6f42c1 !important;
+  background: linear-gradient(135deg, rgba(111, 66, 193, 0.1) 0%, rgba(111, 66, 193, 0.05) 100%) !important;
+  padding: 1rem !important;
+  border-radius: 8px !important;
+  margin-bottom: 1rem !important;
 }
 
 /* עמוד עסקאות - כחול כהה */
@@ -846,14 +846,26 @@ button.btn-primary-emphasized {
 
   /* סגנונות ל-top-section */
   .top-section {
-    background: transparent !important;
+    background: red !important;
     margin: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    padding: 0 !important;
+    padding: 15px 0 0 0 !important;
     max-width: 1400px !important;
     margin-left: auto !important;
     margin-right: auto !important;
+  }
+
+  /* הגדרה ספציפית לדף טיקרים - top-section */
+  .tickers-page .top-section {
+    background: red !important;
+    margin-top: 15px !important;
+  }
+
+  /* הגדרה ספציפית לדף טיקרים - content-section */
+  .tickers-page .content-section {
+    background: blue !important;
+    padding-top: 15px !important;
   }
 
   .top-section .section-header {
@@ -4162,4 +4174,29 @@ a:hover,
 /* Bottom page spacing */
 .bottom-spacing {
   height: 3rem;
+}
+
+/* ===== סגנונות לשדה מזהה חיצוני ===== */
+.form-control-disabled {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+  border-color: #dee2e6 !important;
+}
+
+.form-control-disabled:focus {
+  box-shadow: none !important;
+  border-color: #dee2e6 !important;
+}
+
+.form-control-disabled::placeholder {
+  color: #adb5bd !important;
+}
+
+/* עיצוב טקסט עזרה לשדה מזהה חיצוני */
+.form-text.text-muted {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
 }

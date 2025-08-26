@@ -17,7 +17,7 @@
  * - translation-utils.js (translation functions)
  * 
  * File: trading-ui/scripts/preferences.js
- * @version 2.2
+ * @version 1.9.9
  * @author TikTrack Development Team
  * @since August 2025
  */

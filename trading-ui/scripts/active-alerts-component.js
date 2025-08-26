@@ -9,8 +9,8 @@
  * - alerts.js (formatAlertCondition and parseAlertCondition functions)
  * 
  * File: trading-ui/scripts/active-alerts-component.js
- * Version: 2.4.1
- * Last Updated: August 24, 2025
+ * Version: 1.9.9
+ * Last Updated: August 26, 2025
  * 
  * Features:
  * - מציג איקון פעמון עם מספר אדום בכותרת הסקשן כשיש התראות חדשות

@@ -10,13 +10,29 @@ Features:
 - Get parent entities (entities that this entity references)
 - Support for all entity types: trades, accounts, tickers, alerts, etc.
 - Comprehensive relationship mapping
+- SQLite-specific optimizations with proper type handling
+
+Database Schema:
+- Uses related_type_id (integer) instead of related_type (string)
+- Entity type mappings: 1=account, 2=trade, 3=trade_plan, 4=ticker, 5=alert, 6=cash_flow, 7=execution
+- Proper foreign key relationships with related_item_id
+
+API Endpoints:
+- GET /api/v1/linked-items/<entity_type>/<entity_id>
+  Returns: {child_entities: [], parent_entities: [], total_counts}
 
 Author: Tik.track Development Team
-Last Updated: 2025-01-15
+Last Updated: August 26, 2025
+Version: 2.0
+
+Recent Updates:
+- Fixed SQLite compatibility (CONCAT -> ||)
+- Updated to use related_type_id instead of related_type
+- Enhanced error handling and logging
+- Improved performance with optimized queries
 """
 
 from flask import Blueprint, jsonify, request
-from sqlalchemy import text
 from typing import Dict, List, Any, Optional
 import logging
 
@@ -28,8 +44,15 @@ linked_items_bp = Blueprint('linked_items', __name__, url_prefix='/api/v1/linked
 
 def get_db_connection():
     """Get database connection"""
-    from Backend.app import get_db_connection
-    return get_db_connection()
+    import os
+    import sqlite3
+    
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+    
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 @linked_items_bp.route('/<entity_type>/<int:entity_id>', methods=['GET'])
 def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
@@ -50,7 +73,9 @@ def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
         cursor = conn.cursor()
         
         # Get child entities (entities that reference this entity)
+        logger.info(f"Calling get_child_entities for {entity_type} {entity_id}")
         child_entities = get_child_entities(cursor, entity_type, entity_id)
+        logger.info(f"Found {len(child_entities)} child entities")
         
         # Get parent entities (entities that this entity references)
         parent_entities = get_parent_entities(cursor, entity_type, entity_id)
@@ -190,10 +215,10 @@ def get_trade_child_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     # Get notes
     cursor.execute("""
         SELECT n.id, 'note' as type, 'הערה' as title, 
-               LEFT(n.content, 100) as description,
+               substr(n.content, 1, 100) as description,
                n.created_at, 'active' as status
         FROM notes n
-        WHERE n.related_type = 'trade' AND n.related_id = ?
+        WHERE n.related_type_id = 2 AND n.related_id = ?
     """, (trade_id,))
     
     for row in cursor.fetchall():
@@ -209,10 +234,10 @@ def get_trade_child_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     # Get alerts
     cursor.execute("""
         SELECT id, 'alert' as type, 'התראה' as title, 
-               CONCAT('התראה: ', message) as description,
+               'התראה: ' || message as description,
                created_at, status
         FROM alerts 
-        WHERE related_type = 'trade' AND related_id = ?
+        WHERE related_type_id = 2 AND related_id = ?
     """, (trade_id,))
     
     for row in cursor.fetchall():
@@ -274,10 +299,10 @@ def get_account_child_entities(cursor, account_id: int) -> List[Dict[str, Any]]:
     # Get notes
     cursor.execute("""
         SELECT n.id, 'note' as type, 'הערה' as title, 
-               LEFT(n.content, 100) as description,
+               substr(n.content, 1, 100) as description,
                n.created_at, 'active' as status
         FROM notes n
-        WHERE n.related_type = 'account' AND n.related_id = ?
+        WHERE n.related_type_id = 1 AND n.related_id = ?
     """, (account_id,))
     
     for row in cursor.fetchall():
@@ -296,11 +321,12 @@ def get_account_child_entities(cursor, account_id: int) -> List[Dict[str, Any]]:
 def get_ticker_child_entities(cursor, ticker_id: int) -> List[Dict[str, Any]]:
     """Get child entities for a ticker"""
     children = []
+    logger.info(f"Getting child entities for ticker {ticker_id}")
     
     # Get trades
     cursor.execute("""
         SELECT t.id, 'trade' as type, 'טרייד' as title, 
-               CONCAT('טרייד ', t.side, ' - ', t.investment_type) as description,
+               'טרייד ' || t.side || ' - ' || t.investment_type as description,
                t.created_at, t.status
         FROM trades t
         WHERE t.ticker_id = ?
@@ -319,7 +345,7 @@ def get_ticker_child_entities(cursor, ticker_id: int) -> List[Dict[str, Any]]:
     # Get trade plans
     cursor.execute("""
         SELECT id, 'trade_plan' as type, 'תוכנית טרייד' as title, 
-               CONCAT('תוכנית ', side, ' - ', investment_type) as description,
+               'תוכנית ' || side || ' - ' || investment_type as description,
                created_at, status
         FROM trade_plans 
         WHERE ticker_id = ?
@@ -338,10 +364,10 @@ def get_ticker_child_entities(cursor, ticker_id: int) -> List[Dict[str, Any]]:
     # Get alerts
     cursor.execute("""
         SELECT id, 'alert' as type, 'התראה' as title, 
-               CONCAT('התראה: ', message) as description,
+               'התראה: ' || message as description,
                created_at, status
         FROM alerts 
-        WHERE related_type = 'ticker' AND related_id = ?
+        WHERE related_type_id = 4 AND related_id = ?
     """, (ticker_id,))
     
     for row in cursor.fetchall():
@@ -357,10 +383,10 @@ def get_ticker_child_entities(cursor, ticker_id: int) -> List[Dict[str, Any]]:
     # Get notes
     cursor.execute("""
         SELECT n.id, 'note' as type, 'הערה' as title, 
-               LEFT(n.content, 100) as description,
+               substr(n.content, 1, 100) as description,
                n.created_at, 'active' as status
         FROM notes n
-        WHERE n.related_type = 'ticker' AND n.related_id = ?
+        WHERE n.related_type_id = 4 AND n.related_id = ?
     """, (ticker_id,))
     
     for row in cursor.fetchall():
@@ -480,7 +506,7 @@ def get_note_parent_entities(cursor, note_id: int) -> List[Dict[str, Any]]:
     parents = []
     
     cursor.execute("""
-        SELECT related_id, related_type, content
+        SELECT related_id, related_type_id, content
         FROM notes
         WHERE id = ?
     """, (note_id,))
@@ -488,19 +514,19 @@ def get_note_parent_entities(cursor, note_id: int) -> List[Dict[str, Any]]:
     row = cursor.fetchone()
     if row and row[0] and row[1]:
         related_id = row[0]
-        related_type = row[1]
+        related_type_id = row[1]
         
         # Get the related entity based on type
-        if related_type == 'trade':
+        if related_type_id == 2:  # trade
             cursor.execute("""
                 SELECT t.id, 'trade' as type, 'טרייד' as title, 
-                       CONCAT('טרייד ', t.side, ' על ', tk.symbol) as description,
+                       'טרייד ' || t.side || ' על ' || tk.symbol as description,
                        t.created_at, t.status
                 FROM trades t
                 JOIN tickers tk ON t.ticker_id = tk.id
                 WHERE t.id = ?
             """, (related_id,))
-        elif related_type == 'account':
+        elif related_type_id == 1:  # account
             cursor.execute("""
                 SELECT id, 'account' as type, 'חשבון' as title, 
                        name as description,
@@ -508,10 +534,10 @@ def get_note_parent_entities(cursor, note_id: int) -> List[Dict[str, Any]]:
                 FROM accounts
                 WHERE id = ?
             """, (related_id,))
-        elif related_type == 'ticker':
+        elif related_type_id == 4:  # ticker
             cursor.execute("""
                 SELECT id, 'ticker' as type, 'טיקר' as title, 
-                       CONCAT(symbol, ' - ', name) as description,
+                       symbol || ' - ' || name as description,
                        created_at, 'active' as status
                 FROM tickers
                 WHERE id = ?
@@ -538,7 +564,7 @@ def get_alert_parent_entities(cursor, alert_id: int) -> List[Dict[str, Any]]:
     parents = []
     
     cursor.execute("""
-        SELECT related_id, related_type, message
+        SELECT related_id, related_type_id, message
         FROM alerts
         WHERE id = ?
     """, (alert_id,))
@@ -546,22 +572,22 @@ def get_alert_parent_entities(cursor, alert_id: int) -> List[Dict[str, Any]]:
     row = cursor.fetchone()
     if row and row[0] and row[1]:
         related_id = row[0]
-        related_type = row[1]
+        related_type_id = row[1]
         
         # Get the related entity based on type
-        if related_type == 'trade':
+        if related_type_id == 2:  # trade
             cursor.execute("""
                 SELECT t.id, 'trade' as type, 'טרייד' as title, 
-                       CONCAT('טרייד ', t.side, ' על ', tk.symbol) as description,
+                       'טרייד ' || t.side || ' על ' || tk.symbol as description,
                        t.created_at, t.status
                 FROM trades t
                 JOIN tickers tk ON t.ticker_id = tk.id
                 WHERE t.id = ?
             """, (related_id,))
-        elif related_type == 'ticker':
+        elif related_type_id == 4:  # ticker
             cursor.execute("""
                 SELECT id, 'ticker' as type, 'טיקר' as title, 
-                       CONCAT(symbol, ' - ', name) as description,
+                       symbol || ' - ' || name as description,
                        created_at, 'active' as status
                 FROM tickers
                 WHERE id = ?
@@ -590,10 +616,10 @@ def get_alert_child_entities(cursor, alert_id: int) -> List[Dict[str, Any]]:
     # Get notes
     cursor.execute("""
         SELECT n.id, 'note' as type, 'הערה' as title, 
-               LEFT(n.content, 100) as description,
+               substr(n.content, 1, 100) as description,
                n.created_at, 'active' as status
         FROM notes n
-        WHERE n.related_type = 'alert' AND n.related_id = ?
+        WHERE n.related_type_id = 5 AND n.related_id = ?
     """, (alert_id,))
     
     for row in cursor.fetchall():
@@ -635,10 +661,10 @@ def get_trade_plan_child_entities(cursor, trade_plan_id: int) -> List[Dict[str, 
     # Get notes
     cursor.execute("""
         SELECT n.id, 'note' as type, 'הערה' as title, 
-               LEFT(n.content, 100) as description,
+               substr(n.content, 1, 100) as description,
                n.created_at, 'active' as status
         FROM notes n
-        WHERE n.related_type = 'trade_plan' AND n.related_id = ?
+        WHERE n.related_type_id = 3 AND n.related_id = ?
     """, (trade_plan_id,))
     
     for row in cursor.fetchall():
@@ -660,10 +686,10 @@ def get_cash_flow_child_entities(cursor, cash_flow_id: int) -> List[Dict[str, An
     # Get notes
     cursor.execute("""
         SELECT n.id, 'note' as type, 'הערה' as title, 
-               LEFT(n.content, 100) as description,
+               substr(n.content, 1, 100) as description,
                n.created_at, 'active' as status
         FROM notes n
-        WHERE n.related_type = 'cash_flow' AND n.related_id = ?
+        WHERE n.related_type_id = 6 AND n.related_id = ?
     """, (cash_flow_id,))
     
     for row in cursor.fetchall():
@@ -710,10 +736,10 @@ def get_execution_child_entities(cursor, execution_id: int) -> List[Dict[str, An
     # Get notes
     cursor.execute("""
         SELECT n.id, 'note' as type, 'הערה' as title, 
-               LEFT(n.content, 100) as description,
+               substr(n.content, 1, 100) as description,
                n.created_at, 'active' as status
         FROM notes n
-        WHERE n.related_type = 'execution' AND n.related_id = ?
+        WHERE n.related_type_id = 7 AND n.related_id = ?
     """, (execution_id,))
     
     for row in cursor.fetchall():

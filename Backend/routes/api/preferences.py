@@ -247,9 +247,28 @@ def update_preference(key: str) -> Any:
             print(f"DEBUG: Set backward compatibility {key} = {data['value']}")
         
         # Save back to file
+        print(f"DEBUG: About to save to file: {preferences_path}")
+        print(f"DEBUG: File exists before save: {os.path.exists(preferences_path)}")
+        print(f"DEBUG: Directory exists: {os.path.exists(os.path.dirname(preferences_path))}")
+        print(f"DEBUG: File writable: {os.access(preferences_path, os.W_OK) if os.path.exists(preferences_path) else 'N/A'}")
+        print(f"DEBUG: Current working directory: {os.getcwd()}")
+        
         os.makedirs(os.path.dirname(preferences_path), exist_ok=True)
-        with open(preferences_path, 'w', encoding='utf-8') as f:
-            json.dump(preferences, f, indent=2, ensure_ascii=False)
+        
+        try:
+            with open(preferences_path, 'w', encoding='utf-8') as f:
+                json.dump(preferences, f, indent=2, ensure_ascii=False)
+            print(f"DEBUG: File saved successfully")
+            print(f"DEBUG: File exists after save: {os.path.exists(preferences_path)}")
+            
+            # Verify the write by reading back
+            with open(preferences_path, 'r', encoding='utf-8') as f:
+                verify_data = json.load(f)
+            print(f"DEBUG: Verified {key} = {verify_data.get('user', {}).get(key, 'NOT_FOUND')}")
+            
+        except Exception as write_error:
+            print(f"DEBUG: Error writing file: {write_error}")
+            raise write_error
         
         return jsonify({"status": "success", "message": f"Setting {key} updated successfully"})
     except Exception as e:

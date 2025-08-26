@@ -9,8 +9,8 @@
  * Dependents: All page-specific scripts, main.js, header-system.js
  * 
  * File: trading-ui/scripts/translation-utils.js
- * Version: 2.2
- * Last Updated: August 23, 2025
+ * Version: 1.9.9
+ * Last Updated: August 26, 2025
  */
 
 // ===== תרגום סטטוסים =====

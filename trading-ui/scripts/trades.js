@@ -55,8 +55,8 @@
  * - Column mappings are centralized in table-mappings.js
  * - Sorting uses global window.sortTableData() function
  * 
- * @version 2.3
- * @lastUpdated August 24, 2025
+ * @version 1.9.9
+ * @lastUpdated August 26, 2025
  * @tableStructureFixes August 24, 2025 - Fixed column structure and sorting
  * 
  * פונקציות עיקריות:

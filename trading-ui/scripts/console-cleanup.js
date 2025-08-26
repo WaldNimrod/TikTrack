@@ -20,7 +20,7 @@
  * Dependents: All HTML pages
  * 
  * File: trading-ui/scripts/console-cleanup.js
- * @version 2.2
+ * @version 1.9.9
  * @author TikTrack Development Team
  * @since August 2025
  */

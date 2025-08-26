@@ -24,8 +24,8 @@
  * - CSS: header-system.css
  * 
  * @author TikTrack Development Team
- * @version 2.1
- * @lastUpdated August 22, 2025
+ * @version 1.9.9
+ * @lastUpdated August 26, 2025
  */
 
 /**
@@ -1873,14 +1873,26 @@ class HeaderSystem {
     allOption.onclick = () => this.selectAccountFilter('הכול');
     accountMenu.appendChild(allOption);
 
-    // הוספת חשבונות
-    accounts.forEach(account => {
-      const accountOption = document.createElement('div');
-      accountOption.className = 'account-filter-item';
-      accountOption.textContent = account.name;
-      accountOption.onclick = () => this.selectAccountFilter(account.name);
-      accountMenu.appendChild(accountOption);
-    });
+    // הוספת חשבונות מהשרת
+    if (accounts && accounts.length > 0) {
+      accounts.forEach(account => {
+        const accountOption = document.createElement('div');
+        accountOption.className = 'account-filter-item';
+        accountOption.textContent = account.name;
+        accountOption.onclick = () => this.selectAccountFilter(account.name);
+        accountMenu.appendChild(accountOption);
+      });
+    } else {
+      // הוספת חשבונות סטטיים לבדיקה
+      const staticAccounts = ['חשבון א', 'חשבון ב', 'חשבון ג'];
+      staticAccounts.forEach(accountName => {
+        const accountOption = document.createElement('div');
+        accountOption.className = 'account-filter-item';
+        accountOption.textContent = accountName;
+        accountOption.onclick = () => this.selectAccountFilter(accountName);
+        accountMenu.appendChild(accountOption);
+      });
+    }
   }
 
   selectAccountFilter(accountName) {
@@ -1893,8 +1905,14 @@ class HeaderSystem {
     }
 
     // הפעלת פילטר
-    if (window.filterSystem) {
+    if (window.simpleFilter) {
+      console.log('🔄 Calling simpleFilter.applyAccountFilter with:', accountName === 'הכול' ? [] : [accountName]);
+      window.simpleFilter.applyAccountFilter(accountName === 'הכול' ? [] : [accountName]);
+    } else if (window.filterSystem) {
+      console.log('🔄 Calling filterSystem.updateFilter with:', accountName === 'הכול' ? [] : [accountName]);
       window.filterSystem.updateFilter('account', accountName === 'הכול' ? [] : [accountName]);
+    } else {
+      console.warn('⚠️ No filter system found');
     }
   }
 

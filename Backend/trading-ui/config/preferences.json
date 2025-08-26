@@ -16,11 +16,11 @@
       "defaultStopLoss": 5,
       "defaultTargetPrice": 10,
       "timezone": "Asia/Jerusalem",
-      "defaultStatusFilter": "closed",
-      "defaultTypeFilter": "swing",
+      "defaultStatusFilter": "open",
+      "defaultTypeFilter": "final_test",
       "defaultAccountFilter": "all",
       "defaultDateRangeFilter": "this_week",
-      "defaultSearchFilter": "ררר",
+      "defaultSearchFilter": "",
       "defaultCommission": 1.5,
       "consoleCleanupInterval": 60000
     }
@@ -31,11 +31,11 @@
     "defaultStopLoss": 5,
     "defaultTargetPrice": 10,
     "timezone": "Asia/Jerusalem",
-    "defaultStatusFilter": "closed",
-    "defaultTypeFilter": "swing",
+    "defaultStatusFilter": "open",
+    "defaultTypeFilter": "final_test",
     "defaultAccountFilter": "all",
     "defaultDateRangeFilter": "this_week",
-    "defaultSearchFilter": "ררר",
+    "defaultSearchFilter": "",
     "defaultCommission": 1.5,
     "consoleCleanupInterval": 60000
   }

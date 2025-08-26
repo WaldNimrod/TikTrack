@@ -8,8 +8,8 @@
  * - translation-utils.js (translation functions)
  * 
  * File: trading-ui/scripts/simple-filter.js
- * Version: 2.2
- * Last Updated: August 23, 2025
+ * Version: 1.9.9
+ * Last Updated: August 26, 2025
  */
 
 class SimpleFilter {
@@ -315,18 +315,16 @@ class SimpleFilter {
     }
 
     applyFilters() {
-        // Apply to all tables that have the data attribute
-        const tables = document.querySelectorAll('[data-table-id]');
-
-        tables.forEach(tableElement => {
-            const tableId = tableElement.getAttribute('data-table-id');
-            this.applyFiltersToTable(tableId);
-        });
+        console.log('🔄 applyFilters called');
+        console.log('🔄 Current filters:', this.currentFilters);
 
         // Apply to specific tables based on current page
         this.applyFiltersToTradePlansTable();
         this.applyFiltersToAlertsTable();
         this.applyFiltersToDatabaseDisplayTables();
+
+        console.log('📊 FILTER APPLICATION COMPLETE');
+        console.log('🔄 All tables have been filtered according to current settings');
     }
 
     applyFiltersToTable(tableId) {
@@ -351,7 +349,7 @@ class SimpleFilter {
             let shouldShow = true;
 
             // Status filter
-            if (this.currentFilters.status.length > 0) {
+            if (this.currentFilters.status && Array.isArray(this.currentFilters.status) && this.currentFilters.status.length > 0) {
                 const translatedStatus = this.translateStatus(status);
                 if (!this.currentFilters.status.some(s => this.translateStatus(s) === translatedStatus)) {
                     shouldShow = false;
@@ -359,7 +357,7 @@ class SimpleFilter {
             }
 
             // Type filter
-            if (shouldShow && this.currentFilters.type.length > 0) {
+            if (shouldShow && this.currentFilters.type && Array.isArray(this.currentFilters.type) && this.currentFilters.type.length > 0) {
                 const translatedType = this.translateType(type);
                 if (!this.currentFilters.type.some(t => this.translateType(t) === translatedType)) {
                     shouldShow = false;
@@ -367,7 +365,7 @@ class SimpleFilter {
             }
 
             // Account filter
-            if (shouldShow && this.currentFilters.account.length > 0) {
+            if (shouldShow && this.currentFilters.account && Array.isArray(this.currentFilters.account) && this.currentFilters.account.length > 0) {
                 const accountId = row.querySelector('[data-field="account_id"]')?.getAttribute('data-value');
                 if (!this.currentFilters.account.includes(accountId)) {
                     shouldShow = false;
@@ -465,6 +463,16 @@ class SimpleFilter {
         });
 
         console.log(`🔄 Trade plans table filtering complete: ${visibleCount}/${rows.length} rows visible`);
+        console.log(`📊 TABLE SUMMARY - Trade Plans:`);
+        console.log(`   - Total rows: ${rows.length}`);
+        console.log(`   - Visible rows: ${visibleCount}`);
+        console.log(`   - Hidden rows: ${rows.length - visibleCount}`);
+        console.log(`   - Active filters:`, {
+            status: this.currentFilters.status,
+            type: this.currentFilters.type,
+            account: this.currentFilters.account,
+            search: this.currentFilters.search
+        });
     }
 
     applyFiltersToAlertsTable() {
@@ -550,7 +558,9 @@ class SimpleFilter {
             'executionsTable',
             'cashFlowsTable',
             'alertsTable',
-            'notesTable'
+            'notesTable',
+            'testTable',
+            'notificationsTable'
         ];
 
         tableIds.forEach(tableId => {
@@ -577,6 +587,9 @@ class SimpleFilter {
         const rows = tbody.querySelectorAll('tr');
         let visibleCount = 0;
 
+        // Get table type once for the entire table
+        const tableType = table.getAttribute('data-table-type');
+
         console.log(`🔄 Processing ${rows.length} rows in ${tableId}`);
 
         rows.forEach((row, index) => {
@@ -586,8 +599,9 @@ class SimpleFilter {
             }
 
             // Get data from table cells based on table type
-            const tableType = table.getAttribute('data-table-type');
             let ticker = '', status = '', type = '', account = '';
+
+            console.log(`🔄 Processing row ${index} in ${tableId}, table type: ${tableType}`);
 
             switch (tableType) {
                 case 'trade_plans':
@@ -601,6 +615,12 @@ class SimpleFilter {
                     status = row.cells[5]?.textContent?.trim() || ''; // Status
                     type = row.cells[3]?.textContent?.trim() || ''; // Investment Type
                     account = row.cells[1]?.textContent?.trim() || ''; // Account ID
+                    break;
+                case 'test_trades':
+                    ticker = row.cells[0]?.textContent?.trim() || ''; // Ticker
+                    status = row.cells[1]?.textContent?.trim() || ''; // Status
+                    type = row.cells[2]?.textContent?.trim() || ''; // Type
+                    account = row.cells[3]?.textContent?.trim() || ''; // Account
                     break;
                 case 'accounts':
                     status = row.cells[4]?.textContent?.trim() || ''; // Status
@@ -624,36 +644,157 @@ class SimpleFilter {
                 case 'notes':
                     type = row.cells[1]?.textContent?.trim() || ''; // Entity Type
                     break;
+                case 'test_general':
+                    // For test general table
+                    ticker = row.cells[0]?.textContent?.trim() || ''; // Name
+                    status = row.cells[1]?.textContent?.trim() || ''; // Status
+                    type = row.cells[2]?.textContent?.trim() || ''; // Type
+                    account = row.cells[3]?.textContent?.trim() || ''; // Account
+                    break;
+                case 'test_notifications':
+                    // For notifications table - no status filter applies
+                    ticker = row.cells[0]?.textContent?.trim() || ''; // Symbol
+                    status = ''; // No status in notifications
+                    type = row.cells[1]?.textContent?.trim() || ''; // Related to
+                    account = ''; // No account in notifications
+                    break;
+                default:
+                    // For tables without specific type, try to extract data from any available cells
+                    ticker = row.cells[0]?.textContent?.trim() || '';
+                    status = row.cells[1]?.textContent?.trim() || '';
+                    type = row.cells[2]?.textContent?.trim() || '';
+                    account = row.cells[3]?.textContent?.trim() || '';
+                    break;
             }
 
             let shouldShow = true;
 
-            // Status filter
-            if (this.currentFilters.status && this.currentFilters.status.length > 0) {
-                if (!this.currentFilters.status.some(s => this.translateStatus(s) === status)) {
-                    shouldShow = false;
+            console.log(`🔄 Row data: ticker="${ticker}", status="${status}", type="${type}", account="${account}"`);
+
+            // Status filter - skip for tables without status field
+            if (this.currentFilters.status && Array.isArray(this.currentFilters.status) && this.currentFilters.status.length > 0) {
+                // Skip status filter for tables that don't have status field
+                if (tableType === 'test_notifications' || tableType === 'notes') {
+                    console.log(`🔄 Skipping status filter for ${tableType} table (no status field) - showing all rows`);
+                } else {
+                    console.log(`🔄 Checking status filter: current="${status}", filters=${JSON.stringify(this.currentFilters.status)}`);
+                    // Filter out null/undefined values
+                    const validFilters = this.currentFilters.status.filter(s => s && s !== null && s !== undefined);
+                    console.log(`🔄 Valid filters: ${JSON.stringify(validFilters)}`);
+
+                    if (validFilters.length === 0) {
+                        console.log(`🔄 No valid status filters, showing all rows`);
+                    } else if (!validFilters.includes(status)) {
+                        console.log(`🔄 Status filter failed: "${status}" not in ${JSON.stringify(validFilters)}`);
+                        shouldShow = false;
+                    } else {
+                        console.log(`🔄 Status filter passed: "${status}" found in filters`);
+                    }
                 }
+            } else {
+                console.log(`🔄 No status filter applied - showing all rows`);
             }
 
-            // Type filter
-            if (shouldShow && this.currentFilters.type && this.currentFilters.type.length > 0) {
-                if (!this.currentFilters.type.some(t => this.translateType(t) === type)) {
-                    shouldShow = false;
+            // Type filter - skip for notifications table
+            if (shouldShow && this.currentFilters.type && Array.isArray(this.currentFilters.type) && this.currentFilters.type.length > 0) {
+                // Skip type filter for notifications table
+                if (tableType === 'test_notifications') {
+                    console.log(`🔄 Skipping type filter for ${tableType} table - showing all rows`);
+                } else {
+                    console.log(`🔄 Checking type filter: current="${type}", filters=${JSON.stringify(this.currentFilters.type)}`);
+                    // Filter out null/undefined values
+                    const validTypeFilters = this.currentFilters.type.filter(t => t && t !== null && t !== undefined);
+                    console.log(`🔄 Valid type filters: ${JSON.stringify(validTypeFilters)}`);
+
+                    if (validTypeFilters.length === 0) {
+                        console.log(`🔄 No valid type filters, showing all rows`);
+                    } else if (!validTypeFilters.includes(type)) {
+                        console.log(`🔄 Type filter failed: "${type}" not in ${JSON.stringify(validTypeFilters)}`);
+                        shouldShow = false;
+                    } else {
+                        console.log(`🔄 Type filter passed: "${type}" found in filters`);
+                    }
                 }
+            } else {
+                console.log(`🔄 No type filter applied - showing all rows`);
             }
 
-            // Account filter - skip for now since we only have account IDs
-            if (shouldShow && this.currentFilters.account && this.currentFilters.account.length > 0) {
-                console.log(`🔄 Account filter: skipping for ${tableId} (only have account IDs)`);
+            // Account filter - skip for tables without account field
+            if (shouldShow && this.currentFilters.account && Array.isArray(this.currentFilters.account) && this.currentFilters.account.length > 0) {
+                // Skip account filter for tables that don't have account field
+                if (tableType === 'test_notifications' || tableType === 'notes') {
+                    console.log(`🔄 Skipping account filter for ${tableType} table (no account field) - showing all rows`);
+                } else {
+                    console.log(`🔄 Checking account filter: current="${account}", filters=${JSON.stringify(this.currentFilters.account)}`);
+                    // Filter out null/undefined values
+                    const validAccountFilters = this.currentFilters.account.filter(a => a && a !== null && a !== undefined);
+                    console.log(`🔄 Valid account filters: ${JSON.stringify(validAccountFilters)}`);
+
+                    if (validAccountFilters.length === 0) {
+                        console.log(`🔄 No valid account filters, showing all rows`);
+                    } else if (!validAccountFilters.includes(account)) {
+                        console.log(`🔄 Account filter failed: "${account}" not in ${JSON.stringify(validAccountFilters)}`);
+                        shouldShow = false;
+                    } else {
+                        console.log(`🔄 Account filter passed: "${account}" found in filters`);
+                    }
+                }
+            } else {
+                console.log(`🔄 No account filter applied - showing all rows`);
             }
 
-            // Search filter
+            // Date filter - skip for notifications table
+            if (shouldShow && this.currentFilters.date && Array.isArray(this.currentFilters.date) && this.currentFilters.date.length > 0) {
+                // Skip date filter for notifications table
+                if (tableType === 'test_notifications') {
+                    console.log(`🔄 Skipping date filter for ${tableType} table - showing all rows`);
+                } else {
+                    // Get date from row
+                    let rowDate = '';
+                    switch (tableType) {
+                        case 'test_trades':
+                            rowDate = row.cells[4]?.textContent?.trim() || ''; // Date field
+                            break;
+                        case 'test_general':
+                            rowDate = row.cells[4]?.textContent?.trim() || ''; // Date field
+                            break;
+                        default:
+                            rowDate = row.cells[4]?.textContent?.trim() || ''; // Try to get date from 5th column
+                            break;
+                    }
+
+                    console.log(`🔄 Checking date filter: current="${rowDate}", filters=${JSON.stringify(this.currentFilters.date)}`);
+                    // Filter out null/undefined values
+                    const validDateFilters = this.currentFilters.date.filter(d => d && d !== null && d !== undefined);
+                    console.log(`🔄 Valid date filters: ${JSON.stringify(validDateFilters)}`);
+
+                    if (validDateFilters.length === 0) {
+                        console.log(`🔄 No valid date filters, showing all rows`);
+                    } else {
+                        // For now, just log the date filter - TODO: implement actual date comparison
+                        console.log(`🔄 Date filter check: row date="${rowDate}", filter="${validDateFilters[0]}"`);
+                        // TODO: Implement date range comparison logic
+                        console.log(`🔄 Date filter not yet fully implemented - showing all rows`);
+                    }
+                }
+            } else {
+                console.log(`🔄 No date filter applied - showing all rows`);
+            }
+
+            // Search filter - skip for notifications table
             if (shouldShow && this.currentFilters.search) {
-                const searchText = this.currentFilters.search.toLowerCase();
-                const searchableText = `${ticker} ${status} ${type} ${account}`.toLowerCase();
-                if (!searchableText.includes(searchText)) {
-                    shouldShow = false;
+                // Skip search filter for notifications table
+                if (tableType === 'test_notifications') {
+                    console.log(`🔄 Skipping search filter for ${tableType} table - showing all rows`);
+                } else {
+                    const searchText = this.currentFilters.search.toLowerCase();
+                    const searchableText = `${ticker} ${status} ${type} ${account}`.toLowerCase();
+                    if (!searchableText.includes(searchText)) {
+                        shouldShow = false;
+                    }
                 }
+            } else {
+                console.log(`🔄 No search filter applied - showing all rows`);
             }
 
             row.style.display = shouldShow ? '' : 'none';
@@ -661,6 +802,17 @@ class SimpleFilter {
         });
 
         console.log(`🔄 ${tableId} filtering complete: ${visibleCount}/${rows.length} rows visible`);
+        console.log(`📊 TABLE SUMMARY - ${tableId}:`);
+        console.log(`   - Total rows: ${rows.length}`);
+        console.log(`   - Visible rows: ${visibleCount}`);
+        console.log(`   - Hidden rows: ${rows.length - visibleCount}`);
+        console.log(`   - Table type: ${tableType || 'unknown'}`);
+        console.log(`   - Active filters:`, {
+            status: this.currentFilters.status,
+            type: this.currentFilters.type,
+            account: this.currentFilters.account,
+            search: this.currentFilters.search
+        });
     }
 
     /**
@@ -832,7 +984,11 @@ class SimpleFilter {
      * Update type filter button selections
      */
     updateTypeButtonSelections() {
+        console.log('🔄 updateTypeButtonSelections called');
+        console.log('🔄 Current type filters:', this.currentFilters.type);
+
         const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
+        console.log('🔄 Found type items:', typeItems.length);
 
         // הסרת סימון מכל הכפתורים
         typeItems.forEach(item => item.classList.remove('selected'));
@@ -840,20 +996,32 @@ class SimpleFilter {
         // סימון הכפתורים לפי הפילטרים הנוכחיים
         if (this.currentFilters.type && this.currentFilters.type.length > 0) {
             this.currentFilters.type.forEach(type => {
-                const item = Array.from(typeItems).find(item =>
-                    item.getAttribute('data-value') === type
-                );
+                console.log('🔄 Looking for type:', type);
+                const item = Array.from(typeItems).find(item => {
+                    const dataValue = item.getAttribute('data-value');
+                    console.log('🔄 Checking item with data-value:', dataValue);
+                    return dataValue === type;
+                });
                 if (item) {
+                    console.log('✅ Found and selected type item:', type);
                     item.classList.add('selected');
+                } else {
+                    console.warn('⚠️ Type item not found:', type);
                 }
             });
         } else {
             // אם אין פילטר טיפוס, סמן "הכול"
-            const allItem = Array.from(typeItems).find(item =>
-                item.getAttribute('data-value') === 'הכול'
-            );
+            console.log('🔄 No type filters, selecting "הכול"');
+            const allItem = Array.from(typeItems).find(item => {
+                const dataValue = item.getAttribute('data-value');
+                console.log('🔄 Checking item with data-value:', dataValue);
+                return dataValue === 'הכול';
+            });
             if (allItem) {
+                console.log('✅ Found and selected "הכול" item');
                 allItem.classList.add('selected');
+            } else {
+                console.warn('⚠️ "הכול" item not found');
             }
         }
     }
@@ -863,7 +1031,11 @@ class SimpleFilter {
      * Update account filter button selections
      */
     updateAccountButtonSelections() {
+        console.log('🔄 updateAccountButtonSelections called');
+        console.log('🔄 Current account filters:', this.currentFilters.account);
+
         const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
+        console.log('🔄 Found account items:', accountItems.length);
 
         // הסרת סימון מכל הכפתורים
         accountItems.forEach(item => item.classList.remove('selected'));
@@ -871,20 +1043,32 @@ class SimpleFilter {
         // סימון הכפתורים לפי הפילטרים הנוכחיים
         if (this.currentFilters.account && this.currentFilters.account.length > 0) {
             this.currentFilters.account.forEach(account => {
-                const item = Array.from(accountItems).find(item =>
-                    item.getAttribute('data-value') === account
-                );
+                console.log('🔄 Looking for account:', account);
+                const item = Array.from(accountItems).find(item => {
+                    const dataValue = item.getAttribute('data-value');
+                    console.log('🔄 Checking item with data-value:', dataValue);
+                    return dataValue === account;
+                });
                 if (item) {
+                    console.log('✅ Found and selected account item:', account);
                     item.classList.add('selected');
+                } else {
+                    console.warn('⚠️ Account item not found:', account);
                 }
             });
         } else {
             // אם אין פילטר חשבון, סמן "הכול"
-            const allItem = Array.from(accountItems).find(item =>
-                item.getAttribute('data-value') === 'הכול'
-            );
+            console.log('🔄 No account filters, selecting "הכול"');
+            const allItem = Array.from(accountItems).find(item => {
+                const dataValue = item.getAttribute('data-value');
+                console.log('🔄 Checking item with data-value:', dataValue);
+                return dataValue === 'הכול';
+            });
             if (allItem) {
+                console.log('✅ Found and selected "הכול" item');
                 allItem.classList.add('selected');
+            } else {
+                console.warn('⚠️ "הכול" item not found');
             }
         }
     }
@@ -894,7 +1078,11 @@ class SimpleFilter {
      * Update date filter button selections
      */
     updateDateButtonSelections() {
+        console.log('🔄 updateDateButtonSelections called');
+        console.log('🔄 Current date filters:', this.currentFilters.date);
+
         const dateItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+        console.log('🔄 Found date items:', dateItems.length);
 
         // הסרת סימון מכל הכפתורים
         dateItems.forEach(item => item.classList.remove('selected'));
@@ -902,20 +1090,32 @@ class SimpleFilter {
         // סימון הכפתורים לפי הפילטרים הנוכחיים
         if (this.currentFilters.date && this.currentFilters.date.length > 0) {
             this.currentFilters.date.forEach(date => {
-                const item = Array.from(dateItems).find(item =>
-                    item.getAttribute('data-value') === date
-                );
+                console.log('🔄 Looking for date:', date);
+                const item = Array.from(dateItems).find(item => {
+                    const dataValue = item.getAttribute('data-value');
+                    console.log('🔄 Checking item with data-value:', dataValue);
+                    return dataValue === date;
+                });
                 if (item) {
+                    console.log('✅ Found and selected date item:', date);
                     item.classList.add('selected');
+                } else {
+                    console.warn('⚠️ Date item not found:', date);
                 }
             });
         } else {
             // אם אין פילטר תאריך, סמן "כל זמן"
-            const allItem = Array.from(dateItems).find(item =>
-                item.getAttribute('data-value') === 'כל זמן'
-            );
+            console.log('🔄 No date filters, selecting "כל זמן"');
+            const allItem = Array.from(dateItems).find(item => {
+                const dataValue = item.getAttribute('data-value');
+                console.log('🔄 Checking item with data-value:', dataValue);
+                return dataValue === 'כל זמן';
+            });
             if (allItem) {
+                console.log('✅ Found and selected "כל זמן" item');
                 allItem.classList.add('selected');
+            } else {
+                console.warn('⚠️ "כל זמן" item not found');
             }
         }
     }
@@ -941,9 +1141,10 @@ class SimpleFilter {
 
         // אם יש "הכול" או אין בחירות - מסירים את הפילטר
         if (statuses.includes('הכול') || statuses.length === 0) {
-            this.currentFilters.status = null; // null במקום מערך ריק
+            this.currentFilters.status = []; // מערך ריק במקום null
         } else {
-            this.currentFilters.status = statuses;
+            // Filter out null/undefined values
+            this.currentFilters.status = statuses.filter(s => s && s !== null && s !== undefined);
         }
 
         console.log('🔄 Current status filters:', this.currentFilters.status);
@@ -958,9 +1159,10 @@ class SimpleFilter {
 
         // אם יש "הכול" או אין בחירות - מסירים את הפילטר
         if (types.includes('הכול') || types.length === 0) {
-            this.currentFilters.type = null; // null במקום מערך ריק
+            this.currentFilters.type = []; // מערך ריק במקום null
         } else {
-            this.currentFilters.type = types;
+            // Filter out null/undefined values
+            this.currentFilters.type = types.filter(t => t && t !== null && t !== undefined);
         }
 
         console.log('🔄 Current type filters:', this.currentFilters.type);
@@ -975,21 +1177,10 @@ class SimpleFilter {
 
         // אם יש "הכול" או אין בחירות - מסירים את הפילטר
         if (accounts.includes('הכול') || accounts.length === 0) {
-            this.currentFilters.account = null; // null במקום מערך ריק
+            this.currentFilters.account = []; // מערך ריק במקום null
         } else {
-            // Find account IDs by names
-            const headerElement = document.getElementById('unified-header');
-            const accountIds = [];
-
-            accounts.forEach(accountName => {
-                const accountItem = headerElement?.querySelector(`#accountFilterMenu .account-filter-item[data-value="${accountName}"]`);
-                if (accountItem) {
-                    const accountId = accountItem.getAttribute('data-account-id');
-                    if (accountId) accountIds.push(accountId);
-                }
-            });
-
-            this.currentFilters.account = accountIds;
+            // Filter out null/undefined values and use account names directly
+            this.currentFilters.account = accounts.filter(a => a && a !== null && a !== undefined);
         }
 
         console.log('🔄 Current account filters:', this.currentFilters.account);
@@ -1002,11 +1193,15 @@ class SimpleFilter {
     applyDateRangeFilter(dateRange) {
         console.log('🔄 SimpleFilter.applyDateRangeFilter called with dateRange:', dateRange);
 
-        // For now, just log the date range filter
-        // TODO: Implement date range filtering logic
-        console.log('📅 Date range filter not yet implemented:', dateRange);
+        // אם יש "כל זמן" או אין בחירות - מסירים את הפילטר
+        if (dateRange === 'כל זמן' || !dateRange || dateRange.length === 0) {
+            this.currentFilters.date = []; // מערך ריק במקום null
+        } else {
+            // Filter out null/undefined values and use date range directly
+            this.currentFilters.date = [dateRange].filter(d => d && d !== null && d !== undefined);
+        }
 
-        // This will be implemented when we add date filtering to the table
+        console.log('🔄 Current date filters:', this.currentFilters.date);
         this.applyFilters();
     }
 
@@ -1027,6 +1222,12 @@ class SimpleFilter {
      * Convert status preference to Hebrew values
      */
     convertStatusPreference(preference) {
+        // Handle null/undefined preference
+        if (!preference) {
+            console.log('🔄 convertStatusPreference: preference is null/undefined, returning empty array');
+            return [];
+        }
+
         switch (preference) {
             case 'open':
                 return ['פתוח'];
@@ -1049,6 +1250,12 @@ class SimpleFilter {
      * Convert type preference to Hebrew values
      */
     convertTypePreference(preference) {
+        // Handle null/undefined preference
+        if (!preference) {
+            console.log('🔄 convertTypePreference: preference is null/undefined, returning empty array');
+            return [];
+        }
+
         switch (preference) {
             case 'swing':
                 return ['סווינג'];
@@ -1075,6 +1282,12 @@ class SimpleFilter {
      * Convert account preference to Hebrew values
      */
     convertAccountPreference(preference) {
+        // Handle null/undefined preference
+        if (!preference) {
+            console.log('🔄 convertAccountPreference: preference is null/undefined, returning empty array');
+            return [];
+        }
+
         if (preference === 'all') {
             return [];
         }
@@ -1087,6 +1300,12 @@ class SimpleFilter {
      * Convert date preference to Hebrew values
      */
     convertDatePreference(preference) {
+        // Handle null/undefined preference
+        if (!preference) {
+            console.log('🔄 convertDatePreference: preference is null/undefined, returning empty array');
+            return [];
+        }
+
         switch (preference) {
             case 'this_week':
                 return ['השבוע'];
@@ -1189,13 +1408,22 @@ class SimpleFilter {
      * Update date filter display
      */
     updateDateDisplay() {
+        console.log('🔄 updateDateDisplay called');
+        console.log('🔄 Current date filters:', this.currentFilters.date);
+
         const dateDisplay = document.getElementById('selectedDateRange');
-        if (!dateDisplay) return;
+        if (!dateDisplay) {
+            console.warn('⚠️ selectedDateRange element not found');
+            return;
+        }
 
         if (!this.currentFilters.date || !Array.isArray(this.currentFilters.date) || this.currentFilters.date.length === 0) {
+            console.log('🔄 Setting date display to "כל זמן"');
             dateDisplay.textContent = 'כל זמן';
         } else {
-            dateDisplay.textContent = this.currentFilters.date.join(', ');
+            const displayText = this.currentFilters.date.join(', ');
+            console.log('🔄 Setting date display to:', displayText);
+            dateDisplay.textContent = displayText;
         }
     }
 }

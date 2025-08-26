@@ -19,7 +19,7 @@
       "timezone": "Asia/Jerusalem",
       "consoleCleanupInterval": 60000,
       "defaultStatusFilter": "open",
-      "defaultTypeFilter": "swing",
+      "defaultTypeFilter": "test_write",
       "defaultAccountFilter": "all",
       "defaultDateRangeFilter": "this_week",
       "defaultSearchFilter": ""
@@ -33,7 +33,7 @@
     "timezone": "Asia/Jerusalem",
     "consoleCleanupInterval": 60000,
     "defaultStatusFilter": "open",
-    "defaultTypeFilter": "swing",
+    "defaultTypeFilter": "test_write",
     "defaultAccountFilter": "all",
     "defaultDateRangeFilter": "this_week",
     "defaultSearchFilter": ""

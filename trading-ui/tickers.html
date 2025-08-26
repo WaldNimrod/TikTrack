@@ -13,6 +13,7 @@
     1. טבלת טיקרים - הסקשן הראשי
     2. כרטיסיות התראות - בחלק העליון
     3. מערכת פילטרים ומיון מתקדמת
+    4. מערכת פריטים מקושרים מתקדמת
     
     מבנה הדף:
     - app-header: כותרת האפליקציה עם ניווט
@@ -20,11 +21,19 @@
       - top-section: כרטיסיות התראות וסיכום נתונים
       - content-section: טבלת טיקרים
     
+    מערכת הפריטים המקושרים:
+    - מודל מתקדם עם badges צבעוניים
+    - 4 כפתורי פעולה לכל פריט (צפייה, עריכה, פתיחת דף, מחיקה)
+    - עיצוב responsive עם תמיכה ב-RTL
+    - כותרת דינמית עם סימבול הטיקר
+    
     שינויים אחרונים:
     - עדכון שם הדף לטיקרים
     - שיפור עיצוב כרטיסיות התראות
     - תיקון כפתורי סגירה עצמאיים
     - ריכוז פונקציות טיקרים ב-tickers.js
+    - הוספת מערכת פריטים מקושרים מתקדמת
+    - הוספת קובץ CSS ייעודי למודל הפריטים המקושרים
   -->
 
   <!-- CSS Files - Ordered by priority (weak to strong) -->
@@ -48,6 +57,9 @@
 
   <!-- 7. Warning system styles -->
   <link rel="stylesheet" href="styles/warning-system.css">
+
+  <!-- 8. Linked items modal styles -->
+  <link rel="stylesheet" href="styles/linked-items.css">
 
   <!-- Modular grid files - loaded at end of file -->
 </head>

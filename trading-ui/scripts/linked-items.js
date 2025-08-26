@@ -21,20 +21,42 @@
  * - Unified API for viewing relationships between entities
  * - Easy to maintain and extend linked items functionality
  * 
- * LINKED ITEMS FEATURE IMPLEMENTATION (August 24, 2025):
- * ======================================================
+ * LINKED ITEMS FEATURE IMPLEMENTATION (August 24-26, 2025):
+ * ========================================================
  * 
- * FEATURE: "Show Linked Details" button across all tables
+ * FEATURE: Advanced Linked Items Modal with Color-Coded System
  * - Displays parent and child entities for any record
  * - Opens modal with detailed relationship information
- * - Includes edit, cancel, and delete buttons for each linked item
- * - 3-column layout for better data presentation
+ * - Includes 4 action buttons for each linked item (View, Edit, Open Page, Delete)
+ * - Color-coded badges for item types and statuses
+ * - Responsive 3-column layout for better data presentation
+ * - Hebrew localization with proper RTL support
  * 
  * IMPLEMENTATION DETAILS:
- * - Modal redesign: Changed from single column cards to 3-column grid layout
- * - Header customization: Dynamic headers based on item type (e.g., "מה קשור לטרייד: AAPL")
+ * - Modal redesign: Advanced 3-column grid layout with color-coded badges
+ * - Header customization: Dynamic headers with actual item symbols (e.g., "מה קשור לטיקר: AAPL")
  * - Content optimization: Reduced scrolling with concise item information
  * - Background click to close: Implemented for all modals across the site
+ * - Large X close button: Positioned in top-left corner for easy access
+ * - Color-coded system: Badges for item types and statuses with consistent color scheme
+ * - CSS separation: Dedicated linked-items.css file with no inline styles
+ * 
+ * COLOR CODING SYSTEM:
+ * ===================
+ * 
+ * Item Type Badges:
+ * - Trade/Trade Plan: bg-primary (Blue)
+ * - Account/Execution: bg-success (Green)
+ * - Ticker: bg-info (Light Blue)
+ * - Alert: bg-warning (Yellow)
+ * - Cash Flow: bg-secondary (Gray)
+ * - Note: bg-dark (Black)
+ * 
+ * Status Badges:
+ * - Open/Active/Completed: bg-success (Green)
+ * - Closed: bg-secondary (Gray)
+ * - Pending: bg-warning (Yellow)
+ * - Cancelled: bg-danger (Red)
  * 
  * TABLE-SPECIFIC WRAPPER FUNCTIONS:
  * - viewLinkedItemsForTrade(id) - For trades table
@@ -50,30 +72,26 @@
  * =========
  * 
  * 1. LINKED ITEMS VIEWING SYSTEM:
- *    - viewLinkedItems() - Main function for viewing linked items
- *    - loadLinkedItemsData() - Load linked items from server
  *    - showLinkedItemsModal() - Display linked items modal
- * 
- * 2. TABLE-SPECIFIC WRAPPER FUNCTIONS:
- *    - viewLinkedItemsForTrade() - Trade-specific wrapper
- *    - viewLinkedItemsForAccount() - Account-specific wrapper
- *    - viewLinkedItemsForTicker() - Ticker-specific wrapper
- *    - viewLinkedItemsForAlert() - Alert-specific wrapper
- *    - viewLinkedItemsForCashFlow() - Cash flow-specific wrapper
- *    - viewLinkedItemsForNote() - Note-specific wrapper
- *    - viewLinkedItemsForTradePlan() - Trade plan-specific wrapper
- *    - viewLinkedItemsForExecution() - Execution-specific wrapper
- * 
- * 3. MODAL CREATION AND MANAGEMENT:
  *    - createLinkedItemsModalContent() - Create modal content
  *    - createLinkedItemsList() - Create linked items list (3-column layout)
  *    - createBasicItemInfo() - Create concise item information
- *    - createModal() - Create modal structure
  * 
- * 4. ITEM TYPE MANAGEMENT:
+ * 2. MODAL CREATION AND MANAGEMENT:
+ *    - createModal() - Create modal structure with large X close button
+ *    - getTickerSymbol() - Get ticker symbol from global data
+ * 
+ * 3. ITEM TYPE MANAGEMENT:
  *    - getItemTypeIcon() - Get icon for item type
  *    - getItemTypeDisplayName() - Get display name for item type
- *    - createDetailedItemInfo() - Create detailed item information
+ *    - getTypeBadgeClass() - Get badge color class for item type
+ *    - getStatusBadge() - Get status badge HTML with color coding
+ * 
+ * 4. ACTION BUTTONS:
+ *    - viewItemDetails() - View item details
+ *    - editItem() - Edit item
+ *    - openItemPage() - Open item page
+ *    - deleteItem() - Delete item
  * 
  * 5. SPECIFIC ITEM TYPE HANDLERS:
  *    - createTradeDetails() - Create trade details display
@@ -95,9 +113,17 @@
  * 
  * DEPENDENCIES:
  * ============
- * - ui-utils.js: Modal and notification functions
- * - data-utils.js: API call functions
- * - translation-utils.js: Text translations
+ * - notification-system.js: showLinkedItemsWarning() and loadLinkedItemsData()
+ * - Bootstrap 5.3.0: Modal functionality and styling
+ * - linked-items.css: Dedicated styling for the modal
+ * 
+ * File: trading-ui/scripts/linked-items.js
+ * Version: 3.0
+ * Last Updated: August 26, 2025
+ * 
+ * Global Exports:
+ * - window.showLinkedItemsModal() - Display linked items modal
+ * - window.linkedItems - Module object with all functions
  * 
  * USAGE:
  * ======
@@ -153,41 +179,7 @@ function viewLinkedItems(itemId, itemType = null) {
     loadLinkedItemsData(itemId, itemType);
 }
 
-/**
- * Load linked items data from server
- * 
- * Makes an API call to fetch linked items data for the specified item.
- * Falls back to mock data if the API is not available or returns an error.
- * 
- * @param {number|string} itemId - ID of the item
- * @param {string} itemType - Type of the item
- */
-async function loadLinkedItemsData(itemId, itemType) {
-    try {
-        // API call to get linked items data
-        const response = await fetch(`/api/v1/linked-items/${itemType}/${itemId}`);
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        // Show modal with the data
-        showLinkedItemsModal(data, itemType, itemId);
-
-    } catch (error) {
-        console.error('❌ Error loading linked items data:', error);
-
-        // Show notification to user
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('Showing sample data - API under development', 'info');
-        }
-
-        // Show modal with mock data (for development)
-        showLinkedItemsModal(getMockLinkedData(itemType, itemId), itemType, itemId);
-    }
-}
 
 /**
  * Show linked items modal with data
@@ -207,7 +199,7 @@ function showLinkedItemsModal(data, itemType, itemId) {
 
     // Create and show modal
     const modalId = 'linkedItemsModal';
-    const modalTitle = `Linked Items for ${getItemTypeDisplayName(itemType)} #${itemId}`;
+    const modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
 
     createModal(modalId, modalTitle, modalContent);
 
@@ -244,7 +236,9 @@ function createLinkedItemsModalContent(data, itemType, itemId) {
             break;
         case 'ticker':
             headerTitle = 'מה קשור לטיקר:';
-            itemName = data.tickerSymbol || `טיקר ${itemId}`;
+            // נסה לקבל את הסימבול מהנתונים או מהטבלה
+            const tickerSymbol = data.tickerSymbol || getTickerSymbol(itemId) || `טיקר ${itemId}`;
+            itemName = tickerSymbol;
             break;
         case 'alert':
             headerTitle = 'מה קשור להתראה:';
@@ -273,23 +267,24 @@ function createLinkedItemsModalContent(data, itemType, itemId) {
 
     let content = `
     <div class="linked-items-container">
-      <div class="linked-items-header">
-        <h4>${headerTitle} <strong>${itemName}</strong></h4>
-      </div>
       <div class="alert alert-info">
         <strong>📋 סקירת אלמנטים מקושרים</strong><br>
-        מציג את כל האלמנטים המקושרים ל-${getItemTypeDisplayName(itemType)} #${itemId}
+        מציג את כל האלמנטים המקושרים ל-${getItemTypeDisplayName(itemType)} ${itemName}
       </div>
   `;
 
     // Add linked items list
-    if (data && data.linkedItems && data.linkedItems.length > 0) {
-        content += createLinkedItemsList(data.linkedItems);
+    const childEntities = data.child_entities || [];
+    const parentEntities = data.parent_entities || [];
+    const allEntities = [...childEntities, ...parentEntities];
+
+    if (allEntities.length > 0) {
+        content += createLinkedItemsList(allEntities);
     } else {
         content += `
       <div class="alert alert-warning">
-        <strong>ℹ️ No Linked Items Found</strong><br>
-        This ${getItemTypeDisplayName(itemType)} has no linked items in the system.
+        <strong>ℹ️ לא נמצאו פריטים מקושרים</strong><br>
+        ל-${getItemTypeDisplayName(itemType)} זה אין פריטים מקושרים במערכת.
       </div>
     `;
     }
@@ -323,23 +318,38 @@ function createLinkedItemsList(items) {
         const icon = getItemTypeIcon(item.type);
         const displayName = getItemTypeDisplayName(item.type);
         const basicInfo = createBasicItemInfo(item);
+        const statusBadge = getStatusBadge(item.status);
 
         listHtml += `
       <div class="linked-item-row">
         <div class="linked-item-col">
           <div class="linked-item-icon">${icon}</div>
-          <div class="linked-item-type">${displayName}</div>
+          <div class="linked-item-type">
+            <span class="badge ${getTypeBadgeClass(item.type)}">${displayName}</span>
+          </div>
         </div>
         <div class="linked-item-col">
-          <div class="linked-item-title">${item.name || `אלמנט ${item.id}`}</div>
-          <div class="linked-item-id">#${item.id}</div>
+          <div class="linked-item-title">${item.title || `אלמנט ${item.id}`}</div>
+          <div class="linked-item-description">${item.description || 'אין תיאור'}</div>
+          <div class="linked-item-status">${statusBadge}</div>
         </div>
         <div class="linked-item-col">
           <div class="linked-item-basic-details">${basicInfo}</div>
-          <div class="linked-item-action">
-            <button class="btn btn-sm btn-primary" onclick="openItemPage('${item.type}', ${item.id})" title="פתח דף רשומה">
-              פתח דף
-            </button>
+          <div class="linked-item-actions">
+            <div class="btn-group btn-group-sm" role="group">
+              <button class="btn btn-outline-primary" onclick="viewItemDetails('${item.type}', ${item.id})" title="צפה בפרטים">
+                👁️
+              </button>
+              <button class="btn btn-outline-secondary" onclick="editItem('${item.type}', ${item.id})" title="ערוך">
+                ✏️
+              </button>
+              <button class="btn btn-outline-info" onclick="openItemPage('${item.type}', ${item.id})" title="פתח דף">
+                🔗
+              </button>
+              <button class="btn btn-outline-danger" onclick="deleteItem('${item.type}', ${item.id})" title="מחק">
+                🗑️
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -403,26 +413,11 @@ function getItemTypeDisplayName(type) {
  * @returns {string} Basic info string
  */
 function createBasicItemInfo(item) {
-    switch (item.type) {
-        case 'trade':
-            return `${item.status || 'לא מוגדר'} | ${item.side || 'לא מוגדר'} | ${item.amount ? `$${item.amount.toFixed(2)}` : 'לא מוגדר'}`;
-        case 'account':
-            return `${item.currency || 'לא מוגדר'} | ${item.balance ? `$${item.balance.toFixed(2)}` : 'לא מוגדר'}`;
-        case 'ticker':
-            return `${item.symbol || 'לא מוגדר'} | ${item.current_price ? `$${item.current_price.toFixed(2)}` : 'לא מוגדר'}`;
-        case 'alert':
-            return `${item.status || 'לא מוגדר'} | ${item.message ? item.message.substring(0, 30) + '...' : 'אין הודעה'}`;
-        case 'cash_flow':
-            return `${item.type || 'לא מוגדר'} | ${item.amount ? `$${item.amount.toFixed(2)}` : 'לא מוגדר'}`;
-        case 'note':
-            return `${item.content ? item.content.substring(0, 30) + '...' : 'אין תוכן'}`;
-        case 'trade_plan':
-            return `${item.status || 'לא מוגדר'} | ${item.strategy || 'לא מוגדר'}`;
-        case 'execution':
-            return `${item.quantity || 'לא מוגדר'} | ${item.price ? `$${item.price.toFixed(2)}` : 'לא מוגדר'}`;
-        default:
-            return item.description || item.notes || 'אין פרטים נוספים';
-    }
+    // השתמש בנתונים שמגיעים מהשרת
+    const status = item.status || 'לא מוגדר';
+    const createdAt = item.created_at ? new Date(item.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+
+    return `סטטוס: ${status} | נוצר: ${createdAt}`;
 }
 
 /**
@@ -448,7 +443,9 @@ function createModal(id, title, content) {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="${id}Label">${title}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn btn-link text-dark p-0" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; font-weight: bold; text-decoration: none;">
+              ✕
+            </button>
           </div>
           <div class="modal-body">
             ${content}
@@ -902,10 +899,76 @@ function viewLinkedItemsForExecution(executionId) {
     return viewLinkedItems(executionId, 'execution');
 }
 
+/**
+ * Get ticker symbol by ID
+ * @param {number} tickerId - ID of the ticker
+ * @returns {string} Ticker symbol
+ */
+function getTickerSymbol(tickerId) {
+    // נסה לקבל מהטבלה הגלובלית
+    if (window.tickersData && Array.isArray(window.tickersData)) {
+        const ticker = window.tickersData.find(t => t.id == tickerId);
+        if (ticker && ticker.symbol) {
+            return ticker.symbol;
+        }
+    }
+    return null;
+}
+
+/**
+ * Get badge class for item type
+ * @param {string} type - Item type
+ * @returns {string} Badge CSS class
+ */
+function getTypeBadgeClass(type) {
+    const badgeClasses = {
+        'trade': 'bg-primary',
+        'account': 'bg-success',
+        'ticker': 'bg-info',
+        'alert': 'bg-warning',
+        'cash_flow': 'bg-secondary',
+        'note': 'bg-dark',
+        'trade_plan': 'bg-primary',
+        'execution': 'bg-success'
+    };
+    return badgeClasses[type] || 'bg-secondary';
+}
+
+/**
+ * Get status badge HTML
+ * @param {string} status - Item status
+ * @returns {string} Status badge HTML
+ */
+function getStatusBadge(status) {
+    if (!status) return '';
+
+    const statusClasses = {
+        'open': 'bg-success',
+        'closed': 'bg-secondary',
+        'active': 'bg-primary',
+        'completed': 'bg-success',
+        'pending': 'bg-warning',
+        'cancelled': 'bg-danger'
+    };
+
+    const statusText = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'active': 'פעיל',
+        'completed': 'הושלם',
+        'pending': 'ממתין',
+        'cancelled': 'בוטל'
+    };
+
+    const badgeClass = statusClasses[status] || 'bg-secondary';
+    const badgeText = statusText[status] || status;
+
+    return `<span class="badge ${badgeClass}">${badgeText}</span>`;
+}
+
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
 // Generic functions (for backward compatibility)
 window.viewLinkedItems = viewLinkedItems;
-window.loadLinkedItemsData = loadLinkedItemsData;
 window.showLinkedItemsModal = showLinkedItemsModal;
 window.createLinkedItemsModalContent = createLinkedItemsModalContent;
 window.checkLinkedItems = checkLinkedItems;
@@ -913,6 +976,8 @@ window.exportLinkedItemsData = exportLinkedItemsData;
 window.createDetailedItemInfo = createDetailedItemInfo;
 window.getItemTypeIcon = getItemTypeIcon;
 window.getItemTypeDisplayName = getItemTypeDisplayName;
+window.getTypeBadgeClass = getTypeBadgeClass;
+window.getStatusBadge = getStatusBadge;
 window.viewItemDetails = viewItemDetails;
 window.editItem = editItem;
 window.deleteItem = deleteItem;
@@ -930,7 +995,6 @@ window.viewLinkedItemsForExecution = viewLinkedItemsForExecution;
 // ייצוא המודול עצמו
 window.linkedItems = {
     viewLinkedItems,
-    loadLinkedItemsData,
     showLinkedItemsModal,
     createLinkedItemsModalContent,
     checkLinkedItems,
@@ -938,6 +1002,8 @@ window.linkedItems = {
     createDetailedItemInfo,
     getItemTypeIcon,
     getItemTypeDisplayName,
+    getTypeBadgeClass,
+    getStatusBadge,
     viewItemDetails,
     editItem,
     deleteItem,

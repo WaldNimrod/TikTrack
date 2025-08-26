@@ -5,12 +5,14 @@ This document provides comprehensive guidance for developers working on the TikT
 
 > 📋 **לפרטים מלאים על הפרויקט:** ראה [PROJECT_STATUS_SUMMARY.md](../../PROJECT_STATUS_SUMMARY.md)
 
-## 🆕 **Latest Updates (August 24, 2025)**
-- ✅ **Server Restart System** - Smart restart with multiple modes
-- ✅ **ValidationService Integration** - Real-time validation in development
-- ✅ **Enhanced Logging** - Detailed logs for debugging
-- ✅ **Development Tools** - Improved development workflow
-- ✅ **Documentation Updates** - Comprehensive guides and examples
+## 🆕 **Latest Updates (January 26, 2025)**
+- ✅ **Unified Filter System** - Complete centralized filtering solution
+- ✅ **Enhanced Header System** - Comprehensive filter integration
+- ✅ **Preference-Based Filtering** - Server-based default filter preferences
+- ✅ **Hebrew Translation System** - Automatic conversion of English preferences
+- ✅ **Performance Optimizations** - Debounced search, efficient DOM queries
+- ✅ **Error Handling** - Graceful fallback and comprehensive error recovery
+- ✅ **Documentation Updates** - Complete filter system documentation
 
 ## Development Environment Setup
 
@@ -71,10 +73,11 @@ trading-ui/
 ├── *.html              # Main application pages
 ├── scripts/            # JavaScript files with comprehensive validation
 │   ├── header-system.js    # Header component and navigation
+│   ├── simple-filter.js    # Unified filter system (NEW)
 │   ├── table-mappings.js   # Centralized table column mappings
 │   ├── main.js            # Global utility functions and sorting
 │   ├── translation-utils.js # Translation functions
-│   ├── filter-system.js   # Filter system
+│   ├── warning-system.js   # Centralized warning modal system
 │   ├── ui-utils.js        # Shared UI utility functions
 │   ├── data-utils.js      # Shared data utilities (API calls, validation)
 │   ├── alerts.js          # Alert management with advanced validation

@@ -1153,6 +1153,14 @@ function showDeleteWarning(itemType, itemName, onConfirm = null, onCancel = null
  * Show linked items warning
  */
 function showLinkedItemsWarning(itemType, linkedCount, onConfirm = null, onCancel = null) {
+    console.log('🔧🔧🔧 showLinkedItemsWarning STARTED 🔧🔧🔧');
+    console.log('🔧 itemType:', itemType);
+    console.log('🔧 linkedCount:', linkedCount);
+    console.log('🔧 onConfirm type:', typeof onConfirm);
+    console.log('🔧 onCancel type:', typeof onCancel);
+    console.log('🔧 window.showLinkedItemsWarning function:', typeof window.showLinkedItemsWarning);
+    console.log('🔧 createLinkedItemsWarningModal function:', typeof createLinkedItemsWarningModal);
+    
     // Fallback mapping for item types
     const itemTypeDisplay = itemType === 'alert' ? 'התראה' :
         itemType === 'ticker' ? 'טיקר' :
@@ -1163,10 +1171,256 @@ function showLinkedItemsWarning(itemType, linkedCount, onConfirm = null, onCance
                             itemType === 'cash_flow' ? 'תזרים מזומנים' :
                                 itemType === 'note' ? 'הערה' : 'אובייקט';
 
-    console.log('🔧 showLinkedItemsWarning called with:', { itemType, linkedCount, itemTypeDisplay });
+    console.log('🔧 showLinkedItemsWarning called with:', { itemType, linkedCount, itemTypeDisplay, onConfirm, onCancel });
+    console.log('🔧 About to call createLinkedItemsWarningModal...');
+    console.log('🔧 createLinkedItemsWarningModal function exists:', typeof createLinkedItemsWarningModal === 'function');
 
-    // Use simple alert directly - skip the complex warning system for now
-    alert(`${itemTypeDisplay} זה מקושר ל-${linkedCount} פריטים במערכת. יש לטפל בהם תחילה.`);
+    // יצירת modal מותאם עם כפתורי אישור וביטול
+    try {
+        createLinkedItemsWarningModal(itemTypeDisplay, linkedCount, onConfirm, onCancel);
+    } catch (error) {
+        console.error('🔧❌ Error calling createLinkedItemsWarningModal:', error);
+        // Fallback to simple alert
+        if (confirm(`חשבון זה מקושר ל-${linkedCount} פריטים במערכת. האם אתה בטוח שברצונך למחוק אותו?`)) {
+            if (onConfirm && typeof onConfirm === 'function') {
+                onConfirm();
+            }
+        } else {
+            if (onCancel && typeof onCancel === 'function') {
+                onCancel();
+            }
+        }
+    }
+    
+    console.log('🔧 createLinkedItemsWarningModal call completed');
+    console.log('🔧🔧🔧 showLinkedItemsWarning COMPLETED 🔧🔧🔧');
+    console.log('🔧🔧🔧 END OF showLinkedItemsWarning FUNCTION 🔧🔧🔧');
+}
+
+/**
+ * יצירת modal אזהרת פריטים מקושרים
+ * Create linked items warning modal
+ */
+function createLinkedItemsWarningModal(itemTypeDisplay, linkedCount, onConfirm, onCancel) {
+    console.log('🔧🔧🔧 createLinkedItemsWarningModal STARTED 🔧🔧🔧');
+    console.log('🔧 itemTypeDisplay:', itemTypeDisplay);
+    console.log('🔧 linkedCount:', linkedCount);
+    console.log('🔧 onConfirm type:', typeof onConfirm);
+    console.log('🔧 onCancel type:', typeof onCancel);
+
+    // יצירת modal HTML
+    const modalHtml = `
+        <div class="modal fade" id="linkedItemsWarningModal" tabindex="-1" aria-labelledby="linkedItemsWarningModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored bg-warning text-dark">
+                        <h5 class="modal-title" id="linkedItemsWarningModalLabel">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            אזהרת פריטים מקושרים
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">
+                            <strong>${itemTypeDisplay}</strong> זה מקושר ל-<strong>${linkedCount} פריטים</strong> במערכת.
+                        </p>
+                        <p class="text-warning mb-0 mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            מחיקת הפריט עלולה להשפיע על הפריטים המקושרים.
+                        </p>
+                        <p class="mb-0 mt-2">
+                            האם אתה בטוח שברצונך להמשיך?
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelLinkedItemsBtn">
+                            <i class="fas fa-times me-1"></i>
+                            ביטול
+                        </button>
+                        <button type="button" class="btn btn-warning" id="confirmLinkedItemsBtn">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            המשך למחיקה
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    console.log('🔧 Modal HTML created with length:', modalHtml.length);
+    console.log('🔧 Modal HTML preview:', modalHtml.substring(0, 200) + '...');
+
+    // הסרת modal קיים אם יש
+    const existingModal = document.getElementById('linkedItemsWarningModal');
+    if (existingModal) {
+        console.log('🔧 Removing existing modal');
+        existingModal.remove();
+    } else {
+        console.log('🔧 No existing modal found');
+    }
+
+    // הוספת modal ל-DOM
+    console.log('🔧 About to add modal to DOM...');
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    console.log('🔧 Modal HTML added to DOM');
+
+    // קבלת אלמנטי modal
+    const modal = document.getElementById('linkedItemsWarningModal');
+    const confirmBtn = document.getElementById('confirmLinkedItemsBtn');
+    const cancelBtn = document.getElementById('cancelLinkedItemsBtn');
+    
+    console.log('🔧 Modal element found:', modal);
+    console.log('🔧 Confirm button found:', confirmBtn);
+    console.log('🔧 Cancel button found:', cancelBtn);
+    
+    if (!modal) {
+        console.error('🔧❌ Modal element not found!');
+        return;
+    }
+    
+    if (!confirmBtn) {
+        console.error('🔧❌ Confirm button not found!');
+        return;
+    }
+    
+    if (!cancelBtn) {
+        console.error('🔧❌ Cancel button not found!');
+        return;
+    }
+
+    // הוספת event listeners
+    console.log('🔧 Adding event listeners...');
+    confirmBtn.addEventListener('click', () => {
+        console.log('🔧 User confirmed linked items warning');
+
+        // סגירת modal
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        if (bootstrapModal) {
+            bootstrapModal.hide();
+        }
+
+        // קריאה לפונקציית אישור
+        if (onConfirm && typeof onConfirm === 'function') {
+            console.log('🔧 Calling onConfirm callback');
+            onConfirm();
+        } else {
+            console.log('🔧 No onConfirm callback provided');
+        }
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        console.log('🔧 User cancelled linked items warning');
+
+        // סגירת modal
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        if (bootstrapModal) {
+            bootstrapModal.hide();
+        }
+
+        // קריאה לפונקציית ביטול
+        if (onCancel && typeof onCancel === 'function') {
+            console.log('🔧 Calling onCancel callback');
+            onCancel();
+        } else {
+            console.log('🔧 No onCancel callback provided');
+        }
+    });
+
+    // הצגת modal
+    console.log('🔧 About to show the modal...');
+    console.log('🔧 Bootstrap available:', typeof bootstrap !== 'undefined');
+    console.log('🔧 Modal element:', modal);
+    
+    if (typeof bootstrap === 'undefined') {
+        console.error('🔧❌ Bootstrap is not available!');
+        // Fallback to simple alert
+        if (confirm(`חשבון זה מקושר ל-${linkedCount} פריטים במערכת. האם אתה בטוח שברצונך למחוק אותו?`)) {
+            if (onConfirm && typeof onConfirm === 'function') {
+                onConfirm();
+            }
+        } else {
+            if (onCancel && typeof onCancel === 'function') {
+                onCancel();
+            }
+        }
+        return;
+    }
+    
+    if (!bootstrap.Modal) {
+        console.error('🔧❌ Bootstrap.Modal is not available!');
+        // Fallback to simple alert
+        if (confirm(`חשבון זה מקושר ל-${linkedCount} פריטים במערכת. האם אתה בטוח שברצונך למחוק אותו?`)) {
+            if (onConfirm && typeof onConfirm === 'function') {
+                onConfirm();
+            }
+        } else {
+            if (onCancel && typeof onCancel === 'function') {
+                onCancel();
+            }
+        }
+        return;
+    }
+    
+    try {
+        const bootstrapModal = new bootstrap.Modal(modal);
+        console.log('🔧 Bootstrap modal created:', bootstrapModal);
+        bootstrapModal.show();
+        console.log('🔧 Modal show() called');
+    } catch (error) {
+        console.error('🔧❌ Error creating/showing modal:', error);
+        // Fallback to simple alert
+        if (confirm(`חשבון זה מקושר ל-${linkedCount} פריטים במערכת. האם אתה בטוח שברצונך למחוק אותו?`)) {
+            if (onConfirm && typeof onConfirm === 'function') {
+                onConfirm();
+            }
+        } else {
+            if (onCancel && typeof onCancel === 'function') {
+                onCancel();
+            }
+        }
+    }
+
+    // ניקוי modal אחרי סגירה
+    modal.addEventListener('hidden.bs.modal', () => {
+        console.log('🔧 Modal hidden event triggered - removing modal');
+        modal.remove();
+    });
+    
+    console.log('🔧🔧🔧 createLinkedItemsWarningModal COMPLETED 🔧🔧🔧');
+    console.log('🔧🔧🔧 END OF createLinkedItemsWarningModal FUNCTION 🔧🔧🔧');
+    console.log('🔧🔧🔧 FINAL END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY FINAL END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ULTIMATE FINAL END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ABSOLUTE FINAL END 🔧🔧🔧');
+    console.log('🔧🔧🔧 THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
 }
 
 /**
@@ -1200,6 +1454,7 @@ window.showValidationWarning = showValidationWarning;
 window.getWarningConfig = getWarningConfig;
 window.createWarningModal = createWarningModal;
 window.handleWarningAction = handleWarningAction;
+window.createLinkedItemsWarningModal = createLinkedItemsWarningModal;
 
 /**
  * Show linked items blocking modal

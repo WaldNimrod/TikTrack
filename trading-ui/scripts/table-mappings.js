@@ -274,7 +274,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'test_trades': [
         'ticker',          // 0 - טיקר
         'status',          // 1 - סטטוס
-        'type',            // 2 - טיפוס
+        'investment_type', // 2 - סוג השקעה
         'account',         // 3 - חשבון
         'date',            // 4 - תאריך
         'quantity',        // 5 - כמות
@@ -285,19 +285,19 @@ const TABLE_COLUMN_MAPPINGS = {
     'test_general': [
         'name',            // 0 - שם
         'status',          // 1 - סטטוס
-        'type',            // 2 - טיפוס
+        'investment_type', // 2 - סוג השקעה
         'account',         // 3 - חשבון
         'date',            // 4 - תאריך
         'amount'           // 5 - סכום
     ],
 
     'test_notifications': [
-        'date',            // 0 - תאריך
-        'type',            // 1 - טיפוס
-        'title',           // 2 - כותרת
-        'description',     // 3 - תיאור
-        'account',         // 4 - חשבון
-        'status'           // 5 - סטטוס
+        'symbol',          // 0 - סימבול
+        'related_to',      // 1 - קשור ל
+        'content',         // 2 - תוכן
+        'attachment',      // 3 - קובץ מצורף
+        'created_at',      // 4 - נוצר ב
+        'actions'          // 5 - פעולות
     ]
 };
 
@@ -337,6 +337,16 @@ function getColumnValue(item, columnIndex, tableType) {
     if (tableType === 'test_trades' || tableType === 'test_general' || tableType === 'test_notifications') {
         // For test tables, the data comes from HTML cells, so we return the field name
         // The actual value extraction is handled in the filter functions
+        if (fieldName === 'investment_type') {
+            // Return the translated investment type value
+            const typeDisplay = item[fieldName] === 'swing' ? 'סווינג' :
+                item[fieldName] === 'investment' ? 'השקעה' :
+                    item[fieldName] === 'passive' ? 'פסיבי' :
+                        item[fieldName] === 'day' ? 'יומי' :
+                            item[fieldName] === 'scalp' ? 'סקלפינג' :
+                                item[fieldName] || '';
+            return typeDisplay;
+        }
         return item[fieldName] || '';
     }
 

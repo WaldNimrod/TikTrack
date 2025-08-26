@@ -35,12 +35,16 @@ class AccountService:
     @staticmethod
     def update(db: Session, account_id: int, data: Dict[str, Any]) -> Optional[Account]:
         """Update account"""
+        logger.info(f"Updating account {account_id} with data: {data}")
         account = db.query(Account).filter(Account.id == account_id).first()
         if not account:
+            logger.error(f"Account {account_id} not found")
             return None
         
         # Validate data against dynamic constraints (excluding current ID for unique checks)
+        logger.info(f"Validating data with exclude_id={account_id}")
         is_valid, errors = ValidationService.validate_data(db, 'accounts', data, exclude_id=account_id)
+        logger.info(f"Validation result: valid={is_valid}, errors={errors}")
         if not is_valid:
             raise ValueError(f"Validation failed: {'; '.join(errors)}")
         

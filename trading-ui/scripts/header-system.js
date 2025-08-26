@@ -3046,10 +3046,57 @@ function updateAccountFilterText() {
 // ===== פונקציות איפוס ונקה =====
 
 /**
- * איפוס כל הפילטרים למצב ברירת מחדל
+ * איפוס כל הפילטרים למצב ברירת מחדל מהעדפות
  */
 function resetAllFilters() {
-  console.log('🔄 resetAllFilters called');
+  console.log('🔄 resetAllFilters called - resetting to default preferences');
+
+  // קריאה לפונקציה החדשה שמטפלת בברירות המחדל
+  if (window.simpleFilter) {
+    window.simpleFilter.resetFilters();
+  } else {
+    console.warn('⚠️ simpleFilter not available, using fallback');
+    // Fallback - איפוס ידני
+    resetFiltersManually();
+  }
+}
+
+/**
+ * ניקוי כל הפילטרים - הצגת כל הרשומות
+ */
+function clearAllFilters() {
+  console.log('🔄 clearAllFilters called - showing all records');
+
+  // קריאה לפונקציה החדשה שמנקה את כל הפילטרים
+  if (window.simpleFilter) {
+    window.simpleFilter.clearFilters();
+  } else {
+    console.warn('⚠️ simpleFilter not available, using fallback');
+    // Fallback - ניקוי ידני
+    clearFiltersManually();
+  }
+}
+
+// ייצוא פונקציות הפעלת פילטרים לגלובל
+window.applyStatusFilter = applyStatusFilter;
+window.applyTypeFilter = applyTypeFilter;
+window.applyAccountFilter = applyAccountFilter;
+window.applyDateRangeFilter = applyDateRangeFilter;
+
+// ייצוא פונקציות איפוס ונקה לגלובל
+window.resetAllFilters = resetAllFilters;
+window.clearAllFilters = clearAllFilters;
+
+// ייצוא פונקציות עדכון טקסט לגלובל
+window.updateStatusFilterText = updateStatusFilterText;
+window.updateTypeFilterText = updateTypeFilterText;
+window.updateAccountFilterText = updateAccountFilterText;
+
+/**
+ * איפוס ידני של פילטרים (גיבוי)
+ */
+function resetFiltersManually() {
+  console.log('🔄 Manual reset filters fallback');
 
   // איפוס פילטר סטטוס - בחירת "הכול"
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
@@ -3085,18 +3132,13 @@ function resetAllFilters() {
   updateStatusFilterText();
   updateTypeFilterText();
   updateAccountFilterText();
-
-  // הפעלת הפילטרים
-  if (window.simpleFilter) {
-    window.simpleFilter.resetFilters();
-  }
 }
 
 /**
- * ניקוי כל הפילטרים - הצגת כל הרשומות
+ * ניקוי ידני של פילטרים (גיבוי)
  */
-function clearAllFilters() {
-  console.log('🔄 clearAllFilters called');
+function clearFiltersManually() {
+  console.log('🔄 Manual clear filters fallback');
 
   // הסרת סימון מכל הפילטרים
   document.querySelectorAll('#statusFilterMenu .status-filter-item.selected').forEach(item => item.classList.remove('selected'));
@@ -3114,24 +3156,4 @@ function clearAllFilters() {
   updateStatusFilterText();
   updateTypeFilterText();
   updateAccountFilterText();
-
-  // הפעלת הפילטרים
-  if (window.simpleFilter) {
-    window.simpleFilter.resetFilters();
-  }
 }
-
-// ייצוא פונקציות הפעלת פילטרים לגלובל
-window.applyStatusFilter = applyStatusFilter;
-window.applyTypeFilter = applyTypeFilter;
-window.applyAccountFilter = applyAccountFilter;
-window.applyDateRangeFilter = applyDateRangeFilter;
-
-// ייצוא פונקציות איפוס ונקה לגלובל
-window.resetAllFilters = resetAllFilters;
-window.clearAllFilters = clearAllFilters;
-
-// ייצוא פונקציות עדכון טקסט לגלובל
-window.updateStatusFilterText = updateStatusFilterText;
-window.updateTypeFilterText = updateTypeFilterText;
-window.updateAccountFilterText = updateAccountFilterText;

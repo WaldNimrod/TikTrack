@@ -35,6 +35,7 @@ class ValidationService:
         Returns:
             Tuple of (is_valid, list_of_errors)
         """
+        logger.info(f"Starting validation for {table_name} with data: {data}, exclude_id: {exclude_id}")
         errors = []
         
         try:
@@ -162,14 +163,17 @@ class ValidationService:
     def _validate_unique(db: Session, table_name: str, field_name: str, value: Any, exclude_id: Optional[int] = None) -> bool:
         """Validate UNIQUE constraint"""
         try:
+            logger.info(f"Validating UNIQUE constraint: {table_name}.{field_name} = {value}, exclude_id = {exclude_id}")
             query = text(f"SELECT COUNT(*) FROM {table_name} WHERE {field_name} = :value")
             params = {"value": value}
             
             if exclude_id is not None:
                 query = text(f"SELECT COUNT(*) FROM {table_name} WHERE {field_name} = :value AND id != :exclude_id")
                 params["exclude_id"] = exclude_id
+                logger.info(f"Using exclude_id query: {query}")
             
             count = db.execute(query, params).scalar()
+            logger.info(f"UNIQUE validation result: {count} records found")
             return count == 0
             
         except Exception as e:

@@ -22,7 +22,6 @@
  */
 
 // משתנים גלובליים
-// משתנים גלובליים
 console.log('🔄 === TICKERS.JS LOADING STARTED ===');
 if (!window.tickersData) {
     window.tickersData = [];
@@ -39,6 +38,112 @@ if (!window.currenciesLoaded) {
 let tickersData = window.tickersData;
 console.log('🔄 tickersData נוצר:', tickersData);
 console.log('🔄 window.tickersData:', window.tickersData);
+
+// מפת צבעים לסוגי טיקרים
+const tickerTypeColors = {
+    'stock': { bg: '#e3f2fd', text: '#1976d2', label: 'מניה' },
+    'etf': { bg: '#f3e5f5', text: '#7b1fa2', label: 'ETF' },
+    'bond': { bg: '#e8f5e8', text: '#388e3c', label: 'אג"ח' },
+    'crypto': { bg: '#fff3e0', text: '#f57c00', label: 'קריפטו' },
+    'forex': { bg: '#fce4ec', text: '#c2185b', label: 'מטבע חוץ' },
+    'commodity': { bg: '#f1f8e9', text: '#689f38', label: 'סחורה' },
+    'other': { bg: '#fafafa', text: '#616161', label: 'אחר' }
+};
+
+/**
+ * טעינת נתוני מטבעות מהשרת
+ */
+async function loadCurrenciesData() {
+    console.log('🔄 === LOADCURRENCIESDATA STARTED ===');
+
+    try {
+        const response = await fetch('/api/v1/currencies/');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        window.currenciesData = data.data || data;
+        window.currenciesLoaded = true;
+
+        console.log('✅ מטבעות נטענו:', window.currenciesData.length, 'מטבעות');
+
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת מטבעות:', error);
+        window.currenciesData = [];
+        window.currenciesLoaded = false;
+    }
+}
+
+/**
+ * קבלת סמל מטבע לפי מזהה
+ */
+function getCurrencySymbol(currencyId) {
+    if (!window.currenciesData || !window.currenciesLoaded) {
+        return currencyId || 'N/A';
+    }
+
+    const currency = window.currenciesData.find(c => c.id == currencyId);
+    return currency ? currency.symbol : (currencyId || 'N/A');
+}
+
+/**
+ * קבלת עיצוב סוג טיקר
+ */
+function getTickerTypeStyle(type) {
+    const typeConfig = tickerTypeColors[type] || tickerTypeColors['other'];
+    return {
+        backgroundColor: typeConfig.bg,
+        color: typeConfig.text,
+        padding: '4px 8px',
+        borderRadius: '4px',
+        fontSize: '0.875rem',
+        fontWeight: '500',
+        display: 'inline-block',
+        minWidth: '60px',
+        textAlign: 'center'
+    };
+}
+
+/**
+ * פונקציה ליצירת אפשרויות מטבע בטופס
+ */
+function generateTickerCurrencyOptions(ticker = null) {
+    if (!window.currenciesData || window.currenciesData.length === 0) {
+        // אם אין מטבעות, נחזיר ברירת מחדל
+        return `
+            <option value="1" ${ticker && (ticker.currency_id === 1 || (ticker.currency && ticker.currency.symbol === 'USD') || ticker.currency === 'USD') ? 'selected' : ''}>דולר אמריקאי (USD)</option>
+        `;
+    }
+
+    return window.currenciesData.map(currency => {
+        const isSelected = ticker && (
+            ticker.currency_id === currency.id ||
+            (ticker.currency && ticker.currency.symbol === currency.symbol) ||
+            ticker.currency === currency.symbol
+        );
+
+        return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
+    }).join('');
+}
+
+/**
+ * פונקציה לעדכון אפשרויות מטבע בטופס
+ */
+function updateCurrencyOptions(ticker = null) {
+    const addSelect = document.getElementById('addTickerCurrency');
+    const editSelect = document.getElementById('editTickerCurrency');
+
+    if (addSelect) {
+        const addOptions = generateTickerCurrencyOptions();
+        addSelect.innerHTML = '<option value="">בחר מטבע...</option>' + addOptions;
+    }
+
+    if (editSelect) {
+        const editOptions = generateTickerCurrencyOptions(ticker);
+        editSelect.innerHTML = '<option value="">בחר מטבע...</option>' + editOptions;
+    }
+}
 
 // פונקציה לעדכון שדה active_trades לפי טריידים פתוחים
 async function updateActiveTradesField() {
@@ -73,6 +178,9 @@ async function updateActiveTradesField() {
         });
 
         console.log('✅ שדה active_trades עודכן עבור כל הטיקרים');
+
+        // עדכון סטטיסטיקות סיכום לאחר עדכון שדה active_trades
+        updateTickersSummaryStats(tickersData);
 
     } catch (error) {
         console.error('❌ Error updating active_trades field:', error);
@@ -528,6 +636,9 @@ async function saveTicker() {
             // רענון הנתונים
             await loadTickersData();
 
+            // עדכון שדה active_trades
+            await updateActiveTradesField();
+
         } else {
             const error = await response.text();
             console.error('❌ שגיאה בשמירת טיקר:', error);
@@ -592,6 +703,9 @@ async function updateTicker() {
             // רענון הנתונים
             await loadTickersData();
 
+            // עדכון שדה active_trades
+            await updateActiveTradesField();
+
         } else {
             const error = await response.text();
             console.error('❌ שגיאה בעדכון טיקר:', error);
@@ -624,6 +738,9 @@ async function confirmDeleteTicker(id) {
             // רענון הנתונים
             await loadTickersData();
 
+            // עדכון שדה active_trades
+            await updateActiveTradesField();
+
         } else {
             const errorResponse = await response.text();
             console.error('❌ שגיאה במחיקת טיקר:', errorResponse);
@@ -636,7 +753,14 @@ async function confirmDeleteTicker(id) {
                     errorData.error.message.includes('linked items')) {
 
                     // הצגת אזהרת פריטים מקושרים
-                    showLinkedItemsWarning('ticker', 5); // TODO: Get actual count
+                    if (typeof window.showLinkedItemsWarning === 'function') {
+                        window.showLinkedItemsWarning('ticker', 5, // TODO: Get actual count
+                            () => confirmDeleteTicker(id), // onConfirm callback
+                            () => console.log('מחיקת טיקר בוטלה') // onCancel callback
+                        );
+                    } else {
+                        console.error('❌ showLinkedItemsWarning function not available');
+                    }
                     return;
                 }
 
@@ -670,66 +794,30 @@ async function showTickerLinkedItemsModal(tickerId, errorData) {
         return;
     }
 
-    // עדכון שם הטיקר
-    document.getElementById('linkedTickerName').textContent = `${ticker.symbol} - ${ticker.name}`;
-
     // טעינת פרטי הפריטים המקושרים
-    await loadLinkedItemsDetails(tickerId, errorData);
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'), {
-        backdrop: true,
-        keyboard: true
-    });
-    modal.show();
-}
-
-/**
- * טעינת פרטי הפריטים המקושרים
- */
-async function loadLinkedItemsDetails(tickerId, errorData = null) {
-    console.log('🔄 טעינת פרטי פריטים מקושרים לטיקר:', tickerId);
-    console.log('📊 errorData:', errorData);
-
-    const contentDiv = document.getElementById('linkedItemsContent');
-    contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><br>טוען פרטים...</div>';
-
-    try {
-        // קריאה ל-API לקבלת פרטי הפריטים המקושרים
-        const response = await fetch(`/api/v1/tickers/${tickerId}/linked-items`);
-
-        if (response.ok) {
-            const data = await response.json();
-            console.log('📊 נתונים מהשרת:', data);
-            displayLinkedItems(data.data);
-        } else {
-            console.log('⚠️ API לא זמין, מנסה לטעון ממקורות מרובים');
-            // אם אין API ספציפי, ננסה לטעון מכל ה-APIs
-            await loadLinkedItemsFromMultipleSources(tickerId);
+    const linkedItemsData = await loadLinkedItemsData(tickerId, errorData);
+    
+    // הצגת המודל המפורט
+    if (typeof window.showLinkedItemsModal === 'function') {
+        window.showLinkedItemsModal(linkedItemsData, 'ticker', tickerId);
+    } else {
+        console.error('❌ showLinkedItemsModal function not available');
+        if (typeof window.showErrorNotification === 'function') { 
+            window.showErrorNotification('❌ מערכת הפריטים המקושרים לא זמינה'); 
         }
-
-    } catch (error) {
-        console.error('❌ שגיאה בטעינת פריטים מקושרים:', error);
-        // אם יש שגיאה, ננסה לטעון מכל ה-APIs
-        await loadLinkedItemsFromMultipleSources(tickerId);
     }
 }
 
 /**
- * טעינת פריטים מקושרים ממקורות מרובים
+ * טעינת נתוני פריטים מקושרים בפורמט הנכון
  */
-async function loadLinkedItemsFromMultipleSources(tickerId) {
-    console.log('🔄 טעינת פריטים מקושרים ממקורות מרובים');
-
+async function loadLinkedItemsData(tickerId, errorData = null) {
+    console.log('🔄 טעינת נתוני פריטים מקושרים לטיקר:', tickerId);
+    
     const ticker = tickersData.find(t => t.id == tickerId);
-    if (!ticker) return;
+    if (!ticker) return null;
 
-    const linkedItems = {
-        open_trades: [],
-        open_trade_plans: [],
-        alerts: [],
-        notes: []
-    };
+    const linkedItems = [];
 
     try {
         // טעינת טריידים
@@ -738,10 +826,22 @@ async function loadLinkedItemsFromMultipleSources(tickerId) {
             if (tradesResponse.ok) {
                 const tradesData = await tradesResponse.json();
                 const trades = tradesData.data || tradesData;
-                linkedItems.open_trades = trades.filter(trade =>
+                const tickerTrades = trades.filter(trade =>
                     trade.ticker_id == tickerId &&
                     (trade.status === 'open' || trade.status === 'pending')
                 );
+                
+                tickerTrades.forEach(trade => {
+                    linkedItems.push({
+                        id: trade.id,
+                        type: 'trade',
+                        name: `${trade.symbol} - ${trade.side || 'לא מוגדר'}`,
+                        status: trade.status,
+                        side: trade.side,
+                        amount: trade.amount,
+                        created_at: trade.created_at
+                    });
+                });
             }
         } catch (e) { console.warn('לא ניתן לטעון טריידים:', e); }
 
@@ -751,10 +851,22 @@ async function loadLinkedItemsFromMultipleSources(tickerId) {
             if (plansResponse.ok) {
                 const plansData = await plansResponse.json();
                 const plans = plansData.data || plansData;
-                linkedItems.open_trade_plans = plans.filter(plan =>
+                const tickerPlans = plans.filter(plan =>
                     plan.ticker_id == tickerId &&
                     (plan.status === 'open' || plan.status === 'pending')
                 );
+                
+                tickerPlans.forEach(plan => {
+                    linkedItems.push({
+                        id: plan.id,
+                        type: 'trade_plan',
+                        name: `${plan.investment_type || 'לא מוגדר'} - ${plan.strategy || 'לא מוגדר'}`,
+                        status: plan.status,
+                        strategy: plan.strategy,
+                        investment_type: plan.investment_type,
+                        created_at: plan.created_at
+                    });
+                });
             }
         } catch (e) { console.warn('לא ניתן לטעון תכנונים:', e); }
 
@@ -764,10 +876,22 @@ async function loadLinkedItemsFromMultipleSources(tickerId) {
             if (alertsResponse.ok) {
                 const alertsData = await alertsResponse.json();
                 const alerts = alertsData.data || alertsData;
-                linkedItems.alerts = alerts.filter(alert =>
+                const tickerAlerts = alerts.filter(alert =>
                     alert.related_type_id === 4 && alert.related_id == tickerId &&
                     alert.status === 'open'
                 );
+                
+                tickerAlerts.forEach(alert => {
+                    linkedItems.push({
+                        id: alert.id,
+                        type: 'alert',
+                        name: `${alert.alert_type || 'לא מוגדר'} - ${alert.condition || 'לא מוגדר'}`,
+                        status: alert.status,
+                        alert_type: alert.alert_type,
+                        condition: alert.condition,
+                        created_at: alert.created_at
+                    });
+                });
             }
         } catch (e) { console.warn('לא ניתן לטעון התראות:', e); }
 
@@ -777,228 +901,36 @@ async function loadLinkedItemsFromMultipleSources(tickerId) {
             if (notesResponse.ok) {
                 const notesData = await notesResponse.json();
                 const notes = notesData.data || notesData;
-                linkedItems.notes = notes.filter(note =>
+                const tickerNotes = notes.filter(note =>
                     note.related_type_id === 4 && note.related_id == tickerId
                 );
+                
+                tickerNotes.forEach(note => {
+                    linkedItems.push({
+                        id: note.id,
+                        type: 'note',
+                        name: note.content ? note.content.substring(0, 50) + '...' : 'ללא כותרת',
+                        content: note.content,
+                        created_at: note.created_at
+                    });
+                });
             }
         } catch (e) { console.warn('לא ניתן לטעון הערות:', e); }
 
-        displayLinkedItems(linkedItems);
+        return {
+            tickerSymbol: ticker.symbol,
+            tickerName: ticker.name,
+            linkedItems: linkedItems
+        };
 
     } catch (error) {
-        console.error('❌ שגיאה בטעינת פריטים מקושרים:', error);
-        document.getElementById('linkedItemsContent').innerHTML =
-            '<div class="alert alert-danger">שגיאה בטעינת פרטי הפריטים המקושרים</div>';
+        console.error('❌ שגיאה בטעינת נתוני פריטים מקושרים:', error);
+        return {
+            tickerSymbol: ticker.symbol,
+            tickerName: ticker.name,
+            linkedItems: []
+        };
     }
-}
-
-/**
- * הצגת הפריטים המקושרים
- */
-function displayLinkedItems(linkedItems) {
-    console.log('🔄 הצגת פריטים מקושרים:', linkedItems);
-    console.log('📊 סוג הנתונים:', typeof linkedItems);
-    console.log('📊 מפתחות:', Object.keys(linkedItems || {}));
-
-    const contentDiv = document.getElementById('linkedItemsContent');
-    let html = '';
-
-    // טריידים פתוחים
-    console.log('🔍 בדיקת טריידים פתוחים:', linkedItems.open_trades);
-    console.log('🔍 האם קיים open_trades?', !!linkedItems.open_trades);
-    console.log('🔍 אורך open_trades:', linkedItems.open_trades ? linkedItems.open_trades.length : 'undefined');
-    if (linkedItems.open_trades && linkedItems.open_trades.length > 0) {
-        console.log('✅ נמצאו טריידים פתוחים, יוצר HTML');
-        html += `
-            <div class="card mb-3">
-                <div class="card-header bg-warning text-dark">
-                    <h6 class="mb-0">🔄 טריידים פתוחים (${linkedItems.open_trades.length})</h6>
-                </div>
-                <div class="card-body">
-                    <p><strong>נמצאו ${linkedItems.open_trades.length} טריידים פתוחים:</strong></p>
-                    <ul>
-                        ${linkedItems.open_trades.map(trade => `
-                            <li>
-                                טרייד #${trade.id} - חשבון: ${trade.account_name || 'לא זמין'} - סטטוס: ${trade.status}
-                                <button class="btn btn-sm btn-outline-primary ms-2" onclick="goToTrade(${trade.id})">
-                                    עבור לטרייד
-                                </button>
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
-            </div>
-        `;
-    }
-
-    // תכנונים פתוחים
-    console.log('🔍 בדיקת תכנונים פתוחים:', linkedItems.open_trade_plans);
-    if (linkedItems.open_trade_plans && linkedItems.open_trade_plans.length > 0) {
-        html += `
-            <div class="card mb-3">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0">📋 תכנונים פתוחים (${linkedItems.open_trade_plans.length})</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>מזהה</th>
-                                    <th>סוג השקעה</th>
-                                    <th>סטטוס</th>
-                                    <th>תאריך יצירה</th>
-                                    <th>פעולות</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${linkedItems.open_trade_plans.map(plan => `
-                                    <tr>
-                                        <td>${plan.id}</td>
-                                        <td>${plan.investment_type}</td>
-                                        <td><span class="badge bg-info">${plan.status}</span></td>
-                                        <td>${formatDate(plan.created_at)}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" onclick="goToPlan(${plan.id})">
-                                                עבור לתכנון
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    // התראות פעילות
-    if (linkedItems.alerts && linkedItems.alerts.length > 0) {
-        html += `
-            <div class="card mb-3">
-                <div class="card-header bg-danger text-white">
-                    <h6 class="mb-0">🚨 התראות פעילות (${linkedItems.alerts.length})</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>מזהה</th>
-                                    <th>סוג התראה</th>
-                                    <th>תנאי</th>
-                                    <th>סטטוס</th>
-                                    <th>פעולות</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${linkedItems.alerts.map(alert => `
-                                    <tr>
-                                        <td>${alert.id}</td>
-                                        <td>${alert.alert_type}</td>
-                                        <td>${alert.condition || 'לא זמין'}</td>
-                                        <td><span class="badge bg-danger">${alert.status}</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" onclick="goToAlert(${alert.id})">
-                                                עבור להתראה
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    // הערות
-    if (linkedItems.notes && linkedItems.notes.length > 0) {
-        html += `
-            <div class="card mb-3">
-                <div class="card-header bg-secondary text-white">
-                    <h6 class="mb-0">📝 הערות (${linkedItems.notes.length})</h6>
-            </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>מזהה</th>
-                                    <th>תוכן</th>
-                                    <th>תאריך יצירה</th>
-                                    <th>פעולות</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${linkedItems.notes.map(note => `
-                                    <tr>
-                                        <td>${note.id}</td>
-                                        <td>${note.content ? note.content.substring(0, 50) + '...' : 'ללא תוכן'}</td>
-                                        <td>${formatDate(note.created_at)}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" onclick="goToNote(${note.id})">
-                                                עבור להערה
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-        </div>
-                </div>
-        </div>
-    `;
-    }
-
-    console.log('🔍 HTML שנוצר:', html);
-    if (!html) {
-        html = '<div class="alert alert-success">✅ לא נמצאו פריטים מקושרים פתוחים. ניתן למחוק את הטיקר בבטחה.</div>';
-    }
-
-    contentDiv.innerHTML = html;
-}
-
-/**
- * מעבר לניהול פריטים מקושרים
- */
-function goToLinkedItems() {
-    // סגירת המודל
-    const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsModal'));
-    modal.hide();
-
-    // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
-    window.location.href = '/trade_plans'; // ברירת מחדל - דף תכנון
-}
-
-/**
- * מעבר לטרייד ספציפי
- */
-function goToTrade(tradeId) {
-    window.location.href = `/trade_plans#trade-${tradeId}`;
-}
-
-/**
- * מעבר לתכנון ספציפי
- */
-function goToPlan(planId) {
-    window.location.href = `/planning#plan-${planId}`;
-}
-
-/**
- * מעבר להתראה ספציפית
- */
-function goToAlert(alertId) {
-    window.location.href = `/alerts#alert-${alertId}`;
-}
-
-/**
- * מעבר להערה ספציפית
- */
-function goToNote(noteId) {
-    window.location.href = `/notes#note-${noteId}`;
 }
 
 /**
@@ -1008,6 +940,16 @@ function viewLinkedItemsForTicker(tickerId) {
     console.log('🔄 הצגת פריטים מקושרים לטיקר:', tickerId);
     showTickerLinkedItemsModal(tickerId);
 }
+
+
+
+
+
+
+
+
+
+
 
 // ========================================
 // פונקציות עזר
@@ -1025,6 +967,12 @@ async function loadTickersData() {
     console.log('🔄 === LOADTICKERSDATA STARTED ===');
 
     try {
+        // טעינת מטבעות אם עוד לא נטענו
+        if (!window.currenciesLoaded) {
+            console.log('🔄 טוען מטבעות...');
+            await loadCurrenciesData();
+        }
+
         console.log('🔄 מתחיל fetch ל-/api/v1/tickers/');
         const response = await fetch('/api/v1/tickers/');
         console.log('🔄 תגובה מהשרת:', response.status, response.statusText);
@@ -1045,11 +993,71 @@ async function loadTickersData() {
         console.log('🔄 קורא ל-updateTickersTable');
         updateTickersTable(tickersData);
 
+        // עדכון סטטיסטיקות סיכום
+        console.log('🔄 קורא ל-updateTickersSummaryStats');
+        updateTickersSummaryStats(tickersData);
+
         console.log('✅ loadTickersData הושלם בהצלחה');
 
     } catch (error) {
         console.error('❌ שגיאה ב-loadTickersData:', error);
         console.error('❌ Error stack:', error.stack);
+    }
+}
+
+/**
+ * עדכון סטטיסטיקות סיכום טיקרים
+ */
+function updateTickersSummaryStats(tickers) {
+    console.log('🔄 === UPDATETICKERSSUMMARYSTATS STARTED ===');
+
+    try {
+        if (!tickers || tickers.length === 0) {
+            // אם אין נתונים, אפס את כל השדות
+            document.getElementById('totalTickers').textContent = '0';
+            document.getElementById('activeTickers').textContent = '0';
+            document.getElementById('latestUpdate').textContent = 'אין נתונים';
+            document.getElementById('oldestUpdate').textContent = 'אין נתונים';
+            return;
+        }
+
+        // חישוב סטטיסטיקות
+        const totalTickers = tickers.length;
+        const activeTickers = tickers.filter(ticker => ticker.active_trades).length;
+
+        // חישוב תאריכי עדכון
+        const validUpdatedDates = tickers
+            .map(ticker => ticker.updated_at)
+            .filter(date => date)
+            .map(date => new Date(date))
+            .filter(date => !isNaN(date.getTime()));
+
+        let latestUpdate = 'אין נתונים';
+        let oldestUpdate = 'אין נתונים';
+
+        if (validUpdatedDates.length > 0) {
+            const latest = new Date(Math.max(...validUpdatedDates));
+            const oldest = new Date(Math.min(...validUpdatedDates));
+
+            latestUpdate = latest.toLocaleDateString('he-IL');
+            oldestUpdate = oldest.toLocaleDateString('he-IL');
+        }
+
+        // עדכון השדות ב-HTML
+        document.getElementById('totalTickers').textContent = totalTickers;
+        document.getElementById('activeTickers').textContent = activeTickers;
+        document.getElementById('latestUpdate').textContent = latestUpdate;
+        document.getElementById('oldestUpdate').textContent = oldestUpdate;
+
+        console.log('✅ סטטיסטיקות סיכום עודכנו:', {
+            totalTickers,
+            activeTickers,
+            latestUpdate,
+            oldestUpdate
+        });
+
+    } catch (error) {
+        console.error('❌ שגיאה בעדכון סטטיסטיקות סיכום:', error);
     }
 }
 
@@ -1080,17 +1088,28 @@ function updateTickersTable(tickers) {
 
         console.log('🔄 מתחיל יצירת שורות טבלה...');
 
-        // יצירת שורות פשוטות
+        // יצירת שורות עם עיצוב משופר
         const tableRows = tickers.map(ticker => {
             console.log('🔄 מעבד ticker:', ticker.symbol);
+
+            // קבלת סמל מטבע
+            const currencySymbol = getCurrencySymbol(ticker.currency_id);
+
+            // קבלת עיצוב סוג טיקר
+            const typeStyle = getTickerTypeStyle(ticker.type);
+            const typeLabel = tickerTypeColors[ticker.type]?.label || ticker.type || 'N/A';
 
             return `
                 <tr>
                     <td><strong>${ticker.symbol || 'N/A'}</strong></td>
                     <td>${ticker.active_trades ? '✅' : '❌'}</td>
-                    <td>${ticker.type || 'N/A'}</td>
-                    <td>${ticker.currency_id || 'N/A'}</td>
-                    <td>${ticker.updated_at ? new Date(ticker.updated_at).toLocaleDateString('he-IL') : 'N/A'}</td>
+                    <td>
+                        <span style="background-color: ${typeStyle.backgroundColor}; color: ${typeStyle.color}; padding: ${typeStyle.padding}; border-radius: ${typeStyle.borderRadius}; font-size: ${typeStyle.fontSize}; font-weight: ${typeStyle.fontWeight}; display: ${typeStyle.display}; min-width: ${typeStyle.minWidth}; text-align: ${typeStyle.textAlign};">
+                            ${typeLabel}
+                        </span>
+                    </td>
+                    <td><strong>${currencySymbol}</strong></td>
+                    <td>${ticker.updated_at ? new Date(ticker.updated_at).toLocaleString('he-IL') : 'N/A'}</td>
                     <td>${ticker.name || 'N/A'}</td>
                     <td>${ticker.created_at ? new Date(ticker.created_at).toLocaleDateString('he-IL') : 'N/A'}</td>
                     <td>${ticker.remarks || '-'}</td>
@@ -1116,6 +1135,9 @@ function updateTickersTable(tickers) {
             countElement.textContent = `${tickers.length} טיקרים`;
             console.log('🔄 ספירה עודכנה:', tickers.length);
         }
+
+        // עדכון סטטיסטיקות סיכום
+        updateTickersSummaryStats(tickers);
 
         console.log('✅ updateTickersTable הושלם בהצלחה');
 
@@ -1232,13 +1254,7 @@ window.validateTickerName = validateTickerName;
 
 // פונקציות מודל פריטים מקושרים
 window.showTickerLinkedItemsModal = showTickerLinkedItemsModal;
-window.loadLinkedItemsDetails = loadLinkedItemsDetails;
-window.displayLinkedItems = displayLinkedItems;
-window.goToLinkedItems = goToLinkedItems;
-window.goToTrade = goToTrade;
-window.goToPlan = goToPlan;
-window.goToAlert = goToAlert;
-window.goToNote = goToNote;
+window.loadLinkedItemsData = loadLinkedItemsData;
 window.viewLinkedItemsForTicker = viewLinkedItemsForTicker;
 
 // ===== פונקציות סידור =====
@@ -1283,8 +1299,14 @@ function restoreSortState() {
     }
 }
 
-// הגדרת הפונקציה כגלובלית
+// הגדרת הפונקציות כגלובליות
 window.sortTable = sortTable;
+window.updateTickersSummaryStats = updateTickersSummaryStats;
+window.loadCurrenciesData = loadCurrenciesData;
+window.getCurrencySymbol = getCurrencySymbol;
+window.getTickerTypeStyle = getTickerTypeStyle;
+window.generateTickerCurrencyOptions = generateTickerCurrencyOptions;
+window.updateCurrencyOptions = updateCurrencyOptions;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
@@ -1292,9 +1314,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // שחזור מצב הסגירה
     restoreTickersSectionState();
-
-    // טעינת מטבעות
-    loadCurrenciesFromServer();
 
     // טעינת נתונים
     console.log('🔄 קורא ל-loadTickersData...');

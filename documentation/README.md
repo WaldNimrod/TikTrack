@@ -11,6 +11,14 @@ This is the main documentation directory for the TikTrack investment management 
 - **Database Extra Data Page**: New page for managing auxiliary database tables
 - **Dynamic Table Constraints**: Real-time display of database constraints under tables
 
+### 🔧 System Architecture Improvements
+- **Table Identification System**: Implemented sophisticated table identification system supporting both dedicated pages and unified database views
+  - **CSS Class-Based Identification**: For specific pages (tickers, accounts, trades) using `content-section [page]-page` classes
+  - **Data Attribute-Based Identification**: For database display page using `data-table-type` attributes
+  - **Centralized Table Mappings**: Unified column mapping system in `table-mappings.js`
+  - **Universal Sorting System**: Global `sortTableData()` function working across all table types
+  - **Enhanced Filter Integration**: Filter system now works with both page types seamlessly
+
 ### 🎨 UI/UX Improvements
 - **Modal Styling Fixes**: Fixed white gaps between modal headers and borders
 - **Preferences Auto-Save**: Removed all manual save buttons - settings save automatically

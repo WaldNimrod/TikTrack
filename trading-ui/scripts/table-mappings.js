@@ -47,17 +47,22 @@
  * Each table is defined with an array of field names in column order.
  */
 const TABLE_COLUMN_MAPPINGS = {
-    // טבלת תכנונים (Trade Plans)
+    // טבלת תכנונים (Trade Plans) - Database Display Page Structure
     'trade_plans': [
-        'ticker',           // 0 - נכס
-        'created_at',       // 1 - תאריך
-        'investment_type',  // 2 - סוג
-        'side',            // 3 - צד
-        'planned_amount',  // 4 - סכום
-        'target_price',    // 5 - יעד
-        'stop_price',      // 6 - סטופ
-        'current',         // 7 - נוכחי
-        'status'           // 8 - סטטוס
+        'id',                    // 0 - ID
+        'account_id',            // 1 - Account ID
+        'ticker_id',             // 2 - Ticker ID
+        'investment_type',       // 3 - Investment Type
+        'side',                  // 4 - Side
+        'status',                // 5 - Status
+        'entry_price',           // 6 - Entry Price
+        'target_price',          // 7 - Target Price
+        'stop_loss',             // 8 - Stop Loss
+        'quantity',              // 9 - Quantity
+        'entry_conditions',      // 10 - Entry Conditions
+        'notes',                 // 11 - Notes
+        'created_at',            // 12 - Created At
+        'updated_at'             // 13 - Updated At
     ],
 
     // טבלת עיצובים (Designs)
@@ -73,91 +78,104 @@ const TABLE_COLUMN_MAPPINGS = {
         'status'           // 8 - סטטוס
     ],
 
-    // טבלת טריידים (Trades)
+    // טבלת טריידים (Trades) - Database Display Page Structure
     'trades': [
-        'ticker_symbol',   // 0 - טיקר
-        'status',          // 1 - סטטוס
-        'investment_type', // 2 - סוג
-        'side',            // 3 - צד
-        'total_pl',        // 4 - רווח/הפסד
-        'created_at',      // 5 - נוצר ב
-        'closed_at',       // 6 - נסגר ב
-        'account_name',    // 7 - חשבון
-        'notes',           // 8 - הערות
-        'actions'          // 9 - פעולות
+        'id',                    // 0 - ID
+        'account_id',            // 1 - Account ID
+        'ticker_id',             // 2 - Ticker ID
+        'investment_type',       // 3 - Investment Type
+        'side',                  // 4 - Side
+        'status',                // 5 - Status
+        'entry_price',           // 6 - Entry Price
+        'current_price',         // 7 - Current Price
+        'exit_price',            // 8 - Exit Price
+        'quantity',              // 9 - Quantity
+        'entry_date',            // 10 - Entry Date
+        'exit_date',             // 11 - Exit Date
+        'notes',                 // 12 - Notes
+        'created_at',            // 13 - Created At
+        'updated_at'             // 14 - Updated At
     ],
 
-    // טבלת חשבונות (Accounts)
+    // טבלת חשבונות (Accounts) - Database Display Page Structure
     'accounts': [
-        'id',              // 0 - מזהה
-        'name',            // 1 - שם
-        'status',          // 2 - סטטוס
-        'currency',        // 3 - מטבע
-        'cash_balance',    // 4 - יתרה במזומן
-        'created_at'       // 5 - נוצר ב
+        'id',                    // 0 - ID
+        'name',                  // 1 - Name
+        'currency',              // 2 - Currency
+        'balance',               // 3 - Balance
+        'status',                // 4 - Status
+        'created_at',            // 5 - Created At
+        'updated_at'             // 6 - Updated At
     ],
 
-    // טבלת טיקרים (Tickers)
-            'tickers': [
-            'symbol',          // 0 - סמל
-            'active_trades',   // 1 - יש טריידים
-            'type',            // 2 - סוג
-            'currency',        // 3 - מטבע
-            'updated_at',      // 4 - עודכן ב
-            'name',            // 5 - שם
-            'created_at',      // 6 - נוצר ב
-            'remarks'          // 7 - הערות
-        ],
+    // טבלת טיקרים (Tickers) - Database Display Page Structure
+    'tickers': [
+        'id',                    // 0 - ID
+        'symbol',                // 1 - Symbol
+        'name',                  // 2 - Name
+        'type',                  // 3 - Type
+        'currency_id',           // 4 - Currency ID
+        'remarks',               // 5 - Remarks
+        'active_trades',         // 6 - Active Trades
+        'created_at',            // 7 - Created At
+        'updated_at'             // 8 - Updated At
+    ],
 
-    // טבלת התראות (Alerts)
+    // טבלת התראות (Alerts) - Database Display Page Structure
     'alerts': [
-        'ticker_symbol',   // 0 - טיקר
-        'condition',       // 1 - תנאי
-        'status',          // 2 - סטטוס
-        'is_triggered',    // 3 - הופעל
-        'related_object',  // 4 - קשור ל
-        'message',         // 5 - הודעה
-        'type',            // 6 - סוג התראה
-        'created_at'       // 7 - נוצר ב
+        'id',                    // 0 - ID
+        'type',                  // 1 - Type
+        'status',                // 2 - Status
+        'message',               // 3 - Message
+        'triggered_at',          // 4 - Triggered At
+        'is_triggered',          // 5 - Is Triggered
+        'related_type_id',       // 6 - Related Type ID
+        'related_id',            // 7 - Related ID
+        'condition_attribute',   // 8 - Condition Attribute
+        'condition_operator',    // 9 - Condition Operator
+        'condition_number',      // 10 - Condition Number
+        'created_at',            // 11 - Created At
+        'updated_at'             // 12 - Updated At
     ],
 
-    // טבלת הערות (Notes)
+    // טבלת הערות (Notes) - Database Display Page Structure
     'notes': [
-        'id',              // 0 - מזהה
-        'title',           // 1 - כותרת
-        'type',            // 2 - סוג
-        'created_at',      // 3 - נוצר ב
-        'updated_at'       // 4 - עודכן ב
+        'id',                    // 0 - ID
+        'entity_type',           // 1 - Entity Type
+        'entity_id',             // 2 - Entity ID
+        'title',                 // 3 - Title
+        'content',               // 4 - Content
+        'created_at',            // 5 - Created At
+        'updated_at'             // 6 - Updated At
     ],
 
-    // טבלת עסקעות (Executions)
+    // טבלת עסקעות (Executions) - Database Display Page Structure
     'executions': [
-        'symbol',          // 0 - סימבול
-        'trade_info',      // 1 - מידע טרייד
-        'action',          // 2 - פעולה
-        'quantity',        // 3 - כמות
-        'price',           // 4 - מחיר
-        'fee',             // 5 - עמלה
-        'pl',              // 6 - רווח/הפסד
-        'notes',           // 7 - הערות
-        'created_at',      // 8 - נוצר ב
-        'date',            // 9 - תאריך ביצוע
-        'source',          // 10 - מקור
-        'actions'          // 11 - פעולות
+        'id',                    // 0 - ID
+        'trade_id',              // 1 - Trade ID
+        'action',                // 2 - Action
+        'date',                  // 3 - Date
+        'quantity',              // 4 - Quantity
+        'price',                 // 5 - Price
+        'fee',                   // 6 - Fee
+        'source',                // 7 - Source
+        'created_at'             // 8 - Created At
     ],
 
-    // טבלת תזרימי מזומנים (Cash Flows)
+    // טבלת תזרימי מזומנים (Cash Flows) - Database Display Page Structure
     'cash_flows': [
-        'account_id',      // 0 - חשבון
-        'type',            // 1 - סוג
-        'amount',          // 2 - סכום
-        'currency',        // 3 - מטבע
-        'exchange_rate',   // 4 - שער דולר
-        'date',            // 5 - תאריך
-        'description',     // 6 - תיאור
-        'source',          // 7 - מקור
-        'external_id',     // 8 - מזהה חיצוני
-        'created_at'       // 9 - נוצר ב
+        'id',                    // 0 - ID
+        'account_id',            // 1 - Account ID
+        'type',                  // 2 - Type
+        'amount',                // 3 - Amount
+        'date',                  // 4 - Date
+        'description',           // 5 - Description
+        'currency',              // 6 - Currency
+        'currency_id',           // 7 - Currency ID
+        'usd_rate',              // 8 - USD Rate
+        'source',                // 9 - Source
+        'external_id',           // 10 - External ID
+        'created_at'             // 11 - Created At
     ],
 
     // טבלת תוצאות בדיקות (Test Results)
@@ -209,12 +227,54 @@ function getColumnValue(item, columnIndex, tableType) {
 
     console.log(`🔍 getColumnValue: tableType=${tableType}, columnIndex=${columnIndex}, fieldName=${fieldName}, item:`, item);
 
-    // טיפול מיוחד בשדות מורכבים
-    if ((tableType === 'trade_plans' || tableType === 'designs') && fieldName === 'ticker') {
-        return item.ticker ? (item.ticker.symbol || item.ticker.name || '') : '';
+    // Database Display Page - Direct field mapping
+    if (tableType === 'trade_plans' || tableType === 'trades' || tableType === 'accounts' ||
+        tableType === 'tickers' || tableType === 'notes' ||
+        tableType === 'executions' || tableType === 'cash_flows') {
+
+        // Return the field value directly from the item
+        return item[fieldName] || '';
     }
 
-    if (tableType === 'trades') {
+    // Alerts table - special handling for condition translation
+    if (tableType === 'alerts') {
+        if (fieldName === 'condition') {
+            if (item.condition_attribute && item.condition_operator && item.condition_number && window.translateConditionFields) {
+                return window.translateConditionFields(item.condition_attribute, item.condition_operator, item.condition_number);
+            }
+            return item.condition || '-';
+        }
+        if (fieldName === 'status') {
+            switch (item.status) {
+                case 'open': return 'פתוח';
+                case 'closed': return 'סגור';
+                case 'cancelled': return 'מבוטל';
+                default: return item.status || '';
+            }
+        }
+        if (fieldName === 'is_triggered') {
+            if (item.is_triggered === 'true' || item.is_triggered === true) {
+                return 'כן';
+            } else if (item.is_triggered === 'false' || item.is_triggered === false) {
+                return 'לא';
+            } else if (item.is_triggered === 'new') {
+                return 'חדש';
+            }
+            return 'לא מוגדר';
+        }
+        // For other fields, return directly
+        return item[fieldName] || '';
+    }
+
+    // Legacy support for other table types
+    if (tableType === 'designs') {
+        if (fieldName === 'ticker') {
+            return item.ticker ? (item.ticker.symbol || item.ticker.name || '') : '';
+        }
+    }
+
+    // Legacy trades table (for specific pages)
+    if (tableType === 'trades_legacy') {
         if (fieldName === 'account_name') {
             return item.account_name || item.account_id || '';
         }
@@ -222,13 +282,11 @@ function getColumnValue(item, columnIndex, tableType) {
             return item.ticker_symbol || item.ticker_id || '';
         }
         if (fieldName === 'investment_type') {
-            // טיפול מיוחד בסוג השקעה - שימוש בפונקציה הגלובלית
             if (typeof window.translateTradeType === 'function') {
                 const result = window.translateTradeType(item.investment_type) || item.investment_type || '';
                 console.log(`🔍 investment_type returning: ${result} (translated)`);
                 return result;
             }
-            // fallback אם הפונקציה לא זמינה
             const typeDisplay = item.investment_type === 'long' ? 'לונג' :
                 item.investment_type === 'short' ? 'שורט' :
                     item.investment_type === 'swing' ? 'סווינג' :
@@ -243,11 +301,11 @@ function getColumnValue(item, columnIndex, tableType) {
         }
     }
 
-    if (tableType === 'executions') {
+    // Legacy executions table (for specific pages)
+    if (tableType === 'executions_legacy') {
         console.log('🔍 getColumnValue - executions table:', { fieldName, item });
 
         if (fieldName === 'symbol') {
-            // נדרש לטעון נתוני טריידים וטיקרים
             return item.symbol || item.ticker_symbol || '';
         }
         if (fieldName === 'trade_info') {
@@ -272,22 +330,18 @@ function getColumnValue(item, columnIndex, tableType) {
         }
     }
 
-    // הערה: הלוגיקה עבור 'designs' הוסרה - משתמשים ב-'trade_plans' במקום
-
-    if (tableType === 'alerts') {
+    // Legacy alerts table (for specific pages)
+    if (tableType === 'alerts_legacy') {
         if (fieldName === 'ticker_symbol') {
-            // טיפול בטיקר - נדרש לטעון נתוני טיקרים
             return item.ticker_symbol || item.ticker_id || '';
         }
         if (fieldName === 'condition') {
-            // טיפול בתנאי - שימוש בפונקציית התרגום אם זמינה
             if (item.condition_attribute && item.condition_operator && item.condition_number && window.translateConditionFields) {
                 return window.translateConditionFields(item.condition_attribute, item.condition_operator, item.condition_number);
             }
             return item.condition || '-';
         }
         if (fieldName === 'status') {
-            // המרת סטטוס לעברית
             switch (item.status) {
                 case 'open': return 'פתוח';
                 case 'closed': return 'סגור';
@@ -296,7 +350,6 @@ function getColumnValue(item, columnIndex, tableType) {
             }
         }
         if (fieldName === 'is_triggered') {
-            // המרת מצב הפעלה לעברית
             if (item.is_triggered === 'true' || item.is_triggered === true) {
                 return 'כן';
             } else if (item.is_triggered === 'false' || item.is_triggered === false) {
@@ -307,14 +360,12 @@ function getColumnValue(item, columnIndex, tableType) {
             return 'לא מוגדר';
         }
         if (fieldName === 'related_object') {
-            // טיפול באובייקט מקושר - נדרש לטעון נתונים נוספים
             return item.related_object || '-';
         }
         if (fieldName === 'message') {
             return item.message || '-';
         }
         if (fieldName === 'type') {
-            // המרת סוג התראה לעברית
             switch (item.type) {
                 case 'price_alert': return 'התראה על מחיר';
                 case 'stop_loss': return 'סטופ לוס';
@@ -329,7 +380,8 @@ function getColumnValue(item, columnIndex, tableType) {
         }
     }
 
-    if (tableType === 'cash_flows') {
+    // Legacy cash flows table (for specific pages)
+    if (tableType === 'cash_flows_legacy') {
         if (fieldName === 'account_id') {
             return item.account_name || item.account_id || '';
         }
@@ -343,7 +395,8 @@ function getColumnValue(item, columnIndex, tableType) {
         }
     }
 
-    if (tableType === 'tickers') {
+    // Legacy tickers table (for specific pages)
+    if (tableType === 'tickers_legacy') {
         if (fieldName === 'type') {
             const typeDisplay = item.type === 'stock' ? 'מניה' :
                 item.type === 'etf' ? 'ETF' :

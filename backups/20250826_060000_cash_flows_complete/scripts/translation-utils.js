@@ -1,0 +1,496 @@
+/**
+ * Translation Utilities - TikTrack
+ * קובץ מרכזי לכל פונקציות התרגום במערכת
+ * 
+ * מטרה: ריכוז כל פונקציות התרגום במקום אחד לתחזוקה קלה יותר
+ * כל פונקציה נקראת בשם ברור שמציין לאיזה ישות/עמוד היא מתייחסת
+ * 
+ * Dependencies: None (standalone utility file)
+ * Dependents: All page-specific scripts, main.js, header-system.js
+ * 
+ * File: trading-ui/scripts/translation-utils.js
+ * Version: 2.2
+ * Last Updated: August 23, 2025
+ */
+
+// ===== תרגום סטטוסים =====
+
+/**
+ * תרגום סטטוס חשבון לעברית
+ * @param {string} status - הסטטוס באנגלית
+ * @returns {string} הסטטוס בעברית
+ */
+function translateAccountStatus(status) {
+    const statusMap = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'cancelled': 'מבוטל',
+        'canceled': 'מבוטל'
+    };
+    return statusMap[status] || status;
+}
+
+/**
+ * תרגום סטטוס טיקר לעברית
+ * @param {string} status - הסטטוס באנגלית
+ * @returns {string} הסטטוס בעברית
+ */
+function translateTickerStatus(status) {
+    const statusMap = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'cancelled': 'מבוטל',
+        'canceled': 'מבוטל'
+    };
+    return statusMap[status] || status;
+}
+
+/**
+ * תרגום סטטוס הערה לעברית
+ * @param {string} status - הסטטוס באנגלית
+ * @returns {string} הסטטוס בעברית
+ */
+function translateNoteStatus(status) {
+    const statusMap = {
+        'active': 'פעיל',
+        'archived': 'בארכיון',
+        'deleted': 'נמחק'
+    };
+    return statusMap[status] || status;
+}
+
+/**
+ * תרגום סטטוס התראה לעברית
+ * @param {string} status - הסטטוס באנגלית
+ * @returns {string} הסטטוס בעברית
+ */
+function translateAlertStatus(status) {
+    const statusMap = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'cancelled': 'מבוטל',
+        'canceled': 'מבוטל'
+    };
+    return statusMap[status] || status;
+}
+
+/**
+ * תרגום סוג התראה לעברית
+ * @param {string} type - סוג ההתראה באנגלית
+ * @returns {string} סוג ההתראה בעברית
+ */
+function translateAlertType(type) {
+    const typeMap = {
+        'price': 'מחיר',
+        'volume': 'נפח',
+        'technical': 'טכני',
+        'news': 'חדשות',
+        'time': 'זמן',
+        'custom': 'מותאם אישית'
+    };
+    return typeMap[type] || type;
+}
+
+/**
+ * תרגום תנאי התראה לעברית
+ * @param {string} condition - התנאי באנגלית
+ * @returns {string} התנאי בעברית
+ */
+function translateAlertCondition(condition) {
+    const conditionMap = {
+        'above': 'מעל',
+        'below': 'מתחת',
+        'equals': 'שווה ל',
+        'not_equals': 'לא שווה ל',
+        'contains': 'מכיל',
+        'not_contains': 'לא מכיל',
+        'starts_with': 'מתחיל ב',
+        'ends_with': 'מסתיים ב',
+        'greater_than': 'גדול מ',
+        'less_than': 'קטן מ',
+        'greater_than_or_equal': 'גדול או שווה ל',
+        'less_than_or_equal': 'קטן או שווה ל'
+    };
+    return conditionMap[condition] || condition;
+}
+
+/**
+ * תרגום סטטוס תכנון טרייד לעברית
+ * @param {string} status - הסטטוס באנגלית
+ * @returns {string} הסטטוס בעברית
+ */
+function translateTradePlanStatus(status) {
+    // Safeguarding against invalid values
+    if (status === null || status === undefined) {
+        return 'לא מוגדר';
+    }
+
+    const statusMap = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'cancelled': 'מבוטל',
+        'canceled': 'מבוטל'
+    };
+
+    return statusMap[status.toLowerCase()] || status;
+}
+
+/**
+ * תרגום האם התראה הופעלה
+ * @param {boolean} isTriggered - האם הופעלה
+ * @returns {string} כן/לא
+ */
+function translateIsTriggered(isTriggered) {
+    return isTriggered ? 'כן' : 'לא';
+}
+
+// ===== תרגום סוגים =====
+
+/**
+ * תרגום סוג טרייד לעברית
+ * @param {string} type - סוג הטרייד באנגלית
+ * @returns {string} סוג הטרייד בעברית
+ */
+function translateTradeType(type) {
+    const typeMap = {
+        'swing': 'ספין',
+        'investment': 'השקעה',
+        'passive': 'פסיבי',
+        'crypto': 'קריפטו',
+        'other': 'אחר'
+    };
+    return typeMap[type] || type;
+}
+
+/**
+ * תרגום סטטוס טרייד לעברית
+ * @param {string} status - הסטטוס באנגלית
+ * @returns {string} הסטטוס בעברית
+ */
+function translateTradeStatus(status) {
+    const statusMap = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'cancelled': 'מבוטל',
+        'canceled': 'מבוטל',
+        'pending': 'ממתין',
+        'active': 'פעיל',
+        'inactive': 'לא פעיל'
+    };
+    return statusMap[status] || status;
+}
+
+/**
+ * תרגום סוג תכנון טרייד לעברית
+ * @param {string} type - הסוג באנגלית
+ * @returns {string} הסוג בעברית
+ */
+function translateTradePlanType(type) {
+    // Safeguarding against invalid values
+    if (type === null || type === undefined) {
+        return 'לא מוגדר';
+    }
+
+    const typeMap = {
+        'swing': 'סווינג',
+        'investment': 'השקעה',
+        'passive': 'פאסיבי',
+        'day_trading': 'דיי טריידינג',
+        'scalping': 'סקלפינג'
+    };
+
+    return typeMap[type.toLowerCase()] || type;
+}
+
+/**
+ * תרגום סוג תזרים מזומנים לעברית
+ * @param {string} type - הסוג באנגלית
+ * @returns {string} הסוג בעברית
+ */
+function translateCashFlowType(type) {
+    const typeNames = {
+        'deposit': 'הפקדה',
+        'withdrawal': 'משיכה',
+        'dividend': 'דיבידנד',
+        'fee': 'עמלה',
+        'interest': 'ריבית',
+        'bonus': 'בונוס',
+        'tax': 'מס'
+    };
+    return typeNames[type] || type;
+}
+
+/**
+ * תרגום מקור תזרים מזומנים לעברית
+ * @param {string} source - המקור באנגלית
+ * @returns {string} המקור בעברית
+ */
+function translateCashFlowSource(source) {
+    const sourceNames = {
+        'manual': 'ידני',
+        'file_import': 'ייבוא מקובץ',
+        'direct_import': 'ייבוא ישיר',
+        'api': 'API',
+        'broker': 'ברוקר'
+    };
+    return sourceNames[source] || source;
+}
+
+// ===== תרגום קטגוריות =====
+
+/**
+ * תרגום שם קטגורית בדיקה לעברית
+ * @param {string} category - הקטגוריה באנגלית
+ * @returns {string} הקטגוריה בעברית
+ */
+function translateTestCategory(category) {
+    const categoryNames = {
+        'unit_tests': 'יחידה',
+        'integration_tests': 'אינטגרציה',
+        'e2e_tests': 'End-to-End',
+        'performance_tests': 'ביצועים',
+        'security_tests': 'אבטחה',
+        'load_tests': 'עומס'
+    };
+    return categoryNames[category] || category;
+}
+
+// ===== ייצוא פונקציות =====
+
+// Export functions to global scope
+window.translateAccountStatus = translateAccountStatus;
+window.translateTickerStatus = translateTickerStatus;
+window.translateNoteStatus = translateNoteStatus;
+window.translateAlertStatus = translateAlertStatus;
+window.translateTradePlanStatus = translateTradePlanStatus;
+window.translateIsTriggered = translateIsTriggered;
+window.translateAlertType = translateAlertType;
+window.translateAlertCondition = translateAlertCondition;
+window.translateTradeType = translateTradeType;
+window.translateTradeStatus = translateTradeStatus;
+window.convertExecutionActionToHebrew = translateExecutionAction; // Backward compatibility
+
+// פונקציות מטבעות
+window.getCurrencyIcon = getCurrencyIcon;
+window.getTickerCurrencyDisplay = getTickerCurrencyDisplay;
+window.getTickerCurrencySymbol = getTickerCurrencySymbol;
+window.getCashFlowCurrencyDisplay = getCashFlowCurrencyDisplay;
+
+// תאימות לאחור - שמות ישנים
+window.convertAccountStatusToHebrew = translateAccountStatus;
+window.convertTickerStatusToHebrew = translateTickerStatus;
+window.convertNoteStatusToHebrew = translateNoteStatus;
+window.convertAlertStatusToHebrew = translateAlertStatus;
+window.convertIsTriggeredToHebrew = translateIsTriggered;
+window.getTypeDisplay = translateTradeType; // trades.js
+window.getTypeDisplayName = translateCashFlowType; // cash_flows.js
+window.getCategoryDisplayName = translateTestCategory; // preferences.js
+
+// ===== פונקציות פורמט מספרים =====
+
+/**
+ * פורמט מספר עם פסיקים כל שלוש ספרות
+ * @param {number|string} number - המספר לפורמט
+ * @param {Object} options - אפשרויות פורמט
+ * @returns {string} המספר בפורמט עם פסיקים
+ */
+function formatNumberWithCommas(number, options = {}) {
+    const num = parseFloat(number) || 0;
+    const defaultOptions = {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+        useGrouping: true
+    };
+    const finalOptions = { ...defaultOptions, ...options };
+    
+    return num.toLocaleString('he-IL', finalOptions);
+}
+
+/**
+ * פורמט סכום כסף עם פסיקים וסמל מטבע
+ * @param {number|string} amount - הסכום לפורמט
+ * @param {string} currency - סמל המטבע (ברירת מחדל: USD)
+ * @param {Object} options - אפשרויות פורמט
+ * @returns {string} הסכום בפורמט מטבע עם פסיקים
+ */
+function formatCurrencyWithCommas(amount, currency = 'USD', options = {}) {
+    const num = parseFloat(amount) || 0;
+    const defaultOptions = {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+    };
+    const finalOptions = { ...defaultOptions, ...options };
+    
+    return num.toLocaleString('he-IL', finalOptions);
+}
+
+/**
+ * צביעת סכום לפי ערך - ירוק לחיובי, אדום לשלילי
+ * @param {number|string} amount - הסכום לצביעה
+ * @param {string} displayText - טקסט להצגה (אופציונלי)
+ * @param {HTMLElement} element - אלמנט DOM לעדכון ישיר (אופציונלי)
+ * @returns {string|void} HTML עם צביעה או עדכון ישיר של האלמנט
+ */
+function colorAmountByValue(amount, displayText = null, element = null) {
+    const numAmount = parseFloat(amount);
+    const color = numAmount >= 0 ? '#28a745' : '#dc3545'; // ירוק לחיובי, אדום לשלילי
+    
+    // אם יש אלמנט, נעדכן אותו ישירות
+    if (element) {
+        element.textContent = displayText || formatNumberWithCommas(numAmount);
+        element.style.color = color;
+        element.style.fontWeight = 'bold';
+        return;
+    }
+    
+    // אחרת, נחזיר HTML
+    const text = displayText || formatNumberWithCommas(numAmount);
+    return `<span style="color: ${color}; font-weight: bold;">${text}</span>`;
+}
+
+// ייצוא פונקציות פורמט מספרים
+window.formatNumberWithCommas = formatNumberWithCommas;
+window.formatCurrencyWithCommas = formatCurrencyWithCommas;
+window.colorAmountByValue = colorAmountByValue;
+
+// תאימות לאחור - שמות ישנים
+window.formatNumber = formatNumberWithCommas;
+window.formatCurrency = formatCurrencyWithCommas;
+window.colorAmount = colorAmountByValue;
+
+// ייצוא המודול עצמו
+window.translationUtils = {
+    translateAccountStatus,
+    translateTickerStatus,
+    translateNoteStatus,
+    translateAlertStatus,
+    translateAlertType,
+    translateTradePlanStatus,
+    translateIsTriggered,
+    translateTradeType,
+    translateTradePlanType,
+    translateCashFlowType,
+    translateCashFlowSource,
+    translateTestCategory,
+    translateExecutionAction,
+    formatNumberWithCommas,
+    formatCurrencyWithCommas,
+    colorAmountByValue,
+    // תאימות לאחור
+    formatNumber: formatNumberWithCommas,
+    formatCurrency: formatCurrencyWithCommas,
+    colorAmount: colorAmountByValue
+};
+
+console.log('✅ Translation utilities loaded successfully');
+
+/**
+ * תרגום פעולת ביצוע לעברית
+ * @param {string} action - הפעולה באנגלית
+ * @returns {string} הפעולה בעברית
+ */
+function translateExecutionAction(action) {
+    const actionMap = {
+        'buy': 'קנה',
+        'sell': 'מכר',
+        'hold': 'החזק',
+        'close': 'סגר',
+        'cancel': 'בטל'
+    };
+    return actionMap[action] || action;
+}
+
+// Execution Action Translations
+window.translateExecutionAction = translateExecutionAction;
+window.convertExecutionActionToHebrew = translateExecutionAction; // Backward compatibility
+
+// ===== פונקציות מטבעות =====
+
+/**
+ * קבלת אייקון מטבע לפי סמל
+ * @param {string} currencySymbol - סמל המטבע (USD, EUR, וכו')
+ * @returns {string} אייקון המטבע
+ */
+function getCurrencyIcon(currencySymbol) {
+    if (!currencySymbol) return '💱';
+    
+    const currencyIcons = {
+        'USD': '💵',
+        'EUR': '💶',
+        'GBP': '💷',
+        'JPY': '💴',
+        'ILS': '₪',
+        'BTC': '₿',
+        'ETH': 'Ξ'
+    };
+    
+    return currencyIcons[currencySymbol.toUpperCase()] || '💱';
+}
+
+/**
+ * הצגת מטבע טיקר עם אייקון
+ * @param {Object} ticker - אובייקט טיקר
+ * @returns {string} HTML עם אייקון וסמל מטבע
+ */
+function getTickerCurrencyDisplay(ticker) {
+    let currencySymbol = '';
+
+    if (ticker.currency_id && window.currenciesData && window.currenciesData.length > 0) {
+        // אם יש currency_id, נחפש את המטבע
+        const currency = window.currenciesData.find(c => c.id === ticker.currency_id);
+        if (currency) {
+            currencySymbol = currency.symbol;
+        }
+    }
+
+    if (currencySymbol) {
+        const icon = getCurrencyIcon(currencySymbol);
+        return `<span class="currency-icon">${icon}</span> ${currencySymbol}`;
+    }
+    return '<span class="text-muted">לא מוגדר</span>';
+}
+
+/**
+ * הצגת סמל מטבע טיקר בלבד
+ * @param {Object} ticker - אובייקט טיקר
+ * @returns {string} סמל המטבע
+ */
+function getTickerCurrencySymbol(ticker) {
+    let currencySymbol = '';
+
+    if (ticker.currency_id && window.currenciesData && window.currenciesData.length > 0) {
+        // אם יש currency_id, נחפש את המטבע
+        const currency = window.currenciesData.find(c => c.id === ticker.currency_id);
+        if (currency) {
+            currencySymbol = currency.symbol;
+        }
+    }
+
+    return currencySymbol || 'לא מוגדר';
+}
+
+/**
+ * הצגת מטבע תזרים מזומנים עם אייקון
+ * @param {Object} cashFlow - אובייקט תזרים מזומנים
+ * @returns {string} HTML עם אייקון וסמל מטבע
+ */
+function getCashFlowCurrencyDisplay(cashFlow) {
+    let currencySymbol = '';
+
+    if (cashFlow.currency_id && window.currenciesData && window.currenciesData.length > 0) {
+        // אם יש currency_id, נחפש את המטבע
+        const currency = window.currenciesData.find(c => c.id === cashFlow.currency_id);
+        if (currency) {
+            currencySymbol = currency.symbol;
+        }
+    }
+
+    if (currencySymbol) {
+        const icon = getCurrencyIcon(currencySymbol);
+        return `<span class="currency-icon">${icon}</span> ${currencySymbol}`;
+    }
+    return '<span class="text-muted">לא מוגדר</span>';
+}

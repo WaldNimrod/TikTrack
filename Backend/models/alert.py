@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
 from .base import BaseModel
 from typing import Dict, Any, Optional
@@ -18,7 +18,7 @@ class Alert(BaseModel):
     related_id = Column(Integer, nullable=False)
     condition_attribute = Column(String(50), nullable=False, default='price')
     condition_operator = Column(String(50), nullable=False, default='more_than')
-    condition_number = Column(String(20), nullable=False, default='0')
+    condition_number = Column(Numeric(10, 2), nullable=False, default=0)
     
     # Relationships
     ticker = relationship("Ticker", back_populates="alerts")
@@ -82,7 +82,7 @@ class Alert(BaseModel):
         
         attribute = attribute_translations.get(self.condition_attribute, self.condition_attribute)
         operator = operator_translations.get(self.condition_operator, self.condition_operator)
-        number = self.condition_number
+        number = str(self.condition_number) if self.condition_number else '0'
         
         return f"{attribute} {operator} {number}"
     
@@ -105,7 +105,7 @@ class Alert(BaseModel):
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
             'condition_attribute': self.condition_attribute,
             'condition_operator': self.condition_operator,
-            'condition_number': self.condition_number,
+            'condition_number': str(self.condition_number) if self.condition_number else '0',
             'condition_display_text': self.get_condition_display_text()
         }
         

@@ -313,7 +313,22 @@ window.closeModal = function (modalId) {
         const bootstrapModal = bootstrap.Modal.getInstance(modal);
         if (bootstrapModal) {
             bootstrapModal.hide();
+        } else {
+            // Fallback: hide modal manually
+            modal.classList.remove('show');
+            modal.style.display = 'none';
         }
+
+        // Remove backdrop
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+
+        // Remove modal-open class from body
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
     }
 };
 

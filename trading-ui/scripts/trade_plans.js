@@ -1758,12 +1758,19 @@ window.updateDateRangeFilterDisplayText = function () {
 
 window.updateAccountFilterDisplayText = function () {
     console.log('🔄 updateAccountFilterDisplayText called');
-    // הפונקציה כבר מוגדרת ב-accounts.js
-    if (typeof window.updateAccountFilterDisplayTextGlobal === 'function') {
-        window.updateAccountFilterDisplayTextGlobal();
-    } else {
-        console.warn('⚠️ updateAccountFilterDisplayTextGlobal not found');
+
+    // עדכון טקסט פילטר חשבונות ב-header
+    const accountFilterButton = document.getElementById('accountFilterButton');
+    if (accountFilterButton) {
+        const selectedAccounts = window.simpleFilter?.currentFilters?.account || [];
+        if (selectedAccounts && selectedAccounts.length > 0) {
+            accountFilterButton.textContent = `${selectedAccounts.length} חשבונות נבחרו`;
+        } else {
+            accountFilterButton.textContent = 'כל החשבונות';
+        }
     }
+
+    console.log('✅ updateAccountFilterDisplayText completed');
 };
 
 // updateAccountFilterMenu is already defined in accounts.js

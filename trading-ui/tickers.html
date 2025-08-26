@@ -70,8 +70,7 @@
         <!-- Main header -->
         <div class="section-header">
           <div class="table-title">
-            <img src="images/icons/tickers.svg" alt="טיקרים"
-              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            <img src="images/icons/tickers.svg" alt="טיקרים" class="table-icon">
             טיקרים
           </div>
           <div class="table-actions">
@@ -103,14 +102,13 @@
           <!-- Designs header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/tickers.svg" alt="הטיקרים שלי"
-                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              <img src="images/icons/tickers.svg" alt="הטיקרים שלי" class="table-icon">
               הטיקרים שלי
             </div>
             <div class="table-count">9 טיקרים</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="openTickerDetails()" title="הוסף תיקר חדש">
-                <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
+                <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon">
                 הוסף
               </button>
               <div class="action-separator"></div>
@@ -130,57 +128,49 @@
                   <tr>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }">
                         סמל <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }">
                         יש טריידים <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }">
                         סוג <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }">
                         מטבע <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }">
                         עודכן ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }">
                         שם <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }">
                         נוצר ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }">
                         הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
@@ -470,8 +460,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-            <button type="button" class="btn btn-success" onclick="saveTicker()"
-              style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
+            <button type="button" class="btn btn-success btn-success-outline" onclick="saveTicker()">
               שמור טיקר
             </button>
           </div>
@@ -551,8 +540,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-            <button type="button" class="btn btn-success" onclick="updateTicker()"
-              style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
+            <button type="button" class="btn btn-success btn-success-outline" onclick="updateTicker()">
               עדכן טיקר
             </button>
           </div>
@@ -576,8 +564,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-            <button type="button" class="btn btn-danger" onclick="confirmDeleteTicker()"
-              style="border: 2px solid #dc3545; background-color: white; color: #dc3545; font-size: 0.9rem; padding: 0.375rem 0.75rem;">
+            <button type="button" class="btn btn-danger btn-danger-outline" onclick="confirmDeleteTicker()">
               מחק טיקר
             </button>
           </div>
@@ -585,41 +572,20 @@
       </div>
     </div>
 
-    <!-- Linked Items Modal -->
+    <!-- מודל הצגת פריטים מקושרים -->
     <div class="modal fade" id="linkedItemsModal" tabindex="-1" aria-labelledby="linkedItemsModalLabel"
       aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="linkedItemsModalLabel">לא ניתן למחוק טיקר עם פריטים מקושרים</h5>
+            <h5 class="modal-title" id="linkedItemsModalLabel">פרטים מקושרים</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
-            <div class="alert alert-warning">
-              <strong>⚠️ לא ניתן למחוק את הטיקר <span id="linkedTickerName"></span></strong>
-              <br>
-              הטיקר מקושר לפריטים הבאים במערכת. יש לטפל בהם תחילה:
-            </div>
-
-            <div id="linkedItemsContent">
-              <!-- Linked items content will be displayed here -->
-            </div>
-
-            <div class="alert alert-info mt-3">
-              <strong>💡 מה ניתן לעשות:</strong>
-              <ul class="mb-0">
-                <li>סגור או בטל את כל הטריידים הפתוחים</li>
-                <li>סגור או בטל את כל התכנונים הפתוחים</li>
-                <li>מחק את כל ההתראות הקשורות לטיקר</li>
-                <li>מחק את כל ההערות הקשורות לטיקר</li>
-              </ul>
-            </div>
+          <div class="modal-body" id="linkedItemsModalBody">
+            <!-- תוכן המודל יוכנס כאן דינמית -->
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-            <button type="button" class="btn btn-primary" onclick="goToLinkedItems()">
-              עבור לניהול פריטים
-            </button>
           </div>
         </div>
       </div>

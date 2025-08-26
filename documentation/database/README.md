@@ -98,8 +98,86 @@ The TikTrack system uses SQLite as its primary database with SQLAlchemy ORM for 
 
 ### Data Formats
 - **JSON**: Primary data exchange format
-- **Date Handling**: ISO 8601 date format (YYYY-MM-DD)
-- **Currency**: Proper currency formatting and validation
+
+## Frontend Table Integration
+
+### Table Identification System
+The database integrates with a sophisticated frontend table identification system that supports both dedicated pages and unified database views.
+
+#### **Table Types and Structures**
+Each database table has a corresponding frontend representation with specific identification methods:
+
+**1. Dedicated Pages (Specific Tables)**
+- **Accounts Page**: `content-section accounts-page` → `accountsTable`
+- **Trades Page**: `content-section tracking-page` → `tradesTable`
+- **Tickers Page**: `content-section tickers-page` → `tickersTable`
+- **Alerts Page**: `content-section alerts-page` → `alertsTable`
+- **Notes Page**: `content-section notes-page` → `notesTable`
+- **Executions Page**: `content-section executions-page` → `executionsTable`
+- **Cash Flows Page**: `content-section cash-flows-page` → `cashFlowsTable`
+
+**2. Database Display Page (Unified View)**
+- **Trade Plans**: `data-table-type="trade_plans"` → `tradePlansTable`
+- **Trades**: `data-table-type="trades"` → `tradesTable`
+- **Accounts**: `data-table-type="accounts"` → `accountsTable`
+- **Tickers**: `data-table-type="tickers"` → `tickersTable`
+- **Executions**: `data-table-type="executions"` → `executionsTable`
+- **Cash Flows**: `data-table-type="cash_flows"` → `cashFlowsTable`
+- **Alerts**: `data-table-type="alerts"` → `alertsTable`
+- **Notes**: `data-table-type="notes"` → `notesTable`
+
+#### **Column Mapping System**
+The system uses centralized column mappings in `table-mappings.js` to ensure consistency:
+
+```javascript
+const TABLE_COLUMN_MAPPINGS = {
+    'accounts': [
+        'id',              // 0 - מזהה
+        'name',            // 1 - שם
+        'status',          // 2 - סטטוס
+        'currency',        // 3 - מטבע
+        'cash_balance',    // 4 - יתרה במזומן
+        'created_at'       // 5 - נוצר ב
+    ],
+    'trades': [
+        'ticker_symbol',   // 0 - טיקר
+        'status',          // 1 - סטטוס
+        'investment_type', // 2 - סוג
+        'side',            // 3 - צד
+        'total_pl',        // 4 - רווח/הפסד
+        'created_at',      // 5 - נוצר ב
+        'closed_at',       // 6 - נסגר ב
+        'account_name',    // 7 - חשבון
+        'notes',           // 8 - הערות
+        'actions'          // 9 - פעולות
+    ]
+    // ... other tables
+};
+```
+
+#### **Data Flow Integration**
+```
+Database Table ←→ API Endpoint ←→ Frontend Table ←→ User Interface
+     ↓              ↓                ↓                ↓
+  SQLAlchemy    RESTful API    JavaScript Table    HTML/CSS
+   Model         Response       Identification      Display
+```
+
+#### **Sorting and Filtering**
+- **Universal Sorting**: Global `sortTableData()` function works across all table types
+- **Dynamic Filtering**: Filter system adapts to table structure automatically
+- **State Management**: Sort and filter states persist across page navigation
+- **Performance**: Optimized for large datasets with efficient algorithms
+
+#### **Constraint Display**
+Database constraints are dynamically displayed under each table:
+- **NOT NULL**: Required field indicators
+- **FOREIGN KEY**: Relationship information
+- **UNIQUE**: Uniqueness constraints
+- **ENUM**: Allowed value lists
+- **DEFAULT**: Default value information
+
+## Security and Validation
 
 ## Recent Improvements
 

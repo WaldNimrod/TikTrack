@@ -26,148 +26,159 @@ console.log('🔄 database.js נטען!');
 
 // פונקציה לטעינת אילוצים דינמית
 async function loadConstraints() {
-    try {
-        console.log('🔄 טעינת אילוצים מהשרת');
-        const response = await fetch('/api/v1/constraints/');
-        if (response.ok) {
-            const data = await response.json();
-            allData.constraints = data.data || data;
-            console.log('✅ נטענו', allData.constraints.length, 'אילוצים');
-            updateConstraintsDisplay();
-        } else {
-            console.error('❌ שגיאה בטעינת אילוצים');
-        }
-    } catch (error) {
-        console.error('❌ שגיאה בטעינת אילוצים:', error);
+  try {
+    console.log('🔄 טעינת אילוצים מהשרת');
+    const response = await fetch('/api/v1/constraints/');
+    if (response.ok) {
+      const data = await response.json();
+      allData.constraints = data.data || data;
+      console.log('✅ נטענו', allData.constraints.length, 'אילוצים');
+      updateConstraintsDisplay();
+    } else {
+      console.error('❌ שגיאה בטעינת אילוצים');
     }
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת אילוצים:', error);
+  }
 }
 
 // פונקציה לעדכון תצוגת האילוצים
 function updateConstraintsDisplay() {
-    // קבלת כל הטבלאות עם האילוצים שלהן
-    const tableConstraints = {};
-    
-    // קיבוץ אילוצים לפי טבלה
-    allData.constraints.forEach(constraint => {
-        if (!tableConstraints[constraint.table_name]) {
-            tableConstraints[constraint.table_name] = [];
-        }
-        tableConstraints[constraint.table_name].push(constraint);
-    });
-    
-    // עדכון כל טבלה
-    Object.keys(tableConstraints).forEach(tableName => {
-        updateTableConstraints(tableName, tableConstraints[tableName]);
-    });
+  // קבלת כל הטבלאות עם האילוצים שלהן
+  const tableConstraints = {};
+
+  // קיבוץ אילוצים לפי טבלה
+  allData.constraints.forEach(constraint => {
+    if (!tableConstraints[constraint.table_name]) {
+      tableConstraints[constraint.table_name] = [];
+    }
+    tableConstraints[constraint.table_name].push(constraint);
+  });
+
+  // עדכון כל טבלה
+  Object.keys(tableConstraints).forEach(tableName => {
+    updateTableConstraints(tableName, tableConstraints[tableName]);
+  });
 }
 
 // פונקציה למציאת אלמנט האילוצים של טבלה
 function findTableRulesContainer(tableName) {
-    // מיפוי שמות טבלאות לכותרות ב-HTML
-    const tableHeaders = {
-        'trade_plans': '📋 תוכניות מסחר',
-        'trades': '💼 טריידים',
-        'accounts': '👤 חשבונות',
-        'tickers': '📊 טיקרים',
-        'executions': '⚡ ביצועים',
-        'cash_flows': '💰 תזרימי מזומנים',
-        'alerts': '🔔 התראות',
-        'notes': '📝 הערות'
-    };
-    
-    const headerText = tableHeaders[tableName];
-    if (!headerText) return null;
-    
-    // חיפוש הכותרת ומשם האלמנט של האילוצים
-    const headers = document.querySelectorAll('.table-title');
-    for (const header of headers) {
-        if (header.textContent.trim() === headerText) {
-            // מחפשים את ה-content-section שמכיל את הכותרת הזו
-            const contentSection = header.closest('.content-section');
-            if (contentSection) {
-                return contentSection.querySelector('.table-rules-list');
-            }
-        }
+  // מיפוי שמות טבלאות לכותרות ב-HTML
+  const tableHeaders = {
+    'trade_plans': '📋 תוכניות מסחר',
+    'trades': '💼 טריידים',
+    'accounts': '👤 חשבונות',
+    'tickers': '📊 טיקרים',
+    'executions': '⚡ ביצועים',
+    'cash_flows': '💰 תזרימי מזומנים',
+    'alerts': '🔔 התראות',
+    'notes': '📝 הערות'
+  };
+
+  const headerText = tableHeaders[tableName];
+  if (!headerText) return null;
+
+  // חיפוש הכותרת ומשם האלמנט של האילוצים
+  const headers = document.querySelectorAll('.table-title');
+  for (const header of headers) {
+    if (header.textContent.trim() === headerText) {
+      // מחפשים את ה-content-section שמכיל את הכותרת הזו
+      const contentSection = header.closest('.content-section');
+      if (contentSection) {
+        return contentSection.querySelector('.table-rules-list');
+      }
     }
-    
-    return null;
+  }
+
+  return null;
 }
 
 // פונקציה לעדכון אילוצים של טבלה ספציפית
 function updateTableConstraints(tableName, constraints) {
-    // מיפוי שמות טבלאות לאלמנטים ב-HTML
-    const tableMapping = {
-        'trade_plans': 'tradePlans',
-        'trades': 'trades', 
-        'accounts': 'accounts',
-        'tickers': 'tickers',
-        'executions': 'executions',
-        'cash_flows': 'cashFlows',
-        'alerts': 'alerts',
-        'notes': 'notes'
-    };
-    
-    const elementId = tableMapping[tableName];
-    if (!elementId) return;
-    
-    // חיפוש האלמנט של רשימת האילוצים
-    const rulesContainer = document.querySelector(`#${elementId}Section .table-rules-list`);
-    if (!rulesContainer) {
-        console.warn(`לא נמצא אלמנט אילוצים עבור טבלה ${tableName} (מחפש #${elementId}Section)`);
-        return;
-    }
-    
-    // יצירת HTML לאילוצים
-    const constraintsHtml = constraints.map(constraint => {
-        const typeClass = getConstraintTypeClass(constraint.constraint_type);
-        const description = getConstraintDescription(constraint);
-        return `<li class="${typeClass}">${description}</li>`;
-    }).join('');
-    
-    // עדכון התוכן
-    rulesContainer.innerHTML = constraintsHtml;
-    console.log(`✅ עודכנו אילוצים עבור טבלה ${tableName}: ${constraints.length} אילוצים`);
+  // מיפוי שמות טבלאות לאלמנטים ב-HTML
+  const tableMapping = {
+    'trade_plans': 'tradePlans',
+    'trades': 'trades',
+    'accounts': 'accounts',
+    'tickers': 'tickers',
+    'executions': 'executions',
+    'cash_flows': 'cashFlows',
+    'alerts': 'alerts',
+    'notes': 'notes'
+  };
+
+  const elementId = tableMapping[tableName];
+  if (!elementId) return;
+
+  // חיפוש האלמנט של רשימת האילוצים
+  const rulesContainer = document.querySelector(`#${elementId}Section .table-rules-list`);
+  if (!rulesContainer) {
+    console.warn(`לא נמצא אלמנט אילוצים עבור טבלה ${tableName} (מחפש #${elementId}Section)`);
+    return;
+  }
+
+  // יצירת HTML לאילוצים
+  const constraintsHtml = constraints.map(constraint => {
+    const typeClass = getConstraintTypeClass(constraint.constraint_type);
+    const description = getConstraintDescription(constraint);
+    return `<li class="${typeClass}">${description}</li>`;
+  }).join('');
+
+  // עדכון התוכן
+  rulesContainer.innerHTML = constraintsHtml;
+  console.log(`✅ עודכנו אילוצים עבור טבלה ${tableName}: ${constraints.length} אילוצים`);
 }
 
 // פונקציה לקבלת CSS class לפי סוג אילוץ
 function getConstraintTypeClass(constraintType) {
-    switch (constraintType) {
-        case 'NOT_NULL': return 'constraint';
-        case 'UNIQUE': return 'unique';
-        case 'FOREIGN_KEY': return 'foreign-key';
-        case 'CHECK': return 'check';
-        case 'ENUM': return 'enum';
-        case 'RANGE': return 'range';
-        case 'COMPUTED': return 'computed';
-        default: return 'constraint';
-    }
+  switch (constraintType) {
+    case 'NOT_NULL': return 'constraint';
+    case 'UNIQUE': return 'unique';
+    case 'FOREIGN_KEY': return 'foreign-key';
+    case 'CHECK': return 'check';
+    case 'ENUM': return 'enum';
+    case 'RANGE': return 'range';
+    case 'COMPUTED': return 'computed';
+    default: return 'constraint';
+  }
 }
 
 // פונקציה לקבלת תיאור האילוץ
 function getConstraintDescription(constraint) {
-    const columnName = constraint.column_name;
-    const constraintType = constraint.constraint_type;
-    
-    switch (constraintType) {
-        case 'NOT_NULL':
-            return `${columnName} is required (NOT NULL)`;
-        case 'UNIQUE':
-            return `${columnName} must be unique`;
-        case 'FOREIGN_KEY':
-            return `Foreign key: ${constraint.constraint_definition}`;
-        case 'CHECK':
-            return `Check constraint: ${constraint.constraint_definition}`;
-        case 'ENUM':
-            const enumValues = constraint.enum_values ? 
-                constraint.enum_values.map(ev => ev.value).join(', ') : '';
-            return `${columnName} must be one of: ${enumValues}`;
-        case 'RANGE':
-            return `Range constraint: ${constraint.constraint_definition}`;
-        case 'COMPUTED':
-            return `Computed field: ${constraint.constraint_definition}`;
-        default:
-            return constraint.constraint_definition || `${constraintType} constraint on ${columnName}`;
-    }
+  const columnName = constraint.column_name;
+  const constraintType = constraint.constraint_type;
+
+  switch (constraintType) {
+    case 'NOT_NULL':
+      return `${columnName} is required (NOT NULL)`;
+    case 'UNIQUE':
+      return `${columnName} must be unique`;
+    case 'FOREIGN_KEY':
+      return `Foreign key: ${constraint.constraint_definition}`;
+    case 'CHECK':
+      return `Check constraint: ${constraint.constraint_definition}`;
+    case 'ENUM':
+      const enumValues = constraint.enum_values ?
+        constraint.enum_values.map(ev => ev.value).join(', ') : '';
+      return `${columnName} must be one of: ${enumValues}`;
+    case 'RANGE':
+      return `Range constraint: ${constraint.constraint_definition}`;
+    case 'COMPUTED':
+      return `Computed field: ${constraint.constraint_definition}`;
+    default:
+      return constraint.constraint_definition || `${constraintType} constraint on ${columnName}`;
+  }
+}
+
+// פונקציה לתרגום סטטוס חשבון
+function translateAccountStatus(status) {
+  switch (status) {
+    case 'active': return 'פעיל';
+    case 'inactive': return 'לא פעיל';
+    case 'suspended': return 'מושעה';
+    case 'closed': return 'סגור';
+    default: return status || '';
+  }
 }
 
 // משתנים גלובליים
@@ -330,7 +341,43 @@ async function loadAllData() {
   try {
     console.log('🌐 מתחיל בקשות API...');
 
-    // טעינת כל הנתונים במקביל
+    // שימוש בפונקציה החדשה לטעינה מקבילה עם התקדמות
+    await loadDataWithProgress();
+
+    console.log('✅ עדכון טבלאות הושלם');
+
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת נתונים:', error);
+    console.error('❌ Stack trace:', error.stack);
+    showError('שגיאה בטעינת נתונים מהשרת: ' + error.message);
+  }
+}
+
+// פונקציה לאופטימיזציית ביצועים - טעינה מקבילה
+async function loadDataWithProgress() {
+  console.log('🚀 מתחיל טעינה מקבילה עם התקדמות...');
+
+  const startTime = performance.now();
+
+  // יצירת אינדיקטורים להתקדמות
+  const progressIndicators = {
+    accounts: document.getElementById('accountsCount'),
+    trades: document.getElementById('tradesCount'),
+    tickers: document.getElementById('tickersCount'),
+    tradePlans: document.getElementById('tradePlansCount'),
+    executions: document.getElementById('executionsCount'),
+    cashFlows: document.getElementById('cashFlowsCount'),
+    alerts: document.getElementById('alertsCount'),
+    notes: document.getElementById('notesCount')
+  };
+
+  // עדכון כל האינדיקטורים למצב טעינה
+  Object.values(progressIndicators).forEach(indicator => {
+    if (indicator) indicator.textContent = 'טוען...';
+  });
+
+  try {
+    // טעינה מקבילה של כל הנתונים
     const [
       accountsResponse,
       tradesResponse,
@@ -342,82 +389,40 @@ async function loadAllData() {
       notesResponse,
       constraintsResponse
     ] = await Promise.all([
-      fetch('/api/v1/accounts/').then(r => {
-        console.log('📡 Accounts API response status:', r.status);
-        return r.json();
-      }).catch(e => {
-        console.error('❌ Accounts API error:', e);
-        return { data: [] };
+      fetch('/api/v1/accounts/').then(r => r.json()).then(data => {
+        if (progressIndicators.accounts) progressIndicators.accounts.textContent = `${data.data?.length || 0} רשומות`;
+        return data;
       }),
-      fetch('/api/v1/trades/').then(r => {
-        console.log('📡 Trades API response status:', r.status);
-        return r.json();
-      }).catch(e => {
-        console.error('❌ Trades API error:', e);
-        return { data: [] };
+      fetch('/api/v1/trades/').then(r => r.json()).then(data => {
+        if (progressIndicators.trades) progressIndicators.trades.textContent = `${data.data?.length || 0} רשומות`;
+        return data;
       }),
-      fetch('/api/v1/tickers/').then(r => {
-        console.log('📡 Tickers API response status:', r.status);
-        return r.json();
-      }).catch(e => {
-        console.error('❌ Tickers API error:', e);
-        return { data: [] };
+      fetch('/api/v1/tickers/').then(r => r.json()).then(data => {
+        if (progressIndicators.tickers) progressIndicators.tickers.textContent = `${data.data?.length || 0} רשומות`;
+        return data;
       }),
-      fetch('/api/v1/trade_plans/').then(r => {
-        console.log('📡 Trade Plans API response status:', r.status);
-        return r.json();
-      }).catch(e => {
-        console.error('❌ Trade Plans API error:', e);
-        return { data: [] };
+      fetch('/api/v1/trade_plans/').then(r => r.json()).then(data => {
+        if (progressIndicators.tradePlans) progressIndicators.tradePlans.textContent = `${data.data?.length || 0} רשומות`;
+        return data;
       }),
-      fetch('/api/v1/executions/').then(r => {
-        console.log('📡 Executions API response status:', r.status);
-        return r.json();
-      }).catch(e => {
-        console.error('❌ Executions API error:', e);
-        return { data: [] };
+      fetch('/api/v1/executions/').then(r => r.json()).then(data => {
+        if (progressIndicators.executions) progressIndicators.executions.textContent = `${data.data?.length || 0} רשומות`;
+        return data;
       }),
-      fetch('/api/v1/cash_flows/').then(r => {
-        console.log('📡 Cash Flows API response status:', r.status);
-        return r.json();
-      }).catch(e => {
-        console.error('❌ Cash Flows API error:', e);
-        return { data: [] };
+      fetch('/api/v1/cash_flows/').then(r => r.json()).then(data => {
+        if (progressIndicators.cashFlows) progressIndicators.cashFlows.textContent = `${data.data?.length || 0} רשומות`;
+        return data;
       }),
-      fetch('/api/v1/alerts/').then(r => {
-        console.log('📡 Alerts API response status:', r.status);
-        return r.json();
-      }).catch(e => {
-        console.error('❌ Alerts API error:', e);
-        return { data: [] };
+      fetch('/api/v1/alerts/').then(r => r.json()).then(data => {
+        if (progressIndicators.alerts) progressIndicators.alerts.textContent = `${data.data?.length || 0} רשומות`;
+        return data;
       }),
-      fetch('/api/v1/notes/').then(r => {
-        console.log('📡 Notes API response status:', r.status);
-        return r.json();
-      }).catch(e => {
-        console.error('❌ Notes API error:', e);
-        return { data: [] };
+      fetch('/api/v1/notes/').then(r => r.json()).then(data => {
+        if (progressIndicators.notes) progressIndicators.notes.textContent = `${data.data?.length || 0} רשומות`;
+        return data;
       }),
-      fetch('/api/v1/constraints/').then(r => {
-        console.log('📡 Constraints API response status:', r.status);
-        return r.json();
-      }).catch(e => {
-        console.error('❌ Constraints API error:', e);
-        return { data: [] };
-      })
+      fetch('/api/v1/constraints/').then(r => r.json())
     ]);
-
-    console.log('📥 תגובות API גולמיות:', {
-      accounts: accountsResponse,
-      trades: tradesResponse,
-      tickers: tickersResponse,
-      tradePlans: tradePlansResponse,
-      executions: executionsResponse,
-      cashFlows: cashFlowsResponse,
-      alerts: alertsResponse,
-      notes: notesResponse,
-      constraints: constraintsResponse
-    });
 
     // שמירת הנתונים
     allData.accounts = accountsResponse.data || accountsResponse || [];
@@ -430,7 +435,11 @@ async function loadAllData() {
     allData.notes = notesResponse.data || notesResponse || [];
     allData.constraints = constraintsResponse.data || constraintsResponse || [];
 
-    console.log('✅ נטענו נתונים:', {
+    const endTime = performance.now();
+    const loadTime = endTime - startTime;
+
+    console.log(`✅ טעינה מקבילה הושלמה ב-${loadTime.toFixed(2)}ms`);
+    console.log('📊 נתונים נטענו:', {
       accounts: allData.accounts.length,
       trades: allData.trades.length,
       tickers: allData.tickers.length,
@@ -442,18 +451,13 @@ async function loadAllData() {
       constraints: allData.constraints.length,
     });
 
-    console.log('🔄 מתחיל עדכון טבלאות...');
-    // עדכון כל הטבלאות
+    // עדכון הטבלאות
     updateAllTables();
-    
-    // עדכון אילוצים
     updateConstraintsDisplay();
     updateStatistics();
-    console.log('✅ עדכון טבלאות הושלם');
 
   } catch (error) {
-    console.error('❌ שגיאה בטעינת נתונים:', error);
-    console.error('❌ Stack trace:', error.stack);
+    console.error('❌ שגיאה בטעינה מקבילה:', error);
     showError('שגיאה בטעינת נתונים מהשרת: ' + error.message);
   }
 }
@@ -564,10 +568,10 @@ function updateAccountsTable() {
                 <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק">🗑️</button>
               </td>
               ${account.status && account.status !== 'suspended' ?
-              `<td class="p-0">
+        `<td class="p-0">
                 <button class="btn btn-sm btn-warning" onclick="cancelAccount(${account.id})" title="ביטול">❌</button>
               </td>` :
-              ''}
+        ''}
             </tr>
           </tbody>
         </table>
@@ -627,10 +631,10 @@ function updateTradesTable() {
                 <button class="btn btn-sm btn-danger" onclick="deleteTrade(${trade.id})" title="מחק">🗑️</button>
               </td>
               ${trade.status && trade.status !== 'cancelled' ?
-              `<td class="p-0">
+        `<td class="p-0">
                 <button class="btn btn-sm btn-warning" onclick="cancelTrade(${trade.id})" title="ביטול">❌</button>
               </td>` :
-              ''}
+        ''}
             </tr>
           </tbody>
         </table>
@@ -740,10 +744,10 @@ function updateTradePlansTable() {
                 <button class="btn btn-sm btn-danger" onclick="deleteTradePlan(${plan.id})" title="מחק">🗑️</button>
               </td>
               ${plan.status && plan.status !== 'cancelled' ?
-              `<td class="p-0">
+        `<td class="p-0">
                 <button class="btn btn-sm btn-warning" onclick="cancelTradePlan(${plan.id})" title="ביטול">❌</button>
               </td>` :
-              ''}
+        ''}
             </tr>
           </tbody>
         </table>
@@ -1068,6 +1072,80 @@ function viewCurrency(id) { console.log('צפייה במטבע:', id); }
 function editCurrency(id) { console.log('עריכת מטבע:', id); }
 function deleteCurrency(id) { console.log('מחיקת מטבע:', id); }
 
+// פונקציה למיון טבלאות בעמוד בסיס הנתונים
+function sortTable(columnIndex, tableId) {
+  console.log('🔄 === SORT DATABASE TABLE ===');
+  console.log('🔄 Column clicked:', columnIndex);
+  console.log('🔄 Table ID:', tableId);
+
+  // קבלת סוג הטבלה מה-data-table-type
+  const table = document.getElementById(tableId);
+  if (!table) {
+    console.error('❌ Table not found:', tableId);
+    return;
+  }
+
+  const tableType = table.getAttribute('data-table-type');
+  if (!tableType) {
+    console.error('❌ Table type not found for table:', tableId);
+    return;
+  }
+
+  console.log('🔄 Table type:', tableType);
+
+  // קבלת הנתונים המתאימים לפי סוג הטבלה
+  let data = [];
+  let updateFunction = null;
+
+  switch (tableType) {
+    case 'trade_plans':
+      data = allData.tradePlans || [];
+      updateFunction = updateTradePlansTable;
+      break;
+    case 'trades':
+      data = allData.trades || [];
+      updateFunction = updateTradesTable;
+      break;
+    case 'accounts':
+      data = allData.accounts || [];
+      updateFunction = updateAccountsTable;
+      break;
+    case 'tickers':
+      data = allData.tickers || [];
+      updateFunction = updateTickersTable;
+      break;
+    case 'executions':
+      data = allData.executions || [];
+      updateFunction = updateExecutionsTable;
+      break;
+    case 'cash_flows':
+      data = allData.cashFlows || [];
+      updateFunction = updateCashFlowsTable;
+      break;
+    case 'alerts':
+      data = allData.alerts || [];
+      updateFunction = updateAlertsTable;
+      break;
+    case 'notes':
+      data = allData.notes || [];
+      updateFunction = updateNotesTable;
+      break;
+    default:
+      console.error('❌ Unknown table type:', tableType);
+      return;
+  }
+
+  console.log('🔄 Data length:', data.length);
+  console.log('🔄 Update function:', updateFunction ? 'found' : 'not found');
+
+  // קריאה לפונקציה הגלובלית למיון
+  if (typeof window.sortTableData === 'function') {
+    window.sortTableData(columnIndex, data, tableType, updateFunction);
+  } else {
+    console.error('❌ sortTableData function not found in tables.js');
+  }
+}
+
 // הגדרת הפונקציות כגלובליות
 window.toggleTopSection = toggleTopSection;
 window.toggleMainSection = toggleMainSection;
@@ -1080,6 +1158,9 @@ window.cancelAlert = cancelAlert;
 window.exportAllData = exportAllData;
 window.showDatabaseInfo = showDatabaseInfo;
 window.showBackupOptions = showBackupOptions;
+window.translateAccountStatus = translateAccountStatus;
+window.loadDataWithProgress = loadDataWithProgress;
+window.sortTable = sortTable;
 
 // פונקציות פעולות
 window.viewAccount = viewAccount;

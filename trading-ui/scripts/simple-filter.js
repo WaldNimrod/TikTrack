@@ -231,7 +231,12 @@ class SimpleFilter {
         }
     }
 
+    // שימוש בפונקציות הגלובליות לתרגום
     translateStatus(status) {
+        if (typeof window.translateTradeStatus === 'function') {
+            return window.translateTradeStatus(status);
+        }
+        // fallback
         const translations = {
             'active': 'פעיל',
             'closed': 'סגור',
@@ -244,6 +249,10 @@ class SimpleFilter {
     }
 
     translateType(type) {
+        if (typeof window.translateTradeType === 'function') {
+            return window.translateTradeType(type);
+        }
+        // fallback
         const translations = {
             'swing': 'סווינג',
             'investment': 'השקעה',
@@ -268,6 +277,7 @@ class SimpleFilter {
         // Apply to specific tables based on current page
         this.applyFiltersToTradePlansTable();
         this.applyFiltersToAlertsTable();
+        this.applyFiltersToDatabaseDisplayTables();
     }
 
     applyFiltersToTable(tableId) {
@@ -477,6 +487,131 @@ class SimpleFilter {
         });
 
         console.log(`🔄 Alerts table filtering complete: ${visibleCount}/${rows.length} rows visible`);
+    }
+
+    applyFiltersToDatabaseDisplayTables() {
+        console.log('🔄 Applying filters to database display page tables');
+
+        // Apply filters to all tables in database display page
+        const tableIds = [
+            'tradePlansTable',
+            'tradesTable',
+            'accountsTable',
+            'tickersTable',
+            'executionsTable',
+            'cashFlowsTable',
+            'alertsTable',
+            'notesTable'
+        ];
+
+        tableIds.forEach(tableId => {
+            const table = document.getElementById(tableId);
+            if (table) {
+                console.log(`🔄 Applying filters to ${tableId}`);
+                this.applyFiltersToDatabaseTable(tableId);
+            } else {
+                console.log(`🔄 Table ${tableId} not found, skipping`);
+            }
+        });
+    }
+
+    applyFiltersToDatabaseTable(tableId) {
+        const table = document.getElementById(tableId);
+        if (!table) {
+            console.warn(`⚠️ Table ${tableId} not found`);
+            return;
+        }
+
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+
+        const rows = tbody.querySelectorAll('tr');
+        let visibleCount = 0;
+
+        console.log(`🔄 Processing ${rows.length} rows in ${tableId}`);
+
+        rows.forEach((row, index) => {
+            // Skip loading rows
+            if (row.querySelector('td[colspan]')) {
+                return;
+            }
+
+            // Get data from table cells based on table type
+            const tableType = table.getAttribute('data-table-type');
+            let ticker = '', status = '', type = '', account = '';
+
+            switch (tableType) {
+                case 'trade_plans':
+                    ticker = row.cells[2]?.textContent?.trim() || ''; // Ticker ID
+                    status = row.cells[5]?.textContent?.trim() || ''; // Status
+                    type = row.cells[3]?.textContent?.trim() || ''; // Investment Type
+                    account = row.cells[1]?.textContent?.trim() || ''; // Account ID
+                    break;
+                case 'trades':
+                    ticker = row.cells[2]?.textContent?.trim() || ''; // Ticker ID
+                    status = row.cells[5]?.textContent?.trim() || ''; // Status
+                    type = row.cells[3]?.textContent?.trim() || ''; // Investment Type
+                    account = row.cells[1]?.textContent?.trim() || ''; // Account ID
+                    break;
+                case 'accounts':
+                    status = row.cells[4]?.textContent?.trim() || ''; // Status
+                    break;
+                case 'tickers':
+                    ticker = row.cells[1]?.textContent?.trim() || ''; // Symbol
+                    type = row.cells[3]?.textContent?.trim() || ''; // Type
+                    break;
+                case 'executions':
+                    ticker = row.cells[1]?.textContent?.trim() || ''; // Trade ID
+                    type = row.cells[2]?.textContent?.trim() || ''; // Action
+                    break;
+                case 'cash_flows':
+                    account = row.cells[1]?.textContent?.trim() || ''; // Account ID
+                    type = row.cells[2]?.textContent?.trim() || ''; // Type
+                    break;
+                case 'alerts':
+                    status = row.cells[2]?.textContent?.trim() || ''; // Status
+                    type = row.cells[1]?.textContent?.trim() || ''; // Type
+                    break;
+                case 'notes':
+                    type = row.cells[1]?.textContent?.trim() || ''; // Entity Type
+                    break;
+            }
+
+            let shouldShow = true;
+
+            // Status filter
+            if (this.currentFilters.status && this.currentFilters.status.length > 0) {
+                if (!this.currentFilters.status.some(s => this.translateStatus(s) === status)) {
+                    shouldShow = false;
+                }
+            }
+
+            // Type filter
+            if (shouldShow && this.currentFilters.type && this.currentFilters.type.length > 0) {
+                if (!this.currentFilters.type.some(t => this.translateType(t) === type)) {
+                    shouldShow = false;
+                }
+            }
+
+            // Account filter - skip for now since we only have account IDs
+            if (shouldShow && this.currentFilters.account && this.currentFilters.account.length > 0) {
+                console.log(`🔄 Account filter: skipping for ${tableId} (only have account IDs)`);
+            }
+
+            // Search filter
+            if (shouldShow && this.currentFilters.search) {
+                const searchText = this.currentFilters.search.toLowerCase();
+                const searchableText = `${ticker} ${status} ${type} ${account}`.toLowerCase();
+                if (!searchableText.includes(searchText)) {
+                    shouldShow = false;
+                }
+            }
+
+            row.style.display = shouldShow ? '' : 'none';
+            if (shouldShow) visibleCount++;
+        });
+
+        console.log(`🔄 ${tableId} filtering complete: ${visibleCount}/${rows.length} rows visible`);
     }
 
     resetFilters() {

@@ -109,8 +109,7 @@
         <!-- Accounts header -->
         <div class="section-header">
           <div class="table-title">
-            <img src="images/icons/accounts.svg" alt="חשבונות"
-              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            <img src="images/icons/accounts.svg" alt="חשבונות" class="table-icon">
             חשבונות
           </div>
           <div class="table-actions">
@@ -138,14 +137,13 @@
           <!-- My accounts header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/accounts.svg" alt="החשבונות שלי"
-                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              <img src="images/icons/accounts.svg" alt="החשבונות שלי" class="table-icon">
               החשבונות שלי
             </div>
             <div class="table-count">טוען...</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="showAddAccountModalLocal()" title="הוסף חשבון חדש">
-                <img src="images/icons/accounts.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
+                <img src="images/icons/accounts.svg" alt="הוסף" class="action-icon">
                 הוסף
               </button>
 
@@ -164,50 +162,43 @@
                   <tr>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }">
                         שם <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }">
                         מטבע <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }">
                         סטטוס <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }">
                         יתרה במזומן <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }">
                         ערך כולל <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }">
                         רווח/הפסד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }">
                         הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
@@ -218,7 +209,7 @@
                   <tr>
                     <td colspan="8" class="text-center text-muted">
                       <div class="no-data-message accounts">
-                        <i class="fas fa-database" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <i class="fas fa-database no-data-icon"></i>
                         <h5>אין נתונים זמינים</h5>
                         <p>לא נמצאו חשבונות במערכת</p>
                         <small>הנתונים יוצגו כאן כאשר יתווספו חשבונות למערכת</small>
@@ -234,7 +225,7 @@
     </div> <!-- End page-body -->
 
     <!-- Bottom page spacing -->
-    <div style="height: 3rem;"></div>
+    <div class="bottom-spacing"></div>
 
     <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>

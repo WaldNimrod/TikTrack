@@ -68,6 +68,11 @@ TikTrack is a comprehensive trading management system designed to simplify portf
 - **Responsive Design**: Mobile-first approach
 - **RTL Support**: Right-to-left layout for Hebrew
 - **Real-time Updates**: WebSocket support for live data
+- **Table Identification System**: Sophisticated table identification supporting both dedicated pages and unified database views
+  - **CSS Class-Based**: For specific pages using `content-section [page]-page` classes
+  - **Data Attribute-Based**: For database display using `data-table-type` attributes
+  - **Centralized Mappings**: Unified column mapping system in `table-mappings.js`
+  - **Universal Operations**: Global sorting and filtering across all table types
 
 ### Database Design
 - **Normalized Schema**: Optimized for performance

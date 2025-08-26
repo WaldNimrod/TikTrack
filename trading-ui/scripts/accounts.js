@@ -38,101 +38,11 @@ window.accountsLoaded = false;
 window.currenciesData = [];
 window.currenciesLoaded = false;
 
-// פונקציה לטעינת מטבעות מהשרת
-async function loadCurrenciesFromServer() {
-  try {
-    const token = localStorage.getItem('authToken');
-    const headers = {
-      'Content-Type': 'application/json'
-    };
+// פונקציה לטעינת מטבעות מהשרת - עכשיו זמינה מ-data-utils.js
 
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
+// פונקציה עזר להצגת מטבע - עכשיו זמינה מ-data-utils.js
 
-    const response = await fetch('http://127.0.0.1:8080/api/v1/currencies/', {
-      method: 'GET',
-      headers: headers
-    });
-
-    if (response.ok) {
-      const responseData = await response.json();
-      const currencies = responseData.data || responseData;
-      window.currenciesData = currencies;
-      window.currenciesLoaded = true;
-    } else {
-      // טעינת מטבעות ברירת מחדל
-      window.currenciesData = [
-        { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
-      ];
-      window.currenciesLoaded = true;
-    }
-
-  } catch (error) {
-    // טעינת מטבעות ברירת מחדל
-    window.currenciesData = [
-      { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
-    ];
-    window.currenciesLoaded = true;
-  }
-}
-
-// פונקציה עזר להצגת מטבע
-function getCurrencyDisplay(account) {
-  if (account.currency && account.currency.symbol) {
-    // אם יש פרטי מטבע מלאים
-    const symbol = account.currency.symbol;
-    switch (symbol) {
-      case 'USD': return '$';
-      case 'ILS': return '₪';
-      case 'EUR': return '€';
-      case 'GBP': return '£';
-      default: return symbol;
-    }
-  } else if (account.currency_id && window.currenciesData.length > 0) {
-    // אם יש רק currency_id, נחפש את המטבע
-    const currency = window.currenciesData.find(c => c.id === account.currency_id);
-    if (currency) {
-      switch (currency.symbol) {
-        case 'USD': return '$';
-        case 'ILS': return '₪';
-        case 'EUR': return '€';
-        case 'GBP': return '£';
-        default: return currency.symbol;
-      }
-    }
-  } else if (account.currency) {
-    // fallback למטבע הישן
-    switch (account.currency) {
-      case 'USD': return '$';
-      case 'ILS': return '₪';
-      case 'EUR': return '€';
-      case 'GBP': return '£';
-      default: return account.currency;
-    }
-  }
-  return '-';
-}
-
-// פונקציה ליצירת אפשרויות מטבע בטופס
-function generateCurrencyOptions(account = null) {
-  if (!window.currenciesData || window.currenciesData.length === 0) {
-    // אם אין מטבעות, נחזיר ברירת מחדל
-    return `
-      <option value="1" ${account && (account.currency_id === 1 || (account.currency && account.currency.symbol === 'USD')) ? 'selected' : ''}>דולר אמריקאי (USD)</option>
-    `;
-  }
-
-  return window.currenciesData.map(currency => {
-    const isSelected = account && (
-      account.currency_id === currency.id ||
-      (account.currency && account.currency.symbol === currency.symbol) ||
-      (account.currency === currency.symbol)
-    );
-
-    return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
-  }).join('');
-}
+// פונקציה ליצירת אפשרויות מטבע בטופס - עכשיו זמינה מ-data-utils.js
 
 // פונקציה לטעינת חשבונות מהשרת
 async function loadAccountsFromServer() {
@@ -279,7 +189,7 @@ function updateAccountsTable(accounts) {
     // בדיקה אם זה החשבון האחרון
     const isLastAccount = accounts.length === 1;
     const isProtected = isLastAccount;
-    
+
     return `
     <tr data-account-id="${account.id}" ${isProtected ? 'class="table-warning"' : ''}>
       <td class="ticker-cell" data-account="${account.name || '-'}"><strong>${account.name || '-'}</strong></td>
@@ -365,36 +275,52 @@ async function loadAccounts() {
 
 // פונקציה לעדכון טקסט פילטר החשבונות
 function updateAccountFilterDisplayText() {
-  const appHeader = document.querySelector('app-header');
-  if (!appHeader || !appHeader.shadowRoot) {
-    return;
-  }
+  console.log('🔄 updateAccountFilterDisplayText called');
 
-  const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
-  if (!accountMenu) {
-    return;
-  }
-
-  const accountToggle = appHeader.shadowRoot.getElementById('accountFilterToggle');
-  if (!accountToggle) {
-    return;
-  }
-
-  const selectedText = accountToggle.querySelector('.selected-account-text');
-  if (!selectedText) {
-    return;
-  }
-
-  // קבלת החשבונות הנבחרים
-  const selectedAccounts = window.selectedAccountsForFilter || [];
-
-  if (selectedAccounts.length === 0) {
-    selectedText.textContent = 'כל החשבונות';
-  } else if (selectedAccounts.length === 1) {
-    selectedText.textContent = selectedAccounts[0];
+  // עדכון טקסט פילטר חשבונות ב-header החדש
+  const accountFilterButton = document.getElementById('accountFilterButton');
+  if (accountFilterButton) {
+    const selectedAccounts = window.simpleFilter?.currentFilters?.account || [];
+    if (selectedAccounts && selectedAccounts.length > 0) {
+      accountFilterButton.textContent = `${selectedAccounts.length} חשבונות נבחרו`;
+    } else {
+      accountFilterButton.textContent = 'כל החשבונות';
+    }
   } else {
-    selectedText.textContent = `${selectedAccounts.length} נבחרו`;
+    // Fallback לתמיכה ב-app-header הישן
+    const appHeader = document.querySelector('app-header');
+    if (!appHeader || !appHeader.shadowRoot) {
+      return;
+    }
+
+    const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
+    if (!accountMenu) {
+      return;
+    }
+
+    const accountToggle = appHeader.shadowRoot.getElementById('accountFilterToggle');
+    if (!accountToggle) {
+      return;
+    }
+
+    const selectedText = accountToggle.querySelector('.selected-account-text');
+    if (!selectedText) {
+      return;
+    }
+
+    // קבלת החשבונות הנבחרים
+    const selectedAccounts = window.selectedAccountsForFilter || [];
+
+    if (selectedAccounts.length === 0) {
+      selectedText.textContent = 'כל החשבונות';
+    } else if (selectedAccounts.length === 1) {
+      selectedText.textContent = selectedAccounts[0];
+    } else {
+      selectedText.textContent = `${selectedAccounts.length} נבחרו`;
+    }
   }
+
+  console.log('✅ updateAccountFilterDisplayText completed');
 }
 
 // ייצוא הפונקציות לשימוש גלובלי
@@ -595,7 +521,7 @@ function createAccountModal(mode, account = null) {
                   <label for="accountCurrency" class="form-label">מטבע *</label>
                   <select class="form-select" id="accountCurrency" name="currency_id" required>
                     <option value="">בחר מטבע</option>
-                    ${generateCurrencyOptions(account)}
+                    ${window.generateCurrencyOptions ? window.generateCurrencyOptions(account) : ''}
                   </select>
                   <div class="invalid-feedback" id="currencyError"></div>
                 </div>
@@ -1726,7 +1652,7 @@ window.updateAccountsTable = updateAccountsTable;
 window.editAccount = editAccount;
 window.deleteAccount = deleteAccount;
 window.sortTable = sortTable;
-window.showNotification = showNotification;
+// window.showNotification מיוצאת מקובץ ui-utils.js
 // viewLinkedItems מיוצאת מקובץ linked-items.js
 
 
@@ -1750,7 +1676,7 @@ function deleteAccount(accountId) {
     }
     return;
   }
-  
+
   if (confirm('האם אתה בטוח שברצונך למחוק חשבון זה?')) {
     if (typeof window.showNotification === 'function') {
       window.showNotification('פונקציית מחיקת חשבון תפותח בקרוב', 'info');
@@ -1771,21 +1697,14 @@ setTimeout(() => {
   }
 }, 15000);
 
-// פונקציה להצגת התראות
-function showNotification(message, type = 'info') {
-  if (typeof window.showNotification === 'function') {
-    window.showNotification(message, type);
-  } else {
-    // Fallback להצגת התראה פשוטה
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    alert(`${type.toUpperCase()}: ${message}`);
-  }
-}
+
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
   // טעינת מטבעות
-  loadCurrenciesFromServer();
+  if (typeof window.loadCurrenciesFromServer === 'function') {
+    window.loadCurrenciesFromServer();
+  }
 
   // בדיקה אם אנחנו בדף החשבונות
   if (window.location.pathname.includes('/accounts')) {

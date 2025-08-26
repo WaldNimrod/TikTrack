@@ -98,8 +98,248 @@ trading-ui/scripts/
 **Purpose**: Unified header system
 - Navigation management
 - Filter system integration
-- User interface controls
-- Responsive behavior
+
+## 🎯 Table Identification System
+
+### Overview
+The TikTrack JavaScript architecture implements a sophisticated table identification system that supports both dedicated pages and unified database views. This system ensures consistent behavior across all table operations including sorting, filtering, and data management.
+
+### System Components
+
+#### 1. **Table Mappings (`table-mappings.js`)**
+Centralized column mapping system for all tables.
+
+**Purpose:**
+- Defines column structure for each table type
+- Provides consistent field access across pages
+- Supports sorting and filtering operations
+
+**Key Functions:**
+```javascript
+// Get column value for sorting/filtering
+function getColumnValue(item, columnIndex, tableType)
+
+// Get complete column mapping
+function getTableMapping(tableType)
+
+// Check if table is supported
+function isTableSupported(tableType)
+```
+
+#### 2. **Global Table System (`tables.js`)**
+Universal table operations system.
+
+**Key Functions:**
+```javascript
+// Universal table sorter
+window.sortTableData(columnIndex, data, tableType, updateFunction)
+
+// Legacy compatibility wrapper
+window.sortTable(tableType, columnIndex, dataArray, updateFunction)
+
+// Sort state management
+window.saveSortState(tableType, columnIndex, direction)
+window.getSortState(tableType)
+```
+
+#### 3. **Page-Specific Table Functions**
+Each page implements its own table identification method.
+
+### Table Identification Methods
+
+#### **Method 1: CSS Class-Based (Specific Pages)**
+Used in dedicated pages like `tickers.html`, `accounts.html`, `trades.html`.
+
+**Structure:**
+```html
+<div class="content-section tickers-page">
+  <table class="table" id="tickersTable" data-table-type="tickers">
+    <!-- table content -->
+  </table>
+</div>
+```
+
+**Implementation:**
+```javascript
+// In tickers.js
+function sortTable(columnIndex) {
+    window.sortTableData(
+        columnIndex,
+        window.tickersData || [],
+        'tickers',
+        updateTickersTable
+    );
+}
+```
+
+**Characteristics:**
+- Container has page-specific CSS class
+- Page-specific JavaScript files contain local functions
+- Functions know table type from context
+- Single table per page
+
+#### **Method 2: Data Attribute-Based (Database Display)**
+Used in unified database display page (`db_display.html`).
+
+**Structure:**
+```html
+<table class="table" id="tradePlansTable" data-table-type="trade_plans">
+<table class="table" id="tradesTable" data-table-type="trades">
+<table class="table" id="accountsTable" data-table-type="accounts">
+```
+
+**Implementation:**
+```javascript
+// In database.js
+function sortTable(columnIndex, tableId) {
+    const table = document.getElementById(tableId);
+    const tableType = table.getAttribute('data-table-type');
+    
+    let data = [];
+    let updateFunction = null;
+    
+    switch (tableType) {
+        case 'trade_plans':
+            data = allData.tradePlans || [];
+            updateFunction = updateTradePlansTable;
+            break;
+        case 'trades':
+            data = allData.trades || [];
+            updateFunction = updateTradesTable;
+            break;
+        // ... other cases
+    }
+    
+    window.sortTableData(columnIndex, data, tableType, updateFunction);
+}
+```
+
+**Characteristics:**
+- Each table has `data-table-type` attribute
+- Global function handles multiple tables
+- Function determines table type dynamically
+- Multiple tables per page
+
+### Filter System Integration
+
+#### **Specific Pages Filtering**
+```javascript
+// In simple-filter.js
+applyFiltersToTradePlansTable() {
+    const table = document.getElementById('designsTable');
+    // Works with specific table structure
+}
+
+applyFiltersToAlertsTable() {
+    const table = document.getElementById('alertsTable');
+    // Works with specific table structure
+}
+```
+
+#### **Database Display Page Filtering**
+```javascript
+// In simple-filter.js
+applyFiltersToDatabaseDisplayTables() {
+    const tableIds = [
+        'tradePlansTable', 'tradesTable', 'accountsTable',
+        'tickersTable', 'executionsTable', 'cashFlowsTable',
+        'alertsTable', 'notesTable'
+    ];
+    
+    tableIds.forEach(tableId => {
+        this.applyFiltersToDatabaseTable(tableId);
+    });
+}
+```
+
+### Data Flow Architecture
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   HTML Table    │    │  JavaScript      │    │   Global Data   │
+│                 │    │  Functions       │    │                 │
+├─────────────────┤    ├──────────────────┤    ├─────────────────┤
+│ data-table-type │───▶│ sortTable()      │───▶│ allData object  │
+│ id="tableId"    │    │ updateTable()    │    │ pageData object │
+│ class="..."     │    │ filterTable()    │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       ▼                       │
+         │              ┌──────────────────┐             │
+         │              │  Table Mappings  │             │
+         │              │  (table-mappings │             │
+         └──────────────│  .js)            │◀────────────┘
+                        └──────────────────┘
+```
+
+### Best Practices
+
+#### **1. Consistent Naming**
+- Use consistent table IDs: `[tableName]Table`
+- Use consistent `data-table-type` values
+- Follow naming conventions across all pages
+
+#### **2. Error Handling**
+```javascript
+function sortTable(columnIndex, tableId) {
+    const table = document.getElementById(tableId);
+    if (!table) {
+        console.error('❌ Table not found:', tableId);
+        return;
+    }
+    
+    const tableType = table.getAttribute('data-table-type');
+    if (!tableType) {
+        console.error('❌ Table type not found for table:', tableId);
+        return;
+    }
+    
+    if (!window.isTableSupported(tableType)) {
+        console.error('❌ Unsupported table type:', tableType);
+        return;
+    }
+}
+```
+
+#### **3. Performance Optimization**
+- Cache table references when possible
+- Use efficient DOM queries
+- Minimize redundant table type lookups
+- Implement proper cleanup for event listeners
+
+#### **4. Maintainability**
+- Keep table mappings centralized
+- Use consistent data structures
+- Document table type values
+- Implement proper error logging
+
+### Integration with Other Systems
+
+#### **Header System Integration**
+```javascript
+// Header system provides filter integration
+function initializeHeaderFilters() {
+    const filterContainer = document.getElementById('header-filters');
+    if (filterContainer) {
+        setupFilterSystem(filterContainer);
+    }
+}
+```
+
+#### **Translation System Integration**
+```javascript
+// Translation system works with table data
+function translateTableData(data, tableType) {
+    return data.map(item => {
+        const translated = {};
+        const columns = getTableMapping(tableType);
+        columns.forEach((field, index) => {
+            translated[field] = translateField(item[field], field);
+        });
+        return translated;
+    });
+}
+```
 
 ### console-cleanup.js
 **Purpose**: Console cleanup and logging

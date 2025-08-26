@@ -1,0 +1,445 @@
+/**
+ * Warning System Styles - TikTrack Centralized Warning Styling
+ * ===========================================================
+ * 
+ * CENTRALIZED WARNING STYLES (August 25, 2025):
+ * =============================================
+ * 
+ * This file contains all the CSS styles for the centralized warning system.
+ * It provides consistent styling across all warning modals and components.
+ * 
+ * FEATURES:
+ * - Consistent warning modal styling
+ * - Responsive design for all screen sizes
+ * - RTL support for Hebrew text
+ * - Theme-based color schemes
+ * - Smooth animations and transitions
+ * 
+ * THEMES:
+ * - danger: Red theme for delete warnings
+ * - warning: Yellow theme for general warnings
+ * - info: Blue theme for informational warnings
+ * - primary: Blue theme for confirmations
+ * 
+ * CONTENTS:
+ * =========
+ * 
+ * 1. WARNING MODAL STYLES:
+ *    - .warning-modal - Base modal styles
+ *    - .warning-modal .modal-header - Header styling
+ *    - .warning-modal .modal-body - Body styling
+ *    - .warning-modal .modal-footer - Footer styling
+ * 
+ * 2. WARNING THEME STYLES:
+ *    - .warning-danger - Red theme styles
+ *    - .warning-warning - Yellow theme styles
+ *    - .warning-info - Blue theme styles
+ *    - .warning-primary - Primary theme styles
+ * 
+ * 3. WARNING COMPONENT STYLES:
+ *    - .warning-container - Container styles
+ *    - .warning-header - Header component styles
+ *    - .warning-body - Body component styles
+ *    - .warning-footer - Footer component styles
+ * 
+ * 4. WARNING ICON STYLES:
+ *    - .warning-icon - Icon container styles
+ *    - .warning-icon i - Icon element styles
+ * 
+ * 5. WARNING BUTTON STYLES:
+ *    - .warning-actions - Action buttons container
+ *    - .warning-btn - Individual button styles
+ * 
+ * 6. RESPONSIVE STYLES:
+ *    - Mobile-first responsive design
+ *    - Tablet and desktop optimizations
+ * 
+ * 7. ANIMATION STYLES:
+ *    - Smooth transitions and animations
+ *    - Hover effects and interactions
+ */
+
+/* ===== WARNING MODAL STYLES ===== */
+
+.warning-modal {
+    direction: rtl;
+    text-align: right;
+}
+
+.warning-modal .modal-dialog {
+    max-width: 500px;
+    margin: 1.75rem auto;
+}
+
+.warning-modal .modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+/* ===== WARNING MODAL HEADER ===== */
+
+.warning-modal .modal-header {
+    border-bottom: none;
+    padding: 20px 25px 15px;
+    position: relative;
+}
+
+.warning-modal .modal-header .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.warning-modal .modal-header .modal-title i {
+    font-size: 1.2rem;
+}
+
+.warning-modal .modal-header .btn-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.warning-modal .modal-header .btn-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+/* ===== WARNING MODAL BODY ===== */
+
+.warning-modal .modal-body {
+    padding: 20px 25px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+}
+
+.warning-modal .modal-body p {
+    margin-bottom: 15px;
+}
+
+.warning-modal .modal-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* ===== WARNING MODAL FOOTER ===== */
+
+.warning-modal .modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 15px 25px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.warning-modal .modal-footer .btn {
+    padding: 8px 20px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    min-width: 80px;
+}
+
+.warning-modal .modal-footer .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== WARNING THEME STYLES ===== */
+
+/* Danger Theme (Red) */
+.warning-modal .modal-header.bg-danger {
+    background: linear-gradient(135deg, #dc3545, #c82333) !important;
+}
+
+.warning-modal .modal-header.bg-danger .modal-title {
+    color: white;
+}
+
+.warning-modal .modal-header.bg-danger .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+/* Warning Theme (Yellow) */
+.warning-modal .modal-header.bg-warning {
+    background: linear-gradient(135deg, #ffc107, #e0a800) !important;
+}
+
+.warning-modal .modal-header.bg-warning .modal-title {
+    color: #212529;
+}
+
+.warning-modal .modal-header.bg-warning .btn-close {
+    filter: brightness(0) invert(0.3);
+}
+
+/* Info Theme (Blue) */
+.warning-modal .modal-header.bg-info {
+    background: linear-gradient(135deg, #17a2b8, #138496) !important;
+}
+
+.warning-modal .modal-header.bg-info .modal-title {
+    color: white;
+}
+
+.warning-modal .modal-header.bg-info .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+/* Primary Theme (Blue) */
+.warning-modal .modal-header.bg-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+}
+
+.warning-modal .modal-header.bg-primary .modal-title {
+    color: white;
+}
+
+.warning-modal .modal-header.bg-primary .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+/* ===== WARNING COMPONENT STYLES ===== */
+
+.warning-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.warning-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.warning-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+}
+
+.warning-icon i {
+    font-size: 1.2rem;
+    color: white;
+}
+
+.warning-title h5 {
+    margin: 0;
+    font-weight: 600;
+    color: inherit;
+}
+
+.warning-body {
+    padding: 0 15px;
+}
+
+.warning-message {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+}
+
+.warning-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px;
+    border-top: 1px solid #e9ecef;
+    margin-top: auto;
+}
+
+/* ===== WARNING BUTTON STYLES ===== */
+
+.warning-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.warning-btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    min-width: 80px;
+    text-align: center;
+}
+
+.warning-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.warning-btn:active {
+    transform: translateY(0);
+}
+
+/* ===== RESPONSIVE STYLES ===== */
+
+@media (max-width: 576px) {
+    .warning-modal .modal-dialog {
+        margin: 1rem;
+        max-width: calc(100% - 2rem);
+    }
+
+    .warning-modal .modal-header {
+        padding: 15px 20px 10px;
+    }
+
+    .warning-modal .modal-body {
+        padding: 15px 20px;
+    }
+
+    .warning-modal .modal-footer {
+        padding: 10px 20px 15px;
+        flex-direction: column;
+    }
+
+    .warning-modal .modal-footer .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .warning-modal .modal-footer .btn:last-child {
+        margin-bottom: 0;
+    }
+
+    .warning-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .warning-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .warning-btn {
+        width: 100%;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .warning-modal .modal-dialog {
+        max-width: 450px;
+    }
+}
+
+@media (min-width: 769px) {
+    .warning-modal .modal-dialog {
+        max-width: 500px;
+    }
+}
+
+/* ===== ANIMATION STYLES ===== */
+
+.warning-modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+    transform: translate(0, -50px);
+}
+
+.warning-modal.show .modal-dialog {
+    transform: none;
+}
+
+.warning-modal .modal-content {
+    animation: warningSlideIn 0.3s ease-out;
+}
+
+@keyframes warningSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.warning-icon {
+    animation: warningIconPulse 2s infinite;
+}
+
+@keyframes warningIconPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ===== ACCESSIBILITY STYLES ===== */
+
+.warning-modal .modal-header .btn-close:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+.warning-modal .modal-footer .btn:focus {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* ===== HIGH CONTRAST MODE SUPPORT ===== */
+
+@media (prefers-contrast: high) {
+    .warning-modal .modal-content {
+        border: 2px solid #000;
+    }
+
+    .warning-modal .modal-header .btn-close {
+        border: 2px solid currentColor;
+    }
+
+    .warning-modal .modal-footer {
+        border-top: 2px solid #000;
+    }
+}
+
+/* ===== REDUCED MOTION SUPPORT ===== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .warning-modal .modal-dialog,
+    .warning-modal .modal-content,
+    .warning-icon {
+        animation: none;
+        transition: none;
+    }
+
+    .warning-modal .modal-footer .btn:hover {
+        transform: none;
+    }
+}

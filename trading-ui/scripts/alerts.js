@@ -37,6 +37,10 @@
 
 // משתנים גלובליים
 let alertsData = [];
+let accountsData = [];
+let tradesData = [];
+let tradePlansData = [];
+let tickersData = [];
 
 // בדיקה שהפונקציות הגלובליות זמינות
 console.log('🔧 Checking global functions in alerts.js...');
@@ -630,48 +634,23 @@ function showAddAlertModal() {
     }
   }, 100);
 
-  // הצגת המודל
-  const modalElement = document.getElementById('addAlertModal');
-  if (modalElement) {
-    // הגדרת z-index גבוה מאוד
-    modalElement.style.zIndex = '999999';
-
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+  // הצגת המודל - שימוש בפונקציה הגלובלית
+  if (typeof window.showModal === 'function') {
+    window.showModal('addAlertModal', {
+      backdrop: 'static',
+      keyboard: false
+    });
+  } else {
+    console.error('❌ showModal function not found in ui-utils.js');
+    // fallback - הצגה ישירה
+    const modalElement = document.getElementById('addAlertModal');
+    if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
       const modal = new bootstrap.Modal(modalElement, {
         backdrop: 'static',
         keyboard: false
       });
       modal.show();
-
-      // וידוא שהמודל מופיע מעל הכל
-      setTimeout(() => {
-        modalElement.style.zIndex = '999999';
-        const dialog = modalElement.querySelector('.modal-dialog');
-        if (dialog) {
-          dialog.style.zIndex = '1000000';
-        }
-        const content = modalElement.querySelector('.modal-content');
-        if (content) {
-          content.style.zIndex = '1000001';
-        }
-      }, 100);
-    } else {
-      // אם Bootstrap לא זמין, נציג את המודל באופן ידני
-      modalElement.style.display = 'block';
-      modalElement.classList.add('show');
-      modalElement.style.zIndex = '999999';
-      document.body.classList.add('modal-open');
-
-      // הוספת backdrop
-      const backdrop = document.createElement('div');
-      backdrop.className = 'modal-backdrop fade show';
-      backdrop.id = 'modalBackdrop';
-      backdrop.style.zIndex = '999998';
-      document.body.appendChild(backdrop);
     }
-  } else {
-    console.error('Modal element not found');
   }
 }
 
@@ -690,26 +669,25 @@ async function loadModalData() {
       fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
     ]);
 
-    const accounts = accountsResponse.data || accountsResponse || [];
-    const trades = tradesResponse.data || tradesResponse || [];
-    const tradePlans = tradePlansResponse.data || tradePlansResponse || [];
-    const tickers = tickersResponse.data || tickersResponse || [];
+    // שמירת הנתונים במשתנים הגלובליים
+    accountsData = accountsResponse.data || accountsResponse || [];
+    tradesData = tradesResponse.data || tradesResponse || [];
+    tradePlansData = tradePlansResponse.data || tradePlansResponse || [];
+    tickersData = tickersResponse.data || tickersResponse || [];
 
     console.log('🔧 Modal data loaded:');
-    console.log('🔧 Accounts:', accounts.length);
-    console.log('🔧 Trades:', trades.length);
-    console.log('🔧 Trade Plans:', tradePlans.length);
-    console.log('🔧 Tickers:', tickers.length);
-
-    // נטענו נתונים נוספים
+    console.log('🔧 Accounts:', accountsData.length);
+    console.log('🔧 Trades:', tradesData.length);
+    console.log('🔧 Trade Plans:', tradePlansData.length);
+    console.log('🔧 Tickers:', tickersData.length);
 
     // עדכון רדיו באטונים
-    updateRadioButtons(accounts, trades, tradePlans, tickers);
+    updateRadioButtons(accountsData, tradesData, tradePlansData, tickersData);
 
     // הגדרת נתונים ראשוניים (ברירת מחדל לטיקר)
     console.log('🔧 Setting initial data for tickers...');
-    populateSelect('alertRelatedObjectSelect', tickers, 'symbol', '');
-    populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol', '');
+    populateSelect('alertRelatedObjectSelect', tickersData, 'symbol', '');
+    populateSelect('editAlertRelatedObjectSelect', tickersData, 'symbol', '');
   } catch (error) {
     console.error('שגיאה בטעינת נתונים למודל:', error);
     // המשך עם מערכים ריקים
@@ -727,13 +705,13 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
 
   if (accountRadio) {
     accountRadio.addEventListener('change', () => {
-      populateSelect('alertRelatedObjectSelect', accounts, 'name', 'חשבון');
+      populateSelect('alertRelatedObjectSelect', accountsData, 'name', 'חשבון');
     });
   }
 
   if (editAccountRadio) {
     editAccountRadio.addEventListener('change', () => {
-      populateSelect('editAlertRelatedObjectSelect', accounts, 'name', 'חשבון');
+      populateSelect('editAlertRelatedObjectSelect', accountsData, 'name', 'חשבון');
     });
   }
 
@@ -743,13 +721,13 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
 
   if (tradeRadio) {
     tradeRadio.addEventListener('change', () => {
-      populateSelect('alertRelatedObjectSelect', trades, 'id', 'טרייד');
+      populateSelect('alertRelatedObjectSelect', tradesData, 'id', 'טרייד');
     });
   }
 
   if (editTradeRadio) {
     editTradeRadio.addEventListener('change', () => {
-      populateSelect('editAlertRelatedObjectSelect', trades, 'id', 'טרייד');
+      populateSelect('editAlertRelatedObjectSelect', tradesData, 'id', 'טרייד');
     });
   }
 
@@ -759,13 +737,13 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
 
   if (planRadio) {
     planRadio.addEventListener('change', () => {
-      populateSelect('alertRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+      populateSelect('alertRelatedObjectSelect', tradePlansData, 'id', 'תכנון');
     });
   }
 
   if (editPlanRadio) {
     editPlanRadio.addEventListener('change', () => {
-      populateSelect('editAlertRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+      populateSelect('editAlertRelatedObjectSelect', tradePlansData, 'id', 'תכנון');
     });
   }
 
@@ -775,13 +753,13 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
 
   if (tickerRadio) {
     tickerRadio.addEventListener('change', () => {
-      populateSelect('alertRelatedObjectSelect', tickers, 'symbol', '');
+      populateSelect('alertRelatedObjectSelect', tickersData, 'symbol', '');
     });
   }
 
   if (editTickerRadio) {
     editTickerRadio.addEventListener('change', () => {
-      populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol', '');
+      populateSelect('editAlertRelatedObjectSelect', tickersData, 'symbol', '');
     });
   }
 }
@@ -850,18 +828,7 @@ function populateSelect(selectId, data, field, prefix = '') {
   console.log('🔧 populateSelect completed for:', selectId, 'with', data.length, 'items');
 }
 
-/**
- * סגירת מודל - שימוש בפונקציה גלובלית
- * @deprecated Use window.closeModal from main.js instead
- */
-function closeModal(modalId) {
-  // שימוש בפונקציה הגלובלית
-  if (typeof window.closeModal === 'function') {
-    window.closeModal(modalId);
-  } else {
-    console.error('❌ closeModal function not found in main.js');
-  }
-}
+// סגירת מודלים - שימוש בפונקציה הגלובלית מ-tables.js
 
 
 
@@ -1373,7 +1340,7 @@ async function saveAlert() {
       // התראה נשמרה בהצלחה
 
       // סגירת המודל
-      closeModal('addAlertModal');
+      window.closeModal('addAlertModal');
 
       // רענון הנתונים
       loadAlertsData();
@@ -1480,47 +1447,23 @@ function editAlert(alertId) {
   }, 100);
 
   // הצגת המודל
-  const modalElement = document.getElementById('editAlertModal');
-  if (modalElement) {
-    // הגדרת z-index גבוה מאוד
-    modalElement.style.zIndex = '99999';
-
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+  // הצגת המודל - שימוש בפונקציה הגלובלית
+  if (typeof window.showModal === 'function') {
+    window.showModal('editAlertModal', {
+      backdrop: 'static',
+      keyboard: false
+    });
+  } else {
+    console.error('❌ showModal function not found in ui-utils.js');
+    // fallback - הצגה ישירה
+    const modalElement = document.getElementById('editAlertModal');
+    if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
       const modal = new bootstrap.Modal(modalElement, {
         backdrop: 'static',
         keyboard: false
       });
       modal.show();
-
-      // וידוא שהמודל מופיע מעל הכל
-      setTimeout(() => {
-        modalElement.style.zIndex = '99999';
-        const dialog = modalElement.querySelector('.modal-dialog');
-        if (dialog) {
-          dialog.style.zIndex = '100000';
-        }
-        const content = modalElement.querySelector('.modal-content');
-        if (content) {
-          content.style.zIndex = '100001';
-        }
-      }, 100);
-    } else {
-      // אם Bootstrap לא זמין, נציג את המודל באופן ידני
-      modalElement.style.display = 'block';
-      modalElement.classList.add('show');
-      modalElement.style.zIndex = '99999';
-      document.body.classList.add('modal-open');
-
-      // הוספת backdrop
-      const backdrop = document.createElement('div');
-      backdrop.className = 'modal-backdrop fade show';
-      backdrop.id = 'modalBackdrop';
-      backdrop.style.zIndex = '99998';
-      document.body.appendChild(backdrop);
     }
-  } else {
-    console.error('Edit modal element not found');
   }
 }
 
@@ -1761,7 +1704,7 @@ async function updateAlert() {
       // התראה עודכנה בהצלחה
 
       // סגירת המודל
-      closeModal('editAlertModal');
+      window.closeModal('editAlertModal');
 
       // רענון הנתונים
       loadAlertsData();
@@ -2124,5 +2067,7 @@ window.parseAlertCondition = function (condition) {
 
   return { variable: '', operator: '', value: '' };
 };
+
+
 
 

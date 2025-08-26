@@ -64,6 +64,34 @@ function showModalNotification(type, title, message, modalId = 'notificationModa
 }
 
 /**
+ * פתיחת מודל כללי
+ * Show modal by ID
+ * 
+ * @param {string} modalId - מזהה המודל
+ * @param {Object} options - אפשרויות נוספות
+ */
+function showModal(modalId, options = {}) {
+    const modal = document.getElementById(modalId);
+    if (!modal) {
+        console.error(`❌ Modal ${modalId} not found`);
+        return;
+    }
+
+    // הגדרת אפשרויות ברירת מחדל
+    const defaultOptions = {
+        backdrop: true,
+        keyboard: true,
+        focus: true
+    };
+
+    const modalOptions = { ...defaultOptions, ...options };
+
+    // הצגת המודל
+    const bootstrapModal = new bootstrap.Modal(modal, modalOptions);
+    bootstrapModal.show();
+}
+
+/**
  * הצגת הודעת אישור שנייה
  * Show second confirmation modal
  */
@@ -261,43 +289,50 @@ function colorAmount(amount, displayText = null) {
  * @param {string} type - סוג ההודעה: 'success' (ירוק), 'error' (אדום), 'warning' (צהוב), 'info' (כחול)
  */
 function showNotification(message, type = 'info') {
-    // יצירת מיכל התראות אם לא קיים
-    let container = document.getElementById('toastContainer');
-    if (!container) {
-        container = createToastContainer();
-    }
-
-    // יצירת הודעה חדשה
-    const toast = document.createElement('div');
-    toast.className = `toast align-items-center text-white bg-${getBootstrapColor(type)} border-0`;
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                ${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    `;
-
-    container.appendChild(toast);
-
-    // הצגת ההודעה
-    const bsToast = new bootstrap.Toast(toast, {
-        autohide: true,
-        delay: type === 'error' ? 5000 : 3000
-    });
-    bsToast.show();
-
-    // הסרת ההודעה מהדף אחרי שהיא נעלמת
-    toast.addEventListener('hidden.bs.toast', () => {
-        if (container.contains(toast)) {
-            container.removeChild(toast);
+    // בדיקה אם bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+        // יצירת מיכל התראות אם לא קיים
+        let container = document.getElementById('toastContainer');
+        if (!container) {
+            container = createToastContainer();
         }
-    });
+
+        // יצירת הודעה חדשה
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${getBootstrapColor(type)} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        // הצגת ההודעה
+        const bsToast = new bootstrap.Toast(toast, {
+            autohide: true,
+            delay: type === 'error' ? 5000 : 3000
+        });
+        bsToast.show();
+
+        // הסרת ההודעה מהדף אחרי שהיא נעלמת
+        toast.addEventListener('hidden.bs.toast', () => {
+            if (container.contains(toast)) {
+                container.removeChild(toast);
+            }
+        });
+    } else {
+        // Fallback להצגת התראה פשוטה
+        console.log(`[${type.toUpperCase()}] ${message}`);
+        alert(`${type.toUpperCase()}: ${message}`);
+    }
 }
 
 /**
@@ -323,6 +358,7 @@ function getBootstrapColor(type) {
 
 // ===== Export Functions =====
 window.showModalNotification = showModalNotification;
+window.showModal = showModal;
 window.showSecondConfirmationModal = showSecondConfirmationModal;
 window.confirmSecondAction = confirmSecondAction;
 window.showErrorNotification = showErrorNotification;

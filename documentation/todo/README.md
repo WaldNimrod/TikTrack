@@ -22,6 +22,7 @@ This directory contains all planned features, tasks, and improvements for the Ti
 6. **Full Position Closing Interface** - Complete position closing (Found in code)
 7. **Automatic Target & Stop Loss Calculation** - Auto-calculate based on defaults
 8. **Template System** - Pre-defined templates for trade plans and trades
+9. **Show Closed Trades in Execution Forms** - Display closed trades in add/edit execution modals
 
 ### Medium Priority
 9. **Account Management Functions** - Edit and delete accounts (Found in code)
@@ -44,9 +45,9 @@ This directory contains all planned features, tasks, and improvements for the Ti
 23. **Field Name Change: "Reasons" to "Strategy"** - Rename field in trade planning
 
 ## 📊 Summary
-- **Total Features Found:** 25
+- **Total Features Found:** 26
 - **Features Found in Code:** 13
-- **Features Originally Planned:** 12
+- **Features Originally Planned:** 13
 
 ## 📝 How to Add New Features
 

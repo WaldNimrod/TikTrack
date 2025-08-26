@@ -236,9 +236,7 @@
         <div class="modal-content">
           <div class="modal-header modal-header-colored">
             <h5 class="modal-title" id="addExecutionModalLabel">הוספת עסקה חדשה</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-              ×
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form id="addExecutionForm">
@@ -319,7 +317,7 @@
                     <select class="form-select" id="addExecutionType" required disabled>
                       <option value="">בחר פעולה...</option>
                       <option value="buy">קניה</option>
-                      <option value="sell">מכירה</option>
+                      <option value="sale">מכירה</option>
                     </select>
                     <div class="invalid-feedback" id="addExecutionTypeError"></div>
                   </div>
@@ -425,9 +423,7 @@
         <div class="modal-content">
           <div class="modal-header modal-header-colored">
             <h5 class="modal-title" id="editExecutionModalLabel">עריכת עסקה</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-              ×
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form id="editExecutionForm">
@@ -509,7 +505,7 @@
                     <select class="form-select" id="editExecutionType" required>
                       <option value="">בחר פעולה...</option>
                       <option value="buy">קניה</option>
-                      <option value="sell">מכירה</option>
+                      <option value="sale">מכירה</option>
                     </select>
                     <div class="invalid-feedback" id="editExecutionTypeError"></div>
                   </div>
@@ -558,7 +554,7 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editExecutionSource" class="form-label">מקור</label>
-                    <select class="form-select" id="editExecutionSource" onchange="toggleExternalIdField()">
+                    <select class="form-select" id="editExecutionSource">
                       <option value="manual">ידני</option>
                       <option value="ibkr">IBKR</option>
                       <option value="etrade">E*TRADE</option>
@@ -569,14 +565,7 @@
                     <div class="invalid-feedback" id="editExecutionSourceError"></div>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="editExecutionExternalId" class="form-label">מזהה חיצוני</label>
-                    <input type="text" class="form-control" id="editExecutionExternalId" placeholder="למשל: IBKR-12345"
-                      disabled>
-                    <div class="invalid-feedback" id="editExecutionExternalIdError"></div>
-                  </div>
-                </div>
+
               </div>
               <div class="row">
                 <div class="col-md-12">
@@ -634,9 +623,7 @@
         <div class="modal-content">
           <div class="modal-header modal-header-danger">
             <h5 class="modal-title" id="deleteExecutionModalLabel">מחיקת עסקה</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-              ×
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <p>האם אתה בטוח שברצונך למחוק את העסקה <strong id="deleteExecutionName"></strong>?</p>

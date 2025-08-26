@@ -91,7 +91,51 @@
 
 ---
 
-### 5. Data Update Verification Across All Pages
+### 5. Show Closed Trades in Execution Forms
+**Status:** 🟡 Planned  
+**Priority:** High  
+**Description:** Display closed trades in add/edit execution modals to allow users to add executions to closed trades
+
+**Requirements:**
+- [ ] Add "Show Closed Trades" checkbox to add execution modal
+- [ ] Add "Show Closed Trades" checkbox to edit execution modal
+- [ ] Implement filter logic to display both open and closed trades
+- [ ] Add visual indicators (🟢/🔴) to distinguish open vs closed trades
+- [ ] Update trade plan dropdown to show all plans (open and closed)
+- [ ] Maintain current functionality for open trades
+- [ ] Add status indicators in trade selection dropdown
+- [ ] **Temporary Implementation:** Show "בפיתוח" message when checkbox is clicked
+
+**UI/UX Considerations:**
+- [ ] Clear visual distinction between open and closed trades
+- [ ] Intuitive checkbox placement in modal forms
+- [ ] Consistent status indicators across the interface
+- [ ] Tooltips explaining the feature
+- [ ] Temporary "בפיתוח" notification for user feedback
+
+**Technical Considerations:**
+- [ ] Update `loadModalData()` function to fetch all trades/plans
+- [ ] Modify `updateTickerFromTradePlan()` to handle closed trades
+- [ ] Add event handlers for checkbox state changes
+- [ ] Ensure proper data validation for closed trades
+- [ ] Update API calls to include closed trades in responses
+- [ ] Add temporary click handler to show "בפיתוח" message
+
+**Implementation Notes:**
+- This feature was partially implemented but needs completion
+- Current implementation shows all trade plans but needs refinement
+- Need to ensure proper error handling for closed trade selections
+- Consider adding confirmation dialogs for closed trade selections
+
+**Immediate Action Required:**
+- [ ] Add click handler to "Show Closed Trades" checkbox in add execution modal
+- [ ] Add click handler to "Show Closed Trades" checkbox in edit execution modal  
+- [ ] Show "בפיתוח" notification when checkbox is clicked
+- [ ] Use existing notification system (`showNotification()`)
+
+---
+
+### 6. Data Update Verification Across All Pages
 **Status:** 🟡 Planned  
 **Priority:** Medium  
 **Description:** Implement data update verification and refresh mechanisms
@@ -513,6 +557,7 @@
 4. **Transaction Association System** (High) - Found in code
 5. **Full Position Closing Interface** (High) - Found in code
 6. **Open Plans Field for Tickers** (High) - New feature
+7. **Style Demonstration Page Structure Fix** (High) - Manual container organization
 
 ### Phase 2 - Core Features
 6. **Trading Journal Implementation** (High)

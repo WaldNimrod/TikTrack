@@ -1271,4 +1271,37 @@ window.confirmDeleteNoteRelationTypeRecord = confirmDeleteNoteRelationTypeRecord
 // ייצוא פונקציה כללית
 window.addRecord = addRecord;
 
+// ייצוא פונקציות צפייה
+window.viewCurrency = function(id) {
+  if (typeof window.showEditCurrencyModal === 'function') {
+    window.showEditCurrencyModal(id);
+  } else {
+    console.log('צפייה במטבע:', id);
+  }
+};
+
+window.viewNoteRelationType = function(id) {
+  if (typeof window.showEditNoteRelationTypeModal === 'function') {
+    window.showEditNoteRelationTypeModal(id);
+  } else {
+    console.log('צפייה בסוג קשר:', id);
+  }
+};
+
+// ייצוא פונקציות הוספה
+window.showAddCurrencyModal = showAddCurrencyModal;
+window.showAddNoteRelationTypeModal = showAddNoteRelationTypeModal;
+
+// ייצוא פונקציות עריכה
+window.showEditCurrencyModal = showEditCurrencyModal;
+window.showEditNoteRelationTypeModal = showEditNoteRelationTypeModal;
+
+// ייצוא פונקציות מחיקה
+window.showDeleteCurrencyModal = showDeleteCurrencyModal;
+window.showDeleteNoteRelationTypeModal = showDeleteNoteRelationTypeModal;
+
+// ייצוא פונקציות עדכון טבלאות
+window.updateCurrenciesTable = updateCurrenciesTable;
+window.updateNoteRelationTypesTable = updateNoteRelationTypesTable;
+
 // window.showNotification מיוצאת מקובץ ui-utils.js

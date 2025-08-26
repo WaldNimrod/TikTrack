@@ -179,7 +179,7 @@ function restoreTickersSectionState() {
 
 // פונקציות נוספות
 function openTickerDetails(id) {
-    // פתיחת פרטי תיקר
+    // פתיחת מודל הוספת טיקר חדש
     showAddTickerModal();
 }
 
@@ -737,7 +737,7 @@ async function showTickerLinkedItemsModal(tickerId, errorData) {
 
     // טעינת נתונים מקושרים מהשרת
     try {
-        const response = await fetch(`http://127.0.0.1:8080/api/v1/tickers/${tickerId}/linked-items`);
+        const response = await fetch(`/api/v1/tickers/${tickerId}/linked-items`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -758,12 +758,12 @@ async function showTickerLinkedItemsModal(tickerId, errorData) {
             window.showLinkedItemsModal(enhancedData, 'ticker', tickerId);
         } else {
             console.error('❌ showLinkedItemsModal function not found');
-            showError('פונקציה להצגת פריטים מקושרים לא זמינה');
+            showNotification('❌ פונקציה להצגת פריטים מקושרים לא זמינה', 'error');
         }
 
     } catch (error) {
         console.error('❌ שגיאה בטעינת נתונים מקושרים:', error);
-        showError('שגיאה בטעינת נתונים מקושרים');
+        showNotification('❌ שגיאה בטעינת נתונים מקושרים', 'error');
     }
 }
 
@@ -1053,21 +1053,21 @@ function goToLinkedItems() {
     modal.hide();
 
     // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
-    window.location.href = '/trade_plans'; // ברירת מחדל - דף תכנון
+    window.location.href = '/tickers'; // ברירת מחדל - דף טיקרים
 }
 
 /**
  * מעבר לטרייד ספציפי
  */
 function goToTrade(tradeId) {
-    window.location.href = `/trade_plans#trade-${tradeId}`;
+    window.location.href = `/trades#trade-${tradeId}`;
 }
 
 /**
  * מעבר לתכנון ספציפי
  */
 function goToPlan(planId) {
-    window.location.href = `/planning#plan-${planId}`;
+    window.location.href = `/trade_plans#plan-${planId}`;
 }
 
 /**
@@ -1229,6 +1229,30 @@ function updateTickersTable(tickers) {
     if (countElement) {
         countElement.textContent = `${tickers.length} טיקרים`;
     }
+
+    // עדכון סטטיסטיקות
+    updateTickersStatistics(tickers);
+}
+
+/**
+ * עדכון סטטיסטיקות טיקרים
+ */
+function updateTickersStatistics(tickers) {
+    const totalTickers = tickers.length;
+    const activeTickers = tickers.filter(ticker => ticker.active_trades).length;
+    const tickerTypes = new Set(tickers.map(ticker => ticker.type)).size;
+    const currencies = new Set(tickers.map(ticker => ticker.currency_id || ticker.currency)).size;
+
+    // עדכון אלמנטים בסטטיסטיקות
+    const totalElement = document.getElementById('totalTickers');
+    const activeElement = document.getElementById('activeTickers');
+    const typesElement = document.getElementById('tickerTypes');
+    const currenciesElement = document.getElementById('currencies');
+
+    if (totalElement) totalElement.textContent = totalTickers;
+    if (activeElement) activeElement.textContent = activeTickers;
+    if (typesElement) typesElement.textContent = tickerTypes;
+    if (currenciesElement) currenciesElement.textContent = currencies;
 }
 
 
@@ -1350,6 +1374,32 @@ window.goToAlert = goToAlert;
 window.goToNote = goToNote;
 window.viewLinkedItemsForTicker = viewLinkedItemsForTicker;
 
+// ===== פונקציות עזר נוספות =====
+
+/**
+ * פונקציה לעיצוב תאריך מלא
+ */
+function formatDate(dateString) {
+    if (!dateString) return '';
+    
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '';
+        
+        return date.toLocaleDateString('he-IL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return dateString;
+    }
+}
+
 // ===== פונקציות סידור =====
 
 /**
@@ -1392,8 +1442,10 @@ function restoreSortState() {
     }
 }
 
-// הגדרת הפונקציה כגלובלית
+// הגדרת הפונקציות כגלובליות
 window.sortTable = sortTable;
+window.formatDate = formatDate;
+window.updateTickersStatistics = updateTickersStatistics;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {

@@ -538,6 +538,8 @@ function updateStatistics() {
   document.getElementById('tradePlansStats').textContent = allData.tradePlans?.length || 0;
 }
 
+
+
 // פונקציה להצגת שגיאה
 function showError(message) {
   console.error('❌ שגיאה:', message);
@@ -728,7 +730,7 @@ function updateExecutionsTable() {
 
   // בדיקה אם executions קיים ומערך
   if (!allData.executions || !Array.isArray(allData.executions) || allData.executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10" class="text-center">אין נתונים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="text-center">אין נתונים</td></tr>';
     document.getElementById('executionsCount').textContent = '0 רשומות';
     return;
   }
@@ -746,6 +748,7 @@ function updateExecutionsTable() {
       <td class="number-cell">${formatNumber(execution.price)}</td>
       <td class="number-cell">${formatNumber(execution.fee)}</td>
       <td>${execution.source || ''}</td>
+      <td>${execution.external_id || ''}</td>
       <td>${execution.notes || ''}</td>
       <td>${execution.created_at || ''}</td>
       <td>
@@ -896,8 +899,94 @@ function exportAllData() {
 // פונקציה להוספת רשומה חדשה
 function addRecord() {
   console.log('➕ הוספת רשומה חדשה...');
-  // TODO: לזהות איזה טבלה ולפתוח מודל הוספה מתאים
-  alert('פונקציית הוספת רשומה תתווסף בקרוב');
+
+  // זיהוי הטבלה הנוכחית לפי הכפתור שנלחץ
+  const activeElement = document.activeElement;
+  const button = activeElement.closest('button');
+
+  if (button) {
+    const section = button.closest('.content-section');
+    if (section) {
+      const tableTitle = section.querySelector('.table-title');
+      if (tableTitle) {
+        const title = tableTitle.textContent.trim();
+
+        // מיפוי כותרות לפונקציות הוספה
+        const addFunctions = {
+          'חשבונות': () => {
+            if (typeof window.showAddAccountModal === 'function') {
+              window.showAddAccountModal();
+            } else {
+              alert('פונקציית הוספת חשבון לא זמינה');
+            }
+          },
+          'טריידים': () => {
+            if (typeof window.showAddTradeModal === 'function') {
+              window.showAddTradeModal();
+            } else {
+              alert('פונקציית הוספת טרייד לא זמינה');
+            }
+          },
+          'טיקרים': () => {
+            if (typeof window.showAddTickerModal === 'function') {
+              window.showAddTickerModal();
+            } else {
+              alert('פונקציית הוספת טיקר לא זמינה');
+            }
+          },
+          'תוכניות מסחר': () => {
+            if (typeof window.showAddTradePlanModal === 'function') {
+              window.showAddTradePlanModal();
+            } else {
+              alert('פונקציית הוספת תוכנית מסחר לא זמינה');
+            }
+          },
+          'ביצועים': () => {
+            if (typeof window.showAddExecutionModal === 'function') {
+              window.showAddExecutionModal();
+            } else {
+              alert('פונקציית הוספת ביצוע לא זמינה');
+            }
+          },
+          'תזרימי מזומנים': () => {
+            if (typeof window.showAddCashFlowModal === 'function') {
+              window.showAddCashFlowModal();
+            } else {
+              alert('פונקציית הוספת תזרים מזומנים לא זמינה');
+            }
+          },
+          'התראות': () => {
+            if (typeof window.showAddAlertModal === 'function') {
+              window.showAddAlertModal();
+            } else {
+              alert('פונקציית הוספת התראה לא זמינה');
+            }
+          },
+          'הערות': () => {
+            if (typeof window.showAddNoteModal === 'function') {
+              window.showAddNoteModal();
+            } else {
+              alert('פונקציית הוספת הערה לא זמינה');
+            }
+          },
+
+        };
+
+        const addFunction = addFunctions[title];
+        if (addFunction) {
+          addFunction();
+        } else {
+          alert(`פונקציית הוספה לטבלה "${title}" לא מוגדרת`);
+        }
+      } else {
+        alert('לא ניתן לזהות את הטבלה');
+      }
+    } else {
+      alert('לא ניתן לזהות את הטבלה');
+    }
+  } else {
+    alert('לא ניתן לזהות את הטבלה');
+  }
 }
 
 // פונקציות ביטול
@@ -957,41 +1046,183 @@ function showBackupOptions() {
 }
 
 // פונקציות צפייה/עריכה/מחיקה (placeholder)
-function viewAccount(id) { console.log('צפייה בחשבון:', id); }
-function editAccount(id) { console.log('עריכת חשבון:', id); }
-function deleteAccount(id) { console.log('מחיקת חשבון:', id); }
+function viewAccount(id) {
+  if (typeof window.showEditAccountModalById === 'function') {
+    window.showEditAccountModalById(id);
+  } else {
+    console.log('צפייה בחשבון:', id);
+  }
+}
+function editAccount(id) {
+  if (typeof window.showEditAccountModalById === 'function') {
+    window.showEditAccountModalById(id);
+  } else {
+    console.log('עריכת חשבון:', id);
+  }
+}
+function deleteAccount(id) {
+  if (typeof window.deleteAccount === 'function') {
+    window.deleteAccount(id);
+  } else {
+    console.log('מחיקת חשבון:', id);
+  }
+}
 
-function viewTrade(id) { console.log('צפייה בטרייד:', id); }
-function editTrade(id) { console.log('עריכת טרייד:', id); }
-function deleteTrade(id) { console.log('מחיקת טרייד:', id); }
+function viewTrade(id) {
+  if (typeof window.editTradeRecord === 'function') {
+    window.editTradeRecord(id);
+  } else {
+    console.log('צפייה בטרייד:', id);
+  }
+}
+function editTrade(id) {
+  if (typeof window.editTradeRecord === 'function') {
+    window.editTradeRecord(id);
+  } else {
+    console.log('עריכת טרייד:', id);
+  }
+}
+function deleteTrade(id) {
+  if (typeof window.deleteTradeRecord === 'function') {
+    window.deleteTradeRecord(id);
+  } else {
+    console.log('מחיקת טרייד:', id);
+  }
+}
 
-function viewTicker(id) { console.log('צפייה בטיקר:', id); }
-function editTicker(id) { console.log('עריכת טיקר:', id); }
-function deleteTicker(id) { console.log('מחיקת טיקר:', id); }
+function viewTicker(id) {
+  if (typeof window.showEditTickerModal === 'function') {
+    window.showEditTickerModal(id);
+  } else {
+    console.log('צפייה בטיקר:', id);
+  }
+}
+function editTicker(id) {
+  if (typeof window.showEditTickerModal === 'function') {
+    window.showEditTickerModal(id);
+  } else {
+    console.log('עריכת טיקר:', id);
+  }
+}
+function deleteTicker(id) {
+  if (typeof window.showDeleteTickerModal === 'function') {
+    window.showDeleteTickerModal(id);
+  } else {
+    console.log('מחיקת טיקר:', id);
+  }
+}
 
-function viewTradePlan(id) { console.log('צפייה בתוכנית:', id); }
-function editTradePlan(id) { console.log('עריכת תוכנית:', id); }
-function deleteTradePlan(id) { console.log('מחיקת תוכנית:', id); }
+function viewTradePlan(id) {
+  if (typeof window.openEditTradePlanModal === 'function') {
+    window.openEditTradePlanModal(id);
+  } else {
+    console.log('צפייה בתוכנית:', id);
+  }
+}
+function editTradePlan(id) {
+  if (typeof window.openEditTradePlanModal === 'function') {
+    window.openEditTradePlanModal(id);
+  } else {
+    console.log('עריכת תוכנית:', id);
+  }
+}
+function deleteTradePlan(id) {
+  if (typeof window.openDeleteTradePlanModal === 'function') {
+    window.openDeleteTradePlanModal(id);
+  } else {
+    console.log('מחיקת תוכנית:', id);
+  }
+}
 
-function viewExecution(id) { console.log('צפייה בביצוע:', id); }
-function editExecution(id) { console.log('עריכת ביצוע:', id); }
-function deleteExecution(id) { console.log('מחיקת ביצוע:', id); }
+function viewExecution(id) {
+  if (typeof window.showEditExecutionModal === 'function') {
+    window.showEditExecutionModal(id);
+  } else {
+    console.log('צפייה בביצוע:', id);
+  }
+}
+function editExecution(id) {
+  if (typeof window.showEditExecutionModal === 'function') {
+    window.showEditExecutionModal(id);
+  } else {
+    console.log('עריכת ביצוע:', id);
+  }
+}
+function deleteExecution(id) {
+  if (typeof window.showDeleteExecutionModal === 'function') {
+    window.showDeleteExecutionModal(id);
+  } else {
+    console.log('מחיקת ביצוע:', id);
+  }
+}
 
-function viewCashFlow(id) { console.log('צפייה בתזרים:', id); }
-function editCashFlow(id) { console.log('עריכת תזרים:', id); }
-function deleteCashFlow(id) { console.log('מחיקת תזרים:', id); }
+function viewCashFlow(id) {
+  if (typeof window.showEditCashFlowModal === 'function') {
+    window.showEditCashFlowModal(id);
+  } else {
+    console.log('צפייה בתזרים:', id);
+  }
+}
+function editCashFlow(id) {
+  if (typeof window.showEditCashFlowModal === 'function') {
+    window.showEditCashFlowModal(id);
+  } else {
+    console.log('עריכת תזרים:', id);
+  }
+}
+function deleteCashFlow(id) {
+  if (typeof window.showDeleteCashFlowModal === 'function') {
+    window.showDeleteCashFlowModal(id);
+  } else {
+    console.log('מחיקת תזרים:', id);
+  }
+}
 
-function viewAlert(id) { console.log('צפייה בהתראה:', id); }
-function editAlert(id) { console.log('עריכת התראה:', id); }
-function deleteAlert(id) { console.log('מחיקת התראה:', id); }
+function viewAlert(id) {
+  if (typeof window.editAlert === 'function') {
+    window.editAlert(id);
+  } else {
+    console.log('צפייה בהתראה:', id);
+  }
+}
+function editAlert(id) {
+  if (typeof window.editAlert === 'function') {
+    window.editAlert(id);
+  } else {
+    console.log('עריכת התראה:', id);
+  }
+}
+function deleteAlert(id) {
+  if (typeof window.deleteAlert === 'function') {
+    window.deleteAlert(id);
+  } else {
+    console.log('מחיקת התראה:', id);
+  }
+}
 
-function viewNote(id) { console.log('צפייה בהערה:', id); }
-function editNote(id) { console.log('עריכת הערה:', id); }
-function deleteNote(id) { console.log('מחיקת הערה:', id); }
+function viewNote(id) {
+  if (typeof window.showEditNoteModal === 'function') {
+    window.showEditNoteModal(id);
+  } else {
+    console.log('צפייה בהערה:', id);
+  }
+}
+function editNote(id) {
+  if (typeof window.showEditNoteModal === 'function') {
+    window.showEditNoteModal(id);
+  } else {
+    console.log('עריכת הערה:', id);
+  }
+}
+function deleteNote(id) {
+  if (typeof window.showDeleteNoteModal === 'function') {
+    window.showDeleteNoteModal(id);
+  } else {
+    console.log('מחיקת הערה:', id);
+  }
+}
 
-function viewCurrency(id) { console.log('צפייה במטבע:', id); }
-function editCurrency(id) { console.log('עריכת מטבע:', id); }
-function deleteCurrency(id) { console.log('מחיקת מטבע:', id); }
+
 
 // פונקציה למיון טבלאות בעמוד בסיס הנתונים
 function sortTable(columnIndex, tableId) {
@@ -1051,6 +1282,7 @@ function sortTable(columnIndex, tableId) {
       data = allData.notes || [];
       updateFunction = updateNotesTable;
       break;
+
     default:
       console.error('❌ Unknown table type:', tableType);
       return;
@@ -1108,9 +1340,7 @@ window.deleteAlert = deleteAlert;
 window.viewNote = viewNote;
 window.editNote = editNote;
 window.deleteNote = deleteNote;
-window.viewCurrency = viewCurrency;
-window.editCurrency = editCurrency;
-window.deleteCurrency = deleteCurrency;
+
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {

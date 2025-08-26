@@ -13,6 +13,7 @@ class Execution(BaseModel):
     price = Column(Float, nullable=False)  # NOT NULL per constraints
     fee = Column(Float, default=0, nullable=True)
     source = Column(String(50), default='manual', nullable=True)  # manual, api, etc.
+    external_id = Column(String(100), nullable=True)  # מזהה חיצוני
     notes = Column(String(500), nullable=True)  # הערות על העסקה
     
     # Relationships

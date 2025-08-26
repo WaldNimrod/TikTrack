@@ -91,21 +91,21 @@ async function getTrades() {
  * קבלת תכנונים מהשרת (אופציונלי)
  * @returns {Promise<Array>} מערך של תכנונים
  */
-async function getPlans() {
+async function getTradePlans() {
     try {
-        const response = await fetch('/api/v1/plans/');
+        const response = await fetch('/api/v1/trade_plans/');
         if (response.ok) {
             const data = await response.json();
             const plans = data.data || data || [];
-            console.log('✅ Retrieved', plans.length, 'plans from server');
+            console.log('✅ Retrieved', plans.length, 'trade plans from server');
             return plans;
         } else {
-            console.log('⚠️ Plans API not available, returning empty array');
+            console.log('⚠️ Trade Plans API not available, returning empty array');
             return [];
         }
     } catch (error) {
-        console.log('⚠️ Plans API not available:', error.message);
-        return [];
+        console.log('⚠️ Trade Plans API not available:', error.message);
+            return [];
     }
 }
 
@@ -124,7 +124,7 @@ async function loadCache() {
         const [tickers, trades, plans] = await Promise.all([
             getTickers(),
             getTrades(),
-            getPlans()
+            getTradePlans()
         ]);
 
         tickersCache = tickers;
@@ -192,10 +192,10 @@ async function getTickersWithPlans(options = {}) {
     }
 
     const tickers = tickersCache || await getTickers();
-    const plans = plansCache || await getPlans();
+    const plans = plansCache || await getTradePlans();
 
     if (plans.length === 0) {
-        console.log('⚠️ No plans available');
+        console.log('⚠️ No trade plans available');
         return [];
     }
 
@@ -234,7 +234,7 @@ async function getRelevantTickers(options = {}) {
 
     const tickers = tickersCache || await getTickers();
     const trades = tradesCache || await getTrades();
-    const plans = plansCache || await getPlans();
+    const plans = plansCache || await getTradePlans();
 
     const relevantTickers = tickers.filter(ticker => {
         const hasTrades = trades.some(trade =>
@@ -276,12 +276,12 @@ async function getTickersWithOpenOrClosedTradesAndPlans(options = {}) {
 
     const tickers = tickersCache || await getTickers();
     const trades = tradesCache || await getTrades();
-    const plans = plansCache || await getPlans();
+    const plans = plansCache || await getTradePlans();
 
     const relevantTickers = tickers.filter(ticker => {
         // בדיקת טריידים בסטטוס פתוח או סגור
         const hasOpenOrClosedTrades = trades.some(trade =>
-            trade.ticker_id === ticker.id &&
+            trade.ticker.id === ticker.id &&
             (trade.status === 'open' || trade.status === 'closed')
         );
 
@@ -391,7 +391,7 @@ function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...
 window.tickerService = {
     getTickers,
     getTrades,
-    getPlans,
+    getTradePlans,
     getTickersWithTrades,
     getTickersWithPlans,
     getRelevantTickers,

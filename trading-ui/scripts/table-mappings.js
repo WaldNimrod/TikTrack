@@ -253,6 +253,21 @@ const TABLE_COLUMN_MAPPINGS = {
         'ticker',          // 3 - טיקר
         'status',          // 4 - סטטוס
         'created_at'       // 5 - נוצר ב
+    ],
+
+    'currencies': [
+        'id',              // 0 - מזהה
+        'symbol',          // 1 - סמל
+        'name',            // 2 - שם
+        'usd_rate',        // 3 - שער דולר
+        'usd_rate_default', // 4 - שער דולר ברירת מחדל
+        'created_at'       // 5 - נוצר ב
+    ],
+
+    'note_relation_types': [
+        'id',              // 0 - מזהה
+        'note_relation_type', // 1 - סוג קשר
+        'created_at'       // 2 - נוצר ב
     ]
 };
 

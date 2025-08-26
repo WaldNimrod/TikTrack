@@ -4,30 +4,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>תכנונים - Tik.track</title>
+  <title>טיקרים - Tik.track</title>
 
   <!-- 
-    ===== דף תכנונים - TikTrack =====
+    ===== דף טיקרים - TikTrack =====
     
     דף זה מכיל:
-    1. טבלת תכנונים (עיצובים) - הסקשן הראשון
-    2. טבלת חשבונות - הסקשן השני (נוסף לאחרונה)
-    3. כרטיסיות התראות - בחלק העליון
-    4. מערכת פילטרים ומיון מתקדמת
+    1. טבלת טיקרים - הסקשן הראשי
+    2. כרטיסיות התראות - בחלק העליון
+    3. מערכת פילטרים ומיון מתקדמת
     
     מבנה הדף:
     - app-header: כותרת האפליקציה עם ניווט
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות התראות וסיכום נתונים
-      - content-section (1): טבלת תכנונים
-      - content-section (2): טבלת חשבונות
+      - content-section: טבלת טיקרים
     
     שינויים אחרונים:
-    - שינוי שם מ"עיצובים" ל"תכנונים"
-    - הוספת טבלת חשבונות מלאים
+    - עדכון שם הדף לטיקרים
     - שיפור עיצוב כרטיסיות התראות
     - תיקון כפתורי סגירה עצמאיים
-    - ריכוז פונקציות חשבונות ב-accounts.js
+    - ריכוז פונקציות טיקרים ב-tickers.js
   -->
 
   <!-- CSS Files - Ordered by priority (weak to strong) -->
@@ -86,10 +83,10 @@
 
           <!-- Data summary -->
           <div class="info-summary" id="summaryStats">
-            <div>סה"כ תכנונים: <strong id="totalDesigns">0</strong></div>
-            <div>סה"כ השקעה: <strong id="totalInvestment">$0</strong></div>
-            <div>השקעה ממוצעת: <strong id="avgInvestment">$0</strong></div>
-            <div>רווח כולל: <strong id="totalProfit">$0</strong></div>
+            <div>סה"כ טיקרים: <strong id="totalTickers">0</strong></div>
+            <div>טיקרים פעילים: <strong id="activeTickers">0</strong></div>
+            <div>סוגי טיקרים: <strong id="tickerTypes">0</strong></div>
+            <div>מטבעות: <strong id="currencies">0</strong></div>
           </div>
         </div>
       </div> <!-- End top-section -->
@@ -97,9 +94,9 @@
       <!-- Main content -->
       <div class="main-content">
 
-        <!-- Designs area - content-section -->
+        <!-- Tickers area - content-section -->
         <div class="content-section tickers-page">
-          <!-- Designs header -->
+          <!-- Tickers header -->
           <div class="section-header">
             <div class="table-title">
               <img src="images/icons/tickers.svg" alt="הטיקרים שלי" class="table-icon">
@@ -239,8 +236,8 @@
                     <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>Tesla Inc.</td>
-                    <td>רכב חשמלי</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>רכב חשמלי</td>
                     <td>
                       <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(4)"
                         title="צפה באלמנטים מקושרים">
@@ -257,8 +254,8 @@
                     <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>NVIDIA Corporation</td>
-                    <td>צ'יפים</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>צ'יפים</td>
                     <td>
                       <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(5)"
                         title="צפה באלמנטים מקושרים">
@@ -275,8 +272,8 @@
                     <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>Amazon.com Inc.</td>
-                    <td>מסחר אלקטרוני</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>מסחר אלקטרוני</td>
                     <td>
                       <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(6)"
                         title="צפה באלמנטים מקושרים">
@@ -293,8 +290,8 @@
                     <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>Meta Platforms Inc.</td>
-                    <td>מדיה חברתית</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>מדיה חברתית</td>
                     <td>
                       <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(7)"
                         title="צפה באלמנטים מקושרים">
@@ -311,8 +308,8 @@
                     <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>Netflix Inc.</td>
-                    <td>סטרימינג</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>סטרימינג</td>
                     <td>
                       <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(8)"
                         title="צפה באלמנטים מקושרים">
@@ -329,8 +326,8 @@
                     <td>USD</td>
                     <td>18.8.2025, 20:16:00</td>
                     <td>SPDR S&P 500 ETF</td>
-                    <td>ETF מדד S&P 500</td>
                     <td>18.8.2025, 20:16:00</td>
+                    <td>ETF מדד S&P 500</td>
                     <td>
                       <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTicker(9)"
                         title="צפה באלמנטים מקושרים">

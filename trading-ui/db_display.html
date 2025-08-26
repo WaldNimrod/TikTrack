@@ -155,8 +155,7 @@
                 <li class="foreign-key">Foreign key: account_id references accounts(id)</li>
                 <li class="default">Side defaults to 'Long'</li>
                 <li class="default">Status defaults to 'open'</li>
-                <li class="default">Investment_type defaults to 'swing'</li>
-                <li class="default">Planned_amount defaults to 1</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
                 <li class="unique">ID is auto-incrementing primary key</li>
               </ul>
             </div>
@@ -224,7 +223,6 @@
               <ul class="table-rules-list">
                 <li class="constraint">Account_id and ticker_id are required (NOT NULL)</li>
                 <li class="default">Side defaults to 'Long'</li>
-                <li class="default">Investment_type defaults to 'swing'</li>
                 <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
                 <li class="unique">ID is primary key</li>
               </ul>
@@ -288,9 +286,9 @@
               </div>
               <ul class="table-rules-list">
                 <li class="constraint">Name field is required (NOT NULL)</li>
-                <li class="default">Status defaults to 'open'</li>
                 <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
                 <li class="unique">ID is auto-incrementing primary key</li>
+                <li class="trigger">Protection trigger for last account deletion</li>
               </ul>
             </div>
           </div>
@@ -330,16 +328,17 @@
                     <th onclick="sortTable(2, 'tickersTable')">Name (VARCHAR)</th>
                     <th onclick="sortTable(3, 'tickersTable')">Type (VARCHAR)</th>
                     <th onclick="sortTable(4, 'tickersTable')">Remarks (VARCHAR)</th>
-                    <th onclick="sortTable(5, 'tickersTable')">Currency ID (INTEGER)</th>
+                    <th onclick="sortTable(5, 'tickersTable')">Currency (VARCHAR)</th>
                     <th onclick="sortTable(6, 'tickersTable')">Active Trades (BOOLEAN)</th>
-                    <th onclick="sortTable(7, 'tickersTable')">Created At (DATETIME)</th>
-                    <th onclick="sortTable(8, 'tickersTable')">Updated At (DATETIME)</th>
+                    <th onclick="sortTable(7, 'tickersTable')">Currency ID (INTEGER)</th>
+                    <th onclick="sortTable(8, 'tickersTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(9, 'tickersTable')">Updated At (DATETIME)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="9" class="text-center">טוען נתונים...</td>
+                    <td colspan="10" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -402,14 +401,15 @@
                     <th onclick="sortTable(5, 'executionsTable')">Price (FLOAT)</th>
                     <th onclick="sortTable(6, 'executionsTable')">Fee (FLOAT)</th>
                     <th onclick="sortTable(7, 'executionsTable')">Source (VARCHAR)</th>
-                    <th onclick="sortTable(8, 'executionsTable')">Notes (VARCHAR)</th>
-                    <th onclick="sortTable(9, 'executionsTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(8, 'executionsTable')">External ID (VARCHAR)</th>
+                    <th onclick="sortTable(9, 'executionsTable')">Notes (VARCHAR)</th>
+                    <th onclick="sortTable(10, 'executionsTable')">Created At (DATETIME)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="10" class="text-center">טוען נתונים...</td>
+                    <td colspan="11" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -422,12 +422,7 @@
                 <h6 class="table-rules-title">Table Rules & Constraints</h6>
               </div>
               <ul class="table-rules-list">
-                <li class="constraint">Trade_id, action, quantity, and price are required (NOT NULL)</li>
-                <li class="foreign-key">Foreign key: trade_id references trades(id)</li>
-                <li class="default">Action defaults to 'buy'</li>
-                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
                 <li class="unique">ID is primary key</li>
-                <li class="index">Index on id: ix_executions_id</li>
               </ul>
             </div>
           </div>
@@ -492,12 +487,11 @@
               <ul class="table-rules-list">
                 <li class="constraint">Account_id, type, and amount are required (NOT NULL)</li>
                 <li class="foreign-key">Foreign key: account_id references accounts(id)</li>
-                <li class="default">Currency defaults to 'USD'</li>
                 <li class="default">Currency_id defaults to 1</li>
                 <li class="default">Usd_rate defaults to 1.000000</li>
                 <li class="default">Source defaults to 'manual'</li>
                 <li class="default">External_id defaults to '0'</li>
-                <li class="default">Type defaults to 'new'</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
                 <li class="unique">ID is primary key</li>
                 <li class="index">Index on id: ix_cash_flows_id</li>
               </ul>
@@ -562,13 +556,11 @@
                 <h6 class="table-rules-title">Table Rules & Constraints</h6>
               </div>
               <ul class="table-rules-list">
-                <li class="constraint">Type and condition are required (NOT NULL)</li>
-                <li class="default">Status defaults to 'open'</li>
-                <li class="default">Is_triggered defaults to 'false'</li>
-                <li class="default">Type defaults to 'price'</li>
-                <li class="default">Related_type_id defaults to 4</li>
-                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
                 <li class="unique">ID is auto-incrementing primary key</li>
+                <li class="index">Index on status: idx_alerts_status</li>
+                <li class="index">Index on is_triggered: idx_alerts_is_triggered</li>
+                <li class="index">Index on related_type_id: idx_alerts_related_type_id</li>
+                <li class="index">Index on created_at: idx_alerts_created_at</li>
               </ul>
             </div>
           </div>
@@ -624,13 +616,16 @@
               <h6 class="table-rules-title">Table Rules & Constraints</h6>
             </div>
             <ul class="table-rules-list">
-              <li class="constraint">Content, related_type_id, and related_id are required (NOT NULL)</li>
+              <li class="constraint">Content is required (NOT NULL)</li>
+              <li class="constraint">Related_type_id and related_id are required (NOT NULL)</li>
               <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
               <li class="unique">ID is auto-incrementing primary key</li>
             </ul>
           </div>
         </div>
       </div>
+
+
     </div>
 
 

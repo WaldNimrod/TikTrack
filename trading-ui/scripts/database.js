@@ -22,17 +22,13 @@
  * Last Updated: August 23, 2025
  */
 
-console.log('🔄 database.js נטען!');
-
 // פונקציה לטעינת אילוצים דינמית
 async function loadConstraints() {
   try {
-    console.log('🔄 טעינת אילוצים מהשרת');
     const response = await fetch('/api/v1/constraints/');
     if (response.ok) {
       const data = await response.json();
       allData.constraints = data.data || data;
-      console.log('✅ נטענו', allData.constraints.length, 'אילוצים');
       updateConstraintsDisplay();
     } else {
       console.error('❌ שגיאה בטעינת אילוצים');
@@ -126,7 +122,6 @@ function updateTableConstraints(tableName, constraints) {
 
   // עדכון התוכן
   rulesContainer.innerHTML = constraintsHtml;
-  console.log(`✅ עודכנו אילוצים עבור טבלה ${tableName}: ${constraints.length} אילוצים`);
 }
 
 // פונקציה לקבלת CSS class לפי סוג אילוץ
@@ -227,8 +222,6 @@ let allData = {
 
 // פונקציה לפתיחה/סגירה של סקשנים
 function toggleTopSection() {
-  console.log('🔄 toggleTopSection נקראה - סגירה/פתיחה של כל הסקשנים');
-
   const topSection = document.querySelector('.top-section');
   const contentSections = document.querySelectorAll('.content-section');
   const toggleBtn = topSection ? topSection.querySelector('button[onclick="toggleTopSection()"]') : null;
@@ -283,14 +276,10 @@ function toggleTopSection() {
   if (icon) {
     icon.textContent = shouldCollapse ? '▼' : '▲';
   }
-
-  console.log(`✅ ${shouldCollapse ? 'סגירת' : 'פתיחת'} כל הסקשנים הושלמה`);
 }
 
 function toggleMainSection() {
-  console.log('🔄 toggleMainSection נקראה');
   const contentSections = document.querySelectorAll('.content-section');
-  console.log('📋 מספר content-sections נמצא:', contentSections.length);
 
   // מציאת הסקשן הנוכחי (הכי קרוב לכפתור שנלחץ)
   const clickedButton = window.event ? window.event.target.closest('button') : null;
@@ -300,7 +289,6 @@ function toggleMainSection() {
     console.error('❌ לא נמצא סקשן');
     return;
   }
-  console.log('✅ סקשן נמצא:', currentSection);
 
   const sectionBody = currentSection.querySelector('.section-body');
   const toggleBtn = currentSection.querySelector('button[onclick="toggleMainSection()"]');
@@ -370,12 +358,8 @@ async function loadAllData() {
   console.log('📊 allData לפני טעינה:', allData);
 
   try {
-    console.log('🌐 מתחיל קשות API...');
-
     // שימוש בפונקציה החדשה לטעינה מקבילה עם התקדמות
     await loadDataWithProgress();
-
-    console.log('✅ עדכון טבלאות הושלם');
 
   } catch (error) {
     console.error('❌ שגיאה בטעינת נתונים:', error);
@@ -386,7 +370,6 @@ async function loadAllData() {
 
 // פונקציה לאופטימיזציית ביצועים - טעינה מקבילה
 async function loadDataWithProgress() {
-  console.log('🚀 מתחיל טעינה מקבילה עם התקדמות...');
 
   const startTime = performance.now();
 
@@ -469,19 +452,6 @@ async function loadDataWithProgress() {
     const endTime = performance.now();
     const loadTime = endTime - startTime;
 
-    console.log(`✅ טעינה מקבילה הושלמה ב-${loadTime.toFixed(2)}ms`);
-    console.log('📊 נתונים נטענו:', {
-      accounts: allData.accounts.length,
-      trades: allData.trades.length,
-      tickers: allData.tickers.length,
-      tradePlans: allData.tradePlans.length,
-      executions: allData.executions.length,
-      cashFlows: allData.cashFlows.length,
-      alerts: allData.alerts.length,
-      notes: allData.notes.length,
-      constraints: allData.constraints.length,
-    });
-
     // עדכון הטבלאות
     updateAllTables();
     updateConstraintsDisplay();
@@ -495,35 +465,16 @@ async function loadDataWithProgress() {
 
 // פונקציה לעדכון כל הטבלאות
 function updateAllTables() {
-  console.log('🔄 === עדכון כל הטבלאות ===');
-  console.log('📊 נתונים לעדכון:', allData);
-
   try {
-    console.log('🔄 מעדכן טבלת חשבונות...');
     updateAccountsTable();
-
-    console.log('🔄 מעדכן טבלת טריידים...');
     updateTradesTable();
-
-    console.log('🔄 מעדכן טבלת טיקרים...');
     updateTickersTable();
-
-    console.log('🔄 מעדכן טבלת תוכניות...');
     updateTradePlansTable();
 
-    console.log('🔄 מעדכן טבלת ביצועים...');
     updateExecutionsTable();
-
-    console.log('🔄 מעדכן טבלת תזרימי מזומנים...');
     updateCashFlowsTable();
-
-    console.log('🔄 מעדכן טבלת התראות...');
     updateAlertsTable();
-
-    console.log('🔄 מעדכן טבלת הערות...');
     updateNotesTable();
-
-    console.log('✅ עדכון כל הטבלאות הושלם');
   } catch (error) {
     console.error('❌ שגיאה בעדכון טבלאות:', error);
     console.error('❌ Stack trace:', error.stack);

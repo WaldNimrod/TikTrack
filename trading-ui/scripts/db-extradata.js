@@ -478,49 +478,53 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ===== פונקציות וולידציה =====
 
-// פונקציה לוולידציה של סמל מטבע
+// פונקציה לוולידציה של סמל מטבע (משתמשת במערכת החדשה)
 function validateCurrencySymbol(input) {
+    // בדיקה שהפרמטר קיים ותקין
+    if (!input || !input.value) {
+        console.warn('validateCurrencySymbol: input parameter is invalid');
+        return false;
+    }
+    
     const symbol = input.value.trim().toUpperCase();
-    const symbolPattern = /^[A-Z]+$/;
-
-    // זיהוי איזה מודל זה (הוספה או עריכה)
-    const isEditMode = input.id === 'editCurrencySymbol';
-    const errorElementId = isEditMode ? 'editCurrencySymbolError' : 'currencySymbolError';
-    const errorElement = document.getElementById(errorElementId);
-
+    
     // עדכון הערך לשדה
     input.value = symbol;
-
-    // בדיקת תבנית
-    if (!symbolPattern.test(symbol)) {
-        input.classList.add('is-invalid');
-        if (errorElement) {
-            errorElement.textContent = 'סמל מטבע חייב להכיל רק אותיות אנגליות גדולות';
+    
+    // שימוש במערכת החדשה
+    if (window.validateCurrencySymbol) {
+        const result = window.validateCurrencySymbol(symbol);
+        if (result === true) {
+            if (window.showFieldSuccess) {
+                window.showFieldSuccess(input);
+            }
+            return true;
+        } else {
+            if (window.showFieldError) {
+                window.showFieldError(input, result);
+            }
+            return false;
         }
-        return false;
-    }
-
-    // בדיקת אורך
-    if (symbol.length < 1) {
-        input.classList.add('is-invalid');
-        if (errorElement) {
-            errorElement.textContent = 'סמל מטבע הוא שדה חובה';
+    } else {
+        // Fallback לוולידציה בסיסית
+        const symbolPattern = /^[A-Z]+$/;
+        if (!symbolPattern.test(symbol)) {
+            if (window.showFieldError) {
+                window.showFieldError(input, 'סמל מטבע חייב להכיל רק אותיות אנגליות גדולות');
+            }
+            return false;
         }
-        return false;
-    }
-
-    if (symbol.length > 10) {
-        input.classList.add('is-invalid');
-        if (errorElement) {
-            errorElement.textContent = 'סמל מטבע לא יכול להיות יותר מ-10 תווים';
+        if (symbol.length > 10) {
+            if (window.showFieldError) {
+                window.showFieldError(input, 'סמל מטבע לא יכול להיות יותר מ-10 תווים');
+            }
+            return false;
         }
-        return false;
+        if (window.showFieldSuccess) {
+            window.showFieldSuccess(input);
+        }
+        return true;
     }
-
-    // אם הכל תקין
-    input.classList.remove('is-invalid');
-    input.classList.add('is-valid');
-    return true;
 }
 
 // פונקציה לוולידציה של שם מטבע
@@ -626,12 +630,7 @@ function showAddCurrencyModal() {
                                        required 
                                        maxlength="10" 
                                        pattern="^[A-Z]+$"
-                                       placeholder="USD"
-                                       oninput="validateCurrencySymbol(this)"
-                                       onblur="validateCurrencySymbol(this)">
-                                <div class="invalid-feedback" id="currencySymbolError">
-                                    סמל מטבע חייב להכיל רק אותיות אנגליות גדולות
-                                </div>
+                                       placeholder="USD">
                                 <div class="form-text">רק אותיות אנגליות גדולות (למשל: USD, EUR, ILS)</div>
                             </div>
                             <div class="mb-3">
@@ -643,9 +642,6 @@ function showAddCurrencyModal() {
                                        required 
                                        maxlength="100" 
                                        placeholder="US Dollar">
-                                <div class="invalid-feedback">
-                                    שם מטבע הוא שדה חובה
-                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="currencyUsdRate" class="form-label">שער דולר</label>
@@ -681,6 +677,13 @@ function showAddCurrencyModal() {
 
     // הצגת המודל
     const modal = new bootstrap.Modal(document.getElementById('addCurrencyModal'));
+    
+    // ניקוי וולידציות לפני הצגת המודל
+    modal._element.addEventListener('shown.bs.modal', function() {
+        clearModalValidations('addCurrencyForm');
+        setupModalValidations('addCurrencyForm');
+    });
+    
     modal.show();
 }
 
@@ -725,12 +728,7 @@ function showEditCurrencyModalWithData(currency) {
                                        required 
                                        maxlength="10" 
                                        pattern="^[A-Z]+$"
-                                       value="${currency.symbol}"
-                                       oninput="validateCurrencySymbol(this)"
-                                       onblur="validateCurrencySymbol(this)">
-                                <div class="invalid-feedback" id="editCurrencySymbolError">
-                                    סמל מטבע חייב להכיל רק אותיות אנגליות גדולות
-                                </div>
+                                       value="${currency.symbol}">
                                 <div class="form-text">רק אותיות אנגליות גדולות (למשל: USD, EUR, ILS)</div>
                             </div>
                             <div class="mb-3">
@@ -742,9 +740,6 @@ function showEditCurrencyModalWithData(currency) {
                                        required 
                                        maxlength="100" 
                                        value="${currency.name}">
-                                <div class="invalid-feedback">
-                                    שם מטבע הוא שדה חובה
-                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="editCurrencyUsdRate" class="form-label">שער דולר</label>
@@ -779,6 +774,13 @@ function showEditCurrencyModalWithData(currency) {
 
     // הצגת המודל
     const modal = new bootstrap.Modal(document.getElementById('editCurrencyModal'));
+    
+    // ניקוי וולידציות לפני הצגת המודל
+    modal._element.addEventListener('shown.bs.modal', function() {
+        clearModalValidations('editCurrencyForm');
+        setupModalValidations('editCurrencyForm');
+    });
+    
     modal.show();
 }
 
@@ -1276,7 +1278,7 @@ window.viewCurrency = function(id) {
   if (typeof window.showEditCurrencyModal === 'function') {
     window.showEditCurrencyModal(id);
   } else {
-    console.log('צפייה במטבע:', id);
+
   }
 };
 
@@ -1284,7 +1286,7 @@ window.viewNoteRelationType = function(id) {
   if (typeof window.showEditNoteRelationTypeModal === 'function') {
     window.showEditNoteRelationTypeModal(id);
   } else {
-    console.log('צפייה בסוג קשר:', id);
+
   }
 };
 
@@ -1304,4 +1306,146 @@ window.showDeleteNoteRelationTypeModal = showDeleteNoteRelationTypeModal;
 window.updateCurrenciesTable = updateCurrenciesTable;
 window.updateNoteRelationTypesTable = updateNoteRelationTypesTable;
 
+// ייצוא פונקציות וולידציה
+window.initializeRealTimeValidation = initializeRealTimeValidation;
+window.clearModalValidations = clearModalValidations;
+window.setupModalValidations = setupModalValidations;
+
 // window.showNotification מיוצאת מקובץ ui-utils.js
+
+// ===== פונקציות וולידציה בזמן אמת =====
+
+// פונקציה לניקוי וולידציות במודל
+function clearModalValidations(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    
+    // ניקוי כל השדות
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        if (window.clearFieldValidation) {
+            window.clearFieldValidation(input);
+        } else {
+            // Fallback לניקוי בסיסי
+            input.classList.remove('is-valid', 'is-invalid');
+            const parent = input.parentElement;
+            if (parent) {
+                const icon = parent.querySelector('.validation-icon');
+                if (icon) icon.remove();
+            }
+        }
+    });
+}
+
+// פונקציה להגדרת וולידציות במודל
+function setupModalValidations(formId) {
+    const form = document.getElementById(formId);
+    if (!form || !window.setupFieldValidation) return;
+    
+    // הגדרת וולידציה לכל השדות הרלוונטיים
+    const currencySymbol = form.querySelector('#currencySymbol, #editCurrencySymbol');
+    const currencyName = form.querySelector('#currencyName, #editCurrencyName');
+    const currencyUsdRate = form.querySelector('#currencyUsdRate, #editCurrencyUsdRate');
+    
+    if (currencySymbol) {
+        window.setupFieldValidation(currencySymbol.id, {
+            required: true,
+            pattern: /^[A-Z]+$/,
+            minLength: 1,
+            maxLength: 10
+        }, 'text');
+    }
+    
+    if (currencyName) {
+        window.setupFieldValidation(currencyName.id, {
+            required: true,
+            maxLength: 100
+        }, 'text');
+    }
+    
+    if (currencyUsdRate) {
+        window.setupFieldValidation(currencyUsdRate.id, {
+            type: 'number',
+            min: 0
+        }, 'number');
+    }
+}
+
+// פונקציה לאתחול וולידציה בזמן אמת
+function initializeRealTimeValidation() {
+    console.log('🔄 Setting up real-time validation...');
+    
+    // הגדרת וולידציה לשדות מטבע
+    if (window.setupFieldValidation) {
+        // שדות מודל הוספת מטבע
+        window.setupFieldValidation('currencySymbol', {
+            required: true,
+            pattern: /^[A-Z]+$/,
+            minLength: 1,
+            maxLength: 10
+        }, 'text');
+        
+        window.setupFieldValidation('currencyName', {
+            required: true,
+            maxLength: 100
+        }, 'text');
+        
+        window.setupFieldValidation('currencyUsdRate', {
+            type: 'number',
+            min: 0
+        }, 'number');
+        
+        // שדות מודל עריכת מטבע
+        window.setupFieldValidation('editCurrencySymbol', {
+            required: true,
+            pattern: /^[A-Z]+$/,
+            minLength: 1,
+            maxLength: 10
+        }, 'text');
+        
+        window.setupFieldValidation('editCurrencyName', {
+            required: true,
+            maxLength: 100
+        }, 'text');
+        
+        window.setupFieldValidation('editCurrencyUsdRate', {
+            type: 'number',
+            min: 0
+        }, 'number');
+        
+        // שדות סוגי קישור
+        window.setupFieldValidation('noteRelationType', {
+            required: true,
+            maxLength: 20
+        }, 'text');
+        
+        window.setupFieldValidation('editNoteRelationType', {
+            required: true,
+            maxLength: 20
+        }, 'text');
+        
+        console.log('✅ Real-time validation setup completed');
+    } else {
+        console.warn('⚠️ Validation system not available');
+    }
+}
+
+// ===== אתחול העמוד =====
+
+// אתחול אוטומטי כשהדף נטען
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔄 Initializing db_extradata page...');
+    
+    // טעינת נתונים ראשונית
+    loadCurrenciesData();
+    loadNoteRelationTypesData();
+    
+    // אתחול וולידציה בזמן אמת (אם המערכת זמינה)
+    if (typeof window.setupFieldValidation === 'function') {
+        initializeRealTimeValidation();
+    } else {
+        console.log('⚠️ Validation system not available, skipping real-time validation setup');
+    }
+    
+    console.log('✅ דף טבלאות עזר אותחל בהצלחה');
+});

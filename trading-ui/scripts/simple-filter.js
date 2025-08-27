@@ -35,7 +35,7 @@ class SimpleFilter {
      * Initialize filters with default preferences
      */
     async initializeDefaultFilters() {
-        console.log('🔄 Initializing filters with default preferences...');
+      
 
         try {
             // קריאת ברירות המחדל מהשרת

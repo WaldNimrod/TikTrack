@@ -45,14 +45,14 @@ def get_currencies():
         return jsonify({
             "status": "success",
             "data": result,
-            "message": "Currencies retrieved successfully",
+            "message": "רשימת המטבעות נטענה בהצלחה",
             "version": "v1"
         })
     except Exception as e:
         logger.error(f"Error getting currencies: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve currencies"},
+            "error": {"message": "שגיאה בטעינת רשימת המטבעות"},
             "version": "v1"
         }), 500
 
@@ -80,7 +80,7 @@ def get_currency(currency_id: int):
             return jsonify({
                 "status": "success",
                 "data": currency_dict,
-                "message": "Currency retrieved successfully",
+                "message": "פרטי המטבע נטענו בהצלחה",
                 "version": "v1"
             })
         
@@ -93,7 +93,7 @@ def get_currency(currency_id: int):
         logger.error(f"Error getting currency {currency_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve currency"},
+            "error": {"message": "שגיאה בטעינת פרטי המטבע"},
             "version": "v1"
         }), 500
 
@@ -125,7 +125,7 @@ def create_currency():
         if not re.match(r'^[A-Z]+$', symbol):
             return jsonify({
                 "status": "error",
-                "error": {"message": "סמל מטבע חייב להכיל רק אותיות אנגליות גדולות"},
+                "error": {"message": "סמל מטבע חייב להכיל רק אותיות אנגליות גדולות (למשל: USD, EUR, ILS). אסור להשתמש במספרים או אותיות קטנות."},
                 "version": "v1"
             }), 400
         
@@ -133,7 +133,7 @@ def create_currency():
         if len(symbol) > 10:
             return jsonify({
                 "status": "error",
-                "error": {"message": "סמל מטבע לא יכול להיות יותר מ-10 תווים"},
+                "error": {"message": "סמל מטבע לא יכול להיות יותר מ-10 תווים. נסה סמל קצר יותר."},
                 "version": "v1"
             }), 400
         
@@ -143,13 +143,13 @@ def create_currency():
             if usd_rate < 0:
                 return jsonify({
                     "status": "error",
-                    "error": {"message": "שער דולר חייב להיות מספר חיובי"},
+                    "error": {"message": "שער דולר חייב להיות מספר חיובי. נסה מספר גדול מ-0."},
                     "version": "v1"
                 }), 400
         except (ValueError, TypeError):
             return jsonify({
                 "status": "error",
-                "error": {"message": "שער דולר חייב להיות מספר תקין"},
+                "error": {"message": "שער דולר חייב להיות מספר תקין. נסה מספר עם נקודה עשרונית (למשל: 1.5)."},
                 "version": "v1"
             }), 400
         
@@ -231,7 +231,7 @@ def update_currency(currency_id: int):
         if not re.match(r'^[A-Z]+$', symbol):
             return jsonify({
                 "status": "error",
-                "error": {"message": "סמל מטבע חייב להכיל רק אותיות אנגליות גדולות"},
+                "error": {"message": "סמל מטבע חייב להכיל רק אותיות אנגליות גדולות (למשל: USD, EUR, ILS). אסור להשתמש במספרים או אותיות קטנות."},
                 "version": "v1"
             }), 400
         
@@ -239,7 +239,7 @@ def update_currency(currency_id: int):
         if len(symbol) > 10:
             return jsonify({
                 "status": "error",
-                "error": {"message": "סמל מטבע לא יכול להיות יותר מ-10 תווים"},
+                "error": {"message": "סמל מטבע לא יכול להיות יותר מ-10 תווים. נסה סמל קצר יותר."},
                 "version": "v1"
             }), 400
         
@@ -250,13 +250,13 @@ def update_currency(currency_id: int):
                 if usd_rate < 0:
                     return jsonify({
                         "status": "error",
-                        "error": {"message": "שער דולר חייב להיות מספר חיובי"},
+                        "error": {"message": "שער דולר חייב להיות מספר חיובי. נסה מספר גדול מ-0."},
                         "version": "v1"
                     }), 400
             except (ValueError, TypeError):
                 return jsonify({
                     "status": "error",
-                    "error": {"message": "שער דולר חייב להיות מספר תקין"},
+                    "error": {"message": "שער דולר חייב להיות מספר תקין. נסה מספר עם נקודה עשרונית (למשל: 1.5)."},
                     "version": "v1"
                 }), 400
         
@@ -340,14 +340,14 @@ def get_currencies_dropdown():
         return jsonify({
             "status": "success",
             "data": result,
-            "message": "Currencies for dropdown retrieved successfully",
+            "message": "רשימת המטבעות לתפריט נפתח נטענה בהצלחה",
             "version": "v1"
         })
     except Exception as e:
         logger.error(f"Error getting currencies for dropdown: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve currencies for dropdown"},
+            "error": {"message": "שגיאה בטעינת רשימת המטבעות לתפריט נפתח"},
             "version": "v1"
         }), 500
 
@@ -390,6 +390,6 @@ def delete_currency(currency_id: int):
         logger.error(f"Error deleting currency {currency_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to delete currency"},
+            "error": {"message": "שגיאה במחיקת המטבע"},
             "version": "v1"
         }), 500

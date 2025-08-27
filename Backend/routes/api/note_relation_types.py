@@ -34,22 +34,22 @@ def get_note_relation_types():
         result = []
         for note_type in note_relation_types:
             result.append({
-                'id': note_type[1],  # id is at index 1
-                'note_relation_type': note_type[0],  # note_relation_type is at index 0
+                'id': note_type[0],  # id is at index 0
+                'note_relation_type': note_type[1],  # note_relation_type is at index 1
                 'created_at': note_type[2]  # created_at is at index 2
             })
         
         return jsonify({
             "status": "success",
             "data": result,
-            "message": "Note relation types retrieved successfully",
+            "message": "רשימת סוגי הקישור נטענה בהצלחה",
             "version": "v1"
         })
     except Exception as e:
         logger.error(f"Error getting note relation types: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve note relation types"},
+            "error": {"message": "שגיאה בטעינת רשימת סוגי הקישור"},
             "version": "v1"
         }), 500
 
@@ -67,15 +67,15 @@ def get_note_relation_type(type_id: int):
         
         if note_type:
             note_type_dict = {
-                'id': note_type[1],  # id is at index 1
-                'note_relation_type': note_type[0],  # note_relation_type is at index 0
+                'id': note_type[0],  # id is at index 0
+                'note_relation_type': note_type[1],  # note_relation_type is at index 1
                 'created_at': note_type[2]  # created_at is at index 2
             }
             
             return jsonify({
                 "status": "success",
                 "data": note_type_dict,
-                "message": "Note relation type retrieved successfully",
+                "message": "פרטי סוג הקישור נטענו בהצלחה",
                 "version": "v1"
             })
         
@@ -88,7 +88,7 @@ def get_note_relation_type(type_id: int):
         logger.error(f"Error getting note relation type {type_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve note relation type"},
+            "error": {"message": "שגיאה בטעינת פרטי סוג הקישור"},
             "version": "v1"
         }), 500
 
@@ -102,7 +102,7 @@ def create_note_relation_type():
         if not note_relation_type:
             return jsonify({
                 "status": "error",
-                "error": {"message": "note_relation_type is required"},
+                "error": {"message": "סוג קישור הוא שדה חובה. יש להזין שם לסוג הקישור."},
                 "version": "v1"
             }), 400
         
@@ -125,7 +125,7 @@ def create_note_relation_type():
                 'note_relation_type': note_relation_type,
                 'created_at': None  # Will be set by database default
             },
-            "message": "Note relation type created successfully",
+            "message": "סוג קישור נוסף בהצלחה",
             "version": "v1"
         }), 201
     except Exception as e:
@@ -146,7 +146,7 @@ def update_note_relation_type(type_id: int):
         if not note_relation_type:
             return jsonify({
                 "status": "error",
-                "error": {"message": "note_relation_type is required"},
+                "error": {"message": "סוג קישור הוא שדה חובה. יש להזין שם לסוג הקישור."},
                 "version": "v1"
             }), 400
         
@@ -159,7 +159,7 @@ def update_note_relation_type(type_id: int):
             conn.close()
             return jsonify({
                 "status": "error",
-                "error": {"message": "Note relation type not found"},
+                "error": {"message": "סוג קישור לא נמצא במערכת"},
                 "version": "v1"
             }), 404
         
@@ -178,14 +178,14 @@ def update_note_relation_type(type_id: int):
                 'id': type_id,
                 'note_relation_type': note_relation_type
             },
-            "message": "Note relation type updated successfully",
+            "message": "סוג קישור עודכן בהצלחה",
             "version": "v1"
         })
     except Exception as e:
         logger.error(f"Error updating note relation type {type_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to update note relation type"},
+            "error": {"message": "שגיאה בעדכון סוג קישור"},
             "version": "v1"
         }), 500
 
@@ -213,13 +213,13 @@ def delete_note_relation_type(type_id: int):
         
         return jsonify({
             "status": "success",
-            "message": "Note relation type deleted successfully",
+            "message": "סוג קישור נמחק בהצלחה",
             "version": "v1"
         })
     except Exception as e:
         logger.error(f"Error deleting note relation type {type_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to delete note relation type"},
+            "error": {"message": "שגיאה במחיקת סוג קישור"},
             "version": "v1"
         }), 500

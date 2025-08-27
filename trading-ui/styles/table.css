@@ -96,6 +96,34 @@
   border: 1px solid #c8e6c9;
 }
 
+/* רוחב קבוע לעמודת הפעולות - כלל לכל האתר */
+table th:last-child,
+table td:last-child {
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+    white-space: nowrap !important;
+}
+
+/* רוחב קבוע לעמודת הפעולות - כפתורים בשורה אחת */
+.actions-cell {
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.actions-cell table {
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+.actions-cell table td {
+    padding: 0.1rem !important;
+    width: auto !important;
+}
+
 /* מרווח בתחתית הדף */
 .bottom-spacer {
   height: 3rem;

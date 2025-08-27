@@ -17,20 +17,16 @@
 
 // פונקציות בסיסיות
 function openResearchDetails(id) {
-  console.log('פתיחת פרטי תחקיר:', id);
 }
 
 function editResearch(id) {
-  console.log('עריכת תחקיר:', id);
 }
 
 function deleteResearch(id) {
-  console.log('מחיקת תחקיר:', id);
 }
 
 // פונקציות לטריידים
 function loadTrades() {
-  console.log('טעינת טריידים');
   if (typeof window.loadTradesData === 'function') {
     window.loadTradesData();
   } else {
@@ -39,7 +35,6 @@ function loadTrades() {
 }
 
 function showAddTradeModal() {
-  console.log('הצגת מודל הוספת טרייד');
   if (typeof window.showAddTradeModal === 'function') {
     window.showAddTradeModal();
   } else {
@@ -48,7 +43,6 @@ function showAddTradeModal() {
 }
 
 function filterTradesData(statuses, types, accounts, dateRange, searchTerm) {
-  console.log('פילטור טריידים:', { statuses, types, accounts, dateRange, searchTerm });
   if (typeof window.filterTradesData === 'function') {
     window.filterTradesData(statuses, types, accounts, dateRange, searchTerm);
   } else {

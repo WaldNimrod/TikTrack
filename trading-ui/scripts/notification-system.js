@@ -36,7 +36,6 @@
  */
 function createAlert(alertData) {
     // Implementation for creating business alerts
-    console.log('🚨 Creating alert:', alertData);
     // TODO: Implement alert creation logic
 }
 
@@ -49,7 +48,6 @@ function createAlert(alertData) {
  */
 function deleteAlert(alertId) {
     // Implementation for deleting business alerts
-    console.log('🚨 Deleting alert:', alertId);
     // TODO: Implement alert deletion logic
 }
 
@@ -63,7 +61,6 @@ function deleteAlert(alertId) {
  */
 function updateAlert(alertId, alertData) {
     // Implementation for updating business alerts
-    console.log('🚨 Updating alert:', alertId, alertData);
     // TODO: Implement alert update logic
 }
 
@@ -76,7 +73,6 @@ function updateAlert(alertId, alertData) {
  */
 function markAlertAsTriggered(alertId) {
     // Implementation for marking alerts as triggered
-    console.log('🚨 Marking alert as triggered:', alertId);
     // TODO: Implement alert trigger logic
 }
 
@@ -89,7 +85,6 @@ function markAlertAsTriggered(alertId) {
  */
 function markAlertAsRead(alertId) {
     // Implementation for marking alerts as read
-    console.log('🚨 Marking alert as read:', alertId);
     // TODO: Implement alert read logic
 }
 
@@ -184,7 +179,6 @@ function createNotificationContainer() {
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  */
 function showNotification(title, message, type = 'info', duration = 4000) {
-    console.log(`🔔 Showing ${type} notification:`, { title, message, duration });
 
     // Create notification container
     const container = createNotificationContainer();
@@ -342,7 +336,7 @@ window.markAlertAsTriggered = markAlertAsTriggered;
 window.markAlertAsRead = markAlertAsRead;
 
 // Export NOTIFICATION SYSTEM functions to global scope
-window.showNotification = showNotificationLegacy;
+window.showNotification = showNotification;
 window.showSuccessNotification = showSuccessNotification;
 window.showErrorNotification = showErrorNotification;
 window.showWarningNotification = showWarningNotification;
@@ -376,8 +370,4 @@ window.notificationSystem = {
     loadLinkedItemsData
 };
 
-console.log('✅ Notification System loaded successfully');
-console.log('📋 Available systems:');
-console.log('   🚨 ALERTS SYSTEM - Business alerts for market conditions');
-console.log('   🔔 NOTIFICATION SYSTEM - System messages for user feedback');
-console.log('   🔗 LINKED ITEMS SYSTEM - Linked items display and management');
+

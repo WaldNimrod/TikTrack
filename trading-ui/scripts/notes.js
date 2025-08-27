@@ -23,30 +23,25 @@
 
 // פונקציות בסיסיות
 function openNoteDetails(id) {
-  console.log('🔄 openNoteDetails נקראה');
   showAddNoteModal();
 }
 
 function editNote(id) {
-  console.log('🔄 editNote נקראה עבור ID:', id);
   showEditNoteModal(id);
 }
 
 function deleteNote(id) {
-  console.log('🔄 deleteNote נקראה עבור ID:', id);
   showDeleteNoteModal(id);
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים
 function toggleTopSection() {
-  console.log('🔄 toggleTopSection נקראה');
   const topSection = document.querySelector('.top-section');
 
   if (!topSection) {
     console.error('❌ לא נמצא top-section');
     return;
   }
-  console.log('✅ top-section נמצא:', topSection);
 
   const sectionBody = topSection.querySelector('.section-body');
   const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');

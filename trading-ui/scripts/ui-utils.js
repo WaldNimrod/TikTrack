@@ -207,8 +207,9 @@ function showErrorNotification(title, message) {
     if (window.notificationSystem && window.notificationSystem.showErrorNotification) {
         window.notificationSystem.showErrorNotification(title, message);
     } else {
-        // Fallback to modal notification
-        showModalNotification('error', title, message);
+        // Fallback to simple notification
+        console.log(`❌ ${title}: ${message}`);
+        alert(`${title}: ${message}`);
     }
 }
 
@@ -221,8 +222,9 @@ function showSuccessNotification(title, message) {
     if (window.notificationSystem && window.notificationSystem.showSuccessNotification) {
         window.notificationSystem.showSuccessNotification(title, message);
     } else {
-        // Fallback to modal notification
-        showModalNotification('success', title, message);
+        // Fallback to simple notification
+        console.log(`✅ ${title}: ${message}`);
+        alert(`${title}: ${message}`);
     }
 }
 
@@ -235,8 +237,9 @@ function showInfoNotification(title, message) {
     if (window.notificationSystem && window.notificationSystem.showInfoNotification) {
         window.notificationSystem.showInfoNotification(title, message);
     } else {
-        // Fallback to modal notification
-        showModalNotification('info', title, message);
+        // Fallback to simple notification
+        console.log(`ℹ️ ${title}: ${message}`);
+        alert(`${title}: ${message}`);
     }
 }
 
@@ -249,8 +252,9 @@ function showWarningNotification(title, message) {
     if (window.notificationSystem && window.notificationSystem.showWarningNotification) {
         window.notificationSystem.showWarningNotification(title, message);
     } else {
-        // Fallback to modal notification
-        showModalNotification('warning', title, message);
+        // Fallback to simple notification
+        console.log(`⚠️ ${title}: ${message}`);
+        alert(`${title}: ${message}`);
     }
 }
 
@@ -290,8 +294,9 @@ function colorAmount(amount, displayText = null) {
  */
 function showNotification(message, type = 'info') {
     // שימוש במערכת ההתראות הגלובלית
-    if (typeof window.showNotification === 'function') {
-        window.showNotification('התראה', message, type);
+    if (typeof window.notificationSystem !== 'undefined' && window.notificationSystem.showNotification) {
+        // שימוש במערכת ההתראות הגלובלית
+        window.notificationSystem.showNotification('התראה', message, type);
     } else {
         // Fallback להצגת התראה פשוטה
         console.log(`[${type.toUpperCase()}] ${message}`);

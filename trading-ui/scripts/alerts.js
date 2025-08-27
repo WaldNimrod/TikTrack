@@ -45,9 +45,7 @@ window.tickersData = window.tickersData || [];
 let tickersData = window.tickersData;
 
 // בדיקה שהפונקציות הגלובליות זמינות
-console.log('🔧 Checking global functions in alerts.js...');
-console.log('🔧 translateConditionFields available:', typeof window.translateConditionFields);
-console.log('🔧 translateLegacyCondition available:', typeof window.translateLegacyCondition);
+
 
 
 

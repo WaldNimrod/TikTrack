@@ -233,16 +233,6 @@ function restoreTickersSectionState() {
 }
 
 // פונקציות נוספות
-function openTickerDetails(id) {
-    // פתיחת פרטי תיקר
-    showAddTickerModal();
-}
-
-function editTicker(id) {
-    // עריכת תיקר
-    showEditTickerModal(id);
-}
-
 function deleteTicker(id) {
     // מחיקת תיקר
     showDeleteTickerModal(id);
@@ -323,9 +313,6 @@ function toggleTickersSection() {
 }
 
 // פונקציות נוספות
-function resetAllFiltersAndReloadData() {
-    console.log('איפוס פילטרים');
-}
 
 // ========================================
 // פונקציות מודלים
@@ -995,96 +982,14 @@ function updateTickersTable(tickers) {
 
 
 
-// פונקציית פילטור מקומי לטיקרים
-function filterTickersLocally(tickers, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
-    console.log('🔍 filterTickersLocally called with:', { selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm });
 
-    return tickers.filter(ticker => {
-        // פילטר חיפוש
-        if (searchTerm && searchTerm.trim() !== '') {
-            const searchLower = searchTerm.toLowerCase();
-            const symbol = ticker.symbol || '';
-            const name = ticker.name || '';
-            const remarks = ticker.remarks || '';
-
-            if (!symbol.toLowerCase().includes(searchLower) &&
-                !name.toLowerCase().includes(searchLower) &&
-                !remarks.toLowerCase().includes(searchLower)) {
-                return false;
-            }
-        }
-
-        // פילטר סוג (type)
-        if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('הכול')) {
-            const tickerType = ticker.type === 'stock' ? 'מניה' :
-                ticker.type === 'etf' ? 'ETF' :
-                    ticker.type === 'bond' ? 'אג"ח' :
-                        ticker.type === 'crypto' ? 'קריפטו' : ticker.type;
-
-            if (!selectedTypes.includes(tickerType)) {
-                return false;
-            }
-        }
-
-        // פילטר סטטוס
-        if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('הכול')) {
-            const tickerStatus = ticker.active_trades ? 'פעיל' : 'לא פעיל';
-
-            if (!selectedStatuses.includes(tickerStatus)) {
-                return false;
-            }
-        }
-
-        // פילטר תאריך
-        if (dateRange && dateRange !== 'כל זמן' && dateRange !== 'הכול') {
-            const tickerDate = new Date(ticker.created_at);
-            const now = new Date();
-
-            let startDate, endDate;
-
-            switch (dateRange) {
-                case 'היום':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-                    break;
-                case 'אתמול':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    break;
-                case 'השבוע':
-                    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
-                    startDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-                    break;
-                case '30 יום':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-                    break;
-                default:
-                    return true; // אם לא מוכר, לא מסנן
-            }
-
-            if (tickerDate < startDate || tickerDate >= endDate) {
-                return false;
-            }
-        }
-
-        return true;
-    });
-}
-
-// הגדרת הפונקציה כגלובלית
-window.filterTickersLocally = filterTickersLocally;
-window.updateActiveTradesField = updateActiveTradesField;
 
 // הגדרת הפונקציות כגלובליות
-window.openTickerDetails = openTickerDetails;
-window.editTicker = editTicker;
+window.updateActiveTradesField = updateActiveTradesField;
 window.deleteTicker = deleteTicker;
 window.toggleTopSection = toggleTopSection;
 window.toggleTickersSection = toggleTickersSection;
 window.restoreTickersSectionState = restoreTickersSectionState;
-window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
 
 // פונקציות מודלים
 window.showAddTickerModal = showAddTickerModal;

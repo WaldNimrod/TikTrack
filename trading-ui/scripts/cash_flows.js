@@ -43,67 +43,20 @@ function deleteCashFlow(id) {
     showDeleteCashFlowModal(id);
 }
 
-// פונקציות לפתיחה/סגירה של סקשנים
+// פונקציות לפתיחה/סגירה של סקשנים - משתמשות בפונקציות הגלובליות
 function toggleTopSection() {
-    const topSection = document.querySelector('.top-section');
-
-    if (!topSection) {
-        console.error('❌ לא נמצא top-section');
-        return;
-    }
-
-    const sectionBody = topSection.querySelector('.section-body');
-    const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody) {
-        const isCollapsed = sectionBody.style.display === 'none';
-
-        if (isCollapsed) {
-            sectionBody.style.display = 'block';
-        } else {
-            sectionBody.style.display = 'none';
-        }
-
-        // עדכון האייקון
-        if (icon) {
-            icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('cashFlowsTopSectionHidden', !isCollapsed);
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection('cashFlows');
+    } else {
+        console.error('❌ toggleTopSection function not found in main.js');
     }
 }
 
 function toggleCashFlowsSection() {
-    const contentSections = document.querySelectorAll('.content-section');
-    const cashFlowsSection = contentSections[0]; // הסקשן הראשון - תזרימי מזומנים
-
-    if (!cashFlowsSection) {
-        console.error('❌ לא נמצא סקשן תזרימי מזומנים');
-        return;
-    }
-
-    const sectionBody = cashFlowsSection.querySelector('.section-body');
-    const toggleBtn = cashFlowsSection.querySelector('button[onclick="toggleCashFlowsSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody) {
-        const isCollapsed = sectionBody.style.display === 'none';
-
-        if (isCollapsed) {
-            sectionBody.style.display = 'block';
-        } else {
-            sectionBody.style.display = 'none';
-        }
-
-        // עדכון האייקון
-        if (icon) {
-            icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('cashFlowsSectionCollapsed', !isCollapsed);
+    if (typeof window.toggleMainSection === 'function') {
+        window.toggleMainSection('cashFlows');
+    } else {
+        console.error('❌ toggleMainSection function not found in main.js');
     }
 }
 

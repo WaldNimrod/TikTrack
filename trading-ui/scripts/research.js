@@ -376,40 +376,20 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
   }
 };
 
-// פונקצית סידור מותאמת לטבלת טריידים בדף התחקיר
-function sortTable(columnIndex) {
+// פונקצית סידור מותאמת לטבלת טריידים בדף התחקיר - משתמשת בפונקציה הגלובלית
+function sortResearchTable(columnIndex) {
   console.log('🔄 === SORT RESEARCH TRADES TABLE ===');
   console.log('🔄 Column clicked:', columnIndex);
-  console.log('🔄 window.sortTableData available:', typeof window.sortTableData);
-  console.log('🔄 window.tradesData available:', typeof window.tradesData);
-  console.log('🔄 window.tradesData length:', window.tradesData ? window.tradesData.length : 'undefined');
-  console.log('🔄 window.updateTradesTable available:', typeof window.updateTradesTable);
 
-  // בדיקת נתונים לדוגמה
-  if (window.tradesData && window.tradesData.length > 0) {
-    console.log('🔄 Sample trade data:', window.tradesData[0]);
-    console.log('🔄 Sample trade investment_type:', window.tradesData[0].investment_type);
-    console.log('🔄 Sample trade trade_plan_created_at:', window.tradesData[0].trade_plan_created_at);
-  }
-
-  if (typeof window.sortTableData === 'function') {
-    console.log('🔄 Calling window.sortTableData with:', {
-      columnIndex,
-      data: window.tradesData || [],
-      tableType: 'trades',
-      updateFunction: window.updateTradesTable
-    });
-
-    window.sortTableData(
+  if (typeof window.sortTable === 'function') {
+    window.sortTable(
       columnIndex,
       window.tradesData || [],
       'trades',
       window.updateTradesTable
     );
-
-    console.log('✅ sortTableData called successfully');
   } else {
-    console.error('❌ sortTableData function not found in tables.js');
+    console.error('❌ sortTable function not found in tables.js');
   }
 }
 
@@ -430,7 +410,7 @@ window.initializeResearchPage = initializeResearchPage;
 window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
 window.toggleSummarySection = toggleSummarySection;
 window.refreshSummaryData = refreshSummaryData;
-window.sortTable = sortTable;
+window.sortTable = sortResearchTable;
 
 // בדיקת זמינות פונקציות מיד אחרי הגדרתן
 console.log('🔍 === RESEARCH.JS FUNCTIONS CHECK ===');

@@ -1,12 +1,12 @@
 {
   "title": "דוח פונקציות לא בשימוש - TikTrack",
-  "date": "2025-08-27 13:58:33",
+  "date": "2025-08-27 17:03:19",
   "summary": {
-    "total_files": 60,
-    "total_functions": 1219,
-    "unused_functions": 6,
-    "used_functions": 1213,
-    "analysis_date": "2025-08-27T13:58:33.225395"
+    "total_files": 56,
+    "total_functions": 1165,
+    "unused_functions": 4,
+    "used_functions": 1161,
+    "analysis_date": "2025-08-27T17:03:19.198196"
   },
   "unused_functions_by_file": {
     "header-system.js": [
@@ -30,18 +30,6 @@
         "line": 1798,
         "file_path": "trading-ui/scripts/header-system.js"
       }
-    ],
-    "trade_plans.js": [
-      {
-        "function_name": "hasActiveFilters",
-        "line": 673,
-        "file_path": "trading-ui/scripts/trade_plans.js"
-      },
-      {
-        "function_name": "hasActiveFilters",
-        "line": 673,
-        "file_path": "trading-ui/scripts/trade_plans.js"
-      }
     ]
   },
   "recommendations": [
@@ -53,15 +41,6 @@
         "handleMouseLeave",
         "handleMouseEnter",
         "handleMouseLeave"
-      ],
-      "priority": "medium"
-    },
-    {
-      "file": "trade_plans.js",
-      "unused_count": 2,
-      "functions": [
-        "hasActiveFilters",
-        "hasActiveFilters"
       ],
       "priority": "medium"
     }

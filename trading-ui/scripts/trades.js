@@ -1875,20 +1875,20 @@ window.updateTradesSortIcons = updateTradesSortIcons;      // עדכון איי�
 window.loadTradesSortState = loadTradesSortState;          // טעינת מצב סידור
 window.getTradesStatusForSort = getTradesStatusForSort;    // מיון סטטוסים
 
-// פונקצית סידור מותאמת לטבלת טריידים
-function sortTable(columnIndex) {
+// פונקצית סידור מותאמת לטבלת טריידים - משתמשת בפונקציה הגלובלית
+function sortTradesTable(columnIndex) {
   console.log('🔄 === SORT TRADES TABLE ===');
   console.log('🔄 Column clicked:', columnIndex);
 
-  if (typeof window.sortTableData === 'function') {
-    window.sortTableData(
+  if (typeof window.sortTable === 'function') {
+    window.sortTable(
       columnIndex,
       window.tradesData || [],
       'trades',
       window.updateTradesTable
     );
   } else {
-    console.error('❌ sortTableData function not found in tables.js');
+    console.error('❌ sortTable function not found in tables.js');
   }
 }
 
@@ -1924,7 +1924,7 @@ function updateTradesSortIcons(activeColumnIndex) {
   });
 }
 
-window.sortTable = sortTable;
+window.sortTable = sortTradesTable;
 
 // ייצוא פונקציות גלובליות
 window.loadTradesData = loadTradesData;

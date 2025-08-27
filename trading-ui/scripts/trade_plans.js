@@ -58,6 +58,51 @@
 // Global variables
 let trade_plansData = [];
 
+/**
+ * בדיקת פילטרים פעילים
+ * פונקציה מרכזית לבדיקת האם יש פילטרים פעילים
+ */
+function checkActiveFilters() {
+    // Search check
+    if (window.searchTermForFilter && window.searchTermForFilter.trim() !== '') {
+        return true;
+    }
+
+    // Status check (if not all statuses are selected)
+    if (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) {
+        const allStatuses = ['open', 'closed', 'cancelled'];
+        const selectedStatuses = window.selectedStatusesForFilter.map(s => s.toLowerCase());
+        if (!allStatuses.every(status => selectedStatuses.includes(status))) {
+            return true;
+        }
+    }
+
+    // Type check (if not all types are selected)
+    if (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) {
+        const allTypes = ['swing', 'investment', 'passive'];
+        const selectedTypes = window.selectedTypesForFilter.map(t => t.toLowerCase());
+        if (!allTypes.every(type => selectedTypes.includes(type))) {
+            return true;
+        }
+    }
+
+    // Date range check
+    if (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') {
+        return true;
+    }
+
+    // Additional date filters
+    if (window.selectedStartDateForFilter && window.selectedStartDateForFilter !== 'לא נבחר') {
+        return true;
+    }
+
+    if (window.selectedEndDateForFilter && window.selectedEndDateForFilter !== 'לא נבחר') {
+        return true;
+    }
+
+    return false;
+}
+
 // ===== CRUD Modal Functions =====
 
 /**
@@ -500,10 +545,7 @@ async function loadTradePlansData() {
         let filteredDesigns = [...trade_plansData];
 
         // Checking if there are active filters
-        const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
-            (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
-            (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
-            (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
+        const hasActiveFilters = checkActiveFilters();
 
         console.log('🔄 Checking filters for planning page:', {
             hasActiveFilters,
@@ -670,37 +712,7 @@ function updateTradePlansTable(trade_plans) {
         const hasOriginalData = trade_plansData && trade_plansData.length > 0;
 
         // Checking if there are active filters
-        const hasActiveFilters = (() => {
-            // Search check
-            if (window.searchTermForFilter && window.searchTermForFilter.trim() !== '') {
-                return true;
-            }
-
-            // Status check (if not all statuses are selected)
-            if (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) {
-                const allStatuses = ['open', 'closed', 'cancelled'];
-                const selectedStatuses = window.selectedStatusesForFilter.map(s => s.toLowerCase());
-                if (!allStatuses.every(status => selectedStatuses.includes(status))) {
-                    return true;
-                }
-            }
-
-            // Type check (if not all types are selected)
-            if (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) {
-                const allTypes = ['swing', 'investment', 'passive'];
-                const selectedTypes = window.selectedTypesForFilter.map(t => t.toLowerCase());
-                if (!allTypes.every(type => selectedTypes.includes(type))) {
-                    return true;
-                }
-            }
-
-            // Date range check
-            if (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') {
-                return true;
-            }
-
-            return false;
-        })();
+        const hasActiveFilters = checkActiveFilters();
 
         if (hasOriginalData && hasActiveFilters) {
             // There is data but the filter didn't find results
@@ -1564,12 +1576,7 @@ function updateFilterDebugPanel() {
     }
 
     if (statusElement) {
-        const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
-            (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
-            (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
-            (window.selectedStartDateForFilter && window.selectedStartDateForFilter !== 'לא נבחר') ||
-            (window.selectedEndDateForFilter && window.selectedEndDateForFilter !== 'לא נבחר') ||
-            (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
+        const hasActiveFilters = checkActiveFilters();
 
         statusElement.textContent = hasActiveFilters ? 'פעיל' : 'לא פעיל';
         statusElement.style.color = hasActiveFilters ? '#28a745' : '#6c757d';

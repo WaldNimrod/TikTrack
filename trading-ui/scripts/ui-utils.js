@@ -282,52 +282,16 @@ function colorAmount(amount, displayText = null) {
 // ===== Notification Functions =====
 
 /**
- * הצגת הודעה למשתמש
- * Show notification to user
+ * הצגת הודעה למשתמש - משתמשת במערכת ההתראות הגלובלית
+ * Show notification to user - uses global notification system
  * 
  * @param {string} message - טקסט ההודעה להצגה
  * @param {string} type - סוג ההודעה: 'success' (ירוק), 'error' (אדום), 'warning' (צהוב), 'info' (כחול)
  */
 function showNotification(message, type = 'info') {
-    // בדיקה אם bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-        // יצירת מיכל התראות אם לא קיים
-        let container = document.getElementById('toastContainer');
-        if (!container) {
-            container = createToastContainer();
-        }
-
-        // יצירת הודעה חדשה
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-white bg-${getBootstrapColor(type)} border-0`;
-        toast.setAttribute('role', 'alert');
-        toast.setAttribute('aria-live', 'assertive');
-        toast.setAttribute('aria-atomic', 'true');
-
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">
-                    ${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        `;
-
-        container.appendChild(toast);
-
-        // הצגת ההודעה
-        const bsToast = new bootstrap.Toast(toast, {
-            autohide: true,
-            delay: type === 'error' ? 5000 : 3000
-        });
-        bsToast.show();
-
-        // הסרת ההודעה מהדף אחרי שהיא נעלמת
-        toast.addEventListener('hidden.bs.toast', () => {
-            if (container.contains(toast)) {
-                container.removeChild(toast);
-            }
-        });
+    // שימוש במערכת ההתראות הגלובלית
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('התראה', message, type);
     } else {
         // Fallback להצגת התראה פשוטה
         console.log(`[${type.toUpperCase()}] ${message}`);

@@ -1804,19 +1804,19 @@ async function performDeleteAlert(alertId) {
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
  * @requires updateAlertsTable - פונקציה לעדכון הטבלה
  */
-function sortTable(columnIndex) {
-  console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex} - התראות`);
+function sortAlertsTable(columnIndex) {
+  console.log(`🔄 sortAlertsTable נקראה עבור עמודה ${columnIndex} - התראות`);
 
   // שימוש בפונקציה הגלובלית החדשה
-  if (typeof window.sortTableData === 'function') {
-    window.sortTableData(
+  if (typeof window.sortTable === 'function') {
+    window.sortTable(
       columnIndex,
       window.filteredAlertsData || alertsData,
       'alerts',
       updateAlertsTable
     );
   } else {
-    console.error('❌ sortTableData function not found in tables.js');
+    console.error('❌ sortTable function not found in tables.js');
   }
 }
 
@@ -1972,7 +1972,7 @@ window.updateAlert = updateAlert;
 window.updateStatusAndTriggered = updateStatusAndTriggered;
 window.getAlertState = getAlertState;
 window.validateAlertStatusCombination = validateAlertStatusCombination;
-window.sortTable = sortTable;
+window.sortTable = sortAlertsTable;
 
 
 window.onRelationTypeChange = onRelationTypeChange;

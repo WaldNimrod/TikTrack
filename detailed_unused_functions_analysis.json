@@ -1,12 +1,12 @@
 {
   "title": "דוח מפורט - פונקציות לא בשימוש",
-  "date": "2025-08-27 14:03:45",
+  "date": "2025-08-27 17:04:04",
   "summary": {
-    "total_files": 60,
-    "total_functions": 1219,
-    "unused_functions": 6,
-    "used_functions": 1213,
-    "analysis_date": "2025-08-27T14:03:45.354808"
+    "total_files": 56,
+    "total_functions": 1165,
+    "unused_functions": 4,
+    "used_functions": 1161,
+    "analysis_date": "2025-08-27T17:04:04.793552"
   },
   "files_analysis": {},
   "recommendations": {
@@ -184,42 +184,6 @@
           }
         ],
         "file_path": "trading-ui/scripts/header-system.js"
-      },
-      {
-        "name": "hasActiveFilters",
-        "line": 673,
-        "complexity": {
-          "complexity": "unknown",
-          "lines": 0,
-          "calls_other_functions": 0
-        },
-        "importance": {
-          "score": 1,
-          "reasons": [
-            "מוזכרת בהערות"
-          ],
-          "recommendation": "review"
-        },
-        "indirect_calls": [],
-        "file_path": "trading-ui/scripts/trade_plans.js"
-      },
-      {
-        "name": "hasActiveFilters",
-        "line": 673,
-        "complexity": {
-          "complexity": "unknown",
-          "lines": 0,
-          "calls_other_functions": 0
-        },
-        "importance": {
-          "score": 1,
-          "reasons": [
-            "מוזכרת בהערות"
-          ],
-          "recommendation": "review"
-        },
-        "indirect_calls": [],
-        "file_path": "trading-ui/scripts/trade_plans.js"
       }
     ],
     "keep_functions": []

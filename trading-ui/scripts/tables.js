@@ -96,6 +96,27 @@
  */
 
 // ===== GLOBAL SORTING SYSTEM =====
+
+/**
+ * פונקציה גלובלית למיון טבלאות
+ * Global function for sorting tables
+ * 
+ * @param {number} columnIndex - אינדקס העמודה למיון
+ * @param {Array} data - נתוני הטבלה
+ * @param {string} tableType - סוג הטבלה
+ * @param {Function} updateFunction - פונקציה לעדכון הטבלה
+ */
+function sortTable(columnIndex, data, tableType, updateFunction) {
+    console.log(`🔄 === SORT TABLE ===`);
+    console.log(`🔄 Table: ${tableType}, Column: ${columnIndex}`);
+    
+    if (typeof window.sortTableData === 'function') {
+        window.sortTableData(columnIndex, data, tableType, updateFunction);
+    } else {
+        console.error('❌ sortTableData function not found in tables.js');
+    }
+}
+
 /**
  * Global function for sorting tables
  * 
@@ -369,5 +390,8 @@ window.tables = {
     closeModal: window.closeModal,
     getDefaultColumnDefs: window.getDefaultColumnDefs
 };
+
+// ייצוא פונקציית sortTable גלובלית
+window.sortTable = sortTable;
 
 // Tables.js loaded successfully

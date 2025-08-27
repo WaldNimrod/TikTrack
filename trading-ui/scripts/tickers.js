@@ -238,77 +238,20 @@ function deleteTicker(id) {
     showDeleteTickerModal(id);
 }
 
-// פונקציות לפתיחה/סגירה של סקשנים
+// פונקציות לפתיחה/סגירה של סקשנים - משתמשות בפונקציות הגלובליות
 function toggleTopSection() {
-    console.log('🔄 toggleTopSection נקראה');
-    const topSection = document.querySelector('.top-section');
-
-    if (!topSection) {
-        console.error('❌ לא נמצא top-section');
-        return;
-    }
-    console.log('✅ top-section נמצא:', topSection);
-
-    const sectionBody = topSection.querySelector('.section-body');
-    const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody) {
-        const isCollapsed = sectionBody.style.display === 'none';
-
-        if (isCollapsed) {
-            sectionBody.style.display = 'block';
-        } else {
-            sectionBody.style.display = 'none';
-        }
-
-        // עדכון האייקון
-        if (icon) {
-            icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('tickersTopSectionHidden', !isCollapsed);
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection('tickers');
+    } else {
+        console.error('❌ toggleTopSection function not found in main.js');
     }
 }
 
 function toggleTickersSection() {
-    console.log('🔄 toggleTickersSection נקראה');
-    const contentSections = document.querySelectorAll('.content-section');
-    console.log('📋 מספר content-sections נמצא:', contentSections.length);
-    const tickersSection = contentSections[0]; // הסקשן הראשון - טיקרים
-
-    if (!tickersSection) {
-        console.error('❌ לא נמצא סקשן טיקרים');
-        return;
-    }
-    console.log('✅ סקשן טיקרים נמצא:', tickersSection);
-
-    const sectionBody = tickersSection.querySelector('.section-body');
-    const toggleBtn = tickersSection.querySelector('button[onclick="toggleTickersSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    console.log('🎯 sectionBody נמצא:', !!sectionBody);
-    console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
-    console.log('🎨 icon נמצא:', !!icon);
-
-    if (sectionBody) {
-        const isCollapsed = sectionBody.style.display === 'none';
-        console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
-
-        if (isCollapsed) {
-            sectionBody.style.display = 'block';
-        } else {
-            sectionBody.style.display = 'none';
-        }
-
-        // עדכון האייקון
-        if (icon) {
-            icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('tickersSectionCollapsed', !isCollapsed);
+    if (typeof window.toggleMainSection === 'function') {
+        window.toggleMainSection('tickers');
+    } else {
+        console.error('❌ toggleMainSection function not found in main.js');
     }
 }
 

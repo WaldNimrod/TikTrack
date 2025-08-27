@@ -676,7 +676,86 @@ window.restoreDesignsSectionState = function () {
 };
 
 /**
- * Toggle a specific section
+ * פונקציה גלובלית לפתיחה/סגירה של סקשן עליון
+ * Global function for toggling top section
+ * 
+ * @param {string} sectionName - שם הסקשן (אופציונלי)
+ */
+window.toggleTopSection = function (sectionName = '') {
+  console.log(`🔄 toggleTopSection נקראה ${sectionName ? `עבור ${sectionName}` : ''}`);
+  const topSection = document.querySelector('.top-section');
+
+  if (!topSection) {
+    console.error('❌ לא נמצא top-section');
+    return;
+  }
+
+  const sectionBody = topSection.querySelector('.section-body');
+  const toggleBtn = topSection.querySelector('button[onclick*="toggleTopSection"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (sectionBody) {
+    const isCollapsed = sectionBody.style.display === 'none';
+
+    if (isCollapsed) {
+      sectionBody.style.display = 'block';
+    } else {
+      sectionBody.style.display = 'none';
+    }
+
+    // עדכון האייקון
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // שמירת המצב ב-localStorage
+    const storageKey = sectionName ? `${sectionName}TopSectionHidden` : 'topSectionHidden';
+    localStorage.setItem(storageKey, !isCollapsed);
+  }
+};
+
+/**
+ * פונקציה גלובלית לפתיחה/סגירה של סקשן ראשי
+ * Global function for toggling main section
+ * 
+ * @param {string} sectionName - שם הסקשן
+ */
+window.toggleMainSection = function (sectionName) {
+  console.log(`🔄 toggleMainSection נקראה עבור ${sectionName}`);
+  const contentSections = document.querySelectorAll('.content-section');
+  const targetSection = contentSections[0]; // הסקשן הראשון
+
+  if (!targetSection) {
+    console.error(`❌ לא נמצא סקשן ${sectionName}`);
+    return;
+  }
+
+  const sectionBody = targetSection.querySelector('.section-body');
+  const toggleBtn = targetSection.querySelector(`button[onclick*="toggleMainSection"]`);
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (sectionBody) {
+    const isCollapsed = sectionBody.style.display === 'none';
+
+    if (isCollapsed) {
+      sectionBody.style.display = 'block';
+    } else {
+      sectionBody.style.display = 'none';
+    }
+
+    // עדכון האייקון
+    if (icon) {
+      icon.textContent = isCollapsed ? '▲' : '▼';
+    }
+
+    // שמירת המצב ב-localStorage
+    const storageKey = `${sectionName}SectionCollapsed`;
+    localStorage.setItem(storageKey, !isCollapsed);
+  }
+};
+
+/**
+ * Toggle a specific section (legacy function)
  * Handles opening/closing of individual content sections
  */
 window.toggleSection = function (sectionId) {

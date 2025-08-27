@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<!--
+  ========================================
+  דף בסיס נתונים - Database Display Page
+  ========================================
+  
+  דף זה מציג את כל הנתונים במערכת
+  כולל טבלאות מפורטות לכל הטבלאות בבסיס הנתונים
+  
+  תכונות:
+  - טבלאות מפורטות לכל הטבלאות
+  - כותרות באנגלית עם סוגי נתונים
+  - עמודות פעולות מלאות
+  - סטטיסטיקות כלליות
+  - ייצוא נתונים
+  
+  מחבר: Tik.track Development Team
+  תאריך עדכון אחרון: 2025
+  ========================================
+-->
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>בסיס נתונים - Tik.track</title>
+
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <!-- 1. Apple theme (base) -->
+  <link rel="stylesheet" href="styles/apple-theme.css">
+
+  <!-- 2. Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- 3. General styles -->
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- 4. Typography -->
+  <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
+  <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Header system styles (highest priority) -->
+  <link rel="stylesheet" href="styles/header-system.css">
+
+  <!-- 7. Database display specific styles (highest priority) -->
+  <link rel="stylesheet" href="styles/db-display.css">
+  <!-- 8. Table rules styles -->
+  <link rel="stylesheet" href="styles/table-rules.css">
+</head>
+
+<body class="db-display-page">
+  <!-- Web Component of the header -->
+  <!-- Unified Header System -->
+  <div id="unified-header-container"></div>
+
+  <div class="background-wrapper">
+
+    <!-- Page body - All content after header -->
+    <div class="page-body">
+      <!-- Database area - top-Section -->
+      <div class="top-section">
+        <!-- Main header -->
+        <div class="section-header">
+          <div class="table-title">
+            🗄️ בסיס נתונים
+          </div>
+          <div class="table-actions">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בסיס נתונים">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alert cards -->
+        <div class="section-body">
+          <active-alerts></active-alerts>
+
+          <!-- Data summary -->
+          <div class="info-summary" id="summaryStats">
+            <div>סה"כ חשבונות: <strong id="accountsStats">0</strong></div>
+            <div>סה"כ טריידים: <strong id="tradesStats">0</strong></div>
+            <div>סה"כ טיקרים: <strong id="tickersStats">0</strong></div>
+            <div>סה"כ תוכניות: <strong id="tradePlansStats">0</strong></div>
+          </div>
+        </div>
+      </div> <!-- End top-section -->
+
+      <!-- Main content -->
+      <div class="main-content">
+
+        <!-- Trade Plans Section -->
+        <div class="content-section">
+          <!-- Trade Plans header -->
+          <div class="section-header">
+            <div class="table-title">
+              📋 תוכניות מסחר
+            </div>
+            <div class="table-count" id="tradePlansCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תוכניות מסחר">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Trade Plans table -->
+          <div class="section-body">
+            <div class="table-responsive" id="tradePlansContainer">
+              <table class="table" id="tradePlansTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'tradePlansTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'tradePlansTable')">Account ID (INTEGER)</th>
+                    <th onclick="sortTable(2, 'tradePlansTable')">Ticker ID (INTEGER)</th>
+                    <th onclick="sortTable(3, 'tradePlansTable')">Investment Type (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'tradePlansTable')">Planned Amount (FLOAT)</th>
+                    <th onclick="sortTable(5, 'tradePlansTable')">Entry Conditions (VARCHAR)</th>
+                    <th onclick="sortTable(6, 'tradePlansTable')">Stop Price (FLOAT)</th>
+                    <th onclick="sortTable(7, 'tradePlansTable')">Target Price (FLOAT)</th>
+                    <th onclick="sortTable(8, 'tradePlansTable')">Reasons (VARCHAR)</th>
+                    <th onclick="sortTable(9, 'tradePlansTable')">Cancelled At (DATETIME)</th>
+                    <th onclick="sortTable(10, 'tradePlansTable')">Cancel Reason (VARCHAR)</th>
+                    <th onclick="sortTable(11, 'tradePlansTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(12, 'tradePlansTable')">Side (VARCHAR)</th>
+                    <th onclick="sortTable(13, 'tradePlansTable')">Status (VARCHAR)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="14" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Account_id and ticker_id are required (NOT NULL)</li>
+                <li class="foreign-key">Foreign key: ticker_id references tickers(id)</li>
+                <li class="foreign-key">Foreign key: account_id references accounts(id)</li>
+                <li class="default">Side defaults to 'Long'</li>
+                <li class="default">Status defaults to 'open'</li>
+                <li class="default">Investment_type defaults to 'swing'</li>
+                <li class="default">Planned_amount defaults to 1</li>
+                <li class="unique">ID is auto-incrementing primary key</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trades Section -->
+        <div class="content-section">
+          <!-- Trades header -->
+          <div class="section-header">
+            <div class="table-title">
+              📈 טריידים
+            </div>
+            <div class="table-count" id="tradesCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור טריידים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Trades table -->
+          <div class="section-body">
+            <div class="table-responsive" id="tradesContainer">
+              <table class="table" id="tradesTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'tradesTable')">Account ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'tradesTable')">Ticker ID (INTEGER)</th>
+                    <th onclick="sortTable(2, 'tradesTable')">Trade Plan ID (INTEGER)</th>
+                    <th onclick="sortTable(3, 'tradesTable')">Status (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'tradesTable')">Investment Type (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'tradesTable')">Opened At (DATETIME)</th>
+                    <th onclick="sortTable(6, 'tradesTable')">Closed At (DATETIME)</th>
+                    <th onclick="sortTable(7, 'tradesTable')">Cancelled At (DATETIME)</th>
+                    <th onclick="sortTable(8, 'tradesTable')">Cancel Reason (VARCHAR)</th>
+                    <th onclick="sortTable(9, 'tradesTable')">Total P&L (FLOAT)</th>
+                    <th onclick="sortTable(10, 'tradesTable')">Notes (VARCHAR)</th>
+                    <th onclick="sortTable(11, 'tradesTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(12, 'tradesTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(13, 'tradesTable')">Side (VARCHAR)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="14" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Account_id and ticker_id are required (NOT NULL)</li>
+                <li class="default">Side defaults to 'Long'</li>
+                <li class="default">Investment_type defaults to 'swing'</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="unique">ID is primary key</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accounts Section -->
+        <div class="content-section">
+          <!-- Accounts header -->
+          <div class="section-header">
+            <div class="table-title">
+              🏦 חשבונות
+            </div>
+            <div class="table-count" id="accountsCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור חשבונות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Accounts table -->
+          <div class="section-body">
+            <div class="table-responsive" id="accountsContainer">
+              <table class="table" id="accountsTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'accountsTable')">Name (VARCHAR)</th>
+                    <th onclick="sortTable(1, 'accountsTable')">Currency (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'accountsTable')">Status (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'accountsTable')">Cash Balance (FLOAT)</th>
+                    <th onclick="sortTable(4, 'accountsTable')">Total Value (FLOAT)</th>
+                    <th onclick="sortTable(5, 'accountsTable')">Total P&L (FLOAT)</th>
+                    <th onclick="sortTable(6, 'accountsTable')">Notes (VARCHAR)</th>
+                    <th onclick="sortTable(7, 'accountsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(8, 'accountsTable')">Created At (DATETIME)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="9" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Name field is required (NOT NULL)</li>
+                <li class="default">Status defaults to 'open'</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="unique">ID is auto-incrementing primary key</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Tickers Section -->
+        <div class="content-section">
+          <!-- Tickers header -->
+          <div class="section-header">
+            <div class="table-title">
+              📊 טיקרים
+            </div>
+            <div class="table-count" id="tickersCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור טיקרים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tickers table -->
+          <div class="section-body">
+            <div class="table-responsive" id="tickersContainer">
+              <table class="table" id="tickersTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'tickersTable')">Symbol (VARCHAR)</th>
+                    <th onclick="sortTable(1, 'tickersTable')">Name (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'tickersTable')">Type (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'tickersTable')">Remarks (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'tickersTable')">Currency (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'tickersTable')">Active Trades (BOOLEAN)</th>
+                    <th onclick="sortTable(6, 'tickersTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(7, 'tickersTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(8, 'tickersTable')">Updated At (DATETIME)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="9" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Symbol field is required (NOT NULL)</li>
+                <li class="constraint">ID field is required (NOT NULL)</li>
+                <li class="unique">Symbol has unique constraint</li>
+                <li class="unique">ID is primary key</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="index">Index on id: ix_tickers_id</li>
+                <li class="index">Unique index on symbol: ix_tickers_symbol</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Executions Section -->
+        <div class="content-section">
+          <!-- Executions header -->
+          <div class="section-header">
+            <div class="table-title">
+              💼 ביצועים
+            </div>
+            <div class="table-count" id="executionsCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור ביצועים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Executions table -->
+          <div class="section-body">
+            <div class="table-responsive" id="executionsContainer">
+              <table class="table" id="executionsTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'executionsTable')">Trade ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'executionsTable')">Action (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'executionsTable')">Date (DATETIME)</th>
+                    <th onclick="sortTable(3, 'executionsTable')">Quantity (FLOAT)</th>
+                    <th onclick="sortTable(4, 'executionsTable')">Price (FLOAT)</th>
+                    <th onclick="sortTable(5, 'executionsTable')">Fee (FLOAT)</th>
+                    <th onclick="sortTable(6, 'executionsTable')">Source (VARCHAR)</th>
+                    <th onclick="sortTable(7, 'executionsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(8, 'executionsTable')">Created At (DATETIME)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="9" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Trade_id, action, quantity, and price are required (NOT NULL)</li>
+                <li class="foreign-key">Foreign key: trade_id references trades(id)</li>
+                <li class="default">Action defaults to 'buy'</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="unique">ID is primary key</li>
+                <li class="index">Index on id: ix_executions_id</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cash Flows Section -->
+        <div class="content-section">
+          <!-- Cash Flows header -->
+          <div class="section-header">
+            <div class="table-title">
+              💰 תזרימי מזומנים
+            </div>
+            <div class="table-count" id="cashFlowsCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תזרימי מזומנים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cash Flows table -->
+          <div class="section-body">
+            <div class="table-responsive" id="cashFlowsContainer">
+              <table class="table" id="cashFlowsTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'cashFlowsTable')">Account ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'cashFlowsTable')">Type (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'cashFlowsTable')">Amount (FLOAT)</th>
+                    <th onclick="sortTable(3, 'cashFlowsTable')">Date (DATE)</th>
+                    <th onclick="sortTable(4, 'cashFlowsTable')">Description (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'cashFlowsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(6, 'cashFlowsTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(7, 'cashFlowsTable')">Currency (VARCHAR)</th>
+                    <th onclick="sortTable(8, 'cashFlowsTable')">Currency ID (INTEGER)</th>
+                    <th onclick="sortTable(9, 'cashFlowsTable')">USD Rate (DECIMAL)</th>
+                    <th onclick="sortTable(10, 'cashFlowsTable')">Source (VARCHAR)</th>
+                    <th onclick="sortTable(11, 'cashFlowsTable')">External ID (VARCHAR)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="12" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Account_id, type, and amount are required (NOT NULL)</li>
+                <li class="foreign-key">Foreign key: account_id references accounts(id)</li>
+                <li class="default">Currency defaults to 'USD'</li>
+                <li class="default">Currency_id defaults to 1</li>
+                <li class="default">Usd_rate defaults to 1.000000</li>
+                <li class="default">Source defaults to 'manual'</li>
+                <li class="default">External_id defaults to '0'</li>
+                <li class="default">Type defaults to 'new'</li>
+                <li class="unique">ID is primary key</li>
+                <li class="index">Index on id: ix_cash_flows_id</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerts Section -->
+        <div class="content-section">
+          <!-- Alerts header -->
+          <div class="section-header">
+            <div class="table-title">
+              🔔 התראות
+            </div>
+            <div class="table-count" id="alertsCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+                <span class="action-icon">➕</span> הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התראות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="table-responsive" id="alertsContainer">
+              <table class="table" id="alertsTable">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable(0, 'alertsTable')">Account ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'alertsTable')">Ticker ID (INTEGER)</th>
+                    <th onclick="sortTable(2, 'alertsTable')">Type (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'alertsTable')">Condition (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'alertsTable')">Message (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'alertsTable')">Is Active (BOOLEAN)</th>
+                    <th onclick="sortTable(6, 'alertsTable')">Triggered At (DATETIME)</th>
+                    <th onclick="sortTable(7, 'alertsTable')">ID (INTEGER)</th>
+                    <th onclick="sortTable(8, 'alertsTable')">Created At (DATETIME)</th>
+                    <th onclick="sortTable(9, 'alertsTable')">Status (VARCHAR)</th>
+                    <th onclick="sortTable(10, 'alertsTable')">Is Triggered (VARCHAR)</th>
+                    <th onclick="sortTable(11, 'alertsTable')">Related Type ID (INTEGER)</th>
+                    <th onclick="sortTable(12, 'alertsTable')">Related ID (INTEGER)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="13" class="text-center">טוען נתונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Rules -->
+            <div class="table-rules-container fade-in">
+              <div class="table-rules-header">
+                <span class="rules-icon">📋</span>
+                <h6 class="table-rules-title">Table Rules & Constraints</h6>
+              </div>
+              <ul class="table-rules-list">
+                <li class="constraint">Type and condition are required (NOT NULL)</li>
+                <li class="default">Status defaults to 'open'</li>
+                <li class="default">Is_triggered defaults to 'false'</li>
+                <li class="default">Type defaults to 'price'</li>
+                <li class="default">Related_type_id defaults to 4</li>
+                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+                <li class="unique">ID is auto-incrementing primary key</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Section -->
+      <div class="content-section">
+        <!-- Notes header -->
+        <div class="section-header">
+          <div class="table-title">
+            📝 הערות
+          </div>
+          <div class="table-count" id="notesCount">טוען...</div>
+          <div class="table-actions">
+            <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+              <span class="action-icon">➕</span> הוסף
+            </button>
+            <div class="action-separator"></div>
+            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור הערות">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="table-responsive" id="notesContainer">
+            <table class="table" id="notesTable">
+              <thead>
+                <tr>
+                  <th onclick="sortTable(0, 'notesTable')">ID (INTEGER)</th>
+                  <th onclick="sortTable(1, 'notesTable')">Content (VARCHAR)</th>
+                  <th onclick="sortTable(2, 'notesTable')">Attachment (VARCHAR)</th>
+                  <th onclick="sortTable(3, 'notesTable')">Created At (DATETIME)</th>
+                  <th onclick="sortTable(4, 'notesTable')">Related Type ID (INTEGER)</th>
+                  <th onclick="sortTable(5, 'notesTable')">Related ID (INTEGER)</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="6" class="text-center">טוען נתונים...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Rules -->
+          <div class="table-rules-container fade-in">
+            <div class="table-rules-header">
+              <span class="rules-icon">📋</span>
+              <h6 class="table-rules-title">Table Rules & Constraints</h6>
+            </div>
+            <ul class="table-rules-list">
+              <li class="constraint">Content, related_type_id, and related_id are required (NOT NULL)</li>
+              <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+              <li class="unique">ID is auto-incrementing primary key</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+  </div> <!-- End page-body -->
+
+  <!-- Bottom page spacing -->
+  <div class="bottom-spacer"></div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Modular files -->
+  <script src="scripts/header-system.js"></script>
+  <script src="scripts/console-cleanup.js"></script>
+  <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/database.js"></script>
+
+  <!-- Page initialization -->
+  <script>
+    // Page initialization
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('➕ Initializing database display page...');
+    });
+  </script>
+  <script>
+    // אתחול מערכת הכותרת החדשה
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("🔄 Initializing unified header system...");
+      if (window.headerSystem) {
+        window.headerSystem.init();
+      }
+      if (window.simpleFilter) {
+        window.simpleFilter.init();
+      }
+    });
+  </script>
+</body>
+
+</html>

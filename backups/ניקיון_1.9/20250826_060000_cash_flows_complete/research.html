@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>תחקיר - Tik.track</title>
+
+  <!-- 
+    ===== דף תחקיר - TikTrack =====
+    
+    דף זה מכיל:
+    1. טבלת חשבונות - הסקשן הראשון
+    2. טבלת טריידים - הסקשן השני
+    3. כרטיסיות התראות - בחלק העליון
+    4. מערכת פילטרים ומיון מתקדמת
+    
+    מבנה הדף:
+    - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
+    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+      - top-section: כרטיסיות התראות וסיכום נתונים
+      - content-section (1): טבלת חשבונות
+      - content-section (2): טבלת טריידים
+    
+    שינויים אחרונים:
+    - החלפת app-header במערכת header-system החדשה
+    - יצירת דף תחקיר חדש כשיכפול של עמוד העיצובים
+    - תוכן דמה ללא חיבור לבסיס נתונים
+    - הוספת טבלת חשבונות מלאים
+    - שיפור עיצוב כרטיסיות התראות
+    - תיקון כפתורי סגירה עצמאיים
+    - שינוי סדר: חשבונות לפני טריידים
+  -->
+
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <!-- 1. Apple theme (base) -->
+  <link rel="stylesheet" href="styles/apple-theme.css">
+
+  <!-- 2. Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- 3. General styles -->
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- 4. Typography -->
+  <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
+  <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Research Summary CSS - Summary styles (page specific) -->
+  <link rel="stylesheet" href="styles/research-summary.css">
+
+  <!-- 6. Header system styles (highest priority) -->
+  <link rel="stylesheet" href="styles/header-system.css">
+
+  <!-- Modular grid files - loaded at end of file -->
+</head>
+
+<body>
+  <!-- General background -->
+  <div class="background-wrapper">
+
+    <!-- כותרת האפליקציה החדשה - נוצרת אוטומטית על ידי header-system.js -->
+    <!-- unified-header ייווצר כאן אוטומטית -->
+
+    <!-- Page body - All content after header -->
+    <div class="page-body">
+      <!-- Research area - top-Section -->
+      <div class="top-section">
+        <!-- Main header -->
+        <div class="section-header">
+          <div class="table-title">
+            <img src="images/icons/research.svg" alt="תחקיר"
+              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            תחקיר
+          </div>
+          <div class="table-actions">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר את כל הסקשנים">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alert cards -->
+        <div class="section-body">
+          <active-alerts></active-alerts>
+
+          <!-- Data summary -->
+          <div class="info-summary" id="summaryStats">
+            <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
+            <div>טריידים פתוחים: <strong id="openTrades">0</strong></div>
+            <div>טריידים סגורים: <strong id="closedTrades">0</strong></div>
+            <div>רווח/הפסד כולל: <strong id="totalPL">$0</strong></div>
+          </div>
+        </div>
+      </div> <!-- End top-section -->
+
+      <!-- Main content -->
+      <div class="main-content">
+
+        <!-- First element - Current status summary and daily change -->
+        <div class="content-section research-page">
+          <!-- Status summary header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/research.svg" alt="סיכום מצב עכשווי ושינוי יומי"
+                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              סיכום מצב עכשווי ושינוי יומי
+            </div>
+
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="refreshSummaryData()" title="רענן נתונים">
+                <img src="images/icons/research.svg" alt="רענן" class="action-icon" style="width: 16px; height: 16px;">
+                רענן
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleSummarySection()" title="הצג/הסתר אזור סיכום">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Status summary content -->
+          <div class="section-body">
+            <!-- Quick summary cards -->
+            <div class="summary-cards">
+              <div class="summary-card">
+                <div class="card-icon">💰</div>
+                <div class="card-content">
+                  <div class="card-title">סה"כ נכסים</div>
+                  <div class="card-value">$125,450</div>
+                  <div class="card-change positive">+$2,350 (1.9%)</div>
+                </div>
+              </div>
+              <div class="summary-card">
+                <div class="card-icon">📈</div>
+                <div class="card-content">
+                  <div class="card-title">רווח/הפסד כולל</div>
+                  <div class="card-value">$15,250</div>
+                  <div class="card-change positive">+$1,200 (8.5%)</div>
+                </div>
+              </div>
+              <div class="summary-card">
+                <div class="card-icon">🎯</div>
+                <div class="card-content">
+                  <div class="card-title">Market to Market</div>
+                  <div class="card-value">$3,750</div>
+                  <div class="card-change positive">+$450 (13.6%)</div>
+                </div>
+              </div>
+              <div class="summary-card">
+                <div class="card-icon">⚡</div>
+                <div class="card-content">
+                  <div class="card-title">טריידים פעילים</div>
+                  <div class="card-value">8</div>
+                  <div class="card-change neutral">+2 מהיום</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Summary table by trade type -->
+            <div class="table-responsive">
+              <table class="table summary-table">
+                <thead>
+                  <tr>
+                    <th>סוג טרייד<br><span class="header-subtitle">Trade Type</span></th>
+                    <th>כמות<br><span class="header-subtitle">Count</span></th>
+                    <th>ערך כולל<br><span class="header-subtitle">Total Value</span></th>
+                    <th>רווח/הפסד<br><span class="header-subtitle">P&L</span></th>
+                    <th>אחוז מהתיק<br><span class="header-subtitle">Portfolio %</span></th>
+                    <th>ביצוע יומי<br><span class="header-subtitle">Daily Performance</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="trade-type-badge type-stock">מניות</span></td>
+                    <td>8</td>
+                    <td>$65,200</td>
+                    <td class="profit-positive">+$6,450</td>
+                    <td>52.0%</td>
+                    <td class="profit-positive">+$1,200 (1.9%)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="trade-type-badge type-etf">ETF</span></td>
+                    <td>5</td>
+                    <td>$35,300</td>
+                    <td class="profit-positive">+$2,800</td>
+                    <td>28.2%</td>
+                    <td class="profit-positive">+$450 (1.3%)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="trade-type-badge type-crypto">קריפטו</span></td>
+                    <td>3</td>
+                    <td>$15,500</td>
+                    <td class="profit-positive">+$3,200</td>
+                    <td>12.4%</td>
+                    <td class="profit-positive">+$800 (5.4%)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="trade-type-badge type-commodity">סחורות</span></td>
+                    <td>2</td>
+                    <td>$8,450</td>
+                    <td class="profit-negative">-$1,200</td>
+                    <td>6.7%</td>
+                    <td class="profit-negative">-$300 (-3.4%)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="trade-type-badge type-forex">פורקס</span></td>
+                    <td>1</td>
+                    <td>$1,250</td>
+                    <td class="profit-positive">+$150</td>
+                    <td>1.0%</td>
+                    <td class="profit-positive">+$50 (4.2%)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Daily changes table -->
+            <div class="daily-changes-section">
+              <h4 class="section-subtitle">📅 שינוי יומי - 3 ימים אחרונים</h4>
+              <div class="table-responsive">
+                <table class="table daily-table">
+                  <thead>
+                    <tr>
+                      <th>תאריך<br><span class="header-subtitle">Date</span></th>
+                      <th>סה"כ נכסים<br><span class="header-subtitle">Total Assets</span></th>
+                      <th>רווח/הפסד<br><span class="header-subtitle">P&L</span></th>
+                      <th>שינוי יומי<br><span class="header-subtitle">Daily Change</span></th>
+                      <th>מניות<br><span class="header-subtitle">Stocks</span></th>
+                      <th>ETF<br><span class="header-subtitle">ETF</span></th>
+                      <th>קריפטו<br><span class="header-subtitle">Crypto</span></th>
+                      <th>סחורות<br><span class="header-subtitle">Commodity</span></th>
+                      <th>פורקס<br><span class="header-subtitle">Forex</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>היום</td>
+                      <td>$125,450</td>
+                      <td class="profit-positive">+$1,200</td>
+                      <td class="profit-positive">+1.9%</td>
+                      <td class="profit-positive">+$1,200</td>
+                      <td class="profit-positive">+$450</td>
+                      <td class="profit-positive">+$800</td>
+                      <td class="profit-negative">-$300</td>
+                      <td class="profit-positive">+$50</td>
+                    </tr>
+                    <tr>
+                      <td>אתמול</td>
+                      <td>$123,100</td>
+                      <td class="profit-positive">+$2,100</td>
+                      <td class="profit-positive">+1.7%</td>
+                      <td class="profit-positive">+$1,500</td>
+                      <td class="profit-positive">+$600</td>
+                      <td class="profit-positive">+$200</td>
+                      <td class="profit-positive">+$100</td>
+                      <td class="profit-positive">+$50</td>
+                    </tr>
+                    <tr>
+                      <td>שלשום</td>
+                      <td>$121,000</td>
+                      <td class="profit-negative">-$800</td>
+                      <td class="profit-negative">-0.7%</td>
+                      <td class="profit-negative">-$500</td>
+                      <td class="profit-positive">+$200</td>
+                      <td class="profit-negative">-$400</td>
+                      <td class="profit-negative">-$100</td>
+                      <td class="profit-negative">-$50</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Second element - Trades table -->
+        <div class="content-section research-page">
+          <!-- Trades header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/trades.svg" alt="הטריידים שלי"
+                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              הטריידים שלי<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Trades</span>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <div class="search-input-wrapper">
+                <input type="text" class="search-filter-input" placeholder="חיפוש טריידים..."
+                  onkeyup="filterTradesData([], [], [], null, this.value)">
+              </div>
+              <button class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
+                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
+                הוסף
+              </button>
+              <button class="refresh-btn" onclick="loadTrades()" title="רענן טבלה">
+                <img src="images/icons/trades.svg" alt="רענן" class="action-icon" style="width: 16px; height: 16px;">
+                רענן
+              </button>
+              <button class="filter-toggle-btn" onclick="toggleResearchSection()" title="הצג/הסתר אזור הטריידים שלי">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Trades table -->
+          <div class="section-body">
+            <div class="table-responsive" id="tradesContainer">
+              <table class="table" id="tradesTable" data-table-type="trades">
+                <thead>
+                  <tr>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        חשבון <span class="sort-icon">↕</span>
+                        <br><span class="header-subtitle">Account</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        טיקר <span class="sort-icon">↕</span>
+                        <br><span class="header-subtitle">Ticker</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        תוכנית <span class="sort-icon">↕</span>
+                        <br><span class="header-subtitle">Trade Plan ID</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        סטטוס <span class="sort-icon">↕</span>
+                        <br><span class="header-subtitle">Status</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        סוג <span class="sort-icon">↕</span>
+                        <br><span class="header-subtitle">Type</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        צד <span class="sort-icon">↕</span>
+                        <br><span class="header-subtitle">Side</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        נוצר ב <span class="sort-icon">↕</span>
+                        <br><span class="header-subtitle">Created At</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        נסגר ב <span class="sort-icon">↕</span>
+                        <br><span class="header-subtitle">Closed At</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        רווח/הפסד <span class="sort-icon">↕</span>
+                        <br><span class="header-subtitle">Total P/L</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(9); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        הערות <span class="sort-icon">↕</span>
+                        <br><span class="header-subtitle">Notes</span>
+                      </button>
+                    </th>
+                    <th class="actions-cell">
+                      פעולות
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="11" class="loading">טוען טריידים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- End page-body -->
+
+    <!-- Bottom page spacing -->
+    <div class="bottom-spacer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Modular files -->
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/simple-filter.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/trades.js"></script>
+    <script src="scripts/research.js"></script>
+
+    <!-- Page initialization -->
+    <script>
+      // אתחול הדף
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('🚀 טעינת דף תחקיר עם מערכת ראש דף חדשה...');
+
+        // אתחול HeaderSystem
+        if (window.headerSystem && !window.headerSystem.isInitialized) {
+          console.log('✅ אתחול HeaderSystem...');
+          window.headerSystem.init();
+        }
+
+        // אתחול דף התחקיר
+        if (typeof initializeResearchPage === 'function') {
+          initializeResearchPage();
+        }
+      });
+    </script>
+</body>
+
+</html>

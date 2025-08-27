@@ -1,0 +1,69 @@
+{
+  "title": "דוח פונקציות לא בשימוש - TikTrack",
+  "date": "2025-08-27 13:58:33",
+  "summary": {
+    "total_files": 60,
+    "total_functions": 1219,
+    "unused_functions": 6,
+    "used_functions": 1213,
+    "analysis_date": "2025-08-27T13:58:33.225395"
+  },
+  "unused_functions_by_file": {
+    "header-system.js": [
+      {
+        "function_name": "handleMouseEnter",
+        "line": 1791,
+        "file_path": "trading-ui/scripts/header-system.js"
+      },
+      {
+        "function_name": "handleMouseLeave",
+        "line": 1798,
+        "file_path": "trading-ui/scripts/header-system.js"
+      },
+      {
+        "function_name": "handleMouseEnter",
+        "line": 1791,
+        "file_path": "trading-ui/scripts/header-system.js"
+      },
+      {
+        "function_name": "handleMouseLeave",
+        "line": 1798,
+        "file_path": "trading-ui/scripts/header-system.js"
+      }
+    ],
+    "trade_plans.js": [
+      {
+        "function_name": "hasActiveFilters",
+        "line": 673,
+        "file_path": "trading-ui/scripts/trade_plans.js"
+      },
+      {
+        "function_name": "hasActiveFilters",
+        "line": 673,
+        "file_path": "trading-ui/scripts/trade_plans.js"
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "file": "header-system.js",
+      "unused_count": 4,
+      "functions": [
+        "handleMouseEnter",
+        "handleMouseLeave",
+        "handleMouseEnter",
+        "handleMouseLeave"
+      ],
+      "priority": "medium"
+    },
+    {
+      "file": "trade_plans.js",
+      "unused_count": 2,
+      "functions": [
+        "hasActiveFilters",
+        "hasActiveFilters"
+      ],
+      "priority": "medium"
+    }
+  ]
+}

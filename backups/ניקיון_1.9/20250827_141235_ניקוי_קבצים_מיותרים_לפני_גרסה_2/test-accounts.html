@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת חשבונות - Tik.track</title>
+    <link rel="stylesheet" href="styles/apple-theme.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/typography.css">
+    <link rel="stylesheet" href="styles/table.css">
+</head>
+
+<body>
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="top-section">
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/accounts.svg" alt="חשבונות" class="table-icon">
+                        בדיקת חשבונות
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="info-summary" id="summaryStats">
+                        <div>סה"כ חשבונות: <strong id="totalAccounts">0</strong></div>
+                        <div>חשבונות פתוחים: <strong id="activeAccounts">0</strong></div>
+                        <div>שווי כולל: <strong id="totalValue">₪0</strong></div>
+                        <div>רווח כולל: <strong id="totalProfit">₪0</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="content-section accounts-page">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/accounts.svg" alt="החשבונות שלי" class="table-icon">
+                            החשבונות שלי
+                        </div>
+                        <div class="table-count">טוען...</div>
+                        <div class="table-actions">
+                            <button class="refresh-btn" onclick="loadAccountsData()" title="רענן נתונים">
+                                <img src="images/icons/accounts.svg" alt="רענן" class="action-icon">
+                                רענן
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="section-body">
+                        <div class="table-responsive" id="accountsContainer">
+                            <table class="table" id="accountsTable" data-table-type="accounts">
+                                <thead>
+                                    <tr>
+                                        <th>שם</th>
+                                        <th>מטבע</th>
+                                        <th>סטטוס</th>
+                                        <th>יתרה במזומן</th>
+                                        <th>ערך כולל</th>
+                                        <th>רווח/הפסד</th>
+                                        <th>הערות</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">
+                                            <div class="no-data-message accounts">
+                                                <i class="fas fa-database no-data-icon"></i>
+                                                <h5>אין נתונים זמינים</h5>
+                                                <p>לא נמצאו חשבונות במערכת</p>
+                                                <small>הנתונים יוצגו כאן כאשר יתווספו חשבונות למערכת</small>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/accounts.js"></script>
+
+    <script>
+        // פונקציה פשוטה לטעינת נתונים
+        async function loadAccountsData() {
+            try {
+                console.log('🔄 טוען נתוני חשבונות...');
+                const response = await fetch('/api/v1/accounts/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('✅ נתונים התקבלו:', data);
+
+                const accounts = data.data || [];
+                updateAccountsTable(accounts);
+                updateAccountStatistics(accounts);
+
+            } catch (error) {
+                console.error('❌ שגיאה בטעינת נתונים:', error);
+                document.querySelector('#accountsTable tbody').innerHTML =
+                    `<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת נתונים: ${error.message}</td></tr>`;
+            }
+        }
+
+        // פונקציה לעדכון סטטיסטיקות
+        function updateAccountStatistics(accounts) {
+            const totalElement = document.getElementById('totalAccounts');
+            const activeElement = document.getElementById('activeAccounts');
+            const totalValueElement = document.getElementById('totalValue');
+            const totalProfitElement = document.getElementById('totalProfit');
+
+            if (totalElement) {
+                totalElement.textContent = accounts.length;
+            }
+
+            if (activeElement) {
+                const activeAccounts = accounts.filter(acc => acc.status === 'open');
+                activeElement.textContent = activeAccounts.length;
+            }
+
+            if (totalValueElement) {
+                const totalValue = accounts.reduce((sum, acc) => sum + (acc.total_value || 0), 0);
+                totalValueElement.textContent = `₪${totalValue.toLocaleString()}`;
+            }
+
+            if (totalProfitElement) {
+                const totalProfit = accounts.reduce((sum, acc) => sum + (acc.total_pl || 0), 0);
+                totalProfitElement.textContent = `₪${totalProfit.toLocaleString()}`;
+            }
+        }
+
+        // טעינת נתונים בטעינת הדף
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('🚀 טעינת דף בדיקת חשבונות...');
+            loadAccountsData();
+        });
+    </script>
+</body>
+
+</html>

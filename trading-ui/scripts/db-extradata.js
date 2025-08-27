@@ -612,7 +612,7 @@ function deleteCurrencyRecord(id) {
 // פונקציה להצגת מודל הוספת מטבע
 function showAddCurrencyModal() {
     const modalHtml = `
-        <div class="modal fade" id="addCurrencyModal" tabindex="-1" aria-labelledby="addCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal fade" id="addCurrencyModal" tabindex="-1" aria-labelledby="addCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored bg-primary">
@@ -709,7 +709,7 @@ function showEditCurrencyModal(id) {
 // פונקציה להצגת מודל עריכת מטבע עם נתונים
 function showEditCurrencyModalWithData(currency) {
     const modalHtml = `
-        <div class="modal fade" id="editCurrencyModal" tabindex="-1" aria-labelledby="editCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal fade" id="editCurrencyModal" tabindex="-1" aria-labelledby="editCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored bg-secondary">
@@ -787,7 +787,7 @@ function showEditCurrencyModalWithData(currency) {
 // פונקציה להצגת מודל מחיקת מטבע
 function showDeleteCurrencyModal(id) {
     const modalHtml = `
-        <div class="modal fade" id="deleteCurrencyModal" tabindex="-1" aria-labelledby="deleteCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal fade" id="deleteCurrencyModal" tabindex="-1" aria-labelledby="deleteCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored bg-danger">
@@ -976,7 +976,7 @@ function deleteNoteRelationTypeRecord(id) {
 // פונקציה להצגת מודל הוספת סוג קישור
 function showAddNoteRelationTypeModal() {
     const modalHtml = `
-        <div class="modal fade" id="addNoteRelationTypeModal" tabindex="-1" aria-labelledby="addNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal fade" id="addNoteRelationTypeModal" tabindex="-1" aria-labelledby="addNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored bg-primary">
@@ -1036,7 +1036,7 @@ function showEditNoteRelationTypeModal(id) {
 // פונקציה להצגת מודל עריכת סוג קישור עם נתונים
 function showEditNoteRelationTypeModalWithData(noteType) {
     const modalHtml = `
-        <div class="modal fade" id="editNoteRelationTypeModal" tabindex="-1" aria-labelledby="editNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal fade" id="editNoteRelationTypeModal" tabindex="-1" aria-labelledby="editNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored bg-secondary">
@@ -1078,7 +1078,7 @@ function showEditNoteRelationTypeModalWithData(noteType) {
 // פונקציה להצגת מודל מחיקת סוג קישור
 function showDeleteNoteRelationTypeModal(id) {
     const modalHtml = `
-        <div class="modal fade" id="deleteNoteRelationTypeModal" tabindex="-1" aria-labelledby="deleteNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal fade" id="deleteNoteRelationTypeModal" tabindex="-1" aria-labelledby="deleteNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored bg-danger">

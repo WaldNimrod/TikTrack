@@ -1,558 +1,629 @@
-# TikTrack Development Documentation
+# TikTrack Development Guide
 
-## Overview
-This document provides comprehensive guidance for developers working on the TikTrack system, including setup, development workflow, and best practices.
+## 🚀 Latest Updates
 
-> 📋 **לפרטים מלאים על הפרויקט:** ראה [PROJECT_STATUS_SUMMARY.md](../../PROJECT_STATUS_SUMMARY.md)
+**Version 3.1** - *August 26, 2025*
 
-## 🆕 **Latest Updates (January 26, 2025)**
-- ✅ **Unified Filter System** - Complete centralized filtering solution
-- ✅ **Enhanced Header System** - Comprehensive filter integration
-- ✅ **Preference-Based Filtering** - Server-based default filter preferences
-- ✅ **Hebrew Translation System** - Automatic conversion of English preferences
-- ✅ **Performance Optimizations** - Debounced search, efficient DOM queries
-- ✅ **Error Handling** - Graceful fallback and comprehensive error recovery
-- ✅ **Documentation Updates** - Complete filter system documentation
+### ✅ **Filter System - Complete Implementation & Bug Fixes**
 
-## Development Environment Setup
+#### **Fixed Critical Issues**
+- **Date Filter Implementation**: Complete date filter functionality with proper display updates
+- **Button Selection Logic**: Fixed broken display when selecting "הכול" (All) options
+- **Null/Undefined Protection**: Added comprehensive protection for all preference conversion functions
+- **Table-Specific Filtering**: Smart filtering logic that adapts to different table types
+
+#### **Enhanced Features**
+- **Comprehensive Logging System**: Detailed logs for all filter operations with table summaries
+- **Smart Field Detection**: Automatically detects available fields per table type
+- **Error Handling**: Robust error handling with fallback mechanisms
+- **Performance Optimizations**: Efficient DOM queries and filter processing
+
+#### **Current Status**
+- ✅ **All filter types working correctly**
+- ✅ **Display updates properly**
+- ✅ **Button selections working**
+- ✅ **Multi-table filtering operational**
+- ✅ **Comprehensive logging system**
+- ✅ **Error handling and fallbacks**
+- ✅ **Performance optimizations**
+
+## 📋 Overview
+
+This guide provides comprehensive information for developers working on the TikTrack Trading Management System. It covers setup, development practices, testing, and deployment procedures.
+
+## 🏗️ System Architecture
+
+### Backend (Python Flask)
+- **Framework**: Flask with SQLAlchemy ORM
+- **Database**: SQLite with WAL mode
+- **API**: RESTful API design
+- **Authentication**: Session-based authentication
+
+### Frontend (JavaScript)
+- **Framework**: Vanilla JavaScript with modular architecture
+- **UI Framework**: Custom CSS with responsive design
+- **Filter System**: Advanced multi-table filtering with preference management
+- **Header System**: Unified navigation and filtering interface
+
+### Core Components
+1. **Header System** (`header-system.js`): Navigation and filter interface
+2. **Filter System** (`simple-filter.js`): Advanced filtering across all tables
+3. **Warning System** (`warning-system.js`): Centralized modal management
+4. **Translation System** (`translation-utils.js`): Hebrew/English translation utilities
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- **Python**: 3.8 or higher
-- **Node.js**: 14 or higher (for frontend tools)
-- **Git**: Latest version
-- **SQLite**: 3.30 or higher
+- Python 3.8+
+- Node.js (for frontend development)
+- SQLite (included)
+- Modern web browser
 
 ### Installation
 ```bash
-# Clone the repository
-git clone https://github.com/WaldNimrod/TikTrack.git
-cd TikTrack
+# Clone repository
+git clone <repository-url>
+cd TikTrackApp
 
-# Install Python dependencies
+# Install backend dependencies
+cd Backend
 pip install -r requirements.txt
 
-# Start the development server
-./start_dev.sh
+# Initialize database
+python -c "from app import db; db.create_all()"
+
+# Or use the comprehensive database recreation script
+python3 create_fresh_database.py
+
+# Start development server
+python app.py
+
+# Access application
+# Open http://localhost:8080 in browser
 ```
 
-## Project Structure
+### Development Environment Setup
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-### Backend Structure
-```
-Backend/
-├── app.py                 # Main Flask application
-├── models/               # SQLAlchemy models
-│   ├── __init__.py
-│   ├── trade.py
-│   ├── account.py
-│   ├── alert.py
-│   └── constraint.py
-├── routes/               # API routes
-│   ├── api/             # REST API endpoints
-│   │   ├── trades.py
-│   │   ├── accounts.py
-│   │   ├── alerts.py
-│   │   └── constraints.py
-│   └── pages.py         # HTML page routes
-├── services/            # Business logic
-│   ├── trade_service.py
-│   ├── account_service.py
-│   ├── alert_service.py
-│   └── constraint_service.py
-├── migrations/          # Database migrations
-│   ├── create_constraints_tables.py
-│   ├── insert_basic_constraints.py
-│   └── remove_old_constraints.py
-├── config/             # Configuration files
-└── db/                 # Database files
+# Install dependencies
+pip install -r requirements.txt
+
+# Set environment variables
+export FLASK_ENV=development
+export FLASK_DEBUG=1
+
+# Start development server
+python app.py
 ```
 
-### Frontend Structure
+## 📁 Project Structure
+
 ```
-trading-ui/
-├── *.html              # Main application pages
-├── scripts/            # JavaScript files with comprehensive validation
-│   ├── header-system.js    # Header component and navigation
-│   ├── simple-filter.js    # Unified filter system (NEW)
-│   ├── table-mappings.js   # Centralized table column mappings
-│   ├── main.js            # Global utility functions and sorting
-│   ├── translation-utils.js # Translation functions
-│   ├── warning-system.js   # Centralized warning modal system
-│   ├── ui-utils.js        # Shared UI utility functions
-│   ├── data-utils.js      # Shared data utilities (API calls, validation)
-│   ├── alerts.js          # Alert management with advanced validation
-│   ├── active-alerts-component.js # Alert component
-│   ├── trade_plans.js     # Trade plans with full CRUD and validation
-│   ├── trades.js          # Trades page logic
-│   ├── accounts.js        # Account management with enhanced validation
-│   ├── notes.js           # Notes with content and attachment validation
-│   ├── tickers.js         # Ticker management with symbol validation
-│   ├── executions.js      # Execution validation and management
-│   ├── cash_flows.js      # Cash flow validation and financial data
-│   └── *.js              # Other page-specific scripts
-├── styles/            # CSS files
-│   ├── apple-theme.css
-│   ├── header-system.css
-│   ├── table.css
-│   └── *.css
-└── images/            # Static assets
+TikTrackApp/
+├── Backend/                    # Python Flask backend
+│   ├── app.py                 # Main application
+│   ├── models/                # Database models
+│   │   ├── __init__.py
+│   │   ├── account.py
+│   │   ├── trade.py
+│   │   ├── alert.py
+│   │   └── ...
+│   ├── routes/                # API routes
+│   │   ├── __init__.py
+│   │   ├── api/               # API endpoints
+│   │   └── pages.py           # Page routes
+│   ├── services/              # Business logic
+│   │   ├── __init__.py
+│   │   ├── account_service.py
+│   │   ├── trade_service.py
+│   │   └── ...
+│   ├── config/                # Configuration
+│   │   ├── __init__.py
+│   │   ├── database.py
+│   │   └── logging.py
+│   ├── db/                    # Database files
+│   ├── migrations/            # Database migrations
+│   └── trading-ui/            # Frontend files
+│       ├── scripts/           # JavaScript files
+│       │   ├── header-system.js
+│       │   ├── simple-filter.js
+│       │   ├── warning-system.js
+│       │   ├── translation-utils.js
+│       │   ├── data-utils.js
+│       │   ├── ui-utils.js
+│       │   ├── tables.js
+│       │   ├── date-utils.js
+│       │   ├── linked-items.js
+│       │   ├── page-utils.js
+│       │   ├── main.js
+│       │   └── ...
+│       ├── styles/            # CSS files
+│       │   ├── apple-theme.css
+│       │   ├── header-system.css
+│       │   ├── warning-system.css
+│       │   └── ...
+│       └── *.html            # HTML pages
+├── documentation/             # System documentation
+└── backups/                  # System backups
 ```
 
-## Development Workflow
+## 🔧 Development Workflow
 
 ### 1. Feature Development
-1. **Create Feature Branch**
-   ```bash
-   git checkout -b feature/constraint-system
-   ```
+```bash
+# Create feature branch
+git checkout -b feature/new-feature
 
-2. **Implement Changes**
-   - Backend: Add models, services, and API endpoints
-   - Frontend: Create UI components and JavaScript logic
-   - Database: Create migration scripts if needed
+# Make changes
+# Test thoroughly
+# Update documentation
 
-3. **Test Changes**
-   ```bash
-   # Run backend tests
-   python3 -m pytest Backend/tests/
-   
-   # Test API endpoints
-   curl http://localhost:8080/api/v1/constraints
-   ```
+# Commit changes
+git add .
+git commit -m "Add new feature: description"
 
-4. **Update Documentation**
-   - Update relevant documentation files
-   - Add code comments
-   - Update API documentation
+# Push to remote
+git push origin feature/new-feature
 
-5. **Commit and Push**
-   ```bash
-   git add .
-   git commit -m "Add constraint management system"
-   git push origin feature/constraint-system
-   ```
-
-### 2. Database Changes
-1. **Create Migration Script**
-   ```python
-   # Backend/migrations/new_migration.py
-   import sqlite3
-   import os
-   
-   def run_migration():
-       db_path = 'Backend/db/simpleTrade_new.db'
-       conn = sqlite3.connect(db_path)
-       cursor = conn.cursor()
-       
-       # Add your SQL changes here
-       cursor.execute("""
-           ALTER TABLE trades ADD COLUMN new_column TEXT;
-       """)
-       
-       conn.commit()
-       conn.close()
-   
-   if __name__ == "__main__":
-       run_migration()
-   ```
-
-2. **Run Migration**
-   ```bash
-   python3 Backend/migrations/new_migration.py
-   ```
-
-3. **Update Models**
-   - Update SQLAlchemy models to reflect changes
-   - Add validation rules if needed
-
-### 3. API Development
-1. **Create Service Layer**
-   ```python
-   # Backend/services/new_service.py
-   from Backend.models import db
-   from Backend.models.new_model import NewModel
-   
-   class NewService:
-       @staticmethod
-       def get_all():
-           return NewModel.query.all()
-       
-       @staticmethod
-       def create(data):
-           new_item = NewModel(**data)
-           db.session.add(new_item)
-           db.session.commit()
-           return new_item
-   ```
-
-2. **Create API Routes**
-   ```python
-   # Backend/routes/api/new_routes.py
-   from flask import Blueprint, request, jsonify
-   from Backend.services.new_service import NewService
-   
-   new_bp = Blueprint('new', __name__)
-   
-   @new_bp.route('/new', methods=['GET'])
-   def get_all():
-       items = NewService.get_all()
-       return jsonify({
-           'status': 'success',
-           'data': [item.to_dict() for item in items]
-       })
-   ```
-
-3. **Register Routes**
-   ```python
-   # Backend/app.py
-   from Backend.routes.api.new_routes import new_bp
-   app.register_blueprint(new_bp, url_prefix='/api/v1')
-   ```
-
-## Frontend Architecture
-
-### Comprehensive Validation System
-
-The TikTrack frontend includes a comprehensive validation system across all pages:
-
-#### Validation Features
-- **Real-time Validation**: Immediate feedback on form inputs
-- **Range Validation**: Min/max values for numbers, dates, and text lengths
-- **Format Validation**: Email, phone, symbols, currency formats
-- **Business Logic Validation**: Status combinations, dependencies, constraints
-- **Security Validation**: Input sanitization, XSS prevention
-- **User Experience**: Clear error messages, auto-focus on error fields
-
-#### Page-Specific Validation
-
-**Trade Plans (`trade_plans.js`)**
-- Complete CRUD operations with modal management
-- Plan validation: dates, amounts, investment types
-- Status combination validation
-- Integration with ValidationService backend
-
-**Alerts (`alerts.js`)**
-- Advanced alert condition validation
-- Support for price alerts and stop-loss alerts
-- Variable, operator, and value validation
-- Status/trigger state combination validation
-
-**Cash Flows (`cash_flows.js`)**
-- Financial data validation (amounts, currencies, dates)
-- Account and transaction type validation
-- Range validation for amounts and dates
-- Source and external ID validation
-
-**Notes (`notes.js`)**
-- Content validation (1-10,000 characters)
-- File attachment validation (size, type restrictions)
-- Related object validation and linking
-- Support for multiple attachment types
-
-**Executions (`executions.js`)**
-- Trade execution validation (ID, quantity, price)
-- Date range and business day validation
-- Commission and fee validation
-- Integration with trade management
-
-**Accounts (`accounts.js`)**
-- Account name validation (length, special characters)
-- Currency and status validation
-- Balance and value range validation
-- Enhanced security checks
-
-**Tickers (`tickers.js`)**
-- Symbol uniqueness and format validation
-- Company name and type validation
-- Currency integration validation
-- Market data validation
-
-#### Validation Architecture
-```javascript
-// Unified validation pattern across all pages
-function validateCompleteForm(mode) {
-    const prefix = mode === 'add' ? 'add' : 'edit';
-    let isValid = true;
-    
-    // Field-specific validations
-    if (!validateRequiredFields(prefix)) isValid = false;
-    if (!validateDataTypes(prefix)) isValid = false;
-    if (!validateRanges(prefix)) isValid = false;
-    if (!validateBusinessRules(prefix)) isValid = false;
-    
-    return isValid;
-}
-
-// Error handling and user feedback
-function showFieldError(fieldId, message) {
-    const field = document.getElementById(fieldId);
-    const errorDiv = document.getElementById(fieldId + 'Error');
-    
-    field.classList.add('is-invalid');
-    field.focus();
-    errorDiv.textContent = message;
-    errorDiv.style.display = 'block';
-}
+# Create pull request
 ```
 
-### Table Mapping System
-The application uses a centralized table mapping system located in `trading-ui/scripts/table-mappings.js`. This system provides:
+### 2. Bug Fixes
+```bash
+# Create bug fix branch
+git checkout -b fix/bug-description
 
-- **Centralized Column Mappings**: All table column definitions are stored in one place
-- **Consistent Sorting**: All tables use the same sorting mechanism
-- **Easy Maintenance**: Adding new tables or modifying existing ones requires changes in only one file
-- **Type Safety**: Proper handling of complex fields (nested objects, dates, etc.)
+# Fix the bug
+# Add tests
+# Update documentation
 
-#### Usage
-```javascript
-// Get column value for sorting
-const value = window.getColumnValue(item, columnIndex, tableType);
+# Commit fix
+git commit -m "Fix: description of the fix"
 
-// Check if table is supported
-const isSupported = window.isTableSupported(tableType);
-
-// Get table mapping
-const mapping = window.getTableMapping(tableType);
+# Push and create pull request
 ```
 
-#### Adding New Tables
-1. Add table mapping to `TABLE_COLUMN_MAPPINGS` in `table-mappings.js`
-2. Add special field handling if needed
-3. Include `table-mappings.js` in the HTML page
-4. Add `data-table-type` attribute to the table element
+### 3. Code Review Process
+1. **Self Review**: Review your own code before submitting
+2. **Peer Review**: Have another developer review your code
+3. **Testing**: Ensure all tests pass
+4. **Documentation**: Update relevant documentation
+5. **Merge**: Merge after approval
 
-### Script Loading Order
-The correct order for loading scripts in HTML pages:
-```html
-<script src="scripts/header-system.js"></script>
-<script src="scripts/console-cleanup.js"></script>
-<script src="scripts/translation-utils.js"></script>
-<script src="scripts/table-mappings.js"></script>  <!-- Must be loaded before main.js -->
-<script src="scripts/main.js"></script>
-<script src="scripts/filter-system.js"></script>
-<script src="scripts/alerts.js"></script>
-<script src="scripts/active-alerts-component.js"></script>
-<script src="scripts/[page-specific].js"></script>
-```
+## 🧪 Testing
 
-## Dynamic Constraint Management System
+### Backend Testing
+```bash
+# Run all tests
+cd Backend
+python -m pytest tests/
 
-### Overview
-The constraint management system allows dynamic definition and enforcement of database constraints through a web interface.
+# Run specific test file
+python -m pytest tests/test_accounts.py
 
-### Key Components
+# Run with coverage
+python -m pytest --cov=. tests/
 
-#### 1. Database Tables
-- **constraints**: Main constraint definitions
-- **enum_values**: Enum constraint values
-- **constraint_validations**: Validation results
-
-#### 2. Backend Services
-```python
-# Backend/services/constraint_service.py
-class ConstraintService:
-    @staticmethod
-    def get_all_constraints():
-        return Constraint.query.filter_by(is_active=True).all()
-    
-    @staticmethod
-    def create_constraint(data):
-        constraint = Constraint(**data)
-        db.session.add(constraint)
-        db.session.commit()
-        return constraint
-    
-    @staticmethod
-    def validate_constraints():
-        # Implementation for constraint validation
-        pass
-```
-
-#### 3. API Endpoints
-- `GET /api/v1/constraints` - List all constraints
-- `POST /api/v1/constraints` - Create new constraint
-- `PUT /api/v1/constraints/{id}` - Update constraint
-- `DELETE /api/v1/constraints/{id}` - Delete constraint
-- `GET /api/v1/constraints/health` - System health
-
-#### 4. Frontend Components
-```javascript
-// trading-ui/scripts/constraint-manager.js
-class ConstraintManager {
-    constructor() {
-        this.apiBase = 'http://localhost:8080/api/v1/constraints';
-        this.init();
-    }
-    
-    async init() {
-        await this.loadStats();
-        await this.loadConstraints();
-        this.setupEventListeners();
-    }
-    
-    async loadConstraints() {
-        const response = await fetch(this.apiBase);
-        const data = await response.json();
-        this.renderConstraintsList(data.data);
-    }
-}
-```
-
-### Constraint Types
-1. **CHECK**: Custom validation rules
-2. **NOT NULL**: Required field validation
-3. **UNIQUE**: Unique value enforcement
-4. **FOREIGN KEY**: Referential integrity
-5. **ENUM**: Predefined value lists
-
-### Usage Examples
-
-#### Adding a CHECK Constraint
-```json
-{
-    "table_name": "trades",
-    "column_name": "investment_type",
-    "constraint_type": "CHECK",
-    "constraint_name": "valid_investment_type",
-    "constraint_definition": "investment_type IN ('swing', 'investment', 'passive')"
-}
-```
-
-#### Adding an ENUM Constraint
-```json
-{
-    "table_name": "accounts",
-    "column_name": "status",
-    "constraint_type": "ENUM",
-    "constraint_name": "account_status_enum",
-    "enum_values": [
-        {"value": "active", "display_name": "פעיל", "sort_order": 1},
-        {"value": "inactive", "display_name": "לא פעיל", "sort_order": 2}
-    ]
-}
-```
-
-## Testing
-
-### Unit Testing
-```python
-# Backend/tests/test_constraints.py
-import pytest
-from Backend.services.constraint_service import ConstraintService
-
-def test_create_constraint():
-    data = {
-        "table_name": "trades",
-        "column_name": "status",
-        "constraint_type": "ENUM",
-        "constraint_name": "test_constraint"
-    }
-    
-    constraint = ConstraintService.create_constraint(data)
-    assert constraint.table_name == "trades"
-    assert constraint.constraint_type == "ENUM"
-```
-
-### Integration Testing
-```python
-# Backend/tests/integration/test_constraint_api.py
-def test_constraint_api_endpoints(client):
-    # Test GET /api/v1/constraints
-    response = client.get('/api/v1/constraints')
-    assert response.status_code == 200
-    
-    # Test POST /api/v1/constraints
-    data = {
-        "table_name": "trades",
-        "column_name": "status",
-        "constraint_type": "ENUM",
-        "constraint_name": "test_constraint"
-    }
-    response = client.post('/api/v1/constraints', json=data)
-    assert response.status_code == 201
+# Run with verbose output
+python -m pytest -v tests/
 ```
 
 ### Frontend Testing
+```bash
+# Manual testing with browser dev tools
+# Console logging for debugging
+# Comprehensive error handling
+
+# Test filter system
+# Test navigation system
+# Test warning system
+# Test translation system
+```
+
+### Test Structure
+```
+Backend/
+├── tests/
+│   ├── test_accounts.py
+│   ├── test_trades.py
+│   ├── test_alerts.py
+│   ├── test_api.py
+│   └── ...
+```
+
+## 📊 Filter System Development
+
+### Architecture Overview
+The filter system is built around the `SimpleFilter` class in `simple-filter.js`:
+
 ```javascript
-// trading-ui/tests/constraint-manager.test.js
-describe('ConstraintManager', () => {
-    test('should load constraints', async () => {
-        const manager = new ConstraintManager();
-        await manager.loadConstraints();
-        expect(manager.constraints.length).toBeGreaterThan(0);
-    });
+class SimpleFilter {
+    constructor() {
+        this.currentFilters = {
+            status: [],
+            type: [],
+            account: [],
+            date: [],
+            search: ''
+        };
+    }
+    
+    async init() {
+        await this.waitForElements();
+        await this.initializeDefaultFilters();
+        this.setupEventListeners();
+    }
+}
+```
+
+### Key Components
+
+#### 1. Filter Application
+```javascript
+applyFilters() {
+    this.applyFiltersToTradePlansTable();
+    this.applyFiltersToAlertsTable();
+    this.applyFiltersToDatabaseDisplayTables();
+}
+```
+
+#### 2. Table-Specific Filtering
+```javascript
+applyFiltersToDatabaseTable(tableId) {
+    const table = document.getElementById(tableId);
+    const tableType = table.getAttribute('data-table-type');
+    
+    // Extract data based on table type
+    // Apply filters with comprehensive logging
+    // Update row visibility
+}
+```
+
+#### 3. Preference Management
+```javascript
+async initializeDefaultFilters() {
+    const response = await fetch('/api/v1/preferences/');
+    const preferences = await response.json();
+    this.currentFilters = {
+        status: this.convertStatusPreference(preferences.defaultStatusFilter),
+        type: this.convertTypePreference(preferences.defaultTypeFilter),
+        account: this.convertAccountPreference(preferences.defaultAccountFilter),
+        date: this.convertDatePreference(preferences.defaultDateRangeFilter),
+        search: preferences.defaultSearchFilter || ''
+    };
+}
+```
+
+### Development Guidelines
+
+#### 1. Adding New Filter Types
+1. **Update `currentFilters`**: Add new filter property
+2. **Add conversion function**: Create `convert*Preference()` function
+3. **Add application logic**: Update `applyFiltersToDatabaseTable()`
+4. **Add display updates**: Create `update*Display()` function
+5. **Add button selections**: Create `update*ButtonSelections()` function
+6. **Update HTML**: Add filter menu and display elements
+7. **Add logging**: Include comprehensive logging
+
+#### 2. Adding New Table Types
+1. **Define table type**: Add `data-table-type` attribute
+2. **Add case statement**: Update switch statement in `applyFiltersToDatabaseTable()`
+3. **Define data extraction**: Specify how to extract filterable data
+4. **Test thoroughly**: Test with all filter combinations
+
+#### 3. Performance Optimization
+1. **Efficient DOM queries**: Use specific selectors
+2. **Debounced search**: Prevent excessive filtering during typing
+3. **Smart updates**: Only update necessary elements
+4. **Memory management**: Proper cleanup of event listeners
+
+## 🎨 Frontend Development
+
+### JavaScript Architecture
+
+#### Module Organization
+1. **`header-system.js`**: Navigation and filter interface
+2. **`simple-filter.js`**: Advanced filtering system
+3. **`warning-system.js`**: Centralized modal management
+4. **`translation-utils.js`**: Hebrew/English translation utilities
+5. **`data-utils.js`**: Data handling and API calls
+6. **`ui-utils.js`**: UI utility functions
+7. **`tables.js`**: Table management and sorting
+8. **`date-utils.js`**: Date formatting and utilities
+9. **`linked-items.js`**: Linked items management
+10. **`page-utils.js`**: Page-specific utilities
+11. **`main.js`**: Core initializer and dependency checker
+
+#### Loading Order
+```html
+<!-- Core systems -->
+<script src="scripts/header-system.js"></script>
+<script src="scripts/console-cleanup.js"></script>
+<script src="scripts/simple-filter.js"></script>
+<script src="scripts/translation-utils.js"></script>
+<script src="scripts/data-utils.js"></script>
+<script src="scripts/ui-utils.js"></script>
+
+<!-- Utility modules -->
+<script src="scripts/table-mappings.js"></script>
+<script src="scripts/date-utils.js"></script>
+<script src="scripts/tables.js"></script>
+<script src="scripts/linked-items.js"></script>
+<script src="scripts/page-utils.js"></script>
+
+<!-- Core initializer -->
+<script src="scripts/main.js"></script>
+
+<!-- Page-specific files -->
+<script src="scripts/accounts.js"></script>
+```
+
+### CSS Architecture
+
+#### File Organization
+1. **`apple-theme.css`**: Base theme and variables
+2. **`header-system.css`**: Header and navigation styles
+3. **`warning-system.css`**: Modal and warning styles
+4. **`styles.css`**: General styles and utilities
+
+#### Responsive Design
+```css
+/* Mobile-first approach */
+@media (max-width: 768px) {
+    /* Mobile styles */
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* Tablet styles */
+}
+
+@media (min-width: 1025px) {
+    /* Desktop styles */
+}
+```
+
+### HTML Structure
+
+#### Required Elements
+```html
+<!-- Header System -->
+<div id="unified-header">
+    <!-- Navigation -->
+    <nav class="main-navigation">
+        <!-- Navigation items -->
+    </nav>
+    
+    <!-- Filter System -->
+    <div id="headerFilters">
+        <!-- Filter groups -->
+    </div>
+</div>
+
+<!-- Tables -->
+<table id="tableId" data-table-type="table_type">
+    <thead>
+        <tr>
+            <th>Column 1</th>
+            <th>Column 2</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Data 1</td>
+            <td>Data 2</td>
+        </tr>
+    </tbody>
+</table>
+```
+
+## 🔒 Security
+
+### Input Validation
+```python
+# Backend validation
+from flask import request
+from services.validation_service import ValidationService
+
+def validate_trade_data(data):
+    validator = ValidationService()
+    return validator.validate_trade(data)
+```
+
+### SQL Injection Prevention
+```python
+# Use parameterized queries
+def get_trades_by_status(status):
+    return Trade.query.filter_by(status=status).all()
+```
+
+### XSS Prevention
+```javascript
+// Frontend sanitization
+function sanitizeInput(input) {
+    return input.replace(/[<>]/g, '');
+}
+```
+
+## 📈 Performance
+
+### Backend Optimization
+```python
+# Database optimization
+def get_trades_with_accounts():
+    return Trade.query.options(
+        joinedload(Trade.account)
+    ).all()
+```
+
+### Frontend Optimization
+```javascript
+// Debounced search
+let searchTimeout;
+searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        applySearchFilter(e.target.value);
+    }, 300);
 });
 ```
 
-## Code Standards
+### Caching
+```python
+# Redis caching (if implemented)
+from flask_caching import Cache
 
-### Python Standards
-- **PEP 8**: Follow Python style guide
-- **Type Hints**: Use type annotations
-- **Docstrings**: Document all functions and classes
-- **Error Handling**: Use proper exception handling
+cache = Cache()
 
-### JavaScript Standards
-- **ES6+**: Use modern JavaScript features
-- **Async/Await**: Use for asynchronous operations
-- **Error Handling**: Use try-catch blocks
-- **Comments**: Document complex logic
+@cache.memoize(timeout=300)
+def get_accounts():
+    return Account.query.all()
+```
 
-### Database Standards
-- **Naming**: Use snake_case for table and column names
-- **Indexes**: Add indexes for frequently queried columns
-- **Constraints**: Use appropriate constraints
-- **Migrations**: Always use migration scripts
-
-## Deployment
+## 🚀 Deployment
 
 ### Development Deployment
 ```bash
 # Start development server
-./start_dev.sh
-
-# Access application
-http://localhost:8080
+cd Backend
+python app.py
 ```
 
 ### Production Deployment
 ```bash
-# Start production server
-./start_server.sh
+# Set production environment
+export FLASK_ENV=production
+export SECRET_KEY=your-secret-key
 
-# Monitor logs
-tail -f logs/app.log
+# Start production server
+gunicorn -w 4 -b 0.0.0.0:8080 app:app
 ```
 
-## Troubleshooting
+### Docker Deployment
+```dockerfile
+FROM python:3.9-slim
 
-### Common Issues
-1. **Database Connection**: Check database file permissions
-2. **Migration Errors**: Verify migration scripts
-3. **API Errors**: Check endpoint URLs and parameters
-4. **Frontend Issues**: Check browser console for errors
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-### Debug Tools
-- **Backend**: Use Python debugger (pdb)
-- **Frontend**: Use browser developer tools
-- **Database**: Use SQLite command line tool
-- **API**: Use curl or Postman for testing
+COPY . .
+EXPOSE 8080
 
-## Resources
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "app:app"]
+```
+
+## 🐛 Debugging
+
+### Backend Debugging
+```python
+# Enable debug mode
+app.config['DEBUG'] = True
+
+# Add logging
+import logging
+logging.basicConfig(level=logging.DEBUG)
+```
+
+### Frontend Debugging
+```javascript
+// Console logging
+console.log('🔄 Debug message:', data);
+
+// Error handling
+try {
+    // Code that might fail
+} catch (error) {
+    console.error('❌ Error:', error);
+}
+```
+
+### Database Debugging
+```python
+# Enable SQL logging
+app.config['SQLALCHEMY_ECHO'] = True
+```
+
+## 📚 Best Practices
+
+### Code Organization
+1. **Separation of Concerns**: Keep logic separate from presentation
+2. **DRY Principle**: Don't repeat yourself
+3. **Single Responsibility**: Each function should do one thing
+4. **Consistent Naming**: Use clear, descriptive names
+
+### Error Handling
+1. **Graceful Degradation**: Handle errors gracefully
+2. **User Feedback**: Provide clear error messages
+3. **Logging**: Log errors for debugging
+4. **Fallbacks**: Provide alternative functionality
+
+### Testing
+1. **Unit Tests**: Test individual functions
+2. **Integration Tests**: Test component interactions
+3. **End-to-End Tests**: Test complete workflows
+4. **Performance Tests**: Test system performance
 
 ### Documentation
-- [API Documentation](../api/README.md)
-- [Database Documentation](../database/README.md)
-- [Frontend Documentation](../frontend/README.md)
+1. **Inline Comments**: Comment complex logic
+2. **Function Documentation**: Document function parameters and return values
+3. **API Documentation**: Document API endpoints
+4. **User Documentation**: Document user-facing features
 
-### Tools
-- **API Testing**: Postman, curl
-- **Database**: SQLite Browser, DBeaver
-- **Code Editor**: VS Code, PyCharm
-- **Version Control**: Git, GitHub
+## 🤝 Contributing
+
+### Development Process
+1. **Fork Repository**: Create your own fork
+2. **Create Branch**: Create feature branch
+3. **Make Changes**: Implement your changes
+4. **Test Thoroughly**: Ensure all tests pass
+5. **Update Documentation**: Update relevant documentation
+6. **Submit Pull Request**: Create pull request for review
+
+### Code Review Checklist
+- [ ] Code follows style guidelines
+- [ ] Tests are included and passing
+- [ ] Documentation is updated
+- [ ] No security vulnerabilities
+- [ ] Performance impact is considered
+- [ ] Error handling is implemented
+
+### Commit Message Format
+```
+type(scope): description
+
+[optional body]
+
+[optional footer]
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes
+- `refactor`: Code refactoring
+- `test`: Test changes
+- `chore`: Build process changes
+
+## 📞 Support
+
+### Getting Help
+- **Documentation**: Check relevant documentation
+- **Issues**: Search existing issues
+- **Discussions**: Use GitHub discussions
+- **Team**: Contact development team
+
+### Reporting Issues
+1. **Check Existing Issues**: Search for similar issues
+2. **Provide Details**: Include error messages and steps to reproduce
+3. **Include Environment**: Specify OS, browser, and version
+4. **Attach Logs**: Include relevant logs and screenshots
 
 ---
 
-**Last Updated**: August 23, 2025  
-**Version**: 2.0.0  
-**Author**: TikTrack Development Team
+**Last Updated**: August 26, 2025  
+**Version**: 3.1 (Enhanced Filter System)  
+**Maintainer**: TikTrack Development Team

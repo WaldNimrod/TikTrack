@@ -73,6 +73,12 @@ The TikTrack system uses SQLite as its primary database with SQLAlchemy ORM for 
 
 ## Database Operations
 
+### Database Recreation
+- **Complete Recreation**: `Backend/create_fresh_database.py` - Recreates entire database with sample data
+- **Backup Creation**: Automatically creates backup before deletion
+- **Sample Data**: Includes comprehensive sample data for all modules
+- **Structure**: Creates all tables, constraints, relationships, and indexes
+
 ### Backup System
 - **Automated Backups**: Regular database snapshots
 - **Git Integration**: Version-controlled backups

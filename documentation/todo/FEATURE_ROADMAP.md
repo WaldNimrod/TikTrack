@@ -548,7 +548,40 @@
 
 ---
 
-### 27. Top Section Spacing Enhancement
+### 27. Preferences Page - Default Filter Parameters Not Saving
+**Status:** 🟡 Planned  
+**Priority:** High  
+**Description:** Fix issue where changing default filter parameters in preferences page shows success message but changes are not saved and disappear on refresh
+
+**Requirements:**
+- [ ] Investigate why preferences API returns success but file is not updated
+- [ ] Fix file writing issue in preferences API endpoint
+- [ ] Ensure changes persist after page refresh
+- [ ] Add proper error handling for file write failures
+- [ ] Test all preference types (status, type, account, date range, search filters)
+
+**Technical Requirements:**
+- [ ] Debug file path resolution in preferences.py
+- [ ] Add comprehensive logging for file operations
+- [ ] Verify file permissions and directory access
+- [ ] Test API endpoint with different preference types
+- [ ] Ensure backward compatibility with existing preferences
+
+**Features:**
+- [ ] Reliable preference saving for all filter types
+- [ ] Proper error messages when saving fails
+- [ ] Consistent behavior across all preference settings
+- [ ] Persistent changes after page refresh
+
+**Benefits:**
+- [ ] Users can successfully customize their default filters
+- [ ] Improved user experience with reliable settings
+- [ ] Consistent behavior across the application
+- [ ] Foundation for future preference features
+
+---
+
+### 28. Top Section Spacing Enhancement
 **Status:** 🟡 Planned  
 **Priority:** Low  
 **Description:** Add consistent top margin/spacing to top-section elements across all pages
@@ -585,12 +618,13 @@
 
 ### Phase 1 - Critical Foundation
 1. **Price Data & Ticker Information API** (Critical)
-2. **Trade Plan & Trade Duplication** (High)
-3. **Trading Journal Database Design** (High)
-4. **Transaction Association System** (High) - Found in code
-5. **Full Position Closing Interface** (High) - Found in code
-6. **Open Plans Field for Tickers** (High) - New feature
-7. **Style Demonstration Page Structure Fix** (High) - Manual container organization
+2. **Preferences Page - Default Filter Parameters Not Saving** (High) - Bug fix
+3. **Trade Plan & Trade Duplication** (High)
+4. **Trading Journal Database Design** (High)
+5. **Transaction Association System** (High) - Found in code
+6. **Full Position Closing Interface** (High) - Found in code
+7. **Open Plans Field for Tickers** (High) - New feature
+8. **Style Demonstration Page Structure Fix** (High) - Manual container organization
 
 ### Phase 2 - Core Features
 6. **Trading Journal Implementation** (High)

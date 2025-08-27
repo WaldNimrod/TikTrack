@@ -1,711 +1,523 @@
 # TikTrack Header System Documentation
 
 ## Overview
-The TikTrack header system provides a consistent navigation and user interface across all pages. The system includes a centralized warning system, translation utilities, unified filter system, and responsive design components.
+The TikTrack Header System is a comprehensive navigation and filtering solution that provides a unified interface across all pages of the application. It includes advanced filtering capabilities, responsive navigation, and seamless integration with the backend API.
+
+## File Location
+- **Main File**: `trading-ui/scripts/header-system.js`
+- **Version**: 3.1 (August 26, 2025)
+- **Integration**: Works with `simple-filter.js` for advanced filtering
 
 ## System Components
 
-### 1. Header Navigation
-- **Main Menu**: Primary navigation menu with page links
-- **Settings Dropdown**: Secondary navigation and system settings
-- **Responsive Design**: Mobile-friendly navigation
-- **Active State Management**: Current page highlighting
+### 1. Navigation System
+- **Main Navigation**: Primary navigation menu with dropdown support
+- **Active State Management**: Automatic highlighting of current page
+- **Responsive Design**: Mobile-friendly navigation interface
+- **Dropdown Menus**: Multi-level navigation support
 
-### 2. Unified Filter System ✅ **NEW COMPREHENSIVE SYSTEM**
-- **Purpose**: Centralized filtering system for all data tables across the application
-- **File**: `scripts/simple-filter.js`
-- **Architecture**: Single filter instance manages all filter types across all pages
-- **Features**:
-  - **Multi-Type Filtering**: Status, Type, Account, Date Range, and Search filters
-  - **Preference-Based Defaults**: Loads default filters from user preferences
-  - **Real-Time Updates**: Instant filtering with visual feedback
-  - **Cross-Page Consistency**: Same filter behavior across all pages
-  - **Persistent State**: Maintains filter state during navigation
-  - **Hebrew Translation**: Automatic conversion of English preferences to Hebrew display
-  - **Button State Management**: Visual indication of active filters
-  - **Error Handling**: Graceful fallback when preferences unavailable
+### 2. Unified Filter System
+- **Status Filters**: Filter by trade status (open, closed, cancelled, etc.)
+- **Type Filters**: Filter by investment type (swing, investment, passive, etc.)
+- **Account Filters**: Filter by account (dynamic loading from server)
+- **Date Range Filters**: Filter by date ranges (today, week, month, etc.)
+- **Search Filters**: Text-based search across all fields
+- **Filter Reset/Clear**: Quick actions to reset or clear all filters
 
-### 3. Warning System ✅ **RECENTLY ENHANCED**
-- **Purpose**: Centralized modal system for confirmations and warnings
-- **File**: `scripts/warning-system.js`
-- **Features**:
-  - Delete confirmations with customizable messages
-  - Validation warnings with field-specific guidance
-  - Linked item warnings for data integrity
-  - Consistent UI across all modules
-  - Global callback management for actions
-- **Recent Improvements**:
-  - Enhanced global callback management
-  - Improved modal responsiveness
-  - Better error handling and user feedback
-  - Consistent styling across all modules
-  - Integration with Cash Flows module
+### 3. Filter Display Management
+- **Real-time Updates**: Filter display updates automatically
+- **Button State Management**: Visual indication of active filters
+- **Comprehensive Logging**: Detailed logging for debugging and monitoring
 
-### 4. Translation System ✅ **RECENTLY ENHANCED**
-- **Purpose**: Global translation utilities for consistent text display
-- **File**: `scripts/translation-utils.js`
-- **Features**:
-  - Alert condition translation
-  - Trade status translation
-  - Currency display formatting
-  - Consistent text rendering across modules
-- **Recent Additions**:
-  - `translateAlertCondition()` function
-  - `translateTradeStatus()` function
-  - Enhanced currency display utilities
+### 4. Integration Components
+- **API Integration**: Seamless connection with backend services
+- **Preference System**: User-specific filter preferences
+- **State Management**: Persistent filter and navigation states
 
 ## File Structure
-
-### Core Files
 ```
 trading-ui/
 ├── scripts/
-│   ├── header-system.js      # Header navigation and menu management
-│   ├── simple-filter.js      # Unified filter system (NEW)
-│   ├── warning-system.js     # Centralized warning modal system
-│   ├── translation-utils.js  # Global translation utilities
-│   └── main.js              # General utilities and functions
+│   ├── header-system.js          # Main header system
+│   ├── simple-filter.js          # Enhanced filter system
+│   └── console-cleanup.js        # Console management
 ├── styles/
-│   ├── header-system.css     # Header and navigation styles
-│   └── styles.css           # Global styles and page themes
-├── config/
-│   └── preferences.json     # Default filter preferences
-└── images/
-    └── icons/               # Navigation icons and images
+│   ├── header-system.css         # Header styling
+│   ├── apple-theme.css           # Base theme
+│   └── styles.css                # General styles
+└── config/
+    └── preferences.json          # Default preferences
 ```
 
-### Page Integration
-- **HTML Structure**: Consistent header structure across all pages
-- **JavaScript Loading**: Standardized script loading order
-- **CSS Integration**: Unified styling approach
-- **Responsive Design**: Mobile-first responsive design
+## Key Features
 
-## Unified Filter System Architecture
+### 1. Advanced Filter System Integration
+- **Multi-Table Support**: Filters work across all data tables
+- **Smart Field Detection**: Automatically detects available fields per table
+- **Table-Specific Logic**: Different filtering behavior for different table types
+- **Comprehensive Logging**: Detailed logs for debugging and monitoring
 
-### Core Class: SimpleFilter
+### 2. Enhanced User Experience
+- **Intuitive Interface**: Easy-to-use filter controls
+- **Visual Feedback**: Clear indication of active filters
+- **Responsive Design**: Works on all device sizes
+- **Accessibility**: Keyboard navigation and screen reader support
+
+### 3. Performance Optimizations
+- **Efficient DOM Queries**: Optimized element selection
+- **Debounced Search**: Reduced processing during typing
+- **Smart Updates**: Only updates necessary elements
+- **Memory Management**: Efficient resource usage
+
+### 4. Robust Error Handling
+- **Network Resilience**: Handles API failures gracefully
+- **Missing Element Protection**: Continues working with missing elements
+- **Fallback Mechanisms**: Provides alternatives when primary features fail
+- **Comprehensive Logging**: Detailed error reporting
+
+## Core Methods
+
+### Navigation Management
+
+#### `setActiveMenuItem(currentPath)`
+Sets the active navigation item based on current page:
 ```javascript
-class SimpleFilter {
-    constructor() {
-        this.currentFilters = {
-            status: [],
-            type: [],
-            account: [],
-            date: [],
-            search: ''
-        };
-    }
+setActiveMenuItem(currentPath) {
+    // Remove existing active classes
+    // Find and highlight current page
+    // Handle dropdown items
+    // Update visual state
 }
 ```
 
-### Initialization Process
+#### `updateNavigationState()`
+Updates navigation state based on current page:
 ```javascript
-// 1. Wait for DOM elements
-waitForElements() {
-    const headerElement = document.getElementById('unified-header');
-    if (!headerElement) {
-        setTimeout(() => this.waitForElements(), 100);
-        return;
-    }
-    // Check for filter menus and items
-    this.setupEventListeners();
-}
-
-// 2. Load default preferences
-async initializeDefaultFilters() {
-    const response = await fetch('/api/v1/preferences/');
-    const preferences = await response.json();
-    const userPrefs = preferences.user || preferences.defaults;
-    
-    this.currentFilters = {
-        status: this.convertStatusPreference(userPrefs.defaultStatusFilter),
-        type: this.convertTypePreference(userPrefs.defaultTypeFilter),
-        account: this.convertAccountPreference(userPrefs.defaultAccountFilter),
-        date: this.convertDatePreference(userPrefs.defaultDateRangeFilter),
-        search: userPrefs.defaultSearchFilter || ''
-    };
+updateNavigationState() {
+    const currentPath = window.location.pathname;
+    this.setActiveMenuItem(currentPath);
+    this.saveNavigationState();
 }
 ```
 
-### Preference Conversion System
+### Filter System Integration
+
+#### `initializeFilterSystem()`
+Initializes the integrated filter system:
 ```javascript
-// Convert English preferences to Hebrew display values
-convertStatusPreference(preference) {
-    switch (preference) {
-        case 'open': return ['פתוח'];
-        case 'closed': return ['סגור'];
-        case 'cancelled': return ['מבוטל'];
-        case 'all': default: return [];
-    }
-}
-
-convertTypePreference(preference) {
-    switch (preference) {
-        case 'swing': return ['סווינג'];
-        case 'investment': return ['השקעה'];
-        case 'passive': return ['פסיבי'];
-        case 'all': default: return [];
-    }
-}
-
-convertDatePreference(preference) {
-    switch (preference) {
-        case 'this_week': return ['השבוע'];
-        case 'mtd': return ['MTD'];
-        case '30_days': return ['30 יום'];
-        case 'all': default: return [];
-    }
+initializeFilterSystem() {
+    // Load filter preferences
+    // Set up filter menus
+    // Initialize filter state
+    // Connect with simple-filter.js
 }
 ```
 
-### Filter Application Process
+#### `updateFilterDisplay()`
+Updates filter display elements:
 ```javascript
-applyFilters() {
-    // Apply filters to all tables on the page
-    const tables = ['tradesTable', 'alertsTable', 'accountsTable', 'tickersTable'];
-    
-    tables.forEach(tableId => {
-        const table = document.getElementById(tableId);
-        if (table) {
-            this.filterTable(table, tableId);
-        }
-    });
-}
-
-filterTable(table, tableId) {
-    const rows = table.querySelectorAll('tbody tr');
-    let visibleCount = 0;
-    
-    rows.forEach(row => {
-        let shouldShow = true;
-        
-        // Status filter
-        if (this.currentFilters.status.length > 0) {
-            const rowStatus = this.extractStatusFromRow(row, tableId);
-            if (!this.currentFilters.status.includes(rowStatus)) {
-                shouldShow = false;
-            }
-        }
-        
-        // Type filter
-        if (shouldShow && this.currentFilters.type.length > 0) {
-            const rowType = this.extractTypeFromRow(row, tableId);
-            if (!this.currentFilters.type.includes(rowType)) {
-                shouldShow = false;
-            }
-        }
-        
-        // Search filter
-        if (shouldShow && this.currentFilters.search) {
-            const searchText = this.currentFilters.search.toLowerCase();
-            const rowText = row.textContent.toLowerCase();
-            if (!rowText.includes(searchText)) {
-                shouldShow = false;
-            }
-        }
-        
-        row.style.display = shouldShow ? '' : 'none';
-        if (shouldShow) visibleCount++;
-    });
+updateFilterDisplay() {
+    // Update status display
+    // Update type display
+    // Update account display
+    // Update date display
+    // Update search input
 }
 ```
 
-### Display Update System
+### Account Management
+
+#### `loadAccountsForFilter()`
+Loads accounts from server for filter menu:
 ```javascript
-updateStatusDisplay() {
-    const statusDisplay = document.getElementById('selectedStatus');
-    if (!statusDisplay) return;
-    
-    if (this.currentFilters.status.length === 0) {
-        statusDisplay.textContent = 'הכול';
-    } else {
-        statusDisplay.textContent = this.currentFilters.status.join(', ');
-    }
-}
-
-updateButtonSelections() {
-    // Update visual state of filter buttons
-    this.updateStatusButtonSelections();
-    this.updateTypeButtonSelections();
-    this.updateAccountButtonSelections();
-    this.updateDateButtonSelections();
+async loadAccountsForFilter() {
+    const response = await fetch('/api/v1/accounts/');
+    const accounts = await response.json();
+    this.updateAccountFilterMenu(accounts.data);
 }
 ```
 
-### Default Preferences Configuration
-```json
-{
-  "defaults": {
-    "defaultStatusFilter": "open",
-    "defaultTypeFilter": "swing", 
-    "defaultAccountFilter": "all",
-    "defaultDateRangeFilter": "this_week",
-    "defaultSearchFilter": ""
-  }
+#### `updateAccountFilterMenu(accounts)`
+Updates account filter menu with server data:
+```javascript
+updateAccountFilterMenu(accounts) {
+    // Clear existing menu
+    // Add "All" option
+    // Add account options
+    // Set up event listeners
 }
 ```
 
-## Filter System Integration
+## HTML Structure
 
-### HTML Structure Requirements
+### Required Elements
 ```html
-<!-- Unified Header with Filter Menus -->
 <div id="unified-header">
-    <!-- Status Filter Menu -->
-    <div id="statusFilterMenu">
-        <div class="status-filter-item" data-value="הכול">הכול</div>
-        <div class="status-filter-item" data-value="פתוח">פתוח</div>
-        <div class="status-filter-item" data-value="סגור">סגור</div>
-        <div class="status-filter-item" data-value="מבוטל">מבוטל</div>
-    </div>
-    
-    <!-- Type Filter Menu -->
-    <div id="typeFilterMenu">
-        <div class="type-filter-item" data-value="הכול">הכול</div>
-        <div class="type-filter-item" data-value="סווינג">סווינג</div>
-        <div class="type-filter-item" data-value="השקעה">השקעה</div>
-        <div class="type-filter-item" data-value="פסיבי">פסיבי</div>
-    </div>
-    
-    <!-- Account Filter Menu -->
-    <div id="accountFilterMenu">
-        <div class="account-filter-item" data-value="הכול">הכול</div>
-        <!-- Dynamic account items -->
-    </div>
-    
-    <!-- Date Range Filter Menu -->
-    <div id="dateRangeFilterMenu">
-        <div class="date-range-filter-item" data-value="כל זמן">כל זמן</div>
-        <div class="date-range-filter-item" data-value="השבוע">השבוע</div>
-        <div class="date-range-filter-item" data-value="MTD">MTD</div>
-        <div class="date-range-filter-item" data-value="30 יום">30 יום</div>
+    <!-- Navigation -->
+    <nav class="main-navigation">
+        <ul class="nav-items">
+            <li class="tiktrack-nav-item" href="/">דף הבית</li>
+            <li class="tiktrack-nav-item dropdown" href="#">
+                <span>ניהול</span>
+                <ul class="dropdown-menu">
+                    <li class="tiktrack-dropdown-item" href="/test-header-only">בדיקה</li>
+                    <!-- More dropdown items -->
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Filter System -->
+    <div id="headerFilters">
+        <!-- Status Filter -->
+        <div class="filter-group status-filter">
+            <button class="filter-toggle" id="statusFilterToggle">
+                <span id="selectedStatus">הכול</span>
+                <span class="dropdown-arrow">▼</span>
+            </button>
+            <div id="statusFilterMenu" class="filter-menu">
+                <!-- Status options -->
+            </div>
+        </div>
+
+        <!-- Type Filter -->
+        <div class="filter-group type-filter">
+            <button class="filter-toggle" id="typeFilterToggle">
+                <span id="selectedType">הכול</span>
+                <span class="dropdown-arrow">▼</span>
+            </button>
+            <div id="typeFilterMenu" class="filter-menu">
+                <!-- Type options -->
+            </div>
+        </div>
+
+        <!-- Account Filter -->
+        <div class="filter-group account-filter">
+            <button class="filter-toggle" id="accountFilterToggle">
+                <span id="selectedAccount">הכול</span>
+                <span class="dropdown-arrow">▼</span>
+            </button>
+            <div id="accountFilterMenu" class="filter-menu">
+                <!-- Account options loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Date Range Filter -->
+        <div class="filter-group date-filter">
+            <button class="filter-toggle" id="dateRangeFilterToggle">
+                <span id="selectedDateRange">כל זמן</span>
+                <span class="dropdown-arrow">▼</span>
+            </button>
+            <div id="dateRangeFilterMenu" class="filter-menu">
+                <!-- Date range options -->
+            </div>
+        </div>
+
+        <!-- Search Filter -->
+        <div class="filter-group search-filter">
+            <input id="searchFilterInput" type="text" placeholder="חיפוש...">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="filter-group action-buttons">
+            <button id="resetFiltersBtn" class="reset-btn">↻</button>
+            <button id="clearFiltersBtn" class="clear-btn">×</button>
+        </div>
     </div>
 </div>
-
-<!-- Filter Display Elements -->
-<div id="selectedStatus">הכול</div>
-<div id="selectedType">הכול</div>
-<div id="selectedAccount">הכול</div>
-<div id="selectedDateRange">כל זמן</div>
 ```
 
-### JavaScript Integration
+## Integration Guide
+
+### 1. Include Required Files
+```html
+<!-- CSS Files -->
+<link rel="stylesheet" href="styles/apple-theme.css">
+<link rel="stylesheet" href="styles/header-system.css">
+
+<!-- JavaScript Files -->
+<script src="scripts/header-system.js"></script>
+<script src="scripts/simple-filter.js"></script>
+<script src="scripts/console-cleanup.js"></script>
+```
+
+### 2. Initialize Header System
 ```javascript
-// Initialize filter system
-document.addEventListener('DOMContentLoaded', async () => {
-    window.simpleFilter = new SimpleFilter();
-    await window.simpleFilter.init();
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.headerSystem) {
+        window.headerSystem.init();
+    }
 });
+```
 
+### 3. Set Up Filter Integration
+```javascript
 // Global filter functions for header system
-window.resetAllFilters = async () => {
+window.selectStatusOption = function(status) {
     if (window.simpleFilter) {
-        await window.simpleFilter.resetFilters();
+        window.simpleFilter.applyStatusFilter([status]);
     }
 };
 
-window.clearAllFilters = () => {
+window.selectTypeOption = function(type) {
     if (window.simpleFilter) {
-        window.simpleFilter.clearFilters();
+        window.simpleFilter.applyTypeFilter([type]);
+    }
+};
+
+window.selectAccountFilter = function(account) {
+    if (window.simpleFilter) {
+        window.simpleFilter.applyAccountFilter([account]);
+    }
+};
+
+window.selectDateRangeOption = function(dateRange) {
+    if (window.simpleFilter) {
+        window.simpleFilter.applyDateRangeFilter(dateRange);
     }
 };
 ```
 
-### Event Handling
-```javascript
-setupEventListeners() {
-    // Status filter events
-    const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
-    statusItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const status = item.getAttribute('data-value');
-            item.classList.toggle('selected');
-            
-            if (item.classList.contains('selected')) {
-                if (!this.currentFilters.status.includes(status)) {
-                    this.currentFilters.status.push(status);
-                }
-            } else {
-                this.currentFilters.status = this.currentFilters.status.filter(s => s !== status);
-            }
-            
-            this.updateStatusDisplay();
-            this.applyFilters();
-        });
-    });
-    
-    // Similar setup for type, account, and date filters
-}
+### 4. Add Table Structure
+```html
+<table id="tableId" data-table-type="table_type">
+    <thead>
+        <tr>
+            <th>Column 1</th>
+            <th>Column 2</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Data 1</td>
+            <td>Data 2</td>
+        </tr>
+    </tbody>
+</table>
 ```
 
 ## Filter System Features
 
 ### 1. Multi-Table Support
-- **Automatic Detection**: Automatically finds and filters all tables on the page
-- **Table-Specific Logic**: Different filtering logic for different table types
-- **Performance Optimized**: Efficient filtering with minimal DOM manipulation
+The filter system automatically detects and filters different table types:
 
-### 2. Preference Management
-- **Server Integration**: Loads preferences from `/api/v1/preferences/`
-- **Fallback Handling**: Graceful fallback when server unavailable
-- **User-Specific**: Supports user-specific preferences
-- **Default Values**: Comprehensive default value system
+- **Trade Tables** (`test_trades`, `trades`, `trade_plans`): Full filtering support
+- **General Tables** (`test_general`, `accounts`, `tickers`): Conditional filtering
+- **Special Tables** (`test_notifications`, `notes`): Smart filtering (skips irrelevant filters)
 
-### 3. Visual Feedback
-- **Button States**: Visual indication of selected filter options
-- **Display Updates**: Real-time updates of filter display text
-- **Count Indicators**: Shows number of visible records
-- **Loading States**: Visual feedback during preference loading
-
-### 4. Error Handling
-- **Network Errors**: Handles API failures gracefully
-- **Missing Elements**: Continues working when elements not found
-- **Invalid Data**: Handles malformed preference data
-- **Console Logging**: Comprehensive logging for debugging
-
-### 5. Performance Optimizations
-- **Debounced Search**: Prevents excessive filtering during typing
-- **Efficient DOM Queries**: Optimized element selection
-- **Minimal Re-renders**: Only updates necessary elements
-- **Memory Management**: Proper cleanup of event listeners
-
-## Integration Examples
-
-### Trades Page Integration
+### 2. Smart Field Detection
 ```javascript
-// Trades page specific filtering
-function filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
-    console.log('🔄 Filtering trades data:', {
-        statuses: selectedStatuses,
-        types: selectedTypes,
-        accounts: selectedAccounts,
-        dateRange: selectedDateRange,
-        search: searchTerm
-    });
-    
-    // Apply filters to trades data
-    const filteredTrades = tradesData.filter(trade => {
-        // Status filter
-        if (selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
-            const statusDisplay = translateTradeStatus(trade.status);
-            if (!selectedStatuses.includes(statusDisplay)) {
-                return false;
-            }
-        }
-        
-        // Type filter
-        if (selectedTypes.length > 0 && !selectedTypes.includes('all')) {
-            const typeDisplay = translateTradeType(trade.type);
-            if (!selectedTypes.includes(typeDisplay)) {
-                return false;
-            }
-        }
-        
-        // Account filter
-        if (selectedAccounts.length > 0 && !selectedAccounts.includes('all')) {
-            if (!selectedAccounts.includes(trade.account_name)) {
-                return false;
-            }
-        }
-        
-        // Search filter
-        if (searchTerm) {
-            const searchText = searchTerm.toLowerCase();
-            const tradeText = `${trade.ticker} ${trade.status} ${trade.type} ${trade.account_name}`.toLowerCase();
-            if (!tradeText.includes(searchText)) {
-                return false;
-            }
-        }
-        
-        return true;
-    });
-    
-    updateTradesTable(filteredTrades);
+// Example: Different filtering for different table types
+switch (tableType) {
+    case 'test_trades':
+        // Apply all filters
+        break;
+    case 'test_notifications':
+        // Skip status, account, date filters
+        break;
+    default:
+        // Apply available filters
+        break;
 }
 ```
 
-### Alerts Page Integration
-```javascript
-// Alerts page specific filtering
-function filterAlertsData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
-    console.log('🔄 Filtering alerts data:', {
-        statuses: selectedStatuses,
-        types: selectedTypes,
-        accounts: selectedAccounts,
-        dateRange: selectedDateRange,
-        search: searchTerm
-    });
-    
-    // Apply filters to alerts data
-    const filteredAlerts = alertsData.filter(alert => {
-        // Status filter
-        if (selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
-            const statusDisplay = translateAlertStatus(alert.status);
-            if (!selectedStatuses.includes(statusDisplay)) {
-                return false;
-            }
-        }
-        
-        // Type filter
-        if (selectedTypes.length > 0 && !selectedTypes.includes('all')) {
-            const typeDisplay = translateAlertType(alert.type);
-            if (!selectedTypes.includes(typeDisplay)) {
-                return false;
-            }
-        }
-        
-        // Search filter
-        if (searchTerm) {
-            const searchText = searchTerm.toLowerCase();
-            const alertText = `${alert.ticker} ${alert.condition} ${alert.status}`.toLowerCase();
-            if (!alertText.includes(searchText)) {
-                return false;
-            }
-        }
-        
-        return true;
-    });
-    
-    updateAlertsTable(filteredAlerts);
-}
+### 3. Comprehensive Logging
+The system provides detailed logging for debugging:
+
+```
+🔄 applyFilters called
+🔄 Current filters: {status: Array(1), type: Array(1), account: Array(0), date: Array(1), search: ''}
+🔄 Processing 7 rows in tradesTable
+🔄 Row data: ticker="AAPL", status="פתוח", type="סווינג", account="חשבון א"
+🔄 Checking status filter: current="פתוח", filters=["פתוח"]
+🔄 Status filter passed: "פתוח" found in filters
+📊 TABLE SUMMARY - tradesTable:
+   - Total rows: 7
+   - Visible rows: 3
+   - Hidden rows: 4
+   - Table type: test_trades
+   - Active filters: {status: Array(1), type: Array(1), account: Array(0), search: ''}
 ```
 
-## Warning System Architecture
+## Error Handling
 
-### Modal Management
+### 1. Network Error Handling
 ```javascript
-// Show warning modal
-window.showWarning({
-    title: 'Delete Confirmation',
-    message: 'Are you sure you want to delete this item?',
-    type: 'delete',
-    onConfirm: function() {
-        // Confirmation action
-    },
-    onCancel: function() {
-        // Cancellation action
+try {
+    const response = await fetch('/api/v1/accounts/');
+    if (response.ok) {
+        // Process response
+    } else {
+        console.warn('⚠️ Could not load accounts, using static options');
+        this.loadStaticAccounts();
     }
+} catch (error) {
+    console.error('❌ Network error loading accounts:', error);
+    this.loadStaticAccounts();
+}
+```
+
+### 2. Missing Element Protection
+```javascript
+updateFilterDisplay() {
+    const statusDisplay = document.getElementById('selectedStatus');
+    if (!statusDisplay) {
+        console.warn('⚠️ selectedStatus element not found');
+        return;
+    }
+    // Update display
+}
+```
+
+### 3. Fallback Mechanisms
+```javascript
+// Fallback to static accounts if server unavailable
+loadStaticAccounts() {
+    const staticAccounts = ['חשבון א', 'חשבון ב', 'חשבון ג'];
+    this.updateAccountFilterMenu(staticAccounts);
+}
+```
+
+## Performance Optimizations
+
+### 1. Efficient DOM Queries
+- Uses specific selectors for better performance
+- Caches element references where possible
+- Minimizes DOM manipulation
+
+### 2. Debounced Search
+```javascript
+let searchTimeout;
+searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        this.applySearchFilter(e.target.value);
+    }, 300);
 });
 ```
 
-### Global Callback Management
-- **Callback Storage**: Global storage for confirmation/cancellation callbacks
-- **Event Handling**: Consistent event handling across all modals
-- **Error Recovery**: Graceful error handling for failed operations
-- **User Feedback**: Clear feedback for user actions
+### 3. Smart Updates
+- Only updates necessary elements
+- Batches multiple updates together
+- Avoids unnecessary re-renders
 
-### Integration Examples
+## Testing Guidelines
 
-#### Cash Flows Module
+### 1. Manual Testing
+- **Navigation**: Test all navigation links and dropdowns
+- **Filters**: Test each filter type individually and in combination
+- **Responsive**: Test on different screen sizes
+- **Accessibility**: Test keyboard navigation and screen readers
+
+### 2. Automated Testing
 ```javascript
-// Delete cash flow with warning
-function showDeleteCashFlowModal(id) {
-    window.showDeleteWarning(
-        'האם אתה בטוח שברצונך למחוק את תזרים המזומנים הזה?',
-        () => confirmDeleteCashFlow(id)
-    );
-}
+describe('Header System', () => {
+    test('should initialize correctly', () => {
+        const header = new HeaderSystem();
+        expect(header.isInitialized).toBe(true);
+    });
+    
+    test('should set active menu item', () => {
+        header.setActiveMenuItem('/test-page');
+        expect(document.querySelector('.active')).toBeTruthy();
+    });
+});
 ```
 
-#### Accounts Module
-```javascript
-// Delete account with linked items warning
-function showDeleteAccountModal(id, linkedItems) {
-    if (linkedItems.length > 0) {
-        window.showLinkedItemsWarning(
-            'לא ניתן למחוק חשבון עם פריטים מקושרים',
-            linkedItems,
-            () => deleteAccount(id)
-        );
-    } else {
-        window.showDeleteWarning(
-            'האם אתה בטוח שברצונך למחוק את החשבון הזה?',
-            () => deleteAccount(id)
-        );
-    }
-}
-```
+### 3. Performance Testing
+- **Load Time**: Measure initialization time
+- **Filter Performance**: Test with large datasets
+- **Memory Usage**: Monitor memory consumption
+- **Network Efficiency**: Test API call optimization
 
-## Translation System Architecture
+## Troubleshooting
 
-### Global Functions
-```javascript
-// Alert condition translation
-function translateAlertCondition(condition) {
-    const translations = {
-        'price': 'מחיר',
-        'change': 'שינוי',
-        'ma': 'ממוצע נע',
-        'volume': 'נפח'
-    };
-    return translations[condition] || condition;
-}
+### Common Issues
 
-// Trade status translation
-function translateTradeStatus(status) {
-    const translations = {
-        'open': 'פתוח',
-        'closed': 'סגור',
-        'pending': 'ממתין'
-    };
-    return translations[status] || status;
-}
-```
+#### 1. Filters Not Working
+**Symptoms**: Filters don't apply to tables
+**Solutions**:
+- Check if `simple-filter.js` is loaded
+- Verify table IDs and `data-table-type` attributes
+- Check console for error messages
+- Ensure HTML structure matches requirements
 
-### Currency Display
-```javascript
-// Currency formatting with translation
-function getCashFlowCurrencyDisplay(currencyId) {
-    const currency = currencies.find(c => c.id === currencyId);
-    return currency ? `${currency.symbol} - ${currency.name}` : 'לא נבחר';
-}
-```
+#### 2. Navigation Not Highlighting
+**Symptoms**: Current page not highlighted in navigation
+**Solutions**:
+- Check if `setActiveMenuItem` is called
+- Verify navigation item `href` attributes
+- Check for JavaScript errors
+- Ensure CSS classes are applied correctly
 
-## Styling System
+#### 3. Account Filter Empty
+**Symptoms**: Account filter shows no options
+**Solutions**:
+- Check network connectivity
+- Verify API endpoint `/api/v1/accounts/`
+- Check server response format
+- Look for fallback to static accounts
 
-### Page-Specific Themes ✅ **RECENTLY ENHANCED**
-- **Color Schemes**: Each page has its own color theme
-- **Gradient Backgrounds**: Consistent header styling
-- **Component Styling**: Themed buttons, forms, and tables
-- **Visual Hierarchy**: Clear information architecture
+#### 4. Performance Issues
+**Symptoms**: Slow filter application or navigation
+**Solutions**:
+- Check for excessive DOM queries
+- Verify debounced search implementation
+- Monitor memory usage
+- Check for unnecessary re-renders
 
-### CSS Architecture
-```css
-/* Page-specific styling */
-.cash-flows-page .section-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-}
-
-/* Warning system styling */
-.warning-modal {
-    z-index: 1050;
-    backdrop-filter: blur(5px);
-}
-
-.warning-modal .modal-content {
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-/* Filter system styling */
-.filter-menu {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    padding: 0.5rem;
-}
-
-.filter-item {
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.filter-item:hover {
-    background-color: #f8f9fa;
-}
-
-.filter-item.selected {
-    background-color: #007bff;
-    color: white;
-}
-```
-
-## Responsive Design
-
-### Mobile Navigation
-- **Hamburger Menu**: Collapsible navigation for mobile devices
-- **Touch-Friendly**: Large touch targets for mobile interaction
-- **Adaptive Layout**: Responsive grid system
-- **Performance**: Optimized for mobile performance
-
-### Desktop Navigation
-- **Full Menu**: Complete navigation menu for desktop
-- **Hover Effects**: Interactive hover states
-- **Keyboard Navigation**: Full keyboard accessibility
-- **High Resolution**: Optimized for high-DPI displays
-
-## Integration Guidelines
-
-### Adding New Pages
-1. **HTML Structure**: Use consistent header structure
-2. **Script Loading**: Include required JavaScript files
-3. **CSS Classes**: Apply page-specific CSS classes
-4. **Navigation**: Add page to navigation menu
-5. **Testing**: Test across different devices and browsers
-
-### Filter System Integration
-1. **Include Script**: Add `simple-filter.js` to page
-2. **HTML Structure**: Ensure filter menus and display elements exist
-3. **Table Integration**: Add table IDs for automatic filtering
-4. **Event Handling**: Set up filter event listeners
-5. **Testing**: Test all filter combinations and edge cases
-
-### Warning System Integration
-1. **Import Script**: Include warning-system.js
-2. **Define Callbacks**: Create confirmation/cancellation callbacks
-3. **Show Warnings**: Use appropriate warning functions
-4. **Handle Responses**: Process user responses appropriately
-5. **Error Handling**: Implement proper error handling
-
-### Translation Integration
-1. **Import Script**: Include translation-utils.js
-2. **Use Functions**: Call appropriate translation functions
-3. **Consistent Formatting**: Use consistent text formatting
-4. **Fallback Handling**: Provide fallbacks for missing translations
-5. **Testing**: Test with different languages and text lengths
-
-## Recent Improvements
-
-### System Enhancements
-1. **Unified Filter System**: Comprehensive filtering across all pages
-2. **Warning System**: Centralized modal system for confirmations
-3. **Translation System**: Global translation utilities
-4. **Page Styling**: Consistent gradient backgrounds
-5. **Error Handling**: Improved error messages and logging
-
-### Filter System Features
-1. **Preference-Based Defaults**: Loads user preferences for default filters
-2. **Hebrew Translation**: Automatic conversion of English preferences
-3. **Multi-Table Support**: Filters all tables on the page automatically
-4. **Real-Time Updates**: Instant filtering with visual feedback
-5. **Error Recovery**: Graceful handling of missing elements and data
-
-### Cash Flows Module Integration
-1. **Delete Confirmations**: Integrated warning system for deletions
-2. **Form Validation**: Enhanced validation with warning system
-3. **Error Display**: Improved error message display
-4. **User Feedback**: Better user feedback for actions
-
-### Technical Improvements
-1. **Performance**: Optimized modal rendering and event handling
-2. **Accessibility**: Improved keyboard navigation and screen reader support
-3. **Mobile Support**: Enhanced mobile responsiveness
-4. **Code Quality**: Improved code organization and documentation
+### Debug Steps
+1. **Check Console**: Look for error messages and logs
+2. **Verify Elements**: Ensure all required elements exist
+3. **Test Network**: Verify API calls succeed
+4. **Check Dependencies**: Ensure all required files are loaded
+5. **Test Isolation**: Test components individually
 
 ## Future Enhancements
 
-### Planned Improvements
-1. **Advanced Filtering**: More sophisticated filter types and combinations
-2. **Filter Persistence**: Save filter state across sessions
-3. **Animation System**: Smooth transitions and animations
-4. **Theme System**: Dynamic theme switching
-5. **Accessibility**: Enhanced accessibility features
+### Planned Features
+1. **Filter Persistence**: Save filter state across sessions
+2. **Advanced Filtering**: More sophisticated filter combinations
+3. **Filter Templates**: Predefined filter configurations
+4. **Export Filters**: Export/import filter settings
+5. **Filter Analytics**: Track filter usage patterns
 
-### Technical Debt
-1. **Testing Coverage**: Need comprehensive testing suite
-2. **Performance Monitoring**: Implement performance monitoring
-3. **Code Quality**: Add code quality tools
-4. **Documentation**: Enhance technical documentation
+### Technical Improvements
+1. **Performance**: Optimize filtering algorithms
+2. **Memory**: Reduce memory usage for large datasets
+3. **Accessibility**: Improve keyboard navigation
+4. **Mobile**: Enhance mobile filter experience
+5. **Testing**: Add comprehensive test suite
+
+## Version History
+
+### Version 3.1 (August 26, 2025)
+- **Enhanced**: Integration with improved filter system
+- **Added**: Comprehensive logging for all operations
+- **Fixed**: Button selection logic for filter options
+- **Improved**: Error handling and fallback mechanisms
+- **Enhanced**: Performance optimizations
+- **Added**: Smart table-specific filtering logic
+
+### Version 3.0 (August 23, 2025)
+- **Added**: Unified filter system integration
+- **Enhanced**: Navigation system with dropdown support
+- **Improved**: Responsive design and accessibility
+- **Added**: Account management and API integration
+
+### Version 2.0 (August 20, 2025)
+- **Added**: Basic navigation system
+- **Implemented**: Filter framework
+- **Added**: Responsive design support
+
+## Conclusion
+
+The TikTrack Header System provides a robust, scalable solution for navigation and filtering across the application. With comprehensive error handling, performance optimizations, and seamless integration with the filter system, it ensures reliable functionality while maintaining excellent user experience.
+
+The system's modular design allows for easy extension and maintenance, making it suitable for future enhancements and feature additions.
 
 ---
 
-**Last Updated**: 2025-01-26  
+**Last Updated**: August 26, 2025  
 **Maintainer**: TikTrack Development Team  
-**Version**: 3.0 (Unified Filter System)
+**Version**: 3.1 (Enhanced Filter Integration)

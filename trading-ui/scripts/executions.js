@@ -1038,7 +1038,7 @@ async function confirmDeleteExecution() {
  * שימוש בפונקציה הגלובלית מ-linked-items.js
  */
 async function showExecutionLinkedItemsModal(executionId, errorData) {
-    console.log('🔄 הצגת מודל פריטים מקושרים לעסקה:', executionId);
+  
 
     // מציאת העסקה לפי ID
     const execution = executionsData.find(e => e.id == executionId);
@@ -1055,7 +1055,7 @@ async function showExecutionLinkedItemsModal(executionId, errorData) {
         }
 
         const linkedData = await response.json();
-        console.log('✅ נתונים מקושרים נטענו:', linkedData);
+      
 
         // שימוש בפונקציה הגלובלית מ-linked-items.js
         if (typeof window.showLinkedItemsModal === 'function') {
@@ -1083,8 +1083,8 @@ async function showExecutionLinkedItemsModal(executionId, errorData) {
  * טעינת פרטי הפריטים המקושרים
  */
 async function loadLinkedItemsDetails(executionId, errorData = null) {
-    console.log('🔄 טעינת פרטי פריטים מקושרים לעסקה:', executionId);
-    console.log('📊 errorData:', errorData);
+  
+  
 
     const contentDiv = document.getElementById('linkedItemsContent');
     contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><br>טוען פרטים...</div>';
@@ -1095,10 +1095,10 @@ async function loadLinkedItemsDetails(executionId, errorData = null) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('📊 נתונים מהשרת:', data);
+          
             displayLinkedItems(data.data);
         } else {
-            console.log('⚠️ API לא זמין, מנסה לטעון ממקורות מרובים');
+          
             // אם אין API ספציפי, ננסה לטעון מכל ה-APIs
             await loadLinkedItemsFromMultipleSources(executionId);
         }
@@ -1114,7 +1114,7 @@ async function loadLinkedItemsDetails(executionId, errorData = null) {
  * טעינת פריטים מקושרים ממקורות מרובים
  */
 async function loadLinkedItemsFromMultipleSources(executionId) {
-    console.log('🔄 טעינת פריטים מקושרים ממקורות מרובים');
+  
 
     const execution = executionsData.find(e => e.id == executionId);
     if (!execution) return;

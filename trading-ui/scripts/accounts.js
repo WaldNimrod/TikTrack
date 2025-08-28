@@ -1941,3 +1941,6 @@ async function loadAccountsDataSimple() {
 
 // הגדרת פונקציות גלובליות בסוף הקובץ
 setupGlobalFunctions();
+
+// סיום הקובץ
+console.log('✅ accounts.js loaded successfully');

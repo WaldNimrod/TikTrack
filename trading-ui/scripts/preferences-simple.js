@@ -262,7 +262,7 @@ function showErrorNotification(message) {
  * אתחול הדף
  */
 async function initializePreferences() {
-  console.log('🚀 מאתחל דף העדפות...');
+
   
   // טען העדפות
   await loadPreferences();
@@ -270,7 +270,7 @@ async function initializePreferences() {
   // טען חשבונות
   await loadAccountsToFilter();
   
-  console.log('✅ דף העדפות אותחל בהצלחה');
+
 }
 
 // אתחול כשהדף נטען

@@ -328,15 +328,15 @@ function updateAlertsTable(alerts) {
       let relatedIcon = '';
       let relatedClass = '';
 
-      console.log(`🔍 === PROCESSING ALERT ${alert.id} ===`);
-      console.log(`🔍 Alert data:`, {
+    
+    
         id: alert.id,
         related_type_id: alert.related_type_id,
         related_id: alert.related_id,
 
         status: alert.status
       });
-      console.log(`🔍 Available data counts:`, {
+    
         accounts: accounts.length,
         trades: trades.length,
         tradePlans: tradePlans.length,
@@ -348,7 +348,7 @@ function updateAlertsTable(alerts) {
         relatedDisplay = 'כללי';
         relatedIcon = '🌐';
         relatedClass = 'related-general';
-        console.log(`ℹ️ Alert ${alert.id} is general (not linked to specific object)`);
+      
       } else {
         switch (alert.related_type_id) {
           case 1: // חשבון

@@ -261,12 +261,12 @@ function restoreResearchSectionState() {
 
 // פונקציות נוספות
 function resetAllFiltersAndReloadData() {
-  console.log('איפוס פילטרים');
+
 }
 
 // פונקציה להפעלה בטעינת הדף
 function initializeResearchPage() {
-  console.log('🔄 אתחול דף תחקיר...');
+
 
   // שחזור מצב הסגירה
   restoreTopSectionState();
@@ -274,7 +274,7 @@ function initializeResearchPage() {
   restoreAccountsSectionState();
 
   // טעינת נתונים
-  console.log('🔄 Loading trades data...');
+
   if (typeof window.loadTrades === 'function') {
     window.loadTrades();
   } else {

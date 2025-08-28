@@ -5,8 +5,8 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 
 ## File Location
 - **Main File**: `trading-ui/scripts/header-system.js`
-- **Version**: 4.0 (August 28, 2025)
-- **Status**: **COMPLETE REWRITE** - Removed old filter system, implemented new unified filtering
+- **Version**: 4.1 (August 28, 2025)
+- **Status**: **COMPLETE REWRITE** - Removed old filter system, implemented new unified filtering with enhanced date filtering
 
 ## System Components
 
@@ -23,6 +23,7 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 - **Universal Search**: Search across all columns except actions
 - **Filter Reset/Clear**: Reset to preferences or clear all filters
 - **Fixed Width UI**: Prevents layout shifts during filter operations
+- **Enhanced Date Logic**: Fixed date range calculations and "כל זמן" positioning
 
 ### 3. Filter Display Management
 - **Real-time Updates**: Filter display updates automatically
@@ -55,7 +56,7 @@ trading-ui/
 ### 1. Advanced Filter System (NEW ARCHITECTURE)
 - **Universal Table Filtering**: Single `applyTableFilter()` function works on all tables
 - **Smart Column Detection**: Automatically detects relevant columns by header text
-- **Multi-Container Support**: Filters apply to all visible table containers
+- **Multi-Container Support**: Filters apply to all visible table containers including notifications
 - **Dynamic Filter Application**: Filters adapt to table structure automatically
 - **Comprehensive Logging**: Detailed logs for debugging and monitoring
 
@@ -272,7 +273,7 @@ Tables must be wrapped in containers with specific IDs:
 - `alertsContainer` - Alerts table
 - `executionsContainer` - Executions table
 - `testContainer` - Test table
-- `notificationsContainer` - Notifications table
+- `notificationsContainer` - Notifications table (NEW - supports date filtering)
 - `designsContainer` - Trade designs table
 
 #### Column Header Requirements
@@ -305,8 +306,8 @@ Status and Type filters support multiple selections:
 - "הכול" is automatically deselected when specific items are chosen
 - "הכול" is re-selected when no specific items remain
 
-#### Date Filter Options
-- **כל זמן** - Shows all records (first in list)
+#### Date Filter Options (ENHANCED)
+- **כל זמן** - Shows all records (FIRST in list)
 - **השבוע** - From start of calendar week to today
 - **שבוע** - Last 7 days
 - **MTD** - From start of calendar month to today
@@ -437,10 +438,12 @@ Key CSS classes for customization:
 3. Check browser console for error messages
 4. Ensure header-system.js is loaded
 
-#### Date Filter Issues
+#### Date Filter Issues (FIXED)
 1. Verify date format is "YYYY-MM-DD"
 2. Check if date column is first date column in table
 3. Ensure notificationsContainer is included for notifications table
+4. "כל זמן" now appears FIRST in the list
+5. Date range calculations are now correct
 
 #### Account Filter Issues
 1. Check server returns account data
@@ -472,7 +475,13 @@ window.applyTableFilter('status', ['פתוח']);
 
 ## Version History
 
-### Version 4.0 (August 28, 2025) - CURRENT
+### Version 4.1 (August 28, 2025) - CURRENT
+- **ENHANCED DATE FILTERING**: Fixed date range calculations and "כל זמן" positioning
+- **NOTIFICATIONS SUPPORT**: Added notificationsContainer to date filter
+- **IMPROVED LOGIC**: Enhanced date range logic for all options
+- **UI STABILITY**: Fixed width elements prevent layout shifts
+
+### Version 4.0 (August 28, 2025)
 - **COMPLETE REWRITE** of filter system
 - Removed old `simple-filter.js` and `filter-system.js`
 - Implemented unified `applyTableFilter()` function

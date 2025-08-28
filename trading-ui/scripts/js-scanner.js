@@ -138,7 +138,7 @@ class JsScanner {
             // Store functions data
                           this.functionsData[filename] = functions;
   
-              console.log(`✅ Extracted ${functions.length} functions from ${filename}`);          
+                      
 
         } catch (error) {
             console.error(`❌ Error scanning file ${filename}:`, error);

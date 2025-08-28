@@ -92,7 +92,7 @@ class ActiveAlertsComponent extends HTMLElement {
     setTimeout(() => {
       // בדיקה אם יש הרבה הודעות בקונסולה
       if (this._checkAttempts > 3) {
-        console.log('🧹 Clearing console messages to reduce clutter...');
+      
         if (console.clear) {
           console.clear();
         }
@@ -118,7 +118,7 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   render() {
-    console.log('🎨 Rendering active alerts component');
+  
 
     this.innerHTML = `
       <div class="alerts-container">
@@ -154,7 +154,7 @@ class ActiveAlertsComponent extends HTMLElement {
       </div>
     `;
 
-    console.log('🎨 Component rendered, loading alerts...');
+  
     this.loadActiveAlerts();
   }
 

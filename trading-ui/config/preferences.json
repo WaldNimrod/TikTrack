@@ -17,9 +17,9 @@
       "timezone": "Asia/Jerusalem",
       "defaultStopLoss": 5,
       "defaultTargetPrice": 10,
-      "defaultCommission": 1.0,
+      "defaultCommission": 1,
       "defaultStatusFilter": "all",
-      "defaultTypeFilter": "all",
+      "defaultTypeFilter": "investment",
       "defaultAccountFilter": "all",
       "defaultDateRangeFilter": "all",
       "defaultSearchFilter": ""

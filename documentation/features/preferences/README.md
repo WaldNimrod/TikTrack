@@ -238,16 +238,36 @@ TikTrack/
 - **Solution**: Changed to batch-only saving with clear button text "שמור שינויים"
 - **Status**: ✅ Resolved
 
+#### 7. **Preferences Not Loading from Server**
+- **Problem**: Server returned different data structure than expected
+- **Root Cause**: Code expected `data.user` but server returned nested structure with `data.users.nimrod`
+- **Solution**: Updated load logic to handle multiple data structure formats
+- **Status**: ✅ Resolved
+
+#### 8. **Automatic Saving Confusion**
+- **Problem**: Users confused about when data is saved vs. just updated locally
+- **Root Cause**: Automatic saving on every change made save button seem redundant
+- **Solution**: Changed to local updates only, with explicit batch saving
+- **Status**: ✅ Resolved
+
+#### 9. **Missing Save Feedback**
+- **Problem**: No clear indication when changes are local vs. saved to server
+- **Root Cause**: No distinction between local updates and server saves
+- **Solution**: Added info notifications for local updates, success for server saves
+- **Status**: ✅ Resolved
+
 ### Current System Behavior
 
 #### ✅ Working Features
 - **Header Integration**: Full unified header with navigation
+- **Local Updates**: Immediate local memory updates with visual feedback
 - **Batch Saving**: All changes saved together when clicking "שמור שינויים"
-- **Memory Management**: Changes stored locally until saved
+- **Memory Management**: Changes stored locally until explicitly saved
 - **Error Handling**: Comprehensive error messages and recovery
 - **Notification System**: Uses global notification system consistently
 - **Account Loading**: Dynamic account filter population with fallback
 - **Data Persistence**: Proper saving and loading from server
+- **Clear User Feedback**: Distinction between local updates and server saves
 
 #### 🔍 Areas for Monitoring
 - **Network Connectivity**: Ensure stable connection for API calls
@@ -261,12 +281,13 @@ TikTrack/
 - [ ] **Page Load**: Preferences page loads correctly with header
 - [ ] **Data Loading**: All preferences load from server correctly
 - [ ] **Account Filter**: Account dropdown populates with available accounts
-- [ ] **Change Detection**: UI updates immediately when values change
-- [ ] **Batch Saving**: All changes save when clicking "שמור שינויים"
+- [ ] **Local Updates**: UI updates immediately when values change with info notification
+- [ ] **Batch Saving**: All changes save when clicking "שמור שינויים" with success notification
 - [ ] **Error Handling**: Proper error messages for network/server issues
 - [ ] **Reset Function**: Reset to defaults works correctly
-- [ ] **Notification System**: Success/error messages display properly
+- [ ] **Notification System**: Info/success/error messages display properly
 - [ ] **Mobile Responsive**: Page works correctly on mobile devices
+- [ ] **Save Button Clarity**: Button text clearly indicates batch saving
 
 ### Automated Testing (Future)
 - **Unit Tests**: Individual function testing
@@ -352,6 +373,7 @@ TikTrack/
 - **Check**: Network connection and server status
 - **Solution**: Ensure backend server is running on port 8080
 - **Debug**: Check browser console for error messages
+- **Note**: Changes are stored locally until "שמור שינויים" is clicked
 
 ### Page Not Loading
 - **Check**: Browser cache and JavaScript errors
@@ -397,7 +419,7 @@ For questions, issues, or contributions, please contact the TikTrack development
 | **API Endpoints** | 4 |
 | **Preference Categories** | 3 |
 | **Documentation Files** | 4 |
-| **Issues Resolved** | 6 |
+| **Issues Resolved** | 9 |
 
 ## 🎉 Success Metrics
 
@@ -409,6 +431,33 @@ For questions, issues, or contributions, please contact the TikTrack development
 - ✅ **Mobile Compatible**: Works seamlessly on all devices
 - ✅ **Header Integrated**: Full integration with unified header system
 - ✅ **Error Resolved**: All major issues identified and fixed
+- ✅ **Clear Save Strategy**: Users understand when data is saved vs. updated locally
+
+## 📚 Lessons Learned & Best Practices
+
+### User Experience Lessons
+1. **Clear Save Strategy**: Users need to understand when data is saved vs. just updated locally
+2. **Consistent Feedback**: Use different notification types for different actions (info for local updates, success for server saves)
+3. **Button Clarity**: Button text should clearly indicate what action will be performed
+4. **Immediate Feedback**: Local updates provide immediate visual feedback without server dependency
+
+### Technical Lessons
+1. **Data Structure Handling**: Always handle multiple possible data structures from server responses
+2. **Save Strategy**: Choose between immediate saving vs. batch saving based on user needs
+3. **Error Recovery**: Provide fallback mechanisms for API failures
+4. **Memory Management**: Clear distinction between local state and server state
+
+### Development Best Practices
+1. **Comprehensive Logging**: Add detailed logging for debugging complex data flow issues
+2. **Graceful Degradation**: Handle server errors without breaking user experience
+3. **User Control**: Give users control over when data is persisted
+4. **Clear Documentation**: Document both the what and why of design decisions
+
+### Future Considerations
+1. **Auto-save Option**: Consider adding auto-save as a user preference
+2. **Undo Functionality**: Add ability to revert unsaved changes
+3. **Change Indicators**: Visual indicators for unsaved changes
+4. **Validation Feedback**: Real-time validation feedback for user inputs
 
 ---
 

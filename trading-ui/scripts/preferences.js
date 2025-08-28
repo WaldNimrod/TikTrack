@@ -25,11 +25,11 @@ let currentPreferences = {};
  */
 async function loadPreferences() {
   try {
-    console.log('🔄 טוען העדפות מהשרת...');
+  
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
       const data = await response.json();
-      console.log('📊 נתונים מהשרת:', data);
+    
       
       // בדוק את המבנה הנכון
       if (data.user) {
@@ -60,12 +60,29 @@ async function loadPreferences() {
  * מעדכן העדפה בזיכרון (לא שומר בשרת)
  */
 function updatePreference(key, value) {
-  // עדכן את הזיכרון הזמני מיד
-  currentPreferences[key] = value;
-  console.log(`🔄 עדכון זיכרון זמני: ${key} = ${value}`);
-  
-  // הצג הודעת מידע שהערך עודכן
-  showPreferencesInfo('העדפות', `${getPreferenceLabel(key)} עודכן (לא נשמר עדיין)`);
+  try {
+    console.log(`🔄 updatePreference נקרא: ${key} = ${value}`);
+    
+    // בדיקה מיוחדת לפילטר סוג
+    if (key === 'defaultTypeFilter') {
+      console.log(`🎯 פילטר סוג מיוחד - ערך ישן: ${currentPreferences[key]}, ערך חדש: ${value}`);
+    }
+    
+    // עדכן את הזיכרון הזמני מיד
+    currentPreferences[key] = value;
+    console.log(`🔄 עדכון זיכרון זמני: ${key} = ${value}`);
+    console.log(`📊 currentPreferences אחרי עדכון:`, currentPreferences);
+    
+    // הצג הודעת מידע שהערך עודכן
+    const label = getPreferenceLabel(key);
+    const message = `${label} עודכן (לא נשמר עדיין)`;
+    console.log(`📢 מציג הודעת מידע: ${message}`);
+    showPreferencesInfo('העדפות', message);
+    
+    console.log(`✅ updatePreference הושלם בהצלחה`);
+  } catch (error) {
+    console.error(`❌ שגיאה ב-updatePreference:`, error);
+  }
 }
 
 /**
@@ -73,26 +90,40 @@ function updatePreference(key, value) {
  */
 async function saveAllPreferences() {
   try {
+    console.log('🔄 saveAllPreferences נקרא');
     console.log('🔄 שומר את כל ההעדפות:', currentPreferences);
+    
+    // בדיקה מיוחדת לפילטר סוג
+    if (currentPreferences.defaultTypeFilter) {
+      console.log(`🎯 פילטר סוג בשמירה: ${currentPreferences.defaultTypeFilter}`);
+    }
+    
+    const requestBody = { preferences: currentPreferences };
+    console.log('📤 שליחת בקשה לשרת:', requestBody);
     
     const response = await fetch('/api/v1/preferences/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ preferences: currentPreferences })
+      body: JSON.stringify(requestBody)
     });
     
+    console.log('📥 תגובה מהשרת:', response.status, response.statusText);
+    
     if (response.ok) {
+      const responseData = await response.json();
+      console.log('📊 נתוני תגובה:', responseData);
       console.log('✅ כל ההעדפות נשמרו בהצלחה בשרת');
       showPreferencesSuccess('✅ כל ההעדפות נשמרו בהצלחה');
     } else {
-      console.error('❌ שגיאה בשמירת העדפות:', response.status);
-      showPreferencesError('❌ שגיאה בשמירת העדפות');
+      const errorText = await response.text();
+      console.error('❌ שגיאה בשמירת העדפות:', response.status, errorText);
+      showPreferencesError(`❌ שגיאה בשמירת העדפות: ${response.status}`);
     }
   } catch (error) {
     console.error('❌ שגיאה בשמירת העדפות:', error);
-    showPreferencesError('❌ שגיאה בשמירת העדפות');
+    showPreferencesError(`❌ שגיאה בשמירת העדפות: ${error.message}`);
   }
 }
 
@@ -161,11 +192,17 @@ function updateUI() {
     console.log(`  📊 פילטר סטטוס: ${statusFilterSelect.value}`);
   }
   
-  // פילטר סוג
+  // פילטר סוג - בדיקה מיוחדת
   const typeFilterSelect = document.getElementById('defaultTypeFilter');
   if (typeFilterSelect) {
-    typeFilterSelect.value = currentPreferences.defaultTypeFilter || 'all';
-    console.log(`  🏷️ פילטר סוג: ${typeFilterSelect.value}`);
+    const oldValue = typeFilterSelect.value;
+    const newValue = currentPreferences.defaultTypeFilter || 'all';
+    typeFilterSelect.value = newValue;
+    console.log(`  🏷️ פילטר סוג: ${newValue} (היה: ${oldValue})`);
+    console.log(`  🎯 פילטר סוג - אלמנט נמצא: ${!!typeFilterSelect}`);
+    console.log(`  🎯 פילטר סוג - ערך ב-currentPreferences: ${currentPreferences.defaultTypeFilter}`);
+  } else {
+    console.error(`  ❌ פילטר סוג - אלמנט לא נמצא!`);
   }
   
   // פילטר חשבון
@@ -311,11 +348,16 @@ function getPreferenceLabel(key) {
  * הצגת הודעת הצלחה
  */
 function showPreferencesSuccess(message) {
+  console.log(`📢 showPreferencesSuccess נקרא: ${message}`);
+  
   if (typeof window.showSuccessNotification === 'function') {
+    console.log('📢 משתמש ב-window.showSuccessNotification');
     window.showSuccessNotification('העדפות', message);
   } else if (typeof window.showNotification === 'function') {
+    console.log('📢 משתמש ב-window.showNotification');
     window.showNotification('העדפות', message, 'success');
   } else {
+    console.log('📢 משתמש ב-console.log (ללא מערכת התראות)');
     console.log('✅ הצלחה:', message);
   }
 }
@@ -337,11 +379,16 @@ function showPreferencesError(message) {
  * הצגת הודעת מידע
  */
 function showPreferencesInfo(title, message) {
+  console.log(`📢 showPreferencesInfo נקרא: ${title} - ${message}`);
+  
   if (typeof window.showInfoNotification === 'function') {
+    console.log('📢 משתמש ב-window.showInfoNotification');
     window.showInfoNotification(title, message);
   } else if (typeof window.showNotification === 'function') {
+    console.log('📢 משתמש ב-window.showNotification');
     window.showNotification(title, message, 'info');
   } else {
+    console.log('📢 משתמש ב-console.log (ללא מערכת התראות)');
     console.log('ℹ️ מידע:', title, '-', message);
   }
 }
@@ -365,6 +412,13 @@ function showPreferencesWarning(title, message) {
 async function initializePreferences() {
   console.log('🚀 מאתחל דף העדפות...');
   
+  // בדיקת מערכת ההתראות
+  console.log('🔍 בדיקת מערכת ההתראות:');
+  console.log('  - window.showSuccessNotification:', typeof window.showSuccessNotification);
+  console.log('  - window.showErrorNotification:', typeof window.showErrorNotification);
+  console.log('  - window.showInfoNotification:', typeof window.showInfoNotification);
+  console.log('  - window.showNotification:', typeof window.showNotification);
+  
   try {
     // טען העדפות
     await loadPreferences();
@@ -372,12 +426,12 @@ async function initializePreferences() {
     // טען חשבונות
     await loadAccountsToFilter();
     
-         console.log('✅ דף העדפות אותחל בהצלחה');
-     showPreferencesSuccess('אתחול דף העדפות', 'דף העדפות אותחל בהצלחה');
-   } catch (error) {
-     console.error('❌ שגיאה באתחול דף העדפות:', error);
-     showPreferencesError('אתחול דף העדפות', 'שגיאה באתחול דף העדפות');
-   }
+    console.log('✅ דף העדפות אותחל בהצלחה');
+    showPreferencesSuccess('דף העדפות אותחל בהצלחה');
+  } catch (error) {
+    console.error('❌ שגיאה באתחול דף העדפות:', error);
+    showPreferencesError('שגיאה באתחול דף העדפות');
+  }
 }
 
 // אתחול כשהדף נטען

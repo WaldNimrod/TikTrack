@@ -1,566 +1,349 @@
-# Filter System Documentation
+# TikTrack Filter System Documentation
 
 ## Overview
-The Unified Filter System (`SimpleFilter` class) is a comprehensive JavaScript solution for managing data filtering across multiple tables in the TikTrack application. This system provides centralized filtering logic with support for status, type, account, date range, and search filters.
+The TikTrack Filter System is a unified, client-side filtering solution that provides advanced filtering capabilities across all data tables in the application. It has been completely rewritten to provide a more robust, maintainable, and user-friendly filtering experience.
 
-## File Location
-- **Main File**: `trading-ui/scripts/simple-filter.js`
-- **Version**: 1.9.9 (August 26, 2025)
-- **Integration**: Works with `header-system.js` for UI interactions
+## Version History
+- **Version 4.1** (August 28, 2025) - **CURRENT** - Enhanced date filtering and notifications support
+- **Version 4.0** (August 28, 2025) - Complete rewrite with unified filtering
+- **Version 3.x** (August 2025) - Legacy system (removed)
 
-## Architecture
+## Key Changes in Version 4.1
 
-### Core Components
+### 🎯 Enhanced Date Filtering
+- **Fixed "כל זמן" positioning**: Now appears FIRST in the date filter list
+- **Corrected date range calculations**: All date ranges now calculate correctly
+- **Notifications table support**: Date filter now works on notifications table
+- **Improved date logic**: Enhanced handling of all date range options
 
-#### 1. SimpleFilter Class
-The main class that handles all filtering operations:
+### 🗑️ Removed Components
+- `simple-filter.js` - Completely removed from the system
+- `filter-system.js` - Moved to backup directory
+- Old filter initialization functions
+- Separate filter application functions
 
+### ✨ New Architecture
+
+#### 1. Unified Filter Function
 ```javascript
-class SimpleFilter {
-    constructor() {
-        this.currentFilters = {
-            status: [],
-            type: [],
-            account: [],
-            date: [],
-            search: ''
-        };
-    }
-}
+function applyTableFilter(filterType, selectedValues)
 ```
+- **Single function** handles all filter types
+- **Universal application** across all tables
+- **Smart column detection** by header text
+- **Dynamic container support** for all visible tables
 
-#### 2. Filter Properties
-- **`currentFilters.status`**: Array of selected status filters (Hebrew values)
-- **`currentFilters.type`**: Array of selected type filters (Hebrew values)
-- **`currentFilters.account`**: Array of selected account filters (Hebrew values)
-- **`currentFilters.date`**: Array of selected date range filters (Hebrew values)
-- **`currentFilters.search`**: String for search term filtering
-
-## Key Features
-
-### 1. Multi-Table Support
-- **Trade Tables**: `test_trades`, `trades`, `trade_plans`
-- **General Tables**: `test_general`, `accounts`, `tickers`, `executions`, `cash_flows`
-- **Special Tables**: `test_notifications`, `notes`, `alerts`
-- **Smart Filtering**: Automatically skips irrelevant filters for tables without specific fields
-
-### 2. Preference-Based Defaults
-- Loads default filter settings from `/api/v1/preferences/`
-- Converts English preference values to Hebrew display values
-- Fallback to empty filters if preferences unavailable
-
-### 3. Comprehensive Logging System
-- **Detailed Execution Logs**: Every filter operation is logged with context
-- **Table Summary Logs**: Shows total/visible/hidden rows for each table
-- **Filter State Logs**: Tracks current filter values and changes
-- **Error Handling Logs**: Captures and reports filter-related issues
-
-### 4. Hebrew Translation System
-- **`convertStatusPreference()`**: Converts English status values to Hebrew
-- **`convertTypePreference()`**: Converts English type values to Hebrew
-- **`convertAccountPreference()`**: Handles account name conversion
-- **`convertDatePreference()`**: Converts English date ranges to Hebrew
-
-## Core Methods
-
-### Initialization Methods
-
-#### `async init()`
-Initializes the filter system:
+#### 2. Filter Configuration System
 ```javascript
-async init() {
-    await this.waitForElements();
-    await this.initializeDefaultFilters();
-    this.setupEventListeners();
-}
+function getFilterConfig(filterType)
 ```
+- **Centralized configuration** for all filter types
+- **Flexible column matching** by keywords
+- **Known container support** for specific tables
+- **Extensible design** for new filter types
 
-#### `async initializeDefaultFilters()`
-Loads and applies default filter preferences:
+#### 3. Enhanced Date Filtering
 ```javascript
-async initializeDefaultFilters() {
-    const response = await fetch('/api/v1/preferences/');
-    const preferences = await response.json();
-    this.currentFilters = {
-        status: this.convertStatusPreference(preferences.defaultStatusFilter),
-        type: this.convertTypePreference(preferences.defaultTypeFilter),
-        account: this.convertAccountPreference(preferences.defaultAccountFilter),
-        date: this.convertDatePreference(preferences.defaultDateRangeFilter),
-        search: preferences.defaultSearchFilter || ''
-    };
-}
+function isDateInRange(dateString, dateRange)
 ```
+- **Smart date range calculations**
+- **Hebrew display support**
+- **Multiple date range options**
+- **Robust error handling**
 
-### Filter Application Methods
+## Filter Types
 
-#### `applyFilters()`
-Main method that applies all current filters to all tables:
-```javascript
-applyFilters() {
-    this.applyFiltersToTradePlansTable();
-    this.applyFiltersToAlertsTable();
-    this.applyFiltersToDatabaseDisplayTables();
-}
-```
+### 1. Status Filter
+- **Column**: `סטטוס`
+- **Values**: `פתוח`, `סגור`, `מבוטל`, `פעיל`, `לא פעיל`, `ממתין`
+- **Multi-select**: ✅ Supported
+- **Tables**: Trades, Alerts, Executions, Test
 
-#### `applyFiltersToDatabaseTable(tableId)`
-Applies filters to a specific database table:
-```javascript
-applyFiltersToDatabaseTable(tableId) {
-    const table = document.getElementById(tableId);
-    const tableType = table.getAttribute('data-table-type');
-    
-    // Extract data based on table type
-    // Apply filters with comprehensive logging
-    // Update row visibility
-}
-```
+### 2. Type Filter
+- **Column**: `סוג` or `טיפוס`
+- **Values**: `השקעה`, `סווינג`, `פסיבי`, `קנייה`, `מכירה`
+- **Multi-select**: ✅ Supported
+- **Tables**: Trades, Designs, Test
 
-### Individual Filter Methods
+### 3. Account Filter
+- **Column**: `חשבון`
+- **Values**: Dynamic from server
+- **Multi-select**: ✅ Supported
+- **Caching**: localStorage for performance
+- **Tables**: Trades, Alerts, Executions, Test, Notifications
 
-#### `applyStatusFilter(statuses)`
-Handles status filter application:
-```javascript
-applyStatusFilter(statuses) {
-    if (statuses.includes('הכול') || statuses.length === 0) {
-        this.currentFilters.status = [];
-    } else {
-        this.currentFilters.status = statuses.filter(s => s && s !== null && s !== undefined);
-    }
-    this.applyFilters();
-}
-```
+### 4. Date Filter (ENHANCED)
+- **Column**: `תאריך` (first date column)
+- **Values**: Various date ranges
+- **Single-select**: Only one range at a time
+- **Tables**: All tables with date columns (including notifications)
+- **"כל זמן"**: Now appears FIRST in the list
 
-#### `applyTypeFilter(types)`
-Handles type filter application:
-```javascript
-applyTypeFilter(types) {
-    if (types.includes('הכול') || types.length === 0) {
-        this.currentFilters.type = [];
-    } else {
-        this.currentFilters.type = types.filter(t => t && t !== null && t !== undefined);
-    }
-    this.applyFilters();
-}
-```
+### 5. Search Filter
+- **Scope**: All columns except `פעולות`
+- **Case-insensitive**: ✅
+- **Real-time**: ✅
+- **Multi-term**: ✅
+- **Tables**: All tables
 
-#### `applyAccountFilter(accounts)`
-Handles account filter application:
-```javascript
-applyAccountFilter(accounts) {
-    if (accounts.includes('הכול') || accounts.length === 0) {
-        this.currentFilters.account = [];
-    } else {
-        this.currentFilters.account = accounts.filter(a => a && a !== null && a !== undefined);
-    }
-    this.applyFilters();
-}
-```
+## Date Range Options (ENHANCED)
 
-#### `applyDateRangeFilter(dateRange)`
-Handles date range filter application:
-```javascript
-applyDateRangeFilter(dateRange) {
-    if (dateRange === 'כל זמן' || !dateRange || dateRange.length === 0) {
-        this.currentFilters.date = [];
-    } else {
-        this.currentFilters.date = [dateRange].filter(d => d && d !== null && d !== undefined);
-    }
-    this.applyFilters();
-}
-```
+| Option | Description | Range Calculation |
+|--------|-------------|-------------------|
+| **כל זמן** | All records | No filtering (FIRST in list) |
+| **השבוע** | Current calendar week | Start of week to today |
+| **שבוע** | Last 7 days | 7 days ago to today |
+| **MTD** | Month to date | Start of month to today |
+| **YTD** | Year to date | Start of year to today |
+| **שנה** | Last 365 days | 365 days ago to today |
+| **30 יום** | Last 30 days | 30 days ago to today |
+| **60 יום** | Last 60 days | 60 days ago to today |
+| **90 יום** | Last 90 days | 90 days ago to today |
+| **שבוע קודם** | Previous week | Previous calendar week |
+| **חודש קודם** | Previous month | Previous calendar month |
+| **שנה קודמת** | Previous year | Previous calendar year |
 
-#### `applySearchFilter(searchTerm)`
-Handles search filter application:
-```javascript
-applySearchFilter(searchTerm) {
-    this.currentFilters.search = searchTerm;
-    this.applyFilters();
-}
-```
+## Integration Guide
 
-### Display Update Methods
-
-#### `updateStatusDisplay()`
-Updates the status filter display text:
-```javascript
-updateStatusDisplay() {
-    const statusDisplay = document.getElementById('selectedStatus');
-    if (!this.currentFilters.status || this.currentFilters.status.length === 0) {
-        statusDisplay.textContent = 'הכול';
-    } else {
-        statusDisplay.textContent = this.currentFilters.status.join(', ');
-    }
-}
-```
-
-#### `updateTypeDisplay()`
-Updates the type filter display text:
-```javascript
-updateTypeDisplay() {
-    const typeDisplay = document.getElementById('selectedType');
-    if (!this.currentFilters.type || this.currentFilters.type.length === 0) {
-        typeDisplay.textContent = 'הכול';
-    } else {
-        typeDisplay.textContent = this.currentFilters.type.join(', ');
-    }
-}
-```
-
-#### `updateAccountDisplay()`
-Updates the account filter display text:
-```javascript
-updateAccountDisplay() {
-    const accountDisplay = document.getElementById('selectedAccount');
-    if (!this.currentFilters.account || this.currentFilters.account.length === 0) {
-        accountDisplay.textContent = 'הכול';
-    } else {
-        accountDisplay.textContent = this.currentFilters.account.join(', ');
-    }
-}
-```
-
-#### `updateDateDisplay()`
-Updates the date filter display text:
-```javascript
-updateDateDisplay() {
-    const dateDisplay = document.getElementById('selectedDateRange');
-    if (!this.currentFilters.date || this.currentFilters.date.length === 0) {
-        dateDisplay.textContent = 'כל זמן';
-    } else {
-        dateDisplay.textContent = this.currentFilters.date.join(', ');
-    }
-}
-```
-
-### Button Selection Methods
-
-#### `updateFilterButtonSelections()`
-Updates all filter button selections:
-```javascript
-updateFilterButtonSelections() {
-    this.updateStatusButtonSelections();
-    this.updateTypeButtonSelections();
-    this.updateAccountButtonSelections();
-    this.updateDateButtonSelections();
-    this.updateSearchInput();
-}
-```
-
-#### `updateStatusButtonSelections()`
-Updates status filter button selections with detailed logging:
-```javascript
-updateStatusButtonSelections() {
-    const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
-    statusItems.forEach(item => item.classList.remove('selected'));
-    
-    if (this.currentFilters.status && this.currentFilters.status.length > 0) {
-        this.currentFilters.status.forEach(status => {
-            const item = Array.from(statusItems).find(item => 
-                item.getAttribute('data-value') === status
-            );
-            if (item) item.classList.add('selected');
-        });
-    } else {
-        const allItem = Array.from(statusItems).find(item => 
-            item.getAttribute('data-value') === 'הכול'
-        );
-        if (allItem) allItem.classList.add('selected');
-    }
-}
-```
-
-## Table-Specific Filtering Logic
-
-### Trade Tables (`test_trades`, `trades`, `trade_plans`)
-- **Status Filter**: Applied to status field
-- **Type Filter**: Applied to investment type field
-- **Account Filter**: Applied to account field
-- **Date Filter**: Applied to date field
-- **Search Filter**: Applied to all text fields
-
-### General Tables (`test_general`, `accounts`, `tickers`, etc.)
-- **Status Filter**: Applied if status field exists
-- **Type Filter**: Applied if type field exists
-- **Account Filter**: Applied if account field exists
-- **Date Filter**: Applied if date field exists
-- **Search Filter**: Applied to all text fields
-
-### Special Tables (`test_notifications`, `notes`)
-- **Status Filter**: Skipped (no status field)
-- **Type Filter**: Skipped (no type field)
-- **Account Filter**: Skipped (no account field)
-- **Date Filter**: Skipped (no date field)
-- **Search Filter**: Skipped (no searchable content)
-
-## HTML Structure Requirements
-
-### Required Elements
+### 1. HTML Structure
 ```html
-<!-- Status Filter -->
-<div id="selectedStatus">הכול</div>
-<div id="statusFilterMenu">
-    <div class="status-filter-item" data-value="הכול">הכול</div>
-    <div class="status-filter-item" data-value="פתוח">פתוח</div>
-    <!-- ... more status options -->
+<!-- Table container with specific ID -->
+<div id="tradesContainer" class="table-responsive">
+    <table>
+        <thead>
+            <tr>
+                <th>סטטוס</th>  <!-- Status filter column -->
+                <th>סוג</th>     <!-- Type filter column -->
+                <th>חשבון</th>   <!-- Account filter column -->
+                <th>תאריך</th>   <!-- Date filter column -->
+                <th>פעולות</th>  <!-- Excluded from search -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Table rows with data attributes -->
+            <tr>
+                <td data-status="פתוח">פתוח</td>
+                <td data-investment-type="סווינג">סווינג</td>
+                <td data-account="Trading Account 1">Trading Account 1</td>
+                <td data-created-at="2025-08-28">2025-08-28</td>
+                <td>Actions</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
-
-<!-- Type Filter -->
-<div id="selectedType">הכול</div>
-<div id="typeFilterMenu">
-    <div class="type-filter-item" data-value="הכול">הכול</div>
-    <div class="type-filter-item" data-value="סווינג">סווינג</div>
-    <!-- ... more type options -->
-</div>
-
-<!-- Account Filter -->
-<div id="selectedAccount">הכול</div>
-<div id="accountFilterMenu">
-    <div class="account-filter-item" data-value="הכול">הכול</div>
-    <!-- ... account options loaded dynamically -->
-</div>
-
-<!-- Date Filter -->
-<div id="selectedDateRange">כל זמן</div>
-<div id="dateRangeFilterMenu">
-    <div class="date-range-filter-item" data-value="כל זמן">כל זמן</div>
-    <div class="date-range-filter-item" data-value="השבוע">השבוע</div>
-    <!-- ... more date options -->
-</div>
-
-<!-- Search Filter -->
-<input id="searchFilterInput" type="text" placeholder="חיפוש...">
 ```
 
-### Table Requirements
-```html
-<table id="tableId" data-table-type="table_type">
-    <tbody>
-        <tr>
-            <td>Data</td>
-            <!-- ... more cells -->
-        </tr>
-    </tbody>
-</table>
-```
-
-## Integration with Header System
-
-### Event Handling
-The filter system integrates with the header system through global functions:
-
-```javascript
-// Status filter selection
-window.selectStatusOption = function(status) {
-    if (window.simpleFilter) {
-        window.simpleFilter.applyStatusFilter([status]);
-    }
-};
-
-// Type filter selection
-window.selectTypeOption = function(type) {
-    if (window.simpleFilter) {
-        window.simpleFilter.applyTypeFilter([type]);
-    }
-};
-
-// Account filter selection
-window.selectAccountFilter = function(account) {
-    if (window.simpleFilter) {
-        window.simpleFilter.applyAccountFilter([account]);
-    }
-};
-
-// Date filter selection
-window.selectDateRangeOption = function(dateRange) {
-    if (window.simpleFilter) {
-        window.simpleFilter.applyDateRangeFilter(dateRange);
-    }
-};
-```
-
-### Filter Reset and Clear
-```javascript
-// Reset to default preferences
-async resetFilters() {
-    await this.initializeDefaultFilters();
-    this.updateStatusDisplay();
-    this.updateTypeDisplay();
-    this.updateAccountDisplay();
-    this.updateDateDisplay();
-    this.updateFilterButtonSelections();
-    this.applyFilters();
+### 2. Required CSS
+```css
+/* Fixed widths to prevent layout shifts */
+.filter-toggle {
+    width: 140px;
+    justify-content: space-between;
 }
 
-// Clear all filters
-clearFilters() {
-    this.currentFilters = {
-        status: [],
-        type: [],
-        account: [],
-        date: [],
-        search: ''
-    };
-    this.updateStatusDisplay();
-    this.updateTypeDisplay();
-    this.updateAccountDisplay();
-    this.updateDateDisplay();
-    this.updateFilterButtonSelections();
-    this.applyFilters();
+.selected-value {
+    min-width: 80px;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.reset-btn, .clear-btn {
+    min-width: 30px;
 }
 ```
 
-## Error Handling
-
-### Null/Undefined Protection
-All preference conversion functions include null/undefined checks:
-
+### 3. JavaScript Integration
 ```javascript
-convertStatusPreference(preference) {
-    if (!preference) {
-        console.log('🔄 convertStatusPreference: preference is null/undefined, returning empty array');
-        return [];
-    }
-    // ... conversion logic
-}
-```
-
-### Missing Element Handling
-All display update functions check for missing elements:
-
-```javascript
-updateStatusDisplay() {
-    const statusDisplay = document.getElementById('selectedStatus');
-    if (!statusDisplay) {
-        console.warn('⚠️ selectedStatus element not found');
-        return;
-    }
-    // ... update logic
-}
-```
-
-### Table Not Found Handling
-```javascript
-applyFiltersToDatabaseTable(tableId) {
-    const table = document.getElementById(tableId);
-    if (!table) {
-        console.warn(`⚠️ Table ${tableId} not found`);
-        return;
-    }
-    // ... filtering logic
-}
-```
-
-## Performance Optimizations
-
-### Efficient DOM Queries
-- Uses `querySelectorAll` with specific selectors
-- Caches element references where possible
-- Minimizes DOM manipulation
-
-### Filter Optimization
-- Filters out null/undefined values before processing
-- Uses array methods efficiently
-- Avoids unnecessary filter applications
-
-### Logging Optimization
-- Comprehensive logging for debugging
-- Conditional logging based on filter state
-- Performance impact minimized through efficient string operations
-
-## Debugging and Troubleshooting
-
-### Console Logs
-The system provides extensive logging for debugging:
-
-```
-🔄 applyFilters called
-🔄 Current filters: {status: Array(1), type: Array(1), account: Array(0), date: Array(1), search: ''}
-🔄 Processing 7 rows in tradesTable
-🔄 Row data: ticker="AAPL", status="פתוח", type="סווינג", account="חשבון א"
-🔄 Checking status filter: current="פתוח", filters=["פתוח"]
-🔄 Status filter passed: "פתוח" found in filters
-📊 TABLE SUMMARY - tradesTable:
-   - Total rows: 7
-   - Visible rows: 3
-   - Hidden rows: 4
-   - Table type: test_trades
-   - Active filters: {status: Array(1), type: Array(1), account: Array(0), search: ''}
-```
-
-### Common Issues and Solutions
-
-#### Issue: Filters not working
-**Solution**: Check console logs for missing elements or incorrect data values
-
-#### Issue: Display not updating
-**Solution**: Verify HTML structure and element IDs match requirements
-
-#### Issue: Performance problems
-**Solution**: Check for excessive DOM queries or filter applications
-
-#### Issue: Hebrew text not displaying
-**Solution**: Ensure proper encoding and font support
-
-## Testing Guidelines
-
-### Manual Testing
-1. **Filter Selection**: Test each filter type individually
-2. **Multiple Filters**: Test combinations of different filters
-3. **Reset/Clear**: Test filter reset and clear functionality
-4. **Table Types**: Test with different table types
-5. **Edge Cases**: Test with empty data, missing elements
-
-### Automated Testing
-```javascript
-// Example test structure
-describe('SimpleFilter', () => {
-    test('should initialize with default filters', () => {
-        const filter = new SimpleFilter();
-        expect(filter.currentFilters.status).toEqual([]);
-    });
-    
-    test('should apply status filter correctly', () => {
-        const filter = new SimpleFilter();
-        filter.applyStatusFilter(['פתוח']);
-        expect(filter.currentFilters.status).toEqual(['פתוח']);
-    });
+// No additional JavaScript needed!
+// The header system automatically initializes filters
+document.addEventListener('DOMContentLoaded', function() {
+    const headerSystem = new HeaderSystem();
+    headerSystem.init();
 });
 ```
+
+## API Reference
+
+### Core Functions
+
+#### `applyTableFilter(filterType, selectedValues)`
+Universal filter application function.
+
+**Parameters:**
+- `filterType` (string): 'status', 'type', 'account', 'date', 'search'
+- `selectedValues` (array): Array of selected values
+
+**Example:**
+```javascript
+// Apply status filter
+applyTableFilter('status', ['פתוח', 'סגור']);
+
+// Apply date filter
+applyTableFilter('date', ['השבוע']);
+
+// Apply search filter
+applyTableFilter('search', ['AAPL', 'Apple']);
+```
+
+#### `getFilterConfig(filterType)`
+Returns configuration for a specific filter type.
+
+**Returns:**
+```javascript
+{
+    columnName: 'סטטוס',
+    containerIdKeywords: ['status', 'סטטוס'],
+    knownContainers: ['tradesContainer', 'alertsContainer'],
+    cellValues: ['פתוח', 'סגור', 'מבוטל'],
+    dataField: 'status'
+}
+```
+
+#### `isDateInRange(dateString, dateRange)`
+Checks if a date falls within the specified range.
+
+**Parameters:**
+- `dateString` (string): Date in "YYYY-MM-DD" format
+- `dateRange` (string): Date range option
+
+**Returns:** boolean
+
+#### `getAllVisibleContainers()`
+Returns array of all visible table container IDs.
+
+**Returns:** string[]
+
+#### `showAllRecordsInTable(containerId)`
+Shows all records in a specific table.
+
+**Parameters:**
+- `containerId` (string): Container ID to show all records
+
+## Filter Behavior
+
+### Multi-Select Logic
+For Status and Type filters:
+1. Click to select/deselect items
+2. "הכול" is automatically deselected when specific items are chosen
+3. "הכול" is re-selected when no specific items remain
+4. Multiple items can be selected simultaneously
+
+### Filter Reset Logic
+1. **Reset Button (↻)**: Fetches user preferences from server and applies them
+2. **Clear Button (×)**: Clears all active filters and shows all records
+3. **Preference Integration**: Uses `/api/v1/preferences/` endpoint
+
+### Account Filter Logic
+1. **Dynamic Loading**: Accounts loaded from `/api/v1/accounts/`
+2. **Caching**: Accounts cached in localStorage for performance
+3. **Default Selection**: Uses user preferences for default account
+4. **ID Matching**: Matches by account ID from preferences
+
+### Date Filter Logic (ENHANCED)
+1. **"כל זמן" First**: Appears first in the list for easy access
+2. **Smart Calculations**: All date ranges calculate correctly
+3. **Notifications Support**: Works on notifications table
+4. **Hebrew Display**: Shows date ranges in Hebrew format
+
+## Debugging
+
+### Console Logging
+The system provides comprehensive logging with emoji indicators:
+
+- `🔄` - Function calls and operations
+- `✅` - Successful operations
+- `⚠️` - Warnings and fallbacks
+- `❌` - Errors and failures
+- `🔍` - Debug information
+
+### Debug Commands
+```javascript
+// Check filter states
+console.log('Filter states:', {
+    status: window.selectedStatusesForFilter,
+    type: window.selectedTypesForFilter,
+    account: window.selectedAccountsForFilter,
+    date: window.selectedDateRangeForFilter,
+    search: window.searchTextForFilter
+});
+
+// Check visible containers
+console.log('Visible containers:', window.getAllVisibleContainers());
+
+// Test filter application
+window.applyTableFilter('status', ['פתוח']);
+
+// Check filter configuration
+console.log('Status filter config:', window.getFilterConfig('status'));
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Filters Not Working
+1. **Check container ID**: Must match supported list
+2. **Verify column headers**: Must match expected text exactly
+3. **Check console errors**: Look for JavaScript errors
+4. **Ensure file loading**: Verify header-system.js is loaded
+
+#### Date Filter Issues (FIXED)
+1. **Date format**: Must be "YYYY-MM-DD"
+2. **Column position**: Date column must be first date column
+3. **Container inclusion**: Ensure notificationsContainer is included
+4. **"כל זמן" position**: Now appears FIRST in the list
+5. **Date calculations**: All ranges now calculate correctly
+
+#### Account Filter Issues
+1. **Server response**: Check if `/api/v1/accounts/` returns data
+2. **Name matching**: Verify account names match between server and table
+3. **LocalStorage**: Check for cached account data
+
+#### Multi-Select Issues
+1. **"הכול" item**: Ensure it exists in filter menu
+2. **Click handlers**: Verify they're properly attached
+3. **JavaScript errors**: Check console for errors
+
+### Performance Tips
+1. **Use container IDs**: Specific IDs improve performance
+2. **Limit table size**: Large tables may impact performance
+3. **Cache accounts**: localStorage caching improves account filter performance
+4. **Debounced search**: Search is automatically debounced
+
+## Migration from Version 3.x
+
+### Breaking Changes
+1. **File removal**: `simple-filter.js` and `filter-system.js` removed
+2. **Function changes**: Old filter functions replaced with `applyTableFilter()`
+3. **Initialization**: Automatic initialization, no manual setup required
+4. **Account handling**: Now uses server data instead of static options
+
+### Migration Steps
+1. **Remove old files**: Delete references to old filter files
+2. **Update container IDs**: Ensure they match new convention
+3. **Verify headers**: Check column headers match expected text
+4. **Test functionality**: Verify all filters work correctly
 
 ## Future Enhancements
 
 ### Planned Features
-1. **Advanced Date Filtering**: Implement actual date range comparison logic
-2. **Filter Persistence**: Save filter state to localStorage
-3. **Filter Templates**: Predefined filter combinations
-4. **Export Filtered Data**: Export filtered results to CSV/Excel
-5. **Filter Analytics**: Track filter usage patterns
+1. **Filter persistence**: Save filter state across sessions
+2. **Filter templates**: Predefined filter configurations
+3. **Advanced combinations**: More sophisticated filter logic
+4. **Export/import**: Filter settings export/import
+5. **Analytics**: Filter usage tracking
 
-### Performance Improvements
-1. **Virtual Scrolling**: For large datasets
-2. **Debounced Search**: Reduce search input processing
-3. **Filter Caching**: Cache filter results for better performance
-4. **Lazy Loading**: Load filter options on demand
+### Technical Improvements
+1. **Performance**: Optimize filtering algorithms
+2. **Memory**: Reduce memory usage for large datasets
+3. **Accessibility**: Improve keyboard navigation
+4. **Mobile**: Enhance mobile filter experience
+5. **Testing**: Add comprehensive test suite
 
-## Version History
+---
 
-### Version 1.9.9 (August 26, 2025)
-- **Fixed**: Date filter implementation and display updates
-- **Fixed**: Button selection logic for "הכול" options
-- **Added**: Comprehensive logging system for all filter operations
-- **Added**: Null/undefined protection for all preference conversion functions
-- **Added**: Table-specific filtering logic with smart field detection
-- **Improved**: Error handling and missing element detection
-- **Enhanced**: Display update methods with detailed logging
-
-### Version 2.2 (August 23, 2025)
-- Initial implementation of unified filter system
-- Basic filter functionality for status, type, account, and search
-- Integration with header system
-
-## Conclusion
-
-The Unified Filter System provides a robust, scalable solution for data filtering across the TikTrack application. With comprehensive logging, error handling, and performance optimizations, it ensures reliable filtering functionality while maintaining good user experience.
-
-The system's modular design allows for easy extension and maintenance, making it suitable for future enhancements and feature additions.
+**Last Updated**: August 28, 2025  
+**Version**: 4.1 (Enhanced Date Filtering)  
+**Maintainer**: TikTrack Development Team

@@ -162,8 +162,7 @@ function checkDependencies() {
 
   if (missingModules.length > 0) {
     console.warn('⚠️ Missing modules:', missingModules);
-    console.log('🔍 Available modules:', Object.keys(window).filter(key => requiredModules.includes(key)));
-    console.log('🔍 All window keys:', Object.keys(window).filter(key => key.includes('Utils') || key.includes('System') || key.includes('Mappings')));
+    
     // לא נחזיר false כדי לא לעצור את האתחול
     return true;
   }

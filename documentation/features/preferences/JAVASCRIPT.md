@@ -4,12 +4,17 @@
 
 This document provides comprehensive technical documentation for the `preferences.js` file, which manages all client-side functionality for the TikTrack preferences page.
 
-## Recent Updates (Version 2.4.0)
+## Recent Updates (Version 2.5.0)
 
-### Auto-Save System Implementation
-- **Removed all manual save buttons**: All settings now save automatically on every change
-- **Enhanced user experience**: No need to manually save preferences
-- **Improved API integration**: Direct saving to backend on every preference change
+### Save Strategy Optimization
+- **Changed from auto-save to batch save**: Users now control when to save all changes
+- **Local memory updates**: Changes stored locally until user clicks "שמור שינויים"
+- **Clear user feedback**: Info notifications for local updates, success for server saves
+
+### Data Structure Handling
+- **Fixed server response parsing**: Updated to handle direct object structure from server
+- **Enhanced error handling**: Better handling of multiple data structure formats
+- **Comprehensive logging**: Added detailed logging for debugging data flow issues
 
 ### API Endpoint Updates
 - **Updated API paths**: Changed from `/api/preferences` to `/api/v1/preferences`

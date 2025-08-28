@@ -4,6 +4,8 @@
 
 This directory contains comprehensive documentation for the TikTrack Preferences System, covering all aspects from user guidance to technical implementation details.
 
+**Latest Update**: Version 2.5.0 - Fixed data persistence issues and improved save strategy
+
 ## 📋 Documentation Files
 
 ### 1. 🎯 **PREFERENCES_SYSTEM_README.md**

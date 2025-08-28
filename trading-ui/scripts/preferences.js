@@ -29,15 +29,25 @@ async function loadPreferences() {
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
       const data = await response.json();
-    
+      console.log('📊 נתונים מהשרת:', data);
+      console.log('🔍 בדיקת מבנה נתונים:');
+      console.log('  - data.user:', !!data.user);
+      console.log('  - data.users:', !!data.users);
+      console.log('  - data.defaults:', !!data.defaults);
+      console.log('  - data.defaultTypeFilter:', data.defaultTypeFilter);
+      console.log('  - data.primaryCurrency:', data.primaryCurrency);
       
-      // בדוק את המבנה הנכון
+      // בדוק את המבנה הנכון - השרת מחזיר ישירות את האובייקט
       if (data.user) {
         currentPreferences = data.user;
       } else if (data.users && data.users.nimrod) {
         currentPreferences = data.users.nimrod;
       } else if (data.defaults) {
         currentPreferences = data.defaults;
+      } else if (data.defaultTypeFilter || data.primaryCurrency) {
+        // השרת מחזיר ישירות את האובייקט
+        currentPreferences = data;
+        console.log('📊 השרת החזיר ישירות את האובייקט:', data);
       } else {
         currentPreferences = { ...DEFAULT_PREFERENCES };
       }

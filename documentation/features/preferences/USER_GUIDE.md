@@ -4,12 +4,12 @@
 
 The TikTrack Preferences page allows you to customize your trading interface, set default values, and configure system settings to match your trading style and preferences.
 
-## Recent Updates (Version 2.4.0)
+## Recent Updates (Version 2.5.0)
 
-### Auto-Save System
-- **Automatic Saving**: All settings now save automatically when you change them
-- **No Manual Save Required**: You no longer need to click "Save" buttons
-- **Instant Feedback**: Changes are applied immediately across the application
+### Improved Save System
+- **Batch Saving**: All changes are saved together when you click "שמור שינויים"
+- **Local Updates**: Changes are stored locally until you choose to save
+- **Clear Feedback**: You'll see info messages for local updates and success messages for server saves
 
 ### New Settings
 - **Default Commission**: Set your default commission rate for trades
@@ -28,7 +28,7 @@ The preferences page is organized into collapsible sections:
 
 ### Main Controls
 - **Toggle All Sections**: Opens or closes all sections simultaneously
-- **Auto-Save**: All settings save automatically when changed (no manual save required)
+- **Save Changes**: Click "שמור שינויים" to save all your changes to the server
 
 ### Sections Overview
 1. **System Settings**: Core system configuration
@@ -52,7 +52,7 @@ Configure core system parameters that affect the entire application.
 - **Purpose**: Controls how dates and times are displayed throughout the application
 
 ### Actions Available
-- **Auto-Save**: Settings save automatically when changed
+- **Save Changes**: Click "שמור שינויים" to save all changes
 - **Reset to Defaults**: Restore original system settings
 
 ## Personal Settings
@@ -84,7 +84,7 @@ Customize your individual trading preferences and default values.
 - **Example**: Setting 600 means console will be cleaned every 10 minutes
 
 ### Actions Available
-- **Auto-Save**: Settings save automatically when changed
+- **Save Changes**: Click "שמור שינויים" to save all changes
 - **Reset to Defaults**: Restore original personal settings
 
 ## Security Settings

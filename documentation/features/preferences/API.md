@@ -11,12 +11,13 @@ This document describes the REST API endpoints for managing user preferences in 
 - **Authentication**: Not required (session-based)
 - **Rate Limiting**: Not implemented
 
-## Recent Updates (Version 2.4.0)
+## Recent Updates (Version 2.5.0)
 
 ### API Endpoint Changes
 - **Updated base URL**: Changed from `/api/preferences` to `/api/v1/preferences`
 - **Enhanced preferences structure**: Added `defaultCommission` and `consoleCleanupInterval` fields
 - **Improved error handling**: Better handling of missing preference fields
+- **Fixed data structure**: Server now returns direct object structure instead of nested format
 
 ### New Preference Fields
 ```json
@@ -50,30 +51,21 @@ Accept: application/json
 **Response**:
 ```json
 {
-  "defaults": {
-    "primaryCurrency": "USD",
-    "timezone": "Asia/Jerusalem",
-    "defaultStopLoss": 5,
-    "defaultTargetPrice": 10,
-    "defaultStatusFilter": "all",
-    "defaultTypeFilter": "all",
-    "defaultAccountFilter": "all",
-    "defaultDateRangeFilter": "all",
-    "defaultSearchFilter": ""
-  },
-  "user": {
-    "primaryCurrency": "USD",
-    "timezone": "Asia/Jerusalem",
-    "defaultStopLoss": 7,
-    "defaultTargetPrice": 12,
-    "defaultStatusFilter": "active",
-    "defaultTypeFilter": "all",
-    "defaultAccountFilter": "all",
-    "defaultDateRangeFilter": "last30days",
-    "defaultSearchFilter": ""
-  }
+  "primaryCurrency": "USD",
+  "timezone": "Asia/Jerusalem",
+  "defaultStopLoss": 5,
+  "defaultTargetPrice": 10,
+  "defaultCommission": 1,
+  "defaultStatusFilter": "all",
+  "defaultTypeFilter": "swing",
+  "defaultAccountFilter": "all",
+  "defaultDateRangeFilter": "all",
+  "defaultSearchFilter": "",
+  "consoleCleanupInterval": 60000
 }
 ```
+
+**Note**: The server now returns preferences directly as an object, not nested under `defaults` or `user` keys.
 
 **Status Codes**:
 - `200 OK`: Preferences retrieved successfully

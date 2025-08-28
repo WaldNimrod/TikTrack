@@ -736,16 +736,16 @@ class HeaderSystem {
                   <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="filter-menu" id="dateRangeFilterMenu">
+                  <div class="date-range-filter-item" data-value="כל זמן" onclick="selectDateRangeOption('כל זמן')">
+                    <span class="option-text">כל זמן</span>
+                    <span class="check-mark">●</span>
+                  </div>
                   <div class="date-range-filter-item" data-value="היום" onclick="selectDateRangeOption('היום')">
                     <span class="option-text">היום</span>
                     <span class="check-mark">●</span>
                   </div>
                   <div class="date-range-filter-item" data-value="אתמול" onclick="selectDateRangeOption('אתמול')">
                     <span class="option-text">אתמול</span>
-                    <span class="check-mark">●</span>
-                  </div>
-                  <div class="date-range-filter-item" data-value="כל זמן" onclick="selectDateRangeOption('כל זמן')">
-                    <span class="option-text">כל זמן</span>
                     <span class="check-mark">●</span>
                   </div>
                   <div class="date-range-filter-item" data-value="השבוע" onclick="selectDateRangeOption('השבוע')">
@@ -913,9 +913,11 @@ class HeaderSystem {
         if (searchInput) {
           searchInput.value = '';
           // הפעלת פילטר חיפוש ריק
-          if (window.simpleFilter) {
-            window.simpleFilter.applySearchFilter('');
-          }
+                  if (window.simpleFilter) {
+          window.simpleFilter.applySearchFilter('');
+        } else {
+          window.applySearchFilter('');
+        }
         }
         return;
       }
@@ -928,6 +930,8 @@ class HeaderSystem {
       
         if (window.simpleFilter) {
           window.simpleFilter.applySearchFilter(searchTerm);
+        } else {
+          window.applySearchFilter(searchTerm);
         }
       }
     });
@@ -2488,9 +2492,13 @@ class HeaderSystem {
 
   // ניקוי פילטר חיפוש
   clearSearchFilter() {
-    const searchInput = this.querySelector('#searchFilterInput');
+    const searchInput = document.querySelector('#searchFilterInput');
     if (searchInput) {
       searchInput.value = '';
+      // הפעלת פילטר חיפוש ריק כדי להציג את כל הרשומות
+      if (window.applySearchFilter) {
+        window.applySearchFilter('');
+      }
     }
 
     if (window.filterSystem) {
@@ -3159,6 +3167,8 @@ function applyTableFilter(filterType, selectedValues) {
     return;
   }
 
+  console.log('🔍 Filter config:', filterConfig);
+
   // קבלת כל הקונטיינרים הנראים
   const visibleContainers = getAllVisibleContainers();
   console.log('🔍 Visible containers:', visibleContainers);
@@ -3190,9 +3200,10 @@ function applyTableFilter(filterType, selectedValues) {
     console.log('⚠️ No tables found with the required column');
   }
 
-  // Fallback ל-simpleFilter אם קיים
-  if (window.simpleFilter && window.simpleFilter[`apply${filterType.charAt(0).toUpperCase() + filterType.slice(1)}Filter`]) {
-    window.simpleFilter[`apply${filterType.charAt(0).toUpperCase() + filterType.slice(1)}Filter`](selectedValues);
+  // Fallback לפונקציות ספציפיות לעמודים - רק אם המערכת האחידה לא עובדת
+  if (!appliedToAny && filterType === 'account' && window.filterExecutionsByAccount) {
+    console.log('🔄 Calling filterExecutionsByAccount for executions page as fallback');
+    window.filterExecutionsByAccount(selectedValues);
   }
 }
 
@@ -3224,8 +3235,9 @@ function getFilterConfig(filterType) {
     },
          'date': {
        columnName: 'תאריך',
+       columnNameEnglish: 'Created At',
        containerIdKeywords: ['date', 'תאריך'],
-       knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer'],
+       knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer', 'currenciesContainer', 'noteRelationTypesContainer'],
        cellValues: [], // תאריכים הם דינמיים
        dataField: 'created-at',
        isFirstOccurrence: true // תמיד העמודה הראשונה עם תאריך
@@ -3233,11 +3245,11 @@ function getFilterConfig(filterType) {
     'search': {
       columnName: 'search',
       containerIdKeywords: [],
-      knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer'],
+      knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer', 'currenciesContainer', 'noteRelationTypesContainer'],
       cellValues: [],
       dataField: null,
       searchAllColumns: true, // חיפוש בכל העמודות חוץ מפעולות
-      excludeColumns: ['פעולות', 'actions']
+      excludeColumns: ['פעולות', 'actions', 'Actions']
     }
   };
 
@@ -3268,8 +3280,10 @@ function checkIfTableHasColumn(containerId, filterConfig) {
         const headerText = headers[i].textContent.trim();
         console.log(`🔍 Header ${i}: "${headerText}"`);
         
-        if (headerText.includes(filterConfig.columnName)) {
-          console.log(`✅ Found first ${filterConfig.columnName} column at index ${i}`);
+        if (headerText.includes(filterConfig.columnName) || 
+            headerText.includes('נוצר ב') || 
+            headerText.includes('תאריך יצירה')) {
+          console.log(`✅ Found first ${filterConfig.columnName} column at index ${i} (${headerText})`);
           return true;
         }
       }
@@ -3279,7 +3293,8 @@ function checkIfTableHasColumn(containerId, filterConfig) {
         const headerText = header.textContent.trim();
         console.log(`🔍 Header text: "${headerText}"`);
         
-        if (headerText.includes(filterConfig.columnName)) {
+        if (headerText.includes(filterConfig.columnName) || 
+            (filterConfig.columnNameEnglish && headerText.includes(filterConfig.columnNameEnglish))) {
           console.log(`✅ Found ${filterConfig.columnName} column in table headers`);
           return true;
         }
@@ -3326,6 +3341,7 @@ function applyFilterToTable(containerId, filterConfig, selectedValues) {
   }
 
   const rows = table.querySelectorAll('tbody tr');
+  console.log(`🔍 Found ${rows.length} rows in table ${containerId}`);
   let visibleCount = 0;
 
   for (const row of rows) {
@@ -3335,18 +3351,26 @@ function applyFilterToTable(containerId, filterConfig, selectedValues) {
     if (selectedValues && selectedValues.length > 0 && 
         !selectedValues.includes('הכול') && !selectedValues.includes('כל זמן')) {
       
+      console.log(`🔍 Processing row ${visibleCount + 1} with filter type: ${filterConfig.columnName}`);
+      
       if (filterConfig.searchAllColumns) {
         // חיפוש חופשי - מחפש בכל העמודות
         shouldShow = searchInAllColumns(row, selectedValues, filterConfig);
       } else if (filterConfig.columnName === 'תאריך') {
         // פילטר תאריך - בדיקה מיוחדת
+        console.log('🔍 Processing date filter for row');
         const filterCell = findFilterCell(row, filterConfig);
         
         if (filterCell) {
           const cellValue = filterCell.textContent.trim();
           const dateRange = selectedValues[0]; // פילטר תאריך תמיד יש לו ערך אחד
+          console.log('🔍 Date filter - cell value:', cellValue, 'date range:', dateRange);
+          console.log('🔍 Cell HTML:', filterCell.outerHTML);
           shouldShow = isDateInRange(cellValue, dateRange);
+          console.log('🔍 Date filter result:', shouldShow);
         } else {
+          console.log('⚠️ No date cell found for date filter');
+          console.log('🔍 Row HTML:', row.outerHTML);
           shouldShow = true;
         }
       } else {
@@ -3367,8 +3391,10 @@ function applyFilterToTable(containerId, filterConfig, selectedValues) {
     if (shouldShow) {
       row.style.display = '';
       visibleCount++;
+      console.log(`✅ Row ${visibleCount} shown`);
     } else {
       row.style.display = 'none';
+      console.log(`❌ Row hidden`);
     }
   }
 
@@ -3379,40 +3405,81 @@ function applyFilterToTable(containerId, filterConfig, selectedValues) {
  * חיפוש בכל העמודות של שורה (לחיפוש חופשי)
  */
 function searchInAllColumns(row, searchTerms, filterConfig) {
+  console.log('🔍 searchInAllColumns called with:', { searchTerms, filterConfig });
+  
   const cells = row.querySelectorAll('td');
   const headers = row.closest('table').querySelectorAll('th');
+  
+  console.log(`🔍 Found ${cells.length} cells and ${headers.length} headers`);
   
   for (let i = 0; i < cells.length; i++) {
     // בדיקה אם העמודה הזו לא נכללת בחיפוש
     if (i < headers.length) {
       const headerText = headers[i].textContent.trim();
+      console.log(`🔍 Header ${i}: "${headerText}"`);
+      
       if (filterConfig.excludeColumns.includes(headerText)) {
+        console.log(`⏭️ Skipping excluded column: "${headerText}"`);
         continue; // דילוג על עמודת פעולות
       }
     }
     
     const cellText = cells[i].textContent.trim().toLowerCase();
+    console.log(`🔍 Cell ${i} text: "${cellText}"`);
     
     // בדיקה אם אחד ממונחי החיפוש נמצא בתא
     for (const term of searchTerms) {
-      if (cellText.includes(term.toLowerCase())) {
+      const termLower = term.toLowerCase();
+      console.log(`🔍 Checking if "${termLower}" is in "${cellText}"`);
+      
+      if (cellText.includes(termLower)) {
+        console.log(`✅ Found match: "${termLower}" in cell ${i}`);
         return true; // נמצא התאמה
       }
     }
   }
   
+  console.log('❌ No matches found in this row');
   return false; // לא נמצאה התאמה
 }
 
 /**
  * בדיקה אם תאריך נמצא בטווח
+ * 
+ * ⚠️ חשוב: פונקציה זו תוקנה כבר 3 פעמים לפי הגדרות מדויקות של נימרוד!
+ * אין לשנות את הלוגיקה בלי לקבל אישור מנימרוד!
+ * 
+ * הגדרות מדויקות של נימרוד:
+ * - השבוע = מתחילת השבוע הקלנדארי ועד היום
+ * - שבוע = 7 ימים 
+ * - MTD = מתחילת החודש הקלנדארי ועד היום
+ * - YTD = מתחילת השנה הקלנדארית ועד היום
+ * - החודש = מתחילת החודש הקלנדארי ועד היום
+ * - שנה = 365 יום
+ * - השנה = מתחילת השנה הקלנדארית ועד היום
+ * - שבוע קודם = מתחילת השבוע הקלנדארי הקודם ועד סופו
+ * - חודש קודם = מתחילת החודש הקלנדארי הקודם ועד סופו
+ * - השנה הקודמת = מתחילת השנה הקלנדארית הקודמת ועד סופה
+ * 
+ * 🚨 אזהרה: אין לשנות את הלוגיקה בלי אישור מנימרוד!
  */
 function isDateInRange(dateString, dateRange) {
   try {
+    console.log('🔍 isDateInRange called with:', { dateString, dateRange });
+    
+    // חילוץ התאריך בלבד (ללא שעה)
+    let dateOnly = dateString;
+    
+    // אם התאריך מכיל רווח, ניקח רק את החלק לפני הרווח (התאריך)
+    if (dateString.includes(' ')) {
+      dateOnly = dateString.split(' ')[0];
+      console.log('🔍 Extracted date only:', dateOnly);
+    }
+    
     // המרת התאריך מהתא לטופס Date
-    const date = new Date(dateString);
+    const date = new Date(dateOnly);
     if (isNaN(date.getTime())) {
-      console.log('⚠️ Invalid date:', dateString);
+      console.log('⚠️ Invalid date:', dateOnly);
       return true; // אם התאריך לא תקין, נציג את השורה
     }
 
@@ -3437,9 +3504,10 @@ function isDateInRange(dateString, dateRange) {
         break;
       
       case 'השבוע':
-        // מתחילת השבוע הקלנדארי ועד היום
+        // מתחילת השבוע הקלנדארי ועד היום (ראשון = 0, שני = 1, וכו')
+        const dayOfWeek = today.getDay(); // 0 = ראשון, 1 = שני, וכו'
         startDate = new Date(today);
-        startDate.setDate(today.getDate() - today.getDay());
+        startDate.setDate(today.getDate() - dayOfWeek);
         startDate.setHours(0, 0, 0, 0);
         endDate = today;
         break;
@@ -3464,11 +3532,23 @@ function isDateInRange(dateString, dateRange) {
         endDate = today;
         break;
       
+      case 'החודש':
+        // מתחילת החודש הקלנדארי ועד היום
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        endDate = today;
+        break;
+      
       case 'שנה':
         // 365 יום
         startDate = new Date(today);
         startDate.setDate(today.getDate() - 365);
         startDate.setHours(0, 0, 0, 0);
+        endDate = today;
+        break;
+      
+      case 'השנה':
+        // מתחילת השנה הקלנדארית ועד היום
+        startDate = new Date(today.getFullYear(), 0, 1);
         endDate = today;
         break;
       
@@ -3494,8 +3574,10 @@ function isDateInRange(dateString, dateRange) {
         break;
       
       case 'שבוע קודם':
+        // מתחילת השבוע הקלנדארי הקודם ועד סופו
+        const dayOfWeekForLastWeek = today.getDay();
         startDate = new Date(today);
-        startDate.setDate(today.getDate() - today.getDay() - 7);
+        startDate.setDate(today.getDate() - dayOfWeekForLastWeek - 7);
         startDate.setHours(0, 0, 0, 0);
         endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + 6);
@@ -3503,12 +3585,14 @@ function isDateInRange(dateString, dateRange) {
         break;
       
       case 'חודש קודם':
+        // מתחילת החודש הקלנדארי הקודם ועד סופו
         startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         endDate = new Date(today.getFullYear(), today.getMonth(), 0);
         endDate.setHours(23, 59, 59, 999);
         break;
       
-      case 'שנה קודמת':
+      case 'השנה הקודמת':
+        // מתחילת השנה הקלנדארית הקודמת ועד סופה
         startDate = new Date(today.getFullYear() - 1, 0, 1);
         endDate = new Date(today.getFullYear() - 1, 11, 31);
         endDate.setHours(23, 59, 59, 999);
@@ -3529,14 +3613,25 @@ function isDateInRange(dateString, dateRange) {
  * מציאת תא הפילטר בשורה
  */
 function findFilterCell(row, filterConfig) {
+  console.log('🔍 findFilterCell called for:', filterConfig.columnName);
+  
   const table = row.closest('table');
   const headers = table.querySelectorAll('th');
   const cells = row.querySelectorAll('td');
   
+  console.log(`🔍 Found ${headers.length} headers and ${cells.length} cells`);
+  
   // חיפוש לפי כותרת העמודה
   for (let i = 0; i < headers.length && i < cells.length; i++) {
     const headerText = headers[i].textContent.trim();
-    if (headerText === filterConfig.columnName) {
+    console.log(`🔍 Header ${i}: "${headerText}"`);
+    
+    if (headerText === filterConfig.columnName || 
+        (filterConfig.columnNameEnglish && headerText === filterConfig.columnNameEnglish) ||
+        (filterConfig.columnNameEnglish && headerText.includes(filterConfig.columnNameEnglish)) ||
+        (filterConfig.columnName === 'תאריך' && (headerText.includes('נוצר ב') || headerText.includes('תאריך יצירה')))) {
+      console.log(`✅ Found matching header at index ${i}: "${headerText}"`);
+      console.log(`🔍 Returning cell at index ${i}:`, cells[i]);
       return cells[i];
     }
   }
@@ -3613,6 +3708,8 @@ function applyAccountFilter() {
  */
 function applyDateRangeFilter(dateRange) {
   console.log('🔄 applyDateRangeFilter called with:', dateRange);
+  console.log('🔍 Date range type:', typeof dateRange);
+  console.log('🔍 Date range length:', dateRange ? dateRange.length : 0);
   applyTableFilter('date', [dateRange]);
 }
 
@@ -3621,14 +3718,31 @@ function applyDateRangeFilter(dateRange) {
  */
 function applySearchFilter(searchTerm) {
   console.log('🔄 applySearchFilter called with:', searchTerm);
+  console.log('🔍 Search term type:', typeof searchTerm);
+  console.log('🔍 Search term length:', searchTerm ? searchTerm.length : 0);
+  
   if (searchTerm && searchTerm.trim()) {
+    console.log('🔍 Applying search filter with term:', searchTerm.trim());
     applyTableFilter('search', [searchTerm.trim()]);
   } else {
+    console.log('🔍 Search term is empty, showing all records');
     // אם החיפוש ריק, הצג את כל הרשומות בכל הקונטיינרים הנראים
     const visibleContainers = getAllVisibleContainers();
     for (const containerId of visibleContainers) {
       showAllRecordsInTable(containerId);
     }
+  }
+  
+  // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף חשבונות
+  if (window.searchAccounts) {
+    console.log('🔄 Calling searchAccounts for accounts page');
+    window.searchAccounts(searchTerm);
+  }
+  
+  // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף ביצועים
+  if (window.searchExecutions) {
+    console.log('🔄 Calling searchExecutions for executions page');
+    window.searchExecutions(searchTerm);
   }
 }
 
@@ -3669,6 +3783,18 @@ function applyAccountFilter() {
 
   if (window.simpleFilter) {
     window.simpleFilter.applyAccountFilter(selectedAccounts);
+  }
+  
+  // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף חשבונות
+  if (window.filterAccountsByAccount) {
+    console.log('🔄 Calling filterAccountsByAccount for accounts page');
+    window.filterAccountsByAccount(selectedAccounts);
+  }
+  
+  // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף ביצועים
+  if (window.filterExecutionsByAccount) {
+    console.log('🔄 Calling filterExecutionsByAccount for executions page');
+    window.filterExecutionsByAccount(selectedAccounts);
   }
 }
 
@@ -3815,6 +3941,18 @@ function clearAllFilters() {
     console.warn('⚠️ simpleFilter not available, using fallback');
     // Fallback - ניקוי ידני
     clearFiltersManually();
+  }
+  
+  // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף חשבונות
+  if (window.resetAccountsFilters) {
+    console.log('🔄 Calling resetAccountsFilters for accounts page');
+    window.resetAccountsFilters();
+  }
+  
+  // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף ביצועים
+  if (window.resetExecutionsFilters) {
+    console.log('🔄 Calling resetExecutionsFilters for executions page');
+    window.resetExecutionsFilters();
   }
 }
 
@@ -4091,6 +4229,12 @@ function clearFiltersManually() {
   const selectedDateRangeElement = document.getElementById('selectedDateRange');
   if (selectedDateRangeElement) {
     selectedDateRangeElement.textContent = 'כל זמן';
+  }
+  
+  // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף חשבונות
+  if (window.resetAccountsFilters) {
+    console.log('🔄 Calling resetAccountsFilters for accounts page');
+    window.resetAccountsFilters();
   }
 }
 

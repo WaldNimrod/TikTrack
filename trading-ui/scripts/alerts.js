@@ -328,15 +328,14 @@ function updateAlertsTable(alerts) {
       let relatedIcon = '';
       let relatedClass = '';
 
-    
-    
+      console.log('🔍 Alert details:', {
         id: alert.id,
         related_type_id: alert.related_type_id,
         related_id: alert.related_id,
-
         status: alert.status
       });
     
+      console.log('📊 Related data counts:', {
         accounts: accounts.length,
         trades: trades.length,
         tradePlans: tradePlans.length,

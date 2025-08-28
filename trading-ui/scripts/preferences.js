@@ -141,16 +141,35 @@ async function saveAllPreferences() {
  * מאפס לברירות מחדל
  */
 async function resetToDefaults() {
-  if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
-    currentPreferences = { ...DEFAULT_PREFERENCES };
-    updateUI();
-    
-    try {
-                 await saveAllPreferences();
-           showPreferencesSuccess('✅ העדפות אופסו לברירות מחדל');
-         } catch (error) {
-           showPreferencesError('❌ שגיאה באיפוס העדפות');
-         }
+  if (window.showConfirmationDialog) {
+    window.showConfirmationDialog(
+      'איפוס הגדרות',
+      'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
+      async () => {
+        currentPreferences = { ...DEFAULT_PREFERENCES };
+        updateUI();
+        
+        try {
+          await saveAllPreferences();
+          showPreferencesSuccess('✅ העדפות אופסו לברירות מחדל');
+        } catch (error) {
+          showPreferencesError('❌ שגיאה באיפוס העדפות');
+        }
+      }
+    );
+  } else {
+    // גיבוי למערכת הישנה
+    if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
+      currentPreferences = { ...DEFAULT_PREFERENCES };
+      updateUI();
+      
+      try {
+        await saveAllPreferences();
+        showPreferencesSuccess('✅ העדפות אופסו לברירות מחדל');
+      } catch (error) {
+        showPreferencesError('❌ שגיאה באיפוס העדפות');
+      }
+    }
   }
 }
 
@@ -446,3 +465,33 @@ async function initializePreferences() {
 
 // אתחול כשהדף נטען
 document.addEventListener('DOMContentLoaded', initializePreferences);
+
+// ========================================
+// Export Functions
+// ========================================
+
+// Export main functions
+window.saveAllPreferences = saveAllPreferences;
+window.resetToDefaults = resetToDefaults;
+window.updatePreference = updatePreference;
+window.loadPreferences = loadPreferences;
+window.initializePreferences = initializePreferences;
+
+// Export notification functions
+window.showPreferencesSuccess = showPreferencesSuccess;
+window.showPreferencesError = showPreferencesError;
+window.showPreferencesInfo = showPreferencesInfo;
+window.showPreferencesWarning = showPreferencesWarning;
+
+// Export utility functions
+window.getPreferenceLabel = getPreferenceLabel;
+window.loadAccountsToFilter = loadAccountsToFilter;
+
+// Export toggle functions
+window.toggleTopSection = function() {
+  if (typeof window.toggleTopSectionGlobal === 'function') {
+    window.toggleTopSectionGlobal();
+  } else {
+    console.error('❌ toggleTopSectionGlobal function not found in main.js');
+  }
+};

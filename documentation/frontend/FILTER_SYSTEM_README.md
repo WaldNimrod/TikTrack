@@ -4,13 +4,24 @@
 The TikTrack Filter System is a unified, client-side filtering solution that provides advanced filtering capabilities across all data tables in the application. It has been completely rewritten to provide a more robust, maintainable, and user-friendly filtering experience.
 
 ## Version History
-- **Version 4.1** (August 28, 2025) - **CURRENT** - Enhanced date filtering and notifications support
+- **Version 4.2** (January 2025) - **CURRENT** - Accounts page filter implementation completed
+- **Version 4.1** (August 28, 2025) - Enhanced date filtering and notifications support
 - **Version 4.0** (August 28, 2025) - Complete rewrite with unified filtering
 - **Version 3.x** (August 2025) - Legacy system (removed)
 
-## Key Changes in Version 4.1
+## Key Changes in Version 4.2 (January 2025)
 
-### 🎯 Enhanced Date Filtering
+### ✅ Accounts Page Filter Implementation Completed
+- **Account filter**: Filter by specific account names
+- **Free text search**: Search across name, currency, notes, and status fields
+- **Filter reset**: Clear all filters functionality
+- **Responsive table layout**: Proper column width distribution (100% total)
+- **Action buttons**: Edit, delete, and linked items buttons
+- **Summary statistics**: Real-time display of account counts and totals
+- **Top section toggle**: Show/hide summary section with state persistence
+- **State persistence**: Filter and display states saved to localStorage
+
+### 🎯 Enhanced Date Filtering (Version 4.1)
 - **Fixed "כל זמן" positioning**: Now appears FIRST in the date filter list
 - **Corrected date range calculations**: All date ranges now calculate correctly
 - **Notifications table support**: Date filter now works on notifications table
@@ -98,6 +109,152 @@ function isDateInRange(dateString, dateRange)
 | **שנה** | Last 365 days | 365 days ago to today |
 | **30 יום** | Last 30 days | 30 days ago to today |
 | **60 יום** | Last 60 days | 60 days ago to today |
+
+## 🛠️ Implementation Guide for New Pages
+
+### Step 1: Define Page-Specific Filter Functions
+
+```javascript
+// In your page's JavaScript
+let allData = [];
+let filteredData = [];
+
+// Setup filter functions
+function setupFilterFunctions() {
+  // Account filter (if applicable)
+  window.filterByAccount = function(accountNames) {
+    if (accountNames.includes('הכול')) {
+      filteredData = [...allData];
+    } else {
+      filteredData = allData.filter(item => 
+        accountNames.includes(item.account_name)
+      );
+    }
+    updateTable(filteredData);
+  };
+  
+  // Search filter
+  window.searchData = function(searchTerm) {
+    if (!searchTerm.trim()) {
+      filteredData = [...allData];
+    } else {
+      const term = searchTerm.toLowerCase();
+      filteredData = allData.filter(item => 
+        Object.values(item).some(value => 
+          String(value).toLowerCase().includes(term)
+        )
+      );
+    }
+    updateTable(filteredData);
+  };
+  
+  // Reset filters
+  window.resetFilters = function() {
+    filteredData = [...allData];
+    updateTable(filteredData);
+  };
+}
+```
+
+### Step 2: Connect to Global Filter System
+
+```javascript
+// In header-system.js, add calls to your functions
+function applyAccountFilter() {
+  const selectedAccounts = getSelectedAccounts();
+  
+  // Call page-specific function
+  if (window.filterByAccount) {
+    window.filterByAccount(selectedAccounts);
+  }
+}
+
+function applySearchFilter(searchTerm) {
+  if (window.searchData) {
+    window.searchData(searchTerm);
+  }
+}
+
+function clearAllFilters() {
+  if (window.resetFilters) {
+    window.resetFilters();
+  }
+}
+```
+
+### Step 3: Table Layout with Responsive Design
+
+```css
+/* Responsive table with fixed column widths */
+#yourTable {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+/* Column width distribution (must total 100%) */
+#yourTable th:nth-child(1) { width: 20%; } /* Name */
+#yourTable th:nth-child(2) { width: 10%; } /* Type */
+#yourTable th:nth-child(3) { width: 15%; } /* Amount */
+#yourTable th:nth-child(4) { width: 15%; } /* Date */
+#yourTable th:nth-child(5) { width: 20%; } /* Notes */
+#yourTable th:nth-child(6) { width: 20%; } /* Actions */
+
+/* Action buttons styling */
+#yourTable td:last-child .btn {
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 3px !important;
+  font-size: 0.8rem !important;
+}
+```
+
+### Step 4: State Persistence
+
+```javascript
+// Save filter state
+function saveFilterState() {
+  const state = {
+    searchTerm: document.getElementById('searchInput')?.value || '',
+    selectedFilters: getSelectedFilters()
+  };
+  localStorage.setItem('yourPage_filter_state', JSON.stringify(state));
+}
+
+// Restore filter state
+function restoreFilterState() {
+  const saved = localStorage.getItem('yourPage_filter_state');
+  if (saved) {
+    const state = JSON.parse(saved);
+    applyFilterState(state);
+  }
+}
+```
+
+### Step 5: Summary Statistics (Optional)
+
+```javascript
+function updateSummaryStats(data) {
+  const totalCount = data.length;
+  const activeCount = data.filter(item => item.status === 'active').length;
+  const totalValue = data.reduce((sum, item) => sum + (item.value || 0), 0);
+  
+  document.getElementById('totalCount').textContent = totalCount;
+  document.getElementById('activeCount').textContent = activeCount;
+  document.getElementById('totalValue').textContent = `₪${totalValue.toLocaleString()}`;
+}
+```
+
+## 📋 Checklist for New Page Implementation
+
+- [ ] Define page-specific filter functions
+- [ ] Connect to global filter system in header-system.js
+- [ ] Implement responsive table layout with proper column widths
+- [ ] Add action buttons with proper styling
+- [ ] Implement state persistence (localStorage)
+- [ ] Add summary statistics (if applicable)
+- [ ] Test all filter combinations
+- [ ] Verify responsive design on mobile
+- [ ] Test state restoration on page reload
 | **90 יום** | Last 90 days | 90 days ago to today |
 | **שבוע קודם** | Previous week | Previous calendar week |
 | **חודש קודם** | Previous month | Previous calendar month |

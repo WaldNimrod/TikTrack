@@ -657,6 +657,32 @@ function validateCurrencyRate(value) {
     return true;
 }
 
+/**
+ * וולידציה של סימבול טיקר (רק אותיות אנגליות גדולות ומספרים)
+ * @param {string} value - הערך לבדיקה
+ * @returns {string|true} - הודעת שגיאה או true
+ */
+function validateTickerSymbol(value) {
+    if (!value || value.trim() === '') {
+        return 'סימבול טיקר הוא שדה חובה';
+    }
+    
+    const pattern = /^[A-Z0-9]+$/;
+    if (!pattern.test(value)) {
+        return 'סימבול טיקר חייב להכיל רק אותיות אנגליות גדולות ומספרים (למשל: AAPL, GOOGL, TSLA)';
+    }
+    
+    if (value.length < 1) {
+        return 'סימבול טיקר חייב להכיל לפחות תו אחד';
+    }
+    
+    if (value.length > 10) {
+        return 'סימבול טיקר לא יכול להיות יותר מ-10 תווים';
+    }
+    
+    return true;
+}
+
 // ייצוא פונקציות גלובליות
 window.validateForm = validateForm;
 window.showFieldError = showFieldError;
@@ -734,6 +760,7 @@ function clearValidation(formId) {
 // ייצוא פונקציות וולידציה מותאמות
 window.validateCurrencySymbol = validateCurrencySymbol;
 window.validateCurrencyRate = validateCurrencyRate;
+window.validateTickerSymbol = validateTickerSymbol;
 
 // ייצוא פונקציות אתחול
 window.initializeValidation = initializeValidation;
@@ -759,6 +786,7 @@ window.validationUtils = {
     validateSelectField,
     validateCurrencySymbol,
     validateCurrencyRate,
+    validateTickerSymbol,
     initializeValidation,
     clearValidation
 };

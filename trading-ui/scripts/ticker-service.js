@@ -132,7 +132,7 @@ async function loadCache() {
         plansCache = plans;
         lastCacheUpdate = Date.now();
 
-      
+        console.log('📊 Cache loaded:', {
             tickers: tickers.length,
             trades: trades.length,
             plans: plans.length

@@ -207,9 +207,8 @@ function showErrorNotification(title, message) {
     if (window.notificationSystem && window.notificationSystem.showErrorNotification) {
         window.notificationSystem.showErrorNotification(title, message);
     } else {
-        // Fallback to simple notification
+        // Fallback to console only
         console.log(`❌ ${title}: ${message}`);
-        alert(`${title}: ${message}`);
     }
 }
 
@@ -222,9 +221,8 @@ function showSuccessNotification(title, message) {
     if (window.notificationSystem && window.notificationSystem.showSuccessNotification) {
         window.notificationSystem.showSuccessNotification(title, message);
     } else {
-        // Fallback to simple notification
+        // Fallback to console only
         console.log(`✅ ${title}: ${message}`);
-        alert(`${title}: ${message}`);
     }
 }
 
@@ -237,9 +235,8 @@ function showInfoNotification(title, message) {
     if (window.notificationSystem && window.notificationSystem.showInfoNotification) {
         window.notificationSystem.showInfoNotification(title, message);
     } else {
-        // Fallback to simple notification
+        // Fallback to console only
         console.log(`ℹ️ ${title}: ${message}`);
-        alert(`${title}: ${message}`);
     }
 }
 
@@ -252,9 +249,8 @@ function showWarningNotification(title, message) {
     if (window.notificationSystem && window.notificationSystem.showWarningNotification) {
         window.notificationSystem.showWarningNotification(title, message);
     } else {
-        // Fallback to simple notification
+        // Fallback to console only
         console.log(`⚠️ ${title}: ${message}`);
-        alert(`${title}: ${message}`);
     }
 }
 
@@ -300,7 +296,6 @@ function showNotification(message, type = 'info') {
     } else {
         // Fallback להצגת התראה פשוטה
         console.log(`[${type.toUpperCase()}] ${message}`);
-        alert(`${type.toUpperCase()}: ${message}`);
     }
 }
 
@@ -977,6 +972,34 @@ function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel =
                     </div>
                 </div>
             `;
+        }
+        // Create simple modal for CANCEL type
+        else if (type === 'CANCEL') {
+            const modalId = `warningModal_${Date.now()}`;
+            const itemType = data.itemType || 'פריט';
+            const itemName = data.itemName || 'זה';
+
+            const modalHtml = `
+                <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-warning text-dark">
+                                <h5 class="modal-title" id="${modalId}Label">
+                                    ❌ ביטול ${itemType}
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                האם אתה בטוח שברצונך לבטל את ${itemType} "${itemName}"?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                                <button type="button" class="btn btn-warning" onclick="handleWarningAction('delete')">בטל</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
 
             // Remove existing modal if it exists
             const existingModal = document.getElementById(modalId);
@@ -1022,6 +1045,13 @@ function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel =
             const itemType = data.itemType || 'פריט';
             const itemName = data.itemName || 'זה';
             const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ${itemType} "${itemName}"?`);
+            if (confirmed && onConfirm) {
+                onConfirm();
+            }
+        } else if (type === 'CANCEL') {
+            const itemType = data.itemType || 'פריט';
+            const itemName = data.itemName || 'זה';
+            const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemType} "${itemName}"?`);
             if (confirmed && onConfirm) {
                 onConfirm();
             }
@@ -1112,6 +1142,39 @@ function showDeleteWarning(itemType, itemName, onConfirm = null, onCancel = null
 
         // Fallback to simple confirm
         const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ${itemTypeDisplay} "${itemName}"?`);
+        if (confirmed && onConfirm) {
+            onConfirm();
+        }
+    }
+}
+
+/**
+ * Show cancel warning (for tickers)
+ */
+function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null) {
+    // Fallback mapping for item types
+    const itemTypeDisplay = itemType === 'alert' ? 'התראה' :
+        itemType === 'ticker' ? 'טיקר' :
+            itemType === 'account' ? 'חשבון' :
+                itemType === 'trade' ? 'טרייד' :
+                    itemType === 'trade_plan' ? 'תוכנית טרייד' :
+                        itemType === 'execution' ? 'ביצוע' :
+                            itemType === 'cash_flow' ? 'תזרים מזומנים' :
+                                itemType === 'note' ? 'הערה' : 'אובייקט';
+
+    console.log('🔧 showCancelWarning called with:', { itemType, itemName, itemTypeDisplay });
+
+    // Try to use the warning system, fallback to simple confirm
+    try {
+        return showWarning('CANCEL', {
+            itemType: itemTypeDisplay,
+            itemName: itemName
+        }, {}, onConfirm, onCancel);
+    } catch (error) {
+        console.error('Error in showCancelWarning, using fallback:', error);
+
+        // Fallback to simple confirm
+        const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`);
         if (confirmed && onConfirm) {
             onConfirm();
         }
@@ -1423,6 +1486,7 @@ window.createBasicItemInfo = createBasicItemInfo;
 // Export warning system functions
 window.showWarning = showWarning;
 window.showDeleteWarning = showDeleteWarning;
+window.showCancelWarning = showCancelWarning;
 window.showLinkedItemsWarning = showLinkedItemsWarning;
 window.showValidationWarning = showValidationWarning;
 window.getWarningConfig = getWarningConfig;

@@ -52,6 +52,8 @@ class Ticker(BaseModel):
                         comment="Currency ID from currencies table")
     active_trades = Column(Boolean, default=False, nullable=True, 
                           comment="Whether there are active trades")
+    status = Column(String(20), default='open', nullable=False,
+                   comment="Ticker status: open, closed, canceled")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -128,3 +130,90 @@ class Ticker(BaseModel):
             'notes': 0,  # Will be loaded separately if needed
             'alerts': 0   # Will be loaded separately if needed
         }
+
+    @staticmethod
+    def update_ticker_status_from_linked_items(session, ticker_id: int) -> None:
+        """
+        Update ticker status based on linked trades and trade plans
+        
+        Args:
+            session: SQLAlchemy session
+            ticker_id: ID of the ticker to update
+        """
+        try:
+            from .trade import Trade
+            from .trade_plan import TradePlan
+            
+            # Count open trades for this ticker
+            open_trades_count = session.query(Trade).filter(
+                Trade.ticker_id == ticker_id,
+                Trade.status == 'open'
+            ).count()
+            
+            # Count open trade plans for this ticker
+            open_plans_count = session.query(TradePlan).filter(
+                TradePlan.ticker_id == ticker_id,
+                TradePlan.status == 'open'
+            ).count()
+            
+            # Determine new status
+            has_open_items = open_trades_count > 0 or open_plans_count > 0
+            new_status = 'open' if has_open_items else 'closed'
+            
+            # Update ticker status
+            ticker = session.query(Ticker).filter(Ticker.id == ticker_id).first()
+            if ticker and ticker.status != new_status:
+                ticker.status = new_status
+                ticker.updated_at = datetime.now()
+                session.flush()
+                
+                print(f"Updated ticker {ticker.symbol} status to {new_status} (trades: {open_trades_count}, plans: {open_plans_count})")
+                
+        except Exception as e:
+            print(f"Error updating ticker {ticker_id} status: {e}")
+            session.rollback()
+
+    @staticmethod
+    def update_all_ticker_statuses(session) -> None:
+        """
+        Update status for all tickers based on their linked trades and trade plans
+        
+        Args:
+            session: SQLAlchemy session
+        """
+        try:
+            from .trade import Trade
+            from .trade_plan import TradePlan
+            
+            # Get all tickers
+            tickers = session.query(Ticker).all()
+            
+            for ticker in tickers:
+                # Count open trades for this ticker
+                open_trades_count = session.query(Trade).filter(
+                    Trade.ticker_id == ticker.id,
+                    Trade.status == 'open'
+                ).count()
+                
+                # Count open trade plans for this ticker
+                open_plans_count = session.query(TradePlan).filter(
+                    TradePlan.ticker_id == ticker.id,
+                    TradePlan.status == 'open'
+                ).count()
+                
+                # Determine new status
+                has_open_items = open_trades_count > 0 or open_plans_count > 0
+                new_status = 'open' if has_open_items else 'closed'
+                
+                # Update ticker status if needed
+                if ticker.status != new_status:
+                    ticker.status = new_status
+                    ticker.updated_at = datetime.now()
+                    print(f"Updated ticker {ticker.symbol} status from {ticker.status} to {new_status} (trades: {open_trades_count}, plans: {open_plans_count})")
+            
+            session.commit()
+            print("All ticker statuses updated successfully")
+                
+        except Exception as e:
+            print(f"Error updating all ticker statuses: {e}")
+            session.rollback()

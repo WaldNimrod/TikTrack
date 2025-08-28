@@ -96,6 +96,7 @@
           <div class="info-summary" id="summaryStats">
             <div>סה"כ טיקרים: <strong id="totalTickers">0</strong></div>
             <div>סה"כ טיקרים עם טרייד: <strong id="activeTickers">0</strong></div>
+            <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
             <div>עדכון אחרון: <strong id="latestUpdate">אין נתונים</strong></div>
             <div>עדכון ישן ביותר: <strong id="oldestUpdate">אין נתונים</strong></div>
           </div>
@@ -118,6 +119,11 @@
               <button class="refresh-btn" onclick="showAddTickerModal()" title="הוסף תיקר חדש">
                 <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon">
                 הוסף
+              </button>
+              <div class="action-separator"></div>
+              <button class="refresh-btn" onclick="updateAllTickerStatuses()" title="עדכן כל הסטטוסים">
+                <img src="images/icons/home.svg" alt="עדכן" class="action-icon">
+                עדכן סטטוסים
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleTickersSection()" title="הצג/הסתר אזור טיקרים">
@@ -182,6 +188,12 @@
                         הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); } else { console.error('sortTable function not found'); }">
+                        סטטוס <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
                     <th class="actions-cell">פעולות</th>
                   </tr>
                 </thead>
@@ -205,12 +217,6 @@
 
     <!-- CSS for modals -->
     <style>
-      /* וידוא שהודעות שגיאה מופיעות מעל המודול */
-      .modal .invalid-feedback {
-        position: relative;
-        z-index: 1060;
-      }
-
       /* וידוא שהמודול מופיע מעל הכל */
       .modal {
         z-index: 1055;
@@ -218,21 +224,6 @@
 
       .modal-backdrop {
         z-index: 1050;
-      }
-
-      /* הודעות שגיאה בתוך המודול */
-      .modal-body .invalid-feedback {
-        display: block;
-        color: #dc3545;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-      }
-
-      /* שדות עם שגיאה */
-      .modal-body .form-control.is-invalid,
-      .modal-body .form-select.is-invalid {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
       }
     </style>
 
@@ -251,17 +242,15 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addTickerSymbol" class="form-label">סמל טיקר *</label>
-                    <input type="text" class="form-control" id="addTickerSymbol" required placeholder="למשל: AAPL"
-                      maxlength="10" onblur="validateTickerSymbol(this)">
-                    <div class="invalid-feedback" id="addTickerSymbolError"></div>
+                    <input type="text" class="form-control" id="addTickerSymbol" name="symbol" required placeholder="למשל: AAPL"
+                      maxlength="10">
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addTickerName" class="form-label">שם החברה *</label>
                     <input type="text" class="form-control" id="addTickerName" required placeholder="למשל: Apple Inc."
-                      maxlength="100" onblur="validateTickerName(this)">
-                    <div class="invalid-feedback" id="addTickerNameError"></div>
+                      maxlength="100">
                   </div>
                 </div>
               </div>
@@ -279,7 +268,6 @@
                       <option value="commodity">סחורה</option>
                       <option value="other">אחר</option>
                     </select>
-                    <div class="invalid-feedback" id="addTickerTypeError"></div>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -289,17 +277,25 @@
                       <option value="">בחר מטבע...</option>
                       <!-- Options will be loaded dynamically -->
                     </select>
-                    <div class="invalid-feedback" id="addTickerCurrencyError"></div>
                   </div>
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="addTickerStatus" class="form-label">סטטוס *</label>
+                    <select class="form-select" id="addTickerStatus" name="status" required>
+                      <option value="">בחר סטטוס...</option>
+                      <option value="not_canceled" selected>לא מבוטל</option>
+                      <option value="canceled">מבוטל</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addTickerRemarks" class="form-label">הערות</label>
                     <textarea class="form-control" id="addTickerRemarks" rows="3" placeholder="הערות נוספות על הטיקר..."
                       maxlength="500"></textarea>
-                    <div class="invalid-feedback" id="addTickerRemarksError"></div>
                   </div>
                 </div>
               </div>
@@ -331,17 +327,15 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editTickerSymbol" class="form-label">סמל טיקר *</label>
-                    <input type="text" class="form-control" id="editTickerSymbol" required placeholder="למשל: AAPL"
-                      maxlength="10" onblur="validateTickerSymbol(this)">
-                    <div class="invalid-feedback" id="editTickerSymbolError"></div>
+                    <input type="text" class="form-control" id="editTickerSymbol" name="symbol" required placeholder="למשל: AAPL"
+                      maxlength="10">
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editTickerName" class="form-label">שם החברה *</label>
                     <input type="text" class="form-control" id="editTickerName" required placeholder="למשל: Apple Inc."
-                      maxlength="100" onblur="validateTickerName(this)">
-                    <div class="invalid-feedback" id="editTickerNameError"></div>
+                      maxlength="100">
                   </div>
                 </div>
               </div>
@@ -359,7 +353,6 @@
                       <option value="commodity">סחורה</option>
                       <option value="other">אחר</option>
                     </select>
-                    <div class="invalid-feedback" id="editTickerTypeError"></div>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -369,17 +362,25 @@
                       <option value="">בחר מטבע...</option>
                       <!-- Options will be loaded dynamically -->
                     </select>
-                    <div class="invalid-feedback" id="editTickerCurrencyError"></div>
                   </div>
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editTickerStatus" class="form-label">סטטוס *</label>
+                    <select class="form-select" id="editTickerStatus" name="status" required>
+                      <option value="">בחר סטטוס...</option>
+                      <option value="not_canceled">לא מבוטל</option>
+                      <option value="canceled">מבוטל</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editTickerRemarks" class="form-label">הערות</label>
                     <textarea class="form-control" id="editTickerRemarks" rows="3"
                       placeholder="הערות נוספות על הטיקר..." maxlength="500"></textarea>
-                    <div class="invalid-feedback" id="editTickerRemarksError"></div>
                   </div>
                 </div>
               </div>
@@ -447,18 +448,17 @@
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/ui-utils.js"></script>
-    <script src="scripts/validation-utils.js"></script>
+    <script src="scripts/validation-utils.js?v=20250828_002"></script>
     <script src="scripts/crud-utils.js"></script>
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/date-utils.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/linked-items.js"></script>
-    <script src="scripts/filter-system.js"></script>
 
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/header-system.js"></script>    <script src="scripts/notification-system.js"></script>
-    <script src="scripts/tickers.js"></script>
+    <script src="scripts/tickers.js?v=20250828_044"></script>
     <script>
       // אתחול מערכת הכותרת החדשה
       document.addEventListener("DOMContentLoaded", () => {

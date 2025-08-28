@@ -36,7 +36,7 @@ def get_trade_plans():
                     'status': plan.status,
                     'planned_amount': plan.planned_amount,
                     'target_price': plan.target_price,
-                    'stop_price': plan.stop_price,
+                    'stop_loss': plan.stop_loss,
                     'created_at': plan.created_at.strftime('%Y-%m-%d %H:%M:%S') if plan.created_at else None
                 }
                 plans_data.append(basic_dict)

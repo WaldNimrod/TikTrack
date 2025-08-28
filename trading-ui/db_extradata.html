@@ -115,7 +115,7 @@
           <!-- Currencies table -->
           <div class="section-body">
             <div class="table-responsive" id="currenciesContainer">
-              <table class="table" data-table-type="currencies">
+              <table class="table" id="currenciesTable" data-table-type="currencies">
                 <thead>
                   <tr>
                     <th onclick="sortTable(0, 'currenciesTable')">Symbol (VARCHAR)</th>
@@ -182,7 +182,7 @@
         <!-- Note Relation Types table -->
         <div class="section-body">
           <div class="table-responsive" id="noteRelationTypesContainer">
-            <table class="table" data-table-type="note_relation_types">
+            <table class="table" id="noteRelationTypesTable" data-table-type="note_relation_types">
               <thead>
                 <tr>
                   <th onclick="sortTable(0, 'noteRelationTypesTable')">Note Relation Type (VARCHAR)</th>
@@ -245,36 +245,11 @@
       document.addEventListener('DOMContentLoaded', function () {
         console.log('🔄 Initializing db_extradata page...');
 
-        // שחזור מצב הסגירה
-        const contentSections = document.querySelectorAll('.content-section');
-        contentSections.forEach((section, index) => {
-          const collapsed = localStorage.getItem(`section${index}Collapsed`) === 'true';
-          const sectionBody = section.querySelector('.section-body');
-          const toggleBtn = section.querySelector('.filter-toggle-btn');
-          const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-          if (sectionBody && collapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-              icon.textContent = '▼';
-            }
-          }
-        });
-
-        // שחזור מצב הסקשן הראשי
-        const mainCollapsed = localStorage.getItem('mainSectionCollapsed') === 'true';
-        if (mainCollapsed && contentSections.length > 0) {
-          const mainSection = contentSections[0];
-          const sectionBody = mainSection.querySelector('.section-body');
-          const toggleBtn = mainSection.querySelector('button[onclick="toggleMainSection()"]');
-          const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-          if (sectionBody) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-              icon.textContent = '▼';
-            }
-          }
+        // שחזור מצב הסגירה - משתמש בפונקציה מ-db-extradata.js
+        if (typeof restoreSectionsState === 'function') {
+          restoreSectionsState();
+        } else {
+          console.warn('⚠️ restoreSectionsState function not available');
         }
 
         console.log('✅ דף טבלאות עזר אותחל בהצלחה');

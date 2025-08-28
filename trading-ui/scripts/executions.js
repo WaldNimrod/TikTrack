@@ -29,6 +29,12 @@ if (!window.executionsData) {
 }
 let executionsData = window.executionsData;
 
+// משתנים לפילטרים
+let originalExecutions = []; // הנתונים המקוריים - לא משתנים
+let allExecutions = [];
+let filteredExecutions = [];
+let tradesData = []; // נתוני טריידים לשמירת מפת חשבונות
+
 // פונקציות בסיסיות
 function openExecutionDetails(id) {
   
@@ -1407,19 +1413,29 @@ async function loadExecutionsData() {
     console.log('🔄 === LOAD EXECUTIONS DATA FUNCTION CALLED ===');
     console.log('🔄 Function loadExecutionsData entered at:', new Date().toISOString());
     console.log('🔄 Current page:', window.location.pathname);
+    console.log('🔄 === STARTING LOAD EXECUTIONS DATA ===');
 
     try {
         console.log('🔄 === LOAD EXECUTIONS DATA START ===');
         console.log('🔄 טעינת נתוני עסקעות');
+        console.log('🔄 About to fetch from API...');
 
         const response = await fetch('/api/v1/executions/?_t=' + Date.now());
         console.log('🔄 API response status:', response.status);
+        console.log('🔄 API response ok:', response.ok);
+        
         if (response.ok) {
             const data = await response.json();
-            console.log('🔄 API response data:', data);
+            console.log('🔄 Raw API response:', data);
+            console.log('🔄 Response structure:', Object.keys(data));
+            console.log('🔄 Data field exists:', !!data.data);
+            console.log('🔄 Data field type:', typeof data.data);
+            console.log('🔄 Data field length:', data.data ? data.data.length : 'N/A');
+            
             executionsData = data.data || data;
             console.log('✅ נטענו', executionsData.length, 'עסקעות');
-            console.log('📊 נתוני עסקעות:', executionsData);
+            console.log('📊 Sample execution:', executionsData[0]);
+            console.log('📊 All executions:', executionsData);
 
             // בדיקה אם יש פילטרים פעילים
             if (window.headerSystem && window.headerSystem.currentFilters) {
@@ -1466,27 +1482,40 @@ async function loadExecutionsData() {
  */
 async function updateExecutionsTableMain(executions) {
     console.log('🔄 === UPDATE EXECUTIONS TABLE START (MAIN FUNCTION) ===');
-    console.log('🔄 updateExecutionsTable נקראה עם', executions.length, 'עסקעות');
-    console.log('📊 נתוני עסקעות:', executions);
+    console.log('🔄 updateExecutionsTable נקראה עם', executions ? executions.length : 'undefined', 'עסקעות');
+    console.log('🔄 Executions parameter type:', typeof executions);
+    console.log('🔄 Executions parameter:', executions);
     console.log('🔄 Current page:', window.location.pathname);
+    console.log('🔄 === STARTING UPDATE EXECUTIONS TABLE ===');
+    
+    // לא מעדכנים את הנתונים הגלובליים כאן - הם נשמרים בנפרד
 
     const table = document.querySelector('#executionsTable');
     console.log('🔍 Looking for #executionsTable:', table);
+    console.log('🔍 Table element:', table);
+    console.log('🔍 Table ID:', table ? table.id : 'not found');
+    
     const tbody = document.querySelector('#executionsTable tbody');
     console.log('🔍 Looking for #executionsTable tbody:', tbody);
+    console.log('🔍 Tbody element:', tbody);
     if (!tbody) {
         console.error('❌ executionsTable tbody not found');
         console.log('🔍 All tables on page:', document.querySelectorAll('table'));
         console.log('🔍 All table IDs on page:', Array.from(document.querySelectorAll('table')).map(t => t.id));
+        console.log('🔍 All tbody elements on page:', document.querySelectorAll('tbody'));
         console.log('🔍 Current page:', window.location.pathname);
         return;
     }
     console.log('✅ Found executionsTable tbody, proceeding with update');
+    console.log('🔄 About to update table with', executions ? executions.length : 0, 'executions');
 
     if (executions.length === 0) {
+        console.log('⚠️ No executions to display, showing empty message');
         tbody.innerHTML = '<tr><td colspan="10" class="text-center">לא נמצאו עסקעות</td></tr>';
         return;
     }
+    
+    console.log('🔄 Starting to build table rows for', executions.length, 'executions');
 
     // טעינת נתוני טריידים וטיקרים
     let trades = [];
@@ -1558,6 +1587,9 @@ async function updateExecutionsTableMain(executions) {
             (execution.action || execution.type) === 'sale' ? 'מכירה' :
                 (execution.action || execution.type);
 
+        // מציאת שם החשבון מהטרייד
+        const accountName = trade ? trade.account_name : 'לא מוגדר';
+
         return `
             <tr>
                                    <td class="ticker-cell">
@@ -1574,6 +1606,7 @@ async function updateExecutionsTableMain(executions) {
                         ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
                     </span>
                 </td>
+                <td data-account="${accountName}">${accountName}</td>
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td>${execution.fee ? '$' + execution.fee : '-'}</td>
@@ -1583,21 +1616,9 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${window.formatDateOnly(execution.date || execution.execution_date)}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="actions-cell">
-                    <table class="table table-sm table-borderless mb-0">
-                        <tbody>
-                            <tr>
-                                <td class="p-0 pe-1">
-                                    ${createEditButton(`editExecution(${execution.id})`)}
-                                </td>
-                                <td class="p-0 pe-1">
-                                    ${createDeleteButton(`deleteExecution(${execution.id})`)}
-                                </td>
-                                <td class="p-0">
-                                    ${createLinkButton(`viewLinkedItems(${execution.id})`)}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <button class="btn btn-sm btn-info" onclick="showLinkedItemsWarning('execution', ${execution.id})" title="פריטים מקושרים">🔗</button>
+                    <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
                 </td>
             </tr>
         `;
@@ -1611,11 +1632,159 @@ async function updateExecutionsTableMain(executions) {
 
     // עדכון ה-info-summary
     updateExecutionsSummary(executions);
+    
+    console.log('✅ Table update completed successfully');
+    console.log('🔄 === END UPDATE EXECUTIONS TABLE ===');
 }
 
 // פונקציה formatDate מוגדרת בקובץ main.js
 
+// פונקציה לבדיקה אם תאריך נמצא בטווח
+function isDateInRange(dateString, dateRange) {
+    console.log('🔍 isDateInRange called with:', { dateString, dateRange });
+    
+    if (!dateString || !dateRange || dateRange === 'כל זמן') {
+        return true;
+    }
+    
+    // חילוץ התאריך בלבד (ללא שעה)
+    let dateOnly = dateString;
+    if (dateString.includes(' ')) {
+        dateOnly = dateString.split(' ')[0];
+    }
+    
+    const date = new Date(dateOnly);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // סוף היום
+    
+    console.log('🔍 Parsed date:', date);
+    console.log('🔍 Today:', today);
+    
+    switch (dateRange) {
+        case 'היום':
+            const startOfDay = new Date(today);
+            startOfDay.setHours(0, 0, 0, 0);
+            return date >= startOfDay && date <= today;
+            
+        case 'אתמול':
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const startOfYesterday = new Date(yesterday);
+            startOfYesterday.setHours(0, 0, 0, 0);
+            const endOfYesterday = new Date(yesterday);
+            endOfYesterday.setHours(23, 59, 59, 999);
+            return date >= startOfYesterday && date <= endOfYesterday;
+            
+        case 'שבוע':
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return date >= weekAgo && date <= today;
+            
+        case 'השבוע':
+            const startOfWeek = new Date(today);
+            const dayOfWeek = startOfWeek.getDay();
+            startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek);
+            startOfWeek.setHours(0, 0, 0, 0);
+            return date >= startOfWeek && date <= today;
+            
+        case 'MTD':
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            return date >= startOfMonth && date <= today;
+            
+        case 'YTD':
+            const startOfYear = new Date(today.getFullYear(), 0, 1);
+            return date >= startOfYear && date <= today;
+            
+        case 'שנה':
+            const yearAgo = new Date(today);
+            yearAgo.setDate(yearAgo.getDate() - 365);
+            return date >= yearAgo && date <= today;
+            
+        default:
+            return true;
+    }
+}
+
+// הגדרת הפונקציה כגלובלית
+window.isDateInRange = isDateInRange;
+
 // פונקציית פילטור מקומי לעסקאות
+function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
+    console.log('🔍 filterExecutionsLocally called with:', { selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm });
+    
+    if (!executions || !Array.isArray(executions)) {
+        console.warn('⚠️ No executions data to filter');
+        return [];
+    }
+    
+    let filtered = executions;
+    
+    // פילטר לפי סטטוס
+    if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('הכול')) {
+        filtered = filtered.filter(execution => {
+            const status = execution.status || 'לא מוגדר';
+            return selectedStatuses.includes(status);
+        });
+    }
+    
+    // פילטר לפי סוג
+    if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('הכול')) {
+        filtered = filtered.filter(execution => {
+            const type = execution.type || execution.action || 'לא מוגדר';
+            const typeHebrew = type === 'buy' ? 'קנייה' : type === 'sell' ? 'מכירה' : type;
+            return selectedTypes.includes(typeHebrew);
+        });
+    }
+    
+    // פילטר לפי חשבון
+    if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('הכול')) {
+        filtered = filtered.filter(execution => {
+            const account = execution.account_name || 'לא מוגדר';
+            return selectedAccounts.includes(account);
+        });
+    }
+    
+    // פילטר לפי תאריך - עובד מול שדה created_at (תאריך יצירה)
+    if (dateRange && dateRange !== 'כל זמן') {
+        console.log('🔍 Applying date filter:', dateRange);
+        filtered = filtered.filter(execution => {
+            const executionDate = execution.created_at; // תאריך יצירה בלבד
+            console.log('🔍 Checking execution created_at:', executionDate, 'for execution ID:', execution.id);
+            
+            if (!executionDate) {
+                console.log('🔍 No created_at found, including in results');
+                return true;
+            }
+            
+            // חילוץ התאריך בלבד (ללא שעה)
+            let dateOnly = executionDate;
+            if (executionDate.includes(' ')) {
+                dateOnly = executionDate.split(' ')[0];
+            }
+            
+            const isInRange = isDateInRange(dateOnly, dateRange);
+            console.log('🔍 Created date', dateOnly, 'in range', dateRange, ':', isInRange);
+            return isInRange;
+        });
+        console.log('🔍 After date filter:', filtered.length, 'executions remaining');
+    }
+    
+    // פילטר לפי חיפוש חופשי
+    if (searchTerm && searchTerm.trim()) {
+        const searchLower = searchTerm.toLowerCase();
+        filtered = filtered.filter(execution => {
+            return (
+                (execution.symbol && execution.symbol.toLowerCase().includes(searchLower)) ||
+                (execution.account_name && execution.account_name.toLowerCase().includes(searchLower)) ||
+                (execution.notes && execution.notes.toLowerCase().includes(searchLower)) ||
+                (execution.execution_date && execution.execution_date.toLowerCase().includes(searchLower))
+            );
+        });
+    }
+    
+    console.log(`✅ Filtered ${executions.length} executions to ${filtered.length}`);
+    return filtered;
+}
 
 // הגדרת הפונקציה כגלובלית
 window.filterExecutionsLocally = filterExecutionsLocally;
@@ -1626,6 +1795,12 @@ window.editExecution = editExecution;
 window.deleteExecution = deleteExecution;
 window.toggleExecutionsSection = toggleExecutionsSection;
 window.restoreExecutionsSectionState = restoreExecutionsSectionState;
+
+// פונקציה לאיפוס פילטרים וטעינה מחדש
+function resetAllFiltersAndReloadData() {
+    console.log('🔄 resetAllFiltersAndReloadData called');
+    loadExecutionsData();
+}
 window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
 
 // פונקציות מודלים
@@ -1721,6 +1896,10 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('🔄 About to call loadExecutionsData()...');
     loadExecutionsData();
     console.log('🔄 loadExecutionsData() called successfully');
+    
+    // הגדרת פונקציות פילטר
+    console.log('🔄 Setting up filter functions...');
+    setupExecutionsFilterFunctions();
 
     // שחזור מצב סידור
     console.log('🔄 Restoring sort state...');
@@ -2421,6 +2600,50 @@ window.addEditBuySell = addEditBuySell;
 window.linkExistingExecution = linkExistingExecution;
 window.unlinkExecution = unlinkExecution;
 
+// הגדרת פונקציות פילטר כגלובליות
+window.filterExecutionsByAccount = window.filterExecutionsByAccount || function() {};
+window.searchExecutions = window.searchExecutions || function() {};
+window.resetExecutionsFilters = window.resetExecutionsFilters || function() {};
+
+// פונקציה לעדכון סיכום הנתונים
+function updateExecutionsSummary(executions) {
+    console.log('🔄 Updating executions summary...');
+    console.log('🔄 Executions parameter:', executions);
+    console.log('🔄 ExecutionsData global:', executionsData);
+    
+    const dataToUse = executions || executionsData || [];
+    const totalExecutions = dataToUse.length;
+    const buyExecutions = dataToUse.filter(e => e.action === 'buy').length;
+    const sellExecutions = dataToUse.filter(e => e.action === 'sell').length;
+    
+    const totalBuyAmount = dataToUse
+        .filter(e => e.action === 'buy')
+        .reduce((sum, e) => sum + ((e.quantity * e.price) || 0), 0);
+    
+    const totalSellAmount = dataToUse
+        .filter(e => e.action === 'sell')
+        .reduce((sum, e) => sum + ((e.quantity * e.price) || 0), 0);
+    
+    const balanceAmount = totalSellAmount - totalBuyAmount;
+    
+    // עדכון האלמנטים בדף
+    const totalElement = document.getElementById('totalExecutions');
+    const buyElement = document.getElementById('totalBuyExecutions');
+    const sellElement = document.getElementById('totalSellExecutions');
+    const buyAmountElement = document.getElementById('totalBuyAmount');
+    const sellAmountElement = document.getElementById('totalSellAmount');
+    const balanceElement = document.getElementById('balanceAmount');
+    
+    if (totalElement) totalElement.textContent = totalExecutions;
+    if (buyElement) buyElement.textContent = buyExecutions;
+    if (sellElement) sellElement.textContent = sellExecutions;
+    if (buyAmountElement) buyAmountElement.textContent = `$${totalBuyAmount.toFixed(2)}`;
+    if (sellAmountElement) sellAmountElement.textContent = `$${totalSellAmount.toFixed(2)}`;
+    if (balanceElement) balanceElement.textContent = `$${balanceAmount.toFixed(2)}`;
+    
+    console.log('✅ Executions summary updated');
+}
+
 // בדיקה שהפונקציות נטענו בהצלחה
 console.log('✅ Execution functions loaded:', {
     loadTradeExecutions: typeof loadTradeExecutions,
@@ -2430,3 +2653,144 @@ console.log('✅ Execution functions loaded:', {
     linkExistingExecution: typeof linkExistingExecution,
     unlinkExecution: typeof unlinkExecution
 });
+
+// ===== מערכת פילטרים לעמוד הביצועים =====
+
+// הגדרת פונקציות פילטר
+function setupExecutionsFilterFunctions() {
+  console.log('🔄 Setting up executions filter functions...');
+  
+  // פונקציה לפילטר חשבון
+  window.filterExecutionsByAccount = function(accountNames) {
+    console.log('🔄 Filtering executions by account names:', accountNames);
+    
+    const namesArray = Array.isArray(accountNames) ? accountNames : [accountNames];
+    
+    // בדיקה אם זה "הכול" או רשימה ריקה
+    if (namesArray.length === 0 || namesArray.includes('all') || namesArray.includes('הכול')) {
+      filteredExecutions = [...originalExecutions];
+      console.log('🔄 Showing all executions');
+      updateExecutionsTableMain(filteredExecutions);
+      updateExecutionsSummary(filteredExecutions);
+      console.log('✅ Filtered to', filteredExecutions.length, 'executions');
+      return;
+    }
+    
+    console.log('🔄 Looking for executions with account names:', namesArray);
+    
+    // אם יש לנו כבר נתוני טריידים, השתמש בהם
+    if (tradesData.length > 0) {
+      applyAccountFilterWithTradesData(namesArray);
+    } else {
+      // טעינת נתוני טריידים כדי לקבל את שמות החשבונות
+      fetch('/api/v1/trades/')
+        .then(response => response.json())
+        .then(data => {
+          tradesData = data.data || [];
+          applyAccountFilterWithTradesData(namesArray);
+        })
+        .catch(error => {
+          console.error('❌ Error loading trades for account filter:', error);
+          // Fallback - הצגת כל הביצועים
+          filteredExecutions = [...allExecutions];
+          updateExecutionsTableMain(filteredExecutions);
+          updateExecutionsSummary(filteredExecutions);
+        });
+    }
+  };
+  
+  // פונקציה עזר לפילטר חשבון עם נתוני טריידים
+  function applyAccountFilterWithTradesData(namesArray) {
+    const tradesMap = {};
+    
+    // יצירת מפה של trade_id -> account_name
+    tradesData.forEach(trade => {
+      tradesMap[trade.id] = trade.account_name;
+    });
+    
+    console.log('🔄 Trades map:', tradesMap);
+    console.log('🔄 Looking for accounts:', namesArray);
+    console.log('🔄 Original executions count:', originalExecutions.length);
+    
+    filteredExecutions = originalExecutions.filter(execution => {
+      const tradeAccountName = tradesMap[execution.trade_id];
+      const isIncluded = namesArray.includes(tradeAccountName);
+      console.log('🔄 Execution ID:', execution.id, 'trade_id:', execution.trade_id, 'Account name:', tradeAccountName, 'Looking for:', namesArray, 'Included:', isIncluded);
+      return isIncluded;
+    });
+    
+    console.log('🔄 Filtered executions count:', filteredExecutions.length);
+    updateExecutionsTableMain(filteredExecutions);
+    updateExecutionsSummary(filteredExecutions);
+    console.log('✅ Filtered to', filteredExecutions.length, 'executions');
+  }
+  
+  // פונקציה לחיפוש חופשי
+  window.searchExecutions = function(searchTerm) {
+    console.log('🔄 Searching executions:', searchTerm);
+    
+    if (!searchTerm || searchTerm.trim() === '') {
+      filteredExecutions = [...originalExecutions];
+    } else {
+      const term = searchTerm.toLowerCase();
+      filteredExecutions = originalExecutions.filter(execution => 
+        (execution.symbol && execution.symbol.toLowerCase().includes(term)) ||
+        (execution.trade_name && execution.trade_name.toLowerCase().includes(term)) ||
+        (execution.action && execution.action.toLowerCase().includes(term)) ||
+        (execution.quantity && execution.quantity.toString().includes(term)) ||
+        (execution.price && execution.price.toString().includes(term)) ||
+        (execution.commission && execution.commission.toString().includes(term)) ||
+        (execution.notes && execution.notes.toLowerCase().includes(term)) ||
+        (execution.created_at && execution.created_at.toLowerCase().includes(term)) ||
+        (execution.execution_date && execution.execution_date.toLowerCase().includes(term))
+      );
+    }
+    
+    updateExecutionsTableMain(filteredExecutions);
+    updateExecutionsSummary(filteredExecutions);
+    console.log('✅ Search results:', filteredExecutions.length, 'executions');
+  };
+  
+  // פונקציה לאיפוס פילטרים
+  window.resetExecutionsFilters = function() {
+    console.log('🔄 Resetting executions filters');
+    filteredExecutions = [...originalExecutions];
+    updateExecutionsTableMain(filteredExecutions);
+    updateExecutionsSummary(filteredExecutions);
+    console.log('✅ Filters reset, showing all', originalExecutions.length, 'executions');
+  };
+  
+  console.log('✅ Executions filter functions setup complete');
+}
+
+// פונקציה לעדכון הנתונים הגלובליים
+function updateExecutionsGlobalData(executions) {
+  originalExecutions = executions || [];
+  allExecutions = [...originalExecutions];
+  filteredExecutions = [...allExecutions];
+  console.log('✅ Executions global data updated:', originalExecutions.length, 'executions');
+}
+
+// עדכון הפונקציה הקיימת loadExecutionsData
+const originalLoadExecutionsData = window.loadExecutionsData;
+window.loadExecutionsData = async function() {
+  await originalLoadExecutionsData();
+  
+  // עדכון הנתונים הגלובליים לאחר טעינה
+  if (executionsData && executionsData.length > 0) {
+    updateExecutionsGlobalData(executionsData);
+    
+    // טעינת נתוני טריידים לטובת פילטר החשבונות
+    try {
+      const response = await fetch('/api/v1/trades/');
+      const data = await response.json();
+      tradesData = data.data || [];
+      console.log('✅ Loaded trades data for account filter:', tradesData.length, 'trades');
+    } catch (error) {
+      console.error('❌ Error loading trades data:', error);
+      tradesData = [];
+    }
+    
+    setupExecutionsFilterFunctions();
+  }
+};

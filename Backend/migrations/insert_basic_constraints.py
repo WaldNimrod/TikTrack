@@ -174,12 +174,12 @@ def insert_trade_plans_constraints():
         """, ('trade_plans', 'target_price', 'RANGE', 'positive_target_price', 
               'target_price > 0'))
         
-        # 5. stop_price RANGE constraint
+                # 5. stop_loss RANGE constraint
         cursor.execute("""
             INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
             VALUES (?, ?, ?, ?, ?)
-        """, ('trade_plans', 'stop_price', 'RANGE', 'positive_stop_price', 
-              'stop_price > 0'))
+        """, ('trade_plans', 'stop_loss', 'RANGE', 'positive_stop_loss',
+            'stop_loss > 0'))
         
         conn.commit()
         print("✅ Trade plans constraints inserted successfully")

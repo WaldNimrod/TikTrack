@@ -25,6 +25,42 @@ This directory contains all planned features, tasks, and improvements for the Ti
 9. **Show Closed Trades in Execution Forms** - Display closed trades in add/edit execution modals
 
 ### Medium Priority
+10. **Account Management Functions** - Edit and delete accounts (Found in code)
+11. **Database Record Management** - Add and cancel records (Found in code)
+12. **Rich Comments System** - Rich text comments (Found in code)
+13. **Trade Alerts System** - Individual trade alerts (Found in code)
+14. **Advanced Alert Types** - Volume and custom alerts (Found in code)
+15. **Linked Items View** - View linked items (Found in code)
+16. **Object Linking System** - Link and navigate objects (Found in code)
+17. **Advanced Entry Conditions** - Complex entry conditions (Found in code)
+18. **Advanced Reasons/Strategy System** - Advanced strategy builder (Found in code)
+19. **Tagging System** - Comprehensive tagging for all entities
+20. **Data Update Verification** - Real-time updates across all pages
+21. **Symbol Page** - Dedicated page for symbol/ticker information
+22. **Linked Objects Modal Windows** - Modal windows for linked objects with table and modal phases
+
+### Low Priority
+23. **Test Management Functions** - Edit test functions (Found in code)
+24. **General Functionality Placeholders** - Various placeholders (Found in code)
+25. **Field Name Change: "Reasons" to "Strategy"** - Rename field in trade planning
+
+## 🟢 Completed Features
+
+### Accounts Page Filter System & Display ✅
+- **Status**: Completed
+- **Date**: January 2025
+- **Description**: Implemented comprehensive filter system for accounts page including:
+  - Account filter (by account name)
+  - Free text search (searches in name, currency, notes, status)
+  - Filter reset functionality
+  - Responsive table layout with proper column widths (100% distribution)
+  - Action buttons (edit, delete, linked items)
+  - Summary statistics display
+  - Top section toggle functionality
+  - State persistence using localStorage
+  - **Documentation**: Updated FILTER_SYSTEM_README.md with implementation guide
+
+### Medium Priority
 9. **Account Management Functions** - Edit and delete accounts (Found in code)
 10. **Database Record Management** - Add and cancel records (Found in code)
 11. **Rich Comments System** - Rich text comments (Found in code)

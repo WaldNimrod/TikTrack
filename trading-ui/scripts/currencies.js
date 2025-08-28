@@ -256,11 +256,11 @@ async function saveCurrency() {
             await loadCurrencies();
         } else {
             console.error('❌ שגיאה בשמירת מטבע:', result.error);
-            alert('שגיאה בשמירת מטבע');
+            window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת מטבע');
         }
     } catch (error) {
         console.error('❌ שגיאה בשמירת מטבע:', error);
-        alert('שגיאה בשמירת מטבע');
+        window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת מטבע');
     }
 }
 
@@ -309,11 +309,11 @@ async function updateCurrency() {
             await loadCurrencies();
         } else {
             console.error('❌ שגיאה בעדכון מטבע:', result.error);
-            alert('שגיאה בעדכון מטבע');
+            window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון מטבע');
         }
     } catch (error) {
         console.error('❌ שגיאה בעדכון מטבע:', error);
-        alert('שגיאה בעדכון מטבע');
+        window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון מטבע');
     }
 }
 
@@ -343,11 +343,11 @@ async function confirmDeleteCurrency() {
             await loadCurrencies();
         } else {
             console.error('❌ שגיאה במחיקת מטבע:', result.error);
-            alert('שגיאה במחיקת מטבע');
+            window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת מטבע');
         }
     } catch (error) {
         console.error('❌ שגיאה במחיקת מטבע:', error);
-        alert('שגיאה במחיקת מטבע');
+        window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת מטבע');
     }
 }
 

@@ -82,6 +82,7 @@ def get_ticker(ticker_id: int):
 def check_linked_items(ticker_id: int):
     """Check linked items to ticker before deletion"""
     try:
+        print(f"Starting check_linked_items for ticker {ticker_id}")
         db: Session = next(get_db())
         
         # Check that ticker exists
@@ -93,8 +94,23 @@ def check_linked_items(ticker_id: int):
                 "version": "v1"
             }), 404
         
+        print(f"Ticker found: {ticker.symbol}")
+        
         # Check linked items
-        linked_items = TickerService.check_linked_items(db, ticker_id)
+        try:
+            print(f"About to call check_linked_items for ticker {ticker_id}")
+            linked_items = TickerService.check_linked_items(db, ticker_id)
+            print(f"Successfully called check_linked_items, result: {linked_items}")
+        except Exception as e:
+            logger.error(f"Error in check_linked_items: {str(e)}")
+            print(f"Error in check_linked_items: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Failed to check linked items: {str(e)}"},
+                "version": "v1"
+            }), 500
         
         return jsonify({
             "status": "success",
@@ -104,6 +120,9 @@ def check_linked_items(ticker_id: int):
         })
     except Exception as e:
         logger.error(f"Error checking linked items for ticker {ticker_id}: {str(e)}")
+        print(f"Main error checking linked items for ticker {ticker_id}: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to check linked items"},
@@ -295,6 +314,41 @@ def update_all_active_trades():
         
     except Exception as e:
         logger.error(f"Error updating all active_trades: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()
+
+@tickers_bp.route('/update-all-statuses', methods=['POST'])
+def update_all_statuses():
+    """Update status for all tickers based on linked trades and trade plans"""
+    try:
+        db: Session = next(get_db())
+        
+        # Import the Ticker model
+        from models.ticker import Ticker
+        
+        # Update all ticker statuses
+        Ticker.update_all_ticker_statuses(db)
+        
+        # Get updated tickers for response
+        tickers = TickerService.get_all(db)
+        
+        return jsonify({
+            "status": "success",
+            "data": {
+                "total_tickers": len(tickers),
+                "tickers": [ticker.to_dict() for ticker in tickers]
+            },
+            "message": "All ticker statuses updated successfully",
+            "version": "v1"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error updating all ticker statuses: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},

@@ -367,7 +367,7 @@ function restoreAllSectionStates() {
  * Global toggle function for top sections
  * Handles opening/closing of top sections across all pages
  */
-window.toggleTopSection = function () {
+window.toggleTopSectionGlobal = function () {
   const currentPath = window.location.pathname;
 
   // Special handling for notes page
@@ -447,6 +447,9 @@ window.toggleTopSection = function () {
     localStorage.setItem(storageKey, !isCollapsed);
   }
 };
+
+// Keep the original function name for backward compatibility
+window.toggleTopSection = window.toggleTopSectionGlobal;
 
 /**
  * Global toggle function for main sections

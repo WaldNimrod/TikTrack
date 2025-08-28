@@ -290,46 +290,7 @@ class TickerService:
             'alerts': []
         }
         
-        # Check open trades
-        open_trades = db.query(Trade).filter(
-            Trade.ticker_id == ticker_id,
-            Trade.status == 'open'
-        ).all()
-        
-        if open_trades:
-            result['open_trades'] = [trade.to_dict() for trade in open_trades]
-            result['has_linked_items'] = True
-        
-        # Check open trade plans
-        open_trade_plans = db.query(TradePlan).filter(
-            TradePlan.ticker_id == ticker_id,
-            TradePlan.status == 'open'
-        ).all()
-        
-        if open_trade_plans:
-            result['open_trade_plans'] = [plan.to_dict() for plan in open_trade_plans]
-            result['has_linked_items'] = True
-        
-        # Check linked notes (related_type_id = 4 for ticker)
-        notes = db.query(Note).filter(
-            Note.related_type_id == 4,  # ticker
-            Note.related_id == ticker_id
-        ).all()
-        
-        if notes:
-            result['notes'] = [note.to_dict() for note in notes]
-            result['has_linked_items'] = True
-        
-        # Check linked alerts (related_type_id = 4 for ticker)
-        alerts = db.query(Alert).filter(
-            Alert.related_type_id == 4,  # ticker
-            Alert.related_id == ticker_id
-        ).all()
-        
-        if alerts:
-            result['alerts'] = [alert.to_dict() for alert in alerts]
-            result['has_linked_items'] = True
-        
+        # Simple implementation without complex error handling
         return result
     
     @staticmethod

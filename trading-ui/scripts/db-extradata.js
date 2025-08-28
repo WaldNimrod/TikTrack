@@ -93,6 +93,8 @@ function toggleAllSections() {
 
 // פונקציה לפתיחה/סגירה של סקשן מטבעות
 function toggleCurrenciesSection() {
+    console.log('🔄 toggleCurrenciesSection called');
+    
     const contentSections = document.querySelectorAll('.content-section');
     const currenciesSection = contentSections[0]; // הסקשן הראשון - מטבעות
 
@@ -115,6 +117,7 @@ function toggleCurrenciesSection() {
 
         // שמירת המצב ב-localStorage
         localStorage.setItem('dbExtradataCurrenciesSectionCollapsed', !isCollapsed);
+        console.log('💾 Saved currencies section state to localStorage:', !isCollapsed);
     }
 }
 
@@ -150,6 +153,7 @@ function toggleNoteRelationTypesSection() {
 
 // פונקציה לשחזור מצב הסגירה
 function restoreSectionsState() {
+    console.log('🔄 Restoring sections state...');
 
     // שחזור מצב הסקשן העליון
     const topCollapsed = localStorage.getItem('dbExtradataTopSectionCollapsed') === 'true';
@@ -170,6 +174,8 @@ function restoreSectionsState() {
 
     // שחזור מצב סקשן המטבעות
     const currenciesCollapsed = localStorage.getItem('dbExtradataCurrenciesSectionCollapsed') === 'true';
+    console.log('🔍 Currencies section collapsed state:', currenciesCollapsed);
+    
     const contentSections = document.querySelectorAll('.content-section');
     const currenciesSection = contentSections[0];
 
@@ -183,7 +189,12 @@ function restoreSectionsState() {
             if (icon) {
                 icon.textContent = '▼';
             }
+            console.log('✅ Currencies section restored to collapsed state');
+        } else {
+            console.log('ℹ️ Currencies section restored to expanded state');
         }
+    } else {
+        console.log('⚠️ Currencies section not found');
     }
 
     // שחזור מצב סקשן סוגי הקישור
@@ -593,7 +604,15 @@ function addCurrencyRecord() {
 function editCurrencyRecord(id) {
     // בדיקה אם זה רשומת הבסיס (מזהה 1)
     if (id === 1) {
-        showNotification('לא ניתן לערוך רשומת בסיס מוגנת', 'warning');
+        if (window.showNotification) {
+            window.showNotification('לא ניתן לערוך רשומת בסיס מוגנת', 'warning');
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification('רשומה מוגנת', 'לא ניתן לערוך רשומת בסיס מוגנת');
+            } else {
+                window.showWarningNotification('רשומה מוגנת', 'לא ניתן לערוך רשומת בסיס מוגנת');
+            }
+        }
         return;
     }
     showEditCurrencyModal(id);
@@ -603,7 +622,15 @@ function editCurrencyRecord(id) {
 function deleteCurrencyRecord(id) {
     // בדיקה אם זה רשומת הבסיס (מזהה 1)
     if (id === 1) {
-        showNotification('לא ניתן למחוק רשומת בסיס מוגנת', 'warning');
+        if (window.showNotification) {
+            window.showNotification('לא ניתן למחוק רשומת בסיס מוגנת', 'warning');
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification('רשומה מוגנת', 'לא ניתן למחוק רשומת בסיס מוגנת');
+            } else {
+                window.showWarningNotification('רשומה מוגנת', 'לא ניתן למחוק רשומת בסיס מוגנת');
+            }
+        }
         return;
     }
     showDeleteCurrencyModal(id);
@@ -1373,58 +1400,78 @@ function setupModalValidations(formId) {
 
 // פונקציה לאתחול וולידציה בזמן אמת
 function initializeRealTimeValidation() {
-    
-    
     // הגדרת וולידציה לשדות מטבע
     if (window.setupFieldValidation) {
-        // שדות מודל הוספת מטבע
-        window.setupFieldValidation('currencySymbol', {
-            required: true,
-            pattern: /^[A-Z]+$/,
-            minLength: 1,
-            maxLength: 10
-        }, 'text');
+        // שדות מודל הוספת מטבע - בדיקה אם קיימים
+        const currencySymbol = document.getElementById('currencySymbol');
+        if (currencySymbol) {
+            window.setupFieldValidation('currencySymbol', {
+                required: true,
+                pattern: /^[A-Z]+$/,
+                minLength: 1,
+                maxLength: 10
+            }, 'text');
+        }
         
-        window.setupFieldValidation('currencyName', {
-            required: true,
-            maxLength: 100
-        }, 'text');
+        const currencyName = document.getElementById('currencyName');
+        if (currencyName) {
+            window.setupFieldValidation('currencyName', {
+                required: true,
+                maxLength: 100
+            }, 'text');
+        }
         
-        window.setupFieldValidation('currencyUsdRate', {
-            type: 'number',
-            min: 0
-        }, 'number');
+        const currencyUsdRate = document.getElementById('currencyUsdRate');
+        if (currencyUsdRate) {
+            window.setupFieldValidation('currencyUsdRate', {
+                type: 'number',
+                min: 0
+            }, 'number');
+        }
         
-        // שדות מודל עריכת מטבע
-        window.setupFieldValidation('editCurrencySymbol', {
-            required: true,
-            pattern: /^[A-Z]+$/,
-            minLength: 1,
-            maxLength: 10
-        }, 'text');
+        // שדות מודל עריכת מטבע - בדיקה אם קיימים
+        const editCurrencySymbol = document.getElementById('editCurrencySymbol');
+        if (editCurrencySymbol) {
+            window.setupFieldValidation('editCurrencySymbol', {
+                required: true,
+                pattern: /^[A-Z]+$/,
+                minLength: 1,
+                maxLength: 10
+            }, 'text');
+        }
         
-        window.setupFieldValidation('editCurrencyName', {
-            required: true,
-            maxLength: 100
-        }, 'text');
+        const editCurrencyName = document.getElementById('editCurrencyName');
+        if (editCurrencyName) {
+            window.setupFieldValidation('editCurrencyName', {
+                required: true,
+                maxLength: 100
+            }, 'text');
+        }
         
-        window.setupFieldValidation('editCurrencyUsdRate', {
-            type: 'number',
-            min: 0
-        }, 'number');
+        const editCurrencyUsdRate = document.getElementById('editCurrencyUsdRate');
+        if (editCurrencyUsdRate) {
+            window.setupFieldValidation('editCurrencyUsdRate', {
+                type: 'number',
+                min: 0
+            }, 'number');
+        }
         
-        // שדות סוגי קישור
-        window.setupFieldValidation('noteRelationType', {
-            required: true,
-            maxLength: 20
-        }, 'text');
+        // שדות סוגי קישור - בדיקה אם קיימים
+        const noteRelationType = document.getElementById('noteRelationType');
+        if (noteRelationType) {
+            window.setupFieldValidation('noteRelationType', {
+                required: true,
+                maxLength: 20
+            }, 'text');
+        }
         
-        window.setupFieldValidation('editNoteRelationType', {
-            required: true,
-            maxLength: 20
-        }, 'text');
-        
-
+        const editNoteRelationType = document.getElementById('editNoteRelationType');
+        if (editNoteRelationType) {
+            window.setupFieldValidation('editNoteRelationType', {
+                required: true,
+                maxLength: 20
+            }, 'text');
+        }
     } else {
         console.warn('⚠️ Validation system not available');
     }
@@ -1434,18 +1481,17 @@ function initializeRealTimeValidation() {
 
 // אתחול אוטומטי כשהדף נטען
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔄 Initializing db_extradata page...');
     
-    
-    // טעינת נתונים ראשונית
-    loadCurrenciesData();
-    loadNoteRelationTypesData();
+    // שחזור מצב הסקשנים
+    restoreSectionsState();
     
     // אתחול וולידציה בזמן אמת (אם המערכת זמינה)
     if (typeof window.setupFieldValidation === 'function') {
         initializeRealTimeValidation();
     } else {
-
+        console.warn('⚠️ Validation system not available');
     }
     
-    
+    console.log('✅ דף טבלאות עזר אותחל בהצלחה');
 });

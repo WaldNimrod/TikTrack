@@ -21,6 +21,15 @@
   
   <!-- 4. Typography -->
   <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
+  <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Warning system styles -->
+  <link rel="stylesheet" href="styles/warning-system.css">
+
+  <!-- 7. Linked items modal styles -->
+  <link rel="stylesheet" href="styles/linked-items.css">
   
   <style>
     body {
@@ -106,6 +115,46 @@
     
     <!-- גוף הדף - כל התוכן אחרי הכותרת -->
     <div class="page-body">
+      <!-- top-section -->
+      <div class="top-section">
+        <!-- Main header -->
+        <div class="section-header">
+          <div class="table-title">
+            <img src="images/icons/helper_tables.svg" alt="טבלאות עזר"
+                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            טבלאות עזר
+          </div>
+          <div class="table-actions">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()"
+                title="הצג/הסתר אזור טבלאות עזר">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alert cards -->
+        <div class="section-body">
+          <active-alerts></active-alerts>
+
+          <!-- Data summary -->
+          <div class="info-summary" id="summaryStats">
+            <div>הגדרות מערכת: <strong id="totalPreferences">0</strong></div>
+            <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
+          </div>
+        </div>
+      </div> <!-- End top-section -->
+
+      <!-- Main content -->
+      <div class="main-content">
+        <div class="content-section">
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/helper_tables.svg" alt="הגדרות מערכת"
+                  style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              הגדרות מערכת
+            </div>
+          </div>
+          <div class="section-body">
       <div class="preferences-container">
         <h2 class="mb-4">⚙️ הגדרות מערכת</h2>
     
@@ -261,7 +310,17 @@
       </button>
         </div>
       </div> <!-- סוף preferences-container -->
-    </div> <!-- סוף page-body -->
+        </div> <!-- סוף section-body -->
+      </div> <!-- סוף content-section -->
+    </div> <!-- סוף main-content -->
+  </div> <!-- סוף page-body -->
+
+  <!-- Bottom page spacing -->
+  <div class="bottom-spacer"></div>
+
+  <!-- Notification system -->
+  <div class="notification-container" id="notificationContainer"></div>
+
   </div> <!-- סוף background-wrapper -->
 
   <!-- Bootstrap JS -->
@@ -285,6 +344,20 @@
   
   <!-- Header System Scripts -->
   <script src="scripts/header-system.js"></script>
-      <!-- <script src="scripts/filter-system.js"></script> -->
+  <script src="scripts/active-alerts-component.js"></script>
+  
+  <!-- Page initialization -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // אתחול מערכת הכותרת החדשה
+      console.log("🔄 Initializing unified header system...");
+      if (window.headerSystem) {
+        window.headerSystem.init();
+      }
+      if (window.simpleFilter) {
+        window.simpleFilter.init();
+      }
+    });
+  </script>
 </body>
 </html>

@@ -13,7 +13,7 @@ class TradePlan(BaseModel):
     status = Column(String(20), default='open', nullable=False)  # NOT NULL per constraints
     planned_amount = Column(Float, default=1, nullable=True)  # Default 1 per constraints
     entry_conditions = Column(String(500), nullable=True)
-    stop_price = Column(Float, nullable=True)
+    stop_loss = Column(Float, nullable=True)
     target_price = Column(Float, nullable=True)
     reasons = Column(String(500), nullable=True)
     cancelled_at = Column(DateTime, nullable=True)

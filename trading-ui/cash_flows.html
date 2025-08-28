@@ -47,6 +47,9 @@
     <!-- 7. Warning system styles (new centralized warning system) -->
     <link rel="stylesheet" href="styles/warning-system.css">
 
+    <!-- 8. Linked items modal styles -->
+    <link rel="stylesheet" href="styles/linked-items.css">
+
     <!-- Modular grid files - loaded at end of file -->
 </head>
 
@@ -65,7 +68,7 @@
                 <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
-                        <img src="images/icons/trades.svg" alt="תזרימי מזומנים"
+                        <img src="images/icons/cash_flows.svg" alt="תזרימי מזומנים"
                             style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
                         תזרימי מזומנים
                     </div>
@@ -86,6 +89,7 @@
                         <div>סה"כ תזרימים: <strong id="totalCashFlows">0</strong></div>
                         <div>סה"כ הפקדות: <strong id="totalDeposits">$0</strong></div>
                         <div>סה"כ משיכות: <strong id="totalWithdrawals">$0</strong></div>
+                        <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
                         <div>יתרה נוכחית: <strong id="currentBalance">$0</strong></div>
                     </div>
 
@@ -109,15 +113,15 @@
                 <div class="content-section cash-flows-page">
                     <!-- Cash flows header -->
                     <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/trades.svg" alt="תזרימי המזומנים שלי"
-                                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
-                            תזרימי המזומנים שלי
-                        </div>
+                                            <div class="table-title">
+                        <img src="images/icons/cash_flows.svg" alt="תזרימי המזומנים שלי"
+                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        תזרימי המזומנים שלי
+                    </div>
                         <div class="table-count">0 תזרימים</div>
                         <div class="table-actions">
                             <button class="refresh-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים מזומנים חדש">
-                                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon"
+                                <img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon"
                                     style="width: 16px; height: 16px;"> הוסף
                             </button>
                             <div class="action-separator"></div>
@@ -220,6 +224,12 @@
 
         </div> <!-- End page-body -->
 
+        <!-- Bottom page spacing -->
+        <div class="bottom-spacer"></div>
+
+        <!-- Notification system -->
+        <div class="notification-container" id="notificationContainer"></div>
+
     </div> <!-- End background-wrapper -->
 
     <!-- Add Cash Flow Modal -->
@@ -240,6 +250,7 @@
                                     <select class="form-control" id="cashFlowAccountId" required>
                                         <option value="">בחר חשבון...</option>
                                     </select>
+                                    <div class="invalid-feedback" id="cashFlowAccountIdError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -256,6 +267,7 @@
                                         <option value="transfer">העברה</option>
                                         <option value="other">אחר</option>
                                     </select>
+                                    <div class="invalid-feedback" id="cashFlowTypeError"></div>
                                 </div>
                             </div>
                         </div>
@@ -265,6 +277,7 @@
                                     <label for="cashFlowAmount" class="form-label">סכום</label>
                                     <input type="number" class="form-control" id="cashFlowAmount" step="0.01" required
                                         placeholder="הכנס סכום...">
+                                    <div class="invalid-feedback" id="cashFlowAmountError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -273,6 +286,7 @@
                                     <select class="form-control" id="cashFlowCurrencyId" required>
                                         <option value="">בחר מטבע...</option>
                                     </select>
+                                    <div class="invalid-feedback" id="cashFlowCurrencyIdError"></div>
                                 </div>
                             </div>
                         </div>
@@ -281,6 +295,7 @@
                                 <div class="mb-3">
                                     <label for="cashFlowDate" class="form-label">תאריך</label>
                                     <input type="date" class="form-control" id="cashFlowDate" required>
+                                    <div class="invalid-feedback" id="cashFlowDateError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -291,6 +306,7 @@
                                         <option value="file_import" disabled>ייבוא מקובץ (לא נתמך כרגע)</option>
                                         <option value="direct_import" disabled>ייבוא ישיר (לא נתמך כרגע)</option>
                                     </select>
+                                    <div class="invalid-feedback" id="cashFlowSourceError"></div>
                                 </div>
                             </div>
                         </div>
@@ -343,6 +359,7 @@
                                     <select class="form-control" id="editCashFlowAccountId" required>
                                         <option value="">בחר חשבון...</option>
                                     </select>
+                                    <div class="invalid-feedback" id="editCashFlowAccountIdError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -359,6 +376,7 @@
                                         <option value="transfer">העברה</option>
                                         <option value="other">אחר</option>
                                     </select>
+                                    <div class="invalid-feedback" id="editCashFlowTypeError"></div>
                                 </div>
                             </div>
                         </div>
@@ -368,6 +386,7 @@
                                     <label for="editCashFlowAmount" class="form-label">סכום</label>
                                     <input type="number" class="form-control" id="editCashFlowAmount" step="0.01"
                                         required placeholder="הכנס סכום...">
+                                    <div class="invalid-feedback" id="editCashFlowAmountError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -376,6 +395,7 @@
                                     <select class="form-control" id="editCashFlowCurrencyId" required>
                                         <option value="">בחר מטבע...</option>
                                     </select>
+                                    <div class="invalid-feedback" id="editCashFlowCurrencyIdError"></div>
                                 </div>
                             </div>
                         </div>
@@ -384,6 +404,7 @@
                                 <div class="mb-3">
                                     <label for="editCashFlowDate" class="form-label">תאריך</label>
                                     <input type="date" class="form-control" id="editCashFlowDate" required>
+                                    <div class="invalid-feedback" id="editCashFlowDateError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -394,6 +415,7 @@
                                         <option value="file_import">ייבוא מקובץ</option>
                                         <option value="direct_import">ייבוא ישיר</option>
                                     </select>
+                                    <div class="invalid-feedback" id="editCashFlowSourceError"></div>
                                 </div>
                             </div>
                         </div>
@@ -427,6 +449,49 @@
         </div>
     </div>
 
+    <!-- Delete Cash Flow Modal -->
+    <div class="modal fade" id="deleteCashFlowModal" tabindex="-1" aria-labelledby="deleteCashFlowModalLabel"
+        aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCashFlowModalLabel">מחיקת תזרים מזומנים</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>האם אתה בטוח שברצונך למחוק את תזרים המזומנים <strong id="deleteCashFlowName"></strong>?</p>
+                    <p class="text-danger">פעולה זו אינה הפיכה!</p>
+                    <input type="hidden" id="deleteCashFlowId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-danger btn-danger-outline" onclick="confirmDeleteCashFlow()">
+                        מחק תזרים
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- מודל הצגת פריטים מקושרים -->
+    <div class="modal fade" id="linkedItemsModal" tabindex="-1" aria-labelledby="linkedItemsModalLabel"
+        aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="linkedItemsModalLabel">פרטים מקושרים</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="linkedItemsModalBody">
+                    <!-- תוכן המודל יוכנס כאן דינמית -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -447,7 +512,7 @@
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/header-system.js"></script>
-    <script src="scripts/cash_flows.js?v=20250828_019"></script>
+    <script src="scripts/cash_flows.js?v=20250828_024"></script>
 
     <!-- Page initialization -->
     <script>

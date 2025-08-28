@@ -66,7 +66,7 @@ const DEFAULT_VALIDATION_RULES = {
  * @returns {boolean} האם הטופס תקין
  */
 function validateForm(formId, validationRules = {}) {
-    console.log(`🔍 Validating form: ${formId}`);
+  
     
     const form = document.getElementById(formId);
     if (!form) {
@@ -677,9 +677,67 @@ window.validateEmailField = validateEmailField;
 window.validateDateField = validateDateField;
 window.validateSelectField = validateSelectField;
 
+// ===== פונקציות אתחול =====
+
+/**
+ * אתחול מערכת הוולידציה לטופס
+ * @param {string} formId - מזהה הטופס
+ * @param {Object} validationRules - כללי הוולידציה
+ */
+function initializeValidation(formId, validationRules = {}) {
+  
+    
+    const form = document.getElementById(formId);
+    if (!form) {
+        console.error(`❌ Form ${formId} not found`);
+        return;
+    }
+
+    // הגדרת event listeners לכל השדות
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        // הסרת event listeners קודמים
+        input.removeEventListener('input', input._validationHandler);
+        input.removeEventListener('blur', input._validationHandler);
+        
+        // הוספת event listeners חדשים
+        input._validationHandler = () => validateField(input, validationRules[input.name] || {});
+        input.addEventListener('input', input._validationHandler);
+        input.addEventListener('blur', input._validationHandler);
+    });
+
+  
+}
+
+/**
+ * ניקוי וולידציה לטופס
+ * @param {string} formId - מזהה הטופס
+ */
+function clearValidation(formId) {
+  
+    
+    const form = document.getElementById(formId);
+    if (!form) {
+        console.error(`❌ Form ${formId} not found`);
+        return;
+    }
+
+    // ניקוי כל השדות
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        clearFieldValidation(input);
+    });
+
+  
+}
+
 // ייצוא פונקציות וולידציה מותאמות
 window.validateCurrencySymbol = validateCurrencySymbol;
 window.validateCurrencyRate = validateCurrencyRate;
+
+// ייצוא פונקציות אתחול
+window.initializeValidation = initializeValidation;
+window.clearValidation = clearValidation;
 
 // ייצוא המודול
 window.validationUtils = {
@@ -700,12 +758,9 @@ window.validationUtils = {
     validateDateField,
     validateSelectField,
     validateCurrencySymbol,
-    validateCurrencyRate
+    validateCurrencyRate,
+    initializeValidation,
+    clearValidation
 };
 
-console.log('✅ Validation Utils loaded successfully');
-console.log('📋 Available functions:');
-console.log('   🔧 setupFieldValidation(fieldId, rules, type) - הגדרת וולידציה לשדה');
-console.log('   ✅ validateField(input, rules, type) - וולידציה של שדה בודד');
-console.log('   📝 validateForm(formId) - וולידציה של טופס שלם');
-console.log('   🧹 clearFieldValidation(field) - ניקוי וולידציות');
+

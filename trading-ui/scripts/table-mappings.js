@@ -322,7 +322,7 @@ function getColumnValue(item, columnIndex, tableType) {
         return '';
     }
 
-    console.log(`🔍 getColumnValue: tableType=${tableType}, columnIndex=${columnIndex}, fieldName=${fieldName}, item:`, item);
+  
 
     // Database Display Page - Direct field mapping
     if (tableType === 'trade_plans' || tableType === 'trades' || tableType === 'accounts' ||
@@ -398,7 +398,7 @@ function getColumnValue(item, columnIndex, tableType) {
         if (fieldName === 'investment_type') {
             if (typeof window.translateTradeType === 'function') {
                 const result = window.translateTradeType(item.investment_type) || item.investment_type || '';
-                console.log(`🔍 investment_type returning: ${result} (translated)`);
+              
                 return result;
             }
             const typeDisplay = item.investment_type === 'long' ? 'לונג' :
@@ -407,7 +407,7 @@ function getColumnValue(item, columnIndex, tableType) {
                         item.investment_type === 'day' ? 'יומי' :
                             item.investment_type === 'scalp' ? 'סקלפינג' :
                                 item.investment_type || '';
-            console.log(`🔍 investment_type returning: ${typeDisplay} (fallback)`);
+          
             return typeDisplay;
         }
         if (fieldName === 'actions') {
@@ -417,7 +417,7 @@ function getColumnValue(item, columnIndex, tableType) {
 
     // Legacy executions table (for specific pages)
     if (tableType === 'executions_legacy') {
-        console.log('🔍 getColumnValue - executions table:', { fieldName, item });
+      
 
         if (fieldName === 'symbol') {
             return item.symbol || item.ticker_symbol || '';

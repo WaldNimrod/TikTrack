@@ -20,7 +20,7 @@ let currentTestId = null;
 
 // Page initialization
 function initializeTestsPage() {
-    console.log('🧪 Initializing tests page...');
+  
 
     // Load initial data
     loadTestsData();
@@ -32,13 +32,13 @@ function initializeTestsPage() {
     // Update summary statistics
     updateSummaryStats();
 
-    console.log('✅ Tests page initialized successfully');
+  
 }
 
 // Load tests data
 async function loadTestsData() {
     try {
-        console.log('🔄 Loading tests data...');
+      
 
         // Mock data for now - replace with actual API call
         testsData = [
@@ -85,7 +85,7 @@ async function loadTestsData() {
         ];
 
         updateTestsTable();
-        console.log('✅ Tests data loaded successfully');
+      
 
     } catch (error) {
         console.error('❌ Error loading tests data:', error);
@@ -96,7 +96,7 @@ async function loadTestsData() {
 // Load test results data
 async function loadTestResultsData() {
     try {
-        console.log('🔄 Loading test results data...');
+      
 
         // Mock data for now - replace with actual API call
         testResultsData = [
@@ -130,7 +130,7 @@ async function loadTestResultsData() {
         ];
 
         updateTestResultsTable();
-        console.log('✅ Test results data loaded successfully');
+      
 
     } catch (error) {
         console.error('❌ Error loading test results data:', error);
@@ -289,7 +289,7 @@ function getResultText(result) {
 
 // Test actions
 function runTest(testId) {
-    console.log('▶️ Running test:', testId);
+  
     currentTestId = testId;
 
     // Show loading state
@@ -327,13 +327,13 @@ function runTest(testId) {
             updateTestsTable();
             updateSummaryStats();
 
-            console.log('✅ Test completed:', newResult);
+          
         }
     }, 2000);
 }
 
 function runAllTests() {
-    console.log('▶️ Running all tests...');
+  
 
     const activeTests = testsData.filter(test => test.status === 'active');
     if (activeTests.length === 0) {
@@ -351,13 +351,13 @@ function runAllTests() {
 }
 
 function editTest(testId) {
-    console.log('✏️ Edit test:', testId);
+  
     // TODO: Open edit modal
     alert('פונקציית עריכת בדיקה תתווסף בקרוב');
 }
 
 function deleteTest(testId) {
-    console.log('🗑️ Delete test:', testId);
+  
     if (confirm('האם אתה בטוח שברצונך למחוק בדיקה זו?')) {
         testsData = testsData.filter(test => test.id !== testId);
         updateTestsTable();
@@ -366,7 +366,7 @@ function deleteTest(testId) {
 }
 
 function viewTestResult(resultId) {
-    console.log('👁️ View test result:', resultId);
+  
     const result = testResultsData.find(r => r.id === resultId);
     if (result) {
         alert(`תוצאות בדיקה ${resultId}:\n${result.details}`);
@@ -374,7 +374,7 @@ function viewTestResult(resultId) {
 }
 
 function exportTestResult(resultId) {
-    console.log('📤 Export test result:', resultId);
+  
     const result = testResultsData.find(r => r.id === resultId);
     if (result) {
         const dataStr = JSON.stringify(result, null, 2);
@@ -389,7 +389,7 @@ function exportTestResult(resultId) {
 }
 
 function deleteTestResult(resultId) {
-    console.log('🗑️ Delete test result:', resultId);
+  
     if (confirm('האם אתה בטוח שברצונך למחוק תוצאה זו?')) {
         testResultsData = testResultsData.filter(result => result.id !== resultId);
         updateTestResultsTable();
@@ -397,7 +397,7 @@ function deleteTestResult(resultId) {
 }
 
 function clearTestResults() {
-    console.log('🗑️ Clear all test results');
+  
     if (confirm('האם אתה בטוח שברצונך לנקות את כל תוצאות הבדיקות?')) {
         testResultsData = [];
         updateTestResultsTable();
@@ -406,7 +406,7 @@ function clearTestResults() {
 
 // Section management
 function toggleTopSection() {
-    console.log('🔄 toggleTopSection נקראה - שימוש במערכת הגלובלית');
+  
 
     // שימוש בפונקציה הגלובלית מ-main.js
     if (typeof window.toggleSection === 'function') {
@@ -417,7 +417,7 @@ function toggleTopSection() {
 }
 
 function toggleMainSection() {
-    console.log('🔄 toggleMainSection נקראה - שימוש במערכת הגלובלית');
+  
 
     // שימוש בפונקציה הגלובלית מ-main.js
     if (typeof window.toggleSection === 'function') {
@@ -435,7 +435,7 @@ function toggleMainSection() {
 }
 
 function restoreTestsSectionState() {
-    console.log('🔄 שחזור מצב סקשנים בדף בדיקות - שימוש במערכת הגלובלית');
+  
 
     // שימוש בפונקציה הגלובלית מ-main.js
     if (typeof window.restoreSectionStates === 'function') {
@@ -453,7 +453,7 @@ function showError(message) {
 
 // Preferences functions
 function saveTestPreferences() {
-    console.log('💾 Saving test preferences...');
+  
     const preferences = {
         useTempDatabase: document.getElementById('useTempDatabase')?.checked || false,
         backupBeforeTests: document.getElementById('backupBeforeTests')?.checked || false,
@@ -473,7 +473,7 @@ function saveTestPreferences() {
 }
 
 function resetTestPreferences() {
-    console.log('🔄 Resetting test preferences...');
+  
     if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות הבדיקות לברירות מחדל?')) {
         // Reset all checkboxes to default values
         const checkboxes = [

@@ -36,7 +36,7 @@
 
   <!-- 3. General styles -->
   <link rel="stylesheet" href="styles/styles.css">
-
+    <link rel="stylesheet" href="styles/header-system.css">
   <!-- 4. Typography -->
   <link rel="stylesheet" href="styles/typography.css">
 
@@ -44,13 +44,10 @@
   <link rel="stylesheet" href="styles/table.css">
 
   <!-- 6. Header system styles (highest priority) -->
-  <link rel="stylesheet" href="styles/header-system.css">
 
   <!-- Modular grid files -->
   <script src="scripts/button-icons.js"></script>
-  <script src="scripts/header-system.js"></script>
   <script src="scripts/console-cleanup.js"></script>
-  <script src="scripts/simple-filter.js"></script>
   <script src="scripts/translation-utils.js"></script>
   <script src="scripts/data-utils.js"></script>
   <script src="scripts/notification-system.js"></script>
@@ -64,7 +61,7 @@
   <script src="scripts/filter-system.js"></script>
   <script src="scripts/page-utils.js"></script>
   <script src="scripts/main.js"></script>
-  <script src="scripts/alerts.js"></script>
+    <script src="scripts/header-system.js"></script>  <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
   <script src="scripts/accounts.js"></script>
 </head>
@@ -73,7 +70,6 @@
   <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- כותרת האפליקציה החדשה - נוצרת אוטומטית על ידי header-system.js -->
     <!-- unified-header ייווצר כאן אוטומטית -->
 
     <!-- Page body - All content after header -->
@@ -141,7 +137,7 @@
           <!-- Alerts table -->
           <div class="section-body">
             <div class="table-responsive" id="alertsContainer">
-              <table class="table" id="alertsTable" data-table-type="alerts">
+              <table class="table" data-table-type="alerts">
                 <thead>
                   <tr>
                     <th>

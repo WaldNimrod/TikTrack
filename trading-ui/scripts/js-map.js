@@ -70,7 +70,7 @@ class JsMapSystem {
             return;
         }
 
-        console.log('🚀 Initializing JS Map System');
+      
 
         // Load initial data
         this.loadJsMapData();
@@ -83,7 +83,7 @@ class JsMapSystem {
      */
     async loadJsMapData() {
         try {
-            console.log('📊 Loading JS map data...');
+          
 
             // Show loading state
             this.showLoadingState();
@@ -94,14 +94,13 @@ class JsMapSystem {
             // Get functions data
             await this.loadFunctionsData();
 
-            console.log('📊 Data loaded - Page mapping keys:', Object.keys(this.pageMapping));
-            console.log('📊 Data loaded - Functions data keys:', Object.keys(this.functionsData));
+            
 
             // Render data
             await this.renderPageMapping();
             this.renderFunctionsData();
 
-            console.log('✅ JS map data loaded successfully');
+          
 
         } catch (error) {
             console.error('❌ Error loading JS map data:', error);
@@ -117,7 +116,7 @@ class JsMapSystem {
             const response = await fetch('/api/js-map/page-mapping');
             if (response.ok) {
                 this.pageMapping = await response.json();
-                console.log('✅ Page mapping loaded from server:', this.pageMapping);
+              
             } else {
                 // Fallback to local scanning
                 console.warn('⚠️ Server response not ok, using local scan');
@@ -134,24 +133,22 @@ class JsMapSystem {
      */
     async loadFunctionsData() {
         try {
-            console.log('🔍 Fetching functions data from server...');
+          
             const response = await fetch('/api/js-map/functions');
-            console.log('📡 Response status:', response.status);
+          
 
             if (response.ok) {
                 this.functionsData = await response.json();
-                console.log('✅ Functions data loaded from server:', Object.keys(this.functionsData));
-                console.log('📊 Total files with functions:', Object.keys(this.functionsData).length);
+                
 
                 // Check if we have actual function data
                 const filesWithFunctions = Object.keys(this.functionsData).filter(file =>
                     this.functionsData[file] && this.functionsData[file].length > 0
                 );
-                console.log('📊 Files with actual functions:', filesWithFunctions.length);
+              
 
                 // Log some sample data
-                if (this.functionsData['simple-filter.js']) {
-                    console.log('📄 Sample functions from simple-filter.js:', this.functionsData['simple-filter.js'].length);
+                  
                 }
             } else {
                 // Fallback to local scanning
@@ -172,35 +169,16 @@ class JsMapSystem {
 
         // Define known page to JS file mappings - FIXED LIST
         const pageMappings = {
-            'index.html': ['main.js', 'header-system.js', 'simple-filter.js'],
-            'trades.html': ['trades.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'trade_plans.html': ['trade_plans.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'research.html': ['research.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'alerts.html': ['alerts.js', 'active-alerts-component.js', 'header-system.js', 'simple-filter.js'],
-            'executions.html': ['executions.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'tickers.html': ['tickers.js', 'ticker-service.js', 'header-system.js', 'simple-filter.js'],
-            'accounts.html': ['accounts.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'cash_flows.html': ['cash_flows.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'notes.html': ['notes.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'preferences.html': ['preferences.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'db_display.html': ['database.js', 'db-extradata.js', 'header-system.js', 'simple-filter.js'],
-            'db_extradata.html': ['db-extradata.js', 'header-system.js', 'simple-filter.js'],
-            'constraints.html': ['constraint-manager.js', 'header-system.js', 'simple-filter.js'],
-            'tests.html': ['tests.js', 'header-system.js', 'simple-filter.js'],
-            'styles.html': ['header-system.js', 'simple-filter.js'],
-            'js-map.html': ['js-map.js', 'js-scanner.js', 'header-system.js', 'simple-filter.js']
         };
 
         // Get all JS files - FIXED LIST
         this.jsFiles = [
-            'main.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js',
             'translation-utils.js', 'data-utils.js', 'table-mappings.js',
             'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
             'alerts.js', 'active-alerts-component.js', 'trades.js', 'trade_plans.js',
             'research.js', 'executions.js', 'tickers.js', 'ticker-service.js',
             'accounts.js', 'cash_flows.js', 'notes.js', 'preferences.js',
             'database.js', 'db-extradata.js', 'constraint-manager.js',
-            'tests.js', 'filter-system.js', 'currencies.js', 'auth.js',
             'js-map.js', 'js-scanner.js'
         ];
 
@@ -211,10 +189,6 @@ class JsMapSystem {
         this.htmlPages.forEach(page => {
             mapping[page] = pageMappings[page] || [];
         });
-
-        console.log('🔍 Fixed page mapping created:', mapping);
-        console.log('📄 HTML Pages:', this.htmlPages);
-        console.log('🗂️ JS Files:', this.jsFiles);
 
         return mapping;
     }
@@ -228,9 +202,9 @@ class JsMapSystem {
         // Use the JS scanner to get actual function data
         if (window.jsScanner) {
             try {
-                console.log('🔍 Using JS scanner to get functions...');
+              
                 const scanResult = await window.jsScanner.scanAllJsFiles();
-                console.log('✅ JS scanner result:', Object.keys(scanResult.functions));
+              
                 return scanResult.functions;
             } catch (error) {
                 console.warn('⚠️ Could not scan functions, using fallback structure:', error);
@@ -238,31 +212,9 @@ class JsMapSystem {
         }
 
         // Fallback to sample functions structure
-        console.log('⚠️ Using fallback sample functions structure');
+      
 
-        // Sample functions for key files
-        functions['simple-filter.js'] = [
-            {
-                name: 'SimpleFilter',
-                description: 'מחלקה לניהול פילטרים פשוטים',
-                params: 'אין פרמטרים',
-                returns: 'אין ערך מוחזר',
-                annotations: 'מחלקה לניהול פילטרים פשוטים לטבלת טריידים',
-                code: 'class SimpleFilter {\n  constructor() {\n    this.currentFilters = {};\n  }\n}',
-                line: 1,
-                type: 'class'
-            },
-            {
-                name: 'init',
-                description: 'אתחול הפילטרים',
-                params: 'אין פרמטרים',
-                returns: 'אין ערך מוחזר',
-                annotations: 'אתחול פילטרים למצב ברירת מחדל',
-                code: 'init() {\n  this.waitForElements();\n  this.initializeDefaultFilters();\n}',
-                line: 25,
-                type: 'method'
-            }
-        ];
+
 
         functions['header-system.js'] = [
             {
@@ -284,7 +236,7 @@ class JsMapSystem {
                 params: 'אין פרמטרים',
                 returns: 'אין ערך מוחזר',
                 annotations: 'פונקציה ראשית לאתחול האפליקציה',
-                code: 'function initializeApp() {\n  console.log("App initialized");\n}',
+                code: 'function initializeApp() {\n  // App initialized\n}',
                 line: 1,
                 type: 'function'
             }
@@ -304,14 +256,14 @@ class JsMapSystem {
      * Scan function calls across all JS files
      */
     async scanFunctionCalls() {
-        console.log('🔍 Scanning function calls across all JS files...');
+      
 
         // Try to use the JS scanner for real data
         if (window.jsScanner) {
             try {
-                console.log('🔍 Using JS scanner for real function call data...');
+              
                 const scanResult = await window.jsScanner.scanFunctionCalls();
-                console.log('✅ Real function call data:', scanResult.counts);
+              
                 return scanResult.counts;
             } catch (error) {
                 console.warn('⚠️ Could not scan function calls, using fallback data:', error);
@@ -319,7 +271,7 @@ class JsMapSystem {
         }
 
         // Fallback to static data
-        console.log('⚠️ Using fallback function call data');
+      
 
         const functionCallCounts = {};
 
@@ -332,7 +284,7 @@ class JsMapSystem {
         // For now, we'll use a static mapping based on common patterns
         const sampleFunctionCalls = {
             'header-system.js': 45,  // Most used - header system functions
-            'simple-filter.js': 38,  // Filter functions used everywhere
+
             'ui-utils.js': 32,       // UI utility functions
             'main.js': 15,           // Main app functions
             'trades.js': 28,         // Trade-specific functions
@@ -346,7 +298,6 @@ class JsMapSystem {
             'db-extradata.js': 15,   // Extra data functions
             'constraint-manager.js': 8, // Constraint functions
             'tests.js': 6,           // Test functions
-            'filter-system.js': 10,  // Filter system functions
             'currencies.js': 8,      // Currency functions
             'auth.js': 5,            // Auth functions
             'js-map.js': 3,          // JS map functions
@@ -373,7 +324,7 @@ class JsMapSystem {
             }
         });
 
-        console.log('✅ Function call counts:', functionCallCounts);
+      
         return functionCallCounts;
     }
 
@@ -384,9 +335,7 @@ class JsMapSystem {
         const container = document.getElementById('pageMappingContent');
         if (!container) return;
 
-        console.log('🔍 Rendering page mapping...');
-        console.log('📄 HTML Pages:', this.htmlPages);
-        console.log('🗂️ Page Mapping:', this.pageMapping);
+        
 
         // Sort JS files by generality (most general first)
         const sortedJsFiles = this.sortJsFilesByGenerality();
@@ -433,7 +382,7 @@ class JsMapSystem {
         `;
 
         container.innerHTML = html;
-        console.log('✅ Page mapping rendered with function call counts');
+      
     }
 
     /**
@@ -443,14 +392,13 @@ class JsMapSystem {
         const container = document.getElementById('functionsContent');
         if (!container) return;
 
-        console.log('🔍 Rendering functions data...');
-        console.log('📁 Functions data:', this.functionsData);
+        
 
         let html = '';
 
         Object.keys(this.functionsData).forEach(file => {
             const functions = this.functionsData[file];
-            console.log(`📄 Rendering functions for ${file}: ${functions.length} functions`);
+          
 
             html += `
                 <div class="function-group">
@@ -491,7 +439,7 @@ class JsMapSystem {
         });
 
         container.innerHTML = html;
-        console.log('✅ Functions data rendered');
+      
     }
 
     /**
@@ -500,10 +448,8 @@ class JsMapSystem {
     sortJsFilesByGenerality() {
         const generalityOrder = [
             // Most general files first
-            'main.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js',
             'translation-utils.js', 'data-utils.js', 'table-mappings.js',
             'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
-            'filter-system.js', 'console-cleanup.js',
             // Specific page files
             'alerts.js', 'active-alerts-component.js', 'trades.js', 'trade_plans.js',
             'research.js', 'executions.js', 'tickers.js', 'ticker-service.js',
@@ -572,7 +518,7 @@ class JsMapSystem {
      */
     async refreshJsMapData() {
         try {
-            console.log('🔄 Refreshing JS map data...');
+          
 
             // Disable refresh button
             const refreshButton = document.getElementById('refreshButton');
@@ -593,7 +539,7 @@ class JsMapSystem {
                 refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> רענן נתונים';
             }
 
-            console.log('✅ JS map data refreshed successfully');
+          
 
         } catch (error) {
             console.error('❌ Error refreshing JS map data:', error);
@@ -639,7 +585,7 @@ function toggleFunctionGroup(header) {
 }
 
 function openFunctionDetails(file, functionName) {
-    console.log(`Opening function details: ${functionName} from ${file}`);
+  
 
     // Get function details from scanner
     if (window.jsScanner) {

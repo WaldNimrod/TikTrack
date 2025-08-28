@@ -35,12 +35,12 @@ class Account(BaseModel):
     
     # Database columns - matching actual database schema
     name = Column(String(100), nullable=False)
-    currency = Column(String(3), nullable=False)  # Currency symbol (USD, EUR, etc.) - NOT NULL per constraints
-    status = Column(String(20), default='open')
-    cash_balance = Column(Float, default=0)
-    total_value = Column(Float, default=0)
-    total_pl = Column(Float, default=0)
-    notes = Column(String(500))
+    currency_id = Column(Integer, ForeignKey('currencies.id'), default=1)  # Foreign key to currencies table
+    status = Column(String(20), default='active')
+    balance = Column(Float, default=0)  # cash_balance in model but balance in DB
+    
+    # Relationships
+    currency = relationship("Currency", back_populates="accounts")
     
     # Relationships with other entities
     # Currency is now a simple string field, not a relationship
@@ -61,7 +61,7 @@ class Account(BaseModel):
     
     def __repr__(self) -> str:
         """String representation of the Account object."""
-        currency_symbol = self.currency if self.currency else 'N/A'
+        currency_symbol = self.currency.symbol if self.currency else 'USD'
         return f"<Account(name='{self.name}', currency='{currency_symbol}', status='{self.status}')>"
     
     def to_dict(self) -> Dict[str, Any]:
@@ -74,34 +74,30 @@ class Account(BaseModel):
         return {
             'id': self.id,
             'name': self.name,
-            'currency': self.currency,
+            'currency': self.currency.symbol if self.currency else 'USD',
+            'currency_id': self.currency_id,
             'status': self.status,
-            'cash_balance': self.cash_balance,
-            'total_value': self.total_value,
-            'total_pl': self.total_pl,
-            'notes': self.notes,
+            'balance': self.balance,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
     
-    def is_active(self) -> bool:
+    def is_open(self) -> bool:
         """
-        Check if the account is active.
+        Check if the account is open/active.
         
         Note: All status values are now in English:
-        - 'open': Account is active and operational
+        - 'active': Account is open and operational
         - 'closed': Account is closed but can be reopened
         - 'cancelled': Account is permanently cancelled
         """
-        return self.status == 'open'
+        return self.status == 'active'
     
     def get_balance_info(self) -> Dict[str, str]:
         """Get formatted balance information for display."""
-        currency_symbol = self.currency if self.currency else 'N/A'
+        currency_symbol = self.currency.symbol if self.currency else 'USD'
         return {
-            'cash_balance': f"{self.cash_balance:,.2f} {currency_symbol}" if self.cash_balance else "0.00",
-            'total_value': f"{self.total_value:,.2f} {currency_symbol}" if self.total_value else "0.00",
-            'total_pl': f"{self.total_pl:,.2f} {currency_symbol}" if self.total_pl else "0.00",
-            'pl_percentage': f"{((self.total_pl / self.cash_balance) * 100):.2f}%" if self.cash_balance and self.cash_balance > 0 else "0.00%"
+            'balance': f"{self.balance:,.2f} {currency_symbol}" if self.balance else "0.00",
+            'currency': currency_symbol
         }
     
     @classmethod

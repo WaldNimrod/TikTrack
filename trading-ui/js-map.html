@@ -36,7 +36,7 @@
 
     <!-- 3. General styles -->
     <link rel="stylesheet" href="styles/styles.css">
-
+    <link rel="stylesheet" href="styles/header-system.css">
     <!-- 4. Typography -->
     <link rel="stylesheet" href="styles/typography.css">
 
@@ -44,7 +44,6 @@
     <link rel="stylesheet" href="styles/table.css">
 
     <!-- 6. Header system styles (highest priority) -->
-    <link rel="stylesheet" href="styles/header-system.css">
 
     <!-- 7. Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -53,7 +52,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Required external scripts only -->
-    <script src="scripts/header-system.js"></script>
 
     <style>
         .js-map-container {
@@ -762,8 +760,6 @@
                         console.log('📊 Files with actual functions:', filesWithFunctions.length);
 
                         // Log some sample data
-                        if (this.functionsData['simple-filter.js']) {
-                            console.log('📄 Sample functions from simple-filter.js:', this.functionsData['simple-filter.js'].length);
                         }
                     } else {
                         console.warn('⚠️ Server response not ok, using local scan');
@@ -785,29 +781,10 @@
                 // Define known page to JS file mappings - FIXED LIST
                 // All existing pages except test-header-only.html (which is in tests submenu)
                 const pageMappings = {
-                    'index.html': ['main.js', 'header-system.js', 'simple-filter.js'],
-                    'trades.html': ['trades.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-                    'trade_plans.html': ['trade_plans.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-                    'research.html': ['research.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-                    'alerts.html': ['alerts.js', 'active-alerts-component.js', 'header-system.js', 'simple-filter.js'],
-                    'executions.html': ['executions.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-                    'tickers.html': ['tickers.js', 'ticker-service.js', 'header-system.js', 'simple-filter.js'],
-                    'accounts.html': ['accounts.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-                    'cash_flows.html': ['cash_flows.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-                    'notes.html': ['notes.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-                    'preferences.html': ['preferences.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-                    'db_display.html': ['database.js', 'db-extradata.js', 'header-system.js', 'simple-filter.js'],
-                    'db_extradata.html': ['db-extradata.js', 'header-system.js', 'simple-filter.js'],
-                    'constraints.html': ['constraint-manager.js', 'header-system.js', 'simple-filter.js'],
-                    'tests.html': ['tests.js', 'header-system.js', 'simple-filter.js'],
-                    'designs.html': ['header-system.js', 'simple-filter.js'],
-                    'style_demonstration.html': ['header-system.js', 'simple-filter.js'],
-                    'js-map.html': ['js-map.js', 'js-scanner.js', 'header-system.js', 'simple-filter.js']
                 };
 
                 // Get all JS files - FIXED LIST
                 this.jsFiles = [
-                    'main.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js',
                     'translation-utils.js', 'data-utils.js', 'table-mappings.js',
                     'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
                     'alerts.js', 'active-alerts-component.js', 'trades.js', 'trade_plans.js',
@@ -845,7 +822,6 @@
                 console.log('⚠️ Using fallback sample functions structure');
 
                 // Sample functions for key files
-                functions['simple-filter.js'] = [
                     {
                         name: 'SimpleFilter',
                         description: 'מחלקה לניהול פילטרים פשוטים',
@@ -868,7 +844,6 @@
                     }
                 ];
 
-                functions['header-system.js'] = [
                     {
                         name: 'HeaderSystem',
                         description: 'מערכת ראש דף מאוחדת',
@@ -920,8 +895,6 @@
                 // Sample function call data - in a real implementation, this would scan all files
                 // For now, we'll use a static mapping based on common patterns
                 const sampleFunctionCalls = {
-                    'header-system.js': 45,  // Most used - header system functions
-                    'simple-filter.js': 38,  // Filter functions used everywhere
                     'ui-utils.js': 32,       // UI utility functions
                     'main.js': 15,           // Main app functions
                     'trades.js': 28,         // Trade-specific functions
@@ -1108,7 +1081,6 @@
             sortJsFilesByGenerality() {
                 const generalityOrder = [
                     // Most general files first
-                    'main.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js',
                     'translation-utils.js', 'data-utils.js', 'table-mappings.js',
                     'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
                     'filter-system.js', 'console-cleanup.js',

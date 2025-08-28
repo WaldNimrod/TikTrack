@@ -78,7 +78,6 @@
     <!-- Scripts - Using new Header System -->
     <script src="scripts/header-system.js"></script>
     <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/simple-filter.js"></script>
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/ui-utils.js"></script>
@@ -163,12 +162,18 @@
                                     <div class="card-body">
                                         <div id="filterDebugInfo"
                                             style="font-family: monospace; font-size: 11px; background: #f8f9fa; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
-                                            <div><strong>Status:</strong> <span id="statusDebug">-</span></div>
-                                            <div><strong>Type:</strong> <span id="typeDebug">-</span></div>
-                                            <div><strong>Account:</strong> <span id="accountDebug">-</span></div>
-                                            <div><strong>Date:</strong> <span id="dateDebug">-</span></div>
-                                        </div>
-                                        <button onclick="updateDebugInfo()" class="btn btn-sm btn-primary mt-2">🔄
+                                                            <div><strong>Status:</strong> <span id="statusDebug">-</span></div>
+                <div><strong>Type:</strong> <span id="typeDebug">-</span></div>
+                <div><strong>Account:</strong> <span id="accountDebug">-</span></div>
+                <div><strong>Date:</strong> <span id="dateDebug">-</span></div>
+            </div>
+            <button onclick="updateDebugInfo()" class="btn btn-sm btn-primary mt-2">🔄
+            <button onclick="testStatusFilter()" class="btn btn-sm btn-info mt-2">🧪 בדוק פילטר סטטוס</button>
+            <button onclick="testTypeFilter()" class="btn btn-sm btn-success mt-2">🧪 בדוק פילטר סוג</button>
+            <button onclick="testAccountFilter()" class="btn btn-sm btn-primary mt-2">🧪 בדוק פילטר חשבון</button>
+            <button onclick="testDateFilter()" class="btn btn-sm btn-secondary mt-2">🧪 בדוק פילטר תאריך</button>
+            <button onclick="testSearchFilter()" class="btn btn-sm btn-dark mt-2">🧪 בדוק חיפוש חופשי</button>
+            <button onclick="showActiveContainer()" class="btn btn-sm btn-warning mt-2">🔍 הצג קונטיינר פעיל</button>
                                             עדכן</button>
                                     </div>
                                 </div>
@@ -182,8 +187,9 @@
                                         <h5>טבלת טריידים לבדיקה</h5>
                                     </div>
                                     <div class="card-body">
-                                        <table id="tradesTable" class="table table-striped"
-                                            data-table-type="test_trades">
+                                        <div class="table-responsive" id="tradesContainer">
+                                            <table class="table table-striped"
+                                                data-table-type="test_trades">
                                             <thead>
                                                 <tr>
                                                     <th>טיקר</th>
@@ -201,7 +207,7 @@
                                                     <td>AAPL</td>
                                                     <td data-status="פתוח">פתוח</td>
                                                     <td data-investment-type="swing">סווינג</td>
-                                                    <td data-account="חשבון א">חשבון א</td>
+                                                    <td data-account="Trading Account 1">Trading Account 1</td>
                                                     <td data-created-at="2025-08-22">2025-08-22</td>
                                                     <td>100</td>
                                                     <td>150.50</td>
@@ -211,7 +217,7 @@
                                                     <td>TSLA</td>
                                                     <td data-status="סגור">סגור</td>
                                                     <td data-investment-type="investment">השקעה</td>
-                                                    <td data-account="חשבון ב">חשבון ב</td>
+                                                    <td data-account="Investment Account">Investment Account</td>
                                                     <td data-created-at="2025-08-21">2025-08-21</td>
                                                     <td>50</td>
                                                     <td>200.00</td>
@@ -221,7 +227,7 @@
                                                     <td>SPY</td>
                                                     <td data-status="פתוח">פתוח</td>
                                                     <td data-investment-type="passive">פסיבי</td>
-                                                    <td data-account="חשבון א">חשבון א</td>
+                                                    <td data-account="Trading Account 1">Trading Account 1</td>
                                                     <td data-created-at="2025-08-20">2025-08-20</td>
                                                     <td>200</td>
                                                     <td>450.25</td>
@@ -231,7 +237,7 @@
                                                     <td>BTC</td>
                                                     <td data-status="מבוטל">מבוטל</td>
                                                     <td data-investment-type="swing">סווינג</td>
-                                                    <td data-account="חשבון ג">חשבון ג</td>
+                                                    <td data-account="Retirement Account">Retirement Account</td>
                                                     <td data-created-at="2025-08-15">2025-08-15</td>
                                                     <td>0.5</td>
                                                     <td>45,000</td>
@@ -241,7 +247,7 @@
                                                     <td>MSFT</td>
                                                     <td data-status="פתוח">פתוח</td>
                                                     <td data-investment-type="investment">השקעה</td>
-                                                    <td data-account="חשבון ב">חשבון ב</td>
+                                                    <td data-account="Investment Account">Investment Account</td>
                                                     <td data-created-at="2025-08-10">2025-08-10</td>
                                                     <td>75</td>
                                                     <td>300.75</td>
@@ -251,7 +257,7 @@
                                                     <td>QQQ</td>
                                                     <td data-status="סגור">סגור</td>
                                                     <td data-investment-type="passive">פסיבי</td>
-                                                    <td data-account="חשבון א">חשבון א</td>
+                                                    <td data-account="Trading Account 1">Trading Account 1</td>
                                                     <td data-created-at="2025-08-18">2025-08-18</td>
                                                     <td>150</td>
                                                     <td>380.00</td>
@@ -261,7 +267,7 @@
                                                     <td>NVDA</td>
                                                     <td data-status="פתוח">פתוח</td>
                                                     <td data-investment-type="swing">סווינג</td>
-                                                    <td data-account="חשבון ג">חשבון ג</td>
+                                                    <td data-account="Retirement Account">Retirement Account</td>
                                                     <td data-created-at="2025-08-16">2025-08-16</td>
                                                     <td>25</td>
                                                     <td>450.00</td>
@@ -281,8 +287,9 @@
                                         <h5>טבלת בדיקה כללית</h5>
                                     </div>
                                     <div class="card-body">
-                                        <table id="testTable" class="table table-striped"
-                                            data-table-type="test_general">
+                                        <div class="table-responsive" id="testContainer">
+                                            <table class="table table-striped"
+                                                data-table-type="test_general">
                                             <thead>
                                                 <tr>
                                                     <th>שם</th>
@@ -298,7 +305,7 @@
                                                     <td>טרייד 1</td>
                                                     <td data-status="פתוח">פתוח</td>
                                                     <td data-investment-type="swing">סווינג</td>
-                                                    <td data-account="חשבון א">חשבון א</td>
+                                                    <td data-account="Trading Account 1">Trading Account 1</td>
                                                     <td data-created-at="2025-08-22">2025-08-22</td>
                                                     <td>1000</td>
                                                 </tr>
@@ -306,7 +313,7 @@
                                                     <td>טרייד 2</td>
                                                     <td data-status="סגור">סגור</td>
                                                     <td data-investment-type="passive">פסיבי</td>
-                                                    <td data-account="חשבון ב">חשבון ב</td>
+                                                    <td data-account="Investment Account">Investment Account</td>
                                                     <td data-created-at="2025-08-21">2025-08-21</td>
                                                     <td>2000</td>
                                                 </tr>
@@ -314,12 +321,13 @@
                                                     <td>טרייד 3</td>
                                                     <td data-status="מבוטל">מבוטל</td>
                                                     <td data-investment-type="investment">השקעה</td>
-                                                    <td data-account="חשבון א">חשבון א</td>
+                                                    <td data-account="Trading Account 1">Trading Account 1</td>
                                                     <td data-created-at="2025-08-20">2025-08-20</td>
                                                     <td>500</td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -332,8 +340,9 @@
                                         <h5>טבלת הערות (ללא פילטר סטטוס)</h5>
                                     </div>
                                     <div class="card-body">
-                                        <table id="notificationsTable" class="table table-striped"
-                                            data-table-type="test_notifications">
+                                        <div class="table-responsive" id="notificationsContainer">
+                                            <table class="table table-striped"
+                                                data-table-type="test_notifications">
                                             <thead>
                                                 <tr>
                                                     <th>סימבול</th>
@@ -402,6 +411,7 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -428,8 +438,8 @@
                                                 <h6>מצב פילטרים נוכחי</h6>
                                                 <p><strong>פילטר סטטוס:</strong> <span id="currentStatusFilter">כל
                                                         סטטוס</span></p>
-                                                <p><strong>פילטר טיפוס:</strong> <span id="currentTypeFilter">כל
-                                                        טיפוס</span></p>
+                                                                                        <p><strong>פילטר סוג:</strong> <span id="currentTypeFilter">כל
+                                            סוג</span></p>
                                                 <p><strong>פילטר חשבון:</strong> <span id="currentAccountFilter">כל
                                                         חשבון</span></p>
                                                 <p><strong>פילטר תאריכים:</strong> <span id="currentDateRangeFilter">כל
@@ -490,22 +500,18 @@
         <script>
             // פונקציה לעדכון מידע דיבאג פילטרים
             function updateFilterDebugInfo() {
-                if (window.simpleFilter && window.simpleFilter.currentFilters) {
-                    const filters = window.simpleFilter.currentFilters;
+                // עדכון מידע דיבאג - קורא ישירות מה-DOM
+                const statusText = document.getElementById('selectedStatus');
+                const typeText = document.getElementById('selectedType');
+                const accountText = document.getElementById('selectedAccount');
+                const dateRangeText = document.getElementById('selectedDateRange');
+                const searchInput = document.getElementById('searchFilterInput');
 
-                    // עדכון מידע דיבאג
-                    document.getElementById('statusDebug').textContent =
-                        filters.status ? (Array.isArray(filters.status) ? filters.status.join(', ') : filters.status) : 'כל הסטטוסים';
-
-                    document.getElementById('typeDebug').textContent =
-                        filters.type ? (Array.isArray(filters.type) ? filters.type.join(', ') : filters.type) : 'כל הטיפוסים';
-
-                    document.getElementById('accountDebug').textContent =
-                        filters.account ? (Array.isArray(filters.account) ? filters.account.join(', ') : filters.account) : 'כל החשבונות';
-
-                    document.getElementById('dateDebug').textContent =
-                        filters.date ? (Array.isArray(filters.date) ? filters.date.join(', ') : filters.date) : 'כל התאריכים';
-                }
+                // עדכון מידע דיבאג
+                document.getElementById('statusDebug').textContent = statusText ? statusText.textContent : 'כל הסטטוסים';
+                document.getElementById('typeDebug').textContent = typeText ? typeText.textContent : 'כל הסוגים';
+                document.getElementById('accountDebug').textContent = accountText ? accountText.textContent : 'כל החשבונות';
+                document.getElementById('dateDebug').textContent = dateRangeText ? dateRangeText.textContent : 'כל התאריכים';
             }
 
             // פונקציות בדיקה
@@ -729,7 +735,53 @@
                 log('🚀 טעינת דף בדיקה (ללא app-header)...');
 
                 // עדכון debug כל 2 שניות
-                setInterval(updateDebugInfo, 2000);
+setInterval(updateDebugInfo, 2000);
+
+// פונקציות בדיקה לפילטרים
+function testStatusFilter() {
+    console.log('🧪 Testing status filter...');
+    const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+    const selectedStatuses = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
+    console.log('Selected statuses:', selectedStatuses);
+    applyTableFilter('status', selectedStatuses);
+}
+
+function testTypeFilter() {
+    console.log('🧪 Testing type filter...');
+    const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
+    const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
+    console.log('Selected types:', selectedTypes);
+    applyTableFilter('type', selectedTypes);
+}
+
+function testAccountFilter() {
+    console.log('🧪 Testing account filter...');
+    const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+    const selectedAccounts = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
+    console.log('Selected accounts:', selectedAccounts);
+    applyTableFilter('account', selectedAccounts);
+}
+
+function showActiveContainer() {
+    console.log('🔍 Showing active container...');
+    const activeContainer = getActiveTableContainer();
+    console.log('Active container:', activeContainer);
+    alert(`הקונטיינר הפעיל: ${activeContainer || 'לא נמצא'}`);
+}
+
+function testDateFilter() {
+    console.log('🧪 Testing date filter...');
+    const dateRange = 'השבוע'; // או כל ערך אחר
+    console.log('Date range:', dateRange);
+    applyTableFilter('date', [dateRange]);
+}
+
+function testSearchFilter() {
+    console.log('🧪 Testing search filter...');
+    const searchTerm = 'AAPL'; // או כל ערך אחר
+    console.log('Search term:', searchTerm);
+    applyTableFilter('search', [searchTerm]);
+}
 
                 // בדיקת זמינות המערכות
                 setTimeout(() => {

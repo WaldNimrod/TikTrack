@@ -103,26 +103,145 @@ table td:last-child {
     min-width: 120px !important;
     max-width: 120px !important;
     white-space: nowrap !important;
+    vertical-align: middle !important;
 }
 
-/* רוחב קבוע לעמודת הפעולות - כפתורים בשורה אחת */
+/* וידוא שגובה השורות אחיד בכל הטבלה */
+table {
+    table-layout: fixed !important;
+    width: 100% !important;
+}
+
+table td {
+    vertical-align: middle !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* רוחב עמודות לטבלת תזרימי מזומנים - מותאם ל-1000px */
+table[data-table-type="cash_flows"] th:nth-child(1),
+table[data-table-type="cash_flows"] td:nth-child(1) {
+    width: 12% !important; /* חשבון - 120px */
+}
+
+table[data-table-type="cash_flows"] th:nth-child(2),
+table[data-table-type="cash_flows"] td:nth-child(2) {
+    width: 8% !important; /* סוג - 80px */
+}
+
+table[data-table-type="cash_flows"] th:nth-child(3),
+table[data-table-type="cash_flows"] td:nth-child(3) {
+    width: 10% !important; /* סכום - 100px */
+}
+
+table[data-table-type="cash_flows"] th:nth-child(4),
+table[data-table-type="cash_flows"] td:nth-child(4) {
+    width: 5% !important; /* מטבע - 50px */
+}
+
+table[data-table-type="cash_flows"] th:nth-child(5),
+table[data-table-type="cash_flows"] td:nth-child(5) {
+    width: 6% !important; /* שער דולר - 60px */
+}
+
+table[data-table-type="cash_flows"] th:nth-child(6),
+table[data-table-type="cash_flows"] td:nth-child(6) {
+    width: 8% !important; /* תאריך - 80px */
+}
+
+table[data-table-type="cash_flows"] th:nth-child(7),
+table[data-table-type="cash_flows"] td:nth-child(7) {
+    width: 15% !important; /* תיאור - 150px */
+}
+
+table[data-table-type="cash_flows"] th:nth-child(8),
+table[data-table-type="cash_flows"] td:nth-child(8) {
+    width: 8% !important; /* מקור - 80px */
+}
+
+table[data-table-type="cash_flows"] th:nth-child(9),
+table[data-table-type="cash_flows"] td:nth-child(9) {
+    width: 8% !important; /* מזהה חיצוני - 80px */
+}
+
+table[data-table-type="cash_flows"] th:nth-child(10),
+table[data-table-type="cash_flows"] td:nth-child(10) {
+    width: 8% !important; /* נוצר ב - 80px */
+}
+
+/* עמודת פעולות נשארת 120px קבוע */
+table[data-table-type="cash_flows"] th:last-child,
+table[data-table-type="cash_flows"] td:last-child {
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+    border-bottom: 2px solid #f1f3f4 !important;
+}
+
+/* רוחב קבוע לתאי כפתורים - כלל לכל האתר */
 .actions-cell {
     width: 120px !important;
     min-width: 120px !important;
     max-width: 120px !important;
-    white-space: nowrap !important;
     text-align: center !important;
+    vertical-align: middle !important;
+    height: 100% !important;
+    display: table-cell !important;
+    white-space: nowrap !important;
+}
+
+.actions-cell .btn {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.8rem !important;
+    margin: 0 2px !important;
+    vertical-align: middle !important;
+}
+
+/* וידוא שהכפתורים נראים */
+.actions-cell table td {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: table-cell !important;
+    background: transparent !important;
 }
 
 .actions-cell table {
-    width: 100% !important;
-    margin: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: table !important;
+    background: transparent !important;
 }
 
-.actions-cell table td {
-    padding: 0.1rem !important;
-    width: auto !important;
+/* וידוא שהכפתורים נראים גם בטבלת תזרימי מזומנים */
+table[data-table-type="cash_flows"] .actions-cell {
+    background: transparent !important;
+    border: none !important;
 }
+
+table[data-table-type="cash_flows"] .actions-cell table {
+    background: transparent !important;
+    border: none !important;
+}
+
+table[data-table-type="cash_flows"] .actions-cell table td {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* וידוא שכל הכפתורים נראים */
+.actions-cell .btn {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* רוחב קבוע לעמודת הפעולות - כפתורים בשורה אחת */
+/* הועבר להגדרות הגלובליות למעלה */
 
 /* מרווח בתחתית הדף */
 .bottom-spacer {
@@ -1519,4 +1638,75 @@ th button.sortable-header {
 th {
   white-space: nowrap;
   overflow: hidden;
+}
+
+/* ========================================
+   Table Action Button Styles
+   ========================================
+   
+   These styles ensure consistent minimum width for action buttons
+   in tables to prevent layout shifts and jumping.
+   
+   Author: TikTrack Development Team
+   Last Updated: August 26, 2025
+   ======================================== */
+
+/* כפתורי פעולות בטבלאות - רוחב קבוע */
+.table .btn-sm {
+  min-width: 30px !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 2px !important;
+}
+
+/* כפתורי פעולות ספציפיים בטבלאות */
+.table .btn-info,
+.table .btn-success,
+.table .btn-warning,
+.table .btn-danger,
+.table .btn-primary,
+.table .btn-secondary {
+  min-width: 30px !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 2px !important;
+}
+
+/* כפתורי פעולות בעמודות פעולות */
+.actions-cell .btn-sm {
+  min-width: 30px !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 2px !important;
+}
+
+/* כפתורי פעולות עם טקסט */
+.table .btn-sm.btn-with-text {
+  min-width: 60px !important;
+  width: auto !important;
+  padding: 0.25rem 0.5rem !important;
+}
+
+/* כפתורי פעולות גדולים בטבלאות */
+.table .btn-lg {
+  min-width: 40px !important;
+  width: 40px !important;
+  height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 2px !important;
 }

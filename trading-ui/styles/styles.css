@@ -4200,3 +4200,77 @@ a:hover,
   color: #6c757d;
   margin-top: 0.25rem;
 }
+
+/* ========================================
+   Global Action Button Styles
+   ========================================
+   
+   These styles ensure consistent minimum width for all action buttons
+   across all pages to prevent layout shifts and jumping.
+   
+   Author: TikTrack Development Team
+   Last Updated: August 26, 2025
+   ======================================== */
+
+/* כפתורי פעולות - רוחב קבוע מינימאלי */
+.btn-sm {
+  min-width: 30px !important;
+}
+
+.btn {
+  min-width: 80px !important;
+}
+
+.btn-lg {
+  min-width: 120px !important;
+}
+
+/* כפתורי פעולות ספציפיים */
+.btn-info, .btn-success, .btn-warning, .btn-danger, .btn-primary, .btn-secondary {
+  min-width: 30px !important;
+}
+
+/* כפתורי פעולות בטבלאות */
+.table .btn-sm {
+  min-width: 30px !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/* כפתורי פעולות במודלים */
+.modal .btn {
+  min-width: 80px !important;
+}
+
+.modal .btn-sm {
+  min-width: 60px !important;
+}
+
+/* כפתורי פעולות בפורמים */
+.form-actions .btn {
+  min-width: 100px !important;
+}
+
+/* כפתורי פעולות בסרגלי כלים */
+.toolbar .btn {
+  min-width: 40px !important;
+}
+
+/* כפתורי פעולות בתפריטים */
+.dropdown-menu .btn {
+  min-width: 120px !important;
+}
+
+/* כפתורי פעולות בקארדים */
+.card .btn {
+  min-width: 80px !important;
+}
+
+/* כפתורי פעולות בסיידבר */
+.sidebar .btn {
+  min-width: 100px !important;
+}

@@ -90,7 +90,7 @@ class ConstraintManager {
     }
 
     showSampleData() {
-        console.log('הצגת נתונים לדוגמה');
+      
         this.constraints = [
             {
                 id: 1,
@@ -545,7 +545,7 @@ function addEnumValue() {
 
 // Global function to show add constraint modal
 function showAddConstraintModal() {
-    console.log('הצגת מודל הוספת אילוץ');
+  
     // יצירת מודל דינמי אם לא קיים
     let modal = document.getElementById('add-constraint-modal');
     if (!modal) {
@@ -679,25 +679,4 @@ window.loadConstraintsData = function () {
     }
 };
 
-// Global function for filtering constraints data
-window.filterConstraintsData = function (statusValues, typeValues, accountValues, dateRange, searchText) {
-    console.log('סינון אילוצים:', { statusValues, typeValues, accountValues, dateRange, searchText });
-    if (constraintManager) {
-        // Filter constraints based on search text
-        const filteredConstraints = constraintManager.constraints.filter(constraint => {
-            if (!searchText) return true;
 
-            const searchLower = searchText.toLowerCase();
-            return (
-                constraint.table_name.toLowerCase().includes(searchLower) ||
-                constraint.column_name.toLowerCase().includes(searchLower) ||
-                constraint.constraint_name.toLowerCase().includes(searchLower) ||
-                constraint.constraint_definition.toLowerCase().includes(searchLower)
-            );
-        });
-
-        constraintManager.renderFilteredConstraints(filteredConstraints);
-    } else {
-        console.error('Constraint manager not initialized');
-    }
-};

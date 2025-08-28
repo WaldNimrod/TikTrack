@@ -21,8 +21,7 @@
  * Last Updated: August 23, 2025
  */
 
-console.log('🔄 === EXECUTIONS.JS LOADED ===');
-console.log('🔄 Script loaded at:', new Date().toISOString());
+
 
 // משתנים גלובליים
 if (!window.executionsData) {
@@ -32,44 +31,42 @@ let executionsData = window.executionsData;
 
 // פונקציות בסיסיות
 function openExecutionDetails(id) {
-    console.log('פתיחת פרטי עסקה:', id);
+  
     showAddExecutionModal();
 }
 
 function editExecution(id) {
-    console.log('עריכת עסקה:', id);
+  
     showEditExecutionModal(id);
 }
 
 function deleteExecution(id) {
-    console.log('מחיקת עסקה:', id);
+  
     showDeleteExecutionModal(id);
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים
 function toggleExecutionsSection() {
-    console.log('🔄 toggleExecutionsSection נקראה');
+  
     const contentSections = document.querySelectorAll('.content-section');
-    console.log('📋 מספר content-sections נמצא:', contentSections.length);
+  
     const executionsSection = contentSections[0]; // הסקשן הראשון - עסקעות
 
     if (!executionsSection) {
         console.error('❌ לא נמצא סקשן עסקעות');
         return;
     }
-    console.log('✅ סקשן עסקעות נמצא:', executionsSection);
+  
 
     const sectionBody = executionsSection.querySelector('.section-body');
     const toggleBtn = executionsSection.querySelector('button[onclick="toggleExecutionsSection()"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-    console.log('🎯 sectionBody נמצא:', !!sectionBody);
-    console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
-    console.log('🎨 icon נמצא:', !!icon);
+    
 
     if (sectionBody) {
         const isCollapsed = sectionBody.style.display === 'none';
-        console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
+      
 
         if (isCollapsed) {
             sectionBody.style.display = 'block';
@@ -109,9 +106,6 @@ function restoreExecutionsSectionState() {
 }
 
 // פונקציות נוספות
-function resetAllFiltersAndReloadData() {
-    console.log('איפוס פילטרים');
-}
 
 // ========================================
 // פונקציות מודלים
@@ -149,14 +143,14 @@ function resetAddExecutionForm() {
         tradeLinkButton.style.display = 'none';
     }
 
-    console.log('✅ Reset and disabled all fields in add execution form');
+  
 }
 
 /**
  * הצגת מודל הוספת עסקה
  */
 async function showAddExecutionModal() {
-    console.log('🔄 הצגת מודל הוספת עסקה');
+  
 
     // ניקוי והשבתת השדות
     resetAddExecutionForm();
@@ -170,7 +164,7 @@ async function showAddExecutionModal() {
     try {
         const defaultCommission = 1.0; // ערך ברירת מחדל קבוע
         document.getElementById('addExecutionCommission').value = defaultCommission;
-        console.log('💰 עמלה ברירת מחדל נטענה:', defaultCommission);
+      
     } catch (error) {
         console.warn('⚠️ לא ניתן לטעון עמלה ברירת מחדל:', error);
         document.getElementById('addExecutionCommission').value = 1.0;
@@ -219,14 +213,14 @@ function resetEditExecutionForm() {
         tradeLinkButton.style.display = 'none';
     }
 
-    console.log('✅ Reset and disabled all fields in edit execution form');
+  
 }
 
 /**
  * הצגת מודל עריכת עסקה
  */
 async function showEditExecutionModal(id) {
-    console.log('🔄 הצגת מודל עריכת עסקה:', id);
+  
 
     // מציאת העסקה לפי ID
     const execution = executionsData.find(e => e.id == id);
@@ -253,7 +247,7 @@ async function showEditExecutionModal(id) {
             if (trade) {
                 linkedObject = { type: 'trade', data: trade };
                 tickerId = trade.ticker_id;
-                console.log('✅ Found linked trade:', trade);
+              
             }
         }
 
@@ -269,7 +263,7 @@ async function showEditExecutionModal(id) {
                     if (plan) {
                         linkedObject = { type: 'plan', data: plan };
                         tickerId = plan.ticker_id;
-                        console.log('✅ Found linked plan:', plan);
+                      
                     }
                 }
             } catch (error) {
@@ -313,7 +307,7 @@ async function showEditExecutionModal(id) {
                 const date = new Date(executionDate);
                 const localDateTime = date.toISOString().slice(0, 16);
                 document.getElementById('editExecutionDate').value = localDateTime;
-                console.log('✅ Loaded execution date:', executionDate, '->', localDateTime);
+              
             } catch (error) {
                 console.warn('⚠️ Error processing execution date:', executionDate, error);
                 document.getElementById('editExecutionDate').value = '';
@@ -355,7 +349,7 @@ async function showEditExecutionModal(id) {
  * הצגת מודל מחיקת עסקה
  */
 async function showDeleteExecutionModal(id) {
-    console.log('🔄 הצגת מודל מחיקת עסקה:', id);
+  
 
     // מציאת העסקה לפי ID
     const execution = executionsData.find(e => e.id == id);
@@ -808,7 +802,7 @@ function validateExecutionForm() {
  * שמירת עסקה חדשה
  */
 async function saveExecution() {
-    console.log('🔄 שמירת עסקה חדשה');
+  
 
     // ולידציה
     const tradeIdValue = document.getElementById('addExecutionTradeId').value;
@@ -853,8 +847,7 @@ async function saveExecution() {
             notes: notes || null
         };
 
-        console.log('📤 שליחת נתונים:', executionData);
-        console.log('🔍 ערך action שנשלח:', type);
+        
 
         const response = await fetch('/api/v1/executions', {
             method: 'POST',
@@ -866,7 +859,7 @@ async function saveExecution() {
 
         if (response.ok) {
             const result = await response.json();
-            console.log('✅ עסקה נשמרה בהצלחה:', result);
+          
 
             // סגירת המודל
             const modal = bootstrap.Modal.getInstance(document.getElementById('addExecutionModal'));
@@ -894,7 +887,7 @@ async function saveExecution() {
  * עדכון עסקה קיימת
  */
 async function updateExecution() {
-    console.log('🔄 עדכון עסקה');
+  
 
     const id = document.getElementById('editExecutionId').value;
     const tradeIdValue = document.getElementById('editExecutionTradeId').value;
@@ -941,7 +934,7 @@ async function updateExecution() {
             notes: notes || null
         };
 
-        console.log('📤 שליחת נתונים לעדכון:', executionData);
+      
 
         const response = await fetch(`/api/v1/executions/${id}`, {
             method: 'PUT',
@@ -953,7 +946,7 @@ async function updateExecution() {
 
         if (response.ok) {
             const result = await response.json();
-            console.log('✅ עסקה עודכנה בהצלחה:', result);
+          
 
             // סגירת המודל
             const modal = bootstrap.Modal.getInstance(document.getElementById('editExecutionModal'));
@@ -981,7 +974,7 @@ async function updateExecution() {
  * אישור מחיקת עסקה
  */
 async function confirmDeleteExecution() {
-    console.log('🔄 אישור מחיקת עסקה');
+  
 
     const id = document.getElementById('deleteExecutionId').value;
 
@@ -991,7 +984,7 @@ async function confirmDeleteExecution() {
         });
 
         if (response.ok) {
-            console.log('✅ עסקה נמחקה בהצלחה');
+          
 
             // סגירת המודל
             const modal = bootstrap.Modal.getInstance(document.getElementById('deleteExecutionModal'));
@@ -1623,71 +1616,6 @@ async function updateExecutionsTableMain(executions) {
 // פונקציה formatDate מוגדרת בקובץ main.js
 
 // פונקציית פילטור מקומי לעסקאות
-function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
-    console.log('🔍 filterExecutionsLocally called with:', { selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm });
-
-    return executions.filter(execution => {
-        // פילטר חיפוש
-        if (searchTerm && searchTerm.trim() !== '') {
-            const searchLower = searchTerm.toLowerCase();
-            const symbol = execution.symbol || '';
-            const action = execution.action || execution.type || '';
-            const notes = execution.notes || '';
-
-            if (!symbol.toLowerCase().includes(searchLower) &&
-                !action.toLowerCase().includes(searchLower) &&
-                !notes.toLowerCase().includes(searchLower)) {
-                return false;
-            }
-        }
-
-        // פילטר סוג (type)
-        if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('הכול')) {
-            const executionType = (execution.action || execution.type) === 'buy' ? 'קניה' :
-                (execution.action || execution.type) === 'sale' ? 'מכירה' : (execution.action || execution.type);
-
-            if (!selectedTypes.includes(executionType)) {
-                return false;
-            }
-        }
-
-        // פילטר תאריך
-        if (dateRange && dateRange !== 'כל זמן' && dateRange !== 'הכול') {
-            const executionDate = new Date(execution.created_at || execution.date || execution.execution_date);
-            const now = new Date();
-
-            let startDate, endDate;
-
-            switch (dateRange) {
-                case 'היום':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-                    break;
-                case 'אתמול':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    break;
-                case 'השבוע':
-                    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
-                    startDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-                    break;
-                case '30 יום':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-                    break;
-                default:
-                    return true; // אם לא מוכר, לא מסנן
-            }
-
-            if (executionDate < startDate || executionDate >= endDate) {
-                return false;
-            }
-        }
-
-        return true;
-    });
-}
 
 // הגדרת הפונקציה כגלובלית
 window.filterExecutionsLocally = filterExecutionsLocally;

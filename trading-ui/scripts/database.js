@@ -353,9 +353,7 @@ function restoreDatabaseSectionState() {
 
 // פונקציה לטעינת כל הנתונים
 async function loadAllData() {
-  console.log('🔄 === loadAllData נקראה! ===');
-  console.log('🔄 === טוען את כל הנתונים ===');
-  console.log('📊 allData לפני טעינה:', allData);
+
 
   try {
     // שימוש בפונקציה החדשה לטעינה מקבילה עם התקדמות
@@ -833,12 +831,12 @@ function updateNotesTable() {
 
 // פונקציות פעולות
 function refreshAllData() {
-  console.log('🔄 רענון כל הנתונים');
+
   loadAllData();
 }
 
 function exportAllData() {
-  console.log('📤 ייצוא נתונים');
+
   const dataStr = JSON.stringify(allData, null, 2);
   const dataBlob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(dataBlob);
@@ -851,7 +849,7 @@ function exportAllData() {
 
 // פונקציה להוספת רשומה חדשה
 function addRecord() {
-  console.log('➕ הוספת רשומה חדשה...');
+
 
   // זיהוי הטבלה הנוכחית לפי הכפתור שנלחץ
   const activeElement = document.activeElement;
@@ -944,7 +942,7 @@ function addRecord() {
 
 // פונקציות ביטול
 function cancelAccount(id) {
-  console.log('❌ ביטול חשבון:', id);
+
   if (confirm('האם אתה בטוח שברצונך לבטל חשבון זה?')) {
     // TODO: קריאה ל-API לביטול החשבון
     alert('פונקציית ביטול חשבון תתווסף בקרוב');
@@ -952,7 +950,7 @@ function cancelAccount(id) {
 }
 
 function cancelTrade(id) {
-  console.log('❌ ביטול טרייד:', id);
+
   if (confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
     // TODO: קריאה ל-API לביטול הטרייד
     alert('פונקציית ביטול טרייד תתווסף בקרוב');
@@ -960,7 +958,7 @@ function cancelTrade(id) {
 }
 
 function cancelTradePlan(id) {
-  console.log('❌ ביטול תוכנית מסחר:', id);
+
   if (confirm('האם אתה בטוח שברצונך לבטל תוכנית מסחר זו?')) {
     // TODO: קריאה ל-API לביטול התוכנית
     alert('פונקציית ביטול תוכנית מסחר תתווסף בקרוב');
@@ -968,7 +966,7 @@ function cancelTradePlan(id) {
 }
 
 function cancelAlert(id) {
-  console.log('❌ ביטול התראה:', id);
+
   if (confirm('האם אתה בטוח שברצונך לבטל התראה זו?')) {
     // TODO: קריאה ל-API לביטול ההתראה
     alert('פונקציית ביטול התראה תתווסף בקרוב');
@@ -976,7 +974,7 @@ function cancelAlert(id) {
 }
 
 function showDatabaseInfo() {
-  console.log('ℹ️ מידע בסיס נתונים');
+
   alert('מידע על בסיס הנתונים:\n\n' +
     'מספר טבלאות: 9\n' +
     'חשבונות: ' + allData.accounts.length + '\n' +
@@ -991,7 +989,7 @@ function showDatabaseInfo() {
 }
 
 function showBackupOptions() {
-  console.log('💾 אפשרויות גיבוי');
+
   alert('אפשרויות גיבוי:\n\n' +
     '1. ייצוא JSON - ייצא את כל הנתונים לקובץ JSON\n' +
     '2. גיבוי SQL - ייצא את מבנה הטבלאות והנתונים\n' +
@@ -1003,21 +1001,21 @@ function viewAccount(id) {
   if (typeof window.showEditAccountModalById === 'function') {
     window.showEditAccountModalById(id);
   } else {
-    console.log('צפייה בחשבון:', id);
+  
   }
 }
 function editAccount(id) {
   if (typeof window.showEditAccountModalById === 'function') {
     window.showEditAccountModalById(id);
   } else {
-    console.log('עריכת חשבון:', id);
+  
   }
 }
 function deleteAccount(id) {
   if (typeof window.deleteAccount === 'function') {
     window.deleteAccount(id);
   } else {
-    console.log('מחיקת חשבון:', id);
+  
   }
 }
 
@@ -1025,21 +1023,21 @@ function viewTrade(id) {
   if (typeof window.editTradeRecord === 'function') {
     window.editTradeRecord(id);
   } else {
-    console.log('צפייה בטרייד:', id);
+  
   }
 }
 function editTrade(id) {
   if (typeof window.editTradeRecord === 'function') {
     window.editTradeRecord(id);
   } else {
-    console.log('עריכת טרייד:', id);
+  
   }
 }
 function deleteTrade(id) {
   if (typeof window.deleteTradeRecord === 'function') {
     window.deleteTradeRecord(id);
   } else {
-    console.log('מחיקת טרייד:', id);
+  
   }
 }
 
@@ -1047,21 +1045,21 @@ function viewTicker(id) {
   if (typeof window.showEditTickerModal === 'function') {
     window.showEditTickerModal(id);
   } else {
-    console.log('צפייה בטיקר:', id);
+  
   }
 }
 function editTicker(id) {
   if (typeof window.showEditTickerModal === 'function') {
     window.showEditTickerModal(id);
   } else {
-    console.log('עריכת טיקר:', id);
+  
   }
 }
 function deleteTicker(id) {
   if (typeof window.showDeleteTickerModal === 'function') {
     window.showDeleteTickerModal(id);
   } else {
-    console.log('מחיקת טיקר:', id);
+  
   }
 }
 
@@ -1069,21 +1067,21 @@ function viewTradePlan(id) {
   if (typeof window.openEditTradePlanModal === 'function') {
     window.openEditTradePlanModal(id);
   } else {
-    console.log('צפייה בתוכנית:', id);
+  
   }
 }
 function editTradePlan(id) {
   if (typeof window.openEditTradePlanModal === 'function') {
     window.openEditTradePlanModal(id);
   } else {
-    console.log('עריכת תוכנית:', id);
+  
   }
 }
 function deleteTradePlan(id) {
   if (typeof window.openDeleteTradePlanModal === 'function') {
     window.openDeleteTradePlanModal(id);
   } else {
-    console.log('מחיקת תוכנית:', id);
+  
   }
 }
 
@@ -1091,21 +1089,21 @@ function viewExecution(id) {
   if (typeof window.showEditExecutionModal === 'function') {
     window.showEditExecutionModal(id);
   } else {
-    console.log('צפייה בביצוע:', id);
+  
   }
 }
 function editExecution(id) {
   if (typeof window.showEditExecutionModal === 'function') {
     window.showEditExecutionModal(id);
   } else {
-    console.log('עריכת ביצוע:', id);
+  
   }
 }
 function deleteExecution(id) {
   if (typeof window.showDeleteExecutionModal === 'function') {
     window.showDeleteExecutionModal(id);
   } else {
-    console.log('מחיקת ביצוע:', id);
+  
   }
 }
 
@@ -1113,21 +1111,21 @@ function viewCashFlow(id) {
   if (typeof window.showEditCashFlowModal === 'function') {
     window.showEditCashFlowModal(id);
   } else {
-    console.log('צפייה בתזרים:', id);
+  
   }
 }
 function editCashFlow(id) {
   if (typeof window.showEditCashFlowModal === 'function') {
     window.showEditCashFlowModal(id);
   } else {
-    console.log('עריכת תזרים:', id);
+  
   }
 }
 function deleteCashFlow(id) {
   if (typeof window.showDeleteCashFlowModal === 'function') {
     window.showDeleteCashFlowModal(id);
   } else {
-    console.log('מחיקת תזרים:', id);
+  
   }
 }
 
@@ -1135,21 +1133,21 @@ function viewAlert(id) {
   if (typeof window.editAlert === 'function') {
     window.editAlert(id);
   } else {
-    console.log('צפייה בהתראה:', id);
+  
   }
 }
 function editAlert(id) {
   if (typeof window.editAlert === 'function') {
     window.editAlert(id);
   } else {
-    console.log('עריכת התראה:', id);
+  
   }
 }
 function deleteAlert(id) {
   if (typeof window.deleteAlert === 'function') {
     window.deleteAlert(id);
   } else {
-    console.log('מחיקת התראה:', id);
+  
   }
 }
 
@@ -1157,21 +1155,21 @@ function viewNote(id) {
   if (typeof window.showEditNoteModal === 'function') {
     window.showEditNoteModal(id);
   } else {
-    console.log('צפייה בהערה:', id);
+  
   }
 }
 function editNote(id) {
   if (typeof window.showEditNoteModal === 'function') {
     window.showEditNoteModal(id);
   } else {
-    console.log('עריכת הערה:', id);
+  
   }
 }
 function deleteNote(id) {
   if (typeof window.showDeleteNoteModal === 'function') {
     window.showDeleteNoteModal(id);
   } else {
-    console.log('מחיקת הערה:', id);
+  
   }
 }
 
@@ -1179,9 +1177,7 @@ function deleteNote(id) {
 
 // פונקציה למיון טבלאות בעמוד בסיס הנתונים
 function sortTable(columnIndex, tableId) {
-  console.log('🔄 === SORT DATABASE TABLE ===');
-  console.log('🔄 Column clicked:', columnIndex);
-  console.log('🔄 Table ID:', tableId);
+
 
   // קבלת סוג הטבלה מה-data-table-type
   const table = document.getElementById(tableId);
@@ -1196,7 +1192,7 @@ function sortTable(columnIndex, tableId) {
     return;
   }
 
-  console.log('🔄 Table type:', tableType);
+
 
   // קבלת הנתונים המתאימים לפי סוג הטבלה
   let data = [];
@@ -1241,8 +1237,7 @@ function sortTable(columnIndex, tableId) {
       return;
   }
 
-  console.log('🔄 Data length:', data.length);
-  console.log('🔄 Update function:', updateFunction ? 'found' : 'not found');
+
 
   // קריאה לפונקציה הגלובלית למיון
   if (typeof window.sortTableData === 'function') {
@@ -1297,44 +1292,24 @@ window.deleteNote = deleteNote;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🔄 === DOM CONTENT LOADED (DATABASE) ===');
-  console.log('📄 Current page:', window.location.pathname);
-  console.log('🔍 Document ready state:', document.readyState);
+
 
   try {
-    console.log('🔄 שחזור מצב הסגירה...');
+  
     // שחזור מצב הסגירה
     restoreDatabaseSectionState();
-    console.log('✅ מצב הסגירה שוחזר');
+  
 
-    console.log('🔄 מתחיל טעינת נתונים...');
+  
     // טעינת נתונים
     loadAllData();
-    console.log('✅ טעינת נתונים הוזמנה');
+  
 
-    console.log('✅ דף בסיס נתונים נטען בהצלחה');
+  
   } catch (error) {
     console.error('❌ שגיאה באתחול דף בסיס נתונים:', error);
     console.error('❌ Stack trace:', error.stack);
   }
 });
 
-// פונקציה לעדכון טקסט פילטר חשבונות (נדרשת למערכת הפילטרים)
-function updateAccountFilterDisplayText() {
-  console.log('🔄 updateAccountFilterDisplayText called');
 
-  // עדכון טקסט פילטר חשבונות ב-header
-  const accountFilterButton = document.getElementById('accountFilterButton');
-  if (accountFilterButton) {
-    const selectedAccounts = window.simpleFilter?.currentFilters?.account || [];
-    if (selectedAccounts && selectedAccounts.length > 0) {
-      accountFilterButton.textContent = `${selectedAccounts.length} חשבונות נבחרו`;
-    } else {
-      accountFilterButton.textContent = 'כל החשבונות';
-    }
-  }
-  console.log('✅ updateAccountFilterDisplayText completed');
-}
-
-// הגדרת הפונקציה כגלובלית
-window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;

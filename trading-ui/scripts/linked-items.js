@@ -194,6 +194,9 @@ function viewLinkedItems(itemId, itemType = null) {
  */
 function showLinkedItemsModal(data, itemType, itemId) {
 
+    // הצגת הודעה חשובה
+    alert('ממש חשוב, נכון. אנחנו עובדים על זה.');
+
     // Create modal content
     const modalContent = createLinkedItemsModalContent(data, itemType, itemId);
 

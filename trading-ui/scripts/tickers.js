@@ -29,22 +29,21 @@
  */
 
 // משתנים גלובליים
-console.log('🔄 === TICKERS.JS LOADING STARTED ===');
+
 if (!window.tickersData) {
     window.tickersData = [];
-    console.log('🔄 יצירת window.tickersData חדש');
+  
 }
 if (!window.currenciesData) {
     window.currenciesData = [];
-    console.log('🔄 יצירת window.currenciesData חדש');
+  
 }
 if (!window.currenciesLoaded) {
     window.currenciesLoaded = false;
-    console.log('🔄 יצירת window.currenciesLoaded חדש');
+  
 }
 let tickersData = window.tickersData;
-console.log('🔄 tickersData נוצר:', tickersData);
-console.log('🔄 window.tickersData:', window.tickersData);
+
 
 // מפת צבעים לסוגי טיקרים
 const tickerTypeColors = {

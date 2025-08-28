@@ -17,16 +17,20 @@
 
 // פונקציות בסיסיות
 function openResearchDetails(id) {
+
 }
 
 function editResearch(id) {
+
 }
 
 function deleteResearch(id) {
+
 }
 
 // פונקציות לטריידים
 function loadTrades() {
+
   if (typeof window.loadTradesData === 'function') {
     window.loadTradesData();
   } else {
@@ -35,6 +39,7 @@ function loadTrades() {
 }
 
 function showAddTradeModal() {
+
   if (typeof window.showAddTradeModal === 'function') {
     window.showAddTradeModal();
   } else {
@@ -43,6 +48,7 @@ function showAddTradeModal() {
 }
 
 function filterTradesData(statuses, types, accounts, dateRange, searchTerm) {
+
   if (typeof window.filterTradesData === 'function') {
     window.filterTradesData(statuses, types, accounts, dateRange, searchTerm);
   } else {
@@ -52,7 +58,7 @@ function filterTradesData(statuses, types, accounts, dateRange, searchTerm) {
 
 // פונקציות לפתיחה/סגירה של סקשנים
 function toggleTopSection() {
-  console.log('🔄 toggleTopSection נקראה - סגירה/פתיחה של כל הסקשנים');
+
 
   // מציאת כל הסקשנים
   const topSection = document.querySelector('.top-section');
@@ -111,20 +117,20 @@ function toggleTopSection() {
   // שמירת המצב ב-localStorage
   localStorage.setItem('allSectionsCollapsed', !shouldOpen);
 
-  console.log(`✅ כל הסקשנים ${shouldOpen ? 'נפתחו' : 'נסגרו'}`);
+
 }
 
 function toggleResearchSection() {
-  console.log('🔄 toggleResearchSection נקראה');
+
   const contentSections = document.querySelectorAll('.content-section');
-  console.log('📋 מספר content-sections נמצא:', contentSections.length);
+
   const researchSection = contentSections[1]; // הסקשן השני - טריידים
 
   if (!researchSection) {
     console.error('❌ לא נמצא סקשן טריידים');
     return;
   }
-  console.log('✅ סקשן טריידים נמצא:', researchSection);
+
 
   const sectionBody = researchSection.querySelector('.section-body');
   const toggleBtn = researchSection.querySelector('button[onclick="toggleResearchSection()"]');

@@ -35,7 +35,7 @@
 
     <!-- 3. General styles -->
     <link rel="stylesheet" href="styles/styles.css">
-
+    <link rel="stylesheet" href="styles/header-system.css">
     <!-- 4. Typography -->
     <link rel="stylesheet" href="styles/typography.css">
 
@@ -43,7 +43,6 @@
     <link rel="stylesheet" href="styles/table.css">
 
     <!-- 6. Header system styles (highest priority) -->
-    <link rel="stylesheet" href="styles/header-system.css">
 
     <!-- 7. Warning system styles (new centralized warning system) -->
     <link rel="stylesheet" href="styles/warning-system.css">
@@ -117,7 +116,7 @@
                         </div>
                         <div class="table-count">0 תזרימים</div>
                         <div class="table-actions">
-                            <button class="refresh-btn" onclick="openCashFlowDetails()" title="הוסף תזרים מזומנים חדש">
+                            <button class="refresh-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים מזומנים חדש">
                                 <img src="images/icons/trades.svg" alt="הוסף" class="action-icon"
                                     style="width: 16px; height: 16px;"> הוסף
                             </button>
@@ -132,7 +131,7 @@
                     <!-- Cash flows table -->
                     <div class="section-body">
                         <div class="table-responsive" id="cashFlowsContainer">
-                            <table class="table" id="cashFlowsTable" data-table-type="cash_flows">
+                            <table class="table" data-table-type="cash_flows">
                                 <thead>
                                     <tr>
 
@@ -241,7 +240,6 @@
                                     <select class="form-control" id="cashFlowAccountId" required>
                                         <option value="">בחר חשבון...</option>
                                     </select>
-                                    <div class="invalid-feedback" id="cashFlowAccountIdError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -249,15 +247,15 @@
                                     <label for="cashFlowType" class="form-label">סוג</label>
                                     <select class="form-control" id="cashFlowType" required>
                                         <option value="">בחר סוג...</option>
-                                        <option value="deposit">הפקדה</option>
-                                        <option value="withdrawal">משיכה</option>
+                                        <option value="income">הכנסה</option>
+                                        <option value="expense">הוצאה</option>
                                         <option value="dividend">דיבידנד</option>
                                         <option value="fee">עמלה</option>
                                         <option value="tax">מס</option>
                                         <option value="interest">ריבית</option>
+                                        <option value="transfer">העברה</option>
                                         <option value="other">אחר</option>
                                     </select>
-                                    <div class="invalid-feedback" id="cashFlowTypeError"></div>
                                 </div>
                             </div>
                         </div>
@@ -267,7 +265,6 @@
                                     <label for="cashFlowAmount" class="form-label">סכום</label>
                                     <input type="number" class="form-control" id="cashFlowAmount" step="0.01" required
                                         placeholder="הכנס סכום...">
-                                    <div class="invalid-feedback" id="cashFlowAmountError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -276,7 +273,6 @@
                                     <select class="form-control" id="cashFlowCurrencyId" required>
                                         <option value="">בחר מטבע...</option>
                                     </select>
-                                    <div class="invalid-feedback" id="cashFlowCurrencyIdError"></div>
                                 </div>
                             </div>
                         </div>
@@ -285,7 +281,6 @@
                                 <div class="mb-3">
                                     <label for="cashFlowDate" class="form-label">תאריך</label>
                                     <input type="date" class="form-control" id="cashFlowDate" required>
-                                    <div class="invalid-feedback" id="cashFlowDateError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -296,7 +291,6 @@
                                         <option value="file_import" disabled>ייבוא מקובץ (לא נתמך כרגע)</option>
                                         <option value="direct_import" disabled>ייבוא ישיר (לא נתמך כרגע)</option>
                                     </select>
-                                    <div class="invalid-feedback" id="cashFlowSourceError"></div>
                                 </div>
                             </div>
                         </div>
@@ -306,7 +300,6 @@
                                     <label for="cashFlowDescription" class="form-label">תיאור</label>
                                     <textarea class="form-control" id="cashFlowDescription" rows="3"
                                         placeholder="תיאור התזרים..." maxlength="500"></textarea>
-                                    <div class="invalid-feedback" id="cashFlowDescriptionError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -314,7 +307,6 @@
                                     <label for="cashFlowExternalId" class="form-label">מזהה חיצוני</label>
                                     <input type="text" class="form-control" id="cashFlowExternalId"
                                         placeholder="מזהה הרשומה אצל הברוקר..." maxlength="100" disabled>
-                                    <div class="invalid-feedback" id="cashFlowExternalIdError"></div>
                                     <small class="form-text text-muted">נדרש רק כאשר המקור אינו ידני</small>
                                 </div>
                             </div>
@@ -351,7 +343,6 @@
                                     <select class="form-control" id="editCashFlowAccountId" required>
                                         <option value="">בחר חשבון...</option>
                                     </select>
-                                    <div class="invalid-feedback" id="editCashFlowAccountIdError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -359,15 +350,15 @@
                                     <label for="editCashFlowType" class="form-label">סוג</label>
                                     <select class="form-control" id="editCashFlowType" required>
                                         <option value="">בחר סוג...</option>
-                                        <option value="deposit">הפקדה</option>
-                                        <option value="withdrawal">משיכה</option>
+                                        <option value="income">הכנסה</option>
+                                        <option value="expense">הוצאה</option>
                                         <option value="dividend">דיבידנד</option>
                                         <option value="fee">עמלה</option>
                                         <option value="tax">מס</option>
                                         <option value="interest">ריבית</option>
+                                        <option value="transfer">העברה</option>
                                         <option value="other">אחר</option>
                                     </select>
-                                    <div class="invalid-feedback" id="editCashFlowTypeError"></div>
                                 </div>
                             </div>
                         </div>
@@ -377,7 +368,6 @@
                                     <label for="editCashFlowAmount" class="form-label">סכום</label>
                                     <input type="number" class="form-control" id="editCashFlowAmount" step="0.01"
                                         required placeholder="הכנס סכום...">
-                                    <div class="invalid-feedback" id="editCashFlowAmountError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -386,7 +376,6 @@
                                     <select class="form-control" id="editCashFlowCurrencyId" required>
                                         <option value="">בחר מטבע...</option>
                                     </select>
-                                    <div class="invalid-feedback" id="editCashFlowCurrencyIdError"></div>
                                 </div>
                             </div>
                         </div>
@@ -395,7 +384,6 @@
                                 <div class="mb-3">
                                     <label for="editCashFlowDate" class="form-label">תאריך</label>
                                     <input type="date" class="form-control" id="editCashFlowDate" required>
-                                    <div class="invalid-feedback" id="editCashFlowDateError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -406,7 +394,6 @@
                                         <option value="file_import">ייבוא מקובץ</option>
                                         <option value="direct_import">ייבוא ישיר</option>
                                     </select>
-                                    <div class="invalid-feedback" id="editCashFlowSourceError"></div>
                                 </div>
                             </div>
                         </div>
@@ -416,7 +403,6 @@
                                     <label for="editCashFlowDescription" class="form-label">תיאור</label>
                                     <textarea class="form-control" id="editCashFlowDescription" rows="3"
                                         placeholder="תיאור התזרים..." maxlength="500"></textarea>
-                                    <div class="invalid-feedback" id="editCashFlowDescriptionError"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -424,7 +410,6 @@
                                     <label for="editCashFlowExternalId" class="form-label">מזהה חיצוני</label>
                                     <input type="text" class="form-control" id="editCashFlowExternalId"
                                         placeholder="מזהה הרשומה אצל הברוקר..." maxlength="100" disabled>
-                                    <div class="invalid-feedback" id="editCashFlowExternalIdError"></div>
                                     <small class="form-text text-muted">נדרש רק כאשר המקור אינו ידני</small>
                                 </div>
                             </div>
@@ -447,24 +432,22 @@
 
     <!-- Modular files -->
     <script src="scripts/button-icons.js"></script>
-    <script src="scripts/header-system.js"></script>
     <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/simple-filter.js"></script>
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/ui-utils.js"></script>
     <script src="scripts/validation-utils.js"></script>
+    <script src="scripts/notification-system.js"></script>
     <script src="scripts/crud-utils.js"></script>
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/date-utils.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/linked-items.js"></script>
-    <script src="scripts/filter-system.js"></script>
+    <!-- <script src="scripts/filter-system.js"></script> -->
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/main.js"></script>
-    <script src="scripts/alerts.js"></script>
-
-    <script src="scripts/cash_flows.js"></script>
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/cash_flows.js?v=20250828_019"></script>
 
     <!-- Page initialization -->
     <script>

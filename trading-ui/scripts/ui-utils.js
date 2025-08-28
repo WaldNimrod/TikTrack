@@ -1398,8 +1398,13 @@ function createLinkedItemsWarningModal(itemTypeDisplay, linkedCount, onConfirm, 
 function showValidationWarning(field, message) {
     console.log('🔧 showValidationWarning called with:', { field, message });
 
-    // Use simple alert directly - skip the complex warning system for now
-    alert(`שגיאת אימות בשדה "${field}": ${message}`);
+    // Use our notification system instead of alert
+    if (window.showInfoNotification) {
+        window.showInfoNotification('מידע על הטופס', `${message}`);
+    } else {
+        // Fallback to alert if notification system is not available
+        alert(`${message}`);
+    }
 }
 
 // Export individual functions to global scope

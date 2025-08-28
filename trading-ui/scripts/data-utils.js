@@ -41,7 +41,7 @@ async function loadCurrenciesFromServer() {
       const currencies = responseData.data || responseData;
       window.currenciesData = currencies;
       window.currenciesLoaded = true;
-      console.log('✅ Currencies loaded successfully:', currencies.length);
+      
       return currencies;
     } else {
       // טעינת מטבעות ברירת מחדל
@@ -49,7 +49,7 @@ async function loadCurrenciesFromServer() {
         { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
       ];
       window.currenciesLoaded = true;
-      console.log('⚠️ Using default currencies');
+      
       return window.currenciesData;
     }
 
@@ -60,7 +60,7 @@ async function loadCurrenciesFromServer() {
       { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
     ];
     window.currenciesLoaded = true;
-    console.log('⚠️ Using default currencies due to error');
+    
     return window.currenciesData;
   }
 }
@@ -180,7 +180,7 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
       const data = response.data || response;
 
       if (Array.isArray(data)) {
-        console.log(`✅ Data loaded from ${endpoint}:`, data.length, 'items');
+
         return data;
       } else {
         console.warn('⚠️ Response is not an array:', typeof data);
@@ -214,7 +214,7 @@ function validateDataStructure(data, type = 'data') {
     return false;
   }
 
-  console.log(`✅ ${type} validation passed:`, data.length, 'items');
+  
   return true;
 }
 
@@ -254,6 +254,17 @@ window.loadDataFromAPI = loadDataFromAPI;
 window.validateDataStructure = validateDataStructure;
 window.filterDataBySearch = filterDataBySearch;
 
-console.log('✅ Data Utils loaded successfully');
+// Export module
+window.dataUtils = {
+    loadCurrenciesFromServer,
+    getCurrencyDisplay,
+    generateCurrencyOptions,
+    apiCall,
+    loadDataFromAPI,
+    validateDataStructure,
+    filterDataBySearch
+};
+
+
 
 

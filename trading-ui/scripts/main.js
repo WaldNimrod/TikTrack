@@ -7,7 +7,7 @@
  * 
  * This file has undergone significant refactoring to improve code organization:
  * 
- * ORIGINAL STATE (v1.9.9):
+ * ORIGINAL STATE (v2.2):
  * - 2153 lines of mixed functionality
  * - Duplicate functions across multiple files
  * - Difficult to maintain and debug
@@ -83,7 +83,7 @@
  * page-utils.js:
  * - Page initialization functions
  * - Page state management
- * - Filter setup and management
+
  * - Navigation utilities
  * 
  * DEPENDENCIES:
@@ -96,7 +96,7 @@
  * =========================
  * 1. header-system.js
  * 2. console-cleanup.js
- * 3. simple-filter.js
+
  * 4. translation-utils.js
  * 5. data-utils.js
  * 6. ui-utils.js
@@ -147,8 +147,7 @@ function initializeApplication() {
  */
 function checkDependencies() {
   const requiredModules = [
-    'headerSystem',
-    'simpleFilter',
+    'HeaderSystem',
     'translationUtils',
     'dataUtils',
     'uiUtils',
@@ -163,7 +162,10 @@ function checkDependencies() {
 
   if (missingModules.length > 0) {
     console.warn('⚠️ Missing modules:', missingModules);
-    return false;
+    console.log('🔍 Available modules:', Object.keys(window).filter(key => requiredModules.includes(key)));
+    console.log('🔍 All window keys:', Object.keys(window).filter(key => key.includes('Utils') || key.includes('System') || key.includes('Mappings')));
+    // לא נחזיר false כדי לא לעצור את האתחול
+    return true;
   }
 
   return true;
@@ -174,25 +176,12 @@ function checkDependencies() {
  * Sets up global event handlers and system-wide functionality
  */
 function initializeCoreSystems() {
-  console.log('🔄 initializeCoreSystems called');
-
   // Initialize header system
-  if (window.headerSystem && typeof window.headerSystem.init === 'function') {
-    window.headerSystem.init();
+  if (window.HeaderSystem && typeof window.HeaderSystem.init === 'function') {
+    window.HeaderSystem.init();
   }
 
-  // Initialize filter system
-  if (window.simpleFilter && typeof window.simpleFilter.init === 'function') {
-    window.simpleFilter.init();
-  }
 
-  // Restore section states from localStorage
-  if (typeof window.restoreAllSectionStates === 'function') {
-    console.log('🔄 Calling restoreAllSectionStates from initializeCoreSystems');
-    window.restoreAllSectionStates();
-  } else {
-    console.warn('⚠️ restoreAllSectionStates function not found');
-  }
 
   // Set up global error handlers
   window.addEventListener('error', handleGlobalError);
@@ -206,48 +195,48 @@ function initializeCoreSystems() {
  * Set up global modal configurations to prevent closing on backdrop click
  */
 function setupGlobalModalConfigurations() {
-  console.log('🔄 Setting up global modal configurations...');
 
+  
   // Find all modals and configure them
   const modals = document.querySelectorAll('.modal');
-
+  
   modals.forEach(modalElement => {
     const modalId = modalElement.id;
     const existingBackdrop = modalElement.getAttribute('data-bs-backdrop');
     const existingKeyboard = modalElement.getAttribute('data-bs-keyboard');
-
+    
     // If modal already has specific backdrop settings, respect them
     if (existingBackdrop && existingKeyboard) {
-      console.log(`✅ Modal ${modalId || 'unnamed'} already configured: backdrop=${existingBackdrop}, keyboard=${existingKeyboard}`);
+    
       return;
     }
-
+    
     // Default configuration for modals without specific settings
     modalElement.setAttribute('data-bs-backdrop', 'true');
     modalElement.setAttribute('data-bs-keyboard', 'true');
-
+    
     // Special handling for specific modals that should not close on backdrop click
     if (modalId && (
-      modalId.includes('delete') ||
-      modalId.includes('warning') ||
+      modalId.includes('delete') || 
+      modalId.includes('warning') || 
       modalId.includes('confirm') ||
       (modalId.includes('linkedItems') && !modalId.includes('details'))
     )) {
       modalElement.setAttribute('data-bs-backdrop', 'static');
       modalElement.setAttribute('data-bs-keyboard', 'false');
-
+      
       // Prevent closing on backdrop click for these modals
-      modalElement.addEventListener('click', function (event) {
+      modalElement.addEventListener('click', function(event) {
         if (event.target === modalElement) {
           event.preventDefault();
           event.stopPropagation();
           return false;
         }
       });
-
-      console.log(`✅ Modal ${modalId} configured with static backdrop (confirmation/warning modal)`);
+      
+    
     } else {
-      console.log(`✅ Modal ${modalId || 'unnamed'} configured with clickable backdrop`);
+    
     }
   });
 }
@@ -290,7 +279,7 @@ function getSystemInfo() {
     pageName: getCurrentPageName(),
     modules: {
       headerSystem: !!window.headerSystem,
-      simpleFilter: !!window.simpleFilter,
+
       translationUtils: !!window.translationUtils,
       dataUtils: !!window.dataUtils,
       uiUtils: !!window.uiUtils,
@@ -457,7 +446,6 @@ window.toggleTopSection = function () {
 
     // Save state to localStorage
     localStorage.setItem(storageKey, !isCollapsed);
-    console.log('🔄 Top section state saved:', { storageKey, isCollapsed: !isCollapsed });
   }
 };
 
@@ -543,7 +531,6 @@ window.toggleMainSection = function () {
 
     // Save state to localStorage
     localStorage.setItem(storageKey, !isCollapsed);
-    console.log('🔄 Main section state saved:', { storageKey, isCollapsed: !isCollapsed });
   }
 };
 
@@ -552,7 +539,6 @@ window.toggleMainSection = function () {
  * Called on page load to restore previous section visibility states
  */
 window.restoreAllSectionStates = function () {
-  console.log('🔄 restoreAllSectionStates called for path:', window.location.pathname);
   const currentPath = window.location.pathname;
 
   // Restore top section state
@@ -588,25 +574,15 @@ window.restoreAllSectionStates = function () {
   const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
   const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
 
-  console.log('🔄 Top section elements found:', {
-    topSection: !!topSection,
-    topToggleBtn: !!topToggleBtn,
-    topIcon: !!topIcon,
-    topSectionCollapsed: topSectionCollapsed,
-    storageKey: topSectionKey
-  });
-
   if (topSection && topToggleBtn && topIcon) {
     if (topSectionCollapsed) {
       topSection.classList.add('collapsed');
       topSection.style.display = 'none';
       topIcon.textContent = '▼';
-      console.log('🔄 Top section restored as collapsed');
     } else {
       topSection.classList.remove('collapsed');
       topSection.style.display = 'block';
       topIcon.textContent = '▲';
-      console.log('🔄 Top section restored as expanded');
     }
   }
 
@@ -643,25 +619,15 @@ window.restoreAllSectionStates = function () {
   const mainToggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
   const mainIcon = mainToggleBtn ? mainToggleBtn.querySelector('.filter-icon') : null;
 
-  console.log('🔄 Main section elements found:', {
-    mainSection: !!mainSection,
-    mainToggleBtn: !!mainToggleBtn,
-    mainIcon: !!mainIcon,
-    mainSectionCollapsed: mainSectionCollapsed,
-    storageKey: mainSectionKey
-  });
-
   if (mainSection && mainToggleBtn && mainIcon) {
     if (mainSectionCollapsed) {
       mainSection.classList.add('collapsed');
       mainSection.style.display = 'none';
       mainIcon.textContent = '▼';
-      console.log('🔄 Main section restored as collapsed');
     } else {
       mainSection.classList.remove('collapsed');
       mainSection.style.display = 'block';
       mainIcon.textContent = '▲';
-      console.log('🔄 Main section restored as expanded');
     }
   }
 };
@@ -676,86 +642,7 @@ window.restoreDesignsSectionState = function () {
 };
 
 /**
- * פונקציה גלובלית לפתיחה/סגירה של סקשן עליון
- * Global function for toggling top section
- * 
- * @param {string} sectionName - שם הסקשן (אופציונלי)
- */
-window.toggleTopSection = function (sectionName = '') {
-  console.log(`🔄 toggleTopSection נקראה ${sectionName ? `עבור ${sectionName}` : ''}`);
-  const topSection = document.querySelector('.top-section');
-
-  if (!topSection) {
-    console.error('❌ לא נמצא top-section');
-    return;
-  }
-
-  const sectionBody = topSection.querySelector('.section-body');
-  const toggleBtn = topSection.querySelector('button[onclick*="toggleTopSection"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
-    } else {
-      sectionBody.style.display = 'none';
-    }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // שמירת המצב ב-localStorage
-    const storageKey = sectionName ? `${sectionName}TopSectionHidden` : 'topSectionHidden';
-    localStorage.setItem(storageKey, !isCollapsed);
-  }
-};
-
-/**
- * פונקציה גלובלית לפתיחה/סגירה של סקשן ראשי
- * Global function for toggling main section
- * 
- * @param {string} sectionName - שם הסקשן
- */
-window.toggleMainSection = function (sectionName) {
-  console.log(`🔄 toggleMainSection נקראה עבור ${sectionName}`);
-  const contentSections = document.querySelectorAll('.content-section');
-  const targetSection = contentSections[0]; // הסקשן הראשון
-
-  if (!targetSection) {
-    console.error(`❌ לא נמצא סקשן ${sectionName}`);
-    return;
-  }
-
-  const sectionBody = targetSection.querySelector('.section-body');
-  const toggleBtn = targetSection.querySelector(`button[onclick*="toggleMainSection"]`);
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
-    } else {
-      sectionBody.style.display = 'none';
-    }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // שמירת המצב ב-localStorage
-    const storageKey = `${sectionName}SectionCollapsed`;
-    localStorage.setItem(storageKey, !isCollapsed);
-  }
-};
-
-/**
- * Toggle a specific section (legacy function)
+ * Toggle a specific section
  * Handles opening/closing of individual content sections
  */
 window.toggleSection = function (sectionId) {

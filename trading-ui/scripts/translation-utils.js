@@ -268,6 +268,8 @@ window.translateAlertType = translateAlertType;
 window.translateAlertCondition = translateAlertCondition;
 window.translateTradeType = translateTradeType;
 window.translateTradeStatus = translateTradeStatus;
+window.translateCashFlowType = translateCashFlowType;
+window.translateCashFlowSource = translateCashFlowSource;
 window.convertExecutionActionToHebrew = translateExecutionAction; // Backward compatibility
 
 // פונקציות מטבעות
@@ -393,7 +395,7 @@ window.findAlertById = findAlertById;
 window.getConditionAttributeOptions = getConditionAttributeOptions;
 window.getConditionOperatorOptions = getConditionOperatorOptions;
 
-console.log('✅ Translation utilities loaded successfully');
+
 
 /**
  * תרגום פעולת ביצוע לעברית

@@ -40,7 +40,7 @@ function clearCache() {
     tradesCache = null;
     plansCache = null;
     lastCacheUpdate = null;
-    console.log('🗑️ Ticker service cache cleared');
+  
 }
 
 /**
@@ -53,7 +53,7 @@ async function getTickers() {
         if (response.ok) {
             const data = await response.json();
             const tickers = data.data || data || [];
-            console.log('✅ Retrieved', tickers.length, 'tickers from server');
+          
             return tickers;
         } else {
             console.error('❌ Failed to fetch tickers:', response.status);
@@ -75,7 +75,7 @@ async function getTrades() {
         if (response.ok) {
             const data = await response.json();
             const trades = data.data || data || [];
-            console.log('✅ Retrieved', trades.length, 'trades from server');
+          
             return trades;
         } else {
             console.error('❌ Failed to fetch trades:', response.status);
@@ -97,14 +97,14 @@ async function getTradePlans() {
         if (response.ok) {
             const data = await response.json();
             const plans = data.data || data || [];
-            console.log('✅ Retrieved', plans.length, 'trade plans from server');
+          
             return plans;
         } else {
-            console.log('⚠️ Trade Plans API not available, returning empty array');
+          
             return [];
         }
     } catch (error) {
-        console.log('⚠️ Trade Plans API not available:', error.message);
+      
             return [];
     }
 }
@@ -114,11 +114,11 @@ async function getTradePlans() {
  */
 async function loadCache() {
     if (isCacheValid()) {
-        console.log('📦 Using cached data');
+      
         return;
     }
 
-    console.log('🔄 Loading data to cache...');
+  
 
     try {
         const [tickers, trades, plans] = await Promise.all([
@@ -132,7 +132,7 @@ async function loadCache() {
         plansCache = plans;
         lastCacheUpdate = Date.now();
 
-        console.log('✅ Cache loaded:', {
+      
             tickers: tickers.length,
             trades: trades.length,
             plans: plans.length
@@ -170,7 +170,7 @@ async function getTickersWithTrades(options = {}) {
         );
     });
 
-    console.log(`✅ Found ${relevantTickers.length} tickers with trades (statuses: ${tradeStatuses.join(', ')})`);
+  
     return relevantTickers;
 }
 
@@ -195,7 +195,7 @@ async function getTickersWithPlans(options = {}) {
     const plans = plansCache || await getTradePlans();
 
     if (plans.length === 0) {
-        console.log('⚠️ No trade plans available');
+      
         return [];
     }
 
@@ -206,7 +206,7 @@ async function getTickersWithPlans(options = {}) {
         );
     });
 
-    console.log(`✅ Found ${relevantTickers.length} tickers with plans`);
+  
     return relevantTickers;
 }
 
@@ -248,13 +248,13 @@ async function getRelevantTickers(options = {}) {
         );
 
         if (hasTrades || hasPlans) {
-            console.log(`✅ Ticker ${ticker.symbol} (ID: ${ticker.id}) - hasTrades: ${hasTrades}, hasPlans: ${hasPlans}`);
+          
         }
 
         return hasTrades || hasPlans;
     });
 
-    console.log(`✅ Found ${relevantTickers.length} relevant tickers`);
+  
     return relevantTickers;
 }
 
@@ -292,13 +292,13 @@ async function getTickersWithOpenOrClosedTradesAndPlans(options = {}) {
         );
 
         if (hasOpenOrClosedTrades || hasOpenOrClosedPlans) {
-            console.log(`✅ Ticker ${ticker.symbol} (ID: ${ticker.id}) - hasOpenOrClosedTrades: ${hasOpenOrClosedTrades}, hasOpenOrClosedPlans: ${hasOpenOrClosedPlans}`);
+          
         }
 
         return hasOpenOrClosedTrades || hasOpenOrClosedPlans;
     });
 
-    console.log(`✅ Found ${relevantTickers.length} tickers with open or closed trades/plans`);
+  
     return relevantTickers;
 }
 
@@ -326,7 +326,7 @@ async function getTickersByType(types = [], useCache = true) {
         types.includes(ticker.type)
     );
 
-    console.log(`✅ Found ${filteredTickers.length} tickers of types: ${types.join(', ')}`);
+  
     return filteredTickers;
 }
 
@@ -358,7 +358,7 @@ async function getTickersByActivity(activeOnly = true, useCache = true) {
         );
     });
 
-    console.log(`✅ Found ${activeTickers.length} active tickers`);
+  
     return activeTickers;
 }
 
@@ -384,7 +384,7 @@ function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...
         select.appendChild(option);
     });
 
-    console.log(`✅ Updated select '${selectId}' with ${tickers.length} options`);
+  
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -403,4 +403,4 @@ window.tickerService = {
     loadCache
 };
 
-console.log('✅ Ticker Service loaded successfully');
+

@@ -820,62 +820,21 @@ class SimpleFilter {
      * Reset filters to default preferences
      */
     async resetFilters() {
-        console.log('🔄 Resetting filters to default preferences...');
-
-        try {
-            // קריאת ברירות המחדל מהשרת
-            const response = await fetch('/api/v1/preferences/');
-            if (response.ok) {
-                const preferences = await response.json();
-                const userPrefs = preferences.user || preferences.defaults;
-
-                console.log('📋 Loaded default preferences:', userPrefs);
-
-                // המרת ברירות המחדל לערכים עבריים
-                this.currentFilters = {
-                    status: this.convertStatusPreference(userPrefs.defaultStatusFilter),
-                    type: this.convertTypePreference(userPrefs.defaultTypeFilter),
-                    account: this.convertAccountPreference(userPrefs.defaultAccountFilter),
-                    date: this.convertDatePreference(userPrefs.defaultDateRangeFilter),
-                    search: userPrefs.defaultSearchFilter || ''
-                };
-
-                console.log('🔄 Applied default filters:', this.currentFilters);
-            } else {
-                console.warn('⚠️ Could not load preferences, using empty filters');
-                this.currentFilters = {
-                    status: [],
-                    type: [],
-                    account: [],
-                    date: [],
-                    search: ''
-                };
-            }
-        } catch (error) {
-            console.error('❌ Error loading default preferences:', error);
-            // במקרה של שגיאה, השתמש בפילטרים ריקים
-            this.currentFilters = {
-                status: [],
-                type: [],
-                account: [],
-                date: [],
-                search: ''
-            };
-        }
-
+        console.log('🔄 SimpleFilter.resetFilters called');
+        
+        // אתחול מחדש עם ברירות מחדל
+        await this.initializeDefaultFilters();
+        
         // עדכון התצוגה
         this.updateStatusDisplay();
         this.updateTypeDisplay();
         this.updateAccountDisplay();
         this.updateDateDisplay();
-
-        // עדכון בחירת הכפתורים בממשק
+        this.updateSearchInput();
         this.updateFilterButtonSelections();
-
+        
         // הפעלת הפילטרים
         this.applyFilters();
-
-        console.log('✅ Filters reset to default preferences');
     }
 
     /**
@@ -883,9 +842,9 @@ class SimpleFilter {
      * Clear filters - show all records
      */
     clearFilters() {
-        console.log('🔄 Clearing all filters - showing all records...');
-
-        // איפוס כל הפילטרים
+        console.log('🔄 SimpleFilter.clearFilters called');
+        
+        // ניקוי כל הפילטרים
         this.currentFilters = {
             status: [],
             type: [],
@@ -893,20 +852,17 @@ class SimpleFilter {
             date: [],
             search: ''
         };
-
+        
         // עדכון התצוגה
         this.updateStatusDisplay();
         this.updateTypeDisplay();
         this.updateAccountDisplay();
         this.updateDateDisplay();
-
-        // עדכון בחירת הכפתורים בממשק
+        this.updateSearchInput();
         this.updateFilterButtonSelections();
-
+        
         // הפעלת הפילטרים
         this.applyFilters();
-
-        console.log('✅ All filters cleared - showing all records');
     }
 
     /**
@@ -933,7 +889,7 @@ class SimpleFilter {
     }
 
     /**
-     * עדכון בחירת כפתורי פילטר סטטוס
+     * עדכון כפתורים נבחרים בפילטר סטטוס
      * Update status filter button selections
      */
     updateStatusButtonSelections() {
@@ -980,7 +936,7 @@ class SimpleFilter {
     }
 
     /**
-     * עדכון בחירת כפתורי פילטר טיפוס
+     * עדכון כפתורים נבחרים בפילטר טיפוס
      * Update type filter button selections
      */
     updateTypeButtonSelections() {
@@ -1027,7 +983,7 @@ class SimpleFilter {
     }
 
     /**
-     * עדכון בחירת כפתורי פילטר חשבון
+     * עדכון כפתורים נבחרים בפילטר חשבון
      * Update account filter button selections
      */
     updateAccountButtonSelections() {
@@ -1074,7 +1030,7 @@ class SimpleFilter {
     }
 
     /**
-     * עדכון בחירת כפתורי פילטר תאריכים
+     * עדכון כפתורים נבחרים בפילטר תאריכים
      * Update date filter button selections
      */
     updateDateButtonSelections() {
@@ -1148,6 +1104,10 @@ class SimpleFilter {
         }
 
         console.log('🔄 Current status filters:', this.currentFilters.status);
+        
+        // עדכון התצוגה
+        this.updateStatusDisplay();
+        
         this.applyFilters();
     }
 
@@ -1166,6 +1126,10 @@ class SimpleFilter {
         }
 
         console.log('🔄 Current type filters:', this.currentFilters.type);
+        
+        // עדכון התצוגה
+        this.updateTypeDisplay();
+        
         this.applyFilters();
     }
 
@@ -1184,6 +1148,10 @@ class SimpleFilter {
         }
 
         console.log('🔄 Current account filters:', this.currentFilters.account);
+        
+        // עדכון התצוגה
+        this.updateAccountDisplay();
+        
         this.applyFilters();
     }
 
@@ -1202,6 +1170,10 @@ class SimpleFilter {
         }
 
         console.log('🔄 Current date filters:', this.currentFilters.date);
+        
+        // עדכון התצוגה
+        this.updateDateDisplay();
+        
         this.applyFilters();
     }
 
@@ -1346,8 +1318,8 @@ class SimpleFilter {
         }
 
         if (!this.currentFilters.status || !Array.isArray(this.currentFilters.status) || this.currentFilters.status.length === 0) {
-            console.log('🔄 Setting status display to "הכול"');
-            statusDisplay.textContent = 'הכול';
+            console.log('🔄 Setting status display to "כל סטטוס"');
+            statusDisplay.textContent = 'כל סטטוס';
         } else {
             const displayText = this.currentFilters.status.join(', ');
             console.log('🔄 Setting status display to:', displayText);
@@ -1370,8 +1342,8 @@ class SimpleFilter {
         }
 
         if (!this.currentFilters.type || !Array.isArray(this.currentFilters.type) || this.currentFilters.type.length === 0) {
-            console.log('🔄 Setting type display to "הכול"');
-            typeDisplay.textContent = 'הכול';
+            console.log('🔄 Setting type display to "כל טיפוס"');
+            typeDisplay.textContent = 'כל טיפוס';
         } else {
             const displayText = this.currentFilters.type.join(', ');
             console.log('🔄 Setting type display to:', displayText);
@@ -1394,8 +1366,8 @@ class SimpleFilter {
         }
 
         if (!this.currentFilters.account || !Array.isArray(this.currentFilters.account) || this.currentFilters.account.length === 0) {
-            console.log('🔄 Setting account display to "הכול"');
-            accountDisplay.textContent = 'הכול';
+            console.log('🔄 Setting account display to "כל חשבון"');
+            accountDisplay.textContent = 'כל חשבון';
         } else {
             const displayText = this.currentFilters.account.join(', ');
             console.log('🔄 Setting account display to:', displayText);
@@ -1426,6 +1398,10 @@ class SimpleFilter {
             dateDisplay.textContent = displayText;
         }
     }
+
+
+
+
 }
 
 // פונקציה גלובלית לעדכון טקסט פילטר חשבונות
@@ -1437,6 +1413,148 @@ window.updateAccountFilterDisplayTextGlobal = function () {
         window.updateAccountFilterDisplayText();
     } else {
         console.warn('⚠️ updateAccountFilterDisplayText not found in current page');
+    }
+};
+
+// פונקציות גלובליות לפילטרים
+window.selectStatusOption = function(status) {
+    console.log('🔄 selectStatusOption called with:', status);
+    if (window.simpleFilter) {
+        if (status === 'הכול') {
+            // בחירת "הכול" מנקה את כל הפילטרים
+            window.simpleFilter.applyStatusFilter([]);
+        } else {
+            // מולטיסלקט - הוספה או הסרה מהרשימה
+            const currentStatuses = window.simpleFilter.currentFilters.status || [];
+            let newStatuses;
+            
+            if (currentStatuses.includes(status)) {
+                // הסרה מהרשימה
+                newStatuses = currentStatuses.filter(s => s !== status);
+            } else {
+                // הוספה לרשימה
+                newStatuses = [...currentStatuses, status];
+            }
+            
+            window.simpleFilter.applyStatusFilter(newStatuses);
+        }
+        // עדכון כפתורים נבחרים
+        window.simpleFilter.updateFilterButtonSelections();
+    } else {
+        console.warn('⚠️ simpleFilter not available');
+    }
+};
+
+window.selectTypeOption = function(type) {
+    console.log('🔄 selectTypeOption called with:', type);
+    if (window.simpleFilter) {
+        if (type === 'הכול') {
+            // בחירת "הכול" מנקה את כל הפילטרים
+            window.simpleFilter.applyTypeFilter([]);
+        } else {
+            // מולטיסלקט - הוספה או הסרה מהרשימה
+            const currentTypes = window.simpleFilter.currentFilters.type || [];
+            let newTypes;
+            
+            if (currentTypes.includes(type)) {
+                // הסרה מהרשימה
+                newTypes = currentTypes.filter(t => t !== type);
+            } else {
+                // הוספה לרשימה
+                newTypes = [...currentTypes, type];
+            }
+            
+            window.simpleFilter.applyTypeFilter(newTypes);
+        }
+        // עדכון כפתורים נבחרים
+        window.simpleFilter.updateFilterButtonSelections();
+    } else {
+        console.warn('⚠️ simpleFilter not available');
+    }
+};
+
+window.selectAccountFilter = function(account) {
+    console.log('🔄 selectAccountFilter called with:', account);
+    if (window.simpleFilter) {
+        if (account === 'הכול') {
+            // בחירת "הכול" מנקה את כל הפילטרים
+            window.simpleFilter.applyAccountFilter([]);
+        } else {
+            // מולטיסלקט - הוספה או הסרה מהרשימה
+            const currentAccounts = window.simpleFilter.currentFilters.account || [];
+            let newAccounts;
+            
+            if (currentAccounts.includes(account)) {
+                // הסרה מהרשימה
+                newAccounts = currentAccounts.filter(a => a !== account);
+            } else {
+                // הוספה לרשימה
+                newAccounts = [...currentAccounts, account];
+            }
+            
+            window.simpleFilter.applyAccountFilter(newAccounts);
+        }
+        // עדכון כפתורים נבחרים
+        window.simpleFilter.updateFilterButtonSelections();
+    } else {
+        console.warn('⚠️ simpleFilter not available');
+    }
+};
+
+window.selectDateRangeOption = function(dateRange) {
+    console.log('🔄 selectDateRangeOption called with:', dateRange);
+    if (window.simpleFilter) {
+        if (dateRange === 'כל זמן') {
+            // בחירת "כל זמן" מנקה את כל הפילטרים
+            window.simpleFilter.applyDateRangeFilter([]);
+        } else {
+            // פילטר תאריכים הוא single select - מחליף את הבחירה הקודמת
+            window.simpleFilter.applyDateRangeFilter([dateRange]);
+        }
+        // עדכון כפתורים נבחרים
+        window.simpleFilter.updateFilterButtonSelections();
+    } else {
+        console.warn('⚠️ simpleFilter not available');
+    }
+};
+
+// פונקציות נוספות לפילטרים
+window.clearAllFilters = function() {
+    console.log('🔄 clearAllFilters called');
+    if (window.simpleFilter) {
+        // ניקוי כל הפילטרים
+        window.simpleFilter.currentFilters = {
+            status: [],
+            type: [],
+            account: [],
+            date: [],
+            search: ''
+        };
+        
+        // עדכון התצוגה
+        window.simpleFilter.updateStatusDisplay();
+        window.simpleFilter.updateTypeDisplay();
+        window.simpleFilter.updateAccountDisplay();
+        window.simpleFilter.updateDateDisplay();
+        window.simpleFilter.updateSearchInput();
+        window.simpleFilter.updateFilterButtonSelections();
+        
+        // הפעלת הפילטרים
+        window.simpleFilter.applyFilters();
+    } else {
+        console.warn('⚠️ simpleFilter not available');
+    }
+};
+
+window.resetFiltersToDefaults = async function() {
+    console.log('🔄 resetFiltersToDefaults called');
+    if (window.simpleFilter) {
+        // אתחול מחדש עם ברירות מחדל
+        await window.simpleFilter.initializeDefaultFilters();
+        window.simpleFilter.updateFilterButtonSelections();
+        window.simpleFilter.applyFilters();
+    } else {
+        console.warn('⚠️ simpleFilter not available');
     }
 };
 

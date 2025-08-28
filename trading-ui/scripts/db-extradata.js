@@ -1373,7 +1373,7 @@ function setupModalValidations(formId) {
 
 // פונקציה לאתחול וולידציה בזמן אמת
 function initializeRealTimeValidation() {
-    console.log('🔄 Setting up real-time validation...');
+    
     
     // הגדרת וולידציה לשדות מטבע
     if (window.setupFieldValidation) {
@@ -1424,7 +1424,7 @@ function initializeRealTimeValidation() {
             maxLength: 20
         }, 'text');
         
-        console.log('✅ Real-time validation setup completed');
+
     } else {
         console.warn('⚠️ Validation system not available');
     }
@@ -1434,7 +1434,7 @@ function initializeRealTimeValidation() {
 
 // אתחול אוטומטי כשהדף נטען
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔄 Initializing db_extradata page...');
+    
     
     // טעינת נתונים ראשונית
     loadCurrenciesData();
@@ -1444,8 +1444,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof window.setupFieldValidation === 'function') {
         initializeRealTimeValidation();
     } else {
-        console.log('⚠️ Validation system not available, skipping real-time validation setup');
+
     }
     
-    console.log('✅ דף טבלאות עזר אותחל בהצלחה');
+    
 });

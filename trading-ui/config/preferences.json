@@ -1,41 +1,28 @@
 {
   "defaults": {
     "primaryCurrency": "USD",
+    "timezone": "Asia/Jerusalem",
     "defaultStopLoss": 5,
     "defaultTargetPrice": 10,
-    "timezone": "Asia/Jerusalem",
-    "consoleCleanupInterval": 60000,
-    "defaultStatusFilter": "open",
-    "defaultTypeFilter": "swing",
+    "defaultCommission": 1.0,
+    "defaultStatusFilter": "all",
+    "defaultTypeFilter": "all",
     "defaultAccountFilter": "all",
-    "defaultDateRangeFilter": "this_week",
+    "defaultDateRangeFilter": "all",
     "defaultSearchFilter": ""
   },
   "users": {
     "nimrod": {
       "primaryCurrency": "USD",
+      "timezone": "Asia/Jerusalem",
       "defaultStopLoss": 5,
       "defaultTargetPrice": 10,
-      "timezone": "Asia/Jerusalem",
-      "consoleCleanupInterval": 60000,
-      "defaultStatusFilter": "open",
-      "defaultTypeFilter": "test_write",
+      "defaultCommission": 1.0,
+      "defaultStatusFilter": "all",
+      "defaultTypeFilter": "all",
       "defaultAccountFilter": "all",
-      "defaultDateRangeFilter": "this_week",
+      "defaultDateRangeFilter": "all",
       "defaultSearchFilter": ""
     }
-  },
-  "currentUser": "nimrod",
-  "user": {
-    "primaryCurrency": "USD",
-    "defaultStopLoss": 5,
-    "defaultTargetPrice": 10,
-    "timezone": "Asia/Jerusalem",
-    "consoleCleanupInterval": 60000,
-    "defaultStatusFilter": "open",
-    "defaultTypeFilter": "test_write",
-    "defaultAccountFilter": "all",
-    "defaultDateRangeFilter": "this_week",
-    "defaultSearchFilter": ""
   }
 }

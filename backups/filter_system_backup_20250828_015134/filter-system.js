@@ -560,37 +560,6 @@ class FilterSystem {
 // יצירת מופע גלובלי
 window.filterSystem = new FilterSystem();
 
-/**
- * פונקציה גלובלית לאיפוס פילטרים וטעינת נתונים מחדש
- * Global function for resetting filters and reloading data
- * 
- * @param {string} pageName - שם הדף (אופציונלי)
- */
-window.resetAllFiltersAndReloadData = function (pageName = '') {
-  console.log(`🔄 resetAllFiltersAndReloadData נקראה ${pageName ? `עבור ${pageName}` : ''}`);
-  
-  // איפוס פילטרים במערכת הפילטרים הגלובלית
-  if (window.filterSystem && typeof window.filterSystem.resetAllFilters === 'function') {
-    window.filterSystem.resetAllFilters();
-  }
-  
-  // איפוס פילטרים ספציפיים לדף
-  if (pageName) {
-    const resetFunction = window[`reset${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Filters`];
-    if (typeof resetFunction === 'function') {
-      resetFunction();
-    }
-  }
-  
-  // טעינת נתונים מחדש
-  const loadFunction = window[`load${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`];
-  if (typeof loadFunction === 'function') {
-    loadFunction();
-  } else {
-    console.warn(`⚠️ load${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data function not found`);
-  }
-};
-
 // אתחול אוטומטי כשהדף נטען
 document.addEventListener('DOMContentLoaded', () => {
   // המתן קצת כדי שהאלמנטים יטענו

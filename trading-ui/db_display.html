@@ -34,7 +34,7 @@
 
   <!-- 3. General styles -->
   <link rel="stylesheet" href="styles/styles.css">
-
+    <link rel="stylesheet" href="styles/header-system.css">
   <!-- 4. Typography -->
   <link rel="stylesheet" href="styles/typography.css">
 
@@ -42,7 +42,6 @@
   <link rel="stylesheet" href="styles/table.css">
 
   <!-- 6. Header system styles (highest priority) -->
-  <link rel="stylesheet" href="styles/header-system.css">
 
   <!-- 7. Database display specific styles (highest priority) -->
   <link rel="stylesheet" href="styles/db-display.css">
@@ -116,7 +115,7 @@
           <!-- Trade Plans table -->
           <div class="section-body">
             <div class="table-responsive" id="tradePlansContainer">
-              <table class="table" id="tradePlansTable" data-table-type="trade_plans">
+              <table class="table" data-table-type="trade_plans">
                 <thead>
                   <tr>
                     <th onclick="sortTable(0, 'tradePlansTable')">ID (INTEGER)</th>
@@ -188,7 +187,7 @@
           <!-- Trades table -->
           <div class="section-body">
             <div class="table-responsive" id="tradesContainer">
-              <table class="table" id="tradesTable" data-table-type="trades">
+              <table class="table" data-table-type="trades">
                 <thead>
                   <tr>
                     <th onclick="sortTable(0, 'tradesTable')">ID (INTEGER)</th>
@@ -257,7 +256,7 @@
           <!-- Accounts table -->
           <div class="section-body">
             <div class="table-responsive" id="accountsContainer">
-              <table class="table" id="accountsTable" data-table-type="accounts">
+              <table class="table" data-table-type="accounts">
                 <thead>
                   <tr>
                     <th onclick="sortTable(0, 'accountsTable')">ID (INTEGER)</th>
@@ -322,7 +321,7 @@
           <!-- Tickers table -->
           <div class="section-body">
             <div class="table-responsive" id="tickersContainer">
-              <table class="table" id="tickersTable" data-table-type="tickers">
+              <table class="table" data-table-type="tickers">
                 <thead>
                   <tr>
                     <th onclick="sortTable(0, 'tickersTable')">ID (INTEGER)</th>
@@ -392,7 +391,7 @@
           <!-- Executions table -->
           <div class="section-body">
             <div class="table-responsive" id="executionsContainer">
-              <table class="table" id="executionsTable" data-table-type="executions">
+              <table class="table" data-table-type="executions">
                 <thead>
                   <tr>
                     <th onclick="sortTable(0, 'executionsTable')">ID (INTEGER)</th>
@@ -455,7 +454,7 @@
           <!-- Cash Flows table -->
           <div class="section-body">
             <div class="table-responsive" id="cashFlowsContainer">
-              <table class="table" id="cashFlowsTable" data-table-type="cash_flows">
+              <table class="table" data-table-type="cash_flows">
                 <thead>
                   <tr>
                     <th onclick="sortTable(0, 'cashFlowsTable')">ID (INTEGER)</th>
@@ -524,7 +523,7 @@
           </div>
           <div class="section-body">
             <div class="table-responsive" id="alertsContainer">
-              <table class="table" id="alertsTable" data-table-type="alerts">
+              <table class="table" data-table-type="alerts">
                 <thead>
                   <tr>
                     <th onclick="sortTable(0, 'alertsTable')">ID (INTEGER)</th>
@@ -591,7 +590,7 @@
         </div>
         <div class="section-body">
           <div class="table-responsive" id="notesContainer">
-            <table class="table" id="notesTable" data-table-type="notes">
+            <table class="table" data-table-type="notes">
               <thead>
                 <tr>
                                       <th onclick="sortTable(0, 'notesTable')">ID (INTEGER)</th>
@@ -642,9 +641,7 @@
 
   <!-- Modular files -->
   <script src="scripts/button-icons.js"></script>
-  <script src="scripts/header-system.js"></script>
   <script src="scripts/console-cleanup.js"></script>
-  <script src="scripts/simple-filter.js"></script>
   <script src="scripts/translation-utils.js"></script>
   <script src="scripts/data-utils.js"></script>
   <script src="scripts/ui-utils.js"></script>
@@ -654,7 +651,7 @@
   <script src="scripts/linked-items.js"></script>
   <script src="scripts/page-utils.js"></script>
   <script src="scripts/main.js"></script>
-  <script src="scripts/database.js"></script>
+    <script src="scripts/header-system.js"></script>  <script src="scripts/database.js"></script>
 
   <!-- Page initialization -->
   <script>

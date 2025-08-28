@@ -67,16 +67,16 @@ function toggleTopSection() {
 }
 
 function toggleMainSection() {
-  console.log('🔄 toggleMainSection נקראה');
+
   const contentSections = document.querySelectorAll('.content-section');
-  console.log('📋 מספר content-sections נמצא:', contentSections.length);
+
   const notesSection = contentSections[0]; // הסקשן הראשון - הערות
 
   if (!notesSection) {
     console.error('❌ לא נמצא סקשן הערות');
     return;
   }
-  console.log('✅ סקשן הערות נמצא:', notesSection);
+
 
   const sectionBody = notesSection.querySelector('.section-body');
   const toggleBtn = notesSection.querySelector('button[onclick="toggleMainSection()"]');
@@ -142,9 +142,6 @@ function restoreNotesSectionState() {
 }
 
 // פונקציות נוספות
-function resetAllFiltersAndReloadData() {
-  console.log('איפוס פילטרים');
-}
 
 // הגדרת הפונקציות כגלובליות
 window.openNoteDetails = openNoteDetails;
@@ -157,7 +154,7 @@ window.resetAllFiltersAndReloadData = resetAllFiltersAndReloadData;
 
 // פונקציה לטעינת נתונים
 async function loadNotesData() {
-  console.log('🔄 loadNotesData נקראה');
+
 
   try {
     // קריאה לשרת לקבלת נתוני הערות
@@ -168,7 +165,7 @@ async function loadNotesData() {
 
     const responseData = await response.json();
     const notes = responseData.data || responseData;
-    console.log('✅ נטענו', notes.length, 'הערות מהשרת');
+  
 
     // בדיקה אם הנתונים ריקים או לא תקינים
     if (!notes || notes.length === 0) {
@@ -191,7 +188,7 @@ async function loadNotesData() {
     }
 
     // טעינת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים)
-    console.log('🔄 טוען נתונים נוספים...');
+  
 
     // פונקציה לטעינת נתונים עם טיפול בשגיאות
     const loadDataSafely = async (url, dataName) => {
@@ -1634,118 +1631,8 @@ window.replaceCurrentAttachment = replaceCurrentAttachment;
 window.clearSelectedFile = clearSelectedFile;
 
 // פונקציה לסינון הערות לפי חיפוש
-function filterNotesData(searchTerm) {
-  console.log('🔄 filterNotesData נקראה עם:', searchTerm);
-
-  const tbody = document.querySelector('#notesTable tbody');
-  if (!tbody) {
-    console.error('❌ לא נמצא tbody בטבלה');
-    return;
-  }
-
-  const rows = tbody.querySelectorAll('tr');
-  let visibleCount = 0;
-
-  rows.forEach(row => {
-    // דילוג על שורות ריקות או שגיאות
-    if (row.cells.length < 6) {
-      return;
-    }
-
-    const symbolCell = row.cells[0]?.textContent || '';
-    const relatedCell = row.cells[1]?.textContent || '';
-    const contentCell = row.cells[2]?.textContent || '';
-
-    const searchText = searchTerm.toLowerCase();
-    const rowText = `${symbolCell} ${relatedCell} ${contentCell}`.toLowerCase();
-
-    if (searchText === '' || rowText.includes(searchText)) {
-      row.style.display = '';
-      visibleCount++;
-    } else {
-      row.style.display = 'none';
-    }
-  });
-
-  // עדכון מונה ההערות המוצגות
-  const tableCountElement = document.querySelector('.table-count');
-  if (tableCountElement) {
-    if (searchTerm === '') {
-      // אם אין חיפוש, הצג את המספר המקורי
-      const originalCount = window.originalNotesCount || '0';
-      tableCountElement.textContent = `${originalCount} הערות`;
-    } else {
-      tableCountElement.textContent = `${visibleCount} הערות (מתוך ${window.originalNotesCount || '0'})`;
-    }
-  }
-
-  console.log(`✅ סוננו ${visibleCount} הערות מתוך ${rows.length} שורות`);
-}
 
 // פונקציה לסינון הערות לפי סוג
-function filterNotesByType(type) {
-  console.log('🔄 filterNotesByType נקראה עם:', type);
-
-  // עדכון מצב הכפתורים
-  const filterButtons = document.querySelectorAll('.quick-filters .btn');
-  filterButtons.forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.getAttribute('data-type') === type) {
-      btn.classList.add('active');
-    }
-  });
-
-  const tbody = document.querySelector('#notesTable tbody');
-  if (!tbody) {
-    console.error('❌ לא נמצא tbody בטבלה');
-    return;
-  }
-
-  const rows = tbody.querySelectorAll('tr');
-  let visibleCount = 0;
-
-  rows.forEach(row => {
-    // דילוג על שורות ריקות או שגיאות
-    if (row.cells.length < 6) {
-      return;
-    }
-
-    // קביעת סוג ההערה לפי העמודה השנייה
-    const relatedCell = row.cells[1];
-    const relatedText = relatedCell?.textContent || '';
-    let noteType = 'other';
-
-    if (relatedText.includes('🏦')) {
-      noteType = 'account';
-    } else if (relatedText.includes('📈')) {
-      noteType = 'trade';
-    } else if (relatedText.includes('📋')) {
-      noteType = 'trade_plan';
-    } else if (relatedText.includes('📊')) {
-      noteType = 'ticker';
-    }
-
-    if (type === 'all' || noteType === type) {
-      row.style.display = '';
-      visibleCount++;
-    } else {
-      row.style.display = 'none';
-    }
-  });
-
-  // עדכון מונה ההערות המוצגות
-  const tableCountElement = document.querySelector('.table-count');
-  if (tableCountElement) {
-    if (type === 'all') {
-      const originalCount = window.originalNotesCount || '0';
-      tableCountElement.textContent = `${originalCount} הערות`;
-    } else {
-      tableCountElement.textContent = `${visibleCount} הערות מסוג ${getTypeDisplayName(type)}`;
-    }
-  }
-
-  console.log(`✅ סוננו ${visibleCount} הערות מסוג ${type}`);
-}
 
 // פונקציה לקבלת שם תצוגה לסוג
 function getTypeDisplayName(type) {

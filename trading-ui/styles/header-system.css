@@ -636,6 +636,8 @@
     transition: all 0.2s ease;
     font-size: 0.9rem;
     min-width: 120px;
+    width: 140px;
+    justify-content: space-between;
 }
 
 #unified-header .filter-toggle:hover {
@@ -657,6 +659,11 @@
 #unified-header .selected-value {
     color: var(--apple-text-secondary);
     font-size: 0.85rem;
+    min-width: 80px;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #unified-header .dropdown-arrow {
@@ -899,6 +906,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 30px;
     width: 30px;
     height: 30px;
     background: white;
@@ -933,6 +941,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 30px;
     width: 30px;
     height: 30px;
     background: white;
@@ -967,6 +976,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 32px;
     width: 32px;
     height: 32px;
     background: white;

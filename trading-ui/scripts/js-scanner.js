@@ -66,7 +66,7 @@ class JsScanner {
      * Scan all JS files and extract function information
      */
     async scanAllJsFiles() {
-        console.log('🔍 Starting JS files scan...');
+      
 
         try {
             // Get list of JS files
@@ -80,7 +80,7 @@ class JsScanner {
             // Generate page mapping
             this.generatePageMapping();
 
-            console.log('✅ JS files scan completed');
+          
             return {
                 functions: this.functionsData,
                 pageMapping: this.pageMapping
@@ -107,14 +107,14 @@ class JsScanner {
 
         // Fallback list
         return [
-            'main.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js',
+            'main.js', 'header-system.js', 'ui-utils.js',
             'translation-utils.js', 'data-utils.js', 'table-mappings.js',
             'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
             'alerts.js', 'active-alerts-component.js', 'trades.js', 'trade_plans.js',
             'research.js', 'executions.js', 'tickers.js', 'ticker-service.js',
             'accounts.js', 'cash_flows.js', 'notes.js', 'preferences.js',
             'database.js', 'db-extradata.js', 'constraint-manager.js',
-            'tests.js', 'filter-system.js', 'currencies.js', 'auth.js'
+            'tests.js', 'currencies.js', 'auth.js'
         ];
     }
 
@@ -123,7 +123,7 @@ class JsScanner {
      */
     async scanJsFile(filename) {
         try {
-            console.log(`📄 Scanning file: ${filename}`);
+          
 
             // Get file content
             const content = await this.getFileContent(filename);
@@ -136,9 +136,9 @@ class JsScanner {
             const functions = this.extractFunctions(content, filename);
 
             // Store functions data
-            this.functionsData[filename] = functions;
-
-            console.log(`✅ Extracted ${functions.length} functions from ${filename}`);
+                          this.functionsData[filename] = functions;
+  
+              console.log(`✅ Extracted ${functions.length} functions from ${filename}`);          
 
         } catch (error) {
             console.error(`❌ Error scanning file ${filename}:`, error);
@@ -375,22 +375,22 @@ class JsScanner {
     generatePageMapping() {
         // Define known page to JS file mappings
         const pageMappings = {
-            'index.html': ['main.js', 'header-system.js', 'simple-filter.js'],
-            'trades.html': ['trades.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'trade_plans.html': ['trade_plans.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'research.html': ['research.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'alerts.html': ['alerts.js', 'active-alerts-component.js', 'header-system.js', 'simple-filter.js'],
-            'executions.html': ['executions.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'tickers.html': ['tickers.js', 'ticker-service.js', 'header-system.js', 'simple-filter.js'],
-            'accounts.html': ['accounts.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'cash_flows.html': ['cash_flows.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'notes.html': ['notes.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'preferences.html': ['preferences.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'db_display.html': ['database.js', 'db-extradata.js', 'header-system.js', 'simple-filter.js'],
-            'db_extradata.html': ['db-extradata.js', 'header-system.js', 'simple-filter.js'],
-            'constraints.html': ['constraint-manager.js', 'header-system.js', 'simple-filter.js'],
-            'tests.html': ['tests.js', 'header-system.js', 'simple-filter.js'],
-            'styles.html': ['header-system.js', 'simple-filter.js']
+            'index.html': ['main.js', 'header-system.js'],
+            'trades.html': ['trades.js', 'header-system.js', 'ui-utils.js'],
+            'trade_plans.html': ['trade_plans.js', 'header-system.js', 'ui-utils.js'],
+            'research.html': ['research.js', 'header-system.js', 'ui-utils.js'],
+            'alerts.html': ['alerts.js', 'active-alerts-component.js', 'header-system.js'],
+            'executions.html': ['executions.js', 'header-system.js', 'ui-utils.js'],
+            'tickers.html': ['tickers.js', 'ticker-service.js', 'header-system.js'],
+            'accounts.html': ['accounts.js', 'header-system.js', 'ui-utils.js'],
+            'cash_flows.html': ['cash_flows.js', 'header-system.js', 'ui-utils.js'],
+            'notes.html': ['notes.js', 'header-system.js', 'ui-utils.js'],
+            'preferences.html': ['preferences.js', 'header-system.js', 'ui-utils.js'],
+            'db_display.html': ['database.js', 'db-extradata.js', 'header-system.js'],
+            'db_extradata.html': ['db-extradata.js', 'header-system.js'],
+            'constraints.html': ['constraint-manager.js', 'header-system.js'],
+            'tests.html': ['tests.js', 'header-system.js'],
+            'styles.html': ['header-system.js']
         };
 
         this.pageMapping = pageMappings;
@@ -434,7 +434,7 @@ class JsScanner {
      * Scan function calls across all JS files
      */
     async scanFunctionCalls() {
-        console.log('🔍 Scanning function calls across all JS files...');
+      
 
         const functionCallCounts = {};
         const functionCallDetails = {};
@@ -462,7 +462,7 @@ class JsScanner {
             // Store details globally for access by modal
             window.jsScanner.functionCallDetails = functionCallDetails;
 
-            console.log('✅ Function call scan completed');
+          
             return {
                 counts: functionCallCounts,
                 details: functionCallDetails
@@ -573,11 +573,11 @@ class JsScanner {
      * Get fallback function call data
      */
     getFallbackFunctionCalls() {
-        console.log('⚠️ Using fallback function call data');
+      
 
         const sampleFunctionCalls = {
             'header-system.js': 45,
-            'simple-filter.js': 38,
+
             'ui-utils.js': 32,
             'main.js': 15,
             'trades.js': 28,
@@ -591,7 +591,7 @@ class JsScanner {
             'db-extradata.js': 15,
             'constraint-manager.js': 8,
             'tests.js': 6,
-            'filter-system.js': 10,
+
             'currencies.js': 8,
             'auth.js': 5,
             'js-map.js': 3,

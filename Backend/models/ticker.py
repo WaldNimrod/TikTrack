@@ -53,12 +53,12 @@ class Ticker(BaseModel):
     active_trades = Column(Boolean, default=False, nullable=True, 
                           comment="Whether there are active trades")
     status = Column(String(20), default='open', nullable=False,
-                   comment="Ticker status: open, closed, canceled")
+                   comment="Ticker status: open, closed, cancelled")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    currency = relationship("Currency")
+    currency = relationship("Currency", back_populates="tickers")
     trades = relationship("Trade", back_populates="ticker", 
                          cascade="all, delete-orphan")
     trade_plans = relationship("TradePlan", back_populates="ticker", 
@@ -136,6 +136,9 @@ class Ticker(BaseModel):
         """
         Update ticker status based on linked trades and trade plans
         
+        Note: This function respects the 'cancelled' status - if a ticker is cancelled,
+        it will not be automatically updated to open/closed status.
+        
         Args:
             session: SQLAlchemy session
             ticker_id: ID of the ticker to update
@@ -143,6 +146,15 @@ class Ticker(BaseModel):
         try:
             from .trade import Trade
             from .trade_plan import TradePlan
+            
+            # Get the ticker
+            ticker = session.query(Ticker).filter(Ticker.id == ticker_id).first()
+            if not ticker:
+                return
+            
+            # Don't update if ticker is cancelled (manual status)
+            if ticker.status == 'cancelled':
+                return
             
             # Count open trades for this ticker
             open_trades_count = session.query(Trade).filter(
@@ -156,13 +168,15 @@ class Ticker(BaseModel):
                 TradePlan.status == 'open'
             ).count()
             
+            # Update active_trades field
+            ticker.active_trades = open_trades_count > 0
+            
             # Determine new status
             has_open_items = open_trades_count > 0 or open_plans_count > 0
             new_status = 'open' if has_open_items else 'closed'
             
-            # Update ticker status
-            ticker = session.query(Ticker).filter(Ticker.id == ticker_id).first()
-            if ticker and ticker.status != new_status:
+            # Update ticker status if needed
+            if ticker.status != new_status:
                 ticker.status = new_status
                 ticker.updated_at = datetime.now()
                 session.flush()
@@ -178,6 +192,9 @@ class Ticker(BaseModel):
         """
         Update status for all tickers based on their linked trades and trade plans
         
+        Note: This function respects the 'cancelled' status - cancelled tickers
+        will not be automatically updated to open/closed status.
+        
         Args:
             session: SQLAlchemy session
         """
@@ -185,8 +202,8 @@ class Ticker(BaseModel):
             from .trade import Trade
             from .trade_plan import TradePlan
             
-            # Get all tickers
-            tickers = session.query(Ticker).all()
+            # Get all tickers except cancelled ones
+            tickers = session.query(Ticker).filter(Ticker.status != 'cancelled').all()
             
             for ticker in tickers:
                 # Count open trades for this ticker
@@ -200,6 +217,9 @@ class Ticker(BaseModel):
                     TradePlan.ticker_id == ticker.id,
                     TradePlan.status == 'open'
                 ).count()
+                
+                # Update active_trades field
+                ticker.active_trades = open_trades_count > 0
                 
                 # Determine new status
                 has_open_items = open_trades_count > 0 or open_plans_count > 0
@@ -217,3 +237,45 @@ class Ticker(BaseModel):
         except Exception as e:
             print(f"Error updating all ticker statuses: {e}")
             session.rollback()
+
+    def can_change_status(self, new_status: str) -> bool:
+        """
+        Check if the ticker status can be changed to the new status
+        
+        Args:
+            new_status: The new status to check
+            
+        Returns:
+            bool: True if status change is allowed, False otherwise
+        """
+        # If current status is 'cancelled', only allow manual change to 'open' or 'closed'
+        if self.status == 'cancelled':
+            return new_status in ['open', 'closed']
+        
+        # If new status is 'cancelled', always allow (manual cancellation)
+        if new_status == 'cancelled':
+            return True
+        
+        # For other status changes, allow if it's a valid status
+        return new_status in ['open', 'closed', 'cancelled']
+    
+    def set_status(self, new_status: str, force: bool = False) -> bool:
+        """
+        Set the ticker status with validation
+        
+        Args:
+            new_status: The new status to set
+            force: If True, bypass validation (use with caution)
+            
+        Returns:
+            bool: True if status was changed, False otherwise
+        """
+        if not force and not self.can_change_status(new_status):
+            return False
+        
+        if self.status != new_status:
+            self.status = new_status
+            self.updated_at = datetime.now()
+            return True
+        
+        return False

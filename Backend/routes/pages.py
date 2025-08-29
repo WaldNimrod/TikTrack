@@ -129,6 +129,16 @@ def test_header_only() -> Any:
     """Test header only page"""
     return send_from_directory(UI_DIR, "test-header-only.html")
 
+@pages_bp.route('/external-data-test')
+def external_data_test() -> Any:
+    """External data integration test page"""
+    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_external_data.html")
+
+@pages_bp.route('/models-test')
+def models_test() -> Any:
+    """Models test page"""
+    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_models.html")
+
 @pages_bp.route('/<path:filename>')
 def static_files(filename: str) -> Any:
     """Static files"""
@@ -156,3 +166,13 @@ def scripts_files(filename: str) -> Any:
 def images_files(filename: str) -> Any:
     """Image files"""
     return send_from_directory(UI_DIR / "images", filename)
+
+@pages_bp.route('/external_data_integration_client/styles/<path:filename>')
+def external_data_styles_files(filename: str) -> Any:
+    """External data integration CSS files"""
+    return send_from_directory(UI_DIR / "external_data_integration_client/styles", filename)
+
+@pages_bp.route('/external_data_integration_client/scripts/<path:filename>')
+def external_data_scripts_files(filename: str) -> Any:
+    """External data integration JavaScript files"""
+    return send_from_directory(UI_DIR / "external_data_integration_client/scripts", filename)

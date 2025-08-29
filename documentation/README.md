@@ -163,6 +163,7 @@ Welcome to the comprehensive documentation for the TikTrack Trading Management S
 - **[Constraint Management](features/constraints/README.md)** - Dynamic constraint system
 - **[Notes System](features/notes/README.md)** - Documentation and notes
 - **[File Management](features/files/README.md)** - File upload and storage
+- **[External Data Integration](features/external_data/EXTERNAL_DATA_SYSTEM.md)** - Real-time market data integration
 - **[Database Recreation Script](../Backend/create_fresh_database.py)** - Complete database recreation with sample data
 
 ### 🔒 **Security Documentation**
@@ -204,6 +205,7 @@ Welcome to the comprehensive documentation for the TikTrack Trading Management S
 - **[API Reference](api/README.md)** - Complete API documentation
 - **[Database Schema](database/README.md)** - Database structure and relationships
 - **[Frontend Architecture](frontend/README.md)** - Frontend system overview
+- **[External Data Integration](features/external_data/EXTERNAL_DATA_SYSTEM.md)** - Market data system documentation
 
 ### **For System Administrators**
 - **[Production Deployment](deployment/PRODUCTION.md)** - Production setup guide

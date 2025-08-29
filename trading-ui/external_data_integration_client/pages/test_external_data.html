@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת מידע חיצוני - TikTrack</title>
+
+    <!-- 
+        ===== דף בדיקת מידע חיצוני - TikTrack =====
+        
+        דף זה מכיל:
+        1. בדיקות API למידע חיצוני
+        2. בדיקות חיבור לבסיס נתונים
+        3. סימולציות של מחירים
+        4. לוגים מפורטים של הבדיקות
+        
+        מבנה הדף:
+        - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
+        - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+          - top-section: כרטיסיות התראות וסיכום נתונים
+          - content-section: טופסי בדיקה ותוצאות
+    -->
+
+    <!-- CSS Files - Ordered by priority (weak to strong) -->
+    <!-- 1. Apple theme (base) -->
+    <link rel="stylesheet" href="/styles/apple-theme.css">
+
+    <!-- 2. Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 3. General styles -->
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/header-system.css">
+
+    <!-- 4. Typography -->
+    <link rel="stylesheet" href="/styles/typography.css">
+
+    <!-- 5. Table styles -->
+    <link rel="stylesheet" href="/styles/table.css">
+
+    <!-- 6. External data test styles (page specific) -->
+    <link rel="stylesheet" href="/external_data_integration_client/styles/external_data_test.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Modular grid files -->
+    <script src="/scripts/console-cleanup.js"></script>
+    <script src="/scripts/translation-utils.js"></script>
+    <script src="/scripts/data-utils.js"></script>
+    <script src="/scripts/ui-utils.js"></script>
+    <script src="/scripts/table-mappings.js"></script>
+    <script src="/scripts/date-utils.js"></script>
+    <script src="/scripts/tables.js"></script>
+    <script src="/scripts/linked-items.js"></script>
+    <script src="/scripts/page-utils.js"></script>
+    <script src="/scripts/main.js"></script>
+    <script src="/scripts/header-system.js"></script>
+    <script src="/scripts/alerts.js"></script>
+    <script src="/scripts/active-alerts-component.js"></script>
+
+    <!-- External data test script -->
+    <script src="/external_data_integration_client/scripts/external_data_test.js"></script>
+</head>
+
+<body>
+    <!-- רקע כללי -->
+    <div class="background-wrapper">
+
+        <!-- unified-header ייווצר כאן אוטומטית -->
+
+        <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+        <div class="page-body">
+            <!-- אזור בדיקת מידע חיצוני - top-Section -->
+            <div class="top-section external-data-test-page">
+                <!-- כותרת בדיקת מידע חיצוני -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="/images/icons/research.svg" alt="בדיקת מידע חיצוני" style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        בדיקת מידע חיצוני
+                    </div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בדיקת מידע חיצוני">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- כרטיסיות התראות -->
+                <div class="section-body">
+                    <!-- ווב קומפוננט של התראות פעילות -->
+                    <active-alerts></active-alerts>
+
+                    <!-- סיכום נתונים -->
+                    <div class="info-summary" id="summaryStats">
+                        <div>בדיקות API: <strong id="apiTests">0</strong></div>
+                        <div>בדיקות DB: <strong id="dbTests">0</strong></div>
+                        <div>בדיקות מודלים: <strong id="modelTests">0</strong></div>
+                        <div>זמן תגובה ממוצע: <strong id="avgResponseTime">0ms</strong></div>
+                    </div>
+                </div>
+            </div> <!-- סוף top-section -->
+
+            <!-- תוכן ראשי -->
+            <div class="main-content">
+
+                <!-- אזור בדיקת מידע חיצוני - content-section -->
+                <div class="content-section external-data-test-page">
+                    <!-- כותרת בדיקת מידע חיצוני -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="/images/icons/research.svg" alt="בדיקות מידע חיצוני" style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            בדיקות מידע חיצוני
+                        </div>
+                        <div class="table-count" id="testCount">טוען...</div>
+                        <div class="table-actions">
+                            <button class="refresh-btn" onclick="runAllTests()" title="הרץ את כל הבדיקות">
+                                <i class="fas fa-play me-1"></i> הרץ בדיקות
+                            </button>
+
+                            <div class="action-separator"></div>
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור בדיקות">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- תוכן הבדיקות -->
+                    <div class="section-body">
+                        <div class="container-fluid">
+                            <!-- Loading Indicator -->
+                            <div id="loading-indicator" class="loading-overlay" style="display: none;">
+                                <div class="loading-spinner">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                    <div class="loading-text mt-2">טוען...</div>
+                                </div>
+                            </div>
+
+                            <!-- Error Display -->
+                            <div id="error-display" class="alert alert-danger" style="display: none;">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span id="error-message"></span>
+                            </div>
+
+                            <!-- Current Time Display -->
+                            <div class="current-time-display mb-3">
+                                <i class="fas fa-clock me-2"></i>
+                                <span id="current-time">טוען זמן...</span>
+                            </div>
+
+                            <!-- Test Forms -->
+                            <div class="row">
+                                <!-- Single Quote Test -->
+                                <div class="col-md-6 mb-4">
+                                    <div class="card test-card">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">
+                                                <i class="fas fa-chart-line me-2"></i>
+                                                בדיקת מחיר בודד
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">סמל טיקר:</label>
+                                                <input type="text" class="form-control" id="single-symbol" placeholder="AAPL" value="AAPL">
+                                            </div>
+                                            <button class="btn btn-primary w-100" id="test-single-quote">
+                                                <i class="fas fa-search me-1"></i>בדוק מחיר
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Batch Quote Test -->
+                                <div class="col-md-6 mb-4">
+                                    <div class="card test-card">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">
+                                                <i class="fas fa-list me-2"></i>
+                                                בדיקת מחירים מרובים
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">סמלי טיקרים (מופרדים בפסיקים):</label>
+                                                <input type="text" class="form-control" id="test-symbols" placeholder="AAPL,GOOGL,MSFT" value="AAPL,GOOGL,MSFT,TSLA">
+                                            </div>
+                                            <button class="btn btn-success w-100" id="test-batch-quotes">
+                                                <i class="fas fa-search me-1"></i>בדוק מחירים
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Database Connection Test -->
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card test-card">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">
+                                                <i class="fas fa-database me-2"></i>
+                                                בדיקת חיבור לבסיס נתונים
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">טיקרים מבסיס הנתונים:</label>
+                                                <div class="input-group">
+                                                    <select class="form-control" id="db-tickers-select">
+                                                        <option value="">טוען טיקרים...</option>
+                                                    </select>
+                                                    <button class="btn btn-success" type="button" id="load-db-tickers">
+                                                        <i class="fas fa-database me-1"></i>טען טיקרים
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-secondary" type="button" id="test-db-connection">
+                                                <i class="fas fa-plug me-1"></i>בדוק חיבור DB
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- API Status Test -->
+                                <div class="col-md-6 mb-4">
+                                    <div class="card test-card">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">
+                                                <i class="fas fa-wifi me-2"></i>
+                                                בדיקת סטטוס API
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">בדיקת זמינות:</label>
+                                                <div class="d-grid gap-2">
+                                                    <button class="btn btn-outline-primary" id="test-api-status">
+                                                        <i class="fas fa-heartbeat me-1"></i>בדוק זמינות
+                                                    </button>
+                                                    <button class="btn btn-outline-info" id="test-api-performance">
+                                                        <i class="fas fa-tachometer-alt me-1"></i>בדוק ביצועים
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Test Results -->
+                            <div class="row">
+                                <!-- Single Quote Results -->
+                                <div class="col-md-6 mb-4">
+                                    <div class="card result-card" id="single-quote-card" style="display: none;">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">
+                                                <i class="fas fa-chart-line me-2"></i>
+                                                תוצאות מחיר בודד
+                                            </h5>
+                                        </div>
+                                        <div class="card-body" id="single-quote-content">
+                                            <!-- תוכן דינמי -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Batch Results -->
+                                <div class="col-md-6 mb-4">
+                                    <div class="card result-card" id="batch-results-card" style="display: none;">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">
+                                                <i class="fas fa-list me-2"></i>
+                                                תוצאות מחירים מרובים
+                                            </h5>
+                                        </div>
+                                        <div class="card-body" id="batch-results-content">
+                                            <!-- תוכן דינמי -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Database Status Results -->
+                            <div class="row">
+                                <div class="col-12 mb-4">
+                                    <div class="card result-card" id="db-status-card" style="display: none;">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">
+                                                <i class="fas fa-database me-2"></i>
+                                                סטטוס בסיס נתונים
+                                            </h5>
+                                        </div>
+                                        <div class="card-body" id="db-status-content">
+                                            <!-- תוכן דינמי -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Test Logs -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card log-card">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">
+                                                <i class="fas fa-file-alt me-2"></i>
+                                                לוג בדיקות
+                                                <button class="btn btn-sm btn-outline-secondary float-start" onclick="clearLogs()">
+                                                    <i class="fas fa-trash me-1"></i>נקה
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="log-container" id="test-logs">
+                                                <!-- לוגים יוצגו כאן -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- סוף content-section -->
+            </div> <!-- סוף main-content -->
+        </div> <!-- סוף page-body -->
+    </div> <!-- סוף background-wrapper -->
+
+    <script>
+        // אתחול HeaderSystem
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.headerSystem && !window.headerSystem.isInitialized) {
+                window.headerSystem.init();
+            }
+        });
+    </script>
+</body>
+
+</html>

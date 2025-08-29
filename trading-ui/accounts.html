@@ -73,8 +73,11 @@
   <link rel="stylesheet" href="styles/table.css">
 
   <!-- 6. Header system styles (highest priority) -->
+  <!-- 7. Warning system styles (new centralized warning system) -->
+  <link rel="stylesheet" href="styles/warning-system.css">
 
-
+  <!-- 8. Linked items modal styles -->
+  <link rel="stylesheet" href="styles/linked-items.css">
 
   <!-- Modular grid files -->
   <script src="scripts/button-icons.js"></script>
@@ -89,8 +92,11 @@
   <script src="scripts/page-utils.js"></script>
   <script src="scripts/main.js"></script>
     <script src="scripts/header-system.js"></script>  <script src="scripts/alerts.js"></script>
-  <script src="scripts/active-alerts-component.js"></script>
-  <script src="scripts/accounts.js"></script>
+      <script src="scripts/active-alerts-component.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/validation-utils.js"></script>
+    <script src="scripts/accounts.js"></script>
   
   <style>
     /* רוחב עמודות יחסי לטבלת חשבונות */
@@ -181,7 +187,8 @@
   <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- unified-header ייווצר כאן אוטומטית -->
+    <!-- Unified Header System -->
+    <div id="unified-header-container"></div>
 
     <!-- Active alerts component -->
     <active-alerts></active-alerts>
@@ -312,7 +319,7 @@
     </div> <!-- End page-body -->
 
     <!-- Bottom page spacing -->
-    <div class="bottom-spacing"></div>
+    <div class="bottom-spacer"></div>
 
     <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>

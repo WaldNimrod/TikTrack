@@ -372,16 +372,16 @@ function updateAccountsTable(accounts) {
       </td>
       <td>$${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}</td>
       <td>$${account.total_value ? account.total_value.toLocaleString() : '0'}</td>
-      <td>${window.colorAmount(account.total_pl || 0, `$${account.total_pl ? account.total_pl.toLocaleString() : '0'}`)}</td>
+      <td>${account.total_pl ? `$${account.total_pl.toLocaleString()}` : '$0'}</td>
       <td>${account.notes || '-'}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-secondary" onclick="editAccount(${account.id})" title="ערוך חשבון">
+        <button class="btn btn-sm btn-secondary" onclick="showEditAccountModalById(${account.id})" title="ערוך חשבון">
           ✏️
         </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id})" title="מחק חשבון">
+        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name || 'Unknown'}')" title="מחק חשבון">
           🗑️
         </button>
-        <button class="btn btn-sm btn-info" onclick="viewLinkedItems(${account.id})" title="צפה באלמנטים מקושרים">
+        <button class="btn btn-sm btn-info" onclick="showLinkedItemsWarning('account', ${account.id})" title="צפה באלמנטים מקושרים">
           🔗
         </button>
       </td>
@@ -1447,6 +1447,7 @@ async function cancelAccount(accountId, accountName) {
       if (!confirmed) return;
     });
   } else {
+    // גיבוי למערכת הישנה
     if (!confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
       return;
     }
@@ -1534,6 +1535,7 @@ async function deleteAccount(accountId, accountName) {
       if (!confirmed) return;
     });
   } else {
+    // גיבוי למערכת הישנה
     if (!confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
       return;
     }
@@ -1606,8 +1608,11 @@ function showErrorMessage(message) {
 function showSecondConfirmationModal(message, onConfirm) {
   if (window.showConfirmationDialog) {
     window.showConfirmationDialog('אישור', message, onConfirm, () => {});
-  } else if (confirm(message)) {
-    onConfirm();
+  } else {
+    // גיבוי למערכת הישנה
+    if (confirm(message)) {
+      onConfirm();
+    }
   }
 }
 
@@ -1816,46 +1821,7 @@ async function loadAccountsDataForAccountsPage() {
   }
 }
 
-// פונקציות לפתיחה/סגירה של סקשנים
-function toggleMainSection() {
-  console.log('🔄 toggleMainSection נקראה');
-  const contentSections = document.querySelectorAll('.content-section');
-  console.log('📋 מספר content-sections נמצא:', contentSections.length);
-  const accountsSection = contentSections[0]; // הסקשן הראשון - חשבונות
 
-  if (!accountsSection) {
-    console.error('❌ לא נמצא סקשן חשבונות');
-    return;
-  }
-  console.log('✅ סקשן חשבונות נמצא:', accountsSection);
-
-  const sectionBody = accountsSection.querySelector('.section-body');
-  const toggleBtn = accountsSection.querySelector('button[onclick="toggleMainSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  console.log('🎯 sectionBody נמצא:', !!sectionBody);
-  console.log('🔘 toggleBtn נמצא:', !!toggleBtn);
-  console.log('🎨 icon נמצא:', !!icon);
-
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-    console.log('📊 מצב נוכחי - isCollapsed:', isCollapsed);
-
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
-    } else {
-      sectionBody.style.display = 'none';
-    }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('accountsSectionCollapsed', !isCollapsed);
-  }
-}
 
 // פונקציה להגדרת כותרות למיון
 function setupSortableHeaders() {
@@ -2058,16 +2024,15 @@ function updateAccountFilterMenu(accounts) {
 
 // ייצוא הפונקציות
 window.loadAccountsDataForAccountsPage = loadAccountsDataForAccountsPage;
-window.toggleMainSection = toggleMainSection;
+
 window.setupSortableHeaders = setupSortableHeaders;
 // updateGridFromComponentGlobal הועבר ל-header-system.js
 window.updateAccountFilterMenu = updateAccountFilterMenu;
 window.filterAccountsLocally = filterAccountsLocally;
 window.updateAccountsTable = updateAccountsTable;
-window.editAccount = editAccount;
 window.deleteAccount = deleteAccount;
-window.viewLinkedItems = viewLinkedItems;
-window.showNotification = showNotification;
+
+
 
 // בדיקה סופית שהפונקציות מיוצאות
 console.log('🔄 === בדיקה סופית של ייצוא פונקציות ===');
@@ -2076,9 +2041,7 @@ console.log('- showEditAccountModal:', typeof window.showEditAccountModal);
 console.log('- showAddAccountModal:', typeof window.showAddAccountModal);
 console.log('- toggleMainSection:', typeof window.toggleMainSection);
 console.log('- updateAccountsTable:', typeof window.updateAccountsTable);
-console.log('- editAccount:', typeof window.editAccount);
 console.log('- deleteAccount:', typeof window.deleteAccount);
-console.log('- viewLinkedItems:', typeof window.viewLinkedItems);
 console.log('- showNotification:', typeof window.showNotification);
 console.log('✅ === סיום בדיקת ייצוא ===');
 

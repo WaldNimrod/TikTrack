@@ -1495,3 +1495,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ דף טבלאות עזר אותחל בהצלחה');
 });
+
+// ========================================
+// Export Functions
+// ========================================
+
+// Export toggle functions
+window.toggleAllSections = toggleAllSections;
+window.toggleCurrenciesSection = toggleCurrenciesSection;
+window.toggleNoteRelationTypesSection = toggleNoteRelationTypesSection;

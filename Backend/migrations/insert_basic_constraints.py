@@ -160,26 +160,47 @@ def insert_trade_plans_constraints():
                 VALUES (?, ?, ?, ?)
             """, (constraint_id, value, display_name, sort_order))
         
-        # 3. planned_amount RANGE constraint
+        # 3. status ENUM constraint
+        cursor.execute("""
+            INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
+            VALUES (?, ?, ?, ?, ?)
+        """, ('trade_plans', 'status', 'ENUM', 'valid_plan_status', 
+              'status IN (''open'', ''closed'', ''cancelled'')'))
+        
+        constraint_id = cursor.lastrowid
+        
+        enum_values = [
+            ('open', 'פתוח', 1),
+            ('closed', 'סגור', 2),
+            ('cancelled', 'בוטל', 3)
+        ]
+        
+        for value, display_name, sort_order in enum_values:
+            cursor.execute("""
+                INSERT INTO enum_values (constraint_id, value, display_name, sort_order)
+                VALUES (?, ?, ?, ?)
+            """, (constraint_id, value, display_name, sort_order))
+        
+        # 4. planned_amount RANGE constraint
         cursor.execute("""
             INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
             VALUES (?, ?, ?, ?, ?)
         """, ('trade_plans', 'planned_amount', 'RANGE', 'positive_planned_amount', 
               'planned_amount > 0'))
         
-        # 4. target_price RANGE constraint
+        # 5. target_price RANGE constraint
         cursor.execute("""
             INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
             VALUES (?, ?, ?, ?, ?)
         """, ('trade_plans', 'target_price', 'RANGE', 'positive_target_price', 
               'target_price > 0'))
         
-                # 5. stop_loss RANGE constraint
+        # 6. stop_price RANGE constraint
         cursor.execute("""
             INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
             VALUES (?, ?, ?, ?, ?)
-        """, ('trade_plans', 'stop_loss', 'RANGE', 'positive_stop_loss',
-            'stop_loss > 0'))
+        """, ('trade_plans', 'stop_price', 'RANGE', 'positive_stop_price', 
+              'stop_price > 0'))
         
         conn.commit()
         print("✅ Trade plans constraints inserted successfully")
@@ -274,6 +295,148 @@ def insert_alerts_constraints():
     finally:
         conn.close()
 
+def insert_cash_flows_constraints():
+    """Insert constraints for cash_flows table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        print("📊 Inserting cash_flows table constraints...")
+        
+        # 1. type ENUM constraint
+        cursor.execute("""
+            INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
+            VALUES (?, ?, ?, ?, ?)
+        """, ('cash_flows', 'type', 'ENUM', 'valid_cash_flow_type', 
+              'type IN (''deposit'', ''withdrawal'', ''transfer'', ''fee'', ''dividend'', ''interest'')'))
+        
+        constraint_id = cursor.lastrowid
+        
+        enum_values = [
+            ('deposit', 'הפקדה', 1),
+            ('withdrawal', 'משיכה', 2),
+            ('transfer', 'העברה', 3),
+            ('fee', 'עמלה', 4),
+            ('dividend', 'דיבידנד', 5),
+            ('interest', 'ריבית', 6)
+        ]
+        
+        for value, display_name, sort_order in enum_values:
+            cursor.execute("""
+                INSERT INTO enum_values (constraint_id, value, display_name, sort_order)
+                VALUES (?, ?, ?, ?)
+            """, (constraint_id, value, display_name, sort_order))
+        
+        # 2. source ENUM constraint
+        cursor.execute("""
+            INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
+            VALUES (?, ?, ?, ?, ?)
+        """, ('cash_flows', 'source', 'ENUM', 'valid_cash_flow_source', 
+              'source IN (''manual'', ''file_import'', ''direct_import'', ''api'')'))
+        
+        constraint_id = cursor.lastrowid
+        
+        enum_values = [
+            ('manual', 'ידני', 1),
+            ('file_import', 'ייבוא קובץ', 2),
+            ('direct_import', 'ייבוא ישיר', 3),
+            ('api', 'API', 4)
+        ]
+        
+        for value, display_name, sort_order in enum_values:
+            cursor.execute("""
+                INSERT INTO enum_values (constraint_id, value, display_name, sort_order)
+                VALUES (?, ?, ?, ?)
+            """, (constraint_id, value, display_name, sort_order))
+        
+        # 3. amount RANGE constraint (not zero)
+        cursor.execute("""
+            INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
+            VALUES (?, ?, ?, ?, ?)
+        """, ('cash_flows', 'amount', 'RANGE', 'non_zero_amount', 
+              'amount != 0'))
+        
+        # 4. usd_rate RANGE constraint (positive)
+        cursor.execute("""
+            INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
+            VALUES (?, ?, ?, ?, ?)
+        """, ('cash_flows', 'usd_rate', 'RANGE', 'positive_usd_rate', 
+              'usd_rate > 0'))
+        
+        conn.commit()
+        print("✅ Cash flows constraints inserted successfully")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error inserting cash_flows constraints: {e}")
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
+def insert_tickers_constraints():
+    """Insert constraints for tickers table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        print("📊 Inserting tickers table constraints...")
+        
+        # 1. status ENUM constraint
+        cursor.execute("""
+            INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
+            VALUES (?, ?, ?, ?, ?)
+        """, ('tickers', 'status', 'ENUM', 'valid_ticker_status', 
+              'status IN (''open'', ''closed'', ''cancelled'')'))
+        
+        constraint_id = cursor.lastrowid
+        
+        enum_values = [
+            ('open', 'פעיל', 1),
+            ('closed', 'סגור', 2),
+            ('cancelled', 'מבוטל', 3)
+        ]
+        
+        for value, display_name, sort_order in enum_values:
+            cursor.execute("""
+                INSERT INTO enum_values (constraint_id, value, display_name, sort_order)
+                VALUES (?, ?, ?, ?)
+            """, (constraint_id, value, display_name, sort_order))
+        
+        # 2. type ENUM constraint
+        cursor.execute("""
+            INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
+            VALUES (?, ?, ?, ?, ?)
+        """, ('tickers', 'type', 'ENUM', 'valid_ticker_type', 
+              'type IN (''stock'', ''etf'', ''crypto'', ''forex'', ''commodity'')'))
+        
+        constraint_id = cursor.lastrowid
+        
+        enum_values = [
+            ('stock', 'מניה', 1),
+            ('etf', 'קרן נאמנות', 2),
+            ('crypto', 'מטבע דיגיטלי', 3),
+            ('forex', 'מטבע חוץ', 4),
+            ('commodity', 'סחורה', 5)
+        ]
+        
+        for value, display_name, sort_order in enum_values:
+            cursor.execute("""
+                INSERT INTO enum_values (constraint_id, value, display_name, sort_order)
+                VALUES (?, ?, ?, ?)
+            """, (constraint_id, value, display_name, sort_order))
+        
+        conn.commit()
+        print("✅ Tickers constraints inserted successfully")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error inserting tickers constraints: {e}")
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
 def insert_accounts_constraints():
     """Insert constraints for accounts table"""
     conn = get_db_connection()
@@ -287,14 +450,14 @@ def insert_accounts_constraints():
             INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
             VALUES (?, ?, ?, ?, ?)
         """, ('accounts', 'status', 'ENUM', 'valid_account_status', 
-              'status IN (''active'', ''inactive'', ''suspended'')'))
+              'status IN (''open'', ''closed'', ''cancelled'')'))
         
         constraint_id = cursor.lastrowid
         
         enum_values = [
-            ('active', 'פעיל', 1),
-            ('inactive', 'לא פעיל', 2),
-            ('suspended', 'מושעה', 3)
+            ('open', 'פעיל', 1),
+            ('closed', 'סגור', 2),
+            ('cancelled', 'מבוטל', 3)
         ]
         
         for value, display_name, sort_order in enum_values:
@@ -379,12 +542,22 @@ def main():
         print("❌ Failed to insert alerts constraints")
         return
     
-    # Step 4: Insert accounts constraints
+    # Step 4: Insert cash_flows constraints
+    if not insert_cash_flows_constraints():
+        print("❌ Failed to insert cash_flows constraints")
+        return
+    
+    # Step 5: Insert tickers constraints
+    if not insert_tickers_constraints():
+        print("❌ Failed to insert tickers constraints")
+        return
+    
+    # Step 6: Insert accounts constraints
     if not insert_accounts_constraints():
         print("❌ Failed to insert accounts constraints")
         return
     
-    # Step 5: Verify all constraints
+    # Step 7: Verify all constraints
     if not verify_constraints():
         print("❌ Constraint verification failed")
         return

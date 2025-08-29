@@ -71,6 +71,18 @@
   - Database constraint viewing
   - System data administration
 
+### 7. External Data Integration 🆕
+- **Status**: In Development (Stage-1)
+- **Description**: Real-time market data integration system
+- **Features**:
+  - Yahoo Finance provider integration
+  - Real-time price updates
+  - Configurable refresh policies
+  - Timezone support
+  - Modular provider architecture
+- **Documentation**: [External Data System](external_data/EXTERNAL_DATA_SYSTEM.md)
+- **Development Tasks**: [Development Tasks](external_data/DEVELOPMENT_TASKS.md)
+
 ## Global System Features
 
 ### 1. Warning System
@@ -198,4 +210,4 @@
 ## Last Updated
 **Date**: 2025-01-26
 **Updated By**: AI Assistant
-**Changes**: Cash Flows module completion, warning system integration, page styling improvements
+**Changes**: Cash Flows module completion, warning system integration, page styling improvements, External Data Integration system documentation

@@ -231,7 +231,43 @@ class ValidationService:
                 if isinstance(value, (int, float)):
                     return min_val <= value <= max_val
             
-            # Default: assume constraint passes
+            # Handle inequality constraints like "field != 0"
+            not_equal_match = re.search(r'\w+\s*!=\s*(\d+(?:\.\d+)?)', definition, re.IGNORECASE)
+            if not_equal_match:
+                not_equal_val = float(not_equal_match.group(1))
+                if isinstance(value, (int, float)):
+                    return value != not_equal_val
+            
+            # Handle greater than constraints like "field > 0"
+            greater_than_match = re.search(r'\w+\s*>\s*(\d+(?:\.\d+)?)', definition, re.IGNORECASE)
+            if greater_than_match:
+                min_val = float(greater_than_match.group(1))
+                if isinstance(value, (int, float)):
+                    return value > min_val
+            
+            # Handle greater than or equal constraints like "field >= 0"
+            greater_equal_match = re.search(r'\w+\s*>=\s*(\d+(?:\.\d+)?)', definition, re.IGNORECASE)
+            if greater_equal_match:
+                min_val = float(greater_equal_match.group(1))
+                if isinstance(value, (int, float)):
+                    return value >= min_val
+            
+            # Handle less than constraints like "field < 100"
+            less_than_match = re.search(r'\w+\s*<\s*(\d+(?:\.\d+)?)', definition, re.IGNORECASE)
+            if less_than_match:
+                max_val = float(less_than_match.group(1))
+                if isinstance(value, (int, float)):
+                    return value < max_val
+            
+            # Handle less than or equal constraints like "field <= 100"
+            less_equal_match = re.search(r'\w+\s*<=\s*(\d+(?:\.\d+)?)', definition, re.IGNORECASE)
+            if less_equal_match:
+                max_val = float(less_equal_match.group(1))
+                if isinstance(value, (int, float)):
+                    return value <= max_val
+            
+            # Default: assume constraint passes if we can't parse it
+            logger.warning(f"Unable to parse RANGE constraint: {definition}")
             return True
             
         except Exception as e:

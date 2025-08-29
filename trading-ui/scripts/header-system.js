@@ -632,6 +632,9 @@ class HeaderSystem {
                             <li><a class="tiktrack-dropdown-item" href="/tests#results">תוצאות בדיקות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/tests#crud-results">תוצאות CRUD</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external-data-test">בדיקת מידע חיצוני</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/models-test">בדיקת מודלים</a></li>
                           </ul>
                         </li>
                       </ul>

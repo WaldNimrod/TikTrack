@@ -11,9 +11,9 @@ class Currency(BaseModel):
     usd_rate = Column(Numeric(10, 6), nullable=False, default=1.000000)
     
     # Relationships
+    accounts = relationship("Account", back_populates="currency")
     cash_flows = relationship("CashFlow", back_populates="currency")
     tickers = relationship("Ticker", back_populates="currency")
-    # Removed accounts relationship - Account model uses currency as string field
     
     def __repr__(self) -> str:
         return f"<Currency(symbol='{self.symbol}', name='{self.name}', usd_rate={self.usd_rate})>"

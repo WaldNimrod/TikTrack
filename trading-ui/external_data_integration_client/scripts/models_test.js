@@ -1,306 +1,304 @@
 /**
- * Models Test JavaScript
+ * Models Test JavaScript - Simple Interface
  * 
- * This script provides functionality for testing the external data integration
- * models, including validation and data structure testing.
+ * This script provides a simple interface for testing external data integration
+ * models without complex validation logic.
+ * 
+ * User System: Single user system (user_id = 1 always)
+ * - No user authentication required
+ * - All preferences are assigned to user 1
+ * - Future: Can be extended to multi-user system
  * 
  * Author: TikTrack Development Team
  * Created: January 2025
- * Version: 1.0
+ * Version: 2.1 - Single User System
  */
 
-class ModelsTester {
+class SimpleModelsTester {
     constructor() {
-        this.testResults = [];
+        console.log('🔧 SimpleModelsTester initialized');
         this.initializeEventListeners();
+        this.addInitialMessage();
+        this.startTimeUpdate();
     }
 
     /**
-     * Initialize all event listeners
+     * Initialize event listeners
      */
     initializeEventListeners() {
-        // Ticker model test
-        document.getElementById('test-ticker-model').addEventListener('click', () => {
-            this.testTickerModel();
-        });
+        console.log('🔗 Setting up event listeners...');
+        
+        // Preferences model test
+        const testPreferencesBtn = document.getElementById('test-preferences-model');
+        if (testPreferencesBtn) {
+            testPreferencesBtn.addEventListener('click', () => {
+                this.testPreferencesModel();
+            });
+            console.log('✅ Preferences button listener added');
+        }
 
         // Quote model test
-        document.getElementById('test-quote-model').addEventListener('click', () => {
-            this.testQuoteModel();
-        });
+        const testQuoteBtn = document.getElementById('test-quote-model');
+        if (testQuoteBtn) {
+            testQuoteBtn.addEventListener('click', () => {
+                this.testQuoteModel();
+            });
+            console.log('✅ Quote button listener added');
+        }
 
-        // Preferences model test
-        document.getElementById('test-preferences-model').addEventListener('click', () => {
-            this.testPreferencesModel();
-        });
+        // Ticker model test
+        const testTickerBtn = document.getElementById('test-ticker-model');
+        if (testTickerBtn) {
+            testTickerBtn.addEventListener('click', () => {
+                this.testTickerModel();
+            });
+            console.log('✅ Ticker button listener added');
+        }
 
         // Validation tests
-        document.getElementById('validate-timezone').addEventListener('click', () => {
-            this.validateTimezone();
-        });
-
-        document.getElementById('validate-interval').addEventListener('click', () => {
-            this.validateInterval();
-        });
-
-        document.getElementById('validate-mode').addEventListener('click', () => {
-            this.validateMode();
-        });
-
-        // Clear results
-        document.getElementById('clear-results').addEventListener('click', () => {
-            this.clearResults();
-        });
-    }
-
-    /**
-     * Test Ticker model
-     */
-    testTickerModel() {
-        const symbol = document.getElementById('ticker-symbol').value.trim();
-        const name = document.getElementById('ticker-name').value.trim();
-        const status = document.getElementById('ticker-status').value;
-        const activeTrades = document.getElementById('ticker-active-trades').checked ? 1 : 0;
-
-        // Validation
-        const errors = [];
-        if (!symbol) errors.push('סמל הוא שדה חובה');
-        if (symbol.length > 10) errors.push('סמל לא יכול להיות יותר מ-10 תווים');
-        if (!name) errors.push('שם הוא שדה חובה');
-        if (name.length > 100) errors.push('שם לא יכול להיות יותר מ-100 תווים');
-
-        if (errors.length > 0) {
-            this.addResult('Ticker Model', 'error', errors.join(', '));
-            return;
+        const testDataValidationBtn = document.getElementById('test-data-validation');
+        if (testDataValidationBtn) {
+            testDataValidationBtn.addEventListener('click', () => {
+                this.testDataValidation();
+            });
+            console.log('✅ Data validation button listener added');
         }
 
-        // Create ticker object
-        const ticker = {
-            symbol: symbol,
-            name: name,
-            status: status,
-            active_trades: activeTrades,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        };
-
-        // Test to_dict method
-        const tickerDict = this.simulateTickerToDict(ticker);
-        
-        this.addResult('Ticker Model', 'success', 
-            `מודל Ticker נוצר בהצלחה: ${symbol} - ${name}`, 
-            { ticker, tickerDict }
-        );
-    }
-
-    /**
-     * Test Quote model
-     */
-    testQuoteModel() {
-        const tickerId = parseInt(document.getElementById('quote-ticker-id').value);
-        const price = parseFloat(document.getElementById('quote-price').value);
-        const changeAmount = parseFloat(document.getElementById('quote-change-amount').value);
-        const changePercent = parseFloat(document.getElementById('quote-change-percent').value);
-        const volume = parseInt(document.getElementById('quote-volume').value);
-        const provider = document.getElementById('quote-provider').value;
-
-        // Validation
-        const errors = [];
-        if (!tickerId || tickerId <= 0) errors.push('Ticker ID חייב להיות מספר חיובי');
-        if (!price || price <= 0) errors.push('מחיר חייב להיות מספר חיובי');
-        if (provider.length > 50) errors.push('שם ספק לא יכול להיות יותר מ-50 תווים');
-
-        if (errors.length > 0) {
-            this.addResult('Quote Model', 'error', errors.join(', '));
-            return;
+        const testStructureValidationBtn = document.getElementById('test-structure-validation');
+        if (testStructureValidationBtn) {
+            testStructureValidationBtn.addEventListener('click', () => {
+                this.testStructureValidation();
+            });
+            console.log('✅ Structure validation button listener added');
         }
-
-        // Create quote object
-        const quote = {
-            ticker_id: tickerId,
-            price: price,
-            change_amount: changeAmount,
-            change_percent: changePercent,
-            volume: volume,
-            high_24h: price + Math.random() * 10,
-            low_24h: price - Math.random() * 10,
-            open_price: price + (Math.random() - 0.5) * 5,
-            previous_close: price - changeAmount,
-            provider: provider,
-            asof_utc: new Date().toISOString(),
-            fetched_at: new Date().toISOString(),
-            last_updated: new Date().toISOString(),
-            created_at: new Date().toISOString()
-        };
-
-        // Test to_dict method
-        const quoteDict = this.simulateQuoteToDict(quote);
-        
-        this.addResult('Quote Model', 'success', 
-            `מודל Quote נוצר בהצלחה: מחיר $${price.toFixed(2)}`, 
-            { quote, quoteDict }
-        );
     }
 
     /**
-     * Test Market Preferences model
+     * Add initial message
+     */
+    addInitialMessage() {
+        setTimeout(() => {
+            this.addResult('System', 'info', 'ממשק בדיקת מודלים מוכן לשימוש');
+            this.addResult('System', 'info', 'מערכת חד-משתמשית: כל ההעדפות יוקצו למשתמש 1');
+        }, 500);
+    }
+
+    /**
+     * Start time update
+     */
+    startTimeUpdate() {
+        this.updateTime();
+        // Update time every second
+        setInterval(() => {
+            this.updateTime();
+        }, 1000);
+    }
+
+    /**
+     * Update current time display
+     */
+    updateTime() {
+        const timeElement = document.getElementById('current-time');
+        if (timeElement) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('he-IL', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            const dateString = now.toLocaleDateString('he-IL', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            timeElement.textContent = `${dateString} ${timeString}`;
+        }
+    }
+
+    /**
+     * Test Preferences Model - Simple version
      */
     testPreferencesModel() {
-        const userId = parseInt(document.getElementById('pref-user-id').value);
-        const timezone = document.getElementById('pref-timezone').value;
-        const refreshMode = document.getElementById('pref-refresh-mode').value;
-        const interval = parseInt(document.getElementById('pref-interval').value);
-
-        // Validation
-        const errors = [];
-        if (!userId || userId <= 0) errors.push('User ID חייב להיות מספר חיובי');
-        if (!this.validateTimezone(timezone)) errors.push('אזור זמן לא תקין');
-        if (!this.validateRefreshMode(refreshMode)) errors.push('מצב רענון לא תקין');
-        if (!this.validateRefreshInterval(interval)) errors.push('מרווח רענון לא תקין');
-
-        if (errors.length > 0) {
-            this.addResult('Market Preferences Model', 'error', errors.join(', '));
+        console.log('🧪 Testing preferences model...');
+        
+        const preferencesDataElement = document.getElementById('preferences-data');
+        if (!preferencesDataElement) {
+            this.addResult('Preferences Model', 'error', 'אלמנט preferences-data לא נמצא');
             return;
         }
 
-        // Create preferences object
-        const refreshOverrides = {
-            mode: refreshMode,
-            interval_minutes: interval,
-            closed: {
-                weekdays: { offset_minutes_after_close: 45 }
-            },
-            open: {
-                active: { in_minutes: 5, off_minutes: 60 },
-                no_active: { in_minutes: 60, off_minutes: 60 }
-            },
-            weekend: {
-                open: { daily_hour_ny: 12 }
+        const dataText = preferencesDataElement.value.trim();
+        if (!dataText) {
+            this.addResult('Preferences Model', 'error', 'אין נתונים לבדיקה');
+            return;
+        }
+
+        try {
+            const data = JSON.parse(dataText);
+            
+            // Ensure user_id is always 1 for now (single user system)
+            const preferencesWithUser = {
+                ...data,
+                user_id: 1,
+                created_at: data.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            
+            this.addResult('Preferences Model', 'success', 
+                `העדפות נוצרו בהצלחה עבור משתמש 1 (מערכת חד-משתמשית)`, 
+                preferencesWithUser
+            );
+        } catch (error) {
+            this.addResult('Preferences Model', 'error', `שגיאה בניתוח JSON: ${error.message}`);
+        }
+    }
+
+    /**
+     * Test Quote Model - Simple version
+     */
+    testQuoteModel() {
+        console.log('🧪 Testing quote model...');
+        
+        const quoteDataElement = document.getElementById('quote-data');
+        if (!quoteDataElement) {
+            this.addResult('Quote Model', 'error', 'אלמנט quote-data לא נמצא');
+            return;
+        }
+
+        const dataText = quoteDataElement.value.trim();
+        if (!dataText) {
+            this.addResult('Quote Model', 'error', 'אין נתונים לבדיקה');
+            return;
+        }
+
+        try {
+            const data = JSON.parse(dataText);
+            this.addResult('Quote Model', 'success', 
+                `מחיר נוצר בהצלחה עבור ${data.symbol || 'לא ידוע'}`, 
+                data
+            );
+        } catch (error) {
+            this.addResult('Quote Model', 'error', `שגיאה בניתוח JSON: ${error.message}`);
+        }
+    }
+
+    /**
+     * Test Ticker Model - Simple version
+     */
+    testTickerModel() {
+        console.log('🧪 Testing ticker model...');
+        
+        const tickerDataElement = document.getElementById('ticker-data');
+        if (!tickerDataElement) {
+            this.addResult('Ticker Model', 'error', 'אלמנט ticker-data לא נמצא');
+            return;
+        }
+
+        const dataText = tickerDataElement.value.trim();
+        if (!dataText) {
+            this.addResult('Ticker Model', 'error', 'אין נתונים לבדיקה');
+            return;
+        }
+
+        try {
+            const data = JSON.parse(dataText);
+            this.addResult('Ticker Model', 'success', 
+                `טיקר נוצר בהצלחה: ${data.symbol || 'לא ידוע'} - ${data.name || 'ללא שם'}`, 
+                data
+            );
+        } catch (error) {
+            this.addResult('Ticker Model', 'error', `שגיאה בניתוח JSON: ${error.message}`);
+        }
+    }
+
+    /**
+     * Test Data Validation - Simple version
+     */
+    testDataValidation() {
+        console.log('🧪 Testing data validation...');
+        
+        const elements = [
+            { id: 'preferences-data', name: 'העדפות' },
+            { id: 'quote-data', name: 'מחיר' },
+            { id: 'ticker-data', name: 'טיקר' }
+        ];
+
+        let validCount = 0;
+        let totalCount = 0;
+
+        elements.forEach(element => {
+            const el = document.getElementById(element.id);
+            if (el && el.value.trim()) {
+                totalCount++;
+                try {
+                    JSON.parse(el.value.trim());
+                    validCount++;
+                    this.addResult('Data Validation', 'success', `נתוני ${element.name} תקינים`);
+                } catch (error) {
+                    this.addResult('Data Validation', 'error', `שגיאה בנתוני ${element.name}: ${error.message}`);
+                }
             }
-        };
+        });
 
-        const preferences = {
-            user_id: userId,
-            timezone: timezone,
-            refresh_overrides_json: JSON.stringify(refreshOverrides),
-            updated_at: new Date().toISOString()
-        };
+        if (totalCount === 0) {
+            this.addResult('Data Validation', 'warning', 'אין נתונים לבדיקה');
+        } else {
+            this.addResult('Data Validation', 'info', `בדיקה הושלמה: ${validCount}/${totalCount} תקינים`);
+        }
+    }
 
-        // Test to_dict method
-        const preferencesDict = this.simulatePreferencesToDict(preferences);
+    /**
+     * Test Structure Validation - Simple version
+     */
+    testStructureValidation() {
+        console.log('🧪 Testing structure validation...');
         
-        this.addResult('Market Preferences Model', 'success', 
-            `העדפות נוצרו בהצלחה עבור משתמש ${userId}`, 
-            { preferences, preferencesDict }
-        );
+        const structures = [
+            { 
+                id: 'preferences-data', 
+                name: 'העדפות', 
+                required: ['timezone'] // user_id will be auto-assigned as 1
+            },
+            { 
+                id: 'quote-data', 
+                name: 'מחיר', 
+                required: ['symbol', 'price'] 
+            },
+            { 
+                id: 'ticker-data', 
+                name: 'טיקר', 
+                required: ['symbol', 'name'] 
+            }
+        ];
+
+        structures.forEach(structure => {
+            const el = document.getElementById(structure.id);
+            if (el && el.value.trim()) {
+                try {
+                    const data = JSON.parse(el.value.trim());
+                    const missing = structure.required.filter(field => !data.hasOwnProperty(field));
+                    
+                    if (missing.length === 0) {
+                        this.addResult('Structure Validation', 'success', `מבנה ${structure.name} תקין`);
+                    } else {
+                        this.addResult('Structure Validation', 'error', 
+                            `שדות חסרים ב${structure.name}: ${missing.join(', ')}`);
+                    }
+                } catch (error) {
+                    this.addResult('Structure Validation', 'error', 
+                        `שגיאה במבנה ${structure.name}: ${error.message}`);
+                }
+            }
+        });
     }
 
     /**
-     * Validate timezone
-     */
-    validateTimezone() {
-        const timezone = document.getElementById('validation-timezone').value.trim();
-        const isValid = this.validateTimezone(timezone);
-        
-        this.addResult('Timezone Validation', 
-            isValid ? 'success' : 'error',
-            `אזור זמן "${timezone}": ${isValid ? 'תקין' : 'לא תקין'}`
-        );
-    }
-
-    /**
-     * Validate interval
-     */
-    validateInterval() {
-        const interval = parseInt(document.getElementById('validation-interval').value);
-        const isValid = this.validateRefreshInterval(interval);
-        
-        this.addResult('Interval Validation', 
-            isValid ? 'success' : 'error',
-            `מרווח ${interval} דקות: ${isValid ? 'תקין' : 'לא תקין'}`
-        );
-    }
-
-    /**
-     * Validate mode
-     */
-    validateMode() {
-        const mode = document.getElementById('validation-mode').value.trim();
-        const isValid = this.validateRefreshMode(mode);
-        
-        this.addResult('Mode Validation', 
-            isValid ? 'success' : 'error',
-            `מצב "${mode}": ${isValid ? 'תקין' : 'לא תקין'}`
-        );
-    }
-
-    /**
-     * Validation helper methods
-     */
-    validateTimezone(timezone) {
-        if (!timezone) return false;
-        const validTimezones = ['UTC', 'Asia/Jerusalem', 'America/New_York', 'Europe/London'];
-        return validTimezones.includes(timezone);
-    }
-
-    validateRefreshInterval(minutes) {
-        if (!minutes || typeof minutes !== 'number') return false;
-        return 1 <= minutes && minutes <= 1440;
-    }
-
-    validateRefreshMode(mode) {
-        const validModes = ['auto', 'manual', 'custom'];
-        return validModes.includes(mode);
-    }
-
-    /**
-     * Simulate model methods
-     */
-    simulateTickerToDict(ticker) {
-        return {
-            id: ticker.id || 1,
-            symbol: ticker.symbol,
-            name: ticker.name,
-            status: ticker.status,
-            active_trades: Boolean(ticker.active_trades),
-            created_at: ticker.created_at,
-            updated_at: ticker.updated_at
-        };
-    }
-
-    simulateQuoteToDict(quote) {
-        return {
-            id: quote.id || 1,
-            ticker_id: quote.ticker_id,
-            price: parseFloat(quote.price),
-            change_amount: quote.change_amount ? parseFloat(quote.change_amount) : null,
-            change_percent: quote.change_percent ? parseFloat(quote.change_percent) : null,
-            volume: quote.volume,
-            high_24h: quote.high_24h ? parseFloat(quote.high_24h) : null,
-            low_24h: quote.low_24h ? parseFloat(quote.low_24h) : null,
-            open_price: quote.open_price ? parseFloat(quote.open_price) : null,
-            previous_close: quote.previous_close ? parseFloat(quote.previous_close) : null,
-            provider: quote.provider,
-            asof_utc: quote.asof_utc,
-            fetched_at: quote.fetched_at,
-            last_updated: quote.last_updated,
-            created_at: quote.created_at
-        };
-    }
-
-    simulatePreferencesToDict(preferences) {
-        return {
-            user_id: preferences.user_id,
-            timezone: preferences.timezone,
-            refresh_overrides: JSON.parse(preferences.refresh_overrides_json),
-            updated_at: preferences.updated_at
-        };
-    }
-
-    /**
-     * Add test result
+     * Add result to display
      */
     addResult(model, status, message, data = null) {
+        console.log('📝 Adding result:', { model, status, message });
+        
         const result = {
             timestamp: new Date().toLocaleTimeString('he-IL'),
             model: model,
@@ -309,60 +307,158 @@ class ModelsTester {
             data: data
         };
         
-        this.testResults.push(result);
-        this.updateResultsDisplay();
+        this.displayResult(result);
     }
 
     /**
-     * Update results display
+     * Display result in the UI
      */
-    updateResultsDisplay() {
-        const resultsContainer = document.getElementById('test-results');
-        resultsContainer.innerHTML = '';
+    displayResult(result) {
+        const resultsContainer = document.getElementById('model-test-logs');
+        if (!resultsContainer) {
+            console.error('❌ Results container not found');
+            return;
+        }
+
+        const resultElement = document.createElement('div');
+        resultElement.className = `alert alert-${this.getStatusClass(result.status)} mb-2 fade-in`;
         
-        this.testResults.forEach(result => {
-            const resultElement = document.createElement('div');
-            resultElement.className = `alert alert-${result.status === 'success' ? 'success' : 'danger'} fade-in`;
-            
-            let content = `
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <strong>${result.model}</strong> - ${result.message}
-                        <br><small class="text-muted">${result.timestamp}</small>
-                    </div>
-                    <span class="badge bg-${result.status === 'success' ? 'success' : 'danger'}">
-                        ${result.status === 'success' ? 'הצלחה' : 'שגיאה'}
-                    </span>
+        let content = `
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <strong>${result.model}</strong> - ${result.message}
+                    <br><small class="text-muted">${result.timestamp}</small>
                 </div>
+                <span class="badge bg-${this.getStatusClass(result.status)}">
+                    ${this.getStatusText(result.status)}
+                </span>
+            </div>
+        `;
+        
+        if (result.data) {
+            content += `
+                <details class="mt-2">
+                    <summary>פרטי הנתונים</summary>
+                    <pre class="mt-2 bg-light p-2 rounded"><code>${JSON.stringify(result.data, null, 2)}</code></pre>
+                </details>
             `;
-            
-            if (result.data) {
-                content += `
-                    <details class="mt-2">
-                        <summary>פרטי הנתונים</summary>
-                        <pre class="mt-2 bg-light p-2 rounded"><code>${JSON.stringify(result.data, null, 2)}</code></pre>
-                    </details>
-                `;
-            }
-            
-            resultElement.innerHTML = content;
-            resultsContainer.appendChild(resultElement);
-        });
+        }
+        
+        resultElement.innerHTML = content;
+        resultsContainer.appendChild(resultElement);
         
         // Scroll to bottom
         resultsContainer.scrollTop = resultsContainer.scrollHeight;
+        
+        console.log('✅ Result displayed');
     }
 
     /**
-     * Clear results
+     * Get status class for Bootstrap
      */
-    clearResults() {
-        this.testResults = [];
-        this.updateResultsDisplay();
+    getStatusClass(status) {
+        switch (status) {
+            case 'success': return 'success';
+            case 'error': return 'danger';
+            case 'warning': return 'warning';
+            case 'info': return 'info';
+            default: return 'secondary';
+        }
+    }
+
+    /**
+     * Get status text in Hebrew
+     */
+    getStatusText(status) {
+        switch (status) {
+            case 'success': return 'הצלחה';
+            case 'error': return 'שגיאה';
+            case 'warning': return 'אזהרה';
+            case 'info': return 'מידע';
+            default: return 'לא ידוע';
+        }
     }
 }
 
-// Initialize the tester when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.modelsTester = new ModelsTester();
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM Content Loaded - Initializing SimpleModelsTester');
+    window.modelsTester = new SimpleModelsTester();
+    console.log('✅ SimpleModelsTester initialized');
+});
+
+// Global function for clearing logs
+function clearModelLogs() {
+    const resultsContainer = document.getElementById('model-test-logs');
+    if (resultsContainer) {
+        resultsContainer.innerHTML = '';
+        console.log('🧹 Logs cleared');
+    }
+}
+
+// Global functions for editing data
+function editQuoteData() {
+    const label = document.getElementById('quote-data-label');
+    const textarea = document.getElementById('quote-data');
+    if (label && textarea) {
+        label.style.display = 'none';
+        textarea.style.display = 'block';
+        textarea.focus();
+    }
+}
+
+function editTickerData() {
+    const label = document.getElementById('ticker-data-label');
+    const textarea = document.getElementById('ticker-data');
+    if (label && textarea) {
+        label.style.display = 'none';
+        textarea.style.display = 'block';
+        textarea.focus();
+    }
+}
+
+function editPreferencesData() {
+    const label = document.getElementById('preferences-data-label');
+    const textarea = document.getElementById('preferences-data');
+    if (label && textarea) {
+        label.style.display = 'none';
+        textarea.style.display = 'block';
+        textarea.focus();
+    }
+}
+
+// Update labels when textareas change
+document.addEventListener('DOMContentLoaded', function() {
+    // Quote data
+    const quoteTextarea = document.getElementById('quote-data');
+    const quoteLabel = document.getElementById('quote-data-label');
+    if (quoteTextarea && quoteLabel) {
+        quoteTextarea.addEventListener('blur', function() {
+            quoteLabel.textContent = this.value || 'אין נתונים';
+            quoteLabel.style.display = 'block';
+            this.style.display = 'none';
+        });
+    }
+
+    // Ticker data
+    const tickerTextarea = document.getElementById('ticker-data');
+    const tickerLabel = document.getElementById('ticker-data-label');
+    if (tickerTextarea && tickerLabel) {
+        tickerTextarea.addEventListener('blur', function() {
+            tickerLabel.textContent = this.value || 'אין נתונים';
+            tickerLabel.style.display = 'block';
+            this.style.display = 'none';
+        });
+    }
+
+    // Preferences data
+    const preferencesTextarea = document.getElementById('preferences-data');
+    const preferencesLabel = document.getElementById('preferences-data-label');
+    if (preferencesTextarea && preferencesLabel) {
+        preferencesTextarea.addEventListener('blur', function() {
+            preferencesLabel.textContent = this.value || 'אין נתונים';
+            preferencesLabel.style.display = 'block';
+            this.style.display = 'none';
+        });
+    }
 });

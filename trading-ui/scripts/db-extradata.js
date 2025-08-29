@@ -17,137 +17,30 @@
 
 // ===== פונקציות לפתיחה/סגירה של סקשנים =====
 
-// פונקציה לפתיחה/סגירה של כל הסקשנים
+// פונקציה לפתיחה/סגירה של כל הסקשנים - משתמשת בפונקציה הגלובלית
 function toggleAllSections() {
-    // נמנע מלולאה אינסופית על ידי בדיקה אם הפונקציה הגלובלית קיימת
-    if (typeof window.globalToggleAllSections === 'function') {
-        window.globalToggleAllSections();
+    if (typeof window.toggleAllSections === 'function') {
+        window.toggleAllSections();
     } else {
-        // מימוש מקומי אם הפונקציה הגלובלית לא זמינה
-        const contentSections = document.querySelectorAll('.content-section');
-        const topSection = document.querySelector('.top-section');
-
-        // בדיקה אם כל הסקשנים פתוחים או סגורים
-        let allCollapsed = true;
-        let allExpanded = true;
-
-        // בדיקת סקשן עליון
-        if (topSection) {
-            const topSectionBody = topSection.querySelector('.section-body');
-            if (topSectionBody) {
-                if (topSectionBody.style.display !== 'none') {
-                    allCollapsed = false;
-                } else {
-                    allExpanded = false;
-                }
-            }
-        }
-
-        // בדיקת סקשני תוכן
-        contentSections.forEach(section => {
-            const sectionBody = section.querySelector('.section-body');
-            if (sectionBody) {
-                if (sectionBody.style.display !== 'none') {
-                    allCollapsed = false;
-                } else {
-                    allExpanded = false;
-                }
-            }
-        });
-
-        // החלטה אם לסגור או לפתוח הכל
-        const shouldCollapse = !allCollapsed;
-
-        // סגירה/פתיחה של סקשן עליון
-        if (topSection) {
-            const topSectionBody = topSection.querySelector('.section-body');
-            const toggleBtn = topSection.querySelector('button[onclick="toggleAllSections()"]');
-            const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-            if (topSectionBody) {
-                topSectionBody.style.display = shouldCollapse ? 'none' : 'block';
-                if (icon) {
-                    icon.textContent = shouldCollapse ? '▼' : '▲';
-                }
-            }
-        }
-
-        // סגירה/פתיחה של סקשני תוכן
-        contentSections.forEach(section => {
-            const sectionBody = section.querySelector('.section-body');
-            const toggleBtn = section.querySelector('.filter-toggle-btn');
-            const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-            if (sectionBody) {
-                sectionBody.style.display = shouldCollapse ? 'none' : 'block';
-                if (icon) {
-                    icon.textContent = shouldCollapse ? '▼' : '▲';
-                }
-            }
-        });
-
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('dbExtradataAllSectionsCollapsed', shouldCollapse);
+        console.warn('⚠️ toggleAllSections function not available globally');
     }
 }
 
-// פונקציה לפתיחה/סגירה של סקשן מטבעות
+// פונקציה לפתיחה/סגירה של סקשן מטבעות - משתמשת בפונקציה הגלובלית
 function toggleCurrenciesSection() {
-    console.log('🔄 toggleCurrenciesSection called');
-    
-    const contentSections = document.querySelectorAll('.content-section');
-    const currenciesSection = contentSections[0]; // הסקשן הראשון - מטבעות
-
-    if (!currenciesSection) {
-        console.error('❌ לא נמצא סקשן מטבעות');
-        return;
-    }
-
-    const sectionBody = currenciesSection.querySelector('.section-body');
-    const toggleBtn = currenciesSection.querySelector('button[onclick="toggleCurrenciesSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody) {
-        const isCollapsed = sectionBody.style.display === 'none';
-        sectionBody.style.display = isCollapsed ? 'block' : 'none';
-
-        if (icon) {
-            icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('dbExtradataCurrenciesSectionCollapsed', !isCollapsed);
-        console.log('💾 Saved currencies section state to localStorage:', !isCollapsed);
+    if (typeof window.toggleMainSection === 'function') {
+        window.toggleMainSection();
+    } else {
+        console.warn('⚠️ toggleMainSection function not available globally');
     }
 }
 
-// פונקציה לפתיחה/סגירה של סקשן סוגי קישור
+// פונקציה לפתיחה/סגירה של סקשן סוגי קישור - משתמשת בפונקציה הגלובלית
 function toggleNoteRelationTypesSection() {
-
-    const contentSections = document.querySelectorAll('.content-section');
-    const noteRelationTypesSection = contentSections[1]; // הסקשן השני - סוגי קישור
-
-    if (!noteRelationTypesSection) {
-        console.error('❌ לא נמצא סקשן סוגי קישור');
-        return;
-    }
-
-    const sectionBody = noteRelationTypesSection.querySelector('.section-body');
-    const toggleBtn = noteRelationTypesSection.querySelector('button[onclick="toggleNoteRelationTypesSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody) {
-        const isCollapsed = sectionBody.style.display === 'none';
-        sectionBody.style.display = isCollapsed ? 'block' : 'none';
-
-        if (icon) {
-            icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('dbExtradataNoteRelationTypesSectionCollapsed', !isCollapsed);
-
-        // סקשן סוגי קישור
+    if (typeof window.toggleMainSection === 'function') {
+        window.toggleMainSection();
+    } else {
+        console.warn('⚠️ toggleMainSection function not available globally');
     }
 }
 
@@ -315,11 +208,12 @@ function updateCurrenciesCount(count) {
     }
 }
 
-// פונקציה להצגת שגיאה בטבלת מטבעות
+// פונקציה להצגת שגיאה בטבלת מטבעות - משתמשת במערכת ההתראות הגלובלית
 function showCurrenciesError() {
-    const tbody = document.querySelector('#currenciesTable tbody');
-    if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+    if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני מטבעות');
+    } else {
+        console.error('❌ Error loading currencies data');
     }
 }
 
@@ -413,11 +307,12 @@ function updateNoteRelationTypesCount(count) {
     }
 }
 
-// פונקציה להצגת שגיאה בטבלת סוגי קישור
+// פונקציה להצגת שגיאה בטבלת סוגי קישור - משתמשת במערכת ההתראות הגלובלית
 function showNoteRelationTypesError() {
-    const tbody = document.querySelector('#noteRelationTypesTable tbody');
-    if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">שגיאה בטעינת נתונים</td></tr>';
+    if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני סוגי קישור');
+    } else {
+        console.error('❌ Error loading note relation types data');
     }
 }
 
@@ -502,7 +397,7 @@ function validateCurrencySymbol(input) {
     // עדכון הערך לשדה
     input.value = symbol;
     
-    // שימוש במערכת החדשה
+    // שימוש בפונקציה הגלובלית
     if (window.validateCurrencySymbol) {
         const result = window.validateCurrencySymbol(symbol);
         if (result === true) {
@@ -517,6 +412,7 @@ function validateCurrencySymbol(input) {
             return false;
         }
     } else {
+        console.warn('⚠️ validateCurrencySymbol function not available globally');
         // Fallback לוולידציה בסיסית
         const symbolPattern = /^[A-Z]+$/;
         if (!symbolPattern.test(symbol)) {
@@ -604,14 +500,10 @@ function addCurrencyRecord() {
 function editCurrencyRecord(id) {
     // בדיקה אם זה רשומת הבסיס (מזהה 1)
     if (id === 1) {
-        if (window.showNotification) {
-            window.showNotification('לא ניתן לערוך רשומת בסיס מוגנת', 'warning');
+        if (typeof window.showWarningNotification === 'function') {
+            window.showWarningNotification('רשומה מוגנת', 'לא ניתן לערוך רשומת בסיס מוגנת');
         } else {
-            if (window.showWarningNotification) {
-                window.showWarningNotification('רשומה מוגנת', 'לא ניתן לערוך רשומת בסיס מוגנת');
-            } else {
-                window.showWarningNotification('רשומה מוגנת', 'לא ניתן לערוך רשומת בסיס מוגנת');
-            }
+            console.warn('לא ניתן לערוך רשומת בסיס מוגנת');
         }
         return;
     }
@@ -622,14 +514,10 @@ function editCurrencyRecord(id) {
 function deleteCurrencyRecord(id) {
     // בדיקה אם זה רשומת הבסיס (מזהה 1)
     if (id === 1) {
-        if (window.showNotification) {
-            window.showNotification('לא ניתן למחוק רשומת בסיס מוגנת', 'warning');
+        if (typeof window.showWarningNotification === 'function') {
+            window.showWarningNotification('רשומה מוגנת', 'לא ניתן למחוק רשומת בסיס מוגנת');
         } else {
-            if (window.showWarningNotification) {
-                window.showWarningNotification('רשומה מוגנת', 'לא ניתן למחוק רשומת בסיס מוגנת');
-            } else {
-                window.showWarningNotification('רשומה מוגנת', 'לא ניתן למחוק רשומת בסיס מוגנת');
-            }
+            console.warn('לא ניתן למחוק רשומת בסיס מוגנת');
         }
         return;
     }
@@ -724,12 +612,20 @@ function showEditCurrencyModal(id) {
                 const currency = result.data;
                 showEditCurrencyModalWithData(currency);
             } else {
-                showNotification('שגיאה בטעינת נתוני המטבע', 'error');
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני המטבע');
+                } else {
+                    console.error('שגיאה בטעינת נתוני המטבע');
+                }
             }
         })
         .catch(error => {
             console.error('Error loading currency:', error);
-            showNotification('שגיאה בטעינת נתוני המטבע', 'error');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני המטבע');
+            } else {
+                console.error('שגיאה בטעינת נתוני המטבע');
+            }
         });
 }
 
@@ -852,7 +748,11 @@ function showDeleteCurrencyModal(id) {
 async function saveCurrencyRecord() {
     // וולידציה של הטופס
     if (!validateCurrencyForm()) {
-        showNotification('יש לתקן שגיאות בטופס לפני השמירה', 'error');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני השמירה');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני השמירה');
+        }
         return;
     }
 
@@ -877,7 +777,11 @@ async function saveCurrencyRecord() {
         const result = await response.json();
 
         if (result.status === 'success') {
-            showNotification('מטבע נוסף בהצלחה', 'success');
+            if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'מטבע נוסף בהצלחה');
+        } else {
+            console.log('מטבע נוסף בהצלחה');
+        }
             bootstrap.Modal.getInstance(document.getElementById('addCurrencyModal')).hide();
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
@@ -895,11 +799,19 @@ async function saveCurrencyRecord() {
                 }
             }
 
-            showNotification(errorMessage, 'error');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', errorMessage);
+            } else {
+                console.error(errorMessage);
+            }
         }
     } catch (error) {
         console.error('Error saving currency:', error);
-        showNotification('שגיאה בתקשורת עם השרת', 'error');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה בתקשורת עם השרת');
+        }
     }
 }
 
@@ -907,7 +819,11 @@ async function saveCurrencyRecord() {
 async function updateCurrencyRecord() {
     // וולידציה של הטופס
     if (!validateCurrencyForm()) {
-        showNotification('יש לתקן שגיאות בטופס לפני העדכון', 'error');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני העדכון');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני העדכון');
+        }
         return;
     }
 
@@ -933,7 +849,11 @@ async function updateCurrencyRecord() {
         const result = await response.json();
 
         if (result.status === 'success') {
-            showNotification('מטבע עודכן בהצלחה', 'success');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', 'מטבע עודכן בהצלחה');
+            } else {
+                console.log('מטבע עודכן בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('editCurrencyModal')).hide();
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
@@ -953,11 +873,19 @@ async function updateCurrencyRecord() {
                 }
             }
 
-            showNotification(errorMessage, 'error');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', errorMessage);
+            } else {
+                console.error(errorMessage);
+            }
         }
     } catch (error) {
         console.error('Error updating currency:', error);
-        showNotification('שגיאה בתקשורת עם השרת', 'error');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה בתקשורת עם השרת');
+        }
     }
 }
 
@@ -971,15 +899,27 @@ async function confirmDeleteCurrencyRecord(id) {
         const result = await response.json();
 
         if (result.status === 'success') {
-            showNotification('מטבע נמחק בהצלחה', 'success');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', 'מטבע נמחק בהצלחה');
+            } else {
+                console.log('מטבע נמחק בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('deleteCurrencyModal')).hide();
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
-            showNotification(result.error?.message || 'שגיאה במחיקת מטבע', 'error');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה במחיקת מטבע');
+            } else {
+                console.error(result.error?.message || 'שגיאה במחיקת מטבע');
+            }
         }
     } catch (error) {
         console.error('Error deleting currency:', error);
-        showNotification('שגיאה במחיקת מטבע', 'error');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה במחיקת מטבע');
+        } else {
+            console.error('שגיאה במחיקת מטבע');
+        }
     }
 }
 
@@ -1051,12 +991,20 @@ function showEditNoteRelationTypeModal(id) {
                 const noteType = result.data;
                 showEditNoteRelationTypeModalWithData(noteType);
             } else {
-                showNotification('שגיאה בטעינת נתוני סוג הקישור', 'error');
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני סוג הקישור');
+                } else {
+                    console.error('שגיאה בטעינת נתוני סוג הקישור');
+                }
             }
         })
         .catch(error => {
             console.error('Error loading note relation type:', error);
-            showNotification('שגיאה בטעינת נתוני סוג הקישור', 'error');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני סוג הקישור');
+            } else {
+                console.error('שגיאה בטעינת נתוני סוג הקישור');
+            }
         });
 }
 
@@ -1160,15 +1108,27 @@ async function saveNoteRelationTypeRecord() {
         const result = await response.json();
 
         if (result.status === 'success') {
-            showNotification('סוג קישור נוסף בהצלחה', 'success');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', 'סוג קישור נוסף בהצלחה');
+            } else {
+                console.log('סוג קישור נוסף בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('addNoteRelationTypeModal')).hide();
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
-            showNotification(result.error?.message || 'שגיאה בהוספת סוג קישור', 'error');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה בהוספת סוג קישור');
+            } else {
+                console.error(result.error?.message || 'שגיאה בהוספת סוג קישור');
+            }
         }
     } catch (error) {
         console.error('Error saving note relation type:', error);
-        showNotification('שגיאה בהוספת סוג קישור', 'error');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בהוספת סוג קישור');
+        } else {
+            console.error('שגיאה בהוספת סוג קישור');
+        }
     }
 }
 
@@ -1194,15 +1154,27 @@ async function updateNoteRelationTypeRecord() {
         const result = await response.json();
 
         if (result.status === 'success') {
-            showNotification('סוג קישור עודכן בהצלחה', 'success');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', 'סוג קישור עודכן בהצלחה');
+            } else {
+                console.log('סוג קישור עודכן בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('editNoteRelationTypeModal')).hide();
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
-            showNotification(result.error?.message || 'שגיאה בעדכון סוג קישור', 'error');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה בעדכון סוג קישור');
+            } else {
+                console.error(result.error?.message || 'שגיאה בעדכון סוג קישור');
+            }
         }
     } catch (error) {
         console.error('Error updating note relation type:', error);
-        showNotification('שגיאה בעדכון סוג קישור', 'error');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בעדכון סוג קישור');
+        } else {
+            console.error('שגיאה בעדכון סוג קישור');
+        }
     }
 }
 
@@ -1216,15 +1188,27 @@ async function confirmDeleteNoteRelationTypeRecord(id) {
         const result = await response.json();
 
         if (result.status === 'success') {
-            showNotification('סוג קישור נמחק בהצלחה', 'success');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', 'סוג קישור נמחק בהצלחה');
+            } else {
+                console.log('סוג קישור נמחק בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('deleteNoteRelationTypeModal')).hide();
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
-            showNotification(result.error?.message || 'שגיאה במחיקת סוג קישור', 'error');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה במחיקת סוג קישור');
+            } else {
+                console.error(result.error?.message || 'שגיאה במחיקת סוג קישור');
+            }
         }
     } catch (error) {
         console.error('Error deleting note relation type:', error);
-        showNotification('שגיאה במחיקת סוג קישור', 'error');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה במחיקת סוג קישור');
+        } else {
+            console.error('שגיאה במחיקת סוג קישור');
+        }
     }
 }
 
@@ -1275,11 +1259,19 @@ function addRecord() {
 
 // ===== ייצוא פונקציות לגלובל =====
 
-// ייצוא פונקציות וולידציה
-window.validateCurrencySymbol = validateCurrencySymbol;
-window.validateCurrencyName = validateCurrencyName;
-window.validateCurrencyUsdRate = validateCurrencyUsdRate;
-window.validateCurrencyForm = validateCurrencyForm;
+// ייצוא פונקציות וולידציה - רק אם הפונקציות הגלובליות לא קיימות
+if (!window.validateCurrencySymbol) {
+    window.validateCurrencySymbol = validateCurrencySymbol;
+}
+if (!window.validateCurrencyName) {
+    window.validateCurrencyName = validateCurrencyName;
+}
+if (!window.validateCurrencyUsdRate) {
+    window.validateCurrencyUsdRate = validateCurrencyUsdRate;
+}
+if (!window.validateCurrencyForm) {
+    window.validateCurrencyForm = validateCurrencyForm;
+}
 
 // ייצוא פונקציות מטבעות
 window.addCurrencyRecord = addCurrencyRecord;

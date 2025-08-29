@@ -139,6 +139,26 @@ def models_test() -> Any:
     """Models test page"""
     return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_models.html")
 
+@pages_bp.route('/system-stats-test')
+def system_stats_test() -> Any:
+    """System statistics test page"""
+    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_system_stats.html")
+
+@pages_bp.route('/api-test')
+def api_test() -> Any:
+    """API test page"""
+    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_api.html")
+
+@pages_bp.route('/performance-test')
+def performance_test() -> Any:
+    """Performance test page"""
+    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_performance.html")
+
+@pages_bp.route('/integration-test')
+def integration_test() -> Any:
+    """Integration test page"""
+    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_integration.html")
+
 @pages_bp.route('/<path:filename>')
 def static_files(filename: str) -> Any:
     """Static files"""

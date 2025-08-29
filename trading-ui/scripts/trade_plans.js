@@ -258,8 +258,8 @@ async function saveEditTradePlan() {
       
 
         // הצגת הודעת הצלחה
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('תכנון עודכן בהצלחה!', 'success');
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification('הצלחה', 'תכנון עודכן בהצלחה!');
         }
 
         // סגירת המודל
@@ -271,8 +271,8 @@ async function saveEditTradePlan() {
 
     } catch (error) {
         console.error('❌ Error updating trade plan:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בעדכון התכנון', 'error');
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון התכנון');
         }
     }
 }
@@ -302,8 +302,8 @@ async function confirmDeleteTradePlan() {
       
 
         // הצגת הודעת הצלחה
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('תכנון נמחק בהצלחה!', 'success');
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification('הצלחה', 'תכנון נמחק בהצלחה!');
         }
 
         // סגירת המודל
@@ -315,8 +315,8 @@ async function confirmDeleteTradePlan() {
 
     } catch (error) {
         console.error('❌ Error deleting trade plan:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה במחיקת התכנון', 'error');
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת התכנון');
         }
     }
 }
@@ -325,26 +325,26 @@ async function confirmDeleteTradePlan() {
  * פונקציות עזר למודל העריכה
  */
 function addEditCondition() {
-    if (typeof window.showNotification === 'function') {
-        window.showNotification('פונקציונליות זו תהיה זמינה בקרוב', 'info');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'פונקציונליות זו תהיה זמינה בקרוב');
     }
 }
 
 function addEditReason() {
-    if (typeof window.showNotification === 'function') {
-        window.showNotification('פונקציונליות זו תהיה זמינה בקרוב', 'info');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'פונקציונליות זו תהיה זמינה בקרוב');
     }
 }
 
 function addEditImportantNote() {
-    if (typeof window.showNotification === 'function') {
-        window.showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית', 'info');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית');
     }
 }
 
 function addEditReminder() {
-    if (typeof window.showNotification === 'function') {
-        window.showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'info');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'המודול יאפשר בקרוב לייצר התראות לתוכנית');
     }
 }
 
@@ -352,14 +352,72 @@ function addEditReminder() {
  * פתיחת מודל מחיקת תכנון
  */
 function openDeleteTradePlanModal(tradePlanId) {
-  
+    console.log('🔄 פתיחת מודל מחיקת תכנון:', tradePlanId);
 
     const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
     if (!tradePlan) {
         console.error('Trade plan not found:', tradePlanId);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', 'תכנון לא נמצא');
+        }
         return;
     }
 
+    // בדיקת פריטים מקושרים לפני מחיקה
+    checkLinkedItemsBeforeDelete(tradePlanId, tradePlan);
+}
+
+/**
+ * בדיקת פריטים מקושרים לפני מחיקה
+ */
+async function checkLinkedItemsBeforeDelete(tradePlanId, tradePlan) {
+    try {
+        const response = await fetch(`/api/v1/trade_plans/${tradePlanId}/linked-items`);
+        if (response.ok) {
+            const linkedItems = await response.json();
+            
+            if (linkedItems && linkedItems.data) {
+                const linkedItemsData = linkedItems.data;
+                
+                // בדיקה אם יש פריטים מקושרים
+                const hasLinkedItems = (
+                    (linkedItemsData.trades && linkedItemsData.trades.length > 0) ||
+                    (linkedItemsData.executions && linkedItemsData.executions.length > 0) ||
+                    (linkedItemsData.alerts && linkedItemsData.alerts.length > 0) ||
+                    (linkedItemsData.notes && linkedItemsData.notes.length > 0)
+                );
+                
+                if (hasLinkedItems) {
+                    // הצגת אזהרת פריטים מקושרים
+                    if (window.showLinkedItemsWarning) {
+                        window.showLinkedItemsWarning('trade_plan', tradePlanId);
+                    } else {
+                        if (window.showWarningNotification) {
+                            window.showWarningNotification(
+                                'לא ניתן למחוק תכנון',
+                                'יש פריטים מקושרים לתכנון זה. יש למחוק אותם קודם.'
+                            );
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+        
+        // אם אין פריטים מקושרים - הצג מודל מחיקה רגיל
+        showDeleteModal(tradePlan);
+        
+    } catch (error) {
+        console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error);
+        // הצג מודל מחיקה רגיל גם אם יש שגיאה
+        showDeleteModal(tradePlan);
+    }
+}
+
+/**
+ * הצגת מודל מחיקה
+ */
+function showDeleteModal(tradePlan) {
     // הצגת פרטי התכנון במודל המחיקה
     document.getElementById('deleteTradePlanDetails').innerHTML = `
         <strong>טיקר:</strong> ${tradePlan.ticker?.symbol || 'לא מוגדר'}<br>
@@ -368,7 +426,7 @@ function openDeleteTradePlanModal(tradePlanId) {
         <strong>סכום מתוכנן:</strong> $${tradePlan.planned_amount || '0.00'}
     `;
 
-    document.getElementById('deleteTradePlanModal').setAttribute('data-trade-plan-id', tradePlanId);
+    document.getElementById('deleteTradePlanModal').setAttribute('data-trade-plan-id', tradePlan.id);
 
     const modal = new bootstrap.Modal(document.getElementById('deleteTradePlanModal'));
     modal.show();
@@ -555,10 +613,8 @@ function addImportantNote() {
     console.log('🔄 הודעת הערות עשירות');
 
     // הצגת הודעה למשתמש
-    if (typeof showNotification === 'function') {
-        showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית', 'info');
-    } else {
-        alert('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית');
     }
 }
 
@@ -569,10 +625,8 @@ function addReminder() {
     console.log('🔄 הודעת התראות');
 
     // הצגת הודעה למשתמש
-    if (typeof showNotification === 'function') {
-        showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'warning');
-    } else {
-        alert('המודול יאפשר בקרוב לייצר התראות לתוכנית');
+    if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('אזהרה', 'המודול יאפשר בקרוב לייצר התראות לתוכנית');
     }
 }
 
@@ -795,10 +849,8 @@ function updateAmountFromShares() {
 function addEntryCondition() {
     console.log('🔄 הוספת תנאי כניסה');
 
-    if (typeof showNotification === 'function') {
-        showNotification('המודול יאפשר בקרוב ליצור תנאי כניסה מתקדם', 'info');
-    } else {
-        alert('המודול יאפשר בקרוב ליצור תנאי כניסה מתקדם');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'המודול יאפשר בקרוב ליצור תנאי כניסה מתקדם');
     }
 }
 
@@ -808,10 +860,8 @@ function addEntryCondition() {
 function addReason() {
     console.log('🔄 הוספת סיבה');
 
-    if (typeof showNotification === 'function') {
-        showNotification('המודול יאפשר בקרוב ליצור סיבות מתקדמות', 'info');
-    } else {
-        alert('המודול יאפשר בקרוב ליצור סיבות מתקדמות');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'המודול יאפשר בקרוב ליצור סיבות מתקדמות');
     }
 }
 
@@ -873,3 +923,71 @@ if (window.location.pathname.includes('/trade_plans')) {
         });
     }, 1000);
 }
+
+// ========================================
+// אתחול וולידציה
+// ========================================
+
+// אתחול הדף
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('🔄 === DOM CONTENT LOADED - TRADE PLANS ===');
+
+    // שחזור מצב הסגירה
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    }
+
+    // אתחול וולידציה עם כללים מותאמים לתכניות טרייד
+    if (window.initializeValidation) {
+        // כללי וולידציה מותאמים לטופס הוספת תכנון
+        const addTradePlanValidationRules = {
+            ticker_id: {
+                required: true,
+                message: 'יש לבחור טיקר'
+            },
+            investment_type: {
+                required: true,
+                enum: ['swing', 'investment', 'passive'],
+                message: 'יש לבחור סוג השקעה תקין'
+            },
+            side: {
+                required: true,
+                enum: ['Long', 'Short'],
+                message: 'יש לבחור צד תקין'
+            },
+            planned_amount: {
+                required: true,
+                min: 0.01,
+                message: 'יש להזין סכום מתוכנן חיובי'
+            }
+        };
+        
+        // כללי וולידציה מותאמים לטופס עריכת תכנון
+        const editTradePlanValidationRules = {
+            ticker_id: {
+                required: true,
+                message: 'יש לבחור טיקר'
+            },
+            investment_type: {
+                required: true,
+                enum: ['swing', 'investment', 'passive'],
+                message: 'יש לבחור סוג השקעה תקין'
+            },
+            side: {
+                required: true,
+                enum: ['Long', 'Short'],
+                message: 'יש לבחור צד תקין'
+            },
+            planned_amount: {
+                required: true,
+                min: 0.01,
+                message: 'יש להזין סכום מתוכנן חיובי'
+            }
+        };
+        
+        window.initializeValidation('addTradePlanForm', addTradePlanValidationRules);
+        window.initializeValidation('editTradePlanForm', editTradePlanValidationRules);
+    }
+
+    console.log('✅ Trade plans page initialized successfully');
+});

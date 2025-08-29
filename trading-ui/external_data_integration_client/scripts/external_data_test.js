@@ -43,6 +43,8 @@ class ExternalDataTester {
      * Initialize all event listeners
      */
     initializeEventListeners() {
+        // Add batch symbols edit functionality
+        this.initializeBatchSymbolsEdit();
         // Single quote fetch
         document.getElementById('fetch-single').addEventListener('click', () => {
             this.fetchSingleQuote();
@@ -96,16 +98,39 @@ class ExternalDataTester {
      * Update current time display
      */
     updateCurrentTime() {
-        const now = new Date();
-        const timeString = now.toLocaleString('he-IL', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
-        document.getElementById('current-time').textContent = timeString;
+        const timeElement = document.getElementById('current-time');
+        if (timeElement) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('he-IL', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            const dateString = now.toLocaleDateString('he-IL', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            timeElement.textContent = `${dateString} ${timeString}`;
+        }
+    }
+
+    /**
+     * Initialize batch symbols edit functionality
+     */
+    initializeBatchSymbolsEdit() {
+        const textarea = document.getElementById('batch-symbols');
+        const label = document.getElementById('batch-symbols-label');
+        
+        if (textarea && label) {
+            // Update label on blur
+            textarea.addEventListener('blur', function() {
+                label.textContent = this.value || 'אין נתונים';
+                label.style.display = 'block';
+                this.style.display = 'none';
+            });
+        }
     }
 
     /**
@@ -718,3 +743,22 @@ class ExternalDataTester {
 document.addEventListener('DOMContentLoaded', () => {
     window.externalDataTester = new ExternalDataTester();
 });
+
+// Global functions
+function clearTestLogs() {
+    const logContainer = document.getElementById('test-logs');
+    if (logContainer) {
+        logContainer.innerHTML = '';
+        console.log('🧹 Test logs cleared');
+    }
+}
+
+function editBatchSymbols() {
+    const label = document.getElementById('batch-symbols-label');
+    const textarea = document.getElementById('batch-symbols');
+    if (label && textarea) {
+        label.style.display = 'none';
+        textarea.style.display = 'block';
+        textarea.focus();
+    }
+}

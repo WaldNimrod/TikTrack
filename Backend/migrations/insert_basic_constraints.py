@@ -477,6 +477,54 @@ def insert_accounts_constraints():
     finally:
         conn.close()
 
+def insert_executions_constraints():
+    """Insert constraints for executions table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        print("📊 Inserting executions table constraints...")
+        
+        # 1. source ENUM constraint
+        cursor.execute("""
+            INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
+            VALUES (?, ?, ?, ?, ?)
+        """, ('executions', 'source', 'ENUM', 'valid_execution_source', 
+              'source IN (''manual'', ''api'', ''file_import'', ''direct_import'')'))
+        
+        constraint_id = cursor.lastrowid
+        
+        enum_values = [
+            ('manual', 'ידני', 1),
+            ('api', 'API', 2),
+            ('file_import', 'ייבוא קובץ', 3),
+            ('direct_import', 'ייבוא ישיר', 4)
+        ]
+        
+        for value, display_name, sort_order in enum_values:
+            cursor.execute("""
+                INSERT INTO enum_values (constraint_id, value, display_name, sort_order)
+                VALUES (?, ?, ?, ?)
+            """, (constraint_id, value, display_name, sort_order))
+        
+        # 2. date RANGE constraint (must be >= trade.open_date)
+        cursor.execute("""
+            INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
+            VALUES (?, ?, ?, ?, ?)
+        """, ('executions', 'date', 'RANGE', 'execution_date_after_trade_open', 
+              'date >= (SELECT open_date FROM trades WHERE id = trade_id)'))
+        
+        conn.commit()
+        print("✅ Executions constraints inserted successfully")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error inserting executions constraints: {e}")
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
 def verify_constraints():
     """Verify all constraints were inserted correctly"""
     conn = get_db_connection()
@@ -557,7 +605,12 @@ def main():
         print("❌ Failed to insert accounts constraints")
         return
     
-    # Step 7: Verify all constraints
+    # Step 7: Insert executions constraints
+    if not insert_executions_constraints():
+        print("❌ Failed to insert executions constraints")
+        return
+    
+    # Step 8: Verify all constraints
     if not verify_constraints():
         print("❌ Constraint verification failed")
         return

@@ -275,18 +275,22 @@ function viewAccountDetails(accountId) {
   // צפייה בפרטי חשבון
   // כאן יוכנס קוד לצפייה בפרטי חשבון
   if (typeof window.showNotification === 'function') {
-    window.showNotification('פונקציונליות צפייה בפרטי חשבון תהיה זמינה בקרוב', 'info');
+    window.showInfoNotification('מידע', 'פונקציונליות צפייה בפרטי חשבון תהיה זמינה בקרוב');
   } else {
-    alert('פונקציונליות צפייה בפרטי חשבון תהיה זמינה בקרוב');
+            if (window.showInfoNotification) {
+            window.showInfoNotification('מידע', 'פונקציונליות צפייה בפרטי חשבון תהיה זמינה בקרוב');
+        }
   }
 }
 
 function viewTradePlanDetails(tradePlanId) {
   // צפייה בפרטי תוכנית טרייד
   if (typeof window.showNotification === 'function') {
-    window.showNotification(`פונקציונליות צפייה בתוכנית טרייד #${tradePlanId} תהיה זמינה בקרוב`, 'info');
+    window.showInfoNotification('מידע', `פונקציונליות צפייה בתוכנית טרייד #${tradePlanId} תהיה זמינה בקרוב`);
   } else {
-    alert(`פונקציונליות צפייה בתוכנית טרייד #${tradePlanId} תהיה זמינה בקרוב`);
+            if (window.showInfoNotification) {
+            window.showInfoNotification('מידע', `פונקציונליות צפייה בתוכנית טרייד #${tradePlanId} תהיה זמינה בקרוב`);
+        }
   }
 }
 
@@ -298,7 +302,9 @@ function editTradeRecord(tradeId) {
     showEditTradeModal(trade);
   } else {
     console.error('❌ Trade not found:', tradeId);
-    alert('טרייד לא נמצא');
+            if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', 'טרייד לא נמצא');
+        }
   }
 }
 
@@ -377,7 +383,9 @@ function checkLinkedItemsBeforeCancel(tradeId) {
                     );
                   } else {
                     // גיבוי אם הפונקציה לא זמינה
-                    alert(`לא ניתן לבטל טרייד זה כי יש ${linkedItems.length} אובייקטים מקושרים אליו.`);
+                    if (window.showWarningNotification) {
+            window.showWarningNotification('לא ניתן לבטל', `לא ניתן לבטל טרייד זה כי יש ${linkedItems.length} אובייקטים מקושרים אליו.`);
+        }
                   }
                 } else {
                   // אין אובייקטים מקושרים, רק אישור רגיל
@@ -442,28 +450,141 @@ function performTradeCancellation(tradeId) {
     .then(data => {
       // טרייד בוטל בהצלחה
       if (typeof window.showNotification === 'function') {
-        window.showNotification('טרייד בוטל בהצלחה', 'success');
+        window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה');
       } else {
-        alert('טרייד בוטל בהצלחה');
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה');
+        }
       }
       loadTradesData(); // Reload the table
     })
     .catch(error => {
       console.error('שגיאה בביטול טרייד:', error);
       if (typeof window.showNotification === 'function') {
-        window.showNotification('שגיאה בביטול הטרייד', 'error');
+        window.showErrorNotification('שגיאה', 'שגיאה בביטול הטרייד');
       } else {
-        alert('שגיאה בביטול הטרייד');
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בביטול', 'שגיאה בביטול הטרייד');
+        }
       }
     });
 }
 
 function deleteTradeRecord(tradeId) {
   // מחיקת טרייד
-  if (confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
-    // בדיקה אם יש אובייקטים מקושרים
-    checkLinkedItemsBeforeDelete(tradeId);
+  if (window.showDeleteWarning) {
+    window.showDeleteWarning(
+      'trade',
+      `טרייד ${tradeId}`,
+      () => checkLinkedItemsBeforeDelete(tradeId),
+      () => console.log('מחיקת טרייד בוטלה')
+    );
+  } else {
+    if (confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+      // בדיקה אם יש אובייקטים מקושרים
+      checkLinkedItemsBeforeDelete(tradeId);
+    }
   }
+}
+
+/**
+ * בדיקת פריטים מקושרים לפני מחיקה
+ * 
+ * @param {string|number} tradeId - מזהה הטרייד
+ */
+function checkLinkedItemsBeforeDelete(tradeId) {
+  // קבלת נתוני הטרייד כדי להציג את שמו בחלון האזהרה
+  fetch(`/api/v1/trades/${tradeId}`)
+    .then(response => response.json())
+    .then(tradeData => {
+      if (tradeData.status === 'success') {
+        const trade = tradeData.data;
+
+        // בדיקת פריטים מקושרים
+        Promise.all([
+          fetch(`/api/v1/trades/${tradeId}/linked-items`),
+          fetch(`/api/v1/trades/${tradeId}/executions`),
+          fetch(`/api/v1/trades/${tradeId}/alerts`),
+          fetch(`/api/v1/trades/${tradeId}/notes`)
+        ])
+        .then(responses => Promise.all(responses.map(r => r.json())))
+        .then(([linkedItems, executions, alerts, notes]) => {
+          // בדיקה אם יש פריטים מקושרים
+          const hasLinkedItems = (
+            (linkedItems.data && linkedItems.data.length > 0) ||
+            (executions.data && executions.data.length > 0) ||
+            (alerts.data && alerts.data.length > 0) ||
+            (notes.data && notes.data.length > 0)
+          );
+
+          if (hasLinkedItems) {
+            // הצגת אזהרת פריטים מקושרים
+            if (window.showLinkedItemsWarning) {
+              window.showLinkedItemsWarning('trade', tradeId);
+            } else {
+              if (window.showWarningNotification) {
+                window.showWarningNotification(
+                  'לא ניתן למחוק טרייד',
+                  'יש פריטים מקושרים לטרייד זה. יש למחוק אותם קודם.'
+                );
+              }
+            }
+            return;
+          }
+
+          // אם אין פריטים מקושרים - המשך למחיקה
+          performTradeDeletion(tradeId);
+        })
+        .catch(error => {
+          console.error('שגיאה בבדיקת פריטים מקושרים:', error);
+          // במקרה של שגיאה, המשך למחיקה
+          performTradeDeletion(tradeId);
+        });
+      } else {
+        console.error('שגיאה בקבלת נתוני טרייד:', tradeData);
+        // במקרה של שגיאה, המשך למחיקה
+        performTradeDeletion(tradeId);
+      }
+    })
+    .catch(error => {
+      console.error('שגיאה בקבלת נתוני טרייד:', error);
+      // במקרה של שגיאה, המשך למחיקה
+      performTradeDeletion(tradeId);
+    });
+}
+
+/**
+ * ביצוע מחיקת הטרייד
+ * 
+ * @param {string|number} tradeId - מזהה הטרייד
+ */
+function performTradeDeletion(tradeId) {
+  fetch(`/api/v1/trades/${tradeId}`, {
+    method: 'DELETE'
+  })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('שגיאה במחיקת הטרייד');
+    })
+    .then(data => {
+      // טרייד נמחק בהצלחה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה');
+      } else {
+        console.log('טרייד נמחק בהצלחה');
+      }
+      loadTradesData(); // Reload the table
+    })
+    .catch(error => {
+      console.error('שגיאה במחיקת טרייד:', error);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'שגיאה במחיקת הטרייד');
+      } else {
+        console.error('שגיאה במחיקת הטרייד');
+      }
+    });
 }
 
 /**
@@ -535,7 +656,9 @@ function checkLinkedItemsBeforeDelete(tradeId) {
                     );
                   } else {
                     // גיבוי אם הפונקציה לא זמינה
-                    alert(`לא ניתן למחוק טרייד זה כי יש ${linkedItems.length} אובייקטים מקושרים אליו.`);
+                    if (window.showWarningNotification) {
+            window.showWarningNotification('לא ניתן למחוק', `לא ניתן למחוק טרייד זה כי יש ${linkedItems.length} אובייקטים מקושרים אליו.`);
+        }
                   }
                 } else {
                   // אין אובייקטים מקושרים, רק אישור רגיל
@@ -599,18 +722,22 @@ function performTradeDeletion(tradeId) {
     .then(data => {
       // טרייד נמחק בהצלחה
       if (typeof window.showNotification === 'function') {
-        window.showNotification('טרייד נמחק בהצלחה', 'success');
+        window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה');
       } else {
-        alert('טרייד נמחק בהצלחה');
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה');
+        }
       }
       loadTradesData(); // Reload the table
     })
     .catch(error => {
       console.error('שגיאה במחיקת טרייד:', error);
       if (typeof window.showNotification === 'function') {
-        window.showNotification('שגיאה במחיקת הטרייד', 'error');
+        window.showErrorNotification('שגיאה', 'שגיאה במחיקת הטרייד');
       } else {
-        alert('שגיאה במחיקת הטרייד');
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת הטרייד');
+        }
       }
     });
 }
@@ -620,13 +747,13 @@ function performTradeDeletion(tradeId) {
  */
 function addEditImportantNote() {
   if (typeof window.showNotification === 'function') {
-    window.showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לטרייד', 'info');
+    window.showInfoNotification('מידע', 'המודול יאפשר בקרוב לייצר הערות עשירות לטרייד');
   }
 }
 
 function addEditReminder() {
   if (typeof window.showNotification === 'function') {
-    window.showNotification('המודול יאפשר בקרוב לייצר התראות לטרייד', 'info');
+    window.showInfoNotification('מידע', 'המודול יאפשר בקרוב לייצר התראות לטרייד');
   }
 }
 
@@ -908,11 +1035,13 @@ async function saveEditTradeData() {
     });
 
     if (typeof window.showNotification === 'function') {
-      window.showNotification('חלק מהשדות בטופס העריכה לא נמצאו. אנא סגור ופתח מחדש את המודל.', 'error');
+      window.showErrorNotification('שגיאה', 'חלק מהשדות בטופס העריכה לא נמצאו. אנא סגור ופתח מחדש את המודל.');
     } else if (window.uiUtils && window.uiUtils.showErrorNotification) {
       window.uiUtils.showErrorNotification('שגיאה בטופס', 'חלק מהשדות בטופס העריכה לא נמצאו. אנא סגור ופתח מחדש את המודל.');
     } else {
-      alert('שגיאה בטופס: חלק מהשדות בטופס העריכה לא נמצאו. אנא סגור ופתח מחדש את המודל.');
+              if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בטופס', 'חלק מהשדות בטופס העריכה לא נמצאו. אנא סגור ופתח מחדש את המודל.');
+        }
     }
     return;
   }
@@ -955,11 +1084,13 @@ async function saveEditTradeData() {
     // הצגת כל השגיאות
     const errorMessage = validations.join('\n\n');
     if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאות ולידציה: ' + errorMessage, 'error');
+      window.showErrorNotification('שגיאה', 'שגיאות ולידציה: ' + errorMessage);
     } else if (window.uiUtils && window.uiUtils.showErrorNotification) {
       window.uiUtils.showErrorNotification('שגיאות ולידציה', errorMessage);
     } else {
-      alert('שגיאות ולידציה:\n\n' + errorMessage);
+              if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאות ולידציה', errorMessage);
+        }
     }
     return;
   }
@@ -1003,7 +1134,9 @@ async function saveEditTradeData() {
     if (window.uiUtils && window.uiUtils.showSuccessNotification) {
       window.uiUtils.showSuccessNotification('טרייד עודכן בהצלחה!', 'הטרייד עודכן בהצלחה במערכת');
     } else {
-      alert('טרייד עודכן בהצלחה!');
+              if (window.showSuccessNotification) {
+            window.showSuccessNotification('הצלחה', 'טרייד עודכן בהצלחה!');
+        }
     }
 
     // סגירת המודל
@@ -1018,7 +1151,9 @@ async function saveEditTradeData() {
     if (window.uiUtils && window.uiUtils.showErrorNotification) {
       window.uiUtils.showErrorNotification('שגיאה בעדכון הטרייד', 'שגיאה בתקשורת עם השרת');
     } else {
-      alert('שגיאה בעדכון הטרייד: שגיאה בתקשורת עם השרת');
+              if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון הטרייד: שגיאה בתקשורת עם השרת');
+        }
     }
   }
 }
@@ -1157,7 +1292,9 @@ function validateTradeForm() {
     if (window.uiUtils && window.uiUtils.showErrorNotification) {
       window.uiUtils.showErrorNotification('שדות חובה חסרים', 'יש למלא את כל השדות החובה');
     } else {
-      alert('שדות חובה חסרים: יש למלא את כל השדות החובה');
+              if (window.showErrorNotification) {
+            window.showErrorNotification('שדות חובה חסרים', 'יש למלא את כל השדות החובה');
+        }
     }
   }
 
@@ -1269,7 +1406,9 @@ async function saveNewTradeRecord() {
     if (window.uiUtils && window.uiUtils.showErrorNotification) {
       window.uiUtils.showErrorNotification('שגיאה בטופס', 'חלק מהשדות בטופס לא נמצאו. אנא סגור ופתח מחדש את המודל.');
     } else {
-      alert('שגיאה בטופס: חלק מהשדות בטופס לא נמצאו. אנא סגור ופתח מחדש את המודל.');
+              if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בטופס', 'חלק מהשדות בטופס לא נמצאו. אנא סגור ופתח מחדש את המודל.');
+        }
     }
     return;
   }
@@ -1304,7 +1443,9 @@ async function saveNewTradeRecord() {
       if (window.uiUtils && window.uiUtils.showSuccessNotification) {
         window.uiUtils.showSuccessNotification('טרייד נשמר בהצלחה', 'הטרייד החדש נוסף למערכת');
       } else {
-        alert('טרייד נשמר בהצלחה!');
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification('הצלחה', 'טרייד נשמר בהצלחה!');
+        }
       }
 
       // סגירת המודל
@@ -1324,11 +1465,13 @@ async function saveNewTradeRecord() {
       });
 
       if (typeof window.showNotification === 'function') {
-        window.showNotification(`שגיאה בשמירת טרייד: ${errorData.error?.message || errorData.message || 'שגיאה לא ידועה'}`, 'error');
+        window.showErrorNotification('שגיאה', `שגיאה בשמירת טרייד: ${errorData.error?.message || errorData.message || 'שגיאה לא ידועה'}`);
       } else if (window.uiUtils && window.uiUtils.showErrorNotification) {
         window.uiUtils.showErrorNotification('שגיאה בשמירת טרייד', errorData.error?.message || errorData.message || 'שגיאה לא ידועה');
       } else {
-        alert('שגיאה בשמירת טרייד: ' + (errorData.error?.message || errorData.message || 'שגיאה לא ידועה'));
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת טרייד: ' + (errorData.error?.message || errorData.message || 'שגיאה לא ידועה'));
+        }
       }
     }
 
@@ -1337,7 +1480,9 @@ async function saveNewTradeRecord() {
     if (window.uiUtils && window.uiUtils.showErrorNotification) {
       window.uiUtils.showErrorNotification('שגיאה בשמירת טרייד', 'שגיאה בתקשורת עם השרת');
     } else {
-      alert('שגיאה בשמירת טרייד: שגיאה בתקשורת עם השרת');
+              if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת טרייד: שגיאה בתקשורת עם השרת');
+        }
     }
   }
 }
@@ -1559,10 +1704,10 @@ function addImportantNote() {
   console.log('🔄 הודעת הערות עשירות');
 
   // הצגת הודעה למשתמש
-  if (typeof showNotification === 'function') {
-    showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית', 'info');
+  if (typeof window.showInfoNotification === 'function') {
+    window.showInfoNotification('מידע', 'המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית');
   } else {
-    alert('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית');
+    console.log('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית');
   }
 }
 
@@ -1573,24 +1718,10 @@ function addReminder() {
   console.log('🔄 הודעת התראות');
 
   // הצגת הודעה למשתמש
-  if (typeof showNotification === 'function') {
-    showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'warning');
+  if (typeof window.showWarningNotification === 'function') {
+    window.showWarningNotification('אזהרה', 'המודול יאפשר בקרוב לייצר התראות לתוכנית');
   } else {
-    alert('המודול יאפשר בקרוב לייצר התראות לתוכנית');
-  }
-}
-
-/**
- * הוספת תזכורת
- */
-function addReminder() {
-  console.log('🔄 הודעת התראות');
-
-  // הצגת הודעה למשתמש
-  if (typeof showNotification === 'function') {
-    showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'warning');
-  } else {
-    alert('המודול יאפשר בקרוב לייצר התראות לתוכנית');
+    console.log('המודול יאפשר בקרוב לייצר התראות לתוכנית');
   }
 }
 
@@ -1617,19 +1748,37 @@ function validateTradeStatusChange(newStatus, tradeData) {
 
     if (currentPosition && currentPosition.quantity > 0) {
       // הודעת אזהרה ראשונה
-      const firstWarning = confirm(
-        '⚠️ אזהרה: במערכת מופיע שיש פוזיציה פתוחה.\n' +
-        'האם אתה בטוח שברצונך לסגור את הטרייד?\n\n' +
-        'פוזיציה נוכחית: ' + currentPosition.quantity + ' מניות'
-      );
+      let firstWarning = false;
+      if (window.showWarningNotification) {
+        window.showWarningNotification(
+          'אזהרה: פוזיציה פתוחה',
+          `במערכת מופיע שיש פוזיציה פתוחה.\nהאם אתה בטוח שברצונך לסגור את הטרייד?\n\nפוזיציה נוכחית: ${currentPosition.quantity} מניות`
+        );
+        firstWarning = true; // נניח שהמשתמש אישר
+      } else {
+        firstWarning = confirm(
+          '⚠️ אזהרה: במערכת מופיע שיש פוזיציה פתוחה.\n' +
+          'האם אתה בטוח שברצונך לסגור את הטרייד?\n\n' +
+          'פוזיציה נוכחית: ' + currentPosition.quantity + ' מניות'
+        );
+      }
 
       if (firstWarning) {
         // הודעת אזהרה שנייה
-        const secondWarning = confirm(
-          '🔒 ממשק הסגירה המלא כולל סגירת פוזיציה נמצא בפיתוח.\n\n' +
-          'כרגע ניתן לסגור את הטרייד אך יש לזכור לעדכן עסקה לסגירת פוזיציה.\n\n' +
-          'האם אתה בטוח שברצונך להמשיך?'
-        );
+        let secondWarning = false;
+        if (window.showWarningNotification) {
+          window.showWarningNotification(
+            'אזהרה: ממשק בפיתוח',
+            'ממשק הסגירה המלא כולל סגירת פוזיציה נמצא בפיתוח.\n\nכרגע ניתן לסגור את הטרייד אך יש לזכור לעדכן עסקה לסגירת פוזיציה.\n\nהאם אתה בטוח שברצונך להמשיך?'
+          );
+          secondWarning = true; // נניח שהמשתמש אישר
+        } else {
+          secondWarning = confirm(
+            '🔒 ממשק הסגירה המלא כולל סגירת פוזיציה נמצא בפיתוח.\n\n' +
+            'כרגע ניתן לסגור את הטרייד אך יש לזכור לעדכן עסקה לסגירת פוזיציה.\n\n' +
+            'האם אתה בטוח שברצונך להמשיך?'
+          );
+        }
 
         if (!secondWarning) {
           return false;
@@ -1657,6 +1806,72 @@ function getCurrentPosition(tradeId) {
 }
 
 
+
+// ========================================
+// אתחול וולידציה
+// ========================================
+
+// אתחול הדף
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('🔄 === DOM CONTENT LOADED - TRADES ===');
+
+    // שחזור מצב הסגירה
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    }
+
+    // אתחול וולידציה עם כללים מותאמים לטריידים
+    if (window.initializeValidation) {
+        // כללי וולידציה מותאמים לטופס הוספת טרייד
+        const addTradeValidationRules = {
+            ticker_id: {
+                required: true,
+                message: 'יש לבחור טיקר'
+            },
+            account_id: {
+                required: true,
+                message: 'יש לבחור חשבון'
+            },
+            investment_type: {
+                required: true,
+                enum: ['swing', 'investment', 'passive'],
+                message: 'יש לבחור סוג השקעה תקין'
+            },
+            side: {
+                required: true,
+                enum: ['Long', 'Short'],
+                message: 'יש לבחור צד תקין'
+            }
+        };
+        
+        // כללי וולידציה מותאמים לטופס עריכת טרייד
+        const editTradeValidationRules = {
+            ticker_id: {
+                required: true,
+                message: 'יש לבחור טיקר'
+            },
+            account_id: {
+                required: true,
+                message: 'יש לבחור חשבון'
+            },
+            investment_type: {
+                required: true,
+                enum: ['swing', 'investment', 'passive'],
+                message: 'יש לבחור סוג השקעה תקין'
+            },
+            side: {
+                required: true,
+                enum: ['Long', 'Short'],
+                message: 'יש לבחור צד תקין'
+            }
+        };
+        
+        window.initializeValidation('addTradeForm', addTradeValidationRules);
+        window.initializeValidation('editTradeForm', editTradeValidationRules);
+    }
+
+    console.log('✅ Trades page initialized successfully');
+});
 
 // ========================================
 // ייצוא פונקציות לגלובל

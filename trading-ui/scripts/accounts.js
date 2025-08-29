@@ -91,15 +91,14 @@ async function loadCurrenciesFromServer() {
 
 // פונקציה עזר להצגת מטבע
 function getCurrencyDisplay(account) {
-  if (account.currency && account.currency.symbol) {
-    // אם יש פרטי מטבע מלאים
-    const symbol = account.currency.symbol;
-    switch (symbol) {
+  if (account.currency_symbol) {
+    // אם יש סמל מטבע מהשרת
+    switch (account.currency_symbol) {
       case 'USD': return '$';
       case 'ILS': return '₪';
       case 'EUR': return '€';
       case 'GBP': return '£';
-      default: return symbol;
+      default: return account.currency_symbol;
     }
   } else if (account.currency_id && window.currenciesData.length > 0) {
     // אם יש רק currency_id, נחפש את המטבע
@@ -113,17 +112,17 @@ function getCurrencyDisplay(account) {
         default: return currency.symbol;
       }
     }
-  } else if (account.currency) {
+  } else if (account.currency && account.currency.symbol) {
     // fallback למטבע הישן
-    switch (account.currency) {
+    switch (account.currency.symbol) {
       case 'USD': return '$';
       case 'ILS': return '₪';
       case 'EUR': return '€';
       case 'GBP': return '£';
-      default: return account.currency;
+      default: return account.currency.symbol;
     }
   }
-  return '-';
+  return '$'; // ברירת מחדל
 }
 
 // פונקציה ליצירת אפשרויות מטבע בטופס
@@ -136,15 +135,14 @@ function generateCurrencyOptions(account = null) {
     console.log('🔄 No currencies data, using default');
     // אם אין מטבעות, נחזיר ברירת מחדל
     return `
-      <option value="1" ${account && (account.currency_id === 1 || (account.currency && account.currency.symbol === 'USD')) ? 'selected' : ''}>דולר אמריקאי (USD)</option>
+      <option value="1" ${account && account.currency_id === 1 ? 'selected' : ''}>דולר אמריקאי (USD)</option>
     `;
   }
 
   const options = window.currenciesData.map(currency => {
     const isSelected = account && (
       account.currency_id === currency.id ||
-      (account.currency && account.currency.symbol === currency.symbol) ||
-      (account.currency === currency.symbol)
+      (account.currency_symbol === currency.symbol)
     );
 
     return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
@@ -964,8 +962,6 @@ function validateAccountData(accountData) {
 function showFormError(message) {
   if (typeof window.showErrorNotification === 'function') {
     window.showErrorNotification('שגיאה', message);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(message, 'error');
   } else {
     console.error('שגיאה:', message);
   }
@@ -1035,9 +1031,7 @@ async function saveAccount(mode, accountId = null) {
       const message = mode === 'add' ? 'חשבון נוסף בהצלחה' : 'חשבון עודכן בהצלחה';
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', message);
-      } else if (typeof window.showNotification === 'function') {
-        window.showNotification(message, 'success');
-      } else {
+        } else {
         console.log('הצלחה:', message);
       }
 
@@ -1046,9 +1040,7 @@ async function saveAccount(mode, accountId = null) {
       // אם יש שגיאה ברענון, לא סוגרים את המודל ומציגים הודעת שגיאה
       if (typeof window.showWarningNotification === 'function') {
         window.showWarningNotification('אזהרה', 'החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
-      } else if (typeof window.showNotification === 'function') {
-        window.showNotification('החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.', 'warning');
-      } else {
+        } else {
         console.warn('החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
       }
     }
@@ -1057,9 +1049,7 @@ async function saveAccount(mode, accountId = null) {
     console.error('❌ שגיאה בשמירת חשבון:', error);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בשמירת החשבון');
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בשמירת החשבון', 'error');
-    } else {
+      } else {
       console.error('שגיאה בשמירת החשבון');
     }
   }
@@ -1144,9 +1134,7 @@ async function showEditAccountModalById(accountId) {
     console.error('❌ Invalid account ID:', accountId);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'מזהה חשבון לא תקין');
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('מזהה חשבון לא תקין', 'error');
-    } else {
+      } else {
       console.error('מזהה חשבון לא תקין');
     }
     return;
@@ -1179,9 +1167,7 @@ async function showEditAccountModalById(accountId) {
     console.error('❌ Error loading account data:', error);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני החשבון: ' + error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בטעינת נתוני החשבון: ' + error.message, 'error');
-    } else {
+      } else {
       console.error('שגיאה בטעינת נתוני החשבון:', error.message);
     }
   }
@@ -1195,9 +1181,7 @@ function showEditAccountModal(account) {
     console.error('❌ Invalid account parameter:', account);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל העריכה');
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בפתיחת מודל העריכה', 'error');
-    } else {
+      } else {
       console.error('שגיאה בפתיחת מודל העריכה');
     }
     return;
@@ -1254,7 +1238,7 @@ async function createAccount() {
       },
       body: JSON.stringify({
         name: name,
-        currency: currency,
+        currency_id: parseInt(currency),
         status: status,
         cash_balance: cashBalance,
         total_value: totalValue,
@@ -1318,7 +1302,7 @@ async function updateAccountFromModal() {
       },
       body: JSON.stringify({
         name: name,
-        currency: currency,
+        currency_id: parseInt(currency),
         status: status,
         cash_balance: cashBalance,
         total_value: totalValue,
@@ -1434,8 +1418,13 @@ async function cancelAccount(accountId, accountName) {
               () => resolve(false)
             );
           } else {
-            if (confirm(`הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`)) {
-              resolve(true);
+            if (typeof window.showSecondConfirmationModal === 'function') {
+              window.showSecondConfirmationModal(
+                'ביטול חשבון',
+                `הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`,
+                () => resolve(true),
+                () => resolve(false)
+              );
             } else {
               resolve(false);
             }
@@ -1448,11 +1437,21 @@ async function cancelAccount(accountId, accountName) {
     });
   } else {
     // גיבוי למערכת הישנה
-    if (!confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
-      return;
-    }
-    if (!confirm(`הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`)) {
-      return;
+    if (typeof window.showCancelWarning === 'function') {
+      const confirmed = await new Promise((resolve) => {
+        window.showCancelWarning('חשבון', accountName, 
+          () => resolve(true),
+          () => resolve(false)
+        );
+      });
+      if (!confirmed) return;
+    } else {
+      if (!confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
+        return;
+      }
+      if (!confirm(`הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`)) {
+        return;
+      }
     }
   }
 
@@ -1522,10 +1521,19 @@ async function deleteAccount(accountId, accountName) {
               () => resolve(false)
             );
           } else {
-            if (confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
-              resolve(true);
+            if (typeof window.showSecondConfirmationModal === 'function') {
+              window.showSecondConfirmationModal(
+                'מחיקת חשבון',
+                `פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`,
+                () => resolve(true),
+                () => resolve(false)
+              );
             } else {
-              resolve(false);
+              if (confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
+                resolve(true);
+              } else {
+                resolve(false);
+              }
             }
           }
         },
@@ -1536,11 +1544,21 @@ async function deleteAccount(accountId, accountName) {
     });
   } else {
     // גיבוי למערכת הישנה
-    if (!confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
-      return;
-    }
-    if (!confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
-      return;
+    if (typeof window.showDeleteWarning === 'function') {
+      const confirmed = await new Promise((resolve) => {
+        window.showDeleteWarning('חשבון', accountName, 
+          () => resolve(true),
+          () => resolve(false)
+        );
+      });
+      if (!confirmed) return;
+    } else {
+      if (!confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
+        return;
+      }
+      if (!confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
+        return;
+      }
     }
   }
 
@@ -1582,8 +1600,6 @@ function showSuccessMessage(message) {
   console.log('✅ הצלחה:', message);
   if (typeof window.showSuccessNotification === 'function') {
     window.showSuccessNotification('הצלחה', message);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(message, 'success');
   } else {
     console.log('הצלחה:', message);
   }
@@ -1597,8 +1613,6 @@ function showErrorMessage(message) {
   console.log('❌ שגיאה:', message);
   if (typeof window.showErrorNotification === 'function') {
     window.showErrorNotification('שגיאה', message);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(message, 'error');
   } else {
     console.error('שגיאה:', message);
   }
@@ -1610,8 +1624,17 @@ function showSecondConfirmationModal(message, onConfirm) {
     window.showConfirmationDialog('אישור', message, onConfirm, () => {});
   } else {
     // גיבוי למערכת הישנה
-    if (confirm(message)) {
-      onConfirm();
+    if (typeof window.showSecondConfirmationModal === 'function') {
+      window.showSecondConfirmationModal(
+        'אישור פעולה',
+        message,
+        onConfirm,
+        () => {}
+      );
+    } else {
+      if (confirm(message)) {
+        onConfirm();
+      }
     }
   }
 }
@@ -1628,8 +1651,6 @@ function checkLinkedItems(accountId) {
 function showOpenTradesWarning(accountId, accountName) {
   if (typeof window.showWarningNotification === 'function') {
     window.showWarningNotification('אזהרה', `יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(`יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`, 'warning');
   } else {
     console.warn(`יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
   }
@@ -1638,8 +1659,6 @@ function showOpenTradesWarning(accountId, accountName) {
 function createWarningModal(message) {
   if (typeof window.showWarningNotification === 'function') {
     window.showWarningNotification('אזהרה', message);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(message, 'warning');
   } else {
     console.warn('אזהרה:', message);
   }

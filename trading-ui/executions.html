@@ -73,7 +73,7 @@
         <div class="section-header">
           <div class="table-title">
             <img src="images/icons/executions.svg" alt="עסקעות"
-              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
             עסקעות
           </div>
           <div class="table-actions">
@@ -108,7 +108,7 @@
           <div class="section-header">
             <div class="table-title">
               <img src="images/icons/executions.svg" alt="העסקעות שלי"
-                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
               העסקעות שלי
             </div>
             <div class="table-count">12 עסקעות</div>
@@ -132,70 +132,70 @@
                   <tr>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 0, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         סימבול <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 1, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         טרייד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 2, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         פעולה <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 3, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         חשבון <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 4, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         כמות <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 5, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         מחיר <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 6, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         עמלה <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 7, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         רווח/הפסד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 8, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(9); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 9, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         נוצר ב <span class="sort-icon">↕</span>
                       </button>
@@ -366,7 +366,7 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addExecutionDate" class="form-label">תאריך ביצוע *</label>
-                    <input type="datetime-local" class="form-control" id="addExecutionDate" required disabled>
+                    <input type="datetime-local" class="form-control" id="addExecutionDate" required disabled onblur="validateExecutionDate(this)">
                     <div class="invalid-feedback" id="addExecutionDateError"></div>
                   </div>
                 </div>
@@ -408,7 +408,7 @@
                   <div class="mb-3">
                     <label for="addExecutionNotes" class="form-label">הערות</label>
                     <textarea class="form-control" id="addExecutionNotes" rows="3"
-                      placeholder="הערות נוספות על העסקה..." maxlength="500" disabled></textarea>
+                      placeholder="הערות נוספות על העסקה..." maxlength="500" disabled onblur="validateExecutionNotes(this)" oninput="validateExecutionNotes(this)"></textarea>
                     <div class="invalid-feedback" id="addExecutionNotesError"></div>
                   </div>
                 </div>
@@ -554,7 +554,7 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editExecutionDate" class="form-label">תאריך ביצוע *</label>
-                    <input type="datetime-local" class="form-control" id="editExecutionDate" required>
+                    <input type="datetime-local" class="form-control" id="editExecutionDate" required onblur="validateExecutionDate(this)">
                     <div class="invalid-feedback" id="editExecutionDateError"></div>
                   </div>
                 </div>
@@ -564,7 +564,7 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editExecutionSource" class="form-label">מקור</label>
-                    <select class="form-select" id="editExecutionSource">
+                    <select class="form-select" id="editExecutionSource" onblur="validateExecutionSource(this)">
                       <option value="manual">ידני</option>
                       <option value="ibkr">IBKR</option>
                       <option value="etrade">E*TRADE</option>
@@ -608,7 +608,7 @@
                   <div class="mb-3">
                     <label for="editExecutionNotes" class="form-label">הערות</label>
                     <textarea class="form-control" id="editExecutionNotes" rows="3"
-                      placeholder="הערות נוספות על העסקה..." maxlength="500"></textarea>
+                      placeholder="הערות נוספות על העסקה..." maxlength="500" onblur="validateExecutionNotes(this)" oninput="validateExecutionNotes(this)"></textarea>
                     <div class="invalid-feedback" id="editExecutionNotesError"></div>
                   </div>
                 </div>
@@ -628,7 +628,7 @@
 
     <!-- Delete Execution Modal -->
     <div class="modal fade" id="deleteExecutionModal" tabindex="-1" aria-labelledby="deleteExecutionModalLabel"
-      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+      aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header modal-header-danger">

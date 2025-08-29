@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת API - TikTrack</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- TikTrack Styles -->
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/header-system.css">
+    <link rel="stylesheet" href="/styles/apple-theme.css">
+    <link rel="stylesheet" href="/external_data_integration_client/styles/external_data_test.css">
+    
+    <!-- Modular grid files -->
+    <script src="/scripts/console-cleanup.js"></script>
+    <script src="/scripts/translation-utils.js"></script>
+    <script src="/scripts/data-utils.js"></script>
+    <script src="/scripts/ui-utils.js"></script>
+    <script src="/scripts/table-mappings.js"></script>
+    <script src="/scripts/date-utils.js"></script>
+    <script src="/scripts/tables.js"></script>
+    <script src="/scripts/linked-items.js"></script>
+    <script src="/scripts/page-utils.js"></script>
+    <script src="/scripts/main.js"></script>
+    <script src="/scripts/header-system.js"></script>
+    <script src="/scripts/alerts.js"></script>
+    <script src="/scripts/active-alerts-component.js"></script>
+
+    <!-- API test script -->
+    <script src="/external_data_integration_client/scripts/api_test.js"></script>
+</head>
+
+<body>
+    <!-- רקע כללי -->
+    <div class="background-wrapper">
+
+        <!-- unified-header ייווצר כאן אוטומטית -->
+
+        <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+        <div class="page-body">
+            <!-- אזור בדיקת API - top-Section -->
+            <div class="top-section api-test-page">
+                <!-- כותרת בדיקת API -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="/images/icons/development.svg" alt="בדיקת API" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        בדיקת API
+                    </div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בדיקת API">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+            </div> <!-- סוף top-section -->
+
+            <!-- תוכן ראשי -->
+            <div class="main-content">
+
+                <!-- אזור בדיקת API - content-section -->
+                <div class="content-section api-test-page">
+                    <!-- כותרת בדיקת API -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="/images/icons/development.svg" alt="בדיקת API" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                            בדיקת API
+                        </div>
+                        <div class="table-count">
+                            <img src="/images/icons/development.svg" alt="בדיקות" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                            בדיקות
+                        </div>
+                        <div class="table-actions">
+                            <button class="refresh-btn" onclick="clearApiLogs()" title="נקה לוגים">
+                                <img src="/images/icons/development.svg" alt="נקה" class="action-icon" style="width: 16px; height: 16px;"> נקה
+                            </button>
+
+                            <div class="action-separator"></div>
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור בדיקת API">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- תוכן בדיקות -->
+                    <div class="section-body">
+                        <!-- Loading Indicator -->
+                        <div id="loading-indicator" class="loading-overlay" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">טוען...</span>
+                            </div>
+                        </div>
+
+                        <!-- Error Display -->
+                        <div id="error-display" class="alert alert-danger" style="display: none;">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="error-message"></span>
+                        </div>
+
+                        <!-- Current Time Display -->
+                        <div class="text-muted mb-3">
+                            <i class="fas fa-clock me-1"></i>
+                            <span id="current-time">טוען זמן...</span>
+                        </div>
+
+                        <!-- Two Column Layout -->
+                        <div class="row">
+                            <!-- Left Column - Tests -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3"><i class="fas fa-flask me-2"></i>בדיקות</h6>
+                                
+                                <!-- API Tests -->
+                                <div class="row">
+                                    <!-- Endpoint Test -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-link me-1"></i>
+                                                    בדיקת נקודת קצה
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="mb-1">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <label class="form-label small mb-0 me-2">URL:</label>
+                                                        <button class="btn btn-outline-secondary btn-sm" onclick="editEndpointUrl()" title="ערוך">
+                                                            <i class="fas fa-edit" style="font-size: 10px;"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="data-label" id="endpoint-url-label" style="font-size: 11px; line-height: 1.2; max-height: 30px; overflow: hidden; background: #f8f9fa; padding: 4px; border-radius: 3px;">/api/v1/tickers</div>
+                                                    <textarea class="form-control form-control-sm" id="endpoint-url" rows="2" style="display: none; font-size: 10px;">/api/v1/tickers</textarea>
+                                                </div>
+                                                <div class="d-grid gap-1">
+                                                    <button class="btn btn-primary btn-sm" id="test-get" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-download me-1"></i>GET
+                                                    </button>
+                                                    <button class="btn btn-success btn-sm" id="test-post" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-upload me-1"></i>POST
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Authentication Test -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-key me-1"></i>
+                                                    אימות
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="d-grid gap-1">
+                                                    <button class="btn btn-outline-info btn-sm" id="test-auth" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-user-check me-1"></i>בדוק אימות
+                                                    </button>
+                                                    <button class="btn btn-outline-warning btn-sm" id="test-token" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-token me-1"></i>בדוק טוקן
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Rate Limiting Test -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-tachometer-alt me-1"></i>
+                                                    הגבלת קצב
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="d-grid gap-1">
+                                                    <button class="btn btn-outline-secondary btn-sm" id="test-rate-limit" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-stopwatch me-1"></i>בדוק הגבלה
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm" id="test-burst" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-bolt me-1"></i>בדיקת פרץ
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Error Handling Test -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                                    טיפול שגיאות
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="d-grid gap-1">
+                                                    <button class="btn btn-outline-warning btn-sm" id="test-404" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-search me-1"></i>404
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm" id="test-500" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-server me-1"></i>500
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Performance Test -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-stopwatch me-1"></i>
+                                                    ביצועים
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="d-grid gap-1">
+                                                    <button class="btn btn-outline-success btn-sm" id="test-response-time" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-clock me-1"></i>זמן תגובה
+                                                    </button>
+                                                    <button class="btn btn-outline-info btn-sm" id="test-throughput" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-chart-line me-1"></i>תפוקה
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Custom Request Test -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-cog me-1"></i>
+                                                    בקשה מותאמת
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="mb-1">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <label class="form-label small mb-0 me-2">JSON:</label>
+                                                        <button class="btn btn-outline-secondary btn-sm" onclick="editCustomJson()" title="ערוך">
+                                                            <i class="fas fa-edit" style="font-size: 10px;"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="data-label" id="custom-json-label" style="font-size: 11px; line-height: 1.2; max-height: 30px; overflow: hidden; background: #f8f9fa; padding: 4px; border-radius: 3px;">{"test": "data"}</div>
+                                                    <textarea class="form-control form-control-sm" id="custom-json" rows="2" style="display: none; font-size: 10px;">{"test": "data"}</textarea>
+                                                </div>
+                                                <button class="btn btn-warning btn-sm w-100" id="test-custom-request" style="font-size: 10px; padding: 2px 8px;">
+                                                    <i class="fas fa-paper-plane me-1"></i>שלח
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column - Feedback -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3"><i class="fas fa-comments me-2"></i>משוב</h6>
+                                
+                                <!-- API Results -->
+                                <div class="card result-card mb-3">
+                                    <div class="card-header py-2">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-chart-bar me-2"></i>
+                                            תוצאות API
+                                        </h6>
+                                    </div>
+                                    <div class="card-body py-2">
+                                        <div id="api-results" style="max-height: 200px; overflow-y: auto;">
+                                            <!-- תוצאות יוצגו כאן -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- API Logs -->
+                                <div class="card log-card">
+                                    <div class="card-header py-2">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-file-alt me-2"></i>
+                                            לוג בדיקות
+                                            <button class="btn btn-sm btn-outline-secondary float-start" onclick="clearApiLogs()">
+                                                <i class="fas fa-trash me-1"></i>נקה
+                                            </button>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body py-2">
+                                        <div class="log-container" id="api-test-logs" style="max-height: 300px; overflow-y: auto;">
+                                            <!-- לוגים יוצגו כאן -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- סוף content-section -->
+            </div> <!-- סוף main-content -->
+        </div> <!-- סוף page-body -->
+    </div> <!-- סוף background-wrapper -->
+
+    <script>
+        // אתחול HeaderSystem
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.headerSystem && !window.headerSystem.isInitialized) {
+                window.headerSystem.init();
+            }
+        });
+    </script>
+</body>
+
+</html>

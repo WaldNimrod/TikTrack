@@ -121,29 +121,29 @@ def create_currency():
                 "version": "v1"
             }), 400
         
-        # וולידציה של תבנית סמל מטבע
-        if not re.match(r'^[A-Z]+$', symbol):
+        # וולידציה של תבנית סמל מטבע - בדיוק 3 אותיות גדולות
+        if not re.match(r'^[A-Z]{3}$', symbol):
             return jsonify({
                 "status": "error",
-                "error": {"message": "סמל מטבע חייב להכיל רק אותיות אנגליות גדולות (למשל: USD, EUR, ILS). אסור להשתמש במספרים או אותיות קטנות."},
+                "error": {"message": "סמל מטבע חייב להיות בדיוק 3 אותיות אנגליות גדולות (למשל: USD, EUR, ILS). אסור להשתמש במספרים או אותיות קטנות."},
                 "version": "v1"
             }), 400
         
-        # וולידציה של אורך סמל מטבע
-        if len(symbol) > 10:
+        # וולידציה של אורך שם מטבע
+        if len(name) > 25:
             return jsonify({
                 "status": "error",
-                "error": {"message": "סמל מטבע לא יכול להיות יותר מ-10 תווים. נסה סמל קצר יותר."},
+                "error": {"message": "שם מטבע לא יכול להיות יותר מ-25 תווים. נסה שם קצר יותר."},
                 "version": "v1"
             }), 400
         
         # וולידציה של שער דולר
         try:
             usd_rate = float(usd_rate)
-            if usd_rate < 0:
+            if usd_rate <= 0:
                 return jsonify({
                     "status": "error",
-                    "error": {"message": "שער דולר חייב להיות מספר חיובי. נסה מספר גדול מ-0."},
+                    "error": {"message": "שער דולר חייב להיות מספר חיובי גדול מ-0. נסה מספר עם נקודה עשרונית (למשל: 1.5)."},
                     "version": "v1"
                 }), 400
         except (ValueError, TypeError):
@@ -227,19 +227,19 @@ def update_currency(currency_id: int):
                 "version": "v1"
             }), 400
         
-        # וולידציה של תבנית סמל מטבע
-        if not re.match(r'^[A-Z]+$', symbol):
+        # וולידציה של תבנית סמל מטבע - בדיוק 3 אותיות גדולות
+        if not re.match(r'^[A-Z]{3}$', symbol):
             return jsonify({
                 "status": "error",
-                "error": {"message": "סמל מטבע חייב להכיל רק אותיות אנגליות גדולות (למשל: USD, EUR, ILS). אסור להשתמש במספרים או אותיות קטנות."},
+                "error": {"message": "סמל מטבע חייב להיות בדיוק 3 אותיות אנגליות גדולות (למשל: USD, EUR, ILS). אסור להשתמש במספרים או אותיות קטנות."},
                 "version": "v1"
             }), 400
         
-        # וולידציה של אורך סמל מטבע
-        if len(symbol) > 10:
+        # וולידציה של אורך שם מטבע
+        if len(name) > 25:
             return jsonify({
                 "status": "error",
-                "error": {"message": "סמל מטבע לא יכול להיות יותר מ-10 תווים. נסה סמל קצר יותר."},
+                "error": {"message": "שם מטבע לא יכול להיות יותר מ-25 תווים. נסה שם קצר יותר."},
                 "version": "v1"
             }), 400
         
@@ -247,10 +247,10 @@ def update_currency(currency_id: int):
         if usd_rate is not None:
             try:
                 usd_rate = float(usd_rate)
-                if usd_rate < 0:
+                if usd_rate <= 0:
                     return jsonify({
                         "status": "error",
-                        "error": {"message": "שער דולר חייב להיות מספר חיובי. נסה מספר גדול מ-0."},
+                        "error": {"message": "שער דולר חייב להיות מספר חיובי גדול מ-0. נסה מספר עם נקודה עשרונית (למשל: 1.5)."},
                         "version": "v1"
                     }), 400
             except (ValueError, TypeError):

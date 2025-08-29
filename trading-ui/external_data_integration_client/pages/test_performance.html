@@ -1,27 +1,10 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>בדיקת מידע חיצוני - TikTrack</title>
-
-    <!-- 
-        ===== דף בדיקת מידע חיצוני - TikTrack =====
-        
-        דף זה מכיל:
-        1. בדיקות API של מידע חיצוני
-        2. סימולציות של קריאות API
-        3. בדיקת חיבור לבסיס נתונים
-        4. לוגים מפורטים של הבדיקות
-        
-        מבנה הדף:
-        - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
-        - page-body: תוכן ראשי מוגבל ברוחב (1400px)
-          - top-section: כותרת בדיקת מידע חיצוני
-          - content-section: טופסי בדיקה ותוצאות
-    -->
-
+    <title>בדיקת ביצועים - TikTrack</title>
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -32,7 +15,7 @@
     <link rel="stylesheet" href="/styles/header-system.css">
     <link rel="stylesheet" href="/styles/apple-theme.css">
     <link rel="stylesheet" href="/external_data_integration_client/styles/external_data_test.css">
-
+    
     <!-- Modular grid files -->
     <script src="/scripts/console-cleanup.js"></script>
     <script src="/scripts/translation-utils.js"></script>
@@ -48,8 +31,8 @@
     <script src="/scripts/alerts.js"></script>
     <script src="/scripts/active-alerts-component.js"></script>
 
-    <!-- External data test script -->
-    <script src="/external_data_integration_client/scripts/external_data_test.js"></script>
+    <!-- Performance test script -->
+    <script src="/external_data_integration_client/scripts/performance_test.js"></script>
 </head>
 
 <body>
@@ -60,16 +43,16 @@
 
         <!-- גוף הדף - כל התוכן אחרי הכותרת -->
         <div class="page-body">
-            <!-- אזור בדיקת מידע חיצוני - top-Section -->
-            <div class="top-section external-data-test-page">
-                <!-- כותרת בדיקת מידע חיצוני -->
+            <!-- אזור בדיקת ביצועים - top-Section -->
+            <div class="top-section performance-test-page">
+                <!-- כותרת בדיקת ביצועים -->
                 <div class="section-header">
                     <div class="table-title">
-                        <img src="/images/icons/development.svg" alt="בדיקת מידע חיצוני" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
-                        בדיקת מידע חיצוני
+                        <img src="/images/icons/development.svg" alt="בדיקת ביצועים" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        בדיקת ביצועים
                     </div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בדיקת מידע חיצוני">
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בדיקת ביצועים">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -79,25 +62,25 @@
             <!-- תוכן ראשי -->
             <div class="main-content">
 
-                <!-- אזור בדיקת מידע חיצוני - content-section -->
-                <div class="content-section external-data-test-page">
-                    <!-- כותרת בדיקת מידע חיצוני -->
+                <!-- אזור בדיקת ביצועים - content-section -->
+                <div class="content-section performance-test-page">
+                    <!-- כותרת בדיקת ביצועים -->
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="/images/icons/development.svg" alt="בדיקת מידע חיצוני" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
-                            בדיקת מידע חיצוני
+                            <img src="/images/icons/development.svg" alt="בדיקת ביצועים" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                            בדיקת ביצועים
                         </div>
                         <div class="table-count">
                             <img src="/images/icons/development.svg" alt="בדיקות" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
                             בדיקות
                         </div>
                         <div class="table-actions">
-                            <button class="refresh-btn" onclick="clearTestLogs()" title="נקה לוגים">
+                            <button class="refresh-btn" onclick="clearPerformanceLogs()" title="נקה לוגים">
                                 <img src="/images/icons/development.svg" alt="נקה" class="action-icon" style="width: 16px; height: 16px;"> נקה
                             </button>
 
                             <div class="action-separator"></div>
-                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור בדיקת מידע חיצוני">
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור בדיקת ביצועים">
                                 <span class="filter-icon">▲</span>
                             </button>
                         </div>
@@ -130,102 +113,141 @@
                             <div class="col-md-6">
                                 <h6 class="mb-3"><i class="fas fa-flask me-2"></i>בדיקות</h6>
                                 
-                                <!-- API Tests -->
+                                <!-- Performance Tests -->
                                 <div class="row">
-                                    <!-- Single Quote Test -->
+                                    <!-- Load Test -->
                                     <div class="col-6 mb-2">
                                         <div class="card test-card">
                                             <div class="card-header py-1">
                                                 <h6 class="card-title mb-0">
-                                                    <i class="fas fa-chart-line me-1"></i>
-                                                    מחיר בודד
+                                                    <i class="fas fa-weight me-1"></i>
+                                                    בדיקת עומס
                                                 </h6>
                                             </div>
                                             <div class="card-body py-1">
-                                                <div class="mb-1">
-                                                    <label class="form-label small mb-1">טיקר:</label>
-                                                    <select class="form-select form-select-sm" id="db-tickers-select" style="font-size: 10px;">
-                                                        <option value="">בחר...</option>
-                                                    </select>
+                                                <div class="d-grid gap-1">
+                                                    <button class="btn btn-outline-primary btn-sm" id="test-load" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-chart-line me-1"></i>בדיקת עומס
+                                                    </button>
+                                                    <button class="btn btn-outline-warning btn-sm" id="test-stress" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-fire me-1"></i>בדיקת לחץ
+                                                    </button>
                                                 </div>
-                                                <div class="mb-1">
-                                                    <label class="form-label small mb-1">או הזן:</label>
-                                                    <input type="text" class="form-control form-control-sm" id="single-symbol" placeholder="AAPL" value="AAPL" style="font-size: 10px;">
-                                                </div>
-                                                <button class="btn btn-primary btn-sm w-100" id="test-single-quote" style="font-size: 10px; padding: 2px 8px;">
-                                                    <i class="fas fa-search me-1"></i>בדוק
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Batch Quotes Test -->
+                                    <!-- Memory Profiling -->
                                     <div class="col-6 mb-2">
                                         <div class="card test-card">
                                             <div class="card-header py-1">
                                                 <h6 class="card-title mb-0">
-                                                    <i class="fas fa-list me-1"></i>
-                                                    מחירים מרובים
+                                                    <i class="fas fa-memory me-1"></i>
+                                                    פרופיל זיכרון
                                                 </h6>
                                             </div>
                                             <div class="card-body py-1">
-                                                <div class="mb-1">
-                                                    <div class="d-flex align-items-center mb-1">
-                                                        <label class="form-label small mb-0 me-2">סמלים:</label>
-                                                        <button class="btn btn-outline-secondary btn-sm" onclick="editBatchSymbols()" title="ערוך">
-                                                            <i class="fas fa-edit" style="font-size: 10px;"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="data-label" id="batch-symbols-label" style="font-size: 11px; line-height: 1.2; max-height: 30px; overflow: hidden; background: #f8f9fa; padding: 4px; border-radius: 3px;">AAPL,MSFT,GOOGL</div>
-                                                    <textarea class="form-control form-control-sm" id="batch-symbols" rows="2" style="display: none; font-size: 10px;">AAPL,MSFT,GOOGL,TSLA,NVDA</textarea>
+                                                <div class="d-grid gap-1">
+                                                    <button class="btn btn-outline-info btn-sm" id="test-memory-profile" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-chart-pie me-1"></i>פרופיל זיכרון
+                                                    </button>
+                                                    <button class="btn btn-outline-secondary btn-sm" id="test-memory-leaks" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-search me-1"></i>דליפות זיכרון
+                                                    </button>
                                                 </div>
-                                                <button class="btn btn-success btn-sm w-100" id="test-batch-quotes" style="font-size: 10px; padding: 2px 8px;">
-                                                    <i class="fas fa-list me-1"></i>בדוק
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Database Connection Test -->
+                                    <!-- CPU Profiling -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-microchip me-1"></i>
+                                                    פרופיל CPU
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="d-grid gap-1">
+                                                    <button class="btn btn-outline-success btn-sm" id="test-cpu-profile" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-chart-bar me-1"></i>פרופיל CPU
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm" id="test-cpu-bottleneck" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-tachometer-alt me-1"></i>צוואר בקבוק
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Database Performance -->
                                     <div class="col-6 mb-2">
                                         <div class="card test-card">
                                             <div class="card-header py-1">
                                                 <h6 class="card-title mb-0">
                                                     <i class="fas fa-database me-1"></i>
-                                                    בסיס נתונים
+                                                    ביצועי DB
                                                 </h6>
                                             </div>
                                             <div class="card-body py-1">
                                                 <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-info btn-sm" id="load-db-tickers" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-download me-1"></i>טען טיקרים
+                                                    <button class="btn btn-outline-warning btn-sm" id="test-db-performance" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-stopwatch me-1"></i>ביצועי DB
                                                     </button>
-                                                    <button class="btn btn-outline-warning btn-sm" id="test-db-connection" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-plug me-1"></i>בדוק חיבור
+                                                    <button class="btn btn-outline-info btn-sm" id="test-query-optimization" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-search me-1"></i>אופטימיזציה
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- API Simulation Test -->
+                                    <!-- Network Performance -->
                                     <div class="col-6 mb-2">
                                         <div class="card test-card">
                                             <div class="card-header py-1">
                                                 <h6 class="card-title mb-0">
-                                                    <i class="fas fa-cogs me-1"></i>
-                                                    סימולציה
+                                                    <i class="fas fa-network-wired me-1"></i>
+                                                    ביצועי רשת
                                                 </h6>
                                             </div>
                                             <div class="card-body py-1">
                                                 <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-secondary btn-sm" id="simulate-api-success" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-check me-1"></i>הצלחה
+                                                    <button class="btn btn-outline-primary btn-sm" id="test-network-performance" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-tachometer-alt me-1"></i>ביצועי רשת
                                                     </button>
-                                                    <button class="btn btn-outline-danger btn-sm" id="simulate-api-error" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-times me-1"></i>שגיאה
+                                                    <button class="btn btn-outline-success btn-sm" id="test-bandwidth-test" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-chart-line me-1"></i>רוחב פס
                                                     </button>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Custom Performance Test -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-cog me-1"></i>
+                                                    בדיקה מותאמת
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="mb-1">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <label class="form-label small mb-0 me-2">פקודה:</label>
+                                                        <button class="btn btn-outline-secondary btn-sm" onclick="editCustomPerformanceCommand()" title="ערוך">
+                                                            <i class="fas fa-edit" style="font-size: 10px;"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="data-label" id="custom-performance-command-label" style="font-size: 11px; line-height: 1.2; max-height: 30px; overflow: hidden; background: #f8f9fa; padding: 4px; border-radius: 3px;">time curl -s http://localhost:8080/</div>
+                                                    <textarea class="form-control form-control-sm" id="custom-performance-command" rows="2" style="display: none; font-size: 10px;">time curl -s http://localhost:8080/</textarea>
+                                                </div>
+                                                <button class="btn btn-warning btn-sm w-100" id="test-custom-performance" style="font-size: 10px; padding: 2px 8px;">
+                                                    <i class="fas fa-play me-1"></i>הרץ
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -236,34 +258,34 @@
                             <div class="col-md-6">
                                 <h6 class="mb-3"><i class="fas fa-comments me-2"></i>משוב</h6>
                                 
-                                <!-- Test Results -->
+                                <!-- Performance Results -->
                                 <div class="card result-card mb-3">
                                     <div class="card-header py-2">
                                         <h6 class="card-title mb-0">
                                             <i class="fas fa-chart-bar me-2"></i>
-                                            תוצאות בדיקות
+                                            תוצאות ביצועים
                                         </h6>
                                     </div>
                                     <div class="card-body py-2">
-                                        <div id="test-results" style="max-height: 200px; overflow-y: auto;">
+                                        <div id="performance-results" style="max-height: 200px; overflow-y: auto;">
                                             <!-- תוצאות יוצגו כאן -->
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Test Logs -->
+                                <!-- Performance Logs -->
                                 <div class="card log-card">
                                     <div class="card-header py-2">
                                         <h6 class="card-title mb-0">
                                             <i class="fas fa-file-alt me-2"></i>
                                             לוג בדיקות
-                                            <button class="btn btn-sm btn-outline-secondary float-start" onclick="clearTestLogs()">
+                                            <button class="btn btn-sm btn-outline-secondary float-start" onclick="clearPerformanceLogs()">
                                                 <i class="fas fa-trash me-1"></i>נקה
                                             </button>
                                         </h6>
                                     </div>
                                     <div class="card-body py-2">
-                                        <div class="log-container" id="test-logs" style="max-height: 300px; overflow-y: auto;">
+                                        <div class="log-container" id="performance-test-logs" style="max-height: 300px; overflow-y: auto;">
                                             <!-- לוגים יוצגו כאן -->
                                         </div>
                                     </div>

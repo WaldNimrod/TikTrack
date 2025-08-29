@@ -5,6 +5,7 @@ from models.note_relation_type import NoteRelationType
 import logging
 import os
 import sqlite3
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -97,12 +98,29 @@ def create_note_relation_type():
     """Create new note relation type"""
     try:
         data = request.get_json()
-        note_relation_type = data.get('note_relation_type')
+        note_relation_type = data.get('note_relation_type', '').strip()
         
+        # וולידציה של שדה חובה
         if not note_relation_type:
             return jsonify({
                 "status": "error",
                 "error": {"message": "סוג קישור הוא שדה חובה. יש להזין שם לסוג הקישור."},
+                "version": "v1"
+            }), 400
+        
+        # וולידציה של אורך סוג קישור
+        if len(note_relation_type) > 20:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "סוג קישור לא יכול להיות יותר מ-20 תווים. נסה שם קצר יותר."},
+                "version": "v1"
+            }), 400
+        
+        # וולידציה של תבנית סוג קישור - רק אותיות, מספרים וקווים תחתונים
+        if not re.match(r'^[a-zA-Z0-9_]+$', note_relation_type):
+            return jsonify({
+                "status": "error",
+                "error": {"message": "סוג קישור חייב להכיל רק אותיות אנגליות, מספרים וקווים תחתונים. אסור להשתמש ברווחים או תווים מיוחדים."},
                 "version": "v1"
             }), 400
         
@@ -141,12 +159,29 @@ def update_note_relation_type(type_id: int):
     """Update note relation type"""
     try:
         data = request.get_json()
-        note_relation_type = data.get('note_relation_type')
+        note_relation_type = data.get('note_relation_type', '').strip()
         
+        # וולידציה של שדה חובה
         if not note_relation_type:
             return jsonify({
                 "status": "error",
                 "error": {"message": "סוג קישור הוא שדה חובה. יש להזין שם לסוג הקישור."},
+                "version": "v1"
+            }), 400
+        
+        # וולידציה של אורך סוג קישור
+        if len(note_relation_type) > 20:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "סוג קישור לא יכול להיות יותר מ-20 תווים. נסה שם קצר יותר."},
+                "version": "v1"
+            }), 400
+        
+        # וולידציה של תבנית סוג קישור - רק אותיות, מספרים וקווים תחתונים
+        if not re.match(r'^[a-zA-Z0-9_]+$', note_relation_type):
+            return jsonify({
+                "status": "error",
+                "error": {"message": "סוג קישור חייב להכיל רק אותיות אנגליות, מספרים וקווים תחתונים. אסור להשתמש ברווחים או תווים מיוחדים."},
                 "version": "v1"
             }), 400
         

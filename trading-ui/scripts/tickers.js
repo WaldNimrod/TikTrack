@@ -343,8 +343,6 @@ function showEditTickerModal(id) {
     if (!ticker) {
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
-        } else {
-            alert('❌ טיקר לא נמצא');
         }
         return;
     }
@@ -407,8 +405,6 @@ function showDeleteTickerModal(id) {
     if (!ticker) {
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
-        } else {
-            alert('❌ טיקר לא נמצא');
         }
         return;
     }
@@ -499,8 +495,6 @@ async function saveTicker() {
             // הצגת הודעת הצלחה
             if (window.showSuccessNotification) { 
                 window.showSuccessNotification('הצלחה', 'הטיקר נשמר בהצלחה'); 
-            } else {
-                alert('✅ טיקר נשמר בהצלחה');
             }
 
             // רענון הנתונים
@@ -514,8 +508,6 @@ async function saveTicker() {
             console.error('❌ שגיאה בשמירת טיקר:', error);
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת טיקר: ' + error);
-            } else {
-                alert('❌ שגיאה בשמירת טיקר: ' + error);
             }
         }
 
@@ -523,8 +515,6 @@ async function saveTicker() {
         console.error('❌ שגיאה בשמירת טיקר:', error);
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת טיקר');
-        } else {
-            alert('❌ שגיאה בשמירת טיקר');
         }
     }
 }
@@ -668,8 +658,6 @@ async function updateTicker() {
                                     'לא ניתן לבטל טיקר',
                                     `לא ניתן לבטל את הטיקר ${originalTicker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`
                                 );
-                            } else {
-                                alert(`❌ לא ניתן לבטל את הטיקר ${originalTicker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`);
                             }
                         }
                         return; // לא ממשיכים עם העדכון
@@ -683,8 +671,6 @@ async function updateTicker() {
                     'שגיאה בבדיקה',
                     'לא ניתן לבדוק פריטים מקושרים. לא ניתן לבטל את הטיקר.'
                 );
-            } else {
-                alert('❌ לא ניתן לבדוק פריטים מקושרים. לא ניתן לבטל את הטיקר.');
             }
             return; // לא ממשיכים עם העדכון
         }
@@ -723,8 +709,6 @@ async function updateTicker() {
             // הצגת הודעת הצלחה
             if (window.showSuccessNotification) { 
                 window.showSuccessNotification('הצלחה', 'הטיקר עודכן בהצלחה'); 
-            } else {
-                alert('✅ טיקר עודכן בהצלחה');
             }
 
             // רענון הנתונים
@@ -738,8 +722,6 @@ async function updateTicker() {
             console.error('❌ שגיאה בעדכון טיקר:', error);
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון טיקר: ' + error);
-            } else {
-                alert('❌ שגיאה בעדכון טיקר: ' + error);
             }
         }
 
@@ -747,8 +729,6 @@ async function updateTicker() {
         console.error('❌ שגיאה בעדכון טיקר:', error);
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון טיקר');
-        } else {
-            alert('❌ שגיאה בעדכון טיקר');
         }
     }
 }
@@ -764,8 +744,6 @@ async function cancelTicker(id) {
     if (!ticker) {
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
-        } else {
-            alert('❌ טיקר לא נמצא');
         }
         return;
     }
@@ -774,8 +752,6 @@ async function cancelTicker(id) {
     if (ticker.status === 'canceled') {
         if (window.showInfoNotification) {
             window.showInfoNotification('מידע', 'הטיקר כבר מבוטל');
-        } else {
-            alert('ℹ️ הטיקר כבר מבוטל');
         }
         return;
     }
@@ -788,11 +764,6 @@ async function cancelTicker(id) {
             () => performCancelTickerWithLinkedItemsCheck(id), // onConfirm - בדיקה עם פריטים מקושרים
             () => console.log('ביטול טיקר בוטל') // onCancel
         );
-    } else {
-        // Fallback למקרה שמערכת ההתראות לא זמינה
-        if (confirm(`האם אתה בטוח שברצונך לבטל את הטיקר ${ticker.symbol} - ${ticker.name}?`)) {
-            performCancelTickerWithLinkedItemsCheck(id);
-        }
     }
 }
 
@@ -817,8 +788,6 @@ async function updateAllTickerStatuses() {
             // הצגת הודעת הצלחה
             if (window.showSuccessNotification) { 
                 window.showSuccessNotification('הצלחה', 'סטטוסים של כל הטיקרים עודכנו בהצלחה'); 
-            } else {
-                alert('✅ סטטוסים של כל הטיקרים עודכנו בהצלחה');
             }
 
             // רענון הנתונים
@@ -832,8 +801,6 @@ async function updateAllTickerStatuses() {
             console.error('❌ שגיאה בעדכון סטטוסים:', errorResponse);
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון סטטוסים של טיקרים');
-            } else {
-                alert('❌ שגיאה בעדכון סטטוסים של טיקרים');
             }
         }
 
@@ -841,8 +808,6 @@ async function updateAllTickerStatuses() {
         console.error('❌ שגיאה בעדכון סטטוסים:', error);
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון סטטוסים של טיקרים');
-        } else {
-            alert('❌ שגיאה בעדכון סטטוסים של טיקרים');
         }
     }
 }
@@ -876,8 +841,6 @@ async function performCancelTickerWithLinkedItemsCheck(id) {
                         'שגיאה בבדיקה',
                         'תגובה לא תקינה מהשרת. לא ניתן לבטל את הטיקר.'
                     );
-                } else {
-                    alert('❌ תגובה לא תקינה מהשרת. לא ניתן לבטל את הטיקר.');
                 }
                 return;
             }
@@ -981,8 +944,6 @@ async function performCancelTickerWithLinkedItemsCheck(id) {
                             'לא ניתן לבטל טיקר',
                             `לא ניתן לבטל את הטיקר ${ticker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`
                         );
-                    } else {
-                        alert(`❌ לא ניתן לבטל את הטיקר ${ticker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`);
                     }
                 }
                 return;
@@ -996,8 +957,6 @@ async function performCancelTickerWithLinkedItemsCheck(id) {
                     'שגיאה בבדיקה',
                     'שגיאה בבדיקת פריטים מקושרים. לא ניתן לבטל את הטיקר.'
                 );
-            } else {
-                alert('❌ שגיאה בבדיקת פריטים מקושרים. לא ניתן לבטל את הטיקר.');
             }
             return;
         }
@@ -1008,8 +967,6 @@ async function performCancelTickerWithLinkedItemsCheck(id) {
                 'שגיאה בבדיקה',
                 'לא ניתן לבדוק פריטים מקושרים. לא ניתן לבטל את הטיקר.'
             );
-        } else {
-            alert('❌ לא ניתן לבדוק פריטים מקושרים. לא ניתן לבטל את הטיקר.');
         }
         return;
     }
@@ -1051,8 +1008,6 @@ async function performCancelTicker(id) {
             // הצגת הודעת הצלחה עם פרטי הטיקר
             if (window.showSuccessNotification) { 
                 window.showSuccessNotification('הצלחה', `הטיקר ${ticker.symbol} - ${ticker.name} בוטל בהצלחה`); 
-            } else {
-                alert(`✅ טיקר ${ticker.symbol} - ${ticker.name} בוטל בהצלחה`);
             }
 
             // רענון הנתונים
@@ -1066,8 +1021,6 @@ async function performCancelTicker(id) {
             console.error('❌ שגיאה בביטול טיקר:', errorResponse);
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה בביטול', 'שגיאה בביטול טיקר');
-            } else {
-                alert('❌ שגיאה בביטול טיקר');
             }
         }
 
@@ -1075,8 +1028,6 @@ async function performCancelTicker(id) {
         console.error('❌ שגיאה בביטול טיקר:', error);
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בביטול', 'שגיאה בביטול טיקר');
-        } else {
-            alert('❌ שגיאה בביטול טיקר');
         }
     }
 }
@@ -1098,8 +1049,6 @@ async function confirmDeleteTicker(id) {
             // הצגת הודעת הצלחה
             if (window.showSuccessNotification) { 
                 window.showSuccessNotification('הצלחה', 'הטיקר נמחק בהצלחה'); 
-            } else {
-                alert('✅ טיקר נמחק בהצלחה');
             }
 
             // רענון הנתונים
@@ -1133,8 +1082,6 @@ async function confirmDeleteTicker(id) {
                         console.error('❌ שגיאה בקריאה לפונקציה:', error);
                         if (window.showErrorNotification) {
                             window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק טיקר זה - יש פריטים מקושרים אליו');
-                        } else {
-                            alert('❌ לא ניתן למחוק טיקר זה - יש פריטים מקושרים אליו');
                         }
                     }
                     return;
@@ -1144,16 +1091,12 @@ async function confirmDeleteTicker(id) {
 
                 if (window.showErrorNotification) {
                     window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת טיקר: ' + errorData.error.message);
-                } else {
-                    alert('❌ שגיאה במחיקת טיקר: ' + errorData.error.message);
                 }
 
             } catch (parseError) {
-                if (window.showErrorNotification) {
-                    window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת טיקר: ' + errorResponse);
-                } else {
-                    alert('❌ שגיאה במחיקת טיקר: ' + errorResponse);
-                }
+                            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת טיקר: ' + errorResponse);
+            }
             }
         }
 
@@ -1161,8 +1104,6 @@ async function confirmDeleteTicker(id) {
         console.error('❌ שגיאה במחיקת טיקר:', error);
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת טיקר');
-        } else {
-            alert('❌ שגיאה במחיקת טיקר');
         }
     }
 }
@@ -1422,7 +1363,7 @@ window.confirmDeleteTicker = confirmDeleteTicker;
 
 
 // פונקציות מודל פריטים מקושרים - שימוש במערכת הכללית
-window.showLinkedItemsWarning = showLinkedItemsWarning; // הצגת פריטים מקושרים - פונקציה כללית
+// window.showLinkedItemsWarning - פונקציה כללית זמינה מ-linked-items.js
 
 // ===== פונקציות סידור =====
 

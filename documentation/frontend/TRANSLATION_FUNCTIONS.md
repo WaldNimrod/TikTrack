@@ -29,10 +29,10 @@ The TikTrack translation system provides global utilities for consistent text di
  */
 function translateAlertCondition(condition) {
     const translations = {
-        'price': 'מחיר',
-        'change': 'שינוי',
-        'ma': 'ממוצע נע',
-        'volume': 'נפח'
+        'price': 'Price',
+'change': 'Change',
+'ma': 'Moving Average',
+'volume': 'Volume'
     };
     return translations[condition] || condition;
 }
@@ -42,11 +42,11 @@ function translateAlertCondition(condition) {
 ```javascript
 // In alerts.js
 const conditionText = translateAlertCondition(alert.condition_attribute);
-// Result: 'price' → 'מחיר', 'change' → 'שינוי'
+// Result: 'price' → 'Price', 'change' → 'Change'
 
 // In cash_flows.js
 const typeText = translateAlertCondition(cashFlow.type);
-// Result: 'income' → 'הכנסה', 'expense' → 'הוצאה'
+// Result: 'income' → 'Income', 'expense' → 'Expense'
 ```
 
 ### 2. Trade Status Translation ✅ **RECENTLY ADDED**
@@ -58,10 +58,10 @@ const typeText = translateAlertCondition(cashFlow.type);
  */
 function translateTradeStatus(status) {
     const translations = {
-        'open': 'פתוח',
-        'closed': 'סגור',
-        'pending': 'ממתין',
-        'cancelled': 'בוטל'
+        'open': 'Open',
+'closed': 'Closed',
+'pending': 'Pending',
+'cancelled': 'Cancelled'
     };
     return translations[status] || status;
 }
@@ -71,11 +71,11 @@ function translateTradeStatus(status) {
 ```javascript
 // In trades.js
 const statusText = translateTradeStatus(trade.status);
-// Result: 'open' → 'פתוח', 'closed' → 'סגור'
+// Result: 'open' → 'Open', 'closed' → 'Closed'
 
 // In executions.js
 const executionStatus = translateTradeStatus(execution.status);
-// Result: 'pending' → 'ממתין', 'completed' → 'הושלם'
+// Result: 'pending' → 'Pending', 'completed' → 'Completed'
 ```
 
 ### 3. Currency Display Functions
@@ -88,7 +88,7 @@ const executionStatus = translateTradeStatus(execution.status);
  */
 function getCashFlowCurrencyDisplay(currencyId) {
     const currency = currencies.find(c => c.id === currencyId);
-    return currency ? `${currency.symbol} - ${currency.name}` : 'לא נבחר';
+    return currency ? `${currency.symbol} - ${currency.name}` : 'Not Selected';
 }
 
 /**
@@ -107,7 +107,7 @@ function formatCurrencyWithCommas(amount, currency = '') {
 ```javascript
 // In cash_flows.js
 const currencyDisplay = getCashFlowCurrencyDisplay(cashFlow.currency_id);
-// Result: 'USD - US Dollar' or 'לא נבחר'
+// Result: 'USD - US Dollar' or 'Not Selected'
 
 // In accounts.js
 const balanceDisplay = formatCurrencyWithCommas(account.balance, account.currency);

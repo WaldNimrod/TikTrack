@@ -97,7 +97,7 @@ def test_trade_constraints():
     trade = Trade(
         account_id=1,
         ticker_id=1,
-        status='פתוח'
+        status='Open'
     )
     db.session.add(trade)
     db.session.commit()

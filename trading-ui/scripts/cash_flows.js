@@ -33,111 +33,20 @@ let cashFlowsData = window.cashFlowsData;
 // פונקציות בסיסיות - הוסרו פונקציות לא בשימוש
 
 // פונקציות לפתיחה/סגירה של סקשנים - משתמשות בפונקציות הגלובליות
+// הפונקציות הבאות זמינות גלובלית:
+// - window.toggleTopSection()
+// - window.toggleSection('cash_flows')
+// - window.restoreSectionStates()
 
 /**
  * פונקציה לפתיחה/סגירה של סקשן עליון (התראות וסיכום)
  */
-function toggleTopSection() {
-    console.log('🔄 toggleTopSection נקראה');
-    
-    const topSection = document.querySelector('.top-section');
-    
-    if (topSection) {
-        const sectionBody = topSection.querySelector('.section-body');
-        const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-        
-        if (sectionBody) {
-            const isHidden = sectionBody.style.display === 'none';
-            
-            if (isHidden) {
-                sectionBody.style.display = 'block';
-                if (icon) {
-                    icon.textContent = '▲';
-                }
-                localStorage.setItem('cashFlowsTopSectionHidden', 'false');
-            } else {
-                sectionBody.style.display = 'none';
-                if (icon) {
-                    icon.textContent = '▼';
-                }
-                localStorage.setItem('cashFlowsTopSectionHidden', 'true');
-            }
-        }
-    }
-}
 
 /**
  * פונקציה לפתיחה/סגירה של סקשן תזרימי מזומנים
  */
-function toggleCashFlowsSection() {
-    console.log('🔄 toggleCashFlowsSection נקראה');
-    
-    const contentSections = document.querySelectorAll('.content-section');
-    const cashFlowsSection = contentSections[0];
-    
-    if (cashFlowsSection) {
-        const sectionBody = cashFlowsSection.querySelector('.section-body');
-        const toggleBtn = cashFlowsSection.querySelector('button[onclick*="toggleCashFlowsSection"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-        
-        if (sectionBody) {
-            const isHidden = sectionBody.style.display === 'none';
-            
-            if (isHidden) {
-                sectionBody.style.display = 'block';
-                if (icon) {
-                    icon.textContent = '▲';
-                }
-                localStorage.setItem('cashFlowsSectionCollapsed', 'false');
-            } else {
-                sectionBody.style.display = 'none';
-                if (icon) {
-                    icon.textContent = '▼';
-                }
-                localStorage.setItem('cashFlowsSectionCollapsed', 'true');
-            }
-        }
-    }
-}
 
 // פונקציות לשחזור מצב הסגירה
-function restoreCashFlowsSectionState() {
-    // שחזור מצב top-section (התראות וסיכום)
-    const topCollapsed = localStorage.getItem('cashFlowsTopSectionHidden') === 'true';
-    const topSection = document.querySelector('.top-section');
-
-    if (topSection) {
-        const sectionBody = topSection.querySelector('.section-body');
-        const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && topCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
-            }
-        }
-    }
-
-    // שחזור מצב סקשן תזרימי מזומנים
-    const cashFlowsCollapsed = localStorage.getItem('cashFlowsSectionCollapsed') === 'true';
-    const contentSections = document.querySelectorAll('.content-section');
-    const cashFlowsSection = contentSections[0];
-
-    if (cashFlowsSection) {
-        const sectionBody = cashFlowsSection.querySelector('.section-body');
-        const toggleBtn = cashFlowsSection.querySelector('button[onclick*="toggleCashFlowsSection"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && cashFlowsCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
-            }
-        }
-    }
-}
 
 // פונקציות נוספות
 // resetAllFiltersAndReloadData() - לא בשימוש, הוסרה
@@ -1000,7 +909,7 @@ async function initializeCashFlowsPage() {
     await loadCashFlows();
 
     // שחזור מצב הסגירה
-    restoreCashFlowsSectionState();
+    window.restoreSectionStates();
 
     // שחזור מצב סידור
     restoreSortState();
@@ -1023,7 +932,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ייצוא פונקציות גלובליות
 // פונקציות לא בשימוש - הוסרו
-window.toggleTopSection = toggleTopSection;
 window.toggleCashFlowsSection = toggleCashFlowsSection;
 window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
 window.saveCashFlow = saveCashFlow;
@@ -1705,7 +1613,7 @@ async function initializeCashFlowsPage() {
     await loadCashFlows();
 
     // שחזור מצב הסגירה
-    restoreCashFlowsSectionState();
+    window.restoreSectionStates();
 
     // שחזור מצב סידור
     restoreSortState();

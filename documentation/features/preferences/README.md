@@ -45,7 +45,7 @@ TikTrack/
 1. Open TikTrack application
 2. Navigate to Preferences page (accessible from unified header)
 3. Customize your settings (changes are stored locally)
-4. Click "שמור שינויים" (Save Changes) to save all modifications to server
+4. Click "Save Changes" (Save Changes) to save all modifications to server
 
 ### For Developers
 1. Review the technical documentation files
@@ -132,7 +132,7 @@ TikTrack/
 ### Save Strategy Approach
 - **Local Updates**: Changes stored in memory immediately with visual feedback
 - **User Control**: Clear indication that changes are local until saved
-- **Batch Save**: All changes saved together when user clicks "שמור שינויים"
+- **Batch Save**: All changes saved together when user clicks "Save Changes"
 - **Clear Messaging**: Info notifications for local updates, success for server saves
 
 ### State Management
@@ -233,9 +233,9 @@ TikTrack/
 - **Status**: ✅ Resolved
 
 #### 6. **Confusing Save Button**
-- **Problem**: "שמור הכל" button was confusing since individual saves were automatic
+- **Problem**: "Save All" button was confusing since individual saves were automatic
 - **Root Cause**: Mixed approach of individual and batch saving
-- **Solution**: Changed to batch-only saving with clear button text "שמור שינויים"
+- **Solution**: Changed to batch-only saving with clear button text "Save Changes"
 - **Status**: ✅ Resolved
 
 #### 7. **Preferences Not Loading from Server**
@@ -267,7 +267,7 @@ TikTrack/
 #### ✅ Working Features
 - **Header Integration**: Full unified header with navigation
 - **Local Updates**: Immediate local memory updates with visual feedback
-- **Batch Saving**: All changes saved together when clicking "שמור שינויים"
+- **Batch Saving**: All changes saved together when clicking "Save Changes"
 - **Memory Management**: Changes stored locally until explicitly saved
 - **Error Handling**: Comprehensive error messages and recovery
 - **Notification System**: Uses global notification system consistently
@@ -289,7 +289,7 @@ TikTrack/
 - [ ] **Data Loading**: All preferences load from server correctly
 - [ ] **Account Filter**: Account dropdown populates with available accounts
 - [ ] **Local Updates**: UI updates immediately when values change with info notification
-- [ ] **Batch Saving**: All changes save when clicking "שמור שינויים" with success notification
+- [ ] **Batch Saving**: All changes save when clicking "Save Changes" with success notification
 - [ ] **Error Handling**: Proper error messages for network/server issues
 - [ ] **Reset Function**: Reset to defaults works correctly
 - [ ] **Notification System**: Info/success/error messages display properly
@@ -380,7 +380,7 @@ TikTrack/
 - **Check**: Network connection and server status
 - **Solution**: Ensure backend server is running on port 8080
 - **Debug**: Check browser console for error messages
-- **Note**: Changes are stored locally until "שמור שינויים" is clicked
+- **Note**: Changes are stored locally until "Save Changes" is clicked
 
 ### Page Not Loading
 - **Check**: Browser cache and JavaScript errors

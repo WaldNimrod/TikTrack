@@ -209,7 +209,11 @@ class TickerService:
     
     @staticmethod
     def create(db: Session, ticker_data: dict) -> Ticker:
-        """Create new ticker with validation"""
+        """
+        Create new ticker with validation
+        
+        Note: updated_at field is NOT set during creation - it's reserved for future pricing system updates
+        """
         # Validate data against dynamic constraints
         is_valid, errors = ValidationService.validate_data(db, 'tickers', ticker_data)
         if not is_valid:
@@ -238,7 +242,11 @@ class TickerService:
     
     @staticmethod
     def update(db: Session, ticker_id: int, ticker_data: dict) -> Optional[Ticker]:
-        """Update ticker with validation"""
+        """
+        Update ticker with validation
+        
+        Note: updated_at field is NOT modified during user updates - it's reserved for future pricing system updates
+        """
         ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
         if not ticker:
             raise ValueError(f"Ticker with ID {ticker_id} not found")
@@ -316,27 +324,86 @@ class TickerService:
         return True
     
     @staticmethod
-    def update_open_status(db: Session, ticker_id: int) -> bool:
-        """Update ticker open status"""
-        from models.trade import Trade
-        from models.trade_plan import TradePlan
+    def update_active_trades_status(db: Session, ticker_id: int) -> bool:
+        """
+        Update ticker active_trades status based on open trades
         
-        # Check if there are open plans
-        open_plans = db.query(TradePlan).filter(
-            TradePlan.ticker_id == ticker_id,
-            TradePlan.status == 'open'
-        ).count()
+        This function checks if there are any open trades linked to the ticker
+        and updates the active_trades field accordingly.
+        
+        Args:
+            db (Session): Database connection
+            ticker_id (int): Ticker ID to update
+            
+        Returns:
+            bool: True if updated successfully, False if ticker not found
+            
+        Example:
+            >>> TickerService.update_active_trades_status(db_session, 1)
+            True
+        """
+        from models.trade import Trade
+        
+        # Check if ticker exists
+        ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
+        if not ticker:
+            return False
         
         # Check if there are open trades
-        open_trades = db.query(Trade).filter(
+        open_trades_count = db.query(Trade).filter(
             Trade.ticker_id == ticker_id,
             Trade.status == 'open'
         ).count()
         
-        # Update status
-        ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
-        if ticker:
-            ticker.active_trades = (open_plans > 0 or open_trades > 0)
+        # Update active_trades field
+        ticker.active_trades = (open_trades_count > 0)
+        db.commit()
+        
+        return True
+    
+    @staticmethod
+    def update_all_active_trades_status(db: Session) -> int:
+        """
+        Update active_trades status for all tickers
+        
+        This function updates the active_trades field for all tickers
+        based on their linked open trades.
+        
+        Args:
+            db (Session): Database connection
+            
+        Returns:
+            int: Number of tickers updated
+            
+        Example:
+            >>> updated_count = TickerService.update_all_active_trades_status(db_session)
+            >>> print(f"Updated {updated_count} tickers")
+        """
+        from models.trade import Trade
+        
+        # Get all tickers
+        tickers = db.query(Ticker).all()
+        updated_count = 0
+        
+        for ticker in tickers:
+            # Check if there are open trades for this ticker
+            open_trades_count = db.query(Trade).filter(
+                Trade.ticker_id == ticker.id,
+                Trade.status == 'open'
+            ).count()
+            
+            # Update if different
+            new_status = (open_trades_count > 0)
+            if ticker.active_trades != new_status:
+                ticker.active_trades = new_status
+                updated_count += 1
+        
+        if updated_count > 0:
             db.commit()
-            return True
-        return False
+        
+        return updated_count
+    
+    @staticmethod
+    def update_open_status(db: Session, ticker_id: int) -> bool:
+        """Update ticker open status (legacy function - kept for compatibility)"""
+        return TickerService.update_active_trades_status(db, ticker_id)

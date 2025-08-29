@@ -1,38 +1,38 @@
 # External Data Integration System - Documentation
 
-## 📋 **מבט כללי**
+## 📋 **Overview**
 
-מערכת האינטגרציה לנתונים חיצוניים מאפשרת לקבל מידע עדכני על מחירי מניות, מטבעות וסחורות ממקורות חיצוניים שונים. המערכת בנויה בצורה מודולרית ומאפשרת הוספת providers נוספים בקלות.
+The external data integration system allows receiving current information about stock prices, currencies, and commodities from various external sources. The system is built in a modular way and allows easy addition of additional providers.
 
 ---
 
-## 🏗️ **ארכיטקטורה**
+## 🏗️ **Architecture**
 
-### **מבנה המערכת**
+### **System Structure**
 ```
 External Data Integration
 ├── Server Components (Backend)
-│   ├── Models (מודלים)
-│   ├── Services (שירותים)
-│   ├── Providers (ספקי מידע)
-│   └── API Routes (נקודות קצה)
+│   ├── Models
+│   ├── Services
+│   ├── Providers
+│   └── API Routes
 └── Client Components (Frontend)
-    ├── Pages (דפים)
-    ├── Scripts (סקריפטים)
-    └── Styles (עיצובים)
+    ├── Pages
+    ├── Scripts
+    └── Styles
 ```
 
-### **זרימת נתונים**
-1. **Scheduler** → מפעיל רענון אוטומטי
-2. **Provider** → אוסף נתונים ממקור חיצוני
-3. **Normalizer** → מנרמל נתונים לפורמט אחיד
-4. **Service** → שומר ומעבד נתונים
-5. **API** → מספק נתונים לממשק המשתמש
-6. **UI** → מציג נתונים למשתמש
+### **Data Flow**
+1. **Scheduler** → Triggers automatic refresh
+2. **Provider** → Collects data from external source
+3. **Normalizer** → Normalizes data to unified format
+4. **Service** → Stores and processes data
+5. **API** → Provides data to user interface
+6. **UI** → Displays data to user
 
 ---
 
-## 🗄️ **מודלים (Models)**
+## 🗄️ **Models**
 
 ### **Quote Model**
 ```python
@@ -82,19 +82,19 @@ class Ticker(Base):
 
 ---
 
-## 🔧 **שירותים (Services)**
+## 🔧 **Services**
 
 ### **MarketDataService**
-השירות המרכזי לניהול נתוני שוק:
+The central service for managing market data:
 
-#### **פונקציות עיקריות:**
-- `get_ticker_price(ticker_id)` - קבלת מחיר לטיקר ספציפי
-- `update_ticker_price(ticker_id, quote_data)` - עדכון מחיר
-- `refresh_all_prices()` - רענון כל המחירים
-- `get_user_preferences(user_id)` - קבלת העדפות משתמש
-- `update_user_preferences(user_id, preferences)` - עדכון העדפות
+#### **Main Functions:**
+- `get_ticker_price(ticker_id)` - Get price for specific ticker
+- `update_ticker_price(ticker_id, quote_data)` - Update price
+- `refresh_all_prices()` - Refresh all prices
+- `get_user_preferences(user_id)` - Get user preferences
+- `update_user_preferences(user_id, preferences)` - Update preferences
 
-#### **שימוש:**
+#### **Usage:**
 ```python
 service = MarketDataService(db_session)
 price = service.get_ticker_price(1)
@@ -103,25 +103,25 @@ service.refresh_all_prices()
 
 ---
 
-## 🔌 **ספקי מידע (Providers)**
+## 🔌 **Data Providers**
 
 ### **Yahoo Finance Provider**
-ספק המידע הראשי למערכת:
+The main data provider for the system:
 
-#### **תכונות:**
-- תמיכה במניות, מטבעות וסחורות
-- נתונים בזמן אמת
-- היסטוריה של מחירים
-- מידע על volume ו-high/low
+#### **Features:**
+- Support for stocks, currencies, and commodities
+- Real-time data
+- Price history
+- Volume and high/low information
 
-#### **שימוש:**
+#### **Usage:**
 ```python
 adapter = YahooFinanceAdapter()
 quote = adapter.fetch_quote_data('AAPL')
 batch_quotes = adapter.fetch_batch_quotes(['AAPL', 'GOOGL', 'MSFT'])
 ```
 
-#### **פורמט נתונים:**
+#### **Data Format:**
 ```json
 {
     "symbol": "AAPL",
@@ -138,11 +138,11 @@ batch_quotes = adapter.fetch_batch_quotes(['AAPL', 'GOOGL', 'MSFT'])
 }
 ```
 
-### **Providers עתידיים:**
-- **Interactive Brokers (IBKR)** - לחשבונות מסחר
-- **Alpha Vantage** - נתונים מתקדמים
-- **Polygon.io** - נתונים בזמן אמת
-- **IEX Cloud** - נתונים פיננסיים
+### **Future Providers:**
+- **Interactive Brokers (IBKR)** - For trading accounts
+- **Alpha Vantage** - Advanced data
+- **Polygon.io** - Real-time data
+- **IEX Cloud** - Financial data
 
 ---
 
@@ -164,7 +164,7 @@ GET /api/v1/quotes/{ticker_id}/history
 POST /api/v1/quotes/{ticker_id}/refresh
 ```
 
-### **דוגמאות תגובה:**
+### **Response Examples:**
 ```json
 {
     "success": true,
@@ -181,18 +181,18 @@ POST /api/v1/quotes/{ticker_id}/refresh
 
 ---
 
-## ⚙️ **הגדרות והעדפות**
+## ⚙️ **Settings and Preferences**
 
 ### **Refresh Policy**
-מדיניות רענון הנתונים:
+Data refresh policy:
 
-#### **קטגוריות רענון:**
-- **High Priority** - כל דקה (טיקרים עם מסחר פעיל)
-- **Medium Priority** - כל 5 דקות (טיקרים נפוצים)
-- **Low Priority** - כל 15 דקות (טיקרים נדירים)
-- **Manual** - רק לפי בקשה
+#### **Refresh Categories:**
+- **High Priority** - Every minute (tickers with active trading)
+- **Medium Priority** - Every 5 minutes (common tickers)
+- **Low Priority** - Every 15 minutes (rare tickers)
+- **Manual** - Only on request
 
-#### **הגדרות משתמש:**
+#### **User Settings:**
 ```json
 {
     "timezone": "Asia/Jerusalem",
@@ -205,133 +205,133 @@ POST /api/v1/quotes/{ticker_id}/refresh
 ```
 
 ### **Timezone Support**
-- **Scheduler**: פועל בשעון ניו יורק (NY)
-- **UI**: מציג בשעון מקומי לפי העדפות משתמש
-- **תמיכה**: UTC, Asia/Jerusalem, America/New_York, Europe/London
+- **Scheduler**: Operates on New York time (NY)
+- **UI**: Displays in local time according to user preferences
+- **Support**: UTC, Asia/Jerusalem, America/New_York, Europe/London
 
 ---
 
-## 🔄 **מערכת רענון אוטומטי**
+## 🔄 **Automatic Refresh System**
 
 ### **Scheduler**
-מערכת הרענון האוטומטי:
+The automatic refresh system:
 
-#### **לוגיקה:**
-1. בדיקת שעות מסחר (NY time)
-2. זיהוי טיקרים לפי עדיפות
-3. רענון נתונים מ-providers
-4. שמירה לבסיס הנתונים
-5. עדכון UI בזמן אמת
+#### **Logic:**
+1. Check trading hours (NY time)
+2. Identify tickers by priority
+3. Refresh data from providers
+4. Save to database
+5. Update UI in real-time
 
-#### **תזמון:**
-- **שעות מסחר**: 9:30-16:00 NY time
-- **רענון**: לפי מדיניות המשתמש
-- **שבתות/חגים**: אין רענון
-
----
-
-## 📊 **ממשק משתמש**
-
-### **דף Quotes**
-דף הצגת מחירים:
-
-#### **תכונות:**
-- טבלת מחירים עם פילטרים
-- תצוגת שינויים (צבעים)
-- תצוגת volume ו-high/low
-- רענון ידני
-- הגדרות העדפות
-
-#### **פילטרים:**
-- חיפוש לפי סמל
-- סינון לפי סטטוס
-- סינון לפי שינוי מחיר
-- סינון לפי volume
+#### **Timing:**
+- **Trading Hours**: 9:30-16:00 NY time
+- **Refresh**: According to user policy
+- **Weekends/Holidays**: No refresh
 
 ---
 
-## 🧪 **בדיקות ותיקוף**
+## 📊 **User Interface**
 
-### **בדיקות יחידה**
-- בדיקות מודלים
-- בדיקות שירותים
-- בדיקות providers
-- בדיקות API
+### **Quotes Page**
+Price display page:
 
-### **בדיקות אינטגרציה**
-- בדיקת זרימת נתונים
-- בדיקת רענון אוטומטי
-- בדיקת UI
-- בדיקת ביצועים
+#### **Features:**
+- Price table with filters
+- Change display (colors)
+- Volume and high/low display
+- Manual refresh
+- Preference settings
 
-### **בדיקות error handling**
-- בדיקת חיבור ל-provider
-- בדיקת נתונים לא תקינים
-- בדיקת timeout
-- בדיקת rate limiting
+#### **Filters:**
+- Search by symbol
+- Filter by status
+- Filter by price change
+- Filter by volume
 
 ---
 
-## 📈 **ביצועים ואופטימיזציה**
+## 🧪 **Testing and Validation**
+
+### **Unit Tests**
+- Model tests
+- Service tests
+- Provider tests
+- API tests
+
+### **Integration Tests**
+- Data flow testing
+- Automatic refresh testing
+- UI testing
+- Performance testing
+
+### **Error Handling Tests**
+- Provider connection testing
+- Invalid data testing
+- Timeout testing
+- Rate limiting testing
+
+---
+
+## 📈 **Performance and Optimization**
 
 ### **Cache System**
-- **TTL קצר**: 30 שניות למחירים
-- **TTL בינוני**: 5 דקות לנתונים סטטיים
-- **TTL ארוך**: שעה להיסטוריה
+- **Short TTL**: 30 seconds for prices
+- **Medium TTL**: 5 minutes for static data
+- **Long TTL**: 1 hour for history
 
 ### **Rate Limiting**
 - **Yahoo Finance**: 100 requests/minute
-- **Batch processing**: עד 50 טיקרים בבת אחת
+- **Batch processing**: Up to 50 tickers at once
 - **Error backoff**: exponential retry
 
 ### **Database Optimization**
-- **Indexes**: על ticker_id, asof_utc, provider
-- **Partitioning**: לפי תאריך (עתידי)
-- **Cleanup**: מחיקת נתונים ישנים
+- **Indexes**: On ticker_id, asof_utc, provider
+- **Partitioning**: By date (future)
+- **Cleanup**: Delete old data
 
 ---
 
-## 🔐 **אבטחה**
+## 🔐 **Security**
 
-### **Stage-1 (בסיסי)**
-- Validation של נתונים
+### **Stage-1 (Basic)**
+- Data validation
 - Error handling
-- Logging בסיסי
+- Basic logging
 
-### **Stage-2 (מתקדם)**
-- הצפנת נתונים רגישים
+### **Stage-2 (Advanced)**
+- Encrypting sensitive data
 - API key management
-- Rate limiting מתקדם
+- Advanced rate limiting
 - Audit logging
 
 ---
 
-## 📝 **לוגים וניטור**
+## 📝 **Logs and Monitoring**
 
 ### **Log Levels**
-- **DEBUG**: פרטים טכניים
-- **INFO**: פעולות רגילות
-- **WARNING**: בעיות לא קריטיות
-- **ERROR**: שגיאות קריטיות
+- **DEBUG**: Technical details
+- **INFO**: Regular operations
+- **WARNING**: Non-critical issues
+- **ERROR**: Critical errors
 
 ### **Metrics**
-- מספר בקשות ל-provider
-- זמן תגובה
-- אחוז הצלחה
-- שימוש במשאבים
+- Number of provider requests
+- Response time
+- Success rate
+- Resource usage
 
 ---
 
-## 🚀 **פיתוח עתידי**
+## 🚀 **Future Development**
 
 ### **Stage-2 Features**
-- מערכת התראות חכמה
-- Charts וגרפים
+- Smart alert system
+- Charts and graphs
 - Technical indicators
 - Real-time streaming
 - Mobile app
 
-### **Providers נוספים**
+### **Additional Providers**
 - Interactive Brokers
 - Alpha Vantage
 - Polygon.io
@@ -345,7 +345,7 @@ POST /api/v1/quotes/{ticker_id}/refresh
 
 ---
 
-## 📚 **משאבים נוספים**
+## 📚 **Additional Resources**
 
 - [Development Tasks](./DEVELOPMENT_TASKS.md)
 - [API Documentation](../api/README.md)
@@ -354,11 +354,11 @@ POST /api/v1/quotes/{ticker_id}/refresh
 
 ---
 
-## 🤝 **תמיכה ופיתוח**
+## 🤝 **Support and Development**
 
-לשאלות ובעיות:
-1. בדוק את הלוגים
-2. בדוק את התיעוד
-3. פנה לצוות הפיתוח
-4. פתח issue ב-GitHub
+For questions and issues:
+1. Check the logs
+2. Check the documentation
+3. Contact the development team
+4. Open an issue on GitHub
 

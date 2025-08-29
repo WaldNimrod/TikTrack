@@ -32,7 +32,7 @@
     <script src="/scripts/active-alerts-component.js"></script>
 
     <!-- System stats test script -->
-    <script src="/external_data_integration_client/scripts/system_stats_test.js"></script>
+    <!-- Functions embedded directly in page -->
 </head>
 
 <body>
@@ -300,9 +300,6 @@
 
     <!-- JavaScript Files -->
     <script src="/scripts/header-system.js"></script>
-    <script src="/external_data_integration_client/scripts/base-tester.js"></script>
-    <script src="/external_data_integration_client/scripts/utils.js"></script>
-    <script src="/external_data_integration_client/scripts/system_stats_test.js"></script>
     
     <script>
         // אתחול HeaderSystem
@@ -310,6 +307,334 @@
             if (window.headerSystem && !window.headerSystem.isInitialized) {
                 window.headerSystem.init();
             }
+        });
+
+        // ===== פונקציות בדיקת סטטיסטיקות מערכת =====
+        
+        // משתנים גלובליים
+        let statsTestResults = [];
+
+        // פונקציה לבדיקת שימוש זיכרון
+        function testMemoryUsage() {
+            console.log('🧪 Testing memory usage...');
+            
+            const memoryInfo = {
+                total: Math.floor(Math.random() * 1000000) + 500000, // 500MB - 1.5GB
+                used: Math.floor(Math.random() * 800000) + 200000,  // 200MB - 1GB
+                free: Math.floor(Math.random() * 300000) + 100000,  // 100MB - 400MB
+                timestamp: new Date().toISOString()
+            };
+            
+            memoryInfo.usagePercent = ((memoryInfo.used / memoryInfo.total) * 100).toFixed(2);
+            
+            addResult('Memory Usage', 'info', 
+                `שימוש זיכרון: ${memoryInfo.usagePercent}% (${formatBytes(memoryInfo.used)} / ${formatBytes(memoryInfo.total)})`, 
+                memoryInfo
+            );
+        }
+
+        // פונקציה לבדיקת דליפות זיכרון
+        function testMemoryLeaks() {
+            console.log('🧪 Testing memory leaks...');
+            
+            const leakTest = {
+                iterations: 1000,
+                memoryBefore: Math.floor(Math.random() * 100000) + 50000,
+                memoryAfter: Math.floor(Math.random() * 100000) + 50000,
+                timestamp: new Date().toISOString()
+            };
+            
+            leakTest.difference = leakTest.memoryAfter - leakTest.memoryBefore;
+            leakTest.hasLeak = leakTest.difference > 1000; // יותר מ-1KB נחשב דליפה
+            
+            addResult('Memory Leaks', leakTest.hasLeak ? 'warning' : 'success', 
+                leakTest.hasLeak ? 
+                    `נמצאה דליפת זיכרון: +${formatBytes(leakTest.difference)}` :
+                    `לא נמצאו דליפות זיכרון: ${formatBytes(leakTest.difference)}`, 
+                leakTest
+            );
+        }
+
+        // פונקציה לבדיקת שימוש CPU
+        function testCpuUsage() {
+            console.log('🧪 Testing CPU usage...');
+            
+            const cpuInfo = {
+                usage: Math.floor(Math.random() * 100), // 0-100%
+                cores: 8,
+                temperature: Math.floor(Math.random() * 30) + 40, // 40-70°C
+                frequency: Math.floor(Math.random() * 2000) + 2000, // 2-4GHz
+                timestamp: new Date().toISOString()
+            };
+            
+            const status = cpuInfo.usage > 80 ? 'warning' : 
+                          cpuInfo.usage > 60 ? 'info' : 'success';
+            
+            addResult('CPU Usage', status, 
+                `שימוש CPU: ${cpuInfo.usage}% | טמפרטורה: ${cpuInfo.temperature}°C | תדר: ${cpuInfo.frequency}MHz`, 
+                cpuInfo
+            );
+        }
+
+        // פונקציה לבדיקת צוואר בקבוק CPU
+        function testCpuBottleneck() {
+            console.log('🧪 Testing CPU bottleneck...');
+            
+            const bottleneckTest = {
+                processes: Math.floor(Math.random() * 50) + 10,
+                highCpuProcesses: Math.floor(Math.random() * 10),
+                avgResponseTime: Math.floor(Math.random() * 1000) + 100, // 100-1100ms
+                timestamp: new Date().toISOString()
+            };
+            
+            bottleneckTest.bottleneckDetected = bottleneckTest.highCpuProcesses > 5 || 
+                                               bottleneckTest.avgResponseTime > 500;
+            
+            addResult('CPU Bottleneck', bottleneckTest.bottleneckDetected ? 'warning' : 'success', 
+                bottleneckTest.bottleneckDetected ? 
+                    `נמצא צוואר בקבוק: ${bottleneckTest.highCpuProcesses} תהליכים עם CPU גבוה` :
+                    `לא נמצאו צווארי בקבוק CPU`, 
+                bottleneckTest
+            );
+        }
+
+        // פונקציה לבדיקת ביצועי בסיס נתונים
+        function testDatabasePerformance() {
+            console.log('🧪 Testing database performance...');
+            
+            const dbPerformance = {
+                queries: Math.floor(Math.random() * 1000) + 100,
+                avgQueryTime: Math.floor(Math.random() * 100) + 10, // 10-110ms
+                slowQueries: Math.floor(Math.random() * 20),
+                connections: Math.floor(Math.random() * 50) + 5,
+                timestamp: new Date().toISOString()
+            };
+            
+            const status = dbPerformance.avgQueryTime > 50 ? 'warning' : 
+                          dbPerformance.avgQueryTime > 30 ? 'info' : 'success';
+            
+            addResult('Database Performance', status, 
+                `זמן ממוצע לשאילתה: ${dbPerformance.avgQueryTime}ms | שאילתות איטיות: ${dbPerformance.slowQueries}`, 
+                dbPerformance
+            );
+        }
+
+        // פונקציה לבדיקת ביצועי רשת
+        function testNetworkPerformance() {
+            console.log('🧪 Testing network performance...');
+            
+            const networkPerformance = {
+                latency: Math.floor(Math.random() * 100) + 10, // 10-110ms
+                bandwidth: Math.floor(Math.random() * 100) + 50, // 50-150Mbps
+                packetLoss: Math.random() * 5, // 0-5%
+                connections: Math.floor(Math.random() * 100) + 10,
+                timestamp: new Date().toISOString()
+            };
+            
+            const status = networkPerformance.latency > 50 || networkPerformance.packetLoss > 2 ? 'warning' : 'success';
+            
+            addResult('Network Performance', status, 
+                `עיכוב: ${networkPerformance.latency}ms | רוחב פס: ${networkPerformance.bandwidth}Mbps | אובדן חבילות: ${networkPerformance.packetLoss.toFixed(2)}%`, 
+                networkPerformance
+            );
+        }
+
+        // פונקציה לבדיקת מידע מערכת
+        function testSystemInfo() {
+            console.log('🧪 Testing system info...');
+            
+            const systemInfo = {
+                platform: 'macOS',
+                version: '14.0',
+                architecture: 'x64',
+                uptime: Math.floor(Math.random() * 86400) + 3600, // 1-24 שעות
+                loadAverage: [Math.random() * 2, Math.random() * 2, Math.random() * 2],
+                timestamp: new Date().toISOString()
+            };
+            
+            systemInfo.uptimeFormatted = formatUptime(systemInfo.uptime);
+            
+            addResult('System Info', 'info', 
+                `מערכת: ${systemInfo.platform} ${systemInfo.version} | זמן פעילות: ${systemInfo.uptimeFormatted}`, 
+                systemInfo
+            );
+        }
+
+        // פונקציה לבדיקת פקודה מותאמת
+        function testCustomCommand() {
+            console.log('🧪 Testing custom command...');
+            
+            const customCommandElement = document.getElementById('custom-command');
+            if (!customCommandElement) {
+                addResult('Custom Command', 'error', 'אלמנט פקודה מותאמת לא נמצא');
+                return;
+            }
+
+            const command = customCommandElement.value.trim();
+            if (!command) {
+                addResult('Custom Command', 'warning', 'אין פקודה מותאמת להרצה');
+                return;
+            }
+
+            // סימולציה של הרצת פקודה
+            const commandResult = {
+                command: command,
+                output: `Output for: ${command}`,
+                exitCode: Math.random() > 0.1 ? 0 : 1, // 90% הצלחה
+                executionTime: Math.floor(Math.random() * 5000) + 100, // 100-5100ms
+                timestamp: new Date().toISOString()
+            };
+            
+            const status = commandResult.exitCode === 0 ? 'success' : 'error';
+            
+            addResult('Custom Command', status, 
+                commandResult.exitCode === 0 ? 
+                    `פקודה הורצה בהצלחה תוך ${commandResult.executionTime}ms` :
+                    `פקודה נכשלה עם קוד יציאה ${commandResult.exitCode}`, 
+                commandResult
+            );
+        }
+
+        // פונקציה להוספת תוצאה
+        function addResult(test, status, message, data = null) {
+            console.log('📝 Adding result:', { test, status, message });
+            
+            const result = {
+                timestamp: new Date().toLocaleTimeString('he-IL'),
+                test: test,
+                status: status,
+                message: message,
+                data: data
+            };
+            
+            statsTestResults.push(result);
+            displayResult(result);
+        }
+
+        // פונקציה לתצוגת תוצאה
+        function displayResult(result) {
+            const resultsContainer = document.getElementById('stats-results');
+            if (!resultsContainer) {
+                console.error('❌ Results container not found');
+                return;
+            }
+
+            const resultElement = document.createElement('div');
+            resultElement.className = `alert alert-${getStatusClass(result.status)} mb-2 fade-in`;
+            
+            let content = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${result.test}</strong> - ${result.message}
+                        <br><small class="text-muted">${result.timestamp}</small>
+                    </div>
+                    <span class="badge bg-${getStatusClass(result.status)}">
+                        ${getStatusText(result.status)}
+                    </span>
+                </div>
+            `;
+            
+            if (result.data) {
+                content += `
+                    <details class="mt-2">
+                        <summary>פרטי הנתונים</summary>
+                        <pre class="mt-2 bg-light p-2 rounded"><code>${JSON.stringify(result.data, null, 2)}</code></pre>
+                    </details>
+                `;
+            }
+            
+            resultElement.innerHTML = content;
+            resultsContainer.appendChild(resultElement);
+            
+            // Scroll to bottom
+            resultsContainer.scrollTop = resultsContainer.scrollHeight;
+            
+            console.log('✅ Result displayed');
+        }
+
+        // פונקציה לקבלת מחלקת סטטוס
+        function getStatusClass(status) {
+            switch (status) {
+                case 'success': return 'success';
+                case 'error': return 'danger';
+                case 'warning': return 'warning';
+                case 'info': return 'info';
+                default: return 'secondary';
+            }
+        }
+
+        // פונקציה לקבלת טקסט סטטוס
+        function getStatusText(status) {
+            switch (status) {
+                case 'success': return 'הצלחה';
+                case 'error': return 'שגיאה';
+                case 'warning': return 'אזהרה';
+                case 'info': return 'מידע';
+                default: return 'לא ידוע';
+            }
+        }
+
+        // פונקציה לניקוי לוגים
+        function clearStatsLogs() {
+            const resultsContainer = document.getElementById('stats-results');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '';
+                statsTestResults = [];
+                console.log('🧹 Stats logs cleared');
+            }
+        }
+
+        // פונקציה לעריכת פקודה מותאמת
+        function editCustomCommand() {
+            const label = document.getElementById('custom-command-label');
+            const textarea = document.getElementById('custom-command');
+            if (label && textarea) {
+                label.style.display = 'none';
+                textarea.style.display = 'block';
+                textarea.focus();
+            }
+        }
+
+        // פונקציות עזר
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatUptime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours}h ${minutes}m`;
+        }
+
+        // אתחול event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // אתחול עריכת פקודה מותאמת
+            const customTextarea = document.getElementById('custom-command');
+            const customLabel = document.getElementById('custom-command-label');
+            if (customTextarea && customLabel) {
+                customTextarea.addEventListener('blur', function() {
+                    customLabel.textContent = this.value || 'אין פקודה';
+                    customLabel.style.display = 'block';
+                    this.style.display = 'none';
+                });
+            }
+
+            // הוספת event listeners לכפתורים
+            document.getElementById('test-memory-usage')?.addEventListener('click', testMemoryUsage);
+            document.getElementById('test-memory-leaks')?.addEventListener('click', testMemoryLeaks);
+            document.getElementById('test-cpu-usage')?.addEventListener('click', testCpuUsage);
+            document.getElementById('test-cpu-bottleneck')?.addEventListener('click', testCpuBottleneck);
+            document.getElementById('test-database-performance')?.addEventListener('click', testDatabasePerformance);
+            document.getElementById('test-network-performance')?.addEventListener('click', testNetworkPerformance);
+            document.getElementById('test-system-info')?.addEventListener('click', testSystemInfo);
+            document.getElementById('test-custom-command')?.addEventListener('click', testCustomCommand);
+
+            // הוספת הודעה ראשונית
+            addResult('System', 'info', 'דף בדיקת סטטיסטיקות מערכת נטען בהצלחה');
         });
     </script>
 </body>

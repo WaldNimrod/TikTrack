@@ -1,105 +1,105 @@
 # External Data Integration - Documentation Index
 
-## 📋 **מבט כללי**
+## 📋 **Overview**
 
-מערכת האינטגרציה לנתונים חיצוניים מאפשרת לקבל מידע עדכני על מחירי מניות, מטבעות וסחורות ממקורות חיצוניים שונים. המערכת בנויה בצורה מודולרית ומאפשרת הוספת providers נוספים בקלות.
-
----
-
-## 📚 **דוקומנטציה**
-
-### **📖 דוקומנטציה מרכזית**
-- **[External Data System](EXTERNAL_DATA_SYSTEM.md)** - דוקומנטציה מלאה של המערכת
-- **[Development Tasks](DEVELOPMENT_TASKS.md)** - רשימת משימות פיתוח מפורטת
-
-### **🏗️ ארכיטקטורה**
-- **[System Architecture](EXTERNAL_DATA_SYSTEM.md#ארכיטקטורה)** - מבנה המערכת
-- **[Data Flow](EXTERNAL_DATA_SYSTEM.md#זרימת-נתונים)** - זרימת הנתונים במערכת
-- **[Models](EXTERNAL_DATA_SYSTEM.md#מודלים-models)** - מודלי הנתונים
-
-### **🔧 שירותים ו-API**
-- **[Services](EXTERNAL_DATA_SYSTEM.md#שירותים-services)** - שירותי המערכת
-- **[API Endpoints](EXTERNAL_DATA_SYSTEM.md#api-endpoints)** - נקודות קצה של ה-API
-- **[Providers](EXTERNAL_DATA_SYSTEM.md#ספקי-מידע-providers)** - ספקי המידע
-
-### **⚙️ הגדרות והעדפות**
-- **[Refresh Policy](EXTERNAL_DATA_SYSTEM.md#refresh-policy)** - מדיניות רענון הנתונים
-- **[Timezone Support](EXTERNAL_DATA_SYSTEM.md#timezone-support)** - תמיכה באזורי זמן
-- **[User Preferences](EXTERNAL_DATA_SYSTEM.md#הגדרות-משתמש)** - העדפות משתמש
+The external data integration system allows receiving current information about stock prices, currencies, and commodities from various external sources. The system is built in a modular way and allows easy addition of additional providers.
 
 ---
 
-## 🚀 **פיתוח**
+## 📚 **Documentation**
 
-### **📋 משימות פיתוח**
-- **[Stage-1 Tasks](DEVELOPMENT_TASKS.md#משימות-פיתוח---שלב-א-stage-1)** - משימות שלב א
-- **[Stage-2 Tasks](DEVELOPMENT_TASKS.md#משימות-פיתוח---שלב-ב-stage-2)** - משימות שלב ב
-- **[Timeline](DEVELOPMENT_TASKS.md#לוח-זמנים-מוצע)** - לוח זמנים מוצע
+### **📖 Main Documentation**
+- **[External Data System](EXTERNAL_DATA_SYSTEM.md)** - Complete system documentation
+- **[Development Tasks](DEVELOPMENT_TASKS.md)** - Detailed list of development tasks
 
-### **🎯 קריטריונים להצלחה**
-- **[Stage-1 Success Criteria](DEVELOPMENT_TASKS.md#שלב-א)** - קריטריונים לשלב א
-- **[Stage-2 Success Criteria](DEVELOPMENT_TASKS.md#שלב-ב)** - קריטריונים לשלב ב
+### **🏗️ Architecture**
+- **[System Architecture](EXTERNAL_DATA_SYSTEM.md#Architecture)** - System Structure
+- **[Data Flow](EXTERNAL_DATA_SYSTEM.md#data-flow)** - Data flow in the system
+- **[Models](EXTERNAL_DATA_SYSTEM.md#Models-models)** - Data models
 
----
+### **🔧 Services and API**
+- **[Services](EXTERNAL_DATA_SYSTEM.md#Services-services)** - System services
+- **[API Endpoints](EXTERNAL_DATA_SYSTEM.md#api-endpoints)** - API endpoints
+- **[Providers](EXTERNAL_DATA_SYSTEM.md#data-providers)** - Data providers
 
-## 📊 **מצב נוכחי**
-
-### **✅ הושלם (Stage-1)**
-- [x] יצירת מבנה תיקיות מודולרי
-- [x] יצירת מודלים (Base, Ticker, Quote, MarketPreferences)
-- [x] יצירת Yahoo Finance Provider
-- [x] יצירת Market Data Service
-- [x] יצירת API Routes בסיסיים
-- [x] תיקון טעויות ובדיקות תקינות
-
-### **🔄 בפיתוח (Stage-1)**
-- [ ] יצירת מיגרציות לבסיס הנתונים
-- [ ] אינטגרציה עם המערכת הקיימת
-- [ ] יצירת ממשק העדפות
-- [ ] יצירת מערכת רענון אוטומטי
-- [ ] יצירת דף quotes חדש
-- [ ] בדיקות ותיקוף
-
-### **🚀 עתידי (Stage-2)**
-- [ ] אבטחה מתקדמת
-- [ ] ביצועים ו-Scaling
-- [ ] מערכת התראות חכמה
-- [ ] Monitoring מתקדם
-- [ ] UI מתקדם
-- [ ] Providers נוספים
+### **⚙️ Settings and Preferences**
+- **[Refresh Policy](EXTERNAL_DATA_SYSTEM.md#refresh-policy)** - Data refresh policy
+- **[Timezone Support](EXTERNAL_DATA_SYSTEM.md#timezone-support)** - Timezone support
+- **[User Preferences](EXTERNAL_DATA_SYSTEM.md#user-preferences)** - User preferences
 
 ---
 
-## 🔗 **קישורים מהירים**
+## 🚀 **Development**
 
-### **למפתחים**
-- **[Development Setup](../development/README.md)** - הגדרת סביבת פיתוח
-- **[API Documentation](../api/README.md)** - תיעוד API
-- **[Database Schema](../database/README.md)** - מבנה בסיס הנתונים
+### **📋 Development Tasks**
+- **[Stage-1 Tasks](DEVELOPMENT_TASKS.md#development-tasks---stage-1)** - Stage 1 tasks
+- **[Stage-2 Tasks](DEVELOPMENT_TASKS.md#development-tasks---stage-2)** - Stage 2 tasks
+- **[Timeline](DEVELOPMENT_TASKS.md#proposed-timeline)** - Proposed Timeline
 
-### **למשתמשים**
-- **[User Guide](../user/README.md)** - מדריך משתמש
-- **[Feature Overview](../README.md)** - סקירת תכונות
-
----
-
-## 📝 **הערות חשובות**
-
-1. **עדיפות**: שלב א חייב להיות יציב לפני תחילת שלב ב
-2. **בדיקות**: כל פיצ'ר חדש חייב לעבור בדיקות מלאות
-3. **תיעוד**: כל שינוי חייב להיות מתועד
-4. **גיבויים**: לפני כל שינוי בבסיס הנתונים
-5. **אינטגרציה**: בדיקת תקינות עם המערכת הקיימת
+### **🎯 Success Criteria**
+- **[Stage-1 Success Criteria](DEVELOPMENT_TASKS.md#stage-1)** - Stage 1 criteria
+- **[Stage-2 Success Criteria](DEVELOPMENT_TASKS.md#stage-2)** - Stage 2 criteria
 
 ---
 
-## 🤝 **תמיכה ופיתוח**
+## 📊 **Current Status**
 
-לשאלות ובעיות:
-1. בדוק את הלוגים
-2. בדוק את התיעוד
-3. פנה לצוות הפיתוח
-4. פתח issue ב-GitHub
+### **✅ Completed (Stage-1)**
+- [x] Creating modular folder structure
+- [x] Creating Models (Base, Ticker, Quote, MarketPreferences)
+- [x] Creating Yahoo Finance Provider
+- [x] Creating Market Data Service
+- [x] Creating Basic API Routes
+- [x] Fixing errors and validation tests
+
+### **🔄 In Development (Stage-1)**
+- [ ] Creating database migrations
+- [ ] Integration with Existing System
+- [ ] Creating preferences interface
+- [ ] Creating Automatic Refresh System
+- [ ] Creating new quotes page
+- [ ] Testing and Validation
+
+### **🚀 future (Stage-2)**
+- [ ] Advanced Security
+- [ ] Performance and Scaling
+- [ ] Smart alert system
+- [ ] Monitoring Advanced
+- [ ] UI Advanced
+- [ ] Additional Providers
+
+---
+
+## 🔗 **Quick Links**
+
+### **For Developers**
+- **[Development Setup](../development/README.md)** - Development environment setup
+- **[API Documentation](../api/README.md)** - Documentation API
+- **[Database Schema](../database/README.md)** - Database schema
+
+### **For Users**
+- **[User Guide](../user/README.md)** - User guide
+- **[Feature Overview](../README.md)** - Feature overview
+
+---
+
+## 📝 **Important Notes**
+
+1. **Priority**: Stage 1 must be stable before starting Stage 2
+2. **Testing**: Every new feature must pass full testing
+3. **Documentation**: Every change must be documented
+4. **Backups**: Before any database changes
+5. **Integration**: Testing integrity with existing system
+
+---
+
+## 🤝 **Support and Development**
+
+For questions and issues:
+1. Check the logs
+2. Check the documentation
+3. Contact the development team
+4. Open an issue on GitHub
 
 ---
 

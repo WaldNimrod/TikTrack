@@ -59,56 +59,33 @@ function deleteExecution(id) {
             await confirmDeleteExecution(id);
         }, null);
     } else {
-        console.log('🔧 Using fallback showDeleteExecutionModal');
+        console.log('🔧 Using fallback - global system not available');
         // גיבוי למקרה שהמערכת הגלובלית לא זמינה
-        showDeleteExecutionModal(id);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת מחיקה לא זמינה');
+        } else {
+            console.error('מערכת מחיקה לא זמינה');
+        }
     }
 }
 
-// פונקציות לפתיחה/סגירה של סקשנים
+// פונקציות לפתיחה/סגירה של סקשנים - שימוש במערכת הכללית
 function toggleExecutionsSection() {
-  const contentSections = document.querySelectorAll('.content-section');
-  const executionsSection = contentSections[0];
-  
-  if (executionsSection) {
-    const sectionBody = executionsSection.querySelector('.section-body');
-    const toggleBtn = executionsSection.querySelector('button[onclick="toggleExecutionsSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody) {
-      const isCollapsed = sectionBody.style.display === 'none';
-      
-      if (isCollapsed) {
-        sectionBody.style.display = 'block';
-        if (icon) icon.textContent = '▲';
-        localStorage.setItem('executionsSectionCollapsed', 'false');
-      } else {
-        sectionBody.style.display = 'none';
-        if (icon) icon.textContent = '▼';
-        localStorage.setItem('executionsSectionCollapsed', 'true');
-      }
-    }
+  // שימוש במערכת הכללית מ-main.js
+  if (typeof window.toggleMainSection === 'function') {
+    window.toggleMainSection();
+  } else {
+    console.error('❌ toggleMainSection function not found in main.js');
   }
 }
 
-// פונקציה לשחזור מצב הסגירה
+// פונקציה לשחזור מצב הסגירה - שימוש במערכת הכללית
 function restoreExecutionsSectionState() {
-    // שחזור מצב סקשן העסקעות
-    const executionsCollapsed = localStorage.getItem('executionsSectionCollapsed') === 'true';
-    const contentSections = document.querySelectorAll('.content-section');
-    const executionsSection = contentSections[0];
-
-    if (executionsSection) {
-        const sectionBody = executionsSection.querySelector('.section-body');
-        const toggleBtn = executionsSection.querySelector('button[onclick="toggleExecutionsSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && executionsCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
-            }
-        }
+    // שימוש במערכת הכללית מ-main.js
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    } else {
+        console.error('❌ restoreAllSectionStates function not found in main.js');
     }
 }
 
@@ -321,10 +298,26 @@ async function showEditExecutionModal(id) {
 
         // תיקון שדה הפעולה - מיפוי action/type לערכים ב-select
         const actionValue = execution.action || execution.type;
-        document.getElementById('editExecutionType').value = actionValue;
+        if (actionValue) {
+            const actionSelect = document.getElementById('editExecutionType');
+            if (actionSelect) {
+                actionSelect.value = actionValue;
+                console.log('✅ שדה פעולה מולא:', actionValue);
+            }
+        }
 
-        document.getElementById('editExecutionQuantity').value = execution.quantity;
-        document.getElementById('editExecutionPrice').value = execution.price;
+        // מילוי שדה הכמות
+        if (execution.quantity) {
+            document.getElementById('editExecutionQuantity').value = execution.quantity;
+            console.log('✅ שדה כמות מולא:', execution.quantity);
+        }
+
+        // מילוי שדה המחיר
+        if (execution.price) {
+            document.getElementById('editExecutionPrice').value = execution.price;
+            console.log('✅ שדה מחיר מולא:', execution.price);
+        }
+
         // עיבוד תאריך ביצוע - בדיקה של שדות שונים
         let executionDate = execution.date || execution.execution_date;
         if (executionDate) {
@@ -333,7 +326,7 @@ async function showEditExecutionModal(id) {
                 const date = new Date(executionDate);
                 const localDateTime = date.toISOString().slice(0, 16);
                 document.getElementById('editExecutionDate').value = localDateTime;
-              
+                console.log('✅ שדה תאריך מולא:', localDateTime);
             } catch (error) {
                 console.warn('⚠️ Error processing execution date:', executionDate, error);
                 document.getElementById('editExecutionDate').value = '';
@@ -342,9 +335,25 @@ async function showEditExecutionModal(id) {
             console.warn('⚠️ No execution date found');
             document.getElementById('editExecutionDate').value = '';
         }
-        document.getElementById('editExecutionCommission').value = execution.fee || execution.commission || '';
-        document.getElementById('editExecutionSource').value = execution.source || 'manual';
-        document.getElementById('editExecutionNotes').value = execution.notes || '';
+
+        // מילוי שדה העמלה
+        const commissionValue = execution.fee || execution.commission || '';
+        if (commissionValue) {
+            document.getElementById('editExecutionCommission').value = commissionValue;
+            console.log('✅ שדה עמלה מולא:', commissionValue);
+        }
+
+        // מילוי שדה המקור
+        const sourceValue = execution.source || 'manual';
+        document.getElementById('editExecutionSource').value = sourceValue;
+        console.log('✅ שדה מקור מולא:', sourceValue);
+
+        // מילוי שדה ההערות
+        const notesValue = execution.notes || '';
+        if (notesValue) {
+            document.getElementById('editExecutionNotes').value = notesValue;
+            console.log('✅ שדה הערות מולא:', notesValue);
+        }
 
         // הצגת כפתור קישור לטרייד/תכנון אם יש
         const tradeLinkButton = document.getElementById('editExecutionTradeLink');
@@ -371,54 +380,7 @@ async function showEditExecutionModal(id) {
     modal.show();
 }
 
-/**
- * הצגת מודל מחיקת עסקה
- */
-async function showDeleteExecutionModal(id) {
-  
-
-    // מציאת העסקה לפי ID
-    const execution = executionsData.find(e => e.id == id);
-    if (!execution) {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'עסקה לא נמצאה');
-        } else {
-            console.error('עסקה לא נמצאה');
-        }
-        return;
-    }
-
-    // טעינת פרטי טרייד
-    let tradeDetails = `טרייד ${execution.trade_id}`;
-    try {
-        const tradesResponse = await fetch('/api/v1/trades/');
-        const tradesData = await tradesResponse.json();
-        const trades = tradesData.data || tradesData || [];
-
-        const trade = trades.find(t => t.id == execution.trade_id);
-        if (trade) {
-            // טעינת פרטי טיקר
-            const tickersResponse = await fetch('/api/v1/tickers/');
-            const tickersData = await tickersResponse.json();
-            const tickers = tickersData.data || tickersData || [];
-
-            const ticker = tickers.find(t => t.id == trade.ticker_id);
-            const tickerSymbol = ticker ? ticker.symbol : 'לא מוגדר';
-
-            tradeDetails = `${tickerSymbol} - טרייד ${trade.id} (${trade.side} ${trade.investment_type})`;
-        }
-    } catch (error) {
-        console.warn('⚠️ Error loading trade details:', error);
-    }
-
-    // מילוי המודל
-    document.getElementById('deleteExecutionId').value = execution.id;
-    document.getElementById('deleteExecutionName').textContent = `עסקה ${execution.id} - ${tradeDetails}`;
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('deleteExecutionModal'));
-    modal.show();
-}
+// פונקציה זו הוסרה - שימוש במערכת הגלובלית showDeleteWarning
 
 // ========================================
 // פונקציות ולידציה
@@ -835,8 +797,16 @@ function validateCompleteExecutionForm(mode) {
     if (!isValid && errors.length > 0) {
         const errorMessage = errors.join(', ');
         console.log('🔧 Validation errors:', errors);
+        console.log('🔧 window.showErrorNotification exists:', typeof window.showErrorNotification === 'function');
+        console.log('🔧 window.showValidationWarning exists:', typeof window.showValidationWarning === 'function');
+        
+        // שימוש ישיר ב-showErrorNotification עם פרטים מפורטים
         if (window.showErrorNotification) {
+            console.log('🔧 Calling showErrorNotification with detailed error message');
             window.showErrorNotification('שגיאות בטופס', `יש לתקן את השגיאות הבאות: ${errorMessage}`);
+        } else {
+            console.error('❌ showErrorNotification not available');
+            console.error(`שגיאות בטופס: ${errorMessage}`);
         }
     }
 
@@ -939,10 +909,14 @@ async function saveExecution() {
 
             // הצגת הודעת הצלחה
             console.log('🔧 Showing success notification for save');
+            console.log('🔧 window.showSuccessNotification exists:', typeof window.showSuccessNotification === 'function');
+            
             if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('הצלחה', 'עסקה נשמרה בהצלחה במערכת');
+                console.log('🔧 Calling showSuccessNotification with:', 'הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת');
+                window.showSuccessNotification('הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת');
             } else {
-                console.log('עסקה נשמרה בהצלחה');
+                console.error('❌ showSuccessNotification not available');
+                console.log('עסקה חדשה נוספה בהצלחה למערכת');
             }
 
             // רענון הנתונים
@@ -989,9 +963,14 @@ async function saveExecution() {
                         }
                         
                         // שימוש במערכת ההתראות המובנת
+                        console.log('🔧 Field validation error (add):', { fieldName, fieldError });
+                        console.log('🔧 window.showValidationWarning exists (add):', typeof window.showValidationWarning === 'function');
+                        
                         if (fieldName && window.showValidationWarning) {
+                            console.log('🔧 Calling showValidationWarning (add) with:', fieldName, fieldError);
                             window.showValidationWarning(fieldName, fieldError);
                         } else {
+                            console.log('🔧 Using showErrorNotification as fallback (add)');
                             window.showErrorNotification('שגיאת וולידציה', fieldError);
                         }
                     });
@@ -1008,7 +987,7 @@ async function saveExecution() {
     } catch (error) {
         console.error('❌ שגיאה בשמירת עסקה:', error);
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בשמירת עסקה');
+            window.showErrorNotification('שגיאה', 'שגיאה בשמירת עסקה');
         } else {
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה', 'שגיאה בשמירת עסקה');
@@ -1037,7 +1016,7 @@ async function updateExecution() {
     // בדיקת ולידציה
     if (!validateCompleteExecutionForm('edit')) {
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('יש לתקן את השגיאות בטופס');
+            window.showErrorNotification('שגיאה', 'יש לתקן את השגיאות בטופס');
         } else {
             if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'יש לתקן את השגיאות בטופס');
@@ -1051,7 +1030,7 @@ async function updateExecution() {
     // בדיקת ערך action
     if (!type || (type !== 'buy' && type !== 'sale')) {
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('יש לבחור פעולה תקינה (קניה או מכירה)');
+            window.showErrorNotification('שגיאה', 'יש לבחור פעולה תקינה (קניה או מכירה)');
         } else {
             if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'יש לבחור פעולה תקינה (קניה או מכירה)');
@@ -1068,7 +1047,7 @@ async function updateExecution() {
         tradeId = parseInt(tradeIdValue);
         if (isNaN(tradeId) || tradeId < 0) {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('מזהה טרייד לא תקין');
+                window.showErrorNotification('שגיאה', 'מזהה טרייד לא תקין');
             } else {
                 if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מזהה טרייד לא תקין');
@@ -1114,10 +1093,14 @@ async function updateExecution() {
 
             // הצגת הודעת הצלחה
             console.log('🔧 Showing success notification for update');
+            console.log('🔧 window.showSuccessNotification exists:', typeof window.showSuccessNotification === 'function');
+            
             if (typeof window.showSuccessNotification === 'function') {
+                console.log('🔧 Calling showSuccessNotification with:', 'הצלחה', 'עסקה עודכנה בהצלחה במערכת');
                 window.showSuccessNotification('הצלחה', 'עסקה עודכנה בהצלחה במערכת');
             } else {
-                console.log('עסקה עודכנה בהצלחה');
+                console.error('❌ showSuccessNotification not available');
+                console.log('עסקה עודכנה בהצלחה במערכת');
             }
 
             // רענון הנתונים
@@ -1162,9 +1145,14 @@ async function updateExecution() {
                         }
                         
                         // שימוש במערכת ההתראות המובנת
+                        console.log('🔧 Field validation error (edit):', { fieldName, fieldError });
+                        console.log('🔧 window.showValidationWarning exists (edit):', typeof window.showValidationWarning === 'function');
+                        
                         if (fieldName && window.showValidationWarning) {
+                            console.log('🔧 Calling showValidationWarning (edit) with:', fieldName, fieldError);
                             window.showValidationWarning(fieldName, fieldError);
                         } else {
+                            console.log('🔧 Using showErrorNotification as fallback (edit)');
                             window.showErrorNotification('שגיאת וולידציה', fieldError);
                         }
                     });
@@ -1181,7 +1169,7 @@ async function updateExecution() {
     } catch (error) {
         console.error('❌ שגיאה בעדכון עסקה:', error);
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בעדכון עסקה');
+            window.showErrorNotification('שגיאה', 'שגיאה בעדכון עסקה');
         } else {
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה', 'שגיאה בעדכון עסקה');
@@ -1215,32 +1203,28 @@ async function confirmDeleteExecution(id) {
     }
 
     try {
+        console.log('🔧 Making DELETE request to:', `/api/v1/executions/${id}`);
         const response = await fetch(`/api/v1/executions/${id}`, {
             method: 'DELETE'
         });
+        console.log('🔧 DELETE response status:', response.status);
 
         if (response.ok) {
           
 
-            // סגירת המודל
-            console.log('🔧 Closing delete modal');
-            const modalElement = document.getElementById('deleteExecutionModal');
-            if (modalElement) {
-                const modal = bootstrap.Modal.getInstance(modalElement);
-                if (modal) {
-                    modal.hide();
-                } else {
-                    console.warn('⚠️ Modal instance not found');
-                }
-            } else {
-                console.warn('⚠️ Modal element not found');
-            }
+            // סגירת המודל - לא נדרש כי אין מודל
+            console.log('🔧 Delete successful, no modal to close');
 
             // הצגת הודעת הצלחה
+            console.log('🔧 Showing success notification for delete');
+            console.log('🔧 window.showSuccessNotification exists:', typeof window.showSuccessNotification === 'function');
+            
             if (typeof window.showSuccessNotification === 'function') {
+                console.log('🔧 Calling showSuccessNotification with:', 'הצלחה', 'עסקה נמחקה בהצלחה מהמערכת');
                 window.showSuccessNotification('הצלחה', 'עסקה נמחקה בהצלחה מהמערכת');
             } else {
-                console.log('עסקה נמחקה בהצלחה');
+                console.error('❌ showSuccessNotification not available');
+                console.log('עסקה נמחקה בהצלחה מהמערכת');
             }
 
             // רענון הנתונים
@@ -1257,15 +1241,8 @@ async function confirmDeleteExecution(id) {
                 if (errorData.error && errorData.error.message &&
                     errorData.error.message.includes('linked items')) {
 
-                    // סגירת מודל המחיקה הרגיל
-                    console.log('🔧 Closing delete modal for linked items');
-                    const deleteModalElement = document.getElementById('deleteExecutionModal');
-                    if (deleteModalElement) {
-                        const deleteModal = bootstrap.Modal.getInstance(deleteModalElement);
-                        if (deleteModal) {
-                            deleteModal.hide();
-                        }
-                    }
+                    // סגירת מודל המחיקה הרגיל - לא נדרש
+                    console.log('🔧 Linked items found, no modal to close');
 
                     // הצגת מודל הפריטים המקושרים
                     await showExecutionLinkedItemsModal(id, errorData);
@@ -1273,7 +1250,7 @@ async function confirmDeleteExecution(id) {
                 }
 
                 if (typeof window.showErrorNotification === 'function') {
-                    window.showErrorNotification('שגיאה במחיקת עסקה: ' + errorData.error.message);
+                    window.showErrorNotification('שגיאה', 'שגיאה במחיקת עסקה: ' + errorData.error.message);
                 } else {
                     if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה', 'שגיאה במחיקת עסקה: ' + errorData.error.message);
@@ -1284,7 +1261,7 @@ async function confirmDeleteExecution(id) {
 
             } catch (parseError) {
                 if (typeof window.showErrorNotification === 'function') {
-                    window.showErrorNotification('שגיאה במחיקת עסקה: ' + errorResponse);
+                    window.showErrorNotification('שגיאה', 'שגיאה במחיקת עסקה: ' + errorResponse);
                 } else {
                     if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה', 'שגיאה במחיקת עסקה: ' + errorResponse);
@@ -1352,12 +1329,20 @@ async function showExecutionLinkedItemsModal(executionId, errorData) {
             window.showLinkedItemsModal(enhancedData, 'execution', executionId);
         } else {
             console.error('❌ showLinkedItemsModal function not found');
-            showError('פונקציה להצגת פריטים מקושרים לא זמינה');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'פונקציה להצגת פריטים מקושרים לא זמינה');
+            } else {
+                console.error('פונקציה להצגת פריטים מקושרים לא זמינה');
+            }
         }
 
     } catch (error) {
         console.error('❌ שגיאה בטעינת נתונים מקושרים:', error);
-        showError('שגיאה בטעינת נתונים מקושרים');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים מקושרים');
+        } else {
+            console.error('שגיאה בטעינת נתונים מקושרים');
+        }
     }
 }
 
@@ -2052,7 +2037,7 @@ window.toggleTopSection = function() {
 // פונקציות מודלים
 window.showAddExecutionModal = showAddExecutionModal;
 window.showEditExecutionModal = showEditExecutionModal;
-window.showDeleteExecutionModal = showDeleteExecutionModal;
+// window.showDeleteExecutionModal = showDeleteExecutionModal; // הוסר - שימוש במערכת הגלובלית
 window.saveExecution = saveExecution;
 window.updateExecution = updateExecution;
 window.confirmDeleteExecution = confirmDeleteExecution;
@@ -2393,7 +2378,7 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
 
     // הצגת הודעת "בפיתוח"
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('פיצ\'ר "הצג טריידים סגורים" - בפיתוח');
+                    window.showInfoNotification('מידע', 'פיצ\'ר "הצג טריידים סגורים" - בפיתוח');
     } else {
         if (typeof window.showInfoNotification === 'function') {
             window.showInfoNotification('מידע', 'פיצ\'ר "הצג טריידים סגורים" - בפיתוח');
@@ -2465,13 +2450,9 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
 function goToTickerPage(symbol) {
     console.log('🔄 מעבר לדף טיקר:', symbol);
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('מעבר לדף טיקר - בפיתוח');
+        window.showInfoNotification('מידע', 'מעבר לדף טיקר - בפיתוח');
     } else {
-        if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('מידע', 'מעבר לדף טיקר - בפיתוח');
-        } else {
-            console.log('מעבר לדף טיקר - בפיתוח');
-        }
+        console.log('מעבר לדף טיקר - בפיתוח');
     }
     // TODO: ניתוב לדף טיקר כשהפיצ'ר יהיה מוכן
 }
@@ -2504,13 +2485,9 @@ async function getTickers() {
 function showTickerHelp() {
     console.log('🔄 הצגת עזרה לבחירת טיקר');
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר');
+        window.showInfoNotification('מידע', 'בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר');
     } else {
-        if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('מידע', 'בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר');
-        } else {
-            console.log('בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר');
-        }
+        console.log('בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר');
     }
 }
 
@@ -2520,13 +2497,9 @@ function showTickerHelp() {
 function addNewTicker() {
     console.log('🔄 הוספת טיקר חדש');
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('הוספת טיקר - בפיתוח');
+        window.showInfoNotification('מידע', 'הוספת טיקר - בפיתוח');
     } else {
-        if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('מידע', 'הוספת טיקר - בפיתוח');
-        } else {
-            console.log('הוספת טיקר - בפיתוח');
-        }
+        console.log('הוספת טיקר - בפיתוח');
     }
     // TODO: פתיחת מודל הוספת טיקר
 }
@@ -2537,13 +2510,9 @@ function addNewTicker() {
 function addNewPlan() {
     console.log('🔄 הוספת תכנון חדש');
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('הוספת תכנון - בפיתוח');
+        window.showInfoNotification('מידע', 'הוספת תכנון - בפיתוח');
     } else {
-        if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('מידע', 'הוספת תכנון - בפיתוח');
-        } else {
-            console.log('הוספת תכנון - בפיתוח');
-        }
+        console.log('הוספת תכנון - בפיתוח');
     }
     // TODO: פתיחת מודל הוספת תכנון
 }
@@ -2554,13 +2523,9 @@ function addNewPlan() {
 function addNewTrade() {
     console.log('🔄 הוספת טרייד חדש');
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('הוספת טרייד - בפיתוח');
+        window.showInfoNotification('מידע', 'הוספת טרייד - בפיתוח');
     } else {
-        if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('מידע', 'הוספת טרייד - בפיתוח');
-        } else {
-            console.log('הוספת טרייד - בפיתוח');
-        }
+        console.log('הוספת טרייד - בפיתוח');
     }
     // TODO: פתיחת מודל הוספת טרייד
 }
@@ -2825,9 +2790,7 @@ function updateExecutionsTableForTradeModal(executions) {
  */
 function addEditBuySell() {
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח');
-            } else if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('מידע', 'פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח');
+        window.showInfoNotification('מידע', 'פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח');
     } else {
         console.log('פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח');
     }
@@ -2838,9 +2801,7 @@ function addEditBuySell() {
  */
 function linkExistingExecution() {
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('פונקציונליות שיוך עסקה קיימת נמצאת בפיתוח');
-            } else if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('מידע', 'פונקציונליות שיוך עסקה קיימת נמצאת בפיתוח');
+        window.showInfoNotification('מידע', 'פונקציונליות שיוך עסקה קיימת נמצאת בפיתוח');
     } else {
         console.log('פונקציונליות שיוך עסקה קיימת נמצאת בפיתוח');
     }
@@ -2851,9 +2812,7 @@ function linkExistingExecution() {
  */
 function unlinkExecution() {
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('פונקציונליות ביטול שיוך עסקה נמצאת בפיתוח');
-            } else if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('מידע', 'פונקציונליות ביטול שיוך עסקה נמצאת בפיתוח');
+        window.showInfoNotification('מידע', 'פונקציונליות ביטול שיוך עסקה נמצאת בפיתוח');
     } else {
         console.log('פונקציונליות ביטול שיוך עסקה נמצאת בפיתוח');
     }
@@ -2872,44 +2831,7 @@ window.filterExecutionsByAccount = window.filterExecutionsByAccount || function(
 window.searchExecutions = window.searchExecutions || function() {};
 window.resetExecutionsFilters = window.resetExecutionsFilters || function() {};
 
-// פונקציה לעדכון סיכום הנתונים
-function updateExecutionsSummary(executions) {
-    console.log('🔄 Updating executions summary...');
-    console.log('🔄 Executions parameter:', executions);
-    console.log('🔄 ExecutionsData global:', executionsData);
-    
-    const dataToUse = executions || executionsData || [];
-    const totalExecutions = dataToUse.length;
-    const buyExecutions = dataToUse.filter(e => e.action === 'buy').length;
-    const sellExecutions = dataToUse.filter(e => e.action === 'sell').length;
-    
-    const totalBuyAmount = dataToUse
-        .filter(e => e.action === 'buy')
-        .reduce((sum, e) => sum + ((e.quantity * e.price) || 0), 0);
-    
-    const totalSellAmount = dataToUse
-        .filter(e => e.action === 'sell')
-        .reduce((sum, e) => sum + ((e.quantity * e.price) || 0), 0);
-    
-    const balanceAmount = totalSellAmount - totalBuyAmount;
-    
-    // עדכון האלמנטים בדף
-    const totalElement = document.getElementById('totalExecutions');
-    const buyElement = document.getElementById('totalBuyExecutions');
-    const sellElement = document.getElementById('totalSellExecutions');
-    const buyAmountElement = document.getElementById('totalBuyAmount');
-    const sellAmountElement = document.getElementById('totalSellAmount');
-    const balanceElement = document.getElementById('balanceAmount');
-    
-    if (totalElement) totalElement.textContent = totalExecutions;
-    if (buyElement) buyElement.textContent = buyExecutions;
-    if (sellElement) sellElement.textContent = sellExecutions;
-    if (buyAmountElement) buyAmountElement.textContent = `$${totalBuyAmount.toFixed(2)}`;
-    if (sellAmountElement) sellAmountElement.textContent = `$${totalSellAmount.toFixed(2)}`;
-    if (balanceElement) balanceElement.textContent = `$${balanceAmount.toFixed(2)}`;
-    
-    console.log('✅ Executions summary updated');
-}
+// פונקציה זו הוסרה - כפילות עם הפונקציה הראשונה
 
 // ========================================
 // אתחול וולידציה
@@ -2917,7 +2839,10 @@ function updateExecutionsSummary(executions) {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('🔄 === DOM CONTENT LOADED - EXECUTIONS ===');
+    console.log('🔧 DOM Content Loaded - checking notification functions');
+    console.log('🔧 window.showSuccessNotification:', typeof window.showSuccessNotification);
+    console.log('🔧 window.showErrorNotification:', typeof window.showErrorNotification);
+    console.log('🔧 window.showInfoNotification:', typeof window.showInfoNotification);
 
     // שחזור מצב הסגירה
     if (typeof window.restoreAllSectionStates === 'function') {
@@ -3149,4 +3074,32 @@ if (typeof window.registerCRUDFunctions === 'function') {
     showEditModal: showEditExecutionModal,
     showDeleteModal: deleteExecution
   });
+}
+
+/**
+ * זיהוי מזהה השדה מהודעת שגיאה
+ * @param {string} errorMessage - הודעת השגיאה
+ * @param {string} prefix - קידומת הטופס (add או edit)
+ * @returns {string|null} מזהה השדה או null
+ */
+function getFieldIdFromError(errorMessage, prefix) {
+    const fieldMappings = {
+        'יש לבחור טרייד': `${prefix}ExecutionTradeId`,
+        'יש לבחור פעולה תקינה': `${prefix}ExecutionType`,
+        'יש להזין כמות חיובית': `${prefix}ExecutionQuantity`,
+        'יש להזין מחיר חיובי': `${prefix}ExecutionPrice`,
+        'עמלה גבוהה מדי': `${prefix}ExecutionCommission`,
+        'הערות ארוכות מדי': `${prefix}ExecutionNotes`,
+        'מקור ארוך מדי': `${prefix}ExecutionSource`,
+        'מזהה חיצוני לא תקין': `${prefix}ExecutionExternalId`,
+        'יש להזין תאריך עסקה': `${prefix}ExecutionDate`
+    };
+    
+    for (const [message, fieldId] of Object.entries(fieldMappings)) {
+        if (errorMessage.includes(message)) {
+            return fieldId;
+        }
+    }
+    
+    return null;
 }

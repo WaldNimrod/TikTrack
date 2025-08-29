@@ -112,7 +112,7 @@ window.showValidationWarning(message, fieldName);
 // Usage in page-specific modules
 function showDeleteCashFlowModal(id) {
     window.showDeleteWarning(
-        'האם אתה בטוח שברצונך למחוק את תזרים המזומנים הזה?',
+        'Are you sure you want to delete this cash flow?',
         () => confirmDeleteCashFlow(id)
     );
 }
@@ -123,20 +123,20 @@ function showDeleteCashFlowModal(id) {
 // New translation functions for consistent text display
 function translateAlertCondition(condition) {
     const translations = {
-        'price': 'מחיר',
-        'change': 'שינוי',
-        'ma': 'ממוצע נע',
-        'volume': 'נפח'
+        'price': 'Price',
+'change': 'Change',
+'ma': 'Moving Average',
+'volume': 'Volume'
     };
     return translations[condition] || condition;
 }
 
 function translateTradeStatus(status) {
     const translations = {
-        'open': 'פתוח',
-        'closed': 'סגור',
-        'pending': 'ממתין',
-        'cancelled': 'בוטל'
+        'open': 'Open',
+'closed': 'Closed',
+'pending': 'Pending',
+'cancelled': 'Cancelled'
     };
     return translations[status] || status;
 }

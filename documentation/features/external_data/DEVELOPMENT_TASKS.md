@@ -6,83 +6,83 @@
 - [x] Creating modular folder structure
 - [x] Creating models (Base, Ticker, Quote, MarketPreferences)
 - [x] Creating Yahoo Finance Provider
-- [x] יצירת Market Data Service
-- [x] יצירת API Routes בסיסיים
-- [x] תיקון טעויות ובדיקות תקינות
+- [x] Creating Market Data Service
+- [x] Creating basic API Routes
+- [x] Fixing errors and validation tests
 
-### 🗄️ **בסיס נתונים**
-- [ ] יצירת מיגרציות לבסיס הנתונים
-  - [ ] מיגרציה לטבלת `quotes_last`
-  - [ ] מיגרציה לטבלת `user_preferences`
-  - [ ] מיגרציה לטבלת `provider_configs`
-  - [ ] מיגרציה לטבלת `market_data_logs`
-  - [ ] יצירת אינדקסים חיוניים
-- [ ] בדיקת תקינות המודלים מול בסיס הנתונים
-- [ ] יצירת נתוני בדיקה (test data)
+### 🗄️ **Database**
+- [ ] Creating database migrations
+- [ ] Migration for `quotes_last` table
+- [ ] Migration for `user_preferences` table
+  - [ ] Migration for `provider_configs` table
+- [ ] Migration for `market_data_logs` table
+  - [ ] Creating essential indexes
+- [ ] Validating models against database
+- [ ] Creating test data
 
-### 🔌 **אינטגרציה עם המערכת הקיימת**
-- [ ] העתקת קבצים לתיקיות המתאימות
-  - [ ] העתקת מודלים ל-`Backend/models/`
-  - [ ] העתקת שירותים ל-`Backend/services/`
-  - [ ] העתקת providers ל-`Backend/providers/`
-  - [ ] העתקת API routes ל-`Backend/routes/api/`
-- [ ] עדכון `Backend/app.py` עם Blueprints החדשים
-- [ ] עדכון `Backend/models/__init__.py`
-- [ ] בדיקת תקינות האינטגרציה
+### 🔌 **Integration with Existing System**
+- [ ] Copying files to appropriate directories
+- [ ] Copying models to `Backend/models/`
+- [ ] Copying services to `Backend/services/`
+- [ ] Copying providers to `Backend/providers/`
+- [ ] Copying API routes to `Backend/routes/api/`
+- [ ] Updating `Backend/app.py` with new Blueprints
+- [ ] Updating `Backend/models/__init__.py`
+- [ ] Testing integration integrity
 
-### ⚙️ **הגדרות והעדפות**
-- [ ] יצירת ממשק העדפות במערכת הקיימת
-  - [ ] הוספת שדות refresh policy
-  - [ ] הוספת שדות timezone
-  - [ ] הוספת שדות provider preferences
-- [ ] עדכון מערכת ההעדפות הקיימת
-- [ ] בדיקת שמירה וטעינה של העדפות
+### ⚙️ **Settings and Preferences**
+- [ ] Creating preferences interface in existing system
+- [ ] Adding refresh policy fields
+- [ ] Adding timezone fields
+- [ ] Adding provider preferences fields
+- [ ] Updating existing preferences system
+- [ ] Testing save and load of preferences
 
-### 🔄 **מערכת רענון אוטומטי**
-- [ ] יצירת Scheduler בסיסי
-  - [ ] תמיכה ב-refresh policy גמיש
-  - [ ] תמיכה ב-timezone (NY fixed)
-  - [ ] לוגיקה בסיסית לזיהוי שעות מסחר
-- [ ] אינטגרציה עם Market Data Service
-- [ ] בדיקת רענון אוטומטי
+### 🔄 **Automatic Refresh System**
+- [ ] Creating basic Scheduler
+- [ ] Supporting flexible refresh policy
+- [ ] Supporting timezone (NY fixed)
+- [ ] Basic logic for identifying trading hours
+- [ ] Integration with Market Data Service
+- [ ] Testing automatic refresh
 
-### 📊 **ממשק משתמש בסיסי**
-- [ ] יצירת דף quotes חדש
-  - [ ] טבלת מחירים בסיסית
-  - [ ] תצוגת שינויים (change/percent)
-  - [ ] תצוגת volume
-  - [ ] תצוגת high/low
-- [ ] אינטגרציה עם מערכת הפילטרים הקיימת
-- [ ] תמיכה ב-RTL
+### 📊 **Basic User Interface**
+- [ ] Creating new quotes page
+- [ ] Basic price table
+- [ ] Change display (change/percent)
+- [ ] Volume display
+- [ ] High/low display
+- [ ] Integration with existing filter system
+- [ ] RTL support
 
-### 🧪 **בדיקות ותיקוף**
-- [ ] בדיקות יחידה (unit tests)
-  - [ ] בדיקות מודלים
-  - [ ] בדיקות שירותים
-  - [ ] בדיקות providers
-- [ ] בדיקות אינטגרציה
-- [ ] בדיקות ביצועים בסיסיות
-- [ ] בדיקות error handling
+### 🧪 **Testing and Validation**
+- [ ] Unit tests
+- [ ] Model tests
+- [ ] Service tests
+- [ ] Provider tests
+- [ ] Integration tests
+- [ ] Basic performance tests
+- [ ] Error handling tests
 
-### 📝 **תיעוד**
-- [ ] עדכון תיעוד API
-- [ ] תיעוד פונקציות חדשות
-- [ ] מדריך שימוש למפתחים
-- [ ] מדריך אינטגרציה
+### 📝 **Documentation**
+- [ ] Updating API documentation
+- [ ] Documenting new functions
+- [ ] Developer usage guide
+- [ ] Integration guide
 
 ---
 
-## 🚀 **משימות פיתוח - שלב ב (Stage-2)**
+## 🚀 **Development Tasks - Stage 2**
 
-### 🔐 **אבטחה מתקדם**
-- [ ] הצפנת נתונים רגישים
-- [ ] מערכת הרשאות מתקדמת
+### 🔐 **Advanced Security**
+- [ ] Encrypting sensitive data
+- [ ] Advanced permissions system
 - [ ] API key management
-- [ ] Rate limiting מתקדם
+- [ ] Advanced rate limiting
 - [ ] Audit logging
 
-### 📈 **ביצועים ו-Scaling**
-- [ ] מערכת Cache מתקדמת
+### 📈 **Performance and Scaling**
+- [ ] Advanced cache system
   - [ ] Redis integration
   - [ ] Cache invalidation strategies
   - [ ] Distributed caching
@@ -93,42 +93,42 @@
 - [ ] Load balancing
 - [ ] Horizontal scaling
 
-### 🔄 **מערכת רענון מתקדמת**
+### 🔄 **Advanced Refresh System**
 - [ ] Smart refresh algorithms
 - [ ] Market hours detection
 - [ ] Holiday calendar integration
 - [ ] Dynamic refresh rates
 - [ ] Priority-based refresh
 
-### 📊 **מערכת התראות חכמה**
+### 📊 **Smart Alert System**
 - [ ] Price alerts
 - [ ] Volume alerts
 - [ ] Technical indicators
 - [ ] Custom alert conditions
 - [ ] Alert delivery methods
 
-### 🔍 **Monitoring מתקדם**
+### 🔍 **Advanced Monitoring**
 - [ ] Real-time monitoring dashboard
 - [ ] Performance metrics
 - [ ] Error tracking
 - [ ] Usage analytics
 - [ ] Health checks
 
-### 🎨 **UI מתקדם**
+### 🎨 **Advanced UI**
 - [ ] Charts and graphs
 - [ ] Real-time updates
 - [ ] Advanced filtering
 - [ ] Custom dashboards
 - [ ] Mobile optimization
 
-### 🔌 **Providers נוספים**
+### 🔌 **Additional Providers**
 - [ ] Interactive Brokers (IBKR)
 - [ ] Alpha Vantage
 - [ ] Polygon.io
 - [ ] IEX Cloud
 - [ ] Custom data sources
 
-### 🧪 **בדיקות מתקדמות**
+### 🧪 **Advanced Testing**
 - [ ] Load testing
 - [ ] Stress testing
 - [ ] Security testing
@@ -137,44 +137,44 @@
 
 ---
 
-## 📅 **לוח זמנים מוצע**
+## 📅 **Proposed Timeline**
 
-### **שלב א (Stage-1) - 4-6 שבועות**
-- **שבוע 1-2**: תשתית בסיסית + אינטגרציה
-- **שבוע 3-4**: ממשק משתמש + מערכת רענון
-- **שבוע 5-6**: בדיקות + תיעוד + ייצוב
+### **Stage 1 - 4-6 weeks**
+- **Weeks 1-2**: Basic infrastructure + integration
+- **Weeks 3-4**: User interface + refresh system
+- **Weeks 5-6**: Testing + documentation + stabilization
 
-### **שלב ב (Stage-2) - 8-12 שבועות**
-- **שבוע 1-3**: אבטחה + ביצועים
-- **שבוע 4-6**: התראות + monitoring
-- **שבוע 7-9**: UI מתקדם + providers נוספים
-- **שבוע 10-12**: בדיקות מתקדמות + ייצוב
-
----
-
-## 🎯 **קריטריונים להצלחה**
-
-### **שלב א**
-- [ ] מערכת פועלת יציבה
-- [ ] נתונים מתעדכנים אוטומטית
-- [ ] ממשק משתמש פונקציונלי
-- [ ] תיעוד מלא
-- [ ] בדיקות עוברות
-
-### **שלב ב**
-- [ ] ביצועים גבוהים
-- [ ] אבטחה מלאה
-- [ ] מערכת התראות פעילה
-- [ ] UI מתקדם
-- [ ] תמיכה במספר providers
+### **Stage 2 - 8-12 weeks**
+- **Weeks 1-3**: Security + performance
+- **Weeks 4-6**: Alerts + monitoring
+- **Weeks 7-9**: Advanced UI + additional providers
+- **Weeks 10-12**: Advanced testing + stabilization
 
 ---
 
-## 📝 **הערות חשובות**
+## 🎯 **Success Criteria**
 
-1. **עדיפות**: שלב א חייב להיות יציב לפני תחילת שלב ב
-2. **בדיקות**: כל פיצ'ר חדש חייב לעבור בדיקות מלאות
-3. **תיעוד**: כל שינוי חייב להיות מתועד
-4. **גיבויים**: לפני כל שינוי בבסיס הנתונים
-5. **אינטגרציה**: בדיקת תקינות עם המערכת הקיימת
+### **Stage 1**
+- [ ] System operates stably
+- [ ] Data updates automatically
+- [ ] Functional user interface
+- [ ] Complete documentation
+- [ ] Tests pass
+
+### **Stage 2**
+- [ ] High performance
+- [ ] Complete security
+- [ ] Active alert system
+- [ ] Advanced UI
+- [ ] Support for multiple providers
+
+---
+
+## 📝 **Important Notes**
+
+1. **Priority**: Stage 1 must be stable before starting Stage 2
+2. **Testing**: Every new feature must pass full tests
+3. **Documentation**: Every change must be documented
+4. **Backups**: Before any database changes
+5. **Integration**: Testing integrity with existing system
 

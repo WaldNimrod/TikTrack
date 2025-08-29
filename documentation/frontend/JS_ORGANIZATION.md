@@ -60,7 +60,7 @@ trading-ui/scripts/
 // Show delete warning
 window.showDeleteWarning = function(message, onConfirm) {
     showWarning({
-        title: 'אישור מחיקה',
+        title: 'Delete Confirmation',
         message: message,
         type: 'delete',
         onConfirm: onConfirm
@@ -93,10 +93,10 @@ window.showValidationWarning = function(message, fieldName) {
 // Alert condition translation
 function translateAlertCondition(condition) {
     const translations = {
-        'price': 'מחיר',
-        'change': 'שינוי',
-        'ma': 'ממוצע נע',
-        'volume': 'נפח'
+        'price': 'Price',
+'change': 'Change',
+        'ma': 'Moving Average',
+'volume': 'Volume'
     };
     return translations[condition] || condition;
 }
@@ -104,10 +104,10 @@ function translateAlertCondition(condition) {
 // Trade status translation
 function translateTradeStatus(status) {
     const translations = {
-        'open': 'פתוח',
-        'closed': 'סגור',
-        'pending': 'ממתין',
-        'cancelled': 'בוטל'
+        'open': 'Open',
+'closed': 'Closed',
+'pending': 'Pending',
+'cancelled': 'Cancelled'
     };
     return translations[status] || status;
 }
@@ -115,7 +115,7 @@ function translateTradeStatus(status) {
 // Currency display formatting
 function getCashFlowCurrencyDisplay(currencyId) {
     const currency = currencies.find(c => c.id === currencyId);
-    return currency ? `${currency.symbol} - ${currency.name}` : 'לא נבחר';
+    return currency ? `${currency.symbol} - ${currency.name}` : 'Not Selected';
 }
 ```
 
@@ -162,7 +162,7 @@ async function loadCashFlows() {
         renderCashFlowsTable(cashFlows);
     } catch (error) {
         console.error('Error loading cash flows:', error);
-        window.showErrorNotification('שגיאה בטעינת תזרימי מזומנים');
+        window.showErrorNotification('Error loading cash flows');
     }
 }
 
@@ -190,7 +190,7 @@ function renderCashFlowsTable(cashFlows) {
 // Show delete warning with centralized system
 function showDeleteCashFlowModal(id) {
     window.showDeleteWarning(
-        'האם אתה בטוח שברצונך למחוק את תזרים המזומנים הזה?',
+        'Are you sure you want to delete this cash flow?',
         () => confirmDeleteCashFlow(id)
     );
 }
@@ -219,7 +219,7 @@ async function loadAccounts() {
         renderAccountsTable(accounts);
     } catch (error) {
         console.error('Error loading accounts:', error);
-        window.showErrorNotification('שגיאה בטעינת חשבונות');
+        window.showErrorNotification('Error loading accounts');
     }
 }
 
@@ -255,7 +255,7 @@ async function loadAlerts() {
         renderAlertsTable(alerts);
     } catch (error) {
         console.error('Error loading alerts:', error);
-        window.showErrorNotification('שגיאה בטעינת התראות');
+        window.showErrorNotification('Error loading alerts');
     }
 }
 
@@ -304,7 +304,7 @@ async function apiCall() {
         return await response.json();
     } catch (error) {
         console.error('API Error:', error);
-        window.showErrorNotification('שגיאה בפעולה');
+        window.showErrorNotification('Error in operation');
         throw error;
     }
 }

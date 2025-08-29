@@ -291,8 +291,8 @@ function colorAmount(amount, displayText = null) {
 function showNotification(message, type = 'info') {
     // שימוש במערכת ההתראות הגלובלית
     if (typeof window.notificationSystem !== 'undefined' && window.notificationSystem.showNotification) {
-        // שימוש במערכת ההתראות הגלובלית
-        window.notificationSystem.showNotification('התראה', message, type);
+        // שימוש במערכת ההתראות הגלובלית - סדר נכון: message, type, title
+        window.notificationSystem.showNotification(message, type, 'התראה');
     } else {
         // Fallback להצגת התראה פשוטה
         console.log(`[${type.toUpperCase()}] ${message}`);
@@ -1143,21 +1143,23 @@ function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null
 
     console.log('🔧 showDeleteWarning called with:', { itemType, itemName, displayName });
 
-    // שימוש במערכת ההתראות הגלובלית
-    if (window.showConfirmationDialog) {
-        window.showConfirmationDialog(
-            'מחיקת פריט',
-            `האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?`,
-            'מחק',
-            'ביטול',
-            onConfirm,
-            onCancel
-        );
+    // שימוש במערכת ההתראות הגלובלית החדשה
+    if (typeof window.showDeleteWarning === 'function' && window.showDeleteWarning !== showDeleteWarning) {
+        window.showDeleteWarning(itemType, itemName, displayName, onConfirm, onCancel);
     } else {
-        // Fallback to simple confirm
-        const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?`);
-        if (confirmed && onConfirm) {
-            onConfirm();
+        // Fallback to notification system
+        if (typeof window.showConfirmationDialog === 'function') {
+            const title = `מחיקת ${displayName}`;
+            const message = `האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?\n\nפעולה זו אינה ניתנת לביטול.`;
+            window.showConfirmationDialog(title, message, onConfirm, onCancel);
+        } else {
+            // Fallback to simple confirm
+            const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?`);
+            if (confirmed && onConfirm) {
+                onConfirm();
+            } else if (!confirmed && onCancel) {
+                onCancel();
+            }
         }
     }
 }
@@ -1178,7 +1180,7 @@ function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null
 
     console.log('🔧 showCancelWarning called with:', { itemType, itemName, itemTypeDisplay });
 
-    // Try to use the warning system, fallback to simple confirm
+    // Try to use the warning system, fallback to notification system
     try {
         return showWarning('CANCEL', {
             itemType: itemTypeDisplay,
@@ -1187,10 +1189,17 @@ function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null
     } catch (error) {
         console.error('Error in showCancelWarning, using fallback:', error);
 
-        // Fallback to simple confirm
-        const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`);
-        if (confirmed && onConfirm) {
-            onConfirm();
+        // Fallback to notification system
+        if (typeof window.showConfirmationDialog === 'function') {
+            const title = `ביטול ${itemTypeDisplay}`;
+            const message = `האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`;
+            window.showConfirmationDialog(title, message, onConfirm, onCancel);
+        } else {
+            // Fallback to simple confirm
+            const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`);
+            if (confirmed && onConfirm) {
+                onConfirm();
+            }
         }
     }
 }
@@ -1226,14 +1235,21 @@ function showLinkedItemsWarning(itemType, linkedCount, onConfirm = null, onCance
         createLinkedItemsWarningModal(itemTypeDisplay, linkedCount, onConfirm, onCancel);
     } catch (error) {
         console.error('🔧❌ Error calling createLinkedItemsWarningModal:', error);
-        // Fallback to simple alert
-        if (confirm(`חשבון זה מקושר ל-${linkedCount} פריטים במערכת. האם אתה בטוח שברצונך למחוק אותו?`)) {
-            if (onConfirm && typeof onConfirm === 'function') {
-                onConfirm();
-            }
+        // Fallback to notification system
+        if (typeof window.showConfirmationDialog === 'function') {
+            const title = `פריטים מקושרים`;
+            const message = `${itemTypeDisplay} זה מקושר ל-${linkedCount} פריטים במערכת.\n\nהאם אתה בטוח שברצונך למחוק אותו?`;
+            window.showConfirmationDialog(title, message, onConfirm, onCancel);
         } else {
-            if (onCancel && typeof onCancel === 'function') {
-                onCancel();
+            // Fallback to simple alert
+            if (confirm(`${itemTypeDisplay} זה מקושר ל-${linkedCount} פריטים במערכת. האם אתה בטוח שברצונך למחוק אותו?`)) {
+                if (onConfirm && typeof onConfirm === 'function') {
+                    onConfirm();
+                }
+            } else {
+                if (onCancel && typeof onCancel === 'function') {
+                    onCancel();
+                }
             }
         }
     }
@@ -1456,9 +1472,9 @@ function createLinkedItemsWarningModal(itemTypeDisplay, linkedCount, onConfirm, 
     console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
     console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
     console.log('🔧🔧🔧 ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
+    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
     console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
     console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
     console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
@@ -1472,11 +1488,14 @@ function createLinkedItemsWarningModal(itemTypeDisplay, linkedCount, onConfirm, 
 /**
  * Show validation warning
  */
-function showValidationWarning(field, message) {
-    console.log('🔧 showValidationWarning called with:', { field, message });
+function showValidationWarningLegacy(field, message) {
+    console.log('🔧 showValidationWarningLegacy called with:', { field, message });
 
-    // Use our notification system instead of alert
-    if (window.showErrorNotification) {
+    // Use the global validation warning system from notification-system.js if available
+    if (typeof window.notificationSystem !== 'undefined' && window.notificationSystem.showValidationWarning) {
+        window.notificationSystem.showValidationWarning(field, message);
+    } else if (window.showErrorNotification) {
+        // Use our notification system instead of alert
         window.showErrorNotification('שגיאת וולידציה', `${message}`);
     } else {
         // Fallback to alert if notification system is not available
@@ -1502,7 +1521,7 @@ window.showWarning = showWarning;
 window.showDeleteWarning = showDeleteWarning;
 window.showCancelWarning = showCancelWarning;
 window.showLinkedItemsWarning = showLinkedItemsWarning;
-window.showValidationWarning = showValidationWarning;
+// Don't export showValidationWarning here - it's already exported from notification-system.js
 window.getWarningConfig = getWarningConfig;
 window.createWarningModal = createWarningModal;
 window.handleWarningAction = handleWarningAction;

@@ -32,7 +32,7 @@
     <script src="/scripts/active-alerts-component.js"></script>
 
     <!-- API test script -->
-    <script src="/external_data_integration_client/scripts/api_test.js"></script>
+    <!-- Functions embedded directly in page -->
 </head>
 
 <body>
@@ -310,9 +310,6 @@
 
     <!-- JavaScript Files -->
     <script src="/scripts/header-system.js"></script>
-    <script src="/external_data_integration_client/scripts/base-tester.js"></script>
-    <script src="/external_data_integration_client/scripts/utils.js"></script>
-    <script src="/external_data_integration_client/scripts/api_test.js"></script>
     
     <script>
         // אתחול HeaderSystem
@@ -320,6 +317,472 @@
             if (window.headerSystem && !window.headerSystem.isInitialized) {
                 window.headerSystem.init();
             }
+        });
+
+        // ===== פונקציות בדיקת API =====
+        
+        // משתנים גלובליים
+        let apiTestResults = [];
+
+        // פונקציה לבדיקת GET
+        function testGetRequest() {
+            console.log('🔗 Testing GET request...');
+            
+            const endpoints = [
+                '/api/v1/tickers/',
+                '/api/v1/accounts/',
+                '/api/v1/trades/',
+                '/api/v1/alerts/',
+                '/api/v1/cash_flows/'
+            ];
+
+            const results = {};
+            let successCount = 0;
+            
+            endpoints.forEach(endpoint => {
+                fetch(endpoint)
+                    .then(response => {
+                        results[endpoint] = {
+                            status: response.status,
+                            ok: response.ok,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        if (response.ok) {
+                            successCount++;
+                        }
+                        
+                        // בדיקה אם כל הבדיקות הושלמו
+                        if (Object.keys(results).length === endpoints.length) {
+                            const allSuccess = successCount === endpoints.length;
+                            addApiResult('GET Request', allSuccess ? 'success' : 'warning', 
+                                `${successCount}/${endpoints.length} נקודות קצה פעילות`, 
+                                results
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        results[endpoint] = {
+                            status: 'error',
+                            ok: false,
+                            error: error.message,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        // בדיקה אם כל הבדיקות הושלמו
+                        if (Object.keys(results).length === endpoints.length) {
+                            const allSuccess = successCount === endpoints.length;
+                            addApiResult('GET Request', allSuccess ? 'success' : 'warning', 
+                                `${successCount}/${endpoints.length} נקודות קצה פעילות`, 
+                                results
+                            );
+                        }
+                    });
+            });
+        }
+
+        // פונקציה לבדיקת POST
+        function testPostRequest() {
+            console.log('📤 Testing POST request...');
+            
+            const testData = {
+                test: 'data',
+                timestamp: new Date().toISOString()
+            };
+
+            fetch('/api/v1/test/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(testData)
+            })
+            .then(response => {
+                const result = {
+                    status: response.status,
+                    ok: response.ok,
+                    timestamp: new Date().toISOString()
+                };
+                
+                addApiResult('POST Request', result.ok ? 'success' : 'warning', 
+                    `POST request completed with status ${response.status}`, 
+                    result
+                );
+            })
+            .catch(error => {
+                addApiResult('POST Request', 'error', 
+                    `POST request failed: ${error.message}`, 
+                    { error: error.message, timestamp: new Date().toISOString() }
+                );
+            });
+        }
+
+        // פונקציה לבדיקת אימות
+        function testAuthentication() {
+            console.log('🔐 Testing authentication...');
+            
+            const token = localStorage.getItem('authToken');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            fetch('/api/v1/accounts/', {
+                method: 'GET',
+                headers: headers
+            })
+            .then(response => {
+                const result = {
+                    status: response.status,
+                    ok: response.ok,
+                    hasToken: !!token,
+                    timestamp: new Date().toISOString()
+                };
+                
+                addApiResult('Authentication', result.ok ? 'success' : 'warning', 
+                    `Authentication test completed - Token: ${result.hasToken ? 'Yes' : 'No'}`, 
+                    result
+                );
+            })
+            .catch(error => {
+                addApiResult('Authentication', 'error', 
+                    `Authentication test failed: ${error.message}`, 
+                    { error: error.message, timestamp: new Date().toISOString() }
+                );
+            });
+        }
+
+        // פונקציה לבדיקת הגבלת קצב
+        function testRateLimiting() {
+            console.log('⏱️ Testing rate limiting...');
+            
+            const requests = [];
+            const maxRequests = 10;
+            
+            for (let i = 0; i < maxRequests; i++) {
+                requests.push(
+                    fetch('/api/v1/tickers/')
+                        .then(response => ({
+                            request: i + 1,
+                            status: response.status,
+                            ok: response.ok,
+                            timestamp: new Date().toISOString()
+                        }))
+                        .catch(error => ({
+                            request: i + 1,
+                            status: 'error',
+                            ok: false,
+                            error: error.message,
+                            timestamp: new Date().toISOString()
+                        }))
+                );
+            }
+            
+            Promise.all(requests)
+                .then(results => {
+                    const successCount = results.filter(r => r.ok).length;
+                    const rateLimited = results.some(r => r.status === 429);
+                    
+                    addApiResult('Rate Limiting', rateLimited ? 'warning' : 'success', 
+                        `${successCount}/${maxRequests} בקשות הצליחו${rateLimited ? ' - הגבלת קצב זוהתה' : ''}`, 
+                        results
+                    );
+                });
+        }
+
+        // פונקציה לבדיקת טיפול בשגיאות
+        function testErrorHandling() {
+            console.log('⚠️ Testing error handling...');
+            
+            // בדיקת נקודת קצה לא קיימת
+            fetch('/api/v1/nonexistent/')
+                .then(response => {
+                    const result = {
+                        status: response.status,
+                        ok: response.ok,
+                        expected: '404',
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    addApiResult('Error Handling', result.status === 404 ? 'success' : 'warning', 
+                        `Error handling test - Status: ${response.status}`, 
+                        result
+                    );
+                })
+                .catch(error => {
+                    addApiResult('Error Handling', 'error', 
+                        `Error handling test failed: ${error.message}`, 
+                        { error: error.message, timestamp: new Date().toISOString() }
+                    );
+                });
+        }
+
+        // פונקציה לבדיקת ביצועים
+        function testPerformance() {
+            console.log('⚡ Testing performance...');
+            
+            const startTime = performance.now();
+            
+            fetch('/api/v1/tickers/')
+                .then(response => response.json())
+                .then(data => {
+                    const endTime = performance.now();
+                    const duration = endTime - startTime;
+                    
+                    const result = {
+                        duration: duration.toFixed(2),
+                        dataSize: JSON.stringify(data).length,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    const status = duration < 1000 ? 'success' : duration < 3000 ? 'warning' : 'error';
+                    
+                    addApiResult('Performance', status, 
+                        `בקשה הושלמה תוך ${duration.toFixed(2)}ms`, 
+                        result
+                    );
+                })
+                .catch(error => {
+                    addApiResult('Performance', 'error', 
+                        `Performance test failed: ${error.message}`, 
+                        { error: error.message, timestamp: new Date().toISOString() }
+                    );
+                });
+        }
+
+        // פונקציה לבדיקת תפוקה
+        function testThroughput() {
+            console.log('📊 Testing throughput...');
+            
+            const startTime = performance.now();
+            const requests = [];
+            const maxRequests = 5;
+            
+            for (let i = 0; i < maxRequests; i++) {
+                requests.push(
+                    fetch('/api/v1/tickers/')
+                        .then(response => response.json())
+                        .then(data => ({
+                            request: i + 1,
+                            success: true,
+                            dataSize: JSON.stringify(data).length
+                        }))
+                        .catch(error => ({
+                            request: i + 1,
+                            success: false,
+                            error: error.message
+                        }))
+                );
+            }
+            
+            Promise.all(requests)
+                .then(results => {
+                    const endTime = performance.now();
+                    const duration = endTime - startTime;
+                    const successCount = results.filter(r => r.success).length;
+                    const totalDataSize = results.reduce((sum, r) => sum + (r.dataSize || 0), 0);
+                    
+                    const result = {
+                        duration: duration.toFixed(2),
+                        requests: maxRequests,
+                        successCount: successCount,
+                        totalDataSize: totalDataSize,
+                        requestsPerSecond: (maxRequests / (duration / 1000)).toFixed(2),
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    addApiResult('Throughput', successCount === maxRequests ? 'success' : 'warning', 
+                        `${successCount}/${maxRequests} בקשות הצליחו - ${result.requestsPerSecond} בקשות/שנייה`, 
+                        result
+                    );
+                });
+        }
+
+        // פונקציה לבדיקת בקשה מותאמת
+        function testCustomRequest() {
+            console.log('🔧 Testing custom request...');
+            
+            const customJsonElement = document.getElementById('custom-json');
+            if (!customJsonElement) {
+                addApiResult('Custom Request', 'error', 'אלמנט JSON מותאם לא נמצא');
+                return;
+            }
+
+            const customData = customJsonElement.value.trim();
+            if (!customData) {
+                addApiResult('Custom Request', 'warning', 'אין נתוני JSON מותאמים');
+                return;
+            }
+
+            try {
+                const parsedData = JSON.parse(customData);
+                
+                fetch('/api/v1/test/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(parsedData)
+                })
+                .then(response => {
+                    const result = {
+                        status: response.status,
+                        ok: response.ok,
+                        dataSize: customData.length,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    addApiResult('Custom Request', result.ok ? 'success' : 'warning', 
+                        `בקשה מותאמת הושלמה עם סטטוס ${response.status}`, 
+                        result
+                    );
+                })
+                .catch(error => {
+                    addApiResult('Custom Request', 'error', 
+                        `בקשה מותאמת נכשלה: ${error.message}`, 
+                        { error: error.message, timestamp: new Date().toISOString() }
+                    );
+                });
+            } catch (error) {
+                addApiResult('Custom Request', 'error', 
+                    `JSON לא תקין: ${error.message}`, 
+                    { error: error.message, timestamp: new Date().toISOString() }
+                );
+            }
+        }
+
+        // פונקציה להוספת תוצאה
+        function addApiResult(test, status, message, data = null) {
+            console.log('📝 Adding API result:', { test, status, message });
+            
+            const result = {
+                timestamp: new Date().toLocaleTimeString('he-IL'),
+                test: test,
+                status: status,
+                message: message,
+                data: data
+            };
+            
+            apiTestResults.push(result);
+            displayApiResult(result);
+        }
+
+        // פונקציה לתצוגת תוצאה
+        function displayApiResult(result) {
+            const resultsContainer = document.getElementById('api-results');
+            if (!resultsContainer) {
+                console.error('❌ Results container not found');
+                return;
+            }
+
+            const resultElement = document.createElement('div');
+            resultElement.className = `alert alert-${getStatusClass(result.status)} mb-2 fade-in`;
+            
+            let content = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${result.test}</strong> - ${result.message}
+                        <br><small class="text-muted">${result.timestamp}</small>
+                    </div>
+                    <span class="badge bg-${getStatusClass(result.status)}">
+                        ${getStatusText(result.status)}
+                    </span>
+                </div>
+            `;
+            
+            if (result.data) {
+                content += `
+                    <details class="mt-2">
+                        <summary>פרטי הנתונים</summary>
+                        <pre class="mt-2 bg-light p-2 rounded"><code>${JSON.stringify(result.data, null, 2)}</code></pre>
+                    </details>
+                `;
+            }
+            
+            resultElement.innerHTML = content;
+            resultsContainer.appendChild(resultElement);
+            
+            // Scroll to bottom
+            resultsContainer.scrollTop = resultsContainer.scrollHeight;
+            
+            console.log('✅ API result displayed');
+        }
+
+        // פונקציה לקבלת מחלקת סטטוס
+        function getStatusClass(status) {
+            switch (status) {
+                case 'success': return 'success';
+                case 'error': return 'danger';
+                case 'warning': return 'warning';
+                case 'info': return 'info';
+                default: return 'secondary';
+            }
+        }
+
+        // פונקציה לקבלת טקסט סטטוס
+        function getStatusText(status) {
+            switch (status) {
+                case 'success': return 'הצלחה';
+                case 'error': return 'שגיאה';
+                case 'warning': return 'אזהרה';
+                case 'info': return 'מידע';
+                default: return 'לא ידוע';
+            }
+        }
+
+        // פונקציה לניקוי לוגים
+        function clearApiLogs() {
+            const resultsContainer = document.getElementById('api-results');
+            const logsContainer = document.getElementById('api-test-logs');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '';
+                apiTestResults = [];
+                console.log('🧹 API logs cleared');
+            }
+            if (logsContainer) {
+                logsContainer.innerHTML = '';
+            }
+        }
+
+        // פונקציה לעריכת JSON מותאם
+        function editCustomJson() {
+            const label = document.getElementById('custom-json-label');
+            const textarea = document.getElementById('custom-json');
+            if (label && textarea) {
+                label.style.display = 'none';
+                textarea.style.display = 'block';
+                textarea.focus();
+            }
+        }
+
+        // אתחול event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // אתחול עריכת JSON מותאם
+            const customTextarea = document.getElementById('custom-json');
+            const customLabel = document.getElementById('custom-json-label');
+            if (customTextarea && customLabel) {
+                customTextarea.addEventListener('blur', function() {
+                    customLabel.textContent = this.value || 'אין נתונים';
+                    customLabel.style.display = 'block';
+                    this.style.display = 'none';
+                });
+            }
+
+            // הוספת event listeners לכפתורים
+            document.getElementById('test-get')?.addEventListener('click', testGetRequest);
+            document.getElementById('test-post')?.addEventListener('click', testPostRequest);
+            document.getElementById('test-auth')?.addEventListener('click', testAuthentication);
+            document.getElementById('test-rate-limit')?.addEventListener('click', testRateLimiting);
+            document.getElementById('test-error-handling')?.addEventListener('click', testErrorHandling);
+            document.getElementById('test-performance')?.addEventListener('click', testPerformance);
+            document.getElementById('test-throughput')?.addEventListener('click', testThroughput);
+            document.getElementById('test-custom-request')?.addEventListener('click', testCustomRequest);
+
+            // הוספת הודעה ראשונית
+            addApiResult('System', 'info', 'דף בדיקת API נטען בהצלחה');
         });
     </script>
 </body>

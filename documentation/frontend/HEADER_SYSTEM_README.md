@@ -23,7 +23,7 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 - **Universal Search**: Search across all columns except actions
 - **Filter Reset/Clear**: Reset to preferences or clear all filters
 - **Fixed Width UI**: Prevents layout shifts during filter operations
-- **Enhanced Date Logic**: Fixed date range calculations and "כל זמן" positioning
+- **Enhanced Date Logic**: Fixed date range calculations and "All Time" positioning
 
 ### 3. Filter Display Management
 - **Real-time Updates**: Filter display updates automatically
@@ -134,29 +134,29 @@ Returns filter configuration for different filter types:
 function getFilterConfig(filterType) {
     const configs = {
         'status': {
-            columnName: 'סטטוס',
-            containerIdKeywords: ['status', 'סטטוס'],
+            columnName: 'Status',
+containerIdKeywords: ['status', 'Status'],
             knownContainers: ['tradesContainer', 'designsContainer', 'alertsContainer', 'executionsContainer', 'testContainer'],
-            cellValues: ['פתוח', 'סגור', 'מבוטל', 'פעיל', 'לא פעיל', 'ממתין'],
+            cellValues: ['Open', 'Closed', 'Cancelled', 'Active', 'Inactive', 'Pending'],
             dataField: 'status'
         },
         'type': {
-            columnName: 'טיפוס',
-            containerIdKeywords: ['type', 'סוג', 'טיפוס'],
+            columnName: 'Type',
+            containerIdKeywords: ['type', 'Type'],
             knownContainers: ['tradesContainer', 'designsContainer', 'testContainer'],
-            cellValues: ['השקעה', 'סווינג', 'פסיבי', 'קנייה', 'מכירה'],
+            cellValues: ['Investment', 'Swing', 'Passive', 'Buy', 'Sell'],
             dataField: 'investment-type'
         },
         'account': {
-            columnName: 'חשבון',
-            containerIdKeywords: ['account', 'חשבון'],
+            columnName: 'Account',
+            containerIdKeywords: ['account', 'Account'],
             knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer'],
             cellValues: [], // Dynamic from server
             dataField: 'account'
         },
         'date': {
-            columnName: 'תאריך',
-            containerIdKeywords: ['date', 'תאריך'],
+            columnName: 'Date',
+            containerIdKeywords: ['date', 'Date'],
             knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer'],
             cellValues: [], // Dates are dynamic
             dataField: 'created-at',
@@ -164,12 +164,12 @@ function getFilterConfig(filterType) {
         },
         'search': {
             columnName: 'search',
-            containerIdKeywords: ['search', 'חיפוש'],
+            containerIdKeywords: ['search', 'search'],
             knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer'],
             cellValues: [],
             dataField: 'search',
             searchAllColumns: true,
-            excludeColumns: ['פעולות']
+            excludeColumns: ['Actions']
         }
     };
     return configs[filterType];
@@ -183,7 +183,7 @@ function isDateInRange(dateString, dateRange) {
     // Converts date string to Date object
     // Calculates range based on dateRange type
     // Returns true if date is within range
-    // Handles: היום, אתמול, השבוע, שבוע, MTD, YTD, שנה, etc.
+    // Handles: Today, Yesterday, This Week, Week, MTD, YTD, Year, etc.
 }
 ```
 
@@ -192,7 +192,7 @@ Handles date range selection with Hebrew display:
 ```javascript
 function selectDateRangeOption(dateRange) {
     // Updates display text with calculated date ranges
-    // Handles special cases like "כל זמן"
+    // Handles special cases like "All Time"
     // Applies filter to all relevant tables
     // Updates visual selection state
 }
@@ -230,10 +230,10 @@ Add the header system to any HTML page:
             <table>
                 <thead>
                     <tr>
-                        <th>סטטוס</th>
-                        <th>סוג</th>
-                        <th>חשבון</th>
-                        <th>תאריך</th>
+                        <th>Status</th>
+                        <th>Type</th>
+                        <th>Account</th>
+                        <th>Date</th>
                         <!-- other headers -->
                     </tr>
                 </thead>
@@ -280,41 +280,41 @@ Tables must be wrapped in containers with specific IDs:
 Filters work by matching column headers:
 
 **Status Filter:**
-- Header: `סטטוס`
-- Values: `פתוח`, `סגור`, `מבוטל`, `פעיל`, `לא פעיל`, `ממתין`
+- Header: `Status`
+- Values: `Open`, `Closed`, `Cancelled`, `Active`, `Inactive`, `Pending`
 
 **Type Filter:**
-- Header: `סוג` or `טיפוס`
-- Values: `השקעה`, `סווינג`, `פסיבי`, `קנייה`, `מכירה`
+- Header: `Type` or `Type`
+- Values: `Investment`, `Swing`, `Passive`, `Buy`, `Sell`
 
 **Account Filter:**
-- Header: `חשבון`
+- Header: `Account`
 - Values: Dynamic from server (e.g., "Trading Account 1", "Investment Account")
 
 **Date Filter:**
-- Header: `תאריך`
+- Header: `Date`
 - Values: Date strings in format "YYYY-MM-DD"
 
 **Search Filter:**
-- Searches all columns except `פעולות` (actions)
+- Searches all columns except `Actions` (actions)
 
 ### 3. Filter Behavior
 
 #### Multi-Select Filters
 Status and Type filters support multiple selections:
 - Click to select/deselect items
-- "הכול" is automatically deselected when specific items are chosen
-- "הכול" is re-selected when no specific items remain
+- "All" is automatically deselected when specific items are chosen
+- "All" is re-selected when no specific items remain
 
 #### Date Filter Options (ENHANCED)
-- **כל זמן** - Shows all records (FIRST in list)
-- **השבוע** - From start of calendar week to today
-- **שבוע** - Last 7 days
+- **All Time** - Shows all records (FIRST in list)
+- **This Week** - From start of calendar week to today
+- **Week** - Last 7 days
 - **MTD** - From start of calendar month to today
 - **YTD** - From start of calendar year to today
-- **שנה** - Last 365 days
-- **30 יום**, **60 יום**, **90 יום** - Last X days
-- **שבוע קודם**, **חודש קודם**, **שנה קודמת** - Previous periods
+- **Year** - Last 365 days
+- **30 Days**, **60 Days**, **90 Days** - Last X days
+- **Week Previous**, **Previous Month**, **Year Previous** - Previous periods
 
 #### Account Filter
 - Loads accounts dynamically from server
@@ -442,7 +442,7 @@ Key CSS classes for customization:
 1. Verify date format is "YYYY-MM-DD"
 2. Check if date column is first date column in table
 3. Ensure notificationsContainer is included for notifications table
-4. "כל זמן" now appears FIRST in the list
+4. "All Time" now appears FIRST in the list
 5. Date range calculations are now correct
 
 #### Account Filter Issues
@@ -451,7 +451,7 @@ Key CSS classes for customization:
 3. Check localStorage for cached account data
 
 #### Multi-Select Not Working
-1. Check if "הכול" item exists in filter menu
+1. Check if "All" item exists in filter menu
 2. Verify click handlers are properly attached
 3. Check console for JavaScript errors
 
@@ -470,13 +470,13 @@ console.log('Filter states:', {
 console.log('Visible containers:', window.getAllVisibleContainers());
 
 // Test filter application
-window.applyTableFilter('status', ['פתוח']);
+window.applyTableFilter('status', ['Open']);
 ```
 
 ## Version History
 
 ### Version 4.1 (August 28, 2025) - CURRENT
-- **ENHANCED DATE FILTERING**: Fixed date range calculations and "כל זמן" positioning
+- **ENHANCED DATE FILTERING**: Fixed date range calculations and "All Time" positioning
 - **NOTIFICATIONS SUPPORT**: Added notificationsContainer to date filter
 - **IMPROVED LOGIC**: Enhanced date range logic for all options
 - **UI STABILITY**: Fixed width elements prevent layout shifts

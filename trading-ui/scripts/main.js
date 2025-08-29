@@ -445,6 +445,7 @@ window.toggleTopSectionGlobal = function () {
 
     // Save state to localStorage
     localStorage.setItem(storageKey, !isCollapsed);
+    console.log('🔧 Saved top section state:', { storageKey, collapsed: !isCollapsed });
   }
 };
 
@@ -572,20 +573,26 @@ window.restoreAllSectionStates = function () {
   }
 
   const topSectionCollapsed = localStorage.getItem(topSectionKey) === 'true';
+  console.log('🔧 Restoring top section state:', { topSectionKey, topSectionCollapsed });
   const topSection = document.querySelector('.top-section .section-body');
   const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
   const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
 
   if (topSection && topToggleBtn && topIcon) {
+    console.log('🔧 Found top section elements, applying state:', topSectionCollapsed);
     if (topSectionCollapsed) {
       topSection.classList.add('collapsed');
       topSection.style.display = 'none';
       topIcon.textContent = '▼';
+      console.log('🔧 Top section collapsed');
     } else {
       topSection.classList.remove('collapsed');
       topSection.style.display = 'block';
       topIcon.textContent = '▲';
+      console.log('🔧 Top section expanded');
     }
+  } else {
+    console.log('🔧 Top section elements not found:', { topSection: !!topSection, topToggleBtn: !!topToggleBtn, topIcon: !!topIcon });
   }
 
   // Restore main section state

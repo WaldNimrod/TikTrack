@@ -138,24 +138,24 @@ The system uses centralized column mappings in `table-mappings.js` to ensure con
 ```javascript
 const TABLE_COLUMN_MAPPINGS = {
     'accounts': [
-        'id',              // 0 - מזהה
-        'name',            // 1 - שם
-        'status',          // 2 - סטטוס
-        'currency',        // 3 - מטבע
-        'cash_balance',    // 4 - יתרה במזומן
-        'created_at'       // 5 - נוצר ב
+        'id',              // 0 - ID
+'name',            // 1 - Name
+'status',          // 2 - Status
+'currency',        // 3 - Currency
+'cash_balance',    // 4 - Cash Balance
+        'created_at'       // 5 - Created At
     ],
     'trades': [
-        'ticker_symbol',   // 0 - טיקר
-        'status',          // 1 - סטטוס
-        'investment_type', // 2 - סוג
-        'side',            // 3 - צד
-        'total_pl',        // 4 - רווח/הפסד
-        'created_at',      // 5 - נוצר ב
-        'closed_at',       // 6 - נסגר ב
-        'account_name',    // 7 - חשבון
-        'notes',           // 8 - הערות
-        'actions'          // 9 - פעולות
+        'ticker_symbol',   // 0 - Ticker
+'status',          // 1 - Status
+'investment_type', // 2 - Type
+'side',            // 3 - Side
+'total_pl',        // 4 - Profit/Loss
+        'created_at',      // 5 - Created At
+'closed_at',       // 6 - Closed At
+        'account_name',    // 7 - Account
+'notes',           // 8 - Notes
+        'actions'          // 9 - Actions
     ]
     // ... other tables
 };

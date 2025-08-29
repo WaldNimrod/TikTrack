@@ -239,41 +239,74 @@ async function updateActiveTradesField() {
     }
 }
 
-// פונקציה לשחזור מצב הסגירה
-function restoreTickersSectionState() {
-    // שחזור מצב top-section (התראות וסיכום)
-    const topCollapsed = localStorage.getItem('tickersTopSectionHidden') === 'true';
-    const topSection = document.querySelector('.top-section');
-
-    if (topSection) {
-        const sectionBody = topSection.querySelector('.section-body');
-        const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && topCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
+/**
+ * עדכון אוטומטי של שדה active_trades לטיקר ספציפי
+ */
+async function updateTickerActiveTradesStatus(tickerId) {
+    console.log('🔄 עדכון אוטומטי של שדה active_trades לטיקר:', tickerId);
+    try {
+        const response = await fetch(`/api/v1/tickers/${tickerId}/update-active-trades`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
             }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ שדה active_trades עודכן לטיקר:', result);
+            
+            // רענון הנתונים
+            await loadTickersData();
+        } else {
+            console.error('❌ שגיאה בעדכון שדה active_trades לטיקר:', response.status);
         }
+    } catch (error) {
+        console.error('❌ שגיאה בעדכון שדה active_trades לטיקר:', error);
     }
+}
 
-    // שחזור מצב סקשן הטיקרים
-    const tickersCollapsed = localStorage.getItem('tickersSectionCollapsed') === 'true';
-    const contentSections = document.querySelectorAll('.content-section');
-    const tickersSection = contentSections[0];
-
-    if (tickersSection) {
-        const sectionBody = tickersSection.querySelector('.section-body');
-        const toggleBtn = tickersSection.querySelector('button[onclick="toggleTickersSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && tickersCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
+/**
+ * עדכון אוטומטי של כל שדות active_trades
+ */
+async function updateAllActiveTradesStatuses() {
+    console.log('🔄 עדכון אוטומטי של כל שדות active_trades');
+    try {
+        const response = await fetch('/api/v1/tickers/update-all-active-trades', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
             }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ כל שדות active_trades עודכנו:', result);
+            
+            // רענון הנתונים
+            await loadTickersData();
+        } else {
+            console.error('❌ שגיאה בעדכון כל שדות active_trades:', response.status);
         }
+    } catch (error) {
+        console.error('❌ שגיאה בעדכון כל שדות active_trades:', error);
+    }
+}
+
+// פונקציה לשחזור מצב הסגירה - שימוש בפונקציות הגלובליות
+function restoreTickersSectionState() {
+    // שחזור מצב הסקשן העליון
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    } else {
+        console.warn('⚠️ restoreAllSectionStates function not available globally');
+    }
+    
+    // שחזור מצב הסקשנים הפנימיים
+    if (typeof window.restoreSectionStates === 'function') {
+        window.restoreSectionStates();
+    } else {
+        console.warn('⚠️ restoreSectionStates function not available globally');
     }
 }
 
@@ -286,16 +319,16 @@ function deleteTicker(id) {
 // פונקציות לפתיחה/סגירה של סקשנים - משתמשות בפונקציות הגלובליות
 function toggleTopSection() {
     // קריאה לפונקציה הגלובלית מ-main.js
-    if (typeof window.toggleTopSectionGlobal === 'function') {
-        window.toggleTopSectionGlobal();
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
     } else {
-        console.error('❌ toggleTopSectionGlobal function not found in main.js');
+        console.error('❌ toggleTopSection function not found in main.js');
     }
 }
 
 function toggleTickersSection() {
     if (typeof window.toggleMainSection === 'function') {
-        window.toggleMainSection('tickers');
+        window.toggleMainSection();
     } else {
         console.error('❌ toggleMainSection function not found in main.js');
     }
@@ -410,7 +443,7 @@ function showDeleteTickerModal(id) {
     }
 
     // שימוש במערכת האזהרות המרכזית
-    showDeleteWarning('ticker', `${ticker.symbol} - ${ticker.name}`,
+    showDeleteWarning('ticker', `${ticker.symbol} - ${ticker.name}`, 'טיקר',
         () => confirmDeleteTicker(ticker.id), // onConfirm callback
         () => console.log('מחיקת טיקר בוטלה') // onCancel callback
     );
@@ -439,6 +472,8 @@ function showDeleteTickerModal(id) {
 
 /**
  * שמירת טיקר חדש
+ * 
+ * Note: updated_at field is NOT set during creation - it's reserved for future pricing system updates
  */
 async function saveTicker() {
     console.log('🔄 שמירת טיקר חדש');
@@ -448,7 +483,6 @@ async function saveTicker() {
     const name = document.getElementById('addTickerName').value.trim();
     const type = document.getElementById('addTickerType').value;
     const currency_id = parseInt(document.getElementById('addTickerCurrency').value);
-    const status = document.getElementById('addTickerStatus').value;
     const remarks = document.getElementById('addTickerRemarks').value.trim();
 
     // ולידציה גלובלית
@@ -458,11 +492,20 @@ async function saveTicker() {
         }
     }
 
-    // טיפול בסטטוס "לא מבוטל" - טיקר חדש תמיד יהיה "closed" (אין לו טריידים)
-    let finalStatus = status;
-    if (status === 'not_canceled') {
-        finalStatus = 'closed'; // טיקר חדש אין לו טריידים או תכנונים
+    // בדיקה אם הסמל כבר קיים במערכת
+    const existingTicker = tickersData.find(t => t.symbol.toUpperCase() === symbol.toUpperCase());
+    if (existingTicker) {
+        if (window.showErrorNotification) {
+            window.showErrorNotification(
+                'שגיאת וולידציה', 
+                `הסמל ${symbol} כבר קיים במערכת (טיקר: ${existingTicker.name})`
+            );
+        }
+        return;
     }
+
+    // טיקר חדש תמיד יהיה "closed" (אין לו טריידים)
+    const finalStatus = 'closed';
 
     try {
         const tickerData = {
@@ -494,7 +537,7 @@ async function saveTicker() {
 
             // הצגת הודעת הצלחה
             if (window.showSuccessNotification) { 
-                window.showSuccessNotification('הצלחה', 'הטיקר נשמר בהצלחה'); 
+                window.showSuccessNotification('הצלחה', `טיקר ${symbol} נוסף בהצלחה למערכת`); 
             }
 
             // רענון הנתונים
@@ -504,10 +547,28 @@ async function saveTicker() {
             await updateActiveTradesField();
 
         } else {
-            const error = await response.text();
-            console.error('❌ שגיאה בשמירת טיקר:', error);
+            const errorText = await response.text();
+            console.error('❌ שגיאה בשמירת טיקר:', errorText);
+            
+            // ניסיון לפרסר את השגיאה JSON
+            let errorMessage = 'שגיאה בשמירת טיקר';
+            try {
+                const errorData = JSON.parse(errorText);
+                if (errorData.error && errorData.error.message) {
+                    // בדיקה אם זו שגיאת UNIQUE constraint
+                    if (errorData.error.message.includes('UNIQUE constraint failed: tickers.symbol')) {
+                        errorMessage = 'הסמל כבר קיים במערכת';
+                    } else {
+                        errorMessage = errorData.error.message;
+                    }
+                }
+            } catch (e) {
+                // אם לא ניתן לפרסר JSON, השתמש בטקסט המקורי
+                errorMessage = errorText;
+            }
+            
             if (window.showErrorNotification) {
-                window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת טיקר: ' + error);
+                window.showErrorNotification('שגיאה בשמירה', errorMessage);
             }
         }
 
@@ -521,6 +582,8 @@ async function saveTicker() {
 
 /**
  * עדכון טיקר קיים
+ * 
+ * Note: updated_at field is NOT modified during user updates - it's reserved for future pricing system updates
  */
 async function updateTicker() {
     console.log('🔄 עדכון טיקר');
@@ -538,6 +601,21 @@ async function updateTicker() {
         if (!window.validateForm('editTickerForm')) {
             return;
         }
+    }
+
+    // בדיקה אם הסמל כבר קיים בטיקרים אחרים (לא בטיקר הנוכחי)
+    const existingTicker = tickersData.find(t => 
+        t.symbol.toUpperCase() === symbol.toUpperCase() && 
+        t.id != id
+    );
+    if (existingTicker) {
+        if (window.showErrorNotification) {
+            window.showErrorNotification(
+                'שגיאת וולידציה', 
+                `הסמל ${symbol} כבר קיים במערכת (טיקר: ${existingTicker.name})`
+            );
+        }
+        return;
     }
 
     // טיפול בסטטוס "לא מבוטל" - צריך לקבוע אם זה "open" או "closed"
@@ -645,12 +723,30 @@ async function updateTicker() {
                                 });
                             }
                             
-                            window.showLinkedItemsBlockingModal(
+                            console.log('🔧 קריאה ל-showLinkedItemsBlockingModal עם:', {
                                 blockingData,
-                                'ticker',
-                                id,
-                                'cancel'
-                            );
+                                itemType: 'ticker',
+                                itemId: id,
+                                actionType: 'cancel'
+                            });
+                            
+                            if (typeof window.showLinkedItemsBlockingModal === 'function') {
+                                window.showLinkedItemsBlockingModal(
+                                    blockingData,
+                                    'ticker',
+                                    id,
+                                    'cancel'
+                                );
+                            } else {
+                                console.error('❌ showLinkedItemsBlockingModal לא זמינה');
+                                // Fallback - הצגת הודעת אזהרה
+                                if (window.showWarningNotification) {
+                                    window.showWarningNotification(
+                                        'לא ניתן לבטל טיקר',
+                                        `לא ניתן לבטל את הטיקר ${originalTicker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`
+                                    );
+                                }
+                            }
                         } else {
                             // Fallback - הצגת הודעת אזהרה
                             if (window.showWarningNotification) {
@@ -708,7 +804,7 @@ async function updateTicker() {
 
             // הצגת הודעת הצלחה
             if (window.showSuccessNotification) { 
-                window.showSuccessNotification('הצלחה', 'הטיקר עודכן בהצלחה'); 
+                window.showSuccessNotification('הצלחה', `טיקר ${symbol} עודכן בהצלחה במערכת`); 
             }
 
             // רענון הנתונים
@@ -757,13 +853,71 @@ async function cancelTicker(id) {
     }
 
     // הצגת דיאלוג אישור לביטול
+    console.log('🔧 בדיקה אם showCancelWarning זמינה:', typeof window.showCancelWarning);
+    
     if (window.showCancelWarning) {
+        console.log('🔧 קריאה ל-showCancelWarning עם:', {
+            itemType: 'ticker',
+            itemName: `${ticker.symbol} - ${ticker.name}`,
+            onConfirm: 'performCancelTickerWithLinkedItemsCheck',
+            onCancel: 'console.log'
+        });
+        
         window.showCancelWarning(
             'ticker',
             `${ticker.symbol} - ${ticker.name}`,
             () => performCancelTickerWithLinkedItemsCheck(id), // onConfirm - בדיקה עם פריטים מקושרים
             () => console.log('ביטול טיקר בוטל') // onCancel
         );
+    } else {
+        console.log('🔧 showCancelWarning לא זמינה - בדיקה ישירה');
+        // Fallback - בדיקה ישירה עם פריטים מקושרים
+        await performCancelTickerWithLinkedItemsCheck(id);
+    }
+}
+
+/**
+ * עדכון כל הסטטוסים של טיקרים
+ */
+async function updateAllTickerStatuses() {
+    console.log('🔄 עדכון כל הסטטוסים של טיקרים');
+
+    try {
+        const response = await fetch('/api/v1/tickers/update-all-statuses', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ סטטוסים עודכנו בהצלחה:', result);
+
+            // הצגת הודעת הצלחה
+            if (window.showSuccessNotification) { 
+                window.showSuccessNotification('הצלחה', 'סטטוסים של כל הטיקרים עודכנו בהצלחה'); 
+            }
+
+            // רענון הנתונים
+            await loadTickersData();
+
+            // עדכון שדה active_trades
+            await updateActiveTradesField();
+
+        } else {
+            const errorResponse = await response.text();
+            console.error('❌ שגיאה בעדכון סטטוסים:', errorResponse);
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון סטטוסים של טיקרים');
+            }
+        }
+
+    } catch (error) {
+        console.error('❌ שגיאה בעדכון סטטוסים:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון סטטוסים של טיקרים');
+        }
     }
 }
 
@@ -931,12 +1085,30 @@ async function performCancelTickerWithLinkedItemsCheck(id) {
                     
                     console.log('🔍 מבנה נתונים מותאם:', blockingData);
                     
-                    window.showLinkedItemsBlockingModal(
+                    console.log('🔧 קריאה ל-showLinkedItemsBlockingModal עם:', {
                         blockingData,
-                        'ticker',
-                        id,
-                        'cancel'
-                    );
+                        itemType: 'ticker',
+                        itemId: id,
+                        actionType: 'cancel'
+                    });
+                    
+                    if (typeof window.showLinkedItemsBlockingModal === 'function') {
+                        window.showLinkedItemsBlockingModal(
+                            blockingData,
+                            'ticker',
+                            id,
+                            'cancel'
+                        );
+                    } else {
+                        console.error('❌ showLinkedItemsBlockingModal לא זמינה');
+                        // Fallback - הצגת הודעת אזהרה
+                        if (window.showWarningNotification) {
+                            window.showWarningNotification(
+                                'לא ניתן לבטל טיקר',
+                                `לא ניתן לבטל את הטיקר ${ticker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`
+                            );
+                        }
+                    }
                 } else {
                     // Fallback - הצגת הודעת אזהרה
                     if (window.showWarningNotification) {
@@ -1038,6 +1210,10 @@ async function performCancelTicker(id) {
 async function confirmDeleteTicker(id) {
     console.log('🔄 אישור מחיקת טיקר:', id);
 
+    // מציאת הטיקר לפני מחיקה כדי להציג פרטים בהודעה
+    const ticker = tickersData.find(t => t.id == id);
+    const tickerInfo = ticker ? `${ticker.symbol} - ${ticker.name}` : `טיקר ${id}`;
+
     try {
         const response = await fetch(`/api/v1/tickers/${id}`, {
             method: 'DELETE'
@@ -1048,7 +1224,7 @@ async function confirmDeleteTicker(id) {
 
             // הצגת הודעת הצלחה
             if (window.showSuccessNotification) { 
-                window.showSuccessNotification('הצלחה', 'הטיקר נמחק בהצלחה'); 
+                window.showSuccessNotification('הצלחה', `טיקר ${tickerInfo} נמחק בהצלחה מהמערכת`); 
             }
 
             // רענון הנתונים
@@ -1344,6 +1520,8 @@ function updateTickersTable(tickers) {
 
 // הגדרת הפונקציות כגלובליות
 window.updateActiveTradesField = updateActiveTradesField;
+window.updateTickerActiveTradesStatus = updateTickerActiveTradesStatus;
+window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
 window.deleteTicker = deleteTicker;
 window.cancelTicker = cancelTicker;
 window.performCancelTicker = performCancelTicker;
@@ -1425,24 +1603,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // שחזור מצב הסגירה
     restoreTickersSectionState();
 
-    // אתחול וולידציה עם כללים מותאמים
+    // אתחול וולידציה - שימוש בפונקציות הגלובליות
     if (window.initializeValidation) {
-        // כללי וולידציה מותאמים לטופס הוספת טיקר
-        const addTickerValidationRules = {
-            symbol: {
-                customValidation: window.validateTickerSymbol
-            }
-        };
-        
-        // כללי וולידציה מותאמים לטופס עריכת טיקר
-        const editTickerValidationRules = {
-            symbol: {
-                customValidation: window.validateTickerSymbol
-            }
-        };
-        
-        window.initializeValidation('addTickerForm', addTickerValidationRules);
-        window.initializeValidation('editTickerForm', editTickerValidationRules);
+        // שימוש בוולידציה הגלובלית ללא כללים מותאמים
+        window.initializeValidation('addTickerForm', {});
+        window.initializeValidation('editTickerForm', {});
     }
 
     // שחזור מצב סידור

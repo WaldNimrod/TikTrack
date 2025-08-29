@@ -122,6 +122,18 @@ function validateForm(formId, validationRules = {}) {
         }
     });
 
+    // הצגת התראה גלובלית אם יש שגיאות
+    if (!isValid && typeof window.showValidationWarning === 'function') {
+        const firstError = Object.values(errors)[0];
+        const firstFieldName = Object.keys(errors)[0];
+        const field = form.querySelector(`[name="${firstFieldName}"]`);
+        if (field && field.id) {
+            window.showValidationWarning(field.id, firstError);
+        } else {
+            window.showErrorNotification('שגיאת וולידציה', firstError);
+        }
+    }
+
     return isValid;
 }
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text, DateTime
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text, DateTime, CheckConstraint
 from sqlalchemy.orm import relationship, Mapped
 from .base import BaseModel
 from typing import Dict, Any, Optional, List
@@ -37,7 +37,13 @@ class Ticker(BaseModel):
         ... )
     """
     __tablename__ = "tickers"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        CheckConstraint(
+            "(active_trades = 1 AND EXISTS (SELECT 1 FROM trades WHERE trades.ticker_id = tickers.id AND trades.status = 'open')) OR (active_trades = 0 AND NOT EXISTS (SELECT 1 FROM trades WHERE trades.ticker_id = tickers.id AND trades.status = 'open')) OR active_trades IS NULL",
+            name="active_trades_consistency"
+        ),
+        {'extend_existing': True}
+    )
     
     # Primary fields
     symbol = Column(String(10), unique=True, nullable=False, index=True, 
@@ -55,7 +61,8 @@ class Ticker(BaseModel):
     status = Column(String(20), default='open', nullable=False,
                    comment="Ticker status: open, closed, cancelled")
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=True, 
+                       comment="Last price update timestamp from future pricing system - NOT user modification timestamp")
     
     # Relationships
     currency = relationship("Currency", back_populates="tickers")

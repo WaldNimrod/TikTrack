@@ -104,14 +104,14 @@
 - [ ] Update trade plan dropdown to show all plans (open and closed)
 - [ ] Maintain current functionality for open trades
 - [ ] Add status indicators in trade selection dropdown
-- [ ] **Temporary Implementation:** Show "בפיתוח" message when checkbox is clicked
+- [ ] **Temporary Implementation:** Show "In Development" message when checkbox is clicked
 
 **UI/UX Considerations:**
 - [ ] Clear visual distinction between open and closed trades
 - [ ] Intuitive checkbox placement in modal forms
 - [ ] Consistent status indicators across the interface
 - [ ] Tooltips explaining the feature
-- [ ] Temporary "בפיתוח" notification for user feedback
+- [ ] Temporary "In Development" notification for user feedback
 
 **Technical Considerations:**
 - [ ] Update `loadModalData()` function to fetch all trades/plans
@@ -119,7 +119,7 @@
 - [ ] Add event handlers for checkbox state changes
 - [ ] Ensure proper data validation for closed trades
 - [ ] Update API calls to include closed trades in responses
-- [ ] Add temporary click handler to show "בפיתוח" message
+- [ ] Add temporary click handler to show "In Development" message
 
 **Implementation Notes:**
 - This feature was partially implemented but needs completion
@@ -130,7 +130,7 @@
 **Immediate Action Required:**
 - [ ] Add click handler to "Show Closed Trades" checkbox in add execution modal
 - [ ] Add click handler to "Show Closed Trades" checkbox in edit execution modal  
-- [ ] Show "בפיתוח" notification when checkbox is clicked
+- [ ] Show "In Development" notification when checkbox is clicked
 - [ ] Use existing notification system (`showNotification()`)
 
 ---

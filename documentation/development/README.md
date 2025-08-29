@@ -37,7 +37,7 @@
 
 #### **Fixed Critical Issues**
 - **Date Filter Implementation**: Complete date filter functionality with proper display updates
-- **Button Selection Logic**: Fixed broken display when selecting "הכול" (All) options
+- **Button Selection Logic**: Fixed broken display when selecting "All" options
 - **Null/Undefined Protection**: Added comprehensive protection for all preference conversion functions
 - **Table-Specific Filtering**: Smart filtering logic that adapts to different table types
 

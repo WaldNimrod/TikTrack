@@ -3,7 +3,7 @@
 ## Overview
 The Dynamic Constraint Management System provides a comprehensive solution for managing database constraints dynamically through a web interface. This system allows administrators to define, modify, and validate constraints without requiring database schema changes.
 
-> 📋 **לפרטים מלאים על הפרויקט:** ראה [PROJECT_STATUS_SUMMARY.md](../../../PROJECT_STATUS_SUMMARY.md)
+> 📋 **For full project details:** See [PROJECT_STATUS_SUMMARY.md](../../../PROJECT_STATUS_SUMMARY.md)
 
 ## 🆕 **Latest Updates (August 24, 2025)**
 - ✅ **ValidationService Integration** - Real-time validation in all services

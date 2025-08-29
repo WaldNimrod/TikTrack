@@ -168,13 +168,8 @@ body {
 }
 
 /* הודעות - וידוא שהן מופיעות מעל הכל */
-.notification {
-  z-index: 100000000 !important;
-}
-
-.notification-container {
-  z-index: 100000000 !important;
-}
+/* .notification z-index מוגדר ב-styles.css */
+/* .notification-container z-index מוגדר ב-styles.css */
 
 .toast {
   z-index: 100000000 !important;
@@ -352,13 +347,7 @@ body {
 }
 
 /* הודעות - וידוא שהן מופיעות מעל הכל */
-.notification {
-  z-index: 1000000002 !important;
-}
-
-.notification-container {
-  z-index: 1000000002 !important;
-}
+/* .notification ו-.notification-container מוגדרים ב-styles.css */
 
 /* טבלה בסגנון אפל - הוסרה (AG Grid) */
 

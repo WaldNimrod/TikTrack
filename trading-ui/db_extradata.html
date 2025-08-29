@@ -4,14 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>תכנונים - Tik.track</title>
+  <title>טבלאות עזר - Tik.track</title>
 
   <!-- 
-    ===== דף תכנונים - TikTrack =====
+    ===== דף טבלאות עזר - TikTrack =====
     
     דף זה מכיל:
-    1. טבלת תכנונים (עיצובים) - הסקשן הראשון
-    2. טבלת חשבונות - הסקשן השני (נוסף לאחרונה)
+    1. טבלת מטבעות - הסקשן הראשון
+    2. טבלת סוגי קישור הערות - הסקשן השני
     3. כרטיסיות התראות - בחלק העליון
     4. מערכת פילטרים ומיון מתקדמת
     
@@ -19,12 +19,13 @@
     - app-header: כותרת האפליקציה עם ניווט
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות התראות וסיכום נתונים
-      - content-section (1): טבלת תכנונים
-      - content-section (2): טבלת חשבונות
+      - content-section (1): טבלת מטבעות
+      - content-section (2): טבלת סוגי קישור הערות
     
     שינויים אחרונים:
-    - שינוי שם מ"עיצובים" ל"תכנונים"
-    - הוספת טבלת חשבונות מלאים
+    - שינוי שם מ"תכנונים" ל"טבלאות עזר"
+    - הוספת טבלת מטבעות
+    - הוספת טבלת סוגי קישור הערות
     - שיפור עיצוב כרטיסיות התראות
     - תיקון כפתורי סגירה עצמאיים
   -->
@@ -100,7 +101,7 @@
       <div class="main-content">
 
         <!-- Designs area - content-section -->
-        <div class="content-section extra-data-page">
+        <div class="content-section extra-data-page" data-section="currencies">
           <!-- Currencies header -->
           <div class="section-header">
             <div class="table-title">
@@ -112,7 +113,7 @@
                 <span class="action-icon">➕</span> הוסף
               </button>
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleCurrenciesSection()" title="הצג/הסתר אזור מטבעות">
+              <button class="filter-toggle-btn" onclick="toggleSection('currencies')" title="הצג/הסתר אזור מטבעות">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -166,7 +167,7 @@
       </div>
 
       <!-- Note Relation Types Section -->
-      <div class="content-section extra-data-page">
+      <div class="content-section extra-data-page" data-section="note_relation_types">
         <!-- Note Relation Types header -->
         <div class="section-header">
           <div class="table-title">
@@ -178,7 +179,7 @@
               <span class="action-icon">➕</span> הוסף
             </button>
             <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleNoteRelationTypesSection()"
+            <button class="filter-toggle-btn" onclick="toggleSection('note_relation_types')"
               title="הצג/הסתר אזור סוגי קישור">
               <span class="filter-icon">▲</span>
             </button>

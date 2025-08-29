@@ -68,22 +68,7 @@
       color: white;
     }
 
-    .search-input-wrapper {
-      position: relative;
-    }
 
-    .search-filter-input {
-      border: 1px solid #ced4da;
-      border-radius: 0.375rem;
-      padding: 0.375rem 0.75rem;
-      font-size: 0.875rem;
-    }
-
-    .search-filter-input:focus {
-      border-color: #007bff;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-      outline: 0;
-    }
 
     /* Table row hover effect */
     #notesTable tbody tr:hover {
@@ -137,25 +122,7 @@
             <div>סה"כ קישורים: <strong id="totalLinks">0</strong></div>
           </div>
 
-          <!-- Quick filters -->
-          <div class="quick-filters" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-            <button class="btn btn-sm btn-outline-primary active" onclick="filterNotesByType('all')" data-type="all">
-              הכל
-            </button>
-            <button class="btn btn-sm btn-outline-primary" onclick="filterNotesByType('account')" data-type="account">
-              🏦 חשבונות
-            </button>
-            <button class="btn btn-sm btn-outline-primary" onclick="filterNotesByType('trade')" data-type="trade">
-              📈 טריידים
-            </button>
-            <button class="btn btn-sm btn-outline-primary" onclick="filterNotesByType('trade_plan')"
-              data-type="trade_plan">
-              📋 תוכניות
-            </button>
-            <button class="btn btn-sm btn-outline-primary" onclick="filterNotesByType('ticker')" data-type="ticker">
-              📊 טיקרים
-            </button>
-          </div>
+
         </div>
       </div> <!-- End top-section -->
 
@@ -167,23 +134,37 @@
           <!-- Notes header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/home.svg" alt="ההערות שלי"
-                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-left: 8px; vertical-align: middle;">
+                <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+              </svg>
               ההערות שלי
             </div>
             <div class="table-count">9 הערות</div>
             <div class="table-actions">
-              <!-- Search functionality -->
-              <div class="search-input-wrapper" style="margin-left: 10px;">
-                <input type="text" class="search-filter-input" placeholder="חיפוש בהערות..."
-                  onkeyup="filterNotesData(this.value)" style="width: 200px;">
-              </div>
-              <button class="refresh-btn" onclick="loadNotesData()" title="רענן נתונים">
-                <img src="images/icons/home.svg" alt="רענן" class="action-icon" style="width: 16px; height: 16px;">
-                רענן
+              <!-- Quick filters -->
+              <button class="btn btn-sm active" onclick="filterNotesByType('all')" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">
+                הכל
               </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="filterNotesByType('account')" data-type="account" title="חשבונות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/accounts.svg" alt="חשבונות" style="width: 14px; height: 14px;">
+              </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="filterNotesByType('trade')" data-type="trade" title="טריידים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/trades.svg" alt="טריידים" style="width: 14px; height: 14px;">
+              </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="filterNotesByType('trade_plan')" data-type="trade_plan" title="תוכניות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/trade_plans.svg" alt="תוכניות" style="width: 14px; height: 14px;">
+              </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="filterNotesByType('ticker')" data-type="ticker" title="טיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/tickers.svg" alt="טיקרים" style="width: 14px; height: 14px;">
+              </button>
+              
+              <span style="margin: 0 10px; color: #666;">|</span>
+              
               <button class="refresh-btn" onclick="openNoteDetails()" title="הוסף הערה חדשה">
-                <img src="images/icons/home.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
+                  <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
+                </svg>
                 הוסף
               </button>
               <div class="action-separator"></div>
@@ -196,45 +177,45 @@
           <!-- Notes table -->
           <div class="section-body">
             <div class="table-responsive" id="notesContainer">
-              <table class="table" data-table-type="notes">
+              <table class="table" id="notesTable" data-table-type="notes">
                 <thead>
                   <tr>
-                    <th>
+                    <th style="width: 10%;">
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         סימבול <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th>
+                    <th style="width: 12%;">
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         קשור ל <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th>
+                    <th style="width: 40%;">
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         תוכן <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th>
+                    <th style="width: 10%;">
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         קובץ מצורף <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th>
+                    <th style="width: 10%;">
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         נוצר ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="actions-cell">
+                    <th class="actions-cell" style="width: 8%;">
                       פעולות
                     </th>
                   </tr>

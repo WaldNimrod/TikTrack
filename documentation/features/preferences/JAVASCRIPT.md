@@ -8,7 +8,7 @@ This document provides comprehensive technical documentation for the `preference
 
 ### Save Strategy Optimization
 - **Changed from auto-save to batch save**: Users now control when to save all changes
-- **Local memory updates**: Changes stored locally until user clicks "שמור שינויים"
+- **Local memory updates**: Changes stored locally until user clicks "Save Changes"
 - **Clear user feedback**: Info notifications for local updates, success for server saves
 
 ### Data Structure Handling

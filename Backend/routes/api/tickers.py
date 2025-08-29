@@ -160,6 +160,25 @@ def update_ticker(ticker_id: int):
     try:
         data = request.get_json()
         db: Session = next(get_db())
+        
+        # Check that ticker exists
+        ticker = TickerService.get_by_id(db, ticker_id)
+        if not ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found"},
+                "version": "v1"
+            }), 404
+        
+        # Check active_trades constraint - prevent cancellation if ticker has active trades
+        if 'status' in data and data['status'] == 'cancelled' and ticker.active_trades:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Cannot cancel ticker with active trades. Please close all open trades first."},
+                "version": "v1"
+            }), 400
+        
+        # Update ticker
         ticker = TickerService.update(db, ticker_id, data)
         if ticker:
             return jsonify({
@@ -188,6 +207,34 @@ def delete_ticker(ticker_id: int):
     """Delete ticker"""
     try:
         db: Session = next(get_db())
+        
+        # Check that ticker exists
+        ticker = TickerService.get_by_id(db, ticker_id)
+        if not ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found"},
+                "version": "v1"
+            }), 404
+        
+        # Check active_trades constraint - prevent deletion if ticker has active trades
+        if ticker.active_trades:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Cannot delete ticker with active trades. Please close all open trades first."},
+                "version": "v1"
+            }), 400
+        
+        # Check linked items
+        linked_items = TickerService.check_linked_items(db, ticker_id)
+        if linked_items['has_linked_items']:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Cannot delete ticker with linked items (trades, trade plans, notes, or alerts)"},
+                "version": "v1"
+            }), 400
+        
+        # Delete ticker
         success = TickerService.delete(db, ticker_id)
         if success:
             return jsonify({
@@ -197,9 +244,9 @@ def delete_ticker(ticker_id: int):
             })
         return jsonify({
             "status": "error",
-            "error": {"message": "Ticker not found"},
+            "error": {"message": "Failed to delete ticker"},
             "version": "v1"
-        }), 404
+        }), 500
     except Exception as e:
         logger.error(f"Error deleting ticker {ticker_id}: {str(e)}")
         return jsonify({

@@ -32,7 +32,7 @@
     <script src="/scripts/active-alerts-component.js"></script>
 
     <!-- Integration test script -->
-    <script src="/external_data_integration_client/scripts/integration_test.js"></script>
+    <!-- Functions embedded directly in page -->
 </head>
 
 <body>
@@ -300,9 +300,6 @@
 
     <!-- JavaScript Files -->
     <script src="/scripts/header-system.js"></script>
-    <script src="/external_data_integration_client/scripts/base-tester.js"></script>
-    <script src="/external_data_integration_client/scripts/utils.js"></script>
-    <script src="/external_data_integration_client/scripts/integration_test.js"></script>
     
     <script>
         // אתחול HeaderSystem
@@ -310,6 +307,432 @@
             if (window.headerSystem && !window.headerSystem.isInitialized) {
                 window.headerSystem.init();
             }
+        });
+
+        // ===== פונקציות בדיקת אינטגרציה =====
+        
+        // משתנים גלובליים
+        let integrationTestResults = [];
+
+        // פונקציה לבדיקת חיבור API
+        function testApiConnection() {
+            console.log('🔗 Testing API connection...');
+            
+            const endpoints = [
+                '/api/v1/tickers/',
+                '/api/v1/accounts/',
+                '/api/v1/trades/',
+                '/api/v1/alerts/',
+                '/api/v1/cash_flows/'
+            ];
+
+            const results = {};
+            let successCount = 0;
+            
+            endpoints.forEach(endpoint => {
+                fetch(endpoint)
+                    .then(response => {
+                        results[endpoint] = {
+                            status: response.status,
+                            ok: response.ok,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        if (response.ok) {
+                            successCount++;
+                        }
+                        
+                        // בדיקה אם כל הבדיקות הושלמו
+                        if (Object.keys(results).length === endpoints.length) {
+                            const allSuccess = successCount === endpoints.length;
+                            addResult('API Connection', allSuccess ? 'success' : 'warning', 
+                                `${successCount}/${endpoints.length} נקודות קצה פעילות`, 
+                                results
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        results[endpoint] = {
+                            status: 'error',
+                            ok: false,
+                            error: error.message,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        // בדיקה אם כל הבדיקות הושלמו
+                        if (Object.keys(results).length === endpoints.length) {
+                            const allSuccess = successCount === endpoints.length;
+                            addResult('API Connection', allSuccess ? 'success' : 'warning', 
+                                `${successCount}/${endpoints.length} נקודות קצה פעילות`, 
+                                results
+                            );
+                        }
+                    });
+            });
+        }
+
+        // פונקציה לבדיקת אינטגרציה בסיס נתונים
+        function testDatabaseIntegration() {
+            console.log('🗄️ Testing database integration...');
+            
+            const testQueries = [
+                { name: 'Tickers', endpoint: '/api/v1/tickers/' },
+                { name: 'Accounts', endpoint: '/api/v1/accounts/' },
+                { name: 'Trades', endpoint: '/api/v1/trades/' },
+                { name: 'Alerts', endpoint: '/api/v1/alerts/' },
+                { name: 'Cash Flows', endpoint: '/api/v1/cash_flows/' }
+            ];
+
+            const results = {};
+            let completedQueries = 0;
+            
+            testQueries.forEach(query => {
+                fetch(query.endpoint)
+                    .then(response => response.json())
+                    .then(data => {
+                        results[query.name] = {
+                            count: Array.isArray(data) ? data.length : 1,
+                            hasData: Array.isArray(data) ? data.length > 0 : true,
+                            sample: Array.isArray(data) && data.length > 0 ? data[0] : data,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        completedQueries++;
+                        
+                        if (completedQueries === testQueries.length) {
+                            const totalRecords = Object.values(results).reduce((sum, result) => sum + result.count, 0);
+                            const hasData = Object.values(results).every(result => result.hasData);
+                            
+                            addResult('Database Integration', hasData ? 'success' : 'warning', 
+                                `${totalRecords} רשומות נמצאו ב-${testQueries.length} טבלאות`, 
+                                results
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        results[query.name] = {
+                            count: 0,
+                            hasData: false,
+                            error: error.message,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        completedQueries++;
+                        
+                        if (completedQueries === testQueries.length) {
+                            const totalRecords = Object.values(results).reduce((sum, result) => sum + result.count, 0);
+                            const hasData = Object.values(results).every(result => result.hasData);
+                            
+                            addResult('Database Integration', hasData ? 'success' : 'warning', 
+                                `${totalRecords} רשומות נמצאו ב-${testQueries.length} טבלאות`, 
+                                results
+                            );
+                        }
+                    });
+            });
+        }
+
+        // פונקציה לבדיקת אינטגרציה UI
+        function testUiIntegration() {
+            console.log('🎨 Testing UI integration...');
+            
+            const uiElements = [
+                'unified-header',
+                'page-body',
+                'top-section',
+                'content-section',
+                'main-content'
+            ];
+
+            const results = {};
+            let foundElements = 0;
+            
+            uiElements.forEach(elementId => {
+                const element = document.getElementById(elementId);
+                results[elementId] = {
+                    exists: !!element,
+                    visible: element ? element.offsetParent !== null : false,
+                    timestamp: new Date().toISOString()
+                };
+                
+                if (element) {
+                    foundElements++;
+                }
+            });
+            
+            const allFound = foundElements === uiElements.length;
+            
+            addResult('UI Integration', allFound ? 'success' : 'warning', 
+                `${foundElements}/${uiElements.length} אלמנטי UI נמצאו`, 
+                results
+            );
+        }
+
+        // פונקציה לבדיקת אינטגרציה פונקציות
+        function testFunctionIntegration() {
+            console.log('⚙️ Testing function integration...');
+            
+            const requiredFunctions = [
+                'loadAccountsFromServer',
+                'updateAccountsTable',
+                'loadTradesFromServer',
+                'updateTradesTable',
+                'loadAlertsFromServer',
+                'updateAlertsTable'
+            ];
+
+            const results = {};
+            let foundFunctions = 0;
+            
+            requiredFunctions.forEach(funcName => {
+                const exists = typeof window[funcName] === 'function';
+                results[funcName] = {
+                    exists: exists,
+                    type: typeof window[funcName],
+                    timestamp: new Date().toISOString()
+                };
+                
+                if (exists) {
+                    foundFunctions++;
+                }
+            });
+            
+            const allFound = foundFunctions === requiredFunctions.length;
+            
+            addResult('Function Integration', allFound ? 'success' : 'warning', 
+                `${foundFunctions}/${requiredFunctions.length} פונקציות נמצאו`, 
+                results
+            );
+        }
+
+        // פונקציה לבדיקת אינטגרציה סגנונות
+        function testStyleIntegration() {
+            console.log('🎨 Testing style integration...');
+            
+            const requiredStyles = [
+                'apple-theme.css',
+                'styles.css',
+                'header-system.css',
+                'table.css',
+                'typography.css'
+            ];
+
+            const results = {};
+            let foundStyles = 0;
+            
+            requiredStyles.forEach(styleName => {
+                const linkElement = document.querySelector(`link[href*="${styleName}"]`);
+                const exists = !!linkElement;
+                
+                results[styleName] = {
+                    exists: exists,
+                    href: linkElement ? linkElement.href : null,
+                    timestamp: new Date().toISOString()
+                };
+                
+                if (exists) {
+                    foundStyles++;
+                }
+            });
+            
+            const allFound = foundStyles === requiredStyles.length;
+            
+            addResult('Style Integration', allFound ? 'success' : 'warning', 
+                `${foundStyles}/${requiredStyles.length} קבצי סגנון נטענו`, 
+                results
+            );
+        }
+
+        // פונקציה לבדיקת אינטגרציה סקריפטים
+        function testScriptIntegration() {
+            console.log('📜 Testing script integration...');
+            
+            const requiredScripts = [
+                'header-system.js',
+                'main.js',
+                'tables.js',
+                'translation-utils.js',
+                'data-utils.js'
+            ];
+
+            const results = {};
+            let foundScripts = 0;
+            
+            requiredScripts.forEach(scriptName => {
+                const scriptElement = document.querySelector(`script[src*="${scriptName}"]`);
+                const exists = !!scriptElement;
+                
+                results[scriptName] = {
+                    exists: exists,
+                    src: scriptElement ? scriptElement.src : null,
+                    timestamp: new Date().toISOString()
+                };
+                
+                if (exists) {
+                    foundScripts++;
+                }
+            });
+            
+            const allFound = foundScripts === requiredScripts.length;
+            
+            addResult('Script Integration', allFound ? 'success' : 'warning', 
+                `${foundScripts}/${requiredScripts.length} קבצי סקריפט נטענו`, 
+                results
+            );
+        }
+
+        // פונקציה לבדיקת אינטגרציה מלאה
+        function testFullIntegration() {
+            console.log('🔍 Testing full integration...');
+            
+            // הרצת כל הבדיקות
+            testApiConnection();
+            
+            setTimeout(() => {
+                testDatabaseIntegration();
+            }, 500);
+            
+            setTimeout(() => {
+                testUiIntegration();
+            }, 1000);
+            
+            setTimeout(() => {
+                testFunctionIntegration();
+            }, 1500);
+            
+            setTimeout(() => {
+                testStyleIntegration();
+            }, 2000);
+            
+            setTimeout(() => {
+                testScriptIntegration();
+            }, 2500);
+            
+            setTimeout(() => {
+                // סיכום כל הבדיקות
+                const totalTests = integrationTestResults.length;
+                const successTests = integrationTestResults.filter(r => r.status === 'success').length;
+                const warningTests = integrationTestResults.filter(r => r.status === 'warning').length;
+                const errorTests = integrationTestResults.filter(r => r.status === 'error').length;
+                
+                const overallStatus = errorTests > 0 ? 'error' : 
+                                     warningTests > 0 ? 'warning' : 'success';
+                
+                addResult('Full Integration', overallStatus, 
+                    `סיכום: ${successTests} הצלחות, ${warningTests} אזהרות, ${errorTests} שגיאות מתוך ${totalTests} בדיקות`, 
+                    {
+                        total: totalTests,
+                        success: successTests,
+                        warning: warningTests,
+                        error: errorTests,
+                        percentage: totalTests > 0 ? ((successTests / totalTests) * 100).toFixed(1) : 0
+                    }
+                );
+            }, 3000);
+        }
+
+        // פונקציה להוספת תוצאה
+        function addResult(test, status, message, data = null) {
+            console.log('📝 Adding result:', { test, status, message });
+            
+            const result = {
+                timestamp: new Date().toLocaleTimeString('he-IL'),
+                test: test,
+                status: status,
+                message: message,
+                data: data
+            };
+            
+            integrationTestResults.push(result);
+            displayResult(result);
+        }
+
+        // פונקציה לתצוגת תוצאה
+        function displayResult(result) {
+            const resultsContainer = document.getElementById('integration-results');
+            if (!resultsContainer) {
+                console.error('❌ Results container not found');
+                return;
+            }
+
+            const resultElement = document.createElement('div');
+            resultElement.className = `alert alert-${getStatusClass(result.status)} mb-2 fade-in`;
+            
+            let content = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${result.test}</strong> - ${result.message}
+                        <br><small class="text-muted">${result.timestamp}</small>
+                    </div>
+                    <span class="badge bg-${getStatusClass(result.status)}">
+                        ${getStatusText(result.status)}
+                    </span>
+                </div>
+            `;
+            
+            if (result.data) {
+                content += `
+                    <details class="mt-2">
+                        <summary>פרטי הנתונים</summary>
+                        <pre class="mt-2 bg-light p-2 rounded"><code>${JSON.stringify(result.data, null, 2)}</code></pre>
+                    </details>
+                `;
+            }
+            
+            resultElement.innerHTML = content;
+            resultsContainer.appendChild(resultElement);
+            
+            // Scroll to bottom
+            resultsContainer.scrollTop = resultsContainer.scrollHeight;
+            
+            console.log('✅ Result displayed');
+        }
+
+        // פונקציה לקבלת מחלקת סטטוס
+        function getStatusClass(status) {
+            switch (status) {
+                case 'success': return 'success';
+                case 'error': return 'danger';
+                case 'warning': return 'warning';
+                case 'info': return 'info';
+                default: return 'secondary';
+            }
+        }
+
+        // פונקציה לקבלת טקסט סטטוס
+        function getStatusText(status) {
+            switch (status) {
+                case 'success': return 'הצלחה';
+                case 'error': return 'שגיאה';
+                case 'warning': return 'אזהרה';
+                case 'info': return 'מידע';
+                default: return 'לא ידוע';
+            }
+        }
+
+        // פונקציה לניקוי לוגים
+        function clearIntegrationLogs() {
+            const resultsContainer = document.getElementById('integration-results');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '';
+                integrationTestResults = [];
+                console.log('🧹 Integration logs cleared');
+            }
+        }
+
+        // אתחול event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // הוספת event listeners לכפתורים
+            document.getElementById('test-api-connection')?.addEventListener('click', testApiConnection);
+            document.getElementById('test-database-integration')?.addEventListener('click', testDatabaseIntegration);
+            document.getElementById('test-ui-integration')?.addEventListener('click', testUiIntegration);
+            document.getElementById('test-function-integration')?.addEventListener('click', testFunctionIntegration);
+            document.getElementById('test-style-integration')?.addEventListener('click', testStyleIntegration);
+            document.getElementById('test-script-integration')?.addEventListener('click', testScriptIntegration);
+            document.getElementById('test-full-integration')?.addEventListener('click', testFullIntegration);
+
+            // הוספת הודעה ראשונית
+            addResult('System', 'info', 'דף בדיקת אינטגרציה נטען בהצלחה');
         });
     </script>
 </body>

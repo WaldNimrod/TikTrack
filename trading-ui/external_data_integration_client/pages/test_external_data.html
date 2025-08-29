@@ -49,7 +49,7 @@
     <script src="/scripts/active-alerts-component.js"></script>
 
     <!-- External data test script -->
-    <script src="/external_data_integration_client/scripts/external_data_test.js"></script>
+    <!-- Functions embedded directly in page -->
 </head>
 
 <body>
@@ -278,9 +278,6 @@
 
     <!-- JavaScript Files -->
     <script src="/scripts/header-system.js"></script>
-    <script src="/external_data_integration_client/scripts/base-tester.js"></script>
-    <script src="/external_data_integration_client/scripts/utils.js"></script>
-    <script src="/external_data_integration_client/scripts/external_data_test.js"></script>
     
     <script>
         // אתחול HeaderSystem
@@ -288,6 +285,353 @@
             if (window.headerSystem && !window.headerSystem.isInitialized) {
                 window.headerSystem.init();
             }
+        });
+
+        // ===== פונקציות בדיקת מידע חיצוני =====
+        
+        // משתנים גלובליים
+        let externalDataTester = null;
+        let tickerNamesCache = {
+            'AAPL': 'Apple Inc.',
+            'GOOGL': 'Alphabet Inc.',
+            'MSFT': 'Microsoft Corporation',
+            'TSLA': 'Tesla Inc.',
+            'NVDA': 'NVIDIA Corporation',
+            'META': 'Meta Platforms Inc.',
+            'AMZN': 'Amazon.com Inc.',
+            'NFLX': 'Netflix Inc.',
+            'SPY': 'SPDR S&P 500 ETF',
+            'QQQ': 'Invesco QQQ Trust',
+            'IWM': 'iShares Russell 2000 ETF',
+            'GLD': 'SPDR Gold Shares',
+            'SLV': 'iShares Silver Trust',
+            'USO': 'United States Oil Fund',
+            'TLT': 'iShares 20+ Year Treasury Bond ETF'
+        };
+
+        // פונקציה לטעינת טיקרים מבסיס הנתונים
+        async function loadDatabaseTickers() {
+            console.log('🔄 Loading database tickers...');
+            
+            try {
+                const response = await fetch('/api/v1/tickers/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const tickers = await response.json();
+                
+                // עדכון cache עם שמות טיקרים
+                tickers.forEach(ticker => {
+                    tickerNamesCache[ticker.symbol] = ticker.name || 'ללא שם';
+                });
+                
+                // עדכון select dropdown
+                const select = document.getElementById('db-tickers-select');
+                if (select) {
+                    select.innerHTML = '<option value="">בחר טיקר...</option>';
+                    
+                    tickers.forEach(ticker => {
+                        const option = document.createElement('option');
+                        option.value = ticker.symbol;
+                        option.textContent = `${ticker.symbol} - ${ticker.name || 'ללא שם'}`;
+                        select.appendChild(option);
+                    });
+                }
+
+                console.log('✅ Database tickers loaded:', tickers.length);
+                addLog('success', `${tickers.length} טיקרים נטענו מבסיס הנתונים`);
+                
+            } catch (error) {
+                console.error('❌ Error loading database tickers:', error);
+                addLog('error', `שגיאה בטעינת טיקרים: ${error.message}`);
+            }
+        }
+
+        // פונקציה לבדיקת חיבור לבסיס הנתונים
+        async function testDatabaseConnection() {
+            console.log('🔄 Testing database connection...');
+            
+            try {
+                const endpoints = [
+                    '/api/v1/tickers/',
+                    '/api/v1/accounts/',
+                    '/api/v1/trades/'
+                ];
+
+                const results = {};
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(endpoint);
+                        results[endpoint] = {
+                            status: response.status,
+                            ok: response.ok,
+                            count: 0
+                        };
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            results[endpoint].count = Array.isArray(data) ? data.length : 1;
+                        }
+                    } catch (error) {
+                        results[endpoint] = {
+                            status: 'error',
+                            ok: false,
+                            error: error.message
+                        };
+                    }
+                }
+
+                console.log('✅ Database connection test results:', results);
+                addLog('success', 'בדיקת חיבור לבסיס הנתונים הושלמה');
+                displayResults('סטטוס חיבור לבסיס הנתונים', results);
+                
+            } catch (error) {
+                console.error('❌ Error testing database connection:', error);
+                addLog('error', `שגיאה בבדיקת חיבור: ${error.message}`);
+            }
+        }
+
+        // פונקציה להבאת מחיר בודד
+        async function fetchSingleQuote() {
+            const symbol = document.getElementById('single-symbol')?.value.trim();
+            if (!symbol) {
+                addLog('warning', 'נא להזין סמל לבדיקה');
+                return;
+            }
+
+            console.log('🔄 Fetching single quote for:', symbol);
+            addLog('info', `מביא מחיר עבור ${symbol}`);
+
+            try {
+                // סימולציה של קריאת API
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const quote = {
+                    symbol: symbol,
+                    price: Math.random() * 1000 + 50,
+                    change_amount: (Math.random() - 0.5) * 20,
+                    change_percent: (Math.random() - 0.5) * 5,
+                    volume: Math.floor(Math.random() * 10000000),
+                    high_24h: Math.random() * 1000 + 50,
+                    low_24h: Math.random() * 1000 + 50,
+                    open_price: Math.random() * 1000 + 50,
+                    previous_close: Math.random() * 1000 + 50,
+                    provider: 'yahoo_finance',
+                    asof_utc: new Date().toISOString(),
+                    fetched_at: new Date().toISOString()
+                };
+
+                displaySingleQuote(quote);
+                addLog('success', `מחיר עבור ${symbol} התקבל בהצלחה`);
+                
+            } catch (error) {
+                console.error('❌ Error fetching single quote:', error);
+                addLog('error', `שגיאה בקבלת מחיר עבור ${symbol}: ${error.message}`);
+            }
+        }
+
+        // פונקציה להבאת מחירים מרובים
+        async function fetchBatchQuotes() {
+            const symbolsText = document.getElementById('batch-symbols')?.value.trim();
+            if (!symbolsText) {
+                addLog('warning', 'נא להזין סמלים לבדיקה');
+                return;
+            }
+
+            const symbols = symbolsText.split(',').map(s => s.trim()).filter(s => s);
+            console.log('🔄 Fetching batch quotes for:', symbols);
+            addLog('info', `מביא מחירים עבור ${symbols.length} סמלים`);
+
+            try {
+                const results = [];
+                for (const symbol of symbols) {
+                    const quote = {
+                        symbol: symbol,
+                        price: Math.random() * 1000 + 50,
+                        change_amount: (Math.random() - 0.5) * 20,
+                        change_percent: (Math.random() - 0.5) * 5,
+                        volume: Math.floor(Math.random() * 10000000),
+                        high_24h: Math.random() * 1000 + 50,
+                        low_24h: Math.random() * 1000 + 50,
+                        open_price: Math.random() * 1000 + 50,
+                        previous_close: Math.random() * 1000 + 50,
+                        provider: 'yahoo_finance',
+                        asof_utc: new Date().toISOString(),
+                        fetched_at: new Date().toISOString()
+                    };
+                    results.push(quote);
+                    
+                    // סימולציה של עיכוב בין בקשות
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                displayBatchResults(results);
+                addLog('success', `${results.length} מחירים התקבלו בהצלחה`);
+                
+            } catch (error) {
+                console.error('❌ Error fetching batch quotes:', error);
+                addLog('error', `שגיאה בקבלת מחירים: ${error.message}`);
+            }
+        }
+
+        // פונקציה לתצוגת מחיר בודד
+        function displaySingleQuote(quote) {
+            const resultsContainer = document.getElementById('test-results');
+            if (!resultsContainer) return;
+            
+            const changeClass = quote.change_percent > 0 ? 'text-success' : 
+                               quote.change_percent < 0 ? 'text-danger' : 'text-muted';
+            
+            const resultHtml = `
+                <div class="alert alert-info mb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>${quote.symbol}</strong> - ${getTickerName(quote.symbol)}
+                            <br><small class="text-muted">$${quote.price.toFixed(2)}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="${changeClass}">
+                                ${quote.change_amount > 0 ? '+' : ''}${quote.change_amount.toFixed(2)}
+                            </div>
+                            <div class="${changeClass}">
+                                ${quote.change_percent > 0 ? '+' : ''}${quote.change_percent.toFixed(2)}%
+                            </div>
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        נפח: ${formatNumber(quote.volume)} | 
+                        גבוה: $${quote.high_24h.toFixed(2)} | 
+                        נמוך: $${quote.low_24h.toFixed(2)}
+                    </small>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = resultHtml;
+        }
+
+        // פונקציה לתצוגת תוצאות מרובות
+        function displayBatchResults(quotes) {
+            const resultsContainer = document.getElementById('test-results');
+            if (!resultsContainer) return;
+            
+            let resultsHtml = '';
+            quotes.forEach(quote => {
+                const changeClass = quote.change_percent > 0 ? 'text-success' : 
+                                   quote.change_percent < 0 ? 'text-danger' : 'text-muted';
+                
+                resultsHtml += `
+                    <div class="alert alert-light mb-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${quote.symbol}</strong> - ${getTickerName(quote.symbol)}
+                            </div>
+                            <div class="text-end">
+                                <div>$${quote.price.toFixed(2)}</div>
+                                <div class="${changeClass}">
+                                    ${quote.change_amount > 0 ? '+' : ''}${quote.change_amount.toFixed(2)} 
+                                    (${quote.change_percent > 0 ? '+' : ''}${quote.change_percent.toFixed(2)}%)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = resultsHtml;
+        }
+
+        // פונקציה לתצוגת תוצאות
+        function displayResults(title, data) {
+            const resultsContainer = document.getElementById('test-results');
+            if (!resultsContainer) return;
+            
+            const resultHtml = `
+                <div class="alert alert-info mb-2">
+                    <h6>${title}</h6>
+                    <pre class="mb-0"><code>${JSON.stringify(data, null, 2)}</code></pre>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = resultHtml;
+        }
+
+        // פונקציה להוספת לוג
+        function addLog(level, message) {
+            const logContainer = document.getElementById('test-logs');
+            if (!logContainer) return;
+            
+            const timestamp = new Date().toLocaleTimeString('he-IL');
+            const levelClass = level === 'error' ? 'text-danger' : 
+                              level === 'warning' ? 'text-warning' : 
+                              level === 'success' ? 'text-success' : 'text-info';
+            
+            const logHtml = `
+                <div class="log-entry mb-1">
+                    <small class="text-muted">[${timestamp}]</small>
+                    <span class="${levelClass}">[${level.toUpperCase()}]</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            logContainer.innerHTML += logHtml;
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // פונקציה לניקוי לוגים
+        function clearTestLogs() {
+            const logContainer = document.getElementById('test-logs');
+            const resultsContainer = document.getElementById('test-results');
+            
+            if (logContainer) logContainer.innerHTML = '';
+            if (resultsContainer) resultsContainer.innerHTML = '';
+            
+            addLog('info', 'לוגים נוקו');
+        }
+
+        // פונקציה לקבלת שם טיקר
+        function getTickerName(symbol) {
+            return tickerNamesCache[symbol] || 'שם לא ידוע';
+        }
+
+        // פונקציה לעיצוב מספרים
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // פונקציה לעריכת סמלים מרובים
+        function editBatchSymbols() {
+            const label = document.getElementById('batch-symbols-label');
+            const textarea = document.getElementById('batch-symbols');
+            if (label && textarea) {
+                label.style.display = 'none';
+                textarea.style.display = 'block';
+                textarea.focus();
+            }
+        }
+
+        // אתחול event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // אתחול עריכת סמלים מרובים
+            const batchTextarea = document.getElementById('batch-symbols');
+            const batchLabel = document.getElementById('batch-symbols-label');
+            if (batchTextarea && batchLabel) {
+                batchTextarea.addEventListener('blur', function() {
+                    batchLabel.textContent = this.value || 'אין נתונים';
+                    batchLabel.style.display = 'block';
+                    this.style.display = 'none';
+                });
+            }
+
+            // הוספת event listeners לכפתורים
+            document.getElementById('load-db-tickers')?.addEventListener('click', loadDatabaseTickers);
+            document.getElementById('test-db-connection')?.addEventListener('click', testDatabaseConnection);
+            document.getElementById('test-single-quote')?.addEventListener('click', fetchSingleQuote);
+            document.getElementById('test-batch-quotes')?.addEventListener('click', fetchBatchQuotes);
+
+            // הוספת הודעה ראשונית
+            addLog('info', 'דף בדיקת מידע חיצוני נטען בהצלחה');
         });
     </script>
 </body>

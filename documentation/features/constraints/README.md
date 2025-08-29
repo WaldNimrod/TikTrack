@@ -79,11 +79,11 @@ VALUES ('cash_flows', 'type', 'ENUM', 'cash_flow_type_enum');
 -- Enum values
 INSERT INTO enum_values (constraint_id, value, display_name, sort_order)
 VALUES 
-(1, 'income', 'הכנסה', 1),
-(1, 'expense', 'הוצאה', 2),
-(1, 'fee', 'עמלה', 3),
-(1, 'tax', 'מס', 4),
-(1, 'interest', 'ריבית', 5);
+(1, 'income', 'Income', 1),
+(1, 'expense', 'Expense', 2),
+(1, 'fee', 'Fee', 3),
+(1, 'tax', 'Tax', 4),
+(1, 'interest', 'Interest', 5);
 ```
 
 ### Currency Constraints

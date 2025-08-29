@@ -125,15 +125,15 @@ async function saveAllPreferences() {
       const responseData = await response.json();
       console.log('📊 נתוני תגובה:', responseData);
       console.log('✅ כל ההעדפות נשמרו בהצלחה בשרת');
-      showPreferencesSuccess('✅ כל ההעדפות נשמרו בהצלחה');
+              showPreferencesSuccess('הצלחה', 'כל ההעדפות נשמרו בהצלחה');
     } else {
       const errorText = await response.text();
       console.error('❌ שגיאה בשמירת העדפות:', response.status, errorText);
-      showPreferencesError(`❌ שגיאה בשמירת העדפות: ${response.status}`);
+              showPreferencesError('שגיאה', `שגיאה בשמירת העדפות: ${response.status}`);
     }
   } catch (error) {
     console.error('❌ שגיאה בשמירת העדפות:', error);
-    showPreferencesError(`❌ שגיאה בשמירת העדפות: ${error.message}`);
+            showPreferencesError('שגיאה', `שגיאה בשמירת העדפות: ${error.message}`);
   }
 }
 
@@ -151,9 +151,9 @@ async function resetToDefaults() {
         
         try {
           await saveAllPreferences();
-          showPreferencesSuccess('✅ העדפות אופסו לברירות מחדל');
+          showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
         } catch (error) {
-          showPreferencesError('❌ שגיאה באיפוס העדפות');
+          showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
         }
       }
     );
@@ -165,9 +165,9 @@ async function resetToDefaults() {
       
       try {
         await saveAllPreferences();
-        showPreferencesSuccess('✅ העדפות אופסו לברירות מחדל');
+        showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
       } catch (error) {
-        showPreferencesError('❌ שגיאה באיפוס העדפות');
+        showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
       }
     }
   }
@@ -265,15 +265,17 @@ async function loadAccountsToFilter() {
       // בדוק את מבנה התגובה
       if (result.status === 'success' && result.data) {
         updateAccountFilter(result.data);
-                 if (result.data.length > 0) {
-           showPreferencesInfo('טעינת חשבונות', `נטענו ${result.data.length} חשבונות בהצלחה`);
-         }
+                         if (result.data.length > 0) {
+            // הסרת התראה מיותרת בטעינה
+            console.log(`✅ נטענו ${result.data.length} חשבונות בהצלחה`);
+        }
        } else if (Array.isArray(result)) {
          // אם התגובה היא מערך ישירות
          updateAccountFilter(result);
-         if (result.length > 0) {
-           showPreferencesInfo('טעינת חשבונות', `נטענו ${result.length} חשבונות בהצלחה`);
-         }
+                 if (result.length > 0) {
+            // הסרת התראה מיותרת בטעינה
+            console.log(`✅ נטענו ${result.length} חשבונות בהצלחה`);
+        }
        } else {
          console.warn('⚠️ מבנה תגובה לא צפוי:', result);
          showPreferencesWarning('טעינת חשבונות', 'מבנה תגובה לא צפוי מהשרת, משתמש בנתונים מקומיים');
@@ -306,7 +308,8 @@ function loadLocalAccounts() {
   ];
   
      updateAccountFilter(localAccounts);
-   showPreferencesInfo('טעינת חשבונות', `נטענו ${localAccounts.length} חשבונות מקומיים`);
+           // הסרת התראה מיותרת בטעינה
+    console.log(`✅ נטענו ${localAccounts.length} חשבונות מקומיים`);
 }
 
 /**
@@ -376,31 +379,31 @@ function getPreferenceLabel(key) {
 /**
  * הצגת הודעת הצלחה
  */
-function showPreferencesSuccess(message) {
-  console.log(`📢 showPreferencesSuccess נקרא: ${message}`);
+function showPreferencesSuccess(title, message) {
+  console.log(`📢 showPreferencesSuccess נקרא: ${title} - ${message}`);
   
   if (typeof window.showSuccessNotification === 'function') {
     console.log('📢 משתמש ב-window.showSuccessNotification');
-    window.showSuccessNotification('העדפות', message);
+    window.showSuccessNotification(title, message);
   } else if (typeof window.showNotification === 'function') {
     console.log('📢 משתמש ב-window.showNotification');
-    window.showNotification('העדפות', message, 'success');
+    window.showNotification(title, message, 'success');
   } else {
     console.log('📢 משתמש ב-console.log (ללא מערכת התראות)');
-    console.log('✅ הצלחה:', message);
+    console.log('✅ הצלחה:', title, '-', message);
   }
 }
 
 /**
  * הצגת הודעת שגיאה
  */
-function showPreferencesError(message) {
+function showPreferencesError(title, message) {
   if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification('העדפות', message);
+    window.showErrorNotification(title, message);
   } else if (typeof window.showNotification === 'function') {
-    window.showNotification('העדפות', message, 'error');
+    window.showNotification(title, message, 'error');
   } else {
-    console.error('❌ שגיאה:', message);
+    console.error('❌ שגיאה:', title, '-', message);
   }
 }
 
@@ -456,10 +459,10 @@ async function initializePreferences() {
     await loadAccountsToFilter();
     
     console.log('✅ דף העדפות אותחל בהצלחה');
-    showPreferencesSuccess('דף העדפות אותחל בהצלחה');
+    // הסרת התראה מיותרת בטעינה
   } catch (error) {
     console.error('❌ שגיאה באתחול דף העדפות:', error);
-    showPreferencesError('שגיאה באתחול דף העדפות');
+    showPreferencesError('שגיאה', 'שגיאה באתחול דף העדפות');
   }
 }
 

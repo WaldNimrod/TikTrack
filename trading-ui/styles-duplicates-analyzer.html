@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניתוח סגנונות כפולים - TikTrack</title>
+    <style>
+        body {
+            font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #29a6a8, #1f8a8c);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-left: auto;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #29a6a8;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 15px 12px;
+            text-align: right;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .style-name {
+            font-weight: 600;
+            color: #29a6a8;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .files-list {
+            max-width: 300px;
+        }
+
+        .file-item {
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 2px 0;
+            font-size: 12px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .relationship-type {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .complementary {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .overriding {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-select {
+            padding: 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background: white;
+            font-size: 13px;
+            min-width: 120px;
+        }
+
+        .action-select.merge {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .action-select.keep {
+            border-color: #007bff;
+            background: #f8f9ff;
+        }
+
+        .action-select.remove {
+            border-color: #dc3545;
+            background: #fff8f8;
+        }
+
+        .target-file-select {
+            padding: 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background: white;
+            font-size: 13px;
+            min-width: 150px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .target-file-select:disabled {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .priority {
+            text-align: center;
+        }
+
+        .priority-high {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .priority-medium {
+            color: #ffc107;
+            font-weight: 600;
+        }
+
+        .priority-low {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .export-section {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .export-btn {
+            background: #29a6a8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .export-btn:hover {
+            background: #1f8a8c;
+            transform: translateY(-1px);
+        }
+
+        .legend {
+            padding: 15px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .stats {
+                margin-left: 0;
+                justify-content: space-around;
+            }
+            
+            .legend {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ניתוח סגנונות כפולים - TikTrack</h1>
+            <p>זיהוי וארגון סגנונות CSS המוגדרים ביותר מקובץ אחד</p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #d4edda;"></div>
+                <span>הגדרות משלימות</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f8d7da;"></div>
+                <span>הגדרות דורסות</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #fff3cd;"></div>
+                <span>איחוד נדרש</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="filter-group">
+                <label>סוג קשר:</label>
+                <select id="relationshipFilter">
+                    <option value="all">הכל</option>
+                    <option value="complementary">משלימות</option>
+                    <option value="overriding">דורסות</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>פעולה:</label>
+                <select id="actionFilter">
+                    <option value="all">הכל</option>
+                    <option value="merge">איחוד</option>
+                    <option value="keep">שמירה</option>
+                    <option value="remove">הסרה</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>קובץ יעד:</label>
+                <select id="targetFileFilter">
+                    <option value="all">הכל</option>
+                    <option value="styles.css">styles.css</option>
+                    <option value="typography.css">typography.css</option>
+                    <option value="table.css">table.css</option>
+                    <option value="preferences.css">preferences.css</option>
+                    <option value="warning-system.css">warning-system.css</option>
+                    <option value="apple-theme.css">apple-theme.css</option>
+                    <option value="linked-items.css">linked-items.css</option>
+                    <option value="styles-test.css">styles-test.css</option>
+                </select>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">סה"כ</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="complementaryCount">0</div>
+                    <div class="stat-label">משלימות</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="overridingCount">0</div>
+                    <div class="stat-label">דורסות</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="duplicatesTable">
+                <thead>
+                    <tr>
+                        <th>שם הסגנון</th>
+                        <th>קבצים מוגדר בהם</th>
+                        <th>סוג קשר</th>
+                        <th>מתייחס למה במערכת</th>
+                        <th>עדיפות</th>
+                        <th>פעולה מומלצת</th>
+                        <th>קובץ יעד לאיחוד</th>
+                        <th>הערות</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- נתונים יוכנסו כאן -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="export-section">
+            <button class="export-btn" onclick="exportData()">ייצוא נתונים</button>
+            <button class="export-btn" onclick="exportSummary()" style="margin-right: 10px; background: #28a745;">ייצוא סיכום</button>
+        </div>
+    </div>
+
+    <script>
+        const duplicatesData = [
+            {
+                styleName: '.btn',
+                files: ['styles.css', 'typography.css', 'table.css', 'preferences.css', 'warning-system.css', 'apple-theme.css', 'linked-items.css', 'styles-test.css'],
+                relationship: 'overriding',
+                systemReference: 'כפתורים כלליים במערכת',
+                priority: 'high',
+                recommendedAction: 'merge',
+                targetFile: 'styles.css',
+                notes: 'איחוד הגדרה בסיסית ב-typography.css, הגדרות עיצוב ב-styles.css, הגדרות ספציפיות בקבצי הרכיבים'
+            },
+            {
+                styleName: '.modal',
+                files: ['apple-theme.css (3 הגדרות)'],
+                relationship: 'overriding',
+                systemReference: 'חלונות מודליים',
+                priority: 'high',
+                recommendedAction: 'merge',
+                targetFile: 'apple-theme.css',
+                notes: 'כפילות בתוך אותו קובץ - איחוד כל ההגדרות'
+            },
+            {
+                styleName: '.notification',
+                files: ['styles.css'],
+                relationship: 'complementary',
+                systemReference: 'הודעות מערכת',
+                priority: 'medium',
+                recommendedAction: 'merge',
+                targetFile: 'warning-system.css',
+                notes: 'העברה ל-warning-system.css'
+            },
+            {
+                styleName: '.alert-card',
+                files: ['styles.css (3 הגדרות)'],
+                relationship: 'overriding',
+                systemReference: 'כרטיסי התראה',
+                priority: 'high',
+                recommendedAction: 'merge',
+                targetFile: 'styles.css',
+                notes: 'איחוד ל-styles.css - הגדרות משלימות: responsive + צבעי רקע'
+            },
+            {
+                styleName: '.design-card',
+                files: ['styles.css (2 הגדרות)'],
+                relationship: 'complementary',
+                systemReference: 'כרטיסי עיצוב',
+                priority: 'medium',
+                recommendedAction: 'merge',
+                targetFile: 'styles.css',
+                notes: 'איחוד להגדרה אחת - עיצוב בסיסי + responsive'
+            },
+            {
+                styleName: '.linked-item-*',
+                files: ['linked-items.css'],
+                relationship: 'complementary',
+                systemReference: 'פריטים מקושרים',
+                priority: 'low',
+                recommendedAction: 'keep',
+                targetFile: 'linked-items.css',
+                notes: 'כבר מאוחד ב-linked-items.css'
+            },
+            {
+                styleName: '.warning-modal',
+                files: ['warning-system.css'],
+                relationship: 'complementary',
+                systemReference: 'מודל אזהרה',
+                priority: 'low',
+                recommendedAction: 'keep',
+                targetFile: 'warning-system.css',
+                notes: 'כבר מאוחד להגדרה אחת'
+            },
+            {
+                styleName: '.preference-*',
+                files: ['preferences.css (3 הגדרות)'],
+                relationship: 'complementary',
+                systemReference: 'דף הגדרות',
+                priority: 'medium',
+                recommendedAction: 'merge',
+                targetFile: 'preferences.css',
+                notes: 'איחוד להגדרה אחת - בסיסי + responsive + status'
+            },
+            {
+                styleName: '.status-*',
+                files: ['table.css', 'preferences.css'],
+                relationship: 'overriding',
+                systemReference: 'תגי סטטוס',
+                priority: 'high',
+                recommendedAction: 'merge',
+                targetFile: 'table.css',
+                notes: 'איחוד ל-table.css - הגדרות דורסות'
+            },
+            {
+                styleName: '.loading',
+                files: ['apple-theme.css', 'preferences.css'],
+                relationship: 'overriding',
+                systemReference: 'מצב טעינה',
+                priority: 'medium',
+                recommendedAction: 'merge',
+                targetFile: 'apple-theme.css',
+                notes: 'איחוד ל-apple-theme.css - הגדרות דורסות'
+            },
+            {
+                styleName: '.content-section',
+                files: ['styles.css', 'preferences.css'],
+                relationship: 'complementary',
+                systemReference: 'אזורי תוכן',
+                priority: 'medium',
+                recommendedAction: 'merge',
+                targetFile: 'styles.css',
+                notes: 'איחוד ל-styles.css - בסיסי + collapse animation'
+            },
+            {
+                styleName: '.section-*',
+                files: ['styles.css (2 הגדרות)'],
+                relationship: 'complementary',
+                systemReference: 'אזורים שונים',
+                priority: 'medium',
+                recommendedAction: 'merge',
+                targetFile: 'styles.css',
+                notes: 'איחוד להגדרה אחת ב-styles.css'
+            },
+            {
+                styleName: '.page-name',
+                files: ['styles.css (2 הגדרות)'],
+                relationship: 'complementary',
+                systemReference: 'כותרות דפים',
+                priority: 'low',
+                recommendedAction: 'merge',
+                targetFile: 'styles.css',
+                notes: 'איחוד להגדרה אחת - בסיסי + RTL'
+            },
+            {
+                styleName: '.overview-*',
+                files: ['styles.css (2 הגדרות)'],
+                relationship: 'complementary',
+                systemReference: 'אזורי סקירה',
+                priority: 'low',
+                recommendedAction: 'merge',
+                targetFile: 'styles.css',
+                notes: 'איחוד להגדרה אחת - כפתורים + עיצוב'
+            },
+            {
+                styleName: '.summary-*',
+                files: ['styles.css (2 הגדרות)'],
+                relationship: 'complementary',
+                systemReference: 'אזורי סיכום',
+                priority: 'low',
+                recommendedAction: 'keep',
+                targetFile: 'styles.css',
+                notes: 'להשאיר - אין צורך באיחוד'
+            },
+            {
+                styleName: '.profit-*',
+                files: ['styles.css'],
+                relationship: 'complementary',
+                systemReference: 'הצגת רווחים',
+                priority: 'low',
+                recommendedAction: 'keep',
+                targetFile: 'styles.css',
+                notes: 'להשאיר - אין צורך באיחוד'
+            },
+            {
+                styleName: '.fade-in',
+                files: ['table.css', 'external_data_test.css'],
+                relationship: 'overriding',
+                systemReference: 'אנימציות הופעה',
+                priority: 'medium',
+                recommendedAction: 'merge',
+                targetFile: 'apple-theme.css',
+                notes: 'איחוד ל-apple-theme.css - הגדרות דורסות'
+            }
+        ];
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const relationshipFilter = document.getElementById('relationshipFilter').value;
+            const actionFilter = document.getElementById('actionFilter').value;
+            const targetFileFilter = document.getElementById('targetFileFilter').value;
+
+            let filteredData = duplicatesData;
+
+            if (relationshipFilter !== 'all') {
+                filteredData = filteredData.filter(item => item.relationship === relationshipFilter);
+            }
+
+            if (actionFilter !== 'all') {
+                filteredData = filteredData.filter(item => item.recommendedAction === actionFilter);
+            }
+
+            if (targetFileFilter !== 'all') {
+                filteredData = filteredData.filter(item => item.targetFile === targetFileFilter);
+            }
+
+            tbody.innerHTML = filteredData.map(item => `
+                <tr>
+                    <td><span class="style-name">${item.styleName}</span></td>
+                    <td class="files-list">
+                        ${item.files.map(file => `<div class="file-item">${file}</div>`).join('')}
+                    </td>
+                    <td>
+                        <span class="relationship-type ${item.relationship}">
+                            ${item.relationship === 'complementary' ? 'משלימות' : 'דורסות'}
+                        </span>
+                    </td>
+                    <td>${item.systemReference}</td>
+                    <td class="priority">
+                        <span class="priority-${item.priority}">
+                            ${item.priority === 'high' ? 'גבוהה' : item.priority === 'medium' ? 'בינונית' : 'נמוכה'}
+                        </span>
+                    </td>
+                    <td>
+                        <select class="action-select ${item.recommendedAction}" onchange="updateAction(this, '${item.styleName}')">
+                            <option value="merge" ${item.recommendedAction === 'merge' ? 'selected' : ''}>איחוד</option>
+                            <option value="keep" ${item.recommendedAction === 'keep' ? 'selected' : ''}>שמירה</option>
+                            <option value="remove" ${item.recommendedAction === 'remove' ? 'selected' : ''}>הסרה</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="target-file-select" onchange="updateTargetFile(this, '${item.styleName}')" ${item.recommendedAction !== 'merge' ? 'disabled' : ''}>
+                            <option value="styles.css" ${item.targetFile === 'styles.css' ? 'selected' : ''}>styles.css</option>
+                            <option value="typography.css" ${item.targetFile === 'typography.css' ? 'selected' : ''}>typography.css</option>
+                            <option value="table.css" ${item.targetFile === 'table.css' ? 'selected' : ''}>table.css</option>
+                            <option value="preferences.css" ${item.targetFile === 'preferences.css' ? 'selected' : ''}>preferences.css</option>
+                            <option value="warning-system.css" ${item.targetFile === 'warning-system.css' ? 'selected' : ''}>warning-system.css</option>
+                            <option value="apple-theme.css" ${item.targetFile === 'apple-theme.css' ? 'selected' : ''}>apple-theme.css</option>
+                            <option value="linked-items.css" ${item.targetFile === 'linked-items.css' ? 'selected' : ''}>linked-items.css</option>
+                            <option value="styles-test.css" ${item.targetFile === 'styles-test.css' ? 'selected' : ''}>styles-test.css</option>
+                        </select>
+                    </td>
+                    <td>${item.notes}</td>
+                </tr>
+            `).join('');
+
+            updateStats();
+        }
+
+        function updateAction(select, styleName) {
+            const item = duplicatesData.find(item => item.styleName === styleName);
+            if (item) {
+                item.recommendedAction = select.value;
+                select.className = `action-select ${select.value}`;
+                
+                // עדכון מצב רשימת קובץ היעד
+                const targetFileSelect = select.closest('tr').querySelector('.target-file-select');
+                if (targetFileSelect) {
+                    targetFileSelect.disabled = select.value !== 'merge';
+                }
+            }
+        }
+
+        function updateTargetFile(select, styleName) {
+            const item = duplicatesData.find(item => item.styleName === styleName);
+            if (item) {
+                item.targetFile = select.value;
+            }
+        }
+
+        function updateStats() {
+            const total = duplicatesData.length;
+            const complementary = duplicatesData.filter(item => item.relationship === 'complementary').length;
+            const overriding = duplicatesData.filter(item => item.relationship === 'overriding').length;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('complementaryCount').textContent = complementary;
+            document.getElementById('overridingCount').textContent = overriding;
+        }
+
+        function exportData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                summary: {
+                    total: duplicatesData.length,
+                    complementary: duplicatesData.filter(item => item.relationship === 'complementary').length,
+                    overriding: duplicatesData.filter(item => item.relationship === 'overriding').length,
+                    merge: duplicatesData.filter(item => item.recommendedAction === 'merge').length,
+                    keep: duplicatesData.filter(item => item.recommendedAction === 'keep').length,
+                    remove: duplicatesData.filter(item => item.recommendedAction === 'remove').length
+                },
+                items: duplicatesData,
+                recommendations: {
+                    merge: duplicatesData.filter(item => item.recommendedAction === 'merge').map(item => ({
+                        styleName: item.styleName,
+                        targetFile: item.targetFile,
+                        files: item.files,
+                        notes: item.notes
+                    })),
+                    keep: duplicatesData.filter(item => item.recommendedAction === 'keep').map(item => ({
+                        styleName: item.styleName,
+                        targetFile: item.targetFile,
+                        notes: item.notes
+                    })),
+                    remove: duplicatesData.filter(item => item.recommendedAction === 'remove').map(item => ({
+                        styleName: item.styleName,
+                        files: item.files,
+                        notes: item.notes
+                    }))
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `css-duplicates-analysis-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function exportSummary() {
+            const mergeItems = duplicatesData.filter(item => item.recommendedAction === 'merge');
+            const keepItems = duplicatesData.filter(item => item.recommendedAction === 'keep');
+            const removeItems = duplicatesData.filter(item => item.recommendedAction === 'remove');
+
+            const summary = {
+                timestamp: new Date().toISOString(),
+                totalItems: duplicatesData.length,
+                mergeCount: mergeItems.length,
+                keepCount: keepItems.length,
+                removeCount: removeItems.length,
+                mergeByFile: {},
+                recommendations: {
+                    merge: mergeItems.map(item => ({
+                        styleName: item.styleName,
+                        targetFile: item.targetFile,
+                        files: item.files,
+                        priority: item.priority,
+                        notes: item.notes
+                    })),
+                    keep: keepItems.map(item => ({
+                        styleName: item.styleName,
+                        targetFile: item.targetFile,
+                        priority: item.priority,
+                        notes: item.notes
+                    })),
+                    remove: removeItems.map(item => ({
+                        styleName: item.styleName,
+                        files: item.files,
+                        priority: item.priority,
+                        notes: item.notes
+                    }))
+                }
+            };
+
+            // ארגון לפי קובץ יעד
+            mergeItems.forEach(item => {
+                if (!summary.mergeByFile[item.targetFile]) {
+                    summary.mergeByFile[item.targetFile] = [];
+                }
+                summary.mergeByFile[item.targetFile].push({
+                    styleName: item.styleName,
+                    files: item.files,
+                    priority: item.priority,
+                    notes: item.notes
+                });
+            });
+
+            const blob = new Blob([JSON.stringify(summary, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `css-duplicates-summary-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Event listeners
+        document.getElementById('relationshipFilter').addEventListener('change', renderTable);
+        document.getElementById('actionFilter').addEventListener('change', renderTable);
+        document.getElementById('targetFileFilter').addEventListener('change', renderTable);
+
+        // Initial render
+        renderTable();
+    </script>
+</body>
+</html>

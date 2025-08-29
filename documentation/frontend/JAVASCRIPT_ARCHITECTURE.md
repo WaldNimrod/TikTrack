@@ -9,13 +9,13 @@ This document describes the comprehensive JavaScript architecture implemented in
 ### Project Structure
 ```
 trading-ui/scripts/
-├── 🏛️ Core Files (קבצי ליבה)
+├── 🏛️ Core Files
 │   ├── main.js                    # Global initialization and core functions
 │   ├── header-system.js           # Unified header system
 │   ├── notification-system.js     # Global notification system
 │   └── console-cleanup.js         # Console cleanup
 │
-├── 🛠️ Utility Files (קבצי שירות)
+├── 🛠️ Utility Files
 │   ├── ui-utils.js                # Shared UI functions
 │   ├── validation-utils.js        # Global validation system
 │   ├── data-utils.js              # Shared data functions
@@ -29,7 +29,7 @@ trading-ui/scripts/
 │   ├── warning-system.js          # Central warning system
 │   └── crud-utils.js              # CRUD operations utilities
 │
-├── 📄 Page Files (קבצי עמודים)
+├── 📄 Page Files
 │   ├── accounts.js                # Account management (currency_id migration)
 │   ├── alerts.js                  # Alert management
 │   ├── trades.js                  # Trade management (linked items)
@@ -47,7 +47,7 @@ trading-ui/scripts/
 │   ├── active-alerts-component.js # Active alerts component
 │   └── db-extradata.js            # Auxiliary tables management
 │
-└── 🔧 System Files (קבצי מערכות)
+└── 🔧 System Files
     ├── filter-system.js           # Advanced filter system
     ├── constraint-manager.js      # Constraint manager
     ├── condition-translator.js    # Condition translator

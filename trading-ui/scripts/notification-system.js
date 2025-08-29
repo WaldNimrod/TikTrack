@@ -2,26 +2,22 @@
  * Notification System - TikTrack
  * =============================
  * 
- * This file contains three main systems:
- * 1. ALERTS SYSTEM - Business alerts for market conditions
- * 2. NOTIFICATION SYSTEM - System messages for user feedback
- * 3. LINKED ITEMS SYSTEM - Linked items display and management
+ * מערכת התראות מרכזית לפרויקט TikTrack
  * 
- * Each function is clearly marked with comments indicating which system it belongs to.
+ * קובץ זה מכיל שלושה מערכות עיקריות:
+ * 1. ALERTS SYSTEM - התראות עסקיות לתנאי שוק
+ * 2. NOTIFICATION SYSTEM - הודעות מערכת למשוב משתמש
+ * 3. LINKED ITEMS SYSTEM - הצגה וניהול פריטים מקושרים
  * 
- * File: trading-ui/scripts/notification-system.js
- * Version: 3.0
- * Last Updated: August 26, 2025
+ * קובץ: trading-ui/scripts/notification-system.js
+ * גרסה: 3.0
+ * עדכון אחרון: 29 באוגוסט 2025
  * 
- * Dependencies:
- * - linked-items.js (for modal display functions)
- * - Bootstrap 5.3.0 (for modal functionality)
+ * תלויות:
+ * - linked-items.js (לפונקציות הצגת מודלים)
+ * - Bootstrap 5.3.0 (לפונקציונליות מודלים)
  * 
- * Global Exports:
- * - window.showNotification() - System notifications
- * - window.showLinkedItemsWarning() - Linked items warnings
- * - window.loadLinkedItemsData() - Load linked items data
- * - window.notificationSystem - Module object
+ * דוקומנטציה מפורטת: documentation/frontend/NOTIFICATION_SYSTEM.md
  */
 
 // ===== ALERTS SYSTEM FUNCTIONS =====
@@ -173,32 +169,50 @@ function createNotificationContainer() {
  * Show notification to user
  * NOTIFICATION SYSTEM - Displays system message to user
  * 
- * @param {string} title - Notification title
  * @param {string} message - Notification message
  * @param {string} type - Notification type: 'success', 'error', 'warning', 'info'
+ * @param {string} title - Notification title
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  */
-function showNotification(title, message, type = 'info', duration = 4000) {
+function showNotification(message, type = 'info', title = 'התראה', duration = 4000) {
+    console.log('🔧 showNotification called with:', { message, type, title, duration });
+    console.log('🔧 Parameter types:', { 
+        messageType: typeof message, 
+        typeType: typeof type, 
+        titleType: typeof title, 
+        durationType: typeof duration 
+    });
+    console.log('🔧 Raw parameters:', [message, type, title, duration]);
+    
+    // Validate and sanitize parameters
+    const validTypes = ['success', 'error', 'warning', 'info'];
+    const sanitizedType = validTypes.includes(type) ? type : 'info';
+    const sanitizedTitle = title || 'הודעה';
+    const sanitizedMessage = message || '';
+
+    console.log('🔧 Sanitized parameters:', { sanitizedType, sanitizedTitle, sanitizedMessage });
 
     // Create notification container
     const container = createNotificationContainer();
 
     // Create notification element
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.className = `notification ${sanitizedType}`;
 
     // Get icon for notification type
-    const icon = getNotificationIcon(type);
+    const icon = getNotificationIcon(sanitizedType);
 
     // Create notification content
     notification.innerHTML = `
         <div class="notification-icon">${icon}</div>
         <div class="notification-content">
-            <div class="notification-title">${title}</div>
-            <div class="notification-message">${message}</div>
+            <div class="notification-title">${sanitizedTitle}</div>
+            <div class="notification-message">${sanitizedMessage}</div>
         </div>
         <button class="notification-close" onclick="this.parentElement.remove()">×</button>
     `;
+
+    console.log('🔧 Created notification element:', notification);
 
     // Add to container
     container.appendChild(notification);
@@ -206,6 +220,7 @@ function showNotification(title, message, type = 'info', duration = 4000) {
     // Show notification with animation
     setTimeout(() => {
         notification.classList.add('show');
+        console.log('🔧 Notification shown with class:', notification.className);
     }, 100);
 
     // Auto-remove after duration
@@ -263,7 +278,14 @@ function getNotificationIcon(type) {
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  */
 function showSuccessNotification(title, message, duration = 4000) {
-    showNotification(title, message, 'success', duration);
+    console.log('🔧 showSuccessNotification called with:', { title, message, duration });
+    
+    // Ensure title and message are provided
+    const finalTitle = title || 'הצלחה';
+    const finalMessage = message || 'הפעולה הושלמה בהצלחה';
+    
+    console.log('🔧 showSuccessNotification calling showNotification with:', { finalTitle, finalMessage, type: 'success', duration });
+    showNotification(finalMessage, 'success', finalTitle, duration);
 }
 
 /**
@@ -275,7 +297,9 @@ function showSuccessNotification(title, message, duration = 4000) {
  * @param {number} duration - Display duration in milliseconds (default: 6000)
  */
 function showErrorNotification(title, message, duration = 6000) {
-    showNotification(title, message, 'error', duration);
+    console.log('🔧 showErrorNotification called with:', { title, message, duration });
+    console.log('🔧 showErrorNotification calling showNotification with:', { message, type: 'error', title, duration });
+    showNotification(message, 'error', title, duration);
 }
 
 /**
@@ -287,7 +311,9 @@ function showErrorNotification(title, message, duration = 6000) {
  * @param {number} duration - Display duration in milliseconds (default: 5000)
  */
 function showWarningNotification(title, message, duration = 5000) {
-    showNotification(title, message, 'warning', duration);
+    console.log('🔧 showWarningNotification called with:', { title, message, duration });
+    console.log('🔧 showWarningNotification calling showNotification with:', { message, type: 'warning', title, duration });
+    showNotification(message, 'warning', title, duration);
 }
 
 /**
@@ -299,7 +325,176 @@ function showWarningNotification(title, message, duration = 5000) {
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  */
 function showInfoNotification(title, message, duration = 4000) {
-    showNotification(title, message, 'info', duration);
+    console.log('🔧 showInfoNotification called with:', { title, message, duration });
+    console.log('🔧 showInfoNotification calling showNotification with:', { message, type: 'info', title, duration });
+    showNotification(message, 'info', title, duration);
+}
+
+/**
+ * Show validation warning with field highlighting
+ * NOTIFICATION SYSTEM - Displays validation error with field highlighting
+ * 
+ * @param {string} fieldId - ID of the problematic field
+ * @param {string} message - Validation error message
+ * @param {number} duration - Display duration in milliseconds (default: 6000)
+ */
+function showValidationWarning(fieldId, message, duration = 6000) {
+    console.log('🔧 showValidationWarning called with:', { fieldId, message, duration });
+    
+    // Show error notification (red)
+    console.log('🔧 showValidationWarning calling showErrorNotification with:', { title: 'שגיאת וולידציה', message, duration });
+    showErrorNotification('שגיאת וולידציה', message, duration);
+    
+    // Highlight the problematic field
+    const field = document.getElementById(fieldId);
+    console.log('🔧 Field element found:', field);
+    
+    if (field) {
+        // Add error styling
+        field.classList.add('is-invalid');
+        field.classList.remove('is-valid');
+        
+        // Add red border
+        field.style.borderColor = '#dc3545';
+        field.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+        
+        // Scroll to field
+        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Focus on field
+        field.focus();
+        
+        console.log('🔧 Field styling applied');
+        
+        // Remove styling after 3 seconds
+        setTimeout(() => {
+            field.classList.remove('is-invalid');
+            field.style.borderColor = '';
+            field.style.boxShadow = '';
+            console.log('🔧 Field styling removed');
+        }, 3000);
+    } else {
+        console.log('🔧 Field not found:', fieldId);
+    }
+}
+
+/**
+ * Show confirmation dialog
+ * NOTIFICATION SYSTEM - Shows confirmation dialog for important actions
+ * 
+ * @param {string} title - Dialog title
+ * @param {string} message - Dialog message
+ * @param {Function} onConfirm - Callback for confirm action
+ * @param {Function} onCancel - Callback for cancel action
+ */
+function showConfirmationDialog(title, message, onConfirm = null, onCancel = null) {
+    // יצירת מודל אישור דינמי
+    const modalId = 'confirmationModal';
+    
+    // יצירת HTML למודל
+    const modalHTML = `
+        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="${modalId}Label">${title}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ${message.replace(/\n/g, '<br>')}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-danger confirm-btn">אישור</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // קבלת המודל החדש
+    const modal = document.getElementById(modalId);
+    
+    // הגדרת אירועי כפתורים
+    const confirmBtn = modal.querySelector('.confirm-btn');
+    const cancelBtn = modal.querySelector('.btn-secondary');
+    
+    // פונקציה לסגירת המודל
+    const closeModal = () => {
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        if (bootstrapModal) {
+            bootstrapModal.hide();
+        }
+        // הסרת המודל מהדף אחרי סגירה
+        setTimeout(() => {
+            if (modal && modal.parentNode) {
+                modal.parentNode.removeChild(modal);
+            }
+        }, 300);
+    };
+    
+    // אירוע אישור
+    if (confirmBtn) {
+        confirmBtn.onclick = () => {
+            closeModal();
+            if (typeof onConfirm === 'function') {
+                onConfirm();
+            }
+        };
+    }
+    
+    // אירוע ביטול
+    if (cancelBtn) {
+        cancelBtn.onclick = () => {
+            closeModal();
+            if (typeof onCancel === 'function') {
+                onCancel();
+            }
+        };
+    }
+    
+    // אירוע סגירה על ידי לחיצה מחוץ למודל או ESC
+    modal.addEventListener('hidden.bs.modal', () => {
+        if (typeof onCancel === 'function') {
+            onCancel();
+        }
+        // הסרת המודל מהדף
+        setTimeout(() => {
+            if (modal && modal.parentNode) {
+                modal.parentNode.removeChild(modal);
+            }
+        }, 300);
+    });
+    
+    // הצגת המודל
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
+}
+
+/**
+ * Show delete warning
+ * NOTIFICATION SYSTEM - Shows warning for delete operations
+ * 
+ * @param {string} itemType - Type of item being deleted
+ * @param {string} itemName - Name/ID of item being deleted
+ * @param {string} itemTypeDisplay - Display name for item type
+ * @param {Function} onConfirm - Callback for confirm action
+ * @param {Function} onCancel - Callback for cancel action
+ */
+function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null, onCancel = null) {
+    const title = `מחיקת ${itemTypeDisplay}`;
+    const message = `האם אתה בטוח שברצונך למחוק את ${itemTypeDisplay} "${itemName}"?\n\nפעולה זו אינה ניתנת לביטול.`;
+    
+    showConfirmationDialog(title, message, onConfirm, onCancel);
 }
 
 // ===== LEGACY SUPPORT =====
@@ -319,10 +514,10 @@ function showNotificationLegacy(message, type = 'info', duration = 4000) {
         const parts = message.split(':');
         const title = parts[0].trim();
         const msg = parts.slice(1).join(':').trim();
-        showNotification(title, msg, type, duration);
+        showNotification(msg, type, title, duration);
     } else {
         // Otherwise it's just message
-        showNotification('Message', message, type, duration);
+        showNotification(message, type, 'Message', duration);
     }
 }
 
@@ -341,6 +536,9 @@ window.showSuccessNotification = showSuccessNotification;
 window.showErrorNotification = showErrorNotification;
 window.showWarningNotification = showWarningNotification;
 window.showInfoNotification = showInfoNotification;
+window.showValidationWarning = showValidationWarning;
+window.showConfirmationDialog = showConfirmationDialog;
+window.showDeleteWarning = showDeleteWarning;
 
 // Export LINKED ITEMS SYSTEM functions to global scope
 window.showLinkedItemsWarning = showLinkedItemsWarning;
@@ -364,6 +562,9 @@ window.notificationSystem = {
     createNotificationContainer,
     hideNotification,
     getNotificationIcon,
+    showValidationWarning,
+    showConfirmationDialog,
+    showDeleteWarning,
 
     // LINKED ITEMS SYSTEM functions
     showLinkedItemsWarning,

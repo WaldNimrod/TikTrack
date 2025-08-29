@@ -139,8 +139,8 @@ The API now returns both old and new formats:
   "condition_attribute": "price",              // New format
   "condition_operator": "more_than",           // New format
   "condition_number": "180.50",                // New format
-  "condition_display_text": "מחיר יותר מ 180.50", // Hebrew display
-  "message": "AAPL הגיע ליעד מחיר של 180.50",
+  "condition_display_text": "Price more than 180.50", // English display
+"message": "AAPL reached target price of 180.50",
   "status": "open",
   "is_triggered": "false",
   "related_type_id": 4,
@@ -157,10 +157,10 @@ Updated `condition-translator.js` to handle new field format:
 
 ### 2. Display Format
 Updated alert display to show:
-- **Trades**: `טרייד | [צד] | [סוג השקעה] | [תאריך]`
-- **Trade Plans**: `תוכנית | [צד] | [סוג השקעה] | [תאריך]`
-- **Tickers**: `[סימבול]`
-- **Accounts**: `[שם חשבון] ([מטבע])`
+- **Trades**: `Trade | [Side] | [Investment Type] | [Date]`
+- **Trade Plans**: `Plan | [Side] | [Investment Type] | [Date]`
+- **Tickers**: `[Symbol]`
+- **Accounts**: `[Name Account] ([Currency])`
 
 ## Testing
 

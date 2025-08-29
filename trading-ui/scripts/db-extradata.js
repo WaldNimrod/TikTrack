@@ -15,100 +15,19 @@
  * Last Updated: August 23, 2025
  */
 
-// ===== פונקציות לפתיחה/סגירה של סקשנים =====
-
-// פונקציה לפתיחה/סגירה של כל הסקשנים - משתמשת בפונקציה הגלובלית
-function toggleAllSections() {
-    if (typeof window.toggleAllSections === 'function') {
-        window.toggleAllSections();
-    } else {
-        console.warn('⚠️ toggleAllSections function not available globally');
-    }
+// ===== משתנים גלובליים =====
+// הגדרת משתנים גלובליים לנתונים
+if (!window.currenciesData) {
+    window.currenciesData = [];
+}
+if (!window.noteRelationTypesData) {
+    window.noteRelationTypesData = [];
 }
 
-// פונקציה לפתיחה/סגירה של סקשן מטבעות - משתמשת בפונקציה הגלובלית
-function toggleCurrenciesSection() {
-    if (typeof window.toggleMainSection === 'function') {
-        window.toggleMainSection();
-    } else {
-        console.warn('⚠️ toggleMainSection function not available globally');
-    }
-}
+let currenciesData = window.currenciesData;
+let noteRelationTypesData = window.noteRelationTypesData;
 
-// פונקציה לפתיחה/סגירה של סקשן סוגי קישור - משתמשת בפונקציה הגלובלית
-function toggleNoteRelationTypesSection() {
-    if (typeof window.toggleMainSection === 'function') {
-        window.toggleMainSection();
-    } else {
-        console.warn('⚠️ toggleMainSection function not available globally');
-    }
-}
-
-// פונקציה לשחזור מצב הסגירה
-function restoreSectionsState() {
-    console.log('🔄 Restoring sections state...');
-
-    // שחזור מצב הסקשן העליון
-    const topCollapsed = localStorage.getItem('dbExtradataTopSectionCollapsed') === 'true';
-    const topSection = document.querySelector('.top-section');
-
-    if (topSection) {
-        const sectionBody = topSection.querySelector('.section-body');
-        const toggleBtn = topSection.querySelector('button[onclick="toggleAllSections()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && topCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
-            }
-        }
-    }
-
-    // שחזור מצב סקשן המטבעות
-    const currenciesCollapsed = localStorage.getItem('dbExtradataCurrenciesSectionCollapsed') === 'true';
-    console.log('🔍 Currencies section collapsed state:', currenciesCollapsed);
-    
-    const contentSections = document.querySelectorAll('.content-section');
-    const currenciesSection = contentSections[0];
-
-    if (currenciesSection) {
-        const sectionBody = currenciesSection.querySelector('.section-body');
-        const toggleBtn = currenciesSection.querySelector('button[onclick="toggleCurrenciesSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && currenciesCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
-            }
-            console.log('✅ Currencies section restored to collapsed state');
-        } else {
-            console.log('ℹ️ Currencies section restored to expanded state');
-        }
-    } else {
-        console.log('⚠️ Currencies section not found');
-    }
-
-    // שחזור מצב סקשן סוגי הקישור
-    const noteRelationTypesCollapsed = localStorage.getItem('dbExtradataNoteRelationTypesSectionCollapsed') === 'true';
-    const noteRelationTypesSection = contentSections[1];
-
-    if (noteRelationTypesSection) {
-        const sectionBody = noteRelationTypesSection.querySelector('.section-body');
-        const toggleBtn = noteRelationTypesSection.querySelector('button[onclick="toggleNoteRelationTypesSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && noteRelationTypesCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
-            }
-        }
-    }
-
-    // מצב הסגירה שוחזר
-}
+// ===== פונקציות לטעינת נתונים =====
 
 // פונקציה לטעינת נתוני מטבעות
 async function loadCurrenciesData() {
@@ -122,6 +41,8 @@ async function loadCurrenciesData() {
         const result = await response.json();
 
         if (result.status === 'success') {
+            currenciesData = result.data;
+            window.currenciesData = result.data;
             updateCurrenciesTable(result.data);
             updateCurrenciesCount(result.data.length);
             // נטענו מטבעות
@@ -130,7 +51,11 @@ async function loadCurrenciesData() {
         }
     } catch (error) {
         console.error('❌ שגיאה בטעינת מטבעות:', error);
-        showCurrenciesError();
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני מטבעות');
+        } else {
+            console.error('❌ Error loading currencies data');
+        }
     }
 }
 
@@ -208,15 +133,6 @@ function updateCurrenciesCount(count) {
     }
 }
 
-// פונקציה להצגת שגיאה בטבלת מטבעות - משתמשת במערכת ההתראות הגלובלית
-function showCurrenciesError() {
-    if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני מטבעות');
-    } else {
-        console.error('❌ Error loading currencies data');
-    }
-}
-
 // פונקציה לטעינת נתוני סוגי קישור הערות
 async function loadNoteRelationTypesData() {
 
@@ -229,6 +145,8 @@ async function loadNoteRelationTypesData() {
         const result = await response.json();
 
         if (result.status === 'success') {
+            noteRelationTypesData = result.data;
+            window.noteRelationTypesData = result.data;
             updateNoteRelationTypesTable(result.data);
             updateNoteRelationTypesCount(result.data.length);
             // נטענו סוגי קישור
@@ -237,7 +155,11 @@ async function loadNoteRelationTypesData() {
         }
     } catch (error) {
         console.error('❌ שגיאה בטעינת סוגי קישור:', error);
-        showNoteRelationTypesError();
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני סוגי קישור');
+        } else {
+            console.error('❌ Error loading note relation types data');
+        }
     }
 }
 
@@ -308,13 +230,6 @@ function updateNoteRelationTypesCount(count) {
 }
 
 // פונקציה להצגת שגיאה בטבלת סוגי קישור - משתמשת במערכת ההתראות הגלובלית
-function showNoteRelationTypesError() {
-    if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני סוגי קישור');
-    } else {
-        console.error('❌ Error loading note relation types data');
-    }
-}
 
 // פונקציות עריכה ומחיקה (placeholder)
 // פונקציות אלו הוחלפו בפונקציות החדשות עם שמות ברורים יותר
@@ -372,8 +287,19 @@ function updateLoadingText() {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-    // שחזור מצב הסגירה
-    restoreSectionsState();
+    // שחזור מצב הסגירה של הסקשן העליון
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    } else {
+        console.warn('⚠️ restoreAllSectionStates function not available globally');
+    }
+
+    // שחזור מצב הסגירה של הסקשנים הפנימיים
+    if (typeof window.restoreSectionStates === 'function') {
+        window.restoreSectionStates();
+    } else {
+        console.warn('⚠️ restoreSectionStates function not available globally');
+    }
 
     // עדכון טקסט טעינה
     updateLoadingText();
@@ -384,110 +310,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ===== פונקציות וולידציה =====
 
-// פונקציה לוולידציה של סמל מטבע (משתמשת במערכת החדשה)
-function validateCurrencySymbol(input) {
-    // בדיקה שהפרמטר קיים ותקין
-    if (!input || !input.value) {
-        console.warn('validateCurrencySymbol: input parameter is invalid');
-        return false;
-    }
-    
-    const symbol = input.value.trim().toUpperCase();
-    
-    // עדכון הערך לשדה
-    input.value = symbol;
-    
-    // שימוש בפונקציה הגלובלית
-    if (window.validateCurrencySymbol) {
-        const result = window.validateCurrencySymbol(symbol);
-        if (result === true) {
-            if (window.showFieldSuccess) {
-                window.showFieldSuccess(input);
-            }
-            return true;
-        } else {
-            if (window.showFieldError) {
-                window.showFieldError(input, result);
-            }
-            return false;
-        }
-    } else {
-        console.warn('⚠️ validateCurrencySymbol function not available globally');
-        // Fallback לוולידציה בסיסית
-        const symbolPattern = /^[A-Z]+$/;
-        if (!symbolPattern.test(symbol)) {
-            if (window.showFieldError) {
-                window.showFieldError(input, 'סמל מטבע חייב להכיל רק אותיות אנגליות גדולות');
-            }
-            return false;
-        }
-        if (symbol.length > 10) {
-            if (window.showFieldError) {
-                window.showFieldError(input, 'סמל מטבע לא יכול להיות יותר מ-10 תווים');
-            }
-            return false;
-        }
-        if (window.showFieldSuccess) {
-            window.showFieldSuccess(input);
-        }
-        return true;
-    }
-}
 
-// פונקציה לוולידציה של שם מטבע
-function validateCurrencyName(input) {
-    const name = input.value.trim();
 
-    if (name.length === 0) {
-        input.classList.add('is-invalid');
-        return false;
-    }
 
-    if (name.length > 100) {
-        input.classList.add('is-invalid');
-        return false;
-    }
 
-    input.classList.remove('is-invalid');
-    input.classList.add('is-valid');
-    return true;
-}
-
-// פונקציה לוולידציה של שער דולר
-function validateCurrencyUsdRate(input) {
-    const rate = parseFloat(input.value);
-
-    if (isNaN(rate) || rate < 0) {
-        input.classList.add('is-invalid');
-        return false;
-    }
-
-    input.classList.remove('is-invalid');
-    input.classList.add('is-valid');
-    return true;
-}
-
-// פונקציה לוולידציה של כל הטופס
-function validateCurrencyForm() {
-    // בדיקה אם זה מודל הוספה או עריכה
-    const isEditMode = document.getElementById('editCurrencySymbol') !== null;
-
-    const symbolInput = isEditMode ?
-        document.getElementById('editCurrencySymbol') :
-        document.getElementById('currencySymbol');
-    const nameInput = isEditMode ?
-        document.getElementById('editCurrencyName') :
-        document.getElementById('currencyName');
-    const rateInput = isEditMode ?
-        document.getElementById('editCurrencyUsdRate') :
-        document.getElementById('currencyUsdRate');
-
-    const symbolValid = validateCurrencySymbol(symbolInput);
-    const nameValid = validateCurrencyName(nameInput);
-    const rateValid = validateCurrencyUsdRate(rateInput);
-
-    return symbolValid && nameValid && rateValid;
-}
+// ===== פונקציות CRUD למטבעות (Currencies) =====
 
 // ===== פונקציות CRUD למטבעות (Currencies) =====
 
@@ -710,16 +537,19 @@ function showEditCurrencyModalWithData(currency) {
 // פונקציה להצגת מודל מחיקת מטבע
 function showDeleteCurrencyModal(id) {
     const modalHtml = `
-        <div class="modal fade" id="deleteCurrencyModal" tabindex="-1" aria-labelledby="deleteCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="true">
+        <div class="modal fade" id="deleteCurrencyModal" tabindex="-1" aria-labelledby="deleteCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored bg-danger">
+                    <div class="modal-header" style="background-color: #dc3545; color: white;">
                         <h5 class="modal-title text-white" id="deleteCurrencyModalLabel">מחק מטבע</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>האם אתה בטוח שברצונך למחוק מטבע זה?</p>
-                        <p class="text-muted">פעולה זו אינה הפיכה.</p>
+                        <div class="alert alert-danger" role="alert">
+                            <h6 class="alert-heading">⚠️ אזהרה!</h6>
+                            <p class="mb-1">האם אתה בטוח שברצונך למחוק מטבע זה?</p>
+                            <p class="mb-0 small text-muted">פעולה זו אינה הפיכה ותמחק את המטבע לצמיתות.</p>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
@@ -746,8 +576,8 @@ function showDeleteCurrencyModal(id) {
 
 // פונקציה לשמירת מטבע חדש
 async function saveCurrencyRecord() {
-    // וולידציה של הטופס
-    if (!validateCurrencyForm()) {
+    // וולידציה של הטופס באמצעות הפונקציה הכללית
+    if (!validateForm('addCurrencyForm')) {
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני השמירה');
         } else {
@@ -778,10 +608,10 @@ async function saveCurrencyRecord() {
 
         if (result.status === 'success') {
             if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('הצלחה', 'מטבע נוסף בהצלחה');
-        } else {
-            console.log('מטבע נוסף בהצלחה');
-        }
+                window.showSuccessNotification('הצלחה', `מטבע ${currencyData.symbol} נוסף בהצלחה למערכת`);
+            } else {
+                console.log('מטבע נוסף בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('addCurrencyModal')).hide();
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
@@ -800,7 +630,7 @@ async function saveCurrencyRecord() {
             }
 
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', errorMessage);
+                window.showErrorNotification(errorMessage, 'שגיאה');
             } else {
                 console.error(errorMessage);
             }
@@ -817,8 +647,8 @@ async function saveCurrencyRecord() {
 
 // פונקציה לעדכון מטבע
 async function updateCurrencyRecord() {
-    // וולידציה של הטופס
-    if (!validateCurrencyForm()) {
+    // וולידציה של הטופס באמצעות הפונקציה הכללית
+    if (!validateForm('editCurrencyForm')) {
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני העדכון');
         } else {
@@ -850,7 +680,7 @@ async function updateCurrencyRecord() {
 
         if (result.status === 'success') {
             if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('הצלחה', 'מטבע עודכן בהצלחה');
+                window.showSuccessNotification('הצלחה', `מטבע ${currencyData.symbol} עודכן בהצלחה במערכת`);
             } else {
                 console.log('מטבע עודכן בהצלחה');
             }
@@ -874,7 +704,7 @@ async function updateCurrencyRecord() {
             }
 
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', errorMessage);
+                window.showErrorNotification(errorMessage, 'שגיאה');
             } else {
                 console.error(errorMessage);
             }
@@ -891,6 +721,10 @@ async function updateCurrencyRecord() {
 
 // פונקציה לאישור מחיקת מטבע
 async function confirmDeleteCurrencyRecord(id) {
+    // מציאת המטבע לפני מחיקה כדי להציג פרטים בהודעה
+    const currency = currenciesData.find(c => c.id == id);
+    const currencyInfo = currency ? `${currency.symbol} - ${currency.name}` : `מטבע ${id}`;
+
     try {
         const response = await fetch(`/api/v1/currencies/${id}`, {
             method: 'DELETE'
@@ -900,7 +734,7 @@ async function confirmDeleteCurrencyRecord(id) {
 
         if (result.status === 'success') {
             if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('הצלחה', 'מטבע נמחק בהצלחה');
+                window.showSuccessNotification('הצלחה', `מטבע ${currencyInfo} נמחק בהצלחה מהמערכת`);
             } else {
                 console.log('מטבע נמחק בהצלחה');
             }
@@ -908,7 +742,7 @@ async function confirmDeleteCurrencyRecord(id) {
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה במחיקת מטבע');
+                window.showErrorNotification(result.error?.message || 'שגיאה במחיקת מטבע', 'שגיאה');
             } else {
                 console.error(result.error?.message || 'שגיאה במחיקת מטבע');
             }
@@ -916,7 +750,7 @@ async function confirmDeleteCurrencyRecord(id) {
     } catch (error) {
         console.error('Error deleting currency:', error);
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'שגיאה במחיקת מטבע');
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
         } else {
             console.error('שגיאה במחיקת מטבע');
         }
@@ -1053,16 +887,19 @@ function showEditNoteRelationTypeModalWithData(noteType) {
 // פונקציה להצגת מודל מחיקת סוג קישור
 function showDeleteNoteRelationTypeModal(id) {
     const modalHtml = `
-        <div class="modal fade" id="deleteNoteRelationTypeModal" tabindex="-1" aria-labelledby="deleteNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="true">
+        <div class="modal fade" id="deleteNoteRelationTypeModal" tabindex="-1" aria-labelledby="deleteNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored bg-danger">
+                    <div class="modal-header" style="background-color: #dc3545; color: white;">
                         <h5 class="modal-title text-white" id="deleteNoteRelationTypeModalLabel">מחק סוג קישור</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>האם אתה בטוח שברצונך למחוק סוג קישור זה?</p>
-                        <p class="text-muted">פעולה זו אינה הפיכה.</p>
+                        <div class="alert alert-danger" role="alert">
+                            <h6 class="alert-heading">⚠️ אזהרה!</h6>
+                            <p class="mb-1">האם אתה בטוח שברצונך למחוק סוג קישור זה?</p>
+                            <p class="mb-0 small text-muted">פעולה זו אינה הפיכה ותמחק את סוג הקישור לצמיתות.</p>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
@@ -1089,6 +926,16 @@ function showDeleteNoteRelationTypeModal(id) {
 
 // פונקציה לשמירת סוג קישור חדש
 async function saveNoteRelationTypeRecord() {
+    // וולידציה של הטופס באמצעות הפונקציה הכללית
+    if (!validateForm('addNoteRelationTypeForm')) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני השמירה');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני השמירה');
+        }
+        return;
+    }
+
     const form = document.getElementById('addNoteRelationTypeForm');
     const formData = new FormData(form);
 
@@ -1109,7 +956,7 @@ async function saveNoteRelationTypeRecord() {
 
         if (result.status === 'success') {
             if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('הצלחה', 'סוג קישור נוסף בהצלחה');
+                window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeData.note_relation_type} נוסף בהצלחה למערכת`);
             } else {
                 console.log('סוג קישור נוסף בהצלחה');
             }
@@ -1117,7 +964,7 @@ async function saveNoteRelationTypeRecord() {
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה בהוספת סוג קישור');
+                window.showErrorNotification(result.error?.message || 'שגיאה בהוספת סוג קישור', 'שגיאה');
             } else {
                 console.error(result.error?.message || 'שגיאה בהוספת סוג קישור');
             }
@@ -1125,7 +972,7 @@ async function saveNoteRelationTypeRecord() {
     } catch (error) {
         console.error('Error saving note relation type:', error);
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'שגיאה בהוספת סוג קישור');
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
         } else {
             console.error('שגיאה בהוספת סוג קישור');
         }
@@ -1134,6 +981,16 @@ async function saveNoteRelationTypeRecord() {
 
 // פונקציה לעדכון סוג קישור
 async function updateNoteRelationTypeRecord() {
+    // וולידציה של הטופס באמצעות הפונקציה הכללית
+    if (!validateForm('editNoteRelationTypeForm')) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני העדכון');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני העדכון');
+        }
+        return;
+    }
+
     const form = document.getElementById('editNoteRelationTypeForm');
     const formData = new FormData(form);
     const noteTypeId = document.getElementById('editNoteRelationTypeId').value;
@@ -1155,7 +1012,7 @@ async function updateNoteRelationTypeRecord() {
 
         if (result.status === 'success') {
             if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('הצלחה', 'סוג קישור עודכן בהצלחה');
+                window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeData.note_relation_type} עודכן בהצלחה במערכת`);
             } else {
                 console.log('סוג קישור עודכן בהצלחה');
             }
@@ -1163,7 +1020,7 @@ async function updateNoteRelationTypeRecord() {
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה בעדכון סוג קישור');
+                window.showErrorNotification(result.error?.message || 'שגיאה בעדכון סוג קישור', 'שגיאה');
             } else {
                 console.error(result.error?.message || 'שגיאה בעדכון סוג קישור');
             }
@@ -1171,7 +1028,7 @@ async function updateNoteRelationTypeRecord() {
     } catch (error) {
         console.error('Error updating note relation type:', error);
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'שגיאה בעדכון סוג קישור');
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
         } else {
             console.error('שגיאה בעדכון סוג קישור');
         }
@@ -1180,6 +1037,10 @@ async function updateNoteRelationTypeRecord() {
 
 // פונקציה לאישור מחיקת סוג קישור
 async function confirmDeleteNoteRelationTypeRecord(id) {
+    // מציאת סוג הקישור לפני מחיקה כדי להציג פרטים בהודעה
+    const noteType = noteRelationTypesData.find(n => n.id == id);
+    const noteTypeInfo = noteType ? noteType.note_relation_type : `סוג קישור ${id}`;
+
     try {
         const response = await fetch(`/api/v1/note_relation_types/${id}`, {
             method: 'DELETE'
@@ -1189,7 +1050,7 @@ async function confirmDeleteNoteRelationTypeRecord(id) {
 
         if (result.status === 'success') {
             if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('הצלחה', 'סוג קישור נמחק בהצלחה');
+                window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeInfo} נמחק בהצלחה מהמערכת`);
             } else {
                 console.log('סוג קישור נמחק בהצלחה');
             }
@@ -1197,7 +1058,7 @@ async function confirmDeleteNoteRelationTypeRecord(id) {
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה במחיקת סוג קישור');
+                window.showErrorNotification(result.error?.message || 'שגיאה במחיקת סוג קישור', 'שגיאה');
             } else {
                 console.error(result.error?.message || 'שגיאה במחיקת סוג קישור');
             }
@@ -1205,7 +1066,7 @@ async function confirmDeleteNoteRelationTypeRecord(id) {
     } catch (error) {
         console.error('Error deleting note relation type:', error);
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'שגיאה במחיקת סוג קישור');
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
         } else {
             console.error('שגיאה במחיקת סוג קישור');
         }
@@ -1260,18 +1121,7 @@ function addRecord() {
 // ===== ייצוא פונקציות לגלובל =====
 
 // ייצוא פונקציות וולידציה - רק אם הפונקציות הגלובליות לא קיימות
-if (!window.validateCurrencySymbol) {
-    window.validateCurrencySymbol = validateCurrencySymbol;
-}
-if (!window.validateCurrencyName) {
-    window.validateCurrencyName = validateCurrencyName;
-}
-if (!window.validateCurrencyUsdRate) {
-    window.validateCurrencyUsdRate = validateCurrencyUsdRate;
-}
-if (!window.validateCurrencyForm) {
-    window.validateCurrencyForm = validateCurrencyForm;
-}
+// הערה: פונקציות הוולידציה הוסרו כי הן משתמשות בפונקציות הגלובליות
 
 // ייצוא פונקציות מטבעות
 window.addCurrencyRecord = addCurrencyRecord;
@@ -1475,8 +1325,19 @@ function initializeRealTimeValidation() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔄 Initializing db_extradata page...');
     
-    // שחזור מצב הסקשנים
-    restoreSectionsState();
+    // שחזור מצב הסקשן העליון
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    } else {
+        console.warn('⚠️ restoreAllSectionStates function not available globally');
+    }
+    
+    // שחזור מצב הסקשנים הפנימיים
+    if (typeof window.restoreSectionStates === 'function') {
+        window.restoreSectionStates();
+    } else {
+        console.warn('⚠️ restoreSectionStates function not available globally');
+    }
     
     // אתחול וולידציה בזמן אמת (אם המערכת זמינה)
     if (typeof window.setupFieldValidation === 'function') {
@@ -1493,6 +1354,26 @@ document.addEventListener('DOMContentLoaded', function() {
 // ========================================
 
 // Export toggle functions
-window.toggleAllSections = toggleAllSections;
-window.toggleCurrenciesSection = toggleCurrenciesSection;
-window.toggleNoteRelationTypesSection = toggleNoteRelationTypesSection;
+window.toggleAllSections = function() {
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
+    } else {
+        console.warn('⚠️ toggleTopSection function not available globally');
+    }
+};
+
+window.toggleCurrenciesSection = function() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('currencies');
+    } else {
+        console.warn('⚠️ toggleSection function not available globally');
+    }
+};
+
+window.toggleNoteRelationTypesSection = function() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('note_relation_types');
+    } else {
+        console.warn('⚠️ toggleSection function not available globally');
+    }
+};

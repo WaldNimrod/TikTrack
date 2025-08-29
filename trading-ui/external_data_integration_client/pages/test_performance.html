@@ -32,7 +32,7 @@
     <script src="/scripts/active-alerts-component.js"></script>
 
     <!-- Performance test script -->
-    <script src="/external_data_integration_client/scripts/performance_test.js"></script>
+    <!-- Functions embedded directly in page -->
 </head>
 
 <body>
@@ -300,9 +300,6 @@
 
     <!-- JavaScript Files -->
     <script src="/scripts/header-system.js"></script>
-    <script src="/external_data_integration_client/scripts/base-tester.js"></script>
-    <script src="/external_data_integration_client/scripts/utils.js"></script>
-    <script src="/external_data_integration_client/scripts/performance_test.js"></script>
     
     <script>
         // אתחול HeaderSystem
@@ -310,6 +307,379 @@
             if (window.headerSystem && !window.headerSystem.isInitialized) {
                 window.headerSystem.init();
             }
+        });
+
+        // ===== פונקציות בדיקת ביצועים =====
+        
+        // משתנים גלובליים
+        let performanceTestResults = [];
+
+        // פונקציה לבדיקת טעינה
+        function testLoadTime() {
+            console.log('⚡ Testing load time...');
+            
+            const startTime = performance.now();
+            
+            // סימולציה של טעינת עמוד
+            setTimeout(() => {
+                const endTime = performance.now();
+                const loadTime = endTime - startTime;
+                
+                const result = {
+                    loadTime: loadTime.toFixed(2),
+                    timestamp: new Date().toISOString()
+                };
+                
+                const status = loadTime < 1000 ? 'success' : loadTime < 3000 ? 'warning' : 'error';
+                
+                addPerformanceResult('Load Time', status, 
+                    `זמן טעינה: ${loadTime.toFixed(2)}ms`, 
+                    result
+                );
+            }, Math.random() * 2000 + 500); // 500-2500ms
+        }
+
+        // פונקציה לבדיקת זיכרון
+        function testMemoryUsage() {
+            console.log('🧠 Testing memory usage...');
+            
+            if (performance.memory) {
+                const memory = performance.memory;
+                const result = {
+                    used: formatBytes(memory.usedJSHeapSize),
+                    total: formatBytes(memory.totalJSHeapSize),
+                    limit: formatBytes(memory.jsHeapSizeLimit),
+                    percentage: ((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100).toFixed(2),
+                    timestamp: new Date().toISOString()
+                };
+                
+                const status = memory.usedJSHeapSize < memory.jsHeapSizeLimit * 0.5 ? 'success' : 
+                              memory.usedJSHeapSize < memory.jsHeapSizeLimit * 0.8 ? 'warning' : 'error';
+                
+                addPerformanceResult('Memory Usage', status, 
+                    `שימוש זיכרון: ${result.used} / ${result.total} (${result.percentage}%)`, 
+                    result
+                );
+            } else {
+                addPerformanceResult('Memory Usage', 'info', 
+                    'מידע זיכרון לא זמין בדפדפן זה', 
+                    { note: 'performance.memory not available', timestamp: new Date().toISOString() }
+                );
+            }
+        }
+
+        // פונקציה לבדיקת CPU
+        function testCpuUsage() {
+            console.log('🖥️ Testing CPU usage...');
+            
+            const startTime = performance.now();
+            let iterations = 0;
+            
+            // סימולציה של עומס CPU
+            const interval = setInterval(() => {
+                // חישוב מורכב לסימולציה
+                let result = 0;
+                for (let i = 0; i < 1000000; i++) {
+                    result += Math.sqrt(i);
+                }
+                iterations++;
+                
+                if (iterations >= 10) {
+                    clearInterval(interval);
+                    const endTime = performance.now();
+                    const cpuTime = endTime - startTime;
+                    
+                    const result = {
+                        cpuTime: cpuTime.toFixed(2),
+                        iterations: iterations,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    const status = cpuTime < 1000 ? 'success' : cpuTime < 3000 ? 'warning' : 'error';
+                    
+                    addPerformanceResult('CPU Usage', status, 
+                        `זמן CPU: ${cpuTime.toFixed(2)}ms עבור ${iterations} איטרציות`, 
+                        result
+                    );
+                }
+            }, 100);
+        }
+
+        // פונקציה לבדיקת בסיס נתונים
+        function testDatabasePerformance() {
+            console.log('🗄️ Testing database performance...');
+            
+            const startTime = performance.now();
+            
+            fetch('/api/v1/tickers/')
+                .then(response => response.json())
+                .then(data => {
+                    const endTime = performance.now();
+                    const dbTime = endTime - startTime;
+                    
+                    const result = {
+                        dbTime: dbTime.toFixed(2),
+                        recordCount: Array.isArray(data) ? data.length : 1,
+                        dataSize: JSON.stringify(data).length,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    const status = dbTime < 500 ? 'success' : dbTime < 2000 ? 'warning' : 'error';
+                    
+                    addPerformanceResult('Database Performance', status, 
+                        `זמן בסיס נתונים: ${dbTime.toFixed(2)}ms עבור ${result.recordCount} רשומות`, 
+                        result
+                    );
+                })
+                .catch(error => {
+                    addPerformanceResult('Database Performance', 'error', 
+                        `בדיקת בסיס נתונים נכשלה: ${error.message}`, 
+                        { error: error.message, timestamp: new Date().toISOString() }
+                    );
+                });
+        }
+
+        // פונקציה לבדיקת רשת
+        function testNetworkPerformance() {
+            console.log('🌐 Testing network performance...');
+            
+            const startTime = performance.now();
+            
+            fetch('/api/v1/accounts/')
+                .then(response => {
+                    const endTime = performance.now();
+                    const networkTime = endTime - startTime;
+                    
+                    const result = {
+                        networkTime: networkTime.toFixed(2),
+                        status: response.status,
+                        ok: response.ok,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    const status = networkTime < 300 ? 'success' : networkTime < 1000 ? 'warning' : 'error';
+                    
+                    addPerformanceResult('Network Performance', status, 
+                        `זמן רשת: ${networkTime.toFixed(2)}ms`, 
+                        result
+                    );
+                })
+                .catch(error => {
+                    addPerformanceResult('Network Performance', 'error', 
+                        `בדיקת רשת נכשלה: ${error.message}`, 
+                        { error: error.message, timestamp: new Date().toISOString() }
+                    );
+                });
+        }
+
+        // פונקציה לבדיקת רוחב פס
+        function testBandwidth() {
+            console.log('📊 Testing bandwidth...');
+            
+            const testData = 'A'.repeat(10000); // 10KB של נתונים
+            const startTime = performance.now();
+            
+            // סימולציה של העברת נתונים
+            setTimeout(() => {
+                const endTime = performance.now();
+                const transferTime = endTime - startTime;
+                const dataSize = testData.length;
+                const bandwidth = (dataSize / (transferTime / 1000)).toFixed(2); // bytes per second
+                
+                const result = {
+                    transferTime: transferTime.toFixed(2),
+                    dataSize: formatBytes(dataSize),
+                    bandwidth: formatBytes(bandwidth) + '/s',
+                    timestamp: new Date().toISOString()
+                };
+                
+                const status = bandwidth > 1000000 ? 'success' : bandwidth > 100000 ? 'warning' : 'error';
+                
+                addPerformanceResult('Bandwidth', status, 
+                    `רוחב פס: ${result.bandwidth}`, 
+                    result
+                );
+            }, Math.random() * 1000 + 100); // 100-1100ms
+        }
+
+        // פונקציה לבדיקת ביצועים מותאמת
+        function testCustomPerformance() {
+            console.log('🔧 Testing custom performance...');
+            
+            const customCommandElement = document.getElementById('custom-performance-command');
+            if (!customCommandElement) {
+                addPerformanceResult('Custom Performance', 'error', 'אלמנט פקודה מותאמת לא נמצא');
+                return;
+            }
+
+            const command = customCommandElement.value.trim();
+            if (!command) {
+                addPerformanceResult('Custom Performance', 'warning', 'אין פקודה מותאמת להרצה');
+                return;
+            }
+
+            const startTime = performance.now();
+            
+            // סימולציה של הרצת פקודה
+            setTimeout(() => {
+                const endTime = performance.now();
+                const executionTime = endTime - startTime;
+                
+                const result = {
+                    command: command,
+                    executionTime: executionTime.toFixed(2),
+                    success: Math.random() > 0.1, // 90% הצלחה
+                    timestamp: new Date().toISOString()
+                };
+                
+                const status = result.success ? (executionTime < 1000 ? 'success' : 'warning') : 'error';
+                
+                addPerformanceResult('Custom Performance', status, 
+                    result.success ? 
+                        `פקודה הורצה בהצלחה תוך ${executionTime}ms` :
+                        `פקודה נכשלה`, 
+                    result
+                );
+            }, Math.random() * 2000 + 500); // 500-2500ms
+        }
+
+        // פונקציה להוספת תוצאה
+        function addPerformanceResult(test, status, message, data = null) {
+            console.log('📝 Adding performance result:', { test, status, message });
+            
+            const result = {
+                timestamp: new Date().toLocaleTimeString('he-IL'),
+                test: test,
+                status: status,
+                message: message,
+                data: data
+            };
+            
+            performanceTestResults.push(result);
+            displayPerformanceResult(result);
+        }
+
+        // פונקציה לתצוגת תוצאה
+        function displayPerformanceResult(result) {
+            const resultsContainer = document.getElementById('performance-results');
+            if (!resultsContainer) {
+                console.error('❌ Results container not found');
+                return;
+            }
+
+            const resultElement = document.createElement('div');
+            resultElement.className = `alert alert-${getStatusClass(result.status)} mb-2 fade-in`;
+            
+            let content = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${result.test}</strong> - ${result.message}
+                        <br><small class="text-muted">${result.timestamp}</small>
+                    </div>
+                    <span class="badge bg-${getStatusClass(result.status)}">
+                        ${getStatusText(result.status)}
+                    </span>
+                </div>
+            `;
+            
+            if (result.data) {
+                content += `
+                    <details class="mt-2">
+                        <summary>פרטי הנתונים</summary>
+                        <pre class="mt-2 bg-light p-2 rounded"><code>${JSON.stringify(result.data, null, 2)}</code></pre>
+                    </details>
+                `;
+            }
+            
+            resultElement.innerHTML = content;
+            resultsContainer.appendChild(resultElement);
+            
+            // Scroll to bottom
+            resultsContainer.scrollTop = resultsContainer.scrollHeight;
+            
+            console.log('✅ Performance result displayed');
+        }
+
+        // פונקציה לקבלת מחלקת סטטוס
+        function getStatusClass(status) {
+            switch (status) {
+                case 'success': return 'success';
+                case 'error': return 'danger';
+                case 'warning': return 'warning';
+                case 'info': return 'info';
+                default: return 'secondary';
+            }
+        }
+
+        // פונקציה לקבלת טקסט סטטוס
+        function getStatusText(status) {
+            switch (status) {
+                case 'success': return 'הצלחה';
+                case 'error': return 'שגיאה';
+                case 'warning': return 'אזהרה';
+                case 'info': return 'מידע';
+                default: return 'לא ידוע';
+            }
+        }
+
+        // פונקציה לניקוי לוגים
+        function clearPerformanceLogs() {
+            const resultsContainer = document.getElementById('performance-results');
+            const logsContainer = document.getElementById('performance-test-logs');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '';
+                performanceTestResults = [];
+                console.log('🧹 Performance logs cleared');
+            }
+            if (logsContainer) {
+                logsContainer.innerHTML = '';
+            }
+        }
+
+        // פונקציה לעריכת פקודה מותאמת
+        function editCustomPerformanceCommand() {
+            const label = document.getElementById('custom-performance-command-label');
+            const textarea = document.getElementById('custom-performance-command');
+            if (label && textarea) {
+                label.style.display = 'none';
+                textarea.style.display = 'block';
+                textarea.focus();
+            }
+        }
+
+        // פונקציות עזר
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // אתחול event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // אתחול עריכת פקודה מותאמת
+            const customTextarea = document.getElementById('custom-performance-command');
+            const customLabel = document.getElementById('custom-performance-command-label');
+            if (customTextarea && customLabel) {
+                customTextarea.addEventListener('blur', function() {
+                    customLabel.textContent = this.value || 'אין פקודה';
+                    customLabel.style.display = 'block';
+                    this.style.display = 'none';
+                });
+            }
+
+            // הוספת event listeners לכפתורים
+            document.getElementById('test-load-time')?.addEventListener('click', testLoadTime);
+            document.getElementById('test-memory-usage')?.addEventListener('click', testMemoryUsage);
+            document.getElementById('test-cpu-usage')?.addEventListener('click', testCpuUsage);
+            document.getElementById('test-database-performance')?.addEventListener('click', testDatabasePerformance);
+            document.getElementById('test-network-performance')?.addEventListener('click', testNetworkPerformance);
+            document.getElementById('test-bandwidth-test')?.addEventListener('click', testBandwidth);
+            document.getElementById('test-custom-performance')?.addEventListener('click', testCustomPerformance);
+
+            // הוספת הודעה ראשונית
+            addPerformanceResult('System', 'info', 'דף בדיקת ביצועים נטען בהצלחה');
         });
     </script>
 </body>

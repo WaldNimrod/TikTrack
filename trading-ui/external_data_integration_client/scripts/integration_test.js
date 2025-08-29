@@ -9,15 +9,9 @@
  * Version: 1.0
  */
 
-class IntegrationTester {
+class IntegrationTester extends BaseTester {
     constructor() {
-        this.apiBaseUrl = '/api/v1';
-        this.logEntries = [];
-        this.isLoading = false;
-        
-        this.initializeEventListeners();
-        this.updateCurrentTime();
-        this.startTimeUpdate();
+        super();
         this.log('info', 'דף בדיקת אינטגרציה נטען בהצלחה');
     }
 
@@ -82,108 +76,6 @@ class IntegrationTester {
     /**
      * Update current time display
      */
-    updateCurrentTime() {
-        const timeElement = document.getElementById('current-time');
-        if (timeElement) {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('he-IL', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            });
-            const dateString = now.toLocaleDateString('he-IL', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            timeElement.textContent = `${dateString} ${timeString}`;
-        }
-    }
-
-    /**
-     * Start time update interval
-     */
-    startTimeUpdate() {
-        setInterval(() => {
-            this.updateCurrentTime();
-        }, 1000);
-    }
-
-    /**
-     * Initialize custom path edit functionality
-     */
-    initializeCustomPathEdit() {
-        const textarea = document.getElementById('custom-integration-path');
-        const label = document.getElementById('custom-integration-path-label');
-        
-        if (textarea && label) {
-            // Update label on blur
-            textarea.addEventListener('blur', function() {
-                label.textContent = this.value || 'אין נתיב';
-                label.style.display = 'block';
-                this.style.display = 'none';
-            });
-        }
-    }
-
-    /**
-     * Add log entry
-     */
-    log(level, message) {
-        const timestamp = new Date().toLocaleTimeString('he-IL');
-        const logEntry = {
-            timestamp,
-            level,
-            message
-        };
-        
-        this.logEntries.push(logEntry);
-        this.updateLogDisplay();
-        
-        // Keep only last 100 entries
-        if (this.logEntries.length > 100) {
-            this.logEntries = this.logEntries.slice(-100);
-        }
-    }
-
-    /**
-     * Update log display
-     */
-    updateLogDisplay() {
-        const logContent = document.getElementById('integration-test-logs');
-        if (!logContent) return;
-        
-        logContent.innerHTML = '';
-        
-        this.logEntries.forEach(entry => {
-            const logElement = document.createElement('div');
-            logElement.className = 'log-entry';
-            logElement.innerHTML = `
-                <span class="log-timestamp">[${entry.timestamp}]</span>
-                <span class="log-level-${entry.level}">[${entry.level.toUpperCase()}]</span>
-                <span class="log-message">${entry.message}</span>
-            `;
-            logContent.appendChild(logElement);
-        });
-        
-        // Scroll to bottom
-        logContent.scrollTop = logContent.scrollHeight;
-    }
-
-    /**
-     * Display results
-     */
-    displayResults(title, data, type = 'info') {
-        const resultsContainer = document.getElementById('integration-results');
-        if (!resultsContainer) return;
-
-        const resultElement = document.createElement('div');
-        resultElement.className = `result-item result-${type}`;
-        resultElement.innerHTML = `
-            <div class="result-header">
-                <strong>${title}</strong>
-                <small class="text-muted">${new Date().toLocaleTimeString('he-IL')}</small>
             </div>
             <div class="result-content">
                 <pre>${JSON.stringify(data, null, 2)}</pre>
@@ -623,20 +515,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Global functions
-function clearIntegrationLogs() {
-    const logContainer = document.getElementById('integration-test-logs');
-    if (logContainer) {
-        logContainer.innerHTML = '';
-        console.log('🧹 Integration logs cleared');
-    }
-}
-
-function editCustomIntegrationPath() {
-    const label = document.getElementById('custom-integration-path-label');
-    const textarea = document.getElementById('custom-integration-path');
-    if (label && textarea) {
-        label.style.display = 'none';
-        textarea.style.display = 'block';
-        textarea.focus();
-    }
-}

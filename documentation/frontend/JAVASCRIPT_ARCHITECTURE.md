@@ -12,10 +12,12 @@ trading-ui/scripts/
 ├── 🏛️ Core Files (קבצי ליבה)
 │   ├── main.js                    # Global initialization and core functions
 │   ├── header-system.js           # Unified header system
+│   ├── notification-system.js     # Global notification system
 │   └── console-cleanup.js         # Console cleanup
 │
 ├── 🛠️ Utility Files (קבצי שירות)
 │   ├── ui-utils.js                # Shared UI functions
+│   ├── validation-utils.js        # Global validation system
 │   ├── data-utils.js              # Shared data functions
 │   ├── date-utils.js              # Date functions
 │   ├── tables.js                  # Global table system
@@ -24,30 +26,32 @@ trading-ui/scripts/
 │   ├── translation-utils.js       # Translation functions
 │   ├── table-mappings.js          # Table column mappings
 │   ├── simple-filter.js           # Simple filter system
-│   └── warning-system.js          # Central warning system
+│   ├── warning-system.js          # Central warning system
+│   └── crud-utils.js              # CRUD operations utilities
 │
 ├── 📄 Page Files (קבצי עמודים)
-│   ├── accounts.js                # Account management
+│   ├── accounts.js                # Account management (currency_id migration)
 │   ├── alerts.js                  # Alert management
-│   ├── trades.js                  # Trade management
+│   ├── trades.js                  # Trade management (linked items)
 │   ├── trade_plans.js             # Trade plan management
 │   ├── tickers.js                 # Ticker management
 │   ├── notes.js                   # Note management
-│   ├── executions.js              # Execution management
-│   ├── cash_flows.js              # Cash flow management
+│   ├── executions.js              # Execution management (modal fixes)
+│   ├── cash_flows.js              # Cash flow management (ENUM/RANGE)
 │   ├── currencies.js              # Currency management
 │   ├── preferences.js             # Preference management
 │   ├── research.js                # Research management
 │   ├── tests.js                   # System testing
 │   ├── database.js                # Database management
 │   ├── auth.js                    # User authentication
-│   └── active-alerts-component.js # Active alerts component
+│   ├── active-alerts-component.js # Active alerts component
+│   └── db-extradata.js            # Auxiliary tables management
 │
 └── 🔧 System Files (קבצי מערכות)
     ├── filter-system.js           # Advanced filter system
     ├── constraint-manager.js      # Constraint manager
     ├── condition-translator.js    # Condition translator
-    └── db-extradata.js            # Database extra data
+    └── button-icons.js            # Button icon system
 ```
 
 ## 📥 File Loading Order

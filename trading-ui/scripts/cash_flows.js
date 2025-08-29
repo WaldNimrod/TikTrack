@@ -33,8 +33,73 @@ let cashFlowsData = window.cashFlowsData;
 // פונקציות בסיסיות - הוסרו פונקציות לא בשימוש
 
 // פונקציות לפתיחה/סגירה של סקשנים - משתמשות בפונקציות הגלובליות
-// toggleTopSection() - זמינה גלובלית מ-main.js
-// toggleCashFlowsSection() - זמינה גלובלית מ-main.js
+
+/**
+ * פונקציה לפתיחה/סגירה של סקשן עליון (התראות וסיכום)
+ */
+function toggleTopSection() {
+    console.log('🔄 toggleTopSection נקראה');
+    
+    const topSection = document.querySelector('.top-section');
+    
+    if (topSection) {
+        const sectionBody = topSection.querySelector('.section-body');
+        const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+        
+        if (sectionBody) {
+            const isHidden = sectionBody.style.display === 'none';
+            
+            if (isHidden) {
+                sectionBody.style.display = 'block';
+                if (icon) {
+                    icon.textContent = '▲';
+                }
+                localStorage.setItem('cashFlowsTopSectionHidden', 'false');
+            } else {
+                sectionBody.style.display = 'none';
+                if (icon) {
+                    icon.textContent = '▼';
+                }
+                localStorage.setItem('cashFlowsTopSectionHidden', 'true');
+            }
+        }
+    }
+}
+
+/**
+ * פונקציה לפתיחה/סגירה של סקשן תזרימי מזומנים
+ */
+function toggleCashFlowsSection() {
+    console.log('🔄 toggleCashFlowsSection נקראה');
+    
+    const contentSections = document.querySelectorAll('.content-section');
+    const cashFlowsSection = contentSections[0];
+    
+    if (cashFlowsSection) {
+        const sectionBody = cashFlowsSection.querySelector('.section-body');
+        const toggleBtn = cashFlowsSection.querySelector('button[onclick*="toggleCashFlowsSection"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+        
+        if (sectionBody) {
+            const isHidden = sectionBody.style.display === 'none';
+            
+            if (isHidden) {
+                sectionBody.style.display = 'block';
+                if (icon) {
+                    icon.textContent = '▲';
+                }
+                localStorage.setItem('cashFlowsSectionCollapsed', 'false');
+            } else {
+                sectionBody.style.display = 'none';
+                if (icon) {
+                    icon.textContent = '▼';
+                }
+                localStorage.setItem('cashFlowsSectionCollapsed', 'true');
+            }
+        }
+    }
+}
 
 // פונקציות לשחזור מצב הסגירה
 function restoreCashFlowsSectionState() {
@@ -62,7 +127,7 @@ function restoreCashFlowsSectionState() {
 
     if (cashFlowsSection) {
         const sectionBody = cashFlowsSection.querySelector('.section-body');
-        const toggleBtn = cashFlowsSection.querySelector('button[onclick="toggleCashFlowsSection()"]');
+        const toggleBtn = cashFlowsSection.querySelector('button[onclick*="toggleCashFlowsSection"]');
         const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
         if (sectionBody && cashFlowsCollapsed) {
@@ -78,7 +143,21 @@ function restoreCashFlowsSectionState() {
 // resetAllFiltersAndReloadData() - לא בשימוש, הוסרה
 
 // פונקציה להצגת מודל מחיקה נפרד
-// showDeleteCashFlowModal() - זמינה גלובלית מ-ui-utils.js כ-showDeleteWarning
+function showDeleteCashFlowModal(id) {
+    const cashFlow = cashFlowsData.find(cf => cf.id === id);
+    if (!cashFlow) {
+        console.error('❌ תזרים מזומנים לא נמצא:', id);
+        return;
+    }
+
+    // מילוי פרטי המחיקה
+    document.getElementById('deleteCashFlowId').value = cashFlow.id;
+    document.getElementById('deleteCashFlowName').textContent = `${cashFlow.description || 'תזרים מזומנים'} - ${cashFlow.amount}`;
+
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('deleteCashFlowModal'));
+    modal.show();
+}
 
 // פונקציה להצגת התראת פריטים מקושרים
 function showLinkedItemsWarning(itemType, id) {
@@ -417,7 +496,16 @@ function showDeleteCashFlowWarning(id) {
  */
 async function confirmDeleteCashFlow(id) {
     try {
-      
+        // אם לא הועבר id, נקח אותו מהשדה הנסתר
+        if (!id) {
+            id = document.getElementById('deleteCashFlowId').value;
+        }
+        
+        if (!id) {
+            console.error('❌ לא נמצא מזהה למחיקה');
+            window.showErrorNotification('שגיאה', 'לא נמצא מזהה למחיקה');
+            return;
+        }
 
         const response = await fetch(`http://localhost:8080/api/v1/cash_flows/${id}`, {
             method: 'DELETE'
@@ -433,15 +521,15 @@ async function confirmDeleteCashFlow(id) {
       
 
         if (result.status === 'success') {
-          
+            // סגירת המודל
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCashFlowModal'));
+            modal.hide();
 
             // הצגת הודעת הצלחה
             window.showSuccessNotification('הצלחה', 'תזרים המזומנים נמחק בהצלחה');
 
             // טעינה מחדש של הנתונים
-          
             await loadCashFlows();
-          
         } else {
             console.error('❌ שגיאה במחיקת תזרים מזומנים:', result.error);
 
@@ -492,6 +580,10 @@ const addCashFlowValidationRules = {
     cashFlowSource: {
         required: true,
         message: 'נדרש לבחור מקור'
+    },
+    cashFlowExternalId: {
+        required: false, // לא חובה - תלוי במקור
+        message: 'נדרש להזין מזהה חיצוני'
     }
 };
 
@@ -521,6 +613,10 @@ const editCashFlowValidationRules = {
     editCashFlowSource: {
         required: true,
         message: 'נדרש לבחור מקור'
+    },
+    editCashFlowExternalId: {
+        required: false, // לא חובה - תלוי במקור
+        message: 'נדרש להזין מזהה חיצוני'
     }
 };
 
@@ -533,7 +629,7 @@ const editCashFlowValidationRules = {
  */
 async function loadCurrenciesFromServer() {
     try {
-        const response = await fetch('/api/v1/currencies/dropdown');
+        const response = await fetch('http://localhost:8080/api/v1/currencies/dropdown');
         if (response.ok) {
             const result = await response.json();
             if (result.status === 'success') {
@@ -558,26 +654,44 @@ async function loadCurrenciesFromServer() {
  */
 async function loadAccountsForCashFlow() {
     try {
+        console.log('🔄 טעינת חשבונות להוספה...');
         const response = await fetch('http://localhost:8080/api/v1/accounts/');
+        console.log('📡 תגובת API חשבונות:', response.status);
+        
         if (response.ok) {
             const result = await response.json();
+            console.log('📊 נתוני חשבונות:', result);
+            
             if (result.status === 'success') {
                 const select = document.getElementById('cashFlowAccountId');
-                select.innerHTML = '<option value="">בחר חשבון...</option>';
-
-                // הצגת רק חשבונות פעילים
-                result.data
-                    .filter(account => account.status === 'active')
-                    .forEach(account => {
+                console.log('🔍 אלמנט select חשבונות:', select);
+                
+                if (select) {
+                    select.innerHTML = '<option value="">בחר חשבון...</option>';
+                    
+                                    // הצגת רק חשבונות פתוחים
+                const activeAccounts = result.data.filter(account => account.status === 'open');
+                    console.log('✅ חשבונות פעילים:', activeAccounts);
+                    
+                    activeAccounts.forEach(account => {
                         const option = document.createElement('option');
                         option.value = account.id;
                         option.textContent = account.name;
                         select.appendChild(option);
                     });
+                    
+                    console.log('✅ הוספו', activeAccounts.length, 'חשבונות לרשימה');
+                } else {
+                    console.error('❌ לא נמצא אלמנט select עם ID: cashFlowAccountId');
+                }
+            } else {
+                console.error('❌ שגיאה בתגובת API:', result.error);
             }
+        } else {
+            console.error('❌ שגיאת HTTP:', response.status);
         }
     } catch (error) {
-        console.error('שגיאה בטעינת חשבונות:', error);
+        console.error('❌ שגיאה בטעינת חשבונות:', error);
 
         // הצגת הודעת שגיאה
         if (window.showInfoNotification) {
@@ -598,12 +712,15 @@ async function loadAccountsForEditCashFlow() {
                 const select = document.getElementById('editCashFlowAccountId');
                 select.innerHTML = '<option value="">בחר חשבון...</option>';
 
-                result.data.forEach(account => {
-                    const option = document.createElement('option');
-                    option.value = account.id;
-                    option.textContent = account.name;
-                    select.appendChild(option);
-                });
+                // הצגת רק חשבונות פתוחים
+                result.data
+                    .filter(account => account.status === 'open')
+                    .forEach(account => {
+                        const option = document.createElement('option');
+                        option.value = account.id;
+                        option.textContent = account.name;
+                        select.appendChild(option);
+                    });
             }
         }
     } catch (error) {
@@ -616,20 +733,30 @@ async function loadAccountsForEditCashFlow() {
  */
 async function loadCurrenciesForCashFlow() {
     try {
+        console.log('🔄 טעינת מטבעות להוספה...');
         // טעינת מטבעות מהשרת עם המערכת החדשה
         const currencies = await loadCurrenciesFromServer();
+        console.log('📊 נתוני מטבעות:', currencies);
 
         const select = document.getElementById('cashFlowCurrencyId');
-        select.innerHTML = '<option value="">בחר מטבע...</option>';
+        console.log('🔍 אלמנט select מטבעות:', select);
+        
+        if (select) {
+            select.innerHTML = '<option value="">בחר מטבע...</option>';
 
-        currencies.forEach(currency => {
-            const option = document.createElement('option');
-            option.value = currency.id;
-            option.textContent = `${currency.symbol} - ${currency.name}`;
-            select.appendChild(option);
-        });
+            currencies.forEach(currency => {
+                const option = document.createElement('option');
+                option.value = currency.id;
+                option.textContent = `${currency.symbol} - ${currency.name}`;
+                select.appendChild(option);
+            });
+            
+            console.log('✅ הוספו', currencies.length, 'מטבעות לרשימה');
+        } else {
+            console.error('❌ לא נמצא אלמנט select עם ID: cashFlowCurrencyId');
+        }
     } catch (error) {
-        console.error('שגיאה בטעינת מטבעות:', error);
+        console.error('❌ שגיאה בטעינת מטבעות:', error);
 
         // הצגת הודעת שגיאה
         if (window.showInfoNotification) {
@@ -704,7 +831,7 @@ function renderCashFlowsTable() {
             <td class="actions-cell">
                 ${createEditButton(`showEditCashFlowModal(${cashFlow.id})`)}
                 ${createLinkButton(`showLinkedItemsWarning('cash_flow', ${cashFlow.id})`)}
-                ${createDeleteButton(`showDeleteCashFlowWarning(${cashFlow.id})`)}
+                ${createDeleteButton(`showDeleteCashFlowModal(${cashFlow.id})`)}
             </td>
         `;
         tbody.appendChild(row);
@@ -770,29 +897,17 @@ function getCashFlowTypeWithColor(type) {
 
     let typeClass = '';
     switch (type) {
-        case 'income':
-            typeClass = 'type-investment'; // ירוק - הכנסה
+        case 'deposit':
+            typeClass = 'type-investment'; // ירוק - הפקדה
             break;
-        case 'expense':
-            typeClass = 'type-swing'; // כחול - הוצאה
+        case 'withdrawal':
+            typeClass = 'type-swing'; // כחול - משיכה
             break;
         case 'dividend':
             typeClass = 'type-passive'; // צהוב - דיבידנד
             break;
         case 'fee':
             typeClass = 'type-crypto'; // סגול - עמלה
-            break;
-        case 'tax':
-            typeClass = 'type-crypto'; // סגול - מס
-            break;
-        case 'interest':
-            typeClass = 'type-investment'; // ירוק - ריבית
-            break;
-        case 'transfer':
-            typeClass = 'type-passive'; // צהוב - העברה
-            break;
-        case 'other':
-            typeClass = 'type-other'; // אפור - אחר
             break;
         default:
             typeClass = 'type-other';
@@ -1004,6 +1119,11 @@ function setupSourceFieldListeners() {
         addSourceField.addEventListener('change', function () {
             manageExternalIdField(this.value, 'add');
             validateField('cashFlowSource', this.value, 'add');
+            // בדיקת שדה מזהה חיצוני אחרי שינוי מקור
+            const externalIdField = document.getElementById('cashFlowExternalId');
+            if (externalIdField) {
+                validateField('cashFlowExternalId', externalIdField.value, 'add');
+            }
         });
     }
 
@@ -1013,6 +1133,11 @@ function setupSourceFieldListeners() {
         editSourceField.addEventListener('change', function () {
             manageExternalIdField(this.value, 'edit');
             validateField('editCashFlowSource', this.value, 'edit');
+            // בדיקת שדה מזהה חיצוני אחרי שינוי מקור
+            const externalIdField = document.getElementById('editCashFlowExternalId');
+            if (externalIdField) {
+                validateField('editCashFlowExternalId', externalIdField.value, 'edit');
+            }
         });
     }
 }
@@ -1022,7 +1147,7 @@ function setupSourceFieldListeners() {
  */
 function setupValidationListeners() {
     // שדות למודל הוספה
-    const addFields = ['cashFlowAccountId', 'cashFlowType', 'cashFlowAmount', 'cashFlowCurrencyId', 'cashFlowDate'];
+    const addFields = ['cashFlowAccountId', 'cashFlowType', 'cashFlowAmount', 'cashFlowCurrencyId', 'cashFlowDate', 'cashFlowDescription', 'cashFlowExternalId'];
     addFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
@@ -1030,13 +1155,16 @@ function setupValidationListeners() {
                 validateField(fieldId, this.value, 'add');
             });
             field.addEventListener('input', function() {
-                clearFieldError(fieldId, 'add');
+                const field = document.getElementById(fieldId);
+                if (field && window.clearFieldValidation) {
+                    window.clearFieldValidation(field);
+                }
             });
         }
     });
 
     // שדות למודל עריכה
-    const editFields = ['editCashFlowAccountId', 'editCashFlowType', 'editCashFlowAmount', 'editCashFlowCurrencyId', 'editCashFlowDate'];
+    const editFields = ['editCashFlowAccountId', 'editCashFlowType', 'editCashFlowAmount', 'editCashFlowCurrencyId', 'editCashFlowDate', 'editCashFlowDescription', 'editCashFlowExternalId'];
     editFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
@@ -1044,7 +1172,10 @@ function setupValidationListeners() {
                 validateField(fieldId, this.value, 'edit');
             });
             field.addEventListener('input', function() {
-                clearFieldError(fieldId, 'edit');
+                const field = document.getElementById(fieldId);
+                if (field && window.clearFieldValidation) {
+                    window.clearFieldValidation(field);
+                }
             });
         }
     });
@@ -1069,50 +1200,57 @@ function validateField(fieldId, value, formType) {
     switch (fieldName) {
         case 'AccountId':
             if (!value || isNaN(value)) {
-                if (window.showValidationWarning) {
-                    window.showValidationWarning(fieldId, 'יש לבחור חשבון');
+                const field = document.getElementById(fieldId);
+                if (field && window.showFieldError) {
+                    window.showFieldError(field, 'יש לבחור חשבון');
                 }
                 return false;
             }
             break;
         case 'Type':
             if (!value) {
-                if (window.showValidationWarning) {
-                    window.showValidationWarning(fieldId, 'יש לבחור סוג תזרים');
+                const field = document.getElementById(fieldId);
+                if (field && window.showFieldError) {
+                    window.showFieldError(field, 'יש לבחור סוג תזרים');
                 }
                 return false;
             }
             break;
         case 'Amount':
             if (!value || isNaN(value)) {
-                if (window.showValidationWarning) {
-                    window.showValidationWarning(fieldId, 'יש להזין סכום תקין');
+                const field = document.getElementById(fieldId);
+                if (field && window.showFieldError) {
+                    window.showFieldError(field, 'יש להזין סכום תקין');
                 }
                 return false;
             } else if (parseFloat(value) === 0) {
-                if (window.showValidationWarning) {
-                    window.showValidationWarning(fieldId, 'סכום לא יכול להיות 0');
+                const field = document.getElementById(fieldId);
+                if (field && window.showFieldError) {
+                    window.showFieldError(field, 'סכום לא יכול להיות 0');
                 }
                 return false;
             } else if (Math.abs(parseFloat(value)) > 10000000) {
-                if (window.showValidationWarning) {
-                    window.showValidationWarning(fieldId, 'סכום גבוה מדי (מקסימום 10,000,000)');
+                const field = document.getElementById(fieldId);
+                if (field && window.showFieldError) {
+                    window.showFieldError(field, 'סכום גבוה מדי (מקסימום 10,000,000)');
                 }
                 return false;
             }
             break;
         case 'CurrencyId':
             if (value && isNaN(value)) {
-                if (window.showValidationWarning) {
-                    window.showValidationWarning(fieldId, 'יש לבחור מטבע תקין');
+                const field = document.getElementById(fieldId);
+                if (field && window.showFieldError) {
+                    window.showFieldError(field, 'יש לבחור מטבע תקין');
                 }
                 return false;
             }
             break;
         case 'Date':
             if (!value) {
-                if (window.showValidationWarning) {
-                    window.showValidationWarning(fieldId, 'יש להזין תאריך');
+                const field = document.getElementById(fieldId);
+                if (field && window.showFieldError) {
+                    window.showFieldError(field, 'יש להזין תאריך');
                 }
                 return false;
             } else {
@@ -1122,14 +1260,16 @@ function validateField(fieldId, value, formType) {
                 const minDate = new Date(2000, 0, 1);
 
                 if (date > maxDate) {
-                    if (window.showValidationWarning) {
-                        window.showValidationWarning(fieldId, 'תאריך לא יכול להיות יותר משנה קדימה');
+                    const field = document.getElementById(fieldId);
+                    if (field && window.showFieldError) {
+                        window.showFieldError(field, 'תאריך לא יכול להיות יותר משנה קדימה');
                     }
                     return false;
                 }
                 if (date < minDate) {
-                    if (window.showValidationWarning) {
-                        window.showValidationWarning(fieldId, 'תאריך לא יכול להיות לפני שנת 2000');
+                    const field = document.getElementById(fieldId);
+                    if (field && window.showFieldError) {
+                        window.showFieldError(field, 'תאריך לא יכול להיות לפני שנת 2000');
                     }
                     return false;
                 }
@@ -1137,15 +1277,44 @@ function validateField(fieldId, value, formType) {
             break;
         case 'Source':
             if (!value) {
-                if (window.showValidationWarning) {
-                    window.showValidationWarning(fieldId, 'יש לבחור מקור');
+                const field = document.getElementById(fieldId);
+                if (field && window.showFieldError) {
+                    window.showFieldError(field, 'יש לבחור מקור');
+                }
+                return false;
+            }
+            break;
+        case 'Description':
+            if (value && value.length > 500) {
+                const field = document.getElementById(fieldId);
+                if (field && window.showFieldError) {
+                    window.showFieldError(field, 'תיאור לא יכול להיות יותר מ-500 תווים');
+                }
+                return false;
+            }
+            break;
+        case 'ExternalId':
+            // וולידציה של מזהה חיצוני תלויה במקור
+            const sourceFieldId = fieldId.includes('edit') ? 'editCashFlowSource' : 'cashFlowSource';
+            const sourceField = document.getElementById(sourceFieldId);
+            const source = sourceField ? sourceField.value : 'manual';
+            
+            // אם המקור אינו ידני, המזהה החיצוני נדרש
+            if (source !== 'manual' && !value) {
+                const field = document.getElementById(fieldId);
+                if (field && window.showFieldError) {
+                    window.showFieldError(field, 'נדרש להזין מזהה חיצוני כשהמקור אינו ידני');
                 }
                 return false;
             }
             break;
     }
     
-    clearFieldError(fieldId, formType);
+    // הצגת סימון ירוק כשהערך תקין
+    const field = document.getElementById(fieldId);
+    if (field && window.showFieldSuccess) {
+        window.showFieldSuccess(field);
+    }
     return true;
 }
 
@@ -1189,7 +1358,7 @@ function initializeExternalIdFields() {
 }
 
 // עדכון פונקציית showAddCashFlowModal
-function showAddCashFlowModal() {
+async function showAddCashFlowModal() {
     // איפוס הטופס
     document.getElementById('addCashFlowForm').reset();
 
@@ -1202,19 +1371,29 @@ function showAddCashFlowModal() {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('cashFlowDate').value = today;
 
-    // טעינת רשימת החשבונות והמטבעות
-    loadAccountsForCashFlow();
-    loadCurrenciesForCashFlow();
+    try {
+        // טעינת רשימת החשבונות והמטבעות
+        console.log('🔄 טעינת חשבונות ומטבעות להוספה...');
+        await loadAccountsForCashFlow();
+        await loadCurrenciesForCashFlow();
+        console.log('✅ חשבונות ומטבעות נטענו בהצלחה להוספה');
 
-    // אתחול שדה מזהה חיצוני
-    initializeExternalIdFields();
+        // אתחול שדה מזהה חיצוני
+        initializeExternalIdFields();
 
-    // הוספת event listeners לוולידציה מיידית
-    setupValidationListeners();
+        // הוספת event listeners לוולידציה מיידית
+        setupValidationListeners();
 
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('addCashFlowModal'));
-    modal.show();
+        // הוספת event listeners לשדות מקור
+        setupSourceFieldListeners();
+
+        // הצגת המודל
+        const modal = new bootstrap.Modal(document.getElementById('addCashFlowModal'));
+        modal.show();
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת נתונים להוספה:', error);
+        window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים להוספה');
+    }
 }
 
 // עדכון פונקציית showEditCashFlowModal
@@ -1230,32 +1409,55 @@ async function showEditCashFlowModal(id) {
         window.clearValidation('editCashFlowForm');
     }
 
-    // טעינת רשימת החשבונות והמטבעות קודם
-    await loadAccountsForEditCashFlow();
-    await loadCurrenciesForEditCashFlow();
+    try {
+        // טעינת רשימת החשבונות והמטבעות קודם
+        console.log('🔄 טעינת חשבונות ומטבעות...');
+        await loadAccountsForEditCashFlow();
+        await loadCurrenciesForEditCashFlow();
+        console.log('✅ חשבונות ומטבעות נטענו בהצלחה');
 
-    // מילוי הטופס אחרי שהרשימות נטענו
-    console.log('📝 מילוי טופס עריכה:', cashFlow);
-    document.getElementById('editCashFlowId').value = cashFlow.id;
-    document.getElementById('editCashFlowAccountId').value = cashFlow.account_id;
-    document.getElementById('editCashFlowType').value = cashFlow.type;
-    console.log('🔍 ערך type שנקבע:', cashFlow.type);
-    document.getElementById('editCashFlowAmount').value = cashFlow.amount;
-    document.getElementById('editCashFlowCurrencyId').value = cashFlow.currency_id || '';
-    document.getElementById('editCashFlowDate').value = cashFlow.date;
-    document.getElementById('editCashFlowDescription').value = cashFlow.description || '';
-    document.getElementById('editCashFlowSource').value = cashFlow.source || 'manual';
-    document.getElementById('editCashFlowExternalId').value = cashFlow.external_id || '0';
+        // מילוי הטופס אחרי שהרשימות נטענו
+        console.log('📝 מילוי טופס עריכה:', cashFlow);
+        
+        const editTypeField = document.getElementById('editCashFlowType');
+        console.log('🔍 אלמנט editCashFlowType:', editTypeField);
+        console.log('🔍 ערך type מהנתונים:', cashFlow.type);
+        
+        document.getElementById('editCashFlowId').value = cashFlow.id;
+        document.getElementById('editCashFlowAccountId').value = cashFlow.account_id;
+        
+        if (editTypeField) {
+            editTypeField.value = cashFlow.type;
+            console.log('✅ ערך type נקבע:', editTypeField.value);
+        } else {
+            console.error('❌ לא נמצא אלמנט editCashFlowType');
+        }
+        document.getElementById('editCashFlowAmount').value = cashFlow.amount;
+        document.getElementById('editCashFlowCurrencyId').value = cashFlow.currency_id || '';
+        document.getElementById('editCashFlowDate').value = cashFlow.date;
+        document.getElementById('editCashFlowDescription').value = cashFlow.description || '';
+        
+        const editSourceField = document.getElementById('editCashFlowSource');
+        console.log('🔍 שדה מקור עריכה:', editSourceField);
+        console.log('🔍 ערך מקור מהנתונים:', cashFlow.source);
+        editSourceField.value = cashFlow.source || 'manual';
+        console.log('✅ ערך מקור נקבע:', editSourceField.value);
+        
+        document.getElementById('editCashFlowExternalId').value = cashFlow.external_id || '0';
 
-    // אתחול שדה מזהה חיצוני
-    initializeExternalIdFields();
+        // אתחול שדה מזהה חיצוני
+        initializeExternalIdFields();
 
-    // הוספת event listeners לוולידציה מיידית
-    setupValidationListeners();
+        // הוספת event listeners לוולידציה מיידית
+        setupValidationListeners();
 
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('editCashFlowModal'));
-    modal.show();
+        // הצגת המודל
+        const modal = new bootstrap.Modal(document.getElementById('editCashFlowModal'));
+        modal.show();
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת נתונים לעריכה:', error);
+        window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים לעריכה');
+    }
 }
 
 // עדכון פונקציית saveCashFlow
@@ -1276,6 +1478,8 @@ async function saveCashFlow() {
             external_id: externalIdValue || '0'
         };
 
+        console.log('📤 נתונים שנשלחים לשרת:', formData);
+
         // בדיקת תקינות מקיפה
         if (window.validateForm) {
             if (!window.validateForm('addCashFlowForm')) {
@@ -1294,10 +1498,13 @@ async function saveCashFlow() {
         });
 
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ תגובת שגיאה מהשרת:', errorText);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const result = await response.json();
+        console.log('📥 תגובה מהשרת:', result);
 
         if (result.status === 'success') {
             // סגירת המודל
@@ -1389,6 +1596,8 @@ async function updateCashFlow() {
             external_id: externalIdValue || '0'
         };
 
+        console.log('📤 נתונים שנשלחים לעדכון:', formData);
+
         console.log('📝 נתונים לעדכון:', formData);
         console.log('🔍 ערך type:', formData.type);
         console.log('🔍 ערך type מהשדה:', document.getElementById('editCashFlowType').value);
@@ -1411,10 +1620,13 @@ async function updateCashFlow() {
         });
 
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ תגובת שגיאה מהשרת בעדכון:', errorText);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const result = await response.json();
+        console.log('📥 תגובה מהשרת בעדכון:', result);
 
         if (result.status === 'success') {
             // סגירת המודל

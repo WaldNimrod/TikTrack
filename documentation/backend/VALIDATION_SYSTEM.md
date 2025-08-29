@@ -12,6 +12,8 @@ This document describes the comprehensive dynamic validation system implemented 
 - **Error Handling**: Clear and user-friendly error messages
 - **Performance Optimized**: Cached validation rules for efficiency
 - **Full API Coverage**: All API routes use ValidationService
+- **Version 2.0**: **89 Custom Constraints** with full validation coverage
+- **Currency Migration**: Support for `currency_id` foreign key validation
 
 ### 🔧 **Technical Features**
 - **Constraint-Based Validation**: Uses dynamic constraints from database

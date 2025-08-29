@@ -10,8 +10,9 @@ This document describes the comprehensive dynamic constraints system implemented
 - **Dynamic Constraint Tables**: `constraints`, `enum_values`, `constraint_validations`
 - **Constraint Management Interface**: Full UI for constraint management
 - **Complete API**: All CRUD operations for constraints
-- **90 Predefined Constraints**: For all system tables
+- **89 Custom Constraints**: For all system tables (Version 2.0)
 - **Dynamic Validation**: `ValidationService` working in real-time
+- **Currency Migration**: Successfully migrated `currency` to `currency_id` foreign key
 
 ### 🔧 **Technical Features**
 - **Real-time Display**: Constraints shown with color coding

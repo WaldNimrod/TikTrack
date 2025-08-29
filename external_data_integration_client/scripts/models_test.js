@@ -366,3 +366,4 @@ class ModelsTester {
 document.addEventListener('DOMContentLoaded', () => {
     window.modelsTester = new ModelsTester();
 });
+

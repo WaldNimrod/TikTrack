@@ -526,3 +526,4 @@ class ExternalDataTester {
 document.addEventListener('DOMContentLoaded', () => {
     window.externalDataTester = new ExternalDataTester();
 });
+

@@ -57,3 +57,4 @@ quote_data = adapter.fetch_quote_data('AAPL')
 **ספרייה:** yfinance  
 **סטטוס:** פעיל  
 **גרסה:** 1.0
+

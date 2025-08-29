@@ -105,7 +105,7 @@ python -c "from app import db; db.create_all()"
 python3 create_fresh_database.py
 
 # Start development server
-python app.py
+python dev_server.py
 
 # Access application
 # Open http://localhost:8080 in browser
@@ -125,7 +125,7 @@ export FLASK_ENV=development
 export FLASK_DEBUG=1
 
 # Start development server
-python app.py
+python dev_server.py
 ```
 
 ## 📁 Project Structure
@@ -133,7 +133,7 @@ python app.py
 ```
 TikTrackApp/
 ├── Backend/                    # Python Flask backend
-│   ├── app.py                 # Main application
+│   ├── dev_server.py          # Development server
 │   ├── models/                # Database models
 │   │   ├── __init__.py
 │   │   ├── account.py
@@ -228,16 +228,8 @@ git commit -m "Fix: description of the fix"
 ```bash
 # Run all tests
 cd Backend
-python -m pytest tests/
-
-# Run specific test file
-python -m pytest tests/test_accounts.py
-
-# Run with coverage
-python -m pytest --cov=. tests/
-
-# Run with verbose output
-python -m pytest -v tests/
+# Manual testing - no automated test suite currently
+# Test all functionality manually through the web interface
 ```
 
 ### Frontend Testing
@@ -517,7 +509,7 @@ def get_accounts():
 ```bash
 # Start development server
 cd Backend
-python app.py
+python dev_server.py
 ```
 
 ### Production Deployment
@@ -527,7 +519,7 @@ export FLASK_ENV=production
 export SECRET_KEY=your-secret-key
 
 # Start production server
-gunicorn -w 4 -b 0.0.0.0:8080 app:app
+python dev_server.py
 ```
 
 ### Docker Deployment
@@ -541,7 +533,7 @@ RUN pip install -r requirements.txt
 COPY . .
 EXPOSE 8080
 
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "app:app"]
+CMD ["python", "dev_server.py"]
 ```
 
 ## 🐛 Debugging

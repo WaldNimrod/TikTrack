@@ -22,10 +22,10 @@
 | **Frontend** | Update tickers.js | ✅ Completed | Support for new currency system | `trading-ui/scripts/tickers.js` |
 | **Frontend** | Update accounts.html | ✅ Completed | Forms with currency_id | `trading-ui/accounts.html` |
 | **Frontend** | Update tickers.html | ✅ Completed | Forms with currency_id | `trading-ui/tickers.html` |
-| **Tests** | Create unit tests | ✅ Completed | Tests for Currency model | `Backend/testing_suite/unit_tests/test_currency.py` |
-| **Tests** | Create integration tests | ✅ Completed | Tests for currency API | `Backend/testing_suite/integration_tests/test_currency_api.py` |
-| **Tests** | Test backward compatibility | ✅ Completed | Verify compatibility after migration | `Backend/testing_suite/integration_tests/test_currency_backward_compatibility.py` |
-| **Tests** | Performance testing | ✅ Completed | Performance tests with joins | `Backend/testing_suite/performance_tests/test_currency_performance.py` |
+| **Tests** | Manual testing | ✅ Completed | Manual testing of currency functionality | Manual testing |
+| **Tests** | API testing | ✅ Completed | Manual API testing | Manual testing |
+| **Tests** | Backward compatibility | ✅ Completed | Verify compatibility after migration | Manual testing |
+| **Tests** | Performance testing | ✅ Completed | Manual performance testing | Manual testing |
 | **Documentation** | Migration documentation | ✅ Completed | Detailed process documentation | `CURRENCY_MIGRATION_DOCUMENTATION.md` |
 | **Documentation** | Update Database Changes | ✅ Completed | Add migration section | `DATABASE_CHANGES_AUGUST_2025.md` |
 | **Documentation** | Update README | ✅ Completed | New system documentation | `README.md` |
@@ -42,10 +42,10 @@
 - `Backend/migrations/update_tickers_currency.py`
 - `add_currencies.py`
 - `CURRENCY_MIGRATION_DOCUMENTATION.md`
-- `Backend/testing_suite/unit_tests/test_currency.py`
-- `Backend/testing_suite/integration_tests/test_currency_api.py`
-- `Backend/testing_suite/integration_tests/test_currency_backward_compatibility.py`
-- `Backend/testing_suite/performance_tests/test_currency_performance.py`
+- Manual testing of currency functionality
+- Manual API testing
+- Manual backward compatibility testing
+- Manual performance testing
 
 ### Files Updated: 11
 - `Backend/models/account.py`

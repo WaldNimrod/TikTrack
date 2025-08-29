@@ -90,7 +90,7 @@ This index provides quick access to all documentation files in the TikTrack proj
 - [BACKWARD_COMPATIBILITY.md](frontend/BACKWARD_COMPATIBILITY.md) - Backward compatibility documentation
 - [TRANSLATION_FUNCTIONS.md](frontend/TRANSLATION_FUNCTIONS.md) - Translation functions documentation
 - [HEADER_SYSTEM_README.md](frontend/HEADER_SYSTEM_README.md) - Header system documentation
-- **[NOTIFICATION_SYSTEM.md](frontend/NOTIFICATION_SYSTEM.md)** - מערכת התראות והודעות - הסבר מפורט על ההבדל בין מערכת ההתראות למערכת ההודעות
+- **[NOTIFICATION_SYSTEM.md](frontend/NOTIFICATION_SYSTEM.md)** - Notification and messaging system - Detailed explanation of the difference between notification system and messaging system
 
 #### 🧩 **Components** (`frontend/components/`)
 - [ACTIVE_ALERTS.md](frontend/components/ACTIVE_ALERTS.md) - Active alerts component
@@ -112,20 +112,23 @@ This index provides quick access to all documentation files in the TikTrack proj
 
 ### 🛠️ **Development Documentation** (`development/`)
 - [README.md](development/README.md) - Development overview
+- [QUICK_START.md](development/QUICK_START.md) - Quick start guide for new developers
 - [NEW_DEVELOPER.md](development/NEW_DEVELOPER.md) - New developer guide
 - [WORKFLOW.md](development/WORKFLOW.md) - Development workflow
 - [MODULE_TESTING.md](development/MODULE_TESTING.md) - Module testing checklist
 
 ### 🧪 **Testing Documentation** (`testing/`)
-- [README.md](testing/README.md) - Testing system overview
+- [README.md](testing/README.md) - Testing system overview and strategy
+
+### 👥 **User Documentation** (`user/`)
+- [README.md](user/README.md) - Complete user guide
+- [TROUBLESHOOTING.md](user/TROUBLESHOOTING.md) - Troubleshooting guide
 
 ### ⚠️ **Issues Documentation** (`issues/`)
 - [CURRENT.md](issues/CURRENT.md) - Current issues
-- [KNOWN.md](issues/KNOWN.md) - Known issues
 
 ### 📝 **Rules and TODOs** (`rules/`, `todo/`)
 - [TRADE_PLAN_LINKING.md](rules/TRADE_PLAN_LINKING.md) - Trade plan linking rules
-- [HEADER_REDESIGN.md](todo/HEADER_REDESIGN.md) - Header redesign TODO
 - [FEATURE_ROADMAP.md](todo/FEATURE_ROADMAP.md) - Feature roadmap and planning
 - [README.md](todo/README.md) - TODO system overview
 
@@ -135,22 +138,6 @@ This index provides quick access to all documentation files in the TikTrack proj
 - **[README.md](../../README.md)** - Main project documentation and overview
 - [README.md](README.md) - Main documentation overview (this directory)
 - [INDEX.md](INDEX.md) - This index file
-- **[CHANGELOG.md](../../CHANGELOG.md)** - Complete project changelog and version history
-- **[VERSION_1.4.0_SUMMARY.md](VERSION_1.4.0_SUMMARY.md)** - Comprehensive summary of version 1.4.0 changes
-
-### 🗂️ **System Documentation**
-- [TABLE_SORTING_SYSTEM.md](TABLE_SORTING_SYSTEM.md) - Table sorting system documentation
-
-### 📄 **Additional Documentation Files**
-- [VERSION_1.4.0_SUMMARY.md](VERSION_1.4.0_SUMMARY.md) - Version 1.4.0 comprehensive summary
-- [backend_architecture_new.html](backend_architecture_new.html) - Backend architecture documentation
-- [TikTrack_ProjectSnapshot_2025-01-15.html](TikTrack_ProjectSnapshot_2025-01-15.html) - Project snapshot documentation
-- [Cursor_Performance_Quick_Guide.pdf](Cursor_Performance_Quick_Guide.pdf) - Performance quick guide
-- [backend_architecture_improvement_suggestions.pdf](backend_architecture_improvement_suggestions.pdf) - Architecture improvement suggestions
-- [backend_architecture_simplified.pdf](backend_architecture_simplified.pdf) - Simplified architecture documentation
-- [db_schema_summary_english.pdf](db_schema_summary_english.pdf) - Database schema summary
-- [2026_8_7 אפיון מערכת ניהול טריידים.pdf](2026_8_7 אפיון מערכת ניהול טריידים.pdf) - System specification (Hebrew)
-- [2026_8_6 אפיון מערכת ניהול טריידים.pdf](2026_8_6 אפיון מערכת ניהול טריידים.pdf) - System specification (Hebrew)
 
 ## 📊 Documentation Status
 
@@ -162,43 +149,41 @@ This index provides quick access to all documentation files in the TikTrack proj
 - Frontend documentation
 - Backend documentation
 - Development documentation
-- Testing documentation
 - Issues documentation
 
-### 📦 **Backup Documentation** (`backups/documentation/`)
-- CRUD completion files
-- Old testing files
+### 📦 **Backup Documentation** (`backups/documentation_version_1_backup/`)
+- Old version files
 - Outdated documentation
-- Large Cursor files
+- Large PDF and HTML files
+- Unused system files
 
 ## 🚀 Quick Access by Topic
 
 ### 🆕 **For New Developers**
-1. [development/NEW_DEVELOPER.md](development/NEW_DEVELOPER.md)
-2. [project/PROJECT_SUMMARY.md](project/PROJECT_SUMMARY.md)
-3. [database/README.md](database/README.md)
-4. [server/README.md](server/README.md)
+1. [development/QUICK_START.md](development/QUICK_START.md) - Quick start guide
+2. [development/README.md](development/README.md) - Development overview
+3. [project/PROJECT_SUMMARY.md](project/PROJECT_SUMMARY.md) - Project overview
+4. [database/README.md](database/README.md) - Database overview
 
 ### 🗄️ **For Database Work**
 1. [database/README.md](database/README.md)
-2. [database/CHANGES_AUGUST_2025.md](database/CHANGES_AUGUST_2025.md)
-3. [database/SCHEMA.md](database/SCHEMA.md)
+2. [database/CONSTRAINTS_IMPLEMENTATION.md](database/CONSTRAINTS_IMPLEMENTATION.md)
+3. [database/PAGE_IMPROVEMENTS.md](database/PAGE_IMPROVEMENTS.md)
 
 ### 🖥️ **For Server Issues**
 1. [server/README.md](server/README.md)
-2. [server/TROUBLESHOOTING.md](server/TROUBLESHOOTING.md)
-3. [server/ISSUES.md](server/ISSUES.md)
+2. [server/RESTART_SCRIPT_GUIDE.md](server/RESTART_SCRIPT_GUIDE.md)
 
 ### 🎨 **For Frontend Development**
 1. [frontend/README.md](frontend/README.md)
 2. [frontend/JAVASCRIPT_ARCHITECTURE.md](frontend/JAVASCRIPT_ARCHITECTURE.md)
-3. [frontend/components/ACTIVE_ALERTS.md](frontend/components/ACTIVE_ALERTS.md)
-4. [TABLE_SORTING_SYSTEM.md](TABLE_SORTING_SYSTEM.md)
+3. [frontend/FILTER_SYSTEM_README.md](frontend/FILTER_SYSTEM_README.md)
+4. [frontend/HEADER_SYSTEM_README.md](frontend/HEADER_SYSTEM_README.md)
 
 ### ⚙️ **For Feature Development**
 1. [features/preferences/README.md](features/preferences/README.md)
-2. [features/currencies/README.md](features/currencies/README.md)
-3. [features/alerts/README.md](features/alerts/README.md)
+2. [features/currencies/SUMMARY.md](features/currencies/SUMMARY.md)
+3. [features/external_data/EXTERNAL_DATA_SYSTEM.md](features/external_data/EXTERNAL_DATA_SYSTEM.md)
 
 ## 📝 Documentation Standards
 

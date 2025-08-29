@@ -2,7 +2,7 @@
 
 ## Overview
 
-> 📋 **לפרטים מלאים על הפרויקט:** ראה [PROJECT_STATUS_SUMMARY.md](../../PROJECT_STATUS_SUMMARY.md)
+> 📋 **For full project details:** See [PROJECT_STATUS_SUMMARY.md](../../PROJECT_STATUS_SUMMARY.md)
 
 ## 🆕 **Latest Updates (August 24, 2025)**
 - ✅ **ValidationService Integration** - All endpoints now use dynamic validation
@@ -139,9 +139,9 @@ GET /constraints
             "constraint_name": "valid_investment_type",
             "is_active": true,
             "enum_values": [
-                {"value": "swing", "display_name": "סווינג", "sort_order": 1},
-                {"value": "investment", "display_name": "השקעה", "sort_order": 2},
-                {"value": "passive", "display_name": "פאסיבי", "sort_order": 3}
+                {"value": "swing", "display_name": "Swing", "sort_order": 1},
+{"value": "investment", "display_name": "Investment", "sort_order": 2},
+{"value": "passive", "display_name": "Passive", "sort_order": 3}
             ]
         }
     ]
@@ -160,8 +160,8 @@ POST /constraints
     "constraint_type": "ENUM",
     "constraint_name": "valid_investment_type",
     "enum_values": [
-        {"value": "swing", "display_name": "סווינג", "sort_order": 1},
-        {"value": "investment", "display_name": "השקעה", "sort_order": 2}
+        {"value": "swing", "display_name": "Swing", "sort_order": 1},
+{"value": "investment", "display_name": "Investment", "sort_order": 2}
     ]
 }
 ```
@@ -351,8 +351,8 @@ const newConstraint = {
     constraint_type: 'ENUM',
     constraint_name: 'trade_status_enum',
     enum_values: [
-        {value: 'open', display_name: 'פתוח', sort_order: 1},
-        {value: 'closed', display_name: 'סגור', sort_order: 2}
+        {value: 'open', display_name: 'Open', sort_order: 1},
+{value: 'closed', display_name: 'Closed', sort_order: 2}
     ]
 };
 

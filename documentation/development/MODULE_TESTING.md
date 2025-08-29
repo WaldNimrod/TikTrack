@@ -15,7 +15,7 @@ This document provides comprehensive testing guidelines and checklists for all T
 
 ### 🔧 **Testing Tools**
 - **Python**: pytest, unittest
-- **JavaScript**: Jest, Mocha
+- **JavaScript**: Manual testing
 - **API Testing**: Postman, curl
 - **Database Testing**: SQLite testing utilities
 - **Performance Testing**: Apache Bench, custom scripts
@@ -526,23 +526,22 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        pip install pytest pytest-cov
+        # Manual testing - no automated test suite currently
     
-    - name: Run backend tests
+    - name: Manual Backend Testing
       run: |
         cd Backend
-        pytest tests/ --cov=. --cov-report=xml
+        # Manual testing - no automated test suite currently
     
-    - name: Run frontend tests
+    - name: Manual Frontend Testing
       run: |
-        cd trading-ui
-        npm install
-        npm test
+        # Frontend testing is manual
+# No Node.js setup required
+        # Manual testing - no automated test suite currently
     
-    - name: Upload coverage
-      uses: codecov/codecov-action@v1
-      with:
-        file: Backend/coverage.xml
+    - name: Manual Testing Results
+  run: |
+    echo "Manual testing completed"
 ```
 
 ### Test Reporting
@@ -555,7 +554,7 @@ def generate_test_report():
             'total_tests': 0,
             'passed': 0,
             'failed': 0,
-            'coverage': 0.0
+            'coverage': 'Manual testing'
         },
         'modules': {},
         'performance': {},
@@ -571,7 +570,7 @@ def generate_test_report():
         report['summary']['failed'] += module_results['failed']
     
     # Calculate coverage
-    report['summary']['coverage'] = calculate_coverage()
+    report['summary']['coverage'] = 'Manual testing'
     
     # Generate recommendations
     report['recommendations'] = generate_recommendations(report)

@@ -4,7 +4,8 @@
 The TikTrack Filter System is a unified, client-side filtering solution that provides advanced filtering capabilities across all data tables in the application. It has been completely rewritten to provide a more robust, maintainable, and user-friendly filtering experience.
 
 ## Version History
-- **Version 4.2** (January 2025) - **CURRENT** - Accounts page filter implementation completed
+- **Version 2.0** (August 29, 2025) - **CURRENT** - Complete system alignment and stabilization
+- **Version 4.2** (January 2025) - Accounts page filter implementation completed
 - **Version 4.1** (August 28, 2025) - Enhanced date filtering and notifications support
 - **Version 4.0** (August 28, 2025) - Complete rewrite with unified filtering
 - **Version 3.x** (August 2025) - Legacy system (removed)
@@ -22,7 +23,7 @@ The TikTrack Filter System is a unified, client-side filtering solution that pro
 - **State persistence**: Filter and display states saved to localStorage
 
 ### 🎯 Enhanced Date Filtering (Version 4.1)
-- **Fixed "כל זמן" positioning**: Now appears FIRST in the date filter list
+- **Fixed "All Time" positioning**: Now appears FIRST in the date filter list
 - **Corrected date range calculations**: All date ranges now calculate correctly
 - **Notifications table support**: Date filter now works on notifications table
 - **Improved date logic**: Enhanced handling of all date range options
@@ -65,33 +66,33 @@ function isDateInRange(dateString, dateRange)
 ## Filter Types
 
 ### 1. Status Filter
-- **Column**: `סטטוס`
-- **Values**: `פתוח`, `סגור`, `מבוטל`, `פעיל`, `לא פעיל`, `ממתין`
+- **Column**: `Status`
+- **Values**: `Open`, `Closed`, `Cancelled`, `Active`, `Inactive`, `Pending`
 - **Multi-select**: ✅ Supported
 - **Tables**: Trades, Alerts, Executions, Test
 
 ### 2. Type Filter
-- **Column**: `סוג` or `טיפוס`
-- **Values**: `השקעה`, `סווינג`, `פסיבי`, `קנייה`, `מכירה`
+- **Column**: `Type`
+- **Values**: `Investment`, `Swing`, `Passive`, `Buy`, `Sell`
 - **Multi-select**: ✅ Supported
 - **Tables**: Trades, Designs, Test
 
 ### 3. Account Filter
-- **Column**: `חשבון`
+- **Column**: `Account`
 - **Values**: Dynamic from server
 - **Multi-select**: ✅ Supported
 - **Caching**: localStorage for performance
 - **Tables**: Trades, Alerts, Executions, Test, Notifications
 
 ### 4. Date Filter (ENHANCED)
-- **Column**: `תאריך` (first date column)
+- **Column**: `Date` (first date column)
 - **Values**: Various date ranges
 - **Single-select**: Only one range at a time
 - **Tables**: All tables with date columns (including notifications)
-- **"כל זמן"**: Now appears FIRST in the list
+- **"All Time"**: Now appears FIRST in the list
 
 ### 5. Search Filter
-- **Scope**: All columns except `פעולות`
+- **Scope**: All columns except `Actions`
 - **Case-insensitive**: ✅
 - **Real-time**: ✅
 - **Multi-term**: ✅
@@ -101,14 +102,14 @@ function isDateInRange(dateString, dateRange)
 
 | Option | Description | Range Calculation |
 |--------|-------------|-------------------|
-| **כל זמן** | All records | No filtering (FIRST in list) |
-| **השבוע** | Current calendar week | Start of week to today |
-| **שבוע** | Last 7 days | 7 days ago to today |
+| **All Time** | All records | No filtering (FIRST in list) |
+| **This Week** | Current calendar week | Start of week to today |
+| **Week** | Last 7 days | 7 days ago to today |
 | **MTD** | Month to date | Start of month to today |
 | **YTD** | Year to date | Start of year to today |
-| **שנה** | Last 365 days | 365 days ago to today |
-| **30 יום** | Last 30 days | 30 days ago to today |
-| **60 יום** | Last 60 days | 60 days ago to today |
+| **Year** | Last 365 days | 365 days ago to today |
+| **30 Days** | Last 30 days | 30 days ago to today |
+| **60 Days** | Last 60 days | 60 days ago to today |
 
 ## 🛠️ Implementation Guide for New Pages
 
@@ -123,7 +124,7 @@ let filteredData = [];
 function setupFilterFunctions() {
   // Account filter (if applicable)
   window.filterByAccount = function(accountNames) {
-    if (accountNames.includes('הכול')) {
+    if (accountNames.includes('All')) {
       filteredData = [...allData];
     } else {
       filteredData = allData.filter(item => 
@@ -255,10 +256,10 @@ function updateSummaryStats(data) {
 - [ ] Test all filter combinations
 - [ ] Verify responsive design on mobile
 - [ ] Test state restoration on page reload
-| **90 יום** | Last 90 days | 90 days ago to today |
-| **שבוע קודם** | Previous week | Previous calendar week |
-| **חודש קודם** | Previous month | Previous calendar month |
-| **שנה קודמת** | Previous year | Previous calendar year |
+| **90 Days** | Last 90 days | 90 days ago to today |
+| **Previous Week** | Previous week | Previous calendar week |
+| **Previous Month** | Previous month | Previous calendar month |
+| **Previous Year** | Previous year | Previous calendar year |
 
 ## Integration Guide
 
@@ -269,18 +270,18 @@ function updateSummaryStats(data) {
     <table>
         <thead>
             <tr>
-                <th>סטטוס</th>  <!-- Status filter column -->
-                <th>סוג</th>     <!-- Type filter column -->
-                <th>חשבון</th>   <!-- Account filter column -->
-                <th>תאריך</th>   <!-- Date filter column -->
-                <th>פעולות</th>  <!-- Excluded from search -->
+                <th>Status</th>  <!-- Status filter column -->
+<th>Type</th>     <!-- Type filter column -->
+<th>Account</th>   <!-- Account filter column -->
+<th>Date</th>   <!-- Date filter column -->
+<th>Actions</th>  <!-- Excluded from search -->
             </tr>
         </thead>
         <tbody>
             <!-- Table rows with data attributes -->
             <tr>
-                <td data-status="פתוח">פתוח</td>
-                <td data-investment-type="סווינג">סווינג</td>
+                <td data-status="Open">Open</td>
+<td data-investment-type="Swing">Swing</td>
                 <td data-account="Trading Account 1">Trading Account 1</td>
                 <td data-created-at="2025-08-28">2025-08-28</td>
                 <td>Actions</td>
@@ -335,10 +336,10 @@ Universal filter application function.
 **Example:**
 ```javascript
 // Apply status filter
-applyTableFilter('status', ['פתוח', 'סגור']);
+applyTableFilter('status', ['Open', 'Closed']);
 
 // Apply date filter
-applyTableFilter('date', ['השבוע']);
+applyTableFilter('date', ['This Week']);
 
 // Apply search filter
 applyTableFilter('search', ['AAPL', 'Apple']);
@@ -350,10 +351,10 @@ Returns configuration for a specific filter type.
 **Returns:**
 ```javascript
 {
-    columnName: 'סטטוס',
-    containerIdKeywords: ['status', 'סטטוס'],
+    columnName: 'Status',
+containerIdKeywords: ['status', 'Status'],
     knownContainers: ['tradesContainer', 'alertsContainer'],
-    cellValues: ['פתוח', 'סגור', 'מבוטל'],
+    cellValues: ['Open', 'Closed', 'Cancelled'],
     dataField: 'status'
 }
 ```
@@ -383,8 +384,8 @@ Shows all records in a specific table.
 ### Multi-Select Logic
 For Status and Type filters:
 1. Click to select/deselect items
-2. "הכול" is automatically deselected when specific items are chosen
-3. "הכול" is re-selected when no specific items remain
+2. "All" is automatically deselected when specific items are chosen
+3. "All" is re-selected when no specific items remain
 4. Multiple items can be selected simultaneously
 
 ### Filter Reset Logic
@@ -399,7 +400,7 @@ For Status and Type filters:
 4. **ID Matching**: Matches by account ID from preferences
 
 ### Date Filter Logic (ENHANCED)
-1. **"כל זמן" First**: Appears first in the list for easy access
+1. **"All Time" First**: Appears first in the list for easy access
 2. **Smart Calculations**: All date ranges calculate correctly
 3. **Notifications Support**: Works on notifications table
 4. **Hebrew Display**: Shows date ranges in Hebrew format
@@ -430,7 +431,7 @@ console.log('Filter states:', {
 console.log('Visible containers:', window.getAllVisibleContainers());
 
 // Test filter application
-window.applyTableFilter('status', ['פתוח']);
+window.applyTableFilter('status', ['Open']);
 
 // Check filter configuration
 console.log('Status filter config:', window.getFilterConfig('status'));
@@ -450,7 +451,7 @@ console.log('Status filter config:', window.getFilterConfig('status'));
 1. **Date format**: Must be "YYYY-MM-DD"
 2. **Column position**: Date column must be first date column
 3. **Container inclusion**: Ensure notificationsContainer is included
-4. **"כל זמן" position**: Now appears FIRST in the list
+4. **"All Time" position**: Now appears FIRST in the list
 5. **Date calculations**: All ranges now calculate correctly
 
 #### Account Filter Issues
@@ -459,7 +460,7 @@ console.log('Status filter config:', window.getFilterConfig('status'));
 3. **LocalStorage**: Check for cached account data
 
 #### Multi-Select Issues
-1. **"הכול" item**: Ensure it exists in filter menu
+1. **"All" item**: Ensure it exists in filter menu
 2. **Click handlers**: Verify they're properly attached
 3. **JavaScript errors**: Check console for errors
 

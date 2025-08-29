@@ -23,7 +23,7 @@ This directory contains all server-related documentation for the TikTrack system
 
 ### Technology Stack
 - **Framework**: Flask (Python)
-- **WSGI Server**: Waitress (production) / Flask dev server (development)
+- **WSGI Server**: Flask development server
 - **Database**: SQLite
 - **Static Files**: Served directly by Flask
 - **API**: RESTful API with JSON responses
@@ -33,7 +33,7 @@ This directory contains all server-related documentation for the TikTrack system
 - **API Routes**: `Backend/routes/`
 - **Services**: `Backend/services/`
 - **Models**: `Backend/models/`
-- **Database**: `simpleTrade.db`
+- **Database**: `simpleTrade_new.db`
 
 ## 🚀 Server Management
 
@@ -112,7 +112,7 @@ TikTrack now includes a sophisticated unified restart system with multiple modes
 ```bash
 ./start_server.sh
 ```
-- Uses Waitress WSGI server
+- Uses Flask development server
 - Optimized for production
 - Better stability and performance
 - Port: 8080

@@ -58,3 +58,4 @@ quote_data = adapter.fetch_quote_data('AAPL')
 **ספרייה:** ibapi  
 **סטטוס:** תכנון  
 **גרסה:** 0.0
+

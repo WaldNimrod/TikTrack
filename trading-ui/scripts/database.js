@@ -490,9 +490,15 @@ function updateStatistics() {
 
 
 
-// פונקציה להצגת שגיאה
+// פונקציה להצגת שגיאה - משתמשת במערכת הגלובלית
 function showError(message) {
   console.error('❌ שגיאה:', message);
+  
+  // הצגת הודעת שגיאה גלובלית
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification(message);
+  }
+  
   // הצגת הודעת שגיאה בכל הטבלאות
   const tables = ['accountsTable', 'tradesTable', 'tickersTable', 'tradePlansTable',
     'executionsTable', 'cashFlowsTable', 'alertsTable', 'notesTable'];

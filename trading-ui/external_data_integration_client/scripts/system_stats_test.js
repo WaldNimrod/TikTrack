@@ -9,15 +9,9 @@
  * Version: 1.0
  */
 
-class SystemStatsTester {
+class SystemStatsTester extends BaseTester {
     constructor() {
-        this.apiBaseUrl = '/api/v1';
-        this.logEntries = [];
-        this.isLoading = false;
-        
-        this.initializeEventListeners();
-        this.updateCurrentTime();
-        this.startTimeUpdate();
+        super();
         this.log('info', 'דף בדיקת סטטיסטיקות נטען בהצלחה');
     }
 
@@ -79,36 +73,7 @@ class SystemStatsTester {
         this.initializeCustomCommandEdit();
     }
 
-    /**
-     * Update current time display
-     */
-    updateCurrentTime() {
-        const timeElement = document.getElementById('current-time');
-        if (timeElement) {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('he-IL', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            });
-            const dateString = now.toLocaleDateString('he-IL', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            timeElement.textContent = `${dateString} ${timeString}`;
-        }
-    }
 
-    /**
-     * Start time update interval
-     */
-    startTimeUpdate() {
-        setInterval(() => {
-            this.updateCurrentTime();
-        }, 1000);
-    }
 
     /**
      * Initialize custom command edit functionality
@@ -127,49 +92,7 @@ class SystemStatsTester {
         }
     }
 
-    /**
-     * Add log entry
-     */
-    log(level, message) {
-        const timestamp = new Date().toLocaleTimeString('he-IL');
-        const logEntry = {
-            timestamp,
-            level,
-            message
-        };
-        
-        this.logEntries.push(logEntry);
-        this.updateLogDisplay();
-        
-        // Keep only last 100 entries
-        if (this.logEntries.length > 100) {
-            this.logEntries = this.logEntries.slice(-100);
-        }
-    }
 
-    /**
-     * Update log display
-     */
-    updateLogDisplay() {
-        const logContent = document.getElementById('stats-test-logs');
-        if (!logContent) return;
-        
-        logContent.innerHTML = '';
-        
-        this.logEntries.forEach(entry => {
-            const logElement = document.createElement('div');
-            logElement.className = 'log-entry';
-            logElement.innerHTML = `
-                <span class="log-timestamp">[${entry.timestamp}]</span>
-                <span class="log-level-${entry.level}">[${entry.level.toUpperCase()}]</span>
-                <span class="log-message">${entry.message}</span>
-            `;
-            logContent.appendChild(logElement);
-        });
-        
-        // Scroll to bottom
-        logContent.scrollTop = logContent.scrollHeight;
-    }
 
     /**
      * Display results
@@ -473,21 +396,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.systemStatsTester = new SystemStatsTester();
 });
 
-// Global functions
-function clearStatsLogs() {
-    const logContainer = document.getElementById('stats-test-logs');
-    if (logContainer) {
-        logContainer.innerHTML = '';
-        console.log('🧹 Stats logs cleared');
-    }
-}
 
-function editCustomCommand() {
-    const label = document.getElementById('custom-command-label');
-    const textarea = document.getElementById('custom-command');
-    if (label && textarea) {
-        label.style.display = 'none';
-        textarea.style.display = 'block';
-        textarea.focus();
-    }
-}

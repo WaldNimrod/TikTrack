@@ -9,15 +9,9 @@
  * Version: 1.0
  */
 
-class ApiTester {
+class ApiTester extends BaseTester {
     constructor() {
-        this.apiBaseUrl = '/api/v1';
-        this.logEntries = [];
-        this.isLoading = false;
-        
-        this.initializeEventListeners();
-        this.updateCurrentTime();
-        this.startTimeUpdate();
+        super();
         this.log('info', 'דף בדיקת API נטען בהצלחה');
     }
 
@@ -82,38 +76,6 @@ class ApiTester {
     /**
      * Update current time display
      */
-    updateCurrentTime() {
-        const timeElement = document.getElementById('current-time');
-        if (timeElement) {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('he-IL', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            });
-            const dateString = now.toLocaleDateString('he-IL', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            timeElement.textContent = `${dateString} ${timeString}`;
-        }
-    }
-
-    /**
-     * Start time update interval
-     */
-    startTimeUpdate() {
-        setInterval(() => {
-            this.updateCurrentTime();
-        }, 1000);
-    }
-
-    /**
-     * Initialize custom request edit functionality
-     */
-    initializeCustomRequestEdit() {
         const urlTextarea = document.getElementById('custom-endpoint-url');
         const urlLabel = document.getElementById('custom-endpoint-url-label');
         const jsonTextarea = document.getElementById('custom-request-json');
@@ -139,83 +101,6 @@ class ApiTester {
     /**
      * Add log entry
      */
-    log(level, message) {
-        const timestamp = new Date().toLocaleTimeString('he-IL');
-        const logEntry = {
-            timestamp,
-            level,
-            message
-        };
-        
-        this.logEntries.push(logEntry);
-        this.updateLogDisplay();
-        
-        // Keep only last 100 entries
-        if (this.logEntries.length > 100) {
-            this.logEntries = this.logEntries.slice(-100);
-        }
-    }
-
-    /**
-     * Update log display
-     */
-    updateLogDisplay() {
-        const logContent = document.getElementById('api-test-logs');
-        if (!logContent) return;
-        
-        logContent.innerHTML = '';
-        
-        this.logEntries.forEach(entry => {
-            const logElement = document.createElement('div');
-            logElement.className = 'log-entry';
-            logElement.innerHTML = `
-                <span class="log-timestamp">[${entry.timestamp}]</span>
-                <span class="log-level-${entry.level}">[${entry.level.toUpperCase()}]</span>
-                <span class="log-message">${entry.message}</span>
-            `;
-            logContent.appendChild(logElement);
-        });
-        
-        // Scroll to bottom
-        logContent.scrollTop = logContent.scrollHeight;
-    }
-
-    /**
-     * Display results
-     */
-    displayResults(title, data, type = 'info') {
-        const resultsContainer = document.getElementById('api-results');
-        if (!resultsContainer) return;
-
-        const resultElement = document.createElement('div');
-        resultElement.className = `result-item result-${type}`;
-        resultElement.innerHTML = `
-            <div class="result-header">
-                <strong>${title}</strong>
-                <small class="text-muted">${new Date().toLocaleTimeString('he-IL')}</small>
-            </div>
-            <div class="result-content">
-                <pre>${JSON.stringify(data, null, 2)}</pre>
-            </div>
-        `;
-
-        resultsContainer.appendChild(resultElement);
-        resultsContainer.scrollTop = resultsContainer.scrollHeight;
-    }
-
-    /**
-     * Test Basic Endpoint
-     */
-    async testEndpoint() {
-        this.log('info', 'בדיקת endpoint בסיסי...');
-        
-        try {
-            const startTime = performance.now();
-            const response = await fetch('/api/v1/tickers/');
-            const endTime = performance.now();
-            
-            const data = await response.json();
-            
             const result = {
                 endpoint: '/api/v1/tickers/',
                 method: 'GET',
@@ -566,30 +451,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Global functions
-function clearApiLogs() {
-    const logContainer = document.getElementById('api-test-logs');
-    if (logContainer) {
-        logContainer.innerHTML = '';
-        console.log('🧹 API logs cleared');
-    }
-}
-
-function editCustomEndpointUrl() {
-    const label = document.getElementById('custom-endpoint-url-label');
-    const textarea = document.getElementById('custom-endpoint-url');
-    if (label && textarea) {
-        label.style.display = 'none';
-        textarea.style.display = 'block';
-        textarea.focus();
-    }
-}
-
-function editCustomRequestJson() {
-    const label = document.getElementById('custom-request-json-label');
-    const textarea = document.getElementById('custom-request-json');
-    if (label && textarea) {
-        label.style.display = 'none';
-        textarea.style.display = 'block';
-        textarea.focus();
-    }
-}

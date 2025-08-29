@@ -449,6 +449,7 @@
 /* שגיאה - אדום */
 .notification.error {
   border-left: 4px solid #f44336;
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.1) 100%);
 }
 
 .notification.error .notification-icon {
@@ -458,6 +459,7 @@
 /* אזהרה - כתום */
 .notification.warning {
   border-left: 4px solid #ff9800;
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 111, 0, 0.1) 100%);
 }
 
 .notification.warning .notification-icon {
@@ -467,6 +469,7 @@
 /* מידע - כחול */
 .notification.info {
   border-left: 4px solid #2196F3;
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(30, 136, 229, 0.1) 100%);
 }
 
 .notification.info .notification-icon {

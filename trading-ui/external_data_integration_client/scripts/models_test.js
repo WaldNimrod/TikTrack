@@ -14,12 +14,12 @@
  * Version: 2.1 - Single User System
  */
 
-class SimpleModelsTester {
+class SimpleModelsTester extends BaseTester {
     constructor() {
+        super();
         console.log('🔧 SimpleModelsTester initialized');
         this.initializeEventListeners();
         this.addInitialMessage();
-        this.startTimeUpdate();
     }
 
     /**
@@ -83,38 +83,7 @@ class SimpleModelsTester {
         }, 500);
     }
 
-    /**
-     * Start time update
-     */
-    startTimeUpdate() {
-        this.updateTime();
-        // Update time every second
-        setInterval(() => {
-            this.updateTime();
-        }, 1000);
-    }
 
-    /**
-     * Update current time display
-     */
-    updateTime() {
-        const timeElement = document.getElementById('current-time');
-        if (timeElement) {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('he-IL', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            });
-            const dateString = now.toLocaleDateString('he-IL', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            timeElement.textContent = `${dateString} ${timeString}`;
-        }
-    }
 
     /**
      * Test Preferences Model - Simple version
@@ -352,32 +321,6 @@ class SimpleModelsTester {
         
         console.log('✅ Result displayed');
     }
-
-    /**
-     * Get status class for Bootstrap
-     */
-    getStatusClass(status) {
-        switch (status) {
-            case 'success': return 'success';
-            case 'error': return 'danger';
-            case 'warning': return 'warning';
-            case 'info': return 'info';
-            default: return 'secondary';
-        }
-    }
-
-    /**
-     * Get status text in Hebrew
-     */
-    getStatusText(status) {
-        switch (status) {
-            case 'success': return 'הצלחה';
-            case 'error': return 'שגיאה';
-            case 'warning': return 'אזהרה';
-            case 'info': return 'מידע';
-            default: return 'לא ידוע';
-        }
-    }
 }
 
 // Initialize when DOM is loaded
@@ -387,78 +330,10 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ SimpleModelsTester initialized');
 });
 
-// Global function for clearing logs
-function clearModelLogs() {
-    const resultsContainer = document.getElementById('model-test-logs');
-    if (resultsContainer) {
-        resultsContainer.innerHTML = '';
-        console.log('🧹 Logs cleared');
-    }
-}
 
-// Global functions for editing data
-function editQuoteData() {
-    const label = document.getElementById('quote-data-label');
-    const textarea = document.getElementById('quote-data');
-    if (label && textarea) {
-        label.style.display = 'none';
-        textarea.style.display = 'block';
-        textarea.focus();
-    }
-}
-
-function editTickerData() {
-    const label = document.getElementById('ticker-data-label');
-    const textarea = document.getElementById('ticker-data');
-    if (label && textarea) {
-        label.style.display = 'none';
-        textarea.style.display = 'block';
-        textarea.focus();
-    }
-}
-
-function editPreferencesData() {
-    const label = document.getElementById('preferences-data-label');
-    const textarea = document.getElementById('preferences-data');
-    if (label && textarea) {
-        label.style.display = 'none';
-        textarea.style.display = 'block';
-        textarea.focus();
-    }
-}
 
 // Update labels when textareas change
 document.addEventListener('DOMContentLoaded', function() {
-    // Quote data
-    const quoteTextarea = document.getElementById('quote-data');
-    const quoteLabel = document.getElementById('quote-data-label');
-    if (quoteTextarea && quoteLabel) {
-        quoteTextarea.addEventListener('blur', function() {
-            quoteLabel.textContent = this.value || 'אין נתונים';
-            quoteLabel.style.display = 'block';
-            this.style.display = 'none';
-        });
-    }
-
-    // Ticker data
-    const tickerTextarea = document.getElementById('ticker-data');
-    const tickerLabel = document.getElementById('ticker-data-label');
-    if (tickerTextarea && tickerLabel) {
-        tickerTextarea.addEventListener('blur', function() {
-            tickerLabel.textContent = this.value || 'אין נתונים';
-            tickerLabel.style.display = 'block';
-            this.style.display = 'none';
-        });
-    }
-
-    // Preferences data
-    const preferencesTextarea = document.getElementById('preferences-data');
-    const preferencesLabel = document.getElementById('preferences-data-label');
-    if (preferencesTextarea && preferencesLabel) {
-        preferencesTextarea.addEventListener('blur', function() {
-            preferencesLabel.textContent = this.value || 'אין נתונים';
-            preferencesLabel.style.display = 'block';
-            this.style.display = 'none';
-        });
-    }
+    // Initialize all textarea edit functionality
+    initializeAllTextareaEdits();
 });

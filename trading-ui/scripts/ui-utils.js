@@ -1034,6 +1034,18 @@ function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel =
             return modalId;
         }
 
+        // For DELETE and CANCEL types, use fallback
+        if (type === 'DELETE' || type === 'CANCEL') {
+            const itemType = data.itemType || 'פריט';
+            const itemName = data.itemName || 'זה';
+            const action = type === 'DELETE' ? 'למחוק' : 'לבטל';
+            const confirmed = confirm(`האם אתה בטוח שברצונך ${action} את ${itemType} "${itemName}"?`);
+            if (confirmed && onConfirm) {
+                onConfirm();
+            }
+            return;
+        }
+        
         // For other types, use fallback
         throw new Error(`Unsupported warning type: ${type}`);
 
@@ -1118,30 +1130,32 @@ function handleWarningAction(action) {
 /**
  * Show delete warning
  */
-function showDeleteWarning(itemType, itemName, onConfirm = null, onCancel = null) {
+function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null, onCancel = null) {
     // Fallback mapping for item types
-    const itemTypeDisplay = itemType === 'alert' ? 'התראה' :
+    const displayName = itemTypeDisplay || (itemType === 'alert' ? 'התראה' :
         itemType === 'ticker' ? 'טיקר' :
             itemType === 'account' ? 'חשבון' :
                 itemType === 'trade' ? 'טרייד' :
                     itemType === 'trade_plan' ? 'תוכנית טרייד' :
                         itemType === 'execution' ? 'ביצוע' :
                             itemType === 'cash_flow' ? 'תזרים מזומנים' :
-                                itemType === 'note' ? 'הערה' : 'אובייקט';
+                                itemType === 'note' ? 'הערה' : 'אובייקט');
 
-    console.log('🔧 showDeleteWarning called with:', { itemType, itemName, itemTypeDisplay });
+    console.log('🔧 showDeleteWarning called with:', { itemType, itemName, displayName });
 
-    // Try to use the warning system, fallback to simple confirm
-    try {
-        return showWarning('DELETE', {
-            itemType: itemTypeDisplay,
-            itemName: itemName
-        }, {}, onConfirm, onCancel);
-    } catch (error) {
-        console.error('Error in showDeleteWarning, using fallback:', error);
-
+    // שימוש במערכת ההתראות הגלובלית
+    if (window.showConfirmationDialog) {
+        window.showConfirmationDialog(
+            'מחיקת פריט',
+            `האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?`,
+            'מחק',
+            'ביטול',
+            onConfirm,
+            onCancel
+        );
+    } else {
         // Fallback to simple confirm
-        const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ${itemTypeDisplay} "${itemName}"?`);
+        const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?`);
         if (confirmed && onConfirm) {
             onConfirm();
         }
@@ -1462,8 +1476,8 @@ function showValidationWarning(field, message) {
     console.log('🔧 showValidationWarning called with:', { field, message });
 
     // Use our notification system instead of alert
-    if (window.showInfoNotification) {
-        window.showInfoNotification('מידע על הטופס', `${message}`);
+    if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאת וולידציה', `${message}`);
     } else {
         // Fallback to alert if notification system is not available
         alert(`${message}`);

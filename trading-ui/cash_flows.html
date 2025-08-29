@@ -258,14 +258,10 @@
                                     <label for="cashFlowType" class="form-label">סוג</label>
                                     <select class="form-control" id="cashFlowType" required>
                                         <option value="">בחר סוג...</option>
-                                        <option value="income">הכנסה</option>
-                                        <option value="expense">הוצאה</option>
+                                        <option value="deposit">הפקדה</option>
+                                        <option value="withdrawal">משיכה</option>
                                         <option value="dividend">דיבידנד</option>
                                         <option value="fee">עמלה</option>
-                                        <option value="tax">מס</option>
-                                        <option value="interest">ריבית</option>
-                                        <option value="transfer">העברה</option>
-                                        <option value="other">אחר</option>
                                     </select>
                                     <div class="invalid-feedback" id="cashFlowTypeError"></div>
                                 </div>
@@ -303,10 +299,11 @@
                                     <label for="cashFlowSource" class="form-label">מקור</label>
                                     <select class="form-control" id="cashFlowSource" required>
                                         <option value="manual">ידני</option>
-                                        <option value="file_import" disabled>ייבוא מקובץ (לא נתמך כרגע)</option>
-                                        <option value="direct_import" disabled>ייבוא ישיר (לא נתמך כרגע)</option>
+                                        <option value="IBKR-tradelog-csv" disabled>ייבוא מקובץ IBKR</option>
+                                        <option value="IBKR-api" disabled>ייבוא ישיר IBKR</option>
                                     </select>
                                     <div class="invalid-feedback" id="cashFlowSourceError"></div>
+                                    <small class="form-text text-muted">ייבוא אוטומטי יהיה זמין בהמשך</small>
                                 </div>
                             </div>
                         </div>
@@ -367,14 +364,10 @@
                                     <label for="editCashFlowType" class="form-label">סוג</label>
                                     <select class="form-control" id="editCashFlowType" required>
                                         <option value="">בחר סוג...</option>
-                                        <option value="income">הכנסה</option>
-                                        <option value="expense">הוצאה</option>
+                                        <option value="deposit">הפקדה</option>
+                                        <option value="withdrawal">משיכה</option>
                                         <option value="dividend">דיבידנד</option>
                                         <option value="fee">עמלה</option>
-                                        <option value="tax">מס</option>
-                                        <option value="interest">ריבית</option>
-                                        <option value="transfer">העברה</option>
-                                        <option value="other">אחר</option>
                                     </select>
                                     <div class="invalid-feedback" id="editCashFlowTypeError"></div>
                                 </div>
@@ -412,8 +405,8 @@
                                     <label for="editCashFlowSource" class="form-label">מקור</label>
                                     <select class="form-control" id="editCashFlowSource" required>
                                         <option value="manual">ידני</option>
-                                        <option value="file_import">ייבוא מקובץ</option>
-                                        <option value="direct_import">ייבוא ישיר</option>
+                                        <option value="IBKR-tradelog-csv">ייבוא מקובץ IBKR</option>
+                                        <option value="IBKR-api">ייבוא ישיר IBKR</option>
                                     </select>
                                     <div class="invalid-feedback" id="editCashFlowSourceError"></div>
                                 </div>
@@ -454,7 +447,7 @@
         aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header modal-header-colored">
                     <h5 class="modal-title" id="deleteCashFlowModalLabel">מחיקת תזרים מזומנים</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -530,6 +523,26 @@
             }
             if (window.simpleFilter) {
                 window.simpleFilter.init();
+            }
+        });
+    </script>
+    <script>
+        // תיקון בעיית aria-hidden במודלים
+        document.addEventListener('DOMContentLoaded', function() {
+            // תיקון למודל עריכה
+            const editModal = document.getElementById('editCashFlowModal');
+            if (editModal) {
+                editModal.addEventListener('hidden.bs.modal', function() {
+                    this.removeAttribute('aria-hidden');
+                });
+            }
+            
+            // תיקון למודל מחיקה
+            const deleteModal = document.getElementById('deleteCashFlowModal');
+            if (deleteModal) {
+                deleteModal.addEventListener('hidden.bs.modal', function() {
+                    this.removeAttribute('aria-hidden');
+                });
             }
         });
     </script>

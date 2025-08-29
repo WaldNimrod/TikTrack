@@ -361,3 +361,4 @@ POST /api/v1/quotes/{ticker_id}/refresh
 2. בדוק את התיעוד
 3. פנה לצוות הפיתוח
 4. פתח issue ב-GitHub
+

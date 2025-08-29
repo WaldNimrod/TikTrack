@@ -2770,6 +2770,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.HeaderSystem) {
     window.headerSystem = new HeaderSystem();
     window.headerSystem.init();
+    window.headerSystem.loadSavedState(); // טעינת סטטוס שמור
   }
 });
 

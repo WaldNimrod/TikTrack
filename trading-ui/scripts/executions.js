@@ -1558,7 +1558,7 @@ function displayLinkedItems(linkedItems) {
                                         <td>${alert.id}</td>
                                         <td>${alert.alert_type}</td>
                                         <td>${alert.condition || 'לא זמין'}</td>
-                                        <td><span class="badge bg-danger">${alert.status}</span></td>
+                                        <td><span class="badge ${window.getAlertStatusClass ? window.getAlertStatusClass(alert.status, alert.is_triggered) : 'bg-danger'}">${window.getAlertStatusDisplay ? window.getAlertStatusDisplay(alert.status, alert.is_triggered) : alert.status}</span></td>
                                         <td>
                                             <button class="btn btn-sm btn-outline-primary" onclick="goToAlert(${alert.id})">
                                                 עבור להתראה

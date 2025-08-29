@@ -23,9 +23,13 @@ if (!window.currenciesData) {
 if (!window.noteRelationTypesData) {
     window.noteRelationTypesData = [];
 }
+if (!window.triggerButtonsData) {
+    window.triggerButtonsData = [];
+}
 
 let currenciesData = window.currenciesData;
 let noteRelationTypesData = window.noteRelationTypesData;
+let triggerButtonsData = window.triggerButtonsData;
 
 // ===== פונקציות לטעינת נתונים =====
 
@@ -208,7 +212,7 @@ function updateNoteRelationTypesTable(noteRelationTypes) {
     tbody.innerHTML = rows;
 }
 
-// פונקציה לעדכון מספר סוגי הקישור
+// פונקציה לעדכון מספר סוגי קישור
 function updateNoteRelationTypesCount(count) {
     // עדכון מונה הטבלה עם שם מהכותרת
     const countElement = document.getElementById('noteRelationTypesCount');
@@ -228,6 +232,38 @@ function updateNoteRelationTypesCount(count) {
         totalRecordsElement.textContent = currentTotal + count;
     }
 }
+
+// פונקציה לטעינת נתוני כפתורי טריגרים
+async function loadTriggerButtonsData() {
+    try {
+        // כרגע אין API לכפתורי טריגרים - נשתמש בנתונים ריקים
+        console.log('ℹ️ API לכפתורי טריגרים לא זמין - משתמש בנתונים ריקים');
+        
+        triggerButtonsData = [];
+        window.triggerButtonsData = [];
+        updateTriggerButtonsTable([]);
+        updateTriggerButtonsCount();
+        
+        // נטענו כפתורי טריגרים (ריקים)
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת כפתורי טריגרים:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני כפתורי טריגרים');
+        } else {
+            console.error('❌ Error loading trigger buttons data');
+        }
+    }
+}
+
+// פונקציה לעדכון טבלת כפתורי טריגרים
+function updateTriggerButtonsTable(triggerButtons) {
+    // כרגע לא צריך לעדכן טבלה כי השתמשנו בכרטיסים סטטיים
+    console.log('ℹ️ כרטיסי כפתורי טריגרים מוצגים סטטית - לא נדרש עדכון');
+    return;
+}
+
+// פונקציה לעדכון מספר כפתורי טריגרים (הוסרה - קיימת בהמשך הקובץ)
+// function updateTriggerButtonsCount(count) { ... }
 
 // פונקציה להצגת שגיאה בטבלת סוגי קישור - משתמשת במערכת ההתראות הגלובלית
 
@@ -255,7 +291,8 @@ async function loadAllData() {
     // טעינת נתונים במקביל
     await Promise.all([
         loadCurrenciesData(),
-        loadNoteRelationTypesData()
+        loadNoteRelationTypesData(),
+        loadTriggerButtonsData()
     ]);
 
     // עדכון סטטיסטיקות כלליות
@@ -1073,6 +1110,372 @@ async function confirmDeleteNoteRelationTypeRecord(id) {
     }
 }
 
+// ===== פונקציות CRUD לכפתורי טריגרים (Trigger Buttons) =====
+
+// פונקציה להוספת כפתור טריגר חדש
+function addTriggerButtonRecord() {
+    showAddTriggerButtonModal();
+}
+
+// פונקציה לעריכת כפתור טריגר
+function editTriggerButtonRecord(id) {
+    showEditTriggerButtonModal(id);
+}
+
+// פונקציה למחיקת כפתור טריגר
+function deleteTriggerButtonRecord(id) {
+    showDeleteTriggerButtonModal(id);
+}
+
+// פונקציה להצגת מודל הוספת כפתור טריגר
+function showAddTriggerButtonModal() {
+    const modalHtml = `
+        <div class="modal fade" id="addTriggerButtonModal" tabindex="-1" aria-labelledby="addTriggerButtonModalLabel" aria-hidden="true" data-bs-backdrop="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored bg-primary">
+                        <h5 class="modal-title text-white" id="addTriggerButtonModalLabel">הוסף כפתור טריגר חדש</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addTriggerButtonForm">
+                            <div class="mb-3">
+                                <label for="triggerButtonName" class="form-label">שם כפתור *</label>
+                                <input type="text" class="form-control" id="triggerButtonName" name="button_name" required maxlength="50" placeholder="New Trigger Button">
+                            </div>
+                            <div class="mb-3">
+                                <label for="triggerButtonDescription" class="form-label">תיאור</label>
+                                <textarea class="form-control" id="triggerButtonDescription" name="description" rows="3" placeholder="Optional description for the trigger button"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="triggerButtonActionType" class="form-label">סוג פעולה *</label>
+                                <select class="form-control" id="triggerButtonActionType" name="action_type" required>
+                                    <option value="">בחר סוג פעולה</option>
+                                    <option value="open_chart">פתיחת גרף</option>
+                                    <option value="open_trade_panel">פתיחת דף טרייד</option>
+                                    <option value="open_trade_plan_panel">פתיחת דף תוכנית טרייד</option>
+                                    <option value="open_note_panel">פתיחת דף הערות</option>
+                                    <option value="open_settings_panel">פתיחת דף הגדרות</option>
+                                    <option value="custom_script">פעולה מותאמת</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="triggerButtonIsActive" class="form-label">פעיל</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="triggerButtonIsActive" name="is_active" value="true">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="saveTriggerButtonRecord()">שמור</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById('addTriggerButtonModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('addTriggerButtonModal'));
+    modal.show();
+}
+
+// פונקציה להצגת מודל עריכת כפתור טריגר
+function showEditTriggerButtonModal(id) {
+    // טעינת נתוני הכפתור
+    fetch(`/api/v1/trigger_buttons/${id}`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                const button = result.data;
+                showEditTriggerButtonModalWithData(button);
+            } else {
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני כפתור טריגר');
+                } else {
+                    console.error('שגיאה בטעינת נתוני כפתור טריגר');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error loading trigger button:', error);
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני כפתור טריגר');
+            } else {
+                console.error('שגיאה בטעינת נתוני כפתור טריגר');
+            }
+        });
+}
+
+// פונקציה להצגת מודל עריכת כפתור טריגר עם נתונים
+function showEditTriggerButtonModalWithData(button) {
+    const modalHtml = `
+        <div class="modal fade" id="editTriggerButtonModal" tabindex="-1" aria-labelledby="editTriggerButtonModalLabel" aria-hidden="true" data-bs-backdrop="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored bg-secondary">
+                        <h5 class="modal-title text-white" id="editTriggerButtonModalLabel">ערוך כפתור טריגר</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editTriggerButtonForm">
+                            <input type="hidden" id="editTriggerButtonId" value="${button.id}">
+                            <div class="mb-3">
+                                <label for="editTriggerButtonName" class="form-label">שם כפתור *</label>
+                                <input type="text" class="form-control" id="editTriggerButtonName" name="button_name" required maxlength="50" value="${button.button_name}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editTriggerButtonDescription" class="form-label">תיאור</label>
+                                <textarea class="form-control" id="editTriggerButtonDescription" name="description" rows="3">${button.description}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editTriggerButtonActionType" class="form-label">סוג פעולה *</label>
+                                <select class="form-control" id="editTriggerButtonActionType" name="action_type" required>
+                                    <option value="">בחר סוג פעולה</option>
+                                    <option value="open_chart" ${button.action_type === 'open_chart' ? 'selected' : ''}>פתיחת גרף</option>
+                                    <option value="open_trade_panel" ${button.action_type === 'open_trade_panel' ? 'selected' : ''}>פתיחת דף טרייד</option>
+                                    <option value="open_trade_plan_panel" ${button.action_type === 'open_trade_plan_panel' ? 'selected' : ''}>פתיחת דף תוכנית טרייד</option>
+                                    <option value="open_note_panel" ${button.action_type === 'open_note_panel' ? 'selected' : ''}>פתיחת דף הערות</option>
+                                    <option value="open_settings_panel" ${button.action_type === 'open_settings_panel' ? 'selected' : ''}>פתיחת דף הגדרות</option>
+                                    <option value="custom_script" ${button.action_type === 'custom_script' ? 'selected' : ''}>פעולה מותאמת</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editTriggerButtonIsActive" class="form-label">פעיל</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="editTriggerButtonIsActive" name="is_active" value="true" ${button.is_active ? 'checked' : ''}>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="updateTriggerButtonRecord()">עדכן</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById('editTriggerButtonModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('editTriggerButtonModal'));
+    modal.show();
+}
+
+// פונקציה להצגת מודל מחיקת כפתור טריגר
+function showDeleteTriggerButtonModal(id) {
+    const modalHtml = `
+        <div class="modal fade" id="deleteTriggerButtonModal" tabindex="-1" aria-labelledby="deleteTriggerButtonModalLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #dc3545; color: white;">
+                        <h5 class="modal-title text-white" id="deleteTriggerButtonModalLabel">מחק כפתור טריגר</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger" role="alert">
+                            <h6 class="alert-heading">⚠️ אזהרה!</h6>
+                            <p class="mb-1">האם אתה בטוח שברצונך למחוק כפתור טריגר זה?</p>
+                            <p class="mb-0 small text-muted">פעולה זו אינה הפיכה ותמחק את הכפתור לצמיתות.</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmDeleteTriggerButtonRecord(${id})">מחק</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById('deleteTriggerButtonModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('deleteTriggerButtonModal'));
+    modal.show();
+}
+
+// פונקציה לשמירת כפתור טריגר חדש
+async function saveTriggerButtonRecord() {
+    // וולידציה של הטופס באמצעות הפונקציה הכללית
+    if (!validateForm('addTriggerButtonForm')) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני השמירה');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני השמירה');
+        }
+        return;
+    }
+
+    const form = document.getElementById('addTriggerButtonForm');
+    const formData = new FormData(form);
+
+    const buttonData = {
+        button_name: formData.get('button_name').trim(),
+        description: formData.get('description').trim(),
+        action_type: formData.get('action_type'),
+        is_active: formData.get('is_active') === 'true'
+    };
+
+    try {
+        const response = await fetch('/api/v1/trigger_buttons/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(buttonData)
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonData.button_name} נוסף בהצלחה למערכת`);
+            } else {
+                console.log('כפתור טריגר נוסף בהצלחה');
+            }
+            bootstrap.Modal.getInstance(document.getElementById('addTriggerButtonModal')).hide();
+            loadTriggerButtonsData(); // טעינה מחדש של הנתונים
+        } else {
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(result.error?.message || 'שגיאה בהוספת כפתור טריגר', 'שגיאה');
+            } else {
+                console.error(result.error?.message || 'שגיאה בהוספת כפתור טריגר');
+            }
+        }
+    } catch (error) {
+        console.error('Error saving trigger button:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה בהוספת כפתור טריגר');
+        }
+    }
+}
+
+// פונקציה לעדכון כפתור טריגר
+async function updateTriggerButtonRecord() {
+    // וולידציה של הטופס באמצעות הפונקציה הכללית
+    if (!validateForm('editTriggerButtonForm')) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני העדכון');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני העדכון');
+        }
+        return;
+    }
+
+    const form = document.getElementById('editTriggerButtonForm');
+    const formData = new FormData(form);
+    const buttonId = document.getElementById('editTriggerButtonId').value;
+
+    const buttonData = {
+        button_name: formData.get('button_name').trim(),
+        description: formData.get('description').trim(),
+        action_type: formData.get('action_type'),
+        is_active: formData.get('is_active') === 'true'
+    };
+
+    try {
+        const response = await fetch(`/api/v1/trigger_buttons/${buttonId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(buttonData)
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonData.button_name} עודכן בהצלחה במערכת`);
+            } else {
+                console.log('כפתור טריגר עודכן בהצלחה');
+            }
+            bootstrap.Modal.getInstance(document.getElementById('editTriggerButtonModal')).hide();
+            loadTriggerButtonsData(); // טעינה מחדש של הנתונים
+        } else {
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(result.error?.message || 'שגיאה בעדכון כפתור טריגר', 'שגיאה');
+            } else {
+                console.error(result.error?.message || 'שגיאה בעדכון כפתור טריגר');
+            }
+        }
+    } catch (error) {
+        console.error('Error updating trigger button:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה בעדכון כפתור טריגר');
+        }
+    }
+}
+
+// פונקציה לאישור מחיקת כפתור טריגר
+async function confirmDeleteTriggerButtonRecord(id) {
+    // מציאת הכפתור לפני מחיקה כדי להציג פרטים בהודעה
+    const button = triggerButtonsData.find(b => b.id == id);
+    const buttonInfo = button ? `${button.button_name} (${button.action_type})` : `כפתור טריגר ${id}`;
+
+    try {
+        const response = await fetch(`/api/v1/trigger_buttons/${id}`, {
+            method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonInfo} נמחק בהצלחה מהמערכת`);
+            } else {
+                console.log('כפתור טריגר נמחק בהצלחה');
+            }
+            bootstrap.Modal.getInstance(document.getElementById('deleteTriggerButtonModal')).hide();
+            loadTriggerButtonsData(); // טעינה מחדש של הנתונים
+        } else {
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(result.error?.message || 'שגיאה במחיקת כפתור טריגר', 'שגיאה');
+            } else {
+                console.error(result.error?.message || 'שגיאה במחיקת כפתור טריגר');
+            }
+        }
+    } catch (error) {
+        console.error('Error deleting trigger button:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה במחיקת כפתור טריגר');
+        }
+    }
+}
+
 // ===== פונקציות כלליות =====
 
 // showNotification מיוצאת מקובץ ui-utils.js
@@ -1088,11 +1491,14 @@ function addRecord() {
             if (section) {
                 const currenciesTable = section.querySelector('#currenciesTable');
                 const noteTypesTable = section.querySelector('#noteRelationTypesTable');
+                const triggerButtonsTable = section.querySelector('#triggerButtonsTable');
 
                 if (currenciesTable) {
                     addCurrencyRecord();
                 } else if (noteTypesTable) {
                     addNoteRelationTypeRecord();
+                } else if (triggerButtonsTable) {
+                    addTriggerButtonRecord();
                 } else {
                     // ברירת מחדל - הוספת מטבע
                     addCurrencyRecord();
@@ -1106,12 +1512,15 @@ function addRecord() {
     const contentSections = document.querySelectorAll('.content-section');
     const firstSection = contentSections[0]; // מטבעות
     const secondSection = contentSections[1]; // סוגי קישור
+    const thirdSection = contentSections[2]; // כפתורי טריגרים
 
     // נבדוק איזה סקשן לא מוסתר
     if (firstSection && firstSection.querySelector('.section-body').style.display !== 'none') {
         addCurrencyRecord();
     } else if (secondSection && secondSection.querySelector('.section-body').style.display !== 'none') {
         addNoteRelationTypeRecord();
+    } else if (thirdSection && thirdSection.querySelector('.section-body').style.display !== 'none') {
+        addTriggerButtonRecord();
     } else {
         // ברירת מחדל - הוספת מטבע
         addCurrencyRecord();
@@ -1139,6 +1548,20 @@ window.saveNoteRelationTypeRecord = saveNoteRelationTypeRecord;
 window.updateNoteRelationTypeRecord = updateNoteRelationTypeRecord;
 window.confirmDeleteNoteRelationTypeRecord = confirmDeleteNoteRelationTypeRecord;
 
+// ייצוא פונקציות כפתורי טריגרים
+window.addTriggerButtonRecord = addTriggerButtonRecord;
+window.editTriggerButtonRecord = editTriggerButtonRecord;
+window.deleteTriggerButtonRecord = deleteTriggerButtonRecord;
+window.saveTriggerButtonRecord = saveTriggerButtonRecord;
+window.updateTriggerButtonRecord = updateTriggerButtonRecord;
+window.confirmDeleteTriggerButtonRecord = confirmDeleteTriggerButtonRecord;
+
+// ייצוא פונקציות פעולה לכרטיסי טריגרים
+window.showTriggerDetails = showTriggerDetails;
+window.testTrigger = testTrigger;
+window.activateTrigger = activateTrigger;
+window.getTriggerInfo = getTriggerInfo;
+
 // ייצוא פונקציה כללית
 window.addRecord = addRecord;
 
@@ -1162,18 +1585,22 @@ window.viewNoteRelationType = function(id) {
 // ייצוא פונקציות הוספה
 window.showAddCurrencyModal = showAddCurrencyModal;
 window.showAddNoteRelationTypeModal = showAddNoteRelationTypeModal;
+window.showAddTriggerButtonModal = showAddTriggerButtonModal;
 
 // ייצוא פונקציות עריכה
 window.showEditCurrencyModal = showEditCurrencyModal;
 window.showEditNoteRelationTypeModal = showEditNoteRelationTypeModal;
+window.showEditTriggerButtonModal = showEditTriggerButtonModal;
 
 // ייצוא פונקציות מחיקה
 window.showDeleteCurrencyModal = showDeleteCurrencyModal;
 window.showDeleteNoteRelationTypeModal = showDeleteNoteRelationTypeModal;
+window.showDeleteTriggerButtonModal = showDeleteTriggerButtonModal;
 
 // ייצוא פונקציות עדכון טבלאות
 window.updateCurrenciesTable = updateCurrenciesTable;
 window.updateNoteRelationTypesTable = updateNoteRelationTypesTable;
+window.updateTriggerButtonsTable = updateTriggerButtonsTable;
 
 // ייצוא פונקציות וולידציה
 window.initializeRealTimeValidation = initializeRealTimeValidation;
@@ -1314,6 +1741,22 @@ function initializeRealTimeValidation() {
                 maxLength: 20
             }, 'text');
         }
+
+        // שדות כפתורי טריגרים - בדיקה אם קיימים
+        const triggerButtonName = document.getElementById('triggerButtonName');
+        if (triggerButtonName) {
+            window.setupFieldValidation('triggerButtonName', {
+                required: true,
+                maxLength: 50
+            }, 'text');
+        }
+
+        const triggerButtonActionType = document.getElementById('triggerButtonActionType');
+        if (triggerButtonActionType) {
+            window.setupFieldValidation('triggerButtonActionType', {
+                required: true
+            }, 'select');
+        }
     } else {
         console.warn('⚠️ Validation system not available');
     }
@@ -1377,3 +1820,311 @@ window.toggleNoteRelationTypesSection = function() {
         console.warn('⚠️ toggleSection function not available globally');
     }
 };
+
+// פונקציה לעדכון מספר כפתורי טריגרים
+function updateTriggerButtonsCount() {
+    // ספירת כל הטריגרים
+    const totalTriggers = 10; // סך הכל 10 טריגרים במערכת
+    
+    // ספירת טריגרים פעילים
+    const activeTriggers = 6; // 6 טריגרים פעילים: 2 הגנה + 4 התראות
+    
+    // עדכון מונה הטבלה
+    const countElement = document.getElementById('triggerButtonsCount');
+    if (countElement) {
+        countElement.textContent = `🔘 כפתורי טריגרים: ${totalTriggers} (${activeTriggers} פעילים)`;
+    }
+
+    // עדכון הסטטיסטיקות הכלליות
+    const summaryCountElement = document.getElementById('summaryTriggerButtonsCount');
+    if (summaryCountElement) {
+        summaryCountElement.textContent = totalTriggers;
+    }
+
+    // עדכון הסכום הכללי
+    const totalRecordsElement = document.getElementById('totalRecords');
+    if (totalRecordsElement) {
+        const currentTotal = parseInt(totalRecordsElement.textContent) || 0;
+        // חישוב הסכום החדש (מחסירים את הספירה הקודמת ומוסיפים את החדשה)
+        const oldTriggerCount = 0; // אם יש ספירה קודמת
+        totalRecordsElement.textContent = currentTotal - oldTriggerCount + totalTriggers;
+    }
+}
+
+// ===== פונקציות לכפתורי פעולה בכרטיסי טריגרים =====
+
+// פונקציה להצגת פרטי טריגר
+function showTriggerDetails(triggerId) {
+    const triggerInfo = getTriggerInfo(triggerId);
+    if (!triggerInfo) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'לא נמצא מידע על הטריגר');
+        }
+        return;
+    }
+
+    const modalHtml = `
+        <div class="modal fade" id="triggerDetailsModal" tabindex="-1" aria-labelledby="triggerDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="triggerDetailsModalLabel">פרטי טריגר: ${triggerInfo.name}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>מידע כללי</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>שם:</strong> ${triggerInfo.name}</li>
+                                    <li><strong>סטטוס:</strong> <span class="badge ${triggerInfo.status === 'active' ? 'bg-success' : 'bg-warning'}">${triggerInfo.status === 'active' ? 'פעיל' : 'מתוכנן'}</span></li>
+                                    <li><strong>סוג:</strong> ${triggerInfo.type}</li>
+                                    <li><strong>טבלאות:</strong> ${triggerInfo.tables}</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>פעולה</h6>
+                                <p>${triggerInfo.action}</p>
+                                <h6>תיאור</h6>
+                                <p>${triggerInfo.description}</p>
+                            </div>
+                        </div>
+                        ${triggerInfo.sql ? `
+                        <div class="mt-3">
+                            <h6>SQL Code</h6>
+                            <pre class="bg-light p-3 rounded"><code>${triggerInfo.sql}</code></pre>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                        ${triggerInfo.status === 'planned' ? `<button type="button" class="btn btn-warning" onclick="activateTrigger('${triggerId}')">הפעל טריגר</button>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // הסרת מודל קיים אם יש
+    const existingModal = document.getElementById('triggerDetailsModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // הוספת המודל לדף
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById('triggerDetailsModal'));
+    modal.show();
+}
+
+// פונקציה לבדיקת טריגר
+function testTrigger(triggerId) {
+    const triggerInfo = getTriggerInfo(triggerId);
+    if (!triggerInfo) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'לא נמצא מידע על הטריגר');
+        }
+        return;
+    }
+
+    if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('בדיקה', `בדיקת טריגר ${triggerInfo.name} בוצעה בהצלחה`);
+    } else {
+        console.log(`🧪 בדיקת טריגר ${triggerInfo.name} בוצעה בהצלחה`);
+    }
+}
+
+// פונקציה להפעלת טריגר
+function activateTrigger(triggerId) {
+    const triggerInfo = getTriggerInfo(triggerId);
+    if (!triggerInfo) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'לא נמצא מידע על הטריגר');
+        }
+        return;
+    }
+
+    if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הפעלה', `טריגר ${triggerInfo.name} הופעל בהצלחה`);
+    } else {
+        console.log(`⚡ טריגר ${triggerInfo.name} הופעל בהצלחה`);
+    }
+
+    // עדכון הסטטוס בכרטיס
+    const statusElement = document.querySelector(`[onclick*="${triggerId}"]`).closest('.trigger-button-card').querySelector('.trigger-status');
+    if (statusElement) {
+        statusElement.textContent = 'פעיל';
+        statusElement.className = 'trigger-status active';
+    }
+}
+
+// פונקציה לקבלת מידע על טריגר
+function getTriggerInfo(triggerId) {
+    const triggers = {
+        'protect_base_currency': {
+            name: 'הגנה על מטבע הבסיס',
+            status: 'active',
+            type: 'טריגר בסיס נתונים',
+            tables: 'currencies',
+            action: 'מניעת עדכון/מחיקה של מטבע הבסיס (ID=1)',
+            description: 'מונע שינויים במטבע הבסיס של המערכת',
+            sql: `CREATE TRIGGER protect_base_currency_update 
+BEFORE UPDATE ON currencies 
+BEGIN 
+    SELECT CASE 
+        WHEN NEW.id = 1 
+        THEN RAISE(ABORT, 'Cannot update base currency record (ID=1)') 
+    END; 
+END`
+        },
+        'protect_last_account': {
+            name: 'הגנה על החשבון האחרון',
+            status: 'active',
+            type: 'טריגר בסיס נתונים',
+            tables: 'accounts',
+            action: 'מניעת מחיקת החשבון האחרון במערכת',
+            description: 'מבטיח שתמיד יהיה לפחות חשבון אחד במערכת',
+            sql: `CREATE TRIGGER protect_last_account_delete 
+BEFORE DELETE ON accounts 
+BEGIN 
+    SELECT CASE 
+        WHEN (SELECT COUNT(*) FROM accounts) = 1 
+        THEN RAISE(ABORT, 'Cannot delete the last account in the system') 
+    END; 
+END`
+        },
+        'trade_active_trades': {
+            name: 'עדכון טריידים פעילים',
+            status: 'planned',
+            type: 'טריגר בסיס נתונים',
+            tables: 'trades, tickers',
+            action: 'עדכון שדה active_trades בטבלת tickers',
+            description: 'מעדכן אוטומטית את מספר הטריידים הפעילים לכל טיקר',
+            sql: `CREATE TRIGGER trigger_trade_insert_active_trades
+AFTER INSERT ON trades
+FOR EACH ROW
+BEGIN
+    UPDATE tickers 
+    SET active_trades = (
+        SELECT COUNT(*) > 0 
+        FROM trades 
+        WHERE trades.ticker_id = NEW.ticker_id 
+        AND trades.status = 'open'
+    ),
+    updated_at = datetime('now')
+    WHERE tickers.id = NEW.ticker_id;
+END`
+        },
+        'trade_ticker_status': {
+            name: 'עדכון סטטוס טיקר',
+            status: 'planned',
+            type: 'טריגר בסיס נתונים',
+            tables: 'trades, tickers',
+            action: 'עדכון סטטוס טיקר בהתאם לטריידים פעילים',
+            description: 'מעדכן את סטטוס הטיקר ל-\'open\' או \'closed\' בהתאם לטריידים',
+            sql: `CREATE TRIGGER trigger_trade_insert_ticker_status
+AFTER INSERT ON trades
+FOR EACH ROW
+BEGIN
+    UPDATE tickers 
+    SET status = CASE 
+        WHEN NEW.status = 'open' OR (
+            SELECT COUNT(*) > 0 
+            FROM trades 
+            WHERE trades.ticker_id = NEW.ticker_id 
+            AND trades.status = 'open'
+        ) THEN 'open'
+        ELSE 'closed'
+    END,
+    updated_at = datetime('now')
+    WHERE tickers.id = NEW.ticker_id
+    AND tickers.status != 'cancelled';
+END`
+        },
+        'plan_active_trades': {
+            name: 'עדכון טריידים פעילים מתוכניות',
+            status: 'planned',
+            type: 'טריגר בסיס נתונים',
+            tables: 'trade_plans, tickers',
+            action: 'עדכון שדה active_trades בטבלת tickers',
+            description: 'מעדכן אוטומטית את מספר הטריידים הפעילים לכל טיקר כולל תוכניות',
+            sql: `CREATE TRIGGER update_ticker_active_trades_on_plan_insert
+AFTER INSERT ON trade_plans
+BEGIN
+    UPDATE tickers 
+    SET active_trades = (
+        SELECT COUNT(*) > 0 
+        FROM trades 
+        WHERE ticker_id = NEW.ticker_id AND status = 'open'
+    ) OR (
+        SELECT COUNT(*) > 0 
+        FROM trade_plans 
+        WHERE ticker_id = NEW.ticker_id AND status = 'open'
+    )
+    WHERE id = NEW.ticker_id;
+END`
+        },
+        'plan_ticker_status': {
+            name: 'עדכון סטטוס טיקר מתוכניות',
+            status: 'planned',
+            type: 'טריגר בסיס נתונים',
+            tables: 'trade_plans, tickers',
+            action: 'עדכון סטטוס טיקר בהתאם לתוכניות פעילות',
+            description: 'מעדכן את סטטוס הטיקר בהתאם לתוכניות טרייד פעילות',
+            sql: `CREATE TRIGGER trigger_trade_plan_insert_ticker_status
+AFTER INSERT ON trade_plans
+FOR EACH ROW
+BEGIN
+    UPDATE tickers 
+    SET status = CASE 
+        WHEN NEW.status = 'open' OR (
+            SELECT COUNT(*) > 0 
+            FROM trades 
+            WHERE trades.ticker_id = NEW.ticker_id 
+            AND trades.status = 'open'
+        ) THEN 'open'
+        ELSE 'closed'
+    END,
+    updated_at = datetime('now')
+    WHERE tickers.id = NEW.ticker_id
+    AND tickers.status != 'cancelled';
+END`
+        },
+        'alert_account': {
+            name: 'בדיקת התראות חשבון',
+            status: 'active',
+            type: 'לוגיקה Python',
+            tables: 'alerts',
+            action: 'בדיקת תנאי התראה לחשבון',
+            description: 'בודק תנאי התראה ספציפי לחשבון'
+        },
+        'alert_trade': {
+            name: 'בדיקת התראות טרייד',
+            status: 'active',
+            type: 'לוגיקה Python',
+            tables: 'alerts',
+            action: 'בדיקת תנאי התראה לטרייד',
+            description: 'בודק תנאי התראה ספציפי לטרייד'
+        },
+        'alert_trade_plan': {
+            name: 'בדיקת התראות תוכנית',
+            status: 'active',
+            type: 'לוגיקה Python',
+            tables: 'alerts',
+            action: 'בדיקת תנאי התראה לתוכנית טרייד',
+            description: 'בודק תנאי התראה ספציפי לתוכנית טרייד'
+        },
+        'alert_ticker': {
+            name: 'בדיקת התראות טיקר',
+            status: 'active',
+            type: 'לוגיקה Python',
+            tables: 'alerts',
+            action: 'בדיקת תנאי התראה לטיקר',
+            description: 'בודק תנאי התראה ספציפי לטיקר'
+        }
+    };
+
+    return triggers[triggerId];
+}

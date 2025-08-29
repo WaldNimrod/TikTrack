@@ -30,7 +30,7 @@
  * - תמיכה בערכים פשוטים: price_target, stop_loss, וכו'
  * 
  * Color Scheme by Related Object Type:
- * - 🏦 חשבון (type=1): צבע טורקיז #29a6a8 / #1f8a8c
+ * - 💰 חשבון (type=1): צבע טורקיז #29a6a8 / #1f8a8c
  * - 📈 טרייד (type=2): צבע ירוק #28a745 / #1e7e34  
  * - 📋 תוכנית טרייד (type=3): צבע כתום #ff9500 / #e67e00
  * - 📊 טיקר (type=4): צבע אדום #dc3545 / #c82333
@@ -135,19 +135,19 @@ class ActiveAlertsComponent extends HTMLElement {
           <div class="legend-items">
             <div class="legend-item">
               <div class="legend-color" style="background-color: rgba(41, 166, 168, 0.1); border-left: 4px solid #1f8a8c;"></div>
-              <span>חשבון</span>
+              <span>💰 חשבון</span>
             </div>
             <div class="legend-item">
               <div class="legend-color" style="background-color: rgba(40, 167, 69, 0.1); border-left: 4px solid #1e7e34;"></div>
-              <span>טרייד</span>
+              <span>📈 טרייד</span>
             </div>
             <div class="legend-item">
               <div class="legend-color" style="background-color: rgba(255, 149, 0, 0.1); border-left: 4px solid #e67e00;"></div>
-              <span>תוכנית טרייד</span>
+              <span>📋 תוכנית טרייד</span>
             </div>
             <div class="legend-item">
               <div class="legend-color" style="background-color: rgba(220, 53, 69, 0.1); border-left: 4px solid #c82333;"></div>
-              <span>טיקר</span>
+              <span>📊 טיקר</span>
             </div>
           </div>
         </div>
@@ -451,6 +451,9 @@ class ActiveAlertsComponent extends HTMLElement {
           <h4 class="alert-card-title clickable" onclick="window.showTickerPage('${symbol}')">${objectIcon} ${symbol || 'התראה'}</h4>
           <span class="alert-card-time">${triggeredTime}</span>
         </div>
+        <div class="alert-card-related-object">
+          ${relatedObjectDetails}
+        </div>
         <div class="alert-card-content">
           ${message ? `<p class="alert-card-message"><strong>${message}</strong></p>` : ''}
           <div class="alert-card-details">
@@ -460,9 +463,6 @@ class ActiveAlertsComponent extends HTMLElement {
           </div>
         </div>
         <div class="alert-card-footer">
-          <div class="related-object-info">
-            ${relatedObjectDetails}
-          </div>
           <button class="button-primary btn-mark-read" data-alert-id="${alert.id}">✓ קראתי</button>
         </div>
       </div>
@@ -1156,14 +1156,15 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   /**
-   * קביעת איקון לפי סוג האובייקט המקושר
+   * קביעת איקון לפי סוג האובייקט המקושר - מעודכן לאיקונים של המערכת
    */
   getObjectTypeIcon(relatedTypeId) {
+    // איקונים עקביים עם המערכת
     const objectIcons = {
-      1: '🏦', // חשבון
-      2: '📈', // טרייד
-      3: '📋', // תוכנית טרייד
-      4: '📊'  // טיקר
+      1: '💰', // חשבון - כפי שמופיע ב-index.html, preferences.html
+      2: '📈', // טרייד - כפי שמופיע ב-index.html, trades.html
+      3: '📋', // תוכנית טרייד - כפי שמופיע ב-db_extradata.html
+      4: '📊'  // טיקר - כפי שמופיע ב-index.html, db_extradata.html
     };
     return objectIcons[relatedTypeId] || '📊';
   }

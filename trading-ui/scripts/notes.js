@@ -27,6 +27,7 @@ function openNoteDetails(id) {
 }
 
 function editNote(id) {
+  console.log('🔄 editNote נקראה עבור ID:', id);
   showEditNoteModal(id);
 }
 
@@ -473,21 +474,15 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td>${attachmentDisplay}</td>
         <td data-date="${note.created_at}">${date}</td>
         <td class="actions-cell" onclick="event.stopPropagation();">
-          <table class="table table-sm table-borderless mb-0">
-            <tbody>
-              <tr>
-                <td class="p-0 pe-1">
-                  ${createLinkButton(`viewLinkedItemsForNote(${note.id})`)}
-                </td>
-                <td class="p-0 pe-1">
-                  ${createEditButton(`editNote('${note.id}')`)}
-                </td>
-                <td class="p-0">
-                  ${createDeleteButton(`deleteNote('${note.id}')`)}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsWarning('note', ${note.id})" title="צפה בפריטים מקושרים">
+            🔗
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="editNote('${note.id}')" title="ערוך הערה">
+            ✏️
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="deleteNote('${note.id}')" title="מחק הערה">
+            🗑️
+          </button>
         </td>
       </tr>
     `;
@@ -906,33 +901,46 @@ async function populateEditSelectByType(relationType, selectedId) {
 function validateNoteForm(content, relationType, relatedId, attachment) {
   let isValid = true;
 
+  console.log('🔧 validateNoteForm נקראה עם:', {
+    content: content,
+    contentLength: content?.length,
+    relationType: relationType,
+    relatedId: relatedId,
+    hasAttachment: !!attachment
+  });
+
   // ניקוי שגיאות קודמות
   clearNoteValidationErrors();
 
   // וולידציה של תוכן
   if (!content) {
-    showNoteValidationError('contentError', 'תוכן הערה הוא שדה חובה');
+    console.log('❌ תוכן ריק');
+    window.showValidationWarning('contentError', 'תוכן הערה הוא שדה חובה');
     isValid = false;
   } else if (content.length < 1) {
-    showNoteValidationError('contentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
+    console.log('❌ תוכן קצר מדי');
+    window.showValidationWarning('contentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
     isValid = false;
   } else if (content.length > 10000) {
-    showNoteValidationError('contentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
+    console.log('❌ תוכן ארוך מדי');
+    window.showValidationWarning('contentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
     isValid = false;
+  } else {
+    console.log('✅ תוכן תקין');
   }
 
   // וולידציה של סוג קשר
   if (!relationType) {
-    showNoteValidationError('relationTypeError', 'יש לבחור סוג אובייקט לשיוך');
+    window.showValidationWarning('relationTypeError', 'יש לבחור סוג אובייקט לשיוך');
     isValid = false;
   }
 
   // וולידציה של אובייקט קשור
   if (!relatedId) {
-    showNoteValidationError('relatedObjectError', 'יש לבחור אובייקט לשיוך');
+    window.showValidationWarning('relatedObjectError', 'יש לבחור אובייקט לשיוך');
     isValid = false;
   } else if (isNaN(parseInt(relatedId)) || parseInt(relatedId) <= 0) {
-    showNoteValidationError('relatedObjectError', 'מזהה אובייקט לא תקין');
+    window.showValidationWarning('relatedObjectError', 'מזהה אובייקט לא תקין');
     isValid = false;
   }
 
@@ -940,13 +948,13 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
   if (attachment) {
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (attachment.size > maxSize) {
-      showNoteValidationError('attachmentError', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
+      window.showValidationWarning('attachmentError', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
       isValid = false;
     }
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(attachment.type)) {
-      showNoteValidationError('attachmentError', 'סוג קובץ לא נתמך. מותרים: תמונות, PDF, Word, טקסט');
+      window.showValidationWarning('attachmentError', 'סוג קובץ לא נתמך. מותרים: תמונות (JPG, PNG, GIF, BMP, WebP) ו-PDF בלבד');
       isValid = false;
     }
   }
@@ -965,33 +973,41 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
 function validateEditNoteForm(content, relationType, relatedId, attachment) {
   let isValid = true;
 
+  console.log('🔧 validateEditNoteForm נקראה עם:', {
+    content: content,
+    contentLength: content?.length,
+    relationType: relationType,
+    relatedId: relatedId,
+    hasAttachment: !!attachment
+  });
+
   // ניקוי שגיאות קודמות
   clearNoteValidationErrors();
 
   // וולידציה של תוכן
   if (!content) {
-    showNoteValidationError('editContentError', 'תוכן הערה הוא שדה חובה');
+    window.showValidationWarning('editContentError', 'תוכן הערה הוא שדה חובה');
     isValid = false;
   } else if (content.length < 1) {
-    showNoteValidationError('editContentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
+    window.showValidationWarning('editContentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
     isValid = false;
   } else if (content.length > 10000) {
-    showNoteValidationError('editContentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
+    window.showValidationWarning('editContentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
     isValid = false;
   }
 
   // וולידציה של סוג קשר
   if (!relationType) {
-    showNoteValidationError('editRelationTypeError', 'יש לבחור סוג אובייקט לשיוך');
+    window.showValidationWarning('editRelationTypeError', 'יש לבחור סוג אובייקט לשיוך');
     isValid = false;
   }
 
   // וולידציה של אובייקט קשור
   if (!relatedId) {
-    showNoteValidationError('editRelatedObjectError', 'יש לבחור אובייקט לשיוך');
+    window.showValidationWarning('editRelatedObjectError', 'יש לבחור אובייקט לשיוך');
     isValid = false;
   } else if (isNaN(parseInt(relatedId)) || parseInt(relatedId) <= 0) {
-    showNoteValidationError('editRelatedObjectError', 'מזהה אובייקט לא תקין');
+    window.showValidationWarning('editRelatedObjectError', 'מזהה אובייקט לא תקין');
     isValid = false;
   }
 
@@ -999,17 +1015,18 @@ function validateEditNoteForm(content, relationType, relatedId, attachment) {
   if (attachment) {
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (attachment.size > maxSize) {
-      showNoteValidationError('editAttachmentError', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
+      window.showValidationWarning('editAttachmentError', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
       isValid = false;
     }
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(attachment.type)) {
-      showNoteValidationError('editAttachmentError', 'סוג קובץ לא נתמך. מותרים: תמונות, PDF, Word, טקסט');
+      window.showValidationWarning('editAttachmentError', 'סוג קובץ לא נתמך. מותרים: תמונות (JPG, PNG, GIF, BMP, WebP) ו-PDF בלבד');
       isValid = false;
     }
   }
 
+  console.log('🔧 תוצאת ולידציה עריכה:', isValid);
   return isValid;
 }
 
@@ -1023,64 +1040,101 @@ async function saveNote() {
   const relatedId = document.getElementById('noteRelatedObjectSelect').value;
   const attachment = document.getElementById('noteAttachment').files[0];
 
+  console.log('🔧 נתונים שנאספו:', {
+    content: content,
+    contentLength: content?.length,
+    relationType: relationType,
+    relatedId: relatedId,
+    hasAttachment: !!attachment
+  });
+
   // ולידציה מקיפה
   if (!validateNoteForm(content, relationType, relatedId, attachment)) {
+    console.log('❌ ולידציה נכשלה');
     return;
   }
 
   clearNoteValidationErrors();
 
   try {
-    const formData = new FormData();
-    formData.append('content', content);
-    formData.append('related_type_id', parseInt(relationType));
-    formData.append('related_id', parseInt(relatedId));
-    if (attachment) {
-      formData.append('attachment', attachment);
-    }
-    
-    console.log('🔧 נתונים שנשלחים:', {
+    // יצירת אובייקט JSON לשליחה
+    const requestData = {
       content: content,
-      related_type_id: relationType,
-      related_id: relatedId,
-      hasAttachment: !!attachment
-    });
+      related_type_id: parseInt(relationType),
+      related_id: parseInt(relatedId)
+    };
+    
+    console.log('🔧 נתונים שנשלחים:', requestData);
 
     const response = await fetch('/api/v1/notes/', {
       method: 'POST',
-      body: formData
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
     const result = await response.json();
-    console.log('✅ הערה נשמרה בהצלחה:', result);
-
-    if (typeof window.showSuccessNotification === 'function') {
+    
+    if (response.ok && result.status === 'success') {
+      console.log('✅ הערה נשמרה בהצלחה:', result);
       window.showSuccessNotification('הצלחה', 'הערה נשמרה בהצלחה!');
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('הערה נשמרה בהצלחה!', 'success');
+
+      // סגירת המודל וטעינה מחדש
+      const modal = bootstrap.Modal.getInstance(document.getElementById('addNoteModal'));
+      modal.hide();
+      loadNotesData();
     } else {
-      console.log('הערה נשמרה בהצלחה!');
+      console.error('❌ שגיאה בשמירת הערה:', result);
+      
+      // טיפול בשגיאות וולידציה מהשרת
+      if (result.error && result.error.message) {
+        const serverMessage = result.error.message;
+        
+        // אם זו שגיאת וולידציה, נפרק אותה להודעות ספציפיות
+        if (serverMessage.includes('validation failed')) {
+          const validationErrors = serverMessage.replace('Note validation failed: ', '').split('; ');
+          
+          // הצגת כל שגיאה בנפרד
+          validationErrors.forEach(error => {
+            let fieldError = error;
+            let fieldName = '';
+            
+            // תרגום שגיאות ספציפיות
+            if (error.includes("Field 'content' is required")) {
+              fieldError = 'תוכן הערה הוא שדה חובה';
+              fieldName = 'contentError';
+            } else if (error.includes("Field 'related_type_id' is required")) {
+              fieldError = 'יש לבחור סוג אובייקט לשיוך';
+              fieldName = 'relationTypeError';
+            } else if (error.includes("Field 'related_id' is required")) {
+              fieldError = 'יש לבחור אובייקט לשיוך';
+              fieldName = 'relatedObjectError';
+            } else if (error.includes("Field 'related_id' references non-existent record")) {
+              fieldError = 'האובייקט שנבחר לא קיים במערכת';
+              fieldName = 'relatedObjectError';
+            }
+            
+            // שימוש במערכת ההתראות המובנת
+            if (fieldName && window.showValidationWarning) {
+              window.showValidationWarning(fieldName, fieldError);
+            } else {
+              window.showErrorNotification('שגיאת וולידציה', fieldError);
+            }
+          });
+        } else {
+          // שגיאה כללית
+          window.showErrorNotification('שגיאה בשמירה', serverMessage);
+        }
+      } else {
+        // הצגת הודעת שגיאה כללית
+        window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת הערה - בדוק את הנתונים שהוזנו');
+      }
     }
-
-    // סגירת המודל וטעינה מחדש
-    const modal = bootstrap.Modal.getInstance(document.getElementById('addNoteModal'));
-    modal.hide();
-
-    loadNotesData();
 
   } catch (error) {
     console.error('❌ שגיאה בשמירת הערה:', error);
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה בשמירת הערה');
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בשמירת הערה', 'error');
-    } else {
-      console.error('שגיאה בשמירת הערה');
-    }
+    window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת הערה - בדוק את הנתונים שהוזנו');
   }
 }
 
@@ -1100,8 +1154,11 @@ async function updateNoteFromModal() {
 
   // ולידציה מקיפה
   if (!validateEditNoteForm(content, relationType, relatedId, attachment)) {
+    console.log('❌ ולידציה עריכה נכשלה');
     return;
   }
+  
+  console.log('✅ ולידציה עריכה עברה בהצלחה');
 
   clearNoteValidationErrors();
 
@@ -1144,40 +1201,79 @@ async function updateNoteFromModal() {
       });
     }
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
     const result = await response.json();
-    console.log('✅ הערה עודכנה בהצלחה:', result);
-
-    if (typeof window.showSuccessNotification === 'function') {
+    
+    console.log('🔧 תוצאת עדכון:', {
+      responseOk: response.ok,
+      resultStatus: result.status,
+      result: result
+    });
+    
+    if (response.ok && result.status === 'success') {
+      console.log('✅ הערה עודכנה בהצלחה:', result);
+      console.log('🔧 קורא ל-showSuccessNotification');
+      console.log('🔧 showSuccessNotification זמין:', typeof window.showSuccessNotification === 'function');
       window.showSuccessNotification('הצלחה', 'הערה עודכנה בהצלחה!');
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('הערה עודכנה בהצלחה!', 'success');
+
+      // ניקוי דגלים
+      window.removeAttachmentFlag = false;
+      window.replaceAttachmentFlag = false;
+
+      // סגירת המודל וטעינה מחדש
+      const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
+      modal.hide();
+      loadNotesData();
     } else {
-      console.log('הערה עודכנה בהצלחה!');
+      console.error('❌ שגיאה בעדכון הערה:', result);
+      
+      // טיפול בשגיאות וולידציה מהשרת
+      if (result.error && result.error.message) {
+        const serverMessage = result.error.message;
+        
+        // אם זו שגיאת וולידציה, נפרק אותה להודעות ספציפיות
+        if (serverMessage.includes('validation failed')) {
+          const validationErrors = serverMessage.replace('Note validation failed: ', '').split('; ');
+          
+          // הצגת כל שגיאה בנפרד
+          validationErrors.forEach(error => {
+            let fieldError = error;
+            let fieldName = '';
+            
+            // תרגום שגיאות ספציפיות
+            if (error.includes("Field 'content' is required")) {
+              fieldError = 'תוכן הערה הוא שדה חובה';
+              fieldName = 'editContentError';
+            } else if (error.includes("Field 'related_type_id' is required")) {
+              fieldError = 'יש לבחור סוג אובייקט לשיוך';
+              fieldName = 'editRelationTypeError';
+            } else if (error.includes("Field 'related_id' is required")) {
+              fieldError = 'יש לבחור אובייקט לשיוך';
+              fieldName = 'editRelatedObjectError';
+            } else if (error.includes("Field 'related_id' references non-existent record")) {
+              fieldError = 'האובייקט שנבחר לא קיים במערכת';
+              fieldName = 'editRelatedObjectError';
+            }
+            
+            // שימוש במערכת ההתראות המובנת
+            if (fieldName && window.showValidationWarning) {
+              window.showValidationWarning(fieldName, fieldError);
+            } else {
+              window.showErrorNotification('שגיאת וולידציה', fieldError);
+            }
+          });
+        } else {
+          // שגיאה כללית
+          window.showErrorNotification('שגיאה בעדכון', serverMessage);
+        }
+      } else {
+        // הצגת הודעת שגיאה כללית
+        window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון הערה - בדוק את הנתונים שהוזנו');
+      }
     }
-
-    // ניקוי דגלים
-    window.removeAttachmentFlag = false;
-    window.replaceAttachmentFlag = false;
-
-    // סגירת המודל וטעינה מחדש
-    const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
-    modal.hide();
-
-    loadNotesData();
 
   } catch (error) {
     console.error('❌ שגיאה בעדכון הערה:', error);
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה בעדכון הערה');
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בעדכון הערה', 'error');
-    } else {
-      console.error('שגיאה בעדכון הערה');
-    }
+    window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון הערה - בדוק את הנתונים שהוזנו');
   }
 }
 
@@ -1197,55 +1293,59 @@ async function confirmDeleteNote(noteId) {
 }
 
 async function deleteNoteFromServer(noteId) {
-  try {
-    const response = await fetch(`/api/v1/notes/${noteId}`, {
-      method: 'DELETE'
-    });
+  const maxRetries = 3;
+  let retryCount = 0;
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+  while (retryCount < maxRetries) {
+    try {
+      console.log(`🔄 ניסיון מחיקה ${retryCount + 1}/${maxRetries} עבור הערה ${noteId}`);
+      
+      const response = await fetch(`/api/v1/notes/${noteId}`, {
+        method: 'DELETE'
+      });
 
-    console.log('✅ הערה נמחקה בהצלחה');
+      const result = await response.json();
+      
+      if (response.ok && result.status === 'success') {
+        console.log('✅ הערה נמחקה בהצלחה');
+        window.showSuccessNotification('הצלחה', 'הערה נמחקה בהצלחה!');
+        loadNotesData();
+        return; // יציאה מוצלחת
+      } else {
+        console.error('❌ שגיאה במחיקת הערה:', result);
+        
+        // טיפול בשגיאות מהשרת
+        if (result.error && result.error.message) {
+          const serverMessage = result.error.message;
+          
+          if (serverMessage.includes('has linked items')) {
+            window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק הערה זו - יש פריטים מקושרים אליה');
+          } else {
+            window.showErrorNotification('שגיאה במחיקה', serverMessage);
+          }
+        } else {
+          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת הערה - בדוק את הנתונים');
+        }
+        return; // יציאה עם שגיאה
+      }
 
-    if (typeof window.showSuccessNotification === 'function') {
-      window.showSuccessNotification('הצלחה', 'הערה נמחקה בהצלחה!');
-    } else {
-      console.log('הערה נמחקה בהצלחה!');
-    }
-
-    loadNotesData();
-
-  } catch (error) {
-    console.error('❌ שגיאה במחיקת הערה:', error);
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה במחיקת הערה');
-    } else {
-      console.error('שגיאה במחיקת הערה');
+    } catch (error) {
+      retryCount++;
+      console.error(`❌ שגיאה במחיקת הערה (ניסיון ${retryCount}/${maxRetries}):`, error);
+      
+      if (retryCount >= maxRetries) {
+        // ניסיונות נגמרו - הצגת שגיאה
+        window.showErrorNotification('שגיאה', `שגיאה במחיקת הערה לאחר ${maxRetries} ניסיונות. בדוק את חיבור השרת.`);
+      } else {
+        // המתנה לפני ניסיון נוסף
+        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+      }
     }
   }
 }
 
 // פונקציות ולידציה
-function showNoteValidationError(fieldId, message) {
-  // תמיד להשתמש במערכת המקומית לוולידציה
-  const errorElement = document.getElementById(fieldId);
-  if (errorElement) {
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
-  }
 
-  // הוספת קלאס is-invalid לשדה הקשור
-  const field = getFieldByErrorId(fieldId);
-  if (field) {
-    field.classList.add('is-invalid');
-  }
-  
-  // הצגת הודעת שגיאה גלובלית
-  if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification('שגיאה בוולידציה', message);
-  }
-}
 
 function clearNoteValidationErrors() {
   // שימוש במערכת הגלובלית לוולידציה
@@ -1306,6 +1406,22 @@ window.populateSelect = populateSelect;
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
   console.log('🔄 === DOM CONTENT LOADED ===');
+
+  // בדיקת זמינות מערכות
+  console.log('🔍 בדיקת זמינות מערכות:');
+  console.log('showSuccessNotification:', typeof window.showSuccessNotification);
+  console.log('showErrorNotification:', typeof window.showErrorNotification);
+  console.log('showValidationWarning:', typeof window.showValidationWarning);
+  console.log('showDeleteWarning:', typeof window.showDeleteWarning);
+  
+  // בדיקה שהמערכת זמינה
+  if (typeof window.showSuccessNotification !== 'function') {
+    console.error('❌ מערכת התראות לא זמינה!');
+    alert('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
+    return;
+  }
+  
+  console.log('✅ מערכת התראות זמינה');
 
   // שחזור מצב הסגירה
   restoreNotesSectionState();
@@ -1637,7 +1753,24 @@ function getEditorContent(mode = 'add') {
     return '';
   }
 
-  return editor.innerHTML;
+  // בדיקה אם העורך ריק או מכיל רק תגיות HTML ריקות
+  const content = editor.innerHTML;
+  const textContent = editor.textContent || editor.innerText || '';
+  
+  console.log(`🔧 תוכן עורך ${editorId}:`, {
+    innerHTML: content,
+    textContent: textContent,
+    textContentLength: textContent.length,
+    mode: mode
+  });
+
+  // אם אין תוכן טקסט, החזר מחרוזת ריקה
+  if (!textContent.trim()) {
+    console.log('⚠️ העורך ריק, מחזיר מחרוזת ריקה');
+    return '';
+  }
+
+  return content;
 }
 
 /**
@@ -1947,4 +2080,8 @@ function replaceCurrentAttachment() {
   // סימון שהחלפת הקובץ נדרשת
   window.replaceAttachmentFlag = true;
 }
+
+
+
+
 

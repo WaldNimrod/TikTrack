@@ -51,6 +51,7 @@
   <script src="scripts/translation-utils.js"></script>
   <script src="scripts/data-utils.js"></script>
   <script src="scripts/notification-system.js"></script>
+  <script src="scripts/alert-service.js"></script>
   <script src="scripts/ui-utils.js"></script>
   <script src="scripts/validation-utils.js"></script>
   <script src="scripts/crud-utils.js"></script>
@@ -124,6 +125,25 @@
             </div>
             <div class="table-count">טוען...</div>
             <div class="table-actions">
+              <!-- Quick filters -->
+              <button class="btn btn-sm active" onclick="filterAlertsByType('all')" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">
+                הכל
+              </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByType('account')" data-type="account" title="חשבונות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/accounts.svg" alt="חשבונות" style="width: 14px; height: 14px;">
+              </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByType('trade')" data-type="trade" title="טריידים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/trades.svg" alt="טריידים" style="width: 14px; height: 14px;">
+              </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByType('trade_plan')" data-type="trade_plan" title="תוכניות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/trade_plans.svg" alt="תוכניות" style="width: 14px; height: 14px;">
+              </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByType('ticker')" data-type="ticker" title="טיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/tickers.svg" alt="טיקרים" style="width: 14px; height: 14px;">
+              </button>
+              
+              <span style="margin: 0 10px; color: #666;">|</span>
+              
               <button class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
                 <span class="action-icon">➕</span> הוסף
               </button>
@@ -137,67 +157,73 @@
           <!-- Alerts table -->
           <div class="section-body">
             <div class="table-responsive" id="alertsContainer">
-              <table class="table" data-table-type="alerts">
+              <table class="table" id="alertsTable" data-table-type="alerts">
                 <thead>
                   <tr>
-                    <th>
+                    <th style="width: 7%;">
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         טיקר <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th>
+                    <th style="width: 15%;">
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         תנאי <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th>
+                    <th style="width: 7%;">
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         סטטוס <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th>
+                    <th style="width: 7%;">
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         הופעל <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th>
+                    <th style="width: 10%;">
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                        תאריך הפעלה <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th style="width: 18%;">
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         קשור ל: <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th>
+                    <th style="width: 18%;">
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         הודעה <span class="sort-icon">↕</span>
                       </button>
                     </th>
-
-                    <th>
+                    <th style="width: 8%;">
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         נוצר ב: <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="actions-cell">
+                    <th class="actions-cell" style="width: 8%;">
                       פעולות
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="8" class="loading">טוען התראות...</td>
+                    <td colspan="9" class="loading">טוען התראות...</td>
                   </tr>
                 </tbody>
               </table>

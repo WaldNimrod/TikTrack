@@ -1127,42 +1127,7 @@ function handleWarningAction(action) {
     }
 }
 
-/**
- * Show delete warning
- */
-function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null, onCancel = null) {
-    // Fallback mapping for item types
-    const displayName = itemTypeDisplay || (itemType === 'alert' ? 'התראה' :
-        itemType === 'ticker' ? 'טיקר' :
-            itemType === 'account' ? 'חשבון' :
-                itemType === 'trade' ? 'טרייד' :
-                    itemType === 'trade_plan' ? 'תוכנית טרייד' :
-                        itemType === 'execution' ? 'ביצוע' :
-                            itemType === 'cash_flow' ? 'תזרים מזומנים' :
-                                itemType === 'note' ? 'הערה' : 'אובייקט');
 
-    console.log('🔧 showDeleteWarning called with:', { itemType, itemName, displayName });
-
-    // שימוש במערכת ההתראות הגלובלית החדשה
-    if (typeof window.showDeleteWarning === 'function' && window.showDeleteWarning !== showDeleteWarning) {
-        window.showDeleteWarning(itemType, itemName, displayName, onConfirm, onCancel);
-    } else {
-        // Fallback to notification system
-        if (typeof window.showConfirmationDialog === 'function') {
-            const title = `מחיקת ${displayName}`;
-            const message = `האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?\n\nפעולה זו אינה ניתנת לביטול.`;
-            window.showConfirmationDialog(title, message, onConfirm, onCancel);
-        } else {
-            // Fallback to simple confirm
-            const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ${displayName} "${itemName}"?`);
-            if (confirmed && onConfirm) {
-                onConfirm();
-            } else if (!confirmed && onCancel) {
-                onCancel();
-            }
-        }
-    }
-}
 
 /**
  * Show cancel warning (for tickers)
@@ -1518,9 +1483,14 @@ window.createBasicItemInfo = createBasicItemInfo;
 
 // Export warning system functions
 window.showWarning = showWarning;
-window.showDeleteWarning = showDeleteWarning;
+
 window.showCancelWarning = showCancelWarning;
 window.showLinkedItemsWarning = showLinkedItemsWarning;
+
+// בדיקת פונקציות בסוף טעינת ui-utils.js
+console.log('🔧 ui-utils.js נטען');
+console.log('🔧 window.showDeleteWarning קיים:', typeof window.showDeleteWarning === 'function');
+console.log('🔧 window.showConfirmationDialog קיים:', typeof window.showConfirmationDialog === 'function');
 // Don't export showValidationWarning here - it's already exported from notification-system.js
 window.getWarningConfig = getWarningConfig;
 window.createWarningModal = createWarningModal;

@@ -96,14 +96,14 @@ def check_linked_items(ticker_id: int):
         
         print(f"Ticker found: {ticker.symbol}")
         
-        # Check linked items
+        # Check linked items using the generic function
         try:
-            print(f"About to call check_linked_items for ticker {ticker_id}")
-            linked_items = TickerService.check_linked_items(db, ticker_id)
-            print(f"Successfully called check_linked_items, result: {linked_items}")
+            print(f"About to call check_linked_items_generic for ticker {ticker_id}")
+            linked_items = TickerService.check_linked_items_generic(db, 'ticker', ticker_id)
+            print(f"Successfully called check_linked_items_generic, result: {linked_items}")
         except Exception as e:
-            logger.error(f"Error in check_linked_items: {str(e)}")
-            print(f"Error in check_linked_items: {str(e)}")
+            logger.error(f"Error in check_linked_items_generic: {str(e)}")
+            print(f"Error in check_linked_items_generic: {str(e)}")
             import traceback
             traceback.print_exc()
             return jsonify({
@@ -171,12 +171,29 @@ def update_ticker(ticker_id: int):
             }), 404
         
         # Check active_trades constraint - prevent cancellation if ticker has active trades
-        if 'status' in data and data['status'] == 'cancelled' and ticker.active_trades:
-            return jsonify({
-                "status": "error",
-                "error": {"message": "Cannot cancel ticker with active trades. Please close all open trades first."},
-                "version": "v1"
-            }), 400
+        if 'status' in data and data['status'] == 'cancelled':
+            # Check both active_trades field and actual open trades
+            from models.trade import Trade
+            from models.trade_plan import TradePlan
+            
+            # Check actual open trades
+            open_trades_count = db.query(Trade).filter(
+                Trade.ticker_id == ticker_id,
+                Trade.status == 'open'
+            ).count()
+            
+            # Check actual open trade plans
+            open_plans_count = db.query(TradePlan).filter(
+                TradePlan.ticker_id == ticker_id,
+                TradePlan.status == 'open'
+            ).count()
+            
+            if ticker.active_trades or open_trades_count > 0 or open_plans_count > 0:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Cannot cancel ticker with active trades. Please close all open trades first."},
+                    "version": "v1"
+                }), 400
         
         # Update ticker
         ticker = TickerService.update(db, ticker_id, data)
@@ -369,33 +386,41 @@ def update_all_active_trades():
     finally:
         db.close()
 
-@tickers_bp.route('/update-all-statuses', methods=['POST'])
-def update_all_statuses():
-    """Update status for all tickers based on linked trades and trade plans"""
+@tickers_bp.route('/<int:ticker_id>/update-status-auto', methods=['PUT'])
+def update_ticker_status_auto(ticker_id: int):
+    """Update ticker status automatically based on linked trades and trade plans"""
     try:
         db: Session = next(get_db())
         
-        # Import the Ticker model
-        from models.ticker import Ticker
+        # Check that ticker exists
+        ticker = TickerService.get_by_id(db, ticker_id)
+        if not ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found"},
+                "version": "v1"
+            }), 404
         
-        # Update all ticker statuses
-        Ticker.update_all_ticker_statuses(db)
-        
-        # Get updated tickers for response
-        tickers = TickerService.get_all(db)
-        
-        return jsonify({
-            "status": "success",
-            "data": {
-                "total_tickers": len(tickers),
-                "tickers": [ticker.to_dict() for ticker in tickers]
-            },
-            "message": "All ticker statuses updated successfully",
-            "version": "v1"
-        })
+        # Update ticker status automatically
+        success = TickerService.update_ticker_status_auto(db, ticker_id)
+        if success:
+            # Get updated ticker
+            updated_ticker = TickerService.get_by_id(db, ticker_id)
+            return jsonify({
+                "status": "success",
+                "data": updated_ticker.to_dict(),
+                "message": "Ticker status updated automatically",
+                "version": "v1"
+            })
+        else:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Failed to update ticker status"},
+                "version": "v1"
+            }), 500
         
     except Exception as e:
-        logger.error(f"Error updating all ticker statuses: {str(e)}")
+        logger.error(f"Error updating ticker status auto {ticker_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
@@ -403,3 +428,38 @@ def update_all_statuses():
         }), 500
     finally:
         db.close()
+
+@tickers_bp.route('/update-all-statuses-auto', methods=['POST'])
+def update_all_statuses_auto():
+    """Update status for all non-cancelled tickers automatically"""
+    try:
+        db: Session = next(get_db())
+        
+        # Update all ticker statuses automatically
+        updated_count = TickerService.update_all_ticker_statuses_auto(db)
+        
+        # Get updated tickers for response
+        tickers = TickerService.get_all(db)
+        
+        return jsonify({
+            "status": "success",
+            "data": {
+                "updated_count": updated_count,
+                "total_tickers": len(tickers),
+                "tickers": [ticker.to_dict() for ticker in tickers]
+            },
+            "message": f"Updated status for {updated_count} tickers automatically",
+            "version": "v1"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error updating all ticker statuses auto: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()
+
+# Endpoint removed - status updates automatically now

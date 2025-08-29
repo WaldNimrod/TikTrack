@@ -84,6 +84,8 @@ function markAlertAsRead(alertId) {
     // TODO: Implement alert read logic
 }
 
+
+
 // ===== NOTIFICATION SYSTEM FUNCTIONS =====
 // These functions handle system messages for user feedback
 
@@ -388,6 +390,9 @@ function showValidationWarning(fieldId, message, duration = 6000) {
  * @param {Function} onCancel - Callback for cancel action
  */
 function showConfirmationDialog(title, message, onConfirm = null, onCancel = null) {
+    console.log('🔧 showConfirmationDialog נקראה עם:', { title, message });
+    console.log('🔧 bootstrap קיים:', typeof bootstrap !== 'undefined');
+    
     // יצירת מודל אישור דינמי
     const modalId = 'confirmationModal';
     
@@ -476,8 +481,21 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
     });
     
     // הצגת המודל
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
+    console.log('🔧 מציג את המודל עם bootstrap');
+    try {
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+        console.log('🔧 המודל הוצג בהצלחה');
+    } catch (error) {
+        console.error('🔧 שגיאה בהצגת המודל:', error);
+        // fallback ל-confirm רגיל
+        const confirmed = confirm(message);
+        if (confirmed && onConfirm) {
+            onConfirm();
+        } else if (!confirmed && onCancel) {
+            onCancel();
+        }
+    }
 }
 
 /**
@@ -491,9 +509,13 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
  * @param {Function} onCancel - Callback for cancel action
  */
 function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null, onCancel = null) {
+    console.log('🔧 showDeleteWarning נקראה עם:', { itemType, itemName, itemTypeDisplay });
+    console.log('🔧 showConfirmationDialog קיים:', typeof showConfirmationDialog === 'function');
+    
     const title = `מחיקת ${itemTypeDisplay}`;
     const message = `האם אתה בטוח שברצונך למחוק את ${itemTypeDisplay} "${itemName}"?\n\nפעולה זו אינה ניתנת לביטול.`;
     
+    console.log('🔧 קורא ל-showConfirmationDialog עם:', { title, message });
     showConfirmationDialog(title, message, onConfirm, onCancel);
 }
 
@@ -530,6 +552,7 @@ window.updateAlert = updateAlert;
 window.markAlertAsTriggered = markAlertAsTriggered;
 window.markAlertAsRead = markAlertAsRead;
 
+
 // Export NOTIFICATION SYSTEM functions to global scope
 window.showNotification = showNotification;
 window.showSuccessNotification = showSuccessNotification;
@@ -553,6 +576,7 @@ window.notificationSystem = {
     markAlertAsTriggered,
     markAlertAsRead,
 
+
     // NOTIFICATION SYSTEM functions
     showNotification,
     showSuccessNotification,
@@ -571,4 +595,10 @@ window.notificationSystem = {
     loadLinkedItemsData
 };
 
+// בדיקת פונקציות בסוף טעינת notification-system.js
+console.log('🔧 notification-system.js נטען');
+console.log('🔧 showDeleteWarning קיים:', typeof showDeleteWarning === 'function');
+console.log('🔧 showConfirmationDialog קיים:', typeof showConfirmationDialog === 'function');
+console.log('🔧 window.showDeleteWarning קיים:', typeof window.showDeleteWarning === 'function');
+console.log('🔧 window.showConfirmationDialog קיים:', typeof window.showConfirmationDialog === 'function');
 

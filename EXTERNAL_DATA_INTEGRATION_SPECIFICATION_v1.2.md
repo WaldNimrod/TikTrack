@@ -563,3 +563,4 @@ trading-ui/
 **מחבר**: TikTrack Development Team  
 **שינויים עיקריים**: הוספת Refresh Policy גמיש ו-Timezone Support מלא
 
+

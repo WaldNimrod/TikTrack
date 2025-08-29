@@ -358,15 +358,15 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 100000;
+  z-index: 1000000002 !important;
   max-width: 400px;
   pointer-events: none;
 }
 
 /* התראה בודדת - עיצוב בסיסי */
 .notification {
-  background: rgba(255, 255, 255, 0.5);
-  /* 50% שקוף */
+  background: rgba(255, 255, 255, 0.95);
+  /* 95% אטום - רקע קבוע */
   border: 1px solid var(--apple-border-light);
   border-radius: 12px;
   padding: 16px 20px;
@@ -439,7 +439,7 @@
 /* הצלחה - צבע הלוגו (ירוק טורקיז כמו table-count) */
 .notification.success {
   border-left: 4px solid #29a6a8;
-  background: linear-gradient(135deg, rgba(41, 166, 168, 0.1) 0%, rgba(31, 138, 140, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(41, 166, 168, 0.95) 0%, rgba(31, 138, 140, 0.95) 100%);
   color: #333 !important;
 }
 
@@ -459,7 +459,7 @@
 /* שגיאה - אדום */
 .notification.error {
   border-left: 4px solid #f44336;
-  background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.95) 0%, rgba(211, 47, 47, 0.95) 100%);
   color: #333 !important;
 }
 
@@ -2486,8 +2486,9 @@ button[onclick*="openDesignDetails"]:hover {
   border-radius: 12px;
   border: 1px solid #e9ecef;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 20px;
+  justify-items: start;
 }
 
 /* ===== סגנונות לאיקון התראות בכותרת הסקשן ===== */
@@ -3119,6 +3120,8 @@ button[onclick*="openDesignDetails"]:hover {
   transition: all 0.3s ease;
   position: relative;
   min-height: 220px;
+  max-width: 400px;
+  width: 100%;
   /* צבעי רקע לפי סוג האובייקט המקושר - מוגדר דינמית ב-JavaScript */
 }
 
@@ -3257,7 +3260,13 @@ a:hover,
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
+}
+
+.alert-card-related-object {
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .alert-card-title {
@@ -3344,10 +3353,11 @@ a:hover,
 
 /* פרטי אובייקט מקושר */
 .related-object-info {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 .linked-object-details {
@@ -4280,7 +4290,8 @@ a:hover,
   padding: 0 !important;
 }
 
-/* כפתורי פעולות במודלים */
+
+
 .modal .btn-sm {
   min-width: 60px !important;
 }
@@ -4300,7 +4311,10 @@ a:hover,
   min-width: 120px !important;
 }
 
-
+/* כפתורי פעולות בקארדים */
+.card .btn {
+  min-width: 80px !important;
+}
 
 /* כפתורי פעולות בסיידבר */
 .sidebar .btn {

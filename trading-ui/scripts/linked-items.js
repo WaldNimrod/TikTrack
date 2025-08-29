@@ -194,15 +194,20 @@ function viewLinkedItems(itemId, itemType = null) {
  */
 function showLinkedItemsModal(data, itemType, itemId) {
 
-    // הצגת הודעה חשובה
-    alert('ממש חשוב, נכון. אנחנו עובדים על זה.');
-
     // Create modal content
     const modalContent = createLinkedItemsModalContent(data, itemType, itemId);
 
     // Create and show modal
     const modalId = 'linkedItemsModal';
-    const modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
+    
+    // יצירת כותרת מותאמת עם סימבול הטיקר
+    let modalTitle = '';
+    if (itemType === 'ticker') {
+        const tickerSymbol = data.tickerSymbol || getTickerSymbol(itemId) || `טיקר ${itemId}`;
+        modalTitle = `פריטים מקושרים לטיקר ${tickerSymbol}`;
+    } else {
+        modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
+    }
 
     createModal(modalId, modalTitle, modalContent);
 
@@ -270,6 +275,160 @@ function createLinkedItemsModalContent(data, itemType, itemId) {
 
     let content = `
     <div class="linked-items-container">
+      <style>
+        .linked-item-icon-img {
+          filter: brightness(0) saturate(100%) invert(1);
+          opacity: 0.8;
+        }
+        .linked-item-row {
+          border-radius: 6px;
+          margin-bottom: 6px;
+          padding: 8px 12px;
+          border: 1px solid #e9ecef;
+          background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          transition: all 0.3s ease;
+        }
+        .linked-item-row:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .linked-item-row.trade { border-left: 4px solid #007bff; }
+        .linked-item-row.account { border-left: 4px solid #28a745; }
+        .linked-item-row.ticker { border-left: 4px solid #17a2b8; }
+        .linked-item-row.alert { border-left: 4px solid #ffc107; }
+        .linked-item-row.cash_flow { border-left: 4px solid #6c757d; }
+        .linked-item-row.note { border-left: 4px solid #343a40; }
+        .linked-item-row.trade_plan { border-left: 4px solid #007bff; }
+        .linked-item-row.execution { border-left: 4px solid #28a745; }
+        
+        /* כותרת המודול עם רקע צבעוני */
+        .modal-header {
+          background: linear-gradient(135deg, #ff9c05, #ff8c00);
+          color: white;
+          border-bottom: 2px solid #ff8c00;
+          position: relative;
+          padding-left: 60px;
+          min-height: 60px;
+          display: flex;
+          align-items: center;
+        }
+        
+        /* כפתור סגירה מיושר לשמאל עם עיצוב כתום */
+        .modal-header .btn-close-custom {
+          position: absolute;
+          left: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          background-color: white;
+          color: #ff9c05;
+          border: 2px solid #ff9c05;
+          border-radius: 6px;
+          padding: 6px 12px;
+          font-size: 14px;
+          font-weight: bold;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          z-index: 1056;
+        }
+        .modal-header .btn-close-custom:hover {
+          background-color: #ff9c05;
+          color: white;
+        }
+        
+        /* צמצום רווחים בין אלמנטים */
+        .linked-item-col {
+          padding: 4px 8px;
+        }
+        .linked-item-title {
+          font-size: 14px;
+          margin-bottom: 2px;
+        }
+        .linked-item-description {
+          font-size: 12px;
+          margin-bottom: 2px;
+        }
+        .linked-item-status {
+          margin-bottom: 4px;
+        }
+        .linked-item-basic-details {
+          font-size: 11px;
+          margin-bottom: 4px;
+        }
+        .linked-item-actions .btn-group {
+          gap: 2px;
+        }
+        .linked-item-actions .btn {
+          padding: 2px 6px;
+          font-size: 12px;
+        }
+        
+        /* סגנונות סטטוסים זהה לעמודי הטבלאות */
+        .status-badge {
+          padding: 0.5rem 1rem !important;
+          border-radius: 20px !important;
+          font-size: 0.85rem !important;
+          font-weight: 700 !important;
+          font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.5px !important;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+          position: relative !important;
+          overflow: hidden !important;
+          display: inline-block !important;
+        }
+        
+        .status-badge.status-open {
+          background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(67, 160, 71, 0.15) 100%) !important;
+          color: #2e7d32 !important;
+          border: 1px solid rgba(76, 175, 80, 0.3) !important;
+          box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15) !important;
+        }
+        
+        .status-badge.status-closed {
+          background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(30, 136, 229, 0.15) 100%) !important;
+          color: #1565c0 !important;
+          border: 1px solid rgba(33, 150, 243, 0.3) !important;
+          box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15) !important;
+        }
+        
+        .status-badge.status-cancelled {
+          background: linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 143, 0, 0.15) 100%) !important;
+          color: #ef6c00 !important;
+          border: 1px solid rgba(255, 152, 0, 0.3) !important;
+          box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15) !important;
+        }
+        
+        .status-badge.status-active {
+          background: linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(66, 165, 245, 0.2) 100%) !important;
+          color: #1976d2 !important;
+          box-shadow: 0 2px 6px rgba(100, 181, 246, 0.1) !important;
+        }
+        
+        .status-badge.status-inactive {
+          background: linear-gradient(135deg, rgba(158, 158, 158, 0.2) 0%, rgba(117, 117, 117, 0.2) 100%) !important;
+          color: #616161 !important;
+          box-shadow: 0 2px 6px rgba(158, 158, 158, 0.1) !important;
+        }
+        
+        .status-badge.status-pending {
+          background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) !important;
+          color: #f57c00 !important;
+          box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) !important;
+        }
+        
+        .status-badge.status-completed {
+          background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) !important;
+          color: #388e3c !important;
+          box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) !important;
+        }
+        
+        .status-badge.status-archived {
+          background: linear-gradient(135deg, rgba(158, 158, 158, 0.2) 0%, rgba(117, 117, 117, 0.2) 100%) !important;
+          color: #616161 !important;
+          box-shadow: 0 2px 6px rgba(158, 158, 158, 0.1) !important;
+        }
+      </style>
       <div class="alert alert-info">
         <strong>📋 סקירת אלמנטים מקושרים</strong><br>
         מציג את כל האלמנטים המקושרים ל-${getItemTypeDisplayName(itemType)} ${itemName}
@@ -294,9 +453,9 @@ function createLinkedItemsModalContent(data, itemType, itemId) {
 
     content += `
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
         <button type="button" class="btn btn-primary" onclick="exportLinkedItemsData('${itemType}', ${itemId})">
-          📤 Export Data
+          📤 ייצוא נתונים
         </button>
       </div>
     </div>
@@ -324,7 +483,7 @@ function createLinkedItemsList(items) {
         const statusBadge = getStatusBadge(item.status);
 
         listHtml += `
-      <div class="linked-item-row">
+      <div class="linked-item-row ${item.type}">
         <div class="linked-item-col">
           <div class="linked-item-icon">${icon}</div>
           <div class="linked-item-type">
@@ -333,7 +492,7 @@ function createLinkedItemsList(items) {
         </div>
         <div class="linked-item-col">
           <div class="linked-item-title">${item.title || `אלמנט ${item.id}`}</div>
-          <div class="linked-item-description">${item.description || 'אין תיאור'}</div>
+          <div class="linked-item-description">${item.description || 'אין תיאור'} (מזהה: ${item.id})</div>
           <div class="linked-item-status">${statusBadge}</div>
         </div>
         <div class="linked-item-col">
@@ -373,16 +532,16 @@ function createLinkedItemsList(items) {
  */
 function getItemTypeIcon(type) {
     const icons = {
-        'trade': '📈',
-        'account': '💰',
-        'ticker': '🏢',
-        'alert': '🔔',
-        'cash_flow': '💸',
-        'note': '📝',
-        'trade_plan': '📋',
-        'execution': '⚡'
+        'trade': '<img src="images/icons/trades.svg" alt="טרייד" class="linked-item-icon-img" width="24" height="24">',
+        'account': '<img src="images/icons/accounts.svg" alt="חשבון" class="linked-item-icon-img" width="24" height="24">',
+        'ticker': '<img src="images/icons/tickers.svg" alt="טיקר" class="linked-item-icon-img" width="24" height="24">',
+        'alert': '<img src="images/icons/alerts.svg" alt="התראה" class="linked-item-icon-img" width="24" height="24">',
+        'cash_flow': '<img src="images/icons/cash_flows.svg" alt="תזרים מזומנים" class="linked-item-icon-img" width="24" height="24">',
+        'note': '<img src="images/icons/reserch.svg" alt="הערה" class="linked-item-icon-img" width="24" height="24">',
+        'trade_plan': '<img src="images/icons/trade_plans.svg" alt="תכנון טרייד" class="linked-item-icon-img" width="24" height="24">',
+        'execution': '<img src="images/icons/executions.svg" alt="ביצוע" class="linked-item-icon-img" width="24" height="24">'
     };
-    return icons[type] || '📄';
+    return icons[type] || '<img src="images/icons/db_display.svg" alt="פריט" class="linked-item-icon-img" width="24" height="24">';
 }
 
 /**
@@ -445,10 +604,10 @@ function createModal(id, title, content) {
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="${id}Label">${title}</h5>
-            <button type="button" class="btn btn-link text-dark p-0" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; font-weight: bold; text-decoration: none;">
+            <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
               ✕
             </button>
+            <h5 class="modal-title" id="${id}Label">${title}</h5>
           </div>
           <div class="modal-body">
             ${content}
@@ -519,10 +678,19 @@ function createDetailedItemInfo(item) {
  */
 function createTradeDetails(item) {
     let details = '';
-    if (item.symbol) details += `<div><strong>Symbol:</strong> ${item.symbol}</div>`;
-    if (item.side) details += `<div><strong>Side:</strong> ${item.side}</div>`;
-    if (item.amount) details += `<div><strong>Amount:</strong> ${item.amount}</div>`;
-    if (item.price) details += `<div><strong>Price:</strong> ${item.price}</div>`;
+    if (item.symbol) details += `<div><strong>סמל:</strong> ${item.symbol}</div>`;
+    if (item.side) {
+        const sideMap = {
+            'buy': 'קנייה',
+            'sell': 'מכירה',
+            'long': 'לונג',
+            'short': 'שורט'
+        };
+        const translatedSide = sideMap[item.side] || item.side;
+        details += `<div><strong>צד:</strong> ${translatedSide}</div>`;
+    }
+    if (item.amount) details += `<div><strong>כמות:</strong> ${item.amount}</div>`;
+    if (item.price) details += `<div><strong>מחיר:</strong> ${item.price}</div>`;
     return details;
 }
 
@@ -534,8 +702,8 @@ function createTradeDetails(item) {
  */
 function createAccountDetails(item) {
     let details = '';
-    if (item.currency) details += `<div><strong>Currency:</strong> ${item.currency}</div>`;
-    if (item.balance) details += `<div><strong>Balance:</strong> ${item.balance}</div>`;
+    if (item.currency) details += `<div><strong>מטבע:</strong> ${item.currency}</div>`;
+    if (item.balance) details += `<div><strong>יתרה:</strong> ${item.balance}</div>`;
     return details;
 }
 
@@ -547,9 +715,19 @@ function createAccountDetails(item) {
  */
 function createTickerDetails(item) {
     let details = '';
-    if (item.symbol) details += `<div><strong>Symbol:</strong> ${item.symbol}</div>`;
-    if (item.name) details += `<div><strong>Name:</strong> ${item.name}</div>`;
-    if (item.type) details += `<div><strong>Type:</strong> ${item.type}</div>`;
+    if (item.symbol) details += `<div><strong>סמל:</strong> ${item.symbol}</div>`;
+    if (item.name) details += `<div><strong>שם:</strong> ${item.name}</div>`;
+    if (item.type) {
+        const typeMap = {
+            'stock': 'מניה',
+            'etf': 'ETF',
+            'crypto': 'קריפטו',
+            'forex': 'מט"ח',
+            'commodity': 'סחורה'
+        };
+        const translatedType = typeMap[item.type] || item.type;
+        details += `<div><strong>סוג:</strong> ${translatedType}</div>`;
+    }
     return details;
 }
 
@@ -561,9 +739,36 @@ function createTickerDetails(item) {
  */
 function createAlertDetails(item) {
     let details = '';
-    if (item.symbol) details += `<div><strong>Symbol:</strong> ${item.symbol}</div>`;
-    if (item.message) details += `<div><strong>Message:</strong> ${item.message}</div>`;
-    if (item.priority) details += `<div><strong>Priority:</strong> ${item.priority}</div>`;
+    if (item.symbol) details += `<div><strong>סמל:</strong> ${item.symbol}</div>`;
+    if (item.message) {
+        // המרה ותרגום של התנאי
+        let translatedMessage = item.message;
+        
+        // המרת תנאים נפוצים
+        translatedMessage = translatedMessage.replace(/price > (\d+)/g, 'מחיר גבוה מ-$1');
+        translatedMessage = translatedMessage.replace(/price < (\d+)/g, 'מחיר נמוך מ-$1');
+        translatedMessage = translatedMessage.replace(/price >= (\d+)/g, 'מחיר גבוה או שווה ל-$1');
+        translatedMessage = translatedMessage.replace(/price <= (\d+)/g, 'מחיר נמוך או שווה ל-$1');
+        translatedMessage = translatedMessage.replace(/price == (\d+)/g, 'מחיר שווה ל-$1');
+        translatedMessage = translatedMessage.replace(/price != (\d+)/g, 'מחיר שונה מ-$1');
+        
+        // המרת פעולות נפוצות
+        translatedMessage = translatedMessage.replace(/buy/g, 'קנייה');
+        translatedMessage = translatedMessage.replace(/sell/g, 'מכירה');
+        translatedMessage = translatedMessage.replace(/hold/g, 'החזקה');
+        
+        details += `<div><strong>תנאי:</strong> ${translatedMessage}</div>`;
+    }
+    if (item.priority) {
+        const priorityMap = {
+            'low': 'נמוכה',
+            'medium': 'בינונית', 
+            'high': 'גבוהה',
+            'critical': 'קריטית'
+        };
+        const translatedPriority = priorityMap[item.priority] || item.priority;
+        details += `<div><strong>עדיפות:</strong> ${translatedPriority}</div>`;
+    }
     return details;
 }
 
@@ -575,9 +780,17 @@ function createAlertDetails(item) {
  */
 function createCashFlowDetails(item) {
     let details = '';
-    if (item.amount) details += `<div><strong>Amount:</strong> ${item.amount}</div>`;
-    if (item.type) details += `<div><strong>Type:</strong> ${item.type}</div>`;
-    if (item.description) details += `<div><strong>Description:</strong> ${item.description}</div>`;
+    if (item.amount) details += `<div><strong>סכום:</strong> ${item.amount}</div>`;
+    if (item.type) {
+        const typeMap = {
+            'income': 'הכנסה',
+            'expense': 'הוצאה',
+            'transfer': 'העברה'
+        };
+        const translatedType = typeMap[item.type] || item.type;
+        details += `<div><strong>סוג:</strong> ${translatedType}</div>`;
+    }
+    if (item.description) details += `<div><strong>תיאור:</strong> ${item.description}</div>`;
     return details;
 }
 
@@ -594,7 +807,7 @@ function createNoteDetails(item) {
         const objectId = item.related_object_id;
         details += `<div><strong>קשור ל:</strong> ${objectType} #${objectId}</div>`;
     }
-    if (item.content) details += `<div><strong>Content:</strong> ${item.content.substring(0, 100)}${item.content.length > 100 ? '...' : ''}</div>`;
+    if (item.content) details += `<div><strong>תוכן:</strong> ${item.content.substring(0, 100)}${item.content.length > 100 ? '...' : ''}</div>`;
     return details;
 }
 
@@ -606,9 +819,9 @@ function createNoteDetails(item) {
  */
 function createTradePlanDetails(item) {
     let details = '';
-    if (item.symbol) details += `<div><strong>Symbol:</strong> ${item.symbol}</div>`;
-    if (item.target_price) details += `<div><strong>Target Price:</strong> ${item.target_price}</div>`;
-    if (item.stop_loss) details += `<div><strong>Stop Loss:</strong> ${item.stop_loss}</div>`;
+    if (item.symbol) details += `<div><strong>סמל:</strong> ${item.symbol}</div>`;
+    if (item.target_price) details += `<div><strong>מחיר יעד:</strong> ${item.target_price}</div>`;
+    if (item.stop_loss) details += `<div><strong>סטופ לוס:</strong> ${item.stop_loss}</div>`;
     return details;
 }
 
@@ -620,9 +833,9 @@ function createTradePlanDetails(item) {
  */
 function createExecutionDetails(item) {
     let details = '';
-    if (item.symbol) details += `<div><strong>Symbol:</strong> ${item.symbol}</div>`;
-    if (item.quantity) details += `<div><strong>Quantity:</strong> ${item.quantity}</div>`;
-    if (item.price) details += `<div><strong>Price:</strong> ${item.price}</div>`;
+    if (item.symbol) details += `<div><strong>סמל:</strong> ${item.symbol}</div>`;
+    if (item.quantity) details += `<div><strong>כמות:</strong> ${item.quantity}</div>`;
+    if (item.price) details += `<div><strong>מחיר:</strong> ${item.price}</div>`;
     return details;
 }
 
@@ -769,11 +982,130 @@ function checkLinkedItems(itemId, itemType = null) {
  * @param {string} itemType - Type of item
  * @param {string|number} itemId - ID of item
  */
+/**
+ * Export linked items data to CSV
+ * 
+ * Generic function for exporting linked items data to CSV format
+ * Can be used for any entity type (ticker, trade, account, etc.)
+ * 
+ * @param {string} itemType - Type of the item
+ * @param {string|number} itemId - ID of the item
+ */
 function exportLinkedItemsData(itemType, itemId) {
-    // Exporting linked items data
-    // Implementation for data export
-    if (typeof window.showNotification === 'function') {
-        window.showNotification('Export functionality coming soon', 'info');
+    console.log('🔄 ייצוא נתוני פריטים מקושרים:', itemType, itemId);
+    
+    try {
+        // קבלת הנתונים מהשרת
+        fetch(`/api/v1/linked-items/${itemType}/${itemId}`)
+            .then(response => response.json())
+            .then(data => {
+                // יצירת CSV
+                const csvContent = createCSVFromLinkedItems(data, itemType, itemId);
+                
+                // יצירת קובץ להורדה
+                downloadCSV(csvContent, `linked_items_${itemType}_${itemId}_${new Date().toISOString().split('T')[0]}.csv`);
+                
+                // הצגת הודעת הצלחה
+                if (window.showSuccessNotification) {
+                    window.showSuccessNotification('הצלחה', 'הנתונים יוצאו בהצלחה לקובץ CSV');
+                }
+            })
+            .catch(error => {
+                console.error('❌ שגיאה בייצוא נתונים:', error);
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה בייצוא', 'שגיאה בייצוא הנתונים לקובץ CSV');
+                }
+            });
+    } catch (error) {
+        console.error('❌ שגיאה בייצוא נתונים:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בייצוא', 'שגיאה בייצוא הנתונים לקובץ CSV');
+        }
+    }
+}
+
+/**
+ * Create CSV content from linked items data
+ * 
+ * @param {Object} data - Linked items data
+ * @param {string} itemType - Type of the parent item
+ * @param {string|number} itemId - ID of the parent item
+ * @returns {string} CSV content
+ */
+function createCSVFromLinkedItems(data, itemType, itemId) {
+    const childEntities = data.child_entities || [];
+    const parentEntities = data.parent_entities || [];
+    const allEntities = [...childEntities, ...parentEntities];
+    
+    // כותרות CSV
+    const headers = [
+        'מזהה',
+        'סוג',
+        'כותרת',
+        'תיאור',
+        'סטטוס',
+        'תאריך יצירה',
+        'סמל',
+        'מטבע',
+        'כמות',
+        'מחיר',
+        'יעד',
+        'סטופ לוס',
+        'תנאי',
+        'עדיפות',
+        'תוכן'
+    ];
+    
+    // יצירת שורות נתונים
+    const rows = allEntities.map(item => {
+        const createdDate = item.created_at ? new Date(item.created_at).toLocaleDateString('he-IL') : '';
+        
+        return [
+            item.id || '',
+            getItemTypeDisplayName(item.type) || '',
+            item.title || '',
+            item.description || '',
+            item.status || '',
+            createdDate,
+            item.symbol || '',
+            item.currency || '',
+            item.amount || item.quantity || '',
+            item.price || '',
+            item.target_price || '',
+            item.stop_loss || '',
+            item.message || '',
+            item.priority || '',
+            item.content || ''
+        ];
+    });
+    
+    // יצירת CSV
+    const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+    
+    return csvContent;
+}
+
+/**
+ * Download CSV file
+ * 
+ * @param {string} csvContent - CSV content
+ * @param {string} filename - Filename for download
+ */
+function downloadCSV(csvContent, filename) {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }
 
@@ -939,19 +1271,25 @@ function getTypeBadgeClass(type) {
 
 /**
  * Get status badge HTML
+ * 
+ * Uses the same color scheme as the main application tables
+ * 
  * @param {string} status - Item status
  * @returns {string} Status badge HTML
  */
 function getStatusBadge(status) {
     if (!status) return '';
 
+    // סולם הצבעים הזהה לעמודי הטבלאות
     const statusClasses = {
-        'open': 'bg-success',
-        'closed': 'bg-secondary',
-        'active': 'bg-primary',
-        'completed': 'bg-success',
-        'pending': 'bg-warning',
-        'cancelled': 'bg-danger'
+        'open': 'status-badge status-open',
+        'closed': 'status-badge status-closed',
+        'active': 'status-badge status-active',
+        'completed': 'status-badge status-completed',
+        'pending': 'status-badge status-pending',
+        'cancelled': 'status-badge status-cancelled',
+        'inactive': 'status-badge status-inactive',
+        'archived': 'status-badge status-archived'
     };
 
     const statusText = {
@@ -960,13 +1298,15 @@ function getStatusBadge(status) {
         'active': 'פעיל',
         'completed': 'הושלם',
         'pending': 'ממתין',
-        'cancelled': 'בוטל'
+        'cancelled': 'בוטל',
+        'inactive': 'לא פעיל',
+        'archived': 'בארכיון'
     };
 
-    const badgeClass = statusClasses[status] || 'bg-secondary';
+    const badgeClass = statusClasses[status] || 'status-badge status-inactive';
     const badgeText = statusText[status] || status;
 
-    return `<span class="badge ${badgeClass}">${badgeText}</span>`;
+    return `<span class="${badgeClass}">${badgeText}</span>`;
 }
 
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
@@ -976,6 +1316,8 @@ window.showLinkedItemsModal = showLinkedItemsModal;
 window.createLinkedItemsModalContent = createLinkedItemsModalContent;
 window.checkLinkedItems = checkLinkedItems;
 window.exportLinkedItemsData = exportLinkedItemsData;
+window.createCSVFromLinkedItems = createCSVFromLinkedItems;
+window.downloadCSV = downloadCSV;
 window.createDetailedItemInfo = createDetailedItemInfo;
 window.getItemTypeIcon = getItemTypeIcon;
 window.getItemTypeDisplayName = getItemTypeDisplayName;
@@ -1002,6 +1344,8 @@ window.linkedItems = {
     createLinkedItemsModalContent,
     checkLinkedItems,
     exportLinkedItemsData,
+    createCSVFromLinkedItems,
+    downloadCSV,
     createDetailedItemInfo,
     getItemTypeIcon,
     getItemTypeDisplayName,

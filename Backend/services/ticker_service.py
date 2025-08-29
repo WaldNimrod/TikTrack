@@ -281,7 +281,7 @@ class TickerService:
     @staticmethod
     def check_linked_items(db: Session, ticker_id: int) -> Dict[str, Any]:
         """
-        Check linked items to ticker before deletion
+        Check linked items to ticker before deletion using the linked_items system
         
         Returns dictionary with:
         - has_linked_items: Whether there are linked items
@@ -290,6 +290,11 @@ class TickerService:
         - notes: List of linked notes
         - alerts: List of linked alerts
         """
+        from models.trade import Trade
+        from models.trade_plan import TradePlan
+        from models.note import Note
+        from models.alert import Alert
+        
         result = {
             'has_linked_items': False,
             'open_trades': [],
@@ -298,7 +303,211 @@ class TickerService:
             'alerts': []
         }
         
-        # Simple implementation without complex error handling
+        try:
+            # Use the linked_items system to get all child entities
+            from routes.api.linked_items import get_ticker_child_entities
+            import sqlite3
+            import os
+            
+            # Get database connection for linked_items
+            BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+            
+            conn = sqlite3.connect(DB_PATH)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            try:
+                # Get all child entities using the linked_items system
+                child_entities = get_ticker_child_entities(cursor, ticker_id)
+                
+                # Categorize entities by type
+                for entity in child_entities:
+                    if entity['type'] == 'trade':
+                        # Check if trade is open
+                        trade = db.query(Trade).filter(Trade.id == entity['id']).first()
+                        if trade and trade.status == 'open':
+                            result['open_trades'].append({
+                                'id': entity['id'],
+                                'ticker_symbol': trade.ticker.symbol if trade.ticker else 'Unknown',
+                                'status': entity['status'],
+                                'account_name': trade.account.name if trade.account else 'Unknown',
+                                'notes': trade.notes,
+                                'created_at': entity['created_at']
+                            })
+                    
+                    elif entity['type'] == 'trade_plan':
+                        # Check if trade plan is open
+                        plan = db.query(TradePlan).filter(TradePlan.id == entity['id']).first()
+                        if plan and plan.status == 'open':
+                            result['open_trade_plans'].append({
+                                'id': entity['id'],
+                                'ticker': {'symbol': plan.ticker.symbol} if plan.ticker else {'symbol': 'Unknown'},
+                                'status': entity['status'],
+                                'account': {'name': plan.account.name} if plan.account else {'name': 'Unknown'},
+                                'target_price': plan.target_price,
+                                'created_at': entity['created_at']
+                            })
+                    
+                    elif entity['type'] == 'note':
+                        result['notes'].append({
+                            'id': entity['id'],
+                            'content': entity['description'],
+                            'created_at': entity['created_at']
+                        })
+                    
+                    elif entity['type'] == 'alert':
+                        result['alerts'].append({
+                            'id': entity['id'],
+                            'message': entity['description'].replace('התראה: ', ''),
+                            'status': entity['status'],
+                            'created_at': entity['created_at']
+                        })
+                
+                # Check if there are any linked items
+                result['has_linked_items'] = (
+                    len(result['open_trades']) > 0 or
+                    len(result['open_trade_plans']) > 0 or
+                    len(result['notes']) > 0 or
+                    len(result['alerts']) > 0
+                )
+                
+            finally:
+                conn.close()
+                
+        except Exception as e:
+            logger.error(f"Error checking linked items for ticker {ticker_id}: {str(e)}")
+            # Return empty result on error
+            pass
+        
+        return result
+    
+    @staticmethod
+    def check_linked_items_generic(db: Session, entity_type: str, entity_id: int) -> Dict[str, Any]:
+        """
+        Generic function to check linked items for any entity type
+        
+        Args:
+            db: Database session
+            entity_type: Type of entity ('ticker', 'trade', 'account', 'alert', etc.)
+            entity_id: ID of the entity
+            
+        Returns:
+            Dictionary with linked items categorized by type
+        """
+        from routes.api.linked_items import get_child_entities, get_parent_entities
+        import sqlite3
+        import os
+        
+        result = {
+            'entity_type': entity_type,
+            'entity_id': entity_id,
+            'has_linked_items': False,
+            'child_entities': [],
+            'parent_entities': [],
+            'open_trades': [],
+            'open_trade_plans': [],
+            'notes': [],
+            'alerts': [],
+            'executions': [],
+            'cash_flows': []
+        }
+        
+        try:
+            # Get database connection for linked_items
+            BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+            
+            conn = sqlite3.connect(DB_PATH)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            try:
+                # Get all child entities using the linked_items system
+                child_entities = get_child_entities(cursor, entity_type, entity_id)
+                parent_entities = get_parent_entities(cursor, entity_type, entity_id)
+                
+                result['child_entities'] = child_entities
+                result['parent_entities'] = parent_entities
+                
+                # Categorize child entities by type
+                for entity in child_entities:
+                    if entity['type'] == 'trade':
+                        # Check if trade is open
+                        from models.trade import Trade
+                        trade = db.query(Trade).filter(Trade.id == entity['id']).first()
+                        if trade and trade.status == 'open':
+                            result['open_trades'].append({
+                                'id': entity['id'],
+                                'title': entity['title'],
+                                'description': entity['description'],
+                                'status': entity['status'],
+                                'created_at': entity['created_at']
+                            })
+                    
+                    elif entity['type'] == 'trade_plan':
+                        # Check if trade plan is open
+                        from models.trade_plan import TradePlan
+                        plan = db.query(TradePlan).filter(TradePlan.id == entity['id']).first()
+                        if plan and plan.status == 'open':
+                            result['open_trade_plans'].append({
+                                'id': entity['id'],
+                                'title': entity['title'],
+                                'description': entity['description'],
+                                'status': entity['status'],
+                                'created_at': entity['created_at']
+                            })
+                    
+                    elif entity['type'] == 'note':
+                        result['notes'].append({
+                            'id': entity['id'],
+                            'title': entity['title'],
+                            'description': entity['description'],
+                            'status': entity['status'],
+                            'created_at': entity['created_at']
+                        })
+                    
+                    elif entity['type'] == 'alert':
+                        result['alerts'].append({
+                            'id': entity['id'],
+                            'title': entity['title'],
+                            'description': entity['description'],
+                            'status': entity['status'],
+                            'created_at': entity['created_at']
+                        })
+                    
+                    elif entity['type'] == 'execution':
+                        result['executions'].append({
+                            'id': entity['id'],
+                            'title': entity['title'],
+                            'description': entity['description'],
+                            'status': entity['status'],
+                            'created_at': entity['created_at']
+                        })
+                    
+                    elif entity['type'] == 'cash_flow':
+                        result['cash_flows'].append({
+                            'id': entity['id'],
+                            'title': entity['title'],
+                            'description': entity['description'],
+                            'status': entity['status'],
+                            'created_at': entity['created_at']
+                        })
+                
+                # Check if there are any linked items
+                result['has_linked_items'] = (
+                    len(result['child_entities']) > 0 or
+                    len(result['parent_entities']) > 0
+                )
+                
+            finally:
+                conn.close()
+                
+        except Exception as e:
+            logger.error(f"Error checking linked items for {entity_type} {entity_id}: {str(e)}")
+            # Return empty result on error
+            pass
+        
         return result
     
     @staticmethod
@@ -396,6 +605,119 @@ class TickerService:
             new_status = (open_trades_count > 0)
             if ticker.active_trades != new_status:
                 ticker.active_trades = new_status
+                updated_count += 1
+        
+        if updated_count > 0:
+            db.commit()
+        
+        return updated_count
+    
+    @staticmethod
+    def update_ticker_status_auto(db: Session, ticker_id: int) -> bool:
+        """
+        Update ticker status automatically based on linked trades and trade plans
+        
+        Status logic:
+        1. If cancelled - ignore (user manually cancelled)
+        2. If not cancelled - check for open trades or trade plans
+           - If has open trades/plans -> status = 'open'
+           - If no open trades/plans -> status = 'closed'
+        
+        Args:
+            db (Session): Database connection
+            ticker_id (int): Ticker ID to update
+            
+        Returns:
+            bool: True if updated successfully, False if ticker not found
+            
+        Example:
+            >>> TickerService.update_ticker_status_auto(db_session, 1)
+            True
+        """
+        from models.trade import Trade
+        from models.trade_plan import TradePlan
+        
+        # Check if ticker exists
+        ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
+        if not ticker:
+            return False
+        
+        # If ticker is cancelled, don't update status (user manually cancelled)
+        if ticker.status == 'cancelled':
+            return True
+        
+        # Check if there are open trades
+        open_trades_count = db.query(Trade).filter(
+            Trade.ticker_id == ticker_id,
+            Trade.status == 'open'
+        ).count()
+        
+        # Check if there are open trade plans
+        open_plans_count = db.query(TradePlan).filter(
+            TradePlan.ticker_id == ticker_id,
+            TradePlan.status == 'open'
+        ).count()
+        
+        # Determine new status
+        if open_trades_count > 0 or open_plans_count > 0:
+            new_status = 'open'
+        else:
+            new_status = 'closed'
+        
+        # Update status if different
+        if ticker.status != new_status:
+            ticker.status = new_status
+            db.commit()
+        
+        return True
+    
+    @staticmethod
+    def update_all_ticker_statuses_auto(db: Session) -> int:
+        """
+        Update status for all non-cancelled tickers automatically
+        
+        This function updates the status field for all tickers that are not cancelled
+        based on their linked open trades and trade plans.
+        
+        Args:
+            db (Session): Database connection
+            
+        Returns:
+            int: Number of tickers updated
+            
+        Example:
+            >>> updated_count = TickerService.update_all_ticker_statuses_auto(db_session)
+            >>> print(f"Updated {updated_count} tickers")
+        """
+        from models.trade import Trade
+        from models.trade_plan import TradePlan
+        
+        # Get all non-cancelled tickers
+        tickers = db.query(Ticker).filter(Ticker.status != 'cancelled').all()
+        updated_count = 0
+        
+        for ticker in tickers:
+            # Check if there are open trades for this ticker
+            open_trades_count = db.query(Trade).filter(
+                Trade.ticker_id == ticker.id,
+                Trade.status == 'open'
+            ).count()
+            
+            # Check if there are open trade plans for this ticker
+            open_plans_count = db.query(TradePlan).filter(
+                TradePlan.ticker_id == ticker.id,
+                TradePlan.status == 'open'
+            ).count()
+            
+            # Determine new status
+            if open_trades_count > 0 or open_plans_count > 0:
+                new_status = 'open'
+            else:
+                new_status = 'closed'
+            
+            # Update if different
+            if ticker.status != new_status:
+                ticker.status = new_status
                 updated_count += 1
         
         if updated_count > 0:

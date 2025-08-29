@@ -89,10 +89,11 @@
 
           <!-- Data summary -->
           <div class="info-summary" id="summaryStats">
-            <div>סה"כ טבלאות: <strong id="totalTables">2</strong></div>
+            <div>סה"כ טבלאות: <strong id="totalTables">3</strong></div>
             <div>סה"כ רשומות: <strong id="totalRecords">0</strong></div>
             <div>מטבעות: <strong id="summaryCurrenciesCount">0</strong></div>
             <div>סוגי קישור: <strong id="summaryNoteRelationTypesCount">0</strong></div>
+            <div>כפתורי טריגרים: <strong id="summaryTriggerButtonsCount">0</strong></div>
           </div>
         </div>
       </div> <!-- End top-section -->
@@ -223,6 +224,249 @@
           </div>
         </div>
       </div>
+
+      <!-- Trigger Buttons Section -->
+      <div class="content-section extra-data-page" data-section="trigger_buttons">
+        <!-- Trigger Buttons header -->
+        <div class="section-header">
+          <div class="table-title">
+            🔘 כפתורי טריגרים<br><span class="table-subtitle">trigger_buttons</span>
+          </div>
+          <div class="table-count" id="triggerButtonsCount">🔘 כפתורי טריגרים: טוען...</div>
+          <div class="table-actions">
+            <button class="refresh-btn" onclick="addTriggerButtonRecord()" title="הוסף כפתור טריגר">
+              <span class="action-icon">➕</span> הוסף
+            </button>
+            <div class="action-separator"></div>
+            <button class="filter-toggle-btn" onclick="toggleSection('trigger_buttons')"
+              title="הצג/הסתר אזור כפתורי טריגרים">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Trigger Buttons table -->
+        <div class="section-body">
+          <div class="trigger-buttons-container">
+            
+            <!-- Currencies Triggers -->
+            <div class="entity-triggers-section">
+              <h4 class="entity-title">💱 מטבעות (Currencies)</h4>
+              <div class="trigger-buttons-grid">
+                <div class="trigger-button-card">
+                  <div class="trigger-header">
+                    <h5 class="trigger-name">הגנה על מטבע הבסיס</h5>
+                    <span class="trigger-status active">פעיל</span>
+                  </div>
+                  <div class="trigger-details">
+                    <div class="trigger-action">🛡️ מניעת עדכון/מחיקה של מטבע הבסיס (ID=1)</div>
+                    <div class="trigger-description">מונע שינויים במטבע הבסיס של המערכת</div>
+                    <div class="trigger-info">
+                      <span class="trigger-type">טריגר בסיס נתונים</span>
+                      <span class="trigger-tables">טבלה: currencies</span>
+                    </div>
+                  </div>
+                  <div class="trigger-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showTriggerDetails('protect_base_currency')" title="פרטים">📋</button>
+                    <button class="btn btn-sm btn-success" onclick="testTrigger('protect_base_currency')" title="בדיקה">▶️</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Accounts Triggers -->
+            <div class="entity-triggers-section">
+              <h4 class="entity-title">🏦 חשבונות (Accounts)</h4>
+              <div class="trigger-buttons-grid">
+                <div class="trigger-button-card">
+                  <div class="trigger-header">
+                    <h5 class="trigger-name">הגנה על החשבון האחרון</h5>
+                    <span class="trigger-status active">פעיל</span>
+                  </div>
+                  <div class="trigger-details">
+                    <div class="trigger-action">🛡️ מניעת מחיקת החשבון האחרון במערכת</div>
+                    <div class="trigger-description">מבטיח שתמיד יהיה לפחות חשבון אחד במערכת</div>
+                    <div class="trigger-info">
+                      <span class="trigger-type">טריגר בסיס נתונים</span>
+                      <span class="trigger-tables">טבלה: accounts</span>
+                    </div>
+                  </div>
+                  <div class="trigger-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showTriggerDetails('protect_last_account')" title="פרטים">📋</button>
+                    <button class="btn btn-sm btn-success" onclick="testTrigger('protect_last_account')" title="בדיקה">▶️</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trades Triggers -->
+            <div class="entity-triggers-section">
+              <h4 class="entity-title">📈 טריידים (Trades)</h4>
+              <div class="trigger-buttons-grid">
+                <div class="trigger-button-card">
+                  <div class="trigger-header">
+                    <h5 class="trigger-name">עדכון טריידים פעילים</h5>
+                    <span class="trigger-status planned">מתוכנן</span>
+                  </div>
+                  <div class="trigger-details">
+                    <div class="trigger-action">🔄 עדכון שדה active_trades בטבלת tickers</div>
+                    <div class="trigger-description">מעדכן אוטומטית את מספר הטריידים הפעילים לכל טיקר</div>
+                    <div class="trigger-info">
+                      <span class="trigger-type">טריגר בסיס נתונים</span>
+                      <span class="trigger-tables">טבלאות: trades, tickers</span>
+                    </div>
+                  </div>
+                  <div class="trigger-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showTriggerDetails('trade_active_trades')" title="פרטים">📋</button>
+                    <button class="btn btn-sm btn-warning" onclick="activateTrigger('trade_active_trades')" title="הפעל">⚡</button>
+                  </div>
+                </div>
+                <div class="trigger-button-card">
+                  <div class="trigger-header">
+                    <h5 class="trigger-name">עדכון סטטוס טיקר</h5>
+                    <span class="trigger-status planned">מתוכנן</span>
+                  </div>
+                  <div class="trigger-details">
+                    <div class="trigger-action">🔄 עדכון סטטוס טיקר בהתאם לטריידים פעילים</div>
+                    <div class="trigger-description">מעדכן את סטטוס הטיקר ל-'open' או 'closed' בהתאם לטריידים</div>
+                    <div class="trigger-info">
+                      <span class="trigger-type">טריגר בסיס נתונים</span>
+                      <span class="trigger-tables">טבלאות: trades, tickers</span>
+                    </div>
+                  </div>
+                  <div class="trigger-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showTriggerDetails('trade_ticker_status')" title="פרטים">📋</button>
+                    <button class="btn btn-sm btn-warning" onclick="activateTrigger('trade_ticker_status')" title="הפעל">⚡</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trade Plans Triggers -->
+            <div class="entity-triggers-section">
+              <h4 class="entity-title">📋 תוכניות טרייד (Trade Plans)</h4>
+              <div class="trigger-buttons-grid">
+                <div class="trigger-button-card">
+                  <div class="trigger-header">
+                    <h5 class="trigger-name">עדכון טריידים פעילים מתוכניות</h5>
+                    <span class="trigger-status planned">מתוכנן</span>
+                  </div>
+                  <div class="trigger-details">
+                    <div class="trigger-action">🔄 עדכון שדה active_trades בטבלת tickers</div>
+                    <div class="trigger-description">מעדכן אוטומטית את מספר הטריידים הפעילים לכל טיקר כולל תוכניות</div>
+                    <div class="trigger-info">
+                      <span class="trigger-type">טריגר בסיס נתונים</span>
+                      <span class="trigger-tables">טבלאות: trade_plans, tickers</span>
+                    </div>
+                  </div>
+                  <div class="trigger-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showTriggerDetails('plan_active_trades')" title="פרטים">📋</button>
+                    <button class="btn btn-sm btn-warning" onclick="activateTrigger('plan_active_trades')" title="הפעל">⚡</button>
+                  </div>
+                </div>
+                <div class="trigger-button-card">
+                  <div class="trigger-header">
+                    <h5 class="trigger-name">עדכון סטטוס טיקר מתוכניות</h5>
+                    <span class="trigger-status planned">מתוכנן</span>
+                  </div>
+                  <div class="trigger-details">
+                    <div class="trigger-action">🔄 עדכון סטטוס טיקר בהתאם לתוכניות פעילות</div>
+                    <div class="trigger-description">מעדכן את סטטוס הטיקר בהתאם לתוכניות טרייד פעילות</div>
+                    <div class="trigger-info">
+                      <span class="trigger-type">טריגר בסיס נתונים</span>
+                      <span class="trigger-tables">טבלאות: trade_plans, tickers</span>
+                    </div>
+                  </div>
+                  <div class="trigger-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showTriggerDetails('plan_ticker_status')" title="פרטים">📋</button>
+                    <button class="btn btn-sm btn-warning" onclick="activateTrigger('plan_ticker_status')" title="הפעל">⚡</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alerts Triggers -->
+            <div class="entity-triggers-section">
+              <h4 class="entity-title">🚨 התראות (Alerts)</h4>
+              <div class="trigger-buttons-grid">
+                <div class="trigger-button-card">
+                  <div class="trigger-header">
+                    <h5 class="trigger-name">בדיקת התראות חשבון</h5>
+                    <span class="trigger-status active">פעיל</span>
+                  </div>
+                  <div class="trigger-details">
+                    <div class="trigger-action">🔍 בדיקת תנאי התראה לחשבון</div>
+                    <div class="trigger-description">בודק תנאי התראה ספציפי לחשבון</div>
+                    <div class="trigger-info">
+                      <span class="trigger-type">לוגיקה Python</span>
+                      <span class="trigger-tables">טבלה: alerts</span>
+                    </div>
+                  </div>
+                  <div class="trigger-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showTriggerDetails('alert_account')" title="פרטים">📋</button>
+                    <button class="btn btn-sm btn-success" onclick="testTrigger('alert_account')" title="בדיקה">▶️</button>
+                  </div>
+                </div>
+                <div class="trigger-button-card">
+                  <div class="trigger-header">
+                    <h5 class="trigger-name">בדיקת התראות טרייד</h5>
+                    <span class="trigger-status active">פעיל</span>
+                  </div>
+                  <div class="trigger-details">
+                    <div class="trigger-action">🔍 בדיקת תנאי התראה לטרייד</div>
+                    <div class="trigger-description">בודק תנאי התראה ספציפי לטרייד</div>
+                    <div class="trigger-info">
+                      <span class="trigger-type">לוגיקה Python</span>
+                      <span class="trigger-tables">טבלה: alerts</span>
+                    </div>
+                  </div>
+                  <div class="trigger-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showTriggerDetails('alert_trade')" title="פרטים">📋</button>
+                    <button class="btn btn-sm btn-success" onclick="testTrigger('alert_trade')" title="בדיקה">▶️</button>
+                  </div>
+                </div>
+                <div class="trigger-button-card">
+                  <div class="trigger-header">
+                    <h5 class="trigger-name">בדיקת התראות תוכנית</h5>
+                    <span class="trigger-status active">פעיל</span>
+                  </div>
+                  <div class="trigger-details">
+                    <div class="trigger-action">🔍 בדיקת תנאי התראה לתוכנית טרייד</div>
+                    <div class="trigger-description">בודק תנאי התראה ספציפי לתוכנית טרייד</div>
+                    <div class="trigger-info">
+                      <span class="trigger-type">לוגיקה Python</span>
+                      <span class="trigger-tables">טבלה: alerts</span>
+                    </div>
+                  </div>
+                  <div class="trigger-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showTriggerDetails('alert_trade_plan')" title="פרטים">📋</button>
+                    <button class="btn btn-sm btn-success" onclick="testTrigger('alert_trade_plan')" title="בדיקה">▶️</button>
+                  </div>
+                </div>
+                <div class="trigger-button-card">
+                  <div class="trigger-header">
+                    <h5 class="trigger-name">בדיקת התראות טיקר</h5>
+                    <span class="trigger-status active">פעיל</span>
+                  </div>
+                  <div class="trigger-details">
+                    <div class="trigger-action">🔍 בדיקת תנאי התראה לטיקר</div>
+                    <div class="trigger-description">בודק תנאי התראה ספציפי לטיקר</div>
+                    <div class="trigger-info">
+                      <span class="trigger-type">לוגיקה Python</span>
+                      <span class="trigger-tables">טבלה: alerts</span>
+                    </div>
+                  </div>
+                  <div class="trigger-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showTriggerDetails('alert_ticker')" title="פרטים">📋</button>
+                    <button class="btn btn-sm btn-success" onclick="testTrigger('alert_ticker')" title="בדיקה">▶️</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
     </div> <!-- End page-body -->
 
     <!-- Bottom page spacing -->
@@ -248,6 +492,7 @@
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/header-system.js"></script>
+    <script src="scripts/alerts.js"></script>
     <script src="scripts/active-alerts-component.js"></script>
     <script src="scripts/db-extradata.js"></script>
 

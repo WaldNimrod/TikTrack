@@ -564,3 +564,4 @@ trading-ui/
 **שינויים עיקריים**: הוספת Refresh Policy גמיש ו-Timezone Support מלא
 
 
+

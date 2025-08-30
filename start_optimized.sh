@@ -1,340 +1,309 @@
 #!/bin/bash
 
-# TikTrack Optimized Server Startup Script for Laptops
-# ====================================================
-#
-# 🎯 Purpose: Start memory-optimized development server for laptops
-# ⚡ Features: 
-#   - Memory monitoring
-#   - Automatic cleanup
-#   - Performance optimization
-#   - Resource management
-#
-# 🔧 Usage:
-#   ./start_optimized.sh          # Start optimized server
-#   ./start_optimized.sh monitor  # Start with memory monitoring
-#   ./start_optimized.sh clean    # Clean memory and restart
-#
-# 📊 Memory optimizations:
-#   - Reduced logging
-#   - Aggressive garbage collection
-#   - Limited concurrent connections
-#   - Single process mode
-#   - Automatic memory cleanup
+# TikTrack Optimized Server Startup Script
+# הפעלת שרת אופטימלי לביצועים משופרים
 
 set -e
 
-# Colors for output
+# צבעים
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Configuration
-PORT=8080
-HOST="127.0.0.1"
-LOG_FILE="logs/optimized_server.log"
-ERROR_LOG="logs/optimized_errors.log"
-MEMORY_LOG="logs/memory_usage.log"
-
-# Create logs directory if it doesn't exist
-mkdir -p logs
-
-# Function to print colored output
-print_status() {
-    echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')] $1${NC}"
+# פונקציה להצגת עזרה
+show_help() {
+    echo -e "${BLUE}🚀 TikTrack Optimized Server${NC}"
+    echo -e "${BLUE}==========================${NC}"
+    echo ""
+    echo -e "${YELLOW}Usage: $0 [command]${NC}"
+    echo ""
+    echo -e "${GREEN}Commands:${NC}"
+    echo -e "  ${BLUE}start${NC}     - הפעלת השרת האופטימלי"
+    echo -e "  ${BLUE}stop${NC}      - עצירת השרת"
+    echo -e "  ${BLUE}restart${NC}   - הפעלה מחדש"
+    echo -e "  ${BLUE}status${NC}    - בדיקת מצב השרת"
+    echo -e "  ${BLUE}monitor${NC}   - ניטור ביצועים בזמן אמת"
+    echo -e "  ${BLUE}test${NC}      - בדיקת ביצועים מהירה"
+    echo -e "  ${BLUE}help${NC}      - הצגת עזרה זו"
+    echo ""
+    echo -e "${YELLOW}Examples:${NC}"
+    echo -e "  $0 start"
+    echo -e "  $0 monitor"
+    echo -e "  $0 test"
 }
 
-print_warning() {
-    echo -e "${YELLOW}[$(date '+%Y-%m-%d %H:%M:%S')] WARNING: $1${NC}"
-}
-
-print_error() {
-    echo -e "${RED}[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: $1${NC}"
-}
-
-print_info() {
-    echo -e "${BLUE}[$(date '+%Y-%m-%d %H:%M:%S')] INFO: $1${NC}"
-}
-
-# Function to check system resources
-check_resources() {
-    print_info "Checking system resources..."
+# פונקציה לבדיקת תלויות
+check_dependencies() {
+    echo -e "${YELLOW}🔍 Checking dependencies...${NC}"
     
-    # Check available memory
-    total_mem=$(sysctl -n hw.memsize | awk '{print $0/1024/1024/1024}')
-    free_mem=$(vm_stat | grep "Pages free" | awk '{print $3}' | sed 's/\.//')
-    free_mem_mb=$((free_mem * 4096 / 1024 / 1024))
-    
-    print_info "Total memory: ${total_mem}GB"
-    print_info "Available memory: ${free_mem_mb}MB"
-    
-    if [ $free_mem_mb -lt 1000 ]; then
-        print_warning "Low memory available (${free_mem_mb}MB). Consider closing other applications."
-    fi
-    
-    # Check disk space
-    disk_usage=$(df . | tail -1 | awk '{print $5}' | sed 's/%//')
-    print_info "Disk usage: ${disk_usage}%"
-    
-    if [ $disk_usage -gt 90 ]; then
-        print_warning "High disk usage (${disk_usage}%). Consider cleaning up."
-    fi
-}
-
-# Function to clean memory
-clean_memory() {
-    print_info "Cleaning memory..."
-    
-    # Force garbage collection on running Python processes
-    pkill -f "python.*dev_server" 2>/dev/null || true
-    
-    # Clear Python cache
-    find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-    find . -name "*.pyc" -delete 2>/dev/null || true
-    
-    # Clear browser cache files
-    rm -rf /tmp/.org.chromium.Chromium.* 2>/dev/null || true
-    rm -rf /tmp/.com.google.Chrome.* 2>/dev/null || true
-    
-    print_status "Memory cleanup completed"
-}
-
-# Function to install required packages
-install_packages() {
-    print_info "Checking required packages..."
-    
-    # Check if psutil is installed
-    if ! python3 -c "import psutil" 2>/dev/null; then
-        print_info "Installing psutil for memory monitoring..."
-        pip3 install psutil
-    fi
-    
-    # Check if flask-cors is installed
-    if ! python3 -c "import flask_cors" 2>/dev/null; then
-        print_info "Installing flask-cors..."
-        pip3 install flask-cors
-    fi
-    
-    print_status "All required packages are available"
-}
-
-# Function to start memory monitoring
-start_memory_monitor() {
-    print_info "Starting memory monitoring..."
-    
-    # Start background memory monitoring
-    (
-        while true; do
-            if pgrep -f "dev_server_optimized.py" > /dev/null; then
-                # Get memory usage of the server process
-                SERVER_PID=$(pgrep -f "dev_server_optimized.py")
-                if [ ! -z "$SERVER_PID" ]; then
-                    MEMORY_USAGE=$(ps -o rss= -p $SERVER_PID | awk '{print $1/1024}')
-                    echo "$(date '+%Y-%m-%d %H:%M:%S') - Memory: ${MEMORY_USAGE}MB" >> "$MEMORY_LOG"
-                    
-                    # Alert if memory usage is high
-                    if (( $(echo "$MEMORY_USAGE > 200" | bc -l) )); then
-                        print_warning "High memory usage: ${MEMORY_USAGE}MB"
-                    fi
-                fi
-            fi
-            sleep 30  # Check every 30 seconds
-        done
-    ) &
-    
-    MONITOR_PID=$!
-    echo $MONITOR_PID > /tmp/tiktrack_memory_monitor.pid
-    print_status "Memory monitoring started (PID: $MONITOR_PID)"
-}
-
-# Function to stop memory monitoring
-stop_memory_monitor() {
-    if [ -f /tmp/tiktrack_memory_monitor.pid ]; then
-        MONITOR_PID=$(cat /tmp/tiktrack_memory_monitor.pid)
-        kill $MONITOR_PID 2>/dev/null || true
-        rm -f /tmp/tiktrack_memory_monitor.pid
-        print_status "Memory monitoring stopped"
-    fi
-}
-
-# Function to start the optimized server
-start_server() {
-    print_info "Starting TikTrack Optimized Development Server..."
-    
-    # Check if server is already running
-    if pgrep -f "dev_server_optimized.py" > /dev/null; then
-        print_warning "Server is already running. Stopping existing instance..."
-        pkill -f "dev_server_optimized.py"
-        sleep 2
-    fi
-    
-    # Start the optimized server
-    cd Backend
-    python3 dev_server_optimized.py > "../$LOG_FILE" 2> "../$ERROR_LOG" &
-    SERVER_PID=$!
-    cd ..
-    
-    echo $SERVER_PID > /tmp/tiktrack_optimized_server.pid
-    
-    # Wait for server to start
-    print_info "Waiting for server to start..."
-    for i in {1..30}; do
-        if curl -s "http://$HOST:$PORT/api/health" > /dev/null 2>&1; then
-            print_status "✅ Server started successfully (PID: $SERVER_PID)"
-            break
-        fi
-        sleep 1
-    done
-    
-    if [ $i -eq 30 ]; then
-        print_error "Server failed to start within 30 seconds"
+    # בדיקת Python
+    if ! command -v python3 &> /dev/null; then
+        echo -e "${RED}❌ Python3 not found${NC}"
         exit 1
     fi
     
-    # Show server info
-    print_info "Server URL: http://$HOST:$PORT"
-    print_info "Health check: http://$HOST:$PORT/api/health"
-    print_info "Memory status: http://$HOST:$PORT/api/memory-status"
-    print_info "Log file: $LOG_FILE"
-    print_info "Error log: $ERROR_LOG"
-}
-
-# Function to show server status
-show_status() {
-    print_info "Server Status:"
+    # בדיקת pip packages
+    local missing_packages=()
     
-    if pgrep -f "dev_server_optimized.py" > /dev/null; then
-        SERVER_PID=$(pgrep -f "dev_server_optimized.py")
-        MEMORY_USAGE=$(ps -o rss= -p $SERVER_PID | awk '{print $1/1024}')
-        UPTIME=$(ps -o etime= -p $SERVER_PID)
-        
-        print_status "✅ Server is running (PID: $SERVER_PID)"
-        print_info "Memory usage: ${MEMORY_USAGE}MB"
-        print_info "Uptime: $UPTIME"
-        print_info "URL: http://$HOST:$PORT"
-    else
-        print_error "❌ Server is not running"
+    if ! python3 -c "import flask" &> /dev/null; then
+        missing_packages+=("flask")
     fi
     
-    if [ -f /tmp/tiktrack_memory_monitor.pid ]; then
-        MONITOR_PID=$(cat /tmp/tiktrack_memory_monitor.pid)
-        if kill -0 $MONITOR_PID 2>/dev/null; then
-            print_status "✅ Memory monitoring is active (PID: $MONITOR_PID)"
-        else
-            print_error "❌ Memory monitoring is not running"
+    if ! python3 -c "import psutil" &> /dev/null; then
+        missing_packages+=("psutil")
+    fi
+    
+    if ! python3 -c "import tracemalloc" &> /dev/null; then
+        echo -e "${YELLOW}⚠️  tracemalloc not available (Python < 3.4)${NC}"
+    fi
+    
+    if [ ${#missing_packages[@]} -ne 0 ]; then
+        echo -e "${YELLOW}📦 Installing missing packages: ${missing_packages[*]}${NC}"
+        pip3 install "${missing_packages[@]}"
+    fi
+    
+    echo -e "${GREEN}✅ Dependencies check completed${NC}"
+}
+
+# פונקציה לעצירת שרתים קיימים
+stop_existing_servers() {
+    echo -e "${YELLOW}🛑 Stopping existing servers...${NC}"
+    
+    # עצירת תהליכי Python
+    local python_processes=$(ps aux | grep -E "(python|flask|dev_server)" | grep -v grep | awk '{print $2}')
+    
+    if [ -n "$python_processes" ]; then
+        echo -e "${YELLOW}Found Python processes: $python_processes${NC}"
+        echo "$python_processes" | xargs kill -TERM 2>/dev/null || true
+        sleep 2
+        
+        # בדיקה אם נשארו תהליכים
+        local remaining=$(ps aux | grep -E "(python|flask|dev_server)" | grep -v grep | awk '{print $2}')
+        if [ -n "$remaining" ]; then
+            echo -e "${YELLOW}Force killing remaining processes: $remaining${NC}"
+            echo "$remaining" | xargs kill -KILL 2>/dev/null || true
         fi
     else
-        print_error "❌ Memory monitoring is not running"
+        echo -e "${GREEN}No existing Python processes found${NC}"
+    fi
+    
+    # בדיקת פורט 8080
+    local port_processes=$(lsof -ti:8080 2>/dev/null || true)
+    if [ -n "$port_processes" ]; then
+        echo -e "${YELLOW}Killing processes using port 8080: $port_processes${NC}"
+        echo "$port_processes" | xargs kill -TERM 2>/dev/null || true
+    fi
+    
+    echo -e "${GREEN}✅ Server cleanup completed${NC}"
+}
+
+# פונקציה להפעלת השרת האופטימלי
+start_optimized_server() {
+    echo -e "${GREEN}🚀 Starting optimized server...${NC}"
+    
+    # בדיקת קובץ השרת
+    if [ ! -f "Backend/dev_server_optimized.py" ]; then
+        echo -e "${RED}❌ Optimized server file not found: Backend/dev_server_optimized.py${NC}"
+        exit 1
+    fi
+    
+    # הפעלת השרת ברקע
+    cd Backend
+    nohup python3 dev_server_optimized.py > ../logs/optimized_server.log 2>&1 &
+    local server_pid=$!
+    cd ..
+    
+    echo -e "${GREEN}✅ Server started with PID: $server_pid${NC}"
+    echo "$server_pid" > .optimized_server.pid
+    
+    # המתנה להפעלה
+    echo -e "${YELLOW}⏳ Waiting for server to start...${NC}"
+    local attempts=0
+    while [ $attempts -lt 30 ]; do
+        if curl -s http://127.0.0.1:8080/api/health > /dev/null 2>&1; then
+            echo -e "${GREEN}✅ Server is ready!${NC}"
+            echo -e "${BLUE}🌐 Server URL: http://127.0.0.1:8080${NC}"
+            echo -e "${BLUE}📊 Health Check: http://127.0.0.1:8080/api/health${NC}"
+            echo -e "${BLUE}💾 Memory Status: http://127.0.0.1:8080/api/memory-status${NC}"
+            return 0
+        fi
+        sleep 1
+        attempts=$((attempts + 1))
+        echo -n "."
+    done
+    
+    echo -e "${RED}❌ Server failed to start within 30 seconds${NC}"
+    return 1
+}
+
+# פונקציה לבדיקת מצב השרת
+check_server_status() {
+    echo -e "${BLUE}📊 Server Status Check${NC}"
+    echo -e "${BLUE}==================${NC}"
+    
+    # בדיקת PID
+    if [ -f ".optimized_server.pid" ]; then
+        local pid=$(cat .optimized_server.pid)
+        if ps -p "$pid" > /dev/null 2>&1; then
+            echo -e "${GREEN}✅ Server process running (PID: $pid)${NC}"
+        else
+            echo -e "${RED}❌ Server process not running (PID: $pid)${NC}"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  No PID file found${NC}"
+    fi
+    
+    # בדיקת פורט
+    if lsof -i:8080 > /dev/null 2>&1; then
+        echo -e "${GREEN}✅ Port 8080 is active${NC}"
+    else
+        echo -e "${RED}❌ Port 8080 is not active${NC}"
+    fi
+    
+    # בדיקת תגובת השרת
+    if curl -s http://127.0.0.1:8080/api/health > /dev/null 2>&1; then
+        echo -e "${GREEN}✅ Server responding to health check${NC}"
+        
+        # בדיקת זיכרון
+        local memory_info=$(curl -s http://127.0.0.1:8080/api/memory-status 2>/dev/null || echo "{}")
+        echo -e "${BLUE}📊 Memory status available${NC}"
+    else
+        echo -e "${RED}❌ Server not responding to health check${NC}"
+    fi
+    
+    # בדיקת לוגים
+    if [ -f "logs/optimized_server.log" ]; then
+        echo -e "${BLUE}📝 Log file: logs/optimized_server.log${NC}"
+        echo -e "${YELLOW}Last 5 log lines:${NC}"
+        tail -5 logs/optimized_server.log
     fi
 }
 
-# Function to stop server
+# פונקציה לניטור בזמן אמת
+monitor_server() {
+    echo -e "${BLUE}📊 Real-time Server Monitor${NC}"
+    echo -e "${BLUE}========================${NC}"
+    echo -e "${YELLOW}Press Ctrl+C to stop monitoring${NC}"
+    echo ""
+    
+    while true; do
+        local timestamp=$(date '+%H:%M:%S')
+        
+        # בדיקת זיכרון
+        local memory_usage=$(ps aux | grep -E "(python|flask|dev_server)" | grep -v grep | awk '{sum+=$6} END {print sum/1024}')
+        local cpu_usage=$(ps aux | grep -E "(python|flask|dev_server)" | grep -v grep | awk '{sum+=$3} END {print sum}')
+        
+        # בדיקת תגובת השרת
+        local response_time=$(curl -s -o /dev/null -w "%{time_total}" http://127.0.0.1:8080/api/health 2>/dev/null || echo "N/A")
+        
+        # הצגת מידע
+        printf "${BLUE}[%s]${NC} Memory: ${GREEN}%.1fMB${NC}, CPU: ${YELLOW}%.1f%%${NC}, Response: ${GREEN}%ss${NC}\n" \
+               "$timestamp" "${memory_usage:-0}" "${cpu_usage:-0}" "${response_time:-N/A}"
+        
+        sleep 5
+    done
+}
+
+# פונקציה לבדיקת ביצועים מהירה
+quick_test() {
+    echo -e "${BLUE}⚡ Quick Performance Test${NC}"
+    echo -e "${BLUE}======================${NC}"
+    
+    # בדיקת זיכרון התחלתי
+    local initial_memory=$(ps aux | grep -E "(python|flask|dev_server)" | grep -v grep | awk '{sum+=$6} END {print sum/1024}')
+    echo -e "${YELLOW}Initial memory usage: ${initial_memory:-0}MB${NC}"
+    
+    # בדיקת 10 בקשות מהירות
+    echo -e "${YELLOW}Testing 10 quick requests...${NC}"
+    local total_time=0
+    local success_count=0
+    
+    for i in {1..10}; do
+        local start_time=$(date +%s.%N)
+        if curl -s http://127.0.0.1:8080/api/health > /dev/null 2>&1; then
+            local end_time=$(date +%s.%N)
+            local request_time=$(echo "$end_time - $start_time" | bc 2>/dev/null || echo "0")
+            total_time=$(echo "$total_time + $request_time" | bc 2>/dev/null || echo "$total_time")
+            success_count=$((success_count + 1))
+            echo -n "."
+        else
+            echo -n "x"
+        fi
+    done
+    
+    echo ""
+    
+    # בדיקת זיכרון סופי
+    local final_memory=$(ps aux | grep -E "(python|flask|dev_server)" | grep -v grep | awk '{sum+=$6} END {print sum/1024}')
+    local memory_increase=$(echo "$final_memory - $initial_memory" | bc 2>/dev/null || echo "0")
+    local avg_response_time=$(echo "scale=4; $total_time / $success_count" | bc 2>/dev/null || echo "N/A")
+    
+    echo -e "${GREEN}✅ Quick test completed!${NC}"
+    echo -e "${BLUE}📊 Results:${NC}"
+    echo -e "  Success rate: ${success_count}/10"
+    echo -e "  Average response time: ${avg_response_time}s"
+    echo -e "  Memory increase: ${memory_increase}MB"
+    echo -e "  Final memory usage: ${final_memory}MB"
+}
+
+# פונקציה לעצירת השרת
 stop_server() {
-    print_info "Stopping TikTrack Optimized Server..."
+    echo -e "${YELLOW}🛑 Stopping optimized server...${NC}"
     
-    # Stop memory monitoring
-    stop_memory_monitor
+    if [ -f ".optimized_server.pid" ]; then
+        local pid=$(cat .optimized_server.pid)
+        if ps -p "$pid" > /dev/null 2>&1; then
+            echo -e "${YELLOW}Stopping process $pid...${NC}"
+            kill -TERM "$pid"
+            sleep 2
+            
+            if ps -p "$pid" > /dev/null 2>&1; then
+                echo -e "${YELLOW}Force killing process $pid...${NC}"
+                kill -KILL "$pid"
+            fi
+        else
+            echo -e "${YELLOW}Process $pid not found${NC}"
+        fi
+        rm -f .optimized_server.pid
+    else
+        echo -e "${YELLOW}No PID file found${NC}"
+    fi
     
-    # Stop server
-    pkill -f "dev_server_optimized.py" 2>/dev/null || true
+    # עצירת תהליכים נוספים
+    stop_existing_servers
     
-    # Remove PID files
-    rm -f /tmp/tiktrack_optimized_server.pid
-    rm -f /tmp/tiktrack_memory_monitor.pid
-    
-    print_status "Server stopped"
+    echo -e "${GREEN}✅ Server stopped${NC}"
 }
 
 # Main script logic
-case "${1:-start}" in
-    "start")
-        echo "🚀 TikTrack Optimized Server Startup Script"
-        echo "=========================================="
-        echo "📅 Started at: $(date)"
-        echo "🎯 Mode: optimized for laptops"
-        echo ""
-        
-        check_resources
-        install_packages
-        start_server
-        start_memory_monitor
-        
-        echo ""
-        echo "🎉 Optimized server started successfully!"
-        echo "🌐 Access your application at: http://$HOST:$PORT"
-        echo "📊 Monitor memory at: http://$HOST:$PORT/api/memory-status"
-        echo ""
-        echo "💡 Tips for optimal performance:"
-        echo "   - Close unnecessary browser tabs"
-        echo "   - Avoid running multiple development servers"
-        echo "   - Monitor memory usage regularly"
-        echo "   - Use './start_optimized.sh status' to check server health"
+case "${1:-help}" in
+    start)
+        check_dependencies
+        stop_existing_servers
+        start_optimized_server
         ;;
-    
-    "stop")
+    stop)
         stop_server
         ;;
-    
-    "restart")
+    restart)
         stop_server
         sleep 2
-        $0 start
+        check_dependencies
+        start_optimized_server
         ;;
-    
-    "status")
-        show_status
+    status)
+        check_server_status
         ;;
-    
-    "monitor")
-        start_memory_monitor
+    monitor)
+        monitor_server
         ;;
-    
-    "clean")
-        clean_memory
+    test)
+        quick_test
         ;;
-    
-    "logs")
-        if [ -f "$LOG_FILE" ]; then
-            tail -f "$LOG_FILE"
-        else
-            print_error "Log file not found: $LOG_FILE"
-        fi
-        ;;
-    
-    "errors")
-        if [ -f "$ERROR_LOG" ]; then
-            tail -f "$ERROR_LOG"
-        else
-            print_error "Error log not found: $ERROR_LOG"
-        fi
-        ;;
-    
-    "memory")
-        if [ -f "$MEMORY_LOG" ]; then
-            tail -20 "$MEMORY_LOG"
-        else
-            print_error "Memory log not found: $MEMORY_LOG"
-        fi
-        ;;
-    
-    *)
-        echo "Usage: $0 {start|stop|restart|status|monitor|clean|logs|errors|memory}"
-        echo ""
-        echo "Commands:"
-        echo "  start    - Start optimized server (default)"
-        echo "  stop     - Stop server"
-        echo "  restart  - Restart server"
-        echo "  status   - Show server status"
-        echo "  monitor  - Start memory monitoring"
-        echo "  clean    - Clean memory and cache"
-        echo "  logs     - Show server logs"
-        echo "  errors   - Show error logs"
-        echo "  memory   - Show memory usage log"
-        exit 1
+    help|*)
+        show_help
         ;;
 esac
 

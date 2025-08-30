@@ -11,10 +11,13 @@ class TradePlan(BaseModel):
     investment_type = Column(String(20), default='swing', nullable=False)  # NOT NULL per constraints
     side = Column(String(10), default='Long', nullable=False)  # NOT NULL per constraints
     status = Column(String(20), default='open', nullable=False)  # NOT NULL per constraints
-    planned_amount = Column(Float, default=1, nullable=True)  # Default 1 per constraints
+    planned_amount = Column(Float, default=1000, nullable=False)  # NOT NULL, default 1000 per constraints
     entry_conditions = Column(String(500), nullable=True)
-    stop_price = Column(Float, nullable=True)
-    target_price = Column(Float, nullable=True)
+    stop_price = Column(Float, default=0.1, nullable=True)
+    target_price = Column(Float, default=2000, nullable=True)
+    stop_percentage = Column(Float, default=0.1, nullable=True)  # Percentage for stop calculation
+    target_percentage = Column(Float, default=2000, nullable=True)  # Percentage for target calculation
+    current_price = Column(Float, default=0, nullable=True)  # Current price for calculations
     reasons = Column(String(500), nullable=True)
     cancelled_at = Column(DateTime, nullable=True)
     cancel_reason = Column(String(500), nullable=True)

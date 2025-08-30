@@ -1,0 +1,78 @@
+1|trades|investment_type|ENUM|valid_investment_type|investment_type IN (swing, investment, passive)|1|2025-08-23 00:57:31|2025-08-23 00:57:31
+2|trades|status|ENUM|valid_trade_status|status IN (open, closed, cancelled)|1|2025-08-23 00:57:31|2025-08-23 00:57:31
+3|trades|side|ENUM|valid_trade_side|side IN (Long, Short)|1|2025-08-23 00:57:31|2025-08-23 00:57:31
+4|trades|account_id|NOT_NULL|account_required|account_id IS NOT NULL|1|2025-08-23 00:57:31|2025-08-23 00:57:31
+5|trades|ticker_id|NOT_NULL|ticker_required|ticker_id IS NOT NULL|1|2025-08-23 00:57:31|2025-08-23 00:57:31
+6|trade_plans|investment_type|ENUM|valid_plan_investment_type|investment_type IN (swing, investment, passive)|1|2025-08-23 00:57:31|2025-08-23 00:57:31
+7|trade_plans|side|ENUM|valid_plan_side|side IN (Long, Short)|1|2025-08-23 00:57:31|2025-08-23 00:57:31
+8|trade_plans|planned_amount|RANGE|positive_planned_amount|planned_amount > 0|1|2025-08-23 00:57:31|2025-08-23 00:57:31
+9|trade_plans|target_price|RANGE|positive_target_price|target_price > 0|1|2025-08-23 00:57:31|2025-08-23 00:57:31
+10|trade_plans|stop_price|RANGE|positive_stop_price|stop_price > 0|1|2025-08-23 00:57:31|2025-08-23 00:57:31
+11|alerts|is_triggered|ENUM|valid_alert_triggered|is_triggered IN (new, true, false)|0|2025-08-23 00:57:31|2025-08-23 15:00:15
+14|accounts|status|ENUM|valid_account_status|status IN (open, closed, cancelled)|0|2025-08-23 00:57:31|2025-08-23 13:20:40
+15|trade_plans|ticker_id|NOT_NULL|ticker_required_for_plans|ticker_id IS NOT NULL|1|2025-08-23 03:14:01|2025-08-23 03:14:01
+16|trade_plans|cancelled_at|CHECK|cancelled_after_created|cancelled_at IS NULL OR cancelled_at > created_at|1|2025-08-23 03:14:06|2025-08-23 03:14:06
+17|trade_plans|created_at|NOT_NULL|created_at_required|created_at IS NOT NULL|1|2025-08-23 03:14:11|2025-08-23 03:14:11
+18|trade_plans|status|ENUM|valid_plan_status|status IN (open, closed, cancelled)|1|2025-08-23 03:14:23|2025-08-23 03:14:23
+19|trades|trade_plan_id|NOT_NULL|trade_plan_required_for_trades|trade_plan_id IS NOT NULL|1|2025-08-23 13:11:12|2025-08-23 13:11:12
+20|trades|opened_at|CHECK|opened_at_required_for_open_trades|(status = "open" AND opened_at IS NOT NULL) OR (status != "open")|1|2025-08-23 13:13:28|2025-08-23 13:13:28
+21|trades|closed_at|CHECK|closed_at_required_for_closed_trades|(status = "closed" AND closed_at IS NOT NULL) OR (status != "closed")|0|2025-08-23 13:13:31|2025-08-23 13:14:30
+22|trades|closed_at|CHECK|closed_at_after_opened_at|closed_at IS NULL OR closed_at > opened_at|1|2025-08-23 13:13:36|2025-08-23 13:13:36
+23|accounts|id|NOT_NULL|account_id_required|id IS NOT NULL|1|2025-08-23 13:17:38|2025-08-23 13:17:38
+24|accounts|name|CHECK|account_name_min_length|LENGTH(name) >= 3|1|2025-08-23 13:17:43|2025-08-23 13:17:43
+25|accounts|name|NOT_NULL|account_name_required|name IS NOT NULL|1|2025-08-23 13:17:48|2025-08-23 13:17:48
+26|accounts|currency_id|NOT_NULL|account_currency_required|currency_id IS NOT NULL|1|2025-08-23 13:17:53|2025-08-23 13:17:53
+27|accounts|created_at|NOT_NULL|account_created_at_required|created_at IS NOT NULL|1|2025-08-23 13:17:58|2025-08-23 13:17:58
+28|accounts|status|ENUM|valid_account_status|status IN (active, inactive, suspended)|0|2025-08-23 13:20:46|2025-08-23 13:21:26
+29|accounts|status|ENUM|valid_account_status|status IN (open, closed, cancelled)|1|2025-08-23 13:21:32|2025-08-23 13:21:32
+30|tickers|id|NOT_NULL|ticker_id_required|id IS NOT NULL|1|2025-08-23 13:28:08|2025-08-23 13:28:08
+31|tickers|symbol|NOT_NULL|ticker_symbol_required|symbol IS NOT NULL|1|2025-08-23 13:28:14|2025-08-23 13:28:14
+32|tickers|name|CHECK|ticker_name_max_length|LENGTH(name) <= 100|1|2025-08-23 13:28:19|2025-08-23 13:28:19
+34|tickers|active_trades|CHECK|active_trades_boolean|active_trades IN (0, 1) OR active_trades IS NULL|1|2025-08-23 13:28:31|2025-08-23 13:28:31
+35|tickers|created_at|NOT_NULL|ticker_created_at_required|created_at IS NOT NULL|1|2025-08-23 13:28:36|2025-08-23 13:28:36
+36|tickers|updated_at|CHECK|updated_at_not_future|updated_at IS NULL OR updated_at <= datetime("now")|1|2025-08-23 13:28:42|2025-08-23 13:28:42
+37|executions|id|NOT_NULL|execution_id_required|id IS NOT NULL|1|2025-08-23 14:38:58|2025-08-23 14:38:58
+38|executions|trade_id|CHECK|trade_id_valid|trade_id >= 0|1|2025-08-23 14:39:04|2025-08-23 14:39:04
+39|executions|action|ENUM|valid_execution_action|action IN (buy, sale)|1|2025-08-23 14:39:10|2025-08-23 14:39:10
+40|executions|date|NOT_NULL|execution_date_required|date IS NOT NULL|1|2025-08-23 14:39:15|2025-08-23 14:39:15
+41|executions|quantity|CHECK|quantity_positive|quantity > 0|1|2025-08-23 14:39:22|2025-08-23 14:39:22
+42|executions|price|CHECK|price_positive|price > 0|1|2025-08-23 14:39:32|2025-08-23 14:39:32
+43|executions|created_at|NOT_NULL|execution_created_at_required|created_at IS NOT NULL|1|2025-08-23 14:39:38|2025-08-23 14:39:38
+44|cash_flows|id|NOT_NULL|cash_flow_id_required|id IS NOT NULL|1|2025-08-23 14:49:11|2025-08-23 14:49:11
+45|cash_flows|account_id|NOT_NULL|cash_flow_account_required|account_id IS NOT NULL|1|2025-08-23 14:49:17|2025-08-23 14:49:17
+46|cash_flows|type|ENUM|valid_cash_flow_type|type IN (deposit, withdrawal, dividend, tax, other)|1|2025-08-23 14:49:24|2025-08-23 14:49:24
+47|cash_flows|amount|NOT_NULL|cash_flow_amount_required|amount IS NOT NULL|1|2025-08-23 14:49:30|2025-08-23 14:49:30
+48|cash_flows|date|NOT_NULL|cash_flow_date_required|date IS NOT NULL|1|2025-08-23 14:49:35|2025-08-23 14:49:35
+49|cash_flows|created_at|NOT_NULL|cash_flow_created_at_required|created_at IS NOT NULL|1|2025-08-23 14:49:42|2025-08-23 14:49:42
+50|cash_flows|currency|NOT_NULL|cash_flow_currency_required|currency IS NOT NULL|1|2025-08-23 14:49:48|2025-08-23 14:49:48
+51|cash_flows|currency_id|NOT_NULL|cash_flow_currency_id_required|currency_id IS NOT NULL|1|2025-08-23 14:49:54|2025-08-23 14:49:54
+52|cash_flows|source|ENUM|valid_cash_flow_source|source IN (manual, IBKR-tradelog-csv, IBKR-api)|1|2025-08-23 14:50:01|2025-08-23 14:50:01
+53|cash_flows|external_id|CHECK|external_id_required_for_non_manual|(source != "manual" AND external_id IS NOT NULL) OR source = "manual"|1|2025-08-23 14:50:06|2025-08-23 14:50:06
+54|alerts|id|NOT_NULL|alert_id_required|id IS NOT NULL|1|2025-08-23 15:00:21|2025-08-23 15:00:21
+58|alerts|status|ENUM|valid_alert_status|status IN (open, closed, cancelled)|1|2025-08-23 15:00:49|2025-08-23 15:00:49
+59|alerts|is_triggered|ENUM|valid_alert_triggered|is_triggered IN (new, true, false)|1|2025-08-23 15:00:59|2025-08-23 15:00:59
+60|alerts|related_type_id|NOT_NULL|alert_related_type_required|related_type_id IS NOT NULL|1|2025-08-23 15:01:05|2025-08-23 15:01:05
+61|alerts|related_id|NOT_NULL|alert_related_id_required|related_id IS NOT NULL|1|2025-08-23 15:01:11|2025-08-23 15:01:11
+62|notes|id|NOT_NULL|note_id_required|id IS NOT NULL|1|2025-08-23 15:15:20|2025-08-23 15:15:20
+63|notes|content|CHECK|note_content_min_length|LENGTH(content) >= 1|1|2025-08-23 15:15:24|2025-08-23 15:15:24
+64|notes|related_id|CHECK|note_related_id_positive|related_id > 0|1|2025-08-23 15:15:28|2025-08-23 15:15:28
+65|notes|created_at|CHECK|note_created_at_not_future|created_at IS NULL OR created_at <= datetime("now")|1|2025-08-23 15:15:34|2025-08-23 15:15:34
+66|notes|related_type_id|FOREIGN_KEY|note_related_type_fk|FOREIGN KEY (related_type_id) REFERENCES note_relation_types(id)|1|2025-08-23 15:16:34|2025-08-23 15:16:34
+67|currencies|symbol|CHECK|currency_symbol_format|LENGTH(symbol) = 3 AND symbol = UPPER(symbol) AND symbol GLOB "[A-Z][A-Z][A-Z]"|1|2025-08-23 15:19:29|2025-08-23 15:19:29
+68|currencies|name|CHECK|currency_name_length|LENGTH(name) <= 25|1|2025-08-23 15:19:34|2025-08-23 15:19:34
+69|currencies|usd_rate|CHECK|currency_usd_rate_positive|usd_rate > 0|1|2025-08-23 15:19:38|2025-08-23 15:19:38
+70|currencies|created_at|CHECK|currency_created_at_not_future|created_at IS NULL OR created_at <= datetime("now")|1|2025-08-23 15:19:43|2025-08-23 15:19:43
+71|currencies|symbol|UNIQUE|currency_symbol_unique|UNIQUE(symbol)|1|2025-08-23 15:19:48|2025-08-23 15:19:48
+72|currencies|name|UNIQUE|currency_name_unique|UNIQUE(name)|1|2025-08-23 15:19:52|2025-08-23 15:19:52
+73|accounts|name|UNIQUE|account_name_unique|UNIQUE(name)|1|2025-08-23 15:20:22|2025-08-23 15:20:22
+74|note_relation_types|note_relation_type|CHECK|note_relation_type_length|LENGTH(note_relation_type) <= 20|1|2025-08-23 15:22:52|2025-08-23 15:22:52
+75|note_relation_types|created_at|CHECK|note_relation_created_at_not_future|created_at IS NULL OR created_at <= datetime("now")|1|2025-08-23 15:22:58|2025-08-23 15:22:58
+76|note_relation_types|note_relation_type|UNIQUE|note_relation_type_unique|UNIQUE(note_relation_type)|1|2025-08-23 15:23:05|2025-08-23 15:23:05
+77|note_relation_types|note_relation_type|ENUM|valid_note_relation_types|note_relation_type IN (account, trade, trade_plan, ticker)|1|2025-08-23 15:23:11|2025-08-23 15:23:11
+78|accounts|currency_id|FOREIGN_KEY|account_currency_fk|FOREIGN KEY (currency_id) REFERENCES currencies(id)|1|2025-08-23 15:42:15|2025-08-23 15:42:15
+79|alerts|related_type_id|FOREIGN_KEY|alert_related_type_fk|FOREIGN KEY (related_type_id) REFERENCES note_relation_types(id)|1|2025-08-23 15:42:33|2025-08-23 15:42:33
+80|tickers|type|ENUM|ticker_type_enum|type IN ("stock", "etf", "bond", "crypto", "forex", "commodity", "other")|1|2025-08-29 20:51:35|2025-08-29 20:51:35
+81|tickers|status|ENUM|ticker_status_enum|status IN ("open", "closed", "cancelled")|1|2025-08-29 20:51:39|2025-08-29 20:51:39
+82|tickers|currency_id|FOREIGN_KEY|ticker_currency_fk|currency_id REFERENCES currencies(id)|1|2025-08-29 20:51:44|2025-08-29 20:51:44
+83|tickers|active_trades|CHECK|active_trades_consistency|(active_trades = 1 AND EXISTS (SELECT 1 FROM trades WHERE trades.ticker_id = tickers.id AND trades.status = "open")) OR (active_trades = 0 AND NOT EXISTS (SELECT 1 FROM trades WHERE trades.ticker_id = tickers.id AND trades.status = "open")) OR active_trades IS NULL|1|2025-08-29 20:55:33|2025-08-29 20:55:33
+84|tickers|status|CHECK|ticker_status_auto_update|(status = "cancelled") OR (status = "open" AND (EXISTS (SELECT 1 FROM trades WHERE trades.ticker_id = tickers.id AND trades.status = "open") OR EXISTS (SELECT 1 FROM trade_plans WHERE trade_plans.ticker_id = tickers.id AND trade_plans.status = "open"))) OR (status = "closed" AND NOT EXISTS (SELECT 1 FROM trades WHERE trades.ticker_id = tickers.id AND trades.status = "open") AND NOT EXISTS (SELECT 1 FROM trade_plans WHERE trade_plans.ticker_id = tickers.id AND trade_plans.status = "open"))|1|2025-08-29 21:05:27|2025-08-29 21:05:27

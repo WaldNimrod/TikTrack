@@ -9,6 +9,7 @@ from .note import Note
 from .note_relation_type import NoteRelationType
 from .execution import Execution
 from .currency import Currency
+from .user import User
 
 __all__ = [
     'BaseModel',
@@ -21,5 +22,6 @@ __all__ = [
     'Note',
     'NoteRelationType',
     'Execution',
-    'Currency'
+    'Currency',
+    'User'
 ]

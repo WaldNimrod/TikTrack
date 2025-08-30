@@ -65,21 +65,19 @@ const TABLE_COLUMN_MAPPINGS = {
         'created_at'             // 13 - Created At
     ],
 
-    // טבלת טריידים (Trades) - Database Display Page Structure
+    // טבלת טריידים (Trades) - Trades Page Structure (11 columns)
     'trades': [
-        'id',                    // 0 - ID
-        'account_id',            // 1 - Account ID
-        'ticker_id',             // 2 - Ticker ID
-        'trade_plan_id',         // 3 - Trade Plan ID
-        'status',                // 4 - Status
-        'investment_type',       // 5 - Investment Type
-        'side',                  // 6 - Side
-        'closed_at',             // 7 - Closed At
-        'cancelled_at',          // 8 - Cancelled At
-        'cancel_reason',         // 9 - Cancel Reason
-        'total_pl',              // 10 - Total P&L
-        'notes',                 // 11 - Notes
-        'created_at'             // 12 - Created At
+        'ticker_symbol',         // 0 - טיקר
+        'status',                // 1 - סטטוס
+        'investment_type',       // 2 - סוג
+        'side',                  // 3 - צד
+        'trade_plan_id',         // 4 - תוכנית
+        'total_pl',              // 5 - רווח/הפסד
+        'created_at',            // 6 - נוצר ב
+        'closed_at',             // 7 - נסגר ב
+        'account_name',          // 8 - חשבון
+        'notes',                 // 9 - הערות
+        'actions'                // 10 - פעולות
     ],
 
     // טבלת חשבונות (Accounts) - Database Display Page Structure

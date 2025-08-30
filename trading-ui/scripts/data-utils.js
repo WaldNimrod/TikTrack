@@ -260,6 +260,100 @@ function filterDataBySearch(data, searchTerm, searchFields = []) {
   });
 }
 
+// ===== Validation Functions =====
+
+/**
+ * אימות שדה חובה
+ * Validate required field
+ */
+function validateRequired(value, fieldName) {
+    if (!value || value.trim() === '') {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', `שדה ${fieldName} הוא שדה חובה`);
+        } else {
+            console.error(`שדה ${fieldName} הוא שדה חובה`);
+        }
+        return false;
+    }
+    return true;
+}
+
+/**
+ * אימות מספר
+ * Validate number
+ */
+function validateNumber(value, fieldName, min = null, max = null) {
+    const num = parseFloat(value);
+    if (isNaN(num)) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות מספר`);
+        } else {
+            console.error(`שדה ${fieldName} חייב להיות מספר`);
+        }
+        return false;
+    }
+
+    if (min !== null && num < min) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות לפחות ${min}`);
+        } else {
+            console.error(`שדה ${fieldName} חייב להיות לפחות ${min}`);
+        }
+        return false;
+    }
+
+    if (max !== null && num > max) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות לכל היותר ${max}`);
+        } else {
+            console.error(`שדה ${fieldName} חייב להיות לכל היותר ${max}`);
+        }
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * אימות תאריך
+ * Validate date
+ */
+function validateDate(value, fieldName) {
+    const date = new Date(value);
+    if (isNaN(date.getTime())) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות תאריך תקין`);
+        } else {
+            console.error(`שדה ${fieldName} חייב להיות תאריך תקין`);
+        }
+        return false;
+    }
+    return true;
+}
+
+// ===== Price Calculation Functions =====
+
+/**
+ * Calculate default stop and target prices
+ * @param {number} currentPrice - Current price
+ * @param {object} options - Additional options
+ * @returns {object} Stop and target prices
+ */
+function calculateDefaultPrices(currentPrice, options = {}) {
+    const {
+        defaultStopPercent = 5,
+        defaultTargetPercent = 10
+    } = options;
+
+    const stopPrice = currentPrice * (1 - defaultStopPercent / 100);
+    const targetPrice = currentPrice * (1 + defaultTargetPercent / 100);
+
+    return {
+        stopPrice: parseFloat(stopPrice.toFixed(2)),
+        targetPrice: parseFloat(targetPrice.toFixed(2))
+    };
+}
+
 // ===== Export Functions =====
 
 // Make functions globally available
@@ -267,12 +361,19 @@ window.loadCurrenciesFromServer = loadCurrenciesFromServer;
 window.getCurrencyDisplay = getCurrencyDisplay;
 window.generateCurrencyOptions = generateCurrencyOptions;
 window.apiCall = apiCall;
+window.calculateDefaultPrices = calculateDefaultPrices;
 window.loadDataFromAPI = loadDataFromAPI;
 window.validateDataStructure = validateDataStructure;
 window.filterDataBySearch = filterDataBySearch;
+window.validateRequired = validateRequired;
+window.validateNumber = validateNumber;
+window.validateDate = validateDate;
 
 // Export module
 window.dataUtils = {
+    validateRequired,
+    validateNumber,
+    validateDate,
     loadCurrenciesFromServer,
     getCurrencyDisplay,
     generateCurrencyOptions,

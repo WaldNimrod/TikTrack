@@ -1,41 +1,51 @@
 """
-Simple Preferences API
-API פשוט לניהול העדפות
+User Preferences API - TikTrack
+
+This module provides API endpoints for managing user preferences.
+Supports multi-user system with fallback to default user.
+
+Author: TikTrack Development Team
+Version: 1.0
+Date: August 2025
 """
 
 import json
 import os
 from flask import Blueprint, request, jsonify
 from pathlib import Path
+from sqlalchemy.orm import Session
+from models.database import get_db
+from services.user_service import UserService
 
-# יצירת blueprint
+# Create blueprint
 preferences_bp = Blueprint('preferences', __name__)
 
-# נתיב לקובץ ההעדפות
+# Path to preferences file (for backward compatibility)
 PREFERENCES_FILE = Path(__file__).parent.parent.parent.parent / 'trading-ui' / 'config' / 'preferences.json'
 
-# ברירות מחדל
+# Default preferences
 DEFAULT_PREFERENCES = {
     "primaryCurrency": "USD",
     "timezone": "Asia/Jerusalem", 
     "defaultStopLoss": 5,
     "defaultTargetPrice": 10,
     "defaultCommission": 1.0,
-    "defaultStatusFilter": "all",
-    "defaultTypeFilter": "all",
+    "defaultStatusFilter": "open",
+    "defaultTypeFilter": "swing",
     "defaultAccountFilter": "all",
-    "defaultDateRangeFilter": "all",
-    "defaultSearchFilter": ""
+    "defaultDateRangeFilter": "this_week",
+    "defaultSearchFilter": "",
+    "consoleCleanupInterval": 60000
 }
 
 def load_preferences_file():
-    """טוען את קובץ ההעדפות"""
+    """Load preferences file (for backward compatibility)"""
     try:
         if PREFERENCES_FILE.exists():
             with open(PREFERENCES_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
         else:
-            # יצירת קובץ חדש עם ברירות מחדל
+            # Create new file with defaults
             default_data = {
                 "defaults": DEFAULT_PREFERENCES,
                 "users": {
@@ -45,7 +55,7 @@ def load_preferences_file():
             save_preferences_file(default_data)
             return default_data
     except Exception as e:
-        print(f"❌ שגיאה בטעינת קובץ העדפות: {e}")
+        print(f"❌ Error loading preferences file: {e}")
         return {
             "defaults": DEFAULT_PREFERENCES,
             "users": {
@@ -54,86 +64,104 @@ def load_preferences_file():
         }
 
 def save_preferences_file(data):
-    """שומר את קובץ ההעדפות"""
+    """Save preferences file (for backward compatibility)"""
     try:
-        # וודא שהתיקייה קיימת
+        # Ensure directory exists
         PREFERENCES_FILE.parent.mkdir(parents=True, exist_ok=True)
         
         with open(PREFERENCES_FILE, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         return True
     except Exception as e:
-        print(f"❌ שגיאה בשמירת קובץ העדפות: {e}")
+        print(f"❌ Error saving preferences file: {e}")
         return False
+
+def get_user_id_from_request() -> int:
+    """Get user ID from request, default to default user"""
+    try:
+        # In the future, this will get user ID from session/token
+        # For now, always return default user ID
+        return UserService.get_current_user_id()
+    except Exception as e:
+        print(f"❌ Error getting user ID from request: {e}")
+        return UserService.DEFAULT_USER_ID
 
 @preferences_bp.route('/api/v1/preferences/', methods=['GET'])
 def get_preferences():
-    """מחזיר את כל ההעדפות"""
+    """Get user preferences with fallback to default user"""
     try:
-        data = load_preferences_file()
-        user_preferences = data.get('users', {}).get('nimrod', data.get('defaults', DEFAULT_PREFERENCES))
-        return jsonify(user_preferences)
+        db: Session = next(get_db())
+        user_id = get_user_id_from_request()
+        
+        # Get preferences from database
+        preferences = UserService.get_user_preferences(db, user_id)
+        
+        return jsonify(preferences)
     except Exception as e:
-        print(f"❌ שגיאה בקבלת העדפות: {e}")
+        print(f"❌ Error getting preferences: {e}")
         return jsonify(DEFAULT_PREFERENCES)
 
 @preferences_bp.route('/api/v1/preferences/', methods=['POST'])
 def save_all_preferences():
-    """שומר את כל ההעדפות"""
+    """Save all user preferences with fallback to default user"""
     try:
-        data = load_preferences_file()
+        db: Session = next(get_db())
+        user_id = get_user_id_from_request()
         new_preferences = request.json.get('preferences', {})
         
-        # עדכן העדפות משתמש
-        if 'users' not in data:
-            data['users'] = {}
-        data['users']['nimrod'] = new_preferences
+        # Save preferences to database
+        success = UserService.set_user_preferences(db, new_preferences, user_id)
         
-        if save_preferences_file(data):
-            return jsonify({"success": True, "message": "העדפות נשמרו בהצלחה"})
+        if success:
+            return jsonify({"success": True, "message": "Preferences saved successfully"})
         else:
-            return jsonify({"success": False, "message": "שגיאה בשמירת העדפות"}), 500
+            return jsonify({"success": False, "message": "Error saving preferences"}), 500
     except Exception as e:
-        print(f"❌ שגיאה בשמירת העדפות: {e}")
-        return jsonify({"success": False, "message": "שגיאה בשמירת העדפות"}), 500
+        print(f"❌ Error saving preferences: {e}")
+        return jsonify({"success": False, "message": "Error saving preferences"}), 500
 
 @preferences_bp.route('/api/v1/preferences/<key>', methods=['PUT'])
 def update_preference(key):
-    """מעדכן העדפה אחת"""
+    """Update single preference with fallback to default user"""
     try:
-        data = load_preferences_file()
+        db: Session = next(get_db())
+        user_id = get_user_id_from_request()
         value = request.json.get('value')
         
         if value is None:
-            return jsonify({"success": False, "message": "ערך חסר"}), 400
+            return jsonify({"success": False, "message": "Value is missing"}), 400
         
-        # עדכן העדפה
-        if 'users' not in data:
-            data['users'] = {}
-        if 'nimrod' not in data['users']:
-            data['users']['nimrod'] = {}
+        # Get current preferences
+        current_preferences = UserService.get_user_preferences(db, user_id)
         
-        data['users']['nimrod'][key] = value
+        # Update specific preference
+        current_preferences[key] = value
         
-        if save_preferences_file(data):
-            return jsonify({"success": True, "message": f"העדפה {key} נשמרה בהצלחה"})
+        # Save updated preferences
+        success = UserService.set_user_preferences(db, current_preferences, user_id)
+        
+        if success:
+            return jsonify({"success": True, "message": f"Preference {key} saved successfully"})
         else:
-            return jsonify({"success": False, "message": "שגיאה בשמירת העדפה"}), 500
+            return jsonify({"success": False, "message": "Error saving preference"}), 500
     except Exception as e:
-        print(f"❌ שגיאה בעדכון העדפה {key}: {e}")
-        return jsonify({"success": False, "message": "שגיאה בעדכון העדפה"}), 500
+        print(f"❌ Error updating preference {key}: {e}")
+        return jsonify({"success": False, "message": "Error updating preference"}), 500
 
 @preferences_bp.route('/api/v1/preferences/reset', methods=['POST'])
 def reset_preferences():
-    """מאפס העדפות לברירות מחדל"""
+    """Reset preferences to defaults with fallback to default user"""
     try:
-        data = load_preferences_file()
-        data['users']['nimrod'] = DEFAULT_PREFERENCES.copy()
+        db: Session = next(get_db())
+        user_id = get_user_id_from_request()
         
-        if save_preferences_file(data):
-            return jsonify({"success": True, "message": "העדפות אופסו לברירות מחדל"})
+        # Reset to default preferences
+        success = UserService.set_user_preferences(db, DEFAULT_PREFERENCES, user_id)
+        
+        if success:
+            return jsonify({"success": True, "message": "Preferences reset to defaults"})
         else:
-            return jsonify({"success": False, "message": "שגיאה באיפוס העדפות"}), 500
+            return jsonify({"success": False, "message": "Error resetting preferences"}), 500
     except Exception as e:
-        print(f"❌ שגיאה באיפוס העדפות: {e}")
-        return jsonify({"success": False, "message": "שגיאה באיפוס העדפות"}), 500
+        print(f"❌ Error resetting preferences: {e}")
+        return jsonify({"success": False, "message": "Error resetting preferences"}), 500

@@ -61,9 +61,9 @@ function createEditButton(onClick) {
   return `<button class="btn btn-sm btn-secondary" onclick="${onClick}" title="ערוך">✏️</button>`;
 }
 
-// פונקציה ליצירת כפתור מחיקה
+// פונקציה ליצירת כפתור מחיקה - משתמשת בפונקציה הגלובלית
 function createDeleteButton(onClick) {
-  return `<button class="btn btn-sm btn-danger" onclick="${onClick}" title="מחק">🗑️</button>`;
+  return window.createDeleteButton ? window.createDeleteButton(onClick) : `<button class="btn btn-sm btn-danger" onclick="${onClick}" title="מחק">🗑️</button>`;
 }
 
 // ===== מנגנון ניהול סקשנים חדש =====
@@ -350,10 +350,17 @@ function updateTable(tableType, data) {
 
     // הוספת עמודת פעולות
     const actionsCell = document.createElement('td');
-    actionsCell.innerHTML = `
+    let actionsHtml = `
       ${createEditButton(`editRecord('${tableType}', ${item.id})`)}
       ${createDeleteButton(`deleteRecord('${tableType}', ${item.id})`)}
     `;
+    
+    // הוספת כפתור ביטול לטבלאות עם שדה סטטוס
+    if (item.status && item.status !== 'cancelled' && item.status !== 'closed') {
+      actionsHtml += `<button class="btn btn-sm btn-warning" onclick="cancelRecord('${tableType}', ${item.id})" title="בטל">❌</button>`;
+    }
+    
+    actionsCell.innerHTML = actionsHtml;
     row.appendChild(actionsCell);
 
     tbody.appendChild(row);
@@ -386,6 +393,26 @@ function deleteRecord(tableType, id) {
         if (window.showSuccessNotification) {
           window.showSuccessNotification('מחיקה', 'הרשומה נמחקה בהצלחה');
         }
+      }
+    );
+  }
+}
+
+// פונקציה לביטול רשומה
+function cancelRecord(tableType, id) {
+  console.log(`❌ ביטול רשומה: ${tableType} - ${id}`);
+  if (window.showConfirmationDialog) {
+    window.showConfirmationDialog(
+      'ביטול רשומה',
+      `האם אתה בטוח שברצונך לבטל רשומה זו?`,
+      'ביטול',
+      'חזור',
+      () => {
+        console.log(`✅ ביטול אושר: ${tableType} - ${id}`);
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('ביטול', 'הרשומה בוטלה בהצלחה');
+        }
+        // כאן תהיה קריאה ל-API לביטול הרשומה
       }
     );
   }

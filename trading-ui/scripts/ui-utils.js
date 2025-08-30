@@ -4,9 +4,220 @@
  * פונקציות UI משותפות באמת - רק מה שמשמש הרבה עמודים
  * 
  * File: trading-ui/scripts/ui-utils.js
- * Version: 1.0
- * Last Updated: August 23, 2025
+ * Version: 1.1
+ * Last Updated: August 26, 2025
+ * 
+ * Added: Price calculation functions for trade plans, trades, and tickers
  */
+
+// ===== PRICE CALCULATION FUNCTIONS =====
+// These functions are used across multiple pages (trade plans, trades, tickers)
+
+/**
+ * Calculate stop price based on percentage
+ * @param {number} currentPrice - Current price of the ticker
+ * @param {number} stopPercentage - Stop percentage (e.g., 0.1 for 10%)
+ * @param {string} side - Trade side ('Long' or 'Short')
+ * @returns {number} Calculated stop price
+ */
+function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
+    if (!currentPrice || currentPrice <= 0) {
+        console.warn('Invalid current price for stop calculation:', currentPrice);
+        return 0;
+    }
+    
+    if (!stopPercentage || stopPercentage <= 0) {
+        console.warn('Invalid stop percentage:', stopPercentage);
+        return 0;
+    }
+    
+    const percentage = stopPercentage / 100; // Convert to decimal
+    
+    if (side === 'Long') {
+        // For Long: Stop below current price
+        return currentPrice * (1 - percentage);
+    } else if (side === 'Short') {
+        // For Short: Stop above current price
+        return currentPrice * (1 + percentage);
+    } else {
+        console.warn('Invalid side for stop calculation:', side);
+        return 0;
+    }
+}
+
+/**
+ * Calculate target price based on percentage
+ * @param {number} currentPrice - Current price of the ticker
+ * @param {number} targetPercentage - Target percentage (e.g., 2000 for 2000%)
+ * @param {string} side - Trade side ('Long' or 'Short')
+ * @returns {number} Calculated target price
+ */
+function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
+    if (!currentPrice || currentPrice <= 0) {
+        console.warn('Invalid current price for target calculation:', currentPrice);
+        return 0;
+    }
+    
+    if (!targetPercentage || targetPercentage <= 0) {
+        console.warn('Invalid target percentage:', targetPercentage);
+        return 0;
+    }
+    
+    const percentage = targetPercentage / 100; // Convert to decimal
+    
+    if (side === 'Long') {
+        // For Long: Target above current price
+        return currentPrice * (1 + percentage);
+    } else if (side === 'Short') {
+        // For Short: Target below current price
+        return currentPrice * (1 - percentage);
+    } else {
+        console.warn('Invalid side for target calculation:', side);
+        return 0;
+    }
+}
+
+/**
+ * Calculate percentage from current price to target price
+ * @param {number} currentPrice - Current price
+ * @param {number} targetPrice - Target price
+ * @param {string} side - Trade side ('Long' or 'Short')
+ * @returns {number} Percentage difference
+ */
+function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') {
+    if (!currentPrice || currentPrice <= 0) {
+        console.warn('Invalid current price for percentage calculation:', currentPrice);
+        return 0;
+    }
+    
+    if (!targetPrice || targetPrice <= 0) {
+        console.warn('Invalid target price for percentage calculation:', targetPrice);
+        return 0;
+    }
+    
+    if (side === 'Long') {
+        return ((targetPrice - currentPrice) / currentPrice) * 100;
+    } else if (side === 'Short') {
+        return ((currentPrice - targetPrice) / currentPrice) * 100;
+    } else {
+        console.warn('Invalid side for percentage calculation:', side);
+        return 0;
+    }
+}
+
+/**
+ * Update stop and target prices in form based on current price and percentages
+ * @param {string} formId - ID of the form
+ * @param {number} currentPrice - Current price of the ticker
+ */
+function updatePricesFromPercentages(formId, currentPrice) {
+    const form = document.getElementById(formId);
+    if (!form) {
+        console.error('Form not found:', formId);
+        return;
+    }
+    
+    const sideElement = form.querySelector('[name="side"]');
+    const stopPercentageElement = form.querySelector('[name="stop_percentage"]');
+    const targetPercentageElement = form.querySelector('[name="target_percentage"]');
+    const stopPriceElement = form.querySelector('[name="stop_price"]');
+    const targetPriceElement = form.querySelector('[name="target_price"]');
+    
+    if (!sideElement || !stopPercentageElement || !targetPercentageElement || 
+        !stopPriceElement || !targetPriceElement) {
+        console.error('Required form elements not found');
+        return;
+    }
+    
+    const side = sideElement.value || 'Long';
+    const stopPercentage = parseFloat(stopPercentageElement.value) || 0.1;
+    const targetPercentage = parseFloat(targetPercentageElement.value) || 2000;
+    
+    // Calculate new prices
+    const newStopPrice = calculateStopPrice(currentPrice, stopPercentage, side);
+    const newTargetPrice = calculateTargetPrice(currentPrice, targetPercentage, side);
+    
+    // Update form fields
+    stopPriceElement.value = newStopPrice.toFixed(2);
+    targetPriceElement.value = newTargetPrice.toFixed(2);
+    
+    console.log('🔄 Updated prices from percentages:', {
+        currentPrice,
+        side,
+        stopPercentage,
+        targetPercentage,
+        newStopPrice: newStopPrice.toFixed(2),
+        newTargetPrice: newTargetPrice.toFixed(2)
+    });
+}
+
+/**
+ * Update percentages in form based on current price and target prices
+ * @param {string} formId - ID of the form
+ * @param {number} currentPrice - Current price of the ticker
+ */
+function updatePercentagesFromPrices(formId, currentPrice) {
+    const form = document.getElementById(formId);
+    if (!form) {
+        console.error('Form not found:', formId);
+        return;
+    }
+    
+    const sideElement = form.querySelector('[name="side"]');
+    const stopPriceElement = form.querySelector('[name="stop_price"]');
+    const targetPriceElement = form.querySelector('[name="target_price"]');
+    const stopPercentageElement = form.querySelector('[name="stop_percentage"]');
+    const targetPercentageElement = form.querySelector('[name="target_percentage"]');
+    
+    if (!sideElement || !stopPriceElement || !targetPriceElement || 
+        !stopPercentageElement || !targetPercentageElement) {
+        console.error('Required form elements not found');
+        return;
+    }
+    
+    const side = sideElement.value || 'Long';
+    const stopPrice = parseFloat(stopPriceElement.value) || 0;
+    const targetPrice = parseFloat(targetPriceElement.value) || 0;
+    
+    // Calculate new percentages
+    const newStopPercentage = calculatePercentageFromPrice(currentPrice, stopPrice, side);
+    const newTargetPercentage = calculatePercentageFromPrice(currentPrice, targetPrice, side);
+    
+    // Update form fields
+    stopPercentageElement.value = newStopPercentage.toFixed(2);
+    targetPercentageElement.value = newTargetPercentage.toFixed(2);
+    
+    console.log('🔄 Updated percentages from prices:', {
+        currentPrice,
+        side,
+        stopPrice,
+        targetPrice,
+        newStopPercentage: newStopPercentage.toFixed(2),
+        newTargetPercentage: newTargetPercentage.toFixed(2)
+    });
+}
+
+/**
+ * Format percentage for display
+ * @param {number} percentage - Percentage value
+ * @returns {string} Formatted percentage string
+ */
+function formatPercentage(percentage) {
+    if (percentage >= 100) {
+        return `${percentage.toFixed(0)}%`;
+    } else {
+        return `${percentage.toFixed(2)}%`;
+    }
+}
+
+/**
+ * Format price for display
+ * @param {number} price - Price value
+ * @returns {string} Formatted price string
+ */
+function formatPrice(price) {
+    return `$${price.toFixed(2)}`;
+}
 
 // ===== Notification Functions =====
 
@@ -333,6 +544,15 @@ window.createToastContainer = createToastContainer;
 window.colorAmount = colorAmount;
 window.showNotification = showNotification;
 
+// Export price calculation functions to global scope
+window.calculateStopPrice = calculateStopPrice;
+window.calculateTargetPrice = calculateTargetPrice;
+window.calculatePercentageFromPrice = calculatePercentageFromPrice;
+window.updatePricesFromPercentages = updatePricesFromPercentages;
+window.updatePercentagesFromPrices = updatePercentagesFromPrices;
+window.formatPercentage = formatPercentage;
+window.formatPrice = formatPrice;
+
 // ייצוא המודול עצמו
 window.uiUtils = {
     showModalNotification,
@@ -344,7 +564,15 @@ window.uiUtils = {
     showWarningNotification,
     createToastContainer,
     colorAmount,
-    showNotification
+    showNotification,
+    // Price calculation functions
+    calculateStopPrice,
+    calculateTargetPrice,
+    calculatePercentageFromPrice,
+    updatePricesFromPercentages,
+    updatePercentagesFromPrices,
+    formatPercentage,
+    formatPrice
 };
 
 /**

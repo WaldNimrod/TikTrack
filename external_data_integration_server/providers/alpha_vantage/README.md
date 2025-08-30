@@ -60,3 +60,4 @@ quote_data = adapter.fetch_quote_data('AAPL')
 **גרסה:** 0.0
 
 
+

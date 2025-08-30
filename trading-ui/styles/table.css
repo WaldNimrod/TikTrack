@@ -237,6 +237,20 @@ table[data-table-type="cash_flows"] .actions-cell table td {
     opacity: 1 !important;
 }
 
+/* סגנונות ספציפיים לטבלת טריידים - כפתורים קטנים יותר */
+table[data-table-type="trades"] .actions-cell {
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+}
+
+table[data-table-type="trades"] .actions-cell .btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.7rem !important;
+    margin: 0 1px !important;
+}
+
 /* רוחב קבוע לעמודת הפעולות - כפתורים בשורה אחת */
 /* הועבר להגדרות הגלובליות למעלה */
 

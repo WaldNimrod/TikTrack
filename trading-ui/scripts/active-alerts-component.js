@@ -259,12 +259,15 @@ class ActiveAlertsComponent extends HTMLElement {
 
     const titleEl = this.querySelector('#alertsTitle');
     const cardsContainer = this.querySelector('#alertsCards');
+    const legendHeader = this.querySelector('.alerts-color-legend-header');
 
     if (titleEl) {
       if (this.alerts.length === 0) {
         console.log('🔄 No alerts, updating title to empty state');
         titleEl.innerHTML = '🔕 אין התראות חדשות';
         titleEl.style.opacity = '0.5';
+        titleEl.style.fontSize = '0.9rem'; // הקטנת הכותרת
+        titleEl.style.fontWeight = 'normal'; // הקטנת המשקל
         // סגירת הסקשן כשאין התראות
         this.closeSectionIfNoAlerts();
       } else {
@@ -272,8 +275,21 @@ class ActiveAlertsComponent extends HTMLElement {
         // החלפת האיקון הקיים באיקון עם מספר
         titleEl.innerHTML = this.createTitleWithIcon();
         titleEl.style.opacity = '1';
+        titleEl.style.fontSize = ''; // חזרה לגודל רגיל
+        titleEl.style.fontWeight = ''; // חזרה למשקל רגיל
         // פתיחת הסקשן כשיש התראות
         this.openSectionIfHasAlerts();
+      }
+    }
+
+    // הסתרת/הצגת מפתח הצבעים
+    if (legendHeader) {
+      if (this.alerts.length === 0) {
+        console.log('🔄 Hiding color legend');
+        legendHeader.style.display = 'none';
+      } else {
+        console.log('🔄 Showing color legend');
+        legendHeader.style.display = 'flex';
       }
     }
 
@@ -354,6 +370,8 @@ class ActiveAlertsComponent extends HTMLElement {
     console.log('🎨 Alerts data:', this.alerts);
 
     const container = this.querySelector('#alertsCards');
+    const legendHeader = this.querySelector('.alerts-color-legend-header');
+    
     if (!container) {
       console.warn('❌ No alertsCards container found');
       return;
@@ -365,11 +383,20 @@ class ActiveAlertsComponent extends HTMLElement {
       console.log('🎨 No alerts to display');
       // הסתרת המיכל כשאין התראות
       container.style.display = 'none';
+      // הסתרת מפתח הצבעים כשאין התראות
+      if (legendHeader) {
+        legendHeader.style.display = 'none';
+      }
       this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
       return;
     }
 
     console.log('🎨 Rendering', this.alerts.length, 'alerts');
+
+    // הצגת מפתח הצבעים כשיש התראות
+    if (legendHeader) {
+      legendHeader.style.display = 'flex';
+    }
 
     // מיון ההתראות לפי זמן מהחדשה לישנה
     const sortedAlerts = [...this.alerts].sort((a, b) => {

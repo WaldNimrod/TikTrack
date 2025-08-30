@@ -468,6 +468,12 @@ async function loadTradePlansData() {
 
         const data = await response.json();
         console.log('🔄 Data received from server:', data);
+        console.log('🔄 Data structure check:', {
+            isArray: Array.isArray(data),
+            hasData: data && data.data,
+            dataIsArray: data && data.data && Array.isArray(data.data),
+            dataLength: data && data.data ? data.data.length : 'no data'
+        });
 
         // Checking that data is an array
         let trade_plans = data;
@@ -656,12 +662,17 @@ function filterTradePlansData(filters) {
  * @param {Array} trade_plans - מערך של תכנונים לעדכון
  */
 function updateTradePlansTable(trade_plans) {
-    console.log('🔄 === UPDATE TRADE PLANS TABLE ===');
-    console.log('🔄 Designs to display:', trade_plans.length);
+    console.log('🔄 === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===');
+    console.log('🔄 Trade plans to display:', trade_plans.length);
+    console.log('🔄 Trade plans data:', trade_plans);
 
     const tbody = document.querySelector('#trade_plansTable tbody');
+    console.log('🔄 Looking for table body: #trade_plansTable tbody');
+    console.log('🔄 Table body found:', tbody);
     if (!tbody) {
-        console.error('Table body not found');
+        console.error('❌ Table body not found');
+        console.log('🔄 Available tables:', document.querySelectorAll('table'));
+        console.log('🔄 Available tbody elements:', document.querySelectorAll('tbody'));
         return;
     }
 
@@ -787,8 +798,9 @@ function updateTradePlansTable(trade_plans) {
         const currentDisplay = formatCurrency(design.current || 0);
         const statusDisplay = window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status;
 
-        // Displaying ticker symbol or name
+        // Displaying ticker symbol or name with link icon
         const tickerDisplay = design.ticker ? (design.ticker.symbol || design.ticker.name || 'לא מוגדר') : 'לא מוגדר';
+        const tickerLink = design.ticker ? `<a href="/tickers" onclick="showTickerPage('${design.ticker.symbol}')" title="פיתוח - מעבר לעמוד הנכס" style="color: #007bff; text-decoration: none; margin-right: 5px;">🔗</a>` : '';
 
         // שמירת הערכים המקוריים באנגלית לפילטר
         const typeForFilter = design.investment_type || '';
@@ -796,7 +808,7 @@ function updateTradePlansTable(trade_plans) {
 
         return `
       <tr>
-        <td class="ticker-cell"><span class="ticker-text">${tickerDisplay}</span></td>
+        <td class="ticker-cell">${tickerLink}<span class="ticker-text">${tickerDisplay}</span></td>
         <td data-date="${design.created_at}"><span class="date-text">${dateDisplay}</span></td>
         <td class="type-cell" data-type="${typeForFilter}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
         <td class="side-cell" data-side="${design.side}"><span class="side-badge ${design.side.toLowerCase()}">${sideDisplay}</span></td>
@@ -939,6 +951,14 @@ function showAddTradePlanModal() {
         dateInput.value = today;
     }
 
+    // Loading tickers from server
+    loadTickersForTradePlan();
+
+    // Clear any existing validation errors
+    if (typeof window.clearValidation === 'function') {
+        window.clearValidation('addTradePlanForm');
+    }
+
     // השבתת כל השדות עד לבחירת טיקר
     const fieldsToDisable = [
         'addTradePlanInvestmentType',
@@ -956,6 +976,8 @@ function showAddTradePlanModal() {
         if (field) {
             field.disabled = true;
             field.value = '';
+            // הסרת required מהשדות המושבתים
+            field.removeAttribute('required');
         }
     });
 
@@ -969,6 +991,48 @@ function showAddTradePlanModal() {
     if (changeDisplay) {
         changeDisplay.textContent = '-';
         changeDisplay.style.color = '#6c757d';
+    }
+
+    // Initialize validation system for the form
+    if (typeof window.initializeValidation === 'function') {
+        const validationRules = {
+            'addTradePlanTickerId': { required: true, type: 'select' },
+            'addTradePlanInvestmentType': { required: true, type: 'select' },
+            'addTradePlanSide': { required: true, type: 'select' },
+            'addTradePlanPlannedAmount': { 
+                required: true, 
+                type: 'number',
+                min: 0.01,
+                customValidation: (value) => {
+                    if (parseFloat(value) <= 0) {
+                        return 'סכום מתוכנן חייב להיות חיובי';
+                    }
+                    return true;
+                }
+            },
+            'addTradePlanStopPrice': { 
+                type: 'number',
+                min: 0.01,
+                customValidation: (value) => {
+                    if (value && parseFloat(value) <= 0) {
+                        return 'מחיר עצירה חייב להיות חיובי';
+                    }
+                    return true;
+                }
+            },
+            'addTradePlanTargetPrice': { 
+                type: 'number',
+                min: 0.01,
+                customValidation: (value) => {
+                    if (value && parseFloat(value) <= 0) {
+                        return 'מחיר יעד חייב להיות חיובי';
+                    }
+                    return true;
+                }
+            }
+        };
+        
+        window.initializeValidation('addTradePlanForm', validationRules);
     }
 
     // Displaying the modal
@@ -994,9 +1058,89 @@ async function saveNewTradePlan() {
         return;
     }
 
-    // Validating the form
-    if (!form.checkValidity()) {
-        form.reportValidity();
+    // ===== VALIDATION SYSTEM - Using Global Validation Utils =====
+    
+    // Get form values
+    const tickerId = document.getElementById('addTradePlanTickerId').value;
+    const investmentType = document.getElementById('addTradePlanInvestmentType').value;
+    const side = document.getElementById('addTradePlanSide').value;
+    const plannedAmount = document.getElementById('addTradePlanPlannedAmount').value;
+    const stopPrice = document.getElementById('addTradePlanStopPrice').value;
+    const targetPrice = document.getElementById('addTradePlanTargetPrice').value;
+
+    // Clear previous validation errors
+    if (typeof window.clearValidationErrors === 'function') {
+        window.clearValidationErrors('addTradePlanForm');
+    }
+
+    // Validate using global validation system
+    let hasErrors = false;
+
+    // Required field validation
+    if (!tickerId) {
+        if (typeof window.showValidationWarning === 'function') {
+            window.showValidationWarning('addTradePlanTickerId', 'יש לבחור טיקר');
+        } else {
+            showErrorNotification('שגיאה', 'יש לבחור טיקר');
+        }
+        hasErrors = true;
+    }
+
+    if (!investmentType) {
+        if (typeof window.showValidationWarning === 'function') {
+            window.showValidationWarning('addTradePlanInvestmentType', 'יש לבחור סוג השקעה');
+        } else {
+            showErrorNotification('שגיאה', 'יש לבחור סוג השקעה');
+        }
+        hasErrors = true;
+    }
+
+    if (!side) {
+        if (typeof window.showValidationWarning === 'function') {
+            window.showValidationWarning('addTradePlanSide', 'יש לבחור צד');
+        } else {
+            showErrorNotification('שגיאה', 'יש לבחור צד');
+        }
+        hasErrors = true;
+    }
+
+    if (!plannedAmount) {
+        if (typeof window.showValidationWarning === 'function') {
+            window.showValidationWarning('addTradePlanPlannedAmount', 'יש להזין סכום מתוכנן');
+        } else {
+            showErrorNotification('שגיאה', 'יש להזין סכום מתוכנן');
+        }
+        hasErrors = true;
+    } else if (parseFloat(plannedAmount) <= 0) {
+        if (typeof window.showValidationWarning === 'function') {
+            window.showValidationWarning('addTradePlanPlannedAmount', 'סכום מתוכנן חייב להיות חיובי');
+        } else {
+            showErrorNotification('שגיאה', 'סכום מתוכנן חייב להיות חיובי');
+        }
+        hasErrors = true;
+    }
+
+    // Validate stop and target prices if provided
+    if (stopPrice && parseFloat(stopPrice) <= 0) {
+        if (typeof window.showValidationWarning === 'function') {
+            window.showValidationWarning('addTradePlanStopPrice', 'מחיר עצירה חייב להיות חיובי');
+        } else {
+            showErrorNotification('שגיאה', 'מחיר עצירה חייב להיות חיובי');
+        }
+        hasErrors = true;
+    }
+
+    if (targetPrice && parseFloat(targetPrice) <= 0) {
+        if (typeof window.showValidationWarning === 'function') {
+            window.showValidationWarning('addTradePlanTargetPrice', 'מחיר יעד חייב להיות חיובי');
+        } else {
+            showErrorNotification('שגיאה', 'מחיר יעד חייב להיות חיובי');
+        }
+        hasErrors = true;
+    }
+
+    if (hasErrors) {
+        showErrorNotification('שגיאה', 'יש לתקן את השגיאות בטופס');
         return;
     }
 
@@ -1034,6 +1178,25 @@ async function saveNewTradePlan() {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Error response from server:', errorText);
+            
+            // Try to parse JSON error response
+            try {
+                const errorData = JSON.parse(errorText);
+                if (errorData.errors) {
+                    // Handle validation errors from server
+                    Object.keys(errorData.errors).forEach(field => {
+                        const fieldId = getFieldIdFromServerField(field);
+                        if (fieldId) {
+                            showFieldError(fieldId, errorData.errors[field]);
+                        }
+                    });
+                    showErrorNotification('שגיאה', 'יש לתקן את השגיאות בטופס');
+                    return;
+                }
+            } catch (e) {
+                // Not JSON, treat as general error
+            }
+            
             throw new Error(`Error saving trade plan: ${response.status} - ${errorText}`);
         }
 
@@ -1056,6 +1219,21 @@ async function saveNewTradePlan() {
         console.error('Error saving trade plan:', error);
         showErrorNotification('Error saving trade plan', 'Error saving trade plan: ' + error.message);
     }
+}
+
+/**
+ * המרת שם שדה מהשרת ל-ID של השדה בטופס
+ */
+function getFieldIdFromServerField(serverField) {
+    const fieldMapping = {
+        'ticker_id': 'addTradePlanTickerId',
+        'investment_type': 'addTradePlanInvestmentType',
+        'side': 'addTradePlanSide',
+        'planned_amount': 'addTradePlanPlannedAmount',
+        'stop_price': 'addTradePlanStopPrice',
+        'target_price': 'addTradePlanTargetPrice'
+    };
+    return fieldMapping[serverField] || null;
 }
 
 /**
@@ -1672,6 +1850,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Restoring section state
     if (typeof window.restoreAllSectionStates === 'function') {
         window.restoreAllSectionStates();
+    } else {
+        // Fallback to local section state restoration
+        restorePlanningSectionState();
     }
 
     // Initializing filters
@@ -1713,6 +1894,18 @@ window.translateDateRangeToDates = translateDateRangeToDates;
 window.restoreSortState = restoreSortState;
 window.restoreDesignsSectionState = restoreDesignsSectionState;
 
+// Adding toggle functions to global scope
+window.toggleTopSection = toggleTopSection;
+window.toggleMainSection = toggleMainSection;
+window.restorePlanningSectionState = restorePlanningSectionState;
+window.loadTickersForTradePlan = loadTickersForTradePlan;
+
+// Export validation functions
+window.showFieldError = showFieldError;
+window.clearValidationErrors = clearValidationErrors;
+window.validateField = validateField;
+window.addValidationListeners = addValidationListeners;
+
 // פונקציות חסרות
 window.loadPlanningData = function () {
     console.log('🔄 loadPlanningData called - redirecting to loadTradePlansData');
@@ -1738,6 +1931,164 @@ function setupSortableHeadersLocal() {
         header.style.cursor = 'pointer';
         header.title = 'לחץ למיון';
     });
+}
+
+// פונקציות לפתיחה/סגירה של סקשנים
+function toggleTopSection() {
+    const topSection = document.querySelector('.top-section');
+
+    if (!topSection) {
+        console.error('❌ לא נמצא top-section');
+        return;
+    }
+
+    const sectionBody = topSection.querySelector('.section-body');
+    const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    if (sectionBody) {
+        const isCollapsed = sectionBody.style.display === 'none';
+
+        if (isCollapsed) {
+            sectionBody.style.display = 'block';
+        } else {
+            sectionBody.style.display = 'none';
+        }
+
+        // עדכון האייקון
+        if (icon) {
+            icon.textContent = isCollapsed ? '▲' : '▼';
+        }
+
+        // שמירת המצב ב-localStorage
+        localStorage.setItem('planningTopSectionCollapsed', !isCollapsed);
+    }
+}
+
+function toggleMainSection() {
+    const contentSections = document.querySelectorAll('.content-section');
+    const planningSection = contentSections[0]; // הסקשן הראשון - תכנונים
+
+    if (!planningSection) {
+        console.error('❌ לא נמצא סקשן תכנונים');
+        return;
+    }
+
+    const sectionBody = planningSection.querySelector('.section-body');
+    const toggleBtn = planningSection.querySelector('button[onclick="toggleMainSection()"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    if (sectionBody) {
+        const isCollapsed = sectionBody.style.display === 'none';
+
+        if (isCollapsed) {
+            sectionBody.style.display = 'block';
+        } else {
+            sectionBody.style.display = 'none';
+        }
+
+        // עדכון האייקון
+        if (icon) {
+            icon.textContent = isCollapsed ? '▲' : '▼';
+        }
+
+        // שמירת המצב ב-localStorage
+        localStorage.setItem('planningMainSectionCollapsed', !isCollapsed);
+    }
+}
+
+// פונקציה לשחזור מצב הסגירה
+function restorePlanningSectionState() {
+    // שחזור מצב top-section (התראות וסיכום)
+    const topCollapsed = localStorage.getItem('planningTopSectionCollapsed') === 'true';
+    const topSection = document.querySelector('.top-section');
+
+    if (topSection) {
+        const sectionBody = topSection.querySelector('.section-body');
+        const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+        if (sectionBody && topCollapsed) {
+            sectionBody.style.display = 'none';
+            if (icon) {
+                icon.textContent = '▼';
+            }
+        }
+    }
+
+    // שחזור מצב סקשן התכנונים
+    const planningCollapsed = localStorage.getItem('planningMainSectionCollapsed') === 'true';
+    const contentSections = document.querySelectorAll('.content-section');
+    const planningSection = contentSections[0];
+
+    if (planningSection) {
+        const sectionBody = planningSection.querySelector('.section-body');
+        const toggleBtn = planningSection.querySelector('button[onclick="toggleMainSection()"]');
+        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+        if (sectionBody && planningCollapsed) {
+            sectionBody.style.display = 'none';
+            if (icon) {
+                icon.textContent = '▼';
+            }
+        }
+    }
+}
+
+/**
+ * טעינת טיקרים מהשרת למודל הוספת תכנון
+ * מציג רק טיקרים בסטטוס פתוח או סגור (לא מבוטל)
+ */
+async function loadTickersForTradePlan() {
+    try {
+        console.log('🔄 Loading tickers for trade plan modal...');
+        
+        const response = await fetch('/api/v1/tickers/');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const tickers = data.data || data;
+        
+        console.log('📊 Tickers loaded:', tickers.length);
+        
+        // סינון טיקרים - רק פתוח או סגור
+        const activeTickers = tickers.filter(ticker => 
+            ticker.status === 'open' || ticker.status === 'closed'
+        );
+        
+        console.log('✅ Active tickers (open/closed):', activeTickers.length);
+        
+        // עדכון רשימת הטיקרים
+        const tickerSelect = document.getElementById('addTradePlanTickerId');
+        if (tickerSelect) {
+            // שמירת האופציה הראשונה (בחר טיקר)
+            const defaultOption = tickerSelect.querySelector('option[value=""]');
+            tickerSelect.innerHTML = '';
+            
+            if (defaultOption) {
+                tickerSelect.appendChild(defaultOption);
+            }
+            
+            // הוספת טיקרים פעילים
+            activeTickers.forEach(ticker => {
+                const option = document.createElement('option');
+                option.value = ticker.id;
+                option.textContent = ticker.symbol;
+                tickerSelect.appendChild(option);
+            });
+            
+            console.log('✅ Ticker select updated with', activeTickers.length, 'active tickers');
+        } else {
+            console.error('❌ Ticker select element not found');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading tickers:', error);
+        // Fallback to static options if API fails
+        console.log('⚠️ Using fallback static ticker options');
+    }
 }
 
 // פונקציות נוספות שחסרות
@@ -1809,6 +2160,57 @@ function addReminder() {
     }
 }
 
+// ===== VALIDATION FUNCTIONS =====
+
+/**
+ * הצגת שגיאת שדה - Using Global Validation System
+ */
+function showFieldError(fieldId, message) {
+    // This function is now handled by the global validation system
+    // Use window.showFieldError from validation-utils.js instead
+    if (typeof window.showFieldError === 'function') {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            window.showFieldError(field, message);
+        }
+    }
+}
+
+/**
+ * ניקוי שגיאות ולידציה - Using Global Validation System
+ */
+function clearValidationErrors() {
+    // This function is now handled by the global validation system
+    // Use window.clearValidationErrors from validation-utils.js instead
+    if (typeof window.clearValidationErrors === 'function') {
+        window.clearValidationErrors('addTradePlanForm');
+    }
+}
+
+/**
+ * ולידציה מיידית בשדה - Using Global Validation System
+ */
+function validateField(fieldId, value, type = 'required') {
+    // This function is now handled by the global validation system
+    // Use window.validateField from validation-utils.js instead
+    if (typeof window.validateField === 'function') {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            return window.validateField(field, { required: type === 'required' }, 'text');
+        }
+    }
+    return true;
+}
+
+/**
+ * הוספת מאזיני ולידציה מיידית - Using Global Validation System
+ */
+function addValidationListeners() {
+    // This function is now handled by the global validation system
+    // The validation is initialized in showAddTradePlanModal()
+    console.log('Validation listeners are now handled by global validation system');
+}
+
 /**
  * עדכון מידע טיקר
  */
@@ -1861,6 +2263,11 @@ function updateTickerInfo() {
         entryConditionsTextarea.disabled = false;
         reasonsTextarea.disabled = false;
 
+        // הוספת required לשדות החובה
+        investmentTypeSelect.setAttribute('required', 'required');
+        sideSelect.setAttribute('required', 'required');
+        amountInput.setAttribute('required', 'required');
+
         console.log('✅ Fields enabled:', {
             investmentType: !investmentTypeSelect.disabled,
             side: !sideSelect.disabled,
@@ -1901,6 +2308,11 @@ function updateTickerInfo() {
         targetPriceInput.disabled = true;
         entryConditionsTextarea.disabled = true;
         reasonsTextarea.disabled = true;
+
+        // הסרת required משדות מושבתים
+        investmentTypeSelect.removeAttribute('required');
+        sideSelect.removeAttribute('required');
+        amountInput.removeAttribute('required');
 
         // ניקוי ערכים
         investmentTypeSelect.value = '';

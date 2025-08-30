@@ -102,13 +102,20 @@ class UserService:
             if user_id is None:
                 user_id = UserService.DEFAULT_USER_ID
             
+            # Start with default preferences
+            default_preferences = UserService.load_default_preferences()
+            
             user = UserService.get_user_by_id(db, user_id)
             if user:
-                return user.get_preferences()
+                user_preferences = user.get_preferences()
+                # Merge user preferences with defaults (user preferences override defaults)
+                merged_preferences = default_preferences.copy()
+                merged_preferences.update(user_preferences)
+                return merged_preferences
             
             # Fallback to default preferences from JSON file
             logger.warning(f"User {user_id} not found, using default preferences")
-            return UserService.load_default_preferences()
+            return default_preferences
             
         except Exception as e:
             logger.error(f"Error getting user preferences for user {user_id}: {str(e)}")
@@ -124,7 +131,14 @@ class UserService:
             
             user = UserService.get_user_by_id(db, user_id)
             if user:
-                user.set_preferences(preferences)
+                # Get current preferences and merge with new ones
+                current_preferences = user.get_preferences()
+                # Start with default preferences and merge with current and new
+                default_preferences = UserService.load_default_preferences()
+                merged_preferences = default_preferences.copy()
+                merged_preferences.update(current_preferences)
+                merged_preferences.update(preferences)
+                user.set_preferences(merged_preferences)
                 db.commit()
                 logger.info(f"Updated preferences for user {user_id}")
                 return True
@@ -150,15 +164,13 @@ class UserService:
             if os.path.exists(preferences_file):
                 with open(preferences_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    # Return user preferences if available, otherwise defaults
-                    if 'users' in data and UserService.DEFAULT_USERNAME in data['users']:
-                        return data['users'][UserService.DEFAULT_USERNAME]
-                    elif 'user' in data:
-                        return data['user']
-                    elif 'defaults' in data:
+                    # Return defaults section if available
+                    if 'defaults' in data:
                         return data['defaults']
+                    elif 'preferences' in data:
+                        return data['preferences']
                     else:
-                        return data.get('preferences', {})
+                        return {}
             
             # Fallback to hardcoded defaults
             return {

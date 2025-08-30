@@ -20,6 +20,9 @@ from models.note import Note
 from models.alert import Alert
 from services.validation_service import ValidationService
 from typing import List, Optional, Dict, Any, Union
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TickerService:
     """
@@ -395,6 +398,9 @@ class TickerService:
         Returns:
             Dictionary with linked items categorized by type
         """
+        import logging
+        logger = logging.getLogger(__name__)
+        
         from routes.api.linked_items import get_child_entities, get_parent_entities
         import sqlite3
         import os
@@ -497,7 +503,13 @@ class TickerService:
                 # Check if there are any linked items
                 result['has_linked_items'] = (
                     len(result['child_entities']) > 0 or
-                    len(result['parent_entities']) > 0
+                    len(result['parent_entities']) > 0 or
+                    len(result['open_trades']) > 0 or
+                    len(result['open_trade_plans']) > 0 or
+                    len(result['notes']) > 0 or
+                    len(result['alerts']) > 0 or
+                    len(result['executions']) > 0 or
+                    len(result['cash_flows']) > 0
                 )
                 
             finally:

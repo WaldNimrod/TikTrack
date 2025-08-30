@@ -1,34 +1,29 @@
-// ===== VALIDATION UTILS - פונקציות גלובליות לוולידציה =====
+// ===== VALIDATION UTILS - מערכת ולידציה גלובלית =====
 /*
  * Validation Utils - TikTrack
  * ===========================
  * 
- * מערכת וולידציה גלובלית עם תמיכה בוולידציה בזמן אמת
- * מספקת סימון ויזואלי (✓ ירוק, ✗ אדום) ובדיקות מותאמות
+ * מערכת ולידציה גלובלית עם תמיכה בוולידציה בזמן אמת ובזמן שליחה
  * 
- * תכונות:
- * - וולידציה בזמן אמת (oninput, onblur)
- * - סימון ויזואלי עם אייקונים
- * - תמיכה בכל סוגי השדות
- * - הגדרות מותאמות לכל שדה
+ * 📖 דוקומנטציה מפורטת: VALIDATION_SYSTEM_DOCUMENTATION.md
  * 
  * קובץ: trading-ui/scripts/validation-utils.js
- * גרסה: 2.0
+ * גרסה: 2.1
  * עדכון אחרון: אוגוסט 27, 2025
+ * מחבר: TikTrack Development Team
  */
 
-// ===== הגדרות ברירת מחדל =====
+// ===== קבועים =====
+
+// כללי ולידציה ברירת מחדל
 const DEFAULT_VALIDATION_RULES = {
-    // שדות טקסט רגילים
     text: {
         required: false,
         minLength: 0,
         maxLength: 255,
-        pattern: null,
+        pattern: /.*/,
         customValidation: null
     },
-    
-    // שדות מספריים
     number: {
         required: false,
         min: null,
@@ -36,399 +31,161 @@ const DEFAULT_VALIDATION_RULES = {
         step: null,
         customValidation: null
     },
-    
-    // שדות אימייל
     email: {
         required: false,
         pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         customValidation: null
     },
-    
-    // שדות תאריך
     date: {
         required: false,
         minDate: null,
         maxDate: null,
         customValidation: null
     },
-    
-    // שדות סלקט
     select: {
         required: false,
         customValidation: null
     }
 };
 
+// ===== פונקציות עזר =====
+
 /**
- * ולידציה של טופס
- * @param {string} formId - מזהה הטופס
- * @param {Object} validationRules - כללי הוולידציה
- * @returns {boolean} האם הטופס תקין
+ * בדיקה אם תאריך תקין
  */
-function validateForm(formId, validationRules = {}) {
-  
-    
-    const form = document.getElementById(formId);
-    if (!form) {
-        console.error(`❌ Form ${formId} not found`);
-        return false;
-    }
-
-    let isValid = true;
-    const errors = {};
-
-    // בדיקת שדות חובה
-    const requiredFields = form.querySelectorAll('[required]');
-    requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-            isValid = false;
-            errors[field.name] = 'שדה זה הוא חובה';
-            showFieldError(field, 'שדה זה הוא חובה');
-        } else {
-            clearFieldError(field);
-        }
-    });
-
-    // בדיקת תאריכים
-    const dateFields = form.querySelectorAll('input[type="date"]');
-    dateFields.forEach(field => {
-        if (field.value && !isValidDate(field.value)) {
-            isValid = false;
-            errors[field.name] = 'תאריך לא תקין';
-            showFieldError(field, 'תאריך לא תקין');
-        }
-    });
-
-    // בדיקת מספרים
-    const numberFields = form.querySelectorAll('input[type="number"]');
-    numberFields.forEach(field => {
-        if (field.value && isNaN(parseFloat(field.value))) {
-            isValid = false;
-            errors[field.name] = 'ערך מספרי לא תקין';
-            showFieldError(field, 'ערך מספרי לא תקין');
-        }
-    });
-
-    // בדיקות מותאמות אישית
-    Object.keys(validationRules).forEach(fieldName => {
-        const field = form.querySelector(`[name="${fieldName}"]`);
-        if (field) {
-            const rule = validationRules[fieldName];
-            if (rule.required && !field.value.trim()) {
-                isValid = false;
-                errors[fieldName] = rule.message || 'שדה זה הוא חובה';
-                showFieldError(field, rule.message || 'שדה זה הוא חובה');
-            }
-        }
-    });
-
-    // הצגת התראה גלובלית אם יש שגיאות
-    if (!isValid && typeof window.showValidationWarning === 'function') {
-        const firstError = Object.values(errors)[0];
-        const firstFieldName = Object.keys(errors)[0];
-        const field = form.querySelector(`[name="${firstFieldName}"]`);
-        if (field && field.id) {
-            window.showValidationWarning(field.id, firstError);
-        } else {
-            window.showErrorNotification('שגיאת וולידציה', firstError);
-        }
-    }
-
-    return isValid;
+function isValidDate(dateString) {
+    const date = new Date(dateString);
+    return !isNaN(date.getTime());
 }
 
 /**
- * הצגת שגיאה בשדה
- * @param {HTMLElement} field - אלמנט השדה
- * @param {string} message - הודעת השגיאה
+ * בדיקה אם אימייל תקין
  */
-function showFieldError(field, message) {
-    // הסרת שגיאות קודמות
-    clearFieldError(field);
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/**
+ * בדיקה אם מספר טלפון תקין
+ */
+function isValidPhone(phone) {
+    return /^[\d\s\-\+\(\)]+$/.test(phone);
+}
+
+// ===== פונקציות ויזואליות =====
+
+/**
+ * הצגת שגיאה בשדה
+ */
+function showFieldError(input, message) {
+    // הסרת סימון קודם
+    input.classList.remove('is-valid');
+    input.classList.add('is-invalid');
     
-    // הוספת מחלקת שגיאה
-    field.classList.add('is-invalid');
-    field.classList.remove('is-valid');
+    // הסרת הודעת שגיאה קודמת
+    const existingError = input.parentNode.querySelector('.invalid-feedback');
+    if (existingError) {
+        existingError.remove();
+    }
     
-    // יצירת אלמנט הודעת שגיאה
+    // הוספת הודעת שגיאה חדשה
     const errorDiv = document.createElement('div');
     errorDiv.className = 'invalid-feedback';
     errorDiv.textContent = message;
-    errorDiv.id = `${field.name}-error`;
+    input.parentNode.appendChild(errorDiv);
     
-    // הוספה אחרי השדה
-    field.parentNode.appendChild(errorDiv);
-    
-    // הוספת אייקון שגיאה
-    addValidationIcon(field, 'error');
+    console.log(`❌ Field error: ${input.name} - ${message}`);
 }
 
 /**
  * הצגת הצלחה בשדה
- * @param {HTMLElement} field - אלמנט השדה
  */
-function showFieldSuccess(field) {
-    // הסרת שגיאות קודמות
-    clearFieldError(field);
+function showFieldSuccess(input) {
+    // הסרת סימון קודם
+    input.classList.remove('is-invalid');
+    input.classList.add('is-valid');
     
-    // הוספת מחלקת הצלחה
-    field.classList.add('is-valid');
-    field.classList.remove('is-invalid');
-    
-    // הוספת אייקון הצלחה
-    addValidationIcon(field, 'success');
-}
-
-/**
- * ניקוי שגיאות משדה
- * @param {HTMLElement} field - אלמנט השדה
- */
-function clearFieldError(field) {
-    field.classList.remove('is-invalid');
-    
-    // הסרת הודעת שגיאה קיימת
-    const existingError = document.getElementById(`${field.name}-error`);
+    // הסרת הודעת שגיאה
+    const existingError = input.parentNode.querySelector('.invalid-feedback');
     if (existingError) {
         existingError.remove();
     }
     
-    // הסרת אייקון
-    removeValidationIcon(field);
+    console.log(`✅ Field success: ${input.name}`);
 }
 
 /**
- * ניקוי כל הסימונים משדה
- * @param {HTMLElement} field - אלמנט השדה
+ * ניקוי שגיאה משדה
  */
-function clearFieldValidation(field) {
-    field.classList.remove('is-valid', 'is-invalid');
-    
-    // הסרת הודעת שגיאה קיימת
-    const existingError = document.getElementById(`${field.name}-error`);
+function clearFieldError(input) {
+    input.classList.remove('is-invalid');
+    const existingError = input.parentNode.querySelector('.invalid-feedback');
     if (existingError) {
         existingError.remove();
     }
-    
-    // הסרת אייקון
-    removeValidationIcon(field);
 }
 
 /**
- * הוספת אייקון וולידציה
- * @param {HTMLElement} field - אלמנט השדה
- * @param {string} type - סוג האייקון ('success' או 'error')
+ * ניקוי ולידציה משדה
  */
-function addValidationIcon(field, type) {
-    // הסרת אייקון קודם
-    removeValidationIcon(field);
-    
-    // יצירת אייקון חדש
-    const icon = document.createElement('span');
-    icon.className = `validation-icon validation-icon-${type}`;
-    icon.innerHTML = type === 'success' ? '✓' : '✗';
-    icon.style.cssText = `
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 16px;
-        font-weight: bold;
-        z-index: 10;
-        pointer-events: none;
-    `;
-    
-    // צבעים
-    if (type === 'success') {
-        icon.style.color = '#28a745';
-    } else {
-        icon.style.color = '#dc3545';
-    }
-    
-    // הוספה לשדה
-    const parent = field.parentElement;
-    if (parent) {
-        parent.style.position = 'relative';
-        parent.appendChild(icon);
+function clearFieldValidation(input) {
+    input.classList.remove('is-valid', 'is-invalid');
+    const existingError = input.parentNode.querySelector('.invalid-feedback');
+    if (existingError) {
+        existingError.remove();
     }
 }
 
 /**
- * הסרת אייקון וולידציה
- * @param {HTMLElement} field - אלמנט השדה
- */
-function removeValidationIcon(field) {
-    const parent = field.parentElement;
-    if (parent) {
-        const icon = parent.querySelector('.validation-icon');
-        if (icon) {
-            icon.remove();
-        }
-    }
-}
-
-/**
- * ניקוי כל שגיאות הוולידציה בטופס
- * @param {string} formId - מזהה הטופס
+ * ניקוי כל שגיאות הוולידציה
  */
 function clearValidationErrors(formId) {
     const form = document.getElementById(formId);
     if (!form) return;
-
-    // ניקוי מחלקות שגיאה
-    const invalidFields = form.querySelectorAll('.is-invalid');
-    invalidFields.forEach(field => {
-        field.classList.remove('is-invalid');
-    });
-
-    // הסרת הודעות שגיאה
-    const errorMessages = form.querySelectorAll('.invalid-feedback');
-    errorMessages.forEach(error => {
-        error.remove();
+    
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        clearFieldValidation(input);
     });
 }
 
-/**
- * בדיקת תקינות תאריך
- * @param {string} dateString - מחרוזת התאריך
- * @returns {boolean} האם התאריך תקין
- */
-function isValidDate(dateString) {
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date);
-}
+// ===== פונקציות ולידציה =====
 
 /**
- * בדיקת תקינות אימייל
- * @param {string} email - כתובת האימייל
- * @returns {boolean} האם האימייל תקין
- */
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-/**
- * בדיקת תקינות מספר טלפון
- * @param {string} phone - מספר הטלפון
- * @returns {boolean} האם מספר הטלפון תקין
- */
-function isValidPhone(phone) {
-    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-    return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 9;
-}
-
-// ===== פונקציות וולידציה בזמן אמת =====
-
-/**
- * הגדרת וולידציה לשדה
- * @param {string} fieldId - מזהה השדה
- * @param {Object} rules - כללי הוולידציה
- * @param {string} fieldType - סוג השדה ('text', 'number', 'email', 'date', 'select')
- */
-function setupFieldValidation(fieldId, rules = {}, fieldType = 'text') {
-    const input = document.getElementById(fieldId);
-    if (!input) {
-        console.warn(`Field ${fieldId} not found`);
-        return;
-    }
-    
-    // ניקוי וולידציה קיימת
-    clearFieldValidation(input);
-    
-    // הוספת מאזינים - רק על blur ורק אם יש תוכן
-    input.addEventListener('blur', () => {
-        // וולידציה רק אם יש תוכן או שזה שדה חובה
-        if (input.value.trim() || rules.required) {
-            validateField(input, rules, fieldType);
-        }
-    });
-    
-    // וולידציה על input רק אם יש תוכן
-    input.addEventListener('input', () => {
-        if (input.value.trim()) {
-            validateField(input, rules, fieldType);
-        } else {
-            // אם השדה ריק - ניקוי וולידציה
-            clearFieldValidation(input);
-        }
-    });
-    
-    // שמירת הכללים בשדה
-    input.dataset.validationRules = JSON.stringify(rules);
-    input.dataset.validationType = fieldType;
-}
-
-/**
- * וולידציה של שדה בודד
- * @param {HTMLElement} input - אלמנט השדה
- * @param {Object} rules - כללי הוולידציה
- * @param {string} fieldType - סוג השדה
- * @returns {boolean} - האם השדה תקין
- */
-function validateField(input, rules = {}, fieldType = 'text') {
-    switch (fieldType) {
-        case 'text':
-            return validateTextField(input, rules);
-        case 'number':
-            return validateNumberField(input, rules);
-        case 'email':
-            return validateEmailField(input, rules);
-        case 'date':
-            return validateDateField(input, rules);
-        case 'select':
-            return validateSelectField(input, rules);
-        default:
-            return validateTextField(input, rules);
-    }
-}
-
-/**
- * וולידציה של שדה טקסט
- * @param {HTMLInputElement} input - אלמנט השדה
- * @param {Object} rules - כללי הוולידציה
- * @returns {boolean} - האם השדה תקין
+ * ולידציה של שדה טקסט
  */
 function validateTextField(input, rules = {}) {
     const value = input.value.trim();
     const mergedRules = { ...DEFAULT_VALIDATION_RULES.text, ...rules };
     
-    // בדיקת שדה חובה - רק על blur
+    // בדיקת שדה חובה
     if (mergedRules.required && value.length === 0) {
         showFieldError(input, 'שדה זה הוא חובה');
         return false;
     }
     
-    // אם השדה ריק ולא חובה - ניקוי וולידציה
+    // אם השדה ריק ולא חובה - תקין
     if (value.length === 0) {
         clearFieldValidation(input);
         return true;
     }
     
     // בדיקת אורך מינימלי
-    if (mergedRules.minLength > 0 && value.length < mergedRules.minLength) {
-        showFieldError(input, `מינימום ${mergedRules.minLength} תווים נדרשים`);
+    if (value.length < mergedRules.minLength) {
+        showFieldError(input, `מינימום ${mergedRules.minLength} תווים`);
         return false;
     }
     
     // בדיקת אורך מקסימלי
-    if (mergedRules.maxLength > 0 && value.length > mergedRules.maxLength) {
-        showFieldError(input, `מקסימום ${mergedRules.maxLength} תווים מותרים`);
+    if (value.length > mergedRules.maxLength) {
+        showFieldError(input, `מקסימום ${mergedRules.maxLength} תווים`);
         return false;
     }
     
     // בדיקת תבנית
-    if (mergedRules.pattern && !mergedRules.pattern.test(value)) {
-        showFieldError(input, mergedRules.errorMessage || 'ערך לא תקין');
+    if (!mergedRules.pattern.test(value)) {
+        showFieldError(input, 'ערך לא תקין');
         return false;
-    }
-    
-    // בדיקה מותאמת למטבעות
-    if (input.id === 'currencySymbol' || input.id === 'editCurrencySymbol') {
-        const currencyResult = validateCurrencySymbol(value);
-        if (currencyResult !== true) {
-            showFieldError(input, currencyResult);
-            return false;
-        }
     }
     
     // בדיקה מותאמת אישית
@@ -446,10 +203,7 @@ function validateTextField(input, rules = {}) {
 }
 
 /**
- * וולידציה של שדה מספרי
- * @param {HTMLInputElement} input - אלמנט השדה
- * @param {Object} rules - כללי הוולידציה
- * @returns {boolean} - האם השדה תקין
+ * ולידציה של שדה מספר
  */
 function validateNumberField(input, rules = {}) {
     const value = input.value.trim();
@@ -470,7 +224,7 @@ function validateNumberField(input, rules = {}) {
     // בדיקה שהערך הוא מספר
     const numValue = parseFloat(value);
     if (isNaN(numValue)) {
-        showFieldError(input, 'יש להזין מספר תקין');
+        showFieldError(input, 'ערך מספרי לא תקין');
         return false;
     }
     
@@ -501,10 +255,7 @@ function validateNumberField(input, rules = {}) {
 }
 
 /**
- * וולידציה של שדה אימייל
- * @param {HTMLInputElement} input - אלמנט השדה
- * @param {Object} rules - כללי הוולידציה
- * @returns {boolean} - האם השדה תקין
+ * ולידציה של שדה אימייל
  */
 function validateEmailField(input, rules = {}) {
     const value = input.value.trim();
@@ -543,10 +294,7 @@ function validateEmailField(input, rules = {}) {
 }
 
 /**
- * וולידציה של שדה תאריך
- * @param {HTMLInputElement} input - אלמנט השדה
- * @param {Object} rules - כללי הוולידציה
- * @returns {boolean} - האם השדה תקין
+ * ולידציה של שדה תאריך
  */
 function validateDateField(input, rules = {}) {
     const value = input.value.trim();
@@ -591,7 +339,7 @@ function validateDateField(input, rules = {}) {
     
     // בדיקה מותאמת אישית
     if (mergedRules.customValidation) {
-        const customResult = mergedRules.customValidation(dateValue, input);
+        const customResult = mergedRules.customValidation(value, input);
         if (customResult !== true) {
             showFieldError(input, customResult);
             return false;
@@ -604,10 +352,7 @@ function validateDateField(input, rules = {}) {
 }
 
 /**
- * וולידציה של שדה סלקט
- * @param {HTMLSelectElement} input - אלמנט השדה
- * @param {Object} rules - כללי הוולידציה
- * @returns {boolean} - האם השדה תקין
+ * ולידציה של שדה סלקט
  */
 function validateSelectField(input, rules = {}) {
     const value = input.value;
@@ -615,7 +360,7 @@ function validateSelectField(input, rules = {}) {
     
     // בדיקת שדה חובה
     if (mergedRules.required && (!value || value === '')) {
-        showFieldError(input, 'יש לבחור ערך');
+        showFieldError(input, 'שדה זה הוא חובה');
         return false;
     }
     
@@ -639,91 +384,174 @@ function validateSelectField(input, rules = {}) {
     return true;
 }
 
-// ===== פונקציות וולידציה מותאמות =====
+/**
+ * ולידציה כללית של שדה
+ */
+function validateField(input, rules = {}) {
+    switch (input.type) {
+        case 'text':
+        case 'password':
+        case 'email':
+        case 'tel':
+        case 'url':
+            return validateTextField(input, rules);
+            
+        case 'number':
+            return validateNumberField(input, rules);
+            
+        case 'date':
+            return validateDateField(input, rules);
+            
+        default:
+            if (input.tagName === 'SELECT') {
+                return validateSelectField(input, rules);
+            } else if (input.tagName === 'TEXTAREA') {
+                return validateTextField(input, rules);
+            } else {
+                return validateTextField(input, rules);
+            }
+    }
+}
 
 /**
- * וולידציה של סמל מטבע (רק אותיות אנגליות גדולות)
- * @param {string} value - הערך לבדיקה
- * @returns {string|true} - הודעת שגיאה או true
+ * הגדרת ולידציה לשדה
+ */
+function setupFieldValidation(input, rules = {}) {
+    // הסרת event listeners קודמים
+    if (input._validationHandler) {
+        input.removeEventListener('input', input._validationHandler);
+        input.removeEventListener('blur', input._validationHandler);
+        input.removeEventListener('change', input._validationHandler);
+    }
+    
+    // יצירת פונקציית ולידציה
+    input._validationHandler = () => validateField(input, rules);
+    
+    // הוספת event listeners
+    input.addEventListener('input', input._validationHandler);
+    input.addEventListener('blur', input._validationHandler);
+    input.addEventListener('change', input._validationHandler);
+}
+
+// ===== פונקציות ולידציה מותאמות =====
+
+/**
+ * ולידציה של סמל מטבע
  */
 function validateCurrencySymbol(value) {
-    const pattern = /^[A-Z]+$/;
-    if (!pattern.test(value)) {
-        return 'סמל מטבע חייב להכיל רק אותיות אנגליות גדולות';
-    }
-    if (value.length > 10) {
-        return 'סמל מטבע לא יכול להיות יותר מ-10 תווים';
-    }
+    if (!value || value.length === 0) return 'סמל מטבע הוא חובה';
+    if (value.length !== 3) return 'סמל מטבע חייב להיות 3 תווים';
+    if (!/^[A-Z]{3}$/.test(value)) return 'סמל מטבע חייב להיות 3 אותיות גדולות';
     return true;
 }
 
 /**
- * וולידציה של שער מטבע (מספר חיובי)
- * @param {number} value - הערך לבדיקה
- * @returns {string|true} - הודעת שגיאה או true
+ * ולידציה של שער מטבע
  */
 function validateCurrencyRate(value) {
-    if (value < 0) {
-        return 'שער מטבע חייב להיות מספר חיובי';
-    }
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) return 'שער מטבע חייב להיות מספר';
+    if (numValue <= 0) return 'שער מטבע חייב להיות חיובי';
+    if (numValue > 1000000) return 'שער מטבע לא יכול להיות יותר מ-1,000,000';
     return true;
 }
 
 /**
- * וולידציה של סימבול טיקר (רק אותיות אנגליות גדולות ומספרים)
- * @param {string} value - הערך לבדיקה
- * @returns {string|true} - הודעת שגיאה או true
+ * ולידציה של סמל טיקר
  */
 function validateTickerSymbol(value) {
-    if (!value || value.trim() === '') {
-        return 'סימבול טיקר הוא שדה חובה';
-    }
-    
-    const pattern = /^[A-Z0-9]+$/;
-    if (!pattern.test(value)) {
-        return 'סימבול טיקר חייב להכיל רק אותיות אנגליות גדולות ומספרים (למשל: AAPL, GOOGL, TSLA)';
-    }
-    
-    if (value.length < 1) {
-        return 'סימבול טיקר חייב להכיל לפחות תו אחד';
-    }
-    
-    if (value.length > 10) {
-        return 'סימבול טיקר לא יכול להיות יותר מ-10 תווים';
-    }
-    
+    if (!value || value.length === 0) return 'סמל טיקר הוא חובה';
+    if (value.length > 10) return 'סמל טיקר לא יכול להיות יותר מ-10 תווים';
+    if (!/^[A-Z0-9.]+$/.test(value)) return 'סמל טיקר יכול להכיל רק אותיות גדולות, מספרים ונקודות';
     return true;
 }
 
-// ייצוא פונקציות גלובליות
-window.validateForm = validateForm;
-window.showFieldError = showFieldError;
-window.showFieldSuccess = showFieldSuccess;
-window.clearFieldError = clearFieldError;
-window.clearFieldValidation = clearFieldValidation;
-window.clearValidationErrors = clearValidationErrors;
-window.isValidDate = isValidDate;
-window.isValidEmail = isValidEmail;
-window.isValidPhone = isValidPhone;
+// ===== פונקציה ראשית =====
 
-// ייצוא פונקציות וולידציה בזמן אמת
-window.setupFieldValidation = setupFieldValidation;
-window.validateField = validateField;
-window.validateTextField = validateTextField;
-window.validateNumberField = validateNumberField;
-window.validateEmailField = validateEmailField;
-window.validateDateField = validateDateField;
-window.validateSelectField = validateSelectField;
+/**
+ * ולידציה של טופס
+ */
+function validateForm(formId, validationRules = {}) {
+    console.log('🔍 === VALIDATE FORM ===');
+    console.log('🔍 Form ID:', formId);
+    console.log('🔍 Validation rules:', validationRules);
+    
+    const form = document.getElementById(formId);
+    if (!form) {
+        console.error('❌ Form not found:', formId);
+        return false;
+    }
+    
+    let isValid = true;
+    const errors = {};
+    
+    // בדיקת שדות חובה
+    const requiredFields = form.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+        if (!field.value || field.value.trim() === '') {
+            showFieldError(field, 'שדה זה הוא חובה');
+            isValid = false;
+            errors[field.name] = 'שדה זה הוא חובה';
+        }
+    });
+    
+    // בדיקת שדות תאריך
+    const dateFields = form.querySelectorAll('input[type="date"]');
+    dateFields.forEach(field => {
+        if (field.value && !isValidDate(field.value)) {
+            showFieldError(field, 'תאריך לא תקין');
+            isValid = false;
+            errors[field.name] = 'תאריך לא תקין';
+        }
+    });
+    
+    // בדיקת שדות מספר
+    const numberFields = form.querySelectorAll('input[type="number"]');
+    numberFields.forEach(field => {
+        if (field.value && isNaN(parseFloat(field.value))) {
+            showFieldError(field, 'ערך מספרי לא תקין');
+            isValid = false;
+            errors[field.name] = 'ערך מספרי לא תקין';
+        }
+    });
+    
+    // בדיקת ולידציה מותאמת אישית
+    Object.keys(validationRules).forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (field) {
+            const fieldRules = validationRules[fieldName];
+            const fieldValid = validateField(field, fieldRules);
+            if (!fieldValid) {
+                isValid = false;
+                errors[fieldName] = 'ולידציה נכשלה';
+            }
+        }
+    });
+    
+    console.log('🔍 Validation result:', isValid);
+    console.log('🔍 Errors:', errors);
+    
+    if (!isValid) {
+        // הצגת הודעת שגיאה כללית
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('יש לתקן שגיאות בטופס');
+        } else {
+            alert('יש לתקן שגיאות בטופס');
+        }
+    }
+    
+    return isValid;
+}
 
 // ===== פונקציות אתחול =====
 
 /**
  * אתחול מערכת הוולידציה לטופס
- * @param {string} formId - מזהה הטופס
- * @param {Object} validationRules - כללי הוולידציה
  */
 function initializeValidation(formId, validationRules = {}) {
-  
+    console.log('🔧 === INITIALIZING VALIDATION ===');
+    console.log('🔧 Form ID:', formId);
+    console.log('🔧 Validation rules:', validationRules);
     
     const form = document.getElementById(formId);
     if (!form) {
@@ -731,28 +559,77 @@ function initializeValidation(formId, validationRules = {}) {
         return;
     }
 
-    // הגדרת event listeners לכל השדות
+    // מציאת כל השדות בטופס
     const inputs = form.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        // הסרת event listeners קודמים
-        input.removeEventListener('input', input._validationHandler);
-        input.removeEventListener('blur', input._validationHandler);
+    console.log('🔧 Found inputs:', inputs.length);
+    
+    inputs.forEach((input, index) => {
+        console.log(`🔧 Setting up validation for input ${index + 1}:`, input.name, input.type);
         
-        // הוספת event listeners חדשים
-        input._validationHandler = () => validateField(input, validationRules[input.name] || {});
-        input.addEventListener('input', input._validationHandler);
-        input.addEventListener('blur', input._validationHandler);
+        // הסרת event listeners קודמים
+        if (input._validationHandler) {
+            input.removeEventListener('input', input._validationHandler);
+            input.removeEventListener('blur', input._validationHandler);
+            input.removeEventListener('change', input._validationHandler);
+        }
+        
+        // יצירת פונקציית ולידציה מותאמת לשדה
+        input._validationHandler = () => {
+            const fieldRules = validationRules[input.name] || {};
+            console.log(`🔧 Validating field: ${input.name}`, fieldRules);
+            
+            // ולידציה לפי סוג השדה
+            let isValid = false;
+            
+            switch (input.type) {
+                case 'text':
+                case 'password':
+                case 'email':
+                case 'tel':
+                case 'url':
+                    isValid = validateTextField(input, fieldRules);
+                    break;
+                    
+                case 'number':
+                    isValid = validateNumberField(input, fieldRules);
+                    break;
+                    
+                case 'date':
+                    isValid = validateDateField(input, fieldRules);
+                    break;
+                    
+                default:
+                    if (input.tagName === 'SELECT') {
+                        isValid = validateSelectField(input, fieldRules);
+                    } else if (input.tagName === 'TEXTAREA') {
+                        isValid = validateTextField(input, fieldRules);
+                    } else {
+                        isValid = validateField(input, fieldRules);
+                    }
+                    break;
+            }
+            
+            console.log(`🔧 Field ${input.name} validation result:`, isValid);
+            return isValid;
+        };
+        
+        // הוספת event listeners
+        input.addEventListener('input', input._validationHandler);  // בזמן הקלדה
+        input.addEventListener('blur', input._validationHandler);   // בזמן עזיבת השדה
+        input.addEventListener('change', input._validationHandler); // בזמן שינוי ערך
+        
+        console.log(`✅ Validation setup completed for: ${input.name}`);
     });
-
-  
+    
+    console.log('✅ Validation initialization completed for form:', formId);
 }
 
 /**
  * ניקוי וולידציה לטופס
- * @param {string} formId - מזהה הטופס
  */
 function clearValidation(formId) {
-  
+    console.log('🧹 === CLEARING VALIDATION ===');
+    console.log('🧹 Form ID:', formId);
     
     const form = document.getElementById(formId);
     if (!form) {
@@ -766,10 +643,34 @@ function clearValidation(formId) {
         clearFieldValidation(input);
     });
 
-  
+    console.log('✅ Validation cleared for form:', formId);
 }
 
-// ייצוא פונקציות וולידציה מותאמות
+// ===== ייצוא פונקציות =====
+
+// ייצוא פונקציות עזר
+window.isValidDate = isValidDate;
+window.isValidEmail = isValidEmail;
+window.isValidPhone = isValidPhone;
+
+// ייצוא פונקציות ויזואליות
+window.showFieldError = showFieldError;
+window.showFieldSuccess = showFieldSuccess;
+window.clearFieldError = clearFieldError;
+window.clearFieldValidation = clearFieldValidation;
+window.clearValidationErrors = clearValidationErrors;
+
+// ייצוא פונקציות ולידציה
+window.validateForm = validateForm;
+window.validateField = validateField;
+window.validateTextField = validateTextField;
+window.validateNumberField = validateNumberField;
+window.validateEmailField = validateEmailField;
+window.validateDateField = validateDateField;
+window.validateSelectField = validateSelectField;
+window.setupFieldValidation = setupFieldValidation;
+
+// ייצוא פונקציות ולידציה מותאמות
 window.validateCurrencySymbol = validateCurrencySymbol;
 window.validateCurrencyRate = validateCurrencyRate;
 window.validateTickerSymbol = validateTickerSymbol;

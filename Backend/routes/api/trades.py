@@ -30,9 +30,14 @@ def get_trades():
         else:
             trades = TradeService.get_all(db)
         
+        # Convert trades to dict and log the first one
+        trade_dicts = [trade.to_dict() for trade in trades]
+        if trade_dicts:
+            logger.info(f"First trade data: {trade_dicts[0]}")
+        
         return jsonify({
             "status": "success",
-            "data": [trade.to_dict() for trade in trades],
+            "data": trade_dicts,
             "message": "Trades retrieved successfully",
             "version": "v1"
         })
@@ -145,12 +150,38 @@ def update_trade(trade_id: int):
         db: Session = next(get_db())
         trade = TradeService.update(db, trade_id, data)
         if trade:
-            return jsonify({
-                "status": "success",
-                "data": trade.to_dict(),
-                "message": "Trade updated successfully",
-                "version": "v1"
-            })
+            # Commit the transaction
+            db.commit()
+            logger.info(f"Transaction committed for trade {trade_id}")
+            try:
+                trade_dict = trade.to_dict()
+                return jsonify({
+                    "status": "success",
+                    "data": trade_dict,
+                    "message": "Trade updated successfully",
+                    "version": "v1"
+                })
+            except Exception as e:
+                logger.error(f"Error converting trade to dict: {str(e)}")
+                # Return basic trade data without relationships
+                basic_data = {
+                    "id": trade.id,
+                    "account_id": trade.account_id,
+                    "ticker_id": trade.ticker_id,
+                    "trade_plan_id": trade.trade_plan_id,
+                    "status": trade.status,
+                    "investment_type": trade.investment_type,
+                    "side": trade.side,
+                    "created_at": trade.created_at.strftime('%Y-%m-%d %H:%M:%S') if trade.created_at else None,
+                    "closed_at": trade.closed_at.strftime('%Y-%m-%d %H:%M:%S') if trade.closed_at else None,
+                    "notes": trade.notes
+                }
+                return jsonify({
+                    "status": "success",
+                    "data": basic_data,
+                    "message": "Trade updated successfully (basic data only)",
+                    "version": "v1"
+                })
         return jsonify({
             "status": "error",
             "error": {"message": "Trade not found"},

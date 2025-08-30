@@ -176,14 +176,14 @@
           <!-- Planning table -->
           <div class="section-body">
             <div class="table-responsive" id="trade_plansContainer">
-              <table class="table" id="trade_plansTable" data-table-type="trade_plans">
+              <table class="table trade-plans-table" id="trade_plansTable" data-table-type="trade_plans" style="width: 98%; min-width: 1200px;">
                 <thead>
                   <tr>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        נכס <span class="sort-icon">↕</span>
+                        טיקר <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
@@ -286,7 +286,7 @@
                   <label for="addTradePlanTickerId" class="form-label">
                     טיקר <span class="text-danger">*</span>
                   </label>
-                  <select class="form-control" id="addTradePlanTickerId" onchange="updateTickerInfo()">
+                  <select class="form-control" id="addTradePlanTickerId" name="addTradePlanTickerId" onchange="updateTickerInfo()">
                     <option value="">בחר טיקר</option>
                     <option value="1">AAPL</option>
                     <option value="2">GOOGL</option>
@@ -300,7 +300,7 @@
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="addTradePlanDate" class="form-label">תאריך</label>
-                  <input type="date" class="form-control" id="addTradePlanDate">
+                  <input type="date" class="form-control" id="addTradePlanDate" name="addTradePlanDate">
                 </div>
               </div>
             </div>
@@ -332,7 +332,7 @@
                   <label for="addTradePlanInvestmentType" class="form-label">
                     סוג השקעה <span class="text-danger">*</span>
                   </label>
-                  <select class="form-control" id="addTradePlanInvestmentType" disabled>
+                  <select class="form-control" id="addTradePlanInvestmentType" name="addTradePlanInvestmentType" disabled>
                     <option value="">בחר סוג השקעה</option>
                     <option value="swing">סווינג</option>
                     <option value="investment">השקעה</option>
@@ -346,7 +346,7 @@
                   <label for="addTradePlanSide" class="form-label">
                     צד <span class="text-danger">*</span>
                   </label>
-                  <select class="form-control" id="addTradePlanSide" disabled>
+                  <select class="form-control" id="addTradePlanSide" name="addTradePlanSide" disabled>
                     <option value="">בחר צד</option>
                     <option value="Long">Long</option>
                     <option value="Short">Short</option>
@@ -361,7 +361,7 @@
                   <label for="addTradePlanPlannedAmount" class="form-label">
                     סכום מתוכנן <span class="text-danger">*</span>
                   </label>
-                  <input type="number" step="0.01" class="form-control" id="addTradePlanPlannedAmount"
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanPlannedAmount" name="addTradePlanPlannedAmount"
                     min="0.01" disabled
                     onchange="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); } else { console.error('updateSharesFromAmount not found'); }"
                     oninput="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); }"
@@ -374,7 +374,7 @@
                   <label for="addTradePlanShares" class="form-label">
                     מספר מניות
                   </label>
-                  <input type="number" step="1" class="form-control" id="addTradePlanShares" min="1" disabled
+                  <input type="number" step="1" class="form-control" id="addTradePlanShares" name="addTradePlanShares" min="1" disabled
                     onchange="if(typeof updateAmountFromShares === 'function') { updateAmountFromShares(); } else { console.error('updateAmountFromShares not found'); }"
                     oninput="if(typeof updateAmountFromShares === 'function') { updateAmountFromShares(); }">
                 </div>
@@ -384,20 +384,20 @@
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="addTradePlanStopPrice" class="form-label">מחיר עצירה</label>
-                  <input type="number" step="0.01" class="form-control" id="addTradePlanStopPrice" disabled>
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanStopPrice" name="addTradePlanStopPrice" disabled>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="addTradePlanTargetPrice" class="form-label">מחיר יעד</label>
-                  <input type="number" step="0.01" class="form-control" id="addTradePlanTargetPrice" disabled>
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanTargetPrice" name="addTradePlanTargetPrice" disabled>
                 </div>
               </div>
             </div>
 
             <div class="mb-3">
               <label for="addTradePlanEntryConditions" class="form-label">תנאי כניסה</label>
-              <textarea class="form-control" id="addTradePlanEntryConditions" rows="2" disabled></textarea>
+              <textarea class="form-control" id="addTradePlanEntryConditions" name="addTradePlanEntryConditions" rows="2" disabled></textarea>
               <div class="text-start">
                 <button type="button" class="btn btn-info btn-sm mt-2" onclick="addEntryCondition()">
                   <span class="btn-icon">➕</span> הוסף תנאי
@@ -406,7 +406,7 @@
             </div>
             <div class="mb-3">
               <label for="addTradePlanReasons" class="form-label">סיבות</label>
-              <textarea class="form-control" id="addTradePlanReasons" rows="3" disabled></textarea>
+              <textarea class="form-control" id="addTradePlanReasons" name="addTradePlanReasons" rows="3" disabled></textarea>
               <div class="text-start">
                 <button type="button" class="btn btn-info btn-sm mt-2" onclick="addReason()">
                   <span class="btn-icon">➕</span> הוסף סיבה
@@ -444,9 +444,9 @@
     aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
     <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editTradePlanModalLabel" style="order: 1;">ערוך תכנון</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2;"></button>
+        <div class="modal-header" style="background-color: #ff9c05; color: white;">
+          <h5 class="modal-title" id="editTradePlanModalLabel" style="order: 1; color: white;">ערוך תכנון</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2; filter: invert(1);"></button>
         </div>
         <div class="modal-body">
           <form id="editTradePlanForm">
@@ -498,7 +498,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="mb-3">
                   <label for="editTradePlanInvestmentType" class="form-label">
                     סוג השקעה <span class="text-danger">*</span>
@@ -512,7 +512,7 @@
 
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="mb-3">
                   <label for="editTradePlanSide" class="form-label">
                     צד <span class="text-danger">*</span>
@@ -521,6 +521,20 @@
                     <option value="">בחר צד</option>
                     <option value="Long">Long</option>
                     <option value="Short">Short</option>
+                  </select>
+
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="editTradePlanStatus" class="form-label">
+                    סטטוס <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="editTradePlanStatus" required disabled>
+                    <option value="">בחר סטטוס</option>
+                    <option value="open">פתוח</option>
+                    <option value="closed">סגור</option>
+                    <option value="cancelled">מבוטל</option>
                   </select>
 
                 </div>
@@ -611,14 +625,38 @@
     </div>
   </div>
 
+  <!-- Cancel Trade Plan Modal -->
+  <div class="modal fade" id="cancelTradePlanModal" tabindex="-1" aria-labelledby="cancelTradePlanModalLabel"
+    aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #dc3545; color: white;">
+          <h5 class="modal-title" id="cancelTradePlanModalLabel" style="order: 1; color: white;">בטל תכנון</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2; filter: invert(1);"></button>
+        </div>
+        <div class="modal-body">
+          <p>האם אתה בטוח שברצונך לבטל את התכנון הבא?</p>
+          <div id="cancelTradePlanDetails" class="alert alert-info">
+            פרטי התכנון יוצגו כאן
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="height: 38px;">ביטול</button>
+          <button type="button" class="btn btn-danger"
+            onclick="if (typeof window.confirmCancelTradePlan === 'function') { window.confirmCancelTradePlan(); } else { console.error('confirmCancelTradePlan function not found'); }" style="height: 38px;">בטל תכנון</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Delete Trade Plan Modal -->
   <div class="modal fade" id="deleteTradePlanModal" tabindex="-1" aria-labelledby="deleteTradePlanModalLabel"
     aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteTradePlanModalLabel" style="order: 1;">מחק תכנון</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2;"></button>
+        <div class="modal-header" style="background-color: #ff9c05; color: white;">
+          <h5 class="modal-title" id="deleteTradePlanModalLabel" style="order: 1; color: white;">מחק תכנון</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2; filter: invert(1);"></button>
         </div>
         <div class="modal-body">
           <p>האם אתה בטוח שברצונך למחוק את התכנון הבא?</p>
@@ -635,390 +673,24 @@
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
-
-  <script>
-    // פונקציות מותאמות לעמוד עיצובים
-    function openDesignDetails(id) {
-      console.log('פתיחת פרטי עיצוב:', id);
-      // כאן יוכנס קוד לפתיחת מודל פרטי עיצוב
-    }
-
-    // פונקציה לפתיחת מודל הוספת תכנון חדש
-    function openAddTradePlanModal() {
-      const modal = new bootstrap.Modal(document.getElementById('addTradePlanModal'));
-      // קבע ברירת מחדל של היום לשדה התאריך
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      const todayStr = `${yyyy}-${mm}-${dd}`;
-      const dateInput = document.getElementById('addTradePlanDate');
-      if (dateInput) dateInput.value = todayStr;
-      modal.show();
-    }
-
-    // פונקציה לשמירת תכנון חדש
-    function saveNewTradePlan() {
-      const formData = {
-        ticker_id: document.getElementById('addTradePlanTickerId').value,
-        investment_type: document.getElementById('addTradePlanInvestmentType').value,
-        side: document.getElementById('addTradePlanSide').value,
-        planned_amount: parseFloat(document.getElementById('addTradePlanPlannedAmount').value),
-        stop_price: parseFloat(document.getElementById('addTradePlanStopPrice').value) || null,
-        target_price: parseFloat(document.getElementById('addTradePlanTargetPrice').value) || null,
-        entry_conditions: document.getElementById('addTradePlanEntryConditions').value,
-        reasons: document.getElementById('addTradePlanReasons').value,
-        created_at: document.getElementById('addTradePlanDate').value
-      };
-
-      console.log('שמירת תכנון חדש:', formData);
-
-      // כאן יוכנס קוד לשמירה לשרת
-      // לעת עתה נציג הודעה
-      if (typeof window.showNotification === 'function') {
-        window.showNotification('תכנון חדש נשמר בהצלחה!', 'success');
-      } else {
-        console.error('showNotification function not found');
-      }
-
-      // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addTradePlanModal'));
-      modal.hide();
-
-      // רענון הטבלה
-      if (typeof window.loadDesignsData === 'function') {
-        window.loadDesignsData();
-      } else {
-        console.error('loadDesignsData function not found');
-      }
-    }
-
-    // פונקציות התכנונים מרוכזות ב-trade_plans.js
-    // אין צורך להגדיר אותן כאן
-
-    // מערכת המיון מרוכזת ב-trade_plans.js
-    // אין צורך להגדיר אותה כאן
-
-    // ===== פונקציות פילטרים =====
-
-    // מערך ריק לנתוני תכנונים - יטען מהשרת
-    let designsData = [];
-
-    // פונקציה לתרגום סוג לעברית
-    function translateTradePlanType(type) {
-      const typeMap = {
-        'swing': 'סווינג',
-        'investment': 'השקעה',
-        'passive': 'פאסיבי'
-      };
-      return typeMap[type] || type;
-    }
-
-    // פונקציה לטעינת נתוני תכנונים - מרוכזת ב-trade_plans.js
-    // אין צורך להגדיר אותה כאן
-
-    // פונקציה לעדכון הטבלה - מרוכזת ב-trade_plans.js
-    // אין צורך להגדיר אותה כאן
-
-    // הגדרת הפונקציות כגלובליות - מרוכזות ב-trade_plans.js
-    // אין צורך להגדיר אותן כאן
-
-    // הגדרת הפונקציה הגלובלית לעדכון מהפילטרים
-    window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-      console.log('🔄 updateGridFromComponent called with:', {
-        selectedStatuses,
-        selectedTypes,
-        selectedDateRange,
-        searchTerm
-      });
-
-      // קריאה לפונקציה הגלובלית
-      if (typeof window.updateGridFromComponentGlobal === 'function') {
-        window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'planning');
-      }
-    };
-
-
-
-    // פונקציות נוספות
-    function resetAllFiltersAndReloadData() {
-      if (typeof window.resetAllFiltersForPage === 'function') {
-        window.resetAllFiltersForPage('planning');
-      } else {
-        console.error('resetAllFiltersForPage function not found');
-      }
-      if (typeof window.showNotification === 'function') {
-        window.showNotification('כל הפילטרים אופסו', 'success');
-      } else {
-        console.error('showNotification function not found');
-      }
-    }
-
-    // פונקציות UI מרוכזות ב-trade_plans.js
-    // אין צורך להגדיר אותן כאן
-
-    // פונקציה לשחזור מצב הסגירה
-    function restoreDesignsSectionState() {
-      // שימוש בפונקציה הגלובלית החדשה
-      if (typeof window.restoreAllSectionStates === 'function') {
-        window.restoreAllSectionStates();
-      } else {
-        console.error('restoreAllSectionStates function not found in main.js');
-      }
-    }
-
-
-
-
-
-    // פונקציות מותאמות לעמוד תכנונים
-    function loadDesigns() {
-      console.log('טעינת תכנונים');
-      if (typeof window.loadDesignsData === 'function') {
-        window.loadDesignsData();
-      } else {
-        console.error('loadDesignsData function not found');
-      }
-    }
-
-    function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
-      console.log('פילטור תכנונים:', { statuses, types, accounts, dateRange, searchTerm });
-      // קריאה לפונקציה הגלובלית עם pageName
-      if (typeof window.updateGridFromComponentGlobal === 'function') {
-        window.updateGridFromComponentGlobal(statuses, types, accounts, dateRange, searchTerm, 'planning');
-      }
-    }
-
-
-
-    function showAddTradePlanModal() {
-      console.log('הצגת מודל הוספת תכנון');
-      const modal = new bootstrap.Modal(document.getElementById('addTradePlanModal'));
-      // קבע ברירת מחדל של היום לשדה התאריך
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      const todayStr = `${yyyy}-${mm}-${dd}`;
-      const dateInput = document.getElementById('addTradePlanDate');
-      if (dateInput) dateInput.value = todayStr;
-      modal.show();
-    }
-
-    function openDesignDetails(id) {
-      console.log('פתיחת פרטי תכנון:', id);
-      // כאן יוכנס קוד לפתיחת פרטי תכנון
-    }
-
-    function editDesign(id) {
-      console.log('עריכת תכנון:', id);
-      // כאן יוכנס קוד לעריכת תכנון
-    }
-
-    function deleteDesign(id) {
-      console.log('מחיקת תכנון:', id);
-      // כאן יוכנס קוד למחיקת תכנון
-    }
-
-    // אתחול הדף
-    document.addEventListener('DOMContentLoaded', function () {
-      console.log('🚀 טעינת דף תכנון טריידים עם מערכת ראש דף חדשה...');
-
-      // אתחול HeaderSystem
-      if (window.headerSystem && !window.headerSystem.isInitialized) {
-        console.log('✅ אתחול HeaderSystem...');
-        window.headerSystem.init();
-      }
-
-      // טעינת חשבונות לפילטר
-      if (typeof window.loadAccountsFromServer === 'function') {
-        console.log('✅ טעינת חשבונות לפילטר...');
-        window.loadAccountsFromServer().then(() => {
-          if (window.accountsData && window.accountsData.length > 0) {
-            console.log('✅ חשבונות נטענו:', window.accountsData);
-            if (window.updateAccountFilterMenu) {
-              window.updateAccountFilterMenu(window.accountsData);
-            }
-          }
-        });
-      }
-
-      // טעינת מצב הסקשנים לפי הדף הנוכחי
-      if (typeof window.loadSectionStates === 'function') {
-        window.loadSectionStates();
-      }
-
-      // אתחול פילטרים לדף התכנון
-      if (typeof window.initializePageFilters === 'function') {
-        window.initializePageFilters('planning');
-      }
-
-      // שחזור מצב הסגירה
-      if (typeof window.restoreDesignsSectionState === 'function') {
-        window.restoreDesignsSectionState();
-      } else {
-        console.error('restoreDesignsSectionState function not found');
-      }
-
-      // טעינת נתוני תכנונים
-      if (typeof window.loadPlanningData === 'function') {
-        window.loadPlanningData();
-      } else {
-        console.error('loadPlanningData function not found');
-      }
-
-      // טעינת התראות - נטען אוטומטית על ידי ווב קומפוננט
-      console.log('🔄 === ALERTS WILL BE LOADED BY WEB COMPONENT ===');
-
-      // ווב קומפוננט של התראות פעילות נטען אוטומטית
-      console.log('🔄 === ActiveAlerts Web Component will load automatically ===');
-
-      // הגדרת כותרות למיון מיד
-      console.log('🔄 === SETUP SORTABLE HEADERS IMMEDIATE ===');
-      if (typeof window.setupSortableHeaders === 'function') {
-        window.setupSortableHeaders();
-      } else {
-        console.error('setupSortableHeaders function not found');
-      }
-
-      // הגדרת כותרות למיון אחרי טעינת הדף
-      setTimeout(() => {
-        console.log('🔄 === SETUP SORTABLE HEADERS TIMEOUT ===');
-        if (typeof window.setupSortableHeaders === 'function') {
-          window.setupSortableHeaders();
-        } else {
-          console.error('setupSortableHeaders function not found');
-        }
-      }, 500);
-
-      // בדיקת פילטרים שמורים אחרי 1 שנייה
-      setTimeout(() => {
-        // בדיקת פילטרים שמורים (ללא הצגת הודעה)
-        const savedStatuses = localStorage.getItem('designsFilterStatuses');
-        const savedDateRange = localStorage.getItem('designsFilterDateRange');
-        const savedSearch = localStorage.getItem('designsFilterSearch');
-
-        // הגדרת כותרות למיון אחרי טעינת הפילטרים
-        console.log('🔄 === SETUP SORTABLE HEADERS AFTER FILTERS ===');
-        if (typeof window.setupSortableHeaders === 'function') {
-          window.setupSortableHeaders();
-        } else {
-          console.error('setupSortableHeaders function not found');
-        }
-
-        // עדכון סטטיסטיקות הטבלה
-        if (typeof window.updateTableStats === 'function') {
-          window.updateTableStats('planning');
-        } else {
-          console.error('updateTableStats function not found');
-        }
-      }, 1000);
-
-
-    });
-
-
-
-  </script>
-
-  <!-- Page initialization script - loaded after all external scripts -->
-  <script>
-    // אתחול הדף - רץ אחרי שכל הסקריפטים החיצוניים נטענו
-    document.addEventListener('DOMContentLoaded', function () {
-      console.log('🚀 טעינת דף תכנון טריידים עם מערכת ראש דף חדשה...');
-
-      // אתחול HeaderSystem
-      if (window.headerSystem && !window.headerSystem.isInitialized) {
-        console.log('✅ אתחול HeaderSystem...');
-        window.headerSystem.init();
-      }
-
-      // טעינת חשבונות לפילטר
-      if (typeof window.loadAccountsFromServer === 'function') {
-        console.log('✅ טעינת חשבונות לפילטר...');
-        window.loadAccountsFromServer().then(() => {
-          if (window.accountsData && window.accountsData.length > 0) {
-            console.log('✅ חשבונות נטענו:', window.accountsData);
-            if (window.updateAccountFilterMenu) {
-              window.updateAccountFilterMenu(window.accountsData);
-            }
-          }
-        });
-      }
-
-      // טעינת מצב הסקשנים לפי הדף הנוכחי
-      if (typeof window.loadSectionStates === 'function') {
-        window.loadSectionStates();
-      }
-
-      // אתחול פילטרים לדף התכנון
-      if (typeof window.initializePageFilters === 'function') {
-        window.initializePageFilters('planning');
-      }
-
-      // שחזור מצב הסגירה
-      if (typeof window.restoreDesignsSectionState === 'function') {
-        window.restoreDesignsSectionState();
-      } else {
-        console.error('restoreDesignsSectionState function not found');
-      }
-
-      // טעינת נתוני תכנונים
-      if (typeof window.loadPlanningData === 'function') {
-        window.loadPlanningData();
-      } else {
-        console.error('loadPlanningData function not found');
-      }
-
-      // טעינת התראות - נטען אוטומטית על ידי ווב קומפוננט
-      console.log('🔄 === ALERTS WILL BE LOADED BY WEB COMPONENT ===');
-
-      // ווב קומפוננט של התראות פעילות נטען אוטומטית
-      console.log('🔄 === ActiveAlerts Web Component will load automatically ===');
-
-      // הגדרת כותרות למיון מיד
-      console.log('🔄 === SETUP SORTABLE HEADERS IMMEDIATE ===');
-      if (typeof window.setupSortableHeaders === 'function') {
-        window.setupSortableHeaders();
-      } else {
-        console.error('setupSortableHeaders function not found');
-      }
-
-      // הגדרת כותרות למיון אחרי טעינת הדף
-      setTimeout(() => {
-        console.log('🔄 === SETUP SORTABLE HEADERS TIMEOUT ===');
-        if (typeof window.setupSortableHeaders === 'function') {
-          window.setupSortableHeaders();
-        } else {
-          console.error('setupSortableHeaders function not found');
-        }
-      }, 500);
-
-      // בדיקת פילטרים שמורים אחרי 1 שנייה
-      setTimeout(() => {
-        // בדיקת פילטרים שמורים (ללא הצגת הודעה)
-        const savedStatuses = localStorage.getItem('designsFilterStatuses');
-        const savedDateRange = localStorage.getItem('designsFilterDateRange');
-        const savedSearch = localStorage.getItem('designsFilterSearch');
-
-        // הגדרת כותרות למיון אחרי טעינת הפילטרים
-        console.log('🔄 === SETUP SORTABLE HEADERS AFTER FILTERS ===');
-        if (typeof window.setupSortableHeaders === 'function') {
-          window.setupSortableHeaders();
-        } else {
-          console.error('setupSortableHeaders function not found');
-        }
-
-        // עדכון סטטיסטיקות הטבלה
-        if (typeof window.updateTableStats === 'function') {
-          window.updateTableStats('planning');
-        } else {
-          console.error('updateTableStats function not found');
-        }
-      }, 1000);
-    });
-  </script>
+  <!-- Linked Items Modal -->
+  <div class="modal fade" id="linkedItemsModal" tabindex="-1" aria-labelledby="linkedItemsModalLabel"
+    aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="linkedItemsModalLabel">פרטים מקושרים</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="linkedItemsModalBody">
+          <!-- Content will be dynamically loaded by linked-items.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All JavaScript functionality is handled by external files -->
+  <!-- No inline scripts - all logic is in trade_plans.js and other external files -->
 </body>
 
 </html>

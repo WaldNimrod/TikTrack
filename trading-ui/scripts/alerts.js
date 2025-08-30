@@ -460,6 +460,15 @@ function updateAlertsTable(alerts) {
         day: '2-digit'
       }) : 'לא מוגדר';
 
+      // תאריך הפעלה
+      const triggeredAt = alert.triggered_at ? new Date(alert.triggered_at).toLocaleDateString('he-IL', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : '-';
+
       // המרת סטטוס לעברית להצגה
       // לפי הדוקומנטציה: open=פעיל, closed=הופעל, cancelled=בוטל
       let statusDisplay;
@@ -504,6 +513,7 @@ function updateAlertsTable(alerts) {
         })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
+          <td><span class="triggered-date-text">${triggeredAt}</span></td>
           <td style="padding: 0;">
             <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer;" title="קישור לדף אובייקט - בפיתוח">
               ${relatedDisplay}
@@ -513,28 +523,16 @@ function updateAlertsTable(alerts) {
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
-            <table class="table table-sm table-borderless mb-0">
-              <tbody>
-                <tr>
-                  <td class="p-0 pe-1">
-                    <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">🔗</button>
-                  </td>
-                  <td class="p-0 pe-1">
-                    <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
-                  </td>
-                  <td class="p-0 pe-1">
-                    ${alert.status === 'open' ? `
-                    <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>
-                    ` : `
-                    <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
-                    `}
-                  </td>
-                  <td class="p-0">
-                    <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
+              <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">🔗</button>
+              <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
+              ${alert.status === 'open' ? `
+              <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>
+              ` : `
+              <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
+              `}
+              <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
+            </div>
           </td>
         </tr>
       `;

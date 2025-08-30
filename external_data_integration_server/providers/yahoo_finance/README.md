@@ -60,3 +60,6 @@ quote_data = adapter.fetch_quote_data('AAPL')
 
 
 
+
+
+

@@ -296,11 +296,25 @@ window.getCategoryDisplayName = translateTestCategory; // preferences.js
  */
 function formatNumberWithCommas(number, options = {}) {
     const num = parseFloat(number) || 0;
-    const defaultOptions = {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-        useGrouping: true
-    };
+    
+    // הגדרת עיגול לפי גודל המספר
+    let defaultOptions;
+    if (Math.abs(num) >= 1000) {
+        // מספרים מעל 1000 - ללא ספרות אחרי הנקודה
+        defaultOptions = {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+            useGrouping: true
+        };
+    } else {
+        // מספרים מתחת ל-1000 - 2 ספרות אחרי הנקודה
+        defaultOptions = {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+            useGrouping: true
+        };
+    }
+    
     const finalOptions = { ...defaultOptions, ...options };
 
     return num.toLocaleString('he-IL', finalOptions);
@@ -315,13 +329,29 @@ function formatNumberWithCommas(number, options = {}) {
  */
 function formatCurrencyWithCommas(amount, currency = 'USD', options = {}) {
     const num = parseFloat(amount) || 0;
-    const defaultOptions = {
-        style: 'currency',
-        currency: currency,
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        useGrouping: true
-    };
+    
+    // הגדרת עיגול לפי גודל המספר
+    let defaultOptions;
+    if (Math.abs(num) >= 1000) {
+        // מספרים מעל 1000 - ללא ספרות אחרי הנקודה
+        defaultOptions = {
+            style: 'currency',
+            currency: currency,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+            useGrouping: true
+        };
+    } else {
+        // מספרים מתחת ל-1000 - 2 ספרות אחרי הנקודה
+        defaultOptions = {
+            style: 'currency',
+            currency: currency,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+            useGrouping: true
+        };
+    }
+    
     const finalOptions = { ...defaultOptions, ...options };
 
     return num.toLocaleString('he-IL', finalOptions);

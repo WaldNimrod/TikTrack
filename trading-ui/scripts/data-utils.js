@@ -354,6 +354,73 @@ function calculateDefaultPrices(currentPrice, options = {}) {
     };
 }
 
+/**
+ * Convert amount to shares
+ * @param {number} amount - Amount to invest
+ * @param {number} price - Current price per share
+ * @param {boolean} allowFractionalShares - Whether to allow fractional shares
+ * @returns {object} Shares and adjusted amount
+ */
+function convertAmountToShares(amount, price, allowFractionalShares = null) {
+    if (!amount || !price || price <= 0) {
+        console.warn('Invalid amount or price for conversion:', { amount, price });
+        return { shares: 0, adjustedAmount: 0 };
+    }
+
+    // Get user preference for fractional shares if not specified
+    if (allowFractionalShares === null) {
+        allowFractionalShares = getUserPreference('allowFractionalShares', false);
+    }
+
+    let shares;
+    if (allowFractionalShares) {
+        // Allow fractional shares
+        shares = amount / price;
+    } else {
+        // Only whole shares
+        shares = Math.floor(amount / price);
+    }
+
+    const adjustedAmount = shares * price;
+
+    return {
+        shares: parseFloat(shares.toFixed(4)),
+        adjustedAmount: parseFloat(adjustedAmount.toFixed(2))
+    };
+}
+
+/**
+ * Convert shares to amount
+ * @param {number} shares - Number of shares
+ * @param {number} price - Current price per share
+ * @returns {number} Total amount
+ */
+function convertSharesToAmount(shares, price) {
+    if (!shares || !price || price <= 0) {
+        console.warn('Invalid shares or price for conversion:', { shares, price });
+        return 0;
+    }
+
+    const amount = shares * price;
+    return parseFloat(amount.toFixed(2));
+}
+
+/**
+ * Get user preference
+ * @param {string} key - Preference key
+ * @param {*} defaultValue - Default value
+ * @returns {*} User preference value
+ */
+function getUserPreference(key, defaultValue = null) {
+    try {
+        const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+        return preferences[key] !== undefined ? preferences[key] : defaultValue;
+    } catch (error) {
+        console.warn('Error reading user preference:', error);
+        return defaultValue;
+    }
+}
+
 // ===== Export Functions =====
 
 // Make functions globally available
@@ -362,6 +429,9 @@ window.getCurrencyDisplay = getCurrencyDisplay;
 window.generateCurrencyOptions = generateCurrencyOptions;
 window.apiCall = apiCall;
 window.calculateDefaultPrices = calculateDefaultPrices;
+window.convertAmountToShares = convertAmountToShares;
+window.convertSharesToAmount = convertSharesToAmount;
+window.getUserPreference = getUserPreference;
 window.loadDataFromAPI = loadDataFromAPI;
 window.validateDataStructure = validateDataStructure;
 window.filterDataBySearch = filterDataBySearch;
@@ -378,6 +448,10 @@ window.dataUtils = {
     getCurrencyDisplay,
     generateCurrencyOptions,
     apiCall,
+    calculateDefaultPrices,
+    convertAmountToShares,
+    convertSharesToAmount,
+    getUserPreference,
     loadDataFromAPI,
     validateDataStructure,
     filterDataBySearch

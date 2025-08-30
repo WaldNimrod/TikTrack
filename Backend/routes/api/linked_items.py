@@ -80,13 +80,17 @@ def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
         # Get parent entities (entities that this entity references)
         parent_entities = get_parent_entities(cursor, entity_type, entity_id)
         
+        # Get entity details for display
+        entity_details = get_entity_details(cursor, entity_type, entity_id)
+        
         result = {
             'entity_type': entity_type,
             'entity_id': entity_id,
             'child_entities': child_entities,
             'parent_entities': parent_entities,
             'total_child_count': len(child_entities),
-            'total_parent_count': len(parent_entities)
+            'total_parent_count': len(parent_entities),
+            'entity_details': entity_details
         }
         
         logger.info(f"Found {len(child_entities)} child entities and {len(parent_entities)} parent entities")
@@ -96,84 +100,6 @@ def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Error getting linked items for {entity_type} {entity_id}: {str(e)}")
         return jsonify({'error': f'Failed to get linked items: {str(e)}'}), 500
-    finally:
-        if 'conn' in locals():
-            conn.close()
-
-@linked_items_bp.route('/<entity_type>/<int:entity_id>/check-deletion', methods=['GET'])
-def check_deletion_safety(entity_type: str, entity_id: int) -> Dict[str, Any]:
-    """
-    Check if an entity can be safely deleted (no blocking linked items)
-    
-    Args:
-        entity_type: Type of entity (trade, account, ticker, alert, etc.)
-        entity_id: ID of the entity
-        
-    Returns:
-        Dictionary with deletion safety information and blocking items
-    """
-    try:
-        logger.info(f"Checking deletion safety for {entity_type} {entity_id}")
-        
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Get child entities (entities that reference this entity)
-        child_entities = get_child_entities(cursor, entity_type, entity_id)
-        
-        # Categorize entities by type and check for blocking items
-        blocking_items = {
-            'open_trades': [],
-            'open_trade_plans': [],
-            'active_alerts': [],
-            'notes': [],
-            'executions': [],
-            'cash_flows': []
-        }
-        
-        can_delete = True
-        blocking_reason = None
-        
-        for entity in child_entities:
-            if entity['type'] == 'trade' and entity['status'] == 'open':
-                blocking_items['open_trades'].append(entity)
-                can_delete = False
-                blocking_reason = "Has open trades"
-                
-            elif entity['type'] == 'trade_plan' and entity['status'] == 'open':
-                blocking_items['open_trade_plans'].append(entity)
-                can_delete = False
-                blocking_reason = "Has open trade plans"
-                
-            elif entity['type'] == 'alert' and entity['status'] == 'active':
-                blocking_items['active_alerts'].append(entity)
-                
-            elif entity['type'] == 'note':
-                blocking_items['notes'].append(entity)
-                
-            elif entity['type'] == 'execution':
-                blocking_items['executions'].append(entity)
-                
-            elif entity['type'] == 'cash_flow':
-                blocking_items['cash_flows'].append(entity)
-        
-        result = {
-            'entity_type': entity_type,
-            'entity_id': entity_id,
-            'can_delete': can_delete,
-            'blocking_reason': blocking_reason,
-            'blocking_items': blocking_items,
-            'total_child_count': len(child_entities),
-            'total_blocking_count': sum(len(items) for items in blocking_items.values())
-        }
-        
-        logger.info(f"Deletion safety check for {entity_type} {entity_id}: can_delete={can_delete}, blocking_reason={blocking_reason}")
-        
-        return jsonify(result), 200
-        
-    except Exception as e:
-        logger.error(f"Error checking deletion safety for {entity_type} {entity_id}: {str(e)}")
-        return jsonify({'error': f'Failed to check deletion safety: {str(e)}'}), 500
     finally:
         if 'conn' in locals():
             conn.close()
@@ -229,6 +155,65 @@ def get_child_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[st
         logger.error(f"Error getting child entities for {entity_type} {entity_id}: {str(e)}")
     
     return child_entities
+
+def get_entity_details(cursor, entity_type: str, entity_id: int) -> Dict[str, Any]:
+    """
+    Get entity details for display in linked items modal
+    
+    Args:
+        cursor: Database cursor
+        entity_type: Type of entity
+        entity_id: ID of entity
+        
+    Returns:
+        Dictionary with entity details
+    """
+    try:
+        if entity_type == 'trade_plan':
+            cursor.execute("""
+                SELECT tp.id, tp.created_at, t.symbol as ticker_symbol
+                FROM trade_plans tp
+                LEFT JOIN tickers t ON tp.ticker_id = t.id
+                WHERE tp.id = ?
+            """, (entity_id,))
+            row = cursor.fetchone()
+            if row:
+                return {
+                    'id': row['id'],
+                    'created_at': row['created_at'],
+                    'ticker_symbol': row['ticker_symbol']
+                }
+        elif entity_type == 'trade':
+            cursor.execute("""
+                SELECT t.id, t.created_at, t.symbol
+                FROM trades t
+                WHERE t.id = ?
+            """, (entity_id,))
+            row = cursor.fetchone()
+            if row:
+                return {
+                    'id': row['id'],
+                    'created_at': row['created_at'],
+                    'symbol': row['symbol']
+                }
+        elif entity_type == 'ticker':
+            cursor.execute("""
+                SELECT t.id, t.symbol
+                FROM tickers t
+                WHERE t.id = ?
+            """, (entity_id,))
+            row = cursor.fetchone()
+            if row:
+                return {
+                    'id': row['id'],
+                    'symbol': row['symbol']
+                }
+        # Add more entity types as needed
+        
+    except Exception as e:
+        logger.error(f"Error getting entity details for {entity_type} {entity_id}: {str(e)}")
+    
+    return {}
 
 def get_parent_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[str, Any]]:
     """

@@ -463,8 +463,8 @@ window.toggleTopSectionGlobal = function () {
 
     if (currentPath.includes('/alerts')) {
       storageKey = 'alertsTopSectionCollapsed';
-    } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
-      storageKey = 'planningTopSectionCollapsed';
+        } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
+        storageKey = 'planningTopSectionCollapsed';
     } else if (currentPath.includes('/trades')) {
       storageKey = 'tradesTopSectionCollapsed';
     } else if (currentPath.includes('/accounts')) {
@@ -584,8 +584,8 @@ window.toggleMainSection = function () {
 
     if (currentPath.includes('/alerts')) {
       storageKey = 'alertsMainSectionCollapsed';
-    } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
-      storageKey = 'planningMainSectionCollapsed';
+        } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
+        storageKey = 'planningMainSectionCollapsed';
     } else if (currentPath.includes('/trades')) {
       storageKey = 'tradesMainSectionCollapsed';
     } else if (currentPath.includes('/accounts')) {
@@ -626,8 +626,8 @@ window.restoreAllSectionStates = function () {
   let topSectionKey = 'topSectionCollapsed';
   if (currentPath.includes('/alerts')) {
     topSectionKey = 'alertsTopSectionCollapsed';
-  } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
-    topSectionKey = 'planningTopSectionCollapsed';
+      } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
+        topSectionKey = 'planningTopSectionCollapsed';
   } else if (currentPath.includes('/trades')) {
     topSectionKey = 'tradesTopSectionCollapsed';
   } else if (currentPath.includes('/accounts')) {
@@ -677,8 +677,8 @@ window.restoreAllSectionStates = function () {
   let mainSectionKey = 'mainSectionCollapsed';
   if (currentPath.includes('/alerts')) {
     mainSectionKey = 'alertsMainSectionCollapsed';
-  } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
-    mainSectionKey = 'planningMainSectionCollapsed';
+      } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
+        mainSectionKey = 'planningMainSectionCollapsed';
   } else if (currentPath.includes('/trades')) {
     mainSectionKey = 'tradesMainSectionCollapsed';
   } else if (currentPath.includes('/accounts')) {
@@ -846,6 +846,30 @@ window.restoreSectionStates = function () {
   });
 };
 
+// ===== MODAL FUNCTIONS =====
+
+/**
+ * Close modal globally
+ * @param {string} modalId - Modal ID to close
+ */
+function closeModalGlobal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        if (bootstrapModal) {
+            bootstrapModal.hide();
+        } else {
+            // Fallback if Bootstrap modal not found
+            modal.style.display = 'none';
+            modal.classList.remove('show');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+        }
+    }
+}
+
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
 window.initializeApplication = initializeApplication;
 window.checkDependencies = checkDependencies;
@@ -853,6 +877,7 @@ window.initializeCoreSystems = initializeCoreSystems;
 window.initializeCurrentPage = initializeCurrentPage;
 window.isModuleAvailable = isModuleAvailable;
 window.getSystemInfo = getSystemInfo;
+window.closeModalGlobal = closeModalGlobal;
 
 // Export toggle functions (already defined as window properties above)
 // window.toggleTopSection = toggleTopSection;

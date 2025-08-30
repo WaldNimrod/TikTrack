@@ -107,7 +107,7 @@
   <script src="scripts/active-alerts-component.js"></script>
   <script src="scripts/accounts.js"></script>
   <script src="scripts/executions.js"></script>
-      <script src="scripts/trades.js?v=20250830"></script>
+      <script src="scripts/trades.js?v=20250830_11"></script>
 </head>
 
 <body>
@@ -275,35 +275,7 @@
 
 
 
-    <script>
-      // פונקציות נוספות מוגדרות בקובץ trades.js
-      // Additional functions are defined in trades.js
-      window.updateGridFromComponentGlobal = function (selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm, pageType) {
-        console.log('🔄 === UPDATE GRID FROM COMPONENT GLOBAL CALLED ===');
-        console.log('🔄 Page type:', pageType);
-        console.log('🔄 Parameters:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm });
 
-        if (pageType === 'trades') {
-          // עבור טריידים, נשתמש בפונקציה המותאמת
-          console.log('🔄 Calling filterTradesData for trades page');
-          filterTradesData(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm);
-        } else {
-          console.log('🔄 Page type is not trades, skipping filterTradesData');
-        }
-      };
-
-      // פונקציה להצגת הודעות - מוגדרת בקובץ notification-system.js
-      // Function for showing notifications - defined in notification-system.js
-
-      // פונקציות נוספות מוגדרות בקובץ trades.js
-      // Additional functions are defined in trades.js
-
-      // פונקציות נוספות מוגדרות בקובץ trades.js
-      // Additional functions are defined in trades.js
-
-      // אתחול הדף - מוגדר בקובץ trades.js
-      // Page initialization - defined in trades.js
-    </script>
 
     <!-- מודל עריכת טרייד -->
     <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
@@ -621,7 +593,7 @@
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" id="addTradeShowClosedTrades" onchange="onShowClosedTradesChange(event)">
                       <label class="form-check-label" for="addTradeShowClosedTrades">
-                        הצג טריידים סגורים
+                        הצג תכנונים סגורים
                       </label>
                     </div>
                   </div>
@@ -761,16 +733,7 @@
       </div>
     </div>
 
-    <script>
-      // פונקציה לבדיקת מצב החשבונות - מוגדרת בקובץ accounts.js
-      // Function for checking accounts status - defined in accounts.js
 
-      // אתחול מערכת ראש הדף החדשה - מוגדר בקובץ header-system.js
-      // Initializing new header system - defined in header-system.js
-
-      // הסקריפטים כבר נטענים ב-<head> - אין צורך בטעינה כפולה
-      // Scripts already loaded in <head> - no need for duplicate loading
-    </script>
 </body>
 
 </html>

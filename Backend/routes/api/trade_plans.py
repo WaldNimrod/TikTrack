@@ -242,6 +242,30 @@ def get_trade_plan_summary():
     finally:
         db.close()
 
+@trade_plans_bp.route('/<int:plan_id>/can-cancel', methods=['GET'])
+def can_cancel_trade_plan(plan_id: int):
+    """Check if trade plan can be cancelled"""
+    try:
+        db: Session = next(get_db())
+        cancel_check = TradePlanService.can_cancel_plan(db, plan_id)
+        return jsonify({
+            "status": "success",
+            "data": cancel_check,
+            "message": "Trade plan cancellation check completed",
+            "version": "v1"
+        })
+    except Exception as e:
+        logger.error(f"Error checking if trade plan {plan_id} can be cancelled: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 400
+    finally:
+        db.close()
+
+
+
 @trade_plans_bp.route('/<int:plan_id>', methods=['DELETE'])
 def delete_trade_plan(plan_id: int):
     """Delete trade plan"""

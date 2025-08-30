@@ -25,8 +25,17 @@ class TradeService:
         logger.info(f"Loaded {len(trades)} trades")
         if trades:
             first_trade = trades[0]
-            logger.info(f"First trade account: {hasattr(first_trade, 'account') and first_trade.account}")
-            logger.info(f"First trade ticker: {hasattr(first_trade, 'ticker') and first_trade.ticker}")
+            logger.info(f"First trade ID: {first_trade.id}")
+            logger.info(f"First trade account_id: {first_trade.account_id}")
+            logger.info(f"First trade ticker_id: {first_trade.ticker_id}")
+            logger.info(f"First trade has account attribute: {hasattr(first_trade, 'account')}")
+            logger.info(f"First trade account object: {first_trade.account}")
+            logger.info(f"First trade has ticker attribute: {hasattr(first_trade, 'ticker')}")
+            logger.info(f"First trade ticker object: {first_trade.ticker}")
+            if hasattr(first_trade, 'account') and first_trade.account:
+                logger.info(f"First trade account name: {first_trade.account.name}")
+            if hasattr(first_trade, 'ticker') and first_trade.ticker:
+                logger.info(f"First trade ticker symbol: {first_trade.ticker.symbol}")
         
         return trades
     
@@ -163,7 +172,6 @@ class TradeService:
                 setattr(trade, key, value)
         
         db.commit()
-        db.refresh(trade)
         logger.info(f"Updated trade: {trade.id}")
         return trade
     

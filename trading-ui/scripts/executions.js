@@ -1644,7 +1644,7 @@ function goToTrade(tradeId) {
  * מעבר לתכנון ספציפי
  */
 function goToPlan(planId) {
-    window.location.href = `/planning#plan-${planId}`;
+            window.location.href = `/trade_plans#plan-${planId}`;
 }
 
 /**

@@ -1778,6 +1778,134 @@ th {
   margin: 2px !important;
 }
 
+/* ===== טבלת תכנוני מסחר - רוחב יחסי באחוזים ===== */
+
+/* טבלת תכנוני מסחר - רוחב קבוע עם עמודות יחסיות */
+.trade-plans-table {
+  width: 98% !important;
+  min-width: 1200px !important;
+  table-layout: fixed !important;
+}
+
+/* עמודת טיקר - 10% */
+.trade-plans-table th:nth-child(1),
+.trade-plans-table td:nth-child(1) {
+  width: 10% !important;
+}
+
+/* עמודת תאריך - 8% */
+.trade-plans-table th:nth-child(2),
+.trade-plans-table td:nth-child(2) {
+  width: 8% !important;
+}
+
+/* עמודת סוג השקעה - 8% */
+.trade-plans-table th:nth-child(3),
+.trade-plans-table td:nth-child(3) {
+  width: 8% !important;
+}
+
+/* עמודת צד - 6% */
+.trade-plans-table th:nth-child(4),
+.trade-plans-table td:nth-child(4) {
+  width: 6% !important;
+}
+
+/* עמודת סכום מתוכנן - 8% */
+.trade-plans-table th:nth-child(5),
+.trade-plans-table td:nth-child(5) {
+  width: 8% !important;
+}
+
+/* עמודת מספר מניות - 8% */
+.trade-plans-table th:nth-child(6),
+.trade-plans-table td:nth-child(6) {
+  width: 8% !important;
+}
+
+/* עמודת מחיר עצירה - 8% */
+.trade-plans-table th:nth-child(7),
+.trade-plans-table td:nth-child(7) {
+  width: 8% !important;
+}
+
+/* עמודת מחיר יעד - 8% */
+.trade-plans-table th:nth-child(8),
+.trade-plans-table td:nth-child(8) {
+  width: 8% !important;
+}
+
+/* עמודת תנאי כניסה - 10% */
+.trade-plans-table th:nth-child(9),
+.trade-plans-table td:nth-child(9) {
+  width: 10% !important;
+}
+
+/* עמודת פעולות - 16% (מספיק מקום ל-4 כפתורים) */
+.trade-plans-table th:last-child,
+.trade-plans-table td:last-child {
+  width: 16% !important;
+  min-width: 140px !important;
+}
+
+/* עיצוב כפתורי פעולה בטבלת תכנוני מסחר */
+.trade-plans-table .actions-cell .btn {
+  width: 30px !important;
+  height: 30px !important;
+  margin: 0 2px !important;
+  font-size: 0.8rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* צביעת שדות בטבלת תכנוני מסחר */
+.trade-plans-table .target-text {
+  color: #28a745 !important;
+  font-weight: 600 !important;
+}
+
+.trade-plans-table .stop-text {
+  color: #dc3545 !important;
+  font-weight: 600 !important;
+}
+
+
+
+/* שימוש בסגנונות הגלובליים לשדות צד */
+.trade-plans-table .side-badge.side-long {
+  color: #6f42c1 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(111, 66, 193, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.trade-plans-table .side-badge.side-long:hover {
+  background: rgba(111, 66, 193, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.trade-plans-table .side-badge.side-short {
+  color: #dc3545 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(220, 53, 69, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.trade-plans-table .side-badge.side-short:hover {
+  background: rgba(220, 53, 69, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
 /* ===== טבלת ביצועים - רוחב יחסי באחוזים ===== */
 
 /* טבלת ביצועים - רוחב קבוע עם עמודות יחסיות */
@@ -1892,10 +2020,12 @@ th {
 }
 
 #alertsTable .actions-cell {
-  width: 8% !important;
-  min-width: 80px;
-  max-width: 8% !important;
-  overflow: hidden;
+  width: 12% !important;
+  min-width: 120px;
+  max-width: 12% !important;
+  overflow: visible;
+  text-align: center;
+  padding: 4px 8px;
 }
 
 #alertsTable .ticker-cell {
@@ -1949,7 +2079,7 @@ th {
 
 #alertsTable th:nth-child(9),
 #alertsTable td:nth-child(9) {
-  width: 8% !important;
+  width: 4% !important;
 }
 
 /* מניעת גלילה אופקית בטבלת ההתראות */
@@ -1966,4 +2096,24 @@ th {
   table-layout: fixed;
   width: 98% !important;
   max-width: 98% !important;
+}
+
+/* סגנונות ספציפיים לכפתורים בטבלת ההתראות */
+#alertsTable .actions-cell .btn {
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 0.8rem !important;
+  margin: 0 2px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+#alertsTable .actions-cell .d-flex {
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 2px !important;
 }

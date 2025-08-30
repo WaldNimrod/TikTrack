@@ -67,6 +67,7 @@ from routes.api.cash_flows import cash_flows_bp
 from routes.api.notes import notes_bp
 from routes.api.executions import executions_bp
 from routes.api.preferences import preferences_bp
+from routes.api.users import users_bp
 from routes.api.tests import tests_bp
 from routes.api.test_suite import test_suite_bp
 from routes.api.constraints import constraints_bp
@@ -117,6 +118,7 @@ app.register_blueprint(cash_flows_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
 app.register_blueprint(preferences_bp)
+app.register_blueprint(users_bp)
 app.register_blueprint(tests_bp)
 app.register_blueprint(test_suite_bp)
 app.register_blueprint(constraints_bp)

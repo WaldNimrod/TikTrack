@@ -218,7 +218,7 @@ function updateTradesTable(trades) {
 
     return `
     <tr>
-      <td class="ticker-cell"><strong><a href="#" onclick="viewTickerDetails('${trade.ticker_id}')" class="ticker-link">${trade.ticker_symbol || 'טיקר לא ידוע'}</a></strong></td>
+      <td class="ticker-cell"><strong><a href="#" onclick="viewTickerDetails('${trade.ticker_id}')" class="ticker-link">${trade.ticker_symbol || getTickerSymbol(trade.ticker_id) || 'טיקר לא ידוע'}</a></strong></td>
       <td class="status-cell" data-status="${trade.status || ''}"><span class="status-badge status-${trade.status || 'open'}">${statusDisplay}</span></td>
       <td class="type-cell" data-type="${typeForFilter}">${typeDisplay || trade.investment_type || '-'}</td>
       <td class="side-cell" data-side="${trade.side || 'Long'}">
@@ -231,7 +231,7 @@ function updateTradesTable(trades) {
       <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
-        <div class="d-flex gap-1 justify-content-center">
+        <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
           ${createLinkButton(`viewLinkedItemsForTrade(${trade.id})`)}
           ${createEditButton(`editTradeRecord('${trade.id}')`)}
           ${trade.status === 'open' ?
@@ -260,6 +260,7 @@ function updateTradesTable(trades) {
 }
 
 // פונקציות נוספות
+
 function viewTickerDetails(tickerId) {
   // צפייה בפרטי טיקר
   // כאן יוכנס קוד לצפייה בפרטי טיקר
@@ -623,18 +624,18 @@ async function showEditTradeModal(trade) {
   // שמירת הטרייד המקורי לבדיקות
   window.currentEditTrade = trade;
 
-  // הגדרת ולידציה של שדות תאריך
-  setTimeout(() => {
-    setupDateValidation();
-  }, 100);
+  // הגדרת ולידציה של שדות תאריך - מושבת זמנית
+  // setTimeout(() => {
+  //   setupDateValidation();
+  // }, 100);
 
   // שמירת הטרייד המקורי לבדיקות
   window.currentEditTrade = trade;
 
-  // הגדרת ולידציה של שדות תאריך
-  setTimeout(() => {
-    setupDateValidation();
-  }, 100);
+  // הגדרת ולידציה של שדות תאריך - מושבת זמנית
+  // setTimeout(() => {
+  //   setupDateValidation();
+  // }, 100);
 
   // Show the modal
   const modalElement = document.getElementById('editTradeModal');
@@ -1016,7 +1017,6 @@ function showAddTradeModal() {
   console.log('🚀 showAddTradeModal נקראת');
 
   // טעינת נתונים למודל
-  console.log('🔄 קורא ל-loadModalData...');
   loadModalData();
 
   // ניקוי הטופס
@@ -1039,20 +1039,16 @@ function showAddTradeModal() {
 
   // הצגת המודל
   const modalElement = document.getElementById('addTradeModal');
-  console.log('🔍 modalElement נמצא:', !!modalElement);
   if (modalElement) {
-    console.log('🔍 Bootstrap זמין:', typeof bootstrap !== 'undefined');
     if (typeof bootstrap !== 'undefined') {
       const modal = new bootstrap.Modal(modalElement);
       modal.show();
-      console.log('✅ מודל מוצג עם Bootstrap');
     } else {
       console.error('Bootstrap is not loaded');
       // נסיון חלופי להצגת המודל
       modalElement.style.display = 'block';
       modalElement.classList.add('show');
       document.body.classList.add('modal-open');
-      console.log('✅ מודל מוצג ללא Bootstrap');
     }
   } else {
     console.error('Modal element not found');
@@ -1060,120 +1056,71 @@ function showAddTradeModal() {
 }
 
 /**
- * ולידציה של טופס הוספת טרייד
+ * ולידציה של טופס הוספת טרייד לפי אילוצי בסיס הנתונים
  * 
- * פונקציה זו בודקת את תקינות הטופס לפני שליחה לשרת
- * 
- * תכונות:
- * - בדיקת שדות חובה
- * - הצגת הודעות שגיאה מתאימות
- * - ניקוי שגיאות קודמות
- * - החזרת תוצאה בוליאנית
- * 
- * שדות נבדקים:
- * - סוג טרייד (type)
- * - צד (side)
- * - חשבון (account_id)
+ * משתמשת בפונקציות הכלליות מ-validation-utils.js
  * 
  * @returns {boolean} true אם הטופס תקין, false אם לא
  */
 function validateTradeForm() {
+  // הגדרת כללי הוולידציה לפי אילוצי בסיס הנתונים
+  const validationRules = {
+    'addTradeAccountId': { required: true, type: 'select' },
+    'addTradeTickerId': { required: true, type: 'select' },
+    'addTradeTradePlanId': { required: true, type: 'select' },
+    'addTradeStatus': { 
+      required: false, 
+      type: 'select', 
+      enum: ['open', 'closed', 'cancelled'] 
+    },
+    'addTradeType': { 
+      required: false, 
+      type: 'select', 
+      enum: ['swing', 'investment', 'passive'] 
+    },
+    'addTradeSide': { 
+      required: false, 
+      type: 'select', 
+      enum: ['Long', 'Short'] 
+    },
+    'addTradeOpenedAt': { 
+      required: false, 
+      type: 'datetime-local',
+      conditionalRequired: {
+        field: 'addTradeStatus',
+        value: 'open',
+        message: 'תאריך פתיחה הוא חובה עבור טריידים פתוחים'
+      }
+    },
+    'addTradeClosedAt': { 
+      required: false, 
+      type: 'datetime-local',
+      conditionalRequired: {
+        field: 'addTradeStatus',
+        value: 'closed',
+        message: 'תאריך סגירה הוא חובה עבור טריידים סגורים'
+      },
+      customValidation: function(value, formData) {
+        const openedAt = formData['addTradeOpenedAt'];
+        if (value && openedAt) {
+          const openedDate = new Date(openedAt);
+          const closedDate = new Date(value);
+          if (closedDate <= openedDate) {
+            return { isValid: false, message: 'תאריך סגירה חייב להיות אחרי תאריך פתיחה' };
+          }
+        }
+        return { isValid: true };
+      }
+    }
+  };
 
-  const form = document.getElementById('addTradeForm');
-  if (!form) {
-    console.error('Form element not found');
+  // שימוש בפונקציה הכללית לוולידציה
+  if (typeof window.validateForm === 'function') {
+    return window.validateForm('addTradeForm', validationRules);
+  } else {
+    console.error('❌ validateForm function not found - validation-utils.js not loaded');
     return false;
   }
-
-  // ניקוי שגיאות קודמות
-  clearTradeValidationErrors();
-
-  let isValid = true;
-
-  // בדיקת תוכנית טרייד (חובה לפי האילוצים)
-  const tradePlanElement = document.getElementById('addTradeTradePlanId');
-  if (!tradePlanElement.value) {
-    showTradeValidationError('tradePlanError', 'יש לבחור תוכנית טרייד');
-    isValid = false;
-  }
-
-  // בדיקת טיקר (חובה לפי האילוצים)
-  const tickerElement = document.getElementById('addTradeTickerId');
-  if (!tickerElement.value) {
-    showTradeValidationError('tickerError', 'יש לבחור טיקר');
-    isValid = false;
-  }
-
-  // בדיקת סוג טרייד (תיקון שם השדה)
-  const typeElement = document.getElementById('addTradeType');
-  if (!typeElement.value) {
-    showTradeValidationError('typeError', 'יש לבחור סוג טרייד');
-    isValid = false;
-  }
-
-  // בדיקת צד
-  const sideElement = document.getElementById('addTradeSide');
-  if (!sideElement.value) {
-    showTradeValidationError('sideError', 'יש לבחור צד');
-    isValid = false;
-  }
-
-  // בדיקת חשבון
-  const accountElement = document.getElementById('addTradeAccountId');
-  if (!accountElement.value) {
-    showTradeValidationError('accountError', 'יש לבחור חשבון');
-    isValid = false;
-  }
-
-  // בדיקת תאריך יצירה (חובה לפי האילוצים)
-  const createdAtElement = document.getElementById('addTradeOpenedAt');
-  if (!createdAtElement.value) {
-    showTradeValidationError('createdAtError', 'יש למלא תאריך יצירה');
-    isValid = false;
-  }
-
-  if (!isValid) {
-    if (window.uiUtils && window.uiUtils.showErrorNotification) {
-      window.uiUtils.showErrorNotification('שדות חובה חסרים', 'יש למלא את כל השדות החובה');
-    } else {
-              if (window.showErrorNotification) {
-            window.showErrorNotification('שדות חובה חסרים', 'יש למלא את כל השדות החובה');
-        }
-    }
-  }
-
-  return isValid;
-}
-
-/**
- * הצגת שגיאת ולידציה
- * 
- * פונקציה זו מציגה הודעת שגיאה מתחת לשדה המתאים
- * 
- * @param {string} errorId - מזהה אלמנט השגיאה
- * @param {string} message - הודעת השגיאה
- */
-function showTradeValidationError(errorId, message) {
-  const errorElement = document.getElementById(errorId);
-  if (errorElement) {
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
-  }
-}
-
-/**
- * ניקוי שגיאות ולידציה
- * 
- * פונקציה זו מסתירה את כל הודעות השגיאה בטופס
- */
-function clearTradeValidationErrors() {
-  const errorIds = ['typeError', 'sideError', 'accountError', 'tradePlanError'];
-  errorIds.forEach(id => {
-    const errorElement = document.getElementById(id);
-    if (errorElement) {
-      errorElement.style.display = 'none';
-    }
-  });
 }
 
 /**
@@ -1353,17 +1300,12 @@ async function loadModalData() {
   try {
 
     // טעינת חשבונות
-    console.log('🔄 טוען חשבונות...');
     const accountsResponse = await fetch('/api/v1/accounts/');
     const accounts = await accountsResponse.json();
-    console.log('✅ חשבונות נטענו:', accounts.data.length);
 
     // טעינת תוכניות טרייד
-    console.log('🔄 טוען תוכניות טרייד...');
     const tradePlansResponse = await fetch('/api/v1/trade_plans/');
     const tradePlans = await tradePlansResponse.json();
-    console.log('✅ תוכניות טרייד נטענו:', tradePlans.data.length);
-    console.log('📊 תוכניות פתוחות:', tradePlans.data.filter(p => p.status === 'open').length);
 
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
     const accountSelect = document.getElementById('addTradeAccountId');
@@ -1378,18 +1320,23 @@ async function loadModalData() {
       });
     }
 
-    // מילוי רשימת תוכניות טרייד - הצג כל התוכניות (פתוחות וסגורות)
+    // מילוי רשימת תוכניות טרייד - הצג רק תוכניות פתוחות כברירת מחדל
     const tradePlanSelect = document.getElementById('addTradeTradePlanId');
-    console.log('🔍 tradePlanSelect נמצא:', !!tradePlanSelect);
     if (tradePlanSelect) {
       tradePlanSelect.innerHTML = '<option value="">בחר תוכנית טרייד</option>';
 
-      // הצג כל התוכניות - פתוחות וסגורות
-      // זה מאפשר למשתמש לבחור מתוכנית קיימת גם אם היא סגורה
-      const allPlans = tradePlans.data;
-      console.log('📋 ממלא תוכניות טרייד:', allPlans.length);
+      // בדיקה אם הפילטר "הצג תכנונים סגורים" פעיל
+      const showClosedCheckbox = document.getElementById('addTradeShowClosedTrades');
+      const showClosed = showClosedCheckbox ? showClosedCheckbox.checked : false;
 
-      allPlans.forEach(plan => {
+      // סינון התוכניות לפי הפילטר
+      let filteredPlans = tradePlans.data;
+      if (!showClosed) {
+        // הצג רק תוכניות פתוחות
+        filteredPlans = tradePlans.data.filter(plan => plan.status === 'open');
+      }
+
+      filteredPlans.forEach(plan => {
         const option = document.createElement('option');
         option.value = plan.id;
         // הצגת: סימבול | צד | סוג השקעה | תאריך
@@ -1419,7 +1366,6 @@ async function loadModalData() {
         option.setAttribute('data-plan-status', plan.status);
         tradePlanSelect.appendChild(option);
       });
-      console.log('✅ תוכניות טרייד מולאו:', tradePlanSelect.options.length - 1);
     }
 
     console.log('✅ נתונים נטענו למודל');
@@ -1540,8 +1486,9 @@ window.updateTickersForClosedTradesFilter = function (showClosed) {
  */
 function onShowClosedTradesChange(event) {
   const showClosed = event.target.checked;
-  console.log('🔄 פילטר "הצג טריידים סגורים" השתנה:', showClosed);
-  updateTickersListForClosedTrades(showClosed);
+  console.log('🔄 פילטר "הצג תכנונים סגורים" השתנה:', showClosed);
+  // טעינה מחדש של נתוני המודל כדי לעדכן את רשימת התוכניות
+  loadModalData();
 }
 
 // ייצוא הפונקציה לגלובל
@@ -1759,8 +1706,7 @@ window.saveNewTradeRecord = saveNewTradeRecord;            // שמירת טרי�
 
 // פונקציות ולידציה:
 window.validateTradeForm = validateTradeForm;              // ולידציה של טופס
-window.showTradeValidationError = showTradeValidationError; // הצגת שגיאת ולידציה
-window.clearTradeValidationErrors = clearTradeValidationErrors; // ניקוי שגיאות ולידציה
+  // ולידציה - משתמשת בפונקציות הכלליות מ-validation-utils.js
 
 // פונקציות עזר:
 window.loadModalData = loadModalData;                      // טעינת נתונים למודל
@@ -1780,7 +1726,7 @@ window.validateTradeStatusChange = validateTradeStatusChange; // בדיקת פו
 window.getCurrentPosition = getCurrentPosition;            // קבלת פוזיציה נוכחית
 window.validateTradePlanChange = validateTradePlanChange;  // בדיקת התאמת תוכנית טרייד
 window.validateTradeChanges = validateTradeChanges;        // בדיקת שינויים בטרייד
-window.setupDateValidation = setupDateValidation;          // הגדרת ולידציה של תאריכים
+// window.setupDateValidation = setupDateValidation;          // הגדרת ולידציה של תאריכים - מושבת זמנית
 window.validateDateFields = validateDateFields;            // בדיקת ולידציה של שדות תאריך
 
 // פונקציות סידור - משתמשות בפונקציות הגלובליות מ-tables.js
@@ -2113,89 +2059,7 @@ async function validateTradeChanges(originalTrade, updatedTrade) {
   return validations;
 }
 
-/**
- * ולידציה בזמן אמת של שדות תאריך
- */
-function setupDateValidation() {
-  const openedAtField = document.getElementById('editTradeOpenedAt');
-  const closedAtField = document.getElementById('editTradeClosedAt');
-
-  if (openedAtField && closedAtField) {
-    // ולידציה בעת שינוי תאריך יצירה
-    openedAtField.addEventListener('change', function () {
-      validateDateFields();
-    });
-
-    // ולידציה בעת שינוי תאריך סגירה
-    closedAtField.addEventListener('change', function () {
-      validateDateFields();
-    });
-  }
-}
-
-/**
- * בדיקת ולידציה של שדות תאריך
- */
-function validateDateFields() {
-  const openedAtField = document.getElementById('editTradeOpenedAt');
-  const closedAtField = document.getElementById('editTradeClosedAt');
-
-  if (!openedAtField || !closedAtField) return;
-
-  const openedAt = openedAtField.value;
-  const closedAt = closedAtField.value;
-
-  // הסרת הודעות שגיאה קודמות
-  clearDateValidationMessages();
-
-  if (openedAt && closedAt) {
-    const openedDate = new Date(openedAt);
-    const closedDate = new Date(closedAt);
-
-    if (closedDate < openedDate) {
-      showDateValidationError('תאריך סגירה לא יכול להיות לפני תאריך יצירה');
-      closedAtField.classList.add('is-invalid');
-    } else {
-      closedAtField.classList.remove('is-invalid');
-      closedAtField.classList.add('is-valid');
-    }
-  }
-}
-
-/**
- * הצגת הודעת שגיאה לולידציה
- */
-function showDateValidationError(message) {
-  const closedAtField = document.getElementById('editTradeClosedAt');
-  if (!closedAtField) return;
-
-  // הסרת הודעות קודמות
-  const existingError = closedAtField.parentNode.querySelector('.invalid-feedback');
-  if (existingError) {
-    existingError.remove();
-  }
-
-  // הוספת הודעת שגיאה
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'invalid-feedback';
-  errorDiv.textContent = message;
-  closedAtField.parentNode.appendChild(errorDiv);
-}
-
-/**
- * ניקוי הודעות ולידציה
- */
-function clearDateValidationMessages() {
-  const closedAtField = document.getElementById('editTradeClosedAt');
-  if (!closedAtField) return;
-
-  const existingError = closedAtField.parentNode.querySelector('.invalid-feedback');
-  if (existingError) {
-    existingError.remove();
-  }
-
-  closedAtField.classList.remove('is-invalid', 'is-valid');
-}
+// ולידציה של תאריכים - משתמשת בפונקציות הכלליות מ-validation-utils.js
 
 // ===== פונקציות פילטר לטבלת טריידים =====
 

@@ -262,7 +262,9 @@ function createLinkedItemsModalContent(data, itemType, itemId) {
             break;
         case 'trade_plan':
             headerTitle = 'מה קשור לתוכנית טרייד:';
-            itemName = data.planName || `תוכנית ${itemId}`;
+            // נסה לקבל את פרטי התכנון מהנתונים הגלובליים או מהנתונים שהתקבלו
+            const planDetails = getTradePlanDetails(itemId, data);
+            itemName = planDetails || `תוכנית ${itemId}`;
             break;
         case 'execution':
             headerTitle = 'מה קשור לביצוע:';
@@ -273,6 +275,9 @@ function createLinkedItemsModalContent(data, itemType, itemId) {
             itemName = `רשומה ${itemId}`;
     }
 
+    // קבלת הסבר על הכללים לפי סוג האובייקט והפעולה
+    const rulesExplanation = getRulesExplanation(itemType, data);
+    
     let content = `
     <div class="linked-items-container">
       <style>
@@ -433,6 +438,13 @@ function createLinkedItemsModalContent(data, itemType, itemId) {
         <strong>📋 סקירת אלמנטים מקושרים</strong><br>
         מציג את כל האלמנטים המקושרים ל-${getItemTypeDisplayName(itemType)} ${itemName}
       </div>
+      
+      ${rulesExplanation ? `
+      <div class="alert alert-warning">
+        <strong>⚠️ כללי ביטול/מחיקה</strong><br>
+        ${rulesExplanation}
+      </div>
+      ` : ''}
   `;
 
     // Add linked items list
@@ -523,6 +535,138 @@ function createLinkedItemsList(items) {
 }
 
 /**
+ * Get rules explanation for linked items modal
+ * 
+ * Returns explanation of cancellation/deletion rules based on item type
+ * 
+ * @param {string} itemType - Type of the item
+ * @param {Object} data - Linked items data
+ * @returns {string} Rules explanation
+ */
+function getRulesExplanation(itemType, data) {
+    const childEntities = data.child_entities || [];
+    const parentEntities = data.parent_entities || [];
+    const allEntities = [...childEntities, ...parentEntities];
+    
+    if (allEntities.length === 0) {
+        return null; // אין פריטים מקושרים
+    }
+    
+    switch (itemType) {
+        case 'trade_plan':
+            const activeTrades = childEntities.filter(entity => entity.type === 'trade' && entity.status === 'open');
+            const closedTrades = childEntities.filter(entity => entity.type === 'trade' && entity.status === 'closed');
+            const notes = childEntities.filter(entity => entity.type === 'note');
+            const alerts = childEntities.filter(entity => entity.type === 'alert');
+            const executions = childEntities.filter(entity => entity.type === 'execution');
+            
+            let explanation = 'לא ניתן לבטל תכנון זה כי יש:';
+            if (activeTrades.length > 0) {
+                explanation += `<br>• ${activeTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
+            }
+            if (notes.length > 0) {
+                explanation += `<br>• ${notes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+            }
+            if (alerts.length > 0) {
+                explanation += `<br>• ${alerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+            }
+            if (executions.length > 0) {
+                explanation += `<br>• ${executions.length} ביצוע(ים) מקושר(ים) - יש למחוק אותם קודם`;
+            }
+            if (closedTrades.length > 0) {
+                explanation += `<br>• ${closedTrades.length} טרייד(ים) סגור(ים) - ניתן לבטל תכנון עם טריידים סגורים`;
+            }
+            return explanation;
+            
+        case 'trade':
+            const linkedExecutions = childEntities.filter(entity => entity.type === 'execution');
+            const linkedNotes = childEntities.filter(entity => entity.type === 'note');
+            const linkedAlerts = childEntities.filter(entity => entity.type === 'alert');
+            
+            explanation = 'לא ניתן לבטל טרייד זה כי יש:';
+            if (linkedExecutions.length > 0) {
+                explanation += `<br>• ${linkedExecutions.length} ביצוע(ים) מקושר(ים) - יש למחוק אותם קודם`;
+            }
+            if (linkedNotes.length > 0) {
+                explanation += `<br>• ${linkedNotes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+            }
+            if (linkedAlerts.length > 0) {
+                explanation += `<br>• ${linkedAlerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+            }
+            return explanation;
+            
+        case 'ticker':
+            const linkedTrades = childEntities.filter(entity => entity.type === 'trade' && entity.status === 'open');
+            const linkedPlans = childEntities.filter(entity => entity.type === 'trade_plan' && entity.status === 'open');
+            const tickerNotes = childEntities.filter(entity => entity.type === 'note');
+            const tickerAlerts = childEntities.filter(entity => entity.type === 'alert');
+            
+            explanation = 'לא ניתן למחוק טיקר זה כי יש:';
+            if (linkedTrades.length > 0) {
+                explanation += `<br>• ${linkedTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
+            }
+            if (linkedPlans.length > 0) {
+                explanation += `<br>• ${linkedPlans.length} תכנון(ים) פעיל(ים) - יש לבטל אותם קודם`;
+            }
+            if (tickerNotes.length > 0) {
+                explanation += `<br>• ${tickerNotes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+            }
+            if (tickerAlerts.length > 0) {
+                explanation += `<br>• ${tickerAlerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+            }
+            return explanation;
+            
+        default:
+            return 'יש פריטים מקושרים שמונעים ביטול/מחיקה של פריט זה. יש לטפל בפריטים המקושרים קודם.';
+    }
+}
+
+/**
+ * Get trade plan details for display
+ * 
+ * Returns formatted trade plan information including symbol and date
+ * 
+ * @param {string|number} planId - Trade plan ID
+ * @param {Object} data - Linked items data from API
+ * @returns {string} Formatted trade plan details
+ */
+function getTradePlanDetails(planId, data = null) {
+    try {
+        // נסה לקבל את פרטי התכנון מהנתונים הגלובליים
+        if (window.trade_plansData && Array.isArray(window.trade_plansData)) {
+            const plan = window.trade_plansData.find(p => p.id == planId);
+            if (plan) {
+                const symbol = plan.ticker_symbol || plan.symbol || 'לא מוגדר';
+                const date = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+                return `תוכנית ${symbol} מתאריך ${date}`;
+            }
+        }
+        
+        // נסה לקבל מהנתונים שהתקבלו מה-API
+        if (data && data.entity_details) {
+            const symbol = data.entity_details.ticker_symbol || data.entity_details.symbol || 'לא מוגדר';
+            const date = data.entity_details.created_at ? new Date(data.entity_details.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+            return `תוכנית ${symbol} מתאריך ${date}`;
+        }
+        
+        // אם לא נמצא, נסה לקבל מהטבלה
+        const planRow = document.querySelector(`tr[data-plan-id="${planId}"]`);
+        if (planRow) {
+            const symbolCell = planRow.querySelector('[data-column="ticker_symbol"]') || planRow.querySelector('[data-column="symbol"]');
+            const dateCell = planRow.querySelector('[data-column="created_at"]');
+            const symbol = symbolCell ? symbolCell.textContent.trim() : 'לא מוגדר';
+            const date = dateCell ? new Date(dateCell.textContent.trim()).toLocaleDateString('he-IL') : 'לא מוגדר';
+            return `תוכנית ${symbol} מתאריך ${date}`;
+        }
+        
+        return `תוכנית ${planId}`;
+    } catch (error) {
+        console.error('Error getting trade plan details:', error);
+        return `תוכנית ${planId}`;
+    }
+}
+
+/**
  * Get icon for item type
  * 
  * Returns the appropriate emoji icon for each item type
@@ -532,16 +676,16 @@ function createLinkedItemsList(items) {
  */
 function getItemTypeIcon(type) {
     const icons = {
-        'trade': '<img src="images/icons/trades.svg" alt="טרייד" class="linked-item-icon-img" width="24" height="24">',
-        'account': '<img src="images/icons/accounts.svg" alt="חשבון" class="linked-item-icon-img" width="24" height="24">',
-        'ticker': '<img src="images/icons/tickers.svg" alt="טיקר" class="linked-item-icon-img" width="24" height="24">',
-        'alert': '<img src="images/icons/alerts.svg" alt="התראה" class="linked-item-icon-img" width="24" height="24">',
-        'cash_flow': '<img src="images/icons/cash_flows.svg" alt="תזרים מזומנים" class="linked-item-icon-img" width="24" height="24">',
-        'note': '<img src="images/icons/reserch.svg" alt="הערה" class="linked-item-icon-img" width="24" height="24">',
-        'trade_plan': '<img src="images/icons/trade_plans.svg" alt="תכנון טרייד" class="linked-item-icon-img" width="24" height="24">',
-        'execution': '<img src="images/icons/executions.svg" alt="ביצוע" class="linked-item-icon-img" width="24" height="24">'
+        'trade': '📈',
+        'account': '🏦',
+        'ticker': '💹',
+        'alert': '🔔',
+        'cash_flow': '💰',
+        'note': '📝',
+        'trade_plan': '📋',
+        'execution': '✅'
     };
-    return icons[type] || '<img src="images/icons/db_display.svg" alt="פריט" class="linked-item-icon-img" width="24" height="24">';
+    return icons[type] || '📄';
 }
 
 /**
@@ -1323,6 +1467,7 @@ window.getItemTypeIcon = getItemTypeIcon;
 window.getItemTypeDisplayName = getItemTypeDisplayName;
 window.getTypeBadgeClass = getTypeBadgeClass;
 window.getStatusBadge = getStatusBadge;
+window.getTickerSymbol = getTickerSymbol;
 window.viewItemDetails = viewItemDetails;
 window.editItem = editItem;
 window.deleteItem = deleteItem;
@@ -1351,6 +1496,7 @@ window.linkedItems = {
     getItemTypeDisplayName,
     getTypeBadgeClass,
     getStatusBadge,
+    getTickerSymbol,
     viewItemDetails,
     editItem,
     deleteItem,

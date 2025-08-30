@@ -377,6 +377,18 @@ function getColumnValue(item, columnIndex, tableType) {
             }
             return 'לא מוגדר';
         }
+        if (fieldName === 'triggered_at') {
+            if (item.triggered_at) {
+                return new Date(item.triggered_at).toLocaleDateString('he-IL', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            return '-';
+        }
         // For other fields, return directly
         return item[fieldName] || '';
     }
@@ -473,6 +485,18 @@ function getColumnValue(item, columnIndex, tableType) {
                 return 'חדש';
             }
             return 'לא מוגדר';
+        }
+        if (fieldName === 'triggered_at') {
+            if (item.triggered_at) {
+                return new Date(item.triggered_at).toLocaleDateString('he-IL', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            return '-';
         }
         if (fieldName === 'related_object') {
             return item.related_object || '-';

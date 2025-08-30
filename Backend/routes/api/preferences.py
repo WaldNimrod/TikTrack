@@ -14,7 +14,7 @@ import os
 from flask import Blueprint, request, jsonify
 from pathlib import Path
 from sqlalchemy.orm import Session
-from models.database import get_db
+from config.database import get_db
 from services.user_service import UserService
 
 # Create blueprint
@@ -109,8 +109,12 @@ def save_all_preferences():
         user_id = get_user_id_from_request()
         new_preferences = request.json.get('preferences', {})
         
-        # Save preferences to database
-        success = UserService.set_user_preferences(db, new_preferences, user_id)
+        # Get current preferences and merge with new ones
+        current_preferences = UserService.get_user_preferences(db, user_id)
+        current_preferences.update(new_preferences)
+        
+        # Save merged preferences to database
+        success = UserService.set_user_preferences(db, current_preferences, user_id)
         
         if success:
             return jsonify({"success": True, "message": "Preferences saved successfully"})

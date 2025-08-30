@@ -356,7 +356,7 @@ function updateTable(tableType, data) {
     `;
     
     // הוספת כפתור ביטול לטבלאות עם שדה סטטוס
-    if (item.status && item.status !== 'cancelled' && item.status !== 'closed') {
+    if (item.status && item.status !== 'cancelled' && item.status !== 'canceled') {
       actionsHtml += `<button class="btn btn-sm btn-warning" onclick="cancelRecord('${tableType}', ${item.id})" title="בטל"><span class="cancel-icon">X</span></button>`;
     }
     

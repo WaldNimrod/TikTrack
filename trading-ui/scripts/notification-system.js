@@ -168,7 +168,8 @@ function createNotificationContainer() {
  */
 function showNotification(message, type = 'info', title = 'התראה', duration = 4000) {
       // showNotification called
-  // Parameter types: 
+    // Parameter types: 
+    console.log('🔧 Parameter types:', {
         messageType: typeof message, 
         typeType: typeof type, 
         titleType: typeof title, 
@@ -317,8 +318,8 @@ function showWarningNotification(title, message, duration = 5000) {
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  */
 function showInfoNotification(title, message, duration = 4000) {
-    console.log('🔧 showInfoNotification called with:', { title, message, duration });
-    console.log('🔧 showInfoNotification calling showNotification with:', { message, type: 'info', title, duration });
+      // showInfoNotification called
+  // showInfoNotification calling showNotification
     showNotification(message, 'info', title, duration);
 }
 
@@ -331,15 +332,15 @@ function showInfoNotification(title, message, duration = 4000) {
  * @param {number} duration - Display duration in milliseconds (default: 6000)
  */
 function showValidationWarning(fieldId, message, duration = 6000) {
-    console.log('🔧 showValidationWarning called with:', { fieldId, message, duration });
+    // showValidationWarning called
     
     // Show error notification (red)
-    console.log('🔧 showValidationWarning calling showErrorNotification with:', { title: 'שגיאת וולידציה', message, duration });
+    // showValidationWarning calling showErrorNotification
     showErrorNotification('שגיאת וולידציה', message, duration);
     
     // Highlight the problematic field
     const field = document.getElementById(fieldId);
-    console.log('🔧 Field element found:', field);
+    // Field element found
     
     if (field) {
         // Add error styling
@@ -356,17 +357,17 @@ function showValidationWarning(fieldId, message, duration = 6000) {
         // Focus on field
         field.focus();
         
-        console.log('🔧 Field styling applied');
+        // Field styling applied
         
         // Remove styling after 3 seconds
         setTimeout(() => {
             field.classList.remove('is-invalid');
             field.style.borderColor = '';
             field.style.boxShadow = '';
-            console.log('🔧 Field styling removed');
+            // Field styling removed
         }, 3000);
     } else {
-        console.log('🔧 Field not found:', fieldId);
+        // Field not found
     }
 }
 

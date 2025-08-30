@@ -525,10 +525,10 @@ function updateAlertsTable(alerts) {
                     <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
                   </td>
                   <td class="p-0 pe-1">
-                    ${alert.status === 'open' ? `
-                    <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול"><span class="cancel-icon">X</span></button>
+                    ${alert.status === 'cancelled' || alert.status === 'canceled' ? `
+                    <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה מבוטלת">X</button>
                     ` : `
-                    <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
+                    <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול"><span class="cancel-icon">X</span></button>
                     `}
                   </td>
                   <td class="p-0">

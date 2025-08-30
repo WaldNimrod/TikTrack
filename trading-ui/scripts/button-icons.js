@@ -22,7 +22,7 @@ const BUTTON_ICONS = {
     ARCHIVE: '📦',
     RESTORE: '📤',
     APPROVE: '✅',
-    REJECT: '❌',
+    REJECT: '<span class="cancel-icon">X</span>',
     PAUSE: '⏸️',
     PLAY: '▶️',
     STOP: '⏹️',

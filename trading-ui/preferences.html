@@ -300,6 +300,172 @@
       </div>
     </div>
     
+    <!-- ===== הגדרות מערכת הנתונים החיצוניים ===== -->
+    <div class="preference-item" style="border-top: 2px solid #007bff; margin-top: 20px; padding-top: 20px;">
+      <div class="preference-label">
+        <h4>🌐 מערכת נתונים חיצוניים</h4>
+        <p>הגדרות לחיבור למקורות מידע חיצוניים</p>
+      </div>
+      <div class="preference-control">
+        <!-- Placeholder for section header -->
+      </div>
+    </div>
+    
+    <!-- מרווח רענון נתונים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>⏱️ מרווח רענון נתונים</h4>
+        <p>מרווח זמן בין רענון נתונים חיצוניים (בדקות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="dataRefreshInterval" class="form-control" min="1" max="60" step="1" 
+                 onchange="updatePreference('dataRefreshInterval', this.value)" placeholder="5">
+          <span class="input-group-text">דקות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ספק נתונים ראשי -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📡 ספק נתונים ראשי</h4>
+        <p>ספק הנתונים שישמש כברירת מחדל</p>
+      </div>
+      <div class="preference-control">
+        <select id="primaryDataProvider" class="form-select" onchange="updatePreference('primaryDataProvider', this.value)">
+          <option value="yahoo">Yahoo Finance</option>
+          <option value="google">Google Finance</option>
+          <option value="alpha_vantage">Alpha Vantage</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- ספק נתונים משני -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📡 ספק נתונים משני</h4>
+        <p>ספק נתונים גיבוי במקרה של כשל</p>
+      </div>
+      <div class="preference-control">
+        <select id="secondaryDataProvider" class="form-select" onchange="updatePreference('secondaryDataProvider', this.value)">
+          <option value="google">Google Finance</option>
+          <option value="yahoo">Yahoo Finance</option>
+          <option value="alpha_vantage">Alpha Vantage</option>
+          <option value="none">ללא</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- מרווח זמן Cache -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>💾 מרווח זמן Cache</h4>
+        <p>זמן שמירת נתונים במטמון (בדקות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="cacheTTL" class="form-control" min="1" max="1440" step="1" 
+                 onchange="updatePreference('cacheTTL', this.value)" placeholder="5">
+          <span class="input-group-text">דקות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- מספר מקסימלי של טיקרים לרענון -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📊 מספר מקסימלי של טיקרים לרענון</h4>
+        <p>מספר הטיקרים המקסימלי שירענן בבת אחת</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="maxBatchSize" class="form-control" min="1" max="100" step="1" 
+                 onchange="updatePreference('maxBatchSize', this.value)" placeholder="25">
+          <span class="input-group-text">טיקרים</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- מרווח בין בקשות -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>⏳ מרווח בין בקשות</h4>
+        <p>מרווח זמן בין בקשות לספקי נתונים (במילישניות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="requestDelay" class="form-control" min="0" max="5000" step="100" 
+                 onchange="updatePreference('requestDelay', this.value)" placeholder="200">
+          <span class="input-group-text">מ"ש</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- מספר ניסיונות חוזרים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔄 מספר ניסיונות חוזרים</h4>
+        <p>מספר הניסיונות החוזרים במקרה של כשל</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="retryAttempts" class="form-control" min="0" max="5" step="1" 
+                 onchange="updatePreference('retryAttempts', this.value)" placeholder="2">
+          <span class="input-group-text">ניסיונות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- זמן פסקה בין ניסיונות -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>⏸️ זמן פסקה בין ניסיונות</h4>
+        <p>זמן המתנה בין ניסיונות חוזרים (בשניות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="retryDelay" class="form-control" min="1" max="60" step="1" 
+                 onchange="updatePreference('retryDelay', this.value)" placeholder="5">
+          <span class="input-group-text">שניות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- הפעלת רענון אוטומטי -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔄 רענון אוטומטי</h4>
+        <p>הפעלת רענון אוטומטי של נתונים</p>
+      </div>
+      <div class="preference-control">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="autoRefresh" 
+                 onchange="updatePreference('autoRefresh', this.checked)" style="transform: scale(1.2);">
+          <label class="form-check-label" for="autoRefresh">
+            הפעל רענון אוטומטי
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- הצגת לוגים מפורטים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📝 לוגים מפורטים</h4>
+        <p>הצגת לוגים מפורטים של פעולות נתונים</p>
+      </div>
+      <div class="preference-control">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="verboseLogging" 
+                 onchange="updatePreference('verboseLogging', this.checked)" style="transform: scale(1.2);">
+          <label class="form-check-label" for="verboseLogging">
+            הצג לוגים מפורטים
+          </label>
+        </div>
+      </div>
+    </div>
+    
     <!-- כפתורי פעולה -->
     <div class="d-flex justify-content-between mt-4 pt-4 border-top">
       <button class="btn btn-outline-secondary" onclick="resetToDefaults()">

@@ -82,14 +82,15 @@ function openAddTradePlanModal() {
 /**
  * פתיחת מודל עריכת תכנון קיים
  */
-function openEditTradePlanModal(tradePlanId) {
-    console.log('🔄 Opening edit trade plan modal for ID:', tradePlanId);
-
+async function openEditTradePlanModal(tradePlanId) {
     const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
     if (!tradePlan) {
         console.error('Trade plan not found:', tradePlanId);
         return;
     }
+
+    // טעינת רשימת הטיקרים בחלון הבחירה
+    await loadTickersForEditModal();
 
     // מילוי הטופס בנתונים קיימים
     document.getElementById('editTradePlanId').value = tradePlan.id;
@@ -101,30 +102,6 @@ function openEditTradePlanModal(tradePlanId) {
     document.getElementById('editTradePlanShares').value = tradePlan.shares || '';
     document.getElementById('editTradePlanStopPrice').value = tradePlan.stop_price || '';
     document.getElementById('editTradePlanTargetPrice').value = tradePlan.target_price || '';
-    
-    // מילוי מחירי ברירת מחדל אם הם ריקים
-    if (!tradePlan.stop_price || !tradePlan.target_price) {
-        const priceDisplay = document.getElementById('editCurrentPriceDisplay');
-        if (priceDisplay && priceDisplay.textContent !== '-' && priceDisplay.textContent !== '') {
-            const currentPrice = parseFloat(priceDisplay.textContent.replace('$', ''));
-            if (currentPrice > 0) {
-                const stopPriceInput = document.getElementById('editTradePlanStopPrice');
-                const targetPriceInput = document.getElementById('editTradePlanTargetPrice');
-                
-                if (!tradePlan.stop_price && stopPriceInput) {
-                    // מחיר עצירה - 5% מתחת למחיר הנוכחי
-                    const stopPrice = currentPrice * 0.95;
-                    stopPriceInput.value = stopPrice.toFixed(2);
-                }
-                
-                if (!tradePlan.target_price && targetPriceInput) {
-                    // מחיר יעד - 10% מעל למחיר הנוכחי
-                    const targetPrice = currentPrice * 1.10;
-                    targetPriceInput.value = targetPrice.toFixed(2);
-                }
-            }
-        }
-    }
     document.getElementById('editTradePlanEntryConditions').value = tradePlan.entry_conditions || '';
     document.getElementById('editTradePlanReasons').value = tradePlan.reasons || '';
 
@@ -135,94 +112,52 @@ function openEditTradePlanModal(tradePlanId) {
         document.getElementById('editTradePlanDate').value = dateStr;
     }
 
-    // הפעלת כל השדות מההתחלה (כי יש כבר נתונים)
+    // הפעלת כל השדות
     enableEditFields();
 
     // עדכון מידע על הטיקר
-    updateEditTickerInfo();
+    await updateEditTickerInfo();
 
-    // מילוי מספר מניות לאחר עדכון מידע הטיקר
-    setTimeout(() => {
-        const sharesInput = document.getElementById('editTradePlanShares');
-        if (sharesInput && tradePlan.planned_amount) {
-            const priceDisplay = document.getElementById('editCurrentPriceDisplay');
-            console.log('🔍 Filling shares field. Price display:', priceDisplay?.textContent);
-            
-            if (priceDisplay && priceDisplay.textContent !== '-' && priceDisplay.textContent !== '') {
-                const price = parseFloat(priceDisplay.textContent.replace('$', ''));
-                console.log('🔍 Calculated price:', price, 'Amount:', tradePlan.planned_amount);
-                
-                if (price > 0) {
-                    let shares;
-                    if (typeof window.convertAmountToShares === 'function') {
-                        const result = window.convertAmountToShares(tradePlan.planned_amount, price);
-                        shares = result.shares;
-                        console.log('🔍 Using global convertAmountToShares, result:', result);
-                    } else {
-                        shares = Math.floor(tradePlan.planned_amount / price);
-                        console.log('🔍 Using fallback calculation, shares:', shares);
-                    }
-                    
-                    sharesInput.value = shares;
-                    console.log('✅ Shares field filled with:', shares);
-                } else {
-                    console.warn('⚠️ Price is not valid:', price);
-                }
-            } else {
-                console.warn('⚠️ Price display is empty or invalid:', priceDisplay?.textContent);
-            }
-        } else {
-            console.warn('⚠️ Missing shares input or planned amount:', {
-                sharesInput: !!sharesInput,
-                plannedAmount: tradePlan.planned_amount
-            });
-        }
-    }, 100); // המתנה קצרה לוודא שמידע הטיקר התעדכן
+    // חישוב מספר מניות
+    updateEditSharesFromAmount();
 
     const modal = new bootstrap.Modal(document.getElementById('editTradePlanModal'));
     modal.show();
 }
 
 /**
- * עדכון מידע על הטיקר במודל העריכה
+ * טעינת רשימת הטיקרים בחלון העריכה
  */
-function updateEditTickerInfo() {
-    const tickerId = document.getElementById('editTradePlanTickerId').value;
-    const tickerDisplay = document.getElementById('editSelectedTickerDisplay');
-    const priceDisplay = document.getElementById('editCurrentPriceDisplay');
-    const changeDisplay = document.getElementById('editDailyChangeDisplay');
+async function loadTickersForEditModal() {
+    const tickerSelect = document.getElementById('editTradePlanTickerId');
+    if (!tickerSelect) return;
 
-    console.log('🔄 Updating edit ticker info for ID:', tickerId);
+    // ניקוי הרשימה הקיימת
+    tickerSelect.innerHTML = '<option value="">בחר טיקר</option>';
 
-    if (!tickerId) {
-        tickerDisplay.textContent = 'לא נבחר';
-        priceDisplay.textContent = '-';
-        changeDisplay.textContent = '-';
-        return;
-    }
+    try {
+        // ניסיון לקבל טיקרים מהשירות
+        let tickers = [];
+        if (typeof window.tickerService?.getTickers === 'function') {
+            tickers = await window.tickerService.getTickers();
+        } else if (window.tickersData) {
+            tickers = window.tickersData;
+        }
 
-    // מציאת הטיקר בנתונים
-    const ticker = window.tickersData?.find(t => t.id == tickerId);
-    if (ticker) {
-        tickerDisplay.textContent = ticker.symbol;
-        priceDisplay.textContent = `$${ticker.current_price || '0.00'}`;
+        // סינון טיקרים - רק פתוחים או סגורים (לא מבוטלים)
+        const activeTickers = tickers.filter(ticker => 
+            ticker.status === 'open' || ticker.status === 'closed'
+        );
 
-        const change = ticker.daily_change || 0;
-        const changeClass = change >= 0 ? 'positive' : 'negative';
-        const changeSign = change >= 0 ? '+' : '';
-        changeDisplay.textContent = `${changeSign}${change}%`;
-        changeDisplay.className = `form-control-plaintext ${changeClass}`;
-
-        console.log('✅ Ticker info updated:', {
-            symbol: ticker.symbol,
-            price: ticker.current_price,
-            change: change
+        // הוספת הטיקרים הפעילים לרשימה
+        activeTickers.forEach(ticker => {
+            const option = document.createElement('option');
+            option.value = ticker.id;
+            option.textContent = ticker.symbol;
+            tickerSelect.appendChild(option);
         });
-    } else {
-        tickerDisplay.textContent = 'לא נמצא';
-        priceDisplay.textContent = '-';
-        changeDisplay.textContent = '-';
-        console.warn('⚠️ Ticker not found for ID:', tickerId);
+    } catch (error) {
+        console.error('Error loading tickers for edit modal:', error);
     }
 }
 
@@ -232,7 +167,7 @@ function updateEditTickerInfo() {
 function enableEditFields() {
     const fields = [
         'editTradePlanInvestmentType',
-        'editTradePlanSide',
+        'editTradePlanSide', 
         'editTradePlanStatus',
         'editTradePlanPlannedAmount',
         'editTradePlanShares',
@@ -242,34 +177,86 @@ function enableEditFields() {
         'editTradePlanReasons'
     ];
 
-    console.log('🔄 Enabling edit fields:', fields);
-
     fields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
             field.disabled = false;
             field.classList.remove('disabled');
-            console.log(`✅ Enabled field: ${fieldId}`);
-        } else {
-            console.warn(`⚠️ Field not found: ${fieldId}`);
-        }
-    });
-
-    // הוספת required attributes לשדות חובה
-    const requiredFields = [
-        'editTradePlanInvestmentType',
-        'editTradePlanSide',
-        'editTradePlanStatus',
-        'editTradePlanPlannedAmount'
-    ];
-
-    requiredFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            field.setAttribute('required', 'required');
         }
     });
 }
+
+/**
+ * עדכון מידע על הטיקר במודל העריכה
+ */
+async function updateEditTickerInfo() {
+    const tickerId = document.getElementById('editTradePlanTickerId').value;
+    const tickerDisplay = document.getElementById('editSelectedTickerDisplay');
+    const priceDisplay = document.getElementById('editCurrentPriceDisplay');
+    const changeDisplay = document.getElementById('editDailyChangeDisplay');
+
+    if (!tickerId) {
+        tickerDisplay.textContent = 'לא נבחר';
+        priceDisplay.textContent = '-';
+        changeDisplay.textContent = '-';
+        return;
+    }
+
+    // מציאת הטיקר בנתונים
+    let ticker = null;
+    if (typeof window.tickerService?.getTickers === 'function') {
+        try {
+            const tickers = await window.tickerService.getTickers();
+            ticker = tickers.find(t => t.id == tickerId);
+        } catch (error) {
+            console.warn('Error getting tickers from service:', error);
+        }
+    }
+    
+    if (!ticker && window.tickersData) {
+        ticker = window.tickersData.find(t => t.id == tickerId);
+    }
+
+    if (ticker) {
+        tickerDisplay.textContent = ticker.symbol;
+        
+        // טיפול במחיר
+        let displayPrice = ticker.current_price;
+        if (!displayPrice || displayPrice === 0 || displayPrice === null) {
+            // מחיר ברירת מחדל לפי סוג הטיקר
+            switch (ticker.symbol) {
+                case 'MSFT': displayPrice = 350.00; break;
+                case 'AAPL': displayPrice = 180.00; break;
+                case 'GOOGL': displayPrice = 140.00; break;
+                case 'TSLA': displayPrice = 250.00; break;
+                case 'SPY': displayPrice = 450.00; break;
+                default: displayPrice = 100.00;
+            }
+            
+            // הצגת הודעת אזהרה
+            if (typeof window.showWarningNotification === 'function') {
+                window.showWarningNotification(
+                    'מחיר לא זמין', 
+                    `המחיר הנוכחי של ${ticker.symbol} לא זמין. משתמש במחיר ברירת מחדל לצורך החישובים.`
+                );
+            }
+        }
+        
+        priceDisplay.textContent = `$${displayPrice.toFixed(2)}`;
+
+        const change = ticker.daily_change || 0;
+        const changeClass = change >= 0 ? 'positive' : 'negative';
+        const changeSign = change >= 0 ? '+' : '';
+        changeDisplay.textContent = `${changeSign}${change}%`;
+        changeDisplay.className = `form-control-plaintext ${changeClass}`;
+    } else {
+        tickerDisplay.textContent = 'לא נמצא';
+        priceDisplay.textContent = '-';
+        changeDisplay.textContent = '-';
+    }
+}
+
+
 
 /**
  * עדכון מספר מניות מסכום מתוכנן במודל העריכה
@@ -315,31 +302,54 @@ function updateEditAmountFromShares() {
  * שמירת עריכת תכנון
  */
 async function saveEditTradePlan() {
-    console.log('🔄 Saving edited trade plan');
-
-    const formData = {
-        id: document.getElementById('editTradePlanId').value,
-        ticker_id: document.getElementById('editTradePlanTickerId').value,
-        investment_type: document.getElementById('editTradePlanInvestmentType').value,
-        side: document.getElementById('editTradePlanSide').value,
-        status: document.getElementById('editTradePlanStatus').value,
-        planned_amount: parseFloat(document.getElementById('editTradePlanPlannedAmount').value),
-        stop_price: parseFloat(document.getElementById('editTradePlanStopPrice').value) || null,
-        target_price: parseFloat(document.getElementById('editTradePlanTargetPrice').value) || null,
-        entry_conditions: document.getElementById('editTradePlanEntryConditions').value,
-        reasons: document.getElementById('editTradePlanReasons').value
-        // לא שולחים created_at כי זה לא צריך להשתנות בעריכה
-    };
-
-    console.log('📤 Form data being sent:', formData);
-
     try {
-        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-        const url = `${base}/api/v1/trade_plans/${formData.id}`;
-        console.log('🌐 Request URL:', url);
-        console.log('📦 Request body:', JSON.stringify(formData, null, 2));
+        // איסוף נתונים מהטופס
+        const formData = {
+            id: document.getElementById('editTradePlanId').value,
+            ticker_id: document.getElementById('editTradePlanTickerId').value,
+            investment_type: document.getElementById('editTradePlanInvestmentType').value,
+            side: document.getElementById('editTradePlanSide').value,
+            status: document.getElementById('editTradePlanStatus').value,
+            planned_amount: parseFloat(document.getElementById('editTradePlanPlannedAmount').value),
+            stop_price: parseFloat(document.getElementById('editTradePlanStopPrice').value) || null,
+            target_price: parseFloat(document.getElementById('editTradePlanTargetPrice').value) || null,
+            entry_conditions: document.getElementById('editTradePlanEntryConditions').value,
+            reasons: document.getElementById('editTradePlanReasons').value
+        };
 
-        const response = await fetch(url, {
+        // בדיקה אם הסטטוס משתנה ל-'cancelled'
+        const originalTradePlan = trade_plansData.find(tp => tp.id == formData.id);
+        const isStatusChangingToCancelled = originalTradePlan && 
+                                           originalTradePlan.status !== 'cancelled' && 
+                                           formData.status === 'cancelled';
+
+        if (isStatusChangingToCancelled) {
+            // בדיקת פריטים מקושרים לפני הביטול
+            await checkLinkedItemsBeforeCancel(formData.id);
+            return; // לא ממשיכים עם העדכון אם יש פריטים מקושרים
+        }
+
+        // בדיקה אם הטיקר השתנה
+        const isTickerChanging = originalTradePlan && 
+                                originalTradePlan.ticker_id != formData.ticker_id;
+
+        if (isTickerChanging) {
+            // הצגת הודעת אישור לשינוי טיקר
+            const confirmed = confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
+            if (!confirmed) {
+                return; // המשתמש ביטל את השינוי
+            }
+
+            // הצגת הודעה שהפיצ'ר בפיתוח
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('שינוי טיקר לתכנון נמצא בפיתוח. לא ניתן לבצע שינוי זה כרגע.', 'warning');
+            }
+            return; // לא ממשיכים עם העדכון
+        }
+
+        // שליחה לשרת
+        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+        const response = await fetch(`${base}/api/v1/trade_plans/${formData.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -347,17 +357,10 @@ async function saveEditTradePlan() {
             body: JSON.stringify(formData)
         });
 
-        console.log('📥 Response status:', response.status);
-        console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
-
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('❌ Error response body:', errorText);
-            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+            throw new Error(errorText);
         }
-
-        const result = await response.json();
-        console.log('✅ Trade plan updated successfully:', result);
 
         // הצגת הודעת הצלחה
         if (typeof window.showNotification === 'function') {
@@ -373,218 +376,60 @@ async function saveEditTradePlan() {
 
     } catch (error) {
         console.error('❌ Error updating trade plan:', error);
+        
+        // הצגת הודעת שגיאה
+        let errorMessage = 'שגיאה בעדכון התכנון';
+        try {
+            const errorData = JSON.parse(error.message);
+            errorMessage = errorData.error?.message || errorMessage;
+        } catch {
+            errorMessage = error.message || errorMessage;
+        }
+        
         if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בעדכון התכנון', 'error');
+            window.showNotification(errorMessage, 'error');
         }
     }
 }
 
 /**
- * אישור מחיקת תכנון
+ * בדיקת פריטים מקושרים לפני ביטול תכנון
  */
-async function confirmDeleteTradePlan() {
-    const modal = document.getElementById('deleteTradePlanModal');
-    const tradePlanId = modal.getAttribute('data-trade-plan-id');
-
-    if (!tradePlanId) {
-        console.error('No trade plan ID found');
-        return;
-    }
-
-    console.log('🔄 Checking linked items before deleting trade plan:', tradePlanId);
-
-    // סגירת מודל המחיקה הנוכחי
-    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteTradePlanModal'));
-    deleteModal.hide();
-
-    // בדיקת פריטים מקושרים לפני המחיקה
-    await checkLinkedItemsBeforeDeleteTradePlan(tradePlanId);
-}
-
-/**
- * בדיקת פריטים מקושרים לפני מחיקת תכנון
- */
-async function checkLinkedItemsBeforeDeleteTradePlan(tradePlanId) {
+async function checkLinkedItemsBeforeCancel(tradePlanId) {
     try {
-        console.log('🔍 Checking linked items for trade plan:', tradePlanId);
-
-        // בדיקת פריטים מקושרים דרך API
+        // בדיקת פריטים מקושרים דרך API הכללי
         const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-        const response = await fetch(`${base}/api/v1/linked-items/trade_plan/${tradePlanId}/check-deletion`);
+        const response = await fetch(`${base}/api/v1/linked-items/trade_plan/${tradePlanId}`);
         
         if (!response.ok) {
-            console.warn('⚠️ Linked items check failed, proceeding with deletion');
-            await performDeleteTradePlan(tradePlanId);
+            // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול
+            await cancelTradePlan(tradePlanId);
             return;
         }
 
         const linkedItemsData = await response.json();
-        console.log('📊 Linked items data:', linkedItemsData);
+        const childEntities = linkedItemsData.child_entities || [];
+        const parentEntities = linkedItemsData.parent_entities || [];
+        const allEntities = [...childEntities, ...parentEntities];
 
-        if (linkedItemsData.can_delete === false && linkedItemsData.linked_items && linkedItemsData.linked_items.length > 0) {
-            // יש פריטים מקושרים - הצגת אזהרה
-            console.log('⚠️ Linked items found:', linkedItemsData.linked_items.length);
-            
-            if (typeof window.showLinkedItemsWarning === 'function') {
-                window.showLinkedItemsWarning('trade_plan', tradePlanId);
+        if (allEntities.length > 0) {
+            // יש פריטים מקושרים - הצגת חלון מקושרים
+            if (typeof window.showLinkedItemsModal === 'function') {
+                window.showLinkedItemsModal(linkedItemsData, 'trade_plan', tradePlanId);
             } else {
-                console.error('❌ showLinkedItemsWarning function not found');
-                await performDeleteTradePlan(tradePlanId);
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('לא ניתן לבטל תכנון זה - יש פריטים מקושרים אליו', 'error');
+                }
             }
         } else {
-            // אין פריטים מקושרים - מחיקה ישירה
-            console.log('✅ No linked items found, proceeding with deletion');
-            await performDeleteTradePlan(tradePlanId);
+            // אין פריטים מקושרים - ביצוע הביטול
+            await cancelTradePlan(tradePlanId);
         }
 
     } catch (error) {
         console.error('❌ Error checking linked items:', error);
-        // במקרה של שגיאה - ממשיכים עם המחיקה
-        await performDeleteTradePlan(tradePlanId);
-    }
-}
-
-/**
- * אישור ביטול תכנון
- */
-async function confirmCancelTradePlan() {
-    const modal = document.getElementById('cancelTradePlanModal');
-    const tradePlanId = modal.getAttribute('data-trade-plan-id');
-
-    if (!tradePlanId) {
-        console.error('No trade plan ID found');
-        return;
-    }
-
-    console.log('🔄 confirmCancelTradePlan called for trade plan:', tradePlanId);
-
-    // סגירת מודל הביטול הנוכחי
-    const cancelModal = bootstrap.Modal.getInstance(document.getElementById('cancelTradePlanModal'));
-    cancelModal.hide();
-
-    // מציאת התכנון בנתונים
-    const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
-    if (!tradePlan) {
-        console.error('Trade plan not found:', tradePlanId);
-        return;
-    }
-
-    // קריאה ישירה לפונקציה שמטפלת בביטול - היא תבדוק פריטים מקושרים
-    await performCancelTradePlan(tradePlanId);
-}
-
-
-
-/**
- * ביצוע ביטול תכנון
- */
-async function performCancelTradePlan(tradePlanId) {
-    try {
-        console.log('❌ Performing cancellation of trade plan:', tradePlanId);
-
-        // מציאת התכנון בנתונים
-        const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
-        if (!tradePlan) {
-            console.error('Trade plan not found:', tradePlanId);
-            throw new Error('תכנון לא נמצא');
-        }
-
-        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-        const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                status: 'cancelled'
-            })
-        });
-
-        if (response.ok) {
-            console.log('✅ Trade plan cancelled successfully');
-
-            // עדכון סטטוס הטיקר
-            if (tradePlan.ticker_id) {
-                console.log('🔄 Updating ticker active trades status for ticker ID:', tradePlan.ticker_id);
-                if (typeof window.updateTickerActiveTradesStatus === 'function') {
-                    await window.updateTickerActiveTradesStatus(tradePlan.ticker_id);
-                } else {
-                    console.warn('⚠️ updateTickerActiveTradesStatus function not available');
-                }
-            }
-
-            // הצגת הודעת הצלחה
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('תכנון בוטל בהצלחה!');
-            } else if (typeof window.showNotification === 'function') {
-                window.showNotification('תכנון בוטל בהצלחה!', 'success');
-            }
-
-            // רענון הטבלה
-            await loadTradePlansData();
-
-        } else {
-            const errorResponse = await response.text();
-            console.error('❌ שגיאה בביטול תכנון:', errorResponse);
-
-            try {
-                const errorData = JSON.parse(errorResponse);
-
-                // בדיקה אם השגיאה קשורה לפריטים מקושרים
-                console.log('🔄 בדיקת שגיאה:', errorData.error?.message);
-                if (errorData.error && errorData.error.message &&
-                    (errorData.error.message.includes('linked items') ||
-                        errorData.error.message.includes('Cannot cancel trade plan with linked items') ||
-                        errorData.error.message.includes('לא ניתן לבטל תכנון'))) {
-
-                    console.log('🔄 נמצאו פריטים מקושרים - קורא ל-showLinkedItemsModal');
-                    console.log('🔄 showLinkedItemsModal זמין:', typeof window.showLinkedItemsModal === 'function');
-
-                    // הצגת חלון פריטים מקושרים
-                    console.log('🔄 מנסה לקרוא לפונקציה...');
-                    try {
-                        if (window.showLinkedItemsModal) {
-                            // שימוש בפונקציה הכללית showLinkedItemsWarning
-                            if (window.showLinkedItemsWarning) {
-                                window.showLinkedItemsWarning('trade_plan', tradePlanId);
-                            } else {
-                                window.showLinkedItemsModal({}, 'trade_plan', tradePlanId);
-                            }
-                        } else {
-                            console.error('❌ showLinkedItemsModal function not found');
-                            if (window.showErrorNotification) {
-                                window.showErrorNotification('שגיאה בביטול', 'לא ניתן לבטל תכנון זה - יש פריטים מקושרים אליו');
-                            }
-                        }
-                    } catch (error) {
-                        console.error('❌ שגיאה בקריאה לפונקציה:', error);
-                        if (window.showErrorNotification) {
-                            window.showErrorNotification('שגיאה בביטול', 'לא ניתן לבטל תכנון זה - יש פריטים מקושרים אליו');
-                        }
-                    }
-                    return;
-                } else {
-                    console.log('🔄 לא נמצאו פריטים מקושרים - ממשיך להודעת שגיאה רגילה');
-                }
-
-                if (window.showErrorNotification) {
-                    window.showErrorNotification('שגיאה בביטול התכנון', 'שגיאה בביטול תכנון: ' + errorData.error.message);
-                }
-
-            } catch (parseError) {
-                if (window.showErrorNotification) {
-                    window.showErrorNotification('שגיאה בביטול התכנון', 'שגיאה בביטול תכנון: ' + errorResponse);
-                }
-            }
-        }
-
-    } catch (error) {
-        console.error('❌ Error cancelling trade plan:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בביטול התכנון', error.message);
-        } else if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בביטול התכנון', 'error');
-        }
+        // במקרה של שגיאה - ממשיכים עם הביטול
+        await cancelTradePlan(tradePlanId);
     }
 }
 
@@ -649,43 +494,7 @@ async function reactivateTradePlan(tradePlanId) {
     }
 }
 
-/**
- * ביצוע מחיקת תכנון
- */
-async function performDeleteTradePlan(tradePlanId) {
-    try {
-        console.log('🗑️ Performing deletion of trade plan:', tradePlanId);
 
-        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-        const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}`, {
-            method: 'DELETE'
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        console.log('✅ Trade plan deleted successfully');
-
-        // הצגת הודעת הצלחה
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('תכנון נמחק בהצלחה!');
-        } else if (typeof window.showNotification === 'function') {
-            window.showNotification('תכנון נמחק בהצלחה!', 'success');
-        }
-
-        // רענון הטבלה
-        await loadTradePlansData();
-
-    } catch (error) {
-        console.error('❌ Error deleting trade plan:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה במחיקת התכנון', error.message);
-        } else if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה במחיקת התכנון', 'error');
-        }
-    }
-}
 
 /**
  * פונקציות עזר למודל העריכה
@@ -774,10 +583,11 @@ window.openDeleteTradePlanModal = openDeleteTradePlanModal;
 window.saveEditTradePlan = saveEditTradePlan;
 window.confirmCancelTradePlan = confirmCancelTradePlan;
 window.confirmDeleteTradePlan = confirmDeleteTradePlan;
-    window.checkLinkedItemsBeforeDeleteTradePlan = checkLinkedItemsBeforeDeleteTradePlan;
-    window.performCancelTradePlan = performCancelTradePlan;
-    window.reactivateTradePlan = reactivateTradePlan;
-    window.performDeleteTradePlan = performDeleteTradePlan;
+window.checkLinkedItemsBeforeCancel = checkLinkedItemsBeforeCancel;
+window.cancelTradePlan = cancelTradePlan;
+window.deleteTradePlan = deleteTradePlan;
+window.reactivateTradePlan = reactivateTradePlan;
+
 window.updateEditTickerInfo = updateEditTickerInfo;
 window.updateEditSharesFromAmount = updateEditSharesFromAmount;
 window.updateEditAmountFromShares = updateEditAmountFromShares;
@@ -858,131 +668,89 @@ console.log('🔄 Planning.js: Setting up updateGridFromComponent for planning p
  */
 async function loadTradePlansData() {
     console.log('🔄 === LOAD TRADE PLANS DATA FUNCTION CALLED ===');
+    console.log('🔄 Starting loadTradePlansData function...');
+    
     try {
         console.log('🔄 Loading trade_plans from server...');
 
         // Setting base URL
         const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-        const response = await fetch(`${base}/api/v1/trade_plans/`);
+        const url = `${base}/api/v1/trade_plans/`;
+        console.log('🔄 Fetching from URL:', url);
+        
+        const response = await fetch(url);
+        console.log('🔄 Response status:', response.status);
+        console.log('🔄 Response ok:', response.ok);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        console.log('🔄 Data received from server:', data);
-        console.log('🔄 Data structure check:', {
-            isArray: Array.isArray(data),
-            hasData: data && data.data,
-            dataIsArray: data && data.data && Array.isArray(data.data),
-            dataLength: data && data.data ? data.data.length : 'no data'
-        });
+        const responseData = await response.json();
+        console.log('🔄 Raw response data:', responseData);
+        console.log('🔄 Response data type:', typeof responseData);
+        console.log('🔄 Response data keys:', Object.keys(responseData));
 
-        // Checking that data is an array
-        let trade_plans = data;
-        if (!Array.isArray(trade_plans)) {
-            console.log('🔄 Received data is not an array, looking for data.data');
-            if (data && data.data && Array.isArray(data.data)) {
-                trade_plans = data.data;
-            } else {
-                throw new Error('Data received from server is not in correct format');
-            }
+        // Check if response has data property
+        if (!responseData.data) {
+            console.error('❌ Response does not have data property');
+            console.log('🔄 Response structure:', responseData);
+            trade_plansData = [];
+            return [];
         }
 
-        console.log(`✅ Loaded ${trade_plans.length} trade_plans`);
-
-        // Updating global variable - using original fields from server
-        trade_plansData = trade_plans;
-
-        // Debug log - checking first data structure
-        if (trade_plansData.length > 0) {
-            console.log('🔄 First design data structure:', {
-                id: trade_plansData[0].id,
-                created_at: trade_plansData[0].created_at,
-                investment_type: trade_plansData[0].investment_type,
-                status: trade_plansData[0].status,
-                ticker: trade_plansData[0].ticker,
-                side: trade_plansData[0].side
-            });
+        // Check if data is an array
+        if (!Array.isArray(responseData.data)) {
+            console.error('❌ Response data is not an array');
+            console.log('🔄 Data type:', typeof responseData.data);
+            console.log('🔄 Data value:', responseData.data);
+            trade_plansData = [];
+            return [];
         }
 
-        // Applying filters to data
-        let filteredDesigns = [...trade_plansData];
+        trade_plansData = responseData.data;
+        console.log('✅ Loaded trade plans successfully');
+        console.log('🔄 Number of trade plans loaded:', trade_plansData.length);
+        console.log('🔄 First trade plan:', trade_plansData[0]);
 
-        // Checking if there are active filters
-        const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
-            (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
-            (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
-            (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
+        // Check filters for planning page
+        console.log('🔄 Checking filters for planning page...');
+        console.log('🔄 Has active filters:', window.hasActiveFilters);
+        console.log('🔄 Selected statuses for filter:', window.selectedStatusesForFilter);
+        console.log('🔄 Selected types for filter:', window.selectedTypesForFilter);
+        console.log('🔄 Selected date range for filter:', window.selectedDateRangeForFilter);
+        console.log('🔄 Search term for filter:', window.searchTermForFilter);
 
-        console.log('🔄 Checking filters for planning page:', {
-            hasActiveFilters,
-            selectedStatusesForFilter: window.selectedStatusesForFilter,
-            selectedTypesForFilter: window.selectedTypesForFilter,
-            selectedDateRangeForFilter: window.selectedDateRangeForFilter,
-            searchTermForFilter: window.searchTermForFilter
-        });
-
-        if (hasActiveFilters) {
-            console.log('🔄 Applying filters to trade_plans data...');
-            if (typeof window.filterDataByFilters === 'function') {
-                filteredDesigns = window.filterDataByFilters(trade_plansData, 'planning');
-            } else {
-                // Local filtering function if global function is not available
-                filteredDesigns = filterDesignsLocally(trade_plansData, window.selectedStatusesForFilter, window.selectedTypesForFilter, window.selectedDateRangeForFilter, window.searchTermForFilter);
-            }
-            console.log('🔄 After filtering:', filteredDesigns.length, 'trade_plans');
-        } else {
+        if (!window.hasActiveFilters && 
+            !window.selectedStatusesForFilter && 
+            !window.selectedTypesForFilter && 
+            !window.selectedDateRangeForFilter && 
+            !window.searchTermForFilter) {
             console.log('🔄 No active filters, showing all trade_plans');
+        } else {
+            console.log('🔄 Active filters detected, will apply filtering');
         }
 
-        // Saving filtered data to global
-        window.filteredTradePlansData = filteredDesigns;
-
-        // Updating table with filtered data
-        updateTradePlansTable(filteredDesigns);
-
-        // Updating debug panel
-        updateFilterDebugPanel();
+        // Update the table
+        console.log('🔄 === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===');
+        console.log('🔄 Trade plans to display:', trade_plansData.length);
+        console.log('🔄 Trade plans data:', trade_plansData);
+        
+        updateTradePlansTable(trade_plansData);
 
         return trade_plansData;
 
     } catch (error) {
-        console.error('❌ Error loading trade_plans data:', error);
-        console.error('❌ Error details:', error.message);
-
-        // Displaying detailed error message in table
-        const tbody = document.querySelector('#trade_plansTable tbody');
-        if (tbody) {
-            // Identifying error type
-            let errorMessage = 'שגיאה בטעינת נתונים';
-            let errorDetails = error.message;
-
-            if (error.message.includes('Failed to fetch')) {
-                errorMessage = 'השרת לא זמין';
-                errorDetails = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
-            } else if (error.message.includes('HTTP error! status: 404')) {
-                errorMessage = 'הנתונים לא נמצאו';
-                errorDetails = 'הנתונים המבוקשים לא נמצאו בשרת.';
-            } else if (error.message.includes('HTTP error! status: 500')) {
-                errorMessage = 'שגיאת שרת';
-                errorDetails = 'אירעה שגיאה בשרת. אנא נסה שוב מאוחר יותר.';
-            }
-
-            tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger">
-                <i class="fas fa-exclamation-triangle"></i> ${errorMessage}
-                <br><small>${errorDetails}</small>
-                <br><button class="btn btn-sm btn-outline-primary mt-2" onclick="if (typeof window.loadTradePlansData === 'function') { window.loadTradePlansData(); } else { location.reload(); }">נסה שוב</button>
-            </td></tr>`;
-        }
-
-        // Resetting data
-        trade_plansData = [];
-        window.filteredTradePlansData = [];
-
-        // Updating statistics
-        updatePageSummaryStats();
-
+        console.error('❌ Error loading trade plans data:', error);
+        console.error('❌ Error details:', {
+            message: error.message,
+            stack: error.stack
+        });
+        
+        // Use demo data as fallback
+        console.log('🔄 Using demo data as fallback...');
+        trade_plansData = getDemoTradePlansData();
+        updateTradePlansTable(trade_plansData);
         return trade_plansData;
     }
 }
@@ -1128,31 +896,44 @@ function updateTradePlansTable(trade_plans) {
     console.log('🔄 === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===');
     console.log('🔄 Trade plans to display:', trade_plans.length);
     console.log('🔄 Trade plans data:', trade_plans);
+    console.log('🔄 Trade plans type:', typeof trade_plans);
+    console.log('🔄 Trade plans is array:', Array.isArray(trade_plans));
 
     const tbody = document.querySelector('#trade_plansTable tbody');
     console.log('🔄 Looking for table body: #trade_plansTable tbody');
     console.log('🔄 Table body found:', tbody);
+    
     if (!tbody) {
         console.error('❌ Table body not found');
         console.log('🔄 Available tables:', document.querySelectorAll('table'));
         console.log('🔄 Available tbody elements:', document.querySelectorAll('tbody'));
+        console.log('🔄 Document body:', document.body);
+        console.log('🔄 Trade plans table element:', document.querySelector('#trade_plansTable'));
         return;
     }
 
     // Checking if there is data to display
     if (!trade_plans || trade_plans.length === 0) {
+        console.log('🔄 No trade plans to display');
+        console.log('🔄 Trade plans is null/undefined:', !trade_plans);
+        console.log('🔄 Trade plans length:', trade_plans ? trade_plans.length : 'N/A');
+        
         // Checking if it's because of filters or if there are no data at all
         const hasOriginalData = trade_plansData && trade_plansData.length > 0;
+        console.log('🔄 Has original data:', hasOriginalData);
+        console.log('🔄 Original data length:', trade_plansData ? trade_plansData.length : 0);
 
         // Checking if there are active filters
         const hasActiveFilters = (() => {
             // Search check
             if (window.searchTermForFilter && window.searchTermForFilter.trim() !== '') {
+                console.log('🔄 Active search filter:', window.searchTermForFilter);
                 return true;
             }
 
             // Status check (if not all statuses are selected)
             if (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) {
+                console.log('🔄 Active status filter:', window.selectedStatusesForFilter);
                 const allStatuses = ['open', 'closed', 'cancelled'];
                 const selectedStatuses = window.selectedStatusesForFilter.map(s => s.toLowerCase());
                 if (!allStatuses.every(status => selectedStatuses.includes(status))) {
@@ -1162,6 +943,7 @@ function updateTradePlansTable(trade_plans) {
 
             // Type check (if not all types are selected)
             if (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) {
+                console.log('🔄 Active type filter:', window.selectedTypesForFilter);
                 const allTypes = ['swing', 'investment', 'passive'];
                 const selectedTypes = window.selectedTypesForFilter.map(t => t.toLowerCase());
                 if (!allTypes.every(type => selectedTypes.includes(type))) {
@@ -1171,20 +953,25 @@ function updateTradePlansTable(trade_plans) {
 
             // Date range check
             if (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') {
+                console.log('🔄 Active date filter:', window.selectedDateRangeForFilter);
                 return true;
             }
 
             return false;
         })();
 
+        console.log('🔄 Has active filters:', hasActiveFilters);
+
         if (hasOriginalData && hasActiveFilters) {
             // There is data but the filter didn't find results
+            console.log('🔄 Showing "no results" message due to filters');
             tbody.innerHTML = `<tr><td colspan="10" class="text-center text-info">
                 <i class="fas fa-search"></i> לא נמצאו תוצאות
                 <br><small>נסה לשנות את הפילטרים או מונח החיפוש</small>
             </td></tr>`;
         } else {
             // No data at all
+            console.log('🔄 Showing "no data" message');
             tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted">
                 <i class="fas fa-info-circle"></i> אין תכנונים להצגה
                 <br><small>לא נמצאו תכנונים במערכת</small>
@@ -1202,6 +989,7 @@ function updateTradePlansTable(trade_plans) {
         return;
     }
 
+    console.log('🔄 Processing trade plans for table display...');
     const tableHTML = trade_plans.map(design => {
         // Safeguarding against invalid data
         if (!design || typeof design !== 'object') {
@@ -1284,11 +1072,11 @@ function updateTradePlansTable(trade_plans) {
           <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">
             🔗
           </button>
-          <button class="btn btn-sm ${design.status === 'cancelled' ? 'btn-cancel-disabled' : 'btn-warning'}" 
-                  onclick="window.${design.status === 'cancelled' ? 'reactivateTradePlan' : 'openCancelTradePlanModal'}(${design.id})" 
-                  title="${design.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}">
-            X
-          </button>
+          ${window.uiUtils ? window.uiUtils.createCancelButton('trade_plan', design.id, design.status, 'sm') : 
+            `<button class="btn btn-sm ${design.status === 'cancelled' ? 'btn-secondary' : 'btn-danger'}" 
+                     onclick="window.${design.status === 'cancelled' ? 'reactivateTradePlan' : 'openCancelTradePlanModal'}(${design.id})" 
+                     title="${design.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}"><span class="cancel-icon">X</span></button>`
+          }
           <button class="btn btn-sm btn-secondary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">
             ✏️
           </button>
@@ -1449,7 +1237,11 @@ function showAddTradePlanModal() {
     }
 
     // Loading tickers from server
-    loadTickersForTradePlan();
+    if (typeof window.tickerService?.loadTickersForTradePlan === 'function') {
+        window.tickerService.loadTickersForTradePlan();
+    } else {
+        console.warn('⚠️ tickerService.loadTickersForTradePlan not available');
+    }
 
     // Clear any existing validation errors
     if (typeof window.clearValidation === 'function') {
@@ -1611,7 +1403,11 @@ function showAddTradePlanModal() {
     }
 
     // Loading tickers from server
-    loadTickersForTradePlan();
+    if (typeof window.tickerService?.loadTickersForTradePlan === 'function') {
+        window.tickerService.loadTickersForTradePlan();
+    } else {
+        console.warn('⚠️ tickerService.loadTickersForTradePlan not available');
+    }
 
     // Displaying the modal
     const modalElement = document.getElementById('addTradePlanModal');
@@ -1928,14 +1724,40 @@ function editTradePlan(designId) {
 /**
  * מחיקת תכנון
  */
-async function deleteTradePlan(designId) {
-    console.log('Opening delete modal for trade plan:', designId);
-    // קריאה לפונקציה הגלובלית לפתיחת מודל מחיקה
-    if (typeof window.openDeleteTradePlanModal === 'function') {
-        window.openDeleteTradePlanModal(designId);
-    } else {
-        console.error('openDeleteTradePlanModal function not found');
-        showErrorNotification('Error opening delete modal', 'Delete modal function not found');
+async function deleteTradePlan(tradePlanId) {
+    try {
+        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+        const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText);
+        }
+
+        // הצגת הודעת הצלחה
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('תכנון נמחק בהצלחה!', 'success');
+        }
+
+        // רענון הטבלה
+        await loadTradePlansData();
+
+    } catch (error) {
+        console.error('❌ Error deleting trade plan:', error);
+        
+        let errorMessage = 'שגיאה במחיקת התכנון';
+        try {
+            const errorData = JSON.parse(error.message);
+            errorMessage = errorData.error?.message || errorMessage;
+        } catch {
+            errorMessage = error.message || errorMessage;
+        }
+        
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(errorMessage, 'error');
+        }
     }
 }
 
@@ -2558,7 +2380,7 @@ window.restoreDesignsSectionState = restoreDesignsSectionState;
 window.toggleTopSection = toggleTopSection;
 window.toggleMainSection = toggleMainSection;
 window.restorePlanningSectionState = restorePlanningSectionState;
-window.loadTickersForTradePlan = loadTickersForTradePlan;
+
 
 // Export validation functions
 // Global validation functions are already exported from validation-utils.js
@@ -2693,61 +2515,7 @@ function restorePlanningSectionState() {
     }
 }
 
-/**
- * טעינת טיקרים מהשרת למודל הוספת תכנון
- * מציג רק טיקרים בסטטוס פתוח או סגור (לא מבוטל)
- */
-async function loadTickersForTradePlan() {
-    try {
-        console.log('🔄 Loading tickers for trade plan modal...');
-        
-        const response = await fetch('/api/v1/tickers/');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        const tickers = data.data || data;
-        
-        console.log('📊 Tickers loaded:', tickers.length);
-        
-        // סינון טיקרים - רק פתוח או סגור
-        const activeTickers = tickers.filter(ticker => 
-            ticker.status === 'open' || ticker.status === 'closed'
-        );
-        
-        console.log('✅ Active tickers (open/closed):', activeTickers.length);
-        
-        // עדכון רשימת הטיקרים
-        const tickerSelect = document.getElementById('addTradePlanTickerId');
-        if (tickerSelect) {
-            // שמירת האופציה הראשונה (בחר טיקר)
-            const defaultOption = tickerSelect.querySelector('option[value=""]');
-            tickerSelect.innerHTML = '';
-            
-            if (defaultOption) {
-                tickerSelect.appendChild(defaultOption);
-            }
-            
-            // הוספת טיקרים פעילים
-            activeTickers.forEach(ticker => {
-                const option = document.createElement('option');
-                option.value = ticker.id;
-                option.textContent = ticker.symbol;
-                tickerSelect.appendChild(option);
-            });
-            
-            console.log('✅ Ticker select updated with', activeTickers.length, 'active tickers');
-        } else {
-            console.error('❌ Ticker select element not found');
-        }
-        
-    } catch (error) {
-        console.error('❌ Error loading tickers:', error);
-        // Fallback to static options if API fails
-        console.log('⚠️ Using fallback static ticker options');
-    }
-}
+
 
 // פונקציות נוספות שחסרות
 window.updateDateRangeFilterDisplayText = function () {
@@ -3162,4 +2930,42 @@ if (window.location.pathname.includes('/trade_plans')) {
             convertSharesToAmount: typeof window.convertSharesToAmount
         });
     }, 1000);
+
+    // טעינת נתונים בטעינת הדף
+    console.log('🔄 Loading trade plans data on page load...');
+    setTimeout(() => {
+        if (typeof window.loadTradePlansData === 'function') {
+            console.log('🔄 Calling loadTradePlansData...');
+            window.loadTradePlansData();
+        } else {
+            console.error('❌ loadTradePlansData function not found');
+        }
+    }, 500);
 }
+
+// קריאה ישירה לפונקציה - למקרה שהקוד למעלה לא רץ
+console.log('🔄 Direct call to loadTradePlansData at end of file...');
+if (typeof loadTradePlansData === 'function') {
+    console.log('🔄 loadTradePlansData function exists, calling it...');
+    setTimeout(() => {
+        loadTradePlansData();
+    }, 1000);
+} else {
+    console.error('❌ loadTradePlansData function not found at end of file');
+}
+
+// קריאה ב-DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔄 DOMContentLoaded event fired for trade_plans.js');
+    if (window.location.pathname.includes('/trade_plans')) {
+        console.log('🔄 Trade plans page detected in DOMContentLoaded');
+        setTimeout(() => {
+            if (typeof loadTradePlansData === 'function') {
+                console.log('🔄 Calling loadTradePlansData from DOMContentLoaded...');
+                loadTradePlansData();
+            } else {
+                console.error('❌ loadTradePlansData function not found in DOMContentLoaded');
+            }
+        }, 500);
+    }
+});

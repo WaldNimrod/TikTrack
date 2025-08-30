@@ -31,15 +31,17 @@
 
 ---
 
-## 1) Architecture Overview (Stage‑1: Yahoo only)
+## 1) Architecture Overview (Stage‑1: Yahoo + Google)
 
 ```
 User Management System ──┐
 User Preferences ────────┤
                          │   (Backend-only)
-External (Yahoo) → Adapter → Normalizer → Ingest API → Cache (short TTL) → DB
-                                                  ↓
-                                     UI via /api/v1/quotes[/batch] (renders in user timezone)
+External (Yahoo) ──┐     │
+External (Google) ──┼─── Adapter → Normalizer → Ingest API → Cache (short TTL) → DB
+                    │     │
+                    │     ↓
+                    └─── UI via /api/v1/quotes[/batch] (renders in user timezone)
 ```
 
 **Principles**
@@ -128,6 +130,22 @@ CREATE INDEX IF NOT EXISTS idx_users_active ON users(is_active);
 - **Fallback System**: Automatic fallback to default user (nimrod, ID: 1)
 - **Default Preferences**: Loaded from `Backend/trading-ui/config/preferences.json`
 - **API Integration**: All external data operations use user context
+
+#### External Data Preferences Fields
+```json
+{
+  "dataRefreshInterval": 5,           // Refresh interval in minutes
+  "primaryDataProvider": "yahoo",     // Primary data provider
+  "secondaryDataProvider": "google",  // Secondary/backup provider
+  "cacheTTL": 5,                     // Cache time-to-live in minutes
+  "maxBatchSize": 25,                // Max symbols per batch
+  "requestDelay": 200,               // Delay between requests in ms
+  "retryAttempts": 2,                // Number of retry attempts
+  "retryDelay": 5,                   // Delay between retries in seconds
+  "autoRefresh": true,               // Enable auto-refresh
+  "verboseLogging": false            // Enable verbose logging
+}
+```
 
 **Stage-2 Enhancement (Advanced):**
 - JSON validation constraints

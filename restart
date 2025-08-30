@@ -11,6 +11,26 @@
 # 🆕 Version: 1.9.9 (August 26, 2025)
 # 🛠️ Features: Smart mode detection, user choice, comprehensive logging
 # 
+# ⚠️  IMPORTANT TROUBLESHOOTING NOTE:
+# ====================================
+# 
+# If the default quick restart doesn't resolve your issue:
+# 
+# 1. Try complete restart mode:
+#    ./restart complete
+# 
+# 2. If still having issues, use interactive mode:
+#    ./restart --interactive
+# 
+# 3. For detailed diagnostics:
+#    ./restart --verbose complete
+# 
+# 4. Check server logs:
+#    tail -f logs/server_detailed.log
+# 
+# The complete mode performs comprehensive system analysis and
+# automatic problem fixing that the quick mode doesn't include.
+# 
 # 🔧 RESTART MODES EXPLAINED
 # ==========================
 # 
@@ -48,10 +68,17 @@
 #   - Slower startup time
 #   - More resource intensive
 # 
-# SMART DETECTION LOGIC:
-# ======================
+# DEFAULT BEHAVIOR:
+# =================
 # 
-# The script automatically chooses the appropriate mode based on:
+# The script now defaults to QUICK MODE for faster development cycles.
+# Complete mode is only used when explicitly requested or when auto-detection
+# determines it's necessary.
+# 
+# SMART DETECTION LOGIC (when using --auto):
+# ===========================================
+# 
+# The script can automatically choose the appropriate mode based on:
 # 
 # 1. SYSTEM HEALTH INDICATORS:
 #    - Memory usage > 90% → Complete mode
@@ -73,14 +100,16 @@
 # USAGE EXAMPLES:
 # ===============
 # 
-# Automatic mode selection:
-#   ./restart                    # Smart detection
+# Default behavior:
+#   ./restart                    # Quick mode (default)
 # 
 # Force specific mode:
 #   ./restart quick             # Force quick mode
 #   ./restart complete          # Force complete mode
+#   ./restart auto              # Smart detection
 #   ./restart --quick           # Alternative syntax
 #   ./restart --complete        # Alternative syntax
+#   ./restart --auto            # Alternative syntax
 # 
 # Interactive mode:
 #   ./restart --interactive     # Ask user for choice
@@ -473,9 +502,20 @@ show_interactive_choice() {
 
 # Main execution
 main() {
-    local mode="auto"
+    local mode="quick"
     local interactive=false
     local verbose=false
+    
+    # Show troubleshooting note for quick mode
+    if [ "$1" = "" ] || [ "$1" = "quick" ] || [ "$1" = "--quick" ]; then
+        echo ""
+        echo "⚠️  TROUBLESHOOTING NOTE:"
+        echo "========================="
+        echo "If quick restart doesn't resolve your issue, run:"
+        echo "  ./restart complete    # For comprehensive restart"
+        echo "  ./restart --interactive  # For guided troubleshooting"
+        echo ""
+    fi
     
     # Parse command line arguments
     while [[ $# -gt 0 ]]; do
@@ -554,6 +594,8 @@ main() {
         detected_mode=$(detect_optimal_mode | tail -1)
         mode="$detected_mode"
         log_info "Selected mode: $mode"
+    elif [ "$mode" = "quick" ]; then
+        log_info "⚡ Using quick restart mode (default)"
     fi
     
     # Execute restart
@@ -577,13 +619,35 @@ main() {
         echo "🎉 Restart completed!"
         echo "🌐 Server should be available at: http://localhost:8080"
         echo ""
+        
+        # Show additional help if this was a quick restart
+        if [ "$mode" = "quick" ]; then
+            echo "💡 If you experience issues, consider complete restart:"
+            echo "   $0 complete"
+            echo ""
+        fi
     else
         log_error "❌ Server restart failed"
         echo ""
-        echo "💡 Troubleshooting tips:"
-        echo "  - Try complete mode: $0 complete"
-        echo "  - Check logs: tail -f $DETAILED_LOG"
-        echo "  - Interactive mode: $0 --interactive"
+        echo "💡 TROUBLESHOOTING REQUIRED:"
+        echo "============================="
+        echo ""
+        echo "Quick restart failed. Try these solutions in order:"
+        echo ""
+        echo "1️⃣  COMPLETE RESTART (Recommended):"
+        echo "   $0 complete"
+        echo ""
+        echo "2️⃣  INTERACTIVE MODE (Guided troubleshooting):"
+        echo "   $0 --interactive"
+        echo ""
+        echo "3️⃣  VERBOSE DIAGNOSTICS:"
+        echo "   $0 --verbose complete"
+        echo ""
+        echo "4️⃣  CHECK LOGS:"
+        echo "   tail -f $DETAILED_LOG"
+        echo ""
+        echo "The complete mode performs comprehensive system analysis"
+        echo "and automatic problem fixing that the quick mode doesn't include."
         echo ""
         exit 1
     fi

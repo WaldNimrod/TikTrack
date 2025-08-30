@@ -1306,7 +1306,7 @@ function updateTickersTable(tickers) {
                         <div class="btn-group btn-group-sm" role="group">
                             <button class="btn btn-outline-info" onclick="window.showLinkedItemsWarning('ticker', ${ticker.id})" title="פריטים מקושרים">🔗</button>
                             <button class="btn btn-outline-secondary" onclick="window.showEditTickerModal(${ticker.id})" title="ערוך">✏️</button>
-                            <button class="btn btn-outline-danger" onclick="window.cancelTicker(${ticker.id})" title="בטל טיקר" ${ticker.status === 'canceled' ? 'disabled' : ''}>❌</button>
+                            <button class="btn btn-outline-danger" onclick="window.cancelTicker(${ticker.id})" title="בטל טיקר" ${ticker.status === 'canceled' ? 'disabled' : ''}><span class="cancel-icon">X</span></button>
                         </div>
                     </td>
                 </tr>

@@ -3847,6 +3847,48 @@ window.getFilterConfig = getFilterConfig;
 window.getAllVisibleContainers = getAllVisibleContainers;
 window.isDateInRange = isDateInRange;
 
+/**
+ * פילטר התראות לפי טיפוס (לשמירה על תאימות לאחור)
+ * @param {string} type - סוג ההתראה (all, account, trade, trade_plan, ticker)
+ */
+function filterAlertsByType(type) {
+  console.log('🔄 filterAlertsByType called with:', type);
+  
+  // עדכון מצב הכפתורים
+  const buttons = document.querySelectorAll('[data-type]');
+  buttons.forEach(btn => {
+    if (btn.getAttribute('data-type') === type) {
+      btn.classList.add('active');
+      btn.classList.remove('btn-outline-primary');
+      btn.style.backgroundColor = 'white';
+      btn.style.color = '#28a745';
+      btn.style.borderColor = '#28a745';
+    } else {
+      btn.classList.remove('active');
+      btn.classList.add('btn-outline-primary');
+      btn.style.backgroundColor = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }
+  });
+  
+  // הפעלת הפילטר
+  if (type === 'all') {
+    // הצג את כל ההתראות
+    if (window.simpleFilter) {
+      window.simpleFilter.clearTypeFilter();
+    }
+  } else {
+    // הפעל פילטר לפי הטיפוס
+    if (window.simpleFilter) {
+      window.simpleFilter.applyTypeFilter([type]);
+    }
+  }
+}
+
+// ייצוא הפונקציה לגלובל
+window.filterAlertsByType = filterAlertsByType;
+
 // ===== פונקציות עדכון טקסט פילטרים =====
 
 /**

@@ -167,8 +167,8 @@ function createNotificationContainer() {
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  */
 function showNotification(message, type = 'info', title = 'התראה', duration = 4000) {
-    console.log('🔧 showNotification called with:', { message, type, title, duration });
-    console.log('🔧 Parameter types:', { 
+      // showNotification called
+  // Parameter types: 
         messageType: typeof message, 
         typeType: typeof type, 
         titleType: typeof title, 
@@ -303,8 +303,8 @@ function showErrorNotification(title, message, duration = 6000) {
  * @param {number} duration - Display duration in milliseconds (default: 5000)
  */
 function showWarningNotification(title, message, duration = 5000) {
-    console.log('🔧 showWarningNotification called with:', { title, message, duration });
-    console.log('🔧 showWarningNotification calling showNotification with:', { message, type: 'warning', title, duration });
+      // showWarningNotification called
+  // showWarningNotification calling showNotification
     showNotification(message, 'warning', title, duration);
 }
 

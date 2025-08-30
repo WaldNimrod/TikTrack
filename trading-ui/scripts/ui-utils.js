@@ -353,59 +353,7 @@ function confirmSecondAction() {
     }
 }
 
-/**
- * הצגת מודל אישור שני
- * Show second confirmation modal
- */
-function showSecondConfirmationModal(title, message, onConfirm) {
-    console.log('🔄 Showing second confirmation modal');
 
-    const modal = document.createElement('div');
-    modal.className = 'modal fade';
-    modal.id = 'secondConfirmationModal';
-    modal.innerHTML = `
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">${title}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>${message}</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-danger btn-confirm">אישור</button>
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    // הגדרת פונקציית האישור
-    const confirmBtn = modal.querySelector('.btn-confirm');
-    if (confirmBtn) {
-        confirmBtn.onclick = () => {
-            const bootstrapModal = bootstrap.Modal.getInstance(modal);
-            if (bootstrapModal) {
-                bootstrapModal.hide();
-            }
-            if (onConfirm) onConfirm();
-        };
-    }
-
-    // הצגת המודל
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
-
-    // הסרת המודל מהדף אחרי שהוא נסגר
-    modal.addEventListener('hidden.bs.modal', () => {
-        if (document.body.contains(modal)) {
-            document.body.removeChild(modal);
-        }
-    });
-}
 
 // ===== Notification Functions =====
 
@@ -534,7 +482,7 @@ function getBootstrapColor(type) {
 // ===== Export Functions =====
 window.showModalNotification = showModalNotification;
 window.showModal = showModal;
-window.showSecondConfirmationModal = showSecondConfirmationModal;
+
 window.confirmSecondAction = confirmSecondAction;
 window.showErrorNotification = showErrorNotification;
 window.showSuccessNotification = showSuccessNotification;
@@ -556,7 +504,6 @@ window.formatPrice = formatPrice;
 // ייצוא המודול עצמו
 window.uiUtils = {
     showModalNotification,
-    showSecondConfirmationModal,
     confirmSecondAction,
     showErrorNotification,
     showSuccessNotification,
@@ -807,16 +754,237 @@ function forceDeleteWithLinkedItems(itemType, itemId, onConfirm) {
  */
 function getItemTypeIcon(itemType) {
     const icons = {
-        'account': '🏦',
-        'trade': '📈',
-        'ticker': '📊',
-        'alert': '🔔',
-        'cash_flow': '💰',
-        'note': '📝',
-        'trade_plan': '📋',
-        'execution': '⚡'
+        'account': '<img src="/images/icons/accounts.svg" alt="חשבון" style="width: 16px; height: 16px; vertical-align: middle;">',
+        'trade': '<img src="/images/icons/trades.svg" alt="טרייד" style="width: 16px; height: 16px; vertical-align: middle;">',
+        'ticker': '<img src="/images/icons/tickers.svg" alt="טיקר" style="width: 16px; height: 16px; vertical-align: middle;">',
+        'alert': '<img src="/images/icons/alerts.svg" alt="התראה" style="width: 16px; height: 16px; vertical-align: middle;">',
+        'cash_flow': '<img src="/images/icons/cash_flows.svg" alt="תזרים מזומנים" style="width: 16px; height: 16px; vertical-align: middle;">',
+        'note': '<img src="/images/icons/notes.svg" alt="הערה" style="width: 16px; height: 16px; vertical-align: middle;">',
+        'trade_plan': '<img src="/images/icons/trade_plans.svg" alt="תכנון טרייד" style="width: 16px; height: 16px; vertical-align: middle;">',
+        'execution': '<img src="/images/icons/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; vertical-align: middle;">'
     };
-    return icons[itemType] || '📄';
+    return icons[itemType] || '<img src="/images/icons/home.svg" alt="דף הבית" style="width: 16px; height: 16px; vertical-align: middle;">';
+}
+
+
+
+/**
+ * Global cancel function - unified cancel behavior across all pages
+ * 
+ * @param {string} itemType - Type of the item ('trade', 'ticker', 'alert', 'account', 'trade_plan', etc.)
+ * @param {number} itemId - ID of the item
+ * @param {string} itemName - Display name of the item (optional)
+ * @param {string} currentStatus - Current status of the item (optional)
+ */
+async function cancelItem(itemType, itemId, itemName = null, currentStatus = null) {
+    console.log(`🔄 Global cancel function called for ${itemType} ${itemId}`);
+    
+    // בדיקה אם האובייקט כבר מבוטל
+    if (currentStatus === 'cancelled') {
+        console.log(`⚠️ ${itemType} ${itemId} is already cancelled`);
+        if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification(`${getItemTypeDisplayName(itemType)} כבר מבוטל`);
+        }
+        return;
+    }
+    
+    // הגדרת הפעולה הנוכחית לביטול
+    window.currentAction = 'cancel';
+    
+    // בדיקת פריטים מקושרים לפני הביטול
+    try {
+        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+        const response = await fetch(`${base}/api/v1/linked-items/${itemType}/${itemId}`);
+        
+        if (response.ok) {
+            const linkedItemsData = await response.json();
+            const childEntities = linkedItemsData.child_entities || [];
+            const parentEntities = linkedItemsData.parent_entities || [];
+            const allEntities = [...childEntities, ...parentEntities];
+
+            if (allEntities.length > 0) {
+                // יש פריטים מקושרים - הצגת אזהרה
+                console.log(`⚠️ Linked items found: ${allEntities.length}`);
+                
+                if (typeof window.showLinkedItemsWarning === 'function') {
+                    window.showLinkedItemsWarning(itemType, itemId);
+                } else {
+                    console.error('❌ showLinkedItemsWarning function not found');
+                    if (window.showErrorNotification) {
+                        window.showErrorNotification(`שגיאה בביטול`, `לא ניתן לבטל ${getItemTypeDisplayName(itemType)} זה - יש פריטים מקושרים אליו`);
+                    }
+                }
+                return;
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Linked items check failed, proceeding with cancellation');
+    }
+    
+    // אין פריטים מקושרים - ביצוע הביטול
+    console.log(`✅ No linked items found, proceeding with cancellation`);
+    await performItemCancellation(itemType, itemId, itemName);
+}
+
+/**
+ * Create unified cancel button for any item type
+ * 
+ * @param {string} itemType - Type of the item ('trade', 'ticker', 'alert', 'account', 'trade_plan', etc.)
+ * @param {number} itemId - ID of the item
+ * @param {string} status - Current status of the item
+ * @param {string} size - Button size (sm, lg, etc.)
+ * @param {boolean} useGlobalCancel - Whether to use the global cancel function (default: false)
+ * @returns {string} HTML for cancel button
+ */
+function createCancelButton(itemType, itemId, status = 'open', size = 'sm', useGlobalCancel = false) {
+    const isCancelled = status === 'cancelled';
+    const buttonClass = isCancelled ? 'btn-secondary' : 'btn-danger';
+    const title = isCancelled ? 'הפעל מחדש' : 'בטל';
+    const icon = 'X';
+    
+    // יצירת onclick בהתאם לסטטוס וסוג האובייקט
+    let onclick = '';
+    if (itemId) {
+        if (isCancelled) {
+            // הפעלה מחדש - פונקציות שונות לכל סוג
+            switch (itemType) {
+                case 'trade_plan':
+                    onclick = `onclick="window.reactivateTradePlan(${itemId})"`;
+                    break;
+                case 'trade':
+                    onclick = `onclick="window.reactivateTrade(${itemId})"`;
+                    break;
+                case 'ticker':
+                    onclick = `onclick="window.reactivateTicker(${itemId})"`;
+                    break;
+                case 'alert':
+                    onclick = `onclick="window.reactivateAlert(${itemId})"`;
+                    break;
+                case 'account':
+                    onclick = `onclick="window.reactivateAccount(${itemId})"`;
+                    break;
+                default:
+                    onclick = `onclick="window.reactivate${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
+            }
+        } else {
+            // ביטול - פונקציות שונות לכל סוג
+            switch (itemType) {
+                case 'trade_plan':
+                    onclick = `onclick="window.openCancelTradePlanModal(${itemId})"`;
+                    break;
+                case 'trade':
+                    onclick = `onclick="window.cancelTradeRecord(${itemId})"`;
+                    break;
+                case 'ticker':
+                    onclick = `onclick="window.cancelTicker(${itemId})"`;
+                    break;
+                case 'alert':
+                    onclick = `onclick="window.cancelAlert(${itemId})"`;
+                    break;
+                case 'account':
+                    onclick = `onclick="window.cancelAccount(${itemId})"`;
+                    break;
+                default:
+                    onclick = `onclick="window.cancel${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
+            }
+        }
+    }
+    
+    return `<button class="btn btn-${size} ${buttonClass}" ${onclick} title="${title}"><span class="cancel-icon">${icon}</span></button>`;
+}
+
+/**
+ * Perform the actual cancellation based on item type
+ * 
+ * @param {string} itemType - Type of the item
+ * @param {number} itemId - ID of the item
+ * @param {string} itemName - Display name of the item
+ */
+async function performItemCancellation(itemType, itemId, itemName) {
+    try {
+        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+        let response;
+        let successMessage = `${getItemTypeDisplayName(itemType)} בוטל בהצלחה!`;
+
+        switch (itemType) {
+            case 'trade_plan':
+                response = await fetch(`${base}/api/v1/trade_plans/${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'cancelled' })
+                });
+                break;
+                
+            case 'trade':
+                response = await fetch(`${base}/api/v1/trades/${itemId}/cancel`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cancel_reason: 'בוטל על ידי המשתמש' })
+                });
+                break;
+                
+            case 'ticker':
+                response = await fetch(`${base}/api/v1/tickers/${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'canceled' })
+                });
+                break;
+                
+            case 'alert':
+                response = await fetch(`${base}/api/v1/alerts/${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'cancelled' })
+                });
+                break;
+                
+            case 'account':
+                response = await fetch(`${base}/api/v1/accounts/${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'cancelled' })
+                });
+                break;
+                
+            default:
+                throw new Error(`לא נתמך ביטול עבור סוג: ${itemType}`);
+        }
+
+        if (response.ok) {
+            console.log(`✅ ${itemType} ${itemId} cancelled successfully`);
+            
+            // הצגת הודעת הצלחה
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification(successMessage);
+            } else if (typeof window.showNotification === 'function') {
+                window.showNotification(successMessage, 'success');
+            }
+            
+            // רענון הנתונים
+            if (typeof window.loadData === 'function') {
+                await window.loadData();
+            } else {
+                // נסיון לרענן לפי סוג האובייקט
+                const refreshFunction = window[`load${itemType.charAt(0).toUpperCase() + itemType.slice(1)}sData`];
+                if (typeof refreshFunction === 'function') {
+                    await refreshFunction();
+                }
+            }
+            
+        } else {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        }
+
+    } catch (error) {
+        console.error(`❌ Error cancelling ${itemType} ${itemId}:`, error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification(`שגיאה בביטול ${getItemTypeDisplayName(itemType)}`, error.message);
+        } else if (typeof window.showNotification === 'function') {
+            window.showNotification(`שגיאה בביטול ${getItemTypeDisplayName(itemType)}`, 'error');
+        }
+    }
 }
 
 /**
@@ -876,7 +1044,6 @@ window.uiUtils = {
     showSuccessNotification,
     showInfoNotification,
     createToastContainer,
-    showSecondConfirmationModal,
     showNotification,
     showLinkedItemsWarningModal,
     createLinkedItemsWarningContent,
@@ -888,8 +1055,16 @@ window.uiUtils = {
     createDetailedItemInfo,
     getItemTypeIcon,
     getItemTypeDisplayName,
-    createBasicItemInfo
+    createBasicItemInfo,
+    cancelItem,
+    performItemCancellation,
+    createCancelButton
 };
+
+// Export global cancel functions
+window.cancelItem = cancelItem;
+window.performItemCancellation = performItemCancellation;
+window.createCancelButton = createCancelButton;
 
 // ===== WARNING SYSTEM FUNCTIONS =====
 
@@ -1388,10 +1563,10 @@ function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null
             const message = `האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`;
             window.showConfirmationDialog(title, message, onConfirm, onCancel);
         } else {
-            // Fallback to simple confirm
-            const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`);
-            if (confirmed && onConfirm) {
-                onConfirm();
+        // Fallback to simple confirm
+        const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`);
+        if (confirmed && onConfirm) {
+            onConfirm();
             }
         }
     }
@@ -1400,283 +1575,9 @@ function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null
 /**
  * Show linked items warning
  */
-function showLinkedItemsWarning(itemType, linkedCount, onConfirm = null, onCancel = null) {
-    console.log('🔧🔧🔧 showLinkedItemsWarning STARTED 🔧🔧🔧');
-    console.log('🔧 itemType:', itemType);
-    console.log('🔧 linkedCount:', linkedCount);
-    console.log('🔧 onConfirm type:', typeof onConfirm);
-    console.log('🔧 onCancel type:', typeof onCancel);
-    console.log('🔧 window.showLinkedItemsWarning function:', typeof window.showLinkedItemsWarning);
-    console.log('🔧 createLinkedItemsWarningModal function:', typeof createLinkedItemsWarningModal);
-    
-    // Fallback mapping for item types
-    const itemTypeDisplay = itemType === 'alert' ? 'התראה' :
-        itemType === 'ticker' ? 'טיקר' :
-            itemType === 'account' ? 'חשבון' :
-                itemType === 'trade' ? 'טרייד' :
-                    itemType === 'trade_plan' ? 'תוכנית טרייד' :
-                        itemType === 'execution' ? 'ביצוע' :
-                            itemType === 'cash_flow' ? 'תזרים מזומנים' :
-                                itemType === 'note' ? 'הערה' : 'אובייקט';
 
-    console.log('🔧 showLinkedItemsWarning called with:', { itemType, linkedCount, itemTypeDisplay, onConfirm, onCancel });
-    console.log('🔧 About to call createLinkedItemsWarningModal...');
-    console.log('🔧 createLinkedItemsWarningModal function exists:', typeof createLinkedItemsWarningModal === 'function');
 
-    // יצירת modal מותאם עם כפתורי אישור וביטול
-    try {
-        createLinkedItemsWarningModal(itemTypeDisplay, linkedCount, onConfirm, onCancel);
-    } catch (error) {
-        console.error('🔧❌ Error calling createLinkedItemsWarningModal:', error);
-        // Fallback to notification system
-        if (typeof window.showConfirmationDialog === 'function') {
-            const title = `פריטים מקושרים`;
-            const message = `${itemTypeDisplay} זה מקושר ל-${linkedCount} פריטים במערכת.\n\nהאם אתה בטוח שברצונך למחוק אותו?`;
-            window.showConfirmationDialog(title, message, onConfirm, onCancel);
-        } else {
-            // Fallback to simple alert
-            if (confirm(`${itemTypeDisplay} זה מקושר ל-${linkedCount} פריטים במערכת. האם אתה בטוח שברצונך למחוק אותו?`)) {
-                if (onConfirm && typeof onConfirm === 'function') {
-                    onConfirm();
-                }
-            } else {
-                if (onCancel && typeof onCancel === 'function') {
-                    onCancel();
-                }
-            }
-        }
-    }
-    
-    console.log('🔧 createLinkedItemsWarningModal call completed');
-    console.log('🔧🔧🔧 showLinkedItemsWarning COMPLETED 🔧🔧🔧');
-    console.log('🔧🔧🔧 END OF showLinkedItemsWarning FUNCTION 🔧🔧🔧');
-}
 
-/**
- * יצירת modal אזהרת פריטים מקושרים
- * Create linked items warning modal
- */
-function createLinkedItemsWarningModal(itemTypeDisplay, linkedCount, onConfirm, onCancel) {
-    console.log('🔧🔧🔧 createLinkedItemsWarningModal STARTED 🔧🔧🔧');
-    console.log('🔧 itemTypeDisplay:', itemTypeDisplay);
-    console.log('🔧 linkedCount:', linkedCount);
-    console.log('🔧 onConfirm type:', typeof onConfirm);
-    console.log('🔧 onCancel type:', typeof onCancel);
-
-    // יצירת modal HTML
-    const modalHtml = `
-        <div class="modal fade" id="linkedItemsWarningModal" tabindex="-1" aria-labelledby="linkedItemsWarningModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header modal-header-colored bg-warning text-dark">
-                        <h5 class="modal-title" id="linkedItemsWarningModalLabel">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            אזהרת פריטים מקושרים
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="mb-0">
-                            <strong>${itemTypeDisplay}</strong> זה מקושר ל-<strong>${linkedCount} פריטים</strong> במערכת.
-                        </p>
-                        <p class="text-warning mb-0 mt-2">
-                            <i class="fas fa-info-circle me-1"></i>
-                            מחיקת הפריט עלולה להשפיע על הפריטים המקושרים.
-                        </p>
-                        <p class="mb-0 mt-2">
-                            האם אתה בטוח שברצונך להמשיך?
-                        </p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="cancelLinkedItemsBtn">
-                            <i class="fas fa-times me-1"></i>
-                            ביטול
-                        </button>
-                        <button type="button" class="btn btn-warning" id="confirmLinkedItemsBtn">
-                            <i class="fas fa-exclamation-triangle me-1"></i>
-                            המשך למחיקה
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    console.log('🔧 Modal HTML created with length:', modalHtml.length);
-    console.log('🔧 Modal HTML preview:', modalHtml.substring(0, 200) + '...');
-
-    // הסרת modal קיים אם יש
-    const existingModal = document.getElementById('linkedItemsWarningModal');
-    if (existingModal) {
-        console.log('🔧 Removing existing modal');
-        existingModal.remove();
-    } else {
-        console.log('🔧 No existing modal found');
-    }
-
-    // הוספת modal ל-DOM
-    console.log('🔧 About to add modal to DOM...');
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    console.log('🔧 Modal HTML added to DOM');
-
-    // קבלת אלמנטי modal
-    const modal = document.getElementById('linkedItemsWarningModal');
-    const confirmBtn = document.getElementById('confirmLinkedItemsBtn');
-    const cancelBtn = document.getElementById('cancelLinkedItemsBtn');
-    
-    console.log('🔧 Modal element found:', modal);
-    console.log('🔧 Confirm button found:', confirmBtn);
-    console.log('🔧 Cancel button found:', cancelBtn);
-    
-    if (!modal) {
-        console.error('🔧❌ Modal element not found!');
-        return;
-    }
-    
-    if (!confirmBtn) {
-        console.error('🔧❌ Confirm button not found!');
-        return;
-    }
-    
-    if (!cancelBtn) {
-        console.error('🔧❌ Cancel button not found!');
-        return;
-    }
-
-    // הוספת event listeners
-    console.log('🔧 Adding event listeners...');
-    confirmBtn.addEventListener('click', () => {
-        console.log('🔧 User confirmed linked items warning');
-
-        // סגירת modal
-        const bootstrapModal = bootstrap.Modal.getInstance(modal);
-        if (bootstrapModal) {
-            bootstrapModal.hide();
-        }
-
-        // קריאה לפונקציית אישור
-        if (onConfirm && typeof onConfirm === 'function') {
-            console.log('🔧 Calling onConfirm callback');
-            onConfirm();
-        } else {
-            console.log('🔧 No onConfirm callback provided');
-        }
-    });
-
-    cancelBtn.addEventListener('click', () => {
-        console.log('🔧 User cancelled linked items warning');
-
-        // סגירת modal
-        const bootstrapModal = bootstrap.Modal.getInstance(modal);
-        if (bootstrapModal) {
-            bootstrapModal.hide();
-        }
-
-        // קריאה לפונקציית ביטול
-        if (onCancel && typeof onCancel === 'function') {
-            console.log('🔧 Calling onCancel callback');
-            onCancel();
-        } else {
-            console.log('🔧 No onCancel callback provided');
-        }
-    });
-
-    // הצגת modal
-    console.log('🔧 About to show the modal...');
-    console.log('🔧 Bootstrap available:', typeof bootstrap !== 'undefined');
-    console.log('🔧 Modal element:', modal);
-    
-    if (typeof bootstrap === 'undefined') {
-        console.error('🔧❌ Bootstrap is not available!');
-        // Fallback to simple alert
-        if (confirm(`חשבון זה מקושר ל-${linkedCount} פריטים במערכת. האם אתה בטוח שברצונך למחוק אותו?`)) {
-            if (onConfirm && typeof onConfirm === 'function') {
-                onConfirm();
-            }
-        } else {
-            if (onCancel && typeof onCancel === 'function') {
-                onCancel();
-            }
-        }
-        return;
-    }
-    
-    if (!bootstrap.Modal) {
-        console.error('🔧❌ Bootstrap.Modal is not available!');
-        // Fallback to simple alert
-        if (confirm(`חשבון זה מקושר ל-${linkedCount} פריטים במערכת. האם אתה בטוח שברצונך למחוק אותו?`)) {
-            if (onConfirm && typeof onConfirm === 'function') {
-                onConfirm();
-            }
-        } else {
-            if (onCancel && typeof onCancel === 'function') {
-                onCancel();
-            }
-        }
-        return;
-    }
-    
-    try {
-        const bootstrapModal = new bootstrap.Modal(modal);
-        console.log('🔧 Bootstrap modal created:', bootstrapModal);
-        bootstrapModal.show();
-        console.log('🔧 Modal show() called');
-    } catch (error) {
-        console.error('🔧❌ Error creating/showing modal:', error);
-        // Fallback to simple alert
-        if (confirm(`חשבון זה מקושר ל-${linkedCount} פריטים במערכת. האם אתה בטוח שברצונך למחוק אותו?`)) {
-            if (onConfirm && typeof onConfirm === 'function') {
-                onConfirm();
-            }
-        } else {
-            if (onCancel && typeof onCancel === 'function') {
-                onCancel();
-            }
-        }
-    }
-
-    // ניקוי modal אחרי סגירה
-    modal.addEventListener('hidden.bs.modal', () => {
-        console.log('🔧 Modal hidden event triggered - removing modal');
-        modal.remove();
-    });
-    
-    console.log('🔧🔧🔧 createLinkedItemsWarningModal COMPLETED 🔧🔧🔧');
-    console.log('🔧🔧🔧 END OF createLinkedItemsWarningModal FUNCTION 🔧🔧🔧');
-    console.log('🔧🔧🔧 FINAL END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY FINAL END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ULTIMATE FINAL END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ABSOLUTE FINAL END 🔧🔧🔧');
-    console.log('🔧🔧🔧 THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-    console.log('🔧🔧🔧 ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY ULTIMATELY REALLY ABSOLUTELY REALLY ULTIMATELY ABSOLUTELY FINALLY THE END 🔧🔧🔧');
-}
 
 /**
  * Show validation warning
@@ -1713,7 +1614,7 @@ window.createBasicItemInfo = createBasicItemInfo;
 window.showWarning = showWarning;
 
 window.showCancelWarning = showCancelWarning;
-window.showLinkedItemsWarning = showLinkedItemsWarning;
+
 
 // בדיקת פונקציות בסוף טעינת ui-utils.js
 console.log('🔧 ui-utils.js נטען');
@@ -1723,7 +1624,7 @@ console.log('🔧 window.showConfirmationDialog קיים:', typeof window.showCo
 window.getWarningConfig = getWarningConfig;
 window.createWarningModal = createWarningModal;
 window.handleWarningAction = handleWarningAction;
-window.createLinkedItemsWarningModal = createLinkedItemsWarningModal;
+
 
 /**
  * Show linked items blocking modal

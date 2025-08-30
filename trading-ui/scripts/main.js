@@ -374,7 +374,7 @@ function restoreAllSectionStates() {
         }
       });
 
-      console.log('🔧 Restored database display page section states');
+              // Restored database display page section states
       return;
     }
 
@@ -483,7 +483,7 @@ window.toggleTopSectionGlobal = function () {
       storageKey = 'testsTopSectionCollapsed';
     } else if (currentPath.includes('/db_display')) {
       storageKey = 'dbDisplayTopSectionCollapsed';
-      console.log('🔧 Database display page detected, using storage key:', storageKey);
+              // Database display page detected, using storage key
     } else if (currentPath.includes('/db_extradata')) {
       storageKey = 'dbExtradataTopSectionCollapsed';
     } else if (currentPath.includes('/designs')) {
@@ -492,7 +492,7 @@ window.toggleTopSectionGlobal = function () {
 
     // Save state to localStorage
     localStorage.setItem(storageKey, !isCollapsed);
-    console.log('🔧 Saved top section state:', { storageKey, collapsed: !isCollapsed });
+            // Saved top section state
   }
 };
 
@@ -552,7 +552,7 @@ window.toggleMainSection = function () {
 
         // Save state for this specific section
         localStorage.setItem(`databaseSectionHidden_${sectionTitle}`, !isCollapsed);
-        console.log('🔧 Saved database section state:', { sectionTitle, collapsed: !isCollapsed });
+        // Saved database section state
       }
     }
     return;
@@ -651,26 +651,26 @@ window.restoreAllSectionStates = function () {
   }
 
   const topSectionCollapsed = localStorage.getItem(topSectionKey) === 'true';
-  console.log('🔧 Restoring top section state:', { topSectionKey, topSectionCollapsed });
+          // Restoring top section state
   const topSection = document.querySelector('.top-section .section-body');
   const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
   const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
 
   if (topSection && topToggleBtn && topIcon) {
-    console.log('🔧 Found top section elements, applying state:', topSectionCollapsed);
+            // Found top section elements, applying state
     if (topSectionCollapsed) {
       topSection.classList.add('collapsed');
       topSection.style.display = 'none';
       topIcon.textContent = '▼';
-      console.log('🔧 Top section collapsed');
+              // Top section collapsed
     } else {
       topSection.classList.remove('collapsed');
       topSection.style.display = 'block';
       topIcon.textContent = '▲';
-      console.log('🔧 Top section expanded');
+              // Top section expanded
     }
   } else {
-    console.log('🔧 Top section elements not found:', { topSection: !!topSection, topToggleBtn: !!topToggleBtn, topIcon: !!topIcon });
+          // Top section elements not found
   }
 
   // Restore main section state

@@ -365,8 +365,8 @@
 
 /* התראה בודדת - עיצוב בסיסי */
 .notification {
-  background: rgba(255, 255, 255, 0.95);
-  /* 95% אטום - רקע קבוע */
+  background: rgba(255, 255, 255, 0.8);
+  /* 80% אטום - רקע קבוע */
   border: 1px solid var(--apple-border-light);
   border-radius: 12px;
   padding: 16px 20px;
@@ -435,11 +435,25 @@
   color: var(--apple-text-primary);
 }
 
+/* סגנון לכפתורי ביטול עם X גדולה */
+.btn .cancel-icon {
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  text-align: center;
+  vertical-align: middle;
+  color: inherit;
+  font-family: Arial, sans-serif;
+}
+
 /* סוגי התראות - צבעים ואייקונים */
 /* הצלחה - צבע הלוגו (ירוק טורקיז כמו table-count) */
 .notification.success {
   border-left: 4px solid #29a6a8;
-  background: linear-gradient(135deg, rgba(41, 166, 168, 0.95) 0%, rgba(31, 138, 140, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(41, 166, 168, 0.8) 0%, rgba(31, 138, 140, 0.8) 100%);
   color: #333 !important;
 }
 
@@ -459,7 +473,7 @@
 /* שגיאה - אדום */
 .notification.error {
   border-left: 4px solid #f44336;
-  background: linear-gradient(135deg, rgba(244, 67, 54, 0.95) 0%, rgba(211, 47, 47, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.8) 0%, rgba(211, 47, 47, 0.8) 100%);
   color: #333 !important;
 }
 
@@ -479,7 +493,7 @@
 /* אזהרה - כתום */
 .notification.warning {
   border-left: 4px solid #ff9800;
-  background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 111, 0, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.8) 0%, rgba(255, 111, 0, 0.8) 100%);
   color: #333 !important;
 }
 

@@ -89,6 +89,8 @@
   <script src="scripts/validation-utils.js"></script>
   <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
+  <script src="scripts/ticker-service.js"></script>
+  <script src="scripts/tickers.js"></script>
   <script src="scripts/trade_plans.js"></script>
   <script src="scripts/accounts.js"></script>
 </head>
@@ -654,7 +656,7 @@
     aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header" style="background-color: #ff9c05; color: white;">
+        <div class="modal-header" style="background-color: #dc3545; color: white;">
           <h5 class="modal-title" id="deleteTradePlanModalLabel" style="order: 1; color: white;">מחק תכנון</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2; filter: invert(1);"></button>
         </div>
@@ -665,9 +667,9 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="height: 38px;">ביטול</button>
           <button type="button" class="btn btn-danger"
-            onclick="if (typeof window.confirmDeleteTradePlan === 'function') { window.confirmDeleteTradePlan(); } else { console.error('confirmDeleteTradePlan function not found'); }">מחק</button>
+            onclick="if (typeof window.confirmDeleteTradePlan === 'function') { window.confirmDeleteTradePlan(); } else { console.error('confirmDeleteTradePlan function not found'); }" style="height: 38px;">מחק</button>
         </div>
       </div>
     </div>

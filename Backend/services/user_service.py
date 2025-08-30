@@ -184,7 +184,17 @@ class UserService:
                 "defaultTypeFilter": "swing",
                 "defaultAccountFilter": "all",
                 "defaultDateRangeFilter": "this_week",
-                "defaultSearchFilter": ""
+                "defaultSearchFilter": "",
+                "dataRefreshInterval": 5,
+                "primaryDataProvider": "yahoo",
+                "secondaryDataProvider": "google",
+                "cacheTTL": 5,
+                "maxBatchSize": 25,
+                "requestDelay": 200,
+                "retryAttempts": 2,
+                "retryDelay": 5,
+                "autoRefresh": True,
+                "verboseLogging": False
             }
             
         except Exception as e:
@@ -201,7 +211,17 @@ class UserService:
                 "defaultTypeFilter": "swing",
                 "defaultAccountFilter": "all",
                 "defaultDateRangeFilter": "this_week",
-                "defaultSearchFilter": ""
+                "defaultSearchFilter": "",
+                "dataRefreshInterval": 5,
+                "primaryDataProvider": "yahoo",
+                "secondaryDataProvider": "google",
+                "cacheTTL": 5,
+                "maxBatchSize": 25,
+                "requestDelay": 200,
+                "retryAttempts": 2,
+                "retryDelay": 5,
+                "autoRefresh": True,
+                "verboseLogging": False
             }
     
     @staticmethod

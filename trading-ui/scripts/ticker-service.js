@@ -387,6 +387,63 @@ function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...
   
 }
 
+/**
+ * טעינת טיקרים עבור מודל תכנון טרייד
+ * מספק טיקרים פעילים (פתוח או סגור) לעדכון שדות select
+ * @returns {Promise<void>}
+ */
+async function loadTickersForTradePlan() {
+    try {
+        console.log('🔄 Loading tickers for trade plan modal...');
+        
+        const response = await fetch('/api/v1/tickers/');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const tickers = data.data || data;
+        
+        console.log('📊 Tickers loaded:', tickers.length);
+        
+        // סינון טיקרים - רק פתוח או סגור
+        const activeTickers = tickers.filter(ticker => 
+            ticker.status === 'open' || ticker.status === 'closed'
+        );
+        
+        console.log('✅ Active tickers (open/closed):', activeTickers.length);
+        
+        // עדכון רשימת הטיקרים
+        const tickerSelect = document.getElementById('addTradePlanTickerId');
+        if (tickerSelect) {
+            // שמירת האופציה הראשונה (בחר טיקר)
+            const defaultOption = tickerSelect.querySelector('option[value=""]');
+            tickerSelect.innerHTML = '';
+            
+            if (defaultOption) {
+                tickerSelect.appendChild(defaultOption);
+            }
+            
+            // הוספת טיקרים פעילים
+            activeTickers.forEach(ticker => {
+                const option = document.createElement('option');
+                option.value = ticker.id;
+                option.textContent = ticker.symbol;
+                tickerSelect.appendChild(option);
+            });
+            
+            console.log('✅ Ticker select updated with', activeTickers.length, 'active tickers');
+        } else {
+            console.error('❌ Ticker select element not found');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading tickers:', error);
+        // Fallback to static options if API fails
+        console.log('⚠️ Using fallback static ticker options');
+    }
+}
+
 // הגדרת הפונקציות כגלובליות
 window.tickerService = {
     getTickers,
@@ -399,6 +456,7 @@ window.tickerService = {
     getTickersByType,
     getTickersByActivity,
     updateTickerSelect,
+    loadTickersForTradePlan,
     clearCache,
     loadCache
 };

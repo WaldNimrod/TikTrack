@@ -526,7 +526,7 @@ function updateAlertsTable(alerts) {
                   </td>
                   <td class="p-0 pe-1">
                     ${alert.status === 'open' ? `
-                    <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>
+                    <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול"><span class="cancel-icon">X</span></button>
                     ` : `
                     <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
                     `}

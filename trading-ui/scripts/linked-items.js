@@ -282,8 +282,10 @@ function createLinkedItemsModalContent(data, itemType, itemId) {
     <div class="linked-items-container">
       <style>
         .linked-item-icon-img {
-          filter: brightness(0) saturate(100%) invert(1);
-          opacity: 0.8;
+          width: 24px;
+          height: 24px;
+          vertical-align: middle;
+          margin-right: 8px;
         }
         .linked-item-row {
           border-radius: 6px;
@@ -436,7 +438,7 @@ function createLinkedItemsModalContent(data, itemType, itemId) {
       </style>
       <div class="alert alert-info">
         <strong>📋 סקירת אלמנטים מקושרים</strong><br>
-        מציג את כל האלמנטים המקושרים ל-${getItemTypeDisplayName(itemType)} ${itemName}
+        מציג את כל האלמנטים המקושרים ל-${itemName}
       </div>
       
       ${rulesExplanation ? `
@@ -560,23 +562,48 @@ function getRulesExplanation(itemType, data) {
             const alerts = childEntities.filter(entity => entity.type === 'alert');
             const executions = childEntities.filter(entity => entity.type === 'execution');
             
-            let explanation = 'לא ניתן לבטל תכנון זה כי יש:';
-            if (activeTrades.length > 0) {
-                explanation += `<br>• ${activeTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
+            // בדיקה אם זה מחיקה או ביטול לפי הקונטקסט
+            const isDeletion = window.currentAction === 'delete';
+            
+            if (isDeletion) {
+                // למחיקה - לא ניתן למחוק אם יש כל פריט מקושר
+                let explanation = 'לא ניתן למחוק תכנון זה כי יש פריטים מקושרים:';
+                if (activeTrades.length > 0) {
+                    explanation += `<br>• ${activeTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
+                }
+                if (closedTrades.length > 0) {
+                    explanation += `<br>• ${closedTrades.length} טרייד(ים) מבוטלים - יש למחוק אותם קודם`;
+                }
+                if (notes.length > 0) {
+                    explanation += `<br>• ${notes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+                }
+                if (alerts.length > 0) {
+                    explanation += `<br>• ${alerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+                }
+                if (executions.length > 0) {
+                    explanation += `<br>• ${executions.length} ביצוע(ים) מקושר(ים) - יש למחוק אותם קודם`;
+                }
+                return explanation;
+            } else {
+                // לביטול - רק טריידים פעילים מונעים ביטול
+                let explanation = 'ניתן לבטל רק תכנון ללא טרייד או מקושר לטריידים מבוטלים. לא ניתן לבטל תכנון זה כי יש:';
+                if (activeTrades.length > 0) {
+                    explanation += `<br>• ${activeTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
+                }
+                if (notes.length > 0) {
+                    explanation += `<br>• ${notes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+                }
+                if (alerts.length > 0) {
+                    explanation += `<br>• ${alerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+                }
+                if (executions.length > 0) {
+                    explanation += `<br>• ${executions.length} ביצוע(ים) מקושר(ים) - יש למחוק אותם קודם`;
+                }
+                if (closedTrades.length > 0) {
+                    explanation += `<br>• ${closedTrades.length} טרייד(ים) סגור(ים) - ניתן לבטל תכנון עם טריידים מבוטלים`;
+                }
+                return explanation;
             }
-            if (notes.length > 0) {
-                explanation += `<br>• ${notes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
-            }
-            if (alerts.length > 0) {
-                explanation += `<br>• ${alerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
-            }
-            if (executions.length > 0) {
-                explanation += `<br>• ${executions.length} ביצוע(ים) מקושר(ים) - יש למחוק אותם קודם`;
-            }
-            if (closedTrades.length > 0) {
-                explanation += `<br>• ${closedTrades.length} טרייד(ים) סגור(ים) - ניתן לבטל תכנון עם טריידים סגורים`;
-            }
-            return explanation;
             
         case 'trade':
             const linkedExecutions = childEntities.filter(entity => entity.type === 'execution');
@@ -675,17 +702,25 @@ function getTradePlanDetails(planId, data = null) {
  * @returns {string} Emoji icon
  */
 function getItemTypeIcon(type) {
+    // השתמש בפונקציה הגלובלית אם היא זמינה
+    if (window.uiUtils && window.uiUtils.getItemTypeIcon) {
+        const globalIcon = window.uiUtils.getItemTypeIcon(type);
+        // החלף את הגודל ל-24px עבור חלון המקושרים
+        return globalIcon.replace('width: 16px; height: 16px;', 'width: 24px; height: 24px;').replace('class="', 'class="linked-item-icon-img ');
+    }
+    
+    // ברירת מחדל אם הפונקציה הגלובלית לא זמינה
     const icons = {
-        'trade': '📈',
-        'account': '🏦',
-        'ticker': '💹',
-        'alert': '🔔',
-        'cash_flow': '💰',
-        'note': '📝',
-        'trade_plan': '📋',
-        'execution': '✅'
+        'trade': '<img src="/images/icons/trades.svg" alt="טרייד" class="linked-item-icon-img" width="24" height="24">',
+        'account': '<img src="/images/icons/accounts.svg" alt="חשבון" class="linked-item-icon-img" width="24" height="24">',
+        'ticker': '<img src="/images/icons/tickers.svg" alt="טיקר" class="linked-item-icon-img" width="24" height="24">',
+        'alert': '<img src="/images/icons/alerts.svg" alt="התראה" class="linked-item-icon-img" width="24" height="24">',
+        'cash_flow': '<img src="/images/icons/cash_flows.svg" alt="תזרים מזומנים" class="linked-item-icon-img" width="24" height="24">',
+        'note': '<img src="/images/icons/notes.svg" alt="הערה" class="linked-item-icon-img" width="24" height="24">',
+        'trade_plan': '<img src="/images/icons/trade_plans.svg" alt="תכנון טרייד" class="linked-item-icon-img" width="24" height="24">',
+        'execution': '<img src="/images/icons/executions.svg" alt="ביצוע" class="linked-item-icon-img" width="24" height="24">'
     };
-    return icons[type] || '📄';
+    return icons[type] || '<img src="/images/icons/home.svg" alt="דף הבית" class="linked-item-icon-img" width="24" height="24">';
 }
 
 /**

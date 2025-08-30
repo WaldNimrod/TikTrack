@@ -1,5 +1,3 @@
-console.log('🚀 alerts.js נטען בהצלחה');
-
 /**
  * ========================================
  * דף ההתראות - Alerts Page
@@ -462,6 +460,15 @@ function updateAlertsTable(alerts) {
         day: '2-digit'
       }) : 'לא מוגדר';
 
+      // תאריך הפעלה
+      const triggeredAt = alert.triggered_at ? new Date(alert.triggered_at).toLocaleDateString('he-IL', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : '-';
+
       // המרת סטטוס לעברית להצגה
       // לפי הדוקומנטציה: open=פעיל, closed=הופעל, cancelled=בוטל
       let statusDisplay;
@@ -506,6 +513,7 @@ function updateAlertsTable(alerts) {
         })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
+          <td><span class="triggered-date-text">${triggeredAt}</span></td>
           <td style="padding: 0;">
             <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer;" title="קישור לדף אובייקט - בפיתוח">
               ${relatedDisplay}
@@ -515,28 +523,16 @@ function updateAlertsTable(alerts) {
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
-            <table class="table table-sm table-borderless mb-0">
-              <tbody>
-                <tr>
-                  <td class="p-0 pe-1">
-                    <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">🔗</button>
-                  </td>
-                  <td class="p-0 pe-1">
-                    <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
-                  </td>
-                  <td class="p-0 pe-1">
-                    ${alert.status === 'open' ? `
-                    <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול">❌</button>
-                    ` : `
-                    <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
-                    `}
-                  </td>
-                  <td class="p-0">
-                    <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
+              <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">🔗</button>
+              <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
+              ${alert.status === 'open' ? `
+              <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול"><span class="cancel-icon">X</span></button>
+              ` : `
+              <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה סגורה">X</button>
+              `}
+              <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
+            </div>
           </td>
         </tr>
       `;
@@ -1282,41 +1278,41 @@ async function saveAlert() {
 
   if (!relatedType || !relatedId) {
     console.log('🔧 Validation failed: missing required fields');
-    window.showErrorNotification('שדות חובה חסרים', 'יש למלא את כל השדות החובה');
+    showModalNotification('error', 'שדות חובה חסרים', 'יש למלא את כל השדות החובה', 'addAlertModal');
     return;
   }
 
   if (!conditionAttribute || !conditionOperator || !conditionNumber) {
     console.log('🔧 Validation failed: missing condition fields');
-    window.showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
+    showModalNotification('error', 'תנאי התראה חסר', 'יש למלא את כל שדות התנאי', 'addAlertModal');
     return;
   }
 
   // וולידציה של ערך מספרי
   const numericValue = parseFloat(conditionNumber);
   if (isNaN(numericValue)) {
-    window.showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
+    showModalNotification('error', 'ערך לא תקין', 'הערך חייב להיות מספר', 'addAlertModal');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך חיובי למחיר
   if (conditionAttribute === 'price' && numericValue <= 0) {
-    window.showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
+    showModalNotification('error', 'ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0', 'addAlertModal');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך מקסימלי למחיר
   if (conditionAttribute === 'price' && numericValue > 1000000) {
-    window.showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
+    showModalNotification('error', 'ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000', 'addAlertModal');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של אחוזים (לשינוי)
   if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
-    window.showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
+    showModalNotification('error', 'ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%', 'addAlertModal');
     conditionNumberElement.focus();
     return;
   }
@@ -1364,7 +1360,7 @@ async function saveAlert() {
       loadAlertsData();
 
       // הצגת הודעה
-      window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה!');
+      showModalNotification('success', 'התראה נשמרה', 'התראה נשמרה בהצלחה!', 'addAlertModal');
     } else {
       const errorText = await response.text();
       console.error('🔧 Server error response:', errorText);
@@ -1372,7 +1368,7 @@ async function saveAlert() {
     }
   } catch (error) {
     console.error('🔧 Error saving alert:', error);
-    window.showErrorNotification('שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message);
+    showModalNotification('error', 'שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message, 'addAlertModal');
   }
 }
 
@@ -1387,7 +1383,7 @@ async function saveAlert() {
 function editAlert(alertId) {
   const alert = alertsData.find(a => a.id === alertId);
   if (!alert) {
-    window.showErrorNotification('התראה לא נמצאה', 'התראה לא נמצאה');
+    showErrorNotification('התראה לא נמצאה', 'התראה לא נמצאה');
     return;
   }
 
@@ -1652,7 +1648,7 @@ async function updateAlert() {
   const isTriggered = document.getElementById('editAlertIsTriggered').value;
 
   if (!validateAlertStatusCombination(status, isTriggered)) {
-    window.showErrorNotification('שילוב לא תקין', 'שילוב לא תקין בין סטטוס ומצב הפעלה. ראה את הכללים במערכת ההתראות.');
+    showErrorNotification('שילוב לא תקין', 'שילוב לא תקין בין סטטוס ומצב הפעלה. ראה את הכללים במערכת ההתראות.');
     return;
   }
 
@@ -1661,12 +1657,12 @@ async function updateAlert() {
   const relatedId = parseInt(document.getElementById('editAlertRelatedObjectSelect').value);
 
   if (!relatedTypeId || isNaN(relatedTypeId)) {
-    window.showErrorNotification('סוג אובייקט חסר', 'נא לבחור סוג אובייקט לשיוך (חשבון, טרייד, תכנון או טיקר)');
+    showErrorNotification('סוג אובייקט חסר', 'נא לבחור סוג אובייקט לשיוך (חשבון, טרייד, תכנון או טיקר)');
     return;
   }
 
   if (!relatedId || isNaN(relatedId)) {
-    window.showErrorNotification('אובייקט חסר', 'נא לבחור אובייקט ספציפי לשיוך מהרשימה');
+    showErrorNotification('אובייקט חסר', 'נא לבחור אובייקט ספציפי לשיוך מהרשימה');
     return;
   }
 
@@ -1680,35 +1676,35 @@ async function updateAlert() {
   const conditionNumber = conditionNumberElement.value;
 
   if (!conditionAttribute || !conditionOperator || !conditionNumber) {
-    window.showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
+    showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
     return;
   }
 
   // וולידציה של ערך מספרי
   const numericValue = parseFloat(conditionNumber);
   if (isNaN(numericValue)) {
-    window.showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
+    showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך חיובי למחיר
   if (conditionAttribute === 'price' && numericValue <= 0) {
-    window.showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
+    showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של ערך מקסימלי למחיר
   if (conditionAttribute === 'price' && numericValue > 1000000) {
-    window.showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
+    showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
     conditionNumberElement.focus();
     return;
   }
 
   // וולידציה של אחוזים (לשינוי)
   if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
-    window.showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
+    showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
     conditionNumberElement.focus();
     return;
   }
@@ -1752,13 +1748,13 @@ async function updateAlert() {
       loadAlertsData();
 
       // הצגת הודעה
-      window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!');
+      showSuccessNotification('התראה עודכנה', 'התראה עודכנה בהצלחה!');
     } else {
       throw new Error(`שגיאה בעדכון התראה: ${response.status}`);
     }
   } catch (error) {
     console.error('שגיאה בעדכון התראה:', error);
-    window.showErrorNotification('שגיאה בעדכון התראה', 'שגיאה בעדכון התראה: ' + error.message);
+    showErrorNotification('שגיאה בעדכון התראה', 'שגיאה בעדכון התראה: ' + error.message);
   }
 }
 
@@ -1766,71 +1762,42 @@ async function updateAlert() {
  * מחיקת התראה
  */
 async function deleteAlert(alertId) {
-  // שימוש במערכת הגלובלית למחיקה
-  if (typeof window.showDeleteWarning === 'function') {
-    window.showDeleteWarning('alerts', alertId, 'התראה', async () => {
-      await confirmDeleteAlert(alertId);
-    }, null);
-  } else {
-    // גיבוי למקרה שהמערכת הגלובלית לא זמינה
-    if (typeof window.showConfirmationDialog === 'function') {
-      window.showConfirmationDialog(
-        'מחיקת התראה',
-        'האם אתה בטוח שברצונך למחוק התראה זו?\n\nפעולה זו אינה ניתנת לביטול.',
-        async () => {
-          await confirmDeleteAlert(alertId);
-        },
-        () => {
-          console.log('מחיקה בוטלה');
-        }
-      );
-    } else {
-      // fallback אחרון - confirm רגיל
-      const confirmed = confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
-      if (confirmed) {
-        await confirmDeleteAlert(alertId);
-      }
-    }
+  if (!confirm('האם אתה בטוח שברצונך למחוק התראה זו?')) {
     return;
   }
-}
-
-/**
- * אישור מחיקת התראה
- */
-async function confirmDeleteAlert(alertId) {
-  console.log('🔄 confirmDeleteAlert נקראה עבור ID:', alertId);
 
   try {
+    // מוחק התראה
+
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
       method: 'DELETE'
     });
 
-    const result = await response.json();
-    
-    if (response.ok && result.status === 'success') {
-      console.log('✅ התראה נמחקה בהצלחה');
-      window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
+    if (response.ok) {
+      // התראה נמחקה בהצלחה
+
+      // רענון הנתונים
       loadAlertsData();
+
+      // הצגת הודעה
+      showSuccessNotification('התראה נמחקה', 'התראה נמחקה בהצלחה!');
     } else {
-      console.error('❌ שגיאה במחיקת התראה:', result);
-      
-      // טיפול בשגיאות מהשרת
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-        
-        if (serverMessage.includes('has linked items')) {
-          window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק התראה זו - יש פריטים מקושרים אליה');
-        } else {
-          window.showErrorNotification('שגיאה במחיקה', serverMessage);
+      // ניסיון לקרוא את פרטי השגיאה
+      let errorMessage = `שגיאה במחיקת התראה: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.error && errorData.error.message) {
+          errorMessage = errorData.error.message;
         }
-      } else {
-        window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת התראה - בדוק את הנתונים');
+      } catch (e) {
+        // לא ניתן לקרוא פרטי שגיאה מהשרת
       }
+
+      throw new Error(errorMessage);
     }
   } catch (error) {
-    console.error('❌ שגיאה במחיקת התראה:', error);
-    window.showErrorNotification('שגיאה', 'שגיאה במחיקת התראה - בדוק את חיבור השרת');
+    console.error('שגיאה במחיקת התראה:', error);
+    showErrorNotification('שגיאה במחיקת התראה', 'שגיאה במחיקת התראה: ' + error.message);
   }
 }
 
@@ -1975,42 +1942,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (typeof window.loadSortState === 'function') {
     window.loadSortState('alerts');
   }
-});
-
-// אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('🔄 === DOM CONTENT LOADED (ALERTS) ===');
-
-  // בדיקת זמינות מערכות
-  console.log('🔍 בדיקת זמינות מערכות:');
-  console.log('showSuccessNotification:', typeof window.showSuccessNotification);
-  console.log('showErrorNotification:', typeof window.showErrorNotification);
-  console.log('showValidationWarning:', typeof window.showValidationWarning);
-  console.log('showDeleteWarning:', typeof window.showDeleteWarning);
-  
-  // בדיקה שהמערכת זמינה
-  if (typeof window.showSuccessNotification !== 'function') {
-    console.error('❌ מערכת התראות לא זמינה!');
-    alert('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
-    return;
-  }
-  
-  console.log('✅ מערכת התראות זמינה');
-
-  // שחזור מצב הסגירה
-  if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
-  }
-
-  // טעינת נתונים
-  loadAlertsData();
-
-  // טעינת מצב המיון
-  if (typeof window.loadSortState === 'function') {
-    window.loadSortState('alerts');
-  }
-
-  console.log('דף התראות נטען בהצלחה');
 });
 
 // פונקציה לעדכון הטבלה מפילטרים
@@ -2172,14 +2103,4 @@ window.parseAlertCondition = function (condition) {
   return { variable: '', operator: '', value: '' };
 };
 
-console.log('✅ alerts.js הושלם בהצלחה - כל הפונקציות זמינות');
 
-// בדיקת ייצוא פונקציות
-console.log('🔍 בדיקת ייצוא פונקציות alerts.js:');
-console.log('- loadAlertsData:', typeof window.loadAlertsData);
-console.log('- updateAlertsTable:', typeof window.updateAlertsTable);
-console.log('- showAddAlertModal:', typeof window.showAddAlertModal);
-console.log('- editAlert:', typeof window.editAlert);
-console.log('- deleteAlert:', typeof window.deleteAlert);
-console.log('- formatAlertCondition:', typeof window.formatAlertCondition);
-console.log('- parseAlertCondition:', typeof window.parseAlertCondition);

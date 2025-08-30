@@ -331,10 +331,54 @@ function showSystemError(message) {
  * This function restores the open/closed state of all collapsible sections
  */
 function restoreAllSectionStates() {
-  // Restoring all section states from localStorage
+  const currentPath = window.location.pathname;
 
   try {
-    // Get all section toggles
+    // Special handling for database display page
+    if (currentPath.includes('/db_display')) {
+      // Restore top section state
+      const topSectionHidden = localStorage.getItem('dbDisplayTopSectionCollapsed') === 'true';
+      const topSection = document.querySelector('.top-section .section-body');
+      const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+      const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
+
+      if (topSection && topIcon) {
+        if (topSectionHidden) {
+          topSection.style.display = 'none';
+          topIcon.textContent = '▼';
+        } else {
+          topSection.style.display = 'block';
+          topIcon.textContent = '▲';
+        }
+      }
+
+      // Restore all content sections state
+      const contentSections = document.querySelectorAll('.content-section');
+      contentSections.forEach(section => {
+        const sectionTitle = section.querySelector('.table-title')?.textContent.trim();
+        if (sectionTitle) {
+          const isHidden = localStorage.getItem(`databaseSectionHidden_${sectionTitle}`) === 'true';
+          const sectionBody = section.querySelector('.section-body');
+          const toggleBtn = section.querySelector('button[onclick*="toggleMainSection"]');
+          const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+          if (sectionBody && icon) {
+            if (isHidden) {
+              sectionBody.style.display = 'none';
+              icon.textContent = '▼';
+            } else {
+              sectionBody.style.display = 'block';
+              icon.textContent = '▲';
+            }
+          }
+        }
+      });
+
+      console.log('🔧 Restored database display page section states');
+      return;
+    }
+
+    // Regular handling for other pages
     const sectionToggles = document.querySelectorAll('[onclick*="toggleTopSection"], [onclick*="toggleMainSection"]');
 
     sectionToggles.forEach(toggle => {
@@ -356,11 +400,13 @@ function restoreAllSectionStates() {
       }
     });
 
-
   } catch (error) {
     console.error('❌ Error restoring section states:', error);
   }
 }
+
+// Export to global scope
+window.restoreAllSectionStates = restoreAllSectionStates;
 
 // ===== GLOBAL TOGGLE FUNCTIONS =====
 /**
@@ -437,6 +483,7 @@ window.toggleTopSectionGlobal = function () {
       storageKey = 'testsTopSectionCollapsed';
     } else if (currentPath.includes('/db_display')) {
       storageKey = 'dbDisplayTopSectionCollapsed';
+      console.log('🔧 Database display page detected, using storage key:', storageKey);
     } else if (currentPath.includes('/db_extradata')) {
       storageKey = 'dbExtradataTopSectionCollapsed';
     } else if (currentPath.includes('/designs')) {
@@ -476,6 +523,37 @@ window.toggleMainSection = function () {
 
       // Save state
       localStorage.setItem('notesMainSectionHidden', !isHidden);
+    }
+    return;
+  }
+
+  // Special handling for database display page (multiple sections)
+  if (currentPath.includes('/db_display')) {
+    // Find the specific section that was clicked
+    const clickedButton = window.event ? window.event.target.closest('button') : null;
+    const currentSection = clickedButton ? clickedButton.closest('.content-section') : null;
+    
+    if (currentSection) {
+      const sectionBody = currentSection.querySelector('.section-body');
+      const toggleBtn = currentSection.querySelector('button[onclick*="toggleMainSection"]');
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+      const sectionTitle = currentSection.querySelector('.table-title').textContent.trim();
+
+      if (sectionBody) {
+        const isCollapsed = sectionBody.style.display === 'none';
+
+        if (isCollapsed) {
+          sectionBody.style.display = 'block';
+          if (icon) icon.textContent = '▲';
+        } else {
+          sectionBody.style.display = 'none';
+          if (icon) icon.textContent = '▼';
+        }
+
+        // Save state for this specific section
+        localStorage.setItem(`databaseSectionHidden_${sectionTitle}`, !isCollapsed);
+        console.log('🔧 Saved database section state:', { sectionTitle, collapsed: !isCollapsed });
+      }
     }
     return;
   }

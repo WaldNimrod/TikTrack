@@ -122,34 +122,40 @@ class ActiveAlertsComponent extends HTMLElement {
 
     this.innerHTML = `
       <div class="alerts-container">
-        <div class="alerts-header">
+        <div class="alerts-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px;">
           <h3 id="alertsTitle">🔔 התראות פעילות</h3>
+          
+          <!-- מפתח צבעים בכותרת מצד שמאל -->
+          <div class="alerts-color-legend-header" style="display: flex; gap: 8px; align-items: center; margin-bottom: 0px;">
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: rgba(220, 53, 69, 0.1); border-left: 4px solid #c82333; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; min-width: 80px;">
+                <img src="images/icons/tickers.svg" alt="טיקר" style="width: 14px; height: 14px;">
+                <span style="color: #c82333; font-size: 0.8rem; font-weight: 500;">טיקר</span>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: rgba(255, 149, 0, 0.1); border-left: 4px solid #e67e00; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; min-width: 80px;">
+                <img src="images/icons/trade_plans.svg" alt="תוכנית" style="width: 14px; height: 14px;">
+                <span style="color: #e67e00; font-size: 0.8rem; font-weight: 500;">תוכנית</span>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: rgba(40, 167, 69, 0.1); border-left: 4px solid #1e7e34; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; min-width: 80px;">
+                <img src="images/icons/trades.svg" alt="טרייד" style="width: 14px; height: 14px;">
+                <span style="color: #1e7e34; font-size: 0.8rem; font-weight: 500;">טרייד</span>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: rgba(41, 166, 168, 0.1); border-left: 4px solid #1f8a8c; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; min-width: 80px;">
+                <img src="images/icons/accounts.svg" alt="חשבון" style="width: 14px; height: 14px;">
+                <span style="color: #1f8a8c; font-size: 0.8rem; font-weight: 500;">חשבון</span>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div id="alertsCards" class="alerts-cards-container">
           <!-- התראות יוצגו כאן -->
-        </div>
-        
-        <!-- מפתח צבעים מתחת להתראות -->
-        <div class="alerts-color-legend-below">
-          <div class="legend-items">
-            <div class="legend-item">
-              <div class="legend-color" style="background-color: rgba(41, 166, 168, 0.1); border-left: 4px solid #1f8a8c;"></div>
-              <span>💰 חשבון</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color" style="background-color: rgba(40, 167, 69, 0.1); border-left: 4px solid #1e7e34;"></div>
-              <span>📈 טרייד</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color" style="background-color: rgba(255, 149, 0, 0.1); border-left: 4px solid #e67e00;"></div>
-              <span>📋 תוכנית טרייד</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color" style="background-color: rgba(220, 53, 69, 0.1); border-left: 4px solid #c82333;"></div>
-              <span>📊 טיקר</span>
-            </div>
-          </div>
         </div>
       </div>
     `;
@@ -170,6 +176,8 @@ class ActiveAlertsComponent extends HTMLElement {
     console.log('🔍 === CHECKING GLOBAL FUNCTIONS (ACTIVE ALERTS COMPONENT) ===');
     console.log('🔍 formatAlertCondition available:', typeof window.formatAlertCondition);
     console.log('🔍 parseAlertCondition available:', typeof window.parseAlertCondition);
+    console.log('🔍 BUTTON_ICONS available:', typeof window.BUTTON_ICONS);
+    console.log('🔍 BUTTON_TEXTS available:', typeof window.BUTTON_TEXTS);
 
     // בדיקה אם שתי הפונקציות זמינות
     if (window.formatAlertCondition && window.parseAlertCondition) {
@@ -443,27 +451,27 @@ class ActiveAlertsComponent extends HTMLElement {
 
     // קביעת רקע צבעוני לפי סוג האובייקט המקושר (לא לפי סוג ההתראה)
     const relatedTypeId = alert.related_type_id || 4; // ברירת מחדל לטיקר
+    console.log('🔍 Creating alert card with relatedTypeId:', relatedTypeId);
     const objectIcon = this.getObjectTypeIcon(relatedTypeId);
+    console.log('🔍 Object icon for header:', objectIcon);
 
     const html = `
       <div class="alert-card" data-related-type="${relatedTypeId}" data-alert-id="${alert.id}">
         <div class="alert-card-header">
           <h4 class="alert-card-title clickable" onclick="window.showTickerPage('${symbol}')">${objectIcon} ${symbol || 'התראה'}</h4>
           <span class="alert-card-time">${triggeredTime}</span>
+          <button class="btn-mark-read-icon" data-alert-id="${alert.id}" title="${window.BUTTON_TEXTS ? window.BUTTON_TEXTS.READ : 'קראתי'}">${window.BUTTON_ICONS ? window.BUTTON_ICONS.READ : '✓'}</button>
         </div>
         <div class="alert-card-related-object">
           ${relatedObjectDetails}
         </div>
         <div class="alert-card-content">
-          ${message ? `<p class="alert-card-message"><strong>${message}</strong></p>` : ''}
           <div class="alert-card-details">
             <span class="alert-detail-item condition-item">${window.translateConditionFields(alert.condition_attribute, alert.condition_operator, alert.condition_number)}</span>
             <span class="alert-detail-item ${changeClass}">${currentPrice}</span>
             <span class="alert-detail-item ${changeClass}">${dailyChange}</span>
+            ${message ? `<span class="alert-detail-item message-icon" title="${message}">${window.BUTTON_ICONS ? window.BUTTON_ICONS.SEARCH : '🔍'}</span>` : ''}
           </div>
-        </div>
-        <div class="alert-card-footer">
-          <button class="button-primary btn-mark-read" data-alert-id="${alert.id}">✓ קראתי</button>
         </div>
       </div>
     `;
@@ -473,7 +481,7 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   setupCardEventListeners() {
-    this.querySelectorAll('.btn-mark-read').forEach(btn => {
+    this.querySelectorAll('.btn-mark-read-icon').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.dataset.alertId);
         this.markAlertAsRead(id);
@@ -482,8 +490,12 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   async markAlertAsRead(alertId) {
-    const btn = this.querySelector(`button[data-alert-id="${alertId}"]`);
-    if (btn) { btn.disabled = true; btn.textContent = '✓ נקרא'; }
+    const btn = this.querySelector(`.btn-mark-read-icon[data-alert-id="${alertId}"]`);
+    if (btn) { 
+      btn.disabled = true; 
+            btn.textContent = window.BUTTON_ICONS ? window.BUTTON_ICONS.READ : '✓';
+      btn.style.opacity = '0.5'; 
+    }
     try {
       const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
       const res = await fetch(`${base}/api/v1/alerts/${alertId}/mark-read`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
@@ -504,7 +516,11 @@ class ActiveAlertsComponent extends HTMLElement {
       }
     } catch (err) {
       console.error('failed marking alert as read', err);
-      if (btn) { btn.disabled = false; btn.textContent = '✓ קראתי'; }
+      if (btn) { 
+        btn.disabled = false; 
+        btn.textContent = window.BUTTON_ICONS ? window.BUTTON_ICONS.APPROVE : '✓'; 
+        btn.style.opacity = '1'; 
+      }
     }
   }
 
@@ -1159,14 +1175,17 @@ class ActiveAlertsComponent extends HTMLElement {
    * קביעת איקון לפי סוג האובייקט המקושר - מעודכן לאיקונים של המערכת
    */
   getObjectTypeIcon(relatedTypeId) {
-    // איקונים עקביים עם המערכת
+    console.log('🔍 getObjectTypeIcon called with relatedTypeId:', relatedTypeId);
+    // איקונים עקביים עם המערכת - שימוש באיקונים SVG האמיתיים
     const objectIcons = {
-      1: '💰', // חשבון - כפי שמופיע ב-index.html, preferences.html
-      2: '📈', // טרייד - כפי שמופיע ב-index.html, trades.html
-      3: '📋', // תוכנית טרייד - כפי שמופיע ב-db_extradata.html
-      4: '📊'  // טיקר - כפי שמופיע ב-index.html, db_extradata.html
+      1: '<img src="images/icons/accounts.svg" alt="חשבון" style="width: 16px; height: 16px; vertical-align: middle;">', // חשבון
+      2: '<img src="images/icons/trades.svg" alt="טרייד" style="width: 16px; height: 16px; vertical-align: middle;">', // טרייד
+      3: '<img src="images/icons/trade_plans.svg" alt="תוכנית טרייד" style="width: 16px; height: 16px; vertical-align: middle;">', // תוכנית טרייד
+      4: '<img src="images/icons/tickers.svg" alt="טיקר" style="width: 16px; height: 16px; vertical-align: middle;">'  // טיקר
     };
-    return objectIcons[relatedTypeId] || '📊';
+    const icon = objectIcons[relatedTypeId] || objectIcons[4]; // ברירת מחדל לטיקר
+    console.log('🔍 getObjectTypeIcon returning icon:', icon);
+    return icon;
   }
 
   /**

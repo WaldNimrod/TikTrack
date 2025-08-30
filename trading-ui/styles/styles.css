@@ -3114,12 +3114,12 @@ button[onclick*="openDesignDetails"]:hover {
   background: #fff;
   border: 1px solid #e9ecef;
   border-radius: 12px;
-  padding: 20px;
+  padding: 12px;
   margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   position: relative;
-  min-height: 220px;
+  min-height: 140px;
   max-width: 400px;
   width: 100%;
   /* צבעי רקע לפי סוג האובייקט המקושר - מוגדר דינמית ב-JavaScript */
@@ -3259,8 +3259,48 @@ a:hover,
 .alert-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 8px;
+  gap: 8px;
+  position: relative;
+}
+
+/* כפתור "קראתי" בפינה למעלה */
+.btn-mark-read-icon {
+  background: white;
+  color: #28a745;
+  border: 2px solid #28a745;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.2rem;
+  font-weight: bold;
+  font-family: monospace;
+}
+
+.btn-mark-read-icon:hover {
+  background: #f8f9fa;
+  border-color: #218838;
+  color: #218838;
+  transform: scale(1.05);
+}
+
+.btn-mark-read-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* תאריך ושעה במרכז */
+.alert-card-time-center {
+  text-align: center;
+  margin-bottom: 12px;
+  padding: 4px 0;
 }
 
 .alert-card-related-object {
@@ -3276,6 +3316,19 @@ a:hover,
   margin: 0;
   flex: 1;
   text-align: right;
+}
+
+.alert-card-time {
+  font-size: 0.85rem;
+  color: #666;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .alert-card-time {
@@ -3328,6 +3381,65 @@ a:hover,
   color: #dc3545;
   background: #f8d7da;
   border-color: #f5c6cb;
+}
+
+/* איקון זכוכית מגדלת להודעה */
+.alert-detail-item.message-icon {
+  cursor: pointer;
+  background: #e3f2fd;
+  border-color: #2196f3;
+  color: #1976d2;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.alert-detail-item.message-icon:hover {
+  background: #bbdefb;
+  transform: scale(1.1);
+}
+
+/* בועה שמופיעה במעבר עכבר */
+.alert-detail-item.message-icon::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  max-width: 200px;
+  word-wrap: break-word;
+  white-space: normal;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.alert-detail-item.message-icon::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.alert-detail-item.message-icon:hover::after,
+.alert-detail-item.message-icon:hover::before {
+  opacity: 1;
+  visibility: visible;
 }
 
 .alert-card-footer {
@@ -4290,7 +4402,10 @@ a:hover,
   padding: 0 !important;
 }
 
-
+/* כפתורי פעולות במודלים */
+.modal .btn {
+  min-width: 80px !important;
+}
 
 .modal .btn-sm {
   min-width: 60px !important;

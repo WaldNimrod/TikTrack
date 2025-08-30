@@ -25,7 +25,9 @@ const BUTTON_ICONS = {
     REJECT: '❌',
     PAUSE: '⏸️',
     PLAY: '▶️',
-    STOP: '⏹️'
+    STOP: '⏹️',
+    READ: '✓',
+    CHECK: '✓'
 };
 
 // טקסטים לכפתורים (לנגישות)
@@ -50,7 +52,9 @@ const BUTTON_TEXTS = {
     REJECT: 'דחה',
     PAUSE: 'השהה',
     PLAY: 'הפעל',
-    STOP: 'עצור'
+    STOP: 'עצור',
+    READ: 'קראתי',
+    CHECK: 'סמן'
 };
 
 // פונקציה ליצירת כפתור עם איקון

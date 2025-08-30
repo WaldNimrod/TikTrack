@@ -35,17 +35,7 @@ function createAlert(alertData) {
     // TODO: Implement alert creation logic
 }
 
-/**
- * Delete an alert
- * ALERTS SYSTEM - Deletes business alert
- * 
- * @param {number} alertId - ID of alert to delete
- * @returns {Promise} Promise that resolves when alert is deleted
- */
-function deleteAlert(alertId) {
-    // Implementation for deleting business alerts
-    // TODO: Implement alert deletion logic
-}
+
 
 /**
  * Update an alert
@@ -547,7 +537,6 @@ function showNotificationLegacy(message, type = 'info', duration = 4000) {
 
 // Export ALERTS SYSTEM functions to global scope
 window.createAlert = createAlert;
-window.deleteAlert = deleteAlert;
 window.updateAlert = updateAlert;
 window.markAlertAsTriggered = markAlertAsTriggered;
 window.markAlertAsRead = markAlertAsRead;
@@ -571,7 +560,6 @@ window.loadLinkedItemsData = loadLinkedItemsData;
 window.notificationSystem = {
     // ALERTS SYSTEM functions
     createAlert,
-    deleteAlert,
     updateAlert,
     markAlertAsTriggered,
     markAlertAsRead,

@@ -14,6 +14,23 @@
  * @lastUpdated August 26, 2025
  */
 
+// ===== Utility Functions =====
+
+/**
+ * בדיקה אם ערך הוא מספרי
+ * @param {*} value - הערך לבדיקה
+ * @returns {boolean} true אם הערך הוא מספרי
+ */
+function isNumeric(value) {
+  if (value === null || value === undefined || value === '') {
+    return false;
+  }
+  return !isNaN(parseFloat(value)) && isFinite(value);
+}
+
+// ייצוא פונקציה גלובלית
+window.isNumeric = isNumeric;
+
 // ===== Currency Management =====
 
 /**

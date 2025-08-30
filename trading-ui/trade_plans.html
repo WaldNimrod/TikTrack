@@ -83,7 +83,10 @@
   <script src="scripts/linked-items.js"></script>
   <script src="scripts/page-utils.js"></script>
   <script src="scripts/main.js"></script>
-    <script src="scripts/header-system.js"></script>  <script src="scripts/alerts.js"></script>
+    <script src="scripts/header-system.js"></script>
+  <script src="scripts/notification-system.js"></script>
+  <script src="scripts/alert-service.js"></script>
+  <script src="scripts/alerts.js"></script>
   <script src="scripts/active-alerts-component.js"></script>
   <script src="scripts/trade_plans.js"></script>
   <script src="scripts/accounts.js"></script>
@@ -155,7 +158,7 @@
                 style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
               התכנונים שלי
             </div>
-            <div class="table-count" id="designsCount">טוען...</div>
+            <div class="table-count" id="trade_plansCount">טוען...</div>
             <div style="display: flex; gap: 8px; align-items: center;">
               <button class="refresh-btn"
                 onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); } else { console.error('showAddTradePlanModal function not found'); }"
@@ -172,7 +175,7 @@
           <!-- Planning table -->
           <div class="section-body">
             <div class="table-responsive" id="trade_plansContainer">
-              <table class="table" data-table-type="trade_plans">
+              <table class="table" id="trade_plansTable" data-table-type="trade_plans">
                 <thead>
                   <tr>
                     <th>

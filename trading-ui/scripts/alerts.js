@@ -1223,32 +1223,41 @@ function checkAlertOperator(selectElement) {
  * פונקציה זו מוחקת התראה קיימת
  * @param {number} alertId - מזהה ההתראה למחיקה
  */
-async function deleteAlert(alertId) {
-  console.log('🔧 deleteAlert נקראה עם alertId:', alertId);
-  console.log('🔧 window.showDeleteWarning קיים:', typeof window.showDeleteWarning === 'function');
-  console.log('🔧 window.showConfirmationDialog קיים:', typeof window.showConfirmationDialog === 'function');
-  console.log('🔧 window.showDeleteWarning === window.notificationSystem.showDeleteWarning:', window.showDeleteWarning === window.notificationSystem?.showDeleteWarning);
+function deleteAlert(alertId) {
+  console.log('🔧 ===== deleteAlert נקראה =====');
+  console.log('🔧 deleteAlert called with id:', alertId);
+  console.log('🔧 window.showDeleteWarning exists:', typeof window.showDeleteWarning === 'function');
   
-  // שימוש במערכת ההתראות הגלובלית
+  // שימוש במערכת הגלובלית למחיקה
   if (typeof window.showDeleteWarning === 'function') {
-    console.log('🔧 קורא ל-window.showDeleteWarning');
-    window.showDeleteWarning('alert', alertId, 'התראה', () => {
-      console.log('🔧 אישור מחיקה - קורא ל-deleteAlertFromServer');
-      deleteAlertFromServer(alertId);
-    });
-  } else if (typeof window.showConfirmationDialog === 'function') {
-    console.log('🔧 fallback ל-window.showConfirmationDialog');
-    window.showConfirmationDialog(
-      'מחיקת התראה',
-      'האם אתה בטוח שברצונך למחוק את ההתראה?\n\nפעולה זו אינה ניתנת לביטול.',
-      () => deleteAlertFromServer(alertId),
-      () => {}
-    );
+    console.log('🔧 Using global showDeleteWarning');
+    window.showDeleteWarning('alerts', alertId, 'התראה', async () => {
+      console.log('🔧 Delete confirmed, calling deleteAlertFromServer');
+      // קריאה לפונקציה המקומית לאחר אישור
+      await deleteAlertFromServer(alertId);
+    }, null);
   } else {
-    console.log('🔧 fallback ל-confirm רגיל');
-    // fallback
-    if (confirm('האם אתה בטוח שברצונך למחוק את ההתראה?')) {
-      deleteAlertFromServer(alertId);
+    console.log('🔧 Using fallback - global system not available');
+    // גיבוי למקרה שהמערכת הגלובלית לא זמינה
+    if (typeof window.showConfirmationDialog === 'function') {
+      window.showConfirmationDialog(
+        'מחיקת התראה',
+        'האם אתה בטוח שברצונך למחוק התראה זו?\n\nפעולה זו אינה ניתנת לביטול.',
+        async () => {
+          console.log('🔧 Delete confirmed via fallback, calling deleteAlertFromServer');
+          await deleteAlertFromServer(alertId);
+        },
+        () => {
+          console.log('🔧 Delete cancelled via fallback');
+        }
+      );
+    } else {
+      // fallback אחרון - confirm רגיל
+      const confirmed = confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
+      if (confirmed) {
+        console.log('🔧 Delete confirmed via native confirm, calling deleteAlertFromServer');
+        deleteAlertFromServer(alertId);
+      }
     }
   }
 }
@@ -1970,48 +1979,7 @@ async function updateAlert() {
   }
 }
 
-/**
- * מחיקת התראה
- */
-async function deleteAlert(alertId) {
-  if (!confirm('האם אתה בטוח שברצונך למחוק התראה זו?')) {
-    return;
-  }
 
-  try {
-    // מוחק התראה
-
-    const response = await fetch(`/api/v1/alerts/${alertId}`, {
-      method: 'DELETE'
-    });
-
-    if (response.ok) {
-      // התראה נמחקה בהצלחה
-
-      // רענון הנתונים
-      loadAlertsData();
-
-      // הצגת הודעה
-      showSuccessNotification('התראה נמחקה', 'התראה נמחקה בהצלחה!');
-    } else {
-      // ניסיון לקרוא את פרטי השגיאה
-      let errorMessage = `שגיאה במחיקת התראה: ${response.status}`;
-      try {
-        const errorData = await response.json();
-        if (errorData.error && errorData.error.message) {
-          errorMessage = errorData.error.message;
-        }
-      } catch (e) {
-        // לא ניתן לקרוא פרטי שגיאה מהשרת
-      }
-
-      throw new Error(errorMessage);
-    }
-  } catch (error) {
-    console.error('שגיאה במחיקת התראה:', error);
-    showErrorNotification('שגיאה במחיקת התראה', 'שגיאה במחיקת התראה: ' + error.message);
-  }
-}
 
 /**
  * פונקציה לסידור טבלת התראות
@@ -2164,7 +2132,6 @@ window.updateAlertsTable = updateAlertsTable;
 window.filterAlertsLocally = filterAlertsLocally;
 window.showAddAlertModal = showAddAlertModal;
 window.editAlert = editAlert;
-window.deleteAlert = deleteAlert;
 window.saveAlert = saveAlert;
 window.updateAlert = updateAlert;
 window.updateStatusAndTriggered = updateStatusAndTriggered;
@@ -2194,6 +2161,45 @@ setTimeout(() => {
     console.clear();
   }
 }, 18000);
+
+// ========================================
+// פונקציות לבניית ופרסור תנאי התראות
+// ========================================
+
+/**
+ * בניית מחרוזת תנאי התראה
+ * 
+ * פונקציה זו בונה מחרוזת תנאי מהמשתנה, האופרטור והערך
+ * 
+ * @param {string} variable - המשתנה (price, daily_change, etc.)
+ * @param {string} operator - האופרטור (greater_than, less_than, etc.)
+ * @param {string} value - הערך
+ * @returns {string} מחרוזת התנאי
+ */
+function buildAlertCondition(variable, operator, value) {
+  return `${variable} | ${operator} | ${value}`;
+}
+
+/**
+ * פירוק מחרוזת תנאי התראה
+ * 
+ * פונקציה זו מפרקת מחרוזת תנאי למשתנה, אופרטור וערך
+ * 
+ * @param {string} condition - מחרוזת התנאי בפורמט "variable|operator|value"
+ * @returns {object} אובייקט עם variable, operator, value
+ */
+function parseAlertCondition(condition) {
+  if (!condition || !condition.includes(' | ')) {
+    return { variable: 'price', operator: 'moreThen', value: '' };
+  }
+
+  const parts = condition.split(' | ');
+  return {
+    variable: parts[0] || 'price',
+    operator: parts[1] || 'moreThen',
+    value: parts[2] || ''
+  };
+}
 
 // ========================================
 // פונקציות לתרגום תנאי התראות
@@ -2372,11 +2378,20 @@ function getAlertTypeDisplayName(type) {
 // Export functions to global scope
 window.filterAlertsByType = filterAlertsByType;
 window.getAlertTypeDisplayName = getAlertTypeDisplayName;
+window.buildAlertCondition = buildAlertCondition;
+window.parseAlertCondition = parseAlertCondition;
+window.deleteAlert = deleteAlert;
+window.editAlert = editAlert;
+window.updateAlert = updateAlert;
+window.saveAlert = saveAlert;
+window.showAddAlertModal = showAddAlertModal;
 
 // בדיקת פונקציות בסוף טעינת alerts.js
 console.log('🔧 alerts.js נטען');
 console.log('🔧 window.showDeleteWarning קיים:', typeof window.showDeleteWarning === 'function');
 console.log('🔧 window.showConfirmationDialog קיים:', typeof window.showConfirmationDialog === 'function');
 console.log('🔧 window.notificationSystem קיים:', typeof window.notificationSystem !== 'undefined');
+console.log('🔧 window.deleteAlert קיים:', typeof window.deleteAlert === 'function');
+console.log('🔧 window.deleteAlert === deleteAlert:', window.deleteAlert === deleteAlert);
 
 console.log('✅ alerts.js הושלם בהצלחה - כל הפונקציות זמינות');

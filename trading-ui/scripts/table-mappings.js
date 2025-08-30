@@ -86,7 +86,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'accounts': [
         'id',                    // 0 - ID
         'name',                  // 1 - Name
-        'currency',              // 2 - Currency
+        'currency_id',           // 2 - Currency ID
         'status',                // 3 - Status
         'cash_balance',          // 4 - Cash Balance
         'total_value',           // 5 - Total Value
@@ -102,10 +102,12 @@ const TABLE_COLUMN_MAPPINGS = {
         'name',                  // 2 - Name
         'type',                  // 3 - Type
         'remarks',               // 4 - Remarks
-        'currency_id',           // 5 - Currency ID
+        'currency',              // 5 - Currency
         'active_trades',         // 6 - Active Trades
-        'created_at',            // 7 - Created At
-        'updated_at'             // 8 - Updated At
+        'currency_id',           // 7 - Currency ID
+        'status',                // 8 - Status
+        'created_at',            // 9 - Created At
+        'updated_at'             // 10 - Updated At
     ],
 
     // טבלת ביצועים (Executions) - Database Display Page Structure
@@ -118,8 +120,9 @@ const TABLE_COLUMN_MAPPINGS = {
         'price',                 // 5 - Price
         'fee',                   // 6 - Fee
         'source',                // 7 - Source
-        'notes',                 // 8 - Notes
-        'created_at'             // 9 - Created At
+        'created_at',            // 8 - Created At
+        'external_id',           // 9 - External ID
+        'notes'                  // 10 - Notes
     ],
 
     // טבלת תזרימי מזומנים (Cash Flows) - Database Display Page Structure

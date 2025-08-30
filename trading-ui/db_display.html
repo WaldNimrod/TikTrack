@@ -88,10 +88,10 @@
       </div> <!-- End top-section -->
 
       <!-- Main content -->
-      <div class="main-content">
+      <div class="main-content" data-section="database">
 
         <!-- Trade Plans Section -->
-        <div class="content-section db-display-page" id="tradePlansSection">
+        <div class="content-section" id="tradePlansSection">
           <!-- Trade Plans header -->
           <div class="section-header">
             <div class="table-title">
@@ -190,21 +190,21 @@
               <table class="table" data-table-type="trades">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'tradesTable')">ID (INTEGER)</th>
-                    <th onclick="sortTable(1, 'tradesTable')">Account ID (INTEGER)</th>
-                    <th onclick="sortTable(2, 'tradesTable')">Ticker ID (INTEGER)</th>
-                    <th onclick="sortTable(3, 'tradesTable')">Trade Plan ID (INTEGER)</th>
-                    <th onclick="sortTable(4, 'tradesTable')">Status (VARCHAR)</th>
-                    <th onclick="sortTable(5, 'tradesTable')">Investment Type (VARCHAR)</th>
-                    <th onclick="sortTable(6, 'tradesTable')">Side (VARCHAR)</th>
-                    <th onclick="sortTable(7, 'tradesTable')">Opened At (DATETIME)</th>
-                    <th onclick="sortTable(8, 'tradesTable')">Closed At (DATETIME)</th>
-                    <th onclick="sortTable(9, 'tradesTable')">Cancelled At (DATETIME)</th>
-                    <th onclick="sortTable(10, 'tradesTable')">Cancel Reason (VARCHAR)</th>
-                    <th onclick="sortTable(11, 'tradesTable')">Total P&L (FLOAT)</th>
-                    <th onclick="sortTable(12, 'tradesTable')">Notes (VARCHAR)</th>
-                    <th onclick="sortTable(13, 'tradesTable')">Created At (DATETIME)</th>
-                    <th>Actions</th>
+                    <th onclick="sortTable(0, 'tradesTable')" style="width: 4%;">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'tradesTable')" style="width: 6%;">Account ID (INTEGER)</th>
+                    <th onclick="sortTable(2, 'tradesTable')" style="width: 6%;">Ticker ID (INTEGER)</th>
+                    <th onclick="sortTable(3, 'tradesTable')" style="width: 6%;">Trade Plan ID (INTEGER)</th>
+                    <th onclick="sortTable(4, 'tradesTable')" style="width: 6%;">Status (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'tradesTable')" style="width: 8%;">Investment Type (VARCHAR)</th>
+                    <th onclick="sortTable(6, 'tradesTable')" style="width: 6%;">Side (VARCHAR)</th>
+                    <th onclick="sortTable(7, 'tradesTable')" style="width: 10%;">Opened At (DATETIME)</th>
+                    <th onclick="sortTable(8, 'tradesTable')" style="width: 10%;">Closed At (DATETIME)</th>
+                    <th onclick="sortTable(9, 'tradesTable')" style="width: 10%;">Cancelled At (DATETIME)</th>
+                    <th onclick="sortTable(10, 'tradesTable')" style="width: 12%;">Cancel Reason (VARCHAR)</th>
+                    <th onclick="sortTable(11, 'tradesTable')" style="width: 8%;">Total P&L (FLOAT)</th>
+                    <th onclick="sortTable(12, 'tradesTable')" style="width: 12%;">Notes (VARCHAR)</th>
+                    <th onclick="sortTable(13, 'tradesTable')" style="width: 10%;">Created At (DATETIME)</th>
+                    <th style="width: 3%;">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -259,21 +259,21 @@
               <table class="table" data-table-type="accounts">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'accountsTable')">ID (INTEGER)</th>
-                    <th onclick="sortTable(1, 'accountsTable')">Name (VARCHAR)</th>
-                    <th onclick="sortTable(2, 'accountsTable')">Currency (VARCHAR)</th>
-                    <th onclick="sortTable(3, 'accountsTable')">Status (VARCHAR)</th>
-                    <th onclick="sortTable(4, 'accountsTable')">Cash Balance (FLOAT)</th>
-                    <th onclick="sortTable(5, 'accountsTable')">Total Value (FLOAT)</th>
-                    <th onclick="sortTable(6, 'accountsTable')">Total P&L (FLOAT)</th>
-                    <th onclick="sortTable(7, 'accountsTable')">Notes (VARCHAR)</th>
-                    <th onclick="sortTable(8, 'accountsTable')">Created At (DATETIME)</th>
-                    <th>Actions</th>
+                    <th onclick="sortTable(0, 'accountsTable')" style="width: 5%;">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'accountsTable')" style="width: 15%;">Name (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'accountsTable')" style="width: 8%;">Currency ID (INTEGER)</th>
+                    <th onclick="sortTable(3, 'accountsTable')" style="width: 8%;">Status (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'accountsTable')" style="width: 12%;">Cash Balance (FLOAT)</th>
+                    <th onclick="sortTable(5, 'accountsTable')" style="width: 12%;">Total Value (FLOAT)</th>
+                    <th onclick="sortTable(6, 'accountsTable')" style="width: 12%;">Total P&L (FLOAT)</th>
+                    <th onclick="sortTable(7, 'accountsTable')" style="width: 15%;">Notes (VARCHAR)</th>
+                    <th onclick="sortTable(8, 'accountsTable')" style="width: 10%;">Created At (DATETIME)</th>
+                    <th style="width: 3%;">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="9" class="text-center">טוען נתונים...</td>
+                    <td colspan="10" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -287,8 +287,10 @@
               </div>
               <ul class="table-rules-list">
                 <li class="constraint">Name field is required (NOT NULL)</li>
+                <li class="constraint">Currency_id field is required (NOT NULL)</li>
                 <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
                 <li class="unique">ID is auto-incrementing primary key</li>
+                <li class="foreign-key">Foreign key: currency_id references currencies(id)</li>
                 <li class="trigger">Protection trigger for last account deletion</li>
               </ul>
             </div>
@@ -324,22 +326,23 @@
               <table class="table" data-table-type="tickers">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'tickersTable')">ID (INTEGER)</th>
-                    <th onclick="sortTable(1, 'tickersTable')">Symbol (VARCHAR)</th>
-                    <th onclick="sortTable(2, 'tickersTable')">Name (VARCHAR)</th>
-                    <th onclick="sortTable(3, 'tickersTable')">Type (VARCHAR)</th>
-                    <th onclick="sortTable(4, 'tickersTable')">Remarks (VARCHAR)</th>
-                    <th onclick="sortTable(5, 'tickersTable')">Currency (VARCHAR)</th>
-                    <th onclick="sortTable(6, 'tickersTable')">Active Trades (BOOLEAN)</th>
-                    <th onclick="sortTable(7, 'tickersTable')">Currency ID (INTEGER)</th>
-                    <th onclick="sortTable(8, 'tickersTable')">Created At (DATETIME)</th>
-                    <th onclick="sortTable(9, 'tickersTable')">Updated At (DATETIME)</th>
-                    <th>Actions</th>
+                    <th onclick="sortTable(0, 'tickersTable')" style="width: 5%;">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'tickersTable')" style="width: 10%;">Symbol (VARCHAR)</th>
+                    <th onclick="sortTable(2, 'tickersTable')" style="width: 20%;">Name (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'tickersTable')" style="width: 8%;">Type (VARCHAR)</th>
+                    <th onclick="sortTable(4, 'tickersTable')" style="width: 15%;">Remarks (VARCHAR)</th>
+                    <th onclick="sortTable(5, 'tickersTable')" style="width: 8%;">Currency (VARCHAR)</th>
+                    <th onclick="sortTable(6, 'tickersTable')" style="width: 8%;">Active Trades (BOOLEAN)</th>
+                    <th onclick="sortTable(7, 'tickersTable')" style="width: 8%;">Currency ID (INTEGER)</th>
+                    <th onclick="sortTable(8, 'tickersTable')" style="width: 8%;">Status (TEXT)</th>
+                    <th onclick="sortTable(9, 'tickersTable')" style="width: 10%;">Created At (DATETIME)</th>
+                    <th onclick="sortTable(10, 'tickersTable')" style="width: 10%;">Updated At (DATETIME)</th>
+                    <th style="width: 3%;">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="10" class="text-center">טוען נתונים...</td>
+                    <td colspan="12" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -356,6 +359,7 @@
                 <li class="constraint">ID field is required (NOT NULL)</li>
                 <li class="unique">Symbol has unique constraint</li>
                 <li class="unique">ID is primary key</li>
+                <li class="default">Status defaults to 'open'</li>
                 <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
                 <li class="index">Index on id: ix_tickers_id</li>
                 <li class="index">Unique index on symbol: ix_tickers_symbol</li>
@@ -394,18 +398,18 @@
               <table class="table" data-table-type="executions">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'executionsTable')">ID (INTEGER)</th>
-                    <th onclick="sortTable(1, 'executionsTable')">Trade ID (INTEGER)</th>
-                    <th onclick="sortTable(2, 'executionsTable')">Action (TEXT)</th>
-                    <th onclick="sortTable(3, 'executionsTable')">Date (NUMERIC)</th>
-                    <th onclick="sortTable(4, 'executionsTable')">Quantity (REAL)</th>
-                    <th onclick="sortTable(5, 'executionsTable')">Price (REAL)</th>
-                    <th onclick="sortTable(6, 'executionsTable')">Fee (REAL)</th>
-                    <th onclick="sortTable(7, 'executionsTable')">Source (TEXT)</th>
-                    <th onclick="sortTable(8, 'executionsTable')">Created At (NUMERIC)</th>
-                    <th onclick="sortTable(9, 'executionsTable')">Notes (TEXT)</th>
-                    <th onclick="sortTable(10, 'executionsTable')">External ID (VARCHAR)</th>
-                    <th>Actions</th>
+                    <th onclick="sortTable(0, 'executionsTable')" style="width: 5%;">ID (INTEGER)</th>
+                    <th onclick="sortTable(1, 'executionsTable')" style="width: 8%;">Trade ID (INTEGER)</th>
+                    <th onclick="sortTable(2, 'executionsTable')" style="width: 8%;">Action (VARCHAR)</th>
+                    <th onclick="sortTable(3, 'executionsTable')" style="width: 12%;">Date (DATETIME)</th>
+                    <th onclick="sortTable(4, 'executionsTable')" style="width: 10%;">Quantity (FLOAT)</th>
+                    <th onclick="sortTable(5, 'executionsTable')" style="width: 10%;">Price (FLOAT)</th>
+                    <th onclick="sortTable(6, 'executionsTable')" style="width: 8%;">Fee (FLOAT)</th>
+                    <th onclick="sortTable(7, 'executionsTable')" style="width: 10%;">Source (VARCHAR)</th>
+                    <th onclick="sortTable(8, 'executionsTable')" style="width: 12%;">Created At (DATETIME)</th>
+                    <th onclick="sortTable(9, 'executionsTable')" style="width: 10%;">External ID (VARCHAR)</th>
+                    <th onclick="sortTable(10, 'executionsTable')" style="width: 12%;">Notes (VARCHAR)</th>
+                    <th style="width: 3%;">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -667,6 +671,7 @@
       console.log('➕ Initializing database display page...');
     });
   </script>
+  <script src="scripts/active-alerts-component.js"></script>
   <script>
     // אתחול מערכת הכותרת החדשה
     document.addEventListener("DOMContentLoaded", () => {

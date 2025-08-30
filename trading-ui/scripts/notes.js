@@ -27,42 +27,32 @@ function openNoteDetails(id) {
 }
 
 function editNote(id) {
-  console.log('🔄 editNote נקראה עבור ID:', id);
   showEditNoteModal(id);
 }
 
 function deleteNote(id) {
-  console.log('🔧 deleteNote called with id:', id);
-  console.log('🔧 window.showDeleteWarning exists:', typeof window.showDeleteWarning === 'function');
-  
   // שימוש במערכת הגלובלית למחיקה
   if (typeof window.showDeleteWarning === 'function') {
-    console.log('🔧 Using global showDeleteWarning');
     window.showDeleteWarning('notes', id, 'הערה', async () => {
-      console.log('🔧 Delete confirmed, calling confirmDeleteNote');
       // קריאה לפונקציה המקומית לאחר אישור
       await confirmDeleteNote(id);
     }, null);
   } else {
-    console.log('🔧 Using fallback - global system not available');
     // גיבוי למקרה שהמערכת הגלובלית לא זמינה
     if (typeof window.showConfirmationDialog === 'function') {
       window.showConfirmationDialog(
         'מחיקת הערה',
         'האם אתה בטוח שברצונך למחוק הערה זו?\n\nפעולה זו אינה ניתנת לביטול.',
         async () => {
-          console.log('🔧 Delete confirmed via fallback, calling confirmDeleteNote');
           await confirmDeleteNote(id);
         },
         () => {
-          console.log('🔧 Delete cancelled via fallback');
-        }
+          }
       );
     } else {
       // fallback אחרון - confirm רגיל
       const confirmed = confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
       if (confirmed) {
-        console.log('🔧 Delete confirmed via native confirm, calling confirmDeleteNote');
         confirmDeleteNote(id);
       }
     }
@@ -112,7 +102,6 @@ function toggleMainSection() {
     return;
   }
 
-
   const sectionBody = notesSection.querySelector('.section-body');
   const toggleBtn = notesSection.querySelector('button[onclick="toggleMainSection()"]');
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
@@ -135,8 +124,6 @@ function toggleMainSection() {
     localStorage.setItem('notesMainSectionHidden', !isCollapsed);
   }
 }
-
-
 
 // פונקציה לשחזור מצב הסגירה
 function restoreNotesSectionState() {
@@ -189,7 +176,6 @@ window.restoreNotesSectionState = restoreNotesSectionState;
 // פונקציה לטעינת נתונים
 async function loadNotesData() {
 
-
   try {
     // קריאה לשרת לקבלת נתוני הערות
     const response = await fetch('/api/v1/notes/');
@@ -199,7 +185,6 @@ async function loadNotesData() {
 
     const responseData = await response.json();
     const notes = responseData.data || responseData;
-  
 
     // בדיקה אם הנתונים ריקים או לא תקינים
     if (!notes || notes.length === 0) {
@@ -222,7 +207,6 @@ async function loadNotesData() {
     }
 
     // טעינת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים)
-  
 
     // פונקציה לטעינת נתונים עם טיפול בשגיאות
     const loadDataSafely = async (url, dataName) => {
@@ -250,8 +234,6 @@ async function loadNotesData() {
       loadDataSafely('/api/v1/trade_plans/', 'תוכניות'),
       loadDataSafely('/api/v1/tickers/', 'טיקרים')
     ]);
-
-    console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
 
     // שמירת הנתונים ב-window לסינון
     window.notesData = notes;
@@ -293,9 +275,6 @@ async function loadNotesData() {
 
 // פונקציה לעדכון הטבלה
 function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], tickers = []) {
-  console.log('🔄 updateNotesTable נקראה עם', notes.length, 'הערות');
-  console.log('🔄 נתונים נוספים:', { accounts: accounts.length, trades: trades.length, tradePlans: tradePlans.length, tickers: tickers.length });
-
   const tbody = document.querySelector('#notesTable tbody');
   if (!tbody) {
     console.error('❌ לא נמצא tbody בטבלה');
@@ -489,16 +468,12 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
   }).join('');
 
   tbody.innerHTML = rows;
-  console.log('✅ טבלת ההערות עודכנה בהצלחה');
-
   // עדכון table-count ו-info-summary
   updateNotesSummary(notes);
 }
 
 // פונקציה לעדכון סיכום הערות
 function updateNotesSummary(notes) {
-  console.log('🔄 updateNotesSummary נקראה עם', notes.length, 'הערות');
-
   // שמירת המספר המקורי לחיפוש
   window.originalNotesCount = notes.length;
 
@@ -542,22 +517,16 @@ function updateNotesSummary(notes) {
     totalLinksElement.textContent = linkedNotes.length;
   }
 
-  console.log('✅ סיכום הערות עודכן');
-}
+  }
 
 // פונקציה לעדכון גלובלי של הטבלה (נדרשת עבור הפילטרים)
 function updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
-  console.log('🔄 updateGridFromComponent נקראה עבור הערות');
-  console.log('פרמטרים:', { selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm });
-
   // כרגע רק נטען מחדש את הנתונים
   loadNotesData();
 }
 
 // פונקציות מודלים
 function showAddNoteModal() {
-  console.log('🔄 showAddNoteModal נקראה');
-
   // איפוס הטופס
   document.getElementById('addNoteForm').reset();
 
@@ -592,8 +561,6 @@ function showAddNoteModal() {
 }
 
 function showEditNoteModal(noteId) {
-  console.log('🔄 showEditNoteModal נקראה עבור ID:', noteId);
-
   // ניקוי דגלים
   window.removeAttachmentFlag = false;
   window.replaceAttachmentFlag = false;
@@ -614,12 +581,8 @@ async function loadNoteData(noteId) {
     }
 
     const responseData = await response.json();
-    console.log('✅ נטענו נתוני הערה:', responseData);
-
     // חילוץ הנתונים מהמבנה הנכון
     const note = responseData.data || responseData;
-    console.log('🔧 נתוני הערה לחילוץ:', note);
-
     // מילוי הטופס
     document.getElementById('editNoteId').value = note.id;
     setEditorContent(note.content || '', 'edit');
@@ -629,25 +592,17 @@ async function loadNoteData(noteId) {
 
     // בחירת סוג הקשר
     const relationType = note.related_type_id;
-    console.log('🔧 סוג קשר:', relationType, 'מזהה קשור:', note.related_id);
-
     if (relationType) {
       // בחירת הרדיו באטון הנכון
       const radioButton = document.querySelector(`input[name="editNoteRelationType"][value="${relationType}"]`);
-      console.log('🔧 רדיו באטון שנמצא:', radioButton);
-
       if (radioButton) {
         radioButton.checked = true;
-        console.log('✅ רדיו באטון נבחר');
-
         // טעינת נתונים למודל אם עוד לא נטענו
         if (typeof window.loadModalData === 'function') {
-          console.log('🔄 טוען נתונים למודל...');
           await window.loadModalData();
         }
 
         // מילוי הרשימה הנכונה לפי סוג הקשר
-        console.log('🔄 ממלא רשימה לפי סוג:', relationType);
         await populateEditSelectByType(relationType, note.related_id);
       } else {
         console.error('❌ לא נמצא רדיו באטון עבור ערך:', relationType);
@@ -668,8 +623,6 @@ async function loadNoteData(noteId) {
 
 async function loadModalData() {
   try {
-    console.log('🔄 טוען נתונים למודלים...');
-
     // טעינת נתונים במקביל
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
       fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
@@ -683,13 +636,10 @@ async function loadModalData() {
     const tradePlans = Array.isArray(tradePlansResponse.data) ? tradePlansResponse.data : [];
     const tickers = Array.isArray(tickersResponse.data) ? tickersResponse.data : [];
 
-    console.log(`✅ נטענו ${accounts.length} חשבונות, ${trades.length} טריידים, ${tradePlans.length} תוכניות, ${tickers.length} טיקרים`);
-
     // עדכון רדיו באטונים
     updateRadioButtons(accounts, trades, tradePlans, tickers);
 
     // הגדרת נתונים ראשוניים (ברירת מחדל לטיקר)
-    console.log('🔧 Setting initial data for tickers...');
     populateSelect('noteRelatedObjectSelect', tickers, 'symbol', '');
     populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
 
@@ -776,10 +726,8 @@ function populateSelect(selectId, data, field, prefix = '') {
   const select = document.getElementById(selectId);
   if (!select) return;
 
-  console.log(`🔄 מילוי ${selectId} עם ${data.length} פריטים מסוג ${prefix}`);
   if (data.length > 0) {
-    console.log('📋 דוגמה לפריט ראשון:', data[0]);
-  }
+    }
 
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
@@ -818,16 +766,12 @@ function populateSelect(selectId, data, field, prefix = '') {
 }
 
 function onNoteRelationTypeChange() {
-  console.log('🔄 onNoteRelationTypeChange נקראה');
-
   // הפונקציה הזו נקראת בעת שינוי רדיו באטון
   // הלוגיקה האמיתית נמצאת ב-updateRadioButtons
   // אבל אנחנו צריכים אותה לעבוד גם בעת טעינת נתונים לעריכה
 }
 
 async function populateEditSelectByType(relationType, selectedId) {
-  console.log('🔄 populateEditSelectByType נקראה עבור:', relationType, selectedId);
-
   try {
     let data = [];
     let displayField = '';
@@ -864,20 +808,16 @@ async function populateEditSelectByType(relationType, selectedId) {
         break;
     }
 
-    console.log('🔧 מילוי רשימה עם:', data.length, 'פריטים, שדה תצוגה:', displayField);
-
     // מילוי הרשימה
     populateSelect('editNoteRelatedObjectSelect', data, displayField, placeholder);
 
     // בחירת הערך הנכון
     if (selectedId) {
-      console.log('🔧 בוחר ערך:', selectedId);
       setTimeout(() => {
         const select = document.getElementById('editNoteRelatedObjectSelect');
         if (select) {
           select.value = selectedId;
-          console.log('✅ ערך נבחר ברשימה:', select.value);
-        } else {
+          } else {
           console.error('❌ לא נמצא אלמנט select');
         }
       }, 100);
@@ -901,33 +841,21 @@ async function populateEditSelectByType(relationType, selectedId) {
 function validateNoteForm(content, relationType, relatedId, attachment) {
   let isValid = true;
 
-  console.log('🔧 validateNoteForm נקראה עם:', {
-    content: content,
-    contentLength: content?.length,
-    relationType: relationType,
-    relatedId: relatedId,
-    hasAttachment: !!attachment
-  });
-
   // ניקוי שגיאות קודמות
   clearNoteValidationErrors();
 
   // וולידציה של תוכן
   if (!content) {
-    console.log('❌ תוכן ריק');
     window.showValidationWarning('contentError', 'תוכן הערה הוא שדה חובה');
     isValid = false;
   } else if (content.length < 1) {
-    console.log('❌ תוכן קצר מדי');
     window.showValidationWarning('contentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
     isValid = false;
   } else if (content.length > 10000) {
-    console.log('❌ תוכן ארוך מדי');
     window.showValidationWarning('contentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
     isValid = false;
   } else {
-    console.log('✅ תוכן תקין');
-  }
+    }
 
   // וולידציה של סוג קשר
   if (!relationType) {
@@ -972,14 +900,6 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
  */
 function validateEditNoteForm(content, relationType, relatedId, attachment) {
   let isValid = true;
-
-  console.log('🔧 validateEditNoteForm נקראה עם:', {
-    content: content,
-    contentLength: content?.length,
-    relationType: relationType,
-    relatedId: relatedId,
-    hasAttachment: !!attachment
-  });
 
   // ניקוי שגיאות קודמות
   clearNoteValidationErrors();
@@ -1026,31 +946,19 @@ function validateEditNoteForm(content, relationType, relatedId, attachment) {
     }
   }
 
-  console.log('🔧 תוצאת ולידציה עריכה:', isValid);
   return isValid;
 }
 
 // פונקציות שמירה ומחיקה
 async function saveNote() {
-  console.log('🔄 saveNote נקראה');
-
   // איסוף נתונים מהטופס
   const content = getEditorContent('add');
   const relationType = document.querySelector('input[name="noteRelationType"]:checked')?.value;
   const relatedId = document.getElementById('noteRelatedObjectSelect').value;
   const attachment = document.getElementById('noteAttachment').files[0];
 
-  console.log('🔧 נתונים שנאספו:', {
-    content: content,
-    contentLength: content?.length,
-    relationType: relationType,
-    relatedId: relatedId,
-    hasAttachment: !!attachment
-  });
-
   // ולידציה מקיפה
   if (!validateNoteForm(content, relationType, relatedId, attachment)) {
-    console.log('❌ ולידציה נכשלה');
     return;
   }
 
@@ -1064,8 +972,6 @@ async function saveNote() {
       related_id: parseInt(relatedId)
     };
     
-    console.log('🔧 נתונים שנשלחים:', requestData);
-
     const response = await fetch('/api/v1/notes/', {
       method: 'POST',
       headers: {
@@ -1077,7 +983,6 @@ async function saveNote() {
     const result = await response.json();
     
     if (response.ok && result.status === 'success') {
-      console.log('✅ הערה נשמרה בהצלחה:', result);
       window.showSuccessNotification('הצלחה', 'הערה נשמרה בהצלחה!');
 
       // סגירת המודל וטעינה מחדש
@@ -1139,8 +1044,6 @@ async function saveNote() {
 }
 
 async function updateNoteFromModal() {
-  console.log('🔄 updateNoteFromModal נקראה');
-
   // איסוף נתונים מהטופס
   const noteId = document.getElementById('editNoteId').value;
   const content = getEditorContent('edit');
@@ -1154,12 +1057,9 @@ async function updateNoteFromModal() {
 
   // ולידציה מקיפה
   if (!validateEditNoteForm(content, relationType, relatedId, attachment)) {
-    console.log('❌ ולידציה עריכה נכשלה');
     return;
   }
   
-  console.log('✅ ולידציה עריכה עברה בהצלחה');
-
   clearNoteValidationErrors();
 
   try {
@@ -1203,16 +1103,7 @@ async function updateNoteFromModal() {
 
     const result = await response.json();
     
-    console.log('🔧 תוצאת עדכון:', {
-      responseOk: response.ok,
-      resultStatus: result.status,
-      result: result
-    });
-    
     if (response.ok && result.status === 'success') {
-      console.log('✅ הערה עודכנה בהצלחה:', result);
-      console.log('🔧 קורא ל-showSuccessNotification');
-      console.log('🔧 showSuccessNotification זמין:', typeof window.showSuccessNotification === 'function');
       window.showSuccessNotification('הצלחה', 'הערה עודכנה בהצלחה!');
 
       // ניקוי דגלים
@@ -1280,8 +1171,6 @@ async function updateNoteFromModal() {
 // פונקציה זו הוסרה - שימוש במערכת הגלובלית showDeleteWarning
 
 async function confirmDeleteNote(noteId) {
-  console.log('🔄 confirmDeleteNote נקראה עבור ID:', noteId);
-
   // סגירת המודל
   const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoteModal'));
   if (modal) {
@@ -1298,8 +1187,6 @@ async function deleteNoteFromServer(noteId) {
 
   while (retryCount < maxRetries) {
     try {
-      console.log(`🔄 ניסיון מחיקה ${retryCount + 1}/${maxRetries} עבור הערה ${noteId}`);
-      
       const response = await fetch(`/api/v1/notes/${noteId}`, {
         method: 'DELETE'
       });
@@ -1307,7 +1194,6 @@ async function deleteNoteFromServer(noteId) {
       const result = await response.json();
       
       if (response.ok && result.status === 'success') {
-        console.log('✅ הערה נמחקה בהצלחה');
         window.showSuccessNotification('הצלחה', 'הערה נמחקה בהצלחה!');
         loadNotesData();
         return; // יציאה מוצלחת
@@ -1345,7 +1231,6 @@ async function deleteNoteFromServer(noteId) {
 }
 
 // פונקציות ולידציה
-
 
 function clearNoteValidationErrors() {
   // שימוש במערכת הגלובלית לוולידציה
@@ -1405,15 +1290,7 @@ window.populateSelect = populateSelect;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🔄 === DOM CONTENT LOADED ===');
-
   // בדיקת זמינות מערכות
-  console.log('🔍 בדיקת זמינות מערכות:');
-  console.log('showSuccessNotification:', typeof window.showSuccessNotification);
-  console.log('showErrorNotification:', typeof window.showErrorNotification);
-  console.log('showValidationWarning:', typeof window.showValidationWarning);
-  console.log('showDeleteWarning:', typeof window.showDeleteWarning);
-  
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
     console.error('❌ מערכת התראות לא זמינה!');
@@ -1421,8 +1298,6 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
   
-  console.log('✅ מערכת התראות זמינה');
-
   // שחזור מצב הסגירה
   restoreNotesSectionState();
   
@@ -1440,8 +1315,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // שחזור מצב סידור
   restoreSortState();
 
-  console.log('דף הערות נטען בהצלחה');
-});
+  });
 
 // פונקציה להגדרת אירועי ולידציה
 function setupNoteValidationEvents() {
@@ -1615,8 +1489,6 @@ function clearSelectedFile() {
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
  */
 function sortTable(columnIndex) {
-  console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
-
   if (typeof window.sortTableData === 'function') {
     window.sortTableData(
       columnIndex,
@@ -1634,8 +1506,6 @@ function sortTable(columnIndex) {
  * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
-  console.log('🔄 Restoring sort state for notes table');
-
   if (typeof window.restoreAnyTableSort === 'function') {
     window.restoreAnyTableSort('notes', window.notesData || [], updateNotesTable);
   } else {
@@ -1651,13 +1521,10 @@ window.sortTable = sortTable;
  * @param {string} symbol - סמל הטיקר
  */
 function showTickerPage(symbol) {
-  console.log(`🔄 showTickerPage נקראה עבור סמל: ${symbol}`);
-
   if (typeof window.showInfoNotification === 'function') {
     window.showInfoNotification('מידע', `דף הטיקר ${symbol} נמצא בפיתוח`);
   } else {
-    console.log(`דף הטיקר ${symbol} נמצא בפיתוח`);
-  }
+    }
 }
 
 // הגדרת הפונקציה כגלובלית
@@ -1757,16 +1624,8 @@ function getEditorContent(mode = 'add') {
   const content = editor.innerHTML;
   const textContent = editor.textContent || editor.innerText || '';
   
-  console.log(`🔧 תוכן עורך ${editorId}:`, {
-    innerHTML: content,
-    textContent: textContent,
-    textContentLength: textContent.length,
-    mode: mode
-  });
-
   // אם אין תוכן טקסט, החזר מחרוזת ריקה
   if (!textContent.trim()) {
-    console.log('⚠️ העורך ריק, מחזיר מחרוזת ריקה');
     return '';
   }
 
@@ -1809,8 +1668,6 @@ window.clearSelectedFile = clearSelectedFile;
 
 // פונקציה לסינון הערות לפי חיפוש
 function filterNotesData(searchTerm) {
-  console.log('🔄 filterNotesData נקראה עם:', searchTerm);
-  
   if (!window.notesData) {
     console.warn('⚠️ אין נתוני הערות זמינים לסינון');
     return;
@@ -1824,14 +1681,11 @@ function filterNotesData(searchTerm) {
     return content.includes(searchLower) || relatedDisplay.includes(searchLower);
   });
 
-  console.log(`🔍 נמצאו ${filteredNotes.length} הערות עבור "${searchTerm}"`);
   updateNotesTable(filteredNotes, window.accountsData || [], window.tradesData || [], window.tradePlansData || [], window.tickersData || []);
 }
 
 // פונקציה לסינון הערות לפי סוג
 function filterNotesByType(type) {
-  console.log('🔄 filterNotesByType נקראה עם:', type);
-  
   if (!window.notesData) {
     console.warn('⚠️ אין נתוני הערות זמינים לסינון');
     return;
@@ -1881,7 +1735,6 @@ function filterNotesByType(type) {
     }
   }
 
-  console.log(`🔍 נמצאו ${filteredNotes.length} הערות מסוג ${type}`);
   updateNotesTable(filteredNotes, window.accountsData || [], window.tradesData || [], window.tradePlansData || [], window.tickersData || []);
 }
 
@@ -1898,8 +1751,6 @@ function getTypeDisplayName(type) {
 
 // פונקציה לצפייה בהערה
 function viewNote(noteId) {
-  console.log('🔄 viewNote נקראה עבור ID:', noteId);
-
   // שמירת מזהה ההערה הנוכחית
   window.currentViewingNoteId = noteId;
 
@@ -1921,8 +1772,6 @@ async function loadNoteForViewing(noteId) {
 
     const responseData = await response.json();
     const note = responseData.data || responseData;
-
-    console.log('✅ נטענו נתוני הערה לצפייה:', note);
 
     // מילוי המודל
     document.getElementById('viewNoteRelated').textContent = getNoteRelatedDisplay(note);
@@ -2040,8 +1889,6 @@ function displayCurrentAttachment(attachment) {
 
 // פונקציה למחיקת קובץ מצורף נוכחי
 function removeCurrentAttachment() {
-  console.log('🔄 removeCurrentAttachment נקראה');
-
   const displayElement = document.getElementById('currentAttachmentDisplay');
   const actionsElement = document.getElementById('attachmentActions');
   const fileInput = document.getElementById('editNoteAttachment');
@@ -2064,14 +1911,11 @@ function removeCurrentAttachment() {
   if (typeof window.showInfoNotification === 'function') {
     window.showInfoNotification('מידע', 'הקובץ המצורף יימחק בעת שמירת ההערה');
   } else {
-    console.log('הקובץ המצורף יימחק בעת שמירת ההערה');
-  }
+    }
 }
 
 // פונקציה להחלפת קובץ מצורף
 function replaceCurrentAttachment() {
-  console.log('🔄 replaceCurrentAttachment נקראה');
-
   const fileInput = document.getElementById('editNoteAttachment');
   if (fileInput) {
     fileInput.click();
@@ -2080,8 +1924,4 @@ function replaceCurrentAttachment() {
   // סימון שהחלפת הקובץ נדרשת
   window.replaceAttachmentFlag = true;
 }
-
-
-
-
 

@@ -66,7 +66,6 @@ class JsScanner {
      * Scan all JS files and extract function information
      */
     async scanAllJsFiles() {
-      
 
         try {
             // Get list of JS files
@@ -80,7 +79,6 @@ class JsScanner {
             // Generate page mapping
             this.generatePageMapping();
 
-          
             return {
                 functions: this.functionsData,
                 pageMapping: this.pageMapping
@@ -123,7 +121,6 @@ class JsScanner {
      */
     async scanJsFile(filename) {
         try {
-          
 
             // Get file content
             const content = await this.getFileContent(filename);
@@ -137,8 +134,6 @@ class JsScanner {
 
             // Store functions data
                           this.functionsData[filename] = functions;
-  
-                      
 
         } catch (error) {
             console.error(`❌ Error scanning file ${filename}:`, error);
@@ -434,7 +429,6 @@ class JsScanner {
      * Scan function calls across all JS files
      */
     async scanFunctionCalls() {
-      
 
         const functionCallCounts = {};
         const functionCallDetails = {};
@@ -462,7 +456,6 @@ class JsScanner {
             // Store details globally for access by modal
             window.jsScanner.functionCallDetails = functionCallDetails;
 
-          
             return {
                 counts: functionCallCounts,
                 details: functionCallDetails
@@ -573,7 +566,6 @@ class JsScanner {
      * Get fallback function call data
      */
     getFallbackFunctionCalls() {
-      
 
         const sampleFunctionCalls = {
             'header-system.js': 45,

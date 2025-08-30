@@ -107,8 +107,7 @@
  * @param {Function} updateFunction - פונקציה לעדכון הטבלה
  */
 function sortTable(columnIndex, data, tableType, updateFunction) {
-    
-    
+
     if (typeof window.sortTableData === 'function') {
         window.sortTableData(columnIndex, data, tableType, updateFunction);
     } else {

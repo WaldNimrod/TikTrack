@@ -51,17 +51,13 @@ function toggleCurrenciesSection() {
         console.error('❌ לא נמצא סקשן מטבעות');
         return;
     }
-  
 
     const sectionBody = currenciesSection.querySelector('.section-body');
     const toggleBtn = currenciesSection.querySelector('button[onclick="toggleCurrenciesSection()"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-    
-
     if (sectionBody) {
         const isCollapsed = sectionBody.style.display === 'none';
-      
 
         if (isCollapsed) {
             sectionBody.style.display = 'block';
@@ -128,7 +124,6 @@ function showAddCurrencyModal() {
  * הצגת מודל עריכת מטבע
  */
 function showEditCurrencyModal(id) {
-  
 
     const currency = currenciesData.find(c => c.id === id);
     if (!currency) {
@@ -151,7 +146,6 @@ function showEditCurrencyModal(id) {
  * הצגת מודל מחיקת מטבע
  */
 function showDeleteCurrencyModal(id) {
-  
 
     const currency = currenciesData.find(c => c.id === id);
     if (!currency) {
@@ -177,17 +171,14 @@ function showDeleteCurrencyModal(id) {
  */
 async function loadCurrencies() {
     try {
-      
 
         const response = await fetch('http://localhost:8080/api/v1/currencies/');
-      
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
         }
 
         const result = await response.json();
-      
 
         if (result.status === 'success') {
             currenciesData = result.data;
@@ -217,7 +208,6 @@ async function loadCurrencies() {
  */
 async function saveCurrency() {
     try {
-      
 
         const symbol = document.getElementById('currencySymbol').value.trim();
         const name = document.getElementById('currencyName').value.trim();
@@ -246,7 +236,6 @@ async function saveCurrency() {
         const result = await response.json();
 
         if (result.status === 'success') {
-          
 
             // סגירת המודל
             const modal = bootstrap.Modal.getInstance(document.getElementById('addCurrencyModal'));
@@ -269,7 +258,6 @@ async function saveCurrency() {
  */
 async function updateCurrency() {
     try {
-      
 
         const id = parseInt(document.getElementById('editCurrencyId').value);
         const symbol = document.getElementById('editCurrencySymbol').value.trim();
@@ -299,7 +287,6 @@ async function updateCurrency() {
         const result = await response.json();
 
         if (result.status === 'success') {
-          
 
             // סגירת המודל
             const modal = bootstrap.Modal.getInstance(document.getElementById('editCurrencyModal'));
@@ -322,7 +309,6 @@ async function updateCurrency() {
  */
 async function confirmDeleteCurrency() {
     try {
-      
 
         const id = parseInt(document.getElementById('deleteCurrencyId').value);
 
@@ -333,7 +319,6 @@ async function confirmDeleteCurrency() {
         const result = await response.json();
 
         if (result.status === 'success') {
-          
 
             // סגירת המודל
             const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCurrencyModal'));
@@ -415,7 +400,6 @@ function updatePageSummaryStats() {
  * אתחול דף מטבעות
  */
 async function initializeCurrenciesPage() {
-  
 
     // טעינת נתונים
     await loadCurrencies();
@@ -423,5 +407,4 @@ async function initializeCurrenciesPage() {
     // שחזור מצב הסגירה
     restoreCurrenciesSectionState();
 
-  
 }

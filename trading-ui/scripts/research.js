@@ -59,7 +59,6 @@ function filterTradesData(statuses, types, accounts, dateRange, searchTerm) {
 // פונקציות לפתיחה/סגירה של סקשנים
 function toggleTopSection() {
 
-
   // מציאת כל הסקשנים
   const topSection = document.querySelector('.top-section');
   const contentSections = document.querySelectorAll('.content-section');
@@ -117,7 +116,6 @@ function toggleTopSection() {
   // שמירת המצב ב-localStorage
   localStorage.setItem('allSectionsCollapsed', !shouldOpen);
 
-
 }
 
 function toggleResearchSection() {
@@ -130,7 +128,6 @@ function toggleResearchSection() {
     console.error('❌ לא נמצא סקשן טריידים');
     return;
   }
-
 
   const sectionBody = researchSection.querySelector('.section-body');
   const toggleBtn = researchSection.querySelector('button[onclick="toggleResearchSection()"]');
@@ -267,7 +264,6 @@ function resetAllFiltersAndReloadData() {
 // פונקציה להפעלה בטעינת הדף
 function initializeResearchPage() {
 
-
   // שחזור מצב הסגירה
   restoreTopSectionState();
   restoreResearchSectionState();
@@ -281,14 +277,12 @@ function initializeResearchPage() {
     console.error('❌ loadTrades function not found');
   }
 
-  console.log('✅ דף תחקיר אותחל בהצלחה');
-}
+  }
 
 /**
  * סגירה/פתיחה של סקשן הסיכום
  */
 function toggleSummarySection() {
-  console.log('🔄 toggleSummarySection נקראה');
   const contentSections = document.querySelectorAll('.content-section');
   const summarySection = contentSections[0]; // הסקשן הראשון - סיכום
 
@@ -312,28 +306,22 @@ function toggleSummarySection() {
     // שמירת המצב
     localStorage.setItem('summarySectionCollapsed', !isCollapsed);
 
-    console.log(`✅ סקשן סיכום ${isCollapsed ? 'נפתח' : 'נסגר'}`);
-  }
+    }
 }
 
 /**
  * רענון נתוני הסיכום
  */
 function refreshSummaryData() {
-  console.log('🔄 רענון נתוני סיכום...');
-
   // כאן אפשר להוסיף קריאה לשרת לקבלת נתונים מעודכנים
   // loadSummaryData();
 
-  console.log('✅ נתוני סיכום רועננו');
-}
+  }
 
 /**
  * שחזור מצב סקשן החשבונות
  */
 function restoreAccountsSectionState() {
-  console.log('🔄 שחזור מצב סקשן חשבונות...');
-
   const savedState = localStorage.getItem('accountsSectionCollapsed');
   if (savedState === 'true') {
     const accountsSection = document.querySelector('.accounts-section');
@@ -344,23 +332,15 @@ function restoreAccountsSectionState() {
       if (sectionBody && toggleBtn) {
         sectionBody.style.display = 'none';
         toggleBtn.textContent = 'הצג חשבונות';
-        console.log('✅ סקשן חשבונות נסגר');
-      }
+        }
     }
   } else {
-    console.log('✅ סקשן חשבונות נפתח (ברירת מחדל)');
+    ');
   }
 }
 
 // הגדרת הפונקציה updateGridFromComponent לדף התחקיר
 window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-  console.log('🔄 updateGridFromComponent called for research page with:', {
-    selectedStatuses,
-    selectedTypes,
-    selectedDateRange,
-    searchTerm
-  });
-
   // קריאה לפונקציה הגלובלית אם זמינה
   if (typeof window.updateGridFromComponentGlobal === 'function') {
     window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'research');
@@ -369,7 +349,6 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
     // ניסיון נוסף אחרי זמן קצר
     setTimeout(() => {
       if (typeof window.updateGridFromComponentGlobal === 'function') {
-        console.log('🔄 Retrying updateGridFromComponentGlobal...');
         window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'research');
       }
     }, 1000);
@@ -378,9 +357,6 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
 
 // פונקצית סידור מותאמת לטבלת טריידים בדף התחקיר - משתמשת בפונקציה הגלובלית
 function sortResearchTable(columnIndex) {
-  console.log('🔄 === SORT RESEARCH TRADES TABLE ===');
-  console.log('🔄 Column clicked:', columnIndex);
-
   if (typeof window.sortTable === 'function') {
     window.sortTable(
       columnIndex,
@@ -413,15 +389,8 @@ window.refreshSummaryData = refreshSummaryData;
 window.sortTable = sortResearchTable;
 
 // בדיקת זמינות פונקציות מיד אחרי הגדרתן
-console.log('🔍 === RESEARCH.JS FUNCTIONS CHECK ===');
-console.log('🔍 updateGridFromComponent available:', typeof window.updateGridFromComponent);
-
-
-
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🔄 === DOM CONTENT LOADED ===');
-
   // שחזור מצב הסגירה
   restoreTopSectionState();
   restoreResearchSectionState();
@@ -429,25 +398,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // בדיקת זמינות פונקציות גלובליות
   setTimeout(() => {
-    console.log('🔍 === CHECKING GLOBAL FUNCTIONS (RESEARCH) ===');
-    console.log('🔍 updateGridFromComponent available:', typeof window.updateGridFromComponent);
-    console.log('🔍 updateGridFromComponentGlobal available:', typeof window.updateGridFromComponentGlobal);
-    console.log('🔍 sortTable available:', typeof window.sortTable);
-    console.log('🔍 tradesData available:', typeof window.tradesData);
-    console.log('🔍 tradesData length:', window.tradesData ? window.tradesData.length : 'undefined');
-
+    ===');
     if (typeof window.updateGridFromComponent === 'function') {
-      console.log('✅ updateGridFromComponent is properly defined for research page');
-    } else {
+      } else {
       console.warn('⚠️ updateGridFromComponent not available for research page');
     }
   }, 1000);
 
-  console.log('דף תחקיר נטען בהצלחה');
-
   // ניקוי הודעות קונסולה אחרי זמן קצר
   setTimeout(() => {
-    console.log('🧹 Clearing console messages to reduce clutter...');
     if (console.clear) {
       console.clear();
     }

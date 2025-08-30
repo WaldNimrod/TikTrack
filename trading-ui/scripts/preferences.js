@@ -29,14 +29,6 @@ async function loadPreferences() {
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
       const data = await response.json();
-      console.log('📊 נתונים מהשרת:', data);
-      console.log('🔍 בדיקת מבנה נתונים:');
-      console.log('  - data.user:', !!data.user);
-      console.log('  - data.users:', !!data.users);
-      console.log('  - data.defaults:', !!data.defaults);
-      console.log('  - data.defaultTypeFilter:', data.defaultTypeFilter);
-      console.log('  - data.primaryCurrency:', data.primaryCurrency);
-      
       // בדוק את המבנה הנכון - השרת מחזיר ישירות את האובייקט
       if (data.user) {
         currentPreferences = data.user;
@@ -47,13 +39,11 @@ async function loadPreferences() {
       } else if (data.defaultTypeFilter || data.primaryCurrency) {
         // השרת מחזיר ישירות את האובייקט
         currentPreferences = data;
-        console.log('📊 השרת החזיר ישירות את האובייקט:', data);
-      } else {
+        } else {
         currentPreferences = { ...DEFAULT_PREFERENCES };
       }
       
-      console.log('✅ העדפות נטענו:', currentPreferences);
-    } else {
+      } else {
       console.warn('⚠️ לא ניתן לטעון העדפות מהשרת, משתמש בברירות מחדל');
       currentPreferences = { ...DEFAULT_PREFERENCES };
     }
@@ -71,26 +61,18 @@ async function loadPreferences() {
  */
 function updatePreference(key, value) {
   try {
-    console.log(`🔄 updatePreference נקרא: ${key} = ${value}`);
-    
     // בדיקה מיוחדת לפילטר סוג
     if (key === 'defaultTypeFilter') {
-      console.log(`🎯 פילטר סוג מיוחד - ערך ישן: ${currentPreferences[key]}, ערך חדש: ${value}`);
-    }
+      }
     
     // עדכן את הזיכרון הזמני מיד
     currentPreferences[key] = value;
-    console.log(`🔄 עדכון זיכרון זמני: ${key} = ${value}`);
-    console.log(`📊 currentPreferences אחרי עדכון:`, currentPreferences);
-    
     // הצג הודעת מידע שהערך עודכן
     const label = getPreferenceLabel(key);
     const message = `${label} עודכן (לא נשמר עדיין)`;
-    console.log(`📢 מציג הודעת מידע: ${message}`);
     showPreferencesInfo('העדפות', message);
     
-    console.log(`✅ updatePreference הושלם בהצלחה`);
-  } catch (error) {
+    } catch (error) {
     console.error(`❌ שגיאה ב-updatePreference:`, error);
   }
 }
@@ -100,17 +82,11 @@ function updatePreference(key, value) {
  */
 async function saveAllPreferences() {
   try {
-    console.log('🔄 saveAllPreferences נקרא');
-    console.log('🔄 שומר את כל ההעדפות:', currentPreferences);
-    
     // בדיקה מיוחדת לפילטר סוג
     if (currentPreferences.defaultTypeFilter) {
-      console.log(`🎯 פילטר סוג בשמירה: ${currentPreferences.defaultTypeFilter}`);
-    }
+      }
     
     const requestBody = { preferences: currentPreferences };
-    console.log('📤 שליחת בקשה לשרת:', requestBody);
-    
     const response = await fetch('/api/v1/preferences/', {
       method: 'POST',
       headers: {
@@ -119,13 +95,9 @@ async function saveAllPreferences() {
       body: JSON.stringify(requestBody)
     });
     
-    console.log('📥 תגובה מהשרת:', response.status, response.statusText);
-    
     if (response.ok) {
       const responseData = await response.json();
-      console.log('📊 נתוני תגובה:', responseData);
-      console.log('✅ כל ההעדפות נשמרו בהצלחה בשרת');
-              showPreferencesSuccess('הצלחה', 'כל ההעדפות נשמרו בהצלחה');
+      showPreferencesSuccess('הצלחה', 'כל ההעדפות נשמרו בהצלחה');
     } else {
       const errorText = await response.text();
       console.error('❌ שגיאה בשמירת העדפות:', response.status, errorText);
@@ -177,49 +149,41 @@ async function resetToDefaults() {
  * מעדכן את הממשק עם העדפות נוכחיות
  */
 function updateUI() {
-  console.log('🔄 מעדכן ממשק עם העדפות:', currentPreferences);
-  
   // מטבע ראשי
   const primaryCurrencySelect = document.getElementById('primaryCurrency');
   if (primaryCurrencySelect) {
     primaryCurrencySelect.value = currentPreferences.primaryCurrency || 'USD';
-    console.log(`  💰 מטבע ראשי: ${primaryCurrencySelect.value}`);
-  }
+    }
   
   // אזור זמן
   const timezoneSelect = document.getElementById('timezone');
   if (timezoneSelect) {
     timezoneSelect.value = currentPreferences.timezone || 'Asia/Jerusalem';
-    console.log(`  🌍 אזור זמן: ${timezoneSelect.value}`);
-  }
+    }
   
   // סטופ לוס
   const stopLossInput = document.getElementById('defaultStopLoss');
   if (stopLossInput) {
     stopLossInput.value = currentPreferences.defaultStopLoss || 5;
-    console.log(`  🛑 סטופ לוס: ${stopLossInput.value}`);
-  }
+    }
   
   // יעד
   const targetPriceInput = document.getElementById('defaultTargetPrice');
   if (targetPriceInput) {
     targetPriceInput.value = currentPreferences.defaultTargetPrice || 10;
-    console.log(`  🎯 יעד: ${targetPriceInput.value}`);
-  }
+    }
   
   // עמלה
   const commissionInput = document.getElementById('defaultCommission');
   if (commissionInput) {
     commissionInput.value = currentPreferences.defaultCommission || 1.0;
-    console.log(`  💵 עמלה: ${commissionInput.value}`);
-  }
+    }
   
   // פילטר סטטוס
   const statusFilterSelect = document.getElementById('defaultStatusFilter');
   if (statusFilterSelect) {
     statusFilterSelect.value = currentPreferences.defaultStatusFilter || 'all';
-    console.log(`  📊 פילטר סטטוס: ${statusFilterSelect.value}`);
-  }
+    }
   
   // פילטר סוג - בדיקה מיוחדת
   const typeFilterSelect = document.getElementById('defaultTypeFilter');
@@ -227,10 +191,8 @@ function updateUI() {
     const oldValue = typeFilterSelect.value;
     const newValue = currentPreferences.defaultTypeFilter || 'all';
     typeFilterSelect.value = newValue;
-    console.log(`  🏷️ פילטר סוג: ${newValue} (היה: ${oldValue})`);
-    console.log(`  🎯 פילטר סוג - אלמנט נמצא: ${!!typeFilterSelect}`);
-    console.log(`  🎯 פילטר סוג - ערך ב-currentPreferences: ${currentPreferences.defaultTypeFilter}`);
-  } else {
+    console.log('🔧 Updated type filter to:', newValue);
+    } else {
     console.error(`  ❌ פילטר סוג - אלמנט לא נמצא!`);
   }
   
@@ -238,18 +200,15 @@ function updateUI() {
   const accountFilterSelect = document.getElementById('defaultAccountFilter');
   if (accountFilterSelect) {
     accountFilterSelect.value = currentPreferences.defaultAccountFilter || 'all';
-    console.log(`  🏦 פילטר חשבון: ${accountFilterSelect.value}`);
-  }
+    }
   
   // פילטר טווח תאריכים
   const dateRangeFilterSelect = document.getElementById('defaultDateRangeFilter');
   if (dateRangeFilterSelect) {
     dateRangeFilterSelect.value = currentPreferences.defaultDateRangeFilter || 'all';
-    console.log(`  📅 פילטר טווח תאריכים: ${dateRangeFilterSelect.value}`);
-  }
+    }
   
-  console.log('✅ עדכון ממשק הושלם');
-}
+  }
 
 /**
  * טוען חשבונות לפילטר
@@ -260,22 +219,18 @@ async function loadAccountsToFilter() {
     const response = await fetch('/api/v1/accounts/');
     if (response.ok) {
       const result = await response.json();
-      console.log('📊 תוצאות טעינת חשבונות:', result);
-      
       // בדוק את מבנה התגובה
       if (result.status === 'success' && result.data) {
         updateAccountFilter(result.data);
                          if (result.data.length > 0) {
             // הסרת התראה מיותרת בטעינה
-            console.log(`✅ נטענו ${result.data.length} חשבונות בהצלחה`);
-        }
+            }
        } else if (Array.isArray(result)) {
          // אם התגובה היא מערך ישירות
          updateAccountFilter(result);
                  if (result.length > 0) {
             // הסרת התראה מיותרת בטעינה
-            console.log(`✅ נטענו ${result.length} חשבונות בהצלחה`);
-        }
+            }
        } else {
          console.warn('⚠️ מבנה תגובה לא צפוי:', result);
          showPreferencesWarning('טעינת חשבונות', 'מבנה תגובה לא צפוי מהשרת, משתמש בנתונים מקומיים');
@@ -298,8 +253,6 @@ async function loadAccountsToFilter() {
  * טוען חשבונות מקומיים (גיבוי)
  */
 function loadLocalAccounts() {
-  console.log('🔄 טוען חשבונות מקומיים...');
-  
   // חשבונות לדוגמה
   const localAccounts = [
     { id: 1, name: 'חשבון ראשי' },
@@ -309,15 +262,12 @@ function loadLocalAccounts() {
   
      updateAccountFilter(localAccounts);
            // הסרת התראה מיותרת בטעינה
-    console.log(`✅ נטענו ${localAccounts.length} חשבונות מקומיים`);
-}
+    }
 
 /**
  * מעדכן את פילטר החשבונות
  */
 function updateAccountFilter(accounts) {
-  console.log('🔄 מעדכן פילטר חשבונות עם:', accounts);
-  
   const accountFilterSelect = document.getElementById('defaultAccountFilter');
   if (!accountFilterSelect) {
     console.error('❌ לא נמצא אלמנט פילטר חשבונות');
@@ -326,20 +276,17 @@ function updateAccountFilter(accounts) {
   
   // שמור את הבחירה הנוכחית
   const currentValue = accountFilterSelect.value;
-  console.log('📝 בחירה נוכחית:', currentValue);
-  
   // נקה אפשרויות קיימות (חוץ מ"הכול")
   accountFilterSelect.innerHTML = '<option value="all">הכול</option>';
   
   // הוסף חשבונות
   if (accounts && accounts.length > 0) {
-    console.log(`✅ מוסיף ${accounts.length} חשבונות לפילטר`);
     accounts.forEach((account, index) => {
       const option = document.createElement('option');
       option.value = account.id || account.name;
       option.textContent = account.name || account.id;
       accountFilterSelect.appendChild(option);
-      console.log(`  ${index + 1}. ${account.name} (ID: ${account.id})`);
+      console.log('🔧 Added account option:', account.name || account.id);
     });
   } else {
     console.warn('⚠️ אין חשבונות להוספה');
@@ -348,13 +295,10 @@ function updateAccountFilter(accounts) {
   // החזר את הבחירה הקודמת אם היא עדיין קיימת
   if (currentValue && Array.from(accountFilterSelect.options).some(opt => opt.value === currentValue)) {
     accountFilterSelect.value = currentValue;
-    console.log('✅ החזרתי בחירה קודמת:', currentValue);
-  } else {
-    console.log('ℹ️ אין בחירה קודמת או שהיא לא קיימת יותר');
-  }
+    } else {
+    }
   
-  console.log('✅ פילטר חשבונות עודכן בהצלחה');
-}
+  }
 
 /**
  * מחזיר תווית בעברית להעדפה
@@ -380,18 +324,13 @@ function getPreferenceLabel(key) {
  * הצגת הודעת הצלחה
  */
 function showPreferencesSuccess(title, message) {
-  console.log(`📢 showPreferencesSuccess נקרא: ${title} - ${message}`);
-  
   if (typeof window.showSuccessNotification === 'function') {
-    console.log('📢 משתמש ב-window.showSuccessNotification');
     window.showSuccessNotification(title, message);
   } else if (typeof window.showNotification === 'function') {
-    console.log('📢 משתמש ב-window.showNotification');
     window.showNotification(title, message, 'success');
   } else {
-    console.log('📢 משתמש ב-console.log (ללא מערכת התראות)');
     console.log('✅ הצלחה:', title, '-', message);
-  }
+    }
 }
 
 /**
@@ -411,18 +350,13 @@ function showPreferencesError(title, message) {
  * הצגת הודעת מידע
  */
 function showPreferencesInfo(title, message) {
-  console.log(`📢 showPreferencesInfo נקרא: ${title} - ${message}`);
-  
   if (typeof window.showInfoNotification === 'function') {
-    console.log('📢 משתמש ב-window.showInfoNotification');
     window.showInfoNotification(title, message);
   } else if (typeof window.showNotification === 'function') {
-    console.log('📢 משתמש ב-window.showNotification');
     window.showNotification(title, message, 'info');
   } else {
-    console.log('📢 משתמש ב-console.log (ללא מערכת התראות)');
     console.log('ℹ️ מידע:', title, '-', message);
-  }
+    }
 }
 
 /**
@@ -442,15 +376,7 @@ function showPreferencesWarning(title, message) {
  * אתחול הדף
  */
 async function initializePreferences() {
-  console.log('🚀 מאתחל דף העדפות...');
-  
   // בדיקת מערכת ההתראות
-  console.log('🔍 בדיקת מערכת ההתראות:');
-  console.log('  - window.showSuccessNotification:', typeof window.showSuccessNotification);
-  console.log('  - window.showErrorNotification:', typeof window.showErrorNotification);
-  console.log('  - window.showInfoNotification:', typeof window.showInfoNotification);
-  console.log('  - window.showNotification:', typeof window.showNotification);
-  
   try {
     // טען העדפות
     await loadPreferences();
@@ -458,7 +384,6 @@ async function initializePreferences() {
     // טען חשבונות
     await loadAccountsToFilter();
     
-    console.log('✅ דף העדפות אותחל בהצלחה');
     // הסרת התראה מיותרת בטעינה
   } catch (error) {
     console.error('❌ שגיאה באתחול דף העדפות:', error);

@@ -20,7 +20,6 @@ let currentTestId = null;
 
 // Page initialization
 function initializeTestsPage() {
-  
 
     // Load initial data
     loadTestsData();
@@ -32,13 +31,11 @@ function initializeTestsPage() {
     // Update summary statistics
     updateSummaryStats();
 
-  
 }
 
 // Load tests data
 async function loadTestsData() {
     try {
-      
 
         // Mock data for now - replace with actual API call
         testsData = [
@@ -85,7 +82,6 @@ async function loadTestsData() {
         ];
 
         updateTestsTable();
-      
 
     } catch (error) {
         console.error('❌ Error loading tests data:', error);
@@ -96,7 +92,6 @@ async function loadTestsData() {
 // Load test results data
 async function loadTestResultsData() {
     try {
-      
 
         // Mock data for now - replace with actual API call
         testResultsData = [
@@ -130,7 +125,6 @@ async function loadTestResultsData() {
         ];
 
         updateTestResultsTable();
-      
 
     } catch (error) {
         console.error('❌ Error loading test results data:', error);
@@ -327,13 +321,11 @@ function runTest(testId) {
             updateTestsTable();
             updateSummaryStats();
 
-          
         }
     }, 2000);
 }
 
 function runAllTests() {
-  
 
     const activeTests = testsData.filter(test => test.status === 'active');
     if (activeTests.length === 0) {
@@ -406,7 +398,6 @@ function clearTestResults() {
 
 // Section management
 function toggleTopSection() {
-  
 
     // שימוש בפונקציה הגלובלית מ-main.js
     if (typeof window.toggleSection === 'function') {
@@ -417,7 +408,6 @@ function toggleTopSection() {
 }
 
 function toggleMainSection() {
-  
 
     // שימוש בפונקציה הגלובלית מ-main.js
     if (typeof window.toggleSection === 'function') {
@@ -435,7 +425,6 @@ function toggleMainSection() {
 }
 
 function restoreTestsSectionState() {
-  
 
     // שימוש בפונקציה הגלובלית מ-main.js
     if (typeof window.restoreSectionStates === 'function') {
@@ -503,7 +492,6 @@ function resetTestPreferences() {
 }
 
 function saveCRUDPreferences() {
-    console.log('💾 Saving CRUD preferences...');
     const crudTests = document.querySelectorAll('input[data-test]');
     const preferences = {};
 
@@ -516,7 +504,6 @@ function saveCRUDPreferences() {
 }
 
 function resetCRUDPreferences() {
-    console.log('🔄 Resetting CRUD preferences...');
     if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות CRUD לברירות מחדל?')) {
         const crudTests = document.querySelectorAll('input[data-test]');
         crudTests.forEach(test => {
@@ -529,7 +516,6 @@ function resetCRUDPreferences() {
 }
 
 function saveSecurityPreferences() {
-    console.log('💾 Saving security preferences...');
     const preferences = {
         securityTests: document.getElementById('securityTests')?.checked || false,
         penetrationTests: document.getElementById('penetrationTests')?.checked || false
@@ -540,7 +526,6 @@ function saveSecurityPreferences() {
 }
 
 function resetSecurityPreferences() {
-    console.log('🔄 Resetting security preferences...');
     if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות האבטחה לברירות מחדל?')) {
         const securityTests = document.getElementById('securityTests');
         const penetrationTests = document.getElementById('penetrationTests');
@@ -554,7 +539,6 @@ function resetSecurityPreferences() {
 }
 
 function saveAllPreferences() {
-    console.log('💾 Saving all preferences...');
     saveTestPreferences();
     saveCRUDPreferences();
     saveSecurityPreferences();
@@ -562,7 +546,6 @@ function saveAllPreferences() {
 }
 
 function resetAllPreferences() {
-    console.log('🔄 Resetting all preferences...');
     if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
         resetTestPreferences();
         resetCRUDPreferences();
@@ -572,7 +555,6 @@ function resetAllPreferences() {
 }
 
 async function runAllCRUDTests() {
-    console.log('▶️ Running all CRUD tests...');
     const activeTests = document.querySelectorAll('input[data-test]:checked');
     if (activeTests.length === 0) {
         showNotification('אין בדיקות CRUD פעילות להרצה', 'warning');
@@ -594,7 +576,6 @@ async function runAllCRUDTests() {
 }
 
 function toggleAllCRUDTests() {
-    console.log('🔄 Toggling all CRUD tests...');
     const allTests = document.querySelectorAll('input[data-test]');
     const allChecked = Array.from(allTests).every(test => test.checked);
 
@@ -612,8 +593,6 @@ function toggleAllCRUDTests() {
 }
 
 function toggleAllSections() {
-    console.log('🔄 toggleAllSections נקראה - שימוש במערכת הגלובלית');
-
     // שימוש בפונקציה הגלובלית מ-main.js
     if (typeof window.toggleAllSections === 'function') {
         window.toggleAllSections();
@@ -669,8 +648,6 @@ window.resetCRUDPreferences = resetCRUDPreferences;
  * Run server tests
  */
 async function runServerTests() {
-    console.log('🖥️ Running server tests...');
-
     const selectedTests = getSelectedServerTests();
     if (selectedTests.length === 0) {
         alert('אין בדיקות שרת נבחרות להרצה');
@@ -781,7 +758,6 @@ function displayServerTestResults(results) {
  * Save server preferences
  */
 function saveServerPreferences() {
-    console.log('💾 Saving server preferences...');
     const preferences = {
         serverHealthCheck: document.getElementById('serverHealthCheck')?.checked || false,
         databaseConnectivity: document.getElementById('databaseConnectivity')?.checked || false,
@@ -797,7 +773,6 @@ function saveServerPreferences() {
  * Reset server preferences
  */
 function resetServerPreferences() {
-    console.log('🔄 Resetting server preferences...');
     if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות השרת לברירות מחדל?')) {
         const checkboxes = [
             'serverHealthCheck', 'databaseConnectivity', 'apiEndpoints', 'responseTimeCheck'
@@ -821,8 +796,6 @@ function resetServerPreferences() {
  * Run all API tests
  */
 async function runAllAPITests() {
-    console.log('🔌 Running all API tests...');
-
     const allTables = ['accounts', 'trades', 'tickers', 'alerts', 'notes', 'currencies', 'cash_flows', 'trade_plans', 'executions'];
 
     showNotification(`מתחיל הרצת ${allTables.length} בדיקות API...`, 'info');
@@ -841,8 +814,6 @@ async function runAllAPITests() {
  * Run specific API test
  */
 async function runAPITest(tableName) {
-    console.log(`🔌 Running API test for ${tableName}...`);
-
     showNotification(`מתחיל בדיקת API עבור ${tableName}...`, 'info');
 
     try {
@@ -927,7 +898,6 @@ function displayAPITestResults(results) {
  * Save API preferences
  */
 function saveAPIPreferences() {
-    console.log('💾 Saving API preferences...');
     // API preferences are mainly for future use
     const preferences = {
         lastSaved: new Date().toISOString()
@@ -941,7 +911,6 @@ function saveAPIPreferences() {
  * Reset API preferences
  */
 function resetAPIPreferences() {
-    console.log('🔄 Resetting API preferences...');
     if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות API לברירות מחדל?')) {
         localStorage.removeItem('apiPreferences');
         alert('העדפות בדיקות API אופסו לברירות מחדל!');
@@ -953,7 +922,6 @@ function resetAPIPreferences() {
 /**
  * Show notification
  */
-
 
 /**
  * Check server health before running tests
@@ -1005,8 +973,6 @@ async function executeCRUDTests(activeTests) {
             cleanup: document.getElementById('cleanupAfterTests')?.checked || true
         };
 
-        console.log('🔌 Executing CRUD tests with settings:', settings);
-
         const response = await fetch('/api/v1/tests/crud', {
             method: 'POST',
             headers: {
@@ -1024,7 +990,6 @@ async function executeCRUDTests(activeTests) {
         }
 
         const result = await response.json();
-        console.log('✅ CRUD tests executed successfully:', result);
         return result;
 
     } catch (error) {
@@ -1037,8 +1002,6 @@ async function executeCRUDTests(activeTests) {
  * Display CRUD test results in the test results table
  */
 function displayCRUDTestResults(results) {
-    console.log('📊 Displaying CRUD test results:', results);
-
     if (results.results && results.results.results) {
         const crudResults = results.results.results;
 
@@ -1066,7 +1029,6 @@ function displayCRUDTestResults(results) {
  * Clear CRUD test results
  */
 function clearCRUDTestResults() {
-    console.log('🗑️ Clearing CRUD test results...');
     if (confirm('האם אתה בטוח שברצונך לנקות את כל תוצאות בדיקות CRUD?')) {
         document.getElementById('crudTestResultsContent').innerHTML = '';
         document.getElementById('crudTestResultsArea').style.display = 'none';
@@ -1079,7 +1041,6 @@ function clearCRUDTestResults() {
  * Close CRUD test results area
  */
 function closeCRUDTestResults() {
-    console.log('✕ Closing CRUD test results area...');
     document.getElementById('crudTestResultsArea').style.display = 'none';
 }
 
@@ -1087,8 +1048,6 @@ function closeCRUDTestResults() {
  * Toggle CRUD results section
  */
 function toggleCRUDResultsSection() {
-    console.log('🔄 toggleCRUDResultsSection נקראה - שימוש במערכת הגלובלית');
-
     // שימוש בפונקציה הגלובלית מ-main.js
     if (typeof window.toggleSection === 'function') {
         window.toggleSection('crud-results');
@@ -1101,7 +1060,6 @@ function toggleCRUDResultsSection() {
  * Run selected CRUD tests
  */
 async function runSelectedCRUDTests() {
-    console.log('▶️ Running selected CRUD tests...');
     const selectedTests = getSelectedCRUDTests();
 
     if (selectedTests.length === 0) {
@@ -1145,7 +1103,6 @@ async function runSelectedCRUDTests() {
  * Save CRUD preferences
  */
 function saveCRUDPreferences() {
-    console.log('💾 Saving CRUD preferences...');
     const preferences = {};
 
     // Get all CRUD test checkboxes
@@ -1163,7 +1120,6 @@ function saveCRUDPreferences() {
  * Reset CRUD preferences
  */
 function resetCRUDPreferences() {
-    console.log('🔄 Resetting CRUD preferences...');
     if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות CRUD לברירות מחדל?')) {
         // Reset all CRUD test checkboxes to checked
         const testCheckboxes = document.querySelectorAll('input[data-test]');
@@ -1194,8 +1150,6 @@ function getSelectedCRUDTests() {
  * Run all tests (server + API + CRUD)
  */
 async function runAllTests() {
-    console.log('🧪 Running all tests...');
-
     showNotification('מתחיל הרצת כל הבדיקות...', 'info');
 
     try {

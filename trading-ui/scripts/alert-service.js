@@ -169,8 +169,3 @@ window.alertService = {
     canAlertBeCancelled
 };
 
-console.log('✅ Alert Service loaded successfully');
-
-
-
-

@@ -118,8 +118,6 @@ async function loadCache() {
         return;
     }
 
-  
-
     try {
         const [tickers, trades, plans] = await Promise.all([
             getTickers(),
@@ -132,12 +130,7 @@ async function loadCache() {
         plansCache = plans;
         lastCacheUpdate = Date.now();
 
-        console.log('📊 Cache loaded:', {
-            tickers: tickers.length,
-            trades: trades.length,
-            plans: plans.length
-        });
-    } catch (error) {
+        } catch (error) {
         console.error('❌ Error loading cache:', error);
         clearCache();
     }
@@ -170,7 +163,6 @@ async function getTickersWithTrades(options = {}) {
         );
     });
 
-  
     return relevantTickers;
 }
 
@@ -206,7 +198,6 @@ async function getTickersWithPlans(options = {}) {
         );
     });
 
-  
     return relevantTickers;
 }
 
@@ -254,7 +245,6 @@ async function getRelevantTickers(options = {}) {
         return hasTrades || hasPlans;
     });
 
-  
     return relevantTickers;
 }
 
@@ -298,7 +288,6 @@ async function getTickersWithOpenOrClosedTradesAndPlans(options = {}) {
         return hasOpenOrClosedTrades || hasOpenOrClosedPlans;
     });
 
-  
     return relevantTickers;
 }
 
@@ -326,7 +315,6 @@ async function getTickersByType(types = [], useCache = true) {
         types.includes(ticker.type)
     );
 
-  
     return filteredTickers;
 }
 
@@ -358,7 +346,6 @@ async function getTickersByActivity(activeOnly = true, useCache = true) {
         );
     });
 
-  
     return activeTickers;
 }
 
@@ -384,7 +371,6 @@ function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...
         select.appendChild(option);
     });
 
-  
 }
 
 /**
@@ -394,8 +380,6 @@ function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...
  */
 async function loadTickersForTradePlan() {
     try {
-        console.log('🔄 Loading tickers for trade plan modal...');
-        
         const response = await fetch('/api/v1/tickers/');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -404,14 +388,12 @@ async function loadTickersForTradePlan() {
         const data = await response.json();
         const tickers = data.data || data;
         
-        console.log('📊 Tickers loaded:', tickers.length);
-        
         // סינון טיקרים - רק פתוח או סגור
         const activeTickers = tickers.filter(ticker => 
             ticker.status === 'open' || ticker.status === 'closed'
         );
         
-        console.log('✅ Active tickers (open/closed):', activeTickers.length);
+        console.log('✅ Loaded active tickers:', activeTickers.length);
         
         // עדכון רשימת הטיקרים
         const tickerSelect = document.getElementById('addTradePlanTickerId');
@@ -432,16 +414,14 @@ async function loadTickersForTradePlan() {
                 tickerSelect.appendChild(option);
             });
             
-            console.log('✅ Ticker select updated with', activeTickers.length, 'active tickers');
-        } else {
+            } else {
             console.error('❌ Ticker select element not found');
         }
         
     } catch (error) {
         console.error('❌ Error loading tickers:', error);
         // Fallback to static options if API fails
-        console.log('⚠️ Using fallback static ticker options');
-    }
+        }
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -460,5 +440,4 @@ window.tickerService = {
     clearCache,
     loadCache
 };
-
 

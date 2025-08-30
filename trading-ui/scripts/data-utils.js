@@ -231,7 +231,6 @@ function validateDataStructure(data, type = 'data') {
     return false;
   }
 
-  
   return true;
 }
 
@@ -456,7 +455,4 @@ window.dataUtils = {
     validateDataStructure,
     filterDataBySearch
 };
-
-
-
 

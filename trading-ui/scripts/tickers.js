@@ -1433,9 +1433,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // אתחול וולידציה - שימוש בפונקציות הגלובליות
     if (window.initializeValidation) {
-        // שימוש בוולידציה הגלובלית ללא כללים מותאמים
-        window.initializeValidation('addTickerForm', {});
-        window.initializeValidation('editTickerForm', {});
+        // בדיקה אם הטפסים קיימים לפני אתחול וולידציה
+        const addTickerForm = document.getElementById('addTickerForm');
+        const editTickerForm = document.getElementById('editTickerForm');
+        
+        if (addTickerForm) {
+            window.initializeValidation('addTickerForm', {});
+        }
+        
+        if (editTickerForm) {
+            window.initializeValidation('editTickerForm', {});
+        }
     }
 
     // שחזור מצב סידור

@@ -423,8 +423,6 @@ window.findAlertById = findAlertById;
 window.getConditionAttributeOptions = getConditionAttributeOptions;
 window.getConditionOperatorOptions = getConditionOperatorOptions;
 
-
-
 /**
  * תרגום פעולת ביצוע לעברית
  * @param {string} action - הפעולה באנגלית

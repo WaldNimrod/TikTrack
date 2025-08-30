@@ -147,7 +147,6 @@ function initializeApplication() {
  */
 function checkDependencies() {
   const requiredModules = [
-    'HeaderSystem',
     'translationUtils',
     'dataUtils',
     'uiUtils',
@@ -175,10 +174,8 @@ function checkDependencies() {
  * Sets up global event handlers and system-wide functionality
  */
 function initializeCoreSystems() {
-  // Initialize header system
-  if (window.HeaderSystem && typeof window.HeaderSystem.init === 'function') {
-    window.HeaderSystem.init();
-  }
+  // Initialize header system - HeaderSystem initializes itself via DOMContentLoaded
+  // No need to initialize here as it's handled in header-system.js
 
 
 

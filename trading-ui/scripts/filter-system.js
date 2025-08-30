@@ -47,8 +47,6 @@ class FilterSystem {
   initialize() {
     if (this.initialized) return;
 
-    console.log('🔧 FilterSystem initializing...');
-
     // המתן לטעינת DOM
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.init());
@@ -58,7 +56,6 @@ class FilterSystem {
   }
 
   init() {
-    console.log('🔧 FilterSystem initialized');
     this.loadSavedFilters();
     this.setupGlobalEventListeners();
     this.initialized = true;
@@ -77,8 +74,6 @@ class FilterSystem {
     };
 
     this.tables.set(tableId, table);
-    console.log(`📋 Table ${tableId} registered with fields:`, table.fields);
-
     // טעינת נתונים מהטבלה
     this.loadTableData(tableId);
 
@@ -94,9 +89,6 @@ class FilterSystem {
     const rows = table.element.querySelectorAll('tbody tr');
     const data = [];
 
-    console.log(`📊 Loading data for table ${tableId} with ${rows.length} rows`);
-    console.log(`📊 Table fields:`, table.fields);
-
     rows.forEach((row, rowIndex) => {
       const cells = row.querySelectorAll('td');
       const rowData = {};
@@ -105,8 +97,7 @@ class FilterSystem {
         if (cells[index]) {
           const value = cells[index].textContent.trim();
           rowData[field] = value;
-          console.log(`📊 Row ${rowIndex}, Field ${field}: "${value}"`);
-        }
+          }
       });
 
       data.push(rowData);
@@ -114,22 +105,19 @@ class FilterSystem {
 
     table.data = data;
     table.filteredData = [...data];
-    console.log(`📊 Loaded ${data.length} rows for table ${tableId}:`, data);
-  }
+    }
 
   // רישום פילטר חדש
   registerFilter(filterName, filterConfig) {
     this.filters.set(filterName, filterConfig);
-    console.log(`🔍 Filter ${filterName} registered`);
-  }
+    }
 
   // עדכון פילטר
   updateFilter(filterName, value) {
     this.currentFilters[filterName] = value;
     this.saveFilters();
     this.applyAllFilters();
-    console.log(`🔄 Filter ${filterName} updated:`, value);
-  }
+    }
 
   // הפעלת כל הפילטרים על כל הטבלאות
   applyAllFilters() {
@@ -143,49 +131,34 @@ class FilterSystem {
     const table = this.tables.get(tableId);
     if (!table) return;
 
-    console.log(`🔍 === FILTER PROCESS FOR TABLE ${tableId} ===`);
-    console.log(`🔍 Current filters:`, this.currentFilters);
-
     let filteredData = [...table.data];
-    console.log(`🔍 Starting filter process for table ${tableId} with ${filteredData.length} rows`);
-
     // פילטר חיפוש (סטטי)
     if (this.currentFilters.search && table.fields.some(field =>
       ['name', 'description', 'title', 'symbol', 'account_name'].includes(field))) {
-      console.log(`🔍 Applying search filter: "${this.currentFilters.search}"`);
       filteredData = this.applySearchFilter(filteredData, this.currentFilters.search);
-      console.log(`🔍 After search filter: ${filteredData.length} rows`);
-    }
+      }
 
     // פילטר תאריכים (סטטי)
     if (this.currentFilters.dateRange && this.currentFilters.dateRange !== 'כל זמן' &&
       table.fields.includes('date')) {
-      console.log(`🔍 Applying date filter: "${this.currentFilters.dateRange}"`);
       const dateRange = this.getDateRangeFromText(this.currentFilters.dateRange);
       filteredData = this.applyDateFilter(filteredData, dateRange);
-      console.log(`🔍 After date filter: ${filteredData.length} rows`);
-    }
+      }
 
     // פילטר סטטוס (דינמי)
     if (this.currentFilters.status.length > 0 && table.fields.includes('status')) {
-      console.log(`🔍 Applying status filter:`, this.currentFilters.status);
       filteredData = this.applyStatusFilter(filteredData, this.currentFilters.status);
-      console.log(`🔍 After status filter: ${filteredData.length} rows`);
-    }
+      }
 
     // פילטר סוג (דינמי)
     if (this.currentFilters.type.length > 0 && table.fields.includes('type')) {
-      console.log(`🔍 Applying type filter:`, this.currentFilters.type);
       filteredData = this.applyTypeFilter(filteredData, this.currentFilters.type);
-      console.log(`🔍 After type filter: ${filteredData.length} rows`);
-    }
+      }
 
     // פילטר חשבון (דינמי)
     if (this.currentFilters.account.length > 0 && table.fields.includes('account_id')) {
-      console.log(`🔍 Applying account filter:`, this.currentFilters.account);
       filteredData = this.applyAccountFilter(filteredData, this.currentFilters.account);
-      console.log(`🔍 After account filter: ${filteredData.length} rows`);
-    }
+      }
 
     table.filteredData = filteredData;
 
@@ -214,8 +187,7 @@ class FilterSystem {
       }
     });
 
-    console.log(`🎯 Updated table ${tableId}: showing ${filteredData.length} of ${table.data.length} rows`);
-  }
+    }
 
   // פילטר חיפוש
   applySearchFilter(data, searchTerm) {
@@ -276,22 +248,13 @@ class FilterSystem {
   applyStatusFilter(data, selectedStatuses) {
     if (selectedStatuses.length === 0) return data;
 
-    console.log('🔍 Applying status filter:', selectedStatuses);
-    console.log('🔍 Data before filter:', data);
-
     // תרגום הסטטוסים הנבחרים לאנגלית
     const translatedStatuses = selectedStatuses.map(status => this.translateStatusToEnglish(status));
-    console.log('🔍 Translated statuses:', translatedStatuses);
-
     return data.filter(item => {
       const itemStatus = item.status;
       const itemSymbol = item.ticker || item.symbol || item.name || 'unknown';
-      console.log(`🔍 Checking item ${itemSymbol}: status="${itemStatus}" against translatedStatuses:`, translatedStatuses);
-
       // בדיקה - אם הסטטוס של הפריט נמצא ברשימת הסטטוסים המתורגמים
       const isMatch = translatedStatuses.includes(itemStatus);
-      console.log(`🔍 Item ${itemSymbol}: ${isMatch ? '✅ MATCH' : '❌ NO MATCH'}`);
-
       return isMatch;
     });
   }
@@ -423,8 +386,7 @@ class FilterSystem {
     const saved = localStorage.getItem('globalFilters');
     if (saved) {
       this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
-      console.log('📥 Loaded saved filters:', this.currentFilters);
-    }
+      }
   }
 
   // איפוס פילטרים
@@ -438,8 +400,7 @@ class FilterSystem {
     };
     this.saveFilters();
     this.applyAllFilters();
-    console.log('🔄 Filters reset');
-  }
+    }
 
   // הגדרת event listeners גלובליים
   setupGlobalEventListeners() {
@@ -548,7 +509,6 @@ class FilterSystem {
 
   // עדכון אפשרויות חשבונות
   updateAccountOptions(accounts) {
-    console.log('🔧 Updating account options:', accounts);
     // כאן נוכל להוסיף לוגיקה לעדכון רשימת החשבונות בפילטר
   }
 }

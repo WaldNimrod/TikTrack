@@ -51,7 +51,7 @@ def get_trade_plans():
         logger.error(f"Error getting trade plans: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve trade plans"},
+            "error": {"message": "שגיאה בטעינת תכנונים"},
             "version": "v1"
         }), 500
     finally:
@@ -72,14 +72,14 @@ def get_trade_plan(plan_id: int):
             })
         return jsonify({
             "status": "error",
-            "error": {"message": "Trade plan not found"},
+            "error": {"message": "תכנון לא נמצא"},
             "version": "v1"
         }), 404
     except Exception as e:
         logger.error(f"Error getting trade plan {plan_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve trade plan"},
+            "error": {"message": "שגיאה בטעינת התכנון"},
             "version": "v1"
         }), 500
     finally:
@@ -101,7 +101,7 @@ def get_trade_plans_by_account(account_id: int):
         logger.error(f"Error getting trade plans for account {account_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve account trade plans"},
+            "error": {"message": "שגיאה בטעינת תכנונים לחשבון"},
             "version": "v1"
         }), 500
     finally:
@@ -146,7 +146,7 @@ def update_trade_plan(plan_id: int):
             })
         return jsonify({
             "status": "error",
-            "error": {"message": "Trade plan not found"},
+            "error": {"message": "תכנון לא נמצא"},
             "version": "v1"
         }), 404
     except Exception as e:
@@ -177,7 +177,7 @@ def cancel_trade_plan(plan_id: int):
             })
         return jsonify({
             "status": "error",
-            "error": {"message": "Trade plan not found or already cancelled"},
+            "error": {"message": "תכנון לא נמצא או שכבר מבוטל"},
             "version": "v1"
         }), 404
     except Exception as e:
@@ -206,7 +206,7 @@ def activate_trade_plan(plan_id: int):
             })
         return jsonify({
             "status": "error",
-            "error": {"message": "Trade plan not found or already open"},
+            "error": {"message": "תכנון לא נמצא או שכבר פעיל"},
             "version": "v1"
         }), 404
     except Exception as e:
@@ -236,7 +236,7 @@ def get_trade_plan_summary():
         logger.error(f"Error getting trade plan summary: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve trade plan summary"},
+            "error": {"message": "שגיאה בטעינת סיכום תכנונים"},
             "version": "v1"
         }), 500
     finally:
@@ -283,7 +283,7 @@ def delete_trade_plan(plan_id: int):
         return jsonify({
             "status": "error",
             "error": {
-                "message": "Cannot delete trade plan - it has linked trades or other items"
+                "message": "לא ניתן למחוק תכנון זה - יש פריטים מקושרים אליו"
             },
             "version": "v1"
         }), 400

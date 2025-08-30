@@ -70,8 +70,6 @@ class JsMapSystem {
             return;
         }
 
-      
-
         // Load initial data
         this.loadJsMapData();
 
@@ -83,7 +81,6 @@ class JsMapSystem {
      */
     async loadJsMapData() {
         try {
-          
 
             // Show loading state
             this.showLoadingState();
@@ -94,13 +91,9 @@ class JsMapSystem {
             // Get functions data
             await this.loadFunctionsData();
 
-            
-
             // Render data
             await this.renderPageMapping();
             this.renderFunctionsData();
-
-          
 
         } catch (error) {
             console.error('❌ Error loading JS map data:', error);
@@ -135,17 +128,14 @@ class JsMapSystem {
         try {
           
             const response = await fetch('/api/js-map/functions');
-          
 
             if (response.ok) {
                 this.functionsData = await response.json();
-                
 
                 // Check if we have actual function data
                 const filesWithFunctions = Object.keys(this.functionsData).filter(file =>
                     this.functionsData[file] && this.functionsData[file].length > 0
                 );
-              
 
                 // Log some sample data
                   
@@ -212,9 +202,6 @@ class JsMapSystem {
         }
 
         // Fallback to sample functions structure
-      
-
-
 
         functions['header-system.js'] = [
             {
@@ -256,7 +243,6 @@ class JsMapSystem {
      * Scan function calls across all JS files
      */
     async scanFunctionCalls() {
-      
 
         // Try to use the JS scanner for real data
         if (window.jsScanner) {
@@ -271,7 +257,6 @@ class JsMapSystem {
         }
 
         // Fallback to static data
-      
 
         const functionCallCounts = {};
 
@@ -324,7 +309,6 @@ class JsMapSystem {
             }
         });
 
-      
         return functionCallCounts;
     }
 
@@ -334,8 +318,6 @@ class JsMapSystem {
     async renderPageMapping() {
         const container = document.getElementById('pageMappingContent');
         if (!container) return;
-
-        
 
         // Sort JS files by generality (most general first)
         const sortedJsFiles = this.sortJsFilesByGenerality();
@@ -392,13 +374,10 @@ class JsMapSystem {
         const container = document.getElementById('functionsContent');
         if (!container) return;
 
-        
-
         let html = '';
 
         Object.keys(this.functionsData).forEach(file => {
             const functions = this.functionsData[file];
-          
 
             html += `
                 <div class="function-group">
@@ -518,7 +497,6 @@ class JsMapSystem {
      */
     async refreshJsMapData() {
         try {
-          
 
             // Disable refresh button
             const refreshButton = document.getElementById('refreshButton');
@@ -538,8 +516,6 @@ class JsMapSystem {
                 refreshButton.disabled = false;
                 refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> רענן נתונים';
             }
-
-          
 
         } catch (error) {
             console.error('❌ Error refreshing JS map data:', error);
@@ -585,7 +561,6 @@ function toggleFunctionGroup(header) {
 }
 
 function openFunctionDetails(file, functionName) {
-  
 
     // Get function details from scanner
     if (window.jsScanner) {

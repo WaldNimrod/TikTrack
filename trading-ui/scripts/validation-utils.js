@@ -94,8 +94,7 @@ function showFieldError(input, message) {
     errorDiv.textContent = message;
     input.parentNode.appendChild(errorDiv);
     
-    console.log(`❌ Field error: ${input.name} - ${message}`);
-}
+    }
 
 /**
  * הצגת הצלחה בשדה
@@ -111,8 +110,7 @@ function showFieldSuccess(input) {
         existingError.remove();
     }
     
-    console.log(`✅ Field success: ${input.name}`);
-}
+    }
 
 /**
  * ניקוי שגיאה משדה
@@ -472,10 +470,6 @@ function validateTickerSymbol(value) {
  * ולידציה של טופס
  */
 function validateForm(formId, validationRules = {}) {
-    console.log('🔍 === VALIDATE FORM ===');
-    console.log('🔍 Form ID:', formId);
-    console.log('🔍 Validation rules:', validationRules);
-    
     const form = document.getElementById(formId);
     if (!form) {
         console.error('❌ Form not found:', formId);
@@ -528,9 +522,6 @@ function validateForm(formId, validationRules = {}) {
         }
     });
     
-    console.log('🔍 Validation result:', isValid);
-    console.log('🔍 Errors:', errors);
-    
     if (!isValid) {
         // הצגת הודעת שגיאה כללית
         if (typeof window.showErrorNotification === 'function') {
@@ -549,23 +540,15 @@ function validateForm(formId, validationRules = {}) {
  * אתחול מערכת הוולידציה לטופס
  */
 function initializeValidation(formId, validationRules = {}) {
-    console.log('🔧 === INITIALIZING VALIDATION ===');
-    console.log('🔧 Form ID:', formId);
-    console.log('🔧 Validation rules:', validationRules);
-    
     const form = document.getElementById(formId);
     if (!form) {
-        console.error(`❌ Form ${formId} not found`);
+        console.warn(`⚠️ Form ${formId} not found - skipping validation initialization`);
         return;
     }
 
     // מציאת כל השדות בטופס
     const inputs = form.querySelectorAll('input, select, textarea');
-    console.log('🔧 Found inputs:', inputs.length);
-    
     inputs.forEach((input, index) => {
-        console.log(`🔧 Setting up validation for input ${index + 1}:`, input.name, input.type);
-        
         // הסרת event listeners קודמים
         if (input._validationHandler) {
             input.removeEventListener('input', input._validationHandler);
@@ -576,8 +559,6 @@ function initializeValidation(formId, validationRules = {}) {
         // יצירת פונקציית ולידציה מותאמת לשדה
         input._validationHandler = () => {
             const fieldRules = validationRules[input.name] || {};
-            console.log(`🔧 Validating field: ${input.name}`, fieldRules);
-            
             // ולידציה לפי סוג השדה
             let isValid = false;
             
@@ -609,7 +590,6 @@ function initializeValidation(formId, validationRules = {}) {
                     break;
             }
             
-            console.log(`🔧 Field ${input.name} validation result:`, isValid);
             return isValid;
         };
         
@@ -618,22 +598,17 @@ function initializeValidation(formId, validationRules = {}) {
         input.addEventListener('blur', input._validationHandler);   // בזמן עזיבת השדה
         input.addEventListener('change', input._validationHandler); // בזמן שינוי ערך
         
-        console.log(`✅ Validation setup completed for: ${input.name}`);
-    });
+        });
     
-    console.log('✅ Validation initialization completed for form:', formId);
-}
+    }
 
 /**
  * ניקוי וולידציה לטופס
  */
 function clearValidation(formId) {
-    console.log('🧹 === CLEARING VALIDATION ===');
-    console.log('🧹 Form ID:', formId);
-    
     const form = document.getElementById(formId);
     if (!form) {
-        console.error(`❌ Form ${formId} not found`);
+        console.warn(`⚠️ Form ${formId} not found - skipping validation clearing`);
         return;
     }
 
@@ -643,8 +618,7 @@ function clearValidation(formId) {
         clearFieldValidation(input);
     });
 
-    console.log('✅ Validation cleared for form:', formId);
-}
+    }
 
 // ===== ייצוא פונקציות =====
 
@@ -703,5 +677,4 @@ window.validationUtils = {
     initializeValidation,
     clearValidation
 };
-
 

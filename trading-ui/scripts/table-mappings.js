@@ -323,8 +323,6 @@ function getColumnValue(item, columnIndex, tableType) {
         return '';
     }
 
-  
-
     // Database Display Page - Direct field mapping
     if (tableType === 'trade_plans' || tableType === 'trades' || tableType === 'accounts' ||
         tableType === 'tickers' || tableType === 'notes' ||
@@ -430,7 +428,6 @@ function getColumnValue(item, columnIndex, tableType) {
 
     // Legacy executions table (for specific pages)
     if (tableType === 'executions_legacy') {
-      
 
         if (fieldName === 'symbol') {
             return item.symbol || item.ticker_symbol || '';

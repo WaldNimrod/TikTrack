@@ -1245,7 +1245,7 @@ function parseAlertCondition(condition) {
 async function saveAlert() {
   const form = document.getElementById('addAlertForm');
   if (!form) {
-    console.error('Form element not found');
+    console.warn('⚠️ Form element not found - skipping save operation');
     return;
   }
 

@@ -365,14 +365,13 @@
 
 /* התראה בודדת - עיצוב בסיסי */
 .notification {
-  background: rgba(255, 255, 255, 0.8);
-  /* 80% אטום - רקע קבוע */
-  border: 1px solid var(--apple-border-light);
+  background: #ffffff;
+  /* רקע לבן קבוע */
+  border: 1px solid #e0e0e0;
   border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(20px);
   transform: translateX(100%);
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -450,11 +449,13 @@
 }
 
 /* סוגי התראות - צבעים ואייקונים */
-/* הצלחה - צבע הלוגו (ירוק טורקיז כמו table-count) */
+/* הצלחה - רקע לבן עם מסגרת ירוקה */
 .notification.success {
   border-left: 4px solid #29a6a8;
-  background: linear-gradient(135deg, rgba(41, 166, 168, 0.8) 0%, rgba(31, 138, 140, 0.8) 100%);
+  background: #ffffff;
   color: #333 !important;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #29a6a8;
 }
 
 .notification.success .notification-icon {
@@ -462,7 +463,7 @@
 }
 
 .notification.success .notification-title {
-  color: #333 !important;
+  color: #29a6a8 !important;
   font-weight: 600;
 }
 
@@ -470,11 +471,13 @@
   color: #555 !important;
 }
 
-/* שגיאה - אדום */
+/* שגיאה - רקע לבן עם מסגרת אדומה */
 .notification.error {
   border-left: 4px solid #f44336;
-  background: linear-gradient(135deg, rgba(244, 67, 54, 0.8) 0%, rgba(211, 47, 47, 0.8) 100%);
+  background: #ffffff;
   color: #333 !important;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #f44336;
 }
 
 .notification.error .notification-icon {
@@ -482,7 +485,7 @@
 }
 
 .notification.error .notification-title {
-  color: #333 !important;
+  color: #f44336 !important;
   font-weight: 600;
 }
 
@@ -490,11 +493,13 @@
   color: #555 !important;
 }
 
-/* אזהרה - כתום */
+/* אזהרה - רקע לבן עם מסגרת כתומה */
 .notification.warning {
   border-left: 4px solid #ff9800;
-  background: linear-gradient(135deg, rgba(255, 152, 0, 0.8) 0%, rgba(255, 111, 0, 0.8) 100%);
+  background: #ffffff;
   color: #333 !important;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #ff9800;
 }
 
 .notification.warning .notification-icon {
@@ -502,7 +507,7 @@
 }
 
 .notification.warning .notification-title {
-  color: #333 !important;
+  color: #ff9800 !important;
   font-weight: 600;
 }
 
@@ -510,11 +515,13 @@
   color: #555 !important;
 }
 
-/* מידע - כחול */
+/* מידע - רקע לבן עם מסגרת כחולה */
 .notification.info {
   border-left: 4px solid #2196F3;
-  background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(30, 136, 229, 0.1) 100%);
+  background: #ffffff;
   color: #333 !important;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #2196F3;
 }
 
 .notification.info .notification-icon {
@@ -522,7 +529,7 @@
 }
 
 .notification.info .notification-title {
-  color: #333 !important;
+  color: #2196F3 !important;
   font-weight: 600;
 }
 

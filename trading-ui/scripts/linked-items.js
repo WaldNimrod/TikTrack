@@ -179,8 +179,6 @@ function viewLinkedItems(itemId, itemType = null) {
     loadLinkedItemsData(itemId, itemType);
 }
 
-
-
 /**
  * Show linked items modal with data
  * 
@@ -1171,8 +1169,6 @@ function checkLinkedItems(itemId, itemType = null) {
  * @param {string|number} itemId - ID of the item
  */
 function exportLinkedItemsData(itemType, itemId) {
-    console.log('🔄 ייצוא נתוני פריטים מקושרים:', itemType, itemId);
-    
     try {
         // קבלת הנתונים מהשרת
         fetch(`/api/v1/linked-items/${itemType}/${itemId}`)

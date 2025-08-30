@@ -7,8 +7,7 @@
  * @param {Object} data - נתונים לעדכון
  */
 function editRecord(tableType, id, data) {
-  
-    
+
     // קריאה לפונקציה הספציפית של הטבלה
     const editFunction = window[`edit${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record`];
     if (typeof editFunction === 'function') {
@@ -24,8 +23,7 @@ function editRecord(tableType, id, data) {
  * @param {number} id - מזהה הרשומה
  */
 function deleteRecord(tableType, id) {
-  
-    
+
     // קריאה לפונקציה הספציפית של הטבלה
     const deleteFunction = window[`delete${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record`];
     if (typeof deleteFunction === 'function') {
@@ -41,8 +39,7 @@ function deleteRecord(tableType, id) {
  * @param {number} id - מזהה הרשומה
  */
 function cancelRecord(tableType, id) {
-  
-    
+
     // קריאה לפונקציה הספציפית של הטבלה
     const cancelFunction = window[`cancel${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record`];
     if (typeof cancelFunction === 'function') {

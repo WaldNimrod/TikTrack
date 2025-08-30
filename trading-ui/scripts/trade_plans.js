@@ -335,14 +335,37 @@ async function saveEditTradePlan() {
 
         if (isTickerChanging) {
             // הצגת הודעת אישור לשינוי טיקר
-            const confirmed = confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
-            if (!confirmed) {
-                return; // המשתמש ביטל את השינוי
-            }
-
-            // הצגת הודעה שהפיצ'ר בפיתוח
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('שינוי טיקר לתכנון נמצא בפיתוח. לא ניתן לבצע שינוי זה כרגע.', 'warning');
+            if (typeof window.showConfirmationDialog === 'function') {
+                window.showConfirmationDialog(
+                    'שינוי טיקר לתכנון',
+                    'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?\n\nפעולה זו תשנה את הטיקר המקורי של התכנון.',
+                    () => {
+                        // המשתמש אישר - הצגת הודעה שהפיצ'ר בפיתוח
+                        if (typeof window.showWarningNotification === 'function') {
+                            window.showWarningNotification(
+                                'פיצ\'ר בפיתוח',
+                                'שינוי טיקר לתכנון נמצא בפיתוח. לא ניתן לבצע שינוי זה כרגע.'
+                            );
+                        }
+                    },
+                    () => {
+                        // המשתמש ביטל - לא עושים כלום
+                        console.log('שינוי טיקר בוטל על ידי המשתמש');
+                    }
+                );
+            } else {
+                // Fallback למקרה שהפונקציה לא זמינה
+                const confirmed = confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
+                if (!confirmed) {
+                    return; // המשתמש ביטל את השינוי
+                }
+                
+                if (typeof window.showWarningNotification === 'function') {
+                    window.showWarningNotification(
+                        'פיצ\'ר בפיתוח',
+                        'שינוי טיקר לתכנון נמצא בפיתוח. לא ניתן לבצע שינוי זה כרגע.'
+                    );
+                }
             }
             return; // לא ממשיכים עם העדכון
         }
@@ -575,13 +598,118 @@ function openDeleteTradePlanModal(tradePlanId) {
     modal.show();
 }
 
+/**
+ * ביטול תכנון
+ */
+async function cancelTradePlan(tradePlanId) {
+    try {
+        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+        const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}/cancel`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                cancel_reason: 'תכנון בוטל על ידי המשתמש'
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText);
+        }
+
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'תכנון בוטל בהצלחה!');
+        }
+
+        await loadTradePlansData();
+    } catch (error) {
+        console.error('❌ Error canceling trade plan:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בביטול התכנון');
+        }
+    }
+}
+
+/**
+ * אישור ביטול תכנון
+ */
+function confirmCancelTradePlan() {
+    const modal = document.getElementById('cancelTradePlanModal');
+    const tradePlanId = modal.getAttribute('data-trade-plan-id');
+    
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'ביטול תכנון',
+            'האם אתה בטוח שברצונך לבטל תכנון זה?',
+            () => {
+                cancelTradePlan(tradePlanId);
+                bootstrap.Modal.getInstance(modal).hide();
+            },
+            () => {
+                console.log('ביטול תכנון בוטל על ידי המשתמש');
+            }
+        );
+    } else {
+        // Fallback למקרה שהפונקציה לא זמינה
+        const confirmed = confirm('האם אתה בטוח שברצונך לבטל תכנון זה?');
+        if (confirmed) {
+            cancelTradePlan(tradePlanId);
+            bootstrap.Modal.getInstance(modal).hide();
+        }
+    }
+}
+
+/**
+ * אישור מחיקת תכנון
+ */
+async function confirmDeleteTradePlan() {
+    const modal = document.getElementById('deleteTradePlanModal');
+    const tradePlanId = modal.getAttribute('data-trade-plan-id');
+
+    if (!tradePlanId) {
+        console.error('No trade plan ID found');
+        return;
+    }
+
+    try {
+        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+        const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // הצגת הודעת הצלחה
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification('הצלחה', 'תכנון נמחק בהצלחה!');
+        }
+
+        // סגירת המודל
+        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteTradePlanModal'));
+        deleteModal.hide();
+
+        // רענון הטבלה
+        await loadTradePlansData();
+
+    } catch (error) {
+        console.error('❌ Error deleting trade plan:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת התכנון');
+        }
+    }
+}
+
 // ייצוא פונקציות לגלובל
 window.openAddTradePlanModal = openAddTradePlanModal;
 window.openEditTradePlanModal = openEditTradePlanModal;
 window.openCancelTradePlanModal = openCancelTradePlanModal;
 window.openDeleteTradePlanModal = openDeleteTradePlanModal;
 window.saveEditTradePlan = saveEditTradePlan;
-    // window.confirmCancelTradePlan = confirmCancelTradePlan; // Function not defined
+window.confirmCancelTradePlan = confirmCancelTradePlan;
 window.confirmDeleteTradePlan = confirmDeleteTradePlan;
 window.checkLinkedItemsBeforeCancel = checkLinkedItemsBeforeCancel;
 window.cancelTradePlan = cancelTradePlan;
@@ -1428,7 +1556,7 @@ function showAddTradePlanModal() {
 async function saveNewTradePlan() {
     const form = document.getElementById('addTradePlanForm');
     if (!form) {
-        console.error('Form element not found');
+        console.warn('⚠️ Form element not found - skipping save operation');
         return;
     }
 
@@ -1720,6 +1848,8 @@ function editTradePlan(designId) {
         showErrorNotification('Error opening edit modal', 'Edit modal function not found');
     }
 }
+
+
 
 /**
  * מחיקת תכנון

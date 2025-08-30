@@ -237,8 +237,6 @@ function updateNoteRelationTypesCount(count) {
 async function loadTriggerButtonsData() {
     try {
         // כרגע אין API לכפתורי טריגרים - נשתמש בנתונים ריקים
-        console.log('ℹ️ API לכפתורי טריגרים לא זמין - משתמש בנתונים ריקים');
-        
         triggerButtonsData = [];
         window.triggerButtonsData = [];
         updateTriggerButtonsTable([]);
@@ -258,7 +256,6 @@ async function loadTriggerButtonsData() {
 // פונקציה לעדכון טבלת כפתורי טריגרים
 function updateTriggerButtonsTable(triggerButtons) {
     // כרגע לא צריך לעדכן טבלה כי השתמשנו בכרטיסים סטטיים
-    console.log('ℹ️ כרטיסי כפתורי טריגרים מוצגים סטטית - לא נדרש עדכון');
     return;
 }
 
@@ -346,10 +343,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ===== פונקציות וולידציה =====
-
-
-
-
 
 // ===== פונקציות CRUD למטבעות (Currencies) =====
 
@@ -647,8 +640,7 @@ async function saveCurrencyRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `מטבע ${currencyData.symbol} נוסף בהצלחה למערכת`);
             } else {
-                console.log('מטבע נוסף בהצלחה');
-            }
+                }
             bootstrap.Modal.getInstance(document.getElementById('addCurrencyModal')).hide();
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
@@ -719,8 +711,7 @@ async function updateCurrencyRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `מטבע ${currencyData.symbol} עודכן בהצלחה במערכת`);
             } else {
-                console.log('מטבע עודכן בהצלחה');
-            }
+                }
             bootstrap.Modal.getInstance(document.getElementById('editCurrencyModal')).hide();
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
@@ -773,8 +764,7 @@ async function confirmDeleteCurrencyRecord(id) {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `מטבע ${currencyInfo} נמחק בהצלחה מהמערכת`);
             } else {
-                console.log('מטבע נמחק בהצלחה');
-            }
+                }
             bootstrap.Modal.getInstance(document.getElementById('deleteCurrencyModal')).hide();
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
@@ -995,8 +985,7 @@ async function saveNoteRelationTypeRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeData.note_relation_type} נוסף בהצלחה למערכת`);
             } else {
-                console.log('סוג קישור נוסף בהצלחה');
-            }
+                }
             bootstrap.Modal.getInstance(document.getElementById('addNoteRelationTypeModal')).hide();
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
@@ -1051,8 +1040,7 @@ async function updateNoteRelationTypeRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeData.note_relation_type} עודכן בהצלחה במערכת`);
             } else {
-                console.log('סוג קישור עודכן בהצלחה');
-            }
+                }
             bootstrap.Modal.getInstance(document.getElementById('editNoteRelationTypeModal')).hide();
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
@@ -1089,8 +1077,7 @@ async function confirmDeleteNoteRelationTypeRecord(id) {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeInfo} נמחק בהצלחה מהמערכת`);
             } else {
-                console.log('סוג קישור נמחק בהצלחה');
-            }
+                }
             bootstrap.Modal.getInstance(document.getElementById('deleteNoteRelationTypeModal')).hide();
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
@@ -1358,8 +1345,7 @@ async function saveTriggerButtonRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonData.button_name} נוסף בהצלחה למערכת`);
             } else {
-                console.log('כפתור טריגר נוסף בהצלחה');
-            }
+                }
             bootstrap.Modal.getInstance(document.getElementById('addTriggerButtonModal')).hide();
             loadTriggerButtonsData(); // טעינה מחדש של הנתונים
         } else {
@@ -1417,8 +1403,7 @@ async function updateTriggerButtonRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonData.button_name} עודכן בהצלחה במערכת`);
             } else {
-                console.log('כפתור טריגר עודכן בהצלחה');
-            }
+                }
             bootstrap.Modal.getInstance(document.getElementById('editTriggerButtonModal')).hide();
             loadTriggerButtonsData(); // טעינה מחדש של הנתונים
         } else {
@@ -1455,8 +1440,7 @@ async function confirmDeleteTriggerButtonRecord(id) {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonInfo} נמחק בהצלחה מהמערכת`);
             } else {
-                console.log('כפתור טריגר נמחק בהצלחה');
-            }
+                }
             bootstrap.Modal.getInstance(document.getElementById('deleteTriggerButtonModal')).hide();
             loadTriggerButtonsData(); // טעינה מחדש של הנתונים
         } else {
@@ -1766,8 +1750,6 @@ function initializeRealTimeValidation() {
 
 // אתחול אוטומטי כשהדף נטען
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔄 Initializing db_extradata page...');
-    
     // שחזור מצב הסקשן העליון
     if (typeof window.restoreAllSectionStates === 'function') {
         window.restoreAllSectionStates();
@@ -1789,8 +1771,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('⚠️ Validation system not available');
     }
     
-    console.log('✅ דף טבלאות עזר אותחל בהצלחה');
-});
+    });
 
 // ========================================
 // Export Functions
@@ -1932,8 +1913,7 @@ function testTrigger(triggerId) {
     if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('בדיקה', `בדיקת טריגר ${triggerInfo.name} בוצעה בהצלחה`);
     } else {
-        console.log(`🧪 בדיקת טריגר ${triggerInfo.name} בוצעה בהצלחה`);
-    }
+        }
 }
 
 // פונקציה להפעלת טריגר
@@ -1949,8 +1929,7 @@ function activateTrigger(triggerId) {
     if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הפעלה', `טריגר ${triggerInfo.name} הופעל בהצלחה`);
     } else {
-        console.log(`⚡ טריגר ${triggerInfo.name} הופעל בהצלחה`);
-    }
+        }
 
     // עדכון הסטטוס בכרטיס
     const statusElement = document.querySelector(`[onclick*="${triggerId}"]`).closest('.trigger-button-card').querySelector('.trigger-status');

@@ -1,9 +1,9 @@
-// ===== קובץ JavaScript לדף בסיס נתונים =====
+// ===== קובץ JavaScript לדף נתונים נוספים =====
 /*
- * Database.js - Database Page Management
- * =====================================
+ * db-extradata.js - Database Extra Data Page Management
+ * ===================================================
  * 
- * This file contains all database page functionality for the TikTrack application.
+ * This file contains all database extra data page functionality for the TikTrack application.
  * It handles displaying all tables in one unified view with sorting and filtering.
  * 
  * Dependencies:
@@ -17,10 +17,397 @@
  * - Column mappings are centralized in table-mappings.js
  * - Sorting uses global window.sortTableData() function
  * 
- * File: trading-ui/scripts/database.js
- * Version: 2.3
+ * File: trading-ui/scripts/db-extradata.js
+ * Version: 2.4
  * Last Updated: August 28, 2025
  */
+
+// ===== GRID DATA MANAGEMENT =====
+// נתוני דוגמה סטנדרטיים
+const getDefaultRowData = () => [
+  { ticker: "AAPL", date: "2025-08-01", type: "סווינג", amount: "$25,000 (#100)", target: "$210 (12.3%)", stop: "$180 (-6.7%)", current: "$184.32 (+1.2%)", status: "פתוח", action: "⬅️", account: "חשבון ראשי" },
+  { ticker: "TSLA", date: "2025-07-30", type: "השקעה", amount: "$20,000 (#100)", target: "$780 (10.1%)", stop: "$690 (-4.8%)", current: "$688.90 (-2.1%)", status: "סגור", action: "⬅️", account: "חשבון משני" },
+  { ticker: "NVDA", date: "2025-07-28", type: "השקעה", amount: "$15,000 (#75)", target: "$540 (8.2%)", stop: "$480 (-4.5%)", current: "$503.20 (+0.5%)", status: "פתוח", action: "⬅️", account: "חשבון ראשי" },
+  { ticker: "AMZN", date: "2025-07-27", type: "פאסיבי", amount: "$10,000 (#50)", target: "$140 (6.3%)", stop: "$126 (-3.1%)", current: "$129.00 (-1.0%)", status: "מבוטל", action: "⬅️", account: "חשבון משני" },
+  { ticker: "GOOG", date: "2025-07-26", type: "השקעה", amount: "$20,000 (#60)", target: "$148 (9.0%)", stop: "$130 (-3.4%)", current: "$141.00 (+1.6%)", status: "פתוח", action: "⬅️", account: "חשבון ראשי" },
+  { ticker: "MSFT", date: "2025-07-25", type: "סווינג", amount: "$18,000 (#90)", target: "$355 (11.2%)", stop: "$320 (-4.2%)", current: "$342.00 (+2.4%)", status: "סגור", action: "⬅️", account: "חשבון משני" }
+];
+
+// פונקציה לטעינת נתונים מהשרת
+async function loadPlansFromServer() {
+  try {
+    console.log('Loading plans from server...');
+    
+    // כאן תהיה קריאה לשרת האמיתי
+    // const response = await fetch('/api/plans');
+    // const data = await response.json();
+    
+    // כרגע נחזיר נתוני דוגמה
+    const data = getDefaultRowData();
+    
+    console.log('Plans loaded from server:', data.length, 'items');
+    return data;
+  } catch (error) {
+    console.error('Error loading plans from server:', error);
+    // במקרה של שגיאה, נחזיר נתוני דוגמה
+    return getDefaultRowData();
+  }
+}
+
+// פונקציה לחילוץ סכום מהשדה amount
+function extractAmount(amountString) {
+  if (!amountString) return 0;
+  
+  // מחפש מספר אחרי הסימן $ ולפני הסימן (
+  const match = amountString.match(/\$([0-9,]+)/);
+  if (match) {
+    // מסיר פסיקים וממיר למספר
+    return parseFloat(match[1].replace(/,/g, ''));
+  }
+  
+  // אם לא מצאנו $, נחפש מספר רגיל
+  const numberMatch = amountString.match(/[\d,]+/);
+  if (numberMatch) {
+    return parseInt(numberMatch[0].replace(/,/g, ''));
+  }
+  
+  return 0;
+}
+
+// פונקציה לעדכון סטטיסטיקות
+function updateSummaryStats(data = null) {
+  console.log('=== updateSummaryStats called ===');
+  console.log('Input data:', data);
+  console.log('window.rowData:', window.rowData);
+  console.log('window.gridApi exists:', !!window.gridApi);
+  
+  let statsData;
+  
+  // אם לא הועברו נתונים, השתמש בנתונים המוצגים בגריד (כמו בדף התכנונים)
+  if (!data && window.gridApi) {
+    const displayedRows = [];
+    window.gridApi.forEachNodeAfterFilter(node => {
+      displayedRows.push(node.data);
+    });
+    statsData = displayedRows;
+    console.log('Using displayed rows from grid:', statsData);
+  } else if (!data) {
+    statsData = window.rowData || [];
+    console.log('Using window.rowData:', statsData);
+  } else {
+    statsData = data;
+    console.log('Using provided data:', statsData);
+  }
+  
+  console.log('Stats data to process:', statsData);
+  console.log('Stats data length:', statsData.length);
+  
+  if (statsData.length === 0) {
+    console.log('No data to calculate statistics');
+    // עדכון תצוגה עם אפסים
+    updateStatsDisplay({
+      totalRecords: 0,
+      totalAmount: 0,
+      averageAmount: 0
+    });
+    return;
+  }
+  
+  // חישוב סטטיסטיקות כלליות
+  const totalRecords = statsData.length;
+  let totalAmount = 0;
+  
+  // חישוב סכום כולל
+  statsData.forEach(record => {
+    try {
+      const amount = extractAmount(record.amount);
+      totalAmount += amount;
+    } catch (error) {
+      console.warn('Error extracting amount from record:', record, error);
+    }
+  });
+  
+  const averageAmount = totalRecords > 0 ? totalAmount / totalRecords : 0;
+  
+  // עדכון תצוגה
+  updateStatsDisplay({
+    totalRecords,
+    totalAmount,
+    averageAmount
+  });
+  
+  console.log('Statistics calculated:', {
+    totalRecords,
+    totalAmount,
+    averageAmount
+  });
+}
+
+// פונקציה לעדכון תצוגת הסטטיסטיקות
+function updateStatsDisplay(stats) {
+  const elements = {
+    'totalRecords': stats.totalRecords,
+    'totalAmount': formatCurrency(stats.totalAmount),
+    'averageAmount': formatCurrency(stats.averageAmount)
+  };
+  
+  Object.entries(elements).forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = value;
+    }
+  });
+}
+
+// פונקציה לעיצוב מטבע
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('he-IL', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+// ===== GRID CORE FUNCTIONS =====
+// משתנים גלובליים
+let externalFilterPresent = false;
+
+// פונקציית API כללית
+async function apiCall(endpoint, options = {}) {
+    const baseUrl = 'http://127.0.0.1:8080';
+    const url = `${baseUrl}${endpoint}`;
+    
+    // הגדרת headers
+    let headers = {};
+    
+    // אם יש FormData, לא שולח Content-Type
+    if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+    }
+    
+    // הוספת headers נוספים אם יש
+    if (options.headers) {
+        headers = { ...headers, ...options.headers };
+    }
+
+    const finalOptions = { 
+        ...options,
+        headers
+    };
+
+    try {
+        console.log('📡 שולח בקשה ל:', url);
+        console.log('📋 סוג body:', options.body instanceof FormData ? 'FormData' : 'JSON');
+        
+        const response = await fetch(url, finalOptions);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            console.error('❌ שגיאה בתגובה:', response.status, data);
+            throw new Error(data.error?.message || data.message || `HTTP ${response.status}`);
+        }
+        
+        console.log('✅ תגובה מוצלחת:', data);
+        return data;
+    } catch (error) {
+        console.error(`❌ שגיאת API (${endpoint}):`, error);
+        throw error;
+    }
+}
+
+// הגדרת עמודות הגריד הסטנדרטיות
+const getDefaultColumnDefs = () => [
+  { 
+    headerName: "המרה", 
+    field: "action", 
+    width: 60,
+    minWidth: 50,
+    maxWidth: 80,
+    cellRenderer: params => `<span style="cursor: pointer; font-size: 1.2rem;">${params.value}</span>`
+  },
+  { 
+    headerName: "סטטוס", 
+    field: "status", 
+    width: 80,
+    minWidth: 70,
+    maxWidth: 100, 
+    cellClass: params => `badge-status ${params.value}`,
+    filter: true,
+    filterParams: {
+      filterOptions: ['equals', 'notEqual'],
+      defaultOption: 'equals'
+    }
+  },
+  { 
+    headerName: "נוכחי", 
+    field: "current", 
+    width: 120,
+    minWidth: 100,
+    maxWidth: 150, 
+    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+  },
+  { 
+    headerName: "סטופ", 
+    field: "stop", 
+    width: 120,
+    minWidth: 100,
+    maxWidth: 150, 
+    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+  },
+  { 
+    headerName: "יעד", 
+    field: "target", 
+    width: 120,
+    minWidth: 100,
+    maxWidth: 150, 
+    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
+  },
+  { 
+    headerName: "סכום/כמות", 
+    field: "amount", 
+    width: 140,
+    minWidth: 120,
+    maxWidth: 160
+  },
+  { 
+    headerName: "סוג", 
+    field: "type", 
+    width: 100,
+    minWidth: 80,
+    maxWidth: 120,
+    filter: true,
+    filterParams: {
+      filterOptions: ['equals', 'notEqual'],
+      defaultOption: 'equals'
+    }
+  },
+  { 
+    headerName: "תאריך", 
+    field: "date", 
+    width: 100,
+    minWidth: 80,
+    maxWidth: 120,
+    filter: true,
+    filterParams: {
+      filterOptions: ['equals', 'notEqual', 'greaterThan', 'lessThan'],
+      defaultOption: 'equals'
+    }
+  },
+  { 
+    headerName: "טיקר", 
+    field: "ticker", 
+    width: 80,
+    minWidth: 60,
+    maxWidth: 100,
+    filter: true,
+    filterParams: {
+      filterOptions: ['equals', 'notEqual', 'contains'],
+      defaultOption: 'equals'
+    }
+  },
+  { 
+    headerName: "חשבון", 
+    field: "account", 
+    width: 120,
+    minWidth: 100,
+    maxWidth: 140,
+    filter: true,
+    filterParams: {
+      filterOptions: ['equals', 'notEqual'],
+      defaultOption: 'equals'
+    }
+  }
+];
+
+// פונקציה ליצירת גריד
+function createGrid(containerId, columnDefs = null, rowData = null) {
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.error(`Container ${containerId} not found`);
+    return null;
+  }
+
+  const gridOptions = {
+    columnDefs: columnDefs || getDefaultColumnDefs(),
+    rowData: rowData || getDefaultRowData(),
+    defaultColDef: {
+      sortable: true,
+      filter: true,
+      resizable: true,
+      minWidth: 50
+    },
+    pagination: true,
+    paginationPageSize: 20,
+    domLayout: 'autoHeight',
+    suppressRowClickSelection: true,
+    enableRangeSelection: true,
+    enableFillHandle: true,
+    animateRows: true,
+    onGridReady: (params) => {
+      console.log('Grid ready:', containerId);
+      window.gridApi = params.api;
+      window.columnApi = params.columnApi;
+      
+      // עדכון סטטיסטיקות
+      updateSummaryStats();
+    },
+    onFilterChanged: (params) => {
+      console.log('Filter changed');
+      updateSummaryStats();
+    },
+    onSortChanged: (params) => {
+      console.log('Sort changed');
+    }
+  };
+
+  new agGrid.Grid(container, gridOptions);
+  return gridOptions;
+}
+
+// פונקציה לעדכון נתונים בגריד
+function updateGridData(newData) {
+  if (window.gridApi) {
+    window.gridApi.setRowData(newData);
+    updateSummaryStats(newData);
+  }
+}
+
+// פונקציה לייצוא נתונים
+function exportGridData(format = 'csv') {
+  if (!window.gridApi) {
+    console.error('Grid API not available');
+    return;
+  }
+
+  try {
+    let result;
+    switch (format.toLowerCase()) {
+      case 'csv':
+        result = window.gridApi.getDataAsCsv();
+        break;
+      case 'excel':
+        result = window.gridApi.getDataAsExcel();
+        break;
+      default:
+        console.error('Unsupported export format:', format);
+        return;
+    }
+
+    // יצירת קובץ להורדה
+    const blob = new Blob([result], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `grid_data_${new Date().toISOString().split('T')[0]}.${format}`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    console.log(`Data exported as ${format}`);
+  } catch (error) {
+    console.error('Export error:', error);
+  }
+}
 
 // משתנים גלובליים
 let allData = {
@@ -101,7 +488,7 @@ function toggleTopSection() {
   if (topIcon) {
     topIcon.textContent = shouldCollapse ? '▼' : '▲';
   }
-  localStorage.setItem('dbDisplayTopSectionCollapsed', shouldCollapse);
+  localStorage.setItem('dbExtradataTopSectionCollapsed', shouldCollapse);
   
   // סגירה/פתיחה של כל content-sections
   contentSections.forEach(section => {
@@ -113,7 +500,7 @@ function toggleTopSection() {
     if (sectionIcon) {
       sectionIcon.textContent = shouldCollapse ? '▼' : '▲';
     }
-    localStorage.setItem(`dbDisplaySectionHidden_${sectionTitle}`, shouldCollapse);
+    localStorage.setItem(`dbExtradataSectionHidden_${sectionTitle}`, shouldCollapse);
   });
   
   console.log('✅ toggleTopSection הושלם - כל הסקשנים:', shouldCollapse ? 'סגורים' : 'פתוחים');
@@ -150,7 +537,7 @@ function toggleMainSection() {
   }
   
   // שמירת מצב
-  localStorage.setItem(`dbDisplaySectionHidden_${sectionTitle}`, !isCollapsed);
+  localStorage.setItem(`dbExtradataSectionHidden_${sectionTitle}`, !isCollapsed);
   
   console.log('✅ toggleMainSection הושלם - סקשן:', sectionTitle, isCollapsed ? 'נפתח' : 'נסגר');
 }
@@ -160,7 +547,7 @@ function restoreDatabaseSectionState() {
   console.log('🔧 restoreDatabaseSectionState - שחזור מצב הסקשנים');
   
   // שחזור top section
-  const topSectionHidden = localStorage.getItem('dbDisplayTopSectionCollapsed') === 'true';
+  const topSectionHidden = localStorage.getItem('dbExtradataTopSectionCollapsed') === 'true';
   const topSection = document.querySelector('.top-section .section-body');
   const topToggleBtn = document.querySelector('.top-section button[onclick="toggleTopSection()"]');
   const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
@@ -175,7 +562,7 @@ function restoreDatabaseSectionState() {
   contentSections.forEach(section => {
     const sectionTitle = section.querySelector('.table-title')?.textContent.trim();
     if (sectionTitle) {
-      const isHidden = localStorage.getItem(`dbDisplaySectionHidden_${sectionTitle}`) === 'true';
+      const isHidden = localStorage.getItem(`dbExtradataSectionHidden_${sectionTitle}`) === 'true';
       const sectionBody = section.querySelector('.section-body');
       const toggleBtn = section.querySelector('button[onclick="toggleMainSection()"]');
       const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
@@ -428,7 +815,7 @@ function addRecord() {
 
 // אתחול העמוד
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🔄 אתחול עמוד בסיס נתונים...');
+  console.log('🔄 אתחול עמוד נתונים נוספים...');
   
   // בדיקת זמינות פונקציות גלובליות
   console.log('🔍 בדיקת זמינות פונקציות:');
@@ -446,4 +833,26 @@ document.addEventListener('DOMContentLoaded', function() {
   loadAllDatabaseData();
 });
 
+// ייצוא פונקציות גלובליות
+window.loadPlansFromServer = loadPlansFromServer;
+window.extractAmount = extractAmount;
+window.updateSummaryStats = updateSummaryStats;
+window.updateStatsDisplay = updateStatsDisplay;
+window.formatCurrency = formatCurrency;
+window.apiCall = apiCall;
+window.getDefaultColumnDefs = getDefaultColumnDefs;
+window.createGrid = createGrid;
+window.updateGridData = updateGridData;
+window.exportGridData = exportGridData;
+window.toggleTopSection = toggleTopSection;
+window.toggleMainSection = toggleMainSection;
+window.restoreDatabaseSectionState = restoreDatabaseSectionState;
+window.loadAllDatabaseData = loadAllDatabaseData;
+window.updateSummaryStats = updateSummaryStats;
+window.updateAllTables = updateAllTables;
+window.updateTable = updateTable;
+window.editRecord = editRecord;
+window.deleteRecord = deleteRecord;
+window.cancelRecord = cancelRecord;
+window.addRecord = addRecord;
 

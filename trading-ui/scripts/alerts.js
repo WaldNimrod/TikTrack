@@ -479,7 +479,6 @@ function updateAlertsTable(alerts) {
       return `
         <tr data-status="${alert.status || ''}" data-date="${alert.created_at || ''}">
           <td class="ticker-cell">
-            <span class="link-icon" title="חיבור לעמוד טרייד - בפיתוח" style="cursor: pointer; margin-left: 5px;">🔗</span>
             <span class="symbol-text">${symbolDisplay}</span>
           </td>
           <td><span class="condition-text">${(() => {
@@ -490,37 +489,24 @@ function updateAlertsTable(alerts) {
         })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
-          <td style="padding: 0;">
-            <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer;" title="קישור לדף אובייקט - בפיתוח">
+          <td>
+            <div class="related-object-cell ${relatedClass}" style="cursor: pointer;" title="קישור לדף אובייקט - בפיתוח">
               ${relatedDisplay}
             </div>
           </td>
-
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
-            <table class="table table-sm table-borderless mb-0">
-              <tbody>
-                <tr>
-                  <td class="p-0 pe-1">
-                    <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">🔗</button>
-                  </td>
-                  <td class="p-0 pe-1">
-                    <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
-                  </td>
-                  <td class="p-0 pe-1">
-                    ${alert.status === 'cancelled' || alert.status === 'canceled' ? `
-                    <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה מבוטלת">X</button>
-                    ` : `
-                    <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול"><span class="cancel-icon">X</span></button>
-                    `}
-                  </td>
-                  <td class="p-0">
-                    <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
+              <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים" style="padding: 2px 6px; font-size: 0.8em;">🔗</button>
+              <button class="btn btn-sm btn-secondary" onclick="editAlert(${alert.id})" title="ערוך" style="padding: 2px 6px; font-size: 0.8em;">✏️</button>
+              ${alert.status === 'cancelled' || alert.status === 'canceled' ? `
+              <button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל התראה מבוטלת" style="padding: 2px 6px; font-size: 0.8em;">X</button>
+              ` : `
+              <button class="btn btn-sm btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול" style="padding: 2px 6px; font-size: 0.8em;"><span class="cancel-icon">X</span></button>
+              `}
+              <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})" title="מחק" style="padding: 2px 6px; font-size: 0.8em;">🗑️</button>
+            </div>
           </td>
         </tr>
       `;

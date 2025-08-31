@@ -319,7 +319,7 @@ async function loadAccountsData() {
       return accounts;
     }
   } catch (error) {
-    console.error('❌ שגיאה בטעינת נתוני חשבונות:', error);
+    handleDataLoadError(error, 'טעינת נתוני חשבונות');
     throw error;
   }
 }
@@ -340,7 +340,7 @@ function updateAccountsTable(accounts) {
 
   // בדיקה שהפרמטר תקין
   if (!accounts || !Array.isArray(accounts)) {
-    console.error('❌ Invalid accounts parameter:', accounts);
+    handleValidationError('updateAccountsTable', 'פרמטר חשבונות לא תקין');
     return;
   }
 
@@ -348,7 +348,7 @@ function updateAccountsTable(accounts) {
 
   const tbody = document.querySelector('#accountsTable tbody');
   if (!tbody) {
-    console.error('❌ לא נמצא tbody לטבלת חשבונות');
+    handleElementNotFound('updateAccountsTable', 'לא נמצא tbody לטבלת חשבונות');
     throw new Error('טבלת החשבונות לא נמצאה בדף');
   }
 
@@ -414,7 +414,7 @@ async function loadAccounts() {
     }
 
   } catch (error) {
-    console.error('❌ שגיאה בטעינת חשבונות:', error);
+    handleDataLoadError(error, 'טעינת חשבונות');
     const tbody = document.querySelector('.content-section:nth-child(2) tbody');
     if (tbody) {
       tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">שגיאה בטעינת חשבונות: ${error.message}</td></tr>`;
@@ -676,7 +676,7 @@ function showAddAccountModal() {
       modal.show();
       console.log('🔄 Existing modal shown');
     } catch (error) {
-      console.error('❌ Error showing existing modal:', error);
+      handleSystemError(error, 'הצגת מודל קיים');
     }
   } else {
     console.log('🔄 Creating new modal dynamically');
@@ -697,7 +697,7 @@ function showAddAccountModal() {
         console.log('🔄 Validation initialized');
       }
     } catch (error) {
-      console.error('❌ Error creating/showing new modal:', error);
+      handleSystemError(error, 'יצירת/הצגת מודל חדש');
     }
   }
   console.log('🔄 === showAddAccountModal COMPLETED ===');
@@ -963,7 +963,7 @@ function showFormError(message) {
   if (typeof window.showErrorNotification === 'function') {
     window.showErrorNotification('שגיאה', message);
   } else {
-    console.error('שגיאה:', message);
+    handleSystemError(new Error(message), 'שגיאת טופס');
   }
 }
 
@@ -1036,7 +1036,7 @@ async function saveAccount(mode, accountId = null) {
       }
 
     } catch (refreshError) {
-      console.error('❌ שגיאה ברענון הטבלה:', refreshError);
+      handleSystemError(refreshError, 'רענון הטבלה');
       // אם יש שגיאה ברענון, לא סוגרים את המודל ומציגים הודעת שגיאה
       if (typeof window.showWarningNotification === 'function') {
         window.showWarningNotification('אזהרה', 'החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
@@ -1046,11 +1046,11 @@ async function saveAccount(mode, accountId = null) {
     }
 
   } catch (error) {
-    console.error('❌ שגיאה בשמירת חשבון:', error);
+    handleSaveError(error, 'שמירת חשבון');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בשמירת החשבון');
       } else {
-      console.error('שגיאה בשמירת החשבון');
+      handleSystemError(new Error('שגיאה בשמירת החשבון'), 'שמירת חשבון');
     }
   }
 }
@@ -1081,7 +1081,7 @@ async function addAccountToAPI(accountData) {
     return result;
 
   } catch (error) {
-    console.error('❌ שגיאה בהוספת חשבון:', error);
+    handleSaveError(error, 'הוספת חשבון');
     throw error;
   }
 }
@@ -1113,7 +1113,7 @@ async function updateAccountInAPI(accountId, accountData) {
     return result;
 
   } catch (error) {
-    console.error('❌ שגיאה בעדכון חשבון:', error);
+    handleSaveError(error, 'עדכון חשבון');
     throw error;
   }
 }
@@ -1131,11 +1131,11 @@ async function showEditAccountModalById(accountId) {
 
   // בדיקה שהפרמטר תקין
   if (!accountId) {
-    console.error('❌ Invalid account ID:', accountId);
+    handleValidationError('showEditAccountModalById', 'מזהה חשבון לא תקין');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'מזהה חשבון לא תקין');
       } else {
-      console.error('מזהה חשבון לא תקין');
+      handleValidationError('showEditAccountModalById', 'מזהה חשבון לא תקין');
     }
     return;
   }
@@ -1164,11 +1164,11 @@ async function showEditAccountModalById(accountId) {
     showEditAccountModal(account);
 
   } catch (error) {
-    console.error('❌ Error loading account data:', error);
+    handleDataLoadError(error, 'טעינת נתוני חשבון');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני החשבון: ' + error.message);
       } else {
-      console.error('שגיאה בטעינת נתוני החשבון:', error.message);
+      handleDataLoadError(error, 'טעינת נתוני החשבון');
     }
   }
 }
@@ -1178,11 +1178,11 @@ function showEditAccountModal(account) {
 
   // בדיקה שהפרמטר תקין
   if (!account || typeof account !== 'object') {
-    console.error('❌ Invalid account parameter:', account);
+    handleValidationError('showEditAccountModal', 'פרמטר חשבון לא תקין');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל העריכה');
       } else {
-      console.error('שגיאה בפתיחת מודל העריכה');
+      handleSystemError(new Error('שגיאה בפתיחת מודל העריכה'), 'פתיחת מודל עריכה');
     }
     return;
   }
@@ -1262,7 +1262,7 @@ async function createAccount() {
       showErrorMessage(data.message || 'שגיאה ביצירת חשבון');
     }
   } catch (error) {
-    console.error('שגיאה ביצירת חשבון:', error);
+    handleSaveError(error, 'יצירת חשבון');
     showErrorMessage('שגיאה ביצירת חשבון');
   }
 }
@@ -1326,7 +1326,7 @@ async function updateAccountFromModal() {
       showErrorMessage(data.message || 'שגיאה בעדכון חשבון');
     }
   } catch (error) {
-    console.error('שגיאה בעדכון חשבון:', error);
+    handleSaveError(error, 'עדכון חשבון');
     showErrorMessage('שגיאה בעדכון חשבון');
   }
 }
@@ -1355,12 +1355,12 @@ async function loadAccountsDataFromAPI() {
       console.log('🔄 מערך ישיר נמצא:', result.length, 'חשבונות');
       return result;
     } else {
-      console.error('❌ מבנה נתונים לא צפוי:', result);
+      handleSystemError(new Error('מבנה נתונים לא צפוי'), 'מבנה נתונים לא צפוי מה-API');
       throw new Error('מבנה נתונים לא צפוי מה-API');
     }
 
   } catch (error) {
-    console.error('❌ שגיאה בקריאה ל-API:', error);
+    handleApiError('שגיאה בקריאה ל-API', error.message);
     throw error;
   }
 }
@@ -1393,7 +1393,7 @@ async function deleteAccountFromAPI(accountId, accountName) {
       showErrorMessage(data.message || 'שגיאה במחיקת חשבון');
     }
   } catch (error) {
-    console.error('❌ שגיאה במחיקת חשבון:', error);
+    handleDeleteError(error, 'מחיקת חשבון');
     showErrorMessage('שגיאה במחיקת החשבון');
   }
 }
@@ -1520,7 +1520,7 @@ async function cancelAccount(accountId, accountName) {
       showErrorMessage(data.message || 'שגיאה בביטול חשבון');
     }
   } catch (error) {
-    console.error('שגיאה בביטול חשבון:', error);
+    handleSystemError(error, 'ביטול חשבון');
     showErrorMessage('שגיאה בביטול חשבון');
   }
 }
@@ -1609,7 +1609,7 @@ async function deleteAccount(accountId, accountName) {
       showErrorMessage(data.message || 'שגיאה במחיקת חשבון');
     }
   } catch (error) {
-    console.error('שגיאה במחיקת חשבון:', error);
+    handleDeleteError(error, 'מחיקת חשבון');
     showErrorMessage('שגיאה במחיקת חשבון');
   }
 }
@@ -1647,7 +1647,7 @@ async function checkLinkedItemsBeforeDelete(accountId) {
 
         return false;
     } catch (error) {
-        console.error('שגיאה בבדיקת פריטים מקושרים:', error);
+        handleSystemError(error, 'בדיקת פריטים מקושרים');
         return false;
     }
 }
@@ -1674,7 +1674,7 @@ function showErrorMessage(message) {
   if (typeof window.showErrorNotification === 'function') {
     window.showErrorNotification('שגיאה', message);
   } else {
-    console.error('שגיאה:', message);
+    handleSystemError(new Error(message), 'שגיאת הודעה');
   }
 }
 
@@ -1808,7 +1808,7 @@ if (window.location.pathname.includes('/accounts')) {
     if (typeof window.loadAccountsDataForAccountsPage === 'function') {
       window.loadAccountsDataForAccountsPage();
     } else {
-      console.error('❌ loadAccountsDataForAccountsPage function not found');
+      handleFunctionNotFound('loadAccountsDataForAccountsPage', 'פונקציית טעינת נתוני חשבונות לא נמצאה');
     }
   };
 }
@@ -1835,7 +1835,7 @@ async function loadAccountsDataForAccountsPage() {
 
     // בדיקה שהנתונים תקינים
     if (!accounts || !Array.isArray(accounts)) {
-      console.error('❌ Invalid accounts data received:', accounts);
+      handleValidationError('loadAccountsDataForAccountsPage', 'נתונים לא תקינים התקבלו מהשרת');
       throw new Error('נתונים לא תקינים התקבלו מהשרת');
     }
 
@@ -1888,20 +1888,20 @@ async function loadAccountsDataForAccountsPage() {
       // בדיקה שהטבלה התעדכנה כראוי
       const tbody = document.querySelector('#accountsTable tbody');
       if (tbody && tbody.children.length === 0) {
-        console.error('❌ Table was not updated properly - no rows found');
+        handleSystemError(new Error('הטבלה לא התעדכנה כראוי'), 'עדכון טבלה');
         throw new Error('הטבלה לא התעדכנה כראוי');
       }
 
       console.log('✅ Table updated successfully with', tbody ? tbody.children.length : 0, 'rows');
     } else {
-      console.error('❌ updateAccountsTable function not found');
+      handleFunctionNotFound('updateAccountsTable', 'פונקציית עדכון הטבלה לא נמצאה');
       throw new Error('פונקציית עדכון הטבלה לא נמצאה');
     }
 
     console.log('✅ Accounts page data loaded and table updated successfully');
 
   } catch (error) {
-    console.error('❌ Error loading accounts data for accounts page:', error);
+    handleDataLoadError(error, 'טעינת נתוני חשבונות לדף החשבונות');
 
     // הצגת הודעת שגיאה בטבלה
     const tbody = document.querySelector('#accountsTable tbody');
@@ -2163,14 +2163,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof window.loadAccountsDataForAccountsPage === 'function') {
       window.loadAccountsDataForAccountsPage();
     } else {
-      console.error('❌ loadAccountsDataForAccountsPage function not found');
+      handleFunctionNotFound('loadAccountsDataForAccountsPage', 'פונקציית טעינת נתוני חשבונות לא נמצאה');
     }
 
     // שחזור מצב הסקשנים
     if (typeof window.restoreAccountsSectionState === 'function') {
       window.restoreAccountsSectionState();
     } else {
-      console.error('❌ restoreAccountsSectionState function not found');
+      handleFunctionNotFound('restoreAccountsSectionState', 'פונקציית שחזור מצב סקשנים לא נמצאה');
     }
   }
 

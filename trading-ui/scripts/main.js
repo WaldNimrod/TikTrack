@@ -909,10 +909,10 @@ function getTableType(pageName) {
  */
 function filterDataByFilters(data, pageName) {
       // === FILTER DATA BY FILTERS ===
-  console.log('🔄 Original data length:', data.length);
+      // Original data length
 
   if (!data || data.length === 0) {
-    console.log('🔄 No data to filter');
+    // No data to filter
     return [];
   }
 

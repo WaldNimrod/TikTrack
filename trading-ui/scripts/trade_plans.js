@@ -1295,18 +1295,18 @@ function updateTradePlansTable(trade_plans) {
             return false;
         })();
 
-        console.log('🔄 Has active filters:', hasActiveFilters);
+        // Has active filters check
 
         if (hasOriginalData && hasActiveFilters) {
             // There is data but the filter didn't find results
-            console.log('🔄 Showing "no results" message due to filters');
+            // Showing "no results" message due to filters
             tbody.innerHTML = `<tr><td colspan="10" class="text-center text-info">
                 <i class="fas fa-search"></i> לא נמצאו תוצאות
                 <br><small>נסה לשנות את הפילטרים או מונח החיפוש</small>
             </td></tr>`;
         } else {
             // No data at all
-            console.log('🔄 Showing "no data" message');
+            // Showing "no data" message
             tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted">
                 <i class="fas fa-info-circle"></i> אין תכנונים להצגה
                 <br><small>לא נמצאו תכנונים במערכת</small>

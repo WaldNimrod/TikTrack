@@ -3755,9 +3755,189 @@ window.applyFilterToTable = applyFilterToTable;
 window.findFilterCell = findFilterCell;
 window.searchInAllColumns = searchInAllColumns;
 window.showAllRecordsInTable = showAllRecordsInTable;
-window.getFilterConfig = getFilterConfig;
-window.getAllVisibleContainers = getAllVisibleContainers;
+window.getAllVisibleContainers = getVisibleContainers;
 window.isDateInRange = isDateInRange;
+
+/**
+ * Get filter configuration for different filter types
+ */
+function getFilterConfig(filterType) {
+  const configs = {
+    'status': {
+      columnName: 'Status',
+      containerIdKeywords: ['status', 'Status'],
+      knownContainers: ['tradesContainer', 'tradePlansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
+      cellValues: ['Open', 'Closed', 'Cancelled'],
+      dataField: 'status'
+    },
+    'type': {
+      columnName: 'Investment Type',
+      containerIdKeywords: ['type', 'Type', 'investment'],
+      knownContainers: ['tradesContainer', 'tradePlansContainer'],
+      cellValues: ['Investment', 'Swing', 'Passive'],
+      dataField: 'investment-type'
+    },
+    'account': {
+      columnName: 'Account',
+      containerIdKeywords: ['account', 'Account'],
+      knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'cashFlowsContainer'],
+      cellValues: [], // Dynamic from server (only active accounts)
+      dataField: 'account'
+    },
+    'date': {
+      columnName: 'Date',
+      containerIdKeywords: ['date', 'Date'],
+      knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'cashFlowsContainer', 'notesContainer'],
+      cellValues: [], // Dates are dynamic
+      dataField: 'created-at',
+      isFirstOccurrence: true
+    },
+    'search': {
+      columnName: 'search',
+      containerIdKeywords: ['search', 'search'],
+      knownContainers: ['tradesContainer', 'tradePlansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
+      cellValues: [],
+      dataField: 'search',
+      searchAllColumns: true,
+      excludeColumns: ['Actions']
+    }
+  };
+  return configs[filterType];
+}
+
+window.getFilterConfig = getFilterConfig;
+
+/**
+ * Universal filter function that works on all tables
+ */
+function applyTableFilter(filterType, selectedValues) {
+  console.log(`🔄 applyTableFilter called with:`, { filterType, selectedValues });
+  
+  // Get filter configuration
+  const filterConfig = getFilterConfig(filterType);
+  if (!filterConfig) {
+    console.warn(`⚠️ No filter config found for type: ${filterType}`);
+    return;
+  }
+  
+  // Get all visible containers
+  const visibleContainers = getVisibleContainers();
+  console.log('🔍 Visible containers:', visibleContainers);
+  
+  // Apply filter to each relevant table
+  for (const containerId of visibleContainers) {
+    if (checkIfTableHasColumn(containerId, filterConfig)) {
+      applyFilterToTable(containerId, filterConfig, selectedValues);
+    } else {
+      showAllRecordsInTable(containerId);
+    }
+  }
+}
+
+window.applyTableFilter = applyTableFilter;
+
+/**
+ * Check if a table has the specified column
+ */
+function checkIfTableHasColumn(containerId, filterConfig) {
+  const container = document.getElementById(containerId);
+  if (!container) return false;
+  
+  const table = container.querySelector('table');
+  if (!table) return false;
+  
+  const headers = table.querySelectorAll('th');
+  const columnName = filterConfig.columnName;
+  
+  for (const header of headers) {
+    const headerText = header.textContent.trim();
+    if (headerText.includes(columnName)) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+window.checkIfTableHasColumn = checkIfTableHasColumn;
+
+/**
+ * Apply filter to a specific table
+ */
+function applyFilterToTable(containerId, filterConfig, selectedValues) {
+  console.log(`🔄 applyFilterToTable called with:`, { containerId, filterConfig, selectedValues });
+  
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  const table = container.querySelector('table');
+  if (!table) return;
+  
+  const rows = table.querySelectorAll('tbody tr');
+  let visibleCount = 0;
+  
+  for (const row of rows) {
+    const shouldShow = checkRowFilterWithConfig(row, filterConfig, selectedValues);
+    row.style.display = shouldShow ? '' : 'none';
+    if (shouldShow) visibleCount++;
+  }
+  
+  console.log(`✅ Filter applied to ${containerId}: ${visibleCount}/${rows.length} rows visible`);
+}
+
+/**
+ * Check if a row should be shown based on filter configuration
+ */
+function checkRowFilterWithConfig(row, filterConfig, selectedValues) {
+  // Show all if no filter values
+  if (!selectedValues || selectedValues.length === 0) {
+    return true;
+  }
+  
+  // Special case for search
+  if (filterConfig.searchAllColumns) {
+    return checkSearchFilter(row, selectedValues[0]);
+  }
+  
+  // Get column index for this filter type
+  const columnIndex = getColumnIndexByConfig(row, filterConfig);
+  if (columnIndex === -1) return true; // Show if column not found
+  
+  // Get cell value
+  const cell = row.cells[columnIndex];
+  if (!cell) return true;
+  
+  const cellValue = cell.textContent.trim();
+  
+  // Apply filter logic
+  if (filterConfig.columnName === 'Date') {
+    return checkDateFilter(cellValue, selectedValues[0]);
+  } else {
+    return selectedValues.includes(cellValue);
+  }
+}
+
+/**
+ * Get column index by filter configuration
+ */
+function getColumnIndexByConfig(row, filterConfig) {
+  const table = row.closest('table');
+  if (!table) return -1;
+  
+  const headers = table.querySelectorAll('th');
+  const columnName = filterConfig.columnName;
+  
+  for (let i = 0; i < headers.length; i++) {
+    const headerText = headers[i].textContent.trim();
+    if (headerText.includes(columnName)) {
+      return i;
+    }
+  }
+  
+  return -1;
+}
+
+window.applyFilterToTable = applyFilterToTable;
 
 /**
  * פילטר התראות לפי טיפוס (לשמירה על תאימות לאחור)

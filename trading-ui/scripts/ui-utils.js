@@ -113,7 +113,7 @@ function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') 
 function updatePricesFromPercentages(formId, currentPrice) {
     const form = document.getElementById(formId);
     if (!form) {
-        console.error('Form not found:', formId);
+        handleElementNotFound('updatePricesFromPercentages', `Form not found: ${formId}`);
         return;
     }
     
@@ -125,7 +125,7 @@ function updatePricesFromPercentages(formId, currentPrice) {
     
     if (!sideElement || !stopPercentageElement || !targetPercentageElement || 
         !stopPriceElement || !targetPriceElement) {
-        console.error('Required form elements not found');
+        handleElementNotFound('updatePricesFromPercentages', 'Required form elements not found');
         return;
     }
     
@@ -159,7 +159,7 @@ function updatePricesFromPercentages(formId, currentPrice) {
 function updatePercentagesFromPrices(formId, currentPrice) {
     const form = document.getElementById(formId);
     if (!form) {
-        console.error('Form not found:', formId);
+        handleElementNotFound('updatePercentagesFromPrices', `Form not found: ${formId}`);
         return;
     }
     
@@ -171,7 +171,7 @@ function updatePercentagesFromPrices(formId, currentPrice) {
     
     if (!sideElement || !stopPriceElement || !targetPriceElement || 
         !stopPercentageElement || !targetPercentageElement) {
-        console.error('Required form elements not found');
+        handleElementNotFound('updatePercentagesFromPrices', 'Required form elements not found');
         return;
     }
     
@@ -251,7 +251,7 @@ function showModalNotification(type, title, message, modalId = 'notificationModa
 
     const modal = document.getElementById(modalId);
     if (!modal) {
-        console.error(`❌ Modal ${modalId} not found`);
+        handleElementNotFound('showNotificationModal', `Modal ${modalId} not found`);
         return;
     }
 
@@ -284,7 +284,7 @@ function showModalNotification(type, title, message, modalId = 'notificationModa
 function showModal(modalId, options = {}) {
     const modal = document.getElementById(modalId);
     if (!modal) {
-        console.error(`❌ Modal ${modalId} not found`);
+        handleElementNotFound('showModal', `Modal ${modalId} not found`);
         return;
     }
 
@@ -311,7 +311,7 @@ function showSecondConfirmation(title, message, onConfirm) {
 
     const modal = document.getElementById('secondConfirmationModal');
     if (!modal) {
-        console.error('❌ Second confirmation modal not found');
+        handleElementNotFound('showSecondConfirmation', 'Second confirmation modal not found');
         return;
     }
 
@@ -833,7 +833,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
                 if (typeof window.showLinkedItemsModal === 'function') {
                     window.showLinkedItemsModal(allEntities, itemType, itemId);
                 } else {
-                    console.error('❌ showLinkedItemsModal function not found');
+                    handleFunctionNotFound('showLinkedItemsModal', 'פונקציית הצגת פריטים מקושרים לא נמצאה');
                     if (window.showErrorNotification) {
                         window.showErrorNotification(`שגיאה בביטול`, `לא ניתן לבטל ${getItemTypeDisplayName(itemType)} זה - יש פריטים מקושרים אליו`);
                     }
@@ -1002,7 +1002,7 @@ async function performItemCancellation(itemType, itemId, itemName) {
         }
 
     } catch (error) {
-        console.error(`❌ Error cancelling ${itemType} ${itemId}:`, error);
+        handleApiError(error, `cancelling ${itemType} ${itemId}`);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification(`שגיאה בביטול ${getItemTypeDisplayName(itemType)}`, error.message);
         } else if (typeof window.showNotification === 'function') {
@@ -1493,7 +1493,7 @@ function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel =
         throw new Error(`Unsupported warning type: ${type}`);
 
     } catch (error) {
-        console.error('Error showing warning:', error);
+        handleSystemError(error, 'showing warning');
 
         // Fallback to simple confirm
         if (type === 'DELETE') {
@@ -1544,7 +1544,7 @@ function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel =
             }
         } else {
             // Fallback to console error
-            console.error('שגיאה בהצגת האזהרה:', data.message || 'שגיאה לא ידועה');
+            handleSystemError(new Error(data.message || 'שגיאה לא ידועה'), 'הצגת האזהרה');
         }
     }
 }
@@ -1627,7 +1627,7 @@ function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null
             itemName: itemName
         }, {}, onConfirm, onCancel);
     } catch (error) {
-        console.error('Error in showCancelWarning, using fallback:', error);
+        handleSystemError(error, 'showCancelWarning fallback');
 
         // Fallback to notification system
         if (typeof window.showConfirmationDialog === 'function') {
@@ -1673,7 +1673,7 @@ function showValidationWarningLegacy(field, message) {
         window.showErrorNotification('שגיאת וולידציה', `${message}`);
     } else {
         // Fallback to console error if notification system is not available
-        console.error('שגיאת וולידציה:', message);
+        handleValidationError(field, message);
     }
 }
 

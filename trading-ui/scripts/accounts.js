@@ -80,7 +80,7 @@ async function loadCurrenciesFromServer() {
     }
 
   } catch (error) {
-    console.log('🔄 Error loading currencies from server:', error);
+    // Error loading currencies from server
     // טעינת מטבעות ברירת מחדל
     window.currenciesData = [
       { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
@@ -127,12 +127,12 @@ function getCurrencyDisplay(account) {
 
 // פונקציה ליצירת אפשרויות מטבע בטופס
 function generateCurrencyOptions(account = null) {
-  console.log('🔄 === generateCurrencyOptions STARTED ===');
-  console.log('🔄 Currencies data:', window.currenciesData);
-  console.log('🔄 Currencies loaded:', window.currenciesLoaded);
+  // generateCurrencyOptions STARTED
+  // Currencies data
+  // Currencies loaded
   
   if (!window.currenciesData || window.currenciesData.length === 0) {
-    console.log('🔄 No currencies data, using default');
+    // No currencies data, using default
     // אם אין מטבעות, נחזיר ברירת מחדל
     return `
       <option value="1" ${account && account.currency_id === 1 ? 'selected' : ''}>דולר אמריקאי (USD)</option>
@@ -148,26 +148,26 @@ function generateCurrencyOptions(account = null) {
     return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
   }).join('');
   
-  console.log('🔄 Generated options:', options);
-  console.log('🔄 === generateCurrencyOptions COMPLETED ===');
+  // Generated options
+  // generateCurrencyOptions COMPLETED
   return options;
 }
 
 // פונקציה לטעינת חשבונות מהשרת
 async function loadAccountsFromServer() {
-  console.log('🔄 === Loading accounts from server ===');
+  // Loading accounts from server
 
   try {
     // בדיקה אם יש token שמור
     const token = localStorage.getItem('authToken');
-    console.log('🔄 Token found:', !!token);
+    // Token found
 
     if (!token) {
-      console.log('🔄 No auth token found, trying without token...');
+              // No auth token found, trying without token
       // נסיון לטעון ללא token
     }
 
-    console.log('🔄 Fetching accounts from server...');
+    // Fetching accounts from server
     const headers = {
       'Content-Type': 'application/json'
     };
@@ -181,49 +181,49 @@ async function loadAccountsFromServer() {
       headers: headers
     });
 
-    console.log('🔄 Response status:', response.status);
+    // Response status
 
     if (response.ok) {
       const responseData = await response.json();
-      console.log('🔄 Raw response from server:', responseData);
+      // Raw response from server
 
       // טיפול במבנה התשובה - יכול להיות ישירות מערך או בתוך data
       const allAccounts = responseData.data || responseData;
-      console.log('🔄 All accounts from server:', allAccounts);
+      // All accounts from server
 
       // סינון רק חשבונות בסטטוס open
       const openAccounts = allAccounts.filter(account => account.status === 'open');
       window.accountsData = openAccounts;
       window.accountsLoaded = true;
-      console.log('🔄 All accounts loaded from server:', allAccounts.length, 'accounts');
-      console.log('🔄 Open accounts filtered:', openAccounts.length, 'accounts');
-      console.log('🔄 Open accounts details:', openAccounts);
+      // All accounts loaded from server
+      // Open accounts filtered
+      // Open accounts details
 
       // קריאה לעדכון התפריט
       if (typeof window.updateAccountFilterMenu === 'function') {
         window.updateAccountFilterMenu(openAccounts);
       } else {
-        console.log('🔄 updateAccountFilterMenu not available yet');
+        // updateAccountFilterMenu not available yet
       }
 
       // החזרת הנתונים לטעינה חוזרת
       return openAccounts;
     } else {
-      console.log('🔄 Error loading accounts from server, status:', response.status);
+      // Error loading accounts from server, status
       const errorText = await response.text();
-      console.log('🔄 Error response:', errorText);
+      // Error response
       loadDefaultAccounts();
     }
 
   } catch (error) {
-    console.log('🔄 Error loading accounts from server:', error);
+    // Error loading accounts from server
     loadDefaultAccounts();
   }
 }
 
 // פונקציה לטעינת כל החשבונות מהשרת (לפילטר)
 async function loadAllAccountsFromServer() {
-  console.log('🔄 === Loading all accounts from server ===');
+  // Loading all accounts from server
 
   try {
     const token = localStorage.getItem('authToken');
@@ -243,11 +243,11 @@ async function loadAllAccountsFromServer() {
     if (response.ok) {
       const responseData = await response.json();
       const allAccounts = responseData.data || responseData;
-      console.log('🔄 All accounts loaded for filter:', allAccounts.length, 'accounts');
+      // All accounts loaded for filter
 
       // סינון רק חשבונות בסטטוס open
       const openAccounts = allAccounts.filter(account => account.status === 'open');
-      console.log('🔄 Open accounts filtered:', openAccounts.length, 'accounts');
+      // Open accounts filtered
 
       // שמירת החשבונות הפתוחים במשתנה גלובלי
       window.allAccountsData = openAccounts;

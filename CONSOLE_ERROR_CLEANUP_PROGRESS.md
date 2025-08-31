@@ -32,7 +32,7 @@
 ### 🟡 עדיפות בינונית
 8. **notes.js** - 🔄 **בתהליך** (28 → 20 console.error)
 9. **tests.js** - 17 console.error
-10. **ui-utils.js** - 13 console.error
+10. **ui-utils.js** - ✅ **הושלם** (13 → 0 console.error)
 11. **currencies.js** - 13 console.error
 12. **preferences.js** - 12 console.error
 13. **header-system.js** - 12 console.error
@@ -70,6 +70,7 @@
 - ✅ **השלמת cash_flows.js**: החלפת 34 console.error בפונקציות עזר מתאימות
 - ✅ **השלמת accounts.js**: החלפת 34 console.error בפונקציות עזר מתאימות
 - 🔄 **התחלת notes.js**: החלפת 8 console.error בפונקציות עזר מתאימות (20 נותרו)
+- ✅ **השלמת ui-utils.js**: החלפת 13 console.error בפונקציות עזר מתאימות
 - ✅ **יצירת כלים**: סקריפטים לניתוח והחלפת console.error
 - ✅ **תיעוד**: עדכון קובץ המעקב והדוקומנטציה
 
@@ -140,17 +141,24 @@
 - **שגיאות פונקציות**: הוחלפו ב-`handleFunctionNotFound()`
 - **שגיאות מערכת**: הוחלפו ב-`handleSystemError()`
 
+#### פירוט השינויים ב-ui-utils.js:
+- **שגיאות אלמנטים**: הוחלפו ב-`handleElementNotFound()`
+- **שגיאות API**: הוחלפו ב-`handleApiError()`
+- **שגיאות ולידציה**: הוחלפו ב-`handleValidationError()`
+- **שגיאות מערכת**: הוחלפו ב-`handleSystemError()`
+- **שגיאות פונקציות**: הוחלפו ב-`handleFunctionNotFound()`
+
 #### סטטיסטיקות:
-- **קבצים שהושלמו**: 7/32 (21.9%)
+- **קבצים שהושלמו**: 8/32 (25%)
 - **קבצים בתהליך**: 1/32 (3.1%)
-- **console.error שטופלו**: 310/539 (57.5%)
-- **זמן עבודה**: ~15 שעות
+- **console.error שטופלו**: 323/539 (60%)
+- **זמן עבודה**: ~16 שעות
 - **הערכת זמן נותר**: 2-3 שעות
 
 ## 🎯 יעדים ליום הבא
 1. **notes.js** - השלמת טיפול ב-20 console.error שנותרו
 2. **tests.js** - טיפול ב-17 console.error
-3. **ui-utils.js** - טיפול ב-13 console.error
+3. **currencies.js** - טיפול ב-13 console.error
 
 ## 📝 הערות חשובות
 - כל הפונקציות החדשות מיוצאת ל-global scope וזמינות בכל הפרויקט

@@ -1127,7 +1127,6 @@ async function updateNoteFromModal() {
       modal.hide();
       loadNotesData();
     } else {
-      console.error('❌ שגיאה בעדכון הערה:', result);
       
       // טיפול בשגיאות וולידציה מהשרת
       if (result.error && result.error.message) {
@@ -1175,7 +1174,6 @@ async function updateNoteFromModal() {
     }
 
   } catch (error) {
-    console.error('❌ שגיאה בעדכון הערה:', error);
     window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון הערה - בדוק את הנתונים שהוזנו');
   }
 }
@@ -1210,7 +1208,6 @@ async function deleteNoteFromServer(noteId) {
         loadNotesData();
         return; // יציאה מוצלחת
       } else {
-        console.error('❌ שגיאה במחיקת הערה:', result);
         
         // טיפול בשגיאות מהשרת
         if (result.error && result.error.message) {
@@ -1229,7 +1226,6 @@ async function deleteNoteFromServer(noteId) {
 
     } catch (error) {
       retryCount++;
-      console.error(`❌ שגיאה במחיקת הערה (ניסיון ${retryCount}/${maxRetries}):`, error);
       
       if (retryCount >= maxRetries) {
         // ניסיונות נגמרו - הצגת שגיאה
@@ -1305,8 +1301,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // בדיקת זמינות מערכות
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
-    console.error('❌ מערכת התראות לא זמינה!');
-    console.error('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
     return;
   }
   

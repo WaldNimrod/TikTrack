@@ -244,7 +244,6 @@ class ActiveAlertsComponent extends HTMLElement {
       this.updateCount(); // עדכון הכותרת והסקשן
       this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
     } catch (err) {
-      console.error('❌ Failed loading active alerts:', err);
       this.alerts = [];
       this.renderAlerts();
       this.updateCount(); // עדכון הכותרת והסקשן
@@ -542,7 +541,6 @@ class ActiveAlertsComponent extends HTMLElement {
         }, 220);
       }
     } catch (err) {
-      console.error('failed marking alert as read', err);
       if (btn) { 
         btn.disabled = false; 
         btn.textContent = window.BUTTON_ICONS ? window.BUTTON_ICONS.APPROVE : '✓'; 

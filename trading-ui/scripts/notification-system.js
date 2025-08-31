@@ -109,7 +109,6 @@ async function loadLinkedItemsData(itemType, itemId) {
         return await response.json();
 
     } catch (error) {
-        console.error('❌ Error loading linked items data:', error);
         throw error;
     }
 }
@@ -449,7 +448,6 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
         bootstrapModal.show();
         // המודל הוצג בהצלחה
     } catch (error) {
-        console.error('🔧 שגיאה בהצגת המודל:', error);
         // fallback ל-confirm רגיל
         if (typeof window.showConfirmationDialog === 'function') {
             window.showConfirmationDialog(

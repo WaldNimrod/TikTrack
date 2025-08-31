@@ -3891,6 +3891,7 @@ window.findFilterCell = findFilterCell;
 window.searchInAllColumns = searchInAllColumns;
 window.showAllRecordsInTable = showAllRecordsInTable;
 window.getAllVisibleContainers = getVisibleContainers;
+window.getVisibleContainers = getVisibleContainers;
 window.isDateInRange = isDateInRange;
 
 /**
@@ -4350,7 +4351,7 @@ window.updateAccountFilterText = updateAccountFilterText;
  * זיהוי הקונטיינר הפעיל כרגע
  */
 function getActiveTableContainer() {
-  const visibleContainers = getAllVisibleContainers();
+  const visibleContainers = getVisibleContainers();
   if (visibleContainers.length > 0) {
     return visibleContainers[0]; // מחזיר את הראשון
   }

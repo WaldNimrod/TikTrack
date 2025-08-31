@@ -74,11 +74,11 @@ function showLinkedItemsWarning(itemType, id) {
     const linkedItems = checkLinkedItemsForCashFlow(id);
     
     if (linkedItems && linkedItems.length > 0) {
-        // קריאה לפונקציה הגלובלית
-        if (typeof window.showLinkedItemsWarning === 'function') {
-            window.showLinkedItemsWarning('cash_flow', id);
+        // קריאה לפונקציה הגלובלית החדשה
+        if (typeof window.showLinkedItemsModal === 'function') {
+            window.showLinkedItemsModal(linkedItems, 'cash_flow', id);
         } else {
-            console.error('❌ showLinkedItemsWarning לא זמין');
+            console.error('❌ showLinkedItemsModal לא זמין');
         }
     } else {
         // אין פריטים מקושרים - הצג מודל מחיקה רגיל

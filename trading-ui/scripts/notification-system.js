@@ -82,37 +82,7 @@ function markAlertAsRead(alertId) {
 // ===== LINKED ITEMS SYSTEM FUNCTIONS =====
 // These functions handle linked items display and management
 
-/**
- * Show linked items warning modal
- * LINKED ITEMS SYSTEM - Shows warning when trying to delete item with linked entities
- * 
- * @param {string} itemType - Type of the item (ticker, account, trade, etc.)
- * @param {number} itemId - ID of the item
- */
-async function showLinkedItemsWarning(itemType, itemId) {
-    try {
-        // Load data from server
-        const response = await fetch(`/api/v1/linked-items/${itemType}/${itemId}`);
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        // Show the advanced modal
-        if (typeof window.showLinkedItemsModal === 'function') {
-            window.showLinkedItemsModal(data, itemType, itemId);
-        } else {
-            // Simple fallback
-            alert(`Cannot delete ${itemType} ${itemId} - it has linked items`);
-        }
-
-    } catch (error) {
-        console.error('❌ Error showing linked items warning:', error);
-        alert(`Cannot delete ${itemType} ${itemId} - it has linked items`);
-    }
-}
 
 /**
  * Load linked items data from server
@@ -554,7 +524,6 @@ window.showConfirmationDialog = showConfirmationDialog;
 window.showDeleteWarning = showDeleteWarning;
 
 // Export LINKED ITEMS SYSTEM functions to global scope
-window.showLinkedItemsWarning = showLinkedItemsWarning;
 window.loadLinkedItemsData = loadLinkedItemsData;
 
 // Export the module itself
@@ -580,7 +549,6 @@ window.notificationSystem = {
     showDeleteWarning,
 
     // LINKED ITEMS SYSTEM functions
-    showLinkedItemsWarning,
     loadLinkedItemsData
 };
 

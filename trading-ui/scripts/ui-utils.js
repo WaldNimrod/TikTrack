@@ -806,10 +806,10 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
                 // יש פריטים מקושרים - הצגת אזהרה
                 console.log(`⚠️ Linked items found: ${allEntities.length}`);
                 
-                if (typeof window.showLinkedItemsWarning === 'function') {
-                    window.showLinkedItemsWarning(itemType, itemId);
+                if (typeof window.showLinkedItemsModal === 'function') {
+                    window.showLinkedItemsModal(allEntities, itemType, itemId);
                 } else {
-                    console.error('❌ showLinkedItemsWarning function not found');
+                    console.error('❌ showLinkedItemsModal function not found');
                     if (window.showErrorNotification) {
                         window.showErrorNotification(`שגיאה בביטול`, `לא ניתן לבטל ${getItemTypeDisplayName(itemType)} זה - יש פריטים מקושרים אליו`);
                     }

@@ -379,7 +379,7 @@ function updateAccountsTable(accounts) {
         <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name || 'Unknown'}')" title="מחק חשבון">
           🗑️
         </button>
-        <button class="btn btn-sm btn-info" onclick="showLinkedItemsWarning('account', ${account.id})" title="צפה באלמנטים מקושרים">
+        <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'account', ${account.id})" title="צפה באלמנטים מקושרים">
           🔗
         </button>
       </td>

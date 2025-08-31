@@ -691,11 +691,27 @@ async function updateTicker() {
                 console.log('❌ נמצאו פריטים פתוחים - מונע עדכון');
                 
                 // שימוש במערכת הכללית להצגת פריטים מקושרים
-                if (window.showLinkedItemsWarning) {
-                    console.log('🔧 קריאה ל-showLinkedItemsWarning (מערכת כללית)');
-                    window.showLinkedItemsWarning('ticker', id);
+                if (window.showLinkedItemsModal) {
+                    console.log('🔧 קריאה ל-showLinkedItemsModal (מערכת כללית)');
+                    try {
+                        const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            window.showLinkedItemsModal(data, 'ticker', id);
+                        } else {
+                            throw new Error('Failed to load linked items data');
+                        }
+                    } catch (linkedError) {
+                        console.error('❌ Error loading linked items:', linkedError);
+                        if (window.showWarningNotification) {
+                            window.showWarningNotification(
+                                'לא ניתן לבטל טיקר',
+                                `לא ניתן לבטל את הטיקר ${originalTicker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`
+                            );
+                        }
+                    }
                 } else {
-                    console.error('❌ showLinkedItemsWarning לא זמינה');
+                    console.error('❌ showLinkedItemsModal לא זמינה');
                     // Fallback - הצגת הודעת אזהרה
                     if (window.showWarningNotification) {
                         window.showWarningNotification(
@@ -923,11 +939,27 @@ async function performCancelTickerWithLinkedItemsCheck(id) {
             console.log('❌ נמצאו פריטים פתוחים - מציג חלון מקושרים');
             
             // שימוש במערכת הכללית להצגת פריטים מקושרים
-            if (window.showLinkedItemsWarning) {
-                console.log('🔧 קריאה ל-showLinkedItemsWarning (מערכת כללית)');
-                window.showLinkedItemsWarning('ticker', id);
+            if (window.showLinkedItemsModal) {
+                console.log('🔧 קריאה ל-showLinkedItemsModal (מערכת כללית)');
+                try {
+                    const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        window.showLinkedItemsModal(data, 'ticker', id);
+                    } else {
+                        throw new Error('Failed to load linked items data');
+                    }
+                } catch (linkedError) {
+                    console.error('❌ Error loading linked items:', linkedError);
+                    if (window.showWarningNotification) {
+                        window.showWarningNotification(
+                            'לא ניתן לבטל טיקר',
+                            `לא ניתן לבטל את הטיקר ${ticker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`
+                        );
+                    }
+                }
             } else {
-                console.error('❌ showLinkedItemsWarning לא זמינה');
+                console.error('❌ showLinkedItemsModal לא זמינה');
                 // Fallback - הצגת הודעת אזהרה
                 if (window.showWarningNotification) {
                     window.showWarningNotification(
@@ -1055,17 +1087,23 @@ async function confirmDeleteTicker(id) {
                     (errorData.error.message.includes('linked items') ||
                         errorData.error.message.includes('Cannot delete ticker with linked items'))) {
 
-                    console.log('🔄 נמצאו פריטים מקושרים - קורא ל-showLinkedItemsWarning');
-                    console.log('🔄 showLinkedItemsWarning זמין:', typeof showLinkedItemsWarning === 'function');
-                    console.log('🔄 window.showLinkedItemsWarning זמין:', typeof window.showLinkedItemsWarning === 'function');
+                    console.log('🔄 נמצאו פריטים מקושרים - קורא ל-showLinkedItemsModal');
+                    console.log('🔄 showLinkedItemsModal זמין:', typeof window.showLinkedItemsModal === 'function');
 
                     // הצגת אזהרת פריטים מקושרים לפני מחיקה
                     console.log('🔄 מנסה לקרוא לפונקציה...');
                     try {
-                        if (window.showLinkedItemsWarning) {
-                            window.showLinkedItemsWarning('ticker', id);
+                        if (window.showLinkedItemsModal) {
+                            // טעינת נתוני פריטים מקושרים
+                            const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
+                            if (response.ok) {
+                                const data = await response.json();
+                                window.showLinkedItemsModal(data, 'ticker', id);
+                            } else {
+                                throw new Error('Failed to load linked items data');
+                            }
                         } else {
-                            console.error('❌ showLinkedItemsWarning function not found');
+                            console.error('❌ showLinkedItemsModal function not found');
                         }
                     } catch (error) {
                         console.error('❌ שגיאה בקריאה לפונקציה:', error);

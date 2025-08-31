@@ -3173,6 +3173,12 @@ function selectDateRangeOption(dateRange) {
 function applyTableFilter(filterType, selectedValues) {
   console.log(`🔄 applyTableFilter called for ${filterType}:`, selectedValues);
   
+  // בדיקה אם selectedValues הוא פונקציה במקום מערך
+  if (typeof selectedValues === 'function') {
+    console.log('⚠️ selectedValues is a function, not an array. Skipping filter application.');
+    return;
+  }
+  
   // הגדרת הפילטר לפי הסוג
   const filterConfig = getFilterConfig(filterType);
   if (!filterConfig) {

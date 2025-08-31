@@ -1,4 +1,4 @@
-console.log('🚀 alerts.js נטען בהצלחה');
+// alerts.js loaded successfully - removed debug log
 
 /**
  * ========================================

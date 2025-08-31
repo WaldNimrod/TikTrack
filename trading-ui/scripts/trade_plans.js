@@ -674,32 +674,16 @@ async function confirmDeleteTradePlan() {
     }
 
     try {
-        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-        const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}`, {
-            method: 'DELETE'
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // הצגת הודעת הצלחה
-        if (window.showSuccessNotification) {
-            window.showSuccessNotification('הצלחה', 'תכנון נמחק בהצלחה!');
-        }
-
+        // שימוש בפונקציה deleteTradePlan במקום מחיקה ישירה
+        await deleteTradePlan(tradePlanId);
+        
         // סגירת המודל
         const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteTradePlanModal'));
         deleteModal.hide();
 
-        // רענון הטבלה
-        await loadTradePlansData();
-
     } catch (error) {
         console.error('❌ Error deleting trade plan:', error);
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת התכנון');
-        }
+        // הפונקציה deleteTradePlan כבר מטפלת בהצגת שגיאות
     }
 }
 
@@ -1878,18 +1862,53 @@ async function deleteTradePlan(tradePlanId) {
         console.error('❌ Error deleting trade plan:', error);
         
         let errorMessage = 'שגיאה במחיקת התכנון';
+        let hasLinkedItems = false;
+        
         try {
             const errorData = JSON.parse(error.message);
             errorMessage = errorData.error?.message || errorMessage;
+            
+            // בדיקה אם השגיאה היא על פריטים מקושרים
+            if (errorMessage.includes('פריטים מקושרים') || errorMessage.includes('linked items')) {
+                hasLinkedItems = true;
+            }
         } catch {
             errorMessage = error.message || errorMessage;
         }
         
-        if (typeof window.showNotification === 'function') {
-            window.showNotification(errorMessage, 'error');
+        if (hasLinkedItems) {
+            // הצגת חלון מקושרים באמצעות המערכת הכללית
+            if (typeof window.showLinkedItemsModal === 'function') {
+                try {
+                    const response = await fetch(`/api/v1/linked-items/trade_plan/${tradePlanId}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        window.showLinkedItemsModal(data, 'trade_plan', tradePlanId);
+                    } else {
+                        throw new Error('Failed to load linked items data');
+                    }
+                } catch (linkedError) {
+                    console.error('❌ Error loading linked items:', linkedError);
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('לא ניתן למחוק תכנון שיש לו פריטים מקושרים', 'error');
+                    }
+                }
+            } else {
+                console.error('❌ showLinkedItemsModal function not found');
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('לא ניתן למחוק תכנון שיש לו פריטים מקושרים', 'error');
+                }
+            }
+        } else {
+            // הצגת הודעת שגיאה רגילה
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(errorMessage, 'error');
+            }
         }
     }
 }
+
+
 
 /**
  * סגירת מודל - שימוש בפונקציה גלובלית

@@ -21,7 +21,10 @@
  * Last Updated: August 23, 2025
  */
 
-
+// ייצוא מוקדם של הפונקציה למניעת שגיאות
+window.loadExecutionsData = window.loadExecutionsData || function() {
+    console.warn('⚠️ loadExecutionsData not yet defined, using placeholder');
+};
 
 // משתנים גלובליים
 if (!window.executionsData) {
@@ -1734,7 +1737,7 @@ async function updateExecutionsTableMain(executions) {
     const table = document.querySelector('#executionsTable');
     const tbody = document.querySelector('#executionsTable tbody');
     if (!tbody) {
-        console.error('❌ executionsTable tbody not found');
+        console.warn('⚠️ executionsTable tbody not found - this is expected on trades page');
         return;
     }
 
@@ -1842,7 +1845,7 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${(execution.date || execution.execution_date) ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="actions-cell">
-                    <button class="btn btn-sm btn-info" onclick="showLinkedItemsWarning('execution', ${execution.id})" title="פריטים מקושרים">🔗</button>
+                    <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'execution', ${execution.id})" title="פריטים מקושרים">🔗</button>
                     <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
                     <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
                 </td>
@@ -2537,14 +2540,28 @@ function addNewTrade() {
 function updateExecutionsSummary(executions) {
     console.log('🔄 עדכון סיכום נתונים לעסקעות');
 
+    // בדיקה אם האלמנטים קיימים בדף
+    const totalExecutionsElement = document.getElementById('totalExecutions');
+    const totalBuyExecutionsElement = document.getElementById('totalBuyExecutions');
+    const totalSellExecutionsElement = document.getElementById('totalSellExecutions');
+    const totalBuyAmountElement = document.getElementById('totalBuyAmount');
+    const totalSellAmountElement = document.getElementById('totalSellAmount');
+    const balanceAmountElement = document.getElementById('balanceAmount');
+
+    if (!totalExecutionsElement || !totalBuyExecutionsElement || !totalSellExecutionsElement || 
+        !totalBuyAmountElement || !totalSellAmountElement || !balanceAmountElement) {
+        console.warn('⚠️ Executions summary elements not found - this is expected on trades page');
+        return;
+    }
+
     if (!executions || executions.length === 0) {
         // איפוס ערכים
-        document.getElementById('totalExecutions').textContent = '0';
-        document.getElementById('totalBuyExecutions').textContent = '0';
-        document.getElementById('totalSellExecutions').textContent = '0';
-        document.getElementById('totalBuyAmount').textContent = '$0';
-        document.getElementById('totalSellAmount').textContent = '$0';
-        document.getElementById('balanceAmount').textContent = '$0';
+        totalExecutionsElement.textContent = '0';
+        totalBuyExecutionsElement.textContent = '0';
+        totalSellExecutionsElement.textContent = '0';
+        totalBuyAmountElement.textContent = '$0';
+        totalSellAmountElement.textContent = '$0';
+        balanceAmountElement.textContent = '$0';
         return;
     }
 
@@ -2575,14 +2592,14 @@ function updateExecutionsSummary(executions) {
     const balance = totalSellAmount - totalBuyAmount;
 
     // עדכון ה-DOM עם פורמט מספרים
-    document.getElementById('totalExecutions').textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalExecutions) : totalExecutions.toLocaleString('he-IL');
-    document.getElementById('totalBuyExecutions').textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalBuyExecutions) : totalBuyExecutions.toLocaleString('he-IL');
-    document.getElementById('totalSellExecutions').textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalSellExecutions) : totalSellExecutions.toLocaleString('he-IL');
-    document.getElementById('totalBuyAmount').textContent = window.formatCurrencyWithCommas ? window.formatCurrencyWithCommas(totalBuyAmount) : `$${totalBuyAmount.toFixed(2)}`;
-    document.getElementById('totalSellAmount').textContent = window.formatCurrencyWithCommas ? window.formatCurrencyWithCommas(totalSellAmount) : `$${totalSellAmount.toFixed(2)}`;
+    totalExecutionsElement.textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalExecutions) : totalExecutions.toLocaleString('he-IL');
+    totalBuyExecutionsElement.textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalBuyExecutions) : totalBuyExecutions.toLocaleString('he-IL');
+    totalSellExecutionsElement.textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalSellExecutions) : totalSellExecutions.toLocaleString('he-IL');
+    totalBuyAmountElement.textContent = window.formatCurrencyWithCommas ? window.formatCurrencyWithCommas(totalBuyAmount) : `$${totalBuyAmount.toFixed(2)}`;
+    totalSellAmountElement.textContent = window.formatCurrencyWithCommas ? window.formatCurrencyWithCommas(totalSellAmount) : `$${totalSellAmount.toFixed(2)}`;
 
     // שימוש בפונקציה הכללית לצביעה
-    const balanceElement = document.getElementById('balanceAmount');
+    const balanceElement = balanceAmountElement;
 
     // צביעה ידנית
     balanceElement.textContent = `$${balance.toFixed(2)}`;
@@ -2920,12 +2937,15 @@ console.log('✅ Execution functions loaded:', {
 function setupExecutionsFilterFunctions() {
   console.log('🔄 Setting up executions filter functions...');
   
-  // שימוש במערכת הפילטרים הגלובלית
+  // שימוש במערכת הפילטרים הגלובלית - לא מעבירים פונקציה, רק מתחברים למערכת
   if (typeof window.applyTableFilter === 'function') {
-    window.applyTableFilter('executions', function(filteredData) {
-      updateExecutionsTableMain(filteredData);
-      updateExecutionsSummary(filteredData);
-    });
+    // רישום הפונקציות הגלובליות למערכת הפילטרים
+    window.executionsFilterFunctions = {
+      updateTable: function(filteredData) {
+        updateExecutionsTableMain(filteredData);
+        updateExecutionsSummary(filteredData);
+      }
+    };
   }
   
   // פונקציה לפילטר חשבון
@@ -3084,7 +3104,6 @@ function setupExecutionsFilterFunctions() {
     updateExecutionsSummary(filteredExecutions);
     console.log('✅ Filtered by date:', filteredExecutions.length, 'executions');
   };
-  };
   
   // פונקציה לאיפוס פילטרים
   window.resetExecutionsFilters = function() {
@@ -3107,7 +3126,7 @@ function updateExecutionsGlobalData(executions) {
 }
 
 // עדכון הפונקציה הקיימת loadExecutionsData
-const originalLoadExecutionsData = window.loadExecutionsData;
+const originalLoadExecutionsData = window.loadExecutionsData || loadExecutionsData;
 window.loadExecutionsData = async function() {
   await originalLoadExecutionsData();
   
@@ -3170,3 +3189,6 @@ function getFieldIdFromError(errorMessage, prefix) {
     
     return null;
 }
+
+// ייצוא הפונקציה הגלובלית
+window.loadExecutionsData = loadExecutionsData;

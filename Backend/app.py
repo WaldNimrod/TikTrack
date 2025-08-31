@@ -180,8 +180,7 @@ if not os.path.exists(DB_PATH):
 if not os.path.exists(UI_DIR):
     raise FileNotFoundError(f"UI directory not found at: {UI_DIR}")
 
-print(f"UI Directory: {UI_DIR}")
-print(f"Files in UI directory: {os.listdir(UI_DIR)}")
+# UI Directory validation - removed debug prints
 
 def get_db_connection() -> sqlite3.Connection:
     try:
@@ -202,7 +201,7 @@ def get_db_connection() -> sqlite3.Connection:
         
         return conn
     except Exception as e:
-        print(f"Database connection error: {e}")
+        # Database connection error - removed debug print
         raise
 
 def update_ticker_open_status(ticker_id: int) -> None:
@@ -238,10 +237,10 @@ def update_ticker_open_status(ticker_id: int) -> None:
         """, (is_active, ticker_id))
         
         conn.commit()
-        print(f"DEBUG: active_trades update for ticker {ticker_id}: {is_active} (plans: {open_plans}, trades: {open_trades})")
+        # active_trades update completed - removed debug print
         
     except Exception as e:
-        print(f"ERROR: active_trades update error for ticker {ticker_id}: {str(e)}")
+        # active_trades update error - removed debug print
         conn.rollback()
     finally:
         conn.close()
@@ -261,10 +260,11 @@ def update_all_tickers_open_status() -> None:
         for ticker in tickers:
             update_ticker_open_status(ticker['id'])
         
-        print(f"DEBUG: active_trades update completed for {len(tickers)} tickers")
+        # All tickers active_trades update completed - removed debug print
         
     except Exception as e:
-        print(f"ERROR: error updating all tickers: {str(e)}")
+        # Error updating all tickers - removed debug print
+        pass
     finally:
         conn.close()
 

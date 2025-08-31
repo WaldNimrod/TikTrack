@@ -51,12 +51,6 @@
   <!-- 7. Linked items modal styles -->
   <link rel="stylesheet" href="styles/linked-items.css">
 
-  <!-- Ticker Service - Global ticker management -->
-  <script src="scripts/ticker-service.js"></script>
-  
-  <!-- Tickers functions - Global ticker operations -->
-  <script src="scripts/tickers.js"></script>
-  
   <!-- UI Utils - Global UI utilities -->
   <script src="scripts/ui-utils.js"></script>
 
@@ -376,11 +370,30 @@
                     <div class="invalid-feedback" id="addExecutionDateError"></div>
                   </div>
                 </div>
-
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="addExecutionSource" class="form-label">מקור</label>
+                    <select class="form-select" id="addExecutionSource" onblur="validateExecutionSource(this)" onchange="toggleExternalIdField('add')">
+                      <option value="manual">ידני</option>
+                      <option value="ibkr">IBKR</option>
+                      <option value="etrade">E*TRADE</option>
+                      <option value="fidelity">Fidelity</option>
+                      <option value="schwab">Charles Schwab</option>
+                      <option value="other">אחר</option>
+                    </select>
+                    <div class="invalid-feedback" id="addExecutionSourceError"></div>
+                  </div>
+                </div>
               </div>
               <div class="row">
                 <div class="col-md-6">
-                  <!-- שדה ריק לעת עתה -->
+                  <div class="mb-3" id="addExecutionExternalIdContainer" style="display: none;">
+                    <label for="addExecutionExternalId" class="form-label">מזהה חיצוני</label>
+                    <input type="text" class="form-control" id="addExecutionExternalId" 
+                           placeholder="מזהה חיצוני מהמערכת המקורית..." maxlength="100" 
+                           onblur="validateExecutionExternalId(this)" oninput="validateExecutionExternalId(this)">
+                    <div class="invalid-feedback" id="addExecutionExternalIdError"></div>
+                  </div>
                 </div>
               </div>
               <div class="row">
@@ -570,7 +583,7 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="editExecutionSource" class="form-label">מקור</label>
-                    <select class="form-select" id="editExecutionSource" onblur="validateExecutionSource(this)">
+                    <select class="form-select" id="editExecutionSource" onblur="validateExecutionSource(this)" onchange="toggleExternalIdField('edit')">
                       <option value="manual">ידני</option>
                       <option value="ibkr">IBKR</option>
                       <option value="etrade">E*TRADE</option>
@@ -579,6 +592,15 @@
                       <option value="other">אחר</option>
                     </select>
                     <div class="invalid-feedback" id="editExecutionSourceError"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3" id="editExecutionExternalIdContainer" style="display: none;">
+                    <label for="editExecutionExternalId" class="form-label">מזהה חיצוני</label>
+                    <input type="text" class="form-control" id="editExecutionExternalId" 
+                           placeholder="מזהה חיצוני מהמערכת המקורית..." maxlength="100" 
+                           onblur="validateExecutionExternalId(this)" oninput="validateExecutionExternalId(this)">
+                    <div class="invalid-feedback" id="editExecutionExternalIdError"></div>
                   </div>
                 </div>
 
@@ -693,12 +715,12 @@
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
-    <script src="scripts/ui-utils.js"></script>
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/date-utils.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
+    <script src="scripts/ticker-service.js"></script>
 
     <script src="scripts/alerts.js?v=20250830_1"></script>
     <script src="scripts/active-alerts-component.js?v=20250830_1"></script>

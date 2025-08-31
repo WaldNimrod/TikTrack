@@ -304,12 +304,30 @@ function showInfoNotification(title, message, duration = 4000) {
 function showValidationWarning(fieldId, message, duration = 6000) {
     // showValidationWarning called
     
+    // Get field name for better error message
+    const field = document.getElementById(fieldId);
+    let fieldName = fieldId;
+    
+    if (field) {
+        // Try to get a human-readable field name
+        const label = document.querySelector(`label[for="${fieldId}"]`);
+        if (label) {
+            fieldName = label.textContent.trim();
+        } else if (field.placeholder) {
+            fieldName = field.placeholder;
+        } else if (field.name) {
+            fieldName = field.name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        }
+    }
+    
+    // Create detailed error message
+    const detailedMessage = `${fieldName}: ${message}`;
+    
     // Show error notification (red)
     // showValidationWarning calling showErrorNotification
-    showErrorNotification('שגיאת וולידציה', message, duration);
+    showErrorNotification('שגיאת וולידציה', detailedMessage, duration);
     
     // Highlight the problematic field
-    const field = document.getElementById(fieldId);
     // Field element found
     
     if (field) {
@@ -338,6 +356,7 @@ function showValidationWarning(fieldId, message, duration = 6000) {
         }, 3000);
     } else {
         // Field not found
+        console.warn(`⚠️ Field not found: ${fieldId}`);
     }
 }
 
@@ -350,7 +369,7 @@ function showValidationWarning(fieldId, message, duration = 6000) {
  * @param {Function} onConfirm - Callback for confirm action
  * @param {Function} onCancel - Callback for cancel action
  */
-function showConfirmationDialog(title, message, onConfirm = null, onCancel = null) {
+function showConfirmationDialog(title, message, onConfirm = null, onCancel = null, color = 'danger') {
     // showConfirmationDialog נקראה
     // bootstrap קיים
     
@@ -359,10 +378,10 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
     
     // יצירת HTML למודל
     const modalHTML = `
-        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+        <div class="modal fade warning-modal" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header bg-danger text-white">
+                    <div class="modal-header bg-${color} text-white">
                         <h5 class="modal-title" id="${modalId}Label">${title}</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -371,7 +390,7 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-danger confirm-btn">אישור</button>
+                        <button type="button" class="btn btn-${color} confirm-btn">אישור</button>
                     </div>
                 </div>
             </div>
@@ -492,8 +511,8 @@ function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null
     const title = `מחיקת ${itemTypeDisplay}`;
     const message = `האם אתה בטוח שברצונך למחוק את ${itemTypeDisplay} "${itemName}"?\n\nפעולה זו אינה ניתנת לביטול.`;
     
-    // קורא ל-showConfirmationDialog עם
-    showConfirmationDialog(title, message, onConfirm, onCancel);
+    // קורא ל-showConfirmationDialog עם צבע אדום למחיקה
+    showConfirmationDialog(title, message, onConfirm, onCancel, 'danger');
 }
 
 // ===== LEGACY SUPPORT =====

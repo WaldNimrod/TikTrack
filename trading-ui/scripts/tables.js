@@ -128,6 +128,64 @@ function sortTable(columnIndex, data, tableType, updateFunction) {
  * @param {Function} updateFunction - Function to call with sorted data
  * @returns {Array} Sorted data array
  */
+/**
+ * Get column value for sorting
+ * 
+ * @param {Object} item - Data item
+ * @param {number} columnIndex - Column index
+ * @param {string} tableType - Table type
+ * @returns {*} Column value
+ */
+function getColumnValue(item, columnIndex, tableType) {
+    // Default column mappings for different table types
+    const columnMappings = {
+        'alerts': [
+            'id', 'title', 'status', 'related_type_id', 'condition', 'message', 'created_at', 'is_triggered'
+        ],
+        'trades': [
+            'id', 'symbol', 'side', 'investment_type', 'status', 'account_name', 'created_at', 'amount'
+        ],
+        'accounts': [
+            'id', 'name', 'currency_name', 'balance', 'status', 'created_at'
+        ],
+        'tickers': [
+            'id', 'symbol', 'name', 'price', 'change_percent', 'volume', 'market_cap'
+        ],
+        'trade_plans': [
+            'id', 'symbol', 'side', 'investment_type', 'status', 'target_price', 'stop_loss', 'created_at'
+        ],
+        'executions': [
+            'id', 'symbol', 'side', 'investment_type', 'status', 'account_name', 'created_at', 'amount'
+        ],
+        'cash_flows': [
+            'id', 'type', 'amount', 'currency', 'account_name', 'description', 'created_at'
+        ],
+        'notes': [
+            'id', 'title', 'content', 'type', 'status', 'created_at'
+        ]
+    };
+
+    const mapping = columnMappings[tableType] || [];
+    const fieldName = mapping[columnIndex];
+    
+    if (!fieldName) {
+        return '';
+    }
+
+    // Handle nested properties
+    if (fieldName.includes('.')) {
+        const parts = fieldName.split('.');
+        let value = item;
+        for (const part of parts) {
+            value = value?.[part];
+            if (value === undefined) break;
+        }
+        return value || '';
+    }
+
+    return item[fieldName] || '';
+}
+
 window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
     // Global sortTableData called for table
 
@@ -227,58 +285,27 @@ window.getSortState = function (tableType) {
             console.warn(`⚠️ Invalid sort state for ${tableType}:`, e);
         }
     }
-    return { columnIndex: -1, direction: 'asc', timestamp: 0 };
+    
+    // Return default state
+    return {
+        columnIndex: -1,
+        direction: 'asc',
+        timestamp: Date.now()
+    };
 };
 
 /**
- * Set sort state for a table type
+ * Set sort state for a specific table type
  * 
  * @param {string} tableType - Type of table
  * @param {number} columnIndex - Column index
- * @param {string} direction - Sort direction
+ * @param {string} direction - Sort direction (asc/desc)
  */
 window.setSortState = function (tableType, columnIndex, direction) {
-    const sortState = {
-        columnIndex: columnIndex,
-        direction: direction,
-        timestamp: Date.now()
-    };
-    localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState));
+    window.saveSortState(tableType, columnIndex, direction);
 };
 
-/**
- * Update sort icons in table headers
- * 
- * @param {string} tableType - Type of table
- * @param {number} activeColumnIndex - Active column index
- * @param {string} direction - Sort direction
- */
-window.updateSortIcons = function (tableType, activeColumnIndex, direction) {
-    const table = document.querySelector(`[data-table-type="${tableType}"]`);
-    if (!table) return;
 
-    // Reset all headers and icons
-    const allHeaders = table.querySelectorAll('.sortable-header');
-    allHeaders.forEach(header => {
-        header.classList.remove('active-sort');
-        const icon = header.querySelector('.sort-icon');
-        if (icon) {
-            icon.textContent = '↕';
-            icon.style.color = '#999';
-        }
-    });
-
-    // Set active header and icon
-    const activeHeader = table.querySelector(`th:nth-child(${activeColumnIndex + 1}) .sortable-header`);
-    if (activeHeader) {
-        activeHeader.classList.add('active-sort');
-        const icon = activeHeader.querySelector('.sort-icon');
-        if (icon) {
-            icon.textContent = direction === 'asc' ? '↑' : '↓';
-            icon.style.color = '#ff9c05';
-        }
-    }
-}
 
 /**
  * Universal table sorter - can sort any table with any data

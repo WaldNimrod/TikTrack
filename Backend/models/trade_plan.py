@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, event
 from sqlalchemy.orm import relationship
 from .base import BaseModel
 from typing import Dict, Any, Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TradePlan(BaseModel):
     __tablename__ = "trade_plans"
@@ -81,3 +84,70 @@ class TradePlan(BaseModel):
     
     def __repr__(self) -> str:
         return f"<TradePlan(id={self.id}, type='{self.investment_type}')>"
+
+
+# ========================================
+# SQLAlchemy Event Listeners for Automatic Ticker Status Updates
+# ========================================
+
+@event.listens_for(TradePlan, 'after_insert')
+def trade_plan_inserted(mapper, connection, target):
+    """
+    Event listener for when a trade plan is inserted
+    Updates the ticker status based on linked items
+    """
+    try:
+        from .ticker import Ticker
+        from sqlalchemy.orm import Session
+        
+        # Get session from connection
+        session = Session(bind=connection)
+        
+        # Update ticker status
+        Ticker.update_ticker_status_from_linked_items(session, target.ticker_id)
+        
+        session.close()
+    except Exception as e:
+        logger.error(f"Error in trade_plan_inserted event: {e}")
+        pass
+
+
+@event.listens_for(TradePlan, 'after_update')
+def trade_plan_updated(mapper, connection, target):
+    """
+    Event listener for when a trade plan is updated
+    Updates the ticker status based on linked items
+    """
+    try:
+        from .ticker import Ticker
+        from sqlalchemy.orm import Session
+        
+        # Get session from connection
+        session = Session(bind=connection)
+        
+        # Update ticker status
+        Ticker.update_ticker_status_from_linked_items(session, target.ticker_id)
+        
+        session.close()
+    except Exception as e:
+        logger.error(f"Error in trade_plan_updated event: {e}")
+        pass
+
+
+@event.listens_for(TradePlan, 'after_delete')
+def trade_plan_deleted(mapper, connection, target):
+    """
+    Event listener for when a trade plan is deleted
+    Updates the ticker status based on linked items
+    """
+    try:
+        from .ticker import Ticker
+        from sqlalchemy.orm import Session
+        
+        # Get session from connection
+        session = Session(bind=connection)
+        
+        session.close()
+    except Exception as e:
+        logger.error(f"Error in trade_plan_deleted event: {e}")
+        pass

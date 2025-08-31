@@ -2928,10 +2928,8 @@ function selectStatusOption(status) {
 
       // בדיקה אם יש פריטים נבחרים אחרים
       const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
-      console.log('🔍 Currently selected items:', selectedItems.length);
 
       clickedItem.classList.toggle('selected');
-      console.log('🔍 Toggled clicked item, is now selected:', clickedItem.classList.contains('selected'));
       
       // אם אין פריטים נבחרים, בחר "הכול"
       const newSelectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
@@ -2961,10 +2959,8 @@ function selectTypeOption(type) {
 
   // עדכון סימון ויזואלי
   const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
-  console.log('🔍 Found type items:', typeItems.length);
   
   const clickedItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === type);
-  console.log('🔍 Clicked item found:', !!clickedItem, 'data-value:', type);
 
   if (clickedItem) {
     if (type === 'הכול') {
@@ -2983,10 +2979,8 @@ function selectTypeOption(type) {
 
       // בדיקה אם יש פריטים נבחרים אחרים
       const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
-      console.log('🔍 Currently selected items:', selectedItems.length);
 
       clickedItem.classList.toggle('selected');
-      console.log('🔍 Toggled clicked item, is now selected:', clickedItem.classList.contains('selected'));
       
       // אם אין פריטים נבחרים, בחר "הכול"
       const newSelectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
@@ -3016,10 +3010,8 @@ function selectAccountOption(account) {
 
   // עדכון סימון ויזואלי
   const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
-  console.log('🔍 Found account items:', accountItems.length);
   
   const clickedItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === account);
-  console.log('🔍 Clicked item found:', !!clickedItem, 'data-value:', account);
 
   if (clickedItem) {
     if (account === 'הכול') {
@@ -3038,10 +3030,8 @@ function selectAccountOption(account) {
 
       // בדיקה אם יש פריטים נבחרים אחרים
       const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
-      console.log('🔍 Currently selected items:', selectedItems.length);
 
       clickedItem.classList.toggle('selected');
-      console.log('🔍 Toggled clicked item, is now selected:', clickedItem.classList.contains('selected'));
       
       // אם אין פריטים נבחרים, בחר "הכול"
       const newSelectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
@@ -3055,11 +3045,10 @@ function selectAccountOption(account) {
   }
 
   // עדכון הטקסט הנבחר
-  console.log('🔍 Updating account filter text');
+  // Updating account filter text
   updateAccountFilterText();
 
   // הפעלת הפילטר
-  console.log('🔍 Applying account filter');
   applyAccountFilter();
 }
 
@@ -3243,10 +3232,8 @@ function applyFilter(filterType, selectedValue) {
   
   // Get visible containers
   const visibleContainers = getVisibleContainers();
-  console.log('🔍 Visible containers:', visibleContainers);
   
   if (visibleContainers.length === 0) {
-    console.log('⚠️ No visible containers found');
     return;
   }
   
@@ -3311,7 +3298,7 @@ function applyFilterToContainer(containerId, filterType, selectedValue) {
     if (shouldShow) visibleCount++;
   }
   
-  console.log(`✅ Filter applied to ${containerId}: ${visibleCount}/${rows.length} rows visible`);
+
   
   // Update table count
   updateTableCount(containerId, visibleCount, rows.length);
@@ -3488,7 +3475,7 @@ function updateTableCount(containerId, visibleCount, totalCount) {
     else pageType = 'רשומות';
     
     countElement.textContent = `${visibleCount} ${pageType}`;
-    console.log(`✅ Updated table count for ${containerId}: ${visibleCount} ${pageType}`);
+    // Updated table count
   }
 }
 
@@ -3514,15 +3501,12 @@ function updateTableCount(containerId, visibleCount, totalCount) {
  */
 function isDateInRange(dateString, dateRange) {
   try {
-    console.log('🔍 isDateInRange called with:', { dateString, dateRange });
-    
     // חילוץ התאריך בלבד (ללא שעה)
     let dateOnly = dateString;
     
     // אם התאריך מכיל רווח, ניקח רק את החלק לפני הרווח (התאריך)
     if (dateString.includes(' ')) {
       dateOnly = dateString.split(' ')[0];
-      console.log('🔍 Extracted date only:', dateOnly);
     }
     
     // המרת התאריך לפורמט ISO אם הוא בפורמט עברי
@@ -3535,14 +3519,12 @@ function isDateInRange(dateString, dateRange) {
         const month = parts[1].padStart(2, '0');
         const year = parts[2];
         isoDate = `${year}-${month}-${day}`;
-        console.log('🔍 Converted Hebrew date format:', dateOnly, '->', isoDate);
       }
     }
     
     // המרת התאריך מהתא לטופס Date
     const date = new Date(isoDate);
     if (isNaN(date.getTime())) {
-      console.log('⚠️ Invalid date:', dateOnly, '(converted from:', dateString, ')');
       return true; // אם התאריך לא תקין, נציג את השורה
     }
 
@@ -3551,15 +3533,11 @@ function isDateInRange(dateString, dateRange) {
 
     let startDate, endDate;
 
-    console.log(`🔍 Setting up date range for: "${dateRange}"`);
-    console.log(`🔍 Today is: ${today.toISOString()}`);
-    
     switch (dateRange) {
       case 'היום':
         startDate = new Date(today);
         startDate.setHours(0, 0, 0, 0);
         endDate = today;
-        console.log(`🔍 היום range: ${startDate.toISOString()} - ${endDate.toISOString()}`);
         break;
       
       case 'אתמול':
@@ -3567,7 +3545,6 @@ function isDateInRange(dateString, dateRange) {
         startDate.setHours(0, 0, 0, 0);
         endDate = new Date(startDate);
         endDate.setHours(23, 59, 59, 999);
-        console.log(`🔍 אתמול range: ${startDate.toISOString()} - ${endDate.toISOString()}`);
         break;
       
       case 'השבוע':
@@ -3575,7 +3552,6 @@ function isDateInRange(dateString, dateRange) {
         startDate = new Date(today.getTime() - today.getDay() * 24 * 60 * 60 * 1000);
         startDate.setHours(0, 0, 0, 0);
         endDate = today;
-        console.log(`🔍 השבוע range: ${startDate.toISOString()} - ${endDate.toISOString()} (start of week)`);
         break;
       
       case 'שבוע':
@@ -3583,7 +3559,6 @@ function isDateInRange(dateString, dateRange) {
         startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
         startDate.setHours(0, 0, 0, 0);
         endDate = today;
-        console.log(`🔍 שבוע range: ${startDate.toISOString()} - ${endDate.toISOString()} (7 days back)`);
         break;
       
       case 'MTD':
@@ -3669,10 +3644,10 @@ function isDateInRange(dateString, dateRange) {
     }
 
     const isInRange = date >= startDate && date <= endDate;
-    console.log(`🔍 Date range check: ${dateString} (${date.toISOString()}) in range ${startDate.toISOString()} - ${endDate.toISOString()}: ${isInRange}`);
+    // Date range check
     return isInRange;
   } catch (error) {
-    console.log('⚠️ Error checking date range:', error);
+    // Error checking date range
     return true; // אם יש שגיאה, נציג את השורה
   }
 }
@@ -3681,25 +3656,20 @@ function isDateInRange(dateString, dateRange) {
  * מציאת תא הפילטר בשורה
  */
 function findFilterCell(row, filterConfig) {
-  console.log('🔍 findFilterCell called for:', filterConfig.columnName);
+  // findFilterCell called for
   
   const table = row.closest('table');
   const headers = table.querySelectorAll('th');
   const cells = row.querySelectorAll('td');
   
-  console.log(`🔍 Found ${headers.length} headers and ${cells.length} cells`);
-  
   // חיפוש לפי כותרת העמודה
   for (let i = 0; i < headers.length && i < cells.length; i++) {
     const headerText = headers[i].textContent.trim();
-    console.log(`🔍 Header ${i}: "${headerText}"`);
     
     if (headerText === filterConfig.columnName || 
         (filterConfig.columnNameEnglish && headerText === filterConfig.columnNameEnglish) ||
         (filterConfig.columnNameEnglish && headerText.includes(filterConfig.columnNameEnglish)) ||
         (filterConfig.columnName === 'תאריך' && (headerText.includes('נוצר ב') || headerText.includes('תאריך יצירה')))) {
-      console.log(`✅ Found matching header at index ${i}: "${headerText}"`);
-      console.log(`🔍 Returning cell at index ${i}:`, cells[i]);
       return cells[i];
     }
   }
@@ -3723,13 +3693,11 @@ function showAllRecordsInTable(containerId) {
   
   const container = document.getElementById(containerId);
   if (!container) {
-    console.log('⚠️ Container not found:', containerId);
     return;
   }
 
   const table = container.querySelector('table');
   if (!table) {
-    console.log('⚠️ Table not found in container:', containerId);
     return;
   }
 
@@ -3741,7 +3709,7 @@ function showAllRecordsInTable(containerId) {
     visibleCount++;
   }
 
-  console.log(`✅ All records shown: ${visibleCount} rows visible`);
+
   
   // Update table count
   updateTableCount(containerId, visibleCount, rows.length);
@@ -3873,7 +3841,7 @@ function applyAccountFilter() {
  * הפעלת פילטר תאריכים
  */
 function applyDateRangeFilter(dateRange) {
-  console.log('🔄 applyDateRangeFilter called with:', dateRange);
+  // applyDateRangeFilter called with
 
   // הפעלת הפילטר הכללי
   applyTableFilter('date', [dateRange]);
@@ -3958,8 +3926,6 @@ window.getFilterConfig = getFilterConfig;
  * Universal filter function that works on all tables
  */
 function applyTableFilter(filterType, selectedValues) {
-  console.log(`🔄 applyTableFilter called with:`, { filterType, selectedValues });
-  
   // Get filter configuration
   const filterConfig = getFilterConfig(filterType);
   if (!filterConfig) {
@@ -3969,7 +3935,6 @@ function applyTableFilter(filterType, selectedValues) {
   
   // Get all visible containers
   const visibleContainers = getVisibleContainers();
-  console.log('🔍 Visible containers:', visibleContainers);
   
   // Apply filter to each relevant table
   for (const containerId of visibleContainers) {
@@ -4035,7 +4000,7 @@ window.checkIfTableHasColumn = checkIfTableHasColumn;
  * Apply filter to a specific table
  */
 function applyFilterToTable(containerId, filterConfig, selectedValues) {
-  console.log(`🔄 applyFilterToTable called with:`, { containerId, filterConfig, selectedValues });
+  // applyFilterToTable called with
   
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -4052,7 +4017,7 @@ function applyFilterToTable(containerId, filterConfig, selectedValues) {
     if (shouldShow) visibleCount++;
   }
   
-  console.log(`✅ Filter applied to ${containerId}: ${visibleCount}/${rows.length} rows visible`);
+  // Filter applied to
   
   // Update table count
   updateTableCount(containerId, visibleCount, rows.length);
@@ -4183,7 +4148,7 @@ window.searchInAllColumns = searchInAllColumns;
  * @param {string} type - סוג ההתראה (all, account, trade, trade_plan, ticker)
  */
 function filterAlertsByType(type) {
-  console.log('🔄 filterAlertsByType called with:', type);
+  // filterAlertsByType called with
   
   // עדכון מצב הכפתורים
   const buttons = document.querySelectorAll('[data-type]');
@@ -4286,22 +4251,16 @@ async function resetAllFilters() {
 
   try {
     // קבלת הגדרות ברירת מחדל מהשרת
-    console.log('🔍 Fetching default preferences from server...');
+    // Fetching default preferences from server
     const defaultStatusFilter = await getCurrentPreference('defaultStatusFilter') || 'all';
     const defaultTypeFilter = await getCurrentPreference('defaultTypeFilter') || 'all';
     const defaultAccountFilter = await getCurrentPreference('defaultAccountFilter') || 'all';
     const defaultDateRangeFilter = await getCurrentPreference('defaultDateRangeFilter') || 'all';
     const defaultSearchFilter = await getCurrentPreference('defaultSearchFilter') || '';
 
-    console.log('🔄 Default preferences loaded:', {
-      status: defaultStatusFilter,
-      type: defaultTypeFilter,
-      account: defaultAccountFilter,
-      dateRange: defaultDateRangeFilter,
-      search: defaultSearchFilter
-    });
+    // Default preferences loaded
 
-    console.log('🔍 About to call resetFiltersToDefaults with account value:', defaultAccountFilter);
+    // About to call resetFiltersToDefaults with account value
 
     // הפעלת הפונקציה שמטפלת באיפוס לפי הגדרות
     resetFiltersToDefaults(defaultStatusFilter, defaultTypeFilter, defaultAccountFilter, defaultDateRangeFilter, defaultSearchFilter);
@@ -4318,7 +4277,7 @@ async function resetAllFilters() {
  * ניקוי כל הפילטרים - הצגת כל הרשומות
  */
 function clearAllFilters() {
-  console.log('🔄 clearAllFilters called - showing all records');
+  // clearAllFilters called - showing all records
 
   // קריאה לפונקציה החדשה שמנקה את כל הפילטרים
   if (window.simpleFilter) {
@@ -4331,13 +4290,13 @@ function clearAllFilters() {
   
   // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף חשבונות
   if (window.resetAccountsFilters) {
-    console.log('🔄 Calling resetAccountsFilters for accounts page');
+    // Calling resetAccountsFilters for accounts page
     window.resetAccountsFilters();
   }
   
   // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף ביצועים
   if (window.resetExecutionsFilters) {
-    console.log('🔄 Calling resetExecutionsFilters for executions page');
+    // Calling resetExecutionsFilters for executions page
     window.resetExecutionsFilters();
   }
 }
@@ -4378,7 +4337,7 @@ window.getActiveTableContainer = getActiveTableContainer;
  * איפוס פילטרים לפי הגדרות ברירת מחדל
  */
 function resetFiltersToDefaults(defaultStatus, defaultType, defaultAccount, defaultDateRange, defaultSearch) {
-  console.log('🔄 resetFiltersToDefaults called with:', { defaultStatus, defaultType, defaultAccount, defaultDateRange, defaultSearch });
+  // resetFiltersToDefaults called with
 
   // המרת ערכים מאנגלית לעברית
   const statusTranslation = {
@@ -4412,17 +4371,17 @@ function resetFiltersToDefaults(defaultStatus, defaultType, defaultAccount, defa
   statusItems.forEach(item => item.classList.remove('selected'));
   
   let statusValue = statusTranslation[defaultStatus] || 'הכול';
-  console.log('🔍 Looking for status value:', statusValue);
+  // Looking for status value
   const selectedStatusItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === statusValue);
   if (selectedStatusItem) {
     selectedStatusItem.classList.add('selected');
-    console.log('✅ Found and selected status item:', statusValue);
+    // Found and selected status item
   } else {
     // אם לא נמצא, בחר "הכול"
     const allStatusItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
     if (allStatusItem) {
       allStatusItem.classList.add('selected');
-      console.log('⚠️ Status not found, selected "הכול"');
+      // Status not found, selected "הכול"
     }
   }
 
@@ -4431,7 +4390,7 @@ function resetFiltersToDefaults(defaultStatus, defaultType, defaultAccount, defa
   typeItems.forEach(item => item.classList.remove('selected'));
   
   let typeValue = typeTranslation[defaultType] || 'הכול';
-  console.log('🔍 Looking for type value:', typeValue);
+  // Looking for type value
   const selectedTypeItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === typeValue);
   if (selectedTypeItem) {
     selectedTypeItem.classList.add('selected');
@@ -4441,12 +4400,12 @@ function resetFiltersToDefaults(defaultStatus, defaultType, defaultAccount, defa
     const allTypeItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
     if (allTypeItem) {
       allTypeItem.classList.add('selected');
-      console.log('⚠️ Type not found, selected "הכול"');
+      // Type not found, selected "הכול"
     }
   }
 
   // איפוס פילטר חשבון - נדלג על זה כרגע כי יש בעיות
-  console.log('⚠️ Skipping account filter reset for now');
+  // Skipping account filter reset for now
 
   // איפוס פילטר תאריכים
   const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
@@ -4463,7 +4422,7 @@ function resetFiltersToDefaults(defaultStatus, defaultType, defaultAccount, defa
     const allDateRangeItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === 'כל זמן');
     if (allDateRangeItem) {
       allDateRangeItem.classList.add('selected');
-      console.log('⚠️ Date range not found, selected "כל זמן"');
+      // Date range not found, selected "כל זמן"
     }
   }
 
@@ -4487,14 +4446,14 @@ function resetFiltersToDefaults(defaultStatus, defaultType, defaultAccount, defa
     selectedDateRangeElement.textContent = 'כל זמן';
   }
 
-  console.log('✅ Filters reset to default preferences');
+  // Filters reset to default preferences
 }
 
 /**
  * איפוס ידני של פילטרים (גיבוי)
  */
 function resetFiltersManually() {
-  console.log('🔄 Manual reset filters fallback');
+  // Manual reset filters fallback
 
   // איפוס פילטר סטטוס - בחירת "הכול"
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
@@ -4542,7 +4501,7 @@ function resetFiltersManually() {
  * ניקוי ידני של פילטרים (גיבוי)
  */
 function clearFiltersManually() {
-  console.log('🔄 Manual clear filters fallback');
+  // Manual clear filters fallback
 
   // הסרת סימון מכל הפילטרים
   document.querySelectorAll('#statusFilterMenu .status-filter-item.selected').forEach(item => item.classList.remove('selected'));
@@ -4569,7 +4528,7 @@ function clearFiltersManually() {
   
   // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף חשבונות
   if (window.resetAccountsFilters) {
-    console.log('🔄 Calling resetAccountsFilters for accounts page');
+    // Calling resetAccountsFilters for accounts page
     window.resetAccountsFilters();
   }
 }
@@ -4619,7 +4578,7 @@ function processAccountFilterReset(accountItems, defaultAccount) {
   console.log('🔍 Account items to process:', accountItems.length);
   
   // הדפסת כל החשבונות הזמינים
-  console.log('🔍 Available account items:');
+  // Available account items
   accountItems.forEach((item, index) => {
     const value = item.getAttribute('data-value');
     const id = item.getAttribute('data-account-id');
@@ -4641,7 +4600,7 @@ function processAccountFilterReset(accountItems, defaultAccount) {
     const allAccountItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
     if (allAccountItem) {
       allAccountItem.classList.add('selected');
-      console.log('⚠️ Account not found, selected "הכול"');
+      // Account not found, selected "הכול"
     } else {
       // Even "הכול" account item not found!
     }
@@ -4653,7 +4612,7 @@ function processAccountFilterReset(accountItems, defaultAccount) {
  */
 function updateAccountFilterDisplayText() {
     // פונקציה זמנית - תוסיף לוגיקה בהמשך
-    console.log('🔄 עדכון טקסט פילטר חשבונות');
+    // עדכון טקסט פילטר חשבונות
 }
 // ייצוא הפונקציות
 window.getCurrentPreference = getCurrentPreference;
@@ -4662,4 +4621,4 @@ window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;
 // ייצוא הפונקציה החדשה
 window.applyFilter = applyFilter;
 
-console.log('✅ Header System JS loaded completely');
+// Header System JS loaded completely

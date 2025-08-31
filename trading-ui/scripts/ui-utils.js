@@ -920,6 +920,49 @@ function createCancelButton(itemType, itemId, status = 'open', size = 'sm', useG
 }
 
 /**
+ * Create unified delete button for any item type
+ * 
+ * @param {string} itemType - Type of the item ('trade', 'ticker', 'alert', 'account', 'trade_plan', etc.)
+ * @param {number} itemId - ID of the item
+ * @param {string} size - Button size (sm, lg, etc.)
+ * @returns {string} HTML for delete button
+ */
+function createDeleteButton(itemType, itemId, size = 'sm') {
+    const buttonClass = 'btn-danger';
+    const title = 'מחק';
+    const icon = '🗑️';
+    
+    // יצירת onclick בהתאם לסוג האובייקט
+    let onclick = '';
+    if (itemId) {
+        switch (itemType) {
+            case 'trade_plan':
+                onclick = `onclick="window.deleteTradePlan(${itemId})"`;
+                break;
+            case 'trade':
+                onclick = `onclick="window.deleteTrade(${itemId})"`;
+                break;
+            case 'ticker':
+                onclick = `onclick="window.deleteTicker(${itemId})"`;
+                break;
+            case 'alert':
+                onclick = `onclick="window.deleteAlert(${itemId})"`;
+                break;
+            case 'account':
+                onclick = `onclick="window.deleteAccount(${itemId})"`;
+                break;
+            case 'execution':
+                onclick = `onclick="window.deleteExecution(${itemId})"`;
+                break;
+            default:
+                onclick = `onclick="window.delete${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
+        }
+    }
+    
+    return `<button class="btn btn-${size} ${buttonClass}" ${onclick} title="${title}"><span class="delete-icon">${icon}</span></button>`;
+}
+
+/**
  * Perform the actual cancellation based on item type
  * 
  * @param {string} itemType - Type of the item
@@ -1084,13 +1127,15 @@ window.uiUtils = {
     createBasicItemInfo,
     cancelItem,
     performItemCancellation,
-    createCancelButton
+    createCancelButton,
+    createDeleteButton
 };
 
 // Export global cancel functions
 window.cancelItem = cancelItem;
 window.performItemCancellation = performItemCancellation;
 window.createCancelButton = createCancelButton;
+window.createDeleteButton = createDeleteButton;
 
 // ===== WARNING SYSTEM FUNCTIONS =====
 

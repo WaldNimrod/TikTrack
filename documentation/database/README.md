@@ -52,6 +52,26 @@ The TikTrack system uses SQLite as its primary database with SQLAlchemy ORM for 
 - **Key Fields**: id, note_relation_type, created_at
 - **Constraints**: NOT NULL, UNIQUE
 
+#### 7. Tickers ✅ **RECENTLY ENHANCED**
+- **Purpose**: Stock, ETF, and asset management
+- **Key Fields**: id, symbol, name, type, status, active_trades, currency_id
+- **Relationships**: Linked to trades, trade_plans, alerts
+- **Constraints**: 
+  - NOT NULL constraints on required fields
+  - UNIQUE constraint on symbol
+  - FOREIGN KEY (currencies)
+  - Check constraints for status consistency
+- **Automatic Triggers**: 
+  - SQLAlchemy event listeners for automatic status updates
+  - Database constraints for data consistency
+  - Real-time status synchronization with linked items
+- **Recent Improvements**:
+  - Activated automatic triggers for status updates
+  - Added TradePlan event listeners
+  - Fixed reactivateTicker function logic
+  - Created status correction script
+  - Enhanced status validation and error handling
+
 ## Dynamic Constraint Management
 
 ### Constraint Types
@@ -70,6 +90,8 @@ The TikTrack system uses SQLite as its primary database with SQLAlchemy ORM for 
 - **ENUM Value Management**: Dynamic addition of new enum values
 - **Constraint Validation**: Real-time constraint checking
 - **Error Handling**: Comprehensive error messages for constraint violations
+- **Automatic Triggers**: SQLAlchemy event listeners for real-time data consistency
+- **Status Synchronization**: Automatic ticker status updates based on linked items
 
 ## Database Operations
 

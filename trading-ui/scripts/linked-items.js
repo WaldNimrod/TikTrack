@@ -201,7 +201,7 @@ function showLinkedItemsModal(data, itemType, itemId) {
     // יצירת כותרת מותאמת עם סימבול הטיקר
     let modalTitle = '';
     if (itemType === 'ticker') {
-        const tickerSymbol = data.tickerSymbol || getTickerSymbol(itemId) || `טיקר ${itemId}`;
+        const tickerSymbol = data.tickerSymbol || (window.getTickerSymbol ? window.getTickerSymbol(itemId) : `טיקר ${itemId}`) || `טיקר ${itemId}`;
         modalTitle = `פריטים מקושרים לטיקר ${tickerSymbol}`;
     } else {
         modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
@@ -243,7 +243,7 @@ function createLinkedItemsModalContent(data, itemType, itemId) {
         case 'ticker':
             headerTitle = 'מה קשור לטיקר:';
             // נסה לקבל את הסימבול מהנתונים או מהטבלה
-            const tickerSymbol = data.tickerSymbol || getTickerSymbol(itemId) || `טיקר ${itemId}`;
+            const tickerSymbol = data.tickerSymbol || (window.getTickerSymbol ? window.getTickerSymbol(itemId) : `טיקר ${itemId}`) || `טיקר ${itemId}`;
             itemName = tickerSymbol;
             break;
         case 'alert':
@@ -1458,16 +1458,7 @@ function viewLinkedItemsForExecution(executionId) {
  * @param {number} tickerId - ID of the ticker
  * @returns {string} Ticker symbol
  */
-function getTickerSymbol(tickerId) {
-    // נסה לקבל מהטבלה הגלובלית
-    if (window.tickersData && Array.isArray(window.tickersData)) {
-        const ticker = window.tickersData.find(t => t.id == tickerId);
-        if (ticker && ticker.symbol) {
-            return ticker.symbol;
-        }
-    }
-    return `טיקר ${tickerId}`;
-}
+
 
 /**
  * Get badge class for item type
@@ -1620,7 +1611,7 @@ window.getItemTypeIcon = getItemTypeIcon;
 window.getItemTypeDisplayName = getItemTypeDisplayName;
 window.getTypeBadgeClass = getTypeBadgeClass;
 window.getStatusBadge = getStatusBadge;
-window.getTickerSymbol = getTickerSymbol;
+
 window.viewItemDetails = viewItemDetails;
 window.editItem = editItem;
 window.deleteItem = deleteItem;
@@ -1652,7 +1643,7 @@ window.linkedItems = {
     getItemTypeDisplayName,
     getTypeBadgeClass,
     getStatusBadge,
-    getTickerSymbol,
+
     viewItemDetails,
     editItem,
     deleteItem,

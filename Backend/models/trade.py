@@ -137,9 +137,20 @@ def trade_inserted(mapper, connection, target):
     Event listener for when a trade is inserted
     Updates the active_trades field of the related ticker
     """
-    
-    # Skip the update for now to avoid the error
-    pass
+    try:
+        from .ticker import Ticker
+        from sqlalchemy.orm import Session
+        
+        # Get session from connection
+        session = Session(bind=connection)
+        
+        # Update ticker status
+        Ticker.update_ticker_status_from_linked_items(session, target.ticker_id)
+        
+        session.close()
+    except Exception as e:
+        logger.error(f"Error in trade_inserted event: {e}")
+        pass
 
 
 @event.listens_for(Trade, 'after_update')
@@ -148,9 +159,20 @@ def trade_updated(mapper, connection, target):
     Event listener for when a trade is updated
     Updates the active_trades field of the related ticker
     """
-    
-    # Skip the update for now to avoid the error
-    pass
+    try:
+        from .ticker import Ticker
+        from sqlalchemy.orm import Session
+        
+        # Get session from connection
+        session = Session(bind=connection)
+        
+        # Update ticker status
+        Ticker.update_ticker_status_from_linked_items(session, target.ticker_id)
+        
+        session.close()
+    except Exception as e:
+        logger.error(f"Error in trade_updated event: {e}")
+        pass
 
 
 @event.listens_for(Trade, 'after_delete')
@@ -159,6 +181,17 @@ def trade_deleted(mapper, connection, target):
     Event listener for when a trade is deleted
     Updates the active_trades field of the related ticker
     """
-    
-    # Skip the update for now to avoid the error
-    pass
+    try:
+        from .ticker import Ticker
+        from sqlalchemy.orm import Session
+        
+        # Get session from connection
+        session = Session(bind=connection)
+        
+        # Update ticker status
+        Ticker.update_ticker_status_from_linked_items(session, target.ticker_id)
+        
+        session.close()
+    except Exception as e:
+        logger.error(f"Error in trade_deleted event: {e}")
+        pass

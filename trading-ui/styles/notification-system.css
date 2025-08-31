@@ -165,11 +165,75 @@
 }
 
 .warning-modal .modal-header.bg-danger .modal-title {
-    color: white;
+    color: white !important;
 }
 
 .warning-modal .modal-header.bg-danger .btn-close {
-    filter: brightness(0) invert(1);
+    filter: brightness(0) invert(1) !important;
+}
+
+/* כפתור אישור אדום בחלון האישור */
+.warning-modal .modal-footer .btn-danger {
+    background: #dc3545 !important;
+    color: white !important;
+    border: 1px solid #dc3545 !important;
+}
+
+.warning-modal .modal-footer .btn-danger:hover {
+    background: #c82333 !important;
+    color: white !important;
+    border-color: #c82333 !important;
+}
+
+/* כפתורי מחיקה בטבלאות - צבע אדום */
+.delete-icon {
+    color: #dc3545 !important;
+}
+
+.actions-cell .btn-outline-danger[onclick*="deleteTicker"] {
+    background: #ffffff !important;
+    color: #dc3545 !important;
+    border: 1px solid #dc3545 !important;
+}
+
+.actions-cell .btn-outline-danger[onclick*="deleteTicker"]:hover {
+    background: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+}
+
+/* כפתורי ביטול בטבלאות - צבע אדום */
+.cancel-icon {
+    color: #dc3545 !important;
+}
+
+.actions-cell .btn-outline-danger[onclick*="cancelTicker"] {
+    background: #ffffff !important;
+    color: #dc3545 !important;
+    border: 1px solid #dc3545 !important;
+}
+
+.actions-cell .btn-outline-danger[onclick*="cancelTicker"]:hover {
+    background: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+}
+
+/* כפתורי הפעלה מחדש בטבלאות - צבע ירוק */
+.reactivate-icon {
+    color: #28a745 !important;
+}
+
+.actions-cell .btn-outline-success[onclick*="reactivateTicker"] {
+    background: #ffffff !important;
+    color: #28a745 !important;
+    border: 1px solid #28a745 !important;
+}
+
+.actions-cell .btn-outline-success[onclick*="reactivateTicker"]:hover {
+    background: #28a745 !important;
+    color: white !important;
+    border-color: #28a745 !important;
 }
 
 /* Warning Theme (Yellow) */

@@ -284,12 +284,14 @@ async function showEditExecutionModal(id) {
         // מילוי שדה הכמות
         if (execution.quantity) {
             document.getElementById('editExecutionQuantity').value = execution.quantity;
+            console.log('🔄 מילוי שדה כמות:', execution.quantity);
             // שדה כמות מולא
         }
 
         // מילוי שדה המחיר
         if (execution.price) {
             document.getElementById('editExecutionPrice').value = execution.price;
+            console.log('🔄 מילוי שדה מחיר:', execution.price);
             // שדה מחיר מולא
         }
 
@@ -301,6 +303,7 @@ async function showEditExecutionModal(id) {
                 const date = new Date(executionDate);
                 const localDateTime = date.toISOString().slice(0, 16);
                 document.getElementById('editExecutionDate').value = localDateTime;
+                console.log('🔄 מילוי שדה תאריך:', localDateTime);
                 // שדה תאריך מולא
             } catch (error) {
                 console.warn('⚠️ Error processing execution date:', executionDate, error);
@@ -315,18 +318,46 @@ async function showEditExecutionModal(id) {
         const commissionValue = execution.fee || execution.commission || '';
         if (commissionValue) {
             document.getElementById('editExecutionCommission').value = commissionValue;
+            console.log('🔄 מילוי שדה עמלה:', commissionValue);
             // שדה עמלה מולא
         }
 
         // מילוי שדה המקור
-        const sourceValue = execution.source || 'manual';
-        document.getElementById('editExecutionSource').value = sourceValue;
-        // שדה מקור מולא
+        const sourceValue = execution.source || execution.source_type || execution.source_name || execution.sourceType || 'manual';
+        const sourceField = document.getElementById('editExecutionSource');
+        if (sourceField) {
+            sourceField.value = sourceValue;
+            console.log('🔄 מילוי שדה מקור:', sourceValue);
+            // שדה מקור מולא
+            
+            // Debug: הצגת כל השדות הזמינים
+            // שדות זמינים בעסקה
+            // ערך מקור שנמצא
+            // execution.source
+            // execution.source_type
+            // execution.source_name
+            // execution.sourceType
+            
+            // מילוי שדה מזהה חיצוני אם קיים
+            const externalIdValue = execution.external_id || execution.externalId || '';
+            const externalIdField = document.getElementById('editExecutionExternalId');
+            if (externalIdField) {
+                externalIdField.value = externalIdValue;
+                console.log('🔄 מילוי שדה מזהה חיצוני:', externalIdValue);
+                // שדה מזהה חיצוני מולא
+            }
+            
+            // הצגת/הסתרת שדה מזהה חיצוני לפי המקור
+            toggleExternalIdField('edit');
+        } else {
+            console.warn('⚠️ שדה מקור לא נמצא בטופס');
+        }
 
         // מילוי שדה ההערות
         const notesValue = execution.notes || '';
         if (notesValue) {
             document.getElementById('editExecutionNotes').value = notesValue;
+            console.log('🔄 מילוי שדה הערות:', notesValue);
             // שדה הערות מולא
         }
 
@@ -1716,13 +1747,6 @@ async function updateExecutionsTableMain(executions) {
                     <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'execution', ${execution.id})" title="פריטים מקושרים">🔗</button>
                     <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
                     <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
-                    ${ticker ? (window.uiUtils ?
-                        window.uiUtils.createCancelButton('ticker', ticker.id, ticker.status, 'sm') :
-                        (ticker.status === 'cancelled' ? 
-                            `<button class="btn btn-sm btn-outline-success" onclick="window.reactivateTicker(${ticker.id})" title="הפעל מחדש טיקר" style="margin-right: 4px;"><span class="reactivate-icon">✓</span></button>` :
-                            `<button class="btn btn-sm btn-outline-danger" onclick="window.cancelTicker(${ticker.id})" title="בטל טיקר" style="margin-right: 4px;"><span class="cancel-icon">X</span></button>`
-                        )
-                    ) : ''}
                 </td>
             </tr>
         `;
@@ -1972,7 +1996,7 @@ window.validateExecutionType = validateExecutionType;
 window.validateExecutionSource = validateExecutionSource;
 window.validateExecutionNotes = validateExecutionNotes;
 
-// פונקציות ביטול טיקר - שימוש בפונקציות הגלובליות מ-tickers.js
+
 window.validateExecutionExternalId = validateExecutionExternalId;
 window.validateExecutionDate = validateExecutionDate;
 
@@ -3129,3 +3153,37 @@ window.loadExecutionsData = loadExecutionsData;
 
 // הפונקציות של ביטול טיקר נמצאות בקובץ tickers.js
 // כאן אנחנו משתמשים בפונקציות הגלובליות
+
+/**
+ * הצגת/הסתרת שדה מזהה חיצוני לפי מקור
+ * @param {string} mode - 'add' או 'edit'
+ */
+function toggleExternalIdField(mode) {
+    const prefix = mode === 'add' ? 'add' : 'edit';
+    const sourceField = document.getElementById(`${prefix}ExecutionSource`);
+    const externalIdContainer = document.getElementById(`${prefix}ExecutionExternalIdContainer`);
+    const externalIdField = document.getElementById(`${prefix}ExecutionExternalId`);
+    
+    if (!sourceField || !externalIdContainer) {
+        console.warn(`⚠️ שדות לא נמצאו עבור mode: ${mode}`);
+        return;
+    }
+    
+    const source = sourceField.value;
+    
+    if (source === 'manual') {
+        // הסתרת שדה מזהה חיצוני עבור מקור ידני
+        externalIdContainer.style.display = 'none';
+        if (externalIdField) {
+            externalIdField.value = '';
+        }
+        // שדה מזהה חיצוני מוסתר (מקור ידני)
+    } else {
+        // הצגת שדה מזהה חיצוני עבור מקורות אחרים
+        externalIdContainer.style.display = 'block';
+        // שדה מזהה חיצוני מוצג
+    }
+}
+
+// ייצוא הפונקציה
+window.toggleExternalIdField = toggleExternalIdField;

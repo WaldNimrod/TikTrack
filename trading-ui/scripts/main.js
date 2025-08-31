@@ -455,7 +455,7 @@ function restoreAllSectionStates() {
     const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
 
     // Restoring top section state
-    console.log('Restoring top section state:', {
+    console.log('🔄 Restoring top section state:', {
       storageKey: topSectionStorageKey,
       savedState: topSectionCollapsed,
       topSectionFound: !!topSection,
@@ -521,7 +521,7 @@ window.toggleTopSectionGlobal = function () {
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
   // toggleTopSectionGlobal called
-  console.log('toggleTopSectionGlobal called:', {
+  console.log('🔄 toggleTopSectionGlobal called:', {
     currentPath: currentPath,
     sectionFound: !!section,
     toggleBtnFound: !!toggleBtn,
@@ -569,7 +569,7 @@ window.toggleTopSectionGlobal = function () {
       storageKey = 'testsTopSectionCollapsed';
     } else if (currentPath.includes('/db_display')) {
       storageKey = 'dbDisplayTopSectionCollapsed';
-      console.log('Database display page detected, using storage key:', storageKey);
+      // Database display page detected, using storage key
     } else if (currentPath.includes('/db_extradata')) {
       storageKey = 'dbExtradataTopSectionCollapsed';
     } else if (currentPath.includes('/designs')) {
@@ -578,7 +578,7 @@ window.toggleTopSectionGlobal = function () {
 
     // Save state to localStorage
     localStorage.setItem(storageKey, !isCollapsed);
-    console.log('Saved top section state:', { storageKey, isCollapsed: !isCollapsed });
+    // Saved top section state
   }
 };
 
@@ -1203,5 +1203,43 @@ if (document.readyState === 'loading') {
 } else {
   initializeApplication();
 }
+
+// ===== SORT ICONS FUNCTIONS =====
+/**
+ * Update sort icons for table headers
+ * 
+ * @param {string} tableType - Type of table
+ * @param {number} activeColumnIndex - Active column index
+ * @param {string} direction - Sort direction (asc/desc)
+ */
+window.updateSortIcons = function (tableType, activeColumnIndex, direction) {
+  try {
+    // Find all sortable headers in the current table
+    const table = document.querySelector(`[data-table-type="${tableType}"]`);
+    if (!table) {
+      console.warn(`⚠️ Table with type "${tableType}" not found`);
+      return;
+    }
+
+    const headers = table.querySelectorAll('th[data-sortable="true"]');
+    
+    headers.forEach((header, index) => {
+      const icon = header.querySelector('.sort-icon');
+      if (icon) {
+        if (index === activeColumnIndex) {
+          // Active column - show direction
+          icon.textContent = direction === 'asc' ? '▲' : '▼';
+          icon.style.display = 'inline';
+        } else {
+          // Inactive column - hide icon
+          icon.textContent = '';
+          icon.style.display = 'none';
+        }
+      }
+    });
+  } catch (error) {
+    console.warn('⚠️ Error updating sort icons:', error);
+  }
+};
 
 

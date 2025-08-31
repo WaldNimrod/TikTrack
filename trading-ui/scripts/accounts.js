@@ -40,7 +40,7 @@ window.currenciesLoaded = false;
 
 // פונקציה לטעינת מטבעות מהשרת
 async function loadCurrenciesFromServer() {
-  console.log('🔄 === Loading currencies from server ===');
+  // Loading currencies from server
 
   try {
     const token = localStorage.getItem('authToken');
@@ -57,21 +57,21 @@ async function loadCurrenciesFromServer() {
       headers: headers
     });
 
-    console.log('🔄 Currencies response status:', response.status);
+    // Currencies response status
 
     if (response.ok) {
       const responseData = await response.json();
-      console.log('🔄 Currencies response from server:', responseData);
+      // Currencies response from server
 
       const currencies = responseData.data || responseData;
       window.currenciesData = currencies;
       window.currenciesLoaded = true;
-      console.log('🔄 Currencies loaded from server:', currencies.length, 'currencies');
-      console.log('🔄 Currencies details:', currencies);
+      // Currencies loaded from server
+      // Currencies details
     } else {
-      console.log('🔄 Error loading currencies from server, status:', response.status);
+      // Error loading currencies from server, status
       const errorText = await response.text();
-      console.log('🔄 Error response:', errorText);
+      // Error response
       // טעינת מטבעות ברירת מחדל
       window.currenciesData = [
         { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }

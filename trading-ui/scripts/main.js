@@ -181,8 +181,12 @@ function checkDependencies() {
  * Sets up global event handlers and system-wide functionality
  */
 function initializeCoreSystems() {
-  // Initialize header system - HeaderSystem initializes itself via DOMContentLoaded
-  // No need to initialize here as it's handled in header-system.js
+  // Initialize header system
+  if (window.HeaderSystem && !window.headerSystem) {
+    // Initializing header system from main.js
+    window.headerSystem = new window.HeaderSystem();
+    window.headerSystem.init();
+  }
 
 
 
@@ -928,17 +932,12 @@ function filterDataByFilters(data, pageName) {
   const selectedDateRange = window.selectedDateRangeForFilter || null;
   const searchTerm = window.searchTermForFilter || '';
 
-  console.log('🔄 Filters to apply:', {
-    selectedStatuses,
-    selectedTypes,
-    selectedAccounts,
-    selectedDateRange,
-    searchTerm
-  });
+      // Filters to apply
+          // selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm
 
   // פילטר לפי סטטוס (לא חל על הערות)
   if (tableType !== 'notes' && selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
-    console.log('🔄 Filtering by status:', selectedStatuses);
+    // Filtering by status
     filteredData = filteredData.filter(item => {
       let itemStatus;
 
@@ -976,12 +975,12 @@ function filterDataByFilters(data, pageName) {
       const isMatch = selectedStatuses.includes(itemStatus);
       return isMatch;
     });
-    console.log('🔄 After status filter:', filteredData.length, 'items');
+    // After status filter
   }
 
   // פילטר לפי סוג
   if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
-    console.log('🔄 Filtering by type:', selectedTypes);
+    // Filtering by type
     filteredData = filteredData.filter(item => {
       let typeMatch = false;
 
@@ -1042,22 +1041,22 @@ function filterDataByFilters(data, pageName) {
 
       return typeMatch;
     });
-    console.log('🔄 After type filter:', filteredData.length, 'items');
+    // After type filter
   }
 
   // פילטר לפי חשבון
   if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('all')) {
-    console.log('🔄 Filtering by account:', selectedAccounts);
+    // Filtering by account
     filteredData = filteredData.filter(item => {
       const accountName = item.account?.name || item.account_name || '';
       return selectedAccounts.includes(accountName);
     });
-    console.log('🔄 After account filter:', filteredData.length, 'items');
+    // After account filter
   }
 
   // פילטר לפי טווח תאריכים
   if (selectedDateRange && selectedDateRange !== 'כל זמן') {
-    console.log('🔄 Filtering by date range:', selectedDateRange);
+    // Filtering by date range
     filteredData = filteredData.filter(item => {
       const itemDate = new Date(item.created_at);
       const now = new Date();
@@ -1081,12 +1080,12 @@ function filterDataByFilters(data, pageName) {
           return true;
       }
     });
-    console.log('🔄 After date range filter:', filteredData.length, 'items');
+    // After date range filter
   }
 
   // פילטר לפי חיפוש
   if (searchTerm && searchTerm.trim() !== '') {
-    console.log('🔄 Filtering by search term:', searchTerm);
+    // Filtering by search term
     const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => term.length > 0);
     
     filteredData = filteredData.filter(item => {
@@ -1104,10 +1103,10 @@ function filterDataByFilters(data, pageName) {
       
       return searchTerms.every(term => searchableText.includes(term));
     });
-    console.log('🔄 After search filter:', filteredData.length, 'items');
+    // After search filter
   }
 
-  console.log('🔄 Final filtered data length:', filteredData.length);
+      // Final filtered data length
   return filteredData;
 }
 

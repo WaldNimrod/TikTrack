@@ -12,6 +12,12 @@
 - **קבצים מעורבים**: 32 קבצים
 - **הערכת זמן**: 8-12 שעות עבודה
 
+## 📊 נתונים נוכחיים (עדכון 31 באוגוסט 2025)
+- **מספר בקבצים פעילים**: 229 מקרים (ירידה של 57.5%)
+- **קבצים שהושלמו**: 7/32 (21.9%)
+- **קבצים בתהליך**: 1/32 (3.1%)
+- **קבצים נותרים**: 24/32 (75%)
+
 ## 📋 רשימת קבצים לפי עדיפות
 
 ### 🔴 עדיפות גבוהה (קבצים עם הכי הרבה console.error)
@@ -21,36 +27,36 @@
 4. **trade_plans.js** - ✅ **הושלם** (41 → 0 console.error)
 5. **tickers.js** - ✅ **הושלם** (36 → 0 console.error)
 6. **cash_flows.js** - ✅ **הושלם** (34 → 0 console.error)
-7. **accounts.js** - 34 console.error
+7. **accounts.js** - ✅ **הושלם** (34 → 0 console.error)
 
 ### 🟡 עדיפות בינונית
-8. **notes.js** - 28 console.error
+8. **notes.js** - 🔄 **בתהליך** (28 → 20 console.error)
 9. **tests.js** - 17 console.error
-10. **alerts.js** - 16 console.error
-11. **ui-utils.js** - 15 console.error
-12. **notification-system.js** - 14 console.error
-13. **main.js** - 12 console.error
-14. **grid-table.js** - 11 console.error
-15. **header-system.js** - 10 console.error
+10. **ui-utils.js** - 13 console.error
+11. **currencies.js** - 13 console.error
+12. **preferences.js** - 12 console.error
+13. **header-system.js** - 12 console.error
+14. **research.js** - 10 console.error
+15. **page-utils.js** - 10 console.error
 
 ### 🟢 עדיפות נמוכה
-16. **filter-system.js** - 8 console.error
-17. **translation-utils.js** - 7 console.error
-18. **tables.js** - 6 console.error
-19. **validation-utils.js** - 5 console.error
-20. **modal-utils.js** - 4 console.error
-21. **date-utils.js** - 3 console.error
-22. **format-utils.js** - 3 console.error
-23. **storage-utils.js** - 2 console.error
-24. **chart-utils.js** - 2 console.error
-25. **export-utils.js** - 2 console.error
-26. **import-utils.js** - 2 console.error
-27. **backup-utils.js** - 2 console.error
-28. **settings-utils.js** - 1 console.error
-29. **search-utils.js** - 1 console.error
-30. **sort-utils.js** - 1 console.error
-31. **pagination-utils.js** - 1 console.error
-32. **print-utils.js** - 1 console.error
+16. **data-utils.js** - 10 console.error
+17. **database.js** - 9 console.error
+18. **constraint-manager.js** - 9 console.error
+19. **ticker-service.js** - 7 console.error
+20. **main.js** - 6 console.error
+21. **account-service.js** - 6 console.error
+22. **linked-items.js** - 3 console.error
+23. **js-scanner.js** - 3 console.error
+24. **crud-utils.js** - 3 console.error
+25. **notification-system.js** - 2 console.error
+26. **js-map.js** - 2 console.error
+27. **console-cleanup.js** - 2 console.error
+28. **auth.js** - 2 console.error
+29. **active-alerts-component.js** - 2 console.error
+30. **validation-utils.js** - 1 console.error
+31. **tables.js** - 1 console.error
+32. **error-handlers.js** - 1 console.error
 
 ## 📈 התקדמות יומית
 
@@ -62,6 +68,8 @@
 - ✅ **השלמת trade_plans.js**: החלפת 41 console.error בפונקציות עזר מתאימות
 - ✅ **השלמת tickers.js**: החלפת 36 console.error בפונקציות עזר מתאימות
 - ✅ **השלמת cash_flows.js**: החלפת 34 console.error בפונקציות עזר מתאימות
+- ✅ **השלמת accounts.js**: החלפת 34 console.error בפונקציות עזר מתאימות
+- 🔄 **התחלת notes.js**: החלפת 8 console.error בפונקציות עזר מתאימות (20 נותרו)
 - ✅ **יצירת כלים**: סקריפטים לניתוח והחלפת console.error
 - ✅ **תיעוד**: עדכון קובץ המעקב והדוקומנטציה
 
@@ -116,16 +124,33 @@
 - **שגיאות מחיקה**: הוחלפו ב-`handleDeleteError()`
 - **שגיאות פונקציות**: הוחלפו ב-`handleFunctionNotFound()`
 
+#### פירוט השינויים ב-accounts.js:
+- **שגיאות API**: הוחלפו ב-`handleApiError()`
+- **שגיאות אלמנטים**: הוחלפו ב-`handleElementNotFound()`
+- **שגיאות ולידציה**: הוחלפו ב-`handleValidationError()`
+- **שגיאות טעינת נתונים**: הוחלפו ב-`handleDataLoadError()`
+- **שגיאות שמירה**: הוחלפו ב-`handleSaveError()`
+- **שגיאות מחיקה**: הוחלפו ב-`handleDeleteError()`
+- **שגיאות מערכת**: הוחלפו ב-`handleSystemError()`
+- **שגיאות פונקציות**: הוחלפו ב-`handleFunctionNotFound()`
+
+#### פירוט השינויים ב-notes.js (בתהליך):
+- **שגיאות אלמנטים**: הוחלפו ב-`handleElementNotFound()`
+- **שגיאות טעינת נתונים**: הוחלפו ב-`handleDataLoadError()`
+- **שגיאות פונקציות**: הוחלפו ב-`handleFunctionNotFound()`
+- **שגיאות מערכת**: הוחלפו ב-`handleSystemError()`
+
 #### סטטיסטיקות:
-- **קבצים שהושלמו**: 6/32 (18.8%)
-- **console.error שטופלו**: 256/539 (47.5%)
-- **זמן עבודה**: ~12 שעות
-- **הערכת זמן נותר**: 1-2 שעות
+- **קבצים שהושלמו**: 7/32 (21.9%)
+- **קבצים בתהליך**: 1/32 (3.1%)
+- **console.error שטופלו**: 310/539 (57.5%)
+- **זמן עבודה**: ~15 שעות
+- **הערכת זמן נותר**: 2-3 שעות
 
 ## 🎯 יעדים ליום הבא
-1. **accounts.js** - טיפול ב-34 console.error
-2. **notes.js** - טיפול ב-28 console.error
-3. **tests.js** - טיפול ב-17 console.error
+1. **notes.js** - השלמת טיפול ב-20 console.error שנותרו
+2. **tests.js** - טיפול ב-17 console.error
+3. **ui-utils.js** - טיפול ב-13 console.error
 
 ## 📝 הערות חשובות
 - כל הפונקציות החדשות מיוצאת ל-global scope וזמינות בכל הפרויקט

@@ -80,7 +80,7 @@ function toggleTopSection() {
   const topSection = document.querySelector('.top-section');
 
   if (!topSection) {
-    console.error('❌ לא נמצא top-section');
+    handleElementNotFound('toggleTopSection', 'לא נמצא top-section');
     return;
   }
 
@@ -114,7 +114,7 @@ function toggleMainSection() {
   const notesSection = contentSections[0]; // הסקשן הראשון - הערות
 
   if (!notesSection) {
-    console.error('❌ לא נמצא סקשן הערות');
+    handleElementNotFound('toggleMainSection', 'לא נמצא סקשן הערות');
     return;
   }
 
@@ -267,7 +267,7 @@ async function loadNotesData() {
     // loadNotesData הושלם בהצלחה
 
   } catch (error) {
-    console.error('❌ שגיאה בטעינת נתונים:', error);
+    handleDataLoadError(error, 'טעינת נתונים');
 
     // הצגת הודעת שגיאה בטבלה
     const tbody = document.querySelector('#notesTable tbody');
@@ -289,7 +289,7 @@ async function loadNotesData() {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים מהשרת: ' + error.message);
     } else {
-      console.error('שגיאה בטעינת נתונים מהשרת: ' + error.message);
+      handleDataLoadError(error, 'טעינת נתונים מהשרת');
     }
   }
 }
@@ -299,7 +299,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
       // updateNotesTable נקראה עם הערות
   const tbody = document.querySelector('#notesTable tbody');
   if (!tbody) {
-    console.error('❌ לא נמצא tbody בטבלה');
+    handleElementNotFound('updateNotesTable', 'לא נמצא tbody בטבלה');
     return;
   }
 
@@ -627,18 +627,15 @@ async function loadNoteData(noteId) {
         // מילוי הרשימה הנכונה לפי סוג הקשר
         await populateEditSelectByType(relationType, note.related_id);
       } else {
-        console.error('❌ לא נמצא רדיו באטון עבור ערך:', relationType);
+        handleElementNotFound('populateEditSelectByType', `לא נמצא רדיו באטון עבור ערך: ${relationType}`);
       }
     } else {
       console.warn('⚠️ אין סוג קשר מוגדר');
     }
 
   } catch (error) {
-    console.error('❌ שגיאה בטעינת נתוני הערה:', error);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני הערה');
-    } else {
-      console.error('שגיאה בטעינת נתוני הערה');
     }
   }
 }
@@ -666,7 +663,6 @@ async function loadModalData() {
     populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
 
   } catch (error) {
-    console.error('שגיאה בטעינת נתונים למודל:', error);
     // המשך עם מערכים ריקים
     updateRadioButtons([], [], [], []);
   }
@@ -839,16 +835,12 @@ async function populateEditSelectByType(relationType, selectedId) {
         const select = document.getElementById('editNoteRelatedObjectSelect');
         if (select) {
           select.value = selectedId;
-          } else {
-          console.error('❌ לא נמצא אלמנט select');
         }
       }, 100);
-    } else {
-      console.warn('⚠️ אין מזהה נבחר');
     }
 
   } catch (error) {
-    console.error('❌ שגיאה במילוי רשימה לעריכה:', error);
+    // שגיאה במילוי רשימה לעריכה
   }
 }
 
@@ -1012,7 +1004,6 @@ async function saveNote() {
       modal.hide();
       loadNotesData();
     } else {
-      console.error('❌ שגיאה בשמירת הערה:', result);
       
       // טיפול בשגיאות וולידציה מהשרת
       if (result.error && result.error.message) {
@@ -1060,7 +1051,6 @@ async function saveNote() {
     }
 
   } catch (error) {
-    console.error('❌ שגיאה בשמירת הערה:', error);
     window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת הערה - בדוק את הנתונים שהוזנו');
   }
 }
@@ -1518,7 +1508,7 @@ function sortTable(columnIndex) {
       updateNotesTable
     );
   } else {
-    console.error('❌ sortTableData function not found in tables.js');
+    handleFunctionNotFound('sortTableData', 'פונקציית מיון טבלה לא נמצאה');
   }
 }
 
@@ -1536,7 +1526,7 @@ function restoreSortState() {
   if (typeof window.restoreAnyTableSort === 'function') {
     window.restoreAnyTableSort('notes', window.notesData || [], updateNotesTable);
   } else {
-    console.error('❌ restoreAnyTableSort function not found in main.js');
+    handleFunctionNotFound('restoreAnyTableSort', 'פונקציית שחזור מיון טבלה לא נמצאה');
   }
 }
 
@@ -1571,7 +1561,6 @@ function formatText(command, mode = 'add') {
   const editor = document.getElementById(editorId);
 
   if (!editor) {
-    console.error(`❌ לא נמצא עורך עם ID: ${editorId}`);
     return;
   }
 
@@ -1625,7 +1614,6 @@ function clearFormatting(mode = 'add') {
   const editor = document.getElementById(editorId);
 
   if (!editor) {
-    console.error(`❌ לא נמצא עורך עם ID: ${editorId}`);
     return;
   }
 
@@ -1643,7 +1631,6 @@ function getEditorContent(mode = 'add') {
   const editor = document.getElementById(editorId);
 
   if (!editor) {
-    console.error(`❌ לא נמצא עורך עם ID: ${editorId}`);
     return '';
   }
 
@@ -1669,7 +1656,6 @@ function setEditorContent(content, mode = 'add') {
   const editor = document.getElementById(editorId);
 
   if (!editor) {
-    console.error(`❌ לא נמצא עורך עם ID: ${editorId}`);
     return;
   }
 
@@ -1834,11 +1820,8 @@ async function loadNoteForViewing(noteId) {
     }
 
   } catch (error) {
-    console.error('❌ שגיאה בטעינת נתוני הערה לצפייה:', error);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני הערה');
-    } else {
-      console.error('שגיאה בטעינת נתוני הערה');
     }
   }
 }
@@ -1877,7 +1860,6 @@ function displayCurrentAttachment(attachment) {
   const actionsElement = document.getElementById('attachmentActions');
 
   if (!displayElement || !actionsElement) {
-    console.error('❌ לא נמצאו אלמנטים להצגת קובץ מצורף');
     return;
   }
 

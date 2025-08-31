@@ -120,7 +120,6 @@ async function loadAlertsData() {
     return alertsData;
 
   } catch (error) {
-    console.error('Error loading alerts data:', error);
     // משתמש בנתוני דמו
 
     // שימוש בנתוני דמו
@@ -626,7 +625,7 @@ function showAddAlertModal() {
       document.body.appendChild(backdrop);
     }
   } else {
-    console.error('Modal element not found');
+    // Modal element not found
   }
 }
 
@@ -666,7 +665,6 @@ async function loadModalData() {
     populateSelect('alertRelatedObjectSelect', tickers, 'symbol', '');
     populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol', '');
   } catch (error) {
-    console.error('שגיאה בטעינת נתונים למודל:', error);
     // המשך עם מערכים ריקים
     updateRadioButtons([], [], [], []);
   }
@@ -749,7 +747,6 @@ function populateSelect(selectId, data, field, prefix = '') {
 
   const select = document.getElementById(selectId);
   if (!select) {
-    console.error('🔧 Select element not found:', selectId);
     return;
   }
 
@@ -813,8 +810,6 @@ function closeModal(modalId) {
   // שימוש בפונקציה הגלובלית
   if (typeof window.closeModal === 'function') {
     window.closeModal(modalId);
-  } else {
-    console.error('❌ closeModal function not found in main.js');
   }
 }
 
@@ -1337,11 +1332,9 @@ async function saveAlert() {
       window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה!');
     } else {
       const errorText = await response.text();
-      console.error('🔧 Server error response:', errorText);
       throw new Error(`שגיאה בשמירת התראה: ${response.status} - ${errorText}`);
     }
   } catch (error) {
-    console.error('🔧 Error saving alert:', error);
     window.showErrorNotification('שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message);
   }
 }
@@ -1475,7 +1468,7 @@ function editAlert(alertId) {
       document.body.appendChild(backdrop);
     }
   } else {
-    console.error('Edit modal element not found');
+    // Edit modal element not found
   }
 }
 
@@ -1727,7 +1720,6 @@ async function updateAlert() {
       throw new Error(`שגיאה בעדכון התראה: ${response.status}`);
     }
   } catch (error) {
-    console.error('שגיאה בעדכון התראה:', error);
     window.showErrorNotification('שגיאה בעדכון התראה', 'שגיאה בעדכון התראה: ' + error.message);
   }
 }
@@ -1803,8 +1795,6 @@ async function confirmDeleteAlert(alertId) {
       window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
       loadAlertsData();
     } else {
-      console.error('❌ שגיאה במחיקת התראה:', result);
-      
       // טיפול בשגיאות מהשרת
       if (result.error && result.error.message) {
         const serverMessage = result.error.message;
@@ -1819,7 +1809,6 @@ async function confirmDeleteAlert(alertId) {
       }
     }
   } catch (error) {
-    console.error('❌ שגיאה במחיקת התראה:', error);
     window.showErrorNotification('שגיאה', 'שגיאה במחיקת התראה - בדוק את חיבור השרת');
   }
 }
@@ -1850,8 +1839,6 @@ function sortTable(columnIndex) {
       'alerts',
       updateAlertsTable
     );
-  } else {
-    console.error('❌ sortTableData function not found in tables.js');
   }
 }
 
@@ -1901,8 +1888,6 @@ function restoreAlertsSectionState() {
   // שימוש בפונקציה הגלובלית החדשה
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
-  } else {
-    console.error('restoreAllSectionStates function not found in main.js');
   }
 }
 
@@ -1919,7 +1904,6 @@ if (typeof window.toggleMainSection !== 'function') {
     const alertsSection = contentSections[0]; // הסקשן הראשון - התראות
 
     if (!alertsSection) {
-      console.error('❌ לא נמצא סקשן התראות');
       return;
     }
 
@@ -1980,7 +1964,6 @@ document.addEventListener('DOMContentLoaded', function () {
   
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
-    console.error('❌ מערכת התראות לא זמינה!');
     return;
   }
   
@@ -2012,7 +1995,7 @@ if (window.location.pathname.includes('/alerts')) {
     if (typeof window.loadAlertsData === 'function') {
       window.loadAlertsData();
     } else {
-      console.error('❌ loadAlertsData function not found');
+      // loadAlertsData function not found
     }
   };
 }

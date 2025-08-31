@@ -136,7 +136,6 @@ function restoreCashFlowsSectionState() {
 function showDeleteCashFlowModal(id) {
     const cashFlow = cashFlowsData.find(cf => cf.id === id);
     if (!cashFlow) {
-        handleElementNotFound('showDeleteCashFlowModal', `תזרים מזומנים לא נמצא: ${id}`);
         return;
     }
 

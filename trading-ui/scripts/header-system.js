@@ -2476,7 +2476,6 @@ class HeaderSystem {
         showAllRecordsInTable(containerId);
       }
     }
-    }
   }
 
   // ניקוי כל הפילטרים
@@ -2783,12 +2782,20 @@ window.closeTypeFilter = closeTypeFilter;
 window.closeAccountFilter = closeAccountFilter;
 window.closeDateRangeFilter = closeDateRangeFilter;
 
+// ייצוא הקלאס לגלובל
+window.HeaderSystem = HeaderSystem;
+
 // אתחול אוטומטי
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.HeaderSystem) {
+  console.log('🔄 === DOM CONTENT LOADED (HEADER SYSTEM) ===');
+  console.log('🔍 HeaderSystem available:', typeof HeaderSystem);
+  
+  if (typeof HeaderSystem === 'function') {
     window.headerSystem = new HeaderSystem();
     window.headerSystem.init();
-    window.headerSystem.loadSavedState(); // טעינת סטטוס שמור
+    console.log('✅ Header system initialized successfully');
+  } else {
+    console.error('❌ HeaderSystem class not found');
   }
 });
 

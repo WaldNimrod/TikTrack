@@ -284,13 +284,13 @@ async function showEditExecutionModal(id) {
         // מילוי שדה הכמות
         if (execution.quantity) {
             document.getElementById('editExecutionQuantity').value = execution.quantity;
-            console.log('✅ שדה כמות מולא:', execution.quantity);
+            // שדה כמות מולא
         }
 
         // מילוי שדה המחיר
         if (execution.price) {
             document.getElementById('editExecutionPrice').value = execution.price;
-            console.log('✅ שדה מחיר מולא:', execution.price);
+            // שדה מחיר מולא
         }
 
         // עיבוד תאריך ביצוע - בדיקה של שדות שונים
@@ -301,7 +301,7 @@ async function showEditExecutionModal(id) {
                 const date = new Date(executionDate);
                 const localDateTime = date.toISOString().slice(0, 16);
                 document.getElementById('editExecutionDate').value = localDateTime;
-                console.log('✅ שדה תאריך מולא:', localDateTime);
+                // שדה תאריך מולא
             } catch (error) {
                 console.warn('⚠️ Error processing execution date:', executionDate, error);
                 document.getElementById('editExecutionDate').value = '';
@@ -315,19 +315,19 @@ async function showEditExecutionModal(id) {
         const commissionValue = execution.fee || execution.commission || '';
         if (commissionValue) {
             document.getElementById('editExecutionCommission').value = commissionValue;
-            console.log('✅ שדה עמלה מולא:', commissionValue);
+            // שדה עמלה מולא
         }
 
         // מילוי שדה המקור
         const sourceValue = execution.source || 'manual';
         document.getElementById('editExecutionSource').value = sourceValue;
-        console.log('✅ שדה מקור מולא:', sourceValue);
+        // שדה מקור מולא
 
         // מילוי שדה ההערות
         const notesValue = execution.notes || '';
         if (notesValue) {
             document.getElementById('editExecutionNotes').value = notesValue;
-            console.log('✅ שדה הערות מולא:', notesValue);
+            // שדה הערות מולא
         }
 
         // הצגת כפתור קישור לטרייד/תכנון אם יש
@@ -771,13 +771,13 @@ function validateCompleteExecutionForm(mode) {
     // הצגת הודעת שגיאה מפורטת אם יש שגיאות
     if (!isValid && errors.length > 0) {
         const errorMessage = errors.join(', ');
-        console.log('🔧 Validation errors:', errors);
-        console.log('🔧 window.showErrorNotification exists:', typeof window.showErrorNotification === 'function');
-        console.log('🔧 window.showValidationWarning exists:', typeof window.showValidationWarning === 'function');
+        // Validation errors check
+            // window.showErrorNotification exists check
+    // window.showValidationWarning exists check
         
         // שימוש ישיר ב-showErrorNotification עם פרטים מפורטים
         if (window.showErrorNotification) {
-            console.log('🔧 Calling showErrorNotification with detailed error message');
+            // Calling showErrorNotification with detailed error message
             window.showErrorNotification('שגיאות בטופס', `יש לתקן את השגיאות הבאות: ${errorMessage}`);
         } else {
             handleSystemError(new Error('showErrorNotification not available'), 'מערכת התראות');
@@ -874,11 +874,11 @@ async function saveExecution() {
             modal.hide();
 
             // הצגת הודעת הצלחה
-            console.log('🔧 Showing success notification for save');
-            console.log('🔧 window.showSuccessNotification exists:', typeof window.showSuccessNotification === 'function');
+                // Showing success notification for save
+    // window.showSuccessNotification exists check
             
             if (typeof window.showSuccessNotification === 'function') {
-                console.log('🔧 Calling showSuccessNotification with:', 'הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת');
+                // Calling showSuccessNotification
                 window.showSuccessNotification('הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת');
             } else {
                 handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
@@ -928,14 +928,14 @@ async function saveExecution() {
                         }
                         
                         // שימוש במערכת ההתראות המובנת
-                        console.log('🔧 Field validation error (add):', { fieldName, fieldError });
-                        console.log('🔧 window.showValidationWarning exists (add):', typeof window.showValidationWarning === 'function');
+                            // Field validation error (add) check
+    // window.showValidationWarning exists (add) check
                         
                         if (fieldName && window.showValidationWarning) {
-                            console.log('🔧 Calling showValidationWarning (add) with:', fieldName, fieldError);
+                            // Calling showValidationWarning (add)
                             window.showValidationWarning(fieldName, fieldError);
                         } else {
-                            console.log('🔧 Using showErrorNotification as fallback (add)');
+                            // Using showErrorNotification as fallback (add)
                             window.showErrorNotification('שגיאת וולידציה', fieldError);
                         }
                     });
@@ -1024,11 +1024,11 @@ async function updateExecution() {
             modal.hide();
 
             // הצגת הודעת הצלחה
-            console.log('🔧 Showing success notification for update');
-            console.log('🔧 window.showSuccessNotification exists:', typeof window.showSuccessNotification === 'function');
+                // Showing success notification for update
+    // window.showSuccessNotification exists check
             
             if (typeof window.showSuccessNotification === 'function') {
-                console.log('🔧 Calling showSuccessNotification with:', 'הצלחה', 'עסקה עודכנה בהצלחה במערכת');
+                // Calling showSuccessNotification
                 window.showSuccessNotification('הצלחה', 'עסקה עודכנה בהצלחה במערכת');
             } else {
                 handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
@@ -1076,14 +1076,14 @@ async function updateExecution() {
                         }
                         
                         // שימוש במערכת ההתראות המובנת
-                        console.log('🔧 Field validation error (edit):', { fieldName, fieldError });
-                        console.log('🔧 window.showValidationWarning exists (edit):', typeof window.showValidationWarning === 'function');
+                            // Field validation error (edit) check
+    // window.showValidationWarning exists (edit) check
                         
                         if (fieldName && window.showValidationWarning) {
-                            console.log('🔧 Calling showValidationWarning (edit) with:', fieldName, fieldError);
+                            // Calling showValidationWarning (edit)
                             window.showValidationWarning(fieldName, fieldError);
                         } else {
-                            console.log('🔧 Using showErrorNotification as fallback (edit)');
+                            // Using showErrorNotification as fallback (edit)
                             window.showErrorNotification('שגיאת וולידציה', fieldError);
                         }
                     });
@@ -1106,36 +1106,36 @@ async function updateExecution() {
  * אישור מחיקת עסקה
  */
 async function confirmDeleteExecution(id) {
-    console.log('🔧 confirmDeleteExecution called with id:', id);
+    // confirmDeleteExecution called with id
     
     // אם לא קיבלנו ID כפרמטר, ננסה לקבל אותו מהטופס
     if (!id) {
         id = document.getElementById('deleteExecutionId').value;
-        console.log('🔧 Got id from form:', id);
+        // Got id from form
     }
 
     // ביצועים לא צריכים בדיקת מקושרים - אין להם ילדים
-    console.log('🔧 Executions do not require linked items check - no children');
+    // Executions do not require linked items check - no children
 
     try {
-        console.log('🔧 Making DELETE request to:', `/api/v1/executions/${id}`);
+        // Making DELETE request
         const response = await fetch(`/api/v1/executions/${id}`, {
             method: 'DELETE'
         });
-        console.log('🔧 DELETE response status:', response.status);
+        // DELETE response status
 
         if (response.ok) {
           
 
             // סגירת המודל - לא נדרש כי אין מודל
-            console.log('🔧 Delete successful, no modal to close');
+            // Delete successful, no modal to close
 
             // הצגת הודעת הצלחה
-            console.log('🔧 Showing success notification for delete');
-            console.log('🔧 window.showSuccessNotification exists:', typeof window.showSuccessNotification === 'function');
+                // Showing success notification for delete
+    // window.showSuccessNotification exists check
             
             if (typeof window.showSuccessNotification === 'function') {
-                console.log('🔧 Calling showSuccessNotification with:', 'הצלחה', 'עסקה נמחקה בהצלחה מהמערכת');
+                // Calling showSuccessNotification
                 window.showSuccessNotification('הצלחה', 'עסקה נמחקה בהצלחה מהמערכת');
             } else {
                 handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
@@ -1156,7 +1156,7 @@ async function confirmDeleteExecution(id) {
                     errorData.error.message.includes('linked items')) {
 
                     // סגירת מודל המחיקה הרגיל - לא נדרש
-                    console.log('🔧 Linked items found, no modal to close');
+                    // Linked items found, no modal to close
 
                     // הצגת מודל הפריטים המקושרים
                     await showExecutionLinkedItemsModal(id, errorData);
@@ -1333,19 +1333,19 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
  * הצגת הפריטים המקושרים
  */
 function displayLinkedItems(linkedItems) {
-    console.log('🔄 הצגת פריטים מקושרים:', linkedItems);
-    console.log('📊 סוג הנתונים:', typeof linkedItems);
-    console.log('📊 מפתחות:', Object.keys(linkedItems || {}));
+    // הצגת פריטים מקושרים
+    // סוג הנתונים
+    // מפתחות
 
     const contentDiv = document.getElementById('linkedItemsContent');
     let html = '';
 
     // טריידים מקושרים
-    console.log('🔍 בדיקת טריידים מקושרים:', linkedItems.trades);
-    console.log('🔍 האם קיים trades?', !!linkedItems.trades);
-    console.log('🔍 אורך trades:', linkedItems.trades ? linkedItems.trades.length : 'undefined');
+    // בדיקת טריידים מקושרים
+    // האם קיים trades
+    // אורך trades
     if (linkedItems.trades && linkedItems.trades.length > 0) {
-        console.log('✅ נמצאו טריידים מקושרים, יוצר HTML');
+        // נמצאו טריידים מקושרים, יוצר HTML
         html += `
             <div class="card mb-3">
                 <div class="card-header bg-warning text-dark">
@@ -1369,7 +1369,7 @@ function displayLinkedItems(linkedItems) {
     }
 
     // תכנונים מקושרים
-    console.log('🔍 בדיקת תכנונים מקושרים:', linkedItems.trade_plans);
+    // בדיקת תכנונים מקושרים
     if (linkedItems.trade_plans && linkedItems.trade_plans.length > 0) {
         html += `
             <div class="card mb-3">
@@ -1490,7 +1490,7 @@ function displayLinkedItems(linkedItems) {
     `;
     }
 
-    console.log('🔍 HTML שנוצר:', html);
+    // HTML שנוצר
     if (!html) {
         html = '<div class="alert alert-success">✅ לא נמצאו פריטים מקושרים פתוחים. ניתן למחוק את הטיקר בבטחה.</div>';
     }
@@ -1549,13 +1549,13 @@ function goToNote(noteId) {
  */
 async function loadExecutionsData() {
     try {
-        console.log('🔄 טעינת נתוני עסקעות...');
+        // טעינת נתוני עסקעות
 
         const response = await fetch('/api/v1/executions/?_t=' + Date.now());
         if (response.ok) {
             const data = await response.json();
             executionsData = data.data || data;
-            console.log('✅ נטענו', executionsData.length, 'עסקעות');
+            // נטענו עסקעות
 
             // בדיקה אם יש פילטרים פעילים
             if (window.headerSystem && window.headerSystem.currentFilters) {
@@ -1567,7 +1567,7 @@ async function loadExecutionsData() {
                     (filters.search && filters.search !== '');
 
                 if (hasActiveFilters) {
-                    console.log('🔍 יש פילטרים פעילים, מסנן נתונים מקומית');
+                    // יש פילטרים פעילים, מסנן נתונים מקומית
                     const filteredData = filterExecutionsLocally(
                         executionsData,
                         filters.status,
@@ -1648,7 +1648,7 @@ async function updateExecutionsTableMain(executions) {
             tickers = [];
         }
 
-        console.log(`✅ נטענו ${trades.length} טריידים ו-${tickers.length} טיקרים`);
+        // נטענו טריידים וטיקרים
     } catch (error) {
         console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
         trades = [];
@@ -1727,15 +1727,15 @@ async function updateExecutionsTableMain(executions) {
     // עדכון ה-info-summary
     updateExecutionsSummary(executions);
     
-    console.log('✅ Table update completed successfully');
-    console.log('🔄 === END UPDATE EXECUTIONS TABLE ===');
+    // Table update completed successfully
+    // === END UPDATE EXECUTIONS TABLE ===
 }
 
 // פונקציה formatDate מוגדרת בקובץ main.js
 
 // פונקציה לבדיקה אם תאריך נמצא בטווח
 function isDateInRange(dateString, dateRange) {
-    console.log('🔍 isDateInRange called with:', { dateString, dateRange });
+    // isDateInRange called
     
     if (!dateString || !dateRange || dateRange === 'כל זמן') {
         return true;
@@ -1751,8 +1751,8 @@ function isDateInRange(dateString, dateRange) {
     const today = new Date();
     today.setHours(23, 59, 59, 999); // סוף היום
     
-    console.log('🔍 Parsed date:', date);
-    console.log('🔍 Today:', today);
+    // Parsed date
+    // Today
     
     switch (dateRange) {
         case 'היום':
@@ -1804,7 +1804,7 @@ window.isDateInRange = isDateInRange;
 
 // פונקציית פילטור מקומי לעסקאות
 function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
-    console.log('🔍 filterExecutionsLocally called with:', { selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm });
+    // filterExecutionsLocally called
     
     if (!executions || !Array.isArray(executions)) {
         console.warn('⚠️ No executions data to filter');
@@ -1840,13 +1840,13 @@ function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, se
     
     // פילטר לפי תאריך - עובד מול שדה created_at (תאריך יצירה)
     if (dateRange && dateRange !== 'כל זמן') {
-        console.log('🔍 Applying date filter:', dateRange);
+        // Applying date filter
         filtered = filtered.filter(execution => {
             const executionDate = execution.created_at; // תאריך יצירה בלבד
-            console.log('🔍 Checking execution created_at:', executionDate, 'for execution ID:', execution.id);
+            // Checking execution created_at
             
             if (!executionDate) {
-                console.log('🔍 No created_at found, including in results');
+                // No created_at found, including in results
                 return true;
             }
             
@@ -1857,10 +1857,10 @@ function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, se
             }
             
             const isInRange = isDateInRange(dateOnly, dateRange);
-            console.log('🔍 Created date', dateOnly, 'in range', dateRange, ':', isInRange);
+            // Created date in range check
             return isInRange;
         });
-        console.log('🔍 After date filter:', filtered.length, 'executions remaining');
+        // After date filter
     }
     
     // פילטר לפי חיפוש חופשי
@@ -1876,7 +1876,7 @@ function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, se
         });
     }
     
-    console.log(`✅ Filtered ${executions.length} executions to ${filtered.length}`);
+    // Filtered executions
     return filtered;
 }
 
@@ -1945,7 +1945,7 @@ window.goToNote = goToNote;
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
  */
 function sortTable(columnIndex) {
-    console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex}`);
+    // sortTable נקראה עבור עמודה
 
     if (typeof window.sortTable === 'function') {
         window.sortTable(
@@ -1964,7 +1964,7 @@ function sortTable(columnIndex) {
  * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
-    console.log('🔄 Restoring sort state for executions table');
+    // Restoring sort state for executions table
 
     if (typeof window.restoreAnyTableSort === 'function') {
         window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
@@ -2022,21 +2022,21 @@ function setupModalConfigurations() {
  * טעינת טיקרים עם טריידים ותכנונים בסטטוס פתוח או סגור
  */
 async function loadTickersWithOpenOrClosedTradesAndPlans() {
-    console.log('🔄 Loading tickers with open or closed trades and plans...');
+    // Loading tickers with open or closed trades and plans
 
     try {
         // שימוש בפונקציה החדשה - הצג טיקרים עם טריידים ותכנונים בסטטוס פתוח או סגור
-        console.log('🔍 Loading tickers with open or closed trades and plans...');
+        // Loading tickers with open or closed trades and plans
         const relevantTickers = await window.tickerService.getTickersWithOpenOrClosedTradesAndPlans({
             useCache: true
         });
 
-        console.log('📊 Relevant tickers found:', relevantTickers.length);
-        console.log('📊 Relevant tickers:', relevantTickers.map(t => t.symbol));
+            // Relevant tickers found
+    // Relevant tickers
 
         // אם אין טיקרים רלוונטיים, הצג את כל הטיקרים
         const tickersToShow = relevantTickers.length > 0 ? relevantTickers : await window.tickerService.getTickers();
-        console.log('📊 Showing', tickersToShow.length, 'tickers in dropdown');
+        // Showing tickers in dropdown
 
         // עדכון שדות ה-select
         window.tickerService.updateTickerSelect('addExecutionTicker', tickersToShow);
@@ -2082,7 +2082,7 @@ function enableAllFields(mode = 'add') {
         }
     });
 
-    console.log(`✅ Enabled all fields for ${mode} execution form`);
+    // Enabled all fields for execution form
 }
 
 /**
@@ -2090,14 +2090,14 @@ function enableAllFields(mode = 'add') {
  * @param {string} mode - 'add' או 'edit'
  */
 async function loadActiveTradesForTicker(mode = 'add') {
-    console.log('🔄 Loading trades and plans for ticker, mode:', mode);
+    // Loading trades and plans for ticker, mode
 
     const tickerId = mode === 'add'
         ? document.getElementById('addExecutionTicker').value
         : document.getElementById('editExecutionTicker').value;
 
     if (!tickerId) {
-        console.log('❌ No ticker selected');
+        // No ticker selected
         return;
     }
 
@@ -2106,7 +2106,7 @@ async function loadActiveTradesForTicker(mode = 'add') {
         ? document.getElementById('addExecutionShowClosedTrades')?.checked || false
         : document.getElementById('editExecutionShowClosedTrades')?.checked || false;
 
-    console.log('🔍 Show closed trades:', showClosedTrades);
+            // Show closed trades
 
     try {
         // טעינת טריידים
@@ -2130,8 +2130,8 @@ async function loadActiveTradesForTicker(mode = 'add') {
         const filteredTrades = trades.filter(trade => trade.ticker_id == tickerId);
         const filteredPlans = plans.filter(plan => plan.ticker_id == tickerId);
 
-        console.log('✅ Found', filteredTrades.length, 'trades for ticker', tickerId);
-        console.log('✅ Found', filteredPlans.length, 'plans for ticker', tickerId);
+            // Found trades for ticker
+    // Found plans for ticker
 
         // עדכון שדה הטרייד/תכנון
         const tradeSelect = mode === 'add'
@@ -2208,7 +2208,7 @@ async function loadActiveTradesForTicker(mode = 'add') {
  * טעינת טיקרים עם טריידים סגורים
  */
 async function loadTickersWithClosedTrades() {
-    console.log('🔄 Loading tickers with closed trades...');
+    // Loading tickers with closed trades
 
     try {
         // טעינת טיקרים
@@ -2228,7 +2228,7 @@ async function loadTickersWithClosedTrades() {
                 (trade.status === 'active' || trade.status === 'closed')
             );
         });
-        console.log('✅ Found', allTickers.length, 'tickers with active or closed trades');
+        // Found tickers with active or closed trades
 
         return allTickers;
     } catch (error) {
@@ -2242,7 +2242,7 @@ async function loadTickersWithClosedTrades() {
  * @param {string} mode - 'add' או 'edit'
  */
 async function updateTradesOnCheckboxChange(mode = 'add') {
-    console.log('🔄 Updating trades due to checkbox change, mode:', mode);
+    // Updating trades due to checkbox change, mode
 
     // הצגת הודעת "בפיתוח"
     if (typeof window.showInfoNotification === 'function') {
@@ -2251,7 +2251,7 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
         if (typeof window.showInfoNotification === 'function') {
             window.showInfoNotification('מידע', 'פיצ\'ר "הצג טריידים סגורים" - בפיתוח');
         } else {
-            console.log('פיצ\'ר "הצג טריידים סגורים" - בפיתוח');
+            // פיצ'ר "הצג טריידים סגורים" - בפיתוח
         }
     }
 
@@ -2261,7 +2261,7 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
             ? document.getElementById('addExecutionShowClosedTrades')?.checked || false
             : document.getElementById('editExecutionShowClosedTrades')?.checked || false;
 
-        console.log('🔍 Show closed trades:', showClosedTrades);
+        // Show closed trades
 
         let tickers;
         if (showClosedTrades) {
@@ -2297,7 +2297,7 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
                 option.textContent = `${ticker.symbol} - ${ticker.name}`;
                 tickerSelect.appendChild(option);
             });
-            console.log('✅ Updated ticker select with', tickers.length, 'options');
+            // Updated ticker select with options
         }
 
         // אם יש טיקר נבחר, עדכן את הטריידים
@@ -2316,11 +2316,11 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
  * @param {string} symbol - סמל הטיקר
  */
 function goToTickerPage(symbol) {
-    console.log('🔄 מעבר לדף טיקר:', symbol);
+    // מעבר לדף טיקר
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'מעבר לדף טיקר - בפיתוח');
     } else {
-        console.log('מעבר לדף טיקר - בפיתוח');
+        // מעבר לדף טיקר - בפיתוח
     }
     // TODO: ניתוב לדף טיקר כשהפיצ'ר יהיה מוכן
 }
@@ -2335,7 +2335,7 @@ async function getTickers() {
         if (response.ok) {
             const data = await response.json();
             const tickers = data.data || data || [];
-            console.log('✅ Retrieved', tickers.length, 'tickers from server');
+            // Retrieved tickers from server
             return tickers;
         } else {
             handleApiError(new Error(`Failed to fetch tickers: ${response.status}`), 'FETCH_TICKERS');
@@ -2351,11 +2351,11 @@ async function getTickers() {
  * הצגת עזרה לבחירת טיקר
  */
 function showTickerHelp() {
-    console.log('🔄 הצגת עזרה לבחירת טיקר');
+    // הצגת עזרה לבחירת טיקר
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר');
     } else {
-        console.log('בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר');
+        // בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר
     }
 }
 
@@ -2363,11 +2363,11 @@ function showTickerHelp() {
  * הוספת טיקר חדש
  */
 function addNewTicker() {
-    console.log('🔄 הוספת טיקר חדש');
+    // הוספת טיקר חדש
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'הוספת טיקר - בפיתוח');
     } else {
-        console.log('הוספת טיקר - בפיתוח');
+        // הוספת טיקר - בפיתוח
     }
     // TODO: פתיחת מודל הוספת טיקר
 }
@@ -2376,11 +2376,11 @@ function addNewTicker() {
  * הוספת תכנון חדש
  */
 function addNewPlan() {
-    console.log('🔄 הוספת תכנון חדש');
+    // הוספת תכנון חדש
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'הוספת תכנון - בפיתוח');
     } else {
-        console.log('הוספת תכנון - בפיתוח');
+        // הוספת תכנון - בפיתוח
     }
     // TODO: פתיחת מודל הוספת תכנון
 }
@@ -2389,11 +2389,11 @@ function addNewPlan() {
  * הוספת טרייד חדש
  */
 function addNewTrade() {
-    console.log('🔄 הוספת טרייד חדש');
+    // הוספת טרייד חדש
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'הוספת טרייד - בפיתוח');
     } else {
-        console.log('הוספת טרייד - בפיתוח');
+        // הוספת טרייד - בפיתוח
     }
     // TODO: פתיחת מודל הוספת טרייד
 }
@@ -2403,7 +2403,7 @@ function addNewTrade() {
  * @param {Array} executions - מערך העסקעות
  */
 function updateExecutionsSummary(executions) {
-    console.log('🔄 עדכון סיכום נתונים לעסקעות');
+    // עדכון סיכום נתונים לעסקעות
 
     // בדיקה אם האלמנטים קיימים בדף
     const totalExecutionsElement = document.getElementById('totalExecutions');
@@ -2476,14 +2476,7 @@ function updateExecutionsSummary(executions) {
         balanceElement.style.color = '#6c757d'; // אפור
     }
 
-    console.log('✅ סיכום נתונים עודכן:', {
-        totalExecutions,
-        totalBuyExecutions,
-        totalSellExecutions,
-        totalBuyAmount: totalBuyAmount.toFixed(2),
-        totalSellAmount: totalSellAmount.toFixed(2),
-        balance: balance.toFixed(2)
-    });
+    // סיכום נתונים עודכן
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -2542,7 +2535,7 @@ function goToLinkedTrade(mode = 'edit') {
         : document.getElementById('editExecutionTradeLink').getAttribute('data-trade-id');
 
     if (tradeId) {
-        console.log('🔄 Going to trade:', tradeId);
+        // Going to trade
         // סגירת המודל
         const modalId = mode === 'add' ? 'addExecutionModal' : 'editExecutionModal';
         const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
@@ -2569,7 +2562,7 @@ window.goToLinkedTrade = goToLinkedTrade;
  * @param {number} tradeId - מזהה הטרייד
  */
 function loadTradeExecutions(tradeId) {
-    console.log('🔄 טעינת עסקאות לטרייד:', tradeId);
+    // טעינת עסקאות לטרייד
 
     try {
         // כאן תהיה קריאה לשרת לטעינת העסקאות
@@ -2608,8 +2601,8 @@ function loadTradeExecutions(tradeId) {
         ];
 
         // לא צריך לעדכן טבלה בדף executions (זו פונקציה למודל עריכת טרייד)
-        console.log('ℹ️ loadTradeExecutions called on executions page - no action needed');
-        console.log('✅ loadTradeExecutions completed successfully');
+            // loadTradeExecutions called on executions page - no action needed
+    // loadTradeExecutions completed successfully
     } catch (error) {
         handleDataLoadError(error, 'עסקאות לטרייד');
     }
@@ -2620,7 +2613,7 @@ function loadTradeExecutions(tradeId) {
  * @param {Array} executions - מערך העסקאות
  */
 function updateExecutionsTableForTradeModal(executions) {
-    console.log('🔄 updateExecutionsTableForTradeModal called with:', executions);
+    // updateExecutionsTableForTradeModal called
 
     // בדיקה אם אנחנו בדף trades או בדף executions
     const currentPath = window.location.pathname;
@@ -2660,7 +2653,7 @@ function updateExecutionsTableForTradeModal(executions) {
             tableBody.appendChild(row);
         });
 
-        console.log('✅ updateExecutionsTable completed for trades page');
+        // updateExecutionsTable completed for trades page
     } else {
         // בדף executions - לא צריך לעדכן טבלה זו (זו פונקציה למודל עריכת טרייד)
         console.log('ℹ️ updateExecutionsTableForTradeModal called on executions page - no action needed');

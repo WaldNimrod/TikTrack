@@ -73,7 +73,7 @@ function toggleCashFlowsSection() {
         sectionBody.style.display = 'none';
         toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> הצג תזרימי מזומנים';
         toggleBtn.title = 'הצג תזרימי מזומנים';
-        console.log('🔽 סקשן תזרימי מזומנים נסגר');
+        // סקשן תזרימי מזומנים נסגר
     } else {
         // פתיחת הסקשן
         sectionBody.style.display = 'block';

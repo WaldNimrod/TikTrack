@@ -120,7 +120,7 @@ function openAddTradePlanModal() {
 async function openEditTradePlanModal(tradePlanId) {
     const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
     if (!tradePlan) {
-        console.error('Trade plan not found:', tradePlanId);
+        handleElementNotFound('trade plan', 'CRITICAL');
         return;
     }
 
@@ -192,7 +192,7 @@ async function loadTickersForEditModal() {
             tickerSelect.appendChild(option);
         });
     } catch (error) {
-        console.error('Error loading tickers for edit modal:', error);
+        handleDataLoadError(error, 'טיקרים למודל עריכה');
     }
 }
 
@@ -517,7 +517,7 @@ async function saveEditTradePlan() {
         await loadTradePlansData();
 
     } catch (error) {
-        console.error('❌ Error updating trade plan:', error);
+        handleSaveError(error, 'עדכון תכנון');
         
         // הצגת הודעת שגיאה
         let errorMessage = 'שגיאה בעדכון התכנון';
@@ -575,7 +575,7 @@ async function updateTradePlanOnServer(formData) {
         await loadTradePlansData();
 
     } catch (error) {
-        console.error('❌ Error updating trade plan:', error);
+        handleSaveError(error, 'עדכון תכנון');
         
         // הצגת הודעת שגיאה
         let errorMessage = 'שגיאה בעדכון התכנון';
@@ -629,7 +629,7 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
         }
 
     } catch (error) {
-        console.error('❌ Error checking linked items:', error);
+        handleSystemError(error, 'בדיקת פריטים מקושרים');
         // במקרה של שגיאה - ממשיכים עם הביטול
         await cancelTradePlan(tradePlanId);
     }
@@ -645,7 +645,7 @@ async function reactivateTradePlan(tradePlanId) {
         // מציאת התכנון בנתונים
         const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
         if (!tradePlan) {
-            console.error('Trade plan not found:', tradePlanId);
+            handleElementNotFound('trade plan', 'CRITICAL');
             throw new Error('תכנון לא נמצא');
         }
 
@@ -687,7 +687,7 @@ async function reactivateTradePlan(tradePlanId) {
         await loadTradePlansData();
 
     } catch (error) {
-        console.error('❌ Error reactivating trade plan:', error);
+        handleSaveError(error, 'הפעלה מחדש של תכנון');
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה בהפעלה מחדש', error.message);
         } else if (typeof window.showNotification === 'function') {
@@ -733,7 +733,7 @@ function openCancelTradePlanModal(tradePlanId) {
 
     const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
     if (!tradePlan) {
-        console.error('Trade plan not found:', tradePlanId);
+        handleElementNotFound('trade plan', 'CRITICAL');
         return;
     }
 
@@ -759,7 +759,7 @@ function openDeleteTradePlanModal(tradePlanId) {
 
     const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
     if (!tradePlan) {
-        console.error('Trade plan not found:', tradePlanId);
+        handleElementNotFound('trade plan', 'CRITICAL');
         return;
     }
 
@@ -804,7 +804,7 @@ async function cancelTradePlan(tradePlanId) {
 
         await loadTradePlansData();
     } catch (error) {
-        console.error('❌ Error canceling trade plan:', error);
+        handleSaveError(error, 'ביטול תכנון');
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בביטול התכנון');
         }
@@ -835,7 +835,7 @@ async function confirmDeleteTradePlan() {
     const tradePlanId = modal.getAttribute('data-trade-plan-id');
 
     if (!tradePlanId) {
-        console.error('No trade plan ID found');
+        handleElementNotFound('trade plan ID', 'CRITICAL');
         return;
     }
 
@@ -848,7 +848,7 @@ async function confirmDeleteTradePlan() {
         deleteModal.hide();
 
     } catch (error) {
-        console.error('❌ Error deleting trade plan:', error);
+        handleDeleteError(error, 'תכנון');
         // הפונקציה deleteTradePlan כבר מטפלת בהצגת שגיאות
     }
 }
@@ -931,7 +931,7 @@ console.log('🔄 Planning.js: Setting up updateGridFromComponent for planning p
         if (typeof window.loadTradePlansData === 'function') {
             window.loadTradePlansData();
         } else {
-            console.error('❌ loadTradePlansData function not found');
+            handleFunctionNotFound('loadTradePlansData');
         }
     };
 }
@@ -1044,17 +1044,14 @@ async function loadTradePlansData() {
 
         // Check if response has data property
         if (!responseData.data) {
-            console.error('❌ Response does not have data property');
-            console.log('🔄 Response structure:', responseData);
+            handleValidationError('response data', 'תגובת השרת לא מכילה שדה data');
             trade_plansData = [];
             return [];
         }
 
         // Check if data is an array
         if (!Array.isArray(responseData.data)) {
-            console.error('❌ Response data is not an array');
-            console.log('🔄 Data type:', typeof responseData.data);
-            console.log('🔄 Data value:', responseData.data);
+            handleValidationError('response data', 'נתוני השרת אינם מערך');
             trade_plansData = [];
             return [];
         }
@@ -1090,11 +1087,7 @@ async function loadTradePlansData() {
         return trade_plansData;
 
     } catch (error) {
-        console.error('❌ Error loading trade plans data:', error);
-        console.error('❌ Error details:', {
-            message: error.message,
-            stack: error.stack
-        });
+        handleDataLoadError(error, 'נתוני תכנונים');
         
         // Use demo data as fallback
         // Using demo data as fallback
@@ -1242,11 +1235,7 @@ function updateTradePlansTable(trade_plans) {
     // Looking for table body
     
     if (!tbody) {
-        console.error('❌ Table body not found');
-        console.log('🔄 Available tables:', document.querySelectorAll('table'));
-        console.log('🔄 Available tbody elements:', document.querySelectorAll('tbody'));
-        console.log('🔄 Document body:', document.body);
-        console.log('🔄 Trade plans table element:', document.querySelector('#trade_plansTable'));
+        handleElementNotFound('#trade_plansTable tbody', 'CRITICAL');
         return;
     }
 
@@ -1364,10 +1353,10 @@ function updateTradePlansTable(trade_plans) {
                         display: dateDisplay
                     });
                 } else {
-                    console.error('Invalid date:', design.created_at);
+                    handleValidationError('date', 'תאריך לא תקין');
                 }
             } catch (error) {
-                console.error('Error parsing date:', design.created_at, error);
+                handleValidationError('date parsing', 'שגיאה בניתוח תאריך');
             }
         } else {
             console.log('🔄 No created_at field for design:', design.id);
@@ -1696,7 +1685,7 @@ function showAddTradePlanModal() {
             window.initializeValidation('addTradePlanForm', validationRules);
             console.log('✅ Validation initialization completed successfully');
         } catch (error) {
-            console.error('❌ Error initializing validation:', error);
+            handleSystemError(error, 'אתחול ולידציה');
         }
     } else {
         console.warn('⚠️ window.initializeValidation not available');
@@ -1978,7 +1967,7 @@ async function saveNewTradePlan() {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Error response from server:', errorText);
+            handleApiError('Error response from server', errorText);
             
             // Try to parse JSON error response
             try {
@@ -2008,7 +1997,7 @@ async function saveNewTradePlan() {
                     return;
                 }
             } catch (e) {
-                console.error('Error parsing JSON response:', e);
+                handleSystemError(e, 'ניתוח תגובת JSON');
             }
             
             throw new Error(`Error saving trade plan: ${response.status} - ${errorText}`);
@@ -2030,7 +2019,7 @@ async function saveNewTradePlan() {
             throw new Error(`Error saving trade plan: ${response.status}`);
         }
     } catch (error) {
-        console.error('Error saving trade plan:', error);
+        handleSaveError(error, 'שמירת תכנון');
         showErrorNotification('Error saving trade plan', 'Error saving trade plan: ' + error.message);
     }
 }
@@ -2059,7 +2048,7 @@ function editTradePlan(designId) {
     if (typeof window.openEditTradePlanModal === 'function') {
         window.openEditTradePlanModal(designId);
     } else {
-        console.error('openEditTradePlanModal function not found');
+        handleFunctionNotFound('openEditTradePlanModal');
         showErrorNotification('Error opening edit modal', 'Edit modal function not found');
     }
 }
@@ -2090,7 +2079,7 @@ async function deleteTradePlan(tradePlanId) {
         await loadTradePlansData();
 
     } catch (error) {
-        console.error('❌ Error deleting trade plan:', error);
+        handleDeleteError(error, 'תכנון');
         
         let errorMessage = 'שגיאה במחיקת התכנון';
         let hasLinkedItems = false;
@@ -2119,13 +2108,13 @@ async function deleteTradePlan(tradePlanId) {
                         throw new Error('Failed to load linked items data');
                     }
                 } catch (linkedError) {
-                    console.error('❌ Error loading linked items:', linkedError);
+                    handleDataLoadError(linkedError, 'פריטים מקושרים');
                     if (typeof window.showNotification === 'function') {
                         window.showNotification('לא ניתן למחוק תכנון שיש לו פריטים מקושרים', 'error');
                     }
                 }
             } else {
-                console.error('❌ showLinkedItemsModal function not found');
+                handleFunctionNotFound('showLinkedItemsModal');
                 if (typeof window.showNotification === 'function') {
                     window.showNotification('לא ניתן למחוק תכנון שיש לו פריטים מקושרים', 'error');
                 }
@@ -2210,7 +2199,7 @@ function sortTable(columnIndex) {
             updateDesignsTable
         );
     } else {
-        console.error('❌ sortTableData function not found in tables.js');
+        handleFunctionNotFound('sortTableData');
         // Fallback to local sorting if global function not available
         console.log('🔄 Using fallback local sorting');
         performLocalSort(columnIndex);
@@ -2311,7 +2300,7 @@ function restoreSortState() {
     if (typeof window.restoreAnyTableSort === 'function') {
         window.restoreAnyTableSort('planning', trade_plansData, updateDesignsTable);
     } else {
-        console.error('❌ restoreAnyTableSort function not found in main.js');
+        handleFunctionNotFound('restoreAnyTableSort');
     }
 }
 
@@ -2370,7 +2359,7 @@ function loadUserPreferences() {
             return preferences.user || preferences.defaults;
         }
     } catch (error) {
-        console.error('❌ Error loading preferences:', error);
+        handleDataLoadError(error, 'העדפות משתמש');
     }
     return null;
 }
@@ -2798,7 +2787,7 @@ function toggleTopSection() {
     const topSection = document.querySelector('.top-section');
 
     if (!topSection) {
-        console.error('❌ לא נמצא top-section');
+        handleElementNotFound('top-section', 'CRITICAL');
         return;
     }
 
@@ -2830,7 +2819,7 @@ function toggleMainSection() {
     const planningSection = contentSections[0]; // הסקשן הראשון - תכנונים
 
     if (!planningSection) {
-        console.error('❌ לא נמצא סקשן תכנונים');
+        handleElementNotFound('planning section', 'CRITICAL');
         return;
     }
 
@@ -3148,7 +3137,7 @@ function updateSharesFromAmount() {
                     // לא מעדכנים את הסכום חזרה - רק מספר מניות
                     // amountInput.value = result.adjustedAmount;
                 } else {
-                    console.error('convertAmountToShares function not found!');
+                    handleFunctionNotFound('convertAmountToShares', 'פונקציית המרת סכום למניות לא נמצאה');
                     console.log('Available global functions:', Object.keys(window).filter(key => key.includes('convert')));
                     // fallback
                     const shares = Math.floor(amount / price);
@@ -3161,7 +3150,7 @@ function updateSharesFromAmount() {
             console.log('Missing amount or price. Amount:', amountInput.value, 'Price:', priceDisplay.textContent);
         }
     } else {
-        console.error('One or more elements not found');
+        handleElementNotFound('updateSharesFromAmount', 'אלמנטים נדרשים לא נמצאו לעדכון מניות');
     }
 }
 
@@ -3201,7 +3190,7 @@ function updateAmountFromShares() {
                     console.log('Conversion result:', amount);
                     amountInput.value = amount;
                 } else {
-                    console.error('convertSharesToAmount function not found!');
+                    handleFunctionNotFound('convertSharesToAmount', 'פונקציית המרת מניות לסכום לא נמצאה');
                     // fallback
                     const amount = shares * price;
                     amountInput.value = amount.toFixed(2);
@@ -3209,7 +3198,7 @@ function updateAmountFromShares() {
             }
         }
     } else {
-        console.error('One or more elements not found');
+        handleElementNotFound('updateAmountFromShares', 'אלמנטים נדרשים לא נמצאו לעדכון סכום');
     }
 }
 
@@ -3288,7 +3277,7 @@ if (window.location.pathname.includes('/trade_plans')) {
     if (typeof window.updateGridFromComponent === 'function') {
         console.log('✅ Our updateGridFromComponent function is properly defined');
     } else {
-        console.error('❌ Our updateGridFromComponent function is NOT defined');
+        handleFunctionNotFound('updateGridFromComponent', 'פונקציית עדכון רשת לא נמצאה');
     }
 
     // בדיקת פונקציות המרה
@@ -3308,7 +3297,7 @@ if (window.location.pathname.includes('/trade_plans')) {
             console.log('🔄 Calling loadTradePlansData...');
             window.loadTradePlansData();
         } else {
-            console.error('❌ loadTradePlansData function not found');
+            handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה');
         }
     }, 500);
 }
@@ -3321,7 +3310,7 @@ if (typeof loadTradePlansData === 'function') {
         loadTradePlansData();
     }, 1000);
 } else {
-    console.error('❌ loadTradePlansData function not found at end of file');
+    handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה בסוף הקובץ');
 }
 
 // קריאה ב-DOMContentLoaded
@@ -3334,7 +3323,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('🔄 Calling loadTradePlansData from DOMContentLoaded...');
                 loadTradePlansData();
             } else {
-                console.error('❌ loadTradePlansData function not found in DOMContentLoaded');
+                handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה ב-DOMContentLoaded');
             }
         }, 500);
     }

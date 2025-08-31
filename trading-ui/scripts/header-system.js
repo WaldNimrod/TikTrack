@@ -3281,6 +3281,9 @@ function applyFilterToContainer(containerId, filterType, selectedValue) {
   }
   
   console.log(`✅ Filter applied to ${containerId}: ${visibleCount}/${rows.length} rows visible`);
+  
+  // Update table count
+  updateTableCount(containerId, visibleCount, rows.length);
 }
 
 /**
@@ -3312,7 +3315,12 @@ function checkRowFilter(row, filterType, selectedValue) {
   
   // Check data attributes first (for original values)
   const dataAttribute = `data-${filterType}`;
-  const originalValue = cell.getAttribute(dataAttribute);
+  let originalValue = cell.getAttribute(dataAttribute);
+  
+  // For date filter, also check data-date attribute
+  if (filterType === 'date' && !originalValue) {
+    originalValue = cell.getAttribute('data-date');
+  }
   
   // Apply filter logic
   switch (filterType) {
@@ -3337,6 +3345,10 @@ function checkRowFilter(row, filterType, selectedValue) {
     case 'account':
       return selectedValues.includes(cellValue);
     case 'date':
+      // For date filter, check both cell value and original value
+      if (originalValue) {
+        return checkDateFilter(originalValue, selectedValue) || checkDateFilter(cellValue, selectedValue);
+      }
       return checkDateFilter(cellValue, selectedValue);
     default:
       return true;
@@ -3358,9 +3370,9 @@ function getColumnIndex(row, filterType) {
   // Define Hebrew translations for column names
   const hebrewTranslations = {
     'Status': ['סטטוס', 'Status'],
-    'Investment Type': ['סוג השקעה', 'Investment Type'],
+    'Investment Type': ['סוג השקעה', 'סוג', 'Investment Type'],
     'Account': ['חשבון', 'Account'],
-    'Date': ['תאריך', 'Date']
+    'Date': ['תאריך', 'Date', 'נוצר ב', 'נסגר ב', 'תאריך ביצוע', 'תאריך הפעלה', 'נוצר ב', 'תאריך']
   };
   
   for (let i = 0; i < headers.length; i++) {
@@ -3406,8 +3418,47 @@ function checkSearchFilter(row, searchTerm) {
  * Check date filter
  */
 function checkDateFilter(cellValue, dateRange) {
-  // TODO: Implement date range logic
-  return true;
+  if (!dateRange || dateRange === 'כל זמן') {
+    return true;
+  }
+  
+  return isDateInRange(cellValue, dateRange);
+}
+
+/**
+ * Update table count display
+ */
+function updateTableCount(containerId, visibleCount, totalCount) {
+  // Find table count element in the same container
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  // Look for table-count element in the container or its parent
+  let countElement = container.querySelector('.table-count');
+  if (!countElement) {
+    // Try to find in parent sections
+    const parentSection = container.closest('.content-section, .page-body, .main-content');
+    if (parentSection) {
+      countElement = parentSection.querySelector('.table-count');
+    }
+  }
+  
+  if (countElement) {
+    // Get the page type from container ID
+    let pageType = '';
+    if (containerId.includes('trades')) pageType = 'טריידים';
+    else if (containerId.includes('trade_plans') || containerId.includes('tradePlans')) pageType = 'תכנונים';
+    else if (containerId.includes('executions')) pageType = 'עסקעות';
+    else if (containerId.includes('accounts')) pageType = 'חשבונות';
+    else if (containerId.includes('tickers')) pageType = 'טיקרים';
+    else if (containerId.includes('alerts')) pageType = 'התראות';
+    else if (containerId.includes('notes')) pageType = 'הערות';
+    else if (containerId.includes('cashFlows')) pageType = 'תזרימים';
+    else pageType = 'רשומות';
+    
+    countElement.textContent = `${visibleCount} ${pageType}`;
+    console.log(`✅ Updated table count for ${containerId}: ${visibleCount} ${pageType}`);
+  }
 }
 
 /**
@@ -3443,10 +3494,24 @@ function isDateInRange(dateString, dateRange) {
       console.log('🔍 Extracted date only:', dateOnly);
     }
     
+    // המרת התאריך לפורמט ISO אם הוא בפורמט עברי
+    let isoDate = dateOnly;
+    if (dateOnly.includes('.')) {
+      // פורמט עברי: DD.MM.YYYY
+      const parts = dateOnly.split('.');
+      if (parts.length === 3) {
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2];
+        isoDate = `${year}-${month}-${day}`;
+        console.log('🔍 Converted Hebrew date format:', dateOnly, '->', isoDate);
+      }
+    }
+    
     // המרת התאריך מהתא לטופס Date
-    const date = new Date(dateOnly);
+    const date = new Date(isoDate);
     if (isNaN(date.getTime())) {
-      console.log('⚠️ Invalid date:', dateOnly);
+      console.log('⚠️ Invalid date:', dateOnly, '(converted from:', dateString, ')');
       return true; // אם התאריך לא תקין, נציג את השורה
     }
 
@@ -3455,28 +3520,31 @@ function isDateInRange(dateString, dateRange) {
 
     let startDate, endDate;
 
+    console.log(`🔍 Setting up date range for: "${dateRange}"`);
+    console.log(`🔍 Today is: ${today.toISOString()}`);
+    
     switch (dateRange) {
       case 'היום':
         startDate = new Date(today);
         startDate.setHours(0, 0, 0, 0);
         endDate = today;
+        console.log(`🔍 היום range: ${startDate.toISOString()} - ${endDate.toISOString()}`);
         break;
       
       case 'אתמול':
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - 1);
+        startDate = new Date(today.getTime() - 24 * 60 * 60 * 1000);
         startDate.setHours(0, 0, 0, 0);
         endDate = new Date(startDate);
         endDate.setHours(23, 59, 59, 999);
+        console.log(`🔍 אתמול range: ${startDate.toISOString()} - ${endDate.toISOString()}`);
         break;
       
       case 'השבוע':
         // מתחילת השבוע הקלנדארי ועד היום (ראשון = 0, שני = 1, וכו')
-        const dayOfWeek = today.getDay(); // 0 = ראשון, 1 = שני, וכו'
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - dayOfWeek);
+        startDate = new Date(today.getTime() - today.getDay() * 24 * 60 * 60 * 1000);
         startDate.setHours(0, 0, 0, 0);
         endDate = today;
+        console.log(`🔍 השבוע range: ${startDate.toISOString()} - ${endDate.toISOString()} (dayOfWeek: ${today.getDay()})`);
         break;
       
       case 'שבוע':
@@ -3569,7 +3637,9 @@ function isDateInRange(dateString, dateRange) {
         return true; // אם לא מכירים את הטווח, נציג את השורה
     }
 
-    return date >= startDate && date <= endDate;
+    const isInRange = date >= startDate && date <= endDate;
+    console.log(`🔍 Date range check: ${dateString} (${date.toISOString()}) in range ${startDate.toISOString()} - ${endDate.toISOString()}: ${isInRange}`);
+    return isInRange;
   } catch (error) {
     console.log('⚠️ Error checking date range:', error);
     return true; // אם יש שגיאה, נציג את השורה
@@ -3641,6 +3711,9 @@ function showAllRecordsInTable(containerId) {
   }
 
   console.log(`✅ All records shown: ${visibleCount} rows visible`);
+  
+  // Update table count
+  updateTableCount(containerId, visibleCount, rows.length);
 }
 
 /**
@@ -3719,7 +3792,7 @@ function applySearchFilter(searchTerm) {
 function applyTypeFilter() {
   // applyTypeFilter called
 
-  // איסוף כל הטיפוסים הנבחרים
+  // איסוף כל סוגי ההשקעה הנבחרים
   const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
   const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
 
@@ -3831,7 +3904,7 @@ function getFilterConfig(filterType) {
       containerIdKeywords: ['date', 'Date'],
       knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'cashFlowsContainer', 'notesContainer'],
       cellValues: [], // Dates are dynamic
-      dataField: 'created-at',
+      dataField: 'date',
       isFirstOccurrence: true
     },
     'search': {
@@ -3878,6 +3951,19 @@ function applyTableFilter(filterType, selectedValues) {
 
 window.applyTableFilter = applyTableFilter;
 
+// יצירת מערכת פילטרים גלובלית לדף הבדיקה
+if (!window.filterSystem) {
+  window.filterSystem = {
+    currentFilters: {
+      dateRange: null,
+      status: [],
+      type: [],
+      account: [],
+      search: null
+    }
+  };
+}
+
 /**
  * Check if a table has the specified column
  */
@@ -3895,6 +3981,16 @@ function checkIfTableHasColumn(containerId, filterConfig) {
     const headerText = header.textContent.trim();
     if (headerText.includes(columnName)) {
       return true;
+    }
+    
+    // Check Hebrew translations for Date column
+    if (columnName === 'Date') {
+      const hebrewDateTranslations = ['תאריך', 'Date', 'נוצר ב', 'נסגר ב', 'תאריך ביצוע', 'תאריך הפעלה'];
+      for (const translation of hebrewDateTranslations) {
+        if (headerText.includes(translation)) {
+          return true;
+        }
+      }
     }
   }
   
@@ -3925,6 +4021,9 @@ function applyFilterToTable(containerId, filterConfig, selectedValues) {
   }
   
   console.log(`✅ Filter applied to ${containerId}: ${visibleCount}/${rows.length} rows visible`);
+  
+  // Update table count
+  updateTableCount(containerId, visibleCount, rows.length);
 }
 
 /**
@@ -3953,10 +4052,19 @@ function checkRowFilterWithConfig(row, filterConfig, selectedValues) {
   
   // Check data attributes for original values
   const dataField = filterConfig.dataField;
-  const originalValue = cell.getAttribute(`data-${dataField}`);
+  let originalValue = cell.getAttribute(`data-${dataField}`);
+  
+  // For date filter, also check data-date attribute
+  if (filterConfig.columnName === 'Date' && !originalValue) {
+    originalValue = cell.getAttribute('data-date');
+  }
   
   // Apply filter logic
   if (filterConfig.columnName === 'Date') {
+    // For date filter, check both cell value and original value
+    if (originalValue) {
+      return checkDateFilter(originalValue, selectedValues[0]) || checkDateFilter(cellValue, selectedValues[0]);
+    }
     return checkDateFilter(cellValue, selectedValues[0]);
   } else {
     // Check both original value and displayed value
@@ -3983,9 +4091,9 @@ function getColumnIndexByConfig(row, filterConfig) {
   // Define Hebrew translations for column names
   const hebrewTranslations = {
     'Status': ['סטטוס', 'Status'],
-    'Investment Type': ['סוג השקעה', 'Investment Type'],
+    'Investment Type': ['סוג השקעה', 'סוג', 'Investment Type'],
     'Account': ['חשבון', 'Account'],
-    'Date': ['תאריך', 'Date']
+    'Date': ['תאריך', 'Date', 'נוצר ב', 'נסגר ב', 'תאריך ביצוע', 'תאריך הפעלה', 'נוצר ב', 'תאריך']
   };
   
   for (let i = 0; i < headers.length; i++) {

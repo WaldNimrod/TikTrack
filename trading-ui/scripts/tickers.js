@@ -1348,7 +1348,7 @@ function updateTickersTable(tickers) {
                     </td>
                     <td class="actions-cell">
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-info" onclick="window.showLinkedItemsWarning('ticker', ${ticker.id})" title="פריטים מקושרים">🔗</button>
+                            <button class="btn btn-outline-info" onclick="showLinkedItemsForTicker(${ticker.id})" title="פריטים מקושרים">🔗</button>
                             <button class="btn btn-outline-secondary" onclick="window.showEditTickerModal(${ticker.id})" title="ערוך">✏️</button>
                             <button class="btn btn-outline-danger" onclick="window.cancelTicker(${ticker.id})" title="בטל טיקר" ${ticker.status === 'canceled' ? 'disabled' : ''}><span class="cancel-icon">X</span></button>
                         </div>
@@ -1413,7 +1413,29 @@ window.confirmDeleteTicker = confirmDeleteTicker;
 
 
 // פונקציות מודל פריטים מקושרים - שימוש במערכת הכללית
-// window.showLinkedItemsWarning - פונקציה כללית זמינה מ-linked-items.js
+/**
+ * הצגת פריטים מקושרים לטיקר
+ */
+async function showLinkedItemsForTicker(tickerId) {
+    if (window.showLinkedItemsModal) {
+        try {
+            const response = await fetch(`/api/v1/linked-items/ticker/${tickerId}`);
+            if (response.ok) {
+                const data = await response.json();
+                window.showLinkedItemsModal(data, 'ticker', tickerId);
+            } else {
+                throw new Error('Failed to load linked items data');
+            }
+        } catch (error) {
+            console.error('❌ Error loading linked items:', error);
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('שגיאה בטעינת פריטים מקושרים', 'error');
+            }
+        }
+    } else {
+        console.error('❌ showLinkedItemsModal לא זמינה');
+    }
+}
 
 // ===== פונקציות סידור =====
 

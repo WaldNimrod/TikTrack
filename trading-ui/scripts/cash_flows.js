@@ -704,7 +704,7 @@ function renderCashFlowsTable() {
             <td style="text-align: center;">${formatDateOnly(cashFlow.created_at)}</td>
             <td class="actions-cell">
                 ${createEditButton(`showEditCashFlowModal(${cashFlow.id})`)}
-                ${createLinkButton(`showLinkedItemsWarning('cash_flow', ${cashFlow.id})`)}
+                ${createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`)}
                 ${createDeleteButton(`showDeleteCashFlowModal(${cashFlow.id})`)}
             </td>
         `;

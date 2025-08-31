@@ -4236,10 +4236,7 @@ function updateAccountFilterDisplayText() {
     // פונקציה זמנית - תוסיף לוגיקה בהמשך
     console.log('🔄 עדכון טקסט פילטר חשבונות');
 }
-
-// ייצוא הפונקציות
-window.getCurrentPreference = getCurrentPreference;
-window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;
+}
 
 // ייצוא הפונקציה החדשה
 window.applyFilter = applyFilter;

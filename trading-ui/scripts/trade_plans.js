@@ -942,7 +942,7 @@ console.log('🔄 Planning.js: Setting up updateGridFromComponent for planning p
  * יצירת נתוני דמו לתכנונים
  */
 function getDemoTradePlansData() {
-    console.log('🔄 Creating demo trade plans data...');
+    // Creating demo trade plans data...
     
     const demoData = [
         {
@@ -1007,7 +1007,7 @@ function getDemoTradePlansData() {
         }
     ];
     
-    console.log('✅ Demo trade plans data created:', demoData.length, 'plans');
+    // Demo trade plans data created
     return demoData;
 }
 
@@ -1023,16 +1023,15 @@ async function loadTradePlansData() {
     console.log('🔄 Starting loadTradePlansData function...');
     
     try {
-        console.log('🔄 Loading trade_plans from server...');
+        // Loading trade_plans from server...
 
         // Setting base URL
         const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
         const url = `${base}/api/v1/trade_plans/`;
-        console.log('🔄 Fetching from URL:', url);
+        // Fetching from URL
         
         const response = await fetch(url);
-        console.log('🔄 Response status:', response.status);
-        console.log('🔄 Response ok:', response.ok);
+            // Response status check
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -1084,9 +1083,7 @@ async function loadTradePlansData() {
         }
 
         // Update the table
-        console.log('🔄 === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===');
-        console.log('🔄 Trade plans to display:', trade_plansData.length);
-        console.log('🔄 Trade plans data:', trade_plansData);
+        // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
         
         updateTradePlansTable(trade_plansData);
 
@@ -1100,7 +1097,7 @@ async function loadTradePlansData() {
         });
         
         // Use demo data as fallback
-        console.log('🔄 Using demo data as fallback...');
+        // Using demo data as fallback
         trade_plansData = getDemoTradePlansData();
         updateTradePlansTable(trade_plansData);
         return trade_plansData;
@@ -1118,13 +1115,7 @@ function updateDesignsTable(trade_plans) {
  * פילטור מקומי של נתוני תכנונים
  */
 function filterDesignsLocally(trade_plans, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-    console.log('🔄 filterDesignsLocally called with:', {
-        trade_plans: trade_plans.length,
-        selectedStatuses,
-        selectedTypes,
-        selectedDateRange,
-        searchTerm
-    });
+    // filterDesignsLocally called
 
     let filteredData = [...trade_plans];
 
@@ -1133,7 +1124,7 @@ function filterDesignsLocally(trade_plans, selectedStatuses, selectedTypes, sele
         filteredData = filteredData.filter(plan =>
             selectedStatuses.includes(plan.status)
         );
-        console.log('🔄 After status filter:', filteredData.length, 'plans');
+        // After status filter
     }
 
     // פילטור לפי סוג השקעה
@@ -1141,7 +1132,7 @@ function filterDesignsLocally(trade_plans, selectedStatuses, selectedTypes, sele
         filteredData = filteredData.filter(plan =>
             selectedTypes.includes(plan.investment_type)
         );
-        console.log('🔄 After type filter:', filteredData.length, 'plans');
+        // After type filter
     }
 
     // פילטור לפי תאריך
@@ -1155,7 +1146,7 @@ function filterDesignsLocally(trade_plans, selectedStatuses, selectedTypes, sele
                 return planDate >= startDate && planDate <= endDate;
             });
         }
-        console.log('🔄 After date filter:', filteredData.length, 'plans');
+        // After date filter
     }
 
     // פילטור לפי חיפוש
@@ -1167,10 +1158,10 @@ function filterDesignsLocally(trade_plans, selectedStatuses, selectedTypes, sele
             plan.entry_conditions?.toLowerCase().includes(searchTermLower) ||
             plan.reasons?.toLowerCase().includes(searchTermLower)
         );
-        console.log('🔄 After search filter:', filteredData.length, 'plans');
+        // After search filter
     }
 
-    console.log('✅ filterDesignsLocally completed:', filteredData.length, 'plans');
+    // filterDesignsLocally completed
     return filteredData;
 }
 
@@ -1245,15 +1236,10 @@ function filterTradePlansData(filters) {
  * @param {Array} trade_plans - מערך של תכנונים לעדכון
  */
 function updateTradePlansTable(trade_plans) {
-    console.log('🔄 === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===');
-    console.log('🔄 Trade plans to display:', trade_plans.length);
-    console.log('🔄 Trade plans data:', trade_plans);
-    console.log('🔄 Trade plans type:', typeof trade_plans);
-    console.log('🔄 Trade plans is array:', Array.isArray(trade_plans));
+    // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
 
     const tbody = document.querySelector('#trade_plansTable tbody');
-    console.log('🔄 Looking for table body: #trade_plansTable tbody');
-    console.log('🔄 Table body found:', tbody);
+    // Looking for table body
     
     if (!tbody) {
         console.error('❌ Table body not found');
@@ -1266,14 +1252,11 @@ function updateTradePlansTable(trade_plans) {
 
     // Checking if there is data to display
     if (!trade_plans || trade_plans.length === 0) {
-        console.log('🔄 No trade plans to display');
-        console.log('🔄 Trade plans is null/undefined:', !trade_plans);
-        console.log('🔄 Trade plans length:', trade_plans ? trade_plans.length : 'N/A');
+        // No trade plans to display
         
         // Checking if it's because of filters or if there are no data at all
         const hasOriginalData = trade_plansData && trade_plansData.length > 0;
-        console.log('🔄 Has original data:', hasOriginalData);
-        console.log('🔄 Original data length:', trade_plansData ? trade_plansData.length : 0);
+        // Has original data check
 
         // Checking if there are active filters
         const hasActiveFilters = (() => {

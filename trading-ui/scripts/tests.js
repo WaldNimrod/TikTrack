@@ -35,7 +35,7 @@ function initializeTestsPage() {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🔄 === DOM CONTENT LOADED (TESTS) ===');
+      // === DOM CONTENT LOADED (TESTS) ===
 
   // שחזור מצב הסקשנים
   if (typeof window.restoreAllSectionStates === 'function') {
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // initializeTestsPage function not found
   }
 
-  console.log('✅ Tests page initialization completed');
+      // Tests page initialization completed
 });
 
 // Load tests data

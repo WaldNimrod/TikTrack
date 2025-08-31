@@ -368,7 +368,7 @@ function updateTradesTable(trades) {
           ${createLinkButton(`viewLinkedItemsForTrade(${trade.id})`)}
           ${createEditButton(`editTradeRecord('${trade.id}')`)}
           ${window.uiUtils ? window.uiUtils.createCancelButton('trade', trade.id, trade.status, 'sm') : 
-            (trade.status === 'cancelled' || trade.status === 'canceled' ?
+            (trade.status === 'cancelled' ?
               createButton('REACTIVATE', `reactivateTrade('${trade.id}')`) :
               createButton('CANCEL', `cancelTradeRecord('${trade.id}')`)
             )

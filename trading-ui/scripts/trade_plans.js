@@ -251,7 +251,6 @@ async function updateEditTickerInfo() {
                     'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?\n\nפעולה זו תשנה את הטיקר המקורי של התכנון.',
                     () => {
                         // המשתמש אישר - הצגת הודעה שהפיצ'ר לא נתמך
-                        console.log('שינוי טיקר אושר על ידי המשתמש - אבל הפיצ\'ר לא נתמך');
                         if (typeof window.showWarningNotification === 'function') {
                             window.showWarningNotification(
                                 'פיצ\'ר לא נתמך',
@@ -266,7 +265,6 @@ async function updateEditTickerInfo() {
                     },
                     () => {
                         // המשתמש ביטל - מחזירים את הטיקר המקורי
-                        console.log('שינוי טיקר בוטל על ידי המשתמש');
                         document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
                         // עדכון התצוגה עם הטיקר המקורי
                         updateEditTickerInfo();
@@ -280,7 +278,6 @@ async function updateEditTickerInfo() {
                         'שינוי טיקר לתכנון',
                         'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
                         () => {
-                            console.log('שינוי טיקר אושר על ידי המשתמש - אבל הפיצ\'ר לא נתמך');
                             if (typeof window.showWarningNotification === 'function') {
                                 window.showWarningNotification(
                                     'פיצ\'ר לא נתמך',
@@ -291,7 +288,6 @@ async function updateEditTickerInfo() {
                             updateEditTickerInfo();
                         },
                         () => {
-                            console.log('שינוי טיקר בוטל על ידי המשתמש');
                             document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
                             updateEditTickerInfo();
                         }
@@ -302,7 +298,6 @@ async function updateEditTickerInfo() {
                             'שינוי טיקר לתכנון',
                             'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
                             () => {
-                                console.log('שינוי טיקר אושר על ידי המשתמש - אבל הפיצ\'ר לא נתמך');
                                 if (typeof window.showWarningNotification === 'function') {
                                     window.showWarningNotification(
                                         'פיצ\'ר לא נתמך',
@@ -313,7 +308,6 @@ async function updateEditTickerInfo() {
                                 updateEditTickerInfo();
                             },
                             () => {
-                                console.log('שינוי טיקר בוטל על ידי המשתמש');
                                 document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
                                 updateEditTickerInfo();
                             }
@@ -321,7 +315,6 @@ async function updateEditTickerInfo() {
                     } else {
                         const confirmed = confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
                         if (confirmed) {
-                            console.log('שינוי טיקר אושר על ידי המשתמש - אבל הפיצ\'ר לא נתמך');
                             if (typeof window.showWarningNotification === 'function') {
                                 window.showWarningNotification(
                                     'פיצ\'ר לא נתמך',
@@ -331,7 +324,6 @@ async function updateEditTickerInfo() {
                             document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
                             updateEditTickerInfo();
                         } else {
-                            console.log('שינוי טיקר בוטל על ידי המשתמש');
                             document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
                             updateEditTickerInfo();
                         }
@@ -541,7 +533,7 @@ async function saveEditTradePlan() {
  */
 async function updateTradePlanOnServer(formData) {
     try {
-        console.log('🔄 Updating trade plan on server:', formData);
+
 
         // שליחה לשרת
         const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
@@ -640,7 +632,6 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
  */
 async function reactivateTradePlan(tradePlanId) {
     try {
-        console.log('✅ Reactivating trade plan:', tradePlanId);
 
         // מציאת התכנון בנתונים
         const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
@@ -664,11 +655,11 @@ async function reactivateTradePlan(tradePlanId) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        console.log('✅ Trade plan reactivated successfully');
+
 
         // עדכון סטטוס הטיקר
         if (tradePlan.ticker_id) {
-            console.log('🔄 Updating ticker active trades status for ticker ID:', tradePlan.ticker_id);
+    
             if (typeof window.updateTickerActiveTradesStatus === 'function') {
                 await window.updateTickerActiveTradesStatus(tradePlan.ticker_id);
             } else {
@@ -729,7 +720,6 @@ function addEditReminder() {
  * פתיחת מודל ביטול תכנון
  */
 function openCancelTradePlanModal(tradePlanId) {
-    console.log('🔄 Opening cancel trade plan modal for ID:', tradePlanId);
 
     const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
     if (!tradePlan) {
@@ -755,7 +745,6 @@ function openCancelTradePlanModal(tradePlanId) {
  * פתיחת מודל מחיקת תכנון
  */
 function openDeleteTradePlanModal(tradePlanId) {
-    console.log('🔄 Opening delete trade plan modal for ID:', tradePlanId);
 
     const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
     if (!tradePlan) {
@@ -818,7 +807,7 @@ async function confirmCancelTradePlan() {
     const modal = document.getElementById('cancelTradePlanModal');
     const tradePlanId = modal.getAttribute('data-trade-plan-id');
     
-    console.log('🔄 Confirming cancellation for trade plan:', tradePlanId);
+
     
     // סגירת המודל הראשון
     bootstrap.Modal.getInstance(modal).hide();
@@ -877,18 +866,11 @@ window.addEditReminder = addEditReminder;
 // The translateDateRangeToDates function is already defined at the beginning of the file
 
 // Defining the updateGridFromComponent function immediately at the beginning of the file
-console.log('🔄 Planning.js: Setting up updateGridFromComponent for planning page');
+
 // Ensuring the function is only defined on the planning page
     if (window.location.pathname.includes('/trade_plans')) {
     window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-        console.log('🔄 updateGridFromComponent called for planning page with:', {
-            selectedStatuses,
-            selectedTypes,
-            selectedDateRange,
-            searchTerm
-        });
 
-        console.log('✅ This is the PLANNING page updateGridFromComponent function!');
 
         // Saving filters in global variables
         window.selectedStatusesForFilter = selectedStatuses || [];
@@ -901,25 +883,16 @@ console.log('🔄 Planning.js: Setting up updateGridFromComponent for planning p
         let endDate = 'לא נבחר';
 
         if (selectedDateRange && selectedDateRange !== 'כל זמן') {
-            console.log('🔄 Translating date range:', selectedDateRange);
             // Translating date range to actual dates
             const dateRange = translateDateRangeToDates(selectedDateRange);
             startDate = dateRange.startDate;
             endDate = dateRange.endDate;
-            console.log('🔄 Translation result:', { startDate, endDate });
         }
 
         window.selectedStartDateForFilter = startDate;
         window.selectedEndDateForFilter = endDate;
 
-        console.log('🔄 Filters saved for planning page:', {
-            selectedStatusesForFilter: window.selectedStatusesForFilter,
-            selectedTypesForFilter: window.selectedTypesForFilter,
-            selectedDateRangeForFilter: window.selectedDateRangeForFilter,
-            selectedStartDateForFilter: window.selectedStartDateForFilter,
-            selectedEndDateForFilter: window.selectedEndDateForFilter,
-            searchTermForFilter: window.searchTermForFilter
-        });
+
 
         // Updating debug panel
         if (typeof updateFilterDebugPanel === 'function') {
@@ -927,7 +900,6 @@ console.log('🔄 Planning.js: Setting up updateGridFromComponent for planning p
         }
 
         // Direct call to local function
-        console.log('🔄 Calling loadTradePlansData directly for trade plans page');
         if (typeof window.loadTradePlansData === 'function') {
             window.loadTradePlansData();
         } else {
@@ -1019,8 +991,7 @@ function getDemoTradePlansData() {
  * @returns {Array} Array of planning
  */
 async function loadTradePlansData() {
-    console.log('🔄 === LOAD TRADE PLANS DATA FUNCTION CALLED ===');
-    console.log('🔄 Starting loadTradePlansData function...');
+    
     
     try {
         // Loading trade_plans from server...
@@ -1038,9 +1009,7 @@ async function loadTradePlansData() {
         }
 
         const responseData = await response.json();
-        console.log('🔄 Raw response data:', responseData);
-        console.log('🔄 Response data type:', typeof responseData);
-        console.log('🔄 Response data keys:', Object.keys(responseData));
+
 
         // Check if response has data property
         if (!responseData.data) {
@@ -1057,27 +1026,6 @@ async function loadTradePlansData() {
         }
 
         trade_plansData = responseData.data;
-        console.log('✅ Loaded trade plans successfully');
-        console.log('🔄 Number of trade plans loaded:', trade_plansData.length);
-        console.log('🔄 First trade plan:', trade_plansData[0]);
-
-        // Check filters for planning page
-        console.log('🔄 Checking filters for planning page...');
-        console.log('🔄 Has active filters:', window.hasActiveFilters);
-        console.log('🔄 Selected statuses for filter:', window.selectedStatusesForFilter);
-        console.log('🔄 Selected types for filter:', window.selectedTypesForFilter);
-        console.log('🔄 Selected date range for filter:', window.selectedDateRangeForFilter);
-        console.log('🔄 Search term for filter:', window.searchTermForFilter);
-
-        if (!window.hasActiveFilters && 
-            !window.selectedStatusesForFilter && 
-            !window.selectedTypesForFilter && 
-            !window.selectedDateRangeForFilter && 
-            !window.searchTermForFilter) {
-            console.log('🔄 No active filters, showing all trade_plans');
-        } else {
-            console.log('🔄 Active filters detected, will apply filtering');
-        }
 
         // Update the table
         // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
@@ -1162,10 +1110,10 @@ function filterDesignsLocally(trade_plans, selectedStatuses, selectedTypes, sele
  * פילטור נתוני תכנונים
  */
 function filterTradePlansData(filters) {
-    console.log('🔄 Filtering trade plans data with filters:', filters);
+
 
     if (!window.tradePlansData || !Array.isArray(window.tradePlansData)) {
-        console.log('No trade plans data available for filtering');
+
         return;
     }
 
@@ -1214,7 +1162,7 @@ function filterTradePlansData(filters) {
         );
     }
 
-    console.log(`✅ Filtered ${filteredData.length} trade plans from ${window.tradePlansData.length}`);
+
 
     // עדכון הטבלה
     updateTradePlansTable(filteredData);
@@ -1251,13 +1199,11 @@ function updateTradePlansTable(trade_plans) {
         const hasActiveFilters = (() => {
             // Search check
             if (window.searchTermForFilter && window.searchTermForFilter.trim() !== '') {
-                console.log('🔄 Active search filter:', window.searchTermForFilter);
                 return true;
             }
 
             // Status check (if not all statuses are selected)
             if (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) {
-                console.log('🔄 Active status filter:', window.selectedStatusesForFilter);
                 const allStatuses = ['open', 'closed', 'cancelled'];
                 const selectedStatuses = window.selectedStatusesForFilter.map(s => s.toLowerCase());
                 if (!allStatuses.every(status => selectedStatuses.includes(status))) {
@@ -1267,7 +1213,6 @@ function updateTradePlansTable(trade_plans) {
 
             // Type check (if not all types are selected)
             if (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) {
-                console.log('🔄 Active type filter:', window.selectedTypesForFilter);
                 const allTypes = ['swing', 'investment', 'passive'];
                 const selectedTypes = window.selectedTypesForFilter.map(t => t.toLowerCase());
                 if (!allTypes.every(type => selectedTypes.includes(type))) {
@@ -1277,7 +1222,6 @@ function updateTradePlansTable(trade_plans) {
 
             // Date range check
             if (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') {
-                console.log('🔄 Active date filter:', window.selectedDateRangeForFilter);
                 return true;
             }
 
@@ -1313,7 +1257,7 @@ function updateTradePlansTable(trade_plans) {
         return;
     }
 
-    console.log('🔄 Processing trade plans for table display...');
+    
     const tableHTML = trade_plans.map(design => {
         // Safeguarding against invalid data
         if (!design || typeof design !== 'object') {
@@ -1321,51 +1265,30 @@ function updateTradePlansTable(trade_plans) {
             return '';
         }
 
-        // Debug log
-        console.log('🔄 Processing design for table:', {
-            id: design.id,
-            ticker: design.ticker,
-            tickerSymbol: design.ticker?.symbol,
-            tickerName: design.ticker?.name,
-            investmentType: design.investment_type,
-            status: design.status,
-            side: design.side,
-            created_at: design.created_at
-        });
+
 
         const statusClass = getStatusClass(design.status);
         const typeClass = getTypeClass(design.investment_type);
 
         // Date correction - converting to Hebrew format
         let dateDisplay = 'לא מוגדר';
-        console.log('🔄 Processing date for design:', design.id, 'created_at:', design.created_at, 'type:', typeof design.created_at);
 
         if (design.created_at) {
             try {
                 const dateObj = new Date(design.created_at);
-                console.log('🔄 Date object created:', dateObj, 'isValid:', !isNaN(dateObj.getTime()));
 
                 if (!isNaN(dateObj.getTime())) {
                     dateDisplay = dateObj.toLocaleDateString('he-IL');
-                    console.log('🔄 Date conversion successful:', {
-                        original: design.created_at,
-                        dateObj: dateObj,
-                        display: dateDisplay
-                    });
                 } else {
                     handleValidationError('date', 'תאריך לא תקין');
                 }
             } catch (error) {
                 handleValidationError('date parsing', 'שגיאה בניתוח תאריך');
             }
-        } else {
-            console.log('🔄 No created_at field for design:', design.id);
         }
 
         // Type correction - ensuring a valid value is passed
-        console.log('🔄 Processing type for design:', design.id, 'investment_type:', design.investment_type, 'type:', typeof design.investment_type);
         const typeDisplay = design.investment_type ? (window.translateTradePlanType ? window.translateTradePlanType(design.investment_type) : design.investment_type) : 'לא מוגדר';
-        console.log('🔄 Type display result:', typeDisplay);
         const sideDisplay = design.side === 'Long' ? 'Long' : 'Short';
         const amountDisplay = formatCurrency(design.planned_amount);
         const targetDisplay = formatCurrency(design.target_price);
@@ -1573,8 +1496,6 @@ function showAddTradePlanModal() {
     }
     
     // Initialize real-time validation for the form
-    console.log('🔍 Checking for window.initializeValidation...');
-    console.log('🔍 window.initializeValidation type:', typeof window.initializeValidation);
     if (typeof window.initializeValidation === 'function') {
         const validationRules = {
             'addTradePlanTickerId': { 
@@ -1679,17 +1600,13 @@ function showAddTradePlanModal() {
             }
         };
         
-        console.log('🔧 Initializing real-time validation for addTradePlanForm');
-        console.log('🔧 Validation rules:', validationRules);
         try {
             window.initializeValidation('addTradePlanForm', validationRules);
-            console.log('✅ Validation initialization completed successfully');
         } catch (error) {
             handleSystemError(error, 'אתחול ולידציה');
         }
     } else {
         console.warn('⚠️ window.initializeValidation not available');
-        console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('Validation')));
     }
 
     // השבתת כל השדות עד לבחירת טיקר
@@ -1868,19 +1785,14 @@ async function saveNewTradePlan() {
         const isValid = typeof validationResult === 'object' ? validationResult.isValid : validationResult;
         
         if (!isValid) {
-            console.log('❌ Validation failed - stopping save');
             return;
         }
-        console.log('✅ Validation passed - continuing with save');
     } else {
-        console.log('❌ window.validateForm not available - using fallback');
         // Fallback validation if global system is not available
         const tickerId = document.getElementById('addTradePlanTickerId').value;
         const investmentType = document.getElementById('addTradePlanInvestmentType').value;
         const side = document.getElementById('addTradePlanSide').value;
         const plannedAmount = document.getElementById('addTradePlanPlannedAmount').value;
-        
-        console.log('🔍 Fallback validation values:', { tickerId, investmentType, side, plannedAmount });
         
         if (!tickerId || !investmentType || !side || !plannedAmount) {
             if (typeof window.showErrorNotification === 'function') {
@@ -1994,7 +1906,6 @@ async function saveNewTradePlan() {
 
         if (response.ok) {
             const newDesign = await response.json();
-            console.log('Trade plan saved successfully:', newDesign);
 
             // Closing the modal
             closeModal('addTradePlanModal');
@@ -2032,7 +1943,6 @@ function getFieldIdFromServerField(serverField) {
  * עריכת תכנון
  */
 function editTradePlan(designId) {
-    console.log('Opening edit modal for trade plan:', designId);
     // קריאה לפונקציה הגלובלית לפתיחת מודל עריכה
     if (typeof window.openEditTradePlanModal === 'function') {
         window.openEditTradePlanModal(designId);
@@ -2143,7 +2053,7 @@ function closeModal(modalId) {
  * פילטור נתוני תכנונים
  */
 function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
-    console.log('Filtering trade plans:', { statuses, types, accounts, dateRange, searchTerm });
+
 
     // Calling global function with pageName
     if (typeof window.updateGridFromComponentGlobal === 'function') {
@@ -2177,8 +2087,6 @@ function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
  * @since 2.0
  */
 function sortTable(columnIndex) {
-    console.log(`🔄 Sorting planning table by column ${columnIndex}`);
-
     // Using global function from tables.js
     if (typeof window.sortTableData === 'function') {
         window.sortTableData(
@@ -2190,7 +2098,6 @@ function sortTable(columnIndex) {
     } else {
         handleFunctionNotFound('sortTableData');
         // Fallback to local sorting if global function not available
-        console.log('🔄 Using fallback local sorting');
         performLocalSort(columnIndex);
     }
 }
@@ -2245,7 +2152,7 @@ function performLocalSort(columnIndex) {
     updateDesignsTable(sortedData);
     window.filteredTradePlansData = sortedData;
 
-    console.log(`✅ Local sorting completed for column ${columnIndex}, direction: ${direction}`);
+
 }
 
 /**
@@ -2284,7 +2191,6 @@ function isDateValue(value) {
  * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
-    console.log('🔄 Restoring sort state for planning table');
 
     if (typeof window.restoreAnyTableSort === 'function') {
         window.restoreAnyTableSort('planning', trade_plansData, updateDesignsTable);
@@ -2456,12 +2362,7 @@ function translateDateRangeToDates(dateRange) {
             case 'MTD':
                 startDate = createDateWithTimezone(today.getFullYear(), today.getMonth(), 1);
                 endDate = todayStr;
-                console.log('🔄 MTD calculation:', {
-                    today: todayStr,
-                    month: today.getMonth(),
-                    year: today.getFullYear(),
-                    startDate: startDate
-                });
+
                 break;
 
             case 'השנה':
@@ -2473,11 +2374,7 @@ function translateDateRangeToDates(dateRange) {
             case 'YTD':
                 startDate = createDateWithTimezone(today.getFullYear(), 0, 1);
                 endDate = todayStr;
-                console.log('🔄 YTD calculation:', {
-                    today: todayStr,
-                    year: today.getFullYear(),
-                    startDate: startDate
-                });
+
                 break;
 
             case '30 יום':
@@ -2511,12 +2408,7 @@ function translateDateRangeToDates(dateRange) {
             case 'שנה קודמת':
                 startDate = createDateWithTimezone(today.getFullYear() - 1, 0, 1);
                 endDate = createDateWithTimezone(today.getFullYear() - 1, 11, 31);
-                console.log('🔄 Previous year calculation:', {
-                    today: todayStr,
-                    lastYear: today.getFullYear() - 1,
-                    startDate: startDate,
-                    endDate: endDate
-                });
+
                 break;
 
             default:
@@ -2540,13 +2432,7 @@ function translateDateRangeToDates(dateRange) {
         endDate = dateRange.endDate;
     }
 
-    console.log('🔄 Date range translation:', {
-        original: dateRange,
-        startDate,
-        endDate,
-        today: todayStr,
-        dayOfWeek: today.getDay()
-    });
+
     return { startDate, endDate };
 }
 
@@ -2610,7 +2496,7 @@ function updateFilterDebugPanel() {
         statusElement.style.color = hasActiveFilters ? '#28a745' : '#6c757d';
     }
 
-    console.log('🔄 Filter debug panel updated');
+
 }
 
 /**
@@ -2618,10 +2504,9 @@ function updateFilterDebugPanel() {
  * פונקציה זו מספקת פילטור מקומי כאשר הפונקציה הגלובלית לא זמינה
  */
 function filterTradePlansLocally(data, statuses, types, dateRange, searchTerm) {
-    console.log('🔄 Local filtering of trade plans data');
 
     if (!data || !Array.isArray(data)) {
-        console.warn('No data to filter');
+
         return [];
     }
 
@@ -2644,7 +2529,7 @@ function filterTradePlansLocally(data, statuses, types, dateRange, searchTerm) {
     // פילטור לפי תאריך
     if (dateRange && dateRange !== 'כל זמן') {
         // כאן אפשר להוסיף לוגיקת פילטור לפי תאריך
-        console.log('Date range filtering not implemented yet');
+
     }
 
     // פילטור לפי חיפוש
@@ -2658,7 +2543,7 @@ function filterTradePlansLocally(data, statuses, types, dateRange, searchTerm) {
         );
     }
 
-    console.log(`✅ Locally filtered ${filteredData.length} trade plans from ${data.length}`);
+
     return filteredData;
 }
 
@@ -2672,20 +2557,9 @@ function filterTradePlansLocally(data, statuses, types, dateRange, searchTerm) {
 // restoreDesignsSectionState is already defined in page-utils.js
 
 // Global functions are now properly defined in main.js
-console.log('✅ Global toggle functions available from main.js');
 
 // Initialization
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('🔄 === DOM CONTENT LOADED (PLANNING) ===');
-
-    // Checking global function availability
-    console.log('🔍 Checking global functions:', {
-        toggleTopSection: typeof window.toggleTopSection,
-        toggleMainSection: typeof window.toggleMainSection,
-        restoreAllSectionStates: typeof window.restoreAllSectionStates,
-        filterDataByFilters: typeof window.filterDataByFilters,
-        updateGridFromComponentGlobal: typeof window.updateGridFromComponentGlobal
-    });
 
     // Restoring section state
     if (typeof window.restoreAllSectionStates === 'function') {
@@ -2746,12 +2620,10 @@ window.restorePlanningSectionState = restorePlanningSectionState;
 
 // פונקציות חסרות
 window.loadPlanningData = function () {
-    console.log('🔄 loadPlanningData called - redirecting to loadTradePlansData');
     loadTradePlansData();
 };
 
 window.setupSortableHeaders = function () {
-    console.log('🔄 setupSortableHeaders called for planning page');
     // הפונקציה כבר מוגדרת ב-main.js
     if (typeof window.setupSortableHeadersGlobal === 'function') {
         window.setupSortableHeadersGlobal('planning');
@@ -2763,7 +2635,6 @@ window.setupSortableHeaders = function () {
 };
 
 function setupSortableHeadersLocal() {
-    console.log('🔄 Setting up sortable headers locally for planning page');
     const headers = document.querySelectorAll('#trade_plansTable th[onclick]');
     headers.forEach(header => {
         header.style.cursor = 'pointer';
@@ -2877,7 +2748,6 @@ function restorePlanningSectionState() {
 
 // פונקציות נוספות שחסרות
 window.updateDateRangeFilterDisplayText = function () {
-    console.log('🔄 updateDateRangeFilterDisplayText called');
     // הפונקציה כבר מוגדרת ב-header-system.js
     if (typeof window.updateDateRangeFilterDisplayTextGlobal === 'function') {
         window.updateDateRangeFilterDisplayTextGlobal();
@@ -2887,7 +2757,6 @@ window.updateDateRangeFilterDisplayText = function () {
 };
 
 window.updateAccountFilterDisplayText = function () {
-    console.log('🔄 updateAccountFilterDisplayText called');
     // הפונקציה כבר מוגדרת ב-accounts.js
     if (typeof window.updateAccountFilterDisplayTextGlobal === 'function') {
         window.updateAccountFilterDisplayTextGlobal();
@@ -2929,7 +2798,6 @@ function showTickerPage(tickerId) {
  * הוספת הערה חשובה
  */
 function addImportantNote() {
-    console.log('🔄 הודעת הערות עשירות');
 
     // הצגת הודעה למשתמש
     if (typeof window.showInfoNotification === 'function') {
@@ -2941,7 +2809,6 @@ function addImportantNote() {
  * הוספת תזכורת
  */
 function addReminder() {
-    console.log('🔄 הודעת התראות');
 
     // הצגת הודעה למשתמש
     if (typeof window.showInfoNotification === 'function') {
@@ -3010,23 +2877,7 @@ function updateTickerInfo() {
         sideSelect.setAttribute('required', 'required');
         amountInput.setAttribute('required', 'required');
 
-        console.log('✅ Fields enabled:', {
-            investmentType: !investmentTypeSelect.disabled,
-            side: !sideSelect.disabled,
-            amount: !amountInput.disabled,
-            shares: !sharesInput.disabled,
-            stopPrice: !stopPriceInput.disabled,
-            targetPrice: !targetPriceInput.disabled
-        });
 
-        // בדיקה נוספת של שדה הסכום
-        console.log('🔍 Amount field details:', {
-            disabled: amountInput.disabled,
-            readonly: amountInput.readOnly,
-            value: amountInput.value,
-            style: amountInput.style.backgroundColor,
-            classList: Array.from(amountInput.classList)
-        });
 
         // עדכון מחירי עצירה ויעד ברירת מחדל
         updateDefaultPrices(currentPrice);
@@ -3091,52 +2942,31 @@ function updateDefaultPrices(currentPrice) {
  * עדכון מספר מניות מסכום
  */
 function updateSharesFromAmount() {
-    console.log('🔄 updateSharesFromAmount called');
 
     const amountInput = document.getElementById('addTradePlanPlannedAmount');
     const sharesInput = document.getElementById('addTradePlanShares');
     const priceDisplay = document.getElementById('currentPriceDisplay');
 
-    console.log('Elements found:', {
-        amountInput: !!amountInput,
-        sharesInput: !!sharesInput,
-        priceDisplay: !!priceDisplay
-    });
-
     if (amountInput && sharesInput && priceDisplay) {
-        console.log('Values:', {
-            amount: amountInput.value,
-            price: priceDisplay.textContent
-        });
-
         // בדיקה אם יש מחיר תקין
         if (amountInput.value && priceDisplay.textContent !== '-' && priceDisplay.textContent !== '') {
             const amount = parseFloat(amountInput.value);
             const price = parseFloat(priceDisplay.textContent.replace('$', ''));
 
-            console.log('Parsed values:', { amount, price });
-
             if (price > 0) {
                 // בדיקה אם הפונקציה הכללית זמינה
                 if (typeof window.convertAmountToShares === 'function') {
-                    console.log('Using convertAmountToShares function');
                     const result = window.convertAmountToShares(amount, price);
-                    console.log('Conversion result:', result);
                     sharesInput.value = result.shares;
                     // לא מעדכנים את הסכום חזרה - רק מספר מניות
                     // amountInput.value = result.adjustedAmount;
                 } else {
                     handleFunctionNotFound('convertAmountToShares', 'פונקציית המרת סכום למניות לא נמצאה');
-                    console.log('Available global functions:', Object.keys(window).filter(key => key.includes('convert')));
                     // fallback
                     const shares = Math.floor(amount / price);
                     sharesInput.value = shares;
                 }
-            } else {
-                console.log('Price is not valid:', price);
             }
-        } else {
-            console.log('Missing amount or price. Amount:', amountInput.value, 'Price:', priceDisplay.textContent);
         }
     } else {
         handleElementNotFound('updateSharesFromAmount', 'אלמנטים נדרשים לא נמצאו לעדכון מניות');
@@ -3147,36 +2977,19 @@ function updateSharesFromAmount() {
  * עדכון סכום ממספר מניות
  */
 function updateAmountFromShares() {
-    console.log('🔄 updateAmountFromShares called');
-
     const sharesInput = document.getElementById('addTradePlanShares');
     const amountInput = document.getElementById('addTradePlanPlannedAmount');
     const priceDisplay = document.getElementById('currentPriceDisplay');
 
-    console.log('Elements found:', {
-        sharesInput: !!sharesInput,
-        amountInput: !!amountInput,
-        priceDisplay: !!priceDisplay
-    });
-
     if (sharesInput && amountInput && priceDisplay) {
-        console.log('Values:', {
-            shares: sharesInput.value,
-            price: priceDisplay.textContent
-        });
-
         if (sharesInput.value && priceDisplay.textContent !== '-') {
             const shares = parseFloat(sharesInput.value);
             const price = parseFloat(priceDisplay.textContent.replace('$', ''));
 
-            console.log('Parsed values:', { shares, price });
-
             if (price > 0) {
                 // בדיקה אם הפונקציה הכללית זמינה
                 if (typeof window.convertSharesToAmount === 'function') {
-                    console.log('Using convertSharesToAmount function');
                     const amount = window.convertSharesToAmount(shares, price);
-                    console.log('Conversion result:', amount);
                     amountInput.value = amount;
                 } else {
                     handleFunctionNotFound('convertSharesToAmount', 'פונקציית המרת מניות לסכום לא נמצאה');
@@ -3195,7 +3008,6 @@ function updateAmountFromShares() {
  * הוספת תנאי כניסה
  */
 function addEntryCondition() {
-    console.log('🔄 הוספת תנאי כניסה');
 
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'המודול יאפשר בקרוב ליצור תנאי כניסה מתקדם');
@@ -3206,7 +3018,6 @@ function addEntryCondition() {
  * הוספת סיבה
  */
 function addReason() {
-    console.log('🔄 הוספת סיבה');
 
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'המודול יאפשר בקרוב ליצור סיבות מתקדמות');
@@ -3223,67 +3034,26 @@ window.addEntryCondition = addEntryCondition;
 window.addReason = addReason;
 window.sortTable = sortTable;
 
-console.log('✅ Trade plans functions exported:', {
-    updateSharesFromAmount: typeof updateSharesFromAmount,
-    updateAmountFromShares: typeof updateAmountFromShares
-});
+
 
 // Checking if functions are available
-console.log('🔄 Trade_plans.js loaded. Available functions:', {
-    loadTradePlansData: typeof window.loadTradePlansData,
-    updateTradePlansTable: typeof window.updateTradePlansTable,
-    filterDataByFilters: typeof window.filterDataByFilters,
-    updateGridFromComponentGlobal: typeof window.updateGridFromComponentGlobal,
-    updateGridFromComponent: typeof window.updateGridFromComponent,
-    addImportantNote: typeof window.addImportantNote,
-    addReminder: typeof window.addReminder,
-    updateSharesFromAmount: typeof window.updateSharesFromAmount,
-    updateAmountFromShares: typeof window.updateAmountFromShares
-});
 
 // בדיקת פונקציות המרה
-console.log('🔄 Checking conversion functions:', {
-    convertAmountToShares: typeof window.convertAmountToShares,
-    convertSharesToAmount: typeof window.convertSharesToAmount,
-    calculateDefaultPrices: typeof window.calculateDefaultPrices,
-    getUserPreference: typeof window.getUserPreference,
-    closeModalGlobal: typeof window.closeModalGlobal
-});
 
 // בדיקה נוספת של פונקציות גלובליות
-console.log('🔄 Available global functions:', Object.keys(window).filter(key => 
-    key.includes('convert') || 
-    key.includes('closeModal') || 
-    key.includes('calculate')
-));
 
 // Verifying that our function is defined
 if (window.location.pathname.includes('/trade_plans')) {
-    console.log('✅ Trade plans page detected - updateGridFromComponent should be ours');
-    console.log('✅ Our updateGridFromComponent function:', typeof window.updateGridFromComponent);
-
     // Verifying that our function is called
     if (typeof window.updateGridFromComponent === 'function') {
-        console.log('✅ Our updateGridFromComponent function is properly defined');
+        // Function is properly defined
     } else {
         handleFunctionNotFound('updateGridFromComponent', 'פונקציית עדכון רשת לא נמצאה');
     }
 
-    // בדיקת פונקציות המרה
-    setTimeout(() => {
-        console.log('🔄 Final check of conversion functions:', {
-            updateSharesFromAmount: typeof window.updateSharesFromAmount,
-            updateAmountFromShares: typeof window.updateAmountFromShares,
-            convertAmountToShares: typeof window.convertAmountToShares,
-            convertSharesToAmount: typeof window.convertSharesToAmount
-        });
-    }, 1000);
-
     // טעינת נתונים בטעינת הדף
-    console.log('🔄 Loading trade plans data on page load...');
     setTimeout(() => {
         if (typeof window.loadTradePlansData === 'function') {
-            console.log('🔄 Calling loadTradePlansData...');
             window.loadTradePlansData();
         } else {
             handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה');
@@ -3292,9 +3062,7 @@ if (window.location.pathname.includes('/trade_plans')) {
 }
 
 // קריאה ישירה לפונקציה - למקרה שהקוד למעלה לא רץ
-console.log('🔄 Direct call to loadTradePlansData at end of file...');
 if (typeof loadTradePlansData === 'function') {
-    console.log('🔄 loadTradePlansData function exists, calling it...');
     setTimeout(() => {
         loadTradePlansData();
     }, 1000);
@@ -3304,12 +3072,9 @@ if (typeof loadTradePlansData === 'function') {
 
 // קריאה ב-DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔄 DOMContentLoaded event fired for trade_plans.js');
     if (window.location.pathname.includes('/trade_plans')) {
-        console.log('🔄 Trade plans page detected in DOMContentLoaded');
         setTimeout(() => {
             if (typeof loadTradePlansData === 'function') {
-                console.log('🔄 Calling loadTradePlansData from DOMContentLoaded...');
                 loadTradePlansData();
             } else {
                 handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה ב-DOMContentLoaded');

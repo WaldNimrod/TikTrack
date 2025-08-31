@@ -462,4 +462,85 @@ def update_all_statuses_auto():
     finally:
         db.close()
 
+@tickers_bp.route('/<int:ticker_id>/cancel', methods=['POST'])
+def cancel_ticker(ticker_id: int):
+    """Cancel ticker"""
+    db = None
+    try:
+        data = request.get_json() if request.is_json else {}
+        cancel_reason = data.get('cancel_reason', 'Cancelled by user')
+        db: Session = next(get_db())
+        
+        # Check that ticker exists
+        ticker = TickerService.get_by_id(db, ticker_id)
+        if not ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found"},
+                "version": "v1"
+            }), 404
+        
+        # Check if ticker is already cancelled
+        if ticker.status == 'cancelled':
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker is already cancelled"},
+                "version": "v1"
+            }), 400
+        
+        # Check active_trades constraint - prevent cancellation if ticker has active trades
+        from models.trade import Trade
+        from models.trade_plan import TradePlan
+        
+        # Check actual open trades
+        open_trades_count = db.query(Trade).filter(
+            Trade.ticker_id == ticker_id,
+            Trade.status == 'open'
+        ).count()
+        
+        # Check actual open trade plans
+        open_plans_count = db.query(TradePlan).filter(
+            TradePlan.ticker_id == ticker_id,
+            TradePlan.status == 'open'
+        ).count()
+        
+        if ticker.active_trades or open_trades_count > 0 or open_plans_count > 0:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Cannot cancel ticker with active trades. Please close all open trades first."},
+                "version": "v1"
+            }), 400
+        
+        # Update ticker status to cancelled
+        success = TickerService.update(db, ticker_id, {
+            'status': 'cancelled'
+        })
+        
+        if success:
+            # Get updated ticker
+            updated_ticker = TickerService.get_by_id(db, ticker_id)
+            return jsonify({
+                "status": "success",
+                "data": updated_ticker.to_dict(),
+                "message": "Ticker cancelled successfully",
+                "version": "v1"
+            })
+        else:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Failed to cancel ticker"},
+                "version": "v1"
+            }), 500
+        
+    except Exception as e:
+        logger.error(f"Error cancelling ticker {ticker_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 400
+    finally:
+        if db:
+            db.close()
+
 # Endpoint removed - status updates automatically now

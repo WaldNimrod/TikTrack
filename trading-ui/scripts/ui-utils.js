@@ -141,7 +141,8 @@ function updatePricesFromPercentages(formId, currentPrice) {
     stopPriceElement.value = newStopPrice.toFixed(2);
     targetPriceElement.value = newTargetPrice.toFixed(2);
     
-    console.log('🔄 Updated prices from percentages:', {
+    // Updated prices from percentages
+    console.log('Updated prices from percentages:', {
         currentPrice,
         side,
         stopPercentage,
@@ -187,7 +188,8 @@ function updatePercentagesFromPrices(formId, currentPrice) {
     stopPercentageElement.value = newStopPercentage.toFixed(2);
     targetPercentageElement.value = newTargetPercentage.toFixed(2);
     
-    console.log('🔄 Updated percentages from prices:', {
+    // Updated percentages from prices
+    console.log('Updated percentages from prices:', {
         currentPrice,
         side,
         stopPrice,
@@ -367,7 +369,7 @@ function showErrorNotification(title, message) {
         window.notificationSystem.showErrorNotification(title, message);
     } else {
         // Fallback to console only
-        console.log(`❌ ${title}: ${message}`);
+        // Error notification
     }
 }
 
@@ -381,7 +383,7 @@ function showSuccessNotification(title, message) {
         window.notificationSystem.showSuccessNotification(title, message);
     } else {
         // Fallback to console only
-        console.log(`✅ ${title}: ${message}`);
+        // Success notification
     }
 }
 
@@ -395,7 +397,7 @@ function showInfoNotification(title, message) {
         window.notificationSystem.showInfoNotification(title, message);
     } else {
         // Fallback to console only
-        console.log(`ℹ️ ${title}: ${message}`);
+        // Info notification
     }
 }
 
@@ -409,7 +411,7 @@ function showWarningNotification(title, message) {
         window.notificationSystem.showWarningNotification(title, message);
     } else {
         // Fallback to console only
-        console.log(`⚠️ ${title}: ${message}`);
+        // Warning notification
     }
 }
 
@@ -454,7 +456,7 @@ function showNotification(message, type = 'info') {
         window.notificationSystem.showNotification(message, type, 'התראה');
     } else {
         // Fallback להצגת התראה פשוטה
-        console.log(`[${type.toUpperCase()}] ${message}`);
+        // Notification message
     }
 }
 
@@ -801,11 +803,11 @@ function getItemTypeIcon(itemType) {
  * @param {string} currentStatus - Current status of the item (optional)
  */
 async function cancelItem(itemType, itemId, itemName = null, currentStatus = null) {
-    console.log(`🔄 Global cancel function called for ${itemType} ${itemId}`);
+    // Global cancel function called for
     
     // בדיקה אם האובייקט כבר מבוטל
     if (currentStatus === 'cancelled') {
-        console.log(`⚠️ ${itemType} ${itemId} is already cancelled`);
+        // Item is already cancelled
         if (typeof window.showInfoNotification === 'function') {
             window.showInfoNotification(`${getItemTypeDisplayName(itemType)} כבר מבוטל`);
         }
@@ -828,7 +830,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
 
             if (allEntities.length > 0) {
                 // יש פריטים מקושרים - הצגת אזהרה
-                console.log(`⚠️ Linked items found: ${allEntities.length}`);
+                // Linked items found
                 
                 if (typeof window.showLinkedItemsModal === 'function') {
                     window.showLinkedItemsModal(allEntities, itemType, itemId);
@@ -846,7 +848,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
     }
     
     // אין פריטים מקושרים - ביצוע הביטול
-    console.log(`✅ No linked items found, proceeding with cancellation`);
+    // No linked items found, proceeding with cancellation
     await performItemCancellation(itemType, itemId, itemName);
 }
 
@@ -862,9 +864,9 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
  */
 function createCancelButton(itemType, itemId, status = 'open', size = 'sm', useGlobalCancel = false) {
     const isCancelled = status === 'cancelled';
-    const buttonClass = isCancelled ? 'btn-secondary' : 'btn-danger';
+    const buttonClass = isCancelled ? 'btn-success' : 'btn-danger';
     const title = isCancelled ? 'הפעל מחדש' : 'בטל';
-    const icon = 'X';
+    const icon = isCancelled ? '✓' : 'X';
     
     // יצירת onclick בהתאם לסטטוס וסוג האובייקט
     let onclick = '';
@@ -951,7 +953,7 @@ async function performItemCancellation(itemType, itemId, itemName) {
                 response = await fetch(`${base}/api/v1/tickers/${itemId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: 'canceled' })
+                    body: JSON.stringify({ status: 'cancelled' })
                 });
                 break;
                 
@@ -976,7 +978,7 @@ async function performItemCancellation(itemType, itemId, itemName) {
         }
 
         if (response.ok) {
-            console.log(`✅ ${itemType} ${itemId} cancelled successfully`);
+            // Item cancelled successfully
             
             // הצגת הודעת הצלחה
             if (typeof window.showSuccessNotification === 'function') {
@@ -1156,8 +1158,8 @@ const WARNING_TYPES = {
  * Get warning configuration by type
  */
 function getWarningConfig(type, data = {}) {
-    console.log('🔧 getWarningConfig called with:', { type, data });
-    console.log('🔧 Available warning types:', Object.keys(WARNING_TYPES));
+    // getWarningConfig called with
+    // Available warning types
 
     const config = WARNING_TYPES[type.toUpperCase()];
     if (!config) {
@@ -1170,7 +1172,7 @@ function getWarningConfig(type, data = {}) {
         message: formatWarningMessage(config.message, data)
     };
 
-    console.log('🔧 Warning config result:', result);
+    // Warning config result
     return result;
 }
 
@@ -1178,15 +1180,15 @@ function getWarningConfig(type, data = {}) {
  * Format warning message with data
  */
 function formatWarningMessage(template, data) {
-    console.log('🔧 formatWarningMessage called with:', { template, data });
+    // formatWarningMessage called with
 
     const result = template.replace(/\{(\w+)\}/g, (match, key) => {
         const value = data[key] || match;
-        console.log(`🔧 Replacing ${match} with ${value}`);
+        // Replacing placeholder with value
         return value;
     });
 
-    console.log('🔧 Formatted message result:', result);
+    // Formatted message result
     return result;
 }
 
@@ -1316,8 +1318,8 @@ function getWarningActions(actions, defaultAction, theme, onConfirm = null, onCa
 function createWarningModal(config, options = {}, onConfirm = null, onCancel = null) {
     const modalId = `warningModal_${Date.now()}`;
 
-    console.log('🔧 Creating warning modal with ID:', modalId);
-    console.log('🔧 Config:', config);
+    // Creating warning modal with ID
+    // Config
 
     // Create simple modal HTML
     const modalHtml = `
@@ -1357,7 +1359,7 @@ function createWarningModal(config, options = {}, onConfirm = null, onCancel = n
         throw new Error(`Failed to create modal with ID ${modalId}`);
     }
 
-    console.log('✅ Modal created successfully with ID:', modalId);
+    // Modal created successfully with ID
     return modalId;
 }
 
@@ -1366,7 +1368,7 @@ function createWarningModal(config, options = {}, onConfirm = null, onCancel = n
  */
 function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel = null) {
     try {
-        console.log('🔧 showWarning called with:', { type, data, options });
+        // showWarning called with
 
         // Store callbacks globally
         window.warningConfirmCallback = onConfirm;
@@ -1456,7 +1458,7 @@ function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel =
 
             // Show the modal
             modal.show();
-            console.log('✅ Modal shown successfully');
+            // Modal shown successfully
 
             return modalId;
         }
@@ -1553,7 +1555,7 @@ function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel =
  * Handle warning action
  */
 function handleWarningAction(action) {
-    console.log('🔧 Handling warning action:', action);
+    // Handling warning action
 
     // Close modal - find any open modal
     const openModal = document.querySelector('.modal.show');
@@ -1570,27 +1572,27 @@ function handleWarningAction(action) {
         case 'ok':
         case 'delete':
             if (typeof window.warningConfirmCallback === 'function') {
-                console.log('✅ Executing confirm callback');
+                // Executing confirm callback
                 window.warningConfirmCallback();
             } else {
-                console.log('❌ No confirm callback found');
+                // No confirm callback found
             }
             break;
         case 'cancel':
         case 'close':
             if (typeof window.warningCancelCallback === 'function') {
-                console.log('❌ Executing cancel callback');
+                // Executing cancel callback
                 window.warningCancelCallback();
             } else {
-                console.log('❌ No cancel callback found');
+                // No cancel callback found
             }
             break;
         case 'force_delete':
             if (typeof window.warningConfirmCallback === 'function') {
-                console.log('✅ Executing force delete callback');
+                // Executing force delete callback
                 window.warningConfirmCallback();
             } else {
-                console.log('❌ No confirm callback found');
+                // No confirm callback found
             }
             break;
         case 'manage_linked':
@@ -1618,7 +1620,7 @@ function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null
                             itemType === 'cash_flow' ? 'תזרים מזומנים' :
                                 itemType === 'note' ? 'הערה' : 'אובייקט';
 
-    console.log('🔧 showCancelWarning called with:', { itemType, itemName, itemTypeDisplay });
+    // showCancelWarning called with
 
     // Try to use the warning system, fallback to notification system
     try {
@@ -1663,7 +1665,7 @@ function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null
  * Show validation warning
  */
 function showValidationWarningLegacy(field, message) {
-    console.log('🔧 showValidationWarningLegacy called with:', { field, message });
+    // showValidationWarningLegacy called with
 
     // Use the global validation warning system from notification-system.js if available
     if (typeof window.notificationSystem !== 'undefined' && window.notificationSystem.showValidationWarning) {
@@ -1697,9 +1699,9 @@ window.showCancelWarning = showCancelWarning;
 
 
 // בדיקת פונקציות בסוף טעינת ui-utils.js
-console.log('🔧 ui-utils.js נטען');
-console.log('🔧 window.showDeleteWarning קיים:', typeof window.showDeleteWarning === 'function');
-console.log('🔧 window.showConfirmationDialog קיים:', typeof window.showConfirmationDialog === 'function');
+  // ui-utils.js נטען
+  // window.showDeleteWarning קיים
+  // window.showConfirmationDialog קיים
 // Don't export showValidationWarning here - it's already exported from notification-system.js
 window.getWarningConfig = getWarningConfig;
 window.createWarningModal = createWarningModal;
@@ -1957,7 +1959,7 @@ function createDetailedItemInfo(item) {
  * This function should be called on DOMContentLoaded
  */
 function initializeModalBackdrop() {
-    console.log('🔄 Initializing modal backdrop functionality...');
+    // Initializing modal backdrop functionality
     
     const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {
@@ -1982,7 +1984,7 @@ function initializeModalBackdrop() {
         });
     });
 
-    console.log('✅ Modal backdrop functionality initialized');
+    // Modal backdrop functionality initialized
 }
 
 // Initialize modal backdrop when DOM is loaded

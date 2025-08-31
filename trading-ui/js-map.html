@@ -723,7 +723,7 @@
                     console.log('✅ JS map data loaded successfully');
 
                 } catch (error) {
-                    console.error('❌ Error loading JS map data:', error);
+                    // Error loading JS map data
                     this.showErrorState('שגיאה בטעינת נתונים');
                 }
             }
@@ -945,7 +945,7 @@
             async renderPageMapping() {
                 const container = document.getElementById('pageMappingContent');
                 if (!container) {
-                    console.error('❌ Container not found: pageMappingContent');
+                    // Container not found: pageMappingContent
                     return;
                 }
 
@@ -961,13 +961,13 @@
                 console.log('📁 Sorted JS Files length:', sortedJsFiles ? sortedJsFiles.length : 'undefined');
 
                 if (!this.htmlPages || this.htmlPages.length === 0) {
-                    console.error('❌ No HTML pages found!');
+                    // No HTML pages found!
                     container.innerHTML = '<div class="error">לא נמצאו עמודים להצגה</div>';
                     return;
                 }
 
                 if (!sortedJsFiles || sortedJsFiles.length === 0) {
-                    console.error('❌ No JS files found!');
+                    // No JS files found!
                     container.innerHTML = '<div class="error">לא נמצאו קבצי JS להצגה</div>';
                     return;
                 }
@@ -1176,7 +1176,7 @@
                     console.log('✅ JS map data refreshed successfully');
 
                 } catch (error) {
-                    console.error('❌ Error refreshing JS map data:', error);
+                    // Error refreshing JS map data:, error);
                     this.showErrorState('שגיאה ברענון נתונים');
 
                     // Re-enable refresh button
@@ -1199,7 +1199,7 @@
                 console.log('🔄 Initializing jsMapSystem...');
                 window.jsMapSystem.init();
             } else {
-                console.error('❌ jsMapSystem not found!');
+                // jsMapSystem not found!
             }
         }
 
@@ -1244,7 +1244,7 @@
                     console.log('✅ Function calls refreshed successfully');
 
                 } catch (error) {
-                    console.error('❌ Error refreshing function calls:', error);
+                    // Error refreshing function calls:, error);
                 }
             }
         }

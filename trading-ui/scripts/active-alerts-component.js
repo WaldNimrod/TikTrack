@@ -173,15 +173,8 @@ class ActiveAlertsComponent extends HTMLElement {
       return;
     }
 
-    console.log('🔍 === CHECKING GLOBAL FUNCTIONS (ACTIVE ALERTS COMPONENT) ===');
-    console.log('🔍 formatAlertCondition available:', typeof window.formatAlertCondition);
-    console.log('🔍 parseAlertCondition available:', typeof window.parseAlertCondition);
-    console.log('🔍 BUTTON_ICONS available:', typeof window.BUTTON_ICONS);
-    console.log('🔍 BUTTON_TEXTS available:', typeof window.BUTTON_TEXTS);
-
     // בדיקה אם שתי הפונקציות זמינות
     if (window.formatAlertCondition && window.parseAlertCondition) {
-      console.log('✅ All global functions are available');
       this._functionsChecked = true;
       // ניקוי timeout אם יש אחד פעיל
       if (this._checkTimeout) {
@@ -198,7 +191,6 @@ class ActiveAlertsComponent extends HTMLElement {
 
     if (this._checkAttempts < 5) { // מקסימום 5 ניסיונות
       this._checkAttempts++;
-      console.warn(`⚠️ Global functions not available (attempt ${this._checkAttempts}/5) - retrying in 2 seconds`);
       this._checkTimeout = setTimeout(() => {
         // בדיקה אם הקומפוננטה עדיין מחוברת
         if (this.isConnected) {
@@ -206,7 +198,6 @@ class ActiveAlertsComponent extends HTMLElement {
         }
       }, 2000);
     } else {
-      console.warn('⚠️ Global functions not available after 5 attempts - using local versions');
       this._functionsChecked = true;
       // ניקוי timeout אם יש אחד פעיל
       if (this._checkTimeout) {
@@ -217,30 +208,20 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   async loadActiveAlerts() {
-    console.log('🔄 Loading active alerts...');
-
     if (this.isLoading) {
-      console.log('🔄 Already loading, skipping...');
       return;
     }
 
     this.isLoading = true;
     try {
       const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-      console.log('🔄 Fetching from:', `${base}/api/v1/alerts/unread`);
-
       const response = await fetch(`${base}/api/v1/alerts/unread`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const apiData = await response.json();
-      console.log('🔄 API response:', apiData);
-
       this.alerts = (apiData && apiData.status === 'success' && Array.isArray(apiData.data)) ? apiData.data : [];
-      console.log('🔄 Parsed alerts:', this.alerts);
-      console.log('🔄 Alerts length after parsing:', this.alerts.length);
 
       this.renderAlerts();
-      console.log('🔄 After renderAlerts, alerts length:', this.alerts.length);
       this.updateCount(); // עדכון הכותרת והסקשן
       this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
     } catch (err) {
@@ -254,15 +235,12 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   updateCount() {
-    console.log('🔄 updateCount called, alerts length:', this.alerts.length);
-
     const titleEl = this.querySelector('#alertsTitle');
     const cardsContainer = this.querySelector('#alertsCards');
     const legendHeader = this.querySelector('.alerts-color-legend-header');
 
     if (titleEl) {
       if (this.alerts.length === 0) {
-        console.log('🔄 No alerts, updating title to empty state');
         titleEl.innerHTML = '🔕 אין התראות חדשות';
         titleEl.style.opacity = '0.5';
         titleEl.style.fontSize = '0.9rem'; // הקטנת הכותרת
@@ -270,7 +248,6 @@ class ActiveAlertsComponent extends HTMLElement {
         // סגירת הסקשן כשאין התראות - מבוטל כדי לא להפריע לשמירת סטטוס המשתמש
         // this.closeSectionIfNoAlerts();
       } else {
-        console.log('🔄 Has alerts, updating title with count');
         // החלפת האיקון הקיים באיקון עם מספר
         titleEl.innerHTML = this.createTitleWithIcon();
         titleEl.style.opacity = '1';
@@ -284,10 +261,8 @@ class ActiveAlertsComponent extends HTMLElement {
     // הסתרת/הצגת מפתח הצבעים
     if (legendHeader) {
       if (this.alerts.length === 0) {
-        console.log('🔄 Hiding color legend');
         legendHeader.style.display = 'none';
       } else {
-        console.log('🔄 Showing color legend');
         legendHeader.style.display = 'flex';
       }
     }
@@ -295,10 +270,8 @@ class ActiveAlertsComponent extends HTMLElement {
     // הסתרת/הצגת מיכל הכרטיסיות
     if (cardsContainer) {
       if (this.alerts.length === 0) {
-        console.log('🔄 Hiding cards container');
         cardsContainer.style.display = 'none';
       } else {
-        console.log('🔄 Showing cards container');
         cardsContainer.style.display = 'grid';
       }
     }
@@ -308,25 +281,17 @@ class ActiveAlertsComponent extends HTMLElement {
    * סגירת הסקשן כשאין התראות
    */
   closeSectionIfNoAlerts() {
-    console.log('🔄 closeSectionIfNoAlerts called');
     let currentElement = this;
     while (currentElement && currentElement !== document.body) {
       const parentSection = currentElement.closest('.top-section, .content-section, .section-container');
       if (parentSection) {
-        console.log('🔄 Found parent section:', parentSection);
         const toggleBtn = parentSection.querySelector('.filter-toggle-btn, .top-toggle-btn, [onclick*="toggle"]');
         if (toggleBtn) {
-          console.log('🔄 Found toggle button:', toggleBtn);
           const sectionBody = parentSection.querySelector('.section-body');
           if (sectionBody && sectionBody.style.display !== 'none') {
-            console.log('🔄 Closing section');
             // סגירת הסקשן
             toggleBtn.click();
-          } else {
-            console.log('🔄 Section already closed or no section body found');
           }
-        } else {
-          console.log('🔄 No toggle button found');
         }
         break;
       }
@@ -338,25 +303,17 @@ class ActiveAlertsComponent extends HTMLElement {
    * פתיחת הסקשן כשיש התראות
    */
   openSectionIfHasAlerts() {
-    console.log('🔄 openSectionIfHasAlerts called');
     let currentElement = this;
     while (currentElement && currentElement !== document.body) {
       const parentSection = currentElement.closest('.top-section, .content-section, .section-container');
       if (parentSection) {
-        console.log('🔄 Found parent section:', parentSection);
         const toggleBtn = parentSection.querySelector('.filter-toggle-btn, .top-toggle-btn, [onclick*="toggle"]');
         if (toggleBtn) {
-          console.log('🔄 Found toggle button:', toggleBtn);
           const sectionBody = parentSection.querySelector('.section-body');
           if (sectionBody && sectionBody.style.display === 'none') {
-            console.log('🔄 Opening section');
             // פתיחת הסקשן
             toggleBtn.click();
-          } else {
-            console.log('🔄 Section already open or no section body found');
           }
-        } else {
-          console.log('🔄 No toggle button found');
         }
         break;
       }
@@ -365,21 +322,14 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   renderAlerts() {
-    console.log('🎨 Rendering alerts, count:', this.alerts?.length);
-    console.log('🎨 Alerts data:', this.alerts);
-
     const container = this.querySelector('#alertsCards');
     const legendHeader = this.querySelector('.alerts-color-legend-header');
     
     if (!container) {
-      console.warn('❌ No alertsCards container found');
       return;
     }
 
-    console.log('✅ Found alertsCards container');
-
     if (!this.alerts.length) {
-      console.log('🎨 No alerts to display');
       // הסתרת המיכל כשאין התראות
       container.style.display = 'none';
       // הסתרת מפתח הצבעים כשאין התראות
@@ -389,8 +339,6 @@ class ActiveAlertsComponent extends HTMLElement {
       this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
       return;
     }
-
-    console.log('🎨 Rendering', this.alerts.length, 'alerts');
 
     // הצגת מפתח הצבעים כשיש התראות
     if (legendHeader) {
@@ -404,19 +352,15 @@ class ActiveAlertsComponent extends HTMLElement {
       return timeB - timeA; // מהחדשה לישנה
     });
 
-    console.log('🎨 Sorted alerts:', sortedAlerts);
-
     // הצגת המיכל כשיש התראות
     container.style.display = 'grid';
 
     // יצירת HTML לכל התראה
     const alertsHTML = sortedAlerts.map(a => {
       const html = this.createAlertCardHTML(a);
-      console.log('🎨 Generated HTML for alert:', a.id, html);
       return html;
     }).join('');
 
-    console.log('🎨 Final HTML:', alertsHTML);
     container.innerHTML = alertsHTML;
 
     this.setupCardEventListeners();
@@ -424,8 +368,6 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   createAlertCardHTML(alert) {
-    console.log('🔍 Creating alert card for:', alert);
-
     // שמירת ההתראה הנוכחית לשימוש בפונקציות אחרות
     this.currentAlert = alert;
 
@@ -434,14 +376,6 @@ class ActiveAlertsComponent extends HTMLElement {
     const icon = this.getAlertIcon(alert.type);
 
     // קבלת הסימבול מהאובייקט המקושר
-    console.log('🔍 Alert related data:', {
-      related_type_id: alert.related_type_id,
-      related_object_id: alert.related_object_id,
-      related_id: alert.related_id, // בדיקה אם יש שדה אחר
-      ticker_id: alert.ticker_id,
-      ticker_symbol: alert.ticker_symbol
-    });
-
     // נסה לקבל סימבול מהטיקר ישירות
     let symbol = alert.ticker_symbol;
     if (!symbol && alert.related_type_id && alert.related_id) {
@@ -451,35 +385,25 @@ class ActiveAlertsComponent extends HTMLElement {
     if (!symbol) {
       symbol = 'התראה';
     }
-    console.log('🔍 Symbol:', symbol);
 
     // שימוש בפונקציה formatAlertCondition לתרגום התנאי
-    console.log('🔍 Raw condition:', alert.condition);
     const formattedCondition = window.formatAlertCondition ? window.formatAlertCondition(alert.condition) : this.formatAlertCondition(alert.condition);
-
-    console.log('🔍 Formatted condition:', formattedCondition);
-    console.log('🔍 Alert type:', alert.type);
-    console.log('🔍 Alert message:', alert.message);
 
     // נתוני דמה לטיקר
     const currentPrice = this.getCurrentPrice(symbol);
     const dailyChange = this.getDailyChange(symbol);
     const changeClass = dailyChange.startsWith('+') ? 'positive' : 'negative';
-    console.log('🔍 Price data:', { currentPrice, dailyChange, changeClass });
 
     // טיפול בשדות undefined
     const message = alert.message || '';
     const relatedType = this.getRelatedTypeFromId(alert.related_type_id);
     // נסה להשתמש ב-related_id אם related_object_id לא קיים
     const relatedObjectId = alert.related_id;
-    console.log('🔍 Calling getRelatedObjectDetails with:', { related_type_id: alert.related_type_id, relatedObjectId });
     const relatedObjectDetails = this.getRelatedObjectDetails(alert.related_type_id, relatedObjectId);
 
     // קביעת רקע צבעוני לפי סוג האובייקט המקושר (לא לפי סוג ההתראה)
     const relatedTypeId = alert.related_type_id || 4; // ברירת מחדל לטיקר
-    console.log('🔍 Creating alert card with relatedTypeId:', relatedTypeId);
     const objectIcon = this.getObjectTypeIcon(relatedTypeId);
-    console.log('🔍 Object icon for header:', objectIcon);
 
     const html = `
       <div class="alert-card" data-related-type="${relatedTypeId}" data-alert-id="${alert.id}">
@@ -502,7 +426,6 @@ class ActiveAlertsComponent extends HTMLElement {
       </div>
     `;
 
-    console.log('🔍 Generated HTML:', html);
     return html;
   }
 
@@ -993,8 +916,6 @@ class ActiveAlertsComponent extends HTMLElement {
 
     if (!hasStyles) {
       console.warn('⚠️ Active Alerts Component: styles.css not found - icon may not display correctly');
-    } else {
-      console.log('✅ Active Alerts Component: styles loaded successfully');
     }
   }
 
@@ -1015,11 +936,8 @@ class ActiveAlertsComponent extends HTMLElement {
    * קבלת פרטי האובייקט המקושר - כמו בטבלת ההתראות
    */
   getRelatedObjectDetails(relatedTypeId, relatedObjectId) {
-    console.log('🔍 Getting related object details:', { relatedTypeId, relatedObjectId });
-
     // בדיקה אם השדות קיימים
     if (relatedTypeId === null || relatedTypeId === undefined || relatedObjectId === null || relatedObjectId === undefined) {
-      console.log('🔍 No related object - showing general');
       return '<span class="no-linked-object">כללי</span>';
     }
 
@@ -1060,9 +978,6 @@ class ActiveAlertsComponent extends HTMLElement {
         relatedDisplay = `אובייקט ${relatedObjectId}`;
     }
 
-    console.log('🔍 Related object display:', relatedDisplay);
-    console.log('🔍 Final HTML for related object:', `<span class="linked-object-text">🔗 ${relatedDisplay}</span>`);
-
     // החזרת הטקסט עם איקון קישור קטן - קישור לאובייקטים מקושרים
     return `<span class="linked-object-text linked-object-clickable" onclick="window.showRelatedObjectModal(${relatedTypeId}, ${relatedObjectId})">🔗 ${relatedDisplay}</span>`;
   }
@@ -1084,21 +999,16 @@ class ActiveAlertsComponent extends HTMLElement {
    * קבלת הסימבול מהאובייקט המקושר
    */
   getSymbolFromRelatedObject(relatedTypeId, relatedObjectId) {
-    console.log('🔍 getSymbolFromRelatedObject called with:', { relatedTypeId, relatedObjectId });
-
     if (!relatedObjectId) {
-      console.log('🔍 No relatedObjectId, returning null');
       return null;
     }
 
     // אם יש לנו ticker_symbol ישירות מהשרת, נשתמש בו
     if (this.currentAlert && this.currentAlert.ticker_symbol) {
-      console.log('🔍 Using ticker_symbol from server:', this.currentAlert.ticker_symbol);
       return this.currentAlert.ticker_symbol;
     }
 
     const relatedType = this.getRelatedTypeFromId(relatedTypeId);
-    console.log('🔍 Related type:', relatedType);
 
     // כרגע נחזיר סימבול דמה - בהמשך יטען מהשרת
     // בהתבסס על סוג האובייקט המקושר
@@ -1107,7 +1017,6 @@ class ActiveAlertsComponent extends HTMLElement {
         // אם זה טיקר, נחזיר סימבול אקראי
         const tickerSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'IWM', 'AMZN', 'META', 'NFLX', 'AMD', 'INTC', 'ORCL', 'CRM', 'ADBE'];
         const symbol = tickerSymbols[relatedObjectId % tickerSymbols.length];
-        console.log('🔍 Ticker symbol:', symbol);
         return symbol;
       case 'trade':
         // אם זה טרייד, נחזיר סימבול דמה
@@ -1122,7 +1031,6 @@ class ActiveAlertsComponent extends HTMLElement {
         const accountNames = ['חשבון מעודכן', 'חשבון השקעות', 'חשבון מסחר', 'חשבון פנסיה'];
         return accountNames[relatedObjectId % accountNames.length];
       default:
-        console.log('🔍 Unknown related type, returning התראה');
         return 'התראה';
     }
   }
@@ -1202,7 +1110,6 @@ class ActiveAlertsComponent extends HTMLElement {
    * קביעת איקון לפי סוג האובייקט המקושר - מעודכן לאיקונים של המערכת
    */
   getObjectTypeIcon(relatedTypeId) {
-    console.log('🔍 getObjectTypeIcon called with relatedTypeId:', relatedTypeId);
     // איקונים עקביים עם המערכת - שימוש באיקונים SVG האמיתיים
     const objectIcons = {
       1: '<img src="images/icons/accounts.svg" alt="חשבון" style="width: 16px; height: 16px; vertical-align: middle;">', // חשבון
@@ -1211,7 +1118,6 @@ class ActiveAlertsComponent extends HTMLElement {
       4: '<img src="images/icons/tickers.svg" alt="טיקר" style="width: 16px; height: 16px; vertical-align: middle;">'  // טיקר
     };
     const icon = objectIcons[relatedTypeId] || objectIcons[4]; // ברירת מחדל לטיקר
-    console.log('🔍 getObjectTypeIcon returning icon:', icon);
     return icon;
   }
 

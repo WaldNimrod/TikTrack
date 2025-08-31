@@ -2,7 +2,7 @@
  * Header System - TikTrack Frontend
  * ==================================
  * 
- * console.log('🔄 Header System JS loading...');
+ * Header System JS loading...
  * 
  * Unified header element with menu, logo, and smart filtering system
  * 
@@ -53,6 +53,9 @@ class HeaderSystem {
 
     // הגדרת event listeners
     this.setupEventListeners();
+
+    // טעינת מצב שמור
+    this.loadSavedState();
 
     this.isInitialized = true;
   }
@@ -1479,15 +1482,18 @@ class HeaderSystem {
       if (this.isFilterCollapsed) {
         const filtersElement = document.getElementById('headerFilters');
         const toggleBtn = document.getElementById('filterToggleBtn');
-        const arrow = toggleBtn.querySelector('.filter-arrow');
+        const arrow = toggleBtn?.querySelector('.filter-arrow');
 
-        if (filtersElement) {
+        if (filtersElement && toggleBtn && arrow) {
           filtersElement.style.display = 'none';
           arrow.textContent = '▶';
           toggleBtn.classList.add('collapsed');
         }
       }
     }
+    
+    // שחזור מצב אזור הפילטרים (גיבוי)
+    this.restoreFiltersSectionState();
   }
 
   saveState() {
@@ -1935,17 +1941,17 @@ class HeaderSystem {
         arrow.textContent = '▶';
         toggleBtn.classList.add('collapsed');
         this.isFilterCollapsed = true;
-        // שמירת מצב סגור
-        localStorage.setItem('filtersSectionOpen', 'false');
       } else {
         filtersElement.style.display = 'block';
         arrow.textContent = '▼';
         toggleBtn.classList.remove('collapsed');
         this.isFilterCollapsed = false;
-        // שמירת מצב פתוח
-        localStorage.setItem('filtersSectionOpen', 'true');
       }
 
+      // שמירת מצב ב-localStorage
+      localStorage.setItem('filtersSectionOpen', this.isFilterCollapsed ? 'false' : 'true');
+      
+      // שמירת מצב במערכת
       this.saveState();
     }
   }
@@ -1979,6 +1985,9 @@ class HeaderSystem {
         toggleBtn.classList.add('collapsed');
         this.isFilterCollapsed = true;
       }
+      
+      // עדכון הסטטוס במערכת
+      this.saveState();
     }
   }
 
@@ -2386,7 +2395,7 @@ class HeaderSystem {
         const activeAccounts = data.data.filter(account => 
           account.status === 'active' || account.status === 'open'
         );
-        console.log(`🔍 Loaded ${activeAccounts.length} active accounts out of ${data.data.length} total accounts`);
+        // Loaded active accounts out of total accounts
         this.updateAccountFilterOptions(activeAccounts);
       }
     } catch (err) {
@@ -2401,7 +2410,7 @@ class HeaderSystem {
 
     // שמירת החשבונות ב-localStorage
     localStorage.setItem('tiktrack_accounts', JSON.stringify(accounts));
-    console.log('💾 Saved accounts to localStorage:', accounts.length, 'accounts');
+    // Saved accounts to localStorage
 
     // ניקוי התפריט הקיים
     accountMenu.innerHTML = '';
@@ -2789,13 +2798,13 @@ window.HeaderSystem = HeaderSystem;
 
 // אתחול אוטומטי
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🔄 === DOM CONTENT LOADED (HEADER SYSTEM) ===');
-  console.log('🔍 HeaderSystem available:', typeof HeaderSystem);
+  // === DOM CONTENT LOADED (HEADER SYSTEM) ===
+      // HeaderSystem available
   
   if (typeof HeaderSystem === 'function') {
     window.headerSystem = new HeaderSystem();
     window.headerSystem.init();
-    console.log('✅ Header system initialized successfully');
+          // Header system initialized successfully
   } else {
     // HeaderSystem class not found
   }
@@ -2897,24 +2906,24 @@ function selectStatusOption(status) {
 
   // עדכון סימון ויזואלי
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
-  console.log('🔍 Found status items:', statusItems.length);
+  // Found status items
   
   const clickedItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === status);
-  console.log('🔍 Clicked item found:', !!clickedItem, 'data-value:', status);
+      // Clicked item found
 
   if (clickedItem) {
     if (status === 'הכול') {
-      console.log('🔍 Selecting "הכול" - clearing all others');
+      // Selecting "הכול" - clearing all others
       // אם בוחרים "הכול" - מסירים סימון מכל השאר
       statusItems.forEach(item => item.classList.remove('selected'));
       clickedItem.classList.add('selected');
     } else {
-      console.log('🔍 Selecting specific status - toggling selection');
+      // Selecting specific status - toggling selection
       // אם בוחרים סטטוס ספציפי - מסירים סימון מ"הכול" ומוסיפים/מסירים מהסטטוס
       const allItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
       if (allItem) {
         allItem.classList.remove('selected');
-        console.log('🔍 Removed "הכול" selection');
+        // Removed "הכול" selection
       }
 
       // בדיקה אם יש פריטים נבחרים אחרים
@@ -2927,7 +2936,7 @@ function selectStatusOption(status) {
       // אם אין פריטים נבחרים, בחר "הכול"
       const newSelectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
       if (newSelectedItems.length === 0) {
-        console.log('🔍 No items selected, selecting "הכול"');
+        // No items selected, selecting "הכול"
         if (allItem) allItem.classList.add('selected');
       }
     }
@@ -2936,11 +2945,11 @@ function selectStatusOption(status) {
   }
 
   // עדכון הטקסט הנבחר
-  console.log('🔍 Updating status filter text');
+  // Updating status filter text
   updateStatusFilterText();
 
   // הפעלת הפילטר
-  console.log('🔍 Applying status filter');
+  // Applying status filter
   applyStatusFilter();
 }
 
@@ -2959,17 +2968,17 @@ function selectTypeOption(type) {
 
   if (clickedItem) {
     if (type === 'הכול') {
-      console.log('🔍 Selecting "הכול" - clearing all others');
+      // Selecting "הכול" - clearing all others
       // אם בוחרים "הכול" - מסירים סימון מכל השאר
       typeItems.forEach(item => item.classList.remove('selected'));
       clickedItem.classList.add('selected');
     } else {
-      console.log('🔍 Selecting specific type - toggling selection');
+      // Selecting specific type - toggling selection
       // אם בוחרים טיפוס ספציפי - מסירים סימון מ"הכול" ומוסיפים/מסירים מהטיפוס
       const allItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
       if (allItem) {
         allItem.classList.remove('selected');
-        console.log('🔍 Removed "הכול" selection');
+        // Removed "הכול" selection
       }
 
       // בדיקה אם יש פריטים נבחרים אחרים
@@ -2982,7 +2991,7 @@ function selectTypeOption(type) {
       // אם אין פריטים נבחרים, בחר "הכול"
       const newSelectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
       if (newSelectedItems.length === 0) {
-        console.log('🔍 No items selected, selecting "הכול"');
+        // No items selected, selecting "הכול"
         if (allItem) allItem.classList.add('selected');
       }
     }
@@ -2991,11 +3000,11 @@ function selectTypeOption(type) {
   }
 
   // עדכון הטקסט הנבחר
-  console.log('🔍 Updating type filter text');
+  // Updating type filter text
   updateTypeFilterText();
 
   // הפעלת הפילטר
-  console.log('🔍 Applying type filter');
+  // Applying type filter
   applyTypeFilter();
 }
 
@@ -3014,17 +3023,17 @@ function selectAccountOption(account) {
 
   if (clickedItem) {
     if (account === 'הכול') {
-      console.log('🔍 Selecting "הכול" - clearing all others');
+      // Selecting "הכול" - clearing all others
       // אם בוחרים "הכול" - מסירים סימון מכל השאר
       accountItems.forEach(item => item.classList.remove('selected'));
       clickedItem.classList.add('selected');
     } else {
-      console.log('🔍 Selecting specific account - toggling selection');
+      // Selecting specific account - toggling selection
       // אם בוחרים חשבון ספציפי - מסירים סימון מ"הכול" ומוסיפים/מסירים מהחשבון
       const allItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
       if (allItem) {
         allItem.classList.remove('selected');
-        console.log('🔍 Removed "הכול" selection');
+        // Removed "הכול" selection
       }
 
       // בדיקה אם יש פריטים נבחרים אחרים
@@ -3037,7 +3046,7 @@ function selectAccountOption(account) {
       // אם אין פריטים נבחרים, בחר "הכול"
       const newSelectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
       if (newSelectedItems.length === 0) {
-        console.log('🔍 No items selected, selecting "הכול"');
+        // No items selected, selecting "הכול"
         if (allItem) allItem.classList.add('selected');
       }
     }

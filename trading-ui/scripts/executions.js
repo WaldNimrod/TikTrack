@@ -1276,7 +1276,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
             const tradesResponse = await fetch('/api/v1/trades/');
             if (tradesResponse.ok) {
                 const tradesData = await tradesResponse.json();
-                const trades = tradesData.data || tradesData;
+                const trades = tradesData.data || tradesData || [];
                 linkedItems.trades = trades.filter(trade =>
                     trade.id == execution.trade_id
                 );
@@ -1288,7 +1288,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
             const plansResponse = await fetch('/api/v1/trade_plans/');
             if (plansResponse.ok) {
                 const plansData = await plansResponse.json();
-                const plans = plansData.data || plansData;
+                const plans = plansData.data || plansData || [];
                 linkedItems.trade_plans = plans.filter(plan =>
                     plan.trade_id == execution.trade_id
                 );
@@ -1300,7 +1300,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
             const alertsResponse = await fetch('/api/v1/alerts/');
             if (alertsResponse.ok) {
                 const alertsData = await alertsResponse.json();
-                const alerts = alertsData.data || alertsData;
+                const alerts = alertsData.data || alertsData || [];
                 linkedItems.alerts = alerts.filter(alert =>
                     alert.related_type_id === 5 && alert.related_id == executionId &&
                     alert.status === 'open'
@@ -1313,7 +1313,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
             const notesResponse = await fetch('/api/v1/notes/');
             if (notesResponse.ok) {
                 const notesData = await notesResponse.json();
-                const notes = notesData.data || notesData;
+                const notes = notesData.data || notesData || [];
                 linkedItems.notes = notes.filter(note =>
                     note.related_type_id === 5 && note.related_id == executionId
                 );
@@ -1548,7 +1548,7 @@ function goToNote(noteId) {
  * טעינת נתוני עסקעות
  */
 async function loadExecutionsData() {
-    console.log('🔄 loadExecutionsData called');
+    // loadExecutionsData called
     try {
         // טעינת נתוני עסקעות
 
@@ -1600,7 +1600,7 @@ async function loadExecutionsData() {
  * עדכון טבלת עסקעות
  */
 async function updateExecutionsTableMain(executions) {
-    console.log('🔄 updateExecutionsTableMain called with', executions.length, 'executions');
+    // updateExecutionsTableMain called with executions
     const table = document.querySelector('#executionsTable');
     const tbody = document.querySelector('#executionsTable tbody');
     if (!tbody) {
@@ -1662,10 +1662,11 @@ async function updateExecutionsTableMain(executions) {
         const trade = trades.find(t => t.id === execution.trade_id);
         let symbol = 'לא מוגדר';
         let tradeInfo = '';
+        let ticker = null;
 
         if (trade) {
             // מציאת הטיקר
-            const ticker = tickers.find(t => t.id === trade.ticker_id);
+            ticker = tickers.find(t => t.id === trade.ticker_id);
             symbol = ticker ? ticker.symbol : 'לא מוגדר';
 
             // מידע על הטרייד: תאריך פתיחה | צד | סוג
@@ -1715,6 +1716,13 @@ async function updateExecutionsTableMain(executions) {
                     <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'execution', ${execution.id})" title="פריטים מקושרים">🔗</button>
                     <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
                     <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
+                    ${ticker ? (window.uiUtils ?
+                        window.uiUtils.createCancelButton('ticker', ticker.id, ticker.status, 'sm') :
+                        (ticker.status === 'cancelled' ? 
+                            `<button class="btn btn-sm btn-outline-success" onclick="window.reactivateTicker(${ticker.id})" title="הפעל מחדש טיקר" style="margin-right: 4px;"><span class="reactivate-icon">✓</span></button>` :
+                            `<button class="btn btn-sm btn-outline-danger" onclick="window.cancelTicker(${ticker.id})" title="בטל טיקר" style="margin-right: 4px;"><span class="cancel-icon">X</span></button>`
+                        )
+                    ) : ''}
                 </td>
             </tr>
         `;
@@ -1908,7 +1916,7 @@ function toggleExecutionsSection() {
         
         // שמירת המצב
         localStorage.setItem('executionsSectionState', isVisible ? 'closed' : 'open');
-        console.log('💾 Saved executions section state:', isVisible ? 'closed' : 'open');
+        // Saved executions section state
     }
 }
 
@@ -1926,9 +1934,9 @@ function restoreExecutionsSectionState() {
         if (toggleBtn) {
             toggleBtn.textContent = 'הצג עסקעות';
         }
-        console.log('💾 Restored executions section state: closed');
+        // Restored executions section state: closed
     } else if (section && sectionBody) {
-        console.log('💾 Restored executions section state: open (default)');
+        // Restored executions section state: open (default)
     }
 }
 
@@ -1963,6 +1971,8 @@ window.validateExecutionCommission = validateExecutionCommission;
 window.validateExecutionType = validateExecutionType;
 window.validateExecutionSource = validateExecutionSource;
 window.validateExecutionNotes = validateExecutionNotes;
+
+// פונקציות ביטול טיקר - שימוש בפונקציות הגלובליות מ-tickers.js
 window.validateExecutionExternalId = validateExecutionExternalId;
 window.validateExecutionDate = validateExecutionDate;
 
@@ -2701,7 +2711,7 @@ function updateExecutionsTableForTradeModal(executions) {
         // updateExecutionsTable completed for trades page
     } else {
         // בדף executions - לא צריך לעדכן טבלה זו (זו פונקציה למודל עריכת טרייד)
-        console.log('ℹ️ updateExecutionsTableForTradeModal called on executions page - no action needed');
+        // updateExecutionsTableForTradeModal called on executions page - no action needed
     }
 }
 
@@ -2712,7 +2722,7 @@ function addEditBuySell() {
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח');
     } else {
-        console.log('פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח');
+        // פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח
     }
 }
 
@@ -2723,7 +2733,7 @@ function linkExistingExecution() {
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'פונקציונליות שיוך עסקה קיימת נמצאת בפיתוח');
     } else {
-        console.log('פונקציונליות שיוך עסקה קיימת נמצאת בפיתוח');
+        // פונקציונליות שיוך עסקה קיימת נמצאת בפיתוח
     }
 }
 
@@ -2734,7 +2744,7 @@ function unlinkExecution() {
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'פונקציונליות ביטול שיוך עסקה נמצאת בפיתוח');
     } else {
-        console.log('פונקציונליות ביטול שיוך עסקה נמצאת בפיתוח');
+        // פונקציונליות ביטול שיוך עסקה נמצאת בפיתוח
     }
 }
 
@@ -2759,14 +2769,31 @@ window.resetExecutionsFilters = window.resetExecutionsFilters || function() {};
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('🔧 DOM Content Loaded - checking notification functions');
-    console.log('🔧 window.showSuccessNotification:', typeof window.showSuccessNotification);
-    console.log('🔧 window.showErrorNotification:', typeof window.showErrorNotification);
-    console.log('🔧 window.showInfoNotification:', typeof window.showInfoNotification);
+    // DOM Content Loaded - checking notification functions
+    // window.showSuccessNotification
+    // window.showErrorNotification
+    // window.showInfoNotification
 
     // שחזור מצב הסגירה
     if (typeof window.restoreAllSectionStates === 'function') {
         window.restoreAllSectionStates();
+    } else {
+      console.warn('⚠️ restoreAllSectionStates function not available, using fallback');
+      // Fallback: restore top section state manually
+      const topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
+      const topSection = document.querySelector('.top-section .section-body');
+      const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+      const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
+
+      if (topSection && topIcon) {
+        if (topSectionHidden) {
+          topSection.style.display = 'none';
+          topIcon.textContent = '▼';
+        } else {
+          topSection.style.display = 'block';
+          topIcon.textContent = '▲';
+        }
+      }
     }
 
     // אתחול וולידציה עם כללים מותאמים לביצועים
@@ -2821,7 +2848,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.initializeValidation('editExecutionForm', editExecutionValidationRules);
     }
 
-    console.log('✅ Executions page initialized successfully');
+    // Executions page initialized successfully
 });
 
 // בדיקה שהפונקציות נטענו בהצלחה
@@ -2838,7 +2865,7 @@ console.log('✅ Execution functions loaded:', {
 
 // הגדרת פונקציות פילטר
 function setupExecutionsFilterFunctions() {
-  console.log('🔄 Setting up executions filter functions...');
+  // Setting up executions filter functions
   
   // שימוש במערכת הפילטרים הגלובלית - לא מעבירים פונקציה, רק מתחברים למערכת
   if (typeof window.applyTableFilter === 'function') {
@@ -2853,21 +2880,21 @@ function setupExecutionsFilterFunctions() {
   
   // פונקציה לפילטר חשבון
   window.filterExecutionsByAccount = function(accountNames) {
-    console.log('🔄 Filtering executions by account names:', accountNames);
+    // Filtering executions by account names
     
     const namesArray = Array.isArray(accountNames) ? accountNames : [accountNames];
     
     // בדיקה אם זה "הכול" או רשימה ריקה
     if (namesArray.length === 0 || namesArray.includes('all') || namesArray.includes('הכול')) {
       filteredExecutions = [...originalExecutions];
-      console.log('🔄 Showing all executions');
+      // Showing all executions
       updateExecutionsTableMain(filteredExecutions);
       updateExecutionsSummary(filteredExecutions);
-      console.log('✅ Filtered to', filteredExecutions.length, 'executions');
+      // Filtered to executions
       return;
     }
     
-    console.log('🔄 Looking for executions with account names:', namesArray);
+    // Looking for executions with account names
     
     // אם יש לנו כבר נתוני טריידים, השתמש בהם
     if (tradesData.length > 0) {
@@ -2899,26 +2926,26 @@ function setupExecutionsFilterFunctions() {
       tradesMap[trade.id] = trade.account_name;
     });
     
-    console.log('🔄 Trades map:', tradesMap);
-    console.log('🔄 Looking for accounts:', namesArray);
-    console.log('🔄 Original executions count:', originalExecutions.length);
+    // Trades map
+    // Looking for accounts
+    // Original executions count
     
     filteredExecutions = originalExecutions.filter(execution => {
       const tradeAccountName = tradesMap[execution.trade_id];
       const isIncluded = namesArray.includes(tradeAccountName);
-      console.log('🔄 Execution ID:', execution.id, 'trade_id:', execution.trade_id, 'Account name:', tradeAccountName, 'Looking for:', namesArray, 'Included:', isIncluded);
+      // Execution ID details
       return isIncluded;
     });
     
-    console.log('🔄 Filtered executions count:', filteredExecutions.length);
+    // Filtered executions count
     updateExecutionsTableMain(filteredExecutions);
     updateExecutionsSummary(filteredExecutions);
-    console.log('✅ Filtered to', filteredExecutions.length, 'executions');
+    // Filtered to executions
   }
   
   // פונקציה לחיפוש חופשי
   window.searchExecutions = function(searchTerm) {
-    console.log('🔄 Searching executions:', searchTerm);
+    // Searching executions
     
     if (!searchTerm || searchTerm.trim() === '') {
       filteredExecutions = [...originalExecutions];
@@ -2939,12 +2966,12 @@ function setupExecutionsFilterFunctions() {
     
     updateExecutionsTableMain(filteredExecutions);
     updateExecutionsSummary(filteredExecutions);
-    console.log('✅ Search results:', filteredExecutions.length, 'executions');
+    // Search results
   };
   
   // פונקציה לפילטר לפי סוג עסקה
   window.filterExecutionsByType = function(types) {
-    console.log('🔄 Filtering executions by type:', types);
+    // Filtering executions by type
     
     const typesArray = Array.isArray(types) ? types : [types];
     
@@ -2963,12 +2990,12 @@ function setupExecutionsFilterFunctions() {
     
     updateExecutionsTableMain(filteredExecutions);
     updateExecutionsSummary(filteredExecutions);
-    console.log('✅ Filtered by type:', filteredExecutions.length, 'executions');
+    // Filtered by type
   };
   
   // פונקציה לפילטר לפי תאריך
   window.filterExecutionsByDate = function(dateRange) {
-    console.log('🔄 Filtering executions by date range:', dateRange);
+    // Filtering executions by date range
     
     if (!dateRange || dateRange === 'all' || dateRange === 'הכול') {
       filteredExecutions = [...originalExecutions];
@@ -3005,19 +3032,19 @@ function setupExecutionsFilterFunctions() {
     
     updateExecutionsTableMain(filteredExecutions);
     updateExecutionsSummary(filteredExecutions);
-    console.log('✅ Filtered by date:', filteredExecutions.length, 'executions');
+    // Filtered by date
   };
   
   // פונקציה לאיפוס פילטרים
   window.resetExecutionsFilters = function() {
-    console.log('🔄 Resetting executions filters');
+    // Resetting executions filters
     filteredExecutions = [...originalExecutions];
     updateExecutionsTableMain(filteredExecutions);
     updateExecutionsSummary(filteredExecutions);
-    console.log('✅ Filters reset, showing all', originalExecutions.length, 'executions');
+    // Filters reset, showing all executions
   };
   
-  console.log('✅ Executions filter functions setup complete');
+  // Executions filter functions setup complete
 }
 
 // פונקציה לעדכון הנתונים הגלובליים
@@ -3025,7 +3052,7 @@ function updateExecutionsGlobalData(executions) {
   originalExecutions = executions || [];
   allExecutions = [...originalExecutions];
   filteredExecutions = [...allExecutions];
-  console.log('✅ Executions global data updated:', originalExecutions.length, 'executions');
+  // Executions global data updated
 }
 
 // עדכון הפונקציה הקיימת loadExecutionsData
@@ -3042,7 +3069,7 @@ window.loadExecutionsData = async function() {
       const response = await fetch('/api/v1/trades/');
       const data = await response.json();
       tradesData = data.data || [];
-      console.log('✅ Loaded trades data for account filter:', tradesData.length, 'trades');
+      // Loaded trades data for account filter
     } catch (error) {
       handleDataLoadError(error, 'נתוני טריידים');
       tradesData = [];
@@ -3095,3 +3122,10 @@ function getFieldIdFromError(errorMessage, prefix) {
 
 // ייצוא הפונקציה הגלובלית
 window.loadExecutionsData = loadExecutionsData;
+
+// ========================================
+// פונקציות ביטול טיקר - שימוש בפונקציות הגלובליות
+// ========================================
+
+// הפונקציות של ביטול טיקר נמצאות בקובץ tickers.js
+// כאן אנחנו משתמשים בפונקציות הגלובליות

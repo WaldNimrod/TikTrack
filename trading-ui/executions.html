@@ -53,6 +53,12 @@
 
   <!-- Ticker Service - Global ticker management -->
   <script src="scripts/ticker-service.js"></script>
+  
+  <!-- Tickers functions - Global ticker operations -->
+  <script src="scripts/tickers.js"></script>
+  
+  <!-- UI Utils - Global UI utilities -->
+  <script src="scripts/ui-utils.js"></script>
 
   <!-- Modular grid files - loaded at end of file -->
 </head>
@@ -132,84 +138,84 @@
                   <tr>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 0, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 0, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         סימבול <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 1, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 1, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         טרייד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 2, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 2, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         פעולה <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 3, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 3, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         חשבון <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 4, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 4, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         כמות <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 5, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 5, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         מחיר <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 6, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 6, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         עמלה <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 7, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 7, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         רווח/הפסד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 8, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 8, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 9, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 9, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         נוצר ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 10, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 10, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         תאריך ביצוע <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 11, window.executionsData || [], updateExecutionsTableMain); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 11, window.executionsData || [], updateExecutionsTableMain); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         מקור <span class="sort-icon">↕</span>
                       </button>
@@ -676,6 +682,7 @@
 
     <!-- Global Systems -->
     <script src="scripts/notification-system.js"></script>
+    <script src="scripts/error-handlers.js"></script>
     <script src="scripts/validation-utils.js"></script>
     <script src="scripts/filter-system.js"></script>
     <script src="scripts/crud-utils.js"></script>

@@ -376,6 +376,7 @@ function updateAccountsTable(accounts) {
         <button class="btn btn-sm btn-secondary" onclick="showEditAccountModalById(${account.id})" title="ערוך חשבון">
           ✏️
         </button>
+        ${account.status !== 'cancelled' ? `<button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name || 'Unknown'}')" title="בטל חשבון">❌</button>` : ''}
         <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name || 'Unknown'}')" title="מחק חשבון">
           🗑️
         </button>

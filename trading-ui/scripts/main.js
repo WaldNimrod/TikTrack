@@ -454,7 +454,8 @@ function restoreAllSectionStates() {
     const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
     const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
 
-    console.log('🔍 Restoring top section state:', {
+    // Restoring top section state
+    console.log('Restoring top section state:', {
       storageKey: topSectionStorageKey,
       savedState: topSectionCollapsed,
       topSectionFound: !!topSection,
@@ -472,7 +473,7 @@ function restoreAllSectionStates() {
         topSection.classList.remove('collapsed');
         topIcon.textContent = '▲';
       }
-      console.log('💾 Restored top section state:', topSectionCollapsed ? 'collapsed' : 'expanded', 'for key:', topSectionStorageKey);
+      // Restored top section state
     } else {
       console.warn('⚠️ Could not restore top section state - elements not found');
     }
@@ -519,7 +520,8 @@ window.toggleTopSectionGlobal = function () {
   const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-  console.log('🔍 toggleTopSectionGlobal called:', {
+  // toggleTopSectionGlobal called
+  console.log('toggleTopSectionGlobal called:', {
     currentPath: currentPath,
     sectionFound: !!section,
     toggleBtnFound: !!toggleBtn,
@@ -567,7 +569,7 @@ window.toggleTopSectionGlobal = function () {
       storageKey = 'testsTopSectionCollapsed';
     } else if (currentPath.includes('/db_display')) {
       storageKey = 'dbDisplayTopSectionCollapsed';
-              // Database display page detected, using storage key
+      console.log('Database display page detected, using storage key:', storageKey);
     } else if (currentPath.includes('/db_extradata')) {
       storageKey = 'dbExtradataTopSectionCollapsed';
     } else if (currentPath.includes('/designs')) {
@@ -576,8 +578,7 @@ window.toggleTopSectionGlobal = function () {
 
     // Save state to localStorage
     localStorage.setItem(storageKey, !isCollapsed);
-    console.log('💾 Saved top section state:', !isCollapsed ? 'collapsed' : 'expanded', 'for key:', storageKey);
-            // Saved top section state
+    console.log('Saved top section state:', { storageKey, isCollapsed: !isCollapsed });
   }
 };
 

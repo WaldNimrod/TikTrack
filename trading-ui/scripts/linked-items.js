@@ -552,6 +552,44 @@ function getRulesExplanation(itemType, data) {
         return null; // אין פריטים מקושרים
     }
     
+    // הצגת כל הפריטים המקושרים בהסבר
+    let explanation = `יש ${allEntities.length} פריט(ים) מקושר(ים):`;
+    
+    // סיווג הפריטים לפי סוג
+    const trades = allEntities.filter(entity => entity.type === 'trade');
+    const plans = allEntities.filter(entity => entity.type === 'trade_plan');
+    const notes = allEntities.filter(entity => entity.type === 'note');
+    const alerts = allEntities.filter(entity => entity.type === 'alert');
+    const executions = allEntities.filter(entity => entity.type === 'execution');
+    const accounts = allEntities.filter(entity => entity.type === 'account');
+    
+    if (trades.length > 0) {
+        const openTrades = trades.filter(t => t.status === 'open');
+        const closedTrades = trades.filter(t => t.status === 'closed');
+        explanation += `<br>• ${trades.length} טרייד(ים) (${openTrades.length} פעיל, ${closedTrades.length} סגור)`;
+    }
+    if (plans.length > 0) {
+        const openPlans = plans.filter(p => p.status === 'open');
+        const closedPlans = plans.filter(p => p.status === 'closed');
+        explanation += `<br>• ${plans.length} תכנון(ים) (${openPlans.length} פעיל, ${closedPlans.length} סגור)`;
+    }
+    if (notes.length > 0) {
+        explanation += `<br>• ${notes.length} הערה(ות)`;
+    }
+    if (alerts.length > 0) {
+        explanation += `<br>• ${alerts.length} התראה(ות)`;
+    }
+    if (executions.length > 0) {
+        explanation += `<br>• ${executions.length} ביצוע(ים)`;
+    }
+    if (accounts.length > 0) {
+        explanation += `<br>• ${accounts.length} חשבון(ות)`;
+    }
+    
+    explanation += '<br><br><strong>כללי ביטול:</strong><br>';
+    
+    // הוספת כללים ספציפיים לפי סוג האלמנט
+    
     switch (itemType) {
         case 'trade_plan':
             const activeTrades = childEntities.filter(entity => entity.type === 'trade' && entity.status === 'open');
@@ -621,17 +659,21 @@ function getRulesExplanation(itemType, data) {
             return explanation;
             
         case 'ticker':
-            const linkedTrades = childEntities.filter(entity => entity.type === 'trade' && entity.status === 'open');
-            const linkedPlans = childEntities.filter(entity => entity.type === 'trade_plan' && entity.status === 'open');
+            const linkedTrades = childEntities.filter(entity => entity.type === 'trade');
+            const linkedPlans = childEntities.filter(entity => entity.type === 'trade_plan');
             const tickerNotes = childEntities.filter(entity => entity.type === 'note');
             const tickerAlerts = childEntities.filter(entity => entity.type === 'alert');
             
-            explanation = 'לא ניתן למחוק טיקר זה כי יש:';
+            explanation = 'לא ניתן לבטל טיקר זה כי יש:';
             if (linkedTrades.length > 0) {
-                explanation += `<br>• ${linkedTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
+                const openTrades = linkedTrades.filter(t => t.status === 'open');
+                const closedTrades = linkedTrades.filter(t => t.status === 'closed');
+                explanation += `<br>• ${linkedTrades.length} טרייד(ים) (${openTrades.length} פעיל, ${closedTrades.length} סגור) - יש לבטל את הפעילים קודם`;
             }
             if (linkedPlans.length > 0) {
-                explanation += `<br>• ${linkedPlans.length} תכנון(ים) פעיל(ים) - יש לבטל אותם קודם`;
+                const openPlans = linkedPlans.filter(p => p.status === 'open');
+                const closedPlans = linkedPlans.filter(p => p.status === 'closed');
+                explanation += `<br>• ${linkedPlans.length} תכנון(ים) (${openPlans.length} פעיל, ${closedPlans.length} סגור) - יש לבטל את הפעילים קודם`;
             }
             if (tickerNotes.length > 0) {
                 explanation += `<br>• ${tickerNotes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
@@ -1424,7 +1466,7 @@ function getTickerSymbol(tickerId) {
             return ticker.symbol;
         }
     }
-    return null;
+    return `טיקר ${tickerId}`;
 }
 
 /**
@@ -1519,7 +1561,7 @@ async function loadLinkedItemsData(itemType, itemId) {
  * @param {Function} onCancel - Callback function to execute on cancellation
  */
 async function showLinkedItemsWarning(itemType, itemId, onConfirm = null, onCancel = null) {
-    console.log('🔧 showLinkedItemsWarning called with:', { itemType, itemId, onConfirm: !!onConfirm, onCancel: !!onCancel });
+    // showLinkedItemsWarning called with
     
     try {
         // Load linked items data
@@ -1535,7 +1577,7 @@ async function showLinkedItemsWarning(itemType, itemId, onConfirm = null, onCanc
                               (linkedItemsData.parent_entities && linkedItemsData.parent_entities.length > 0);
         
         if (!hasLinkedItems) {
-            console.log('✅ No linked items found - proceeding with action');
+            // No linked items found - proceeding with action
             if (onConfirm) {
                 onConfirm();
             }
@@ -1543,7 +1585,7 @@ async function showLinkedItemsWarning(itemType, itemId, onConfirm = null, onCanc
         }
         
         // Show linked items modal
-        console.log('🔧 Showing linked items modal for warning');
+        // Showing linked items modal for warning
         showLinkedItemsModal(itemType, itemId);
         
         // Store callbacks for later use
@@ -1560,11 +1602,14 @@ async function showLinkedItemsWarning(itemType, itemId, onConfirm = null, onCanc
     }
 }
 
+
+
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
 // Generic functions (for backward compatibility)
 window.viewLinkedItems = viewLinkedItems;
 window.showLinkedItemsModal = showLinkedItemsModal;
 window.showLinkedItemsWarning = showLinkedItemsWarning;
+window.loadLinkedItemsData = loadLinkedItemsData;
 window.createLinkedItemsModalContent = createLinkedItemsModalContent;
 window.checkLinkedItems = checkLinkedItems;
 window.exportLinkedItemsData = exportLinkedItemsData;
@@ -1590,11 +1635,13 @@ window.viewLinkedItemsForNote = viewLinkedItemsForNote;
 window.viewLinkedItemsForTradePlan = viewLinkedItemsForTradePlan;
 window.viewLinkedItemsForExecution = viewLinkedItemsForExecution;
 
+
 // ייצוא המודול עצמו
 window.linkedItems = {
     viewLinkedItems,
     showLinkedItemsModal,
     showLinkedItemsWarning,
+    loadLinkedItemsData,
     createLinkedItemsModalContent,
     checkLinkedItems,
     exportLinkedItemsData,
@@ -1616,7 +1663,7 @@ window.linkedItems = {
     viewLinkedItemsForCashFlow,
     viewLinkedItemsForNote,
     viewLinkedItemsForTradePlan,
-    viewLinkedItemsForExecution
+        viewLinkedItemsForExecution
 };
 
 // Linked Items loaded successfully

@@ -36,7 +36,7 @@ const getDefaultRowData = () => [
 // פונקציה לטעינת נתונים מהשרת
 async function loadPlansFromServer() {
   try {
-    console.log('Loading plans from server...');
+    // Loading plans from server
     
     // כאן תהיה קריאה לשרת האמיתי
     // const response = await fetch('/api/plans');
@@ -45,7 +45,7 @@ async function loadPlansFromServer() {
     // כרגע נחזיר נתוני דוגמה
     const data = getDefaultRowData();
     
-    console.log('Plans loaded from server:', data.length, 'items');
+    // Plans loaded from server
     return data;
   } catch (error) {
     handleDataLoadError(error, 'plans');
@@ -76,25 +76,25 @@ function extractAmount(amountString) {
 
 // פונקציה לעדכון סטטיסטיקות
 function updateSummaryStats(data = null) {
-  console.log('=== updateSummaryStats called ===');
-  console.log('Input data:', data);
+  // === updateSummaryStats called ===
+      // Input data
   
   let statsData;
   
   // אם לא הועברו נתונים, השתמש בנתונים הגלובליים
   if (!data) {
     statsData = window.rowData || [];
-    console.log('Using window.rowData:', statsData);
+    // Using window.rowData
   } else {
     statsData = data;
-    console.log('Using provided data:', statsData);
+    // Using provided data
   }
   
-  console.log('Stats data to process:', statsData);
-  console.log('Stats data length:', statsData.length);
+  // Stats data to process
+  // Stats data length
   
   if (statsData.length === 0) {
-    console.log('No data to calculate statistics');
+    // No data to calculate statistics
     // עדכון תצוגה עם אפסים
     updateStatsDisplay({
       totalRecords: 0,
@@ -188,8 +188,8 @@ async function apiCall(endpoint, options = {}) {
     };
 
     try {
-        console.log('📡 שולח בקשה ל:', url);
-        console.log('📋 סוג body:', options.body instanceof FormData ? 'FormData' : 'JSON');
+        // שולח בקשה ל
+        // סוג body
         
         const response = await fetch(url, finalOptions);
         const data = await response.json();
@@ -199,7 +199,7 @@ async function apiCall(endpoint, options = {}) {
             throw new Error(data.error?.message || data.message || `HTTP ${response.status}`);
         }
         
-        console.log('✅ תגובה מוצלחת:', data);
+        // תגובה מוצלחת
         return data;
     } catch (error) {
         handleApiError(error, 'API_CALL', `שגיאה ב-${endpoint}`);
@@ -212,18 +212,18 @@ async function apiCall(endpoint, options = {}) {
 
 // פונקציה ליצירת גריד - לא בשימוש (ag-grid לא נטען)
 function createGrid(containerId, columnDefs = null, rowData = null) {
-  console.log('⚠️ createGrid לא נתמך - ag-grid לא נטען');
+  // createGrid לא נתמך - ag-grid לא נטען
   return null;
 }
 
 // פונקציה לעדכון נתונים בגריד - לא בשימוש (ag-grid לא נטען)
 function updateGridData(newData) {
-  console.log('⚠️ updateGridData לא נתמך - ag-grid לא נטען');
+  // updateGridData לא נתמך - ag-grid לא נטען
 }
 
 // פונקציה לייצוא נתונים - לא בשימוש (ag-grid לא נטען)
 function exportGridData(format = 'csv') {
-  console.log('⚠️ exportGridData לא נתמך - ag-grid לא נטען');
+  // exportGridData לא נתמך - ag-grid לא נטען
 }
 
 // משתנים גלובליים
@@ -273,7 +273,7 @@ function createDeleteButton(onClick) {
 // פונקציה להפעלה מחדש של רשומה מבוטלת
 async function reactivateRecord(tableType, recordId) {
   try {
-    console.log(`🔄 הפעלה מחדש של רשומה: ${tableType} ID: ${recordId}`);
+    // הפעלה מחדש של רשומה
     
     // שימוש בפונקציה הכללית להפעלה מחדש
     if (window.uiUtils && window.uiUtils.performItemReactivation) {
@@ -324,7 +324,7 @@ async function reactivateRecord(tableType, recordId) {
       }
       
       if (response.ok) {
-        console.log(`✅ רשומה הופעלה מחדש בהצלחה: ${tableType} ID: ${recordId}`);
+        // רשומה הופעלה מחדש בהצלחה
         // רענון הנתונים
         loadAllDatabaseData();
         // הצגת הודעת הצלחה
@@ -346,7 +346,7 @@ async function reactivateRecord(tableType, recordId) {
 // פונקציה לביטול רשומה - משתמשת בפונקציות הכלליות
 async function cancelRecord(tableType, recordId) {
   try {
-    console.log(`🔄 ביטול רשומה: ${tableType} ID: ${recordId}`);
+    // ביטול רשומה
     
     // שימוש בפונקציה הכללית לביטול
     if (window.uiUtils && window.uiUtils.performItemCancellation) {
@@ -397,7 +397,7 @@ async function cancelRecord(tableType, recordId) {
       }
       
       if (response.ok) {
-        console.log(`✅ רשומה בוטלה בהצלחה: ${tableType} ID: ${recordId}`);
+        // רשומה בוטלה בהצלחה
         // רענון הנתונים
         loadAllDatabaseData();
         // הצגת הודעת הצלחה
@@ -418,7 +418,7 @@ async function cancelRecord(tableType, recordId) {
 
 // פונקציה לעדכון סטטיסטיקות הטבלאות
 function updateTableStats() {
-  console.log('🔄 updateTableStats נקראה');
+  // updateTableStats נקראה
   
   // עדכון ספירת תוכניות מסחר
   const tradePlansCount = document.getElementById('tradePlansCount');
@@ -462,14 +462,14 @@ function updateTableStats() {
     notesCount.textContent = `${window.notesData.length} הערות`;
   }
   
-  console.log('✅ updateTableStats הושלם');
+  // updateTableStats הושלם
 }
 
 // ===== מנגנון ניהול סקשנים חדש =====
 
 // פונקציה לפתיחה/סגירה של סקשן עליון (פותח/סוגר את כל הסקשנים)
 function toggleTopSection() {
-  console.log('🔧 toggleTopSection - פתיחה/סגירה של כל הסקשנים');
+  // toggleTopSection - פתיחה/סגירה של כל הסקשנים
   
   const topSection = document.querySelector('.top-section .section-body');
   const contentSections = document.querySelectorAll('.content-section .section-body');
@@ -515,12 +515,12 @@ function toggleTopSection() {
     localStorage.setItem(`dbExtradataSectionHidden_${sectionTitle}`, shouldCollapse);
   });
   
-  console.log('✅ toggleTopSection הושלם - כל הסקשנים:', shouldCollapse ? 'סגורים' : 'פתוחים');
+      // toggleTopSection הושלם - כל הסקשנים
 }
 
 // פונקציה לפתיחה/סגירה של סקשן תוכן בודד
 function toggleMainSection() {
-  console.log('🔧 toggleMainSection - פתיחה/סגירה של סקשן בודד');
+  // toggleMainSection - פתיחה/סגירה של סקשן בודד
   
   const clickedButton = window.event ? window.event.target.closest('button') : null;
   const currentSection = clickedButton ? clickedButton.closest('.content-section') : null;
@@ -551,12 +551,12 @@ function toggleMainSection() {
   // שמירת מצב
   localStorage.setItem(`dbExtradataSectionHidden_${sectionTitle}`, !isCollapsed);
   
-  console.log('✅ toggleMainSection הושלם - סקשן:', sectionTitle, isCollapsed ? 'נפתח' : 'נסגר');
+      // toggleMainSection הושלם - סקשן
 }
 
 // פונקציה לשחזור מצב הסקשנים
 function restoreDatabaseSectionState() {
-  console.log('🔧 restoreDatabaseSectionState - שחזור מצב הסקשנים');
+  // restoreDatabaseSectionState - שחזור מצב הסקשנים
   
   // שחזור top section
   const topSectionHidden = localStorage.getItem('dbExtradataTopSectionCollapsed') === 'true';
@@ -586,13 +586,13 @@ function restoreDatabaseSectionState() {
     }
   });
   
-  console.log('✅ restoreDatabaseSectionState הושלם');
+  // restoreDatabaseSectionState הושלם
 }
 
 // פונקציה לטעינת נתונים מכל הטבלאות
 async function loadAllDatabaseData() {
-  console.log('🔄 loadAllDatabaseData נקראה');
-  console.log('🔄 טוען נתונים מכל הטבלאות...');
+  // loadAllDatabaseData נקראה
+      // טוען נתונים מכל הטבלאות
   
   try {
     // טעינת נתונים מכל הטבלאות במקביל עם טיפול בשגיאות
@@ -697,7 +697,7 @@ function updateAllTables() {
 
 // פונקציה לעדכון טבלה ספציפית
 function updateTable(tableType, data) {
-  console.log(`🔄 updateTable נקראה עבור ${tableType} עם ${data?.length || 0} רשומות`);
+  // updateTable נקראה עבור tableType
   const table = document.querySelector(`[data-table-type="${tableType}"]`);
   if (!table) {
     console.warn(`⚠️ לא נמצאה טבלה מסוג: ${tableType}`);
@@ -819,21 +819,21 @@ function updateTable(tableType, data) {
 
 // פונקציות עריכה ומחיקה
 function editRecord(tableType, id) {
-  console.log(`✏️ עריכת רשומה: ${tableType} - ${id}`);
+  // עריכת רשומה
   if (window.showSuccessNotification) {
     window.showSuccessNotification('עריכה', `עריכת רשומה ${tableType} מספר ${id}`);
   }
 }
 
 function deleteRecord(tableType, id) {
-  console.log(`🗑️ מחיקת רשומה: ${tableType} - ${id}`);
+  // מחיקת רשומה
   if (window.showDeleteWarning) {
     window.showDeleteWarning(
       'רשומה',
       `האם אתה בטוח שברצונך למחוק רשומה זו?`,
       'מחיקה',
       () => {
-        console.log(`✅ מחיקה אושרה: ${tableType} - ${id}`);
+        // מחיקה אושרה
         if (window.showSuccessNotification) {
           window.showSuccessNotification('מחיקה', 'הרשומה נמחקה בהצלחה');
         }
@@ -844,7 +844,7 @@ function deleteRecord(tableType, id) {
 
 // פונקציה לביטול רשומה
 function cancelRecord(tableType, id) {
-  console.log(`❌ ביטול רשומה: ${tableType} - ${id}`);
+  // ביטול רשומה
   if (window.showConfirmationDialog) {
     window.showConfirmationDialog(
       'ביטול רשומה',
@@ -852,7 +852,7 @@ function cancelRecord(tableType, id) {
       'ביטול',
       'חזור',
       () => {
-        console.log(`✅ ביטול אושר: ${tableType} - ${id}`);
+        // ביטול אושר
         if (window.showSuccessNotification) {
           window.showSuccessNotification('ביטול', 'הרשומה בוטלה בהצלחה');
         }
@@ -864,7 +864,7 @@ function cancelRecord(tableType, id) {
 
 // פונקציה להוספת רשומה
 function addRecord() {
-  console.log('➕ הוספת רשומה חדשה');
+  // הוספת רשומה חדשה
   if (window.showSuccessNotification) {
     window.showSuccessNotification('הוספה', 'פתיחת טופס הוספת רשומה חדשה');
   }
@@ -872,16 +872,16 @@ function addRecord() {
 
 // אתחול העמוד
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🔄 אתחול עמוד נתונים נוספים...');
+  // אתחול עמוד נתונים נוספים
   
   // בדיקת זמינות פונקציות גלובליות
-  console.log('🔍 בדיקת זמינות פונקציות:');
-  console.log('- toggleTopSectionGlobal:', typeof window.toggleTopSectionGlobal);
-  console.log('- toggleMainSection:', typeof window.toggleMainSection);
-  console.log('- restoreAllSectionStates:', typeof window.restoreAllSectionStates);
-  console.log('- showSuccessNotification:', typeof window.showSuccessNotification);
-  console.log('- showErrorNotification:', typeof window.showErrorNotification);
-  console.log('- showDeleteWarning:', typeof window.showDeleteWarning);
+      // בדיקת זמינות פונקציות
+    // toggleTopSectionGlobal
+    // toggleMainSection
+    // restoreAllSectionStates
+      // showSuccessNotification
+    // showErrorNotification
+    // showDeleteWarning
   
   // שחזור מצב הסקשנים
   restoreDatabaseSectionState();

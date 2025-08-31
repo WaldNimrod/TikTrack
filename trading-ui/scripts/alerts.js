@@ -83,6 +83,12 @@ const demoAlerts = [
  * 
  * @returns {Array} מערך של התראות
  */
+/**
+ * טעינת נתוני התראות מהשרת
+ * 
+ * פונקציה זו טוענת את כל ההתראות מהשרת ומעדכנת את הנתונים הגלובליים
+ * כולל טיפול בשגיאות ושימוש בנתוני דמו במקרה הצורך
+ */
 async function loadAlertsData() {
   try {
     const response = await fetch('/api/v1/alerts/');
@@ -94,8 +100,8 @@ async function loadAlertsData() {
     const data = await response.json();
     const alerts = data.data || data;
 
-    // עדכון המשתנה הגלובלי
-    alertsData = alerts.map(alert => ({
+    // עיבוד הנתונים
+    const processedAlerts = alerts.map(alert => ({
       id: alert.id,
       title: alert.title,
       status: alert.status,
@@ -111,25 +117,20 @@ async function loadAlertsData() {
     }));
     
     // הגדרת המשתנה הגלובלי
-    window.alertsData = alertsData;
+    window.alertsData = processedAlerts;
 
-    // עדכון הטבלה
+    // עדכון הטבלה והסטטיסטיקות
+    updateAlertsTable(processedAlerts);
+    updatePageSummaryStats();
 
-    // בדיקה אם יש פילטרים פעילים
-
-
-    updateAlertsTable(alertsData);
-
-    return alertsData;
+    return processedAlerts;
 
   } catch (error) {
-    // משתמש בנתוני דמו
-
-    // שימוש בנתוני דמו
-    alertsData = demoAlerts;
-    updateAlertsTable(alertsData);
-
-    return alertsData;
+    // שימוש בנתוני דמו במקרה של שגיאה
+    window.alertsData = demoAlerts;
+    updateAlertsTable(demoAlerts);
+    updatePageSummaryStats();
+    return demoAlerts;
   }
 }
 
@@ -285,45 +286,37 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
  * 
  * @param {Array} alerts - מערך של התראות לעדכון
  */
+/**
+ * עדכון טבלת התראות
+ * 
+ * פונקציה זו מעדכנת את טבלת ההתראות עם הנתונים החדשים
+ * כולל הגנה מלולאה אינסופית ושימוש בנתונים גלובליים
+ */
 function updateAlertsTable(alerts) {
-  const tbody = document.querySelector('#alertsTable tbody');
-  if (!tbody) {
-    // No alerts table found on this page - skipping table update
+  // הגנה מלולאה אינסופית
+  if (updateAlertsTable.callCount === undefined) {
+    updateAlertsTable.callCount = 0;
+  }
+  updateAlertsTable.callCount++;
+  
+  if (updateAlertsTable.callCount > 10) {
+    console.warn('⚠️ Too many calls to updateAlertsTable - preventing infinite loop');
+    updateAlertsTable.callCount = 0;
     return;
   }
 
-  // טעינת נתונים נוספים לצורך הצגת סימבולים
-  let accounts = [];
-  let trades = [];
-  let tradePlans = [];
-  let tickers = [];
+  // בדיקת קיום הטבלה
+  const tbody = document.querySelector('#alertsTable tbody');
+  if (!tbody) {
+    updateAlertsTable.callCount = 0;
+    return;
+  }
 
-  // פונקציה לטעינת נתונים נוספים
-  const loadAdditionalData = async () => {
-    try {
-      const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-        fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
-      ]);
-
-      accounts = (accountsResponse.data || accountsResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-      trades = (tradesResponse.data || tradesResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-      tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-      tickers = (tickersResponse.data || tickersResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-    } catch (error) {
-      console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
-      // המשך עם מערכים ריקים
-      accounts = [];
-      trades = [];
-      tradePlans = [];
-      tickers = [];
-    }
-  };
-
-  // טעינת נתונים ועדכון הטבלה
-  loadAdditionalData().then(() => {
+  // שימוש בנתונים הגלובליים
+  const accounts = window.accountsData || [];
+  const trades = window.tradesData || [];
+  const tradePlans = window.tradePlansData || [];
+  const tickers = window.tickersData || [];
 
     const tableHTML = alerts.map(alert => {
       const statusClass = getStatusClass(alert.status);
@@ -524,35 +517,54 @@ function updateAlertsTable(alerts) {
 
     // עדכון סטטיסטיקות
     updatePageSummaryStats();
-
-
-  });
+    
+    // איפוס מונה הקריאות
+    updateAlertsTable.callCount = 0;
 }
 
 /**
  * עדכון סטטיסטיקות סיכום
  */
+/**
+ * עדכון סטטיסטיקות עמוד התראות
+ * 
+ * פונקציה זו מעדכנת את הסטטיסטיקות המוצגות בעמוד ההתראות
+ * כולל ספירת התראות כוללת, פעילות, חדשות, היום והשבוע
+ */
 function updatePageSummaryStats() {
-  // סטטיסטיקות לפי הדוקומנטציה של מערכת ההתראות
-  const totalAlerts = alertsData.length;
-  const openAlerts = alertsData.filter(alert => alert.status === 'open').length; // התראות פעילות
-  const newAlerts = alertsData.filter(alert => alert.is_triggered === 'new').length; // התראות חדשות (הופעלו ולא נקראו)
-  const todayAlerts = alertsData.filter(alert => {
+  const alerts = window.alertsData || [];
+  
+  // חישוב סטטיסטיקות
+  const totalAlerts = alerts.length;
+  const openAlerts = alerts.filter(alert => alert.status === 'open').length;
+  const newAlerts = alerts.filter(alert => alert.is_triggered === 'new').length;
+  
+  const todayAlerts = alerts.filter(alert => {
     const today = new Date().toDateString();
     const alertDate = new Date(alert.created_at).toDateString();
     return alertDate === today;
   }).length;
-  const weekAlerts = alertsData.filter(alert => {
+  
+  const weekAlerts = alerts.filter(alert => {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     return new Date(alert.created_at) >= weekAgo;
   }).length;
 
-  document.getElementById('totalAlerts').textContent = totalAlerts;
-  document.getElementById('activeAlerts').textContent = openAlerts;
-  document.getElementById('newAlerts').textContent = newAlerts;
-  document.getElementById('todayAlerts').textContent = todayAlerts;
-  document.getElementById('weekAlerts').textContent = weekAlerts;
+  // עדכון אלמנטים בדף
+  const elements = {
+    total: document.getElementById('totalAlerts'),
+    active: document.getElementById('activeAlerts'),
+    new: document.getElementById('newAlerts'),
+    today: document.getElementById('todayAlerts'),
+    week: document.getElementById('weekAlerts')
+  };
+
+  if (elements.total) elements.total.textContent = totalAlerts;
+  if (elements.active) elements.active.textContent = openAlerts;
+  if (elements.new) elements.new.textContent = newAlerts;
+  if (elements.today) elements.today.textContent = todayAlerts;
+  if (elements.week) elements.week.textContent = weekAlerts;
 }
 
 
@@ -638,19 +650,64 @@ function showAddAlertModal() {
 async function loadModalData() {
   try {
 
-    // טעינת נתונים במקביל
-    // Loading modal data
-    const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
-    ]);
+    // טעינת נתונים אם הם לא קיימים
+    let accounts = window.accountsData || [];
+    let trades = window.tradesData || [];
+    let tradePlans = window.tradePlansData || [];
+    let tickers = window.tickersData || [];
 
-    const accounts = accountsResponse.data || accountsResponse || [];
-    const trades = tradesResponse.data || tradesResponse || [];
-    const tradePlans = tradePlansResponse.data || tradePlansResponse || [];
-    const tickers = tickersResponse.data || tickersResponse || [];
+    // אם הנתונים לא קיימים, נטען אותם
+    if (accounts.length === 0) {
+      try {
+        const response = await fetch('/api/v1/accounts/');
+        if (response.ok) {
+          const data = await response.json();
+          accounts = data.data || data || [];
+          window.accountsData = accounts;
+        }
+      } catch (error) {
+        console.warn('שגיאה בטעינת חשבונות:', error);
+      }
+    }
+
+    if (trades.length === 0) {
+      try {
+        const response = await fetch('/api/v1/trades/');
+        if (response.ok) {
+          const data = await response.json();
+          trades = data.data || data || [];
+          window.tradesData = trades;
+        }
+      } catch (error) {
+        console.warn('שגיאה בטעינת טריידים:', error);
+      }
+    }
+
+    if (tradePlans.length === 0) {
+      try {
+        const response = await fetch('/api/v1/trade_plans/');
+        if (response.ok) {
+          const data = await response.json();
+          tradePlans = data.data || data || [];
+          window.tradePlansData = tradePlans;
+        }
+      } catch (error) {
+        console.warn('שגיאה בטעינת תכנונים:', error);
+      }
+    }
+
+    if (tickers.length === 0) {
+      try {
+        const response = await fetch('/api/v1/tickers/');
+        if (response.ok) {
+          const data = await response.json();
+          tickers = data.data || data || [];
+          window.tickersData = tickers;
+        }
+      } catch (error) {
+        console.warn('שגיאה בטעינת טיקרים:', error);
+      }
+    }
 
     // Modal data loaded
     // Accounts count
@@ -957,6 +1014,11 @@ function populateRelatedObjects(relationTypeId) {
           option.textContent = `${account.name} (${account.currency_name || 'N/A'})`;
           selectElement.appendChild(option);
         });
+      } else {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'אין חשבונות זמינים';
+        selectElement.appendChild(option);
       }
       break;
 
@@ -968,6 +1030,11 @@ function populateRelatedObjects(relationTypeId) {
           option.textContent = `${trade.symbol} - ${trade.type} (${trade.status})`;
           selectElement.appendChild(option);
         });
+      } else {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'אין טריידים זמינים';
+        selectElement.appendChild(option);
       }
       break;
 
@@ -979,6 +1046,11 @@ function populateRelatedObjects(relationTypeId) {
           option.textContent = `${plan.symbol} - ${plan.type} (${plan.status})`;
           selectElement.appendChild(option);
         });
+      } else {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'אין תכנונים זמינים';
+        selectElement.appendChild(option);
       }
       break;
 
@@ -991,19 +1063,10 @@ function populateRelatedObjects(relationTypeId) {
           selectElement.appendChild(option);
         });
       } else {
-        // נסה לטעון נתוני טיקרים אם הם לא קיימים
-        loadTickersDataIfNeeded().then(() => {
-          if (window.tickersData && window.tickersData.length > 0) {
-            window.tickersData.forEach(ticker => {
-              const option = document.createElement('option');
-              option.value = ticker.id;
-              option.textContent = `${ticker.symbol} - ${ticker.name}`;
-              selectElement.appendChild(option);
-            });
-          }
-        }).catch(error => {
-          // שגיאה בטעינת נתוני טיקרים
-        });
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'אין טיקרים זמינים';
+        selectElement.appendChild(option);
       }
       break;
   }
@@ -1030,6 +1093,11 @@ function populateEditRelatedObjects(relationTypeId) {
           option.textContent = `${account.name} (${account.currency_name || 'N/A'})`;
           selectElement.appendChild(option);
         });
+      } else {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'אין חשבונות זמינים';
+        selectElement.appendChild(option);
       }
       break;
 
@@ -1041,6 +1109,11 @@ function populateEditRelatedObjects(relationTypeId) {
           option.textContent = `${trade.symbol} - ${trade.type} (${trade.status})`;
           selectElement.appendChild(option);
         });
+      } else {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'אין טריידים זמינים';
+        selectElement.appendChild(option);
       }
       break;
 
@@ -1052,6 +1125,11 @@ function populateEditRelatedObjects(relationTypeId) {
           option.textContent = `${plan.symbol} - ${plan.type} (${plan.status})`;
           selectElement.appendChild(option);
         });
+      } else {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'אין תכנונים זמינים';
+        selectElement.appendChild(option);
       }
       break;
 
@@ -1064,19 +1142,10 @@ function populateEditRelatedObjects(relationTypeId) {
           selectElement.appendChild(option);
         });
       } else {
-        // נסה לטעון נתוני טיקרים אם הם לא קיימים
-        loadTickersDataIfNeeded().then(() => {
-          if (window.tickersData && window.tickersData.length > 0) {
-            window.tickersData.forEach(ticker => {
-              const option = document.createElement('option');
-              option.value = ticker.id;
-              option.textContent = `${ticker.symbol} - ${ticker.name}`;
-              selectElement.appendChild(option);
-            });
-          }
-        }).catch(error => {
-          // שגיאה בטעינת נתוני טיקרים
-        });
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'אין טיקרים זמינים';
+        selectElement.appendChild(option);
       }
       break;
   }
@@ -1262,104 +1331,55 @@ function parseAlertCondition(condition) {
  * כולל בדיקת תקינות וטיפול בשגיאות
  * משתמשת במערכת ההתראות הגלובלית להודעות
  */
+/**
+ * שמירת התראה חדשה
+ * 
+ * פונקציה זו שומרת התראה חדשה עם הנתונים מהטופס
+ * כולל בדיקת תקינות, אימות שילוב סטטוס/הפעלה, ושליחה לשרת
+ * משתמשת במערכת ההתראות הגלובלית להודעות
+ */
 async function saveAlert() {
-  const form = document.getElementById('addAlertForm');
-  if (!form) {
-    console.warn('⚠️ Form element not found - skipping save operation');
-    return;
-  }
-
-
-
-  // בדיקת תקינות הטופס
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    return;
-  }
-
-  // בדיקת שדות חובה
-  const formData = new FormData(form);
-  const relatedType = formData.get('alertRelationType');
-  const relatedId = document.getElementById('alertRelatedObjectSelect').value;
-
-      // Form validation
-    // Related type
-    // Related ID
-
-  // בדיקת תנאי התראה
-  const conditionAttributeElement = document.getElementById('conditionAttribute');
-  const conditionOperatorElement = document.getElementById('conditionOperator');
-  const conditionNumberElement = document.getElementById('conditionNumber');
-
-  const conditionAttribute = conditionAttributeElement.value;
-  const conditionOperator = conditionOperatorElement.value;
-  const conditionNumber = conditionNumberElement.value;
-
-      // Condition validation
-    // Condition attribute
-    // Condition operator
-    // Condition number
-
-  if (!relatedType || !relatedId) {
-    // Validation failed: missing required fields
-    window.showErrorNotification('שדות חובה חסרים', 'יש למלא את כל השדות החובה');
-    return;
-  }
-
-  if (!conditionAttribute || !conditionOperator || !conditionNumber) {
-    // Validation failed: missing condition fields
-    window.showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
-    return;
-  }
-
-  // וולידציה של ערך מספרי
-  const numericValue = parseFloat(conditionNumber);
-  if (isNaN(numericValue)) {
-    window.showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
-    conditionNumberElement.focus();
-    return;
-  }
-
-  // וולידציה של ערך חיובי למחיר
-  if (conditionAttribute === 'price' && numericValue <= 0) {
-    window.showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
-    conditionNumberElement.focus();
-    return;
-  }
-
-  // וולידציה של ערך מקסימלי למחיר
-  if (conditionAttribute === 'price' && numericValue > 1000000) {
-    window.showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
-    conditionNumberElement.focus();
-    return;
-  }
-
-  // וולידציה של אחוזים (לשינוי)
-  if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
-    window.showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
-    conditionNumberElement.focus();
-    return;
-  }
-
-  const alertData = {
-    related_type_id: parseInt(formData.get('alertRelationType')),
-    related_id: parseInt(document.getElementById('alertRelatedObjectSelect').value),
-    condition_attribute: conditionAttribute,
-    condition_operator: conditionOperator,
-    condition_number: conditionNumber,
-    message: document.getElementById('alertMessage').value || null,
-    status: 'open',
-    is_triggered: 'false'
-  };
-
-  // שולח התראה חדשה
-      // === SAVING ALERT ===
-    // Alert data
-    // Request URL
-    // Request method
-    // Request body
-
   try {
+    // 1. בדיקת קיום הטופס
+    const form = document.getElementById('addAlertForm');
+    if (!form) {
+      window.showErrorNotification('שגיאה', 'טופס הוספת התראה לא נמצא');
+      return;
+    }
+
+    // 2. בדיקת תקינות הטופס
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    // 3. איסוף נתונים מהטופס
+    const formData = new FormData(form);
+    const relatedTypeId = parseInt(formData.get('alertRelationType'));
+    const relatedId = parseInt(document.getElementById('alertRelatedObjectSelect').value);
+    const conditionAttribute = document.getElementById('conditionAttribute').value;
+    const conditionOperator = document.getElementById('conditionOperator').value;
+    const conditionNumber = document.getElementById('conditionNumber').value;
+    const message = document.getElementById('alertMessage').value || null;
+
+    // 4. בדיקות תקינות
+    if (!validateNewAlertData(relatedTypeId, relatedId, conditionAttribute, conditionOperator, conditionNumber)) {
+      return;
+    }
+
+    // 5. הכנת נתונים לשליחה
+    const alertData = {
+      related_type_id: relatedTypeId,
+      related_id: relatedId,
+      condition_attribute: conditionAttribute,
+      condition_operator: conditionOperator,
+      condition_number: parseFloat(conditionNumber),
+      message: message,
+      status: 'open',
+      is_triggered: 'false'
+    };
+
+    // 6. שליחה לשרת
     const response = await fetch('/api/v1/alerts/', {
       method: 'POST',
       headers: {
@@ -1377,24 +1397,83 @@ async function saveAlert() {
 
       // התראה נשמרה בהצלחה
 
-      // הוספת ההתראה החדשה לנתונים במקום בלי טעינה מחדש
-      if (window.alertsData) {
-        window.alertsData.push(newAlert);
-        updateAlertsTable(window.alertsData);
-      }
+      // 7. הוספת ההתראה החדשה לנתונים המקומיים
+      addLocalAlertData(newAlert);
 
-      // סגירת המודל
+      // 8. סגירת המודל והצגת הודעה
       closeModal('addAlertModal');
-
-      // הצגת הודעה
       window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה!');
     } else {
       const errorText = await response.text();
       throw new Error(`שגיאה בשמירת התראה: ${response.status} - ${errorText}`);
     }
   } catch (error) {
-    window.showErrorNotification('שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message);
+    window.showErrorNotification('שגיאה בשמירת התראה', error.message);
   }
+}
+
+/**
+ * בדיקת תקינות נתוני התראה חדשה
+ */
+function validateNewAlertData(relatedTypeId, relatedId, conditionAttribute, conditionOperator, conditionNumber) {
+  // בדיקת בחירת אובייקט
+  if (!relatedTypeId || isNaN(relatedTypeId)) {
+    window.showErrorNotification('סוג אובייקט חסר', 'נא לבחור סוג אובייקט לשיוך (חשבון, טרייד, תכנון או טיקר)');
+    return false;
+  }
+
+  if (!relatedId || isNaN(relatedId)) {
+    window.showErrorNotification('אובייקט חסר', 'נא לבחור אובייקט ספציפי לשיוך מהרשימה');
+    return false;
+  }
+
+  // בדיקת תנאי התראה
+  if (!conditionAttribute || !conditionOperator || !conditionNumber) {
+    window.showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
+    return false;
+  }
+
+  // וולידציה של ערך מספרי
+  const numericValue = parseFloat(conditionNumber);
+  if (isNaN(numericValue)) {
+    window.showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
+    document.getElementById('conditionNumber').focus();
+    return false;
+  }
+
+  // וולידציה של ערך חיובי למחיר
+  if (conditionAttribute === 'price' && numericValue <= 0) {
+    window.showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
+    document.getElementById('conditionNumber').focus();
+    return false;
+  }
+
+  // וולידציה של ערך מקסימלי למחיר
+  if (conditionAttribute === 'price' && numericValue > 1000000) {
+    window.showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
+    document.getElementById('conditionNumber').focus();
+    return false;
+  }
+
+  // וולידציה של אחוזים (לשינוי)
+  if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
+    window.showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
+    document.getElementById('conditionNumber').focus();
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * הוספת התראה חדשה לנתונים המקומיים
+ */
+function addLocalAlertData(newAlert) {
+  if (!window.alertsData) {
+    window.alertsData = [];
+  }
+  window.alertsData.push(newAlert);
+  updateAlertsTable(window.alertsData);
 }
 
 /**
@@ -1406,7 +1485,7 @@ async function saveAlert() {
  * @param {number} alertId - מזהה ההתראה לעריכה
  */
 function editAlert(alertId) {
-  const alert = alertsData.find(a => a.id === alertId);
+  const alert = window.alertsData?.find(a => a.id === alertId);
   if (!alert) {
     window.showErrorNotification('התראה לא נמצאה', 'התראה לא נמצאה');
     return;
@@ -1657,103 +1736,46 @@ function updateStatusAndTriggered() {
  * משתמשת במערכת ההתראות הגלובלית להודעות
  */
 async function updateAlert() {
-  const form = document.getElementById('editAlertForm');
-  if (!form) {
-    console.warn('⚠️ Form element not found - skipping update operation');
-    return;
-  }
-
-
-
-  // עדכון status ו-is_triggered לפי המצב הנבחר
-  updateStatusAndTriggered();
-
-  // בדיקת תקינות הקשר בין status ו-is_triggered
-  const status = document.getElementById('editAlertStatus').value;
-  const isTriggered = document.getElementById('editAlertIsTriggered').value;
-
-  if (!validateAlertStatusCombination(status, isTriggered)) {
-    window.showErrorNotification('שילוב לא תקין', 'שילוב לא תקין בין סטטוס ומצב הפעלה. ראה את הכללים במערכת ההתראות.');
-    return;
-  }
-
-  // בדיקת בחירת אובייקט
-  const relatedTypeId = parseInt(document.querySelector('input[name="editAlertRelationType"]:checked')?.value);
-  const relatedId = parseInt(document.getElementById('editAlertRelatedObjectSelect').value);
-
-  if (!relatedTypeId || isNaN(relatedTypeId)) {
-    window.showErrorNotification('סוג אובייקט חסר', 'נא לבחור סוג אובייקט לשיוך (חשבון, טרייד, תכנון או טיקר)');
-    return;
-  }
-
-  if (!relatedId || isNaN(relatedId)) {
-    window.showErrorNotification('אובייקט חסר', 'נא לבחור אובייקט ספציפי לשיוך מהרשימה');
-    return;
-  }
-
-  // בדיקת תנאי התראה
-  const conditionAttributeElement = document.getElementById('editConditionAttribute');
-  const conditionOperatorElement = document.getElementById('editConditionOperator');
-  const conditionNumberElement = document.getElementById('editConditionNumber');
-
-  const conditionAttribute = conditionAttributeElement.value;
-  const conditionOperator = conditionOperatorElement.value;
-  const conditionNumber = conditionNumberElement.value;
-
-  if (!conditionAttribute || !conditionOperator || !conditionNumber) {
-    window.showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
-    return;
-  }
-
-  // וולידציה של ערך מספרי
-  const numericValue = parseFloat(conditionNumber);
-  if (isNaN(numericValue)) {
-    window.showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
-    conditionNumberElement.focus();
-    return;
-  }
-
-  // וולידציה של ערך חיובי למחיר
-  if (conditionAttribute === 'price' && numericValue <= 0) {
-    window.showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
-    conditionNumberElement.focus();
-    return;
-  }
-
-  // וולידציה של ערך מקסימלי למחיר
-  if (conditionAttribute === 'price' && numericValue > 1000000) {
-    window.showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
-    conditionNumberElement.focus();
-    return;
-  }
-
-  // וולידציה של אחוזים (לשינוי)
-  if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
-    window.showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
-    conditionNumberElement.focus();
-    return;
-  }
-
-  const alertId = document.getElementById('editAlertId').value;
-  const alertData = {
-    related_type_id: relatedTypeId,
-    related_id: relatedId,
-    condition_attribute: conditionAttribute,
-    condition_operator: conditionOperator,
-    condition_number: conditionNumber,
-    message: document.getElementById('editAlertMessage').value || null,
-    status: document.getElementById('editAlertStatus').value,
-    is_triggered: document.getElementById('editAlertIsTriggered').value
-  };
-
-  // מעדכן התראה
-      // בדיקת נתונים לפני שליחה
-    // related_type_id check
-    // related_id check
-    // status check
-    // is_triggered check
-
   try {
+    // 1. בדיקת קיום הטופס
+    const form = document.getElementById('editAlertForm');
+    if (!form) {
+      window.showErrorNotification('שגיאה', 'טופס העדכון לא נמצא');
+      return;
+    }
+
+    // 2. עדכון status ו-is_triggered לפי המצב הנבחר
+    updateStatusAndTriggered();
+
+    // 3. איסוף נתונים מהטופס
+    const alertId = document.getElementById('editAlertId').value;
+    const status = document.getElementById('editAlertStatus').value;
+    const isTriggered = document.getElementById('editAlertIsTriggered').value;
+    const relatedTypeId = parseInt(document.querySelector('input[name="editAlertRelationType"]:checked')?.value);
+    const relatedId = parseInt(document.getElementById('editAlertRelatedObjectSelect').value);
+    const conditionAttribute = document.getElementById('editConditionAttribute').value;
+    const conditionOperator = document.getElementById('editConditionOperator').value;
+    const conditionNumber = document.getElementById('editConditionNumber').value;
+    const message = document.getElementById('editAlertMessage').value || null;
+
+    // 4. בדיקות תקינות
+    if (!validateAlertData(relatedTypeId, relatedId, conditionAttribute, conditionOperator, conditionNumber, status, isTriggered)) {
+      return;
+    }
+
+    // 5. הכנת נתונים לשליחה
+    const alertData = {
+      related_type_id: relatedTypeId,
+      related_id: relatedId,
+      condition_attribute: conditionAttribute,
+      condition_operator: conditionOperator,
+      condition_number: parseFloat(conditionNumber),
+      message: message,
+      status: status,
+      is_triggered: isTriggered
+    };
+
+    // 6. שליחה לשרת
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
       method: 'PUT',
       headers: {
@@ -1762,29 +1784,93 @@ async function updateAlert() {
       body: JSON.stringify(alertData)
     });
 
-    if (response.ok) {
-      const updatedAlert = await response.json();
-      // התראה עודכנה בהצלחה
-
-      // עדכון הנתונים במקום בלי טעינה מחדש
-      if (window.alertsData) {
-        const alertIndex = window.alertsData.findIndex(alert => alert.id == alertId);
-        if (alertIndex !== -1) {
-          window.alertsData[alertIndex] = updatedAlert;
-          updateAlertsTable(window.alertsData);
-        }
-      }
-
-      // סגירת המודל
-      closeModal('editAlertModal');
-
-      // הצגת הודעה
-      window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!');
-    } else {
+    if (!response.ok) {
       throw new Error(`שגיאה בעדכון התראה: ${response.status}`);
     }
+
+    const updatedAlert = await response.json();
+
+    // 7. עדכון הנתונים המקומיים
+    updateLocalAlertData(alertId, updatedAlert);
+
+    // 8. סגירת המודל והצגת הודעה
+    closeModal('editAlertModal');
+    window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!');
+
   } catch (error) {
-    window.showErrorNotification('שגיאה בעדכון התראה', 'שגיאה בעדכון התראה: ' + error.message);
+    window.showErrorNotification('שגיאה בעדכון התראה', error.message);
+  }
+}
+
+/**
+ * בדיקת תקינות נתוני התראה
+ */
+function validateAlertData(relatedTypeId, relatedId, conditionAttribute, conditionOperator, conditionNumber, status, isTriggered) {
+  // בדיקת שילוב סטטוס/הפעלה
+  if (!validateAlertStatusCombination(status, isTriggered)) {
+    window.showErrorNotification('שילוב לא תקין', 'שילוב לא תקין בין סטטוס ומצב הפעלה. ראה את הכללים במערכת ההתראות.');
+    return false;
+  }
+
+  // בדיקת בחירת אובייקט
+  if (!relatedTypeId || isNaN(relatedTypeId)) {
+    window.showErrorNotification('סוג אובייקט חסר', 'נא לבחור סוג אובייקט לשיוך (חשבון, טרייד, תכנון או טיקר)');
+    return false;
+  }
+
+  if (!relatedId || isNaN(relatedId)) {
+    window.showErrorNotification('אובייקט חסר', 'נא לבחור אובייקט ספציפי לשיוך מהרשימה');
+    return false;
+  }
+
+  // בדיקת תנאי התראה
+  if (!conditionAttribute || !conditionOperator || !conditionNumber) {
+    window.showErrorNotification('תנאי התראה חסר', 'יש למלא את כל שדות התנאי');
+    return false;
+  }
+
+  // וולידציה של ערך מספרי
+  const numericValue = parseFloat(conditionNumber);
+  if (isNaN(numericValue)) {
+    window.showErrorNotification('ערך לא תקין', 'הערך חייב להיות מספר');
+    document.getElementById('editConditionNumber').focus();
+    return false;
+  }
+
+  // וולידציה של ערך חיובי למחיר
+  if (conditionAttribute === 'price' && numericValue <= 0) {
+    window.showErrorNotification('ערך מחיר לא תקין', 'מחיר חייב להיות גדול מ-0');
+    document.getElementById('editConditionNumber').focus();
+    return false;
+  }
+
+  // וולידציה של ערך מקסימלי למחיר
+  if (conditionAttribute === 'price' && numericValue > 1000000) {
+    window.showErrorNotification('ערך מחיר גבוה מדי', 'מחיר לא יכול להיות גדול מ-1,000,000');
+    document.getElementById('editConditionNumber').focus();
+    return false;
+  }
+
+  // וולידציה של אחוזים (לשינוי)
+  if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
+    window.showErrorNotification('ערך אחוז לא תקין', 'אחוז שינוי חייב להיות בין -100% ל-100%');
+    document.getElementById('editConditionNumber').focus();
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * עדכון נתוני התראה מקומיים
+ */
+function updateLocalAlertData(alertId, updatedAlert) {
+  if (!window.alertsData) return;
+
+  const alertIndex = window.alertsData.findIndex(alert => alert.id == alertId);
+  if (alertIndex !== -1) {
+    window.alertsData[alertIndex] = updatedAlert;
+    updateAlertsTable(window.alertsData);
   }
 }
 
@@ -1792,52 +1878,15 @@ async function updateAlert() {
  * מחיקת התראה
  */
 async function deleteAlert(alertId) {
-  // שימוש במערכת הגלובלית למחיקה
   if (typeof window.showDeleteWarning === 'function') {
     window.showDeleteWarning('alerts', alertId, 'התראה', async () => {
       await confirmDeleteAlert(alertId);
     }, null);
   } else {
-    // גיבוי למקרה שהמערכת הגלובלית לא זמינה
-    if (typeof window.showConfirmationDialog === 'function') {
-      window.showConfirmationDialog(
-        'מחיקת התראה',
-        'האם אתה בטוח שברצונך למחוק התראה זו?\n\nפעולה זו אינה ניתנת לביטול.',
-        async () => {
-          await confirmDeleteAlert(alertId);
-        },
-        () => {
-          // מחיקה בוטלה
-        }
-      );
-    } else {
-      // fallback אחרון - confirm רגיל
-              if (typeof window.showConfirmationDialog === 'function') {
-            window.showConfirmationDialog(
-                'מחיקת התראה',
-                'האם אתה בטוח שברצונך למחוק התראה זו?',
-                async () => {
-                    await confirmDeleteAlert(alertId);
-                }
-            );
-        } else {
-                    if (typeof window.showConfirmationDialog === 'function') {
-            window.showConfirmationDialog(
-                'מחיקת התראה',
-                'האם אתה בטוח שברצונך למחוק התראה זו?',
-                async () => {
-                    await confirmDeleteAlert(alertId);
-                }
-            );
-        } else {
-            const confirmed = confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
-            if (confirmed) {
-                await confirmDeleteAlert(alertId);
-            }
-        }
-        }
+    const confirmed = confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
+    if (confirmed) {
+      await confirmDeleteAlert(alertId);
     }
-    return;
   }
 }
 
@@ -1845,8 +1894,6 @@ async function deleteAlert(alertId) {
  * אישור מחיקת התראה
  */
 async function confirmDeleteAlert(alertId) {
-      // confirmDeleteAlert נקראה עבור ID
-
   try {
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
       method: 'DELETE'
@@ -1855,31 +1902,18 @@ async function confirmDeleteAlert(alertId) {
     const result = await response.json();
     
     if (response.ok && result.status === 'success') {
-      // התראה נמחקה בהצלחה
-      
-      // הסרת ההתראה מהנתונים במקום בלי טעינה מחדש
+      // הסרת ההתראה מהנתונים המקומיים
       if (window.alertsData) {
         window.alertsData = window.alertsData.filter(alert => alert.id != alertId);
         updateAlertsTable(window.alertsData);
       }
-      
+
       window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
     } else {
-      // טיפול בשגיאות מהשרת
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-        
-        if (serverMessage.includes('has linked items')) {
-          window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק התראה זו - יש פריטים מקושרים אליה');
-        } else {
-          window.showErrorNotification('שגיאה במחיקה', serverMessage);
-        }
-      } else {
-        window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת התראה - בדוק את הנתונים');
-      }
+      throw new Error(result.message || 'שגיאה במחיקת התראה');
     }
   } catch (error) {
-    window.showErrorNotification('שגיאה', 'שגיאה במחיקת התראה - בדוק את חיבור השרת');
+    window.showErrorNotification('שגיאה במחיקת התראה', error.message);
   }
 }
 
@@ -2003,59 +2037,31 @@ if (typeof window.toggleMainSection !== 'function') {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-
-  // שחזור מצב הסקשנים
-  restoreAlertsSectionState();
-
-  // אתחול פילטרים
-  if (typeof window.initializePageFilters === 'function') {
-    window.initializePageFilters('alerts');
-  }
-
-  // טעינת נתונים - הסרת הקריאה הכפולה כדי למנוע לולאה אינסופית
-  // loadAlertsData();
-
-  // טעינת מצב המיון
-  if (typeof window.loadSortState === 'function') {
-    window.loadSortState('alerts');
-  }
-});
-
-// אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-      // === DOM CONTENT LOADED (ALERTS) ===
-
-  // בדיקת זמינות מערכות
-      // בדיקת זמינות מערכות
-    // showSuccessNotification check
-    // showErrorNotification check
-    // showValidationWarning check
-    // showDeleteWarning check
-  
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
     return;
   }
-  
-      // מערכת התראות זמינה
+
+  // שחזור מצב הסקשנים
+  restoreAlertsSectionState();
 
   // שחזור מצב הסגירה
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
   }
 
-  // טעינת נתונים - השארת קריאה יחידה לטעינת הנתונים
-  loadAlertsData().then(() => {
-    // עדכון הטבלה לאחר טעינת הנתונים
-    updateAlertsTable(window.alertsData || []);
-  });
+  // אתחול פילטרים
+  if (typeof window.initializePageFilters === 'function') {
+    window.initializePageFilters('alerts');
+  }
+
+  // טעינת נתונים
+  loadAlertsData();
 
   // טעינת מצב המיון
   if (typeof window.loadSortState === 'function') {
     window.loadSortState('alerts');
   }
-
-      // דף התראות נטען בהצלחה
 });
 
 // פונקציה לעדכון הטבלה מפילטרים

@@ -16,7 +16,6 @@ def update_trades_investment_type():
     db_path = "Backend/db/simpleTrade_new.db"
     
     if not os.path.exists(db_path):
-        print(f"❌ Database file not found: {db_path}")
         return False
     
     try:
@@ -24,36 +23,28 @@ def update_trades_investment_type():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        print("🔄 Starting migration: Update trades table to use investment_type...")
         
         # 1. Check current table structure
-        print("📋 Checking current table structure...")
         cursor.execute("PRAGMA table_info(trades)")
         columns = cursor.fetchall()
         
         has_type_column = any(col[1] == 'type' for col in columns)
         has_investment_type_column = any(col[1] == 'investment_type' for col in columns)
         
-        print(f"   Has 'type' column: {has_type_column}")
-        print(f"   Has 'investment_type' column: {has_investment_type_column}")
         
         if not has_type_column:
-            print("❌ 'type' column not found in trades table")
             return False
         
         if has_investment_type_column:
-            print("⚠️  'investment_type' column already exists")
             return True
         
         # 2. Create backup
-        print("📋 Creating backup...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS trades_backup_investment_type AS 
             SELECT * FROM trades
         """)
         
         # 3. Get current data
-        print("📋 Getting current data...")
         cursor.execute("SELECT * FROM trades")
         trades_data = cursor.fetchall()
         
@@ -62,10 +53,8 @@ def update_trades_investment_type():
         columns_info = cursor.fetchall()
         column_names = [col[1] for col in columns_info]
         
-        print(f"   Current columns: {column_names}")
         
         # 4. Create new table with investment_type
-        print("🔄 Creating new table with investment_type column...")
         
         # Create new column list with investment_type instead of type
         new_columns = []
@@ -91,7 +80,6 @@ def update_trades_investment_type():
         cursor.execute(create_sql)
         
         # 5. Copy data with column mapping
-        print("🔄 Copying data...")
         
         # Create new column names list
         new_column_names = []
@@ -108,12 +96,10 @@ def update_trades_investment_type():
             cursor.executemany(insert_sql, trades_data)
         
         # 6. Drop old table and rename new table
-        print("🔄 Replacing table...")
         cursor.execute("DROP TABLE trades")
         cursor.execute("ALTER TABLE trades_new RENAME TO trades")
         
         # 7. Update constraints table
-        print("🔄 Updating constraints...")
         cursor.execute("""
             UPDATE constraints 
             SET column_name = 'investment_type' 
@@ -121,43 +107,30 @@ def update_trades_investment_type():
         """)
         
         # 8. Verify
-        print("🔍 Verifying migration...")
         cursor.execute("PRAGMA table_info(trades)")
         new_columns = cursor.fetchall()
         new_column_names = [col[1] for col in new_columns]
         
-        print(f"   New columns: {new_column_names}")
         
         has_investment_type = 'investment_type' in new_column_names
         has_type = 'type' in new_column_names
         
-        print(f"   Has 'investment_type' column: {has_investment_type}")
-        print(f"   Has 'type' column: {has_type}")
         
         # Check data
         cursor.execute("SELECT COUNT(*) FROM trades")
         count = cursor.fetchone()[0]
-        print(f"   Trades count: {count}")
         
         if count > 0:
             cursor.execute("SELECT id, investment_type, status, side FROM trades LIMIT 3")
             sample_data = cursor.fetchall()
-            print(f"   Sample data: {sample_data}")
         
         # Commit changes
         conn.commit()
         
-        print("✅ Migration completed successfully!")
-        print("📋 Summary:")
-        print(f"   - Renamed 'type' column to 'investment_type' in trades table")
-        print(f"   - Updated constraints table")
-        print(f"   - All data preserved")
-        print(f"   - {count} trades records updated")
         
         return True
         
     except Exception as e:
-        print(f"❌ Error during migration: {e}")
         conn.rollback()
         return False
         
@@ -167,7 +140,5 @@ def update_trades_investment_type():
 if __name__ == "__main__":
     success = update_trades_investment_type()
     if success:
-        print("🎉 Migration completed successfully!")
     else:
-        print("💥 Migration failed!")
         exit(1)

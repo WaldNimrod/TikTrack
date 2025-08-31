@@ -31,35 +31,29 @@ def update_tickers_currency_table():
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
         with engine.connect() as connection:
-            print("🔄 Starting tickers table update...")
             
             # 1. Check that currencies table exists
             result = connection.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='currencies'"))
             if not result.fetchone():
-                print("❌ Error: Currencies table does not exist. Run create_currencies_table.py first")
                 return False
             
             # 2. Check that there are currencies in the table
             result = connection.execute(text("SELECT COUNT(*) as count FROM currencies"))
             currency_count = result.fetchone()[0]
             if currency_count == 0:
-                print("❌ Error: No currencies in currencies table. Run add_currencies.py first")
                 return False
             
-            print(f"✓ Found {currency_count} currencies in currencies table")
             
             # 3. Check if currency_id column already exists
             result = connection.execute(text("PRAGMA table_info(tickers)"))
             columns = [col[1] for col in result.fetchall()]
             
             if 'currency_id' in columns:
-                print("⚠️  Currency_id column already exists in tickers table")
                 return True
             
             # 4. Create new currency_id column
             connection.execute(text("ALTER TABLE tickers ADD COLUMN currency_id INTEGER"))
             connection.commit()
-            print("✓ Added currency_id column to tickers table")
             
             # 5. Map existing currencies to IDs
             currency_mapping = {}
@@ -67,7 +61,6 @@ def update_tickers_currency_table():
             for row in result.fetchall():
                 currency_mapping[row[1]] = row[0]
             
-            print(f"✓ Currency mapping: {currency_mapping}")
             
             # 6. Update existing records
             result = connection.execute(text("SELECT id, symbol, currency FROM tickers WHERE currency IS NOT NULL"))
@@ -92,10 +85,8 @@ def update_tickers_currency_table():
                         {"currency_id": default_currency_id, "ticker_id": ticker_id}
                     )
                     updated_count += 1
-                    print(f"⚠️  Ticker {symbol}: Currency '{currency_str}' not found, set to USD")
             
             connection.commit()
-            print(f"✓ Updated {updated_count} tickers with currency IDs")
             
             # 7. Set default for records without currency
             usd_id = currency_mapping.get('USD', 1)
@@ -106,7 +97,6 @@ def update_tickers_currency_table():
             connection.commit()
             
             if result.rowcount > 0:
-                print(f"✓ Set default currency (USD) for {result.rowcount} tickers")
             
             # 8. Data validation check
             result = connection.execute(text("""
@@ -118,16 +108,12 @@ def update_tickers_currency_table():
             
             invalid_count = result.fetchone()[0]
             if invalid_count > 0:
-                print(f"❌ Error: Found {invalid_count} tickers with invalid currency IDs")
                 return False
             
-            print("✓ All currency IDs in tickers are valid")
             
-            print("\n🎉 Tickers table update completed successfully!")
             return True
             
     except Exception as e:
-        print(f"❌ Error updating tickers table: {e}")
         return False
 
 def verify_tickers_update():
@@ -137,17 +123,13 @@ def verify_tickers_update():
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
         with engine.connect() as connection:
-            print("\n📋 Checking update results:")
-            print("=" * 50)
             
             # Check table structure
             result = connection.execute(text("PRAGMA table_info(tickers)"))
             columns = result.fetchall()
             
-            print("Tickers table structure:")
             for col in columns:
                 col_name, col_type = col[1], col[2]
-                print(f"  {col_name}: {col_type}")
             
             # Check data
             result = connection.execute(text("""
@@ -165,24 +147,18 @@ def verify_tickers_update():
             
             tickers = result.fetchall()
             if tickers:
-                print("\nSample tickers:")
                 for ticker in tickers:
-                    print(f"  {ticker[1]} ({ticker[2]}): Currency {ticker[4]} ({ticker[5]})")
             
             return True
             
     except Exception as e:
-        print(f"❌ Error checking update: {e}")
         return False
 
 if __name__ == "__main__":
-    print("🔄 Updating tickers table to use currency IDs - TikTrack")
-    print("=" * 70)
     
     # Update table
     if update_tickers_currency_table():
         # Check results
         verify_tickers_update()
     else:
-        print("\n❌ Update failed")
         sys.exit(1)

@@ -772,6 +772,80 @@ console.log('🔄 Planning.js: Setting up updateGridFromComponent for planning p
 
 /**
  * Loading planning data from server
+/**
+ * יצירת נתוני דמו לתכנונים
+ */
+function getDemoTradePlansData() {
+    console.log('🔄 Creating demo trade plans data...');
+    
+    const demoData = [
+        {
+            id: 1,
+            account_id: 1,
+            ticker_id: 1,
+            investment_type: 'swing',
+            side: 'Long',
+            status: 'open',
+            entry_price: 150.00,
+            target_price: 180.00,
+            stop_loss: 140.00,
+            quantity: 10,
+            planned_amount: 1500.00,
+            entry_conditions: 'מחיר נכנס מתחת ל-150',
+            reasons: 'תנועה טכנית חיובית',
+            notes: 'תכנון דמו לבדיקה',
+            created_at: '2025-08-30T10:00:00',
+            updated_at: '2025-08-30T10:00:00',
+            ticker: {
+                id: 1,
+                symbol: 'AAPL',
+                name: 'Apple Inc.',
+                status: 'open'
+            },
+            account: {
+                id: 1,
+                name: 'חשבון ראשי',
+                type: 'checking',
+                status: 'open'
+            }
+        },
+        {
+            id: 2,
+            account_id: 1,
+            ticker_id: 2,
+            investment_type: 'investment',
+            side: 'Long',
+            status: 'closed',
+            entry_price: 300.00,
+            target_price: 350.00,
+            stop_loss: 280.00,
+            quantity: 5,
+            planned_amount: 1500.00,
+            entry_conditions: 'מחיר נכנס מתחת ל-300',
+            reasons: 'תנועה טכנית חיובית',
+            notes: 'תכנון דמו סגור',
+            created_at: '2025-08-29T14:30:00',
+            updated_at: '2025-08-30T15:00:00',
+            ticker: {
+                id: 2,
+                symbol: 'GOOGL',
+                name: 'Alphabet Inc.',
+                status: 'open'
+            },
+            account: {
+                id: 1,
+                name: 'חשבון ראשי',
+                type: 'checking',
+                status: 'open'
+            }
+        }
+    ];
+    
+    console.log('✅ Demo trade plans data created:', demoData.length, 'plans');
+    return demoData;
+}
+
+/**
  * 
  * This function loads all planning from the server and updates the table
  * If server is not available, uses demo data

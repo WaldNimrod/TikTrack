@@ -45,8 +45,89 @@ let cashFlowsData = window.cashFlowsData;
 /**
  * פונקציה לפתיחה/סגירה של סקשן תזרימי מזומנים
  */
+function toggleCashFlowsSection() {
+    console.log('🔄 toggleCashFlowsSection נקראה');
+    
+    const cashFlowsSection = document.querySelector('.cash-flows-section');
+    if (!cashFlowsSection) {
+        console.error('❌ סקשן תזרימי מזומנים לא נמצא');
+        return;
+    }
+
+    const sectionBody = cashFlowsSection.querySelector('.section-body');
+    if (!sectionBody) {
+        console.error('❌ גוף הסקשן לא נמצא');
+        return;
+    }
+
+    const toggleBtn = cashFlowsSection.querySelector('button[onclick="toggleCashFlowsSection()"]');
+    if (!toggleBtn) {
+        console.error('❌ כפתור הפתיחה/סגירה לא נמצא');
+        return;
+    }
+
+    const isVisible = sectionBody.style.display !== 'none';
+    
+    if (isVisible) {
+        // סגירת הסקשן
+        sectionBody.style.display = 'none';
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> הצג תזרימי מזומנים';
+        toggleBtn.title = 'הצג תזרימי מזומנים';
+        console.log('🔽 סקשן תזרימי מזומנים נסגר');
+    } else {
+        // פתיחת הסקשן
+        sectionBody.style.display = 'block';
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> הסתר תזרימי מזומנים';
+        toggleBtn.title = 'הסתר תזרימי מזומנים';
+        console.log('🔼 סקשן תזרימי מזומנים נפתח');
+    }
+
+    // שמירת המצב
+    localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
+}
 
 // פונקציות לשחזור מצב הסגירה
+function restoreCashFlowsSectionState() {
+    console.log('🔄 restoreCashFlowsSectionState נקראה');
+    
+    const savedState = localStorage.getItem('cashFlowsSectionState');
+    if (!savedState) {
+        console.log('📝 אין מצב שמור לסקשן תזרימי מזומנים');
+        return;
+    }
+
+    const cashFlowsSection = document.querySelector('.cash-flows-section');
+    if (!cashFlowsSection) {
+        console.error('❌ סקשן תזרימי מזומנים לא נמצא');
+        return;
+    }
+
+    const sectionBody = cashFlowsSection.querySelector('.section-body');
+    if (!sectionBody) {
+        console.error('❌ גוף הסקשן לא נמצא');
+        return;
+    }
+
+    const toggleBtn = cashFlowsSection.querySelector('button[onclick="toggleCashFlowsSection()"]');
+    if (!toggleBtn) {
+        console.error('❌ כפתור הפתיחה/סגירה לא נמצא');
+        return;
+    }
+
+    if (savedState === 'closed') {
+        // שחזור מצב סגור
+        sectionBody.style.display = 'none';
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> הצג תזרימי מזומנים';
+        toggleBtn.title = 'הצג תזרימי מזומנים';
+        console.log('🔽 שחזור מצב סגור לסקשן תזרימי מזומנים');
+    } else {
+        // שחזור מצב פתוח
+        sectionBody.style.display = 'block';
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> הסתר תזרימי מזומנים';
+        toggleBtn.title = 'הסתר תזרימי מזומנים';
+        console.log('🔼 שחזור מצב פתוח לסקשן תזרימי מזומנים');
+    }
+}
 
 // פונקציות נוספות
 // resetAllFiltersAndReloadData() - לא בשימוש, הוסרה
@@ -1548,7 +1629,9 @@ async function initializeCashFlowsPage() {
     await loadCashFlows();
 
     // שחזור מצב הסגירה
-    window.restoreSectionStates();
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    }
 
     // שחזור מצב סידור
     restoreSortState();

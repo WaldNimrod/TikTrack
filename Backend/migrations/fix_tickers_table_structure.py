@@ -15,7 +15,6 @@ def migrate():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'simpleTrade_new.db')
     
     if not os.path.exists(db_path):
-        print(f"❌ Database not found at {db_path}")
         return False
     
     try:
@@ -23,10 +22,8 @@ def migrate():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        print("🔄 Starting migration: Fix tickers table structure")
         
         # 1. Backup current data
-        print("📋 Backing up current data...")
         cursor.execute("DROP TABLE IF EXISTS tickers_backup")
         cursor.execute("""
             CREATE TABLE tickers_backup AS 
@@ -34,7 +31,6 @@ def migrate():
         """)
         
         # 2. Create new tickers table with proper structure
-        print("🔧 Creating new tickers table with proper structure...")
         cursor.execute("DROP TABLE IF EXISTS tickers_new")
         cursor.execute("""
             CREATE TABLE tickers_new (
@@ -53,7 +49,6 @@ def migrate():
         """)
         
         # 3. Copy data from old table to new table
-        print("📊 Copying data to new table...")
         cursor.execute("""
             INSERT INTO tickers_new (
                 symbol, name, type, remarks, currency_id, 
@@ -66,35 +61,27 @@ def migrate():
         """)
         
         # 4. Drop old table
-        print("🗑️ Dropping old table...")
         cursor.execute("DROP TABLE tickers")
         
         # 5. Rename new table
-        print("🔄 Renaming new table...")
         cursor.execute("ALTER TABLE tickers_new RENAME TO tickers")
         
         # 6. Recreate indexes
-        print("🔗 Recreating indexes...")
         cursor.execute("CREATE UNIQUE INDEX ix_tickers_symbol ON tickers (symbol)")
         cursor.execute("CREATE INDEX ix_tickers_id ON tickers (id)")
         
         # Commit changes
         conn.commit()
         
-        print("✅ Migration completed successfully!")
         
         # Print summary
         cursor.execute("SELECT COUNT(*) FROM tickers")
         tickers_count = cursor.fetchone()[0]
         
-        print(f"📊 Summary:")
-        print(f"   - Tickers: {tickers_count} records")
-        print(f"   - Table structure fixed with proper ID as PRIMARY KEY AUTOINCREMENT")
         
         return True
         
     except Exception as e:
-        print(f"❌ Migration failed: {str(e)}")
         conn.rollback()
         return False
         

@@ -30,14 +30,12 @@ def remove_accounts_currency_string():
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
         with engine.connect() as connection:
-            print("🔄 Starting removal of old currency field from accounts table...")
             
             # 1. Check that currency_id column exists and has data
             result = connection.execute(text("PRAGMA table_info(accounts)"))
             columns = [col[1] for col in result.fetchall()]
             
             if 'currency_id' not in columns:
-                print("❌ Error: currency_id column does not exist in accounts table")
                 return False
             
             # 2. Check that currency_id has data
@@ -45,14 +43,11 @@ def remove_accounts_currency_string():
             count = result.fetchone()[0]
             
             if count == 0:
-                print("❌ Error: No accounts have currency_id values")
                 return False
             
-            print(f"✓ Found {count} accounts with currency_id values")
             
             # 3. Check that currency column exists
             if 'currency' not in columns:
-                print("⚠️  Currency column already removed from accounts table")
                 return True
             
             # 4. Verify data integrity before removal
@@ -65,13 +60,10 @@ def remove_accounts_currency_string():
             
             invalid_count = result.fetchone()[0]
             if invalid_count > 0:
-                print(f"❌ Error: Found {invalid_count} accounts with invalid currency IDs")
                 return False
             
-            print("✓ All currency IDs are valid")
             
             # 5. Create new table without currency column
-            print("🔧 Creating new accounts table without currency column...")
             connection.execute(text("""
                 CREATE TABLE accounts_new (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -89,7 +81,6 @@ def remove_accounts_currency_string():
             """))
             
             # 6. Copy data to new table
-            print("📊 Copying data to new table...")
             connection.execute(text("""
                 INSERT INTO accounts_new (
                     id, name, currency_id, status, cash_balance, 
@@ -102,12 +93,10 @@ def remove_accounts_currency_string():
             """))
             
             # 7. Drop old table and rename new table
-            print("🗑️  Removing old table...")
             connection.execute(text("DROP TABLE accounts"))
             connection.execute(text("ALTER TABLE accounts_new RENAME TO accounts"))
             
             # 8. Recreate trigger
-            print("🔧 Recreating trigger...")
             connection.execute(text("""
                 CREATE TRIGGER protect_last_account_delete 
                 BEFORE DELETE ON accounts 
@@ -120,13 +109,10 @@ def remove_accounts_currency_string():
             """))
             
             connection.commit()
-            print("✓ Successfully removed currency column from accounts table")
             
-            print("\n🎉 Accounts table update completed successfully!")
             return True
             
     except Exception as e:
-        print(f"❌ Error updating accounts table: {e}")
         return False
 
 def verify_accounts_update():
@@ -136,25 +122,19 @@ def verify_accounts_update():
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
         with engine.connect() as connection:
-            print("\n📋 Verifying update results:")
-            print("=" * 50)
             
             # Check table structure
             result = connection.execute(text("PRAGMA table_info(accounts)"))
             columns = result.fetchall()
             
-            print("Accounts table structure:")
             for col in columns:
                 col_name, col_type = col[1], col[2]
-                print(f"  {col_name}: {col_type}")
             
             # Check for old currency column
             column_names = [col[1] for col in columns]
             if 'currency' in column_names:
-                print("❌ Error: Old currency column still exists")
                 return False
             else:
-                print("✓ Old currency column successfully removed")
             
             # Check data
             result = connection.execute(text("""
@@ -171,24 +151,18 @@ def verify_accounts_update():
             
             accounts = result.fetchall()
             if accounts:
-                print("\nAccount examples:")
                 for acc in accounts:
-                    print(f"  Account {acc[0]}: {acc[1]} | Currency: {acc[3]} ({acc[4]})")
             
             return True
             
     except Exception as e:
-        print(f"❌ Error verifying update: {e}")
         return False
 
 if __name__ == "__main__":
-    print("🔄 Removing old currency field from accounts table - TikTrack")
-    print("=" * 70)
     
     # Update table
     if remove_accounts_currency_string():
         # Verify results
         verify_accounts_update()
     else:
-        print("\n❌ Update failed")
         sys.exit(1)

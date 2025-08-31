@@ -3,7 +3,9 @@ from config.settings import UI_DIR
 import os
 from typing import Any
 
+# Create Blueprint
 pages_bp = Blueprint('pages', __name__)
+
 
 @pages_bp.route('/')
 def home() -> Any:

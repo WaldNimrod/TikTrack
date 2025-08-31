@@ -24,10 +24,8 @@ def update_alerts_structure():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'simpleTrade_new.db')
     
     if not os.path.exists(db_path):
-        print(f"❌ Database not found: {db_path}")
         return False
     
-    print("🚀 Starting migration to update alerts table structure...")
     
     try:
         conn = sqlite3.connect(db_path)
@@ -38,34 +36,26 @@ def update_alerts_structure():
         columns = [column[1] for column in cursor.fetchall()]
         
         if 'related_type_id' in columns and 'related_id' in columns:
-            print("✅ New fields already exist in alerts table")
             return True
         
         # 1. Add 'ticker' association type to note_relation_types table
-        print("📝 Adding 'ticker' association type...")
         try:
             cursor.execute("INSERT INTO note_relation_types (note_relation_type) VALUES (?)", ('ticker',))
             ticker_relation_id = cursor.lastrowid
-            print(f"   ✅ Added 'ticker' association type with ID {ticker_relation_id}")
         except sqlite3.IntegrityError:
             # If already exists, get the ID
             cursor.execute("SELECT id FROM note_relation_types WHERE note_relation_type = ?", ('ticker',))
             ticker_relation_id = cursor.fetchone()[0]
-            print(f"   ℹ️ 'ticker' association type already exists with ID {ticker_relation_id}")
         
         # Get existing association type IDs
         cursor.execute("SELECT id, note_relation_type FROM note_relation_types")
         relation_types = {row[1]: row[0] for row in cursor.fetchall()}
-        print(f"   📊 Existing association types: {relation_types}")
         
         # 2. Add new fields
-        print("📝 Adding new fields to alerts table...")
         cursor.execute("ALTER TABLE alerts ADD COLUMN related_type_id INTEGER")
         cursor.execute("ALTER TABLE alerts ADD COLUMN related_id INTEGER")
-        print("   ✅ Added related_type_id and related_id fields")
         
         # 3. Transfer existing data
-        print("📝 Transferring existing data to new system...")
         
         # Transfer alerts associated with accounts
         cursor.execute("""
@@ -74,7 +64,6 @@ def update_alerts_structure():
             WHERE account_id IS NOT NULL
         """, (relation_types.get('account', 1),))
         account_alerts_updated = cursor.rowcount
-        print(f"   ✅ Updated {account_alerts_updated} alerts associated with accounts")
         
         # Transfer alerts associated with tickers
         cursor.execute("""
@@ -83,10 +72,8 @@ def update_alerts_structure():
             WHERE ticker_id IS NOT NULL
         """, (ticker_relation_id,))
         ticker_alerts_updated = cursor.rowcount
-        print(f"   ✅ Updated {ticker_alerts_updated} alerts associated with tickers")
         
         # 4. Remove old fields
-        print("📝 Removing old fields...")
         
         # Create temporary table with new structure
         cursor.execute("""
@@ -119,34 +106,27 @@ def update_alerts_structure():
         # Rename new table
         cursor.execute("ALTER TABLE alerts_new RENAME TO alerts")
         
-        print("   ✅ Removed old fields account_id and ticker_id")
         
         # 5. Create indexes
-        print("📝 Creating indexes...")
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_alerts_related_type_id ON alerts(related_type_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_alerts_related_id ON alerts(related_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_alerts_is_triggered ON alerts(is_triggered)")
         cursor.execute("CREATE INDEX IF NOT EXISTS ix_alerts_status ON alerts(status)")
-        print("   ✅ Indexes created")
         
         # 6. Final check
         cursor.execute("PRAGMA table_info(alerts)")
         final_columns = [column[1] for column in cursor.fetchall()]
-        print(f"   📊 Final fields in alerts table: {final_columns}")
         
         # Data check
         cursor.execute("SELECT COUNT(*) FROM alerts")
         total_alerts = cursor.fetchone()[0]
-        print(f"   📊 Total alerts in table: {total_alerts}")
         
         conn.commit()
         conn.close()
         
-        print("✅ Migration completed successfully!")
         return True
         
     except Exception as e:
-        print(f"❌ Error in migration: {e}")
         if 'conn' in locals():
             conn.rollback()
             conn.close()
@@ -155,7 +135,5 @@ def update_alerts_structure():
 if __name__ == "__main__":
     success = update_alerts_structure()
     if success:
-        print("🎉 Migration completed successfully!")
     else:
-        print("💥 Migration failed!")
         exit(1)

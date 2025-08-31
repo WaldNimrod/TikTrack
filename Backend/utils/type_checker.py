@@ -267,7 +267,6 @@ def main():
     """Main function to run type annotation checker"""
     checker = TypeAnnotationChecker()
     report = checker.generate_report()
-    print(report)
 
 if __name__ == "__main__":
     main()

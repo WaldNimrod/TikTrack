@@ -13,33 +13,26 @@ def add_alert_condition_fields():
     db_path = 'db/simpleTrade_new.db'
     
     if not os.path.exists(db_path):
-        print(f"Database not found at {db_path}")
         return
     
     # Connect to database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    print("Starting alert condition fields migration...")
     
     # Create backup
     cursor.execute("CREATE TABLE IF NOT EXISTS alerts_backup_condition AS SELECT * FROM alerts")
-    print("Created backup table alerts_backup_condition")
     
     # Add new fields
-    print("Adding new condition fields...")
     
     # Add condition_attribute field
     cursor.execute("ALTER TABLE alerts ADD COLUMN condition_attribute VARCHAR(50)")
-    print("Added condition_attribute field")
     
     # Add condition_operator field  
     cursor.execute("ALTER TABLE alerts ADD COLUMN condition_operator VARCHAR(50)")
-    print("Added condition_operator field")
     
     # Add condition_number field
     cursor.execute("ALTER TABLE alerts ADD COLUMN condition_number DECIMAL(10,2)")
-    print("Added condition_number field")
     
     # Define mapping from old conditions to new fields
     condition_mapping = {
@@ -67,7 +60,6 @@ def add_alert_condition_fields():
         """, (attribute, operator, number, old_condition))
         
         if cursor.rowcount > 0:
-            print(f"Updated {cursor.rowcount} alerts from '{old_condition}' to ({attribute}, {operator}, {number})")
             updated_count += cursor.rowcount
     
     # Set default values for any remaining records
@@ -79,11 +71,9 @@ def add_alert_condition_fields():
     
     remaining_updated = cursor.rowcount
     if remaining_updated > 0:
-        print(f"Updated {remaining_updated} alerts with default values")
         updated_count += remaining_updated
     
     # Add constraints
-    print("Adding constraints...")
     
     # Constraint for condition_attribute
     cursor.execute("""
@@ -110,7 +100,6 @@ def add_alert_condition_fields():
     conn.commit()
     
     # Show results
-    print(f"\nTotal alerts updated: {updated_count}")
     
     # Show sample data
     cursor.execute("""
@@ -121,12 +110,9 @@ def add_alert_condition_fields():
         LIMIT 5
     """)
     
-    print("\nSample data after migration:")
     for row in cursor.fetchall():
-        print(f"  - {row[0]} | {row[1]} | {row[2]} (count: {row[3]})")
     
     conn.close()
-    print("\nAlert condition fields migration completed successfully!")
 
 if __name__ == "__main__":
     add_alert_condition_fields()

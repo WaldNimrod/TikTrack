@@ -21,7 +21,6 @@ def create_constraints_table():
     cursor = conn.cursor()
     
     try:
-        print("🏗️ Creating constraints table...")
         
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS constraints (
@@ -43,11 +42,9 @@ def create_constraints_table():
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_constraints_active ON constraints (is_active)")
         
         conn.commit()
-        print("✅ Constraints table created successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error creating constraints table: {e}")
         conn.rollback()
         return False
     finally:
@@ -59,7 +56,6 @@ def create_enum_values_table():
     cursor = conn.cursor()
     
     try:
-        print("🏗️ Creating enum_values table...")
         
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS enum_values (
@@ -79,11 +75,9 @@ def create_enum_values_table():
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_enum_sort ON enum_values (sort_order)")
         
         conn.commit()
-        print("✅ Enum values table created successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error creating enum_values table: {e}")
         conn.rollback()
         return False
     finally:
@@ -95,7 +89,6 @@ def create_constraint_validations_table():
     cursor = conn.cursor()
     
     try:
-        print("🏗️ Creating constraint_validations table...")
         
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS constraint_validations (
@@ -115,11 +108,9 @@ def create_constraint_validations_table():
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_validation_active ON constraint_validations (is_active)")
         
         conn.commit()
-        print("✅ Constraint validations table created successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error creating constraint_validations table: {e}")
         conn.rollback()
         return False
     finally:
@@ -131,16 +122,13 @@ def verify_tables():
     cursor = conn.cursor()
     
     try:
-        print("\n📋 Verifying tables...")
         
         # Check constraints table
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='constraints'")
         if cursor.fetchone():
             cursor.execute("PRAGMA table_info(constraints)")
             columns = cursor.fetchall()
-            print(f"✅ Constraints table: {len(columns)} columns")
         else:
-            print("❌ Constraints table not found")
             return False
         
         # Check enum_values table
@@ -148,9 +136,7 @@ def verify_tables():
         if cursor.fetchone():
             cursor.execute("PRAGMA table_info(enum_values)")
             columns = cursor.fetchall()
-            print(f"✅ Enum values table: {len(columns)} columns")
         else:
-            print("❌ Enum values table not found")
             return False
         
         # Check constraint_validations table
@@ -158,51 +144,35 @@ def verify_tables():
         if cursor.fetchone():
             cursor.execute("PRAGMA table_info(constraint_validations)")
             columns = cursor.fetchall()
-            print(f"✅ Constraint validations table: {len(columns)} columns")
         else:
-            print("❌ Constraint validations table not found")
             return False
         
-        print("✅ All tables verified successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error verifying tables: {e}")
         return False
     finally:
         conn.close()
 
 def main():
     """Main migration function"""
-    print("🚀 Starting Dynamic Constraints Tables Creation")
-    print("=" * 60)
     
     # Step 1: Create constraints table
     if not create_constraints_table():
-        print("❌ Failed to create constraints table")
         return
     
     # Step 2: Create enum_values table
     if not create_enum_values_table():
-        print("❌ Failed to create enum_values table")
         return
     
     # Step 3: Create constraint_validations table
     if not create_constraint_validations_table():
-        print("❌ Failed to create constraint_validations table")
         return
     
     # Step 4: Verify all tables
     if not verify_tables():
-        print("❌ Table verification failed")
         return
     
-    print("\n✅ Dynamic Constraints Tables Creation Completed Successfully!")
-    print("📝 Next steps:")
-    print("  1. Insert basic constraints")
-    print("  2. Create constraint service")
-    print("  3. Update API routes")
-    print("  4. Test constraint validation")
 
 if __name__ == "__main__":
     main()

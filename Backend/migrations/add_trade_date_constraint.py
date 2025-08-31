@@ -35,14 +35,11 @@ def add_trade_date_constraint():
         success, message = constraint_service.add_constraint(constraint_data)
         
         if success:
-            print(f"✅ Successfully added trade date constraint: {message}")
             return True
         else:
-            print(f"❌ Failed to add trade date constraint: {message}")
             return False
             
     except Exception as e:
-        print(f"❌ Error adding trade date constraint: {e}")
         return False
 
 def validate_trade_dates():
@@ -65,32 +62,23 @@ def validate_trade_dates():
         invalid_trades = cursor.fetchall()
         
         if invalid_trades:
-            print(f"⚠️  Found {len(invalid_trades)} trades with invalid dates:")
             for trade in invalid_trades:
-                print(f"   Trade ID {trade[0]}: opened_at={trade[1]}, closed_at={trade[2]}")
             return False
         else:
-            print("✅ All existing trades comply with the date constraint")
             return True
             
     except Exception as e:
-        print(f"❌ Error validating trade dates: {e}")
         return False
     finally:
         conn.close()
 
 if __name__ == "__main__":
-    print("🔄 Adding trade date constraint...")
     
     # Validate existing data first
-    print("📋 Validating existing trade dates...")
     if not validate_trade_dates():
-        print("❌ Cannot proceed - existing data violates the constraint")
         sys.exit(1)
     
     # Add the constraint
     if add_trade_date_constraint():
-        print("✅ Migration completed successfully")
     else:
-        print("❌ Migration failed")
         sys.exit(1)

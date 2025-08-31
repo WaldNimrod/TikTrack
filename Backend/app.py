@@ -126,7 +126,6 @@ app.register_blueprint(currencies_bp)
 app.register_blueprint(linked_items_bp)
 app.register_blueprint(note_relation_types_bp)
 app.register_blueprint(js_map_bp)
-
 app.register_blueprint(pages_bp)
 
 # Error handling setup
@@ -353,11 +352,6 @@ if __name__ == "__main__":
     #
     # ✅ **New Configuration:** Simple and stable Flask development server
     
-    print("🚀 Starting Flask development server...")
-    print("📍 Server running on http://127.0.0.1:8080")
-    print("⚡ Debug mode enabled")
-    print("📝 Detailed logs enabled")
-    print("-" * 50)
     
     app.run(
         host='127.0.0.1',

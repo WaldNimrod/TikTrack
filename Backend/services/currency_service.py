@@ -71,7 +71,6 @@ class CurrencyService:
             
         Example:
             >>> currencies = CurrencyService.get_all(db_session)
-            >>> print(f"Number of currencies in system: {len(currencies)}")
         """
         return db.query(Currency).order_by(Currency.symbol).all()
     
@@ -90,7 +89,6 @@ class CurrencyService:
         Example:
             >>> currency = CurrencyService.get_by_id(db_session, 1)
             >>> if currency:
-            ...     print(f"Found currency: {currency.symbol}")
         """
         return db.query(Currency).filter(Currency.id == currency_id).first()
     
@@ -109,7 +107,6 @@ class CurrencyService:
         Example:
             >>> currency = CurrencyService.get_by_symbol(db_session, 'USD')
             >>> if currency:
-            ...     print(f"USD rate: {currency.usd_rate}")
         """
         return db.query(Currency).filter(Currency.symbol == symbol.upper()).first()
     
@@ -270,7 +267,6 @@ class CurrencyService:
         Example:
             >>> success = CurrencyService.delete(db_session, 1)
             >>> if success:
-            ...     print("Currency deleted successfully")
         """
         currency = CurrencyService.get_by_id(db, currency_id)
         if not currency:
@@ -305,7 +301,6 @@ class CurrencyService:
         Example:
             >>> in_use = CurrencyService.is_currency_in_use(db_session, 1)
             >>> if in_use:
-            ...     print("Cannot delete - currency is in use")
         """
         # Check in tickers table
         ticker_count = db.query(Ticker).filter(Ticker.currency == currency_id).count()
@@ -396,7 +391,6 @@ class CurrencyService:
             
         Example:
             >>> usage = CurrencyService.get_currency_usage_summary(db_session, 1)
-            >>> print(f"Tickers: {usage['tickers']}, Accounts: {usage['accounts']}")
         """
         return {
             'tickers': db.query(Ticker).filter(Ticker.currency == currency_id).count(),
@@ -420,7 +414,6 @@ class CurrencyService:
         Example:
             >>> currencies = CurrencyService.get_currencies_for_dropdown(db_session)
             >>> for currency in currencies:
-            ...     print(f"{currency['symbol']} - {currency['name']}")
         """
         currencies = db.query(Currency).order_by(Currency.symbol).all()
         return [

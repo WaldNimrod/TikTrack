@@ -66,7 +66,6 @@ class MigrationManager:
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(migration_data, f, indent=2, ensure_ascii=False)
             
-        print(f"✅ Migration created: {filename}")
         return version
         
     def apply_migration(self, version: str) -> bool:
@@ -80,7 +79,6 @@ class MigrationManager:
                     break
                     
             if not migration_file:
-                print(f"❌ Migration not found: {version}")
                 return False
                 
             with open(migration_file, 'r', encoding='utf-8') as f:
@@ -92,12 +90,10 @@ class MigrationManager:
             
             cursor.execute(f"SELECT COUNT(*) FROM {self.migrations_table} WHERE version = ?", (version,))
             if cursor.fetchone()[0] > 0:
-                print(f"⚠️  Migration already applied: {version}")
                 conn.close()
                 return True
                 
             # Apply SQL - execute statements one by one
-            print(f"🔄 Applying migration: {migration['name']}")
             sql_statements = migration['sql_up'].split(';')
             
             for statement in sql_statements:
@@ -105,9 +101,7 @@ class MigrationManager:
                 if statement:  # Only if there's content
                     try:
                         cursor.execute(statement)
-                        print(f"  ✅ Executing: {statement[:50]}...")
                     except Exception as e:
-                        print(f"  ❌ Error executing: {statement[:50]}... - {str(e)}")
                         conn.rollback()
                         conn.close()
                         return False
@@ -121,11 +115,9 @@ class MigrationManager:
             conn.commit()
             conn.close()
             
-            print(f"✅ Migration applied successfully: {migration['name']}")
             return True
             
         except Exception as e:
-            print(f"❌ Error applying migration: {str(e)}")
             return False
             
     def rollback_migration(self, version: str) -> bool:
@@ -139,18 +131,15 @@ class MigrationManager:
             result = cursor.fetchone()
             
             if not result:
-                print(f"❌ Migration not found: {version}")
                 conn.close()
                 return False
                 
             sql_down = result[0]
             if not sql_down:
-                print(f"⚠️  No rollback SQL for migration: {version}")
                 conn.close()
                 return False
                 
             # Execute rollback
-            print(f"🔄 Rolling back migration: {version}")
             cursor.execute(sql_down)
             
             # Delete from table
@@ -159,11 +148,9 @@ class MigrationManager:
             conn.commit()
             conn.close()
             
-            print(f"✅ Migration rolled back successfully: {version}")
             return True
             
         except Exception as e:
-            print(f"❌ Error rolling back migration: {str(e)}")
             return False
             
     def get_applied_migrations(self) -> List[Dict[str, Any]]:
@@ -202,17 +189,13 @@ class MigrationManager:
         pending = self.get_pending_migrations()
         
         if not pending:
-            print("✅ No pending migrations")
             return True
             
-        print(f"🔄 Applying {len(pending)} migrations...")
         
         for version in pending:
             if not self.apply_migration(version):
-                print(f"❌ Failed to apply migration: {version}")
                 return False
                 
-        print("✅ All migrations applied successfully")
         return True
         
     def status(self):
@@ -220,19 +203,12 @@ class MigrationManager:
         applied = self.get_applied_migrations()
         pending = self.get_pending_migrations()
         
-        print("📊 Migrations Status:")
-        print(f"✅ Applied: {len(applied)}")
-        print(f"⏳ Pending: {len(pending)}")
         
         if applied:
-            print("\n📋 Applied Migrations:")
             for migration in applied:
-                print(f"  • {migration['version']} - {migration['name']} ({migration['applied_at']})")
                 
         if pending:
-            print("\n⏳ Pending Migrations:")
             for version in pending:
-                print(f"  • {version}")
 
 # Create migration for current issue
 def create_notes_migration():
@@ -324,14 +300,12 @@ def create_notes_migration():
         sql_down
     )
     
-    print(f"✅ Migration created: {version}")
     return version
 
 if __name__ == "__main__":
     import sys
     
     if len(sys.argv) < 2:
-        print("""
 Usage:
   python migrations_manager.py status          # Show status
   python migrations_manager.py migrate         # Apply all migrations
@@ -355,5 +329,4 @@ Usage:
     elif command == "rollback" and len(sys.argv) > 2:
         manager.rollback_migration(sys.argv[2])
     else:
-        print("❌ Unknown command")
         sys.exit(1)

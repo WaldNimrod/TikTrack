@@ -24,7 +24,6 @@ def add_trade_plan_ticker_constraint():
     """
     Add constraint to ensure trade plan ticker matches trade ticker
     """
-    print("🔄 Adding trade plan ticker constraint...")
     
     try:
         # Initialize constraint service
@@ -53,21 +52,17 @@ def add_trade_plan_ticker_constraint():
         success, message = constraint_service.add_constraint(constraint_data)
         
         if success:
-            print("✅ Trade plan ticker constraint added successfully")
             return True
         else:
-            print("❌ Failed to add trade plan ticker constraint")
             return False
             
     except Exception as e:
-        print(f"❌ Error adding trade plan ticker constraint: {e}")
         return False
 
 def verify_constraint():
     """
     Verify that the constraint was added correctly
     """
-    print("🔍 Verifying constraint...")
     
     try:
         db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'simpleTrade_new.db')
@@ -85,29 +80,21 @@ def verify_constraint():
         result = cursor.fetchone()
         
         if result:
-            print(f"✅ Constraint found: {result[0]}")
-            print(f"   Definition: {result[1]}")
             conn.close()
             return True
         else:
-            print("❌ Constraint not found")
             conn.close()
             return False
             
     except Exception as e:
-        print(f"❌ Error verifying constraint: {e}")
         return False
 
 if __name__ == "__main__":
-    print("🚀 Starting trade plan ticker constraint migration...")
     
     # Add the constraint
     if add_trade_plan_ticker_constraint():
         # Verify the constraint
         if verify_constraint():
-            print("🎉 Migration completed successfully!")
         else:
-            print("⚠️ Migration completed but verification failed")
     else:
-        print("❌ Migration failed")
         sys.exit(1)

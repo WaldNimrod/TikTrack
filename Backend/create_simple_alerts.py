@@ -11,14 +11,12 @@ def create_simple_alerts():
     db_path = 'db/simpleTrade_new.db'
     
     if not os.path.exists(db_path):
-        print(f"Database not found at {db_path}")
         return
     
     # Connect to database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    print("Creating 10 simple alerts...")
     
     # Simple alerts data using new condition fields
     simple_alerts = [
@@ -183,7 +181,6 @@ def create_simple_alerts():
             alert_data['created_at']
         ))
         
-        print(f"✅ Added alert {i}: {alert_data['type']} - {alert_data['condition_attribute']} {alert_data['condition_operator']} {alert_data['condition_number']}")
     
     # Commit changes
     conn.commit()
@@ -192,30 +189,23 @@ def create_simple_alerts():
     cursor.execute("SELECT COUNT(*) FROM alerts")
     total_alerts = cursor.fetchone()[0]
     
-    print(f"\n📊 Total alerts in database: {total_alerts}")
     
     # Show breakdown by status
     cursor.execute("SELECT status, COUNT(*) FROM alerts GROUP BY status ORDER BY COUNT(*) DESC")
     status_dist = cursor.fetchall()
-    print("\n📋 Alerts by status:")
     for status, count in status_dist:
-        print(f"  - {status}: {count} alerts")
     
     # Show breakdown by type
     cursor.execute("SELECT type, COUNT(*) FROM alerts GROUP BY type ORDER BY COUNT(*) DESC")
     type_dist = cursor.fetchall()
-    print("\n📋 Alerts by type:")
     for alert_type, count in type_dist:
-        print(f"  - {alert_type}: {count} alerts")
     
     # Show breakdown by related_type_id
     cursor.execute("SELECT related_type_id, COUNT(*) FROM alerts GROUP BY related_type_id ORDER BY COUNT(*) DESC")
     related_dist = cursor.fetchall()
-    print("\n📋 Alerts by related type:")
     type_names = {1: 'Account', 2: 'Trade', 3: 'Trade Plan', 4: 'Ticker'}
     for related_type, count in related_dist:
         type_name = type_names.get(related_type, f'Unknown({related_type})')
-        print(f"  - {type_name}: {count} alerts")
     
     # Show recent alerts
     cursor.execute("""
@@ -225,14 +215,11 @@ def create_simple_alerts():
         LIMIT 5
     """)
     
-    print("\n📋 Recent alerts:")
     for row in cursor.fetchall():
         type_name = {1: 'Account', 2: 'Trade', 3: 'Trade Plan', 4: 'Ticker'}.get(row[5], 'Unknown')
         condition = f"{row[2]} {row[3]} {row[4]}"
-        print(f"  - ID: {row[0]}, Type: {row[1]}, Condition: {condition}, Related: {type_name}, Status: {row[6]}, Triggered: {row[7]}, Created: {row[8]}")
     
     conn.close()
-    print("\n✅ Simple alerts created successfully!")
 
 if __name__ == "__main__":
     create_simple_alerts()

@@ -11,14 +11,12 @@ def add_sample_alerts():
     db_path = 'db/simpleTrade_new.db'
     
     if not os.path.exists(db_path):
-        print(f"Database not found at {db_path}")
         return
     
     # Connect to database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    print("Adding 6 diverse sample alerts...")
     
     # Sample alerts data - covering all constraints
     sample_alerts = [
@@ -115,7 +113,6 @@ def add_sample_alerts():
             datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         ))
         
-        print(f"✅ Added alert {i}: {alert_data['type']} - {alert_data['condition_attribute']} {alert_data['condition_operator']} {alert_data['condition_number']}")
     
     # Commit changes
     conn.commit()
@@ -124,7 +121,6 @@ def add_sample_alerts():
     cursor.execute("SELECT COUNT(*) FROM alerts")
     total_alerts = cursor.fetchone()[0]
     
-    print(f"\n📊 Total alerts in database: {total_alerts}")
     
     # Show sample of alerts
     cursor.execute("""
@@ -135,12 +131,9 @@ def add_sample_alerts():
         LIMIT 10
     """)
     
-    print("\n📋 Recent alerts:")
     for row in cursor.fetchall():
-        print(f"  - ID: {row[0]}, Type: {row[1]}, Condition: {row[2]} {row[3]} {row[4]}, Related: {row[5]}, Status: {row[6]}")
     
     conn.close()
-    print("\n✅ Sample alerts added successfully!")
 
 if __name__ == "__main__":
     add_sample_alerts()

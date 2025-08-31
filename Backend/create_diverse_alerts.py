@@ -11,14 +11,12 @@ def create_diverse_alerts():
     db_path = 'db/simpleTrade_new.db'
     
     if not os.path.exists(db_path):
-        print(f"Database not found at {db_path}")
         return
     
     # Connect to database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    print("Creating 10 diverse sample alerts...")
     
     # Diverse alerts data - covering all constraints and validation rules
     diverse_alerts = [
@@ -188,7 +186,6 @@ def create_diverse_alerts():
             alert_data['created_at']
         ))
         
-        print(f"✅ Added alert {i}: {alert_data['type']} - {alert_data['condition_attribute']} {alert_data['condition_operator']} {alert_data['condition_number']}")
     
     # Commit changes
     conn.commit()
@@ -197,7 +194,6 @@ def create_diverse_alerts():
     cursor.execute("SELECT COUNT(*) FROM alerts")
     total_alerts = cursor.fetchone()[0]
     
-    print(f"\n📊 Total alerts in database: {total_alerts}")
     
     # Show breakdown by status
     cursor.execute("""
@@ -207,9 +203,7 @@ def create_diverse_alerts():
         ORDER BY count DESC
     """)
     
-    print("\n📋 Alerts by status:")
     for row in cursor.fetchall():
-        print(f"  - {row[0]}: {row[1]} alerts")
     
     # Show breakdown by type
     cursor.execute("""
@@ -219,9 +213,7 @@ def create_diverse_alerts():
         ORDER BY count DESC
     """)
     
-    print("\n📋 Alerts by type:")
     for row in cursor.fetchall():
-        print(f"  - {row[0]}: {row[1]} alerts")
     
     # Show breakdown by related_type_id
     cursor.execute("""
@@ -231,10 +223,8 @@ def create_diverse_alerts():
         ORDER BY count DESC
     """)
     
-    print("\n📋 Alerts by related type:")
     for row in cursor.fetchall():
         type_name = {1: 'Account', 2: 'Trade', 3: 'Trade Plan', 4: 'Ticker'}.get(row[0], 'Unknown')
-        print(f"  - {type_name} ({row[0]}): {row[1]} alerts")
     
     # Show breakdown by condition_attribute
     cursor.execute("""
@@ -244,9 +234,7 @@ def create_diverse_alerts():
         ORDER BY count DESC
     """)
     
-    print("\n📋 Alerts by condition attribute:")
     for row in cursor.fetchall():
-        print(f"  - {row[0]}: {row[1]} alerts")
     
     # Show breakdown by condition_operator
     cursor.execute("""
@@ -256,9 +244,7 @@ def create_diverse_alerts():
         ORDER BY count DESC
     """)
     
-    print("\n📋 Alerts by condition operator:")
     for row in cursor.fetchall():
-        print(f"  - {row[0]}: {row[1]} alerts")
     
     # Show recent alerts
     cursor.execute("""
@@ -269,13 +255,10 @@ def create_diverse_alerts():
         LIMIT 5
     """)
     
-    print("\n📋 Recent alerts:")
     for row in cursor.fetchall():
         type_name = {1: 'Account', 2: 'Trade', 3: 'Trade Plan', 4: 'Ticker'}.get(row[5], 'Unknown')
-        print(f"  - ID: {row[0]}, Type: {row[1]}, Condition: {row[2]} {row[3]} {row[4]}, Related: {type_name}, Status: {row[6]}, Triggered: {row[7]}, Created: {row[8]}")
     
     conn.close()
-    print("\n✅ Diverse alerts created successfully!")
 
 if __name__ == "__main__":
     create_diverse_alerts()

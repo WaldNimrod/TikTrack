@@ -52,27 +52,20 @@ def create_currencies_table():
             # Create table
             connection.execute(text(create_table_sql))
             connection.commit()
-            print("✓ Currencies table created successfully")
             
             # Create index
             connection.execute(text(create_index_sql))
             connection.commit()
-            print("✓ Index on symbol field created successfully")
             
             # Verify table was created
             result = connection.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='currencies'"))
             if result.fetchone():
-                print("✓ Table exists and recognized by system")
             else:
-                print("✗ Error: Table was not created properly")
                 return False
         
-        print("\n🎉 Migration completed successfully!")
-        print("📋 Next step: Run add_currencies.py script to add initial currencies")
         return True
         
     except Exception as e:
-        print(f"✗ Error creating table: {e}")
         return False
 
 def verify_table_structure():
@@ -86,8 +79,6 @@ def verify_table_structure():
             result = connection.execute(text("PRAGMA table_info(currencies)"))
             columns = result.fetchall()
             
-            print("\n📋 Currencies table structure:")
-            print("=" * 50)
             
             expected_columns = {
                 'id': 'INTEGER PRIMARY KEY',
@@ -102,7 +93,6 @@ def verify_table_structure():
                 col_name = col[1]
                 col_type = col[2]
                 found_columns[col_name] = col_type
-                print(f"  {col_name}: {col_type}")
             
             # Check that all required fields exist
             missing_columns = []
@@ -111,24 +101,18 @@ def verify_table_structure():
                     missing_columns.append(expected_col)
             
             if missing_columns:
-                print(f"\n⚠️  Missing fields: {', '.join(missing_columns)}")
                 return False
             else:
-                print("\n✓ All required fields exist")
                 return True
                 
     except Exception as e:
-        print(f"✗ Error checking table structure: {e}")
         return False
 
 if __name__ == "__main__":
-    print("🔄 Creating currencies table - TikTrack")
-    print("=" * 50)
     
     # Create table
     if create_currencies_table():
         # Check structure
         verify_table_structure()
     else:
-        print("\n❌ Migration failed")
         sys.exit(1)

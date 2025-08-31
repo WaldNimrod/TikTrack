@@ -45,12 +45,6 @@ def main():
     """
     הפעלת השרת עם Waitress המתוקן
     """
-    print("🚀 Starting TikTrack with Fixed Waitress Server...")
-    print("📍 Server will run on: http://127.0.0.1:8080")
-    print("⚡ Fixed configuration - more stable")
-    print("📝 Detailed logs will be saved to server_detailed.log")
-    print("🛑 Press Ctrl+C to stop the server")
-    print("-" * 50)
     
     logger.info("Starting TikTrack server with Fixed Waitress")
     
@@ -58,16 +52,13 @@ def main():
         # בדיקת תיקיות וקבצים חיוניים לפני הפעלת השרת
         if not os.path.exists("db/simpleTrade_new.db"):
             logger.error("Database file not found!")
-            print("❌ Database file not found at db/simpleTrade_new.db")
             sys.exit(1)
         
         if not os.path.exists("../trading-ui"):
             logger.error("UI directory not found!")
-            print("❌ UI directory not found at ../trading-ui")
             sys.exit(1)
         
         logger.info("All required files and directories found")
-        print("✅ All required files and directories found")
         
         # הפעלת השרת עם Waitress - הגדרות יציבות
         # הגדרות אלו נבחרו בקפידה למניעת segmentation fault
@@ -86,10 +77,8 @@ def main():
         )
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
-        print("\n🛑 Server stopped by user")
     except Exception as e:
         logger.error(f"Error starting server: {e}")
-        print(f"❌ Error starting server: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

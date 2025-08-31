@@ -113,7 +113,7 @@
     <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
   <script src="scripts/account-service.js"></script>
   <script src="scripts/executions.js?v=20250830_1"></script>
-      <script src="scripts/trades.js?v=20250830_20"></script>
+      <script src="scripts/trades.js?v=20250830_21"></script>
 </head>
 
 <body>
@@ -342,7 +342,19 @@
           </div>
           <div class="modal-body">
             <form id="editTradeForm">
-              <!-- שורה ראשונה: סוג + צד -->
+              <!-- שורה ראשונה: תוכנית טרייד -->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-3">
+                    <label for="editTradeTradePlanId" class="form-label">תוכנית טרייד</label>
+                    <select class="form-select" id="editTradeTradePlanId">
+                      <option value="">ללא תוכנית</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- שורה שנייה: סוג + צד -->
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-2">
@@ -457,17 +469,7 @@
                 </div>
               </div>
 
-              <!-- שורה שביעית: תוכנית טרייד -->
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="mb-3">
-                    <label for="editTradeTradePlanId" class="form-label">תוכנית טרייד</label>
-                    <select class="form-select" id="editTradeTradePlanId">
-                      <option value="">ללא תוכנית</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
+
 
               <!-- שורה שמינית: טבלת עסקאות -->
               <div class="row">
@@ -635,7 +637,7 @@
                 <div class="col-md-6">
                   <div class="mb-2">
                     <label for="addTradeType" class="form-label">סוג</label>
-                    <select class="form-select" id="addTradeType" required>
+                    <select class="form-select" id="addTradeType" required disabled>
                       <option value="swing">סווינג</option>
                       <option value="investment">השקעה</option>
                       <option value="passive">פאסיבי</option>
@@ -646,7 +648,7 @@
                 <div class="col-md-6">
                   <div class="mb-2">
                     <label for="addTradeSide" class="form-label">צד</label>
-                    <select class="form-select" id="addTradeSide" required>
+                    <select class="form-select" id="addTradeSide" required disabled>
                       <option value="Long">Long</option>
                       <option value="Short">Short</option>
                     </select>
@@ -660,7 +662,7 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addTradeAccountId" class="form-label">חשבון</label>
-                    <select class="form-select" id="addTradeAccountId" required>
+                    <select class="form-select" id="addTradeAccountId" required disabled>
                       <option value="">בחר חשבון</option>
                     </select>
                     <div class="invalid-feedback" id="accountError"></div>
@@ -669,18 +671,18 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="addTradeOpenedAt" class="form-label">תאריך יצירה *</label>
-                    <input type="datetime-local" class="form-control" id="addTradeOpenedAt" required>
+                    <input type="datetime-local" class="form-control" id="addTradeOpenedAt" required disabled>
                     <div class="invalid-feedback" id="createdAtError"></div>
                   </div>
                 </div>
               </div>
 
-              <!-- שורה רביעית: הערות -->
+              <!-- שורה חמישית: הערות -->
               <div class="row">
                 <div class="col-md-12">
                   <div class="mb-3">
                     <label for="addTradeNotes" class="form-label">הערות</label>
-                    <textarea class="form-control" id="addTradeNotes" rows="3"></textarea>
+                    <textarea class="form-control" id="addTradeNotes" rows="3" disabled></textarea>
                   </div>
                 </div>
               </div>

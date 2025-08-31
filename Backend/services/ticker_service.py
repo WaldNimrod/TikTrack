@@ -71,7 +71,6 @@ class TickerService:
             
         Example:
             >>> tickers = TickerService.get_all(db_session)
-            >>> print(f"Number of tickers in system: {len(tickers)}")
         """
         return db.query(Ticker).all()
     
@@ -90,7 +89,6 @@ class TickerService:
         Example:
             >>> ticker = TickerService.get_by_id(db_session, 1)
             >>> if ticker:
-            ...     print(f"Found ticker: {ticker.symbol}")
         """
         return db.query(Ticker).filter(Ticker.id == ticker_id).first()
     
@@ -109,7 +107,6 @@ class TickerService:
         Example:
             >>> ticker = TickerService.get_by_symbol(db_session, "AAPL")
             >>> if ticker:
-            ...     print(f"Found ticker: {ticker.name}")
         """
         return db.query(Ticker).filter(Ticker.symbol == symbol.upper()).first()
     
@@ -138,8 +135,6 @@ class TickerService:
         Example:
             >>> data = {'symbol': 'AAPL', 'name': 'Apple Inc.', 'type': 'stock'}
             >>> result = TickerService.validate_ticker_data(data)
-            >>> print(f"Valid: {result['is_valid']}")
-            >>> print(f"Errors: {result['errors']}")
         """
         errors = []
         warnings = []
@@ -598,7 +593,6 @@ class TickerService:
             
         Example:
             >>> updated_count = TickerService.update_all_active_trades_status(db_session)
-            >>> print(f"Updated {updated_count} tickers")
         """
         from models.trade import Trade
         
@@ -699,7 +693,6 @@ class TickerService:
             
         Example:
             >>> updated_count = TickerService.update_all_ticker_statuses_auto(db_session)
-            >>> print(f"Updated {updated_count} tickers")
         """
         from models.trade import Trade
         from models.trade_plan import TradePlan

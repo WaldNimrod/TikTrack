@@ -21,7 +21,6 @@ def insert_trades_constraints():
     cursor = conn.cursor()
     
     try:
-        print("📊 Inserting trades table constraints...")
         
         # 1. investment_type ENUM constraint
         cursor.execute("""
@@ -101,11 +100,9 @@ def insert_trades_constraints():
               'ticker_id IS NOT NULL'))
         
         conn.commit()
-        print("✅ Trades constraints inserted successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error inserting trades constraints: {e}")
         conn.rollback()
         return False
     finally:
@@ -117,7 +114,6 @@ def insert_trade_plans_constraints():
     cursor = conn.cursor()
     
     try:
-        print("📊 Inserting trade_plans table constraints...")
         
         # 1. investment_type ENUM constraint
         cursor.execute("""
@@ -203,11 +199,9 @@ def insert_trade_plans_constraints():
               'stop_price > 0'))
         
         conn.commit()
-        print("✅ Trade plans constraints inserted successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error inserting trade_plans constraints: {e}")
         conn.rollback()
         return False
     finally:
@@ -219,7 +213,6 @@ def insert_alerts_constraints():
     cursor = conn.cursor()
     
     try:
-        print("📊 Inserting alerts table constraints...")
         
         # 1. is_triggered ENUM constraint
         cursor.execute("""
@@ -285,11 +278,9 @@ def insert_alerts_constraints():
             """, (constraint_id, value, display_name, sort_order))
         
         conn.commit()
-        print("✅ Alerts constraints inserted successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error inserting alerts constraints: {e}")
         conn.rollback()
         return False
     finally:
@@ -301,7 +292,6 @@ def insert_cash_flows_constraints():
     cursor = conn.cursor()
     
     try:
-        print("📊 Inserting cash_flows table constraints...")
         
         # 1. type ENUM constraint
         cursor.execute("""
@@ -364,11 +354,9 @@ def insert_cash_flows_constraints():
               'usd_rate > 0'))
         
         conn.commit()
-        print("✅ Cash flows constraints inserted successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error inserting cash_flows constraints: {e}")
         conn.rollback()
         return False
     finally:
@@ -380,7 +368,6 @@ def insert_tickers_constraints():
     cursor = conn.cursor()
     
     try:
-        print("📊 Inserting tickers table constraints...")
         
         # 1. status ENUM constraint
         cursor.execute("""
@@ -427,11 +414,9 @@ def insert_tickers_constraints():
             """, (constraint_id, value, display_name, sort_order))
         
         conn.commit()
-        print("✅ Tickers constraints inserted successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error inserting tickers constraints: {e}")
         conn.rollback()
         return False
     finally:
@@ -443,7 +428,6 @@ def insert_accounts_constraints():
     cursor = conn.cursor()
     
     try:
-        print("📊 Inserting accounts table constraints...")
         
         # 1. status ENUM constraint
         cursor.execute("""
@@ -467,11 +451,9 @@ def insert_accounts_constraints():
             """, (constraint_id, value, display_name, sort_order))
         
         conn.commit()
-        print("✅ Accounts constraints inserted successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error inserting accounts constraints: {e}")
         conn.rollback()
         return False
     finally:
@@ -483,7 +465,6 @@ def insert_executions_constraints():
     cursor = conn.cursor()
     
     try:
-        print("📊 Inserting executions table constraints...")
         
         # 1. source ENUM constraint
         cursor.execute("""
@@ -515,11 +496,9 @@ def insert_executions_constraints():
               'date >= (SELECT open_date FROM trades WHERE id = trade_id)'))
         
         conn.commit()
-        print("✅ Executions constraints inserted successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error inserting executions constraints: {e}")
         conn.rollback()
         return False
     finally:
@@ -531,7 +510,6 @@ def verify_constraints():
     cursor = conn.cursor()
     
     try:
-        print("\n📋 Verifying constraints...")
         
         # Count constraints by table
         cursor.execute("""
@@ -542,14 +520,11 @@ def verify_constraints():
         """)
         
         results = cursor.fetchall()
-        print("📊 Constraints by table:")
         for table_name, count in results:
-            print(f"  - {table_name}: {count} constraints")
         
         # Count enum values
         cursor.execute("SELECT COUNT(*) FROM enum_values")
         enum_count = cursor.fetchone()[0]
-        print(f"📊 Total enum values: {enum_count}")
         
         # Show sample constraints
         cursor.execute("""
@@ -558,69 +533,50 @@ def verify_constraints():
             ORDER BY table_name, column_name
         """)
         
-        print("\n📋 Sample constraints:")
         for table_name, column_name, constraint_type, constraint_name in cursor.fetchall():
-            print(f"  - {table_name}.{column_name}: {constraint_type} ({constraint_name})")
         
         return True
         
     except Exception as e:
-        print(f"❌ Error verifying constraints: {e}")
         return False
     finally:
         conn.close()
 
 def main():
     """Main migration function"""
-    print("🚀 Starting Basic Constraints Insertion")
-    print("=" * 60)
     
     # Step 1: Insert trades constraints
     if not insert_trades_constraints():
-        print("❌ Failed to insert trades constraints")
         return
     
     # Step 2: Insert trade_plans constraints
     if not insert_trade_plans_constraints():
-        print("❌ Failed to insert trade_plans constraints")
         return
     
     # Step 3: Insert alerts constraints
     if not insert_alerts_constraints():
-        print("❌ Failed to insert alerts constraints")
         return
     
     # Step 4: Insert cash_flows constraints
     if not insert_cash_flows_constraints():
-        print("❌ Failed to insert cash_flows constraints")
         return
     
     # Step 5: Insert tickers constraints
     if not insert_tickers_constraints():
-        print("❌ Failed to insert tickers constraints")
         return
     
     # Step 6: Insert accounts constraints
     if not insert_accounts_constraints():
-        print("❌ Failed to insert accounts constraints")
         return
     
     # Step 7: Insert executions constraints
     if not insert_executions_constraints():
-        print("❌ Failed to insert executions constraints")
         return
     
     # Step 8: Verify all constraints
     if not verify_constraints():
-        print("❌ Constraint verification failed")
         return
     
-    print("\n✅ Basic Constraints Insertion Completed Successfully!")
-    print("📝 Next steps:")
-    print("  1. Create constraint service")
-    print("  2. Update API routes")
-    print("  3. Test constraint validation")
-    print("  4. Create frontend interface")
 
 if __name__ == "__main__":
     main()

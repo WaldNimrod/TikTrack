@@ -31,18 +31,12 @@ def signal_handler(signum, frame):
     """
     מטפל בסיגנלים לעצירה מסודרת
     """
-    print(f"\n🛑 Received signal {signum}, shutting down gracefully...")
     sys.exit(0)
 
 def main():
     """
     הפעלת השרת היציב
     """
-    print("🚀 Starting TikTrack with Stable Server...")
-    print("📍 Server will run on: http://127.0.0.1:8080")
-    print("🛡️  Stable configuration - less memory usage")
-    print("🛑 Press Ctrl+C to stop the server")
-    print("-" * 50)
     
     # הגדרת signal handlers לעצירה מסודרת
     signal.signal(signal.SIGINT, signal_handler)   # Ctrl+C
@@ -60,9 +54,7 @@ def main():
             processes=1,                # ✅ רק process אחד - מניעת בעיות
         )
     except KeyboardInterrupt:
-        print("\n🛑 Server stopped by user")
     except Exception as e:
-        print(f"❌ Error starting server: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

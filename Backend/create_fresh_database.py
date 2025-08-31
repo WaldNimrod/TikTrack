@@ -494,24 +494,13 @@ class DatabaseRecreator:
 
 def main():
     """Main execution function"""
-    print("=" * 60)
-    print("🗄️  TikTrack Database Recreation Script")
-    print("=" * 60)
-    print()
-    print("⚠️  WARNING: This will DELETE the existing database!")
-    print("📦 A backup will be created before deletion.")
-    print()
     
     response = input("Do you want to continue? (yes/no): ").lower().strip()
     
     if response in ['yes', 'y', 'כן']:
         recreator = DatabaseRecreator()
         recreator.create_fresh_database()
-        print()
-        print("✅ Database recreation completed successfully!")
-        print("🚀 You can now start the TikTrack application.")
     else:
-        print("❌ Operation cancelled by user.")
 
 if __name__ == "__main__":
     main()

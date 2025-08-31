@@ -31,35 +31,29 @@ def update_accounts_currency_table():
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
         with engine.connect() as connection:
-            print("🔄 Starting accounts table update...")
             
             # 1. Check that currencies table exists
             result = connection.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='currencies'"))
             if not result.fetchone():
-                print("❌ Error: Currencies table does not exist. Run create_currencies_table.py first")
                 return False
             
             # 2. Check that there are currencies in the table
             result = connection.execute(text("SELECT COUNT(*) as count FROM currencies"))
             currency_count = result.fetchone()[0]
             if currency_count == 0:
-                print("❌ Error: No currencies in currencies table. Run add_currencies.py first")
                 return False
             
-            print(f"✓ Found {currency_count} currencies in currencies table")
             
             # 3. Check if currency_id column already exists
             result = connection.execute(text("PRAGMA table_info(accounts)"))
             columns = [col[1] for col in result.fetchall()]
             
             if 'currency_id' in columns:
-                print("⚠️  Currency_id column already exists in accounts table")
                 return True
             
             # 4. Create new currency_id column
             connection.execute(text("ALTER TABLE accounts ADD COLUMN currency_id INTEGER"))
             connection.commit()
-            print("✓ Added currency_id column to accounts table")
             
             # 5. Map existing currencies to IDs
             currency_mapping = {}
@@ -67,7 +61,6 @@ def update_accounts_currency_table():
             for row in result.fetchall():
                 currency_mapping[row[1]] = row[0]
             
-            print(f"✓ Currency mapping: {currency_mapping}")
             
             # 6. Update existing records
             result = connection.execute(text("SELECT id, currency FROM accounts WHERE currency IS NOT NULL"))
@@ -92,10 +85,8 @@ def update_accounts_currency_table():
                         {"currency_id": default_currency_id, "account_id": account_id}
                     )
                     updated_count += 1
-                    print(f"⚠️  Account {account_id}: Currency '{currency_str}' not found, set to USD")
             
             connection.commit()
-            print(f"✓ Updated {updated_count} accounts with currency IDs")
             
             # 7. Set default for records without currency
             usd_id = currency_mapping.get('USD', 1)
@@ -106,7 +97,6 @@ def update_accounts_currency_table():
             connection.commit()
             
             if result.rowcount > 0:
-                print(f"✓ Default currency (USD) set for {result.rowcount} accounts")
             
             # 8. Create Foreign Key constraint (indirectly in SQLite)
             # SQLite doesn't support ALTER TABLE ADD CONSTRAINT, so verify data integrity
@@ -119,17 +109,12 @@ def update_accounts_currency_table():
             
             invalid_count = result.fetchone()[0]
             if invalid_count > 0:
-                print(f"❌ Error: Found {invalid_count} accounts with invalid currency IDs")
                 return False
             
-            print("✓ All currency IDs in accounts are valid")
             
-            print("\n🎉 Accounts table update completed successfully!")
-            print("📋 Next step: Update tickers table")
             return True
             
     except Exception as e:
-        print(f"❌ Error updating accounts table: {e}")
         return False
 
 def verify_accounts_update():
@@ -139,17 +124,13 @@ def verify_accounts_update():
         engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
         
         with engine.connect() as connection:
-            print("\n📋 Verifying update results:")
-            print("=" * 50)
             
             # Check table structure
             result = connection.execute(text("PRAGMA table_info(accounts)"))
             columns = result.fetchall()
             
-            print("Accounts table structure:")
             for col in columns:
                 col_name, col_type = col[1], col[2]
-                print(f"  {col_name}: {col_type}")
             
             # Check data
             result = connection.execute(text("""
@@ -166,24 +147,18 @@ def verify_accounts_update():
             
             accounts = result.fetchall()
             if accounts:
-                print("\nAccount examples:")
                 for acc in accounts:
-                    print(f"  Account {acc[0]}: {acc[1]} | Currency: {acc[3]} ({acc[4]})")
             
             return True
             
     except Exception as e:
-        print(f"❌ Error verifying update: {e}")
         return False
 
 if __name__ == "__main__":
-    print("🔄 Updating accounts table to use currency IDs - TikTrack")
-    print("=" * 70)
     
     # Update table
     if update_accounts_currency_table():
         # Verify results
         verify_accounts_update()
     else:
-        print("\n❌ Update failed")
         sys.exit(1)

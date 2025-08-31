@@ -37,4 +37,3 @@ def init_db() -> None:
     from models.base import Base
     from models import ticker, trade, account, trade_plan, alert, cash_flow, note, execution, currency, note_relation_type
     Base.metadata.create_all(bind=engine)
-    print("✅ Database tables created successfully!")

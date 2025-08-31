@@ -10,21 +10,17 @@ def update_alert_constraints():
     db_path = 'db/simpleTrade_new.db'
     
     if not os.path.exists(db_path):
-        print(f"Database not found at {db_path}")
         return
     
     # Connect to database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    print("Starting alert constraints update...")
     
     # Create backup
     cursor.execute("CREATE TABLE IF NOT EXISTS alerts_backup_old AS SELECT * FROM alerts")
-    print("Created backup table alerts_backup_old")
     
     # Remove the old CHECK constraint by recreating the table
-    print("Removing old CHECK constraint...")
     
     # Get current data
     cursor.execute("SELECT * FROM alerts")
@@ -67,14 +63,12 @@ def update_alert_constraints():
     cursor.execute("CREATE INDEX idx_alerts_related_type_id ON alerts(related_type_id)")
     cursor.execute("CREATE INDEX idx_alerts_created_at ON alerts(created_at)")
     
-    print("Recreated table without old constraint")
     
     # Insert data back
     if alerts_data:
         placeholders = ','.join(['?' for _ in column_names])
         insert_sql = f"INSERT INTO alerts ({','.join(column_names)}) VALUES ({placeholders})"
         cursor.executemany(insert_sql, alerts_data)
-        print(f"Reinserted {len(alerts_data)} alerts")
     
     # Define condition mapping to new format
     condition_mapping = {
@@ -102,7 +96,6 @@ def update_alert_constraints():
         """, (new_condition, old_condition))
         
         if cursor.rowcount > 0:
-            print(f"Updated {cursor.rowcount} alerts from '{old_condition}' to '{new_condition}'")
             updated_count += cursor.rowcount
     
     # For any remaining conditions that don't follow the format, set a default
@@ -114,24 +107,19 @@ def update_alert_constraints():
     
     remaining_updated = cursor.rowcount
     if remaining_updated > 0:
-        print(f"Updated {remaining_updated} alerts with default condition")
         updated_count += remaining_updated
     
     # Commit changes
     conn.commit()
     
     # Show results
-    print(f"\nTotal alerts updated: {updated_count}")
     
     # Show current conditions
     cursor.execute("SELECT DISTINCT condition FROM alerts LIMIT 10")
     current_conditions = cursor.fetchall()
-    print("\nCurrent conditions in database:")
     for condition in current_conditions:
-        print(f"  - {condition[0]}")
     
     conn.close()
-    print("\nAlert constraints updated successfully!")
 
 if __name__ == "__main__":
     update_alert_constraints()

@@ -22,14 +22,12 @@ def upgrade():
     """
     Add triggers to automatically update active_trades field
     """
-    print("🔄 Adding active_trades triggers...")
     
     # Get database path
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     db_path = os.path.join(base_dir, "db", "simpleTrade_new.db")
     
     if not os.path.exists(db_path):
-        print(f"❌ Database not found at: {db_path}")
         return False
     
     try:
@@ -115,9 +113,7 @@ def upgrade():
         """)
         triggers = cursor.fetchall()
         
-        print(f"✅ Created {len(triggers)} triggers:")
         for trigger in triggers:
-            print(f"   - {trigger[0]}")
         
         # Show updated tickers
         cursor.execute("""
@@ -127,16 +123,12 @@ def upgrade():
         """)
         active_tickers = cursor.fetchall()
         
-        print(f"✅ Found {len(active_tickers)} tickers with active trades:")
         for ticker in active_tickers:
-            print(f"   - {ticker[1]} ({ticker[2]}) - ID: {ticker[0]}")
         
         conn.close()
-        print("✅ Active trades triggers migration completed successfully!")
         return True
         
     except Exception as e:
-        print(f"❌ Error in migration: {e}")
         if conn:
             conn.rollback()
             conn.close()
@@ -147,13 +139,11 @@ def downgrade():
     """
     Remove the active_trades triggers
     """
-    print("🔄 Removing active_trades triggers...")
     
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     db_path = os.path.join(base_dir, "db", "simpleTrade_new.db")
     
     if not os.path.exists(db_path):
-        print(f"❌ Database not found at: {db_path}")
         return False
     
     try:
@@ -169,7 +159,6 @@ def downgrade():
         
         for trigger_name in triggers_to_drop:
             cursor.execute(f"DROP TRIGGER IF EXISTS {trigger_name}")
-            print(f"✅ Dropped trigger: {trigger_name}")
         
         # Reset all active_trades to False
         cursor.execute("""
@@ -181,11 +170,9 @@ def downgrade():
         conn.commit()
         conn.close()
         
-        print("✅ Active trades triggers removed successfully!")
         return True
         
     except Exception as e:
-        print(f"❌ Error in downgrade: {e}")
         if conn:
             conn.rollback()
             conn.close()
@@ -193,13 +180,9 @@ def downgrade():
 
 
 if __name__ == "__main__":
-    print("🚀 Running Active Trades Trigger Migration")
-    print("=" * 50)
     
     success = upgrade()
     
     if success:
-        print("✅ Migration completed successfully!")
     else:
-        print("❌ Migration failed!")
         exit(1)

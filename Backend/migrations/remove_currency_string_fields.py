@@ -15,7 +15,6 @@ def migrate():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'simpleTrade_new.db')
     
     if not os.path.exists(db_path):
-        print(f"❌ Database not found at {db_path}")
         return False
     
     try:
@@ -23,10 +22,8 @@ def migrate():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        print("🔄 Starting migration: Remove currency string fields")
         
         # 1. Backup current data
-        print("📋 Backing up current data...")
         
         # Backup tickers table
         cursor.execute("DROP TABLE IF EXISTS tickers_backup")
@@ -43,7 +40,6 @@ def migrate():
         """)
         
         # 2. Create new tickers table without currency field
-        print("🔧 Creating new tickers table...")
         cursor.execute("DROP TABLE IF EXISTS tickers_new")
         cursor.execute("""
             CREATE TABLE tickers_new (
@@ -62,7 +58,6 @@ def migrate():
         """)
         
         # 3. Create new cash_flows table without currency field
-        print("🔧 Creating new cash_flows table...")
         cursor.execute("DROP TABLE IF EXISTS cash_flows_new")
         cursor.execute("""
             CREATE TABLE cash_flows_new (
@@ -84,7 +79,6 @@ def migrate():
         """)
         
         # 4. Copy data from old tables to new tables
-        print("📊 Copying data to new tables...")
         
         # Copy tickers data (converting currency to currency_id)
         cursor.execute("""
@@ -123,23 +117,19 @@ def migrate():
         """)
         
         # 5. Drop old tables
-        print("🗑️ Dropping old tables...")
         cursor.execute("DROP TABLE tickers")
         cursor.execute("DROP TABLE cash_flows")
         
         # 6. Rename new tables
-        print("🔄 Renaming new tables...")
         cursor.execute("ALTER TABLE tickers_new RENAME TO tickers")
         cursor.execute("ALTER TABLE cash_flows_new RENAME TO cash_flows")
         
         # 7. Recreate indexes
-        print("🔗 Recreating indexes...")
         cursor.execute("CREATE UNIQUE INDEX ix_tickers_symbol ON tickers (symbol)")
         cursor.execute("CREATE INDEX ix_tickers_id ON tickers (id)")
         cursor.execute("CREATE INDEX ix_cash_flows_id ON cash_flows (id)")
         
         # 8. Update constraints table - remove currency field constraints
-        print("🔧 Updating constraints...")
         
         # Remove constraints for currency field in tickers
         cursor.execute("""
@@ -182,7 +172,6 @@ def migrate():
         # Commit changes
         conn.commit()
         
-        print("✅ Migration completed successfully!")
         
         # Print summary
         cursor.execute("SELECT COUNT(*) FROM tickers")
@@ -191,16 +180,10 @@ def migrate():
         cursor.execute("SELECT COUNT(*) FROM cash_flows")
         cash_flows_count = cursor.fetchone()[0]
         
-        print(f"📊 Summary:")
-        print(f"   - Tickers: {tickers_count} records")
-        print(f"   - Cash Flows: {cash_flows_count} records")
-        print(f"   - Currency field removed from both tables")
-        print(f"   - Only currency_id field remains")
         
         return True
         
     except Exception as e:
-        print(f"❌ Migration failed: {str(e)}")
         conn.rollback()
         return False
         

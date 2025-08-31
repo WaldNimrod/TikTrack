@@ -18,5 +18,3 @@ DATABASE_URL = f"sqlite:///{DB_PATH}"
 if not UI_DIR.exists():
     raise FileNotFoundError(f"UI directory not found at: {UI_DIR}")
 
-print(f"✅ UI Directory: {UI_DIR}")
-print(f"✅ Database will be created at: {DB_PATH}")

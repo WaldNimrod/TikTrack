@@ -10,7 +10,6 @@ def fix_alert_conditions():
     db_path = 'db/simpleTrade_new.db'
     
     if not os.path.exists(db_path):
-        print(f"Database not found at {db_path}")
         return
     
     # Connect to database
@@ -19,7 +18,6 @@ def fix_alert_conditions():
     
     # Create backup
     cursor.execute("CREATE TABLE IF NOT EXISTS alerts_backup AS SELECT * FROM alerts")
-    print("Created backup table alerts_backup")
     
     # Define condition mapping
     condition_mapping = {
@@ -45,7 +43,6 @@ def fix_alert_conditions():
         """, (new_condition, old_condition))
         
         if cursor.rowcount > 0:
-            print(f"Updated {cursor.rowcount} alerts from '{old_condition}' to '{new_condition}'")
             updated_count += cursor.rowcount
     
     # For any remaining conditions that don't follow the format, set a default
@@ -57,24 +54,19 @@ def fix_alert_conditions():
     
     remaining_updated = cursor.rowcount
     if remaining_updated > 0:
-        print(f"Updated {remaining_updated} alerts with default condition")
         updated_count += remaining_updated
     
     # Commit changes
     conn.commit()
     
     # Show results
-    print(f"\nTotal alerts updated: {updated_count}")
     
     # Show current conditions
     cursor.execute("SELECT DISTINCT condition FROM alerts LIMIT 10")
     current_conditions = cursor.fetchall()
-    print("\nCurrent conditions in database:")
     for condition in current_conditions:
-        print(f"  - {condition[0]}")
     
     conn.close()
-    print("\nAlert conditions fixed successfully!")
 
 if __name__ == "__main__":
     fix_alert_conditions()

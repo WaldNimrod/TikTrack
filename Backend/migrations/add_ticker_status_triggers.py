@@ -24,14 +24,12 @@ def upgrade():
     """
     Add triggers to automatically update ticker status and active_trades
     """
-    print("🔄 Adding ticker status triggers...")
     
     # Get database path
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     db_path = os.path.join(base_dir, "db", "simpleTrade_new.db")
     
     if not os.path.exists(db_path):
-        print(f"❌ Database not found at: {db_path}")
         return False
     
     try:
@@ -268,9 +266,7 @@ def upgrade():
         """)
         triggers = cursor.fetchall()
         
-        print(f"✅ Created {len(triggers)} ticker status triggers:")
         for trigger in triggers:
-            print(f"   - {trigger[0]}")
         
         # Show updated tickers
         cursor.execute("""
@@ -280,16 +276,12 @@ def upgrade():
         """)
         tickers = cursor.fetchall()
         
-        print(f"✅ Updated {len(tickers)} tickers:")
         for ticker in tickers:
-            print(f"   - {ticker[1]} ({ticker[2]}) - Status: {ticker[3]}, Active: {ticker[4]}")
         
         conn.close()
-        print("✅ Ticker status triggers migration completed successfully!")
         return True
         
     except Exception as e:
-        print(f"❌ Error in migration: {e}")
         if conn:
             conn.rollback()
             conn.close()
@@ -300,13 +292,11 @@ def downgrade():
     """
     Remove the ticker status triggers
     """
-    print("🔄 Removing ticker status triggers...")
     
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     db_path = os.path.join(base_dir, "db", "simpleTrade_new.db")
     
     if not os.path.exists(db_path):
-        print(f"❌ Database not found at: {db_path}")
         return False
     
     try:
@@ -325,7 +315,6 @@ def downgrade():
         
         for trigger_name in triggers_to_drop:
             cursor.execute(f"DROP TRIGGER IF EXISTS {trigger_name}")
-            print(f"✅ Dropped trigger: {trigger_name}")
         
         # Reset all tickers to closed status
         cursor.execute("""
@@ -339,11 +328,9 @@ def downgrade():
         conn.commit()
         conn.close()
         
-        print("✅ Ticker status triggers removed successfully!")
         return True
         
     except Exception as e:
-        print(f"❌ Error in downgrade: {e}")
         if conn:
             conn.rollback()
             conn.close()
@@ -351,13 +338,9 @@ def downgrade():
 
 
 if __name__ == "__main__":
-    print("🚀 Running Ticker Status Triggers Migration")
-    print("=" * 50)
     
     success = upgrade()
     
     if success:
-        print("✅ Migration completed successfully!")
     else:
-        print("❌ Migration failed!")
         exit(1)

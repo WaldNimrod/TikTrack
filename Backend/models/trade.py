@@ -126,10 +126,8 @@ def update_ticker_active_trades(session, ticker_id: int) -> None:
             ticker.updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             session.flush()  # Flush to ensure the change is applied
             
-            print(f"✅ Updated ticker {ticker.symbol} (ID: {ticker_id}) active_trades to: {ticker.active_trades}")
         
     except Exception as e:
-        print(f"❌ Error updating ticker {ticker_id} active_trades: {e}")
         session.rollback()
 
 
@@ -139,7 +137,6 @@ def trade_inserted(mapper, connection, target):
     Event listener for when a trade is inserted
     Updates the active_trades field of the related ticker
     """
-    print(f"🔄 Trade inserted: ID {target.id}, Ticker ID {target.ticker_id}, Status {target.status}")
     
     # Skip the update for now to avoid the error
     pass
@@ -151,7 +148,6 @@ def trade_updated(mapper, connection, target):
     Event listener for when a trade is updated
     Updates the active_trades field of the related ticker
     """
-    print(f"🔄 Trade updated: ID {target.id}, Ticker ID {target.ticker_id}, Status {target.status}")
     
     # Skip the update for now to avoid the error
     pass
@@ -163,7 +159,6 @@ def trade_deleted(mapper, connection, target):
     Event listener for when a trade is deleted
     Updates the active_trades field of the related ticker
     """
-    print(f"🔄 Trade deleted: ID {target.id}, Ticker ID {target.ticker_id}")
     
     # Skip the update for now to avoid the error
     pass

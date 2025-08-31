@@ -116,3 +116,4 @@ window.createButton = createButton;
 window.createEditButton = createEditButton;
 window.createDeleteButton = createDeleteButton;
 window.createLinkButton = createLinkButton;
+window.getButtonClass = getButtonClass;

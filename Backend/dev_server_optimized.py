@@ -109,28 +109,9 @@ CORS(app, origins=['http://127.0.0.1:8080', 'http://localhost:8080'])
 # Initialize database
 try:
     init_db()
-    print("✅ Database initialized successfully")
 except Exception as e:
-    print(f"⚠️ Database initialization warning: {e}")
 
 # Register blueprints
-app.register_blueprint(accounts_bp, url_prefix='/api/v1/accounts')
-app.register_blueprint(tickers_bp, url_prefix='/api/v1/tickers')
-app.register_blueprint(trades_bp, url_prefix='/api/v1/trades')
-app.register_blueprint(trade_plans_bp, url_prefix='/api/v1/trade_plans')
-app.register_blueprint(alerts_bp, url_prefix='/api/v1/alerts')
-app.register_blueprint(cash_flows_bp, url_prefix='/api/v1/cash_flows')
-app.register_blueprint(notes_bp, url_prefix='/api/v1/notes')
-app.register_blueprint(executions_bp, url_prefix='/api/v1/executions')
-app.register_blueprint(preferences_bp, url_prefix='/api/v1/preferences')
-app.register_blueprint(tests_bp, url_prefix='/api/v1/tests')
-app.register_blueprint(test_suite_bp, url_prefix='/api/v1/test_suite')
-app.register_blueprint(constraints_bp, url_prefix='/api/v1/constraints')
-app.register_blueprint(currencies_bp, url_prefix='/api/v1/currencies')
-app.register_blueprint(linked_items_bp, url_prefix='/api/v1/linked_items')
-app.register_blueprint(note_relation_types_bp, url_prefix='/api/v1/note_relation_types')
-app.register_blueprint(js_map_bp, url_prefix='/api/v1/js_map')
-app.register_blueprint(pages_bp)
 
 # Memory optimization middleware
 @app.before_request
@@ -222,10 +203,8 @@ def memory_cleanup_thread():
             # Force garbage collection if memory is high
             if memory_info['current_mb'] > 50:
                 collected = memory_monitor.force_gc()
-                print(f"🧹 Memory cleanup: {collected} objects collected, {memory_info['current_mb']}MB used")
             
         except Exception as e:
-            print(f"⚠️ Memory cleanup error: {e}")
 
 if __name__ == "__main__":
     # Enable memory tracking
@@ -238,13 +217,6 @@ if __name__ == "__main__":
     # Initial memory info
     initial_memory = memory_monitor.get_memory_usage()
     
-    print("🚀 Starting TikTrack Optimized Development Server...")
-    print("📍 Server running on http://127.0.0.1:8080")
-    print("⚡ Memory optimized for laptops")
-    print("🧹 Automatic garbage collection enabled")
-    print("📊 Memory monitoring enabled")
-    print(f"💾 Initial memory usage: {initial_memory['current_mb']}MB")
-    print("-" * 50)
     
     # Configure Flask for minimal memory usage
     app.run(

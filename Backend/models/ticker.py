@@ -192,10 +192,8 @@ class Ticker(BaseModel):
                 ticker.updated_at = datetime.now()
                 session.flush()
                 
-                print(f"Updated ticker {ticker.symbol} status to {new_status} (trades: {open_trades_count}, plans: {open_plans_count})")
                 
         except Exception as e:
-            print(f"Error updating ticker {ticker_id} status: {e}")
             session.rollback()
 
     @staticmethod
@@ -240,13 +238,10 @@ class Ticker(BaseModel):
                 if ticker.status != new_status:
                     ticker.status = new_status
                     ticker.updated_at = datetime.now()
-                    print(f"Updated ticker {ticker.symbol} status from {ticker.status} to {new_status} (trades: {open_trades_count}, plans: {open_plans_count})")
             
             session.commit()
-            print("All ticker statuses updated successfully")
                 
         except Exception as e:
-            print(f"Error updating all ticker statuses: {e}")
             session.rollback()
 
     def can_change_status(self, new_status: str) -> bool:

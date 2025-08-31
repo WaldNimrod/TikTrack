@@ -81,7 +81,6 @@ class CodeChangeHandler(FileSystemEventHandler):
         if current_time - self.last_restart < 2:
             return
             
-        print(f"🔄 שינוי זוהה בקובץ: {event.src_path}")
         logger.info(f"File change detected: {event.src_path}")
         self.last_restart = current_time
         self.restart_callback()
@@ -105,7 +104,6 @@ class DevServer:
         """
         מטפל בסיגנלים לעצירה מסודרת
         """
-        print(f"\n🛑 Received signal {signum}, shutting down gracefully...")
         self.is_running = False
         self.stop_server()
         if self.observer:
@@ -126,7 +124,6 @@ class DevServer:
         """
         הפעלת השרת עם Waitress ישירות (ללא תלות ב-run_waitress_fixed.py)
         """
-        print("🚀 מפעיל שרת פיתוח עם Waitress...")
         logger.info("Starting development server with Waitress")
         
         # עצירת תהליך קיים אם יש
@@ -137,12 +134,10 @@ class DevServer:
             # בדיקת תיקיות וקבצים חיוניים
             if not os.path.exists("db/simpleTrade_new.db"):
                 logger.error("Database file not found!")
-                print("❌ Database file not found at db/simpleTrade_new.db")
                 return False
             
             if not os.path.exists("../trading-ui"):
                 logger.error("UI directory not found!")
-                print("❌ UI directory not found at ../trading-ui")
                 return False
             
             # הפעלת השרת עם subprocess - משתמש ב-app.py ישירות
@@ -151,12 +146,6 @@ class DevServer:
                 sys.executable, 'app.py'
             ], cwd=os.path.dirname(os.path.abspath(__file__)))
             
-            print("✅ כל הקבצים והתיקיות הנדרשים נמצאו")
-            print("📍 שרת פיתוח פועל על http://localhost:8080")
-            print("⚡ Waitress - יציב יותר מ-Flask development server")
-            print("📝 לוגים מפורטים נשמרים ב-server_detailed.log")
-            print("🔄 השרת מתעדכן אוטומטית בשינויים")
-            print("-" * 50)
             
             # המתנה שהשרת יעלה
             time.sleep(3)
@@ -164,7 +153,6 @@ class DevServer:
             
         except Exception as e:
             logger.error(f"Error starting server: {e}")
-            print(f"❌ שגיאה בהפעלת השרת: {e}")
             return False
         
     def stop_server(self):
@@ -185,13 +173,11 @@ class DevServer:
         """
         הפעלה מחדש של השרת עם הגבלת מספר הפעלות
         """
-        print("🔄 מפעיל מחדש את השרת...")
         logger.info("Restarting server...")
         self.restart_count += 1
         
         # הגבלת מספר הפעלות מחדש למניעת לולאה אינסופית
         if self.restart_count >= self.max_restarts:
-            print(f"❌ הגעת למספר המקסימלי של הפעלות מחדש ({self.max_restarts})")
             logger.error(f"Maximum restart attempts reached: {self.max_restarts}")
             return False
             
@@ -216,7 +202,6 @@ class DevServer:
             full_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), path)
             if os.path.exists(full_path):
                 self.observer.schedule(event_handler, full_path, recursive=True)
-                print(f"👀 צופה בשינויים ב: {full_path}")
                 logger.info(f"Watching for changes in: {full_path}")
         
         self.observer.start()
@@ -226,27 +211,17 @@ class DevServer:
         הפעלת השרת עם צופה - הפונקציה הראשית
         """
         try:
-            print("🔍 TikTrack Development Server Monitor Started")
-            print("📍 Monitoring server at http://127.0.0.1:8080")
-            print("🔄 Auto-restart enabled")
-            print("⚡ Using Waitress for stability")
-            print("📝 Detailed logs in server_detailed.log")
-            print("🎯 קונפיגורציה אחידה - רק dev_server.py ו-start_dev.sh")
-            print("-" * 50)
             
             # הפעלת השרת והצופה
             self.start_server()
             self.start_watcher()
             
-            print("🔄 השרת מתעדכן אוטומטית בשינויים")
-            print("⏹️  לחץ Ctrl+C לעצירה")
             
             # לולאה ראשית - מחכה לסיגנל עצירה
             while self.is_running:
                 time.sleep(1)
                 
         except KeyboardInterrupt:
-            print("\n⏹️  עוצר את השרת...")
             logger.info("Server stopped by user")
         finally:
             # ניקוי מסודר

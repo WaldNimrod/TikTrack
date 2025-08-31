@@ -21,7 +21,6 @@ def add_active_trades_constraint():
     cursor = conn.cursor()
     
     try:
-        print("🔧 Adding active_trades dynamic constraint...")
         
         # Add the constraint definition
         cursor.execute("""
@@ -41,11 +40,9 @@ def add_active_trades_constraint():
               'active_trades field must reflect actual open trades and plans'))
         
         conn.commit()
-        print("✅ Active trades constraint added successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error adding active_trades constraint: {e}")
         conn.rollback()
         return False
     finally:
@@ -57,7 +54,6 @@ def create_update_triggers():
     cursor = conn.cursor()
     
     try:
-        print("🔧 Creating update triggers for active_trades...")
         
         # Trigger for trades table - when trade status changes
         cursor.execute("""
@@ -174,11 +170,9 @@ def create_update_triggers():
         """)
         
         conn.commit()
-        print("✅ Update triggers created successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error creating triggers: {e}")
         conn.rollback()
         return False
     finally:
@@ -190,7 +184,6 @@ def update_all_tickers_active_status():
     cursor = conn.cursor()
     
     try:
-        print("🔄 Updating all tickers active_trades status...")
         
         cursor.execute("""
             UPDATE tickers 
@@ -207,11 +200,9 @@ def update_all_tickers_active_status():
         
         updated_count = cursor.rowcount
         conn.commit()
-        print(f"✅ Updated {updated_count} tickers active_trades status")
         return True
         
     except Exception as e:
-        print(f"❌ Error updating tickers: {e}")
         conn.rollback()
         return False
     finally:
@@ -223,7 +214,6 @@ def verify_triggers():
     cursor = conn.cursor()
     
     try:
-        print("\n📋 Verifying triggers...")
         
         cursor.execute("SELECT name FROM sqlite_master WHERE type='trigger' AND name LIKE '%active_trades%'")
         triggers = cursor.fetchall()
@@ -239,58 +229,39 @@ def verify_triggers():
         
         created_triggers = [trigger[0] for trigger in triggers]
         
-        print("📊 Created triggers:")
         for trigger in created_triggers:
-            print(f"  ✅ {trigger}")
         
         missing_triggers = [t for t in expected_triggers if t not in created_triggers]
         if missing_triggers:
-            print("❌ Missing triggers:")
             for trigger in missing_triggers:
-                print(f"  ❌ {trigger}")
             return False
         
-        print("✅ All triggers verified successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Error verifying triggers: {e}")
         return False
     finally:
         conn.close()
 
 def main():
     """Main migration function"""
-    print("🚀 Starting Active Trades Constraint Migration")
-    print("=" * 60)
     
     # Step 1: Add dynamic constraint
     if not add_active_trades_constraint():
-        print("❌ Failed to add active_trades constraint")
         return
     
     # Step 2: Create update triggers
     if not create_update_triggers():
-        print("❌ Failed to create triggers")
         return
     
     # Step 3: Update all existing tickers
     if not update_all_tickers_active_status():
-        print("❌ Failed to update tickers")
         return
     
     # Step 4: Verify triggers
     if not verify_triggers():
-        print("❌ Trigger verification failed")
         return
     
-    print("\n✅ Active Trades Constraint Migration Completed Successfully!")
-    print("📝 Features added:")
-    print("  ✅ Dynamic constraint for active_trades field")
-    print("  ✅ Automatic triggers for trade status changes")
-    print("  ✅ Automatic triggers for plan status changes")
-    print("  ✅ Real-time active_trades updates")
-    print("  ✅ All existing tickers updated")
 
 if __name__ == "__main__":
     main()

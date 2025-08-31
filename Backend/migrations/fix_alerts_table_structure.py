@@ -18,15 +18,12 @@ def migrate():
     # Database path
     db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'simpleTrade_new.db')
     
-    print(f"🔄 Starting migration: Fix alerts table structure")
-    print(f"📁 Database path: {db_path}")
     
     try:
         # Connect to database
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        print("🔄 Creating temporary table...")
         
         # Create new table with correct structure
         cursor.execute("""
@@ -47,7 +44,6 @@ def migrate():
             )
         """)
         
-        print("🔄 Copying data from old table...")
         
         # Copy data from old table to new table
         cursor.execute("""
@@ -76,17 +72,14 @@ def migrate():
             FROM alerts
         """)
         
-        print("🔄 Dropping old table...")
         
         # Drop old table
         cursor.execute("DROP TABLE alerts")
         
-        print("🔄 Renaming new table...")
         
         # Rename new table to original name
         cursor.execute("ALTER TABLE alerts_new RENAME TO alerts")
         
-        print("🔄 Creating indexes...")
         
         # Recreate indexes
         cursor.execute("CREATE INDEX idx_alerts_status ON alerts(status)")
@@ -97,19 +90,15 @@ def migrate():
         # Commit changes
         conn.commit()
         
-        print("✅ Migration completed successfully")
         
         # Show new table structure
         cursor.execute(".schema alerts")
         schema = cursor.fetchall()
-        print("📋 New table structure:")
         for line in schema:
-            print(f"   {line[0]}")
         
         return True
         
     except Exception as e:
-        print(f"❌ Migration failed: {e}")
         if conn:
             conn.rollback()
         return False

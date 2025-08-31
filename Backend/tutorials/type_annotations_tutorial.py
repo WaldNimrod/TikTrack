@@ -9,14 +9,9 @@ from typing import Dict, Any, List, Optional, Tuple
 
 def print_header(title: str) -> None:
     """Print a formatted header"""
-    print("\n" + "="*50)
-    print(f"🎯 {title}")
-    print("="*50)
 
 def print_section(title: str) -> None:
     """Print a formatted section"""
-    print(f"\n📚 {title}")
-    print("-" * 30)
 
 def interactive_quiz() -> None:
     """Interactive quiz about type annotations"""
@@ -62,34 +57,23 @@ def interactive_quiz() -> None:
     total = len(questions)
     
     for i, q in enumerate(questions, 1):
-        print(f"\n❓ Question {i}: {q['question']}")
         for j, option in enumerate(q['options']):
-            print(f"   {j+1}. {option}")
         
         while True:
             try:
                 answer = int(input("\nYour answer (1-4): ")) - 1
                 if 0 <= answer <= 3:
                     break
-                print("Please enter a number between 1 and 4")
             except ValueError:
-                print("Please enter a valid number")
         
         if answer == q['correct']:
-            print("✅ Correct!")
             score += 1
         else:
-            print(f"❌ Wrong! The correct answer is: {q['options'][q['correct']]}")
         
-        print(f"💡 Explanation: {q['explanation']}")
     
-    print(f"\n🎉 Quiz completed! Score: {score}/{total}")
     if score == total:
-        print("🌟 Perfect! You're ready to write type annotations!")
     elif score >= total * 0.7:
-        print("👍 Good job! Keep practicing!")
     else:
-        print("📚 Review the guidelines and try again!")
 
 def show_examples() -> None:
     """Show practical examples of type annotations"""
@@ -172,7 +156,6 @@ def validate_data(data: Dict[str, Any]) -> Tuple[bool, str]:
     
     for example in examples:
         print_section(example['title'])
-        print(example['code'])
 
 def show_common_mistakes() -> None:
     """Show common mistakes and how to fix them"""
@@ -206,12 +189,6 @@ def show_common_mistakes() -> None:
     ]
     
     for i, mistake in enumerate(mistakes, 1):
-        print(f"\n❌ Mistake {i}: {mistake['mistake']}")
-        print(f"Wrong:")
-        print(f"   {mistake['wrong']}")
-        print(f"Correct:")
-        print(f"   {mistake['correct']}")
-        print(f"💡 {mistake['explanation']}")
 
 def show_tools() -> None:
     """Show available tools for type checking"""
@@ -245,25 +222,13 @@ def show_tools() -> None:
     ]
     
     for tool in tools:
-        print(f"\n🔧 {tool['name']}")
-        print(f"   Command: {tool['command']}")
-        print(f"   Description: {tool['description']}")
-        print(f"   Purpose: {tool['purpose']}")
 
 def main() -> None:
     """Main tutorial function"""
     print_header("TikTrack Type Annotations Tutorial")
     
-    print("Welcome to the Type Annotations Tutorial!")
-    print("This tutorial will help you understand how to write proper type annotations.")
     
     while True:
-        print("\n📋 Choose an option:")
-        print("1. 📚 Show examples")
-        print("2. ❌ Show common mistakes")
-        print("3. 🛠️ Show available tools")
-        print("4. 🎯 Take interactive quiz")
-        print("5. 🚪 Exit")
         
         choice = input("\nEnter your choice (1-5): ").strip()
         
@@ -276,11 +241,8 @@ def main() -> None:
         elif choice == "4":
             interactive_quiz()
         elif choice == "5":
-            print("\n👋 Thanks for using the tutorial!")
-            print("Remember: Always add type annotations to your functions!")
             break
         else:
-            print("Please enter a valid choice (1-5)")
 
 if __name__ == "__main__":
     main()

@@ -335,7 +335,7 @@ function restoreAccountsSectionState() {
         }
     }
   } else {
-    ');
+    // לא צריך לעשות כלום אם הסקשן לא היה סגור
   }
 }
 
@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // בדיקת זמינות פונקציות גלובליות
   setTimeout(() => {
-    ===');
+    console.log('🔍 Checking global functions availability for research page...');
     if (typeof window.updateGridFromComponent === 'function') {
       } else {
       console.warn('⚠️ updateGridFromComponent not available for research page');

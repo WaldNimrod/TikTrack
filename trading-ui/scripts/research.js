@@ -34,7 +34,7 @@ function loadTrades() {
   if (typeof window.loadTradesData === 'function') {
     window.loadTradesData();
   } else {
-    console.error('loadTradesData function not found');
+    handleFunctionNotFound('loadTradesData');
   }
 }
 
@@ -43,7 +43,7 @@ function showAddTradeModal() {
   if (typeof window.showAddTradeModal === 'function') {
     window.showAddTradeModal();
   } else {
-    console.error('showAddTradeModal function not found');
+    handleFunctionNotFound('showAddTradeModal');
   }
 }
 
@@ -52,7 +52,7 @@ function filterTradesData(statuses, types, accounts, dateRange, searchTerm) {
   if (typeof window.filterTradesData === 'function') {
     window.filterTradesData(statuses, types, accounts, dateRange, searchTerm);
   } else {
-    console.error('filterTradesData function not found');
+    handleFunctionNotFound('filterTradesData');
   }
 }
 
@@ -64,7 +64,7 @@ function toggleTopSection() {
   const contentSections = document.querySelectorAll('.content-section');
 
   if (!topSection) {
-    console.error('❌ לא נמצא top-section');
+    handleElementNotFound('top-section');
     return;
   }
 
@@ -125,7 +125,7 @@ function toggleResearchSection() {
   const researchSection = contentSections[1]; // הסקשן השני - טריידים
 
   if (!researchSection) {
-    console.error('❌ לא נמצא סקשן טריידים');
+    handleElementNotFound('research-section');
     return;
   }
 
@@ -157,7 +157,7 @@ function toggleAccountsSection() {
   const accountsSection = contentSections[1]; // הסקשן השני - חשבונות
 
   if (!accountsSection) {
-    console.error('❌ לא נמצא סקשן חשבונות');
+    handleElementNotFound('accounts-section');
     return;
   }
 
@@ -274,7 +274,7 @@ function initializeResearchPage() {
   if (typeof window.loadTrades === 'function') {
     window.loadTrades();
   } else {
-    console.error('❌ loadTrades function not found');
+    handleFunctionNotFound('loadTrades');
   }
 
   }
@@ -287,7 +287,7 @@ function toggleSummarySection() {
   const summarySection = contentSections[0]; // הסקשן הראשון - סיכום
 
   if (!summarySection) {
-    console.error('❌ לא נמצא סקשן סיכום');
+    handleElementNotFound('summary-section');
     return;
   }
 
@@ -345,7 +345,7 @@ window.updateGridFromComponent = function (selectedStatuses, selectedTypes, sele
   if (typeof window.updateGridFromComponentGlobal === 'function') {
     window.updateGridFromComponentGlobal(selectedStatuses, selectedTypes, [], selectedDateRange, searchTerm, 'research');
   } else {
-    console.error('❌ updateGridFromComponentGlobal function not found');
+    handleFunctionNotFound('updateGridFromComponentGlobal');
     // ניסיון נוסף אחרי זמן קצר
     setTimeout(() => {
       if (typeof window.updateGridFromComponentGlobal === 'function') {
@@ -365,7 +365,7 @@ function sortResearchTable(columnIndex) {
       window.updateTradesTable
     );
   } else {
-    console.error('❌ sortTable function not found in tables.js');
+    handleFunctionNotFound('sortTable');
   }
 }
 

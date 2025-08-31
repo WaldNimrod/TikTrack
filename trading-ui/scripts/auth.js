@@ -34,7 +34,7 @@ async function login(username, password) {
 
     return data;
   } catch (error) {
-    console.error('Login error:', error);
+    // Login error
     throw error;
   }
 }
@@ -51,7 +51,7 @@ function showLoginError(message, containerId = 'loginError') {
     }, 5000);
   } else {
     // אם אין אלמנט שגיאה, נציג console error
-    console.error('שגיאה:', message);
+    // שגיאה
   }
 }
 

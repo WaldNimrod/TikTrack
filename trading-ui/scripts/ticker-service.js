@@ -56,11 +56,11 @@ async function getTickers() {
           
             return tickers;
         } else {
-            console.error('❌ Failed to fetch tickers:', response.status);
+            // Failed to fetch tickers
             return [];
         }
     } catch (error) {
-        console.error('❌ Error fetching tickers:', error);
+        // Error fetching tickers
         return [];
     }
 }
@@ -78,11 +78,11 @@ async function getTrades() {
           
             return trades;
         } else {
-            console.error('❌ Failed to fetch trades:', response.status);
+            // Failed to fetch trades
             return [];
         }
     } catch (error) {
-        console.error('❌ Error fetching trades:', error);
+        // Error fetching trades
         return [];
     }
 }
@@ -131,7 +131,7 @@ async function loadCache() {
         lastCacheUpdate = Date.now();
 
         } catch (error) {
-        console.error('❌ Error loading cache:', error);
+        // Error loading cache
         clearCache();
     }
 }
@@ -415,11 +415,11 @@ async function loadTickersForTradePlan() {
             });
             
             } else {
-            console.error('❌ Ticker select element not found');
+            // Ticker select element not found
         }
         
     } catch (error) {
-        console.error('❌ Error loading tickers:', error);
+        // Error loading tickers
         // Fallback to static options if API fails
         }
 }

@@ -48,7 +48,7 @@ async function loadPlansFromServer() {
     console.log('Plans loaded from server:', data.length, 'items');
     return data;
   } catch (error) {
-    console.error('Error loading plans from server:', error);
+    handleDataLoadError(error, 'plans');
     // במקרה של שגיאה, נחזיר נתוני דוגמה
     return getDefaultRowData();
   }
@@ -195,14 +195,14 @@ async function apiCall(endpoint, options = {}) {
         const data = await response.json();
         
         if (!response.ok) {
-            console.error('❌ שגיאה בתגובה:', response.status, data);
+            handleApiError(new Error(`HTTP ${response.status}: ${data.error?.message || data.message}`), 'API_RESPONSE', `שגיאה בתגובה: ${response.status}`);
             throw new Error(data.error?.message || data.message || `HTTP ${response.status}`);
         }
         
         console.log('✅ תגובה מוצלחת:', data);
         return data;
     } catch (error) {
-        console.error(`❌ שגיאת API (${endpoint}):`, error);
+        handleApiError(error, 'API_CALL', `שגיאה ב-${endpoint}`);
         throw error;
     }
 }
@@ -336,7 +336,7 @@ async function reactivateRecord(tableType, recordId) {
       }
     }
   } catch (error) {
-    console.error(`❌ שגיאה בהפעלה מחדש של רשומה:`, error);
+    handleSystemError(error, 'RECORD_REACTIVATION');
     if (window.showErrorNotification) {
       window.showErrorNotification(`שגיאה בהפעלה מחדש: ${error.message}`);
     }
@@ -409,7 +409,7 @@ async function cancelRecord(tableType, recordId) {
       }
     }
   } catch (error) {
-    console.error(`❌ שגיאה בביטול רשומה:`, error);
+    handleSystemError(error, 'RECORD_CANCELLATION');
     if (window.showErrorNotification) {
       window.showErrorNotification(`שגיאה בביטול: ${error.message}`);
     }
@@ -477,7 +477,7 @@ function toggleTopSection() {
   const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
   
   if (!topSection) {
-    console.error('❌ לא נמצא top-section');
+    handleElementNotFound('top-section');
     return;
   }
   
@@ -526,7 +526,7 @@ function toggleMainSection() {
   const currentSection = clickedButton ? clickedButton.closest('.content-section') : null;
   
   if (!currentSection) {
-    console.error('❌ לא נמצא content-section');
+    handleElementNotFound('content-section');
     return;
   }
   
@@ -536,7 +536,7 @@ function toggleMainSection() {
   const sectionTitle = currentSection.querySelector('.table-title').textContent.trim();
   
   if (!sectionBody) {
-    console.error('❌ לא נמצא section-body');
+    handleElementNotFound('section-body');
     return;
   }
   
@@ -659,7 +659,7 @@ async function loadAllDatabaseData() {
       notes: allData.notes.length
     });
   } catch (error) {
-    console.error('❌ שגיאה בטעינת נתונים:', error);
+    handleDataLoadError(error, 'database');
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה בטעינת נתונים', 'לא ניתן לטעון נתונים מהשרת');
     }

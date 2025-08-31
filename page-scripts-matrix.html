@@ -12,7 +12,7 @@
             padding: 20px 0;
         }
         .container-fluid {
-            max-width: 1400px;
+            max-width: 1600px;
         }
         .table-container {
             background-color: white;
@@ -32,22 +32,25 @@
             color: white;
             border: none;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             text-align: center;
             vertical-align: middle;
-            min-width: 100px;
+            min-width: 80px;
+            padding: 8px 4px;
         }
         .table td {
             vertical-align: middle;
             border: 1px solid #dee2e6;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
+            padding: 4px 2px;
         }
         .script-name {
             font-weight: bold;
             color: #2c3e50;
             text-align: right;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
+            min-width: 150px;
         }
         .connected {
             background-color: #d4edda;
@@ -88,6 +91,16 @@
             color: white !important;
             font-weight: bold !important;
         }
+        .service-scripts {
+            background-color: #f39c12;
+            color: white;
+            font-weight: bold;
+        }
+        .test-scripts {
+            background-color: #9b59b6;
+            color: white;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -101,14 +114,16 @@
             <div class="legend-item"><span class="primary-scripts">■</span> סקריפטים ראשיים</div>
             <div class="legend-item"><span class="utility-scripts">■</span> סקריפטים כלליים</div>
             <div class="legend-item"><span class="universal-script">■</span> סקריפטים אוניברסליים (מקושרים לכל העמודים)</div>
+            <div class="legend-item"><span class="service-scripts">■</span> סקריפטי שירות</div>
+            <div class="legend-item"><span class="test-scripts">■</span> סקריפטי בדיקות</div>
         </div>
 
         <div class="table-container">
             <table class="table table-bordered table-sm">
                 <thead>
                     <tr>
-                        <th style="width: 20%;">סקריפט</th>
-                        <th class="primary-scripts" colspan="11">עמודים ראשיים</th>
+                        <th style="width: 15%;">סקריפט</th>
+                        <th class="primary-scripts" colspan="15">עמודים ראשיים ועמודי מערכת</th>
                     </tr>
                     <tr>
                         <th>שם הסקריפט</th>
@@ -124,6 +139,13 @@
                         <th>⚡ ביצועים</th>
                         <th>🗄️ מסד נתונים</th>
                         <th>🛠️ נתונים נוספים</th>
+                        <th>🔬 מחקר</th>
+                        <th>🧪 בדיקות</th>
+                        <th>⚙️ העדפות</th>
+                        <th>🧩 אילוצים</th>
+                        <th>🎨 עיצובים</th>
+                        <th>🧪 בדיקת ראש</th>
+                        <th>🎨 הדגמת סגנונות</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -132,12 +154,19 @@
                         <td class="script-name">accounts.js</td>
                         <td></td>
                         <td class="connected">✓</td>
-                        <td></td>
-                        <td></td>
-                        <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td></td>
                         <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -147,14 +176,21 @@
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
                         <td></td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td></td>
-                        <td class="connected">✓</td>
                         <td></td>
                         <td class="connected">✓</td>
-                        <td></td>
                     </tr>
                     <tr class="primary-scripts">
                         <td class="script-name">cash_flows.js</td>
@@ -162,6 +198,13 @@
                         <td></td>
                         <td></td>
                         <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -180,9 +223,16 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td class="connected">✓</td>
                         <td></td>
                         <td></td>
                         <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     <tr class="primary-scripts">
                         <td class="script-name">trade_plans.js</td>
@@ -197,6 +247,13 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     <tr class="primary-scripts">
                         <td class="script-name">tickers.js</td>
@@ -205,8 +262,15 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td></td>
                         <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -225,6 +289,13 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     <tr class="primary-scripts">
                         <td class="script-name">executions.js</td>
@@ -239,6 +310,13 @@
                         <td class="connected">✓</td>
                         <td></td>
                         <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     <tr class="primary-scripts">
                         <td class="script-name">database.js</td>
@@ -250,7 +328,14 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -265,7 +350,14 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                     </tr>
                     <tr class="primary-scripts">
@@ -280,12 +372,89 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="primary-scripts">
+                        <td class="script-name">tests.js</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="primary-scripts">
+                        <td class="script-name">preferences.js</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="primary-scripts">
+                        <td class="script-name">constraint-manager.js</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     
                     <!-- Universal Scripts -->
                     <tr class="universal-script">
                         <td class="script-name">main.js</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
@@ -311,9 +480,44 @@
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
                     </tr>
                     <tr class="universal-script">
                         <td class="script-name">translation-utils.js</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                    </tr>
+                    <tr class="universal-script">
+                        <td class="script-name">console-cleanup.js</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
@@ -339,9 +543,23 @@
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
                     </tr>
                     <tr class="universal-script">
                         <td class="script-name">data-utils.js</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
@@ -367,6 +585,13 @@
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
                     </tr>
                     <tr class="universal-script">
                         <td class="script-name">linked-items.js</td>
@@ -381,9 +606,23 @@
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
                     </tr>
                     <tr class="universal-script">
                         <td class="script-name">table-mappings.js</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
@@ -409,99 +648,6 @@
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
-                    </tr>
-                    
-                    <!-- Utility Scripts -->
-                    <tr class="universal-script">
-                        <td class="script-name">notification-system.js</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                    </tr>
-                    <tr class="universal-script">
-                        <td class="script-name">filter-system.js</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                    </tr>
-                    <tr class="universal-script">
-                        <td class="script-name">button-icons.js</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                    </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">console-cleanup.js</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                    </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">alert-service.js</td>
-                        <td></td>
-                        <td></td>
-                        <td class="connected">✓</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">validation-utils.js</td>
-                        <td></td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                    </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">crud-utils.js</td>
-                        <td></td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
@@ -523,51 +669,153 @@
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                    </tr>
+                    
+                    <!-- Utility Scripts -->
+                    <tr class="universal-script">
+                        <td class="script-name">notification-system.js</td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="universal-script">
+                        <td class="script-name">filter-system.js</td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="universal-script">
+                        <td class="script-name">button-icons.js</td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     <tr class="utility-scripts">
+                        <td class="script-name">validation-utils.js</td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="utility-scripts">
+                        <td class="script-name">crud-utils.js</td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="universal-script">
                         <td class="script-name">active-alerts-component.js</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
-                        <td></td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
+                        <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td></td>
-                        <td class="connected">✓</td>
                         <td></td>
                         <td class="connected">✓</td>
                         <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
                     </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">grid-data.js</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                    
+                    <!-- Service Scripts -->
+                    <tr class="service-scripts">
+                        <td class="script-name">alert-service.js</td>
                         <td></td>
                         <td></td>
                         <td class="connected">✓</td>
                         <td></td>
-                    </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">grid-init.js</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
                         <td></td>
                         <td class="connected">✓</td>
                         <td></td>
-                    </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">grid-table.js</td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -577,78 +825,81 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td class="connected">✓</td>
-                        <td></td>
-                    </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">graph-utils.js</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="connected">✓</td>
                         <td></td>
                         <td></td>
                     </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">grid-display.js</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                    <tr class="service-scripts">
+                        <td class="script-name">account-service.js</td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                     </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">db-table-utils.js</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="connected">✓</td>
-                        <td></td>
-                    </tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">style-utils.js</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                    <tr class="service-scripts">
+                        <td class="script-name">ticker-service.js</td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td class="connected">✓</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="alert alert-info">
-            <h5>📝 הערות:</h5>
+            <h5>📝 הערות עדכניות:</h5>
             <ul class="mb-0">
                 <li><strong>✓</strong> - הסקריפט מקושר לעמוד</li>
                 <li><strong>תא ריק</strong> - הסקריפט לא מקושר לעמוד</li>
-                <li>עמודי העדפות פשוטות הועברו לגיבוי</li>
-                <li>עמודי בדיקה לא נכללו בטבלה</li>
+                <li>נוספו עמודים חדשים: מחקר, בדיקות, העדפות, אילוצים, עיצובים, בדיקת ראש, הדגמת סגנונות</li>
+                <li>נוספו סקריפטי שירות חדשים: alert-service.js, account-service.js, ticker-service.js</li>
+                <li>נוסף סקריפט ניהול אילוצים: constraint-manager.js</li>
                 <li>הטבלה מציגה את כל הסקריפטים בשורות ואת כל העמודים בעמודות</li>
-                <li><strong>קבצים אוניברסליים</strong> - מקושרים לכל העמודים ומסומנים בירוק</li>
+                <li><strong>קבצים אוניברסליים</strong> - מקושרים לרוב העמודים ומסומנים בירוק</li>
+                <li><strong>סקריפטי שירות</strong> - מקושרים לעמודים ספציפיים ומסומנים בכתום</li>
+                <li>עמודי בדיקה ועזר לא נכללו בטבלה</li>
+                <li>עמוד העדפות לא משתמש ברוב הסקריפטים הכלליים</li>
+            </ul>
+        </div>
+        
+        <div class="alert alert-warning">
+            <h5>🔄 עדכונים אחרונים:</h5>
+            <ul class="mb-0">
+                <li>עמוד התזרימים עבר עדכון מקיף של חיבורי הסקריפטים</li>
+                <li>עמוד הטריידים נוספו סקריפטי שירות נוספים</li>
+                <li>עמוד תוכניות הטריידים נוספו סקריפטי שירות מתקדמים</li>
+                <li>עמוד הביצועים נוספו סקריפטי פילטרים ותיקוף</li>
+                <li>עמוד מסד הנתונים עבר שדרוג משמעותי בסקריפטים</li>
+                <li>עמוד הנתונים הנוספים עבר התאמה לארכיטקטורה החדשה</li>
+                <li>עמוד המחקר נוסף חיבור לסקריפט הטריידים</li>
             </ul>
         </div>
     </div>

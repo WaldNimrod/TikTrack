@@ -51,9 +51,25 @@ function deleteNote(id) {
       );
     } else {
       // fallback אחרון - confirm רגיל
-      const confirmed = confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
-      if (confirmed) {
-        confirmDeleteNote(id);
+      if (typeof window.showConfirmationDialog === 'function') {
+          window.showConfirmationDialog(
+              'מחיקת הערה',
+              'האם אתה בטוח שברצונך למחוק הערה זו?',
+              () => confirmDeleteNote(id)
+          );
+      } else {
+                  if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'מחיקת הערה',
+                'האם אתה בטוח שברצונך למחוק הערה זו?',
+                () => confirmDeleteNote(id)
+            );
+        } else {
+            const confirmed = confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
+            if (confirmed) {
+                confirmDeleteNote(id);
+            }
+        }
       }
     }
   }
@@ -1300,7 +1316,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
     console.error('❌ מערכת התראות לא זמינה!');
-    alert('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
+    console.error('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
     return;
   }
   

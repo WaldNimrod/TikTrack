@@ -299,53 +299,7 @@ async function updateAllActiveTradesStatuses() {
     }
 }
 
-// פונקציה לשחזור מצב הסגירה - שימוש בפונקציות הגלובליות
-function restoreTickersSectionState() {
-    // שחזור מצב הסקשן העליון
-    if (typeof window.restoreAllSectionStates === 'function') {
-        window.restoreAllSectionStates();
-    } else {
-        console.warn('⚠️ restoreAllSectionStates function not available globally');
-    }
-    
-    // שחזור מצב הסקשנים הפנימיים
-    if (typeof window.restoreSectionStates === 'function') {
-        window.restoreSectionStates();
-    } else {
-        console.warn('⚠️ restoreSectionStates function not available globally');
-    }
-}
-
-// פונקציות נוספות
-
-// פונקציות לפתיחה/סגירה של סקשנים - משתמשות בפונקציות הגלובליות
-function toggleTopSection() {
-    // קריאה לפונקציה הגלובלית מ-main.js
-    if (typeof window.toggleTopSectionGlobal === 'function') {
-        window.toggleTopSectionGlobal();
-    } else {
-        console.error('❌ toggleTopSectionGlobal function not found in main.js');
-    }
-}
-
-function toggleTickersSection() {
-    if (typeof window.toggleMainSection === 'function') {
-        window.toggleMainSection();
-    } else {
-        console.error('❌ toggleMainSection function not found in main.js');
-    }
-}
-
-// פונקציות נוספות
-
-// ========================================
-// פונקציות מודלים
-// ========================================
-
-/**
- * הצגת מודל הוספת טיקר
- */
-function showAddTickerModal() {
+// פונקציה לשחזור מצב הסגירה
     console.log('🔄 הצגת מודל הוספת טיקר');
 
     // עדכון אפשרויות מטבע לפני הצגת הטופס
@@ -602,7 +556,7 @@ async function saveTicker() {
  * 
  * כולל ולידציה של פריטים מקושרים באמצעות המערכת הכללית:
  * - API: /api/v1/linked-items/ticker/{id}
- * - פונקציה: window.showLinkedItemsWarning('ticker', id)
+ * - פונקציה: window.showLinkedItemsModal(data, 'ticker', id)
  * - מונע ביטול כאשר יש פריטים פתוחים
  * 
  * Note: updated_at field is NOT modified during user updates - it's reserved for future pricing system updates
@@ -891,7 +845,7 @@ async function updateAllTickerStatuses() {
  * 
  * משתמש במערכת הכללית לקבלת פריטים מקושרים:
  * - API: /api/v1/linked-items/ticker/{id}
- * - פונקציה: window.showLinkedItemsWarning('ticker', id)
+ * - פונקציה: window.showLinkedItemsModal(data, 'ticker', id)
  * - מודל: window.showLinkedItemsModal (מעוצב עם כל המידע)
  */
 async function performCancelTickerWithLinkedItemsCheck(id) {
@@ -1051,6 +1005,14 @@ async function performCancelTicker(id) {
 async function confirmDeleteTicker(id) {
     console.log('🔄 אישור מחיקת טיקר:', id);
 
+    // בדיקת פריטים מקושרים לפני מחיקה
+    if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
+        const hasLinkedItems = await window.checkLinkedItemsBeforeDelete(id);
+        if (hasLinkedItems) {
+            return; // הפונקציה תטפל בהצגת המודול
+        }
+    }
+
     // מציאת הטיקר לפני מחיקה כדי להציג פרטים בהודעה
     const ticker = tickersData.find(t => t.id == id);
     const tickerInfo = ticker ? `${ticker.symbol} - ${ticker.name}` : `טיקר ${id}`;
@@ -1138,6 +1100,44 @@ async function confirmDeleteTicker(id) {
 // ========================================
 // פונקציות מודל פריטים מקושרים
 // ========================================
+
+/**
+ * בדיקת פריטים מקושרים לפני מחיקה
+ */
+async function checkLinkedItemsBeforeDelete(tickerId) {
+    try {
+        const response = await fetch(`/api/v1/linked-items/ticker/${tickerId}`);
+        
+        if (!response.ok) {
+            // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
+            return false;
+        }
+
+        const linkedItemsData = await response.json();
+        const childEntities = linkedItemsData.child_entities || [];
+        const parentEntities = linkedItemsData.parent_entities || [];
+        
+        // בדיקה רק אם יש פריטים שמקושרים אל הטיקר (child entities)
+        // parent entities הם פריטים שהטיקר מקושר אליהם (מטבע) - לא רלוונטי למחיקה
+        if (childEntities.length > 0) {
+            // יש פריטים מקושרים - הצגת חלון מקושרים
+            if (typeof window.showLinkedItemsModal === 'function') {
+                window.showLinkedItemsModal(linkedItemsData, 'ticker', tickerId);
+                return true;
+            } else {
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('אזהרה', 'יש פריטים מקושרים לטיקר זה', 'warning');
+                }
+                return true;
+            }
+        }
+
+        return false;
+    } catch (error) {
+        console.error('שגיאה בבדיקת פריטים מקושרים:', error);
+        return false;
+    }
+}
 
 
 
@@ -1409,6 +1409,7 @@ window.showDeleteTickerModal = showDeleteTickerModal;
 window.saveTicker = saveTicker;
 window.updateTicker = updateTicker;
 window.confirmDeleteTicker = confirmDeleteTicker;
+window.checkLinkedItemsBeforeDelete = checkLinkedItemsBeforeDelete;  // בדיקת אובייקטים מקושרים למחיקה
 
 
 

@@ -307,8 +307,44 @@ class ConstraintManager {
     }
 
     async deleteConstraint(constraintId) {
-        if (!confirm('האם אתה בטוח שברצונך למחוק את האילוץ הזה?')) {
-            return;
+        if (typeof window.showConfirmationDialog === 'function') {
+            const confirmed = await new Promise((resolve) => {
+                window.showConfirmationDialog(
+                    'מחיקת אילוץ',
+                    'האם אתה בטוח שברצונך למחוק את האילוץ הזה?',
+                    () => resolve(true),
+                    () => resolve(false)
+                );
+            });
+            if (!confirmed) return;
+        } else {
+                    if (typeof window.showConfirmationDialog === 'function') {
+            const confirmed = await new Promise((resolve) => {
+                window.showConfirmationDialog(
+                    'מחיקת אילוץ',
+                    'האם אתה בטוח שברצונך למחוק את האילוץ הזה?',
+                    () => resolve(true),
+                    () => resolve(false)
+                );
+            });
+            if (!confirmed) return;
+        } else {
+                    if (typeof window.showConfirmationDialog === 'function') {
+            const confirmed = await new Promise((resolve) => {
+                window.showConfirmationDialog(
+                    'מחיקת אילוץ',
+                    'האם אתה בטוח שברצונך למחוק את האילוץ הזה?',
+                    () => resolve(true),
+                    () => resolve(false)
+                );
+            });
+            if (!confirmed) return;
+        } else {
+            if (!confirm('האם אתה בטוח שברצונך למחוק את האילוץ הזה?')) {
+                return;
+            }
+        }
+        }
         }
 
         try {

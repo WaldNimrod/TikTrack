@@ -73,26 +73,6 @@ function deleteExecution(id) {
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים - שימוש במערכת הכללית
-function toggleExecutionsSection() {
-  // שימוש במערכת הכללית מ-main.js
-  if (typeof window.toggleMainSection === 'function') {
-    window.toggleMainSection();
-  } else {
-    console.error('❌ toggleMainSection function not found in main.js');
-  }
-}
-
-// פונקציה לשחזור מצב הסגירה - שימוש במערכת הכללית
-function restoreExecutionsSectionState() {
-    // שימוש במערכת הכללית מ-main.js
-    if (typeof window.restoreAllSectionStates === 'function') {
-        window.restoreAllSectionStates();
-    } else {
-        console.error('❌ restoreAllSectionStates function not found in main.js');
-    }
-}
-
-// פונקציות נוספות
 
 // ========================================
 // פונקציות מודלים

@@ -251,6 +251,13 @@ function setupGlobalModalConfigurations() {
 function initializeCurrentPage() {
   const currentPage = getCurrentPageName();
 
+  // שחזור מצב הסקשנים
+  if (typeof window.restoreAllSectionStates === 'function') {
+    window.restoreAllSectionStates();
+  } else {
+    console.error('❌ restoreAllSectionStates function not found');
+  }
+
   // Call page-specific initialization if available
   const initFunctionName = `initialize${currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}Page`;
   if (typeof window[initFunctionName] === 'function') {
@@ -322,10 +329,10 @@ function handleUnhandledRejection(event) {
  * @param {string} message - Error message to display
  */
 function showSystemError(message) {
-  if (typeof window.showNotification === 'function') {
-    window.showNotification(message, 'error');
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('שגיאת מערכת', message);
   } else {
-    alert(`System Error: ${message}`);
+    console.error('System Error:', message);
   }
 }
 

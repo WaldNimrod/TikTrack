@@ -1446,11 +1446,35 @@ async function cancelAccount(accountId, accountName) {
       });
       if (!confirmed) return;
     } else {
-      if (!confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
-        return;
-      }
-      if (!confirm(`הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`)) {
-        return;
+      if (typeof window.showConfirmationDialog === 'function') {
+          const confirmed = await new Promise((resolve) => {
+              window.showConfirmationDialog(
+                  'ביטול חשבון',
+                  `האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?\n\nהסטטוס ישתנה ל"מבוטל".`,
+                  () => resolve(true),
+                  () => resolve(false)
+              );
+          });
+          if (!confirmed) return;
+      } else {
+                  if (typeof window.showConfirmationDialog === 'function') {
+            const confirmed = await new Promise((resolve) => {
+                window.showConfirmationDialog(
+                    'ביטול חשבון',
+                    `האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?\n\nהסטטוס ישתנה ל"מבוטל".`,
+                    () => resolve(true),
+                    () => resolve(false)
+                );
+            });
+            if (!confirmed) return;
+        } else {
+            if (!confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
+                return;
+            }
+            if (!confirm(`הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`)) {
+                return;
+            }
+        }
       }
     }
   }
@@ -1509,56 +1533,54 @@ async function cancelAccount(accountId, accountName) {
 async function deleteAccount(accountId, accountName) {
   console.log('🔄 מחיקת חשבון:', accountId, accountName);
 
-  // בדיקה ראשונה
-  if (window.showDeleteWarning) {
-    await new Promise((resolve) => {
-      window.showDeleteWarning('חשבון', accountName, 
-        () => {
-          // בדיקה שנייה
-          if (window.showDeleteWarning) {
-            window.showDeleteWarning('חשבון', accountName, 
-              () => resolve(true),
-              () => resolve(false)
-            );
-          } else {
-            if (typeof window.showSecondConfirmationModal === 'function') {
-              window.showSecondConfirmationModal(
-                'מחיקת חשבון',
-                `פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`,
-                () => resolve(true),
-                () => resolve(false)
-              );
-            } else {
-              if (confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
-                resolve(true);
-              } else {
-                resolve(false);
-              }
-            }
-          }
-        },
+  // בדיקת פריטים מקושרים לפני מחיקה
+  if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
+    const hasLinkedItems = await window.checkLinkedItemsBeforeDelete(accountId);
+    if (hasLinkedItems) {
+      return; // הפונקציה תטפל בהצגת המודול
+    }
+  }
+
+  // אישור מהמשתמש
+  if (typeof window.showDeleteWarning === 'function') {
+    const confirmed = await new Promise((resolve) => {
+      window.showDeleteWarning('account', accountId, 'חשבון', 
+        () => resolve(true),
         () => resolve(false)
       );
-    }).then((confirmed) => {
-      if (!confirmed) return;
     });
+    if (!confirmed) return;
   } else {
-    // גיבוי למערכת הישנה
-    if (typeof window.showDeleteWarning === 'function') {
-      const confirmed = await new Promise((resolve) => {
-        window.showDeleteWarning('חשבון', accountName, 
-          () => resolve(true),
-          () => resolve(false)
-        );
-      });
-      if (!confirmed) return;
+    // Fallback למערכת הישנה
+    if (typeof window.showConfirmationDialog === 'function') {
+        const confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+                'מחיקת חשבון',
+                `האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?\n\nפעולה זו אינה הפיכה.`,
+                () => resolve(true),
+                () => resolve(false)
+            );
+        });
+        if (!confirmed) return;
     } else {
-      if (!confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
-        return;
-      }
-      if (!confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
-        return;
-      }
+        if (typeof window.showConfirmationDialog === 'function') {
+            const confirmed = await new Promise((resolve) => {
+                window.showConfirmationDialog(
+                    'מחיקת חשבון',
+                    `האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?\n\nפעולה זו אינה הפיכה.`,
+                    () => resolve(true),
+                    () => resolve(false)
+                );
+            });
+            if (!confirmed) return;
+        } else {
+            if (!confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
+                return;
+            }
+            if (!confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
+                return;
+            }
+        }
     }
   }
 
@@ -1590,6 +1612,44 @@ async function deleteAccount(accountId, accountName) {
     console.error('שגיאה במחיקת חשבון:', error);
     showErrorMessage('שגיאה במחיקת חשבון');
   }
+}
+
+/**
+ * בדיקת פריטים מקושרים לפני מחיקה
+ */
+async function checkLinkedItemsBeforeDelete(accountId) {
+    try {
+        const response = await fetch(`/api/v1/linked-items/account/${accountId}`);
+        
+        if (!response.ok) {
+            // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
+            return false;
+        }
+
+        const linkedItemsData = await response.json();
+        const childEntities = linkedItemsData.child_entities || [];
+        const parentEntities = linkedItemsData.parent_entities || [];
+        
+        // בדיקה רק אם יש פריטים שמקושרים אל החשבון (child entities)
+        // parent entities הם פריטים שהחשבון מקושר אליהם (מטבע) - לא רלוונטי למחיקה
+        if (childEntities.length > 0) {
+            // יש פריטים מקושרים - הצגת חלון מקושרים
+            if (typeof window.showLinkedItemsModal === 'function') {
+                window.showLinkedItemsModal(linkedItemsData, 'account', accountId);
+                return true;
+            } else {
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('אזהרה', 'יש פריטים מקושרים לחשבון זה', 'warning');
+                }
+                return true;
+            }
+        }
+
+        return false;
+    } catch (error) {
+        console.error('שגיאה בבדיקת פריטים מקושרים:', error);
+        return false;
+    }
 }
 
 /**
@@ -1632,9 +1692,25 @@ function showSecondConfirmationModal(message, onConfirm) {
         () => {}
       );
     } else {
-      if (confirm(message)) {
-        onConfirm();
-      }
+          if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'אישור',
+            message,
+            onConfirm
+        );
+    } else {
+            if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'אישור',
+            message,
+            onConfirm
+        );
+    } else {
+        if (confirm(message)) {
+            onConfirm();
+        }
+    }
+    }
     }
   }
 }
@@ -1643,10 +1719,10 @@ function confirmDeleteAccount(accountId, accountName) {
   deleteAccount(accountId, accountName);
 }
 
-function checkLinkedItems(accountId) {
-  // פונקציה פשוטה לבדיקת פריטים מקושרים
-  return Promise.resolve({ hasLinkedItems: false, items: [] });
-}
+// function checkLinkedItems(accountId) { // הוסר - הוחלף ב-checkLinkedItemsBeforeDelete
+//   // פונקציה פשוטה לבדיקת פריטים מקושרים
+//   return Promise.resolve({ hasLinkedItems: false, items: [] });
+// }
 
 function showOpenTradesWarning(accountId, accountName) {
   if (typeof window.showWarningNotification === 'function') {
@@ -1674,13 +1750,14 @@ window.showSuccessMessage = showSuccessMessage;
 window.showErrorMessage = showErrorMessage;
 window.showSecondConfirmationModal = showSecondConfirmationModal;
 window.confirmDeleteAccount = confirmDeleteAccount;
-window.checkLinkedItems = checkLinkedItems;
+// window.checkLinkedItems = checkLinkedItems; // הוסר - הוחלף ב-checkLinkedItemsBeforeDelete
 window.showOpenTradesWarning = showOpenTradesWarning;
 window.createWarningModal = createWarningModal;
 window.deleteAccountFromAPI = deleteAccountFromAPI;
 window.loadAccountsDataFromAPI = loadAccountsDataFromAPI;
 window.addAccountToAPI = addAccountToAPI;
 window.updateAccountInAPI = updateAccountInAPI;
+window.checkLinkedItemsBeforeDelete = checkLinkedItemsBeforeDelete;  // בדיקת אובייקטים מקושרים למחיקה
 window.createAccountModal = createAccountModal;
 window.saveAccount = saveAccount;
 window.validateAccountData = validateAccountData;
@@ -2041,10 +2118,7 @@ function updateAccountFilterMenu(accounts) {
   console.log(`🔄 Account filter menu updated with ${accounts ? accounts.length : 0} accounts`);
 }
 
-// ייצוא הפונקציות
-window.loadAccountsDataForAccountsPage = loadAccountsDataForAccountsPage;
-
-window.setupSortableHeaders = setupSortableHeaders;
+// פונקציות לפתיחה/סגירה של סקשנים
 // updateGridFromComponentGlobal הועבר ל-header-system.js
 window.updateAccountFilterMenu = updateAccountFilterMenu;
 window.filterAccountsLocally = filterAccountsLocally;
@@ -2090,6 +2164,13 @@ document.addEventListener('DOMContentLoaded', function () {
       window.loadAccountsDataForAccountsPage();
     } else {
       console.error('❌ loadAccountsDataForAccountsPage function not found');
+    }
+
+    // שחזור מצב הסקשנים
+    if (typeof window.restoreAccountsSectionState === 'function') {
+      window.restoreAccountsSectionState();
+    } else {
+      console.error('❌ restoreAccountsSectionState function not found');
     }
   }
 

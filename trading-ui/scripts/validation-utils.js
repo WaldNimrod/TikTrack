@@ -648,8 +648,6 @@ function validateForm(formId, validationRules = {}) {
         const errorSummary = errorMessages.join('\n• ');
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאות בטופס', `נמצאו ${errorMessages.length} שגיאות:\n• ${errorSummary}`);
-        } else {
-            alert(`שגיאות בטופס:\n• ${errorSummary}`);
         }
     }
     

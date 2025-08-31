@@ -1076,7 +1076,9 @@ class ActiveAlertsComponent extends HTMLElement {
     if (window.showInfoNotification) {
       window.showInfoNotification('קישור לאובייקט נמצא בפיתוח', 'info');
     } else {
-      alert('קישור לאובייקט נמצא בפיתוח');
+              if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('פיתוח', 'קישור לאובייקט נמצא בפיתוח');
+        }
     }
   }
 
@@ -1287,7 +1289,9 @@ window.showLinkedObjectMessage = function () {
   if (window.showInfoNotification) {
     window.showInfoNotification('אובייקט מקושר', 'הקישור לאובייקט המקושר יופעל בהמשך');
   } else {
-    alert('הקישור לאובייקט המקושר יופעל בהמשך');
+            if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('פיתוח', 'הקישור לאובייקט המקושר יופעל בהמשך');
+        }
   }
 };
 
@@ -1296,7 +1300,9 @@ window.showTickerPage = function (symbol) {
   if (window.showInfoNotification) {
     window.showInfoNotification('דף טיקר', `דף הטיקר עבור ${symbol} ייפתח בקרוב`);
   } else {
-    alert(`דף הטיקר עבור ${symbol} ייפתח בקרוב`);
+            if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('פיתוח', `דף הטיקר עבור ${symbol} ייפתח בקרוב`);
+        }
   }
 };
 
@@ -1305,7 +1311,9 @@ window.showRelatedObjectModal = function (relatedTypeId, relatedObjectId) {
   if (window.showInfoNotification) {
     window.showInfoNotification('אובייקט מקושר', `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`);
   } else {
-    alert(`פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`);
+            if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('פיתוח', `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`);
+        }
   }
 };
 

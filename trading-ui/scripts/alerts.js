@@ -1770,10 +1770,30 @@ async function deleteAlert(alertId) {
       );
     } else {
       // fallback אחרון - confirm רגיל
-      const confirmed = confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
-      if (confirmed) {
-        await confirmDeleteAlert(alertId);
-      }
+              if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'מחיקת התראה',
+                'האם אתה בטוח שברצונך למחוק התראה זו?',
+                async () => {
+                    await confirmDeleteAlert(alertId);
+                }
+            );
+        } else {
+                    if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'מחיקת התראה',
+                'האם אתה בטוח שברצונך למחוק התראה זו?',
+                async () => {
+                    await confirmDeleteAlert(alertId);
+                }
+            );
+        } else {
+            const confirmed = confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
+            if (confirmed) {
+                await confirmDeleteAlert(alertId);
+            }
+        }
+        }
     }
     return;
   }
@@ -1975,7 +1995,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
     console.error('❌ מערכת התראות לא זמינה!');
-    alert('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
     return;
   }
   

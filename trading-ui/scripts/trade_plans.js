@@ -99,7 +99,7 @@ let trade_plansData = [];
  * פתיחת מודל הוספת תכנון חדש
  */
 function openAddTradePlanModal() {
-    console.log('🔄 Opening add trade plan modal');
+    // Opening add trade plan modal
     const modal = new bootstrap.Modal(document.getElementById('addTradePlanModal'));
 
     // קבע ברירת מחדל של היום לשדה התאריך
@@ -242,7 +242,7 @@ async function updateEditTickerInfo() {
     if (tradePlanId) {
         const originalTradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
         if (originalTradePlan && originalTradePlan.ticker_id != tickerId) {
-            console.log('🔄 Ticker changed from', originalTradePlan.ticker_id, 'to', tickerId);
+            // Ticker changed from original to new
             
             // הצגת הודעת אישור לשינוי טיקר
             if (typeof window.showConfirmationDialog === 'function') {
@@ -275,20 +275,67 @@ async function updateEditTickerInfo() {
                 );
             } else {
                 // Fallback למקרה שהפונקציה לא זמינה
-                const confirmed = confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
-                if (confirmed) {
-                    console.log('שינוי טיקר אושר על ידי המשתמש - אבל הפיצ\'ר לא נתמך');
-                    alert('שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.');
-                    document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
-                    // עדכון התצוגה עם הטיקר המקורי
-                    updateEditTickerInfo();
-                    return;
+                if (typeof window.showConfirmationDialog === 'function') {
+                    window.showConfirmationDialog(
+                        'שינוי טיקר לתכנון',
+                        'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
+                        () => {
+                            console.log('שינוי טיקר אושר על ידי המשתמש - אבל הפיצ\'ר לא נתמך');
+                            if (typeof window.showWarningNotification === 'function') {
+                                window.showWarningNotification(
+                                    'פיצ\'ר לא נתמך',
+                                    'שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.'
+                                );
+                            }
+                            document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                            updateEditTickerInfo();
+                        },
+                        () => {
+                            console.log('שינוי טיקר בוטל על ידי המשתמש');
+                            document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                            updateEditTickerInfo();
+                        }
+                    );
                 } else {
-                    console.log('שינוי טיקר בוטל על ידי המשתמש');
-                    document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
-                    // עדכון התצוגה עם הטיקר המקורי
-                    updateEditTickerInfo();
-                    return;
+                    if (typeof window.showConfirmationDialog === 'function') {
+                        window.showConfirmationDialog(
+                            'שינוי טיקר לתכנון',
+                            'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
+                            () => {
+                                console.log('שינוי טיקר אושר על ידי המשתמש - אבל הפיצ\'ר לא נתמך');
+                                if (typeof window.showWarningNotification === 'function') {
+                                    window.showWarningNotification(
+                                        'פיצ\'ר לא נתמך',
+                                        'שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.'
+                                    );
+                                }
+                                document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                                updateEditTickerInfo();
+                            },
+                            () => {
+                                console.log('שינוי טיקר בוטל על ידי המשתמש');
+                                document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                                updateEditTickerInfo();
+                            }
+                        );
+                    } else {
+                        const confirmed = confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
+                        if (confirmed) {
+                            console.log('שינוי טיקר אושר על ידי המשתמש - אבל הפיצ\'ר לא נתמך');
+                            if (typeof window.showWarningNotification === 'function') {
+                                window.showWarningNotification(
+                                    'פיצ\'ר לא נתמך',
+                                    'שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.'
+                                );
+                            }
+                            document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                            updateEditTickerInfo();
+                        } else {
+                            console.log('שינוי טיקר בוטל על ידי המשתמש');
+                            document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                            updateEditTickerInfo();
+                        }
+                    }
                 }
             }
         }
@@ -427,7 +474,7 @@ async function saveEditTradePlan() {
 
         if (isTickerChanging) {
             // שינוי טיקר לא נתמך - הצגת הודעה ודחיית השינוי
-            console.log('❌ Ticker change detected - feature not supported');
+            // Ticker change detected - feature not supported
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification(
                     'פיצ\'ר לא נתמך',
@@ -1864,7 +1911,9 @@ async function saveNewTradePlan() {
         console.log('🔍 Fallback validation values:', { tickerId, investmentType, side, plannedAmount });
         
         if (!tickerId || !investmentType || !side || !plannedAmount) {
-            alert('יש למלא את כל השדות החובה');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה בטופס', 'יש למלא את כל השדות החובה');
+            }
             return;
         }
     }
@@ -2912,8 +2961,6 @@ window.updateAccountFilterDisplayText = function () {
 function showTickerPage(tickerId) {
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('פיתוח', 'עמוד הנכס נמצא בפיתוח');
-    } else {
-        alert('עמוד הנכס נמצא בפיתוח');
     }
 }
 
@@ -2924,10 +2971,8 @@ function addImportantNote() {
     console.log('🔄 הודעת הערות עשירות');
 
     // הצגת הודעה למשתמש
-    if (typeof showNotification === 'function') {
-        showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית', 'info');
-    } else {
-        alert('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית');
     }
 }
 
@@ -2938,10 +2983,8 @@ function addReminder() {
     console.log('🔄 הודעת התראות');
 
     // הצגת הודעה למשתמש
-    if (typeof showNotification === 'function') {
-        showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'warning');
-    } else {
-        alert('המודול יאפשר בקרוב לייצר התראות לתוכנית');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'המודול יאפשר בקרוב לייצר התראות לתוכנית');
     }
 }
 
@@ -3193,10 +3236,8 @@ function updateAmountFromShares() {
 function addEntryCondition() {
     console.log('🔄 הוספת תנאי כניסה');
 
-    if (typeof showNotification === 'function') {
-        showNotification('המודול יאפשר בקרוב ליצור תנאי כניסה מתקדם', 'info');
-    } else {
-        alert('המודול יאפשר בקרוב ליצור תנאי כניסה מתקדם');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'המודול יאפשר בקרוב ליצור תנאי כניסה מתקדם');
     }
 }
 
@@ -3206,10 +3247,8 @@ function addEntryCondition() {
 function addReason() {
     console.log('🔄 הוספת סיבה');
 
-    if (typeof showNotification === 'function') {
-        showNotification('המודול יאפשר בקרוב ליצור סיבות מתקדמות', 'info');
-    } else {
-        alert('המודול יאפשר בקרוב ליצור סיבות מתקדמות');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'המודול יאפשר בקרוב ליצור סיבות מתקדמות');
     }
 }
 

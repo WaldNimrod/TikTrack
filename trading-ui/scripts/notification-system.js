@@ -456,11 +456,28 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
     } catch (error) {
         console.error('🔧 שגיאה בהצגת המודל:', error);
         // fallback ל-confirm רגיל
-        const confirmed = confirm(message);
-        if (confirmed && onConfirm) {
-            onConfirm();
-        } else if (!confirmed && onCancel) {
-            onCancel();
+        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'אישור',
+                message,
+                onConfirm
+            );
+        } else {
+                    if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'אישור',
+                message,
+                onConfirm,
+                onCancel
+            );
+        } else {
+            const confirmed = confirm(message);
+            if (confirmed && onConfirm) {
+                onConfirm();
+            } else if (!confirmed && onCancel) {
+                onCancel();
+            }
+        }
         }
     }
 }

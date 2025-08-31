@@ -739,9 +739,33 @@ function forceDeleteWithLinkedItems(itemType, itemId, onConfirm) {
     }
 
     // Show final confirmation
-    if (confirm(`האם אתה בטוח שברצונך למחוק ${getItemTypeDisplayName(itemType)} #${itemId} יחד עם כל האובייקטים המקושרים אליו?`)) {
-        if (onConfirm && typeof onConfirm === 'function') {
-            onConfirm();
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'מחיקה עם פריטים מקושרים',
+            `האם אתה בטוח שברצונך למחוק ${getItemTypeDisplayName(itemType)} #${itemId} יחד עם כל האובייקטים המקושרים אליו?`,
+            () => {
+                if (onConfirm && typeof onConfirm === 'function') {
+                    onConfirm();
+                }
+            }
+        );
+    } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'מחיקה עם פריטים מקושרים',
+                `האם אתה בטוח שברצונך למחוק ${getItemTypeDisplayName(itemType)} #${itemId} יחד עם כל האובייקטים המקושרים אליו?`,
+                () => {
+                    if (onConfirm && typeof onConfirm === 'function') {
+                        onConfirm();
+                    }
+                }
+            );
+        } else {
+            if (confirm(`האם אתה בטוח שברצונך למחוק ${getItemTypeDisplayName(itemType)} #${itemId} יחד עם כל האובייקטים המקושרים אליו?`)) {
+                if (onConfirm && typeof onConfirm === 'function') {
+                    onConfirm();
+                }
+            }
         }
     }
 }
@@ -1442,9 +1466,25 @@ function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel =
             const itemType = data.itemType || 'פריט';
             const itemName = data.itemName || 'זה';
             const action = type === 'DELETE' ? 'למחוק' : 'לבטל';
+            if (typeof window.showConfirmationDialog === 'function') {
+                window.showConfirmationDialog(
+                    `${action} ${itemType}`,
+                    `האם אתה בטוח שברצונך ${action} את ${itemType} "${itemName}"?`,
+                    onConfirm
+                );
+            } else {
+                        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                `${action} ${itemType}`,
+                `האם אתה בטוח שברצונך ${action} את ${itemType} "${itemName}"?`,
+                onConfirm
+            );
+        } else {
             const confirmed = confirm(`האם אתה בטוח שברצונך ${action} את ${itemType} "${itemName}"?`);
             if (confirmed && onConfirm) {
                 onConfirm();
+            }
+        }
             }
             return;
         }
@@ -1459,20 +1499,52 @@ function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel =
         if (type === 'DELETE') {
             const itemType = data.itemType || 'פריט';
             const itemName = data.itemName || 'זה';
+            if (typeof window.showConfirmationDialog === 'function') {
+                window.showConfirmationDialog(
+                    'מחיקה',
+                    `האם אתה בטוח שברצונך למחוק את ${itemType} "${itemName}"?`,
+                    onConfirm
+                );
+            } else {
+                        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'מחיקה',
+                `האם אתה בטוח שברצונך למחוק את ${itemType} "${itemName}"?`,
+                onConfirm
+            );
+        } else {
             const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את ${itemType} "${itemName}"?`);
             if (confirmed && onConfirm) {
                 onConfirm();
             }
+        }
+            }
         } else if (type === 'CANCEL') {
             const itemType = data.itemType || 'פריט';
             const itemName = data.itemName || 'זה';
+            if (typeof window.showConfirmationDialog === 'function') {
+                window.showConfirmationDialog(
+                    'ביטול',
+                    `האם אתה בטוח שברצונך לבטל את ${itemType} "${itemName}"?`,
+                    onConfirm
+                );
+            } else {
+                        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'ביטול',
+                `האם אתה בטוח שברצונך לבטל את ${itemType} "${itemName}"?`,
+                onConfirm
+            );
+        } else {
             const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemType} "${itemName}"?`);
             if (confirmed && onConfirm) {
                 onConfirm();
             }
+        }
+            }
         } else {
-            // Fallback to simple alert
-            alert(data.message || 'שגיאה בהצגת האזהרה');
+            // Fallback to console error
+            console.error('שגיאה בהצגת האזהרה:', data.message || 'שגיאה לא ידועה');
         }
     }
 }
@@ -1564,10 +1636,18 @@ function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null
             window.showConfirmationDialog(title, message, onConfirm, onCancel);
         } else {
         // Fallback to simple confirm
-        const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`);
-        if (confirmed && onConfirm) {
-            onConfirm();
+        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'ביטול',
+                `האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`,
+                onConfirm
+            );
+        } else {
+            const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`);
+            if (confirmed && onConfirm) {
+                onConfirm();
             }
+        }
         }
     }
 }
@@ -1592,8 +1672,8 @@ function showValidationWarningLegacy(field, message) {
         // Use our notification system instead of alert
         window.showErrorNotification('שגיאת וולידציה', `${message}`);
     } else {
-        // Fallback to alert if notification system is not available
-        alert(`${message}`);
+        // Fallback to console error if notification system is not available
+        console.error('שגיאת וולידציה:', message);
     }
 }
 

@@ -41,83 +41,6 @@ function deleteCurrency(id) {
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים
-function toggleCurrenciesSection() {
-  
-    const contentSections = document.querySelectorAll('.content-section');
-  
-    const currenciesSection = contentSections[0]; // הסקשן הראשון - מטבעות
-
-    if (!currenciesSection) {
-        console.error('❌ לא נמצא סקשן מטבעות');
-        return;
-    }
-
-    const sectionBody = currenciesSection.querySelector('.section-body');
-    const toggleBtn = currenciesSection.querySelector('button[onclick="toggleCurrenciesSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody) {
-        const isCollapsed = sectionBody.style.display === 'none';
-
-        if (isCollapsed) {
-            sectionBody.style.display = 'block';
-        } else {
-            sectionBody.style.display = 'none';
-        }
-
-        // עדכון האייקון
-        if (icon) {
-            icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-
-        // שמירת המצב ב-localStorage
-        localStorage.setItem('currenciesSectionCollapsed', !isCollapsed);
-    }
-}
-
-// פונקציה לשחזור מצב הסגירה
-function restoreCurrenciesSectionState() {
-    // שחזור מצב סקשן מטבעות
-    const currenciesCollapsed = localStorage.getItem('currenciesSectionCollapsed') === 'true';
-    const contentSections = document.querySelectorAll('.content-section');
-    const currenciesSection = contentSections[0];
-
-    if (currenciesSection) {
-        const sectionBody = currenciesSection.querySelector('.section-body');
-        const toggleBtn = currenciesSection.querySelector('button[onclick="toggleCurrenciesSection()"]');
-        const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-        if (sectionBody && currenciesCollapsed) {
-            sectionBody.style.display = 'none';
-            if (icon) {
-                icon.textContent = '▼';
-            }
-        }
-    }
-}
-
-// פונקציות נוספות
-
-// ========================================
-// פונקציות מודלים
-// ========================================
-
-/**
- * הצגת מודל הוספת מטבע
- */
-function showAddCurrencyModal() {
-  
-    const modal = document.getElementById('addCurrencyModal');
-    if (modal) {
-        // איפוס הטופס
-        document.getElementById('addCurrencyForm').reset();
-
-        // הצגת המודל
-        const bootstrapModal = new bootstrap.Modal(modal);
-        bootstrapModal.show();
-    } else {
-        console.error('❌ לא נמצא מודל הוספת מטבע');
-    }
 }
 
 /**
@@ -215,7 +138,9 @@ async function saveCurrency() {
 
         // ולידציה
         if (!symbol || !name || isNaN(usdRate)) {
-            alert('יש למלא את כל השדות');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה בטופס', 'יש למלא את כל השדות');
+            }
             return;
         }
 
@@ -266,7 +191,9 @@ async function updateCurrency() {
 
         // ולידציה
         if (!symbol || !name || isNaN(usdRate)) {
-            alert('יש למלא את כל השדות');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה בטופס', 'יש למלא את כל השדות');
+            }
             return;
         }
 
@@ -309,8 +236,15 @@ async function updateCurrency() {
  */
 async function confirmDeleteCurrency() {
     try {
-
         const id = parseInt(document.getElementById('deleteCurrencyId').value);
+
+        // בדיקת פריטים מקושרים לפני מחיקה
+        if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
+            const hasLinkedItems = await window.checkLinkedItemsBeforeDelete(id);
+            if (hasLinkedItems) {
+                return; // הפונקציה תטפל בהצגת המודול
+            }
+        }
 
         const response = await fetch(`http://localhost:8080/api/v1/currencies/${id}`, {
             method: 'DELETE'
@@ -339,6 +273,44 @@ async function confirmDeleteCurrency() {
 // ========================================
 // פונקציות תצוגה
 // ========================================
+
+/**
+ * בדיקת פריטים מקושרים לפני מחיקה
+ */
+async function checkLinkedItemsBeforeDelete(currencyId) {
+    try {
+        const response = await fetch(`/api/v1/linked-items/currency/${currencyId}`);
+        
+        if (!response.ok) {
+            // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
+            return false;
+        }
+
+        const linkedItemsData = await response.json();
+        const childEntities = linkedItemsData.child_entities || [];
+        const parentEntities = linkedItemsData.parent_entities || [];
+        
+        // בדיקה רק אם יש פריטים שמקושרים אל המטבע (child entities)
+        // parent entities הם פריטים שהמטבע מקושר אליהם - לא רלוונטי למחיקה
+        if (childEntities.length > 0) {
+            // יש פריטים מקושרים - הצגת חלון מקושרים
+            if (typeof window.showLinkedItemsModal === 'function') {
+                window.showLinkedItemsModal(linkedItemsData, 'currency', currencyId);
+                return true;
+            } else {
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('אזהרה', 'יש פריטים מקושרים למטבע זה', 'warning');
+                }
+                return true;
+            }
+        }
+
+        return false;
+    } catch (error) {
+        console.error('שגיאה בבדיקת פריטים מקושרים:', error);
+        return false;
+    }
+}
 
 /**
  * רינדור טבלת מטבעות
@@ -408,3 +380,41 @@ async function initializeCurrenciesPage() {
     restoreCurrenciesSectionState();
 
 }
+
+// ========================================
+// ייצוא פונקציות
+// ========================================
+
+// אתחול הדף
+document.addEventListener('DOMContentLoaded', function () {
+  console.log('🔄 === DOM CONTENT LOADED (CURRENCIES) ===');
+
+  // שחזור מצב הסקשנים
+  if (typeof window.restoreCurrenciesSectionState === 'function') {
+    window.restoreCurrenciesSectionState();
+  } else {
+    console.error('❌ restoreCurrenciesSectionState function not found');
+  }
+
+  // טעינת נתונים
+  if (typeof window.loadCurrenciesData === 'function') {
+    window.loadCurrenciesData();
+  } else {
+    console.error('❌ loadCurrenciesData function not found');
+  }
+
+  console.log('✅ Currencies page initialization completed');
+});
+
+// ייצוא פונקציות גלובליות
+window.openCurrencyDetails = openCurrencyDetails;
+window.editCurrency = editCurrency;
+window.deleteCurrency = deleteCurrency;
+window.showDeleteCurrencyModal = showDeleteCurrencyModal;
+window.confirmDeleteCurrency = confirmDeleteCurrency;
+window.checkLinkedItemsBeforeDelete = checkLinkedItemsBeforeDelete;  // בדיקת אובייקטים מקושרים למחיקה
+window.toggleCurrenciesSection = toggleCurrenciesSection;
+window.restoreCurrenciesSectionState = restoreCurrenciesSectionState;
+window.renderCurrenciesTable = renderCurrenciesTable;
+window.updatePageSummaryStats = updatePageSummaryStats;
+window.initializeCurrenciesPage = initializeCurrenciesPage;

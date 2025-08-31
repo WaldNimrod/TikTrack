@@ -33,6 +33,27 @@ function initializeTestsPage() {
 
 }
 
+// אתחול הדף
+document.addEventListener('DOMContentLoaded', function () {
+  console.log('🔄 === DOM CONTENT LOADED (TESTS) ===');
+
+  // שחזור מצב הסקשנים
+  if (typeof window.restoreAllSectionStates === 'function') {
+    window.restoreAllSectionStates();
+  } else {
+    console.error('❌ restoreAllSectionStates function not found');
+  }
+
+  // אתחול דף הבדיקות
+  if (typeof window.initializeTestsPage === 'function') {
+    window.initializeTestsPage();
+  } else {
+    console.error('❌ initializeTestsPage function not found');
+  }
+
+  console.log('✅ Tests page initialization completed');
+});
+
 // Load tests data
 async function loadTestsData() {
     try {
@@ -329,11 +350,26 @@ function runAllTests() {
 
     const activeTests = testsData.filter(test => test.status === 'active');
     if (activeTests.length === 0) {
-        alert('אין בדיקות פעילות להרצה');
+        if (typeof window.showWarningNotification === 'function') {
+            window.showWarningNotification('אזהרה', 'אין בדיקות פעילות להרצה');
+        }
         return;
     }
 
-    if (confirm(`האם להריץ את כל ${activeTests.length} הבדיקות הפעילות?`)) {
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'הרצת בדיקות',
+            `האם להריץ את כל ${activeTests.length} הבדיקות הפעילות?`,
+            () => {
+                runAllTests();
+            }
+        );
+    } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'הרצת בדיקות',
+                `האם להריץ את כל ${activeTests.length} הבדיקות הפעילות?`,
+                () => {
         activeTests.forEach((test, index) => {
             setTimeout(() => {
                 runTest(test.id);
@@ -345,15 +381,33 @@ function runAllTests() {
 function editTest(testId) {
   
     // TODO: Open edit modal
-    alert('פונקציית עריכת בדיקה תתווסף בקרוב');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('פיתוח', 'פונקציית עריכת בדיקה תתווסף בקרוב');
+    }
 }
 
 function deleteTest(testId) {
   
-    if (confirm('האם אתה בטוח שברצונך למחוק בדיקה זו?')) {
-        testsData = testsData.filter(test => test.id !== testId);
-        updateTestsTable();
-        updateSummaryStats();
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'מחיקת בדיקה',
+            'האם אתה בטוח שברצונך למחוק בדיקה זו?',
+            () => {
+                testsData = testsData.filter(test => test.id !== testId);
+                updateTestsTable();
+                updateSummaryStats();
+            }
+        );
+    } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'מחיקת בדיקה',
+                'האם אתה בטוח שברצונך למחוק בדיקה זו?',
+                () => {
+            testsData = testsData.filter(test => test.id !== testId);
+            updateTestsTable();
+            updateSummaryStats();
+        }
     }
 }
 
@@ -361,7 +415,9 @@ function viewTestResult(resultId) {
   
     const result = testResultsData.find(r => r.id === resultId);
     if (result) {
-        alert(`תוצאות בדיקה ${resultId}:\n${result.details}`);
+        if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('תוצאות בדיקה', `תוצאות בדיקה ${resultId}:\n${result.details}`);
+        }
     }
 }
 
@@ -382,96 +438,47 @@ function exportTestResult(resultId) {
 
 function deleteTestResult(resultId) {
   
-    if (confirm('האם אתה בטוח שברצונך למחוק תוצאה זו?')) {
-        testResultsData = testResultsData.filter(result => result.id !== resultId);
-        updateTestResultsTable();
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'מחיקת תוצאה',
+            'האם אתה בטוח שברצונך למחוק תוצאה זו?',
+            () => {
+                testResultsData = testResultsData.filter(result => result.id !== resultId);
+                updateTestResultsTable();
+            }
+        );
+    } else {
+        if (confirm('האם אתה בטוח שברצונך למחוק תוצאה זו?')) {
+            testResultsData = testResultsData.filter(result => result.id !== resultId);
+            updateTestResultsTable();
+        }
     }
 }
 
 function clearTestResults() {
   
-    if (confirm('האם אתה בטוח שברצונך לנקות את כל תוצאות הבדיקות?')) {
-        testResultsData = [];
-        updateTestResultsTable();
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'ניקוי תוצאות',
+            'האם אתה בטוח שברצונך לנקות את כל תוצאות הבדיקות?',
+            () => {
+                testResultsData = [];
+                updateTestResultsTable();
+            }
+        );
+    } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'ניקוי תוצאות',
+                'האם אתה בטוח שברצונך לנקות את כל תוצאות הבדיקות?',
+                () => {
+            testResultsData = [];
+            updateTestResultsTable();
+        }
     }
 }
 
 // Section management
-function toggleTopSection() {
-
-    // שימוש בפונקציה הגלובלית מ-main.js
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection('top');
-    } else {
-        console.error('❌ הפונקציה הגלובלית toggleSection לא זמינה');
-    }
-}
-
-function toggleMainSection() {
-
-    // שימוש בפונקציה הגלובלית מ-main.js
-    if (typeof window.toggleSection === 'function') {
-        // מצא את הסקשן הקרוב לכפתור שנלחץ
-        const button = event.target.closest('button');
-        const section = button?.closest('.content-section');
-        if (section && section.dataset.section) {
-            window.toggleSection(section.dataset.section);
-        } else {
-            console.error('❌ לא ניתן למצוא סקשן עם data-section');
-        }
-    } else {
-        console.error('❌ הפונקציה הגלובלית toggleSection לא זמינה');
-    }
-}
-
-function restoreTestsSectionState() {
-
-    // שימוש בפונקציה הגלובלית מ-main.js
-    if (typeof window.restoreSectionStates === 'function') {
-        window.restoreSectionStates();
-    } else {
-        console.error('❌ הפונקציה הגלובלית restoreSectionStates לא זמינה');
-    }
-}
-
-// Error handling
-function showError(message) {
-    console.error('❌ Error:', message);
-    // TODO: Show user-friendly error message
-}
-
-// Preferences functions
-function saveTestPreferences() {
-  
-    const preferences = {
-        useTempDatabase: document.getElementById('useTempDatabase')?.checked || false,
-        backupBeforeTests: document.getElementById('backupBeforeTests')?.checked || false,
-        cleanupAfterTests: document.getElementById('cleanupAfterTests')?.checked || false,
-        parallelTests: document.getElementById('parallelTests')?.checked || false,
-        showProgress: document.getElementById('showProgress')?.checked || false,
-        stopOnError: document.getElementById('stopOnError')?.checked || false,
-        detailedReport: document.getElementById('detailedReport')?.checked || false,
-        saveReports: document.getElementById('saveReports')?.checked || false,
-        htmlReport: document.getElementById('htmlReport')?.checked || false,
-        errorNotifications: document.getElementById('errorNotifications')?.checked || false,
-        successNotifications: document.getElementById('successNotifications')?.checked || false
-    };
-
-    localStorage.setItem('testPreferences', JSON.stringify(preferences));
-    alert('העדפות בדיקות נשמרו בהצלחה!');
-}
-
-function resetTestPreferences() {
-  
-    if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות הבדיקות לברירות מחדל?')) {
-        // Reset all checkboxes to default values
-        const checkboxes = [
-            'useTempDatabase', 'backupBeforeTests', 'cleanupAfterTests', 'showProgress',
-            'detailedReport', 'saveReports', 'htmlReport', 'errorNotifications', 'successNotifications'
-        ];
-
-        checkboxes.forEach(id => {
-            const checkbox = document.getElementById(id);
             if (checkbox) {
                 checkbox.checked = true; // Default to checked
             }
@@ -487,7 +494,9 @@ function resetTestPreferences() {
         });
 
         localStorage.removeItem('testPreferences');
-        alert('העדפות בדיקות אופסו לברירות מחדל!');
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'העדפות בדיקות אופסו לברירות מחדל!');
+        }
     }
 }
 
@@ -500,18 +509,44 @@ function saveCRUDPreferences() {
     });
 
     localStorage.setItem('crudPreferences', JSON.stringify(preferences));
-    alert('העדפות בדיקות CRUD נשמרו בהצלחה!');
+            if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'העדפות בדיקות CRUD נשמרו בהצלחה!');
+        }
 }
 
 function resetCRUDPreferences() {
-    if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות CRUD לברירות מחדל?')) {
-        const crudTests = document.querySelectorAll('input[data-test]');
-        crudTests.forEach(test => {
-            test.checked = true; // Default to checked
-        });
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'איפוס העדפות CRUD',
+            'האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות CRUD לברירות מחדל?',
+            () => {
+                const crudTests = document.querySelectorAll('input[data-test]');
+                crudTests.forEach(test => {
+                    test.checked = true; // Default to checked
+                });
 
-        localStorage.removeItem('crudPreferences');
-        alert('העדפות בדיקות CRUD אופסו לברירות מחדל!');
+                localStorage.removeItem('crudPreferences');
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('הצלחה', 'העדפות בדיקות CRUD אופסו לברירות מחדל!');
+                }
+            }
+        );
+    } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'איפוס העדפות CRUD',
+            'האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות CRUD לברירות מחדל?',
+            () => {
+            const crudTests = document.querySelectorAll('input[data-test]');
+            crudTests.forEach(test => {
+                test.checked = true; // Default to checked
+            });
+
+            localStorage.removeItem('crudPreferences');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', 'העדפות בדיקות CRUD אופסו לברירות מחדל!');
+            }
+        }
     }
 }
 
@@ -522,19 +557,46 @@ function saveSecurityPreferences() {
     };
 
     localStorage.setItem('securityPreferences', JSON.stringify(preferences));
-    alert('העדפות אבטחה נשמרו בהצלחה!');
+            if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'העדפות אבטחה נשמרו בהצלחה!');
+        }
 }
 
 function resetSecurityPreferences() {
-    if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות האבטחה לברירות מחדל?')) {
-        const securityTests = document.getElementById('securityTests');
-        const penetrationTests = document.getElementById('penetrationTests');
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'איפוס העדפות אבטחה',
+            'האם אתה בטוח שברצונך לאפס את כל העדפות האבטחה לברירות מחדל?',
+            () => {
+                const securityTests = document.getElementById('securityTests');
+                const penetrationTests = document.getElementById('penetrationTests');
 
-        if (securityTests) securityTests.checked = false;
-        if (penetrationTests) penetrationTests.checked = false;
+                if (securityTests) securityTests.checked = false;
+                if (penetrationTests) penetrationTests.checked = false;
 
-        localStorage.removeItem('securityPreferences');
-        alert('העדפות אבטחה אופסו לברירות מחדל!');
+                localStorage.removeItem('securityPreferences');
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('הצלחה', 'העדפות אבטחה אופסו לברירות מחדל!');
+                }
+            }
+        );
+    } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'איפוס העדפות אבטחה',
+                'האם אתה בטוח שברצונך לאפס את כל העדפות האבטחה לברירות מחדל?',
+                () => {
+            const securityTests = document.getElementById('securityTests');
+            const penetrationTests = document.getElementById('penetrationTests');
+
+            if (securityTests) securityTests.checked = false;
+            if (penetrationTests) penetrationTests.checked = false;
+
+            localStorage.removeItem('securityPreferences');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', 'העדפות אבטחה אופסו לברירות מחדל!');
+            }
+        }
     }
 }
 
@@ -542,15 +604,38 @@ function saveAllPreferences() {
     saveTestPreferences();
     saveCRUDPreferences();
     saveSecurityPreferences();
-    alert('כל ההעדפות נשמרו בהצלחה!');
+            if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'כל ההעדפות נשמרו בהצלחה!');
+        }
 }
 
 function resetAllPreferences() {
-    if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
-        resetTestPreferences();
-        resetCRUDPreferences();
-        resetSecurityPreferences();
-        alert('כל ההעדפות אופסו לברירות מחדל!');
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'איפוס כל ההעדפות',
+            'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
+            () => {
+                resetTestPreferences();
+                resetCRUDPreferences();
+                resetSecurityPreferences();
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('הצלחה', 'כל ההעדפות אופסו לברירות מחדל!');
+                }
+            }
+        );
+    } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'איפוס כל ההעדפות',
+                'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
+                () => {
+            resetTestPreferences();
+            resetCRUDPreferences();
+            resetSecurityPreferences();
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', 'כל ההעדפות אופסו לברירות מחדל!');
+            }
+        }
     }
 }
 
@@ -561,7 +646,29 @@ async function runAllCRUDTests() {
         return;
     }
 
-    if (confirm(`האם להריץ את כל ${activeTests.length} בדיקות CRUD הפעילות?`)) {
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'הרצת בדיקות CRUD',
+            `האם להריץ את כל ${activeTests.length} בדיקות CRUD הפעילות?`,
+            async () => {
+                showNotification(`מתחיל הרצת ${activeTests.length} בדיקות CRUD...`, 'info');
+
+                try {
+                    const results = await executeCRUDTests(activeTests);
+                    displayCRUDTestResults(results);
+                    showNotification('בדיקות CRUD הושלמו בהצלחה!', 'success');
+                } catch (error) {
+                    console.error('❌ Error running CRUD tests:', error);
+                    showNotification('שגיאה בהרצת בדיקות CRUD', 'error');
+                }
+            }
+        );
+    } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'הרצת בדיקות CRUD',
+                `האם להריץ את כל ${activeTests.length} בדיקות CRUD הפעילות?`,
+                async () => {
         showNotification(`מתחיל הרצת ${activeTests.length} בדיקות CRUD...`, 'info');
 
         try {
@@ -650,7 +757,9 @@ window.resetCRUDPreferences = resetCRUDPreferences;
 async function runServerTests() {
     const selectedTests = getSelectedServerTests();
     if (selectedTests.length === 0) {
-        alert('אין בדיקות שרת נבחרות להרצה');
+        if (typeof window.showWarningNotification === 'function') {
+            window.showWarningNotification('אזהרה', 'אין בדיקות שרת נבחרות להרצה');
+        }
         return;
     }
 
@@ -766,14 +875,20 @@ function saveServerPreferences() {
     };
 
     localStorage.setItem('serverPreferences', JSON.stringify(preferences));
-    alert('העדפות בדיקות שרת נשמרו בהצלחה!');
+            if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'העדפות בדיקות שרת נשמרו בהצלחה!');
+        }
 }
 
 /**
  * Reset server preferences
  */
 function resetServerPreferences() {
-    if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות השרת לברירות מחדל?')) {
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'איפוס העדפות שרת',
+            'האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות השרת לברירות מחדל?',
+            () => {
         const checkboxes = [
             'serverHealthCheck', 'databaseConnectivity', 'apiEndpoints', 'responseTimeCheck'
         ];
@@ -786,7 +901,9 @@ function resetServerPreferences() {
         });
 
         localStorage.removeItem('serverPreferences');
-        alert('העדפות בדיקות שרת אופסו לברירות מחדל!');
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'העדפות בדיקות שרת אופסו לברירות מחדל!');
+        }
     }
 }
 
@@ -904,16 +1021,24 @@ function saveAPIPreferences() {
     };
 
     localStorage.setItem('apiPreferences', JSON.stringify(preferences));
-    alert('העדפות בדיקות API נשמרו בהצלחה!');
+            if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'העדפות בדיקות API נשמרו בהצלחה!');
+        }
 }
 
 /**
  * Reset API preferences
  */
 function resetAPIPreferences() {
-    if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות API לברירות מחדל?')) {
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'איפוס העדפות API',
+            'האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות API לברירות מחדל?',
+            () => {
         localStorage.removeItem('apiPreferences');
-        alert('העדפות בדיקות API אופסו לברירות מחדל!');
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'העדפות בדיקות API אופסו לברירות מחדל!');
+        }
     }
 }
 
@@ -1029,7 +1154,11 @@ function displayCRUDTestResults(results) {
  * Clear CRUD test results
  */
 function clearCRUDTestResults() {
-    if (confirm('האם אתה בטוח שברצונך לנקות את כל תוצאות בדיקות CRUD?')) {
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'ניקוי תוצאות CRUD',
+            'האם אתה בטוח שברצונך לנקות את כל תוצאות בדיקות CRUD?',
+            () => {
         document.getElementById('crudTestResultsContent').innerHTML = '';
         document.getElementById('crudTestResultsArea').style.display = 'none';
         document.getElementById('crudTestResultsCount').textContent = '0 תוצאות';
@@ -1120,7 +1249,11 @@ function saveCRUDPreferences() {
  * Reset CRUD preferences
  */
 function resetCRUDPreferences() {
-    if (confirm('האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות CRUD לברירות מחדל?')) {
+            if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'איפוס העדפות CRUD',
+                'האם אתה בטוח שברצונך לאפס את כל העדפות בדיקות CRUD לברירות מחדל?',
+                () => {
         // Reset all CRUD test checkboxes to checked
         const testCheckboxes = document.querySelectorAll('input[data-test]');
         testCheckboxes.forEach(checkbox => {

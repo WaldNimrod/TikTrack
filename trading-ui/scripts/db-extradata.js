@@ -321,18 +321,11 @@ function updateLoadingText() {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-    // שחזור מצב הסגירה של הסקשן העליון
-    if (typeof window.restoreAllSectionStates === 'function') {
-        window.restoreAllSectionStates();
+    // שחזור מצב הסגירה של הסקשנים
+    if (typeof window.restoreDbExtradataSectionState === 'function') {
+        window.restoreDbExtradataSectionState();
     } else {
-        console.warn('⚠️ restoreAllSectionStates function not available globally');
-    }
-
-    // שחזור מצב הסגירה של הסקשנים הפנימיים
-    if (typeof window.restoreSectionStates === 'function') {
-        window.restoreSectionStates();
-    } else {
-        console.warn('⚠️ restoreSectionStates function not available globally');
+        console.error('❌ restoreDbExtradataSectionState function not found');
     }
 
     // עדכון טקסט טעינה
@@ -1777,52 +1770,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Export Functions
 // ========================================
 
-// Export toggle functions
-window.toggleAllSections = function() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
-    } else {
-        console.warn('⚠️ toggleTopSection function not available globally');
-    }
-};
-
-window.toggleCurrenciesSection = function() {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection('currencies');
-    } else {
-        console.warn('⚠️ toggleSection function not available globally');
-    }
-};
-
-window.toggleNoteRelationTypesSection = function() {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection('note_relation_types');
-    } else {
-        console.warn('⚠️ toggleSection function not available globally');
-    }
-};
-
-// פונקציה לעדכון מספר כפתורי טריגרים
-function updateTriggerButtonsCount() {
-    // ספירת כל הטריגרים
-    const totalTriggers = 10; // סך הכל 10 טריגרים במערכת
-    
-    // ספירת טריגרים פעילים
-    const activeTriggers = 6; // 6 טריגרים פעילים: 2 הגנה + 4 התראות
-    
-    // עדכון מונה הטבלה
-    const countElement = document.getElementById('triggerButtonsCount');
-    if (countElement) {
-        countElement.textContent = `🔘 כפתורי טריגרים: ${totalTriggers} (${activeTriggers} פעילים)`;
-    }
-
-    // עדכון הסטטיסטיקות הכלליות
-    const summaryCountElement = document.getElementById('summaryTriggerButtonsCount');
-    if (summaryCountElement) {
-        summaryCountElement.textContent = totalTriggers;
-    }
-
-    // עדכון הסכום הכללי
+// פונקציות לפתיחה/סגירה של סקשנים
     const totalRecordsElement = document.getElementById('totalRecords');
     if (totalRecordsElement) {
         const currentTotal = parseInt(totalRecordsElement.textContent) || 0;

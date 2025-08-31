@@ -208,3 +208,21 @@ console.log('❌ Error loading data:', error);
 - ✅ **לוגים מפורטים** לניטור
 
 המערכת מוכנה לשימוש ולפיתוח עתידי!
+
+## Version History
+
+### Version 3.0 (August 31, 2025) - CURRENT
+- **COMPLETE FILTER SYSTEM REFACTORING**: Simplified architecture by removing complex functions
+- **NEW FILTER FUNCTIONS**: Replaced complex system with simple, direct filter application
+- **ENGLISH-ONLY LOGIC**: All internal filter logic now uses English column names
+- **DIRECT COLUMN MAPPING**: Simplified column detection and filtering
+- **CLEANER CODE**: Removed over-engineered configurations and complex container detection
+- **BETTER MAINTAINABILITY**: Easier to understand and modify filter system
+
+### Version 2.1 (August 31, 2025)
+- **UPDATED FILTER VALUES**: Corrected status filter to exactly 3 values (Open, Closed, Cancelled)
+- **UPDATED TYPE FILTER**: Corrected type filter to exactly 3 values (Investment, Swing, Passive)
+- **UPDATED ACCOUNT FILTER**: Only active accounts are loaded and displayed
+- **UPDATED SUPPORTED PAGES**: Added support for all main pages (trades, trade plans, tickers, accounts, cash flows, notes)
+- **REMOVED NOTIFICATIONS**: Removed non-existent notificationsContainer reference
+- **ENHANCED DOCUMENTATION**: Updated all documentation to reflect current system state

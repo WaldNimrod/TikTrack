@@ -149,34 +149,8 @@ function showDeleteCashFlowModal(id) {
     modal.show();
 }
 
-// פונקציה להצגת התראת פריטים מקושרים
-function showLinkedItemsWarning(itemType, id) {
-    // בדיקה אם יש פריטים מקושרים
-    const linkedItems = checkLinkedItemsForCashFlow(id);
-    
-    if (linkedItems && linkedItems.length > 0) {
-        // קריאה לפונקציה הגלובלית החדשה
-        if (typeof window.showLinkedItemsModal === 'function') {
-            window.showLinkedItemsModal(linkedItems, 'cash_flow', id);
-        } else {
-            console.error('❌ showLinkedItemsModal לא זמין');
-        }
-    } else {
-        // אין פריטים מקושרים - הצג מודל מחיקה רגיל
-        if (typeof window.showDeleteWarning === 'function') {
-            window.showDeleteWarning('cash_flow', id, 'תזרים מזומנים');
-        } else {
-            console.error('❌ showDeleteWarning לא זמין');
-        }
-    }
-}
-
-// פונקציה לבדיקת פריטים מקושרים לתזרים מזומנים
-function checkLinkedItemsForCashFlow(cashFlowId) {
-    // כאן תהיה בדיקה אמיתית מול השרת
-    // כרגע נחזיר מערך ריק (אין פריטים מקושרים)
-    return [];
-}
+// פונקציות אלו הוסרו - תזרימי מזומנים לא צריכים בדיקת מקושרים
+// הפונקציה showDeleteCashFlowWarning משתמשת ישירות ב-window.showDeleteWarning
 
 // ========================================
 // פונקציות מודלים
@@ -468,8 +442,24 @@ function showDeleteCashFlowWarning(id) {
         window.showDeleteWarning('cash_flow', id, 'תזרים מזומנים');
     } else {
         // Fallback למקרה שהמערכת הגלובלית לא זמינה
-        if (confirm('האם אתה בטוח שברצונך למחוק תזרים מזומנים זה?')) {
-            confirmDeleteCashFlow(id);
+        if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'מחיקת תזרים מזומנים',
+                'האם אתה בטוח שברצונך למחוק תזרים מזומנים זה?',
+                () => confirmDeleteCashFlow(id)
+            );
+        } else {
+                    if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+                'מחיקת תזרים מזומנים',
+                'האם אתה בטוח שברצונך למחוק תזרים מזומנים זה?',
+                () => confirmDeleteCashFlow(id)
+            );
+        } else {
+            if (confirm('האם אתה בטוח שברצונך למחוק תזרים מזומנים זה?')) {
+                confirmDeleteCashFlow(id);
+            }
+        }
         }
     }
 }
@@ -1653,5 +1643,5 @@ window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.showDeleteCashFlowWarning = showDeleteCashFlowWarning;
 window.showDeleteCashFlowModal = showDeleteCashFlowModal;
-// window.showLinkedItemsWarning = showLinkedItemsWarning; // הוחלף ב-showLinkedItemsModal
-window.checkLinkedItemsForCashFlow = checkLinkedItemsForCashFlow;
+// window.showLinkedItemsWarning = showLinkedItemsWarning; // הוסר - הוחלף ב-showLinkedItemsModal
+// window.checkLinkedItemsForCashFlow = checkLinkedItemsForCashFlow; // הוסר - לא נחוץ יותר

@@ -265,9 +265,204 @@ function createEditButton(onClick) {
   return `<button class="btn btn-sm btn-secondary" onclick="${onClick}" title="ערוך">✏️</button>`;
 }
 
-// פונקציה ליצירת כפתור מחיקה - משתמשת בפונקציה הגלובלית
+// פונקציה ליצירת כפתור מחיקה
 function createDeleteButton(onClick) {
-  return window.createDeleteButton ? window.createDeleteButton(onClick) : `<button class="btn btn-sm btn-danger" onclick="${onClick}" title="מחק">🗑️</button>`;
+  return `<button class="btn btn-sm btn-danger" onclick="${onClick}" title="מחק">🗑️</button>`;
+}
+
+// פונקציה להפעלה מחדש של רשומה מבוטלת
+async function reactivateRecord(tableType, recordId) {
+  try {
+    console.log(`🔄 הפעלה מחדש של רשומה: ${tableType} ID: ${recordId}`);
+    
+    // שימוש בפונקציה הכללית להפעלה מחדש
+    if (window.uiUtils && window.uiUtils.performItemReactivation) {
+      await window.uiUtils.performItemReactivation(tableType, recordId, `רשומה ${recordId}`);
+    } else {
+      // fallback אם הפונקציה הכללית לא זמינה
+      const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+      let response;
+      
+      switch (tableType) {
+        case 'trades':
+          response = await fetch(`${base}/api/v1/trades/${recordId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'open' })
+          });
+          break;
+        case 'trade_plans':
+          response = await fetch(`${base}/api/v1/trade_plans/${recordId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'open' })
+          });
+          break;
+        case 'accounts':
+          response = await fetch(`${base}/api/v1/accounts/${recordId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'active' })
+          });
+          break;
+        case 'tickers':
+          response = await fetch(`${base}/api/v1/tickers/${recordId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'active' })
+          });
+          break;
+        case 'alerts':
+          response = await fetch(`${base}/api/v1/alerts/${recordId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'active' })
+          });
+          break;
+        default:
+          throw new Error(`לא נתמך הפעלה מחדש עבור ${tableType}`);
+      }
+      
+      if (response.ok) {
+        console.log(`✅ רשומה הופעלה מחדש בהצלחה: ${tableType} ID: ${recordId}`);
+        // רענון הנתונים
+        loadAllDatabaseData();
+        // הצגת הודעת הצלחה
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification(`${tableType} הופעל מחדש בהצלחה!`);
+        }
+      } else {
+        throw new Error(`שגיאה בהפעלה מחדש: ${response.status}`);
+      }
+    }
+  } catch (error) {
+    console.error(`❌ שגיאה בהפעלה מחדש של רשומה:`, error);
+    if (window.showErrorNotification) {
+      window.showErrorNotification(`שגיאה בהפעלה מחדש: ${error.message}`);
+    }
+  }
+}
+
+// פונקציה לביטול רשומה - משתמשת בפונקציות הכלליות
+async function cancelRecord(tableType, recordId) {
+  try {
+    console.log(`🔄 ביטול רשומה: ${tableType} ID: ${recordId}`);
+    
+    // שימוש בפונקציה הכללית לביטול
+    if (window.uiUtils && window.uiUtils.performItemCancellation) {
+      await window.uiUtils.performItemCancellation(tableType, recordId, `רשומה ${recordId}`);
+    } else {
+      // fallback אם הפונקציה הכללית לא זמינה
+      const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+      let response;
+      
+      switch (tableType) {
+        case 'trades':
+          response = await fetch(`${base}/api/v1/trades/${recordId}/cancel`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cancel_reason: 'בוטל על ידי המשתמש' })
+          });
+          break;
+        case 'trade_plans':
+          response = await fetch(`${base}/api/v1/trade_plans/${recordId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'cancelled' })
+          });
+          break;
+        case 'accounts':
+          response = await fetch(`${base}/api/v1/accounts/${recordId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'cancelled' })
+          });
+          break;
+        case 'tickers':
+          response = await fetch(`${base}/api/v1/tickers/${recordId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'canceled' })
+          });
+          break;
+        case 'alerts':
+          response = await fetch(`${base}/api/v1/alerts/${recordId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'cancelled' })
+          });
+          break;
+        default:
+          throw new Error(`לא נתמך ביטול עבור ${tableType}`);
+      }
+      
+      if (response.ok) {
+        console.log(`✅ רשומה בוטלה בהצלחה: ${tableType} ID: ${recordId}`);
+        // רענון הנתונים
+        loadAllDatabaseData();
+        // הצגת הודעת הצלחה
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification(`${tableType} בוטל בהצלחה!`);
+        }
+      } else {
+        throw new Error(`שגיאה בביטול: ${response.status}`);
+      }
+    }
+  } catch (error) {
+    console.error(`❌ שגיאה בביטול רשומה:`, error);
+    if (window.showErrorNotification) {
+      window.showErrorNotification(`שגיאה בביטול: ${error.message}`);
+    }
+  }
+}
+
+// פונקציה לעדכון סטטיסטיקות הטבלאות
+function updateTableStats() {
+  console.log('🔄 updateTableStats נקראה');
+  
+  // עדכון ספירת תוכניות מסחר
+  const tradePlansCount = document.getElementById('tradePlansCount');
+  if (tradePlansCount && window.tradePlansData) {
+    tradePlansCount.textContent = `${window.tradePlansData.length} תוכניות מסחר`;
+  }
+  
+  // עדכון ספירת עסקאות
+  const tradesCount = document.getElementById('tradesCount');
+  if (tradesCount && window.tradesData) {
+    tradesCount.textContent = `${window.tradesData.length} עסקאות`;
+  }
+  
+  // עדכון ספירת חשבונות
+  const accountsCount = document.getElementById('accountsCount');
+  if (accountsCount && window.accountsData) {
+    accountsCount.textContent = `${window.accountsData.length} חשבונות`;
+  }
+  
+  // עדכון ספירת טיקרים
+  const tickersCount = document.getElementById('tickersCount');
+  if (tickersCount && window.tickersData) {
+    tickersCount.textContent = `${window.tickersData.length} טיקרים`;
+  }
+  
+  // עדכון ספירת ביצועים
+  const executionsCount = document.getElementById('executionsCount');
+  if (executionsCount && window.executionsData) {
+    executionsCount.textContent = `${window.executionsData.length} ביצועים`;
+  }
+  
+  // עדכון ספירת התראות
+  const alertsCount = document.getElementById('alertsCount');
+  if (alertsCount && window.alertsData) {
+    alertsCount.textContent = `${window.alertsData.length} התראות`;
+  }
+  
+  // עדכון ספירת הערות
+  const notesCount = document.getElementById('notesCount');
+  if (notesCount && window.notesData) {
+    notesCount.textContent = `${window.notesData.length} הערות`;
+  }
+  
+  console.log('✅ updateTableStats הושלם');
 }
 
 // ===== מנגנון ניהול סקשנים חדש =====
@@ -450,6 +645,9 @@ async function loadAllDatabaseData() {
     // עדכון כל הטבלאות
     updateAllTables();
     
+    // עדכון סטטיסטיקות הטבלאות
+    updateTableStats();
+    
     console.log('✅ נתונים נטענו בהצלחה');
     console.log('📊 סיכום נתונים:', {
       accounts: allData.accounts.length,
@@ -536,16 +734,44 @@ function updateTable(tableType, data) {
   // הוספת שורות נתונים
   data.forEach(item => {
     const row = document.createElement('tr');
-    const columnMappings = TABLE_COLUMN_MAPPINGS[tableType] || [];
+    
+    // הגדרת מיפוי עמודות לפי סוג הטבלה
+    let columnMappings = [];
+    switch (tableType) {
+      case 'trades':
+        columnMappings = ['id', 'account_id', 'ticker_id', 'trade_plan_id', 'status', 'investment_type', 'side', 'opened_at', 'closed_at', 'cancelled_at', 'cancel_reason', 'total_pl', 'notes', 'created_at'];
+        break;
+      case 'accounts':
+        columnMappings = ['id', 'name', 'currency_id', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes', 'created_at'];
+        break;
+      case 'trade_plans':
+        columnMappings = ['id', 'account_id', 'ticker_id', 'investment_type', 'side', 'status', 'planned_amount', 'entry_conditions', 'stop_price', 'target_price', 'reasons', 'cancelled_at', 'cancel_reason', 'created_at'];
+        break;
+      case 'tickers':
+        columnMappings = ['id', 'symbol', 'name', 'type', 'remarks', 'currency_id', 'active_trades', 'status', 'created_at', 'updated_at'];
+        break;
+      case 'executions':
+        columnMappings = ['id', 'trade_id', 'action', 'date', 'quantity', 'price', 'fee', 'source', 'created_at', 'external_id', 'notes'];
+        break;
+      case 'alerts':
+        columnMappings = ['id', 'condition', 'condition_display_text', 'status', 'related_type', 'related_id', 'trade_id', 'trade_plan_id', 'account_id', 'ticker_id', 'is_triggered', 'created_at'];
+        break;
+      case 'notes':
+        columnMappings = ['id', 'content', 'related_type', 'related_id', 'related_type_id', 'attachment', 'created_at'];
+        break;
+      default:
+        console.warn(`⚠️ לא מוגדר מיפוי עמודות עבור ${tableType}`);
+        return;
+    }
     
     columnMappings.forEach(field => {
       const cell = document.createElement('td');
-      const value = item[field];
+      let value = item[field];
       
       // עיצוב ערכים מיוחדים
       if (isNumeric(value)) {
         cell.textContent = formatNumber(value);
-      } else if (field === 'created_at' || field === 'updated_at' || field === 'date') {
+      } else if (field === 'created_at' || field === 'updated_at' || field === 'opened_at' || field === 'closed_at' || field === 'cancelled_at' || field === 'executed_at') {
         cell.textContent = value ? new Date(value).toLocaleDateString('he-IL') : '';
       } else {
         cell.textContent = value || '';
@@ -556,14 +782,26 @@ function updateTable(tableType, data) {
 
     // הוספת עמודת פעולות
     const actionsCell = document.createElement('td');
+    actionsCell.className = 'actions-cell';
     let actionsHtml = `
       ${createEditButton(`editRecord('${tableType}', ${item.id})`)}
       ${createDeleteButton(`deleteRecord('${tableType}', ${item.id})`)}
     `;
     
-    // הוספת כפתור ביטול לטבלאות עם שדה סטטוס
-    if (item.status && item.status !== 'cancelled' && item.status !== 'canceled') {
-      actionsHtml += `<button class="btn btn-sm btn-warning" onclick="cancelRecord('${tableType}', ${item.id})" title="בטל"><span class="cancel-icon">X</span></button>`;
+    // הוספת כפתור ביטול/הפעלה מחדש לטבלאות עם שדה סטטוס
+    if (item.status) {
+      // שימוש בפונקציה הכללית ליצירת כפתור ביטול/הפעלה מחדש
+      if (window.uiUtils && window.uiUtils.createCancelButton) {
+        actionsHtml += window.uiUtils.createCancelButton(tableType, item.id, item.status, 'sm');
+      } else {
+        // fallback אם הפונקציה הכללית לא זמינה
+        const isCancelled = item.status === 'cancelled' || item.status === 'canceled';
+        const buttonClass = isCancelled ? 'btn-success' : 'btn-danger';
+        const title = isCancelled ? 'הפעל מחדש' : 'בטל';
+        const onclick = isCancelled ? `reactivateRecord('${tableType}', ${item.id})` : `cancelRecord('${tableType}', ${item.id})`;
+        
+        actionsHtml += `<button class="btn btn-sm ${buttonClass}" onclick="${onclick}" title="${title}"><span class="cancel-icon">${isCancelled ? '↻' : 'X'}</span></button>`;
+      }
     }
     
     actionsCell.innerHTML = actionsHtml;

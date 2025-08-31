@@ -251,6 +251,90 @@ table[data-table-type="trades"] .actions-cell .btn {
     margin: 0 1px !important;
 }
 
+/* סגנונות לטבלת חשבונות */
+table[data-table-type="accounts"] .actions-cell {
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+}
+
+table[data-table-type="accounts"] .actions-cell .btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.7rem !important;
+    margin: 0 1px !important;
+}
+
+/* סגנונות לטבלת תוכניות מסחר */
+table[data-table-type="trade_plans"] .actions-cell {
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+}
+
+table[data-table-type="trade_plans"] .actions-cell .btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.7rem !important;
+    margin: 0 1px !important;
+}
+
+/* סגנונות לטבלת טיקרים */
+table[data-table-type="tickers"] .actions-cell {
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+}
+
+table[data-table-type="tickers"] .actions-cell .btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.7rem !important;
+    margin: 0 1px !important;
+}
+
+/* סגנונות לטבלת ביצועים */
+table[data-table-type="executions"] .actions-cell {
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+}
+
+table[data-table-type="executions"] .actions-cell .btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.7rem !important;
+    margin: 0 1px !important;
+}
+
+/* סגנונות לטבלת התראות */
+table[data-table-type="alerts"] .actions-cell {
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+}
+
+table[data-table-type="alerts"] .actions-cell .btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.7rem !important;
+    margin: 0 1px !important;
+}
+
+/* סגנונות לטבלת הערות */
+table[data-table-type="notes"] .actions-cell {
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+}
+
+table[data-table-type="notes"] .actions-cell .btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.7rem !important;
+    margin: 0 1px !important;
+}
+
 /* רוחב קבוע לעמודת הפעולות - כפתורים בשורה אחת */
 /* הועבר להגדרות הגלובליות למעלה */
 

@@ -131,18 +131,78 @@ async function resetToDefaults() {
     );
   } else {
     // גיבוי למערכת הישנה
-    if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
-      currentPreferences = { ...DEFAULT_PREFERENCES };
-      updateUI();
-      
-      try {
-        await saveAllPreferences();
-        showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
-      } catch (error) {
-        showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
-      }
+    if (typeof window.showConfirmationDialog === 'function') {
+      const confirmed = await new Promise((resolve) => {
+        window.showConfirmationDialog(
+          'איפוס העדפות',
+          'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
+          async () => {
+            currentPreferences = { ...DEFAULT_PREFERENCES };
+            updateUI();
+            
+            try {
+              await saveAllPreferences();
+              showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
+            } catch (error) {
+              showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
+            }
+            resolve(true);
+          },
+          () => resolve(false)
+        );
+      });
+    } else {
+          if (typeof window.showConfirmationDialog === 'function') {
+        const confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+                'איפוס העדפות',
+                'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
+                async () => {
+                    currentPreferences = { ...DEFAULT_PREFERENCES };
+                    updateUI();
+                    
+                    try {
+                        await saveAllPreferences();
+                        showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
+                    } catch (error) {
+                        showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
+                    }
+                    resolve(true);
+                },
+                () => resolve(false)
+            );
+        });
+    } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'איפוס העדפות',
+            'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
+            async () => {
+                currentPreferences = { ...DEFAULT_PREFERENCES };
+                updateUI();
+                
+                try {
+                    await saveAllPreferences();
+                    showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
+                } catch (error) {
+                    showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
+                }
+            }
+        );
+    } else {
+        if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
+            currentPreferences = { ...DEFAULT_PREFERENCES };
+            updateUI();
+            
+            try {
+                await saveAllPreferences();
+                showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
+            } catch (error) {
+                showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
+            }
+        }
     }
-  }
+}
 }
 
 /**
@@ -372,7 +432,7 @@ function showPreferencesInfo(title, message) {
     window.showNotification(title, message, 'info');
   } else {
     console.log('ℹ️ מידע:', title, '-', message);
-    }
+  }
 }
 
 /**
@@ -394,6 +454,13 @@ function showPreferencesWarning(title, message) {
 async function initializePreferences() {
   // בדיקת מערכת ההתראות
   try {
+    // שחזור מצב הסקשנים
+    if (typeof window.restoreAllSectionStates === 'function') {
+      window.restoreAllSectionStates();
+    } else {
+      console.error('❌ restoreAllSectionStates function not found');
+    }
+
     // טען העדפות
     await loadPreferences();
     

@@ -113,7 +113,7 @@
  * 
  * DEPENDENCIES:
  * ============
- * - notification-system.js: showLinkedItemsWarning() and loadLinkedItemsData()
+ * - notification-system.js: showLinkedItemsModal() and loadLinkedItemsData()
  * - Bootstrap 5.3.0: Modal functionality and styling
  * - linked-items.css: Dedicated styling for the modal
  * 
@@ -1337,7 +1337,9 @@ function openItemPage(itemType, itemId) {
     if (typeof window.showNotification === 'function') {
         window.showNotification('פתיחת דף רשומה - בפיתוח', 'info');
     } else {
-        alert('פתיחת דף רשומה - בפיתוח');
+        if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('פיתוח', 'פתיחת דף רשומה - בפיתוח');
+        }
     }
 
     // Future implementation: navigate to item page

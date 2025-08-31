@@ -5,8 +5,8 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 
 ## File Location
 - **Main File**: `trading-ui/scripts/header-system.js`
-- **Version**: 4.1 (August 28, 2025)
-- **Status**: **COMPLETE REWRITE** - Removed old filter system, implemented new unified filtering with enhanced date filtering
+- **Version**: 4.2 (August 31, 2025)
+- **Status**: **UPDATED** - Corrected filter values and supported pages
 
 ## System Components
 
@@ -16,9 +16,9 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 - **Responsive Design**: Mobile-friendly navigation interface
 - **Dropdown Menus**: Multi-level navigation support
 
-### 2. Unified Filter System (NEW)
+### 2. Unified Filter System (UPDATED)
 - **Multi-Select Filters**: Status and Type filters support multiple selections
-- **Dynamic Account Loading**: Accounts loaded from server with caching
+- **Dynamic Account Loading**: Only active accounts loaded from server with caching
 - **Advanced Date Filtering**: Smart date range calculations with Hebrew display
 - **Universal Search**: Search across all columns except actions
 - **Filter Reset/Clear**: Reset to preferences or clear all filters
@@ -41,7 +41,7 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 ```
 trading-ui/
 ├── scripts/
-│   ├── header-system.js          # Main header system (COMPLETELY REWRITTEN)
+│   ├── header-system.js          # Main header system (UPDATED)
 │   └── console-cleanup.js        # Console management
 ├── styles/
 │   ├── header-system.css         # Header styling (UPDATED)
@@ -53,10 +53,10 @@ trading-ui/
 
 ## Key Features
 
-### 1. Advanced Filter System (NEW ARCHITECTURE)
+### 1. Advanced Filter System (UPDATED ARCHITECTURE)
 - **Universal Table Filtering**: Single `applyTableFilter()` function works on all tables
 - **Smart Column Detection**: Automatically detects relevant columns by header text
-- **Multi-Container Support**: Filters apply to all visible table containers including notifications
+- **Multi-Container Support**: Filters apply to all visible table containers
 - **Dynamic Filter Application**: Filters adapt to table structure automatically
 - **Comprehensive Logging**: Detailed logs for debugging and monitoring
 
@@ -105,7 +105,7 @@ updateNavigationState() {
 }
 ```
 
-### Filter System (NEW)
+### Filter System (UPDATED)
 
 #### `applyTableFilter(filterType, selectedValues)`
 Universal filter function that works on all tables:
@@ -128,36 +128,36 @@ function applyTableFilter(filterType, selectedValues) {
 }
 ```
 
-#### `getFilterConfig(filterType)`
+#### `getFilterConfig(filterType)` (UPDATED)
 Returns filter configuration for different filter types:
 ```javascript
 function getFilterConfig(filterType) {
     const configs = {
         'status': {
             columnName: 'Status',
-containerIdKeywords: ['status', 'Status'],
-            knownContainers: ['tradesContainer', 'designsContainer', 'alertsContainer', 'executionsContainer', 'testContainer'],
-            cellValues: ['Open', 'Closed', 'Cancelled', 'Active', 'Inactive', 'Pending'],
+            containerIdKeywords: ['status', 'Status'],
+            knownContainers: ['tradesContainer', 'tradePlansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
+            cellValues: ['Open', 'Closed', 'Cancelled'],
             dataField: 'status'
         },
         'type': {
-            columnName: 'Type',
-            containerIdKeywords: ['type', 'Type'],
-            knownContainers: ['tradesContainer', 'designsContainer', 'testContainer'],
-            cellValues: ['Investment', 'Swing', 'Passive', 'Buy', 'Sell'],
+            columnName: 'Investment Type',
+            containerIdKeywords: ['type', 'Type', 'investment'],
+            knownContainers: ['tradesContainer', 'tradePlansContainer'],
+            cellValues: ['Investment', 'Swing', 'Passive'],
             dataField: 'investment-type'
         },
         'account': {
             columnName: 'Account',
             containerIdKeywords: ['account', 'Account'],
-            knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer'],
-            cellValues: [], // Dynamic from server
+            knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'cashFlowsContainer'],
+            cellValues: [], // Dynamic from server (only active accounts)
             dataField: 'account'
         },
         'date': {
             columnName: 'Date',
             containerIdKeywords: ['date', 'Date'],
-            knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer'],
+            knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'cashFlowsContainer', 'notesContainer'],
             cellValues: [], // Dates are dynamic
             dataField: 'created-at',
             isFirstOccurrence: true
@@ -165,7 +165,7 @@ containerIdKeywords: ['status', 'Status'],
         'search': {
             columnName: 'search',
             containerIdKeywords: ['search', 'search'],
-            knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer'],
+            knownContainers: ['tradesContainer', 'tradePlansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
             cellValues: [],
             dataField: 'search',
             searchAllColumns: true,
@@ -231,7 +231,7 @@ Add the header system to any HTML page:
                 <thead>
                     <tr>
                         <th>Status</th>
-                        <th>Type</th>
+                        <th>Investment Type</th>
                         <th>Account</th>
                         <th>Date</th>
                         <!-- other headers -->
@@ -268,31 +268,33 @@ Tables must be wrapped in containers with specific IDs:
 </div>
 ```
 
-**Supported Container IDs:**
+**Supported Container IDs (UPDATED):**
 - `tradesContainer` - Trades table
+- `tradePlansContainer` - Trade plans table
 - `alertsContainer` - Alerts table
 - `executionsContainer` - Executions table
-- `testContainer` - Test table
-- `notificationsContainer` - Notifications table (NEW - supports date filtering)
-- `designsContainer` - Trade designs table
+- `accountsContainer` - Accounts table
+- `tickersContainer` - Tickers table
+- `cashFlowsContainer` - Cash flows table
+- `notesContainer` - Notes table
 
 #### Column Header Requirements
 Filters work by matching column headers:
 
-**Status Filter:**
+**Status Filter (UPDATED):**
 - Header: `Status`
-- Values: `Open`, `Closed`, `Cancelled`, `Active`, `Inactive`, `Pending`
+- Values: `Open`, `Closed`, `Cancelled` (exactly 3 values)
 
-**Type Filter:**
-- Header: `Type` or `Type`
-- Values: `Investment`, `Swing`, `Passive`, `Buy`, `Sell`
+**Type Filter (UPDATED):**
+- Header: `Investment Type` or `סוג השקעה`
+- Values: `Investment`, `Swing`, `Passive` (exactly 3 values)
 
-**Account Filter:**
+**Account Filter (UPDATED):**
 - Header: `Account`
-- Values: Dynamic from server (e.g., "Trading Account 1", "Investment Account")
+- Values: Dynamic from server (only active accounts)
 
 **Date Filter:**
-- Header: `Date`
+- Header: `Date` or `Created At`
 - Values: Date strings in format "YYYY-MM-DD"
 
 **Search Filter:**
@@ -316,8 +318,8 @@ Status and Type filters support multiple selections:
 - **30 Days**, **60 Days**, **90 Days** - Last X days
 - **Week Previous**, **Previous Month**, **Year Previous** - Previous periods
 
-#### Account Filter
-- Loads accounts dynamically from server
+#### Account Filter (UPDATED)
+- Loads only active accounts dynamically from server
 - Caches accounts in localStorage for performance
 - Supports default account selection from preferences
 - Matches by account ID or name
@@ -441,12 +443,11 @@ Key CSS classes for customization:
 #### Date Filter Issues (FIXED)
 1. Verify date format is "YYYY-MM-DD"
 2. Check if date column is first date column in table
-3. Ensure notificationsContainer is included for notifications table
-4. "All Time" now appears FIRST in the list
-5. Date range calculations are now correct
+3. "All Time" now appears FIRST in the list
+4. Date range calculations are now correct
 
-#### Account Filter Issues
-1. Check server returns account data
+#### Account Filter Issues (UPDATED)
+1. Check server returns only active account data
 2. Verify account names match between server and table
 3. Check localStorage for cached account data
 
@@ -475,7 +476,23 @@ window.applyTableFilter('status', ['Open']);
 
 ## Version History
 
-### Version 4.1 (August 28, 2025) - CURRENT
+### Version 4.3 (August 31, 2025) - CURRENT
+- **COMPLETE FILTER SYSTEM REFACTORING**: Simplified architecture by removing complex functions
+- **NEW FILTER FUNCTIONS**: Replaced complex system with simple, direct filter application
+- **ENGLISH-ONLY LOGIC**: All internal filter logic now uses English column names
+- **DIRECT COLUMN MAPPING**: Simplified column detection and filtering
+- **CLEANER CODE**: Removed over-engineered configurations and complex container detection
+- **BETTER MAINTAINABILITY**: Easier to understand and modify filter system
+
+### Version 4.2 (August 31, 2025)
+- **UPDATED FILTER VALUES**: Corrected status filter to exactly 3 values (Open, Closed, Cancelled)
+- **UPDATED TYPE FILTER**: Corrected type filter to exactly 3 values (Investment, Swing, Passive)
+- **UPDATED ACCOUNT FILTER**: Only active accounts are loaded and displayed
+- **UPDATED SUPPORTED PAGES**: Added support for all main pages (trades, trade plans, tickers, accounts, cash flows, notes)
+- **REMOVED NOTIFICATIONS**: Removed non-existent notificationsContainer reference
+- **ENHANCED DOCUMENTATION**: Updated all documentation to reflect current system state
+
+### Version 4.1 (August 28, 2025)
 - **ENHANCED DATE FILTERING**: Fixed date range calculations and "All Time" positioning
 - **NOTIFICATIONS SUPPORT**: Added notificationsContainer to date filter
 - **IMPROVED LOGIC**: Enhanced date range logic for all options
@@ -509,3 +526,18 @@ For issues or questions:
 2. Review this documentation
 3. Check filter configuration matches requirements
 4. Verify table structure follows conventions
+
+## Future Enhancements
+
+### Planned Features
+- **Database Display Page Filtering**: Implement filters for database display page affecting all tables simultaneously
+- **Auxiliary Tables Filtering**: Add filter support for auxiliary tables pages
+- **Advanced Date Filtering**: Add custom date range selection
+- **Filter Presets**: Save and load filter combinations
+- **Export Filtered Data**: Export only filtered data to CSV/Excel
+
+### Implementation Roadmap
+1. **Phase 1**: Complete main page filtering (trades, trade plans, tickers, accounts, cash flows, notes)
+2. **Phase 2**: Implement database display page filtering
+3. **Phase 3**: Add auxiliary tables filtering
+4. **Phase 4**: Advanced features and optimizations

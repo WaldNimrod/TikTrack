@@ -50,8 +50,8 @@ function showLoginError(message, containerId = 'loginError') {
       errorDiv.style.display = 'none';
     }, 5000);
   } else {
-    // אם אין אלמנט שגיאה, נציג alert
-    alert('שגיאה: ' + message);
+    // אם אין אלמנט שגיאה, נציג console error
+    console.error('שגיאה:', message);
   }
 }
 

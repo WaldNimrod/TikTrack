@@ -2369,7 +2369,7 @@ class HeaderSystem {
   //     }
   //   }
 
-  // טעינת חשבונות לפילטר
+  // טעינת חשבונות לפילטר (רק חשבונות פעילים)
   async loadAccountsForFilter() {
     try {
       const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
@@ -2380,7 +2380,12 @@ class HeaderSystem {
       const data = await response.json();
 
       if (data.status === 'success' && Array.isArray(data.data)) {
-        this.updateAccountFilterOptions(data.data);
+        // סינון רק חשבונות פעילים
+        const activeAccounts = data.data.filter(account => 
+          account.status === 'active' || account.status === 'open'
+        );
+        console.log(`🔍 Loaded ${activeAccounts.length} active accounts out of ${data.data.length} total accounts`);
+        this.updateAccountFilterOptions(activeAccounts);
       }
     } catch (err) {
       console.warn('Failed to load accounts for filter:', err);
@@ -3168,306 +3173,200 @@ function selectDateRangeOption(dateRange) {
 // ===== פונקציות הפעלת פילטרים =====
 
 /**
- * פונקציה כללית להפעלת פילטרים על טבלאות
+ * Simple Filter System - New Architecture
+ * =======================================
+ * 
+ * Simple, direct filter application without complex configurations
  */
-function applyTableFilter(filterType, selectedValues) {
-  console.log(`🔄 applyTableFilter called for ${filterType}:`, selectedValues);
-  
-  // בדיקה אם selectedValues הוא פונקציה במקום מערך
-  if (typeof selectedValues === 'function') {
-    console.log('⚠️ selectedValues is a function, not an array. Skipping filter application.');
-    return;
-  }
-  
-  // הגדרת הפילטר לפי הסוג
-  const filterConfig = getFilterConfig(filterType);
-  if (!filterConfig) {
-    console.log('⚠️ Unknown filter type:', filterType);
-    return;
-  }
 
-  console.log('🔍 Filter config:', filterConfig);
+// Supported containers for filtering
+const SUPPORTED_CONTAINERS = [
+  'tradesContainer',
+  'tradePlansContainer', 
+  'accountsContainer',
+  'alertsContainer',
+  'cashFlowsContainer',
+  'executionsContainer',
+  'notesContainer',
+  'tickersContainer'
+];
 
-  // קבלת כל הקונטיינרים הנראים
-  const visibleContainers = getAllVisibleContainers();
+// Filter column mappings
+const FILTER_COLUMNS = {
+  'status': 'Status',
+  'type': 'Investment Type',
+  'account': 'Account',
+  'date': 'Date',
+  'search': null // Special case - searches all columns
+};
+
+// Tables that support type filter
+const TYPE_FILTER_TABLES = ['tradesContainer', 'tradePlansContainer'];
+
+/**
+ * Simple filter application function
+ */
+function applyFilter(filterType, selectedValue) {
+  console.log(`🔄 Applying ${filterType} filter with value:`, selectedValue);
+  
+  // Get visible containers
+  const visibleContainers = getVisibleContainers();
   console.log('🔍 Visible containers:', visibleContainers);
-
+  
   if (visibleContainers.length === 0) {
     console.log('⚠️ No visible containers found');
     return;
   }
-
-  // הפעלת הפילטר על כל הקונטיינרים הנראים
-  let appliedToAny = false;
   
+  // Apply filter to each container
   for (const containerId of visibleContainers) {
-    // בדיקה אם הטבלה הזו צריכה להיות מושפעת מהפילטר
-    const shouldApplyFilter = checkIfTableHasColumn(containerId, filterConfig);
-    
-    if (shouldApplyFilter) {
-      console.log(`✅ Table ${containerId} has ${filterType} column - applying filter`);
-      applyFilterToTable(containerId, filterConfig, selectedValues);
-      appliedToAny = true;
-    } else {
-      console.log(`ℹ️ Table ${containerId} does not have ${filterType} column - showing all records`);
-      // אם אין עמודה מתאימה, נציג את כל הרשומות
-      showAllRecordsInTable(containerId);
+    if (shouldApplyFilterToContainer(containerId, filterType)) {
+      applyFilterToContainer(containerId, filterType, selectedValue);
     }
-  }
-
-  if (!appliedToAny) {
-    console.log('⚠️ No tables found with the required column');
-  }
-
-  // Fallback לפונקציות ספציפיות לעמודים - רק אם המערכת האחידה לא עובדת
-  if (!appliedToAny && filterType === 'account' && window.filterExecutionsByAccount) {
-    console.log('🔄 Calling filterExecutionsByAccount for executions page as fallback');
-    window.filterExecutionsByAccount(selectedValues);
   }
 }
 
 /**
- * הגדרת תצורות הפילטרים השונים
+ * Get visible containers from the supported list
  */
-function getFilterConfig(filterType) {
-  const configs = {
-    'status': {
-      columnName: 'סטטוס',
-      containerIdKeywords: ['status', 'סטטוס'],
-      knownContainers: ['tradesContainer', 'designsContainer', 'alertsContainer', 'executionsContainer', 'testContainer'],
-      cellValues: ['פתוח', 'סגור', 'מבוטל', 'פעיל', 'לא פעיל', 'ממתין'],
-      dataField: 'status'
-    },
-    'executions': {
-      columnName: 'עסקעות',
-      containerIdKeywords: ['executions', 'עסקעות'],
-      knownContainers: ['executionsContainer', 'testContainer'],
-      cellValues: ['קנייה', 'מכירה', 'buy', 'sell'],
-      dataField: 'execution-type'
-    },
-         'type': {
-       columnName: 'טיפוס',
-       containerIdKeywords: ['type', 'סוג', 'טיפוס'],
-       knownContainers: ['tradesContainer', 'designsContainer', 'testContainer'],
-       cellValues: ['השקעה', 'סווינג', 'פסיבי', 'קנייה', 'מכירה'],
-       dataField: 'investment-type'
-     },
-    'account': {
-      columnName: 'חשבון',
-      containerIdKeywords: ['account', 'חשבון'],
-      knownContainers: ['tradesContainer', 'accountsContainer', 'testContainer'],
-      cellValues: ['חשבון א', 'חשבון ב', 'חשבון ג'],
-      dataField: 'account'
-    },
-         'date': {
-       columnName: 'תאריך',
-       columnNameEnglish: 'Created At',
-       containerIdKeywords: ['date', 'תאריך'],
-       knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer', 'currenciesContainer', 'noteRelationTypesContainer'],
-       cellValues: [], // תאריכים הם דינמיים
-       dataField: 'created-at',
-       isFirstOccurrence: true // תמיד העמודה הראשונה עם תאריך
-     },
-    'search': {
-      columnName: 'search',
-      containerIdKeywords: [],
-      knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'testContainer', 'notificationsContainer', 'currenciesContainer', 'noteRelationTypesContainer'],
-      cellValues: [],
-      dataField: null,
-      searchAllColumns: true, // חיפוש בכל העמודות חוץ מפעולות
-      excludeColumns: ['פעולות', 'actions', 'Actions']
-    }
-  };
-
-  return configs[filterType];
-}
-
-/**
- * בדיקה אם לטבלה יש עמודה מסוימת
- */
-function checkIfTableHasColumn(containerId, filterConfig) {
-  console.log(`🔍 Checking if table has ${filterConfig.columnName} column: ${containerId}`);
+function getVisibleContainers() {
+  const visible = [];
   
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.log('⚠️ Container not found:', containerId);
+  for (const containerId of SUPPORTED_CONTAINERS) {
+    const container = document.getElementById(containerId);
+    if (container && container.offsetParent !== null) {
+      const rect = container.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        visible.push(containerId);
+      }
+    }
+  }
+  
+  return visible;
+}
+
+/**
+ * Check if filter should be applied to this container
+ */
+function shouldApplyFilterToContainer(containerId, filterType) {
+  // Type filter only applies to specific tables
+  if (filterType === 'type' && !TYPE_FILTER_TABLES.includes(containerId)) {
     return false;
   }
+  
+  // All other filters apply to all supported containers
+  return true;
+}
 
-  // בדיקה 1: חיפוש שם העמודה בכותרת הטבלה
+/**
+ * Apply filter to a specific container
+ */
+function applyFilterToContainer(containerId, filterType, selectedValue) {
+  console.log(`🔄 Applying ${filterType} filter to ${containerId}`);
+  
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
   const table = container.querySelector('table');
-  if (table) {
-    const headers = table.querySelectorAll('th');
-    console.log(`🔍 Found ${headers.length} headers in table`);
-    
-    if (filterConfig.isFirstOccurrence) {
-      // עבור תאריכים - מחפשים את העמודה הראשונה עם תאריך
-      for (let i = 0; i < headers.length; i++) {
-        const headerText = headers[i].textContent.trim();
-        console.log(`🔍 Header ${i}: "${headerText}"`);
-        
-        if (headerText.includes(filterConfig.columnName) || 
-            headerText.includes('נוצר ב') || 
-            headerText.includes('תאריך יצירה')) {
-          console.log(`✅ Found first ${filterConfig.columnName} column at index ${i} (${headerText})`);
-          return true;
-        }
-      }
-    } else {
-      // עבור פילטרים רגילים - מחפשים בכל הכותרות
-      for (const header of headers) {
-        const headerText = header.textContent.trim();
-        console.log(`🔍 Header text: "${headerText}"`);
-        
-        if (headerText.includes(filterConfig.columnName) || 
-            (filterConfig.columnNameEnglish && headerText.includes(filterConfig.columnNameEnglish))) {
-          console.log(`✅ Found ${filterConfig.columnName} column in table headers`);
-          return true;
-        }
-      }
-    }
-  } else {
-    console.log('⚠️ No table found in container');
+  if (!table) return;
+  
+  const rows = table.querySelectorAll('tbody tr');
+  let visibleCount = 0;
+  
+  for (const row of rows) {
+    const shouldShow = checkRowFilter(row, filterType, selectedValue);
+    row.style.display = shouldShow ? '' : 'none';
+    if (shouldShow) visibleCount++;
   }
+  
+  console.log(`✅ Filter applied to ${containerId}: ${visibleCount}/${rows.length} rows visible`);
+}
 
-  // בדיקה 2: חיפוש מילות מפתח במזהה הקונטיינר
-  for (const keyword of filterConfig.containerIdKeywords) {
-    if (containerId.toLowerCase().includes(keyword) || containerId.includes(keyword)) {
-      console.log(`✅ Found ${keyword} in container ID`);
+/**
+ * Check if a row should be shown based on filter
+ */
+function checkRowFilter(row, filterType, selectedValue) {
+  // Show all if no filter value
+  if (!selectedValue || selectedValue === 'הכול' || selectedValue === 'כל זמן') {
+    return true;
+  }
+  
+  // Special case for search
+  if (filterType === 'search') {
+    return checkSearchFilter(row, selectedValue);
+  }
+  
+  // Get column index for this filter type
+  const columnIndex = getColumnIndex(row, filterType);
+  if (columnIndex === -1) return true; // Show if column not found
+  
+  // Get cell value
+  const cell = row.cells[columnIndex];
+  if (!cell) return true;
+  
+  const cellValue = cell.textContent.trim();
+  
+  // Apply filter logic
+  switch (filterType) {
+    case 'status':
+      return cellValue === selectedValue;
+    case 'type':
+      return cellValue === selectedValue;
+    case 'account':
+      return cellValue === selectedValue;
+    case 'date':
+      return checkDateFilter(cellValue, selectedValue);
+    default:
+      return true;
+  }
+}
+
+/**
+ * Get column index for filter type
+ */
+function getColumnIndex(row, filterType) {
+  const table = row.closest('table');
+  if (!table) return -1;
+  
+  const headers = table.querySelectorAll('th');
+  const columnName = FILTER_COLUMNS[filterType];
+  
+  if (!columnName) return -1;
+  
+  for (let i = 0; i < headers.length; i++) {
+    const headerText = headers[i].textContent.trim();
+    if (headerText.includes(columnName)) {
+      return i;
+    }
+  }
+  
+  return -1;
+}
+
+/**
+ * Check search filter
+ */
+function checkSearchFilter(row, searchTerm) {
+  if (!searchTerm) return true;
+  
+  const cells = row.querySelectorAll('td');
+  for (const cell of cells) {
+    const cellText = cell.textContent.toLowerCase();
+    if (cellText.includes(searchTerm.toLowerCase())) {
       return true;
     }
   }
-
-  // בדיקה 3: רשימה ידנית של קונטיינרים שידוע שיש להם עמודה זו
-  if (filterConfig.knownContainers.includes(containerId)) {
-    console.log(`✅ Container in known ${filterConfig.columnName} tables list`);
-    return true;
-  }
-
-  console.log(`❌ No ${filterConfig.columnName} column found in table`);
+  
   return false;
 }
 
 /**
- * הפעלת פילטר על טבלה ספציפית
+ * Check date filter
  */
-function applyFilterToTable(containerId, filterConfig, selectedValues) {
-  console.log(`🔄 Applying ${filterConfig.columnName} filter to ${containerId}:`, selectedValues);
-  
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.log('⚠️ Container not found:', containerId);
-    return;
-  }
+function checkDateFilter(cellValue, dateRange) {
+  // TODO: Implement date range logic
+  return true;
 
-  const table = container.querySelector('table');
-  if (!table) {
-    console.log('⚠️ Table not found in container:', containerId);
-    return;
-  }
-
-  const rows = table.querySelectorAll('tbody tr');
-  console.log(`🔍 Found ${rows.length} rows in table ${containerId}`);
-  let visibleCount = 0;
-
-  for (const row of rows) {
-    let shouldShow = true;
-
-    // אם יש בחירות ספציפיות (לא "הכול" או "כל זמן")
-    if (selectedValues && selectedValues.length > 0 && 
-        !selectedValues.includes('הכול') && !selectedValues.includes('כל זמן')) {
-      
-      console.log(`🔍 Processing row ${visibleCount + 1} with filter type: ${filterConfig.columnName}`);
-      
-      if (filterConfig.searchAllColumns) {
-        // חיפוש חופשי - מחפש בכל העמודות
-        shouldShow = searchInAllColumns(row, selectedValues, filterConfig);
-      } else if (filterConfig.columnName === 'תאריך') {
-        // פילטר תאריך - בדיקה מיוחדת
-        console.log('🔍 Processing date filter for row');
-        const filterCell = findFilterCell(row, filterConfig);
-        
-        if (filterCell) {
-          const cellValue = filterCell.textContent.trim();
-          const dateRange = selectedValues[0]; // פילטר תאריך תמיד יש לו ערך אחד
-          console.log('🔍 Date filter - cell value:', cellValue, 'date range:', dateRange);
-          console.log('🔍 Cell HTML:', filterCell.outerHTML);
-          shouldShow = isDateInRange(cellValue, dateRange);
-          console.log('🔍 Date filter result:', shouldShow);
-        } else {
-          console.log('⚠️ No date cell found for date filter');
-          console.log('🔍 Row HTML:', row.outerHTML);
-          shouldShow = true;
-        }
-      } else {
-        // פילטר רגיל - מחפש בעמודה ספציפית
-        const filterCell = findFilterCell(row, filterConfig);
-        
-        if (filterCell) {
-          const cellValue = filterCell.textContent.trim();
-          shouldShow = selectedValues.includes(cellValue);
-        } else {
-          // אם לא מצאנו עמודה מתאימה, נציג את השורה
-          shouldShow = true;
-        }
-      }
-    }
-
-    // הצגה/הסתרה של השורה
-    if (shouldShow) {
-      row.style.display = '';
-      visibleCount++;
-      console.log(`✅ Row ${visibleCount} shown`);
-    } else {
-      row.style.display = 'none';
-      console.log(`❌ Row hidden`);
-    }
-  }
-
-  console.log(`✅ ${filterConfig.columnName} filter applied: ${visibleCount} rows visible`);
-}
-
-/**
- * חיפוש בכל העמודות של שורה (לחיפוש חופשי)
- */
-function searchInAllColumns(row, searchTerms, filterConfig) {
-  console.log('🔍 searchInAllColumns called with:', { searchTerms, filterConfig });
-  
-  const cells = row.querySelectorAll('td');
-  const headers = row.closest('table').querySelectorAll('th');
-  
-  console.log(`🔍 Found ${cells.length} cells and ${headers.length} headers`);
-  
-  for (let i = 0; i < cells.length; i++) {
-    // בדיקה אם העמודה הזו לא נכללת בחיפוש
-    if (i < headers.length) {
-      const headerText = headers[i].textContent.trim();
-      console.log(`🔍 Header ${i}: "${headerText}"`);
-      
-      if (filterConfig.excludeColumns.includes(headerText)) {
-        console.log(`⏭️ Skipping excluded column: "${headerText}"`);
-        continue; // דילוג על עמודת פעולות
-      }
-    }
-    
-    const cellText = cells[i].textContent.trim().toLowerCase();
-    console.log(`🔍 Cell ${i} text: "${cellText}"`);
-    
-    // בדיקה אם אחד ממונחי החיפוש נמצא בתא
-    for (const term of searchTerms) {
-      const termLower = term.toLowerCase();
-      console.log(`🔍 Checking if "${termLower}" is in "${cellText}"`);
-      
-      if (cellText.includes(termLower)) {
-        console.log(`✅ Found match: "${termLower}" in cell ${i}`);
-        return true; // נמצא התאמה
-      }
-    }
-  }
-  
-  console.log('❌ No matches found in this row');
-  return false; // לא נמצאה התאמה
-}
 
 /**
  * בדיקה אם תאריך נמצא בטווח
@@ -3708,7 +3607,7 @@ function showAllRecordsInTable(containerId) {
 function applyStatusFilter() {
   const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
   const selectedStatuses = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-  applyTableFilter('status', selectedStatuses);
+  applyFilter('status', selectedStatuses[0]);
 }
 
 /**
@@ -3717,7 +3616,7 @@ function applyStatusFilter() {
 function applyTypeFilter() {
   const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
   const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-  applyTableFilter('type', selectedTypes);
+  applyFilter('type', selectedTypes[0]);
 }
 
 /**
@@ -3726,7 +3625,7 @@ function applyTypeFilter() {
 function applyAccountFilter() {
   const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
   const selectedAccounts = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-  applyTableFilter('account', selectedAccounts);
+  applyFilter('account', selectedAccounts[0]);
 }
 
 /**
@@ -3736,7 +3635,7 @@ function applyDateRangeFilter(dateRange) {
   console.log('🔄 applyDateRangeFilter called with:', dateRange);
   console.log('🔍 Date range type:', typeof dateRange);
   console.log('🔍 Date range length:', dateRange ? dateRange.length : 0);
-  applyTableFilter('date', [dateRange]);
+  applyFilter('date', dateRange);
 }
 
 /**
@@ -3749,11 +3648,11 @@ function applySearchFilter(searchTerm) {
   
   if (searchTerm && searchTerm.trim()) {
     console.log('🔍 Applying search filter with term:', searchTerm.trim());
-    applyTableFilter('search', [searchTerm.trim()]);
+    applyFilter('search', searchTerm.trim());
   } else {
     console.log('🔍 Search term is empty, showing all records');
     // אם החיפוש ריק, הצג את כל הרשומות בכל הקונטיינרים הנראים
-    const visibleContainers = getAllVisibleContainers();
+    const visibleContainers = getVisibleContainers();
     for (const containerId of visibleContainers) {
       showAllRecordsInTable(containerId);
     }
@@ -3785,7 +3684,7 @@ function applyTypeFilter() {
   console.log('🔍 Selected types:', selectedTypes);
 
   // הפעלת הפילטר הכללי
-  applyTableFilter('type', selectedTypes);
+  applyFilter('type', selectedTypes[0]);
 
   if (window.simpleFilter) {
     window.simpleFilter.applyTypeFilter(selectedTypes);
@@ -3805,7 +3704,7 @@ function applyAccountFilter() {
   console.log('🔍 Selected accounts:', selectedAccounts);
 
   // הפעלת הפילטר הכללי
-  applyTableFilter('account', selectedAccounts);
+  applyFilter('account', selectedAccounts[0]);
 
   if (window.simpleFilter) {
     window.simpleFilter.applyAccountFilter(selectedAccounts);
@@ -3850,7 +3749,7 @@ window.applyTypeFilter = applyTypeFilter;
 window.applyAccountFilter = applyAccountFilter;
 window.applyDateRangeFilter = applyDateRangeFilter;
 window.applySearchFilter = applySearchFilter;
-window.applyTableFilter = applyTableFilter;
+
 window.checkIfTableHasColumn = checkIfTableHasColumn;
 window.applyFilterToTable = applyFilterToTable;
 window.findFilterCell = findFilterCell;
@@ -4051,57 +3950,7 @@ function getActiveTableContainer() {
   return null;
 }
 
-/**
- * קבלת כל הקונטיינרים הנראים
- */
-function getAllVisibleContainers() {
-  // רשימת כל הקונטיינרים במערכת
-  const containers = [
-    'tradesContainer',
-    'trade_plansContainer', 
-    'accountsContainer',
-    'alertsContainer',
-    'cashFlowsContainer',
-    'executionsContainer',
-    'notesContainer',
-    'tickersContainer',
-    'designsContainer',
-    'testResultsContainer',
-    'currenciesContainer',
-    'noteRelationTypesContainer',
-    'constraints-list-container',
-    'testContainer',
-    'notificationsContainer'
-  ];
 
-  console.log('🔍 Checking for visible containers...');
-  
-  const visibleContainers = [];
-  
-  for (const containerId of containers) {
-    const container = document.getElementById(containerId);
-    console.log(`🔍 Checking container: ${containerId}`, {
-      exists: !!container,
-      offsetParent: container ? container.offsetParent : null,
-      display: container ? container.style.display : 'N/A',
-      visibility: container ? container.style.visibility : 'N/A'
-    });
-    
-    if (container && container.offsetParent !== null) {
-      // בדיקה שהאלמנט נראה (לא מוסתר)
-      const rect = container.getBoundingClientRect();
-      console.log(`🔍 Container ${containerId} rect:`, rect);
-      
-      if (rect.width > 0 && rect.height > 0) {
-        console.log(`✅ Visible container found: ${containerId}`);
-        visibleContainers.push(containerId);
-      }
-    }
-  }
-
-  console.log('🔍 All visible containers:', visibleContainers);
-  return visibleContainers;
-}
 
 // ייצוא פונקציה לגלובל
 window.getActiveTableContainer = getActiveTableContainer;
@@ -4391,3 +4240,6 @@ function updateAccountFilterDisplayText() {
 // ייצוא הפונקציות
 window.getCurrentPreference = getCurrentPreference;
 window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;
+
+// ייצוא הפונקציה החדשה
+window.applyFilter = applyFilter;

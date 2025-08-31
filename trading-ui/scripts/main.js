@@ -415,6 +415,56 @@ function restoreAllSectionStates() {
       }
     });
 
+    // Restore top section state for all pages
+    const currentPath = window.location.pathname;
+    let topSectionStorageKey = 'topSectionCollapsed';
+
+    if (currentPath.includes('/alerts')) {
+      topSectionStorageKey = 'alertsTopSectionCollapsed';
+    } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
+      topSectionStorageKey = 'planningTopSectionCollapsed';
+    } else if (currentPath.includes('/trades')) {
+      topSectionStorageKey = 'tradesTopSectionCollapsed';
+    } else if (currentPath.includes('/accounts')) {
+      topSectionStorageKey = 'accountsTopSectionCollapsed';
+    } else if (currentPath.includes('/tickers')) {
+      topSectionStorageKey = 'tickersTopSectionCollapsed';
+    } else if (currentPath.includes('/cash_flows')) {
+      topSectionStorageKey = 'cashFlowsTopSectionCollapsed';
+    } else if (currentPath.includes('/executions')) {
+      topSectionStorageKey = 'executionsTopSectionCollapsed';
+    } else if (currentPath.includes('/research')) {
+      topSectionStorageKey = 'researchTopSectionCollapsed';
+    } else if (currentPath.includes('/constraints')) {
+      topSectionStorageKey = 'constraintsTopSectionCollapsed';
+    } else if (currentPath.includes('/tests')) {
+      topSectionStorageKey = 'testsTopSectionCollapsed';
+    } else if (currentPath.includes('/db_display')) {
+      topSectionStorageKey = 'dbDisplayTopSectionCollapsed';
+    } else if (currentPath.includes('/db_extradata')) {
+      topSectionStorageKey = 'dbExtradataTopSectionCollapsed';
+    } else if (currentPath.includes('/designs')) {
+      topSectionStorageKey = 'topSectionCollapsed';
+    }
+
+    const topSectionCollapsed = localStorage.getItem(topSectionStorageKey) === 'true';
+    const topSection = document.querySelector('.top-section .section-body');
+    const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+    const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
+
+    if (topSection && topIcon) {
+      if (topSectionCollapsed) {
+        topSection.style.display = 'none';
+        topSection.classList.add('collapsed');
+        topIcon.textContent = '▼';
+      } else {
+        topSection.style.display = 'block';
+        topSection.classList.remove('collapsed');
+        topIcon.textContent = '▲';
+      }
+      console.log('💾 Restored top section state:', topSectionCollapsed ? 'collapsed' : 'expanded', 'for key:', topSectionStorageKey);
+    }
+
   } catch (error) {
     // Error restoring section states
   }

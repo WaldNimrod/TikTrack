@@ -238,7 +238,8 @@ async function updateActiveTradesField() {
         console.log('✅ שדה active_trades עודכן עבור כל הטיקרים');
 
         // עדכון סטטיסטיקות סיכום לאחר עדכון שדה active_trades
-        updateTickersSummaryStats(tickersData);
+        // הסרת הקריאה הכפולה - updateTickersSummaryStats נקראת ב-loadTickersData
+        // updateTickersSummaryStats(tickersData);
 
     } catch (error) {
         handleSystemError(error, 'עדכון שדה active_trades');

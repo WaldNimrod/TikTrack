@@ -50,11 +50,11 @@ async function getAccounts() {
             const accounts = data.data || data || [];
             return accounts;
         } else {
-            console.error('❌ Failed to fetch accounts:', response.status);
+            // Failed to fetch accounts
             return [];
         }
     } catch (error) {
-        console.error('❌ Error fetching accounts:', error);
+        // Error fetching accounts
         return [];
     }
 }
@@ -104,7 +104,7 @@ async function cancelAccount(accountId) {
         return true;
 
     } catch (error) {
-        console.error('❌ שגיאה בביטול חשבון:', error);
+        // שגיאה בביטול חשבון
         throw error;
     }
 }
@@ -135,7 +135,7 @@ async function reactivateAccount(accountId) {
         return true;
 
     } catch (error) {
-        console.error('❌ שגיאה בהפעלה מחדש של חשבון:', error);
+        // שגיאה בהפעלה מחדש של חשבון
         throw error;
     }
 }
@@ -152,7 +152,7 @@ async function getAccountById(accountId) {
             const data = await response.json();
             return data.data || data;
         } else {
-            console.error('❌ Failed to fetch account:', response.status);
+            // Failed to fetch account
             return null;
         }
     } catch (error) {

@@ -1917,7 +1917,7 @@ function toggleExecutionsSection() {
  */
 function restoreExecutionsSectionState() {
     const savedState = localStorage.getItem('executionsSectionState');
-    const section = document.querySelector('.content-section');
+    const section = document.querySelector('.content-section.executions-page');
     const sectionBody = section ? section.querySelector('.section-body') : null;
     const toggleBtn = document.querySelector('[onclick="toggleExecutionsSection()"]');
     
@@ -1926,6 +1926,9 @@ function restoreExecutionsSectionState() {
         if (toggleBtn) {
             toggleBtn.textContent = 'הצג עסקעות';
         }
+        console.log('💾 Restored executions section state: closed');
+    } else if (section && sectionBody) {
+        console.log('💾 Restored executions section state: open (default)');
     }
 }
 

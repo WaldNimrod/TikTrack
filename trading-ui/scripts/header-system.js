@@ -2476,7 +2476,6 @@ class HeaderSystem {
         showAllRecordsInTable(containerId);
       }
     }
-    }
   }
 
   // ניקוי כל הפילטרים
@@ -3554,10 +3553,12 @@ function isDateInRange(dateString, dateRange) {
       
       case 'השבוע':
         // מתחילת השבוע הקלנדארי ועד היום (ראשון = 0, שני = 1, וכו')
-        startDate = new Date(today.getTime() - today.getDay() * 24 * 60 * 60 * 1000);
+        // בישראל השבוע מתחיל ביום ראשון
+        const dayOfWeek = today.getDay(); // 0 = ראשון, 1 = שני, וכו'
+        startDate = new Date(today.getTime() - dayOfWeek * 24 * 60 * 60 * 1000);
         startDate.setHours(0, 0, 0, 0);
         endDate = today;
-        console.log(`🔍 השבוע range: ${startDate.toISOString()} - ${endDate.toISOString()} (start of week)`);
+        console.log(`🔍 השבוע range: ${startDate.toISOString()} - ${endDate.toISOString()} (start of week, dayOfWeek: ${dayOfWeek})`);
         break;
       
       case 'שבוע':
@@ -4339,11 +4340,56 @@ window.updateStatusFilterText = updateStatusFilterText;
 window.updateTypeFilterText = updateTypeFilterText;
 window.updateAccountFilterText = updateAccountFilterText;
 
+// ייצוא פונקציות עזר לגלובל
+window.getVisibleContainers = getVisibleContainers;
+window.getAllVisibleContainers = getAllVisibleContainers;
+window.showAllRecordsInTable = showAllRecordsInTable;
+window.updateTableCount = updateTableCount;
+window.handleElementNotFound = handleElementNotFound;
+window.resetFiltersManually = resetFiltersManually;
+window.handleDataLoadError = handleDataLoadError;
+window.tryLoadData = tryLoadData;
+window.handleSystemError = handleSystemError;
+window.safeUpdateElement = safeUpdateElement;
+
+/**
+ * קבלת כל הקונטיינרים הנראים
+ */
+function getVisibleContainers() {
+  const containers = [];
+  const possibleContainers = [
+    'trade_plansContainer',
+    'tradesContainer', 
+    'executionsContainer',
+    'cash_flowsContainer',
+    'alertsContainer',
+    'notesContainer',
+    'accountsContainer',
+    'tickersContainer'
+  ];
+  
+  for (const containerId of possibleContainers) {
+    const container = document.getElementById(containerId);
+    if (container && container.style.display !== 'none') {
+      containers.push(containerId);
+    }
+  }
+  
+  return containers;
+}
+
+/**
+ * קבלת כל הקונטיינרים הנראים (alias לפונקציה הקיימת)
+ */
+function getAllVisibleContainers() {
+  return getVisibleContainers();
+}
+
 /**
  * זיהוי הקונטיינר הפעיל כרגע
  */
 function getActiveTableContainer() {
-  const visibleContainers = getAllVisibleContainers();
+  const visibleContainers = getVisibleContainers();
   if (visibleContainers.length > 0) {
     return visibleContainers[0]; // מחזיר את הראשון
   }
@@ -4426,8 +4472,40 @@ function resetFiltersToDefaults(defaultStatus, defaultType, defaultAccount, defa
     }
   }
 
-  // איפוס פילטר חשבון - נדלג על זה כרגע כי יש בעיות
-  console.log('⚠️ Skipping account filter reset for now');
+  // איפוס פילטר חשבון
+  const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
+  accountItems.forEach(item => item.classList.remove('selected'));
+  
+  // נסה למצוא את החשבון לפי ID או שם
+  let selectedAccountItem = null;
+  
+  // קודם ננסה למצוא לפי ID
+  if (defaultAccount && defaultAccount !== 'all') {
+    selectedAccountItem = Array.from(accountItems).find(item => 
+      item.getAttribute('data-value') === defaultAccount ||
+      item.getAttribute('data-account-id') === defaultAccount
+    );
+  }
+  
+  // אם לא נמצא, ננסה למצוא לפי שם החשבון
+  if (!selectedAccountItem && defaultAccount && defaultAccount !== 'all') {
+    // נסה למצוא לפי שם החשבון
+    selectedAccountItem = Array.from(accountItems).find(item => 
+      item.textContent.trim() === defaultAccount
+    );
+  }
+  
+  if (selectedAccountItem) {
+    selectedAccountItem.classList.add('selected');
+    console.log('✅ Found and selected account item:', defaultAccount);
+  } else {
+    // אם לא נמצא, בחר "הכול"
+    const allAccountItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
+    if (allAccountItem) {
+      allAccountItem.classList.add('selected');
+      console.log('⚠️ Account not found, selected "הכול"');
+    }
+  }
 
   // איפוס פילטר תאריכים
   const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
@@ -4520,6 +4598,53 @@ function resetFiltersManually() {
 }
 
 /**
+ * איפוס ידני של פילטרים (גיבוי)
+ */
+function resetFiltersManually() {
+  console.log('🔄 Manual reset filters fallback');
+
+  // הסרת סימון מכל הפילטרים
+  document.querySelectorAll('#statusFilterMenu .status-filter-item.selected').forEach(item => item.classList.remove('selected'));
+  document.querySelectorAll('#typeFilterMenu .type-filter-item.selected').forEach(item => item.classList.remove('selected'));
+  document.querySelectorAll('#accountFilterMenu .account-filter-item.selected').forEach(item => item.classList.remove('selected'));
+  document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected').forEach(item => item.classList.remove('selected'));
+
+  // בחירת "הכול" בכל הפילטרים
+  const allStatusItem = document.querySelector('#statusFilterMenu .status-filter-item[data-value="הכול"]');
+  const allTypeItem = document.querySelector('#typeFilterMenu .type-filter-item[data-value="הכול"]');
+  const allAccountItem = document.querySelector('#accountFilterMenu .account-filter-item[data-value="הכול"]');
+  const allDateRangeItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="כל זמן"]');
+
+  if (allStatusItem) allStatusItem.classList.add('selected');
+  if (allTypeItem) allTypeItem.classList.add('selected');
+  if (allAccountItem) allAccountItem.classList.add('selected');
+  if (allDateRangeItem) allDateRangeItem.classList.add('selected');
+
+  // ניקוי פילטר חיפוש
+  const searchInput = document.querySelector('#searchFilterInput');
+  if (searchInput) {
+    searchInput.value = '';
+  }
+
+  // עדכון טקסטים
+  updateStatusFilterText();
+  updateTypeFilterText();
+  updateAccountFilterText();
+  
+  // עדכון טקסט פילטר תאריכים
+  const selectedDateRangeElement = document.getElementById('selectedDateRange');
+  if (selectedDateRangeElement) {
+    selectedDateRangeElement.textContent = 'כל זמן';
+  }
+  
+  // הפעלת הפילטרים המעודכנים
+  const visibleContainers = getVisibleContainers();
+  for (const containerId of visibleContainers) {
+    showAllRecordsInTable(containerId);
+  }
+}
+
+/**
  * ניקוי ידני של פילטרים (גיבוי)
  */
 function clearFiltersManually() {
@@ -4565,7 +4690,22 @@ async function getCurrentPreference(key) {
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
       const preferences = await response.json();
-      return preferences.user[key] || preferences.defaults[key];
+      console.log('🔍 Raw preferences response:', preferences);
+      
+      // בדיקה אם המבנה תקין
+      if (preferences && preferences.user && preferences.defaults) {
+        const userValue = preferences.user[key];
+        const defaultValue = preferences.defaults[key];
+        console.log(`🔍 Preference ${key}: user=${userValue}, default=${defaultValue}`);
+        return userValue !== undefined ? userValue : defaultValue;
+      } else if (preferences && typeof preferences === 'object') {
+        // מבנה פשוט יותר
+        console.log(`🔍 Simple preferences structure for ${key}:`, preferences[key]);
+        return preferences[key];
+      }
+      
+      console.log('⚠️ Unexpected preferences structure:', preferences);
+      return null;
     }
     return null;
   } catch (error) {
@@ -4642,3 +4782,132 @@ window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;
 
 // ייצוא הפונקציה החדשה
 window.applyFilter = applyFilter;
+
+/**
+ * עדכון מספר הרשומות בטבלה
+ */
+function updateTableCount(containerId, visibleCount, totalCount) {
+  const tableCountElement = document.querySelector('.table-count');
+  if (tableCountElement) {
+    let pageType = '';
+    
+    // זיהוי סוג הדף לפי containerId
+    if (containerId.includes('trade_plans')) {
+      pageType = 'תכנונים';
+    } else if (containerId.includes('trades')) {
+      pageType = 'טריידים';
+    } else if (containerId.includes('executions')) {
+      pageType = 'ביצועים';
+    } else if (containerId.includes('cash_flows')) {
+      pageType = 'תזרימי מזומן';
+    } else if (containerId.includes('alerts')) {
+      pageType = 'התראות';
+    } else if (containerId.includes('notes')) {
+      pageType = 'הערות';
+    } else if (containerId.includes('accounts')) {
+      pageType = 'חשבונות';
+    } else if (containerId.includes('tickers')) {
+      pageType = 'טיקרים';
+    } else {
+      pageType = 'רשומות';
+    }
+    
+    tableCountElement.textContent = `${visibleCount} ${pageType}`;
+    console.log(`✅ Updated table count for ${containerId}: ${visibleCount} ${pageType}`);
+  }
+}
+
+/**
+ * הצגת כל הרשומות בטבלה
+ */
+function showAllRecordsInTable(containerId) {
+  console.log(`🔄 Showing all records in container: ${containerId}`);
+  
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.warn(`⚠️ Container not found: ${containerId}`);
+    return;
+  }
+  
+  const rows = container.querySelectorAll('tbody tr');
+  let visibleCount = 0;
+  
+  rows.forEach(row => {
+    row.style.display = '';
+    visibleCount++;
+  });
+  
+  console.log(`✅ All records shown: ${visibleCount} rows visible`);
+  updateTableCount(containerId, visibleCount, rows.length);
+}
+
+/**
+ * טיפול במקרה שאלמנט לא נמצא
+ */
+function handleElementNotFound(elementType, containerId) {
+  console.warn(`⚠️ ${elementType} not found for container: ${containerId}`);
+  // אפשר להוסיף לוגיקה נוספת כאן אם צריך
+}
+
+/**
+ * טיפול בשגיאות טעינת נתונים
+ */
+function handleDataLoadError(error, context) {
+  console.error(`❌ Data load error in ${context}:`, error);
+  // אפשר להוסיף לוגיקה נוספת כאן אם צריך
+}
+
+/**
+ * ניסיון לטעינת נתונים
+ */
+function tryLoadData(containerId, maxAttempts = 10) {
+  console.log(`🔄 Trying to load data for container: ${containerId}`);
+  
+  let attempts = 0;
+  const attemptLoad = () => {
+    attempts++;
+    console.log(`🔄 Attempt ${attempts} to load data...`);
+    
+    const container = document.getElementById(containerId);
+    if (container) {
+      console.log(`✅ Container found: ${containerId}`);
+      return true;
+    }
+    
+    if (attempts >= maxAttempts) {
+      console.warn(`⚠️ Failed to find container after ${maxAttempts} attempts: ${containerId}`);
+      handleElementNotFound('container', containerId);
+      return false;
+    }
+    
+    // נסיון נוסף אחרי 100ms
+    setTimeout(attemptLoad, 100);
+    return false;
+  };
+  
+  return attemptLoad();
+}
+
+/**
+ * טיפול בשגיאות מערכת
+ */
+function handleSystemError(error, context) {
+  console.error(`❌ System error in ${context}:`, error);
+  // אפשר להוסיף לוגיקה נוספת כאן אם צריך
+}
+
+/**
+ * בדיקה אם אלמנט קיים לפני עדכון
+ */
+function safeUpdateElement(elementId, updateFunction) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    try {
+      updateFunction(element);
+    } catch (error) {
+      console.warn(`⚠️ Error updating element ${elementId}:`, error);
+    }
+  } else {
+    console.warn(`⚠️ Element not found: ${elementId}`);
+  }
+}

@@ -507,6 +507,8 @@
   <script src="scripts/notification-system.js"></script>
   <script src="scripts/accounts.js?v=20250830_1"></script>
   <script src="scripts/filter-system.js"></script>
+  <script src="scripts/tables.js"></script>
+  <script src="scripts/main.js"></script>
   <script src="scripts/preferences.js"></script>
   
   <!-- Header System Scripts -->
@@ -522,8 +524,8 @@
       if (window.headerSystem) {
         window.headerSystem.init();
       }
-      if (window.simpleFilter) {
-        window.simpleFilter.init();
+      if (window.filterSystem) {
+        window.filterSystem.initialize();
       }
     });
   </script>

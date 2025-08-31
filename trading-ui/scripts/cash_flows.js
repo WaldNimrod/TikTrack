@@ -50,19 +50,19 @@ function toggleCashFlowsSection() {
     
     const cashFlowsSection = document.querySelector('.cash-flows-section');
     if (!cashFlowsSection) {
-        console.error('❌ סקשן תזרימי מזומנים לא נמצא');
+        handleElementNotFound('toggleCashFlowsSection', 'סקשן תזרימי מזומנים לא נמצא');
         return;
     }
 
     const sectionBody = cashFlowsSection.querySelector('.section-body');
     if (!sectionBody) {
-        console.error('❌ גוף הסקשן לא נמצא');
+        handleElementNotFound('toggleCashFlowsSection', 'גוף הסקשן לא נמצא');
         return;
     }
 
     const toggleBtn = cashFlowsSection.querySelector('button[onclick="toggleCashFlowsSection()"]');
     if (!toggleBtn) {
-        console.error('❌ כפתור הפתיחה/סגירה לא נמצא');
+        handleElementNotFound('toggleCashFlowsSection', 'כפתור הפתיחה/סגירה לא נמצא');
         return;
     }
 
@@ -98,19 +98,19 @@ function restoreCashFlowsSectionState() {
 
     const cashFlowsSection = document.querySelector('.cash-flows-section');
     if (!cashFlowsSection) {
-        console.error('❌ סקשן תזרימי מזומנים לא נמצא');
+        handleElementNotFound('restoreCashFlowsSectionState', 'סקשן תזרימי מזומנים לא נמצא');
         return;
     }
 
     const sectionBody = cashFlowsSection.querySelector('.section-body');
     if (!sectionBody) {
-        console.error('❌ גוף הסקשן לא נמצא');
+        handleElementNotFound('restoreCashFlowsSectionState', 'גוף הסקשן לא נמצא');
         return;
     }
 
     const toggleBtn = cashFlowsSection.querySelector('button[onclick="toggleCashFlowsSection()"]');
     if (!toggleBtn) {
-        console.error('❌ כפתור הפתיחה/סגירה לא נמצא');
+        handleElementNotFound('restoreCashFlowsSectionState', 'כפתור הפתיחה/סגירה לא נמצא');
         return;
     }
 
@@ -136,7 +136,7 @@ function restoreCashFlowsSectionState() {
 function showDeleteCashFlowModal(id) {
     const cashFlow = cashFlowsData.find(cf => cf.id === id);
     if (!cashFlow) {
-        console.error('❌ תזרים מזומנים לא נמצא:', id);
+        handleElementNotFound('showDeleteCashFlowModal', `תזרים מזומנים לא נמצא: ${id}`);
         return;
     }
 
@@ -180,7 +180,7 @@ async function loadCashFlows() {
             renderCashFlowsTable();
             updatePageSummaryStats();
         } else {
-            console.error('❌ שגיאה בטעינת תזרימי מזומנים:', result.error);
+            handleApiError('שגיאה בטעינת תזרימי מזומנים', result.error);
 
             // הצגת הודעת שגיאה
                     if (window.showInfoNotification) {
@@ -188,7 +188,7 @@ async function loadCashFlows() {
         }
         }
     } catch (error) {
-        console.error('❌ שגיאה בטעינת תזרימי מזומנים:', error);
+        handleDataLoadError(error, 'טעינת תזרימי מזומנים');
 
         // הצגת הודעת שגיאה
         if (window.showInfoNotification) {
@@ -475,7 +475,7 @@ async function confirmDeleteCashFlow(id) {
         }
         
         if (!id) {
-            console.error('❌ לא נמצא מזהה למחיקה');
+            handleValidationError('deleteCashFlow', 'לא נמצא מזהה למחיקה');
             window.showErrorNotification('שגיאה', 'לא נמצא מזהה למחיקה');
             return;
         }
@@ -501,13 +501,13 @@ async function confirmDeleteCashFlow(id) {
             // טעינה מחדש של הנתונים
             await loadCashFlows();
         } else {
-            console.error('❌ שגיאה במחיקת תזרים מזומנים:', result.error);
+            handleApiError('שגיאה במחיקת תזרים מזומנים', result.error);
 
             // הצגת הודעת שגיאה
             window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים מזומנים - ייתכן שיש פריטים מקושרים');
         }
     } catch (error) {
-        console.error('❌ שגיאה במחיקת תזרים מזומנים:', error);
+        handleDeleteError(error, 'מחיקת תזרים מזומנים');
 
         // הצגת הודעת שגיאה
         window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים מזומנים - ייתכן שיש פריטים מקושרים');
@@ -607,7 +607,7 @@ async function loadCurrenciesFromServer() {
             }
         }
     } catch (error) {
-        console.error('שגיאה בטעינת מטבעות מהשרת:', error);
+        handleDataLoadError(error, 'טעינת מטבעות מהשרת');
 
         // הצגת הודעת שגיאה
         if (window.showInfoNotification) {
@@ -640,16 +640,16 @@ async function loadAccountsForCashFlow() {
                     });
                     
                     } else {
-                    console.error('❌ לא נמצא אלמנט select עם ID: cashFlowAccountId');
+                    handleElementNotFound('loadAccountsForCashFlow', 'לא נמצא אלמנט select עם ID: cashFlowAccountId');
                 }
             } else {
-                console.error('❌ שגיאה בתגובת API:', result.error);
+                handleApiError('שגיאה בתגובת API', result.error);
             }
         } else {
-            console.error('❌ שגיאת HTTP:', response.status);
+            handleApiError('שגיאת HTTP', response.status);
         }
     } catch (error) {
-        console.error('❌ שגיאה בטעינת חשבונות:', error);
+        handleDataLoadError(error, 'טעינת חשבונות');
 
         // הצגת הודעת שגיאה
         if (window.showInfoNotification) {
@@ -682,7 +682,7 @@ async function loadAccountsForEditCashFlow() {
             }
         }
     } catch (error) {
-        console.error('שגיאה בטעינת חשבונות:', error);
+        handleDataLoadError(error, 'טעינת חשבונות');
     }
 }
 
@@ -705,10 +705,10 @@ async function loadCurrenciesForCashFlow() {
             });
             
             } else {
-            console.error('❌ לא נמצא אלמנט select עם ID: cashFlowCurrencyId');
+            handleElementNotFound('loadCurrenciesForCashFlow', 'לא נמצא אלמנט select עם ID: cashFlowCurrencyId');
         }
     } catch (error) {
-        console.error('❌ שגיאה בטעינת מטבעות:', error);
+        handleDataLoadError(error, 'טעינת מטבעות');
 
         // הצגת הודעת שגיאה
         if (window.showInfoNotification) {
@@ -735,7 +735,7 @@ async function loadCurrenciesForEditCashFlow() {
             select.appendChild(option);
         });
     } catch (error) {
-        console.error('שגיאה בטעינת מטבעות:', error);
+        handleDataLoadError(error, 'טעינת מטבעות');
     }
 }
 
@@ -1003,7 +1003,7 @@ function sortTable(columnIndex) {
             updateCashFlowsTable
         );
     } else {
-        console.error('❌ sortTableData function not found in tables.js');
+        handleFunctionNotFound('sortTableData', 'פונקציית סידור טבלה לא נמצאה');
     }
 }
 
@@ -1016,7 +1016,7 @@ function restoreSortState() {
     if (typeof window.restoreAnyTableSort === 'function') {
         window.restoreAnyTableSort('cash_flows', window.cashFlowsData || [], updateCashFlowsTable);
     } else {
-        console.error('❌ restoreAnyTableSort function not found in main.js');
+        handleFunctionNotFound('restoreAnyTableSort', 'פונקציית שחזור סידור לא נמצאה');
     }
 }
 
@@ -1037,7 +1037,7 @@ function manageExternalIdField(source, modalType) {
     const externalIdField = document.getElementById(fieldId);
 
     if (!externalIdField) {
-        console.error(`❌ שדה מזהה חיצוני לא נמצא במודל ${modalType} - מחפש ${fieldId}`);
+        handleElementNotFound('manageExternalIdField', `שדה מזהה חיצוני לא נמצא במודל ${modalType} - מחפש ${fieldId}`);
         return;
     }
 
@@ -1337,7 +1337,7 @@ async function showAddCashFlowModal() {
         const modal = new bootstrap.Modal(document.getElementById('addCashFlowModal'));
         modal.show();
     } catch (error) {
-        console.error('❌ שגיאה בטעינת נתונים להוספה:', error);
+        handleDataLoadError(error, 'טעינת נתונים להוספה');
         window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים להוספה');
     }
 }
@@ -1346,7 +1346,7 @@ async function showAddCashFlowModal() {
 async function showEditCashFlowModal(id) {
     const cashFlow = cashFlowsData.find(cf => cf.id === id);
     if (!cashFlow) {
-        console.error('❌ תזרים מזומנים לא נמצא:', id);
+        handleElementNotFound('showEditCashFlowModal', `תזרים מזומנים לא נמצא: ${id}`);
         return;
     }
 
@@ -1367,7 +1367,7 @@ async function showEditCashFlowModal(id) {
         if (editTypeField) {
             editTypeField.value = cashFlow.type;
             } else {
-            console.error('❌ לא נמצא אלמנט editCashFlowType');
+            handleElementNotFound('showEditCashFlowModal', 'לא נמצא אלמנט editCashFlowType');
         }
         document.getElementById('editCashFlowAmount').value = cashFlow.amount;
         document.getElementById('editCashFlowCurrencyId').value = cashFlow.currency_id || '';
@@ -1388,7 +1388,7 @@ async function showEditCashFlowModal(id) {
         const modal = new bootstrap.Modal(document.getElementById('editCashFlowModal'));
         modal.show();
     } catch (error) {
-        console.error('❌ שגיאה בטעינת נתונים לעריכה:', error);
+        handleDataLoadError(error, 'טעינת נתונים לעריכה');
         window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים לעריכה');
     }
 }
@@ -1430,7 +1430,7 @@ async function saveCashFlow() {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('❌ תגובת שגיאה מהשרת:', errorText);
+            handleApiError('תגובת שגיאה מהשרת', errorText);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
@@ -1446,7 +1446,7 @@ async function saveCashFlow() {
             // טעינה מחדש של הנתונים
             await loadCashFlows();
         } else {
-            console.error('❌ שגיאה בשמירת תזרים מזומנים:', result.error);
+            handleApiError('שגיאה בשמירת תזרים מזומנים', result.error);
 
             // טיפול בשגיאות וולידציה מהשרת
             let errorMessage = 'שגיאה בשמירת תזרים מזומנים';
@@ -1498,7 +1498,7 @@ async function saveCashFlow() {
             }
         }
     } catch (error) {
-        console.error('❌ שגיאה בשמירת תזרים מזומנים:', error);
+        handleSaveError(error, 'שמירת תזרים מזומנים');
 
         // הצגת הודעת שגיאה
         window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת תזרים מזומנים - בדוק את הנתונים שהוזנו');
@@ -1544,7 +1544,7 @@ async function updateCashFlow() {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('❌ תגובת שגיאה מהשרת בעדכון:', errorText);
+            handleApiError('תגובת שגיאה מהשרת בעדכון', errorText);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
@@ -1560,7 +1560,7 @@ async function updateCashFlow() {
             // טעינה מחדש של הנתונים
             await loadCashFlows();
         } else {
-            console.error('❌ שגיאה בעדכון תזרים מזומנים:', result.error);
+            handleApiError('שגיאה בעדכון תזרים מזומנים', result.error);
 
             // טיפול בשגיאות וולידציה מהשרת
             if (result.error && result.error.message) {
@@ -1610,7 +1610,7 @@ async function updateCashFlow() {
             }
         }
     } catch (error) {
-        console.error('❌ שגיאה בעדכון תזרים מזומנים:', error);
+        handleSaveError(error, 'עדכון תזרים מזומנים');
 
         // הצגת הודעת שגיאה
         window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון תזרים מזומנים - בדוק את הנתונים שהוזנו');

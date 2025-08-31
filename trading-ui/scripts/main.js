@@ -908,7 +908,7 @@ function getTableType(pageName) {
  * פונקציה גלובלית שמשותפת לכל הדפים
  */
 function filterDataByFilters(data, pageName) {
-  console.log(`🔄 === FILTER DATA BY FILTERS (${pageName}) ===`);
+      // === FILTER DATA BY FILTERS ===
   console.log('🔄 Original data length:', data.length);
 
   if (!data || data.length === 0) {

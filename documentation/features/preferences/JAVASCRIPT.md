@@ -1,553 +1,518 @@
-# Preferences.js Technical Documentation
+# JavaScript Documentation - מערכת העדפות
 
-## Overview
+## סקירה כללית
 
-This document provides comprehensive technical documentation for the `preferences.js` file, which manages all client-side functionality for the TikTrack preferences page.
+מערכת ההעדפות משתמשת ב-JavaScript לניהול הגדרות משתמש, שמירה לטווח ארוך, ואינטגרציה עם מערכת הפילטרים הגלובלית.
 
-## Recent Updates (Version 2.5.0)
+## קבצים עיקריים
 
-### Save Strategy Optimization
-- **Changed from auto-save to batch save**: Users now control when to save all changes
-- **Local memory updates**: Changes stored locally until user clicks "Save Changes"
-- **Clear user feedback**: Info notifications for local updates, success for server saves
+### `trading-ui/scripts/preferences.js`
+הקובץ הראשי המכיל את כל הלוגיקה של מערכת ההעדפות.
 
-### Data Structure Handling
-- **Fixed server response parsing**: Updated to handle direct object structure from server
-- **Enhanced error handling**: Better handling of multiple data structure formats
-- **Comprehensive logging**: Added detailed logging for debugging data flow issues
+### תלויות
+- `filter-system.js` - מערכת פילטרים גלובלית
+- `main.js` - פונקציות גלובליות
+- `tables.js` - פונקציות טבלאות
+- `ui-utils.js` - פונקציות ממשק משתמש
+- `notification-system.js` - מערכת התראות
 
-### API Endpoint Updates
-- **Updated API paths**: Changed from `/api/preferences` to `/api/v1/preferences`
-- **Fixed trailing slash issues**: Corrected PUT request URLs
-- **Enhanced error handling**: Better handling of API responses
+## פונקציות עיקריות
 
-### New Preference Fields
-- **Added `defaultCommission`**: Default commission rate setting
-- **Added `consoleCleanupInterval`**: Console cleanup interval setting
-- **Dynamic account filter population**: Account filter now loads from `window.accountsData`
-
-## File Information
-
-- **File**: `trading-ui/scripts/preferences.js`
-- **Size**: 1,780 lines
-- **Functions**: 64 total functions
-- **Global Exports**: 44 window functions
-- **Dependencies**: None (vanilla JavaScript)
-
-## Architecture Overview
-
-### Core Systems
-
-1. **Preferences Management System**
-2. **Section State Management System**
-3. **Change Tracking System**
-4. **API Communication Layer**
-5. **Event Handling System**
-
-## Function Categories
-
-### 1. Preferences Management (12 functions)
-
-#### Core CRUD Operations
-```javascript
-async function saveAllPreferences()
-async function loadPreferencesToUI()
-async function savePreference(key, value)
-function getCurrentPreference(key)
-```
-
-#### Section-Specific Operations
-```javascript
-async function saveSystemPreferences()
-async function resetSystemPreferences()
-async function savePersonalPreferences()
-async function resetPersonalPreferences()
-async function saveSecurityPreferences()
-async function resetSecurityPreferences()
-async function saveDisplayPreferences()
-async function resetDisplayPreferences()
-```
-
-### 2. Individual Preference Updates (9 functions)
+### `loadPreferences()`
+טוען העדפות מהשרת ומעדכן את הממשק.
 
 ```javascript
-async function updatePrimaryCurrency(value)      // USD restriction enforced
-async function updateTimezone(value)             // System timezone
-async function updateDefaultStopLoss(value)      // Numeric validation
-async function updateDefaultTargetPrice(value)   // Numeric validation
-async function updateDefaultStatusFilter(value)  // Filter preferences
-async function updateDefaultTypeFilter(value)
-async function updateDefaultAccountFilter(value)
-async function updateDefaultDateRangeFilter(value)
-async function updateDefaultSearchFilter(value)
-```
-
-### 3. Section Management System (12 functions)
-
-#### Main Section Controls
-```javascript
-function toggleAllSections()                     // Master toggle button
-function toggleSection(sectionContainer)         // Individual section toggle
-function saveSectionState(sectionContainer, isCollapsed)  // State persistence
-function restoreAllSectionsState()               // Load saved states
-function clearAllSectionsState()                 // Clear localStorage
-```
-
-#### Individual Section Toggles
-```javascript
-function toggleTopSection()                      // Top section toggle
-function toggleSystemSection()                   // System settings section
-function togglePersonalSection()                 // Personal settings section
-function toggleSecuritySection()                 // Security settings section
-function toggleDisplaySection()                  // Display settings section
-function toggleTestingSection()                  // Testing section
-```
-
-#### Utility Functions
-```javascript
-function getSectionId(sectionContainer)          // Generate section ID
-function debugSectionsState()                    // Debug helper
-```
-
-### 4. Change Tracking System (8 functions)
-
-```javascript
-// Global state variables
-let hasUnsavedChanges = false;
-let originalValues = {};
-
-// Core change tracking
-function markAsChanged()                         // Mark as having changes
-function markAsSaved()                           // Mark as saved
-function updatePageTitle()                       // Visual indicator
-function checkForUnsavedChanges()               // Pre-navigation check
-function saveOriginalValues()                    // Store initial values
-function checkForChanges()                       // Compare current vs original
-```
-
-### 5. Testing Management (8 functions)
-
-```javascript
-async function saveTestPreferences()
-async function resetTestPreferences()
-async function runSelectedTests()
-function toggleAllTestsInCategory(category)
-function updateCategoryButtonStates()
-// ... additional test management functions
-```
-
-### 6. Utility Functions (15 functions)
-
-```javascript
-function showNotification(message, type)         // User feedback
-function validateNumericInput(value, min, max)   // Input validation
-function formatCurrency(value)                   // Display formatting
-function sanitizeInput(value)                    // Security
-// ... additional utility functions
-```
-
-## Global Exports
-
-All functions are exported to the global `window` object for HTML access:
-
-```javascript
-// Core preferences functions
-window.saveAllPreferences = saveAllPreferences;
-window.loadPreferencesToUI = loadPreferencesToUI;
-window.savePreference = savePreference;
-
-// Section management
-window.toggleAllSections = toggleAllSections;
-window.toggleSystemSection = toggleSystemSection;
-window.togglePersonalSection = togglePersonalSection;
-// ... all toggle functions
-
-// Individual updaters
-window.updatePrimaryCurrency = updatePrimaryCurrency;
-window.updateTimezone = updateTimezone;
-// ... all update functions
-
-// Change tracking (internal use)
-// hasUnsavedChanges and related functions not exported
-```
-
-## Data Structures
-
-### Preferences Object Structure
-```javascript
-const preferencesData = {
-  defaults: {
-    primaryCurrency: "USD",
-    timezone: "Asia/Jerusalem",
-    defaultStopLoss: 5,
-    defaultTargetPrice: 10,
-    defaultStatusFilter: "all",
-    defaultTypeFilter: "all",
-    defaultAccountFilter: "all",
-    defaultDateRangeFilter: "all",
-    defaultSearchFilter: ""
-  },
-  user: {
-    // User's current preferences (same structure as defaults)
-  }
-};
-```
-
-### Section State Storage
-```javascript
-// LocalStorage structure for section states
-const sectionStates = {
-  "preferences-top-section": false,      // false = expanded, true = collapsed
-  "preferences-system-section": false,
-  "preferences-personal-section": false,
-  "preferences-security-section": false,
-  "preferences-display-section": false,
-  "preferences-testing-section": true    // collapsed by default
-};
-```
-
-## API Integration
-
-### Endpoints Used
-
-#### GET /api/preferences
-```javascript
-// Loads all preferences from server
-const response = await fetch('/api/preferences');
-const data = await response.json();
-// Returns: { defaults: {...}, user: {...} }
-```
-
-#### POST /api/preferences
-```javascript
-// Saves all preferences to server
-const response = await fetch('/api/preferences', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(preferencesData)
-});
-// Returns: { message: "Preferences saved successfully", status: "success" }
-```
-
-#### PUT /api/preferences/{key}
-```javascript
-// Updates individual preference
-const response = await fetch(`/api/preferences/${key}`, {
-  method: 'PUT',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ value: value })
-});
-// Returns: success/error status
-```
-
-## Event Handling
-
-### Page Load Initialization
-```javascript
-document.addEventListener('DOMContentLoaded', function() {
+async function loadPreferences() {
   try {
-    console.log('🔄 Initializing preferences page...');
-    
-    // Load preferences from server
-    loadPreferencesToUI().then(() => {
-      console.log('✅ Preferences loaded successfully');
-    });
-    
-    // Restore section states
-    restoreAllSectionsState();
-    
-    // Save original values for change tracking
-    setTimeout(() => {
-      saveOriginalValues();
-    }, 1000);
-    
-    console.log('✅ Preferences page initialized');
+    const response = await fetch('/api/v1/preferences/');
+    if (response.ok) {
+      const data = await response.json();
+      // בדיקת מבנה התגובה
+      if (data.user) {
+        currentPreferences = data.user;
+      } else if (data.users && data.users.nimrod) {
+        currentPreferences = data.users.nimrod;
+      } else if (data.defaults) {
+        currentPreferences = data.defaults;
+      } else if (data.defaultTypeFilter || data.primaryCurrency) {
+        currentPreferences = data;
+      } else {
+        currentPreferences = { ...DEFAULT_PREFERENCES };
+      }
+    } else {
+      console.warn('⚠️ לא ניתן לטעון העדפות מהשרת, משתמש בברירות מחדל');
+      currentPreferences = { ...DEFAULT_PREFERENCES };
+    }
   } catch (error) {
-    console.error('❌ Error initializing preferences page:', error);
-    showNotification('Error loading preferences page', 'error');
+    console.error('❌ שגיאה בטעינת העדפות:', error);
+    currentPreferences = { ...DEFAULT_PREFERENCES };
   }
-});
+  
+  updateUI();
+}
 ```
 
-### Navigation Protection
+### `updatePreference(key, value)`
+מעדכן העדפה בזיכרון (לא שומר בשרת).
+
 ```javascript
-// Warn before leaving with unsaved changes
-window.addEventListener('beforeunload', function(e) {
-  if (hasUnsavedChanges) {
-    e.preventDefault();
-    e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-    return e.returnValue;
-  }
-});
-
-// Intercept link clicks
-document.addEventListener('click', function(e) {
-  const link = e.target.closest('a');
-  if (link && link.href && !link.href.includes('preferences') && hasUnsavedChanges) {
-    const userChoice = checkForUnsavedChanges();
-    if (userChoice) {
-      e.preventDefault();
-      return false;
-    }
-  }
-});
-```
-
-## Business Logic
-
-### Currency Restriction
-```javascript
-async function updatePrimaryCurrency(value) {
-  console.log('🔄 Updating primary currency:', value);
-
-  // USD-only restriction
-  if (value !== 'USD') {
-    showNotification('❌ Cannot change primary currency. System supports USD only.', 'error');
-    
-    // Revert selection
-    const select = document.getElementById('primaryCurrencySelect');
-    if (select) {
-      select.value = 'USD';
-    }
-    return;
-  }
-
-  // Save if valid
-  const success = await savePreference('primaryCurrency', value);
-  if (success) {
-    console.log('✅ Primary currency updated successfully');
-    markAsSaved();
+function updatePreference(key, value) {
+  try {
+    currentPreferences[key] = value;
+    const label = getPreferenceLabel(key);
+    const message = `${label} עודכן (לא נשמר עדיין)`;
+    showPreferencesInfo('העדפות', message);
+  } catch (error) {
+    console.error(`❌ שגיאה ב-updatePreference:`, error);
   }
 }
 ```
 
-### Input Validation
-```javascript
-async function updateDefaultStopLoss(value) {
-  console.log('🔄 Updating default stop loss:', value);
+### `saveAllPreferences()`
+שומר את כל ההעדפות בשרת.
 
-  // Validate numeric input
-  const numValue = parseFloat(value);
-  if (isNaN(numValue) || numValue < 0 || numValue > 100) {
-    showNotification('❌ Stop loss must be between 0-100%', 'error');
-    return;
-  }
-
-  // Save valid value
-  const success = await savePreference('defaultStopLoss', numValue);
-  if (success) {
-    markAsChanged();
-  }
-}
-```
-
-## Error Handling
-
-### API Error Handling
 ```javascript
 async function saveAllPreferences() {
   try {
-    const response = await fetch('/api/preferences', {
+    const requestBody = { preferences: currentPreferences };
+    const response = await fetch('/api/v1/preferences/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(preferencesData)
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
     });
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (response.ok) {
+      const responseData = await response.json();
+      showPreferencesSuccess('הצלחה', 'כל ההעדפות נשמרו בהצלחה');
+    } else {
+      const errorText = await response.text();
+      console.error('❌ שגיאה בשמירת העדפות:', response.status, errorText);
+      showPreferencesError('שגיאה', `שגיאה בשמירת העדפות: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בשמירת העדפות:', error);
+    showPreferencesError('שגיאה', `שגיאה בשמירת העדפות: ${error.message}`);
+  }
+}
+```
+
+### `resetToDefaults()`
+מאפס את כל ההעדפות לברירות מחדל.
+
+```javascript
+async function resetToDefaults() {
+  try {
+    if (typeof window.showConfirmationDialog === 'function') {
+      window.showConfirmationDialog(
+        'איפוס הגדרות',
+        'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
+        async () => {
+          currentPreferences = { ...DEFAULT_PREFERENCES };
+          updateUI();
+          
+          try {
+            await saveAllPreferences();
+            showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
+          } catch (error) {
+            showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
+          }
+        }
+      );
+    } else {
+      if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
+        currentPreferences = { ...DEFAULT_PREFERENCES };
+        updateUI();
+        
+        try {
+          await saveAllPreferences();
+          showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
+        } catch (error) {
+          showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
+        }
+      }
+    }
+  } catch (error) {
+    console.error('❌ שגיאה באיפוס העדפות:', error);
+    showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
+  }
+}
+```
+
+### `updateUI()`
+מעדכן את הממשק עם העדפות נוכחיות.
+
+```javascript
+function updateUI() {
+  const isPreferencesPage = document.getElementById('primaryCurrency') !== null;
+  
+  if (!isPreferencesPage) {
+    return;
+  }
+  
+  // עדכון כל השדות
+  const primaryCurrencySelect = document.getElementById('primaryCurrency');
+  if (primaryCurrencySelect) {
+    primaryCurrencySelect.value = currentPreferences.primaryCurrency || 'USD';
+  }
+  
+  // ... עדכון שאר השדות
+}
+```
+
+### `loadAccountsToFilter()`
+טוען חשבונות לפילטר חשבון.
+
+```javascript
+async function loadAccountsToFilter() {
+  try {
+    const response = await fetch('/api/v1/accounts/');
+    if (response.ok) {
+      const result = await response.json();
+      if (result.status === 'success' && result.data) {
+        updateAccountFilter(result.data);
+      } else if (Array.isArray(result)) {
+        updateAccountFilter(result);
+      } else {
+        console.warn('⚠️ מבנה תגובה לא צפוי:', result);
+        showPreferencesWarning('טעינת חשבונות', 'מבנה תגובה לא צפוי מהשרת, משתמש בנתונים מקומיים');
+        loadLocalAccounts();
+      }
+    } else {
+      console.warn('⚠️ לא ניתן לטעון חשבונות מהשרת, משתמש בנתונים מקומיים');
+      showPreferencesWarning('טעינת חשבונות', 'לא ניתן לטעון חשבונות מהשרת, משתמש בנתונים מקומיים');
+      loadLocalAccounts();
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת חשבונות:', error);
+    showPreferencesError('טעינת חשבונות', 'שגיאה בטעינת חשבונות מהשרת');
+    loadLocalAccounts();
+  }
+}
+```
+
+## פונקציות עזר
+
+### `getPreferenceLabel(key)`
+מחזיר תווית בעברית להעדפה.
+
+```javascript
+function getPreferenceLabel(key) {
+  const labels = {
+    primaryCurrency: 'מטבע ראשי',
+    timezone: 'אזור זמן',
+    defaultStopLoss: 'סטופ לוס ברירת מחדל',
+    defaultTargetPrice: 'יעד ברירת מחדל',
+    defaultCommission: 'עמלה ברירת מחדל',
+    defaultStatusFilter: 'פילטר סטטוס ברירת מחדל',
+    defaultTypeFilter: 'פילטר סוג ברירת מחדל',
+    defaultAccountFilter: 'פילטר חשבון ברירת מחדל',
+    defaultDateRangeFilter: 'פילטר טווח תאריכים ברירת מחדל',
+    defaultSearchFilter: 'פילטר חיפוש ברירת מחדל'
+  };
+  
+  return labels[key] || key;
+}
+```
+
+### פונקציות התראות
+```javascript
+function showPreferencesSuccess(title, message) {
+  if (typeof window.showSuccessNotification === 'function') {
+    window.showSuccessNotification(title, message);
+  } else if (typeof window.showNotification === 'function') {
+    window.showNotification(title, message, 'success');
+  } else {
+    console.log('✅ הצלחה:', title, '-', message);
+  }
+}
+
+function showPreferencesError(title, message) {
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification(title, message);
+  } else if (typeof window.showNotification === 'function') {
+    window.showNotification(title, message, 'error');
+  } else {
+    console.error('❌ שגיאה:', title, '-', message);
+  }
+}
+
+function showPreferencesInfo(title, message) {
+  if (typeof window.showInfoNotification === 'function') {
+    window.showInfoNotification(title, message);
+  } else if (typeof window.showNotification === 'function') {
+    window.showNotification(title, message, 'info');
+  } else {
+    console.log('ℹ️ מידע:', title, '-', message);
+  }
+}
+
+function showPreferencesWarning(title, message) {
+  if (typeof window.showWarningNotification === 'function') {
+    window.showWarningNotification(title, message);
+  } else if (typeof window.showNotification === 'function') {
+    window.showNotification(title, message, 'warning');
+  } else {
+    console.warn('⚠️ אזהרה:', title, '-', message);
+  }
+}
+```
+
+## פונקציות חדשות (אוגוסט 2025)
+
+### `getVisibleContainers()`
+קבלת כל הקונטיינרים הנראים.
+
+```javascript
+function getVisibleContainers() {
+  const containers = [];
+  const possibleContainers = [
+    'trade_plansContainer',
+    'tradesContainer', 
+    'executionsContainer',
+    'cash_flowsContainer',
+    'alertsContainer',
+    'notesContainer',
+    'accountsContainer',
+    'tickersContainer'
+  ];
+  
+  for (const containerId of possibleContainers) {
+    const container = document.getElementById(containerId);
+    if (container && container.style.display !== 'none') {
+      containers.push(containerId);
+    }
+  }
+  
+  return containers;
+}
+```
+
+### `showAllRecordsInTable(containerId)`
+הצגת כל הרשומות בטבלה.
+
+```javascript
+function showAllRecordsInTable(containerId) {
+  console.log(`🔄 Showing all records in container: ${containerId}`);
+  
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.warn(`⚠️ Container not found: ${containerId}`);
+    return;
+  }
+  
+  const rows = container.querySelectorAll('tbody tr');
+  let visibleCount = 0;
+  
+  rows.forEach(row => {
+    row.style.display = '';
+    visibleCount++;
+  });
+  
+  console.log(`✅ All records shown: ${visibleCount} rows visible`);
+  updateTableCount(containerId, visibleCount, rows.length);
+}
+```
+
+### `updateTableCount(containerId, visibleCount, totalCount)`
+עדכון מספר הרשומות בטבלה.
+
+```javascript
+function updateTableCount(containerId, visibleCount, totalCount) {
+  const tableCountElement = document.querySelector('.table-count');
+  if (tableCountElement) {
+    let pageType = '';
+    
+    if (containerId.includes('trade_plans')) {
+      pageType = 'תכנונים';
+    } else if (containerId.includes('trades')) {
+      pageType = 'טריידים';
+    } else if (containerId.includes('executions')) {
+      pageType = 'ביצועים';
+    } else if (containerId.includes('cash_flows')) {
+      pageType = 'תזרימי מזומן';
+    } else if (containerId.includes('alerts')) {
+      pageType = 'התראות';
+    } else if (containerId.includes('notes')) {
+      pageType = 'הערות';
+    } else if (containerId.includes('accounts')) {
+      pageType = 'חשבונות';
+    } else if (containerId.includes('tickers')) {
+      pageType = 'טיקרים';
+    } else {
+      pageType = 'רשומות';
     }
     
-    const result = await response.json();
-    console.log('✅ All preferences saved successfully');
-    showNotification('All preferences saved successfully', 'success');
-    markAsSaved();
-    
-  } catch (error) {
-    console.error('❌ Error saving preferences:', error);
-    showNotification('Error saving preferences. Please try again.', 'error');
+    tableCountElement.textContent = `${visibleCount} ${pageType}`;
+    console.log(`✅ Updated table count for ${containerId}: ${visibleCount} ${pageType}`);
   }
 }
 ```
 
-### UI Error Handling
+### `resetFiltersManually()`
+איפוס ידני של פילטרים (גיבוי).
+
 ```javascript
-function showNotification(message, type = 'success') {
-  try {
-    const notification = document.createElement('div');
-    const bgColor = type === 'error' ? '#f8d7da' : '#d4edda';
-    const textColor = type === 'error' ? '#721c24' : '#155724';
-    
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      padding: 12px 20px;
-      border-radius: 8px;
-      background-color: ${bgColor};
-      color: ${textColor};
-      /* ... more styles ... */
-    `;
-    
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    // Auto-remove after 3 seconds
-    setTimeout(() => {
-      notification.style.opacity = '0';
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      }, 300);
-    }, 3000);
-    
-  } catch (error) {
-    console.error('Error showing notification:', error);
-    // Fallback to alert if notification system fails
-    alert(message);
+function resetFiltersManually() {
+  console.log('🔄 Manual reset filters fallback');
+
+  // הסרת סימון מכל הפילטרים
+  document.querySelectorAll('#statusFilterMenu .status-filter-item.selected').forEach(item => item.classList.remove('selected'));
+  document.querySelectorAll('#typeFilterMenu .type-filter-item.selected').forEach(item => item.classList.remove('selected'));
+  document.querySelectorAll('#accountFilterMenu .account-filter-item.selected').forEach(item => item.classList.remove('selected'));
+  document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected').forEach(item => item.classList.remove('selected'));
+
+  // בחירת "הכול" בכל הפילטרים
+  const allStatusItem = document.querySelector('#statusFilterMenu .status-filter-item[data-value="הכול"]');
+  const allTypeItem = document.querySelector('#typeFilterMenu .type-filter-item[data-value="הכול"]');
+  const allAccountItem = document.querySelector('#accountFilterMenu .account-filter-item[data-value="הכול"]');
+  const allDateRangeItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="כל זמן"]');
+
+  if (allStatusItem) allStatusItem.classList.add('selected');
+  if (allTypeItem) allTypeItem.classList.add('selected');
+  if (allAccountItem) allAccountItem.classList.add('selected');
+  if (allDateRangeItem) allDateRangeItem.classList.add('selected');
+
+  // ניקוי פילטר חיפוש
+  const searchInput = document.querySelector('#searchFilterInput');
+  if (searchInput) {
+    searchInput.value = '';
+  }
+
+  // עדכון טקסטים
+  updateStatusFilterText();
+  updateTypeFilterText();
+  updateAccountFilterText();
+  
+  // עדכון טקסט פילטר תאריכים
+  const selectedDateRangeElement = document.getElementById('selectedDateRange');
+  if (selectedDateRangeElement) {
+    selectedDateRangeElement.textContent = 'כל זמן';
+  }
+  
+  // הפעלת הפילטרים המעודכנים
+  const visibleContainers = getVisibleContainers();
+  for (const containerId of visibleContainers) {
+    showAllRecordsInTable(containerId);
   }
 }
 ```
 
-## Performance Considerations
+## ברירות מחדל
 
-### Debouncing
 ```javascript
-// Input change detection with debouncing
-let changeCheckTimeout;
-function scheduleChangeCheck() {
-  clearTimeout(changeCheckTimeout);
-  changeCheckTimeout = setTimeout(() => {
-    checkForChanges();
-  }, 500); // 500ms debounce
-}
-```
-
-### Efficient DOM Queries
-```javascript
-// Cache DOM elements to avoid repeated queries
-const sectionElements = {
-  top: document.querySelector('[data-section="top"]'),
-  system: document.querySelector('[data-section="system"]'),
-  personal: document.querySelector('[data-section="personal"]'),
-  // ... cache other sections
+const DEFAULT_PREFERENCES = {
+  primaryCurrency: 'USD',
+  timezone: 'Asia/Jerusalem',
+  defaultStopLoss: 5,
+  defaultTargetPrice: 10,
+  defaultCommission: 1.0,
+  defaultStatusFilter: 'all',
+  defaultTypeFilter: 'all',
+  defaultAccountFilter: 'all',
+  defaultDateRangeFilter: 'all',
+  defaultSearchFilter: ''
 };
 ```
 
-### Memory Management
+## אתחול
+
 ```javascript
-// Clean up event listeners and timeouts
-function cleanup() {
-  clearTimeout(changeCheckTimeout);
-  // Remove event listeners if needed
-  // Clear large objects if needed
+async function initializePreferences() {
+  try {
+    // שחזור מצב הסקשנים
+    if (typeof window.restoreAllSectionStates === 'function') {
+      window.restoreAllSectionStates();
+    } else {
+      console.error('❌ restoreAllSectionStates function not found');
+    }
+
+    // טען העדפות
+    await loadPreferences();
+    
+    // טען חשבונות
+    await loadAccountsToFilter();
+  } catch (error) {
+    console.error('❌ שגיאה באתחול דף העדפות:', error);
+    showPreferencesError('שגיאה', 'שגיאה באתחול דף העדפות');
+  }
 }
 
-// Call cleanup on page unload
-window.addEventListener('beforeunload', cleanup);
+// אתחול כשהדף נטען
+document.addEventListener('DOMContentLoaded', initializePreferences);
 ```
 
-## Testing Guidelines
+## ייצוא פונקציות
 
-### Unit Testing
 ```javascript
-// Example test structure for individual functions
-describe('updatePrimaryCurrency', () => {
-  test('should reject non-USD currencies', async () => {
-    const result = await updatePrimaryCurrency('EUR');
-    expect(result).toBe(false);
-    expect(showNotificationSpy).toHaveBeenCalledWith(
-      expect.stringContaining('USD only'), 
-      'error'
-    );
-  });
-});
+// Export main functions
+window.saveAllPreferences = saveAllPreferences;
+window.resetToDefaults = resetToDefaults;
+window.updatePreference = updatePreference;
+window.loadPreferences = loadPreferences;
+window.initializePreferences = initializePreferences;
+
+// Export notification functions
+window.showPreferencesSuccess = showPreferencesSuccess;
+window.showPreferencesError = showPreferencesError;
+window.showPreferencesInfo = showPreferencesInfo;
+window.showPreferencesWarning = showPreferencesWarning;
+
+// Export utility functions
+window.getPreferenceLabel = getPreferenceLabel;
+window.loadAccountsToFilter = loadAccountsToFilter;
 ```
 
-### Integration Testing
+## טיפול בשגיאות
+
+### שגיאות נפוצות ותיקונים
+
+1. **שגיאת מערכת פילטרים**: `window.filterSystem.resetFilters is not a function`
+   - **תיקון**: הוספת `filter-system.js` לעמוד ההעדפות
+   - **תיקון**: תיקון אתחול מערכת הפילטרים
+
+2. **סקריפטים חסרים**: פונקציות לא זמינות
+   - **תיקון**: הוספת `main.js`, `tables.js` לעמוד ההעדפות
+   - **תיקון**: תיקון סדר הטעינה של הסקריפטים
+
+3. **קוד כפול**: פונקציה `resetToDefaults` כפולה
+   - **תיקון**: ניקוי הקוד הכפול
+   - **תיקון**: פישוט הלוגיקה
+
+4. **אתחול שגוי**: מערכת פילטרים לא מאותחלת
+   - **תיקון**: שינוי מ-`simpleFilter` ל-`filterSystem`
+   - **תיקון**: הוספת בדיקות קיום פונקציות
+
+## הערות טכניות
+
+### סדר טעינת קבצים
+1. `filter-system.js`
+2. `tables.js`
+3. `main.js`
+4. `preferences.js`
+
+### תלויות גלובליות
+- `window.showConfirmationDialog` - דיאלוג אישור
+- `window.showSuccessNotification` - הודעות הצלחה
+- `window.showErrorNotification` - הודעות שגיאה
+- `window.showInfoNotification` - הודעות מידע
+- `window.showWarningNotification` - הודעות אזהרה
+- `window.restoreAllSectionStates` - שחזור מצב סקשנים
+
+### מבנה נתונים
+העדפות נשמרות כאובייקט JavaScript עם המבנה הבא:
 ```javascript
-// Test API integration
-describe('API Integration', () => {
-  test('should save preferences successfully', async () => {
-    const mockResponse = { message: 'Success', status: 'success' };
-    fetch.mockResolvedValue({ ok: true, json: () => mockResponse });
-    
-    await saveAllPreferences();
-    
-    expect(fetch).toHaveBeenCalledWith('/api/preferences', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: expect.any(String)
-    });
-  });
-});
-```
-
-## Maintenance Guidelines
-
-### Adding New Preferences
-1. Add HTML form element in appropriate section
-2. Create corresponding `update{PreferenceName}(value)` function
-3. Add to `preferencesData.defaults` object
-4. Include in `loadPreferencesToUI()` function
-5. Add to appropriate section save/reset functions
-6. Export to window object
-7. Add validation if needed
-8. Update documentation
-
-### Modifying Sections
-1. Update HTML structure
-2. Modify section management functions
-3. Update `getSectionId()` logic if needed
-4. Test toggle operations
-5. Update state persistence logic
-
-### API Changes
-1. Update endpoint URLs
-2. Modify request/response handling
-3. Update error handling
-4. Test integration thoroughly
-5. Update documentation
-
-## Security Considerations
-
-### Input Sanitization
-```javascript
-function sanitizeInput(value) {
-  if (typeof value !== 'string') return value;
-  
-  // Remove potentially dangerous characters
-  return value
-    .replace(/[<>]/g, '') // Remove HTML tags
-    .replace(/javascript:/gi, '') // Remove javascript: protocols
-    .trim(); // Remove whitespace
+{
+  primaryCurrency: "USD",
+  timezone: "Asia/Jerusalem",
+  defaultStopLoss: 5,
+  defaultTargetPrice: 10,
+  defaultCommission: 1.0,
+  defaultStatusFilter: "open",
+  defaultTypeFilter: "swing",
+  defaultAccountFilter: "all",
+  defaultDateRangeFilter: "this_week",
+  // ... הגדרות נוספות
 }
 ```
-
-### XSS Prevention
-- All user inputs are sanitized before display
-- No `innerHTML` usage with user data
-- All notifications use `textContent`
-- API responses are validated before use
-
-### CSRF Protection
-- All API requests include proper headers
-- No sensitive operations in GET requests
-- Proper error handling for unauthorized requests
-
-## Conclusion
-
-The `preferences.js` file provides a comprehensive, well-structured system for managing user preferences with:
-- Clean architecture and separation of concerns
-- Robust error handling and user feedback
-- Efficient performance and memory usage
-- Comprehensive change tracking
-- Strong security measures
-- Extensive documentation and maintainability
-
----
-
-**Document Version**: 1.0  
-**Last Updated**: August 2025  
-**Author**: TikTrack Development Team

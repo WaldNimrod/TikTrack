@@ -1855,14 +1855,14 @@ async function saveNewTradePlan() {
     };
 
     // Use global validation system
-    console.log('🔍 === VALIDATION CHECK ===');
+    // === VALIDATION CHECK ===
     // window.validateForm available check
-    console.log('🔍 validationRules:', validationRules);
+    // validationRules check
     
     if (typeof window.validateForm === 'function') {
         // Calling window.validateForm
         const validationResult = window.validateForm('addTradePlanForm', validationRules);
-        console.log('🔍 Validation result:', validationResult);
+        // Validation result
         
         // בדיקה אם התוצאה היא אובייקט עם isValid או ערך בוליאני
         const isValid = typeof validationResult === 'object' ? validationResult.isValid : validationResult;
@@ -1898,14 +1898,7 @@ async function saveNewTradePlan() {
     const stopPriceValue = document.getElementById('addTradePlanStopPrice').value;
     const targetPriceValue = document.getElementById('addTradePlanTargetPrice').value;
 
-    console.log('🔍 Form values before processing:', {
-        tickerId: tickerIdValue,
-        investmentType: investmentTypeValue,
-        side: sideValue,
-        plannedAmount: plannedAmountValue,
-        stopPrice: stopPriceValue,
-        targetPrice: targetPriceValue
-    });
+    // Form values before processing
 
     const formData = {
         account_id: 1, // Default to main account
@@ -1920,7 +1913,7 @@ async function saveNewTradePlan() {
         status: 'open' // Default to open status
     };
 
-    console.log('Sending new trade plan:', formData);
+    // Sending new trade plan
 
     // Additional validation before sending - רק אם המערכת הגלובלית לא זמינה
     if (typeof window.validateForm !== 'function') {
@@ -1959,11 +1952,7 @@ async function saveNewTradePlan() {
         });
 
         // Detailed log of the response
-        console.log('Server response:', {
-            status: response.status,
-            statusText: response.statusText,
-            ok: response.ok
-        });
+        // Server response check
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -1972,12 +1961,12 @@ async function saveNewTradePlan() {
             // Try to parse JSON error response
             try {
                 const errorData = JSON.parse(errorText);
-                console.log('Parsed error data:', errorData);
+                // Parsed error data
                 
                 // Handle validation errors from server
                 if (errorData.error && errorData.error.message) {
                     const errorMessage = errorData.error.message;
-                    console.log('Error message:', errorMessage);
+                    // Error message
                     
                     // Parse the error message to identify specific field issues
                     if (errorMessage.includes('investment_type')) {

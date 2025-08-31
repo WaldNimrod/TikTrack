@@ -346,7 +346,7 @@ function toggleTickersSection() {
  * הצגת מודל הוספת טיקר
  */
 function showAddTickerModal() {
-    console.log('🔄 הצגת מודל הוספת טיקר');
+    // הצגת מודל הוספת טיקר
 
     // עדכון אפשרויות מטבע לפני הצגת הטופס
     updateCurrencyOptions();
@@ -371,7 +371,7 @@ function showAddTickerModal() {
  * הצגת מודל עריכת טיקר
  */
 function showEditTickerModal(id) {
-    console.log('🔄 הצגת מודל עריכת טיקר:', id);
+    // הצגת מודל עריכת טיקר
 
     // מציאת הטיקר לפי ID
     const ticker = tickersData.find(t => t.id == id);
@@ -1491,7 +1491,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // שחזור מצב סידור
     restoreSortState();
 
-    console.log('דף טיקרים נטען בהצלחה');
+    // דף טיקרים נטען בהצלחה
 });
 
 // אתחול נוסף כשהדף נטען לחלוטין
@@ -1504,34 +1504,34 @@ window.addEventListener('load', function () {
     
     function tryLoadData() {
         // tryLoadData נקראה
-        console.log(`🔄 ניסיון ${attempts + 1} לטעינת נתונים...`);
+        // ניסיון לטעינת נתונים
         
         // בדיקה מפורטת יותר
         const table = document.querySelector('table[data-table-type="tickers"]');
-        console.log('🔄 table element:', table);
+        // table element check
         
         const container = document.getElementById('tickersContainer');
-        console.log('🔄 container element:', container);
+        // container element check
         
         const tbody = document.querySelector('table[data-table-type="tickers"] tbody') || 
                      document.getElementById('tickersContainer')?.querySelector('tbody');
         
-        console.log('🔄 tbody element:', tbody);
+        // tbody element check
         
         if (tbody) {
-            console.log('✅ נמצא tbody, טוען נתונים...');
-            console.log('🔄 קורא ל-loadTickersData...');
+            // נמצא tbody, טוען נתונים
+            // קורא ל-loadTickersData
             loadTickersData();
         } else if (attempts < maxAttempts) {
             attempts++;
             setTimeout(tryLoadData, 500);
         } else {
             handleElementNotFound('tryLoadData', 'לא הצלחתי למצוא את הטבלה אחרי 10 ניסיונות');
-            console.log('🔄 מנסה לטעון נתונים בכל מקרה...');
+            // מנסה לטעון נתונים בכל מקרה
             loadTickersData();
         }
     }
     
-    console.log('🔄 קורא ל-tryLoadData...');
+    // קורא ל-tryLoadData
     tryLoadData();
 });

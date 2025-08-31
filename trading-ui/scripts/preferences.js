@@ -113,11 +113,26 @@ async function saveAllPreferences() {
  * מאפס לברירות מחדל
  */
 async function resetToDefaults() {
-  if (window.showConfirmationDialog) {
-    window.showConfirmationDialog(
-      'איפוס הגדרות',
-      'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
-      async () => {
+  try {
+    if (typeof window.showConfirmationDialog === 'function') {
+      window.showConfirmationDialog(
+        'איפוס הגדרות',
+        'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
+        async () => {
+          currentPreferences = { ...DEFAULT_PREFERENCES };
+          updateUI();
+          
+          try {
+            await saveAllPreferences();
+            showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
+          } catch (error) {
+            showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
+          }
+        }
+      );
+    } else {
+      // Fallback to browser confirm
+      if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
         currentPreferences = { ...DEFAULT_PREFERENCES };
         updateUI();
         
@@ -128,81 +143,11 @@ async function resetToDefaults() {
           showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
         }
       }
-    );
-  } else {
-    // גיבוי למערכת הישנה
-    if (typeof window.showConfirmationDialog === 'function') {
-      const confirmed = await new Promise((resolve) => {
-        window.showConfirmationDialog(
-          'איפוס העדפות',
-          'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
-          async () => {
-            currentPreferences = { ...DEFAULT_PREFERENCES };
-            updateUI();
-            
-            try {
-              await saveAllPreferences();
-              showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
-            } catch (error) {
-              showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
-            }
-            resolve(true);
-          },
-          () => resolve(false)
-        );
-      });
-    } else {
-          if (typeof window.showConfirmationDialog === 'function') {
-        const confirmed = await new Promise((resolve) => {
-            window.showConfirmationDialog(
-                'איפוס העדפות',
-                'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
-                async () => {
-                    currentPreferences = { ...DEFAULT_PREFERENCES };
-                    updateUI();
-                    
-                    try {
-                        await saveAllPreferences();
-                        showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
-                    } catch (error) {
-                        showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
-                    }
-                    resolve(true);
-                },
-                () => resolve(false)
-            );
-        });
-    } else {
-        if (typeof window.showConfirmationDialog === 'function') {
-        window.showConfirmationDialog(
-            'איפוס העדפות',
-            'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?',
-            async () => {
-                currentPreferences = { ...DEFAULT_PREFERENCES };
-                updateUI();
-                
-                try {
-                    await saveAllPreferences();
-                    showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
-                } catch (error) {
-                    showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
-                }
-            }
-        );
-    } else {
-        if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
-            currentPreferences = { ...DEFAULT_PREFERENCES };
-            updateUI();
-            
-            try {
-                await saveAllPreferences();
-                showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
-            } catch (error) {
-                showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
-            }
-        }
     }
-}
+  } catch (error) {
+    console.error('❌ שגיאה באיפוס העדפות:', error);
+    showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
+  }
 }
 
 /**

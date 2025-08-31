@@ -93,6 +93,139 @@ if (typeof window.tradesData === 'undefined') {
 }
 
 /**
+ * קביעת צבע לפי סוג השקעה
+ * @param {string} investmentType - סוג ההשקעה
+ * @returns {string} - קוד הצבע
+ */
+function getInvestmentTypeColor(investmentType) {
+  if (!investmentType) return '#6c757d'; // אפור לנתונים חסרים
+  
+  const typeColors = {
+    'swing': '#007bff',      // כחול - השקעות סווינג
+    'passive': '#28a745',    // ירוק - השקעות פאסיביות
+    'day': '#ffc107',        // צהוב - מסחר יומי
+    'scalping': '#dc3545',   // אדום - סקאלפינג
+    'position': '#6f42c1',   // סגול - פוזיציה ארוכה
+    'momentum': '#fd7e14',   // כתום - מומנטום
+    'value': '#20c997',      // טורקיז - השקעות ערך
+    'growth': '#e83e8c',     // ורוד - השקעות צמיחה
+    'dividend': '#17a2b8',   // תכלת - השקעות דיבידנד
+    'index': '#6c757d',      // אפור - מדדים
+    'etf': '#495057',        // אפור כהה - ETF
+    'crypto': '#fd7e14',     // כתום - קריפטו
+    'forex': '#20c997',      // טורקיז - מטבעות
+    'commodity': '#ffc107',  // צהוב - סחורות
+    'bond': '#28a745',       // ירוק - אגרות חוב
+    'option': '#dc3545',     // אדום - אופציות
+    'future': '#6f42c1'      // סגול - חוזים עתידיים
+  };
+  
+  const normalizedType = investmentType.toLowerCase().trim();
+  return typeColors[normalizedType] || '#6c757d'; // ברירת מחדל אפור
+}
+
+/**
+ * הוספת סולם צבעים לעמודת סוג השקעה
+ */
+function addInvestmentTypeColorLegend() {
+  const tableContainer = document.querySelector('#tradesTable').closest('.table-container') || 
+                        document.querySelector('#tradesTable').parentElement;
+  
+  if (!tableContainer) return;
+  
+  // בדיקה אם כבר קיים סולם צבעים
+  const existingLegend = tableContainer.querySelector('.investment-type-legend');
+  if (existingLegend) {
+    existingLegend.remove();
+  }
+  
+  const legendContainer = document.createElement('div');
+  legendContainer.className = 'investment-type-legend';
+  legendContainer.style.cssText = `
+    margin: 10px 0;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 0.85em;
+  `;
+  
+  const legendTitle = document.createElement('div');
+  legendTitle.textContent = '🎨 סולם צבעים - סוגי השקעה:';
+  legendTitle.style.cssText = `
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #495057;
+  `;
+  
+  const legendItems = document.createElement('div');
+  legendItems.style.cssText = `
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  `;
+  
+  const typeLabels = {
+    'swing': 'סווינג',
+    'passive': 'פאסיבי',
+    'day': 'יומי',
+    'scalping': 'סקאלפינג',
+    'position': 'פוזיציה',
+    'momentum': 'מומנטום',
+    'value': 'ערך',
+    'growth': 'צמיחה',
+    'dividend': 'דיבידנד',
+    'index': 'מדד',
+    'etf': 'ETF',
+    'crypto': 'קריפטו',
+    'forex': 'מטבעות',
+    'commodity': 'סחורות',
+    'bond': 'אגרות חוב',
+    'option': 'אופציות',
+    'future': 'חוזים עתידיים'
+  };
+  
+  Object.entries(typeLabels).forEach(([type, label]) => {
+    const color = getInvestmentTypeColor(type);
+    const legendItem = document.createElement('span');
+    legendItem.style.cssText = `
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: white;
+      border: 1px solid #dee2e6;
+      font-size: 0.8em;
+    `;
+    
+    const colorDot = document.createElement('span');
+    colorDot.style.cssText = `
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: ${color};
+      border: 1px solid #dee2e6;
+    `;
+    
+    const labelText = document.createElement('span');
+    labelText.textContent = label;
+    
+    legendItem.appendChild(colorDot);
+    legendItem.appendChild(labelText);
+    legendItems.appendChild(legendItem);
+  });
+  
+  legendContainer.appendChild(legendTitle);
+  legendContainer.appendChild(legendItems);
+  
+  // הוספה לפני הטבלה
+  const table = document.querySelector('#tradesTable');
+  tableContainer.insertBefore(legendContainer, table);
+}
+
+/**
  * טעינת נתוני טריידים מהשרת
  * 
  * פונקציה זו טוענת את כל הטריידים מהשרת ומעדכנת את הטבלה
@@ -208,12 +341,19 @@ function updateTradesTable(trades) {
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = trade.investment_type || '';
+    
+    // קביעת צבע לפי סוג השקעה
+    const typeColor = getInvestmentTypeColor(trade.investment_type);
 
     return `
     <tr>
       <td class="ticker-cell"><strong><a href="#" onclick="viewTickerDetails('${trade.ticker_id}')" class="ticker-link">${trade.ticker_symbol || getTickerSymbol(trade.ticker_id) || 'טיקר לא ידוע'}</a></strong></td>
       <td class="status-cell" data-status="${trade.status || ''}"><span class="status-badge status-${trade.status || 'open'}">${statusDisplay}</span></td>
-      <td class="type-cell" data-type="${typeForFilter}">${typeDisplay || trade.investment_type || '-'}</td>
+      <td class="type-cell" data-type="${typeForFilter}">
+        <span class="investment-type-badge" style="background-color: ${typeColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 500;">
+          ${typeDisplay || trade.investment_type || '-'}
+        </span>
+      </td>
       <td class="side-cell" data-side="${trade.side || 'Long'}">
         <span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>
       </td>
@@ -252,6 +392,9 @@ function updateTradesTable(trades) {
   
   // טעינת תאריכי יצירה של תוכניות
   loadTradePlanDates();
+  
+  // הוספת סולם צבעים לעמודת סוג השקעה
+  addInvestmentTypeColorLegend();
 }
 
 // פונקציות נוספות

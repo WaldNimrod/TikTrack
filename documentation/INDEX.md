@@ -1,216 +1,181 @@
-# TikTrack Documentation Index
+# TikTrack - תיעוד מערכת
 
-## 📋 Quick Navigation
+## סקירה כללית
 
-This index provides quick access to all documentation files in the TikTrack project.
+TikTrack היא מערכת ניהול מסחר מתקדמת המאפשרת מעקב אחר טריידים, ניהול חשבונות, התראות מתקדמות ואינטגרציה עם נתונים חיצוניים.
 
-## 🆕 Recent Updates (Version 2.8.0)
+## תכונות מרכזיות
 
-### 🎯 New Completed Modules
-- **[Database Extra Data System](database/)** - Complete currency and note relation types management
-- **[Dynamic Table Constraints](database/)** - Real-time display of database constraints
-- **[Validation System](database/)** - Comprehensive client and server-side validation
-- **[JavaScript Architecture](frontend/)** - Complete modular JavaScript system with 40+ files
-- **[Filter System](frontend/)** - Unified filtering system across all pages
-- **[Number Formatting](frontend/)** - Global number and currency formatting system
+### ניהול טריידים
+- **תכנוני מסחר**: יצירה וניהול תכניות מסחר
+- **טריידים**: מעקב אחר עסקאות פעילות וסגורות
+- **ביצועים**: ניהול ביצועי עסקאות
+- **תזרימי מזומן**: מעקב אחר תזרימי כספים
 
-### 📚 Updated Documentation
-- **[CHANGELOG.md](project/CHANGELOG.md)** - Added comprehensive version 1.8.0 documentation
-- **[HANDOVER_SUMMARY.md](../../HANDOVER_SUMMARY.md)** - Updated with new completed modules
-- **[README.md](README.md)** - Updated with version 1.8.0 changes
-- **[VERSION_1.8.0_SUMMARY.md](project/VERSION_1.8.0_SUMMARY.md)** - Comprehensive summary of all changes
+### ניהול חשבונות
+- **חשבונות**: ניהול חשבונות מרובים
+- **טיקרים**: מעקב אחר מניות וניירות ערך
+- **הערות**: מערכת הערות מתקדמת
 
-### 🔧 Technical Improvements
-- **Currency Management**: Complete CRUD operations with validation
-- **Note Relation Types**: Full management system with API integration
-- **Database Constraints**: Dynamic display with color coding
-- **Button Styling**: Consistent modal button design
-- **Section Toggle**: Improved collapse/expand functionality
-- **JavaScript Modularity**: 40+ organized script files with clear architecture
-- **Global Number Formatting**: Consistent number display across all pages
-- **Unified Filter System**: Advanced filtering with "All" options and reset functionality
+### התראות מתקדמות
+- **התראות**: מערכת התראות מותאמת אישית
+- **תנאים**: הגדרת תנאי התראה מתקדמים
+- **מעקב**: מעקב אחר התראות פעילות
 
-## 🏗️ Project Structure
+### הגדרות מערכת
+- **העדפות**: הגדרות מערכת מותאמות אישית
+- **פילטרים**: מערכת פילטרים גלובלית
+- **ממשק**: ממשק משתמש אחיד ומתקדם
 
-### 📊 **Project Documentation** (`project/`)
-- [PROJECT_SUMMARY.md](project/PROJECT_SUMMARY.md) - Complete project overview
-- [CHANGELOG.md](project/CHANGELOG.md) - Project changelog and version history
-- [SUMMARY_TABLE.md](project/SUMMARY_TABLE.md) - Project summary table
-- [VERSION_1.8.0_SUMMARY.md](project/VERSION_1.8.0_SUMMARY.md) - Version 1.8.0 comprehensive summary
+## ארכיטקטורה
 
-### 🎯 **Feature Documentation** (`features/`)
+### Frontend
+- **HTML**: דפים מותאמים אישית לכל מודול
+- **JavaScript**: סקריפטים מודולריים
+- **CSS**: עיצוב אחיד ומתקדם
 
-#### 💰 **Currencies** (`features/currencies/`)
-- [SUMMARY.md](features/currencies/SUMMARY.md) - Currency system summary
+### Backend
+- **Python**: Flask framework
+- **Database**: SQLite עם SQLAlchemy ORM
+- **API**: RESTful API endpoints
 
-#### 📋 **Trade Plans** (`features/trade_plans/`)
-- [README.md](features/trade_plans/README.md) - Trade plans system overview
+### נתונים חיצוניים
+- **Yahoo Finance**: נתוני מניות בזמן אמת
+- **Google Finance**: נתונים פיננסיים
+- **Alpha Vantage**: נתוני שוק מתקדמים
 
-#### ⚙️ **Preferences** (`features/preferences/`)
-- [README.md](features/preferences/README.md) - Preferences system overview
-- [API.md](features/preferences/API.md) - Preferences API documentation
-- [JAVASCRIPT.md](features/preferences/JAVASCRIPT.md) - Preferences JavaScript documentation
-- [REFACTORING.md](features/preferences/REFACTORING.md) - Preferences page refactoring
-- [USER_GUIDE.md](features/preferences/USER_GUIDE.md) - User preferences guide
-- [PROJECT_SUMMARY.md](features/preferences/PROJECT_SUMMARY.md) - Preferences project summary
-- [INDEX.md](features/preferences/INDEX.md) - Preferences documentation index
+## תיקונים אחרונים (אוגוסט 2025)
 
-#### 📋 **Open Plans Field** (`features/`)
-- [open_plans_field.md](features/open_plans_field.md) - Open plans field implementation for tickers
+### בעיות שתוקנו:
+1. **שגיאת מערכת פילטרים**: `window.filterSystem.resetFilters is not a function`
+2. **סקריפטים חסרים**: הוספת קבצים חיוניים לעמוד ההעדפות
+3. **קוד כפול**: ניקוי קוד כפול ופגום
+4. **אתחול שגוי**: תיקון אתחול מערכות
 
-#### 🔒 **Constraints** (`features/constraints/`)
-- [README.md](features/constraints/README.md) - Constraints system overview
-- [active_trades_field.md](features/constraints/active_trades_field.md) - Active trades field implementation
-- [ACTIVE_TRADES_CONSTRAINT.md](features/constraints/ACTIVE_TRADES_CONSTRAINT.md) - Active trades constraint documentation
-- [CONSTRAINT_SYSTEM_DOCUMENTATION.md](features/constraints/CONSTRAINT_SYSTEM_DOCUMENTATION.md) - Complete constraint system documentation
+### שינויים שבוצעו:
+- הוספת `filter-system.js`, `main.js`, `tables.js` לעמוד ההעדפות
+- תיקון סדר הטעינה של הסקריפטים
+- ניקוי קוד כפול בפונקציה `resetToDefaults`
+- הוספת פונקציות עזר גלובליות ב-`header-system.js`
+- תיקון אתחול מערכת הפילטרים
 
-### 🗄️ **Database Documentation** (`database/`)
-- [README.md](database/README.md) - Database system overview
-- [CHANGES_AUGUST_2025.md](database/CHANGES_AUGUST_2025.md) - Database changes (August 2025)
-- [PAGE_IMPROVEMENTS.md](database/PAGE_IMPROVEMENTS.md) - Database page improvements
-- [SCHEMA.md](database/SCHEMA.md) - Database schema documentation
-- [MIGRATIONS.md](database/MIGRATIONS.md) - Database migration guides
-- [CONSTRAINTS_IMPLEMENTATION.md](database/CONSTRAINTS_IMPLEMENTATION.md) - Dynamic constraints system
-- [ALERTS_TABLE_MIGRATION.md](database/ALERTS_TABLE_MIGRATION.md) - Alerts table migration documentation
+### פונקציות חדשות שנוספו:
+- `getVisibleContainers()` - קבלת כל הקונטיינרים הנראים
+- `showAllRecordsInTable()` - הצגת כל הרשומות בטבלה
+- `updateTableCount()` - עדכון מספר הרשומות בטבלה
+- `resetFiltersManually()` - איפוס ידני של פילטרים (גיבוי)
+- `handleElementNotFound()` - טיפול במקרה שאלמנט לא נמצא
+- `handleDataLoadError()` - טיפול בשגיאות טעינת נתונים
+- `tryLoadData()` - ניסיון לטעינת נתונים
 
-### 🖥️ **Server Documentation** (`server/`)
-- [README.md](server/README.md) - Server system overview
-- [CONFIGURATIONS.md](server/CONFIGURATIONS.md) - Server configuration guide
-- [GUIDELINES.md](server/GUIDELINES.md) - Development guidelines
-- [ISSUES.md](server/ISSUES.md) - Server issues and problems
-- [TROUBLESHOOTING.md](server/TROUBLESHOOTING.md) - Server troubleshooting guide
-- **[RESTART_SCRIPT_GUIDE.md](server/RESTART_SCRIPT_GUIDE.md)** - Complete server restart script guide
+## תיעוד מפורט
 
-### 🎨 **Frontend Documentation** (`frontend/`)
-- [README.md](frontend/README.md) - Frontend system overview
-- [CONSOLE_CLEANUP.md](frontend/CONSOLE_CLEANUP.md) - Console cleanup system
-- [CONSOLE_CLEANUP_SYSTEM.md](frontend/CONSOLE_CLEANUP_SYSTEM.md) - Console cleanup system details
-- [JAVASCRIPT_ARCHITECTURE.md](frontend/JAVASCRIPT_ARCHITECTURE.md) - Complete JavaScript architecture (40+ files)
-- [FILTER_SYSTEM.md](frontend/FILTER_SYSTEM.md) - Unified filtering system documentation
-- [NUMBER_FORMATTING.md](frontend/NUMBER_FORMATTING.md) - Global number formatting system
-- [FUNCTION_NAMING.md](frontend/FUNCTION_NAMING.md) - Function naming conventions
-- [JS_ORGANIZATION.md](frontend/JS_ORGANIZATION.md) - JavaScript organization guidelines
-- [BACKWARD_COMPATIBILITY.md](frontend/BACKWARD_COMPATIBILITY.md) - Backward compatibility documentation
-- [TRANSLATION_FUNCTIONS.md](frontend/TRANSLATION_FUNCTIONS.md) - Translation functions documentation
-- [HEADER_SYSTEM_README.md](frontend/HEADER_SYSTEM_README.md) - Header system documentation
-- **[NOTIFICATION_SYSTEM.md](frontend/NOTIFICATION_SYSTEM.md)** - Notification and messaging system - Detailed explanation of the difference between notification system and messaging system
+### מערכות עיקריות
+- [מערכת העדפות](features/preferences/README.md) - הגדרות מערכת מותאמות אישית
+- [מערכת פילטרים](features/filter-system/README.md) - פילטרים גלובליים
+- [מערכת התראות](features/alerts/README.md) - התראות מתקדמות
+- [מערכת חשבונות](features/accounts/README.md) - ניהול חשבונות
+- [מערכת טריידים](features/trades/README.md) - ניהול טריידים
+- [מערכת נתונים חיצוניים](features/external-data/README.md) - אינטגרציה עם נתונים חיצוניים
 
-#### 🧩 **Components** (`frontend/components/`)
-- [ACTIVE_ALERTS.md](frontend/components/ACTIVE_ALERTS.md) - Active alerts component
+### פיתוח
+- [הגדרת פיתוח](development/README.md) - הגדרת סביבת פיתוח
+- [API Reference](api/README.md) - תיעוד API
+- [Database Schema](database/README.md) - מבנה בסיס הנתונים
+- [Testing](testing/README.md) - מדריך בדיקות
 
-#### 🎨 **CSS System** (`frontend/css/`)
-- [CSS_ARCHITECTURE.md](frontend/css/CSS_ARCHITECTURE.md) - CSS architecture and organization
-- [CSS_ORGANIZATION_PROCESS.md](frontend/css/CSS_ORGANIZATION_PROCESS.md) - CSS organization process
-- [CSS_VARIABLES.md](frontend/css/CSS_VARIABLES.md) - CSS variables reference
-- [COMPONENT_STYLE_GUIDE.md](frontend/css/COMPONENT_STYLE_GUIDE.md) - Component style guide
-- **[MODAL_STYLING_GUIDE.md](frontend/css/MODAL_STYLING_GUIDE.md)** - Modal styling standards and guidelines
-- [CSS_MAINTENANCE.md](frontend/css/CSS_MAINTENANCE.md) - CSS maintenance guidelines
-- [CSS_OPTIMIZATION.md](frontend/css/CSS_OPTIMIZATION.md) - CSS optimization techniques
+### שרת
+- [Server Setup](server/README.md) - הגדרת שרת
+- [Deployment](server/DEPLOYMENT.md) - פריסת מערכת
 
-### ⚙️ **Backend Documentation** (`backend/`)
-- [README.md](backend/README.md) - Backend system overview
-- [GRID_SYSTEM.md](backend/GRID_SYSTEM.md) - Grid system documentation
-- [NOTES_SYSTEM.md](backend/NOTES_SYSTEM.md) - Notes system documentation
-- [VALIDATION_SYSTEM.md](backend/VALIDATION_SYSTEM.md) - Dynamic validation system
+### משתמשים
+- [User Guide](user/README.md) - מדריך משתמש
+- [Troubleshooting](user/TROUBLESHOOTING.md) - פתרון בעיות
 
-### 🛠️ **Development Documentation** (`development/`)
-- [README.md](development/README.md) - Development overview
-- [QUICK_START.md](development/QUICK_START.md) - Quick start guide for new developers
-- [NEW_DEVELOPER.md](development/NEW_DEVELOPER.md) - New developer guide
-- [WORKFLOW.md](development/WORKFLOW.md) - Development workflow
-- [MODULE_TESTING.md](development/MODULE_TESTING.md) - Module testing checklist
+## התקנה והפעלה
 
-### 🧪 **Testing Documentation** (`testing/`)
-- [README.md](testing/README.md) - Testing system overview and strategy
+### דרישות מערכת
+- Python 3.9+
+- Node.js 14+
+- SQLite 3
 
-### 👥 **User Documentation** (`user/`)
-- [README.md](user/README.md) - Complete user guide
-- [TROUBLESHOOTING.md](user/TROUBLESHOOTING.md) - Troubleshooting guide
+### התקנה מהירה
+```bash
+# Clone repository
+git clone <repository-url>
+cd TikTrackApp
 
-### ⚠️ **Issues Documentation** (`issues/`)
-- [CURRENT.md](issues/CURRENT.md) - Current issues
+# Install dependencies
+pip install -r requirements.txt
 
-### 📝 **Rules and TODOs** (`rules/`, `todo/`)
-- [TRADE_PLAN_LINKING.md](rules/TRADE_PLAN_LINKING.md) - Trade plan linking rules
-- [FEATURE_ROADMAP.md](todo/FEATURE_ROADMAP.md) - Feature roadmap and planning
-- [README.md](todo/README.md) - TODO system overview
+# Start development server
+./start_dev.sh
+```
 
-## 🔗 Main Documentation Files
+### הפעלת שרת
+```bash
+# Development server
+./start_dev.sh
 
-### 📖 **Core Documentation**
-- **[README.md](../../README.md)** - Main project documentation and overview
-- [README.md](README.md) - Main documentation overview (this directory)
-- [INDEX.md](INDEX.md) - This index file
+# Production server
+./start_optimized.sh
+```
 
-## 📊 Documentation Status
+## פיתוח
 
-### ✅ **Active Documentation**
-- Project documentation
-- Feature documentation
-- Database documentation
-- Server documentation
-- Frontend documentation
-- Backend documentation
-- Development documentation
-- Issues documentation
+### מבנה פרויקט
+```
+TikTrackApp/
+├── Backend/                 # Backend Python code
+│   ├── routes/             # API routes
+│   ├── models/             # Database models
+│   ├── services/           # Business logic
+│   └── utils/              # Utilities
+├── trading-ui/             # Frontend code
+│   ├── scripts/            # JavaScript files
+│   ├── styles/             # CSS files
+│   └── *.html              # HTML pages
+├── documentation/          # Documentation
+└── external_data_integration_server/  # External data server
+```
 
-### 📦 **Backup Documentation** (`backups/documentation_version_1_backup/`)
-- Old version files
-- Outdated documentation
-- Large PDF and HTML files
-- Unused system files
+### כללי פיתוח
+- **קוד נקי**: עקוב אחר כללי קוד נקי
+- **תיעוד**: תיעד כל פונקציה וקובץ
+- **בדיקות**: כתוב בדיקות לכל פונקציונליות חדשה
+- **תאימות**: ווד תאימות עם דפדפנים שונים
 
-## 🚀 Quick Access by Topic
+### תיקון באגים
+1. **זיהוי הבעיה**: בדוק לוגים וקונסול
+2. **מציאת מקור**: חפש בקוד המקור
+3. **תיקון**: תקן את הבעיה
+4. **בדיקה**: בדוק שהתיקון עובד
+5. **תיעוד**: עדכן תיעוד אם צריך
 
-### 🆕 **For New Developers**
-1. [development/QUICK_START.md](development/QUICK_START.md) - Quick start guide
-2. [development/README.md](development/README.md) - Development overview
-3. [project/PROJECT_SUMMARY.md](project/PROJECT_SUMMARY.md) - Project overview
-4. [database/README.md](database/README.md) - Database overview
+## תמיכה
 
-### 🗄️ **For Database Work**
-1. [database/README.md](database/README.md)
-2. [database/CONSTRAINTS_IMPLEMENTATION.md](database/CONSTRAINTS_IMPLEMENTATION.md)
-3. [database/PAGE_IMPROVEMENTS.md](database/PAGE_IMPROVEMENTS.md)
+### בעיות נפוצות
+- **שגיאות JavaScript**: בדוק קונסול דפדפן
+- **בעיות שרת**: בדוק לוגי שרת
+- **בעיות נתונים**: בדוק בסיס נתונים
 
-### 🖥️ **For Server Issues**
-1. [server/README.md](server/README.md)
-2. [server/RESTART_SCRIPT_GUIDE.md](server/RESTART_SCRIPT_GUIDE.md)
+### קבלת עזרה
+- בדוק תיעוד רלוונטי
+- חפש בעיות דומות
+- פנה לצוות הפיתוח
 
-### 🎨 **For Frontend Development**
-1. [frontend/README.md](frontend/README.md)
-2. [frontend/JAVASCRIPT_ARCHITECTURE.md](frontend/JAVASCRIPT_ARCHITECTURE.md)
-3. [frontend/FILTER_SYSTEM_README.md](frontend/FILTER_SYSTEM_README.md)
-4. [frontend/HEADER_SYSTEM_README.md](frontend/HEADER_SYSTEM_README.md)
+## רישיון
 
-### ⚙️ **For Feature Development**
-1. [features/preferences/README.md](features/preferences/README.md)
-2. [features/currencies/SUMMARY.md](features/currencies/SUMMARY.md)
-3. [features/external_data/EXTERNAL_DATA_SYSTEM.md](features/external_data/EXTERNAL_DATA_SYSTEM.md)
+פרויקט זה מוגן תחת רישיון MIT. ראה קובץ LICENSE לפרטים.
 
-## 📝 Documentation Standards
+## צוות
 
-### 📁 **File Organization**
-- All documentation in `documentation/` directory
-- Logical folder structure by topic
-- English names only
-- Descriptive file names
-
-### 📋 **Content Standards**
-- English language only
-- Clear and concise writing
-- Include examples where relevant
-- Link to related documentation
-- Keep documentation up to date
-
-### 🔗 **Linking Standards**
-- Use relative links within documentation
-- Link to related files
-- Include table of contents for long documents
-- Update links when files are moved
+- **מפתח ראשי**: Nimrod
+- **ארכיטקט**: TikTrack Team
+- **תיעוד**: Development Team
 
 ---
 
-**Last Updated:** August 26, 2025  
-**Maintainer:** TikTrack Development Team  
-**Version:** 2.8.0
+**גרסה**: 1.3.1  
+**עדכון אחרון**: אוגוסט 2025  
+**סטטוס**: יציב ופעיל

@@ -393,7 +393,7 @@ async function loadTickersForTradePlan() {
             ticker.status === 'open' || ticker.status === 'closed'
         );
         
-        console.log('✅ Loaded active tickers:', activeTickers.length);
+        // Loaded active tickers
         
         // עדכון רשימת הטיקרים
         const tickerSelect = document.getElementById('addTradePlanTickerId');

@@ -73,7 +73,7 @@ async function initializeConsoleCleanup() {
         }, cleanupInterval);
 
     } catch (error) {
-        console.error('❌ שגיאה באתחול ניקוי קונסולה:', error);
+        // שגיאה באתחול ניקוי קונסולה
     }
 }
 
@@ -145,7 +145,7 @@ async function updateConsoleCleanupInterval(newInterval) {
         }, newInterval);
 
     } catch (error) {
-        console.error('❌ שגיאה בעדכון זמן ניקוי קונסולה:', error);
+        // שגיאה בעדכון זמן ניקוי קונסולה
     }
 }
 

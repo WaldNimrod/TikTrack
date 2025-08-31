@@ -267,8 +267,8 @@ class ActiveAlertsComponent extends HTMLElement {
         titleEl.style.opacity = '0.5';
         titleEl.style.fontSize = '0.9rem'; // הקטנת הכותרת
         titleEl.style.fontWeight = 'normal'; // הקטנת המשקל
-        // סגירת הסקשן כשאין התראות
-        this.closeSectionIfNoAlerts();
+        // סגירת הסקשן כשאין התראות - מבוטל כדי לא להפריע לשמירת סטטוס המשתמש
+        // this.closeSectionIfNoAlerts();
       } else {
         console.log('🔄 Has alerts, updating title with count');
         // החלפת האיקון הקיים באיקון עם מספר
@@ -276,8 +276,8 @@ class ActiveAlertsComponent extends HTMLElement {
         titleEl.style.opacity = '1';
         titleEl.style.fontSize = ''; // חזרה לגודל רגיל
         titleEl.style.fontWeight = ''; // חזרה למשקל רגיל
-        // פתיחת הסקשן כשיש התראות
-        this.openSectionIfHasAlerts();
+        // פתיחת הסקשן כשיש התראות - מבוטל כדי לא להפריע לשמירת סטטוס המשתמש
+        // this.openSectionIfHasAlerts();
       }
     }
 

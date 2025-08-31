@@ -156,7 +156,7 @@ async function getAccountById(accountId) {
             return null;
         }
     } catch (error) {
-        console.error('❌ Error fetching account:', error);
+        // Error fetching account
         return null;
     }
 }

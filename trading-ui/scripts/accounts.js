@@ -2124,6 +2124,28 @@ window.updateAccountFilterMenu = updateAccountFilterMenu;
 window.filterAccountsLocally = filterAccountsLocally;
 window.updateAccountsTable = updateAccountsTable;
 window.deleteAccount = deleteAccount;
+window.loadAccountsDataForAccountsPage = loadAccountsDataForAccountsPage;
+
+/**
+ * שחזור מצב סקשן החשבונות
+ */
+function restoreAccountsSectionState() {
+  const savedState = localStorage.getItem('accountsSectionCollapsed');
+  if (savedState === 'true') {
+    const accountsSection = document.querySelector('.accounts-section');
+    if (accountsSection) {
+      const sectionBody = accountsSection.querySelector('.section-body');
+      const toggleBtn = accountsSection.querySelector('button[onclick="toggleAccountsSection()"]');
+
+      if (sectionBody && toggleBtn) {
+        sectionBody.style.display = 'none';
+        toggleBtn.textContent = 'הצג חשבונות';
+      }
+    }
+  }
+}
+
+window.restoreAccountsSectionState = restoreAccountsSectionState;
 
 
 

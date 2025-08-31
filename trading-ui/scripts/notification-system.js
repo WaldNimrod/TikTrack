@@ -241,13 +241,13 @@ function getNotificationIcon(type) {
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  */
 function showSuccessNotification(title, message, duration = 4000) {
-    console.log('🔧 showSuccessNotification called with:', { title, message, duration });
+    // showSuccessNotification called with
     
     // Ensure title and message are provided
     const finalTitle = title || 'הצלחה';
     const finalMessage = message || 'הפעולה הושלמה בהצלחה';
     
-    console.log('🔧 showSuccessNotification calling showNotification with:', { finalTitle, finalMessage, type: 'success', duration });
+    // showSuccessNotification calling showNotification with
     showNotification(finalMessage, 'success', finalTitle, duration);
 }
 
@@ -260,8 +260,8 @@ function showSuccessNotification(title, message, duration = 4000) {
  * @param {number} duration - Display duration in milliseconds (default: 6000)
  */
 function showErrorNotification(title, message, duration = 6000) {
-    console.log('🔧 showErrorNotification called with:', { title, message, duration });
-    console.log('🔧 showErrorNotification calling showNotification with:', { message, type: 'error', title, duration });
+    // showErrorNotification called with
+    // showErrorNotification calling showNotification with
     showNotification(message, 'error', title, duration);
 }
 
@@ -486,13 +486,13 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
  * @param {Function} onCancel - Callback for cancel action
  */
 function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null, onCancel = null) {
-    console.log('🔧 showDeleteWarning נקראה עם:', { itemType, itemName, itemTypeDisplay });
-    console.log('🔧 showConfirmationDialog קיים:', typeof showConfirmationDialog === 'function');
+    // showDeleteWarning נקראה עם
+    // showConfirmationDialog קיים
     
     const title = `מחיקת ${itemTypeDisplay}`;
     const message = `האם אתה בטוח שברצונך למחוק את ${itemTypeDisplay} "${itemName}"?\n\nפעולה זו אינה ניתנת לביטול.`;
     
-    console.log('🔧 קורא ל-showConfirmationDialog עם:', { title, message });
+    // קורא ל-showConfirmationDialog עם
     showConfirmationDialog(title, message, onConfirm, onCancel);
 }
 
@@ -569,9 +569,9 @@ window.notificationSystem = {
 };
 
 // בדיקת פונקציות בסוף טעינת notification-system.js
-console.log('🔧 notification-system.js נטען');
-console.log('🔧 showDeleteWarning קיים:', typeof showDeleteWarning === 'function');
-console.log('🔧 showConfirmationDialog קיים:', typeof showConfirmationDialog === 'function');
-console.log('🔧 window.showDeleteWarning קיים:', typeof window.showDeleteWarning === 'function');
-console.log('🔧 window.showConfirmationDialog קיים:', typeof window.showConfirmationDialog === 'function');
+  // notification-system.js נטען
+  // showDeleteWarning קיים
+  // showConfirmationDialog קיים
+  // window.showDeleteWarning קיים
+  // window.showConfirmationDialog קיים
 

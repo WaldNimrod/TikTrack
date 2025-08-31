@@ -255,18 +255,20 @@ function setupGlobalModalConfigurations() {
 function initializeCurrentPage() {
   const currentPage = getCurrentPageName();
 
-  // שחזור מצב הסקשנים
-  if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
-  } else {
-    // restoreAllSectionStates function not found
-  }
-
   // Call page-specific initialization if available
   const initFunctionName = `initialize${currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}Page`;
   if (typeof window[initFunctionName] === 'function') {
     window[initFunctionName]();
   }
+
+  // שחזור מצב הסקשנים אחרי אתחול הדף
+  setTimeout(() => {
+    if (typeof window.restoreAllSectionStates === 'function') {
+      window.restoreAllSectionStates();
+    } else {
+      console.warn('⚠️ restoreAllSectionStates function not found');
+    }
+  }, 100);
 }
 
 // ===== GLOBAL HELPER FUNCTIONS =====
@@ -452,6 +454,14 @@ function restoreAllSectionStates() {
     const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
     const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
 
+    console.log('🔍 Restoring top section state:', {
+      storageKey: topSectionStorageKey,
+      savedState: topSectionCollapsed,
+      topSectionFound: !!topSection,
+      topToggleBtnFound: !!topToggleBtn,
+      topIconFound: !!topIcon
+    });
+
     if (topSection && topIcon) {
       if (topSectionCollapsed) {
         topSection.style.display = 'none';
@@ -463,6 +473,8 @@ function restoreAllSectionStates() {
         topIcon.textContent = '▲';
       }
       console.log('💾 Restored top section state:', topSectionCollapsed ? 'collapsed' : 'expanded', 'for key:', topSectionStorageKey);
+    } else {
+      console.warn('⚠️ Could not restore top section state - elements not found');
     }
 
   } catch (error) {
@@ -506,6 +518,13 @@ window.toggleTopSectionGlobal = function () {
   const section = document.querySelector('.top-section .section-body');
   const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  console.log('🔍 toggleTopSectionGlobal called:', {
+    currentPath: currentPath,
+    sectionFound: !!section,
+    toggleBtnFound: !!toggleBtn,
+    iconFound: !!icon
+  });
 
   if (section) {
     const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
@@ -557,6 +576,7 @@ window.toggleTopSectionGlobal = function () {
 
     // Save state to localStorage
     localStorage.setItem(storageKey, !isCollapsed);
+    console.log('💾 Saved top section state:', !isCollapsed ? 'collapsed' : 'expanded', 'for key:', storageKey);
             // Saved top section state
   }
 };

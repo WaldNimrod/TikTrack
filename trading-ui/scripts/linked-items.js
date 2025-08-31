@@ -1486,10 +1486,85 @@ function getStatusBadge(status) {
     return `<span class="${badgeClass}">${badgeText}</span>`;
 }
 
+/**
+ * Load linked items data from server
+ * 
+ * @param {string} itemType - Type of the item
+ * @param {number|string} itemId - ID of the item
+ * @returns {Object} Linked items data
+ */
+async function loadLinkedItemsData(itemType, itemId) {
+    try {
+        const response = await fetch(`/api/v1/linked-items/${itemType}/${itemId}`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+/**
+ * Show linked items warning modal
+ * 
+ * This function shows a warning when trying to delete/cancel an item that has linked items
+ * 
+ * @param {string} itemType - Type of the item (ticker, trade, account, etc.)
+ * @param {number|string} itemId - ID of the item
+ * @param {Function} onConfirm - Callback function to execute on confirmation
+ * @param {Function} onCancel - Callback function to execute on cancellation
+ */
+async function showLinkedItemsWarning(itemType, itemId, onConfirm = null, onCancel = null) {
+    console.log('🔧 showLinkedItemsWarning called with:', { itemType, itemId, onConfirm: !!onConfirm, onCancel: !!onCancel });
+    
+    try {
+        // Load linked items data
+        const linkedItemsData = await loadLinkedItemsData(itemType, itemId);
+        
+        if (!linkedItemsData) {
+            console.warn('⚠️ No linked items data received');
+            return;
+        }
+        
+        // Check if there are any linked items
+        const hasLinkedItems = (linkedItemsData.child_entities && linkedItemsData.child_entities.length > 0) ||
+                              (linkedItemsData.parent_entities && linkedItemsData.parent_entities.length > 0);
+        
+        if (!hasLinkedItems) {
+            console.log('✅ No linked items found - proceeding with action');
+            if (onConfirm) {
+                onConfirm();
+            }
+            return;
+        }
+        
+        // Show linked items modal
+        console.log('🔧 Showing linked items modal for warning');
+        showLinkedItemsModal(itemType, itemId);
+        
+        // Store callbacks for later use
+        window._linkedItemsWarningCallbacks = {
+            onConfirm,
+            onCancel
+        };
+        
+    } catch (error) {
+        handleSystemError(error, 'LINKED_ITEMS_WARNING');
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', 'שגיאה בבדיקת פריטים מקושרים');
+        }
+    }
+}
+
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
 // Generic functions (for backward compatibility)
 window.viewLinkedItems = viewLinkedItems;
 window.showLinkedItemsModal = showLinkedItemsModal;
+window.showLinkedItemsWarning = showLinkedItemsWarning;
 window.createLinkedItemsModalContent = createLinkedItemsModalContent;
 window.checkLinkedItems = checkLinkedItems;
 window.exportLinkedItemsData = exportLinkedItemsData;
@@ -1519,6 +1594,7 @@ window.viewLinkedItemsForExecution = viewLinkedItemsForExecution;
 window.linkedItems = {
     viewLinkedItems,
     showLinkedItemsModal,
+    showLinkedItemsWarning,
     createLinkedItemsModalContent,
     checkLinkedItems,
     exportLinkedItemsData,

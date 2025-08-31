@@ -1947,3 +1947,45 @@ function createDetailedItemInfo(item) {
 
     return info || '<div class="item-no-info">אין מידע נוסף</div>';
 }
+
+// ===== MODAL UTILITIES =====
+
+/**
+ * Initialize modal backdrop functionality
+ * 
+ * Ensures all modals can be closed by clicking on the backdrop
+ * This function should be called on DOMContentLoaded
+ */
+function initializeModalBackdrop() {
+    console.log('🔄 Initializing modal backdrop functionality...');
+    
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        // הוספת data-bs-backdrop אם לא קיים
+        if (!modal.hasAttribute('data-bs-backdrop')) {
+            modal.setAttribute('data-bs-backdrop', 'true');
+        }
+        
+        // הוספת data-bs-keyboard אם לא קיים
+        if (!modal.hasAttribute('data-bs-keyboard')) {
+            modal.setAttribute('data-bs-keyboard', 'true');
+        }
+
+        // הוספת event listener לסגירה בלחיצה על הרקע
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            }
+        });
+    });
+
+    console.log('✅ Modal backdrop functionality initialized');
+}
+
+// Initialize modal backdrop when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initializeModalBackdrop();
+});

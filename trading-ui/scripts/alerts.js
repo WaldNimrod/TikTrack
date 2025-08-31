@@ -109,6 +109,9 @@ async function loadAlertsData() {
       created_at: alert.created_at,
       is_triggered: alert.is_triggered
     }));
+    
+    // הגדרת המשתנה הגלובלי
+    window.alertsData = alertsData;
 
     // עדכון הטבלה
 
@@ -927,7 +930,6 @@ async function loadTickersDataIfNeeded() {
         }
       }
     } catch (error) {
-      console.error('שגיאה בטעינת נתוני טיקרים:', error);
       window.tickersData = [];
     }
   }
@@ -1000,7 +1002,7 @@ function populateRelatedObjects(relationTypeId) {
             });
           }
         }).catch(error => {
-          console.error('שגיאה בטעינת נתוני טיקרים:', error);
+          // שגיאה בטעינת נתוני טיקרים
         });
       }
       break;
@@ -1073,7 +1075,7 @@ function populateEditRelatedObjects(relationTypeId) {
             });
           }
         }).catch(error => {
-          console.error('שגיאה בטעינת נתוני טיקרים:', error);
+          // שגיאה בטעינת נתוני טיקרים
         });
       }
       break;
@@ -1375,11 +1377,14 @@ async function saveAlert() {
 
       // התראה נשמרה בהצלחה
 
+      // הוספת ההתראה החדשה לנתונים במקום בלי טעינה מחדש
+      if (window.alertsData) {
+        window.alertsData.push(newAlert);
+        updateAlertsTable(window.alertsData);
+      }
+
       // סגירת המודל
       closeModal('addAlertModal');
-
-      // רענון הנתונים
-      loadAlertsData();
 
       // הצגת הודעה
       window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה!');
@@ -1761,11 +1766,17 @@ async function updateAlert() {
       const updatedAlert = await response.json();
       // התראה עודכנה בהצלחה
 
+      // עדכון הנתונים במקום בלי טעינה מחדש
+      if (window.alertsData) {
+        const alertIndex = window.alertsData.findIndex(alert => alert.id == alertId);
+        if (alertIndex !== -1) {
+          window.alertsData[alertIndex] = updatedAlert;
+          updateAlertsTable(window.alertsData);
+        }
+      }
+
       // סגירת המודל
       closeModal('editAlertModal');
-
-      // רענון הנתונים
-      loadAlertsData();
 
       // הצגת הודעה
       window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!');
@@ -1845,8 +1856,14 @@ async function confirmDeleteAlert(alertId) {
     
     if (response.ok && result.status === 'success') {
       // התראה נמחקה בהצלחה
+      
+      // הסרת ההתראה מהנתונים במקום בלי טעינה מחדש
+      if (window.alertsData) {
+        window.alertsData = window.alertsData.filter(alert => alert.id != alertId);
+        updateAlertsTable(window.alertsData);
+      }
+      
       window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
-      loadAlertsData();
     } else {
       // טיפול בשגיאות מהשרת
       if (result.error && result.error.message) {
@@ -1995,8 +2012,8 @@ document.addEventListener('DOMContentLoaded', function () {
     window.initializePageFilters('alerts');
   }
 
-  // טעינת נתונים
-  loadAlertsData();
+  // טעינת נתונים - הסרת הקריאה הכפולה כדי למנוע לולאה אינסופית
+  // loadAlertsData();
 
   // טעינת מצב המיון
   if (typeof window.loadSortState === 'function') {
@@ -2027,8 +2044,11 @@ document.addEventListener('DOMContentLoaded', function () {
     window.restoreAllSectionStates();
   }
 
-  // טעינת נתונים
-  loadAlertsData();
+  // טעינת נתונים - השארת קריאה יחידה לטעינת הנתונים
+  loadAlertsData().then(() => {
+    // עדכון הטבלה לאחר טעינת הנתונים
+    updateAlertsTable(window.alertsData || []);
+  });
 
   // טעינת מצב המיון
   if (typeof window.loadSortState === 'function') {
@@ -2044,12 +2064,12 @@ if (window.location.pathname.includes('/alerts')) {
     // שמירת הפילטרים
 
 
-    // טעינת נתונים מחדש עם הפילטרים החדשים
-    if (typeof window.loadAlertsData === 'function') {
-      window.loadAlertsData();
-    } else {
-      // loadAlertsData function not found
-    }
+    // טעינת נתונים מחדש עם הפילטרים החדשים - הסרת הקריאה הכפולה
+    // if (typeof window.loadAlertsData === 'function') {
+    //   window.loadAlertsData();
+    // } else {
+    //   // loadAlertsData function not found
+    // }
   };
 }
 
@@ -2079,9 +2099,10 @@ window.checkAlertOperator = checkAlertOperator;
 window.buildAlertCondition = buildAlertCondition;
 window.parseAlertCondition = parseAlertCondition;
 
-// פונקציה לטעינת התראות (alias ל-loadAlertsData)
+// פונקציה לטעינת התראות (alias ל-loadAlertsData) - הסרת הקריאה הכפולה
 function loadAlerts() {
-  return loadAlertsData();
+  // return loadAlertsData();
+  return window.alertsData || [];
 }
 
 // חשיפת פונקציית loadAlerts

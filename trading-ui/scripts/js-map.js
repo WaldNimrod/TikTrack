@@ -96,7 +96,7 @@ class JsMapSystem {
             this.renderFunctionsData();
 
         } catch (error) {
-            console.error('❌ Error loading JS map data:', error);
+            // Error loading JS map data
             this.showErrorState('שגיאה בטעינת נתונים');
         }
     }
@@ -518,7 +518,7 @@ class JsMapSystem {
             }
 
         } catch (error) {
-            console.error('❌ Error refreshing JS map data:', error);
+            // Error refreshing JS map data
             this.showErrorState('שגיאה ברענון נתונים');
 
             // Re-enable refresh button

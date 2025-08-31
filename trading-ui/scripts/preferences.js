@@ -204,7 +204,7 @@ function updateUI() {
     const oldValue = typeFilterSelect.value;
     const newValue = currentPreferences.defaultTypeFilter || 'all';
     typeFilterSelect.value = newValue;
-    console.log('🔧 Updated type filter to:', newValue);
+    // Updated type filter to
     } else {
     handleElementNotFound('updateUI', 'פילטר סוג - אלמנט לא נמצא');
   }
@@ -307,7 +307,7 @@ function updateAccountFilter(accounts) {
       option.value = account.id || account.name;
       option.textContent = account.name || account.id;
       accountFilterSelect.appendChild(option);
-      console.log('🔧 Added account option:', account.name || account.id);
+      // Added account option
     });
   } else {
     console.warn('⚠️ אין חשבונות להוספה');
@@ -350,7 +350,7 @@ function showPreferencesSuccess(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'success');
   } else {
-    console.log('✅ הצלחה:', title, '-', message);
+    // הצלחה
     }
 }
 
@@ -376,7 +376,7 @@ function showPreferencesInfo(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'info');
   } else {
-    console.log('ℹ️ מידע:', title, '-', message);
+    // מידע
   }
 }
 

@@ -85,7 +85,7 @@ class JsScanner {
             };
 
         } catch (error) {
-            console.error('❌ Error scanning JS files:', error);
+            // Error scanning JS files
             throw error;
         }
     }
@@ -136,7 +136,7 @@ class JsScanner {
                           this.functionsData[filename] = functions;
 
         } catch (error) {
-            console.error(`❌ Error scanning file ${filename}:`, error);
+            // Error scanning file
             this.functionsData[filename] = [];
         }
     }
@@ -462,7 +462,7 @@ class JsScanner {
             };
 
         } catch (error) {
-            console.error('❌ Error scanning function calls:', error);
+            // Error scanning function calls
             return this.getFallbackFunctionCalls();
         }
     }

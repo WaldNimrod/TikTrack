@@ -41,14 +41,14 @@ document.addEventListener('DOMContentLoaded', function () {
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
   } else {
-    console.error('❌ restoreAllSectionStates function not found');
+    // restoreAllSectionStates function not found
   }
 
   // אתחול דף הבדיקות
   if (typeof window.initializeTestsPage === 'function') {
     window.initializeTestsPage();
   } else {
-    console.error('❌ initializeTestsPage function not found');
+    // initializeTestsPage function not found
   }
 
   console.log('✅ Tests page initialization completed');
@@ -105,7 +105,7 @@ async function loadTestsData() {
         updateTestsTable();
 
     } catch (error) {
-        console.error('❌ Error loading tests data:', error);
+        // Error loading tests data
         showError('שגיאה בטעינת נתוני בדיקות');
     }
 }
@@ -148,7 +148,7 @@ async function loadTestResultsData() {
         updateTestResultsTable();
 
     } catch (error) {
-        console.error('❌ Error loading test results data:', error);
+        // Error loading test results data
         showError('שגיאה בטעינת תוצאות בדיקות');
     }
 }
@@ -658,7 +658,7 @@ async function runAllCRUDTests() {
                     displayCRUDTestResults(results);
                     showNotification('בדיקות CRUD הושלמו בהצלחה!', 'success');
                 } catch (error) {
-                    console.error('❌ Error running CRUD tests:', error);
+                    // Error running CRUD tests
                     showNotification('שגיאה בהרצת בדיקות CRUD', 'error');
                 }
             }
@@ -676,7 +676,7 @@ async function runAllCRUDTests() {
             displayCRUDTestResults(results);
             showNotification('בדיקות CRUD הושלמו בהצלחה!', 'success');
         } catch (error) {
-            console.error('❌ Error running CRUD tests:', error);
+            // Error running CRUD tests
             showNotification('שגיאה בהרצת בדיקות CRUD', 'error');
         }
     }
@@ -704,7 +704,7 @@ function toggleAllSections() {
     if (typeof window.toggleAllSections === 'function') {
         window.toggleAllSections();
     } else {
-        console.error('❌ הפונקציה הגלובלית toggleAllSections לא זמינה');
+        // הפונקציה הגלובלית toggleAllSections לא זמינה
     }
 }
 
@@ -770,7 +770,7 @@ async function runServerTests() {
         displayServerTestResults(results);
         showNotification('בדיקות שרת הושלמו בהצלחה', 'success');
     } catch (error) {
-        console.error('❌ Error running server tests:', error);
+        // Error running server tests
         showNotification('שגיאה בהרצת בדיקות שרת', 'error');
     }
 }
@@ -831,7 +831,7 @@ async function executeServerTests(testList) {
         const result = await response.json();
         return result;
     } catch (error) {
-        console.error('❌ Error executing server tests:', error);
+        // Error executing server tests
         throw error;
     }
 }
@@ -922,7 +922,7 @@ async function runAllAPITests() {
         displayAPITestResults(results);
         showNotification('בדיקות API הושלמו בהצלחה', 'success');
     } catch (error) {
-        console.error('❌ Error running API tests:', error);
+        // Error running API tests
         showNotification('שגיאה בהרצת בדיקות API', 'error');
     }
 }
@@ -938,7 +938,7 @@ async function runAPITest(tableName) {
         displayAPITestResults(results);
         showNotification(`בדיקת API עבור ${tableName} הושלמה בהצלחה`, 'success');
     } catch (error) {
-        console.error(`❌ Error running API test for ${tableName}:`, error);
+        // Error running API test
         showNotification(`שגיאה בהרצת בדיקת API עבור ${tableName}`, 'error');
     }
 }
@@ -977,7 +977,7 @@ async function executeAPITests(tableList) {
         const result = await response.json();
         return result;
     } catch (error) {
-        console.error('❌ Error executing API tests:', error);
+        // Error executing API tests
         throw error;
     }
 }
@@ -1064,7 +1064,7 @@ async function checkServerHealth() {
             throw new Error(`Server health check failed: ${response.status}`);
         }
     } catch (error) {
-        console.error('❌ Server health check failed:', error);
+        // Server health check failed
         return false;
     }
 }
@@ -1118,7 +1118,7 @@ async function executeCRUDTests(activeTests) {
         return result;
 
     } catch (error) {
-        console.error('❌ Error executing CRUD tests:', error);
+        // Error executing CRUD tests
         throw error;
     }
 }
@@ -1181,7 +1181,7 @@ function toggleCRUDResultsSection() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection('crud-results');
     } else {
-        console.error('❌ הפונקציה הגלובלית toggleSection לא זמינה');
+        // הפונקציה הגלובלית toggleSection לא זמינה
     }
 }
 
@@ -1223,7 +1223,7 @@ async function runSelectedCRUDTests() {
         showNotification('בדיקות CRUD נבחרות הושלמו בהצלחה!', 'success');
 
     } catch (error) {
-        console.error('❌ Error running selected CRUD tests:', error);
+        // Error running selected CRUD tests
         showNotification('שגיאה בהרצת בדיקות CRUD נבחרות', 'error');
     }
 }
@@ -1297,7 +1297,7 @@ async function runAllTests() {
 
         showNotification('כל הבדיקות הושלמו בהצלחה!', 'success');
     } catch (error) {
-        console.error('❌ Error running all tests:', error);
+        // Error running all tests
         showNotification('שגיאה בהרצת כל הבדיקות', 'error');
     }
 }

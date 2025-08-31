@@ -616,7 +616,6 @@ async function updateTicker() {
     const name = document.getElementById('editTickerName').value.trim();
     const type = document.getElementById('editTickerType').value;
     const currency_id = parseInt(document.getElementById('editTickerCurrency').value);
-    const status = document.getElementById('editTickerStatus').value;
     const remarks = document.getElementById('editTickerRemarks').value.trim();
 
     // ולידציה גלובלית
@@ -641,88 +640,7 @@ async function updateTicker() {
         return;
     }
 
-    // טיפול בסטטוס "לא מבוטל" - צריך לקבוע אם זה "open" או "closed"
-    let finalStatus = status;
-    if (status === 'not_canceled') {
-        // בדיקה אם יש טריידים או תכנונים פתוחים לטיקר זה
-        const ticker = tickersData.find(t => t.id == id);
-        if (ticker) {
-            // אם יש טריידים או תכנונים פתוחים - סטטוס "open", אחרת "closed"
-            finalStatus = ticker.active_trades ? 'open' : 'closed';
-        } else {
-            finalStatus = 'closed'; // ברירת מחדל
-        }
-    }
-
-    // בדיקה אם הסטטוס השתנה ל"מבוטל" - אם כן, בדוק פריטים מקושרים
-    const originalTicker = tickersData.find(t => t.id == id);
-    if (originalTicker && status === 'canceled' && originalTicker.status !== 'canceled') {
-        console.log('🔄 הסטטוס השתנה ל"מבוטל" - בודק פריטים מקושרים');
-        
-        // בדיקת פריטים מקושרים באמצעות המערכת הכללית
-        try {
-            console.log('🔧 בדיקת פריטים מקושרים בעדכון באמצעות המערכת הכללית');
-            
-            // שימוש ב-API הכללי לקבלת פריטים מקושרים
-            const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const linkedItemsData = await response.json();
-            console.log('🔍 נתוני פריטים מקושרים לעדכון:', linkedItemsData);
-            
-            // בדיקה אם יש פריטים פתוחים שמונעים ביטול
-            const openTrades = linkedItemsData.child_entities ? linkedItemsData.child_entities.filter(entity => 
-                entity.type === 'trade' && entity.status === 'open'
-            ) : [];
-            const openPlans = linkedItemsData.child_entities ? linkedItemsData.child_entities.filter(entity => 
-                entity.type === 'trade_plan' && entity.status === 'open'
-            ) : [];
-            
-            const hasOpenTrades = openTrades.length > 0;
-            const hasOpenPlans = openPlans.length > 0;
-            
-            console.log('🔍 hasOpenTrades:', hasOpenTrades, 'hasOpenPlans:', hasOpenPlans);
-            console.log('🔍 openTrades:', openTrades);
-            console.log('🔍 openPlans:', openPlans);
-            
-            if (hasOpenTrades || hasOpenPlans) {
-                console.log('❌ נמצאו פריטים פתוחים - מונע עדכון');
-                
-                // שימוש במערכת הכללית להצגת פריטים מקושרים
-                if (window.showLinkedItemsWarning) {
-                    console.log('🔧 קריאה ל-showLinkedItemsWarning (מערכת כללית)');
-                    window.showLinkedItemsWarning('ticker', id);
-                } else {
-                    handleFunctionNotFound('showLinkedItemsWarning', 'פונקציית בדיקת פריטים מקושרים לא זמינה');
-                    // Fallback - הצגת הודעת אזהרה
-                    if (window.showWarningNotification) {
-                        window.showWarningNotification(
-                            'לא ניתן לבטל טיקר',
-                            `לא ניתן לבטל את הטיקר ${originalTicker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`
-                        );
-                    }
-                }
-                return; // לא ממשיכים עם העדכון
-            }
-            
-            console.log('✅ אין פריטים פתוחים - ממשיך עם העדכון');
-            
-        } catch (error) {
-            handleSystemError(error, 'בדיקת פריטים מקושרים בעדכון');
-            if (window.showErrorNotification) {
-                window.showErrorNotification(
-                    'שגיאה בבדיקה',
-                    'שגיאה בבדיקת פריטים מקושרים. לא ניתן לבטל את הטיקר.'
-                );
-            }
-            return; // לא ממשיכים עם העדכון
-        }
-        
-        console.log('✅ אין פריטים פתוחים - ממשיך עם העדכון');
-    }
+    // העדכון לא כולל שינוי סטטוס - ביטול יתבצע רק דרך כפתור הביטול
 
     try {
         const tickerData = {
@@ -730,7 +648,6 @@ async function updateTicker() {
             name: name,
             type: type,
             currency_id: currency_id,
-            status: finalStatus,
             remarks: remarks || null
         };
 

@@ -1638,7 +1638,7 @@ function updateStatusAndTriggered() {
 async function updateAlert() {
   const form = document.getElementById('editAlertForm');
   if (!form) {
-    console.error('Form element not found');
+    console.warn('⚠️ Form element not found - skipping update operation');
     return;
   }
 

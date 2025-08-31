@@ -1577,6 +1577,44 @@ function clearDateValidationMessages() {
 }
 
 /**
+ * ביצוע ביטול טרייד
+ */
+function performTradeCancellation(tradeId) {
+  fetch(`/api/v1/trades/${tradeId}/cancel`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      cancel_reason: 'בוטל על ידי המשתמש'
+    })
+  })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('שגיאה בביטול הטרייד');
+    })
+    .then(data => {
+      // טרייד בוטל בהצלחה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה');
+      } else {
+        alert('טרייד בוטל בהצלחה');
+      }
+      loadTradesData(); // Reload the table
+    })
+    .catch(error => {
+      console.error('שגיאה בביטול טרייד:', error);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'שגיאה בביטול הטרייד');
+      } else {
+        alert('שגיאה בביטול הטרייד');
+      }
+    });
+}
+
+/**
  * ביצוע מחיקת טרייד
  */
 function performTradeDeletion(tradeId) {
@@ -1665,6 +1703,17 @@ function toggleMainSection() {
     window.toggleMainSection();
   } else {
     console.error('toggleMainSection function not found');
+  }
+}
+
+// פונקציה לפילטור נתונים - משתמשת בפונקציה הגלובלית
+function filterDataByFilters(data, pageName) {
+  console.log('🔄 filterDataByFilters called for page:', pageName);
+  if (typeof window.filterDataByFilters === 'function') {
+    return window.filterDataByFilters(data, pageName);
+  } else {
+    console.warn('⚠️ Global filterDataByFilters function not found, returning original data');
+    return data || [];
   }
 }
 

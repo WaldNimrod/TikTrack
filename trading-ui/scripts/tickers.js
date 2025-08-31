@@ -1205,11 +1205,16 @@ function updateTickersSummaryStats(tickers) {
             oldestUpdate = oldest.toLocaleDateString('he-IL');
         }
 
-        // עדכון השדות ב-HTML
-        document.getElementById('totalTickers').textContent = totalTickers;
-        document.getElementById('activeTickers').textContent = activeTickers;
-        document.getElementById('latestUpdate').textContent = latestUpdate;
-        document.getElementById('oldestUpdate').textContent = oldestUpdate;
+        // עדכון השדות ב-HTML - בדיקה אם האלמנטים קיימים
+        const totalTickersElement = document.getElementById('totalTickers');
+        const activeTickersElement = document.getElementById('activeTickers');
+        const latestUpdateElement = document.getElementById('latestUpdate');
+        const oldestUpdateElement = document.getElementById('oldestUpdate');
+        
+        if (totalTickersElement) totalTickersElement.textContent = totalTickers;
+        if (activeTickersElement) activeTickersElement.textContent = activeTickers;
+        if (latestUpdateElement) latestUpdateElement.textContent = latestUpdate;
+        if (oldestUpdateElement) oldestUpdateElement.textContent = oldestUpdate;
 
         console.log('✅ סטטיסטיקות סיכום עודכנו:', {
             totalTickers,
@@ -1233,28 +1238,29 @@ function updateTickersTable(tickers) {
     console.log('🔄 tickers.length:', tickers ? tickers.length : 'undefined');
 
     try {
+        // בדיקה אם אנחנו בדף הטיקרים
+        const tickersTable = document.querySelector('table[data-table-type="tickers"]');
+        const tickersContainer = document.getElementById('tickersContainer');
+        
+        if (!tickersTable && !tickersContainer) {
+            console.log('🔄 לא נמצאה טבלת טיקרים - כנראה לא בדף הטיקרים');
+            return;
+        }
+
         // מציאת ה-tbody
         let tbody = document.querySelector('table[data-table-type="tickers"] tbody');
         console.log('🔄 tbody element:', tbody);
 
         if (!tbody) {
             console.log('🔄 מנסה דרך הקונטיינר...');
-            const container = document.getElementById('tickersContainer');
-            if (container) {
-                tbody = container.querySelector('tbody');
+            if (tickersContainer) {
+                tbody = tickersContainer.querySelector('tbody');
                 console.log('🔄 tbody דרך קונטיינר:', tbody);
             }
         }
 
         if (!tbody) {
-            console.error('❌ לא נמצא tbody element!');
-            console.log('🔄 מנסה למצוא את הטבלה...');
-            const table = document.querySelector('table[data-table-type="tickers"]');
-            console.log('🔄 table element:', table);
-            if (table) {
-                console.log('🔄 table.innerHTML:', table.innerHTML);
-            }
-            console.log('🔄 updateTickersTable מסתיים ללא tbody');
+            console.warn('⚠️ לא נמצא tbody element - כנראה לא בדף הטיקרים');
             return;
         }
 
@@ -1464,12 +1470,18 @@ window.addEventListener('load', function () {
         console.log('🔄 tryLoadData נקראה');
         console.log(`🔄 ניסיון ${attempts + 1} לטעינת נתונים...`);
         
-        // בדיקה מפורטת יותר
+        // בדיקה אם אנחנו בדף הטיקרים
         const table = document.querySelector('table[data-table-type="tickers"]');
-        console.log('🔄 table element:', table);
-        
         const container = document.getElementById('tickersContainer');
+        
+        console.log('🔄 table element:', table);
         console.log('🔄 container element:', container);
+        
+        // אם אין טבלת טיקרים, כנראה לא בדף הטיקרים
+        if (!table && !container) {
+            console.log('🔄 לא נמצאה טבלת טיקרים - כנראה לא בדף הטיקרים, דילוג על טעינת נתונים');
+            return;
+        }
         
         const tbody = document.querySelector('table[data-table-type="tickers"] tbody') || 
                      document.getElementById('tickersContainer')?.querySelector('tbody');
@@ -1484,9 +1496,7 @@ window.addEventListener('load', function () {
             attempts++;
             setTimeout(tryLoadData, 500);
         } else {
-            console.error('❌ לא הצלחתי למצוא את הטבלה אחרי 10 ניסיונות');
-            console.log('🔄 מנסה לטעון נתונים בכל מקרה...');
-            loadTickersData();
+            console.warn('⚠️ לא הצלחתי למצוא את הטבלה אחרי 10 ניסיונות - כנראה לא בדף הטיקרים');
         }
     }
     

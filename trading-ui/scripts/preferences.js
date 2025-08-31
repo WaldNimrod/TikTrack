@@ -149,6 +149,14 @@ async function resetToDefaults() {
  * מעדכן את הממשק עם העדפות נוכחיות
  */
 function updateUI() {
+  // בדוק אם אנחנו בעמוד העדפות
+  const isPreferencesPage = document.getElementById('primaryCurrency') !== null;
+  
+  if (!isPreferencesPage) {
+    // לא אנחנו בעמוד העדפות, לא ננסה לטעון אלמנטים
+    return;
+  }
+  
   // מטבע ראשי
   const primaryCurrencySelect = document.getElementById('primaryCurrency');
   if (primaryCurrencySelect) {
@@ -268,6 +276,14 @@ function loadLocalAccounts() {
  * מעדכן את פילטר החשבונות
  */
 function updateAccountFilter(accounts) {
+  // בדוק אם אנחנו בעמוד העדפות
+  const isPreferencesPage = document.getElementById('primaryCurrency') !== null;
+  
+  if (!isPreferencesPage) {
+    // לא אנחנו בעמוד העדפות, לא ננסה לטעון אלמנטים
+    return;
+  }
+  
   const accountFilterSelect = document.getElementById('defaultAccountFilter');
   if (!accountFilterSelect) {
     console.error('❌ לא נמצא אלמנט פילטר חשבונות');

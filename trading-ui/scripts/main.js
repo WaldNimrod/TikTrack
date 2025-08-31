@@ -867,6 +867,236 @@ function closeModalGlobal(modalId) {
     }
 }
 
+// ===== FILTER FUNCTIONS =====
+
+/**
+ * פונקציה לקבלת סוג הטבלה לפי מזהה הדף
+ * @param {string} pageName - שם הדף
+ * @returns {string} - סוג הטבלה
+ */
+function getTableType(pageName) {
+  // מיפוי דפים לסוגי טבלאות
+  const tableTypeMap = {
+    'designs': 'designs',
+    'planning': 'designs',
+    'tracking': 'trades',
+    'trades': 'trades',
+    'accounts': 'accounts',
+    'notes': 'notes',
+    'alerts': 'alerts'
+  };
+
+  return tableTypeMap[pageName] || pageName;
+}
+
+/**
+ * פונקציה לפילטור נתונים לפי כל הפילטרים
+ * פונקציה גלובלית שמשותפת לכל הדפים
+ */
+function filterDataByFilters(data, pageName) {
+  console.log(`🔄 === FILTER DATA BY FILTERS (${pageName}) ===`);
+  console.log('🔄 Original data length:', data.length);
+
+  if (!data || data.length === 0) {
+    console.log('🔄 No data to filter');
+    return [];
+  }
+
+  let filteredData = [...data];
+
+  // קבלת סוג הטבלה
+  const tableType = getTableType(pageName);
+
+  // קבלת פילטרים שמורים
+  const selectedStatuses = window.selectedStatusesForFilter || [];
+  const selectedTypes = window.selectedTypesForFilter || [];
+  const selectedAccounts = window.selectedAccountsForFilter || [];
+  const selectedDateRange = window.selectedDateRangeForFilter || null;
+  const searchTerm = window.searchTermForFilter || '';
+
+  console.log('🔄 Filters to apply:', {
+    selectedStatuses,
+    selectedTypes,
+    selectedAccounts,
+    selectedDateRange,
+    searchTerm
+  });
+
+  // פילטר לפי סטטוס (לא חל על הערות)
+  if (tableType !== 'notes' && selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
+    console.log('🔄 Filtering by status:', selectedStatuses);
+    filteredData = filteredData.filter(item => {
+      let itemStatus;
+
+      if (pageName === 'planning') {
+        // מיפוי סטטוסים לדף התכנון
+        if (item.status === 'cancelled') {
+          itemStatus = 'מבוטל';
+        } else if (item.status === 'closed') {
+          itemStatus = 'סגור';
+        } else {
+          itemStatus = 'פתוח';
+        }
+      } else if (pageName === 'tracking' || pageName === 'trades') {
+        // מיפוי סטטוסים לדף המעקב
+        if (item.status === 'closed') {
+          itemStatus = 'סגור';
+        } else if (item.status === 'cancelled') {
+          itemStatus = 'מבוטל';
+        } else {
+          itemStatus = 'פתוח';
+        }
+      } else if (pageName === 'accounts') {
+        // מיפוי סטטוסים לדף החשבונות
+        if (item.status === 'closed') {
+          itemStatus = 'סגור';
+        } else if (item.status === 'cancelled') {
+          itemStatus = 'מבוטל';
+        } else {
+          itemStatus = 'פתוח';
+        }
+      } else {
+        itemStatus = item.status;
+      }
+
+      const isMatch = selectedStatuses.includes(itemStatus);
+      return isMatch;
+    });
+    console.log('🔄 After status filter:', filteredData.length, 'items');
+  }
+
+  // פילטר לפי סוג
+  if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
+    console.log('🔄 Filtering by type:', selectedTypes);
+    filteredData = filteredData.filter(item => {
+      let typeMatch = false;
+
+      if (pageName === 'notes') {
+        // בדף הערות - פילטר לפי סוג האובייקט המקושר
+        if (item.related_type === 'account' && selectedTypes.includes('חשבון')) {
+          typeMatch = true;
+        } else if (item.related_type === 'trade' && selectedTypes.includes('טרייד')) {
+          typeMatch = true;
+        } else if (item.related_type === 'trade_plan' && selectedTypes.includes('תכנון')) {
+          typeMatch = true;
+        } else if (item.related_type === 'ticker' && selectedTypes.includes('טיקר')) {
+          typeMatch = true;
+        }
+      } else if (pageName === 'planning') {
+        // מיפוי סוגים לדף התכנון
+        let typeDisplay;
+        switch (item.type || item.investment_type) {
+          case 'swing':
+            typeDisplay = 'סווינג';
+            break;
+          case 'investment':
+            typeDisplay = 'השקעה';
+            break;
+          case 'passive':
+            typeDisplay = 'פאסיבי';
+            break;
+          default:
+            typeDisplay = item.type || item.investment_type;
+        }
+        typeMatch = selectedTypes.includes(typeDisplay);
+      } else if (pageName === 'tracking' || pageName === 'trades') {
+        // מיפוי סוגים לדף המעקב
+        let typeDisplay;
+        switch (item.type) {
+          case 'swing':
+            typeDisplay = 'סווינג';
+            break;
+          case 'investment':
+            typeDisplay = 'השקעה';
+            break;
+          case 'passive':
+            typeDisplay = 'פאסיבי';
+            break;
+          case 'buy':
+            typeDisplay = 'קנייה';
+            break;
+          case 'sell':
+            typeDisplay = 'מכירה';
+            break;
+          default:
+            typeDisplay = item.type;
+        }
+        typeMatch = selectedTypes.includes(typeDisplay);
+      } else {
+        typeMatch = selectedTypes.includes(item.type);
+      }
+
+      return typeMatch;
+    });
+    console.log('🔄 After type filter:', filteredData.length, 'items');
+  }
+
+  // פילטר לפי חשבון
+  if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('all')) {
+    console.log('🔄 Filtering by account:', selectedAccounts);
+    filteredData = filteredData.filter(item => {
+      const accountName = item.account?.name || item.account_name || '';
+      return selectedAccounts.includes(accountName);
+    });
+    console.log('🔄 After account filter:', filteredData.length, 'items');
+  }
+
+  // פילטר לפי טווח תאריכים
+  if (selectedDateRange && selectedDateRange !== 'כל זמן') {
+    console.log('🔄 Filtering by date range:', selectedDateRange);
+    filteredData = filteredData.filter(item => {
+      const itemDate = new Date(item.created_at);
+      const now = new Date();
+      
+      switch (selectedDateRange) {
+        case 'היום':
+          return itemDate.toDateString() === now.toDateString();
+        case 'אתמול':
+          const yesterday = new Date(now);
+          yesterday.setDate(yesterday.getDate() - 1);
+          return itemDate.toDateString() === yesterday.toDateString();
+        case 'השבוע':
+          const weekAgo = new Date(now);
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return itemDate >= weekAgo;
+        case 'החודש':
+          return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+        case 'השנה':
+          return itemDate.getFullYear() === now.getFullYear();
+        default:
+          return true;
+      }
+    });
+    console.log('🔄 After date range filter:', filteredData.length, 'items');
+  }
+
+  // פילטר לפי חיפוש
+  if (searchTerm && searchTerm.trim() !== '') {
+    console.log('🔄 Filtering by search term:', searchTerm);
+    const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => term.length > 0);
+    
+    filteredData = filteredData.filter(item => {
+      const searchableText = [
+        item.name || '',
+        item.title || '',
+        item.content || '',
+        item.notes || '',
+        item.ticker?.symbol || '',
+        item.ticker?.name || '',
+        item.account?.name || '',
+        item.status || '',
+        item.type || ''
+      ].join(' ').toLowerCase();
+      
+      return searchTerms.every(term => searchableText.includes(term));
+    });
+    console.log('🔄 After search filter:', filteredData.length, 'items');
+  }
+
+  console.log('🔄 Final filtered data length:', filteredData.length);
+  return filteredData;
+}
+
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
 window.initializeApplication = initializeApplication;
 window.checkDependencies = checkDependencies;
@@ -875,6 +1105,7 @@ window.initializeCurrentPage = initializeCurrentPage;
 window.isModuleAvailable = isModuleAvailable;
 window.getSystemInfo = getSystemInfo;
 window.closeModalGlobal = closeModalGlobal;
+window.filterDataByFilters = filterDataByFilters;
 
 // Export toggle functions (already defined as window properties above)
 // window.toggleTopSection = toggleTopSection;

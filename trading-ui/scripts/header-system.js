@@ -3232,6 +3232,13 @@ function getFilterConfig(filterType) {
       cellValues: ['פתוח', 'סגור', 'מבוטל', 'פעיל', 'לא פעיל', 'ממתין'],
       dataField: 'status'
     },
+    'executions': {
+      columnName: 'עסקעות',
+      containerIdKeywords: ['executions', 'עסקעות'],
+      knownContainers: ['executionsContainer', 'testContainer'],
+      cellValues: ['קנייה', 'מכירה', 'buy', 'sell'],
+      dataField: 'execution-type'
+    },
          'type': {
        columnName: 'טיפוס',
        containerIdKeywords: ['type', 'סוג', 'טיפוס'],

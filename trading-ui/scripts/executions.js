@@ -3019,6 +3019,73 @@ function setupExecutionsFilterFunctions() {
     console.log('✅ Search results:', filteredExecutions.length, 'executions');
   };
   
+  // פונקציה לפילטר לפי סוג עסקה
+  window.filterExecutionsByType = function(types) {
+    console.log('🔄 Filtering executions by type:', types);
+    
+    const typesArray = Array.isArray(types) ? types : [types];
+    
+    if (typesArray.length === 0 || typesArray.includes('all') || typesArray.includes('הכול')) {
+      filteredExecutions = [...originalExecutions];
+    } else {
+      filteredExecutions = originalExecutions.filter(execution => {
+        const executionType = execution.action || execution.type || '';
+        return typesArray.some(type => 
+          executionType.toLowerCase().includes(type.toLowerCase()) ||
+          (type === 'קנייה' && executionType.toLowerCase().includes('buy')) ||
+          (type === 'מכירה' && executionType.toLowerCase().includes('sell'))
+        );
+      });
+    }
+    
+    updateExecutionsTableMain(filteredExecutions);
+    updateExecutionsSummary(filteredExecutions);
+    console.log('✅ Filtered by type:', filteredExecutions.length, 'executions');
+  };
+  
+  // פונקציה לפילטר לפי תאריך
+  window.filterExecutionsByDate = function(dateRange) {
+    console.log('🔄 Filtering executions by date range:', dateRange);
+    
+    if (!dateRange || dateRange === 'all' || dateRange === 'הכול') {
+      filteredExecutions = [...originalExecutions];
+    } else {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      filteredExecutions = originalExecutions.filter(execution => {
+        const executionDate = new Date(execution.execution_date || execution.created_at);
+        
+        switch (dateRange) {
+          case 'today':
+          case 'היום':
+            return executionDate.toDateString() === today.toDateString();
+          case 'yesterday':
+          case 'אתמול':
+            return executionDate.toDateString() === yesterday.toDateString();
+          case 'week':
+          case 'שבוע':
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return executionDate >= weekAgo;
+          case 'month':
+          case 'חודש':
+            const monthAgo = new Date(today);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            return executionDate >= monthAgo;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    updateExecutionsTableMain(filteredExecutions);
+    updateExecutionsSummary(filteredExecutions);
+    console.log('✅ Filtered by date:', filteredExecutions.length, 'executions');
+  };
+  };
+  
   // פונקציה לאיפוס פילטרים
   window.resetExecutionsFilters = function() {
     console.log('🔄 Resetting executions filters');

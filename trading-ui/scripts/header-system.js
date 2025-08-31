@@ -699,11 +699,11 @@ class HeaderSystem {
               </div>
             </div>
 
-            <!-- פילטר טיפוס -->
+            <!-- פילטר סוג השקעה -->
             <div class="filter-group type-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle type-filter-toggle" id="typeFilterToggle" onclick="toggleTypeFilter()">
-                                          <span class="selected-value selected-type-text" id="selectedType">כל טיפוס</span>
+                                          <span class="selected-value selected-type-text" id="selectedType">כל סוג השקעה</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="filter-menu" id="typeFilterMenu">
@@ -2211,7 +2211,7 @@ class HeaderSystem {
     const selectedTypes = window.selectedTypesForFilter || [];
 
     if (selectedTypes.length === 0) {
-      selectedText.textContent = 'כל הטיפוסים';
+      selectedText.textContent = 'כל סוגי ההשקעה';
     } else if (selectedTypes.length === 1) {
       selectedText.textContent = selectedTypes[0];
     } else {
@@ -3208,7 +3208,7 @@ const TYPE_FILTER_TABLES = ['tradesContainer', 'tradePlansContainer', 'trade_pla
  * Simple filter application function
  */
 function applyFilter(filterType, selectedValue) {
-  console.log(`🔄 Applying ${filterType} filter with value:`, selectedValue);
+      // Applying filter with value
   
   // Get visible containers
   const visibleContainers = getVisibleContainers();
@@ -3263,7 +3263,7 @@ function shouldApplyFilterToContainer(containerId, filterType) {
  * Apply filter to a specific container
  */
 function applyFilterToContainer(containerId, filterType, selectedValue) {
-  console.log(`🔄 Applying ${filterType} filter to ${containerId}`);
+      // Applying filter to container
   
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -3287,8 +3287,11 @@ function applyFilterToContainer(containerId, filterType, selectedValue) {
  * Check if a row should be shown based on filter
  */
 function checkRowFilter(row, filterType, selectedValue) {
-  // Show all if no filter value
-  if (!selectedValue || selectedValue === 'הכול' || selectedValue === 'כל זמן') {
+  // Convert selectedValue to array if it's not already
+  const selectedValues = Array.isArray(selectedValue) ? selectedValue : [selectedValue];
+  
+  // Show all if no filter value or if "הכול" is selected
+  if (!selectedValue || selectedValues.length === 0 || selectedValues.includes('הכול') || selectedValue === 'כל זמן') {
     return true;
   }
   
@@ -3316,19 +3319,23 @@ function checkRowFilter(row, filterType, selectedValue) {
     case 'status':
       // Check both original value and displayed value
       if (originalValue) {
-        return originalValue.toLowerCase() === selectedValue.toLowerCase() || 
-               cellValue === selectedValue;
+        return selectedValues.some(value => 
+          originalValue.toLowerCase() === value.toLowerCase() || 
+          cellValue === value
+        );
       }
-      return cellValue === selectedValue;
+      return selectedValues.includes(cellValue);
     case 'type':
       // Check both original value and displayed value
       if (originalValue) {
-        return originalValue.toLowerCase() === selectedValue.toLowerCase() || 
-               cellValue === selectedValue;
+        return selectedValues.some(value => 
+          originalValue.toLowerCase() === value.toLowerCase() || 
+          cellValue === value
+        );
       }
-      return cellValue === selectedValue;
+      return selectedValues.includes(cellValue);
     case 'account':
-      return cellValue === selectedValue;
+      return selectedValues.includes(cellValue);
     case 'date':
       return checkDateFilter(cellValue, selectedValue);
     default:
@@ -3611,7 +3618,7 @@ function findFilterCell(row, filterConfig) {
  * הצגת כל הרשומות בטבלה (כאשר אין עמודה מתאימה)
  */
 function showAllRecordsInTable(containerId) {
-  console.log(`🔄 Showing all records in ${containerId}`);
+      // Showing all records in container
   
   const container = document.getElementById(containerId);
   if (!container) {
@@ -3642,7 +3649,7 @@ function showAllRecordsInTable(containerId) {
 function applyStatusFilter() {
   const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
   const selectedStatuses = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-  applyFilter('status', selectedStatuses[0]);
+  applyFilter('status', selectedStatuses);
 }
 
 /**
@@ -3651,7 +3658,7 @@ function applyStatusFilter() {
 function applyTypeFilter() {
   const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
   const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-  applyFilter('type', selectedTypes[0]);
+  applyFilter('type', selectedTypes);
 }
 
 /**
@@ -3660,16 +3667,16 @@ function applyTypeFilter() {
 function applyAccountFilter() {
   const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
   const selectedAccounts = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-  applyFilter('account', selectedAccounts[0]);
+  applyFilter('account', selectedAccounts);
 }
 
 /**
  * הפעלת פילטר תאריכים (לשמירה על תאימות לאחור)
  */
 function applyDateRangeFilter(dateRange) {
-  console.log('🔄 applyDateRangeFilter called with:', dateRange);
-  console.log('🔍 Date range type:', typeof dateRange);
-  console.log('🔍 Date range length:', dateRange ? dateRange.length : 0);
+  // applyDateRangeFilter called
+  // Date range type check
+  // Date range length check
   applyFilter('date', dateRange);
 }
 
@@ -3677,15 +3684,15 @@ function applyDateRangeFilter(dateRange) {
  * הפעלת פילטר חיפוש חופשי
  */
 function applySearchFilter(searchTerm) {
-  console.log('🔄 applySearchFilter called with:', searchTerm);
-  console.log('🔍 Search term type:', typeof searchTerm);
-  console.log('🔍 Search term length:', searchTerm ? searchTerm.length : 0);
+  // applySearchFilter called
+  // Search term type check
+  // Search term length check
   
   if (searchTerm && searchTerm.trim()) {
-    console.log('🔍 Applying search filter with term:', searchTerm.trim());
+    // Applying search filter with term
     applyFilter('search', searchTerm.trim());
   } else {
-    console.log('🔍 Search term is empty, showing all records');
+    // Search term is empty, showing all records
     // אם החיפוש ריק, הצג את כל הרשומות בכל הקונטיינרים הנראים
     const visibleContainers = getVisibleContainers();
     for (const containerId of visibleContainers) {
@@ -3695,13 +3702,13 @@ function applySearchFilter(searchTerm) {
   
   // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף חשבונות
   if (window.searchAccounts) {
-    console.log('🔄 Calling searchAccounts for accounts page');
+    // Calling searchAccounts for accounts page
     window.searchAccounts(searchTerm);
   }
   
   // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף ביצועים
   if (window.searchExecutions) {
-    console.log('🔄 Calling searchExecutions for executions page');
+    // Calling searchExecutions for executions page
     window.searchExecutions(searchTerm);
   }
 }
@@ -3710,16 +3717,16 @@ function applySearchFilter(searchTerm) {
  * הפעלת פילטר טיפוס
  */
 function applyTypeFilter() {
-  console.log('🔄 applyTypeFilter called');
+  // applyTypeFilter called
 
   // איסוף כל הטיפוסים הנבחרים
   const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
   const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
 
-  console.log('🔍 Selected types:', selectedTypes);
+  // Selected types check
 
   // הפעלת הפילטר הכללי
-  applyFilter('type', selectedTypes[0]);
+  applyFilter('type', selectedTypes);
 
   if (window.simpleFilter) {
     window.simpleFilter.applyTypeFilter(selectedTypes);
@@ -3730,16 +3737,16 @@ function applyTypeFilter() {
  * הפעלת פילטר חשבון
  */
 function applyAccountFilter() {
-  console.log('🔄 applyAccountFilter called');
+  // applyAccountFilter called
 
   // איסוף כל החשבונות הנבחרים
   const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
   const selectedAccounts = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
 
-  console.log('🔍 Selected accounts:', selectedAccounts);
+  // Selected accounts check
 
   // הפעלת הפילטר הכללי
-  applyFilter('account', selectedAccounts[0]);
+  applyFilter('account', selectedAccounts);
 
   if (window.simpleFilter) {
     window.simpleFilter.applyAccountFilter(selectedAccounts);
@@ -3747,13 +3754,13 @@ function applyAccountFilter() {
   
   // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף חשבונות
   if (window.filterAccountsByAccount) {
-    console.log('🔄 Calling filterAccountsByAccount for accounts page');
+    // Calling filterAccountsByAccount for accounts page
     window.filterAccountsByAccount(selectedAccounts);
   }
   
   // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף ביצועים
   if (window.filterExecutionsByAccount) {
-    console.log('🔄 Calling filterExecutionsByAccount for executions page');
+    // Calling filterExecutionsByAccount for executions page
     window.filterExecutionsByAccount(selectedAccounts);
   }
 }
@@ -4101,13 +4108,13 @@ function updateTypeFilterText() {
   const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
 
   if (selectedItems.length === 0) {
-    selectedTypeElement.textContent = 'כל טיפוס';
+    selectedTypeElement.textContent = 'כל סוג השקעה';
   } else if (selectedItems.length === 1) {
     const item = selectedItems[0];
     const value = item.getAttribute('data-value');
-    selectedTypeElement.textContent = value === 'הכול' ? 'כל טיפוס' : value;
+    selectedTypeElement.textContent = value === 'הכול' ? 'כל סוג השקעה' : value;
   } else {
-    selectedTypeElement.textContent = `${selectedItems.length} טיפוסים`;
+    selectedTypeElement.textContent = `${selectedItems.length} סוגי השקעה`;
   }
 }
 

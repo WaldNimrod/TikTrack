@@ -257,13 +257,13 @@ async function showEditExecutionModal(id) {
                 // האפשרויות מכילות מספרים ישירים, לא trade_X או plan_X
                 const value = linkedObject.data.id.toString();
                 
-                console.log('🔍 מחפש ערך:', value, 'באפשרויות:', Array.from(tradeSelect.options).map(opt => opt.value));
+                // מחפש ערך באפשרויות
                 
                 // בדיקה אם הערך קיים באפשרויות
                 const optionExists = Array.from(tradeSelect.options).some(option => option.value === value);
                 if (optionExists) {
                     tradeSelect.value = value;
-                    console.log('✅ שדה טרייד/תכנון מולא:', value);
+                    // שדה טרייד/תכנון מולא
                 } else {
                     console.warn('⚠️ הערך לא נמצא באפשרויות:', value);
                     console.warn('⚠️ האפשרויות הזמינות:', Array.from(tradeSelect.options).map(opt => ({value: opt.value, text: opt.textContent})));
@@ -277,7 +277,7 @@ async function showEditExecutionModal(id) {
             const actionSelect = document.getElementById('editExecutionType');
             if (actionSelect) {
                 actionSelect.value = actionValue;
-                console.log('✅ שדה פעולה מולא:', actionValue);
+                // שדה פעולה מולא
             }
         }
 

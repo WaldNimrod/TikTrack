@@ -1867,11 +1867,11 @@ async function saveNewTradePlan() {
 
     // Use global validation system
     console.log('🔍 === VALIDATION CHECK ===');
-    console.log('🔍 window.validateForm available:', typeof window.validateForm);
+    // window.validateForm available check
     console.log('🔍 validationRules:', validationRules);
     
     if (typeof window.validateForm === 'function') {
-        console.log('🔍 Calling window.validateForm...');
+        // Calling window.validateForm
         const validationResult = window.validateForm('addTradePlanForm', validationRules);
         console.log('🔍 Validation result:', validationResult);
         

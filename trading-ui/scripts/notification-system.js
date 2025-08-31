@@ -145,13 +145,8 @@ function createNotificationContainer() {
 function showNotification(message, type = 'info', title = 'התראה', duration = 4000) {
       // showNotification called
     // Parameter types: 
-    console.log('🔧 Parameter types:', {
-        messageType: typeof message, 
-        typeType: typeof type, 
-        titleType: typeof title, 
-        durationType: typeof duration 
-    });
-    console.log('🔧 Raw parameters:', [message, type, title, duration]);
+        // Parameter types check
+    // Raw parameters check
     
     // Validate and sanitize parameters
     const validTypes = ['success', 'error', 'warning', 'info'];
@@ -159,7 +154,7 @@ function showNotification(message, type = 'info', title = 'התראה', duration
     const sanitizedTitle = title || 'הודעה';
     const sanitizedMessage = message || '';
 
-    console.log('🔧 Sanitized parameters:', { sanitizedType, sanitizedTitle, sanitizedMessage });
+    // Sanitized parameters check
 
     // Create notification container
     const container = createNotificationContainer();
@@ -181,7 +176,7 @@ function showNotification(message, type = 'info', title = 'התראה', duration
         <button class="notification-close" onclick="this.parentElement.remove()">×</button>
     `;
 
-    console.log('🔧 Created notification element:', notification);
+    // Created notification element
 
     // Add to container
     container.appendChild(notification);
@@ -189,7 +184,7 @@ function showNotification(message, type = 'info', title = 'התראה', duration
     // Show notification with animation
     setTimeout(() => {
         notification.classList.add('show');
-        console.log('🔧 Notification shown with class:', notification.className);
+        // Notification shown
     }, 100);
 
     // Auto-remove after duration
@@ -357,8 +352,8 @@ function showValidationWarning(fieldId, message, duration = 6000) {
  * @param {Function} onCancel - Callback for cancel action
  */
 function showConfirmationDialog(title, message, onConfirm = null, onCancel = null) {
-    console.log('🔧 showConfirmationDialog נקראה עם:', { title, message });
-    console.log('🔧 bootstrap קיים:', typeof bootstrap !== 'undefined');
+    // showConfirmationDialog נקראה
+    // bootstrap קיים
     
     // יצירת מודל אישור דינמי
     const modalId = 'confirmationModal';
@@ -448,11 +443,11 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
     });
     
     // הצגת המודל
-    console.log('🔧 מציג את המודל עם bootstrap');
+    // מציג את המודל עם bootstrap
     try {
         const bootstrapModal = new bootstrap.Modal(modal);
         bootstrapModal.show();
-        console.log('🔧 המודל הוצג בהצלחה');
+        // המודל הוצג בהצלחה
     } catch (error) {
         console.error('🔧 שגיאה בהצגת המודל:', error);
         // fallback ל-confirm רגיל

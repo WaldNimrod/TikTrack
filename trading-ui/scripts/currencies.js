@@ -50,7 +50,7 @@ function showEditCurrencyModal(id) {
 
     const currency = currenciesData.find(c => c.id === id);
     if (!currency) {
-        console.error('❌ מטבע לא נמצא:', id);
+        handleElementNotFound('showEditCurrencyModal', `מטבע לא נמצא: ${id}`);
         return;
     }
 
@@ -72,7 +72,7 @@ function showDeleteCurrencyModal(id) {
 
     const currency = currenciesData.find(c => c.id === id);
     if (!currency) {
-        console.error('❌ מטבע לא נמצא:', id);
+        handleElementNotFound('showDeleteCurrencyModal', `מטבע לא נמצא: ${id}`);
         return;
     }
 
@@ -109,7 +109,7 @@ async function loadCurrencies() {
             renderCurrenciesTable();
             updatePageSummaryStats();
         } else {
-            console.error('❌ שגיאה בטעינת מטבעות:', result.error);
+            handleApiError(new Error(result.error), 'טעינת מטבעות');
             // הצגת שגיאה למשתמש
             const tbody = document.querySelector('#currenciesTable tbody');
             if (tbody) {
@@ -117,7 +117,7 @@ async function loadCurrencies() {
             }
         }
     } catch (error) {
-        console.error('❌ שגיאה בטעינת מטבעות:', error);
+        handleDataLoadError(error, 'טעינת מטבעות');
         // הצגת שגיאה למשתמש
         const tbody = document.querySelector('#currenciesTable tbody');
         if (tbody) {
@@ -169,11 +169,11 @@ async function saveCurrency() {
             // טעינה מחדש של הנתונים
             await loadCurrencies();
         } else {
-            console.error('❌ שגיאה בשמירת מטבע:', result.error);
+            handleApiError(new Error(result.error), 'שמירת מטבע');
             window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת מטבע');
         }
     } catch (error) {
-        console.error('❌ שגיאה בשמירת מטבע:', error);
+        handleSaveError(error, 'שמירת מטבע');
         window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת מטבע');
     }
 }
@@ -222,11 +222,11 @@ async function updateCurrency() {
             // טעינה מחדש של הנתונים
             await loadCurrencies();
         } else {
-            console.error('❌ שגיאה בעדכון מטבע:', result.error);
+            handleApiError(new Error(result.error), 'עדכון מטבע');
             window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון מטבע');
         }
     } catch (error) {
-        console.error('❌ שגיאה בעדכון מטבע:', error);
+        handleSaveError(error, 'עדכון מטבע');
         window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון מטבע');
     }
 }
@@ -261,11 +261,11 @@ async function confirmDeleteCurrency() {
             // טעינה מחדש של הנתונים
             await loadCurrencies();
         } else {
-            console.error('❌ שגיאה במחיקת מטבע:', result.error);
+            handleApiError(new Error(result.error), 'מחיקת מטבע');
             window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת מטבע');
         }
     } catch (error) {
-        console.error('❌ שגיאה במחיקת מטבע:', error);
+        handleDeleteError(error, 'מחיקת מטבע');
         window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת מטבע');
     }
 }
@@ -307,7 +307,7 @@ async function checkLinkedItemsBeforeDelete(currencyId) {
 
         return false;
     } catch (error) {
-        console.error('שגיאה בבדיקת פריטים מקושרים:', error);
+        handleSystemError(error, 'בדיקת פריטים מקושרים');
         return false;
     }
 }
@@ -393,14 +393,14 @@ document.addEventListener('DOMContentLoaded', function () {
   if (typeof window.restoreCurrenciesSectionState === 'function') {
     window.restoreCurrenciesSectionState();
   } else {
-    console.error('❌ restoreCurrenciesSectionState function not found');
+    handleFunctionNotFound('restoreCurrenciesSectionState', 'פונקציית שחזור מצב מטבעות לא נמצאה');
   }
 
   // טעינת נתונים
   if (typeof window.loadCurrenciesData === 'function') {
     window.loadCurrenciesData();
   } else {
-    console.error('❌ loadCurrenciesData function not found');
+    handleFunctionNotFound('loadCurrenciesData', 'פונקציית טעינת נתוני מטבעות לא נמצאה');
   }
 
       // Currencies page initialization completed

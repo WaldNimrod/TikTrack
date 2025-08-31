@@ -2,6 +2,8 @@
  * Header System - TikTrack Frontend
  * ==================================
  * 
+ * console.log('🔄 Header System JS loading...');
+ * 
  * Unified header element with menu, logo, and smart filtering system
  * 
  * Features:
@@ -1290,7 +1292,7 @@ class HeaderSystem {
           window.filterSystem.updateFilter('search', filterStates.search || '');
         }
       } catch (error) {
-        console.error('Error restoring filter states:', error);
+        // Error restoring filter states
       }
     }
   }
@@ -1851,11 +1853,11 @@ class HeaderSystem {
           // עדכון תפריט החשבונות
           this.updateAccountFilterMenu(data.data);
         } else {
-          console.error('❌ Error loading accounts: Invalid response format');
+          // Error loading accounts: Invalid response format
         }
       })
       .catch(error => {
-        console.error('❌ Error loading accounts for filter:', error);
+        // Error loading accounts for filter
       });
   }
 
@@ -2145,7 +2147,7 @@ class HeaderSystem {
         return JSON.parse(userPreferences);
       }
     } catch (error) {
-      console.error('Error loading user preferences:', error);
+      // Error loading user preferences
     }
 
     // החזרת ערכי ברירת מחדל אם אין העדפות
@@ -2795,7 +2797,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.headerSystem.init();
     console.log('✅ Header system initialized successfully');
   } else {
-    console.error('❌ HeaderSystem class not found');
+    // HeaderSystem class not found
   }
 });
 
@@ -2930,7 +2932,7 @@ function selectStatusOption(status) {
       }
     }
   } else {
-    console.error('❌ Clicked item not found for status:', status);
+    // Clicked item not found for status
   }
 
   // עדכון הטקסט הנבחר
@@ -2985,7 +2987,7 @@ function selectTypeOption(type) {
       }
     }
   } else {
-    console.error('❌ Clicked item not found for type:', type);
+    // Clicked item not found for type
   }
 
   // עדכון הטקסט הנבחר
@@ -3040,7 +3042,7 @@ function selectAccountOption(account) {
       }
     }
   } else {
-    console.error('❌ Clicked item not found for account:', account);
+    // Clicked item not found for account
   }
 
   // עדכון הטקסט הנבחר
@@ -4296,7 +4298,7 @@ async function resetAllFilters() {
     resetFiltersToDefaults(defaultStatusFilter, defaultTypeFilter, defaultAccountFilter, defaultDateRangeFilter, defaultSearchFilter);
 
   } catch (error) {
-    console.error('❌ שגיאה בקבלת הגדרות ברירת מחדל:', error);
+    // שגיאה בקבלת הגדרות ברירת מחדל
     console.warn('⚠️ Using fallback reset');
     // Fallback - איפוס ידני
     resetFiltersManually();
@@ -4577,7 +4579,7 @@ async function getCurrentPreference(key) {
     }
     return null;
   } catch (error) {
-    console.error(`❌ שגיאה בקבלת הגדרה ${key}:`, error);
+    // שגיאה בקבלת הגדרה
     return null;
   }
 }
@@ -4595,7 +4597,7 @@ function getAccountsFromStorage() {
     }
     return null;
   } catch (error) {
-    console.error('❌ שגיאה בקבלת חשבונות מ-localStorage:', error);
+    // שגיאה בקבלת חשבונות מ-localStorage
     return null;
   }
 }
@@ -4632,7 +4634,7 @@ function processAccountFilterReset(accountItems, defaultAccount) {
       allAccountItem.classList.add('selected');
       console.log('⚠️ Account not found, selected "הכול"');
     } else {
-      console.error('❌ Even "הכול" account item not found!');
+      // Even "הכול" account item not found!
     }
   }
 }
@@ -4650,3 +4652,5 @@ window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;
 
 // ייצוא הפונקציה החדשה
 window.applyFilter = applyFilter;
+
+console.log('✅ Header System JS loaded completely');

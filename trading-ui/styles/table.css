@@ -51,6 +51,40 @@
 
 /* סגנונות למודלים - משתמש בהגדרות הגלובליות מ-styles.css */
 
+/* ===== סגנונות כלליים לכל הכותרות ===== */
+/* וידוא שכל הכותרות יוצגו במלואן */
+table th,
+.table th,
+.data-table th {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  min-width: fit-content !important;
+  max-width: none !important;
+  word-wrap: normal !important;
+  word-break: keep-all !important;
+  hyphens: none !important;
+}
+
+/* סגנונות לכפתורי כותרות */
+table th .btn-link,
+.table th .btn-link,
+.data-table th .btn-link,
+.sortable-header,
+.sortable-header-btn {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  min-width: fit-content !important;
+  max-width: none !important;
+  word-wrap: normal !important;
+  word-break: keep-all !important;
+  hyphens: none !important;
+  display: inline-block !important;
+  width: auto !important;
+  min-width: 100% !important;
+}
+
 /* פתרון קבוע לרדיו באטונים בעברית */
 .radio-group-item {
   text-align: right;
@@ -615,7 +649,7 @@ table[data-table-type="tickers"] td:last-child {
   letter-spacing: 0.01em !important;
   text-transform: uppercase !important;
   position: relative !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   border-right: 1px solid #dee2e6 !important;
 }
 
@@ -691,7 +725,7 @@ table[data-table-type="tickers"] td:last-child {
   width: 100% !important;
   text-align: right !important;
   position: relative !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 .sortable-header-btn:hover {
@@ -714,7 +748,7 @@ table[data-table-type="tickers"] td:last-child {
   width: 100% !important;
   text-align: center !important;
   position: relative !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   /* דחיית הגדרות גלובליות של כפתורים */
   background-color: transparent !important;
   color: inherit !important;
@@ -1996,6 +2030,13 @@ th {
 #executionsTable {
   width: 100% !important;
   table-layout: fixed !important;
+  min-width: 1200px !important;
+  max-width: 100% !important;
+}
+
+#executionsContainer {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
 }
 
 /* עמודת סימבול - 8% */
@@ -2070,9 +2111,9 @@ th {
   width: 6% !important;
 }
 
-/* עמודת פעולות - 14% (לא יותר מ-15% כפי שביקשת) */
-#executionsTable th:last-child,
-#executionsTable td:last-child {
+/* עמודת פעולות - 14% */
+#executionsTable th:nth-child(13),
+#executionsTable td:nth-child(13) {
   width: 14% !important;
 }
 
@@ -2086,6 +2127,24 @@ th {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+}
+
+/* עיצוב כותרות טבלת ביצועים */
+#executionsTable th {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  padding: 8px 4px !important;
+  font-size: 0.85rem !important;
+  min-width: fit-content !important;
+}
+
+#executionsTable th .btn-link {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  min-width: fit-content !important;
+  max-width: none !important;
 }
 
 /* סה"כ: 8+12+8+10+8+8+6+8+8+8+8+6+14 = 102% (מאוזן היטב) */
@@ -2210,6 +2269,10 @@ th {
   padding: 12px 4px !important;
   font-size: 0.85rem !important;
   font-weight: 600 !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  min-width: fit-content !important;
 }
 
 /* מניעת גלישת טקסט */

@@ -137,7 +137,7 @@
           </div>
           <div class="table-actions">
             <button class="refresh-btn"
-              onclick="if (typeof window.openAddTradePlanModal === 'function') { window.openAddTradePlanModal(); } else { console.error('openAddTradePlanModal function not found'); }"
+              onclick="if (typeof window.openAddTradePlanModal === 'function') { window.openAddTradePlanModal(); }"
               title="הוסף תכנון חדש">
               <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
               הוסף
@@ -184,7 +184,7 @@
             <div class="table-count" id="trade_plansCount">טוען...</div>
             <div style="display: flex; gap: 8px; align-items: center;">
               <button class="refresh-btn"
-                onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); } else { console.error('showAddTradePlanModal function not found'); }"
+                onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }"
                 title="הוסף תכנון חדש">
                 <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon"
                   style="width: 16px; height: 16px;"> הוסף
@@ -203,63 +203,63 @@
                   <tr>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         טיקר <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         תאריך <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         סוג <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         צד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         סכום <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         יעד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         סטופ <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         נוכחי <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); } else { console.error('sortTable function not found'); }"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         סטטוס <span class="sort-icon">↕</span>
                       </button>
@@ -385,7 +385,7 @@
                   </label>
                   <input type="number" step="0.01" class="form-control" id="addTradePlanPlannedAmount" name="addTradePlanPlannedAmount"
                     min="0.01" disabled
-                    onchange="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); } else { console.error('updateSharesFromAmount not found'); }"
+                    onchange="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); }"
                     oninput="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); }"
                     style="background-color: #f8f9fa;">
 
@@ -397,7 +397,7 @@
                     מספר מניות
                   </label>
                   <input type="number" step="1" class="form-control" id="addTradePlanShares" name="addTradePlanShares" min="1" disabled
-                    onchange="if(typeof updateAmountFromShares === 'function') { updateAmountFromShares(); } else { console.error('updateAmountFromShares not found'); }"
+                    onchange="if(typeof updateAmountFromShares === 'function') { updateAmountFromShares(); }"
                     oninput="if(typeof updateAmountFromShares === 'function') { updateAmountFromShares(); }">
                 </div>
               </div>
@@ -453,7 +453,7 @@
             <div>
               <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ביטול</button>
               <button type="button" class="btn btn-success"
-                onclick="if (typeof window.saveNewTradePlan === 'function') { window.saveNewTradePlan(); } else { console.error('saveNewTradePlan function not found'); }">שמור</button>
+                onclick="if (typeof window.saveNewTradePlan === 'function') { window.saveNewTradePlan(); }">שמור</button>
             </div>
           </div>
         </div>
@@ -638,7 +638,7 @@
             <div>
               <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ביטול</button>
               <button type="button" class="btn btn-success"
-                onclick="if (typeof window.saveEditTradePlan === 'function') { window.saveEditTradePlan(); } else { console.error('saveEditTradePlan function not found'); }">שמור</button>
+                onclick="if (typeof window.saveEditTradePlan === 'function') { window.saveEditTradePlan(); }">שמור</button>
             </div>
           </div>
         </div>
@@ -664,7 +664,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="height: 38px;">ביטול</button>
           <button type="button" class="btn btn-danger"
-            onclick="if (typeof window.confirmCancelTradePlan === 'function') { window.confirmCancelTradePlan(); } else { console.error('confirmCancelTradePlan function not found'); }" style="height: 38px;">בטל תכנון</button>
+            onclick="if (typeof window.confirmCancelTradePlan === 'function') { window.confirmCancelTradePlan(); }" style="height: 38px;">בטל תכנון</button>
         </div>
       </div>
     </div>
@@ -688,7 +688,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="height: 38px;">ביטול</button>
           <button type="button" class="btn btn-danger"
-            onclick="if (typeof window.confirmDeleteTradePlan === 'function') { window.confirmDeleteTradePlan(); } else { console.error('confirmDeleteTradePlan function not found'); }" style="height: 38px;">מחק</button>
+            onclick="if (typeof window.confirmDeleteTradePlan === 'function') { window.confirmDeleteTradePlan(); }" style="height: 38px;">מחק</button>
         </div>
       </div>
     </div>

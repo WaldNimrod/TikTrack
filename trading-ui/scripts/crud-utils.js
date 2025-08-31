@@ -13,7 +13,7 @@ function editRecord(tableType, id, data) {
     if (typeof editFunction === 'function') {
         editFunction(id, data);
     } else {
-        console.error(`❌ edit${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record function not found`);
+        // editRecord function not found
     }
 }
 
@@ -29,7 +29,7 @@ function deleteRecord(tableType, id) {
     if (typeof deleteFunction === 'function') {
         deleteFunction(id);
     } else {
-        console.error(`❌ delete${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record function not found`);
+        // deleteRecord function not found
     }
 }
 
@@ -45,7 +45,7 @@ function cancelRecord(tableType, id) {
     if (typeof cancelFunction === 'function') {
         cancelFunction(id);
     } else {
-        console.error(`❌ cancel${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record function not found`);
+        // cancelRecord function not found
     }
 }
 

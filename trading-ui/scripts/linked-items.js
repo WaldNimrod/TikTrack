@@ -686,7 +686,7 @@ function getTradePlanDetails(planId, data = null) {
         
         return `תוכנית ${planId}`;
     } catch (error) {
-        console.error('Error getting trade plan details:', error);
+        // Error getting trade plan details
         return `תוכנית ${planId}`;
     }
 }
@@ -1186,13 +1186,13 @@ function exportLinkedItemsData(itemType, itemId) {
                 }
             })
             .catch(error => {
-                console.error('❌ שגיאה בייצוא נתונים:', error);
+                // שגיאה בייצוא נתונים
                 if (window.showErrorNotification) {
                     window.showErrorNotification('שגיאה בייצוא', 'שגיאה בייצוא הנתונים לקובץ CSV');
                 }
             });
     } catch (error) {
-        console.error('❌ שגיאה בייצוא נתונים:', error);
+        // שגיאה בייצוא נתונים
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בייצוא', 'שגיאה בייצוא הנתונים לקובץ CSV');
         }

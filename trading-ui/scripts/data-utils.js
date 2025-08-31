@@ -71,7 +71,7 @@ async function loadCurrenciesFromServer() {
     }
 
   } catch (error) {
-    console.error('❌ Error loading currencies:', error);
+    // Error loading currencies
     // טעינת מטבעות ברירת מחדל
     window.currenciesData = [
       { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
@@ -179,7 +179,7 @@ async function apiCall(url, options = {}) {
 
     return await response.json();
   } catch (error) {
-    console.error('❌ API call failed:', error);
+    // API call failed
     throw error;
   }
 }
@@ -204,10 +204,10 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
         return [];
       }
     } catch (error) {
-      console.error(`❌ Attempt ${attempt} failed for ${endpoint}:`, error);
+      // Attempt failed for endpoint
 
       if (attempt === maxRetries) {
-        console.error(`❌ All ${maxRetries} attempts failed for ${endpoint}`);
+        // All attempts failed for endpoint
         return [];
       }
 
@@ -227,7 +227,7 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
  */
 function validateDataStructure(data, type = 'data') {
   if (!Array.isArray(data)) {
-    console.error(`❌ ${type} is not an array:`, typeof data);
+    // Data is not an array
     return false;
   }
 
@@ -270,7 +270,7 @@ function validateRequired(value, fieldName) {
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', `שדה ${fieldName} הוא שדה חובה`);
         } else {
-            console.error(`שדה ${fieldName} הוא שדה חובה`);
+            // שדה הוא שדה חובה
         }
         return false;
     }
@@ -287,7 +287,7 @@ function validateNumber(value, fieldName, min = null, max = null) {
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות מספר`);
         } else {
-            console.error(`שדה ${fieldName} חייב להיות מספר`);
+            // שדה חייב להיות מספר
         }
         return false;
     }
@@ -296,7 +296,7 @@ function validateNumber(value, fieldName, min = null, max = null) {
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות לפחות ${min}`);
         } else {
-            console.error(`שדה ${fieldName} חייב להיות לפחות ${min}`);
+            // שדה חייב להיות לפחות מינימום
         }
         return false;
     }
@@ -305,7 +305,7 @@ function validateNumber(value, fieldName, min = null, max = null) {
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות לכל היותר ${max}`);
         } else {
-            console.error(`שדה ${fieldName} חייב להיות לכל היותר ${max}`);
+            // שדה חייב להיות לכל היותר מקסימום
         }
         return false;
     }
@@ -323,7 +323,7 @@ function validateDate(value, fieldName) {
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות תאריך תקין`);
         } else {
-            console.error(`שדה ${fieldName} חייב להיות תאריך תקין`);
+            // שדה חייב להיות תאריך תקין
         }
         return false;
     }

@@ -102,7 +102,7 @@ function initializePageFilters(pageName) {
 
         // Filters initialized for page
     } catch (error) {
-        console.error(`❌ Error initializing filters for ${pageName}:`, error);
+        // Error initializing filters
     }
 }
 
@@ -137,7 +137,7 @@ function setupSortableHeaders(pageName) {
 
         // Sortable headers setup for page
     } catch (error) {
-        console.error(`❌ Error setting up sortable headers for ${pageName}:`, error);
+        // Error setting up sortable headers
     }
 }
 
@@ -167,7 +167,7 @@ function updateTableStats(pageName, data = null) {
 
         // Table stats updated for page
     } catch (error) {
-        console.error(`❌ Error updating table stats for ${pageName}:`, error);
+        // Error updating table stats
     }
 }
 
@@ -215,7 +215,7 @@ function restoreDesignsSectionState() {
 
         // Designs section state restored
     } catch (error) {
-        console.error('❌ Error restoring designs section state:', error);
+        // Error restoring designs section state
     }
 }
 
@@ -260,7 +260,7 @@ function initializePage(pageName) {
 
         // Page initialized successfully
     } catch (error) {
-        console.error(`❌ Error initializing page ${pageName}:`, error);
+        // Error initializing page
     }
 }
 
@@ -286,7 +286,7 @@ function savePageState(pageName, state) {
         localStorage.setItem(key, JSON.stringify(stateToSave));
         // Page state saved for page
     } catch (error) {
-        console.error(`❌ Error saving page state for ${pageName}:`, error);
+        // Error saving page state
     }
 }
 
@@ -312,7 +312,7 @@ function loadPageState(pageName) {
 
         return null;
     } catch (error) {
-        console.error(`❌ Error loading page state for ${pageName}:`, error);
+        // Error loading page state
         return null;
     }
 }
@@ -330,7 +330,7 @@ function clearPageState(pageName) {
         localStorage.removeItem(key);
         // Page state cleared for page
     } catch (error) {
-        console.error(`❌ Error clearing page state for ${pageName}:`, error);
+        // Error clearing page state
     }
 }
 
@@ -397,7 +397,7 @@ function navigateToPage(pageName, options = {}) {
 
     try {
         if (!isPageAvailable(pageName)) {
-            console.error(`❌ Page ${pageName} is not available`);
+            // Page is not available
             return;
         }
 
@@ -414,7 +414,7 @@ function navigateToPage(pageName, options = {}) {
         window.location.href = pageInfo.url;
 
     } catch (error) {
-        console.error(`❌ Error navigating to page ${pageName}:`, error);
+        // Error navigating to page
     }
 }
 

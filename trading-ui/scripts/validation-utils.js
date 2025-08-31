@@ -579,7 +579,7 @@ function validateTickerSymbol(value) {
 function validateForm(formId, validationRules = {}) {
     const form = document.getElementById(formId);
     if (!form) {
-        console.error('❌ Form not found:', formId);
+        // Form not found
         return { isValid: false, errors: { form: 'טופס לא נמצא' } };
     }
     

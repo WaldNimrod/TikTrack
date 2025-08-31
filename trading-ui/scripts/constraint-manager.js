@@ -29,7 +29,7 @@ class ConstraintManager {
             await this.loadConstraints();
             this.setupEventListeners();
         } catch (error) {
-            console.error('Error initializing constraint manager:', error);
+            // Error initializing constraint manager
             this.showMessage('שגיאה בטעינת המערכת', 'error');
         }
     }
@@ -50,7 +50,7 @@ class ConstraintManager {
                 document.getElementById('total-enums').textContent = enumCount;
             }
         } catch (error) {
-            console.error('Error loading stats:', error);
+            // Error loading stats
         }
     }
 
@@ -64,7 +64,7 @@ class ConstraintManager {
                 this.populateTableFilter();
             }
         } catch (error) {
-            console.error('Error loading tables:', error);
+            // Error loading tables
         }
     }
 
@@ -78,11 +78,11 @@ class ConstraintManager {
                 this.constraints = data.data;
                 this.renderConstraintsList();
             } else {
-                console.error('Error loading constraints:', data);
+                // Error loading constraints
                 this.showMessage('שגיאה בטעינת האילוצים', 'error');
             }
         } catch (error) {
-            console.error('Error loading constraints:', error);
+            // Error loading constraints
             this.showMessage('שגיאה בטעינת האילוצים', 'error');
             // הצגת נתונים לדוגמה במקרה של שגיאה
             this.showSampleData();
@@ -367,7 +367,7 @@ class ConstraintManager {
                 this.showMessage('שגיאה במחיקת האילוץ', 'error');
             }
         } catch (error) {
-            console.error('Error deleting constraint:', error);
+            // Error deleting constraint
             this.showMessage('שגיאה במחיקת האילוץ', 'error');
         }
     }
@@ -393,7 +393,6 @@ class ConstraintManager {
                 this.showMessage(data.message || 'שגיאה בהוספת האילוץ', 'error');
             }
         } catch (error) {
-            console.error('Error adding constraint:', error);
             this.showMessage('שגיאה בהוספת האילוץ', 'error');
         }
     }
@@ -557,7 +556,6 @@ class ConstraintManager {
                 this.showMessage('שגיאה בהוספת האילוץ', 'error');
             }
         } catch (error) {
-            console.error('Error adding constraint:', error);
             this.showMessage('שגיאה בהוספת האילוץ', 'error');
         }
     }
@@ -711,7 +709,7 @@ window.loadConstraintsData = function () {
     if (constraintManager) {
         constraintManager.loadConstraints();
     } else {
-        console.error('Constraint manager not initialized');
+        // Constraint manager not initialized
     }
 };
 

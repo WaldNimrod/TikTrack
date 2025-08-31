@@ -256,26 +256,26 @@ async function loadAllAccountsFromServer() {
       if (typeof window.updateAccountFilterMenu === 'function') {
         window.updateAccountFilterMenu(openAccounts);
       } else {
-        console.log('🔄 updateAccountFilterMenu not available yet, trying direct update...');
+        // updateAccountFilterMenu not available yet, trying direct update
         // ניסיון לעדכן ישירות
       }
 
       // החזרת הנתונים לטעינה חוזרת
       return openAccounts;
     } else {
-      console.log('🔄 Error loading all accounts from server, status:', response.status);
+      // Error loading all accounts from server, status
       return [];
     }
 
   } catch (error) {
-    console.log('🔄 Error loading all accounts from server:', error);
+    // Error loading all accounts from server
     return [];
   }
 }
 
 // פונקציה לטעינת חשבונות ברירת מחדל
 function loadDefaultAccounts() {
-  console.log('🔄 Loading default accounts - no dummy data');
+  // Loading default accounts - no dummy data
   window.accountsData = [];
   window.accountsLoaded = true;
   if (typeof window.updateAccountFilterMenu === 'function') {
@@ -298,13 +298,13 @@ function isAccountsLoaded() {
 // פונקציה לטעינת נתוני חשבונות מהשרת
 async function loadAccountsData() {
   try {
-    console.log('🔄 טוען נתוני חשבונות מהשרת...');
+    // טוען נתוני חשבונות מהשרת
 
     // בדיקה אם יש פונקציה apiCall זמינה
     if (typeof window.apiCall === 'function') {
       const response = await window.apiCall('/api/v1/accounts/');
       const accounts = response.data || response;
-      console.log('📊 חשבונות שהתקבלו:', accounts);
+      // חשבונות שהתקבלו
       return accounts;
     } else {
       // קריאה ישירה ל-API
@@ -315,7 +315,7 @@ async function loadAccountsData() {
       }
       const result = await response.json();
       const accounts = result.data || result;
-      console.log('📊 חשבונות שהתקבלו:', accounts);
+      // חשבונות שהתקבלו
       return accounts;
     }
   } catch (error) {
@@ -334,9 +334,9 @@ async function loadAccountsData() {
  * updateAccountsTable(accounts);
  */
 function updateAccountsTable(accounts) {
-  console.log('🔄 === UPDATE ACCOUNTS TABLE CALLED ===');
-  console.log('🔄 Function called from:', new Error().stack.split('\n')[2]);
-  console.log('🔄 Accounts parameter:', accounts);
+  // UPDATE ACCOUNTS TABLE CALLED
+  // Function called from
+  // Accounts parameter
 
   // בדיקה שהפרמטר תקין
   if (!accounts || !Array.isArray(accounts)) {
@@ -344,7 +344,7 @@ function updateAccountsTable(accounts) {
     return;
   }
 
-  console.log('🔄 מעדכן טבלת חשבונות עם', accounts.length, 'חשבונות');
+  // מעדכן טבלת חשבונות עם
 
   const tbody = document.querySelector('#accountsTable tbody');
   if (!tbody) {
@@ -392,8 +392,8 @@ function updateAccountsTable(accounts) {
     countElement.textContent = `${accounts.length} חשבונות`;
   }
 
-  console.log('✅ טבלת חשבונות עודכנה בהצלחה עם', accounts.length, 'חשבונות');
-  console.log('🔄 === END UPDATE ACCOUNTS TABLE ===');
+  // טבלת חשבונות עודכנה בהצלחה עם
+  // END UPDATE ACCOUNTS TABLE
 }
 
 /**
@@ -402,7 +402,7 @@ function updateAccountsTable(accounts) {
  */
 async function loadAccounts() {
   try {
-    console.log('🔄 טוען חשבונות...');
+    // טוען חשבונות
 
     // קריאה לפונקציה מ-accounts.js
     if (typeof window.loadAccountsDataFromAPI === 'function') {
@@ -436,35 +436,35 @@ async function loadAccounts() {
 
 // פונקציה לעדכון טקסט פילטר החשבונות
 function updateAccountFilterDisplayText() {
-  console.log('🔄 updateAccountFilterText called');
+  // updateAccountFilterText called
 
   const appHeader = document.querySelector('app-header');
   if (!appHeader || !appHeader.shadowRoot) {
-    console.log('🔄 App header or shadow root not found in updateAccountFilterText');
+    // App header or shadow root not found in updateAccountFilterText
     return;
   }
 
   const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
   if (!accountMenu) {
-    console.log('🔄 Account menu not found in updateAccountFilterText');
+    // Account menu not found in updateAccountFilterText
     return;
   }
 
   const accountToggle = appHeader.shadowRoot.getElementById('accountFilterToggle');
   if (!accountToggle) {
-    console.log('🔄 Account toggle not found in updateAccountFilterText');
+    // Account toggle not found in updateAccountFilterText
     return;
   }
 
   const selectedText = accountToggle.querySelector('.selected-account-text');
   if (!selectedText) {
-    console.log('🔄 Selected account text element not found in updateAccountFilterText');
+    // Selected account text element not found in updateAccountFilterText
     return;
   }
 
   // קבלת החשבונות הנבחרים
   const selectedAccounts = window.selectedAccountsForFilter || [];
-  console.log('🔄 Selected account values for text update:', selectedAccounts);
+  // Selected account values for text update
 
   if (selectedAccounts.length === 0) {
     selectedText.textContent = 'כל החשבונות';
@@ -474,7 +474,7 @@ function updateAccountFilterDisplayText() {
     selectedText.textContent = `${selectedAccounts.length} נבחרו`;
   }
 
-  console.log('🔄 Updated account filter text to:', selectedText.textContent);
+  // Updated account filter text to
 }
 
 // ייצוא הפונקציות לשימוש גלובלי
@@ -491,51 +491,51 @@ window.loadAccounts = loadAccounts;
 
 // פונקציה גלובלית לעדכון ידני של תפריט החשבונות
 window.refreshAccountFilterMenu = function () {
-  console.log('🔄 Manual refresh of account filter menu called');
+  // Manual refresh of account filter menu called
   if (window.accountsData && window.accountsData.length > 0) {
-    console.log('🔄 Using existing accounts data:', window.accountsData);
+          // Using existing accounts data
     if (typeof window.updateAccountFilterMenu === 'function') {
       window.updateAccountFilterMenu(window.accountsData);
     } else {
-      console.log('🔄 updateAccountFilterMenu not available yet');
+              // updateAccountFilterMenu not available yet
     }
   } else {
-    console.log('🔄 No accounts data, loading from server...');
+          // No accounts data, loading from server
     loadAccountsFromServer();
   }
 };
 
 // פונקציה לבדיקת מצב החשבונות
 window.checkAccountsStatus = function () {
-  console.log('🔄 === ACCOUNTS STATUS CHECK ===');
-  console.log('🔄 accountsData:', window.accountsData);
-  console.log('🔄 accountsLoaded:', window.accountsLoaded);
-  console.log('🔄 loadAccountsFromServer function:', typeof window.loadAccountsFromServer);
-  console.log('🔄 updateAccountFilterMenu function moved to grid-filters.js');
+  // ACCOUNTS STATUS CHECK
+  // accountsData
+  // accountsLoaded
+  // loadAccountsFromServer function
+  // updateAccountFilterMenu function moved to grid-filters.js
 
   const appHeader = document.querySelector('app-header');
   if (appHeader) {
     const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
     if (accountMenu) {
       const items = accountMenu.querySelectorAll('.account-filter-item');
-      console.log('🔄 Account menu items count:', items.length);
+      // Account menu items count
       items.forEach((item, index) => {
         const accountName = item.getAttribute('data-account');
-        console.log(`🔄 Item ${index + 1}: ${accountName}`);
+                  // Item details
       });
     } else {
-      console.log('🔄 Account menu not found in shadow DOM');
+      // Account menu not found in shadow DOM
     }
   } else {
-    console.log('🔄 App header not found');
+    // App header not found
   }
-  console.log('🔄 === END ACCOUNTS STATUS CHECK ===');
+  // END ACCOUNTS STATUS CHECK
 };
 
 // פונקציה זמנית לעדכון תפריט החשבונות
 window.updateAccountFilterMenuDirectly = function (accounts) {
-  console.log('🔄 === UPDATE ACCOUNT FILTER MENU DIRECTLY ===');
-  console.log('🔄 Accounts received:', accounts);
+  // UPDATE ACCOUNT FILTER MENU DIRECTLY
+  // Accounts received
 
   // חיפוש התפריט בתוך האפ-הדר (Shadow DOM)
   const appHeader = document.querySelector('app-header');

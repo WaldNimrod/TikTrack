@@ -48,7 +48,7 @@ async function loadPreferences() {
       currentPreferences = { ...DEFAULT_PREFERENCES };
     }
   } catch (error) {
-    console.error('❌ שגיאה בטעינת העדפות:', error);
+    handleDataLoadError(error, 'טעינת העדפות');
     currentPreferences = { ...DEFAULT_PREFERENCES };
   }
   
@@ -73,7 +73,7 @@ function updatePreference(key, value) {
     showPreferencesInfo('העדפות', message);
     
     } catch (error) {
-    console.error(`❌ שגיאה ב-updatePreference:`, error);
+    handleSystemError(error, 'updatePreference');
   }
 }
 
@@ -100,11 +100,11 @@ async function saveAllPreferences() {
       showPreferencesSuccess('הצלחה', 'כל ההעדפות נשמרו בהצלחה');
     } else {
       const errorText = await response.text();
-      console.error('❌ שגיאה בשמירת העדפות:', response.status, errorText);
+      handleApiError(new Error(`HTTP ${response.status}: ${errorText}`), 'שמירת העדפות');
               showPreferencesError('שגיאה', `שגיאה בשמירת העדפות: ${response.status}`);
     }
   } catch (error) {
-    console.error('❌ שגיאה בשמירת העדפות:', error);
+    handleSaveError(error, 'שמירת העדפות');
             showPreferencesError('שגיאה', `שגיאה בשמירת העדפות: ${error.message}`);
   }
 }
@@ -145,7 +145,7 @@ async function resetToDefaults() {
       }
     }
   } catch (error) {
-    console.error('❌ שגיאה באיפוס העדפות:', error);
+    handleSystemError(error, 'איפוס העדפות');
     showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
   }
 }
@@ -206,7 +206,7 @@ function updateUI() {
     typeFilterSelect.value = newValue;
     console.log('🔧 Updated type filter to:', newValue);
     } else {
-    console.error(`  ❌ פילטר סוג - אלמנט לא נמצא!`);
+    handleElementNotFound('updateUI', 'פילטר סוג - אלמנט לא נמצא');
   }
   
   // פילטר חשבון
@@ -256,7 +256,7 @@ async function loadAccountsToFilter() {
        loadLocalAccounts();
      }
    } catch (error) {
-     console.error('❌ שגיאה בטעינת חשבונות:', error);
+     handleDataLoadError(error, 'טעינת חשבונות');
      showPreferencesError('טעינת חשבונות', 'שגיאה בטעינת חשבונות מהשרת');
      loadLocalAccounts();
    }
@@ -291,7 +291,7 @@ function updateAccountFilter(accounts) {
   
   const accountFilterSelect = document.getElementById('defaultAccountFilter');
   if (!accountFilterSelect) {
-    console.error('❌ לא נמצא אלמנט פילטר חשבונות');
+    handleElementNotFound('updateAccountFilter', 'לא נמצא אלמנט פילטר חשבונות');
     return;
   }
   
@@ -363,7 +363,7 @@ function showPreferencesError(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'error');
   } else {
-    console.error('❌ שגיאה:', title, '-', message);
+    handleSystemError(new Error(`${title}: ${message}`), 'הצגת שגיאת העדפות');
   }
 }
 
@@ -403,7 +403,7 @@ async function initializePreferences() {
     if (typeof window.restoreAllSectionStates === 'function') {
       window.restoreAllSectionStates();
     } else {
-      console.error('❌ restoreAllSectionStates function not found');
+      handleFunctionNotFound('restoreAllSectionStates', 'פונקציית שחזור מצב סקשנים לא נמצאה');
     }
 
     // טען העדפות
@@ -414,7 +414,7 @@ async function initializePreferences() {
     
     // הסרת התראה מיותרת בטעינה
   } catch (error) {
-    console.error('❌ שגיאה באתחול דף העדפות:', error);
+    handleSystemError(error, 'אתחול דף העדפות');
     showPreferencesError('שגיאה', 'שגיאה באתחול דף העדפות');
   }
 }
@@ -448,6 +448,6 @@ window.toggleTopSection = function() {
   if (typeof window.toggleTopSectionGlobal === 'function') {
     window.toggleTopSectionGlobal();
   } else {
-    console.error('❌ toggleTopSectionGlobal function not found in main.js');
+    handleFunctionNotFound('toggleTopSectionGlobal', 'פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
   }
 };

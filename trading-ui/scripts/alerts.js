@@ -910,6 +910,31 @@ function disableConditionFields() {
 }
 
 /**
+ * טעינת נתוני טיקרים אם הם לא קיימים
+ * @returns {Promise} הבטחה לטעינת הנתונים
+ */
+async function loadTickersDataIfNeeded() {
+  if (!window.tickersData || window.tickersData.length === 0) {
+    try {
+      if (window.loadTickersData && typeof window.loadTickersData === 'function') {
+        await window.loadTickersData();
+      } else {
+        // אם הפונקציה לא קיימת, נטען ישירות
+        const response = await fetch('/api/v1/tickers/');
+        if (response.ok) {
+          const data = await response.json();
+          window.tickersData = data.data || data || [];
+        }
+      }
+    } catch (error) {
+      console.error('שגיאה בטעינת נתוני טיקרים:', error);
+      window.tickersData = [];
+    }
+  }
+  return window.tickersData;
+}
+
+/**
  * מילוי רשימת אובייקטים לפי סוג השיוך
  * @param {number} relationTypeId - מזהה סוג השיוך
  */
@@ -923,8 +948,8 @@ function populateRelatedObjects(relationTypeId) {
   // מילוי לפי סוג השיוך
   switch (relationTypeId) {
     case 1: // חשבון
-      if (accountsData && accountsData.length > 0) {
-        accountsData.forEach(account => {
+      if (window.accountsData && window.accountsData.length > 0) {
+        window.accountsData.forEach(account => {
           const option = document.createElement('option');
           option.value = account.id;
           option.textContent = `${account.name} (${account.currency_name || 'N/A'})`;
@@ -934,8 +959,8 @@ function populateRelatedObjects(relationTypeId) {
       break;
 
     case 2: // טרייד
-      if (tradesData && tradesData.length > 0) {
-        tradesData.forEach(trade => {
+      if (window.tradesData && window.tradesData.length > 0) {
+        window.tradesData.forEach(trade => {
           const option = document.createElement('option');
           option.value = trade.id;
           option.textContent = `${trade.symbol} - ${trade.type} (${trade.status})`;
@@ -945,8 +970,8 @@ function populateRelatedObjects(relationTypeId) {
       break;
 
     case 3: // תכנון טרייד
-      if (tradePlansData && tradePlansData.length > 0) {
-        tradePlansData.forEach(plan => {
+      if (window.tradePlansData && window.tradePlansData.length > 0) {
+        window.tradePlansData.forEach(plan => {
           const option = document.createElement('option');
           option.value = plan.id;
           option.textContent = `${plan.symbol} - ${plan.type} (${plan.status})`;
@@ -956,12 +981,26 @@ function populateRelatedObjects(relationTypeId) {
       break;
 
     case 4: // טיקר
-      if (tickersData && tickersData.length > 0) {
-        tickersData.forEach(ticker => {
+      if (window.tickersData && window.tickersData.length > 0) {
+        window.tickersData.forEach(ticker => {
           const option = document.createElement('option');
           option.value = ticker.id;
           option.textContent = `${ticker.symbol} - ${ticker.name}`;
           selectElement.appendChild(option);
+        });
+      } else {
+        // נסה לטעון נתוני טיקרים אם הם לא קיימים
+        loadTickersDataIfNeeded().then(() => {
+          if (window.tickersData && window.tickersData.length > 0) {
+            window.tickersData.forEach(ticker => {
+              const option = document.createElement('option');
+              option.value = ticker.id;
+              option.textContent = `${ticker.symbol} - ${ticker.name}`;
+              selectElement.appendChild(option);
+            });
+          }
+        }).catch(error => {
+          console.error('שגיאה בטעינת נתוני טיקרים:', error);
         });
       }
       break;
@@ -982,8 +1021,8 @@ function populateEditRelatedObjects(relationTypeId) {
   // מילוי לפי סוג השיוך
   switch (relationTypeId) {
     case 1: // חשבון
-      if (accountsData && accountsData.length > 0) {
-        accountsData.forEach(account => {
+      if (window.accountsData && window.accountsData.length > 0) {
+        window.accountsData.forEach(account => {
           const option = document.createElement('option');
           option.value = account.id;
           option.textContent = `${account.name} (${account.currency_name || 'N/A'})`;
@@ -993,8 +1032,8 @@ function populateEditRelatedObjects(relationTypeId) {
       break;
 
     case 2: // טרייד
-      if (tradesData && tradesData.length > 0) {
-        tradesData.forEach(trade => {
+      if (window.tradesData && window.tradesData.length > 0) {
+        window.tradesData.forEach(trade => {
           const option = document.createElement('option');
           option.value = trade.id;
           option.textContent = `${trade.symbol} - ${trade.type} (${trade.status})`;
@@ -1004,8 +1043,8 @@ function populateEditRelatedObjects(relationTypeId) {
       break;
 
     case 3: // תכנון טרייד
-      if (tradePlansData && tradePlansData.length > 0) {
-        tradePlansData.forEach(plan => {
+      if (window.tradePlansData && window.tradePlansData.length > 0) {
+        window.tradePlansData.forEach(plan => {
           const option = document.createElement('option');
           option.value = plan.id;
           option.textContent = `${plan.symbol} - ${plan.type} (${plan.status})`;
@@ -1015,12 +1054,26 @@ function populateEditRelatedObjects(relationTypeId) {
       break;
 
     case 4: // טיקר
-      if (tickersData && tickersData.length > 0) {
-        tickersData.forEach(ticker => {
+      if (window.tickersData && window.tickersData.length > 0) {
+        window.tickersData.forEach(ticker => {
           const option = document.createElement('option');
           option.value = ticker.id;
           option.textContent = `${ticker.symbol} - ${ticker.name}`;
           selectElement.appendChild(option);
+        });
+      } else {
+        // נסה לטעון נתוני טיקרים אם הם לא קיימים
+        loadTickersDataIfNeeded().then(() => {
+          if (window.tickersData && window.tickersData.length > 0) {
+            window.tickersData.forEach(ticker => {
+              const option = document.createElement('option');
+              option.value = ticker.id;
+              option.textContent = `${ticker.symbol} - ${ticker.name}`;
+              selectElement.appendChild(option);
+            });
+          }
+        }).catch(error => {
+          console.error('שגיאה בטעינת נתוני טיקרים:', error);
         });
       }
       break;

@@ -32,7 +32,7 @@ function handleApiError(error, context = 'API_CALL', userMessage = null) {
     if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה', message);
     } else {
-        console.error('❌ showErrorNotification לא זמינה');
+        // showErrorNotification לא זמינה
     }
 }
 

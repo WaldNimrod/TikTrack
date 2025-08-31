@@ -85,7 +85,7 @@ async function getAccountsByStatus(status) {
  */
 async function cancelAccount(accountId) {
     try {
-        console.log('🔄 ביטול חשבון:', accountId);
+        // ביטול חשבון
 
         const response = await fetch(`/api/v1/accounts/${accountId}`, {
             method: 'PUT',
@@ -116,7 +116,7 @@ async function cancelAccount(accountId) {
  */
 async function reactivateAccount(accountId) {
     try {
-        console.log('🔄 הפעלה מחדש של חשבון:', accountId);
+        // הפעלה מחדש של חשבון
 
         const response = await fetch(`/api/v1/accounts/${accountId}`, {
             method: 'PUT',

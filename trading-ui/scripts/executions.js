@@ -1548,6 +1548,7 @@ function goToNote(noteId) {
  * טעינת נתוני עסקעות
  */
 async function loadExecutionsData() {
+    console.log('🔄 loadExecutionsData called');
     try {
         // טעינת נתוני עסקעות
 
@@ -1599,6 +1600,7 @@ async function loadExecutionsData() {
  * עדכון טבלת עסקעות
  */
 async function updateExecutionsTableMain(executions) {
+    console.log('🔄 updateExecutionsTableMain called with', executions.length, 'executions');
     const table = document.querySelector('#executionsTable');
     const tbody = document.querySelector('#executionsTable tbody');
     if (!tbody) {
@@ -1887,6 +1889,46 @@ window.filterExecutionsLocally = filterExecutionsLocally;
 window.openExecutionDetails = openExecutionDetails;
 window.editExecution = editExecution;
 window.deleteExecution = deleteExecution;
+
+/**
+ * פונקציה לסגירה/פתיחה של executions-section
+ */
+function toggleExecutionsSection() {
+    const section = document.querySelector('.content-section.executions-page');
+    const sectionBody = section ? section.querySelector('.section-body') : null;
+    const toggleBtn = document.querySelector('[onclick="toggleExecutionsSection()"]');
+    
+    if (section && sectionBody) {
+        const isVisible = sectionBody.style.display !== 'none';
+        sectionBody.style.display = isVisible ? 'none' : 'block';
+        
+        if (toggleBtn) {
+            toggleBtn.textContent = isVisible ? 'הצג עסקעות' : 'הסתר עסקעות';
+        }
+        
+        // שמירת המצב
+        localStorage.setItem('executionsSectionState', isVisible ? 'closed' : 'open');
+        console.log('💾 Saved executions section state:', isVisible ? 'closed' : 'open');
+    }
+}
+
+/**
+ * שחזור מצב executions-section
+ */
+function restoreExecutionsSectionState() {
+    const savedState = localStorage.getItem('executionsSectionState');
+    const section = document.querySelector('.content-section');
+    const sectionBody = section ? section.querySelector('.section-body') : null;
+    const toggleBtn = document.querySelector('[onclick="toggleExecutionsSection()"]');
+    
+    if (section && sectionBody && savedState === 'closed') {
+        sectionBody.style.display = 'none';
+        if (toggleBtn) {
+            toggleBtn.textContent = 'הצג עסקעות';
+        }
+    }
+}
+
 window.toggleExecutionsSection = toggleExecutionsSection;
 window.restoreExecutionsSectionState = restoreExecutionsSectionState;
 

@@ -142,7 +142,7 @@ function initializeApplication() {
     // Initialize current page
     initializeCurrentPage();
   } catch (error) {
-    console.error('❌ Application Initialization Failed:', error);
+    // Application Initialization Failed
     showSystemError('Application initialization failed. Please refresh the page.');
   }
 }
@@ -259,7 +259,7 @@ function initializeCurrentPage() {
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
   } else {
-    console.error('❌ restoreAllSectionStates function not found');
+    // restoreAllSectionStates function not found
   }
 
   // Call page-specific initialization if available
@@ -313,7 +313,7 @@ function getSystemInfo() {
  * @param {ErrorEvent} event - Error event object
  */
 function handleGlobalError(event) {
-  console.error('🌐 Global Error:', event.error);
+  // Global Error
   showSystemError(`System error: ${event.error.message}`);
 }
 
@@ -323,7 +323,7 @@ function handleGlobalError(event) {
  * @param {PromiseRejectionEvent} event - Rejection event object
  */
 function handleUnhandledRejection(event) {
-  console.error('🚫 Unhandled Promise Rejection:', event.reason);
+  // Unhandled Promise Rejection
   showSystemError(`Promise error: ${event.reason}`);
 }
 
@@ -336,7 +336,7 @@ function showSystemError(message) {
   if (typeof window.showErrorNotification === 'function') {
     window.showErrorNotification('שגיאת מערכת', message);
   } else {
-    console.error('System Error:', message);
+    // System Error
   }
 }
 
@@ -416,7 +416,7 @@ function restoreAllSectionStates() {
     });
 
   } catch (error) {
-    console.error('❌ Error restoring section states:', error);
+    // Error restoring section states
   }
 }
 

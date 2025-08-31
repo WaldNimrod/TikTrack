@@ -111,7 +111,7 @@ function sortTable(columnIndex, data, tableType, updateFunction) {
     if (typeof window.sortTableData === 'function') {
         window.sortTableData(columnIndex, data, tableType, updateFunction);
     } else {
-        console.error('❌ sortTableData function not found in tables.js');
+        // sortTableData function not found in tables.js
     }
 }
 

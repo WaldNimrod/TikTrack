@@ -64,11 +64,7 @@ function deleteExecution(id) {
     } else {
         // Using fallback - global system not available
         // גיבוי למקרה שהמערכת הגלובלית לא זמינה
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'מערכת מחיקה לא זמינה');
-        } else {
-            console.error('מערכת מחיקה לא זמינה');
-        }
+        handleSystemError(new Error('מערכת מחיקה לא זמינה'), 'מערכת מחיקה');
     }
 }
 
@@ -192,11 +188,7 @@ async function showEditExecutionModal(id) {
     // מציאת העסקה לפי ID
     const execution = executionsData.find(e => e.id == id);
     if (!execution) {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'עסקה לא נמצאה');
-        } else {
-            console.error('עסקה לא נמצאה');
-        }
+        handleElementNotFound('execution', 'CRITICAL');
         return;
     }
 
@@ -346,9 +338,9 @@ async function showEditExecutionModal(id) {
             tradeLinkButton.setAttribute('data-object-type', linkedObject.type);
         }
 
-    } catch (error) {
-        console.error('❌ Error loading linked object details:', error);
-    }
+            } catch (error) {
+            handleDataLoadError(error, 'פרטי אובייקט מקושר');
+        }
 
     clearExecutionValidationErrors();
 
@@ -788,8 +780,7 @@ function validateCompleteExecutionForm(mode) {
             console.log('🔧 Calling showErrorNotification with detailed error message');
             window.showErrorNotification('שגיאות בטופס', `יש לתקן את השגיאות הבאות: ${errorMessage}`);
         } else {
-            console.error('❌ showErrorNotification not available');
-            console.error(`שגיאות בטופס: ${errorMessage}`);
+            handleSystemError(new Error('showErrorNotification not available'), 'מערכת התראות');
         }
     }
 
@@ -838,11 +829,7 @@ async function saveExecution() {
 
     // בדיקת ערך action
     if (!type || (type !== 'buy' && type !== 'sale')) {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'יש לבחור פעולה תקינה (קניה או מכירה)');
-        } else {
-            console.error('יש לבחור פעולה תקינה (קניה או מכירה)');
-        }
+        handleValidationError('addExecutionType', 'יש לבחור פעולה תקינה (קניה או מכירה)');
         return;
     }
 
@@ -851,11 +838,7 @@ async function saveExecution() {
     if (tradeIdValue) {
         tradeId = parseInt(tradeIdValue);
         if (isNaN(tradeId) || tradeId < 0) {
-                    if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'מזהה טרייד לא תקין');
-        } else {
-            console.error('מזהה טרייד לא תקין');
-        }
+                    handleValidationError('addExecutionTradeId', 'מזהה טרייד לא תקין');
             return;
         }
     }
@@ -898,8 +881,7 @@ async function saveExecution() {
                 console.log('🔧 Calling showSuccessNotification with:', 'הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת');
                 window.showSuccessNotification('הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת');
             } else {
-                console.error('❌ showSuccessNotification not available');
-                console.log('עסקה חדשה נוספה בהצלחה למערכת');
+                handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
             }
 
             // רענון הנתונים
@@ -907,7 +889,7 @@ async function saveExecution() {
 
         } else {
             const result = await response.json();
-            console.error('❌ שגיאה בשמירת עסקה:', result.error);
+            handleSaveError(new Error(result.error), 'שמירת עסקה');
             
             // טיפול בשגיאות וולידציה מהשרת
             let errorMessage = 'שגיאה בשמירת עסקה';
@@ -968,16 +950,7 @@ async function saveExecution() {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בשמירת עסקה:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'שגיאה בשמירת עסקה');
-        } else {
-            if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', 'שגיאה בשמירת עסקה');
-            } else {
-                console.error('שגיאה בשמירת עסקה');
-            }
-        }
+        handleSaveError(error, 'שמירת עסקה');
     }
 }
 
@@ -998,29 +971,13 @@ async function updateExecution() {
 
     // בדיקת ולידציה
     if (!validateCompleteExecutionForm('edit')) {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'יש לתקן את השגיאות בטופס');
-        } else {
-            if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'יש לתקן את השגיאות בטופס');
-        } else {
-            console.error('יש לתקן את השגיאות בטופס');
-        }
-        }
+        handleValidationError('editExecutionForm', 'יש לתקן את השגיאות בטופס');
         return;
     }
 
     // בדיקת ערך action
     if (!type || (type !== 'buy' && type !== 'sale')) {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'יש לבחור פעולה תקינה (קניה או מכירה)');
-        } else {
-            if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'יש לבחור פעולה תקינה (קניה או מכירה)');
-        } else {
-            console.error('יש לבחור פעולה תקינה (קניה או מכירה)');
-        }
-        }
+        handleValidationError('editExecutionType', 'יש לבחור פעולה תקינה (קניה או מכירה)');
         return;
     }
 
@@ -1029,15 +986,7 @@ async function updateExecution() {
     if (tradeIdValue) {
         tradeId = parseInt(tradeIdValue);
         if (isNaN(tradeId) || tradeId < 0) {
-            if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', 'מזהה טרייד לא תקין');
-            } else {
-                if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'מזהה טרייד לא תקין');
-        } else {
-            console.error('מזהה טרייד לא תקין');
-        }
-            }
+            handleValidationError('editExecutionTradeId', 'מזהה טרייד לא תקין');
             return;
         }
     }
@@ -1082,8 +1031,7 @@ async function updateExecution() {
                 console.log('🔧 Calling showSuccessNotification with:', 'הצלחה', 'עסקה עודכנה בהצלחה במערכת');
                 window.showSuccessNotification('הצלחה', 'עסקה עודכנה בהצלחה במערכת');
             } else {
-                console.error('❌ showSuccessNotification not available');
-                console.log('עסקה עודכנה בהצלחה במערכת');
+                handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
             }
 
             // רענון הנתונים
@@ -1091,7 +1039,7 @@ async function updateExecution() {
 
         } else {
             const result = await response.json();
-            console.error('❌ שגיאה בעדכון עסקה:', result.error);
+            handleSaveError(new Error(result.error), 'עדכון עסקה');
             
             // טיפול בשגיאות וולידציה מהשרת
             if (result.error && result.error.message) {
@@ -1150,16 +1098,7 @@ async function updateExecution() {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בעדכון עסקה:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'שגיאה בעדכון עסקה');
-        } else {
-            if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', 'שגיאה בעדכון עסקה');
-            } else {
-                console.error('שגיאה בעדכון עסקה');
-            }
-        }
+        handleSaveError(error, 'עדכון עסקה');
     }
 }
 
@@ -1199,8 +1138,7 @@ async function confirmDeleteExecution(id) {
                 console.log('🔧 Calling showSuccessNotification with:', 'הצלחה', 'עסקה נמחקה בהצלחה מהמערכת');
                 window.showSuccessNotification('הצלחה', 'עסקה נמחקה בהצלחה מהמערכת');
             } else {
-                console.error('❌ showSuccessNotification not available');
-                console.log('עסקה נמחקה בהצלחה מהמערכת');
+                handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
             }
 
             // רענון הנתונים
@@ -1208,7 +1146,7 @@ async function confirmDeleteExecution(id) {
 
         } else {
             const errorResponse = await response.text();
-            console.error('❌ שגיאה במחיקת עסקה:', errorResponse);
+            handleDeleteError(new Error(errorResponse), 'עסקה');
 
             try {
                 const errorData = JSON.parse(errorResponse);
@@ -1225,38 +1163,15 @@ async function confirmDeleteExecution(id) {
                     return;
                 }
 
-                if (typeof window.showErrorNotification === 'function') {
-                    window.showErrorNotification('שגיאה', 'שגיאה במחיקת עסקה: ' + errorData.error.message);
-                } else {
-                    if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', 'שגיאה במחיקת עסקה: ' + errorData.error.message);
-            } else {
-                console.error('שגיאה במחיקת עסקה: ' + errorData.error.message);
-            }
-                }
+                handleDeleteError(new Error(errorData.error.message), 'עסקה');
 
             } catch (parseError) {
-                if (typeof window.showErrorNotification === 'function') {
-                    window.showErrorNotification('שגיאה', 'שגיאה במחיקת עסקה: ' + errorResponse);
-                } else {
-                    if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', 'שגיאה במחיקת עסקה: ' + errorResponse);
-            } else {
-                console.error('שגיאה במחיקת עסקה: ' + errorResponse);
-            }
-                }
+                handleDeleteError(new Error(errorResponse), 'עסקה');
             }
         }
 
     } catch (error) {
-        console.error('❌ שגיאה במחיקת עסקה:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            const errorMessage = error.message || 'שגיאה לא ידועה';
-            const errorDetails = error.response ? `סטטוס: ${error.response.status}` : '';
-            window.showErrorNotification('שגיאה במחיקת עסקה', `${errorMessage} ${errorDetails}`);
-        } else {
-            console.error('שגיאה במחיקת עסקה');
-        }
+        handleDeleteError(error, 'עסקה');
     }
 }
 
@@ -1274,11 +1189,7 @@ async function showExecutionLinkedItemsModal(executionId, errorData) {
     // מציאת העסקה לפי ID
     const execution = executionsData.find(e => e.id == executionId);
     if (!execution) {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'עסקה לא נמצאה');
-        } else {
-            console.error('עסקה לא נמצאה');
-        }
+        handleElementNotFound('execution', 'CRITICAL');
         return;
     }
 
@@ -1304,21 +1215,11 @@ async function showExecutionLinkedItemsModal(executionId, errorData) {
             // קריאה לפונקציה הגלובלית
             window.showLinkedItemsModal(enhancedData, 'execution', executionId);
         } else {
-            console.error('❌ showLinkedItemsModal function not found');
-            if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', 'פונקציה להצגת פריטים מקושרים לא זמינה');
-            } else {
-                console.error('פונקציה להצגת פריטים מקושרים לא זמינה');
-            }
+            handleFunctionNotFound('showLinkedItemsModal', 'CRITICAL');
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בטעינת נתונים מקושרים:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים מקושרים');
-        } else {
-            console.error('שגיאה בטעינת נתונים מקושרים');
-        }
+        handleDataLoadError(error, 'נתונים מקושרים');
     }
 }
 
@@ -1347,7 +1248,7 @@ async function loadLinkedItemsDetails(executionId, errorData = null) {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בטעינת פריטים מקושרים:', error);
+        handleDataLoadError(error, 'פריטים מקושרים');
         // אם יש שגיאה, ננסה לטעון מכל ה-APIs
         await loadLinkedItemsFromMultipleSources(executionId);
     }
@@ -1422,7 +1323,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
         displayLinkedItems(linkedItems);
 
     } catch (error) {
-        console.error('❌ שגיאה בטעינת פריטים מקושרים:', error);
+        handleDataLoadError(error, 'פריטים מקושרים');
         document.getElementById('linkedItemsContent').innerHTML =
             '<div class="alert alert-danger">שגיאה בטעינת פרטי הפריטים המקושרים</div>';
     }
@@ -1685,21 +1586,12 @@ async function loadExecutionsData() {
 
         } else {
             const errorText = await response.text();
-            console.error('❌ שגיאה בטעינת עסקעות:', response.status, errorText);
-            if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה בטעינת נתונים', `סטטוס: ${response.status} - ${errorText}`);
-            } else {
-                console.error('שגיאה בטעינת נתונים');
-            }
+            handleDataLoadError(new Error(`סטטוס: ${response.status} - ${errorText}`), 'עסקעות');
+            handleDataLoadError(new Error(`סטטוס: ${response.status} - ${errorText}`), 'עסקעות');
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בטעינת עסקעות:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בטעינת נתונים', error.message || 'שגיאה לא ידועה');
-        } else {
-            console.error('שגיאה בטעינת נתונים');
-        }
+        handleDataLoadError(error, 'עסקעות');
     }
 }
 
@@ -2003,7 +1895,7 @@ window.toggleTopSection = function() {
     if (typeof window.toggleTopSectionGlobal === 'function') {
         window.toggleTopSectionGlobal();
     } else {
-        console.error('❌ toggleTopSectionGlobal function not found in main.js');
+        handleFunctionNotFound('toggleTopSectionGlobal');
     }
 };
 
@@ -2063,7 +1955,7 @@ function sortTable(columnIndex) {
             updateExecutionsTableMain
         );
     } else {
-        console.error('❌ sortTable function not found in main.js');
+        handleFunctionNotFound('sortTable');
     }
 }
 
@@ -2077,7 +1969,7 @@ function restoreSortState() {
     if (typeof window.restoreAnyTableSort === 'function') {
         window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
     } else {
-        console.error('❌ restoreAnyTableSort function not found in main.js');
+        handleFunctionNotFound('restoreAnyTableSort');
     }
 }
 
@@ -2151,14 +2043,14 @@ async function loadTickersWithOpenOrClosedTradesAndPlans() {
         window.tickerService.updateTickerSelect('editExecutionTicker', tickersToShow);
 
     } catch (error) {
-        console.error('❌ Error loading tickers with open or closed trades and plans:', error);
+        handleDataLoadError(error, 'טיקרים עם טריידים ותכנונים');
         // Fallback - טעינת כל הטיקרים
         try {
             const allTickers = await window.tickerService.getTickers();
             window.tickerService.updateTickerSelect('addExecutionTicker', allTickers);
             window.tickerService.updateTickerSelect('editExecutionTicker', allTickers);
         } catch (fallbackError) {
-            console.error('❌ Fallback also failed:', fallbackError);
+            handleDataLoadError(fallbackError, 'טיקרים (גיבוי)');
         }
     }
 }
@@ -2308,7 +2200,7 @@ async function loadActiveTradesForTicker(mode = 'add') {
         }
 
     } catch (error) {
-        console.error('❌ Error loading trades and plans for ticker:', error);
+        handleDataLoadError(error, 'טריידים ותכנונים לטיקר');
     }
 }
 
@@ -2340,7 +2232,7 @@ async function loadTickersWithClosedTrades() {
 
         return allTickers;
     } catch (error) {
-        console.error('❌ Error loading tickers with closed trades:', error);
+        handleDataLoadError(error, 'טיקרים עם טריידים סגורים');
         return [];
     }
 }
@@ -2415,7 +2307,7 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
         }
 
     } catch (error) {
-        console.error('❌ Error updating trades on checkbox change:', error);
+        handleDataLoadError(error, 'עדכון טריידים לפי צ\'קבוקס');
     }
 }
 
@@ -2446,11 +2338,11 @@ async function getTickers() {
             console.log('✅ Retrieved', tickers.length, 'tickers from server');
             return tickers;
         } else {
-            console.error('❌ Failed to fetch tickers:', response.status);
+            handleApiError(new Error(`Failed to fetch tickers: ${response.status}`), 'FETCH_TICKERS');
             return [];
         }
     } catch (error) {
-        console.error('❌ Error fetching tickers:', error);
+        handleApiError(error, 'FETCH_TICKERS');
         return [];
     }
 }
@@ -2661,7 +2553,7 @@ function goToLinkedTrade(mode = 'edit') {
         // מעבר לדף הטריידים
         window.location.href = `/trades?highlight=${tradeId}`;
     } else {
-        console.error('❌ No trade ID found');
+        handleElementNotFound('trade ID', 'CRITICAL');
     }
 }
 
@@ -2719,7 +2611,7 @@ function loadTradeExecutions(tradeId) {
         console.log('ℹ️ loadTradeExecutions called on executions page - no action needed');
         console.log('✅ loadTradeExecutions completed successfully');
     } catch (error) {
-        console.error('❌ Error in loadTradeExecutions:', error);
+        handleDataLoadError(error, 'עסקאות לטרייד');
     }
 }
 
@@ -2951,7 +2843,7 @@ function setupExecutionsFilterFunctions() {
           applyAccountFilterWithTradesData(namesArray);
         })
         .catch(error => {
-          console.error('❌ Error loading trades for account filter:', error);
+          handleDataLoadError(error, 'טריידים לפילטר חשבון');
           // Fallback - הצגת כל הביצועים
           filteredExecutions = [...allExecutions];
           updateExecutionsTableMain(filteredExecutions);
@@ -3114,7 +3006,7 @@ window.loadExecutionsData = async function() {
       tradesData = data.data || [];
       console.log('✅ Loaded trades data for account filter:', tradesData.length, 'trades');
     } catch (error) {
-      console.error('❌ Error loading trades data:', error);
+      handleDataLoadError(error, 'נתוני טריידים');
       tradesData = [];
     }
     

@@ -4443,6 +4443,7 @@ async function getCurrentPreference(key) {
   } catch (error) {
     console.error(`❌ שגיאה בקבלת הגדרה ${key}:`, error);
     return null;
+  }
 }
 
 /**

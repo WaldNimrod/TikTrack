@@ -46,7 +46,7 @@ let cashFlowsData = window.cashFlowsData;
  * פונקציה לפתיחה/סגירה של סקשן תזרימי מזומנים
  */
 function toggleCashFlowsSection() {
-    // toggleCashFlowsSection נקראה
+    console.log('🔄 toggleCashFlowsSection נקראה');
     
     const cashFlowsSection = document.querySelector('.cash-flows-section');
     if (!cashFlowsSection) {
@@ -88,7 +88,7 @@ function toggleCashFlowsSection() {
 
 // פונקציות לשחזור מצב הסגירה
 function restoreCashFlowsSectionState() {
-    // restoreCashFlowsSectionState נקראה
+    console.log('🔄 restoreCashFlowsSectionState נקראה');
     
     const savedState = localStorage.getItem('cashFlowsSectionState');
     if (!savedState) {

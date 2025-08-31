@@ -3182,8 +3182,7 @@ function selectDateRangeOption(dateRange) {
 // Supported containers for filtering
 const SUPPORTED_CONTAINERS = [
   'tradesContainer',
-  'tradePlansContainer',
-  'trade_plansContainer', 
+  'tradePlansContainer', 
   'accountsContainer',
   'alertsContainer',
   'cashFlowsContainer',
@@ -3202,7 +3201,7 @@ const FILTER_COLUMNS = {
 };
 
 // Tables that support type filter
-const TYPE_FILTER_TABLES = ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer'];
+const TYPE_FILTER_TABLES = ['tradesContainer', 'tradePlansContainer'];
 
 /**
  * Simple filter application function
@@ -3307,25 +3306,11 @@ function checkRowFilter(row, filterType, selectedValue) {
   
   const cellValue = cell.textContent.trim();
   
-  // Check data attributes first (for original values)
-  const dataAttribute = `data-${filterType}`;
-  const originalValue = cell.getAttribute(dataAttribute);
-  
   // Apply filter logic
   switch (filterType) {
     case 'status':
-      // Check both original value and displayed value
-      if (originalValue) {
-        return originalValue.toLowerCase() === selectedValue.toLowerCase() || 
-               cellValue === selectedValue;
-      }
       return cellValue === selectedValue;
     case 'type':
-      // Check both original value and displayed value
-      if (originalValue) {
-        return originalValue.toLowerCase() === selectedValue.toLowerCase() || 
-               cellValue === selectedValue;
-      }
       return cellValue === selectedValue;
     case 'account':
       return cellValue === selectedValue;
@@ -3348,30 +3333,10 @@ function getColumnIndex(row, filterType) {
   
   if (!columnName) return -1;
   
-  // Define Hebrew translations for column names
-  const hebrewTranslations = {
-    'Status': ['סטטוס', 'Status'],
-    'Investment Type': ['סוג השקעה', 'Investment Type'],
-    'Account': ['חשבון', 'Account'],
-    'Date': ['תאריך', 'Date']
-  };
-  
   for (let i = 0; i < headers.length; i++) {
     const headerText = headers[i].textContent.trim();
-    
-    // Check exact match first
     if (headerText.includes(columnName)) {
       return i;
-    }
-    
-    // Check Hebrew translations
-    const translations = hebrewTranslations[columnName];
-    if (translations) {
-      for (const translation of translations) {
-        if (headerText.includes(translation)) {
-          return i;
-        }
-      }
     }
   }
   
@@ -3801,14 +3766,14 @@ function getFilterConfig(filterType) {
     'status': {
       columnName: 'Status',
       containerIdKeywords: ['status', 'Status'],
-      knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
+      knownContainers: ['tradesContainer', 'tradePlansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
       cellValues: ['Open', 'Closed', 'Cancelled'],
       dataField: 'status'
     },
     'type': {
       columnName: 'Investment Type',
       containerIdKeywords: ['type', 'Type', 'investment'],
-      knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer'],
+      knownContainers: ['tradesContainer', 'tradePlansContainer'],
       cellValues: ['Investment', 'Swing', 'Passive'],
       dataField: 'investment-type'
     },
@@ -3830,7 +3795,7 @@ function getFilterConfig(filterType) {
     'search': {
       columnName: 'search',
       containerIdKeywords: ['search', 'search'],
-      knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
+      knownContainers: ['tradesContainer', 'tradePlansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
       cellValues: [],
       dataField: 'search',
       searchAllColumns: true,
@@ -3944,21 +3909,10 @@ function checkRowFilterWithConfig(row, filterConfig, selectedValues) {
   
   const cellValue = cell.textContent.trim();
   
-  // Check data attributes for original values
-  const dataField = filterConfig.dataField;
-  const originalValue = cell.getAttribute(`data-${dataField}`);
-  
   // Apply filter logic
   if (filterConfig.columnName === 'Date') {
     return checkDateFilter(cellValue, selectedValues[0]);
   } else {
-    // Check both original value and displayed value
-    if (originalValue) {
-      return selectedValues.some(value => 
-        originalValue.toLowerCase() === value.toLowerCase() || 
-        cellValue === value
-      );
-    }
     return selectedValues.includes(cellValue);
   }
 }
@@ -3973,30 +3927,10 @@ function getColumnIndexByConfig(row, filterConfig) {
   const headers = table.querySelectorAll('th');
   const columnName = filterConfig.columnName;
   
-  // Define Hebrew translations for column names
-  const hebrewTranslations = {
-    'Status': ['סטטוס', 'Status'],
-    'Investment Type': ['סוג השקעה', 'Investment Type'],
-    'Account': ['חשבון', 'Account'],
-    'Date': ['תאריך', 'Date']
-  };
-  
   for (let i = 0; i < headers.length; i++) {
     const headerText = headers[i].textContent.trim();
-    
-    // Check exact match first
     if (headerText.includes(columnName)) {
       return i;
-    }
-    
-    // Check Hebrew translations
-    const translations = hebrewTranslations[columnName];
-    if (translations) {
-      for (const translation of translations) {
-        if (headerText.includes(translation)) {
-          return i;
-        }
-      }
     }
   }
   
@@ -4004,32 +3938,6 @@ function getColumnIndexByConfig(row, filterConfig) {
 }
 
 window.applyFilterToTable = applyFilterToTable;
-
-/**
- * Search in all columns of a table
- */
-function searchInAllColumns(row, searchTerm, excludeColumns = []) {
-  if (!searchTerm) return true;
-  
-  const cells = row.querySelectorAll('td');
-  for (let i = 0; i < cells.length; i++) {
-    const cell = cells[i];
-    const header = cell.closest('table').querySelectorAll('th')[i];
-    
-    if (header && excludeColumns.includes(header.textContent.trim())) {
-      continue; // Skip excluded columns
-    }
-    
-    const cellText = cell.textContent.toLowerCase();
-    if (cellText.includes(searchTerm.toLowerCase())) {
-      return true;
-    }
-  }
-  
-  return false;
-}
-
-window.searchInAllColumns = searchInAllColumns;
 
 /**
  * פילטר התראות לפי טיפוס (לשמירה על תאימות לאחור)
@@ -4443,6 +4351,7 @@ async function getCurrentPreference(key) {
   } catch (error) {
     console.error(`❌ שגיאה בקבלת הגדרה ${key}:`, error);
     return null;
+  }
 }
 
 /**
@@ -4507,6 +4416,7 @@ function updateAccountFilterDisplayText() {
     // פונקציה זמנית - תוסיף לוגיקה בהמשך
     console.log('🔄 עדכון טקסט פילטר חשבונות');
 }
+
 // ייצוא הפונקציות
 window.getCurrentPreference = getCurrentPreference;
 window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;

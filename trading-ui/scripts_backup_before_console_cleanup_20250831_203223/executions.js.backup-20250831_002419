@@ -21,10 +21,7 @@
  * Last Updated: August 23, 2025
  */
 
-// ייצוא מוקדם של הפונקציה למניעת שגיאות
-window.loadExecutionsData = window.loadExecutionsData || function() {
-    console.warn('⚠️ loadExecutionsData not yet defined, using placeholder');
-};
+
 
 // משתנים גלובליים
 if (!window.executionsData) {
@@ -50,19 +47,19 @@ function editExecution(id) {
 }
 
 function deleteExecution(id) {
-    // deleteExecution called with id
-    // window.showDeleteWarning exists check
+    console.log('🔧 deleteExecution called with id:', id);
+    console.log('🔧 window.showDeleteWarning exists:', typeof window.showDeleteWarning === 'function');
     
     // שימוש במערכת הגלובלית למחיקה
     if (typeof window.showDeleteWarning === 'function') {
-        // Using global showDeleteWarning
+        console.log('🔧 Using global showDeleteWarning');
         window.showDeleteWarning('executions', id, 'עסקה', async () => {
-            // Delete confirmed, calling confirmDeleteExecution
+            console.log('🔧 Delete confirmed, calling confirmDeleteExecution');
             // קריאה לפונקציה המקומית לאחר אישור
             await confirmDeleteExecution(id);
         }, null);
     } else {
-        // Using fallback - global system not available
+        console.log('🔧 Using fallback - global system not available');
         // גיבוי למקרה שהמערכת הגלובלית לא זמינה
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מערכת מחיקה לא זמינה');
@@ -73,6 +70,26 @@ function deleteExecution(id) {
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים - שימוש במערכת הכללית
+function toggleExecutionsSection() {
+  // שימוש במערכת הכללית מ-main.js
+  if (typeof window.toggleMainSection === 'function') {
+    window.toggleMainSection();
+  } else {
+    console.error('❌ toggleMainSection function not found in main.js');
+  }
+}
+
+// פונקציה לשחזור מצב הסגירה - שימוש במערכת הכללית
+function restoreExecutionsSectionState() {
+    // שימוש במערכת הכללית מ-main.js
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    } else {
+        console.error('❌ restoreAllSectionStates function not found in main.js');
+    }
+}
+
+// פונקציות נוספות
 
 // ========================================
 // פונקציות מודלים
@@ -1175,8 +1192,15 @@ async function confirmDeleteExecution(id) {
         console.log('🔧 Got id from form:', id);
     }
 
-    // ביצועים לא צריכים בדיקת מקושרים - אין להם ילדים
-    console.log('🔧 Executions do not require linked items check - no children');
+    // בדיקת פריטים מקושרים לפני מחיקה
+    if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
+        console.log('🔧 Checking linked items before delete');
+        const hasLinkedItems = await window.checkLinkedItemsBeforeDelete('executions', id);
+        if (hasLinkedItems) {
+            console.log('🔧 Has linked items, returning');
+            return; // הפונקציה הגלובלית תטפל בהצגת המודל
+        }
+    }
 
     try {
         console.log('🔧 Making DELETE request to:', `/api/v1/executions/${id}`);
@@ -1710,7 +1734,7 @@ async function updateExecutionsTableMain(executions) {
     const table = document.querySelector('#executionsTable');
     const tbody = document.querySelector('#executionsTable tbody');
     if (!tbody) {
-        console.warn('⚠️ executionsTable tbody not found - this is expected on trades page');
+        console.error('❌ executionsTable tbody not found');
         return;
     }
 
@@ -1818,7 +1842,7 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${(execution.date || execution.execution_date) ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="actions-cell">
-                    <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'execution', ${execution.id})" title="פריטים מקושרים">🔗</button>
+                    <button class="btn btn-sm btn-info" onclick="showLinkedItemsWarning('execution', ${execution.id})" title="פריטים מקושרים">🔗</button>
                     <button class="btn btn-sm btn-secondary" onclick="editExecution(${execution.id})" title="ערוך">✏️</button>
                     <button class="btn btn-sm btn-danger" onclick="deleteExecution(${execution.id})" title="מחק">🗑️</button>
                 </td>
@@ -2513,28 +2537,14 @@ function addNewTrade() {
 function updateExecutionsSummary(executions) {
     console.log('🔄 עדכון סיכום נתונים לעסקעות');
 
-    // בדיקה אם האלמנטים קיימים בדף
-    const totalExecutionsElement = document.getElementById('totalExecutions');
-    const totalBuyExecutionsElement = document.getElementById('totalBuyExecutions');
-    const totalSellExecutionsElement = document.getElementById('totalSellExecutions');
-    const totalBuyAmountElement = document.getElementById('totalBuyAmount');
-    const totalSellAmountElement = document.getElementById('totalSellAmount');
-    const balanceAmountElement = document.getElementById('balanceAmount');
-
-    if (!totalExecutionsElement || !totalBuyExecutionsElement || !totalSellExecutionsElement || 
-        !totalBuyAmountElement || !totalSellAmountElement || !balanceAmountElement) {
-        console.warn('⚠️ Executions summary elements not found - this is expected on trades page');
-        return;
-    }
-
     if (!executions || executions.length === 0) {
         // איפוס ערכים
-        totalExecutionsElement.textContent = '0';
-        totalBuyExecutionsElement.textContent = '0';
-        totalSellExecutionsElement.textContent = '0';
-        totalBuyAmountElement.textContent = '$0';
-        totalSellAmountElement.textContent = '$0';
-        balanceAmountElement.textContent = '$0';
+        document.getElementById('totalExecutions').textContent = '0';
+        document.getElementById('totalBuyExecutions').textContent = '0';
+        document.getElementById('totalSellExecutions').textContent = '0';
+        document.getElementById('totalBuyAmount').textContent = '$0';
+        document.getElementById('totalSellAmount').textContent = '$0';
+        document.getElementById('balanceAmount').textContent = '$0';
         return;
     }
 
@@ -2565,14 +2575,14 @@ function updateExecutionsSummary(executions) {
     const balance = totalSellAmount - totalBuyAmount;
 
     // עדכון ה-DOM עם פורמט מספרים
-    totalExecutionsElement.textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalExecutions) : totalExecutions.toLocaleString('he-IL');
-    totalBuyExecutionsElement.textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalBuyExecutions) : totalBuyExecutions.toLocaleString('he-IL');
-    totalSellExecutionsElement.textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalSellExecutions) : totalSellExecutions.toLocaleString('he-IL');
-    totalBuyAmountElement.textContent = window.formatCurrencyWithCommas ? window.formatCurrencyWithCommas(totalBuyAmount) : `$${totalBuyAmount.toFixed(2)}`;
-    totalSellAmountElement.textContent = window.formatCurrencyWithCommas ? window.formatCurrencyWithCommas(totalSellAmount) : `$${totalSellAmount.toFixed(2)}`;
+    document.getElementById('totalExecutions').textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalExecutions) : totalExecutions.toLocaleString('he-IL');
+    document.getElementById('totalBuyExecutions').textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalBuyExecutions) : totalBuyExecutions.toLocaleString('he-IL');
+    document.getElementById('totalSellExecutions').textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalSellExecutions) : totalSellExecutions.toLocaleString('he-IL');
+    document.getElementById('totalBuyAmount').textContent = window.formatCurrencyWithCommas ? window.formatCurrencyWithCommas(totalBuyAmount) : `$${totalBuyAmount.toFixed(2)}`;
+    document.getElementById('totalSellAmount').textContent = window.formatCurrencyWithCommas ? window.formatCurrencyWithCommas(totalSellAmount) : `$${totalSellAmount.toFixed(2)}`;
 
     // שימוש בפונקציה הכללית לצביעה
-    const balanceElement = balanceAmountElement;
+    const balanceElement = document.getElementById('balanceAmount');
 
     // צביעה ידנית
     balanceElement.textContent = `$${balance.toFixed(2)}`;
@@ -2910,15 +2920,12 @@ console.log('✅ Execution functions loaded:', {
 function setupExecutionsFilterFunctions() {
   console.log('🔄 Setting up executions filter functions...');
   
-  // שימוש במערכת הפילטרים הגלובלית - לא מעבירים פונקציה, רק מתחברים למערכת
+  // שימוש במערכת הפילטרים הגלובלית
   if (typeof window.applyTableFilter === 'function') {
-    // רישום הפונקציות הגלובליות למערכת הפילטרים
-    window.executionsFilterFunctions = {
-      updateTable: function(filteredData) {
-        updateExecutionsTableMain(filteredData);
-        updateExecutionsSummary(filteredData);
-      }
-    };
+    window.applyTableFilter('executions', function(filteredData) {
+      updateExecutionsTableMain(filteredData);
+      updateExecutionsSummary(filteredData);
+    });
   }
   
   // פונקציה לפילטר חשבון
@@ -3012,72 +3019,6 @@ function setupExecutionsFilterFunctions() {
     console.log('✅ Search results:', filteredExecutions.length, 'executions');
   };
   
-  // פונקציה לפילטר לפי סוג עסקה
-  window.filterExecutionsByType = function(types) {
-    console.log('🔄 Filtering executions by type:', types);
-    
-    const typesArray = Array.isArray(types) ? types : [types];
-    
-    if (typesArray.length === 0 || typesArray.includes('all') || typesArray.includes('הכול')) {
-      filteredExecutions = [...originalExecutions];
-    } else {
-      filteredExecutions = originalExecutions.filter(execution => {
-        const executionType = execution.action || execution.type || '';
-        return typesArray.some(type => 
-          executionType.toLowerCase().includes(type.toLowerCase()) ||
-          (type === 'קנייה' && executionType.toLowerCase().includes('buy')) ||
-          (type === 'מכירה' && executionType.toLowerCase().includes('sell'))
-        );
-      });
-    }
-    
-    updateExecutionsTableMain(filteredExecutions);
-    updateExecutionsSummary(filteredExecutions);
-    console.log('✅ Filtered by type:', filteredExecutions.length, 'executions');
-  };
-  
-  // פונקציה לפילטר לפי תאריך
-  window.filterExecutionsByDate = function(dateRange) {
-    console.log('🔄 Filtering executions by date range:', dateRange);
-    
-    if (!dateRange || dateRange === 'all' || dateRange === 'הכול') {
-      filteredExecutions = [...originalExecutions];
-    } else {
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      filteredExecutions = originalExecutions.filter(execution => {
-        const executionDate = new Date(execution.execution_date || execution.created_at);
-        
-        switch (dateRange) {
-          case 'today':
-          case 'היום':
-            return executionDate.toDateString() === today.toDateString();
-          case 'yesterday':
-          case 'אתמול':
-            return executionDate.toDateString() === yesterday.toDateString();
-          case 'week':
-          case 'שבוע':
-            const weekAgo = new Date(today);
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            return executionDate >= weekAgo;
-          case 'month':
-          case 'חודש':
-            const monthAgo = new Date(today);
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            return executionDate >= monthAgo;
-          default:
-            return true;
-        }
-      });
-    }
-    
-    updateExecutionsTableMain(filteredExecutions);
-    updateExecutionsSummary(filteredExecutions);
-    console.log('✅ Filtered by date:', filteredExecutions.length, 'executions');
-  };
-  
   // פונקציה לאיפוס פילטרים
   window.resetExecutionsFilters = function() {
     console.log('🔄 Resetting executions filters');
@@ -3099,7 +3040,7 @@ function updateExecutionsGlobalData(executions) {
 }
 
 // עדכון הפונקציה הקיימת loadExecutionsData
-const originalLoadExecutionsData = window.loadExecutionsData || loadExecutionsData;
+const originalLoadExecutionsData = window.loadExecutionsData;
 window.loadExecutionsData = async function() {
   await originalLoadExecutionsData();
   
@@ -3162,6 +3103,3 @@ function getFieldIdFromError(errorMessage, prefix) {
     
     return null;
 }
-
-// ייצוא הפונקציה הגלובלית
-window.loadExecutionsData = loadExecutionsData;

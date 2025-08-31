@@ -54,7 +54,12 @@ async function loadCurrenciesData() {
             throw new Error(result.error?.message || 'שגיאה בטעינת מטבעות');
         }
     } catch (error) {
-        handleDataLoadError(error, 'מטבעות');
+        console.error('❌ שגיאה בטעינת מטבעות:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני מטבעות');
+        } else {
+            console.error('❌ Error loading currencies data');
+        }
     }
 }
 
@@ -62,7 +67,7 @@ async function loadCurrenciesData() {
 function updateCurrenciesTable(currencies) {
     const tbody = document.querySelector('#currenciesTable tbody');
     if (!tbody) {
-        handleElementNotFound('#currenciesTable tbody', 'CRITICAL');
+        console.error('❌ לא נמצא tbody לטבלת מטבעות');
         return;
     }
 
@@ -153,7 +158,12 @@ async function loadNoteRelationTypesData() {
             throw new Error(result.error?.message || 'שגיאה בטעינת סוגי קישור');
         }
     } catch (error) {
-        handleDataLoadError(error, 'סוגי קישור');
+        console.error('❌ שגיאה בטעינת סוגי קישור:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני סוגי קישור');
+        } else {
+            console.error('❌ Error loading note relation types data');
+        }
     }
 }
 
@@ -161,7 +171,7 @@ async function loadNoteRelationTypesData() {
 function updateNoteRelationTypesTable(noteRelationTypes) {
     const tbody = document.querySelector('#noteRelationTypesTable tbody');
     if (!tbody) {
-        handleElementNotFound('#noteRelationTypesTable tbody', 'CRITICAL');
+        console.error('❌ לא נמצא tbody לטבלת סוגי קישור');
         return;
     }
 
@@ -227,6 +237,8 @@ function updateNoteRelationTypesCount(count) {
 async function loadTriggerButtonsData() {
     try {
         // כרגע אין API לכפתורי טריגרים - נשתמש בנתונים ריקים
+        console.log('ℹ️ API לכפתורי טריגרים לא זמין - משתמש בנתונים ריקים');
+        
         triggerButtonsData = [];
         window.triggerButtonsData = [];
         updateTriggerButtonsTable([]);
@@ -234,13 +246,19 @@ async function loadTriggerButtonsData() {
         
         // נטענו כפתורי טריגרים (ריקים)
     } catch (error) {
-        handleDataLoadError(error, 'כפתורי טריגרים');
+        console.error('❌ שגיאה בטעינת כפתורי טריגרים:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני כפתורי טריגרים');
+        } else {
+            console.error('❌ Error loading trigger buttons data');
+        }
     }
 }
 
 // פונקציה לעדכון טבלת כפתורי טריגרים
 function updateTriggerButtonsTable(triggerButtons) {
     // כרגע לא צריך לעדכן טבלה כי השתמשנו בכרטיסים סטטיים
+    console.log('ℹ️ כרטיסי כפתורי טריגרים מוצגים סטטית - לא נדרש עדכון');
     return;
 }
 
@@ -306,11 +324,18 @@ function updateLoadingText() {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-    // שחזור מצב הסגירה של הסקשנים
-    if (typeof window.restoreDbExtradataSectionState === 'function') {
-        window.restoreDbExtradataSectionState();
+    // שחזור מצב הסגירה של הסקשן העליון
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
     } else {
-        handleFunctionNotFound('restoreDbExtradataSectionState');
+        console.warn('⚠️ restoreAllSectionStates function not available globally');
+    }
+
+    // שחזור מצב הסגירה של הסקשנים הפנימיים
+    if (typeof window.restoreSectionStates === 'function') {
+        window.restoreSectionStates();
+    } else {
+        console.warn('⚠️ restoreSectionStates function not available globally');
     }
 
     // עדכון טקסט טעינה
@@ -321,6 +346,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ===== פונקציות וולידציה =====
+
+
+
+
 
 // ===== פונקציות CRUD למטבעות (Currencies) =====
 
@@ -447,11 +476,20 @@ function showEditCurrencyModal(id) {
                 const currency = result.data;
                 showEditCurrencyModalWithData(currency);
             } else {
-                handleDataLoadError(new Error('שגיאה בטעינת נתוני המטבע'), 'נתוני המטבע');
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני המטבע');
+                } else {
+                    console.error('שגיאה בטעינת נתוני המטבע');
+                }
             }
         })
         .catch(error => {
-            handleDataLoadError(error, 'נתוני המטבע');
+            console.error('Error loading currency:', error);
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני המטבע');
+            } else {
+                console.error('שגיאה בטעינת נתוני המטבע');
+            }
         });
 }
 
@@ -577,7 +615,11 @@ function showDeleteCurrencyModal(id) {
 async function saveCurrencyRecord() {
     // וולידציה של הטופס באמצעות הפונקציה הכללית
     if (!validateForm('addCurrencyForm')) {
-        handleValidationError('addCurrencyForm', 'יש לתקן שגיאות בטופס לפני השמירה');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני השמירה');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני השמירה');
+        }
         return;
     }
 
@@ -605,7 +647,8 @@ async function saveCurrencyRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `מטבע ${currencyData.symbol} נוסף בהצלחה למערכת`);
             } else {
-                }
+                console.log('מטבע נוסף בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('addCurrencyModal')).hide();
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
@@ -624,13 +667,18 @@ async function saveCurrencyRecord() {
             }
 
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', errorMessage);
+                window.showErrorNotification(errorMessage, 'שגיאה');
             } else {
-                handleValidationError('addCurrencyForm', errorMessage);
+                console.error(errorMessage);
             }
         }
     } catch (error) {
-        handleSaveError(error, 'הוספת מטבע');
+        console.error('Error saving currency:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה בתקשורת עם השרת');
+        }
     }
 }
 
@@ -638,7 +686,11 @@ async function saveCurrencyRecord() {
 async function updateCurrencyRecord() {
     // וולידציה של הטופס באמצעות הפונקציה הכללית
     if (!validateForm('editCurrencyForm')) {
-        handleValidationError('editCurrencyForm', 'יש לתקן שגיאות בטופס לפני העדכון');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני העדכון');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני העדכון');
+        }
         return;
     }
 
@@ -667,7 +719,8 @@ async function updateCurrencyRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `מטבע ${currencyData.symbol} עודכן בהצלחה במערכת`);
             } else {
-                }
+                console.log('מטבע עודכן בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('editCurrencyModal')).hide();
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
@@ -688,13 +741,18 @@ async function updateCurrencyRecord() {
             }
 
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', errorMessage);
+                window.showErrorNotification(errorMessage, 'שגיאה');
             } else {
-                handleValidationError('editCurrencyForm', errorMessage);
+                console.error(errorMessage);
             }
         }
     } catch (error) {
-        handleSaveError(error, 'עדכון מטבע');
+        console.error('Error updating currency:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה בתקשורת עם השרת');
+        }
     }
 }
 
@@ -715,18 +773,24 @@ async function confirmDeleteCurrencyRecord(id) {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `מטבע ${currencyInfo} נמחק בהצלחה מהמערכת`);
             } else {
-                }
+                console.log('מטבע נמחק בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('deleteCurrencyModal')).hide();
             loadCurrenciesData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה במחיקת מטבע');
+                window.showErrorNotification(result.error?.message || 'שגיאה במחיקת מטבע', 'שגיאה');
             } else {
-                handleDeleteError(new Error(result.error?.message || 'שגיאה במחיקת מטבע'), 'מטבע');
+                console.error(result.error?.message || 'שגיאה במחיקת מטבע');
             }
         }
     } catch (error) {
-        handleDeleteError(error, 'מטבע');
+        console.error('Error deleting currency:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה במחיקת מטבע');
+        }
     }
 }
 
@@ -798,11 +862,20 @@ function showEditNoteRelationTypeModal(id) {
                 const noteType = result.data;
                 showEditNoteRelationTypeModalWithData(noteType);
             } else {
-                handleDataLoadError(new Error('שגיאה בטעינת נתוני סוג הקישור'), 'נתוני סוג הקישור');
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני סוג הקישור');
+                } else {
+                    console.error('שגיאה בטעינת נתוני סוג הקישור');
+                }
             }
         })
         .catch(error => {
-            handleDataLoadError(error, 'נתוני סוג הקישור');
+            console.error('Error loading note relation type:', error);
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני סוג הקישור');
+            } else {
+                console.error('שגיאה בטעינת נתוני סוג הקישור');
+            }
         });
 }
 
@@ -892,7 +965,11 @@ function showDeleteNoteRelationTypeModal(id) {
 async function saveNoteRelationTypeRecord() {
     // וולידציה של הטופס באמצעות הפונקציה הכללית
     if (!validateForm('addNoteRelationTypeForm')) {
-        handleValidationError('addNoteRelationTypeForm', 'יש לתקן שגיאות בטופס לפני השמירה');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני השמירה');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני השמירה');
+        }
         return;
     }
 
@@ -918,18 +995,24 @@ async function saveNoteRelationTypeRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeData.note_relation_type} נוסף בהצלחה למערכת`);
             } else {
-                }
+                console.log('סוג קישור נוסף בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('addNoteRelationTypeModal')).hide();
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה בהוספת סוג קישור');
+                window.showErrorNotification(result.error?.message || 'שגיאה בהוספת סוג קישור', 'שגיאה');
             } else {
-                handleSaveError(new Error(result.error?.message || 'שגיאה בהוספת סוג קישור'), 'הוספת סוג קישור');
+                console.error(result.error?.message || 'שגיאה בהוספת סוג קישור');
             }
         }
     } catch (error) {
-        handleSaveError(error, 'הוספת סוג קישור');
+        console.error('Error saving note relation type:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה בהוספת סוג קישור');
+        }
     }
 }
 
@@ -937,7 +1020,11 @@ async function saveNoteRelationTypeRecord() {
 async function updateNoteRelationTypeRecord() {
     // וולידציה של הטופס באמצעות הפונקציה הכללית
     if (!validateForm('editNoteRelationTypeForm')) {
-        handleValidationError('editNoteRelationTypeForm', 'יש לתקן שגיאות בטופס לפני העדכון');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני העדכון');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני העדכון');
+        }
         return;
     }
 
@@ -964,18 +1051,24 @@ async function updateNoteRelationTypeRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeData.note_relation_type} עודכן בהצלחה במערכת`);
             } else {
-                }
+                console.log('סוג קישור עודכן בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('editNoteRelationTypeModal')).hide();
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה בעדכון סוג קישור');
+                window.showErrorNotification(result.error?.message || 'שגיאה בעדכון סוג קישור', 'שגיאה');
             } else {
-                handleSaveError(new Error(result.error?.message || 'שגיאה בעדכון סוג קישור'), 'עדכון סוג קישור');
+                console.error(result.error?.message || 'שגיאה בעדכון סוג קישור');
             }
         }
     } catch (error) {
-        handleSaveError(error, 'עדכון סוג קישור');
+        console.error('Error updating note relation type:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה בעדכון סוג קישור');
+        }
     }
 }
 
@@ -996,18 +1089,24 @@ async function confirmDeleteNoteRelationTypeRecord(id) {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeInfo} נמחק בהצלחה מהמערכת`);
             } else {
-                }
+                console.log('סוג קישור נמחק בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('deleteNoteRelationTypeModal')).hide();
             loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה במחיקת סוג קישור');
+                window.showErrorNotification(result.error?.message || 'שגיאה במחיקת סוג קישור', 'שגיאה');
             } else {
-                handleDeleteError(new Error(result.error?.message || 'שגיאה במחיקת סוג קישור'), 'סוג קישור');
+                console.error(result.error?.message || 'שגיאה במחיקת סוג קישור');
             }
         }
     } catch (error) {
-        handleDeleteError(error, 'סוג קישור');
+        console.error('Error deleting note relation type:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה במחיקת סוג קישור');
+        }
     }
 }
 
@@ -1101,11 +1200,20 @@ function showEditTriggerButtonModal(id) {
                 const button = result.data;
                 showEditTriggerButtonModalWithData(button);
             } else {
-                handleDataLoadError(new Error('שגיאה בטעינת נתוני כפתור טריגר'), 'נתוני כפתור טריגר');
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני כפתור טריגר');
+                } else {
+                    console.error('שגיאה בטעינת נתוני כפתור טריגר');
+                }
             }
         })
         .catch(error => {
-            handleDataLoadError(error, 'נתוני כפתור טריגר');
+            console.error('Error loading trigger button:', error);
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני כפתור טריגר');
+            } else {
+                console.error('שגיאה בטעינת נתוני כפתור טריגר');
+            }
         });
 }
 
@@ -1217,7 +1325,11 @@ function showDeleteTriggerButtonModal(id) {
 async function saveTriggerButtonRecord() {
     // וולידציה של הטופס באמצעות הפונקציה הכללית
     if (!validateForm('addTriggerButtonForm')) {
-        handleValidationError('addTriggerButtonForm', 'יש לתקן שגיאות בטופס לפני השמירה');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני השמירה');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני השמירה');
+        }
         return;
     }
 
@@ -1246,18 +1358,24 @@ async function saveTriggerButtonRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonData.button_name} נוסף בהצלחה למערכת`);
             } else {
-                }
+                console.log('כפתור טריגר נוסף בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('addTriggerButtonModal')).hide();
             loadTriggerButtonsData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה בהוספת כפתור טריגר');
+                window.showErrorNotification(result.error?.message || 'שגיאה בהוספת כפתור טריגר', 'שגיאה');
             } else {
-                handleSaveError(new Error(result.error?.message || 'שגיאה בהוספת כפתור טריגר'), 'הוספת כפתור טריגר');
+                console.error(result.error?.message || 'שגיאה בהוספת כפתור טריגר');
             }
         }
     } catch (error) {
-        handleSaveError(error, 'הוספת כפתור טריגר');
+        console.error('Error saving trigger button:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה בהוספת כפתור טריגר');
+        }
     }
 }
 
@@ -1265,7 +1383,11 @@ async function saveTriggerButtonRecord() {
 async function updateTriggerButtonRecord() {
     // וולידציה של הטופס באמצעות הפונקציה הכללית
     if (!validateForm('editTriggerButtonForm')) {
-        handleValidationError('editTriggerButtonForm', 'יש לתקן שגיאות בטופס לפני העדכון');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'יש לתקן שגיאות בטופס לפני העדכון');
+        } else {
+            console.error('יש לתקן שגיאות בטופס לפני העדכון');
+        }
         return;
     }
 
@@ -1295,18 +1417,24 @@ async function updateTriggerButtonRecord() {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonData.button_name} עודכן בהצלחה במערכת`);
             } else {
-                }
+                console.log('כפתור טריגר עודכן בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('editTriggerButtonModal')).hide();
             loadTriggerButtonsData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה בעדכון כפתור טריגר');
+                window.showErrorNotification(result.error?.message || 'שגיאה בעדכון כפתור טריגר', 'שגיאה');
             } else {
-                handleSaveError(new Error(result.error?.message || 'שגיאה בעדכון כפתור טריגר'), 'עדכון כפתור טריגר');
+                console.error(result.error?.message || 'שגיאה בעדכון כפתור טריגר');
             }
         }
     } catch (error) {
-        handleSaveError(error, 'עדכון כפתור טריגר');
+        console.error('Error updating trigger button:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה בעדכון כפתור טריגר');
+        }
     }
 }
 
@@ -1327,18 +1455,24 @@ async function confirmDeleteTriggerButtonRecord(id) {
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonInfo} נמחק בהצלחה מהמערכת`);
             } else {
-                }
+                console.log('כפתור טריגר נמחק בהצלחה');
+            }
             bootstrap.Modal.getInstance(document.getElementById('deleteTriggerButtonModal')).hide();
             loadTriggerButtonsData(); // טעינה מחדש של הנתונים
         } else {
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', result.error?.message || 'שגיאה במחיקת כפתור טריגר');
+                window.showErrorNotification(result.error?.message || 'שגיאה במחיקת כפתור טריגר', 'שגיאה');
             } else {
-                handleDeleteError(new Error(result.error?.message || 'שגיאה במחיקת כפתור טריגר'), 'כפתור טריגר');
+                console.error(result.error?.message || 'שגיאה במחיקת כפתור טריגר');
             }
         }
     } catch (error) {
-        handleDeleteError(error, 'כפתור טריגר');
+        console.error('Error deleting trigger button:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
+        } else {
+            console.error('שגיאה במחיקת כפתור טריגר');
+        }
     }
 }
 
@@ -1632,6 +1766,8 @@ function initializeRealTimeValidation() {
 
 // אתחול אוטומטי כשהדף נטען
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔄 Initializing db_extradata page...');
+    
     // שחזור מצב הסקשן העליון
     if (typeof window.restoreAllSectionStates === 'function') {
         window.restoreAllSectionStates();
@@ -1653,13 +1789,59 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('⚠️ Validation system not available');
     }
     
-    });
+    console.log('✅ דף טבלאות עזר אותחל בהצלחה');
+});
 
 // ========================================
 // Export Functions
 // ========================================
 
-// פונקציות לפתיחה/סגירה של סקשנים
+// Export toggle functions
+window.toggleAllSections = function() {
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
+    } else {
+        console.warn('⚠️ toggleTopSection function not available globally');
+    }
+};
+
+window.toggleCurrenciesSection = function() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('currencies');
+    } else {
+        console.warn('⚠️ toggleSection function not available globally');
+    }
+};
+
+window.toggleNoteRelationTypesSection = function() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('note_relation_types');
+    } else {
+        console.warn('⚠️ toggleSection function not available globally');
+    }
+};
+
+// פונקציה לעדכון מספר כפתורי טריגרים
+function updateTriggerButtonsCount() {
+    // ספירת כל הטריגרים
+    const totalTriggers = 10; // סך הכל 10 טריגרים במערכת
+    
+    // ספירת טריגרים פעילים
+    const activeTriggers = 6; // 6 טריגרים פעילים: 2 הגנה + 4 התראות
+    
+    // עדכון מונה הטבלה
+    const countElement = document.getElementById('triggerButtonsCount');
+    if (countElement) {
+        countElement.textContent = `🔘 כפתורי טריגרים: ${totalTriggers} (${activeTriggers} פעילים)`;
+    }
+
+    // עדכון הסטטיסטיקות הכלליות
+    const summaryCountElement = document.getElementById('summaryTriggerButtonsCount');
+    if (summaryCountElement) {
+        summaryCountElement.textContent = totalTriggers;
+    }
+
+    // עדכון הסכום הכללי
     const totalRecordsElement = document.getElementById('totalRecords');
     if (totalRecordsElement) {
         const currentTotal = parseInt(totalRecordsElement.textContent) || 0;
@@ -1750,7 +1932,8 @@ function testTrigger(triggerId) {
     if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('בדיקה', `בדיקת טריגר ${triggerInfo.name} בוצעה בהצלחה`);
     } else {
-        }
+        console.log(`🧪 בדיקת טריגר ${triggerInfo.name} בוצעה בהצלחה`);
+    }
 }
 
 // פונקציה להפעלת טריגר
@@ -1766,7 +1949,8 @@ function activateTrigger(triggerId) {
     if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הפעלה', `טריגר ${triggerInfo.name} הופעל בהצלחה`);
     } else {
-        }
+        console.log(`⚡ טריגר ${triggerInfo.name} הופעל בהצלחה`);
+    }
 
     // עדכון הסטטוס בכרטיס
     const statusElement = document.querySelector(`[onclick*="${triggerId}"]`).closest('.trigger-button-card').querySelector('.trigger-status');

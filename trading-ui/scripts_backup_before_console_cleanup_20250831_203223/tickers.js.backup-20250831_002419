@@ -60,7 +60,7 @@ const tickerTypeColors = {
  * טעינת נתוני מטבעות מהשרת
  */
 async function loadCurrenciesData() {
-    // === LOADCURRENCIESDATA STARTED ===
+    console.log('🔄 === LOADCURRENCIESDATA STARTED ===');
 
     try {
         const response = await fetch('/api/v1/currencies/');
@@ -299,7 +299,53 @@ async function updateAllActiveTradesStatuses() {
     }
 }
 
-// פונקציה לשחזור מצב הסגירה
+// פונקציה לשחזור מצב הסגירה - שימוש בפונקציות הגלובליות
+function restoreTickersSectionState() {
+    // שחזור מצב הסקשן העליון
+    if (typeof window.restoreAllSectionStates === 'function') {
+        window.restoreAllSectionStates();
+    } else {
+        console.warn('⚠️ restoreAllSectionStates function not available globally');
+    }
+    
+    // שחזור מצב הסקשנים הפנימיים
+    if (typeof window.restoreSectionStates === 'function') {
+        window.restoreSectionStates();
+    } else {
+        console.warn('⚠️ restoreSectionStates function not available globally');
+    }
+}
+
+// פונקציות נוספות
+
+// פונקציות לפתיחה/סגירה של סקשנים - משתמשות בפונקציות הגלובליות
+function toggleTopSection() {
+    // קריאה לפונקציה הגלובלית מ-main.js
+    if (typeof window.toggleTopSectionGlobal === 'function') {
+        window.toggleTopSectionGlobal();
+    } else {
+        console.error('❌ toggleTopSectionGlobal function not found in main.js');
+    }
+}
+
+function toggleTickersSection() {
+    if (typeof window.toggleMainSection === 'function') {
+        window.toggleMainSection();
+    } else {
+        console.error('❌ toggleMainSection function not found in main.js');
+    }
+}
+
+// פונקציות נוספות
+
+// ========================================
+// פונקציות מודלים
+// ========================================
+
+/**
+ * הצגת מודל הוספת טיקר
+ */
+function showAddTickerModal() {
     console.log('🔄 הצגת מודל הוספת טיקר');
 
     // עדכון אפשרויות מטבע לפני הצגת הטופס
@@ -325,7 +371,7 @@ async function updateAllActiveTradesStatuses() {
  * הצגת מודל עריכת טיקר
  */
 function showEditTickerModal(id) {
-    // הצגת מודל עריכת טיקר
+    console.log('🔄 הצגת מודל עריכת טיקר:', id);
 
     // מציאת הטיקר לפי ID
     const ticker = tickersData.find(t => t.id == id);
@@ -387,7 +433,7 @@ function showEditTickerModal(id) {
  * מחיקת טיקר - wrapper לפונקציה showDeleteTickerModal
  */
 function deleteTicker(id) {
-    // deleteTicker נקראה עבור ID
+    console.log('🔄 deleteTicker נקראה עבור ID:', id);
     showDeleteTickerModal(id);
 }
 
@@ -395,7 +441,7 @@ function deleteTicker(id) {
  * הצגת מודל מחיקת טיקר
  */
 function showDeleteTickerModal(id) {
-    // הצגת מודל מחיקת טיקר
+    console.log('🔄 הצגת מודל מחיקת טיקר:', id);
 
     // מציאת הטיקר לפי ID
     const ticker = tickersData.find(t => t.id == id);
@@ -447,7 +493,7 @@ function showDeleteTickerModal(id) {
  * Note: updated_at field is NOT set during creation - it's reserved for future pricing system updates
  */
 async function saveTicker() {
-    // שמירת טיקר חדש
+    console.log('🔄 שמירת טיקר חדש');
 
     // ולידציה
     const symbol = document.getElementById('addTickerSymbol').value.trim().toUpperCase();
@@ -556,13 +602,13 @@ async function saveTicker() {
  * 
  * כולל ולידציה של פריטים מקושרים באמצעות המערכת הכללית:
  * - API: /api/v1/linked-items/ticker/{id}
- * - פונקציה: window.showLinkedItemsModal(data, 'ticker', id)
+ * - פונקציה: window.showLinkedItemsWarning('ticker', id)
  * - מונע ביטול כאשר יש פריטים פתוחים
  * 
  * Note: updated_at field is NOT modified during user updates - it's reserved for future pricing system updates
  */
 async function updateTicker() {
-    // עדכון טיקר
+    console.log('🔄 עדכון טיקר');
 
     const id = document.getElementById('editTickerId').value;
     const symbol = document.getElementById('editTickerSymbol').value.trim().toUpperCase();
@@ -614,7 +660,7 @@ async function updateTicker() {
         
         // בדיקת פריטים מקושרים באמצעות המערכת הכללית
         try {
-            // בדיקת פריטים מקושרים בעדכון באמצעות המערכת הכללית
+            console.log('🔧 בדיקת פריטים מקושרים בעדכון באמצעות המערכת הכללית');
             
             // שימוש ב-API הכללי לקבלת פריטים מקושרים
             const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
@@ -645,27 +691,11 @@ async function updateTicker() {
                 console.log('❌ נמצאו פריטים פתוחים - מונע עדכון');
                 
                 // שימוש במערכת הכללית להצגת פריטים מקושרים
-                if (window.showLinkedItemsModal) {
-                    // קריאה ל-showLinkedItemsModal (מערכת כללית)
-                    try {
-                        const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
-                        if (response.ok) {
-                            const data = await response.json();
-                            window.showLinkedItemsModal(data, 'ticker', id);
-                        } else {
-                            throw new Error('Failed to load linked items data');
-                        }
-                    } catch (linkedError) {
-                        console.error('❌ Error loading linked items:', linkedError);
-                        if (window.showWarningNotification) {
-                            window.showWarningNotification(
-                                'לא ניתן לבטל טיקר',
-                                `לא ניתן לבטל את הטיקר ${originalTicker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`
-                            );
-                        }
-                    }
+                if (window.showLinkedItemsWarning) {
+                    console.log('🔧 קריאה ל-showLinkedItemsWarning (מערכת כללית)');
+                    window.showLinkedItemsWarning('ticker', id);
                 } else {
-                    console.error('❌ showLinkedItemsModal לא זמינה');
+                    console.error('❌ showLinkedItemsWarning לא זמינה');
                     // Fallback - הצגת הודעת אזהרה
                     if (window.showWarningNotification) {
                         window.showWarningNotification(
@@ -845,7 +875,7 @@ async function updateAllTickerStatuses() {
  * 
  * משתמש במערכת הכללית לקבלת פריטים מקושרים:
  * - API: /api/v1/linked-items/ticker/{id}
- * - פונקציה: window.showLinkedItemsModal(data, 'ticker', id)
+ * - פונקציה: window.showLinkedItemsWarning('ticker', id)
  * - מודל: window.showLinkedItemsModal (מעוצב עם כל המידע)
  */
 async function performCancelTickerWithLinkedItemsCheck(id) {
@@ -893,27 +923,11 @@ async function performCancelTickerWithLinkedItemsCheck(id) {
             console.log('❌ נמצאו פריטים פתוחים - מציג חלון מקושרים');
             
             // שימוש במערכת הכללית להצגת פריטים מקושרים
-            if (window.showLinkedItemsModal) {
-                console.log('🔧 קריאה ל-showLinkedItemsModal (מערכת כללית)');
-                try {
-                    const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        window.showLinkedItemsModal(data, 'ticker', id);
-                    } else {
-                        throw new Error('Failed to load linked items data');
-                    }
-                } catch (linkedError) {
-                    console.error('❌ Error loading linked items:', linkedError);
-                    if (window.showWarningNotification) {
-                        window.showWarningNotification(
-                            'לא ניתן לבטל טיקר',
-                            `לא ניתן לבטל את הטיקר ${ticker.symbol} כי יש לו טריידים או תכנונים פתוחים. יש לסגור אותם קודם.`
-                        );
-                    }
-                }
+            if (window.showLinkedItemsWarning) {
+                console.log('🔧 קריאה ל-showLinkedItemsWarning (מערכת כללית)');
+                window.showLinkedItemsWarning('ticker', id);
             } else {
-                console.error('❌ showLinkedItemsModal לא זמינה');
+                console.error('❌ showLinkedItemsWarning לא זמינה');
                 // Fallback - הצגת הודעת אזהרה
                 if (window.showWarningNotification) {
                     window.showWarningNotification(
@@ -1000,18 +1014,62 @@ async function performCancelTicker(id) {
 }
 
 /**
+ * הפעלה מחדש של טיקר מבוטל
+ * 
+ * @param {string|number} tickerId - מזהה הטיקר
+ */
+async function reactivateTicker(tickerId) {
+    try {
+        console.log('✅ הפעלה מחדש של טיקר:', tickerId);
+
+        // מציאת הטיקר בנתונים
+        const ticker = tickersData.find(t => t.id == tickerId);
+        if (!ticker) {
+            console.error('Ticker not found:', tickerId);
+            throw new Error('טיקר לא נמצא');
+        }
+
+        const response = await fetch(`/api/v1/tickers/${tickerId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: 'active'
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log('✅ Ticker reactivated successfully');
+
+        // הצגת הודעת הצלחה
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('טיקר הופעל מחדש בהצלחה!');
+        } else if (typeof window.showNotification === 'function') {
+            window.showNotification('טיקר הופעל מחדש בהצלחה!', 'success');
+        }
+
+        // רענון הטבלה
+        await loadTickersData();
+
+    } catch (error) {
+        console.error('❌ Error reactivating ticker:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בהפעלה מחדש', error.message);
+        } else if (typeof window.showNotification === 'function') {
+            window.showNotification('שגיאה בהפעלה מחדש', 'error');
+        }
+    }
+}
+
+/**
  * אישור מחיקת טיקר
  */
 async function confirmDeleteTicker(id) {
-    // אישור מחיקת טיקר
-
-    // בדיקת פריטים מקושרים לפני מחיקה
-    if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
-        const hasLinkedItems = await window.checkLinkedItemsBeforeDelete(id);
-        if (hasLinkedItems) {
-            return; // הפונקציה תטפל בהצגת המודול
-        }
-    }
+    console.log('🔄 אישור מחיקת טיקר:', id);
 
     // מציאת הטיקר לפני מחיקה כדי להציג פרטים בהודעה
     const ticker = tickersData.find(t => t.id == id);
@@ -1049,23 +1107,17 @@ async function confirmDeleteTicker(id) {
                     (errorData.error.message.includes('linked items') ||
                         errorData.error.message.includes('Cannot delete ticker with linked items'))) {
 
-                    console.log('🔄 נמצאו פריטים מקושרים - קורא ל-showLinkedItemsModal');
-                    console.log('🔄 showLinkedItemsModal זמין:', typeof window.showLinkedItemsModal === 'function');
+                    console.log('🔄 נמצאו פריטים מקושרים - קורא ל-showLinkedItemsWarning');
+                    console.log('🔄 showLinkedItemsWarning זמין:', typeof showLinkedItemsWarning === 'function');
+                    console.log('🔄 window.showLinkedItemsWarning זמין:', typeof window.showLinkedItemsWarning === 'function');
 
                     // הצגת אזהרת פריטים מקושרים לפני מחיקה
                     console.log('🔄 מנסה לקרוא לפונקציה...');
                     try {
-                        if (window.showLinkedItemsModal) {
-                            // טעינת נתוני פריטים מקושרים
-                            const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
-                            if (response.ok) {
-                                const data = await response.json();
-                                window.showLinkedItemsModal(data, 'ticker', id);
-                            } else {
-                                throw new Error('Failed to load linked items data');
-                            }
+                        if (window.showLinkedItemsWarning) {
+                            window.showLinkedItemsWarning('ticker', id);
                         } else {
-                            console.error('❌ showLinkedItemsModal function not found');
+                            console.error('❌ showLinkedItemsWarning function not found');
                         }
                     } catch (error) {
                         console.error('❌ שגיאה בקריאה לפונקציה:', error);
@@ -1101,44 +1153,6 @@ async function confirmDeleteTicker(id) {
 // פונקציות מודל פריטים מקושרים
 // ========================================
 
-/**
- * בדיקת פריטים מקושרים לפני מחיקה
- */
-async function checkLinkedItemsBeforeDelete(tickerId) {
-    try {
-        const response = await fetch(`/api/v1/linked-items/ticker/${tickerId}`);
-        
-        if (!response.ok) {
-            // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
-            return false;
-        }
-
-        const linkedItemsData = await response.json();
-        const childEntities = linkedItemsData.child_entities || [];
-        const parentEntities = linkedItemsData.parent_entities || [];
-        
-        // בדיקה רק אם יש פריטים שמקושרים אל הטיקר (child entities)
-        // parent entities הם פריטים שהטיקר מקושר אליהם (מטבע) - לא רלוונטי למחיקה
-        if (childEntities.length > 0) {
-            // יש פריטים מקושרים - הצגת חלון מקושרים
-            if (typeof window.showLinkedItemsModal === 'function') {
-                window.showLinkedItemsModal(linkedItemsData, 'ticker', tickerId);
-                return true;
-            } else {
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification('אזהרה', 'יש פריטים מקושרים לטיקר זה', 'warning');
-                }
-                return true;
-            }
-        }
-
-        return false;
-    } catch (error) {
-        console.error('שגיאה בבדיקת פריטים מקושרים:', error);
-        return false;
-    }
-}
-
 
 
 // ========================================
@@ -1154,44 +1168,44 @@ async function checkLinkedItemsBeforeDelete(tickerId) {
  * טעינת נתוני טיקרים - גרסה פשוטה
  */
 async function loadTickersData() {
-    // === LOADTICKERSDATA STARTED ===
-    // loadTickersData נקראה
+    console.log('🔄 === LOADTICKERSDATA STARTED ===');
+    console.log('🔄 loadTickersData נקראה');
 
     try {
         // טעינת מטבעות אם עוד לא נטענו
         if (!window.currenciesLoaded) {
-            // טוען מטבעות
+            console.log('🔄 טוען מטבעות...');
             await loadCurrenciesData();
         }
 
-        // מתחיל fetch ל-/api/v1/tickers/
+        console.log('🔄 מתחיל fetch ל-/api/v1/tickers/');
         const response = await fetch('/api/v1/tickers/');
-        // תגובה מהשרת
+        console.log('🔄 תגובה מהשרת:', response.status, response.statusText);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        // נתונים מהשרת
+        console.log('🔄 נתונים מהשרת:', data);
 
         // שמירת הנתונים
         tickersData = data.data || data;
         window.tickersData = tickersData;
-        // tickersData נשמר
-        // tickersData תוכן
+        console.log('🔄 tickersData נשמר:', tickersData.length, 'טיקרים');
+        console.log('🔄 tickersData תוכן:', tickersData);
 
         // עדכון שדה active_trades
-        // קורא ל-updateActiveTradesField
+        console.log('🔄 קורא ל-updateActiveTradesField');
         await updateActiveTradesField();
 
         // עדכון הטבלה (אחרי עדכון active_trades)
-        // קורא ל-updateTickersTable
-        // updateTickersTable זמין
+        console.log('🔄 קורא ל-updateTickersTable');
+        console.log('🔄 updateTickersTable זמין:', typeof updateTickersTable === 'function');
         updateTickersTable(tickersData);
 
         // עדכון סטטיסטיקות סיכום
-        // קורא ל-updateTickersSummaryStats
+        console.log('🔄 קורא ל-updateTickersSummaryStats');
         console.log('🔄 updateTickersSummaryStats זמין:', typeof updateTickersSummaryStats === 'function');
         updateTickersSummaryStats(tickersData);
 
@@ -1243,16 +1257,11 @@ function updateTickersSummaryStats(tickers) {
             oldestUpdate = oldest.toLocaleDateString('he-IL');
         }
 
-        // עדכון השדות ב-HTML - בדיקה אם האלמנטים קיימים
-        const totalTickersElement = document.getElementById('totalTickers');
-        const activeTickersElement = document.getElementById('activeTickers');
-        const latestUpdateElement = document.getElementById('latestUpdate');
-        const oldestUpdateElement = document.getElementById('oldestUpdate');
-        
-        if (totalTickersElement) totalTickersElement.textContent = totalTickers;
-        if (activeTickersElement) activeTickersElement.textContent = activeTickers;
-        if (latestUpdateElement) latestUpdateElement.textContent = latestUpdate;
-        if (oldestUpdateElement) oldestUpdateElement.textContent = oldestUpdate;
+        // עדכון השדות ב-HTML
+        document.getElementById('totalTickers').textContent = totalTickers;
+        document.getElementById('activeTickers').textContent = activeTickers;
+        document.getElementById('latestUpdate').textContent = latestUpdate;
+        document.getElementById('oldestUpdate').textContent = oldestUpdate;
 
         console.log('✅ סטטיסטיקות סיכום עודכנו:', {
             totalTickers,
@@ -1276,29 +1285,28 @@ function updateTickersTable(tickers) {
     console.log('🔄 tickers.length:', tickers ? tickers.length : 'undefined');
 
     try {
-        // בדיקה אם אנחנו בדף הטיקרים
-        const tickersTable = document.querySelector('table[data-table-type="tickers"]');
-        const tickersContainer = document.getElementById('tickersContainer');
-        
-        if (!tickersTable && !tickersContainer) {
-            console.log('🔄 לא נמצאה טבלת טיקרים - כנראה לא בדף הטיקרים');
-            return;
-        }
-
         // מציאת ה-tbody
         let tbody = document.querySelector('table[data-table-type="tickers"] tbody');
         console.log('🔄 tbody element:', tbody);
 
         if (!tbody) {
             console.log('🔄 מנסה דרך הקונטיינר...');
-            if (tickersContainer) {
-                tbody = tickersContainer.querySelector('tbody');
+            const container = document.getElementById('tickersContainer');
+            if (container) {
+                tbody = container.querySelector('tbody');
                 console.log('🔄 tbody דרך קונטיינר:', tbody);
             }
         }
 
         if (!tbody) {
-            console.warn('⚠️ לא נמצא tbody element - כנראה לא בדף הטיקרים');
+            console.error('❌ לא נמצא tbody element!');
+            console.log('🔄 מנסה למצוא את הטבלה...');
+            const table = document.querySelector('table[data-table-type="tickers"]');
+            console.log('🔄 table element:', table);
+            if (table) {
+                console.log('🔄 table.innerHTML:', table.innerHTML);
+            }
+            console.log('🔄 updateTickersTable מסתיים ללא tbody');
             return;
         }
 
@@ -1348,7 +1356,7 @@ function updateTickersTable(tickers) {
                     </td>
                     <td class="actions-cell">
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-info" onclick="showLinkedItemsForTicker(${ticker.id})" title="פריטים מקושרים">🔗</button>
+                            <button class="btn btn-outline-info" onclick="window.showLinkedItemsWarning('ticker', ${ticker.id})" title="פריטים מקושרים">🔗</button>
                             <button class="btn btn-outline-secondary" onclick="window.showEditTickerModal(${ticker.id})" title="ערוך">✏️</button>
                             <button class="btn btn-outline-danger" onclick="window.cancelTicker(${ticker.id})" title="בטל טיקר" ${ticker.status === 'canceled' ? 'disabled' : ''}><span class="cancel-icon">X</span></button>
                         </div>
@@ -1409,34 +1417,11 @@ window.showDeleteTickerModal = showDeleteTickerModal;
 window.saveTicker = saveTicker;
 window.updateTicker = updateTicker;
 window.confirmDeleteTicker = confirmDeleteTicker;
-window.checkLinkedItemsBeforeDelete = checkLinkedItemsBeforeDelete;  // בדיקת אובייקטים מקושרים למחיקה
 
 
 
 // פונקציות מודל פריטים מקושרים - שימוש במערכת הכללית
-/**
- * הצגת פריטים מקושרים לטיקר
- */
-async function showLinkedItemsForTicker(tickerId) {
-    if (window.showLinkedItemsModal) {
-        try {
-            const response = await fetch(`/api/v1/linked-items/ticker/${tickerId}`);
-            if (response.ok) {
-                const data = await response.json();
-                window.showLinkedItemsModal(data, 'ticker', tickerId);
-            } else {
-                throw new Error('Failed to load linked items data');
-            }
-        } catch (error) {
-            console.error('❌ Error loading linked items:', error);
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('שגיאה בטעינת פריטים מקושרים', 'error');
-            }
-        }
-    } else {
-        console.error('❌ showLinkedItemsModal לא זמינה');
-    }
-}
+// window.showLinkedItemsWarning - פונקציה כללית זמינה מ-linked-items.js
 
 // ===== פונקציות סידור =====
 
@@ -1500,17 +1485,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // אתחול וולידציה - שימוש בפונקציות הגלובליות
     if (window.initializeValidation) {
-        // בדיקה אם הטפסים קיימים לפני אתחול וולידציה
-        const addTickerForm = document.getElementById('addTickerForm');
-        const editTickerForm = document.getElementById('editTickerForm');
-        
-        if (addTickerForm) {
-            window.initializeValidation('addTickerForm', {});
-        }
-        
-        if (editTickerForm) {
-            window.initializeValidation('editTickerForm', {});
-        }
+        // שימוש בוולידציה הגלובלית ללא כללים מותאמים
+        window.initializeValidation('addTickerForm', {});
+        window.initializeValidation('editTickerForm', {});
     }
 
     // שחזור מצב סידור
@@ -1531,18 +1508,12 @@ window.addEventListener('load', function () {
         console.log('🔄 tryLoadData נקראה');
         console.log(`🔄 ניסיון ${attempts + 1} לטעינת נתונים...`);
         
-        // בדיקה אם אנחנו בדף הטיקרים
+        // בדיקה מפורטת יותר
         const table = document.querySelector('table[data-table-type="tickers"]');
-        const container = document.getElementById('tickersContainer');
-        
         console.log('🔄 table element:', table);
-        console.log('🔄 container element:', container);
         
-        // אם אין טבלת טיקרים, כנראה לא בדף הטיקרים
-        if (!table && !container) {
-            console.log('🔄 לא נמצאה טבלת טיקרים - כנראה לא בדף הטיקרים, דילוג על טעינת נתונים');
-            return;
-        }
+        const container = document.getElementById('tickersContainer');
+        console.log('🔄 container element:', container);
         
         const tbody = document.querySelector('table[data-table-type="tickers"] tbody') || 
                      document.getElementById('tickersContainer')?.querySelector('tbody');
@@ -1557,7 +1528,9 @@ window.addEventListener('load', function () {
             attempts++;
             setTimeout(tryLoadData, 500);
         } else {
-            console.warn('⚠️ לא הצלחתי למצוא את הטבלה אחרי 10 ניסיונות - כנראה לא בדף הטיקרים');
+            console.error('❌ לא הצלחתי למצוא את הטבלה אחרי 10 ניסיונות');
+            console.log('🔄 מנסה לטעון נתונים בכל מקרה...');
+            loadTickersData();
         }
     }
     

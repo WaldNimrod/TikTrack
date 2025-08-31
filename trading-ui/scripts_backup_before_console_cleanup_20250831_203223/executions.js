@@ -50,19 +50,19 @@ function editExecution(id) {
 }
 
 function deleteExecution(id) {
-    // deleteExecution called with id
-    // window.showDeleteWarning exists check
+    console.log('🔧 deleteExecution called with id:', id);
+    console.log('🔧 window.showDeleteWarning exists:', typeof window.showDeleteWarning === 'function');
     
     // שימוש במערכת הגלובלית למחיקה
     if (typeof window.showDeleteWarning === 'function') {
-        // Using global showDeleteWarning
+        console.log('🔧 Using global showDeleteWarning');
         window.showDeleteWarning('executions', id, 'עסקה', async () => {
-            // Delete confirmed, calling confirmDeleteExecution
+            console.log('🔧 Delete confirmed, calling confirmDeleteExecution');
             // קריאה לפונקציה המקומית לאחר אישור
             await confirmDeleteExecution(id);
         }, null);
     } else {
-        // Using fallback - global system not available
+        console.log('🔧 Using fallback - global system not available');
         // גיבוי למקרה שהמערכת הגלובלית לא זמינה
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מערכת מחיקה לא זמינה');

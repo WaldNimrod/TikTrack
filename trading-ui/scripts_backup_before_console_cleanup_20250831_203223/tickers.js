@@ -60,7 +60,7 @@ const tickerTypeColors = {
  * טעינת נתוני מטבעות מהשרת
  */
 async function loadCurrenciesData() {
-    // === LOADCURRENCIESDATA STARTED ===
+    console.log('🔄 === LOADCURRENCIESDATA STARTED ===');
 
     try {
         const response = await fetch('/api/v1/currencies/');
@@ -325,7 +325,7 @@ async function updateAllActiveTradesStatuses() {
  * הצגת מודל עריכת טיקר
  */
 function showEditTickerModal(id) {
-    // הצגת מודל עריכת טיקר
+    console.log('🔄 הצגת מודל עריכת טיקר:', id);
 
     // מציאת הטיקר לפי ID
     const ticker = tickersData.find(t => t.id == id);
@@ -387,7 +387,7 @@ function showEditTickerModal(id) {
  * מחיקת טיקר - wrapper לפונקציה showDeleteTickerModal
  */
 function deleteTicker(id) {
-    // deleteTicker נקראה עבור ID
+    console.log('🔄 deleteTicker נקראה עבור ID:', id);
     showDeleteTickerModal(id);
 }
 
@@ -395,7 +395,7 @@ function deleteTicker(id) {
  * הצגת מודל מחיקת טיקר
  */
 function showDeleteTickerModal(id) {
-    // הצגת מודל מחיקת טיקר
+    console.log('🔄 הצגת מודל מחיקת טיקר:', id);
 
     // מציאת הטיקר לפי ID
     const ticker = tickersData.find(t => t.id == id);
@@ -447,7 +447,7 @@ function showDeleteTickerModal(id) {
  * Note: updated_at field is NOT set during creation - it's reserved for future pricing system updates
  */
 async function saveTicker() {
-    // שמירת טיקר חדש
+    console.log('🔄 שמירת טיקר חדש');
 
     // ולידציה
     const symbol = document.getElementById('addTickerSymbol').value.trim().toUpperCase();
@@ -562,7 +562,7 @@ async function saveTicker() {
  * Note: updated_at field is NOT modified during user updates - it's reserved for future pricing system updates
  */
 async function updateTicker() {
-    // עדכון טיקר
+    console.log('🔄 עדכון טיקר');
 
     const id = document.getElementById('editTickerId').value;
     const symbol = document.getElementById('editTickerSymbol').value.trim().toUpperCase();
@@ -614,7 +614,7 @@ async function updateTicker() {
         
         // בדיקת פריטים מקושרים באמצעות המערכת הכללית
         try {
-            // בדיקת פריטים מקושרים בעדכון באמצעות המערכת הכללית
+            console.log('🔧 בדיקת פריטים מקושרים בעדכון באמצעות המערכת הכללית');
             
             // שימוש ב-API הכללי לקבלת פריטים מקושרים
             const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
@@ -646,7 +646,7 @@ async function updateTicker() {
                 
                 // שימוש במערכת הכללית להצגת פריטים מקושרים
                 if (window.showLinkedItemsModal) {
-                    // קריאה ל-showLinkedItemsModal (מערכת כללית)
+                    console.log('🔧 קריאה ל-showLinkedItemsModal (מערכת כללית)');
                     try {
                         const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
                         if (response.ok) {
@@ -1003,7 +1003,7 @@ async function performCancelTicker(id) {
  * אישור מחיקת טיקר
  */
 async function confirmDeleteTicker(id) {
-    // אישור מחיקת טיקר
+    console.log('🔄 אישור מחיקת טיקר:', id);
 
     // בדיקת פריטים מקושרים לפני מחיקה
     if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
@@ -1154,44 +1154,44 @@ async function checkLinkedItemsBeforeDelete(tickerId) {
  * טעינת נתוני טיקרים - גרסה פשוטה
  */
 async function loadTickersData() {
-    // === LOADTICKERSDATA STARTED ===
-    // loadTickersData נקראה
+    console.log('🔄 === LOADTICKERSDATA STARTED ===');
+    console.log('🔄 loadTickersData נקראה');
 
     try {
         // טעינת מטבעות אם עוד לא נטענו
         if (!window.currenciesLoaded) {
-            // טוען מטבעות
+            console.log('🔄 טוען מטבעות...');
             await loadCurrenciesData();
         }
 
-        // מתחיל fetch ל-/api/v1/tickers/
+        console.log('🔄 מתחיל fetch ל-/api/v1/tickers/');
         const response = await fetch('/api/v1/tickers/');
-        // תגובה מהשרת
+        console.log('🔄 תגובה מהשרת:', response.status, response.statusText);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        // נתונים מהשרת
+        console.log('🔄 נתונים מהשרת:', data);
 
         // שמירת הנתונים
         tickersData = data.data || data;
         window.tickersData = tickersData;
-        // tickersData נשמר
-        // tickersData תוכן
+        console.log('🔄 tickersData נשמר:', tickersData.length, 'טיקרים');
+        console.log('🔄 tickersData תוכן:', tickersData);
 
         // עדכון שדה active_trades
-        // קורא ל-updateActiveTradesField
+        console.log('🔄 קורא ל-updateActiveTradesField');
         await updateActiveTradesField();
 
         // עדכון הטבלה (אחרי עדכון active_trades)
-        // קורא ל-updateTickersTable
-        // updateTickersTable זמין
+        console.log('🔄 קורא ל-updateTickersTable');
+        console.log('🔄 updateTickersTable זמין:', typeof updateTickersTable === 'function');
         updateTickersTable(tickersData);
 
         // עדכון סטטיסטיקות סיכום
-        // קורא ל-updateTickersSummaryStats
+        console.log('🔄 קורא ל-updateTickersSummaryStats');
         console.log('🔄 updateTickersSummaryStats זמין:', typeof updateTickersSummaryStats === 'function');
         updateTickersSummaryStats(tickersData);
 

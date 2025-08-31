@@ -2467,8 +2467,15 @@ class HeaderSystem {
     }
 
     // הפעלת הפילטרים המעודכנים
-    if (window.filterSystem) {
+    if (window.filterSystem && window.filterSystem.resetFilters) {
       window.filterSystem.resetFilters();
+    } else {
+      // Fallback - הצגת כל הרשומות
+      const visibleContainers = getVisibleContainers();
+      for (const containerId of visibleContainers) {
+        showAllRecordsInTable(containerId);
+      }
+    }
     }
   }
 
@@ -2502,8 +2509,14 @@ class HeaderSystem {
     }
 
     // הפעלת הפילטרים המעודכנים
-    if (window.filterSystem) {
+    if (window.filterSystem && window.filterSystem.resetFilters) {
       window.filterSystem.resetFilters();
+    } else {
+      // Fallback - הצגת כל הרשומות
+      const visibleContainers = getVisibleContainers();
+      for (const containerId of visibleContainers) {
+        showAllRecordsInTable(containerId);
+      }
     }
   }
 
@@ -3544,15 +3557,15 @@ function isDateInRange(dateString, dateRange) {
         startDate = new Date(today.getTime() - today.getDay() * 24 * 60 * 60 * 1000);
         startDate.setHours(0, 0, 0, 0);
         endDate = today;
-        console.log(`🔍 השבוע range: ${startDate.toISOString()} - ${endDate.toISOString()} (dayOfWeek: ${today.getDay()})`);
+        console.log(`🔍 השבוע range: ${startDate.toISOString()} - ${endDate.toISOString()} (start of week)`);
         break;
       
       case 'שבוע':
         // 7 ימים אחרונים
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - 7);
+        startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
         startDate.setHours(0, 0, 0, 0);
         endDate = today;
+        console.log(`🔍 שבוע range: ${startDate.toISOString()} - ${endDate.toISOString()} (7 days back)`);
         break;
       
       case 'MTD':

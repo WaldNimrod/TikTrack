@@ -387,7 +387,7 @@ async function initializeCurrenciesPage() {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🔄 === DOM CONTENT LOADED (CURRENCIES) ===');
+      // === DOM CONTENT LOADED (CURRENCIES) ===
 
   // שחזור מצב הסקשנים
   if (typeof window.restoreCurrenciesSectionState === 'function') {
@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.error('❌ loadCurrenciesData function not found');
   }
 
-  console.log('✅ Currencies page initialization completed');
+      // Currencies page initialization completed
 });
 
 // ייצוא פונקציות גלובליות

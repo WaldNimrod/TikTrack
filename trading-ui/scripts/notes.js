@@ -191,11 +191,11 @@ window.restoreNotesSectionState = restoreNotesSectionState;
 
 // פונקציה לטעינת נתונים
 async function loadNotesData() {
-  console.log('🔄 loadNotesData נקראה');
+      // loadNotesData נקראה
 
   try {
     // קריאה לשרת לקבלת נתוני הערות
-    console.log('📡 קריאה לשרת לקבלת נתוני הערות...');
+    // קריאה לשרת לקבלת נתוני הערות
     const response = await fetch('/api/v1/notes/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -203,7 +203,7 @@ async function loadNotesData() {
 
     const responseData = await response.json();
     const notes = responseData.data || responseData;
-    console.log('📊 נתונים התקבלו מהשרת:', notes.length, 'הערות');
+    // נתונים התקבלו מהשרת
 
     // בדיקה אם הנתונים ריקים או לא תקינים
     if (!notes || notes.length === 0) {
@@ -262,9 +262,9 @@ async function loadNotesData() {
     window.tickersData = tickers;
 
     // עדכון הטבלה עם הנתונים הנוספים
-    console.log('🎨 עדכון הטבלה עם', notes.length, 'הערות');
+    // עדכון הטבלה עם הערות
     updateNotesTable(notes, accounts, trades, tradePlans, tickers);
-    console.log('✅ loadNotesData הושלם בהצלחה');
+    // loadNotesData הושלם בהצלחה
 
   } catch (error) {
     console.error('❌ שגיאה בטעינת נתונים:', error);
@@ -296,7 +296,7 @@ async function loadNotesData() {
 
 // פונקציה לעדכון הטבלה
 function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], tickers = []) {
-  console.log('🔄 updateNotesTable נקראה עם', notes.length, 'הערות');
+      // updateNotesTable נקראה עם הערות
   const tbody = document.querySelector('#notesTable tbody');
   if (!tbody) {
     console.error('❌ לא נמצא tbody בטבלה');
@@ -1529,7 +1529,7 @@ function sortTable(columnIndex) {
 function restoreSortState() {
   // בדיקה אם יש נתונים לפני שחזור סידור
   if (!window.notesData || window.notesData.length === 0) {
-    console.log('📝 אין נתונים לשחזור סידור - ממתין לטעינת נתונים');
+    // אין נתונים לשחזור סידור - ממתין לטעינת נתונים
     return;
   }
   

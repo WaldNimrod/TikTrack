@@ -79,7 +79,7 @@ function toggleCashFlowsSection() {
         sectionBody.style.display = 'block';
         toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> הסתר תזרימי מזומנים';
         toggleBtn.title = 'הסתר תזרימי מזומנים';
-        console.log('🔼 סקשן תזרימי מזומנים נפתח');
+        // סקשן תזרימי מזומנים נפתח
     }
 
     // שמירת המצב
@@ -92,7 +92,7 @@ function restoreCashFlowsSectionState() {
     
     const savedState = localStorage.getItem('cashFlowsSectionState');
     if (!savedState) {
-        console.log('📝 אין מצב שמור לסקשן תזרימי מזומנים');
+        // אין מצב שמור לסקשן תזרימי מזומנים
         return;
     }
 
@@ -119,13 +119,13 @@ function restoreCashFlowsSectionState() {
         sectionBody.style.display = 'none';
         toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> הצג תזרימי מזומנים';
         toggleBtn.title = 'הצג תזרימי מזומנים';
-        console.log('🔽 שחזור מצב סגור לסקשן תזרימי מזומנים');
+        // שחזור מצב סגור לסקשן תזרימי מזומנים
     } else {
         // שחזור מצב פתוח
         sectionBody.style.display = 'block';
         toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> הסתר תזרימי מזומנים';
         toggleBtn.title = 'הסתר תזרימי מזומנים';
-        console.log('🔼 שחזור מצב פתוח לסקשן תזרימי מזומנים');
+        // שחזור מצב פתוח לסקשן תזרימי מזומנים
     }
 }
 

@@ -1389,11 +1389,11 @@ async function updateTickerFromTradePlan(tradePlanId) {
         // טוען מחיר לטיקר ID
         try {
           const tickerResponse = await fetch(`/api/v1/tickers/${tickerId}`);
-          console.log('🔍 תגובת API:', tickerResponse.status, tickerResponse.ok);
+          // תגובת API
           if (tickerResponse.ok) {
             const tickerData = await tickerResponse.json();
             const ticker = tickerData.data;
-            console.log('🔍 נתוני טיקר:', ticker);
+            // נתוני טיקר
             
             // עדכון מחיר נוכחי
             const currentPriceElement = document.getElementById('addTradeCurrentPrice');
@@ -2020,7 +2020,7 @@ window.addEditBuySell = addEditBuySell;                    // הוספת עסק�
 function updateTableStats() {
   // בדיקה אם אנחנו בדף הנכון
   if (!document.querySelector('#tradesTable')) {
-    console.log('🔍 Not on trades page, skipping stats update');
+    // Not on trades page, skipping stats update
     return;
   }
 
@@ -2319,7 +2319,7 @@ function applyStatusFilterToTrades(selectedStatuses) {
       return englishStatuses.includes(tradeStatus);
     });
 
-    console.log(`✅ Status filter applied - ${filteredTrades.length} trades found`);
+    // Status filter applied
   }
 
   // עדכון הטבלה עם הנתונים המסוננים
